@@ -81,8 +81,8 @@
 #include	<vecstr.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<ascii.h>		/* LIBU */
-#include	<field.h>		/* LIBUC */
 #include	<fieldterms.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<bfile.h>		/* LIBUC */
 #include	<psem.h>		/* LIBUC */
@@ -214,19 +214,19 @@ struct disp_thr {
 } ; /* end struct */
 
 struct disp_head {
+	ptm		*mxp ;		/* nbusy-mutex */
+	ptc		*cvp ;		/* condition variable */
 	DISP_THR	*threads ;	/* thread-privte data */
 	DISP_ARGS	a ;		/* arguments */
 	tagq		wq ;		/* work-queue */
 	psem		sem_wq ;	/* work-queue semaphore */
 	psem		sem_done ;	/* done-semaphore */
-	ptm		*mxp ;		/* nbusy-mutex */
-	ptc		*cvp ;		/* condition variable */
 	vol int		f_exit ;	/* assumed atomic */
 	vol int		f_done ;	/* assumed atomic */
 	vol int		f_ready ;	/* ready for workers to access */
 	int		qlen ;		/* max work-queue length */
 	int		nthr ;		/* bumber of threads configured */
-} ; /* end struct (disp_head)  
+} ; /* end struct (disp_head) */
 
 
 /* forward references */
@@ -305,6 +305,8 @@ local int	textlook_checkdisp(TL *,int,SK *,rtags *) noex ;
 local int	subinfo_start(SI *) noex ;
 local int	subinfo_finish(SI *) noex ;
 
+local int	disp_ctor(DISP *) noex ;
+local int	disp_dtor(DISP *) noex ;
 local int	disp_start(DISP *,DISP_ARGS *) noex ;
 local int	disp_starter(DISP *) noex ;
 local int	disp_finish(DISP *,int) noex ;
@@ -335,8 +337,8 @@ local int	vcmpthreads(DISP_THR **,DISP_THR **) noex ;
 /* local variables */
 
 static char		wterms[fieldterms_termsize] ;
-
-constexpr bool		f_singleword = CF_SINGLEWORD ;
+cint			nchars = (UCHAR_MAX + 1) ;
+cbool			f_singleword = CF_SINGLEWORD ;
 
 
 /* exported variables */
@@ -485,6 +487,7 @@ int textlook_curend(TL *op,TL_CUR *curp) noex {
 	if ((rs = textlook_magic(op,curp)) >= 0) {
 	    rs = SR_NOTOPEN ;
 	    if (curp->magval == TEXTLOOK_MAGIC) {
+		rs = SR_OK ;
 		{
 		    rs1 = rtags_curend(&curp->tags,&curp->tcur) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -516,6 +519,7 @@ int textlook_curlook(TL *op,TL_CUR *curp,int qo,cchar **qsp) noex {
 	if ((rs = textlook_magic(op,curp,qsp)) >= 0) {
 	    rs = SR_NOTOPEN ;
 	    if (curp->magval == TEXTLOOK_MAGIC) {
+		rs = SR_OK ;
 	        /* as a curtesy, dump any prior results */
 	        if (curp->ntags > 0) {
 	            curp->ntags = 0 ;
@@ -569,7 +573,7 @@ int textlook_curread(TL *op,TL_CUR *curp,TL_TAG *tagp,char *bp,int bl) noex {
 			fl = rs ;
 	                tagp->recoff = rt.recoff ;
 	                tagp->reclen = rt.reclen ;
-	            }
+	            } /* end if (rtags_curenum) */
 	        } else {
 	            rs = SR_NOTFOUND ;
 	        }
@@ -719,11 +723,11 @@ local int textlook_havekeys(TL *op,TI_TAG *tagp,cc *fp,int fl,
 	int		f = false ;
 	if (tagp->reclen > 0) {
 	    SK_POP	pkeys ;
-	    cint	f_prefix = (qo & TEXTLOOK_OPREFIX) ;
-	    if ((rs = searchkeys_popbegin(skp,&pkeys,f_prefix)) >= 0) {
+	    cint	topt = (qo & TEXTLOOK_OPREFIX) ;
+	    if ((rs = searchkeys_popbegin(skp,&pkeys,topt)) >= 0) {
 	        if (rs > 0) {
 	            cchar	*fn = fp ;
-	            if ((fn[0] == '\0') && (op->sfn != np)) {
+	            if ((fn[0] == '\0') && op->sfn) {
 	                fn = op->sfn ;
 	            }
 	            if (fn[0] != '\0') {
@@ -1038,47 +1042,86 @@ local int subinfo_finish(SI *sip) noex {
 	return rs ;
 } /* end subroutine (subinfo_finish) */
 
+local int disp_ctor(DISP *dop) noex {
+    	cnullptr	np{} ;
+    	cnothrow	nt{} ;
+    	int		rs = SR_FAULT ;
+    	if (dop) {
+	    memclear(dop) ;
+	    rs = SR_NOMEM ;
+	    if ((dop->mxp = new(nt) ptm) != np) {
+	        if ((dop->cvp = new(nt) ptc) != np) {
+		    rs = SR_OK ;
+	        } /* end if (new-ptm) */
+		if (rs < 0) {
+	    	    delete dop->mxp ;
+		    dop->mxp = nullptr ;
+		} /* end if (error) */
+	    } /* end if (new-ptm) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (disp_ctor) */
+
+local int disp_dtor(DISP *dop) noex {
+    	int		rs = SR_FAULT ;
+    	if (dop) {
+	    rs = SR_OK ;
+	    if (dop->cvp) {
+	    	delete dop->cvp ;
+		dop->cvp = nullptr ;
+	    }
+	    if (dop->mxp) {
+	    	delete dop->mxp ;
+		dop->mxp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (disp_dtor) */
+
 local int disp_start(DISP *dop,DISP_ARGS *dap) noex {
 	cint		qlen = TEXTLOOK_QLEN ;
-	int		rs = SR_FAULT ;
-	if (dop) ylikely {
-	    ptm *mxp = &dop->mx ;
-	    memclear(dop) ;
+	int		rs ;
+	if ((rs = disp_ctor(dop)) >= 0) ylikely {
+	    ptm *mxp = dop->mxp ;
 	    dop->a = *dap ;
 	    dop->nthr = dap->npar ;
 	    if ((rs = mxp->create) >= 0) ylikely {
-	        ptc *cnp = &dop->cn ;
+	        ptc *cnp = dop->cvp ;
 	        if ((rs = cnp->create) >= 0) ylikely {
 	            cint	f_sh = false ;
-	            if ((rs = psem_create(&dop->sem_wq,f_sh,0)) >= 0) ylikely {
+	            if ((rs = psem_create(&dop->sem_wq,f_sh,0)) >= 0) {
 	                psem	*ws = &dop->sem_done ;
 	                if ((rs = psem_create(ws,f_sh,0)) >= 0) {
 	                    dop->qlen = (dop->a.npar + qlen) ;
-	                    if ((rs = tagq_start(&dop->wq,dop->qlen)) >= 0) {
+			    tagq *tqp = &dop->wq ;
+	                    if ((rs = tagq_start(tqp,dop->qlen)) >= 0) {
 	                        {
 	                            rs = disp_starter(dop) ;
 	                        }
 	                        if (rs < 0) {
 	                            tagq_finish(&dop->wq) ;
-			        }
+			        } /* end if (error) */
 	                    } /* end if (tagq_start) */
 	                    if (rs < 0) {
 	                        psem_destroy(&dop->sem_done) ;
-			    }
-	                }
+			    } /* end if (error) */
+	                } /* end if (psem_create) */
 	                if (rs < 0) {
 	                    psem_destroy(&dop->sem_wq) ;
-		        }
-	            }
+		        } /* end if (error) */
+	            } /* end if (psem_create) */
 	            if (rs < 0) {
 	                cnp->destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptc-create) */
 	        if (rs < 0) {
 	            mxp->destroy() ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (ptm-create) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		disp_dtor(dop) ;
+	    } /* end if (error) */
+        } /* end if (disp_dtor) */
 	return rs ;
 } /* end subroutine (disp_start) */
 
@@ -1116,7 +1159,7 @@ local int disp_starter(DISP *dop) noex {
 	        lm_free(p) ;
 	        dop->threads = nullptr ;
 	    } /* end if (error) */
-	} /* end if (m-a) */
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (disp_starter) */
 
@@ -1165,6 +1208,10 @@ local int disp_finish(DISP *dop,int f_abort) noex {
 	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
+	    {
+		rs1 = disp_dtor(dop) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (disp_finish) */
@@ -1179,7 +1226,7 @@ local int disp_addwork(DISP *dop,TI_TAG *tagp,cc *fp,int fl) noex {
 
 /* worker threads call this to set their "busy" status */
 local int disp_setstate(DISP *dop,DISP_THR *tip,int f) noex {
-	ptm		*mxp = &dop->mx ;
+	ptm		*mxp = dop->mxp ;
 	int		rs ;
 	int		rs1 ;
 	int		f_prev = false ;
@@ -1331,12 +1378,12 @@ local int disp_getourthr(DISP *dop,DISP_THR **rpp) noex {
 
 /* main-thread calls this to indicate sub-threads can read completed object */
 local int disp_readyset(DISP *dop) noex {
-	ptm		*mxp = &dop->mx ;
+	ptm		*mxp = dop->mxp ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mxp->lockbegin) >= 0) {
 	    {
-	        ptc *cnp = &dop->cn ;
+	        ptc *cnp = dop->cvp ;
 	        dop->f_ready = true ;
 	        rs = cnp->broadcast ; /* 0-bit semaphore */
 	    } /* end block */
@@ -1348,12 +1395,12 @@ local int disp_readyset(DISP *dop) noex {
 
 /* sub-threads call this to wait until object is ready */
 local int disp_readywait(DISP *dop) noex {
-	ptm		*mxp = &dop->mx ;
+	ptm		*mxp = dop->mxp ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mxp->lockbegin) >= 0) {
 	    {
-	        ptc *cnp = &dop->cn ;
+	        ptc *cnp = dop->cvp ;
 	        while ((! dop->f_ready) && (! dop->f_exit)) {
 	            rs = cnp->wait(mxp) ;
 	            if (rs < 0) break ;
@@ -1443,13 +1490,14 @@ local int tagq_rem(tagq *tqp,TI_TAG *tagp,char *fbuf,int flen) noex {
 } /* end subroutine (tagq_rem) */
 
 local int mkfieldterms(char *terms) noex {
+    	cint		n = fieldterms_termsize ;
     	int		rs = SR_FAULT ;
 	if (terms) ylikely {
 	    rs = SR_OK ;
-	    for (int i = 0 ; i < 32 ; i += 1) {
-	        terms[i] = UCHAR_MAX ;
+	    for (int i = 0 ; i < n ; i += 1) {
+	        terms[i] = char(UCHAR_MAX) ;
 	    } /* end for */
-	    for (int i = 0 ; i < 256 ; i += 1) {
+	    for (int i = 0 ; i < nchars ; i += 1) {
 	        if (isalnumlatin(i)) {
 	            baclr(terms,i) ;
 	        }
