@@ -190,7 +190,7 @@ int lockmemalloc_init() noex {
 		rs = msleep(1) ;
 		if (rs == SR_INTR) break ;
 	    }
-	    if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKLOST ;
+	    if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKFAIL ;
 	}
 	return (rs >= 0) ? f : rs ;
 }
