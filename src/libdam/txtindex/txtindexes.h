@@ -20,17 +20,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ptm.h>
-
-#include	<txtindexhdr.h>		/* this is the hash-file-header */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<txtindexhdr.h>		/* LINDAM hash-file-header */
 
 
-#define	TXTINDEXES_MAGIC	0x88773421
 #define	TXTINDEXES		struct txtindexes_head
 #define	TXTINDEXES_OBJ		struct txtindexes_object
 #define	TXTINDEXES_CUR		struct txtindexes_cursor
@@ -38,12 +33,13 @@
 #define	TXTINDEXES_FI		struct txtindexes_file
 #define	TXTINDEXES_MI		struct txtindexes_mile
 #define	TXTINDEXES_INFO		struct txtindexes_information
+#define	TXTINDEXES_MAGIC	0x88773421
 
 
 struct txtindexes_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct txtindexes_cursor {
@@ -92,7 +88,7 @@ struct txtindexes_head {
 	TXTINDEXES_MI	mi ;
 	txtindexhdr	ifi ;		/* index-file (header) information */
 	time_t		ti_lastcheck ;	/* time last check of file */
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 } ; /* end struct */
 
@@ -122,6 +118,8 @@ extern int	txtindexes_audit(txtindexes *) noex ;
 extern int	txtindexes_close(txtindexes *) noex ;
 
 EXTERNC_end
+
+extern const txtindexes_obj	txtindexes_modinfo ;
 
 
 #endif /* TXTINDEXES_INCLUDE */
