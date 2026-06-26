@@ -1,18 +1,19 @@
-/* b_append (KSH builtin) */
+/* b_append SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a generic "main" module */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
@@ -20,9 +21,11 @@
 
 /*******************************************************************************
 
-	This is a simple program (of some sort!).
+  	Name:
+	b_append
 
-	This program appends either specified files or the standarf input to a
+	This is a simple program (of some sort!).  This program
+	appends either specified files or the standarf input to a
 	specified file.
 
 	Synopsis:
@@ -92,17 +95,6 @@
 
 /* external subroutines */
 
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	cfdecmful(cchar *,int,ulong *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -112,11 +104,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -146,7 +133,7 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
 static int	procfile(PROGINFO *,void *,cchar *) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
@@ -241,8 +228,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	PARAMOPT	aparams ;
 	SHIO		errfile ;
 
@@ -545,7 +532,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -881,7 +868,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 		cchar *ofn,cchar *ifn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
