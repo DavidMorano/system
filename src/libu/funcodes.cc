@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	Object:
-	functioncodes
+	funcodes
 
 	Description:
 	Function codes for extended Input-Output operations.
