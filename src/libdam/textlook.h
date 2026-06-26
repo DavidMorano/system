@@ -26,8 +26,22 @@
 #define	TEXTLOOK_OBJ	struct textlook_object
 #define	TEXTLOOK_TAG	struct textlook_taget
 #define	TEXTLOOK_INFO	struct textlook_information
-/* query options */
 #define	TEXTLOOK_MAGIC	0x99889298
+
+enum textlookos {
+    textlooko_prefix,
+    textlooko_overlast
+} ; /* end enum (textlookos) */
+
+#ifdef	__cplusplus
+
+struct textlookms {
+    static constexpr int	prefix		= (1 < textlooko_prefix) ;
+} ; /* end struct (textlookms) */
+
+#endif /* __cplusplus */
+
+/* query options */
 #define	TEXTLOOK_OPREFIX	(1 << 0)	/* prefix match */
 
 
@@ -111,6 +125,10 @@ extern int textlook_close(textlook *) noex ;
 EXTERNC_end
 
 extern const textlook_obj	textlook_modinfo ;
+
+#ifdef	__cplusplus
+extern const textlookms		textlookm ;
+#endif /* __cplusplus */
 
 
 #endif /* TEXTLOOK_INCLUDE */
