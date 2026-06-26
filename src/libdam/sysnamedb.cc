@@ -35,26 +35,29 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<netdb.h>
-#include	<clusterdb.h>
-#include	<ids.h>
-#include	<mkpathx.h>
-#include	<permx.h>
-#include	<isnot.h>
-#include	<iserror.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<netdb.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<clusterdb.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<iserror.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysnamedb.h"
 
@@ -86,10 +89,6 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
 
 
 /* external variables */
@@ -199,8 +198,7 @@ int sysnamedb_open(sysnamedb *op,cchar *pr) noex {
 	    }
 	} /* end if (sysnamedb_ctor) */
 	return rs ;
-}
-/* end subroutine (sysnamedb_open) */
+} /* end subroutine (sysnamedb_open) */
 
 int sysnamedb_close(sysnamedb *op) noex {
 	int		rs ;
@@ -221,8 +219,7 @@ int sysnamedb_close(sysnamedb *op) noex {
 	    op->magic = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysnamedb_close) */
+} /* end subroutine (sysnamedb_close) */
 
 int sysnamedb_getclusters(sysnamedb *op,vecstr *slp,cchar *nn) noex {
 	int		rs ;
@@ -239,8 +236,7 @@ int sysnamedb_getclusters(sysnamedb *op,vecstr *slp,cchar *nn) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sysnamedb_getclusters) */
+} /* end subroutine (sysnamedb_getclusters) */
 
 int sysnamedb_getnodes(sysnamedb *op,vecstr *clp,vecstr *nlp) noex {
 	int		rs ;
@@ -279,8 +275,7 @@ int sysnamedb_getnodes(sysnamedb *op,vecstr *clp,vecstr *nlp) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sysnamedb_getnodes) */
+} /* end subroutine (sysnamedb_getnodes) */
 
 
 /* private subroutines */
@@ -307,8 +302,7 @@ local int sysnamedb_nodebegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (sysnamedb_nodebegin) */
+} /* end subroutine (sysnamedb_nodebegin) */
 
 local int sysnamedb_nodeend(sysnamedb *op) noex {
 	int		rs = SR_OK ;
@@ -320,8 +314,7 @@ local int sysnamedb_nodeend(sysnamedb *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (sysnamedb_nodeend) */
+} /* end subroutine (sysnamedb_nodeend) */
 
 local int sysnamedb_clusterbegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	int		rs ;
@@ -345,8 +338,7 @@ local int sysnamedb_clusterbegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (sysnamedb_clusterbegin) */
+} /* end subroutine (sysnamedb_clusterbegin) */
 
 local int sysnamedb_clusterend(sysnamedb *op) noex {
 	int		rs = SR_OK ;
@@ -358,8 +350,7 @@ local int sysnamedb_clusterend(sysnamedb *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (sysnamedb_clusterend) */
+} /* end subroutine (sysnamedb_clusterend) */
 
 local int sysnamedb_trynodes(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -394,8 +385,7 @@ local int sysnamedb_trynodes(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (DB lookup) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sysnamedb_trynodes) */
+} /* end subroutine (sysnamedb_trynodes) */
 
 local int sysnamedb_tryclusters(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -427,8 +417,7 @@ local int sysnamedb_tryclusters(sysnamedb *op,vecstr *slp,cc *nn) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (have cluster-DB) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sysnamedb_tryclusters) */
+} /* end subroutine (sysnamedb_tryclusters) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -437,7 +426,6 @@ vars::operator int () noex {
 	    elen = (rs * EBUFMULT) ;
 	}
     	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
