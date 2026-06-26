@@ -65,13 +65,15 @@
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	"shio.h"
-#include	"kshlib.h"
+#include	<biblebook.h>		/* LIBDAM */
+#include	<biblepara.h>		/* LIBDAM */
+#include	<bibleq.h>		/* LIBDAM */
+
+#include	<shio.h>
+#include	<kshlib.h>
+
 #include	"b_bibleq.h"
 #include	"defs.h"
-#include	"biblebook.h"
-#include	"biblepara.h"
-#include	"bibleq.h"
 
 
 /* local defines */
@@ -91,13 +93,13 @@
 #define	PI		proginfo
 
 #define	LI		locinfo
-#define	LI_FL	locinfo_fl
+#define	LI_FL		locinfo_fl
 
 
 /* external subroutines */
 
-extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) noex ;
+extern int	proginfo_setpiv(PI *,cchar *,const pivars *) noex ;
 
 
 /* external variables */
@@ -123,16 +125,16 @@ struct locinfo_fl {
 } ; /* end struct */
 
 struct locinfo {
-	BIBLEBOOK	ndb ;		/* bible-book-name DB */
-	BIBLEQ		*dbp ;
-	BIBLEPARA	pdb ;
+	bibleq		*dbp ;
+	biblebook	ndb ;		/* bible-book-name DB */
+	biblepara	pdb ;
 	void		*ofp ;
 	cchar		*ndbname ;	/* name-db */
 	cchar		*vdbname ;	/* verse-db name */
 	cchar		*pdbname ;	/* paragraph-db name */
-	PI	*pip ;
-	LI_FL	have, fl, changed, finval ;
-	LI_FL	open ;
+	PI		*pip ;
+	LI_FL		have, fl, changed, finval ;
+	LI_FL		open ;
 	int		linelen ;
 	int		indent ;
 	int		nverses ;
@@ -145,21 +147,21 @@ struct locinfo {
 
 local int	mainsub(int,con mainv,con mainv,void *) noex ;
 
-local int	locinfo_start(LI *,PI *) ;
-local int	locinfo_nlookup(LI *,int,char *,int) ;
-local int	locinfo_finish(LI *) ;
-local int	locinfo_deflinelen(LI *) ;
-local int	locinfo_ispara(LI *,BIBLEQ_Q *) ;
+local int	locinfo_start(LI *,PI *) noex ;
+local int	locinfo_nlookup(LI *,int,char *,int) noex ;
+local int	locinfo_finish(LI *) noex ;
+local int	locinfo_deflinelen(LI *) noex ;
+local int	locinfo_ispara(LI *,bibleq_q *) noex ;
 
-local int	usage(PI *) ;
+local int	usage(PI *) noex ;
 
-local int	procopts(PI *,keyopt *) ;
-local int	procargs(PI *,ARGINFO *,bits *,cchar *,cchar *) ;
-local int	procspecs(PI *,cchar *,int) ;
-local int	procspec(PI *,vecstr *) ;
-local int	procoutcite(PI *,BIBLEQ_Q *,int) ;
-local int	procout(PI *,BIBLEQ_QUERY *,cchar *,int) ;
-local int	procoutline(PI *,cchar *,int) ;
+local int	procopts(PI *,keyopt *) noex ;
+local int	procargs(PI *,ARGINFO *,bits *,cchar *,cchar *) noex ;
+local int	procspecs(PI *,cchar *,int) noex ;
+local int	procspec(PI *,vecstr *) noex ;
+local int	procoutcite(PI *,bibleq_q *,int) noex ;
+local int	procout(PI *,bibleq_q *,cchar *,int) noex ;
+local int	procoutline(PI *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -856,7 +858,7 @@ local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    BIBLEQ	vdb ;
+	    bibleq	vdb ;
 	    lip->dbp = &vdb ;
 	    if ((rs = bibleq_open(&vdb,pip->pr,vdbname)) >= 0) {
 
@@ -1315,9 +1317,9 @@ local int procspecs(PI *pip,cchar *sp,int sl) noex {
 
 local int procspec(PI *pip,vecstr *qsp) noex {
 	LI		*lip = pip->lip ;
-	BIBLEQ		*bqp ;
-	BIBLEQ_CUR	cur ;
-	BIBLEQ_CITE	q ;
+	bibleq		*bqp ;
+	bibleq_cur	cur ;
+	bibleq_q	q ;
 	int		rs ;
 	int		rs1 ;
 	int		qopts = 0 ;
@@ -1343,9 +1345,9 @@ local int procspec(PI *pip,vecstr *qsp) noex {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3)) {
-	        int	i ;
-	        for (i = 0 ; qkeya[i] != nullptr ; i += 1)
+	        for (int i = 0 ; qkeya[i] != nullptr ; i += 1) {
 	            debugprintf("bibleq/procspec: sk=>%s<\n",qkeya[i]) ;
+		}
 	    }
 #endif /* CF_DEBUG */
 
@@ -1385,7 +1387,7 @@ local int procspec(PI *pip,vecstr *qsp) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (procspec) */
 
-local int procoutcite(PI *pip,BIBLEQ_Q *qp,int edays) noex {
+local int procoutcite(PI *pip,bibleq_q *qp,int edays) noex {
 	LI		*lip = pip->lip ;
 	cint	clen = COLBUFLEN ;
 	int		rs = SR_OK ;
@@ -1412,16 +1414,12 @@ local int procoutcite(PI *pip,BIBLEQ_Q *qp,int edays) noex {
 	} /* end if (separator) */
 
 	if (rs >= 0) {
-
-/* print out the text-data itself */
-
+	    /* print out the text-data itself */
 	    if (lip->fl.bookname) {
 	        cint	blen = BIBLEBOOK_LEN ;
-	        int		bbl ;
+	        int	bbl ;
 	        char	bbuf[BIBLEBOOK_LEN + 1] ;
-
 	        if ((bbl = locinfo_nlookup(lip,qp->b,bbuf,blen)) > 0) {
-
 	            f_havebook = true ;
 	            fmt = (edays > 0) ? "%r %u:%u (%u)" : "%r %u:%u" ;
 	            rs = bufprintf(cbuf,clen,fmt,bbuf,bbl,c,v,(edays+1)) ;
@@ -1430,13 +1428,9 @@ local int procoutcite(PI *pip,BIBLEQ_Q *qp,int edays) noex {
 	                rs = shio_print(lip->ofp,cbuf,cl) ;
 	                wlen += rs ;
 	            }
-
 	        } /* end if (nlookup) */
-
 	    } /* end if (book-name) */
-
 	    if ((rs >= 0) && (! f_havebook)) {
-
 	        fmt = (edays > 0) ? "%u:%u:%u (%u)" : "%u:%u:%u" ;
 	        rs = bufprintf(cbuf,clen,fmt,b,c,v,(edays+1)) ;
 	        cl = rs ;
@@ -1444,18 +1438,15 @@ local int procoutcite(PI *pip,BIBLEQ_Q *qp,int edays) noex {
 	            rs = shio_print(lip->ofp,cbuf,cl) ;
 	            wlen += rs ;
 	        }
-
 	    } /* end if (type of book-name display) */
-
 	} /* end if (ok) */
-
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (procoutcite) */
 
-local int procout(PI *pip,BIBLEQ_Q *qp,cchar *vp,int vl) noex {
+local int procout(PI *pip,bibleq_q *qp,cchar *vp,int vl) noex {
 	LI		*lip = pip->lip ;
 	wordfill	w ;
-	cint	clen = COLBUFLEN ;
+	cint		clen = COLBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl = vl ;
@@ -1626,8 +1617,8 @@ local int locinfo_nlookup(LI *lip,int bi,char *nbuf,int nlen) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (locinfo_nlookup) */
 
-local int locinfo_ispara(LI *lip,BIBLEQ_Q *qp) noex {
-	PI	*pip = lip->pip ;
+local int locinfo_ispara(LI *lip,bibleq_q *qp) noex {
+	PI		*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		f = false ;
 
@@ -1647,7 +1638,7 @@ local int locinfo_ispara(LI *lip,BIBLEQ_Q *qp) noex {
 	    }
 
 	    if (rs >= 0) {
-	        BIBLEPARA_QUERY	pq ;
+	        biblepara_q	pq ;
 	        pq.b = qp->b ;
 	        pq.c = qp->c ;
 	        pq.v = qp->v ;
