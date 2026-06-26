@@ -141,7 +141,7 @@ int progpeername(proginfo *pip,clientinfo *cip,char *dp,int dl) noex {
 
 	return (rs >= 0) ? f_success : rs ;
 }
-/* end subroutines (progpeername) */
+/* end subroutine (progpeername) */
 
 
 /* local subroutines */
