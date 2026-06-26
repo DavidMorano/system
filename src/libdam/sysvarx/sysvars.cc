@@ -35,37 +35,37 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<strlibval.hh>
-#include	<vecobj.h>
-#include	<vecstr.h>
-#include	<spawnproc.h>
-#include	<storebuf.h>
-#include	<ids.h>
-#include	<hdbstr.h>
-#include	<expcook.h>
-#include	<dirseen.h>
-#include	<pathclean.h>
-#include	<sfx.h>
-#include	<mkpathx.h>
-#include	<mkdirs.h>
-#include	<permx.h>
-#include	<strwcpy.h>
-#include	<mkchar.h>
-#include	<char.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<hdbstr.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<dirseen.h>		/* LIBUC */
+#include	<pathclean.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkdirs.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysvars.h"
 #include	"var.h"
@@ -78,6 +78,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 #define	SVS		sysvars
 #define	SVS_C		sysvars_cur
+
+#define	SI		subinfo
+#define	SI_FL		subinfo_fl
 
 #ifndef	VARSYSNAME
 #define	VARSYSNAME	"SYSNAME"
@@ -186,9 +189,6 @@ import libutil ;			/* |lenstr(3u)| */
 #define	DEFNVARS	20
 #endif
 
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
-
 
 /* imported namespaces */
 
@@ -211,13 +211,13 @@ extern "C" {
 
 /* local structures */
 
-struct subinfo_flags {
+struct subinfo_fl {
 	uint		id:1 ;
 } ; /* end struct */
 
 struct subinfo {
 	ids		id ;
-	SUBINFO_FL	fl ;
+	SI_FL		fl ;
 	time_t		daytime ;
 } ; /* end struct */
 
@@ -265,24 +265,24 @@ local inline int sysvars_magic(sysvars *op,Args ... args) noex {
 
 local int	sysvars_infoloadbegin(SVS *,cchar *,cchar *) noex ;
 local int	sysvars_infoloadend(SVS *) noex ;
-local int	sysvars_indopen(SVS *,SUBINFO *) noex ;
+local int	sysvars_indopen(SVS *,SI *) noex ;
 
 local int	sysvars_indclose(SVS *) noex ;
 local int	sysvars_indmk(SVS *,cchar *) noex ;
 local int	sysvars_indmkdata(SVS *,cchar *,mode_t) noex ;
-local int	sysvars_indopenseq(SVS *,SUBINFO *) noex ;
-local int	sysvars_indopenseqer(SVS *,SUBINFO *,dirseen *,
+local int	sysvars_indopenseq(SVS *,SI *) noex ;
+local int	sysvars_indopenseqer(SVS *,SI *,dirseen *,
 			vecstr *,expcook *) noex ;
 local int	sysvars_loadcooks(SVS *,expcook *) noex ;
-local int	sysvars_indopenalt(SVS *,SUBINFO *,dirseen *) noex ;
+local int	sysvars_indopenalt(SVS *,SI *,dirseen *) noex ;
 
 #if	CF_MKSYSVARS
-local int	sysvars_mksysvarsi(SVS *,SUBINFO *,cchar *) noex ;
+local int	sysvars_mksysvarsi(SVS *,SI *,cchar *) noex ;
 #endif
 
-local int	subinfo_start(SUBINFO *) noex ;
-local int	subinfo_ids(SUBINFO *) noex ;
-local int	subinfo_finish(SUBINFO *) noex ;
+local int	subinfo_start(SI *) noex ;
+local int	subinfo_ids(SI *) noex ;
+local int	subinfo_finish(SI *) noex ;
 
 local int	checkdname(cchar *) noex ;
 
@@ -310,7 +310,7 @@ constexpr cpcchar	envdefs[] = {
 	VARTZ,
 	VARWSTATION,
 	nullptr
-} ;
+} ; /* end array (envdefs) */
 #endif /* CF_MKSYSVARS */
 
 /* use fixed locations for security reasons (like we care!) */
@@ -319,14 +319,14 @@ constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
 	nullptr
-} ;
+} ; /* end array (prbins) */
 #endif /* CF_MKSYSVARS */
 
 constexpr cpcchar	sysfnames[] = {
 	DEFINITFNAME,	
 	DEFLOGFNAME,
 	nullptr
-} ;
+} ; /* end array (sysfnames) */
 
 constexpr cpcchar	dbdirs[] = {
 	"%R/var",
@@ -337,7 +337,7 @@ constexpr cpcchar	dbdirs[] = {
 	"%T/%{PRN}",
 	"%T",
 	nullptr
-} ;
+} ; /* end array (dbdirs) */
 
 static strlibval	tmpdname(strlibval_tmpdir) ;
 
@@ -350,7 +350,7 @@ const sysvars_obj		sysvars_modinfo = {
 	"sysvars",
 	szof(sysvars),
 	szof(sysvars_cur)
-} ;
+} ; /* end innitialization */
 
 
 /* exported subroutines */
@@ -362,7 +362,7 @@ int sysvars_open(SVS *op,cchar *pr,cchar *dbname) noex {
 	if ((rs = sysvars_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (pr[0]) ylikely {
-	        if (SUBINFO si ; (rs = subinfo_start(&si)) >= 0) ylikely {
+	        if (SI si ; (rs = subinfo_start(&si)) >= 0) ylikely {
 	            if ((rs = sysvars_infoloadbegin(op,pr,dbname)) >= 0) {
 	                if ((rs = sysvars_indopen(op,&si)) >= 0) {
 	            	    op->magic = SYSVARS_MAGIC ;
@@ -380,8 +380,7 @@ int sysvars_open(SVS *op,cchar *pr,cchar *dbname) noex {
 	    }
 	} /* end if (sysvars_ctor) */
 	return rs ;
-}
-/* end subroutine (sysvars_open) */
+} /* end subroutine (sysvars_open) */
 
 int sysvars_close(SVS *op) noex {
 	int		rs ;
@@ -402,8 +401,7 @@ int sysvars_close(SVS *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvars_close) */
+} /* end subroutine (sysvars_close) */
 
 int sysvars_audit(SVS *op) noex {
 	int		rs ;
@@ -411,8 +409,7 @@ int sysvars_audit(SVS *op) noex {
 	    rs = var_audit(op->vindp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysvars_audit) */
+} /* end subroutine (sysvars_audit) */
 
 int sysvars_curbegin(SVS *op,SVS_C *curp) noex {
 	int		rs ;
@@ -428,8 +425,7 @@ int sysvars_curbegin(SVS *op,SVS_C *curp) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvars_curbegin) */
+} /* end subroutine (sysvars_curbegin) */
 
 int sysvars_curend(SVS *op,SVS_C *curp) noex {
 	int		rs ;
@@ -443,8 +439,7 @@ int sysvars_curend(SVS *op,SVS_C *curp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvars_curend) */
+} /* end subroutine (sysvars_curend) */
 
 int sysvars_fetch(SVS *op,cc *kp,int kl,SVS_C *curp,char *vbuf,int vlen) noex {
 	int		rs ;
@@ -459,8 +454,7 @@ int sysvars_fetch(SVS *op,cc *kp,int kl,SVS_C *curp,char *vbuf,int vlen) noex {
 	    vbuf[0] = '\0' ;
 	}
 	return rs ;
-}
-/* end subroutine (sysvars_fetch) */
+} /* end subroutine (sysvars_fetch) */
 
 int sysvars_curenum(SVS *op,SVS_C *curp,char *kp,int kl,char *vp,int vl) noex {
 	int		rs = SR_FAULT ;
@@ -475,8 +469,7 @@ int sysvars_curenum(SVS *op,SVS_C *curp,char *kp,int kl,char *vp,int vl) noex {
 	    vp[0] = '\0' ;
 	}
 	return rs ;
-}
-/* end subroutine (sysvars_curenum) */
+} /* end subroutine (sysvars_curenum) */
 
 int sysvars_count(SVS *op) noex {
 	int		rs = SR_FAULT ;
@@ -484,8 +477,7 @@ int sysvars_count(SVS *op) noex {
 	    rs = var_count(op->vindp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvars_count) */
+} /* end subroutine (sysvars_count) */
 
 
 /* private subroutines */
@@ -503,8 +495,7 @@ local int sysvars_infoloadbegin(SVS *op,cchar *pr,cchar *dbname) noex {
 	    bp = (strwcpy(bp,dbname,-1)+1) ;
 	} /* emd if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (sysvars_infoloadbegin) */
+} /* end subroutine (sysvars_infoloadbegin) */
 
 local int sysvars_infoloadend(SVS *op) noex {
 	int		rs = SR_OK ;
@@ -517,15 +508,13 @@ local int sysvars_infoloadend(SVS *op) noex {
 	op->pr = nullptr ;
 	op->dbname = nullptr ;
 	return rs ;
-}
-/* end subroutine (sysvars_infoloadend) */
+} /* end subroutine (sysvars_infoloadend) */
 
-local int sysvars_indopen(SVS *op,SUBINFO *sip) noex {
+local int sysvars_indopen(SVS *op,SI *sip) noex {
 	return sysvars_indopenseq(op,sip) ;
-}
-/* end subroutine (sysvars_indopen) */
+} /* end subroutine (sysvars_indopen) */
 
-local int sysvars_indopenseq(SVS *op,SUBINFO *sip) noex {
+local int sysvars_indopenseq(SVS *op,SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	if (dirseen ds ; (rs = dirseen_start(&ds)) >= 0) ylikely {
@@ -547,10 +536,9 @@ local int sysvars_indopenseq(SVS *op,SUBINFO *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dirseen) */
 	return rs ;
-}
-/* end subroutine (sysvars_indopenseq) */
+} /* end subroutine (sysvars_indopenseq) */
 
-local int sysvars_indopenseqer(SVS *op,SUBINFO *sip,dirseen *dsp,
+local int sysvars_indopenseqer(SVS *op,SI *sip,dirseen *dsp,
 		vecstr *sdp,expcook *ecp) noex {
 	cint	elen = MAXPATHLEN ;
 	int		rs = SR_OK ;
@@ -619,8 +607,7 @@ local int sysvars_indopenseqer(SVS *op,SUBINFO *sip,dirseen *dsp,
 	} /* end if (ok) */
 
 	return rs ;
-}
-/* end subroutine (sysvars_indopenseqer) */
+} /* end subroutine (sysvars_indopenseqer) */
 
 local int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 	int		rs = SR_OK ;
@@ -655,10 +642,9 @@ local int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 	    }
 	} /* end if (ok) */
 	return rs ;
-}
-/* end subroutine (sysvars_loadcooks) */
+} /* end subroutine (sysvars_loadcooks) */
 
-local int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
+local int sysvars_indopenalt(SVS *op,SI *sip,dirseen *dsp) noex {
 	int		rs ;
 	int		rs1 ;
 	if (dirseen_cur cur ; (rs = dirseen_curbegin(dsp,&cur)) >= 0) {
@@ -702,8 +688,7 @@ local int sysvars_indopenalt(SVS *op,SUBINFO *sip,dirseen *dsp) noex {
 	} /* end if (cursor) */
 
 	return rs ;
-}
-/* end subroutine (sysvars_indopenalt) */
+} /* end subroutine (sysvars_indopenalt) */
 
 local int sysvars_indmk(SVS *op,cchar *dname) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -727,8 +712,7 @@ local int sysvars_indmk(SVS *op,cchar *dname) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (ok) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sysvars_indmk) */
+} /* end subroutine (sysvars_indmk) */
 
 local int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
 	int		rs = SR_FAULT ;
@@ -755,8 +739,7 @@ local int sysvars_indmkdata(SVS *op,cchar *indname,mode_t om) noex {
 	    } /* end if (hdbstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sysvars_indmkdata) */
+} /* end subroutine (sysvars_indmkdata) */
 
 local int sysvars_indclose(SVS *op) noex {
 	int		rs = SR_OK ;
@@ -767,12 +750,11 @@ local int sysvars_indclose(SVS *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (sysvars_indclose) */
+} /* end subroutine (sysvars_indclose) */
 
 /* make the index */
 #if	CF_MKSYSVARS
-local int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
+local int sysvars_mksysvarsi(SVS *op,SI *sip,cchar *dname) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
@@ -875,31 +857,26 @@ local int sysvars_mksysvarsi(SVS *op,SUBINFO *sip,cchar *dname) noex {
 	                        } /* end if (spawnproc) */
 	                    } /* end if (vecstr_getvec) */
 	                } /* end if (ok) */
-
 	                rs1 = vecstr_finish(&envs) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (vecstr) */
 	        } /* end if (ok) */
-
 	    } /* end if (subinfo_ids) */
 	} /* end if (mkpath) */
-
 	return rs ;
-}
-/* end subroutine (sysvars_mksysvarsi) */
+} /* end subroutine (sysvars_mksysvarsi) */
 #endif /* CF_MKSYSVARS */
 
-local int subinfo_start(SUBINFO *sip) noex {
+local int subinfo_start(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = memclear(sip) ;
 	    sip->daytime = time(nullptr) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-local int subinfo_ids(SUBINFO *sip) noex {
+local int subinfo_ids(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = SR_OK ;
@@ -909,10 +886,9 @@ local int subinfo_ids(SUBINFO *sip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_ids) */
+} /* end subroutine (subinfo_ids) */
 
-local int subinfo_finish(SUBINFO *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (sip) {
@@ -924,24 +900,19 @@ local int subinfo_finish(SUBINFO *sip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 local int checkdname(cchar *dname) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_INVALID ;
 	if (dname[0] != '/') {
-	    if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
+		rs = SR_NOTDIR ;
 	        if (S_ISDIR(sb.st_mode)) {
 	            rs = perm(dname,-1,-1,nullptr,W_OK) ;
-		} else {
-		    rs = SR_NOTDIR ;
-	        }
-	    } /* end if (stat) */
-	} else {
-	    rs = SR_INVALID ;
-	}
+	        } /* end if (directory) */
+	    } /* end if (u_stat) */
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (checkdname) */
+} /* end subroutine (checkdname) */
 
 
