@@ -43,9 +43,9 @@ struct txtindexmk_head {
 	void		*callp ;
 	void		*obj ;		/* object pointer */
 	TXTINDEXMK_FL	fl ;
-	uint		magic ;
-	int		objsize ;	/* object size */
-	int		cursize ;	/* cursor size (not used here) */
+	uint		magval ;
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size (not used here) */
 	int		nfd ;
 } ; /* end struct */
 
