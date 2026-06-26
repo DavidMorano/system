@@ -27,29 +27,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<vector>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<strwcmp.h>
-#include	<char.h>
-#include	<cfhex.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<vector>		/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC*/
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<cfhex.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<char.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"querystr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -127,7 +129,7 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static int querystr_ctor(querystr *op,Args ... args) noex {
+local int querystr_ctor(querystr *op,Args ... args) noex {
     	QUERYSTR	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -139,10 +141,9 @@ static int querystr_ctor(querystr *op,Args ... args) noex {
 	    } /* end if (new-strpack) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (querystr_ctor) */
+} /* end subroutine (querystr_ctor) */
 
-static int querystr_dtor(querystr *op) noex {
+local int querystr_dtor(querystr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -152,10 +153,9 @@ static int querystr_dtor(querystr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (querystr_dtor) */
+} /* end subroutine (querystr_dtor) */
 
-static char	*strwebhex(char *,cchar *,int) noex ;
+local char	*strwebhex(char *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -187,8 +187,7 @@ int querystr_start(querystr *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (querystr_ctor) */
 	return rs ;
-}
-/* end subroutine (querystr_start) */
+} /* end subroutine (querystr_start) */
 
 int querystr_finish(querystr *op) noex {
 	int		rs = SR_FAULT ;
@@ -211,8 +210,7 @@ int querystr_finish(querystr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (querystr_finish) */
+} /* end subroutine (querystr_finish) */
 
 int querystr_count(querystr *op) noex {
 	int		rs = SR_FAULT ;
@@ -220,8 +218,7 @@ int querystr_count(querystr *op) noex {
 	    rs = op->n ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (querystr_count) */
+} /* end subroutine (querystr_count) */
 
 int querystr_already(querystr *op,cchar *kstr,int klen) noex {
 	int		rs = SR_FAULT ;
@@ -236,8 +233,7 @@ int querystr_already(querystr *op,cchar *kstr,int klen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end if (querystr_already) */
+} /* end if (querystr_already) */
 
 int querystr_curbegin(querystr *op,cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -246,8 +242,7 @@ int querystr_curbegin(querystr *op,cur *curp) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (querystr_curbegin) */
+} /* end subroutine (querystr_curbegin) */
 
 int querystr_curend(querystr *op,cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -256,8 +251,7 @@ int querystr_curend(querystr *op,cur *curp) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (querystr_curend) */
+} /* end subroutine (querystr_curend) */
 
 /* fetch the next entry value matching the given key */
 int querystr_fetch(querystr *op,cc *kstr,int klen,cur *curp,cc **rpp) noex {
@@ -292,8 +286,7 @@ int querystr_fetch(querystr *op,cc *kstr,int klen,cur *curp,cc **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (querystr_fetch) */
+} /* end subroutine (querystr_fetch) */
 
 int querystr_curenum(querystr *op,cur *curp,cc **kpp,cc **vpp) noex {
 	int		rs = SR_FAULT ;
@@ -476,7 +469,7 @@ int subinfo::load() noex {
 }
 /* end subroutine (subinfo::load) */
 
-static char *strwebhex(char *rp,cchar *tp,int tl) noex {
+local char *strwebhex(char *rp,cchar *tp,int tl) noex {
 	if ((tl >= 3) && (*tp == '%')) {
 	    cint	ch1 = mkchar(tp[1]) ;
 	    cint	ch2 = mkchar(tp[2]) ;
@@ -487,7 +480,6 @@ static char *strwebhex(char *rp,cchar *tp,int tl) noex {
 	    }
 	}
 	return rp ;
-}
-/* end subroutine (strwebhex) */
+} /* end subroutine (strwebhex) */
 
 
