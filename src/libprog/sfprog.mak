@@ -42,12 +42,9 @@ LIBS= -lu
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -141,7 +138,7 @@ OBJE=
 OBJ= obja.o 
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		all
@@ -157,6 +154,9 @@ so:			$(T).so
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -169,15 +169,18 @@ so:			$(T).so
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	gxx -c -x c++ -o $@ -O $<
+
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $(T).a $?
 
-$(T).o:			$(OBJ) Makefile localmisc.h
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+$(T).o:			$(OBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
-$(T).so:		$(OBJ) Makefile localmisc.h
-	$(LD) -o $@ $(SOFL) $(LDFLAGS) $(OBJ) $(LIBINFO)
+$(T).so:		$(OBJ)
+	$(LD) -o $@ $(SOFL) $(LDFLAGS) $^ $(LIBINFO)
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
