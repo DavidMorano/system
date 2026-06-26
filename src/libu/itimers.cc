@@ -1,4 +1,4 @@
-/* timers SUPPORT */
+/* itimers SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
