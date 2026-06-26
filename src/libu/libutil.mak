@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += libutil.h
+INCS += libutil.hh
 
 MODS += libutil.ccm
 
