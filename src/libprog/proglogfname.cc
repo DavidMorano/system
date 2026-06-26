@@ -19,68 +19,42 @@
 
 /*******************************************************************************
 
+  	Descrption:
 	This subroutine calculates the log filename for a program.
 
 	Synopsis:
-
-	int proglogfname(pip,tmpfname,logcname,logfname)
-	PROGINFO	*pip ;
-	char		tmpfname[] ;
-	const char	logcname[] ;
-	const char	*logfname ;
+	int proglogfname(PI *pip,char *tmpfname,cc *logcname,cc *logfname) noex
 
 	Arguments:
-
 	pip		program-information pointer
 	tmpfname	buffer to receive result
 	logcname	directory component name for log-directory
 	logfname	the name of the (supposed) log file
 
 	Returns:
-
-	<0		error
 	>=0		length of created file-name
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LINU */
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<localmisc.h>
-
-#include	"config.h"
-#include	"defs.h"
+#include	<proginfo.hh>
 
 
 /* local defines */
 
 
 /* external subroutines */
-
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -95,11 +69,12 @@ extern char	*timestr_log(time_t,char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int proglogfname(PROGINFO *pip,char *rbuf,cchar *logcname,cchar *lfname)
-{
+int proglogfname(PI *pip,char *rbuf,cchar *logcname,cchar *lfname) noex {
 	int		rs = SR_OK ;
 	int		pl = 0 ;
 
@@ -149,7 +124,6 @@ int proglogfname(PROGINFO *pip,char *rbuf,cchar *logcname,cchar *lfname)
 #endif
 
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (proglogfname) */
+} /* end subroutine (proglogfname) */
 
 
