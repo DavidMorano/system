@@ -13,14 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
-#include	<keyvals.h>
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<keyvals.h>		/* LIBUC */
 
 
 #define	MXALIAS		struct mxalias_head
@@ -33,7 +30,7 @@ struct mxalias_cursor {
 	char		*vbuf ;
 	char		**vals ;
 	KEYVALS_CUR	*kvcp ;
-	uint		magic ;
+	uint		magval ;
 	int		nvals ;
 	int		i ;
 } ; /* end struct */
@@ -53,7 +50,7 @@ struct mxalias_head {
 	time_t		ti_access ;
 	time_t		ti_check ;
 	MXALIAS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 	int		count ;
 } ; /* end struct */
