@@ -1,11 +1,11 @@
-/* jobdb */
+/* jobdb SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* perform various functions on a job */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -18,38 +18,45 @@
 
 /*******************************************************************************
 
+  	Object:
+	jobdb
+
+	Description:
 	This module is responsible for providing means to store a
 	job and the retrieve it later by its PID.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<estrings.h>
-#include	<rmdirfiles.h>
-#include	<localmisc.h>
-
-#if	CF_DEBUGS
-#include	<debug.h>
-#endif
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<mkdirs.h>		/* LIBUC */
+#include	<rmdirfiles.h>		/* LIBUC */
+#include	<mktmp.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"jobdb.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |memclear(3u)| */
+import uconstants ;			/* |varname(3u)| */
 
 /* local defines */
 
@@ -61,6 +68,20 @@ import libutil ;			/* |memclear(3u)| */
 #define	VARTMPDNAME	"TMPDIR"
 #endif
 
+#define	INITSZ		10
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
@@ -70,438 +91,439 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int		maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 
 /* forward references */
 
-static int	jobdb_delit(JOBDB *,int,JOBDB_ENT *) ;
-static int	jobdb_checkdir(JOBDB *) ;
+template<typename ... Args>
+local inline int jobdb_ctor(jobdb *op,Args ... args) noex {
+    	JOBDB		*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    op->tmpdname = nullptr ;
+	    if ((op->dbp = new(nt) vecitem) != np) ylikely {
+		rs = SR_OK ;
+	    } /* end if (new-vecitem) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (jobdb_ctor) */
 
-static int	entry_start(JOBDB_ENT *,cchar *,cchar *,int) ;
-static int	entry_finish(JOBDB_ENT *) ;
+local int jobdb_dtor(jobdb *op) noex {
+	int		rs = SR_OK ;
+	if (op->dbp) ylikely {
+	    delete op->dbp ;
+	    op->dbp = nullptr ;
+	} /* end if (memory-release) */
+	return rs ;
+} /* end subroutine (jobdb_dtor) */
 
-static int	mkfile(cchar *,cchar **) ;
+local int	jobdb_delit(jobdb *,int,jobdb_ent *) noex ;
+local int	jobdb_checkdir(jobdb *) noex ;
+
+local int	entry_start(jobdb_ent *,cchar *,cchar *,int) noex ;
+local int	entry_finish(jobdb_ent *) noex ;
+
+local int	mkfile(cchar *,cchar **) noex ;
 
 
-/* external variables */
+/* local variables */
+
+static vars		var ;
+cbool			f_debug		= CF_DEBUG ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int jobdb_start(JOBDB *jlp,int initsize,cchar *tmpdname)
-{
+int jobdb_start(jobdb *op,int initsz,cchar *tmpdname) noex {
 	int		rs ;
-	cchar	*cp ;
-
-	if (jlp == NULL) return SR_FAULT ;
-
-	if (initsize < 10) initsize = 10 ;
-
-	if (tmpdname == NULL) tmpdname = getenv(VARTMPDNAME) ;
-	if (tmpdname == NULL) tmpdname = TMPDNAME ;
-
-	if ((rs = uc_mallocstrw(tmpdname,-1,&cp)) >= 0) {
-	    const int	vo = (VECITEM_OREUSE | VECITEM_OCONSERVE) ;
-	    jlp->tmpdname = cp ;
-	    rs = vecitem_start(&jlp->db,initsize,vo) ;
+	if (initsz < 10) initsz = 10 ;
+	if (tmpdname == nullptr) tmpdname = getenver(varname.tmpdir) ;
+	if (tmpdname == nullptr) tmpdname = sysword.w_tmpdir ;
+	if ((rs = jobdb_ctor(op)) >= 0) {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) {
+	        if (cchar *cp ; (rs = mem.strw(tmpdname,-1,&cp)) >= 0) {
+	            cint	vo = (vecitemm.reuse | vecitemm.conserve) ;
+	            op->tmpdname = cp ;
+	            rs = vecitem_start(op->dbp,initsz,vo) ;
+	            if (rs < 0) {
+	                voidp vp = voidp(op->tmpdname) ;
+	                mem.free(vp) ;
+	                op->tmpdname = nullptr ;
+	            } /* end if (error) */
+	        } /* end if (memory-acquire) */
+	    } /* end if (vars) */
 	    if (rs < 0) {
-	        uc_free(jlp->tmpdname) ;
-	        jlp->tmpdname = NULL ;
-	    }
-	} /* end if (m-a) */
-
+		jobdb_dtor(op) ;
+	    } /* end if (error) */
+	} /* end if (jobdb_ctor) */
 	return rs ;
-}
-/* end subroutine (jobdb_start) */
+} /* end subroutine (jobdb_start) */
 
-
-/* free a job structure */
-int jobdb_finish(JOBDB *jlp)
-{
-	VECITEM		*elp = &jlp->db ;
-	JOBDB_ENT	*jep ;
-	int		rs = SR_OK ;
+int jobdb_finish(jobdb *op) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		i ;
-	int		c = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("jobdb_finish: ent\n") ;
-#endif
-
-	if (jlp == NULL) return SR_FAULT ;
-
-	for (i = 0 ; vecitem_get(elp,i,&jep) >= 0 ; i += 1) {
-	    if (jep != NULL) {
-	        rs1 = entry_finish(jep) ;
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (vecitem *dbp = op->dbp ; dbp) {
+	        void *vp ; 
+	        for (int i = 0 ; dbp->get(i,&vp) >= 0 ; i += 1) {
+	            jobdb_ent	*jep = resumelife<jobdb_ent>(vp) ;
+	            if (vp) {
+	                rs1 = entry_finish(jep) ;
+	                if (rs >= 0) rs = rs1 ;
+		        c += 1 ;
+	            }
+	        } /* end for */
+	        {
+	            rs1 = dbp->finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	    } /* end if (non-null) */
+	    if (op->tmpdname) {
+	        voidp vp = voidp(op->tmpdname) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
-		c += 1 ;
+	        op->tmpdname = nullptr ;
+	    } /* end if (memory-release) */
+	    {
+	        rs1 = jobdb_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
-	} /* end for */
-
-	rs1 = vecitem_finish(elp) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (jlp->tmpdname != NULL) {
-	    rs1 = uc_free(jlp->tmpdname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    jlp->tmpdname = NULL ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("jobdb_finish: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (jobdb_finish) */
+} /* end subroutine (jobdb_finish) */
 
+local int jobdb_newjobs(jobdb *,cchar *,int) noex ;
 
-/* add a new job */
-int jobdb_newjob(JOBDB *jlp,cchar *jobid,int f_so)
-{
-	int		rs ;
-
-	if (jlp == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("jobdb_newjob: ent f_so=%u\n",f_so) ;
-#endif
-
-	if ((rs = jobdb_checkdir(jlp)) >= 0) {
-	    const int	clen = MAXNAMELEN ;
-	    cchar	*pre = JOBDB_JOBPREFIX ;
-	    cchar	*x = "XXXXXXXXX" ;
-	    char	cbuf[MAXNAMELEN+1] ;
-	    if ((rs = sncpy2(cbuf,clen,pre,x)) >= 0) {
-	        char	template[MAXPATHLEN + 1] ;
-	        if ((rs = mkpath2(template,jlp->tmpdname,cbuf)) >= 0) {
-	            JOBDB_ENT	je ;
-	            if ((rs = entry_start(&je,template,jobid,f_so)) >= 0) {
-	                const int	esize = szof(JOBDB_ENT) ;
-	                rs = vecitem_add(&jlp->db,&je,esize) ;
-	                if (rs < 0)
-		            entry_finish(&je) ;
-		    } /* end if (entry_start) */
-	        } /* end if (mkpath) */
-	    } /* end if (sncpy2) */
-	} /* end if (jobdb_checkdir) */
-
-#if	CF_DEBUGS
-	debugprintf("jobdb_newjob: ret rs=%d\n",rs) ;
-#endif
-
+int jobdb_newjob(jobdb *op,cchar *jobid,int f_so) noex {
+	int		rs = SR_FAULT ;
+	DEBUGPRINTF("ent f_so=%u\n",f_so) ;
+	if (op) {
+	    if ((rs = jobdb_checkdir(op)) >= 0) {
+		rs = jobdb_newjobs(op,jobid,f_so) ;
+	    } /* end if (jobdb_checkdir) */
+	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (jobdb_newjob) */
+} /* end subroutine (jobdb_newjob) */
 
+local int jobdb_newjobs(jobdb *op,cchar *jobid,int f_so) noex {
+    	int		rs = SR_BUGCHECK ;
+	int		rs1 ;
+	if (vecitem *dbp = op->dbp ; dbp) {
+	    if (char *cbuf ; (rs = mem.mn(&cbuf)) >= 0) {
+	        cint	clen = rs ;
+	        cchar	pre[] = JOBDB_JOBPREFIX ;
+	        cchar	x[] = "XXXXXXXXX" ;
+	        if ((rs = sncpy(cbuf,clen,pre,x)) >= 0) {
+		    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	                if ((rs = mkpath(tbuf,op->tmpdname,cbuf)) >= 0) {
+	                    jobdb_ent	je ;
+	                    if ((rs = entry_start(&je,tbuf,jobid,f_so)) >= 0) {
+	                        cint esz = szof(jobdb_ent) ;
+	                        rs = dbp->add(&je,esz) ;
+	                        if (rs < 0) {
+		                    entry_finish(&je) ;
+			        } /* end if (error) */
+		            } /* end if (entry_start) */
+	                } /* end if (mkpath) */
+		        rs1 = mem.free(tbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	        } /* end if (sncpy2) */
+	        rs1 = mem.free(cbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (bug-check) */
+	return rs ;
+} /* end subroutine (jobdb_newjobs) */
 
 /* search the job table for a PID match */
-int jobdb_findpid(JOBDB *jlp,pid_t pid,JOBDB_ENT **jepp)
-{
-	int		rs ;
-	int		i ;
-
-	if (jlp == NULL) return SR_FAULT ;
-
-	for (i = 0 ; (rs = vecitem_get(&jlp->db,i,jepp)) >= 0 ; i += 1) {
-	    if ((*jepp) != NULL) {
-	        if ((*jepp)->pid == pid) break ;
-	    }
-	} /* end for */
-
-	if (rs < 0) (*jepp) = NULL ;
-
-	return rs ;
-}
-/* end subroutine (jobdb_findpid) */
-
+int jobdb_findpid(jobdb *op,pid_t pid,jobdb_ent **jepp) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ; /* return-value */
+	if (op && jepp) {
+	    rs = SR_BUGCHECK ;
+	    if (vecitem *dbp = op->dbp ; dbp) {
+		void *vp ;
+		for (i = 0 ; (rs = dbp->get(i,&vp)) >= 0 ; i += 1) {
+		    jobdb_ent *jap = resumelife<jobdb_ent>(vp) ;
+		    if (vp) {
+	      	        if (jap->pid == pid) {
+			    *jepp = jap ;
+			    break ;
+			}
+	    	    }
+		} /* end for */
+		if (rs < 0) {
+	    	    *jepp = nullptr ;
+		} /* end if (error) */
+	    } /* end if (bug-check) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
+} /* end subroutine (jobdb_findpid) */
 
 /* search for a job in the job table via its filename */
-int jobdb_search(JOBDB *jlp,cchar *fname,JOBDB_ENT **jepp)
-{
-	int		rs ;
-	int		i ;
-
-	if (jlp == NULL) return SR_FAULT ;
-
-	for (i = 0 ; (rs = vecitem_get(&jlp->db,i,jepp)) >= 0 ; i += 1) {
-	    if ((*jepp) != NULL) {
-	        if (strcmp((*jepp)->efname,fname) == 0) break ;
-	    }
-	} /* end for */
-
-	if (rs < 0) (*jepp) = NULL ;
-
+int jobdb_search(jobdb *op,cchar *fname,jobdb_ent **jepp) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ; /* return-value */
+	if (op && fname && jepp) {
+	    rs = SR_BUGCHECK ;
+	    if (vecitem *dbp = op->dbp ; dbp) {
+		void *vp ;
+	        for (i = 0 ; (rs = dbp->get(i,&vp)) >= 0 ; i += 1) {
+		    jobdb_ent *jap = resumelife<jobdb_ent>(vp) ;
+	            if (vp) {
+	                if (strcmp(jap->efname,fname) == 0) {
+			    *jepp = jap ;
+			    break ;
+			}
+	            }
+	        } /* end for */
+	        if (rs < 0) {
+	            *jepp = nullptr ;
+	        } /* end if (error) */
+	    } /* end if (bug-check) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (jobdb_search) */
-
+} /* end subroutine (jobdb_search) */
 
 /* enumerate all of the jobs */
-int jobdb_get(JOBDB *jlp,int i,JOBDB_ENT **jepp)
-{
-
-	if (jlp == NULL) return SR_FAULT ;
-
-	return vecitem_get(&jlp->db,i,jepp) ;
-}
-/* end subroutine (jobdb_get) */
-
+int jobdb_get(jobdb *op,int i,jobdb_ent **jepp) noex {
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_BUGCHECK ;
+	    if (vecitem *dbp = op->dbp ; dbp) {
+	        rs = dbp->get(i,jepp) ;
+	    } /* end if (bug-check) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (jobdb_get) */
 
 /* get a job by its structure pointer */
-int jobdb_getp(JOBDB *jlp,JOBDB_ENT *jep)
-{
-	JOBDB_ENT	*jep2 ;
-	int		rs ;
-	int		i ;
-
-	if (jlp == NULL) return SR_FAULT ;
-
-	for (i = 0 ; (rs = vecitem_get(&jlp->db,i,&jep2)) >= 0 ; i += 1) {
-	    if (jep2 != NULL) {
-	        if (jep2 == jep) break ;
-	    }
-	} /* end for */
-
+int jobdb_getent(jobdb *op,jobdb_ent *jep) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ; /* return-value */
+	if (op) {
+	    rs = SR_BUGCHECK ;
+	    if (vecitem *dbp = op->dbp ; dbp) {
+		void *vp ;
+	        for (i = 0 ; (rs = dbp->get(i,&vp)) >= 0 ; i += 1) {
+	            jobdb_ent *jap = resumelife<jobdb_ent>(vp) ;
+	            if (vp) {
+	                if (jap == jep) break ;
+	            }
+	        } /* end for */
+	    } /* end if (bug-check) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (jobdb_getp) */
-
+} /* end subroutine (jobdb_getent) */
 
 /* delete a job by index */
-int jobdb_del(JOBDB *jlp,int i)
-{
-	JOBDB_ENT	*jep ;
-	int		rs ;
+int jobdb_del(jobdb *op,int i) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("jobdb_del: ent i=%i\n",i) ;
-#endif
-
-	if (jlp == NULL) return SR_FAULT ;
-
-	if ((rs = vecitem_get(&jlp->db,i,&jep)) >= 0) {
-	    if (jep != NULL) {
-	        rs1 = jobdb_delit(jlp,i,jep) ;
-		if (rs >= 0) rs = rs1 ;
-	    }
-	} /* end if (found job) */
-
-#if	CF_DEBUGS
-	{
-	    const int	c = vecitem_count(&jlp->db) ;
-	    debugprintf("jobdb_del: ret rs=%d c=%u\n",rs,c) ;
-	}
-#endif /* CF_DEBUGS */
-
+	DEBUGPRINTF("ent i=%i\n",i) ;
+	if (op) {
+	    rs = SR_BUGCHECK ;
+	    if (vecitem *dbp = op->dbp ; dbp) {
+		void *vp ;
+		if ((rs = dbp->get(i,&vp)) >= 0) {
+		    jobdb_ent *jap = resumelife<jobdb_ent>(vp) ;
+	    	    if (vp) {
+	        	rs1 = jobdb_delit(op,i,jap) ;
+			if (rs >= 0) rs = rs1 ;
+		    }
+	        } /* end if (found entry) */
+	    } /* end if (bug-check) */
+	} /* end if (non-null) */
+	if_constexpr (f_debug) {
+	    cint c = vecitem_count(op->dbp) ;
+	    DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
+	} /* end if_constexpr (f_debug) */
 	return rs ;
-}
-/* end subroutine (jobdb_del) */
+} /* end subroutine (jobdb_del) */
 
-
-/* delete a job by pointer */
-int jobdb_delp(JOBDB *jlp,JOBDB_ENT *jep)
-{
-	JOBDB_ENT	*jep2 ;
-	int		rs ;
-	int		i ;
-
-#if	CF_DEBUGS
-	debugprintf("jobdb_delp: ent\n") ;
-#endif
-
-	if (jlp == NULL) return SR_FAULT ;
-
-	for (i = 0 ; (rs = vecitem_get(&jlp->db,i,&jep2)) >= 0 ; i += 1) {
-	    if (jep2 != NULL) {
-	        if (jep2 == jep) {
-	            rs = jobdb_delit(jlp,i,jep) ;
-		    break ;
-	        }
-	    }
-	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("jobdb_delp: ret rs=%d\n",rs) ;
-#endif
-
+/* delete a job by entry (pointer) */
+int jobdb_delent(jobdb *op,jobdb_ent *jep) noex {
+	int		rs = SR_FAULT ;
+	int		i ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
+	if (op && jep) {
+	    rs = SR_BUGCHECK ;
+	    if (vecitem *dbp = op->dbp ; dbp) {
+	        void *vp ;
+	        for (i = 0 ; (rs = dbp->get(i,&vp)) >= 0 ; i += 1) {
+	            jobdb_ent *jap = resumelife<jobdb_ent>(vp) ;
+	            if (vp) {
+	                if (jap == jep) {
+	                    rs = jobdb_delit(op,i,jep) ;
+		            break ;
+	                }
+	            }
+	        } /* end for */
+	    } /* end if (bug-check) */
+	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (jobdb_delp) */
+} /* end subroutine (jobdb_delent) */
 
-
-int jobdb_count(JOBDB *jlp)
-{
-
-	if (jlp == NULL) return SR_FAULT ;
-
-	return vecitem_count(&jlp->db) ;
-}
-/* end subroutine (jobdb_count) */
-
-
-int jobdb_check(JOBDB *jlp,time_t dt,int to)
-{
-	int		rs = SR_OK ;
-	if (jlp == NULL) return SR_FAULT ;
-	if ((dt - jlp->ti_jobdir) >= to) {
-	    const int	jto = JOBDB_JOBFILETO ;
-	    cchar	*pref = JOBDB_JOBPREFIX ;
-	    jlp->ti_jobdir = dt ;
-	    rs = rmdirfiles(jlp->tmpdname,pref,jto) ;
-	}
+int jobdb_count(jobdb *op) noex {
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = vecitem_count(op->dbp) ;
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (jobdb_check) */
+} /* end subroutine (jobdb_count) */
+
+int jobdb_check(jobdb *op,time_t dt,int to) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if ((dt - op->ti_jobdir) >= to) {
+	        cint	jto = JOBDB_JOBFILETO ;
+	        cchar	*pref = JOBDB_JOBPREFIX ;
+	        op->ti_jobdir = dt ;
+	        rs = rmdirfiles(op->tmpdname,pref,jto) ;
+	    } /* end if (time-out) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (jobdb_check) */
 
 
 /* private subroutines */
-
-
-/* private subroutines */
-
 
 /* delete stuff associated with this job */
-static int jobdb_delit(JOBDB *jlp,int i,JOBDB_ENT *jep)
-{
-	int		rs = SR_OK ;
+local int jobdb_delit(jobdb *op,int i,jobdb_ent *jep) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("jobdb_delit: ent i=%u\n",i) ;
-#endif
-
-	if (jlp == NULL) return SR_FAULT ;
-
-	rs1 = entry_finish(jep) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = vecitem_del(&jlp->db,i) ;
-	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("jobdb_delit: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ent i=%u\n",i) ;
+	if (op) {
+	    rs = SR_OK ;
+	    {
+		rs1 = entry_finish(jep) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = vecitem_del(op->dbp,i) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (jobdb_delit) */
-
+} /* end subroutine (jobdb_delit) */
 
 /* check if the spool directory is present */
-static int jobdb_checkdir(JOBDB *jlp)
-{
-	ustat	sb ;
-	const int	rsn = SR_NOENT ;
+local int jobdb_checkdir(jobdb *op) noex {
+	cint		rsn = SR_NOENT ;
 	int		rs ;
-
-	if ((rs = u_stat(jlp->tmpdname,&sb)) == rsn) {
-	    const mode_t	dm = (0777 | S_ISVTX) ;
-	    if ((rs = mkdirs(jlp->tmpdname,dm)) >= 0) {
-		rs = chmod(jlp->tmpdname,dm) ;
+	if (ustat sb ; (rs = u_stat(op->tmpdname,&sb)) == rsn) {
+	    cmode	dm = (0777 | S_ISVTX) ;
+	    if ((rs = mkdirs(op->tmpdname,dm)) >= 0) {
+		rs = chmod(op->tmpdname,dm) ;
 	    }
 	} /* end if (needed to create) */
-
 	return rs ;
-}
-/* end subroutine (jobdb_checkdir) */
+} /* end subroutine (jobdb_checkdir) */
 
-
-static int entry_start(JOBDB_ENT *jep,cchar *template,cchar *jobid,int f_so)
-{
+local int entry_start(jobdb_ent *jep,cchar *tpat,cchar *jobid,int f_so) noex {
 	custime		dt = getustime ;
 	int		rs ;
-
 	memclear(jep) ;
 	jep->pid = -1 ;
 	jep->atime = dt ;
 	jep->stime = dt ;
-
 	strwcpy(jep->jobid,jobid,JOBDB_JOBIDLEN) ;
-
-	if (cchar *cp ; (rs = mkfile(template,&cp)) >= 0) {
-	    jep->efname = (char *) cp ;
+	if (cchar *cp ; (rs = mkfile(tpat,&cp)) >= 0) {
+	    jep->efname = charp(cp) ;
 	    if (f_so) {
-	        rs = mkfile(template,&cp) ;
+	        rs = mkfile(tpat,&cp) ;
 	        jep->ofname = (char *) cp ;
 	    }
 	    if (rs < 0) {
-	        if (jep->efname != NULL) {
+	        if (jep->efname) {
 	            if (jep->efname[0] != '\0') {
 		        u_unlink(jep->efname) ;
 		        jep->efname[0] = '\0' ;
 		    }
-	            uc_free(jep->efname) ;
-	            jep->efname = NULL ;
-	        }
-	    } /* end if (error-recovery) */
-	} /* end if */
-
+	            mem.free(jep->efname) ;
+	            jep->efname = nullptr ;
+	        } /* end if (memory-release) */
+	    } /* end if (error) */
+	} /* end if (mkfile) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
-
-static int entry_finish(JOBDB_ENT *jep)
-{
+local int entry_finish(jobdb_ent *jep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("jobdb/entry_finish: ent jodb=%s\n",jep->jobid) ;
-#endif
-
-	if (jep->ofname != NULL) {
+	DEBUGPRINTF("ent jodb=%s\n",jep->jobid) ;
+	if (jep->ofname) {
 	    if (jep->ofname[0] != '\0') {
 		u_unlink(jep->ofname) ;
 		jep->ofname[0] = '\0' ;
 	    }
-	    rs1 = uc_free(jep->ofname) ;
+	    rs1 = mem.free(jep->ofname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->ofname = NULL ;
-	}
-
-	if (jep->efname != NULL) {
+	    jep->ofname = nullptr ;
+	} /* end if (memory-release) */
+	if (jep->efname) {
 	    if (jep->efname[0] != '\0') {
 		u_unlink(jep->efname) ;
 		jep->efname[0] = '\0' ;
 	    }
-	    rs1 = uc_free(jep->efname) ;
+	    rs1 = mem.free(jep->efname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    jep->efname = NULL ;
-	}
-
+	    jep->efname = nullptr ;
+	} /* end if (memory-release) */
 	jep->pid = -1 ;
 	jep->jobid[0] = '\0' ;
-
-#if	CF_DEBUGS
-	debugprintf("jobdb/entry_finish: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	    maxpathlen = rs ;
+	} /* end if (bufsizeget) */
+    	return rs ;
+} /* end method (vars::operator) */
 
-static int mkfile(cchar *template,cchar **rpp)
-{
+local int mkfile(cchar *tpat,cchar **rpp) noex {
 	int		rs ;
-	int		tl = 0 ;
-	char		tbuf[MAXPATHLEN + 1] ;
-
-	if ((rs = mktmpfile(tbuf,0666,template)) >= 0) {
-	    tl = rs ;
-	    rs = uc_mallocstrw(tbuf,tl,rpp) ;
-	    if (rs < 0) {
-	        u_unlink(tbuf) ;
-		*rpp = NULL ;
-	    } /* end if (error-recovery) */
-	} /* end if (mktmpfile) */
-
+	int		rs1 ;
+	int		tl = 0 ; /* return-value */
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	    cmode fm = 0666 ;
+	    if ((rs = mktmpfile(tbuf,tpat,fm)) >= 0) {
+	        tl = rs ;
+	        rs = mem.strw(tbuf,tl,rpp) ;
+	        if (rs < 0) {
+	            u_unlink(tbuf) ;
+		    *rpp = nullptr ;
+	        } /* end if (error) */
+	    } /* end if (mktmpfile) */
+	    rs1 = mem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? tl : rs ;
-}
-/* end subroutine (mkfile) */
+} /* end subroutine (mkfile) */
 
 
