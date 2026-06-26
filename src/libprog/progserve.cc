@@ -63,7 +63,7 @@
 #include	<strwcpy.h>
 #include	<svckey.h>
 #include	<procse.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -997,7 +997,7 @@ badnoprog:
 ret0:
 	return rs ;
 }
-/* end subroutines (procserverexec) */
+/* end subroutine (procserverexec) */
 
 
 local int procfindprog(pip,plp,prdirs,progfname,pnp,pnl)
@@ -1043,7 +1043,7 @@ int		pnl ;
 
 	return (rs >= 0) ? rlen : rs ;
 }
-/* end subroutines (procfindprog) */
+/* end subroutine (procfindprog) */
 
 
 #if	CF_CHECKACCESS
@@ -1275,7 +1275,7 @@ local int loadpeernames(PROGINFO *pip,CLIENTINFO *cip,vecstr *nlp)
 
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutines (loadpeernames) */
+/* end subroutine (loadpeernames) */
 
 local int loadaccgroups(PROGINFO *pip,vecstr *glp,cchar *accbuf,int acclen)
 {
