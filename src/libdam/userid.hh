@@ -14,20 +14,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 enum useridmems {
     	useridmem_finish,
     	useridmem_overlast
-} ;
+} ; /* end enum */
 struct userid ;
 struct userid_st {
 	userid		*op = nullptr ;
@@ -60,8 +57,8 @@ struct userid {
 	uid_t		uid ;
 	gid_t		gid ;
 	userid() noex {
-	    start.init(this) ;
-	    finish(this,useridmem_finish) ;
+	    start.init	(this) ;
+	    finish	(this,useridmem_finish) ;
 	} ;
 	destruct userid() {
 	    if (username) dtor() ;
@@ -72,8 +69,8 @@ struct userid {
 
 EXTERNC_begin
 
-extern int	userid_star(userid *,cchar * = nullptr) noex ;
-extern int	userid_finish(userid *) noex ;
+extern int	userid_star	(userid *,cchar * = nullptr) noex ;
+extern int	userid_finish	(userid *) noex ;
 
 EXTERNC_end
 
