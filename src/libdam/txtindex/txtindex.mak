@@ -57,8 +57,7 @@ OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -101,7 +100,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -142,14 +141,14 @@ obj6.o:			$(OBJ6)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj7.o:			$(OBJ7)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 txtindex_prime.o:	txtindex_prime.cc			$(INCS)
