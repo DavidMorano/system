@@ -13,22 +13,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/stat.h>
-#include	<time.h>		/* |time_t| */
-#include	<stdlib.h>		/* |size_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
-#include	<vecobj.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<sys/stat.h>		/* POSIX */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<stdlib.h>		/* CSTD |size_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
 
 
-#define	DW_MAGIC	0x31415926
-#define	DW_INTCHECK	20		/* default check time (seconds) */
 #define	DW		struct dw_head
 #define	DW_FL		struct dw_flags
 #define	DW_ENT		struct dw_entry
 #define	DW_CUR		struct dw_cursor
+#define	DW_MAGIC	0x31415926
+#define	DW_INTCHECK	20		/* default check time (seconds) */
 
 
 enum dwstates {
