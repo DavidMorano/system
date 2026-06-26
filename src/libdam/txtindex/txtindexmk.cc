@@ -28,23 +28,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getnodedomain.h>
-#include	<mkpr.h>
-#include	<estrings.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<netdb.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC */
+#include	<mkpr.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"txtindexmk.h"
 #include	"txtindexmks.h"
@@ -75,12 +75,12 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 extern "C" {            
-    typedef int	(*soopen_f)(void *,TIM_PA *,cchar *,int,int) noex ;
-    typedef int	(*soaddeigens_f)(void *,TIM_KEY *,int) noex ;
-    typedef int	(*soaddtags_f)(void *,TIM_TAG *,int) noex ;
-    typedef int	(*sonoop_f)(void *) noex ;
-    typedef int	(*soabort_f)(void *) noex ;
-    typedef int	(*soclose_f)(void *) noex ;
+    typedef int	(*soopen_f)		(void *,TIM_PA *,cchar *,int,int) noex ;
+    typedef int	(*soaddeigens_f)	(void *,TIM_KEY *,int) noex ;
+    typedef int	(*soaddtags_f)		(void *,TIM_TAG *,int) noex ;
+    typedef int	(*sonoop_f)		(void *) noex ;
+    typedef int	(*soabort_f)		(void *) noex ;
+    typedef int	(*soclose_f)		(void *) noex ;
 } /* end extern (C) */
 
 
@@ -172,7 +172,7 @@ template<typename ... Args>
 local inline int txtindexmk_magic(txtindexmk *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == TXTINDEXMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == TXTINDEXMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (txtindexmk_magic) */
@@ -196,9 +196,9 @@ enum subs {
 	sub_noop,
 	sub_abort,
 	sub_overlast
-} ;
+} ; /* end enum (subs) */
 
-constexpr cpcchar	subs[] = {
+constexpr cpcchar	subnames[] = {
 	"open",
 	"addeigens",
 	"addtags",
@@ -206,7 +206,7 @@ constexpr cpcchar	subs[] = {
 	"noop",
 	"abort",
 	nullptr
-} ;
+} ; /* end array (subnames) */
 
 static vars		var ;
 
@@ -239,8 +239,7 @@ int txtindexmk_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	    }
 	} /* end if (txtindexmk_ctor) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (txtindexmk_open) */
+} /* end subroutine (txtindexmk_open) */
 
 int opener::operator () (char *ap) noex {
 	int		rs ;
@@ -257,7 +256,7 @@ int opener::operator () (char *ap) noex {
 	    	    txtindexmk_calls	*callp = callsp(op->callp) ;
 	    	    if ((rs = (*callp->open)(op->obj,pp,db,of,om)) >= 0) {
 			rv = rs ;
-			op->magic = TXTINDEXMK_MAGIC ;
+			op->magval = TXTINDEXMK_MAGIC ;
 	    	    }
 	    	    if (rs < 0) {
 			txtindexmk_objloadend(op) ;
@@ -266,8 +265,7 @@ int opener::operator () (char *ap) noex {
 	    } /* end if (mkpr) */
 	} /* end if (getnodedomain) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end method (opener::operator) */
+} /* end method (opener::operator) */
 
 int txtindexmk_close(TIM *op) noex {
 	int		rs ;
@@ -286,11 +284,10 @@ int txtindexmk_close(TIM *op) noex {
 		rs1 = txtindexmk_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindexmk_close) */
+} /* end subroutine (txtindexmk_close) */
 
 int txtindexmk_addeigens(TIM *op,TIM_KEY *keys,int nkeys) noex {
 	int		rs ;
@@ -299,8 +296,7 @@ int txtindexmk_addeigens(TIM *op,TIM_KEY *keys,int nkeys) noex {
 	    rs = (*callp->addeigens)(op->obj,keys,nkeys) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindexmk_addeigens) */
+} /* end subroutine (txtindexmk_addeigens) */
 
 int txtindexmk_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
 	int		rs ;
@@ -309,8 +305,7 @@ int txtindexmk_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
 	    rs = (*callp->addtags)(op->obj,tags,ntags) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindexmk_addtags) */
+} /* end subroutine (txtindexmk_addtags) */
 
 int txtindexmk_noop(TIM *op) noex {
 	int		rs ;
@@ -321,44 +316,43 @@ int txtindexmk_noop(TIM *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindexmk_noop) */
+} /* end subroutine (txtindexmk_noop) */
 
 
 /* private subroutines */
 
 local int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
-	modload		*lp = op->mlp ;
+	modload		*mlp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
 		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = TIM_MODBNAME ;
 		    int		mo = 0 ;
 	            mo |= modloadm.libvar ;
 	            mo |= modloadm.libsdirs ;
-	            if ((rs = modload_open(lp,pr,mn,objn,mo,sv)) >= 0) {
+	            if ((rs = modload_open(mlp,pr,mn,objn,mo,sv)) >= 0) {
 			op->fl.modload = true ;
-	    		if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
-			    cint	sz = op->objsize ;
-			    op->objsize = mv[0] ;
-		            op->cursize = mv[1] ;
+	    		if (int mv[2] ; (rs = modload_getmva(mlp,mv,2)) >= 0) {
+			    cint	sz = op->objsz ;
+			    op->objsz = mv[0] ;
+		            op->cursz = mv[1] ;
 			    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 		                op->obj = vp ;
 		                rs = txtindexmk_loadcalls(op,&syms) ;
 		                if (rs < 0) {
 			            lm_free(op->obj) ;
 			            op->obj = nullptr ;
-		                }
+		                } /* end if (error) */
 		            } /* end if (memory-allocation) */
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
 			    op->fl.modload = false ;
-		            modload_close(lp) ;
-			}
+		            modload_close(mlp) ;
+			} /* end if (error) */
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
 	    } /* end if (vecstr_addsyms) */
@@ -366,12 +360,11 @@ local int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
-	        modload_close(lp) ;
-	    }
+	        modload_close(mlp) ;
+	    } /* end if (error) */
 	} /* end if (vecstr-syms) */
 	return rs ;
-}
-/* end subroutine (txtindexmk_objloadbegin) */
+} /* end subroutine (txtindexmk_objloadbegin) */
 
 local int txtindexmk_objloadend(TIM *op) noex {
 	int		rs = SR_OK ;
@@ -380,15 +373,14 @@ local int txtindexmk_objloadend(TIM *op) noex {
 	    rs1 = lm_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (op->mlp && op->fl.modload) {
 	    op->fl.modload = false ;
 	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (txtindexmk_objloadend) */
+} /* end subroutine (txtindexmk_objloadend) */
 
 local int txtindexmk_loadcalls(TIM *op,vecstr *slp) noex {
 	modload		*lp = op->mlp ;
@@ -428,8 +420,7 @@ local int txtindexmk_loadcalls(TIM *op,vecstr *slp) noex {
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (txtindexmk_loadcalls) */
+} /* end subroutine (txtindexmk_loadcalls) */
 
 local int mkvars() noex {
 	int		rs ;
@@ -440,8 +431,7 @@ local int mkvars() noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (mkvars) */
+} /* end subroutine (mkvars) */
 
 local bool isrequired(int i) noex {
 	bool		f = false ;
@@ -454,7 +444,6 @@ local bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
