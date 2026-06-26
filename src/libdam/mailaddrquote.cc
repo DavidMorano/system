@@ -169,8 +169,7 @@ int mailaddrquote_start(MAQ *op,cc *abuf,int alen,cc **rpp) noex {
 	    *rpp = (rs >= 0) ? rp : nullptr ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mailaddrquote_start) */
+} /* end subroutine (mailaddrquote_start) */
 
 int mailaddrquote_finish(MAQ *op) noex {
 	int		rs ;
@@ -189,8 +188,7 @@ int mailaddrquote_finish(MAQ *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mailaddrquote_finish) */
+} /* end subroutine (mailaddrquote_finish) */
 
 
 /* local subroutines */
