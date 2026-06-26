@@ -5,7 +5,6 @@
 /* log handling (general-program) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
 
 /* revision history:
@@ -29,26 +28,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstdarg>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
-#include	<bfile.h>
-#include	<logfile.h>
-#include	<fmtstr.h>
-#include	<userinfo.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<climits>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
-#include	"config.h"
-#include	"defs.h"
+#include	<proginfo.hh>
 
 
 /* local defines */
@@ -61,7 +59,7 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	proglogfname(PROGINFO *,char *,cchar *,cchar *) noex ;
+    extern int	proglogfname(PI *,char *,cchar *,cchar *) noex ;
 }
 
 
@@ -82,7 +80,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int progloger_begin(PROGINFO *pip,cchar *lfn,USERINFO *uip) noex {
+int progloger_begin(PI *pip,cchar *lfn,userinfo *uip) noex {
 	int		rs = SR_OK ;
 	int		f_opened = false ;
 
@@ -142,7 +140,7 @@ int progloger_begin(PROGINFO *pip,cchar *lfn,USERINFO *uip) noex {
 /* end subroutine (progloger_begin) */
 
 
-int progloger_end(PROGINFO *pip)
+int progloger_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -158,7 +156,7 @@ int progloger_end(PROGINFO *pip)
 /* end subroutine (progloger_end) */
 
 
-int progloger_print(PROGINFO *pip,cchar *sp,int sl)
+int progloger_print(PI *pip,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	if (pip == nullptr) return SR_FAULT ;
@@ -170,9 +168,8 @@ int progloger_print(PROGINFO *pip,cchar *sp,int sl)
 }
 /* end subroutine (progloger_print) */
 
-
 /* vprintf-like thing */
-int progloger_vprintf(PROGINFO *pip,cchar *fmt,va_list ap)
+int progloger_vprintf(PI *pip,cchar *fmt,va_list ap)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -190,13 +187,10 @@ int progloger_vprintf(PROGINFO *pip,cchar *fmt,va_list ap)
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (progloger_vprintf) */
-
+} /* end subroutine (progloger_vprintf) */
 
 /* PRINTFLIKE2 */
-int progloger_printf(PROGINFO *pip,cchar fmt[],...)
-{
+int progloger_printf(PI *pip,cchar *fmt,...) noex {
 	int		rs = SR_OK ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
@@ -211,19 +205,17 @@ int progloger_printf(PROGINFO *pip,cchar fmt[],...)
 	    va_end(ap) ;
 	}
 	return rs ;
-}
-/* end subroutine (progloger_printf) */
+} /* end subroutine (progloger_printf) */
 
-
-int progloger_flush(PROGINFO *pip)
-{
-	int		rs = SR_OK ;
-	if (pip == nullptr) return SR_FAULT ;
-	if (pip->open.logprog) {
-	    rs = logfile_flush(&pip->lh) ;
-	}
+int progloger_flush(PI *pip) noex {
+	int		rs = SR_FAULT ;
+	if (pip) {
+	    rs = SR_OK ;
+	   if (pip->open.logprog) {
+	       rs = logfile_flush(&pip->lh) ;
+	   }
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (progloger_flush) */
+} /* end subroutine (progloger_flush) */
 
 
