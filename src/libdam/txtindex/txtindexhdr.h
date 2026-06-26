@@ -13,11 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 #define	TXTINDEXHDR		struct txtindexhdr_head
@@ -51,7 +51,14 @@ struct txtindexhdr_head {
 	uchar		vetu[4] ;
 } ; /* end struct */
 
+#ifdef	__cplusplus
+struct txtindexhdr : txtindexhdr_head {
+    	int rd		(char *,int)	noex ;
+    	int wr		(cchar *,int)	noex ;
+} ; /* end struct (bvshdr) */
+#else /* __cplusplus */
 typedef	TXTINDEXHDR	txtindexhdr ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
