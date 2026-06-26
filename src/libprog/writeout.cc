@@ -1,4 +1,5 @@
 /* progdebugout SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* write out the output files from the executed program */
@@ -17,15 +18,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<linefold.h>
-#include	<bfile.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<linefold.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
-#include	"shio.h"
-#include	"defs.h"
+#include	<proginfo.hh>
 
 
 /* local defines */
@@ -47,7 +49,7 @@
 
 /* forward references */
 
-static int	procline(PROGINFO *,int,cchar *,int) noex ;
+local int	procline(PROGINFO *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -60,8 +62,7 @@ static cchar	blanks[] = "        " ;
 
 /* exported subroutines */
 
-int progdebugout(PROGINFO *pip,cchar *s,cchar *fname)
-{
+int progdebugout(PROGINFO *pip,cchar *s,cchar *fname) noex {
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	int		wlen = 0 ;
@@ -88,7 +89,7 @@ int progdebugout(PROGINFO *pip,cchar *s,cchar *fname)
 	        bfile	ofile, *ofp = &ofile ;
 
 	        if ((rs = bopen(ofp,fname,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 		    int		f_title = FALSE ;
 	            int		lines = 0 ;
 	            int		len ;
@@ -137,11 +138,9 @@ int progdebugout(PROGINFO *pip,cchar *s,cchar *fname)
 
 /* local subroutines */
 
-
-static int procline(PROGINFO *pip,int columns,cchar *lp,int ll)
-{
+local int procline(PROGINFO *pip,int columns,cchar *lp,int ll) noex {
 	SHIO		*fp = pip->efp ;
-	const int	indent = 2 ;
+	cint		indent = 2 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		leadlen ;
@@ -169,7 +168,6 @@ static int procline(PROGINFO *pip,int columns,cchar *lp,int ll)
 	} /* end if (non-zero) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procline) */
+} /* end subroutine (procline) */
 
 
