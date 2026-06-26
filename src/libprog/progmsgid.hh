@@ -35,13 +35,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<userinfo.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	<proginfo.hh>
 
