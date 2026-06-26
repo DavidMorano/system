@@ -1,0 +1,9 @@
+MD5C
+
+This code was written by: 
+Dirk Eddelbuettel
+
+His GitHub repository is:
+https://github.com/eddelbuettel
+
+
