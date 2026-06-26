@@ -30,28 +30,34 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
-#include	<malloccc.h>
-#include	<bfile.h>
-#include	<linefold.h>
-#include	<logfile.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* LIBUC */
+#include	<sys/param.h>		/* LIBUC */
+#include	<unistd.h>		/* LIBUC */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<linefold.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
-#include	"config.h"
-#include	"defs.h"
+#include	<proginfo.hh>
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#ifndef	
 #define	PI		proginfo
+#endif
 
 #ifndef	MAXOUTLEN
 #define	MAXOUTLEN	64
@@ -80,8 +86,8 @@ extern "C" {
 
 /* forward references */
 
-static int	procfile(PI *,cchar *,int,cchar *) noex ;
-static int	procline(PI *,int,cchar *,int) noex ;
+local int	procfile(PI *,cchar *,int,cchar *) noex ;
+local int	procline(PI *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -113,19 +119,18 @@ int proglogout(PI *pip,cchar *msgstr,cchar *fname) noex {
 	    } /* end if (non-nul) */
 	} /* end if (fname) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (proglogout) */
+} /* end subroutine (proglogout) */
 
 
 /* local subroutines */
 
-static int procfile(PI *pip,cchar *sp,int sl,cchar *fname) noex {
+local int procfile(PI *pip,cchar *sp,int sl,cchar *fname) noex {
 	cint		columns = LOGFILE_FMTLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
-	    bfile		ofile, *fp = &ofile ;
+	if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
+	    bfile	ofile, *fp = &ofile ;
 	    if ((rs = bopen(fp,fname,"r",0666)) >= 0) {
 	        int		len ;
 	        int		line = 0 ;
@@ -147,13 +152,13 @@ static int procfile(PI *pip,cchar *sp,int sl,cchar *fname) noex {
 	        rs1 = bclose(fp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (server output-file) */
-	    rs = rsfree(rs,lbuf) ;
+	    rs1 = mem.free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procfile) */
+} /* end subroutine (procfile) */
 
-static int procline(PI *pip,int columns,cchar *lp,int ll) noex {
+local int procline(PI *pip,int columns,cchar *lp,int ll) noex {
 	cint		indent = 2 ;
 	cint		leadlen = 4 ;
 	int		rs = SR_OK ;
@@ -180,7 +185,6 @@ static int procline(PI *pip,int columns,cchar *lp,int ll) noex {
 	    } /* end if (linefold) */
 	} /* end if (non-zero) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procline) */
+} /* end subroutine (procline) */
 
 
