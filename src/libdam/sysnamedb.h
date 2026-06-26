@@ -33,11 +33,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<nodedb.h>
-#include	<clusterdb.h>
-#include	<vecstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<nodedb.h>		/* LIBUC */
+#include	<clusterdb.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
 
 
 #define	SYSNAMEDB	struct sysnamedb_head
