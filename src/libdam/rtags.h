@@ -13,11 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
-#include	<vecobj.h>
-#include	<ptm.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<hdb.h>			/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	RTAGS		struct rtags_head
@@ -37,7 +37,7 @@ struct rtags_head {
 	vecobj		*tlp ;		/* tag-list-pointer */
 	hdb		*hdp ;		/* has-data-pointer */
 	ptm		*mxp ;		/* mutex-pointer */
-	uint		magic ;
+	uint		magval ;
 	int		nfiles ;
 } ; /* end struct */
 
