@@ -760,7 +760,7 @@ local int msgid_fileinit(msgid *op,time_t dt) noex {
 	    }
 	    if (rs >= 0) {
 	        cint		fltop = MSGID_FLTOP ;
-	        if ((rs = u_pread(op->fd,fbuf,MSGID_FBUFLEN,0z)) >= fltop) {
+	        if ((rs = u_readp(op->fd,fbuf,MSGID_FBUFLEN,0z)) >= fltop) {
 		    cfm		fc = funmode::wr ;
 		    bl = 0 ;
 	            if ((rs = filemagic(&fm,fc,(fbuf + bl))) >= 0) {
@@ -780,7 +780,7 @@ local int msgid_fileinit(msgid *op,time_t dt) noex {
 	                    op->fl.fileinit = f ;
 			} /* end if (filehead) */
 		    } /* end if (filemagic) */
-	        } /* end if (u_pread) */
+	        } /* end if (u_readp) */
 	    } /* end if (ok) */
 	} /* end if */
 	/* if we locked, we unlock it, otherwise leave it! */
@@ -806,7 +806,7 @@ local int msgid_filechanged(msgid *op) noex {
 	    if ((! f_changed) && op->fl.fileinit) {
 	        MSGID_FH	h ;
 	        char		hbuf[MSGID_FLTOP + 1] ;
-	        if ((rs = u_pread(op->fd,hbuf,MSGID_FLTOP,0z)) >= 0) {
+	        if ((rs = u_readp(op->fd,hbuf,MSGID_FLTOP,0z)) >= 0) {
 	            if (rs < MSGID_FLTOP) {
 	                op->fl.fileinit = false ;
 		    }
@@ -820,7 +820,7 @@ local int msgid_filechanged(msgid *op) noex {
 	                    op->h = h ;
 			}
 	            } /* end if (positive) */
-	        } /* end if (u_pread) */
+	        } /* end if (u_readp) */
 	    } /* end if (reading file header) */
 	    /* OK, we are done */
 	    if ((rs >= 0) && f_changed) {
@@ -1123,7 +1123,7 @@ local int msgid_bufload(msgid *op,int roff,int rlen,char **rpp) noex {
 		}
 	        len = fext - foff ;
 	        poff = foff ;
-	        if ((rs = u_pread(op->fd,rbuf,len,poff)) >= 0) {
+	        if ((rs = u_readp(op->fd,rbuf,len,poff)) >= 0) {
 	            op->b.len += rs ;
 		    uint	t1len = ((op->b.off + op->b.len) - boff) ;
 		    uint	t2len = uint(rlen) ;
@@ -1141,7 +1141,7 @@ local int msgid_bufload(msgid *op,int roff,int rlen,char **rpp) noex {
 	            fext = bend ;
 		}
 	        len = fext - foff ;
-	        if ((rs = u_pread(op->fd,op->b.mbuf,len,foff)) >= 0) {
+	        if ((rs = u_readp(op->fd,op->b.mbuf,len,foff)) >= 0) {
 	            op->b.len = rs ;
 	            len = min(rs,rlen) ;
 	        }
