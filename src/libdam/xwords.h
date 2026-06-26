@@ -13,8 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	XWORDS		struct xwords_head
@@ -28,8 +28,8 @@ struct xwords_worditem {
 } ; /* end struct */
 
 struct xwords_head {
-	XWORDS_WORD	words[XWORDS_MAX] ;
 	XWORDS_WORD	*xa ;
+	XWORDS_WORD	words[XWORDS_MAX] ;
 	int		nwords ;
 } ; /* end struct */
 
@@ -61,9 +61,8 @@ struct xwords : xwords_head {
 	} ;
 	xwords(const xwords &) = delete ;
 	xwords &operator = (const xwords &) = delete ;
-	int start(cchar *,int) noex ;
-	int get(int,cchar **) noex ;
-	int del(int = -1) noex ;
+	int start	(cchar *,int) noex ;
+	int get		(int,cchar **) noex ;
 	void dtor() noex ;
 	destruct xwords() {
 	    if (xa) dtor() ;
@@ -72,6 +71,8 @@ struct xwords : xwords_head {
 #else	/* __cplusplus */
 typedef XWORDS		xwords ;
 #endif /* __cplusplus */
+
+typedef	XWORDS_WORD	xwords_word ;
 
 EXTERNC_begin
 
