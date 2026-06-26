@@ -37,8 +37,7 @@ INCS += libprog.h proginfo.hh
 
 MODS +=
 
-#LIBS= -ldam -luc -lu
-LIBS= -lu
+LIBS= -luo
 
 
 OBJ00= proginfo.o proglog.o proguserlist.o
@@ -125,8 +124,7 @@ OBJ= obja.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -171,17 +169,17 @@ so:			$(T).so
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $(T).a $?
 
 $(T).o:			$(OBJ) Makefile localmisc.h
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
-$(T).so:		$(OBJ) Makefile localmisc.h
-	$(LD) -o $@ $(SOFL) $(LDFLAGS) $(OBJ) $(LIBINFO)
+$(T).so:		$(OBJ)
+	$(LD) -o $@ $(SOFL) $(LDFLAGS) $^ $(LIBINFO)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -236,10 +234,13 @@ objg.o:			$(OBJG)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-proginfo.o:	proginfo.cc	proginfo.hh			$(INCS)
-progmsgid.o:	progmsgid.cc	progmsgid.h			$(INCS)
-proglog.o:	proglog.cc	proglog.hh			$(INCS)
-proguserlist.o:	proguserlist.cc	proguserlist.h			$(INCS)
-progexpand.o:	progexpand.cc	progexpand.h			$(INCS)
+proginfo.o:		proginfo.cc	proginfo.hh			$(INCS)
+proglog.o:		proglog.cc	proglog.hh			$(INCS)
+
+progmsgid.o:		progmsgid.cc	progmsgid.h			$(INCS)
+proguserlist.o:		proguserlist.cc	proguserlist.h			$(INCS)
+progexpand.o:		progexpand.cc	progexpand.h			$(INCS)
+
+pimkrand.o:		pimkrand.cc	pimkrand.hh		$(INCS)
 
 
