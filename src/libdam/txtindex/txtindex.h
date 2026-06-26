@@ -20,22 +20,18 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-
-#include	<txtindexes.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBDAM */
+#include	<txtindexes.h>		/* LIBDAM */
 
 
-#define	TXTINDEX_MAGIC		0x99447246
 #define	TXTINDEX		struct txtindex_head
 #define	TXTINDEX_FL		struct txtindex_flags
 #define	TXTINDEX_CUR		struct txtindex_cursor
-#define	TXTINDEX_TAG		TXTINDEXES_TAG
-#define	TXTINDEX_INFO		TXTINDEXES_INFO
+#define	TXTINDEX_TAG		txtindexes_tag
+#define	TXTINDEX_INFO		txtindexes_info
+#define	TXTINDEX_MAGIC		0x99447246
 
 
 struct txtindex_flags {
@@ -44,7 +40,7 @@ struct txtindex_flags {
 
 struct txtindex_cursor {
 	void		*scp ;		/* SO-cursor pointer */
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct txtindex_head {
@@ -52,7 +48,7 @@ struct txtindex_head {
 	void		*callp ;
 	void		*obj ;		/* object pointer */
 	TXTINDEX_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
 } ; /* end struct */
