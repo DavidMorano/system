@@ -104,6 +104,7 @@ const char varnames::tmout[] =		"TMOUT" ;
 const char varnames::editor[] =		"EDITOR" ;
 const char varnames::visual[] =		"VISUAL" ;
 const char varnames::random[] =		"RANDOM" ;
+const char varnames::seconds[] =	"SECONDS" ;
 const char varnames::hz[] =		"HZ" ;
 const char varnames::ncpu[] =		"NCPU" ;
 const char varnames::nisdomain[] =	"NISDOMAIN" ;
