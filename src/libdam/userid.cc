@@ -42,16 +42,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |stpcpy(3c)| */
-#include	<string>
-#include	<usystem.h>
-#include	<getusername.h>
-#include	<getgroupname.h>
-#include	<mallocxx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |stpcpy(3c)| */
+#include	<string>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getgroupname.h>	/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"userid.hh"
 
@@ -63,6 +65,7 @@ import libutil ;
 /* imported namespaces */
 
 using std::string ;			/* type */
+using libuc::mem ;
 
 
 /* local typedefs */
@@ -127,8 +130,7 @@ int userid_start(userid *op,cc *un,cc *gn,uid_t uid,gid_t gid) noex {
 	    rs = so ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (userid_start) */
+} /* end subroutine (userid_start) */
 
 int userid_finish(userid *op) noex {
     	int		rs = SR_FAULT ;
@@ -137,15 +139,14 @@ int userid_finish(userid *op) noex {
 	    rs = SR_OK ;
 	    if (op->username) {
 		char *bp = cast_const<charp>(op->username) ;
-		rs1 = uc_free(bp) ;
+		rs1 = mem.free(bp) ;
 		if (rs >= 0) rs = rs1 ;
 		op->username = nullptr ;
 		op->groupname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (userid_finish) */
+} /* end subroutine (userid_finish) */
 
 
 /* private subroutines */
@@ -170,22 +171,25 @@ submgr::operator int () noex {
 
 int submgr::getgn() noex {
     	int		rs ;
-	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	int		rs1 ;
+	if (char *pwbuf ; (rs = mem.pw(&pwbuf)) >= 0) {
 	    cint	pwlen = rs ;
 	    if (ucentpw pw ; (rs = pw.getnam(pwbuf,pwlen,un)) >= 0) {
 		if (gn == nullptr) {
 		    rs = loadgn(pw.pw_gid) ;
-		}
+		} /* end if (pw.getnam) */
 		loadids(&pw) ;
 	    } /* end if (pw.getname) */
-	    rs = rsfree(rs,pwbuf) ;
+	    rs1 = mem.free(pwbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 } /* end method (submgr::getgn) */
 
 int submgr::getun() noex {
     	int		rs ;
-	if (char *pwbuf ; (rs = malloc_pw(&pwbuf)) >= 0) {
+	int		rs1 ;
+	if (char *pwbuf ; (rs = mem.pw(&pwbuf)) >= 0) {
 	    cint	pwlen = rs ;
 	    if (ucentpw pw ; (rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
 		{
@@ -197,14 +201,16 @@ int submgr::getun() noex {
 		}
 		loadids(&pw) ;
 	    } /* end if (getpwusername) */
-	    rs = rsfree(rs,pwbuf) ;
+	    rs1 = mem.free(pwbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
 } /* end method (submgr::getun) */
 
 int submgr::loadgn(gid_t pwgid) noex {
     	int		rs ;
-        if (char *gnbuf ; (rs = malloc_gn(&gnbuf)) >= 0) {
+	int		rs1 ;
+        if (char *gnbuf ; (rs = mem.gn(&gnbuf)) >= 0) {
             if ((rs = getgroupname(gnbuf,rs,pwgid)) >= 0) {
                 try {
                     tgn = gnbuf ;
@@ -213,7 +219,8 @@ int submgr::loadgn(gid_t pwgid) noex {
                     rs = SR_NOMEM ;
                 }
             } /* end if (getgroupname) */
-            rs = rsfree(rs,gnbuf) ;
+            rs1 = mem.free(gnbuf) ;
+	    if (rs >= 0) rs = rs1 ;
         } /* end if (m-a-f) */
 	return rs ;
 } /* end method (submgr::loadgn) */
@@ -237,7 +244,7 @@ int submgr::alloc() noex {
 	    sz += int(tgn.size() + 1) ;
 	    gcp = tgn.c_str() ;
 	}
-	if (char *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	if (char *a ; (rs = mem.mall(sz,&a)) >= 0) {
 	    op->username = a ;
 	    a = (stpcpy(a,ucp) + 1) ;
 	    op->groupname = a ;
