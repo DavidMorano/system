@@ -27,6 +27,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<endian.h>		/* LIBU */
@@ -37,6 +40,8 @@
 
 
 /* local defines */
+
+#define	MD5_BYTES	16		/* number bytes in MD5 digest */
 
 
 /* local namespaces */
@@ -59,6 +64,8 @@
 
 /* local variables */
 
+cint		nbytes_md5	= MD5_BYTES ;
+
 
 /* exported variables */
 
@@ -69,14 +76,14 @@ int md5calc(ulong *rp,cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
 	if (rp && sp) {
 	    ulong	hv = 0 ;
-	    uchar	out[16] ;
+	    uchar	out[nbytes_md5] ;
 	    md5_calc(out,(uchar *) sp,(uint) sl) ;
-	    for (int i = 0 ; i < 8 ; i += 1) {
+	    for (int i = 0 ; i < szof(ulong) ; i += 1) {
 	        ulong v = out[i] ;
 	        if (ENDIAN) {
-	            hv = ((hv << 8) | v) ;
+	            hv = ((hv << CHAR_BIT) | v) ;
 	        } else {
-	            v = (v << (i * 8)) ;
+	            v = (v << (i * CHAR_BIT)) ;
 	            hv |= v ;
 	        } /* end if */
 	    } /* end for */
