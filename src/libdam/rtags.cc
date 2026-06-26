@@ -29,18 +29,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<hdb.h>
-#include	<vecobj.h>
-#include	<ptm.h>
-#include	<mkpathx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"rtags.h"
 
@@ -54,15 +53,13 @@ import libutil ;			/* |memclear(3u)| */
 #define	RT_TAG	rtags_tag
 
 #define	FNAME	rtags_fname
-#define	CUR	rtags_cur
+#define	RT_CUR	rtags_cur
 
 #define	NDEFS	10
 
 
 /* imported namespaces */
 
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -102,17 +99,17 @@ local int rtags_ctor(rtags *op,Args ... args) noex {
 		        if (rs < 0) {
 		            delete op->hdp ;
 		            op->hdp = nullptr ;
-		        }
+		        } /* end if (error) */
 		    } /* end if (new-hdb) */
 		    if (rs < 0) {
 		        delete op->tlp ;
 		        op->tlp = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (new-vecobj) */
 		if (rs < 0) {
 		    delete op->flp ;
 		    op->flp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
@@ -125,19 +122,19 @@ local int rtags_dtor(rtags *op) noex {
 	    if (op->mxp) ylikely {
 		delete op->mxp ;
 		op->mxp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->hdp) ylikely {
 		delete op->hdp ;
 		op->hdp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->tlp) ylikely {
 		delete op->tlp ;
 		op->tlp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->flp) ylikely {
 		delete op->flp ;
 		op->flp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (rtags_dtor) */
@@ -146,7 +143,7 @@ template<typename ... Args>
 local inline int rtags_magic(rtags *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == RTAGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == RTAGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (rtags_magic) */
@@ -186,27 +183,26 @@ int rtags_start(rtags *op,int vn) noex {
 	            if ((rs = vecobj_start(op->tlp,vsz,vn,vo)) >= 0) ylikely {
 	    	        ptm *mxp = op->mxp ;
 	                if ((rs = mxp->create) >= 0) ylikely {
-	                    op->magic = RTAGS_MAGIC ;
+	                    op->magval = RTAGS_MAGIC ;
 	                }
 	                if (rs < 0) {
 	                    vecobj_finish(op->tlp) ;
-		        }
+		        } /* end if (error) */
 	            }
 	            if (rs < 0) {
 	                vecobj_finish(op->flp) ;
-		    }
+		    } /* end if (error) */
 	        }
 	        if (rs < 0) {
 	            hdb_finish(op->hdp) ;
-	        }
+	        } /* end if (error) */
 	    }
 	    if (rs < 0) {
 		rtags_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (rtags_ctor) */
 	return rs ;
-}
-/* end subroutine (rtags_start) */
+} /* end subroutine (rtags_start) */
 
 int rtags_finish(rtags *op) noex {
 	int		rs ;
@@ -243,11 +239,10 @@ int rtags_finish(rtags *op) noex {
 		rs1 = rtags_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (rtags_finish) */
+} /* end subroutine (rtags_finish) */
 
 int rtags_add(rtags *op,RT_TAG *tip,cchar *fp,int fl) noex {
 	int		rs ;
@@ -309,8 +304,7 @@ int rtags_add(rtags *op,RT_TAG *tip,cchar *fp,int fl) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (rtags_add) */
+} /* end subroutine (rtags_add) */
 
 int rtags_sort(rtags *op,rtags_f cf) noex {
 	int		rs ;
@@ -329,28 +323,25 @@ int rtags_sort(rtags *op,rtags_f cf) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (rtags_sort) */
+} /* end subroutine (rtags_sort) */
 
-int rtags_curbegin(rtags *op,CUR *curp) noex {
+int rtags_curbegin(rtags *op,RT_CUR *curp) noex {
 	int		rs ;
 	if ((rs = rtags_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (rtags_curbegin) */
+} /* end subroutine (rtags_curbegin) */
 
-int rtags_curend(rtags *op,CUR *curp) noex {
+int rtags_curend(rtags *op,RT_CUR *curp) noex {
     	int		rs ;
 	if ((rs = rtags_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (rtags_curend) */
+} /* end subroutine (rtags_curend) */
 
-int rtags_curdump(rtags *op,CUR *curp) noex {
+int rtags_curdump(rtags *op,RT_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = rtags_magic(op,curp)) >= 0) {
@@ -382,10 +373,9 @@ int rtags_curdump(rtags *op,CUR *curp) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (rtags_curdump) */
+} /* end subroutine (rtags_curdump) */
 
-int rtags_curenum(rtags *op,CUR *curp,RT_TAG *tip,char *rb,int rl) noex {
+int rtags_curenum(rtags *op,RT_CUR *curp,RT_TAG *tip,char *rb,int rl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fl = 0 ; /* file-length */
@@ -416,15 +406,14 @@ int rtags_curenum(rtags *op,CUR *curp,RT_TAG *tip,char *rb,int rl) noex {
 	                } else {
 	                    rs = SR_NOANODE ;
 		        }
-	            }
+	            } /* end if (vecobj_get) */
 	        } /* end if (ok) */
 	        rs1 = mxp->lockend ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (rtags_curenum) */
+} /* end subroutine (rtags_curenum) */
 
 int rtags_count(rtags *op) noex {
 	int		rs ;
@@ -442,8 +431,7 @@ int rtags_count(rtags *op) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (rtags_count) */
+} /* end subroutine (rtags_count) */
 
 
 /* private subroutines */
@@ -454,11 +442,10 @@ local int fname_start(FNAME *fep,cc *fp,int fl,int fi) noex {
 	    fep->fi = fi ;
 	    if (cchar *cp{} ; (rs = lm_strw(fp,fl,&cp)) >= 0) {
 		fep->name = cp ;
-	    }
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fname_start) */
+} /* end subroutine (fname_start) */
 
 local int fname_finish(FNAME *fep) noex {
 	int		rs = SR_FAULT ;
@@ -470,11 +457,10 @@ local int fname_finish(FNAME *fep) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->name = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fname_finish) */
+} /* end subroutine (fname_finish) */
 
 local int tagent_start(RT_TAG *tep,int fi,int recoff,int reclen) noex {
     	int		rs = SR_FAULT ;
@@ -485,8 +471,7 @@ local int tagent_start(RT_TAG *tep,int fi,int recoff,int reclen) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (tagent_start) */
+} /* end subroutine (tagent_start) */
 
 local int tagent_finish(RT_TAG *tep) noex {
     	int		rs = SR_FAULT ;
@@ -495,8 +480,7 @@ local int tagent_finish(RT_TAG *tep) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (tagent_finish) */
+} /* end subroutine (tagent_finish) */
 
 local int cmpdefe(RT_TAG *e1p,RT_TAG *e2p) noex {
 	int		rc  = 0 ;
@@ -512,14 +496,12 @@ local int cmpdefe(RT_TAG *e1p,RT_TAG *e2p) noex {
 	    } 
 	}
 	return rc ;
-}
-/* end subroutine (cmpdefe) */
+} /* end subroutine (cmpdefe) */
 
 local int vcmpdef(cvoid **v1pp,cvoid **v2pp) noex {
     	RT_TAG	*e1p = (RT_TAG *) *v1pp ;
     	RT_TAG	*e2p = (RT_TAG *) *v2pp ;
 	return cmpdefe(e1p,e2p) ;
-}
-/* end subroutine (vcmpdef) */
+} /* end subroutine (vcmpdef) */
 
 
