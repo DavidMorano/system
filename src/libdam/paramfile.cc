@@ -39,7 +39,7 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strchr(3c)| */
-#include	<new>			/* C++STD */
+#include	<new>			/* C++STD |nothrow| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -73,11 +73,11 @@ import ucstream ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	PF			paramfile
-#define	PF_F			paramfile_file
-#define	PF_C			paramfile_cur
-#define	PF_E			paramfile_ent
-#define	VS			vecstr
+#define	PF		paramfile
+#define	PF_F		paramfile_file
+#define	PF_C		paramfile_cur
+#define	PF_E		paramfile_ent
+#define	VS		vecstr
 
 
 /* imported namespaces */
@@ -114,7 +114,7 @@ struct paramfile_file {
 	size_t		fsize ;
 	ino_t		ino ;
 	dev_t		dev ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -246,19 +246,18 @@ static bufsizevar	maxlinelen(bufsize_ml) ;
 /* exported subroutines */
 
 int paramfile_open(PF *op,con mainv envv,cchar *fname) noex {
-	static cint	srs = mkterms() ;
 	int		rs ;
-	if ((rs = srs) >= 0) ylikely {
+	if (static cint srs = mkterms() ; (rs = srs) >= 0) ylikely {
 	    if ((rs = paramfile_ctor(op)) >= 0) ylikely {
 		vecobj	*flp = op->filep ;
 	        int	esz = szof(PF_F) ;
-	        int	vo = VECOBJ_OSTATIONARY ;
-	        op->envv = envv ;
-	        op->intcheck = PARAMFILE_INTCHECK ;
-	        op->ti_check = time(nullptr) ;
+	        int	vo = vecobjm.stationary ;
+	        op->envv	= envv ;
+	        op->intcheck	= PARAMFILE_INTCHECK ;
+	        op->ti_check	= time(nullptr) ;
 	        if ((rs = vecobj_start(flp,esz,10,vo)) >= 0) ylikely {
 		    vecobj	*elp = op->entsp ;
-	            vo = (VECOBJ_OCOMPACT | VECOBJ_OORDERED) ;
+	            vo = (vecobjm.compact | vecobjm.ordered) ;
 	            esz = szof(PF_E) ;
 	            if ((rs = vecobj_start(elp,esz,10,vo)) >= 0) {
 	                if (op->envv) {
@@ -285,8 +284,7 @@ int paramfile_open(PF *op,con mainv envv,cchar *fname) noex {
 	    } /* end if (paramfile_ctor) */
 	} /* end if (mkterms) */
 	return rs ;
-}
-/* end subroutine (paramfile_open) */
+} /* end subroutine (paramfile_open) */
 
 int paramfile_close(PF *op) noex {
 	int		rs ;
@@ -324,8 +322,7 @@ int paramfile_close(PF *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (paramfile_close) */
+} /* end subroutine (paramfile_close) */
 
 int paramfile_setdefines(PF *op,vecstr *dvp) noex {
 	int		rs ;
@@ -345,8 +342,7 @@ int paramfile_setdefines(PF *op,vecstr *dvp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (paramfile_setdefines) */
+} /* end subroutine (paramfile_setdefines) */
 
 int paramfile_fileadd(PF *op,cchar *fname) noex {
 	int		rs ;
@@ -371,8 +367,7 @@ int paramfile_fileadd(PF *op,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (paramfile_fileadd) */
+} /* end subroutine (paramfile_fileadd) */
 
 int paramfile_curbegin(PF *op,PF_C *curp) noex {
 	int		rs ;
@@ -380,8 +375,7 @@ int paramfile_curbegin(PF *op,PF_C *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (paramfile_curbegin) */
+} /* end subroutine (paramfile_curbegin) */
 
 int paramfile_curend(PF *op,PF_C *curp) noex {
 	int		rs ;
@@ -389,8 +383,7 @@ int paramfile_curend(PF *op,PF_C *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (paramfile_curend) */
+} /* end subroutine (paramfile_curend) */
 
 int paramfile_fetch(PF *op,cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
 	int		rs ;
@@ -436,8 +429,7 @@ int paramfile_fetch(PF *op,cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (paramfile_fetch) */
+} /* end subroutine (paramfile_fetch) */
 
 int paramfile_curenum(PF *op,PF_C *curp,PF_E *ep,char *ebuf,int elen) noex {
 	int		rs ;
@@ -474,8 +466,7 @@ int paramfile_curenum(PF *op,PF_C *curp,PF_E *ep,char *ebuf,int elen) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (paramfile_curenum) */
+} /* end subroutine (paramfile_curenum) */
 
 int paramfile_checkint(PF *op,int intcheck) noex {
 	int		rs ;
@@ -484,8 +475,7 @@ int paramfile_checkint(PF *op,int intcheck) noex {
 	    op->intcheck = intcheck ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (paramfile_checkint) */
+} /* end subroutine (paramfile_checkint) */
 
 int paramfile_check(PF *op,time_t dt) noex {
 	cint		to = PARAMFILE_INTCHANGE ;
