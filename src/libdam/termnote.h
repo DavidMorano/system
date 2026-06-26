@@ -20,22 +20,19 @@
 #define	TERMNOTE_INCLUDE
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdarg.h>		/* |va_list| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<tmpx.h>
-#include	<ids.h>
-#include	<logfile.h>
-#include	<localmisc.h>		/* |LOGIDLEN| */
+#include	<stdarg.h>		/* CSTD |va_list| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<tmpx.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |LOGIDLEN| */
 
 
 /* object defines */
-#define	TERMNOTE_MAGIC		0x13f3c200
 #define	TERMNOTE		struct termnote_head
 #define	TERMNOTE_FL		struct termnote_flags
+#define	TERMNOTE_MAGIC		0x13f3c200
 #define	TERMNOTE_MAXLINES	20
 #define	TERMNOTE_LOGSIZE	400000
 /* options */
