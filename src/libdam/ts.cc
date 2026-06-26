@@ -125,34 +125,35 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<usysflag.h>
-#include	<getfstype.h>
-#include	<sysval.hh>
-#include	<endian.h>
-#include	<vecstr.h>
-#include	<mapstrint.h>
-#include	<stdorder.h>
-#include	<hash.h>		/* |hash_elf(3dam)| */
-#include	<strwcpy.h>
-#include	<strdcpyx.h>
-#include	<matxstr.h>
-#include	<lockfile.h>
-#include	<sncpyx.h>		/* |sncpy(3uc)| */
-#include	<mkx.h>			/* |mkmagic(3uc)| */
-#include	<entbuf.h>
-#include	<funmode.hh>
-#include	<isnot.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LINBUC */
+#include	<getfstype.h>		/* LINBUC */
+#include	<sysval.hh>		/* LINBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<mapstrint.h>		/* LIBUC */
+#include	<stdorder.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC |hash_elf(3dam)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strdcpyx.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<lockfile.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC |sncpy(3uc)| */
+#include	<mkx.h>			/* LIBUC |mkmagic(3uc)| */
+#include	<entbuf.h>		/* LIBUC */
+#include	<funmode.hh>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<vetus.h>		/* LIBDAM */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"ts.h"
 #include	"tse.hh"
@@ -217,14 +218,6 @@ extern "C" {
 
 
 /* local structures */
-
-enum vetus {
-    vetu_version,
-    vetu_endian,
-    vetu_type,
-    vetu_unused,
-    vetu_overlast
-} ; /* end enum (vetus) */
 
 namespace {
     struct vars {
@@ -315,18 +308,18 @@ local bool	namematch(cchar *,cchar *,int) noex ;
 
 static vars		var ;
 
-constexpr int		toplen = TS_TOPLEN ;
-constexpr int		taboff = TS_TABOFF ;
-constexpr int		nidxent = TS_NIDXENT ;
-constexpr int		maglen = TS_FILEMAGICSIZE ;
+constexpr int		toplen		= TS_TOPLEN ;
+constexpr int		taboff		= TS_TABOFF ;
+constexpr int		nidxent		= TS_NIDXENT ;
+constexpr int		maglen		= TS_FILEMAGICSIZE ;
 
-constexpr char		magstr[] = TS_FILEMAGIC ;
+constexpr char		magstr[]	= TS_FILEMAGIC ;
 
-constexpr bool		f_comment = false ;
-constexpr bool		f_creat = CF_CREAT ;
-constexpr bool		f_lockf = CF_LOCKF ;
-constexpr bool		f_nienum = CF_NIENUM ;
-constexpr bool		f_solarisbug = CF_SOLARISBUG ;
+constexpr bool		f_comment	= false ;
+constexpr bool		f_creat		= CF_CREAT ;
+constexpr bool		f_lockf		= CF_LOCKF ;
+constexpr bool		f_nienum	= CF_NIENUM ;
+constexpr bool		f_solarisbug	= CF_SOLARISBUG ;
 
 
 /* exported variables */
@@ -342,8 +335,7 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 	if ((rs = ts_ctor(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) ylikely {
+		if (static cint	rsv = var ; (rs = rsv) >= 0) ylikely {
 	            op->fd = -1 ;
 	            op->oflags = oflags ;
 	            op->operm = operm ;
@@ -359,22 +351,21 @@ int ts_open(ts *op,cchar *fname,int oflags,mode_t operm) noex {
 			    void *vp = voidp(op->fname) ;
 			    lm_free(vp) ;
 			    op->fname = nullptr ;
-			}
+			} /* end if (error) */
 	            } /* end if (memory-acquire) */
 		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		ts_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ts_ctor) */
 	return (rs >= 0) ? f_created : rs ;
-}
-/* end subroutine (ts_open) */
+} /* end subroutine (ts_open) */
 
 local int ts_opens(ts *op) noex {
+        custime		dt = getustime ;
     	int		rs ;
 	int		fcreated = false ;
-        custime     dt = getustime ;
         if ((rs = ts_fileopen(op,dt)) >= 0) ylikely {
             fcreated = (rs > 0) ;
             if ((rs = ts_filebegin(op,dt)) >= 0) {
@@ -384,11 +375,10 @@ local int ts_opens(ts *op) noex {
             }
             if (rs < 0) {
                 ts_fileclose(op) ;
-            }
+            } /* end if (error) */
         } /* end if (ts_fileopen) */
 	return (rs >= 0) ? fcreated : rs ;
-}
-/* end subroutine (ts_opens) */
+} /* end subroutine (ts_opens) */
 
 int ts_close(ts *op) noex {
 	int		rs ;
@@ -407,7 +397,7 @@ int ts_close(ts *op) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 		rs1 = ts_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -415,8 +405,7 @@ int ts_close(ts *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ts_close) */
+} /* end subroutine (ts_close) */
 
 int ts_count(ts *op) noex {
 	int		rs ;
@@ -425,8 +414,7 @@ int ts_count(ts *op) noex {
 	    c = (op->filesize - taboff) / var.entsz ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (ts_count) */
+} /* end subroutine (ts_count) */
 
 int ts_curbegin(ts *op,ts_cur *curp) noex {
 	int		rs ;
@@ -437,8 +425,7 @@ int ts_curbegin(ts *op,ts_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ts_curbegin) */
+} /* end subroutine (ts_curbegin) */
 
 int ts_curend(ts *op,ts_cur *curp) noex {
 	int		rs ;
@@ -460,8 +447,7 @@ int ts_curend(ts *op,ts_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ts_curend) */
+} /* end subroutine (ts_curend) */
 
 int ts_curenum(ts *op,ts_cur *curp,char *rbuf,int rlen,ts_ent *ep) noex {
 	int		rs ;
@@ -482,8 +468,7 @@ int ts_curenum(ts *op,ts_cur *curp,char *rbuf,int rlen,ts_ent *ep) noex {
 	    } /* end if (acquire) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (ts_curenum) */
+} /* end subroutine (ts_curenum) */
 
 /* match on a key-name */
 int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
@@ -516,8 +501,7 @@ int ts_match(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	    } /* end if (ts_acquire) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (ts_match) */
+} /* end subroutine (ts_match) */
 
 /* write an entry (match on a key-name) */
 int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
@@ -605,8 +589,7 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	    } /* end if (ts_acquire) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (ts_write) */
+} /* end subroutine (ts_write) */
 
 /* update an entry */
 int ts_update(ts *op,time_t dt,cc *kp,int kl,ts_ent *ep) noex {
@@ -623,8 +606,7 @@ int ts_update(ts *op,time_t dt,cc *kp,int kl,ts_ent *ep) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (ts_update) */
+} /* end subroutine (ts_update) */
 
 /* do some checking */
 int ts_check(ts *op,time_t dt) noex {
@@ -643,8 +625,7 @@ int ts_check(ts *op,time_t dt) noex {
 	    } /* end if (file-desc) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ts_check) */
+} /* end subroutine (ts_check) */
 
 
 /* private subroutines */
@@ -705,8 +686,7 @@ local int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
 	    op->fl.cursoracc = true ;
 	}
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (rs_updater) */
+} /* end subroutine (rs_updater) */
 
 local int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	cnullptr	np{} ;
@@ -737,8 +717,7 @@ local int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	    *rpp = (rs >= 0) ? bp : nullptr ;
 	}
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (ts_findname) */
+} /* end subroutine (ts_findname) */
 
 /* search for an entry */
 local int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
@@ -777,8 +756,7 @@ local int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	    }
 	} /* end if (ok) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (ts_search) */
+} /* end subroutine (ts_search) */
 
 local int ts_acquire(ts *op,time_t dt,int f_read) noex {
 	int		rs ;
@@ -805,8 +783,7 @@ local int ts_acquire(ts *op,time_t dt,int f_read) noex {
 	    } /* end if (need lock) */
 	} /* end if (ts_fileopen) */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (ts_acquire) */
+} /* end subroutine (ts_acquire) */
 
 /* initialize the file header (either read it only or write it) */
 local int ts_filebegin(ts *op,time_t dt) noex {
@@ -850,8 +827,7 @@ local int ts_filebegin(ts *op,time_t dt) noex {
 	    ts_lockrel(op) ;
 	}
 	return rs ;
-}
-/* end subroutine (ts_filebegin) */
+} /* end subroutine (ts_filebegin) */
 
 local int ts_filecheck(ts *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -872,8 +848,7 @@ local int ts_filecheck(ts *op,time_t dt) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (ts_filecheck) */
+} /* end subroutine (ts_filecheck) */
 
 local int ts_filetopwrite(ts *op,time_t dt) noex {
 	char		*bp = op->topbuf ;
@@ -907,18 +882,16 @@ local int ts_filetopwrite(ts *op,time_t dt) noex {
 	    } /* end if (u_writep) */
 	} /* end if (mkmagic) */
 	return rs ;
-}
-/* end subroutine (ts_filetopwrite) */
+} /* end subroutine (ts_filetopwrite) */
 
 local int ts_filetopread(ts *op) noex {
 	coff		poff = 0z ;
 	int		rs ;
-	if ((rs = u_pread(op->fd,op->topbuf,toplen,poff)) >= 0) {
+	if ((rs = u_readp(op->fd,op->topbuf,toplen,poff)) >= 0) {
 	    op->topsize = rs ;
 	}
 	return rs ;
-}
-/* end subroutine (ts_filetopread) */
+} /* end subroutine (ts_filetopread) */
 
 local int ts_fileverify(ts *op) noex {
 	static cint	magl = lenstr(magstr) ;
@@ -943,8 +916,7 @@ local int ts_fileverify(ts *op) noex {
 	    } /* end if (valid) */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (ts_fileverify) */
+} /* end subroutine (ts_fileverify) */
 
 /* read or write the file header */
 local int ts_headtab(ts *op,funmode fc) noex {
@@ -981,8 +953,7 @@ local int ts_headtab(ts *op,funmode fc) noex {
 	    break ;
 	} /* end switch */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (ts_headtab) */
+} /* end subroutine (ts_headtab) */
 
 /* acquire access to the file */
 local int ts_lockacq(ts *op,time_t dt,int f_read) noex {
@@ -1051,8 +1022,7 @@ local int ts_lockacq(ts *op,time_t dt,int f_read) noex {
 	    } /* end if (was not already) */
 	} /* end if (ts_fileopen) */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (ts_lockacq) */
+} /* end subroutine (ts_lockacq) */
 
 local int ts_lockrel(ts *op) noex {
 	int		rs = SR_OK ;
@@ -1074,8 +1044,7 @@ local int ts_lockrel(ts *op) noex {
 	    op->fl.lockedwrite = false ;
 	} /* end if (there was a possible lock set) */
 	return rs ;
-}
-/* end subroutine (ts_lockrel) */
+} /* end subroutine (ts_lockrel) */
 
 local int ts_fileopen(ts *op,time_t dt) noex {
 	int	rs = SR_OK ;
@@ -1104,8 +1073,7 @@ local int ts_fileopen(ts *op,time_t dt) noex {
 	    } /* end if (ok) */
 	} /* end if (needed to be opened) */
 	return (rs >= 0) ? f_created : rs ;
-}
-/* end subroutine (ts_fileopen) */
+} /* end subroutine (ts_fileopen) */
 
 local int ts_fileclose(ts *op) noex {
 	int	rs = SR_OK ;
@@ -1122,8 +1090,7 @@ local int ts_fileclose(ts *op) noex {
 	    op->fd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (ts_fileclose) */
+} /* end subroutine (ts_fileclose) */
 
 local int ts_filesetinfo(ts *op,time_t dt) noex {
 	int		rs ;
@@ -1146,8 +1113,7 @@ local int ts_filesetinfo(ts *op,time_t dt) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (u_fstat) */
 	return rs ;
-}
-/* end subroutine (ts_filesetinfo) */
+} /* end subroutine (ts_filesetinfo) */
 
 local int ts_ebufstart(ts *op) noex {
 	int		rs = SR_OK ;
@@ -1164,8 +1130,7 @@ local int ts_ebufstart(ts *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (ts_ebufstart) */
+} /* end subroutine (ts_ebufstart) */
 
 local int ts_ebuffinish(ts *op) noex {
 	int		rs = SR_OK ;
@@ -1176,8 +1141,7 @@ local int ts_ebuffinish(ts *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (ts_ebuffinish) */
+} /* end subroutine (ts_ebuffinish) */
 
 local int ts_readentry(ts *op,int ei,char **rpp) noex {
 	int		rs ;
@@ -1204,8 +1168,7 @@ local int ts_readentry(ts *op,int ei,char **rpp) noex {
 	    *rpp = (rs >= 0) ? bp : nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (ts_readentry) */
+} /* end subroutine (ts_readentry) */
 
 /* add to the name-index if necessary */
 local int ts_index(ts *op,cchar *sp,int sl,int ei) noex {
@@ -1225,8 +1188,7 @@ local int ts_index(ts *op,cchar *sp,int sl,int ei) noex {
 	    rs = mapstrint_add(op->nip,sp,nl2,ei) ;
 	} /* end if (not found) */
 	return rs ;
-}
-/* end subroutine (ts_index) */
+} /* end subroutine (ts_index) */
 
 local int ts_headwrite(ts *op) noex {
 	int		rs ;
@@ -1238,8 +1200,7 @@ local int ts_headwrite(ts *op) noex {
 	    rs = u_writep(op->fd,bp,bl,poff) ;
 	}
 	return rs ;
-}
-/* end subroutine (ts_headwrite) */
+} /* end subroutine (ts_headwrite) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -1252,8 +1213,7 @@ vars::operator int () noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (tse) */
     	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 local int tsent_load(tsent *ep,cc *bp,char *rb,int rl) noex {
     	int		rs ;
@@ -1271,8 +1231,7 @@ local int tsent_load(tsent *ep,cc *bp,char *rb,int rl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (tse) */
 	return rs ;
-}
-/* end subroutine (tsent_load) */
+} /* end subroutine (tsent_load) */
 
 local int tsent_trans(tsent *ep,tse *tep) noex {
     	int		rs = SR_FAULT ;
@@ -1283,8 +1242,7 @@ local int tsent_trans(tsent *ep,tse *tep) noex {
 	    tep->ctime = ep->ctime ;
 	}
 	return rs ;
-}
-/* end subroutine (tsent_trans) */
+} /* end subroutine (tsent_trans) */
 
 local bool namematch(cc *sp,cc *nnp,int nnl) noex {
 	bool		f = false ;
@@ -1293,7 +1251,6 @@ local bool namematch(cc *sp,cc *nnp,int nnl) noex {
 	    f = f && (sp[nnl] == '\0') ;
 	}
 	return f ;
-}
-/* end subroutine (namematch) */
+} /* end subroutine (namematch) */
 
 
