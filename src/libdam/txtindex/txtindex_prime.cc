@@ -1,4 +1,4 @@
-/* txtindex_main SUPPORT */
+/* txtindex_primeSUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -28,14 +28,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"txtindex.h"
 #include	"txtindexes.h"
@@ -50,13 +50,12 @@ import libutil ;			/* |lenstr(3u)| */
 #define	TXTINDEX_MODBNAME	"txtindexes"
 #define	TXTINDEX_OBJNAME	"txtindexes"
 
-#define	TI_CUR			txtindex_cur
-#define	TI_TAG			txtindex_tag
+#define	TI_CUR		txtindex_cur
+#define	TI_TAG		txtindex_tag
 
-#undef	TIS_CUR
-#define	TIS_CUR			TXTINDEXES_CUR
-#undef	TIS_TAG
-#define	TIS_TAG			TXTINDEXES_TAG
+#define	TIS_CUR		txtindexes_cur
+#define	TIS_TAG		txtindexes_tag
+#define	TIS_INFO	txtindexes_info
 
 
 /* imported namespaces */
@@ -67,19 +66,19 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 extern "C" {
-    typedef int	(*soopen_f)(void *,cchar *) noex ;
-    typedef int	(*socount_f)(void *) noex ;
-    typedef int	(*soneigen_f)(void *) noex ;
-    typedef int	(*sogetinfo_f)(void *,txtindexes_info *) noex ;
-    typedef int	(*sogetsdn_f)(void *,char *,int) noex ;
-    typedef int	(*sogetsfn_f)(void *,char *,int) noex ;
-    typedef int	(*soiseigen_f)(void *,cchar *,int) noex ;
-    typedef int	(*socurbegin_f)(void *,void *) noex ;
-    typedef int	(*socurlook_f)(void *,void *,mainv) noex ;
-    typedef int	(*socurenum_f)(void *,void *,txtindexes_tag *,char *,int) noex ;
-    typedef int	(*socurend_f)(void *,void *) noex ;
-    typedef int	(*soaudit_f)(void *) noex ;
-    typedef int	(*soclose_f)(void *) noex ;
+    typedef int	(*soopen_f)	(void *,cchar *) noex ;
+    typedef int	(*socount_f)	(void *) noex ;
+    typedef int	(*soneigen_f)	(void *) noex ;
+    typedef int	(*sogetinfo_f)	(void *,TIS_INFO *) noex ;
+    typedef int	(*sogetsdn_f)	(void *,char *,int) noex ;
+    typedef int	(*sogetsfn_f)	(void *,char *,int) noex ;
+    typedef int	(*soiseigen_f)	(void *,cchar *,int) noex ;
+    typedef int	(*socurbegin_f)	(void *,void *) noex ;
+    typedef int	(*socurlook_f)	(void *,void *,mainv) noex ;
+    typedef int	(*socurenum_f)	(void *,void *,TIS_TAG *,char *,int) noex ;
+    typedef int	(*socurend_f)	(void *,void *) noex ;
+    typedef int	(*soaudit_f)	(void *) noex ;
+    typedef int	(*soclose_f)	(void *) noex ;
 } /* end extern (C) */
 
 
@@ -156,7 +155,7 @@ template<typename ... Args>
 local inline int txtindex_magic(txtindex *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == TXTINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == TXTINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (txtindex_magic) */
@@ -165,7 +164,7 @@ local int	txtindex_objloadbegin(txtindex *,cchar *,cchar *) noex ;
 local int	txtindex_objloadend(txtindex *) noex ;
 local int	txtindex_loadcalls(txtindex *,vecstr *) noex ;
 
-static bool	isrequired(int) noex ;
+local bool	isrequired(int) noex ;
 
 
 /* local variables */
@@ -185,9 +184,9 @@ enum subs {
 	sub_audit,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum (subs) */
 
-constexpr cpcchar	subs[] = {
+constexpr cpcchar	subnames[] = {
 	"open",
 	"count",
 	"neigen",
@@ -202,7 +201,7 @@ constexpr cpcchar	subs[] = {
 	"audit",
 	"close",
 	nullptr
-} ;
+} ; /* end array (subnames) */
 
 
 /* exported variables */
@@ -216,24 +215,23 @@ int txtindex_open(txtindex *op,cchar *pr,cchar *dbname) noex {
 	    rs = SR_INVALID ;
 	    if (dbname[0]) ylikely {
 		txtindex_calls	*callp = callsp(op->callp) ;
-	        cchar		*objn = TXTINDEX_OBJNAME ;
+	        cchar	*objn = TXTINDEX_OBJNAME ;
 	        if ((rs = txtindex_objloadbegin(op,pr,objn)) >= 0) ylikely {
 		    auto	co = callp->open ;
 	            if ((rs = co(op->obj,dbname)) >= 0) ylikely {
-		        op->magic = TXTINDEX_MAGIC ;
+		        op->magval = TXTINDEX_MAGIC ;
 	            }
 	            if (rs < 0) {
 		        txtindex_objloadend(op) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (txtindex_objloadbegin) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		txtindex_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (txtindex_ctor) */
 	return rs ;
-}
-/* end subroutine (txtindex_open) */
+} /* end subroutine (txtindex_open) */
 
 int txtindex_close(txtindex *op) noex {
 	int		rs ;
@@ -249,11 +247,14 @@ int txtindex_close(txtindex *op) noex {
 	        rs1 = txtindex_objloadend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    {
+		rs1 = txtindex_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindex_close) */
+} /* end subroutine (txtindex_close) */
 
 int txtindex_audit(txtindex *op) noex {
 	int		rs ;
@@ -266,8 +267,7 @@ int txtindex_audit(txtindex *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindex_audit) */
+} /* end subroutine (txtindex_audit) */
 
 int txtindex_count(txtindex *op) noex {
 	int		rs ;
@@ -280,8 +280,7 @@ int txtindex_count(txtindex *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindex_count) */
+} /* end subroutine (txtindex_count) */
 
 int txtindex_neigen(txtindex *op) noex {
 	int		rs ;
@@ -294,47 +293,43 @@ int txtindex_neigen(txtindex *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindex_neigen) */
+} /* end subroutine (txtindex_neigen) */
 
 int txtindex_getinfo(txtindex *op,TXTINDEX_INFO *ip) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op,ip)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (auto co = callp->getinfo ; co != nullptr) {
+	    if (cauto co = callp->getinfo ; co) {
 	        rs = co(op->obj,ip) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindex_getinfo) */
+} /* end subroutine (txtindex_getinfo) */
 
 int txtindex_getsdn(txtindex *op,char *rb,int rl) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op,rb)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (auto co = callp->getsdn ; co != nullptr) {
+	    if (cauto co = callp->getsdn ; co) {
 	        rs = co(op->obj,rb,rl) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindex_getsdn) */
+} /* end subroutine (txtindex_getsdn) */
 
 int txtindex_getsfn(txtindex *op,char *rb,int rl) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op,rb)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (auto co = callp->getsfn ; co != nullptr) {
+	    if (cauto co = callp->getsfn ; co) {
 	        rs = co(op->obj,rb,rl) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindex_getsfn) */
+} /* end subroutine (txtindex_getsfn) */
 
 int txtindex_curbegin(txtindex *op,TI_CUR *curp) noex {
 	int		rs ;
@@ -348,21 +343,20 @@ int txtindex_curbegin(txtindex *op,TI_CUR *curp) noex {
 		    if (callp->curbegin) {
 		        auto	co = callp->curbegin ;
 		        if ((rs = co(op->obj,curp->scp)) >= 0) {
-	    	            curp->magic = TXTINDEX_MAGIC ;
+	    	            curp->magval = TXTINDEX_MAGIC ;
 		        }
 		    }
 	            if (rs < 0) {
 	    	        lm_free(curp->scp) ;
 	    	        curp->scp = nullptr ;
-		    }
+		    } /* end if (erro) */
 	        } /* end if (m-a) */
 	    } else {
 	        rs = SR_NOSYS ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindex_curbegin) */
+} /* end subroutine (txtindex_curbegin) */
 
 int txtindex_curend(txtindex *op,TI_CUR *curp) noex {
 	int		rs ;
@@ -370,7 +364,7 @@ int txtindex_curend(txtindex *op,TI_CUR *curp) noex {
 	if ((rs = txtindex_magic(op,curp)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == TXTINDEX_MAGIC) {
+	    if (curp->magval == TXTINDEX_MAGIC) {
 	        rs = SR_BUGCHECK ;
 	        if (curp->scp) {
 	            if (callp->curend) {
@@ -382,30 +376,28 @@ int txtindex_curend(txtindex *op,TI_CUR *curp) noex {
 	                rs1 = lm_free(curp->scp) ;
 	                if (rs >= 0) rs = rs1 ;
 	                curp->scp = nullptr ;
-	            }
-	            curp->magic = 0 ;
+	            } /* end block (memory-release) */
+	            curp->magval = 0 ;
 	        } /* end if (valid) */
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindex_curend) */
+} /* end subroutine (txtindex_curend) */
 
 int txtindex_curlook(txtindex *op,TI_CUR *curp,mainv klp) noex {
 	int		rs ;
 	if ((rs = txtindex_magic(op,curp,klp)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == TXTINDEX_MAGIC) {
+	    if (curp->magval == TXTINDEX_MAGIC) {
 		rs = SR_BUGCHECK ;
-		if (auto co = callp->curlook ; co != nullptr) {
+		if (cauto co = callp->curlook ; co) {
 		    rs = co(op->obj,curp->scp,klp) ;
 		}
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindex_curlook) */
+} /* end subroutine (txtindex_curlook) */
 
 int txtindex_curenum(txtindex *op,TI_CUR *curp,TI_TAG *tagp,
 		char *rb,int rl) noex {
@@ -414,17 +406,16 @@ int txtindex_curenum(txtindex *op,TI_CUR *curp,TI_TAG *tagp,
 	if ((rs = txtindex_magic(op,curp,tagp)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == TXTINDEX_MAGIC) {
+	    if (curp->magval == TXTINDEX_MAGIC) {
 		rs = SR_NOSYS ;
-	        if (auto co = callp->curenum ; co != nullptr) {
+	        if (cauto co = callp->curenum ; co) {
 	            rs = co(op->obj,curp->scp,tagp,rb,rl) ;
 		    fl = rs ;
 	        }
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (txtindex_curenum) */
+} /* end subroutine (txtindex_curenum) */
 
 
 /* private subroutines */
@@ -436,7 +427,7 @@ local int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
 		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*modbname = TXTINDEX_MODBNAME ;
 	            int		mo = 0 ;
@@ -455,13 +446,13 @@ local int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 		                if (rs < 0) {
 			            op->obj = nullptr ;
 			            lm_free(op->obj) ;
-		                }
+		                } /* end if (error) */
 		            } /* end if (memory-allocation) */
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
 		            op->fl.modload = false ;
 		            modload_close(lp) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (modload_open) */
 		} /* end it (vecstr_getvec) */
 	    } /* end if (vecstr_addsyms) */
@@ -470,11 +461,10 @@ local int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
 		modload_close(lp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (vecstr-syms) */
 	return rs ;
-}
-/* end subroutine (txtindex_objloadbegin) */
+} /* end subroutine (txtindex_objloadbegin) */
 
 local int txtindex_objloadend(txtindex *op) noex {
 	int		rs = SR_OK ;
@@ -483,18 +473,17 @@ local int txtindex_objloadend(txtindex *op) noex {
 	    rs1 = lm_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (op->mlp && op->fl.modload) {
 	    op->fl.modload = false ;
 	    rs1 = modload_close(op->mlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (txtindex_objloadend) */
+} /* end subroutine (txtindex_objloadend) */
 
 local int txtindex_loadcalls(txtindex *op,vecstr *slp) noex {
-	modload		*lp = op->mlp ;
+	modload		*mlp = op->mlp ;
 	txtindex_calls	*callp = callsp(op->callp) ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
@@ -502,47 +491,47 @@ local int txtindex_loadcalls(txtindex *op,vecstr *slp) noex {
 	int		c = 0 ;
 	cchar		*sname{} ;
 	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
-	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
+	    if (cvoid *snp{} ; (rs = modload_getsym(mlp,sname,&snp)) >= 0) {
                 c += 1 ;
                 switch (i) {
                 case sub_open:
-                    callp->open = soopen_f(snp) ;
+                    callp->open		= soopen_f(snp) ;
                     break ;
                 case sub_count:
-                    callp->count = socount_f(snp) ;
+                    callp->count	= socount_f(snp) ;
                     break ;
                 case sub_neigen:
-                    callp->neigen = soneigen_f(snp) ;
+                    callp->neigen	= soneigen_f(snp) ;
                     break ;
                 case sub_getinfo:
-                    callp->getinfo = sogetinfo_f(snp) ;
+                    callp->getinfo	= sogetinfo_f(snp) ;
                     break ;
                 case sub_getsdn:
-                    callp->getsdn = sogetsdn_f(snp) ;
+                    callp->getsdn	= sogetsdn_f(snp) ;
                     break ;
                 case sub_getsfn:
-                    callp->getsfn = sogetsfn_f(snp) ;
+                    callp->getsfn	= sogetsfn_f(snp) ;
                     break ;
                 case sub_iseigen:
-                    callp->iseigen = soiseigen_f(snp) ;
+                    callp->iseigen	= soiseigen_f(snp) ;
                     break ;
                 case sub_curbegin:
-                    callp->curbegin = socurbegin_f(snp) ;
+                    callp->curbegin	= socurbegin_f(snp) ;
                     break ;
                 case sub_curlook:
-                    callp->curlook = socurlook_f(snp) ;
+                    callp->curlook	= socurlook_f(snp) ;
                     break ;
                 case sub_curenum:
-                    callp->curenum = socurenum_f(snp) ;
+                    callp->curenum	= socurenum_f(snp) ;
                     break ;
                 case sub_curend:
-                    callp->curend = socurend_f(snp) ;
+                    callp->curend	= socurend_f(snp) ;
                     break ;
                 case sub_audit:
-                    callp->audit = soaudit_f(snp) ;
+                    callp->audit	= soaudit_f(snp) ;
                     break ;
                 case sub_close:
-                    callp->close = soclose_f(snp) ;
+                    callp->close	= soclose_f(snp) ;
                     break ;
                 } /* end switch */
             } else if (rs == rsn) {
@@ -552,10 +541,9 @@ local int txtindex_loadcalls(txtindex *op,vecstr *slp) noex {
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (txtindex_loadcalls) */
+} /* end subroutine (txtindex_loadcalls) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
@@ -570,7 +558,6 @@ static bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
