@@ -196,7 +196,7 @@ OBJ88= tcgetlines.o tcsetlines.o tcpeek.o tcsetmesg.o tcsetbiff.o tcsetown.o
 OBJ89= tcgetws.o tcsetws.o
 OBJ90=
 OBJ91=
-OBJ92= unlinkd.o mapshmtmp.o
+OBJ92= unlinkd.o
 OBJ93=
 OBJ94=
 OBJ95=
@@ -927,6 +927,7 @@ fsdirtreestat.o:	fsdirtreestat.cc	fsdirtreestat.h		$(INCS)
 makedirs.o:		makedirs.cc		makedirs.h		$(INCS)
 naturalwords.o:		naturalwords.cc		naturalwords.h		$(INCS)
 termcmdkey.o:		termcmdkey.cc		termcmdkey.h		$(INCS)
+vetus.o:		vetus.cc		vetus.h			$(INCS)
 
 # DFSA
 dfsa.o:			dfsa0.o dfsa1.o			$(INCS)
