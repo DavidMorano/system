@@ -68,44 +68,47 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucsysmisc.h>
-#include	<bufsizeget.h>
-#include	<getpwd.h>
-#include	<sysval.hh>
-#include	<endian.h>
-#include	<estrings.h>
-#include	<vecint.h>
-#include	<setoint.h>
-#include	<strtab.h>
-#include	<bfile.h>
-#include	<filer.h>
-#include	<opentmp.h>
-#include	<mktmp.h>
-#include	<mkfname.h>
-#include	<sfx.h>
-#include	<strw.h>
-#include	<strn.h>
-#include	<hash.h>
-#include	<permx.h>
-#include	<char.h>
-#include	<hasx.h>
-#include	<ischarx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getpwd.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<vecint.h>		/* LIBUC */
+#include	<setoint.h>		/* LIBUC */
+#include	<strtab.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<mktmp.h>		/* LIBUC */
+#include	<mkfname.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strw.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"txtindexmks.h"
 #include	"txtindexhdr.h"
@@ -189,23 +192,18 @@ typedef int *	rectab_t ;
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_stat(cchar *,ustat *) noex ;
-    extern int uc_unlink(cchar *) noex ;
-    extern int uc_fminmod(int,mode_t) noex ;
-}
-
 
 /* external variables */
 
 
 /* local structures */
 
-struct vars {
-	int		pagesize ;
+namespace {
+    struct vars {
+	int		pagesz ;
 	int		maxpathlen ;
-} ; /* end struct */
+    } ; /* end struct */
+} /* end namespace */
 
 
 /* forward references */
@@ -252,7 +250,7 @@ template<typename ... Args>
 local inline int txtindexmks_magic(txtindexmks *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == TXTINDEXMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == TXTINDEXMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (txtindexmks_magic) */
@@ -294,16 +292,16 @@ static vars	var ;
 
 constexpr char	zerobuf[4] = {
 	0, 0, 0, 0 
-} ;
+} ; /* end array */
 
 
 /* exported variables */
 
-txtindexmks_obj	txtindexmks_modinfo = {
+const txtindexmks_obj	txtindexmks_modinfo = {
 	"txtindexmks",
 	szof(txtindexmks),
 	0
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -329,7 +327,7 @@ int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	                            f = rs ;
 	                            if ((rs = txtindexmks_listbegin(op)) >= 0) {
 	                                op->ti.maxtags = 0 ;
-	                                op->magic = TXTINDEXMKS_MAGIC ;
+	                                op->magval = TXTINDEXMKS_MAGIC ;
 	                            }
 	                            if (rs < 0) {
 	                                txtindexmks_filesend(op) ;
@@ -355,8 +353,7 @@ int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	    }
 	} /* end if (txtindexmks_ctor) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (txtindexmks_open) */
+} /* end subroutine (txtindexmks_open) */
 
 int txtindexmks_close(TIM *op) noex {
 	int		rs ;
@@ -402,11 +399,10 @@ int txtindexmks_close(TIM *op) noex {
 		rs1 = txtindexmks_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? clists : rs ;
-}
-/* end subroutine (txtindexmks_close) */
+} /* end subroutine (txtindexmks_close) */
 
 int txtindexmks_noop(TIM *op) noex {
 	int		rs ;
@@ -414,8 +410,7 @@ int txtindexmks_noop(TIM *op) noex {
 	    rs = SR_OK ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_noop) */
+} /* end subroutine (txtindexmks_noop) */
 
 int txtindexmks_abort(TIM *op) noex {
 	int		rs ;
@@ -423,8 +418,7 @@ int txtindexmks_abort(TIM *op) noex {
 	    op->fl.abort = true ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_abort) */
+} /* end subroutine (txtindexmks_abort) */
 
 int txtindexmks_addeigens(TIM *op,TIM_KEY *eigens,int n) noex {
 	int		rs ;
@@ -451,8 +445,7 @@ int txtindexmks_addeigens(TIM *op,TIM_KEY *eigens,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_addeigens) */
+} /* end subroutine (txtindexmks_addeigens) */
 
 int txtindexmks_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
 	int		rs ;
@@ -468,8 +461,7 @@ int txtindexmks_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (txtindexmks_addtags) */
+} /* end subroutine (txtindexmks_addtags) */
 
 
 /* private subroutines */
@@ -490,8 +482,7 @@ local int txtindexmks_checkparams(TIM *op) noex {
 	    pp->maxwlen = KEYBUFLEN ;
 	}
 	return rs ;
-}
-/* end subroutine (txtindexmks_checkparams) */
+} /* end subroutine (txtindexmks_checkparams) */
 
 local int txtindexmks_filesbegin(TIM *op) noex {
 	int		rs = SR_OK ;
@@ -503,8 +494,7 @@ local int txtindexmks_filesbegin(TIM *op) noex {
 	    c = rs ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (txtindexmks_filesbegin) */
+} /* end subroutine (txtindexmks_filesbegin) */
 
 local int txtindexmks_filesbeginc(TIM *op) noex {
 	cint		type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
@@ -548,8 +538,7 @@ local int txtindexmks_filesbeginc(TIM *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_filesbeginc) */
+} /* end subroutine (txtindexmks_filesbeginc) */
 
 local int txtindexmks_filesbeginwait(TIM *op) noex {
 	int		rs ;
@@ -574,14 +563,13 @@ local int txtindexmks_filesbeginwait(TIM *op) noex {
 		}
 	} /* end if (mknewfname) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (txtindexmks_filesbeginwait) */
+} /* end subroutine (txtindexmks_filesbeginwait) */
 
 local int txtindexmks_filesbeginopen(TIM *op,cchar *tfn) noex {
-	bfile		*tfp = op->tagfilep ;
 	cmode		om = op->om ;
 	int		rs ;
 	char		ostr[8] = "wce" ;
+	bfile		*tfp = op->tagfilep ;
 	if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) {
 	    op->fl.created = true ;
 	    if (cchar *cp ; (rs = libmem.strw(tfn,-1,&cp)) >= 0) {
@@ -589,11 +577,10 @@ local int txtindexmks_filesbeginopen(TIM *op,cchar *tfn) noex {
 	    }
 	    if (rs < 0) {
 		bclose(tfp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (bopen) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_filesbeginopen) */
+} /* end subroutine (txtindexmks_filesbeginopen) */
 
 local int txtindexmks_filesend(TIM *op) noex {
 	int		rs = SR_OK ;
@@ -611,8 +598,8 @@ local int txtindexmks_filesend(TIM *op) noex {
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->ntagfname = nullptr ;
-	}
-	if (op->nidxfname != nullptr) {
+	} /* end if (memory-release) */
+	if (op->nidxfname) {
 	    if (op->fl.created && (op->nidxfname[0] != '\0')) {
 	        u_unlink(op->nidxfname) ;
 	    }
@@ -620,10 +607,9 @@ local int txtindexmks_filesend(TIM *op) noex {
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->nidxfname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_filesend) */
+} /* end subroutine (txtindexmks_filesend) */
 
 local int txtindexmks_idxdirbegin(TIM *op) noex {
 	int		rs = SR_INVALID ;
@@ -644,24 +630,22 @@ local int txtindexmks_idxdirbegin(TIM *op) noex {
 	                op->idname = cp ;
 	            }
 	        }
-	    }
-	}
+	    } /* end if (ok) */
+	} /* end if (sfdirname) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_idxdirbegin) */
+} /* end subroutine (txtindexmks_idxdirbegin) */
 
 local int txtindexmks_idxdirend(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->idname != nullptr) {
+	if (op->idname) {
 	    void *vp = voidp(op->idname) ;
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->idname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_idxdirend) */
+} /* end subroutine (txtindexmks_idxdirend) */
 
 local int txtindexmks_listbegin(TIM *op) noex {
 	int		sz = int(op->pi.tablen * szof(LISTOBJ)) ;
@@ -685,20 +669,19 @@ local int txtindexmks_listbegin(TIM *op) noex {
 	    if (rs >= 0) {
 	        sz = TXTINDEXMKS_EIGENSIZE ;
 	        rs = strtab_start(op->eigenp,sz) ;
-	    }
+	    } /* end if (ok) */
 	    if (rs < 0) {
 	        for (int j = 0 ; j <= idx ; j += 1) {
 	            LISTOBJ_FINISH(lop+j) ;
 	        }
-	    }
+	    } /* end if (error) */
 	    if (rs < 0) {
 	        libmem.free(op->lists) ;
 	        op->lists = nullptr ;
-	    }
+	    } /* end if (error) */
 	} /* end if (m-a) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_listbegin) */
+} /* end subroutine (txtindexmks_listbegin) */
 
 local int txtindexmks_listend(TIM *op) noex {
 	int		rs = SR_OK ;
@@ -715,14 +698,13 @@ local int txtindexmks_listend(TIM *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	}
-	if (op->lists != nullptr) {
+	if (op->lists) {
 	    rs1 = libmem.free(op->lists) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->lists = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_listend) */
+} /* end subroutine (txtindexmks_listend) */
 
 local int txtindexmks_addtag(TIM *op,TIM_TAG *tagp) noex {
 	LISTOBJ		*lop = (LISTOBJ *) op->lists ;
@@ -793,8 +775,7 @@ local int txtindexmks_addtag(TIM *op,TIM_TAG *tagp) noex {
 	} /* end if (bprintf) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (txtindexmks_addtag) */
+} /* end subroutine (txtindexmks_addtag) */
 
 local int txtindexmks_mkhash(TIM *op) noex {
 	int		rs ;
@@ -829,13 +810,12 @@ local int txtindexmks_mkhash(TIM *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (txtindexmks_nhash) */
 	return (rs >= 0) ? clists : rs ;
-}
-/* end subroutine (txtindexmks_mkhash) */
+} /* end subroutine (txtindexmks_mkhash) */
 
 local int txtindexmks_mkhashwrmain(TIM *op,HDR *hdrp) noex {
 	filer		hf, *hfp = &hf ;
 	cint		nfd = op->nfd ;
-	cint		ps = var.pagesize ;
+	cint		ps = var.pagesz ;
 	int		bsize ;
 	int		rs ;
 	int		rs1 ;
@@ -871,8 +851,7 @@ local int txtindexmks_mkhashwrmain(TIM *op,HDR *hdrp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
 	return (rs >= 0) ? off : rs ;
-}
-/* end subroutine (txtindexmks_mkhashwrmain) */
+} /* end subroutine (txtindexmks_mkhashwrmain) */
 
 local int txtindexmks_mkhashwrhdr(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 	int		rs = SR_FAULT ;
@@ -888,8 +867,7 @@ local int txtindexmks_mkhashwrhdr(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (txtindexmks_mkhashwrhdr) */
+} /* end subroutine (txtindexmks_mkhashwrhdr) */
 
 local int txtindexmks_mkhashwrtab(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 	int		tsz = op->pi.tablen * szof(uint) ;
@@ -916,8 +894,7 @@ local int txtindexmks_mkhashwrtab(TIM *op,HDR *hdrp,filer *hfp,int off) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (txtindexmks_mkhashwrtab) */
+} /* end subroutine (txtindexmks_mkhashwrtab) */
 
 local int txtindexmks_mkhashwrtabone(TIM *op,HDR *hdrp,
 		filer *hfp,int off,int *tab,int i) noex {
@@ -957,8 +934,7 @@ local int txtindexmks_mkhashwrtabone(TIM *op,HDR *hdrp,
 	    tab[i] = 0 ;
 	} /* end if (LISTOBJ_COUNT) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (txtindexmks_mkhashwrtabone) */
+} /* end subroutine (txtindexmks_mkhashwrtabone) */
 
 local int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 		filer *hfp,int off) noex {
@@ -1040,8 +1016,7 @@ local int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 	} /* end if (strtab_strsize) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (txtindexmks_mkhashwreigen) */
+} /* end subroutine (txtindexmks_mkhashwreigen) */
 
 local int txtindexmks_nhashopen(TIM *op) noex {
 	cint		type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
@@ -1070,8 +1045,7 @@ local int txtindexmks_nhashopen(TIM *op) noex {
 	    } /* end if (ok) */
 	} /* end if (mknewfname) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_nhashopen) */
+} /* end subroutine (txtindexmks_nhashopen) */
 
 local int txtindexmks_nhashclose(TIM *op) noex {
 	int		rs = SR_OK ;
@@ -1082,8 +1056,7 @@ local int txtindexmks_nhashclose(TIM *op) noex {
 	    op->nfd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (txtindexmks_nhashclose) */
+} /* end subroutine (txtindexmks_nhashclose) */
 
 local int txtindexmks_renamefiles(TIM *op) noex {
 	int		rs ;
@@ -1115,8 +1088,7 @@ local int txtindexmks_renamefiles(TIM *op) noex {
 	} /* end if (ok) */
 
 	return rs ;
-}
-/* end subroutine (txtindexmks_renamefiles) */
+} /* end subroutine (txtindexmks_renamefiles) */
 
 int txtindexmks_ntagclose(TIM *op) noex {
 	int		rs ;
@@ -1134,8 +1106,7 @@ int txtindexmks_ntagclose(TIM *op) noex {
 	    op->fl.tagopen = false ;
 	}
 	return (rs >= 0) ? tagsize : rs ;
-}
-/* end if (txtindexmks_ntagclose) */
+} /* end if (txtindexmks_ntagclose) */
 
 #ifdef	COMMENT
 
@@ -1167,8 +1138,7 @@ local int txtindexmks_printeigen(TIM *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (txtindexmks_printeigen) */
+} /* end subroutine (txtindexmks_printeigen) */
 
 local int txtindexmks_printeigener(TIM *op,printeigen *ap) noex {
 	strtab		*edp = op->eigenp ;
@@ -1209,8 +1179,7 @@ local int txtindexmks_printeigener(TIM *op,printeigen *ap) noex {
 	    } /* end if (strtab_indsize) */
 	} /* end if (strtab_recmk) */
 	return rs ;
-}
-/* end subroutine (txtindexmks_printeigener) */
+} /* end subroutine (txtindexmks_printeigener) */
 
 #endif /* COMMENT */
 
@@ -1218,8 +1187,7 @@ local int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf) noex {
 	cchar		*end = ENDIANSTR ;
 	cchar		*fin = (type) ? "xXXXX" : "n" ;
 	return mkfnamesuf3(tbuf,dbn,suf,end,fin) ;
-}
-/* end subroutine (mknewfname) */
+} /* end subroutine (mknewfname) */
 
 local int unlinkstale(cchar *fn,int to) noex {
 	custime		dt = getustime ;
@@ -1235,20 +1203,18 @@ local int unlinkstale(cchar *fn,int to) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (unlinkstale) */
+} /* end subroutine (unlinkstale) */
 
 local int mkvars() noex {
 	int		rs ;
 	if ((rs = ucpagesize) >= 0) {
-	    var.pagesize = rs ;
+	    var.pagesz = rs ;
 	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	        var.maxpathlen = rs ;
 	    } /* end if (bufsizeget) */
 	} /* end if (uc_pagesize) */
 	return rs ;
-}
-/* end subroutine (mkvars) */
+} /* end subroutine (mkvars) */
 
 #ifdef	COMMENT
 
@@ -1258,8 +1224,7 @@ local int checksize(cchar *s,int rs,int sz) noex {
 	        s,rs,sz) ;
 	}
 	return 0 ;
-}
-/* end subroutine (checksize) */
+} /* end subroutine (checksize) */
 
 local int checkalign(cchar *s,uint off) noex {
 	if ((off & 3) != 0) {
@@ -1267,8 +1232,7 @@ local int checkalign(cchar *s,uint off) noex {
 	        s,off) ;
 	}
 	return 0 ;
-}
-/* end subroutine (checkalign) */
+} /* end subroutine (checkalign) */
 
 #endif /* COMMENT */
 
