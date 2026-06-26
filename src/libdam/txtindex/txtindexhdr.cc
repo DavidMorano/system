@@ -42,15 +42,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<endian.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"txtindexhdr.h"
 
@@ -97,9 +97,9 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize = hi_overlast * szof(uint) ;
-constexpr int		magicsize = TXTINDEXHDR_MAGICSIZE ;
-constexpr char		magicstr[] = TXTINDEXHDR_MAGICSTR ;
+constexpr int		headsize	= hi_overlast * szof(uint) ;
+constexpr int		magicsize	= TXTINDEXHDR_MAGICSIZE ;
+constexpr char		magicstr[]	= TXTINDEXHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -118,36 +118,36 @@ int txtindexhdr_rd(txtindexhdr *ep,char *hbuf,int hlen) noex {
 	            bp += magicsize ;
 	            bl -= magicsize ;
 	    	    memcpy(bp,ep->vetu,4) ;
-	    	    bp[0] = TXTINDEXHDR_VERSION ;
-	    	    bp[1] = ENDIAN ;
+	    	    bp[0] = char(TXTINDEXHDR_VERSION) ;
+	    	    bp[1] = char(ENDIAN) ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
 	        	uint	*header = uintp(bp) ;
-	        	header[hi_hfsize] = ep->hfsize ;
-	        	header[hi_tfsize] = ep->tfsize ;
-	        	header[hi_ersize] = ep->ersize ;
-	        	header[hi_eisize] = ep->eisize ;
-	        	header[hi_wtime] = ep->wtime ;
-	        	header[hi_sdnoff] = ep->sdnoff ;
-	        	header[hi_sfnoff] = ep->sfnoff ;
-	        	header[hi_listoff] = ep->listoff ;
-	        	header[hi_esoff] = ep->esoff ;
-	        	header[hi_essize] = ep->essize ;
-	        	header[hi_eroff] = ep->eroff ;
-	        	header[hi_erlen] = ep->erlen ;
-	        	header[hi_eioff] = ep->eioff ;
-	        	header[hi_eilen] = ep->eilen ;
-	        	header[hi_eiskip] = ep->eiskip ;
-	        	header[hi_taboff] = ep->taboff ;
-	        	header[hi_tablen] = ep->tablen ;
-	        	header[hi_taglen] = ep->taglen ;
-	        	header[hi_maxtags] = ep->maxtags ;
-	        	header[hi_minwlen] = ep->minwlen ;
-	        	header[hi_maxwlen] = ep->maxwlen ;
+	        	header[hi_hfsize]	= ep->hfsize ;
+	        	header[hi_tfsize]	= ep->tfsize ;
+	        	header[hi_ersize]	= ep->ersize ;
+	        	header[hi_eisize]	= ep->eisize ;
+	        	header[hi_wtime]	= ep->wtime ;
+	        	header[hi_sdnoff]	= ep->sdnoff ;
+	        	header[hi_sfnoff]	= ep->sfnoff ;
+	        	header[hi_listoff]	= ep->listoff ;
+	        	header[hi_esoff]	= ep->esoff ;
+	        	header[hi_essize]	= ep->essize ;
+	        	header[hi_eroff]	= ep->eroff ;
+	        	header[hi_erlen]	= ep->erlen ;
+	        	header[hi_eioff]	= ep->eioff ;
+	        	header[hi_eilen]	= ep->eilen ;
+	        	header[hi_eiskip]	= ep->eiskip ;
+	        	header[hi_taboff]	= ep->taboff ;
+	        	header[hi_tablen]	= ep->tablen ;
+	        	header[hi_taglen]	= ep->taglen ;
+	        	header[hi_maxtags]	= ep->maxtags ;
+	        	header[hi_minwlen]	= ep->minwlen ;
+	        	header[hi_maxwlen]	= ep->maxwlen ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
 	            }
@@ -157,8 +157,7 @@ int txtindexhdr_rd(txtindexhdr *ep,char *hbuf,int hlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (txtindexhdr_rd) */
+} /* end subroutine (txtindexhdr_rd) */
 
 int txtindexhdr_wr(txtindexhdr *ep,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
@@ -187,30 +186,30 @@ int txtindexhdr_wr(txtindexhdr *ep,cchar *hbuf,int hlen) noex {
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
 	        	uint	*header = uintp(bp) ;
-	        	ep->hfsize = header[hi_hfsize] ;
-	        	ep->tfsize = header[hi_tfsize] ;
-	        	ep->ersize = header[hi_ersize] ;
-	        	ep->eisize = header[hi_eisize] ;
-	        	ep->wtime = header[hi_wtime] ;
-	        	ep->sdnoff = header[hi_sdnoff] ;
-	        	ep->sfnoff = header[hi_sfnoff] ;
-	        	ep->listoff = header[hi_listoff] ;
-	        	ep->esoff = header[hi_esoff] ;
-	        	ep->essize = header[hi_essize] ;
-	        	ep->eroff = header[hi_eroff] ;
-	        	ep->erlen = header[hi_erlen] ;
-	        	ep->eioff = header[hi_eioff] ;
-	        	ep->eilen = header[hi_eilen] ;
-	        	ep->eiskip = header[hi_eiskip] ;
-	        	ep->taboff = header[hi_taboff] ;
-	        	ep->tablen = header[hi_tablen] ;
-	        	ep->taglen = header[hi_taglen] ;
-	        	ep->maxtags = header[hi_maxtags] ;
-	        	ep->minwlen = header[hi_minwlen] ;
-	        	ep->maxwlen = header[hi_maxwlen] ;
+	        	ep->hfsize	= header[hi_hfsize] ;
+	        	ep->tfsize	= header[hi_tfsize] ;
+	        	ep->ersize	= header[hi_ersize] ;
+	        	ep->eisize	= header[hi_eisize] ;
+	        	ep->wtime	= header[hi_wtime] ;
+	        	ep->sdnoff	= header[hi_sdnoff] ;
+	        	ep->sfnoff	= header[hi_sfnoff] ;
+	        	ep->listoff	= header[hi_listoff] ;
+	        	ep->esoff	= header[hi_esoff] ;
+	        	ep->essize	= header[hi_essize] ;
+	        	ep->eroff	= header[hi_eroff] ;
+	        	ep->erlen	= header[hi_erlen] ;
+	        	ep->eioff	= header[hi_eioff] ;
+	        	ep->eilen	= header[hi_eilen] ;
+	        	ep->eiskip	= header[hi_eiskip] ;
+	        	ep->taboff	= header[hi_taboff] ;
+	        	ep->tablen	= header[hi_tablen] ;
+	        	ep->taglen	= header[hi_taglen] ;
+	        	ep->maxtags	= header[hi_maxtags] ;
+	        	ep->minwlen	= header[hi_minwlen] ;
+	        	ep->maxwlen	= header[hi_maxwlen] ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
-			len = (bp - hbuf) ;
+			len = intconv(bp - hbuf) ;
 		    } else {
 		        rs = SR_ILSEQ ;
 		    }
@@ -220,7 +219,17 @@ int txtindexhdr_wr(txtindexhdr *ep,cchar *hbuf,int hlen) noex {
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (txtindexhdr_wr) */
+} /* end subroutine (txtindexhdr_wr) */
+
+
+/* local subroutines */
+
+int txtindexhdr::rd(char *rbuf,int rlen) noex {
+    	return txtindexhdr_rd(this,rbuf,rlen) ;
+} /* end method (txtindexhdr::rd) */
+
+int txtindexhdr::wr(cchar *wbuf,int wlen) noex {
+    	return txtindexhdr_wr(this,wbuf,wlen) ;
+} /* end method (txtindexhdr::wr) */
 
 
