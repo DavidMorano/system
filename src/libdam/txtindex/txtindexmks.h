@@ -90,7 +90,7 @@ struct txtindexmks_head {
 	TXTINDEXMKS_FL	fl ;
 	uint		tagoff ;	/* tag-file running offset */
 	uint		tagsize ;	/* tag-file size (after completed) */
-	uint		magic ;
+	uint		magval ;
 	int		nfd ;
 	int		clists ;
 	mode_t		om ;
@@ -115,6 +115,8 @@ extern int txtindexmks_abort(txtindexmks *) noex ;
 extern int txtindexmks_close(txtindexmks *) noex ;
 
 EXTERNC_end
+
+extern const txtindexmks_obj	txtindexmks_modinfo ;
 
 
 #endif /* TXTINDEXMKS_INCLUDE */
