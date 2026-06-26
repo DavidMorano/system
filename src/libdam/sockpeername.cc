@@ -27,28 +27,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<sys/socket.h>		/* POSIX */
+#include	<netinet/in.h>		/* POSIX */
+#include	<arpa/inet.h>		/* POSIX */
 #include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uinet.h>		/* |INETXADDRLEN| */
-#include	<uclibmem.h>
-#include	<ucgetx.h>		/* |uc_getnameinfo(3uc)| */
-#include	<bufsizeget.h>
-#include	<getxx.h>
-#include	<sockaddress.h>
-#include	<hostent.h>
-#include	<inetaddr.h>
-#include	<sncpyx.h>
-#include	<strwcpy.h>
-#include	<isindomain.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU |INETXADDRLEN| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC |uc_getnameinfo(3uc)| */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getxx.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<inetaddr.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<isindomain.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sockpeername.h"
 
@@ -72,15 +72,17 @@ typedef sockaddr *		sockaddrp ;
 
 /* local structures */
 
-struct vars {
+namespace {
+    struct vars {
 	int		maxhostlen ;
 	int		svcnamelen ;
-} ;
+    } ; /* end struct */
+} /* end namespace */
 
 
 /* forward references */
 
-static int	mkvars() noex ;
+local int	mkvars() noex ;
 
 
 /* local variables */
@@ -92,16 +94,16 @@ namespace {
 	int		rlen ;
 	suber(char *rb,int rl,cc *adn) noex : rbuf(rb), rlen(rl), dn(adn) { } ;
 	int operator () (int) noex ;
-	int proc_unix(sockaddress *) noex ;
-	int proc_in4(sockaddress *) noex ;
-	int proc_in6(sockaddress *) noex ;
-	int proc_in4name(hostent *) noex ;
-	int proc_in4namex(hostent *) noex ;
-	int proc_in4namedom(bool,hostent *) noex ;
-	int proc_in4namecan(hostent *) noex ;
-	int proc_in4addr(INADDR4 *) noex ;
+	int proc_unix		(sockaddress *) noex ;
+	int proc_in4		(sockaddress *) noex ;
+	int proc_in6		(sockaddress *) noex ;
+	int proc_in4name	(hostent *) noex ;
+	int proc_in4namex	(hostent *) noex ;
+	int proc_in4namedom	(bool,hostent *) noex ;
+	int proc_in4namecan	(hostent *) noex ;
+	int proc_in4addr	(INADDR4 *) noex ;
     } ; /* end struct (suber) */
-}
+} /* end namespace */
 
 static vars		var ;
 
@@ -119,14 +121,13 @@ int sockpeername(int s,char *rbuf,int rlen,cc *dn) noex {
 	    if (s >= 0) {
 		rs = SR_INVALID ;
 		if (rlen > 0) {
-		    suber	so(rbuf,rlen,dn) ;
+		    suber so(rbuf,rlen,dn) ;
 		    rs = so(s) ;
 		}
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sockpeername) */
+} /* end subroutine (sockpeername) */
 
 
 /* local subroutines */
@@ -162,8 +163,7 @@ int suber::operator () (int s) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (u_getpeername) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (suber::operator) */
+} /* end method (suber::operator) */
 		
 int suber::proc_unix(sockaddress *sap) noex {
 	int		rs ;
@@ -179,8 +179,7 @@ int suber::proc_unix(sockaddress *sap) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (suber::proc_unix) */
+} /* end method (suber::proc_unix) */
 
 int suber::proc_in4(sockaddress *sap) noex {
 	INADDR4		naddr{} ;
@@ -210,8 +209,7 @@ int suber::proc_in4(sockaddress *sap) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (sockaddress_getaddr) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (suber::proc_in4) */
+} /* end method (suber::proc_in4) */
 
 int suber::proc_in4name(hostent *hep) noex {
 	int		rs ;
@@ -222,8 +220,7 @@ int suber::proc_in4name(hostent *hep) noex {
 	    }
 	}
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (suber::proc_in4name) */
+} /* end method (suber::proc_in4name) */
 
 int suber::proc_in4namex(hostent *hep) noex {
 	int		rs = SR_OK ;
@@ -243,8 +240,7 @@ int suber::proc_in4namex(hostent *hep) noex {
 		rl = rs ;
 	}
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (suber::proc_in4namex) */
+} /* end method (suber::proc_in4namex) */
 
 int suber::proc_in4namedom(bool fany,hostent *hep) noex {
 	hostent_cur	hc ;
@@ -264,14 +260,12 @@ int suber::proc_in4namedom(bool fany,hostent *hep) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hostent) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (suber::proc_in4namedom) */
+} /* end method (suber::proc_in4namedom) */
 
 #ifdef	COMMENT
 int suber::proc_in4nameany(hostent *hep) noex {
 	return proc_in4namedom(true,hep) ;
-}
-/* end method (suber::proc_in4nameany) */
+} /* end method (suber::proc_in4nameany) */
 #endif /* COMMENT */
 
 int suber::proc_in4namecan(hostent *hep) noex {
@@ -285,15 +279,14 @@ int suber::proc_in4namecan(hostent *hep) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (suber::proc_in4namecan) */
+} /* end method (suber::proc_in4namecan) */
 
 int suber::proc_in4addr(INADDR4 *naddrp) noex {
-	inetaddr	ia ;
+    	const inetaddrs	atype = inetaddr_bin ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if ((rs = ia.start(naddrp)) >= 0) {
+	if (inetaddr ia ; (rs = ia.start(atype,naddrp)) >= 0) {
 	    {
 		rs = ia.getdotaddr(rbuf,rlen) ;
 		rl = rs ;
@@ -302,8 +295,7 @@ int suber::proc_in4addr(INADDR4 *naddrp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (suber::proc_in4addr) */
+} /* end method (suber::proc_in4addr) */
 
 namespace {
     struct in6er {
@@ -317,20 +309,18 @@ namespace {
 	} ;
 	int operator () (sockaddress *) noex ;
     } ; /* end struct (in6er) */
-}
+} /* end namespace */
 
 int suber::proc_in6(sockaddress *sap) noex {
-	static cint	rsv = mkvars() ;
 	int		rs ;
 	int		rl = 0 ;
-	if ((rs = rsv) >= 0) {
-	    in6er	io(rbuf,rlen,dn) ;
+	if (static cint	rsv = mkvars() ; (rs = rsv) >= 0) {
+	    in6er io(rbuf,rlen,dn) ;
 	    rs = io(sap) ;
 	    rl = rs ;
 	} /* end if (mkvars) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (suber::proc_in6) */
+} /* end method (suber::proc_in6) */
 
 int in6er::operator () (sockaddress *sap) noex {
 	int		rs ;
@@ -350,10 +340,9 @@ int in6er::operator () (sockaddress *sap) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (sockaddress_getlen) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (in6er::operator) */
+} /* end method (in6er::operator) */
 
-static int mkvars() noex {
+local int mkvars() noex {
 	int		rs ;
 	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	    var.maxhostlen = rs ;
@@ -362,7 +351,6 @@ static int mkvars() noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (mkvars) */
+} /* end method (mkvars) */
 
 
