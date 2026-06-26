@@ -26,8 +26,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	<progexpand.h>
 #include	<proginfo.hh>
@@ -37,6 +37,7 @@
 #include	<progchecklock.h>
 #include	<proglogzone.h>
 #include	<progpeername.hh>
+#include	<pimkrand.hh>
 
 
 #endif /* LIBPROG_INCLUDE */
