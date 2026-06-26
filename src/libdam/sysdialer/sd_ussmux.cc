@@ -54,6 +54,9 @@
 #include	"sd_ussinfo.h"
 #include	"envs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -73,8 +76,6 @@
 #ifndef	SVCNAMELEN
 #define	SVCNAMELEN	32
 #endif
-
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
 
 #define	NPARG		2	/* number of positional arguments */
 #define	MAXARGINDEX	100
@@ -104,13 +105,13 @@ static int ussmux_logstuff(USSMUX *,USSINFO *) ;
 
 /* exported variables */
 
-SYSDIALER_INFO	ussmux = {
+SYSDIALER_INFO	sd_ussmux = {
 	USSMUX_MNAME,
 	USSMUX_VERSION,
 	USSMUX_INAME,
-	sizeof(USSMUX),
+	szof(USSMUX),
 	USSMUX_MF
-} ;
+} ; /* end object */
 
 
 /* exported subroutines */
@@ -138,7 +139,7 @@ cchar	*av[] ;
 	if (hostname[0] == '\0')
 	    return SR_INVALID ;
 
-	memset(op,0,sizeof(USSMUX)) ;
+	memclear(op) ; /* dangerous */
 
 #if	CF_DEBUGS
 	{
