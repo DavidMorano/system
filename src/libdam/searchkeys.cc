@@ -34,25 +34,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<usystem.h>
-#include	<vecobj.h>
-#include	<strpack.h>
-#include	<nleadstr.h>
-#include	<strwcpy.h>
-#include	<strx.h>
-#include	<hasx.h>
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |NATURALWORDLEN| */
+#include	<sys/types.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |lenstr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<strpack.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<xwords.h>		/* LIBDAM */
+#include	<naturalwords.h>	/* LIBDAM |NATURALWORDLEN| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"searchkeys.h"
-#include	"naturalwords.h"
-#include	"xwords.h"
 
 import libutil ;
 
@@ -66,7 +68,6 @@ import libutil ;
 
 #undef	BUILD
 #define	BUILD		struct build
-
 #undef	BUILD_PH
 #define	BUILD_PH	struct build_phrase
 
@@ -77,7 +78,6 @@ import libutil ;
 #ifdef	CF_BUILDREDUCE
 #define	CF_BUILDREDUCE	1		/* try |{xx}_buildreduce()| */
 #endif
-
 #ifndef	CF_SHORTCUT
 #define	CF_SHORTCUT	1		/* use short-cut */
 #endif
@@ -85,6 +85,7 @@ import libutil ;
 
 /* imported namespaces */
 
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -101,11 +102,11 @@ using std::nothrow ;			/* constant */
 
 struct build {
 	vecobj	phrases ;
-} ;
+} ; /* end struct */
 
 struct build_phrase {
 	vecobj	words ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -132,7 +133,7 @@ local int searchkeys_dtor(SK *op) noex {
 	    if (op->spp) ylikely {
 		delete op->spp ;
 		op->spp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (searchkeys_dtor) */
@@ -141,7 +142,7 @@ template<typename ... Args>
 local inline int searchkeys_magic(SK *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SEARCHKEYS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SEARCHKEYS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (searchkeys_magic) */
@@ -188,19 +189,18 @@ int searchkeys_start(SK *op,mainv qsp) noex {
 	    if ((rs = strpack_start(op->spp,0)) >= 0) {
 	        if ((rs = searchkeys_build(op,qsp)) >= 0) {
 	            nphrases = op->nphrases ;
-	            op->magic = SEARCHKEYS_MAGIC ;
+	            op->magval = SEARCHKEYS_MAGIC ;
 	        }
 	        if (rs < 0) {
 	            strpack_finish(op->spp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (strpack) */
 	    if (rs < 0) {
 		searchkeys_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (searchkeys_ctor) */
 	return (rs >= 0) ? nphrases : rs ;
-}
-/* end subroutine (searchkeys_start) */
+} /* end subroutine (searchkeys_start) */
 
 int searchkeys_finish(SK *op) noex {
 	int		rs ;
@@ -209,17 +209,17 @@ int searchkeys_finish(SK *op) noex {
 	    if (op->kphrases) {
 	        for (int i = 0 ; i < op->nphrases ; i += 1) {
 	            if (op->kphrases[i].kwords != nullptr) {
-	                rs1 = uc_free(op->kphrases[i].kwords) ;
+	                rs1 = mem.free(op->kphrases[i].kwords) ;
 	                if (rs >= 0) rs = rs1 ;
 	                op->kphrases[i].kwords = nullptr ;
-	            }
+	            } /* end if (memory-release) */
 	        } /* end for */
 	        if (op->kphrases) {
-	            rs1 = uc_free(op->kphrases) ;
+	            rs1 = mem.free(op->kphrases) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->kphrases = nullptr ;
 	            op->nphrases = 0 ;
-	        }
+	        } /* end if (memory-release) */
 	    } /* end if */
 	    {
 	        rs1 = strpack_finish(op->spp) ;
@@ -229,11 +229,10 @@ int searchkeys_finish(SK *op) noex {
 	        rs1 = searchkeys_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (searchkeys_finish) */
+} /* end subroutine (searchkeys_finish) */
 
 int searchkeys_popbegin(SK *op,SK_POP *pop,int f_prefix) noex {
 	int		rs ;
@@ -246,18 +245,17 @@ int searchkeys_popbegin(SK *op,SK_POP *pop,int f_prefix) noex {
 		if ((n = op->nphrases) > 0) ylikely {
 	            cint	sz = (n + 1) * szof(int) ;
 	            pop->f_prefix = f_prefix ;
-	            if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	            if (void *vp ; (rs = mem.mall(sz,&vp)) >= 0) {
 	                pop->nmatch = intp(vp) ;
 	                memset(pop->nmatch,0,sz) ;
 	                pop->cphrases = n ;
-	                pop->magic = SEARCHKEYS_MAGIC ;
+	                pop->magval = SEARCHKEYS_MAGIC ;
 	            } /* end if (memory-acquire) */
 	        } /* end if (valid) */
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (searchkeys_popbegin) */
+} /* end subroutine (searchkeys_popbegin) */
 
 int searchkeys_popend(SK *op,SK_POP *pop) noex {
 	int		rs ;
@@ -266,21 +264,20 @@ int searchkeys_popend(SK *op,SK_POP *pop) noex {
 	    rs = SR_FAULT ;
 	    if (pop) {
 		rs = SR_NOTOPEN ;
-	        if (pop->magic == SEARCHKEYS_MAGIC) {
+	        if (pop->magval == SEARCHKEYS_MAGIC) {
 		    rs = SR_OK ;
 	            pop->cphrases = 0 ;
 	            if (pop->nmatch) {
-	                rs1 = uc_free(pop->nmatch) ;
+	                rs1 = mem.free(pop->nmatch) ;
 	                if (rs >= 0) rs = rs1 ;
 	                pop->nmatch = nullptr ;
-	            }
-	            pop->magic = 0 ;
+	            } /* end if (memory-release) */
+	            pop->magval = 0 ;
 	        } /* end if (was open) */
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (searchkeys_popend) */
+} /* end subroutine (searchkeys_popend) */
 
 #if	CF_REGPROC
 int searchkeys_process(SK *op,SK_POP *pop,cchar *sp,int sl) noex {
@@ -288,7 +285,7 @@ int searchkeys_process(SK *op,SK_POP *pop,cchar *sp,int sl) noex {
 	int		f_match = false ;
 	if ((rs = searchkeys_magic(op,pop,sp)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (pop->magic == SEARCHKEYS_MAGIC) {
+	    if (pop->magval == SEARCHKEYS_MAGIC) {
 		rs = SR_BADFMT ;
 		if (pop->nmatch) {
 		    rs = SR_OK ;
@@ -316,8 +313,7 @@ int searchkeys_process(SK *op,SK_POP *pop,cchar *sp,int sl) noex {
 	    } /* end if (POP-magic) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_match : rs ;
-}
-/* end subroutine (searchkeys_process) */
+} /* end subroutine (searchkeys_process) */
 #endif /* CF_REGPROC */
 
 int searchkeys_processxw(SK *op,SK_POP *pop,xwords *xwp) noex {
@@ -351,8 +347,7 @@ int searchkeys_processxw(SK *op,SK_POP *pop,xwords *xwp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_match : rs ;
-}
-/* end subroutine (searchkeys_processxw) */
+} /* end subroutine (searchkeys_processxw) */
 
 int searchkeys_curbegin(SK *op,SK_CUR *curp) noex {
     	int		rs ;
@@ -361,8 +356,7 @@ int searchkeys_curbegin(SK *op,SK_CUR *curp) noex {
 	    curp->j = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (searchkeys_curbegin) */
+} /* end subroutine (searchkeys_curbegin) */
 
 int searchkeys_curend(SK *op,SK_CUR *curp) noex {
     	int		rs ;
@@ -371,8 +365,7 @@ int searchkeys_curend(SK *op,SK_CUR *curp) noex {
 	    curp->j = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (searchkeys_curend) */
+} /* end subroutine (searchkeys_curend) */
 
 int searchkeys_curenum(SK *op,SK_CUR *curp,cchar **rpp) noex {
 	int		rs ;
@@ -400,8 +393,7 @@ int searchkeys_curenum(SK *op,SK_CUR *curp,cchar **rpp) noex {
 	    } /* end if (searchkeys_curinc) */
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (searchkeys_enum) */
+} /* end subroutine (searchkeys_curenum) */
 
 
 /* private subroutines */
@@ -440,8 +432,7 @@ local int searchkeys_build(SK *op,mainv qsp) noex {
 	    } /* end if (phrases) */
 	} /* end block */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (searchkeys_build) */
+} /* end subroutine (searchkeys_build) */
 
 local int searchkeys_buildadd(SK *op,BUILD *bip,cchar *phrase) noex {
 	int		rs ;
@@ -493,8 +484,7 @@ local int searchkeys_buildadd(SK *op,BUILD *bip,cchar *phrase) noex {
 	    }
 	} /* end if (buildphrase_start) */
 	return (rs >= 0) ? wc : rs ;
-}
-/* end subroutine (searchkeys_buildadd) */
+} /* end subroutine (searchkeys_buildadd) */
 
 local int searchkeys_buildaddword(SK *op,BUILD_PH *bpp,cc *wp,int wl) noex {
 	int		rs = SR_OK ;
@@ -512,8 +502,7 @@ local int searchkeys_buildaddword(SK *op,BUILD_PH *bpp,cc *wp,int wl) noex {
 	    rs = buildphrase_add(bpp,kp,kl) ;
 	}
 	return rs ;
-}
-/* end subroutine (searchkeys_buildaddword) */
+} /* end subroutine (searchkeys_buildaddword) */
 
 local int searchkeys_buildphrasemat(SK *op,BUILD *bip,BUILD_PH *bpp) noex {
 	int		rs  = SR_FAULT ;
@@ -536,8 +525,7 @@ local int searchkeys_buildphrasemat(SK *op,BUILD *bip,BUILD_PH *bpp) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_match : rs ;
-}
-/* end subroutine (searchkeys_buildphrasemat) */
+} /* end subroutine (searchkeys_buildphrasemat) */
 
 local int searchkeys_buildreduce(SK *op,BUILD *bip) noex {
 	vecobj		*plp = &bip->phrases ;
@@ -563,8 +551,7 @@ local int searchkeys_buildreduce(SK *op,BUILD *bip) noex {
 	} /* end for */
 	c = op->nphrases ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (searchkeys_buildreduce) */
+} /* end subroutine (searchkeys_buildreduce) */
 
 local int searchkeys_buildfins(SK *op,BUILD *bip) noex {
 	vecobj		*plp = &bip->phrases ;
@@ -587,8 +574,7 @@ local int searchkeys_buildfins(SK *op,BUILD *bip) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (searchkeys_buildfins) */
+} /* end subroutine (searchkeys_buildfins) */
 
 local int searchkeys_buildmatone(SK *op,BUILD *bip,int si,BUILD_PH *bpp) noex {
 	int		rs = SR_FAULT ;
@@ -614,8 +600,7 @@ local int searchkeys_buildmatone(SK *op,BUILD *bip,int si,BUILD_PH *bpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_match : rs ;
-}
-/* end subroutine (searchkeys_buildmatone) */
+} /* end subroutine (searchkeys_buildmatone) */
 
 local int searchkeys_buildload(SK *op,BUILD *bip) noex {
 	vecobj		*plp = &bip->phrases ;
@@ -625,7 +610,7 @@ local int searchkeys_buildload(SK *op,BUILD *bip) noex {
 	if ((rs = plp->count) >= 0) {
 	    int		sz = (rs + 1) * szof(SK_PH) ;
 	    nphrases = rs ;
-	    if (void *vp{} ; (rs = uc_malloc(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = mem.mall(sz,&vp)) >= 0) {
 	        int	nwords ;
 	        int	pi, pj ;
 	        int	wi, wj ;
@@ -638,22 +623,22 @@ local int searchkeys_buildload(SK *op,BUILD *bip) noex {
 	    	    BUILD_PH	*bpp = (BUILD_PH *) vp ;
 	            if (vp) {
 	    		SK_KW	*wep{} ;
-			{
+			if (rs >= 0) {
 	                    rs = buildphrase_count(bpp) ;
 	                    if (rs < 0) break ;
 	                    nwords = rs ;
 		    	}
-			{
+			if (rs >= 0) {
 	                    sz = (nwords + 1) * szof(SK_KW) ;
-	                    rs = uc_malloc(sz,&wep) ;
+	                    rs = mem.mall(sz,&wep) ;
 	                    if (rs < 0) break ;
-		    	}
+		    	} /* end block (memory-acquire) */
 			{
 	                    op->kphrases[pj].kwords = wep ;
 	                    op->kphrases[pj].nwords = nwords ;
 	                    pj += 1 ;
 		    	}
-			{
+			if (rs >= 0) {
 			    cchar	*kp{} ;
 	                    wj = 0 ;
 	                    wi = 0 ;
@@ -678,21 +663,20 @@ local int searchkeys_buildload(SK *op,BUILD *bip) noex {
 		}
 	        if (rs < 0) {
 	            for (pi = 0 ; op->kphrases[pi].kwords ; pi += 1) {
-	                rs1 = uc_free(op->kphrases[pi].kwords) ;
+	                rs1 = mem.free(op->kphrases[pi].kwords) ;
 			if (rs >= 0) rs = rs1 ;
 	                op->kphrases[pi].kwords = nullptr ;
-	            } /* end for */
+	            } /* end for (memory-release) */
 	            {
-	                rs1 = uc_free(op->kphrases) ;
+	                rs1 = mem.free(op->kphrases) ;
 			if (rs >= 0) rs = rs1 ;
 	                op->kphrases = nullptr ;
-	            }
+	            } /* end if (memory-release) */
 	        } /* end if (error) */
 	    } /* end if (memory-acquire) */
 	} /* end if (vecobj_count) */
 	return (rs >= 0) ? nphrases : rs ;
-}
-/* end subroutine (searchkeys_buildload) */
+} /* end subroutine (searchkeys_buildload) */
 
 local int searchkeys_curinc(SK *op,SK_CUR *curp,int *ip,int *jp) noex {
 	int		rs = SR_OK ;
@@ -715,8 +699,7 @@ local int searchkeys_curinc(SK *op,SK_CUR *curp,int *ip,int *jp) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (searchkeys_curinc) */
+} /* end subroutine (searchkeys_curinc) */
 
 local int buildphrase_start(BUILD_PH *bpp) noex {
 	int		rs = SR_FAULT ;
@@ -727,8 +710,7 @@ local int buildphrase_start(BUILD_PH *bpp) noex {
 	    rs = vecobj_start(&bpp->words,sz,vn,vo) ;
 	}
 	return rs ;
-}
-/* end subroutine (buildphrase_start) */
+} /* end subroutine (buildphrase_start) */
 
 local int buildphrase_finish(BUILD_PH *bpp) noex {
 	int		rs = SR_FAULT ;
@@ -738,21 +720,19 @@ local int buildphrase_finish(BUILD_PH *bpp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (buildphrase_finish) */
+} /* end subroutine (buildphrase_finish) */
 
 local int buildphrase_add(BUILD_PH *bpp,cchar *kp,int kl) noex {
 	int		rs = SR_FAULT ;
 	if (bpp) {
-	    SK_KW	ke ;
+	    SK_KW	ke{} ;
 	    if (kl < 0) kl = lenstr(kp) ;
 	    ke.kp = kp ;
 	    ke.kl = kl ;
 	    rs = vecobj_add(&bpp->words,&ke) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (buildphrase_add) */
+} /* end subroutine (buildphrase_add) */
 
 local int buildphrase_count(BUILD_PH *bpp) noex {
 	int		rs = SR_FAULT ;
@@ -760,8 +740,7 @@ local int buildphrase_count(BUILD_PH *bpp) noex {
 	    rs = vecobj_count(&bpp->words) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (buildphrase_count) */
+} /* end subroutine (buildphrase_count) */
 
 local int buildphrase_getkey(BUILD_PH *bpp,int i,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -782,8 +761,7 @@ local int buildphrase_getkey(BUILD_PH *bpp,int i,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (buildphrase_getkey) */
+} /* end subroutine (buildphrase_getkey) */
 
 local int buildphrase_havekey(BUILD_PH *bpp,cchar *kp,int kl) noex {
     	int		rs = SR_FAULT ;
@@ -803,8 +781,7 @@ local int buildphrase_havekey(BUILD_PH *bpp,cchar *kp,int kl) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (buildphrase_havekey) */
+} /* end subroutine (buildphrase_havekey) */
 
 #if	CF_REGPROC
 local int kphrase_proc(SKPHRSE *pep,int f_prefix,int ki,cc *wp,int wl) noex {
@@ -835,8 +812,7 @@ local int kphrase_proc(SKPHRSE *pep,int f_prefix,int ki,cc *wp,int wl) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (kphrase_proc) */
+} /* end subroutine (kphrase_proc) */
 #endif /* CF_REGPROC */
 
 local int kphrase_procxw(SK_PH *pep,int f_prefix,int ki,xwords *xwp) noex {
@@ -873,7 +849,6 @@ local int kphrase_procxw(SK_PH *pep,int f_prefix,int ki,xwords *xwp) noex {
 	    rs = SR_INVALID ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (kphrase_procxw) */
+} /* end subroutine (kphrase_procxw) */
 
 
