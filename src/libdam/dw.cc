@@ -31,31 +31,33 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<bufsizeget.h>
-#include	<bufsizevar.hh>
-#include	<vecobj.h>
-#include	<vecstr.h>
-#include	<absfn.h>
-#include	<fsdir.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<strwcpy.h>
-#include	<strdcpy.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<absfn.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strdcpy.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dw.h"
 
@@ -85,24 +87,6 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_getpid() noex ;
-    extern int uc_stat(cchar *,ustat *) noex ;
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_moveup(int,int) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_lockf(int,int,off_t) noex ;
-    extern int uc_readln(int,void *,int) noex ;
-    extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_writedesc(int,int,int) noex ;
-    extern int uc_rewind(int) noex ;
-    extern int uc_seek(int,off_t,int) noex ;
-    extern int uc_setappend(int,int) noex ;
-    extern int uc_ftruncate(int,off_t) noex ;
-    extern int uc_setappend(int,int) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-} /* end extern */
 
 
 /* external variables */
@@ -146,8 +130,7 @@ local int dw_ctor(dw *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dw_ctor) */
+} /* end subroutine (dw_ctor) */
 
 local int dw_dtor(dw *op) noex {
 	int		rs = SR_FAULT ;
@@ -159,53 +142,48 @@ local int dw_dtor(dw *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dw_dtor) */
+} /* end subroutine (dw_dtor) */
 
 template<typename ... Args>
-static inline int dw_magic(dw *op,Args ... args) noex {
+local inline int dw_magic(dw *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DW_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (dw_magic) */
+} /* end subroutine (dw_magic) */
 
-static int	dw_starter(DW *,cchar *) noex ;
-static int	dw_finents(DW *) noex ;
-static int	dw_checker(DW *,time_t) noex ;
-static int	dw_checkx(DW *,time_t) noex ;
-static int	dw_checknew(DW *,time_t,char *) noex ;
-static int	dw_checknewent(DW *,time_t,IENT *,char *) noex ;
-static int	dw_checkrm(DW *,time_t,char *) noex ;
-static int	dw_checkrmer(DW *,char *,time_t) noex ;
-static int	dw_checkrment(DW *,time_t,IENT *,cchar *) noex ;
-static int	dw_scan(DW *,time_t) noex ;
-static int	dw_scaner(DW *,char *,int,time_t) noex ;
-static int	dw_scanent(DW *,cchar *,cchar *,time_t) noex ;
-static int	dw_findi(DW *,cchar *,IENT **) noex ;
-static int	dw_diropen(DW *,time_t) noex ;
-static int	dw_dirclose(DW *) noex ;
+local int	dw_starter(DW *,cchar *) noex ;
+local int	dw_finents(DW *) noex ;
+local int	dw_checker(DW *,time_t) noex ;
+local int	dw_checkx(DW *,time_t) noex ;
+local int	dw_checknew(DW *,time_t,char *) noex ;
+local int	dw_checknewent(DW *,time_t,IENT *,char *) noex ;
+local int	dw_checkrm(DW *,time_t,char *) noex ;
+local int	dw_checkrmer(DW *,char *,time_t) noex ;
+local int	dw_checkrment(DW *,time_t,IENT *,cchar *) noex ;
+local int	dw_scan(DW *,time_t) noex ;
+local int	dw_scaner(DW *,char *,int,time_t) noex ;
+local int	dw_scanent(DW *,cchar *,cchar *,time_t) noex ;
+local int	dw_findi(DW *,cchar *,IENT **) noex ;
+local int	dw_diropen(DW *,time_t) noex ;
+local int	dw_dirclose(DW *) noex ;
 
-static int	ient_start(IENT *,DW *,cchar *,ustat *) noex ;
-static int	ient_finish(IENT *,DW *) noex ;
+local int	ient_start(IENT *,DW *,cchar *,ustat *) noex ;
+local int	ient_finish(IENT *,DW *) noex ;
 
-static int	entry_load(DW_ENT *,IENT *,cchar *) noex ;
+local int	entry_load(DW_ENT *,IENT *,cchar *) noex ;
 
 extern "C" {
-    static int	vcmpfn(cvoid **,cvoid **) noex ;
+    local int	vcmpfn(cvoid **,cvoid **) noex ;
 }
 
 
 /* local variables */
 
 constexpr intvals	intval ;
-
 static vars		var ;
-
 const int		rsn = SR_NOTFOUND ;
-
 const bool		f_fnamecmp = CF_FNAMECMP ;
 
 
@@ -232,11 +210,10 @@ int dw_start(DW *op,cchar *dirname,int intck) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		dw_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (dw_ctor) */
 	return rs ;
-}
-/* end subroutine (dw_start) */
+} /* end subroutine (dw_start) */
 
 local int dw_starter(DW *op,cchar *dn) noex {
 	static cint	rsv = var ;
@@ -277,8 +254,7 @@ local int dw_starter(DW *op,cchar *dn) noex {
 	    } /* end if (vecobj-start) */
 	} /* end if (vars) */
 	return rs ;
-}
-/* end subroutine (dw_starter) */
+} /* end subroutine (dw_starter) */
 
 int dw_finish(DW *op) noex {
 	int		rs ;
@@ -309,8 +285,7 @@ int dw_finish(DW *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dw_finish) */
+} /* end subroutine (dw_finish) */
 
 local int dw_finents(DW *op) noex {
     	int		rs = SR_BUGCHECK ;
@@ -330,8 +305,7 @@ local int dw_finents(DW *op) noex {
 	    if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	}
 	return rs ;
-}
-/* end subroutine (dw_finents) */
+} /* end subroutine (dw_finents) */
 
 int dw_curbegin(DW *op,DW_CUR *curp) noex {
     	int		rs ;
@@ -339,8 +313,7 @@ int dw_curbegin(DW *op,DW_CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dw_curbegin) */
+} /* end subroutine (dw_curbegin) */
 
 int dw_curend(DW *op,DW_CUR *curp) noex {
     	int		rs ;
@@ -348,8 +321,7 @@ int dw_curend(DW *op,DW_CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dw_curend) */
+} /* end subroutine (dw_curend) */
 
 int dw_curenum(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -383,8 +355,7 @@ int dw_curenum(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? nlen : rs ;
-}
-/* end subroutine (dw_curenum) */
+} /* end subroutine (dw_curenum) */
 
 /* enumerate those entries that are "checkable" */
 int dw_curenumcheck(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
@@ -419,8 +390,7 @@ int dw_curenumcheck(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (dw_enumcheckable) */
+} /* end subroutine (dw_enumcheckable) */
 
 int dw_del(DW *op,DW_CUR *curp) noex {
 	int		rs ;
@@ -442,8 +412,7 @@ int dw_del(DW *op,DW_CUR *curp) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dw_del) */
+} /* end subroutine (dw_del) */
 
 int dw_find(DW *op,cchar *name,DW_ENT *dep,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -479,8 +448,7 @@ int dw_find(DW *op,cchar *name,DW_ENT *dep,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (dw_find) */
+} /* end subroutine (dw_find) */
 
 int dw_check(DW *op,time_t dt) noex {
     	int		rs ;
@@ -496,8 +464,7 @@ int dw_check(DW *op,time_t dt) noex {
 	    } /* end if (check-time) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (dw_check) */
+} /* end subroutine (dw_check) */
 
 local int dw_checker(DW *op,time_t dt) noex {
     	int		rs ;
@@ -519,8 +486,7 @@ local int dw_checker(DW *op,time_t dt) noex {
 	    }
 	} /* end if (stat) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (dw_checker) */
+} /* end subroutine (dw_checker) */
 
 local int dw_checkx(DW *op,time_t dt) noex {
     	int		rs ;
@@ -535,8 +501,7 @@ local int dw_checkx(DW *op,time_t dt) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (dw_checkx) */
+} /* end subroutine (dw_checkx) */
 
 local int dw_checknew(DW *op,time_t dt,char *dbuf) noex {
     	int		rs = SR_OK ;
@@ -556,8 +521,7 @@ local int dw_checknew(DW *op,time_t dt,char *dbuf) noex {
 	        } /* end for */
 	} /* end if (non-zero positive new entries) */
 	return rs ;
-}
-/* end subroutine (dw_checknew) */
+} /* end subroutine (dw_checknew) */
 
 local int dw_checknewent(DW *op,time_t dt,IENT *iep,char *dbuf) noex {
 	int		rs ;
@@ -573,8 +537,7 @@ local int dw_checknewent(DW *op,time_t dt,IENT *iep,char *dbuf) noex {
 	    rs = SR_OK ;
 	} /* end if (stat) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (dw_checknewent) */
+} /* end subroutine (dw_checknewent) */
 
 local int dw_checkrm(DW *op,time_t dt,char *dbuf) noex {
     	int		rs = SR_OK ;
@@ -586,8 +549,7 @@ local int dw_checkrm(DW *op,time_t dt,char *dbuf) noex {
 	    } /* end if (vecobj_count) */
 	} /* end if (idle interval) */
 	return rs ;
-}
-/* end subroutine (dw_checkrm) */
+} /* end subroutine (dw_checkrm) */
 
 local int dw_checkrmer(DW *op,char *dbuf,time_t dt) noex {
     	vecobj		*elp = op->elp ;
@@ -610,8 +572,7 @@ local int dw_checkrmer(DW *op,char *dbuf,time_t dt) noex {
 	    if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (dw_checkrmer) */
+} /* end subroutine (dw_checkrmer) */
 
 local int dw_checkrment(DW *op,time_t dt,IENT *iep,cchar *dbuf) noex {
     	int		rs ;
@@ -627,8 +588,7 @@ local int dw_checkrment(DW *op,time_t dt,IENT *iep,cchar *dbuf) noex {
 	    }
 	} /* end if (could not 'stat') */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (dw_checkrment) */
+} /* end subroutine (dw_checkrment) */
 
 int dw_state(DW *op,int i,int state) noex {
 	int		rs ;
@@ -645,8 +605,7 @@ int dw_state(DW *op,int i,int state) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? state_prev : rs ;
-}
-/* end subroutine (dw_state) */
+} /* end subroutine (dw_state) */
 
 
 /* private subroutines */
@@ -665,8 +624,7 @@ local int dw_scan(DW *op,time_t dt) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (dw_scan) */
+} /* end subroutine (dw_scan) */
 
 /* "do" the subdirectory */
 local int dw_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
@@ -692,8 +650,7 @@ local int dw_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (dw_scaner) */
+} /* end subroutine (dw_scaner) */
 
 local int dw_scanent(DW *op,cchar *dbuf,cchar *dn,time_t dt) noex {
 	int		rs ;
@@ -724,8 +681,7 @@ local int dw_scanent(DW *op,cchar *dbuf,cchar *dn,time_t dt) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (dw_scanent) */
+} /* end subroutine (dw_scanent) */
 
 local int dw_diropen(DW *op,time_t dt) noex {
     	int		rs = SR_OK ;
@@ -745,8 +701,7 @@ local int dw_diropen(DW *op,time_t dt) noex {
 	    } /* end if (u_open) */
 	} /* end if (opened FD for caching) */
 	return rs ;
-}
-/* end subroutine (dw_diropen) */
+} /* end subroutine (dw_diropen) */
 
 local int dw_dirclose(DW *op) noex {
     	int		rs = SR_OK ;
@@ -757,8 +712,7 @@ local int dw_dirclose(DW *op) noex {
 	    op->fd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (dw_dirclose) */
+} /* end subroutine (dw_dirclose) */
 
 #ifdef	COMMENT
 
@@ -773,8 +727,7 @@ local int dw_delname(DW *op,cchar *name) noex {
 	    rs = vecobj_del(op->elp,i) ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (dw_delname) */
+} /* end subroutine (dw_delname) */
 
 #endif /* COMMENT */
 
@@ -788,8 +741,7 @@ local int dw_findi(DW *op,cchar *name,IENT **iepp) noex {
 	    *iepp = iep ;
 	}
 	return rs ;
-}
-/* end subroutine (dw_findi) */
+} /* end subroutine (dw_findi) */
 
 /* initialize an entry */
 local int ient_start(IENT *iep,DW *op,cchar *name,ustat *sbp) noex {
@@ -813,8 +765,7 @@ local int ient_start(IENT *iep,DW *op,cchar *name,ustat *sbp) noex {
 	    iep->itime = ((sbp) ? sbp->st_mtime : 0) ;
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (ient_start) */
+} /* end subroutine (ient_start) */
 
 local int ient_finish(IENT *iep,DW *op) noex {
 	int		rs = SR_OK ;
@@ -831,8 +782,7 @@ local int ient_finish(IENT *iep,DW *op) noex {
 	    iep->name = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (ient_finish) */
+} /* end subroutine (ient_finish) */
 
 local int entry_load(DW_ENT *dep,IENT *iep,cchar *rbuf) noex {
 	int		rs = SR_FAULT ;
@@ -848,8 +798,7 @@ local int entry_load(DW_ENT *dep,IENT *iep,cchar *rbuf) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_load) */
+} /* end subroutine (entry_load) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -857,8 +806,7 @@ vars::operator int () noex {
 	    maxpathlen = rs ;
 	} /* end if (bufsizeget) */
     	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 local int vcmpfn(cvoid **v1pp,cvoid **v2pp) noex {
 	IENT		**e1pp = (IENT **) v1pp ;
@@ -880,7 +828,6 @@ local int vcmpfn(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (vcmpfn) */
+} /* end subroutine (vcmpfn) */
 
 
