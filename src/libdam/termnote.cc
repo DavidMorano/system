@@ -81,48 +81,53 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mallocxx.h>
-#include	<getnodename.h>
-#include	<getusername.h>
-#include	<ascii.h>
-#include	<ids.h>
-#include	<buffer.h>
-#include	<vecstr.h>
-#include	<vecobj.h>
-#include	<linefold.h>
-#include	<tmpx.h>
-#include	<logfile.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<snx.h>
-#include	<mkx.h>
-#include	<mklogid.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<termconseq.h>
-#include	<ncol.h>		/* |ncolchar(3uc)| */
-#include	<pow.h>
-#include	<permx.h>
-#include	<timestr.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<isnot.h>
-#include	<localmisc.h>		/* |NTABCOLS| + |COLUMNS| */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |lenstr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucgetpid.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<linefold.h>		/* LIBUC */
+#include	<tmpx.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<mklogid.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<termconseq.h>		/* LIBUC */
+#include	<ncol.h>		/* LIBUC |ncolchar(3uc)| */
+#include	<pow.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |NTABCOLS| + |COLUMNS| */
 
 #include	"termnote.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -148,6 +153,7 @@ import libutil ;
 
 /* imported namespaces */
 
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -294,7 +300,7 @@ int termnote_open(TN *op,cchar *pr) noex {
 	if ((rs = termnote_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (pr[0]) ylikely {
-	        if (cchar *cp ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = mem.strw(pr,-1,&cp)) >= 0) {
 	            op->pr = cp ;
 	            if ((rs = termnote_txopen(op,dt)) >= 0) ylikely {
 	                if ((rs = ids_load(op->idp)) >= 0) {
@@ -307,21 +313,21 @@ int termnote_open(TN *op,cchar *pr) noex {
 	                } /* end if (ids_load) */
 	                if (rs < 0) {
 		            termnote_txclose(op) ;
-		        }
+		        } /* end if (error) */
 	            } /* end if (termnote_txopen) */
 	            if (rs < 0) {
-	                uc_free(op->pr) ;
+	                voidp vp = voidp(op->pr) ;
+	                mem.free(vp) ;
 	                op->pr = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		termnote_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (termnote_ctor) */
 	return rs ;
-}
-/* end subroutine (termnote_open) */
+} /* end subroutine (termnote_open) */
 
 int termnote_close(TN *op) noex {
 	int		rs ;
@@ -338,15 +344,17 @@ int termnote_close(TN *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->username) ylikely {
-	        rs1 = uc_free(op->username) ;
+	        voidp vp = voidp(op->username) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->username = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->nodename) ylikely {
-	        rs1 = uc_free(op->nodename) ;
+	        voidp vp = voidp(op->nodename) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->nodename = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->idp) ylikely {
 	        rs1 = ids_release(op->idp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -356,10 +364,11 @@ int termnote_close(TN *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->pr) {
-	        rs1 = uc_free(op->pr) ;
+	        voidp vp = voidp(op->pr) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->pr = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 		rs1 = termnote_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -367,8 +376,7 @@ int termnote_close(TN *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (termnote_close) */
+} /* end subroutine (termnote_close) */
 
 int termnote_printf(TN *op,cc **rpp,int n,int o,cc *fmt,...) noex {
 	va_list		ap ;
@@ -379,8 +387,7 @@ int termnote_printf(TN *op,cc **rpp,int n,int o,cc *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (termnote_printf) */
+} /* end subroutine (termnote_printf) */
 
 /* make a log entry */
 int termnote_vprintf(TN *op,cc **rpp,int n,int o,cc *fmt,va_list ap) noex {
@@ -388,19 +395,18 @@ int termnote_vprintf(TN *op,cc **rpp,int n,int o,cc *fmt,va_list ap) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = termnote_magic(op,rpp,fmt)) >= 0) ylikely {
-	    if (char *obuf ; (rs = malloc_ml(&obuf)) >= 0) ylikely {
+	    if (char *obuf ; (rs = mem.ml(&obuf)) >= 0) ylikely {
 		cint	olen = rs ;
 	        if ((rs = bufvprintf(obuf,olen,fmt,ap)) >= 0) ylikely {
 	            rs = termnote_write(op,rpp,n,o,obuf,rs) ;
 	            wlen = rs ;
 	        }
-	        rs1 = uc_free(obuf) ;
+	        rs1 = mem.free(obuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (termnote_vprintf) */
+} /* end subroutine (termnote_vprintf) */
 
 int termnote_check(TN *op,time_t dt) noex {
 	int		rs ;
@@ -425,8 +431,7 @@ int termnote_check(TN *op,time_t dt) noex {
 	    } /* end if (check) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (termnote_check) */
+} /* end subroutine (termnote_check) */
 
 int termnote_write(TN *op,cc **rpp,int mw,int o,cc *sbuf,int slen) noex {
 	int		rs = SR_OK ;
@@ -471,8 +476,7 @@ int termnote_write(TN *op,cc **rpp,int mw,int o,cc *sbuf,int slen) noex {
 	    } /* end if (not-empty) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (termnote_write) */
+} /* end subroutine (termnote_write) */
 
 
 /* private subroutines */
@@ -519,8 +523,7 @@ local int termnote_writer(TN *op,cc **rpp,int m,int o,cc *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (buffer) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (termnote_writer) */
+} /* end subroutine (termnote_writer) */
 
 local int termnote_bufline(TN *op,buffer *obp,cchar *lp,int ll) noex {
 	cint		cols = COLUMNS ;
@@ -565,8 +568,7 @@ local int termnote_bufline(TN *op,buffer *obp,cchar *lp,int ll) noex {
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termnote_bufline) */
+} /* end subroutine (termnote_bufline) */
 
 local int termnote_bufextra(TN *op,buffer *obp,int o) noex {
 	int		rs = SR_FAULT ;
@@ -577,8 +579,7 @@ local int termnote_bufextra(TN *op,buffer *obp,int o) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termnote_bufextra) */
+} /* end subroutine (termnote_bufextra) */
 
 local int termnote_dis(TN *op,cchar **rpp,int n,int o,mbuf *mp) noex {
 	int		rs = SR_OK ;
@@ -588,8 +589,7 @@ local int termnote_dis(TN *op,cchar **rpp,int n,int o,mbuf *mp) noex {
 	    c += rs ;
 	} /* end for */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (termnote_dis) */
+} /* end subroutine (termnote_dis) */
 
 namespace {
     struct disuser {
@@ -600,7 +600,7 @@ namespace {
 	int loadtermsx(vecstr *,int) noex ;
 	int writeterms(int,int,mbuf *) noex ;
     } ; /* end struct (disuser) */
-}
+} /* end namespace */
 
 local int termnote_disuser(TN *op,int nmax,int o,mbuf *mp,cc *un) noex {
 	cint		utsz = szof(userterm) ;
@@ -616,8 +616,7 @@ local int termnote_disuser(TN *op,int nmax,int o,mbuf *mp,cc *un) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (user-term list) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (termnote_disuser) */
+} /* end subroutine (termnote_disuser) */
 
 int disuser::loadterms(int o,cchar *un) noex {
 	int		rs ;
@@ -639,8 +638,7 @@ int disuser::loadterms(int o,cchar *un) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (user-term lines) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (disuser::loadterms) */
+} /* end method (disuser::loadterms) */
 
 int disuser::loadtermsx(vecstr *llp,int o) noex {
 	userterm	ut ;
@@ -679,8 +677,7 @@ int disuser::loadtermsx(vecstr *llp,int o) noex {
             if (rs < 0) break ;
         } /* end for */
 	return rs ;
-}
-/* end method (disuser::loadtermsx) */
+} /* end method (disuser::loadtermsx) */
 
 int disuser::writeterms(int nmax,int o,mbuf *mp) noex {
         vecobj_vcf	vcf = vecobj_vcf(vcmpatime) ;
@@ -716,8 +713,7 @@ int disuser::writeterms(int nmax,int o,mbuf *mp) noex {
             } /* end for (looping through user-terms) */
 	} /* end if (vecobj_sort) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (disuser::writeterms) */
+} /* end method (disuser::writeterms) */
 
 local int termnote_diswrite(TN *op,int o,mbuf *mp,cc *termdev) noex {
 	int		rs = SR_FAULT ;
@@ -739,8 +735,7 @@ local int termnote_diswrite(TN *op,int o,mbuf *mp,cc *termdev) noex {
 	    } /* end if (open terminal-device) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (termnote_diswrite) */
+} /* end subroutine (termnote_diswrite) */
 
 local int termnote_txopen(TN *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -752,8 +747,7 @@ local int termnote_txopen(TN *op,time_t dt) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (termnote_txopen) */
+} /* end subroutine (termnote_txopen) */
 
 local int termnote_txclose(TN *op) noex {
 	int		rs = SR_OK ;
@@ -764,8 +758,7 @@ local int termnote_txclose(TN *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (termnote_txclose) */
+} /* end subroutine (termnote_txclose) */
 
 local int termnote_lfopen(TN *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -783,20 +776,19 @@ local int termnote_lfopen(TN *op,time_t dt) noex {
 		}
 	    }
 	    if (rs >= 0) {
-	        if (char *lfname{} ; (rs = malloc_mp(&lfname)) >= 0) {
+	        if (char *lfname{} ; (rs = mem.mp(&lfname)) >= 0) {
 	  	    cchar	*sn = TN_SN ;
 	            if ((rs = mkpath3(lfname,op->pr,LOGDNAME,sn)) >= 0) {
 		        rs = termnote_lfopener(op,dt,lfname,sn) ;
 		        f_opened = (rs > 0) ;
 		    }
-		    rs1 = uc_free(lfname) ;
+		    rs1 = mem.free(lfname) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (ok) */
 	} /* end if (needed initialization) */
 	return (rs >= 0) ? f_opened : rs ;
-}
-/* end subroutine (termnote_lfopen) */
+} /* end subroutine (termnote_lfopen) */
 
 local int termnote_lfopener(TN *op,time_t dt,cc *lfname,cc *sn) noex {
 	logfile		*lfp = op->lfp ;
@@ -827,8 +819,7 @@ local int termnote_lfopener(TN *op,time_t dt,cc *lfname,cc *sn) noex {
             rs = SR_OK ;
         } /* end if (logfile opened) */
 	return (rs >= 0) ? fopened : rs ;
-}
-/* end subroutine (termnote_lfopener) */
+} /* end subroutine (termnote_lfopener) */
 
 local int termnote_lfclose(TN *op) noex {
 	int		rs = SR_OK ;
@@ -839,54 +830,51 @@ local int termnote_lfclose(TN *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (termnote_lfclose) */
+} /* end subroutine (termnote_lfclose) */
 
 local int termnote_username(TN *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rl = 0 ;
 	if (op->username == nullptr) {
-	    if (char *ubuf ; (rs = malloc_un(&ubuf)) >= 0) ylikely {
+	    if (char *ubuf ; (rs = mem.un(&ubuf)) >= 0) ylikely {
 		cint	ulen = rs ;
 	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) ylikely {
 	            rl = rs ;
-		    if (cc *cp{} ; (rs = uc_mallocstrw(ubuf,rl,&cp)) >= 0) {
+		    if (cc *cp{} ; (rs = mem.strw(ubuf,rl,&cp)) >= 0) {
 		        op->username = cp ;
-		    }
+		    } /* end if (memory-acquire) */
 	        } /* end if (getnodename) */
-		rs1 = uc_free(ubuf) ;
+		rs1 = mem.free(ubuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
 	   rl = lenstr(op->username) ;
 	}
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (termnote_username) */
+} /* end subroutine (termnote_username) */
 
 local int termnote_nodename(TN *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rl = 0 ;
 	if (op->nodename == nullptr) {
-	    if (char *nbuf ; (rs = malloc_nn(&nbuf)) >= 0) ylikely {
+	    if (char *nbuf ; (rs = mem.nn(&nbuf)) >= 0) ylikely {
 		cint	nlen = rs ;
 	        if ((rs = getnodename(nbuf,nlen)) >= 0) ylikely {
 	            rl = rs ;
-		    if (cc *cp ; (rs = uc_mallocstrw(nbuf,rl,&cp)) >= 0) {
+		    if (cc *cp ; (rs = mem.strw(nbuf,rl,&cp)) >= 0) {
 		        op->nodename = cp ;
 		    }
 	        } /* end if (getnodename) */
-		rs1 = uc_free(nbuf) ;
+		rs1 = mem.free(nbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
 	    rl = lenstr(op->nodename) ;
 	}
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (termnote_nodename) */
+} /* end subroutine (termnote_nodename) */
 
 #ifdef	COMMENT
 
@@ -898,8 +886,7 @@ local int colstate_load(colstate *csp,int ncols,int ncol) noex {
 	    csp->ncol = ncol ;
 	}
 	return rs ;
-}
-/* end subroutine (colstate_load) */
+} /* end subroutine (colstate_load) */
 
 /* return the number of characters that will fill the current column limit */
 local int colstate_linecols(colstate *csp,cchar *sbuf,int slen) noex {
@@ -913,8 +900,7 @@ local int colstate_linecols(colstate *csp,cchar *sbuf,int slen) noex {
 	    rcols -= cols ;
 	} /* end for */
 	return i ;
-}
-/* end subroutine (colstate_linecols) */
+} /* end subroutine (colstate_linecols) */
 
 #endif /* COMMENT */
 
@@ -925,8 +911,7 @@ local int mkclean(char *obuf,int olen,cchar *sp,int sl) noex {
 	    obuf[i] = char((isourbad(ch)) ? mkchar('¿') : ch) ;
 	} /* end for */
 	return i ;
-}
-/* end subroutine (mkclean) */
+} /* end subroutine (mkclean) */
 
 local bool hasourbad(cchar *sp,int sl) noex {
 	bool		f = false ;
@@ -938,8 +923,7 @@ local bool hasourbad(cchar *sp,int sl) noex {
 	    sl -= 1 ;
 	} /* end if */
 	return f ;
-}
-/* end subroutine (hasourbad) */
+} /* end subroutine (hasourbad) */
 
 local bool isourbad(int ch) noex {
 	bool		f = false ;
@@ -956,8 +940,7 @@ local bool isourbad(int ch) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isourbad) */
+} /* end subroutine (isourbad) */
 
 /* we want to do a reverse sort here (in descending order) */
 local int vcmpatime(cvoid **v1pp,cvoid **v2pp) noex {
@@ -980,7 +963,6 @@ local int vcmpatime(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (vcmpatime) */
+} /* end subroutine (vcmpatime) */
 
 
