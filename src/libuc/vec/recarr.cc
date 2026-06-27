@@ -123,8 +123,7 @@ int recarr_start(recarr *op,int n,int opts) noex {
 	    }
 	} /* end if (recarr_ctor) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (recarr_start) */
+} /* end subroutine (recarr_start) */
 
 int recarr_finish(recarr *op) noex {
 	int		rs = SR_FAULT ;
@@ -145,8 +144,7 @@ int recarr_finish(recarr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (recarr_finish) */
+} /* end subroutine (recarr_finish) */
 
 int recarr_add(recarr *op,cvoid *sp) noex {
 	int		rs = SR_FAULT ;
@@ -184,8 +182,7 @@ int recarr_add(recarr *op,cvoid *sp) noex {
 	    op->fl.issorted = false ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (recarr_add) */
+} /* end subroutine (recarr_add) */
 
 int recarr_audit(recarr *op) noex {
 	int		rs = SR_FAULT ;
@@ -203,8 +200,7 @@ int recarr_audit(recarr *op) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (recarr_audit) */
+} /* end subroutine (recarr_audit) */
 
 int recarr_get(recarr *op,int i,cvoid *vp) noex {
 	int		rs = SR_FAULT ;
@@ -221,8 +217,7 @@ int recarr_get(recarr *op,int i,cvoid *vp) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (recarr_get) */
+} /* end subroutine (recarr_get) */
 
 int recarr_getlast(recarr *op,cvoid *vp) noex {
 	void		**epp = (void **) vp ;
@@ -244,8 +239,7 @@ int recarr_getlast(recarr *op,cvoid *vp) noex {
 	    *epp = (rs >= 0) ? op->va[i] : nullptr ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (recarr_getlast) */
+} /* end subroutine (recarr_getlast) */
 
 int recarr_ent(recarr *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
@@ -262,8 +256,7 @@ int recarr_ent(recarr *op,cvoid *ep) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (recarr_ent) */
+} /* end subroutine (recarr_ent) */
 
 int recarr_del(recarr *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -318,8 +311,7 @@ int recarr_del(recarr *op,int i) noex {
 	    } /* end if (valid index) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (recarr_del) */
+} /* end subroutine (recarr_del) */
 
 int recarr_delhand(recarr *op,cvoid *ep) noex {
 	int		rs ;
@@ -327,8 +319,7 @@ int recarr_delhand(recarr *op,cvoid *ep) noex {
 	    rs = recarr_del(op,rs) ;
 	}
 	return rs ;
-}
-/* end subroutine (recarr_delhand) */
+} /* end subroutine (recarr_delhand) */
 
 int recarr_delall(recarr *op) noex {
 	int		rs = SR_FAULT ;
@@ -343,8 +334,7 @@ int recarr_delall(recarr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (recarr_delall) */
+} /* end subroutine (recarr_delall) */
 
 int recarr_count(recarr *op) noex {
 	int		rs = SR_FAULT ;
@@ -352,8 +342,7 @@ int recarr_count(recarr *op) noex {
 	    rs = op->c ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (recarr_count) */
+} /* end subroutine (recarr_count) */
 
 int recarr_sort(recarr *op,recarr_cf vcmp) noex {
 	int		rs = SR_FAULT ;
@@ -374,8 +363,7 @@ int recarr_sort(recarr *op,recarr_cf vcmp) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (recarr_sort) */
+} /* end subroutine (recarr_sort) */
 
 int recarr_setsorted(recarr *op) noex {
 	int		rs = SR_FAULT ;
@@ -384,8 +372,7 @@ int recarr_setsorted(recarr *op) noex {
 	    op->fl.issorted = true ;
 	}
 	return rs ;
-}
-/* end subroutine (recarr_setsorted) */
+} /* end subroutine (recarr_setsorted) */
 
 int recarr_search(recarr *op,cvoid *ep,recarr_cf vcmp,void *vrp) noex {
 	int		rs = SR_FAULT ;
@@ -423,8 +410,7 @@ int recarr_search(recarr *op,cvoid *ep,recarr_cf vcmp,void *vrp) noex {
 	    *rpp = (rs >= 0) ? op->va[i] : nullptr ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (recarr_search) */
+} /* end subroutine (recarr_search) */
 
 int recarr_getvec(recarr *op,void *rp) noex {
 	int		rs = SR_FAULT ;
@@ -436,8 +422,7 @@ int recarr_getvec(recarr *op,void *rp) noex {
 	    }
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (recarr_getvec) */
+} /* end subroutine (recarr_getvec) */
 
 int recarr_extent(recarr *op) noex {
 	int		rs = SR_FAULT ;
@@ -445,8 +430,7 @@ int recarr_extent(recarr *op) noex {
 	    rs = op->n ;
 	}
 	return rs ;
-}
-/* end subroutine (recarr_extent) */
+} /* end subroutine (recarr_extent) */
 
 
 /* private subroutines */
