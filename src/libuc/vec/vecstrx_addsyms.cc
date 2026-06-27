@@ -134,8 +134,7 @@ int vecstrx::addsyms(cc *objn,mainv syms) noex {
 	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_addsyms) */
+} /* end subroutine (vecstrx_addsyms) */
 
 
 /* private subroutines */
