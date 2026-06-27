@@ -189,8 +189,7 @@ int vecstr_start(vecstr *op,int vn,int vo) noex {
 	    } /* end if (error) */
 	} /* end if (vecstr_ctor) */
 	return (rs >= 0) ? vn : rs ;
-}
-/* end subroutine (vecstr_start) */
+} /* end subroutine (vecstr_start) */
 
 int vecstr_finish(vecstr *op) noex {
 	int		rs = SR_FAULT ;
@@ -221,8 +220,7 @@ int vecstr_finish(vecstr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_finish) */
+} /* end subroutine (vecstr_finish) */
 
 int vecstr_audit(vecstr *op) noex {
 	int		rs = SR_FAULT ;
@@ -242,13 +240,11 @@ int vecstr_audit(vecstr *op) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstr_audit) */
+} /* end subroutine (vecstr_audit) */
 
 int vecstr_add(vecstr *op,cchar *sp,int sl) noex {
 	return vecstr_store(op,sp,sl,nullptr) ;
-}
-/* end subroutine (vecstr_add) */
+} /* end subroutine (vecstr_add) */
 
 int vecstr_adduniq(vecstr *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
@@ -262,8 +258,7 @@ int vecstr_adduniq(vecstr *op,cchar *sp,int 탎l) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_adduniq) */
+} /* end subroutine (vecstr_adduniq) */
 
 int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
@@ -291,8 +286,7 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecstr_addkeyval) */
+} /* end subroutine (vecstr_addkeyval) */
 
 int vecstr_insert(vecstr *op,int ii,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
@@ -315,8 +309,7 @@ int vecstr_insert(vecstr *op,int ii,cchar *sp,int 탎l) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecstr_insert) */
+} /* end subroutine (vecstr_insert) */
 
 int vecstr_store(vecstr *op,cchar *sp,int 탎l,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -340,13 +333,11 @@ int vecstr_store(vecstr *op,cchar *sp,int 탎l,cchar **rpp) noex {
 	    if (rpp && (rs < 0)) *rpp = nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecstr_store) */
+} /* end subroutine (vecstr_store) */
 
 int vecstr_already(vecstr *op,cchar *sp,int sl) noex {
 	return vecstr_findn(op,sp,sl) ;
-}
-/* end subroutine (vecstr_already) */
+} /* end subroutine (vecstr_already) */
 
 int vecstr_get(vecstr *op,int i,cchar **spp) noex {
 	int		rs = SR_FAULT ;
@@ -360,8 +351,7 @@ int vecstr_get(vecstr *op,int i,cchar **spp) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_get) */
+} /* end subroutine (vecstr_get) */
 
 int vecstr_getlast(vecstr *op,cchar **spp) noex {
 	int		rs = SR_FAULT ;
@@ -380,8 +370,7 @@ int vecstr_getlast(vecstr *op,cchar **spp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecstr_getlast) */
+} /* end subroutine (vecstr_getlast) */
 
 int vecstr_del(vecstr *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -444,8 +433,7 @@ int vecstr_del(vecstr *op,int i) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstr_del) */
+} /* end subroutine (vecstr_del) */
 
 int vecstr_delall(vecstr *op) noex {
 	int		rs = SR_FAULT ;
@@ -468,8 +456,7 @@ int vecstr_delall(vecstr *op) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_delall) */
+} /* end subroutine (vecstr_delall) */
 
 int vecstr_count(vecstr *op) noex {
 	int	rs = SR_FAULT ;
@@ -477,8 +464,7 @@ int vecstr_count(vecstr *op) noex {
 	    rs = op->c ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_count) */
+} /* end subroutine (vecstr_count) */
 
 int vecstr_sort(vecstr *op,vecstr_vcmp vcf) noex {
 	int		rs = SR_FAULT ;
@@ -495,8 +481,7 @@ int vecstr_sort(vecstr *op,vecstr_vcmp vcf) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstr_sort) */
+} /* end subroutine (vecstr_sort) */
 
 int vecstr_search(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	int		rs  = SR_FAULT ;
@@ -537,8 +522,7 @@ int vecstr_search(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_search) */
+} /* end subroutine (vecstr_search) */
 
 int vecstr_searchl(vecstr *op,cc *sp,int sl,vecstr_vcmp vcf,cc **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -560,8 +544,7 @@ int vecstr_searchl(vecstr *op,cc *sp,int sl,vecstr_vcmp vcf,cc **rpp) noex {
 	    rs = SR_NOTFOUND ; /* real errors priority */
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecstr_searchl) */
+} /* end subroutine (vecstr_searchl) */
 
 int vecstr_finder(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -582,8 +565,7 @@ int vecstr_finder(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_finder) */
+} /* end subroutine (vecstr_finder) */
 
 int vecstr_find(vecstr *op,cchar *sp) noex {
 	int		rs = SR_FAULT ;
@@ -604,7 +586,6 @@ int vecstr_find(vecstr *op,cchar *sp) noex {
 	return rs ;
 }
 /* end subroutine (vecstr_find) */
-
 int vecstr_findn(vecstr *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
@@ -625,8 +606,7 @@ int vecstr_findn(vecstr *op,cchar *sp,int 탎l) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_findn) */
+} /* end subroutine (vecstr_findn) */
 
 int vecstr_findaddr(vecstr *op,cchar *addr) noex {
 	int		rs = SR_FAULT ;
@@ -643,8 +623,7 @@ int vecstr_findaddr(vecstr *op,cchar *addr) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_findaddr) */
+} /* end subroutine (vecstr_findaddr) */
 
 int vecstr_getvec(vecstr *op,mainv *rppp) noex {
 	int		rs = SR_FAULT ;
@@ -657,8 +636,7 @@ int vecstr_getvec(vecstr *op,mainv *rppp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_getvec) */
+} /* end subroutine (vecstr_getvec) */
 
 int vecstr_strsize(vecstr *op) noex {
 	int		rs = SR_FAULT ;
@@ -680,8 +658,7 @@ int vecstr_strsize(vecstr *op) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? stsz : rs ;
-}
-/* end subroutine (vecstr_strsize) */
+} /* end subroutine (vecstr_strsize) */
 
 int vecstr_strmk(vecstr *op,char *tab,int tabs) noex {
 	int		rs = SR_FAULT ;
@@ -709,8 +686,7 @@ int vecstr_strmk(vecstr *op,char *tab,int tabs) noex {
 	    } /* end if (supplied table large enough) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstr_strmk) */
+} /* end subroutine (vecstr_strmk) */
 
 int vecstr_recsize(vecstr *op) noex {
 	int		rs = SR_FAULT ;
@@ -722,8 +698,7 @@ int vecstr_recsize(vecstr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rsz : rs ;
-}
-/* end subroutine (vecstr_recsize) */
+} /* end subroutine (vecstr_recsize) */
 
 int vecstr_cksize(vecstr *op) noex {
 	int		rs = SR_FAULT ;
@@ -733,8 +708,7 @@ int vecstr_cksize(vecstr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_cksize) */
+} /* end subroutine (vecstr_cksize) */
 
 int vecstr_recmk(vecstr *op,int *rec,int recs) noex {
 	int		rs = SR_FAULT ;
@@ -760,8 +734,7 @@ int vecstr_recmk(vecstr *op,int *rec,int recs) noex {
 	    } /* end if (user-supplied size was OK) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstr_recmk) */
+} /* end subroutine (vecstr_recmk) */
 
 int vecstr_recmkstr(vecstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	int		rs = SR_FAULT ;
@@ -793,8 +766,7 @@ int vecstr_recmkstr(vecstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	    } /* end if (OK so far) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstr_recmkstr) */
+} /* end subroutine (vecstr_recmkstr) */
 
 int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	int		rs = SR_FAULT ;
@@ -822,8 +794,7 @@ int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	    } /* end if (vecstr_cksize) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstr_avmkstr) */
+} /* end subroutine (vecstr_avmkstr) */
 
 int vecstr_add(vecstr *op,string *strp) noex {
 	int		rs = SR_FAULT ;
