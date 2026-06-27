@@ -63,7 +63,6 @@ int vecstrx::foilcmp(vecstrx *rnp) noex {
 	    if (rs == SR_NOTFOUND) rs = SR_OK ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_match : rs ;
-}
-/* end subroutine (vecstrx_foilcmp) */
+} /* end subroutine (vecstrx_foilcmp) */
 
 
