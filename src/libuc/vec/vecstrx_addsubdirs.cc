@@ -103,7 +103,6 @@ int vecstrx::addsubdirs(cchar *dname) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_addsubdirs) */
+} /* end subroutine (vecstrx_addsubdirs) */
 
 
