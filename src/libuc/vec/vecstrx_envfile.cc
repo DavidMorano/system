@@ -175,8 +175,7 @@ int vecstrx::envfile(cchar *fname) noex {
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_envfile) */
+} /* end subroutine (vecstrx_envfile) */
 
 
 /* private subroutines */
