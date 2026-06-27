@@ -93,7 +93,6 @@ int vecstrx::adds(cchar *sp,int sl) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_adds) */
+} /* end subroutine (vecstrx_adds) */
 
 
