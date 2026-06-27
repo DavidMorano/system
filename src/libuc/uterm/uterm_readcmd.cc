@@ -43,15 +43,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucdescread.h>
-#include	<ascii.h>		/* |CH_{xx}| */
-#include	<ndigit.h>
-#include	<cfdec.h>
-#include	<ischarx.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_{xx}| */
+#include	<ucdescread.h>		/* LIBUC */
+#include	<ndigit.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
 #include	<localmisc.h>		/* |DIGBUFLEN| + |UC()| */
 
 #include	"uterm.h"
@@ -96,22 +96,22 @@ struct sub {
 
 /* forward subroutines */
 
-local int sub_start(sub *,uterm *,termcmd *,int,int) noex ;
-local int sub_readch(sub *) noex ;
-local int sub_procesc(sub *) noex ;
-local int sub_procCSI(sub *) noex ;
-local int sub_proc_dcs(sub *) noex ;
-local int sub_proc_pf(sub *) noex ;
-local int sub_proc_reg(sub *,int) noex ;
-local int sub_procescmore(sub *,int) noex ;
-local int sub_loadparam(sub *,cchar *,int) noex ;
-local int sub_finish(sub *) noex ;
+local int sub_start		(sub *,uterm *,termcmd *,int,int) noex ;
+local int sub_readch		(sub *) noex ;
+local int sub_procesc		(sub *) noex ;
+local int sub_procCSI		(sub *) noex ;
+local int sub_proc_dcs		(sub *) noex ;
+local int sub_proc_pf		(sub *) noex ;
+local int sub_proc_reg		(sub *,int) noex ;
+local int sub_procescmore	(sub *,int) noex ;
+local int sub_loadparam		(sub *,cchar *,int) noex ;
+local int sub_finish		(sub *) noex ;
 
-local bool isinter(int) noex ;
-local bool isfinalesc(int) noex ;
-local bool isfinalcsi(int) noex ;
-local bool isparam(int) noex ;
-local bool iscancel(int) noex ;
+local bool isinter	(int) noex ;
+local bool isfinalesc	(int) noex ;
+local bool isfinalcsi	(int) noex ;
+local bool isparam	(int) noex ;
+local bool iscancel	(int) noex ;
 
 
 /* local variables */
@@ -184,8 +184,7 @@ int uterm_readcmd(uterm *utp,termcmd *ckp,int to,int ich) noex {
 	    } /* end if (clear) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (uterm_readcmd) */
+} /* end subroutine (uterm_readcmd) */
 
 
 /* local subroutines */
@@ -201,8 +200,7 @@ local int sub_start(sub *sip,uterm *utp,termcmd *ckp,int to,int ich) noex {
 	    sip->ich = ich ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sub_start) */
+} /* end subroutine (sub_start) */
 
 local int sub_finish(sub *sip) noex {
 	int		rs = SR_FAULT ;
@@ -210,8 +208,7 @@ local int sub_finish(sub *sip) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (sub_finish) */
+} /* end subroutine (sub_finish) */
 
 local int sub_readch(sub *sip) noex {
 	int		rs = SR_OK ;
@@ -229,8 +226,7 @@ local int sub_readch(sub *sip) noex {
 	    if (rs > 0) sip->rlen += 1 ;
 	}
 	return (rs >= 0) ? rch : rs ;
-}
-/* end subroutine (sub_readch) */
+} /* end subroutine (sub_readch) */
 
 local int sub_procesc(sub *sip) noex {
 	termcmd		*ckp = sip->ckp ;
@@ -261,8 +257,7 @@ local int sub_procesc(sub *sip) noex {
 	    } /* end switch */
 	} /* end if (sub_readch) */
 	return rs ;
-}
-/* end subroutine (sub_procesc) */
+} /* end subroutine (sub_procesc) */
 
 local int sub_procescmore(sub *sip,int ch) noex {
 	termcmd		*ckp = sip->ckp ;
@@ -303,8 +298,7 @@ local int sub_procescmore(sub *sip,int ch) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (sub_procescmore) */
+} /* end subroutine (sub_procescmore) */
 
 local int sub_procCSI(sub *sip) noex {
 	termcmd		*ckp = sip->ckp ;
@@ -394,8 +388,7 @@ local int sub_procCSI(sub *sip) noex {
 	    } /* end if_constexpr (f_comment) */
 	} /* end if (sub_readch) */
 	return rs ;
-}
-/* end subroutine (sub_procCSI) */
+} /* end subroutine (sub_procCSI) */
 
 local int sub_proc_dcs(sub *sip) noex {
 	termcmd		*ckp = sip->ckp ;
@@ -513,8 +506,7 @@ local int sub_proc_dcs(sub *sip) noex {
 	    } /* end if_constexpr (f_comment) */
 	} /* end if (sub_readch) */
 	return rs ;
-}
-/* end subroutine (sub_proc_dcs) */
+} /* end subroutine (sub_proc_dcs) */
 
 local int sub_proc_pf(sub *sip) noex {
 	termcmd		*ckp = sip->ckp ;
@@ -544,8 +536,7 @@ local int sub_proc_pf(sub *sip) noex {
 	    }
 	} /* end if (sub_readch) */
 	return rs ;
-}
-/* end subroutine (sub_proc_pf) */
+} /* end subroutine (sub_proc_pf) */
 
 local int sub_proc_reg(sub *sip,int ich) noex {
 	termcmd		*ckp = sip->ckp ;
@@ -555,8 +546,7 @@ local int sub_proc_reg(sub *sip,int ich) noex {
 	    ckp->name = shortconv(ich) ;
 	}
 	return rs ;
-}
-/* end subroutine (sub_proc_reg) */
+} /* end subroutine (sub_proc_reg) */
 
 local int sub_loadparam(sub *sip,cchar *dbuf,int dl) noex {
 	termcmd		*ckp = sip->ckp ;
@@ -584,28 +574,23 @@ local int sub_loadparam(sub *sip,cchar *dbuf,int dl) noex {
 	    sip->f_error = true ;
 	}
 	return rs ;
-}
-/* end subroutine (sub_loadparam) */
+} /* end subroutine (sub_loadparam) */
 
 local bool isinter(int ch) noex {
 	return ((ch >= 0x20) && (ch <= 0x2F)) ;
-}
-/* end subroutine (isinter) */
+} /* end subroutine (isinter) */
 
 local bool isfinalesc(int ch) noex {
 	return ((ch >= 0x30) && (ch <= 0x7E)) ;
-}
-/* end subroutine (isfinalesc) */
+} /* end subroutine (isfinalesc) */
 
 local bool isfinalcsi(int ch) noex {
 	return ((ch >= 0x40) && (ch <= 0x7E)) ;
-}
-/* end subroutine (isfinalcsi) */
+} /* end subroutine (isfinalcsi) */
 
 local bool isparam(int ch) noex {
 	return ((ch >= 0x30) && (ch <= 0x3F)) ;
-}
-/* end subroutine (isparam) */
+} /* end subroutine (isparam) */
 
 local bool iscancel(int ch) noex {
 	bool		f = false ;
@@ -614,7 +599,6 @@ local bool iscancel(int ch) noex {
 	    if (f) break ;
 	}
 	return f ;
-}
-/* end subroutine (iscancel) */
+} /* end subroutine (iscancel) */
 
 
