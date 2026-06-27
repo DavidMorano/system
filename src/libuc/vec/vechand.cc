@@ -110,8 +110,7 @@ int vechand_start(vechand *op,int vn,int vo) noex {
 	    } /* end if (options) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? vn : rs ;
-}
-/* end subroutine (vechand_start) */
+} /* end subroutine (vechand_start) */
 
 int vechand_finish(vechand *op) noex {
 	int		rs = SR_FAULT ;
@@ -128,8 +127,7 @@ int vechand_finish(vechand *op) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vechand_finish) */
+} /* end subroutine (vechand_finish) */
 
 int vechand_add(vechand *op,cvoid *nep) noex {
 	int		rs = SR_FAULT ;
@@ -167,8 +165,7 @@ int vechand_add(vechand *op,cvoid *nep) noex {
 	    } /* end if (extended) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vechand_add) */
+} /* end subroutine (vechand_add) */
 
 int vechand_get(vechand *op,int i,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -182,8 +179,7 @@ int vechand_get(vechand *op,int i,void **rpp) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vechand_get) */
+} /* end subroutine (vechand_get) */
 
 int vechand_getlast(vechand *op,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -205,8 +201,7 @@ int vechand_getlast(vechand *op,void **rpp) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vechand_getlast) */
+} /* end subroutine (vechand_getlast) */
 
 int vechand_search(vechand *op,cv *ep,vechand_vcmp vcf,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -246,8 +241,7 @@ int vechand_search(vechand *op,cv *ep,vechand_vcmp vcf,void **rpp) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vechand_search) */
+} /* end subroutine (vechand_search) */
 
 int vechand_ent(vechand *op,cvoid *vp) noex {
 	int		rs = SR_FAULT ;
@@ -264,8 +258,7 @@ int vechand_ent(vechand *op,cvoid *vp) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vechand_ent) */
+} /* end subroutine (vechand_ent) */
 
 int vechand_del(vechand *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -319,8 +312,7 @@ int vechand_del(vechand *op,int i) noex {
 	    } /* end if (popularion) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vechand_del) */
+} /* end subroutine (vechand_del) */
 
 int vechand_delhand(vechand *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
@@ -330,8 +322,7 @@ int vechand_delhand(vechand *op,cvoid *ep) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (vechand_delhand) */
+} /* end subroutine (vechand_delhand) */
 
 int vechand_delall(vechand *op) noex {
 	int		rs = SR_FAULT ;
@@ -347,8 +338,7 @@ int vechand_delall(vechand *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vechand_delall) */
+} /* end subroutine (vechand_delall) */
 
 int vechand_count(vechand *op) noex {
 	int		rs = SR_FAULT ;
@@ -359,8 +349,7 @@ int vechand_count(vechand *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vechand_count) */
+} /* end subroutine (vechand_count) */
 
 int vechand_sort(vechand *op,vechand_vcmp vcf) noex {
 	int		rs = SR_FAULT ;
@@ -381,8 +370,7 @@ int vechand_sort(vechand *op,vechand_vcmp vcf) noex {
 	    } /* end if (had entries) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vechand_sort) */
+} /* end subroutine (vechand_sort) */
 
 int vechand_issorted(vechand *op) noex {
 	int		rs = SR_FAULT ;
@@ -392,8 +380,7 @@ int vechand_issorted(vechand *op) noex {
 	    f_issorted = op->fl.issorted ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_issorted : rs ;
-}
-/* end subroutine (vechand_issorted) */
+} /* end subroutine (vechand_issorted) */
 
 int vechand_setsorted(vechand *op) noex {
 	int		rs = SR_FAULT ;
@@ -404,8 +391,7 @@ int vechand_setsorted(vechand *op) noex {
 	    c = op->c ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vechand_setsorted) */
+} /* end subroutine (vechand_setsorted) */
 
 int vechand_getvec(vechand *op,void *rp) noex {
 	int		rs = SR_FAULT ;
@@ -417,8 +403,7 @@ int vechand_getvec(vechand *op,void *rp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vechand_getvec) */
+} /* end subroutine (vechand_getvec) */
 
 int vechand_extent(vechand *op) noex {
 	int		rs = SR_FAULT ;
@@ -426,8 +411,7 @@ int vechand_extent(vechand *op) noex {
 	    rs = op->n ;
 	}
 	return rs ;
-}
-/* end subroutine (vechand_extent) */
+} /* end subroutine (vechand_extent) */
 
 int vechand_audit(vechand *op) noex {
 	int		rs = SR_FAULT ;
@@ -446,8 +430,7 @@ int vechand_audit(vechand *op) noex {
 	    } /* end if (had entries) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vechand_audit) */
+} /* end subroutine (vechand_audit) */
 
 
 /* private subroutines */
