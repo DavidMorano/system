@@ -75,7 +75,7 @@
 #include	<storebuf.h>
 #include	<snx.h>			/* |snabbrname(3uc)| */
 #include	<mkui.h>		/* |mkuiname(3dam)| */
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
