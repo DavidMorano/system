@@ -85,7 +85,6 @@ int vecobj_strsort(vecobj *op,vecobj_vcf vcmp) noex {
 	    } /* end if (open) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecobj_strsort) */
+} /* end subroutine (vecobj_strsort) */
 
 
