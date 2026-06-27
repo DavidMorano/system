@@ -126,8 +126,7 @@ int vsetstr_start(VS *op,int vn) noex {
 	    }
 	} /* end if (vsetstr_ctor) */
 	return rs ;
-}
-/* end subroutine (vsetstr_start) */
+} /* end subroutine (vsetstr_start) */
 
 int vsetstr_finish(VS *op) noex {
 	int		rs ;
@@ -145,8 +144,7 @@ int vsetstr_finish(VS *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vsetstr_finish) */
+} /* end subroutine (vsetstr_finish) */
 
 int vsetstr_look(VS *op,cchar *sbuf,int slen) noex {
 	int		rs ;
@@ -155,8 +153,7 @@ int vsetstr_look(VS *op,cchar *sbuf,int slen) noex {
 	    rs = elp->already(sbuf,slen) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vsetstr_look) */
+} /* end subroutine (vsetstr_look) */
 
 /* add a string to the database */
 int vsetstr_add(VS *op,cchar *sp,int µsl) noex {
@@ -173,8 +170,7 @@ int vsetstr_add(VS *op,cchar *sp,int µsl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vsetstr_add) */
+} /* end subroutine (vsetstr_add) */
 
 int vsetstr_curbegin(VS *op,VS_CUR *curp) noex {
     	int		rs ;
@@ -182,8 +178,7 @@ int vsetstr_curbegin(VS *op,VS_CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vsetstr_curbegin) */
+} /* end subroutine (vsetstr_curbegin) */
 
 int vsetstr_curend(VS *op,VS_CUR *curp) noex {
     	int		rs ;
@@ -191,8 +186,7 @@ int vsetstr_curend(VS *op,VS_CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vsetstr_curend) */
+} /* end subroutine (vsetstr_curend) */
 
 int vsetstr_curdel(VS *op,VS_CUR *curp) noex {
 	int		rs ;
@@ -202,8 +196,7 @@ int vsetstr_curdel(VS *op,VS_CUR *curp) noex {
 	    rs = elp->del(i) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vsetstr_curdel) */
+} /* end subroutine (vsetstr_curdel) */
 
 /* enumerate all of the entries */
 int vsetstr_curenum(VS *op,VS_CUR *curp,cchar **vpp) noex {
@@ -226,8 +219,7 @@ int vsetstr_curenum(VS *op,VS_CUR *curp,cchar **vpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (vsetstr_curenum) */
+} /* end subroutine (vsetstr_curenum) */
 
 /* advance the cursor to the next entry regardless of key */
 int vsetstr_curnext(VS *op,VS_CUR *curp) noex {
@@ -237,8 +229,7 @@ int vsetstr_curnext(VS *op,VS_CUR *curp) noex {
 	    curp->i = i ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vsetstr_curnext) */
+} /* end subroutine (vsetstr_curnext) */
 
 int vsetstr_already(VS *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -251,8 +242,7 @@ int vsetstr_already(VS *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vsetstr_already) */
+} /* end subroutine (vsetstr_already) */
 
 int vsetstr_count(VS *op) noex {
 	int		rs ;
@@ -261,12 +251,10 @@ int vsetstr_count(VS *op) noex {
 	    rs = elp->count ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vsetstr_count) */
+} /* end subroutine (vsetstr_count) */
 
 int vsetstr_extent(VS *op) noex {
 	return vsetstr_count(op) ;
-}
-/* end subroutine (vsetstr_extent) */
+} /* end subroutine (vsetstr_extent) */
 
 
