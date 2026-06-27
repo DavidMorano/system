@@ -53,7 +53,7 @@
 #include	<svcfile.h>
 #include	<acctab.h>
 #include	<strx.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
