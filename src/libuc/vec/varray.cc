@@ -132,8 +132,7 @@ int varray_start(varray *op,int esz,int n) noex {
 	    } /* end if (error) */
 	} /* end if (varray_ctor) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (varray_start) */
+} /* end subroutine (varray_start) */
 
 int varray_finish(varray *op) noex {
 	int		rs = SR_FAULT ;
@@ -160,8 +159,7 @@ int varray_finish(varray *op) noex {
 	    op->ext = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (varray_finish) */
+} /* end subroutine (varray_finish) */
 
 int varray_enumer(varray *op,int i,void *rp) noex {
 	int		rs = SR_FAULT ;
@@ -182,8 +180,7 @@ int varray_enumer(varray *op,int i,void *rp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (varray_enumer) */
+} /* end subroutine (varray_enumer) */
 
 int varray_acc(varray *op,int i,void *rp) noex {
 	int		rs = SR_FAULT ;
@@ -206,8 +203,7 @@ int varray_acc(varray *op,int i,void *rp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (varray_acc) */
+} /* end subroutine (varray_acc) */
 
 int varray_mk(varray *op,int i,void *rp) noex {
 	int		rs = SR_FAULT ;
@@ -238,8 +234,7 @@ int varray_mk(varray *op,int i,void *rp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (varray_mk) */
+} /* end subroutine (varray_mk) */
 
 int varray_del(varray *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -261,8 +256,7 @@ int varray_del(varray *op,int i) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (varray_del) */
+} /* end subroutine (varray_del) */
 
 int varray_delall(varray *op) noex {
 	int		rs = SR_FAULT ;
@@ -282,8 +276,7 @@ int varray_delall(varray *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (varray_delall) */
+} /* end subroutine (varray_delall) */
 
 int varray_count(varray *op) noex {
 	int		rs = SR_FAULT ;
@@ -294,8 +287,7 @@ int varray_count(varray *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (varray_count) */
+} /* end subroutine (varray_count) */
 
 int varray_find(varray *op,void *oep) noex {
 	int		rs = SR_FAULT ;
@@ -315,8 +307,7 @@ int varray_find(varray *op,void *oep) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (varray_find) */
+} /* end subroutine (varray_find) */
 
 int varray_search(varray *op,void *oep,varray_vcmp fvcmp,void *vrp) noex {
 	int		rs = SR_FAULT ;
@@ -339,8 +330,7 @@ int varray_search(varray *op,void *oep,varray_vcmp fvcmp,void *vrp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (varray_search) */
+} /* end subroutine (varray_search) */
 
 int varray_audit(varray *op) noex {
 	int		rs = SR_FAULT ;
