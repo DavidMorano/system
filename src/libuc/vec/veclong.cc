@@ -136,8 +136,7 @@ int veclong_finish(veclong *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_finish) */
+} /* end subroutine (veclong_finish) */
 
 int veclong_add(veclong *op,VECLONG_TYPE v) noex {
 	int		rs ;
@@ -145,10 +144,9 @@ int veclong_add(veclong *op,VECLONG_TYPE v) noex {
 	    rs = veclong_addval(op,v) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_add) */
+} /* end subroutine (veclong_add) */
 
-extern int veclong_addlist(veclong *op,const VECLONG_TYPE *lp,int ll) noex {
+int veclong_addlist(veclong *op,const VECLONG_TYPE *lp,int ll) noex {
 	int		rs ;
 	if ((rs = veclong_magic(op,lp)) >= 0) ylikely {
 	    for (int i = 0 ; (rs >= 0) && (i < ll) ; i += 1) {
@@ -156,8 +154,7 @@ extern int veclong_addlist(veclong *op,const VECLONG_TYPE *lp,int ll) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_addlist) */
+} /* end subroutine (veclong_addlist) */
 
 int veclong_adduniq(veclong *op,VECLONG_TYPE v) noex {
 	int		rs ;
@@ -174,8 +171,7 @@ int veclong_adduniq(veclong *op,VECLONG_TYPE v) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (veclong_adduniq) */
+} /* end subroutine (veclong_adduniq) */
 
 int veclong_insert(veclong *op,int ii,VECLONG_TYPE val) noex {
 	int		rs ;
@@ -194,8 +190,7 @@ int veclong_insert(veclong *op,int ii,VECLONG_TYPE val) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_insert) */
+} /* end subroutine (veclong_insert) */
 
 int veclong_assign(veclong *op,int ii,VECLONG_TYPE val) noex {
 	int		rs ;
@@ -215,8 +210,7 @@ int veclong_assign(veclong *op,int ii,VECLONG_TYPE val) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_assign) */
+} /* end subroutine (veclong_assign) */
 
 int veclong_resize(veclong *op,int n) noex {
 	int		rs ;
@@ -241,8 +235,7 @@ int veclong_resize(veclong *op,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_resize) */
+} /* end subroutine (veclong_resize) */
 
 int veclong_getval(veclong *op,int i,VECLONG_TYPE *rp) noex {
 	int		rs ;
@@ -255,8 +248,7 @@ int veclong_getval(veclong *op,int i,VECLONG_TYPE *rp) noex {
 	     }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_getval) */
+} /* end subroutine (veclong_getval) */
 
 int veclong_del(veclong *op,int i) noex {
 	int		rs ;
@@ -310,8 +302,7 @@ int veclong_del(veclong *op,int i) noex {
 	    } /* end if (found) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (veclong_del) */
+} /* end subroutine (veclong_del) */
 
 int veclong_delall(veclong *op) noex {
 	int		rs ;
@@ -321,8 +312,7 @@ int veclong_delall(veclong *op) noex {
 	    op->fi = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_delall) */
+} /* end subroutine (veclong_delall) */
 
 int veclong_count(veclong *op) noex {
 	int		rs ;
@@ -330,8 +320,7 @@ int veclong_count(veclong *op) noex {
 	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_count) */
+} /* end subroutine (veclong_count) */
 
 int veclong_extent(veclong *op) noex {
 	int		rs ;
@@ -339,8 +328,7 @@ int veclong_extent(veclong *op) noex {
 	    rs = op->i ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_extent) */
+} /* end subroutine (veclong_extent) */
 
 int veclong_sort(veclong *op) noex {
 	int		rs ;
@@ -357,8 +345,7 @@ int veclong_sort(veclong *op) noex {
 	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_sort) */
+} /* end subroutine (veclong_sort) */
 
 int veclong_setsorted(veclong *op) noex {
 	int		rs ;
@@ -367,8 +354,7 @@ int veclong_setsorted(veclong *op) noex {
 	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_setsorted) */
+} /* end subroutine (veclong_setsorted) */
 
 int veclong_find(veclong *op,VECLONG_TYPE v) noex {
 	int		rs ;
@@ -393,8 +379,7 @@ int veclong_find(veclong *op,VECLONG_TYPE v) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (veclong_find) */
+} /* end subroutine (veclong_find) */
 
 int veclong_match(veclong *op,VECLONG_TYPE v) noex {
 	int		rs ;
@@ -404,8 +389,7 @@ int veclong_match(veclong *op,VECLONG_TYPE v) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (veclong_match) */
+} /* end subroutine (veclong_match) */
 
 int veclong_getvec(veclong *op,VECLONG_TYPE **rpp) noex {
 	int		rs ;
@@ -414,8 +398,7 @@ int veclong_getvec(veclong *op,VECLONG_TYPE **rpp) noex {
 	    rs = op->i ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_getvec) */
+} /* end subroutine (veclong_getvec) */
 
 int veclong_mkvec(veclong *op,VECLONG_TYPE *va) noex {
 	int		rs ;
@@ -429,8 +412,7 @@ int veclong_mkvec(veclong *op,VECLONG_TYPE *va) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (veclong_mkvec) */
+} /* end subroutine (veclong_mkvec) */
 
 int veclong_curbegin(veclong *op,veclong_cur *curp) noex {
 	int		rs ;
@@ -438,8 +420,7 @@ int veclong_curbegin(veclong *op,veclong_cur *curp) noex {
 	    curp->i = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_curend) */
+} /* end subroutine (veclong_curend) */
 
 int veclong_curend(veclong *op,veclong_cur *curp) noex {
 	int		rs ;
@@ -447,8 +428,7 @@ int veclong_curend(veclong *op,veclong_cur *curp) noex {
 	    curp->i = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (veclong_curend) */
+} /* end subroutine (veclong_curend) */
 
 int veclong_curenum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp) noex {
 	int		rs ;
@@ -464,8 +444,7 @@ int veclong_curenum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp) noex {
 	} /* end if (magic) */
 	if (rp) *rp = (rs >= 0) ? v : VECLONG_MIN ;
 	return rs ;
-}
-/* end subroutine (veclong_curenum) */
+} /* end subroutine (veclong_curenum) */
 
 int veclong_audit(veclong *op) noex {
 	int		rs ;
