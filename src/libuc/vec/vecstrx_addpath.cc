@@ -116,8 +116,7 @@ local int vecstrx_addone(vecstrx *op,char *pbuf,cchar *sp,int sl) noex {
 	    if (rs < INT_MAX) c += 1 ;
 	} /* end if (pathclean) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_addone) */
+} /* end subroutine (vecstrx_addone) */
 
 
 /* local variables */
@@ -162,8 +161,7 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_addpathclean) */
+} /* end subroutine (vecstrx_addpathclean) */
 
 int vecstrx::addpath(cchar *lp,int ll) noex {
     	cnullptr	np{} ;
@@ -189,8 +187,7 @@ int vecstrx::addpath(cchar *lp,int ll) noex {
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_addpath) */
+} /* end subroutine (vecstrx_addpath) */
 
 int vecstrx::addcspath() noex {
 	int		rs ;
@@ -209,7 +206,6 @@ int vecstrx::addcspath() noex {
             } /* end if (m-a-f) */
         } /* end if (maxpathlen) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx::addcspath) */
+} /* end subroutine (vecstrx::addcspath) */
 
 
