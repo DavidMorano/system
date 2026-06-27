@@ -20,13 +20,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types |uid_t| */
-#include	<time.h>		/* |time_t| */
-#include	<termios.h>
-#include	<limits.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<charq.h>
+#include	<sys/types.h>		/* POSIX system types |uid_t| */
+#include	<termios.h>		/* POSIX */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<limits.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<charq.h>		/* LIBUC */
+#include	<termcmd.h>		/* LIBUC */
 
 
 #define	UTERM		struct uterm_head
@@ -92,12 +93,13 @@ struct uterm_head {
 	time_t		ti_start ;
 	uid_t		uid ;
 	UTERM_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
 	int		loopcount ;
 	int		timeout ;	/* timeout timer counter */
 	int		mode ;
-	int		ch_read, ch_write ;
+	int		ch_read ;
+	int		ch_write ;
 	int		status ;
 	uchar		rterms[32] ;
 } ; /* end struct (uterm_head) */
@@ -114,6 +116,7 @@ extern int uterm_control(uterm *,int,...) noex ;
 extern int uterm_status(uterm *,int,...) noex ;
 extern int uterm_read(uterm *,char *,int) noex ;
 extern int uterm_reade(uterm *,char *,int,int,int,uterm_pr *,uterm_ld *) noex ;
+extern int uterm_readcmd(uterm *,termcmd *,int,int) noex ;
 extern int uterm_write(uterm *,cchar *,int) noex ;
 extern int uterm_suspend(uterm *) noex ;
 extern int uterm_resume(uterm *) noex ;
