@@ -41,19 +41,18 @@ LIBS +=
 
 
 OBJ0= uterm_prime.o uterm_readcmd.o
-OBJ1=
+OBJ1= termcmd.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
 OBJB=
 
 OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,11 +95,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -135,7 +134,9 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-uterm_prime.o:		uterm_prime.cc 		$(INCS)
-uterm_readcmd.o:	uterm_readcmd.cc	$(INCS)
+uterm_prime.o:		uterm_prime.cc 				$(INCS)
+uterm_readcmd.o:	uterm_readcmd.cc	termcmd.h	$(INCS)
+
+termcmd.o:		termcmd.cc		termcmd.h	$(INCS)
 
 
