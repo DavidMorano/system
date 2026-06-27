@@ -128,8 +128,7 @@ int vecsorthand_finish(vecsorthand *op) noex {
 	    op->e = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecsorthand_finish) */
+} /* end subroutine (vecsorthand_finish) */
 
 int vecsorthand_add(vecsorthand *op,cvoid *nep) noex {
 	int		rs = SR_FAULT ;
@@ -171,8 +170,7 @@ int vecsorthand_add(vecsorthand *op,cvoid *nep) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecsorthand_add) */
+} /* end subroutine (vecsorthand_add) */
 
 int vecsorthand_get(vecsorthand *op,int i,void *vp) noex {
 	int		rs = SR_NOTFOUND ;
@@ -192,8 +190,7 @@ int vecsorthand_get(vecsorthand *op,int i,void *vp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecsorthand_get) */
+} /* end subroutine (vecsorthand_get) */
 
 int vecsorthand_del(vecsorthand *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -213,8 +210,7 @@ int vecsorthand_del(vecsorthand *op,int i) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecsorthand_del) */
+} /* end subroutine (vecsorthand_del) */
 
 int vecsorthand_delhand(vecsorthand *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
@@ -235,8 +231,7 @@ int vecsorthand_delhand(vecsorthand *op,cvoid *ep) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecsorthand_delhand) */
+} /* end subroutine (vecsorthand_delhand) */
 
 int vecsorthand_count(vecsorthand *op) noex {
 	int		rs = SR_FAULT ;
@@ -247,8 +242,7 @@ int vecsorthand_count(vecsorthand *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecsorthand_count) */
+} /* end subroutine (vecsorthand_count) */
 
 int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	int		rs = SR_FAULT ;
@@ -287,8 +281,7 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecsorthand_search) */
+} /* end subroutine (vecsorthand_search) */
 
 
 /* private subroutines */
