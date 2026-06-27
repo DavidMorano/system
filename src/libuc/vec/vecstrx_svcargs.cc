@@ -100,8 +100,7 @@ int vecstrx::svcargs(int *fp,cchar *abuf) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null non-zero) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_svcargs) */
+} /* end subroutine (vecstrx_svcargs) */
 
 
 /* private subroutines */
