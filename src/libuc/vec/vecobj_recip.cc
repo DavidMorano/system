@@ -91,8 +91,7 @@ int vecobj_recipadd(vecobj *op,cchar *sp,int sl) noex {
 	    } /* end if (new recipient) */
 	} /* end if (positive) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecobj_recipadd) */
+} /* end subroutine (vecobj_recipadd) */
 
 int vecobj_recipfins(vecobj *op) noex {
 	int		rs = SR_OK ;
@@ -106,8 +105,7 @@ int vecobj_recipfins(vecobj *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (vecobj_recipfins) */
+} /* end subroutine (vecobj_recipfins) */
 
 
 /* private subroutines */
