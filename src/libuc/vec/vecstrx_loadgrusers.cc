@@ -113,8 +113,7 @@ int vecstrx::loadgrusers(gid_t sgid) noex {
 	    } /* end if (subinfo) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_loadgrusers) */
+} /* end subroutine (vecstrx_loadgrusers) */
 
 
 /* private subroutines */
