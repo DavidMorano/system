@@ -92,16 +92,14 @@ int vecstrx::srvargs(cchar *abuf) noex {
 	if (abuf) ylikely {
 	    rs = SR_INVALID ;
 	    if (abuf[0]) ylikely {
-	        static cint	rst = mkterms() ;
-	        if ((rs = rst) >= 0) ylikely {
+	        if (static cint	rst = mkterms() ; (rs = rst) >= 0) ylikely {
 		    rs = vecstrx_arger(this,abuf) ;
 		    c = rs ;
 	        } /* end if (terms) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_srvargs) */
+} /* end subroutine (vecstrx_srvargs) */
 
 
 /* private subroutines */
