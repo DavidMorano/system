@@ -118,8 +118,7 @@ int vecelem_start(vecelem *op,int esz,int vn,int vo) noex {
 	    }
 	} /* end if (vecelem_ctor) */
 	return (rs >= 0) ? vn : rs ;
-}
-/* end subroutine (vecelem_start) */
+} /* end subroutine (vecelem_start) */
 
 int vecelem_finish(vecelem *op) noex {
 	int		rs ;
@@ -140,8 +139,7 @@ int vecelem_finish(vecelem *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecelem_finish) */
+} /* end subroutine (vecelem_finish) */
 
 int vecelem_add(vecelem *op,cvoid *ep) noex {
 	int		rs ;
@@ -158,8 +156,7 @@ int vecelem_add(vecelem *op,cvoid *ep) noex {
 	    } /* end if (vecelem_ext) */
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecelem_add) */
+} /* end subroutine (vecelem_add) */
 
 int vecelem_addlist(vecelem *op,cvoid *listp,int listl) noex {
     	int		rs = SR_FAULT ;
@@ -197,8 +194,7 @@ int vecelem_adduniq(vecelem *op,cvoid *ep) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecelem_adduniq) */
+} /* end subroutine (vecelem_adduniq) */
 
 int vecelem_get(vecelem *op,int i,void *arp) noex {
 	int		rs ;
@@ -213,8 +209,7 @@ int vecelem_get(vecelem *op,int i,void *arp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecelem_get) */
+} /* end subroutine (vecelem_get) */
 
 int vecelem_getval(vecelem *op,int i,void *vrp) noex {
 	int		rs ;
@@ -228,8 +223,7 @@ int vecelem_getval(vecelem *op,int i,void *vrp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecelem_getval) */
+} /* end subroutine (vecelem_getval) */
 
 int vecelem_count(vecelem *op) noex {
 	int		rs ;
@@ -237,8 +231,7 @@ int vecelem_count(vecelem *op) noex {
 	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecelem_count) */
+} /* end subroutine (vecelem_count) */
 
 int vecelem_extent(vecelem *op) noex {
 	int		rs ;
@@ -246,8 +239,7 @@ int vecelem_extent(vecelem *op) noex {
 	    rs = op->n ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecelem_extent) */
+} /* end subroutine (vecelem_extent) */
 
 int vecelem_del(vecelem *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -304,8 +296,7 @@ int vecelem_del(vecelem *op,int i) noex {
 	    } /* end if (popularion) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecelem_del) */
+} /* end subroutine (vecelem_del) */
 
 int vecelem_delall(vecelem *op) noex {
 	int		rs ;
@@ -320,8 +311,7 @@ int vecelem_delall(vecelem *op) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecelem_delall) */
+} /* end subroutine (vecelem_delall) */
 
 int vecelem_sort(vecelem *op,vecelem_vcmp vcf) noex {
 	int		rs ;
@@ -338,8 +328,7 @@ int vecelem_sort(vecelem *op,vecelem_vcmp vcf) noex {
 	    } /* end if (not already sorted) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecelem_sort) */
+} /* end subroutine (vecelem_sort) */
 
 int vecelem_setsorted(vecelem *op) noex {
 	int		rs ;
@@ -348,8 +337,7 @@ int vecelem_setsorted(vecelem *op) noex {
 	    op->fl.issorted = true ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecelem_setsorted) */
+} /* end subroutine (vecelem_setsorted) */
 
 int vecelem_getvec(vecelem *op,void **rpp) noex {
 	int		rs ;
@@ -358,8 +346,7 @@ int vecelem_getvec(vecelem *op,void **rpp) noex {
 	    *rpp = op->va ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecelem_getvec) */
+} /* end subroutine (vecelem_getvec) */
 
 int vecelem_audit(vecelem *op) noex {
 	int		rs ;
