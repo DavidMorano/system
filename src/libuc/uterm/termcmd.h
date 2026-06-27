@@ -20,11 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	TERMCMD		struct termcmd_head
@@ -49,7 +46,7 @@ struct termcmd_flags {
 	uint		fpriv:1 ;	/* private CSI */
 	uint		iover:1 ;	/* intermediate-string overflow */
 	uint		dover:1 ;	/* device-control-string overflow */
-} ;
+} ; /* end struct */
 
 struct termcmd_head {
 	short		type ;		/* terminal-command type */
