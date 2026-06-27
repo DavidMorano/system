@@ -230,7 +230,7 @@ extern int vecitem_curend	(vecitem *,vecitem_cur *) noex ;
 EXTERNC_end
 
 #if	__cplusplus
-extern const vecitemms	vecitemm ;
+extern const vecitemms		vecitemm ;
 #endif /* __cplusplus */
 
 
