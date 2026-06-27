@@ -39,31 +39,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<termios.h>
-#include	<unistd.h>
-#include	<poll.h>
-#include	<ctime>			/* |time_t| */
-#include	<climits>		/* |CHAR_UMAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uctc.h>		/* terminal-control */
-#include	<ucsysconf.h>
-#include	<ucdescread.h>
-#include	<ascii.h>
-#include	<baops.h>
-#include	<charq.h>
-#include	<vecobj.h>
-#include	<buffer.h>
-#include	<sbuf.h>
-#include	<sigign.h>
-#include	<strn.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<termios.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<poll.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |CHAR_UMAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<uctc.h>		/* LIBUC terminal-control */
+#include	<ucsysconf.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<charq.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<sigign.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uterm.h"
 
@@ -140,7 +140,7 @@ template<typename ... Args>
 local inline int uterm_magic(uterm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == UTERM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == UTERM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (uterm_magic) */
@@ -177,15 +177,15 @@ constexpr uchar		uterms[] = {
 	0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 
-} ; /* end array */
+} ; /* end array (uterms) */
 
 constexpr int		sigouts[] = {
 	SIGTTOU,
 	0
-} ; /* end array */
+} ; /* end array (sigouts) */
 
-constexpr bool		f_firstread = CF_FIRSTREAD ;
-constexpr bool		f_subunix = CF_SUBUNIX ;
+constexpr bool		f_firstread	= CF_FIRSTREAD ;
+constexpr bool		f_subunix	= CF_SUBUNIX ;
 
 
 /* exported variables */
@@ -209,7 +209,7 @@ int uterm_start(uterm *op,int fd) noex {
 		    if ((rs = uterm_loadterms(op,uterms)) >= 0) ylikely {
 	                if ((rs = uterm_attrbegin(op)) >= 0) ylikely {
 		            if ((rs = uterm_qbegin(op)) >= 0) ylikely {
-		                op->magic = UTERM_MAGIC ;
+		                op->magval = UTERM_MAGIC ;
 		            }
 	 	            if (rs < 0) {
 		                uterm_attrend(op) ;
@@ -220,8 +220,7 @@ int uterm_start(uterm *op,int fd) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uterm_start) */
+} /* end subroutine (uterm_start) */
 
 int uterm_finish(uterm *op) noex {
 	int		rs ;
@@ -235,21 +234,18 @@ int uterm_finish(uterm *op) noex {
 		rs1 = uterm_attrend(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uterm_finish) */
+} /* end subroutine (uterm_finish) */
 
 int uterm_suspend(uterm *op) noex {
 	return uterm_restore(op) ;
-}
-/* end subroutine (uterm_suspend) */
+} /* end subroutine (uterm_suspend) */
 
 int uterm_resume(uterm *op) noex {
 	return uterm_ensure(op) ;
-}
-/* end subroutine (uterm_resume) */
+} /* end subroutine (uterm_resume) */
 
 int uterm_restore(uterm *op) noex {
 	int		rs ;
@@ -260,8 +256,7 @@ int uterm_restore(uterm *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uterm_restore) */
+} /* end subroutine (uterm_restore) */
 
 int uterm_ensure(uterm *op) noex {
 	int		rs ;
@@ -271,8 +266,7 @@ int uterm_ensure(uterm *op) noex {
 	    rs = uc_tcattrset(op->fd,cmd,attrp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uterm_ensure) */
+} /* end subroutine (uterm_ensure) */
 
 int uterm_control(uterm *op,int cmd,...) noex {
 	va_list		ap ;
@@ -341,7 +335,7 @@ int uterm_control(uterm *op,int cmd,...) noex {
 	        break ;
 	    case utermcmd_setpgrp:
 		{
-		    SIGIGN	si ;
+		    sigign si ;
 		    if ((rs = sigign_start(&si,sigouts)) >= 0) ylikely {
 		        const pid_t	pgrp = (pid_t) va_arg(ap,pid_t) ;
 	                rs = uc_tcsetpgrp(op->fd,pgrp) ;
@@ -354,7 +348,7 @@ int uterm_control(uterm *op,int cmd,...) noex {
 		break ;
 	    case utermcmd_setpop:
 		{
-		    cint	v = (int) va_arg(ap,int) ;
+		    cint v = (int) va_arg(ap,int) ;
 	            rs = uterm_setpop(op,v) ;
 		}
 		break ;
@@ -365,8 +359,7 @@ int uterm_control(uterm *op,int cmd,...) noex {
 	    va_end(ap) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uterm_control) */
+} /* end subroutine (uterm_control) */
 
 int uterm_status(uterm *op,int cmd,...) noex {
 	va_list		ap ;
@@ -410,8 +403,7 @@ int uterm_status(uterm *op,int cmd,...) noex {
 	    va_end(ap) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uterm_status) */
+} /* end subroutine (uterm_status) */
 
 int uterm_reade(uterm *op,char *rbuf,int rlen,int timeout,int fc,
 		uterm_pr *lpp,uterm_ld *llp) noex {
@@ -553,13 +545,11 @@ int uterm_reade(uterm *op,char *rbuf,int rlen,int timeout,int fc,
 	op->fl.read = false ;
 	} /* end if (magic) */
 	return (rs >= 0) ? count : rs ;
-}
-/* end subroutine (uterm_reade) */
+} /* end subroutine (uterm_reade) */
 
 int uterm_read(uterm *op,char *rbuf,int rlen) noex {
 	return uterm_reade(op,rbuf,rlen,-1,0,nullptr,nullptr) ;
-}
-/* end subroutine (uterm_read) */
+} /* end subroutine (uterm_read) */
 
 int uterm_write(uterm *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
@@ -577,8 +567,7 @@ int uterm_write(uterm *op,cchar *wbuf,int wlen) noex {
 	    } /* end if (not-in-cancel) */
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (uterm_write) */
+} /* end subroutine (uterm_write) */
 
 int uterm_cancel(uterm *op,int fc,int cparam) noex {
 	int		rs ;
@@ -587,8 +576,7 @@ int uterm_cancel(uterm *op,int fc,int cparam) noex {
 	    rs = cparam ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uterm_cancel) */
+} /* end subroutine (uterm_cancel) */
 
 int uterm_poll(uterm *op) noex {
 	int		rs ;
@@ -598,8 +586,7 @@ int uterm_poll(uterm *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uterm_poll) */
+} /* end subroutine (uterm_poll) */
 
 int uterm_getmesg(uterm *op) noex {
 	int		rs ;
@@ -609,8 +596,7 @@ int uterm_getmesg(uterm *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uterm_getmesg) */
+} /* end subroutine (uterm_getmesg) */
 
 int uterm_getbiff(uterm *op) noex {
 	int		rs ;
@@ -620,8 +606,7 @@ int uterm_getbiff(uterm *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uterm_getbiff) */
+} /* end subroutine (uterm_getbiff) */
 
 int uterm_getpop(uterm *op) noex {
 	int		rs ;
@@ -634,8 +619,7 @@ int uterm_getpop(uterm *op) noex {
 	    } /* end if (u_fstat) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uterm_getpop) */
+} /* end subroutine (uterm_getpop) */
 
 int uterm_setpop(uterm *op,int v) noex {
 	int		rs ;
@@ -655,8 +639,7 @@ int uterm_setpop(uterm *op,int v) noex {
 	    } /* end if (stat) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (uterm_setpop) */
+} /* end subroutine (uterm_setpop) */
 
 
 /* private subroutines */
@@ -668,7 +651,7 @@ local int uterm_loadterms(uterm *op,const uchar *ut) noex {
 	    memcpy(op->rterms,ut,fieldterm_tabsize) ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
 local int uterm_attrbegin(uterm *op) noex {
 	cint		fd = op->fd ;
@@ -710,8 +693,7 @@ local int uterm_attrbegin(uterm *op) noex {
 	    } /* end if (error) */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (uterm_attrbegin) */
+} /* end subroutine (uterm_attrbegin) */
 
 local int uterm_attrend(uterm *op) noex {
 	cint		fd = op->fd ;
@@ -722,8 +704,7 @@ local int uterm_attrend(uterm *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (uterm_attrend) */
+} /* end subroutine (uterm_attrend) */
 
 local int uterm_qbegin(uterm *op) noex {
 	int		rs ;
@@ -734,8 +715,7 @@ local int uterm_qbegin(uterm *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (uterm_qbegin) */
+} /* end subroutine (uterm_qbegin) */
 
 local int uterm_qend(uterm *op) noex {
 	int		rs = SR_OK ;
@@ -749,16 +729,14 @@ local int uterm_qend(uterm *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (uterm_qend) */
+} /* end subroutine (uterm_qend) */
 
 local int uterm_controlmode(uterm *op) noex {
 	cint		m = op->mode ;
 	int		rs = SR_OK ;
 	op->fl.nosig = ((m & fm_nosig) != 0) ;
 	return rs ;
-}
-/* end subroutine (uterm_controlmode) */
+} /* end subroutine (uterm_controlmode) */
 
 local int uterm_writeproc(uterm *op,cchar *buf,int buflen) noex {
 	int		rs = SR_OK ;
@@ -807,8 +785,7 @@ local int uterm_writeproc(uterm *op,cchar *buf,int buflen) noex {
 	}
 
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (uterm_writeproc) */
+} /* end subroutine (uterm_writeproc) */
 
 local int tty_wps(uterm *op,cchar *ubuf,int ulen) noex {
 	int		rs = SR_OK ;
@@ -843,8 +820,7 @@ local int tty_wps(uterm *op,cchar *ubuf,int ulen) noex {
 	    }
 	} /* end if (non-zero) */
 	return (rs >= 0) ? ulen : rs ;
-}
-/* end subroutine (tty_wps) */
+} /* end subroutine (tty_wps) */
 
 local int tty_loadchar(uterm *op,cchar *pbuf,int pbuflen) noex {
 	int		rs = SR_OK ;
@@ -857,8 +833,7 @@ local int tty_loadchar(uterm *op,cchar *pbuf,int pbuflen) noex {
 	    }
 	} /* end for */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (tty_loadchar) */
+} /* end subroutine (tty_loadchar) */
 
 local int tty_wait(uterm *op,int timeout) noex {
 	POLLFD		fds[2] = {} ;
@@ -971,8 +946,7 @@ enter:
 /* we-re out of here */
 ret0:
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (tty_wait) */
+} /* end subroutine (tty_wait) */
 
 local int tty_risr(uterm *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -1043,8 +1017,7 @@ local int tty_risr(uterm *op,cchar *sp,int sl) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return (rs >= 0) ? f_dle : rs ;
-}
-/* end subroutine (tty_risr) */
+} /* end subroutine (tty_risr) */
 
 local int tty_echo(uterm *op,cchar *ebuf,int elen) noex {
 	int		rs = SR_OK ;
@@ -1053,8 +1026,7 @@ local int tty_echo(uterm *op,cchar *ebuf,int elen) noex {
 	    rs = u_write(op->fd,ebuf,elen) ;
 	}
 	return rs ;
-}
-/* end subroutine (tty_echo) */
+} /* end subroutine (tty_echo) */
 
 local int sinotprint(cchar *sp,int sl) noex {
 	int		i = 0 ; /* used-afterwards */
@@ -1066,7 +1038,6 @@ local int sinotprint(cchar *sp,int sl) noex {
 	    if (! f) break ;
 	} /* end for */
 	return (f) ? -1 : i ;
-}
-/* end subroutine (sinotprint) */
+} /* end subroutine (sinotprint) */
 
 
