@@ -115,7 +115,7 @@ constexpr cur		curdef = mkcurdef() ;
 
 /* exported variables */
 
-constexpr vecitemms		vecitemm ;
+constexpr vecitemms	vecitemm ;
 
 
 /* exported subroutines */
@@ -136,8 +136,7 @@ int vecitem_start(vecitem *op,int vn,int opts) noex {
 	    } /* end if (vecitem_setopts) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? vn : rs ;
-}
-/* end subroutine (vecitem_start) */
+} /* end subroutine (vecitem_start) */
 
 int vecitem_finish(vecitem *op) noex {
 	int		rs = SR_FAULT ;
@@ -162,8 +161,7 @@ int vecitem_finish(vecitem *op) noex {
 	    op->n = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecitem_finish) */
+} /* end subroutine (vecitem_finish) */
 
 int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	int		rs = SR_FAULT ;
@@ -210,8 +208,7 @@ int vecitem_add(vecitem *op,cvoid *ep,int el) noex {
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecitem_add) */
+} /* end subroutine (vecitem_add) */
 
 int vecitem_get(vecitem *op,int i,void *vrp) noex {
 	int		rs = SR_FAULT ;
@@ -226,8 +223,7 @@ int vecitem_get(vecitem *op,int i,void *vrp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecitem_get) */
+} /* end subroutine (vecitem_get) */
 
 int vecitem_del(vecitem *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -289,8 +285,7 @@ int vecitem_del(vecitem *op,int i) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecitem_del) */
+} /* end subroutine (vecitem_del) */
 
 int vecitem_count(vecitem *op) noex {
 	int		rs = SR_FAULT ;
@@ -298,8 +293,7 @@ int vecitem_count(vecitem *op) noex {
 	    rs = op->c ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecitem_count) */
+} /* end subroutine (vecitem_count) */
 
 int vecitem_sort(vecitem *op,cmpf cf) noex {
 	int		rs = SR_FAULT ;
@@ -316,8 +310,7 @@ int vecitem_sort(vecitem *op,cmpf cf) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecitem_sort) */
+} /* end subroutine (vecitem_sort) */
 
 int vecitem_curbegin(vecitem *op,cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -326,8 +319,7 @@ int vecitem_curbegin(vecitem *op,cur *curp) noex {
 	    *curp = curdef ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (curbegin) */
+} /* end subroutine (curbegin) */
 
 int vecitem_curend(vecitem *op,cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -336,8 +328,7 @@ int vecitem_curend(vecitem *op,cur *curp) noex {
 	    *curp = curdef ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (curend) */
+} /* end subroutine (curend) */
 
 int vecitem_fetch(vecitem *op,cvoid *cep,cur *curp,cmpf cf,void *vrp) noex {
 	void		**rpp = (void **) vrp ;
@@ -367,8 +358,7 @@ int vecitem_fetch(vecitem *op,cvoid *cep,cur *curp,cmpf cf,void *vrp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecitem_fetch) */
+} /* end subroutine (vecitem_fetch) */
 
 int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 	void		**rpp = (void **) vrp ;
@@ -408,8 +398,7 @@ int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecitem_search) */
+} /* end subroutine (vecitem_search) */
 
 int vecitem_find(vecitem *op,cvoid *cep,int len) noex {
 	int		rs = SR_FAULT ;
@@ -427,8 +416,7 @@ int vecitem_find(vecitem *op,cvoid *cep,int len) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecitem_find) */
+} /* end subroutine (vecitem_find) */
 
 int vecitem_getvec(vecitem *op,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -437,8 +425,7 @@ int vecitem_getvec(vecitem *op,void **rpp) noex {
 	    *rpp = op->va ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecitem_getvec) */
+} /* end subroutine (vecitem_getvec) */
 
 int vecitem_audit(vecitem *op) noex {
 	int		rs = SR_FAULT ;
