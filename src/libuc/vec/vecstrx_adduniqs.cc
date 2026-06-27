@@ -105,7 +105,6 @@ int vecstrx::adduniqs(cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_adduniqs) */
+} /* end subroutine (vecstrx_adduniqs) */
 
 
