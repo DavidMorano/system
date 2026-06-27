@@ -43,20 +43,20 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<sysval.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mapshmtmp.h"
 
@@ -89,7 +89,7 @@ extern "C" {
 
 /* forward reference */
 
-static int	shmalloc(int,int) noex ;
+local int	shmalloc(int,int) noex ;
 
 
 /* local variables */
@@ -137,13 +137,12 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapshmtmp) */
+} /* end subroutine (mapshmtmp) */
 
 
 /* local subroutines */
 
-static int shmalloc(int fd,int shmlen) noex {
+local int shmalloc(int fd,int shmlen) noex {
 	int		rs ;
 	if ((rs = pagesz) >= 0) ylikely {
 	    cint	ps = rs ;
@@ -156,7 +155,6 @@ static int shmalloc(int fd,int shmlen) noex {
 	    } /* end while */
 	} /* end if (pagesz) */
 	return rs ;
-}
-/* end subroutine (shmalloc) */
+} /* end subroutine (shmalloc) */
 
 
