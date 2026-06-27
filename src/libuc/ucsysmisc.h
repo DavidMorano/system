@@ -31,7 +31,6 @@ extern int	uc_gethz(int) noex ;
 extern int	uc_syspages(int) noex ;
 extern int	uc_pagesize() noex ;
 extern int	uc_ftime(TIMEB *) noex ;
-extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
 
 EXTERNC_end
 
