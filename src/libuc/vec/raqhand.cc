@@ -96,8 +96,7 @@ int raqhand_start(raqhand *op,int n,int opts) noex {
 	    } /* end if (options) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (raqhand_start) */
+} /* end subroutine (raqhand_start) */
 
 int raqhand_finish(raqhand *op) noex {
 	int		rs = SR_FAULT ;
@@ -116,8 +115,7 @@ int raqhand_finish(raqhand *op) noex {
 	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (raqhand_finish) */
+} /* end subroutine (raqhand_finish) */
 
 int raqhand_ins(raqhand *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
@@ -136,8 +134,7 @@ int raqhand_ins(raqhand *op,cvoid *ep) noex {
 	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (raqhand_ins) */
+} /* end subroutine (raqhand_ins) */
 
 int raqhand_acc(raqhand *op,int ai,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -158,8 +155,7 @@ int raqhand_acc(raqhand *op,int ai,void **rpp) noex {
 	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (raqhand_acc) */
+} /* end subroutine (raqhand_acc) */
 
 int raqhand_acclast(raqhand *op,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -179,8 +175,7 @@ int raqhand_acclast(raqhand *op,void **rpp) noex {
 	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (raqhand_acclast) */
+} /* end subroutine (raqhand_acclast) */
 
 int raqhand_get(raqhand *op,int i,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -195,8 +190,7 @@ int raqhand_get(raqhand *op,int i,void **rpp) noex {
 	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (raqhand_get) */
+} /* end subroutine (raqhand_get) */
 
 int raqhand_rem(raqhand *op,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -218,8 +212,7 @@ int raqhand_rem(raqhand *op,void **rpp) noex {
 	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (raqhand_rem) */
+} /* end subroutine (raqhand_rem) */
 
 int raqhand_ent(raqhand *op,cvoid *cvp) noex {
 	int		rs = SR_FAULT ;
@@ -244,8 +237,7 @@ int raqhand_ent(raqhand *op,cvoid *cvp) noex {
 	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (raqhand_ent) */
+} /* end subroutine (raqhand_ent) */
 
 int raqhand_del(raqhand *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -258,8 +250,7 @@ int raqhand_del(raqhand *op,int i) noex {
 	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (raqhand_del) */
+} /* end subroutine (raqhand_del) */
 
 int raqhand_delall(raqhand *op) noex {
 	int		rs = SR_FAULT ;
@@ -273,8 +264,7 @@ int raqhand_delall(raqhand *op) noex {
 	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (raqhand_delall) */
+} /* end subroutine (raqhand_delall) */
 
 int raqhand_count(raqhand *op) noex {
 	int		rs = SR_FAULT ;
@@ -287,8 +277,7 @@ int raqhand_count(raqhand *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (raqhand_count) */
+} /* end subroutine (raqhand_count) */
 
 
 /* private subroutines */
