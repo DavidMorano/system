@@ -107,8 +107,7 @@ int vecstrx::loadpjusers(cchar *pjn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_loadpjusers) */
+} /* end subroutine (vecstrx_loadpjusers) */
 
 
 /* private subroutines */
