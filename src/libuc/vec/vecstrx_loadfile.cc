@@ -154,8 +154,7 @@ int vecstrx::loadfile(int fu,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_loadfile) */
+} /* end subroutine (vecstrx_loadfile) */
 
 
 /* private subroutines */
@@ -257,6 +256,6 @@ vars::operator int () noex {
             var.linebuflen = (rs * LINEBUFMULT) ;
         }
         return rs ;
-}       /* end subroutine (vars::operator) */
+} /* end subroutine (vars::operator) */
 
 
