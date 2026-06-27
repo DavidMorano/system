@@ -83,7 +83,6 @@ int vecobj_hsort(vecobj *op,vecobj_vcf cmpfunc) noex {
 	    } /* end if (open) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecobj_hsort) */
+} /* end subroutine (vecobj_hsort) */
 
 
