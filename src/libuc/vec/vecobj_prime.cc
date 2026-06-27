@@ -116,8 +116,7 @@ int vecobj_start(vecobj *op,int osize,int n,int opts) noex {
 	    }
 	} /* end if (vecobj_ctor) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (vecobj_start) */
+} /* end subroutine (vecobj_start) */
 
 int vecobj_finish(vecobj *op) noex {
 	int		rs = SR_FAULT ;
@@ -145,8 +144,7 @@ int vecobj_finish(vecobj *op) noex {
 		}
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecobj_finish) */
+} /* end subroutine (vecobj_finish) */
 
 int vecobj_add(vecobj *op,cvoid *s) noex {
 	int		rs ;
@@ -154,8 +152,7 @@ int vecobj_add(vecobj *op,cvoid *s) noex {
 	    memcpy(ep,s,op->esz) ;
 	}
 	return rs ;
-}
-/* end subroutine (vecobj_add) */
+} /* end subroutine (vecobj_add) */
 
 int vecobj_adduniq(vecobj *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
@@ -177,8 +174,7 @@ int vecobj_adduniq(vecobj *op,cvoid *ep) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecobj_adduniq) */
+} /* end subroutine (vecobj_adduniq) */
 
 int vecobj_addnew(vecobj *op,void **epp) noex {
 	int		rs  SR_FAULT ;
@@ -226,8 +222,7 @@ int vecobj_addnew(vecobj *op,void **epp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecobj_addnew) */
+} /* end subroutine (vecobj_addnew) */
 
 int vecobj_inorder(vecobj *op,cvoid *cep,vecobj_vcf vcf,int cn) noex {
 	int		rs = SR_FAULT ;
@@ -297,8 +292,7 @@ int vecobj_inorder(vecobj *op,cvoid *cep,vecobj_vcf vcf,int cn) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (vecobj_inorder) */
+} /* end subroutine (vecobj_inorder) */
 
 int vecobj_store(vecobj *op,cvoid *s,void **rpp) noex {
 	int		rs ;
@@ -310,8 +304,7 @@ int vecobj_store(vecobj *op,cvoid *s,void **rpp) noex {
 	    }
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecobj_store) */
+} /* end subroutine (vecobj_store) */
 
 int vecobj_get(vecobj *op,int i,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -328,8 +321,7 @@ int vecobj_get(vecobj *op,int i,void **rpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecobj_get) */
+} /* end subroutine (vecobj_get) */
 
 int vecobj_del(vecobj *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -397,8 +389,7 @@ int vecobj_del(vecobj *op,int i) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecobj_del) */
+} /* end subroutine (vecobj_del) */
 
 int vecobj_delall(vecobj *op) noex {
 	int		rs = SR_FAULT ;
@@ -420,8 +411,7 @@ int vecobj_delall(vecobj *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecobj_delall) */
+} /* end subroutine (vecobj_delall) */
 
 int vecobj_count(vecobj *op) noex {
 	int		rs = SR_FAULT ;
@@ -432,8 +422,7 @@ int vecobj_count(vecobj *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecobj_count) */
+} /* end subroutine (vecobj_count) */
 
 int vecobj_sort(vecobj *op,vecobj_vcf vcf) noex {
 	int		rs = SR_FAULT ;
@@ -453,8 +442,7 @@ int vecobj_sort(vecobj *op,vecobj_vcf vcf) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecobj_sort) */
+} /* end subroutine (vecobj_sort) */
 
 int vecobj_setsorted(vecobj *op) noex {
 	int		rs = SR_FAULT ;
@@ -466,8 +454,7 @@ int vecobj_setsorted(vecobj *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecobj_setsorted) */
+} /* end subroutine (vecobj_setsorted) */
 
 int vecobj_curbegin(vecobj *op,vecobj_cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -480,8 +467,7 @@ int vecobj_curbegin(vecobj *op,vecobj_cur *curp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecobj_curbegin) */
+} /* end subroutine (vecobj_curbegin) */
 
 int vecobj_curend(vecobj *op,vecobj_cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -539,8 +525,7 @@ int vecobj_curfetch(vecobj *op,cvoid *ep,cur *curp,c_f vcf,void **rpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecobj_curfetch) */
+} /* end subroutine (vecobj_curfetch) */
 
 int vecobj_search(vecobj *op,cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -574,8 +559,7 @@ int vecobj_search(vecobj *op,cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecobj_search) */
+} /* end subroutine (vecobj_search) */
 
 int vecobj_find(vecobj *op,cvoid *cep) noex {
 	int		rs = SR_FAULT ;
@@ -593,8 +577,7 @@ int vecobj_find(vecobj *op,cvoid *cep) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecobj_find) */
+} /* end subroutine (vecobj_find) */
 
 int vecobj_getvec(vecobj *op,void ***rppp) noex {
 	int		rs = SR_FAULT ;
@@ -608,8 +591,7 @@ int vecobj_getvec(vecobj *op,void ***rppp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecobj_getvec) */
+} /* end subroutine (vecobj_getvec) */
 
 int vecobj_audit(vecobj *op) noex {
 	int		rs = SR_FAULT ;
@@ -663,8 +645,7 @@ local int vecobj_dtor(vecobj *op) noex {
 	    op->lap = nullptr ;
 	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (vecobj_dtor) */
+} /* end subroutine (vecobj_dtor) */
 
 consteval int mkoptmask() noex {
 	int		m = 0 ;
