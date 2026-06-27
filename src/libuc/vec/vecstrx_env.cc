@@ -109,8 +109,7 @@ int vecstrx::envadd(cchar *kp,cchar *vp,int vl) noex {
 	    } /* end if (was not found) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecstrx_envadd) */
+} /* end subroutine (vecstrx_envadd) */
 
 int vecstrx::envadds(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -133,8 +132,7 @@ int vecstrx::envadds(cchar *sp,int sl) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstrx_envadds) */
+} /* end subroutine (vecstrx_envadds) */
 
 int vecstrx::envset(cchar *kp,cchar *vp,int vl) noex {
     	cnullptr	np{} ;
@@ -151,8 +149,7 @@ int vecstrx::envset(cchar *kp,cchar *vp,int vl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstrx_envset) */
+} /* end subroutine (vecstrx_envset) */
 
 int vecstrx::envget(cchar *kp,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -171,8 +168,7 @@ int vecstrx::envget(cchar *kp,cchar **rpp) noex {
 	    if (rpp) *rpp = rp ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (vecstrx_envget) */
+} /* end subroutine (vecstrx_envget) */
 
 
 /* private subroutines */
