@@ -199,8 +199,7 @@ int vecpstr_start(vecpstr *op,int vn,int vsz,int vo) noex {
 	    } /* end if(error) */
 	} /* end if (vecpstr_ctor) */
 	return rs ;
-}
-/* end subroutine (vecpstr_start) */
+} /* end subroutine (vecpstr_start) */
 
 int vecpstr_finish(vecpstr *op) noex {
 	int		rs ;
@@ -229,8 +228,7 @@ int vecpstr_finish(vecpstr *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecpstr_finish) */
+} /* end subroutine (vecpstr_finish) */
 
 int vecpstr_audit(vecpstr *op) noex {
 	int		rs ;
@@ -251,13 +249,11 @@ int vecpstr_audit(vecpstr *op) noex {
             } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecpstr_audit) */
+} /* end subroutine (vecpstr_audit) */
 
 int vecpstr_add(vecpstr *op,cchar *sp,int sl) noex {
 	return vecpstr_store(op,sp,sl,nullptr) ;
-}
-/* end subroutine (vecpstr_add) */
+} /* end subroutine (vecpstr_add) */
 
 int vecpstr_adduniq(vecpstr *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
@@ -271,8 +267,7 @@ int vecpstr_adduniq(vecpstr *op,cchar *sp,int 탎l) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecpstr_adduniq) */
+} /* end subroutine (vecpstr_adduniq) */
 
 int vecpstr_addkeyval(vecpstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs ;
@@ -296,8 +291,7 @@ int vecpstr_addkeyval(vecpstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
             } /* end if (vecpstr_extstr) */
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecpstr_addkeyval) */
+} /* end subroutine (vecpstr_addkeyval) */
 
 int vecpstr_insert(vecpstr *op,int ii,cchar *sp,int 탎l) noex {
 	int		rs ;
@@ -320,8 +314,7 @@ int vecpstr_insert(vecpstr *op,int ii,cchar *sp,int 탎l) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (valid index) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecpstr_insert) */
+} /* end subroutine (vecpstr_insert) */
 
 int vecpstr_store(vecpstr *op,cchar *sp,int 탎l,cchar **rpp) noex {
 	int		rs ;
@@ -344,13 +337,11 @@ int vecpstr_store(vecpstr *op,cchar *sp,int 탎l,cchar **rpp) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecpstr_store) */
+} /* end subroutine (vecpstr_store) */
 
 int vecpstr_already(vecpstr *op,cchar *sp,int sl) noex {
 	return vecpstr_findn(op,sp,sl) ;
-}
-/* end subroutine (vecpstr_already) */
+} /* end subroutine (vecpstr_already) */
 
 int vecpstr_get(vecpstr *op,int i,cchar **rpp) noex {
 	int		rs ;
@@ -360,8 +351,7 @@ int vecpstr_get(vecpstr *op,int i,cchar **rpp) noex {
 	    }
 	} /* end if (validx) */
 	return rs ;
-}
-/* end subroutine (vecpstr_get) */
+} /* end subroutine (vecpstr_get) */
 
 int vecpstr_getlast(vecpstr *op,cchar **spp) noex {
 	int		rs ;
@@ -380,8 +370,7 @@ int vecpstr_getlast(vecpstr *op,cchar **spp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecpstr_getlast) */
+} /* end subroutine (vecpstr_getlast) */
 
 int vecpstr_del(vecpstr *op,int i) noex {
 	int		rs ;
@@ -437,8 +426,7 @@ int vecpstr_del(vecpstr *op,int i) noex {
 	    rs = vecpstr_delall(op) ;
 	} /* end if (validx) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecpstr_del) */
+} /* end subroutine (vecpstr_del) */
 
 int vecpstr_delall(vecpstr *op) noex {
 	int		rs ;
@@ -463,8 +451,7 @@ int vecpstr_delall(vecpstr *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecpstr_delall) */
+} /* end subroutine (vecpstr_delall) */
 
 int vecpstr_count(vecpstr *op) noex {
 	int		rs ;
@@ -472,8 +459,7 @@ int vecpstr_count(vecpstr *op) noex {
 	    rs = op->cnt ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecpstr_count) */
+} /* end subroutine (vecpstr_count) */
 
 int vecpstr_sort(vecpstr *op,vecpstr_vcmp vcf) noex {
 	int		rs ;
@@ -489,8 +475,7 @@ int vecpstr_sort(vecpstr *op,vecpstr_vcmp vcf) noex {
 	    } /* end if (populated) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecpstr_sort) */
+} /* end subroutine (vecpstr_sort) */
 
 int vecpstr_search(vecpstr *op,cchar *sp,vecpstr_vcmp vcf,cchar **rpp) noex {
 	int		rs ;
@@ -525,8 +510,7 @@ int vecpstr_search(vecpstr *op,cchar *sp,vecpstr_vcmp vcf,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecpstr_search) */
+} /* end subroutine (vecpstr_search) */
 
 int vecpstr_searchl(vecpstr *op,cc *sp,int sl,vecpstr_vcmp vcf,cc **rpp) noex {
     	cint		rsn = SR_NOTFOUND ;
@@ -549,8 +533,7 @@ int vecpstr_searchl(vecpstr *op,cc *sp,int sl,vecpstr_vcmp vcf,cc **rpp) noex {
 	    rs = SR_NOTFOUND ; /* real errors priority */
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecpstr_searchl) */
+} /* end subroutine (vecpstr_searchl) */
 
 int vecpstr_finder(vecpstr *op,cc *sp,vecpstr_vcmp vcf,cc **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -571,8 +554,7 @@ int vecpstr_finder(vecpstr *op,cc *sp,vecpstr_vcmp vcf,cc **rpp) noex {
             } /* end if (populated) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecpstr_finder) */
+} /* end subroutine (vecpstr_finder) */
 
 int vecpstr_find(vecpstr *op,cchar *sp) noex {
         int             rs ;
@@ -591,8 +573,7 @@ int vecpstr_find(vecpstr *op,cchar *sp) noex {
             } /* end if (populated) */
 	} /* end if (magic) */
         return rs ;
-}
-/* end subroutine (vecpstr_find) */
+} /* end subroutine (vecpstr_find) */
 
 int vecpstr_findn(vecpstr *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -611,8 +592,7 @@ int vecpstr_findn(vecpstr *op,cchar *sp,int sl) noex {
 	    if (i < op->idx) rs = i ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecpstr_findn) */
+} /* end subroutine (vecpstr_findn) */
 
 int vecpstr_findaddr(vecpstr *op,cchar *addr) noex {
 	int		rs ;
@@ -629,8 +609,7 @@ int vecpstr_findaddr(vecpstr *op,cchar *addr) noex {
             } /* end if (populated) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecpstr_findaddr) */
+} /* end subroutine (vecpstr_findaddr) */
 
 int vecpstr_getsize(vecpstr *op) noex {
 	int		rs ;
@@ -639,8 +618,7 @@ int vecpstr_getsize(vecpstr *op) noex {
 	    if (op->stsz > 0) sz = op->stsz ;
 	} /* end if (magic) */
 	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (vecpstr_getsize) */
+} /* end subroutine (vecpstr_getsize) */
 
 int vecpstr_strsize(vecpstr *op) noex {
 	int		rs ;
@@ -659,8 +637,7 @@ int vecpstr_strsize(vecpstr *op) noex {
             stsz = uceil(op->stsz,resz) ;
 	} /* end if (magic) */
 	return (rs >= 0) ? stsz : rs ;
-}
-/* end subroutine (vecpstr_strsize) */
+} /* end subroutine (vecpstr_strsize) */
 
 int vecpstr_strmk(vecpstr *op,char *tab,int tabsize) noex {
 	int		rs ;
@@ -691,8 +668,7 @@ int vecpstr_strmk(vecpstr *op,char *tab,int tabsize) noex {
             } /* end if (not overflow) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecpstr_strmk) */
+} /* end subroutine (vecpstr_strmk) */
 
 int vecpstr_recsize(vecpstr *op) noex {
 	int		rs ;
@@ -703,8 +679,7 @@ int vecpstr_recsize(vecpstr *op) noex {
 	    } /* end if (populated) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rsz : rs ;
-}
-/* end subroutine (vecpstr_recsize) */
+} /* end subroutine (vecpstr_recsize) */
 
 int vecpstr_cksize(vecpstr *op) noex {
 	int		rs ;
@@ -714,8 +689,7 @@ int vecpstr_cksize(vecpstr *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (vecpstr_cksize) */
+} /* end subroutine (vecpstr_cksize) */
 
 int vecpstr_recmk(vecpstr *op,int *rec,int recsize) noex {
 	int		rs ;
@@ -739,8 +713,7 @@ int vecpstr_recmk(vecpstr *op,int *rec,int recsize) noex {
             } /* end if (not overflow) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecpstr_recmk) */
+} /* end subroutine (vecpstr_recmk) */
 
 int vecpstr_recmkstr(vecpstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	int		rs ;
@@ -771,8 +744,7 @@ int vecpstr_recmkstr(vecpstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecpstr_recmkstr) */
+} /* end subroutine (vecpstr_recmkstr) */
 
 int vecpstr_avmkstr(vecpstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	int		rs ;
@@ -800,8 +772,7 @@ int vecpstr_avmkstr(vecpstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	    } /* end if (vecpstr_cksize) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecpstr_avmkstr) */
+} /* end subroutine (vecpstr_avmkstr) */
 
 int vecpstr_indlen(vecpstr *op) noex {
 	int		rs ;
@@ -810,8 +781,7 @@ int vecpstr_indlen(vecpstr *op) noex {
 	    il = indexlen(op->idx + 1) ;
 	} /* end if (magic) */
 	return (rs >= 0) ? il : rs ;
-}
-/* end subroutine (vecpstr_indlen) */
+} /* end subroutine (vecpstr_indlen) */
 
 int vecpstr_indsize(vecpstr *op) noex {
 	int		rs ;
@@ -821,8 +791,7 @@ int vecpstr_indsize(vecpstr *op) noex {
 	    isize = indexsize(il) ;
 	} /* end if (magic) */
 	return (rs >= 0) ? isize : rs ;
-}
-/* end subroutine (vecpstr_indsize) */
+} /* end subroutine (vecpstr_indsize) */
 
 int vecpstr_getvec(vecpstr *op,mainv *rppp) noex {
 	int		rs ;
@@ -834,8 +803,7 @@ int vecpstr_getvec(vecpstr *op,mainv *rppp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (vecpstr_getvec) */
+} /* end subroutine (vecpstr_getvec) */
 
 int vecpstr_add(vecpstr *op,string *strp) noex {
 	int		rs = SR_FAULT ;
