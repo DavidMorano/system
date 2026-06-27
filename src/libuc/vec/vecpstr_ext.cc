@@ -83,111 +83,93 @@ namespace {
 int vecpstr_addpathclean(vecpstr *op,cchar *lp,int ll) noex {
     	vecpstrer	vo(op) ;
 	return vo.addpathclean(lp,ll) ;
-}
-/* end subroutine (vecpstr_addpathclean) */
+} /* end subroutine (vecpstr_addpathclean) */
 
 int vecpstr_addpath(vecpstr *op,cchar *lp,int ll) noex {
     	vecpstrer	vo(op) ;
 	return vo.addpath(lp,ll) ;
-}
-/* end subroutine (vecpstr_addpath) */
+} /* end subroutine (vecpstr_addpath) */
 
 int vecpstr_addcspath(vecpstr *op) noex {
     	vecpstrer	vo(op) ;
 	return vo.addcspath() ;
-}
-/* end subroutine (vecpstr_addcspath) */
+} /* end subroutine (vecpstr_addcspath) */
 
 int vecpstr_adds(vecpstr *op,cchar *sp,int sl) noex {
     	vecpstrer	vo(op) ;
 	return vo.adds(sp,sl) ;
-}
-/* end subroutine (vecpstr_adds) */
+} /* end subroutine (vecpstr_adds) */
 
 int vecpstr_addsubdirs(vecpstr *op,cchar *newsdname) noex {
     	vecpstrer	vo(op) ;
 	return vo.addsubdirs(newsdname) ;
-}
-/* end subroutine (vecpstr_addsubdirs) */
+} /* end subroutine (vecpstr_addsubdirs) */
 
 int vecpstr_addsyms(vecpstr *op,cc *objn,mainv syms) noex {
     	vecpstrer	vo(op) ;
 	return vo.addsyms(objn,syms) ;
-}
-/* end subroutine (vecpstr_addsymss) */
+} /* end subroutine (vecpstr_addsymss) */
 
 int vecpstr_adduniqs(vecpstr *op,cchar *sp,int sl) noex {
     	vecpstrer	vo(op) ;
 	return vo.adduniqs(sp,sl) ;
-}
-/* end subroutine (vecpstr_adduniqs) */
+} /* end subroutine (vecpstr_adduniqs) */
 
 int vecpstr_envadd(vecpstr *op,cchar *kp,cchar *vp,int vl) noex {
     	vecpstrer	vo(op) ;
 	return vo.envadd(kp,vp,vl) ;
-}
-/* end subroutine (vecpstr_envadd) */
+} /* end subroutine (vecpstr_envadd) */
 
 int vecpstr_envadds(vecpstr *op,cchar *sp,int sl) noex {
     	vecpstrer	vo(op) ;
 	return vo.envadds(sp,sl) ;
-}
-/* end subroutine (vecpstr_envadds) */
+} /* end subroutine (vecpstr_envadds) */
 
 int vecpstr_envset(vecpstr *op,cchar *kp,cchar *vp,int vl) noex {
     	vecpstrer	vo(op) ;
 	return vo.envset(kp,vp,vl) ;
-}
-/* end subroutine (vecpstr_envset) */
+} /* end subroutine (vecpstr_envset) */
 
 int vecpstr_envget(vecpstr *op,cchar *kp,cchar **rpp) noex {
     	vecpstrer	vo(op) ;
 	return vo.envget(kp,rpp) ;
-}
-/* end subroutine (vecpstr_envget) */
+} /* end subroutine (vecpstr_envget) */
 
 int vecpstr_envfile(vecpstr *op,cchar *fname) noex {
     	vecpstrer	vo(op) ;
 	return vo.envfile(fname) ;
-}
-/* end subroutine (vecpstr_envfile) */
+} /* end subroutine (vecpstr_envfile) */
 
 int vecpstr_foilcmp(vecpstr *op,vecpstr *rnp) noex {
     	vecpstrer	vo(op) ;
 	vecpstrer	voo(rnp) ;
 	return vo.foilcmp(&voo) ;
-}
-/* end subroutine (vecpstr_foilcmp) */
+} /* end subroutine (vecpstr_foilcmp) */
 
 int vecpstr_loadfile(vecpstr *op,int fu,cchar *fname) noex {
     	vecpstrer	vo(op) ;
 	return vo.loadfile(fu,fname) ;
-}
-/* end subroutine (vecpstr_loadfile) */
+} /* end subroutine (vecpstr_loadfile) */
 
 int vecpstr_loadgrusers(vecpstr *op,gid_t sgid) noex {
     	vecpstrer	vo(op) ;
 	return vo.loadgrusers(sgid) ;
-}
-/* end subroutine (vecpstr_loadgrusers) */
+} /* end subroutine (vecpstr_loadgrusers) */
 
 int vecpstr_loadpjusers(vecpstr *op,cchar *pjn) noex {
     	vecpstrer	vo(op) ;
 	return vo.loadpjusers(pjn) ;
-}
-/* end subroutine (vecpstr_loadpjusers) */
+} /* end subroutine (vecpstr_loadpjusers) */
 
 int vecpstr_srvargs(vecpstr *op,cchar *abuf) noex {
     	vecpstrer	vo(op) ;
 	return vo.srvargs(abuf) ;
-}
-/* end subroutine (vecpstr_srvargs) */
+} /* end subroutine (vecpstr_srvargs) */
 
 int vecpstr_svcargs(vecpstr *op,int *fp,cchar *abuf) noex {
     	vecpstrer	vo(op) ;
 	return vo.svcargs(fp,abuf) ;
-}
-/* end subroutine (vecpstr_svcargs) */
+} /* end subroutine (vecpstr_svcargs) */
 
 
 /* private subroutines */
