@@ -26,12 +26,23 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
+#ifdef	__cplusplus
+struct isaccmoder {
+    bool rd	(int) const noex ;
+    bool wr	(int) const noex ;
+} ; /* end struct (isaccmoder) */
+#endif /* __cplusplus */
+
 EXTERNC_begin
 
 extern bool	isaccmode_readable(int) noex ;
 extern bool	isaccmode_writable(int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern isaccmoder	isaccmode ;
+#endif /* __cplusplus */
 
 
 #endif /* ISACCMODE_INCLUDE */
