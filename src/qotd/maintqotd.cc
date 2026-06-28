@@ -60,6 +60,7 @@
 #include	<netdb.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<csignal>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<clanguage.h>
@@ -187,7 +188,7 @@ extern cchar	**environ ;
 struct config {
 	uint		magic ;
 	MAINTQOTD	*sip ;
-	PARAMFILE	p ;
+	paramfile	p ;
 	EXPCOOK		cooks ;
 	uint		f_p:1 ;
 	uint		f_cooks:1 ;
@@ -1480,8 +1481,8 @@ static int config_read(CONFIG *csp)
 static int config_reader(CONFIG *csp,char *ebuf,int elen)
 {
 	MAINTQOTD	*sip = csp->sip ;
-	PARAMFILE	*pfp = &csp->p ;
-	PARAMFILE_CUR	cur ;
+	paramfile	*pfp = &csp->p ;
+	paramfile_cur	cur ;
 	const int	vlen = VBUFLEN ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -1562,10 +1563,10 @@ static int config_reader(CONFIG *csp,char *ebuf,int elen)
 	                        break ;
 
 	                    case cparam_logfile:
-	                        if (! sip->final.lfname) {
+	                        if (! sip->finval.lfname) {
 	                            cchar *lfn = sip->lfname ;
 	                            cchar	*tfn = tbuf ;
-	                            sip->final.lfname = TRUE ;
+	                            sip->finval.lfname = TRUE ;
 	                            sip->have.lfname = TRUE ;
 	                            ml = setfname(sip,tbuf,ebuf,el,TRUE,
 	                                LOGCNAME,sn,"") ;
@@ -1621,7 +1622,7 @@ static int getdefmjd(time_t dt)
 	TMTIME		ct ;
 	int		rs ;
 	if (dt == 0) dt = time(NULL) ;
-	if ((rs = tmtime_localtime(&ct,dt)) >= 0) {
+	if ((rs = tmtime_timelocal(&ct,dt)) >= 0) {
 	    int	y = (ct.year + TM_YEAR_BASE) ;
 	    int	m = ct.mon ;
 	    int	d = ct.mday ;
