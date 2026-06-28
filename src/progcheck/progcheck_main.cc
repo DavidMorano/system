@@ -155,7 +155,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LI_FL		have, f, changed, final ;
+	LI_FL		have, f, changed, finval ;
 	LI_FL		open ;
 	vecstr		stores ;
 	PI		*pip ;
@@ -185,7 +185,7 @@ local int	mainsub(int,cchar **,cchar **,void *) noex ;
 local int	usage(PI *) noex ;
 
 local int	procopts(PI *,KO *) noex ;
-local int	procargs(PI *,AI *,BITS *,cchar *,cchar *) noex ;
+local int	procargs(PI *,AI *,bits *,cchar *,cchar *) noex ;
 local int	procfile(PI *,void *,cchar *) noex ;
 local int	procln(PI *,LS *,FC *,int,cchar *,int) noex ;
 local int	procout(PI *,void *,cchar *,FC *) noex ;
@@ -357,7 +357,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PI		pi, *pip = &pi ;
 	LI		li, *lip = &li ;
 	AI		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	LO		akopts ;
 	SHIO		errfile ;
 
@@ -1119,7 +1119,7 @@ local int procopts(PI *pip,KO *kop) noex {
 }
 /* end subroutine (procopts) */
 
-local int procargs(PI *pip,AI *aip,BITS *bop,cchar *ofn,cchar *afn) noex {
+local int procargs(PI *pip,AI *aip,bits *bop,cchar *ofn,cchar *afn) noex {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
