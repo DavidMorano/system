@@ -1,4 +1,5 @@
 /* progartmaint SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* perform article maintenance on the bb-newgroup spool area */
@@ -18,6 +19,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine performs article maintenance on the articles
 	int the PCS BB-newsgroup spool area.
 
@@ -27,15 +29,16 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
-#include	<fsdirtree.h>
 #include	<fsdir.h>
-#include	<char.h>
+#include	<fsdirtree.h>
 #include	<mailmsg.h>
 #include	<mailmsg_enver.h>
 #include	<mailmsghdrs.h>
@@ -48,10 +51,12 @@
 #include	<sbuf.h>
 #include	<buffer.h>
 #include	<ascii.h>
+#include	<char.h>
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"defs.h"
@@ -170,7 +175,7 @@ struct artinfo {
 	ARTINFO_FL	f, open ;
 	EMA		ngema ;
 	char		*tdname ;
-	const char	*anp ;
+	cchar	*anp ;
 	int		anl ;
 	int		ngroups ;
 } ;
@@ -180,7 +185,7 @@ struct artinfo {
 
 static int	procartfiles(PROGINFO *) ;
 static int	procmsg(PROGINFO *,PROCDATA *,cchar *,int) ;
-static int	procmsger(PROGINFO *,PROCDATA *,const char *,int) ;
+static int	procmsger(PROGINFO *,PROCDATA *,cchar *,int) ;
 static int	procmsgexpires(PROGINFO *,PROCDATA *,ARTINFO *) ;
 static int	procmsgmaint(PROGINFO *,PROCDATA *,ARTINFO *) ;
 static int	procmsgdel(PROGINFO *,PROCDATA *,ARTINFO *) ;
@@ -188,7 +193,7 @@ static int	procmsgdel(PROGINFO *,PROCDATA *,ARTINFO *) ;
 static int	procdata_start(PROCDATA *,char *,int) ;
 static int	procdata_finish(PROCDATA *) ;
 
-static int	artinfo_start(ARTINFO *,char *,const char *,int) ;
+static int	artinfo_start(ARTINFO *,char *,cchar *,int) ;
 static int	artinfo_ngs(ARTINFO *,MAILMSG *,EMA **) ;
 static int	artinfo_finish(ARTINFO *) ;
 
@@ -218,9 +223,8 @@ int progartmaint(PROGINFO *pip,TDINFO *tip)
 	if ((rs = procartfiles(pip)) >= 0) {
 	    PROCDATA	pd ;
 	    if ((rs = procdata_start(&pd,tip->tdname,tip->tdlen)) >= 0) {
-	        FSDIR		artdir ;
-	        FSDIR_ENT	de ;
-
+	        fsdir		artdir ;
+	        fsdir_ent	de ;
 	        if ((rs = fsdir_open(&artdir,tip->tdname)) >= 0) {
 	            while ((rs = fsdir_read(&artdir,&de)) > 0) {
 	                int	el = rs ;
@@ -258,18 +262,18 @@ static int procartfiles(PROGINFO *pip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((pip->newsdname != NULL) && pip->fl.artcores) {
-	    const int	flen = MAXPATHLEN ;
+	    cint	flen = MAXPATHLEN ;
 	    char	*fbuf ;
 	    if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 		if ((rs = mkpath1(fbuf,pip->newsdname)) >= 0) {
-	            fsdirtree	dt ;
-		    int		fo = 0 ;
+		    int		fdo = 0 ;
 		    int		dl = (flen-(rs+1)) ;
 		    char	*dp = (fbuf+(rs+1)) ;
 		    fbuf[rs] = '/' ;
-	            fo |= (FSDIRTREE_MFOLLOW | FSDIRTREE_MUNIQ) ;
+	            fdo |= (fsdirtreem.follow | fsdirtreem.uniq) ;
+	            fsdirtree	dt ;
 	            if ((rs = fsdirtree_open(&dt,pip->newsdname,fo)) >= 0) {
-		        USTAT	sb ;
+		        ustat	sb ;
 		        while ((rs = fsdirtree_read(&dt,&sb,dp,dl)) > 0) {
 			    if (! S_ISDIR(sb.st_mode)) {
 			        int	cl ;
@@ -304,7 +308,7 @@ static int procartfiles(PROGINFO *pip)
 /* process the current message */
 static int procmsg(PROGINFO *pip,PROCDATA *pdp,cchar *ep,int el)
 {
-	const int	tdlen = pdp->tdlen ;
+	cint	tdlen = pdp->tdlen ;
 	int		rs ;
 	int		rs1 ;
 	char		*abuf = pdp->tdname ;
@@ -322,8 +326,7 @@ static int procmsg(PROGINFO *pip,PROCDATA *pdp,cchar *ep,int el)
 	    } else {
 		bfile	afile, *afp = &afile ;
 	        if ((rs = bopen(afp,abuf,"r",0666)) >= 0) {
-		    USTAT	sb ;
-		    if ((rs = bstat(afp,&sb)) >= 0) {
+		    if (ustat sb ; (rs = bstat(afp,&sb)) >= 0) {
 		        if (S_ISREG(sb.st_mode)) {
 			    MAILMSG	amsg, *msgp = &amsg ;
 	        	    if ((rs = mailmsg_start(msgp)) >= 0) {
@@ -400,8 +403,8 @@ static int procmsgexpires(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 	const time_t	dt = pip->daytime ;
 	int		rs ;
 	int		c = 1 ;
-	const char	*hdr = HN_EXPIRES ;
-	const char	*vp ;
+	cchar	*hdr = HN_EXPIRES ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    DATER	*tdp = &pip->td ;
@@ -453,11 +456,11 @@ static int procmsgmaint(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 	            char	abuf[MAXPATHLEN+1] ;
 	            nl = rs ;
 	            if ((rs = progngdname(pip,abuf,np,nl)) > 0) {
-	                NULSTR		a ;
-	                const int	alen = rs ;
-	                const int	al = aip->anl ;
-	                const char	*ap = aip->anp ;
-	                const char	*aname ;
+	                nulstr		a ;
+	                cint	alen = rs ;
+	                cint	al = aip->anl ;
+	                cchar	*ap = aip->anp ;
+	                cchar	*aname ;
 	                if ((rs = nulstr_start(&a,ap,al,&aname)) >= 0) {
 	                    if ((rs = pathadd(abuf,alen,aname)) >= 0) {
 
@@ -488,11 +491,11 @@ static int procmsgmaint(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 #endif
 
 	if ((rs >= 0) && (c == 0)) {
-	    NULSTR	a ;
-	    const int	alen = pdp->tdlen ;
-	    const int	al = aip->anl ;
-	    const char	*ap = aip->anp ;
-	    const char	*aname ;
+	    nulstr	a ;
+	    cint	alen = pdp->tdlen ;
+	    cint	al = aip->anl ;
+	    cchar	*ap = aip->anp ;
+	    cchar	*aname ;
 	    char	*abuf = pdp->tdname ;
 	    if ((rs = nulstr_start(&a,ap,al,&aname)) >= 0) {
 	        if ((rs = pathadd(abuf,alen,aname)) >= 0) {
@@ -536,11 +539,11 @@ static int procmsgdel(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 	            char	abuf[MAXPATHLEN+1] ;
 	            nl = rs ;
 	            if ((rs = progngdname(pip,abuf,np,nl)) >= 0) {
-	                NULSTR		a ;
-	                const int	alen = rs ;
-	                const int	al = aip->anl ;
-	                const char	*ap = aip->anp ;
-	                const char	*aname ;
+	                nulstr		a ;
+	                cint	alen = rs ;
+	                cint	al = aip->anl ;
+	                cchar	*ap = aip->anp ;
+	                cchar	*aname ;
 	                if ((rs = nulstr_start(&a,ap,al,&aname)) >= 0) {
 	                    if ((rs = pathadd(abuf,alen,aname)) >= 0) {
 
@@ -565,17 +568,16 @@ static int procmsgdel(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 #endif
 
 	if (rs >= 0) {
-	    NULSTR	a ;
-	    const int	alen = pdp->tdlen ;
-	    const int	al = aip->anl ;
-	    const char	*ap = aip->anp ;
-	    const char	*aname ;
+	    cint	alen = pdp->tdlen ;
+	    cint	al = aip->anl ;
+	    cchar	*ap = aip->anp ;
+	    cchar	*aname ;
 	    char	*abuf = pdp->tdname ;
-	    if ((rs = nulstr_start(&a,ap,al,&aname)) >= 0) {
+	    if (nulstr a ; (rs = nulstr_start(&a,ap,al,&aname)) >= 0) {
 	        if ((rs = pathadd(abuf,alen,aname)) >= 0) {
-
-	            rs = uc_unlink(abuf) ;
-
+		    {
+	                rs = uc_unlink(abuf) ;
+		    }
 	        } /* end if (path-add) */
 	        rs1 = nulstr_finish(&a) ;
 		if (rs >= 0) rs = rs1 ;
