@@ -35,7 +35,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<pwd.h>
 #include	<shadow.h>
 #include	<grp.h>
