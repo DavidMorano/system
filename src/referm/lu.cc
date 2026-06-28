@@ -1,11 +1,11 @@
-/* lu */
+/* lu SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* lookup a reference in the databases */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1
-
 
 /* revision history:
 
@@ -24,25 +24,25 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine processes a file by looking up and inserting
-	the bibliographical references into the text.
-	All input is copied to the output with the addition of
-	the bibliographical references.
-
+	the bibliographical references into the text.  All input
+	is copied to the output with the addition of the bibliographical
+	references.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<fcntl.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdlib>
-#include	<ctype.h>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 
@@ -51,6 +51,9 @@
 #include	"bdb.h"
 #include	"lu.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -61,13 +64,11 @@
 
 /* external subroutines */
 
-extern char	*strbasename() ;
-
 
 /* external variables */
 
 
-/* local structure definitions */
+/* local structures */
 
 struct bufdesc {
 	int	len ;
@@ -75,28 +76,36 @@ struct bufdesc {
 } ;
 
 struct br {
-	struct bufdesc	a ;
-	struct bufdesc	t ;
-	struct bufdesc	d ;
-	struct bufdesc	j ;
-	struct bufdesc	m ;
-	struct bufdesc	i ;
-	struct bufdesc	p ;
-	struct bufdesc	c ;
+	bufdesc	a ;
+	bufdesc	t ;
+	bufdesc	d ;
+	bufdesc	j ;
+	bufdesc	m ;
+	bufdesc	i ;
+	bufdesc	p ;
+	bufdesc	c ;
 } ;
 
 
-/* forward subroutine references */
+/* forward references */
 
 void		bufdesc_init(), br_init() ;
 
 
-
-int lu_open(bdbp)
-bdb	*bdbp ;
-{
+/* local variables */
 
 
+/* exported variables */
+
+
+/* exported subroutines */
+
+int lu_open(bdb *bdbp) {
+    	int		rs = SR_FAULT ;
+	if (bdbp) {
+	    rs = SR_OK ;
+	}
+	return rs ;
 }
 /* end subroutine (lu_open) */
 
@@ -111,9 +120,7 @@ char		keys[] ;
 	bfile		lookofile, *lofp = &lookofile ;
 	bfile		lookefile, *lefp = &lookefile ;
 	bfile		*fpa[3] ;
-
 	struct br	entry ;
-
 	pid_t		pid_lookbib ;
 
 	int	i ;
