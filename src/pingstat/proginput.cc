@@ -36,6 +36,7 @@
 #include	<fcntl.h>
 #include	<csignal>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
