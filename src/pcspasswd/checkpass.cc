@@ -42,7 +42,7 @@
 #include	<grp.h>
 
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bfile.h>
 #include	<pwfile.h>
 #include	<vecstr.h>
@@ -225,7 +225,7 @@ static int try_finish(PASSDATA *pdp)
 static int try_pwd(PASSDATA *pdp)
 {
 	struct passwd	pw ;
-	const int	pwlen = getbufsize(getbufsize_pw) ;
+	const int	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs ;
 	char		*pwbuf ;
 
@@ -249,7 +249,7 @@ static int try_pwd(PASSDATA *pdp)
 static int try_spw(PASSDATA *pdp)
 {
 	struct spwd	sp ;
-	const int	splen = getbufsize(getbufsize_sp) ;
+	const int	splen = bufsizeget(bufsize_sp) ;
 	int		rs ;
 	char		*spbuf ;
 
