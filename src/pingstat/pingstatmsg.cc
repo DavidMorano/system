@@ -2,10 +2,10 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* create and parse the internal messages */
+/* create and parse PINGSTAT (internal) messages */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -55,8 +55,10 @@
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int pingstatmsg_update(sp,f,mbuf,mlen)
 struct pingstatmsg_update	*sp ;
@@ -64,7 +66,7 @@ int			f ;
 char			mbuf[] ;
 int			mlen ;
 {
-	SERIALBUF	msgbuf ;
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 
@@ -124,7 +126,7 @@ int			f ;
 char			mbuf[] ;
 int			mlen ;
 {
-	SERIALBUF	msgbuf ;
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 
@@ -193,7 +195,7 @@ int			f ;
 char			mbuf[] ;
 int			mlen ;
 {
-	SERIALBUF	msgbuf ;
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 
@@ -227,12 +229,9 @@ int			mlen ;
 }
 /* end subroutine (pingstatmsg_unknown) */
 
-
 #ifdef	COMMENT
-int pingstatmsg_msglen(int type)
-{
+int pingstatmsg_msglen(int type) noex {
 	int		rs ;
-
 	switch (type) {
 	case pingstatmsgtype_update:
 	    rs = PINGSTATMSG_SUPDATE ;
@@ -244,7 +243,6 @@ int pingstatmsg_msglen(int type)
 	    rs = SR_INVALID ;
 	    break ;
 	} /* end switch */
-
 	return rs ;
 }
 /* end subroutine (pingstatmsg_msglen) */
