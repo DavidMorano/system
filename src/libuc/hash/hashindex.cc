@@ -89,7 +89,7 @@ uint hashindex(uint v,int n) noex {
 	}
 	if (rv == 0) rv = 1 ;
 	return rv ;
-} /* end subroutine (hasindex) */
+} /* end subroutine (hashindex) */
 #endif /* COMMENT */
 
 
