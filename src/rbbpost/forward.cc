@@ -44,7 +44,7 @@
 ******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -85,25 +85,12 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	bopencmd(bfile **,const char *) ;
-
-extern int	msgheaders() ;
-extern int	ng_parse() ;
-extern int	matmsgstart(const char *,int) ;
-extern int	matmsghead(const char *,int,char *,int *) ;
-
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
 
 
 /* external variables */
