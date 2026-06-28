@@ -1,12 +1,12 @@
-/* progoutput */
+/* progoutput SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program-output */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
@@ -19,33 +19,31 @@
 
 /*******************************************************************************
 
-        This subroutine forms the front-end part of a generic PCS type of
-        program. This front-end is used in a variety of PCS programs.
-
-        This code was originally part of the Personal Communications
-        Services (PCS) package but can also be used independently from it.
-        Historically, this was developed as part of an effort to maintain high
-        function (and reliable) email communications in the face of increasingly
-        draconian security restrictions imposed on the computers in the DEFINITY
-        development organization.
-
+  	Description:
+	This subroutine forms the front-end part of a generic PCS
+	type of program. This front-end is used in a variety of PCS
+	programs.  This code was originally part of the Personal
+	Communications Services (PCS) package but can also be used
+	independently from it.  Historically, this was developed
+	as part of an effort to maintain high function (and reliable)
+	email communications in the face of increasingly draconian
+	security restrictions imposed on the computers in the
+	DEFINITY development organization.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bits.h>
 #include	<bfile.h>
 #include	<logfile.h>
@@ -66,40 +64,13 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkpath5(char *,cchar *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	sfdirname(const char *,int,cchar **) ;
-extern int	sfshrink(const char *,int,cchar **) ;
-extern int	sfkey(const char *,int,cchar **) ;
-extern int	nextfield(char *,int,cchar **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	getpwd(char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	isNotPresent(int) ;
-
-extern int	progpingtabadd(PROGINFO *,const char *,int) ;
-extern int	proghost(PROGINFO *,const char *,int,int) ;
+extern int	progpingtabadd(PROGINFO *,cchar *,int) ;
+extern int	proghost(PROGINFO *,cchar *,int,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* externals variables */
@@ -113,32 +84,33 @@ extern char	*timestr_log(time_t,char *) ;
 
 /* forward references */
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,vechand *) ;
-static int	procdefpingtab(PROGINFO *) ;
-static int	prochostsfins(PROGINFO *,VECHAND *) ;
-static int	prochosts(PROGINFO *,VECHAND *) ;
-static int	mungepingtab(PROGINFO *,char *,cchar *) ;
-static int	loadpingtabs(PROGINFO *,VECHAND *) ;
-static int	loadpingtab(PROGINFO *,VECHAND *,cchar *) ;
-static int	loadhost(PROGINFO *,VECHAND *,cchar *,int,int,int) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,vechand *) ;
+local int	procdefpingtab(PROGINFO *) ;
+local int	prochostsfins(PROGINFO *,VECHAND *) ;
+local int	prochosts(PROGINFO *,VECHAND *) ;
+local int	mungepingtab(PROGINFO *,char *,cchar *) ;
+local int	loadpingtabs(PROGINFO *,VECHAND *) ;
+local int	loadpingtab(PROGINFO *,VECHAND *,cchar *) ;
+local int	loadhost(PROGINFO *,VECHAND *,cchar *,int,int,int) ;
 
-static int	procout_begin(PROGINFO *,bfile *,const char *) ;
-static int	procout_end(PROGINFO *) ;
+local int	procout_begin(PROGINFO *,bfile *,cchar *) ;
+local int	procout_end(PROGINFO *) ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progoutput(PROGINFO *pip,ARGINFO *aip,BITS *bop)
-{
+int progoutput(PROGINFO *pip,ARGINFO *aip,bits *bop) noex {
 	bfile		ofile ;
 	int		rs ;
 	int		rs1 ;
 	int		pan = 0 ;
-	const char	*ofn = pip->ofname ;
+	cchar	*ofn = pip->ofname ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
@@ -192,7 +164,7 @@ int progoutput(PROGINFO *pip,ARGINFO *aip,BITS *bop)
 /* local subroutines */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,vechand *php)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vechand *php)
 {
 	const int	defintmin = pip->defintminping ;
 	const int	to = pip->toping ;
@@ -275,7 +247,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,vechand *php)
 /* end subroutine (procargs) */
 
 
-static int procout_begin(PROGINFO *pip,bfile *ofp,cchar *ofname)
+local int procout_begin(PROGINFO *pip,bfile *ofp,cchar *ofname)
 {
 	int		rs = SR_OK ;
 	if (! pip->fl.nooutput) {
@@ -290,7 +262,7 @@ static int procout_begin(PROGINFO *pip,bfile *ofp,cchar *ofname)
 /* end subroutine (procout_begin) */
 
 
-static int procout_end(PROGINFO *pip)
+local int procout_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -304,10 +276,10 @@ static int procout_end(PROGINFO *pip)
 /* end subroutine (procout_end) */
 
 
-static int procdefpingtab(PROGINFO *pip)
+local int procdefpingtab(PROGINFO *pip)
 {
 	int		rs ;
-	const char	*dn = DEFPTFNAME ;
+	cchar	*dn = DEFPTFNAME ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -322,7 +294,7 @@ static int procdefpingtab(PROGINFO *pip)
 
 
 /* process all of the ping-hosts */
-static int prochosts(PROGINFO *pip,VECHAND *phlp)
+local int prochosts(PROGINFO *pip,VECHAND *phlp)
 {
 	PINGHOST	*php ;
 	int		rs = SR_OK ;
@@ -386,7 +358,7 @@ static int prochosts(PROGINFO *pip,VECHAND *phlp)
 
 
 /* free up all of the ping-hosts */
-static int prochostsfins(PROGINFO *pip,VECHAND *phlp)
+local int prochostsfins(PROGINFO *pip,VECHAND *phlp)
 {
 	PINGHOST	*php ;
 	int		rs = SR_OK ;
@@ -416,7 +388,7 @@ static int prochostsfins(PROGINFO *pip,VECHAND *phlp)
 
 
 /* munge up the pingtab file names */
-static int mungepingtab(PROGINFO *pip,char *rbuf,cchar *ptfname)
+local int mungepingtab(PROGINFO *pip,char *rbuf,cchar *ptfname)
 {
 	USTAT		sb ;
 	int		rs ;
@@ -444,7 +416,7 @@ static int mungepingtab(PROGINFO *pip,char *rbuf,cchar *ptfname)
 
 
 /* load the ping-hosts from a pingtab file */
-static int loadpingtabs(PROGINFO *pip,VECHAND *phlp)
+local int loadpingtabs(PROGINFO *pip,VECHAND *phlp)
 {
 	VECSTR		*ptp = &pip->pingtabs ;
 	int		rs = SR_OK ;
@@ -452,7 +424,7 @@ static int loadpingtabs(PROGINFO *pip,VECHAND *phlp)
 	int		c = 0 ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
-	const char	*ptname ;
+	cchar	*ptname ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
@@ -518,7 +490,7 @@ static int loadpingtabs(PROGINFO *pip,VECHAND *phlp)
 /* end subroutine (loadpingtabs) */
 
 
-static int loadpingtab(PROGINFO *pip,VECHAND *phlp,cchar *ptfname)
+local int loadpingtab(PROGINFO *pip,VECHAND *phlp,cchar *ptfname)
 {
 	PINGTAB		pt ;
 	int		rs ;
@@ -577,10 +549,10 @@ static int loadpingtab(PROGINFO *pip,VECHAND *phlp,cchar *ptfname)
 
 
 /* load a single ping-host */
-static int loadhost(pip,phlp,hp,hl,min,to)
+local int loadhost(pip,phlp,hp,hl,min,to)
 PROGINFO	*pip ;
 VECHAND		*phlp ;
-const char	hp[] ;
+cchar	hp[] ;
 int		hl ;
 int		min ;
 int		to ;
