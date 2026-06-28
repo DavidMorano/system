@@ -23,17 +23,11 @@
 #include	<netdb.h>		/* POSIX */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<inetaddrs.h>		/* LIBU */
 
 
 #define	INETADDR	union inetaddr_head
 
-
-enum inetaddrs {
-    	inetaddr_bin,
-    	inetaddr_str,
-    	inetaddr_dot,
-    	inetaddr_overlast
-} ; /* end enum (inetaddrs) */
 
 struct inetaddr_head {
 	union {
