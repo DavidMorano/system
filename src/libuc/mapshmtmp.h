@@ -20,16 +20,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int mapshmtmp(char *,int,mode_t,int,char **) noex ;
+extern int	mapshmtmp(char *,int,mode_t,int,char **) noex ;
 
 EXTERNC_end
 
