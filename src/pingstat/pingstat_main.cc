@@ -52,7 +52,6 @@
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<getbufsize.h>
 #include	<getportnum.h>
 #include	<gethe.h>
 #include	<bits.h>
