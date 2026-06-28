@@ -73,6 +73,8 @@
 
 /* exported variables */
 
+isaccmoder		isaccmode ;
+
 
 /* exported subroutines */
 
@@ -85,5 +87,13 @@ bool isaccmode_writable(int am) noex {
     	am &= O_ACCMODE ;
 	return ((am == O_WRONLY) || (am == O_RDWR)) ;
 } /* end subroutine (isaccmode_writable) */
+
+bool isaccmoder::rd(int am) const noex {
+    	return isaccmode_readable(am) ;
+}
+
+bool isaccmoder::wr(int am) const noex {
+	return isaccmode_writable(am) ;
+}
 
 
