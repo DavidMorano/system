@@ -46,6 +46,7 @@
 #include	<sys/timeb.h>
 #include	<unistd.h>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
@@ -61,8 +62,6 @@
 #include	<vecstr.h>
 #include	<vechand.h>
 #include	<userinfo.h>
-#include	<pcsconf.h>
-#include	<pcspoll.h>
 #include	<field.h>
 #include	<vecitem.h>
 #include	<ema.h>
@@ -70,12 +69,14 @@
 #include	<buffer.h>
 #include	<nulstr.h>
 #include	<hdbstr.h>
-#include	<ng.h>
-#include	<article.h>
+#include	<pcsconf.h>		/* PCS */
+#include	<pcspoll.h>		/* PCS */
+#include	<ng.h>			/* PCS */
+#include	<article.h>		/* PCS */
+#include	<bbhosts.h>		/* PCS */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
-#include	"bbhosts.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -170,9 +171,9 @@ struct locinfo {
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procbase(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,struct tdinfo *,ARGINFO *,BITS *,
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procbase(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,struct tdinfo *,ARGINFO *,bits *,
 			cchar *,cchar *,cchar *) ;
 static int	procspecs(PROGINFO *,vecstr *,cchar *,int) ;
 static int	procinput(PROGINFO *,struct tdinfo *,vecstr *,cchar *) ;
@@ -316,8 +317,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	TMZ		stz ;
 	bfile		errfile ;
 
@@ -961,7 +962,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        if ((rs = tmz_isset(&stz)) > 0) {
 	            tmtime tmt ;
 	            if (! stz.f.year) {
-	                rs = tmtime_localtime(&tmt,pip->daytime) ;
+	                rs = tmtime_timelocal(&tmt,pip->daytime) ;
 	                stz.st.tm_year = tmt.year ;
 	            } /* end if (getting the current year) */
 	            if (rs >= 0) {
@@ -1009,7 +1010,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        if ((rs = proglog_begin(pip,&u)) >= 0) {
 	                            if ((rs = proguserlist_begin(pip)) >= 0) {
 	                                ARGINFO	*aip = &ainfo ;
-				        BITS	*bop = &pargs ;
+				        bits	*bop = &pargs ;
 	                                cchar	*afn = afname ;
 	                                cchar	*ofn = ofname ;
 	                                cchar	*ifn = ifname ;
@@ -1187,7 +1188,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1199,7 +1200,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -1391,7 +1392,7 @@ static int procpcsconf_end(PROGINFO *pip)
 /* end subroutine (procpcsconf_end) */
 
 
-static int procbase(PROGINFO *pip,ARGINFO *aip,BITS *app,cchar *afn,cchar *ofn,
+static int procbase(PROGINFO *pip,ARGINFO *aip,bits *app,cchar *afn,cchar *ofn,
 		cchar *ifn)
 {
 	int		rs ;
@@ -1435,7 +1436,7 @@ static int procargs(pip,tip,aip,app,afn,ofn,ifn)
 PROGINFO	*pip ;
 struct tdinfo	*tip ;
 ARGINFO		*aip ;
-BITS		*app ;
+bits		*app ;
 cchar		*afn ;
 cchar		*ofn ;
 cchar		*ifn ;
@@ -2284,7 +2285,7 @@ static int locinfo_hdrfromget(LOCINFO *lip,EMA **epp)
 	}
 	return rs ;
 }
-/* end subroutines (locinfo_hdrfromget) */
+/* end subroutine (locinfo_hdrfromget) */
 
 
 /* our little NG-directory cache (caching only positive hits) */
@@ -2334,7 +2335,7 @@ static int locinfo_ngdname(LOCINFO *lip,char *ngdname,cchar *np,int nl)
 
 	return (rs >= 0) ? vl : rs ;
 }
-/* end subroutines (locinfo_ngdname) */
+/* end subroutine (locinfo_ngdname) */
 
 
 int progngdname(PROGINFO *pip,char *ngdname,cchar *np,int nl)
@@ -2357,7 +2358,7 @@ int progmsgfromema(PROGINFO *pip,EMA **epp)
 #endif
 	return rs ;
 }
-/* end subroutines (progmsgfromget) */
+/* end subroutine (progmsgfromget) */
 
 
 int progexpiration(PROGINFO *pip,cchar **rpp)
@@ -2378,7 +2379,7 @@ int progexpiration(PROGINFO *pip,cchar **rpp)
 
 	return rs ;
 }
-/* end subroutines (progexpiration) */
+/* end subroutine (progexpiration) */
 
 
 #ifdef	COMMENT
