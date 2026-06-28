@@ -139,7 +139,7 @@ int subpcs_all(SUBPCS *sip,FILER *ofp)
 
 
 /* ARGSUSED */
-int subpcs_args(SUBPCS *sip,FILER *ofp,ARGINFO *aip,BITS *bop,
+int subpcs_args(SUBPCS *sip,FILER *ofp,ARGINFO *aip,bits *bop,
 		cchar *afn)
 {
 	const int	argc = aip->argc ;
