@@ -32,11 +32,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<netdb.h>		/* POSIX <- the money shot */
 #include	<stdint.h>		/* |uint32_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<netdb.h>		/* <- the money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #ifndef	NETENT
