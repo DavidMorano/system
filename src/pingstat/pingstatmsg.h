@@ -1,17 +1,29 @@
-/* pingstatmsg */
+/* pingstatmsg HEADER */
+/* charset=ISO8859-1 */
+/* version %I% last-modified %G% */
 
+/* create and parse PINGSTAT (internal) messages */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2001-07-21, David A­D­ Morano
+	This module was originally written.
+
+*/
 
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	PINGSTATMSG_INCLUDE
-#define	PINGSTATMSG_INCLUDE	1
+#define	PINGSTATMSG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<netdb.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 
 
 struct pingstatmsg_update {
@@ -20,7 +32,7 @@ struct pingstatmsg_update {
 	short	hostnamelen ;
 	uchar	msgtype ;		/* message type */
 	char	hostname[MAXHOSTNAMELEN + 1] ;
-} ;
+} ; /* end struct */
 
 struct pingstatmsg_uptime {
 	uint	msglen ;
@@ -30,14 +42,13 @@ struct pingstatmsg_uptime {
 	short	hostnamelen ;
 	uchar	msgtype ;		/* message type */
 	char	hostname[MAXHOSTNAMELEN + 1] ;
-} ;
+} ; /* end struct */
 
 /* unknown */
 struct pingstatmsg_unknown {
 	uint	msglen ;
 	uchar	msgtype ;		/* message type */
-} ;
-
+} ; /* end struct */
 
 /* request types */
 enum pingstatmsgtypes {
@@ -45,8 +56,7 @@ enum pingstatmsgtypes {
 	pingstatmsgtype_uptime,
 	pingstatmsgtype_unknown,
 	pingstatmsgtype_overlast
-} ;
-
+} ; /* end enum */
 
 /* response codes */
 enum pingstatmsgrcs {
@@ -56,26 +66,20 @@ enum pingstatmsgrcs {
 	pingstatmsgrc_done,
 	pingstatmsgrc_goingdown,
 	pingstatmsgrc_overlast
-} ;
-
+} ;} ; /* end enum */
 
 /* message sizes */
-
 #define	PINGSTATMSG_SUPDATE		sizeof(struct pingstatmsg_update) ;
 #define	PINGSTATMSG_SUPTIME		sizeof(struct pingstatmsg_uptime) ;
 
-
-#if	(! defined(PINGSTATMSG_MASTER)) || (PINGSTATMSG_MASTER == 0)
+EXTERNC_begin
 
 extern int pingstatmsg_update(struct pingstatmsg_update *,int,char *,int) ;
 extern int pingstatmsg_uptime(struct pingstatmsg_uptime *,int,char *,int) ;
 extern int pingstatmsg_unknown(struct pingstatmsg_unknown *,int,char *,int) ;
 
-#ifdef	COMMENT
-extern int pingstatmsg_msglen(int) ;
-#endif
+EXTERNC_end
 
-#endif /* PINGSTATMSG_MASTER */
 
 #endif /* PINGSTATMSG_INCLUDE */
 
