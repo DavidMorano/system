@@ -52,7 +52,7 @@ struct maintqotd_head {
 	vecstr		stores ;
 	vecpstr		hosts ;
 	vecpstr		sources ;
-	MAINTQOTD_FL	f, have, changed, final ;
+	MAINTQOTD_FL	f, have, changed, finval ;
 	MAINTQOTD_FL	open ;
 	ids		id ;
 	cchar		*pr ;
