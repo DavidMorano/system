@@ -35,7 +35,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctype.h>
-#include	<time.h>
+#include	<ctime>
 #include	<netdb.h>
 
 #include	<usystem.h>
@@ -80,7 +80,7 @@ extern int	cfdecmfi(const char *,int,int *) ;
 extern int	cfdecmfu(const char *,int,uint *) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	prsetfname(cchar *,char *,cchar *,int,int,
+extern int	prmkfname(cchar *,char *,cchar *,int,int,
 			cchar *,cchar *,cchar *) ;
 extern int	isNotPresent(int) ;
 
@@ -241,7 +241,7 @@ int progconf_check(PROGINFO *pip)
 	int		f = FALSE ;
 
 	if (pip->fl.pc && pip->open.params) {
-	    PARAMFILE	*pfp = &pip->params ;
+	    paramfile	*pfp = &pip->params ;
 	    if ((rs = paramfile_check(pfp,pip->daytime)) > 0) {
 	        f = TRUE ;
 	        rs = progconf_read(pip) ;
@@ -265,8 +265,8 @@ int progconf_read(PROGINFO *pip)
 #endif
 
 	if (pip->open.params) {
-	PARAMFILE_CUR	cur ;
-	PARAMFILE_ENT	pe ;
+	paramfile_cur	cur ;
+	paramfile_ent	pe ;
 	int		oi ;
 	int		kl ;
 	int		vl ;
@@ -323,7 +323,7 @@ int progconf_read(PROGINFO *pip)
 
 	    switch (oi) {
 	    case configopt_logsize:
-	        if ((elen > 0) && (! pip->final.logsize)) {
+	        if ((elen > 0) && (! pip->finval.logsize)) {
 	            rs1 = cfdecmfi(ebuf,elen,&v) ;
 	            if ((rs1 >= 0) && (v >= 0)) {
 	                pip->have.logsize = TRUE ;
@@ -343,28 +343,28 @@ int progconf_read(PROGINFO *pip)
 	        if ((rs1 >= 0) && (v >= 0)) {
 	            switch (oi) {
 	            case configopt_markint:
-	                if (! pip->final.intmark) {
+	                if (! pip->finval.intmark) {
 	                    pip->have.intmark = TRUE ;
 	                    pip->changed.intmark = TRUE ;
 	                    pip->intmark = v ;
 	                }
 	                break ;
 	            case configopt_minpingint:
-	                if (! pip->final.intminping) {
+	                if (! pip->finval.intminping) {
 	                    pip->have.intminping = TRUE ;
 	                    pip->changed.intminping = TRUE ;
 	                    pip->intminping = v ;
 	                }
 	                break ;
 	            case configopt_minupdateint:
-	                if (! pip->final.intminupdate) {
+	                if (! pip->finval.intminupdate) {
 	                    pip->have.intminupdate = TRUE ;
 	                    pip->changed.intminupdate = TRUE ;
 	                    pip->intminupdate = v ;
 	                }
 	                break ;
 	            case configopt_pingto:
-	                if (! pip->final.toping) {
+	                if (! pip->finval.toping) {
 	                    pip->have.toping = TRUE ;
 	                    pip->changed.toping = TRUE ;
 	                    pip->toping = v ;
@@ -374,11 +374,11 @@ int progconf_read(PROGINFO *pip)
 	        } /* end if (valid number) */
 	        break ;
 	    case configopt_sumfile:
-	        if (! pip->final.sumfile) {
+	        if (! pip->finval.sumfile) {
 	            char	dname[MAXPATHLEN + 1] ;
 	            pip->have.sumfile = TRUE ;
 	            mkpath2(dname,VDNAME,pip->searchname) ;
-	            tl = prsetfname(pr,tbuf,ebuf,elen,TRUE,
+	            tl = prmkfname(pr,tbuf,ebuf,elen,TRUE,
 	                dname,pip->nodename,SUMFEXT) ;
 	            f = (pip->sumfname == NULL) ;
 	            f = f || (strcmp(pip->sumfname,tbuf) != 0) ;
@@ -390,9 +390,9 @@ int progconf_read(PROGINFO *pip)
 	        }
 	        break ;
 	    case configopt_pidfile:
-	        if (! pip->final.pfname) {
+	        if (! pip->finval.pfname) {
 	            pip->have.pfname = TRUE ;
-	            tl = prsetfname(pr,tbuf,ebuf,elen,TRUE,
+	            tl = prmkfname(pr,tbuf,ebuf,elen,TRUE,
 	                RUNDNAME,pip->nodename,pip->searchname) ;
 	            f = (pip->pfname == NULL) ;
 	            f = f || (strcmp(pip->pfname,tbuf) != 0) ;
@@ -404,9 +404,9 @@ int progconf_read(PROGINFO *pip)
 	        }
 	        break ;
 	    case configopt_logfile:
-	        if (! pip->final.logfile) {
+	        if (! pip->finval.logfile) {
 	            pip->have.logfile = TRUE ;
-	            tl = prsetfname(pr,tbuf,ebuf,elen,TRUE,
+	            tl = prmkfname(pr,tbuf,ebuf,elen,TRUE,
 	                LOGDNAME,pip->searchname,"") ;
 	            f = (pip->lfname == NULL) ;
 	            f = f || (strcmp(pip->lfname,tbuf) != 0) ;
