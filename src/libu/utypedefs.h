@@ -323,6 +323,26 @@ typedef int *			intp ;
 typedef long *			longp ;
 #endif
 
+#ifndef	TYPEDEF_SCHARP
+#define	TYPEDEF_SCHARP
+typedef signed char *		scharp ;
+#endif
+
+#ifndef	TYPEDEF_SSHORTP
+#define	TYPEDEF_SSHORTP
+typedef signed short *		sshortp ;
+#endif
+
+#ifndef	TYPEDEF_SINTP
+#define	TYPEDEF_SINTP
+typedef signed int *		sintp ;
+#endif
+
+#ifndef	TYPEDEF_SLONGP
+#define	TYPEDEF_SLONGP
+typedef signed long *		slongp ;
+#endif
+
 #ifndef	TYPEDEF_UCHARP
 #define	TYPEDEF_UCHARP
 typedef unsigned char *		ucharp ;
