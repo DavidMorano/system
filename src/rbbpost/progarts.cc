@@ -19,7 +19,7 @@
 #define	CF_CLENTRAIL	0		/* trailing CLEN processing */
 #define	CF_CLINES	1		/* CLINES processing */
 #define	CF_NEWSGROUPS	1		/* newsgroups */
-#define	CF_MKARTFILE	1		/* use |mkartfile(3dam)| */
+#define	CF_MKARTFILE	1		/* use |mkfileart(3dam)| */
 
 /* revision history:
 
@@ -175,8 +175,7 @@ extern int	matstr(cchar **,cchar *,int) ;
 extern int	matcasestr(cchar **,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	mkartfile(char *,mode_t,cchar *,cchar *,int) ;
-extern int	mkbestaddr(char *,int,cchar *,int) ;
+extern int	mkfileart(char *,mode_t,cchar *,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 
 extern int	progmsgid(PROGINFO *,char *,int,int) ;
@@ -1335,7 +1334,7 @@ PROCDATA	*pdp ;
 	                } else if (j == received_keyfor) {
 
 			    sp = sabuf ;
-	                    rs = mkbestaddr(sabuf,salen,rp,rl) ;
+	                    rs = mkaddrbest(sabuf,salen,rp,rl) ;
 
 	                } /* end if (special handling cases) */
 
@@ -3766,7 +3765,7 @@ cchar	tdname[] ;
 	int		rs ;
 	cchar	*nn = pip->nodename ;
 
-	    if ((rs = mkartfile(afname,om,tdname,nn,mi)) >= 0) {
+	    if ((rs = mkfileart(afname,om,tdname,nn,mi)) >= 0) {
 		int		al ;
 		cchar	*ap ;
 		if ((al = sfbasename(afname,rs,&ap)) > 0) {
@@ -3776,7 +3775,7 @@ cchar	tdname[] ;
 		if (rs < 0) {
 		    uc_unlink(afname) ;
 		}
-	    } /* end if (mkartfile) */
+	    } /* end if (mkfileart) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
