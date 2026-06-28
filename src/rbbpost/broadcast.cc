@@ -31,26 +31,28 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<netdb.h>
+#include	<dirent.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<csignal>
-#include	<dirent.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
-#include	<pcsconf.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getchostname.h>
 #include	<userinfo.h>
 #include	<logfile.h>
 #include	<vecitem.h>
 #include	<mailmsg.h>
 #include	<mallocstuff.h>
-#include	<getchostname.h>
+#include	<retpath.h>
+#include	<pcsconf.h>		/* PCS */
+#include	<ng.h>			/* PCS */
+#include	<bbhosts.hh>		/* PCS */
 #include	<localmisc.h>
 
-#include	"ng.h"
-#include	"bbhosts.h"
-#include	"retpath.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -63,24 +65,15 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-
-extern int	pcsngdir(const char *,char *,const char *,const char *) ;
 extern int	forward(struct proginfo *,
-			struct article *,const char *,const char *) ;
+			struct article *,cchar *,cchar *) ;
 
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -88,7 +81,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	isourself(struct proginfo *,BBHOSTS *,const char *) ;
+static int	isourself(struct proginfo *,BBHOSTS *,cchar *) ;
 
 
 /* exported subroutines */
@@ -115,8 +108,8 @@ BBHOSTS		*bhp, *bnp ;
 	int	copies = 0 ;
 	int	narticles = 0 ;
 
-	const char	*pathname ;
-	const char	*cp, *hp ;
+	cchar	*pathname ;
+	cchar	*cp, *hp ;
 
 	char	hostname[MAXHOSTNAMELEN + 1] ;
 	char	tmphostname[MAXHOSTNAMELEN + 1] ;
@@ -150,7 +143,7 @@ BBHOSTS		*bhp, *bnp ;
 	bufprintf(tmphostname,MAXPATHLEN,"%s.%s",cp,pip->orgdomainname) ;
 #else
 	{
-	    const char	*dn = pip->orgdomainname ;
+	    cchar	*dn = pip->orgdomainname ;
 	    if (dn == NULL) dn = pip->domainname ;
 	    snsds(tmphostname,MAXPATHLEN,cp,dn) ;
 	}
@@ -401,9 +394,9 @@ BBHOSTS		*bhp, *bnp ;
 static int isourself(pip,bnp,name)
 struct proginfo	*pip ;
 BBHOSTS		*bnp ;
-const char	name[] ;
+cchar	name[] ;
 {
-	const char	*cp ;
+	cchar	*cp ;
 
 	char	nodename[NODENAMELEN + 1] ;
 	char	domainname[MAXHOSTNAMELEN + 1] ;
