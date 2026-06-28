@@ -47,11 +47,11 @@ OBJ3= ucnonblock.o ucndelay.o ucfsync.o
 
 OBJ4= ucttyname.o ucsetappend.o
 OBJ5= ucclose.o
-OBJ6= 
+OBJ6= ucpeek.o
 OBJ7= 
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o obj5.o
+OBJB= obj4.o obj5.o obj6.o
 
 OBJ= obja.o objb.o
 
@@ -153,6 +153,7 @@ objb.o:			$(OBJB)
 
 ucdescmanip.o:		ucdescmanip.cc		ucdescmanip.h		$(INCS)
 ucdescmiscers.o:	ucdescmiscers.cc	ucdescmiscers.h		$(INCS)
+ucclose.o:		ucclose.cc		ucclose.h		$(INCS)
 uccloseonexec.o:	uccloseonexec.cc	uccloseonexec.h		$(INCS)
 ucftruncate.o:		ucftruncate.cc		ucftruncate.h		$(INCS)
 ucfminmod.o:		ucfminmod.cc		ucfminmod.h		$(INCS)
@@ -160,7 +161,7 @@ ucfstat.o:		ucfstat.cc		ucfstat.h		$(INCS)
 ucfsync.o:		ucfsync.cc		ucfsync.h		$(INCS)
 ucndelay.o:		ucndelay.cc		ucndelay.h		$(INCS)
 ucnonblock.o:		ucnonblock.cc		ucnonblock.h		$(INCS)
-ucclose.o:		ucclose.cc		ucclose.h		$(INCS)
+ucpeek.o:		ucpeek.cc		ucpeek.h		$(INCS)
 ucttyname.o:		ucttyname.cc		ucttyname.h		$(INCS)
 ucsetappend.o:		ucsetappend.cc		ucsetappend.h		$(INCS)
 

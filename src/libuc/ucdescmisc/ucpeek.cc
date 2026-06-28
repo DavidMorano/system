@@ -143,7 +143,7 @@ static int peek_regular(int fd,void *dbuf,int dlen) noex {
 	off_t		fo{} ;
 	int		rs ;
 	if ((rs = u_tell(fd,&fo)) >= 0) {
-	    rs = u_pread(fd,dbuf,dlen,fo) ;
+	    rs = u_readp(fd,dbuf,dlen,fo) ;
 	} /* end if (u_tell) */
 	return rs ;
 }
