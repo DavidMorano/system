@@ -1,7 +1,9 @@
-/* opensvc_fshome */
+/* opensvc_fshome SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* LOCAL facility open-service (fshome) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* extra-special debugging */
@@ -9,15 +11,13 @@
 #define	CF_SETENTRY	0		/* need 'subinfo_setentry()' */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 
-
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-
-	This code was started by taking the corresponding code from the
-	TCP-family module.  In retrospect, that was a mistake.  Rather I should
-	have started this code by using the corresponding UUX dialer module.
-
+	This code was started by taking the corresponding code from
+	the TCP-family module.  In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -25,10 +25,10 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is an open-facility-service module.
 
 	Synopsis:
-
 	int opensvc_fshome(pr,prn,of,om,argv,envv,to)
 	const char	*pr ;
 	const char	*prn ;
@@ -39,7 +39,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	of		open-flags
@@ -49,27 +48,24 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
 	<0		error
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/statvfs.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<char.h>
@@ -77,7 +73,7 @@
 #include	<passwdent.h>
 #include	<getusername.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<localmisc.h>
 
 #include	"opensvc_fshome.h"
@@ -115,18 +111,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	statvfsdir(cchar *,STATVFS *) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-
 #if	CF_DEBUGS
 extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
@@ -134,11 +118,6 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 extern int	nprintf(const char *,const char *,...) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
 
 
 /* local structures */
@@ -196,10 +175,10 @@ const char	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	const int	ulen = USERNAMELEN ;
-	const int	llen = LINEBUFLEN ;
+	bits		pargs ;
+	keyopt		akopts ;
+	cint	ulen = USERNAMELEN ;
+	cint	llen = LINEBUFLEN ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -246,7 +225,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -319,7 +298,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -447,7 +426,7 @@ int		to ;
 
 	if (rs >= 0) {
 	if ((rs = subinfo_procuser(sip,lbuf,llen,un)) >= 0) {
-	    const int	ll = rs ;
+	    cint	ll = rs ;
 	    if ((rs = u_pipe(pipes)) >= 0) {
 	        int	wfd = pipes[1] ;
 	        fd = pipes[0] ;
@@ -571,18 +550,16 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (subinfo_setentry) */
 #endif /* CF_SETENTRY */
 
-
-static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un)
-{
+static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un) noex {
 	PASSWDENT	pw ;
-	const int	pwlen = getbufsize(getbufsize_pw) ;
+	cint	pwlen = bufsizeget(bufsize_pw) ;
 	int		f_blocks = sip->fl.blocks ;
 	int		rs ;
 	int		ll = 0 ;
 	char		*pwbuf ;
 
 	if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-	    const int	hlen = MAXPATHLEN ;
+	    cint	hlen = MAXPATHLEN ;
 	    char	hbuf[MAXPATHLEN+1] ;
 
 #if	CF_GETUSERHOME /* not perfect enough for mixed environments */
