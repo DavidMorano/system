@@ -42,16 +42,14 @@ LIBS +=
 
 OBJ0= hash_elf.o hash_djb.o hash_hsieh.o
 OBJ1= hash_again.o 
-OBJ2= hashindex.o
+OBJ2= hashindex.o hashmunch.o
 OBJ3=
 
 OBJ_HASH= obj0.o obj1.o obj2.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -94,11 +92,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ_HASH)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_HASH)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -131,6 +129,7 @@ hash_djb.o:		hash_djb.cc			$(INCS)
 hash_hsieh.o:		hash_hsieh.cc			$(INCS)
 hash_again.o:		hash_again.cc			$(INCS)
 
-hashindex.o:		hashindex.cc hashindex.h	$(INCS)
+hashindex.o:		hashindex.cc	hashindex.h	$(INCS)
+hashmunch.o:		hashmunch.cc	hashmunch.h	$(INCS)
 
 
