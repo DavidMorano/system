@@ -17,7 +17,7 @@
 /* Copyright © 1994,1998 David A­D­ Morano.  All rights reserved. */
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<localmisc.h>
 
