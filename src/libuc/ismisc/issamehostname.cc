@@ -43,7 +43,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstrings>		/* |strncasecmp(3c)| + |strlen(3c)| */
+#include	<cstrings>		/* CSTD |strncasecmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -78,10 +78,10 @@ namespace {
 	    localdomain = ald ;
 	} ;
 	operator bool () noex ;
-	bool tryh1() noex ;
-	bool tryh2() noex ;
+	bool tryh1	() noex ;
+	bool tryh2	() noex ;
     } ; /* end struct (samehelp) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -98,8 +98,7 @@ namespace {
 bool issamehostname(cchar *h1,cchar *h2,cchar *localdomain) noex {
 	samehelp	ho(h1,h2,localdomain) ;
 	return ho ;
-}
-/* end subroutine (issamehostname) */
+} /* end subroutine (issamehostname) */
 
 
 /* local subroutines */
@@ -122,9 +121,9 @@ samehelp::operator bool () noex {
 	    } else {
 	        f = tryh2() ;
 	    }
-	}
+	} /* end if */
 	return f ;
-}
+} /* end method */
 
 bool samehelp::tryh1() noex {
 	cint		len1 = intconv(cp1 - h1) ;
@@ -137,8 +136,7 @@ bool samehelp::tryh1() noex {
 	    }
 	}
 	return f ;
-} 
-/* end method (tryh1) */
+} /* end method (tryh1) */
 
 bool samehelp::tryh2() noex {
 	cint		len1 = lenstr(h1) ;
@@ -151,7 +149,6 @@ bool samehelp::tryh2() noex {
 	    }
 	} /* end if */
 	return f ;
-}
-/* end method (tryh2) */
+} /* end method (tryh2) */
 
 
