@@ -34,21 +34,30 @@
 	Arguments:
 	rbuf		result buffer pointer
 	rsz		result buffer size (not NUL-terminator)
-	ms		source c-string
+	ms		source magic c-string pointer
+	ml		source magic c-string length
 
 	Returns:
 	>=0		length of resulting string
 	<0		error (system-return)
 
+	Notes:
+	1. The given magic string must be one less byte in length than
+	the given result buffer size.  A New-Line (NL) character is
+	always placed into the result buffer after the end of the
+	magic string is placed in there.  And remaining bytes of the
+	result buffer that were not used by the magic string or the
+	trailing NL character are zero-filled.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkmagic.h"
 
@@ -85,20 +94,18 @@ int mkmagic(char *rbuf,int rsz,cchar *ms,int ml) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if ((rsz >= 2) && ms[0]) ylikely {
-	        if (cint mslen = lenstr(ms,ml) ; (mslen+1) <= rsz) ylikely {
+		rs = SR_OVERFLOW ;
+	        if (cint mslen = lenstr(ms,ml) ; (mslen + 1) <= rsz) ylikely {
 	            char	*bp = strwcpy(rbuf,ms,ml) ;
 	            rs = SR_OK ;
 	            *bp++ = '\n' ;
 	            if (cint zl = intconv((rbuf + rsz) - bp) ; zl > 0) {
 	                memclear(bp,zl) ;
 		    }
-	        } else {
-	            rs = SR_OVERFLOW ;
-	        }
+	        } /* end if */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rsz : rs ;
-}
-/* end subroutine (mkmagic) */
+} /* end subroutine (mkmagic) */
 
 
