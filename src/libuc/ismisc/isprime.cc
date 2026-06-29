@@ -27,13 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<math.h>		/* math functions */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<math.h>		/* CSTD math functions */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ismisc.h"
 
@@ -84,7 +83,6 @@ bool isprime(uint n) noex {
 	    } /* end if (number not '1' and not odd) */
 	} /* end if (number not '2') */
 	return f ;
-}
-/* end subroutine (isprime) */
+} /* end subroutine (isprime) */
 
 
