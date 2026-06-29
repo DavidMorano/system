@@ -28,11 +28,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ismisc.h"
 
@@ -67,7 +67,6 @@ bool isdotdir(cchar *dname) noex {
 	    f = f || ((dname[1] == '.') && (dname[2] == '\0')) ;
 	}
 	return f ;
-}
-/* end subroutine (isdotdir) */
+} /* end subroutine (isdotdir) */
 
 
