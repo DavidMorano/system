@@ -20,22 +20,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern bool isFailOpen(int) noex ;
-extern bool isFailConn(int) noex ;
-extern bool isBadSend(int) noex ;
-extern bool isBadRecv(int) noex ;
-extern bool isBadMsg(int) noex ;
-extern bool isIOError(int) noex ;
+extern bool isFailOpen	(int) noex ;
+extern bool isFailConn	(int) noex ;
+extern bool isBadSend	(int) noex ;
+extern bool isBadRecv	(int) noex ;
+extern bool isBadMsg	(int) noex ;
+extern bool isIOError	(int) noex ;
 
-static inline bool isFailIO(int rs) noex {
+local inline bool isFailIO(int rs) noex {
     	return isIOError(rs) ;
 }
 
