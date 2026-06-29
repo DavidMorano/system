@@ -126,11 +126,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_MKX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_MKX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).a:			$(OBJ_MKX)
 	$(AR) $(ARFLAGS) -rc $@ $?
