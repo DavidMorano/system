@@ -57,16 +57,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<dlfcn.h>		/* |RTLD_{xxx}| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdfnames.h>		/* |stdfname(3u)| */
-#include	<matstr.h>
-#include	<localmisc.h>
+#include	<dlfcn.h>		/* POSIX |RTLD_{xxx}| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdfnames.h>		/* LIBU |stdfname(3u)| */
+#include	<matstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ismisc.h"
 
@@ -114,12 +114,10 @@ bool isobjspecial(void *sop) noex {
 	    if (f) break ;
 	} /* end if */
 	return f ;
-}
-/* end subroutine (isobjspecial) */
+} /* end subroutine (isobjspecial) */
 
 bool isfnamespecial(cchar *fp,int fl) noex {
 	return (getstdfname(fp,fl) >= 0) ;
-}
-/* end subroutine (isfnamespecial) */
+} /* end subroutine (isfnamespecial) */
 
 
