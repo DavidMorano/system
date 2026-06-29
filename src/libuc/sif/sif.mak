@@ -99,7 +99,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			objprime.o objimpl.o
@@ -151,7 +151,7 @@ objimpl.o:		$(OBJIMPL)
 
 # module primary
 sif0.o:			sif.ccm $(OBJPART)		$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
 sif1.o:			sif1.cc sif0.o			$(INCS)
