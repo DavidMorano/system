@@ -38,13 +38,18 @@ INCS += sigx.h
 LIBS +=
 
 
+OBJ0= sigaction.o sigdefaults.o
+OBJ1= sigevent.o sigignores.o
+
+OBJA= obj0.o obj1.o
+
+OBJ= $(OBJA)
+
+
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -55,15 +60,7 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ0= sigaction.o sigdefaults.o
-OBJ1= sigevent.o sigignores.o
-
-OBJA= obj0.o obj1.o
-
-OBJ= $(OBJA)
-
-
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -77,6 +74,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -89,9 +89,12 @@ all:			$(ALL)
 .cc.o:
 	$(COMPILE.cc) $<
 
+.ccm.o:
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
 
 $(T).o:			$(OBJ)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ)
+	$(LD) $(LDFLAGS) -r -o $@ $^
 
 $(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
