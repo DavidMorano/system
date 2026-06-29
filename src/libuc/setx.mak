@@ -101,11 +101,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -165,7 +165,7 @@ setint.o:		setint.cc setint.h			$(INCS)
 setoint.o:		setoint.cc setoint.h			$(INCS)
 
 sethand.o:		sethand.ccm				$(INCS)
-	makemodule sethand
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # SETSTRX
 setstrx_loadfile.o:	setstrx_loadfile.cc	setstrx.hh	$(INCS)
