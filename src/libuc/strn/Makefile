@@ -95,11 +95,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_STRN)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_STRN)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -162,7 +162,7 @@ strnwht.o:		strnwht0.o strnwht1.o
 
 # module primary
 strnwht0.o:		strnwht.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
 strnwht1.o:		strnwht1.cc strnwht0.o		$(INCS)
