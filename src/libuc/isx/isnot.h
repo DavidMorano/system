@@ -20,22 +20,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern bool isNotPresent(int) noex ;
-extern bool isNotAccess(int) noex ;
-extern bool isNotValid(int) noex ;
-extern bool isNotLib(int) noex ;
-extern bool isNotTerm(int) noex ;
-extern bool isNotSupport(int) noex ;
+extern bool isNotPresent	(int) noex ;
+extern bool isNotAccess		(int) noex ;
+extern bool isNotValid		(int) noex ;
+extern bool isNotLib		(int) noex ;
+extern bool isNotTerm		(int) noex ;
+extern bool isNotSupport	(int) noex ;
 
-static inline bool isInvalid(int rs) noex {
+local inline bool isInvalid(int rs) noex {
 	return isNotValid(rs) ;
 }
 
