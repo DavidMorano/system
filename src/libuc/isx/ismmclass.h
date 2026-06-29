@@ -32,16 +32,16 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern bool	ismmclass_7bit(int) noex ;
-extern bool	ismmclass_8bit(int) noex ;
+extern bool	ismmclass_7bit	(int) noex ;
+extern bool	ismmclass_8bit	(int) noex ;
 extern bool	ismmclass_binary(int) noex ;
 
 EXTERNC_end
