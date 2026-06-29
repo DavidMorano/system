@@ -41,11 +41,11 @@ define	isleap(y) ((((y) % 4) == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ismisc.h"
 
@@ -71,7 +71,6 @@ bool isleapyear(int y) noex {
 	bool	f = ((y % 4) == 0) ;
 	f = f && (((y % 100) != 0) || ((y % 400) == 0)) ;
 	return f ;
-}
-/* end subroutine (isleapyear) */
+} /* end subroutine (isleapyear) */
 
 
