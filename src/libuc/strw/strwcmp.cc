@@ -43,20 +43,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* |strncasecmp(3c)| */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdclib.hh>		/* |std_strncasecmp(3u)| */
-#include	<nleadstr.h>
-#include	<strnxcmp.h>		/* |strnfoldcmp(3uc)| */
-#include	<toxc.h>
-#include	<localmisc.h>
+#include	<strings.h>		/* CSTD |strncasecmp(3c)| */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdclib.hh>		/* LIBU |std_strncasecmp(3u)| */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<strnxcmp.h>		/* LIBUC |strnfoldcmp(3uc)| */
+#include	<toxc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strwcmp.h"
 
@@ -144,20 +144,17 @@ namespace {
 int strwbasecmp(cchar *s1,cchar *s2,int s2len) noex {
 	basecmpx co ;
 	return co.x(s1,s2,s2len) ;
-}
-/* end subroutine (strwbasecmpx) */
+} /* end subroutine (strwbasecmpx) */
 
 int strwcasecmp(cchar *s1,cchar *s2,int s2len) noex {
 	casecmpx co ;
 	return co.x(s1,s2,s2len) ;
-}
-/* end subroutine (strwcasecmpx) */
+} /* end subroutine (strwcasecmpx) */
 
 int strwfoldcmp(cchar *s1,cchar *s2,int s2len) noex {
 	foldcmpx co ;
 	return co.x(s1,s2,s2len) ;
-}
-/* end subroutine (strwfoldcmpx) */
+} /* end subroutine (strwfoldcmpx) */
 
 
 /* local subroutines */
