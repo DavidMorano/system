@@ -106,11 +106,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_SFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).a:			$(OBJ_SFX)
 	$(AR) $(ARFLAGS) -rc $@ $?
