@@ -46,11 +46,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strwset.h"
 
@@ -92,7 +92,6 @@ char *strwset(char *dp,int ch,int n) noex {
 	    *dp = '\0' ;
 	} /* end if (non-null) */
 	return dp ;
-}
-/* end subroutine (strwset) */
+} /* end subroutine (strwset) */
 
 
