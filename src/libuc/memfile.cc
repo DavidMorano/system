@@ -94,7 +94,7 @@ local inline int memfile_ctor(memfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->dbuf = nullptr ;
 	    op->bp = nullptr ;
 	    op->off = 0 ;
@@ -119,7 +119,7 @@ template<typename ... Args>
 local inline int memfile_magic(memfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MEMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MEMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -150,7 +150,7 @@ int memfile_open(memfile *op,cchar *fname,int of,mode_t om) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
 	 	if ((rs = memfile_opener(op,fname,of,om)) >= 0) ylikely {
-		    op->magic = MEMFILE_MAGIC ;
+		    op->magval = MEMFILE_MAGIC ;
 		}
 	    } /* end if (valid) */
 	    if (rs < 0) {
@@ -178,7 +178,7 @@ int memfile_close(memfile *op) noex {
                 rs1 = memfile_dtor(op) ;
                 if (rs >= 0) rs = rs1 ;
             }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
