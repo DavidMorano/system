@@ -27,15 +27,15 @@
 #include	<pq.h>
 
 
-#define	GRMEMS_MAGIC		0x98643169
-#define	GRMEMS_CURMAGIC		0x9864316a
 #define	GRMEMS			struct grmems_head
 #define	GRMEMS_ST		struct grmems_statdata
 #define	GRMEMS_CUR		struct grmems_cursor
+#define	GRMEMS_MAGIC		0x98643169
+#define	GRMEMS_CURMAGIC		0x9864316a
 
 
 struct grmems_cursor {
-	uint		magic ;
+	uint		magval ;
 	int		ri ;		/* record index */
 	int		i ;		/* index through members */
 } ; /* end struct (grmems_cursor) */
