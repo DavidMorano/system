@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += strn.h
 
-MODS +=
+MODS += strnwht.o
 
 LIBS +=
 
@@ -154,6 +154,8 @@ strnnlen.o:		strnnlen.cc			$(INCS)
 strnset.o:		strnset.cc			$(INCS)
 strncpyxc.o:		strncpyxc.cc	strncpyxc.h	$(INCS)
 strnwcpyxc.o:		strnwcpyxc.cc	strnwcpyxc.h	$(INCS)
+
+mods.o:			$(MODS)
 
 # STRNWHY
 strnwht.o:		strnwht0.o strnwht1.o
