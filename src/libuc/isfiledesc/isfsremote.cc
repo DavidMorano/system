@@ -38,14 +38,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bufsizeget.h>
-#include	<matxstr.h>		/* |matlocalfs(3uc)| */
-#include	<getfstype.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC |matlocalfs(3uc)| */
+#include	<getfstype.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"isfiledesc.h"
 
@@ -90,7 +90,6 @@ int isfsremote(int fd) noex {
 	    }
 	} /* end if (bufsizeget) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (isfsremote) */
+} /* end subroutine (isfsremote) */
 
 
