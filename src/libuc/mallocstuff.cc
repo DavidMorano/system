@@ -30,8 +30,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<usupport.h>		/* |ulogeerror(3u)| */
+#include	<ucmem.h>		/* |mem(3uc)| */
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -80,7 +82,7 @@ char *mallocbuf(void *bp,int µbl) noex {
 	        if ((rs = mem.malloc((bl+1),&rp)) >= 0) {
 		    memcopy(rp,bp,bl) ;
 		    *rp = '\0' ;
-	        } /* end if (memory-allocation) */
+	        } /* end if (memory-acquire) */
 	        if (rs < 0) {
 		    ulogerror("mallocbuf",rs,"uc_malloc") ;
 	        }
