@@ -97,7 +97,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
@@ -138,10 +138,9 @@ objb.o:			$(OBJB)
 
 
 memtrack0.o:			memtrack.ccm			$(INCS)
-	makemodule memtrack
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-memtrack1.o:			memtrack1.cc memtrack.ccm	$(INCS)
-	makemodule memtrack
+memtrack1.o:			memtrack1.cc memtrack0.o	$(INCS)
 	$(COMPILE.cc) $<
 
 
