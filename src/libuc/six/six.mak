@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += six.h
 
-MODS +=
+MODS += siwht.o
 
 LIBS +=
 
@@ -49,10 +49,13 @@ OBJ5= sidquote.o sixterm.o siext.o
 OBJ6= sixchr.o sixbrk.o sixsub.o siwht.o
 OBJ7= sileadzero.o sileadchr.o
 
+OBJ8= substring.o
+
 OBJA= obj0.o obj1.o obj2.o obj3.o 
 OBJB= obj4.o obj5.o obj6.o obj7.o
+OBJC= obj8.o
 
-OBJ= obja.o objb.o
+OBJ= obja.o objb.o objc.o
 
 
 INCDIRS +=
@@ -143,10 +146,17 @@ obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj8.o:			$(OBJ8)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objc.o:			$(OBJC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -175,6 +185,8 @@ sinon.o:		sinon.cc	sinon.h		$(INCS)
 sichar.o:		sichar.cc	sichar.h	$(INCS)
 sileadchr.o:		sileadchr.cc	sileadchr.h	$(INCS)
 
+mods.o:			$(MODS)
+
 # SIWHT
 siwht.o:		siwht0.o siwht1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
@@ -191,5 +203,8 @@ siwht1.o:		siwht1.cc siwht0.o strn.o	$(INCS)
 strn.o:			strn.dir
 strn.dir:
 	makesubdir $@
+
+substring.o:		substring.cc	substring.h	$(INCS)
+
 
 
