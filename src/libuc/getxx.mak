@@ -96,11 +96,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_GETXX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_GETXX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -113,6 +113,7 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
 
 obj0_getxx.o:	$(OBJ0_GETXX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
