@@ -110,7 +110,7 @@ static inline int userattrdb_ctor(userattrdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->init = {} ;
 	    op->have = {} ;
 	    op->username = nullptr ;
@@ -132,7 +132,7 @@ template<typename ... Args>
 static int userattrdb_magic(userattrdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == USERATTRDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == USERATTRDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (userattrdb_magic) */
@@ -163,7 +163,7 @@ int userattrdb_open(uad *op,cchar *username) noex {
 	    if (username[0]) ylikely {
 		rs = SR_OK ;
 	        op->username = username ;
-	        op->magic = USERATTRDB_MAGIC ;
+	        op->magval = USERATTRDB_MAGIC ;
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		userattrdb_dtor(op) ;
@@ -192,7 +192,7 @@ int userattrdb_close(uad *op) noex {
 		rs1 = userattrdb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
