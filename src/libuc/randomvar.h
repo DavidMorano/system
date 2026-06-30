@@ -56,7 +56,7 @@ struct randomvar_head {
 	ulong		*state ;
 	time_t		laststir ;
 	RANDOMVAR_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		maintcount ;
 	int		a, b, c ;
 } ;
