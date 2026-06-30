@@ -239,7 +239,7 @@ template<typename ... Args>
 local inline int spawner_magic(spawner *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SPAWNER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SPAWNER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (spawner_magic) */
@@ -353,7 +353,7 @@ int spawner_start(spawner *op,cchar *fn,mainv av,mainv ev) noex {
 		    op->argv = av ;
 		    op->pid = -1 ;
 		    if (starter so(op,fn,av,ev) ; (rs = so) >= 0) ylikely {
-			op->magic = SPAWNER_MAGIC ;
+			op->magval = SPAWNER_MAGIC ;
 		    }
 		} /* end if (mkvars) */
 	    } /* end if (valid) */
