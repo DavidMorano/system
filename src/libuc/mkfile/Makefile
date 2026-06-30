@@ -95,11 +95,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).o:			$(OBJ_MKFILE) Makefile
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_MKFILE)
+$(T).o:			$(OBJ_MKFILE)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
