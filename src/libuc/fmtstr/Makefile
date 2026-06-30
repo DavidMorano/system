@@ -109,11 +109,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -169,7 +169,7 @@ fmtobj.o:		fmtobj0.o fmtobj1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 fmtobj0.o:		fmtobj.ccm $(DEPS_OBJ)			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 fmtobj1.o:		fmtobj1.cc fmtobj0.o $(DEPS_OBJ)	$(INCS)
 	$(COMPILE.cc) $<
@@ -180,7 +180,7 @@ fmtsub.o:		$(MOBJ_SUB)				$(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ_SUB)
 
 fmtsub0.o:		fmtsub.ccm $(DEPS_SUB)			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 fmtsub1.o:		fmtsub1.cc fmtsub0.o $(DEPS_SUB)	$(INCS)
 	$(COMPILE.cc) $<
@@ -198,7 +198,7 @@ fmtspec.o:		fmtspec0.o fmtspec1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 fmtspec0.o:		fmtspec.ccm $(DEPS_SPEC)		$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 fmtspec1.o:		fmtspec1.cc fmtspec0.o $(DEPS_SPEC)	$(INCS)
 	$(COMPILE.cc) $<
@@ -208,13 +208,13 @@ fmtutil.o:		fmtutil0.o fmtutil1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 fmtutil0.o:		fmtutil.ccm $(DEPS_UTIL)		$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 fmtutil1.o:		fmtutil1.cc fmtutil0.o $(DEPS_UTIL)	$(INCS)
 	$(COMPILE.cc) $<
 
 cvtfloat.o:		cvtfloat.ccm fmtflag.o $(DEPS_CVTFLOAT)	$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 fmtflag.o:		fmtflag.dir
 fmtflag.dir:
