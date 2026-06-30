@@ -46,7 +46,7 @@ struct nodedb_head {
 	vecobj		*filep ;		/* files-pointer */
 	hdb		*entsp ;		/* entries-pointer */
 	time_t		checktime ;
-	uint		magic ;
+	uint		magval ;
 	int		cursors ;
 	int		entbuflen ;		/* <- public member */
 } ; /* end struct (nodedb_head) */
