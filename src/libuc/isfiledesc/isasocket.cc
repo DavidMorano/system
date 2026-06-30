@@ -74,7 +74,7 @@ constexpr int	rsock[] = {
 	SR_OPNOTSUPP,
 	SR_NOTSUP,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -95,15 +95,13 @@ int isasocket(int fd) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (isasocket) */
+} /* end subroutine (isasocket) */
 
 
 /* local subroutines */
 
 local bool isNotSock(int rs) noex {
 	return isOneOf(rsock,rs) ;
-}
-/* end subroutine (isNotSock) */
+} /* end subroutine (isNotSock) */
 
 
