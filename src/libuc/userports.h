@@ -56,7 +56,7 @@ struct userports_head {
 	cchar		*fname ;
 	USERPORTS_FI	fi ;
 	USERPORTS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ;
 
 typedef	USERPORTS	userports ;
