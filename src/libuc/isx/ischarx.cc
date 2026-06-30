@@ -184,16 +184,16 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bitset>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bitset>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ischarx.h"
 
@@ -217,7 +217,7 @@ using std::bitset ;			/* type */
 
 /* local structures */
 
-constexpr int   chtablen = (UCHAR_MAX+1) ;
+constexpr int   chtablen = (UCHAR_MAX + 1) ;
 
 namespace {
     struct charmgr {
