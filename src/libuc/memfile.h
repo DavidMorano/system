@@ -37,7 +37,7 @@ struct memfile_head {
 	size_t		off ;
 	size_t		dlen ;
 	size_t		fsize ;
-	uint		magic ;
+	uint		magval ;
 	int		pagesz ;
 	int		fd ;
 } ; /* end struct (memfile_head) */
