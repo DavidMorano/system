@@ -80,7 +80,7 @@ struct spawner_head {
 	envhelp		*envp ;
 	pid_t		pid ;
 	pid_t		pgrp ;
-	uint		magic ;
+	uint		magval ;
 	int		opts ;
 } ; /* end struct (spawner_head) */
 
