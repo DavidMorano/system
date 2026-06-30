@@ -61,7 +61,7 @@ local int thrcomm_ctor(thrcomm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->cmd = 0 ;
 	    op->rrs = 0 ;
 	    op->f_cmd = {} ;
@@ -96,7 +96,7 @@ template<typename ... Args>
 local inline int thrcomm_magic(thrcomm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == THRCOMM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == THRCOMM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (thrcomm_magic) */
@@ -121,7 +121,7 @@ int thrcomm_start(thrcomm *op,int f_shared) noex {
 	    ptm *mxp = op->mxp ;
 	    if ((rs = thrcomm_ptminit(op,f_shared)) >= 0) ylikely {
 	        if ((rs = thrcomm_ptcinit(op,f_shared)) >= 0) ylikely {
-		    op->magic = THRCOMM_MAGIC ;
+		    op->magval = THRCOMM_MAGIC ;
 		}
 	        if (rs < 0) {
 		    mxp->destroy() ;
@@ -153,7 +153,7 @@ int thrcomm_finish(thrcomm *op) noex {
 	        rs1 = thrcomm_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
