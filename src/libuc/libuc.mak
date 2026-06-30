@@ -159,7 +159,7 @@ a:			$(T).a
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).so:		$(OBJ) Makefile
@@ -454,7 +454,7 @@ ucproject.o:		ucproject.cc ucproject.h
 
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # MEMTRACK
 memtrack.o:		memtrack.dir
@@ -1107,15 +1107,15 @@ strenv.o:		strenv.cc	strenv.hh	$(INCS)
 
 # BSTREE
 bstree.o:		bstree.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # SVIEW
 sview.o:		sview.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # BUFSIZEDATA
 bufsizedata.o:		bufsizedata.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 obj00_mod.o:		$(OBJ00_MOD)
