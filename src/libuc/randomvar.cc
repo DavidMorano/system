@@ -178,7 +178,7 @@ template<typename ... Args>
 local inline int randomvar_magic(randomvar *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == RANDOMVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == RANDOMVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (randomvar_magic) */
@@ -243,7 +243,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 	            op->a = COF(67) ;
 	            op->b = COF(23) ;
 	            op->c = COF(0) ;
-	            op->magic = RANDOMVAR_MAGIC ;
+	            op->magval = RANDOMVAR_MAGIC ;
 		    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 			ulong	dummy ;
 			rs = randomvar_getulong(op,&dummy) ;
@@ -252,7 +252,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 		if (rs < 0) {
 		    lm_free(op->state) ;
 		    op->state = nullptr ;
-		    op->magic = 0 ;
+		    op->magval = 0 ;
 		} /* end if (error) */
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
@@ -268,7 +268,7 @@ int randomvar_finish(randomvar *op) noex {
 		rs1 = lm_free(op->state) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
