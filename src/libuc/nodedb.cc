@@ -185,7 +185,7 @@ local inline int nodedb_ctor(nodedb *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->checktime = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->cursors = 0 ;
 	    if ((op->filep = new(nothrow) vecobj) != np) ylikely {
 	        if ((op->entsp = new(nothrow) hdb) != np) ylikely {
@@ -217,7 +217,7 @@ template<typename ... Args>
 local inline int nodedb_magic(nodedb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == NODEDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == NODEDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (nodedb_magic) */
@@ -285,11 +285,11 @@ int nodedb_open(ND *op,cchar *fname) noex {
 	                if ((rs = hdb_start(elp,hn,0,np,np)) >= 0) {
 		    	    op->entbuflen = var.entbuflen ;
 	                    op->checktime = getustime ;
-	                    op->magic = NODEDB_MAGIC ;
+	                    op->magval = NODEDB_MAGIC ;
 	                    if (fname && fname[0]) {
 	                        rs = nodedb_fileadd(op,fname) ;
 	                        if (rs < 0) {
-	                            op->magic = 0 ;
+	                            op->magval = 0 ;
 	                        }
 	                    } /* end if (had an optional file) */
 	                    if (rs < 0) {
@@ -334,7 +334,7 @@ int nodedb_close(ND *op) noex {
 	        rs1 = nodedb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
