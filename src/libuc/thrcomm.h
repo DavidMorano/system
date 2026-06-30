@@ -26,7 +26,7 @@
 struct thrcomm_head {
 	ptm		*mxp ;
 	ptc		*cvp ;
-	uint		magic ;
+	uint		magval ;
 	volatile int	cmd ;
 	volatile int	rrs ;
 	volatile int	f_cmd ;
