@@ -186,7 +186,7 @@ template<typename ... Args>
 local int grmems_magic(grmems *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == GRMEMS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == GRMEMS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (grmems_magic) */
@@ -257,7 +257,7 @@ int grmems_start(grmems *op,int nmax,int ttl) noex {
 	        if ((rs = pq_start(op->lrup)) >= 0) ylikely {
 	            op->nmax = nmax ;
 	            op->ttl = ttl ;
-	            op->magic = GRMEMS_MAGIC ;
+	            op->magval = GRMEMS_MAGIC ;
 	        }
 	    } /* end if (vars) */
 	    if (rs < 0) {
@@ -306,7 +306,7 @@ int grmems_finish(grmems *op) noex {
 		rs1 = grmems_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -319,7 +319,7 @@ int grmems_curbegin(grmems *op,grmems_cur *curp) noex {
 	    curp->ri = -1 ;
 	    curp->i = -1 ;
 	    op->cursors += 1 ;
-	    curp->magic = GRMEMS_CURMAGIC ;
+	    curp->magval = GRMEMS_CURMAGIC ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -329,12 +329,12 @@ int grmems_curend(grmems *op,grmems_cur *curp) noex {
 	int		rs ;
 	if ((rs = grmems_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == GRMEMS_CURMAGIC) ylikely {
+	    if (curp->magval == GRMEMS_CURMAGIC) ylikely {
 		rs = SR_OK ;
 	        if (op->cursors > 0) op->cursors -= 1 ;
 	        curp->ri = -1 ;
 	        curp->i = -1 ;
-	        curp->magic = 0 ;
+	        curp->magval = 0 ;
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return rs ;
@@ -346,7 +346,7 @@ int grmems_lookup(grmems *op,grmems_cur *curp,cchar *gnp,int gnl) noex {
 	int		ri = 0 ;
 	if ((rs = grmems_magic(op,curp,gnp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == GRMEMS_CURMAGIC) ylikely {
+	    if (curp->magval == GRMEMS_CURMAGIC) ylikely {
 		rs = SR_INVALID ;
 	        if (gnp[0]) {
 		    rs = SR_OK ;
@@ -384,7 +384,7 @@ int grmems_lookread(grmems *op,grmems_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = grmems_magic(op,curp,rbuf)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == GRMEMS_CURMAGIC) ylikely {
+	    if (curp->magval == GRMEMS_CURMAGIC) ylikely {
 		rs = SR_OK ;
 	        if (op->recs == nullptr) {
 	            rs = grmems_starter(op) ;
