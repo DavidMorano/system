@@ -180,7 +180,7 @@ template<typename ... Args>
 local int userports_magic(userports *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == USERPORTS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == USERPORTS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (userports_magic) */
@@ -255,7 +255,7 @@ int userports_close(UP *op) noex {
 		rs1 = userports_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -389,7 +389,7 @@ local int userports_opener(UP *op,cchar *fname) noex {
 	        if ((rs = vecpstr_start(op->plp,dents,dsize,0)) >= 0) {
 	            if ((rs = vecpstr_start(op->olp,dents,dsize,0)) >= 0) {
 	                if ((rs = userports_procfile(op)) >= 0) {
-	                    op->magic = USERPORTS_MAGIC ;
+	                    op->magval = USERPORTS_MAGIC ;
 	                } /* end if (procfile) */
 		        if (rs < 0) {
 		            vecpstr_finish(op->olp) ;
