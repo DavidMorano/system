@@ -1128,13 +1128,12 @@ local int disp_start(DISP *dop,DISP_ARGS *dap) noex {
 local int disp_starter(DISP *dop) noex {
 	cint		sz = (dop->nthr * szof(DISP_THR)) ;
 	int		rs ;
-	if (void *p ; (rs = lm_mall(sz,&p)) >= 0) ylikely {
+	if (void *p ; (rs = lm_call(1,sz,&p)) >= 0) ylikely {
 	    DISP_THR	*dtp ;
 	    pthread_t	tid ;
 	    uptsub_f	sub = uptsub_f(disp_worker) ;
 	    int		i ; /* used-afterwards */
 	    dop->threads = (DISP_THR *) p ;
-	    memset(p,0,sz) ;
 	    for (i = 0 ; i < dop->nthr ; i += 1) {
 	        dtp = (dop->threads+i) ;
 	        if ((rs = uptcreate(&tid,nullptr,sub,dop)) >= 0) {
