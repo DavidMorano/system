@@ -48,35 +48,38 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<sys/timeb.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<bufsizevar.hh>
-#include	<linebuffer.h>
-#include	<estrings.h>
-#include	<ascii.h>
-#include	<filer.h>
-#include	<storeitem.h>
-#include	<linebuffer.h>
-#include	<initnow.h>
-#include	<dater.h>
-#include	<timestr.h>
-#include	<cfdec.h>
-#include	<ctdec.h>
-#include	<strn.h>		/* |strnblanks(3uc)| */
-#include	<sfx.h>
-#include	<strwcmp.h>
-#include	<isnot.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/timeb.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetpid.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<linebuffer.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<linebuffer.h>		/* LIBUC */
+#include	<initnow.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnblanks(3uc)| */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"useraccdb.h"
@@ -125,24 +128,6 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_getpid() noex ;
-    extern int uc_stat(cchar *,ustat *) noex ;
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_moveup(int,int) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_lockf(int,int,off_t) noex ;
-    extern int uc_readln(int,void *,int) noex ;
-    extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_writedesc(int,int,int) noex ;
-    extern int uc_rewind(int) noex ;
-    extern int uc_seek(int,off_t,int) noex ;
-    extern int uc_setappend(int,int) noex ;
-    extern int uc_ftruncate(int,off_t) noex ;
-    extern int uc_setappend(int,int) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-} /* end extern */
-
 
 /* external variables */
 
@@ -188,7 +173,7 @@ local int useraccdb_ctor(UAD *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->eo = -1 ;
 	    op->fd = -1 ;
 	    if ((op->dmp = new(nothrow) dater) != np) ylikely {
@@ -214,7 +199,7 @@ template<typename ... Args>
 local int useraccdb_magic(UAD *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == USERACCDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == USERACCDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (useraccdb_magic) */
@@ -243,13 +228,10 @@ local int	mkts(char *,int,time_t) noex ;
 
 /* local variables */
 
-static bufsizevar	maxpathlen(bufsize_mp) ;
-
-constexpr int		diglen = DIGBUFLEN ;
-
-constexpr char		totaluser[] = TOTALNAME ;
-
-cbool			f_comment = false ;
+static bufsizevar	maxpathlen	(bufsize_mp) ;
+constexpr int		diglen		= DIGBUFLEN ;
+constexpr char		totaluser[]	= TOTALNAME ;
+cbool			f_comment	= false ;
 
 
 /* exported variables */
@@ -279,7 +261,7 @@ int useraccdb_open(UAD *op,cchar *pr,cchar *dbname) noex {
 		                if ((rs = lm_strw(fname,pl,&cp)) >= 0) {
 		                    op->fname = cp ;
 		                    if ((rs = useraccdb_fileopen(op)) >= 0) {
-			                op->magic = USERACCDB_MAGIC ;
+			                op->magval = USERACCDB_MAGIC ;
 		                    }
 		                    if (rs < 0) {
 					void *vp = voidp(op->fname) ;
@@ -296,11 +278,10 @@ int useraccdb_open(UAD *op,cchar *pr,cchar *dbname) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		useraccdb_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (useraccdb_ctor) */
 	return rs ;
-}
-/* end subroutine (useraccdb_open) */
+} /* end subroutine (useraccdb_open) */
 
 int useraccdb_close(UAD *op) noex {
 	int		rs ;
@@ -325,11 +306,10 @@ int useraccdb_close(UAD *op) noex {
 		rs1 = useraccdb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (useraccdb_close) */
+} /* end subroutine (useraccdb_close) */
 
 int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,cc *user) noex {
 	int		rs ;
@@ -374,8 +354,7 @@ int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,cc *user) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (useraccdb_find) */
+} /* end subroutine (useraccdb_find) */
 
 int useraccdb_update(UAD *op,cchar *user,cchar *name) noex {
 	int		rs ;
@@ -400,8 +379,7 @@ int useraccdb_update(UAD *op,cchar *user,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (useraccdb_update) */
+} /* end subroutine (useraccdb_update) */
 
 int useraccdb_curbegin(UAD *op,UAD_CUR *curp) noex {
 	int		rs ;
@@ -419,8 +397,7 @@ int useraccdb_curbegin(UAD *op,UAD_CUR *curp) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (useraccdb_curbegin) */
+} /* end subroutine (useraccdb_curbegin) */
 
 int useraccdb_curend(UAD *op,UAD_CUR *curp) noex {
 	int		rs ;
@@ -518,8 +495,7 @@ int useraccdb_curenum(UAD *op,UAD_CUR *curp,UAD_ENT *ep,
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (useraccdb_curenum) */
+} /* end subroutine (useraccdb_curenum) */
 
 int useraccdb_check(UAD *op,time_t ti_now) noex {
 	int		rs ;
@@ -529,8 +505,7 @@ int useraccdb_check(UAD *op,time_t ti_now) noex {
 	    if (ti_now == 1) f_changed = true ; /* fake out LINT */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (useraccdb_check) */
+} /* end subroutine (useraccdb_check) */
 
 
 /* private subroutines */
@@ -544,8 +519,7 @@ local int useraccdb_openlock(UAD *op) noex {
 	    rs = useraccdb_lock(op,true) ;
 	}
 	return rs ;
-}
-/* end subroutine (useraccdb_openlock) */
+} /* end subroutine (useraccdb_openlock) */
 
 local int useraccdb_fileopen(UAD *op) noex {
 	int		rs = SR_OK ;
@@ -568,8 +542,7 @@ local int useraccdb_fileopen(UAD *op) noex {
 	    } /* end if (open) */
 	} /* end if (open was needed) */
 	return rs ;
-}
-/* end subroutine (useraccdb_fileopen) */
+} /* end subroutine (useraccdb_fileopen) */
 
 local int useraccdb_fileclose(UAD *op) noex {
 	int		rs = SR_OK ;
@@ -578,8 +551,7 @@ local int useraccdb_fileclose(UAD *op) noex {
 	    op->fd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (useraccdb_fileclose) */
+} /* end subroutine (useraccdb_fileclose) */
 
 local int useraccdb_lock(UAD *op,int f) noex {
 	int		rs = SR_OK ;
@@ -601,8 +573,7 @@ local int useraccdb_lock(UAD *op,int f) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (useraccdb_lock) */
+} /* end subroutine (useraccdb_lock) */
 
 local int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
 	int		rs = SR_OK ;
@@ -624,8 +595,7 @@ local int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
 	    rs = SR_INVALID ;
 	}
 	return rs ;
-}
-/* end subroutine (useraccdb_recproc) */
+} /* end subroutine (useraccdb_recproc) */
 
 local int useraccdb_doit(UAD *op,time_t *timep,cc *tsp,int tsl) noex {
 	int		rs = SR_OK ;
@@ -648,8 +618,7 @@ local int useraccdb_doit(UAD *op,time_t *timep,cc *tsp,int tsl) noex {
 	    rs = dater_gettime(op->dmp,timep) ;
 	}
 	return rs ;
-}
-/* end subroutine (useraccdb_doit) */
+} /* end subroutine (useraccdb_doit) */
 
 local int useraccdb_updater(UAD *op,UPI *uip) noex {
 	int		rs ;
@@ -674,8 +643,7 @@ local int useraccdb_updater(UAD *op,UPI *uip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (useraccdb_updater) */
+} /* end subroutine (useraccdb_updater) */
 
 local int upinfo_start(UPI *uip,UAD *op,cc *au,cc *an) noex {
     	int		rs = SR_BUGCHECK ;
@@ -690,8 +658,7 @@ local int upinfo_start(UPI *uip,UAD *op,cc *au,cc *an) noex {
 	    rs = mkts(uip->tbuf,UAFILE_LDATE,uip->utime) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (upinfo_start) */
+} /* end subroutine (upinfo_start) */
 
 local int upinfo_finish(UPI *uip) noex {
 	int		rs = SR_FAULT ;
@@ -699,8 +666,7 @@ local int upinfo_finish(UPI *uip) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (upinfo_finish) */
+} /* end subroutine (upinfo_finish) */
 
 local int upinfo_match(UPI *uip,off_t ro,UAD_REC *recp) noex {
 	UPI_REC		*urp = nullptr ;
@@ -731,8 +697,7 @@ local int upinfo_match(UPI *uip,off_t ro,UAD_REC *recp) noex {
 	    rc = (uip->user.found && uip->total.found) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (upinfo_match) */
+} /* end subroutine (upinfo_match) */
 
 local int upinfo_update(UPI *uip) noex {
 	UPI_REC		*urp ;
@@ -746,8 +711,7 @@ local int upinfo_update(UPI *uip) noex {
 	    rs = upinfo_upone(uip,urp,1) ;
 	}
 	return rs ;
-}
-/* end subroutine (upinfo_update) */
+} /* end subroutine (upinfo_update) */
 
 local int upinfo_upone(UPI *uip,UPI_REC *urp,int type) noex {
 	cint		rlen = UAFILE_RECLEN ;
@@ -765,8 +729,7 @@ local int upinfo_upone(UPI *uip,UPI_REC *urp,int type) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (upinfo_upone) */
+} /* end subroutine (upinfo_upone) */
 
 local int upinfo_mkrec(UPI *uip,UPI_REC *urp,char *rbuf,int rlen,
 		int type) noex {
@@ -810,8 +773,7 @@ local int upinfo_mkrec(UPI *uip,UPI_REC *urp,char *rbuf,int rlen,
 	    } /* end if */
 	} /* end if (valid) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (upinfo_mkrec) */
+} /* end subroutine (upinfo_mkrec) */
 
 local int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
@@ -855,8 +817,7 @@ local int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 	    }
 	} /* end if (strnchr) */
 	return rs ;
-}
-/* end subroutine (rec_parse) */
+} /* end subroutine (rec_parse) */
 
 local int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
 	int		rs ;
@@ -877,8 +838,7 @@ local int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (storeitem) */
 	return rs ;
-}
-/* end subroutine (entry_load) */
+} /* end subroutine (entry_load) */
 
 local int mkts(char *tbuf,int tlen,time_t t) noex {
 	int		tl = 0 ;
@@ -889,7 +849,6 @@ local int mkts(char *tbuf,int tlen,time_t t) noex {
 	    strnblanks(bp,bl) ;
 	}
 	return tl ;
-}
-/* end subroutine (mkts) */
+} /* end subroutine (mkts) */
 
 
