@@ -178,7 +178,6 @@ import uconstants ;			/* |sysword(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -408,11 +407,10 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	    } /* end if (vars::mkvars) */
 	    if (rs < 0) {
 		userinfo_dtor(uip) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (userinfo_ctor) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (userinfo_start) */
+} /* end subroutine (userinfo_start) */
 
 int userinfo_finish(UI *op) noex {
 	int		rs ;
@@ -422,7 +420,7 @@ int userinfo_finish(UI *op) noex {
 	        rs1 = lm_free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 	        rs1 = userinfo_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -430,18 +428,16 @@ int userinfo_finish(UI *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (userinfo_finish) */
+} /* end subroutine (userinfo_finish) */
 
 
 /* local subroutines */
 
 local int userinfo_process(UI *uip,strstore *stp,int *sis,cchar *un) noex {
-	PCI	pi ;
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = procinfo_start(&pi,uip,stp,sis)) >= 0) ylikely {
+	if (PCI pi ; (rs = procinfo_start(&pi,uip,stp,sis)) >= 0) ylikely {
 	    {
 	        rs = procinfo_find(&pi,un) ;
 		rv = rs ;
@@ -637,7 +633,7 @@ local int procinfo_finish(PCI *pip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    pip->pwbuf = nullptr ;
 	    pip->pwlen = 0 ;
-	}
+	} /* end if (memory-release) */
 	{
 	    rs1 = bits_finish(&pip->have) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -646,7 +642,7 @@ local int procinfo_finish(PCI *pip) noex {
 	    rs1 = lm_free(pip->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    pip->a = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (procinfo_finish) */
 
@@ -666,7 +662,7 @@ local int procinfo_store(PCI *pip,int uit,cc *vp,int vl,cc **rpp) noex {
 	}
 	if (rpp && (rs < 0)) {
 	    *rpp = nullptr ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end subroutine (procinfo_store) */
 
@@ -690,7 +686,7 @@ local int procinfo_uabegin(PCI *pip) noex {
 	                lm_free(pip->uap) ;
 	                pip->uap = nullptr ;
 	                pip->fl.allocua = false ;
-		    }
+		    } /* end if (memory-release) */
 		    if (isNotPresent(rs)) rs = SR_OK ;
 		}
 	    } /* end if (ok) */
@@ -711,7 +707,7 @@ local int procinfo_uaend(PCI *pip) noex {
 	    pip->uap = nullptr ;
 	    pip->fl.allocua = false ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (procinfo_uaend) */
 
@@ -800,7 +796,7 @@ local int procinfo_pwentry(PCI *pip,cchar *un) noex {
 	            }
 	            if (rs < 0) {
 	                lm_free(p) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (memory-acquire) */
 	    } /* end if (passwdent_size) */
 	} /* end if (procinfo_getpwuser) */
@@ -1513,10 +1509,9 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	int		sz = 0 ;
 	if (oup && ubuf) ylikely {
 	    rs = SR_TOOBIG ;
-	    if (ulen >= var.nodenamelen) {
-	        userinfo	u ;
-	        memset(ubuf,0,ulen) ;
-	        if ((rs = userinfo_start(&u,un)) >= 0) ylikely {
+	    if ((ulen < 0) && (ulen >= var.nodenamelen)) {
+	        memnset(ubuf,0,ulen) ;
+	        if (userinfo u ; (rs = userinfo_start(&u,un)) >= 0) ylikely {
 	            if (storeitem si ; (rs = si.start(ubuf,ulen)) >= 0) {
 	                cchar	*sp ;
 	                cchar	**rpp ;
