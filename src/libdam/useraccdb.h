@@ -13,19 +13,19 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/stat.h>		/* system types */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<filer.h>
-#include	<dater.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<sys/stat.h>		/* POSIX system types */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<filer.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
 
 
-#define	USERACCDB_MAGIC		0x11359299
 #define	USERACCDB		struct useraccdb_head
 #define	USERACCDB_FL		struct useraccdb_flags
 #define	USERACCDB_CUR		struct useraccdb_cursor
 #define	USERACCDB_ENT		struct useraccdb_entry
+#define	USERACCDB_MAGIC		0x11359299
 
 
 struct useraccdb_entry {
@@ -54,7 +54,7 @@ struct useraccdb_head {
 	ino_t		ino ;
 	dev_t		dev ;
 	USERACCDB_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
 } ; /* end struct */
 
