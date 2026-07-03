@@ -104,6 +104,9 @@ namespace libu {
 	    cc *s6) noex {
 	return strdcpyx(dp,dl,6,s1,s2,s3,s4,s5,s6) ;
     } /* end subroutine (strdcpy6) */
+} /* end namespace */
+
+namespace libu {
     char *strdcpyx(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	if (dp) {
