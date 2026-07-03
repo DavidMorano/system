@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdint.h>
-#include	<clanguage.h>
+#include	<stdint.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
 
 
 /* non-constants */
