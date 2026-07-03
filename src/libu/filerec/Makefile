@@ -99,7 +99,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			objprime.o objimpl.o
@@ -150,7 +150,7 @@ objimpl.o:		$(OBJIMPL)
 
 # module primary
 filerec0.o:		filerec.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
 filerec1.o:		filerec1.cc filerec0.o		$(INCS)
