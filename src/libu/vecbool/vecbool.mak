@@ -92,7 +92,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
@@ -126,7 +126,7 @@ objb.o:			$(OBJB)
 
 
 vecbool0.o:		vecbool.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 vecbool1.o:		vecbool1.cc vecbool0.o		$(INCS)
 	$(COMPILE.cc) $<
