@@ -55,7 +55,7 @@ OBJ10= usupport_strnchar.o usupport_strnwht.o
 OBJ11= usupport_strkeycmp.o usupport_strwcmp.o
 
 OBJ12= usupport_strncmp.o usupport_strnkeycmp.o
-OBJ13= usupport_strncpyxc.o 
+OBJ13= usupport_strncpyxc.o usupport_strnset.o
 OBJ14= usupport_sichar.o usupport_sispan.o
 OBJ15= usupport_sixchr.o usupport_siwhtx.o
 
@@ -123,7 +123,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
@@ -275,6 +275,7 @@ usupport_strkeycmp.o:	usupport_strkeycmp.cc	usupport_strkeycmp.hh	$(INCS)
 usupport_strnchar.o:	usupport_strnchar.cc	usupport_strnchar.hh	$(INCS)
 usupport_strncmp.o:	usupport_strncmp.cc	usupport_strncmp.hh	$(INCS)
 usupport_strncpyxc.o:	usupport_strncpyxc.cc	usupport_strncpyxc.hh	$(INCS)
+usupport_strnset.o:	usupport_strnset.cc	usupport_strnset.hh	$(INCS)
 usupport_strnxchr.o:	usupport_strnxchr.cc	usupport_strnxchr.hh	$(INCS)
 usupport_strnxbrk.o:	usupport_strnxbrk.cc	usupport_strnxbrk.hh	$(INCS)
 usupport_strnkeycmp.o:	usupport_strnkeycmp.cc	usupport_strnkeycmp.hh	$(INCS)
