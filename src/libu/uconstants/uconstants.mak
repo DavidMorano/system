@@ -89,7 +89,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_UCONSTS) Makefile
@@ -115,7 +115,7 @@ control:
 
 # UCONSTANTS
 uconstants0.o:		uconstants.ccm $(DEP_UCONST)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 uconstants_def.o:	uconstants_def.cc uconstants.ccm $(DEP_UCONST)
 	$(COMPILE.cc) $<
