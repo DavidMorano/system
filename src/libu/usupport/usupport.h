@@ -62,11 +62,12 @@
 #include	<usupport_strncmp.hh>
 #include	<usupport_strncpyxc.hh>
 #include	<usupport_strnkeycmp.hh>
-#include	<usupport_strwcmp.hh>
 #include	<usupport_strnchar.hh>
+#include	<usupport_strnset.hh>
 #include	<usupport_strnwht.hh>
 #include	<usupport_strnxchr.hh>
 #include	<usupport_strnxbrk.hh>
+#include	<usupport_strwcmp.hh>
 #include	<usupport_strwcpy.hh>
 #include	<usupport_strxxxxcmp.hh>
 #include	<usupport_toxc.hh>
