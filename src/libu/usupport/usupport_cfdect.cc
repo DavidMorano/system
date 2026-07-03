@@ -137,7 +137,7 @@ namespace libu {
 	        } /* end if (test for negative) */
 		if ((rs = cfloop(sp,sl,&res)) >= 0) ylikely {
 	            if (fneg) {
-		        res = (- res) ;
+		        res = (neg res) ;
 		    }
 		} /* end if (cfloop) */
 	    } /* end if (valid) */
@@ -223,7 +223,7 @@ local int cfloop(cchar *sp,int sl,int *rp) noex {
 	if ((rs >= 0) && (sl > 0)) {
 	    rs = convert(sp,sl,0,&inc) ;
 	    res += inc ;
-	}
+	} /* end if (trailing component) */
 	*rp = res ;
 	DPRINTF("ret rs=%d v=%d\n",rs,res) ;
 	return rs ;
