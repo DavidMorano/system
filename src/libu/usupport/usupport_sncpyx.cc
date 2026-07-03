@@ -44,9 +44,9 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| + |va_arg(3c)| */
 #include	<cstring>		/* CSTD |strlcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usupport_sncpyx.hh"
 
@@ -85,9 +85,9 @@ namespace libu {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	char		*bp = dp ;
 	if (dl < 0) dl = (INT_MAX - 1) ;
 	if (dp) {
+	    char	*bp = dp ;
 	    size_t	rlen = (dl + 1) ;
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
