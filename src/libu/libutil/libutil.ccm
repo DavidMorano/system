@@ -29,6 +29,7 @@ export import :memclear ;
 export import :memload ;
 export import :memcopy ;
 export import :memcpy ;
+export import :memnset ;
 export import :resumelife ;
 export import :stpcpy ;
 export import :strcopy ;
