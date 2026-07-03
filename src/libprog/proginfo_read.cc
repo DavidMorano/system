@@ -1,4 +1,5 @@
 /* proginfo_real SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* proginfo-information real-UID functions */
@@ -52,12 +53,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
-#include	"proginfo.hh"
+#include	<proginfo.hh>
 
 
 /* local defines */
@@ -97,8 +101,7 @@ int proginfo_realbegin(proginfo *pip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (proginfo_realbegin) */
+} /* end subroutine (proginfo_realbegin) */
 
 int proginfo_realend(proginfo *pip) noex {
 	int		rs = SR_FAULT ;
@@ -114,7 +117,6 @@ int proginfo_realend(proginfo *pip) noex {
 	    } /* end if (setuid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (proginfo_realend) */
+} /* end subroutine (proginfo_realend) */
 
 
