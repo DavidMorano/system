@@ -117,7 +117,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			obj.o
@@ -199,30 +199,30 @@ objimpl.o:		$(OBJIMPL)
 
 
 varithmetic0.o:		varithmetic.ccm 	$(MDEP)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 varithmetic_util.o:	varithmetic_util.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 varithmetic_logical.o:	varithmetic_logical.ccm	$(MUTIL)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 varithmetic_shift.o:	varithmetic_shift.ccm	$(MUTIL)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 varithmetic_rotate.o:	varithmetic_rotate.ccm	$(MUTIL)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 varithmetic_add.o:	varithmetic_add.ccm	$(MUTIL)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 varithmetic_sub.o:	varithmetic_sub.ccm	$(MUTIL)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 varithmetic_mul.o:	varithmetic_mul.ccm	$(MUTIL) varithmetic_add.o
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 varithmetic_div.o:	varithmetic_div.ccm	$(MUTIL) $(DEP_DIV)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
