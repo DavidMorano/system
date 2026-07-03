@@ -92,7 +92,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
@@ -127,7 +127,7 @@ objb.o:			$(OBJB)
 
 
 usigsets0.o:		usigsets.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 usigsets1.o:		usigsets1.cc usigsets0.o	$(INCS)
 	$(COMPILE.cc) $<
