@@ -102,7 +102,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			objpart.o objprime.o objimpl.o
@@ -158,21 +158,21 @@ objimpl.o:		$(OBJIMPL)
 
 # module partitions
 umisc-mknpathx.o:	umisc-mknpathx.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 umisc-mknpathxw.o:	umisc-mknpathxw.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 umisc-pathnadd.o:	umisc-pathnadd.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 umisc-snadd.o:		umisc-snadd.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 # module primary
 umisc0.o:		umisc.ccm $(OBJPART)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
 umisc1.o:		umisc1.cc objprime.o
