@@ -29,13 +29,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<intsat.h>
-#include	<stdintx.h>
-#include	<strtox.h>
-#include	<strnul.hh>
-#include	<localmisc.h>		/* |DECBUFLEN| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<strtox.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |DECBUFLEN| */
 
 #include	"usupport_cfhex.hh"
 
@@ -91,6 +91,9 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine-template (cfhexx) */
+} /* end namespace (libu) */
+
+namespace libu {
     int cfhex(cchar *sp,int sl,int *rp)		noex {
 	return cfhexx(strtoxi,sp,sl,rp) ;
     }
