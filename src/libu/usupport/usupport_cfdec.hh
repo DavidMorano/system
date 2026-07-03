@@ -25,9 +25,9 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD |abs(3c)| */
 #include	<cstdint>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 namespace libu {
