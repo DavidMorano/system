@@ -56,8 +56,7 @@ OBJ= obja.o objb.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -100,7 +99,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
@@ -176,9 +175,9 @@ dfsa.o:			dfsa0.o dfsa1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 dfsa0.o:		dfsa.ccm
+	gxx -c -x c++ -o $@ -O $<
 
-dfsa1.o:		dfsa1.cc dfsa.ccm
-	makemodule dfsa
+dfsa1.o:		dfsa1.cc dfsa0.o
 	$(COMPILE.cc) $<
 
 # DFSB
@@ -186,9 +185,9 @@ dfsb.o:			dfsb0.o dfsb1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 dfsb0.o:		dfsb.ccm
+	gxx -c -x c++ -o $@ -O $<
 
-dfsb1.o:		dfsb1.cc dfsb.ccm
-	makemodule dfsb
+dfsb1.o:		dfsb1.cc dfsb0.o
 	$(COMPILE.cc) $<
 
 
