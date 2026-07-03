@@ -112,7 +112,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			objpart.o objprime.o objimpl.o
@@ -217,7 +217,7 @@ ureserve-vecstr.o:	ureserve-vecstr.ccm
 
 # module primary
 ureserve0.o:		ureserve.ccm objpart.o
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
 ureserve1.o:		ureserve1.cc ureserve0.o
