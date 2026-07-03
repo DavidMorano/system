@@ -98,7 +98,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_EMA)
@@ -149,18 +149,18 @@ ema_first.o:		ema_first.cc				$(INCS)
 
 # EMA_PARTS
 ema_parts.o:		ema_parts.ccm				$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # EMA_ENTRY
 ema_entry.o:		ema_entry.ccm				$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # EMA_ASSTR
 ema_asstr.o:		ema_asstr0.o ema_asstr1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 ema_asstr0.o:		ema_asstr.ccm				$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 ema_asstr1.o:		ema_asstr1.cc ema_asstr0.o		$(INCS)
 	$(COMPILE.cc) $<
