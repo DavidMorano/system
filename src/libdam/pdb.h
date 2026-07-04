@@ -55,7 +55,7 @@ struct pdb_head {
 	char		*a ;		/* memory allocation */
 	PDB_DB		dbs[pdb_overlast] ;
 	time_t		dt ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 typedef	PDB		pdb ;
@@ -63,10 +63,10 @@ typedef	PDB_DB		pdb_db ;
 
 EXTERNC_begin
 
-extern int	pdb_open(pdb *,cchar *,cchar *,cchar *,cchar *) noex ;
-extern int	pdb_fetch(pdb *,char *,int,cchar *,cchar *) noex ;
-extern int	pdb_check(pdb *,time_t) noex ;
-extern int	pdb_close(pdb *) noex ;
+extern int	pdb_open	(pdb *,cchar *,cchar *,cchar *,cchar *) noex ;
+extern int	pdb_fetch	(pdb *,char *,int,cchar *,cchar *) noex ;
+extern int	pdb_check	(pdb *,time_t) noex ;
+extern int	pdb_close	(pdb *) noex ;
 
 EXTERNC_end
 
