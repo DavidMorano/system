@@ -33,7 +33,7 @@
 struct conslog_head {
 	time_t		ti_open ;
 	time_t		ti_write ;
-	uint		magic ;
+	uint		magval ;
 	int		logfac ;
 	int		lfd ;
 	int		c ;
