@@ -189,7 +189,7 @@ template<typename ... Args>
 static inline int acctab_magic(acctab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == ACCTAB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == ACCTAB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -288,12 +288,12 @@ int acctab_open(acctab *op,cchar *fname) noex {
 	        if ((rs = vecobj_start(op->stdalp,vsz,vn,vo)) >= 0) {
 	            vo = VECOBJ_OCOMPACT ;
 	            if ((rs = vecobj_start(op->rgxalp,vsz,vn,vo)) >= 0) {
-	                op->magic = ACCTAB_MAGIC ;
+	                op->magval = ACCTAB_MAGIC ;
 	                if (fname) {
 	                    rs = acctab_fileadd(op,fname) ;
 	                }
 	                if (rs < 0) {
-	                    op->magic = 0 ;
+	                    op->magval = 0 ;
 	                    vecobj_finish(op->rgxalp) ;
 	                }
 	            } /* end if (rgx) */
@@ -341,7 +341,7 @@ int acctab_close(acctab *op) noex {
 		rs1 = acctab_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
