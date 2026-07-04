@@ -13,22 +13,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
-#define	DENSITY_MAGIC	91827346
 #define	DENSITY		struct density_head
 #define	DENSITY_ST	struct density_stats
+#define	DENSITY_MAGIC	91827346
 
 
 struct density_head {
 	ulong		*a ;
 	ulong		c ;
-	uint		magic ;
+	uint		magval ;
 	uint		ovf ;
 	int		nmax ;
 	int		len ;
@@ -57,6 +57,6 @@ extern int	density_finish(density *) noex ;
 EXTERNC_end
 
 
-#endif /* density_INCLUDE */
+#endif /* DENSITY_INCLUDE */
 
 
