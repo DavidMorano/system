@@ -50,7 +50,7 @@ New C-language operators
 ¤	? (outer-product)
 §	?
 ¶	?
-­	? (hyphen)
+­	? (soft-hyphen)
 
 ||>	*unassigned*
 ||<	*unassigned*
