@@ -20,14 +20,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
-#include	<vecstr.h>
-#include	<expcook.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
 
 
 EXTERNC_begin
 
-extern int defproc(vecstr *dlp,mainv envv,expcook *,cchar *) noex ;
+extern int defproc(vecstr *,con mainv envv,expcook *,cchar *) noex ;
 
 EXTERNC_end
 
