@@ -29,16 +29,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<vector>
-#include	<usystem.h>
-#include	<ascii.h>
-#include	<six.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<six.h>			/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"codebal.h"
 
@@ -64,40 +64,37 @@ import libutil ;			/* |memclear(3u)| */
 /* forward references */
 
 template<typename ... Args>
-static int codebal_ctor(codebal *op,Args ... args) noex {
+local int codebal_ctor(codebal *op,Args ... args) noex {
 	CODEBAL		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (codebal_ctor) */
+} /* end subroutine (codebal_ctor) */
 
-static int codebal_dtor(codebal *op) noex {
+local int codebal_dtor(codebal *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (codebal_dtor) */
+} /* end subroutine (codebal_dtor) */
 
 template<typename ... Args>
-static inline int codebal_magic(codebal *op,Args ... args) noex {
+local inline int codebal_magic(codebal *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CODEBAL_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CODEBAL_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (codebal_magic) */
+} /* end subroutine (codebal_magic) */
 
 
 /* local variables */
 
-constexpr char	chopen[] = { CH_LPAREN, CH_LBRACE, CH_LBRACK, '\0' } ;
-constexpr char	chclose[] = { CH_RPAREN, CH_RBRACE, CH_RBRACK, '\0' } ;
+constexpr char	chopen[]	= { CH_LPAREN, CH_LBRACE, CH_LBRACK, '\0' } ;
+constexpr char	chclose[]	= { CH_RPAREN, CH_RBRACE, CH_RBRACK, '\0' } ;
 
 
 /* exported variables */
@@ -114,8 +111,7 @@ int codebal_start(codebal *op) noex {
 	    }
 	} /* end if (codebal_ctor) */
 	return rs ;
-}
-/* end subroutine (codebal_start) */
+} /* end subroutine (codebal_start) */
 
 int codebal_finish(codebal *op) noex {
 	int		rs ;
@@ -133,11 +129,10 @@ int codebal_finish(codebal *op) noex {
 		rs1 = codebal_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f_bal : rs ;
-}
-/* end subroutine (codebal_finish) */
+} /* end subroutine (codebal_finish) */
 
 int codebal_load(codebal *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -145,9 +140,8 @@ int codebal_load(codebal *op,cchar *sp,int sl) noex {
 	    bool	f_fail = false ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    while (sl-- && *sp) {
-	        cint	ch = mkchar(*sp++) ;
 	        int	w{} ;
-	        switch (ch) {
+	        switch (cint ch = mkchar(*sp++) ; ch) {
 	        case CH_LPAREN:
 	        case CH_LBRACE:
 	        case CH_LBRACK:
@@ -169,8 +163,7 @@ int codebal_load(codebal *op,cchar *sp,int sl) noex {
 	    } /* end while */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (codebal_load) */
+} /* end subroutine (codebal_load) */
 
 
 /* private subroutines */
