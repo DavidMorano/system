@@ -4,7 +4,7 @@
 (GBCS COMPAS ID 40232)
 %I AT&T
 %C Holmdel, NJ
-%D July 13, 1994
+%D 13 July 1994
 %K optical switching
 %X This document provides an initial draft staff or work item estimate for
 developing an optical switch based on Ti:LiNbO3.
@@ -13,7 +13,7 @@ developing an optical switch based on Ti:LiNbO3.
 %T A New Differential Bus (GBCS COMPAS ID 40216)
 %I AT&T
 %C Holmdel, NJ
-%D April 21, 1994
+%D 21 April 1994
 %K BASE DDL bus scheme
 %X This document describes the new differential bus scheme which
 enables a time slotted bus to operate at speeds beyond approximately 300 Mtps.
@@ -24,7 +24,7 @@ enables a time slotted bus to operate at speeds beyond approximately 300 Mtps.
 %T Proposed DDL Bus Transceiever, Issue 1.2 (GBCS COMPAS ID 29727)
 %I AT&T
 %C Holmdel, NJ
-%D July 21, 1993
+%D 21 July 1993
 %K bus BASE switching enhancements transceiver DDL BLAST
 %X This document describes a proposal for an IC design to implement
 a DDL transceiver suitable for use in building and enhanced BASE bus
@@ -38,7 +38,7 @@ as first proposed in
 Issue 1.0 (BCS COMPAS ID 29581)
 %I AT&T
 %C Holmdel, NJ
-%D May 14, 1993
+%D 14 May 1993
 %K bus BASE switching enhancements
 %X This document describes possible enhancements to the bus described in
 "Broadband ATM & STM Electrical (BASE) Bus ; Issue 1.6".  These enhancements
@@ -53,7 +53,7 @@ specification sited above.
 Issue 2.0 (BCS COMPAS ID 37518)
 %I AT&T
 %C Holmdel, NJ
-%D March 20, 1994
+%D 20 March 1994
 %K bus BASE switching enhanced DDL
 %X This document is a draft specification for the BASE bus
 which built upon the design intent originally described in
@@ -81,7 +81,7 @@ Specification,
 Issue 1 (BCS COMPAS ID 41984)
 %I AT&T
 %C Holmdel, NJ
-%D January 31, 1995
+%D 31 January 1995
 %K bus BASE switching DDL BLAST transceiver
 %X This document provides some of the design information for the
 BLAST II transceiver IC device.
@@ -92,7 +92,7 @@ BLAST II transceiver IC device.
 Issue 1.6 (GBCS COMPAS ID 29728)
 %I AT&T
 %C Holmdel, NJ
-%D August 11, 1993
+%D 11 August 1993
 %K bus BASE switching
 %X This document describes the initial bus iontended to be used
 as an electronic switching endpoint to the DiSCO optical switch.
@@ -105,7 +105,7 @@ as an electronic switching endpoint to the DiSCO optical switch.
 (GBCS COMPAS ID 29979)
 %I AT&T
 %C Holmdel, NJ
-%D August 08, 1993
+%D 8 August 1993
 %K bus BASE switching test plan
 %X This document presents the information necessary to build and test
 the prototype bus described in the document entitled
@@ -126,7 +126,7 @@ dissipation possible.
 %T BASE Bus Prototype Test Results (GBCS COMPAS ID 38185)
 %I AT&T
 %C Holmdel, NJ
-%D May 25, 1994
+%D 25 May 1994
 %X This document describes the results of testing the prototype implementation
 of the Broadband ATM & STM Electrical (BASE) Bus as described in the
 document "Broadband ATM & STM Electrical (BASE) Bus ; Issue 1.6.
@@ -138,7 +138,7 @@ document "Broadband ATM & STM Electrical (BASE) Bus ; Issue 1.6.
 %P 126-128
 %I IEEE
 %C Parsippany, NJ
-%D February 04, 1994
+%D 4 February 1994
 %O AT&T Bell Laboratories
 %K balanced differential noise chip interconnections inductive
 %X On-chip balanced drivers can essentially eliminate
@@ -155,7 +155,7 @@ immunity, and eliminate ground noise.
 %T High Speed Bus Challenges (BCS COMPAS ID 51597)
 %I Lucent Technologies
 %C Holmdel, NJ
-%D April 19, 1996
+%D 19 April 1996
 %K high speed bus
 %X The Adaptive Standard Interface (ASI) is designed to overcome 
 the numberous obstacles
@@ -178,7 +178,7 @@ technologies do not is presented.
 %T ASI Bus Prototype Test Results, Issue 1
 %I Lucent Technologies, Inc.
 %C Holmdel, NJ
-%D February 21, 1996
+%D 21 February 1996
 %O AT&T Bell Laboratories, BCS COMPAS ID 50829
 %K ASI bus prototype test results
 %X This document provides the test results and analysis of a prototype
@@ -191,7 +191,7 @@ ASI based bus.
 %T Adaptive Standard Interface (ASI) Broadband Specification, Issue 3.0
 %I Lucent Technologies, Inc.
 %C Holmdel, NJ
-%D December 21, 1994
+%D 21 December 1994
 %O AT&T Bell Laboratories, BCS COMPAS ID 39604
 %K ASI adaptive standard interface broadband
 %X This document provides the design specification for the
