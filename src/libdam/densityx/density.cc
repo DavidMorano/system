@@ -28,13 +28,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"density.h"
 #include	"densitystat.h"
@@ -64,7 +64,7 @@ import libutil ;			/* |lenstr(3u)| */
 /* forward references */
 
 template<typename ... Args>
-static int density_ctor(density *op,Args ... args) noex {
+local int density_ctor(density *op,Args ... args) noex {
     	DENSITY		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
@@ -73,7 +73,7 @@ static int density_ctor(density *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (density_ctor) */
 
-static int density_dtor(density *op) noex {
+local int density_dtor(density *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -82,10 +82,10 @@ static int density_dtor(density *op) noex {
 } /* end subroutine (density_dtor) */
 
 template<typename ... Args>
-static inline int density_magic(density *op,Args ... args) noex {
+local inline int density_magic(density *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == DENSITY_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DENSITY_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (density_magic) */
@@ -109,16 +109,15 @@ int density_start(density *op,int len) noex {
 	            op->a = ulongp(p) ;
 	            memclear(op->a,sz) ;
 	            op->len = len ;
-	            op->magic = DENSITY_MAGIC ;
+	            op->magval = DENSITY_MAGIC ;
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		density_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (density_ctor) */
 	return rs ;
-}
-/* end subroutine (density_start) */
+} /* end subroutine (density_start) */
 
 int density_finish(density *op) noex {
 	int		rs ;
@@ -128,16 +127,15 @@ int density_finish(density *op) noex {
 	        rs1 = lm_free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 	        rs1 = density_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (density_finish) */
+} /* end subroutine (density_finish) */
 
 int density_update(density *op,int ai) noex {
 	int		rs ;
@@ -154,8 +152,7 @@ int density_update(density *op,int ai) noex {
 	    op->a[ai] += 1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (density_update) */
+} /* end subroutine (density_update) */
 
 int density_slot(density *op,int ai,ulong *rp) noex {
     	int		rs ;
@@ -167,8 +164,7 @@ int density_slot(density *op,int ai,ulong *rp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (density_slot) */
+} /* end subroutine (density_slot) */
 
 int density_getstats(density *op,density_st *sp) noex {
 	int		rs ;
@@ -189,7 +185,6 @@ int density_getstats(density *op,density_st *sp) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (density_getstats) */
+} /* end subroutine (density_getstats) */
 
 
