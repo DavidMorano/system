@@ -53,6 +53,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<svcfile.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
@@ -131,16 +132,16 @@ template<typename ... Args>
 local inline int pdb_magic(pdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == PDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == PDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (pdb_magic) */
 
-local int pdb_fetcher(pdb *,char *,int,cchar *,cchar *,int) noex ;
-local int pdb_dbopen(pdb *,int) noex ;
-local int pdb_dbclose(pdb *,int) noex ;
-local int pdb_dbcheck(pdb *,int) noex ;
-local int pdb_findfile(pdb *,char *,int) noex ;
+local int pdb_fetcher	(pdb *,char *,int,cchar *,cchar *,int) noex ;
+local int pdb_dbopen	(pdb *,int) noex ;
+local int pdb_dbclose	(pdb *,int) noex ;
+local int pdb_dbcheck	(pdb *,int) noex ;
+local int pdb_findfile	(pdb *,char *,int) noex ;
 
 
 /* local variables */
@@ -186,7 +187,7 @@ int pdb_open(pdb *op,cchar *pr,cchar *ur,cchar *uname,cchar *fname) noex {
 	                bp = (strwcpy(bp,uname,-1)+1) ;
 	                op->fname = bp ;
 	                bp = (strwcpy(bp,fname,-1)+1) ;
-	                op->magic = PDB_MAGIC ;
+	                op->magval = PDB_MAGIC ;
 	            } /* end if (memory-acquire) */
 		} /* end if (mkvars) */
 	    } /* end if (valid) */
@@ -216,7 +217,7 @@ int pdb_close(pdb *op) noex {
 	        rs1 = pdb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (pdb_close) */
@@ -227,7 +228,7 @@ int pdb_fetch(pdb *op,char *vbuf,int vlen,cchar *printer,cchar *key) noex {
 	if ((rs = pdb_magic(op,vbuf,printer,key)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (printer[0] && key[0]) {
-	        int	w = pdb_local ;
+	        int w = pdb_local ;
 	        if ((rs = pdb_fetcher(op,vbuf,vlen,printer,key,w)) == rsn) {
 	            w = pdb_system ;
 	            rs = pdb_fetcher(op,vbuf,vlen,printer,key,w) ;
@@ -251,8 +252,7 @@ int pdb_check(pdb *op,time_t dt) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end if (pdb_check) */
+} /* end if (pdb_check) */
 
 
 /* private subroutines*/
@@ -428,8 +428,7 @@ local int pdb_dbcheck(pdb *op,int w) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (pdb_dbcheck) */
+} /* end subroutine (pdb_dbcheck) */
 
 int vars::mkvars() noex {
     	int		rs ;
@@ -437,6 +436,5 @@ int vars::mkvars() noex {
 	    maxpathlen = rs ;
 	} /* end if (bufsizeget) */
     	return rs ;
-}
-/* end method (vars:mkvars) */
+} /* end method (vars:mkvars) */
 
