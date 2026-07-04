@@ -116,16 +116,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"stubrpc.h"
 #include	"onc.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -181,12 +184,11 @@ int onckeyalready(cchar *netname) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (onckeyalready) */
+} /* end subroutine (onckeyalready) */
 
-int onckeygetset(cchar *netname,cchar *passbuf) noex {
+int onckeygetset(cchar *netname,cchar *pass) noex {
 	int		rs = SR_FAULT ;
-	if (netname && passbuf) {
+	if (netname && pass) {
 	    rs = SR_INVALID ;
 	    if (netname[0]) {
 		if ((rs = oncinit()) >= 0) {
@@ -194,18 +196,18 @@ int onckeygetset(cchar *netname,cchar *passbuf) noex {
 	            cchar		*nnp = netname ;
 	            char		passbuf[passlen + 1] ;
 		    rs = SR_OK ;
-	            strncpy(passbuf,passbuf,passlen) ;
+	            strncpy(passbuf,pass,passlen) ;
 	            passbuf[passlen] = '\0' ;	/* truncate */
-	            memset(sna.st_priv_key,0,HEXKEYBYTES) ;
+	            memnset(sna.st_priv_key,0,HEXKEYBYTES) ;
 	            sna.st_pub_key[0] = '\0' ;
-	            sna.st_netname = (char *) netname ;
+	            sna.st_netname = charp(netname) ;
 		    /* decrypt and retrieve the private key */
 	            if (getsecretkey(nnp,sna.st_priv_key,passbuf) > 0) {
 	                if (sna.st_priv_key[0] != '\0') {
 			/* we have successfully decrypted our private ONC key */
 			/* give it to KEYSERV */
 	                    if ((rs = key_setnet(&sna)) > 0) {
-	                        memset(sna.st_priv_key,0,HEXKEYBYTES) ;
+	                        memnset(sna.st_priv_key,0,HEXKEYBYTES) ;
 		            } else if (rs == 0) {
 		                rs = SR_PROTO ;
 		            } else {
@@ -217,17 +219,16 @@ int onckeygetset(cchar *netname,cchar *passbuf) noex {
 	            } else {
 	                rs = SR_NOENT ;
 	            }
-	            memset(passbuf,0,passlen) ;
+	            memnset(passbuf,0,passlen) ;
 		} /* end if (vars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (oncskeygetset) */
+} /* end subroutine (oncskeygetset) */
 
-int onckeylogin(cchar *passbuf) noex {
+int onckeylogin(cchar *pass) noex {
 	int		rs = SR_FAULT ;
-	if (passbuf) {
+	if (pass) {
 	    if ((rs = oncinit()) >= 0) {
 		cint netlen = var.netnamelen ;
 	        key_netstarg	sna{} ;
@@ -238,11 +239,11 @@ int onckeylogin(cchar *passbuf) noex {
 	                char	netname3[netlen + 1] ;
 	                char	passbuf[passlen + 1] ;
 	                char	*nnp = netname ;
-	                strncpy(passbuf,passbuf,passlen) ;
+	                strncpy(passbuf,pass,passlen) ;
 		        /* truncate at maximum */
 	                passbuf[passlen] = '\0' ; 
 	                strcpy(netname3,nnp) ;
-	                memset(sna.st_priv_key,0,HEXKEYBYTES) ;
+	                memnset(sna.st_priv_key,0,HEXKEYBYTES) ;
 	                sna.st_pub_key[0] = '\0' ;
 	                sna.st_netname = netname3 ;
 		        bool f = true ;
@@ -256,9 +257,9 @@ int onckeylogin(cchar *passbuf) noex {
 	                        rs = SR_ACCESS ;
 		            }
 			    /* destroy the private key */
-	                    memset(sna.st_priv_key,0,HEXKEYBYTES) ;
+	                    memnset(sna.st_priv_key,0,HEXKEYBYTES) ;
 	                } /* end if (decrypted and retrieved private key) */
-	                memset(passbuf,0,passlen) ;
+	                memnset(passbuf,0,passlen) ;
 	            } /* end if (key-is-already-set) */
 	        } else {
 	            rs = SR_NOTSUP ;
@@ -266,8 +267,7 @@ int onckeylogin(cchar *passbuf) noex {
 	    } /* end if (oncinit) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (onckeylogin) */
+} /* end subroutine (onckeylogin) */
 
 
 /* local subroutines */
@@ -280,7 +280,7 @@ vars::operator int () noex {
 	return rs ;
 } /* end methof (vars::operator) */
 
-local int oncinit() noex ; {
+local int oncinit() noex {
     static cint rsv = var ;
     return rsv ;
 } /* end subroutine (oncinit) */
