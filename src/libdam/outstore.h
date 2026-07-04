@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 #define	OUTSTORE	struct outstore_head
@@ -42,7 +42,7 @@ struct outstore_head {
 	int		dlen ;
 	int		len ;
 	char		sbuf[OUTSTORE_SLEN+1] ; /* "static" or "stack" */
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum outstoremems {
@@ -50,7 +50,7 @@ enum outstoremems {
 	outstoremem_clear,
 	outstoremem_finish,
 	outstoremem_overlast
-} ;
+} ; /* end enum */
 struct outstore ;
 struct outstore_co {
 	outstore	*op = nullptr ;
@@ -94,11 +94,11 @@ typedef OUTSTORE_FL	outstore_fl ;
 
 EXTERNC_begin
 
-extern int	outstore_start(outstore *) noex ;
-extern int	outstore_strw(outstore *,cchar *,int) noex ;
-extern int	outstore_get(outstore *,cchar **) noex ;
-extern int	outstore_clear(outstore *) noex ;
-extern int	outstore_finish(outstore *) noex ;
+extern int	outstore_start	(outstore *) noex ;
+extern int	outstore_strw	(outstore *,cchar *,int) noex ;
+extern int	outstore_get	(outstore *,cchar **) noex ;
+extern int	outstore_clear	(outstore *) noex ;
+extern int	outstore_finish	(outstore *) noex ;
 
 EXTERNC_end
 
