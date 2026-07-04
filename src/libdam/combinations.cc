@@ -65,11 +65,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"combinations.h"
 
 
 /* local namespaces */
@@ -124,14 +129,12 @@ long combinations(int n,int k) noex {
 	    ans = 0 ;
 	}
 	return ans ;
-}
-/* end subroutine (combinations) */
+} /* end subroutine (combinations) */
 
 #ifdef	COMMENT
 long multicombinations(int n,int k) noex {
 	return combinations((n + k - 1),k) ;
-}
-/* end subroutine (multicombinations) */
+} /* end subroutine (multicombinations) */
 #endif /* COMMENT */
 
 
