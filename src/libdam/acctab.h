@@ -46,7 +46,7 @@ struct acctab_head {
 	vecobj		*stdalp ;		/* access-list-entries */
 	vecobj		*rgxalp ;		/* access-list-entries */
 	time_t		checktime ;
-	uint		magic ;
+	uint		magval ;
 } ;
 
 struct acctab_part {
