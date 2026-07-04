@@ -1,4 +1,4 @@
-/* cgi SUPPORT (cgi creation and output) */
+/* cgi SUPPORT (CGI creation and output) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -26,19 +26,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>
-#include	<cstdarg>
-#include	<usystem.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC |timestr_msg(3uc)| */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 #include	<shio.h>
-#include	<sbuf.h>
-#include	<ascii.h>
-#include	<timestr.h>		/* |timestr_msg(3uc)| */
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"cgi.h"
 
@@ -72,34 +72,31 @@ extern "C" {
 /* forward references */
 
 template<typename ... Args>
-static int cgi_ctor(cgi *op,Args ... args) noex {
+local int cgi_ctor(cgi *op,Args ... args) noex {
     	CGI		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cgi_ctor) */
+} /* end subroutine (cgi_ctor) */
 
-static int cgi_dtor(cgi *op) noex {
+local int cgi_dtor(cgi *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cgi_dtor) */
+} /* end subroutine (cgi_dtor) */
 
 template<typename ... Args>
-static inline int cgi_magic(cgi *op,Args ... args) noex {
+local inline int cgi_magic(cgi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CGI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CGI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (cgi_magic) */
+} /* end subroutine (cgi_magic) */
 
 
 /* local variables */
@@ -115,15 +112,14 @@ int cgi_start(cgi *op,shio *ofp) noex {
 	int		wlen = 0 ;
 	if ((rs = cgi_ctor(op,ofp)) >= 0) {
 	    op->ofp = ofp ;
-	    op->magic = CGI_MAGIC ;
+	    op->magval = CGI_MAGIC ;
 	    op->wlen += wlen ;
 	    if (rs < 0) {
 		cgi_dtor(op) ;
 	    }
 	} /* end if (cgi_ctor) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cgi_start) */
+} /* end subroutine (cgi_start) */
 
 int cgi_finish(cgi *op) noex {
 	int		rs ;
@@ -134,11 +130,10 @@ int cgi_finish(cgi *op) noex {
 		rs1 = cgi_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cgi_finish) */
+} /* end subroutine (cgi_finish) */
 
 int cgi_eoh(cgi *op) noex {
 	int		rs ;
@@ -149,8 +144,7 @@ int cgi_eoh(cgi *op) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cgi_eof) */
+} /* end subroutine (cgi_eof) */
 
 int cgi_hdrdate(cgi *op,time_t t) noex {
 	int		rs ;
@@ -170,8 +164,7 @@ int cgi_hdrdate(cgi *op,time_t t) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cgi_hdrdate) */
+} /* end subroutine (cgi_hdrdate) */
 
 int cgi_hdr(cgi *op,cchar *kp,cchar *vp,int vl) noex {
 	int		rs ;
@@ -190,8 +183,7 @@ int cgi_hdr(cgi *op,cchar *kp,cchar *vp,int vl) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cgi_hdr) */
+} /* end subroutine (cgi_hdr) */
 
 int cgi_write(cgi *op,cvoid *lbuf,int llen) noex {
 	int		rs ;
@@ -202,8 +194,7 @@ int cgi_write(cgi *op,cvoid *lbuf,int llen) noex {
 	    op->wlen += rs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cgi_write) */
+} /* end subroutine (cgi_write) */
 
 int cgi_println(cgi *op,cchar *lbuf,int llen) noex {
 	int		rs ;
@@ -214,8 +205,7 @@ int cgi_println(cgi *op,cchar *lbuf,int llen) noex {
 	    op->wlen += rs ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cgi_println) */
+} /* end subroutine (cgi_println) */
 
 int cgi_printf(cgi *op,cchar *fmt,...) noex {
 	va_list		ap ;
@@ -226,8 +216,7 @@ int cgi_printf(cgi *op,cchar *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cgi_printf) */
+} /* end subroutine (cgi_printf) */
 
 int cgi_vprintf(cgi *op,cchar *fmt,va_list ap) noex {
 	int		rs ;
@@ -238,8 +227,7 @@ int cgi_vprintf(cgi *op,cchar *fmt,va_list ap) noex {
 	    op->wlen += rs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cgi_vprintf) */
+} /* end subroutine (cgi_vprintf) */
 
 int cgi_putc(cgi *op,int ch) noex {
 	int		rs ;
@@ -250,7 +238,6 @@ int cgi_putc(cgi *op,int ch) noex {
 	    op->wlen += rs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cgi_putc) */
+} /* end subroutine (cgi_putc) */
 
 
