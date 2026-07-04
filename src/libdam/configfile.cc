@@ -84,7 +84,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* forward references */
 
-static void	checkfree() noex ;
+local void	checkfree() noex ;
 
 
 /* local variables */
@@ -830,7 +830,7 @@ int configfile_start(configfile *csp,configfname) noex {
 /* done with configuration file processing */
 
 	if (rs >= 0)
-	    csp->magic = CONFIGFILE_MAGIC ;
+	    csp->magval = CONFIGFILE_MAGIC ;
 
 ret1:
 	buffer_finish(&options) ;
@@ -860,7 +860,7 @@ int configfile_finish(configfile *csp) noex {
 	int		rs = SR_FAULT ;
 	if (csp ) {
 	    rs = SR_NOTOPEN ;
-	    if (csp->magic == CONFIGFILE_MAGIC) {
+	    if (csp->magval == CONFIGFILE_MAGIC) {
 	        /* free up the complex data types */
 	vecstr_finish(&csp->defines) ;
 	vecstr_finish(&csp->unsets) ;
@@ -902,7 +902,7 @@ int configfile_finish(configfile *csp) noex {
 	checkfree(&csp->filetime) ;
 	checkfree(&csp->passfname) ;
 	checkfree(&csp->eigenfname) ;
-	csp->magic = 0 ;
+	csp->magval = 0 ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -912,7 +912,7 @@ int configfile_finish(configfile *csp) noex {
 
 /* local subroutines */
 
-static void checkfree(char **vp) noex {
+local void checkfree(char **vp) noex {
 	if (*vp != nullptr) {
 	    uc_free(*vp) ;
 	    *vp = nullptr ;
