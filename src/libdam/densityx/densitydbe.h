@@ -20,14 +20,14 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
-#define	DENSITYDBE		struct densitydbe_head
+#define	DENSITYDBE	struct densitydbe_head
 
 
 struct densitydbe_head {
@@ -59,20 +59,24 @@ struct densitydbe : densitydbe_head {
 	densitydbe_co	start ;
 	densitydbe_co	entsz ;
 	densitydbe_co	finish ;
+	void coinit() noex {
+	    start	(this,densitydbemem_start) ;
+	    entsz	(this,densitydbemem_entsz) ;
+	    finish	(this,densitydbemem_finish) ;
+	} ;
 	densitydbe() noex {
-	    start(this,densitydbemem_start) ;
-	    entsz(this,densitydbemem_entsz) ;
-	    finish(this,densitydbemem_finish) ;
-	} ;
-	densitydbe(const densitydbe &) = delete ;
-	densitydbe &operator = (const densitydbe &) = delete ;
-	int rd(char *,int) noex ;
-	int wr(cchar *,int) noex ;
+	    coinit() ;
+	    utime = 0 ;
+	} ; /* end if (ctor) */
+	densitydbe(const densitydbe &) noex ;
+	const densitydbe &operator = (const densitydbe &) noex ;
+	int rd		(char *,int) noex ;
+	int wr		(cchar *,int) noex ;
+	void dtor	() noex ;
 	operator int () noex ;
-	void dtor() noex ;
-	~densitydbe() {
-	    dtor() ;
-	} ;
+	destruct densitydbe() {
+	    if (utime) dtor() ;
+	} ; /* end destruct */
 } ; /* end struct (densitydbe) */
 #else	/* __cplusplus */
 typedef	DENSITYDBE	densitydbe ;
@@ -81,11 +85,11 @@ typedef	DENSITYDBE	densitydbe ;
 
 EXTERNC_begin
 
-extern int densitydbe_start(densitydbe *) noex ;
-extern int densitydbe_finish(densitydbe *) noex ;
-extern int densitydbe_rd(densitydbe *,char *,int) noex ;
-extern int densitydbe_wr(densitydbe *,cchar *,int) noex ;
-extern int densitydbe_entsz(densitydbe *) noex ;
+extern int densitydbe_start	(densitydbe *) noex ;
+extern int densitydbe_finish	(densitydbe *) noex ;
+extern int densitydbe_rd	(densitydbe *,char *,int) noex ;
+extern int densitydbe_wr	(densitydbe *,cchar *,int) noex ;
+extern int densitydbe_entsz	(densitydbe *) noex ;
 
 EXTERNC_end
 
