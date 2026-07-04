@@ -26,15 +26,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"banum.h"
 
@@ -45,7 +45,7 @@ import libutil ;			/* |memclear(3u)| */
 /* local defines */
 
 #ifndef	BANUM_DIGIT
-#ifndef	BANUM_DIGIT	int
+#define	BANUM_DIGIT	int
 #endif
 
 #define	BANUM_LIM16	(1 << 16)
@@ -86,17 +86,17 @@ local int	numbits(int) noex ;
 
 /* exported subroutines */
 
-int banum_start(ba *op) noex {
+int banum_start(banum *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	    op->num = nullptr ;
+	    op->nwords = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (banum_start) */
+} /* end subroutine (banum_start) */
 
-int banum_finish(ba *op) noex {
+int banum_finish(banum *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) {
@@ -105,27 +105,29 @@ int banum_finish(ba *op) noex {
 	        rs1 = libmem.free(op->num) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->num = nullptr ;
-	    }
+	    } /* end if (memory-release) */
+	    op->nwords = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (banum_finish) */
+} /* end subroutine (banum_finish) */
 
-int banum_prepare(banum *cnp) noex {
-	cint		asz = (BANUM_LIM16 * szof(int)) ;
+int banum_prepare(banum *op) noex {
+	cint		asz = (BANUM_LIM16 * szof(BANUM_DIGIT)) ;
 	int		rs = SR_FAULT ;
-	if (cnp) {
+	if (op) {
+	    cint n = BANUM_LIM16 ;
 	    if (void *vp ; (rs = libmem.mall(asz,&vp)) >= 0) {
-	        cnp->num = intp(vp) ;
-	        for (int i = 0 ; i < BANUM_LIM16 ; i += 1) {
-	            cnp->num[i] = numbits(i) ;
-	        }
+	        op->num = digitp(vp) ;
+	        for (int i = 0 ; i < n ; i += 1) {
+	            op->num[i] = numbits(i) ;
+	        } /* end for */
+		op->nwords = n ;
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (banum_prepare) */
+} /* end subroutine (banum_prepare) */
 
+#ifdef	COMMENT
 int banum_num(banum *op) noex {
 	int		sum = 0 ;
 	int		rs = SR_FAULT ;
@@ -133,7 +135,7 @@ int banum_num(banum *op) noex {
 	    int		*na = op ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < op->nwords ; i += 1) {
-	        BANUM_DIGIT	v = op->a[i] ;
+	        BANUM_DIGIT	v = op->num[i] ;
 	        sum += na[v & (BANUM_LIM16 - 1)] ; v >>= 16 ;
 	        sum += na[v & (BANUM_LIM16 - 1)] ; v >>= 16 ;
 	        sum += na[v & (BANUM_LIM16 - 1)] ; v >>= 16 ;
@@ -142,23 +144,22 @@ int banum_num(banum *op) noex {
 	    rs = intsat(sum) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (banum_num) */
+} /* end subroutine (banum_num) */
+#endif /* COMMENT */
 
-int banum_forsake(banum *cnp) noex {
+int banum_forsake(banum *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (cnp) {
+	if (op) {
 	    rs = SR_OK ;
-	    if (cnp->num) {
-	        rs1 = libmem.free(cnp->num) ;
+	    if (op->num) {
+	        rs1 = libmem.free(op->num) ;
 	        if (rs >= 0) rs = rs1 ;
-	        cnp->num = nullptr ;
-	    }
+	        op->num = nullptr ;
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (banum_forsake) */
+} /* end subroutine (banum_forsake) */
 
 
 /* private subroutines */
@@ -167,10 +168,9 @@ local int numbits(int n) noex {
 	int		sum = 0 ;
 	while (n) {
 	    if (n & 1) sum += 1 ;
-	    n = n >> 1 ;
+	    n >>= 1 ;
 	} /* end while */
 	return sum ;
-}
-/* end subroutine (numbits) */
+} /* end subroutine (numbits) */
 
 
