@@ -20,32 +20,29 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
-#define	CODEBAL_MAGIC	0x13f3c203
 #define	CODEBAL		struct codebal_head
+#define	CODEBAL_MAGIC	0x13f3c203
 #define	CODEBAL_NCH	3
 
 
 struct codebal_head {
-	uint		magic ;
+	uint		magval ;
 	int		counts[CODEBAL_NCH] ;
 	int		f_fail ;
-} ;
+} ; /* end struct (codebal_head) */
 
 typedef	CODEBAL		codebal ;
 
 EXTERNC_begin
 
-extern int codebal_start(codebal *) noex ;
-extern int codebal_load(codebal *,cchar *,int) noex ;
-extern int codebal_read(codebal *,char *,int) noex ;
-extern int codebal_finish(codebal *) noex ;
+extern int codebal_start	(codebal *) noex ;
+extern int codebal_load		(codebal *,cchar *,int) noex ;
+extern int codebal_read		(codebal *,char *,int) noex ;
+extern int codebal_finish	(codebal *) noex ;
 
 EXTERNC_end
 
