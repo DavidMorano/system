@@ -39,15 +39,29 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdlib>		/* <- for |qsort(3c)| */
-#include	<cstring>		/* <- for |memset(3c)| */
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"detdupai.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -56,7 +70,7 @@
 /* forwards references */
 
 extern "C" {
-    static int	cmpint(cvoid *,cvoid *) noex ;
+    local int	cmpint(cvoid *,cvoid *) noex ;
 }
 
 
@@ -75,12 +89,11 @@ int detdupai(cint *ap,int al) noex {
 	if (ap) {
 	    rs = SR_OK ;
 	    if (al > 1) {
-		cint	esize = szof(int) ;
+		cint	esz = szof(int) ;
 		cint	sz = ((al+1)*szof(int)) ;
-	        int	*aa ;
-	        if ((rs = lm_mall(sz,&aa)) >= 0) {
-	            memcpy(aa,ap,sz) ;
-	            qsort(aa,al,esize,cmpint) ;
+	        if (int	*aa ; (rs = lm_mall(sz,&aa)) >= 0) {
+	            memcopy(aa,ap,sz) ;
+	            qsort(aa,al,esz,cmpint) ;
 	            for (int i = 1 ; (!f) && (i < al) ; i += 1) {
 		        f = (aa[i] == aa[i-1]) ;
 		    } /* end for */
@@ -90,8 +103,7 @@ int detdupai(cint *ap,int al) noex {
 	    } /* end if (needed more work) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (detdupai) */
+} /* end subroutine (detdupai) */
 
 
 /* local subroutines */
@@ -100,7 +112,6 @@ int cmpint(cvoid *v1p,cvoid *v2p) noex {
 	cint	*i1p = intp(v1p) ;
 	cint	*i2p = intp(v2p) ;
 	return (*i1p - *i2p) ;
-}
-/* end subroutine (cmpint) */
+} /* end subroutine (cmpint) */
 
 
