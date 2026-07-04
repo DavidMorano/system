@@ -29,65 +29,74 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/statvfs.h>
-#include	<sys/mman.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<inttypes.h>
-#include	<netdb.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<usystem.h>
-#include	<serialbuf.h>
-#include	<endian.h>
-#include	<mkfnamesuf.h>
-#include	<mkx.h>
-#include	<strwcpy.h>
-#include	<isfiledesc.h>
-#include	<isnot.h>
-#include	<iserror.h>
-#include	<funmode.hh>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<inttypes.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<netdb.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<bit>			/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<mkfnamesuf.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<lockfile.h>		/* LIBUC */
+#include	<isfiledesc.h>		/* LIBUC |isfsremote(3uc)| */
+#include	<ismisc.h>		/* LIBUC |isaccmode(3uc)| */
+#include	<isnot.h>		/* LIBUC */
+#include	<iserror.h>		/* LIBUC */
+#include	<msgsub.hh>		/* LIBDAM */
+#include	<filemagic.hh>		/* LIBDAM */
+#include	<localmisc.h>		/* LIBU |MIN| */
+#include	<libdebug.h>		/* LIBDEBUG */
 
-#include	"densitydb.h"
 #include	"densitydbe.h"
+#include	"densitydb.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| */
-import densityx_filehead ;
 import filemagic ;
+import densityhdr ;
 
 /* local defines */
 
-#define	DENSITYDB_FLID		(16 + 4)
-#define	DENSITYDB_FLHEAD	filehead::bufsz
+#define	DENSITYDB_FLID		filemagic_sz
+#define	DENSITYDB_FLHEAD	dbhdr::bufsz
 #define	DENSITYDB_FLTOP		(DENSITYDB_FLID + DENSITYDB_FLHEAD)
 
 #define	DENSITYDB_FOID		0
 #define	DENSITYDB_FOHEAD	(DENSITYDB_FOID + DENSITYDB_FLID)
 #define	DENSITYDB_FOTAB		(DENSITYDB_FOHEAD + DENSITYDB_FLHEAD)
 
-#define	DENSITYDB_EBS		((var.entsz + 3) & (~ 3))
-
-#define	DENSITYDB_BUFSIZE	(64 * 1024)
-#define	DENSITYDB_READSIZE	(16 * 1024)
+#define	DENSITYDB_EDSZ		((var.entsz + 3) & (~ 3))
+#define	DENSITYDB_BUFSZ		(64 * 1024)
+#define	DENSITYDB_READSZ	(16 * 1024)
 
 #define	DENSITYDB_FBUFLEN	(DENSITYDB_FLTOP + 9)
 
-#define	DD			densitydb
-#define	DD_ENT			densitydb_ent
-#define	FM			filemagic
-#define	FH			filehead
+#define	DD		densitydb
+#define	DD_ENT		densitydb_ent
+#define	DD_CUR		densitydb_cur
+#define	FM		filemagic
+#define	FM_SZ		filemagic_sz
+#define	FH		dbhdr
 
 #define	TO_OPEN		(60 * 60)	/* maximum file-open time */
 #define	TO_ACCESS	(2 * 60)	/* maximum access idle time */
@@ -100,12 +109,13 @@ import filemagic ;
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
+using namespace densityx ;
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
 
-typedef const funmode	cfunmode ;
+typedef const msgsub	cmsgsub ;
 
 
 /* external subroutines */
@@ -116,23 +126,18 @@ typedef const funmode	cfunmode ;
 
 /* local structures */
 
-struct oldentry {
-	time_t		utime ;
-	int		ei ;
-} ; /* end struct */
-
 namespace {
     struct vars {
 	int		entsz ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-    struct buffer {
+    struct denbuf {
 	char		*bup ;			/* fixed buffer pointer */
 	int		bsz ;			/* fixed buffer size */
 	int		off ;			/* file offset of valid area */
 	int		len ;			/* length of valid area */
-    } ; /* end struct (buffer) */
- } /* end namespace */
+    } ; /* end struct (denbuf) */
+} /* end namespace */
 
 
 /* forward references */
@@ -146,67 +151,68 @@ local int densitydb_ctor(densitydb *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if (buffer *buf ; (bup = new(nt) buffer) != np) {ylikely {
-		op->bup = bup ;
-	        if (filehead *fhp ; (fhp = new(nt) filehead) != np) ylikely {
+	    if (denbuf *dbp = new(nt) denbuf ; dbp) ylikely {
+		op->dbp = dbp ;
+	        if (dbhdr *fhp = new(nt) dbhdr ; fhp) ylikely {
 		    op->fhp = fhp ;
 		    rs = SR_OK ;
-		} /* end if (new-filehead) */
+		} /* end if (new-dbhdr) */
 		if (rs < 0) {
-		    delete bup ;
-		    op->buf = nullptr ;
-		}
-	    } /* end if (new-buffer) */
+		    delete dbp ;
+		    op->dbp = np ;
+		} /* end if (error) */
+	    } /* end if (new-denbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (densitydb_ctor) */
+} /* end subroutine (densitydb_ctor) */
 
 local int densitydb_dtor(densitydb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->fhp) ylikely {
-		fileheader *fhp = (filehead *) op->fhp ;
+		dbhdr *fhp = resumelife<dbhdr>(op->fhp) ;
 		delete fhp ;
 		op->fhp = nullptr ;
-	    }
-	    if (op->bup) ylikely {
-		buffer *bup = (buffer *) op->bup ;
-		delete bup ;
-		op->bup = nullptr ;
-	    }
+	    } /* end if (memory-release) */
+	    if (op->dbp) ylikely {
+		denbuf *dbp = resumelife<denbuf>(op->dbp) ;
+		delete dbp ;
+		op->dbp = nullptr ;
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (densitydb_dtor) */
+} /* end subroutine (densitydb_dtor) */
 
 template<typename ... Args>
 local inline int densitydb_magic(densitydb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == DENSITYDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DENSITYDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (densitydb_magic) */
+} /* end subroutine (densitydb_magic) */
 
-local int densitydb_openbegin(DD *,cchar *) noex ;
-local int densitydb_opener(DD *,char *,cchar *,int) noex ;
-local int densitydb_openend(DD *) noex ;
+local inline int densitydb_locked(densitydb *op) noex {
+    	return (op->fl.lockedrd || op->fl.lockedwr) ;
+} /* end subroutine (densitydb_locked) */
 
-local int densitydb_fileopen(DD *,time_t) noex ;
-local int densitydb_fileclose(DD *) noex ;
-local int densitydb_fileinit(DD *,time_t) noex ;
-local int densitydb_filechanged(DD *) noex ;
-local int densitydb_filecheck(DD *,time_t,cfunmode) noex ;
-local int densitydb_lockacq(DD *,time_t,cfunmode) noex ;
-local int densitydb_lockrel(DD *) noex ;
-local int densitydb_buf(DD *,uint,int,char **) noex ;
-local int densitydb_bufupdate(DD *,uint,int,cchar *) noex ;
-local int densitydb_bufbegin(DD *) noex ;
-local int densitydb_bufend(DD *) noex ;
-local int densitydb_writehead(DD *) noex ;
+local int densitydb_openbegin	(DD *,cchar *) noex ;
+local int densitydb_opener	(DD *,char *,cchar *,int) noex ;
+local int densitydb_openend	(DD *) noex ;
+
+local int densitydb_fileopen	(DD *,time_t) noex ;
+local int densitydb_fileclose	(DD *) noex ;
+local int densitydb_fileinit	(DD *,time_t) noex ;
+local int densitydb_filechanged	(DD *) noex ;
+local int densitydb_filecheck	(DD *,time_t,cmsgsub) noex ;
+local int densitydb_lockacq	(DD *,time_t,cmsgsub) noex ;
+local int densitydb_lockrel	(DD *) noex ;
+local int densitydb_bufget	(DD *,int,int,char **) noex ;
+local int densitydb_bufbegin	(DD *) noex ;
+local int densitydb_bufend	(DD *) noex ;
+[[maybe_unused]] local int densitydb_writehead	(DD *) noex ;
+[[maybe_unused]] local int densitydb_bufupdate	(DD *,int,int,cchar *) noex ;
 
 
 /* local variables */
@@ -219,13 +225,19 @@ constexpr cpcchar	localfs[] = {
 	"hfs",
 	"vxfs",
 	nullptr
-} ;
+} ; /* end array */
 
-cint		magsiz		= DENSITYDB_MAGSIZ ;
+constexpr cpcchar	suffixes[] = {
+	DENSITYDB_FS,
+	DENSITYDB_FSA,
+	DENSITYDB_FSB
+} ; /* end array */
 
-constexpr char	magstr[]	= DENSITYDB_MAGSTR ;
-
-cbool		f_creat 	= CF_CREAT ;
+static vars		var ;
+cint			hlen		= DENSITYDB_FLTOP ;
+cint			magsiz		= DENSITYDB_MAGSIZ ;
+cchar			magstr[]	= DENSITYDB_MAGSTR ;
+cbool			f_creat 	= CF_CREAT ;
 
 
 /* exported variables */
@@ -237,7 +249,7 @@ local int densitydb_opens(DD *,cc *) noex ;
 
 int densitydb_open(DD *op,cc *fname,int oflags,mode_t om,int maxent) noex {
 	int		rs ;
-	int		fcreate = false ;
+	int		fcreate = false ; /* return-value */
 	if ((rs = densitydb_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
@@ -246,12 +258,11 @@ int densitydb_open(DD *op,cc *fname,int oflags,mode_t om,int maxent) noex {
 	        }
 	        op->oflags = (oflags &= (~ O_TRUNC)) ;
 		if ((rs = ucpagesize) >= 0) {
-		    static cint		rsv = var ;
 	            op->pagesz = rs ;
-		    if ((rs = rsv) >= 0) {
+		    if (static cint rsv = var ; (rs = rsv) >= 0) {
 	        	op->om = om ;
 	        	op->maxent = maxent ;
-	        	op->ebs = uceil(var.entsz,szof(int)) ;
+	        	op->entsz = uceil(var.entsz,szof(int)) ;
 		        rs = densitydb_opens(op,fname) ;
 			fcreate = (rs > 0) ;
 		    } /* end if (vars) */
@@ -259,11 +270,10 @@ int densitydb_open(DD *op,cc *fname,int oflags,mode_t om,int maxent) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		densitydb_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (densitydb_ctor) */
 	return (rs >= 0) ? fcreate : rs ;
-}
-/* end subroutine (densitydb_open) */
+} /* end subroutine (densitydb_open) */
 
 local int densitydb_opens(DD *op,cc *fname) noex {
     	int		rs ;
@@ -271,46 +281,47 @@ local int densitydb_opens(DD *op,cc *fname) noex {
         if ((rs = densitydb_bufbegin(op)) >= 0) {
             if ((rs = densitydb_openbegin(op,fname)) >= 0) {
 		custime		dt = getustime ;
-		fcreate = rs ;
-                if (cchar *cp ; (rs = uc_malloc(fname,-1,&cp)) >= 0) {
+		fcreate = (rs > 0) ;
+                if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
                     cint	am = (op->oflags & O_ACCMODE) ;
-                    op->fname = cp ;
-                    op->fl.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
+                    op->fname = charp(cp) ;
+                    op->fl.writable = isaccmode.wr(am) ;
                     op->tiopen = dt ;
                     op->tiopen = dt ;
-                    if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+                    if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+			csize fsize = size_t(sb.st_size) ;
                         op->timod = uint(sb.st_mtime) ;
-                        op->filesz = intsat(sb.st_size) ;
+                        op->filesz = intsat(fsize) ;
                         if ((rs = isfsremote(op->fd)) >= 0) {
                             op->fl.remote = (rs > 0) ;
                             if ((rs = densitydb_fileinit(op,dt)) >= 0) {
-                                op->magic = DENSITYDB_MAGIC ;
+                                op->magval = DENSITYDB_MAGIC ;
                             }
-                        }
-                    }
+                        } /* end if (isfsremote) */
+                    } /* end if (stat) */
                     if (rs < 0) {
-                        uc_free(op->fname) ;
+                        voidp vp = voidp(op->fname) ;
+                        mem.free(vp) ;
                         op->fname = nullptr ;
-                    }
-                } /* end if (m-a) */
+                    } /* end if (error) */
+                } /* end if (memory-release) */
                 if (rs < 0) {
-		    densitydb_openend() ;
-                }
+		    densitydb_openend(op) ;
+                } /* end if (error) */
             } /* end if (densitydb_openbegin) */
-            if (rs < 0) {
+            if (rs < 0) { /* end if (error) */
                 densitydb_bufend(op) ;
-            }
+            } /* end if (error) */
         } /* end if (densitydb_bufbegin) */
 	return (rs >= 0) ? fcreate : rs ;
-}
-/* end subroutine (densitydb_opens) */
+} /* end subroutine (densitydb_opens) */ /* end if (error) */
 
 int densitydb_close(DD *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = densitydb_magic(op)) >= 0) {
 	    {
-	        rs1 = desnitydb_openend(op) ;
+	        rs1 = densitydb_openend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -321,16 +332,15 @@ int densitydb_close(DD *op) noex {
 	        rs1 = uc_free(op->fname) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 	        rs1 = densitydb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (densitydb_close) */
+} /* end subroutine (densitydb_close) */
 
 int densitydb_count(DD *op) noex {
 	int		rs ;
@@ -339,8 +349,7 @@ int densitydb_count(DD *op) noex {
 	    c = (op->filesz - DENSITYDB_FOTAB) / var.entsz ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (densitydb_count) */
+} /* end subroutine (densitydb_count) */
 
 int densitydb_curbegin(DD *op,DD_CUR *curp) noex {
     	int		rs ;
@@ -348,8 +357,7 @@ int densitydb_curbegin(DD *op,DD_CUR *curp) noex {
 	    curp->i = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (densitydb_curbegin) */
+} /* end subroutine (densitydb_curbegin) */
 
 int densitydb_curend(DD *op,DD_CUR *curp) noex {
     	int		rs ;
@@ -357,17 +365,16 @@ int densitydb_curend(DD *op,DD_CUR *curp) noex {
 	    curp->i = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (densitydb_curend) */
+} /* end subroutine (densitydb_curend) */
 
 local int densitydb_curenums(DD *,DD_CUR *,DD_ENT *) noex ;
 
 int densitydb_curenum(DD *op,DD_CUR *curp,DD_ENT *ep) noex {
 	int		rs ;
 	int		ei = 0 ; /* return-value */
-	if ((rs = density_magic(op,curp,ep)) >= 0) {
+	if ((rs = densitydb_magic(op,curp,ep)) >= 0) {
 	    rs = SR_NOTFOUND ;
-	    if (op->fl.fileinit) {
+	    if (op->fl.fileinited) {
 		rs = SR_LOCKFAIL ;
 		if (! op->fl.cursorlockbroken) {
 		    rs = densitydb_curenums(op,curp,ep) ;
@@ -376,162 +383,139 @@ int densitydb_curenum(DD *op,DD_CUR *curp,DD_ENT *ep) noex {
 	    } /* end if (file-initialized) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (densitydb_curenum) */
+} /* end subroutine (densitydb_curenum) */
 
 local int densitydb_curenums(DD *op,DD_CUR *curp,DD_ENT *ep) noex {
-	cfunmode	fc = funmode::rd ;
+	cmsgsub		fc = msgsub::rd ;
 	custime		dt = getustime ;
 	int		rs ;
-	int		ei = 0 ;
+	int		ei = 0 ; /* return-value */
 	if ((rs = densitydb_filecheck(op,dt,fc)) >= 0) {
 	    cint	fotab = DENSITYDB_FOTAB ;
 	    ei = (curp->i < 0) ? 0 : curp->i + 1 ;
 	    rs = SR_EOF ;
-	    if (op->fl.fileinit) {
-		cuint	eoff = uint(fotab + (ei * op->ebs)) ;
+	    if (op->fl.fileinited) {
+		cint	eoff = uint(fotab + (ei * op->entsz)) ;
 		rs = SR_NOTFOUND ;
-		if ((eoff + op->ebs) <= op->filesz) {
+		if ((eoff + op->entsz) <= op->filesz) {
 		    char	*bp ;
-		    if ((rs = densitydb_buf(op,eoff,op->ebs,&bp)) >= 0) {
-			if (rs < op->ebs) {
+		    if ((rs = densitydb_bufget(op,eoff,op->entsz,&bp)) >= 0) {
+			if (rs < op->entsz) {
 			    rs = SR_EOF ;
 			}
-		        if ((rs >= 0 && ep) {
-	    	            rs = densitydbe_wr(ep,bp,var.entsz)
+		        if ((rs >= 0) && ep) {
+	    	            rs = densitydbe_wr(ep,bp,var.entsz) ;
 		        } /* end if */
 		        if (rs >= 0) {
 		            curp->i = ei ;
 		            op->fl.cursoracc = true ;
-		        }
-		    } /* end if (densitydb_buf) */
+		        } /* end if (ok) */
+		    } /* end if (densitydb_bufget) */
 		} /* end if (valid) */
 	    } /* end if (file-initialized) */
 	} /* end if (densirydb_filecheck) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (densitydb_curenums) */
+} /* end subroutine (densitydb_curenums) */
+
+local int densitydb_updates(DD *,time_t,int,DD_ENT *) noex ;
 
 int densitydb_update(DD *op,time_t dt,int idx,DD_ENT *ep) noex {
 	int		rs ;
 	int		ei = 0 ; /* return-value */
-	if ((rs = density_magic(op,curp,ep)) >= 0) {
+	if ((rs = densitydb_magic(op,ep)) >= 0) {
 	    rs = SR_INVALID ;
-	    id (idx >= 0) {
+	    if (idx >= 0) {
 		rs = SR_NOTFOUND ;
-		if (op->fl.fileinit) {
+		if (op->fl.fileinited) {
+		    cmsgsub	fc = msgsub::rd ;
 		    if (dt == 0) dt = getustime ;
-	DENSITYDBE	m0 ;
-	off_t	uoff ;
-	uint		eoff ;
-	int		wlen ;
-	int		f_addition = false ;
-	int		f_bufupdate = false ;
-	char		ebuf[DENSITYDBE_SIZE + 4] ;
-	char		*bep ;
-
-
-/* do we have proper file access? */
-
-
-	cfunmode	fc = funmode::rd ;
-	rs = densitydb_filecheck(op,dt,fc) ;
-
-	if ((rs < 0) || (! op->fl.fileinit))
-	    goto ret0 ;
-
-/* continue with the search */
-
-	ei = index ;
-	if (ei > (op->h.nents - 1))
-	    ei = (op->h.nents - 1) ;
-
-	if (ep != nullptr) {
-	    densitydbe_all(bep,DENSITYDBE_SIZE,1,ep) ;
-	    m0 = *ep ;
-	} else {
-	    densitydbe_all(bep,DENSITYDBE_SIZE,1,&m0) ;
-	}
-
-	    m0.count += 1 ;
-	    m0.utime = dt ;
-	    wlen = densitydbe_all(bep,DENSITYDBE_SIZE,0,&m0) ;
-
-/* update the in-core file buffer as needed or as appropriate */
-
-	    if ((rs >= 0) && f_bufupdate && op->fl.writable) {
-	        eoff = DENSITYDB_FOTAB + (ei * op->ebs) ;
-	        densitydb_bufupdate(op,eoff,wlen,ebuf) ;
-	    }
-
-	if ((rs >= 0) && op->fl.writable) {
-
-/* write back this entry */
-
-	    eoff = DENSITYDB_FOTAB + (ei * op->ebs) ;
-
-	    uoff = eoff ;
-	    rs = u_writep(op->fd,bep,wlen,uoff) ;
-
-	    if (rs >= wlen) {
-
-	        if (dt == 0)
-	            dt = getustime ;
-
-	        op->h.wcount += 1 ;
-	        op->h.wtime = dt ;
-	        if (f_addition) {
-	            op->h.nents += 1 ;
-	            op->filesz += wlen ;
-	        }
-
-	        rs = densitydb_writehead(op) ;
-
-	        if ((rs >= 0) && op->fl.remote)
-	            u_fsync(op->fd) ;
-
-	    } /* end if (data write was successful) */
-
-	} /* end if (writing updated entry to file) */
-
-/* update access time as appropriate */
-
-	if (dt == 0)
-	    dt = getustime ;
-
-	op->tiopen = dt ;
-
-/* done */
-ret0:
+		    if ((rs = densitydb_filecheck(op,dt,fc)) >= 0) {
+			rs = densitydb_updates(op,dt,idx,ep) ;
+			ei = rs ;
+		    }
+		    /* update access time as appropriate */
+		    if (dt == 0) dt = getustime ;
+		    op->tiopen = dt ;
+	        } /* end if (initialized) */
+	    } /* end if (valid) */
+        } /* end if (densitydb_magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (densitydb_update) */
+} /* end subroutine (densitydb_update) */
+
+local int densitydb_updates(DD *op,time_t dt,int idx,DD_ENT *ep) noex {
+    	dbhdr		*fhp = resumelife<dbhdr>(op->fhp) ;
+	densitydbe	m0{} ;
+    	int		rs = SR_OK ;
+	int		ei = idx ; /* return-value */
+	cint		entsz = ep->entsz ;
+	char		ebuf[entsz + 4] ;
+	bool		f_addition = false ;
+	bool		f_bufupdate = false ;
+	/* continue with the search */
+	if (int nents = int(fhp->nents) ; ei > (nents - 1)) {
+	    ei = (nents - 1) ;
+	}
+	if (ep) {
+	    m0 = *ep ;
+	}
+	m0.count += 1 ;
+	m0.utime = uint(dt) ;
+	if ((rs = m0.rd(ebuf,entsz)) >= 0) {
+	    cint eoff = DENSITYDB_FOTAB + (ei * op->entsz) ;
+	    cint wlen = rs ;
+	    /* update the in-core file buffer */
+	    if (f_bufupdate && op->fl.writable) {
+	        rs = densitydb_bufupdate(op,eoff,wlen,ebuf) ;
+	    }
+	    if ((rs >= 0) && op->fl.writable) {
+	        coff uoff = off_t(eoff) ;
+	        /* write back this entry */
+	        if ((rs = u_writep(op->fd,ebuf,wlen,uoff)) >= wlen) {
+	            if (dt == 0) dt = getustime ;
+	            fhp->wcount += 1 ;
+	            fhp->wtime = uint(dt) ;
+	            if (f_addition) {
+	                fhp->nents += 1 ;
+	                op->filesz += wlen ;
+	            }
+	            if ((rs = densitydb_writehead(op)) >= 0) {
+	                if (op->fl.remote) {
+			    u_fsync(op->fd) ;
+		        } /* end if (ok) */
+		    } /* end if (density_writehead) */
+	        } /* end if (data write was successful) */
+	    } /* end if (writing updated entry to file) */
+	} /* end if (densitydbe_rd) */
+	return (rs >= 0) ? ei : rs ;
+} /* end subroutine (densitydb_updates) */
 
 int densitydb_check(DD *op,time_t dt) noex {
-	int		rs = SR_OK ;
-	if (op->fd >= 0) {
-	    if (dt == 0) dt = getustime ;
-	    if (! (op->fl.readlocked || op->fl.writelocked)) {
-		bool	f = false ;
-	        f = f || ((dt - op->tiopen) > TO_ACCESS) ;
-		f = f || ((dt - op->tiopen) > TO_OPEN) ;
-		if (f) {
-		    rs = densitydb_fileclose(op) ;
-		}
-	    } /* end if (not locked) */
-	} /* end if (was open) */
+	int		rs ;
+	if ((rs = densitydb_magic(op)) >= 0) {
+	   if (op->fd >= 0) {
+	       if (dt == 0) dt = getustime ;
+	       if (! (op->fl.lockedrd || op->fl.lockedwr)) {
+		   bool	f = false ;
+	           f = f || ((dt - op->tiopen) > TO_ACCESS) ;
+		   f = f || ((dt - op->tiopen) > TO_OPEN) ;
+		   if (f) {
+		       rs = densitydb_fileclose(op) ;
+		   }
+	       } /* end if (not locked) */
+	   } /* end if (was open) */
+        } /* end if (densitydb_magic) */
 	return rs ;
-}
-/* end subroutine (densitydb_check) */
+} /* end subroutine (densitydb_check) */
 
 
 /* private subroutines */
 
 local int densitydb_openbegin(DD *op,cchar *fname) noex {
-	cint		of = (op->oflags & (~ O_CREAT)) ;
+	mut int		of = (op->oflags & (~ O_CREAT)) ;
 	int		rs ;
-	int		fcreate = false ;
-	if (char *tbuf ; (rs = mallocxx_mp(&tbuf)) >= 0) {
+	int		rs1 ;
+	int		fcreate = false ; /* return-value */
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
 	    if ((rs = densitydb_opener(op,tbuf,fname,of)) >= 0) {
 		rs = 0 ;
 	    } else if (isNotPresent(rs)) {
@@ -540,12 +524,12 @@ local int densitydb_openbegin(DD *op,cchar *fname) noex {
 		    fcreate = true ;
 	            rs = densitydb_opener(op,tbuf,fname,of) ;
 	        }
-	    }
-	    rs = rsfree(rs,tbuf) ;
+	    } /* end if */
+	    rs1 = mem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? fcreate : rs ;
-}
-/* end subroutine (densitydb_openbegin) */
+} /* end subroutine (densitydb_openbegin) */
 
 local int densitydb_opener(DD *op,char *tbuf,cchar *fname,int of) noex {
 	int		rs ;
@@ -566,13 +550,12 @@ local int densitydb_opener(DD *op,char *tbuf,cchar *fname,int of) noex {
 	              		op->fd = rs ;
 	    	    	    }
 			}
-		    }
-		}
+		    } /* end if */
+		} /* end if (mkfnamesuf) */
 	    }
-	}
+	} /* end if (mkfnamesuf) */
 	return rs ;
-}
-/* end subroutine (densitydb_opener) */
+} /* end subroutine (densitydb_opener) */
 
 local int densitydb_openend(DD *op) noex {
     	int		rs = SR_OK ;
@@ -581,200 +564,213 @@ local int densitydb_openend(DD *op) noex {
 	    rs1 = u_close(op->fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->fd = -1 ;
-	}
+	} /* end if (was open) */
 	return rs ;
-}
-/* end subroutine (densitydb_openend) */
+} /* end subroutine (densitydb_openend) */
 
-local int densitydb_filecheck(DD *op,time_t dt,cfunmode fc) noex {
-	int		rs = SR_OK ;
+local int densitydb_filecheck(DD *op,time_t dt,cmsgsub fc) noex {
+	int		rs ;
 	int		fch = false ;
 	if (dt == 0) dt = getustime ;
 	if ((rs = densitydb_fileopen(op,dt)) >= 0) {
-	    if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
+	    if ((! op->fl.lockedrd) && (! op->fl.lockedwr)) {
 	        if ((rs = densitydb_lockacq(op,dt,fc)) >= 0) {
 	    	    rs = densitydb_filechanged(op) ;
 	    	    fch = (rs > 0) ;
 		    if (rs < 0) {
 			densitydb_lockrel(op) ;
-		    }
+		    } /* end if (error) */
 		} /* end if (densitydb_lockacq) */
 	    } /* end if (capture lock) */
 	} /* end if (densitydb_fileopen) */
 	return (rs >= 0) ? fch : rs ;
-}
-/* end subroutine (densitydb_filecheck) */
+} /* end subroutine (densitydb_filecheck) */
+
+local int densitydb_fileinitz(DD *,time_t) noex ;
+local int densitydb_fileinitn(DD *,time_t) noex ;
 
 local int densitydb_fileinit(DD *op,time_t dt) noex {
-	FM	fm ;
-	int		rs ;
-	int		bl ;
-	int		f_locked = false ;
-	char		fbuf[DENSITYDB_FBUFLEN + 1], *bp ;
-	char		*cp ;
-
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		rv = 0 ; /* return-value */
 	if (op->filesz == 0) {
-
-	    u_seek(op->fd,0L,SEEK_SET) ;
-
-	    op->fl.fileinit = false ;
-	    if (op->fl.writable) {
-
-	        if (! op->fl.writelocked) {
-		    const funmode	fwr = funmode:wr ;
-	            rs = densitydb_lockacq(op,dt,fwr) ;
-
-	            if (rs < 0)
-	                goto ret0 ;
-
-	            f_locked = true ;
-	        }
-
-/* write the file magic and header stuff */
-
-/* file magic */
-
-	        strwcpy(fm.magic,DENSITYDB_MAGSTR,14) ;
-
-	        fm.vetu[0] = DENSITYDB_FILEVERSION ;
-	        fm.vetu[1] = DENSITYDB_ENDIAN ;
-	        fm.vetu[2] = 0 ;
-	        fm.vetu[3] = 0 ;
-
-	        bl = 0 ;
-	        bl += filemagic((fbuf + bl),0,&fm) ;
-
-/* file header */
-
-	        memclear(&op->h) ;
-
-	        bl += filehead(&op->h,(fbuf + bl),0) ;
-
-/* write them to the file */
-
-	        rs = u_writep(op->fd,fbuf,bl,0L) ;
-
-	        if (rs > 0) {
-
-	            op->filesz = rs ;
-	            op->timod = dt ;
-	            if (op->fl.remote)
-	                u_fsync(op->fd) ;
-
-	            densitydb_bufupdate(op,0,bl,fbuf) ;
-
-	        }
-
-	        op->fl.fileinit = (rs >= 0) ;
-
-	    } /* end if (writing) */
-
+	    rs = densitydb_fileinitz(op,dt) ;
+	    rv = rs ;
 	} else if (op->filesz >= DENSITYDB_FOTAB) {
-	    int	f ;
+	    rs = densitydb_fileinitn(op,dt) ;
+	    rv = rs ;
+	} /* end if */
+	{
+	    if ((rs1 = densitydb_locked(op)) > 0) {
+	        rs1 = densitydb_lockrel(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (was locked) */
+	    if (rs >= 0) rs = rs1 ;
+	} /* end block */
+	return (rs >= 0) ? rv : rs ;
+} /* end subroutine (densitydb_fileinit) */
 
-/* read the file header */
+local int densitydb_fileinitzw(DD *,time_t) noex ;
 
-	    if (! op->fl.readlocked) {
-		const funmode	frd = funmode:rd ;
-	        rs = densitydb_lockacq(op,dt,frd) ;
+local int densitydb_fileinitz(DD *op,time_t dt) noex {
+	int		rs ;
+	int		rv = 0 ; /* return-value */
+	bool		f_locked = false ;
+	if ((rs = u_seek(op->fd,0z,SEEK_SET)) >= 0) {
+	    op->fl.fileinited = false ;
+	    if (op->fl.writable) {
+	        if (! op->fl.lockedwr) {
+		    cmsgsub	fwr = msgsub::wr ;
+	            if ((rs = densitydb_lockacq(op,dt,fwr)) >= 0) {
+	                op->fl.lockedwr = true ;
+		    }
+	        } /* end if (locking required) */
+		/* write the file magic and header stuff */
+		if (rs >= 0) {
+		    rs = densitydb_fileinitzw(op,dt) ;
+		    rv = rs ;
+		} /* end if (ok) */
+	    } /* end if (writing) */
+	} /* end if (u_seek) */
+	(void) f_locked ;
+	return (rs >= 0) ? rv : rs ;
+} /* end subroutine (densitydb_fileinitz) */
 
-	        if (rs < 0)
-	            goto ret0 ;
+local int densitydb_fileinitzw(DD *op,time_t dt) noex {
+	dbhdr		*fhp = resumelife<dbhdr>(op->fhp) ;
+	cint		flen = DENSITYDB_FLTOP ;
+	int		rs ;
+	int		rv = 0 ; /* return-value */
+	uchar		vbuf[4] = {} ;
+	/* file magic */
+	vbuf[0] = uchar(DENSITYDB_FILEVERSION) ;
+	vbuf[1] = uchar(DENSITYDB_ENDIAN) ;
+	vbuf[2] = 0 ;
+	vbuf[3] = 0 ;
+	if (FM fm ; (rs = fm.load(magstr,magsiz,vbuf)) >= 0) {
+	    if (char fbuf[flen + 1] ; (rs = fm.rd(fbuf,flen)) >= 0) {
+	        int bl = rs ;
+	        /* file header */
+	        if ((rs = fhp->rd(fbuf + bl)) >= 0) {
+		    bl += rs ;
+		    /* write them to the file */
+	            if ((rs = u_writep(op->fd,fbuf,bl,0z)) > 0) {
+	                op->filesz = rs ;
+	                op->timod = dt ;
+	                if (op->fl.remote) {
+	                    u_fsync(op->fd) ;
+		        }
+	                rs = densitydb_bufupdate(op,0,bl,fbuf) ;
+			rv = rs ;
+	            } /* end if (u_writep) */
+	            op->fl.fileinited = (rs >= 0) ;
+	        } /* end if (dbhdr_rd) */
+	    } /* end if (filemagic_rd) */
+	} /* end if (filemagic_load) */
+	return (rs >= 0) ? rv : rs ;
+} /* end subroutine (densitydb_fileinitzw) */
 
+local int densitydb_fileinitn(DD *op,time_t dt) noex {
+	dbhdr		*fhp = resumelife<dbhdr>(op->fhp) ;
+	int		rs = SR_OK ;
+	bool		f_locked = false ;
+	/* read the file header */
+	if (! op->fl.lockedrd) {
+	   cmsgsub	frd = msgsub::rd ;
+	   if ((rs = densitydb_lockacq(op,dt,frd)) >= 0) {
 	        f_locked = true ;
 	    }
-
-	    rs = u_readp(op->fd,fbuf,DENSITYDB_FBUFLEN,0L) ;
-
-	    if (rs >= DENSITYDB_FLTOP) {
-
-	        bl = 0 ;
-	        bl += filemagic((fbuf + bl),1,&fm) ;
-
-	        filehead((fbuf + bl),1,&op->h) ;
-
-	        f = (strcmp(fm.magic,DENSITYDB_MAGSTR) == 0) ;
-	        f = f && (fm.vetu[0] <= DENSITYDB_FILEVERSION) ;
-	        f = f && (fm.vetu[1] == DENSITYDB_ENDIAN) ;
-	        if (! f)
-	            rs = SR_BADFMT ;
-
-	        op->fl.fileinit = f ;
-
-	    }
-
-	} /* end if */
-
-/* if we locked, we unlock it, otherwise leave it ! */
-
-	if (f_locked)
-	    densitydb_lockrel(op) ;
-
-/* we're out of here */
-ret0:
+	} /* end if (needed lock) */
+	if (rs >= 0) {
+	    cint	flen = DENSITYDB_FBUFLEN ;
+	    char	fbuf[DENSITYDB_FBUFLEN + 1] ;
+	    if ((rs = u_readp(op->fd,fbuf,flen,0z)) >= 0) {
+		int  bl = 0 ;
+	        if (FM fm ; (rs = fm.rd(fbuf + bl)) >= 0) {
+		    bl += rs ;
+		    if ((rs = fm.verify(magstr,magsiz)) > 0) {
+	                if ((rs = fhp->rd(fbuf + bl)) >= 0) {
+			    bool f = true ;
+			    bl += rs ;
+	                    f = f && (fm.vetu[0] <= DENSITYDB_FILEVERSION) ;
+	                    f = f && (fm.vetu[1] == DENSITYDB_ENDIAN) ;
+	                    if (! f) {
+	                        rs = SR_BADFMT ;
+		            }
+	                    op->fl.fileinited = f ;
+		        } /* end if (filehead_rd) */
+		    } else {
+			rs = SR_BADFMT ;
+		    } /* end if (valid) */
+		} /* end if (filemagic_rd) */
+	    } /* end if (u_readp) */
+	} /* end if (ok) */
+	(void) f_locked ;
 	return rs ;
-}
-/* end subroutine (densitydb_fileinit) */
+} /* end subroutine (densitydb_fileinitn) */
 
 local int densitydb_filechanged(DD *op) noex {
 	int		rs ;
-	int		fch = false ;
-	if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
-	    cint	fsz = intsat(sb.st_size) ;
-	    if (fsz >= DENSITYDB_FOTAB) {
-	        fch = fch || (sb.st_size != op->filesz) ;
+	int		fch = false ; /* return-value */
+	if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+	    csize	fsize = size_t(sb.st_size) ;
+	    if (cint fsz = intsat(fsize) ; fsz >= DENSITYDB_FOTAB) {
+	        fch = fch || (fsz != op->filesz) ;
 	        fch = fch || (sb.st_mtime != op->timod) ;
-	    if ((! fch) && op->fl.fileinit) {
-	        char	hbuf[DENSITYDB_FLTOP + 1] ;
-	        id ((rs = u_readp(op->fd,hbuf,DENSITYDB_FLTOP,0z)) >= 0) {
-	            if (rs < DENSITYDB_FLTOP) {
-	                op->fl.fileinit = false ;
-	            }
-	            if (rs > 0) {
-	                if (FH h ; (rs = h.wr(hbuf,rs)) >= 0) {
-
-	        fch = (op->h.wtime != h.wtime) ||
-	            (op->h.wcount != h.wcount) ||
-	            (op->h.nents != h.nents) ;
-
-	        if (fch)
-	            op->h = h ;
-
-	    }
-
-	} /* end if (reading file header) */
-
-	    } else {
-	        op->fl.fileinit = false ;
-	    } /* end if */
-	} else if (isNotPresent(rs)) {
-	    rs = SR_OK ;
-	    fch = true ;
-	} /* end if (stat) */
-	if (fch) {
-	    op->b.len = 0 ;
-	    op->filesz = sb.st_size ;
-	    op->timod = sb.st_mtime ;
-	}
+	        if ((! fch) && op->fl.fileinited) {
+	            char	hbuf[hlen + 1] ;
+	            if ((rs = u_readp(op->fd,hbuf,hlen,0z)) >= 0) {
+	                if (rs < hlen) {
+	                    op->fl.fileinited = false ;
+	                }  /* end if */
+			if (rs > 0) {
+	                    if (FH h ; (rs = h.wr(hbuf)) >= 0) {
+				dbhdr *fhp = resumelife<dbhdr>(op->fhp) ;
+				fch = false ;
+	                        fch = fch || (fhp->wtime != h.wtime) ;
+				fch = fch || (fhp->wcount != h.wcount) ;
+				fch = fch || (fhp->nents != h.nents) ;
+	                        if (fch) {
+	                            *fhp = h ; /* object copy */
+		                }
+		            } /* end if */
+		        } /* end if (reading file header) */
+	            } else {
+	                op->fl.fileinited = false ;
+	            } /* end if */
+	        } else if (isNotPresent(rs)) {
+	            rs = SR_OK ;
+	            fch = true ;
+	        } /* end if (stat) */
+	    } /* end if (was already initialized) */
+	    if (fch) {
+		denbuf *dbp = resumelife<denbuf>(op->dbp) ;
+		cint fsz = intsat(fsize) ;
+	        dbp->len = 0 ;
+	        op->filesz = fsz ;
+	        op->timod = sb.st_mtime ;
+	    } /* end if (file has changed) */
+	} /* end if (u_fstat) */
 	return (rs >= 0) ? fch : rs ;
-}
-/* end subroutine (densitydb_filechanged) */
+} /* end subroutine (densitydb_filechanged) */
 
-local int densitydb_lockacq(DD *op,time_t dt,cfunmode fc) noex {
-	int		rs = SR_OK ;
+local int densitydb_lockacq(DD *op,time_t dt,cmsgsub fc) noex {
+	int		rs ;
 	bool		falready = false ;
 	if ((rs = densitydb_fileopen(op,dt)) >= 0) {
 	    int		lockcmd = -1 ;
-	    if ((fc == funmode::rd) || (! op->fl.writable)) {
-	        f_already = op->fl.readlocked ;
-	        op->fl.readlocked = true ;
-	        op->fl.writelocked = false ;
+	    if ((fc == msgsub::rd) || (! op->fl.writable)) {
+	        falready = op->fl.lockedrd ;
+	        op->fl.lockedrd = true ;
+	        op->fl.lockedwr = false ;
 	        lockcmd = F_RLOCK ;
-	    } else {
-	        f_already = op->fl.writelocked ;
-	        op->fl.readlocked = false ;
-	        op->fl.writelocked = true ;
+	    } else if (fc == msgsub::wr) {
+	        falready = op->fl.lockedwr ;
+	        op->fl.lockedrd = false ;
+	        op->fl.lockedwr = true ;
 	        lockcmd = F_WLOCK ;
+	    } else {
+		rs = SR_BUGCHECK ;
 	    } /* end if */
 	    if ((! falready) && (lockcmd >= 0)) {
 		cint	to = TO_LOCK ;
@@ -782,21 +778,19 @@ local int densitydb_lockacq(DD *op,time_t dt,cfunmode fc) noex {
 	    }
 	} /* end if (ok) */
 	return rs ;
-}
-/* end subroutine (densitydb_lockacq) */
+} /* end subroutine (densitydb_lockacq) */
 
 local int densitydb_lockrel(DD *op) noex {
 	int		rs = SR_OK ;
-	if ((op->fl.readlocked || op->fl.writelocked)) {
+	if ((op->fl.lockedrd || op->fl.lockedwr)) {
 	    if (op->fd >= 0) {
 	        rs = lockfile(op->fd,F_ULOCK,0z,0z,TO_LOCK) ;
 	    }
-	    op->fl.readlocked = false ;
-	    op->fl.writelocked = false ;
-	}
+	    op->fl.lockedrd = false ;
+	    op->fl.lockedwr = false ;
+	} /* end if (locked) */
 	return rs ;
-}
-/* end subroutine (densitydb_lockrel) */
+} /* end subroutine (densitydb_lockrel) */
 
 local int densitydb_fileopen(DD *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -805,11 +799,10 @@ local int densitydb_fileopen(DD *op,time_t dt) noex {
 	        op->fd = rs ;
 	        uc_closeonexec(op->fd,true) ;
 	        op->tiopen = dt ;
-	    }
-	}
+	    } /* end if (u_open) */
+	} /* end if (was not already open) */
 	return (rs >= 0) ? op->fd : rs ;
-}
-/* end subroutine (densitydb_fileopen) */
+} /* end subroutine (densitydb_fileopen) */
 
 int densitydb_fileclose(DD *op) noex {
 	int		rs = SR_OK ;
@@ -819,158 +812,148 @@ int densitydb_fileclose(DD *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->fd = -1 ;
 	    op->tiopen = 0 ;
-	}
+	} /* end if (was open) */
 	return rs ;
-}
-/* end subroutine (densitydb_fileclose) */
+} /* end subroutine (densitydb_fileclose) */
 
 local int densitydb_bufbegin(DD *op) noex {
-	cint		bsz = DENSITYDB_BUFSIZE ;
+	denbuf		*dbp = resumelife<denbuf>(op->dbp) ;
+	cint		bsz = DENSITYDB_BUFSZ ;
 	int		rs ;
-	op->b.off = 0 ;
-	op->b.len = 0 ;
-	op->b.bsz = 0 ;
-	op->b.bup = nullptr ;
-	if (char *bp ; (rs = uc_malloc(bsz,&bp)) >= 0) {
-	    op->b.bup = bp ;
-	    op->b.bsz = bsz ;
-	}
+	dbp->off = 0 ;
+	dbp->len = 0 ;
+	dbp->bsz = 0 ;
+	dbp->bup = nullptr ;
+	if (char *bp ; (rs = mem.mall(bsz,&bp)) >= 0) {
+	    dbp->bup = bp ;
+	    dbp->bsz = bsz ;
+	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (densitydb_bufbegin) */
+} /* end subroutine (densitydb_bufbegin) */
 
 local int densitydb_bufend(DD *op) noex {
+	denbuf		*dbp = resumelife<denbuf>(op->dbp) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->b.bup) {
-	    rs1 = uc_free(op->b.bup) ;
+	if (dbp->bup) {
+	    rs1 = mem.free(dbp->bup) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->b.bup = nullptr ;
-	}
-	op->b.bsz = 0 ;
-	op->b.len = 0 ;
+	    dbp->bup = nullptr ;
+	} /* end if (memory-release) */
+	dbp->bsz = 0 ;
+	dbp->len = 0 ;
 	return rs ;
-}
-/* end subroutine (densitydb_bufend) */
+} /* end subroutine (densitydb_bufend) */
 
-local int densitydb_buf(DD *op,uint roff,int rlen,char **rpp) noex {
-	off_t		foff ;
-	uint		bext, bend, fext, fend ;
-	uint		rext = (roff + rlen), ext ;
+local int densitydb_bufget(DD *op,int roff,int rlen,char **rpp) noex {
+	denbuf		*dbp = resumelife<denbuf>(op->dbp) ;
+	cint		rext = (roff + rlen) ;
+	int		fext ;
+	int		bend ;
+	int		ext ;
 	int		rs = SR_OK ;
 	int		len = rlen ;
-	char		*rbuf ;
-
+	fext = (dbp->off + dbp->len) ;
 	/* do we need to read in more data? */
-
-	fext = op->b.off + op->b.len ;
-	if ((roff < op->b.off) || (rext > fext)) {
-
+	if ((roff < dbp->off) || (rext > fext)) {
+	    int  off ;
+	    char *rbuf ;
 	    /* can we do an "add-on" type read operation? */
-
-	    bend = op->b.off + op->b.bsz ;
-	    if ((roff >= op->b.off) && (rext <= bend)) {
-
-	        foff = op->b.off + op->b.len ;
-	        rbuf = op->b.bup + op->b.len ;
-
-	        ext = roff + MAX(rlen,DENSITYDB_READSIZE) ;
-	        fext = uceil(ext,op->pagesz) ;
-
-	        if (fext > bend)
+	    bend = (dbp->off + dbp->bsz) ;
+	    if ((roff >= dbp->off) && (rext <= bend)) {
+	        rbuf = (dbp->bup + dbp->len) ;
+		off = (dbp->off + dbp->len) ;
+		{
+	            ext = roff + MAX(rlen,DENSITYDB_READSZ) ;
+	            fext = uceil(ext,op->pagesz) ;
+		}
+	        if (fext > bend) {
 	            fext = bend ;
-
-	        len = (fext - foff) ;
-
+		}
+	        len = (fext - off) ;
+	        coff foff = off_t(off) ;
 	        if ((rs = u_readp(op->fd,rbuf,len,foff)) >= 0) {
-	            op->b.len += rs ;
-	            len = MIN(((op->b.off + op->b.len) - roff),rlen) ;
-	        }
-
+	            dbp->len += rs ;
+	            len = MIN(((dbp->off + dbp->len) - roff),rlen) ;
+	        } /* end if (u_readp) */
 	    } else {
-
-	        op->b.off = roff ;
-	        op->b.len = 0 ;
-
-	        bend = roff + op->b.bsz ;
-
-	        foff = roff ;
-	        rbuf = op->b.bup ;
-
-	        ext = roff + MAX(rlen,DENSITYDB_READSIZE) ;
-	        fext = uceil(ext,op->pagesz) ;
-
-	        if (fext > bend)
+	        rbuf = dbp->bup ;
+		off = roff ;
+	        bend = roff + dbp->bsz ;
+		{
+	            dbp->off = roff ;
+	            dbp->len = 0 ;
+		}
+		{
+	            ext = roff + MAX(rlen,DENSITYDB_READSZ) ;
+	            fext = uceil(ext,op->pagesz) ;
+		}
+	        if (fext > bend) {
 	            fext = bend ;
-
-	        len = fext - foff ;
-	        if ((rs = u_readp(op->fd,op->b.bup,len,foff)) >= 0) {
-	            op->b.len = rs ;
+		}
+	        len = (fext - off) ;
+	        coff foff = off_t(off) ;
+	        if ((rs = u_readp(op->fd,dbp->bup,len,foff)) >= 0) {
+	            dbp->len = rs ;
 	            len = MIN(rs,rlen) ;
-	        }
-
+	        } /* end if (u_readp) */
 	    } /* end if */
-
 	} /* end if (needed to read more data) */
-
-	if (rpp != nullptr) {
-	    *rpp = op->b.bup + (roff - op->b.off) ;
+	if (rpp) {
+	    *rpp = dbp->bup + (roff - dbp->off) ;
 	}
-
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (densitydb_buf) */
+} /* end subroutine (densitydb_bufget) */
 
-local int densitydb_bufupdate(DD *op,uint roff,int rbuflen,cchar *rbuf) noex {
-	uint		boff, bext ;
-	uint		rext = roff + rbuflen ;
-	int		buflen, bdiff ;
-
-	buflen = op->b.len ;
-	boff = op->b.off ;
-	bext = boff + buflen ;
-
-	if (roff < boff) {
-
-	    if (rext <= boff)
-	        return 0 ;
-
-	    rbuf += (boff - roff) ;
-	    rbuflen -= (boff - roff) ;
-	    roff = boff ;
-
+local int densitydb_bufupdate(DD *op,int roff,int rlen,cchar *rbuf) noex {
+	denbuf		*dbp = resumelife<denbuf>(op->dbp) ;
+	int		boff ;
+	int		bext ;
+	int		rext = (roff + rlen) ;
+	int		buflen ;
+	bool		fcont = true ;
+	{
+	    buflen	= int(dbp->len) ;
+	    boff	= int(dbp->off) ;
+	    bext	= (boff + buflen) ;
 	}
-
-	if (rext > bext) {
-
-	    if (roff >= bext)
-	        return 0 ;
-
-	    rbuflen -= (rext - bext) ;
-	    rext = bext ;
-
-	}
-
-	if (rbuflen > 0) {
-	    bdiff = roff - boff ;
-	    memcpy((op->b.bup + bdiff),rbuf,rbuflen) ;
-	}
-
-	return rbuflen ;
-}
-/* end subroutine (densitydb_bufupdate) */
+	if (fcont && (roff < boff)) {
+	    if (rext > boff) {
+	        rbuf += (boff - roff) ;
+	        rlen -= (boff - roff) ;
+	        roff = boff ;
+	    } else {
+		rlen = 0 ;
+	        fcont = false ;
+	    }
+	} /* end if */
+	if (fcont && (rext > bext)) {
+	    if (roff < bext) {
+	        rlen -= (rext - bext) ;
+	        rext = bext ;
+	    } else {
+		rlen = 0 ;
+	        fcont = false ;
+	    }
+	} /* end if */
+	if (fcont && (rlen > 0)) {
+	    cint bdiff = (roff - boff) ;
+	    memcopy((dbp->bup + bdiff),rbuf,rlen) ;
+	} /* end if */
+	return rlen ;
+} /* end subroutine (densitydb_bufupdate) */
 
 local int densitydb_writehead(DD *op) noex {
+    	dbhdr		*fhp = resumelife<dbhdr>(op->fhp) ;
 	int		rs ;
 	char		fbuf[DENSITYDB_FBUFLEN + 1] ;
-	if ((rs = filehead(fbuf,0,&op->h)) >= 0) {
+	if ((rs = fhp->rd(fbuf)) >= 0) {
 	    coff	uoff = DENSITYDB_FOHEAD ;
 	    cint	bl = rs ;
 	    rs = u_writep(op->fd,fbuf,bl,uoff) ;
-	}
+	} /* end if (dbhdr::rd) */
 	return rs ;
-}
-/* end subroutine (densitydb_writehead) */
+} /* end subroutine (densitydb_writehead) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -984,7 +967,6 @@ vars::operator int () noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (densitydbe) */
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
