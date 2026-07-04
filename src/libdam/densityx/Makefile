@@ -35,25 +35,24 @@ DEFS +=
 
 INCS += densityx.h
 
-MODS +=
+MODS += densityhdr.o
 
 LIBS +=
 
 
 OBJ0= density.o 
-OBJ1= densityx_filehead.o densitydbe.o
-#OBJ1= densityx_filehead.o densitydb.o densitydbe.o
-OBJ2= densitystat.o denpercents.o
-OBJ3=
+OBJ1= densitydb.o
+OBJ2= densityhdr.o densitydbe.o
+OBJ3= densitystat.o denpercents.o
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB=
 
 OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -96,11 +95,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -135,22 +134,22 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-density.o:		mods.o density.cc	density.h	$(INCS)
-densitydb.o:		mods.o densitydb.cc	densitydb.h	$(INCS)
-densitydbe.o:		mods.o densitydbe.cc	densitydbe.h	$(INCS)
+density.o:		density.cc	mods.o density.h	$(INCS)
+densitydb.o:		densitydb.cc	mods.o densitydb.h	$(INCS)
+densitydbe.o:		densitydbe.cc	mods.o densitydbe.h	$(INCS)
+densitystat.o:		densitystat.cc	mods.o densitystat.h	$(INCS)
+denpercents.o:		denpercents.cc	denpercents.h		$(INCS)
 
-densitystat.o:		mods.o densitystat.cc	densitystat.h	$(INCS)
-denpercents.o:		denpercents.cc denpercents.h		$(INCS)
+mods.o:			$(MODS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-mods.o:			densityx_filehead.o filemagic.o
-	$(LD) -r $(LDFLAGS) -o $@ densityx_filehead.o filemagic.o
+densityhdr.o:		densityhdr0.o densityhdr1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-densityx_filehead.o:	densityx_filehead.ccm
-	makemodule densityx_filehead
+densityhdr0.o:		densityhdr.ccm	densityhdr.hh			$(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-filemagic.o:		filemagic.ccm
-
-filemagic.ccm:
-	makemodcurrent $@
+densityhdr1.o:		densityhdr1.cc densityhdr0.o densityhdr.hh	$(INCS)
+	$(COMPILE.cc) $<
 
 
