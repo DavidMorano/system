@@ -33,17 +33,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"outstore.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -52,6 +57,7 @@ import libutil ;
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -85,8 +91,7 @@ int outstore_start(outstore *op) noex {
 	    op->fl.open = true ;
 	}
 	return rs ;
-}
-/* end subroutine (outstore_start) */
+} /* end subroutine (outstore_start) */
 
 int outstore_finish(outstore *op) noex {
 	int		rs = SR_FAULT ;
@@ -95,17 +100,16 @@ int outstore_finish(outstore *op) noex {
 	    rs = SR_OK ;
 	    if (op->dbuf) {
 	        op->dbuf[0] = '\0' ; /* cute safety trick */
-	        rs1 = uc_free(op->dbuf) ;
+	        rs1 = mem.free(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->sbuf[0] = '\0' ;
 	    op->len = 0 ;
 	    op->fl.open = false ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (outstore_finish) */
+} /* end subroutine (outstore_finish) */
 
 int outstore_get(outstore *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -116,8 +120,7 @@ int outstore_get(outstore *op,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (outstore_get) */
+} /* end subroutine (outstore_get) */
 
 int outstore_clear(outstore *op) noex {
 	int		rs = SR_FAULT ;
@@ -126,8 +129,7 @@ int outstore_clear(outstore *op) noex {
 	    op->len = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (outstore_clear) */
+} /* end subroutine (outstore_clear) */
 
 int outstore_strw(outstore *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -156,7 +158,7 @@ int outstore_strw(outstore *op,cchar *sp,int sl) noex {
 	        rlen = (slen - op->len) ;
 	        if (sl > rlen) {
 		    cint	dlen = max((sl + slen),(2 * slen)) ;
-		    if (char *dp{} ; (rs = uc_malloc((dlen + 1),&dp)) >= 0) {
+		    if (char *dp{} ; (rs = mem.mall((dlen + 1),&dp)) >= 0) {
 		        op->dlen = dlen ;
 		        op->dbuf = dp ;
 		        dp = strwcpy(dp,op->sbuf,op->len) ;
@@ -171,8 +173,7 @@ int outstore_strw(outstore *op,cchar *sp,int sl) noex {
 	    } /* end if (current mode) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (outstore_strw) */
+} /* end subroutine (outstore_strw) */
 
 int outstore::get(cchar **app) noex {
 	return outstore_get(this,app) ;
@@ -190,7 +191,7 @@ void outstore::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("outstore",rs,"fini-finish") ;
 	}
-}
+} /* end method (outstore::dtor) */
 
 outstore::operator int () noex {
     	int		rs = SR_NOTOPEN ;
@@ -198,7 +199,7 @@ outstore::operator int () noex {
 	    rs = len ;
 	}
 	return rs ;
-}
+} /* end method (outstore::operator) */
 
 outstore_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -216,8 +217,7 @@ outstore_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (outstore_co::operator) */
+} /* end method (outstore_co::operator) */
 
 
 
