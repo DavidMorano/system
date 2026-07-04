@@ -12,6 +12,6 @@ GCC-Expressions
 
 int sub() noex {
 	return ABS(2) ;
-}
-/* end subroutine (sub) */
+} /* end subroutine (sub) */
+
 
