@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* make all directories in a directory path */
+/* change the owner of one file to be that of a reference file */
 /* version %I% last-modified %G% */
 
 
@@ -26,7 +26,7 @@
 	reference.
 
 	Synopsis:
-	int chownsame(cchar *dname,cchar *ref)
+	int chownsame(cchar *dname,cchar *ref) noex
 
 	Arguments:
 	dname		direcrtory path to a new directory to create
@@ -94,8 +94,7 @@ int chownsame(cchar *dname,cchar *ref) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (chownsame) */
+} /* end subroutine (chownsame) */
 
 int chownref(cchar *dname,cchar *ref) noex {
     	return chownsame(dname,ref) ;
