@@ -169,7 +169,7 @@ template<typename ... Args>
 static inline int devpermfile_magic(devpermfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == DEVPERMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DEVPERMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -291,7 +291,7 @@ static int devpermfile_opener(DP *op) noex {
 	    vo = 0 ;
 	    if ((rs = vecobj_start(op->elp,vsz,vn,vo)) >= 0) {
 		if ((rs = devpermfile_parse(op,op->fname)) >= 0) {
-		    op->magic = DEVPERMFILE_MAGIC ;
+		    op->magval = DEVPERMFILE_MAGIC ;
 		}
 		if (rs < 0) {
 		    devpermfile_finents(op) ;
@@ -337,7 +337,7 @@ int devpermfile_close(DP *op) noex {
 		rs1 = devpermfile_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
