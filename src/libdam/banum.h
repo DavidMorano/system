@@ -20,15 +20,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	BANUM		struct banum_head
+#define	BANUM_DIGIT	int
 
 
 struct banum_head {
-	int		*num ;
+	BANUM_DIGIT	*num ;
+	int		nwords ;
 } ; /* end struct */
 
 typedef	BANUM		banum ;
