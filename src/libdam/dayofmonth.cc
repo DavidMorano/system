@@ -27,23 +27,24 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |geustime(3u)| */
-#include	<uclibmem.h>
-#include	<uctimeconv.h>		/* |uc_mktime(3uc)| */
-#include	<tmtime.hh>
-#include	<calstrs.h>
-#include	<matstr.h>		/* |matcasestr(3uc)| */
-#include	<cfdec.h>
-#include	<mkchar.h>
-#include	<ismisc.h>		/* |isleapyear(3uc)| */
-#include	<ischarx.h>		/* |isdigitlatin(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSYD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |geustime(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucmem.h>		/* LIBUC */
+#include	<uctimeconv.h>		/* LIBUC |uc_mktime(3uc)| */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<calstrs.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC |matcasestr(3uc)| */
+#include	<cfdec.h>		/* LIBUC */
+#include	<ismisc.h>		/* LIBUC |isleapyear(3uc)| */
+#include	<ischarx.h>		/* LIBUC |isdigitlatin(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dayofmonth.h"
 
@@ -93,9 +94,9 @@ local int dayofmonth_ctor(dayofmonth *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    cint	sz = (szof(dayofmonth_mon *) * DAYOFMONTH_NMONS) ;
 	    memclear(hop) ;
-	    if (void *vp{} ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 		op->months = (dayofmonth_mon **) vp ;
-	    }
+	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (dayofmonth_ctor) */
@@ -109,7 +110,7 @@ local int dayofmonth_dtor(dayofmonth *op) noex {
 		rs1 = lm_free(op->months) ;
 		if (rs >= 0) rs = rs1 ;
 		op->months = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (dayofmonth_dtor) */
@@ -136,7 +137,7 @@ local int	dayofmonth_mkmonth(dayofmonth *,int) noex ;
 
 constexpr int	daysmonth[] = {
 	31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 0
-} ;
+} ; /* endarray */
 
 enum months {
 	month_january,
@@ -186,8 +187,7 @@ int dayofmonth_start(dayofmonth *op,int year) noex {
 	    }
 	} /* end if (dayofmonth_ctor) */
 	return rs ;
-}
-/* end subroutine (dayofmonth_start) */
+} /* end subroutine (dayofmonth_start) */
 
 int dayofmonth_finish(dayofmonth *op) noex {
 	cint		n = DAYOFMONTH_NMONS ;
@@ -210,8 +210,7 @@ int dayofmonth_finish(dayofmonth *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (dayofmonth_finish) */
+} /* end subroutine (dayofmonth_finish) */
 
 int dayofmonth_lookup(dayofmonth *op,int m,int wday,int oday) noex {
 	cint		n = DAYOFMONTH_NMONS ;
@@ -251,8 +250,7 @@ int dayofmonth_lookup(dayofmonth *op,int m,int wday,int oday) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? mday : rs ;
-}
-/* end subroutine (dayofmonth_lookup) */
+} /* end subroutine (dayofmonth_lookup) */
 
 int dayofmonth_mkday(dayofmonth *op,int m,cchar *cp,int cl) noex {
 	int		rs ;
@@ -291,8 +289,7 @@ int dayofmonth_mkday(dayofmonth *op,int m,cchar *cp,int cl) noex {
 	    }
 	} /* end if (dayofmonth_magic) */
 	return (rs >= 0) ? mday : rs ;
-}
-/* end subroutine (dayofmonth_mkday) */
+} /* end subroutine (dayofmonth_mkday) */
 
 
 /* private subroutines */
