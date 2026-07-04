@@ -61,7 +61,7 @@
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
 #include	"defproc.h"
@@ -118,7 +118,7 @@ constexpr int			envnamelen = REALNAMELEN ;
 
 constexpr char		ssb[] = {
 	CH_LBRACE, CH_RBRACE, 0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -126,7 +126,7 @@ constexpr char		ssb[] = {
 
 /* exported subroutines */
 
-int defproc(vecstr *dlp,mainv envv,expcook *clp,cchar *fn) noex {
+int defproc(vecstr *dlp,con mainv envv,expcook *clp,cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ; /* return-value */
 	if (dlp && clp && fn) ylikely {
@@ -138,8 +138,7 @@ int defproc(vecstr *dlp,mainv envv,expcook *clp,cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-} 
-/* end subroutine (defproc) */
+} /* end subroutine (defproc) */
 
 
 /* local subroutines */
