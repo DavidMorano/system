@@ -28,14 +28,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<serialbuf.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"densitydbe.h"
 
@@ -79,7 +79,7 @@ int densitydbe_start(densitydbe *op) noex {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine */
 
 int densitydbe_finish(densitydbe *op) noex {
     	int		rs = SR_FAULT ;
@@ -87,7 +87,7 @@ int densitydbe_finish(densitydbe *op) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine */
 
 int densitydbe_wr(densitydbe *op,cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
@@ -105,8 +105,7 @@ int densitydbe_wr(densitydbe *op,cchar *mbuf,int mlen) noex {
 	    } /* end if (serialbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (densitydbe_wr) */
+} /* end subroutine (densitydbe_wr) */
 
 int densitydbe_rd(densitydbe *op,char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
@@ -123,20 +122,31 @@ int densitydbe_rd(densitydbe *op,char *mbuf,int mlen) noex {
 	    } /* end if (serialbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (densitydbe_rd) */
+} /* end subroutine (densitydbe_rd) */
 
 int densitydbe_entsz(densitydbe *op) noex {
     	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = (2 * szof(uint)) ;
+	    rs = szof(densitydbe_head) ;
 	}
 	return rs ;
-}
-/* end subroutine (densitydbe_entsz) */
+} /* end subroutine (densitydbe_entsz) */
 
 
 /* private subroutines */
+
+densitydbe::densitydbe(const densitydbe &o) noex {
+    	coinit() ;
+	count	= o.count ;
+	utime	= o.utime ;
+} /* end ctor (densitydbe) */
+
+const densitydbe &densitydbe::operator = (const densitydbe &o) noex {
+    	coinit() ;
+	count	= o.count ;
+	utime	= o.utime ;
+	return *this ;
+} /* end method (densirydbe::assignment) */
 
 int densitydbe::wr(cchar *mbuf,int mlen) noex {
 	return densitydbe_wr(this,mbuf,mlen) ;
@@ -150,7 +160,7 @@ void densitydbe::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("densitydbe",rs,"fini-finish") ;
 	}
-}
+} /* end method (densitydbe::dtor) */
 
 densitydbe::operator int () noex {
 	return densitydbe_entsz(this) ;
@@ -172,7 +182,6 @@ densitydbe_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (densitydbe_co::operator) */
+} /* end method (densitydbe_co::operator) */
 
 
