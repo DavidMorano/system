@@ -20,34 +20,34 @@
 
 
 #include	<envstandards.h>	/* must be ordered fist to configure */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<endian.h>
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
 
 #include	"densitydbe.h"
 
 
-#define	DENSITYDB_MAGIC		0x10928474
 #define	DENSITYDB		struct densitydb_head
 #define	DENSITYDB_FL		struct densitydb_flags
 #define	DENSITYDB_CUR		struct densitydb_cursor
+#define	DENSITYDB_MAGIC		0x10928474
 #define	DENSITYDB_MAGSTR	"densitydb"
 #define	DENSITYDB_MAGSIZ	16
 /* other defines */
 #define	DENSITYDB_FILEVERSION	0
 #define	DENSITYDB_ENDIAN	ENDIAN	/* endian */
 #define	DENSITYDB_ENT		densitydbe
+#define	DENSITYDB_FS		"den"
+#define	DENSITYDB_FSA		"dena"
+#define	DENSITYDB_FSB		"denb"
 
 
 struct densitydb_flags {
-	uint		fileinit:1 ;		/* file initialized */
+	uint		fileinited:1 ;		/* file initialized */
 	uint		writable:1 ;
-	uint		readlocked:1 ;
-	uint		writelocked:1 ;
+	uint		lockedrd:1 ;
+	uint		lockedwr:1 ;
 	uint		cursorlockbroken:1 ;	/* cursor lock broken */
 	uint		cursoracc:1 ;		/* accessed while cursored? */
 	uint		remote:1 ;		/* remote mounted file */
@@ -55,20 +55,20 @@ struct densitydb_flags {
 
 struct densitydb_head {
 	char		*fname ;
-	time_t		tiopen ;		/* file open time */
-	time_t		tiaccess ;		/* file access time */
-	time_t		timod ;			/* file modification time */
-	void		*fhp ;
-	void		*bop ;
+	void		*dbp ;		/* DENBUF pointer */
+	void		*fhp ;		/* file-header-pointer */
+	time_t		tiopen ;	/* file-time open */
+	time_t		tiaccess ;	/* file-time access */
+	time_t		timod ;		/* file-time modification */
 	DENSITYDB_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		oflags ;
 	int		maxent ;
 	int		pagesz ;
 	int		filesz ;
 	int		fd ;
 	int		cursors ;
-	int		ebs ;		/* entry buffer size */
+	int		entsz ;		/* entry buffer size */
 	mode_t		om ;
 } ; /* end struct */
 
