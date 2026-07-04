@@ -131,7 +131,7 @@ template<typename ... Args>
 local inline int recipient_magic(recipient *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == RECIPIENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == RECIPIENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (recipient_magic) */
