@@ -44,12 +44,12 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<concepts>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<concepts>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -57,7 +57,7 @@
 
 /* local namespaces */
 
-using std::unsigned_integral ;		/* concept */
+using std::integral_unsigned ;		/* concept */
 
 
 /* local typedefs */
@@ -76,7 +76,7 @@ cint		hundred = 100 ;
 
 /* forward references */
 
-template<unsigned_integral T> int denpercentsx(T *a,int n,double *ptab) noex {
+template<integral_unsigned T> int denpercentsx(T *a,int n,double *ptab) noex {
     	int		rs = SR_FAULT ;
 	if (a && ptab) {
 	    rs = SR_NOENT ;
@@ -114,8 +114,7 @@ template<unsigned_integral T> int denpercentsx(T *a,int n,double *ptab) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (denpercentsx) */
+} /* end subroutine (denpercentsx) */
 
 
 /* local variables */
