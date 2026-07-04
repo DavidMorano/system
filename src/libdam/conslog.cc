@@ -116,7 +116,7 @@ template<typename ... Args>
 static inline int conslog_magic(conslog *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CONSLOG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CONSLOG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -167,7 +167,7 @@ int conslog_open(conslog *op,int logfac) noex {
 	    memclear(op) ;
 	    if (isLogFac(logfac)) {
 	        op->lfd = -1 ;
-	        op->magic = CONSLOG_MAGIC ;
+	        op->magval = CONSLOG_MAGIC ;
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		conslog_dtor(op) ;
@@ -189,7 +189,7 @@ int conslog_close(conslog *op) noex {
 	        rs1 = conslog_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
