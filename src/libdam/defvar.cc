@@ -36,25 +36,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<snwcpy.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"defvar.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -74,10 +77,6 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
 
 
 /* external variables */
@@ -119,7 +118,7 @@ template<typename ... Args>
 local inline int defvar_magic(defvar *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == DEFVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DEFVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (defvar_magic) */
@@ -146,7 +145,7 @@ int defvar_open(DF *op,cchar *fname) noex {
 	    	        op->ti_filemod = sb.st_mtime ;
 	                if ((rs = vecstr_start(op->vlp,vn,vo)) >= 0) {
 	                    if ((rs = vecstr_envfile(op->vlp,fname)) >= 0) {
-	                        op->magic = DEFVAR_MAGIC ;
+	                        op->magval = DEFVAR_MAGIC ;
 	                    }
 	                    if (rs < 0) {
 	                        vecstr_finish(op->vlp) ;
@@ -165,8 +164,7 @@ int defvar_open(DF *op,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (defvar_ctor) */
 	return rs ;
-}
-/* end subroutine (defvar_open) */
+} /* end subroutine (defvar_open) */
 
 int defvar_close(DF *op) noex {
 	int		rs ;
@@ -186,11 +184,10 @@ int defvar_close(DF *op) noex {
 		rs1 = defvar_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (defvar_close) */
+} /* end subroutine (defvar_close) */
 
 int defvar_curbegin(DF *op,DF_CUR *curp) noex {
     	int		rs ;
@@ -198,8 +195,7 @@ int defvar_curbegin(DF *op,DF_CUR *curp) noex {
 	    curp->i = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (defvar_curbegin) */
+} /* end subroutine (defvar_curbegin) */
 
 int defvar_curend(DF *op,DF_CUR *curp) noex {
     	int		rs ;
@@ -207,8 +203,7 @@ int defvar_curend(DF *op,DF_CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (defvar_curend) */
+} /* end subroutine (defvar_curend) */
 
 int defvar_fetch(DF *op,cchar *key,cchar **rpp) noex {
 	int		rs ;
@@ -221,8 +216,7 @@ int defvar_fetch(DF *op,cchar *key,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (defvar_fetch) */
+} /* end subroutine (defvar_fetch) */
 
 int defvar_curenum(DF *op,DF_CUR *curp,char *kbuf,int klen,cchar **rpp) noex {
 	int		rs ;
@@ -255,8 +249,7 @@ int defvar_curenum(DF *op,DF_CUR *curp,char *kbuf,int klen,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (defvar_curenum) */
+} /* end subroutine (defvar_curenum) */
 
 int defvar_checkint(DF *op,int intcheck) noex {
     	int		rs ;
@@ -265,8 +258,7 @@ int defvar_checkint(DF *op,int intcheck) noex {
 	    op->intcheck = intcheck ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (defvar_checkint) */
+} /* end subroutine (defvar_checkint) */
 
 int defvar_check(DF *op,time_t dt) noex {
 	int		rs ;
@@ -292,7 +284,6 @@ int defvar_check(DF *op,time_t dt) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (defvar_check) */
+} /* end subroutine (defvar_check) */
 
 
