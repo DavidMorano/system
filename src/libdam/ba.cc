@@ -26,19 +26,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bit>			/* |popcount(2c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bit>			/* C++SYD |popcount(2c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ba.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
 
 import libutil ;			/* |memclear(3u)| */
 import varithmetic ;			/* |vlshr| + |vlshl| */
@@ -95,8 +97,7 @@ int ba_start(ba *op,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ba_start) */
+} /* end subroutine (ba_start) */
 
 int ba_finish(ba *op) noex {
 	int		rs = SR_FAULT ;
@@ -112,29 +113,26 @@ int ba_finish(ba *op) noex {
 	    op->nwords = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ba_finish) */
+} /* end subroutine (ba_finish) */
 
 int ba_setones(ba *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    int		asz = op->nwords * szof(BA_DIGIT) ;
 	    rs = SR_OK ;
-	    memset(op->a,(~0),asz) ;
-	}
+	    memnset(op->a,UCHAR_MAX,asz) ;
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ba_setones) */
+} /* end subroutine (ba_setones) */
 
 int ba_zero(ba *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    cint	asz = op->nwords * szof(BA_DIGIT) ;
 	    rs = memclear(op->a,asz) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ba_zero) */
+} /* end subroutine (ba_zero) */
 
 int ba_countdown(ba *op) noex {
 	int		rs = SR_FAULT ;
@@ -153,8 +151,7 @@ int ba_countdown(ba *op) noex {
 	    } while (f_borrow && (r < op->nwords)) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ba_countdown) */
+} /* end subroutine (ba_countdown) */
 
 int ba_and(ba *op1,ba *op2) noex {
 	int		rs = SR_FAULT ;
@@ -166,8 +163,7 @@ int ba_and(ba *op1,ba *op2) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ba_and) */
+} /* end subroutine (ba_and) */
 
 int ba_numones(ba *op) noex {
 	int		rs = SR_FAULT ;
@@ -180,8 +176,7 @@ int ba_numones(ba *op) noex {
 	    rs = sum ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ba_numones) */
+} /* end subroutine (ba_numones) */
 
 local int ba_shx(ba *op,int nbits,bool f) noex {
     	int		rs = SR_FAULT ;
