@@ -19,8 +19,8 @@ struct example {
     rs = ex.m(43) ;
 
     example	*exp = &ex ;
-    rs = exp->m(42) ;
     rs = (exp->*(exp->m))(42) ;
+    rs = exp->m(42) ;
 
 }
 
