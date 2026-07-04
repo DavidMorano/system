@@ -65,7 +65,7 @@ struct configfile_head {
 	char	*interval ;		/* poll interval */
 	char	*stampdir ;		/* timestamp directory */
 	char	*maxjobs ;		/* maximum jobs */
-	uint		magic ;		/* magic number */
+	uint		magval ;	/* magic number */
 	int	badline ;	/* line number of bad thing */
 	int	srs ;		/* secondary return status */
 	int	loglen ;	/* log file length */
