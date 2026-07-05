@@ -55,7 +55,7 @@ struct termenq_head {
 	size_t		fsize ;		/* file total size */
 	TERMENQ_FL	fl ;
 	uint		mapoff ;	/* file mapping starting offset */
-	uint		magic ;
+	uint		magval ;
 	int		pagesz ;
 	int		oflags ;	/* open flags */
 	int		operms ;	/* open permissions */
