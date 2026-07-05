@@ -39,15 +39,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
-#include	<connection.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC |getinetdomain(3uc)| */
+#include	<connection.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getsrcname.h"
 
@@ -80,7 +80,7 @@ typedef connection	conn ;
 int getsrcname(char *rbuf,int rlen,int s) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if ((rlen > 0) && (s >= 0)) {
@@ -102,8 +102,7 @@ int getsrcname(char *rbuf,int rlen,int s) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getsrcname) */
+} /* end subroutine (getsrcname) */
 
 
 /* local subroutines */
