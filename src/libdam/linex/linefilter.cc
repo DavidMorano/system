@@ -173,7 +173,7 @@ int linefilter_finish(linefilter *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-		rs = linefilter_dtor(op) ;
+		rs1 = linefilter_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
