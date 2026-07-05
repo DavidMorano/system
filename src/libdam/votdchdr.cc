@@ -42,14 +42,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
-#include	<usystem.h>
-#include	<endian.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"votdchdr.h"
 
@@ -71,10 +72,10 @@
 
 /* local variables */
 
-constexpr int		magsz = VOTDCHDR_MAGICSIZE ;
-constexpr int		headsz = (votdchdrh_overlast * szof(uint)) ;
+constexpr int		magsz		= VOTDCHDR_MAGICSIZE ;
+constexpr int		headsz		= (votdchdrh_overlast * szof(uint)) ;
 
-constexpr char		magstr[] = VOTDCHDR_MAGICSTR ;
+constexpr char		magstr[]	= VOTDCHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -109,25 +110,25 @@ int votdchdr_wr(votdchdr *ep,cchar *hbuf,int hlen) noex {
 	        if (rs >= 0) {
 	            if (bl >= headsz) {
 	    	        uint	*header = uintp(bp) ;
-	                ep->shmsize = header[votdchdrh_shmsize] ;
-	                ep->wtime = header[votdchdrh_wtime] ;
-	                ep->atime = header[votdchdrh_atime] ;
-	                ep->wcount = header[votdchdrh_wcount] ;
-	                ep->acount = header[votdchdrh_acount] ;
-	                ep->muoff = header[votdchdrh_muoff] ;
-	                ep->musize = header[votdchdrh_musize] ;
-	                ep->bookoff = header[votdchdrh_bookoff] ;
-	                ep->booklen = header[votdchdrh_booklen] ;
-	                ep->recoff = header[votdchdrh_recoff] ;
-	                ep->reclen = header[votdchdrh_reclen] ;
-	                ep->balloff = header[votdchdrh_balloff] ;
-	                ep->ballsize = header[votdchdrh_ballsize] ;
-	                ep->valloff = header[votdchdrh_valloff] ;
-	                ep->vallsize = header[votdchdrh_vallsize] ;
-	                ep->bstroff = header[votdchdrh_bstroff] ;
-	                ep->blenstr = header[votdchdrh_blenstr] ;
-	                ep->vstroff = header[votdchdrh_vstroff] ;
-	                ep->vlenstr = header[votdchdrh_vlenstr] ;
+	                ep->shmsize	= header[votdchdrh_shmsize] ;
+	                ep->wtime	= header[votdchdrh_wtime] ;
+	                ep->atime	= header[votdchdrh_atime] ;
+	                ep->wcount	= header[votdchdrh_wcount] ;
+	                ep->acount	= header[votdchdrh_acount] ;
+	                ep->muoff	= header[votdchdrh_muoff] ;
+	                ep->musize	= header[votdchdrh_musize] ;
+	                ep->bookoff	= header[votdchdrh_bookoff] ;
+	                ep->booklen	= header[votdchdrh_booklen] ;
+	                ep->recoff	= header[votdchdrh_recoff] ;
+	                ep->reclen	= header[votdchdrh_reclen] ;
+	                ep->balloff	= header[votdchdrh_balloff] ;
+	                ep->ballsize	= header[votdchdrh_ballsize] ;
+	                ep->valloff	= header[votdchdrh_valloff] ;
+	                ep->vallsize	= header[votdchdrh_vallsize] ;
+	                ep->bstroff	= header[votdchdrh_bstroff] ;
+	                ep->blenstr	= header[votdchdrh_blenstr] ;
+	                ep->vstroff	= header[votdchdrh_vstroff] ;
+	                ep->vlenstr	= header[votdchdrh_vlenstr] ;
 	                bp += headsz ;
 	                bl -= headsz ;
 	            } else {
@@ -139,8 +140,7 @@ int votdchdr_wr(votdchdr *ep,cchar *hbuf,int hlen) noex {
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (votdchdr_wr) */
+} /* end subroutine (votdchdr_wr) */
 
 int votdchdr_rd(votdchdr *ep,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
@@ -159,25 +159,25 @@ int votdchdr_rd(votdchdr *ep,char *hbuf,int hlen) noex {
 	    	    bl -= 4 ;
 	    	    if (bl >= headsz) {
 	    	        uint	*header = uintp(bp) ;
-	        	header[votdchdrh_shmsize] = ep->shmsize ;
-	        	header[votdchdrh_wtime] = ep->wtime ;
-	        	header[votdchdrh_atime] = ep->atime ;
-	        	header[votdchdrh_wcount] = ep->wcount ;
-	        	header[votdchdrh_acount] = ep->acount ;
-	        	header[votdchdrh_muoff] = ep->muoff ;
-	        	header[votdchdrh_musize] = ep->musize ;
-	        	header[votdchdrh_bookoff] = ep->bookoff ;
-	        	header[votdchdrh_booklen] = ep->booklen ;
-	        	header[votdchdrh_recoff] = ep->recoff ;
-	        	header[votdchdrh_reclen] = ep->reclen ;
-	        	header[votdchdrh_balloff] = ep->balloff ;
-	        	header[votdchdrh_ballsize] = ep->ballsize ;
-	        	header[votdchdrh_valloff] = ep->valloff ;
-	        	header[votdchdrh_vallsize] = ep->vallsize ;
-	        	header[votdchdrh_bstroff] = ep->bstroff ;
-	        	header[votdchdrh_blenstr] = ep->blenstr ;
-	        	header[votdchdrh_vstroff] = ep->vstroff ;
-	        	header[votdchdrh_vlenstr] = ep->vlenstr ;
+	        	header[votdchdrh_shmsize]	= ep->shmsize ;
+	        	header[votdchdrh_wtime]		= ep->wtime ;
+	        	header[votdchdrh_atime]		= ep->atime ;
+	        	header[votdchdrh_wcount]	= ep->wcount ;
+	        	header[votdchdrh_acount]	= ep->acount ;
+	        	header[votdchdrh_muoff]		= ep->muoff ;
+	        	header[votdchdrh_musize]	= ep->musize ;
+	        	header[votdchdrh_bookoff]	= ep->bookoff ;
+	        	header[votdchdrh_booklen]	= ep->booklen ;
+	        	header[votdchdrh_recoff]	= ep->recoff ;
+	        	header[votdchdrh_reclen]	= ep->reclen ;
+	        	header[votdchdrh_balloff]	= ep->balloff ;
+	        	header[votdchdrh_ballsize]	= ep->ballsize ;
+	        	header[votdchdrh_valloff]	= ep->valloff ;
+	        	header[votdchdrh_vallsize]	= ep->vallsize ;
+	        	header[votdchdrh_bstroff]	= ep->bstroff ;
+	        	header[votdchdrh_blenstr]	= ep->blenstr ;
+	        	header[votdchdrh_vstroff]	= ep->vstroff ;
+	        	header[votdchdrh_vlenstr]	= ep->vlenstr ;
 	        	bp += headsz ;
 	        	bl -= headsz ;
 			len = intconv(bp - hbuf) ;
@@ -190,7 +190,6 @@ int votdchdr_rd(votdchdr *ep,char *hbuf,int hlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (votdchdr_rd) */
+} /* end subroutine (votdchdr_rd) */
 
 
