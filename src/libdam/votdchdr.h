@@ -10,11 +10,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 #define	VOTDCHDR		struct votdchdr_head
@@ -45,7 +45,7 @@ enum votdchdrhs {
 	votdchdrh_vstroff,		/* verse string table */
 	votdchdrh_vlenstr,
 	votdchdrh_overlast
-} ;
+} ; /* end enum */
 
 struct votdchdr_head {
 	uint		shmsize ;
@@ -68,7 +68,7 @@ struct votdchdr_head {
 	uint		vstroff ;	/* verse string table (aligned) */
 	uint		vlenstr ;
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 typedef	VOTDCHDR	votdchdr ;
 
