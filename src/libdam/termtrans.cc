@@ -238,7 +238,7 @@ template<typename ... Args>
 local inline int termtrans_magic(termtrans *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == TERMTRANS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == TERMTRANS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (termtrans_magic) */
@@ -361,7 +361,7 @@ local int termtrans_starts(TT *op) noex {
 	        if ((rs = sncpy(fcsbuf,fcslen,fcs,suf)) >= 0) ylikely {
 		    cchar	*tcsp = TERMTRANS_TCS ;
 		    if ((rs = uiconv_open(op->idp,tcsp,fcsbuf)) >= 0) ylikely {
-			op->magic = TERMTRANS_MAGIC ;
+			op->magval = TERMTRANS_MAGIC ;
 		    }
 		} /* end if (sncpy) */
 		if (rs < 0) {
@@ -398,7 +398,7 @@ int termtrans_finish(TT *op) noex {
 		rs1 = termtrans_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
