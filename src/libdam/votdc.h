@@ -124,7 +124,7 @@ struct votdc_head {
 	size_t		mapsize ;	/* SHM map-size */
 	VOTDC_TC	tcs[VOTDC_NBOOKS] ;
 	VOTDC_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		pagesize ;
 	int		shmsize ;
 	int		nents ;	
