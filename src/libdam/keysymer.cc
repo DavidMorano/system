@@ -118,7 +118,7 @@ template<typename ... Args>
 static inline int keysymer_magic(keysymer *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == KEYSYMER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == KEYSYMER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -159,7 +159,7 @@ int keysymer_open(keysymer *op,cchar *pr) noex {
 		                cchar	*kfn = KS_KSFNAME ;
 		                if ((rs = mkpath(tbuf,pr,idn,kfn)) >= 0) {
 			            if ((rs = keysymer_parse(op,tbuf)) >= 0) {
-			                op->magic = KEYSYMER_MAGIC ;
+			                op->magval = KEYSYMER_MAGIC ;
 			            }
 		                } /* end if (mkpath) */
 				rs1 = uc_free(tbuf) ;
@@ -198,7 +198,7 @@ int keysymer_close(keysymer *op) noex {
 	        rs1 = keysymer_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
