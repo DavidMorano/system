@@ -59,7 +59,7 @@ template<typename ... Args>
 static inline int streamsync_magic(streamsync *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == STREAMSYNC_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == STREAMSYNC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -92,7 +92,7 @@ int streamsync_start(streamsync *op,cchar *st,int stlen) noex {
 	            op->data = (p + stlen) ;
 	            memcopy(op->st,st,stlen) ;
 	            memclear(op->data,stlen) ;
-	            op->magic = STREAMSYNC_MAGIC ;
+	            op->magval = STREAMSYNC_MAGIC ;
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -109,7 +109,7 @@ int streamsync_finish(streamsync *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->st = nullptr ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
