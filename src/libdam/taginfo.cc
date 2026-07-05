@@ -39,17 +39,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<cfdec.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<cfdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"taginfo.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -111,7 +114,6 @@ int taginfo_parse(taginfo *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? ki : rs ;
-}
-/* end subroutine (taginfo_parse) */
+} /* end subroutine (taginfo_parse) */
 
 
