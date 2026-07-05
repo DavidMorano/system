@@ -41,7 +41,7 @@ struct lookword_head {
 	void		*md ;		/* map-data */
 	size_t		ms ;		/* map-size */
 	LOOKWORD_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
 } ;
 
