@@ -88,7 +88,7 @@ template<typename ... Args>
 static inline int lookword_magic(lookword *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LOOKWORD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LOOKWORD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -134,7 +134,7 @@ int lookword_open(LW *op,cchar *dfname,int opts) noex {
 	                op->fd = fd ;
 	                op->md = md ;
 	                op->ms = ms ;
-	                op->magic = LOOKWORD_MAGIC ;
+	                op->magval = LOOKWORD_MAGIC ;
 	            } /* end if (mapfile) */
 	        } /* end if (fsize) */
 	        if (rs < 0) {
@@ -161,7 +161,7 @@ int lookword_close(LW *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->fd = -1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
