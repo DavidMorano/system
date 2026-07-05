@@ -24,7 +24,7 @@
 
 
 struct syshelper_head {
-	uint		magic ;
+	uint		magval ;
 	int		fd ;		/* socket file descriptor */
 	int		pid ;		/* daemon PID */
 } ;
@@ -33,11 +33,11 @@ typedef SYSHELPER	syshelper ;
 
 EXTERNC_begin
 
-extern int syshelper_start(syshelper *,char *) noex ;
-extern int syshelper_getpid(syshelper *,pid_t *) noex ;
-extern int syshelper_finish(syshelper *) noex ;
-extern int syshelper_localtime(syshelper *,time_t,TM *) noex ;
-extern int syshelper_random(syshelper *,char *,int) noex ;
+extern int syshelper_start	(syshelper *,char *) noex ;
+extern int syshelper_getpid	(syshelper *,pid_t *) noex ;
+extern int syshelper_finish	(syshelper *) noex ;
+extern int syshelper_localtime	(syshelper *,time_t,TM *) noex ;
+extern int syshelper_random	(syshelper *,char *,int) noex ;
 
 EXTERNC_end
 
