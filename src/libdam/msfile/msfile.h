@@ -20,15 +20,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<mapstrint.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<mapstrint.h>		/* LIBUC */
 
-#include	<msfilee.h>
-#include	<entbuf.h>
+#include	<msfilee.h>		/* LIBDAM */
+#include	<entbuf.h>		/* LIBDAM */
 
 
 /* object defines */
@@ -69,7 +69,7 @@ struct msfile_flags {
 	uint		remote:1 ;		/* remote mounted file */
 	uint		bufvalid:1 ;		/* buffer valid */
 	uint		entbuf:1 ;		/* EBUF active */
-} ;
+} ; /* end struct */
 
 struct msfile_head {
 	entbuf		ebm ;		/* entry-buffer-manager */
@@ -80,7 +80,7 @@ struct msfile_head {
 	time_t		ti_open ;		/* file open time */
 	time_t		ti_access ;		/* file access time */
 	time_t		ti_mod ;		/* file modification time */
-	uint		magic ;
+	uint		magval ;
 	int		oflags ;
 	int		pagesize ;
 	int		filesize ;
@@ -90,11 +90,11 @@ struct msfile_head {
 	int		fileversion, fileencoding, filetype ;
 	mode_t		operm ;
 	char		topbuf[MSFILE_TOPLEN + 1] ;	/* top-buffer */
-} ;
+} ; /* end struct */
 
 struct msfile_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef MSFILE		msfile ;
 typedef MSFILE_CUR	msfile_cur ;
