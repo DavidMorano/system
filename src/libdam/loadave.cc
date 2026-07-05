@@ -5,7 +5,7 @@
 /* loadave gathering and manipulation */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_GETLOADAVG	1		/* use |u_getloadavg(2)| */
 
 /* revision history:
@@ -34,22 +34,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* POSIX */
 #include	<sys/systeminfo.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* POSIX */
 #include	<kstat.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<baops.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<baops.h>		/* LIBU */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"loadave.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -79,13 +81,13 @@
 
 /* forward references */
 
-static int	loadave_kopen(LA *,time_t) noex ;
-static int	loadave_kclose(LA *) noex ;
-static int	loadave_getid(LA *,time_t) noex ;
-static int	loadave_getdata(LA *,LA_VALS *) noex ;
+local int	loadave_kopen(LA *,time_t) noex ;
+local int	loadave_kclose(LA *) noex ;
+local int	loadave_getid(LA *,time_t) noex ;
+local int	loadave_getdata(LA *,LA_VALS *) noex ;
 
-static void	popuint() noex ;
-static void	poptime() noex ;
+local void	popuint() noex ;
+local void	poptime() noex ;
 
 
 /* local variables */
@@ -114,19 +116,18 @@ constexpr cpcchar	miscnames[] = {
 
 /* exported subroutines */
 
-
 int loadave_start(loadave *eop) noex {
 	kstat_named_t *ksn ;
 	time_t		daytime = time(nullptr) ;
 	int		rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loadave_start: ent\n") ;
 #endif
 
 	if (eop == nullptr) return SR_FAULT ;
 
-	memset(eop,0,sizeof(LA)) ;
+	memclear(eop) ;
 
 	rs = loadave_kopen(eop,daytime) ;
 	if (rs < 0) goto bad0 ;
@@ -137,7 +138,7 @@ int loadave_start(loadave *eop) noex {
 	rs = loadave_getdata(eop,&eop->v) ;
 	if (rs < 0) goto bad1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loadave_start: loadave_getdata() rs=%d\n",rs) ;
 #endif
 
@@ -146,14 +147,14 @@ int loadave_start(loadave *eop) noex {
 	ksn = (kstat_named_t *)
 	    kstat_data_lookup(eop->ksp,"boot_time") ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loadave_start: lookup boot_time %s\n",
 	    ((ksn == nullptr) ? "no" : "yes")) ;
 #endif
 
 	poptime(ksn,&eop->v.tim_boot) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loadave_start: popped time \n") ;
 #endif
 
@@ -162,7 +163,7 @@ int loadave_start(loadave *eop) noex {
 
 	eop->tim_access = daytime ;
 
-	eop->magic = LA_MAGIC ;
+	eop->magval = LA_MAGIC ;
 
 ret0:
 	return rs ;
@@ -176,18 +177,17 @@ bad1:
 
 bad0:
 	goto ret0 ;
-}
-/* end subroutine (loadave_start) */
+} /* end subroutine (loadave_start) */
 
 int loadave_finish(loadave *eop) noex {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loadave_finish: ent\n") ;
 #endif
 
 	if (eop == nullptr) return SR_FAULT ;
 
-	if (eop->magic != LA_MAGIC) return SR_NOTOPEN ;
+	if (eop->magval != LA_MAGIC) return SR_NOTOPEN ;
 
 	if (eop->kcp != nullptr) {
 	    kstat_close(eop->kcp) ;
@@ -195,8 +195,7 @@ int loadave_finish(loadave *eop) noex {
 	}
 
 	return SR_OK ;
-}
-/* end subroutine (loadave_finish) */
+} /* end subroutine (loadave_finish) */
 
 int loadave_readvalues(loadave *eop,loadave_vals *vp) noex {
 	time_t		daytime = time(nullptr) ;
@@ -205,7 +204,7 @@ int loadave_readvalues(loadave *eop,loadave_vals *vp) noex {
 	if (eop == nullptr) return SR_FAULT ;
 	if (vp == nullptr) return SR_FAULT ;
 
-	if (eop->magic != LA_MAGIC) return SR_NOTOPEN ;
+	if (eop->magval != LA_MAGIC) return SR_NOTOPEN ;
 
 /* have we reached the timeout for the chain update? */
 
@@ -250,8 +249,7 @@ int loadave_readvalues(loadave *eop,loadave_vals *vp) noex {
 	memcpy(vp,&eop->v,sizeof(LA_VALS)) ;
 
 	return rs ;
-}
-/* end subroutine (loadave_readvalues) */
+} /* end subroutine (loadave_readvalues) */
 
 int loadave_readmid(loadave *eop,loadave_mid *vp) noex {
 	time_t		daytime = time(nullptr) ;
@@ -260,7 +258,7 @@ int loadave_readmid(loadave *eop,loadave_mid *vp) noex {
 	if (eop == nullptr) return SR_FAULT ;
 	if (vp == nullptr) return SR_FAULT ;
 
-	if (eop->magic != LA_MAGIC) return SR_NOTOPEN ;
+	if (eop->magval != LA_MAGIC) return SR_NOTOPEN ;
 
 	if ((daytime - eop->mid.tim_read) >= TO_KUPDATE)
 	    rs = loadave_getid(eop,daytime) ;
@@ -268,15 +266,14 @@ int loadave_readmid(loadave *eop,loadave_mid *vp) noex {
 	memcpy(vp,&eop->mid,sizeof(LA_MID)) ;
 
 	return rs ;
-}
-/* end subroutine (loadave_readmid) */
+} /* end subroutine (loadave_readmid) */
 
 int loadave_check(loadave *eop,time_t daytime) noex {
 	int		rs = SR_OK ;
 
 	if (eop == nullptr) return SR_FAULT ;
 
-	if (eop->magic != LA_MAGIC) return SR_NOTOPEN ;
+	if (eop->magval != LA_MAGIC) return SR_NOTOPEN ;
 
 	if (daytime == 0)
 	    daytime = time(nullptr) ;
@@ -292,13 +289,12 @@ int loadave_check(loadave *eop,time_t daytime) noex {
 	    loadave_kclose(eop) ;
 
 	return rs ;
-}
-/* end subroutine (loadave_check) */
+} /* end subroutine (loadave_check) */
 
 
 /* private subroutines */
 
-static int loadave_kopen(loadave *eop,time_t daytime) noex {
+local int loadave_kopen(loadave *eop,time_t daytime) noex {
 	eop->kcp = kstat_open() ;
 
 	if (eop->kcp == nullptr)
@@ -309,20 +305,18 @@ static int loadave_kopen(loadave *eop,time_t daytime) noex {
 	eop->fl.open = TRUE ;
 
 	return SR_OK ;
-}
-/* end subroutine (loadave_kopen) */
+} /* end subroutine (loadave_kopen) */
 
-static int loadave_kclose(loadave *eop) noex {
+local int loadave_kclose(loadave *eop) noex {
 	if (eop->kcp != nullptr) {
 	    kstat_close(eop->kcp) ;
 	    eop->kcp = nullptr ;
 	}
 	eop->fl.open = FALSE ;
 	return SR_OK ;
-}
-/* end subroutine (loadave_kclose) */
+} /* end subroutine (loadave_kclose) */
 
-static int loadave_getid(loadave *eop,time_t daytime) noex {
+local int loadave_getid(loadave *eop,time_t daytime) noex {
 	loadave_mid	*mp ;
 	int		rs ;
 	char		buf[LA_BUFLEN + 1] ;
@@ -353,10 +347,9 @@ ret0:
 bad1:
 bad0:
 	goto ret0 ;
-}
-/* end subroutine (loadave_getid) */
+} /* end subroutine (loadave_getid) */
 
-static int loadave_getdata(loadave *eop,loadave_vals *vp) noex {
+local int loadave_getdata(loadave *eop,loadave_vals *vp) noex {
 	kstat_t		*ksp ;
 	kstat_named_t	*ksn ;
 	kid_t		kid ;
@@ -366,7 +359,7 @@ static int loadave_getdata(loadave *eop,loadave_vals *vp) noex {
 
 	if ((ksp = eop->ksp) == nullptr) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("loadave_getdata: lookup 'system_misc' !\n") ;
 #endif
 
@@ -381,7 +374,7 @@ static int loadave_getdata(loadave *eop,loadave_vals *vp) noex {
 
 	} /* end if (chached KSTAT pointer) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loadave_getdata: got a 'system_misc'\n") ;
 #endif
 
@@ -392,9 +385,9 @@ static int loadave_getdata(loadave *eop,loadave_vals *vp) noex {
 	    goto bad0 ;
 	}
 
-	memset(haveval,0,miscname_overlast) ;
+	memnset(haveval,0,miscname_overlast) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loadave_getdata: read some data, kid=%d\n",
 	    kid) ;
 #endif
@@ -402,7 +395,7 @@ static int loadave_getdata(loadave *eop,loadave_vals *vp) noex {
 	ksn = (kstat_named_t *) ksp->ks_data ;
 	for (i = 0 ; i < ksp->ks_ndata ; i += 1) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("loadave_getdata: looping i=%d\n",i) ;
 #endif
 
@@ -439,10 +432,9 @@ static int loadave_getdata(loadave *eop,loadave_vals *vp) noex {
 	    ksn += 1 ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (loadave_getdata) */
+} /* end subroutine (loadave_getdata) */
 
-static void popuint(kstat_named_t *ksn,uint *vp) noex {
+local void popuint(kstat_named_t *ksn,uint *vp) noex {
 	switch (ksn->data_type) {
 	case KSTAT_DATA_CHAR:
 	    *vp = (uint) ksn->value.c[0] ;
@@ -460,10 +452,9 @@ static void popuint(kstat_named_t *ksn,uint *vp) noex {
 	    *vp = (uint) ksn->value.ui64 ;
 	    break ;
 	} /* end switch */
-}
-/* end subroutine (popuint) */
+} /* end subroutine (popuint) */
 
-static void poptime(kstat_named_t *ksn,time_t *vp) noex {
+local void poptime(kstat_named_t *ksn,time_t *vp) noex {
 	switch (ksn->data_type) {
 	case KSTAT_DATA_CHAR:
 	    *vp = (time_t) ksn->value.c[0] ;
@@ -481,7 +472,6 @@ static void poptime(kstat_named_t *ksn,time_t *vp) noex {
 	    *vp = (time_t) ksn->value.ui64 ;
 	    break ;
 	} /* end switch */
-}
-/* end subroutine (poptime) */
+} /* end subroutine (poptime) */
 
 
