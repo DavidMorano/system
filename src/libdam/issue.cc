@@ -218,7 +218,7 @@ template<typename ... Args>
 local inline int issue_magic(issue *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == IS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == IS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (issue_magic) */
@@ -319,7 +319,7 @@ int issue_open(IS *op,cchar *pr) noex {
 	                    if ((rs = issue_mapfind(op,dt)) >= 0) {
 	                        if ((rs = issue_envbegin(op)) >= 0) {
 	                            op->ti_lastcheck = dt ;
-	                            op->magic = IS_MAGIC ;
+	                            op->magval = IS_MAGIC ;
 	                        }
 	                        if (rs < 0) {
 	                            issue_maplose(op) ;
@@ -373,7 +373,7 @@ int issue_close(IS *op) noex {
 		rs1 = issue_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -668,11 +668,11 @@ local int mapper_start(IS_MAP *mmp,time_t dt,cchar fname[]) noex {
 	            if ((rs = pfp->open(evp,fn)) >= 0) {
 	                cint	to = TO_MAPCHECK ;
 	                if ((rs = pfp->checkint(to)) >= 0) {
-	                    mmp->magic = IS_MAPMAGIC ;
+	                    mmp->magval = IS_MAPMAGIC ;
 	                    mmp->ti_check = dt ;
 	                    rs = mapper_mapload(mmp) ;
 	                    if (rs < 0) {
-	                        mmp->magic = 0 ;
+	                        mmp->magval = 0 ;
 			    }
 	                } /* end if */
 	                if (rs < 0) {
@@ -703,7 +703,7 @@ local int mapper_finish(IS_MAP *mmp) noex {
 	int		rs1 ;
 	if (mmp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (mmp->magic == IS_MAPMAGIC) ylikely {
+	    if (mmp->magval == IS_MAPMAGIC) ylikely {
 		rs = SR_OK ;
 		{
 	            rs1 = paramfile_close(&mmp->dirsfile) ;
@@ -727,7 +727,7 @@ local int mapper_finish(IS_MAP *mmp) noex {
 	            rs1 = lockrw_destroy(&mmp->rwm) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
-	        mmp->magic = 0 ;
+	        mmp->magval = 0 ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -741,7 +741,7 @@ local int mapper_check(IS_MAP *mmp,time_t dt) noex {
 	int		nchanged = 0 ; /* return-value */
 	if (mmp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (mmp->magic == IS_MAPMAGIC) ylikely {
+	    if (mmp->magval == IS_MAPMAGIC) ylikely {
 	        if ((rs = lockrw_wrlock(&mmp->rwm,to_lock)) >= 0) {
 		    paramfile	*pfp = &mmp->dirsfile ;
 	            cint	to = TO_MAPCHECK ;
@@ -772,7 +772,7 @@ local int mapper_process(IS_MAP *mmp,cc **ev,mv adms,cc *gn,int fd) noex {
 	int		wlen = 0 ; /* return-value */
 	if (mmp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (mmp->magic == IS_MAPMAGIC) ylikely {
+	    if (mmp->magval == IS_MAPMAGIC) ylikely {
 	        if ((rs = lockrw_rdlock(&mmp->rwm,to_lock)) >= 0) {
 	            {
 	                rs = mapper_processor(mmp,ev,adms,gn,fd) ;
@@ -792,7 +792,7 @@ local int mapper_processor(IS_MAP *mmp,cc **ev,mv adms,cc *gn,int fd) noex {
 	int		wlen = 0 ;
 	if (mmp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (mmp->magic == IS_MAPMAGIC) ylikely {
+	    if (mmp->magval == IS_MAPMAGIC) ylikely {
 		vechand *mp = &mmp->mapdirs ;
 	        void *vp{} ;
 		rs = SR_OK ;
@@ -816,7 +816,7 @@ local int mapper_mapload(IS_MAP *mmp) noex {
 	int		c = 0 ;
 	if (mmp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (mmp->magic == IS_MAPMAGIC) ylikely {
+	    if (mmp->magval == IS_MAPMAGIC) ylikely {
 	        if (ustat sb ; (rs = u_stat(mmp->fname,&sb)) >= 0) {
 	            mmp->ti_mtime = sb.st_mtime ;
 		    if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
@@ -894,7 +894,7 @@ local int mapper_mapfins(IS_MAP *mmp) noex {
 	int		rs1 ;
 	if (mmp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (mmp->magic == IS_MAPMAGIC) ylikely {
+	    if (mmp->magval == IS_MAPMAGIC) ylikely {
 		vechand		*mlp = &mmp->mapdirs ;
 		rs = SR_OK ;
 	        if ((rs1 = mlp->count) >= 0) {
@@ -928,7 +928,7 @@ local int mapper_audit(IS_MAP *mmp) noex {
 	int		rs = SR_FAULT ;
 	if (mmp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (mmp->magic == IS_MAPMAGIC) ylikely {
+	    if (mmp->magval == IS_MAPMAGIC) ylikely {
 	        vechand		*mlp = &mmp->mapdirs ;
 		rs = vechand_count(mlp) ;
 	    } /* end if (valid) */
