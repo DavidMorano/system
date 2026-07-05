@@ -20,23 +20,23 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<time.h>		/* POSIX |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
-#define	HOLIDAYS_MAGIC	0x63328183
 #define	HOLIDAYS	struct holidays_head
 #define	HOLIDAYS_OBJ	struct holidays_object
 #define	HOLIDAYS_CITE	struct holidays_query
 #define	HOLIDAYS_CUR	struct holidays_cursor
+#define	HOLIDAYS_MAGIC	0x63328183
 
 
 struct holidays_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct holidays_query {
@@ -58,7 +58,7 @@ struct holidays_head {
 	char		*vst ;		/* val string-table */
 	time_t		ti_check ;
 	time_t		ti_mtime ;
-	uint		magic ;
+	uint		magval ;
 	int		year ;
 	int		kslen ;
 	int		vslen ;
@@ -96,6 +96,8 @@ extern int holidays_read(holidays *,holidays_cur *,
 #endif
 
 EXTERNC_end
+
+extern const holidays_obj	holidays_modinfo ;
 
 
 #endif /* HOLIDAYS_INCLUDE */
