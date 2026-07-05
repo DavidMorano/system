@@ -2,6 +2,10 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
+/* terminal character sets */
+/* version %I% last-modified %G% */
+
+
 /* revision history:
 
 	= 1998-04-13, David A-D- Morano
@@ -11,9 +15,6 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	TERMCHARSETS_INCLUDE
-#define	TERMCHARSETS_INCLUDE
-
 /**** Notes:
 
 	The DEC® Line-Drawing character set (a 94-cs) is also known
@@ -22,6 +23,17 @@
 	We tend to use the old name (Line-Drawing).
 
 ****/
+
+#ifndef	TERMCHARSETS_INCLUDE
+#define	TERMCHARSETS_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+
 
 #define	TCS_ASCII	"B"		/* 94-cs */
 #define	TCS_UK		"A"		/* 94-cs */
