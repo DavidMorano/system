@@ -29,11 +29,11 @@
 #include	<vecobj.h>
 
 
-#define	DEVPERMFILE_MAGIC	0x12349887
 #define	DEVPERMFILE		struct devpermfile_head
 #define	DEVPERMFILE_FL		struct devpermfile_flags
 #define	DEVPERMFILE_ENT		struct devpermfile_entry
 #define	DEVPERMFILE_CUR		struct devpermfile_cursor
+#define	DEVPERMFILE_MAGIC	0x12349887
 
 
 struct devpermfile_flags {
@@ -48,7 +48,7 @@ struct devpermfile_head {
 	time_t		ti_check ;	/* time last checked */
 	time_t		ti_mod ;
 	DEVPERMFILE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		intcheck ;	/* check interval (seconds) */
 	int		intchange ;	/* file-change interval (seconds) */
 	int		ccount ;	/* cursor count */
