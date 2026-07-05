@@ -41,7 +41,7 @@ struct offindex_flags {
 struct offindex_head {
 	vecobj		*oip ;
 	OFFINDEX_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ;
 
 typedef	OFFINDEX	offindex ;
