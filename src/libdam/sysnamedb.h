@@ -54,7 +54,7 @@ struct sysnamedb_head {
 	nodedb		*nlp ;		/* node-list-pointer */
 	clusterdb	*clp ;		/* cluster-list-pointer */
 	SYSNAMEDB_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 typedef	SYSNAMEDB	sysnamedb ;
