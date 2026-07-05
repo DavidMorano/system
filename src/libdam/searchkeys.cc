@@ -245,9 +245,8 @@ int searchkeys_popbegin(SK *op,SK_POP *pop,int f_prefix) noex {
 		if ((n = op->nphrases) > 0) ylikely {
 	            cint	sz = (n + 1) * szof(int) ;
 	            pop->f_prefix = f_prefix ;
-	            if (void *vp ; (rs = mem.mall(sz,&vp)) >= 0) {
+	            if (void *vp ; (rs = mem.call(1,sz,&vp)) >= 0) {
 	                pop->nmatch = intp(vp) ;
-	                memset(pop->nmatch,0,sz) ;
 	                pop->cphrases = n ;
 	                pop->magval = SEARCHKEYS_MAGIC ;
 	            } /* end if (memory-acquire) */
@@ -610,12 +609,11 @@ local int searchkeys_buildload(SK *op,BUILD *bip) noex {
 	if ((rs = plp->count) >= 0) {
 	    int		sz = (rs + 1) * szof(SK_PH) ;
 	    nphrases = rs ;
-	    if (void *vp ; (rs = mem.mall(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = mem.call(1,sz,&vp)) >= 0) {
 	        int	nwords ;
 	        int	pi, pj ;
 	        int	wi, wj ;
 	        int	kl ;
-	        memset(vp,0,sz) ;
 	        op->kphrases = (SK_PH *) vp ;
 	        op->nphrases = nphrases ;
 	        pj = 0 ;
