@@ -46,24 +46,24 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<vecstr.h>
-#include	<mkpathx.h>
-#include	<isnot.h>
-#include	<nodedb.h>
-#include	<clusterdb.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LINUC */
+#include	<vecstr.h>		/* LINUC */
+#include	<mkpathx.h>		/* LINUC */
+#include	<isnot.h>		/* LINUC */
+#include	<nodedb.h>		/* LINUC */
+#include	<clusterdb.h>		/* LINUC */
+#include	<localmisc.h>		/* LINU */
 
 #include	"getclusters.h"
 
@@ -136,8 +136,7 @@ int getclusters(cchar *pr,vecstr *slp,cchar *nn) noex {
 	if (pr && slp && nn) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && nn[0]) {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+		if (static cint rsv = var ; (rs = rsv) >= 0) {
 		    geter go(pr,slp,nn) ;
 		    rs = go ;
 		    c = rs ;
@@ -145,8 +144,7 @@ int getclusters(cchar *pr,vecstr *slp,cchar *nn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (getclusters) */
+} /* end subroutine (getclusters) */
 
 
 /* local subroutines */
@@ -171,8 +169,7 @@ geter::operator int () noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (geter::operator) */
+} /* end method (geter::operator) */
 
 int geter::ndb() noex {
     	int		rs ;
@@ -206,8 +203,7 @@ int geter::ndb() noex {
 	    }
 	} /* end if (mkpath) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (geter::ndb) */
+} /* end method (geter::ndb) */
 
 int geter::cdb() noex {
 	int		rs ;
@@ -238,8 +234,7 @@ int geter::cdb() noex {
 	    }
 	} /* end if (mkpath) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (geter::cdb) */
+} /* end method (geter::cdb) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -251,7 +246,6 @@ vars::operator int () noex {
 	    }
 	}
     	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
