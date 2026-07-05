@@ -28,7 +28,6 @@
 #define	FINDUID		struct finduid_head
 #define	FINDUID_FL	struct finduid_flags
 #define	FINDUID_ST	struct finduid_stats
-
 #define	FINDUID_MAGIC	0x98643169
 #define	FINDUID_DEFMAX	20	/* default maximum entries */
 #define	FINDUID_DEFTTL	600	/* default time-to-live */
@@ -53,7 +52,7 @@ struct finduid_head {
 	time_t		ti_utcheck ;	/* check-time */
 	FINDUID_ST	s ;
 	FINDUID_FL	open ;
-	uint		magic ;
+	uint		magval ;
 	int		ttl ;		/* time-to-live */
 	int		nmax ;		/* maximum entries */
 } ;
