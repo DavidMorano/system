@@ -18,7 +18,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	schedvar
 
 	Description:
@@ -32,20 +32,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<sbuf.h>
-#include	<snx.h>			/* |snkeyval(3uc)| */
-#include	<sncpyx.h>
-#include	<snwcpy.h>
-#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC |snkeyval(3uc)| */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"schedvar.h"
 
@@ -90,12 +90,12 @@ template<typename ... Args>
 inline int schedvar_magic(schedvar *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SCHEDVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SCHEDVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (schedvar_magic) */
 
-static int schedvar_exper(SV *,char *,int,cc *,int) noex ;
+local int schedvar_exper(SV *,char *,int,cc *,int) noex ;
 
 
 /* local variables */
@@ -112,14 +112,14 @@ int schedvar_start(SV *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    cint	osz = szof(vecstr) ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    if (void *vp ; (rs = lm_mall(osz,&vp)) >= 0) ylikely {
 		vecstr	*slp = vecstrp(vp) ;
 	        cint	ve = SCHEDVAR_NE ;
 	        cint	vo = vecstrm.sorted ;
 	        if ((rs = slp->start(ve,vo)) >= 0) ylikely {
 		    op->slp = slp ;
-		    op->magic = SCHEDVAR_MAGIC ;
+		    op->magval = SCHEDVAR_MAGIC ;
 		}
 		if (rs < 0) {
 		    lm_free(slp) ;
@@ -127,8 +127,7 @@ int schedvar_start(SV *op) noex {
 	    } /* end if (object allocation) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (schedvar_start) */
+} /* end subroutine (schedvar_start) */
 
 int schedvar_finish(SV *op) noex {
 	int		rs ;
@@ -145,11 +144,10 @@ int schedvar_finish(SV *op) noex {
 		    op->slp = nullptr ;
 	        }
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (schedvar_finish) */
+} /* end subroutine (schedvar_finish) */
 
 int schedvar_add(SV *op,cc *key,cc *vp,int vl) noex {
 	int		rs ;
@@ -157,8 +155,7 @@ int schedvar_add(SV *op,cc *key,cc *vp,int vl) noex {
 	    rs = vecstr_envset(op->slp,key,vp,vl) ;
 	}
 	return rs ;
-}
-/* end subroutine (schedvar_add) */
+} /* end subroutine (schedvar_add) */
 
 int schedvar_curbegin(SV *op,SV_C *curp) noex {
 	int		rs ;
@@ -166,8 +163,7 @@ int schedvar_curbegin(SV *op,SV_C *curp) noex {
 	    curp->i = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (schedvar_curbegin) */
+} /* end subroutine (schedvar_curbegin) */
 
 int schedvar_curend(SV *op,SV_C *curp) noex {
 	int		rs ;
@@ -175,8 +171,7 @@ int schedvar_curend(SV *op,SV_C *curp) noex {
 	    curp->i = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (schedvar_curend) */
+} /* end subroutine (schedvar_curend) */
 
 int schedvar_curenum(SV *op,SV_C *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
@@ -209,8 +204,7 @@ int schedvar_curenum(SV *op,SV_C *curp,char *kbuf,int klen,
 	    if (rs >= 0) curp->i = i ;
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (schedvar_curenum) */
+} /* end subroutine (schedvar_curenum) */
 
 int schedvar_findkey(SV *op,cc *key,cc **rpp) noex {
 	int		rs ;
@@ -223,8 +217,7 @@ int schedvar_findkey(SV *op,cc *key,cc **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (schedvar_findkey) */
+} /* end subroutine (schedvar_findkey) */
 
 int schedvar_del(SV *op,cc *key) noex {
 	int		rs ;
@@ -235,8 +228,7 @@ int schedvar_del(SV *op,cc *key) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (schedvar_del) */
+} /* end subroutine (schedvar_del) */
 
 int schedvar_expand(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 	int		rs ;
@@ -251,20 +243,19 @@ int schedvar_expand(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (schedvar_expand) */
+} /* end subroutine (schedvar_expand) */
 
 
 /* private subroutines */
 
-static int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
+local int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		len = 0 ;
 	if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) ylikely {
 	    vecstr	*slp = op->slp ;
             cchar	*lfp = (sp + sl) ;
-            char	keybuf[2] ;
+            char	keybuf[2] = {} ;
             for (cc *fp = sp ; (fp < lfp) && *fp && (rs >= 0) ; fp += 1) {
                 if (*fp == '%') {
                     fp += 1 ;
@@ -293,7 +284,6 @@ static int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
             if (rs >= 0) rs = len ;
         } /* end if (sbuf) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (schedvar_exper) */
+} /* end subroutine (schedvar_exper) */
 
 
