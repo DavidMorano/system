@@ -143,7 +143,7 @@ template<typename ... Args>
 static int finduid_magic(finduid *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == FINDUID_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == FINDUID_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -179,7 +179,7 @@ int finduid_start(finduid *op,int nmax,int ttl) noex {
 		    if (rs >= 0) {
 			op->nmax = nmax ;
 			op->ttl = ttl ;
-			op->magic = FINDUID_MAGIC ;
+			op->magval = FINDUID_MAGIC ;
 		    }
 		}
 		if (rs < 0) {
@@ -216,7 +216,7 @@ int finduid_finish(finduid *op) noex {
 		rs1 = finduid_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
