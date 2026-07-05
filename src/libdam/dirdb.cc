@@ -121,7 +121,7 @@ template<typename ... Args>
 static inline int dirdb_magic(dirdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == DIRDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DIRDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -156,7 +156,7 @@ int dirdb_start(dirdb *op,int n) noex {
 	    op->count = 0 ;
 	    if ((rs = vechand_start(op->dlp,n,0)) >= 0) {
 	        if ((rs = hdb_start(op->dbp,n,1,np,np)) >= 0) {
-	            op->magic = DIRDB_MAGIC ;
+	            op->magval = DIRDB_MAGIC ;
 	        }
 	        if (rs < 0) {
 		    vechand_finish(op->dlp) ;
@@ -204,7 +204,7 @@ int dirdb_finish(dirdb *op) noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->count = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
