@@ -67,7 +67,7 @@ struct nodesearch_head {
 	NODESEARCH_FI	fi ;
 	time_t		ti_check ;	/* last check time */
 	time_t		ti_load ;	/* last load time */
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 typedef NODESEARCH	nodesearch ;
