@@ -149,7 +149,7 @@ int holidayer_open(HO *op,cchar *pr) noex {
 	if (cchar *cp{} ; (rs = lm_strw(pr,-1,&cp)) >= 0) {
 	    op->pr = cp ;
 	    if ((rs = ids_load(&op->id)) >= 0) {
-	        op->magic = HOLIDAYER_MAGIC ;
+	        op->magval = HOLIDAYER_MAGIC ;
 	    }
 	}
 
@@ -163,7 +163,7 @@ int holidayer_close(HO *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
 	debugprintf("holidayer_close: ent\n") ;
@@ -191,7 +191,7 @@ int holidayer_close(HO *op) noex {
 	debugprintf("holidayer_close: ret rs=%d\n",rs) ;
 #endif
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (holidayer_close) */
@@ -202,7 +202,7 @@ int holidayer_audit(HO *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.hols) {
 	    vechand	*hlp = &op->hols ;
@@ -227,10 +227,10 @@ int HO_CURbegin(HO *op,HO_CUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
 
 	memclear(curp) ;
-	curp->magic = HOLIDAYER_MAGIC ;
+	curp->magval = HOLIDAYER_MAGIC ;
 
 	op->ncursors += 1 ;
 	return SR_OK ;
@@ -243,8 +243,8 @@ int HO_CURend(HO *op,HO_CUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
 
 	if (op->ncursors > 0) {
 	    if (curp->hop != nullptr) {
@@ -254,7 +254,7 @@ int HO_CURend(HO *op,HO_CUR *curp) noex {
 	            op->ncursors -= 1 ;
 	            curp->hop = nullptr ;
 	            curp->year = 0 ;
-	            curp->magic = 0 ;
+	            curp->magval = 0 ;
 	        }
 	    } /* end if (cursor was used) */
 	} else {
@@ -274,8 +274,8 @@ int holidayer_fetchcite(HO *op,HO_CITE *qp,
 	if (qp == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
 	debugprintf("holidayer_fetchcite: ent %u:%u:%u\n",
@@ -330,7 +330,7 @@ int holidayer_fetchname(HO *op,uint y,cc *kp,int kl,
 	if (curp == nullptr) return SR_FAULT ;
 	if (qp == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
 	debugprintf("holidayer_fetchname: ent y=%d k=>%r<\n",y,kp,kl) ;
@@ -386,8 +386,8 @@ int holidayer_enum(HO *op,HO_CUR *curp,HO_CITE *qp,
 	if (curp == nullptr) return SR_FAULT ;
 	if (qp == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
 
 	if (op->ncursors == 0) return SR_INVALID ;
 
@@ -442,7 +442,7 @@ int holidayer_check(HO *op,time_t dt) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
 
 	if (dt == 0) dt = time(nullptr) ;
 
