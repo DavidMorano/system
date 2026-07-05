@@ -119,7 +119,7 @@ template<typename ... Args>
 local inline int nodesearch_magic(NS *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == NODESEARCH_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == NODESEARCH_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -154,7 +154,7 @@ int nodesearch_open(NS *op,cc *fname,int fsz) noex {
 			    if (! S_ISDIR(sb.st_mode)) {
 			        nodesfile	*nfp = op->nfp ;
 			        if ((rs = nodesfile_open(nfp,fn,fsz)) >= 0) {
-				    op->magic = NODESEARCH_MAGIC ;
+				    op->magval = NODESEARCH_MAGIC ;
 			        }
 			    }
 		        } /* end if (stat) */
@@ -196,7 +196,7 @@ int nodesearch_close(NS *op) noex {
 	        rs1 = nodesearch_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
