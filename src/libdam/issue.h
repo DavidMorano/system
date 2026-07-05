@@ -36,7 +36,7 @@ struct issue_mapper {
 	cchar		*fname ;
 	time_t		ti_mtime ;
 	time_t		ti_check ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct issue_flags {
@@ -51,7 +51,7 @@ struct issue_head {
 	cchar		*fe ;
 	time_t		ti_lastcheck ;
 	ISSUE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		nmaps ;
 	int		nenv ;
 } ; /* end struct */
