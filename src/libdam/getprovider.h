@@ -13,8 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 enum providerids {
@@ -40,9 +40,9 @@ enum providerids {
 
 EXTERNC_begin
 
-extern int getproviderid(cchar *,int) noex ;
-extern int getprovider(char *,int) noex ;
-extern int getvendor(char *,int) noex ;
+extern int getproviderid	(cchar *,int) noex ;
+extern int getprovider		(char *,int) noex ;
+extern int getvendor		(char *,int) noex ;
 
 EXTERNC_end
 
