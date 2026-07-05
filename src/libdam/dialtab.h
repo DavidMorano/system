@@ -37,7 +37,7 @@ struct dialtab_entry {
 struct dialtab_head {
 	vecobj		*flp ;
 	vecobj		*elp ;
-	uint		magic ;
+	uint		magval ;
 } ;
 
 typedef	DIALTAB		dialtab ;
