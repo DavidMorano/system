@@ -224,7 +224,7 @@ local int pingstatdb_opener(pingstatdb *op) noex {
 	    if ((rs = initnow(&op->now,znbuf,znlen)) >= 0) {
 		if (char *a ; (rs = uc_mallocstrw(znbuf,rs,&a)) >= 0) {
 		    op->zname = a ;
-		    op->magic = PINGSTATDB_MAGIC ;
+		    op->magval = PINGSTATDB_MAGIC ;
 		} /* end if (memory-acquire) */
 	    }
 	    rs = rsfree(rs,znbuf) ;
@@ -239,7 +239,7 @@ int pingstatdb_close(PINGSTATDB *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
 	{
 	rs1 = pingstatdb_fes(op) ;
 	if (rs >= 0) rs = rs1 ;
@@ -262,7 +262,7 @@ int pingstatdb_close(PINGSTATDB *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->zname = nullptr ;
 	}
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (pingstatdb_close) */
@@ -275,7 +275,7 @@ int pingstatdb_curbegin(PINGSTATDB *op,PINGSTATDB_CUR *curp)
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
 
 	op->fl.cursor = true ;
 	curp->i = -1 ;
@@ -293,7 +293,7 @@ int pingstatdb_curend(PINGSTATDB *op,PINGSTATDB_CUR *curp)
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.readlocked || op->fl.writelocked) {
 	    op->fl.readlocked = false ;
@@ -318,7 +318,7 @@ int pingstatdb_enum(PINGSTATDB *op,PINGSTATDB_CUR *curp,PINGSTATDB_ENT *ep)
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
 
 	if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
 	    rs = bcontrol(&op->pfile,BC_LOCKREAD,TO_LOCK) ;
@@ -362,7 +362,7 @@ int pingstatdb_match(PINGSTATDB *op,cchar *hostname,PINGSTATDB_ENT *ep)
 	if (op == nullptr) return SR_FAULT ;
 	if (hostname == nullptr) return SR_FAULT ;
 
-	if (op->magic != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
@@ -428,7 +428,7 @@ int pingstatdb_update(PINGSTATDB *op,cchar *hostname,int f_up,time_t timestamp)
 	if (op == nullptr) return SR_FAULT ;
 	if (hostname == nullptr) return SR_FAULT ;
 
-	if (op->magic != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
@@ -527,7 +527,7 @@ int pingstatdb_uptime(PINGSTATDB *op,cchar *hostname,PINGSTATDB_UP *up)
 	if (hostname == nullptr) return SR_FAULT ;
 	if (up == nullptr) return SR_FAULT ;
 
-	if (op->magic != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
@@ -744,7 +744,7 @@ int pingstatdb_check(PINGSTATDB *op,time_t daytime)
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
 
 	if (daytime == 0)
 	    daytime = time(nullptr) ;
