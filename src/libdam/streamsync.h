@@ -27,7 +27,7 @@
 struct streamsync_head {
 	char		*st ;		/* sequence to test against */
 	char		*data ;		/* the data stream */
-	uint		magic ;
+	uint		magval ;
 	int		stlen ;		/* sequence length needed */
 	int		i ;		/* current length */
 } ;
@@ -54,7 +54,7 @@ struct streamsync : streamsync_head {
 	streamsync_co	finish ;
 	streamsync() noex {
 	    finish(this,streamsyncmem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ;
 	streamsync(const streamsync &) = delete ;
 	streamsync &operator = (const streamsync &) = delete ;
@@ -63,7 +63,7 @@ struct streamsync : streamsync_head {
 	void dtor() noex ;
 	operator int () noex ;
 	destruct streamsync() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (streamsync) */
 #else	/* __cplusplus */
