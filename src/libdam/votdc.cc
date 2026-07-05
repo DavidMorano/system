@@ -181,7 +181,7 @@ template<typename ... Args>
 static inline int votdc_magic(votdc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == VOTDC_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == VOTDC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -292,7 +292,7 @@ int votdc_open(votdc *op,cchar *pr,cchar *lang,int of) noex {
 	                if ((rs = votdc_strbegin(op,pr,lang)) >= 0) ylikely {
 		            cmode	om = VOTDC_PERMS ;
 	                    if ((rs = votdc_shmbegin(op,of,om)) >= 0) ylikely {
-	   	                op->magic = VOTDC_MAGIC ;
+	   	                op->magval = VOTDC_MAGIC ;
 	                    } /* end if (votdc_shmbegin) */
 	                    if (rs < 0) {
 		                votdc_strend(op) ;
@@ -336,7 +336,7 @@ int votdc_close(votdc *op) noex {
 	        rs1 = votdc_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -351,7 +351,7 @@ int votdc_titleloads(votdc *op,cchar *lang,cchar **tv) noex {
 	if (lang == nullptr) return SR_FAULT ;
 	if (tv == nullptr) return SR_FAULT ;
 
-	if (op->magic != VOTDC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VOTDC_MAGIC) return SR_NOTOPEN ;
 
 	if (lang[0] == '\0') return SR_INVALID ;
 
@@ -384,7 +384,7 @@ int votdc_titlelang(votdc *op,cchar *lang) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (lang == nullptr) return SR_FAULT ;
 
-	if (op->magic != VOTDC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VOTDC_MAGIC) return SR_NOTOPEN ;
 
 	if (lang[0] == '\0') return SR_INVALID ;
 
@@ -415,7 +415,7 @@ int votdc_titleget(votdc *op,char *rbuf,int rlen,int li,int ti) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (rbuf == nullptr) return SR_FAULT ;
 
-	if (op->magic != VOTDC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VOTDC_MAGIC) return SR_NOTOPEN ;
 
 	if ((li < 0) || (li >= VOTDC_NBOOKS)) return SR_INVALID ;
 	if ((ti < 0) || (ti >= VOTDC_NTITLES)) return SR_INVALID ;
@@ -451,7 +451,7 @@ int votdc_titlefetch(votdc *op,char *rbuf,int rlen,cchar *lang,int ti) noex {
 	if (rbuf == nullptr) return SR_FAULT ;
 	if (lang == nullptr) return SR_FAULT ;
 
-	if (op->magic != VOTDC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VOTDC_MAGIC) return SR_NOTOPEN ;
 
 	if (lang[0] == '\0') return SR_INVALID ;
 	if ((ti < 0) || (ti >= VOTDC_NTITLES)) return SR_INVALID ;
@@ -498,7 +498,7 @@ int votdc_titlematch(votdc *op,cchar *lang,cchar *sp,int sl) noex {
 	if (lang == nullptr) return SR_FAULT ;
 	if (sp == nullptr) return SR_FAULT ;
 
-	if (op->magic != VOTDC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VOTDC_MAGIC) return SR_NOTOPEN ;
 
 	if (lang[0] == '\0') return SR_INVALID ;
 	if (sp[0] == '\0') return SR_INVALID ;
@@ -647,7 +647,7 @@ int votdc_getinfo(votdc *op,VOTDC_INFO *bip) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (bip == nullptr) return SR_FAULT ;
 
-	if (op->magic != VOTDC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VOTDC_MAGIC) return SR_NOTOPEN ;
 
 	if (sigblocker s ; (rs = sigblocker_start(&s,nullptr)) >= 0) {
 	    ptm		*mxp = op->mxp ;
