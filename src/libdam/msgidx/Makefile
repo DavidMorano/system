@@ -41,11 +41,11 @@ LIBS +=
 
 
 OBJ0= msgid.o msgide.o
-OBJ1= funmode.o
+OBJ1=
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o
 OBJB=
 
 OBJ= $(OBJA)
@@ -137,7 +137,5 @@ objb.o:			$(OBJB)
 
 msgid.o:		msgid.cc	msgid.h msgide.hh	$(INCS)
 msgide.o:		msgide.cc	msgide.hh		$(INCS)
-
-funmode.o:		funmode.cc	funmode.hh		$(INCS)
 
 
