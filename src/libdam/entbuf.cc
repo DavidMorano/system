@@ -39,7 +39,7 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |memset(3c)| */
+#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -131,11 +131,10 @@ int entbuf_start(entbuf *op,int fd,uint soff,int esz,int nways,int npw) noex {
 	            op->nentries = ((foff - soff) / esz) ;
 	        }
 	        sz = nways * szof(WAY) ;
-	        if (void *vp ; (rs = mem.mall(sz,&vp)) >= 0) {
+	        if (void *vp ; (rs = mem.call(1,sz,&vp)) >= 0) {
 		    op->ways = (WAY *) vp ;
-		    memset(op->ways,0,sz) ;
 		    op->magval = ENTBUF_MAGIC ;
-	        } /* end if (m-a) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (fstat) */
 	} /* end if (non-null) */
 	return rs ;
@@ -153,7 +152,7 @@ int entbuf_finish(entbuf *op) noex {
 	        rs1 = mem.free(op->ways) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->ways = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -256,7 +255,7 @@ local int entbuf_wayend(entbuf *op,int wi) noex {
 	    rs1 = mem.free(wp->wbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    wp->wbuf = nullptr ;
-	}
+	} /* end if (memory-release) */
 	memclear(wp) ;
 	return rs ;
 } /* end subroutine (entbuf_wayend) */
