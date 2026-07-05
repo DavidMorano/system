@@ -20,11 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysvase.h>		/* LIBU */
 
 #include	<msgid.h>
 #include	<msgide.hh>
