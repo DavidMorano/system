@@ -50,7 +50,7 @@ struct statmsg_mapper {
 	cchar		*fname ;
 	time_t		ti_mtime ;
 	time_t		ti_check ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct statmsg_flags {
@@ -73,7 +73,7 @@ struct statmsg_head {
 	char		*useralloc ;
 	time_t		ti_lastcheck ;
 	STATMSG_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		nmaps ;
 	int		nenv ;
 } ; /* end struct */
