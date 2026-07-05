@@ -154,7 +154,7 @@ template<typename ... Args>
 local inline int sysrealname_magic(sysrealname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SYSREALNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SYSREALNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (sysrealname_magic) */
@@ -218,7 +218,7 @@ int sysrealname_open(SRN *op,cchar *dbname) noex {
 		if (op->callp) {
 		    cauto co = callp->open ;
 	            if ((rs = co(op->obj,dbname)) >= 0) {
-	                op->magic = SYSREALNAME_MAGIC ;
+	                op->magval = SYSREALNAME_MAGIC ;
 	            }
 		}
 	    } /* end if (sysrealname_objloadbegin) */
@@ -249,7 +249,7 @@ int sysrealname_close(SRN *op) noex {
 		rs1 = sysrealname_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -297,7 +297,7 @@ int sysrealname_curbegin(SRN *op,SRN_CUR *curp) noex {
 		    IPW_CUR	*icurp = (IPW_CUR *) curp->scp ;
 		    curp->scp = vp ;
 	            if ((rs = co(op->obj,icurp)) >= 0) {
-		        curp->magic = SRN_CURMAGIC ;
+		        curp->magval = SRN_CURMAGIC ;
 		    }
 		    if (rs < 0) {
 		        uc_free(curp->scp) ;
@@ -316,7 +316,7 @@ int sysrealname_curend(SRN *op,SRN_CUR *curp) noex {
 	if ((rs = sysrealname_magic(op,curp)) >= 0) ylikely {
             sysrealname_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == SRN_CURMAGIC) {
+	    if (curp->magval == SRN_CURMAGIC) {
 		rs = SR_OK ;
 	        if (callp->curend) {
 		    cauto 	co = callp->curend ;
@@ -338,7 +338,7 @@ int sysrealname_curend(SRN *op,SRN_CUR *curp) noex {
 	            if (rs >= 0) rs = rs1 ;
 	            curp->sa = nullptr ;
 	        }
-		curp->magic = 0 ;
+		curp->magval = 0 ;
 	    } /* end if (valid-magic) */
 	} /* end if (magic) */
 	return rs ;
@@ -370,7 +370,7 @@ int sysrealname_curlookparts(SRN *op,SRN_CUR *curp,int fo,
 	int		rs ;
 	if ((rs = sysrealname_magic(op,curp,sa)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == SRN_CURMAGIC) {
+	    if (curp->magval == SRN_CURMAGIC) {
 	        rs = sysrealname_curload(op,curp,fo,sa,sn) ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -383,7 +383,7 @@ int sysrealname_curlookread(SRN *op,SRN_CUR *curp,char *rbuf) noex {
 	if ((rs = sysrealname_magic(op,curp,rbuf)) >= 0) ylikely {
             sysrealname_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == SRN_CURMAGIC) {
+	    if (curp->magval == SRN_CURMAGIC) {
 		rs = SR_NOSYS ;
 	        if (callp->curfetch) {
 		    cauto	co = callp->curfetch ;
@@ -408,7 +408,7 @@ int sysrealname_curenum(SRN *op,SRN_CUR *curp,char *ubuf,
 	if ((rs = sysrealname_magic(op,curp,ubuf,sa,rbuf)) >= 0) ylikely {
             sysrealname_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == SRN_CURMAGIC) {
+	    if (curp->magval == SRN_CURMAGIC) {
 		rs = SR_NOSYS ;
 	        if (callp->curenum) {
 		    cauto 	co = callp->curenum ;
