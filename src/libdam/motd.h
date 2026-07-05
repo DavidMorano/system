@@ -46,7 +46,7 @@ struct motd_mapper {
 	cchar		*fname ;
 	time_t		ti_mtime ;
 	time_t		ti_check ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct motd_flags {
@@ -62,7 +62,7 @@ struct motd_head {
 	cchar		*fe ;		/* file-ending */
 	time_t		ti_lastcheck ;
 	MOTD_FL		open ;
-	uint		magic ;
+	uint		magval ;
 	int		nmaps ;
 	int		nenv ;
 } ; /* end struct */
