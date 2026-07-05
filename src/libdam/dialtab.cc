@@ -131,7 +131,7 @@ template<typename ... Args>
 static inline int dialtab_magic(DT *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == DT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -197,13 +197,13 @@ int dialtab_open(DT *op,cchar *dialfname) noex {
 		vsz = szof(DT_ENT) ;
 		vn = 20 ;
 	        if ((rs = vecobj_start(op->elp,vsz,vn,vo)) >= 0) {
-		    op->magic = DT_MAGIC ;
+		    op->magval = DT_MAGIC ;
 	            if (dialfname) {
 	                rs = dialtab_fileadd(op,dialfname) ;
 			c = rs ;
 	            } /* end if */
 		    if (rs < 0) {
-			op->magic = 0 ;
+			op->magval = 0 ;
 			vecobj_finish(op->elp) ;
 		    }
 		} /* end if (vecobj_start) */
@@ -260,7 +260,7 @@ int dialtab_close(DT *op) noex {
 	        rs1 = dialtab_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
