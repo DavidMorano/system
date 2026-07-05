@@ -30,8 +30,8 @@
 
 
 struct egs_head {
-	uint		magic ;
 	pid_t		pid ;		/* daemon PID */
+	uint		magic ;
 	int		fd ;		/* socket file descriptor */
 } ;
 
