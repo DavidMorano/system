@@ -13,10 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* POSIX */
 #include	<kstat.h>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* object defines */
@@ -33,7 +34,7 @@ struct loadave_mid {
 	uint		hostid ;
 	char		provider[LOADAVE_IDLEN + 1] ; /* vendor name? */
 	char		serial[LOADAVE_IDLEN + 1] ; /* vendor serial number */
-} ;
+} ; /* end struct */
 
 struct loadave_values {
 	time_t		tim_read ;	/* time of read */
@@ -43,11 +44,11 @@ struct loadave_values {
 	uint		la1min ;
 	uint		la5min ;
 	uint		la15min ;
-} ;
+} ; /* end struct */
 
 struct loadave_flags {
 	uint		open:1 ;
-} ;
+} ; /* end struct */
 
 struct loadave_head {
 	kstat_ctl_t	*kcp ;		/* the KSTAT chain pointer */
@@ -58,8 +59,8 @@ struct loadave_head {
 	time_t		tim_update ;	/* time of last KSTAT chain update */
 	time_t		tim_access ;	/* time of last read */
 	LOADAVE_FL	fl ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef	LOADAVE			loadave ;
 typedef	LOADAVE_FL		loadave_fl ;
