@@ -260,8 +260,8 @@ OBJ145= cfhulian.o
 OBJ146= ctb26.o cthexstr.o ctroman.o ctwords.o
 OBJ147= quickselecti.o igcd.o minmax.o isort.o
 OBJ148= fam.o fhm.o
-OBJ149= permutations.o combinations.o
-OBJ150= wsnwcpynarrow.o
+OBJ149= permutations.o combinations.o msgsub.o
+OBJ150= wsnwcpynarrow.o termcharsets.o
 OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
 
 OBJ152= getuserorg.o getdefzinfo.o getrealname.o getprojname.o
@@ -391,14 +391,14 @@ a:			$(T).a
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).o:			$(OBJ) Makefile
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+$(T).o:			$(OBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
-$(T).so:		$(OBJ) Makefile
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
+$(T).so:		$(OBJ)
+	$(LD) -shared -o $@ $(LDFLAGS) $^ $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
@@ -698,7 +698,7 @@ sesmsg.o:		sesmsg.cc	sesmsg.hh
 msgdata.o:		msgdata.cc msgdata.h
 msgbuf.o:		msgbuf.cc msgbuf.h
 sysrealname.o:		sysrealname.cc sysrealname.h
-dayofmonth.o:		dayofmonth.cc dayofmonth.h
+dayofmonth.o:		dayofmonth.cc	dayofmonth.h		$(INCS)
 netfile.o:		netfile.cc netfile.h
 sysnamedb.o:		sysnamedb.cc sysnamedb.h
 dirdb.o:		dirdb.cc dirdb.h
@@ -720,6 +720,7 @@ statmsg.o:		statmsg.cc	statmsg.h		$(INCS)
 defvar.o:		defvar.cc	defvar.h		$(INCS)
 schedvar.o:		schedvar.cc	schedvar.h		$(INCS)
 cmdmap.o:		cmdmap.cc	cmdmap.h		$(INCS)
+pdb.o:			pdb.cc		pdb.h			$(INCS)
 
 # TEXT related
 textlook.o:		textlook.cc	textlook.h		$(INCS)
@@ -928,13 +929,20 @@ makedirs.o:		makedirs.cc		makedirs.h		$(INCS)
 naturalwords.o:		naturalwords.cc		naturalwords.h		$(INCS)
 termcmdkey.o:		termcmdkey.cc		termcmdkey.h		$(INCS)
 vetus.o:		vetus.cc		vetus.h			$(INCS)
+nettime.o:		nettime.cc		nettime.h		$(INCS)
+taginfo.o:		taginfo.cc		taginfo.h		$(INCS)
+permutations.o:		permutations.cc		permutations.h		$(INCS)
+combinations.o:		combinations.cc		combinations.h		$(INCS)
+msgsub.o:		msgsub.cc		msgsub.hh		$(INCS)
+termcharsetx.o:		termcharsets.cc		termcharsets.h		$(INCS)
+findinline.o:		findline.cc		findinline.h		$(INCS)
 
 # DFSA
 dfsa.o:			dfsa0.o dfsa1.o			$(INCS)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 dfsa0.o:		dfsa.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 dfsa1.o:		dfsa1.cc dfsa0.o		$(INCS)
 	$(COMPILE.cc) $<
@@ -944,31 +952,34 @@ dfsb.o:			dfsb0.o dfsb1.o			$(INCS)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 dfsb0.o:		dfsb.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 dfsb1.o:		dfsb1.cc dfsb0.o		$(INCS)
 	$(COMPILE.cc) $<
 
 sort_merge.o:		sort_merge.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 sort_insertion.o:	sort_insertion.ccm		$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # CCMUTEX
 ccmutex.o:		ccmutex.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # MINMAXELEM
 minmaxelem.o:		minmaxelem.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # HASDUPLICATE
 hascount.o:		hascount.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # BINCHAR
 binchar.o:		binchar.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
+filemagic.o:		filemagic.ccm	filemagic.hh	$(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
