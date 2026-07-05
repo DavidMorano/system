@@ -20,16 +20,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<unistd.h>
-#include	<usystem.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<unistd.h>		/* POSIX */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 /* object defines */
-#define	LFM_MAGIC		0x8a7b7c6d
 #define	LFM			struct lfm_head
 #define	LFM_IN			struct lfm_information
 #define	LFM_CH			struct lfm_checkdata
+#define	LFM_MAGIC		0x8a7b7c6d
 /* lock-file types */
 #define	LFM_TRECORD		0		/* record lock */
 #define	LFM_TCREATE		1		/* old create file 0444 */
@@ -46,7 +47,7 @@ struct lfm_information {
 	ino_t		ino ;
 	dev_t		dev ;
 	int		tocheck ;	/* check interval */
-} ;
+} ; /* end struct */
 
 struct lfm_checkdata {
 	cchar		*nodename ;	/* lock node name */
@@ -55,7 +56,7 @@ struct lfm_checkdata {
 	pid_t		pid ;		/* lock PID */
 	int		status ;	/* status */
 	char		buf[LFM_CHBUFLEN + 1] ;
-} ;
+} ; /* end struct */
 
 struct lfm_head {
 	cchar		*lfname ;	/* file name (processed) */
@@ -68,12 +69,12 @@ struct lfm_head {
 	dev_t		dev ;
 	pid_t		pid ;		/* our PID */
 	pid_t		pid_lock ;	/* old times sake */
-	uint		magic ;
+	uint		magval ;
 	int		lfd ;
 	int		type ;		/* lock type */
 	int		tolock ;	/* lock timeout */
 	int		tocheck ;	/* check interval */
-} ;
+} ; /* end struct */
 
 typedef LFM		lfm ;
 typedef	LFM_IN		lfm_in ;
