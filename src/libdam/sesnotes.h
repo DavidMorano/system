@@ -38,19 +38,19 @@ struct sesnotes_head {
 	char		*sfname ;
 	char		*unbuf ;	/* memory-allocated */
 	pid_t		pid ;
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
-} ;
+} ; /* end struct */
 
 typedef	SESNOTES	sesnotes ;
 
 EXTERNC_begin
 
-extern int sesnotes_open(sesnotes *,cchar *) noex ;
-extern int sesnotes_send(sesnotes *,int,cchar *,int,pid_t) noex ;
-extern int sesnotes_sendbiff(sesnotes *,cchar *,int,pid_t) noex ;
-extern int sesnotes_sendgen(sesnotes *,cchar *,int,pid_t) noex ;
-extern int sesnotes_close(sesnotes *) noex ;
+extern int sesnotes_open	(sesnotes *,cchar *) noex ;
+extern int sesnotes_send	(sesnotes *,int,cchar *,int,pid_t) noex ;
+extern int sesnotes_sendbiff	(sesnotes *,cchar *,int,pid_t) noex ;
+extern int sesnotes_sendgen	(sesnotes *,cchar *,int,pid_t) noex ;
+extern int sesnotes_close	(sesnotes *) noex ;
 
 EXTERNC_end
 
