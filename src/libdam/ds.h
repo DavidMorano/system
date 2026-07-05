@@ -21,19 +21,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdarg.h>		/* |va_list| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<td.h>
+#include	<stdarg.h>		/* CSTD |va_list| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<td.h>			/* LIBDAM */
 
 
 /* object define */
-#define	DS_MAGIC	0x24182137
 #define	DS		struct ds_head
 #define	DS_FL		struct ds_flags
+#define	DS_MAGIC	0x24182137
 /* windows */
 #define	DS_WROOT	0
 #define	DS_WHEADER	1
@@ -48,17 +45,17 @@
 struct ds_flags {
 	uint		update:1 ;
 	uint		mailnew:1 ;	/* new mail arrived */
-} ;
+} ; /* end struct */
 
 struct ds_head {
 	cchar		*termtype ;
 	TD		*tdp ;		/* terminal display manager */
 	DS_FL		fl ;		/* currently unused! */
-	uint		magic ;
+	uint		magval ;
 	int		tfd ;
 	int		rows ;
 	int		cols ;
-} ;
+} ; /* end struct */
 
 typedef	DS		ds ;
 typedef	DS_FL		ds_fl ;
