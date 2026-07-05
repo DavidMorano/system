@@ -49,11 +49,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"permutations.h"
 
 
 /* local defines */
@@ -96,7 +101,6 @@ long permutations(int n,int k) noex {
 	    ans = 0 ;
 	}
 	return ans ;
-}
-/* end subroutine (permutations) */
+} /* end subroutine (permutations) */
 
 
