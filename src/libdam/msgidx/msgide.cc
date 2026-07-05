@@ -28,17 +28,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<serialbuf.h>
-#include	<sncpyx.h>
-#include	<snwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"msgide.hh"
 
@@ -87,9 +87,8 @@ static vars		var ;
 
 int msgide::istart() noex {
     	int		rs ;
-	int		esz = 0 ;
-	static cint	rsv = var ;
-	if ((rs = rsv) >= 0) {
+	int		esz = 0 ; /* return-value */
+	if (static cint rsv = var ; (rs = rsv) >= 0) {
 	    cint	maxhost = var.maxhostlen ;
 	    cint	sz = ((var.reciplen + 1) + (2 * (var.maxhostlen + 1))) ;
 	    int		ai = 0 ;
@@ -111,7 +110,7 @@ int msgide::istart() noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (vars) */
 	return (rs >= 0) ? esz : rs ;
-}
+} /* end method */
 
 int msgide::ifinish() noex {
     	int		rs = SR_NOTOPEN ;
@@ -127,7 +126,7 @@ int msgide::ifinish() noex {
 	    }
 	}
 	return rs ;
-}
+} /* end method */
 
 int msgide::wr(cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
@@ -155,8 +154,7 @@ int msgide::wr(cchar *mbuf,int mlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-} 
-/* end method (msgide::wr) */
+} /* end method (msgide::wr) */
 
 int msgide::wru(cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
@@ -177,8 +175,7 @@ int msgide::wru(cchar *mbuf,int mlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-} 
-/* end method (msgide::wru) */
+} /* end method (msgide::wru) */
 
 int msgide::rd(char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
@@ -204,8 +201,7 @@ int msgide::rd(char *mbuf,int mlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msgide::rd) */
+} /* end subroutine (msgide::rd) */
 
 int msgide::rdu(char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
@@ -225,8 +221,7 @@ int msgide::rdu(char *mbuf,int mlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (msgide::rdu) */
+} /* end method (msgide::rdu) */
 
 int msgide::loadrec(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -238,8 +233,7 @@ int msgide::loadrec(cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (msgide::loadrec) */
+} /* end method (msgide::loadrec) */
 
 int msgide::loadmid(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -251,11 +245,10 @@ int msgide::loadmid(cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (msgide::loadmid) */
+} /* end method (msgide::loadmid) */
 
 
-/* local subroutines */
+/* private subroutines */
 
 template<> 
 msgide_co<msgide>::operator int () noex {
