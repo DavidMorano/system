@@ -26,23 +26,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstdarg>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<shio.h>
-#include	<sbuf.h>
-#include	<buffer.h>
-#include	<ascii.h>
-#include	<linefold.h>
-#include	<bufprintf.h>
-#include	<ctdec.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<linefold.h>		/* LIBUC */
+#include	<bufprintf.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* |COLUMNS| + |DIGBUFLEN| */
+#include	<shio.h>		/* LIBSHELL */
 
 #include	"htm.h"
 
@@ -86,7 +87,7 @@ template<typename ... Args>
 static inline int htm_magic(htm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == HTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == HTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (htm_magic) */
@@ -127,7 +128,7 @@ int htm_start(htm *op,shio *ofp,cchar *lang) noex {
 	            if (rs >= 0) {
 	                if ((rs = shio_print(op->ofp,op->lbuf,rs)) >= 0) {
 	                    wlen += rs ;
-	    		    op->magic = HTM_MAGIC ;
+	    		    op->magval = HTM_MAGIC ;
 		        }
 	            }
 		    if (rs < 0) {
@@ -144,8 +145,7 @@ int htm_start(htm *op,shio *ofp,cchar *lang) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_start) */
+} /* end subroutine (htm_start) */
 
 int htm_finish(htm *op) noex {
 	int		rs ;
@@ -168,11 +168,10 @@ int htm_finish(htm *op) noex {
 	    }
 	    wlen = op->wlen ;
 	    op->ofp = nullptr ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_finish) */
+} /* end subroutine (htm_finish) */
 
 int htm_headbegin(htm *op,cchar *cfname) noex {
 	int		rs ;
@@ -189,8 +188,7 @@ int htm_headbegin(htm *op,cchar *cfname) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_headbegin) */
+} /* end subroutine (htm_headbegin) */
 
 int htm_headend(htm *op) noex {
 	int		rs ;
@@ -202,8 +200,7 @@ int htm_headend(htm *op) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_headend) */
+} /* end subroutine (htm_headend) */
 
 int htm_bodybegin(htm *op,cchar *cfname) noex {
 	int		rs ;
@@ -220,8 +217,7 @@ int htm_bodybegin(htm *op,cchar *cfname) noex {
 	    } /* end if (shio_print) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_bodybegin) */
+} /* end subroutine (htm_bodybegin) */
 
 int htm_bodyend(htm *op) noex {
 	int		rs ;
@@ -233,8 +229,7 @@ int htm_bodyend(htm *op) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_bodyend) */
+} /* end subroutine (htm_bodyend) */
 
 int htm_tagbegin(htm *op,cc *tag,cc *eclass,cc *id,cc *(*kv)[2]) noex {
 	int		rs ;
@@ -296,8 +291,7 @@ int htm_tagbegin(htm *op,cc *tag,cc *eclass,cc *id,cc *(*kv)[2]) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_tagbegin) */
+} /* end subroutine (htm_tagbegin) */
 
 int htm_tagend(htm *op,cchar *tag) noex {
 	int		rs ;
@@ -314,8 +308,7 @@ int htm_tagend(htm *op,cchar *tag) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_tagend) */
+} /* end subroutine (htm_tagend) */
 
 int htm_textbegin(htm *op,cc *eclass,cc *id,cc *title,
 		int r,int c,cchar *(*tkv)[2]) noex {
@@ -375,14 +368,12 @@ int htm_textbegin(htm *op,cc *eclass,cc *id,cc *title,
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (htm_textbegin) */
+} /* end subroutine (htm_textbegin) */
 
 int htm_textend(htm *op) noex {
 	cchar	*tag = "textarea" ;
 	return htm_tagend(op,tag) ;
-}
-/* end subroutine (htm_textend) */
+} /* end subroutine (htm_textend) */
 
 int htm_abegin(htm *op,cc *eclass,cc *id,cc *href,cc *title) noex {
 	int		rs ;
@@ -434,8 +425,7 @@ int htm_abegin(htm *op,cc *eclass,cc *id,cc *href,cc *title) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_abegin) */
+} /* end subroutine (htm_abegin) */
 
 int htm_aend(htm *op) noex {
 	int		rs ;
@@ -449,18 +439,15 @@ int htm_aend(htm *op) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_aend) */
+} /* end subroutine (htm_aend) */
 
 int htm_hr(htm *op,cchar *eclass,cchar *id) noex {
 	return htm_tagalone(op,"hr",eclass,id) ;
-}
-/* end subroutine (htm_hr) */
+} /* end subroutine (htm_hr) */
 
 int htm_br(htm *op,cchar *eclass,cchar *id) noex {
 	return htm_tagalone(op,"br",eclass,id) ;
-}
-/* end subroutine (htm_br) */
+} /* end subroutine (htm_br) */
 
 int htm_img(htm *op,cc *eclass,cc *id,cc *src,cc *title,cc *alt,
 		int w,int h) noex {
@@ -525,8 +512,7 @@ int htm_img(htm *op,cc *eclass,cc *id,cc *src,cc *title,cc *alt,
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_img) */
+} /* end subroutine (htm_img) */
 
 int htm_write(htm *op,cvoid *lbuf,int llen) noex {
 	int		rs ;
@@ -537,8 +523,7 @@ int htm_write(htm *op,cvoid *lbuf,int llen) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_write) */
+} /* end subroutine (htm_write) */
 
 int htm_printline(htm *op,cchar *lbuf,int llen) noex {
 	int		rs ;
@@ -549,8 +534,7 @@ int htm_printline(htm *op,cchar *lbuf,int llen) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_printline) */
+} /* end subroutine (htm_printline) */
 
 int htm_printf(htm *op,cchar *fmt,...) noex {
 	va_list		ap ;
@@ -561,8 +545,7 @@ int htm_printf(htm *op,cchar *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (htm_printf) */
+} /* end subroutine (htm_printf) */
 
 int htm_vprintf(htm *op,cchar *fmt,va_list ap) noex {
 	int		rs ;
@@ -573,8 +556,7 @@ int htm_vprintf(htm *op,cchar *fmt,va_list ap) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_vprintf) */
+} /* end subroutine (htm_vprintf) */
 
 int htm_putc(htm *op,int ch) noex {
 	int		rs ;
@@ -585,13 +567,12 @@ int htm_putc(htm *op,int ch) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (htm_putc) */
+} /* end subroutine (htm_putc) */
 
 
 /* private subroutines */
 
-int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
+local int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
