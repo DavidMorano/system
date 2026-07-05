@@ -53,35 +53,35 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/time.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uinet.h>
-#include	<uclibmem.h>
-#include	<funcodes.h>		/* |FM_{x}(3uc)| */
-#include	<bufsizeget.h>
-#include	<getpf.h>
-#include	<dialtcp.h>
-#include	<hostaddr.h>
-#include	<sockaddress.h>
-#include	<vechand.h>
-#include	<sbuf.h>
-#include	<cthex.h>
-#include	<sncpyx.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/time.h>		/* POSIX */
+#include	<sys/socket.h>		/* POSIX */
+#include	<netinet/in.h>		/* POSIX */
+#include	<arpa/inet.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<netdb.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memcpy(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU */
+#include	<funcodes.h>		/* LIBU |FM_{x}(3uc)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getpf.h>		/* LIBUC */
+#include	<dialtcp.h>		/* LIBUC */
+#include	<hostaddr.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<cthex.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
 #include	<localmisc.h>		/* |TIMEBUFLEN| + |NYEARS_CENTURY| */
 
 #include	"nettime.h"
