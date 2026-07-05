@@ -13,9 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
 
 
 #define	SCHEDVAR	struct schedvar_head
@@ -29,7 +29,7 @@ struct schedvar_cursor {
 
 struct schedvar_head {
 	vecstr		*slp ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 typedef	SCHEDVAR	schedvar ;
