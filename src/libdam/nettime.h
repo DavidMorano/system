@@ -13,9 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/time.h>		/* |TIMEVAL| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/time.h>		/* POSIX |TIMEVAL| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	NETTIME		struct nettime_head
