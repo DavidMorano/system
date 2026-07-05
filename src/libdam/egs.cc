@@ -117,7 +117,7 @@ template<typename ... Args>
 static inline int egs_magic(egs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == EGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == EGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -142,7 +142,7 @@ int egs_open(egs *op,cchar *filename) noex {
 	            op->fd = rs ;
 	            if ((uc_closeonexec(op->fd,true)) >= 0) ylikely {
 		        if ((rs = egs_opencheck(op)) >= 0) ylikely {
-		            op->magic = EGS_MAGIC ;
+		            op->magval = EGS_MAGIC ;
 		        }
 	            } /* end if (closeonexec) */
 	            if (rs < 0) {
@@ -172,7 +172,7 @@ int egs_close(egs *op) noex {
 		rs1 = egs_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
