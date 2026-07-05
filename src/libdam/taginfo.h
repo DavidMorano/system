@@ -20,21 +20,23 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
-#define	TAGINFO		struct taginfo
+#define	TAGINFO		struct taginfo_head
 
 
-struct taginfo {
+struct taginfo_head {
 	ulong		recoff ;
 	ulong		reclen ;
 	int		fnamelen ;
-} ;
+} ; /* end if (taginfo) */
+
+typedef	TAGINFO		taginfo ;
 
 EXTERNC_begin
 
