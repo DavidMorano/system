@@ -148,7 +148,7 @@ template<typename ... Args>
 local inline int sysnamedb_magic(sysnamedb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SYSNAMEDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SYSNAMEDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (sysnamedb_magic) */
@@ -182,7 +182,7 @@ int sysnamedb_open(sysnamedb *op,cchar *pr) noex {
 	            if (ids id ; (rs = id.load) >= 0) {
 	                if ((rs = sysnamedb_nodebegin(op,&id,pr)) >= 0) {
 	                    if ((rs = sysnamedb_clusterbegin(op,&id,pr)) >= 0) {
-			        op->magic = SYSNAMEDB_MAGIC ;
+			        op->magval = SYSNAMEDB_MAGIC ;
 			    }
 	                    if (rs < 0) {
 	                        sysnamedb_nodeend(op) ;
@@ -216,7 +216,7 @@ int sysnamedb_close(sysnamedb *op) noex {
 	        rs1 = sysnamedb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (sysnamedb_close) */
