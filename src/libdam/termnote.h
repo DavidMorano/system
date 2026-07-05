@@ -58,7 +58,7 @@ struct termnote_head {
 	time_t		ti_logcheck ;
 	time_t		ti_write ;
 	TERMNOTE_FL	init, open ;
-	uint		magic ;
+	uint		magval ;
 	int		sn ;		/* serial-number */
 	char		logid[LOGIDLEN+1] ;
 } ;
