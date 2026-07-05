@@ -44,31 +44,40 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<ostream>
-#include	<usystem.h>
-#include	<syswords.hh>
-#include	<bufsizevar.hh>
-#include	<mallocxx.h>
-#include	<vecstr.h>
-#include	<bfile.h>
-#include	<expcook.h>
-#include	<snx.h>
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<mkpathx.h>
-#include	<mkchar.h>
-#include	<permx.h>
-#include	<getx.h>		/* |getnodedomain(3uc)| */
-#include	<rmx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<ostream>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<getx.h>		/* LIBUC |getnodedomain(3uc)| */
+#include	<vecstr.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"printhelp.hh"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -86,6 +95,7 @@
 /* imported namespaces */
 
 using std::ostream ;			/* type */
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -99,11 +109,13 @@ using std::ostream ;			/* type */
 
 /* local structures */
 
-struct vars {
+namespace {
+    struct vars {
 	int		maxnodelen ;
 	int		maxhostlen ;
 	int		maxcombolen ;
-} ;
+    } ; /* end struct */
+} /* end namespace */
 
 namespace {
     struct helper ;
@@ -119,27 +131,27 @@ namespace {
 	helper(ostream *sp,cc *p,cc *s,cc *f) noex : osp(sp), pr(p), sn(s) { 
 	    fn = f ;
 	} ; /* end ctor */
- 	int start(char *,int) noex ;
-	int finish() noex ;
-	operator int () noex ;
-	int sched(mainv) noex ;
-	int schedfile() noex ;
-	int schedlocal() noex ;
+ 	int start	(char *,int) noex ;
+	int finish	() noex ;
+	operator int	() noex ;
+	int sched	(mainv) noex ;
+	int schedfile	() noex ;
+	int schedlocal	() noex ;
     } ; /* end struct (helper) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
-static int	printhelper(ostream *,cc *,cc *,cc *) noex ;
-static int	printproc(ostream *,cchar *,cchar *,cchar *) noex ;
-static int	printout(ostream *,expcook *,cc *) noex ;
+local int	printhelper	(ostream *,cc *,cc *,cc *) noex ;
+local int	printproc	(ostream *,cchar *,cchar *,cchar *) noex ;
+local int	printout	(ostream *,expcook *,cc *) noex ;
 
-static int	vecstr_loadscheds(vecstr *,cchar *,cchar *) noex ;
+local int	vecstr_loadscheds(vecstr *,cchar *,cchar *) noex ;
 
-static int	expcook_load(expcook *,cc *,cc *) noex ;
+local int	expcook_load	(expcook *,cc *,cc *) noex ;
 
-static int	mkvars() noex ;
+local int	mkvars() noex ;
 
 
 /* local variables */
@@ -157,7 +169,7 @@ constexpr cpcchar	schedule[] = {
 	"%r/%n.%f",
 	"%n.%f",
 	nullptr
-} ;
+} ; /* end array */
 
 enum expkeys {
 	expkey_sn,
@@ -165,7 +177,7 @@ enum expkeys {
 	expkey_pr,
 	expkey_rn,
 	expkey_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	expkeys[] = {
 	"SN",
@@ -173,16 +185,16 @@ constexpr cpcchar	expkeys[] = {
 	"PR",
 	"RN",
 	nullptr
-} ;
+} ; /* end array */
 
 static bufsizevar	maxpathlen(bufsize_mp) ;
 static vars		var ;
 
-constexpr helper_m	mems[] = {
+constexpr helper_m	subs[] = {
 	&helper::schedfile,
 	&helper::schedlocal,
 	nullptr
-} ;
+} ; /* end initialization */
 
 
 /* exported variables */
@@ -199,8 +211,7 @@ int printhelp(ostream *osp,cchar *pr,cchar *sn,cchar *fn) noex {
 	if (osp && pr && sn) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && sn[0]) {
-		static cint	rsv = mkvars() ;
-		if ((rs = rsv) >= 0) {
+		if (static cint rsv = mkvars() ; (rs = rsv) >= 0) {
 	            if (fn[0] != '/') {
 		        rs = printhelper(osp,pr,sn,fn) ;
 		        len = rs ;
@@ -212,18 +223,16 @@ int printhelp(ostream *osp,cchar *pr,cchar *sn,cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (printhelp) */
+} /* end subroutine (printhelp) */
 
 
 /* local subroutines */
 
-static int printhelper(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
+local int printhelper(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
 	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
-	char		*tbuf{} ;
-	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	int		len = 0 ; /* return-value */
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
 	    cint	tlen = rs ;
 	    if (strchr(fn,'/') != nullptr) {
 	        if ((rs = mkpath(tbuf,pr,fn)) >= 0) {
@@ -243,45 +252,40 @@ static int printhelper(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (helper) */
 	    } /* end if (searching for file) */
-	    rs1 = uc_free(tbuf) ;
+	    rs1 = mem.free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (printhelper) */
+} /* end subroutine (printhelper) */
 
-static int printproc(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
-	expcook		ck ;
+local int printproc(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
 	int		rs ;
 	int		rs1 ;
-	int		wlen = 0 ;
-	if ((rs = expcook_start(&ck)) >= 0) {
+	int		wlen = 0 ; /* return-value */
+	if (expcook ck ; (rs = ck.start) >= 0) {
 	    if ((rs = expcook_load(&ck,pr,sn)) >= 0) {
 	        rs = printout(osp,&ck,fn) ;
 	        wlen += rs ;
 	    } /* end if (expcook_load) */
-	    rs1 = expcook_finish(&ck) ;
+	    rs1 = ck.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (expcook) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (printproc) */
+} /* end subroutine (printproc) */
 
-static int printout(ostream *osp,expcook *ecp,cc *fn) noex {
+local int printout(ostream *osp,expcook *ecp,cc *fn) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	char		*lbuf{} ;
-	if ((rs = malloc_ml(&lbuf)) >= 0) {
-	    char	*ebuf{} ;
+	if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    cint	elen = (EXPANDMULT * rs) ;
-	    if ((rs = uc_malloc((elen+1),&ebuf)) >= 0) {
+	    if (char *ebuf ; (rs = mem.mall((elen+1),&ebuf)) >= 0) {
 	        bfile	helpfile, *hfp = &helpfile ;
 	        if ((rs = bopen(hfp,fn,"r",0666)) >= 0) {
 	            while ((rs = breadln(hfp,lbuf,llen)) > 0) {
 	                cint	len = rmeol(lbuf,rs) ;
-		        if ((rs = expcook_exp(ecp,0,ebuf,elen,lbuf,len)) > 0) {
+		        if ((rs = ecp->exp(0,ebuf,elen,lbuf,len)) > 0) {
 			    try {
 			        (*osp) << ebuf << eol ;
 	                        wlen += (rs + 1) ;
@@ -294,10 +298,10 @@ static int printout(ostream *osp,expcook *ecp,cc *fn) noex {
 	            rs1 = bclose(hfp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (opened helpfile) */
-		rs1 = uc_free(ebuf) ;
+		rs1 = mem.free(ebuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
-	    rs1 = uc_free(lbuf) ;
+	    rs1 = mem.free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
@@ -313,7 +317,7 @@ int helper::start(char *b,int l) noex {
 	    rs = vecstr_loadscheds(svp,pr,sn) ;
 	}
 	return rs ;
-}
+} /* end method (helper::start) */
 
 int helper::finish() noex {
 	vecstr		*svp = &svars ;
@@ -324,26 +328,27 @@ int helper::finish() noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
+} /* end method (helper::finish) */
 
 helper::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
-	    helper_m	m = mems[i] ;
+	for (int i = 0 ; (rs == SR_OK) && subs[i] ; i += 1) {
+	    helper_m	m = subs[i] ;
 	    rs = (this->*m)() ;
 	} /* end for */
 	return rs ;
-}
+} /* end method (helper::operator) */
 
 int helper::schedfile() noex {
 	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if ((rs = mkpath2(tbuf,pr,HELPSCHEDFNAME)) >= 0) {
 	    if ((rs = perm(tbuf,-1,-1,nullptr,R_OK)) >= 0) {
-		vecstr	hs ;
+		cint	vn = 15 ;
 		cint	vo = vecstrm.compact ;
-	        if ((rs = vecstr_start(&hs,15,vo)) >= 0) {
+		vecstr	hs ;
+	        if ((rs = vecstr_start(&hs,vn,vo)) >= 0) {
 	            if ((rs = vecstr_loadfile(&hs,false,tbuf)) >= 0) {
 			mainv	spp{} ;
 	                if ((rs = vecstr_getvec(&hs,&spp)) >= 0) {
@@ -361,18 +366,16 @@ int helper::schedfile() noex {
 	    }
 	} /* end if (mkpath) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (helper::schedfile) */
+} /* end method (helper::schedfile) */
 
 int helper::schedlocal() noex {
 	return sched(schedule) ;
-}
-/* end method (helper::schedlocal) */
+} /* end method (helper::schedlocal) */
 
 int helper::sched(mainv spp) noex {
 	vecstr		*svp = &svars ;
 	int		rs ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if ((rs = permsched(spp,svp,tbuf,tlen,fn,R_OK)) >= 0) {
 	    rs = printproc(osp,pr,sn,tbuf) ;
 	    len = rs ;
@@ -380,10 +383,9 @@ int helper::sched(mainv spp) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (helper::sched) */
+} /* end method (helper::sched) */
 
-static int vecstr_loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
+local int vecstr_loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 	int		rs = SR_OK ;
 	if (pr != nullptr) {
 	    rs = vecstr_envadd(slp,"r",pr,-1) ;
@@ -391,27 +393,25 @@ static int vecstr_loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 	if (rs >= 0) {
 	    cchar	*w_lib = sysword.w_lib ;
 	    rs = vecstr_envadd(slp,"l",w_lib,-1) ;
-	}
+	} /* end if (ok) */
 	if (rs >= 0) {
 	    if (sn == nullptr) sn = "prog" ;
 	    rs = vecstr_envadd(slp,"n",sn,-1) ;
-	}
+	} /* end if (ok) */
 	return rs ;
-}
-/* end subroutine (vecstr_loadscheds) */
+} /* end subroutine (vecstr_loadscheds) */
 
-static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
+local int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 	cint		sz = var.maxcombolen ;
 	int		rs ;
 	int		rs1 ;
-	if (char *nn ; (rs = uc_malloc(sz,&nn)) >= 0) {
+	if (char *nn ; (rs = mem.mall(sz,&nn)) >= 0) {
 	    char	*dn = (nn + (var.maxnodelen + 1)) ;
 	    if ((rs = getnodedomain(nn,dn)) >= 0) {
-	        if (char *hbuf ; (rs = malloc_hn(&hbuf)) >= 0) {
+	        if (char *hbuf ; (rs = mem.hostname(&hbuf)) >= 0) {
 		    cint	hlen = rs ;
 	            cchar	*ks = "SNDHPR" ;
-	            char	kbuf[KBUFLEN+1] ;
-	            kbuf[1] = '\0' ;
+	            char	kbuf[KBUFLEN+1] = {} ;
 	            for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
 	                cint	kch = mkchar(ks[i]) ;
 		        int	vl = -1 ;
@@ -440,9 +440,9 @@ static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 		            break ;
 	                } /* end switch */
 	                if ((rs >= 0) && vp) {
-		            kbuf[0] = kch ;
-		            rs = expcook_add(ecp,kbuf,vp,vl) ;
-	                }
+		            kbuf[0] = char(kch) ;
+		            rs = ecp->add(kbuf,vp,vl) ;
+	                } /* end if (ok) */
 	            } /* end for */
 	            if (rs >= 0) {
 		        cint	n = expkey_overlast ;
@@ -455,7 +455,7 @@ static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 			        break ;
 		            case expkey_ss:
 			        vp = hbuf ;
-			        vl = strwcpyuc(hbuf,sn,-1) - hbuf ;
+			        vl = intconv(strwcpyuc(hbuf,sn,-1) - hbuf) ;
 			        break ;
 		            case expkey_pr:
 			        vp = pr ;
@@ -465,22 +465,21 @@ static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 			        break ;
 		            } /* end switch */
 	                    if ((rs >= 0) && vp) {
-		                rs = expcook_add(ecp,expkeys[i],vp,vl) ;
-	                    }
+		                rs = ecp->add(expkeys[i],vp,vl) ;
+	                    } /* end if (ok) */
 		        } /* end for */
 	            } /* end if (ok) */
-		    rs1 = uc_free(hbuf) ;
+		    rs1 = mem.free(hbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (getnodedomain) */
-	    rs1 = uc_free(nn) ;
+	    rs1 = mem.free(nn) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (expcook_load) */
+} /* end subroutine (expcook_load) */
 
-static int mkvars() noex {
+local int mkvars() noex {
 	int		rs ;
 	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
 	    var.maxhostlen = rs ;
@@ -490,7 +489,6 @@ static int mkvars() noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (mkvars) */
+} /* end subroutine (mkvars) */
 
 
