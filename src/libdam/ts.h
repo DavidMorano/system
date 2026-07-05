@@ -23,12 +23,12 @@
 #include	<entbuf.h>
 
 
-#define	TS_MAGIC		918245636
 #define	TS			struct ts_head
 #define	TS_FL			struct ts_flags
 #define	TS_CUR			struct ts_cursor
 #define	TS_HDR			struct ts_header
 #define	TS_ENT			struct ts_entry
+#define	TS_MAGIC		918245636
 #define	TS_FILEMAGIC		"TIMESTAMP"
 #define	TS_FILEMAGICSIZE	16		/* magic size */
 #define	TS_FILEVERSION		0
@@ -69,7 +69,7 @@ struct ts_head {
 	time_t		timod ;			/* file modification time */
 	TS_HDR		h ;
 	TS_FL		fl ;
-	uint		magic ;
+	uint		magval ;
 	int		oflags ;
 	int		filesize ;
 	int		topsize ;
