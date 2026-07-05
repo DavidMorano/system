@@ -39,7 +39,7 @@ struct holidayer_object {
 struct holidayer_cursor {
 	holidays_cur	hcur ;
 	holidays	*hop ;
-	uint		magic ;
+	uint		magval ;
 	uint		year ;
 } ; /* end struct */
 
@@ -52,7 +52,7 @@ struct holidayer_head {
 	ids		id ;
 	vechand		hols ;
 	HOLIDAYER_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	uint		year ;
 	int		ncursors ;
 } ; /* end struct */
