@@ -148,7 +148,7 @@ template<typename ... Args>
 local inline int dw_magic(dw *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == DW_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DW_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (dw_magic) */
@@ -238,7 +238,7 @@ local int dw_starter(DW *op,cchar *dn) noex {
 	                rs = dw_scan(op,dt) ;
 	                if (rs == SR_NOENT) rs = SR_OK ;
 			if (rs >= 0) {
-	                    op->magic = DW_MAGIC ;
+	                    op->magval = DW_MAGIC ;
 			}
 		    } else {
 		        rs = SR_TOOBIG ;
@@ -282,7 +282,7 @@ int dw_finish(DW *op) noex {
 		rs1 = dw_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (dw_finish) */
