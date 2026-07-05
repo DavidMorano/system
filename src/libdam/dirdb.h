@@ -43,7 +43,7 @@ struct dirdb_entry {
 struct dirdb_head {
 	vechand		*dlp ;		/* directory-list-pointer */
 	hdb		*dbp ;		/* data-base-pointer */
-	uint		magic ;
+	uint		magval ;
 	int		count ;
 } ; /* end struct */
 
