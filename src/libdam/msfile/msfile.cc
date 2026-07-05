@@ -5,7 +5,7 @@
 /* object to manipulate a MSFILE file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGTEST	0		/* special debugging for test */
 #define	CF_SAFE		1		/* safer? */
 #define	CF_CREAT	0		/* always create the file? */
@@ -142,13 +142,15 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>			/* |time_t| */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<endian.h>
+#include	<ctime>			/* CSTD |time_t| */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
 #include	<mapstrint.h>
 #include	<stdorder.h>
 #include	<mkx.h>
@@ -158,7 +160,8 @@
 #include	<hasx.h>
 #include	<isnot.h>
 #include	<isfiledesc.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"msfile.h"
 #include	"msfilee.h"
@@ -192,15 +195,10 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	MS		msfile
 #define	MS_ENT		msfile_ent
+#define	MS_MAG		MSFILE_MAGIC
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) noex ;
-extern int	strlinelen(cchar *,int,int) noex ;
-extern int	stroflags(char *,int) noex ;
-#endif
 
 
 /* external variables */
@@ -212,62 +210,59 @@ extern int	stroflags(char *,int) noex ;
 /* forward references */
 
 template<typename ... Args>
-static int msfile_ctor(msfile *op,Args ... args) noex {
+local int msfile_ctor(msfile *op,Args ... args) noex {
     	MSFILE		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msfile_ctor) */
+} /* end subroutine (msfile_ctor) */
 
-static int msfile_dtor(msfile *op) noex {
+local int msfile_dtor(msfile *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msfile_dtor) */
+} /* end subroutine (msfile_dtor) */
 
 template<typename ... Args>
-static inline int msfile_magic(msfile *op,Args ... args) noex {
+local inline int msfile_magic(msfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MSFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MSFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (msfile_magic) */
+} /* end subroutine (msfile_magic) */
 
-static int	msfile_fileopen(MS *,time_t) noex ;
-static int	msfile_fileclose(MS *) noex ;
-static int	msfile_filesetinfo(MS *) noex ;
-static int	msfile_lockget(MS *,time_t,int) noex ;
-static int	msfile_lockrelease(MS *) noex ;
-static int	msfile_filebegin(MS *,time_t) noex ;
-static int	msfile_acquire(MS *,time_t,int) noex ;
-static int	msfile_filecheck(MS *) noex ;
-static int	msfile_entbufstart(MS *) noex ;
-static int	msfile_entbuffinish(MS *) noex ;
+local int	msfile_fileopen(MS *,time_t) noex ;
+local int	msfile_fileclose(MS *) noex ;
+local int	msfile_filesetinfo(MS *) noex ;
+local int	msfile_lockget(MS *,time_t,int) noex ;
+local int	msfile_lockrelease(MS *) noex ;
+local int	msfile_filebegin(MS *,time_t) noex ;
+local int	msfile_acquire(MS *,time_t,int) noex ;
+local int	msfile_filecheck(MS *) noex ;
+local int	msfile_entbufstart(MS *) noex ;
+local int	msfile_entbuffinish(MS *) noex ;
 
-static int	msfile_filetopwrite(MS *) noex ;
-static int	msfile_filetopread(MS *) noex ;
-static int	msfile_fileverify(MS *) noex ;
-static int	msfile_headtab(MS *,int) noex ;
+local int	msfile_filetopwrite(MS *) noex ;
+local int	msfile_filetopread(MS *) noex ;
+local int	msfile_fileverify(MS *) noex ;
+local int	msfile_headtab(MS *,int) noex ;
 
-static int	msfile_findname(MS *,cchar *,int,char **) noex ;
-static int	msfile_search(MS *,cchar *,int,char **) noex ;
-static int	msfile_readentry(MS *,int,char **) noex ;
+local int	msfile_findname(MS *,cchar *,int,char **) noex ;
+local int	msfile_search(MS *,cchar *,int,char **) noex ;
+local int	msfile_readentry(MS *,int,char **) noex ;
 
 #if	CF_NISEARCH
-static int	msfile_index(MS *,cchar *,int,int) noex ;
+local int	msfile_index(MS *,cchar *,int,int) noex ;
 #endif
 
-static int	msfile_headwrite(MS *) noex ;
+local int	msfile_headwrite(MS *) noex ;
 
-static int	namematch(cchar *,cchar *,int) noex ;
+local int	namematch(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -284,7 +279,7 @@ int msfile_open(MS *op,cchar *fname,int oflags,mode_t operm) noex {
 	int		f_created = false ;
 	cchar		*cp ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_open: ent\n") ;
 #endif
 
@@ -296,7 +291,7 @@ int msfile_open(MS *op,cchar *fname,int oflags,mode_t operm) noex {
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	timentbuf[TIMEBUFLEN + 1] ;
 	    debugprintf("msfile_open: fname=%s\n", fname) ;
@@ -305,7 +300,7 @@ int msfile_open(MS *op,cchar *fname,int oflags,mode_t operm) noex {
 	    if (oflags & O_CREAT)
 	        debugprintf("msfile_open: creating as needed\n") ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 #if	CF_CREAT
 	oflags |= O_CREAT ;
@@ -318,14 +313,14 @@ int msfile_open(MS *op,cchar *fname,int oflags,mode_t operm) noex {
 	op->oflags = oflags ;
 	op->operm = operm ;
 
-	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	if ((rs = mem.strw(fname,-1,&cp)) >= 0) {
 	    op->fname = cp ;
 	    op->ti_mod = 0 ;
 	    if ((rs = msfile_fileopen(op,dt)) >= 0) {
 	        if ((rs = msfile_filebegin(op,dt)) >= 0) {
 	            cint	n = MSFILE_NIDXENT ;
 	            if ((rs = mapstrint_start(&op->ni,n)) >= 0) {
-	                op->magic = MSFILE_MAGIC ;
+	                op->magval = MSFILE_MAGIC ;
 	            }
 	        }
 	        if (rs < 0) {
@@ -333,18 +328,18 @@ int msfile_open(MS *op,cchar *fname,int oflags,mode_t operm) noex {
 	        }
 	    }
 	    if (rs < 0) {
-	        uc_free(op->fname) ;
+	        voidp vp = voidp(op->fname) ;
+	        mem.free(vp) ;
 	        op->fname = nullptr ;
-	    }
+	    } /* end if (error) */
 	} /* end if (m-a) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_open: ret rs=%d f_created=%u\n",rs,f_created) ;
 #endif
 
 	return (rs >= 0) ? f_created : rs ;
-}
-/* end subroutine (msfile_open) */
+} /* end subroutine (msfile_open) */
 
 int msfile_close(MS *op) noex {
 	int		rs = SR_OK ;
@@ -352,42 +347,34 @@ int msfile_close(MS *op) noex {
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MSFILE_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != MSFILE_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_close: mapstrint_finish() \n") ;
 #endif
-
+	{
 	rs1 = mapstrint_finish(&op->ni) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("msfile_close: _fileclose() \n") ;
-#endif
-
+	}
+	{
 	rs1 = msfile_fileclose(op) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("msfile_close: uc_free() \n") ;
-#endif
-
-	if (op->fname != nullptr) {
-	    rs1 = uc_free(op->fname) ;
+	}
+	if (op->fname) {
+	    voidp vp = voidp(op->fname) ;
+	    rs1 = uc_free(vp) :
 	    if (rs >= 0) rs = rs1 ;
 	    op->fname = nullptr ;
-	}
+	} /* end if (memory-release) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_close: ret rs=%d\n") ;
 #endif
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (msfile_close) */
+} /* end subroutine (msfile_close) */
 
 int msfile_count(MS *op) noex {
 	int		rs = SR_OK ;
@@ -396,21 +383,20 @@ int msfile_count(MS *op) noex {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != MSFILE_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != MSFILE_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
 	c = ((op->filesize - MSFILE_TABOFF) / MSFILE_ENTSIZE) ;
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (msfile_count) */
+} /* end subroutine (msfile_count) */
 
 int msfile_curbegin(MS *op,MSFILE_CUR *curp) noex {
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != MSFILE_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != MSFILE_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
 	if (curp == nullptr) return SR_FAULT ;
@@ -421,8 +407,7 @@ int msfile_curbegin(MS *op,MSFILE_CUR *curp) noex {
 
 	curp->i = -1 ;
 	return SR_OK ;
-}
-/* end subroutine (msfile_curbegin) */
+} /* end subroutine (msfile_curbegin) */
 
 int msfile_curend(MS *op,MSFILE_CUR *curp) noex {
 	int		rs = SR_OK ;
@@ -431,7 +416,7 @@ int msfile_curend(MS *op,MSFILE_CUR *curp) noex {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != MSFILE_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != MSFILE_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
 	if (curp == nullptr) return SR_FAULT ;
@@ -453,8 +438,7 @@ int msfile_curend(MS *op,MSFILE_CUR *curp) noex {
 
 	curp->i = -1 ;
 	return rs ;
-}
-/* end subroutine (msfile_curend) */
+} /* end subroutine (msfile_curend) */
 
 int msfile_enum(MS *op,MSFILE_CUR *curp,MS_ENT *ep) noex {
 	time_t		dt = 0 ;
@@ -462,14 +446,14 @@ int msfile_enum(MS *op,MSFILE_CUR *curp,MS_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		ei = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_enum: ent\n") ;
 #endif
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != MSFILE_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != MSFILE_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
 	if (curp == nullptr) return SR_FAULT ;
@@ -490,13 +474,12 @@ int msfile_enum(MS *op,MSFILE_CUR *curp,MS_ENT *ep) noex {
 	    }
 	} /* end if (msfile_acquire) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_enum: ret rs=%d ei=%u\n",rs,ei) ;
 #endif
 
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (msfile_enum) */
+} /* end subroutine (msfile_enum) */
 
 int msfile_match(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	cint		ebs = MSFILE_ENTSIZE ;
@@ -508,12 +491,12 @@ int msfile_match(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != MSFILE_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != MSFILE_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
 	if (nnp == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_match: ent nnl=%d nnp=%r\n",
 	    nnl,nnp,lenstr(nnp,nnl)) ;
 #endif
@@ -524,7 +507,7 @@ int msfile_match(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 
 	nnl = lenstr(nnp,i) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_match: nnl=%d nnp=%r\n",nnl,nnp,nnl) ;
 #endif
 
@@ -537,13 +520,13 @@ int msfile_match(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 
 	    if ((rs >= 0) && (ep != nullptr)) {
 
-#if	CF_DEBUGS 
+#if	CF_DEBUG 
 	        debugprintf("msfile_match: found it rs=%d\n",rs) ;
 #endif
 
 	        rs = msfilee_all(ep,1,bp,ebs) ;
 
-#if	CF_DEBUGS 
+#if	CF_DEBUG 
 	        debugprintf("msfile_match: rs1=%d ep->nodename=%s\n",
 	            rs,ep->nodename) ;
 #endif
@@ -574,13 +557,12 @@ int msfile_match(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 
 	} /* end if (msfile_acquire) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_match: ret rs=%d ei=%u\n",rs,ei) ;
 #endif
 
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (msfile_match) */
+} /* end subroutine (msfile_match) */
 
 int msfile_write(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	cint		ebs = MSFILE_ENTSIZE ;
@@ -589,15 +571,15 @@ int msfile_write(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	int		ei ;
 	char		*bp ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_write: ent nnl=%d nodename=%r\n",
 	    nnl,nnp,lenstr(nnp,nnl)) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != MSFILE_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != MSFILE_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
 	if (nnp == nullptr) return SR_FAULT ;
@@ -607,7 +589,7 @@ int msfile_write(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 
 	nnl = lenstr(nnp,i) ;
 
-#if	CF_DEBUGS && 0
+#if	CF_DEBUG && 0
 	debugprintf("msfile_write: nodename=%r\n",nnp,nnl) ;
 #endif
 
@@ -707,31 +689,30 @@ int msfile_write(MS *op,time_t dt,cchar *nnp,int nnl,MS_ENT *ep) noex {
 	    } /* end if (msfile_findname) */
 	} /* end if (msfile_acquire) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_write: ret rs=%d ei=%u\n",rs,ei) ;
 #endif
 
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (msfile_write) */
+} /* end subroutine (msfile_write) */
 
 int msfile_update(MS *op,time_t dt,MS_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		ei = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_update: ent\n") ;
 #endif
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != MSFILE_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != MSFILE_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
 	if (ep == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_update: writable=%u\n",opop->fl.writable) ;
 #endif
 
@@ -755,7 +736,7 @@ int msfile_update(MS *op,time_t dt,MS_ENT *ep) noex {
 
 /* found existing entry */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            debugprintf("msfile_update: existing entry\n") ;
 #endif
 
@@ -855,7 +836,7 @@ int msfile_update(MS *op,time_t dt,MS_ENT *ep) noex {
 
 	            rs = entbuf_write(&op->ebm,ei,nullptr) ; /* sync */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            debugprintf("msfile_update: 0 entbuf_write() rs=%d\n",rs) ;
 #endif
 
@@ -874,7 +855,7 @@ int msfile_update(MS *op,time_t dt,MS_ENT *ep) noex {
 	            ei = op->h.nentries ;
 	            rs = entbuf_write(&op->ebm,ei,entbuf) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            debugprintf("msfile_update: 1 entbuf_pwrite() rs=%d\n",
 			    rs) ;
 #endif
@@ -883,7 +864,7 @@ int msfile_update(MS *op,time_t dt,MS_ENT *ep) noex {
 
 /* update the file header */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("msfile_update: header rs=%d\n",rs) ;
 #endif
 
@@ -913,13 +894,12 @@ int msfile_update(MS *op,time_t dt,MS_ENT *ep) noex {
 	    }
 	} /* end if (msfile_acquire) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_update: ret rs=%d ei=%u\n",rs,ei) ;
 #endif
 
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (msfile_update) */
+} /* end subroutine (msfile_update) */
 
 int msfile_check(MS *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -928,7 +908,7 @@ int msfile_check(MS *op,time_t dt) noex {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != MSFILE_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != MSFILE_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
 	if (op->fd >= 0) {
@@ -943,13 +923,12 @@ int msfile_check(MS *op,time_t dt) noex {
 	} /* end if (open) */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (msfile_check) */
+} /* end subroutine (msfile_check) */
 
 
 /* private subroutines */
 
-static int msfile_findname(MS *op,cchar *nnp,int nnl,char **rpp) noex {
+local int msfile_findname(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 	int		rs ;
 	int		ei = 0 ;
 	char		*bp = nullptr ;
@@ -957,7 +936,7 @@ static int msfile_findname(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 
 	if ((rs = mapstrint_fetch(&op->ni,nnp,nnl,nullptr,&ei)) >= 0) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("msfile_update: mapstrint_fetch() rs=%d\n",rs) ;
 	    if (rs >= 0)
 	        debugprintf("msfile_update: ei=%d\n",ei) ;
@@ -965,7 +944,7 @@ static int msfile_findname(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 
 	    if ((rs = entbuf_read(&op->ebm,ei,&bp)) > 0) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("msfile_update: entbuf_read() rs=%d\n",rs) ;
 #endif
 
@@ -981,7 +960,7 @@ static int msfile_findname(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 
 	} /* end if (was in the index) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_update: mid rs=%d\n",rs) ;
 #endif
 
@@ -997,10 +976,9 @@ static int msfile_findname(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 	}
 
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (msfile_findname) */
+} /* end subroutine (msfile_findname) */
 
-static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
+local int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 	cint		ebs = MSFILE_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -1010,7 +988,7 @@ static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 	char		*bp ;
 	char		*np = nullptr ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_search: ent nnl=%u nodename=%r\n",
 	    nnl,nnp,lenstr(nnp,nnl)) ;
 #endif
@@ -1018,7 +996,7 @@ static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 	if (nnl < 0)
 	    nnl = lenstr(nnp) ;
 
-#if	CF_DEBUGS 
+#if	CF_DEBUG 
 	debugprintf("msfile_search: nnl=%u pagesize=%u ebs=%u\n",
 	    nnl,op->pagesize,ebs) ;
 #endif
@@ -1031,7 +1009,7 @@ static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 	    rs = entbuf_read(&op->ebm,ei,&bp) ;
 	    ne = rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("msfile_search: entbuf_read() rs=%d\n",rs) ;
 #endif
 
@@ -1044,7 +1022,7 @@ static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 
 /* is this a match for what we want? */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("msfile_search: i=%u db_node=%r\n",i,
 	            np,lenstr(np,MSFILEE_LNODENAME)) ;
 #endif
@@ -1058,21 +1036,21 @@ static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 
 	    } /* end for (looping through entries) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("msfile_search: for-out i=%d f_found=%u\n",
 	        i,f_found) ;
 #endif
 
 	    ei += i ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("msfile_search: ei=%d f_found=%u\n",ei,f_found) ;
 #endif
 
 	    if (f_found) break ;
 	} /* end while */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_search: fin rs=%d f_found=%u\n",rs,f_found) ;
 	debugprintf("msfile_search: ne=%d \n",ne) ;
 #endif
@@ -1085,21 +1063,20 @@ static int msfile_search(MS *op,cchar *nnp,int nnl,char **rpp) noex {
 	    }
 	} /* end if */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_search: ret rs=%d ei=%u\n",rs,ei) ;
 #endif
 
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (msfile_search) */
+} /* end subroutine (msfile_search) */
 
-static int msfile_acquire(MS *op,time_t dt,int f_read) noex {
+local int msfile_acquire(MS *op,time_t dt,int f_read) noex {
 	cint		ebs = MSFILE_ENTSIZE ;
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 	int		f ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_acquire: ent\n") ;
 #endif
 
@@ -1132,19 +1109,18 @@ static int msfile_acquire(MS *op,time_t dt,int f_read) noex {
 	    }
 	} /* end if (need lock) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_acquire: ret rs=%d\n",rs) ;
 #endif
 
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (msfile_acquire) */
+} /* end subroutine (msfile_acquire) */
 
-static int msfile_filebegin(MS *op,time_t dt) noex {
+local int msfile_filebegin(MS *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f_locked = false ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_filebegin: ent fd=%d filesize=%u\n",
 	    op->fd,op->filesize) ;
 #endif
@@ -1181,7 +1157,7 @@ static int msfile_filebegin(MS *op,time_t dt) noex {
 	        f_locked = (rs >= 0) ;
 	    }
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("msfile_filebegin: msfile_fileverify() \n") ;
 #endif
 
@@ -1202,15 +1178,14 @@ static int msfile_filebegin(MS *op,time_t dt) noex {
 	    msfile_lockrelease(op) ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_filebegin: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (msfile_filebegin) */
+} /* end subroutine (msfile_filebegin) */
 
-static int msfile_filecheck(MS *op) noex {
+local int msfile_filecheck(MS *op) noex {
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 
@@ -1230,18 +1205,15 @@ static int msfile_filecheck(MS *op) noex {
 	} /* end if */
 
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (msfile_filecheck) */
+} /* end subroutine (msfile_filecheck) */
 
-static int msfile_filetopwrite(MS *op) noex {
+local int msfile_filetopwrite(MS *op) noex {
 	off_t	poff = 0L ;
 	int		ml ;
 	int		rs = SR_OK ;
 	int		bl ;
 	char		*bp = op->topbuf ;
-
-/* write the file header stuff */
-
+	/* write the file header stuff */
 	ml = mkmagic(bp,MSFILE_FILEMAGICSIZE,MSFILE_FILEMAGIC) ;
 	bp += ml ;
 
@@ -1250,9 +1222,9 @@ static int msfile_filetopwrite(MS *op) noex {
 	*bp++ = 0 ;		/* file type */
 	*bp++ = 0 ;		/* unused */
 
-/* next is the header (we just write zeros here) */
+	/* next is the header (we just write zeros here) */
 
-	memset(bp,0,MSFILE_HEADTABLEN) ;
+	memnset(bp,0,MSFILE_HEADTABLEN) ;
 	bp += MSFILE_HEADTABLEN ;
 
 	bl = bp - op->topbuf ;
@@ -1266,10 +1238,9 @@ static int msfile_filetopwrite(MS *op) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (msfile_filetopwrite) */
+} /* end subroutine (msfile_filetopwrite) */
 
-static int msfile_filetopread(MS *op) noex {
+local int msfile_filetopread(MS *op) noex {
 	off_t	poff = 0L ;
 	int		rs ;
 
@@ -1277,13 +1248,12 @@ static int msfile_filetopread(MS *op) noex {
 	op->topsize = rs ;
 
 	return rs ;
-}
-/* end subroutine (msfile_filetopread) */
+} /* end subroutine (msfile_filetopread) */
 
-static int msfile_fileverify(MS *op) noex {
+local int msfile_fileverify(MS *op) noex {
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_fileverify: ent\n") ;
 	debugprintf("msfile_fileverify: filemagic=%s\n",
 		MSFILE_FILEMAGIC) ;
@@ -1294,7 +1264,7 @@ static int msfile_fileverify(MS *op) noex {
 	if (op->topsize >= MSFILE_TOPLEN) {
 	    cint	msize = MSFILE_FILEMAGICSIZE ;
 	    cchar	*cp = op->topbuf ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("msfile_fileverify: ms=%r\n",cp,strlinelen(cp,-1,40)) ;
 #endif
 	    if (hasValidMagic(cp,msize,MSFILE_FILEMAGIC)) {
@@ -1316,15 +1286,14 @@ static int msfile_fileverify(MS *op) noex {
 	    rs = SR_INVALID ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_fileverify: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (msfile_fileverify) */
+} /* end subroutine (msfile_fileverify) */
 
-static int msfile_headtab(MS *op,int f_read) noex {
+local int msfile_headtab(MS *op,int f_read) noex {
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 	char		*bp = (op->topbuf + MSFILE_HEADTABOFF) ;
@@ -1362,17 +1331,16 @@ static int msfile_headtab(MS *op,int f_read) noex {
 	} /* end if */
 
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (msfile_headtab) */
+} /* end subroutine (msfile_headtab) */
 
-static int msfile_lockget(MS *op,time_t dt,int f_read) noex {
+local int msfile_lockget(MS *op,time_t dt,int f_read) noex {
 	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		lockcmd ;
 	int		f_already = false ;
 	int		f_changed = false ;
 
-#if	CF_DEBUGS && 0
+#if	CF_DEBUG && 0
 	debugprintf("msfile_lockget: ent f_read=%d\n",f_read) ;
 #endif
 
@@ -1415,7 +1383,7 @@ static int msfile_lockget(MS *op,time_t dt,int f_read) noex {
 #endif /* CF_SOLARISBUF */
 #endif /* CF_LOCKF */
 
-#if	CF_DEBUGS && 0
+#if	CF_DEBUG && 0
 	        debugprintf("msfile_lockget: LOCK lockfile() rs=%d\n",rs) ;
 #endif
 
@@ -1447,19 +1415,18 @@ static int msfile_lockget(MS *op,time_t dt,int f_read) noex {
 
 	} /* end if (ok) */
 
-#if	CF_DEBUGS && 0
+#if	CF_DEBUG && 0
 	debugprintf("msfile_lockget: ret rs=%d f_changed=%u\n",
 	    rs,f_changed) ;
 #endif
 
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (msfile_lockget) */
+} /* end subroutine (msfile_lockget) */
 
-static int msfile_lockrelease(MS *op) noex {
+local int msfile_lockrelease(MS *op) noex {
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS && 0
+#if	CF_DEBUG && 0
 	debugprintf("msfile_lockrelease: ent\n") ;
 #endif
 
@@ -1480,11 +1447,11 @@ static int msfile_lockrelease(MS *op) noex {
 #endif /* CF_SOLARISBUF */
 #endif /* CF_LOCKF */
 
-#if	CF_DEBUGS && 0
+#if	CF_DEBUG && 0
 	        debugprintf("msfile_lockrelease: lockfile() rs=%d\n",rs) ;
 #endif
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("msfile_lockrelease: UNLOCK lockfile() rs=%d\n",
 	            rs) ;
 #endif
@@ -1496,19 +1463,18 @@ static int msfile_lockrelease(MS *op) noex {
 
 	} /* end if (there was a possible lock set) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_lockrelease: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (msfile_lockrelease) */
+} /* end subroutine (msfile_lockrelease) */
 
-static int msfile_fileopen(MS *op,time_t dt) noex {
+local int msfile_fileopen(MS *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f_created = false ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_fileopen: fname=%s\n",op->fname) ;
 #endif
 
@@ -1541,7 +1507,7 @@ static int msfile_fileopen(MS *op,time_t dt) noex {
 	    } /* end if (ok) */
 	} /* end if (open-needed) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_fileopen: ret rs=%d f_create=%u\n",rs,f_created) ;
 #endif
 
@@ -1567,10 +1533,9 @@ int msfile_fileclose(MS *op) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (msfile_fileclose) */
+} /* end subroutine (msfile_fileclose) */
 
-static int msfile_filesetinfo(MS *op) noex {
+local int msfile_filesetinfo(MS *op) noex {
 	USTAT		sb ;
 	int		rs ;
 	int		amode ;
@@ -1584,10 +1549,9 @@ static int msfile_filesetinfo(MS *op) noex {
 	    }
 	} /* end if (stat) */
 	return rs ;
-}
-/* end subroutine (msfile_filesetinfo) */
+} /* end subroutine (msfile_filesetinfo) */
 
-static int msfile_entbufstart(MS *op) noex {
+local int msfile_entbufstart(MS *op) noex {
 	int		rs = SR_OK ;
 
 	if (! opop->fl.entbuf) {
@@ -1604,10 +1568,9 @@ static int msfile_entbufstart(MS *op) noex {
 	} /* end if (needed) */
 
 	return rs ;
-}
-/* end subroutine (msfile_entbufstart) */
+} /* end subroutine (msfile_entbufstart) */
 
-static int msfile_entbuffinish(MS *op) noex {
+local int msfile_entbuffinish(MS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1618,10 +1581,9 @@ static int msfile_entbuffinish(MS *op) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (msfile_entbuffinish) */
+} /* end subroutine (msfile_entbuffinish) */
 
-static int msfile_readentry(MS *op,int ei,char **rpp) noex {
+local int msfile_readentry(MS *op,int ei,char **rpp) noex {
 	int		rs ;
 	char		*bp ;
 
@@ -1645,7 +1607,7 @@ static int msfile_readentry(MS *op,int ei,char **rpp) noex {
 
 	} /* end if */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msfile_readentry: ret rs=%d \n",rs) ;
 #endif
 
@@ -1656,7 +1618,7 @@ static int msfile_readentry(MS *op,int ei,char **rpp) noex {
 
 #if	CF_NISEARCH
 
-static int msfile_index(MS *op,cchar *np,int nl,int ei) noex {
+local int msfile_index(MS *op,cchar *np,int nl,int ei) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ei2 ;
@@ -1677,12 +1639,11 @@ static int msfile_index(MS *op,cchar *np,int nl,int ei) noex {
 	} /* end if (not found) */
 
 	return rs ;
-}
-/* end subroutine (msfile_index) */
+} /* end subroutine (msfile_index) */
 
 #endif /* CF_NISEARCH */
 
-static int msfile_headwrite(MS *op) noex {
+local int msfile_headwrite(MS *op) noex {
 	int		rs ;
 
 	if ((rs = msfile_headtab(op,0)) >= 0) {
@@ -1698,30 +1659,26 @@ static int msfile_headwrite(MS *op) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (msfile_headwrite) */
+} /* end subroutine (msfile_headwrite) */
 
-
-static int namematch(cchar *np,cchar *nnp,int nnl)
-{
+local int namematch(cchar *nap,cchar *nnp,int nnl) noex {
 	int		f = false ;
 
-#if	CF_DEBUGS
-	debugprintf("namematch: ent np=%s\n",np) ;
+#if	CF_DEBUG
+	debugprintf("namematch: ent nap=%s\n",nap) ;
 	debugprintf("namematch: nnl=%d nnp=%r\n",nnl,nnp,lenstr(nnp,nnl)) ;
 #endif
 
 	if (nnl <= MSFILEE_LNODENAME) {
-	    f = (strncmp(np,nnp,nnl) == 0) ;
-	    f = f && (np[nnl] == '\0') ;
+	    f = (strncmp(nap,nnp,nnl) == 0) ;
+	    f = f && (nap[nnl] == '\0') ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("namematch: ret f=%u\n",f) ;
 #endif
 
 	return f ;
-}
-/* end subroutine (namematch) */
+} /* end subroutine (namematch) */
 
 
