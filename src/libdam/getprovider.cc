@@ -81,16 +81,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucinfo.h>
-#include	<estrings.h>		/* |sf{x}(3uc)| + |snwcpy(3uc)| */
-#include	<nleadstr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucinfo.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC |sf{x}(3uc)| + |snwcpy(3uc)| */
+#include	<nleadstr.h>		/* LINUC */
+#include	<localmisc.h>		/* LINU */
 
 #include	"getprovider.h"
 
@@ -148,7 +148,7 @@ constexpr provider	providers[] = {
     	{ 5, "Hewlett Packard",			nullptr },
     	{ 6, "Apple Computer",			nullptr },
 	{ 7, nullptr, 				nullptr }
-} ;
+} ; /* end array */
 
 constexpr trier_m	tries[] = {
     	&trier::tryenv,
@@ -179,8 +179,7 @@ int getproviderid(cchar *sp,int µsl) noex {
 	    } /* end for */
 	} /* end if (getlenstr) */
 	return (rs >= 0) ? id : rs ;
-}
-/* end subroutine (getproviderid) */
+} /* end subroutine (getproviderid) */
 
 int getprovider(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -192,8 +191,7 @@ int getprovider(char *rbuf,int rlen) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getprovider) */
+} /* end subroutine (getprovider) */
 
 int getvendor(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -231,8 +229,7 @@ int getvendor(char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (getvendor) */
+} /* end subroutine (getvendor) */
 
 
 /* local subroutines */
