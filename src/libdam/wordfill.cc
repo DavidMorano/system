@@ -27,15 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<estrings.h>
-#include	<fifostr.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<estrings.h>		/* LIBU */
+#include	<fifostr.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"wordfill.h"
 
@@ -98,7 +98,7 @@ template<typename ... Args>
 local int wordfill_magic(wordfill *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == WORDFILL_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == WORDFILL_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (wordfill_magic) */
@@ -118,13 +118,13 @@ int wordfill_start(wordfill *op,cchar *lp,int ll) noex {
 	int		rs ;
 	if ((rs = wordfill_ctor(op)) >= 0) ylikely {
 	    if ((rs = fifostr_start(op->sqp)) >= 0) ylikely {
-	        op->magic = WORDFILL_MAGIC ;
+	        op->magval = WORDFILL_MAGIC ;
 	        if (lp) {
 	            rs = wordfill_addlines(op,lp,ll) ;
 	        }
 	        if (rs < 0) {
 		    fifostr_finish(op->sqp) ;
-	            op->magic = 0 ;
+	            op->magval = 0 ;
 	        }
 	    } /* end if (fifostr-start) */
 	    if (rs < 0) {
@@ -132,8 +132,7 @@ int wordfill_start(wordfill *op,cchar *lp,int ll) noex {
 	    }
 	} /* end if (wordfill_ctor) */
 	return rs ;
-}
-/* end subroutine (wordfill_start) */
+} /* end subroutine (wordfill_start) */
 
 int wordfill_finish(wordfill *op) noex {
 	int		rs ;
@@ -147,11 +146,10 @@ int wordfill_finish(wordfill *op) noex {
 		rs1 = wordfill_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (wordfill_finish) */
+} /* end subroutine (wordfill_finish) */
 
 int wordfill_addword(wordfill *op,cchar *lbuf,int llen) noex {
 	int		rs ;
@@ -167,8 +165,7 @@ int wordfill_addword(wordfill *op,cchar *lbuf,int llen) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (wordfill_addword) */
+} /* end subroutine (wordfill_addword) */
 
 int wordfill_addline(wordfill *op,cchar *lbuf,int llen) noex {
 	int		rs ;
@@ -188,8 +185,7 @@ int wordfill_addline(wordfill *op,cchar *lbuf,int llen) noex {
 	    } /* end if (non-zero positive) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (wordfill_addline) */
+} /* end subroutine (wordfill_addline) */
 
 int wordfill_addlines(wordfill *op,cchar *lbuf,int llen) noex {
 	int		rs ;
@@ -217,18 +213,15 @@ int wordfill_addlines(wordfill *op,cchar *lbuf,int llen) noex {
 	    } /* end while */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (wordfill_addlines) */
+} /* end subroutine (wordfill_addlines) */
 
 int wordfill_mklinefull(wordfill *op,char *lbuf,int llen) noex {
 	return wordfill_mkline(op,false,lbuf,llen) ;
-}
-/* end subroutine (wordfill_mklinefull) */
+} /* end subroutine (wordfill_mklinefull) */
 
 int wordfill_mklinepart(wordfill *op,char *lbuf,int llen) noex {
 	return wordfill_mkline(op,true,lbuf,llen) ;
-}
-/* end subroutine (wordfill_mklinepart) */
+} /* end subroutine (wordfill_mklinepart) */
 
 
 /* private subroutines */
