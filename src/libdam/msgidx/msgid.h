@@ -20,16 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	"msgide.hh"
 
 
-#define	MSGID_MAGIC		1092847456
 #define	MSGID			struct msgid_head
 #define	MSGID_FL		struct msgid_flags
 #define	MSGID_FM		struct msgid_filemagic
@@ -37,6 +33,7 @@
 #define	MSGID_KEY		struct msgid_keyer
 #define	MSGID_CUR		struct msgid_cursor
 #define	MSGID_BUF		struct msgid_buffer
+#define	MSGID_MAGIC		1092847456
 #define	MSGID_MAGICSIZE		16
 /* other defines */
 #define	MSGID_FILEPATH		"/tmp/msgid"
@@ -53,7 +50,7 @@ struct msgid_buffer {
 
 /* decoded file magic */
 struct msgid_filemagic {
-	char		magic[MSGID_MAGICSIZE] ;
+	char		magval[MSGID_MAGICSIZE] ;
 	uchar		vetu[4] ;
 } ; /* end struct */
 
@@ -83,11 +80,11 @@ struct msgid_head {
 	time_t		accesstime ;	/* file access time */
 	time_t		mtime ;		/* file modification time */
 	mode_t		operm ;
-	uint		magic ;
+	uint		magval ;
 	int		oflags ;
 	int		maxentry ;
-	int		pagesize ;
-	int		filesize ;
+	int		pagesz ;
+	int		filesz ;
 	int		fd ;
 	int		cursors ;
 	int		entsz ;		/* entry buffer size */
