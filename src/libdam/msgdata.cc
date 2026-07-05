@@ -78,7 +78,7 @@ local int	msgdata_setrecv(msgdata *) noex ;
 
 /* local variables */
 
-constexpr int		conmsghdr_len = int(szof(CONMSGHDR)) ;
+cint		conmsghdr_len = int(szof(CONMSGHDR)) ;
 
 
 /* exported variables */
@@ -132,7 +132,7 @@ int msgdata_fini(msgdata *mip) noex {
 	        rs1 = lm_free(mip->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        mip->a = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    mip->mbuf = nullptr ;
 	    mip->mlen = 0 ;
 	    mip->ml = 0 ;
@@ -207,7 +207,7 @@ int msgdata_conpass(msgdata *mip,int f_passfd) noex {
 	MSGHDR		*mp = &mip->msg ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	mip->ns = -1 ;
 	if (mp->msg_controllen > 0) {
 	    CONMSGHDR	*cmp = CMSG_FIRSTHDR(mp) ;
@@ -248,10 +248,10 @@ int msgdata_setaddr(msgdata *mip,cvoid *sap,int sal) noex {
 
 int msgdata_rmeol(msgdata *mip) noex {
 	while (mip->ml > 0) {
-	    cint	ch = mkchar(mip->mbuf[mip->ml-1]) ;
+	    cint	ch = mkchar(mip->mbuf[mip->ml - 1]) ;
  	    if (! iseol(ch)) break ;
 	    mip->ml -= 1 ;
-	}
+	} /* end while */
 	return mip->ml ;
 } /* end subroutine (msgdata_rmeol) */
 
@@ -259,13 +259,16 @@ int msgdata_rmeol(msgdata *mip) noex {
 /* private subroutines */
 
 local int msgdata_setrecv(msgdata *mip) noex {
-	MSGHDR		*mp = &mip->msg ;
-	mip->mbuf[0] = '\0' ;
-	mip->vecs[0].iov_base = mip->mbuf ;
-	mip->vecs[0].iov_len = mip->mlen ;
-	mip->ml = 0 ;
-	mp->msg_controllen = mip->clen ;
-	return SR_OK ;
+    	int		rs = SR_BUGCHECK ;
+	if (MSGHDR *mp = &mip->msg ; mp) {
+	    mip->mbuf[0] = '\0' ;
+	    mip->vecs[0].iov_base = mip->mbuf ;
+	    mip->vecs[0].iov_len = mip->mlen ;
+	    mip->ml = 0 ;
+	    mp->msg_controllen = mip->clen ;
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 } /* end subroutine (msgdata_setrecv) */
 
 
