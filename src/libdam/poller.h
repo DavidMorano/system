@@ -42,9 +42,9 @@ struct poller_cursor {
 } ;
 
 struct poller_head {
-	uint		magic ;
 	vecobj		*rlp ;		/* register-list-pointer */
 	POLLFD		*pa ;
+	uint		magval ;
 	int		n ;		/* array number */
 	int		e ;		/* array extent */
 	int		nready ;
