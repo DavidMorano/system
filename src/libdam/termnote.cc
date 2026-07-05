@@ -250,7 +250,7 @@ template<typename ... Args>
 local int termnote_magic(TN *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == TERMNOTE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == TERMNOTE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (termnote_magic) */
@@ -305,7 +305,7 @@ int termnote_open(TN *op,cchar *pr) noex {
 	            if ((rs = termnote_txopen(op,dt)) >= 0) ylikely {
 	                if ((rs = ids_load(op->idp)) >= 0) {
 	    	            if ((rs = termnote_lfopen(op,dt)) >= 0) {
-	                        op->magic = TERMNOTE_MAGIC ;
+	                        op->magval = TERMNOTE_MAGIC ;
 	                    }
 	                    if (rs < 0) {
 		                ids_release(op->idp) ;
@@ -373,7 +373,7 @@ int termnote_close(TN *op) noex {
 		rs1 = termnote_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (termnote_close) */
