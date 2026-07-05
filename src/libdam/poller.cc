@@ -103,7 +103,7 @@ template<typename ... Args>
 static inline int poller_magic(poller *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == POLLER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == POLLER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -130,7 +130,7 @@ int poller_start(poller *op) noex {
 	    cint	vn = POLLER_NDEF ;
 	    cint	vo = 0 ;
 	    if ((rs = vecobj_start(op->rlp,esz,vn,vo)) >= 0) ylikely {
-	        op->magic = POLLER_MAGIC ;
+	        op->magval = POLLER_MAGIC ;
 	    }
 	    if (rs < 0) {
 		poller_dtor(op) ;
@@ -154,10 +154,10 @@ int poller_finish(poller *op) noex {
 	        op->pa = nullptr ;
 	    }
 	    {
-	        rs = poller_dtor(op) ;
+	        rs1 = poller_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
