@@ -46,30 +46,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<uclibmem.h>
-#include	<getnodename.h>
-#include	<getnodedomain.h>
-#include	<bufsizevar.hh>
-#include	<ids.h>
-#include	<storebuf.h>
-#include	<dirseen.h>
-#include	<nulstr.h>
-#include	<strn.h>
-#include	<strx.h>
-#include	<mkpathx.h>
-#include	<mkpathxw.h>
-#include	<mkpr.h>
-#include	<permx.h>
-#include	<isnot.h>
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<dirseen.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkpathxw.h>		/* LIBUC */
+#include	<mkpr.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"getprogroot.h"
@@ -109,24 +110,23 @@ struct subinfo {
 
 /* forward references */
 
-local int	subinfo_start(SI *) noex ;
-local int	subinfo_local(SI *,char *,cchar *,int) noex ;
-local int	subinfo_pr(SI *,cchar *,char *,cchar *,int) noex ;
-local int	subinfo_prs(SI *,mainv,char *,cchar *,int) noex ;
-local int	subinfo_other(SI *,char *,cchar *,int) noex ;
-local int	subinfo_check(SI *,cchar *,int,char *,cchar *,int) noex ;
-local int	subinfo_dirstat(SI *,ustat *,cchar *,int) noex ;
-local int	subinfo_record(SI *,ustat *,cchar *,int) noex ;
-local int	subinfo_xfile(SI *,cchar *) noex ;
-local int	subinfo_finish(SI *) noex ;
+local int	subinfo_start	(SI *) noex ;
+local int	subinfo_local	(SI *,char *,cchar *,int) noex ;
+local int	subinfo_pr	(SI *,cchar *,char *,cchar *,int) noex ;
+local int	subinfo_prs	(SI *,mainv,char *,cchar *,int) noex ;
+local int	subinfo_other	(SI *,char *,cchar *,int) noex ;
+local int	subinfo_check	(SI *,cchar *,int,char *,cchar *,int) noex ;
+local int	subinfo_dirstat	(SI *,ustat *,cchar *,int) noex ;
+local int	subinfo_record	(SI *,ustat *,cchar *,int) noex ;
+local int	subinfo_xfile	(SI *,cchar *) noex ;
+local int	subinfo_finish	(SI *) noex ;
 
-local int	mkdfname(char *,cchar *,int,cchar *,int) noex ;
+local int	mkdfname	(char *,cchar *,int,cchar *,int) noex ;
 
 
 /* local variables */
 
 constexpr cchar		*varpath = varname.path ;
-
 static bufsizevar	maxpathlen(bufsize_mp) ;
 
 
@@ -138,12 +138,12 @@ static bufsizevar	maxpathlen(bufsize_mp) ;
 int getprogroot(cc *pr,con mainv pns,int *prlenp,char *obuf,cc *namep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		outlen = 0 ;
+	int		outlen = 0 ; /* return-value */
 	if (namep && obuf) {
 	    rs = SR_INVALID ;
 	    if (namep[0]) {
-	        int		namel = lenstr(namep) ;
-	        bool		f_changed = false ;
+	        int	namel = lenstr(namep) ;
+	        bool	f_changed = false ;
 	        obuf[0] = '\0' ;
 	        while ((namel > 0) && (namep[namel - 1] == '/')) {
 	            f_changed = true ;
@@ -180,8 +180,7 @@ int getprogroot(cc *pr,con mainv pns,int *prlenp,char *obuf,cc *namep) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? outlen : rs ;
-}
-/* end subroutine (getprogroot) */
+} /* end subroutine (getprogroot) */
 
 
 /* local subroutines */
@@ -347,8 +346,7 @@ local int subinfo_record(SI *sip,ustat *sbp,cc *d,int dlen) noex {
 	    rs = dirseen_add(&sip->dirs,d,dlen,sbp) ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_record) */
+} /* end subroutine (subinfo_record) */
 
 local int subinfo_xfile(SI *sip,cc *name) noex {
 	int		rs ;
@@ -363,7 +361,7 @@ local int subinfo_xfile(SI *sip,cc *name) noex {
 
 local int mkdfname(char *rbuf,cc *dnp,int dnl,cc *sp,int sl) noex {
 	int		rs ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if ((rs = maxpathlen) >= 0) {
 	    if (storebuf buf(rbuf,rs) ; (rs = buf.strw(dnp,dnl)) >= 0) {
 	        cint dl = rs ;
