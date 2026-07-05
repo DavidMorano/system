@@ -24,16 +24,16 @@
 
 
 /* object defines */
-#define	SHIFTREG_MAGIC		0x74896233
 #define	SHIFTREG		struct shiftreg_head
+#define	SHIFTREG_MAGIC		0x74896233
 
 
 struct shiftreg_head {
 	ulong		*regs ;
-	uint		magic ;
+	uint		magval ;
 	int		n ;
 	int		i ;		/* next write index */
-} ;
+} ; /* end struct */
 
 typedef	SHIFTREG	shiftreg ;
 
