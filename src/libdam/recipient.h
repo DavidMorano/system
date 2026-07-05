@@ -36,7 +36,7 @@
 struct recipient_head {
 	hdb		*hlp ;		/* hold entire entries */
 	vecstr		*nlp ;		/* hold host names */
-	uint		magic ;
+	uint		magval ;
 } ;
 
 struct recipient_value {
