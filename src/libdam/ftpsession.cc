@@ -1,17 +1,16 @@
-/* ftpsession */
+/* ftpsession SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* way to access remote files with FTP */
+/* lang=C++20 */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
 	= 1998-12-01, David A­D­ Morano
-
 	This module was originally written.
-
 
 */
 
@@ -19,29 +18,29 @@
 
 /**************************************************************************
 
+  	Name:
+
+	Description:
 	This module supplies a subset of the features of the LibFTP
 	library.  This library currently only has enough stuff to
-	"read" a remote file.  Remarkably, that is all that is needed
-	right now.
-
+	"read" a remote file.  Remarkably, that is all that is
+	needed right now.
 
 **************************************************************************/
 
-
-#define	FTPSESSION_MASTER	1
-
-
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-#include	<cerrno>
-
-#include	<usystem.h>
-#include	<getusername.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<getusername.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ftpsession.h"
 
@@ -79,7 +78,7 @@ const char	account[] ;
 	if (fsp == NULL)
 	    return SR_FAULT ;
 
-	fsp->magic = 0 ;
+	fsp->magval = 0 ;
 	if ((hostname == NULL) || (hostname[0] == '\0'))
 	    return SR_INVALID ;
 
@@ -108,7 +107,7 @@ const char	account[] ;
 	}
 
 	if (rs >= 0)
-	    fsp->magic = FTPSESSION_MAGIC ;
+	    fsp->magval = FTPSESSION_MAGIC ;
 
 ret0:
 	return (rs >= 0) ? sl : rs ;
@@ -126,7 +125,7 @@ FTPSESSION	*fsp ;
 	if (fsp == NULL)
 	    return SR_FAULT ;
 
-	if (fsp->magic != FTPSESSION_MAGIC)
+	if (fsp->magval != FTPSESSION_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = FtpBye(fsp->sp) ;
@@ -150,7 +149,7 @@ int		type ;
 	if (fsp == NULL)
 	    return SR_FAULT ;
 
-	if (fsp->magic != FTPSESSION_MAGIC)
+	if (fsp->magval != FTPSESSION_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = FtpType(fsp->sp,type) ;
@@ -173,7 +172,7 @@ FTPSESSION	*fsp ;
 	if (fsp == NULL)
 	    return SR_FAULT ;
 
-	if (fsp->magic != FTPSESSION_MAGIC)
+	if (fsp->magval != FTPSESSION_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = FtpBinary(fsp->sp) ;
@@ -196,7 +195,7 @@ FTPSESSION	*fsp ;
 	if (fsp == NULL)
 	    return SR_FAULT ;
 
-	if (fsp->magic != FTPSESSION_MAGIC)
+	if (fsp->magval != FTPSESSION_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = FtpAscii(fsp->sp) ;
@@ -220,7 +219,7 @@ char		filename[] ;
 	if (fsp == NULL)
 	    return SR_FAULT ;
 
-	if (fsp->magic != FTPSESSION_MAGIC)
+	if (fsp->magval != FTPSESSION_MAGIC)
 	    return SR_NOTOPEN ;
 
 	if ((filename == NULL) || (filename[0] == '\0'))
@@ -247,7 +246,7 @@ char		filename[] ;
 	if (fsp == NULL)
 	    return SR_FAULT ;
 
-	if (fsp->magic != FTPSESSION_MAGIC)
+	if (fsp->magval != FTPSESSION_MAGIC)
 	    return SR_NOTOPEN ;
 
 	if ((filename == NULL) || (filename[0] == '\0'))
@@ -275,7 +274,7 @@ int		buflen ;
 	if (fsp == NULL)
 	    return SR_FAULT ;
 
-	if (fsp->magic != FTPSESSION_MAGIC)
+	if (fsp->magval != FTPSESSION_MAGIC)
 	    return SR_NOTOPEN ;
 
 	if (buf == NULL)
@@ -298,16 +297,9 @@ char	buf[] ;
 int	buflen ;
 {
 	int	rs ;
-
-
-	if (fsp == NULL)
-	    return SR_FAULT ;
-
-	if (fsp->magic != FTPSESSION_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (buf == NULL)
-	    return SR_FAULT ;
+	if (fsp == NULL) return SR_FAULT ;
+	if (fsp->magval != FTPSESSION_MAGIC) return SR_NOTOPEN ;
+	if (buf == NULL) return SR_FAULT ;
 
 	rs = FtpWriteBlock(fsp->sp,buf,buflen) ;
 
@@ -315,8 +307,6 @@ int	buflen ;
 	    rs = (- errno) ;
 
 	return rs ;
-}
-/* end subroutine (ftpsession_write) */
-
+} /* end subroutine (ftpsession_write) */
 
 
