@@ -37,7 +37,7 @@ struct keyvals_head {
 	vecobj		*keyp ;		/* store "keys" */
 	hdb		*bykeyp ;	/* indexed by key only */
 	hdb		*bykeyvalp ;	/* indexed by key-val together */
-	uint		magic ;
+	uint		magval ;
 } ;
 
 typedef KEYVALS_CUR	keyvals_cur ;
@@ -73,7 +73,7 @@ struct keyvals : keyvals_head {
 	    count(this,keyvalsmem_count) ;
 	    delset(this,keyvalsmem_delset) ;
 	    finish(this,keyvalsmem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ;
 	keyvals(const keyvals &) = delete ;
 	keyvals &operator = (const keyvals &) = delete ;
@@ -89,7 +89,7 @@ struct keyvals : keyvals_head {
 	void dtor() noex ;
 	operator int () noex ;
 	destruct keyvals() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (keyvals) */
 #else	/* __cplusplus */
