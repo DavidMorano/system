@@ -114,7 +114,7 @@ template<typename ... Args>
 static inline int offindex_magic(offindex *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == OFFINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == OFFINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -142,7 +142,7 @@ int offindex_start(offindex *op,int vn) noex {
 	    cint	vsz = szof(OI_E) ;
 	    cint	vo = 0 ;
 	    if ((rs = vecobj_start(op->oip,vsz,vn,vo)) >= 0) {
-	        op->magic = OFFINDEX_MAGIC ;
+	        op->magval = OFFINDEX_MAGIC ;
 	    }
 	    if (rs < 0) {
 		offindex_dtor(op) ;
@@ -164,7 +164,7 @@ int offindex_finish(offindex *op) noex {
 		rs1 = offindex_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
