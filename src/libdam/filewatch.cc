@@ -118,7 +118,7 @@ template<typename ... Args>
 static inline int filewatch_magic(filewatch *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == FILEWATCH_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == FILEWATCH_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (filewatch_magic) */
@@ -163,7 +163,7 @@ int filewatch_start(FW *op,FW_ARGS *ap,LF *lfp,cc *fn) noex {
 		        if (cc *cp ; (rs = uc_mallocstrw(fn,-1,&cp)) >= 0) {
 			    op->fname = cp ;
 			        if ((rs = filewatch_starts(op,ap)) >= 0) {
-				    op->magic = FILEWATCH_MAGIC ;
+				    op->magval = FILEWATCH_MAGIC ;
 			        }
 			    if (rs < 0) {
 				uc_free(op->fname) ;
@@ -224,7 +224,7 @@ int filewatch_finish(FW *op) noex {
 	        rs1 = filewatch_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
