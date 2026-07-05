@@ -69,7 +69,7 @@ struct filewatch_head {
 	ino_t		ino ;
 	dev_t		dev ;
 	FILEWATCH_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		bufl ;
 	int		interval ;
 	int		cut ;
@@ -105,14 +105,14 @@ struct filewatch : filewatch_head {
 	filewatch_co	finish ;
 	filewatch() noex {
 	    finish	(this,filewatchmem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	int start(filewatch_ar *,linefilter *,cchar *) noex ;
 	int check(time_t,bfile *) noex ;
 	int readln(time_t,char *,int) noex ;
 	void dtor() noex ;
 	destruct filewatch() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (filewatch) */
 #else
