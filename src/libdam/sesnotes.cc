@@ -122,7 +122,7 @@ template<typename ... Args>
 static inline int sesnotes_magic(SN *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SESNOTES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SESNOTES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -155,7 +155,7 @@ int sesnotes_open(SN *op,cchar *un) noex {
 		    op->pid = rs ;
 		    op->fd = -1 ;
 		    strdcpy1(op->unbuf,ulen,un) ;
-		    op->magic = SESNOTES_MAGIC ;
+		    op->magval = SESNOTES_MAGIC ;
 		} /* end if (ucgetpid) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
@@ -190,7 +190,7 @@ int sesnotes_close(SN *op) noex {
 		rs1 = sesnotes_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
