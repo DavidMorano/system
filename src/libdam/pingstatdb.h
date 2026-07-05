@@ -46,7 +46,7 @@ struct pingstatdb_head {
 	TIMEB		now ;
 	time_t		mtime ;
 	PINGSTATDB_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ;
 
 struct pingstatdb_cursor {
