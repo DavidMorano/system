@@ -122,7 +122,7 @@ template<typename ... Args>
 static inline int syshelper_magic(SH *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SYSHELPER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SYSHELPER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -147,7 +147,7 @@ int syshelper_open(SH *op,cchar *filename) noex {
 	            op->fd = rs ;
 	            if ((uc_closeonexec(op->fd,true)) >= 0) ylikely {
 		        if ((rs = syshelper_opencheck(op)) >= 0) ylikely {
-		            op->magic = SYSHELPER_MAGIC ;
+		            op->magval = SYSHELPER_MAGIC ;
 		        }
 	            } /* end if (closeonexec) */
 	            if (rs < 0) {
@@ -177,7 +177,7 @@ int syshelper_close(SH *op) noex {
 		rs1 = syshelper_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
