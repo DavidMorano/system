@@ -13,17 +13,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |off_t| */
-#include	<stdarg.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<shio.h>
+#include	<sys/types.h>		/* POSIX |off_t| */
+#include	<stdarg.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<shio.h>		/* LIBSHELL */
 
 
-#define	HTM_MAGIC		0x43628193
 #define	HTM			struct htm_head
 #define	HTM_FL			struct htm_flags
-
+#define	HTM_MAGIC		0x43628193
+/* options */
 #define	HTM_FBUFWHOLE		(1<<0)
 #define	HTM_FBUFLINE		(1<<1)
 #define	HTM_FBUFNONE		(1<<2)
@@ -38,7 +38,7 @@ struct htm_head {
 	shio		*ofp ;
 	char		*lbuf ;
 	HTM_FL		fl ;		/* currently unused! */
-	uint		magic ;
+	uint		magval ;
 	int		llen ;
 	int		wlen ;
 } ; /* end struct */
