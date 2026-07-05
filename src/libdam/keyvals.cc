@@ -102,7 +102,7 @@ static int keyvals_ctor(keyvals *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    if ((op->keyp = new(nothrow) vecobj) != np) ylikely {
 		if ((op->bykeyp = new(nothrow) hdb) != np) ylikely {
 		    if ((op->bykeyvalp = new(nothrow) hdb) != np) ylikely {
@@ -148,7 +148,7 @@ template<typename ... Args>
 static inline int keyvals_magic(keyvals *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == KEYVALS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == KEYVALS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -208,7 +208,7 @@ int keyvals_start(keyvals *op,int ndef) noex {
 	            auto	hk = hashent ;
 	            auto	cmp = cmpent ;
 	            if ((rs = hdb_start(op->bykeyvalp,ndef,0,hk,cmp)) >= 0) {
-	                op->magic = KEYVALS_MAGIC ;
+	                op->magval = KEYVALS_MAGIC ;
 	            }
 		    if (rs < 0) {
 	    	        hdb_finish(op->bykeyp) ;
@@ -251,10 +251,10 @@ int keyvals_finish(keyvals *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-		rs = keyvals_dtor(op) ;
+		rs1 = keyvals_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
