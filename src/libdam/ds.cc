@@ -33,18 +33,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>
-#include	<usystem.h>
-#include	<termstr.h>
-#include	<ascii.h>
-#include	<uterm.h>
-#include	<td.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<termstr.h>		/* LIBUC */
+#include	<uterm.h>		/* LIBUC */
+#include	<td.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ds.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| */
 
@@ -56,6 +60,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -74,7 +79,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int ds_ctor(ds *op,Args ... args) noex {
+local int ds_ctor(ds *op,Args ... args) noex {
     	DS		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -86,10 +91,9 @@ static int ds_ctor(ds *op,Args ... args) noex {
 	    } /* end if (new-td) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ds_ctor) */
+} /* end subroutine (ds_ctor) */
 
-static int ds_dtor(ds *op) noex {
+local int ds_dtor(ds *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -99,18 +103,17 @@ static int ds_dtor(ds *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ds_dtor) */
+} /* end subroutine (ds_dtor) */
 
 template<typename ... Args>
-static inline int ds_magic(ds *op,Args ... args) noex {
+local inline int ds_magic(ds *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == DS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (ds_magic) */
+} /* end subroutine (ds_magic) */
+
 
 /* local variables */
 
@@ -129,26 +132,26 @@ int ds_start(DS *op,int tfd,cchar *termtype,int rows,int cols) noex {
 		if (tfd >= 0) {
 		    auto &tt = termtype ;
 	            op->tfd = tfd ;
-	            if (cchar *cp ; (rs = uc_mallocstrw(tt,-1,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = mem.strw(tt,-1,&cp)) >= 0) {
 	                op->termtype = cp ;
 	                rs = td_start(op->tdp,tfd,termtype,rows,cols) ;
 	                if (rs >= 0) {
-	                    op->magic = DS_MAGIC ;
+	                    op->magval = DS_MAGIC ;
 	                }
 	                if (rs < 0) {
-	                    uc_free(op->termtype) ;
-	                    op->termtype = NULL ;
-	                }
-	            } /* end if (m-a) */
+	                    voidp vp = voidp(op->termtype) ;
+	                    mem.free(vp) ;
+	                    op->termtype = nullptr ;
+	                } /* end if (error) */
+	            } /* end if (memory-acquire) */
 	        } /* end if (good-FD) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		ds_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ds_start) */
+} /* end subroutine (ds_start) */
 
 int ds_finish(DS *op) noex {
 	int		rs ;
@@ -159,19 +162,19 @@ int ds_finish(DS *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->termtype) {
-	        rs1 = uc_free(op->termtype) ;
+	        voidp vp = voidp(op->termtype) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->termtype = NULL ;
-	    }
+	        op->termtype = nullptr ;
+	    } /* end if (memory-release) */
 	    {
 		rs1 = ds_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ds_finish) */
+} /* end subroutine (ds_finish) */
 
 int ds_subnew(DS *op,int srow,int scol,int rows,int cols) noex {
 	int		rs ;
@@ -179,8 +182,7 @@ int ds_subnew(DS *op,int srow,int scol,int rows,int cols) noex {
 	    rs = td_subnew(op->tdp,srow,scol,rows,cols) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ds_subnew) */
+} /* end subroutine (ds_subnew) */
 
 int ds_subdel(DS *op,int w) noex {
 	int		rs ;
@@ -188,8 +190,7 @@ int ds_subdel(DS *op,int w) noex {
 	    rs = td_subdel(op->tdp,w) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ds_subdel) */
+} /* end subroutine (ds_subdel) */
 
 int ds_getlines(DS *op,int w) noex {
 	int		rs ;
@@ -197,8 +198,7 @@ int ds_getlines(DS *op,int w) noex {
 	    rs = td_getlines(op->tdp,w) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ds_getlines) */
+} /* end subroutine (ds_getlines) */
 
 int ds_setlines(DS *op,int w,int nl) noex {
 	int		rs ;
@@ -206,8 +206,7 @@ int ds_setlines(DS *op,int w,int nl) noex {
 	    rs = td_setlines(op->tdp,w,nl) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ds_setlines) */
+} /* end subroutine (ds_setlines) */
 
 int ds_move(DS *op,int w,int r,int c) noex {
 	int		rs ;
@@ -215,8 +214,7 @@ int ds_move(DS *op,int w,int r,int c) noex {
 	    rs = td_move(op->tdp,w,r,c) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ds_move) */
+} /* end subroutine (ds_move) */
 
 int ds_printf(DS *op,int w,cchar *fmt,...) noex {
 	va_list		ap ;
@@ -227,8 +225,7 @@ int ds_printf(DS *op,int w,cchar *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end wubroutine (ds_printf) */
+} /* end wubroutine (ds_printf) */
 
 int ds_pprintf(DS *op,int w,int r,int c,cchar *fmt,...) noex {
 	va_list		ap ;
@@ -239,8 +236,7 @@ int ds_pprintf(DS *op,int w,int r,int c,cchar *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end wubroutine (ds_pprintf) */
+} /* end wubroutine (ds_pprintf) */
 
 int ds_vprintf(DS *op,int w,cchar *fmt,va_list ap) noex {
 	int		rs ;
@@ -248,8 +244,7 @@ int ds_vprintf(DS *op,int w,cchar *fmt,va_list ap) noex {
 	    rs = td_vpprintf(op->tdp,w,-1,-1,fmt,ap) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end wubroutine (ds_vprintf) */
+} /* end wubroutine (ds_vprintf) */
 
 int ds_vpprintf(DS *op,int w,int r,int c,cchar *fmt,va_list ap) noex {
 	int		rs ;
@@ -257,8 +252,7 @@ int ds_vpprintf(DS *op,int w,int r,int c,cchar *fmt,va_list ap) noex {
 	    rs = td_vpprintf(op->tdp,w,r,c,fmt,ap) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end wubroutine (ds_vpprintf) */
+} /* end wubroutine (ds_vpprintf) */
 
 int ds_write(DS *op,int w,cchar *bp,int bl) noex {
 	int		rs ;
@@ -266,8 +260,7 @@ int ds_write(DS *op,int w,cchar *bp,int bl) noex {
 	    rs = td_pwrite(op->tdp,w,-1,-1,bp,bl) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end wubroutine (ds_write) */
+} /* end wubroutine (ds_write) */
 
 int ds_pwrite(DS *op,int w,int r,int c,cchar *bp,int bl) noex {
 	int		rs ;
@@ -275,8 +268,7 @@ int ds_pwrite(DS *op,int w,int r,int c,cchar *bp,int bl) noex {
 	    rs = td_pwrite(op->tdp,w,r,c,bp,bl) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end wubroutine (ds_pwrite) */
+} /* end wubroutine (ds_pwrite) */
 
 int ds_pwritegr(DS *op,int w,int r,int c,int gr,cchar *bp,int bl) noex {
 	int		rs ;
@@ -291,8 +283,7 @@ int ds_pwritegr(DS *op,int w,int r,int c,int gr,cchar *bp,int bl) noex {
 	    rs = td_pwritegr(op->tdp,w,r,c,tdgr,bp,bl) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end wubroutine (ds_pwritegr) */
+} /* end wubroutine (ds_pwritegr) */
 
 /* erase window; type: 0=forward, 1=back, 2=whole */
 int ds_ew(DS *op,int w,int r,int type) noex {
@@ -303,8 +294,7 @@ int ds_ew(DS *op,int w,int r,int type) noex {
 	    len = rs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end wubroutine (ds_ew) */
+} /* end wubroutine (ds_ew) */
 
 int ds_el(DS *op,int w,int type) noex {
 	int		rs ;
@@ -314,8 +304,7 @@ int ds_el(DS *op,int w,int type) noex {
 	    len = rs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end wubroutine (ds_el) */
+} /* end wubroutine (ds_el) */
 
 int ds_ec(DS *op,int w,int n) noex {
 	int		rs ;
@@ -325,8 +314,7 @@ int ds_ec(DS *op,int w,int n) noex {
 	    len = rs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end wubroutine (ds_ec) */
+} /* end wubroutine (ds_ec) */
 
 int ds_scroll(DS *op,int w,int n) noex {
 	int		rs ;
@@ -336,8 +324,7 @@ int ds_scroll(DS *op,int w,int n) noex {
 	    len = rs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ds_scroll) */
+} /* end subroutine (ds_scroll) */
 
 int ds_clear(DS *op,int w) noex {
 	int		rs ;
@@ -347,8 +334,7 @@ int ds_clear(DS *op,int w) noex {
 	    len = rs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ds_clear) */
+} /* end subroutine (ds_clear) */
 
 int ds_flush(DS *op) noex {
 	int		rs ;
@@ -356,8 +342,7 @@ int ds_flush(DS *op) noex {
 	    rs = td_flush(op->tdp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ds_flush) */
+} /* end subroutine (ds_flush) */
 
 /* suspend the display (optionally leaving the cursor someplace) */
 int ds_suspend(DS *op,int r,int c) noex {
@@ -368,8 +353,7 @@ int ds_suspend(DS *op,int r,int c) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ds_suspend) */
+} /* end subroutine (ds_suspend) */
 
 int ds_done(DS *op) noex {
 	int		rs ;
@@ -381,7 +365,6 @@ int ds_done(DS *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (ds_done) */
+} /* end subroutine (ds_done) */
 
 
