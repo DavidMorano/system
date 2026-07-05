@@ -243,7 +243,7 @@ int uux_open(UUX *op,SD_ARGS *ap,cc *hostname,cc *svcname,mainv av) noex {
 	    op->fd = rs ;
 
 	if (rs >= 0)
-	    op->magic = UUX_MAGIC ;
+	    op->magval = UUX_MAGIC ;
 
 	} /* end if (mkargs) */
 	} /* end if (ok) */
@@ -273,7 +273,7 @@ UUX		*op ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != UUX_MAGIC)
+	if (op->magval != UUX_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs1 = u_close(op->fd) ;
@@ -286,7 +286,7 @@ UUX		*op ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (uux_close) */
@@ -304,7 +304,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != UUX_MAGIC)
+	if (op->magval != UUX_MAGIC)
 	    return SR_NOTOPEN ;
 
 #ifdef	COMMENT
@@ -331,7 +331,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != UUX_MAGIC)
+	if (op->magval != UUX_MAGIC)
 	    return SR_NOTOPEN ;
 
 #ifdef	COMMENT
@@ -360,7 +360,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != UUX_MAGIC)
+	if (op->magval != UUX_MAGIC)
 	    return SR_NOTOPEN ;
 
 #ifdef	COMMENT
@@ -386,7 +386,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != UUX_MAGIC)
+	if (op->magval != UUX_MAGIC)
 	    return SR_NOTOPEN ;
 
 #ifdef	COMMENT
@@ -411,7 +411,7 @@ int		buflen ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != UUX_MAGIC)
+	if (op->magval != UUX_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_writen(op->fd,buf,buflen) ;
@@ -436,7 +436,7 @@ int		flags ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != UUX_MAGIC)
+	if (op->magval != UUX_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_send(op->fd,buf,buflen,flags) ;
@@ -463,7 +463,7 @@ int		salen ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != UUX_MAGIC)
+	if (op->magval != UUX_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_sendto(op->fd,buf,buflen,flags,sap,salen) ;
@@ -487,7 +487,7 @@ int		flags ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != UUX_MAGIC)
+	if (op->magval != UUX_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_sendmsg(op->fd,msgp,flags) ;
@@ -510,7 +510,7 @@ int		cmd ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != UUX_MAGIC)
+	if (op->magval != UUX_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_shutdown(op->fd,cmd) ;
