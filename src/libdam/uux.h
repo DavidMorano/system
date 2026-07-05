@@ -41,7 +41,7 @@ struct uux_flags {
 struct uux_head {
 	logfile		*lfp ;		/* log-file-pointer */
 	UUX_FL		fl ;
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
 	int		tlen ;
 } ;
