@@ -70,7 +70,7 @@ template<typename ... Args>
 static inline int shiftreg_magic(shiftreg *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SHIFTREG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SHIFTREG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -98,7 +98,7 @@ int shiftreg_start(shiftreg *op,int n) noex {
 	        for (int i = 0 ; i < op->n ; i += 1) {
 	            op->regs[i] = i ;
 	        }
-	        op->magic = SHIFTREG_MAGIC ;
+	        op->magval = SHIFTREG_MAGIC ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -113,7 +113,7 @@ int shiftreg_finish(shiftreg *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->regs = nullptr ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
