@@ -270,7 +270,7 @@ template<typename ... Args>
 static inline int ts_magic(ts *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == TS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == TS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (ts_magic) */
@@ -370,7 +370,7 @@ local int ts_opens(ts *op) noex {
             fcreated = (rs > 0) ;
             if ((rs = ts_filebegin(op,dt)) >= 0) {
                 if ((rs = mapstrint_start(op->nip,nidxent)) >= 0) {
-                    op->magic = TS_MAGIC ;
+                    op->magval = TS_MAGIC ;
                 }
             }
             if (rs < 0) {
@@ -402,7 +402,7 @@ int ts_close(ts *op) noex {
 		rs1 = ts_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (ts_close) */
