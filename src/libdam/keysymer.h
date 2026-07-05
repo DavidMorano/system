@@ -41,7 +41,7 @@ struct keysymer_cursor {
 struct keysymer_head {
 	mapstrint	*mlp ;		/* map-list-pointer */
 	KEYSYMER_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ;
 
 typedef	KEYSYMER	keysymer ;
