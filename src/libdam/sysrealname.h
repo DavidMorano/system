@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
-#include	<modload.h>
+#include	<usystem.h>		/* LIBU */
+#include	<modload.h>		/* LIBU */
 
 
 #define	SYSREALNAME		struct sysrealname_head
@@ -36,15 +36,15 @@
 
 struct sysrealname_flags {
     	uint		modload:1 ;
-} ;
+} ; /* end struct */
 
 struct sysrealname_cursor {
 	void		*scp ;
 	cchar		**sa ;
-	uint		magic ;
+	uint		magval ;
 	int		sn ;
 	int		fo ;		/* options */
-} ;
+} ; /* end struct */
 
 struct sysrealname_information {
 	time_t		writetime ;	/* time DB written */
@@ -54,7 +54,7 @@ struct sysrealname_information {
 	uint		encoding ;
 	uint		type ;
 	uint		collisions ;
-} ;
+} ; /* end struct */
 
 struct sysrealname_head {
 	modload		*mlp ;
@@ -64,7 +64,7 @@ struct sysrealname_head {
 	uint		magic ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
-} ;
+} ; /* end struct */
 
 typedef SYSREALNAME		sysrealname ;
 typedef	SYSREALNAME_FL		sysrealname_fl ;
