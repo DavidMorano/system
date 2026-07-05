@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<fifostr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<fifostr.h>		/* LIBUC */
 
 
 #define	WORDFILL	struct wordfill_head
@@ -31,7 +31,7 @@
 
 struct wordfill_head {
 	fifostr		*sqp ;		/* string-queue-pointer */
-	uint		magic ;
+	uint		magval ;
 	int		wc ;		/* word-count */
 	int		chrc ;		/* character count (w/ blanks) */
 } ; /* end struct */
