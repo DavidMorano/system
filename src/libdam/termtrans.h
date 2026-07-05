@@ -43,7 +43,7 @@ struct termtrans_head {
 	void		*lvp ;		/* line-vector-pointer */
 	UICONV		*idp ;		/* UICONV-pointer */
 	TERMTRANS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	uint		termattr ;	/* mask of terminal attributes */
 	int		ncols ;		/* terminal columns */
 } ; /* end struct */
