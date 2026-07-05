@@ -107,7 +107,7 @@ template<typename ... Args>
 static inline int termenq_magic(termenq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == TERMENQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == TERMENQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -154,7 +154,7 @@ int termenq_open(TE *op,cchar *dbfn,int oflags) noex {
                             if (USTAT sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
                                 op->fsize = size_t(sb.st_size & INT_MAX) ;
                                 op->ti_mod = sb.st_mtime ;
-                                op->magic = TERMENQ_MAGIC ;
+                                op->magval = TERMENQ_MAGIC ;
                             } /* end if (stat) */
                             if (rs < 0) {
                                 termenq_fileclose(op) ;
@@ -194,7 +194,7 @@ int termenq_close(TE *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -387,7 +387,7 @@ int termenq_read(TE *op,int ei,TE_ENT *ep) noex {
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != TERMENQ_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != TERMENQ_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAGE */
 
 	if (ei < 0) return SR_INVALID ;
