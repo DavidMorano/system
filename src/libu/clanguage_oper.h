@@ -29,6 +29,12 @@
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
+#ifndef	bitnot
+#define	bitnot			~
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 #ifndef	bitxor
 #define	bitxor			xor
 #endif
@@ -38,7 +44,7 @@
 #ifndef	bitand_eq
 #define	bitand_eq		&=
 #define	bitor_eq		|=
-#define	bitxor_eq		^
+#define	bitxor_eq		^=
 #endif
 #endif /* __cplusplus */
 
