@@ -170,7 +170,7 @@ int varsub_start(VS *op,int aopts) noex {
 	    op->n = VS_DEFENT ;
 	    if ((rs = varsub_setopts(op,aopts)) >= 0) ylikely {
 		vechand	*slp = op->slp ;
-	        cint	vo = VECHAND_OORDERED ;
+	        cint	vo = vechandm.ordered ;
 	        if ((rs = vechand_start(slp,op->n,vo)) >= 0) ylikely {
 	            op->magic = VS_MAGIC ;
 	        }
@@ -180,8 +180,7 @@ int varsub_start(VS *op,int aopts) noex {
 	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (varsub_start) */
+} /* end subroutine (varsub_start) */
 
 int varsub_finish(VS *op) noex {
 	int		rs ;
@@ -202,8 +201,7 @@ int varsub_finish(VS *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (varsub_finish) */
+} /* end subroutine (varsub_finish) */
 
 int varsub_add(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs ;
@@ -214,8 +212,7 @@ int varsub_add(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (varsub_add) */
+} /* end subroutine (varsub_add) */
 
 int varsub_addva(VS *op,mainv envv) noex {
 	int		rs ;
@@ -239,8 +236,7 @@ int varsub_addva(VS *op,mainv envv) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (varsub_addva) */
+} /* end subroutine (varsub_addva) */
 
 int varsub_addquick(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs ;
@@ -251,8 +247,7 @@ int varsub_addquick(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (varsub_addquick) */
+} /* end subroutine (varsub_addquick) */
 
 int varsub_addvaquick(VS *op,cchar **envv) noex {
 	int		rs ;
@@ -276,8 +271,7 @@ int varsub_addvaquick(VS *op,cchar **envv) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (varsub_addvaquick) */
+} /* end subroutine (varsub_addvaquick) */
 
 int varsub_del(VS *op,cchar *k,int klen) noex {
 	int		rs ;
@@ -308,8 +302,7 @@ int varsub_del(VS *op,cchar *k,int klen) noex {
 	    } /* end if (non-zero positive) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (varsub_del) */
+} /* end subroutine (varsub_del) */
 
 int varsub_find(VS *op,cchar *k,int klen,cchar **vpp,int *vlenp) noex {
 	int		rs ;
@@ -323,8 +316,7 @@ int varsub_find(VS *op,cchar *k,int klen,cchar **vpp,int *vlenp) noex {
 	    if (vlenp) *vlenp = (rs >= 0) ? vl : 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (varsub_find) */
+} /* end subroutine (varsub_find) */
 
 int varsub_fetch(VS *op,cchar *k,int klen,cchar **vpp) noex {
 	int		rs ;
@@ -335,8 +327,7 @@ int varsub_fetch(VS *op,cchar *k,int klen,cchar **vpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (varsub_fetch) */
+} /* end subroutine (varsub_fetch) */
 
 int varsub_curbegin(VS *op,varsub_cur *curp) noex {
 	int		rs ;
@@ -344,8 +335,7 @@ int varsub_curbegin(VS *op,varsub_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (varsub_curbegin) */
+} /* end subroutine (varsub_curbegin) */
 
 int varsub_curend(VS *op,varsub_cur *curp) noex {
 	int		rs ;
@@ -353,8 +343,7 @@ int varsub_curend(VS *op,varsub_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (varsub_curend) */
+} /* end subroutine (varsub_curend) */
 
 int varsub_curenum(VS *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
 	int		rs ;
@@ -381,8 +370,7 @@ int varsub_curenum(VS *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (varsub_curenum) */
+} /* end subroutine (varsub_curenum) */
 
 int varsub_expfile(VS *op,bfile *ifp,bfile *ofp) noex {
 	int		rs ;
@@ -394,8 +382,7 @@ int varsub_expfile(VS *op,bfile *ifp,bfile *ofp) noex {
 	    } /* end if (varsub_sort) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (varsub_expfile) */
+} /* end subroutine (varsub_expfile) */
 
 int varsub_exp(VS *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 	int		rs ;
@@ -426,8 +413,7 @@ int varsub_exp(VS *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 	    } /* end if (maxlinelen) */
 	} /* end if (magic) */
 	return (rs >= 0) ? bl : rs ;
-}
-/* end subroutine (varsub_exp) */
+} /* end subroutine (varsub_exp) */
 
 int varsub_expbuf(VS *op,buffer *bufp,cchar *sbuf,int slen) noex {
 	int		rs ;
@@ -853,7 +839,6 @@ local int vcmpent(cvoid **ve1pp,cvoid **ve2pp) noex {
 	    }
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (vcmpent) */
+} /* end subroutine (vcmpent) */
 
 
