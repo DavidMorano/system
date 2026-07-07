@@ -30,17 +30,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<upt.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<upt.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dispatcher.h"
 
@@ -125,7 +125,7 @@ int dispatcher_start(DISPATCHER *dop,int n,void *callsub,void *callarg) noex {
 	        if ((rs = psem_create(&dop->ws,false,0)) >= 0) {
 	            cint	psz = szof(pthread_t) ;
 		    cint	vn = 10 ;
-	            cint	vo = (VECOBJ_OREUSE) ;
+	            cint	vo = vecobjm.reuse ;
 	            if ((rs = vecobj_start(&dop->tids,psz,vn,vo)) >= 0) {
 	                pthread_t	tid, *tidp ;
 	                workthr		w = (workthr) dispatcher_worker ;
@@ -141,7 +141,7 @@ int dispatcher_start(DISPATCHER *dop,int n,void *callsub,void *callarg) noex {
 	                    dop->f_exit = true ;
 	                    for (i = 0 ; i < dop->nthr ; i += 1) {
 	                        psem_post(&dop->ws) ;
-	                    }
+	                    } /* end for */
 	                    i = 0 ;
 			    void *vp ;
 	                    while (vecobj_get(&dop->tids,i,&vp) >= 0) {
@@ -165,8 +165,7 @@ int dispatcher_start(DISPATCHER *dop,int n,void *callsub,void *callarg) noex {
 	} /* end if (ok) */
 
 	return rs ;
-}
-/* end subroutine (dispatcher_start) */
+} /* end subroutine (dispatcher_start) */
 
 int dispatcher_finish(DISPATCHER *dop,int f_abort) noex {
 	pthread_t	*tidp ;
@@ -225,8 +224,7 @@ int dispatcher_finish(DISPATCHER *dop,int f_abort) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (dispatcher_finish) */
+} /* end subroutine (dispatcher_finish) */
 
 int dispatcher_add(DISPATCHER *dop,void *wop) noex {
 	int		rs ;
@@ -239,8 +237,7 @@ int dispatcher_add(DISPATCHER *dop,void *wop) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (dispatcher_add) */
+} /* end subroutine (dispatcher_add) */
 
 
 /* local subroutines */
@@ -282,7 +279,6 @@ local int dispatcher_worker(DISPATCHER *dop) noex {
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (dispatcher_worker) */
+} /* end subroutine (dispatcher_worker) */
 
 
