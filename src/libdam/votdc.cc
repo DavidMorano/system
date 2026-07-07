@@ -30,40 +30,44 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<strings.h>		/* for |strcasecmp(3c)| */
-#include	<climits>		/* |INT_MAX| + |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdarg>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<strings.h>		/* CSTD |strcasecmp(3c)| */
+#include	<climits>		/* CSTD |INT_MAX| + |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<ptma.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<uclibmem.h>		/* LINUC */
+#include	<ucmem.h>		/* LINUC */
 #include	<ucsysmisc.h>		/* |ucpagesize(3uc)| */
-#include	<bufsizeget.h>
-#include	<getax.h>
-#include	<sigblocker.h>
-#include	<endian.h>
-#include	<intceil.h>
-#include	<estrings.h>
-#include	<filer.h>
-#include	<storebuf.h>
-#include	<ptma.h>
-#include	<ptm.h>
+#include	<ucopen.h>		/* LINUC */
+#include	<ucdesc.h>		/* LINUC */
+#include	<ucfileop.h>		/* LINUC */
+#include	<bufsizeget.h>		/* LINUC */
+#include	<getax.h>		/* LINUC */
+#include	<sigblocker.h>		/* LINUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
 #include	<mkx.h>			/* |mkshmname(3uc)| */
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<matxstr.h>
-#include	<cvtdater.h>
-#include	<shmalloc.h>
-#include	<localmisc.h>
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<cvtdater.h>		/* LIBUC */
+#include	<shmalloc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"votdc.h"
 #include	"votdchdr.h"
@@ -105,6 +109,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -118,25 +123,6 @@ typedef ptm *		ptmp ;
 
 extern "C" {
     extern int uc_getpid() noex ;
-    extern int uc_stat(cchar *,ustat *) noex ;
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_openshm(cchar *,int,mode_t) noex ;
-    extern int uc_openshmto(cchar *,int,mode_t,int) noex ;
-    extern int uc_moveup(int,int) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_fsize(int) noex ;
-    extern int uc_lockf(int,int,off_t) noex ;
-    extern int uc_readln(int,void *,int) noex ;
-    extern int uc_writen(int,cvoid *,int) noex ;
-    extern int uc_writedesc(int,int,int) noex ;
-    extern int uc_rewind(int) noex ;
-    extern int uc_seek(int,off_t,int) noex ;
-    extern int uc_setappend(int,int) noex ;
-    extern int uc_ftruncate(int,off_t) noex ;
-    extern int uc_setappend(int,int) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-    extern int uc_unlink(cchar *) noex ;
-    extern int uc_unlinkshm(cchar *) noex ;
 } /* end extern */
 
 
@@ -158,104 +144,101 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static int votdc_ctor(votdc *op,Args ... args) noex {
+local int votdc_ctor(votdc *op,Args ... args) noex {
     	VOTDC		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely{
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (votdc_ctor) */
+} /* end subroutine (votdc_ctor) */
 
-static int votdc_dtor(votdc *op) noex {
+local int votdc_dtor(votdc *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (votdc_dtor) */
+} /* end subroutine (votdc_dtor) */
 
 template<typename ... Args>
-static inline int votdc_magic(votdc *op,Args ... args) noex {
+local inline int votdc_magic(votdc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == VOTDC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (votdc_magic) */
+} /* end subroutine (votdc_magic) */
 
-static int	votdc_shmhandbegin(votdc *,cchar *) noex ;
-static int	votdc_shmhandend(votdc *) noex ;
+local int	votdc_shmhandbegin(votdc *,cchar *) noex ;
+local int	votdc_shmhandend(votdc *) noex ;
 
-static int	votdc_strbegin(votdc *,cchar *,cchar *) noex ;
-static int	votdc_strend(votdc *) noex ;
+local int	votdc_strbegin(votdc *,cchar *,cchar *) noex ;
+local int	votdc_strend(votdc *) noex ;
 
-static int	votdc_shmbegin(votdc *,int,mode_t) noex ;
-static int	votdc_shmbeginer(votdc *,time_t,int,mode_t,int) noex ;
-static int	votdc_shmend(votdc *) noex ;
+local int	votdc_shmbegin(votdc *,int,mode_t) noex ;
+local int	votdc_shmbeginer(votdc *,time_t,int,mode_t,int) noex ;
+local int	votdc_shmend(votdc *) noex ;
 
-static int	votdc_mapbegin(votdc *,time_t,int) noex ;
-static int	votdc_mapend(votdc *) noex ;
+local int	votdc_mapbegin(votdc *,time_t,int) noex ;
+local int	votdc_mapend(votdc *) noex ;
 
-static int	votdc_shmhdrin(votdc *,votdchdr *) noex ;
-static int	votdc_shmprep(votdc *,time_t,int,mode_t,votdchdr *) noex ;
-static int	votdc_shmpreper(votdc *,time_t,int,mode_t,votdchdr *) noex ;
-static int	votdc_shmwriter(votdc *,time_t,int fd,votdchdr *,cc*,int) noex ;
-static int	votdc_allocinit(votdc *,votdchdr *) noex ;
-static int	votdc_mutexinit(votdc *) noex ;
-static int	votdc_shmchown(votdc *) noex ;
-static int	votdc_verify(votdc *) noex ;
+local int	votdc_shmhdrin(votdc *,votdchdr *) noex ;
+local int	votdc_shmprep(votdc *,time_t,int,mode_t,votdchdr *) noex ;
+local int	votdc_shmpreper(votdc *,time_t,int,mode_t,votdchdr *) noex ;
+local int	votdc_shmwriter(votdc *,time_t,int fd,votdchdr *,cc*,int) noex ;
+local int	votdc_allocinit(votdc *,votdchdr *) noex ;
+local int	votdc_mutexinit(votdc *) noex ;
+local int	votdc_shmchown(votdc *) noex ;
+local int	votdc_verify(votdc *) noex ;
 
-static int	votdc_bookslotfind(votdc *,cchar *) noex ;
-static int	votdc_bookslotload(votdc *,time_t,int,cchar *,cchar **) noex ;
-static int	votdc_bookslotdump(votdc *,int) noex ;
-static int	votdc_verselangdump(votdc *,int) noex ;
+local int	votdc_bookslotfind(votdc *,cchar *) noex ;
+local int	votdc_bookslotload(votdc *,time_t,int,cchar *,cchar **) noex ;
+local int	votdc_bookslotdump(votdc *,int) noex ;
+local int	votdc_verselangdump(votdc *,int) noex ;
 
-static int	votdc_booklanghave(votdc *,cchar *) noex ;
-static int	votdc_versehave(votdc *,int,int) noex ;
-static int	votdc_verseslotnext(votdc *,int) noex ;
-static int	votdc_verseslotfind(votdc *) noex ;
-static int	votdc_verseslotfinder(votdc *) noex ;
+local int	votdc_booklanghave(votdc *,cchar *) noex ;
+local int	votdc_versehave(votdc *,int,int) noex ;
+local int	votdc_verseslotnext(votdc *,int) noex ;
+local int	votdc_verseslotfind(votdc *) noex ;
+local int	votdc_verseslotfinder(votdc *) noex ;
 
-static int	votdc_mktitles(votdc *,cchar *,int) noex ;
-static int	votdc_titlematcher(votdc *,int,int,cchar *,int) noex ;
-static int	votdc_titlevalid(votdc *,int) noex ;
-static int	votdc_titletouse(votdc *) noex ;
-static int	votdc_access(votdc *) noex ;
-static int	votdc_getwcount(votdc *) noex ;
-static int	votdc_titlefins(votdc *) noex ;
+local int	votdc_mktitles(votdc *,cchar *,int) noex ;
+local int	votdc_titlematcher(votdc *,int,int,cchar *,int) noex ;
+local int	votdc_titlevalid(votdc *,int) noex ;
+local int	votdc_titletouse(votdc *) noex ;
+local int	votdc_access(votdc *) noex ;
+local int	votdc_getwcount(votdc *) noex ;
+local int	votdc_titlefins(votdc *) noex ;
 
 #if	CF_GETACOUNT
-static int	votdc_getacount(votdc *) noex ;
+local int	votdc_getacount(votdc *) noex ;
 #endif /* CF_GETACOUNT */
 
 #if	CF_UPDATE
-static int	votdc_update(votdc *) noex ;
+local int	votdc_update(votdc *) noex ;
 #endif /* CF_UPDATE */
 
-static int	verse_dump(votdc_verse *,shmalloc *,int) noex ;
-static int	verse_match(votdc_verse *,int,int) noex ;
-static int	verse_read(votdc_verse *,char *,
+local int	verse_dump(votdc_verse *,shmalloc *,int) noex ;
+local int	verse_match(votdc_verse *,int,int) noex ;
+local int	verse_read(votdc_verse *,char *,
 			votdc_cite *,char *,int) noex ;
-static int	verse_load(votdc_verse *,time_t,int,shmalloc *,char *,
+local int	verse_load(votdc_verse *,time_t,int,shmalloc *,char *,
 			votdc_cite *,int,cchar *,int) noex ;
-static int	verse_isempty(votdc_verse *) noex ;
-static int	verse_isused(votdc_verse *) noex ;
-static int	verse_isleast(votdc_verse *,time_t *) noex ;
-static int	verse_accessed(votdc_verse *,time_t) noex ;
+local int	verse_isempty(votdc_verse *) noex ;
+local int	verse_isused(votdc_verse *) noex ;
+local int	verse_isleast(votdc_verse *,time_t *) noex ;
+local int	verse_accessed(votdc_verse *,time_t) noex ;
 
-static int	book_load(votdc_book *,shmalloc *,char *,time_t,int,
+local int	book_load(votdc_book *,shmalloc *,char *,time_t,int,
 			cchar *,cchar **) noex ;
-static int	book_dump(votdc_book *,shmalloc *) noex ;
-static int	book_getwmark(votdc_book *) noex ;
-static int	book_getwmarklang(votdc_book *,cchar **) noex ;
-static int	book_read(votdc_book *,char *,int,char *,int,int) noex ;
+local int	book_dump(votdc_book *,shmalloc *) noex ;
+local int	book_getwmark(votdc_book *) noex ;
+local int	book_getwmarklang(votdc_book *,cchar **) noex ;
+local int	book_read(votdc_book *,char *,int,char *,int,int) noex ;
 
-static int	titlecache_load(VOTDC_TC *,int,cchar *,char *,int *) noex ;
-static int	titlecache_release(VOTDC_TC *) noex ;
+local int	titlecache_load(VOTDC_TC *,int,cchar *,char *,int *) noex ;
+local int	titlecache_release(VOTDC_TC *) noex ;
 
 
 /* local variables */
@@ -265,11 +248,11 @@ static vars		var ;
 
 /* exported variables */
 
-votdc_obj	votdc_modinfo = {
+const votdc_obj		votdc_modinfo = {
 	VOTDC_OBJNAME,
 	szof(votdc),
 	0
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -309,8 +292,7 @@ int votdc_open(votdc *op,cchar *pr,cchar *lang,int of) noex {
 	    }
 	} /* end if (votdc_ctor) */
 	return rs ;
-}
-/* end subroutine (votdc_open) */
+} /* end subroutine (votdc_open) */
 
 int votdc_close(votdc *op) noex {
 	int		rs ;
@@ -339,8 +321,7 @@ int votdc_close(votdc *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (votdc_close) */
+} /* end subroutine (votdc_close) */
 
 /* loads all book-titles with one call */
 int votdc_titleloads(votdc *op,cchar *lang,cchar **tv) noex {
@@ -372,8 +353,7 @@ int votdc_titleloads(votdc *op,cchar *lang,cchar **tv) noex {
 	} /* end if (sigblock) */
 
 	return rs ;
-}
-/* end subroutine (votdc_titleloads) */
+} /* end subroutine (votdc_titleloads) */
 
 /* do we have book-titles in a language? */
 int votdc_titlelang(votdc *op,cchar *lang) noex {
@@ -404,8 +384,7 @@ int votdc_titlelang(votdc *op,cchar *lang) noex {
 	} /* end if (sigblock) */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (votdc_titlelang) */
+} /* end subroutine (votdc_titlelang) */
 
 int votdc_titleget(votdc *op,char *rbuf,int rlen,int li,int ti) noex {
 	int		rs ;
@@ -439,8 +418,7 @@ int votdc_titleget(votdc *op,char *rbuf,int rlen,int li,int ti) noex {
 	} /* end if (sigblock) */
 
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (votdc_titleget) */
+} /* end subroutine (votdc_titleget) */
 
 int votdc_titlefetch(votdc *op,char *rbuf,int rlen,cchar *lang,int ti) noex {
 	int		rs ;
@@ -486,8 +464,7 @@ int votdc_titlefetch(votdc *op,char *rbuf,int rlen,cchar *lang,int ti) noex {
 	} /* end if (sigblock) */
 
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (votdc_titlefetch) */
+} /* end subroutine (votdc_titlefetch) */
 
 int votdc_titlematch(votdc *op,cchar *lang,cchar *sp,int sl) noex {
 	int		rs ;
@@ -538,8 +515,7 @@ int votdc_titlematch(votdc *op,cchar *lang,cchar *sp,int sl) noex {
 	} /* end if (sigblock) */
 
 	return (rs >= 0) ? bi : rs ;
-}
-/* end subroutine (votdc_titlematch) */
+} /* end subroutine (votdc_titlematch) */
 
 int votdc_versefetch(votdc *op,votdc_cite *citep,char *rbuf,int rlen,
 			cchar *lang,int mjd) noex {
@@ -574,9 +550,7 @@ int votdc_versefetch(votdc *op,votdc_cite *citep,char *rbuf,int rlen,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (votdc_versefetch) */
-
+} /* end subroutine (votdc_versefetch) */
 
 int votdc_verseload(votdc *op,cc *lang,votdc_cite *citep,int mjd,
 		cc *vp,int vl) noex {
@@ -637,8 +611,7 @@ int votdc_verseload(votdc *op,cc *lang,votdc_cite *citep,int mjd,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (votdc_verseload) */
+} /* end subroutine (votdc_verseload) */
 
 int votdc_getinfo(votdc *op,VOTDC_INFO *bip) noex {
 	int		rs ;
@@ -681,24 +654,21 @@ int votdc_getinfo(votdc *op,VOTDC_INFO *bip) noex {
 	} /* end if (sigblock) */
 
 	return rs ;
-}
-/* end subroutine (votdc_getinfo) */
+} /* end subroutine (votdc_getinfo) */
 
 int votdc_vcurbegin(votdc *op,VOTDC_VCUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 	curp->i = -1 ;
 	return SR_OK ;
-}
-/* end subroutine (votdc_vcurbegin) */
+} /* end subroutine (votdc_vcurbegin) */
 
 int votdc_vcurend(votdc *op,VOTDC_VCUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 	curp->i = -1 ;
 	return SR_OK ;
-}
-/* end subroutine (votdc_vcurend) */
+} /* end subroutine (votdc_vcurend) */
 
 int votdc_vcurenum(votdc *op,VOTDC_VCUR *curp,votdc_cite *citep,
 		char *rbuf,int rlen) noex {
@@ -735,7 +705,7 @@ int votdc_vcurenum(votdc *op,VOTDC_VCUR *curp,votdc_cite *citep,
 
 /* private subroutines */
 
-static int votdc_strbegin(votdc *op,cchar *pr,cchar *lang) noex {
+local int votdc_strbegin(votdc *op,cchar *pr,cchar *lang) noex {
 	int		rs ;
 	int		sz = 0 ;
 	sz += (lenstr(pr) + 1) ;
@@ -748,10 +718,9 @@ static int votdc_strbegin(votdc *op,cchar *pr,cchar *lang) noex {
 	    bp = (strwcpy(bp,lang,-1)+1) ;
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (votdc_strbegin) */
+} /* end subroutine (votdc_strbegin) */
 
-static int votdc_strend(votdc *op) noex {
+local int votdc_strend(votdc *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->a != nullptr) {
@@ -762,10 +731,9 @@ static int votdc_strend(votdc *op) noex {
 	    op->lang = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (votdc_strend) */
+} /* end subroutine (votdc_strend) */
 
-static int votdc_shmbegin(votdc *op,int of,mode_t om) noex {
+local int votdc_shmbegin(votdc *op,int of,mode_t om) noex {
 	votdchdr	*hdrp = &op->hdr ;
 	custime		dt = getustime ;
 	cint		rsn = SR_NOENT ;
@@ -837,10 +805,9 @@ static int votdc_shmbegin(votdc *op,int of,mode_t om) noex {
 	} /* end if (ok) */
 
 	return rs ;
-}
-/* end subroutine (votdc_shmbegin) */
+} /* end subroutine (votdc_shmbegin) */
 
-static int votdc_shmbeginer(votdc *op,time_t dt,int fd,m_t om,int fninit) noex {
+local int votdc_shmbeginer(votdc *op,time_t dt,int fd,m_t om,int fninit) noex {
 	int		rs ;
 	if ((rs = votdc_mapbegin(op,dt,fd)) >= 0) {
 	    votdchdr	*hdrp = &op->hdr ;
@@ -860,10 +827,9 @@ static int votdc_shmbeginer(votdc *op,time_t dt,int fd,m_t om,int fninit) noex {
 	        votdc_mapend(op) ;
 	} /* end if (votdc_mapbegin) */
 	return rs ;
-}
-/* end subroutine (votdc_shmbeginer) */
+} /* end subroutine (votdc_shmbeginer) */
 
-static int votdc_shmend(votdc *op) noex {
+local int votdc_shmend(votdc *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapdata != nullptr) {
@@ -876,10 +842,9 @@ static int votdc_shmend(votdc *op) noex {
 	    op->fd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (votdc_shmend) */
+} /* end subroutine (votdc_shmend) */
 
-static int votdc_mapbegin(votdc *op,time_t dt,int fd) noex {
+local int votdc_mapbegin(votdc *op,time_t dt,int fd) noex {
 	int		rs = SR_INVALID ;
 	if (op && (fd >= 0)) {
 	    cnullptr	np{} ;
@@ -895,10 +860,9 @@ static int votdc_mapbegin(votdc *op,time_t dt,int fd) noex {
 	    } /* end if (map) */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (votdc_mapbegin) */
+} /* end subroutine (votdc_mapbegin) */
 
-static int votdc_mapend(votdc *op) noex {
+local int votdc_mapend(votdc *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapdata != nullptr) {
@@ -912,10 +876,9 @@ static int votdc_mapend(votdc *op) noex {
 	    op->ti_map = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (votdc_mapend) */
+} /* end subroutine (votdc_mapend) */
 
-static int votdc_shmprep(votdc *op,time_t dt,int fd,m_t om,
+local int votdc_shmprep(votdc *op,time_t dt,int fd,m_t om,
 		votdchdr *hdrp) noex {
 	int		rs ;
 	int		foff = 0 ;
@@ -933,10 +896,9 @@ static int votdc_shmprep(votdc *op,time_t dt,int fd,m_t om,
 	foff = rs ;
 
 	return (rs >= 0) ? foff : rs ;
-}
-/* end subroutine (votdc_shmprep) */
+} /* end subroutine (votdc_shmprep) */
 
-static int votdc_shmpreper(votdc *op,time_t dt,int fd,mode_t om,
+local int votdc_shmpreper(votdc *op,time_t dt,int fd,mode_t om,
 		votdchdr *hdrp) noex {
     	cint		hsz = (var.hdrbuflen + 1) ;
 	int		rs ;
@@ -964,10 +926,9 @@ static int votdc_shmpreper(votdc *op,time_t dt,int fd,mode_t om,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? foff : rs ;
-}
-/* end subroutine (votdc_shmpreper) */
+} /* end subroutine (votdc_shmpreper) */
 
-static int votdc_shmwriter(votdc *op,time_t dt,int fd,votdchdr *hdrp,
+local int votdc_shmwriter(votdc *op,time_t dt,int fd,votdchdr *hdrp,
 		cchar *hbuf,int hlen) noex {
 	filer		sfile, *sfp = &sfile ;
 	cint		bsz = 2048 ;
@@ -1076,10 +1037,9 @@ static int votdc_shmwriter(votdc *op,time_t dt,int fd,votdchdr *hdrp,
 
 	hdrp->shmsize = foff ;
 	return (rs >= 0) ? foff : rs ;
-}
-/* end subroutine (votdc_shmwriter) */
+} /* end subroutine (votdc_shmwriter) */
 
-static int votdc_shmhdrin(votdc *op,votdchdr *hdrp) noex {
+local int votdc_shmhdrin(votdc *op,votdchdr *hdrp) noex {
 	int		rs ;
 	cint		hsz = int(op->mapsize) ;
 	if ((rs = votdchdr_wr(hdrp,op->mapdata,hsz)) >= 0) {
@@ -1095,10 +1055,9 @@ static int votdc_shmhdrin(votdc *op,votdchdr *hdrp) noex {
 	    }
 	} /* end if (votdchdr_wr) */
 	return rs ;
-}
-/* end subroutine (votdc_shmhdrin) */
+} /* end subroutine (votdc_shmhdrin) */
 
-static int votdc_allocinit(votdc *op,votdchdr *hdrp) noex {
+local int votdc_allocinit(votdc *op,votdchdr *hdrp) noex {
 	int		rs ;
 	if ((rs = shmalloc_init(op->ball,op->bstr,hdrp->blenstr)) >= 0) {
 	    rs = shmalloc_init(op->vall,op->vstr,hdrp->vlenstr) ;
@@ -1107,10 +1066,9 @@ static int votdc_allocinit(votdc *op,votdchdr *hdrp) noex {
 	    }
 	} /* end if (shmalloc initialization) */
 	return rs ;
-}
-/* end subroutine (votdc_allocinit) */
+} /* end subroutine (votdc_allocinit) */
 
-static int votdc_mutexinit(votdc *op) noex {
+local int votdc_mutexinit(votdc *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if (ptma ma ; (rs = ptma_create(&ma)) >= 0) {
@@ -1123,10 +1081,9 @@ static int votdc_mutexinit(votdc *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (mutex-lock attribute) */
 	return rs ;
-}
-/* end subroutine (votdc_mutexinit) */
+} /* end subroutine (votdc_mutexinit) */
 
-static int votdc_shmchown(votdc *op) noex {
+local int votdc_shmchown(votdc *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
@@ -1147,10 +1104,9 @@ static int votdc_shmchown(votdc *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (votdc_shmchown) */
+} /* end subroutine (votdc_shmchown) */
 
-static int votdc_verify(votdc *op) noex {
+local int votdc_verify(votdc *op) noex {
 	votdchdr	*hdrp = &op->hdr ;
 	uint		ushmsz = int(op->shmsize) ;;
 	int		rs = SR_OK ;
@@ -1181,10 +1137,9 @@ static int votdc_verify(votdc *op) noex {
 	f = f && ((hdrp->vstroff + hdrp->vlenstr) < ushmsz) ;
 	if (! f) rs = SR_BADFMT ;
 	return rs ;
-}
-/* end subroutine (votdc_verify) */
+} /* end subroutine (votdc_verify) */
 
-static int votdc_shmhandbegin(votdc *op,cchar *pr) noex {
+local int votdc_shmhandbegin(votdc *op,cchar *pr) noex {
 	int		rs = SR_OK ;
 	cchar		*rn ;
 	if (int rl ; (rl = sfrootname(pr,-1,&rn)) > 0) {
@@ -1199,10 +1154,9 @@ static int votdc_shmhandbegin(votdc *op,cchar *pr) noex {
 	    rs = SR_INVALID ;
 	}
 	return rs ;
-}
-/* end subroutine (votdc_shmhandbegin) */
+} /* end subroutine (votdc_shmhandbegin) */
 
-static int votdc_shmhandend(votdc *op) noex {
+local int votdc_shmhandend(votdc *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->shmname != nullptr) {
@@ -1212,10 +1166,9 @@ static int votdc_shmhandend(votdc *op) noex {
 	    op->shmname = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (votdc_shmhandend) */
+} /* end subroutine (votdc_shmhandend) */
 
-static int votdc_bookslotload(votdc *op,time_t dt,int si,cc *lang,
+local int votdc_bookslotload(votdc *op,time_t dt,int si,cc *lang,
 		cc **tv) noex {
 	int		rs ;
 	if ((rs = votdc_getwcount(op)) >= 0) {
@@ -1225,10 +1178,9 @@ static int votdc_bookslotload(votdc *op,time_t dt,int si,cc *lang,
 	    rs = book_load(blp,bap,op->bstr,dt,wc,lang,tv) ;
 	}
 	return rs ;
-}
-/* end subroutine (votdc_bookslotload) */
+} /* end subroutine (votdc_bookslotload) */
 
-static int votdc_bookslotfind(votdc *op,cchar *lang) noex {
+local int votdc_bookslotfind(votdc *op,cchar *lang) noex {
 	votdc_book	*blp = op->books ;
 	cint		n = int(op->hdr.booklen) ;
 	int		rs = SR_OK ;
@@ -1264,10 +1216,9 @@ static int votdc_bookslotfind(votdc *op,cchar *lang) noex {
 	    }
 	} /* end if (same or not) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (votdc_bookslotfind) */
+} /* end subroutine (votdc_bookslotfind) */
 
-static int votdc_bookslotdump(votdc *op,int ei) noex {
+local int votdc_bookslotdump(votdc *op,int ei) noex {
 	int		rs ;
 	if ((rs = votdc_verselangdump(op,ei)) >= 0) {
 	    votdc_book	*blp = (op->books + ei) ;
@@ -1276,10 +1227,9 @@ static int votdc_bookslotdump(votdc *op,int ei) noex {
 	} /* end if (votdc_verselangdump) */
 
 	return rs ;
-}
-/* end subroutine (votdc_bookslotdump) */
+} /* end subroutine (votdc_bookslotdump) */
 
-static int votdc_verselangdump(votdc *op,int li) noex {
+local int votdc_verselangdump(votdc *op,int li) noex {
 	votdc_verse	*vep = op->verses ;
 	shmalloc	*vap = op->vall ;
 	cint		n = int(op->hdr.reclen) ;
@@ -1289,10 +1239,9 @@ static int votdc_verselangdump(votdc *op,int li) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (votdc_verselangdump) */
+} /* end subroutine (votdc_verselangdump) */
 
-static int votdc_booklanghave(votdc *op,cchar *lang) noex {
+local int votdc_booklanghave(votdc *op,cchar *lang) noex {
 	votdc_book	*bap = op->books ;
 	cint		n = int(op->hdr.booklen) ;
 	int		rs = SR_NOTFOUND ;
@@ -1304,10 +1253,9 @@ static int votdc_booklanghave(votdc *op,cchar *lang) noex {
 	    }
 	} /* end for */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (votdc_booklanghave) */
+} /* end subroutine (votdc_booklanghave) */
 
-static int votdc_versehave(votdc *op,int li,int mjd) noex {
+local int votdc_versehave(votdc *op,int li,int mjd) noex {
 	votdc_verse	*vep = op->verses ;
 	cint		n = int(op->hdr.reclen) ;
 	int		rs = SR_NOTFOUND ;
@@ -1317,10 +1265,9 @@ static int votdc_versehave(votdc *op,int li,int mjd) noex {
 	    if (rs != SR_NOTFOUND) break ;
 	} /* end for */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (votdc_versehave) */
+} /* end subroutine (votdc_versehave) */
 
-static int votdc_verseslotnext(votdc *op,int vi) noex {
+local int votdc_verseslotnext(votdc *op,int vi) noex {
 	votdc_verse	*vep = op->verses ;
 	cint		n = int(op->hdr.reclen) ;
 	int		rs = SR_NOTFOUND ;
@@ -1330,10 +1277,9 @@ static int votdc_verseslotnext(votdc *op,int vi) noex {
 	    if (rs != SR_NOTFOUND) break ;
 	} /* end for */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (votdc_verseslotnext) */
+} /* end subroutine (votdc_verseslotnext) */
 
-static int votdc_verseslotfind(votdc *op) noex {
+local int votdc_verseslotfind(votdc *op) noex {
 	votdc_verse	*vep = op->verses ;
 	cint		n = int(op->hdr.reclen) ;
 	int		rs = SR_NOTFOUND ;
@@ -1343,10 +1289,9 @@ static int votdc_verseslotfind(votdc *op) noex {
 	    if (rs != SR_NOTFOUND) break ;
 	} /* end for */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (votdc_verseslotfind) */
+} /* end subroutine (votdc_verseslotfind) */
 
-static int votdc_verseslotfinder(votdc *op) noex {
+local int votdc_verseslotfinder(votdc *op) noex {
 	votdc_verse	*vep = op->verses ;
 	time_t		mt = INT_MAX ;
 	cint		n = int(op->hdr.reclen) ;
@@ -1359,10 +1304,9 @@ static int votdc_verseslotfinder(votdc *op) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return (rs >= 0) ? mi : rs ;
-}
-/* end subroutine (votdc_verseslotfinder) */
+} /* end subroutine (votdc_verseslotfinder) */
 
-static int votdc_getwcount(votdc *op) noex {
+local int votdc_getwcount(votdc *op) noex {
 	int		rs ;
 	char		*mdp = (char *) op->mapdata ;
 	int		*htab ;
@@ -1371,10 +1315,9 @@ static int votdc_getwcount(votdc *op) noex {
 	wcp = intp(htab + votdchdrh_wcount) ;
 	rs = *wcp ;
 	return rs ;
-}
-/* end subroutine (votdc_getwcount) */
+} /* end subroutine (votdc_getwcount) */
 
-static int votdc_access(votdc *op) noex {
+local int votdc_access(votdc *op) noex {
 	uint		*htab ;
 	int		rs ;
 	char		*mdp = charp(op->mapdata) ;
@@ -1385,11 +1328,10 @@ static int votdc_access(votdc *op) noex {
 	    rs = *acp ;
 	}
 	return rs ;
-}
-/* end subroutine (votdc_access) */
+} /* end subroutine (votdc_access) */
 
 #if	CF_UPDATE
-static int votdc_update(votdc *op) noex {
+local int votdc_update(votdc *op) noex {
 	uint		*htab ;
 	int		rs ;
 	char		*mdp = (char *) op->mapdata ;
@@ -1400,12 +1342,11 @@ static int votdc_update(votdc *op) noex {
 	    *wcp += 1 ;
 	}
 	return rs ;
-}
-/* end subroutine (votdc_update) */
+} /* end subroutine (votdc_update) */
 #endif /* CF_UPDATE */
 
 #if	CF_GETACOUNT
-static int votdc_getacount(votdc *op) noex {
+local int votdc_getacount(votdc *op) noex {
 	uint		*htab ;
 	int		rs ;
 	int		*acp ;
@@ -1414,11 +1355,10 @@ static int votdc_getacount(votdc *op) noex {
 	acp = intp(htab + votdchdrh_acount) ;
 	rs = *acp ;
 	return rs ;
-}
-/* end subroutine (votdc_getacount) */
+} /* end subroutine (votdc_getacount) */
 #endif /* CF_GETACOUNT */
 
-static int votdc_mktitles(votdc *op,cchar *lang,int bi) noex {
+local int votdc_mktitles(votdc *op,cchar *lang,int bi) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		ci = 0 ;
@@ -1437,10 +1377,9 @@ static int votdc_mktitles(votdc *op,cchar *lang,int bi) noex {
 	    ci = rs ;
 	}
 	return (rs >= 0) ? ci : rs ;
-}
-/* end subroutine (votdc_mktitles) */
+} /* end subroutine (votdc_mktitles) */
 
-static int votdc_titlematcher(votdc *op,int ac,int ci,cc *cbuf,int cl) noex {
+local int votdc_titlematcher(votdc *op,int ac,int ci,cc *cbuf,int cl) noex {
 	VOTDC_TC	*tcp = (op->tcs+ci) ;
 	int		rs = SR_NOTFOUND ;
 	if (tcp->titles != nullptr) {
@@ -1450,10 +1389,9 @@ static int votdc_titlematcher(votdc *op,int ac,int ci,cc *cbuf,int cl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (votdc_titlematcher) */
+} /* end subroutine (votdc_titlematcher) */
 
-static int votdc_titletouse(votdc *op) noex {
+local int votdc_titletouse(votdc *op) noex {
 	VOTDC_TC	*tcp = op->tcs ;
 	int		rs = SR_OK ;
 	int		ci = -1 ;
@@ -1473,10 +1411,9 @@ static int votdc_titletouse(votdc *op) noex {
 	    } /* end for */
 	} /* end if (find oldest) */
 	return (rs >= 0) ? ci : rs ;
-}
-/* end subroutine (votdc_titletouse) */
+} /* end subroutine (votdc_titletouse) */
 
-static int votdc_titlevalid(votdc *op,int bi) noex {
+local int votdc_titlevalid(votdc *op,int bi) noex {
 	votdc_book	*bep = (op->books+bi) ;
 	int		rs ;
 	int		i = 0 ; /* return-value */
@@ -1495,10 +1432,9 @@ static int votdc_titlevalid(votdc *op,int bi) noex {
 	    if (!f) rs = SR_NOTFOUND ;
 	} /* end if (votdc_getwcount) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (votdc_titlevalid) */
+} /* end subroutine (votdc_titlevalid) */
 
-static int votdc_titlefins(votdc *op) noex {
+local int votdc_titlefins(votdc *op) noex {
 	cint		n = VOTDC_NBOOKS ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1507,10 +1443,9 @@ static int votdc_titlefins(votdc *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (votdc_titlefins) */
+} /* end subroutine (votdc_titlefins) */
 
-static int verse_dump(votdc_verse *vep,shmalloc *vap,int li) noex {
+local int verse_dump(votdc_verse *vep,shmalloc *vap,int li) noex {
 	int		rs = SR_OK ;
 	li &= UCHAR_MAX ;
 	if ((vep->lang == li) && (vep->vlen > 0)) {
@@ -1524,19 +1459,17 @@ static int verse_dump(votdc_verse *vep,shmalloc *vap,int li) noex {
 	    } /* end if (shmalloc_free) */
 	}
 	return rs ;
-}
-/* end subroutine (verse_dump) */
+} /* end subroutine (verse_dump) */
 
-static int verse_match(votdc_verse *vep,int li,int mjd) noex {
+local int verse_match(votdc_verse *vep,int li,int mjd) noex {
 	int		rs = SR_NOTFOUND ;
 	if ((vep->lang == li) && (vep->mjd == mjd)) {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (verse_match) */
+} /* end subroutine (verse_match) */
 
-static int verse_read(votdc_verse *vep,char *vstr,votdc_cite *citep,
+local int verse_read(votdc_verse *vep,char *vstr,votdc_cite *citep,
 		char *rbuf,int rlen) noex {
 	int		rs ;
 	citep->b = vep->book ;
@@ -1545,17 +1478,15 @@ static int verse_read(votdc_verse *vep,char *vstr,votdc_cite *citep,
 	citep->l = vep->lang ;
 	rs = sncpy1(rbuf,rlen,(vstr+vep->voff)) ;
 	return rs ;
-}
-/* end subroutine (verse_read) */
+} /* end subroutine (verse_read) */
 
-static int verse_accessed(votdc_verse *vep,time_t dt) noex {
+local int verse_accessed(votdc_verse *vep,time_t dt) noex {
 	int		rs = SR_OK ;
 	vep->atime = dt ;
 	return rs ;
-}
-/* end subroutine (verse_accessed) */
+} /* end subroutine (verse_accessed) */
 
-static int verse_load(votdc_verse *vep,time_t dt,int wm,shmalloc *vap,
+local int verse_load(votdc_verse *vep,time_t dt,int wm,shmalloc *vap,
 		char *vstr,votdc_cite *citep,int mjd,cc *valp,int vall) noex {
 	int		rs ;
 	int		voff = 0 ;
@@ -1577,34 +1508,30 @@ static int verse_load(votdc_verse *vep,time_t dt,int wm,shmalloc *vap,
 	    strwcpy(bp,valp,vall) ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? voff : rs ;
-}
-/* end subroutine (verse_load) */
+} /* end subroutine (verse_load) */
 
-static int verse_isempty(votdc_verse *vep) noex {
+local int verse_isempty(votdc_verse *vep) noex {
 	int		rs = SR_OK ;
 	if (vep->mjd > 0) rs = SR_NOTFOUND ;
 	return rs ;
-}
-/* end subroutine (verse_isempty) */
+} /* end subroutine (verse_isempty) */
 
-static int verse_isused(votdc_verse *vep) noex {
+local int verse_isused(votdc_verse *vep) noex {
 	int		rs = SR_OK ;
 	if (vep->mjd == 0) rs = SR_NOTFOUND ;
 	return rs ;
-}
-/* end subroutine (verse_isused) */
+} /* end subroutine (verse_isused) */
 
-static int verse_isleast(votdc_verse *vep,time_t *tp) noex {
+local int verse_isleast(votdc_verse *vep,time_t *tp) noex {
 	int		rs = 0 ;
 	if ((vep->mjd == 0) || (vep->atime < *tp)) {
 	    rs = 1 ;
 	    *tp = vep->atime ;
 	}
 	return rs ;
-}
-/* end subroutine (verse_isleast) */
+} /* end subroutine (verse_isleast) */
 
-static int book_load(votdc_book *blp,shmalloc *bap,char *bsp,time_t dt,
+local int book_load(votdc_book *blp,shmalloc *bap,char *bsp,time_t dt,
 		int wm,cchar *lang,cchar **tv) noex {
     	cint		n = VOTDC_NTITLES ;
 	int		rs = SR_OK ;
@@ -1623,10 +1550,9 @@ static int book_load(votdc_book *blp,shmalloc *bap,char *bsp,time_t dt,
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (book_load) */
+} /* end subroutine (book_load) */
 
-static int book_dump(votdc_book *blp,shmalloc *bap) noex {
+local int book_dump(votdc_book *blp,shmalloc *bap) noex {
     	cint		n = VOTDC_NTITLES ;
 	int		rs = SR_OK ;
 	blp->ctime = 0 ;
@@ -1640,39 +1566,35 @@ static int book_dump(votdc_book *blp,shmalloc *bap) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (book_dump) */
+} /* end subroutine (book_dump) */
 
-static int book_getwmark(votdc_book *bep) noex {
+local int book_getwmark(votdc_book *bep) noex {
 	int		rs = SR_NOTFOUND ;
 	if (bep->lang[0] != '\0') {
 	    rs = bep->wmark ;
 	}
 	return rs ;
-}
-/* end subroutine (book_getwmark) */
+} /* end subroutine (book_getwmark) */
 
-static int book_getwmarklang(votdc_book *bep,cchar **lpp) noex {
+local int book_getwmarklang(votdc_book *bep,cchar **lpp) noex {
 	int		rs = SR_NOTFOUND ;
 	if (bep->lang[0] != '\0') {
 	    if (lpp != nullptr) *lpp = bep->lang ;
 	    rs = bep->wmark ;
 	}
 	return rs ;
-}
-/* end subroutine (book_getwmarklang) */
+} /* end subroutine (book_getwmarklang) */
 
-static int book_read(votdc_book *bep,char *bstr,int ac,char *rbuf,int rlen,
+local int book_read(votdc_book *bep,char *bstr,int ac,char *rbuf,int rlen,
 		int ti) noex {
 	cint		boff = bep->b[ti] ;
 	int		rs ;
 	bep->amark = ac ;
 	rs = sncpy1(rbuf,rlen,(bstr+boff)) ;
 	return rs ;
-}
-/* end subroutine (book_read) */
+} /* end subroutine (book_read) */
 
-static int titlecache_load(VOTDC_TC *tcp,int wm,cc *lang,
+local int titlecache_load(VOTDC_TC *tcp,int wm,cc *lang,
 		char *bstr,int *boffs) noex {
 	cint		n = VOTDC_NTITLES ;
 	int		rs ;
@@ -1699,10 +1621,9 @@ static int titlecache_load(VOTDC_TC *tcp,int wm,cc *lang,
 	    tcp->titles[i] = nullptr ;
 	} /* end if (m-a) */
 	return rs ;
-}
-/* end subroutine (titlecache_load) */
+} /* end subroutine (titlecache_load) */
 
-static int titlecache_release(VOTDC_TC *tcp) noex {
+local int titlecache_release(VOTDC_TC *tcp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (tcp->a != nullptr) ylikely {
@@ -1715,8 +1636,7 @@ static int titlecache_release(VOTDC_TC *tcp) noex {
 	tcp->wmark = 0 ;
 	tcp->amark = 0 ;
 	return rs ;
-}
-/* end subroutine (titlecache_release) */
+} /* end subroutine (titlecache_release) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -1728,7 +1648,6 @@ vars::operator int () noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
