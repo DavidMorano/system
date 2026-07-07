@@ -221,11 +221,11 @@ extern "C" {
 
 /* exported variables */
 
-extern const cmimk_obj	cmimk_modinfo = {
+const cmimk_obj	cmimk_modinfo = {
 	"cmimk",
 	szof(cmimk),
 	0
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -263,8 +263,7 @@ int cmimk_open(cmimk *op,cchar *dbname,int of,mode_t om) noex {
 	    }
 	} /* end if (cmimk_ctor) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (cmimk_open) */
+} /* end subroutine (cmimk_open) */
 
 int cmimk_close(cmimk *op) noex {
 	int		rs ;
@@ -313,8 +312,7 @@ int cmimk_close(cmimk *op) noex {
 	op->magic = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? nents : rs ;
-}
-/* end subroutine (cmimk_close) */
+} /* end subroutine (cmimk_close) */
 
 int cmimk_setdb(cmimk *op,size_t size_db,time_t ti_db) noex {
     	int		rs ;
@@ -323,8 +321,7 @@ int cmimk_setdb(cmimk *op,size_t size_db,time_t ti_db) noex {
 	    op->ti_db = ti_db ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cmimk_setdb) */
+} /* end subroutine (cmimk_setdb) */
 
 int cmimk_add(cmimk *op,CMIMK_ENT *bvp) noex {
 	int		rs ;
@@ -359,8 +356,7 @@ int cmimk_add(cmimk *op,CMIMK_ENT *bvp) noex {
 	} /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cmimk_add) */
+} /* end subroutine (cmimk_add) */
 
 int cmimk_abort(cmimk *op,int f) noex {
     	int		rs ;
@@ -368,8 +364,7 @@ int cmimk_abort(cmimk *op,int f) noex {
 	    op->fl.abort = !!f ;
 	}
 	return rs ;
-}
-/* end subroutine (cmimk_abort) */
+} /* end subroutine (cmimk_abort) */
 
 int cmimk_getinfo(cmimk *op,cmimk_info *bip) noex {
 	int		rs ;
@@ -382,8 +377,7 @@ int cmimk_getinfo(cmimk *op,cmimk_info *bip) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? nents : rs ;
-}
-/* end subroutine (cmimk_getinfo) */
+} /* end subroutine (cmimk_getinfo) */
 
 
 /* private subroutines */
@@ -398,8 +392,7 @@ local int cmimk_filesbegin(cmimk *op) noex {
 	    c = rs ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (cmimk_filesbegin) */
+} /* end subroutine (cmimk_filesbegin) */
 
 local int cmimk_filesbeginc(cmimk *op) noex {
 	cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
@@ -427,8 +420,7 @@ local int cmimk_filesbeginc(cmimk *op) noex {
 	    } /* end if (ok) */
 	} /* end if (mknewfname) */
 	return rs ;
-}
-/* end subroutine (cmimk_filesbeginc) */
+} /* end subroutine (cmimk_filesbeginc) */
 
 local int cmimk_filesbeginwait(cmimk *op) noex {
 	int		rs ;
@@ -455,8 +447,7 @@ local int cmimk_filesbeginwait(cmimk *op) noex {
 	    }
 	} /* end if (mknewfname) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (cmimk_filesbeginwait) */
+} /* end subroutine (cmimk_filesbeginwait) */
 
 local int cmimk_filesbegincreate(cmimk *op,cchar *tfn,int of,mode_t om) noex {
 	int		rs ;
@@ -471,8 +462,7 @@ local int cmimk_filesbegincreate(cmimk *op,cchar *tfn,int of,mode_t om) noex {
 	} /* end if (create) */
 
 	return rs ;
-}
-/* end subroutine (cmimk_filesbegincreate) */
+} /* end subroutine (cmimk_filesbegincreate) */
 
 local int cmimk_filesend(cmimk *op) noex {
 	int		rs = SR_OK ;
@@ -494,29 +484,23 @@ local int cmimk_filesend(cmimk *op) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (cmimk_filesend) */
+} /* end subroutine (cmimk_filesend) */
 
-local int cmimk_listbegin(cmimk *op,int n) noex {
+local int cmimk_listbegin(cmimk *op,int vn) noex {
 	int		rs ;
-	int		sz ;
-	int		opts ;
-
-	opts = 0 ;
-	opts |= VECOBJ_OCOMPACT ;
-	opts |= VECOBJ_OORDERED ;
-	opts |= VECOBJ_OSTATIONARY ;
-	sz = szof(struct cmentry) ;
-	if ((rs = vecobj_start(op->elp,sz,n,opts)) >= 0) {
-	    rs = vecobj_start(op->llp,sz,(n * 2),opts) ;
+	int		sz = szof(cmentry) ;
+	int		vo = 0 ;
+	vo |= vecobjm.compact ;
+	vo |= vecobjm.ordered ;
+	vo |= vecobjm.stationary ;
+	if ((rs = vecobj_start(op->elp,sz,vn,vo)) >= 0) {
+	    rs = vecobj_start(op->llp,sz,(vn * 2),opts) ;
 	    if (rs < 0) {
 	        vecobj_finish(op->elp) ;
-	    }
+	    } /* end if (error) */
 	}
-
 	return rs ;
-}
-/* end subroutine (cmimk_listbegin) */
+} /* end subroutine (cmimk_listbegin) */
 
 local int cmimk_listend(cmimk *op) noex {
 	int		rs = SR_OK ;
@@ -530,8 +514,7 @@ local int cmimk_listend(cmimk *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (cmimk_listend) */
+} /* end subroutine (cmimk_listend) */
 
 local int cmimk_mkidx(cmimk *op) noex {
 	int		rs ;
@@ -571,8 +554,7 @@ local int cmimk_mkidx(cmimk *op) noex {
 	} /* end if (cmimk_nidx) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cmimk_mkidx) */
+} /* end subroutine (cmimk_mkidx) */
 
 local int cmimk_mkidxwrmain(cmimk *op,cmihdr *hdrp) noex {
 	filer		hf, *hfp = &hf ;
@@ -599,8 +581,7 @@ local int cmimk_mkidxwrmain(cmimk *op,cmihdr *hdrp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
 	return (rs >= 0) ? off : rs ;
-}
-/* end subroutine (cmimk_mkidxwrmain) */
+} /* end subroutine (cmimk_mkidxwrmain) */
 
 local int cmimk_mkidxwrhdr(cmimk *op,cmihdr *hdrp,filer *hfp) noex {
 	int		rs = SR_FAULT ;
@@ -614,8 +595,7 @@ local int cmimk_mkidxwrhdr(cmimk *op,cmihdr *hdrp,filer *hfp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cmimk_mkidxwrhdr) */
+} /* end subroutine (cmimk_mkidxwrhdr) */
 
 local int cmimk_mkidxwrents(cmimk *op,cmihdr *hdrp,filer *hfp,int off) noex {
 	uint		a[4] ;
@@ -640,8 +620,7 @@ local int cmimk_mkidxwrents(cmimk *op,cmihdr *hdrp,filer *hfp,int off) noex {
 	} /* end for */
 	hdrp->vilen = n ;
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cmimk_mkidxwrents) */
+} /* end subroutine (cmimk_mkidxwrents) */
 
 local int cmimk_mkidxwrlines(cmimk *op,cmihdr *hdrp,filer *hfp,int off) noex {
 	uint		a[4] ;
@@ -664,8 +643,7 @@ local int cmimk_mkidxwrlines(cmimk *op,cmihdr *hdrp,filer *hfp,int off) noex {
 	} /* end for */
 	hdrp->vllen = n ;
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (cmimk_mkidxwrlines) */
+} /* end subroutine (cmimk_mkidxwrlines) */
 
 local int cmimk_nidxopen(cmimk *op) noex {
 	int		rs ;
@@ -704,8 +682,7 @@ local int cmimk_nidxopen(cmimk *op) noex {
 	    fd = rs ;
 	}
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (cmimk_nidxopen) */
+} /* end subroutine (cmimk_nidxopen) */
 
 local int cmimk_nidxclose(cmimk *op) noex {
 	int		rs = SR_OK ;
@@ -716,8 +693,7 @@ local int cmimk_nidxclose(cmimk *op) noex {
 	    op->nfd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (cmimk_nidxclose) */
+} /* end subroutine (cmimk_nidxclose) */
 
 local int cmimk_renamefiles(cmimk *op) noex {
 	int		rs ;
@@ -735,15 +711,13 @@ local int cmimk_renamefiles(cmimk *op) noex {
 	} /* end if (mkfnamesuf) */
 
 	return rs ;
-}
-/* end subroutine (cmimk_renamefiles) */
+} /* end subroutine (cmimk_renamefiles) */
 
 local int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf) noex {
 	cchar		*end = ENDIANSTR ;
 	cchar		*fin = (type) ? "xXXXX" : "n" ;
 	return mkfnamesuf3(tbuf,dbn,suf,end,fin) ;
-}
-/* end subroutine (mknewfname) */
+} /* end subroutine (mknewfname) */
 
 local int unlinkstale(cchar *fn,int to) noex {
 	custime		dt = getustime ;
@@ -759,14 +733,13 @@ local int unlinkstale(cchar *fn,int to) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (unlinkstale) */
+} /* end subroutine (unlinkstale) */
 
 local int entcmp(cmentry *e1p,cmentry *e2p) noex {
 	int	c1 = int(e1p->cn) ;
 	int	c2 = int(e2p->cn) ;
 	return (c1 - c2) ;
-}
+} /* end subroutine */
 
 local int vvecmp(cvoid **v1p,cvoid **v2p) noex {
 	cmentry	**e1pp = (cmentry **) v1p ;
