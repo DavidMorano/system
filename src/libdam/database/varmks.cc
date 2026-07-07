@@ -625,7 +625,7 @@ local int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,filer *hfp,int off) noex {
 	hdrp->rtlen = rtl ;
 	size = ((rtl + 1) * 2 * szof(uint)) ;
 	if ((rs = filer_write(hfp,rt,size)) >= 0) {
-	    STRTAB	*ksp = &op->keys ;
+	    strtab	*ksp = &op->keys ;
 	    char	*kstab = nullptr ;
 	    off += rs ;
 	    wlen += rs ;
@@ -679,13 +679,12 @@ int varmks_mkind(varmks *op,cc *kst,int (*it)[3],int il) noex {
 
 #if	CF_FIRSTHASH
 	{
-	    struct varentry	*vep ;
-	    VECOBJ		ves ;
-	    int			size, opts ;
-
-	    size = szof(struct varentry) ;
-	    opts = VECOBJ_OCOMPACT ;
-	    if ((rs = vecobj_start(&ves,size,rtl,opts)) >= 0) {
+	    varentry	*vep ;
+	    vecobj	ves ;
+	    int		sz = szof(varentry) ;
+	    int		opts ;
+	    opts = vecobjm.compact ;
+	    if ((rs = vecobj_start(&ves,sz,rtl,opts)) >= 0) {
 
 	        for (ri = 1 ; ri < rtl ; ri += 1) {
 
@@ -767,17 +766,17 @@ int varmks_mkind(varmks *op,cc *kst,int (*it)[3],int il) noex {
 } /* end subroutine (varmks_mkind) */
 
 local int varmks_mkstrtab(VARMKS *op,VARHDR *hdrp,filer *hfp,int off) noex {
-	STRTAB		*vsp = &op->vals ;
+	strtab		*vsp = &op->vals ;
 	int		rs ;
-	int		size ;
-	int		wlen = 0 ;
+	int		sz ;
+	int		wlen = 0 ; /* return-value */
 	char		*vstab ;
-	    size = strtab_strsize(vsp) ;
+	    sz = strtab_strsize(vsp) ;
 	    hdrp->vsoff = off ;
-	    hdrp->vslen = size ;
-	    if ((rs = uc_malloc(size,&vstab)) >= 0) {
-	        if ((rs = strtab_strmk(vsp,vstab,size)) >= 0) {
-	            rs = filer_write(hfp,vstab,size) ;
+	    hdrp->vslen = sz ;
+	    if ((rs = uc_malloc(sz,&vstab)) >= 0) {
+	        if ((rs = strtab_strmk(vsp,vstab,sz)) >= 0) {
+	            rs = filer_write(hfp,vstab,sz) ;
 	            off += rs ;
 		    wlen += rs ;
 	        }
