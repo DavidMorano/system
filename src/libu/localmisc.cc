@@ -2,17 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* standard (relatively) UNIX® preprocessor defiitions */
+/* miscellaneous pre-processor definitions */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-02-15, David A­D­ Morano
-	This code is newly written but modeled after some code that
-	was originally written to get some standardized variable
-	serialization for the Ethernet-Controller (ETHCON) development
-	work.
+	This code is a collection of miscellaneious pre-processor
+	defintions that were eidely used on the various embedded
+	code projects and also on many of the support tool projects.
 
 */
 
@@ -28,13 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+
+#include	"localmisc.h"
 
 
 /* local defines */
