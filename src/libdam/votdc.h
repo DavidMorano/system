@@ -160,6 +160,8 @@ extern int votdc_close(votdc *) noex ;
 
 EXTERNC_end
 
+extern const votdc_obj		votdc_modinfo ;
+
 
 #endif /* VOTDC_INCLUDE */
 
