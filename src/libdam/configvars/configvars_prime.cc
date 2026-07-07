@@ -195,7 +195,7 @@ int configvars_open(configvars *cvp,cchar *cfn,vecobj *eep) noex {
 	                vip = cvp->setp ;
 		        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	            	    vip = cvp->expp ;
-			    vo = VECOBJ_OSORTED ;
+			    vo = vecobjm.sorted ;
 			    if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	                        vip = cvp->unvp ;
 				if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
@@ -212,28 +212,27 @@ int configvars_open(configvars *cvp,cchar *cfn,vecobj *eep) noex {
 				} /* end if (unv) */
 				if (rs < 0) {
 			            vecobj_finish(cvp->expp) ;
-				}
+				} /* end if (error) */
 			    } /* end if (exp) */
 			    if (rs < 0) {
 				vecobj_finish(cvp->setp) ;
-			    }
+			    } /* end if (error) */
 			} /* end if (set) */
 			if (rs < 0) {
 			    vecobj_finish(cvp->defp) ;
-			}
+			} /* end if (error) */
 		    } /* end if (def) */
 		    if (rs < 0) {
 			vecobj_finish(cvp->varp) ;
-		    }
+		    } /* end if (error) */
 		} /* end if (var) */
 		if (rs < 0) {
 		    vecobj_finish(cvp->fesp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (fes) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (configvars_open) */
+} /* end subroutine (configvars_open) */
 
 int configvars_close(CV *cvp) noex {
 	int		rs  ;
@@ -254,8 +253,7 @@ int configvars_close(CV *cvp) noex {
 	    cvp->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (configvars_close) */
+} /* end subroutine (configvars_close) */
 
 int configvars_addfile(CV *cvp,cchar *cfname,vecobj *eep) noex {
 	int		rs ;
