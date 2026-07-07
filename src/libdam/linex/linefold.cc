@@ -121,7 +121,7 @@ local int linefold_dtor(linefold *op) noex {
 	    if (op->llp) ylikely {
 		delete op->llp ;
 		op->llp = nullptr ;
-	    }
+	    } /* emd if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (linefold_dtor) */
@@ -162,7 +162,7 @@ int linefold_start(linefold *op,int cols,int ind,cchar *lbuf,int llen) noex {
 	    if ((rs = argcols(cols)) >= 0) {
 	        cint	sz = szof(liner) ;
 		cint	ne = 10 ;
-	        cint	vo = (VECOBJ_OCOMPACT) ;
+	        cint	vo = (vecobjm.compact) ;
 		cols = rs ;
 	        if ((rs = vecobj_start(op->llp,sz,ne,vo)) >= 0) {
 		    cint	ll = rmeol(lbuf,llen) ;
@@ -180,8 +180,7 @@ int linefold_start(linefold *op,int cols,int ind,cchar *lbuf,int llen) noex {
 	    }
 	} /* end if (linefold_ctor) */
 	return (rs >= 0) ? nlines : rs ;
-}
-/* end subroutine (linefold_start) */
+} /* end subroutine (linefold_start) */
 
 int linefold_finish(linefold *op) noex {
 	int		rs ;
@@ -198,8 +197,7 @@ int linefold_finish(linefold *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (linefold_finish) */
+} /* end subroutine (linefold_finish) */
 
 int linefold_get(linefold *op,int li,cchar **rpp) noex {
 	int		rs ;
@@ -220,8 +218,7 @@ int linefold_get(linefold *op,int li,cchar **rpp) noex {
 	    *rpp = (rs >= 0) ? rp : nullptr ;
 	}
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (linefold_get) */
+} /* end subroutine (linefold_get) */
 
 int linefold_getln(linefold *op,int li,cchar **rpp) noex {
 	int		rs ;
@@ -244,8 +241,7 @@ int linefold_getln(linefold *op,int li,cchar **rpp) noex {
 	    *rpp = ((rs >= 0) && (ll > 0)) ? rp : nullptr ;
 	}
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (linefold_getln) */
+} /* end subroutine (linefold_getln) */
 
 int linefold_count(linefold *op) noex {
 	int		rs ;
@@ -256,8 +252,7 @@ int linefold_count(linefold *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (linefold_count) */
+} /* end subroutine (linefold_count) */
 
 
 /* private subroutines */
@@ -285,8 +280,7 @@ local int linefold_process(linefold *op,int cols,int ind,
 	    }
 	} /* end if (params_load) */
 	return (rs >= 0) ? nline : rs ;
-}
-/* end subroutine (linefold_process) */
+} /* end subroutine (linefold_process) */
 
 local int params_load(params *pp,int cols,int ind) noex {
 	int		rs = SR_FAULT ;
@@ -296,8 +290,7 @@ local int params_load(params *pp,int cols,int ind) noex {
 	    pp->ind = ind ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (params_load) */
+} /* end subroutine (params_load) */
 
 local int params_nextline(params *pp,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_OK ;
@@ -327,13 +320,11 @@ local int params_nextline(params *pp,cchar *sp,int sl,cchar **rpp) noex {
 	    pp->nline += 1 ;
 	}
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (params_nextline) */
+} /* end subroutine (params_nextline) */
 
 local int params_nline(params *pp) noex {
 	return pp->nline ;
-}
-/* end subroutine (params_nline) */
+} /* end subroutine (params_nline) */
 
 local int argcols(int cols) noex {
 	cchar		*vncols = varname.columns ;
@@ -348,8 +339,7 @@ local int argcols(int cols) noex {
 	    }
 	} /* end if (default cols) */
 	return (rs >= 0) ? cols : rs ;
-}
-/* end subroutine (argcols) */
+} /* end subroutine (argcols) */
 
 local int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	int		pl = 0 ;
