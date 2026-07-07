@@ -15,6 +15,24 @@
 
 /* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Group:
+	typecodes
+
+	Description:
+	What (the ??) is a "typecode"?  A typecode is a value that
+	is the log-base-2 of the size of a type in bytes.  So, for
+	example, the typecode for a 'char' type is '0'.  Why?
+	Because the size in bytes of the 'char' type is '1' and the
+	value (number base) of two raised to the power of zero ('0')
+	is the resulting value of '1', the size in bytes of the
+	type 'char'.  OK, so you get the idea.  So the "typecode"
+	for the type 'short' is '1', et cetera.  Where are typeocodes
+	used or needed?  That is the subject of another explanation.
+
+*******************************************************************************/
+
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
