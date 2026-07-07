@@ -306,26 +306,24 @@ int calyears_open(CALYEARS *op,cchar *pr,cchar **dns,cchar **cns) noex {
 	int		c = 0 ;
 	if (op && pr) {
 	    rs = SR_INVALID ;
+	    memclear(op) ;
+	    if (op->tmpdname == np) op->tmpdname = getenver(VARTMPDNAME) ;
+	    if (op->tmpdname == np) op->tmpdname = TMPDNAME ;
 	    if (pr[0]) {
-		static cint rsv = var ;
-	        memclear(op) ;
-	        if (op->tmpdname == np) op->tmpdname = getenv(VARTMPDNAME) ;
-	        if (op->tmpdname == np) op->tmpdname = TMPDNAME ;
-		if ((rs = rsv) >= 0) {
+		if (static cint rsv = var ; (rs = rsv) >= 0) {
  		    rs = calyears_opener(op,pr,dns,cns) ;
 		    c = rs ;
 		} /* end if (vars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (calyears_open) */
+} /* end subroutine (calyears_open) */
 
 local int calyears_opener(calyears *op,cc *pr,cc **dns,cc **) noex {
     	int		rs ;
 	if ((rs = calyears_argbegin(op,pr)) >= 0) {
 	    cint	vn = 20 ;
-	    cint	vo = VECHAND_OSTATIONARY ;
+	    cint	vo = vechandm.stationary ;
 	    if ((rs = vechand_start(&op->cals,vn,vo)) >= 0) {
 		if ((rs = vechand_start(&op->doms,1,0)) >= 0) {
 		    custime	dt = time(nullptr) ;
@@ -385,8 +383,7 @@ int calyears_close(CALYEARS *op) noex {
 	op->nentries = 0 ;
 	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (calyears_close) */
+} /* end subroutine (calyears_close) */
 
 int calyears_count(CALYEARS *op) noex {
 	int		rs ;
@@ -400,8 +397,7 @@ int calyears_count(CALYEARS *op) noex {
 	rs = op->nentries ;
 
 	return rs ;
-}
-/* end subroutine (calyears_count) */
+} /* end subroutine (calyears_count) */
 
 int calyears_audit(CALYEARS *op) noex {
 	CALMGR		*calp ;
@@ -423,8 +419,7 @@ int calyears_audit(CALYEARS *op) noex {
 	} /* end for */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (calyears_audit) */
+} /* end subroutine (calyears_audit) */
 
 int calyears_curbegin(CALYEARS *op,CALYEARS_CUR *curp) noex {
 
@@ -440,8 +435,7 @@ int calyears_curbegin(CALYEARS *op,CALYEARS_CUR *curp) noex {
 	op->ncursors += 1 ;
 	curp->magval = CALYEARS_MAGIC ;
 	return SR_OK ;
-}
-/* end subroutine (calyears_curbegin) */
+} /* end subroutine (calyears_curbegin) */
 
 int calyears_curend(CALYEARS *op,CALYEARS_CUR *curp) noex {
 	int		rs = SR_OK ;
@@ -471,8 +465,7 @@ int calyears_curend(CALYEARS *op,CALYEARS_CUR *curp) noex {
 	curp->i = 0 ;
 	curp->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (calyears_curend) */
+} /* end subroutine (calyears_curend) */
 
 int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp) noex {
 	int		rs = SR_OK ;
@@ -505,12 +498,11 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp) noex {
 	}
 
 	if (rs >= 0) {
-	    vecobj	res ;
 	    cint	sz = szof(CALENT) ;
 	    int 	vo = 0 ;
-	    vo |= VECOBJ_OORDERED ;
-	    vo |= VECOBJ_OSTATIONARY ;
-	    if ((rs = vecobj_start(&res,sz,0,vo)) >= 0) {
+	    vo |= vecobjm.ordered ;
+	    vo |= vecobjm.stationary ;
+	    if (vecobj res ; (rs = vecobj_start(&res,sz,0,vo)) >= 0) {
 	        CALMGR		*calp ;
 	        vechand		*clp = &op->cals ;
 	        int		i ;
@@ -537,8 +529,7 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp) noex {
 	} /* end if (ok) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (calyears_lookcite) */
+} /* end subroutine (calyears_lookcite) */
 
 int calyears_read(CALYEARS *op,CALYEARS_CUR *curp,CALYEARS_CITE *qp,
 		char *rbuf,int rlen) noex {
@@ -576,8 +567,7 @@ int calyears_read(CALYEARS *op,CALYEARS_CUR *curp,CALYEARS_CITE *qp,
 	    rs = SR_NOTFOUND ;
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (calyears_read) */
+} /* end subroutine (calyears_read) */
 
 int calyears_check(CALYEARS *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -592,8 +582,7 @@ int calyears_check(CALYEARS *op,time_t dt) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (calyears_check) */
+} /* end subroutine (calyears_check) */
 
 int calyears_already(CALYEARS *op,vecobj *rlp,CALENT *ep) noex {
 	uint		nhash, ohash ;
@@ -619,8 +608,7 @@ int calyears_already(CALYEARS *op,vecobj *rlp,CALENT *ep) noex {
 	} /* end if (calyears_gethash) */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (calyears_already) */
+} /* end subroutine (calyears_already) */
 
 int calyears_havestart(CALYEARS *op,CALCITE *qp,int y,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
@@ -673,8 +661,7 @@ int calyears_havestart(CALYEARS *op,CALCITE *qp,int y,cchar *lp,int ll) noex {
 	} /* end if (not-white) */
 
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (calyears_havestart) */
+} /* end subroutine (calyears_havestart) */
 
 
 /* private subroutines */
@@ -794,7 +781,6 @@ local int calyears_calsdestroy(CALYEARS *op) noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
-
 	return rs ;
 } /* end subroutine (calyears_calsdestroy) */
 
@@ -871,9 +857,8 @@ local int calyears_domerfins(CALYEARS *op) noex {
 	vechand		*dlp = &op->doms ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
 	int		c = 0 ;
-	for (i = 0 ; vechand_get(dlp,i,&dep) >= 0 ; i += 1) {
+	for (int i = 0 ; vechand_get(dlp,i,&dep) >= 0 ; i += 1) {
 	    if (dep != nullptr) {
 		c += 1 ;
 		rs1 = calyears_domerend(op,dep) ;
@@ -986,7 +971,6 @@ local int calyears_getcalbase(CALYEARS *op,CALENT *ep,cchar **rpp) noex {
 
 local int calyears_loadbuf(CALYEARS *op,char *rbuf,int rlen,CALENT *ep) noex {
 	int		rs ;
-
 	if ((rs = calent_getci(ep)) >= 0) {
 	    CALMGR	*calp ;
 	    vechand	*ilp = &op->cals ;
@@ -995,42 +979,36 @@ local int calyears_loadbuf(CALYEARS *op,char *rbuf,int rlen,CALENT *ep) noex {
 	        rs = calmgr_loadbuf(calp,rbuf,rlen,ep) ;
 	    }
 	}
-
 	return rs ;
 } /* end subroutine (calyears_loadbuf) */
 
 #if	CF_TRANSHOL
 local int calyears_transhol(CALYEARS *op,CALCITE *qp,int y,
 		cc *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs ;
-	int		nl ;
-	int		f_negative = false ;
-	int		f_found = false ;
-	cchar	*tp ;
-	cchar	*np ;
+	int		nal = 0 ;
+	int		f_found = false ; /* return-value */
+	bool		f_negative = false ;
+	cchar		*nap = nullptr ;
 
 	qp->m = 0 ;
 	qp->d = 0 ;
-	qp->y = (ushort) y ;
+	qp->y = ushort(y) ;
 
-	np = nullptr ;
-	nl = 0 ;
-	if ((tp = strnbrk(sp,sl,"+-")) != nullptr) {
-	    np = (tp + 1) ;
-	    nl = (sl - ((tp + 1) - sp)) ;
-	    sl = (tp - sp) ;
+	if (cchar *tp ; (tp = strnbrk(sp,sl,"+-")) != np) {
+	    nap = (tp + 1) ;
+	    nal = (sl - intconv((tp + 1) - sp)) ;
+	    sl = intconv(tp - sp) ;
 	    f_negative = (tp[0] == '-') ;
 	}
-
 	if ((rs = calyears_dayname(op,qp,y,sp,sl)) > 0) {
 	    f_found = true ;
 	    if (nl > 0) {
-	        if (int odays{} ; (rs = cfdeci(np,nl,&odays)) >= 0) {
-		    TMTIME	tm ;
+	        if (int odays{} ; (rs = cfdeci(nap,nal,&odays)) >= 0) {
 	            time_t	t = time(nullptr) ;
-
-	            if (f_negative) odays = (- odays) ;
-
+	            if (f_negative) odays = (neg odays) ;
+		    iTMTIME	tm ;
 		    if ((rs = tmtime_timelocal(&tm,t)) >= 0) {
 	                tm.isdst = -1 ;
 	                tm.gmtoff = op->gmtoff ;
@@ -1056,14 +1034,13 @@ local int calyears_dayname(CALYEARS *op,CALCITE *qp,int y,
 		cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if ((rs = calyears_holidayer(op)) > 0) {
 	    HOLIDAYER		*holp = &op->hols ;
-	    HOLIDAYER_CUR	hcur ;
 	    HOLIDAYER_CITE	hc ;
 	    cint		hlen = HOLBUFLEN ;
 	    char		hbuf[HOLBUFLEN + 1] ;
-
+	    HOLIDAYER_CUR	hcur ;
 	    if ((rs = holidayer_curbegin(holp,&hcur)) >= 0) {
 		cint	rsn = SR_NOTFOUND ;
 
@@ -1076,7 +1053,6 @@ local int calyears_dayname(CALYEARS *op,CALCITE *qp,int y,
 	        } else if (rs == rsn) {
 		    rs = SR_OK ;
 		}
-
 	        rs1 = holidayer_curend(holp,&hcur) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (holidayer-cur) */
@@ -1116,23 +1092,18 @@ local int calyears_checkupdate(CALYEARS *op,time_t dt) noex {
 	            f = f || (sb.st_mtime > op->ti_db) ;
 		    f = f || (sb.st_mtime > op->ti_map) ;
 		    if (f) {
-	                SI	si ;
-
 	                calyears_dbloadend(op) ;
-
-	                if ((rs = subinfo_start(&si,op,0)) >= 0) {
-
-	                    rs = calyears_dbloadbegin(op,&si) ;
-
+	                if (SI si ; (rs = subinfo_start(&si,op,0)) >= 0) {
+			    {
+	                        rs = calyears_dbloadbegin(op,&si) ;
+			    }
 	                    rs1 = subinfo_finish(&si) ;
 			    if (rs >= 0) rs = rs1 ;
 	                } /* end if (subinfo) */
-
 	            } /* end if (update) */
 	        } /* end if (stat) */
 	    } /* end if (time-out) */
 	} /* end if (no cursors out) */
-
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (calyears_checkupdate) */
 #endif /* COMMENT */
@@ -1159,17 +1130,17 @@ local int subinfo_finish(SI *sip) noex {
 	    rs1 = lm_free(sip->tudname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->tudname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (sip->userhome) {
 	    rs1 = lm_free(sip->userhome) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->userhome = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (sip->fl.id) {
 	    rs1 = ids_release(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->fl.id = false ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (subinfo_finish) */
 
@@ -1195,13 +1166,13 @@ local int subinfo_calscreate(SI *sip,cchar **dns,cchar **cns) noex {
 } /* end subroutine (subinfo_calscreate) */
 
 local int subinfo_calscreater(SI *sip,cchar *dn,cchar **cns) noex {
-	vecstr		cals ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	int		f_search = false ;
 	cchar	**names = nullptr ;
 
 	if (cns == nullptr) {
+	    vecstr cals ;
 	    if ((rs = vecstr_start(&cals,1,0)) >= 0) {
 	        f_search = true ;
 	        if ((rs = subinfo_loadnames(sip,&cals,dn)) > 0) {
