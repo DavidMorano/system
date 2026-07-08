@@ -13,12 +13,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<time.h>		/* |time_t| */
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<linefilter.h>
-#include	<linecleanopt.h>	/* line-cleanint options */
+#include	<sys/types.h>		/* POSIX system types */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<linefilter.h>		/* LIBUC */
+#include	<linecleanopt.h>	/* LIBUC line-cleanint options */
+#include	<bfile.h>		/* LIBB */
 
 
 /* objects */
@@ -33,10 +34,12 @@ enum filewatchos {
     	filewatcho_overlast
 } ; /* end enum (filewatchos) */
 
+#ifdef	__cplusplus
 struct filewatchms {
     	static cint	carriage ;
     	static cint	clean ;
 } ; /* end struct (filewatchms) */
+#endif /* __cplusplus */
 
 /* options */
 #define	FILEWATCH_MCARRIAGE	(1 << filewatcho_carriage)
@@ -46,7 +49,7 @@ struct filewatch_flags {
 	uint		open:1 ;
 	uint		carriage:1 ;
 	uint		clean:1 ;
-} ;
+} ; /* end struct */
 
 struct filewatch_args {
 	int		interval ;
@@ -54,7 +57,7 @@ struct filewatch_args {
 	int		columns ;
 	int		indent ;
 	int		opts ;
-} ;
+} ; /* end struct */
 
 struct filewatch_head {
 	cchar		*fname ;
@@ -129,11 +132,8 @@ extern int filewatch_finish(filewatch *) noex ;
 
 EXTERNC_end
 
-
 #ifdef	__cplusplus
-
 extern const filewatchms	filewatchm ;
-
 #endif /* __cplusplus */
 
 
