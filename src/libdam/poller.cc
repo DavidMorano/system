@@ -27,16 +27,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<poll.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<vecobj.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<poll.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"poller.h"
 
@@ -53,6 +56,7 @@ import libutil ;			/* |memclear(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -71,7 +75,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int poller_ctor(poller *op,Args ... args) noex {
+local int poller_ctor(poller *op,Args ... args) noex {
     	POLLER		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -83,36 +87,33 @@ static int poller_ctor(poller *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (poller_ctor) */
+} /* end subroutine (poller_ctor) */
 
-static int poller_dtor(poller *op) noex {
+local int poller_dtor(poller *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->rlp) ylikely {
 		delete op->rlp ;
 		op->rlp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (poller_dtor) */
+} /* end subroutine (poller_dtor) */
 
 template<typename ... Args>
-static inline int poller_magic(poller *op,Args ... args) noex {
+local inline int poller_magic(poller *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == POLLER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (poller_magic) */
+} /* end subroutine (poller_magic) */
 
-static int	poller_extend(poller *,int) noex ;
-static int	poller_del(poller *,poller_spec *) noex ;
+local int	poller_extend(poller *,int) noex ;
+local int	poller_del(poller *,poller_spec *) noex ;
 
-static bool	ismatch(poller_spec *,poller_spec *) noex ;
+local bool	ismatch(poller_spec *,poller_spec *) noex ;
 
 
 /* local variables */
@@ -137,8 +138,7 @@ int poller_start(poller *op) noex {
 	    }
 	} /* end if (poller_ctor) */
 	return rs ;
-}
-/* end subroutine (poller_start) */
+} /* end subroutine (poller_start) */
 
 int poller_finish(poller *op) noex {
 	int		rs ;
@@ -149,10 +149,10 @@ int poller_finish(poller *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->pa) ylikely {
-	        rs1 = uc_free(op->pa) ;
+	        rs1 = mem.free(op->pa) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->pa = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 	        rs1 = poller_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -160,8 +160,7 @@ int poller_finish(poller *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (poller_finish) */
+} /* end subroutine (poller_finish) */
 
 /* register an event */
 int poller_reg(poller *op,poller_spec *rep) noex {
@@ -170,8 +169,7 @@ int poller_reg(poller *op,poller_spec *rep) noex {
 	   rs = vecobj_add(op->rlp,rep) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (poller_reg) */
+} /* end subroutine (poller_reg) */
 
 /* cancel a previously registered event */
 int poller_cancel(poller *op,poller_spec *cep) noex {
@@ -192,8 +190,7 @@ int poller_cancel(poller *op,poller_spec *cep) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (poller_cancel) */
+} /* end subroutine (poller_cancel) */
 
 /* cancel all previously registered events on an FD */
 int poller_cancelfd(poller *op,int fd) noex {
@@ -214,8 +211,7 @@ int poller_cancelfd(poller *op,int fd) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (poller_cancelfd) */
+} /* end subroutine (poller_cancelfd) */
 
 /* wait for an event to become ready */
 int poller_wait(poller *op,poller_spec *rp,int mto) noex {
@@ -258,8 +254,7 @@ int poller_wait(poller *op,poller_spec *rp,int mto) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (poller_wait) */
+} /* end subroutine (poller_wait) */
 
 int poller_get(poller *op,poller_spec *rp) noex {
     	int		rs ;
@@ -280,8 +275,7 @@ int poller_get(poller *op,poller_spec *rp) noex {
 	    } /* end if (result) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (poller_get) */
+} /* end subroutine (poller_get) */
 
 int poller_count(poller *op) noex {
 	int		rs ;
@@ -289,8 +283,7 @@ int poller_count(poller *op) noex {
 	    rs = vecobj_count(op->rlp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (poller_count) */
+} /* end subroutine (poller_count) */
 
 int poller_curbegin(poller *op,poller_cur *curp) noex {
     	int		rs ;
@@ -298,8 +291,7 @@ int poller_curbegin(poller *op,poller_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (poller_curbegin) */
+} /* end subroutine (poller_curbegin) */
 
 int poller_curend(poller *op,poller_cur *curp) noex {
     	int		rs ;
@@ -307,8 +299,7 @@ int poller_curend(poller *op,poller_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (poller_curend) */
+} /* end subroutine (poller_curend) */
 
 int poller_enum(poller *op,poller_cur *curp,poller_spec *rp) noex {
 	int		rs ;
@@ -327,33 +318,31 @@ int poller_enum(poller *op,poller_cur *curp,poller_spec *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (poller_enum) */
+} /* end subroutine (poller_enum) */
 
 
 /* private subroutines */
 
-static int poller_extend(poller *op,int n) noex {
+local int poller_extend(poller *op,int n) noex {
 	int		rs = SR_OK ;
 	cint		ne = max(n,1) ;
 	if ((ne > op->e) || (op->pa == nullptr)) {
 	    cint	sz = ne * szof(poller_spec) ;
 	    if (op->pa) {
-	        uc_free(op->pa) ;
+	        mem.free(op->pa) ;
 	        op->pa = nullptr ;
-	    }
-	    if (POLLFD *a ; (rs = uc_malloc(sz,&a)) >= 0) {
+	    } /* end if (memory-release) */
+	    if (pollfd *a ; (rs = mem.mall(sz,&a)) >= 0) {
 	        op->pa = a ;
 	        op->e = ne ;
-	    } else {
+	    } else { /* end if (memory-acquire) */
 	        op->pa = nullptr ;
 	    }
 	} /* end if (needed) */
 	return (rs >= 0) ? ne : rs ;
-}
-/* end subroutine (poller_extend) */
+} /* end subroutine (poller_extend) */
 
-static int poller_del(poller *op,poller_spec *cep) noex {
+local int poller_del(poller *op,poller_spec *cep) noex {
 	vecobj		*rlp = op->rlp ;
 	int		rs = SR_OK ;
 	int		i ; /* used-afterwards */
@@ -368,15 +357,13 @@ static int poller_del(poller *op,poller_spec *cep) noex {
 	    }
 	} /* end for */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (poller_del) */
+} /* end subroutine (poller_del) */
 
-static bool ismatch(poller_spec *e1p,poller_spec *e2p) noex {
+local bool ismatch(poller_spec *e1p,poller_spec *e2p) noex {
 	bool		f = true ;
 	f = f && (e1p->fd == e2p->fd) ;
 	f = f && (e1p->events == e2p->events) ;
 	return f ;
-}
-/* end subroutine (ismatch) */
+} /* end subroutine (ismatch) */
 
 
