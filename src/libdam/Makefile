@@ -601,48 +601,27 @@ objv.o:			$(OBJV)
 
 
 dstr.o:			dstr.c dstr.h
-
 keyvals.o:		keyvals.cc keyvals.h
-
-loadave.o:		loadave.c loadave.h
-
+loadave.o:		loadave.cc loadave.h
 egs.o:			egs.cc egs.h
-
 sha1.o:			sha1.c sha1.h
-
 outline.o:		outline.cc	outline.h
 outstore.o:		outstore.cc	outstore.h
-
 lookaside.o:		lookaside.c lookaside.h
-
 serialbuf.o:		serialbuf.c serialbuf.h
-
 netorder.o:		netorder.c netorder.h
-
 matenv.o:		matenv.c matenv.h
-
 stackaddr.o:		stackaddr.c stsackaddr.h
-
 comparse.o:		comparse.c comparse.h
-
 mhcom.o:		mhcom.c mhcom.h
-
 date.o:			date.c date.h
-
 zdb.o:			zdb.c zdb.h
-
 zos.o:			zos.c zos.h
-
 tmz.o:			tmz.c tmz.h
-
 zoffparts.o:		zoffparts.c zoffparts.h
-
 dayspec.o:		dayspec.c dayspec.h
-
 gecos.o:		gecos.c gecos.h
-
 kinfo.o:		kinfo.c kinfo.h
-
 msfile.o:		msfile.c msfile.h msfilee.h
 msfilee.o:		msfilee.c msfilee.h
 
