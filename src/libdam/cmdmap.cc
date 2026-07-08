@@ -130,7 +130,7 @@ int cmdmap_start(cmdmap *op,const cmdmap_ent *defmap) noex {
 	if ((rs = cmdmap_ctor(op)) >= 0) {
 	    cint	sz = szof(cmdmap_ent) ;
 	    cint	vn = 10 ;
-	    cint	vo = VECOBJ_OREUSE ;
+	    cint	vo = vecobjm.reuse ;
 	    if ((rs = vecobj_start(op->mlp,sz,vn,vo)) >= 0) {
 	        if (defmap) {
 		    rs = cmdmap_defmap(op,defmap) ;
@@ -140,11 +140,11 @@ int cmdmap_start(cmdmap *op,const cmdmap_ent *defmap) noex {
 	        }
 	        if (rs < 0) {
 		    vecobj_finish(op->mlp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (vecobj-started) */
 	    if (rs < 0) {
 		cmdmap_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (cmdmap_ctor) */
 	return rs ;
 } /* end subroutine (cmdmap_start) */
