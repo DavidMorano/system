@@ -20,8 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<hdb.h>
-#include	<vecstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
+#include	<vecstr.h>			/* LIBUC */
 
 
 #define	RECIPIENT		struct recipient_head
@@ -29,7 +31,6 @@
 #define	RECIPIENT_HCUR		int
 #define	RECIPIENT_VCUR		hdb_cur
 #define	RECIPIENT_MAGIC		0x87542381
-
 #define	RECIPIENT_NOHOST	"*nohost*"
 
 
@@ -37,14 +38,14 @@ struct recipient_head {
 	hdb		*hlp ;		/* hold entire entries */
 	vecstr		*nlp ;		/* hold host names */
 	uint		magval ;
-} ;
+} ; /* end struct */
 
 struct recipient_value {
-	cchar		*a ;		/* memory-allocation */
+	char		*a ;		/* memory-allocation */
 	cchar		*hostpart ;
 	cchar		*localpart ;
 	int		type ;
-} ;
+} ; /* end struct */
 
 typedef RECIPIENT	recipient ;
 typedef	RECIPIENT_VAL	recipient_val ;
