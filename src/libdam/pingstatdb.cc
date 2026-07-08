@@ -83,6 +83,9 @@
 
 #include	"pingstatdb.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
