@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += fonce.h
+INCS += fonce.hh
 
 MODS +=
 
@@ -48,6 +48,7 @@ OBJ0= fonce1.o
 OBJ1=
 
 OBJA= obj0.o
+OBJB=
 
 OBJIMPL= obja.o
 
@@ -96,10 +97,10 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).o:			objprime.o objimpl.o
+$(T).o:			fonce0.o fonce1.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
@@ -140,11 +141,11 @@ objimpl.o:		$(OBJIMPL)
 
 
 # module primary
-fonce0.o:		fonce.ccm			$(INCS)
-	makemodule fonce
+fonce0.o:		fonce.ccm	fonce.hh	$(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
-fonce1.o:		fonce1.cc objprime.o		$(INCS)
+fonce1.o:		fonce1.cc fonce0.o		$(INCS)
 	$(COMPILE.cc) $<
 
 
