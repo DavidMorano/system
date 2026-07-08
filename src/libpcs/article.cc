@@ -28,20 +28,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucmem.h>
-#include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucmem.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"article.h"
 
@@ -157,24 +157,23 @@ int article_start(AR *op) noex {
 	            op->fl.path = true ;
 		    if ((rs = vechand_start(op->envp,1,0)) >= 0) {
 	                op->fl.envdates = true ;
-		    }
+		    } /* end if */
 		    if (rs < 0) {
 	                op->fl.path = true ;
 	    	        retpath_finish(op->pathp) ;
-		    }
+		    } /* end if (error) */
 	        }
 	        if (rs < 0) {
 	            op->fl.ngs = false ;
 		    ng_finish(op->ngp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (ngs) */
 	    if (rs < 0) {
 		article_dtor(op) ;
 	    } /* end if (error) */
 	} /* end if (article_ctor) */
 	return rs ;
-}
-/* end subroutine (article_start) */
+} /* end subroutine (article_start) */
 
 int article_finish(AR *op) noex {
 	int		rs ;
@@ -234,8 +233,7 @@ int article_finish(AR *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_finish) */
+} /* end subroutine (article_finish) */
 
 int article_addpath(AR *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -249,8 +247,7 @@ int article_addpath(AR *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_addpath) */
+} /* end subroutine (article_addpath) */
 
 int article_addng(AR *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -264,8 +261,7 @@ int article_addng(AR *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_addng) */
+} /* end subroutine (article_addng) */
 
 int article_addenvdate(AR *op,dater *d2p) noex {
 	int		rs ;
@@ -284,8 +280,7 @@ int article_addenvdate(AR *op,dater *d2p) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_addenvdate) */
+} /* end subroutine (article_addenvdate) */
 
 int article_addmsgdate(AR *op,dater *dp) noex {
 	int		rs ;
@@ -299,8 +294,7 @@ int article_addmsgdate(AR *op,dater *dp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_addmsgdate) */
+} /* end subroutine (article_addmsgdate) */
 
 int article_addaddr(AR *op,int type,cchar *sp,int sl) noex {
 	int		rs ;
@@ -319,11 +313,11 @@ int article_addaddr(AR *op,int type,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_addaddr) */
+} /* end subroutine (article_addaddr) */
 
 int article_addstr(AR *op,int type,cchar *sp,int sl) noex {
 	int		rs ;
+	int		rs1 ;
 	if ((rs = article_magic(op,sp)) >= 0) {
 	    cint	n = articlestr_overlast ;
 	    rs = SR_INVALID ;
@@ -331,19 +325,19 @@ int article_addstr(AR *op,int type,cchar *sp,int sl) noex {
 		rs = SR_OK ;
 	        if (op->strs[type] != nullptr) {
 	            void *vp = voidp(op->strs[type]) ;
-	            rs = mem.free(vp) ;
+	            rs1 = mem.free(vp) ;	/* <- on purpose */
+		    if (rs >= 0) rs = rs1 ;	/* <- on purpose */
 	            op->strs[type] = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	        if (rs >= 0) {
 	            if (cchar *cp ; (rs = mem.strw(sp,sl,&cp)) > 0) {
 		        op->strs[type] = cp ;
-	            }
+	            } /* end if (memory-acquire) */
 	        } /* end if (ok) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_addstr) */
+} /* end subroutine (article_addstr) */
 
 /* extract newsgroup names from the "newsgroups" header string */
 int article_addparse(AR *op,cchar *sp,int sl) noex {
@@ -373,8 +367,7 @@ int article_addparse(AR *op,cchar *sp,int sl) noex {
 	    } /* end if (ema) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (article_addparse) */
+} /* end subroutine (article_addparse) */
 
 int article_ao(AR *op,uint aoff,uint alen) noex {
     	int		rs ;
@@ -383,8 +376,7 @@ int article_ao(AR *op,uint aoff,uint alen) noex {
 	    op->alen = alen ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_ao) */
+} /* end subroutine (article_ao) */
 
 int article_countenvdate(AR *op) noex {
 	int		rs ;
@@ -392,8 +384,7 @@ int article_countenvdate(AR *op) noex {
 	    rs = vechand_count(op->envp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_countenvdate) */
+} /* end subroutine (article_countenvdate) */
 
 int article_getenvdate(AR *op,int i,dater **epp) noex {
 	int		rs = SR_FAULT ;
@@ -405,8 +396,7 @@ int article_getenvdate(AR *op,int i,dater **epp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (article_getenvdate) */
+} /* end subroutine (article_getenvdate) */
 
 int article_getstr(AR *op,int type,cchar **rpp) noex {
 	int		rs = SR_OK ;
@@ -425,8 +415,7 @@ int article_getstr(AR *op,int type,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_getstr) */
+} /* end subroutine (article_getstr) */
 
 int article_getaddrema(AR *op,int type,ema **rpp) noex {
 	int		rs = SR_OK ;
@@ -445,7 +434,6 @@ int article_getaddrema(AR *op,int type,ema **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (article_getaddrema) */
+} /* end subroutine (article_getaddrema) */
 
 
