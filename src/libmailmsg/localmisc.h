@@ -2,17 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* miscellaneous stuff which essentially every program wants! */
+/* miscellaneous pre-processor definitions */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-02-15, David A­D­ Morano
-	This code was started to make life easier on the outside
-	(outside of Lucent Technologies).  This file largely contains
-	those things (defines) that I have found to be either useful
-	or problematic in the past.
+	This code is a collection of miscellaneious pre-processor
+	defintions that were eidely used on the various embedded
+	code projects and also on many of the support tool projects.
 
 */
 
@@ -23,12 +22,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<stdlib.h>		/* |size_t| */
-#include	<string.h>		/* |memset(3c)| */
-#include	<clanguage.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<limits.h>		/* CSTD */
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD |size_t| */
+#include	<string.h>		/* CSTD |memset(3c)| */
+#include	<clanguage.h>		/* LIBU */
 
 
 #ifndef	TRUE
