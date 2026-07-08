@@ -161,7 +161,7 @@ so:			$(T).so
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ) Makefile $(INCS)
@@ -519,7 +519,7 @@ ustream.dir:
 	makesubdir $@
 
 usigblock.o:		usigblock.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 ucodenames.o:		ucodenames.cc	ucodenames.h	$(INCS)
 
@@ -545,10 +545,10 @@ deb.dir:
 
 # misc-objects
 chrset.o:		chrset.ccm					$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 bitgrp.o:		bitgrp.ccm					$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 nulstr.o:		nulstr.cc	nulstr.h			$(INCS)
 posixdirent.o:		posixdirent.cc	posixdirent.hh			$(INCS)
@@ -584,10 +584,10 @@ funcodes.o:		funcodes.cc	funcodes.h			$(INCS)
 baops.o:		baops.c		baops.h				$(INCS)
 
 bitmanip.o:		bitmanip.ccm					$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 findbit.o:		findbit.ccm					$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # STRING handling
 strtox.o:		strtox.cc	strtox.h bitmanip.o		$(INCS)
@@ -607,16 +607,16 @@ ischx.o:		ischx0.o ischx1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 ischx0.o:		ischx.ccm	ischx.hh			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 ischx1.o:		ischx1.cc	ischx0.o	ischx.hh	$(INCS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 udiv.o:			udiv.ccm	udiv.hh				$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 typecodes.o:		typecodes.ccm	ffbs.h				$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # singles
 conintx.o:		conintx.cc		conintx.hh		$(INCS)
