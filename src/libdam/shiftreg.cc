@@ -31,14 +31,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"shiftreg.h"
 
@@ -50,6 +48,8 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* local namespaces */
+
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -67,14 +67,13 @@ import libutil ;			/* |memclear(3u)| */
 /* forward references */
 
 template<typename ... Args>
-static inline int shiftreg_magic(shiftreg *op,Args ... args) noex {
+local inline int shiftreg_magic(shiftreg *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == SHIFTREG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (shiftreg_magic) */
+} /* end subroutine (shiftreg_magic) */
 
 
 /* local variables */
@@ -92,31 +91,31 @@ int shiftreg_start(shiftreg *op,int n) noex {
 	if (op) ylikely {
 	    cint	sz = n * szof(ulong) ;
 	    memclear(hop) ;
-	    if (ulong *a ; (rs = uc_malloc(sz,&a)) >= 0) ylikely {
+	    if (ulong *a ; (rs = mem.mall(sz,&a)) >= 0) ylikely {
 		op->regs = a ;
 	        op->n = n ;
 	        for (int i = 0 ; i < op->n ; i += 1) {
 	            op->regs[i] = i ;
-	        }
+	        } /* end for */
 	        op->magval = SHIFTREG_MAGIC ;
-	    }
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine */
 
 int shiftreg_finish(shiftreg *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = shiftreg_magic(op)) >= 0) ylikely {
 	    if (op->regs) ylikely {
-	        rs1 = uc_free(op->regs) ;
+	        rs1 = mem.free(op->regs) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->regs = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
+} /* end subroutine */
 
 int shiftreg_shiftin(shiftreg *op,ulong val) noex {
     	int		rs ;
@@ -125,7 +124,7 @@ int shiftreg_shiftin(shiftreg *op,ulong val) noex {
 	    op->i = (op->i + 1) % op->n ;
 	} /* end if (magic) */
 	return rs ;
-}
+} /* end subroutine */
 
 int shiftreg_get(shiftreg *op,int i,ulong *rp) noex {
     	int		rs ;
@@ -136,7 +135,6 @@ int shiftreg_get(shiftreg *op,int i,ulong *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (shiftreg_get) */
+} /* end subroutine (shiftreg_get) */
 
 
