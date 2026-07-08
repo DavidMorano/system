@@ -13,12 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	DIALTAB		struct dialtab_head
@@ -32,13 +29,13 @@ struct dialtab_entry {
 	cchar		*username ;
 	cchar		*password ;
 	int		fi ;
-} ;
+} ; /* end struct */
 
 struct dialtab_head {
 	vecobj		*flp ;
 	vecobj		*elp ;
 	uint		magval ;
-} ;
+} ; /* end struct */
 
 typedef	DIALTAB		dialtab ;
 typedef	DIALTAB_ENT	dialtab_ent ;
