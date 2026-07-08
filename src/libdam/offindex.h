@@ -20,13 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* |off_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
+#include	<unistd.h>		/* POSIX |off_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	OFFINDEX	struct offindex_head
@@ -35,24 +32,24 @@
 
 
 struct offindex_flags {
-	int		setsorted:1 ;
-} ;
+	uint		setsorted:1 ;
+} ; /* end struct */
 
 struct offindex_head {
 	vecobj		*oip ;
 	OFFINDEX_FL	fl ;
 	uint		magval ;
-} ;
+} ; /* end struct */
 
 typedef	OFFINDEX	offindex ;
 typedef	OFFINDEX_FL	offindex_fl ;
 
 EXTERNC_begin
 
-extern int	offindex_start(offindex *,int) noex ;
-extern int	offindex_add(offindex *,off_t,int) noex ;
-extern int	offindex_lookup(offindex *,off_t) noex ;
-extern int	offindex_finish(offindex *) noex ;
+extern int	offindex_start	(offindex *,int) noex ;
+extern int	offindex_add	(offindex *,off_t,int) noex ;
+extern int	offindex_lookup	(offindex *,off_t) noex ;
+extern int	offindex_finish	(offindex *) noex ;
 
 EXTERNC_end
 
