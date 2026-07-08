@@ -13,13 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
-#include	<hdb.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
 
 
 #define	KEYVALS			struct keyvals_head
@@ -31,14 +28,14 @@
 struct keyvals_cursor {
 	hdb_cur		*ecp ;
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct keyvals_head {
 	vecobj		*keyp ;		/* store "keys" */
 	hdb		*bykeyp ;	/* indexed by key only */
 	hdb		*bykeyvalp ;	/* indexed by key-val together */
 	uint		magval ;
-} ;
+} ; /* end struct */
 
 typedef KEYVALS_CUR	keyvals_cur ;
 
@@ -49,7 +46,7 @@ enum keyvalsmems {
 	keyvalsmem_delset,
 	keyvalsmem_finish,
 	keyvalsmem_overlast
-} ;
+} ; /* end enum */
 struct keyvals ;
 struct keyvals_co {
 	keyvals		*op = nullptr ;
@@ -69,23 +66,23 @@ struct keyvals : keyvals_head {
 	keyvals_co	delset ;
 	keyvals_co	finish ;
 	keyvals() noex {
-	    start(this,keyvalsmem_start) ;
-	    count(this,keyvalsmem_count) ;
-	    delset(this,keyvalsmem_delset) ;
-	    finish(this,keyvalsmem_finish) ;
-	    magval = 0 ;
-	} ;
+	    start	(this,keyvalsmem_start) ;
+	    count	(this,keyvalsmem_count) ;
+	    delset	(this,keyvalsmem_delset) ;
+	    finish	(this,keyvalsmem_finish) ;
+	    magval	= 0 ;
+	} ; /* end ctor */
 	keyvals(const keyvals &) = delete ;
 	keyvals &operator = (const keyvals &) = delete ;
-	int add(keyvals *,int,cchar *,cchar *,int) noex ;
-	int already(keyvals *,cchar *,int) noex ;
-	int curbegin(keyvals *,keyvals_cur *) noex ;
-	int curend(keyvals *,keyvals_cur *) noex ;
-	int curenumkey(keyvals *,keyvals_cur *,cchar **) noex ;
-	int curenum(keyvals *,keyvals_cur *,cchar **,cchar **) noex ;
-	int fetch(keyvals *,cchar *,keyvals_cur *,cchar **) noex ;
-	int delkey(keyvals *,cchar *,int) noex ;
-	int check(keyvals *,time_t) noex ;
+	int add		(keyvals *,int,cchar *,cchar *,int) noex ;
+	int already	(keyvals *,cchar *,int) noex ;
+	int curbegin	(keyvals *,keyvals_cur *) noex ;
+	int curend	(keyvals *,keyvals_cur *) noex ;
+	int curenumkey	(keyvals *,keyvals_cur *,cchar **) noex ;
+	int curenum	(keyvals *,keyvals_cur *,cchar **,cchar **) noex ;
+	int fetch	(keyvals *,cchar *,keyvals_cur *,cchar **) noex ;
+	int delkey	(keyvals *,cchar *,int) noex ;
+	int check	(keyvals *,time_t) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct keyvals() {
