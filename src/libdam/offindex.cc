@@ -30,15 +30,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* |off_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<new>
-#include	<usystem.h>
-#include	<vecobj.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX |off_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"offindex.h"
 
@@ -76,13 +77,13 @@ struct offindex_e {
 	int		linelen ;
 	offindex_e() = default ;
 	offindex_e(off_t o,int l) noex : lineoff(o), linelen(l) { } ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int offindex_ctor(offindex *op,Args ... args) noex {
+local int offindex_ctor(offindex *op,Args ... args) noex {
     	OFFINDEX	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -91,13 +92,12 @@ static int offindex_ctor(offindex *op,Args ... args) noex {
 	    memclear(hop) ;
 	    if ((op->oip = new(nothrow) vecobj) != np) ylikely {
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (offindex_ctor) */
+} /* end subroutine (offindex_ctor) */
 
-static int offindex_dtor(offindex *op) noex {
+local int offindex_dtor(offindex *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -107,24 +107,22 @@ static int offindex_dtor(offindex *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (offindex_dtor) */
+} /* end subroutine (offindex_dtor) */
 
 template<typename ... Args>
-static inline int offindex_magic(offindex *op,Args ... args) noex {
+local inline int offindex_magic(offindex *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == OFFINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (offindex_magic) */
+} /* end subroutine (offindex_magic) */
 
 extern "C" {
-    static int vecmp(cvoid **,cvoid **) noex ;
+    local int vecmp(cvoid **,cvoid **) noex ;
 }
 
-static int ecmpe(OI_E *,OI_E *) noex ;
+local int ecmpe(OI_E *,OI_E *) noex ;
 
 
 /* local variables */
@@ -146,11 +144,10 @@ int offindex_start(offindex *op,int vn) noex {
 	    }
 	    if (rs < 0) {
 		offindex_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (offindex_ctor) */
 	return rs ;
-}
-/* end subroutine (offindex_start) */
+} /* end subroutine (offindex_start) */
 
 int offindex_finish(offindex *op) noex {
 	int		rs ;
@@ -167,8 +164,7 @@ int offindex_finish(offindex *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (offindex_finish) */
+} /* end subroutine (offindex_finish) */
 
 int offindex_add(offindex *op,off_t off,int len) noex {
 	int		rs ;
@@ -179,8 +175,7 @@ int offindex_add(offindex *op,off_t off,int len) noex {
 	    rs = vecobj_add(op->oip,&e) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (offindex_add) */
+} /* end subroutine (offindex_add) */
 
 int offindex_lookup(offindex *op,off_t off) noex {
 	int		rs ;
@@ -205,32 +200,30 @@ int offindex_lookup(offindex *op,off_t off) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (offindex_lookup) */
+} /* end subroutine (offindex_lookup) */
 
 
 /* private subroutines */
 
-static int vecmp(cvoid **v1pp,cvoid **v2pp) noex {
+local int vecmp(cvoid **v1pp,cvoid **v2pp) noex {
 	OI_E		*e1p = (OI_E *) *v1pp ;
 	OI_E		*e2p = (OI_E *) *v2pp ;
 	return ecmpe(e1p,e2p) ;
-}
-/* end subroutine (vecmp) */
+} /* end subroutine (vecmp) */
 
-static int ecmpe(OI_E *e1p,OI_E *e2p) noex {
+local int ecmpe(OI_E *e1p,OI_E *e2p) noex {
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
-	            rc = (e1p->lineoff - e2p->lineoff) ;
+		    coff lo = (e1p->lineoff - e2p->lineoff) ;
+	            rc = intconv(lo) ;
 	        }
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (ecmpe) */
+} /* end subroutine (ecmpe) */
 
 
