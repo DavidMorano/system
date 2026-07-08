@@ -99,7 +99,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
@@ -144,6 +144,6 @@ uconstants.dir:
 
 # INTMINMAX
 intminmax.o:		intminmax.ccm			$(DEPS) $(INCS)
-	makemodule intminmax
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
