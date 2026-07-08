@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>		/* system types */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 /* object defines */
@@ -31,20 +32,20 @@
 
 struct egs_head {
 	pid_t		pid ;		/* daemon PID */
-	uint		magic ;
+	uint		magval ;
 	int		fd ;		/* socket file descriptor */
-} ;
+} ; /* end struct */
 
 typedef EGS		egs ;
 
 EXTERNC_begin
 
-extern int egs_open(egs *,cchar *) noex ;
-extern int egs_read(egs *,char *,int) noex ;
-extern int egs_write(egs *,cchar *,int) noex ;
-extern int egs_level(egs *) noex ;
-extern int egs_getpid(egs *,pid_t *) noex ;
-extern int egs_close(egs *) noex ;
+extern int egs_open	(egs *,cchar *) noex ;
+extern int egs_read	(egs *,char *,int) noex ;
+extern int egs_write	(egs *,cchar *,int) noex ;
+extern int egs_level	(egs *) noex ;
+extern int egs_getpid	(egs *,pid_t *) noex ;
+extern int egs_close	(egs *) noex ;
 
 EXTERNC_end
 
