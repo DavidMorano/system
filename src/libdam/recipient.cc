@@ -40,18 +40,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<hdb.h>
-#include	<vecstr.h>
-#include	<strwcpyx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<netdb.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<strwcpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"recipient.h"
 
@@ -73,6 +74,7 @@ import libutil ;			/* |memclear(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -105,7 +107,7 @@ local int recipient_ctor(recipient *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->hlp ;
 		    op->hlp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-hdb) */
 	} /* end if (non-null) */
 	return rs ;
@@ -156,15 +158,14 @@ int recipient_start(RC *op,int vn) noex {
 		}
 	        if (rs < 0) {
 	            hdb_finish(op->hlp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if */
 	    if (rs < 0) {
 		recipient_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (recipient_ctor) */
 	return rs ;
-}
-/* end subroutine (recipient_start) */
+} /* end subroutine (recipient_start) */
 
 int recipient_finish(RC *op) noex {
     	cint		rsn = SR_NOTFOUND ;
@@ -177,22 +178,23 @@ int recipient_finish(RC *op) noex {
 		hdb_dat		key{} ;
 		hdb_dat		val{} ;
 	        while ((rs2 = hdb_curenum(op->hlp,&kcur,&key,&val)) >= 0) {
-	            RC_VAL	*vp = (RC_VAL *) val.buf ;
+	            RC_VAL *vap = resumelife<RC_VAL>(val.buf) ;
 	            if (val.buf) {
-	                if (vp->a) {
-	                    rs1 = uc_free(vp->a) ;
+	                if (vap->a) {
+	                    rs1 = mem.free(vap->a) ;
 			    if (rs >= 0) rs = rs1 ;
-	                    vp->a = nullptr ;
-	                }
-	                if (vp->localpart) {
-	                    rs1 = uc_free(vp->localpart) ;
+	                    vap->a = nullptr ;
+	                } /* end if (memory-release) */
+	                if (vap->localpart) {
+			    voidp vp = voidp(vap->localpart) ;
+	                    rs1 = mem.free(vp) ;
 			    if (rs >= 0) rs = rs1 ;
-	                    vp->localpart = nullptr ;
-	                }
+	                    vap->localpart = nullptr ;
+	                } /* end if (memory-release) */
 		        {
-	                    rs1 = uc_free(vp) ;
+	                    rs1 = mem.free(vap) ;
 			    if (rs >= 0) rs = rs1 ;
-		        }
+		        } /* end if (memory-release) */
 	            } /* end if (non-null) */
 	        } /* end while */
 	        rs1 = hdb_curend(op->hlp,&kcur) ;
@@ -214,17 +216,19 @@ int recipient_finish(RC *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recipient_finish) */
+} /* end subroutine (recipient_finish) */
 
-int recipient_add(RC *op,cc *host,cc *local,int type) noex {
+int recipient_add(RC *op,cc *host,cc *locvap,int type) noex {
+    	cnullptr	np{} ;
 	int		rs ;
+	int		rs1 ;
 	if ((host == nullptr) || (type < 0)) {
 	    host = RECIPIENT_NOHOST ;
 	}
-	if ((rs = recipient_magic(op,local)) >= 0) {
-	    if (char *hbuf{} ; (rs = malloc_hn(&hbuf)) >= 0) {
-	        if (cint hl = strwcpylc(hbuf,host,rs) - hbuf ; hl > 0) {
+	if ((rs = recipient_magic(op,locvap)) >= 0) {
+	    if (char *hbuf ; (rs = mem.hostname(&hbuf)) >= 0) {
+	        cint hl = intconv(strwcpylc(hbuf,host,rs) - hbuf) ;
+	        if (hl > 0) {
 		    hdb_dat	key ;
 		    hdb_dat	val{} ;
 		    RC_VAL	ve{} ;
@@ -233,7 +237,7 @@ int recipient_add(RC *op,cc *host,cc *local,int type) noex {
 		    /* is this host in the hash table? */
 		    key.buf = hbuf ;
 		    key.len = hl ;
-		    if ((rs = hdb_fetch(op->hlp,key,nullptr,&val)) >= 0) {
+		    if ((rs = hdb_fetch(op->hlp,key,np,&val)) >= 0) {
 	    	        RC_VAL	*valp = (RC_VAL *) val.buf ;
 	    	        key.buf = valp->hostpart ;
 	    	        key.len = -1 ;
@@ -247,47 +251,49 @@ int recipient_add(RC *op,cc *host,cc *local,int type) noex {
 	    	        } /* end if (vecstr_get) */
 		    } /* end if */
 		    if (rs >= 0) {
-	    	        if ((rs = uc_mallocstrw(local,-1,&cp)) >= 0) {
+	    	        if ((rs = mem.strw(locvap,-1,&cp)) >= 0) {
 	        	    cint	osz = szof(RC_VAL) ;
 	        	    ve.type = type ;
 	        	    ve.a = nullptr ;
 	        	    ve.hostpart = charp(key.buf) ;
 	        	    ve.localpart = cp ;
-			    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+			    if (void *vp{} ; (rs = mem.mall(osz,&vp)) >= 0) {
 	                        RC_VAL	*valp = (RC_VAL *) vp ;
 	                        val.buf = valp ;
 	                        val.len = osz ;
 	                        rs = hdb_store(op->hlp,key,val) ;
 	                        if (rs < 0) {
-	                            uc_free(vp) ;
-	                        }
+	                            mem.free(vp) ;
+	                        } /* end if (error) */
 	                    } /* end if (m-a) */
 	                    if (rs < 0) {
-	                        uc_free(ve.localpart) ;
-	                    }
+	                        voidp vp = voidp(ve.localpart) ;
+	                        mem.free(vp) ;
+	                    } /* end if (error) */
 	                } /* end if (m-a) */
 	                if ((rs < 0) && (vidx >= 0)) {
 	                    vecstr_del(op->nlp,vidx) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (ok) */
 		} /* end if (to-lower-case) */
-		rs = rsfree(rs,hbuf) ;
+		rs1 = mem.free(hbuf) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recipient_add) */
+} /* end subroutine (recipient_add) */
 
 /* fetch on a address tripple */
-int recipient_already(RC *op,cchar *host,cchar *local,int type) noex {
+int recipient_already(RC *op,cchar *host,cchar *locvap,int type) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((host == nullptr) || (type < 0)) {
 	    host = RECIPIENT_NOHOST ;
 	}
-	if ((rs = recipient_magic(op,local)) >= 0) {
-	    if (char *hbuf{} ; (rs = malloc_hn(&hbuf)) >= 0) {
-		if (cint hl = strwcpylc(hbuf,host,rs) - hbuf ; hl > 0) {
+	if ((rs = recipient_magic(op,locvap)) >= 0) {
+	    if (char *hbuf ; (rs = mem.hostname(&hbuf)) >= 0) {
+		cint hl = intconv(strwcpylc(hbuf,host,rs) - hbuf) ;
+		if (hl > 0) {
 	            hdb_dat	key ;
 	            hdb_dat	val{} ;
 	            key.buf = hbuf ;
@@ -297,19 +303,19 @@ int recipient_already(RC *op,cchar *host,cchar *local,int type) noex {
 		            RC_VAL	*valp = (RC_VAL *) val.buf ;
 	                    bool	f = true ;
 	                    f = f && (type == valp->type) ;
-	                    f = f && (strcmp(local,valp->localpart) == 0) ;
+	                    f = f && (strcmp(locvap,valp->localpart) == 0) ;
 	                    if (f) break ;
 	                } /* end while */
 	                rs1 = hdb_curend(op->hlp,&cur) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (curosr) */
-		    rs = rsfree(rs,hbuf) ;
+		    rs1 = mem.free(hbuf) ;
+	    	    if (rs >= 0) rs = rs1 ;
 		} /* end if (to-lower-case) */
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recipient_already) */
+} /* end subroutine (recipient_already) */
 
 int recipient_counthosts(RC *op) noex {
 	int		rs ;
@@ -317,8 +323,7 @@ int recipient_counthosts(RC *op) noex {
 	    rs = vecstr_count(op->nlp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recipient_counthosts) */
+} /* end subroutine (recipient_counthosts) */
 
 /* return the count of the number of items in this list */
 int recipient_count(RC *op) noex {
@@ -327,8 +332,7 @@ int recipient_count(RC *op) noex {
 	    rs = hdb_count(op->hlp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recipient_count) */
+} /* end subroutine (recipient_count) */
 
 #ifdef	COMMENT
 
@@ -345,8 +349,7 @@ int recipient_sort(RC *vhp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) idx : rs ;
-}
-/* end subroutine (recipient_sort) */
+} /* end subroutine (recipient_sort) */
 
 #endif /* COMMENT */
 
@@ -363,8 +366,7 @@ int recipient_enumhost(RC *op,RC_HCUR *hcp,cchar **hnpp) noex {
 	*hcp = (rs >= 0) ? i : -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recipient_enumhost) */
+} /* end subroutine (recipient_enumhost) */
 
 /* fetch the next entry value that matches the given host name */
 int recipient_fetchvalue(RC *op,cc *host,RC_VCUR *vcp,RC_VAL **vepp) noex {
@@ -382,8 +384,7 @@ int recipient_fetchvalue(RC *op,cc *host,RC_VCUR *vcp,RC_VAL **vepp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recipient_fetchvalue) */
+} /* end subroutine (recipient_fetchvalue) */
 
 int recipient_hcurbegin(RC *op,RC_HCUR *hcp) noex {
     	int		rs ;
@@ -391,8 +392,7 @@ int recipient_hcurbegin(RC *op,RC_HCUR *hcp) noex {
 	    *hcp = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recipient_hcurbegin) */
+} /* end subroutine (recipient_hcurbegin) */
 
 int recipient_hcurend(RC *op,RC_HCUR *hcp) noex {
     	int		rs ;
@@ -400,8 +400,7 @@ int recipient_hcurend(RC *op,RC_HCUR *hcp) noex {
 	    *hcp = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recipient_hcurend) */
+} /* end subroutine (recipient_hcurend) */
 
 int recipient_vcurbegin(RC *op,RC_VCUR *vcp) noex {
 	int		rs ;
@@ -409,8 +408,7 @@ int recipient_vcurbegin(RC *op,RC_VCUR *vcp) noex {
 	    rs = hdb_curbegin(op->hlp,vcp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recipient_vcurbegin) */
+} /* end subroutine (recipient_vcurbegin) */
 
 int recipient_vcurend(RC *op,RC_VCUR *vcp) noex {
 	int		rs ;
@@ -418,7 +416,6 @@ int recipient_vcurend(RC *op,RC_VCUR *vcp) noex {
 	    rs = hdb_curend(op->hlp,vcp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* ens subroutine (recipient_vcurend) */
+} /* ens subroutine (recipient_vcurend) */
 
 
