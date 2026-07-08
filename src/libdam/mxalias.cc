@@ -303,13 +303,12 @@ int mxalias_open(MA *op,cchar *pr,cchar *username) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = mxalias_ctor(op,pr,username)) >= 0) {
-	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) {
 	        if (cchar *cp ; (rs = lm_strw(pr,-1,&cp)) >= 0) {
 	            op->pr = cp ;
 	            if ((rs = mxalias_username(op,username)) >= 0) {
 		        cint	vn = 5 ;
-	                cint	vo = (VECOBJ_OSTATIONARY | VECOBJ_OREUSE) ;
+	                cint	vo = (vecobjm.stationary | vecobjm.reuse) ;
 	                cint	sz = szof(MA_FI) ;
 	                if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) {
 	                    if ((rs = keyvals_start(op->elp,vn)) >= 0) {
@@ -331,12 +330,12 @@ int mxalias_open(MA *op,cchar *pr,cchar *username) noex {
 	                    if (rs < 0) {
 	                        mxalias_filedels(op) ;
 	                        vecobj_finish(op->flp) ;
-	                    }
+	                    } /* end if (error) */
 	                } /* end if (files) */
 	            } /* end if (username) */
 	            if (rs < 0) {
 	                mxalias_finallocs(op) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (program-root) */
 	    } /* end if (vars) */
 	    if (rs < 0) {
@@ -428,7 +427,7 @@ int mxalias_curend(MA *op,MA_CUR *curp) noex {
 	        rs1 = lm_free(curp->vals) ;
 	        if (rs >= 0) rs = rs1 ;
 	        curp->vals = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (curp->kvcp) {
 	        {
 	            rs1 = keyvals_curend(op->elp,curp->kvcp) ;
@@ -1176,7 +1175,7 @@ vars::operator int () noex {
 	    maxlinelen = rs ;
 	}
 	return rs ;
-}
+} /* end method */
 
 local int cmpfe(MA_FI *e1p,MA_FI *e2p) noex {
 	int		rc = 0 ;
