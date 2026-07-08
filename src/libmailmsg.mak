@@ -71,8 +71,7 @@ OBJ= obja.o objb.o objc.o
 
 
 LDRPATH= $(EXTRA)/lib
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -117,14 +116,14 @@ so:			$(T).so
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ -O $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
-$(T).so:		$(OBJ) Makefile
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO)
+$(T).so:		$(OBJ)
+	$(LD) -shared -o $@ $(LDFLAGS) $^ $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
