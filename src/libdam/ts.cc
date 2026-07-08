@@ -122,9 +122,9 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
 #include	<ctime>			/* CSTD */
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
@@ -267,7 +267,7 @@ local int ts_dtor(ts *op) noex {
 } /* end subroutine (ts_dtor) */
 
 template<typename ... Args>
-static inline int ts_magic(ts *op,Args ... args) noex {
+local inline int ts_magic(ts *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == TS_MAGIC) ? SR_OK : SR_NOTOPEN ;
