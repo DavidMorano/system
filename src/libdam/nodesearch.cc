@@ -32,25 +32,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<absfn.h>
-#include	<hdbstr.h>
-#include	<strwcpy.h>
-#include	<nodesfile.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* LIBU */
+#include	<climits>		/* LIBU */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<absfn.h>		/* LIBUC */
+#include	<hdbstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<nodesfile.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nodesearch.h"
 
@@ -69,6 +69,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
+using libuc::libmem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -99,8 +100,7 @@ local int nodesearch_ctor(NS *op,Args ... args) noex {
 	    } /* end if (new-nodesfile) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (nodesearch_ctor) */
+} /* end subroutine (nodesearch_ctor) */
 
 local int nodesearch_dtor(NS *op) noex {
 	int		rs = SR_FAULT ;
@@ -112,8 +112,7 @@ local int nodesearch_dtor(NS *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (nodesearch_dtor) */
+} /* end subroutine (nodesearch_dtor) */
 
 template<typename ... Args>
 local inline int nodesearch_magic(NS *op,Args ... args) noex {
@@ -122,8 +121,7 @@ local inline int nodesearch_magic(NS *op,Args ... args) noex {
 	    rs = (op->magval == NODESEARCH_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (nodesearch_magic) */
+} /* end subroutine (nodesearch_magic) */
 
 #ifdef	COMMENT
 local int	nodesearch_filechanged(NS *,time_t) noex ;
@@ -175,8 +173,7 @@ int nodesearch_open(NS *op,cc *fname,int fsz) noex {
 	    }
 	} /* end if (nodesearch_ctor) */
 	return rs ;
-}
-/* end subroutine (nodesearch_open) */
+} /* end subroutine (nodesearch_open) */
 
 int nodesearch_close(NS *op) noex {
 	int		rs ;
@@ -199,8 +196,7 @@ int nodesearch_close(NS *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodesearch_close) */
+} /* end subroutine (nodesearch_close) */
 
 int nodesearch_check(NS *op,time_t dt) noex {
 	int		rs ;
@@ -212,12 +208,11 @@ int nodesearch_check(NS *op,time_t dt) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodesearch_check) */
+} /* end subroutine (nodesearch_check) */
 
 int nodesearch_search(NS *op,cc *sp,int sl) noex {
 	int		rs ;
-	int		f_found = false ;
+	int		f_found = false ; /* return-value */
 	if ((rs = nodesearch_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rs = nodesfile_have(op->nfp,sp,sl)) >= 0) {
@@ -225,8 +220,7 @@ int nodesearch_search(NS *op,cc *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f_found : rs ;
-}
-/* end subroutine (nodesearch_search) */
+} /* end subroutine (nodesearch_search) */
 
 int nodesearch_curbegin(NS *op,NS_CUR *curp) noex {
 	int		rs ;
@@ -242,8 +236,7 @@ int nodesearch_curbegin(NS *op,NS_CUR *curp) noex {
 	    } /* end if (memory-allocatiob) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodesearch_curbegin) */
+} /* end subroutine (nodesearch_curbegin) */
 
 int nodesearch_curend(NS *op,NS_CUR *curp) noex {
 	int		rs ;
@@ -264,8 +257,7 @@ int nodesearch_curend(NS *op,NS_CUR *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodesearch_curend) */
+} /* end subroutine (nodesearch_curend) */
 
 int nodesearch_curenum(NS *op,NS_CUR *curp,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -276,8 +268,7 @@ int nodesearch_curenum(NS *op,NS_CUR *curp,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodesearch_curenum) */
+} /* end subroutine (nodesearch_curenum) */
 
 
 /* private subroutines */
@@ -300,8 +291,7 @@ local int nodesearch_filechanged(NS *op,time_t daytime) noex {
 	    }
 	} /* end if (u_stat) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (nodesearch_filechanged) */
+} /* end subroutine (nodesearch_filechanged) */
 #endif /* COMMENT */
 
 
