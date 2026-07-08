@@ -51,7 +51,7 @@
 #include	"sesnotes.h"
 #include	"sesmsg.hh"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| */
 
