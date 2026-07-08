@@ -132,8 +132,7 @@ int bwriteblock(bfile *op,bfile *ifp,int ulen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bwriteblock) */
+} /* end subroutine (bwriteblock) */
 
 
 /* local subroutines */
@@ -166,8 +165,10 @@ int writer::abegin() noex {
 
 int writer::aend() noex {
 	int		rs = SR_BUGCHECK ;
+	int		rs1 ;
 	if (tbuf) {
-	    rs = mem.free(tbuf) ;
+	    rs1 = mem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	    tbuf = nullptr ;
 	    tlen = 0 ;
 	} /* end if (memory-release) */
