@@ -54,10 +54,10 @@
 #include	"termtrans.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/flbs.ccm"
+#pragma		GCC dependency		"mod/findbit.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
-import flbs ;
+import findbit ;
 
 /* local defines */
 
