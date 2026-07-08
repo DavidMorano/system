@@ -21,12 +21,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<terment.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<terment.h>		/* LIBUC */
 
 
 /* object defines */
@@ -39,11 +36,11 @@
 
 struct termenq_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct termenq_flags {
 	uint		writable:1 ;
-} ;
+} ; /* end struct */
 
 struct termenq_head {
 	cchar		*fname ;	/* stored file name */
@@ -64,7 +61,7 @@ struct termenq_head {
 	int		mapei ;		/* index of top mapped entry */
 	int		mapen ;		/* number of mapped entries */
 	int		en ;		/* convenience store */
-} ;
+} ; /* end struct */
 
 typedef	TERMENQ		termenq ;
 typedef	TERMENQ_FL	termenq_fl ;
