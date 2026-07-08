@@ -28,11 +28,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |uc_memalloc(3uc)| */
-#include	<cstring>		/* |memcmp(3c)| */
-#include	<usystem.h>		/* |uc_memalloc(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"streamsync.h"
 
@@ -47,6 +52,14 @@ import libutil ;			/* |lenstr(3u)| */
 #endif
 
 
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -56,14 +69,13 @@ import libutil ;			/* |lenstr(3u)| */
 /* forward references */
 
 template<typename ... Args>
-static inline int streamsync_magic(streamsync *op,Args ... args) noex {
+local inline int streamsync_magic(streamsync *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == STREAMSYNC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (streamsync_magic) */
+} /* end subroutine (streamsync_magic) */
 
 
 /* local variables */
@@ -87,7 +99,7 @@ int streamsync_start(streamsync *op,cchar *st,int stlen) noex {
 	        op->i = 0 ;
 	        op->stlen = stlen ;
 	        sz = (2 * stlen * szof(char)) ;
-	        if (char *p ; (rs = uc_malloc(sz,&p)) >= 0) {
+	        if (char *p ; (rs = mem.mall(sz,&p)) >= 0) {
 	            op->st = (p + 0) ;
 	            op->data = (p + stlen) ;
 	            memcopy(op->st,st,stlen) ;
@@ -97,23 +109,21 @@ int streamsync_start(streamsync *op,cchar *st,int stlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (streamsync_start) */
+} /* end subroutine (streamsync_start) */
 
 int streamsync_finish(streamsync *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = streamsync_magic(op)) >= 0) ylikely {
 	    if (op->st) ylikely {
-	        rs1 = uc_free(op->st) ;
+	        rs1 = mem.free(op->st) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->st = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (streamsync_finish) */
+} /* end subroutine (streamsync_finish) */
 
 int streamsync_test(streamsync *op,int ch) noex {
 	int		rs ;
@@ -123,7 +133,7 @@ int streamsync_test(streamsync *op,int ch) noex {
 	    /* shift the new byte in */
 	    for (i = 0 ; i < (op->stlen - 1) ; i += 1) {
 	        op->data[i] = op->data[i + 1] ;
-	    }
+	    } /* end for */
 	    op->data[i] = char(ch) ;
 	    /* now do the test */
 	    if (op->data[i] == op->st[i]) {
@@ -139,8 +149,7 @@ int streamsync_test(streamsync *op,int ch) noex {
 	    } /* end if (test good so far) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (streamsync_test) */
+} /* end subroutine (streamsync_test) */
 
 int streamsync::start(cchar *stp,int stl) noex {
 	return streamsync_start(this,stp,stl) ;
@@ -154,15 +163,15 @@ void streamsync::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("streamsync",rs,"dtor-finish") ;
 	}
-}
+} /* end method */
 
 streamsync::operator int () noex {
     	int		rs = SR_NOTOPEN ;
-	if (magic == STREAMSYNC_MAGIC) {
+	if (magval == STREAMSYNC_MAGIC) {
 	    rs = i ;
 	}
 	return rs ;
-}
+} /* end method */
 
 streamsync_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -174,7 +183,6 @@ streamsync_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (streamsync_co::operator) */
+} /* end method (streamsync_co::operator) */
 
 
