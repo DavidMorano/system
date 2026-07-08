@@ -21,25 +21,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<poll.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<poll.h>		/* POSIX */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
-#define	POLLER_MAGIC	0x09854123
 #define	POLLER		struct poller_head
 #define	POLLER_SPEC	struct pollfd
 #define	POLLER_CUR	struct poller_cursor
+#define	POLLER_MAGIC	0x09854123
 
 
 struct poller_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct poller_head {
 	vecobj		*rlp ;		/* register-list-pointer */
@@ -48,7 +45,7 @@ struct poller_head {
 	int		n ;		/* array number */
 	int		e ;		/* array extent */
 	int		nready ;
-} ;
+} ; /* end struct */
 
 typedef	POLLER		poller ;
 typedef	POLLER_SPEC	poller_spec ;
@@ -56,16 +53,16 @@ typedef	POLLER_CUR	poller_cur ;
 
 EXTERNC_begin
 
-extern int poller_start(poller*) noex ;
-extern int poller_reg(poller*,poller_spec *) noex ;
-extern int poller_cancel(poller*,poller_spec *) noex ;
-extern int poller_cancelfd(poller*,int) noex ;
-extern int poller_wait(poller*,poller_spec *,int) noex ;
-extern int poller_get(poller*,poller_spec *) noex ;
-extern int poller_curbegin(poller*,poller_cur *) noex ;
-extern int poller_enum(poller*,poller_cur *,poller_spec *) noex ;
-extern int poller_curend(poller*,poller_cur *) noex ;
-extern int poller_finish(poller*) noex ;
+extern int poller_start		(poller*) noex ;
+extern int poller_reg		(poller*,poller_spec *) noex ;
+extern int poller_cancel	(poller*,poller_spec *) noex ;
+extern int poller_cancelfd	(poller*,int) noex ;
+extern int poller_wait		(poller*,poller_spec *,int) noex ;
+extern int poller_get		(poller*,poller_spec *) noex ;
+extern int poller_curbegin	(poller*,poller_cur *) noex ;
+extern int poller_curenum	(poller*,poller_cur *,poller_spec *) noex ;
+extern int poller_curend	(poller*,poller_cur *) noex ;
+extern int poller_finish	(poller*) noex ;
 
 EXTERNC_end
 
