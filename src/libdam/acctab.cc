@@ -52,36 +52,43 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |UINT_MAX| */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<regex>			/* C++ REGEX; currently unused */
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<absfn.h>
-#include	<linebuffer.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<fieldterminit.hh>
-#include	<sfx.h>
-#include	<vecobj.h>
-#include	<vecstr.h>
-#include	<mkpathx.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<isnot.h>
-#include	<ismatstar.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |UINT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| + |strncmp(3c)| */
+#include	<regex>			/* C++STD REGEX - currently unused */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ugetx.h>		/* LIBU |getustime| */
+#include	<intsat.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<absfn.h>		/* LIBUC */
+#include	<linebuffer.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<ismatstar.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"acctab.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
@@ -92,9 +99,9 @@ import libutil ;
 #define	ACCTAB_CHANGETIME	3	/* wait change interval (seconds) */
 #define	ACCTAB_DEFNETGROUP	"DEFAULT"
 #define	ACCTAB_RGXLEN		256
-#define	ACCTAB_FI		struct acctab_file
+#define	ACCTAB_FI		acctab_file
 
-#define	PARTTYPE		struct acctab_part
+#define	PARTTYPE		acctab_part
 #define	PARTTYPE_STD		0
 #define	PARTTYPE_RGX		1
 #define	PARTTYPE_UNKNOWN	2
@@ -106,6 +113,7 @@ import libutil ;
 
 /* imported namespaces */
 
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -129,7 +137,7 @@ struct acctab_file {
 	dev_t		dev ;
 	ino_t		ino ;
 	int		len ;
-} ;
+} ; /* end struct */
 
 typedef acctab_file *	filep ;
 
@@ -137,11 +145,11 @@ typedef acctab_file *	filep ;
 /* forward references */
 
 template<typename ... Args>
-static int acctab_ctor(acctab *op,Args ... args) noex {
+local int acctab_ctor(acctab *op,Args ... args) noex {
 	ACCTAB		*hop = op ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    cnullptr	np{} ;
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
 	    if ((op->flp = new(nothrow) vecobj) != np) {
@@ -152,21 +160,20 @@ static int acctab_ctor(acctab *op,Args ... args) noex {
 		    if (rs < 0) {
 		        delete op->stdalp ;
 		        op->stdalp = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (new-vecobj) */
 		if (rs < 0) {
 		    delete op->flp ;
 		    op->flp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (acctab_ctor) */
+} /* end subroutine (acctab_ctor) */
 
-static int acctab_dtor(acctab *op) noex {
+local int acctab_dtor(acctab *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->rgxalp) {
 		delete op->rgxalp ;
@@ -182,66 +189,62 @@ static int acctab_dtor(acctab *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (acctab_dtor) */
+} /* end subroutine (acctab_dtor) */
 
 template<typename ... Args>
-static inline int acctab_magic(acctab *op,Args ... args) noex {
+local inline int acctab_magic(acctab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magval == ACCTAB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (acctab_magic) */
+} /* end subroutine (acctab_magic) */
 
-static int	acctab_filefins(acctab *) noex ;
-static int	acctab_fileparse(acctab *,int) noex ;
-static int	acctab_filedump(acctab *,int) noex ;
-static int	acctab_filedel(acctab *,int) noex ;
-static int	acctab_filechecks(acctab *,time_t) noex ;
-static int	acctab_entadd(acctab *,acctab_ent *) noex ;
-static int	acctab_entfins(acctab *) noex ;
+local int	acctab_filefins(acctab *) noex ;
+local int	acctab_fileparse(acctab *,int) noex ;
+local int	acctab_filedump(acctab *,int) noex ;
+local int	acctab_filedel(acctab *,int) noex ;
+local int	acctab_filechecks(acctab *,time_t) noex ;
+local int	acctab_entadd(acctab *,acctab_ent *) noex ;
+local int	acctab_entfins(acctab *) noex ;
 
-static int	entry_start(acctab_ent *,int = -1) noex ;
-static int	entry_tmpload(acctab_ent *,cc *,cc *,cc *,cc *) noex ;
-[[maybe_unused]] static int	entry_addnet(acctab_ent *,cchar *,int) noex ;
-[[maybe_unused]] static int	entry_addmac(acctab_ent *,cchar *,int) noex ;
-[[maybe_unused]] static int	entry_adduse(acctab_ent *,cchar *,int) noex ;
-[[maybe_unused]] static int	entry_addpas(acctab_ent *,cchar *,int) noex ;
-static int	entry_addx(acctab_ent *,int,cchar *,int) noex ;
-static int	entry_mat2(acctab_ent *,acctab_ent *) noex ;
-static int	entry_mat3(acctab_ent *,acctab_ent *) noex ;
-static int	entry_release(acctab_ent *) noex ;
-static int	entry_finish(acctab_ent *) noex ;
+local int	entry_start(acctab_ent *,int = -1) noex ;
+local int	entry_tmpload(acctab_ent *,cc *,cc *,cc *,cc *) noex ;
+[[maybe_unused]] local int	entry_addnet(acctab_ent *,cchar *,int) noex ;
+[[maybe_unused]] local int	entry_addmac(acctab_ent *,cchar *,int) noex ;
+[[maybe_unused]] local int	entry_adduse(acctab_ent *,cchar *,int) noex ;
+[[maybe_unused]] local int	entry_addpas(acctab_ent *,cchar *,int) noex ;
+local int	entry_addx(acctab_ent *,int,cchar *,int) noex ;
+local int	entry_mat2(acctab_ent *,acctab_ent *) noex ;
+local int	entry_mat3(acctab_ent *,acctab_ent *) noex ;
+local int	entry_release(acctab_ent *) noex ;
+local int	entry_finish(acctab_ent *) noex ;
 
-static int	file_start(ACCTAB_FI *,cchar *) noex ;
-static int	file_changed(ACCTAB_FI *,custime) noex ;
-static int	file_finish(ACCTAB_FI *) noex ;
+local int	file_start(ACCTAB_FI *,cchar *) noex ;
+local int	file_changed(ACCTAB_FI *,custime) noex ;
+local int	file_finish(ACCTAB_FI *) noex ;
 
-static int	part_start(acctab_pa *) noex ;
-static int	part_load(acctab_pa *,cchar *,int = -1) noex ;
-[[maybe_unused]] static int	part_copy(acctab_pa *,acctab_pa *) noex ;
-[[maybe_unused]] static int	part_compile(acctab_pa *,cchar *,int) noex ;
-static int	part_match(acctab_pa *,cchar *) noex ;
-static int	part_release(acctab_pa *) noex ;
-static int	part_finish(acctab_pa *) noex ;
+local int	part_start(acctab_pa *) noex ;
+local int	part_load(acctab_pa *,cchar *,int = -1) noex ;
+[[maybe_unused]] local int	part_copy(acctab_pa *,acctab_pa *) noex ;
+[[maybe_unused]] local int	part_compile(acctab_pa *,cchar *,int) noex ;
+local int	part_match(acctab_pa *,cchar *) noex ;
+local int	part_release(acctab_pa *) noex ;
+local int	part_finish(acctab_pa *) noex ;
 
-static int	parttype(cchar *) noex ;
+local int	parttype(cchar *) noex ;
 
 extern "C" {
-    static int	vcmpent(cvoid **,cvoid **) noex ;
+    local int	vcmpent(cvoid **,cvoid **) noex ;
 }
 
-static int	freeit(cchar **) noex ;
-
 static charp	compile(cchar *,char *,char *) noex ;
-static int	advance(cchar *,cchar *) noex ;
+local int	advance(cchar *,cchar *) noex ;
 
 
 /* local varaibles */
 
-static int	regerrno ;		/* TODO - get rid of this stuff! */
+local int	regerrno ;		/* TODO - get rid of this stuff! */
 
 constexpr char		gterms[] = { /* BS HT VT FF SP # : */
 	0x00, 0x1B, 0x00, 0x00,
@@ -252,7 +255,7 @@ constexpr char		gterms[] = { /* BS HT VT FF SP # : */
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 constexpr char		aterms[] = { /* BS HT VT FF SP # */
 	0x00, 0x1B, 0x00, 0x00,
@@ -263,7 +266,7 @@ constexpr char		aterms[] = { /* BS HT VT FF SP # */
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 constexpr int		intcheck = ACCTAB_CHECKTIME ;
 
@@ -280,13 +283,13 @@ int acctab_open(acctab *op,cchar *fname) noex {
 	if ((rs = acctab_ctor(op)) >= 0) {
 	    cint	sz = szof(ACCTAB_FI) ;
 	    cint	vn = 10 ;
-	    int		vo = VECOBJ_OREUSE ;
+	    int		vo = vecobjm.reuse ;
 	    op->checktime = getustime ;
 	    if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) {
 		cint	vsz = szof(acctab_ent) ;
-	        vo = VECOBJ_OSORTED ;
+	        vo = vecobjm.sorted ;
 	        if ((rs = vecobj_start(op->stdalp,vsz,vn,vo)) >= 0) {
-	            vo = VECOBJ_OCOMPACT ;
+	            vo = vecobjm.compact ;
 	            if ((rs = vecobj_start(op->rgxalp,vsz,vn,vo)) >= 0) {
 	                op->magval = ACCTAB_MAGIC ;
 	                if (fname) {
@@ -295,23 +298,22 @@ int acctab_open(acctab *op,cchar *fname) noex {
 	                if (rs < 0) {
 	                    op->magval = 0 ;
 	                    vecobj_finish(op->rgxalp) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (rgx) */
 	            if (rs < 0) {
 	                vecobj_finish(op->stdalp) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (std) */
 	        if (rs < 0) {
 	            vecobj_finish(op->flp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (vecobj-files) */
 	    if (rs < 0) {
 		acctab_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (acctab_ctor) */
 	return rs ;
-}
-/* end subroutine (acctab_open) */
+} /* end subroutine (acctab_open) */
 
 int acctab_close(acctab *op) noex {
 	int		rs ;
@@ -344,8 +346,7 @@ int acctab_close(acctab *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (acctab_close) */
+} /* end subroutine (acctab_close) */
 
 int acctab_fileadd(acctab *op,cchar *fname) noex {
 	int		rs ;
@@ -371,8 +372,7 @@ int acctab_fileadd(acctab *op,cchar *fname) noex {
 	    } /* end if (absfn) */
 	} /* end if (magic) */
 	return (rs >= 0) ? fi : rs ;
-}
-/* end subroutine (acctab_fileadd) */
+} /* end subroutine (acctab_fileadd) */
 
 int acctab_allowed(acctab *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
 	custime		dt = getustime ;
@@ -431,8 +431,7 @@ int acctab_allowed(acctab *op,cchar *ng,cchar *ma,cchar *un,cchar *pw) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (acctab_allowed) */
+} /* end subroutine (acctab_allowed) */
 
 int acctab_anyallowed(acctab *op,vecstr *nlp,vecstr *mlp,cc *un,cc *pw) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -465,8 +464,7 @@ int acctab_anyallowed(acctab *op,vecstr *nlp,vecstr *mlp,cc *un,cc *pw) noex {
 	    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (acctab_anyallowed) */
+} /* end subroutine (acctab_anyallowed) */
 
 #ifdef	COMMENT
 
@@ -490,8 +488,7 @@ int acctab_find(acctab *op,cc *netgroup,acctab_ent **sepp) noex {
 	    if (f) idx = i ;
 	} /* end if (magic) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (acctab_find) */
+} /* end subroutine (acctab_find) */
 
 #endif /* COMMENT */
 
@@ -502,8 +499,7 @@ int acctab_curbegin(acctab *op,acctab_cur *curp) noex {
 	    curp->j = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (acctab_curbegin) */
+} /* end subroutine (acctab_curbegin) */
 
 int acctab_curend(acctab *op,acctab_cur *curp) noex {
 	int		rs ;
@@ -512,8 +508,7 @@ int acctab_curend(acctab *op,acctab_cur *curp) noex {
 	    curp->j = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (acctab_curend) */
+} /* end subroutine (acctab_curend) */
 
 int acctab_curenum(acctab *op,acctab_cur *curp,acctab_ent **sepp) noex {
 	int		rs ;
@@ -556,8 +551,7 @@ int acctab_curenum(acctab *op,acctab_cur *curp,acctab_ent **sepp) noex {
 	    } /* end if (RGX entries) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (acctab_curenum) */
+} /* end subroutine (acctab_curenum) */
 
 /* check if the access tables files have changed */
 int acctab_check(acctab *op) noex {
@@ -569,13 +563,12 @@ int acctab_check(acctab *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (acctab_check) */
+} /* end subroutine (acctab_check) */
 
 
 /* private subroutines */
 
-static int acctab_filefins(acctab *op) noex {
+local int acctab_filefins(acctab *op) noex {
     	vecobj		*flp = op->flp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -588,10 +581,9 @@ static int acctab_filefins(acctab *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (acctab_filefins) */
+} /* end subroutine (acctab_filefins) */
 
-static int acctab_filechecks(acctab *op,time_t dt) noex {
+local int acctab_filechecks(acctab *op,time_t dt) noex {
     	vecobj		*flp = op->flp ;
 	int		rs = SR_OK ;
 	int		c_changed = false ;
@@ -613,8 +605,7 @@ static int acctab_filechecks(acctab *op,time_t dt) noex {
 	} /* end if (something changed) */
 	op->checktime = dt ;
 	return (rs >= 0) ? c_changed : rs ;
-}
-/* end subroutine (acctab_filechecks) */
+} /* end subroutine (acctab_filechecks) */
 
 namespace {
     struct parser {
@@ -629,9 +620,9 @@ namespace {
 	operator int () noex ;
 	int parseln(cchar *,int) noex ;
     } ; /* end struct (parser) */
-}
+} /* end namespace */
 
-static int acctab_fileparse(acctab *op,int fi) noex {
+local int acctab_fileparse(acctab *op,int fi) noex {
     	int		rs ;
 	int		c = 0 ;
 	if (void *vp{} ; (rs = vecobj_get(op->flp,fi,&vp)) >= 0) {
@@ -648,8 +639,7 @@ static int acctab_fileparse(acctab *op,int fi) noex {
 	    }
 	} /* end if (vecobj_get) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (acctab_fileparse) */
+} /* end subroutine (acctab_fileparse) */
 
 parser::operator int () noex {
 	int		rs ;
@@ -658,13 +648,14 @@ parser::operator int () noex {
     	if (linebuffer lb ; (rs = lb.start) >= 0) {
 	    bfile	afile, *afp = &afile ;
 	    if ((rs = bopen(afp,fep->fname,"r",0)) >= 0) {
-	        if (USTAT sb ; (rs = bcontrol(afp,BC_STAT,&sb)) >= 0) {
+	        if (ustat sb ; (rs = bcontrol(afp,BC_STAT,&sb)) >= 0) {
+		    csize fsize = size_t(sb.st_size) ;
 		    if (sb.st_size <= INT_MAX) {
 		        if (sb.st_mtime > fep->mtime) {
 			    fep->dev = sb.st_dev ;
 			    fep->ino = sb.st_ino ;
 			    fep->mtime = sb.st_mtime ;
-			    fep->len = intsat(sb.st_size) ;
+			    fep->len = intsat(fsize) ;
 			    while ((rs = breadln(afp,lb.lbuf,lb.llen)) > 0) {
 			        cchar	*cp{} ;
 			        char	*lp = lb.lbuf ;
@@ -678,11 +669,11 @@ parser::operator int () noex {
 				    rs = entry_release(&se) ;
 				    fent = false ;
 				}
-			    }
+			    } /* end if (ok) */
 			    if ((rs < 0) && fent) {
 				fent = false ;
 				entry_finish(&se) ;
-			    }
+			    } /* end if (error) */
 		        } /* end if (file older) */
 		    } else {
 			rs = SR_TOOBIG ;
@@ -695,8 +686,7 @@ parser::operator int () noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (linebuffer) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (parser::operator) */
+} /* end method (parser::operator) */
 
 int parser::parseln(cchar *lp,int ll) noex {
     	cint		rsn = SR_NOTFOUND ;
@@ -729,7 +719,7 @@ int parser::parseln(cchar *lp,int ll) noex {
 			    if (rs < 0) {
 				fent = false ;
 				entry_finish(&se) ;
-			    }
+			    } /* end if (error) */
 		        } /* end if (entry_start) */
 		    } /* end if (ok) */
 	        } /* end if (new netgroup) */
@@ -751,10 +741,9 @@ int parser::parseln(cchar *lp,int ll) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (parser::parseln) */
+} /* end subroutine (parser::parseln) */
 
-static int acctab_entadd(acctab *op,acctab_ent *sep) noex {
+local int acctab_entadd(acctab *op,acctab_ent *sep) noex {
 	int		rs ;
 	if (parttype(sep->netgroup.patstd) == PARTTYPE_STD) {
 	    rs = vecobj_add(op->stdalp,sep) ;
@@ -762,10 +751,9 @@ static int acctab_entadd(acctab *op,acctab_ent *sep) noex {
 	    rs = vecobj_add(op->rgxalp,sep) ;
 	}
 	return rs ;
-}
-/* end subroutine (acctab_entadd) */
+} /* end subroutine (acctab_entadd) */
 
-static int acctab_filedump(acctab *op,int fi) noex {
+local int acctab_filedump(acctab *op,int fi) noex {
 	vecobj		*slp ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
@@ -792,10 +780,9 @@ static int acctab_filedump(acctab *op,int fi) noex {
 	    if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	} /* end for (looping on the different types of entries) */
 	return rs ;
-}
-/* end subroutine (acctab_filedump) */
+} /* end subroutine (acctab_filedump) */
 
-static int acctab_filedel(acctab *op,int fi) noex {
+local int acctab_filedel(acctab *op,int fi) noex {
 	int		rs ;
 	int		rs1 ;
 	if (void *vp{} ; (rs = vecobj_get(op->flp,fi,&vp)) >= 0) {
@@ -812,10 +799,9 @@ static int acctab_filedel(acctab *op,int fi) noex {
 	    }
 	} /* end if (vecobj_get) */
 	return rs ;
-}
-/* end subroutine (acctab_filedel) */
+} /* end subroutine (acctab_filedel) */
 
-static int acctab_entfins(acctab *op) noex {
+local int acctab_entfins(acctab *op) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -838,41 +824,38 @@ static int acctab_entfins(acctab *op) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (acctab_entfins) */
+} /* end subroutine (acctab_entfins) */
 
-static int file_start(ACCTAB_FI *fep,cchar *fname) noex {
+local int file_start(ACCTAB_FI *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (fep && fname) {
 	    memclear(fep) ;
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	    if (cchar *cp{} ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
 	        fep->fname = cp ;
-	    }
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_start) */
+} /* end subroutine (file_start) */
 
-static int file_finish(ACCTAB_FI *fep) noex {
+local int file_finish(ACCTAB_FI *fep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (fep) {
 	    rs = SR_OK ;
 	    if (fep->fname) {
-	        rs1 = uc_free(fep->fname) ;
+	        voidp vp = voidp(fep->fname) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->fname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_finish) */
+} /* end subroutine (file_finish) */
 
-static int file_changed(ACCTAB_FI *fep,custime dt) noex {
-	USTAT		sb ;
+local int file_changed(ACCTAB_FI *fep,custime dt) noex {
 	int		rs ;
-	int		f = false ;
-	if ((rs = uc_stat(fep->fname,&sb)) >= 0) {
+	int		f = false ; /* return-value */
+	if (ustat sb ; (rs = uc_stat(fep->fname,&sb)) >= 0) {
 	    if (sb.st_mtime > fep->mtime) {
 	        f = ((dt - sb.st_mtime) >= intcheck) ;
 	    }
@@ -880,10 +863,9 @@ static int file_changed(ACCTAB_FI *fep,custime dt) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (file_changed) */
+} /* end subroutine (file_changed) */
 
-static int entry_start(acctab_ent *sep,int fi) noex {
+local int entry_start(acctab_ent *sep,int fi) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
 	    if ((rs = memclear(sep)) >= 0) {
@@ -900,19 +882,18 @@ static int entry_start(acctab_ent *sep,int fi) noex {
 			}
 			if (rs < 0) {
 			    part_finish(&sep->machine) ;
-			}
+			} /* end if (error) */
 		    }
 		    if (rs < 0) {
 			part_finish(&sep->netgroup) ;
-		    }
-		}
+		    } /* end if (error) */
+		} /* end if (part_start) */
 	    } /* end if (memclear) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
-static int entry_finish(acctab_ent *sep) noex {
+local int entry_finish(acctab_ent *sep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (sep) {
@@ -938,10 +919,9 @@ static int entry_finish(acctab_ent *sep) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
-static int entry_release(acctab_ent *ep) noex {
+local int entry_release(acctab_ent *ep) noex {
     	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (ep) {
@@ -967,9 +947,9 @@ static int entry_release(acctab_ent *ep) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine */
 
-static int entry_tmpload(acctab_ent *aep,cc *n,cc *m,cc *u,cc *p) noex {
+local int entry_tmpload(acctab_ent *aep,cc *n,cc *m,cc *u,cc *p) noex {
 	int		rs = SR_FAULT ;
 	if (aep) {
 	    rs = SR_OK ;
@@ -982,72 +962,69 @@ static int entry_tmpload(acctab_ent *aep,cc *n,cc *m,cc *u,cc *p) noex {
 	    aep->password.patstd = charp(p) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_tmpload) */
+} /* end subroutine (entry_tmpload) */
 
-static int entry_addnet(acctab_ent *aep,cc *sp,int sl) noex {
+local int entry_addnet(acctab_ent *aep,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (aep) {
 	    rs = part_load(&aep->netgroup,sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_addnet) */
+} /* end subroutine (entry_addnet) */
 
-static int entry_addmac(acctab_ent *aep,cc *sp,int sl) noex {
+local int entry_addmac(acctab_ent *aep,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (aep) {
 	    rs = part_load(&aep->machine,sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_addmac) */
+} /* end subroutine (entry_addmac) */
 
-static int entry_adduse(acctab_ent *aep,cc *sp,int sl) noex {
+local int entry_adduse(acctab_ent *aep,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (aep) {
 	    rs = part_load(&aep->username,sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_adduse) */
+} /* end subroutine (entry_adduse) */
 
-static int entry_addpas(acctab_ent *aep,cc *sp,int sl) noex {
+local int entry_addpas(acctab_ent *aep,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (aep) {
 	    rs = part_load(&aep->password,sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_addpas) */
+} /* end subroutine (entry_addpas) */
 
-static int entry_addx(acctab_ent *aep,int idx,cc *sp,int sl) noex {
+local int entry_addx(acctab_ent *aep,int idx,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (aep) {
+	if (aep) ylikely {
+	    acctab_pa *pap = nullptr ;
 	    switch (idx) {
 	    case 0:
-	       rs = part_load(&aep->machine,sp,sl) ;
-	       break ;
+		pap = &aep->machine ;
+	        break ;
 	    case 1:
-	       rs = part_load(&aep->username,sp,sl) ;
-	       break ;
+	        pap = &aep->username ;
+	        break ;
 	    case 2:
-	       rs = part_load(&aep->password,sp,sl) ;
-	       break ;
+	        pap = &aep->password ;
+	        break ;
 	    default:
-	       rs = SR_BUGCHECK ;
-	       break ;
+	        rs = SR_BUGCHECK ;
+	        break ;
 	    } /* end switch */
-	}
+	    if (pap) {
+	       rs = part_load(pap,sp,sl) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_addx) */
+} /* end subroutine (entry_addx) */
 
-static int entry_mat2(acctab_ent *e1p,acctab_ent *e2p) noex {
+local int entry_mat2(acctab_ent *e1p,acctab_ent *e2p) noex {
 	int		rs ;
-	int		f = false ;
-	cchar		*cp ;
-	cp = e2p->machine.patstd ;
+	int		f = false ; /* return-value */
+	cchar		*cp = e2p->machine.patstd ;
 	if ((rs = part_match(&e1p->machine,cp)) > 0) {
 	    cp = e2p->username.patstd ;
 	    if ((rs = part_match(&e1p->username,cp)) > 0) {
@@ -1058,14 +1035,12 @@ static int entry_mat2(acctab_ent *e1p,acctab_ent *e2p) noex {
 	    }
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (entry_mat2) */
+} /* end subroutine (entry_mat2) */
 
-static int entry_mat3(acctab_ent *e1p,acctab_ent *e2p) noex {
+local int entry_mat3(acctab_ent *e1p,acctab_ent *e2p) noex {
 	int		rs ;
-	int		f = false ;
-	cchar		*cp ;
-	cp = e2p->netgroup.patstd ;
+	int		f = false ; /* return-value */
+	cchar		*cp = e2p->netgroup.patstd ;
 	if ((rs = part_match(&e1p->netgroup,cp)) > 0) {
 	    cp = e2p->machine.patstd ;
 	    if ((rs = part_match(&e1p->machine,cp)) > 0) {
@@ -1079,12 +1054,11 @@ static int entry_mat3(acctab_ent *e1p,acctab_ent *e2p) noex {
 	    }
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (entry_mat3) */
+} /* end subroutine (entry_mat3) */
 
-static int part_start(PARTTYPE *pp) noex {
+local int part_start(PARTTYPE *pp) noex {
 	int		rs = SR_FAULT ;
-	if (pp) {
+	if (pp) ylikely {
 	    rs = SR_OK ;
 	    pp->type = 0 ;
 	    pp->patstd = nullptr ;
@@ -1092,90 +1066,87 @@ static int part_start(PARTTYPE *pp) noex {
 	    pp->patrgxlen = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (part_start) */
+} /* end subroutine (part_start) */
 
-static int part_load(PARTTYPE *pp,cchar *sp,int sl) noex {
+local int part_load(PARTTYPE *pp,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (pp && sp) {
-	    if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	if (pp && sp) ylikely {
+	    if (cchar *cp ; (rs = mem.strw(sp,sl,&cp)) >= 0) {
 		pp->patstd = cp ;
 		pp->type = PARTTYPE_STD	;
-	    }
-	}
+	    } /* end if (memory-acquire) */
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (part_load) */
+} /* end subroutine (part_load) */
 
 /* p1 gets loaded up (from p2) */
-static int part_copy(PARTTYPE *p1p,PARTTYPE *p2p) noex {
+local int part_copy(PARTTYPE *p1p,PARTTYPE *p2p) noex {
 	int		rs = SR_OK ;
 	cchar		*cp ;
 	memclear(p1p) ;
 	p1p->type = p2p->type ;
 	if (p2p->patstd != nullptr) {
-	    if ((rs = uc_mallocstrw(p2p->patstd,-1,&cp)) >= 0) {
+	    if ((rs = mem.strw(p2p->patstd,-1,&cp)) >= 0) ylikely {
 	        p1p->patstd = cp ;
-	    }
+	    } /* end if (memory-acqtire) */
 	} /* end if (copied STD) */
 	if_constexpr (f_regex) {
 	    if (rs >= 0) {
 	        if (p2p->patrgx != nullptr) {
 		    cint	sl = p2p->patrgxlen ;
 		    cchar	*sp = p2p->patrgx ;
-	            if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	            if ((rs = mem.strw(sp,sl,&cp)) >= 0) {
 	                p1p->patrgx = cp ;
 	                p1p->patrgxlen = p2p->patrgxlen ;
-	            }
+	            } /* end if (memory-acquire) */
 	        } /* end if (copied RGX) */
 	    } /* end if (ok) */
 	    if (rs < 0) {
-	        if (p1p->patstd != nullptr) {
-	            uc_free(p1p->patstd) ;
+	        if (p1p->patstd) {
+	            voidp vp = voidp(p1p->patstd) ;
+	            mem.free(vp) ;
 	            p1p->patstd = nullptr ;
-	        }
-	    }
+	        } /* end if (memory-release) */
+	    } /* end if (error) */
 	} /* end if_constexpr (f_regex) */
 	return rs ;
-}
-/* end subroutine (part_copy) */
+} /* end subroutine (part_copy) */
 
-static int part_compile(PARTTYPE *pp,cchar *sp,int sl) noex {
+local int part_compile(PARTTYPE *pp,cchar *sp,int sl) noex {
 	int		rs ;
 	pp->type = 0 ;
 	pp->patstd = nullptr ;
 	pp->patrgx = nullptr ;
 	pp->patrgxlen = 0 ;
-	if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = mem.strw(sp,sl,&cp)) >= 0) ylikely {
 	    pp->patstd = cp ;
 	    if_constexpr (f_regex) {
 		cint	pt = PARTTYPE_STD ;
 		int	type ;
 	        if ((rs >= 0) && ((type = parttype(pp->patstd)) > pt)) {
+		    cint	rlen = ACCTAB_RGXLEN ;
 	            char	*rgxbuf ;
-	            char	*rp ;
-	            if ((rs = uc_malloc(ACCTAB_RGXLEN,&rgxbuf)) >= 0) {
-			cint	rlen = ACCTAB_RGXLEN ;
+	            if ((rs = mem.mall(rlen,&rgxbuf)) >= 0) {
+	                char	*rp ;
 	                rp = compile(pp->patstd,rgxbuf,(rgxbuf + rlen)) ;
-	                if (rp != nullptr) {
+	                if (rp) {
 	                    pp->patrgx = rp ;
 	                    pp->patrgxlen = ACCTAB_RGXLEN ;
 	                    pp->type = type ;
 	                } else {
 	                    rs = (regerrno == 0) ? SR_NOMEM : SR_INVALID ;
-	                    uc_free(rgxbuf) ;
-	                }
-	            } /* end if (got memory) */
+	                    mem.free(rgxbuf) ;
+	                } /* end if (memory-release) */
+	            } /* end if (memory-qcquire) */
 	        } /* end if (RGX indicated) */
 	    } /* end if_constexpr (f_regex) */
-	} /* end if (m-a) */
+	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (part_compile) */
+} /* end subroutine (part_compile) */
 
-static int part_match(PARTTYPE *pp,cchar *s) noex {
-	int		f = true ;
-	if (pp->patstd) {
+local int part_match(PARTTYPE *pp,cchar *s) noex {
+	int		f = true ; /* return-value */
+	if (pp->patstd) ylikely {
 	    f = false ;
 	    if (s) {
 	        if (pp->patrgx == nullptr) {
@@ -1185,16 +1156,15 @@ static int part_match(PARTTYPE *pp,cchar *s) noex {
 	            }
 	        } else {
 	            if (pp->type == 1) {
-			cnullptr	np{} ;
-	                if (cchar *tp ; (tp = strchr(pp->patstd,'*')) != np) {
-		            int		sl ;
+	                if (cchar *tp = strchr(pp->patstd,'*') ; tp) {
 	                    f = false ;
-	                    if (strncmp(s,pp->patstd,(tp - pp->patstd)) == 0) {
+			    size_t tsz = (tp - pp->patstd) ;
+	                    if (strncmp(s,pp->patstd,tsz) == 0) {
 	                        cint	sl1 = lenstr(s) ;
 	                        cint	sl2 = lenstr(pp->patstd) ;
 	                        tp += 1 ;
-	                        sl = intconv(pp->patstd + sl2 - tp) ;
-	                        f = (strncmp(s + sl1 - sl,tp,sl) == 0) ;
+	                        tsz = (pp->patstd + sl2 - tp) ;
+	                        f = (strncmp(s + sl1 - tsz,tp,tsz) == 0) ;
 	                    } /* end if */
 	                } else {
 	                    f = (strcmp(pp->patstd,s) == 0) ;
@@ -1213,49 +1183,40 @@ static int part_match(PARTTYPE *pp,cchar *s) noex {
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (part_match) */
+} /* end subroutine (part_match) */
 
-static int part_release(PARTTYPE *pp) noex {
+local int part_release(PARTTYPE *pp) noex {
     	int		rs = SR_FAULT ;
-	if (pp) {
+	if (pp) ylikely {
 	    rs = memclear(pp) ;
 	}
 	return rs ;
-}
-/* end subroutine (part_release) */
+} /* end subroutine (part_release) */
 
-static int part_finish(PARTTYPE *pp) noex {
+local int part_finish(PARTTYPE *pp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (pp) {
+	if (pp) ylikely {
 	    rs = SR_OK ;
 	    if (pp->patstd) {
-	        rs1 = freeit(&pp->patstd) ;
+	        voidp vp = voidp(pp->patstd) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	        pp->patstd = nullptr ;
+	    } /* end if (memory-release) */
 	    if (pp->patrgx) {
-	        rs1 = freeit(&pp->patrgx) ;
+	        voidp vp = voidp(pp->patrgx) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	        pp->patrgx = nullptr ;
+	    } /* end if (memory-release) */
 	    pp->patrgxlen = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (part_finish) */
-
-static int freeit(cchar **pp) noex {
-	int		rs = SR_OK ;
-	if (*pp != nullptr) {
-	    rs = uc_free(*pp) ;
-	    *pp = nullptr ;
-	}
-	return rs ;
-}
-/* end subroutine (freeit) */
+} /* end subroutine (part_finish) */
 
 /* compare just the 'netgroup' part of entries (used for sorting) */
-static int vcmpent(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpent(cvoid **v1pp,cvoid **v2pp) noex {
 	acctab_ent	*e1p = (acctab_ent *) *v1pp ;
 	acctab_ent	*e2p = (acctab_ent *) *v2pp ;
 	int		rc = 0 ;
@@ -1271,11 +1232,10 @@ static int vcmpent(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpent) */
+} /* end subroutine (vcmpent) */
 
 /* determine the type of this string part */
-static int parttype(cchar *s) noex {
+local int parttype(cchar *s) noex {
 	int		type = PARTTYPE_STD ;
 	bool		f = false ;
 	for ( ; *s ; s += 1) {
@@ -1290,8 +1250,7 @@ static int parttype(cchar *s) noex {
 	    if (! f) break ;
 	} /* end for */
 	return (*s == '\0') ? type : PARTTYPE_UNKNOWN ;
-}
-/* end subroutine (parttype) */
+} /* end subroutine (parttype) */
 
 /* dummy subroutine; one of the old SysV REGEX functions (not standardized) */
 static charp compile(cchar *,char *,char *) noex {
@@ -1299,7 +1258,7 @@ static charp compile(cchar *,char *,char *) noex {
 }
 
 /* dummy subroutine; one of the old SysV REGEX functions (not standardized) */
-static int advance(cchar *,cchar *) noex {
+local int advance(cchar *,cchar *) noex {
 	return 0 ;
 }
 
