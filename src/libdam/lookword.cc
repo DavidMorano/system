@@ -26,24 +26,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<naturalwords.h>
-#include	<ascii.h>
-#include	<vecobj.h>
-#include	<snwcpy.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |LINEBUFLEN| */
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<naturalwords.h>	/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |LINEBUFLEN| */
 
 #include	"lookword.h"
 
@@ -71,6 +77,7 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	LW		lookword
 #define	LW_CUR		lookword_cur
+#define	LW_W		lookword_word
 
 
 /* external subroutines */
@@ -85,26 +92,25 @@ import libutil ;			/* |memclear(3u)| */
 /* forward references */
 
 template<typename ... Args>
-static inline int lookword_magic(lookword *op,Args ... args) noex {
+local inline int lookword_magic(lookword *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == LOOKWORD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (lookword_magic) */
+} /* end subroutine (lookword_magic) */
 
-static int	lookword_proc(LW *,LW_CUR *,
+local int	lookword_proc(LW *,LW_CUR *,
 			cchar *,cchar *,cchar *) noex ;
-static int	lookword_mksword(LW *,char *,int,cchar *) noex ;
-static int	lookword_record(LW *,LW_CUR *,
+local int	lookword_mksword(LW *,char *,int,cchar *) noex ;
+local int	lookword_record(LW *,LW_CUR *,
 			cchar *,cchar *,cchar *) noex ;
-static int	lookword_recorder(LW *,LW_CUR *,vecobj *,int) noex ;
+local int	lookword_recorder(LW *,LW_CUR *,vecobj *,int) noex ;
 
-static int      compare(LW *,cchar *,cchar *,cchar *,int *) noex ;
+local int      compare(LW *,cchar *,cchar *,cchar *,int *) noex ;
 
-static cchar    *binary_search(LW *,cchar *,cchar *,cchar *) noex ;
-static cchar    *linear_search(LW *,cchar *,cchar *,cchar *) noex ;
+local cchar    *binary_search(LW *,cchar *,cchar *,cchar *) noex ;
+local cchar    *linear_search(LW *,cchar *,cchar *,cchar *) noex ;
 
 
 /* local variables */
@@ -143,8 +149,7 @@ int lookword_open(LW *op,cchar *dfname,int opts) noex {
 	    } /* end if (file-open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookword_open) */
+} /* end subroutine (lookword_open) */
 
 int lookword_close(LW *op) noex {
 	int		rs ;
@@ -164,8 +169,7 @@ int lookword_close(LW *op) noex {
 	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookword_close) */
+} /* end subroutine (lookword_close) */
 
 int lookword_curbegin(LW *op,LW_CUR *curp) noex {
 	int		rs ;
@@ -173,8 +177,7 @@ int lookword_curbegin(LW *op,LW_CUR *curp) noex {
 	    rs = memclear(curp) ;
 	}
 	return rs ;
-}
-/* end subroutine (lookword_curbegin) */
+} /* end subroutine (lookword_curbegin) */
 
 int lookword_curend(LW *op,LW_CUR *curp) noex {
 	int		rs ;
@@ -188,8 +191,7 @@ int lookword_curend(LW *op,LW_CUR *curp) noex {
 	    curp->n = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lookword_curend) */
+} /* end subroutine (lookword_curend) */
 
 int lookword_lookup(LW *op,LW_CUR *curp,cchar *wstr) noex {
 	int		rs ;
@@ -205,8 +207,7 @@ int lookword_lookup(LW *op,LW_CUR *curp,cchar *wstr) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (lookword_lookup) */
+} /* end subroutine (lookword_lookup) */
 
 int lookword_read(LW *op,LW_CUR *curp,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -214,7 +215,7 @@ int lookword_read(LW *op,LW_CUR *curp,char *rbuf,int rlen) noex {
 	if ((rs = lookword_magic(op,curp,rbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
 	    if (curp->i < curp->n) {
-	        LOOKWORD_WORD	*ap = (curp->ans + curp->i) ;
+	        LW_W	*ap = (curp->ans + curp->i) ;
 	        if ((rs = snwcpy(rbuf,rlen,ap->wp,ap->wl)) >= 0) {
 	            rl = rs ;
 	            curp->i += 1 ;
@@ -222,13 +223,12 @@ int lookword_read(LW *op,LW_CUR *curp,char *rbuf,int rlen) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (lookword_read) */
+} /* end subroutine (lookword_read) */
 
 
 /* private subroutines */
 
-static int lookword_proc(LW *op,LW_CUR *curp,
+local int lookword_proc(LW *op,LW_CUR *curp,
 		cc *front,cc *back,cc *wstr) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -239,13 +239,13 @@ static int lookword_proc(LW *op,LW_CUR *curp,
 	    c = rs ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (lookword_proc) */
+} /* end subroutine (lookword_proc) */
 
-static int lookword_mksword(LW *op,char *rbuf,int rlen,cchar *s) noex {
+local int lookword_mksword(LW *op,char *rbuf,int rlen,cchar *s) noex {
 	int		rs = SR_OK ;
 	int		i ; /* used-afterwards */
-	int		dch, fch ;
+	int		dch ;
+	int		fch ;
 	cchar		*readp = s ;
 	char		*writep = rbuf ;
 	for (i = 0 ; (i < rlen) && (s[i] != '\0') ; i += 1) {
@@ -254,24 +254,23 @@ static int lookword_mksword(LW *op,char *rbuf,int rlen,cchar *s) noex {
 	    dch = (op->fl.dict) ? DICT(ch) : ch ;
 	    if (dch != NO_COMPARE) {
 	        fch = (op->fl.fold) ? FOLD(dch) : dch ;
-	        *(writep++) = fch ;
+	        *(writep++) = char(fch) ;
 	    }
 	} /* end for */
 	*writep = '\0' ;
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (lookword_mksword) */
+} /* end subroutine (lookword_mksword) */
 
-static int lookword_record(LW *op,LW_CUR *curp,
+local int lookword_record(LW *op,LW_CUR *curp,
 		cc *front,cc *back,cc *wstr) noex {
 	cnullptr	np{} ;
 	vecobj		ans ;
-	cint		esize = szof(LOOKWORD_WORD) ;
+	cint		esize = szof(LW_W) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = vecobj_start(&ans,esize,1,0)) >= 0) {
-	    LOOKWORD_WORD	w ;
+	    LW_W	w ;
 	    int			m ;
 	    bool		f_mat = true ;
 	    cchar		*tp ;
@@ -290,13 +289,13 @@ static int lookword_record(LW *op,LW_CUR *curp,
 	                if (f_mat) {
 	                    c += 1 ;
 	                    w.wp = front ;
-	                    w.wl = (tp-front) ;
+	                    w.wl = intconv(tp - front) ;
 	                    rs = vecobj_add(&ans,&w) ;
 	                }
 	            } else {
 	                c += 1 ;
 	                w.wp = front ;
-	                w.wl = (tp-front) ;
+	                w.wl = intconv(tp - front) ;
 	                rs = vecobj_add(&ans,&w) ;
 	            } /* end if (whole or partial) */
 	            front = (tp + 1) ;
@@ -311,26 +310,25 @@ static int lookword_record(LW *op,LW_CUR *curp,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecobj) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (lookword_record) */
+} /* end subroutine (lookword_record) */
 
-static int lookword_recorder(LW *op,LW_CUR *curp,vecobj *alp,int c) noex {
+local int lookword_recorder(LW *op,LW_CUR *curp,vecobj *alp,int c) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
 	if (op) {
-	    cint	asize = ((c+1) * szof(LOOKWORD_WORD)) ;
+	    cint	asize = ((c+1) * szof(LW_W)) ;
 	    void	*p ;
 	    if (curp->ans) {
 	        uc_free(curp->ans) ;
 	        curp->ans = nullptr ;
 	    }
 	    if ((rs = uc_malloc(asize,&p)) >= 0) {
-	        LOOKWORD_WORD	*ans = (LOOKWORD_WORD *) p ;
-	        void		*vp{} ;
-	        curp->ans = (LOOKWORD_WORD *) p ;
+	        LW_W	*ans = (LOOKWORD_WORD *) p ;
+	        void	*vp{} ;
+	        curp->ans = (LW_W *) p ;
 	        for (int i = 0 ; vecobj_get(alp,i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
-	    	        LOOKWORD_WORD	*ep = (LOOKWORD_WORD *) vp ;
+	    	        LW_W	*ep = (LW_W *) vp ;
 	                ans[n].wp = ep->wp ;
 	                ans[n].wl = ep->wl ;
 	                n += 1 ;
@@ -342,8 +340,7 @@ static int lookword_recorder(LW *op,LW_CUR *curp,vecobj *alp,int c) noex {
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (lookword_recorder) */
+} /* end subroutine (lookword_recorder) */
 
 /***
  * Binary search for "string" in memory between "front" and "back".
@@ -389,7 +386,7 @@ static int lookword_recorder(LW *op,LW_CUR *curp,vecobj *alp,int c) noex {
 #define	SKNL(p,back) \
 	    while (((p) < (back)) && (*(p)++ != '\n')) ;
 
-static cchar *binary_search(LW *op,cc *front,cc *back,cc *wstr) noex {
+local cchar *binary_search(LW *op,cc *front,cc *back,cc *wstr) noex {
 	cchar		*p = front + ((back - front) / 2) ;
 	SKNL(p,back) ;
 	while ((p < back) && (back > front)) {
@@ -402,8 +399,7 @@ static cchar *binary_search(LW *op,cc *front,cc *back,cc *wstr) noex {
 	    SKNL(p,back) ;
 	} /* end while */
 	return (front) ;
-}
-/* end subroutine (binary_search) */
+} /* end subroutine (binary_search) */
 
 /****
   Find the first line that starts with string, linearly searching
@@ -415,7 +411,7 @@ static cchar *binary_search(LW *op,cc *front,cc *back,cc *wstr) noex {
 
  ****/
 
-static cchar *linear_search(LW *op,cc *front,cc *back,cc *wstr) noex {
+local cchar *linear_search(LW *op,cc *front,cc *back,cc *wstr) noex {
 	int		rc = 0 ;
 	while (front < back) {
 	    rc = compare(op,front,back,wstr,nullptr) ;
@@ -423,8 +419,7 @@ static cchar *linear_search(LW *op,cc *front,cc *back,cc *wstr) noex {
 	    SKNL(front,back) ;
 	} /* end while */
 	return ((rc == 0) ? front : nullptr) ;
-}
-/* end subroutine (linear_search) */
+} /* end subroutine (linear_search) */
 
 /****
  Return LESS, GREATER, or EQUAL depending on how the string1 compares
@@ -437,7 +432,7 @@ static cchar *linear_search(LW *op,cc *front,cc *back,cc *wstr) noex {
  * (or "back" terminated).
  ****/
 
-static int compare(LW *op,cchar *s2,cchar *back,cchar *s1,int *rp) noex {
+local int compare(LW *op,cchar *s2,cchar *back,cchar *s1,int *rp) noex {
 	int		ch1, ch2 ;
 	int		fch1, fch2 ;
 	int		i = 0 ;
@@ -470,7 +465,6 @@ static int compare(LW *op,cchar *s2,cchar *back,cchar *s1,int *rp) noex {
 	}
 	if (rp) *rp = j ;
 	return rc ;
-}
-/* end subroutine (compare) */
+} /* end subroutine (compare) */
 
 
