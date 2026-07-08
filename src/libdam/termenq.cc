@@ -29,20 +29,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<intceil.h>
-#include	<intfloor.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/mman.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<intfloor.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"termenq.h"
 
@@ -84,41 +84,38 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int termenq_ctor(termenq *op,Args ... args) noex {
+local int termenq_ctor(termenq *op,Args ... args) noex {
     	TERMENQ		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termenq_ctor) */
+} /* end subroutine (termenq_ctor) */
 
-static int termenq_dtor(termenq *op) noex {
+local int termenq_dtor(termenq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termenq_dtor) */
+} /* end subroutine (termenq_dtor) */
 
 template<typename ... Args>
-static inline int termenq_magic(termenq *op,Args ... args) noex {
+local inline int termenq_magic(termenq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == TERMENQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (termenq_magic) */
+} /* end subroutine (termenq_magic) */
 
-static int	termenq_initstuff(TE *,int) noex ;
-static int	termenq_filesz(TE *,time_t = 0L) noex ;
-static int	termenq_fileopen(TE *,time_t = 0L) noex ;
-static int	termenq_fileclose(TE *) noex ;
-static int	termenq_mapents(TE *,int,TE_ENT **) noex ;
-static int	termenq_mapper(TE *,int,uint,uint) noex ;
+local int	termenq_initstuff(TE *,int) noex ;
+local int	termenq_filesz(TE *,time_t = 0L) noex ;
+local int	termenq_fileopen(TE *,time_t = 0L) noex ;
+local int	termenq_fileclose(TE *) noex ;
+local int	termenq_mapents(TE *,int,TE_ENT **) noex ;
+local int	termenq_mapper(TE *,int,uint,uint) noex ;
 
 static bool	isproctype(int) noex ;
 
@@ -130,7 +127,7 @@ constexpr int		proctypes[] = {
 	TERMENT_TUSERPROC,
 	TERMENT_TDEADPROC,
 	-1
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -173,8 +170,7 @@ int termenq_open(TE *op,cchar *dbfn,int oflags) noex {
 	    }
 	} /* end if (termenq_ctor) */
 	return rs ;
-}
-/* end subroutine (termenq_open) */
+} /* end subroutine (termenq_open) */
 
 int termenq_close(TE *op) noex {
 	int		rs ;
@@ -197,8 +193,7 @@ int termenq_close(TE *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (termenq_close) */
+} /* end subroutine (termenq_close) */
 
 int termenq_write(TE *op,int ei,TE_ENT *ep) noex {
 	int		rs ;
@@ -218,8 +213,7 @@ int termenq_write(TE *op,int ei,TE_ENT *ep) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (termenq_write) */
+} /* end subroutine (termenq_write) */
 
 int termenq_check(TE *op,time_t dt) noex {
 	int		rs ;
@@ -254,8 +248,7 @@ int termenq_check(TE *op,time_t dt) noex {
 	    } /* end if (cursor-available) */
 	} /* end if (magic) */
 	return (rs >= 0) ? fch : rs ;
-}
-/* end subroutine (termenq_check) */
+} /* end subroutine (termenq_check) */
 
 int termenq_curbegin(TE *op,TE_CUR *curp) noex {
 	int		rs ;
@@ -272,8 +265,7 @@ int termenq_curbegin(TE *op,TE_CUR *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (termenq_curbegin) */
+} /* end subroutine (termenq_curbegin) */
 
 int termenq_curend(TE *op,TE_CUR *curp) noex {
     	int		rs ;
@@ -284,8 +276,7 @@ int termenq_curend(TE *op,TE_CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (termenq_curend) */
+} /* end subroutine (termenq_curend) */
 
 int termenq_curenum(TE *op,TE_CUR *curp,TE_ENT *ep) noex {
 	int		rs ;
@@ -296,7 +287,7 @@ int termenq_curenum(TE *op,TE_CUR *curp,TE_ENT *ep) noex {
 		cint	n = rs ;
 	        if ((n > 0) && bp) {
 	            if (ep) {
-	        	memcpy(ep,bp,sizeof(TE_ENT)) ;
+	        	memcopy(ep,bp,szof(TE_ENT)) ;
 	    	    }
 	            curp->i = ei ;
 	        } else {
@@ -305,8 +296,7 @@ int termenq_curenum(TE *op,TE_CUR *curp,TE_ENT *ep) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (termenq_curenum) */
+} /* end subroutine (termenq_curenum) */
 
 int termenq_fetchsid(TE *op,TE_ENT *ep,pid_t pid) noex {
 	int		rs ;
@@ -330,7 +320,7 @@ int termenq_fetchsid(TE *op,TE_ENT *ep,pid_t pid) noex {
 	            if (f) break ;
 	        } /* end while */
 	        if ((rs >= 0) && f && ep && up) {
-	            memcpy(ep,up,sizeof(TE_ENT)) ;
+	            memcopy(ep,up,szof(TE_ENT)) ;
 	        }
 	        if ((rs == SR_OK) && (! f)) {
 	            rs = SR_SEARCH ;
@@ -338,8 +328,7 @@ int termenq_fetchsid(TE *op,TE_ENT *ep,pid_t pid) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (termenq_fetchsid) */
+} /* end subroutine (termenq_fetchsid) */
 
 int termenq_curfetchln(TE *op,TE_CUR *curp,TE_ENT *ep,cchar *name) noex {
 	int		rs ;
@@ -377,8 +366,7 @@ int termenq_curfetchln(TE *op,TE_CUR *curp,TE_ENT *ep,cchar *name) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (termenq_fetchline) */
+} /* end subroutine (termenq_fetchline) */
 
 int termenq_read(TE *op,int ei,TE_ENT *ep) noex {
 	int		rs = SR_OK ;
@@ -409,8 +397,7 @@ int termenq_read(TE *op,int ei,TE_ENT *ep) noex {
 	} /* end if */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (termenq_read) */
+} /* end subroutine (termenq_read) */
 
 int termenq_nactive(TE *op) noex {
 	int		rs ;
@@ -437,13 +424,12 @@ int termenq_nactive(TE *op) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (termenq_nactive) */
+} /* end subroutine (termenq_nactive) */
 
 
 /* private subroutines */
 
-static int termenq_initstuff(TE *op,int of) noex {
+local int termenq_initstuff(TE *op,int of) noex {
     	int		rs = SR_OK ;
         int		am = (of & O_ACCMODE) ;
 	op->oflags = of ;
@@ -462,10 +448,9 @@ static int termenq_initstuff(TE *op,int of) noex {
         } /* end switch */
 	op->fl.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
 	return rs ;
-}
-/* end subroutine (termenq_initstuff) */
+} /* end subroutine (termenq_initstuff) */
 
-static int termenq_filesz(TE *op,time_t dt) noex {
+local int termenq_filesz(TE *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    rs = termenq_fileopen(op,dt) ;
@@ -477,10 +462,9 @@ static int termenq_filesz(TE *op,time_t dt) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (termenq_filesz) */
+} /* end subroutine (termenq_filesz) */
 
-static int termenq_fileopen(TE *op,time_t dt) noex {
+local int termenq_fileopen(TE *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    if ((rs = u_open(op->fname,op->oflags,0660)) >= 0) {
@@ -496,10 +480,9 @@ static int termenq_fileopen(TE *op,time_t dt) noex {
 	    }
 	} /* end if (open) */
 	return rs ;
-}
-/* end subroutine (termenq_fileopen) */
+} /* end subroutine (termenq_fileopen) */
 
-static int termenq_fileclose(TE *op) noex {
+local int termenq_fileclose(TE *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fd >= 0) {
@@ -508,10 +491,9 @@ static int termenq_fileclose(TE *op) noex {
 	    op->fd = -1 ;
 	} /* end if (was open) */
 	return rs ;
-}
-/* end subroutine (termenq_fileclose) */
+} /* end subroutine (termenq_fileclose) */
 
-static int termenq_mapents(TE *op,int ei,TE_ENT **rpp) noex {
+local int termenq_mapents(TE *op,int ei,TE_ENT **rpp) noex {
 	cint		esz = szof(TE_ENT) ;
 	int		en ;
 	int		rs = SR_OK ;
@@ -573,10 +555,9 @@ static int termenq_mapents(TE *op,int ei,TE_ENT **rpp) noex {
 	} /* end if (non-equal-zero) */
 
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (termenq_mapents) */
+} /* end subroutine (termenq_mapents) */
 
-static int termenq_mapper(TE *op,int ei,uint woff,uint wsize) noex {
+local int termenq_mapper(TE *op,int ei,uint woff,uint wsize) noex {
     	cnullptr	np{} ;
 	coff		mo = off_t(woff) ;
 	csize		ms = size_t(wsize) ;
@@ -621,8 +602,7 @@ static int termenq_mapper(TE *op,int ei,uint woff,uint wsize) noex {
 	} /* end if (mapped) */
 
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (termenq_mapper) */
+} /* end subroutine (termenq_mapper) */
 
 static bool isproctype(int type) noex {
 	bool		f = false ;
@@ -631,7 +611,6 @@ static bool isproctype(int type) noex {
 	    if (f) break ;
 	} /* end for */
 	return f ;
-}
-/* end subroutine (isproctype) */
+} /* end subroutine (isproctype) */
 
 
