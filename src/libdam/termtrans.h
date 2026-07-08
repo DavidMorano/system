@@ -21,10 +21,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>		/* |wchar_t| */
-#include	<uiconv.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<uiconv.h>		/* POSIX */
+#include	<stddef.h>		/* CSTD |wchar_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	TERMTRANS	struct termtrans_head
