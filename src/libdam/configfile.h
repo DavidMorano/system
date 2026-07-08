@@ -14,15 +14,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
 
 
 #define	CONFIGFILE		struct configfile_head
+#define	CONFIGFILE_MAGIC	0x04311633
 
 
 struct configfile_head {
