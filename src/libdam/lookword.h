@@ -13,18 +13,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
-#define	LOOKWORD_MAGIC	0x97543218
 #define	LOOKWORD	struct lookword_head
 #define	LOOKWORD_CUR	struct lookword_cursor
 #define	LOOKWORD_FL	struct lookword_flags
 #define	LOOKWORD_WORD	struct lookword_worder
+#define	LOOKWORD_MAGIC	0x97543218
 /* options */
 #define	LOOKWORD_OFOLD	(1<<0)		/* fold characters for comparison */
 #define	LOOKWORD_ODICT	(1<<1)		/* use "dictionary" comparison rules */
@@ -35,7 +32,7 @@ struct lookword_flags {
 	uint		dict:1 ;
 	uint		fold:1 ;
 	uint		word:1 ;
-} ;
+} ; /* end struct */
 
 struct lookword_head {
 	void		*md ;		/* map-data */
@@ -43,18 +40,18 @@ struct lookword_head {
 	LOOKWORD_FL	fl ;
 	uint		magval ;
 	int		fd ;
-} ;
+} ; /* end struct */
 
 struct lookword_worder {
 	cchar		*wp ;
 	int		wl ;
-} ;
+} ; /* end struct */
 
 struct lookword_cursor {
 	LOOKWORD_WORD	*ans ;
 	int		n ;
 	int		i ;		/* when enumerating */
-} ;
+} ; /* end struct */
 
 typedef	LOOKWORD	lookword ;
 typedef	LOOKWORD_FL	lookword_fl ;
