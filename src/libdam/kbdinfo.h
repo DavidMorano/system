@@ -25,6 +25,7 @@
 #define	KBDINFO_ENT		struct kbdinfo_entry
 #define	KBDINFO_CUR		struct kbdinfo_cursor
 #define	KBDINFO_MAGIC		0x24182138
+
 /* types (enums) */
 enum kbdinfo_types {
 	kbdinfot_reg,
@@ -35,6 +36,7 @@ enum kbdinfo_types {
 	kbdinfot_fkey,
 	kbdinfot_overlast
 } ; /* end enum (kbdinfo_types) */
+
 /* types (defines) */
 #define	KBDINFO_TREG		kbdinfot_reg
 #define	KBDINFO_TESC		kbdinfot_esc
