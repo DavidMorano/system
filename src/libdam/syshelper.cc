@@ -40,23 +40,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| + |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<dial.h>
-#include	<permx.h>
-#include	<cfdec.h>
-#include	<netorder.h>
-#include	<egscmd.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<sys/param.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD |INT_MAX| + |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<netorder.h>		/* LIBUC */
+#include	<egscmd.hh>		/* LIBUC */
+#include	<dial.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"syshelper.h"
 
@@ -99,36 +104,33 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int syshelper_ctor(SH *op,Args ... args) noex {
+local int syshelper_ctor(SH *op,Args ... args) noex {
     	SYSHELPER	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (syshelper_ctor) */
+} /* end subroutine (syshelper_ctor) */
 
-static int syshelper_dtor(SH *op) noex {
+local int syshelper_dtor(SH *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (syshelper_dtor) */
+} /* end subroutine (syshelper_dtor) */
 
 template<typename ... Args>
-static inline int syshelper_magic(SH *op,Args ... args) noex {
+local inline int syshelper_magic(SH *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == SYSHELPER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (syshelper_magic) */
+} /* end subroutine (syshelper_magic) */
 
-static int syshelper_opencheck(SH *) noex ;
+local int syshelper_opencheck(SH *) noex ;
 
 
 /* exported variables */
@@ -153,16 +155,15 @@ int syshelper_open(SH *op,cchar *filename) noex {
 	            if (rs < 0) {
 		        u_close(op->fd) ;
 		        op->fd = -1 ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (dialuss) */
 	    } /* end if (perm) */
 	    if (rs < 0) {
 		syshelper_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (syshelper_ctor) */
 	return rs ;
-}
-/* end subroutine (syshelper_open) */
+} /* end subroutine (syshelper_open) */
 
 int syshelper_close(SH *op) noex {
 	int		rs ;
@@ -180,8 +181,7 @@ int syshelper_close(SH *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (syshelper_close) */
+} /* end subroutine (syshelper_close) */
 
 int syshelper_read(SH *op,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -207,8 +207,7 @@ int syshelper_read(SH *op,char *rbuf,int rlen) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (syshelper_read) */
+} /* end subroutine (syshelper_read) */
 
 /* add some of our own entropy to the mix (is this a security problem?) */
 int syshelper_write(SH *op,cchar *wbuf,int wlen) noex {
@@ -238,8 +237,7 @@ int syshelper_write(SH *op,cchar *wbuf,int wlen) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? wl : rs ;
-}
-/* end subroutine (syshelper_write) */
+} /* end subroutine (syshelper_write) */
 
 /* return the level of entropy available */
 int syshelper_level(SH *op) noex {
@@ -261,8 +259,7 @@ int syshelper_level(SH *op) noex {
 	    } /* end if (uc_writen) */
 	} /* end if (magic) */
 	return (rs >= 0) ? level : rs ;
-}
-/* end subroutine (syshelper_level) */
+} /* end subroutine (syshelper_level) */
 
 int syshelper_getpid(SH *op,pid_t *pidp) noex {
 	int		rs ;
@@ -271,14 +268,13 @@ int syshelper_getpid(SH *op,pid_t *pidp) noex {
 	    rs = int(op->pid) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (syshelper_getpid) */
+} /* end subroutine (syshelper_getpid) */
 
 
 /* private subroutines */
 
 /* get the EGD program PID and check it */
-static int syshelper_opencheck(SH *op) noex {
+local int syshelper_opencheck(SH *op) noex {
 	int		rs ;
 	int		len ;
 	char		cmdbuf[CMDBUFLEN + 1] ;
@@ -306,7 +302,6 @@ static int syshelper_opencheck(SH *op) noex {
 	    } /* end if (uc_reade) */
 	} /* end if (uc_writen) */
 	return rs ;
-}
-/* end subroutine (syshelper_opencheck) */
+} /* end subroutine (syshelper_opencheck) */
 
 
