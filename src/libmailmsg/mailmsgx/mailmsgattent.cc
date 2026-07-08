@@ -605,7 +605,7 @@ local int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
             if (rs >= 0) {
                 if (op->clen < 0) op->clen = clen ;
                 op->clines = (code < CE_BINARY) ? lines : -1 ;
-            }
+            } /* end if (ok) */
 	    rs1 = lm_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
@@ -614,9 +614,11 @@ local int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
 
 local int freeit(void *p) noex {
         int             rs = SR_OK ;
+	int		rs1 ;
         void            **pp = (void **) p ;
         if (*pp != nullptr) {
-            rs = libmem.free(*pp) ;
+            rs1 = libmem.free(*pp) ;
+	    if (rs >= 0) rs = rs1 ;
             *pp = nullptr ;
         } /* end if */
         return rs ;
