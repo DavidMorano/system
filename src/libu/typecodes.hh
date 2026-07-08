@@ -1,6 +1,6 @@
 /* typecodes HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* bit manipulations */
 /* version %I% last-modified %G% */
@@ -17,6 +17,7 @@
 
 #ifndef	TYPECODES_INCLUDE
 #define	TYPECODES_INCLUDE
+#ifdef	__cplusplus /* C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -26,6 +27,7 @@
 #include	<usysdefs.h>
 
 
+#endif /* __cplusplus (C++ only) */
 #endif /* TYPECODES_INCLUDE */
 
 
