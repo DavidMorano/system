@@ -13,20 +13,20 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/stat.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<hdb.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<sys/stat.h>		/* POSIX */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
 
 
-#define	DIRDB_MAGIC	0x33119572
-#define	DIRDB_NDEF	30
 #define	DIRDB		struct dirdb_head
 #define	DIRDB_ENT	struct dirdb_entry
 #define	DIRDB_FID	struct dirdb_fider	/* file-ID */
 #define	DIRDB_CUR	struct dirdb_cursor
+#define	DIRDB_MAGIC	0x33119572
+#define	DIRDB_NDEF	30
 
 
 struct dirdb_fider {
@@ -58,13 +58,13 @@ typedef	DIRDB_CUR	dirdb_cur ;
 
 EXTERNC_begin
 
-extern int dirdb_start(dirdb *,int) noex ;
-extern int dirdb_add(dirdb *,cchar *,int) noex ;
-extern int dirdb_clean(dirdb *) noex ;
-extern int dirdb_curbegin(dirdb *,dirdb_cur *) noex ;
-extern int dirdb_curenum(dirdb *,dirdb_cur *,dirdb_ent **) noex ;
-extern int dirdb_curend(dirdb *,dirdb_cur *) noex ;
-extern int dirdb_finish(dirdb *) noex ;
+extern int dirdb_start		(dirdb *,int) noex ;
+extern int dirdb_add		(dirdb *,cchar *,int) noex ;
+extern int dirdb_clean		(dirdb *) noex ;
+extern int dirdb_curbegin	(dirdb *,dirdb_cur *) noex ;
+extern int dirdb_curenum	(dirdb *,dirdb_cur *,dirdb_ent **) noex ;
+extern int dirdb_curend		(dirdb *,dirdb_cur *) noex ;
+extern int dirdb_finish		(dirdb *) noex ;
 
 EXTERNC_end
 
