@@ -13,36 +13,37 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
-#include	<mapstrint.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mapstrint.h>		/* LIBUC */
 
 
-#define	KEYSYMER_MAGIC		0x24282138
 #define	KEYSYMER		struct keysymer_head
 #define	KEYSYMER_FL		struct keysymer_flags
 #define	KEYSYMER_KE		struct keysymer_entry
 #define	KEYSYMER_CUR		struct keysymer_cursor
 #define	KEYSYMER_NAMELEN	60
+#define	KEYSYMER_MAGIC		0x24282138
 
 
 struct keysymer_flags {
 	uint		dummy:1 ;	/* dummy */
-} ;
+} ; /* end struct */
 
 struct keysymer_entry {
 	int		keynum ;
 	char		keyname[KEYSYMER_NAMELEN+1] ;
-} ;
+} ; /* end struct */
 
 struct keysymer_cursor {
 	MAPSTRINT_CUR	c ;
-} ;
+} ; /* end struct */
 
 struct keysymer_head {
 	mapstrint	*mlp ;		/* map-list-pointer */
 	KEYSYMER_FL	fl ;
 	uint		magval ;
-} ;
+} ; /* end struct */
 
 typedef	KEYSYMER	keysymer ;
 typedef	KEYSYMER_FL	keysymer_fl ;
