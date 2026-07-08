@@ -13,16 +13,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ptm.h>
-#include	<pwcache.h>
-#include	<tmpx.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<pwcache.h>		/* LIBUC */
+#include	<tmpx.h>		/* LIBUC */
 
 
 #define	FINDUID		struct finduid_head
@@ -38,11 +35,11 @@ struct finduid_stats {
 	uint		refreshes ;	/* refreshes */
 	uint		phits ;		/* positive hit */
 	uint		nhits ;		/* negative hit */
-} ;
+} ; /* end struct */
 
 struct finduid_flags {
 	uint		ut:1 ;
-} ;
+} ; /* end struct */
 
 struct finduid_head {
 	ptm		*mxp ;
@@ -55,7 +52,7 @@ struct finduid_head {
 	uint		magval ;
 	int		ttl ;		/* time-to-live */
 	int		nmax ;		/* maximum entries */
-} ;
+} ; /* end struct */
 
 typedef	FINDUID		finduid ;
 typedef	FINDUID_FL	finduid_fl ;
