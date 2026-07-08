@@ -27,30 +27,33 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>			/* |time_t| */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<new>			/* placement-new + |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<ulogerror.h>
-#include	<stdfnames.h>		/* |STDFNIN| */
-#include	<mallocxx.h>
-#include	<bfile.h>
-#include	<linefilter.h>
-#include	<linefold.h>
-#include	<lineclean.h>		/* + line-cleaning options */
-#include	<linecleanopt.h>	/* line-cleaning options */
-#include	<ascii.h>
-#include	<ischarx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD |time_t| */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<new>			/* C++STD placement-new */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<stdfnames.h>		/* LIBU |STDFNIN| */
+#include	<intsat.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<linefilter.h>		/* LIBUC */
+#include	<linefold.h>		/* LIBUC */
+#include	<lineclean.h>		/* CSTD line-cleaning options */
+#include	<linecleanopt.h>	/* CSTD line-cleaning options */
+#include	<ischarx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"filewatch.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
@@ -70,6 +73,7 @@ import libutil ;
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -88,7 +92,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int filewatch_ctor(filewatch *op,Args ... args) noex {
+local int filewatch_ctor(filewatch *op,Args ... args) noex {
     	FILEWATCH	*hop = op ;
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -102,7 +106,7 @@ static int filewatch_ctor(filewatch *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (filewatch_ctor) */
 
-static int filewatch_dtor(filewatch *op) noex {
+local int filewatch_dtor(filewatch *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -115,7 +119,7 @@ static int filewatch_dtor(filewatch *op) noex {
 } /* end subroutine (filewatch_dtor) */
 
 template<typename ... Args>
-static inline int filewatch_magic(filewatch *op,Args ... args) noex {
+local inline int filewatch_magic(filewatch *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == FILEWATCH_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -123,14 +127,14 @@ static inline int filewatch_magic(filewatch *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (filewatch_magic) */
 
-static int	filewatch_fileready(FW *,time_t,cchar *,int) noex ;
-static int	filewatch_fileopen(FW *,time_t,cchar *,int) noex ;
-static int	filewatch_fileclose(FW *) noex ;
-static int	filewatch_stat(FW *,ustat *) noex ;
-static int	filewatch_putout(FW *,bfile *,char *,int) noex ;
-static int	filewatch_putoutln(FW *,bfile *,int,cchar *,int) noex ;
+local int	filewatch_fileready(FW *,time_t,cchar *,int) noex ;
+local int	filewatch_fileopen(FW *,time_t,cchar *,int) noex ;
+local int	filewatch_fileclose(FW *) noex ;
+local int	filewatch_stat(FW *,ustat *) noex ;
+local int	filewatch_putout(FW *,bfile *,char *,int) noex ;
+local int	filewatch_putoutln(FW *,bfile *,int,cchar *,int) noex ;
 
-static int	bopenx(bfile *,cchar *) noex ;
+local int	bopenx(bfile *,cchar *) noex ;
 
 
 /* local variables */
@@ -146,7 +150,7 @@ const filewatchms	filewatchm ;
 
 /* exported subroutines */
 
-static int filewatch_starts(FW *op,FW_ARGS *ap) noex ;
+local int filewatch_starts(FW *op,FW_ARGS *ap) noex ;
 
 int filewatch_start(FW *op,FW_ARGS *ap,LF *lfp,cc *fn) noex {
 	int		rs ;
@@ -155,18 +159,19 @@ int filewatch_start(FW *op,FW_ARGS *ap,LF *lfp,cc *fn) noex {
 	    if (fn[0]) {
 		custime		dt = getustime ;
 		op->lfp = lfp ;
-		if (char *bp ; (rs = malloc_ps(&bp)) >= 0) {
+		if (char *bp ; (rs = mem.ps(&bp)) >= 0) {
 		    op->bufp = bp ;
 		    op->bufl = rs ;
 		    op->lastcheck = dt ;
 		    if ((rs = filewatch_fileopen(op,dt,fn,-1)) >= 0) {
-		        if (cc *cp ; (rs = uc_mallocstrw(fn,-1,&cp)) >= 0) {
+		        if (cc *cp ; (rs = mem.strw(fn,-1,&cp)) >= 0) {
 			    op->fname = cp ;
 			        if ((rs = filewatch_starts(op,ap)) >= 0) {
 				    op->magval = FILEWATCH_MAGIC ;
 			        }
 			    if (rs < 0) {
-				uc_free(op->fname) ;
+				voidp vp = voidp(op->fname) ;
+				mem.free(vp) ;
 				op->fname = nullptr ;
 			    } /* end if (error) */
 			} /* end if (memory-acquire) */
@@ -176,29 +181,32 @@ int filewatch_start(FW *op,FW_ARGS *ap,LF *lfp,cc *fn) noex {
 		    } /* end if (filewatch_open) */
 		    if (rs < 0) {
 			if (op->bufp) {
-	    		    uc_free(op->bufp) ;
+	    		    mem.free(op->bufp) ;
 	    		    op->bufp = nullptr ;
 			    op->bufl = 0 ;
-			}
+			} /* end if (memory-release) */
 		    } /* end if (error) */
 		} /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		filewatch_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (filewatch_ctor) */
 	return rs ;
 } /* end subroutine (filewatch_start) */
 
-static int filewatch_starts(FW *op,FW_ARGS *ap) noex {
-	op->interval = (ap->interval > 1) ? ap->interval : 1 ;
-	op->cut = (ap->cut > 0) ? ap->cut : 0 ;
-	op->columns	= max(ap->columns,3) ;
-	op->indent	= max(ap->indent,0) ;
-	op->opts = ap->opts ;
-	op->fl.carriage	= !!(ap->opts & filewatchm.carriage) ;
-	op->fl.clean	= !!(ap->opts & filewatchm.clean) ;
-	return SR_OK ;
+local int filewatch_starts(FW *op,FW_ARGS *ap) noex {
+    	int		rs = SR_FAULT ;
+	if (op && ap) {
+	    op->interval = (ap->interval > 1) ? ap->interval : 1 ;
+	    op->cut = (ap->cut > 0) ? ap->cut : 0 ;
+	    op->columns	= max(ap->columns,3) ;
+	    op->indent	= max(ap->indent,0) ;
+	    op->opts = ap->opts ;
+	    op->fl.carriage	= !!(ap->opts & filewatchm.carriage) ;
+	    op->fl.clean	= !!(ap->opts & filewatchm.clean) ;
+	} /* end if (non-null) */
+	return rs ;
 } /* end subroutine (filewatch_starts) */
 
 int filewatch_finish(FW *op) noex {
@@ -206,20 +214,21 @@ int filewatch_finish(FW *op) noex {
 	int		rs1 ;
 	if ((rs = filewatch_magic(op)) >= 0) {
 	    if (op->fname) {
-	        rs1 = uc_free(op->fname) ;
+	        voidp vp = voidp(op->fname) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 		rs1 = filewatch_fileclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->bufp) {
-	        rs1 = uc_free(op->bufp) ;
+	        rs1 = mem.free(op->bufp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->bufp = nullptr ;
 		op->bufl = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 	        rs1 = filewatch_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -229,9 +238,8 @@ int filewatch_finish(FW *op) noex {
 	return rs ;
 }
 /* end subroutine (filewatch_finish) */
-
-static int filewatch_checks(FW *,off_t,bfile *) noex ;
-static int filewatch_checkrest(FW *,time_t) noex ;
+local int filewatch_checks(FW *,off_t,bfile *) noex ;
+local int filewatch_checkrest(FW *,time_t) noex ;
 
 /* check if our file has changed */
 int filewatch_check(FW *op,time_t dt,BF *ofp) noex {
@@ -242,14 +250,16 @@ int filewatch_check(FW *op,time_t dt,BF *ofp) noex {
 	    if ((dt - op->lastcheck) >= op->interval) {
 		op->lastcheck = dt ;
 		if (ustat sb ; (rs = filewatch_stat(op,&sb)) >= 0) ylikely {
-		    coff	fsize = sb.st_size ;
+		    csize	fsize = sb.st_size ;
+		    csize	szoff = size_t(op->offset) ;
 		    custime	mtime = sb.st_mtime ;
+		    coff	foff = sb.st_size ;
 		    bool	fchanged = false ;
 		    fchanged = fchanged || (mtime > op->lastchange) ;
-		    fchanged = fchanged || (fsize != op->offset) ;
+		    fchanged = fchanged || (foff != op->offset) ;
 		    if (fchanged) {
 			cchar	*fn = op->fname ;
-			int	off = intsat(op->offset) ;
+			int	off = intsat(szoff) ;
 			if ((rs = filewatch_fileready(op,dt,fn,off)) >= 0) {
 			    if ((rs = filewatch_checks(op,fsize,ofp)) >= 0) {
 			        wlen += rs ;
@@ -263,10 +273,10 @@ int filewatch_check(FW *op,time_t dt,BF *ofp) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (filewatch_check) */
 
-static int filewatch_checkgt(FW *op,off_t,bfile *) noex ;
-static int filewatch_checklt(FW *op,off_t) noex ;
+local int filewatch_checkgt(FW *op,off_t,bfile *) noex ;
+local int filewatch_checklt(FW *op,off_t) noex ;
 
-static int filewatch_checks(FW *op,off_t fsize,bfile *ofp) noex {
+local int filewatch_checks(FW *op,off_t fsize,bfile *ofp) noex {
     	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	if (fsize > op->offset) {
@@ -277,7 +287,7 @@ static int filewatch_checks(FW *op,off_t fsize,bfile *ofp) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (filewatch_checks) */
 
-static int filewatch_checkgt(FW *op,off_t fsize,bfile *ofp) noex {
+local int filewatch_checkgt(FW *op,off_t fsize,bfile *ofp) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len ;
@@ -309,7 +319,7 @@ static int filewatch_checkgt(FW *op,off_t fsize,bfile *ofp) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (filewatch_checkgt) */
 
-static int filewatch_checklt(FW *op,off_t fsize) noex {
+local int filewatch_checklt(FW *op,off_t fsize) noex {
     	bfile		*wfp = op->wfp ;
     	int		rs ;
 	if ((rs = wfp->seek(fsize,SEEK_SET)) >= 0) {
@@ -318,7 +328,7 @@ static int filewatch_checklt(FW *op,off_t fsize) noex {
 	return rs ;
 } /* end subroutine (filewatch_checklt) */
 
-static int filewatch_checkrest(FW *op,time_t dt) noex {
+local int filewatch_checkrest(FW *op,time_t dt) noex {
     	cint		to = TO_OPEN ;
     	int		rs ;
 	if (op->fl.open && ((dt - op->opentime) > to)) {
@@ -340,8 +350,8 @@ static int filewatch_checkrest(FW *op,time_t dt) noex {
 	return rs ;
 } /* end subroutine (filewatch_checkrest) */
 
-static int filewatch_readhave(FW *,char *,int) noex ;
-static int filewatch_readget(FW *,char *,int,time_t) noex ;
+local int filewatch_readhave(FW *,char *,int) noex ;
+local int filewatch_readget(FW *,char *,int,time_t) noex ;
 
 int filewatch_readln(FW *op,time_t dt,char *lbuf,int llen) noex {
 	int		rs = SR_FAULT ;
@@ -361,7 +371,7 @@ int filewatch_readln(FW *op,time_t dt,char *lbuf,int llen) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (filewatch_readln) */
 
-static int filewatch_readhave(FW *op,char *lbuf,int llen) noex {
+local int filewatch_readhave(FW *op,char *lbuf,int llen) noex {
     	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	if (op->ll > 0) {
@@ -373,9 +383,9 @@ static int filewatch_readhave(FW *op,char *lbuf,int llen) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (filewatch_readhave) */
 
-static int filewatch_readproc(FW *,off_t,char *,int) noex ;
+local int filewatch_readproc(FW *,off_t,char *,int) noex ;
 
-static int filewatch_readget(FW *op,char *lbuf,int llen,time_t dt) noex {
+local int filewatch_readget(FW *op,char *lbuf,int llen,time_t dt) noex {
     	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	if ((dt - op->lastcheck) >= op->interval) {
@@ -398,7 +408,7 @@ static int filewatch_readget(FW *op,char *lbuf,int llen,time_t dt) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (filewatch_readget) */
 
-static int filewatch_readproc(FW *op,off_t fsize,char *lbuf,int llen) noex {
+local int filewatch_readproc(FW *op,off_t fsize,char *lbuf,int llen) noex {
     	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	    if (fsize > op->offset) {
@@ -429,7 +439,7 @@ static int filewatch_readproc(FW *op,off_t fsize,char *lbuf,int llen) noex {
 
 /* private subroutines */
 
-static int filewatch_fileready(FW *op,time_t dt,cc *fn,int off) noex {
+local int filewatch_fileready(FW *op,time_t dt,cc *fn,int off) noex {
 
 	int		rs = SR_OK ;
 	if (! op->fl.open) {
@@ -438,7 +448,7 @@ static int filewatch_fileready(FW *op,time_t dt,cc *fn,int off) noex {
 	return rs ;
 } /* end subroutine (filewatch_fileready) */
 
-static int filewatch_fileopen(FW *op,time_t dt,cc *fn,int off) noex {
+local int filewatch_fileopen(FW *op,time_t dt,cc *fn,int off) noex {
 	int		rs = SR_OK ;
 	if (! op->fl.open) {
 	    bfile *wfp = op->wfp ;
@@ -473,7 +483,7 @@ static int filewatch_fileopen(FW *op,time_t dt,cc *fn,int off) noex {
 	return rs ;
 } /* end subroutine (filewatch_fileopen) */
 
-static int filewatch_fileclose(FW *op) noex {
+local int filewatch_fileclose(FW *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.open) {
@@ -482,10 +492,9 @@ static int filewatch_fileclose(FW *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (filewatch_fileclose) */
+} /* end subroutine (filewatch_fileclose) */
 
-static int filewatch_stat(FW *op,ustat *sbp) noex {
+local int filewatch_stat(FW *op,ustat *sbp) noex {
     	int		rs ;
 	if (op->fl.open) {
 	    rs = bcontrol(op->wfp,BC_STAT,sbp) ;
@@ -495,7 +504,7 @@ static int filewatch_stat(FW *op,ustat *sbp) noex {
 	return rs ;
 } /* end subroutine (filewatch_stat) */
 
-static int filewatch_putout(FW *op,BF *ofp,char *bufp,int bufl) noex {
+local int filewatch_putout(FW *op,BF *ofp,char *bufp,int bufl) noex {
     	cint		cols = op->columns ;
 	cint		inds = op->indent ;
 	int		rs = SR_OK ;
@@ -520,14 +529,13 @@ static int filewatch_putout(FW *op,BF *ofp,char *bufp,int bufl) noex {
 	        } /* end if (linefold) */
 	        if (rs >= 0) {
 	            rs = bflush(ofp) ;
-		}
+		} /* end if (ok) */
 	    } /* end if (non-zero positive) */
 	} /* end if (soething) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filewatch_putout) */
+} /* end subroutine (filewatch_putout) */
 
-static int filewatch_putoutln(FW *op,BF *ofp,int nline,cc *lp,int ll) noex {
+local int filewatch_putoutln(FW *op,BF *ofp,int nline,cc *lp,int ll) noex {
     	cint		m = (linecleanoptm.nonsub | linecleanoptm.nulsub) ;
 	int		rs ;
 	int		rs1 ;
@@ -559,8 +567,7 @@ static int filewatch_putoutln(FW *op,BF *ofp,int nline,cc *lp,int ll) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filewatch_putoutln) */
+} /* end subroutine (filewatch_putoutln) */
 
 int filewatch::check(time_t dt,BF *ofp) noex {
 	return filewatch_check(this,dt,ofp) ;
@@ -586,10 +593,9 @@ filewatch_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (filewatch_co::operator) */
+} /* end method (filewatch_co::operator) */
 
-static int bopenx(bfile *wfp,cchar *fn) noex {
+local int bopenx(bfile *wfp,cchar *fn) noex {
 	if (strcmp(fn,"-") == 0) fn = STDFNIN ;
 	return bopen(wfp,fn,"r",0) ;
 } /* end subroutine (bopenx) */
