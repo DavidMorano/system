@@ -31,28 +31,32 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<strings.h>		/* |strncasecmp(3c)| + |lenstr(3c)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<estrings.h>		/* |strnchr(3uc)| */
-#include	<mapstrint.h>
-#include	<bfile.h>
-#include	<bfliner.h>
-#include	<cfnum.h>
-#include	<ascii.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<strings.h>		/* CSTD  |strncasecmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC |strnchr(3uc)| */
+#include	<mapstrint.h>		/* LIBUC */
+#include	<cfnum.h>		/* LIBUC */
 #include	<sfx.h>			/* |sfnext(3uc)| */
-#include	<strwcpy.h>
-#include	<rmx.h>
-#include	<mkchar.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<strwcpy.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
+#include	<bfliner.h>		/* LIBUC */
 
 #include	"keysymer.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
@@ -68,6 +72,7 @@ import libutil ;
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -86,7 +91,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int keysymer_ctor(keysymer *op,Args ... args) noex {
+local int keysymer_ctor(keysymer *op,Args ... args) noex {
 	KEYSYMER	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -98,10 +103,9 @@ static int keysymer_ctor(keysymer *op,Args ... args) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (keysymer_ctor) */
+} /* end subroutine (keysymer_ctor) */
 
-static int keysymer_dtor(keysymer *op) noex {
+local int keysymer_dtor(keysymer *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -111,27 +115,25 @@ static int keysymer_dtor(keysymer *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (keysymer_dtor) */
+} /* end subroutine (keysymer_dtor) */
 
 template<typename ... Args>
-static inline int keysymer_magic(keysymer *op,Args ... args) noex {
+local inline int keysymer_magic(keysymer *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == KEYSYMER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (keysymer_magic) */
+} /* end subroutine (keysymer_magic) */
 
-static int keysymer_parse(keysymer *,cchar *) noex ;
-static int keysymer_parseln(keysymer *,cchar *,int) noex ;
-static int keysymer_ks(KS *,cc *,int,cc *,int) noex ;
-static int keysymer_process(keysymer *,cchar *,int,int) noex ;
-static int keysymer_finishthem(keysymer *) noex ;
-static int keysymer_seen(keysymer *,cchar *,int,int *) noex ;
+local int keysymer_parse(keysymer *,cchar *) noex ;
+local int keysymer_parseln(keysymer *,cchar *,int) noex ;
+local int keysymer_ks(KS *,cc *,int,cc *,int) noex ;
+local int keysymer_process(keysymer *,cchar *,int,int) noex ;
+local int keysymer_finishthem(keysymer *) noex ;
+local int keysymer_seen(keysymer *,cchar *,int,int *) noex ;
 
-static int cfliteral(cchar *,int,int *) noex ;
+local int cfliteral(cchar *,int,int *) noex ;
 
 
 /* local variables */
@@ -154,7 +156,7 @@ int keysymer_open(keysymer *op,cchar *pr) noex {
 	        if ((rs = mapstrint_start(op->mlp,ne)) >= 0) {
 	            if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) {
 		        if (S_ISDIR(sb.st_mode)) {
-	        	    if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	        	    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
 		                cchar	*idn = KS_INCDNAME ;
 		                cchar	*kfn = KS_KSFNAME ;
 		                if ((rs = mkpath(tbuf,pr,idn,kfn)) >= 0) {
@@ -162,7 +164,7 @@ int keysymer_open(keysymer *op,cchar *pr) noex {
 			                op->magval = KEYSYMER_MAGIC ;
 			            }
 		                } /* end if (mkpath) */
-				rs1 = uc_free(tbuf) ;
+				rs1 = mem.free(tbuf) ;
 				if (rs >= 0) rs = rs1 ;
 			    } /* end if (m-a-f) */
 		        } else {
@@ -171,16 +173,15 @@ int keysymer_open(keysymer *op,cchar *pr) noex {
 	            } /* end if (stat) */
 	            if (rs < 0) {
 	                mapstrint_finish(op->mlp) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (mapstrint_start) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		keysymer_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (keysymer_open) */
+} /* end subroutine (keysymer_open) */
 
 int keysymer_close(keysymer *op) noex {
 	int		rs ;
@@ -201,8 +202,7 @@ int keysymer_close(keysymer *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keysymer_close) */
+} /* end subroutine (keysymer_close) */
 
 int keysymer_count(keysymer *op) noex {
 	int		rs ;
@@ -210,8 +210,7 @@ int keysymer_count(keysymer *op) noex {
 	    rs = mapstrint_count(op->mlp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keysymer_count) */
+} /* end subroutine (keysymer_count) */
 
 int keysymer_lookup(keysymer *op,cchar *kp,int kl) noex {
 	int		rs ;
@@ -229,8 +228,7 @@ int keysymer_lookup(keysymer *op,cchar *kp,int kl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (keysymer_lookup) */
+} /* end subroutine (keysymer_lookup) */
 
 int keysymer_curbegin(keysymer *op,keysymer_cur *curp) noex {
 	int		rs ;
@@ -238,8 +236,7 @@ int keysymer_curbegin(keysymer *op,keysymer_cur *curp) noex {
 	    rs = mapstrint_curbegin(op->mlp,&curp->c) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keysymer_curbegin) */
+} /* end subroutine (keysymer_curbegin) */
 
 int keysymer_curend(keysymer *op,keysymer_cur *curp) noex {
 	int		rs ;
@@ -247,8 +244,7 @@ int keysymer_curend(keysymer *op,keysymer_cur *curp) noex {
 	    rs = mapstrint_curend(op->mlp,&curp->c) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keysymer_curend) */
+} /* end subroutine (keysymer_curend) */
 
 int keysymer_enum(keysymer *op,keysymer_cur *curp,keysymer_ke *rp) noex {
 	int		rs ;
@@ -267,13 +263,12 @@ int keysymer_enum(keysymer *op,keysymer_cur *curp,keysymer_ke *rp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (keysymer_enum) */
+} /* end subroutine (keysymer_enum) */
 
 
 /* private subroutines */
 
-static int keysymer_parse(keysymer *op,cchar *fname) noex {
+local int keysymer_parse(keysymer *op,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -305,7 +300,7 @@ static int keysymer_parse(keysymer *op,cchar *fname) noex {
 }
 /* end subroutine (keysymer_parse) */
 
-static int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
+local int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (ll < 0) ll = lenstr(lp) ;
@@ -336,11 +331,10 @@ static int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
 	    } /* end if (deine-key) */
 	} /* end if (pound) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (keysymer_parseln) */
+} /* end subroutine (keysymer_parseln) */
 
 /* store a key-value string pair */
-static int keysymer_ks(KS *op,cc *kp,int kl,cc *sp,int sl) noex {
+local int keysymer_ks(KS *op,cc *kp,int kl,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -360,10 +354,9 @@ static int keysymer_ks(KS *op,cc *kp,int kl,cc *sp,int sl) noex {
 	    }
 	} /* end if (postive) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (keysymer_ks) */
+} /* end subroutine (keysymer_ks) */
 
-static int keysymer_process(keysymer *op,cchar *kp,int kl,int kn) noex {
+local int keysymer_process(keysymer *op,cchar *kp,int kl,int kn) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	{
@@ -376,19 +369,17 @@ static int keysymer_process(keysymer *op,cchar *kp,int kl,int kn) noex {
 	    rs = mapstrint_add(op->mlp,kp,kl,kn) ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (keysymer_process) */
+} /* end subroutine (keysymer_process) */
 
-static int keysymer_finishthem(keysymer *op) noex {
+local int keysymer_finishthem(keysymer *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (keysymer_finishthem) */
+} /* end subroutine (keysymer_finishthem) */
 
-static int keysymer_seen(keysymer *op,cchar *sp,int sl,int *rp) noex {
+local int keysymer_seen(keysymer *op,cchar *sp,int sl,int *rp) noex {
 	int		rs = SR_INVALID ;
 	int		v = 0 ;
 	if (sl < 0) sl = lenstr(sp) ;
@@ -407,11 +398,10 @@ static int keysymer_seen(keysymer *op,cchar *sp,int sl,int *rp) noex {
 	    *rp = (rs >= 0) ? v : 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (keysymer_seen) */
+} /* end subroutine (keysymer_seen) */
 
 /* Convert-From-Literal */
-static int cfliteral(cchar *sp,int sl,int *rp) noex {
+local int cfliteral(cchar *sp,int sl,int *rp) noex {
 	cint		sch = CH_SQUOTE ;
 	int		rs = SR_INVALID ;
 	int		v = 0 ;
@@ -430,7 +420,6 @@ static int cfliteral(cchar *sp,int sl,int *rp) noex {
 	    *rp = (rs >= 0) ? v : 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (cfliteral) */
+} /* end subroutine (cfliteral) */
 
 
