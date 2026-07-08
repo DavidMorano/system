@@ -13,14 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |time_t| + |mode_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<mapstrint.h>
-#include	<entbuf.h>
+#include	<sys/types.h>		/* POSIX |time_t| + |mode_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mapstrint.h>		/* LIBUC */
+#include	<entbuf.h>		/* LIBUC */
 
 
 #define	TS			struct ts_head
@@ -46,7 +43,7 @@ struct ts_header {
 	uint		nentries ;
 	uint		wtime ;
 	uint		wcount ;
-} ;
+} ; /* end struct */
 
 struct ts_flags {
 	uint		fileinit:1 ;		/* file init'ed */
@@ -58,7 +55,7 @@ struct ts_flags {
 	uint		remote:1 ;		/* remote mounted file */
 	uint		bufvalid:1 ;		/* buffer valid */
 	uint		entbuf:1 ;		/* ENTBUF active */
-} ;
+} ; /* end struct */
 
 struct ts_head {
 	cchar		*fname ;
@@ -82,13 +79,13 @@ struct ts_head {
 
 struct ts_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct ts_entry {
 	uint		count ;		/* count */
 	uint		utime ;		/* update time-stamp */
 	uint		ctime ;		/* creation time-stamp */
-} ;
+} ; /* end struct */
 
 typedef	TS		ts ;
 typedef	TS_FL		ts_fl ;
@@ -98,16 +95,16 @@ typedef	TS_ENT		ts_ent ;
 
 EXTERNC_begin
 
-extern int ts_open(ts *,cchar *,int,mode_t) noex ;
-extern int ts_curbegin(ts *,ts_cur *) noex ;
-extern int ts_curend(ts *,ts_cur *) noex ;
-extern int ts_curenum(ts *,ts_cur *,char *,int,ts_ent *) noex ;
-extern int ts_match(ts *,time_t,cchar *,int,ts_ent *) noex ;
-extern int ts_write(ts *,time_t,cchar *,int,ts_ent *) noex ;
-extern int ts_update(ts *,time_t,cchar *,int,ts_ent *) noex ;
-extern int ts_check(ts *,time_t) noex ;
-extern int ts_count(ts *) noex ;
-extern int ts_close(ts *) noex ;
+extern int ts_open	(ts *,cchar *,int,mode_t) noex ;
+extern int ts_curbegin	(ts *,ts_cur *) noex ;
+extern int ts_curend	(ts *,ts_cur *) noex ;
+extern int ts_curenum	(ts *,ts_cur *,char *,int,ts_ent *) noex ;
+extern int ts_match	(ts *,time_t,cchar *,int,ts_ent *) noex ;
+extern int ts_write	(ts *,time_t,cchar *,int,ts_ent *) noex ;
+extern int ts_update	(ts *,time_t,cchar *,int,ts_ent *) noex ;
+extern int ts_check	(ts *,time_t) noex ;
+extern int ts_count	(ts *) noex ;
+extern int ts_close	(ts *) noex ;
 
 EXTERNC_end
 
