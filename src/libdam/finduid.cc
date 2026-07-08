@@ -43,17 +43,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<getpwd.h>
-#include	<snx.h>
-#include	<mkpath.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucentpw.h>		/* LIBUC */
+#include	<getpwd.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<mkpath.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"finduid.h"
 
@@ -91,7 +94,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int finduid_ctor(finduid *op,Args ... args) noex {
+local int finduid_ctor(finduid *op,Args ... args) noex {
     	FINDUID		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -106,19 +109,18 @@ static int finduid_ctor(finduid *op,Args ... args) noex {
 		    if (rs < 0) {
 		        delete op->utp ;
 		        op->utp = nullptr ;
-		    }
+		    } /* end if (error */
 	        } /* end if (new-tmpx) */
 		if (rs < 0) {
 		    delete op->mxp ;
 		    op->mxp = nullptr ;
-		}
+		} /* end if (error */
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (finduid_ctor) */
+} /* end subroutine (finduid_ctor) */
 
-static int finduid_dtor(finduid *op) noex {
+local int finduid_dtor(finduid *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -136,23 +138,21 @@ static int finduid_dtor(finduid *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (finduid_dtor) */
+} /* end subroutine (finduid_dtor) */
 
 template<typename ... Args>
-static int finduid_magic(finduid *op,Args ... args) noex {
+local int finduid_magic(finduid *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == FINDUID_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (finduid_magic) */
+} /* end subroutine (finduid_magic) */
 
-static int	finduid_lookuper(finduid *,char *,int,uid_t) noex ;
-static int	finduid_tmpxready(finduid *) noex ;
-static int	finduid_tmpxopen(finduid *) noex ;
-static int	finduid_tmpxclose(finduid *) noex ;
+local int	finduid_lookuper(finduid *,char *,int,uid_t) noex ;
+local int	finduid_tmpxready(finduid *) noex ;
+local int	finduid_tmpxopen(finduid *) noex ;
+local int	finduid_tmpxclose(finduid *) noex ;
 
 
 /* local variables */
@@ -180,19 +180,18 @@ int finduid_start(finduid *op,int nmax,int ttl) noex {
 			op->nmax = nmax ;
 			op->ttl = ttl ;
 			op->magval = FINDUID_MAGIC ;
-		    }
-		}
+		    } /* end if (ok) */
+		} /* end if */
 		if (rs < 0) {
 		    mxp->destroy() ;
-		}
+		} /* end if (error) */
 	    } /* end if (ptm-create) */
 	    if (rs < 0) {
 		finduid_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (finduid_ctor) */
 	return rs ;
-}
-/* end subroutine (finduid_start) */
+} /* end subroutine (finduid_start) */
 
 int finduid_finish(finduid *op) noex {
 	int		rs ;
@@ -219,8 +218,7 @@ int finduid_finish(finduid *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (finduid_finish) */
+} /* end subroutine (finduid_finish) */
 
 int finduid_lookup(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
@@ -240,8 +238,7 @@ int finduid_lookup(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (finduid_lookup) */
+} /* end subroutine (finduid_lookup) */
 
 int finduid_check(finduid *op,time_t dt) noex {
 	int		rs ;
@@ -268,8 +265,7 @@ int finduid_check(finduid *op,time_t dt) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (finduid_check) */
+} /* end subroutine (finduid_check) */
 
 int finduid_getstats(finduid *op,finduid_st *sp) noex {
 	int		rs ;
@@ -277,13 +273,12 @@ int finduid_getstats(finduid *op,finduid_st *sp) noex {
 	    *sp = op->s ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (finduid_getstats) */
+} /* end subroutine (finduid_getstats) */
 
 
 /* private subroutines */
 
-static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
+local int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
 	int		rs1 = SR_OK ;
 	int		ul = 0 ;
@@ -324,10 +319,9 @@ static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (finduid_lookuper) */
+} /* end subroutine (finduid_lookuper) */
 
-static int finduid_tmpxready(finduid *op) noex {
+local int finduid_tmpxready(finduid *op) noex {
     	int		rs = SR_OK ;
 	if (! op->open.ut) {
 	    rs = finduid_tmpxopen(op) ;
@@ -335,7 +329,7 @@ static int finduid_tmpxready(finduid *op) noex {
 	return rs ;
 } /* end subroutine (finduid_tmpxready) */
 
-static int finduid_tmpxopen(finduid *op) noex {
+local int finduid_tmpxopen(finduid *op) noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	if (! op->open.ut) {
@@ -346,10 +340,9 @@ static int finduid_tmpxopen(finduid *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (finduid_tmpxopen) */
+} /* end subroutine (finduid_tmpxopen) */
 
-static int finduid_tmpxclose(finduid *op) noex {
+local int finduid_tmpxclose(finduid *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->open.ut) {
@@ -358,7 +351,6 @@ static int finduid_tmpxclose(finduid *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (finduid_tmpxclose) */
+} /* end subroutine (finduid_tmpxclose) */
 
 
