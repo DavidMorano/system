@@ -40,24 +40,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| + |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<dial.h>
-#include	<permx.h>
-#include	<cfdec.h>
-#include	<netorder.h>
-#include	<egscmd.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD |INT_MAX| + |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<dial.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<netorder.h>		/* LIBUC */
+#include	<egscmd.hh>		/* LIBUC */
+#include	<dial.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"egs.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
@@ -76,7 +83,7 @@ import libutil ;
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -94,36 +101,33 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int egs_ctor(egs *op,Args ... args) noex {
+local int egs_ctor(egs *op,Args ... args) noex {
     	EGS		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (egs_ctor) */
+} /* end subroutine (egs_ctor) */
 
-static int egs_dtor(egs *op) noex {
+local int egs_dtor(egs *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (egs_dtor) */
+} /* end subroutine (egs_dtor) */
 
 template<typename ... Args>
-static inline int egs_magic(egs *op,Args ... args) noex {
+local inline int egs_magic(egs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == EGS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (egs_magic) */
+} /* end subroutine (egs_magic) */
 
-static int egs_opencheck(egs *) noex ;
+local int egs_opencheck(egs *) noex ;
 
 
 /* exported variables */
@@ -148,16 +152,15 @@ int egs_open(egs *op,cchar *filename) noex {
 	            if (rs < 0) {
 		        u_close(op->fd) ;
 		        op->fd = -1 ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (dialuss) */
 	    } /* end if (perm) */
 	    if (rs < 0) {
 		egs_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (egs_ctor) */
 	return rs ;
-}
-/* end subroutine (egs_open) */
+} /* end subroutine (egs_open) */
 
 int egs_close(egs *op) noex {
 	int		rs ;
@@ -175,8 +178,7 @@ int egs_close(egs *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (egs_close) */
+} /* end subroutine (egs_close) */
 
 int egs_read(egs *op,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -202,8 +204,7 @@ int egs_read(egs *op,char *rbuf,int rlen) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (egs_read) */
+} /* end subroutine (egs_read) */
 
 /* add some of our own entropy to the mix (is this a security problem?) */
 int egs_write(egs *op,cchar *wbuf,int wlen) noex {
@@ -233,8 +234,7 @@ int egs_write(egs *op,cchar *wbuf,int wlen) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? wl : rs ;
-}
-/* end subroutine (egs_write) */
+} /* end subroutine (egs_write) */
 
 /* return the level of entropy available */
 int egs_level(egs *op) noex {
@@ -256,8 +256,7 @@ int egs_level(egs *op) noex {
 	    } /* end if (uc_writen) */
 	} /* end if (magic) */
 	return (rs >= 0) ? level : rs ;
-}
-/* end subroutine (egs_level) */
+} /* end subroutine (egs_level) */
 
 int egs_getpid(egs *op,pid_t *pidp) noex {
 	int		rs ;
@@ -266,14 +265,13 @@ int egs_getpid(egs *op,pid_t *pidp) noex {
 	    rs = int(op->pid) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (egs_getpid) */
+} /* end subroutine (egs_getpid) */
 
 
 /* private subroutines */
 
 /* get the EGD program PID and check it */
-static int egs_opencheck(egs *op) noex {
+local int egs_opencheck(egs *op) noex {
 	int		rs ;
 	int		len ;
 	char		cmdbuf[CMDBUFLEN + 1] ;
@@ -301,7 +299,6 @@ static int egs_opencheck(egs *op) noex {
 	    } /* end if (uc_reade) */
 	} /* end if (uc_writen) */
 	return rs ;
-}
-/* end subroutine (egs_opencheck) */
+} /* end subroutine (egs_opencheck) */
 
 
