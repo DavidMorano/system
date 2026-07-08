@@ -13,13 +13,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<time.h>
-#include	<usystem.h>
+#include	<sys/types.h>		/* POSIX system types */
+#include	<time.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
-#define	SYSHELPER_MAGIC		0x93847561
 #define	SYSHELPER		struct syshelper_head
+#define	SYSHELPER_MAGIC		0x93847561
 #define	SYSHELPER_DEFFILE	"/tmp/syshelper"
 
 
@@ -27,7 +28,7 @@ struct syshelper_head {
 	uint		magval ;
 	int		fd ;		/* socket file descriptor */
 	int		pid ;		/* daemon PID */
-} ;
+} ; /* end struct */
 
 typedef SYSHELPER	syshelper ;
 
