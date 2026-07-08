@@ -108,7 +108,7 @@ int codebal_start(codebal *op) noex {
 	    rs = SR_OK ;
 	    if (rs < 0) {
 		codebal_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (codebal_ctor) */
 	return rs ;
 } /* end subroutine (codebal_start) */
