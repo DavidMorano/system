@@ -37,6 +37,11 @@
 	>=0		length of result
 	<0		error (system-return)
 
+	Notes:
+	1. The initial buffer size estimate given to the BUFFER
+	object des not really matter.  That object dynamically
+	increases its internal buffer size as needed automatically.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -54,7 +59,7 @@
 #include	<ucgetx.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<buffer.h>		/* LIBUC */
-#include	<hash.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC |hashmunch(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"proginfo.hh"
@@ -72,7 +77,7 @@ import uconstants ;			/* |varname(3u)| */
 #define	PI		proginfo
 #endif
 
-#define	HNMULT		2
+#define	BSZMULT		2
 
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
@@ -172,62 +177,62 @@ local int mkrand_heavy(PI *pip) noex {
     	cnullptr	np{} ;
 	ulong		rv = 0 ;
 	int		rs ;
-	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
-	    cint bsz = (HNMULT * rs) ;
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	    cint bsz = (BSZMULT * rs) ;
 	    if (buffer hb ; (rs = buffer_start(&hb,bsz)) >= 0) {
 	        int	bl ;
 		cchar	*cp ;
 	        if (pip->pwd) {
-	            buffer_strw(&hb,pip->pwd,-1) ;
+	            hb.strw(pip->pwd) ;
 	        }
 	        if (pip->progename) {
-	            buffer_strw(&hb,pip->progename,-1) ;
+	            hb.strw(pip->progename) ;
 	        }
 	        if (pip->username) {
-	            buffer_strw(&hb,pip->username,-1) ;
+	            hb.strw(pip->username) ;
 	        }
 	        if (pip->homedname) {
-	            buffer_strw(&hb,pip->homedname,-1) ;
+	            hb.strw(pip->homedname) ;
 	        }
 	        if (pip->nodename) {
-	            buffer_strw(&hb,pip->nodename,-1) ;
+	            hb.strw(pip->nodename) ;
 	        }
 	        if (pip->domainname) {
-	            buffer_strw(&hb,pip->domainname,-1) ;
+	            hb.strw(pip->domainname) ;
 	        }
 	        if (pip->org) {
-	            buffer_strw(&hb,pip->org,-1) ;
+	            hb.strw(pip->org) ;
 	        }
 	        if (pip->name) {
-	            buffer_strw(&hb,pip->name,-1) ;
+	            hb.strw(pip->name) ;
 	        }
 	        if (pip->fullname) {
-	            buffer_strw(&hb,pip->fullname,-1) ;
+	            hb.strw(pip->fullname) ;
 	        }
 	        if ((cp = getenv(varname.random)) != np) {
-	            buffer_strw(&hb,cp,-1) ;
+	            hb.strw(cp) ;
 	        }
 	        if ((cp = getenv(varname.seconds)) != np) {
-	            buffer_strw(&hb,cp,-1) ;
+	            hb.strw(cp) ;
 	        }
-#ifdef	COMMENT
 	        /* get this stuff so far */
-	        if ((rs = buffer_get(&hb,&buf)) >= 0) {
-	            rs = md5calc(&rv,buf,rs) ;
+	        if (cchar *buf{} ; (rs = hb.get(&buf)) >= 0) {
+	            rs = hashmunch(buf,rs,&rv) ;
 	        }
-#endif /* COMMENT */
 	        /* I think we are done with the buffer */
-	        bl = buffer_finish(&hb) ;
+	        bl = hb.finish ;
 	        if (rs >= 0) rs = bl ;
 	    } /* end if (buffer) */
 	    /* pop in our environment also! */
 	    if_constexpr (f_environ) {
 	       if (rs >= 0) {
+		   ulong hv = 0 ;
 	           for (int i = 0 ; pip->envv[i] ; i += 1) {
-	               uint	hv = hash_elf(pip->envv[i],-1) ;
-	               rv ^= (((ulong) hv) << ((i & 1) ? 32 : 0)) ;
+		       cchar *evar = pip->envv[i] ;
+	               hv = hash_elf(evar,-1) ;
+	               rv ^= (hv << ((i & 1) ? 32 : 0)) ;
 	           } /* end for */
-	       }
+	       } /* end if (ok) */
 	    } /* end if_constexpr (f_environ) */
 	    if (rs >= 0) {
 	        pip->randvar += rv ;
