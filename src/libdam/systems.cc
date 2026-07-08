@@ -176,6 +176,7 @@ local int entry_finish(ENT *) noex ;
 
 static vars		var ;
 
+
 /* entry field terminators */
 constexpr cchar		fterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
@@ -189,7 +190,7 @@ constexpr cchar		fterms[32] = {
 } ;
 
 /* entry argument terminators (just '#' to provide "remainder" function) */
-constexpr cchar		remterms[32] = {
+constexpr cchar		remterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x08, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -198,7 +199,7 @@ constexpr cchar		remterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -213,7 +214,7 @@ int systems_open(systems *op,cchar *sysfname) noex {
 	    if ((rs = rsv) >= 0) ylikely {
 	        int	sz = szof(SYS_FILE) ;
 	        int	vn = 10 ;
-	        int	vo = VECOBJ_OREUSE ;
+	        int	vo = vecobjm.reuse ;
 	        if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) ylikely {
 	            sz = szof(ENT) ;
 		    vn = 20 ;
@@ -226,20 +227,19 @@ int systems_open(systems *op,cchar *sysfname) noex {
 	                if (rs < 0) {
 		            op->magval = 0 ;
 		            vecobj_finish(op->elp) ;
-	                }
+	                } /* end if (error) */
 	            }
 	            if (rs < 0) {
 	               vecobj_finish(op->flp) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (vecobj_start) */
 	    } /* end if (vars) */
 	    if (rs < 0) {
 		systems_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (systems_ctor) */
 	return rs ;
-}
-/* end subroutine (systems_open) */
+} /* end subroutine (systems_open) */
 
 int systems_close(systems *op) noex {
 	int		rs ;
@@ -282,8 +282,7 @@ int systems_close(systems *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (systems_close) */
+} /* end subroutine (systems_close) */
 
 int systems_fileadd(systems *op,cchar *sysfname) noex {
 	int		rs ;
@@ -306,19 +305,18 @@ int systems_fileadd(systems *op,cchar *sysfname) noex {
 	                }
 	                if (rs < 0) {
 		            flp->del(fi) ;
-		        }
+		        } /* end if (error) */
 	            } /* end if (vecobj_add) */
 	            if (rs < 0) {
 		        file_finish(&fe) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (file_start) */
 		rs1 = sfn.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (systems_fileadd) */
+} /* end subroutine (systems_fileadd) */
 
 int systems_curbegin(systems *op,CUR *curp) noex {
     	int		rs ;
@@ -326,8 +324,7 @@ int systems_curbegin(systems *op,CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (systems_curbegin) */
+} /* end subroutine (systems_curbegin) */
 
 int systems_curend(systems *op,CUR *curp) noex {
     	int		rs ;
@@ -335,8 +332,7 @@ int systems_curend(systems *op,CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (systems_curend) */
+} /* end subroutine (systems_curend) */
 
 int systems_curenum(systems *op,CUR *curp,ENT **depp) noex {
 	int		rs ;
@@ -350,8 +346,7 @@ int systems_curenum(systems *op,CUR *curp,ENT **depp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (systems_curenum) */
+} /* end subroutine (systems_curenum) */
 
 int systems_fetch(systems *op,cchar *name,CUR *curp,ENT **depp) noex {
 	int		rs ;
@@ -371,11 +366,10 @@ int systems_fetch(systems *op,cchar *name,CUR *curp,ENT **depp) noex {
 	    } /* end while */
 	    if (rs >= 0) {
 	        curp->i = ei ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (systems_fetch) */
+} /* end subroutine (systems_fetch) */
 
 int systems_check(systems *op,time_t dt) noex {
 	int		rs ;
@@ -453,12 +447,12 @@ int parser::operator () (SYS_FILE *fep) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
+} /* end method */
 
 local int systems_fileparse(systems *op,int fi,SYS_FILE *fep) noex {
 	parser	po(op,fi) ;
        	return po(fep) ;
-}
+} /* end subroutine */
 
 int parser::parse(SYS_FILE *fep) noex {
     	cnullptr	np{} ;
@@ -499,14 +493,13 @@ int parser::parse(SYS_FILE *fep) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (parser::parse) */
+} /* end method (parser::parse) */
 
 int parser::parsealready(dev_t dev,ino_t ino) noex {
 	vecobj		*flp = op->flp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	void		*vp{} ;
 	for (int i = 0 ; (rs1 = flp->get(i,&vp)) >= 0 ; i += 1) {
 	    SYS_FILE	*fep = filep(vp) ;
@@ -517,8 +510,7 @@ int parser::parsealready(dev_t dev,ino_t ino) noex {
 	} /* end for */
 	if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (parser::parsealready) */
+} /* end method (parser::parsealready) */
 
 int parser::parseln(field *fsp) noex {
 	int		rs = SR_OK ;
@@ -547,12 +539,11 @@ int parser::parseln(field *fsp) noex {
 	        } /* end if (field_get) */
 	        if ((rs < 0) || f_fin) {
 		    entry_finish(&e) ;
-		}
+		} /* end if (error) */
 	    } /* end if (entry_start) */
 	} /* end if (possible) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (parser::parseln) */
+} /* end method (parser::parseln) */
 
 local int systems_delfes(systems *op,int fi) noex {
 	vecobj		*elp = op->elp ;
@@ -575,8 +566,7 @@ local int systems_delfes(systems *op,int fi) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (systems_delfes) */
+} /* end subroutine (systems_delfes) */
 
 local int file_start(SYS_FILE *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
@@ -587,8 +577,7 @@ local int file_start(SYS_FILE *fep,cchar *fname) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_start) */
+} /* end subroutine (file_start) */
 
 local int file_finish(SYS_FILE *fep) noex {
 	int		rs = SR_FAULT ;
@@ -603,8 +592,7 @@ local int file_finish(SYS_FILE *fep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_finish) */
+} /* end subroutine (file_finish) */
 
 local int entry_start(ENT *ep,int fi,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -617,8 +605,7 @@ local int entry_start(ENT *ep,int fi,cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 local int entry_dialer(ENT *ep,cchar *dp,int dl) noex {
 	int		rs ;
@@ -627,8 +614,7 @@ local int entry_dialer(ENT *ep,cchar *dp,int dl) noex {
 	    ep->dialername = cp ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_dialer) */
+} /* end subroutine (entry_dialer) */
 
 local int entry_args(ENT *ep,cchar *argp,int argl) noex {
 	int		rs = SR_OK ;
@@ -639,8 +625,7 @@ local int entry_args(ENT *ep,cchar *argp,int argl) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? argl : rs ;
-}
-/* end subroutine (entry_args) */
+} /* end subroutine (entry_args) */
 
 local int entry_finish(ENT *ep) noex {
 	int		rs = SR_FAULT ;
@@ -654,25 +639,24 @@ local int entry_finish(ENT *ep) noex {
 	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 		    ep->dialerargs = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	        if (ep->dialername) ylikely {
 	            vp = voidp(ep->dialername) ;
 	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            ep->dialername = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	        if (ep->sysname) ylikely {
 	            vp = voidp(ep->sysname) ;
 	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            ep->sysname = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	        ep->sysnamelen = 0 ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -685,7 +669,6 @@ vars::operator int () noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
