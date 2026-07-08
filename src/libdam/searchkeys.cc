@@ -56,6 +56,8 @@
 
 #include	"searchkeys.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 import libutil ;
 
 /* local defines */
@@ -405,7 +407,7 @@ local int searchkeys_build(SK *op,mainv qsp) noex {
 	{
 	    cint	vsz = szof(BUILD_PH) ;
 	    cint	vn = 4 ;
-	    cint	vo = VECOBJ_OSWAP ;
+	    cint	vo = vecobjm.swap ;
     	    vecobj	*plp = &bip->phrases ;
 	    if ((rs = plp->start(vsz,vn,vo)) >= 0) {
 	        for (int i = 0 ; qsp[i] ; i += 1) {
@@ -704,7 +706,7 @@ local int buildphrase_start(BUILD_PH *bpp) noex {
 	if (bpp) {
 	    cint	sz = szof(SK_KW) ;
 	    cint	vn = 1 ;
-	    cint	vo = (VECOBJ_OCOMPACT | VECOBJ_OSTATIONARY) ;
+	    cint	vo = (vecobjm.compact | vecobjm.stationary) ;
 	    rs = vecobj_start(&bpp->words,sz,vn,vo) ;
 	}
 	return rs ;
