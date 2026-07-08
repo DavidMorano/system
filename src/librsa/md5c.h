@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* RSA MD5 has (Message-Digest) */
+/* RSA MD5 hash (Message-Digest) */
 /* version %I% last-modified %G% */
 
 /****
