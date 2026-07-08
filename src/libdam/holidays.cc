@@ -603,7 +603,7 @@ int holidays_enum(HO *op,HO_CUR *curp,HO_CITE *qp,char *vbuf,int vlen) noex {
 
 	ri = (curp->i < 1) ? 1 : (curp->i + 1) ;
 
-/* ok, we're good to go */
+/* ok, we are good to go */
 
 	if (ri < op->rtlen) {
 	    vst = op->vst ;
@@ -624,13 +624,16 @@ int holidays_enum(HO *op,HO_CUR *curp,HO_CITE *qp,char *vbuf,int vlen) noex {
 	            qp->d = ((cite >> 0) & UCHAR_MAX) ;
 	        }
 
-	        if (rs >= 0)
+	        if (rs >= 0) {
 	            curp->i = ri ;
+		}
 
-	    } else
+	    } else {
 	        rs = SR_BADFMT ;
-	} else 
+	    }
+	} else {
 	    rs = SR_NOTFOUND ;
+	}
 
 	return (rs >= 0) ? vl : rs ;
 } /* end subroutine (holidays_enum) */
@@ -746,20 +749,20 @@ local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
-	rs1 = strtab_finish(&sip->vstrs) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = strtab_finish(&sip->vstrs) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	{
-	rs1 = strtab_finish(&sip->kstrs) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = strtab_finish(&sip->kstrs) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	{
-	rs1 = vecobj_finish(&sip->recs) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = vecobj_finish(&sip->recs) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	{
-	rs1 = bclose(&sip->hfile) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = bclose(&sip->hfile) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	sip->op = nullptr ;
 	return rs ;
@@ -987,13 +990,12 @@ local int subinfo_mkind(SI *sip,cchar kst[],int (*it)[3],int il) noex {
 
 #if	CF_FIRSTHASH
 	{
-	    vecobj		ves ;
-	    cint		sz = szof(varentry) ;
-	    int			vo = VECOBJ_OCOMPACT ;
+	    vecobj	ves ;
+	    cint	sz = szof(varentry) ;
+	    int		vo = vecobjm.compact ;
 	    if ((rs = vecobj_start(&ves,sz,rtl,vo)) >= 0) {
 	        int	i ;
-
-	        for (ri = 1 ; ri < rtl ; ri += 1) {
+	        for (int ri = 1 ; ri < rtl ; ri += 1) {
 
 	            ki = rt[ri][1] ;
 	            kp = kst + ki ;
@@ -1012,18 +1014,17 @@ local int subinfo_mkind(SI *sip,cchar kst[],int (*it)[3],int il) noex {
 	                ve.khash = chash ;
 	                ve.hi = hi ;
 	                rs = vecobj_add(&ves,&ve) ;
-	            }
+	            } /* end if */
 
 	            if (rs < 0) break ;
 	        } /* end for */
 
 	        if (rs >= 0) {
 	            varentry	*vep ;
-	            for (i = 0 ; vecobj_get(&ves,i,&vep) >= 0 ; i += 1) {
+	            for (int i = 0 ; vecobj_get(&ves,i,&vep) >= 0 ; i += 1) {
 	                sc += indinsert(rt,it,il,vep) ;
 	            } /* end for */
-	        }
-
+	        } /* end if (ok) */
 	        vecobj_finish(&ves) ;
 	    } /* end if (vecobj) */
 
@@ -1060,13 +1061,11 @@ local int subinfo_mkind(SI *sip,cchar kst[],int (*it)[3],int il) noex {
 } /* end subroutine (subinfo_mkind) */
 
 local int getyear(time_t dt) noex {
-	TMTIME		tm ;
 	int		rs ;
-	int		year ;
-
-	rs = tmtime_timegm(&tm,dt) ;
-	year = (tm.year + TM_YEAR_BASE) ;
-
+	int		year = 0 ; /* return-value */
+	if (TMTIME tm ; rs = tmtime_timegm(&tm,dt)) >= 0) {
+	    year = (tm.year + TM_YEAR_BASE) ;
+	}
 	return (rs >= 0) ? year : rs ;
 } /* end subroutine (getyear) */
 
@@ -1082,7 +1081,6 @@ local int getcite(uint *citep,cchar *cp,int cl) noex {
 	        } /* end if (cfdeci) */
 	    } /* end if (cfdeci) */
 	} /* end if (strnchr) */
-
 	return rs ;
 } /* end subroutine (getcite) */
 
@@ -1112,16 +1110,14 @@ local int indinsert(uint (*rt)[3],int (*it)[3],int il,varentry *vep) noex {
 	chash = (nhash & INT_MAX) ;
 
 	forever {
-
-	    if (it[hi][0] == 0)
-	        break ;
+	    if (it[hi][0] == 0) break ;
 
 	    ri = it[hi][0] ;
 	    ki = rt[ri][1] ;
 	    if (ki == vep->ki)
 	        break ;
 
-	    it[hi][1] |= (~ INT_MAX) ;
+	    it[hi][1] |= (compl INT_MAX) ;
 	    nhash = hash_again(nhash,c++,HO_NSKIP) ;
 
 	    hi = hashindex(nhash,il) ;
@@ -1183,14 +1179,16 @@ local int cmprec(cvoid *v1p,cvoid *v2p) noex {
 	uint		*i1p = (uint *) v1p ;
 	uint		*i2p = (uint *) v2p ;
 	int		rc = 0 ;
-	if ((i1p != nullptr) || (i2p != nullptr)) {
-	    if (i1p != nullptr) {
-	        if (i2p != nullptr) {
+	if (i1p || i2p) {
+	    if (i1p) {
+	        if (i2p) {
 	      	    rc = (*i1p - *i2p) ;
-	    	} else
+	    	} else {
 	            rc = -1 ;
-	    } else
+		}
+	    } else {
 	        rc = +1 ;
+	    }
 	}
 	return rc ;
 } /* end subroutine (cmprec) */
