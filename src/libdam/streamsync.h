@@ -13,15 +13,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
-#define	STREAMSYNC_MAGIC	0x96817463
 #define	STREAMSYNC		struct streamsync_head
+#define	STREAMSYNC_MAGIC	0x96817463
 
 
 struct streamsync_head {
@@ -30,13 +27,13 @@ struct streamsync_head {
 	uint		magval ;
 	int		stlen ;		/* sequence length needed */
 	int		i ;		/* current length */
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum streamsyncmems {
 	streamsyncmem_finish,
 	streamsyncmem_overlast
-} ;
+} ; /* end enum */
 struct streamsync ;
 struct streamsync_co {
 	streamsync	*op = nullptr ;
@@ -72,9 +69,9 @@ typedef STREAMSYNC	streamsync ;
 
 EXTERNC_begin
 
-extern int streamsync_start(streamsync *,cchar *,int) noex ;
-extern int streamsync_test(streamsync *,int) noex ;
-extern int streamsync_finish(streamsync *) noex ;
+extern int streamsync_start	(streamsync *,cchar *,int) noex ;
+extern int streamsync_test	(streamsync *,int) noex ;
+extern int streamsync_finish	(streamsync *) noex ;
 
 EXTERNC_end
 
