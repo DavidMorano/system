@@ -150,7 +150,7 @@ int ktag_start(KT *op,KT_PA *kap,uint soff,cchar *lp,int ll) noex {
 	if ((rs = ktag_ctor(op,kap,lp)) >= 0) ylikely {
 	    cint	sz = szof(KT_KEY) ;
 	    cint	vn = 0 ;
-	    cint	vo = VECOBJ_OCOMPACT ;
+	    cint	vo = vecobjm.compact ;
 	    op->kap = kap ;
 	    op->recoff = soff ;
 	    if ((rs = vecobj_start(op->klp,sz,vn,vo)) >= 0) {
