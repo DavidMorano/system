@@ -35,21 +35,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<vecstr.h>
-#include	<field.h>
-#include	<buffer.h>
-#include	<mallocstuff.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |UC(3u)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"configfile.h"
 
@@ -58,8 +60,6 @@
 import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
-
-#define	CONFIGFILE_MAGIC	0x04311633
 
 #ifndef	LINEBUFLEN
 #ifdef	LINE_MAX
@@ -84,25 +84,25 @@ import libutil ;			/* |memclear(3u)| */
 
 /* forward references */
 
-local void	checkfree() noex ;
+local void	checkfree(char **) noex ;
 
 
 /* local variables */
 
 /* these are the terminators for most everything */
-constexpr char		fterms[32] = {
-	0x7F, 0xFE, 0xC0, 0xFE,
-	0x8B, 0x00, 0x00, 0x24, 
+constexpr char		fterms[] = {
+	0x7F, UC(0xFE), 0xC0, UC(0xFE),
+	UC(0x8B), 0x00, 0x00, 0x24, 
 	0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x80,
-	0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, UC(0x80),
 	0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 
-} ;
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 
+} ; /* end array */
 
 /* these are the terminators for options */
-constexpr char		oterms[32] = {
+constexpr char		oterms[] = {
 	0x00, 0x0B, 0x00, 0x00,
 	0x09, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -111,7 +111,7 @@ constexpr char		oterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 enum configkeys {
 	configkey_define,
@@ -161,7 +161,7 @@ enum configkeys {
 	configkey_maxwordlen,
 	configkey_keys,
 	configkey_overlast
-} ;
+} ; /* end enum (configkeys) */
 
 constexpr cpcchar	configkeys[] = {
 	"define",
@@ -207,7 +207,7 @@ constexpr cpcchar	configkeys[] = {
 	"filetime",
 	"passfile",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -289,7 +289,7 @@ int configfile_start(configfile *csp,configfname) noex {
 	    if (linebuf[--len] != '\n') {
 
 #ifdef	COMMENT
-	        f_trunc = TRUE ;
+	        f_trunc = true ;
 #endif
 	        while ((c = bgetc(cfp)) >= 0)
 	            if (c == '\n') break ;
@@ -853,12 +853,11 @@ bad1:
 
 bad0:
 	goto ret0 ;
-}
-/* end subroutine (configfile_start) */
+} /* end subroutine (configfile_start) */
 
 int configfile_finish(configfile *csp) noex {
 	int		rs = SR_FAULT ;
-	if (csp ) {
+	if (csp) {
 	    rs = SR_NOTOPEN ;
 	    if (csp->magval == CONFIGFILE_MAGIC) {
 	        /* free up the complex data types */
@@ -906,18 +905,16 @@ int configfile_finish(configfile *csp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (configfile_finish) */
+} /* end subroutine (configfile_finish) */
 
 
 /* local subroutines */
 
 local void checkfree(char **vp) noex {
-	if (*vp != nullptr) {
-	    uc_free(*vp) ;
+	if (*vp) {
+	    mem.free(*vp) ;
 	    *vp = nullptr ;
 	}
-}
-/* end subroutine (checkfree) */
+} /* end subroutine (checkfree) */
 
 
