@@ -29,20 +29,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<hdb.h>
-#include	<sfx.h>
-#include	<mkpathx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUS */
+#include	<hdb.h>			/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dirdb.h"
 
@@ -79,7 +79,7 @@ extern "C" {
 /* forward references */
 
 template<typename ... Args>
-static int dirdb_ctor(dirdb *op,Args ... args) noex {
+local int dirdb_ctor(dirdb *op,Args ... args) noex {
 	DIRDB		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -93,14 +93,13 @@ static int dirdb_ctor(dirdb *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->dlp ;
 		    op->dlp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dirdb_ctor) */
+} /* end subroutine (dirdb_ctor) */
 
-static int dirdb_dtor(dirdb *op) noex {
+local int dirdb_dtor(dirdb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -114,29 +113,27 @@ static int dirdb_dtor(dirdb *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dirdb_dtor) */
+} /* end subroutine (dirdb_dtor) */
 
 template<typename ... Args>
-static inline int dirdb_magic(dirdb *op,Args ... args) noex {
+local inline int dirdb_magic(dirdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magval == DIRDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (dirdb_magic) */
+} /* end subroutine (dirdb_magic) */
 
-static int	dirdb_alreadyentry(dirdb *,dirdb_ent *) noex ;
-static int	dirdb_alreadyname(dirdb *,cchar *,int) noex ;
-static int	dirdb_adding(dirdb *,ustat *,cchar *,int) noex ;
+local int	dirdb_alreadyentry(dirdb *,dirdb_ent *) noex ;
+local int	dirdb_alreadyname(dirdb *,cchar *,int) noex ;
+local int	dirdb_adding(dirdb *,ustat *,cchar *,int) noex ;
 
-static int	entry_start(dirdb_ent *,cchar *,int,ustat *,int) noex ;
-static int	entry_finish(dirdb_ent *) noex ;
+local int	entry_start(dirdb_ent *,cchar *,int,ustat *,int) noex ;
+local int	entry_finish(dirdb_ent *) noex ;
 
 #if	CF_STATCMP
 extern "C" {
-    static int	vcmpstat(cvoid **,cvoid **) noex ;
+    local int	vcmpstat(cvoid **,cvoid **) noex ;
 }
 #endif
 
@@ -160,15 +157,14 @@ int dirdb_start(dirdb *op,int n) noex {
 	        }
 	        if (rs < 0) {
 		    vechand_finish(op->dlp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (vechand_start) */
 	    if (rs < 0) {
 		dirdb_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (dirdb_ctor) */
 	return rs ;
-}
-/* end subroutine (dirdb_start) */
+} /* end subroutine (dirdb_start) */
 
 int dirdb_finish(dirdb *op) noex {
 	int		rs ;
@@ -187,7 +183,7 @@ int dirdb_finish(dirdb *op) noex {
 		        {
 	                    rs1 = lm_free(ep) ;
 	                    if (rs >= 0) rs = rs1 ;
-		        }
+		        } /* end if (memory-release) */
 	            }
 	        } /* end for */
 		{
@@ -207,8 +203,7 @@ int dirdb_finish(dirdb *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirdb_finish) */
+} /* end subroutine (dirdb_finish) */
 
 int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 	int		rs ;
@@ -225,7 +220,7 @@ int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 		                 bool	f_add = true ;
 		                 while ((dl > 0) && (dp[dl-1] == '/')) {
 	    	                     dl -= 1 ;
-		                 }
+		                 } /* end while */
 		                 cchar	*sp = dp ;
 		                 int	sl = dl ;
 		                 if ((rs = dirdb_alreadyname(op,dp,dl)) == 0) {
@@ -257,8 +252,7 @@ int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_new : rs ;
-}
-/* end subroutine (dirdb_add) */
+} /* end subroutine (dirdb_add) */
 
 int dirdb_clean(dirdb *op) noex {
 	int		rs ;
@@ -281,7 +275,7 @@ int dirdb_clean(dirdb *op) noex {
 		        {
 	                    rs1 = lm_free(ep) ;
 		            if (rs >= 0) rs = rs1 ;
-		        }
+		        } /* end if (memory-release) */
 	            } else if (isNotPresent(rs)) {
 		        rs = SR_OK ;
 	            } /* end if */
@@ -292,8 +286,7 @@ int dirdb_clean(dirdb *op) noex {
 	    } /* end if (kdb-cursor) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirdb_clean) */
+} /* end subroutine (dirdb_clean) */
 
 int dirdb_curbegin(dirdb *op,dirdb_cur *curp) noex {
 	int		rs ;
@@ -301,8 +294,7 @@ int dirdb_curbegin(dirdb *op,dirdb_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirdb_curbegin) */
+} /* end subroutine (dirdb_curbegin) */
 
 int dirdb_curend(dirdb *op,dirdb_cur *curp) noex {
 	int		rs ;
@@ -310,8 +302,7 @@ int dirdb_curend(dirdb *op,dirdb_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dirdb_curend) */
+} /* end subroutine (dirdb_curend) */
 
 int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 	int		rs ;
@@ -326,13 +317,12 @@ int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (dirdb_enum) */
+} /* end subroutine (dirdb_enum) */
 
 
 /* private subroutines */
 
-static int dirdb_adding(dirdb *op,ustat *sbp,cchar *sp,int sl) noex {
+local int dirdb_adding(dirdb *op,ustat *sbp,cchar *sp,int sl) noex {
 	cint		sz = szof(dirdb_ent) ;
 	int		rs ;
 	if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
@@ -351,21 +341,20 @@ static int dirdb_adding(dirdb *op,ustat *sbp,cchar *sp,int sl) noex {
 	            } /* end if (hdb_store) */
 	            if (rs < 0) {
 		        vechand_del(op->dlp,dbi) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (vechand_add) */
 	        if (rs < 0) {
 	            entry_finish(ep) ;
-		}
+		} /* end if (error) */
 	    } /* end if (entry_start) */
 	    if (rs < 0) {
 	        lm_free(ep) ;
-	    }
-	} /* end if (m-a) */
+	    } /* end if (error) */
+	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (dirdb_adding) */
+} /* end subroutine (dirdb_adding) */
 
-static int dirdb_alreadyentry(dirdb *op,dirdb_ent *ep) noex {
+local int dirdb_alreadyentry(dirdb *op,dirdb_ent *ep) noex {
 	int		rs = SR_OK ;
 	int		dnamel = lenstr(ep->name) ;
 	int		f = false ; /* return-value */
@@ -381,10 +370,9 @@ static int dirdb_alreadyentry(dirdb *op,dirdb_ent *ep) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (dirdb_alreadyentry) */
+} /* end subroutine (dirdb_alreadyentry) */
 
-static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
+local int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
@@ -412,10 +400,9 @@ static int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (dirdb_alreadyname) */
+} /* end subroutine (dirdb_alreadyname) */
 
-static int entry_start(dirdb_ent *ep,cc *sp,int sl,ustat *sbp,int count) noex {
+local int entry_start(dirdb_ent *ep,cc *sp,int sl,ustat *sbp,int count) noex {
 	int		rs = SR_FAULT ;
 	if (ep) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
@@ -425,13 +412,12 @@ static int entry_start(dirdb_ent *ep,cc *sp,int sl,ustat *sbp,int count) noex {
 	    ep->count = count ;
 	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) ylikely {
 	        ep->name = cp ;
-	    }
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
-static int entry_finish(dirdb_ent *ep) noex {
+local int entry_finish(dirdb_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (ep) ylikely {
@@ -441,24 +427,22 @@ static int entry_finish(dirdb_ent *ep) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->name = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 #if	CF_STATCMP
 
-static int cmpstat(const ustat *e1p,const ustat *e2p) noex {
+local int cmpstat(const ustat *e1p,const ustat *e2p) noex {
 	int		rc = (e1p->st_ino - e2p->st_ino) ;
 	if (rc == 0) {
 	    rc = (e1p->st_dev - e2p->st_dev) ;
 	}
 	return rc ;
-}
-/* end subroutine (cmpstat) */
+} /* end subroutine (cmpstat) */
 
-static int vcmpstat(cvoid **v1pp,cvoid **v2pp) noex {
+local int vcmpstat(cvoid **v1pp,cvoid **v2pp) noex {
 	const ustat	*e1p = (ustat *) *v1pp ;
 	const ustat	*e2p = (ustat *) *v2pp ;
 	int		rc = 0 ;
@@ -472,8 +456,7 @@ static int vcmpstat(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpstat) */
+} /* end subroutine (vcmpstat) */
 
 #endif /* CF_STATCMP */
 
