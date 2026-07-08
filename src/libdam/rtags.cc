@@ -175,7 +175,7 @@ int rtags_start(rtags *op,int vn) noex {
 	if (vn < NDEFS) vn = NDEFS ;
 	if ((rs = rtags_ctor(op)) >= 0) ylikely {
 	    if ((rs = hdb_start(op->hdp,vn,1,np,np)) >= 0) ylikely {
-	        int	vo = VECOBJ_OSTATIONARY ;
+	        int	vo = vecobjm.stationary ;
 	        int	vsz = szof(FNAME) ;
 	        if ((rs = vecobj_start(op->flp,vsz,vn,vo)) >= 0) ylikely {
 	            vsz = szof(RT_TAG) ;
