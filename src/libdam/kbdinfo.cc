@@ -61,6 +61,8 @@
 
 #include	"kbdinfo.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 import libutil ;
 
 /* local defines */
@@ -70,8 +72,7 @@ import libutil ;
 #define	KI_CUR		kbdinfo_cur
 #define	KI_KEYNAMELEN	60
 
-#undef	ENTRYINFO
-#define	ENTRYINFO	entryinfo
+#define	EI		entryinfo
 
 
 /* imported namespaces */
@@ -129,11 +130,11 @@ local inline int kbdinfo_magic(kbdinfo *op,Args ... args) noex {
 
 local int kbdinfo_parse		(KI *,cchar *) noex ;
 local int kbdinfo_parseline	(KI *,cchar *,int) noex ;
-local int kbdinfo_process	(KI *,ENTRYINFO *,int) noex ;
-local int kbdinfo_store		(KI *,int,cchar *,int,ENTRYINFO *,int) noex ;
+local int kbdinfo_process	(KI *,EI *,int) noex ;
+local int kbdinfo_store		(KI *,int,cchar *,int,EI *,int) noex ;
 local int kbdinfo_kefins	(KI *) noex ;
 
-local int ke_start(KI_ENT *,int,cchar *,int,ENTRYINFO *,int) noex ;
+local int ke_start(KI_ENT *,int,cchar *,int,EI *,int) noex ;
 local int ke_finish(KI_ENT *) noex ;
 
 local int vcmpfind(cvoid **,cvoid **) noex ;
@@ -174,7 +175,7 @@ int kbdinfo_open(KI *op,keysymer *ksp,cchar *fname) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 	        cint	vsz = szof(KI_ENT) ;
-	        cint	vo = VECOBJ_OSORTED ;
+	        cint	vo = vecobjm.sorted ;
 	        cint	ve = 4 ;
 	        cint	n = KBDINFO_TOVERLAST ;
 		int	i ; /* used-afterwards */
@@ -266,7 +267,7 @@ int kbdinfo_lookup(KI *op,char *ksbuf,int kslen,termcmd *cmdp) noex {
 	        for (i = 0 ; i < n ; i += 1) {
 	            te.p[i] = cmdp->p[i] ;
 		    if (cmdp->p[i] < 0) break ;
-	        }
+	        } /* end for */
 	        te.nparams = i ;
 	    } /* end if */
 	    void *vp ;
@@ -277,7 +278,6 @@ int kbdinfo_lookup(KI *op,char *ksbuf,int kslen,termcmd *cmdp) noex {
 	            if (ep->keynum < 0) {
 	                if (op->ksp != nullptr) {
 	                    rs1 = keysymer_lookup(op->ksp,ep->keyname,-1) ;
-        
 	                    if (rs1 >= 0) {
 	                        ep->keynum = rs1 ;
 	                        keynum = rs1 ;
@@ -350,8 +350,7 @@ int kbdinfo_curenum(KI *op,KI_CUR *curp,KI_ENT **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? nl : rs ;
-}
-/* end subroutine (kbdinfo_curenum) */
+} /* end subroutine (kbdinfo_curenum) */
 
 
 /* private subroutines */
@@ -384,7 +383,7 @@ local int kbdinfo_parse(KI *op,cchar *fname) noex {
 } /* end subroutine (kbdinfo_parse) */
 
 local int kbdinfo_parseline(KI *op,cchar *lp,int ll) noex {
-	ENTRYINFO	eis[20] = {} ;
+	EI		eis[20] = {} ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
@@ -408,7 +407,7 @@ local int kbdinfo_parseline(KI *op,cchar *lp,int ll) noex {
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (kbdinfo_parseline) */
 
-local int kbdinfo_process(KI *op,ENTRYINFO *eis,int n) noex {
+local int kbdinfo_process(KI *op,EI *eis,int n) noex {
 	int		rs = SR_OK ;
 	int		ktl = eis[1].fl ;
 	int		c = 0 ; /* return-value */
@@ -423,7 +422,7 @@ local int kbdinfo_process(KI *op,ENTRYINFO *eis,int n) noex {
 } /* end subroutine (kbdinfo_process) */
 
 local int kbdinfo_store(KI *op,int ktype,cchar *knp,int knl,
-		ENTRYINFO *eis,int n) noex {
+		EI *eis,int n) noex {
 	int		rs = SR_OK ;
 	char		keybuf[KI_KEYNAMELEN + 1] ;
 	if (knl < 0) knl = lenstr(knp) ;
@@ -456,28 +455,18 @@ local int kbdinfo_kefins(KI *op) noex {
 	    } /* end for */
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (kbdinfo_kefins) */
+} /* end subroutine (kbdinfo_kefins) */
 
-#ifdef	COMMENT
-struct kbdinfo_e {
-	cchar	*a		/* the memory allocation */
-	cchar	*keyname ;	/* keysym-name */
-	cchar	*istr ;
-	cchar	*dstr ;
-	short		*p ;		/* parameters */
-	int		type ;		/* key type */
-	int		name ;		/* key name */
-	int		keynum ;	/* key number */
-	int		np ;		/* number of paramters */
-} ;
+/****
+
 # keysym	type	final	inter	param(s)
 F6              FKEY	-	-	17
 F7              FKEY	-	-	18
-#endif /* COMMENT */
+
+****/
 
 local int ke_start(KI_ENT *kep,int ktype,cchar *knp,int knl,
-		ENTRYINFO *eis,int n) noex {
+		EI *eis,int n) noex {
 	cint		oi = 4 ;
 	int		rs = SR_FAULT ;
 	int		nparams = 0 ;
@@ -486,75 +475,69 @@ local int ke_start(KI_ENT *kep,int ktype,cchar *knp,int knl,
 	    rs = SR_INVALID ;
 	    if (knp[0]) {
 	        rs = memclear(kep) ;
-	kep->type = ktype ;
-	kep->keynum = -1 ;
-	{
-	    int	name = (eis[2].fp[0] & 0xff) ;
-	    if (ktype == KBDINFO_TFKEY) name = '~' ;
-	    kep->name = name ;
-	}
-	sz += (lenstr(knp,knl) + 1) ;
-	if (n > 3) {
-	    sz += (lenstr(eis[3].fp,eis[3].fl) + 1) ;
-	} else {
-	    sz += 1 ;
-	}
-	if (n > oi) {
-	    for (int i = oi ; i < n ; i += 1) {
-	        if ((eis[i].fl > 0) && (eis[i].fp[0] != '-')) {
-		    nparams = (i+1-oi) ;
-	        }
-	    }
-	    sz += (nparams * szof(short)) ;
-	}
-
-	if (char *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
-	    int		pi ;
-	    int		fl ;
-	    int		v ;
-	    short	*pp ;
-	    cchar	*fp ;
-
-	    kep->a = bp ;
-	    kep->nparams = nparams ;
-	    kep->p = (short *) bp ;
-	    pp = (short *) bp ;
-	    for (pi = 0 ; pi < nparams ; pi += 1) {
-		v = 0 ;
-		fl = eis[pi+oi].fl ;
-		fp = eis[pi+oi].fp ;
-		if (fl > 0) {
-		    if ((fp != nullptr) && (fp[0] != '-')) {
-		        rs = cfnumi(fp,fl,&v) ;
-		    }
-		}
-		pp[pi] = (v & SHORT_MAX) ;
-		if (rs < 0) break ;
-	    } /* end for */
-	    bp += (nparams * szof(short)) ;
-
-	    if (rs >= 0) {
-	        kep->keyname = bp ;
-		bp = (strwcpy(bp,knp,knl) + 1) ;
-	    } /* end if (ok) */
-
-	    if (rs >= 0) {
-	        kep->istr = bp ;
-		fp = eis[3].fp ;
-		fl = eis[3].fl ;
-		if ((fl > 0) && (fp[0] != '-')) {
-		    bp = (strwcpy(bp,fp,fl) + 1) ;
-		} else {
-		    *bp++ = '\0' ;
-		}
-	    } /* end if (ok) */
-
-	    if (rs < 0) {
-		mem.free(kep->a) ;
-		kep->a = nullptr ;
-	    } /* end if (error) */
-	} /* end if (memory-acquire) */
-
+	        kep->type = ktype ;
+	        kep->keynum = -1 ;
+	        {
+	            int	name = (eis[2].fp[0] & 0xff) ;
+	            if (ktype == KBDINFO_TFKEY) name = '~' ;
+	            kep->name = name ;
+	        } /* end block */
+	        sz += (lenstr(knp,knl) + 1) ;
+	        if (n > 3) {
+	            sz += (lenstr(eis[3].fp,eis[3].fl) + 1) ;
+	        } else {
+	            sz += 1 ;
+	        } /* end if */
+	        if (n > oi) {
+	            for (int i = oi ; i < n ; i += 1) {
+	                if ((eis[i].fl > 0) && (eis[i].fp[0] != '-')) {
+		            nparams = (i+1-oi) ;
+	                }
+	            }
+	            sz += (nparams * szof(short)) ;
+	        } /* end if */
+	        if (char *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
+	            int		pi ;
+	            int		fl ;
+	            int		v ;
+	            short	*pp ;
+	            cchar	*fp ;
+	            kep->a = bp ;
+	            kep->nparams = nparams ;
+	            kep->p = (short *) bp ;
+	            pp = (short *) bp ;
+	            for (pi = 0 ; pi < nparams ; pi += 1) {
+		        v = 0 ;
+		        fl = eis[pi+oi].fl ;
+		        fp = eis[pi+oi].fp ;
+		        if (fl > 0) {
+		            if ((fp != nullptr) && (fp[0] != '-')) {
+		                rs = cfnumi(fp,fl,&v) ;
+		            }
+		        }
+		        pp[pi] = (v & SHORT_MAX) ;
+		        if (rs < 0) break ;
+	            } /* end for */
+	            bp += (nparams * szof(short)) ;
+	            if (rs >= 0) {
+	                kep->keyname = bp ;
+		        bp = (strwcpy(bp,knp,knl) + 1) ;
+	            } /* end if (ok) */
+	            if (rs >= 0) {
+	                kep->istr = bp ;
+		        fp = eis[3].fp ;
+		        fl = eis[3].fl ;
+		        if ((fl > 0) && (fp[0] != '-')) {
+		            bp = (strwcpy(bp,fp,fl) + 1) ;
+		        } else {
+		            *bp++ = '\0' ;
+		        }
+	            } /* end if (ok) */
+	            if (rs < 0) {
+		        mem.free(kep->a) ;
+		        kep->a = nullptr ;
+	            } /* end if (error) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
