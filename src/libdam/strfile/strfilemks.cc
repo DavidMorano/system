@@ -141,16 +141,16 @@ struct recmgr {
 	vecobj		recs ;
 	int		bso ;		/* base string-offiset */
 	int		so ;		/* string-offset */
-} ;
+} ; /* end struct */
 
 struct recmgr_e {
 	int		si ;
 	int		sl ;
-} ;
+} ; /* end struct */
 
 struct idx_fl {
 	uint		fb:1 ;
-}
+} ; /* end struct */
 
 struct idx {
 	cchar		*idname ;	/* idx dir-name */
@@ -162,58 +162,58 @@ struct idx {
 	filer		fb ;
 	int		fd ;
 	uint		fo ;
-} ;
+} ; /* end struct */
 
 struct mapfile {
 	void		*mdata ;
 	size_t		msize ;
-} ;
+} ; /* end struct */
 
 struct strentry {
 	uint	khash ;
 	uint	ri ;
 	uint	ki ;
 	uint	hi ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-local int	strfilemks_recbegin(STRFILEMKS *) ;
-local int	strfilemks_recend(STRFILEMKS *) ;
+local int	strfilemks_recbegin(STRFILEMKS *) noex ;
+local int	strfilemks_recend(STRFILEMKS *) noex ;
 
-local int	strfilemks_idxbegin(STRFILEMKS *,cchar *) ;
-local int	strfilemks_idxend(STRFILEMKS *) ;
+local int	strfilemks_idxbegin(STRFILEMKS *,cchar *) noex ;
+local int	strfilemks_idxend(STRFILEMKS *) noex ;
 
-local int	strfilemks_filesbegin(STRFILEMKS *) ;
-local int	strfilemks_filesend(STRFILEMKS *,int) ;
+local int	strfilemks_filesbegin(STRFILEMKS *) noex ;
+local int	strfilemks_filesend(STRFILEMKS *,int) noex ;
 
-local int	strfilemks_listbegin(STRFILEMKS *,int) ;
-local int	strfilemks_listend(STRFILEMKS *) ;
+local int	strfilemks_listbegin(STRFILEMKS *,int) noex ;
+local int	strfilemks_listend(STRFILEMKS *) noex ;
 
-local int	strfilemks_nfcreate(STRFILEMKS *,cchar *) ;
+local int	strfilemks_nfcreate(STRFILEMKS *,cchar *) noex ;
 local int	strfilemks_nfcreatecheck(STRFILEMKS *,
-			cchar *,cchar *) ;
-local int	strfilemks_nfdestroy(STRFILEMKS *) ;
-local int	strfilemks_nfstore(STRFILEMKS *,cchar *) ;
-local int	strfilemks_fexists(STRFILEMKS *) ;
+			cchar *,cchar *) noex ;
+local int	strfilemks_nfdestroy(STRFILEMKS *) noex ;
+local int	strfilemks_nfstore(STRFILEMKS *,cchar *) noex ;
+local int	strfilemks_fexists(STRFILEMKS *) noex ;
 
-local int	strfilemks_addfiler(STRFILEMKS *,MAPFILE *) ;
+local int	strfilemks_addfiler(STRFILEMKS *,MAPFILE *) noex ;
 
-local int	strfilemks_mkvarfile(STRFILEMKS *) ;
-local int	strfilemks_wrvarfile(STRFILEMKS *) ;
-local int	strfilemks_mkind(STRFILEMKS *,cchar *,uint (*)[3],int) ;
-local int	strfilemks_renamefiles(STRFILEMKS *) ;
+local int	strfilemks_mkvarfile(STRFILEMKS *) noex ;
+local int	strfilemks_wrvarfile(STRFILEMKS *) noex ;
+local int	strfilemks_mkind(STRFILEMKS *,cchar *,uint (*)[3],int) noex ;
+local int	strfilemks_renamefiles(STRFILEMKS *) noex ;
 
-local int	rectab_start(RECTAB *,int) ;
-local int	rectab_add(RECTAB *,uint,uint) ;
-local int	rectab_done(RECTAB *) ;
-local int	rectab_getvec(RECTAB *,uint (**)[2]) ;
-local int	rectab_extend(RECTAB *) ;
-local int	rectab_finish(RECTAB *) ;
+local int	rectab_start(RECTAB *,int) noex ;
+local int	rectab_add(RECTAB *,uint,uint) noex ;
+local int	rectab_done(RECTAB *) noex ;
+local int	rectab_getvec(RECTAB *,uint (**)[2]) noex ;
+local int	rectab_extend(RECTAB *) noex ;
+local int	rectab_finish(RECTAB *) noex ;
 
 #ifdef	COMMENT
-local int	rectab_count(RECTAB *) ;
+local int	rectab_count(RECTAB *) noex ;
 #endif
 
 local int	mapfile_start(MAPFILE *,int,cchar *,int) noex ;
@@ -227,7 +227,7 @@ local int	hashindex(uint,int) noex ;
 
 constexpr char		zerobuf[4] = {
 	0, 0, 0, 0 
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -236,7 +236,7 @@ const SFM_OBJ	strfilemks_mod = {
 	"strfilemks",
 	szof(STRFILEMKS),
 	0
-} ;
+} ; /* end initialization */
 
 
 /* exported variables */
@@ -294,9 +294,7 @@ int		n ;
 	} /* end if (recmgr) */
 
 	return rs ;
-}
-/* end subroutine (strfilemks_open) */
-
+} /* end subroutine (strfilemks_open) */
 
 int strfilemks_close(op)
 STRFILEMKS	*op ;
@@ -346,9 +344,7 @@ STRFILEMKS	*op ;
 
 	op->magic = 0 ;
 	return (rs >= 0) ? nvars : rs ;
-}
-/* end subroutine (strfilemks_close) */
-
+} /* end subroutine (strfilemks_close) */
 
 int strfilemks_addfile(op,sp,sl)
 STRFILEMKS	*op ;
@@ -357,7 +353,6 @@ int		sl ;
 {
 	cint	ms = STEFILEMK_MAXFILESIZE ;
 	int	rs ;
-
 
 	if (op == nullptr) return SR_FAULT ;
 	if (sp == nullptr) return SR_FAULT ;
@@ -372,9 +367,7 @@ int		sl ;
 	} /* end if (mapfile) */
 
 	return rs ;
-}
-/* end subroutine (strfilemks_addfile) */
-
+} /* end subroutine (strfilemks_addfile) */
 
 local int strfilemks_addfiler(STRFILEMKS *op,MAPFILE *mfp) noex {
 	RECMGR		*rmp = op->recorder ;
@@ -415,8 +408,7 @@ local int strfilemks_addfiler(STRFILEMKS *op,MAPFILE *mfp) noex {
 
 	op->nstrs += c ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (strfilemks_addfiler) */
+} /* end subroutine (strfilemks_addfiler) */
 
 local int recmgr_start(RECMGR *rmp) noex {
 	cint	esz = szof(RECMGR_ENT) ;
@@ -424,78 +416,44 @@ local int recmgr_start(RECMGR *rmp) noex {
 	cint	vo = 0 ;
 	memclear(rmp) ;
 	return vecobj_start(&rmp->recs,esz,vn,vo) ;
-}
-/* end subroutine (strfilemks_start) */
+} /* end subroutine (strfilemks_start) */
 
-
-local int recmgr_finish(RECMGR *rmp)
-{
+local int recmgr_finish(RECMGR *rmp) noex {
 	return vecobj_finish(&rmp->recs) ;
-}
-/* end subroutine (strfilemks_finish) */
+} /* end subroutine (strfilemks_finish) */
 
-
-local int recmgr_grpbegin(RECMGR *rmp)
-{
+local int recmgr_grpbegin(RECMGR *rmp) noex {
 	rmp->bso = rmp->so ;
 	return SR_OK ;
-}
-/* end subroutine (strfilemks_grpbegin) */
-
+} /* end subroutine (strfilemks_grpbegin) */
 
 /* nothing to do */
-local int recmgr_grpend(RECMGR *rmp)
-{
+local int recmgr_grpend(RECMGR *rmp) noex {
 	if (rmp == nullptr) return SR_FAULT ;
 	return SR_OK ;
-}
-/* end subroutine (strfilemks_grpend) */
+} /* end subroutine (strfilemks_grpend) */
 
-
-local int recmgr_grpadd(RECMGR *rmp,int si,int sl)
-{
+local int recmgr_grpadd(RECMGR *rmp,int si,int sl) noex {
 	RECMGR_ENT	e ;
 	e.si = (si + rmp->bso) ;
 	s.sl = sl ;
 	rmp->so += (si+1) ;
 	return vecobj_add(&rmp->recs,&e) ;
-}
-/* end subroutine (strfilemks_grpadd) */
+} /* end subroutine (strfilemks_grpadd) */
 
-
-int strfilemks_abort(op)
-STRFILEMKS	*op ;
-{
-
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (op->magic != SFM_MAGIC)
-	    return SR_NOTOPEN ;
-
+int strfilemks_abort(STRFILEMKS	*op) noex {
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != SFM_MAGIC) return SR_NOTOPEN ;
 	op->fl.abort = true ;
 	return SR_OK ;
-}
-/* end subroutine (strfilemks_abort) */
+} /* end subroutine (strfilemks_abort) */
 
-
-int strfilemks_chgrp(op,gid)
-STRFILEMKS	*op ;
-gid_t		gid ;
-{
-
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (op->magic != SFM_MAGIC)
-	    return SR_NOTOPEN ;
-
+int strfilemks_chgrp(STRFILEMKS *op,gid_t gid) noex {
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != SFM_MAGIC) return SR_NOTOPEN ;
 	op->gid = gid ;
 	return SR_OK ;
-}
-/* end subroutine (strfilemks_chgrp) */
+} /* end subroutine (strfilemks_chgrp) */
 
 
 /* private subroutines */
@@ -510,27 +468,25 @@ local int strfilemks_recbegin(STRFILEMKS *op) noex {
 	    if (rs < 0) {
 		uc_free(op->recorder) ;
 		op->recorder = nullptr ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (strfilemks_recbegin) */
+} /* end subroutine (strfilemks_recbegin) */
 
 local int strfilemks_recend(STRFILEMKS *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 	{
-	rs1 = recmg_finish(&op->recorder) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = recmg_finish(&op->recorder) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	if (op->recorder) {
 	    rs1 = uc_free(op->recorder) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->recorder = nullptr ;
-	}
+	} /* end if (meory-release) */
 	return rs ;
-}
-/* end subroutine (strfilemks_recend) */
+} /* end subroutine (strfilemks_recend) */
 
 local int strfilemks_idxbegin(STRFILEMKS *op,cchar *dbname) noex {
 	cint	isz = szof(idx) ;
@@ -545,31 +501,29 @@ local int strfilemks_idxbegin(STRFILEMKS *op,cchar *dbname) noex {
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (strfilemks_idxbegin) */
+} /* end subroutine (strfilemks_idxbegin) */
 
 local int strfilemks_idxend(STRFILEMKS *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
 	if (op->idx) {
-	    rs1 = idx_finish(op->idx) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(op->idx) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->idx = nullptr ;
+	    {
+	        rs1 = idx_finish(op->idx) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = uc_free(op->idx) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->idx = nullptr ;
+	    }
 	}
-
 	return rs ;
-}
-/* end subroutine (strfilemks_idxend) */
+} /* end subroutine (strfilemks_idxend) */
 
 local int idx_start(idx *ixp,cchar *dbname) noex {
 	int	rs = SR_OK ;
 	int	dnl ;
-
 	cchar	*dnp ;
-
 	memclear(ixp) ;
 	ixp->fd = -1 ;
 	if ((dnl = sfdirname(dbname,-1,&dnp)) >= 0) {
@@ -603,55 +557,39 @@ local int idx_start(idx *ixp,cchar *dbname) noex {
 	} else {
 	    rs = SR_BADFMT ;
 	}
-
 	return rs ;
-}
-/* end subroutine (idx_start) */
+} /* end subroutine (idx_start) */
 
-
-local int idx_finish(idx *ixp)
-{
+local int idx_finish(idx *ixp) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
-	if (ixp->nfname != nullptr) {
+	if (ixp->nfname) {
 	    rs1 = uc_free(ixp->nfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ixp->nfname = nullptr ;
 	}
-
-	if (ixp->ai != nullptr) {
+	if (ixp->ai) {
 	    rs1 = uc_free(ixp->ai) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ixp->ai = nullptr ;
 	    idx->idname = nullptr ;
 	    idx->ibname = nullptr ;
 	}
-
 	return rs ;
-}
-/* end subroutine (idx_finish) */
+} /* end subroutine (idx_finish) */
 
-
-local int idx_dirwritable(idx *ixp)
-{
+local int idx_dirwritable(idx *ixp) noex {
 	cint	am = (X_OK|W_OK) ;
 	int	rs ;
 	cchar	*dname = ixp->idname ;
-
 	if (dname[0] == '\0') dname = "." ;
-
 	rs = perm(dname,-1,-1,nullptr,am) ;
-
 	return rs ;
-}
-/* end subroutine (idx_dirwritable) */
+} /* end subroutine (idx_dirwritable) */
 
-
-local int idx_create(idx *ixp,cchar *fsuf)
-{
+local int idx_create(idx *ixp,cchar *fsuf) noex {
 	time_t		dt = time(nullptr) ;
-	cint	clen = MAXNAMELEN ;
+	cint		clen = MAXNAMELEN ;
 	int		rs ;
 	cchar	*ibname = ixp->ibname ;
 	cchar	*end = ENDIANSTR ;
@@ -675,72 +613,55 @@ local int idx_create(idx *ixp,cchar *fsuf)
 	    if (rs >= 0) {
 		if ((rs = idx_bufbegin(ixp)) >= 0) {
 		    rs = idx_creator(ixp) ;
-		    if (rs < 0)
+		    if (rs < 0) {
 			idx_bufend(ixp) ;
+		    } /* end if (error) */
 		}
 		if (rs < 0) {
 		    idx_destroy(ixp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (ok) */
 	} /* end if (making component name) */
-
 	return rs ;
-}
-/* end subroutine (idx_create) */
+} /* end subroutine (idx_create) */
 
-
-local int idx_creator(idx *ixp)
-{
+local int idx_creator(idx *ixp) noex {
 	int	rs ;
-
 	if ((rs = idx_mapbegin(ixp)) >= 0) {
 	    rs = idx_bufhdr(ixp) ;
 	}
-
 	return rs ;
-}
-/* end subroutine (idx_creator) */
+} /* end subroutine (idx_creator) */
 
-
-local int idx_destroy(idx *ixp)
-{
+local int idx_destroy(idx *ixp) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
 	if (ixp->fd >= 0) {
 	    rs1 = u_close(ixp->fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ixp->fd = -1 ;
 	}
-
-	if (ixp->nfname != nullptr) {
-	    if (ixp->nfname[0] != '\0') u_unlink(izp->nfname) ;
+	if (ixp->nfname) {
+	    if (ixp->nfname[0] != '\0') {
+		u_unlink(izp->nfname) ;
+	    }
 	    rs1 = uc_free(ixp->nfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ixp->nfname = nullptr ;
-	}
-
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (idx_destroy) */
+} /* end subroutine (idx_destroy) */
 
-
-local int idx_nfopen(idx *ixp,cchar *nfname)
-{
+local int idx_nfopen(idx *ixp,cchar *nfname) noex {
 	cint	of = (O_CREAT | O_EXCL | O_WRONLY) ;
 	int	rs ;
-
 	if ((rs = u_open(nfname,of,op->om)) >= 0) {
 	    op->nfd = rs ;
 	}
-
 	return rs ;
-}
-/* end subroutine (idx_nfopen) */
+} /* end subroutine (idx_nfopen) */
 
-
-local int idx_nfclose(idx *ixp)
-{
+local int idx_nfclose(idx *ixp) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 	if (ixp->fd >= 0) {
@@ -749,16 +670,12 @@ local int idx_nfclose(idx *ixp)
 	    op->fd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (idx_nfclose) */
+} /* end subroutine (idx_nfclose) */
 
-
-local int idx_nfold(idx *ixp,time_t dt,cchar *nfname)
-{
-	ustat	sb ;
+local int idx_nfold(idx *ixp,time_t dt,cchar *nfname) noex {
 	int	rs ;
 	int	f = false ;
-	if ((rs = u_stat(nfname,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(nfname,&sb)) >= 0) {
 	    if ((dt-sb.st_mtime) >= TO_OLD) {
 		if (u_unlink(nfname) >= 0) f = true ;
 	    }
@@ -767,8 +684,7 @@ local int idx_nfold(idx *ixp,time_t dt,cchar *nfname)
 	    f = true ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (idx_nfold) */
+} /* end subroutine (idx_nfold) */
 
 local int idx_nfopentmp(idx *ixp,cchar *fsuf) noex {
 	cint	of = (O_WRONLY | O_CREAT) ;
@@ -799,8 +715,7 @@ local int idx_nfopentmp(idx *ixp,cchar *fsuf) noex {
 	    } /* end if (ok) */
 	} /* end if (making file-name) */
 	return rs ;
-}
-/* end subroutine (idx_nfopentmp) */
+} /* end subroutine (idx_nfopentmp) */
 
 local int idx_nfstore(idx *op,cchar *nf) noex {
 	int		rs = SR_OK ;
@@ -816,8 +731,7 @@ local int idx_nfstore(idx *op,cchar *nf) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (idx_nfstore) */
+} /* end subroutine (idx_nfstore) */
 
 local int idx_bufbegin(idx *ixp) noex {
 	int	rs ;
@@ -825,8 +739,7 @@ local int idx_bufbegin(idx *ixp) noex {
 	    ixp->fl.fb = true ;
 	}
 	return rs ;
-}
-/* end subroutine (idx_bufbegin) */
+} /* end subroutine (idx_bufbegin) */
 
 local int idx_bufend(idx *ixp) noex {
 	int	rs = SR_OK ;
@@ -844,8 +757,7 @@ local int idx_bufwrite(idx *ixp,cvoid *wbuf,int wlen) noex {
 	int	rs = filer_write(&ixp->db,wbuf,wlen) ;
 	ixp->fo += rs ;
 	return rs ;
-}
-/* end subroutine (idx_bufwrite) */
+} /* end subroutine (idx_bufwrite) */
 
 local int idx_bufhdr(idx *ixp) noex {
 	cint	hlen = szof(STRLISTHDR) ;
@@ -854,16 +766,16 @@ local int idx_bufhdr(idx *ixp) noex {
 	ixp->fo += rs ;
 	ixp->hdr.stoff = ixp->fo ;
 	return rs ;
-}
-/* end subroutine (idx_bufhdr) */
+} /* end subroutine (idx_bufhdr) */
 
 local int idx_bufstr(idx *ixp,cchar *lp,int ll) noex {
 	filer	*fbp = &ixp->fb ;
 	int	rs ;
+	{
 	rs = filer_println(fbp,lp,ll) ;
+	}
 	return rs ;
-}
-/* end subroutine (idx_bufstr) */
+} /* end subroutine (idx_bufstr) */
 
 local int strfilemks_filesbegin(STRFILEMKS *op) noex {
 	int		rs = SR_INVALID ;
@@ -903,56 +815,38 @@ local int strfilemks_filesbegin(STRFILEMKS *op) noex {
 	} /* end if (sfdirname) */
 
 	return rs ;
-}
-/* end subroutine (strfilemks_filesbegin) */
+} /* end subroutine (strfilemks_filesbegin) */
 
-
-local int strfilemks_filesend(op,f)
-STRFILEMKS	*op ;
-{
+local int strfilemks_filesend(STRFILEMKS *op,int f) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
-
-	if (op->nfname != nullptr) {
+	(void) f ;
+	if (op->nfname) {
 	    if (f && (op->nfname[0] != '\0')) {
 	        u_unlink(op->nfname) ;
 	    }
 	    rs1 = uc_free(op->nfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->nfname = nullptr ;
-	}
-
-	if (op->idname != nullptr) {
+	} /* end if (memory-release) */
+	if (op->idname) {
 	    rs1 = uc_free(op->idname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->idname = nullptr ;
-	}
-
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (strfilemks_filesend) */
-
+} /* end subroutine (strfilemks_filesend) */
 
 /* exclusively create this new file */
-local int strfilemks_nfcreate(op,fsuf)
-STRFILEMKS	*op ;
-cchar	fsuf[] ;
-{
-	ustat	sb ;
-
+local int strfilemks_nfcreate(STRFILEMKS *op,cchar *fsuf) noex {
 	cint	to_old = TO_OLDFILE ;
-
 	int	rs ;
 	int	rs1 ;
 	int	nfl ;
 	int	oflags = (O_CREAT | O_EXCL | O_WRONLY) ;
-
 	cchar	*end = ENDIANSTR ;
 	cchar	*cp ;
-
 	char	nfname[MAXPATHLEN + 1] ;
-
 
 	rs = mkfnamesuf3(nfname,op->dbname,fsuf,end,"n") ;
 	nfl = rs ;
@@ -977,6 +871,7 @@ again:
 	if (rs == SR_EXIST) {
 	    time_t	daytime = time(nullptr) ;
 	    int		f_inprogress ;
+	ustat	sb ;
 	    rs1 = u_stat(op->nfname,&sb) ;
 	    if ((rs1 >= 0) && ((daytime - sb.st_mtime) > to_old)) {
 		u_unlink(op->nfname) ;
@@ -999,9 +894,7 @@ again:
 
 ret0:
 	return rs ;
-}
-/* end subroutine (txindexmks_nfcreate) */
-
+} /* end subroutine (txindexmks_nfcreate) */
 
 local int strfilemks_nfcreatecheck(op,fpre,fsuf)
 STRFILEMKS	*op ;
@@ -1061,24 +954,17 @@ cchar	fsuf[] ;
 	} /* end if */
 
 	return rs ;
-}
-/* end subroutine (strfilemks_nfcreatecheck) */
+} /* end subroutine (strfilemks_nfcreatecheck) */
 
-
-local int strfilemks_nfdestroy(op)
-STRFILEMKS	*op ;
-{
+local int strfilemks_nfdestroy(STRFILEMKS *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
-
 	if (op->nfd >= 0) {
 	    rs1 = u_close(op->nfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->nfd = -1 ;
 	}
-
-	if (op->nfname != nullptr) {
+	if (op->nfname) {
 	    if (op->nfname[0] != '\0') {
 		rs1 = u_unlink(op->nfname) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -1086,40 +972,26 @@ STRFILEMKS	*op ;
 	    rs1 = uc_free(op->nfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->nfname = nullptr ;
-	}
-
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (strfilemks_nfdestroy) */
+} /* end subroutine (strfilemks_nfdestroy) */
 
-
-local int strfilemks_nfstore(op,outfname)
-STRFILEMKS	*op ;
-cchar	outfname[] ;
-{
-	int	rs ;
-
-	cchar	*cp ;
-
-
-	if (op->nfname != nullptr) {
-	    uc_free(op->nfname) ;
-	    op->nfname = nullptr ;
-	}
-
-	rs = uc_mallocstrw(outfname,-1,&cp) ;
-	if (rs >= 0) op->nfname = (char *) cp ;
-
-	return rs ;
-}
-/* end subroutine (strfilemks_nfstore) */
-
-
-local int strfilemks_fexists(op)
-STRFILEMKS	*op ;
-{
+local int strfilemks_nfstore(STRFILEMKS *op,cchar *outfname) noex {
 	int	rs = SR_OK ;
+	int	rs1 ;
+	if (op->nfname) {
+	    rs1 = uc_free(op->nfname) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->nfname = nullptr ;
+	} /* end if (memory-release) */
+	if (cchar *cp ; (rs = = uc_mallocstrw(outfname,-1,&cp)) >= 0) {
+	    op->nfname = charp(cp) ;
+	}
+	return rs ;
+} /* end subroutine (strfilemks_nfstore) */
 
+local int strfilemks_fexists(STRFILEMKS *op) noex {
+	int	rs = SR_OK ;
 	if (op->fl.creat && op->fl.excl && op->fl.inprogress) {
 	    cchar	*suf = FSUF_IND ;
 	    cchar	*end = ENDIANSTR ;
@@ -1132,8 +1004,7 @@ STRFILEMKS	*op ;
 	}
 
 	return rs ;
-}
-/* end subroutine (strfilemks_fexists) */
+} /* end subroutine (strfilemks_fexists) */
 
 local int strfilemks_listbegin(STRFILEMKS *op,int n) noex {
 	cint		sz = (n * SFM_SIZEMULT) ;
@@ -1142,26 +1013,24 @@ local int strfilemks_listbegin(STRFILEMKS *op,int n) noex {
 	    rs = rectab_start(&op->rectab,n) ;
 	    if (rs < 0) {
 		strtab_finish(&op->strs) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (strtab-keys) */
 	return rs ;
-}
-/* end subroutine (strfilemks_listbegin) */
+} /* end subroutine (strfilemks_listbegin) */
 
 local int strfilemks_listend(STRFILEMKS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
-	rs1 = rectab_finish(&op->rectab) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = rectab_finish(&op->rectab) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	{
-	rs1 = strtab_finish(&op->strs) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = strtab_finish(&op->strs) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (strfilemks_listend) */
+} /* end subroutine (strfilemks_listend) */
 
 local int strfilemks_mkvarfile(STRFILEMKS *op) noex {
 	int		rs ;
@@ -1181,28 +1050,19 @@ local int strfilemks_mkvarfile(STRFILEMKS *op) noex {
 
 local int strfilemks_wrvarfile(STRFILEMKS *op) noex {
 	STRLISTGDR	hf ;
-
 	filer	varfile ;
-
 	strtab	*ksp = &op->strs ;
-
 	time_t	daytime = time(nullptr) ;
-
 	uint	fileoff = 0 ;
-
 	uint	(*rt)[2] ;
-
 	cint	pagesize = getpagesize() ;
-
 	int	rs = SR_OK ;
 	int	rs1 ;
 	int	rtl ;
 	int	itl ;
-	int	size ;
+	int	sz ;
 	int	bl ;
-
 	char	buf[BUFLEN + 1] ;
-
 
 	rtl = rectab_getvec(&op->rectab,&rt) ;
 
@@ -1213,8 +1073,8 @@ local int strfilemks_wrvarfile(STRFILEMKS *op) noex {
 	    goto ret0 ;
 
 	op->fl.viopen = true ;
-	size = (pagesize * 4) ;
-	rs = filer_start(&varfile,op->nfd,0z,size,0) ;
+	sz = (pagesize * 4) ;
+	rs = filer_start(&varfile,op->nfd,0z,sz,0) ;
 	if (rs < 0)
 	    goto ret1 ;
 
@@ -1251,8 +1111,8 @@ local int strfilemks_wrvarfile(STRFILEMKS *op) noex {
 	hf.rtoff = fileoff ;
 	hf.rtlen = rtl ;
 
-	size = (rtl + 1) * 2 * szof(uint) ;
-	rs = filer_write(&varfile,rt,size) ;
+	sz = (rtl + 1) * 2 * szof(uint) ;
+	rs = filer_write(&varfile,rt,sz) ;
 	fileoff += rs ;
 
 /* make and write out key-string table */
@@ -1260,19 +1120,19 @@ local int strfilemks_wrvarfile(STRFILEMKS *op) noex {
 	if (rs >= 0) {
 	    char	*kstab = nullptr ;
 
-	    size = strtab_strsize(ksp) ;
+	    sz = strtab_strsize(ksp) ;
 
 	    hf.ksoff = fileoff ;
-	    hf.kslen = size ;
+	    hf.kslen = sz ;
 
-	    if ((rs = uc_malloc(size,&kstab)) >= 0) {
+	    if ((rs = uc_malloc(sz,&kstab)) >= 0) {
 
-	        rs = strtab_strmk(ksp,kstab,size) ;
+	        rs = strtab_strmk(ksp,kstab,sz) ;
 
 /* write out the key-string table */
 
 	        if (rs >= 0) {
-	            rs = filer_write(&varfile,kstab,size) ;
+	            rs = filer_write(&varfile,kstab,sz) ;
 	            fileoff += rs ;
 	        }
 
@@ -1286,16 +1146,16 @@ local int strfilemks_wrvarfile(STRFILEMKS *op) noex {
 	            hf.itoff = fileoff ;
 	            hf.itlen = itl ;
 
-	            size = (itl + 1) * 3 * szof(int) ;
+	            sz = (itl + 1) * 3 * szof(int) ;
 
-	            if ((rs = uc_malloc(size,&indtab)) >= 0) {
+	            if ((rs = uc_malloc(sz,&indtab)) >= 0) {
 
-			memset(indtab,0,size) ;
+			memnset(indtab,0,sz) ;
 
 	                rs = strfilemks_mkind(op,kstab,indtab,itl) ;
 
 	                if (rs >= 0) {
-	                    rs = filer_write(&varfile,indtab,size) ;
+	                    rs = filer_write(&varfile,indtab,sz) ;
 	                    fileoff += rs ;
 	                }
 
@@ -1377,11 +1237,12 @@ int		il ;
 	{
 	    struct strentry	*vep ;
 	    VECOBJ	ves ;
-	    int		size, opts ;
+	    int		sz ;
+	    int		opts ;
 
-	    size = szof(struct strentry) ;
-	    opts = VECOBJ_OCOMPACT ;
-	    if ((rs = vecobj_start(&ves,size,rtl,opts)) >= 0) {
+	    sz = szof(strentry) ;
+	    opts = vecobjm.compact ;
+	    if ((rs = vecobj_start(&ves,sz,rtl,opts)) >= 0) {
 
 	    for (ri = 1 ; ri < rtl ; ri += 1) {
 
@@ -1471,77 +1332,55 @@ STRFILEMKS	*op ;
 	}
 
 	return rs ;
-}
-/* end subroutine (strfilemks_renamefiles) */
-
+} /* end subroutine (strfilemks_renamefiles) */
 
 local int rectab_start(rtp,n)
 RECTAB		*rtp ;
 int		n ;
 {
 	int	rs = SR_OK ;
-	int	size ;
-
+	int	sz ;
 	void	*p ;
-
-
-	if (n < 10)
-	    n = 10 ;
-
+	if (n < 10) n = 10 ;
 	rtp->i = 0 ;
 	rtp->n = n ;
-	size = (n + 1) * 2 * szof(int) ;
-	if ((rs = uc_malloc(size,&p)) >= 0) {
+	sz = (n + 1) * 2 * szof(int) ;
+	if ((rs = uc_malloc(sz,&p)) >= 0) {
 	    rtp->rectab = p ;
 	    rtp->rectab[0][0] = 0 ;
 	    rtp->rectab[0][1] = 0 ;
 	    rtp->i = 1 ;
 	}
-
 	return rs ;
-}
-/* end subroutine (rectab_start) */
+} /* end subroutine (rectab_start) */
 
-
-local int rectab_finish(rtp)
-RECTAB		*rtp ;
-{
+local int rectab_finish(RECTAB *rtp) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
-
-	if (rtp->rectab != nullptr) {
+	if (rtp->rectab) {
 	    rs1 = uc_free(rtp->rectab) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rtp->rectab = nullptr ;
-	}
-
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (rectab_finish) */
-
+} /* end subroutine (rectab_finish) */
 
 local int rectab_add(rtp,ki,vi)
 RECTAB		*rtp ;
 uint		ki, vi ;
 {
 	int	rs = SR_OK ;
-	int	i ;
-
-
-	i = rtp->i ;
-	if ((i + 1) > rtp->n)
+	int	i = rtp->i ;
+	if ((i + 1) > rtp->n) {
 	    rs = rectab_extend(rtp) ;
-
+	}
 	if (rs >= 0) {
 	    rtp->rectab[i][0] = ki ;
 	    rtp->rectab[i][1] = vi ;
 	    rtp->i += 1 ;
 	}
-
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (rectab_add) */
+} /* end subroutine (rectab_add) */
 
 local int rectab_extend(RECTAB *rtp) noex {
 	int	rs = SR_OK ;
@@ -1557,23 +1396,19 @@ local int rectab_extend(RECTAB *rtp) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (rectab_extend) */
-
+} /* end subroutine (rectab_extend) */
 
 local int rectab_done(RECTAB *rtp) noex {
 	int	i = rtp->i ;
 	rtp->rectab[i][0] = UINT_MAX ;
 	rtp->rectab[i][1] = 0 ;
 	return rtp->i ;
-}
-/* end subroutine (rectab_done) */
+} /* end subroutine (rectab_done) */
 
 #ifdef	COMMENT
 local int rectab_count(RECTAB *rtp) noex {
 	return rtp->i ;
-}
-/* end subroutine (rectab_count) */
+} /* end subroutine (rectab_count) */
 #endif /* COMMENT */
 
 local int rectab_getvec(RECTAB *rtp,uint (**rpp)[2]) noex {
@@ -1624,10 +1459,8 @@ local int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl) noex {
 	} /* end if (file-open) */
 	    nulstr_finish(&fn) ;
 	} /* end if (file-name) */
-
 	return rs ;
-}
-/* end subroutine (mapfile_begin) */
+} /* end subroutine (mapfile_begin) */
 
 local int mapfile_end(MAPFILE *mfp) noex {
 	int		rs = SR_OK ;
@@ -1639,22 +1472,17 @@ local int mapfile_end(MAPFILE *mfp) noex {
 	    mfp->mapsize = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (mapfile_end) */
-
+} /* end subroutine (mapfile_end) */
 
 local int filer_writefill(filer *bp,cchar *wbuf,iknt elen) noex {
 	int		rs ;
 	int		r, nzero ;
 	int		len ;
-
 	if (wlen < 0) {
 	    wlen = (lenstr(wbuf) + 1) ;
 	}
-
 	rs = filer_write(bp,wbuf,wlen) ;
 	len = rs ;
-
 	r = (wlen & 3) ;
 	if ((rs >= 0) && (r > 0)) {
 	    nzero = (4 - r) ;
@@ -1663,11 +1491,8 @@ local int filer_writefill(filer *bp,cchar *wbuf,iknt elen) noex {
 	        len += rs ;
 	    }
 	}
-
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (filer_writefill) */
-
+} /* end subroutine (filer_writefill) */
 
 local int indinsert(rt,it,il,vep)
 uint		(*rt)[2] ;
@@ -1676,32 +1501,27 @@ int		il ;
 struct strentry	*vep ;
 {
 	uint	nhash, chash ;
-
 	uint	ri, ki ;
 	uint	lhi, nhi, hi ;
-
 	int	c = 0 ;
-
 
 	hi = vep->hi ;
 	nhash = vep->khash ;
 	chash = (nhash & INT_MAX) ;
 
 /* CONSTCOND */
-	while (true) {
+	forever {
 	    if (it[hi][0] == 0) break ;
 
 	    ri = it[hi][0] ;
 	    ki = rt[ri][0] ;
-	    if (ki == vep->ki)
-		break ;
+	    if (ki == vep->ki) break ;
 
-	    it[hi][1] |= (~ INT_MAX) ;
+	    it[hi][1] |= (compl INT_MAX) ;
 	    nhash = hashagain(nhash,c++,SFM_NSKIP) ;
 
 	    hi = hashindex(nhash,il) ;
-
-	} /* end while */
+	} /* end forever */
 
 	if (it[hi][0] > 0) {
 
@@ -1723,15 +1543,12 @@ struct strentry	*vep ;
 	it[hi][2] = 0 ;
 
 	return c ;
-}
-/* end subroutine (indinsert) */
+} /* end subroutine (indinsert) */
 
 local int hashindex(uint i,int n) noex {
 	int		hi = MODP2(i,n) ;
 	if (hi == 0) hi = 1 ;
 	return hi ;
-}
-/* end subroutine (hashindex) */
-
+} /* end subroutine (hashindex) */
 
 
