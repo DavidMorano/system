@@ -205,7 +205,7 @@ local int svcfile_dtor(svcfile *op) noex {
 } /* end subroutine (svcfile_dtor) */
 
 template<typename ... Args>
-static inline int svcfile_magic(svcfile *op,Args ... args) noex {
+local inline int svcfile_magic(svcfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == SVCFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -314,10 +314,10 @@ int svcfile_open(svcfile *op,cchar *fname) noex {
 	    if ((rs = rsv) >= 0) ylikely {
 	        int		sz = szof(SVCFILE_FILE) ;
 	        int		vn = DEFNFILES ;
-	        int		vo = (VECOBJ_OSTATIONARY | VECOBJ_OREUSE) ;
+	        int		vo = (vecobjm.stationary | vecobjm.reuse) ;
 	        if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) ylikely {
 	            sz = szof(SVCFILE_SVCNAME) ;
-	            vo = VECOBJ_OCOMPACT ;
+	            vo = vecobjm.compact ;
 	            if ((rs = vecobj_start(op->slp,sz,10,vo)) >= 0) ylikely {
 	                vn = DEFNENTRIES ;
 	                if ((rs = hdb_start(op->elp,vn,0,np,np)) >= 0) {
@@ -330,25 +330,24 @@ int svcfile_open(svcfile *op,cchar *fname) noex {
 	                    if (rs < 0) {
 	                        hdb_finish(op->elp) ;
 	                        op->magic = 0 ;
-	                    }
+	                    } /* end if (error) */
 	                } /* end if (hdb-start) */
 	                if (rs < 0) {
 	                    svcfile_svcfins(op) ;
 	                    vecobj_finish(op->slp) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if svcnames) */
 	            if (rs < 0) {
 	                vecobj_finish(op->flp) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (vecobj_start) */
 	    } /* end if (mkvars) */
 	    if (rs < 0) {
 		svcfile_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (svcfile_ctor) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (svcfile_open) */
+} /* end subroutine (svcfile_open) */
 
 int svcfile_close(svcfile *op) noex {
 	int		rs ;
@@ -386,8 +385,7 @@ int svcfile_close(svcfile *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcfile_close) */
+} /* end subroutine (svcfile_close) */
 
 int svcfile_fileadd(svcfile *op,cchar *fname) noex {
 	cnullptr	np{} ;
@@ -417,15 +415,14 @@ int svcfile_fileadd(svcfile *op,cchar *fname) noex {
 	            }
 	            if ((rs < 0) || f_fin) {
 	                file_finish(&fe) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (file_start) */
 		rs1 = af.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (absfn) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcfile_fileadd) */
+} /* end subroutine (svcfile_fileadd) */
 
 int svcfile_curbegin(svcfile *op,svcfile_cur *curp) noex {
 	int		rs ;
@@ -451,8 +448,7 @@ int svcfile_curbegin(svcfile *op,svcfile_cur *curp) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcfile_curbegin) */
+} /* end subroutine (svcfile_curbegin) */
 
 int svcfile_curend(svcfile *op,svcfile_cur *curp) noex {
 	int		rs ;
@@ -470,8 +466,7 @@ int svcfile_curend(svcfile *op,svcfile_cur *curp) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcfile_curend) */
+} /* end subroutine (svcfile_curend) */
 
 int svcfile_curenumsvc(svcfile *op,svcfile_cur *curp,char *ebuf,int elen) noex {
 	int		rs ;
@@ -490,11 +485,10 @@ int svcfile_curenumsvc(svcfile *op,svcfile_cur *curp,char *ebuf,int elen) noex {
 	            kl = rs ;
 	            curp->i = i ;
 	        }
-	    } /* end if */
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (svcfile_curenumsvc) */
+} /* end subroutine (svcfile_curenumsvc) */
 
 int svcfile_curenum(svcfile *op,svcfile_cur *curp,svcfile_ent *ep,
 		char *ebuf,int elen) noex {
@@ -521,8 +515,7 @@ int svcfile_curenum(svcfile *op,svcfile_cur *curp,svcfile_ent *ep,
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return (rs >= 0) ? svclen : rs ;
-}
-/* end subroutine (svcfile_enum) */
+} /* end subroutine (svcfile_enum) */
 
 int svcfile_curfetch(svcfile *op,cc *svcname,svcfile_cur *curp,svcfile_ent *ep,
 		char *ebuf,int elen) noex {
@@ -568,8 +561,7 @@ int svcfile_curfetch(svcfile *op,cc *svcname,svcfile_cur *curp,svcfile_ent *ep,
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? svclen : rs ;
-}
-/* end subroutine (svcfile_fetch) */
+} /* end subroutine (svcfile_fetch) */
 
 int svcfile_check(svcfile *op,time_t dt) noex {
 	int		rs ;
@@ -585,8 +577,7 @@ int svcfile_check(svcfile *op,time_t dt) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (svcfile_check) */
+} /* end subroutine (svcfile_check) */
 
 int svcfile_match(svcfile *op,cchar *name) noex {
 	int		rs ;
@@ -594,8 +585,7 @@ int svcfile_match(svcfile *op,cchar *name) noex {
 	    rs = svcfile_fetch(op,name,nullptr,nullptr,nullptr,0) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcfile_match) */
+} /* end subroutine (svcfile_match) */
 
 
 /* private subroutines */
@@ -614,8 +604,7 @@ local int svcfile_filefins(svcfile *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (svcfile_filefins) */
+} /* end subroutine (svcfile_filefins) */
 
 /* check if the access table files have changed */
 /* ARGSUSED */
@@ -641,8 +630,7 @@ local int svcfile_checkfiles(svcfile *op,time_t dt) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return (rs >= 0) ? c_changed : rs ;
-}
-/* end subroutine (svcfile_checkfiles) */
+} /* end subroutine (svcfile_checkfiles) */
 
 local int svcfile_fileparse(svcfile *op,int fi) noex {
 	int		rs ;
@@ -696,7 +684,7 @@ namespace {
 local int svcfile_fileparser(svcfile *op,int fi,cchar *fname) noex {
 	fileparser	fo(op,fi) ;
 	return fo(fname) ;
-}
+} /* end subroutine */
 
 int fileparser::allocbegin() noex {
 	int		sz = 0 ;
@@ -720,7 +708,7 @@ int fileparser::allocbegin() noex {
 	    sbuf[0] = '\0' ;
 	} /* end if (memory-allocation) */
 	return rs ;
-}
+} /* end method */
 
 int fileparser::allocend() noex {
 	int		rs = SR_BUGCHECK ;
@@ -740,7 +728,7 @@ int fileparser::allocend() noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method */
 
 int fileparser::operator () (cchar *fn) noex {
 	int		rs ;
@@ -755,7 +743,7 @@ int fileparser::operator () (cchar *fn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (alloc) */
 	return (rs >= 0) ? c : rs ;
-}
+} /* end method */
 
 int fileparser::parsef(cchar *fn) noex {
 	int		rs ;
@@ -787,15 +775,13 @@ int fileparser::parsef(cchar *fn) noex {
 	    svcfile_filedump(op,fi) ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (fileparser::parsef) */
+} /* end method (fileparser::parsef) */
 
 int fileparser::parseln(svcentry *sep,cchar *cp,int cl) noex {
-	field		fsb ;
 	int		rs ;
 	int		rs1 ;
 	int		ce = 0 ;	/* count-entries */
-	if ((rs = fsb.start(cp,cl)) >= 0) {
+	if (field fsb ; (rs = fsb.start(cp,cl)) >= 0) {
 	    int		cf = 0 ;	/* count-fields */
 	    int		ck = 0 ;	/* count-keys */
 	    cchar	*fp{} ;
@@ -839,8 +825,7 @@ int fileparser::parseln(svcentry *sep,cchar *cp,int cl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? ce : rs ;
-}
-/* end method (fileparser::parseln) */
+} /* end method (fileparser::parseln) */
 
 #if	CF_DEVINO
 local int svcfile_filealready(svcfile *op,dev_t dev,ino_t ino) noex {
@@ -857,8 +842,7 @@ local int svcfile_filealready(svcfile *op,dev_t dev,ino_t ino) noex {
 	} /* end for */
 	if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (svcfile_filealready) */
+} /* end subroutine (svcfile_filealready) */
 #endif /* CF_DEVINO */
 
 /* add an entry to the access entry list */
@@ -918,8 +902,7 @@ local int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
 #endif
 
 	return (rs >= 0) ? f_added : rs ;
-}
-/* end subroutine (svcfile_addentry) */
+} /* end subroutine (svcfile_addentry) */
 
 #if	CF_ALREADY
 local int svcfile_already(svcfile *op,cchar *svcname) noex {
@@ -931,8 +914,7 @@ local int svcfile_already(svcfile *op,cchar *svcname) noex {
 	    rs = hdb_fetch(op->elp,key,nullptr,nullptr) ;
 	}
 	return rs ;
-}
-/* end subroutine (svcfile_already) */
+} /* end subroutine (svcfile_already) */
 #endif /* CF_ALREADY */
 
 /* free up all of the entries in this svcfile list associated w/ a file */
@@ -974,8 +956,7 @@ local int svcfile_filedump(svcfile *op,int fi) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
 	return rs ;
-}
-/* end subroutine (svcfile_filedump) */
+} /* end subroutine (svcfile_filedump) */
 
 #if	CF_FILEDEL
 local int svcfile_filedel(svcfile *op,int fi) noex {
@@ -996,8 +977,7 @@ local int svcfile_filedel(svcfile *op,int fi) noex {
 	    } /* end if */
 	} /* end if (vecobj_get) */
 	return rs ;
-}
-/* end subroutine (svcfile_filedel) */
+} /* end subroutine (svcfile_filedel) */
 #endif /* CF_FILEDEL */
 
 local int svcfile_svcadd(svcfile *op,cchar *svc) noex {
@@ -1021,8 +1001,7 @@ local int svcfile_svcadd(svcfile *op,cchar *svc) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if */
 	return (rs >= 0) ? f_added : rs ;
-}
-/* end subroutine (svcfile_svcadd) */
+} /* end subroutine (svcfile_svcadd) */
 
 local int svcfile_svcdel(svcfile *op,cchar *svc) noex {
 	SVCFILE_SVCNAME	sn{} ;
@@ -1054,8 +1033,7 @@ local int svcfile_svcdel(svcfile *op,cchar *svc) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (svcfile_svcdel) */
+} /* end subroutine (svcfile_svcdel) */
 
 local int svcfile_svcfins(svcfile *op) noex {
 	int		rs = SR_OK ;
@@ -1071,8 +1049,7 @@ local int svcfile_svcfins(svcfile *op) noex {
 	    }
 	} /* end for */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (svcfile_svcfins) */
+} /* end subroutine (svcfile_svcfins) */
 
 local int file_start(SVCFILE_FILE *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
@@ -1083,8 +1060,7 @@ local int file_start(SVCFILE_FILE *fep,cchar *fname) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_start) */
+} /* end subroutine (file_start) */
 
 local int file_finish(SVCFILE_FILE *fep) noex {
 	int		rs = SR_FAULT ;
@@ -1096,11 +1072,10 @@ local int file_finish(SVCFILE_FILE *fep) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->fname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_finish) */
+} /* end subroutine (file_finish) */
 
 local int svcname_start(SVCFILE_SVCNAME *snp,cchar *svc) noex {
 	int		rs ;
@@ -1110,8 +1085,7 @@ local int svcname_start(SVCFILE_SVCNAME *snp,cchar *svc) noex {
 	    snp->svcname = cp ;
 	}
 	return rs ;
-}
-/* end subroutine (svcname_start) */
+} /* end subroutine (svcname_start) */
 
 local int svcname_finish(SVCFILE_SVCNAME *snp) noex {
 	cint		c = snp->count ;
@@ -1123,17 +1097,15 @@ local int svcname_finish(SVCFILE_SVCNAME *snp) noex {
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    snp->svcname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (svcname_finish) */
+} /* end subroutine (svcname_finish) */
 
 local int svcname_incr(SVCFILE_SVCNAME *snp) noex {
 	cint	c = snp->count ;
 	snp->count += 1 ;
 	return c ;
-}
-/* end subroutine (svcname_incr) */
+} /* end subroutine (svcname_incr) */
 
 local int svcname_decr(SVCFILE_SVCNAME *snp) noex {
 	int		rs = SR_OK ;
@@ -1148,8 +1120,7 @@ local int svcname_decr(SVCFILE_SVCNAME *snp) noex {
 	    }
 	} /* end if (count == 0) */
 	return (rs >= 0) ? snp->count : rs ;
-}
-/* end subroutine (svcname_decr) */
+} /* end subroutine (svcname_decr) */
 
 local int svcentry_start(SVCENTRY *sep,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -1158,7 +1129,7 @@ local int svcentry_start(SVCENTRY *sep,cchar *sp,int sl) noex {
 	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) {
 	        cint	sz = szof(SVCENTRY_KEY) ;
 		cint	vn = 5 ;
-		cint	vo = VECOBJ_OORDERED ;
+		cint	vo = vecobjm.ordered ;
 	        sep->svc = cp ;
 	        rs = vecobj_start(&sep->keys,sz,vn,vo) ;
 	        if (rs < 0) {
@@ -1169,8 +1140,7 @@ local int svcentry_start(SVCENTRY *sep,cchar *sp,int sl) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (svcentry_start) */
+} /* end subroutine (svcentry_start) */
 
 local int svcentry_finish(SVCENTRY *sep) noex {
 	int		rs = SR_OK ;
@@ -1196,8 +1166,7 @@ local int svcentry_finish(SVCENTRY *sep) noex {
 	    sep->svc = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (svcentry_finish) */
+} /* end subroutine (svcentry_finish) */
 
 local int svcentry_addkey(SVCENTRY *sep,cc *kp,int kl,cc *ap,int al) noex {
 	int		rs ;
@@ -1224,13 +1193,11 @@ local int svcentry_addkey(SVCENTRY *sep,cc *kp,int kl,cc *ap,int al) noex {
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (svcentry_addkey) */
+} /* end subroutine (svcentry_addkey) */
 
 local int svcentry_nkeys(SVCENTRY *sep) noex {
 	return vecobj_count(&sep->keys) ;
-}
-/* end subroutine (svcentry_nkeys) */
+} /* end subroutine (svcentry_nkeys) */
 
 local int svcentry_size(SVCENTRY *sep) noex {
 	int		sz = 0 ;
@@ -1244,8 +1211,7 @@ local int svcentry_size(SVCENTRY *sep) noex {
 	    }
 	} /* end for */
 	return sz ;
-}
-/* end subroutine (svcentry_size) */
+} /* end subroutine (svcentry_size) */
 
 local int ientry_loadstr(SF_IE *iep,char *bp,SVCENTRY *nep) noex {
 	int		rs = SR_FAULT ;
@@ -1276,8 +1242,7 @@ local int ientry_loadstr(SF_IE *iep,char *bp,SVCENTRY *nep) noex {
 	    iep->keyvals[j][1] = nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (ientry_loadstr) */
+} /* end subroutine (ientry_loadstr) */
 
 local int ientry_finish(SF_IE *iep) noex {
 	int		rs = SR_FAULT ;
@@ -1288,16 +1253,15 @@ local int ientry_finish(SF_IE *iep) noex {
 	        rs1 = const_free(iep->keyvals) ;
 	        if (rs >= 0) rs = rs1 ;
 	        iep->keyvals = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (iep->svc) {
 	        rs1 = const_free(iep->svc) ;
 	        if (rs >= 0) rs = rs1 ;
 	        iep->svc = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ientry_finish) */
+} /* end subroutine (ientry_finish) */
 
 #if	CF_MOREKEYS
 local int ientry_morekeys(SF_IE *iep,int c,int i) noex {
@@ -1310,8 +1274,7 @@ local int ientry_morekeys(SF_IE *iep,int c,int i) noex {
 	    f_more = f_more && (iep->keyvals[i][0] != nullptr) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_more : rs ;
-}
-/* end subroutine (ientry_morekeys) */
+} /* end subroutine (ientry_morekeys) */
 #endif /* CF_MOREKEYS */
 
 /* load up the user-interface entry from the internal structure */
@@ -1357,8 +1320,7 @@ local int entry_load(svcfile_ent *ep,char *ebuf,int elen,SF_IE *iep) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rlen : rs ;
-}
-/* end subroutine (entry_load) */
+} /* end subroutine (entry_load) */
 
 local int mkvars() noex {
 	int		rs ;
@@ -1372,8 +1334,7 @@ local int mkvars() noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (mkvars) */
+} /* end subroutine (mkvars) */
 
 local int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
 	SVCFILE_FILE	*e1p = (SVCFILE_FILE *) *v1pp ;
@@ -1389,8 +1350,7 @@ local int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpfname) */
+} /* end subroutine (vcmpfname) */
 
 local int vcmpsvcname(cvoid **v1pp, cvoid **v2pp) noex {
 	SVCFILE_SVCNAME	*e1p = (SVCFILE_SVCNAME *) *v1pp ;
@@ -1415,7 +1375,6 @@ local int vcmpsvcname(cvoid **v1pp, cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpsvcname) */
+} /* end subroutine (vcmpsvcname) */
 
 
