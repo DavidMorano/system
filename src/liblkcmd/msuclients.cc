@@ -48,7 +48,7 @@
 #include	<sockaddress.h>
 #include	<spawnproc.h>
 #include	<ctdec.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"msuclients.h"
