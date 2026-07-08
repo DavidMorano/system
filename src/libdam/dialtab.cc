@@ -30,39 +30,42 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<mallocstuff.h>
-#include	<getpwd.h>
-#include	<absfn.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<vecobj.h>
-#include	<mkpathx.h>
-#include	<sfx.h>
-#include	<matxstr.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<getpwd.h>		/* LIBUC */
+#include	<absfn.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBUC */
 
 #include	"dialtab.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
 /* local defines */
 
-#define	DT_MAGIC	31415926
 #define	DT		dialtab
 #define	DT_ENT		dialtab_ent
 #define	DT_FI		dialtab_file
+#define	DT_MAGIC	31415926
 
 
 /* imported namespaces */
 
+using libuc::mem ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -83,13 +86,13 @@ struct dialtab_file {
 	off_t		fsize ;
 	ino_t		ino ;
 	dev_t		dev ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int dialtab_ctor(DT *op,Args ... args) noex {
+local int dialtab_ctor(DT *op,Args ... args) noex {
     	DIALTAB		*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
@@ -103,14 +106,13 @@ static int dialtab_ctor(DT *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->flp ;
 		    op->flp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dialtab_ctor) */
+} /* end subroutine (dialtab_ctor) */
 
-static int dialtab_dtor(DT *op) noex {
+local int dialtab_dtor(DT *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -124,31 +126,27 @@ static int dialtab_dtor(DT *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dialtab_dtor) */
+} /* end subroutine (dialtab_dtor) */
 
 template<typename ... Args>
-static inline int dialtab_magic(DT *op,Args ... args) noex {
+local inline int dialtab_magic(DT *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == DT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (dialtab_magic) */
+} /* end subroutine (dialtab_magic) */
 
-static int	dialtab_fileload(DT *,DT_FI *,cchar *,DT_FI **) noex ;
-static int	dialtab_filedump(DT *,int) noex ;
-static int	dialtab_filedel(DT *,int) noex ;
+local int	dialtab_fileload(DT *,DT_FI *,cchar *,DT_FI **) noex ;
+local int	dialtab_filedump(DT *,int) noex ;
+local int	dialtab_filedel(DT *,int) noex ;
 
-static int	file_start(DT_FI *,cchar *) noex ;
-static int	file_finish(DT_FI *) noex ;
+local int	file_start(DT_FI *,cchar *) noex ;
+local int	file_finish(DT_FI *) noex ;
 
-static int	entry_start(DT_ENT *,int,cchar *,int) noex ;
-static int	entry_enough(DT_ENT *) noex ;
-static int	entry_finish(DT_ENT *) noex ;
-
-static void	freeit(cchar **) noex ;
+local int	entry_start(DT_ENT *,int,cchar *,int) noex ;
+local int	entry_enough(DT_ENT *) noex ;
+local int	entry_finish(DT_ENT *) noex ;
 
 
 /* local variables */
@@ -162,7 +160,7 @@ constexpr char 		fterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 enum dialkeys {
 	dialkey_uucp,
@@ -170,7 +168,7 @@ enum dialkeys {
 	dialkey_username,
 	dialkey_password,
 	dialkey_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	dialkeys[] = {
 	"uucp",
@@ -178,7 +176,7 @@ constexpr cpcchar	dialkeys[] = {
 	"username",
 	"password",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -205,19 +203,18 @@ int dialtab_open(DT *op,cchar *dialfname) noex {
 		    if (rs < 0) {
 			op->magval = 0 ;
 			vecobj_finish(op->elp) ;
-		    }
+		    } /* end if (error) */
 		} /* end if (vecobj_start) */
 		if (rs < 0) {
 		    vecobj_finish(op->flp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (vecobj_start) */
 	    if (rs < 0) {
 		dialtab_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (dialtab_ctor) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (dialtab_open) */
+} /* end subroutine (dialtab_open) */
 
 int dialtab_close(DT *op) noex {
     	int		rs ;
@@ -263,14 +260,13 @@ int dialtab_close(DT *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dialtab_close) */
+} /* end subroutine (dialtab_close) */
 
 enum orgloccos {
 	adderco_start,
 	adderco_finish,
 	adderco_overlast
-} ;
+} ; /* end enum */
 
 namespace {
     struct adder ;
@@ -303,7 +299,7 @@ namespace {
 	int procln(int,cchar *,int) noex ;
 	int remainder() noex ;
     } ; /* end struct (adder) */
-}
+} /* end namespace */
 
 int adder::operator () (cchar *afn) noex {
     	int		rs ;
@@ -330,21 +326,20 @@ int adder::operator () (cchar *afn) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (start-finish) */
     	return (rs >= 0) ? c : rs ;
-}
-/* end method (adder::operator) */
+} /* end method (adder::operator) */
 
 int adder::reader(DT_FI *fep,cchar *fn,int fi) noex {
     	cnullptr	np{} ;
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    cchar	*os = "r" ;
 	    cmode	om = 0 ;
 	    if (bfile b ; (rs = bopen(&b,fn,os,om)) >= 0) {
 		cint	cmd = BC_STAT ;
-		if (USTAT sb ; (rs = bcontrol(&b,cmd,&sb)) >= 0) {
+		if (ustat sb ; (rs = bcontrol(&b,cmd,&sb)) >= 0) {
 		    cint	to = -1 ;
 		    fep->dev = sb.st_dev ;
 		    fep->ino = sb.st_ino ;
@@ -361,11 +356,11 @@ int adder::reader(DT_FI *fep,cchar *fn,int fi) noex {
 	        rs1 = bclose(&b) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (bfile) */
-	    rs = rsfree(rs,lbuf) ;
+	    rs1 = mem.free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (adder::reader) */
+} /* end method (adder::reader) */
 
 int adder::procln(int fi,cchar *lp,int ll) noex {
     	int		rs ;
@@ -373,8 +368,7 @@ int adder::procln(int fi,cchar *lp,int ll) noex {
 	int		c = 0 ;
         if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
 	    int		fl ;
-            cchar	*fp{} ;
-            if ((fl = fsb.get(fterms,&fp)) > 0) {
+            if (cchar *fp{} ; (fl = fsb.get(fterms,&fp)) > 0) {
                 if (fsb.term == ':') {
                     if (flg.ent) {
                         if (entry_enough(&de) > 0) {
@@ -389,24 +383,31 @@ int adder::procln(int fi,cchar *lp,int ll) noex {
 		    if (rs >= 0) {
                         rs = entry_start(&de,fi,fp,fl) ;
                         flg.ent = (rs >= 0) ;
-		    }
+		    } /* end if (ok) */
                 } else {
                     if (int ki ; (ki = matostr(dialkeys,2,fp,fl)) >= 0) {
                         if ((fl = fsb.get(fterms,&fp)) > 0) {
+			    cchar **rpp = nullptr ;
                             switch (ki) {
                             case dialkey_uucp:
-                                de.uucp = mallocstrw(fp,fl) ;
+                                rpp = &de.uucp ;
                                 break ;
                             case dialkey_inet:
-                                de.inet = mallocstrw(fp,fl) ;
+                                rpp = &de.inet ;
                                 break ;
                             case dialkey_username:
-                                de.username = mallocstrw(fp,fl) ;
+                                rpp = &de.username ;
                                 break ;
                             case dialkey_password:
-                                de.password = mallocstrw(fp,fl) ;
+                                rpp = &de.password ;
                                 break ;
                             } /* end switch */
+			    if (rpp) {
+				cchar *cp ;
+				if ((rs = mem.strw(fp,fl,&cp)) >= 0) {
+				    *rpp = cp ;
+				} /* end if (memory-acquire) */
+			    } /* end if */
                         } /* end if (got value for this key) */
                     } /* end if (got a valid key) */
                 } /* end if */
@@ -415,8 +416,7 @@ int adder::procln(int fi,cchar *lp,int ll) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (field) */
     	return (rs >= 0) ? c : rs ;
-}
-/* end method (adder::procln) */
+} /* end method (adder::procln) */
 
 int adder::remainder() noex {
 	int		rs = SR_OK ;
@@ -433,8 +433,7 @@ int adder::remainder() noex {
 	    }
 	} /* end if (had entry) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (adder::remainder) */
+} /* end method (adder::remainder) */
 
 int dialtab_fileadd(DT *op,cchar *dfname) noex {
     	int		rs ;
@@ -454,8 +453,7 @@ int dialtab_fileadd(DT *op,cchar *dfname) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (dialtab_fileadd) */
+} /* end subroutine (dialtab_fileadd) */
 
 /* search the dial table for a name match */
 int dialtab_search(DT *op,cchar *name,DT_ENT **depp) noex {
@@ -493,13 +491,12 @@ int dialtab_search(DT *op,cchar *name,DT_ENT **depp) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (dialtab_search) */
+} /* end subroutine (dialtab_search) */
 
 
 /* private subroutines */
 
-static int dialtab_fileload(DT *op,DT_FI *fep,cchar *fn,DT_FI **rpp) noex {
+local int dialtab_fileload(DT *op,DT_FI *fep,cchar *fn,DT_FI **rpp) noex {
     	int		rs = SR_BUGCHECK ;
 	int		fi = 0 ;
 	if (fep && rpp) {
@@ -521,10 +518,9 @@ static int dialtab_fileload(DT *op,DT_FI *fep,cchar *fn,DT_FI **rpp) noex {
 	    } /* end if (file_start) */
 	} /* end if (bugcheck) */
 	return (rs >= 0) ? fi : rs ;
-}
-/* end subroutine (dialtab_fileload) */
+} /* end subroutine (dialtab_fileload) */
 
-static int dialtab_filedump(DT *op,int fi) noex {
+local int dialtab_filedump(DT *op,int fi) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) ylikely {
@@ -547,10 +543,9 @@ static int dialtab_filedump(DT *op,int fi) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dialtab_filedump) */
+} /* end subroutine (dialtab_filedump) */
 
-static int dialtab_filedel(DT *op,int fi) noex {
+local int dialtab_filedel(DT *op,int fi) noex {
 	int		rs  SR_BUGCHECK ;
 	int		rs1 ;
 	if (op && (fi >= 0)) {
@@ -569,51 +564,47 @@ static int dialtab_filedel(DT *op,int fi) noex {
 	    } /* end if (vecobj_get) */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (dialtab_filedel) */
+} /* end subroutine (dialtab_filedel) */
 
-static int file_start(DT_FI *fep,cchar *fname) noex {
+local int file_start(DT_FI *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (fep && fname) ylikely {
-	    rs = memclear(fep) ;
-	    if ((fep->fname = mallocstr(fname)) == nullptr) {
-	        rs = SR_NOMEM ;
-	    }
+	    memclear(fep) ;
+	    if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
+	        fep->fname = cp ;
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_start) */
+} /* end subroutine (file_start) */
 
-static int file_finish(DT_FI *fep) noex {
+local int file_finish(DT_FI *fep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (fep) ylikely {
 	    rs = SR_OK ;
 	    if (fep->fname) ylikely {
-	        rs1 = uc_free(fep->fname) ;
+	        voidp vp = voidp(fep->fname) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->fname = nullptr ;
-	    }
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_finish) */
+} /* end subroutine (file_finish) */
 
-static int entry_start(DT_ENT *dep,int fi,cchar *sp,int sl) noex {
+local int entry_start(DT_ENT *dep,int fi,cchar *sp,int sl) noex {
 	int		rs = SR_BUGCHECK ;
 	if (dep && sp && (fi >= 0)) {
-	    rs = memclear(dep) ;
-	    if ((dep->name = mallocstrw(sp,sl)) != nullptr) {
+	    memclear(dep) ;
+	    if (cchar *cp ; (rs = mem.strw(sp,sl,&cp)) >= 0) {
+	        dep->name = cp ;
 		dep->fi = fi ;
-	    } else {
-	        rs = SR_NOMEM ;
-	    }
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
-static int entry_enough(DT_ENT *dep) noex {
+local int entry_enough(DT_ENT *dep) noex {
     	int		rs = SR_FAULT ;
 	int		fret = false ;
 	if (dep) ylikely {
@@ -623,36 +614,45 @@ static int entry_enough(DT_ENT *dep) noex {
 	        fret = fret || (dep->inet && (dep->inet[0] != '\0')) ;
 	        fret = fret || (dep->username && (dep->username[0] != '\0')) ;
 	        fret = fret || (dep->password && (dep->password[0] != '\0')) ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fret : rs ;
-}
-/* end subroutine (entry_enough) */
+} /* end subroutine (entry_enough) */
 
-static int entry_finish(DT_ENT *dep) noex {
+namespace {
+    struct memfreer {
+	int	rs = SR_OK ;
+	int	rs1 ;
+	void operator () (ccharp &p) noex {
+	    if (p) {
+		voidp vp = voidp(p) ;
+	        rs1 = mem.free(vp) ;
+		if (rs >= 0) rs = rs1 ;
+		p = nullptr ;
+	    }
+	} ; /* end method */
+	operator int () noex {
+	    return rs ;
+	} ; /* end method */
+    } ; /* end struct */
+} /* end namespace */
+
+local int entry_finish(DT_ENT *dep) noex {
     	int		rs = SR_FAULT ;
 	if (dep) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (dep->name) ylikely {
-	        rs = SR_OK ;
-		freeit(&dep->name) ;
-		freeit(&dep->uucp) ;
-		freeit(&dep->inet) ;
-		freeit(&dep->username) ;
-		freeit(&dep->password) ;
+		memfreer fo ;
+		fo(dep->name) ;
+		fo(dep->uucp) ;
+		fo(dep->inet) ;
+		fo(dep->username) ;
+		fo(dep->password) ;
+		rs = fo ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
-
-static void freeit(cchar **pp) noex {
-	if (*pp) {
-	    uc_free(*pp) ;
-	    *pp = nullptr ;
-	}
-}
-/* end subroutine (freeit) */
+} /* end subroutine (entry_finish) */
 
 int adder::istart() noex {
 	return SR_OK ;
@@ -675,7 +675,6 @@ adder_co::operator int () noex {
 	    } /* end switch */
 	}
 	return rs ;
-}
-/* end method (adder_co::operator) */
+} /* end method (adder_co::operator) */
 
 
