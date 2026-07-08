@@ -116,7 +116,7 @@ int cgi_start(cgi *op,shio *ofp) noex {
 	    op->wlen += wlen ;
 	    if (rs < 0) {
 		cgi_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (cgi_ctor) */
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (cgi_start) */
