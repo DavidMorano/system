@@ -22,12 +22,12 @@
 #include	"holidays.h"
 
 
-#define	HOLIDAYER_MAGIC	0x63328184
 #define	HOLIDAYER	struct holidayer_head
 #define	HOLIDAYER_FL	struct holidayer_flags
 #define	HOLIDAYER_OBJ	struct holidayer_object
 #define	HOLIDAYER_CUR	struct holidayer_cursor
 #define	HOLIDAYER_CITE	HOLIDAYS_CITE
+#define	HOLIDAYER_MAGIC	0x63328184
 
 
 struct holidayer_object {
@@ -79,6 +79,8 @@ extern int holidayer_audit(holidayer *) noex ;
 extern int holidayer_close(holidayer *) noex ;
 
 EXTERNC_end
+
+extern const holidayer_obj	holidayer_modinfo ;
 
 
 #endif /* HOLIDAYER_INCLUDE */
