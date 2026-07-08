@@ -20,21 +20,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
-#include	<vecstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
 
 
-#define	ACCTAB_MAGIC		0x31415926
 #define	ACCTAB			struct acctab_head
 #define	ACCTAB_PA		struct acctab_part
 #define	ACCTAB_ENT		struct acctab_entry
 #define	ACCTAB_ERR		struct acctab_errline
 #define	ACCTAB_CUR		struct acctab_cursor
+#define	ACCTAB_MAGIC		0x31415926
 
 
 struct acctab_cursor {
@@ -47,14 +44,14 @@ struct acctab_head {
 	vecobj		*rgxalp ;		/* access-list-entries */
 	time_t		checktime ;
 	uint		magval ;
-} ;
+} ; /* end struct */
 
 struct acctab_part {
 	cchar		*patstd ;
 	cchar		*patrgx ;
 	int		patrgxlen ;
 	int		type ;
-} ;
+} ; /* end struct */
 
 struct acctab_entry {
 	ACCTAB_PA	netgroup ;
@@ -62,12 +59,12 @@ struct acctab_entry {
 	ACCTAB_PA	username ;
 	ACCTAB_PA	password ;
 	int		fi ;		/* file index */
-} ;
+} ; /* end struct */
 
 struct acctab_errline {
 	cchar		*fname ;
 	int		line ;
-} ;
+} ; /* end struct */
 
 typedef ACCTAB		acctab ;
 typedef	ACCTAB_PA	acctab_pa ;
