@@ -276,8 +276,7 @@ int sysdialer_start(SD *op,cchar *pr,mainv prs,mainv dirs) noex {
 	    }
 	} /* end if (sysdialer_ctor) */
 	return rs ;
-}
-/* end subroutine (sysdialer_start) */
+} /* end subroutine (sysdialer_start) */
 
 local int sysdialer_startprs(SD *,mainv) noex ;
 local int sysdialer_startdirs(SD *,mainv) noex ;
@@ -294,8 +293,7 @@ local int sysdialer_starter(SD *op,mainv prs,mainv dirs) noex {
             }
 	}
 	return rs ;
-}
-/* end subroutine (sysdialer_starter) */
+} /* end subroutine (sysdialer_starter) */
 
 local int sysdialer_startprs(SD *op,mainv prs) noex {
     	int		rs = SR_OK ;
@@ -318,8 +316,7 @@ local int sysdialer_startprs(SD *op,mainv prs) noex {
             } /* end if (vecstr_start) */
         } /* end if (had program roots) */
 	return rs ;
-}
-/* end subroutine (sysdialer_startprs) */
+} /* end subroutine (sysdialer_startprs) */
 
 local int sysdialer_startdirs(SD *op,mainv dirs) noex {
     	int		rs = SR_OK ;
@@ -348,14 +345,13 @@ local int sysdialer_startdirs(SD *op,mainv dirs) noex {
             op->dirs = prdirs ;
         } /* end if */
 	return rs ;
-}
-/* end subroutine (sysdialer_startdirs) */
+} /* end subroutine (sysdialer_startdirs) */
 
 local int sysdialer_startents(SD *op) noex {
         vecobj  	*elp = op->elp ;
         cint    	vsz = szof(ent) ;
         cint    	vn = 5 ;
-        cint    	vo = VECOBJ_OSORTED ;
+        cint    	vo = vecobjm.sorted ;
     	int		rs ;
         if ((rs = elp->start(vsz,vn,vo)) >= 0) {
             op->fl.voents = true ;
@@ -369,8 +365,7 @@ local int sysdialer_startents(SD *op) noex {
             } /* end if (error) */
         } /* end if (vecobj_start) */
 	return rs ;
-}
-/* end subroutine (sysdialer_startents) */
+} /* end subroutine (sysdialer_startents) */
 
 int sysdialer_finish(SD *op) noex {
 	int		rs ;
@@ -420,8 +415,7 @@ int sysdialer_finish(SD *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysdialer_finish) */
+} /* end subroutine (sysdialer_finish) */
 
 /* load a dialer */
 int sysdialer_loadin(SD *op,cchar *name,ent **depp) noex {
@@ -462,8 +456,7 @@ int sysdialer_loadin(SD *op,cchar *name,ent **depp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysdialer_loadin) */
+} /* end subroutine (sysdialer_loadin) */
 
 int sysdialer_loadout(SD *op,cchar *name) noex {
 	int		rs ;
@@ -488,8 +481,7 @@ int sysdialer_loadout(SD *op,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysdialer_loadout) */
+} /* end subroutine (sysdialer_loadout) */
 
 int sysdialer_check(SD *op,time_t dt) noex {
 	int		rs ;
@@ -558,8 +550,7 @@ int sofind::operator () (SD *op,cchar *pr) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (sofind::operator) */
+} /* end method (sofind::operator) */
 
 int sofind::sofindpr(SD *op,cc *pr) noex {
 	int		rs ;
@@ -590,8 +581,7 @@ int sofind::sofindpr(SD *op,cc *pr) noex {
 	    }
 	} /* end if (mkpath) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sysdialer::sofindpr) */
+} /* end method (sysdialer::sofindpr) */
 
 int sofind::sofindprs(SD *op) noex {
 	int		rs = SR_OK ;
@@ -606,11 +596,10 @@ int sofind::sofindprs(SD *op) noex {
 	    if (rs >= 0) break ;
 	} /* end for */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sofind::sofindprs) */
+} /* end method (sofind::sofindprs) */
 
 int sofind::sofindvar(SD *op) noex {
-	static cchar	*sp = getenv(varname.libpath) ;
+	static cchar	*sp = getenver(varname.libpath) ;
 	cnullptr	np{} ;
 	int		rs = SR_NOENT ;
 	if (sp) {
@@ -631,8 +620,7 @@ int sofind::sofindvar(SD *op) noex {
 	    } /* end if (erro) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sofind::sofindvar) */
+} /* end subroutine (sofind::sofindvar) */
 
 int sofind::socheck(SD *op,ustat *sbp) noex {
     	int		rs ;
@@ -645,8 +633,7 @@ int sofind::socheck(SD *op,ustat *sbp) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subriutine (sofind::socheck) */
+} /* end subriutine (sofind::socheck) */
 
 local int sysdialer_socheckvarc(SD *op,ids *idp,DS *dsp,cc *ldnp,
 		int ldnl,cc *soname,ent *ep) noex {
@@ -677,8 +664,7 @@ local int sysdialer_socheckvarc(SD *op,ids *idp,DS *dsp,cc *ldnp,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (sysdialer_socheckvarc) */
+} /* end subroutine (sysdialer_socheckvarc) */
 
 local int sysdialer_sochecklib(SD *op,ids *idp,DS *dsp,cc *libdname,
 		cc *soname,ent *ep) noex {
@@ -716,8 +702,7 @@ local int sysdialer_sochecklib(SD *op,ids *idp,DS *dsp,cc *libdname,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (sysdialer_sochecklib) */
+} /* end subroutine (sysdialer_sochecklib) */
 
 #ifdef	COMMENT
 local int sysdialer_sotest(SD *op,cc *soname) noex {
@@ -733,8 +718,7 @@ local int sysdialer_sotest(SD *op,cc *soname) noex {
 	    }
 	} /* end if (dlsym) */
 	return rs ;
-}
-/* end subroutine (sysdialer_sotest) */
+} /* end subroutine (sysdialer_sotest) */
 #endif /* COMMENT */
 
 /* compare the whole entries (including the netgroup) */
@@ -756,8 +740,7 @@ local int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (vcmpname) */
+} /* end subroutine (vcmpname) */
 
 local bool isNotConn(int rs) noex {
     	return isOneOf(rsnotconnect,rs) ;
