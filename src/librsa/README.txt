@@ -1,4 +1,4 @@
-LINRSA
+LIBRSA
 
 This directory contains code for some RSA algorithms.
 
