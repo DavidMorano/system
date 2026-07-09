@@ -133,7 +133,7 @@ local int clusterdb_ctor(clusterdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    if ((op->ctp = new(nothrow) kvsfile) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new_kvsfile) */
@@ -157,7 +157,7 @@ template<typename ... Args>
 local int clusterdb_magic(clusterdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (clusterdb_magic) */
@@ -183,7 +183,7 @@ int clusterdb_open(clusterdb *op,cchar *fname) noex {
 		        cint	isz = intsat(fsz / 4) ;
 	                ne = max(isz,10) ;
 	                if ((rs = kvsfile_open(op->ctp,ne,fname)) >= 0) {
-	                    op->magic = CD_MAGIC ;
+	                    op->magval = CD_MAGIC ;
 	                }
 		    } /* end block */
 	        } /* end if (stat) */
@@ -208,7 +208,7 @@ int clusterdb_close(clusterdb *op) noex {
 		rs1 = clusterdb_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
