@@ -62,11 +62,11 @@ OBJ15= usupport_sixchr.o usupport_siwhtx.o
 OBJ16= usupport_matstr.o usupport_matostr.o 
 OBJ17= usupport_hasnot.o usupport_strwcpy.o
 OBJ18= usupport_nleadkeystr.o usupport_nleadstr.o
-OBJ19= usupport_getusmtime.o usupport_getustime.o 
+OBJ19= usupport_matkeystr.o 
 
 OBJ20= usupport_strdcpyx.o usupport_strdcpyxw.o
 OBJ21= usupport_vstrcmp.o usupport_vstrkeycmp.o
-OBJ22= usupport_strxxxxcmp.o usupport_matkeystr.o 
+OBJ22= usupport_strxxxxcmp.o 
 OBJ23= vstrorders.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
