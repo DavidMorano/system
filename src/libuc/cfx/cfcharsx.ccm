@@ -61,14 +61,14 @@ module ;
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<charconv>		/* C++STD */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<stdintx.h>		/* extended integer types */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU extended integer types */
 #include	<cfutil.hh>		/* namespace |cfx| + |lenstr(3u)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 export module cfcharsx ;
 
