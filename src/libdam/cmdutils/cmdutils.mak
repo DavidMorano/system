@@ -98,7 +98,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			objprime.o objimpl.o
@@ -148,7 +148,7 @@ objimpl.o:		$(OBJIMPL)
 
 
 cmdutils0.o:		cmdutils.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 cmdutils1.o:		cmdutils1.cc objprime.o
 	$(COMPILE.cc) $<
