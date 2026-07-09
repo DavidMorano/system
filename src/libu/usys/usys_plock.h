@@ -1,6 +1,6 @@
 /* usys_plock HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* miscelllaneous (XXX) operating system support */
 /* version %I% last-modified %G% */
@@ -36,44 +36,23 @@
 
 #ifndef	USYSPLOCK_INCLUDE
 #define	USYSPLOCK_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/mman.h>
-#include	<unistd.h>		/* for Solaris® */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-
-/* MEMPLOCK begin */
-#if	defined(SYSHAS_MEMPLOCK) && (SYSHAS_MEMPLOCK > 0)
-/******************************************************************************/
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
-/* SunOS (Solaris®) already has the |plock(2)| system call */
-
-
-/******************************************************************************/
-#else /* defined(SYSHAS_MEMPLOCK) && (SYSHAS_MEMPLOCK > 0) */
-#ifdef	__cplusplus /* C++ only */
-/******************************************************************************/
-
-
-#ifndef	DECLARATION_PLOCK
-#define	DECLARATION_PLOCK
 namespace usys {
-    extern unixret_t usys_plock(int) noex ;
+    extern sysret_t	usys_plock(int) noex ;
 }
-#endif /* DECLARATION_PLOCK */
 
 
-/******************************************************************************/
-#endif /* __cplusplus (C++ only) */
-#endif /* defined(SYSHAS_MEMPLOCK) && (SYSHAS_MEMPLOCK > 0) */
-/* MEMPLOCK end */
-
-
+#endif /* __cplusplus */
 #endif /* USYSPLOCK_INCLUDE */
 
 
