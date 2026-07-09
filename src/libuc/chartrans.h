@@ -45,7 +45,7 @@ struct chartrans_head {
 	cchar		*pr ;
 	void		*utf8decoder ;
 	CHARTRANS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		nmax ;
 	int		nsets ;
 	int		acount ;
