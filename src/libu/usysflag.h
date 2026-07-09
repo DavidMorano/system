@@ -27,6 +27,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 #if defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 #define	F_SUNOS		1
