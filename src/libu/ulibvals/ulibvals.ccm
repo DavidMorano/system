@@ -40,11 +40,11 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>		/* |{xxx}BUFLEN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |{xxx}BUFLEN| */
 
 export module ulibvals ;
 
@@ -65,6 +65,7 @@ export {
 	static const int	maxnamelen ;	/* file-system */
 	static const int	maxpathlen ;	/* file-system */
 	static const int	maxmsglen ;	/* Maximum-Message-Length */
+	static const int	maxsysuid ;	/* maximum-system-UID */
 	static const int	nodenamelen ;	/* name system node */
 	static const int	usernamelen ;	/* name system user */
 	static const int	groupnamelen ;	/* name system group */
