@@ -37,13 +37,14 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bit>			/* |endian(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysdefs.h>		/* |MAXBASE| */
-#include	<ulogerror.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bit>			/* C++STD |endian(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysdefs.h>		/* LIBU |MAXBASE| */
+#include	<ulogerror.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
 #include	<sysconfcmds.h>		/* |_SC_{xx}| */
 #include	<localmisc.h>		/* |{xxx}BUFLEN| */
 
@@ -54,6 +55,10 @@ module ulibvals ;
 import usysconf ;			/* |usysconfval(3u)| */
 
 using std::endian ;
+
+#ifndef	MAXSYSUID
+#define	MAXSYSUID	(500 - 1)
+#endif
 
 static int	rscum ;
 
@@ -96,6 +101,7 @@ const int	ulibvals::maxgroups	= getval(_SC_NGROUPS_MAX) ;
 const int	ulibvals::maxnamelen	= getval(_SC_NAME_MAX) ;
 const int	ulibvals::maxpathlen	= getval(_SC_PATH_MAX) ;
 const int	ulibvals::maxmsglen	= getval(_SC_MSG_MAX) ;
+const int	ulibvals::maxsysuid	= MAXSYSUID ;
 const int	ulibvals::nodenamelen	= getval(_SC_NODENAME_MAX) ;
 const int	ulibvals::usernamelen	= getval(_SC_USERNAME_MAX) ;
 const int	ulibvals::groupnamelen	= getval(_SC_GROUPNAME_MAX) ;
