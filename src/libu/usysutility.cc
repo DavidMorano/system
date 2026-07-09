@@ -84,14 +84,14 @@ namespace {
 	    dlap = dp ;
 	    dlan = n ;
 	    return handler() ;
-	} ;
+	} ; /* end method */
         int callstd() noex override {
             int         rs = SR_BUGCHECK ;
             if (m) {
                 rs = (this->*m)() ;
             }
             return rs ;
-        } ;
+        } ; /* end method */
 	sysret_t std_getloadavg() noex ;
     } ; /* end struct (syscaller) */
 } /* end namespace */
@@ -117,7 +117,7 @@ namespace libu {
 	repeat {
 	    errno = 0 ;
 	    if ((rs = getrandom(rbuf,rem,fl)) < 0) {
-	        rs = (errno) ? (- errno) : SR_NOTSUP ;
+	        rs = (errno) ? (neg errno) : SR_NOTSUP ;
 	    }
 	} until ((rs != SR_INTR) && (rs != SR_AGAIN)) ;
 	return (rs >= 0) ? rlen : rs ;
@@ -127,9 +127,9 @@ namespace libu {
 namespace libu {
     int uloadavgd(double *dla,int n) noex {
 	int		rs = SR_FAULT ;
-	if (dla) {
+	if (dla) ylikely {
 	    rs = SR_INVALID ;
-	    if (n >= 0) {
+	    if (n >= 0) ylikely {
 		syscaller sc ;
 		sc.m = &syscaller::std_getloadavg ;
 		rs = sc(dla,n) ;
@@ -143,9 +143,9 @@ namespace libu {
     int ctdecf(char *rbuf,int rlen,int prec,double v) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (prec >= 0) {
+	    if (prec >= 0) ylikely {
 		rs = snprintf(rbuf,rlen,"%.*f",prec,v) ;
 		len = rs ;
 	    } /* end if (valid) */
@@ -154,9 +154,9 @@ namespace libu {
     } /* end subroutine (ctdecf) */
     int snvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf && fmt && ap) {
+	if (rbuf && fmt && ap) ylikely {
 	    rs = SR_INVALID ;
-	    if ((rlen >= 0) && fmt[0]) {
+	    if ((rlen >= 0) && fmt[0]) ylikely {
 		errtimer	to_again	= utimeout[uto_again] ;
 		errtimer	to_nomem	= utimeout[uto_nomem] ;
 		errtimer	to_nosr		= utimeout[uto_nosr] ;
@@ -196,9 +196,9 @@ namespace libu {
     int snprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
-	if (rbuf && fmt) {
+	if (rbuf && fmt) ylikely {
 	    rs = SR_INVALID ;
-	    if ((rlen >= 0) && fmt[0]) {
+	    if ((rlen >= 0) && fmt[0]) ylikely {
 		va_begin(ap,fmt) ;
 		rs = snvprintf(rbuf,rlen,fmt,ap) ;
 		va_end(ap) ;
@@ -209,10 +209,10 @@ namespace libu {
     int	snloadavgd(char *rbuf,int rlen,int prec,double *dlap,int dlan) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf && dlap) {
+	if (rbuf && dlap) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if ((rlen >= 0) && (prec >= 0) && (dlan >= 0)) {
+	    if ((rlen >= 0) && (prec >= 0) && (dlan >= 0)) ylikely {
 		try {
 		    string	s ;
 		    cint	dlen = DECBUFLEN ;
@@ -244,8 +244,8 @@ namespace libu {
 
 sysret_t syscaller::std_getloadavg() noex {
 	int		rs ;
-	if ((rs = getloadavg(dlap,dlan)) < 0) {
-	    rs = (- errno) ;
+	if ((rs = getloadavg(dlap,dlan)) < 0) ylikely {
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (syscaller::std_getloadavg) */
@@ -253,12 +253,12 @@ sysret_t syscaller::std_getloadavg() noex {
 local sysret_t std_vsnprintf(char *rbuf,int rlen,cc *fmt,va_list ap) noex {
 	csize		rsize = size_t(rlen + 1) ;
 	int		rs ;
-	if ((rs = vsnprintf(rbuf,rsize,fmt,ap)) >= 0) {
+	if ((rs = vsnprintf(rbuf,rsize,fmt,ap)) >= 0) ylikely {
 	    if (rs > rlen) {
 	        rs = SR_OVERFLOW ;
 	    }
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} /* end if */
 	return rs ;
 } /* end subroutine (std_vsnprintf) */
