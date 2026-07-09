@@ -85,7 +85,7 @@ template<typename ... Args>
 local inline int chartrans_magic(chartrans *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CHARTRANS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CHARTRANS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -144,7 +144,7 @@ int chartrans_open(CT *op ,cchar *pr,int maxtx) noex {
 	            if (void *p ; (rs = libmem.mall(asize,&p)) >= 0) ylikely {
 	                op->sets = (chartrans_set *) p ;
 	                op->nmax = maxtx ;
-	                op->magic = CHARTRANS_MAGIC ;
+	                op->magval = CHARTRANS_MAGIC ;
 	                memset(p,0,asize) ;
 	            } /* end if (memory-acquire) */
 	            if (rs < 0) {
@@ -190,7 +190,7 @@ int chartrans_close(CT *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->pr = nullptr ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
