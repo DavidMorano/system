@@ -35,8 +35,8 @@ DEFS=
 
 INCS= cfx.h cfutil.hh
 
-MODS += cfalphax.ccm cfcharsx.ccm cfdigx.ccm
-MODS += cfpowx.ccm cfsysx.ccm
+MODS += cfalphax.o cfcharsx.o cfdigx.o
+MODS += cfpowx.o cfsysx.o
 
 LIBS=
 
@@ -62,7 +62,6 @@ OBJ_CFX= obja_cfx.o objb_cfx.o objc_cfx.o
 
 
 INCDIRS=
-
 LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
@@ -103,11 +102,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_CFX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_CFX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -201,18 +200,18 @@ mods.o:			$(MOBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
 cfalphax.o:		cfalphax.ccm	cfutil.hh
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 cfcharsx.o:		cfcharsx.ccm	cfutil.hh
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 cfdigx.o:		cfdigx.ccm	cfutil.hh
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 cfpowx.o:		cfpowx.ccm	cfutil.hh
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 cfsysx.o:		cfsysx.ccm	cfutil.hh
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
