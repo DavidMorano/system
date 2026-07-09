@@ -107,7 +107,7 @@ namespace cfx {
 	    while ((sl > 0) && islead(*sp)) {
 		sp += 1 ;
 		sl -= 1 ;
-	    }
+	    } /* end while */
 	    rl = sl ;
 	} /* end if (shshrink) */
 	*rpp = sp ;
@@ -121,29 +121,29 @@ namespace cfx {
 	int		skiplen = 0 ; /* return-value */
 	if (int sl ; fnegp && ((sl = getlenstr(sp,µsl)) >= 0)) ylikely {
 	    cint slen = sl ;
-		rs = SR_OK ;
-	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        if ((sl > 0) && ispm(*sp)) {
-	            *fnegp = (*sp == '-') ;
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	            sp += 1 ;
-	            sl -= 1 ;
-	        }
-	        if (sl > 1) {
-		    if (iszero(*sp)) {
-		        sp += 1 ;
-		        sl -= 1 ;
-		    }
-	        } else if (sl == 0) {
-		    rs = SR_INVALID ;
-	        } /* end if */
-		skiplen = (slen - sl) ;
+	    rs = SR_OK ;
+	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    } /* end while */
+	    if ((sl > 0) && ispm(*sp)) {
+	        *fnegp = (*sp == '-') ;
+	        sp += 1 ;
+	        sl -= 1 ;
+	    } /* end if */
+	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    } /* end while */
+	    if (sl > 1) {
+		if (iszero(*sp)) {
+		    sp += 1 ;
+		    sl -= 1 ;
+		}
+	    } else if (sl == 0) {
+		rs = SR_INVALID ;
+	    } /* end if */
+	    skiplen = (slen - sl) ;
 	} /* end if (valid) */
 	return (rs >= 0) ? skiplen : rs ;
     } ; /* end if (getsign) */
