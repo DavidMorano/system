@@ -76,19 +76,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<utimeout.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"um.h"
 
@@ -101,7 +99,6 @@
 
 
 /* imported namespaces */
-
 
 
 /* local typedefs */
@@ -188,7 +185,7 @@ int u_brk(cvoid *endp,void **rapp) noex {
 	    int		f_exit = false ;
 	    repeat {
 	        if (void *rap{} ; (rap = brk(endp)) == brkfailed) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        } else {
 		    *rapp = rap ;
 	        }
@@ -217,8 +214,7 @@ int u_brk(cvoid *endp,void **rapp) noex {
 	    } until ((rs >= 0) || f_exit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_brk) */
+} /* end subroutine (u_brk) */
 #endif /* DEPRECATED */
 
 #ifdef	DEPRECATED
@@ -233,7 +229,7 @@ int u_sbrk(int incr,void **rpp) noex {
 	        repeat {
 	            rs = SR_OK ;
 	            if (void *rap ; (rp = (incr)) == brkfailed) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            } else {
 		        *rpp = rap ;
 	            }
@@ -264,8 +260,7 @@ int u_sbrk(int incr,void **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_sbrk) */
+} /* end subroutine (u_sbrk) */
 #endif /* DEPRECATED */
 
 int u_mmapbegin(void *ma,size_t ms,int pr,int fl,int fd,
@@ -273,114 +268,99 @@ int u_mmapbegin(void *ma,size_t ms,int pr,int fl,int fd,
 	umemop	umo(pr,fl,fd,off,vp) ;
 	umo.m = &umemop::mapbegin ;
 	return umo(ma,ms) ;
-}
-/* end subroutine (u_mmapbegin) */
+} /* end subroutine (u_mmapbegin) */
 
 int u_mmapend(void *ma,size_t ms) noex {
 	umemop	umo ;
 	umo.m = &umemop::mapend ;
 	return umo(ma,ms) ;
-}
-/* end subroutine (u_mmapend) */
+} /* end subroutine (u_mmapend) */
 
 int u_mlockbegin(void *ma,size_t ms) noex {
 	umemop	umo ;
 	umo.m = &umemop::lockbegin ;
 	return umo(ma,ms) ;
-}
-/* end subroutine (u_mlockbegin) */
+} /* end subroutine (u_mlockbegin) */
 
 int u_mlockend(void *ma,size_t ms) noex {
 	umemop	umo ;
 	umo.m = &umemop::lockend ;
 	return umo(ma,ms) ;
-}
-/* end subroutine (u_mlockend) */
+} /* end subroutine (u_mlockend) */
 
 int u_mlockallbegin(int flags) noex {
 	cnullptr	np{} ;
 	umemop	umo(flags) ;
 	umo.m = &umemop::lockallbegin ;
 	return umo(np,0z) ;
-}
-/* end subroutine (u_mlockallbegin) */
+} /* end subroutine (u_mlockallbegin) */
 
 int u_mlockallend() noex {
 	cnullptr	np{} ;
 	umemop	umo ;
 	umo.m = &umemop::lockallend ;
 	return umo(np,0z) ;
-}
-/* end subroutine (u_mlockallend) */
+} /* end subroutine (u_mlockallend) */
 
 int u_mincore(void *ma,size_t ms,char *vec) noex {
 	umemop	umo(vec) ;
 	umo.m = &umemop::incore ;
 	return umo(ma,ms) ;
-}
-/* end subroutine (u_mincore) */
+} /* end subroutine (u_mincore) */
 
 int u_mprotect(void *ma,size_t ms,int cmd) noex {
 	umemop	umo(cmd) ;
 	umo.m = &umemop::protect ;
 	return umo(ma,ms) ;
-}
-/* end subroutine (u_mprotect) */
+} /* end subroutine (u_mprotect) */
 
 int u_madvise(void *ma,size_t ms,int cmd) noex {
 	umemop	umo(cmd) ;
 	umo.m = &umemop::advise ;
 	return umo(ma,ms) ;
-}
-/* end subroutine (u_madvise) */
+} /* end subroutine (u_madvise) */
 
 int u_msync(void *ma,size_t ms,int cmd) noex {
 	umemop	umo(cmd) ;
 	umo.m = &umemop::sync ;
 	return umo(ma,ms) ;
-}
-/* end subroutine (u_msync) */
+} /* end subroutine (u_msync) */
 
 int u_mcntl(void *ma,size_t ms,int cmd,void *arg,int attr,int mask) noex {
 	umemop	umo(cmd,arg,attr,mask) ;
 	umo.m = &umemop::cntl ;
 	return umo(ma,ms) ;
-}
-/* end subroutine (u_mcntl) */
+} /* end subroutine (u_mcntl) */
 
 int u_minherit(void *ma,size_t ms,int cmd) noex {
 	umemop	umo(cmd) ;
 	umo.m = &umemop::inherit ;
 	return umo(ma,ms) ;
-}
-/* end subroutine (u_minherit) */
+} /* end subroutine (u_minherit) */
 
 int u_mlockp(int cmd) noex { /* process-lock? */
 	cnullptr	np{} ;
 	umemop	umo(cmd) ;
 	umo.m = &umemop::lockp ;
 	return umo(np,0z) ;
-}
-/* end subroutine (u_mlockp) */
-
+} /* end subroutine (u_mlockp) */
 
 /* legacy */
-
 int u_mapfile(void *ma,size_t ms,int pr,int fl,int fd,
 			off_t off,void *vp) noex {
 	return u_mmapbegin(ma,ms,pr,fl,fd,off,vp) ;
-}
-/* end subroutine (u_mapfile) */
+} /* end subroutine (u_mapfile) */
 
+/* legacy */
 int u_mmap(void *ma,size_t ms,int pr,int fl,int fd,
 			off_t off,void *vp) noex {
 	return u_mmapbegin(ma,ms,pr,fl,fd,off,vp) ;
-}
-/* end subroutine (u_mmap) */
+} /* end subroutine (u_mmap) */
 
+/* legacy */
 int u_munmap(void *ma,size_t ms) noex {
 	return u_mmapend(ma,ms) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -459,14 +439,13 @@ int umemop::mapbegin(void *ma,size_t ms) noex {
 	    if (ms > 0) {
 	        rs = SR_OK ;
 	        if ((ra = mmap(ma,ms,pr,fl,fd,off)) == mapfailed) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    }
 	    *rpp = (rs >= 0) ? ra : nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umemop::mapbegin) */
+} /* end method (umemop::mapbegin) */
 
 int umemop::mapend(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
@@ -474,13 +453,12 @@ int umemop::mapend(void *ma,size_t ms) noex {
 	    rs = SR_INVALID ;
 	    if (ms > 0) {
 	        if ((rs = munmap(ma,ms)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umemop::mapend) */
+} /* end method (umemop::mapend) */
 
 int umemop::lockbegin(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
@@ -488,13 +466,12 @@ int umemop::lockbegin(void *ma,size_t ms) noex {
 	    rs = SR_INVALID ;
 	    if (ms > 0) {
 	        if ((rs = mlock(ma,ms)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umemop::lockbegin) */
+} /* end method (umemop::lockbegin) */
 
 int umemop::lockend(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
@@ -502,31 +479,28 @@ int umemop::lockend(void *ma,size_t ms) noex {
 	    rs = SR_INVALID ;
 	    if (ms > 0) {
 	        if ((rs = munlock(ma,ms)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umemop::lockend) */
+} /* end method (umemop::lockend) */
 
 int umemop::lockallbegin(void *,size_t) noex {
 	int		rs ;
 	if ((rs = mlockall(fl)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (umemop::lockallbegin) */
+} /* end method (umemop::lockallbegin) */
 
 int umemop::lockallend(void *,size_t) noex {
 	int		rs ;
 	if ((rs = munlockall()) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (umemop::lockallend) */
+} /* end method (umemop::lockallend) */
 
 int umemop::incore(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
@@ -534,13 +508,12 @@ int umemop::incore(void *ma,size_t ms) noex {
 	    rs = SR_INVALID ;
 	    if (ms > 0) {
 	        if ((rs = mincore(ma,ms,vec)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umemop::incore) */
+} /* end method (umemop::incore) */
 
 int umemop::protect(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
@@ -548,13 +521,12 @@ int umemop::protect(void *ma,size_t ms) noex {
 	    rs = SR_INVALID ;
 	    if (ms > 0) {
 	        if ((rs = mprotect(ma,ms,fl)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umemop::protect) */
+} /* end method (umemop::protect) */
 
 int umemop::advise(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
@@ -562,13 +534,12 @@ int umemop::advise(void *ma,size_t ms) noex {
 	    rs = SR_INVALID ;
 	    if (ms > 0) {
 	        if ((rs = madvise(ma,ms,fl)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umemop::advise) */
+} /* end method (umemop::advise) */
 
 int umemop::sync(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
@@ -576,13 +547,12 @@ int umemop::sync(void *ma,size_t ms) noex {
 	    rs = SR_INVALID ;
 	    if (ms > 0) {
 	        if ((rs = msync(ma,ms,fl)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umemop::sync) */
+} /* end method (umemop::sync) */
 
 int umemop::cntl(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
@@ -590,13 +560,12 @@ int umemop::cntl(void *ma,size_t ms) noex {
 	    rs = SR_INVALID ;
 	    if (ms > 0) {
 	        if ((rs = memcntl(ma,ms,fl,arg,attr,mask)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umemop::cntl) */
+} /* end method (umemop::cntl) */
 
 int umemop::inherit(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
@@ -605,21 +574,15 @@ int umemop::inherit(void *ma,size_t ms) noex {
 	    if ((ms > 0) && (fl >= 0)) {
 		caddr_t ca = caddr_t(ma) ;
 	        if ((rs = minherit(ca,ms,fl)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umemop::inherit) */
+} /* end method (umemop::inherit) */
 
 int umemop::lockp(void *,size_t) noex {
-	int		rs ;
-	if ((rs = plock(fl)) < 0) {
-	    rs = (- errno) ;
-	}
-	return rs ;
-}
-/* end method (umemop::lockp) */
+    	return usys::usys_plock(fl) ;
+} /* end method (umemop::lockp) */
 
 
