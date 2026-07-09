@@ -39,8 +39,6 @@
 #include	<usupport_cfhex.hh>
 #include	<usupport_cfinet.hh>
 #include	<usupport_getsign.hh>
-#include	<usupport_getusmtime.hh>
-#include	<usupport_getustime.hh>
 #include	<usupport_hasnot.hh>
 #include	<usupport_itimer.hh>
 #include	<usupport_matkeystr.hh>
