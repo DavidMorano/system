@@ -198,7 +198,7 @@ enum syshasmemplock {
 	syshasmemplock_lockall,
 	syshasmemplock_locktxt,
 	syshasmemplock_lockdat,
-	syshasmemplock_verlast
+	syshasmemplock_overlast
 } ; /* end enum (syshasmemplock) */
 
 #ifndef	UNLOCK
