@@ -131,6 +131,10 @@
 #define	SHMNAME_MAX	14		/* historic value (in decimal) */
 #endif
 
+#ifndef	SYSUID_MAX
+#define	SYSUID_MAX	500		/* really from Apple-Darwin */
+#endif
+
 
 #endif /* USYSDEFSMAX_INCLUDE */
 
