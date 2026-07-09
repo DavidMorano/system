@@ -109,14 +109,14 @@ so:			$(T).so
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).so:		$(OBJ_CHRONO) Makefile
-	$(LD) -shared -fpic -o $@ $(LDFLAGS) $(OBJ_CHRONO) $(LIBINFO)
+$(T).so:		$(OBJ_CHRONO)
+	$(LD) -shared -fpic -o $@ $(LDFLAGS) $^ $(LIBINFO)
 
 $(T).o:			$(OBJ_CHRONO)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_CHRONO) $(LIBINFO)
+	$(LD) -r -o $@ $(LDFLAGS) $^ $(LIBINFO)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
