@@ -35,7 +35,7 @@
 	I simultaneoulsy did this also to the cousin code of
 	this code named |cfsysx(3uc)|.
 
-	= 2023-10,10, David A-D- Morano
+	= 2023-10-10, David A-D- Morano
 	I took the liberty to rewite these subroutines in terms of
 	a subroutine-template.  This did nothing to make the code
 	faster in any way.  After template expansion the code is
@@ -86,18 +86,18 @@ module ;
 #include	<climits>		/* CSTD |CHAR_BIT| + |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<stdintx.h>		/* extended integer types */
-#include	<conintx.hh>		/* concept |stdintx| */
-#include	<checkbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU extended integer types */
+#include	<conintx.hh>		/* LIBU concept |stdintx| */
+#include	<checkbase.h>		/* LIBUC */
 #include	<cfutil.hh>		/* namespace |cfx| */
-#include	<char.h>		/* |CHAR_TOVAL(3uc)| */
-#include	<ischarx.h>		/* |isplusminus(3uc)| */
-#include	<localmisc.h>
+#include	<char.h>		/* LIBUC |CHAR_TOVAL(3uc)| */
+#include	<ischarx.h>		/* LIBUC |isplusminus(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 export module cfdigx ;
 
@@ -139,8 +139,8 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 		    cutlim -= base ;
 		    cutoff += 1 ;
 		}
-		cutlim = (- cutlim) ;
-	    }
+		cutlim = (neg cutlim) ;
+	    } /* end if (was negative) */
 	} ; /* end method (prepare) */
 	int getval(int ch) noex {
 	    int		rs = CHAR_TOVAL(ch) ;
