@@ -2,7 +2,6 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-
 /* define some missing or special subroutines for Apple-Darwin */
 /* version %I% last-modified %G% */
 
@@ -27,7 +26,7 @@
 	(system call) |plock2)|.
 
 	Synopsis:
-	int usys_plock(int cmd) noex
+	sysret_t usys_plock(int cmd) noex
 
 	Arguments:
 	cmd		one of:
@@ -63,23 +62,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/mman.h>
-#include	<unistd.h>
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX®*/
 #include	<cerrno>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
+#include	"usys_xxx.h"
 #include	"usys_plock.h"
 
 
 /* local defines */
+
+#if	defined(SYSHAS_MEMPLOCK) && (SYSHAS_MEMPLOCK > 0)
+#define	F_MEMPLOCK	1
+#else
+#define	F_MEMPLOCK	0
+#endif /* defined(SYSHAS_MEMPLOCK) && (SYSHAS_MEMPLOCK > 0) */
 
 
 /* local namespaces */
@@ -102,14 +108,15 @@
 
 /* local variables */
 
+cbool		f_memplock		= F_MEMPLOCK ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-namespace usys {
-    unixret_t usys_plock(int op) noex {
+local unixret_t unix_plock(int op) noex {
         int rc = 0 ; /* return-value */
         int flags = 0 ;
         switch (op) {
@@ -139,7 +146,39 @@ namespace usys {
     	    break ;
         } /* end switch */
         return rc ;
-    } /* end subroutine (usys_plock) */
+} /* end subroutine (unix_plock) */
+
+local sysret_t sys_plock(int opt) noex {
+    	int		rs{} ;
+	if_constexpr (f_memplock) {
+	    rs = plock(opt) ;
+	} else {
+	    rs = unix_plock(opt) ;
+	}
+	if (rs < 0) {
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (sys_plock) */
+
+namespace usys {
+    sysret_t usys_plock(int op) noex {
+	int		rs = SR_OK ;
+	bool		fexit = false ;
+	repeat {
+	    if ((rs = sys_plock(op)) < 0) {
+		switch (rs) {
+		case SR_INTR:
+		case SR_AGAIN:
+		    break ;
+		default:
+		    fexit = true ;
+		    break ;
+		} /* end switch */
+	    } /* end if */
+	} until ((rs >= 0) || fexit) ;
+	return rs ;
+    } /* end subroutine (unix_plock) */
 } /* end namespace (usys) */
 
 
