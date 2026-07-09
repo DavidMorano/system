@@ -41,8 +41,16 @@
 #include	<usysrets.h>		/* LIBU */
 
 
+enum unprocscmds {
+	unprocscmd_all,
+	unprocscmd_system,
+	unprocscmd_user,
+	unprocscmd_session,
+	unprocscmd_overlast
+} ; /* end enum (cmds) */
+
 namespace usys {
-    extern sysret_t	usys_nprocs() noex ;
+    extern sysret_t	usys_nprocs(int) noex ;
 }
 
 
