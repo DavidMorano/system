@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += ulibvals.h
+INCS += ulibvals.hh
 
 MODS +=
 
@@ -149,11 +149,11 @@ objimpl.o:		$(OBJIMPL)
 
 
 # module primary
-ulibvals0.o:		ulibvals.ccm
+ulibvals0.o:		ulibvals.ccm				$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
-ulibvals1.o:		ulibvals1.cc objprime.o
+ulibvals1.o:		ulibvals1.cc objprime.o			$(INCS)
 	$(COMPILE.cc) $<
 
 
