@@ -81,6 +81,8 @@
 #include	<usys_getauid.h>
 #include	<usys_atox.h>
 #include	<usys_strtox.h>
+#include	<usys_nprocs.h>
+#include	<usys_getprocuid.h>
 
 
 #endif /* USYS_INCLUDE */
