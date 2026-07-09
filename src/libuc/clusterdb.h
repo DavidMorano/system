@@ -39,7 +39,7 @@ struct clusterdb_cursor {
 
 struct clusterdb_head {
 	kvsfile		*ctp ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct (clusterdb_head) */
 
 typedef CLUSTERDB	clusterdb ;
