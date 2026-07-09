@@ -75,41 +75,41 @@ module ;
 #include	<climits>		/* CSTD |CHAR_BIT| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucstrto.h>
-#include	<uclibmem.h>
-#include	<stdintx.h>		/* extended integer types */
-#include	<snwcpy.h>
-#include	<sfx.h>
-#include	<checkbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucstrto.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU extended integer types */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<checkbase.h>		/* LIBUC */
 #include	<cfutil.hh>		/* namespace |cfx| + |lenstr(3u)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 export module cfsysx ;
 
 /* max for |int256_t| + sign */
 inline constexpr int	cfsysx_maxstack = (256+1) ;
 
-template<typename T> inline int cfsystox(cc *,int,T *) noex {
+template<typename T> inline int cfsystox(cc *,int,T *)		noex {
 	return SR_BUGCHECK ;
 }
-template<> inline int cfsystox(cc *sp,int b,int *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,int *rp)		noex {
 	return uc_strtoi(sp,nullptr,b,rp) ;
 }
-template<> inline int cfsystox(cc *sp,int b,long *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,long *rp)		noex {
 	return uc_strtol(sp,nullptr,b,rp) ;
 }
-template<> inline int cfsystox(cc *sp,int b,longlong *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,longlong *rp)	noex {
 	return uc_strtoll(sp,nullptr,b,rp) ;
 }
-template<> inline int cfsystox(cc *sp,int b,uint *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,uint *rp)		noex {
 	return uc_strtoui(sp,nullptr,b,rp) ;
 }
-template<> inline int cfsystox(cc *sp,int b,ulong *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,ulong *rp)		noex {
 	return uc_strtoul(sp,nullptr,b,rp) ;
 }
-template<> inline int cfsystox(cc *sp,int b,ulonglong *rp) noex {
+template<> inline int cfsystox(cc *sp,int b,ulonglong *rp)	noex {
 	return uc_strtoull(sp,nullptr,b,rp) ;
 }
 
