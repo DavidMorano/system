@@ -94,11 +94,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -135,10 +135,9 @@ objb.o:			$(OBJB)
 
 # ADDRSET
 addrset0.o:		addrset.ccm			$(INCS)
-	makemodule addrset
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-addrset1.o:		addrset1.cc addrset.ccm		$(INCS)
-	makemodule addrset
+addrset1.o:		addrset1.cc addrset0.o		$(INCS)
 	$(COMPILE.cc) $<
 
 
