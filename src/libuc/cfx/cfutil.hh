@@ -21,15 +21,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 namespace cfx {
-    extern int	rmleadzero(cchar *,int) noex ;		/* used internally */
-    extern int	sfdigs(cchar *,int,cchar **) noex ;
-    extern int	sfchars(cchar *,int,cchar **) noex ;
-    extern int	getsign(cchar *,int,bool *) noex ;
+    extern int	rmleadzero	(cchar *,int) noex ; /* used internally */
+    extern int	sfdigs		(cchar *,int,cchar **) noex ;
+    extern int	sfchars		(cchar *,int,cchar **) noex ;
+    extern int	getsign		(cchar *,int,bool *) noex ;
 } /* end namespace */
 
 
