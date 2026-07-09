@@ -95,7 +95,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
@@ -139,6 +139,6 @@ bufsizevar.o:		bufsizevar.cc		bufsizevar.hh	$(INCS)
 bufsizeget.o:		bufsizeget.cc		bufsizeget.h	$(INCS)
 
 bufsizedata.o:		bufsizedata.ccm		bufsizes.h	$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
