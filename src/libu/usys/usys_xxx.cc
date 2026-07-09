@@ -175,7 +175,7 @@ namespace usys {
 #if	CF_STRTOX
 #ifndef	SUBROUTINE_STRTOX
 #define	SUBROUTINE_STRTOX
-extern int	strtoi	(cchar *sp,char **endp,int b) noex { 
+int	strtoi	(cchar *sp,char **endp,int b) noex { 
     	int		res = 0 ;
     	cint nb = (szof(int) * CHAR_BIT) ;
 	if (sp) {
@@ -189,7 +189,7 @@ extern int	strtoi	(cchar *sp,char **endp,int b) noex {
 	}
 	return res ;
 } /* end subroutine */
-extern uint	strtoui	(cchar *sp,char **endp,int b) noex {
+uint	strtoui	(cchar *sp,char **endp,int b) noex {
     	uint		res = 0 ;
     	cint nb = (szof(uint) * CHAR_BIT) ;
 	if (sp) {
