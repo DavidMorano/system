@@ -52,16 +52,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
-#include	<usys.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usys.h>		/* LIBU */
 
 
 EXTERNC_begin
