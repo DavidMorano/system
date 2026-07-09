@@ -46,7 +46,7 @@ OBJ02_USYS= usys_darwin.o usys_darwinexec.o usys_darwinargz.o
 OBJ03_USYS= usys_linux.o 
 
 OBJ04_USYS= usys_pathpid.o usys_project.o usys_task.o
-OBJ05_USYS= usys_ttynamerp.o usysargz.o
+OBJ05_USYS= usys_ttynamerp.o usysargz.o usys_nprocs.o
 OBJ06_USYS= usys_stime.o usys_resolvepath.o usys_waitid.o
 OBJ07_USYS= usys_sigx.o usys_streams.o usys_getexecname.o
 
@@ -60,12 +60,17 @@ OBJ13_USYS= usys_eaccess.o usys_stat.o usys_xti.o
 OBJ14_USYS= usys_environ.o usys_onc.o usys_getnetname.o
 OBJ15_USYS= usys_getauid.o usys_atox.o usys_strtox.o
 
+OBJ16_USYS= usys_getprocuid.o
+OBJ17_USYS=
+OBJ18_USYS=
+OBJ19_USYS=
+
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
 OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
 OBJC= obj06_usys.o obj07_usys.o obj08_usys.o
 OBJD= obj09_usys.o obj10_usys.o obj11_usys.o 
 OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
-OBJF= obj15_usys.o
+OBJF= obj15_usys.o obj16_usys.o
 
 OBJ_USYS= obja.o objb.o objc.o objd.o obje.o objf.o
 
@@ -184,6 +189,19 @@ obj15_usys.o:	$(OBJ15_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj16_usys.o:	$(OBJ16_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj17_usys.o:	$(OBJ17_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj18_usys.o:	$(OBJ18_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj19_usys.o:	$(OBJ19_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:		$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -255,6 +273,8 @@ usys_getnetname.o:	usys_getnetname.cc	usys_getnetname.h	$(INCS)
 usys_getauid.o:		usys_getauid.cc		usys_getauid.h		$(INCS)
 usys_atox.o:		usys_atox.cc		usys_atox.h		$(INCS)
 usys_strtox.o:		usys_strtox.cc		usys_strtox.h		$(INCS)
+usys_nprocs.o:		usys_nprocs.cc		usys_nprocs.h		$(INCS)
+usys_getprocuid.o:	usys_getprocuid.cc	usys_getprocuid.h	$(INCS)
 
 # special
 usysargz.o:		usysargz.cc		usysargz.hh		$(INCS)
