@@ -99,11 +99,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_DIAL)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
