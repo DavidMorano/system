@@ -1,6 +1,6 @@
 /* calent SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* calendar entry object (for CALYEARS) */
 /* version %I% last-modified %G% */
