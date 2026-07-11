@@ -1,0 +1,1 @@
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
