@@ -1,6 +1,6 @@
 /* cyimk SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* Calendar-Year-Index DB-make (make a CYI database) */
 /* version %I% last-modified %G% */
