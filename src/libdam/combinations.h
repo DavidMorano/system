@@ -28,7 +28,7 @@
 
 EXTERNC_begin
 
-extern int	long combinations(int,int) noex ;
+extern long combinations(int,int) noex ;
 
 EXTERNC_end
 
