@@ -99,7 +99,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			objprime.o objimpl.o
@@ -150,7 +150,7 @@ objimpl.o:	$(OBJIMPL)
 
 # module primary
 modproc0.o:		modproc.ccm $(OBJPART)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implemetation
 modproc1.o:		modproc1.cc modproc.ccm
