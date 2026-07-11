@@ -1,6 +1,6 @@
 /* filemagic HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* this object helps manage the magic information in (DB) files */
 /* version %I% last-modified %G% */
