@@ -20,13 +20,20 @@
 
 
 #define	CONFIGFILE		struct configfile_head
+#define	CONFIGFILE_FL		struct configfile_flags
 #define	CONFIGFILE_MAGIC	0x04311633
 
 
+struct configfile_flags {
+    	uint		dlp:1 ;
+    	uint		elp:1 ;
+    	uint		ulp:1 ;
+} ; /* end struct */
+
 struct configfile_head {
-	vecstr	defines ;	/* defined variables */
-	vecstr	unsets ;	/* unset ENV variables */
-	vecstr	exports ;	/* environment variables */
+	void		*dlp ;		/* list-pointer variables defined */
+	void		*elp ;		/* list-pointer variables ENV set */
+	void		*ulp ;		/* list-pointer variables ENV un-set */
 	char	*root ;			/* program root */
 	char	*tmpdir ;		/* environment variable */
 	char	*logfname ;		/* log file name */
@@ -63,16 +70,17 @@ struct configfile_head {
 	char	*interval ;		/* poll interval */
 	char	*stampdir ;		/* timestamp directory */
 	char	*maxjobs ;		/* maximum jobs */
+	CONFIGFILE_FL	fl ;
 	uint		magval ;	/* magic number */
-	int	badline ;	/* line number of bad thing */
-	int	srs ;		/* secondary return status */
-	int	loglen ;	/* log file length */
+	int	badline ;		/* line number of bad thing */
+	int	srs ;			/* secondary return status */
+	int	loglen ;		/* log file length */
 	int	minwordlen ;
 	int	maxwordlen ;
 	int	keys ;
-} ;
+} ; /* end struct (configfile_head) */
 
-typedef	CONFIGFILE		configfile ;
+typedef	CONFIGFILE	configfile ;
 
 EXTERNC_begin
 
