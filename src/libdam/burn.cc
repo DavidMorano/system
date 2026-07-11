@@ -1,6 +1,6 @@
 /* burn SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to burn (shred) a file */
 /* version %I% last-modified %G% */
@@ -39,22 +39,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucsysmisc.h>		/* |ucpagesize(3uc)| */
-#include	<randomvar.h>
-#include	<hash.h>		/* |hash_elf(3dam)| */
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC |ucpagesize(3uc)| */
+#include	<randomvar.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC |hash_elf(3dam)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"burn.h"
 
@@ -74,13 +74,6 @@ using std::max ;			/* subroutine-template */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	uc_fstat(int,ustat *) noex ;
-    extern int	uc_seek(int,off_t,int) noex ;
-    extern int	uc_writen(int,cvoid *,int) noex ;
-    extern int	uc_fsyncdata(int) noex ;
-}
 
 
 /* external variables */
@@ -102,12 +95,12 @@ namespace {
 	    rvp = abp ;
 	} ;
 	int operator () (cchar *) noex ;
-	int rvbegin(cchar *) noex ;
-	int rvend() noex ;
-	int filer(char *,int,cchar *) noex ;
-	int writer(int,char *,int) noex ;
-	int rewind(int,int) noex ;
-	int loadbuf(char *,int) noex ;
+	int rvbegin	(cchar *) noex ;
+	int rvend	() noex ;
+	int filer	(char *,int,cchar *) noex ;
+	int writer	(int,char *,int) noex ;
+	int rewind	(int,int) noex ;
+	int loadbuf	(char *,int) noex ;
     } ; /* end struct (burner) */
 } /* end namespace */
 
@@ -134,8 +127,7 @@ int burn(cchar *name,int bcount,randomvar *rvp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (burn) */
+} /* end subroutine (burn) */
 
 
 /* local subroutines */
@@ -150,7 +142,7 @@ int burner::rvbegin(cchar *fn) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method */
 
 int burner::rvend() noex {
     	int		rs = SR_OK ;
@@ -162,7 +154,7 @@ int burner::rvend() noex {
 	    fl.randomvar = false ;
 	}
 	return rs ;
-}
+} /* end method */
 
 int burner::operator () (cchar *fn) noex {
     	int		rs ;
@@ -172,7 +164,7 @@ int burner::operator () (cchar *fn) noex {
 	    cint	ps = rs ;
 	    if ((rs = rvbegin(fn)) >= 0) {
 		cint	flen = (NPAGES * ps) ;
-		if (char *fbuf{} ; (rs = lm_vall(flen,&fbuf)) >= 0) {
+		if (char *fbuf ; (rs = lm_vall(flen,&fbuf)) >= 0) {
 	            {
 		        rs = filer(fbuf,flen,fn) ;
 			rv = rs ;
@@ -186,8 +178,7 @@ int burner::operator () (cchar *fn) noex {
 	    } /* end if (randomvar) */
 	} /* end if (ucpagesize) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end method (burner::operator) */
+} /* end method (burner::operator) */
 
 int burner::filer(char *fbuf,int flen,cchar *fn) noex {
     	cint		of = O_WRONLY ;
@@ -206,8 +197,7 @@ int burner::filer(char *fbuf,int flen,cchar *fn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file) */
 	return rs ;
-}
-/* end method (burner::filer) */
+} /* end method (burner::filer) */
 
 int burner::writer(int fd,char *fbuf,int flen) noex {
     	coff		msz = off_t(flen) ;
@@ -225,8 +215,7 @@ int burner::writer(int fd,char *fbuf,int flen) noex {
 	    } /* end if (rewind) */
 	} /* end for (burn-count) */
 	return rs ;
-}
-/* end mthod (burner::writer) */
+} /* end mthod (burner::writer) */
 
 int burner::rewind(int fd,int idx) noex {
     	int		rs = SR_OK ;
@@ -236,12 +225,10 @@ int burner::rewind(int fd,int idx) noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (burner::rewind) */
+} /* end method (burner::rewind) */
 
 int burner::loadbuf(char *fbuf,int flen) noex {
     	return rvp->get(fbuf,flen) ;
-}
-/* end mthod (burner::loadbuf) */
+} /* end mthod (burner::loadbuf) */
 
 
