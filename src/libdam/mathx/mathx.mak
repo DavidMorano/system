@@ -101,11 +101,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -160,10 +160,9 @@ complex.o:		complex0.o complex1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 complex0.o:		complex.ccm			$(INCS)
-	makemodule complex
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-complex1.o:		complex1.cc complex.ccm		$(INCS)
-	makemodule complex
+complex1.o:		complex1.cc complex0.o		$(INCS)
 	$(COMPILE.cc) $<
 
 fft.o:			fft.ccm				$(INCS)
