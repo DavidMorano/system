@@ -103,7 +103,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			objprime.o objimpl.o
@@ -166,7 +166,7 @@ objimpl.o:		$(OBJIMPL)
 
 # module primary
 argutils0.o:		argutils.ccm					$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
 argutils1.o:		argutils1.cc argutils0.o			$(INCS)
