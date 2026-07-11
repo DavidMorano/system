@@ -44,27 +44,27 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern float		logbasef(float,float) noex ;
-extern double		logbase(double,double) noex ;
-extern long double	logbasel(long double,long double) noex ;
+extern float		logbasef(float,float)			noex ;
+extern double		logbase(double,double)			noex ;
+extern long double	logbasel(long double,long double)	noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline float		logbase(float b,float v) noex {
+local inline float		logbase(float b,float v) noex {
 	return logbasef(b,v) ;
 }
-static inline long double	logbase(long double b,long double v) noex {
+local inline long double	logbase(long double b,long double v) noex {
 	return logbasel(b,v) ;
 }
 
