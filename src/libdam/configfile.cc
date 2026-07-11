@@ -1,4 +1,4 @@
-/* configfile SUPPORT */
+/* CF SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -43,13 +43,17 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
 #include	<buffer.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
+#include	<baops.h>		/* LIBU |baset(3u)| */
 #include	<localmisc.h>		/* LIBU |UC(3u)| */
 #include	<bfile.h>		/* LIBB */
 
@@ -72,6 +76,16 @@ import libutil ;			/* |memclear(3u)| */
 #undef	BUFLEN
 #define	BUFLEN		(LINEBUFLEN * 2)
 
+#define	CF		configfile
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
@@ -81,8 +95,82 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int	maxlinelen ;
+    	operator int () noex ;
+    } ; /* end struct (vars) */
+    struct starter {
+	configfile	*op ;
+	vecstr		*dlp ;
+	vecstr		*elp ;
+	vecstr		*ulp ;
+	cchar		*cfn ;
+	buffer		*bop ;
+	starter(configfile *o,cchar *c) noex : op(o), cfn(c) { } ;
+	operator int () noex ;
+	int buf		() noex ;
+    } ; /* end struct */
+} /* end namespace */
+
 
 /* forward references */
+
+template<typename ... Args>
+local inline int configfile_ctor(CF *op,Args ... args) noex {
+    	COFIGFILE	*hop = op ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if (vecstr *dlp = new(nt) vecstr ; dlp) {
+		op->dlp = dlp ;
+	        if (vecstr *elp = new(nt) vecstr ; ulp) {
+		    op->elp = elp ;
+	            if (vecstr *ulp = new(nt) vecstr ; ulp) {
+			op->ulp = ulp ;
+			rs = SR_OK ;
+	            } /* end if (new-vecstr) */
+		    if (rs < 0) {
+		        delete elp ;
+		        op->elp = nullptr ;
+		    } /* end if (error) */
+	        } /* end if (new-vecstr) */
+		if (rs < 0) {
+		    delete dlp ;
+		    op->dlp = nullptr ;
+		} /* end if (error) */
+	    } /* end if (new-vecstr) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (configfile_ctor) */
+
+local int configfile_dtor(CF *op) noex {
+	int		rs = SR_OK ;
+	if (op->ulp) ylikely {
+	    delete op->ulp ;
+	    op->ulp = nullptr ;
+	} /* end if (memory-release) */
+	if (op->elp) ylikely {
+	    delete op->elp ;
+	    op->elp = nullptr ;
+	} /* end if (memory-release) */
+	if (op->dlp) ylikely {
+	    delete op->dlp ;
+	    op->dlp = nullptr ;
+	} /* end if (memory-release) */
+	return rs ;
+} /* end subroutine (configfile_dtor) */
+
+template<typename ... Args>
+local inline int configfile_magic(CF *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == CONFIGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (configfile_magic) */
 
 local void	checkfree(char **) noex ;
 
@@ -90,28 +178,9 @@ local void	checkfree(char **) noex ;
 /* local variables */
 
 /* these are the terminators for most everything */
-constexpr char		fterms[] = {
-	0x7F, UC(0xFE), 0xC0, UC(0xFE),
-	UC(0x8B), 0x00, 0x00, 0x24, 
-	0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, UC(0x80),
-	0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x00, 
-} ; /* end array */
-
+static char		fterms[fieldterms_termsize] ;
 /* these are the terminators for options */
-constexpr char		oterms[] = {
-	0x00, 0x0B, 0x00, 0x00,
-	0x09, 0x10, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ; /* end array */
+static char		oterms[fieldterms_termsize] ;
 
 enum configkeys {
 	configkey_define,
@@ -209,13 +278,84 @@ constexpr cpcchar	configkeys[] = {
 	nullptr
 } ; /* end array */
 
+static vars		var ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int configfile_start(configfile *csp,configfname) noex {
+int configfile_start(CF *op,cchar *cfn) noex {
+	int		rs ;
+	int		c = 0 ; /* return-value */
+	if ((rs = configfile_ctor(op,cfn)) >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if (cfn[0]) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+		    starter so(op,cfn) ;
+		    rs = so ;
+		    c = rs ;
+		} /* end if (vars) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		cofigfile_dtor(op) ;
+	    } /* end if (errro) */
+        } /* end if (configfile_ctor) */
+	return (rs >= 0) ? ? c : rs ;
+} /* end subroutine (conigfile_start) */
+
+starter::operator int () noex {
+    	cnothrow	nt{} ;
+    	int		rs = SR_NOMEM ;
+	int		rs1 ;
+	if (dlp = new(nt) vecstr ; dlp) {
+	    if (elp = new(nt) vecstr ; elp) {
+	        if (ulp = new(nt) vecstr ; ulp) {
+    		    cint	vn = 10 ;
+		    cint	vo = 0 ;
+	            if ((rs = dlp->startop(vn,vo)) >= 0) {
+	                if ((rs = elp->startop(vn,vo)) >= 0) {
+	                    if ((rs = ulp->startop(vn,vo)) >= 0) {
+		                {
+			            rs = buf() ;
+		                }
+	                        rs1 = elp->finish() ;
+	                        if (rs >= 0) rs = rs1 ;
+		            } /* end if (vecstr_start) */
+	                    rs1 = elp->finish() ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (vecstr_start) */
+	                rs1 = dlp->finish() ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (vecstr_start) */
+	            delete ulp ;
+	            ulp = nullptr ;
+	        } /* end if (m-a-f) */
+	        delete elp ;
+	        elp = nullptr ;
+	    } /* end if (m-a-f) */
+	    delete dlp ;
+	    dlp = nullptr ;
+	} /* end if (m-a-f) */
+	return rs ;
+} /* end method (starter::operator) */
+
+int starter::buf() noex {
+    	cnothrow	nt{} ;
+    	int		rs = SR_NOMEM ;
+	int		rs1 ;
+	if (bop = new(nt) buffer ; bop) {
+	    {
+
+	    }
+	    delete bop ;
+	    bop = nullptr ;
+	} /* end if (m-a-f) */
+	return rs ;
+} /* end method (starter::bufoperator) */
+
+int configfile_starts(CF *csp,cchar *cfn) noex {
 	buffer		options ;
 	field		fsb ;
 	bfile		cfile, *cfp = &cfile ;
@@ -240,29 +380,17 @@ int configfile_start(configfile *csp,configfname) noex {
 	if (csp == nullptr)
 	    return SR_FAULT ;
 
-	memclear(csp) ;
+	/* initialize */
 
-	if ((configfname == nullptr) || (configfname[0] == '\0'))
-	    return SR_NOEXIST ;
-
-/* initialize */
-
-	csp->srs = 0 ;
-	csp->badline = -1 ;
-	csp->loglen = -1 ;
-	csp->minwordlen = -1 ;
-	csp->maxwordlen = -1 ;
-	csp->keys = -1 ;
-
-	rs = vecstr_start(&csp->defines,10,0) ;
+	rs = vecstr_start(op->dlp,10,0) ;
 	if (rs < 0)
 	    goto bad0 ;
 
-	rs = vecstr_start(&csp->unsets,10,0) ;
+	rs = vecstr_start(op->ulp,10,0) ;
 	if (rs < 0)
 	    goto bad1 ;
 
-	rs = vecstr_start(&csp->exports,10,0) ;
+	rs = vecstr_start(op->elp,10,0) ;
 	if (rs < 0)
 	    goto bad2 ;
 
@@ -349,260 +477,259 @@ int configfile_start(configfile *csp,configfname) noex {
 	        case configkey_eigenfile:
 	            fl = field_get(&fsb,fterms,&fp) ;
 
-	            if (fl > 0)
+	            if (fl > 0) {
 	                bp = mallocstrw(fp,fl) ;
-
-	            else 
+		    } else {
 	                bp = mallocstrw(buf,0) ;
+		    }
 
 	            switch (i) {
-
 	            case configkey_root:
-	                if (csp->root != nullptr)
-	                    uc_free(csp->root) ;
+	                if (op->root != nullptr)
+	                    uc_free(op->root) ;
 
-	                csp->root = bp ;
+	                op->root = bp ;
 	                break ;
 
 	            case configkey_log:
-	                if (csp->logfname != nullptr)
-	                    uc_free(csp->logfname) ;
+	                if (op->logfname != nullptr)
+	                    uc_free(op->logfname) ;
 
-	                csp->logfname = bp ;
+	                op->logfname = bp ;
 	                break ;
 
 	            case configkey_tmpdir:
-	                if (csp->tmpdir != nullptr)
-	                    uc_free(csp->tmpdir) ;
+	                if (op->tmpdir != nullptr)
+	                    uc_free(op->tmpdir) ;
 
-	                csp->tmpdir = bp ;
+	                op->tmpdir = bp ;
 	                break ;
 
 	            case configkey_workdir:
-	                if (csp->workdir != nullptr)
-	                    uc_free(csp->workdir) ;
+	                if (op->workdir != nullptr)
+	                    uc_free(op->workdir) ;
 
-	                csp->workdir = bp ;
+	                op->workdir = bp ;
 	                break ;
 
 	            case configkey_user:
-	                if (csp->user != nullptr)
-	                    uc_free(csp->user) ;
+	                if (op->user != nullptr)
+	                    uc_free(op->user) ;
 
-	                csp->user = bp ;
+	                op->user = bp ;
 	                break ;
 
 	            case configkey_group:
-	                if (csp->group != nullptr)
-	                    uc_free(csp->group) ;
+	                if (op->group != nullptr)
+	                    uc_free(op->group) ;
 
-	                csp->group = bp ;
+	                op->group = bp ;
 	                break ;
 
 	            case configkey_pidfile:
-	                if (csp->pidfname != nullptr)
-	                    uc_free(csp->pidfname) ;
+	                if (op->pidfname != nullptr)
+	                    uc_free(op->pidfname) ;
 
-	                csp->pidfname = bp ;
+	                op->pidfname = bp ;
 	                break ;
 
 	            case configkey_lockfile:
-	                if (csp->lockfname != nullptr)
-	                    uc_free(csp->lockfname) ;
+	                if (op->lockfname != nullptr)
+	                    uc_free(op->lockfname) ;
 
-	                csp->lockfname = bp ;
+	                op->lockfname = bp ;
 	                break ;
 
 	            case configkey_port:
-	                if (csp->port != nullptr)
-	                    uc_free(csp->port) ;
+	                if (op->port != nullptr)
+	                    uc_free(op->port) ;
 
-	                csp->port = bp ;
+	                op->port = bp ;
 	                break ;
 
 	            case configkey_userpass:
-	                if (csp->userpass != nullptr)
-	                    uc_free(csp->userpass) ;
+	                if (op->userpass != nullptr)
+	                    uc_free(op->userpass) ;
 
-	                csp->userpass = bp ;
+	                op->userpass = bp ;
 	                break ;
 
 	            case configkey_machpass:
-	                if (csp->machpass != nullptr)
-	                    uc_free(csp->machpass) ;
+	                if (op->machpass != nullptr)
+	                    uc_free(op->machpass) ;
 
-	                csp->machpass = bp ;
+	                op->machpass = bp ;
 	                break ;
 
 	            case configkey_srvtab:
-	                if (csp->srvtab != nullptr)
-	                    uc_free(csp->srvtab) ;
+	                if (op->srvtab != nullptr)
+	                    uc_free(op->srvtab) ;
 
-	                csp->srvtab = bp ;
+	                op->srvtab = bp ;
 	                break ;
 
 	            case configkey_sendmail:
 	            case configkey_mintexec:
-	                if (csp->sendmail != nullptr)
-	                    uc_free(csp->sendmail) ;
+	                if (op->sendmail != nullptr)
+	                    uc_free(op->sendmail) ;
 
-	                csp->sendmail = bp ;
+	                op->sendmail = bp ;
 	                break ;
 
 	            case configkey_envfile:
-	                if (csp->envfname != nullptr)
-	                    uc_free(csp->envfname) ;
+	                if (op->envfname != nullptr)
+	                    uc_free(op->envfname) ;
 
-	                csp->envfname = bp ;
+	                op->envfname = bp ;
 	                break ;
 
 	            case configkey_pathfile:
-	                if (csp->pathfname != nullptr)
-	                    uc_free(csp->pathfname) ;
+	                if (op->pathfname != nullptr)
+	                    uc_free(op->pathfname) ;
 
-	                csp->pathfname = bp ;
+	                op->pathfname = bp ;
 	                break ;
 
 	            case configkey_devicefile:
-	                if (csp->devicefname != nullptr)
-	                    uc_free(csp->devicefname) ;
+	                if (op->devicefname != nullptr)
+	                    uc_free(op->devicefname) ;
 
-	                csp->devicefname = bp ;
+	                op->devicefname = bp ;
 	                break ;
 
 	            case configkey_seedfile:
-	                if (csp->seedfname != nullptr)
-	                    uc_free(csp->seedfname) ;
+	                if (op->seedfname != nullptr)
+	                    uc_free(op->seedfname) ;
 
-	                csp->seedfname = bp ;
+	                op->seedfname = bp ;
 	                break ;
 
 	            case configkey_logsize:
-	                if (csp->logsize != nullptr)
-	                    uc_free(csp->logsize) ;
+	                if (op->logsize != nullptr)
+	                    uc_free(op->logsize) ;
 
-	                csp->logsize = bp ;
+	                op->logsize = bp ;
 	                break ;
 
 	            case configkey_organization:
-	                if (csp->organization != nullptr)
-	                    uc_free(csp->organization) ;
+	                if (op->organization != nullptr)
+	                    uc_free(op->organization) ;
 
-	                csp->organization = bp ;
+	                op->organization = bp ;
 	                break ;
 
 	            case configkey_timeout:
-	                if (csp->timeout != nullptr)
-	                    uc_free(csp->timeout) ;
+	                if (op->timeout != nullptr)
+	                    uc_free(op->timeout) ;
 
-	                csp->timeout = bp ;
+	                op->timeout = bp ;
 	                break ;
 
 	            case configkey_interval:
-	                if (csp->interval != nullptr)
-	                    uc_free(csp->interval) ;
+	                if (op->interval != nullptr)
+	                    uc_free(op->interval) ;
 
-	                csp->interval = bp ;
+	                op->interval = bp ;
 	                break ;
 
 	            case configkey_removemul:
-	                if (csp->removemul != nullptr)
-	                    uc_free(csp->removemul) ;
+	                if (op->removemul != nullptr)
+	                    uc_free(op->removemul) ;
 
-	                csp->removemul = bp ;
+	                op->removemul = bp ;
 	                break ;
 
 	            case configkey_acctab:
-	                if (csp->acctab != nullptr)
-	                    uc_free(csp->acctab) ;
+	                if (op->acctab != nullptr)
+	                    uc_free(op->acctab) ;
 
-	                csp->acctab = bp ;
+	                op->acctab = bp ;
 	                break ;
 
 	            case configkey_paramfile:
 	            case configkey_paramtab:
 	            case configkey_pingtab:
-	                if (csp->paramfname != nullptr)
-	                    uc_free(csp->paramfname) ;
+	                if (op->paramfname != nullptr)
+	                    uc_free(op->paramfname) ;
 
-	                csp->paramfname = bp ;
+	                op->paramfname = bp ;
 	                break ;
 
 	            case configkey_nrecips:
-	                if (csp->nrecips != nullptr)
-	                    uc_free(csp->nrecips) ;
+	                if (op->nrecips != nullptr)
+	                    uc_free(op->nrecips) ;
 
-	                csp->nrecips = bp ;
+	                op->nrecips = bp ;
 	                break ;
 
 	            case configkey_helpfile:
-	                if (csp->helpfname != nullptr)
-	                    uc_free(csp->helpfname) ;
+	                if (op->helpfname != nullptr)
+	                    uc_free(op->helpfname) ;
 
-	                csp->helpfname = bp ;
+	                op->helpfname = bp ;
 	                break ;
 
 	            case configkey_pingstat:
-	                if (csp->statfname != nullptr)
-	                    uc_free(csp->statfname) ;
+	                if (op->statfname != nullptr)
+	                    uc_free(op->statfname) ;
 
-	                csp->statfname = bp ;
+	                op->statfname = bp ;
 	                break ;
 
 	            case configkey_stampdir:
-	                if (csp->stampdir != nullptr)
-	                    uc_free(csp->stampdir) ;
+	                if (op->stampdir != nullptr)
+	                    uc_free(op->stampdir) ;
 
-	                csp->stampdir = bp ;
+	                op->stampdir = bp ;
 	                break ;
 
 	            case configkey_maxjobs:
-	                if (csp->maxjobs != nullptr)
-	                    uc_free(csp->maxjobs) ;
+	                if (op->maxjobs != nullptr)
+	                    uc_free(op->maxjobs) ;
 
-	                csp->maxjobs = bp ;
+	                op->maxjobs = bp ;
 	                break ;
 
 	            case configkey_directory:
-	                if (csp->directory != nullptr)
-	                    uc_free(csp->directory) ;
+	                if (op->directory != nullptr)
+	                    uc_free(op->directory) ;
 
-	                csp->directory = bp ;
+	                op->directory = bp ;
 	                break ;
 
 	            case configkey_interrupt:
-	                if (csp->interrupt != nullptr)
-	                    uc_free(csp->interrupt) ;
+	                if (op->interrupt != nullptr)
+	                    uc_free(op->interrupt) ;
 
-	                csp->interrupt = bp ;
+	                op->interrupt = bp ;
 	                break ;
 
 	            case configkey_polltime:
-	                if (csp->polltime != nullptr)
-	                    uc_free(csp->polltime) ;
+	                if (op->polltime != nullptr)
+	                    uc_free(op->polltime) ;
 
-	                csp->polltime = bp ;
+	                op->polltime = bp ;
 	                break ;
 
 	            case configkey_filetime:
-	                if (csp->filetime != nullptr)
-	                    uc_free(csp->filetime) ;
+	                if (op->filetime != nullptr)
+	                    uc_free(op->filetime) ;
 
-	                csp->filetime = bp ;
+	                op->filetime = bp ;
 	                break ;
 
 	            case configkey_passfile:
-	                if (csp->passfname != nullptr)
-	                    uc_free(csp->passfname) ;
+	                if (op->passfname != nullptr)
+	                    uc_free(op->passfname) ;
 
-	                csp->passfname = bp ;
+	                op->passfname = bp ;
 	                break ;
 
 	            case configkey_eigenfile:
-	                if (csp->eigenfname != nullptr)
-	                    uc_free(csp->eigenfname) ;
+	                if (op->eigenfname != nullptr)
+	                    uc_free(op->eigenfname) ;
 
-	                csp->eigenfname = bp ;
+	                op->eigenfname = bp ;
 	                break ;
 
 	            } /* end switch (inner) */
@@ -613,18 +740,15 @@ int configfile_start(configfile *csp,configfname) noex {
 	        case configkey_option:
 	            while ((fsb.term != '#') &&
 	                ((fl = field_get(&fsb,oterms,&fp)) >= 0)) {
-
 	                if (fl > 0) {
-
-	                    if (noptions > 0)
+	                    if (noptions > 0) {
 	                        rs = buffer_chr(&options,',') ;
-
-			    if (rs >= 0)
+			    }
+			    if (rs >= 0) {
 	                        buffer_strw(&options,fp,fl) ;
-
+			    }
 	                    noptions += 1 ;
 	                }
-
 	            } /* end while */
 
 	            break ;
@@ -634,7 +758,7 @@ int configfile_start(configfile *csp,configfname) noex {
 	            fl = field_get(&fsb,fterms,&fp) ;
 
 	            if (fl > 0)
-	                rs = vecstr_add(&csp->unsets,fp,fl) ;
+	                rs = vecstr_add(op->ulp,fp,fl) ;
 
 	            break ;
 
@@ -652,7 +776,7 @@ int configfile_start(configfile *csp,configfname) noex {
 
 	                if (fl <= 0) {
 	                    rs = SR_INVALID ;
-	                    csp->badline = line ;
+	                    op->badline = line ;
 	                    break ;
 	                }
 
@@ -687,10 +811,8 @@ int configfile_start(configfile *csp,configfname) noex {
 
 	                f1p[f1l] = '\0' ;
 	                if (f2l > 0) {
-
 	                    f2p[f2l] = '\0' ;
 	                    rs1 = sncpy3(buf2,BUFLEN,f1p,"=",f2p) ;
-
 			} else if (f_equal) {
 	                    rs1 = sncpy2(buf2,BUFLEN,f1p,"=") ;
 	                } else {
@@ -701,11 +823,11 @@ int configfile_start(configfile *csp,configfname) noex {
 
 /* store it away */
 
-	                if (i == configkey_export)
-	                    vsp = &csp->exports ;
-
-	                else
-	                    vsp = &csp->defines ;
+	                if (i == configkey_export) {
+	                    vsp = op->elp ;
+			} else {
+	                    vsp = op->dlp ;
+			}
 
 			f = (rs1 > 0) ;
 
@@ -729,11 +851,11 @@ int configfile_start(configfile *csp,configfname) noex {
 
 	                        if (strncmp(buf2,"TMPDIR",len1) == 0) {
 
-	                            if (csp->tmpdir != nullptr)
-	                                uc_free(csp->tmpdir) ;
+	                            if (op->tmpdir != nullptr)
+	                                uc_free(op->tmpdir) ;
 
-	                            csp->tmpdir = 
-	                                mallocstr((csp->exports).va[index]) ;
+	                            op->tmpdir = 
+	                                mallocstr((op->exports).va[index]) ;
 
 	                        } /* end if (handling TMPDIR specially) */
 
@@ -749,9 +871,9 @@ int configfile_start(configfile *csp,configfname) noex {
 	            fl = field_get(&fsb,fterms,&fp) ;
 
 	            if ((fl <= 0) ||
-	                (cfdecmfi(fp,fl,&csp->loglen) < 0)) {
+	                (cfdecmfi(fp,fl,&op->loglen) < 0)) {
 
-	                csp->badline = line ;
+	                op->badline = line ;
 	                rs = SR_INVALID ;
 	                break ;
 	            }
@@ -762,9 +884,9 @@ int configfile_start(configfile *csp,configfname) noex {
 	            fl = field_get(&fsb,fterms,&fp) ;
 
 	            if ((fl <= 0) ||
-	                (cfdecmfi(fp,fl,&csp->minwordlen) < 0)) {
+	                (cfdecmfi(fp,fl,&op->minwordlen) < 0)) {
 
-	                csp->badline = line ;
+	                op->badline = line ;
 	                rs = SR_INVALID ;
 	                break ;
 	            }
@@ -775,9 +897,9 @@ int configfile_start(configfile *csp,configfname) noex {
 	            fl = field_get(&fsb,fterms,&fp) ;
 
 	            if ((fl <= 0) ||
-	                (cfdecmfi(fp,fl,&csp->maxwordlen) < 0)) {
+	                (cfdecmfi(fp,fl,&op->maxwordlen) < 0)) {
 
-	                csp->badline = line ;
+	                op->badline = line ;
 	                rs = SR_INVALID ;
 	                break ;
 	            }
@@ -788,9 +910,9 @@ int configfile_start(configfile *csp,configfname) noex {
 	            fl = field_get(&fsb,fterms,&fp) ;
 
 	            if ((fl <= 0) ||
-	                (cfdecmfi(fp,fl,&csp->keys) < 0)) {
+	                (cfdecmfi(fp,fl,&op->keys) < 0)) {
 
-	                csp->badline = line ;
+	                op->badline = line ;
 	                rs = SR_INVALID ;
 	                break ;
 	            }
@@ -804,16 +926,10 @@ int configfile_start(configfile *csp,configfname) noex {
 	        } /* end switch */
 
 	    } /* end if (valid key) */
-
 	    field_finish(&fsb) ;
-
 	    } /* end if */
-
-	    if (rs < 0)
-	        break ;
-
+	    if (rs < 0) break ;
 	} /* end while (reading lines) */
-
 	bclose(cfp) ;
 
 /* load up the options if we got any */
@@ -823,14 +939,14 @@ int configfile_start(configfile *csp,configfname) noex {
 	    cl = buffer_get(&options,&cp) ;
 
 	    if (cl > 0)
-	        csp->options = mallocstrw(cp,cl) ;
+	        op->options = mallocstrw(cp,cl) ;
 
 	} /* end if (options) */
 
 /* done with configuration file processing */
 
 	if (rs >= 0)
-	    csp->magval = CONFIGFILE_MAGIC ;
+	    op->magval = CONFIGFILE_MAGIC ;
 
 ret1:
 	buffer_finish(&options) ;
@@ -843,72 +959,84 @@ ret0:
 
 /* handle bad things */
 bad3:
-	vecstr_finish(&csp->exports) ;
+	vecstr_finish(op->elp) ;
 
 bad2:
-	vecstr_finish(&csp->unsets) ;
+	vecstr_finish(op->ulp) ;
 
 bad1:
-	vecstr_finish(&csp->defines) ;
+	vecstr_finish(op->dlp) ;
 
 bad0:
 	goto ret0 ;
 } /* end subroutine (configfile_start) */
 
-int configfile_finish(configfile *csp) noex {
-	int		rs = SR_FAULT ;
-	if (csp) {
-	    rs = SR_NOTOPEN ;
-	    if (csp->magval == CONFIGFILE_MAGIC) {
+int configfile_finish(CF *op) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = configfile_magic(op)) >= 0) {
 	        /* free up the complex data types */
-	vecstr_finish(&csp->defines) ;
-	vecstr_finish(&csp->unsets) ;
-	vecstr_finish(&csp->exports) ;
-	/* free up the simple ones */
-	checkfree(&csp->root) ;
-	checkfree(&csp->tmpdir) ;
-	checkfree(&csp->pidfname) ;
-	checkfree(&csp->lockfname) ;
-	checkfree(&csp->logfname) ;
-	checkfree(&csp->workdir) ;
-	checkfree(&csp->port) ;
-	checkfree(&csp->user) ;
-	checkfree(&csp->group) ;
-	checkfree(&csp->userpass) ;
-	checkfree(&csp->machpass) ;
-	checkfree(&csp->srvtab) ;
-	checkfree(&csp->sendmail) ;
-	checkfree(&csp->envfname) ;
-	checkfree(&csp->pathfname) ;
-	checkfree(&csp->devicefname) ;
-	checkfree(&csp->seedfname) ;
-	checkfree(&csp->logsize) ;
-	checkfree(&csp->organization) ;
-	checkfree(&csp->timeout) ;
-	checkfree(&csp->removemul) ;
-	checkfree(&csp->acctab) ;
-	checkfree(&csp->paramfname) ;
-	checkfree(&csp->nrecips) ;
-	checkfree(&csp->helpfname) ;
-	checkfree(&csp->statfname) ;
-	checkfree(&csp->options) ;
-	checkfree(&csp->interval) ;
-	checkfree(&csp->stampdir) ;
-	checkfree(&csp->maxjobs) ;
-	checkfree(&csp->directory) ;
-	checkfree(&csp->interrupt) ;
-	checkfree(&csp->polltime) ;
-	checkfree(&csp->filetime) ;
-	checkfree(&csp->passfname) ;
-	checkfree(&csp->eigenfname) ;
-	csp->magval = 0 ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
+		vecstr_finish(op->dlp) ;
+		vecstr_finish(op->ulp) ;
+		vecstr_finish(op->elp) ;
+		/* free up the simple ones */
+		checkfree(&op->root) ;
+		checkfree(&op->tmpdir) ;
+		checkfree(&op->pidfname) ;
+		checkfree(&op->lockfname) ;
+		checkfree(&op->logfname) ;
+		checkfree(&op->workdir) ;
+		checkfree(&op->port) ;
+		checkfree(&op->user) ;
+		checkfree(&op->group) ;
+		checkfree(&op->userpass) ;
+		checkfree(&op->machpass) ;
+		checkfree(&op->srvtab) ;
+		checkfree(&op->sendmail) ;
+		checkfree(&op->envfname) ;
+		checkfree(&op->pathfname) ;
+		checkfree(&op->devicefname) ;
+		checkfree(&op->seedfname) ;
+		checkfree(&op->logsize) ;
+		checkfree(&op->organization) ;
+		checkfree(&op->timeout) ;
+		checkfree(&op->removemul) ;
+		checkfree(&op->acctab) ;
+		checkfree(&op->paramfname) ;
+		checkfree(&op->nrecips) ;
+		checkfree(&op->helpfname) ;
+		checkfree(&op->statfname) ;
+		checkfree(&op->options) ;
+		checkfree(&op->interval) ;
+		checkfree(&op->stampdir) ;
+		checkfree(&op->maxjobs) ;
+		checkfree(&op->directory) ;
+		checkfree(&op->interrupt) ;
+		checkfree(&op->polltime) ;
+		checkfree(&op->filetime) ;
+		checkfree(&op->passfname) ;
+		checkfree(&op->eigenfname) ;
+		op->magval = 0 ;
+		{
+		    rs1 = configfile_dtor(op) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+        } /* end if (configfile_magic) */
 	return rs ;
 } /* end subroutine (configfile_finish) */
 
 
 /* local subroutines */
+
+local int configfile_initvars() noex {
+	op->srs = 0 ;
+	op->badline = -1 ;
+	op->loglen = -1 ;
+	op->minwordlen = -1 ;
+	op->maxwordlen = -1 ;
+	op->keys = -1 ;
+	return SR_OK ;
+} /* end subroutine */
 
 local void checkfree(char **vp) noex {
 	if (*vp) {
@@ -916,5 +1044,29 @@ local void checkfree(char **vp) noex {
 	    *vp = nullptr ;
 	}
 } /* end subroutine (checkfree) */
+
+constexpr uchar		f_terms[] = {
+	0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+	0x0E, 0x0F, 0x16, 0x17,
+	0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F 
+} ; /* end array */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_ml)) >= 0) {
+	    cbool	f = false ;
+	    maxlinelen = rs ;
+	    if ((rs = fieldterms(oterms,f,"\b\t\v #,")) >= 0) {
+	        if ((rs = fieldterms(fterms,f,"\v\f\r\n !#':=") >= 0) {
+	    	    baset(fterms,CH_NUL) ;
+	    	    baset(fterms,CH_DEL) ;
+		    for (cauto &ch : f_terms) {
+	    	        baset(fterms,ch) ;
+		    } /* end for */
+	        } /* end if (fieldterms) */
+	    } /* end if (fieldterms) */
+	} /* end if (bufsizeget) */
+    	return rs ;
+} /* end method (vars::operator) */
 
 
