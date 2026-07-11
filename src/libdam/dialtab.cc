@@ -41,13 +41,14 @@
 #include	<ucmem.h>		/* LIBUC */
 #include	<getpwd.h>		/* LIBUC */
 #include	<absfn.h>		/* LIBUC */
-#include	<bfile.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<matxstr.h>		/* LIBUC */
-#include	<localmisc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"dialtab.h"
 
@@ -60,7 +61,7 @@ import libutil ;
 #define	DT		dialtab
 #define	DT_ENT		dialtab_ent
 #define	DT_FI		dialtab_file
-#define	DT_MAGIC	31415926
+#define	DT_MAGIC	0x31415926
 
 
 /* imported namespaces */
@@ -151,16 +152,7 @@ local int	entry_finish(DT_ENT *) noex ;
 
 /* local variables */
 
-constexpr char 		fterms[32] = {
-	0x00, 0x00, 0x00, 0x00,
-	0x08, 0x10, 0x00, 0x24,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ; /* end array */
+constexpr fieldterminit		ft("#,:=") ;	/* # , : = */
 
 enum dialkeys {
 	dialkey_uucp,
@@ -170,13 +162,13 @@ enum dialkeys {
 	dialkey_overlast
 } ; /* end enum */
 
-constexpr cpcchar	dialkeys[] = {
+constexpr cpcchar	dialnames[] = {
 	"uucp",
 	"inet",
 	"username",
 	"password",
 	nullptr
-} ; /* end array */
+} ; /* end array (dialnames) */
 
 
 /* exported variables */
@@ -293,11 +285,11 @@ namespace {
 	    finish(this,adderco_finish) ;
 	} ;
 	int operator () (cchar *) noex ;
-	int istart() noex ;
-	int ifinish() noex ;
-	int reader(DT_FI *,cchar *,int) noex ;
-	int procln(int,cchar *,int) noex ;
-	int remainder() noex ;
+	int istart	() noex ;
+	int ifinish	() noex ;
+	int reader	(DT_FI *,cchar *,int) noex ;
+	int procln	(int,cchar *,int) noex ;
+	int remainder	() noex ;
     } ; /* end struct (adder) */
 } /* end namespace */
 
@@ -315,12 +307,12 @@ int adder::operator () (cchar *afn) noex {
                         c += rs ;
                         rs = remainder() ;
                         c += rs ;
-                    }
-                }
+                    } /* end if (reader) */
+                } /* end block */
                 if (rs < 0) {
                     dialtab_filedump(op,fi) ;
                     dialtab_filedel(op,fi) ;
-                }
+                } /* end if (error) */
             } /* end if (dialtab_fileload) */
             rs1 = finish ;
             if (rs >= 0) rs = rs1 ;
@@ -351,7 +343,8 @@ int adder::reader(DT_FI *fep,cchar *fn,int fi) noex {
 		            rs = procln(fi,lp,ll) ;
 			    c += rs ;
 		        }
-	            } /* end if (bfile_readln) */
+			if (rs < 0) break ;
+	            } /* end while (bfile_readln) */
 		} /* end if (bcontrol) */
 	        rs1 = bclose(&b) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -368,7 +361,7 @@ int adder::procln(int fi,cchar *lp,int ll) noex {
 	int		c = 0 ;
         if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
 	    int		fl ;
-            if (cchar *fp{} ; (fl = fsb.get(fterms,&fp)) > 0) {
+            if (cchar *fp{} ; (fl = fsb.get(ft.terms,&fp)) > 0) {
                 if (fsb.term == ':') {
                     if (flg.ent) {
                         if (entry_enough(&de) > 0) {
@@ -385,8 +378,8 @@ int adder::procln(int fi,cchar *lp,int ll) noex {
                         flg.ent = (rs >= 0) ;
 		    } /* end if (ok) */
                 } else {
-                    if (int ki ; (ki = matostr(dialkeys,2,fp,fl)) >= 0) {
-                        if ((fl = fsb.get(fterms,&fp)) > 0) {
+                    if (int ki ; (ki = matostr(dialnames,2,fp,fl)) >= 0) {
+                        if ((fl = fsb.get(ft.terms,&fp)) > 0) {
 			    cchar **rpp = nullptr ;
                             switch (ki) {
                             case dialkey_uucp:
@@ -499,22 +492,22 @@ int dialtab_search(DT *op,cchar *name,DT_ENT **depp) noex {
 local int dialtab_fileload(DT *op,DT_FI *fep,cchar *fn,DT_FI **rpp) noex {
     	int		rs = SR_BUGCHECK ;
 	int		fi = 0 ;
-	if (fep && rpp) {
-	    if ((rs = file_start(fep,fn)) >= 0) {
+	if (fep && rpp) ylikely {
+	    if ((rs = file_start(fep,fn)) >= 0) ylikely {
 		vecobj	*flp = op->flp ;
-	        if ((rs = flp->add(fep)) >= 0) {
+	        if ((rs = flp->add(fep)) >= 0) ylikely {
 	            fi = rs ;
-    		    if (void *vp{} ; (rs = flp->get(fi,&vp)) >= 0) {
+    		    if (void *vp{} ; (rs = flp->get(fi,&vp)) >= 0) ylikely {
 			DT_FI	*rp = (DT_FI *) vp ;
 		        *rpp = rp ;
-		    }
+		    } /* end if */
 		    if (rs < 0) {
 		        flp->del(fi) ;
-		    }
+		    } /* end if (error) */
 	        } /* end fi (vecobj_add) */
 	        if (rs < 0) {
 		    file_finish(fep) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (file_start) */
 	} /* end if (bugcheck) */
 	return (rs >= 0) ? fi : rs ;
@@ -538,7 +531,7 @@ local int dialtab_filedump(DT *op,int fi) noex {
 	                    rs1 = vecobj_del(op->elp,i--) ;
 			    if (rs >= 0) rs = rs1 ;
 			}
-	            }
+	            } /* end if */
 	        } /* end if (non-null) */
 	    } /* end for */
 	} /* end if (non-null) */
@@ -548,7 +541,7 @@ local int dialtab_filedump(DT *op,int fi) noex {
 local int dialtab_filedel(DT *op,int fi) noex {
 	int		rs  SR_BUGCHECK ;
 	int		rs1 ;
-	if (op && (fi >= 0)) {
+	if (op && (fi >= 0)) ylikely {
 	    if (void *vp{} ; (rs = vecobj_get(op->flp,fi,&vp)) >= 0) {
 	        DT_FI	*fep = (DT_FI *) vp ;
 	        if (vp) {
@@ -570,7 +563,7 @@ local int file_start(DT_FI *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (fep && fname) ylikely {
 	    memclear(fep) ;
-	    if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) ylikely {
 	        fep->fname = cp ;
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
@@ -609,7 +602,7 @@ local int entry_enough(DT_ENT *dep) noex {
 	int		fret = false ;
 	if (dep) ylikely {
 	    rs = SR_OK ;
-	    if (dep->name && dep->name[0]) {
+	    if (dep->name && dep->name[0]) ylikely {
 	        fret = fret || (dep->uucp && (dep->uucp[0] != '\0')) ;
 	        fret = fret || (dep->inet && (dep->inet[0] != '\0')) ;
 	        fret = fret || (dep->username && (dep->username[0] != '\0')) ;
@@ -624,12 +617,12 @@ namespace {
 	int	rs = SR_OK ;
 	int	rs1 ;
 	void operator () (ccharp &p) noex {
-	    if (p) {
+	    if (p) ylikely {
 		voidp vp = voidp(p) ;
 	        rs1 = mem.free(vp) ;
 		if (rs >= 0) rs = rs1 ;
 		p = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} ; /* end method */
 	operator int () noex {
 	    return rs ;
@@ -656,15 +649,15 @@ local int entry_finish(DT_ENT *dep) noex {
 
 int adder::istart() noex {
 	return SR_OK ;
-}
+} /* end method */
 
 int adder::ifinish() noex {
 	return SR_OK ;
-}
+} /* end method */
 
 adder_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case adderco_start:
 		rs = op->istart() ;
@@ -673,7 +666,7 @@ adder_co::operator int () noex {
 		rs = op->ifinish() ;
 		break ;
 	    } /* end switch */
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end method (adder_co::operator) */
 
