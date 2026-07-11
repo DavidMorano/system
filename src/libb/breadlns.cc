@@ -1,6 +1,6 @@
 /* breadlns SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get a line with possible continuation */
 /* version %I% last-modified %G% */
