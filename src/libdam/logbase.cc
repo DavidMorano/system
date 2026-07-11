@@ -1,6 +1,6 @@
 /* logbase SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* calculate the log of a number given the base also */
 /* version %I% last-modified %G% */
@@ -40,16 +40,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cmath>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cmath>			/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 #include	"logbase.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using std::log ;			/* subroutine */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -63,13 +73,11 @@
 
 /* forward references */
 
-template<typename T>
-T logbasex(T b,T v) noex {
+template<typename T> T logbasex(T b,T v) noex {
 	const T		n = log(v) ;
 	const T		d = log(b) ;
 	return (n / d) ;
-}
-/* end subroutine-template (logbasef) */
+} /* end subroutine-template (logbasef) */
 
 
 /* local variables */
@@ -80,19 +88,16 @@ T logbasex(T b,T v) noex {
 
 /* exported subroutines */
 
-float logbasef(float b,float v) noex {
+float		logbasef(float b,float v)		noex {
 	return logbasex(b,v) ;
-}
-/* end subroutine (logbasef) */
+} /* end subroutine (logbasef) */
 
-double logbase(double b,double v) noex {
+double		logbase(double b,double v)		noex {
 	return logbasex(b,v) ;
-}
-/* end subroutine (logbase) */
+} /* end subroutine (logbase) */
 
-long double logbasel(long double b,long double v) noex {
+long double	logbasel(long double b,long double v)	noex {
 	return logbasex(b,v) ;
-}
-/* end subroutine (logbasel) */
+} /* end subroutine (logbasel) */
 
 
