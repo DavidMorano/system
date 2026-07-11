@@ -72,7 +72,6 @@
 #include	<ucfileop.h>		/* LIBUC */
 #include	<absfn.h>		/* LIBUC */
 #include	<linebuffer.h>		/* LIBUC */
-#include	<bfile.h>		/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<fieldterminit.hh>	/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
@@ -85,6 +84,7 @@
 #include	<isnot.h>		/* LIBUC */
 #include	<ismatstar.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"acctab.h"
 
@@ -238,7 +238,7 @@ extern "C" {
     local int	vcmpent(cvoid **,cvoid **) noex ;
 }
 
-static charp	compile(cchar *,char *,char *) noex ;
+local charp	compile(cchar *,char *,char *) noex ;
 local int	advance(cchar *,cchar *) noex ;
 
 
@@ -246,30 +246,10 @@ local int	advance(cchar *,cchar *) noex ;
 
 local int	regerrno ;		/* TODO - get rid of this stuff! */
 
-constexpr char		gterms[] = { /* BS HT VT FF SP # : */
-	0x00, 0x1B, 0x00, 0x00,
-	0x09, 0x00, 0x00, 0x04,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ; /* end array */
-
-constexpr char		aterms[] = { /* BS HT VT FF SP # */
-	0x00, 0x1B, 0x00, 0x00,
-	0x09, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ; /* end array */
+constexpr fieldterminit		gt("\b\t\v\f #:") ;
+constexpr fieldterminit		at("\b\t\v\f #") ;
 
 constexpr int		intcheck = ACCTAB_CHECKTIME ;
-
 constexpr bool		f_regex = CF_REGEX ;
 
 
@@ -694,7 +674,7 @@ int parser::parseln(cchar *lp,int ll) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
-	    if (cchar *fp{} ; (rs = fsb.get(gterms,&fp)) > 0) {
+	    if (cchar *fp{} ; (rs = fsb.get(gt.terms,&fp)) > 0) {
 		int	fl = rs ;
 	        if (fsb.term == ':') {
 		    if (fent) {
@@ -725,7 +705,7 @@ int parser::parseln(cchar *lp,int ll) noex {
 	        } /* end if (new netgroup) */
 		if ((rs >= 0) && fent && (fsb.term != '#')) {
 		    for (int i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
-	                if ((rs = fsb.get(aterms,&fp)) > 0) {
+	                if ((rs = fsb.get(at.terms,&fp)) > 0) {
 			    rs = entry_addx(&se,i,fp,rs) ;
 			} /* end if (field_get) */
 			if (fsb.term == '#') break ;
@@ -830,7 +810,7 @@ local int file_start(ACCTAB_FI *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (fep && fname) {
 	    memclear(fep) ;
-	    if (cchar *cp{} ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
 	        fep->fname = cp ;
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
@@ -1253,13 +1233,13 @@ local int parttype(cchar *s) noex {
 } /* end subroutine (parttype) */
 
 /* dummy subroutine; one of the old SysV REGEX functions (not standardized) */
-static charp compile(cchar *,char *,char *) noex {
+local charp compile(cchar *,char *,char *) noex {
 	return nullptr ;
-}
+} /* end subroutine */
 
 /* dummy subroutine; one of the old SysV REGEX functions (not standardized) */
 local int advance(cchar *,cchar *) noex {
 	return 0 ;
-}
+} /* end subroutine */
 
 
