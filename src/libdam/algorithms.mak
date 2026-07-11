@@ -99,7 +99,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
@@ -175,7 +175,7 @@ dfsa.o:			dfsa0.o dfsa1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 dfsa0.o:		dfsa.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 dfsa1.o:		dfsa1.cc dfsa0.o
 	$(COMPILE.cc) $<
@@ -185,7 +185,7 @@ dfsb.o:			dfsb0.o dfsb1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 dfsb0.o:		dfsb.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 dfsb1.o:		dfsb1.cc dfsb0.o
 	$(COMPILE.cc) $<
