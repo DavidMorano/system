@@ -20,18 +20,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 EXTERNC_begin
 
 extern int	optval(cchar *,int) noex ;
 
-static inline int optbool(cchar *sp,int sl) noex {
+local inline int optbool(cchar *sp,int sl) noex {
 	return optval(sp,sl) ;
 }
 
