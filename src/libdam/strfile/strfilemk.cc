@@ -1,6 +1,6 @@
 /* strfilemk HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* STRFILEMK management */
 /* version %I% last-modified %G% */
