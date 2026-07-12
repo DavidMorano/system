@@ -1,6 +1,6 @@
 /* terment SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* methods for the TERMENT object */
 /* version %I% last-modified %G% */
@@ -31,12 +31,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<snwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"terment.h"
 
@@ -74,8 +75,7 @@ int terment_start(terment *op) noex {
 	    rs = memclear(hop) ;
 	}
 	return rs ;
-}
-/* end subroutine (terment_start) */
+} /* end subroutine (terment_start) */
 
 int terment_finish(terment *op) noex {
 	int		rs = SR_FAULT ;
@@ -83,8 +83,7 @@ int terment_finish(terment *op) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (terment_finish) */
+} /* end subroutine (terment_finish) */
 
 int terment_settype(terment *op,int type) noex {
 	int		rs = SR_FAULT ;
@@ -93,8 +92,7 @@ int terment_settype(terment *op,int type) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (terment_settype) */
+} /* end subroutine (terment_settype) */
 
 int terment_setsid(terment *op,pid_t sid) noex {
 	int		rs = SR_FAULT ;
@@ -103,8 +101,7 @@ int terment_setsid(terment *op,pid_t sid) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (terment_setsid) */
+} /* end subroutine (terment_setsid) */
 
 int terment_setlines(terment *op,int lines) noex {
 	int		rs = SR_FAULT ;
@@ -113,8 +110,7 @@ int terment_setlines(terment *op,int lines) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (terment_setlines) */
+} /* end subroutine (terment_setlines) */
 
 int terment_setcols(terment *op,int cols) noex {
 	int		rs = SR_FAULT ;
@@ -123,8 +119,7 @@ int terment_setcols(terment *op,int cols) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (terment_setcols) */
+} /* end subroutine (terment_setcols) */
 
 int terment_setid(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -133,8 +128,7 @@ int terment_setid(terment *op,cchar *sp,int sl) noex {
 	    rs = snwcpy(op->id,dl,sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (terment_setid) */
+} /* end subroutine (terment_setid) */
 
 int terment_setline(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -143,8 +137,7 @@ int terment_setline(terment *op,cchar *sp,int sl) noex {
 	    rs = snwcpy(op->line,dl,sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (terment_setline) */
+} /* end subroutine (terment_setline) */
 
 int terment_settermtype(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -153,8 +146,7 @@ int terment_settermtype(terment *op,cchar *sp,int sl) noex {
 	    rs = snwcpy(op->termtype,dl,sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (terment_settermtype) */
+} /* end subroutine (terment_settermtype) */
 
 int terment_setanswer(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -163,8 +155,7 @@ int terment_setanswer(terment *op,cchar *sp,int sl) noex {
 	    rs = snwcpy(op->answer,dl,sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (terment_setanswer) */
+} /* end subroutine (terment_setanswer) */
 
 int terment_gettype(terment *op) noex {
 	int		rs = SR_FAULT ;
@@ -172,8 +163,7 @@ int terment_gettype(terment *op) noex {
 	    rs = MKCHAR(op->type) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_gettype) */
+} /* end subroutine (terment_gettype) */
 
 int terment_getsid(terment *op) noex {
 	int		rs = SR_FAULT ;
@@ -181,8 +171,7 @@ int terment_getsid(terment *op) noex {
 	    rs = op->sid ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_getsid) */
+} /* end subroutine (terment_getsid) */
 
 int terment_getlines(terment *op) noex {
 	int		rs = SR_FAULT ;
@@ -190,8 +179,7 @@ int terment_getlines(terment *op) noex {
 	    rs = op->lines ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_getlines) */
+} /* end subroutine (terment_getlines) */
 
 int terment_getcols(terment *op) noex {
 	int		rs = SR_FAULT ;
@@ -199,8 +187,7 @@ int terment_getcols(terment *op) noex {
 	    rs = op->cols ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_getcols) */
+} /* end subroutine (terment_getcols) */
 
 int terment_getid(terment *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -209,8 +196,7 @@ int terment_getid(terment *op,cchar **rpp) noex {
 	   if (rpp) *rpp = op->id ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_getid) */
+} /* end subroutine (terment_getid) */
 
 int terment_getline(terment *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -219,8 +205,7 @@ int terment_getline(terment *op,cchar **rpp) noex {
 	    if (rpp) *rpp = op->line ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_getline) */
+} /* end subroutine (terment_getline) */
 
 int terment_gettermtype(terment *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -229,8 +214,7 @@ int terment_gettermtype(terment *op,cchar **rpp) noex {
 	    if (rpp) *rpp = op->termtype ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_gettermtype) */
+} /* end subroutine (terment_gettermtype) */
 
 int terment_getanswer(terment *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -239,7 +223,6 @@ int terment_getanswer(terment *op,cchar **rpp) noex {
 	    if (rpp) *rpp = op->answer ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_getanswer) */
+} /* end subroutine (terment_getanswer) */
 
 
