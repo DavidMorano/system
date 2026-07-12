@@ -1,6 +1,6 @@
 /* pipe2 SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* check file access for the current process by its effective UID */
 /* version %I% last-modified %G% */
