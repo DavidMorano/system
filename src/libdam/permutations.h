@@ -28,7 +28,7 @@
 
 EXTERNC_begin
 
-extern int	long permutations(int,int) noex ;
+extern long permutations(int,int) noex ;
 
 EXTERNC_end
 
