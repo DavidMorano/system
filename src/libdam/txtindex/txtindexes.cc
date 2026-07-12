@@ -1,6 +1,6 @@
 /* txtindexes SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* read or audit a TXTINDEX database */
 /* version %I% last-modified %G% */
