@@ -47,7 +47,7 @@ struct modloadms {
     	static constexpr int	libsdirs	= (1 << modloado_libsdirs) ;
     	static constexpr int	avail		= (1 << modloado_avail) ;
     	static constexpr int	self		= (1 << modloado_self) ;
-} ; /* end structenum (modloadms) */
+} ; /* end struct (modloadms) */
 
 #endif /* __cplusplus */
 
