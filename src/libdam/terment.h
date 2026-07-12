@@ -35,7 +35,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	"terment.h"
 
@@ -64,7 +66,7 @@ struct terment_head {
 	char		line[TERMENT_LLINE] ;
 	char		termtype[TERMENT_LTERMTYPE] ;
 	char		answer[TERMENT_LANSWER] ;
-} ;
+} ; /* end struct */
 
 typedef TERMENT		terment ;
 
