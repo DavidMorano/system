@@ -1,6 +1,6 @@
 /* permutations SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* n-P-k function */
 /* version %I% last-modified %G% */
