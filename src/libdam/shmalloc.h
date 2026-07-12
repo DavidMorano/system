@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	SHMALLOC		struct shmalloc_head
@@ -29,27 +26,27 @@
 struct shmalloc_block {
 	int		bsz ;		/* block size */
 	int		next ;		/* offset to next block */
-} ;
+} ; /* end struct */
 
 struct shmalloc_head {
 	int		str ;		/* string-area offset */
 	int		used ;
 	SHMALLOC_BLK	b ;
-} ;
+} ; /* end struct */
 
 typedef	SHMALLOC	shmalloc ;
 typedef	SHMALLOC_BLK	shmalloc_blk ;
 
 EXTERNC_begin
 
-extern int shmalloc_init(shmalloc *,char *,int) noex ;
-extern int shmalloc_fini(shmalloc *) noex ;
-extern int shmalloc_alloc(shmalloc *,int) noex ;
-extern int shmalloc_free(shmalloc *,int) noex ;
-extern int shmalloc_avail(shmalloc *) noex ;
-extern int shmalloc_audit(shmalloc *) noex ;
-extern int shmalloc_used(shmalloc *) noex ;
-extern int shmalloc_already(shmalloc *,int) noex ;
+extern int shmalloc_init	(shmalloc *,char *,int) noex ;
+extern int shmalloc_fini	(shmalloc *) noex ;
+extern int shmalloc_alloc	(shmalloc *,int) noex ;
+extern int shmalloc_free	(shmalloc *,int) noex ;
+extern int shmalloc_avail	(shmalloc *) noex ;
+extern int shmalloc_audit	(shmalloc *) noex ;
+extern int shmalloc_used	(shmalloc *) noex ;
+extern int shmalloc_already	(shmalloc *,int) noex ;
 
 EXTERNC_end
 
