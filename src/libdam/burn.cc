@@ -88,7 +88,7 @@ namespace {
     struct burner {
 	randomvar	*rvp = nullptr ;
 	randomvar	x ;
-	off_t		fsz ;
+	off_t		fsize ;
 	int		bcount ;
 	burner_fl	fl{} ;
 	burner(randomvar *abp,int bc) noex : bcount(bc) {
@@ -189,7 +189,7 @@ int burner::filer(char *fbuf,int flen,cchar *fn) noex {
 	    cint	fd = rs ;
 	    if (USTAT sb{} ; (rs = uc_fstat(fd,&sb)) >= 0) {
 		if (S_ISREG(sb.st_mode) && (sb.st_size > 0)) {
-		    fsz = sb.st_size ;
+		    fsize = sb.st_size ;
 		    rs = writer(fd,fbuf,flen) ;
 		} /* end if (regular non-zero file) */
 	    } /* end if (uc_fstat) */
@@ -200,16 +200,16 @@ int burner::filer(char *fbuf,int flen,cchar *fn) noex {
 } /* end method (burner::filer) */
 
 int burner::writer(int fd,char *fbuf,int flen) noex {
-    	coff		msz = off_t(flen) ;
+    	coff		msize = off_t(flen) ;
     	int		rs = SR_OK ;
 	for (int i = 0 ; (rs >= 0) && (i < bcount) ; i += 1) {
-	    off_t	tsz = 0 ;
+	    off_t	tsize = 0 ;
 	    if ((rs = rewind(fd,i)) >= 0) {
-	        while ((rs >= 0) && (fsz > tsz)) {
-		    cint	wl = int(min((fsz - tsz),msz)) ;
+	        while ((rs >= 0) && (fsize > tsize)) {
+		    cint	wl = int(min((fsize - tsize),msize)) ;
 		    if ((rs = loadbuf(fbuf,wl)) >= 0) {
 	                rs = uc_writen(fd,fbuf,wl) ;
-	                tsz += rs ;
+	                tsize += rs ;
 		    } /* end if (loadbuf) */
 	        } /* end while */
 	    } /* end if (rewind) */
