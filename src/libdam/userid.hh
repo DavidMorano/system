@@ -1,6 +1,6 @@
 /* userid HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* some sort of identification-object for the MOTD object */
 /* version %I% last-modified %G% */
