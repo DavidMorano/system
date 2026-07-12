@@ -39,16 +39,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<intceil.h>
-#include	<intfloor.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<intfloor.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"shmalloc.h"
 
@@ -104,8 +106,7 @@ int shmalloc_init(shmalloc *op,char *strp,int ssz) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (shmalloc_init) */
+} /* end subroutine (shmalloc_init) */
 
 int shmalloc_fini(shmalloc *op) noex {
     	int		rs = SR_FAULT ;
@@ -113,8 +114,7 @@ int shmalloc_fini(shmalloc *op) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (shmalloc_finish) */
+} /* end subroutine (shmalloc_finish) */
 
 /* returns <0 (SR_NOMEM) on NOMEM */
 int shmalloc_alloc(shmalloc *op,int rsz) noex {
@@ -160,8 +160,7 @@ int shmalloc_alloc(shmalloc *op,int rsz) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? roff : rs ;
-}
-/* end subroutine (shmalloc_alloc) */
+} /* end subroutine (shmalloc_alloc) */
 
 int shmalloc_free(shmalloc *op,int uoff) noex {
 	cint		asz = SHMALLOC_ALIGNSIZE ;
@@ -224,8 +223,7 @@ int shmalloc_free(shmalloc *op,int uoff) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rused : rs ;
-}
-/* end subroutine (shmalloc_free) */
+} /* end subroutine (shmalloc_free) */
 
 int shmalloc_already(shmalloc *op,int uoff) noex {
 	cint		asz = SHMALLOC_ALIGNSIZE ;
@@ -259,13 +257,11 @@ int shmalloc_already(shmalloc *op,int uoff) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (shmalloc_already) */
+} /* end subroutine (shmalloc_already) */
 
 int shmalloc_used(shmalloc *op) noex {
 	return op->used ;
-}
-/* end subroutine (shmalloc_used) */
+} /* end subroutine (shmalloc_used) */
 
 int shmalloc_avail(shmalloc *op) noex {
 	int		rs = SR_FAULT ;
@@ -287,8 +283,7 @@ int shmalloc_avail(shmalloc *op) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? avail : rs ;
-}
-/* end subroutine (shmalloc_avail) */
+} /* end subroutine (shmalloc_avail) */
 
 int shmalloc_audit(shmalloc *op) noex {
 	int		rs = SR_FAULT ;
@@ -300,7 +295,6 @@ int shmalloc_audit(shmalloc *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (shmalloc_audit) */
+} /* end subroutine (shmalloc_audit) */
 
 
