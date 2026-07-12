@@ -1,4 +1,5 @@
 
+
 %T Instruction-Level Parallel Processors
 %A H.C. Torng
 %A Stamatis Vassiliadis
@@ -32,7 +33,7 @@ architectures
 %I
 %J PACT
 %C
-%D Oct. 1998
+%D October 1998
 %K instruction level parallelism
 %X
 %B
@@ -53,5 +54,17 @@ architectures
 %X
 %B
 
+%A A.K. Uht
+%A D.A.D. Morano
+%A A. Khalafi
+%A D.R. Kaeli
+%T Levo -- A Scalable Processor With High IPC
+%J The Journal of Instruction-Level Parallelism
+%D August 2003 
+%U http://www.jilp.org/vol5
+%K instruction level parallelism
+%Q uht2003scalable
+%V 1
+%N
 
 
