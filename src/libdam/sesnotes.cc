@@ -27,26 +27,32 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<ucgetpid.h>
-#include	<bufsizeget.h>
-#include	<mallocxx.h>
-#include	<opentmp.h>
-#include	<mktmp.h>
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<snx.h>
-#include	<sockaddress.h>
-#include	<fsdir.h>
-#include	<nulstr.h>
-#include	<strdcpyx.h>
-#include	<strwcpy.h>
-#include	<cfdec.h>
-#include	<isnot.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucgetpid.h>		/* LIBUC */
+#include	<ucproc.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<mktmp.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<strdcpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"sesnotes.h"
 #include	"sesmsg.hh"
@@ -59,6 +65,14 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	SN		sesnotes
 #define	SN_PROGDNAME	"sesnotes"
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -88,20 +102,18 @@ local int sesnotes_ctor(SN *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
-	    if (char *bp ; (rs = malloc_un(&bp)) >= 0) ylikely {
-		static cint	rsv = mkvars(rs) ;
-		if ((rs = rsv) >= 0) ylikely {
+	    if (char *bp ; (rs = mem.un(&bp)) >= 0) ylikely {
+		if (static cint	rsv = mkvars(rs) ; (rs = rsv) >= 0) ylikely {
 		    op->unbuf = bp ;
-		}
+		} /* end if */
 		if (rs < 0) {
-		    uc_free(bp) ;
+		    mem.free(bp) ;
 		    op->unbuf = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sesnotes_ctor) */
+} /* end subroutine (sesnotes_ctor) */
 
 local int sesnotes_dtor(SN *op) noex {
 	int		rs = SR_FAULT ;
@@ -109,14 +121,13 @@ local int sesnotes_dtor(SN *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->unbuf) ylikely {
-		rs1 = uc_free(op->unbuf) ;
+		rs1 = mem.free(op->unbuf) ;
 		if (rs >= 0) rs = rs1 ;
 		op->unbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sesnotes_dtor) */
+} /* end subroutine (sesnotes_dtor) */
 
 template<typename ... Args>
 static inline int sesnotes_magic(SN *op,Args ... args) noex {
@@ -125,8 +136,7 @@ static inline int sesnotes_magic(SN *op,Args ... args) noex {
 	    rs = (op->magval == SESNOTES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (sesnotes_magic) */
+} /* end subroutine (sesnotes_magic) */
 
 local int sesnotes_ready(SN *) noex ;
 local int sesnotes_sends(SN *,char *,int,int,time_t,cchar *,int) noex ;
@@ -160,11 +170,10 @@ int sesnotes_open(SN *op,cchar *un) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		sesnotes_dtor(op) ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (sesnotes_ctor) */
 	return rs ;
-}
-/* end subroutine (sesnotes_open) */
+} /* end subroutine (sesnotes_open) */
 
 int sesnotes_close(SN *op) noex {
 	int		rs ;
@@ -181,10 +190,10 @@ int sesnotes_close(SN *op) noex {
 	            op->sfname[0] = '\0' ;
 	        }
 		{
-	            rs1 = uc_free(op->sfname) ;
+	            rs1 = mem.free(op->sfname) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->sfname = nullptr ;
-		}
+		} /* end if (memory-release) */
 	    }
 	    {
 		rs1 = sesnotes_dtor(op) ;
@@ -193,20 +202,17 @@ int sesnotes_close(SN *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sesnotes_close) */
+} /* end subroutine (sesnotes_close) */
 
 int sesnotes_sendbiff(SN *op,cchar *sp,int sl,pid_t sid) noex {
 	cint		mt = sesmsgtype_biff ;
 	return sesnotes_send(op,mt,sp,sl,sid) ;
-}
-/* end subroutine (sesnotes_sendbiff) */
+} /* end subroutine (sesnotes_sendbiff) */
 
 int sesnotes_sendgen(SN *op,cchar *sp,int sl,pid_t sid) noex {
 	cint		mt = sesmsgtype_gen ;
 	return sesnotes_send(op,mt,sp,sl,sid) ;
-}
-/* end subroutine (sesnotes_sendgen) */
+} /* end subroutine (sesnotes_sendgen) */
 
 int sesnotes_send(SN *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 	constexpr char	sesdname[] = SESNOTES_SESDNAME ;
@@ -221,7 +227,7 @@ int sesnotes_send(SN *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 		cint	maxpath = rs ;
 		int	ai = 0 ;
 		sz += ((maxpath + 1) * 2) ;
-		if (char *ap ; (rs = uc_malloc(sz,&ap)) >= 0) {
+		if (char *ap ; (rs = mem.mall(sz,&ap)) >= 0) {
 		     char	*cbuf = (ap + ((maxpath + 1) * ai++)) ;
 		     if ((rs = snsd(cbuf,maxpath,"s",uv)) >= 0) {
 	    	         char	*dbuf = (ap + ((maxpath + 1) * ai++)) ;
@@ -230,14 +236,13 @@ int sesnotes_send(SN *op,int mt,cchar *mp,int ml,pid_t sid) noex {
 	        	     c += rs ;
 	    	        } /* end if (mkpath) */
 		    } /* end if (snsd) */
-		    rs1 = uc_free(ap) ;
+		    rs1 = mem.free(ap) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (bufsizeget) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sesnotes_send) */
+} /* end subroutine (sesnotes_send) */
 
 
 /* private subroutines */
@@ -251,7 +256,7 @@ local int sesnotes_ready(SN *op) noex {
 	    cint	sz = ((var.maxpathlen + 1) * 3) ;
 	    int		ai = 0 ;
 	    cmode	dm = 0775 ;
-	    if (char *ap ; (rs = uc_malloc(sz,&ap)) >= 0) {
+	    if (char *ap ; (rs = mem.mall(sz,&ap)) >= 0) {
 	        char	*dbuf = ap + ((var.maxpathlen + 1) * ai++) ;
 	        if ((rs = mktmpuserdir(dbuf,op->unbuf,dname,dm)) >= 0) {
 	            char	*rbuf = ap + ((var.maxpathlen + 1) * ai++) ;
@@ -262,32 +267,31 @@ local int sesnotes_ready(SN *op) noex {
 	                if ((rs = opentmpusd(rbuf,of,om,sbuf)) >= 0) {
 	                    cchar	*cp ;
 	                    op->fd = rs ;
-	                    if ((rs = uc_mallocstrw(sbuf,-1,&cp)) >= 0) {
+	                    if ((rs = mem.strw(sbuf,-1,&cp)) >= 0) {
 	                        op->sfname = (char *) cp ;
 	                        rs = 1 ;
-	                    }
+	                    } /* end if */
 	                    if (rs < 0) {
 	                        u_close(op->fd) ;
 	                        op->fd = -1 ;
 	                        uc_unlink(sbuf) ;
-	                    }
+	                    } /* end if (error) */
 	                } /* end if (opentmpusd) */
 	            } /* end if (mkpath) */
 	        } /* end if (mktmpuserdir) */
-		rs1 = uc_free(ap) ;
+		rs1 = mem.free(ap) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (initializaion needed) */
 	return rs ;
-}
-/* end subroutine (sesnotes_ready) */
+} /* end subroutine (sesnotes_ready) */
 
 local int sesnotes_sends(SN *op,char *dbuf,int dlen,
 		int mt,time_t st,cchar *mp,int ml) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *nbuf ; (rs = malloc_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = mem.mn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if (fsdir d ; (rs = fsdir_open(&d,dbuf)) >= 0) {
 	        fsdir_ent	de ;
@@ -319,12 +323,11 @@ local int sesnotes_sends(SN *op,char *dbuf,int dlen,
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;
 	    }
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = mem.free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sesnotes_sends) */
+} /* end subroutine (sesnotes_sends) */
 
 local int addrun(sockaddress *sap,cchar *ap) noex {
     	int		rs ;
@@ -403,8 +406,7 @@ local int sesnotes_sender(SN *op,cc *ap,int mt,time_t st,cc *sp,int sl) noex {
 	    } /* end if (sockaddress) */
 	} /* end if (sesnotes_ready) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (sesnotes_sender) */
+} /* end subroutine (sesnotes_sender) */
 
 local int haveproc(cchar *pp,int pl) noex {
 	int		rs = SR_OK ;
@@ -417,8 +419,7 @@ local int haveproc(cchar *pp,int pl) noex {
 	    }
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (haveproc) */
+} /* end subroutine (haveproc) */
 
 int vars::operator () (int unl) noex {
 	int		rs = SR_BUGCHECK ;
@@ -429,8 +430,7 @@ int vars::operator () (int unl) noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 local int mkvars(int unl) noex {
     	return var(unl) ;
