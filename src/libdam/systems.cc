@@ -1,6 +1,6 @@
 /* systems SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get machine dialing information from UUCP "Systems" DB */
 /* version %I% last-modified %G% */
@@ -32,30 +32,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getpwd.h>
-#include	<absfn.h>
-#include	<mkpathx.h>
-#include	<vecobj.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<ismatstar.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getpwd.h>		/* LIBUC */
+#include	<absfn.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<ismatstar.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"systems.h"
 
@@ -379,7 +379,7 @@ int systems_check(systems *op,time_t dt) noex {
 	    /* should we even check? */
 	    if ((dt - op->checktime) > TI_FILECHECK) {
 		vecobj	*flp = op->flp ;
-	        USTAT	sb ;
+	        ustat	sb ;
 	        void	*vp{} ;
 	        op->checktime = dt ;
 	        for (int i = 0 ; flp->get(i,&vp) >= 0 ; i += 1) {
