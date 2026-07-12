@@ -1,6 +1,6 @@
 /* tse HEADER (Time-Stamp Entry) */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* machine status entry */
 /* version %I% last-modified %G% */
@@ -29,7 +29,7 @@ enum tsemems {
     	tsemem_start,
 	tsemem_finish,
 	tsemem_overlast
-} ;
+} ; /* end enum */
 
 struct tse ;
 
