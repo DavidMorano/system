@@ -28,14 +28,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |CHAR_BIT| + |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdorder.h>
-#include	<serialbuf.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdorder.h>		/* LIBUC */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sesmsg.hh"		/* C++ only header */
 
@@ -95,8 +95,7 @@ int sesmsger_exit(SESMSG_EXIT *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_exit) */
+} /* end subroutine (sesmsg_exit) */
 
 int sesmsger_noop(SESMSG_NOOP *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -122,29 +121,25 @@ int sesmsger_noop(SESMSG_NOOP *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_noop) */
+} /* end subroutine (sesmsg_noop) */
 
 int sesmsger_gen(SESMSG_GEN *sp,int f,char *mbuf,int mlen) noex {
 	SESMSG_MBUF	*mp = (SESMSG_MBUF *) sp ;
 	cint		mt = sesmsgtype_gen ;
 	return sesmsger_mbuf(mp,mt,f,mbuf,mlen) ;
-}
-/* end subroutine (sesmsg_gen) */
+} /* end subroutine (sesmsg_gen) */
 
 int sesmsger_biff(SESMSG_BIFF *sp,int f,char *mbuf,int mlen) noex {
 	SESMSG_MBUF	*mp = (SESMSG_MBUF *) sp ;
 	cint		mt = sesmsgtype_biff ;
 	return sesmsger_mbuf(mp,mt,f,mbuf,mlen) ;
-}
-/* end subroutine (sesmsg_biff) */
+} /* end subroutine (sesmsg_biff) */
 
 int sesmsger_echo(SESMSG_ECHO *sp,int f,char *mbuf,int mlen) noex {
 	SESMSG_MBUF	*mp = (SESMSG_MBUF *) sp ;
 	cint		mt = sesmsgtype_echo ;
 	return sesmsger_mbuf(mp,mt,f,mbuf,mlen) ;
-}
-/* end subroutine (sesmsg_echo) */
+} /* end subroutine (sesmsg_echo) */
 
 int sesmsger_response(SESMSG_RESPONSE *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -174,8 +169,7 @@ int sesmsger_response(SESMSG_RESPONSE *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_response) */
+} /* end subroutine (sesmsg_response) */
 
 int sesmsger_passfd(SESMSG_PASSFD *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -204,8 +198,7 @@ int sesmsger_passfd(SESMSG_PASSFD *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_passfd) */
+} /* end subroutine (sesmsg_passfd) */
 
 int sesmsger_getsysmisc(SESMSG_GETSYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -231,8 +224,7 @@ int sesmsger_getsysmisc(SESMSG_GETSYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_getsysmisc) */
+} /* end subroutine (sesmsg_getsysmisc) */
 
 int sesmsger_sysmisc(SESMSG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -270,8 +262,7 @@ int sesmsger_sysmisc(SESMSG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_sysmisc) */
+} /* end subroutine (sesmsg_sysmisc) */
 
 int sesmsger_getloadave(SESMSG_GETLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -297,8 +288,7 @@ int sesmsger_getloadave(SESMSG_GETLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_getloadve) */
+} /* end subroutine (sesmsg_getloadve) */
 
 int sesmsger_loadave(SESMSG_LOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -332,8 +322,7 @@ int sesmsger_loadave(SESMSG_LOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_loadave) */
+} /* end subroutine (sesmsg_loadave) */
 
 int sesmsger_reploadave(SESMSG_REPLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -377,8 +366,7 @@ int sesmsger_reploadave(SESMSG_REPLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_reploadave) */
+} /* end subroutine (sesmsg_reploadave) */
 
 int sesmsger_getlistener(SESMSG_GETLISTENER *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -406,8 +394,7 @@ int sesmsger_getlistener(SESMSG_GETLISTENER *sp,int f,char *mbuf,int mlen) noex 
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_getlistener) */
+} /* end subroutine (sesmsg_getlistener) */
 
 int sesmsger_listener(SESMSG_LISTENER *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -445,8 +432,7 @@ int sesmsger_listener(SESMSG_LISTENER *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_listener) */
+} /* end subroutine (sesmsg_listener) */
 
 int sesmsger_mark(SESMSG_MARK *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -472,8 +458,7 @@ int sesmsger_mark(SESMSG_MARK *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_mark) */
+} /* end subroutine (sesmsg_mark) */
 
 int sesmsger_unknown(SESMSG_UNKNOWN *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -497,8 +482,7 @@ int sesmsger_unknown(SESMSG_UNKNOWN *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_unknown) */
+} /* end subroutine (sesmsg_unknown) */
 
 int sesmsger_gethelp(SESMSG_GETHELP *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -526,8 +510,7 @@ int sesmsger_gethelp(SESMSG_GETHELP *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_gethelp) */
+} /* end subroutine (sesmsg_gethelp) */
 
 int sesmsger_help(SESMSG_HELP *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -562,8 +545,7 @@ int sesmsger_help(SESMSG_HELP *sp,int f,char *mbuf,int mlen) noex {
 	} /* end if (serialbuf) */
 
 	return rs ;
-}
-/* end subroutine (sesmsg_help) */
+} /* end subroutine (sesmsg_help) */
 
 int sesmsger_cmd(SESMSG_CMD *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -591,8 +573,7 @@ int sesmsger_cmd(SESMSG_CMD *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_cmd) */
+} /* end subroutine (sesmsg_cmd) */
 
 
 /* local subroutines */
@@ -634,7 +615,6 @@ local int sesmsger_mbuf(SESMSG_MBUF *sp,int mt,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (sesmsg_mbuf) */
+} /* end subroutine (sesmsg_mbuf) */
 
 
