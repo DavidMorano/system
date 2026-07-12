@@ -1,6 +1,6 @@
 /* textlook SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* text look-up manager (we use the index and verify speculative results) */
 /* version %I% last-modified %G% */
