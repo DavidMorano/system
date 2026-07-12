@@ -162,11 +162,11 @@ local int mxalias_ctor(mxalias *op,Args ... args) noex {
 	    if ((op->flp = new(nothrow) vecobj) != np) ylikely {
 	        if ((op->elp = new(nothrow) keyvals) != np) ylikely {
 		    rs = SR_OK ;
-		}
+		} /* end if (new-keyvals) */
 		if (rs < 0) {
 		    delete op->flp ;
 		    op->flp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
@@ -422,7 +422,7 @@ int mxalias_curend(MA *op,MA_CUR *curp) noex {
 	        rs1 = lm_free(curp->vbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        curp->vbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (curp->vals) {
 	        rs1 = lm_free(curp->vals) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -437,7 +437,7 @@ int mxalias_curend(MA *op,MA_CUR *curp) noex {
 	            rs1 = lm_free(curp->kvcp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            curp->kvcp = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	    }
 	    op->ncursors -= 1 ;
 	    curp->magval = 0 ;
@@ -527,7 +527,7 @@ local int mxalias_curlooks(MA *op,MA_CUR *curp,cc *kbuf,int klen) noex {
 	                if (rs >= 0) {
 	                    rs = mxalias_mkvals(op,curp,&vlist) ;
 	                    c = rs ;
-	                }
+	                } /* end if (ok) */
 	            } /* end if (addvals) */
 	            rs1 = vlist.finish ;
 	            if (rs >= 0) rs = rs1 ;
@@ -618,7 +618,7 @@ local int mxalias_filesadd(MA *op,time_t dt) noex {
 	                    rs = mxalias_fileadd(op,fbuf) ;
 	                    c += rs ;
 	                }
-	            } /* end if */
+	            } /* end if (ok) */
 	        } /* end if_constexpr (f_filesys) */
 	        if_constexpr (f_fileuser) {
 	            if (rs >= 0) {
@@ -673,7 +673,7 @@ int mxalias_fileadd(MA *op,cchar *atfname) noex {
 		if (tbuf) {
 		    rs1 = lm_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
-		}
+		} /* end if (memory-release) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
@@ -688,10 +688,10 @@ local int mxalias_filereg(MA *op,ustat *sbp,cchar *fn) noex {
 	    if ((rs = flp->search(&fe,vcmpfe,nullptr)) == rsn) {
 	        rs = flp->add(&fe) ;
 	        fi = rs ;
-	    }
+	    } /* end if */
 	    if (rs < 0) {
 	        file_finish(&fe) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (file_start) */
 	return (rs >= 0) ? fi : rs ;
 } /* end subroutine (mxalias_filereg) */
@@ -772,7 +772,7 @@ local int mxalias_fileparse(MA *op,int fi) noex {
 	        } /* end if (bfile) */
 		if (rs < 0) {
 	    	    mxalias_filedump(op,fi) ;
-		}
+		} /* end if (error) */
 	    } else {
 	        rs = SR_NOTFOUND ;
 	    }
@@ -1076,25 +1076,25 @@ local int mxalias_finallocs(MA *op) noex {
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->pwd = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (op->userdname) {
 	    void *vp = voidp(op->userdname) ;
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->userdname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (op->username) {
 	    void *vp = voidp(op->username) ;
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->username = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (op->pr) {
 	    void *vp = voidp(op->pr) ;
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->pr = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (mxalias_finallocs) */
 
@@ -1133,7 +1133,7 @@ local int file_finish(MA_FI *fep) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->fname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (file_finish) */
@@ -1165,7 +1165,7 @@ local int bufdesc_finish(BD *bdp) noex {
 	    rs1 = lm_free(bdp->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    bdp->a = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (bufdesc_finish) */
 
@@ -1205,7 +1205,7 @@ local int vcmpfe(cvoid **v1pp,cvoid **v2pp) noex {
 	MA_FI	*e1p = (MA_FI *) *v1pp ;
 	MA_FI	*e2p = (MA_FI *) *v2pp ;
 	return cmpfe(e1p,e2p) ;
-}
+} /* end subroutine */
 
 local bool isnotspecial(int ch) noex {
 	ch &= 255 ;
