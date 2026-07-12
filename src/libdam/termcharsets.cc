@@ -1,6 +1,6 @@
 /* termcharsets SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* miscellaneous pre-processor definitions */
 /* version %I% last-modified %G% */
