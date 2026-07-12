@@ -95,7 +95,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
