@@ -422,8 +422,8 @@ local int searchkeys_build(SK *op,mainv qsp) noex {
 	            if (rs >= 0) {
 	                rs = searchkeys_buildload(op,bip) ;
 	                c = 0 ;
-	            }
-	        } /* end if */
+	            } /* end if (ok) */
+	        } /* end if (ok) */
 	        {
 	            rs1 = searchkeys_buildfins(op,bip) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -436,22 +436,22 @@ local int searchkeys_build(SK *op,mainv qsp) noex {
 } /* end subroutine (searchkeys_build) */
 
 local int searchkeys_buildadd(SK *op,BUILD *bip,cchar *phrase) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		wc = 0 ;
 	if (BUILD_PH bpe{} ; (rs = buildphrase_start(&bpe)) >= 0) {
 	    bool	f_match = false ;
 	    bool	f_buildphrase = true ;
-	    cchar	*tp ;
 	    cchar	*sp = phrase ;
-	    while ((tp = strbrk(sp," \t,")) != nullptr) {
+	    for (cchar *tp ; (tp = strbrk(sp," \t,")) != np ; ) {
 	        if ((tp - sp) > 0) {
 		    cint tl = intconv(tp - sp) ;
 	            rs = searchkeys_buildaddword(op,&bpe,sp,tl) ;
 		}
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
-	    } /* end while */
+	    } /* end for */
 	    if ((rs >= 0) && (sp[0] != '\0')) {
 	        rs = searchkeys_buildaddword(op,&bpe,sp,-1) ;
 	    }
@@ -473,13 +473,13 @@ local int searchkeys_buildadd(SK *op,BUILD *bip,cchar *phrase) noex {
 	                rs1 = buildphrase_finish(&bpe) ;
 	                if (rs >= 0) rs = rs1 ;
 	            }
-	        } /* end if */
-	    } /* end if */
+	        } /* end if (ok) */
+	    } /* end if (ok) */
 	    if (rs < 0) {
 	        if (f_buildphrase) {
 	            buildphrase_finish(&bpe) ;
 	        }
-	    }
+	    } /* end if (error) */
 	    if (wc > 0) {
 	        op->nphrases += 1 ;
 	    }
@@ -501,14 +501,14 @@ local int searchkeys_buildaddword(SK *op,BUILD_PH *bpp,cc *wp,int wl) noex {
 	} /* end if */
 	if (rs >= 0) {
 	    rs = buildphrase_add(bpp,kp,kl) ;
-	}
+	} /* end if (ok) */
 	return rs ;
 } /* end subroutine (searchkeys_buildaddword) */
 
 local int searchkeys_buildphrasemat(SK *op,BUILD *bip,BUILD_PH *bpp) noex {
 	int		rs  = SR_FAULT ;
 	int		rs1 ;
-	int		f_match = false ;
+	int		f_match = false ; /* return-value */
 	if (op) {
 	    if (cchar *kp{} ; (rs = buildphrase_getkey(bpp,0,&kp)) > 0) {
 		vecobj	*plp = &bip->phrases ;
