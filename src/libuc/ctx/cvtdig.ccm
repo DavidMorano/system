@@ -92,7 +92,7 @@ export {
 	    ndig = ((n * CHAR_BIT) + nshift - 1) / nshift ;
 	    rs = SR_OVERFLOW ;
 	    if (ndig <= rlen) {
-	        const UT	mask = uint(b - 1) ;
+	        const UT	mask = UT(b - 1) ;
 	        for (int i = (ndig - 1) ; i >= 0 ; i -= 1) {
 		    cint	di = int(val & mask) ; /* digit-index */
 	            rbuf[i] = getdig(di) ;
