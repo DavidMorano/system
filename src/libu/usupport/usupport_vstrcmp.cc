@@ -23,7 +23,7 @@
 	Description:
 	These subroutines are suitable for the sorting of c-strings
 	using other subroutines like |qsort(3c)| or |bsearch(3c)|
-	and |vecstr_finder(3dam)|.
+	and |vecstr_finder(3uc)|.
 
 	Arguments:
 	int vstrbasecmp(cchar **,cchar **) noex
@@ -99,7 +99,7 @@ local int vstrxcmp(strxcmp_f vx,cchar **s1pp,cchar **s2pp) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rc ;
-} /* end subroutine (vstrcmpx) */
+} /* end subroutine (vstrxcmp) */
 
 
 /* local variables */
