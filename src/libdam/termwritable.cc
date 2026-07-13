@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* determine is a terminal is writable */
+/* determine if a terminal is writable */
 /* version %I% last-modified %G% */
 
 
@@ -21,16 +21,37 @@
 	termwritable
 
 	Description:
-	We determine if the terminal specified is writable or not.
+	I determine if the terminal specified is writable or not
+	for Biffing.  So I check that it is group-writable and
+	that the eXecution permission bit is set for the user
+	or group.
+
+	Synopsis:
+	int termwritable(cchar *fname) noex
+
+	Arguments:
+	fname		file-name of terminal to check
+
+	Returns:
+	>0		yes
+	==0		no
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cassert>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"termwritable.h"
 
 
 /* local defines */
@@ -63,18 +84,23 @@
 /* exported subroutines */
 
 int termwritable(cchar *fname) noex {
-	int		rs ;
-	int		n = 0 ;
-	if (USTAT sb ; (rs = u_stat(fname,&sb)) >= 0) {
-	    if (sb.st_mode & S_IWGRP) {
-	        n += 1 ;
-	        if (sb.st_mode & S_IXUSR) {
-	            n += 1 ;
-	        }
-	    }
-	}
+	int		rs = SR_FAULT ;
+	int		n = 0 ; /* return-value */
+	assert(fname) ;
+	if (fname) ylikely {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+	        if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
+	            if (sb.st_mode & S_IWGRP) {
+	                n += 1 ;
+	                if (sb.st_mode & (S_IXUSR || S_IXGRP)) {
+	                    n += 1 ;
+	                } /* user or group executable */
+	            } /* end if (group-writable) */
+	        } /* end if (u_stat) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (termwritable) */
+} /* end subroutine (termwritable) */
 
 
