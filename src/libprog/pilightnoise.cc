@@ -1,5 +1,5 @@
 /* pilightnoise SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* gather light noise */
 /* version %I% last-modified %G% */
