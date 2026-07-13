@@ -1,11 +1,11 @@
-/* logout */
+/* logout SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* log out of the system (out of the UTMP database) */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -22,31 +22,30 @@
         is to log the caller out of the UTMP database.
 
 	Synopsis:
-
-	int logout(pid_t sid)
+	int logout(pid_t sid) noex
 
 	Arguments:
-
 	sid		session ID to log-out
 
 	Returns:
-
 	0		OK
 	SR_PERM		no permission to perform function
 	SR_NOENT	session was not logged in
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<tmpx.h>		/* LIBUC */
+#include	<utmptypes.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG */
 
-#include	<sys/types.h>
-#include	<unistd.h>
-
-#include	<usystem.h>
-#include	<tmpx.h>
-#include	<localmisc.h>
+#include	"logout.h"
 
 
 /* local defines */
@@ -59,20 +58,14 @@
 #define	UTMPFNAME	"/var/adm/utmpx"
 #endif
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
+
+#define	F_UTXEXIT	(F_LINUX || F_SUNOS)
+
 
 /* external subroutines */
-
-extern int	sncpy2(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	mkutmpid(char *,int,const char *,int) ;
-extern int	idcpy(char *,const char *,int,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -86,52 +79,41 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* local variables */
 
+static cint	utx_user	= utmptype.procuser ;
+cbool		f_debug		= CF_DEBUG ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int logout(pid_t sid)
-{
-	struct utmpx	uc ;
-	struct utmpx	*up ;
+int logout(pid_t sid) noex {
+	utmpx		*up = nullptr ;
 	int		rs = SR_OK ;
-	int		si = 0 ;
-
+	int		si = 0 ; /* return-value */
+	DEBUGPRINTF("ent sid=%d\n",sid) ;
 	if (sid <= 0) sid = getsid(0) ;	/* not supposed to fail! */
-
-#if	CF_DEBUGS
-	    debugprintf("logout: sid=%d\n",sid) ;
-#endif
-
 	setutxent() ;
-
-	while ((up = getutxent()) != NULL) {
-
-	    if ((up->ut_pid == sid) && (up->ut_type == TMPX_TUSERPROC))
-	        break ;
-
+	while ((up = getutxent()) != nullptr) {
+	    if ((up->ut_pid == sid) && (up->ut_type == utx_user)) break ;
 	    si += 1 ;
-
 	} /* end while (positioning within the UTMPX file) */
-
-	if (up != NULL) {
-
-	    uc = *up ;		/* copy the record found */
-
-	    uc.ut_exit.e_termination = 0 ;
-	    uc.ut_exit.e_exit = 0 ;
-	    uc.ut_type = TMPX_TDEADPROC ;
-
+	if (up) {
+	    utmpx uc = *up ;		/* copy the record found */
+#if	F_UTXEXIT
+	        uc.ut_exit.e_termination = 0 ;
+	        uc.ut_exit.e_exit = 0 ;
+#endif /* F_UTXEXIT */
+	    uc.ut_type = utmptype.procdead ;
 	    up = pututxline(&uc) ;
-	    if (up == NULL) rs = SR_PERM ;
-
-	} else
+	    if (up == nullptr) rs = SR_PERM ;
+	} else {
 	    rs = SR_NOENT ;
-
+	}
 	endutxent() ;
-
+	DEBUGPRINTF("ret rs=%d si=%d\n",rs,si) ;
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (logout) */
+} /* end subroutine (logout) */
 
 
