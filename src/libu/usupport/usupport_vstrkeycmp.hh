@@ -1,6 +1,6 @@
 /* usupport_vstrkeycmp HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* v-string key-comparison functions */
 /* version %I% last-modified %G% */
@@ -17,6 +17,7 @@
 
 #ifndef	USUPPORTVSTRKEYCMP_INCLUDE
 #define	USUPPORTVSTRKEYCMP_INCLUDE
+#ifdef	__cplusplus	/* C++ only! */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -79,6 +80,7 @@ namespace libu {
 } /* end nanespace (libu) */
 
 
+#endif /* __cplusplus (C++ only) */
 #endif /* USUPPORTVSTRKEYCMP_INCLUDE */
 
 
