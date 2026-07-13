@@ -779,6 +779,6 @@ static int mkfile(cchar *tpat,cchar **rpp) noex {
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? tl : rs ;
 }
-/* end subroutines (mkfile) */
+/* end subroutine (mkfile) */
 
 
