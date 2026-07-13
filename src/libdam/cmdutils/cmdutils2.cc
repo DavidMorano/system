@@ -86,15 +86,6 @@ import deb ;				/* |debprintf(3u)| */
 
 /* forward references */
 
-
-/* local variables */
-
-
-/* exported variables */
-
-
-/* exported subroutines */
-
 local int	liner(int,size_t) noex ;
 
 
