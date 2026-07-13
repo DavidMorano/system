@@ -26,14 +26,15 @@
 #include	<cerrno>		/* CSTD */
 #include	<ctime>			/* CSTD |nanosleep(2)| */
 #include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstdint>		/* CSTD |uintptr_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>		/* |ustime| */
-#include	<utypealiases.h>	/* |TIMESPEC| */
-#include	<usysdefs.h>
-#include	<usysflag.h>
-#include	<timespec.h>		/* |timespec_load(3u)| */
-#include	<localmisc.h>		/* |LEQUIV| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU |ustime| */
+#include	<utypealiases.h>	/* LIBU |TIMESPEC| */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<timespec.h>		/* LIBU |timespec_load(3u)| */
+#include	<localmisc.h>		/* LIBU |LEQUIV| */
 
 #include	"usys_ucloseonexec.h"
 
