@@ -1,6 +1,6 @@
 /* usys_libstr SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* miscelllaneous (XXX) operating system support */
 /* version %I% last-modified %G% */
