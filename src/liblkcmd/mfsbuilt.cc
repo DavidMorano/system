@@ -814,7 +814,7 @@ local int mkfile(cchar *template,cchar **rpp) noex {
 
 	return (rs >= 0) ? tl : rs ;
 }
-/* end subroutines (mkfile) */
+/* end subroutine (mkfile) */
 #endif /* COMMENT */
 
 local int hasFileType(cchar *sp,int sl) noex {
