@@ -73,39 +73,33 @@ int ctocti(char *dp,int dl,int val) noex {
 	uint		uv = uint(val) ;
 	cint		n = szof(int) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-}
-/* end subroutine (ctocti) */
+} /* end subroutine (ctocti) */
 
 int ctoctl(char *dp,int dl,long val) noex {
 	ulong		uv = ulong(val) ;
 	cint		n = szof(long) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-}
-/* end subroutine (ctoctl) */
+} /* end subroutine (ctoctl) */
 
 int ctoctll(char *dp,int dl,longlong val) noex {
 	ulonglong	uv = ulonglong(val) ;
 	cint		n = szof(longlong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-}
-/* end subroutine (ctoctll) */
+} /* end subroutine (ctoctll) */
 
 int ctoctui(char *dp,int dl,uint uv) noex {
 	cint		n = szof(uint) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-}
-/* end subroutine (ctoctui) */
+} /* end subroutine (ctoctui) */
 
 int ctoctul(char *dp,int dl,ulong uv) noex {
 	cint		n = szof(ulong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-}
-/* end subroutine (ctoctul) */
+} /* end subroutine (ctoctul) */
 
 int ctoctull(char *dp,int dl,ulonglong uv) noex {
 	cint		n = szof(ulonglong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-}
-/* end subroutine (ctoctull) */
+} /* end subroutine (ctoctull) */
 
 
