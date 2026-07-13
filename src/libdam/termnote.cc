@@ -90,6 +90,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<cstring>		/* CSTD |lenstr(3c)| */
+#include	<cassert>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
@@ -297,6 +298,7 @@ cint	userterm::tdlen = TERMDEVLEN ;
 int termnote_open(TN *op,cchar *pr) noex {
 	custime		dt = getustime ;
 	int		rs ;
+	assert(op && pr) ;
 	if ((rs = termnote_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (pr[0]) ylikely {
@@ -332,6 +334,7 @@ int termnote_open(TN *op,cchar *pr) noex {
 int termnote_close(TN *op) noex {
 	int		rs ;
 	int		rs1 ;
+	assert(op) ;
 	if ((rs = termnote_magic(op)) >= 0) ylikely {
 	    if (op->open.lf) {
 	        custime		dt = getustime ;
@@ -381,6 +384,7 @@ int termnote_close(TN *op) noex {
 int termnote_printf(TN *op,cc **rpp,int n,int o,cc *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
+	assert(op) ;
 	if ((rs = termnote_magic(op,rpp,fmt)) >= 0) ylikely {
 	    va_begin(ap,fmt) ;
 	    rs = termnote_vprintf(op,rpp,n,o,fmt,ap) ;
@@ -394,6 +398,7 @@ int termnote_vprintf(TN *op,cc **rpp,int n,int o,cc *fmt,va_list ap) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
+	assert(op) ;
 	if ((rs = termnote_magic(op,rpp,fmt)) >= 0) ylikely {
 	    if (char *obuf ; (rs = mem.ml(&obuf)) >= 0) ylikely {
 		cint	olen = rs ;
@@ -410,6 +415,7 @@ int termnote_vprintf(TN *op,cc **rpp,int n,int o,cc *fmt,va_list ap) noex {
 
 int termnote_check(TN *op,time_t dt) noex {
 	int		rs ;
+	assert(op) ;
 	if ((rs = termnote_magic(op)) >= 0) ylikely {
 	    if (dt == 0) dt = getustime ;
 	    if ((dt - op->ti_check) >= TO_CHECK) {
@@ -436,6 +442,7 @@ int termnote_check(TN *op,time_t dt) noex {
 int termnote_write(TN *op,cc **rpp,int mw,int o,cc *sbuf,int slen) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
+	assert(op) ;
 	if ((rs = termnote_magic(op,rpp,sbuf)) >= 0) ylikely {
 	    if (rpp[0] != nullptr) ylikely {
 	        time_t		dt = 0 ;
