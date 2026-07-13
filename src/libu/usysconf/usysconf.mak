@@ -35,20 +35,21 @@ DEFS +=
 
 INCS += usysconf.h
 
-MODS += usysconf.o usysconfitems.o
+MODS += usysconf.o usysconfcheck.o
 
 LIBS +=
 
 
-DEPS= usysconfitems.o
+DEPS= usysconfcheck.o
 
 OBJPART=
 
 OBJPRIME= usysconf0.o
 
 OBJ0= usysconf1.o
-OBJ1= usysconfitems.o
+OBJ1= usysconfcheck.o
 OBJ2= sysconfcmds.o
+OBJ3=
 
 OBJA= obj0.o obj1.o obj2.o
 OBJB=
@@ -157,8 +158,14 @@ usysconf0.o:		usysconf.ccm				$(INCS)
 usysconf1.o:		usysconf1.cc usysconf0.o $(DEPS)	$(INCS)
 	$(COMPILE.cc) $<
 
-usysconfitems.o:	usysconfitems.ccm 			$(INCS)
+usysconfcheck.o:	usysconfcheck0.o usysconfcheck1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+usysconfcheck0.o:	usysconfcheck.ccm usysconfcheck.hh	$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
+usysconfcheck1.o:	usysconfcheck1.cc usysconfcheck0.o	$(INCS)
+	$(COMPILE.cc) $<
 
 sysconfcmds.o:		sysconfcmds.cc	sysconfcmds.h		$(INCS)
 
