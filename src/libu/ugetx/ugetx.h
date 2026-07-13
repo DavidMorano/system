@@ -27,6 +27,8 @@
 #include	<getenver.h>
 #include	<getev.h>
 #include	<getourenv.h>
+#include	<getusmtime.hh>
+#include	<getustime.hh>
 
 
 #endif /* UGETX_INCLUDE */
