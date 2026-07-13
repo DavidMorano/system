@@ -1,5 +1,5 @@
 /* gettimeofday */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* this is the intercept for the UNIX® System |gettimeofday(3c)| call */
 /* version %I% last-modified %G% */
