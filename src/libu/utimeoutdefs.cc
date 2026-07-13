@@ -1,6 +1,6 @@
 /* utimeoutdefs SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 (MUST be C-lang) */
+/* lang=C++20 (MUST be C-lang) */
 
 /* manage UNIX® kernal-call (and std-c library) timeouts */
 /* version %I% last-modified %G% */
