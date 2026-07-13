@@ -1,6 +1,6 @@
 /* uopenbase HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UNIX® support for opening files or devices */
 /* version %I% last-modified %G% */
@@ -33,7 +33,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>
 #include	<usysbase.h>
-
 
 
 #endif /* __cplusplus */
