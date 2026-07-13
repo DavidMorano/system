@@ -27,13 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<iconv.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usyscalls.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<iconv.h>		/* ?? */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uiconv.h"
 
@@ -90,7 +92,7 @@ template<typename ... Args>
 local inline int uiconv_magic(uiconv *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == UICONV_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == UICONV_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (uiconv_magic) */
@@ -122,7 +124,7 @@ int uiconv_open(uiconv *op,cchar *tsp,cchar *fsp) noex {
 	        if (ic_t *cdp ; (cdp = new(nt) iconv_t) != np) ylikely {
 		    op->cdp = cdp ;
 	            if ((rs = uiconv_libopen(op,tsp,fsp)) >= 0) ylikely {
-	                op->magic = UICONV_MAGIC ;
+	                op->magval = UICONV_MAGIC ;
 	            }
 	            if (rs < 0) {
 			cdp = iconvp(op->cdp) ;
@@ -133,11 +135,10 @@ int uiconv_open(uiconv *op,cchar *tsp,cchar *fsp) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		uiconv_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (uiconv_ctor) */
 	return rs ;
-}
-/* end subroutine (uiconv_open) */
+} /* end subroutine (uiconv_open) */
 
 int uiconv_close(uiconv *op) noex {
 	int		rs ;
@@ -156,11 +157,10 @@ int uiconv_close(uiconv *op) noex {
 		rs1 = uiconv_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uiconv_close) */
+} /* end subroutine (uiconv_close) */
 
 int uiconv_trans(uiconv *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 	int		rs ;
@@ -188,8 +188,7 @@ int uiconv_trans(uiconv *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uiconv_trans) */
+} /* end subroutine (uiconv_trans) */
 
 
 /* private subroutines */
@@ -224,8 +223,7 @@ local int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
 	    } until ((rs >= 0) || f_exit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uiconv_libopen) */
+} /* end subroutine (uiconv_libopen) */
 
 local int uiconv_libclose(uiconv *op) noex {
 	iconv_t		*cdp = iconvp(op->cdp) ;
@@ -236,7 +234,6 @@ local int uiconv_libclose(uiconv *op) noex {
 	    }
 	} until (rs != SR_INTR) ;
 	return rs ;
-}
-/* end subroutine (uiconv_close) */
+} /* end subroutine (uiconv_close) */
 
 
