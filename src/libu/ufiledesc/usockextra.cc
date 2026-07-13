@@ -35,15 +35,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>		/* |uintptr_t| */
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ufiledescbase.hh"
 #include	"usockextra.h"
@@ -97,8 +97,7 @@ int u_linger(int fd,int to) noex {
 	    } /* end if (socket) */
 	} /* end if (stat) */
 	return rs ;
-}
-/* end subroutine (u_linger) */
+} /* end subroutine (u_linger) */
 
 
 /* local subroutines */
