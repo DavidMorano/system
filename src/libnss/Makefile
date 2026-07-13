@@ -88,11 +88,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).so:		$(OBJ_LIBNSS)
-	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ_LIBNSS) $(RUNINFO) $(LIBINFO)
+	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(RUNINFO) $(LIBINFO)
 
 $(T).o:			$(OBJ_LIBNSS)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LIBNSS)
