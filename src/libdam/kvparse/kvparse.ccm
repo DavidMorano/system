@@ -1,0 +1,96 @@
+/* kvparse MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* key-value parsing */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2011-05-18, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+	= 2011-05-18, David A­D­ Morano
+	I converted this to a C++ module (new w/ C++20).
+
+*/
+
+/* Copyright © 2011,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Object:
+	kvparse
+
+	Description:
+	This object parses a simple string into a key-value pair.
+	The result of the parse is stored in the object as two
+	pointer-length pairs.
+
+	Synopsis:
+	kvparse(cchar *sp,int sl) noex
+
+	Arguments:
+	sp		source array of integers
+	sl		length of source array
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+
+export module kvparse ;
+
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* forwards references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+export {
+    struct kvparse {
+	cchar		*keyp ;
+	cchar		*valp ;
+	int		keyl ;
+	int		vall ;
+	void initvars() noex {
+	    keyp = nullptr ;
+	    valp = nullptr ;
+	    keyl = 0 ;
+	    vall = 0 ;
+	} ; /* end method */
+	kvparse() noex {
+	    initvars() ;
+	} ; /* end ctor */
+        int extract(cchar *,int) noex ;
+	destruct kvparse() {
+	    initvars() ;
+	} ; /* end dtor */
+    } ; /* end struct (kvparse) */
+} /* end export */
+
+
