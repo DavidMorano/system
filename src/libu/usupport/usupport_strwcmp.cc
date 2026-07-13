@@ -46,13 +46,13 @@
 #include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usupport.h>
-#include	<stdclib.hh>		/* |std_strncasecmp(3u)| */
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<stdclib.hh>		/* LIBU |std_strncasecmp(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usupport_strncmp.hh"
 #include	"usupport_strwcmp.hh"
@@ -146,15 +146,15 @@ namespace libu {
     int strwbasecmp(cchar *s1,cchar *s2,int s2len) noex {
 	basecmpx co ;
 	return co.x(s1,s2,s2len) ;
-    } /* end subroutine (strwbasecmpx) */
+    } /* end subroutine (strwbasecmp) */
     int strwcasecmp(cchar *s1,cchar *s2,int s2len) noex {
 	casecmpx co ;
 	return co.x(s1,s2,s2len) ;
-    } /* end subroutine (strwcasecmpx) */
+    } /* end subroutine (strwcasecmp) */
     int strwfoldcmp(cchar *s1,cchar *s2,int s2len) noex {
 	foldcmpx co ;
 	return co.x(s1,s2,s2len) ;
-    } /* end subroutine (strwfoldcmpx) */
+    } /* end subroutine (strwfoldcmp) */
 } /* end namespace (libu) */
 
 
