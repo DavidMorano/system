@@ -1,6 +1,6 @@
 /* uinet SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* Internet-Address functions */
 /* version %I% last-modified %G% */
