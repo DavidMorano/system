@@ -1,4 +1,4 @@
-/* configfile HEADER */
+/* configfile HEADER (Configuration File) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -34,42 +34,42 @@ struct configfile_head {
 	void		*dlp ;		/* list-pointer variables defined */
 	void		*elp ;		/* list-pointer variables ENV set */
 	void		*ulp ;		/* list-pointer variables ENV un-set */
-	char	*root ;			/* program root */
-	char	*tmpdir ;		/* environment variable */
-	char	*logfname ;		/* log file name */
-	char	*workdir ;		/* working directory */
-	char	*directory ;		/* directory */
-	char	*user ;			/* default username */
-	char	*group ;		/* default groupname */
-	char	*pidfname ;		/* traditionally hold PID */
-	char	*lockfname ;		/* lock file */
-	char	*interrupt ;
-	char	*polltime ;
-	char	*filetime ;
-	char	*port ;			/* port to listen on */
-	char	*userpass ;		/* user password file */
-	char	*machpass ;		/* machine password file */
-	char	*srvtab ;		/* SRVTAB */
-	char	*sendmail ;		/* SENDMAIL program path */
-	char	*envfname ;		/* environment file */
-	char	*pathfname ;		/* PATH file */
-	char	*devicefname ;		/* daemon device file path */
-	char	*seedfname ;		/* seed file path */
-	char	*logsize ;		/* default target log length */
-	char	*organization ;
-	char	*timeout ;
-	char	*removemul ;		/* remove multiplier */
-	char	*acctab ;		/* access table file */
-	char	*paramfname ;		/* parameter file */
-	char	*nrecips ;		/* number of recips at a time */
-	char	*helpfname ;
-	char	*statfname ;		/* status file name */
-	char	*passfname ;		/* pass-FD file name */
-	char	*eigenfname ;
-	char	*options ;
-	char	*interval ;		/* poll interval */
-	char	*stampdir ;		/* timestamp directory */
-	char	*maxjobs ;		/* maximum jobs */
+	cchar	*root ;			/* program root */
+	cchar	*tmpdir ;		/* environment variable */
+	cchar	*logfname ;		/* log file name */
+	cchar	*workdir ;		/* working directory */
+	cchar	*directory ;		/* directory */
+	cchar	*user ;			/* default username */
+	cchar	*group ;		/* default groupname */
+	cchar	*pidfname ;		/* traditionally hold PID */
+	cchar	*lockfname ;		/* lock file */
+	cchar	*interrupt ;
+	cchar	*polltime ;
+	cchar	*filetime ;
+	cchar	*port ;			/* port to listen on */
+	cchar	*userpass ;		/* user password file */
+	cchar	*machpass ;		/* machine password file */
+	cchar	*srvtab ;		/* SRVTAB */
+	cchar	*sendmail ;		/* SENDMAIL program path */
+	cchar	*envfname ;		/* environment file */
+	cchar	*pathfname ;		/* PATH file */
+	cchar	*devicefname ;		/* daemon device file path */
+	cchar	*seedfname ;		/* seed file path */
+	cchar	*logsize ;		/* default target log length */
+	cchar	*organization ;
+	cchar	*timeout ;
+	cchar	*removemul ;		/* remove multiplier */
+	cchar	*acctab ;		/* access table file */
+	cchar	*paramfname ;		/* parameter file */
+	cchar	*nrecips ;		/* number of recips at a time */
+	cchar	*helpfname ;
+	cchar	*statfname ;		/* status file name */
+	cchar	*passfname ;		/* pass-FD file name */
+	cchar	*eigenfname ;
+	cchar	*options ;
+	cchar	*interval ;		/* poll interval */
+	cchar	*stampdir ;		/* timestamp directory */
+	cchar	*maxjobs ;		/* maximum jobs */
 	CONFIGFILE_FL	fl ;
 	uint		magval ;	/* magic number */
 	int	badline ;		/* line number of bad thing */
