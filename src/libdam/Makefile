@@ -880,6 +880,11 @@ keyopt.o:		keyopt.dir
 keyopt.dir:
 	makesubdir $@
 
+# KVPARSE
+kcparse.o:		kvparse.dir
+kvparse.dir:
+	makesubdir $@
+
 fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
