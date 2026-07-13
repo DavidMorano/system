@@ -29,16 +29,17 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* <- |mode_t| */
-#include	<sys/wait.h>		/* <- type |idtype_t| is there */
-#include	<sys/time.h>		/* <- |TIMESPEC| is there */
-#include	<signal.h>		/* <- |SIGEVENT| */
-#include	<pthread.h>
-#include	<time.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<sys/types.h>		/* POSIX® |mode_t| */
+#include	<sys/wait.h>		/* POSIX® type |idtype_t| is there */
+#include	<sys/time.h>		/* POSIX® |TIMESPEC| is there */
+#include	<pthread.h>		/* POSIX® */
+#include	<time.h>		/* CSTD */
+#include	<signal.h>		/* CSTD |SIGEVENT| */
+#include	<stdint.h>		/* CSTD |uintptr_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #ifndef	MQATTR
