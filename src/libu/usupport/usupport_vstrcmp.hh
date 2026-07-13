@@ -1,6 +1,6 @@
 /* usupport_vstrcmp HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* USUPPORT v-string comparison (w/ various cases) */
 /* version %I% last-modified %G% */
@@ -17,6 +17,7 @@
 
 #ifndef	USUPPORTVSTRCMP_INCLUDE
 #define	USUPPORTVSTRCMP_INCLUDE
+#ifdef	__cplusplus	/* C++ only! */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -79,6 +80,7 @@ namespace libu {
 } /* end namespace (libc) */
 
 
+#endif /* __cplusplus (C++ only) */
 #endif /* USUPPORTVSTRCMP_INCLUDE */
 
 
