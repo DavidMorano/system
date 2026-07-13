@@ -90,7 +90,7 @@ module ;
 
 module usysconf ;
 
-import usysconfitems ;
+import usysconfcheck ;			/* cache item check */
 
 /* local defines */
 
@@ -137,7 +137,7 @@ namespace {
 	int getstr	(int) noex ;
 	int getvalsys	(int) noex ;
 	int synthetic	(int) noex ;
-	int getvalcache	(int) noex ;
+	int getvalcache	(int,int) noex ;
 	int callstd	(int) noex ;
 	int getdefmsg	() noex ;
 	int getdefzoneinfo() noex ;
@@ -169,13 +169,10 @@ extern "C" {
     int u_sysconfval(int cmd,long *rp) noex {
         return usysconfval(cmd,rp) ;
     }
-}
-
-extern "C" {
     int u_sysconfstr(int cmd,char *rbuf,int rlen) noex {
         return usysconfstr(cmd,rbuf,rlen) ;
     }
-}
+} /* end extern (C) */
 
 
 extern "C++" {
@@ -222,105 +219,29 @@ int usysconf::getstr(int req) noex {
 } /* end subroutine (usysconf::getstr) */
 
 int usysconf::getval(int req) noex {
-    	int		rs = SR_OK ;
+        cint            rsn = SR_NOTFOUND ;
+    	int		rs ;
 	DPRINTF("ent\n") ;
-	switch (req) {
-	case _SC_PAGESIZE:
-	case _SC_PID_MAX:
-	case _SC_ARG_MAX:
-	case _SC_LINE_MAX:
-	case _SC_LINK_MAX:
-	case _SC_LOGIN_NAME_MAX:	/* name */
-	case _SC_NGROUPS_MAX:
-	case _SC_SYMLOOP_MAX:
-	case _SC_SYMBOL_MAX:		/* name */
-        case _SC_NAME_MAX:
-        case _SC_PATH_MAX:
-	case _SC_NODENAME_MAX:		/* name */
-	case _SC_USERNAME_MAX:		/* name */
-	case _SC_GROUPNAME_MAX:		/* name */
-	case _SC_PROJECTNAME_MAX:	/* name */
-	case _SC_PROTNAME_MAX:		/* name */
-	case _SC_NETWNAME_MAX:		/* name */
-	case _SC_HOSTNAME_MAX:		/* name */
-	case _SC_SERVNAME_MAX:		/* name */
-	case _SC_UTMPENT_SIZE_MAX:	/* entry */
-	case _SC_GETPW_R_SIZE_MAX:	/* entry */
-	case _SC_GETSP_R_SIZE_MAX:	/* entry */
-	case _SC_GETUA_R_SIZE_MAX:	/* entry */
-	case _SC_GETGR_R_SIZE_MAX:	/* entry */
-	case _SC_GETPJ_R_SIZE_MAX:	/* entry */
-	case _SC_GETPR_R_SIZE_MAX:	/* entry */
-	case _SC_GETNW_R_SIZE_MAX:	/* entry */
-	case _SC_GETHO_R_SIZE_MAX:	/* entry */
-	case _SC_GETSV_R_SIZE_MAX:	/* entry */
-	case _SC_MSG_MAX:
-	case _SC_FSTYPE:
-	case _SC_TZNAME_MAX:
-	case _SC_CLK_TCK:
-	    rs = getvalcache(req) ;
-	    break ;
-	default:
+        if ((rs = getci(req)) >= 0) {
+            rs = getvalcache(req,rs) ;
+        } else if (rs == rsn) {
 	    rs = getvalsys(req) ;
-	    break ;
 	} /* end switch */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method (usysconf::getval) */
 
-int usysconf::getvalcache(int req) noex {
-	int		rs = SR_OK ;
-	int		ii = -1 ;
-	DPRINTF("ent\n") ;
-	switch (req) {
-	case _SC_PAGESIZE:		ii = dataitem_pagesz ; 		break ;
-	case _SC_PID_MAX:		ii = dataitem_maxpid ; 		break ;
-	case _SC_ARG_MAX:		ii = dataitem_maxarg ; 		break ;
-	case _SC_LINE_MAX:		ii = dataitem_maxline ; 	break ;
-	case _SC_LINK_MAX:		ii = dataitem_maxlink ; 	break ;
-	case _SC_LOGIN_NAME_MAX:	ii = dataitem_maxlogin ; 	break ;
-	case _SC_NGROUPS_MAX:		ii = dataitem_maxgroups ; 	break ;
-	case _SC_SYMLOOP_MAX:		ii = dataitem_symlinks ;	break ;
-	case _SC_SYMBOL_MAX:		ii = dataitem_maxsymbol ;	break ;
-	case _SC_NAME_MAX:		ii = dataitem_maxnamelen ;	break ;
-	case _SC_PATH_MAX:		ii = dataitem_maxpathlen ;	break ;
-	case _SC_NODENAME_MAX:		ii = dataitem_maxnodename ; 	break ;
-	case _SC_USERNAME_MAX:		ii = dataitem_maxusername ; 	break ;
-	case _SC_GROUPNAME_MAX:		ii = dataitem_maxgroupname ; 	break ;
-	case _SC_PROJECTNAME_MAX:	ii = dataitem_maxprojectname ; 	break ;
-	case _SC_PROTNAME_MAX:		ii = dataitem_maxprot ; 	break ;
-	case _SC_NETWNAME_MAX:		ii = dataitem_maxnetw ; 	break ;
-	case _SC_HOSTNAME_MAX:		ii = dataitem_maxhost ; 	break ;
-	case _SC_SERVNAME_MAX:		ii = dataitem_maxserv ; 	break ;
-	case _SC_UTMPENT_SIZE_MAX:	ii = dataitem_maxentut ;	break ;
-	case _SC_GETPW_R_SIZE_MAX:	ii = dataitem_maxentpw ;	break ;
-	case _SC_GETSP_R_SIZE_MAX:	ii = dataitem_maxentsp ;	break ;
-	case _SC_GETUA_R_SIZE_MAX:	ii = dataitem_maxentua ;	break ;
-	case _SC_GETGR_R_SIZE_MAX:	ii = dataitem_maxentgr ;	break ;
-	case _SC_GETPJ_R_SIZE_MAX:	ii = dataitem_maxentpj ;	break ;
-	case _SC_GETPR_R_SIZE_MAX:	ii = dataitem_maxentpr ;	break ;
-	case _SC_GETNW_R_SIZE_MAX:	ii = dataitem_maxentnw ;	break ;
-	case _SC_GETHO_R_SIZE_MAX:	ii = dataitem_maxentho ;	break ;
-	case _SC_GETSV_R_SIZE_MAX:	ii = dataitem_maxentsv ;	break ;
-	case _SC_MSG_MAX:		ii = dataitem_maxmsg ; 		break ;
-	case _SC_FSTYPE:		ii = dataitem_maxfstype ;	break ;
-	case _SC_TZNAME_MAX:		ii = dataitem_maxtzname ; 	break ;
-	case _SC_CLK_TCK:		ii = dataitem_clk ; 		break ;
-	    break ;
-	default:
-	    rs = SR_BUGCHECK ;
-	    break ;
-	} /* end switch */
-	if ((rs >= 0) && (ii >= 0)) {
-	    if ((rs = udata.d[ii].load(memord_relaxed)) == 0) {
+int usysconf::getvalcache(int req,int ci) noex {
+	int		rs ;
+	DPRINTF("ent req=%d ci=%dn",req,ci) ;
+	    if ((rs = udata.d[ci].load(memord_relaxed)) == 0) {
 		if ((rs = getvalsys(req)) > 0) {
-		    udata.d[ii].store(rs,memord_relaxed) ;
+		    udata.d[ci].store(rs,memord_relaxed) ;
 		}
 	    } /* end if (filling cache) */
 	    if (rs >= 0) {
 		if (lp) *lp = long(rs) ;
 	    } /* end if (result) */
-	} /* end if */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (usysconf::getvalcache) */
