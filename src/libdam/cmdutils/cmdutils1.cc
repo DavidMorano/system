@@ -67,12 +67,6 @@ using libu::matocasestr ;		/* |matocasestr(3u)| */
 
 /* local variables */
 
-
-/* exported variables */
-
-
-/* exported subroutines */
-
 constexpr cpcchar	hits[] = {
 	"0",
 	"1",
