@@ -1,6 +1,6 @@
 /* usupport_siwhtx HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* find a character or white-space */
 /* version %I% last-modified %G% */
@@ -17,6 +17,7 @@
 
 #ifndef	USUPPORTSIWHTX_INCLUDE
 #define	USUPPORTSIWHTX_INCLUDE
+#ifdef	__cplusplus	/* C++ only! */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -30,6 +31,7 @@ namespace libu {
 } /* end namespace (libu) */
 
 
+#endif /* __cplusplus (C++ only) */
 #endif /* USUPPORTSIWHTX_INCLUDE */
 
 
