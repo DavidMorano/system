@@ -44,7 +44,7 @@
 struct termnote_flags {
 	uint		tx:1 ;
 	uint		lf:1 ;
-} ;
+} ; /* end struct */
 
 struct termnote_head {
 	ids		*idp ;
@@ -61,7 +61,7 @@ struct termnote_head {
 	uint		magval ;
 	int		sn ;		/* serial-number */
 	char		logid[LOGIDLEN+1] ;
-} ;
+} ; /* end struct */
 
 typedef TERMNOTE	termnote ;
 typedef TERMNOTE_FL	termnote_fl ;
