@@ -8,22 +8,20 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<limits.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
 
-#include	<localmisc.h>
-
-
-/* service name */
-#ifndef	SVCNAMELEN
+#ifndef	SVCNAMELEN	/* service name */
 #define	SVCNAMELEN	32
 #endif
 
-#define	MUXIMSG_REASONLEN	100
 #define	MUXIMSG_SVCLEN		MAX(SVCNAMELEN,32)
 #define	MUXIMSG_CMDLEN		MAX(SVCNAMELEN,32)
+#define	MUXIMSG_REASONLEN	100
 #define	MUXIMSG_LNAMELEN	MAXNAMELEN
 #define	MUXIMSG_LADDRLEN	(MAXPATHLEN + 20)
 
@@ -35,34 +33,34 @@ struct muximsg_response {
 	uint	pid ;
 	uchar	msgtype ;		/* message type */
 	uchar	rc ;
-} ;
+} ; /* end struct */
 
 struct muximsg_noop {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 struct muximsg_passfd {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
 	char	svc[MUXIMSG_SVCLEN + 1] ;
-} ;
+} ; /* end struct */
 
 struct muximsg_exit {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
 	char	reason[MUXIMSG_REASONLEN + 1] ;
-} ;
+} ; /* end struct */
 
 /* request to parent server */
 struct muximsg_getsysmisc {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 /* response to sub-server */
 struct muximsg_sysmisc {
@@ -75,13 +73,13 @@ struct muximsg_sysmisc {
 	uint	nproc ;
 	uchar	rc ;
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 struct muximsg_getloadave {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 struct muximsg_loadave {
 	uint	msglen ;
@@ -91,7 +89,7 @@ struct muximsg_loadave {
 	uint	la_15min ;
 	uchar	msgtype ;		/* message type */
 	uchar	rc ;
-} ;
+} ; /* end struct */
 
 struct muximsg_reploadave {
 	uint	msglen ;
@@ -103,7 +101,7 @@ struct muximsg_reploadave {
 	ushort	addrport ;		/* used for UDP response */
 	uint	addrhost[4] ;		/* used for UDP response */
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 /* request listener information */
 struct muximsg_getlistener {
@@ -111,7 +109,7 @@ struct muximsg_getlistener {
 	uint	tag ;
 	uint	idx ;			/* listener index */
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 /* listener information (response) */
 struct muximsg_listener {
@@ -124,18 +122,18 @@ struct muximsg_listener {
 	uchar	ls ;			/* listener status */
 	char	name[MUXIMSG_LNAMELEN + 1] ;
 	char	addr[MUXIMSG_LADDRLEN + 1] ;
-} ;
+} ; /* end struct */
 
 struct muximsg_mark {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 struct muximsg_unknown {
 	uint	msglen ;
 	uchar	msgtype ;
-} ;
+} ; /* end struct */
 
 /* request help information */
 struct muximsg_gethelp {
@@ -143,7 +141,7 @@ struct muximsg_gethelp {
 	uint	tag ;
 	uint	idx ;			/* help index */
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 /* help information (response) */
 struct muximsg_help {
@@ -154,14 +152,14 @@ struct muximsg_help {
 	uchar	msgtype ;		/* message type */
 	uchar	rc ;
 	char	name[MUXIMSG_LNAMELEN + 1] ;
-} ;
+} ; /* end struct */
 
 struct muximsg_cmd {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
 	char	cmd[MUXIMSG_CMDLEN + 1] ;
-} ;
+} ; /* end struct */
 
 /* message types */
 enum muximsgtypes {
@@ -182,7 +180,7 @@ enum muximsgtypes {
 	muximsgtype_help,
 	muximsgtype_cmd,		/* 15 */
 	muximsgtype_overlast
-} ;
+} ; /* end enum */
 
 /* response codes */
 enum muximsgrcs {
@@ -193,14 +191,9 @@ enum muximsgrcs {
 	muximsgrc_error,
 	muximsgrc_overflow,
 	muximsgrc_overlast
-} ;
+} ; /* end enum */
 
-
-#if	(! defined(MUXIMSG_MASTER)) || (MUXIMSG_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int muximsg_response(struct muximsg_response *,int,char *,int) ;
 extern int muximsg_noop(struct muximsg_noop *,int,char *,int) ;
@@ -220,11 +213,8 @@ extern int muximsg_gethelp(struct muximsg_gethelp *,int,char *,int) ;
 extern int muximsg_help(struct muximsg_help *,int,char *,int) ;
 extern int muximsg_cmd(struct muximsg_cmd *,int,char *,int) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* MUXIMSG_MASTER */
 
 #endif /* MUXIMSG_INCLUDE */
 
