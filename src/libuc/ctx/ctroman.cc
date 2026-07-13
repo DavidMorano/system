@@ -114,41 +114,35 @@ constexpr cchar		*ones[] = {
 int ctromani(char *dbuf,int dlen,int v) noex {
 	ulonglong	ulv = (ulonglong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
-}
-/* end subroutine (ctromani) */
+} /* end subroutine (ctromani) */
 
 int ctromanl(char *dbuf,int dlen,long v) noex {
 	ulonglong	ulv = (ulonglong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
-}
-/* end subroutine (ctromanl) */
+} /* end subroutine (ctromanl) */
 
 int ctromanll(char *dbuf,int dlen,longlong v) noex {
 	ulonglong	ulv = (longlong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
-}
-/* end subroutine (ctromanll) */
+} /* end subroutine (ctromanll) */
 
 /* unsigned */
 int ctromanui(char *dbuf,int dlen,uint v) noex {
 	ulonglong	ulv = ulonglong(v) ;
 	return ictroman(dbuf,dlen,ulv) ;
-}
-/* end subroutine (ctromanui) */
+} /* end subroutine (ctromanui) */
 
 /* unsigned */
 int ctromanul(char *dbuf,int dlen,ulong v) noex {
 	ulonglong	ulv = ulonglong(v) ;
 	return ictroman(dbuf,dlen,ulv) ;
-}
-/* end subroutine (ctromanul) */
+} /* end subroutine (ctromanul) */
 
 /* unsigned */
 int ctromanull(char *dbuf,int dlen,ulonglong v) noex {
 	ulonglong	ulv = ulonglong(v) ;
 	return ictroman(dbuf,dlen,ulv) ;
-}
-/* end subroutine (ctromanull) */
+} /* end subroutine (ctromanull) */
 
 
 /* local subroutines */
