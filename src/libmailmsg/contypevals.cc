@@ -1,6 +1,6 @@
 /* contypevals SUPPORT (for Email) */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* email content-type values */
 /* version %I% last-modified %G% */
