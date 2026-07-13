@@ -1,6 +1,6 @@
 /* usys_strtox SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* miscelllaneous (XXX) operating system support */
 /* version %I% last-modified %G% */
@@ -45,10 +45,11 @@ sint	strtosi(cchar *s,char **endpp,int b) noex {
 	errno_t		ec = 0 ;
 	if (s) {
 	    if (s[0]) {
-	        clong		v = strtol(s,endpp,b) ;
+	        clong	v = strtol(s,endpp,b) ;
 	        if (errno == 0) {
 	            ulong	uv = ulong(v) ;
 	            cint	nb = nbits<long> ;
+		    res = intconv(v) ;
 	            {
 	                cbool	fneg = bit(v,(nb - 1)) ;
 		        if (fneg) {	/* test negative value */
