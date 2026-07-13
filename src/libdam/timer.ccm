@@ -31,15 +31,16 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++| */
-#include	<utility>
-#include	<functional>
-#include	<stdexcept>
-#include	<usystem.h>
-#include	<timeout.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++| */
+#include	<utility>		/* C++STD */
+#include	<functional>		/* C++STD */
+#include	<stdexcept>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<timeout.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module timer ;
 
@@ -103,12 +104,12 @@ export {
 		if (rs >= 0) {
 		    custime	valabs = (dt + valint) ;
 		    rs = timeout_load(&to,valabs,np,np,tag,arg) ;
-		}
+		} /* end if (ok) */
 	    } else {
 		rs = SR_INVALID ;
 	    }
 	    return rs ;
-	} ;
+	} ; /* end method */
 	int cancel() {
 	    int		rs = SR_OK ;
 	    if (f_running) {
@@ -117,7 +118,7 @@ export {
 		rs = uc_timeout(cmd,&to) ;
 	    }
 	    return rs ;
-	} ;
+	} ; /* end method */
     } ; /* end struct (timer) */
 } /* end export */
 
