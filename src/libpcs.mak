@@ -49,7 +49,7 @@ OBJ03= pcsgetdate.o pcsgetorg.o
 OBJ04= pcsconf.o pcsunodes.o
 OBJ05= mkdirlist.o dirshown.o
 OBJ06= artlist.o article.o monthname.o
-OBJ07= datestr_envelope.o datestr_header.o
+OBJ07=
 
 OBJ08= pcsgetfacility.o pcsmailcheck.o
 OBJ09= errfile.o hmatch.o mheader.o
@@ -61,7 +61,7 @@ OBJ14=
 OBJ15=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
-OBJB= obj04.o obj05.o obj06.o obj07.o
+OBJB= obj04.o obj05.o obj06.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD=
 
@@ -69,8 +69,7 @@ OBJ= obja.o objb.o objc.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(EUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -113,11 +112,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
@@ -223,9 +222,6 @@ pcsgetdate.o:		pcsgetdate.cc	pcsgetdate.h		$(INCS)
 pcsgetorg.o:		pcsgetorg.cc	pcsgetorg.h		$(INCS)
 pcsmailcheck.o:		pcsmailcheck.cc	pcsmailcheck.h		$(INCS)
 
-datestr_envelope.o:	datestr_envelope.cc	datestr.h	$(INCS)
-datestr_header.o:	datestr_header.cc	datestr.h	$(INCS)
-
 pcsgetfacility.o:	pcsgetfacility.cc	pcsgetfacility.h	$(INCS)
 
 monthname.o:		monthname.cc	monthname.h			$(INCS)
@@ -235,7 +231,7 @@ mheader.o:		mheader.cc	mheader.h	$(DEPS)		$(INCS)
 
 # modules
 pcsutil.o:		pcsutil.ccm					$(INCS)
-	makemodule $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 	touchr $(*).h $<
 
 
