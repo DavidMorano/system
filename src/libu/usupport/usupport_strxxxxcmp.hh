@@ -1,6 +1,6 @@
 /* usupport_strxxxxcmp HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* USUPPORT compare c-strings w/ various case insensitivities */
 /* version %I% last-modified %G% */
@@ -17,6 +17,7 @@
 
 #ifndef	USUPPORTSTRXXXXCMP_INCLUDE
 #define	USUPPORTSTRXXXXCMP_INCLUDE
+#ifdef	__cplusplus	/* C++ only! */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -74,6 +75,7 @@ namespace libu {
 } /* end namespace (libu) */
 
 
+#endif /* __cplusplus (C++ only) */
 #endif /* USUPPORTSTRXXXXCMP_INCLUDE */
 
 
