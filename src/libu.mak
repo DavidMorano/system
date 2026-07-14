@@ -92,7 +92,7 @@ OBJ35= utmptypes.o utmpsizes.o ascii.o
 
 OBJ36= mapex.o deb.o
 OBJ37= syspredefined.o
-OBJ38= typecodes.o
+OBJ38= typecodes.o charnames.o
 OBJ39=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -609,8 +609,8 @@ ischx.o:		ischx0.o ischx1.o
 ischx0.o:		ischx.ccm	ischx.hh			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-ischx1.o:		ischx1.cc	ischx0.o	ischx.hh	$(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $^
+ischx1.o:		ischx1.cc	ischx0.o			$(INCS)
+	$(COMPILE.cc) $<
 
 udiv.o:			udiv.ccm	udiv.hh				$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
@@ -632,6 +632,7 @@ localmisc.o:		localmisc.cc		localmisc.h		$(INCS)
 mapex.o:		mapex.cc		mapex.h			$(INCS)
 sysconfcmds.o:		sysconfcmds.cc		sysconfcmds.h		$(INCS)
 ascii.o:		ascii.cc		ascii.h			$(INCS)
+charnames.o:		charnames.cc		charnames.h		$(INCS)
 syspredefined.o:	syspredefined.cc	syspredefined.h		$(INCS)
 
 
