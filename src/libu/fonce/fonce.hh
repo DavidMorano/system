@@ -1,6 +1,6 @@
 /* fonce HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* File-Once management */
 /* version %I% last-modified %G% */
@@ -17,6 +17,7 @@
 
 #ifndef	FONCE_INCLUDE
 #define	FONCE_INCLUDE
+#ifdef	__cplusplus	/* C++ only! */
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -24,6 +25,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
+#endif /* __cplusplus (C++ only) */
 #endif /* FONCE_INCLUDE */
 
 
