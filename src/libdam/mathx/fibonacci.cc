@@ -119,15 +119,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cmath>			/* |floor(3m++)| + |sqrt(3c++)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cmath>			/* CSTD |floor(3m++)| + |sqrt(3c++)| */
 #include	<numbers>		/* C++20 math constants */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"binexp.h"
 #include	"fibonacci.h"
@@ -187,8 +187,7 @@ template<typename T> static T fibonaccix(int n) noex {
 	    } /* end if */
 	}
 	return res ;
-}
-/* end subroutine-template (fibonaccix) */
+} /* end subroutine-template (fibonaccix) */
 
 
 /* local variables */
@@ -208,8 +207,7 @@ long fibonacci(int n) noex {
 	    res = fibonacci(n - 1) * fibonacci(n - 2) ;
 	}
 	return res ;
-}
-/* end subroutine (fibonacci) */
+} /* end subroutine (fibonacci) */
 
 double		fibonaccid(int n) noex {
     	return fibonaccix<double>(n) ;
