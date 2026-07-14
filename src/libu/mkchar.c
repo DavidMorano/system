@@ -1,6 +1,6 @@
 /* mkchar SUPPORT (LIBU) */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make a character-type value (8-bit) returning an integer */
 /* version %I% last-modified %G% */
