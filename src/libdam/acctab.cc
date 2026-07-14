@@ -72,8 +72,8 @@
 #include	<ucfileop.h>		/* LIBUC */
 #include	<absfn.h>		/* LIBUC */
 #include	<linebuffer.h>		/* LIBUC */
-#include	<field.h>		/* LIBUC */
 #include	<fieldterminit.hh>	/* LIBUC */
+#include	<field.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
