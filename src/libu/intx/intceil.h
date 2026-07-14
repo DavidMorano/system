@@ -20,13 +20,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |off_t| + |size_t| */
-#include	<stdint.h>		/* |intptr_t| + |uintptr_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
+#include	<sys/types.h>		/* POSIX® |off_t| + |size_t| */
+#include	<stdint.h>		/* CSTD |intptr_t| + |uintptr_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
