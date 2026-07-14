@@ -1,6 +1,6 @@
 /* syspredefined SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* predefined variables in the various operating systems */
 /* version %I% last-modified %G% */
