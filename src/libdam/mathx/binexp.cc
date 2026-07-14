@@ -46,14 +46,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cmath>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cmath>			/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"binexp.h"
 
@@ -109,8 +109,7 @@ template<typename T> static T binexpx(T x,int n) noex {
 	    } /* end switch */
 	}
 	return res ;
-}
-/* end subroutine-template (binexpx) */
+} /* end subroutine-template (binexpx) */
 
 
 /* local variables */
