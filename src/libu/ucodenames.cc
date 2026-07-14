@@ -358,7 +358,7 @@ namespace {
 	w_sr,
 	w_sig,
 	w_overlast
-    } ;
+    } ; /* end enum */
     struct codemgr {
 	uchar		tab_sr	[ne_sr] ;
 	uchar		tab_sig	[ne_sig] ;
