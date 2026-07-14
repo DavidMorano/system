@@ -1,6 +1,6 @@
 /* clockids HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* provides identifiers for UINX® system clock IDs */
 /* version %I% last-modified %G% */
