@@ -133,15 +133,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>		/* required for |fstatfs(2)| */
-#include	<sys/mount.h>		/* required for |fstatfs(2)| */
-#include	<sys/ioctl.h>		/* for |ioctl(2)| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® required for |fstatfs(2)| */
+#include	<sys/mount.h>		/* POSIX® required for |fstatfs(2)| */
+#include	<sys/ioctl.h>		/* POSIX® for |ioctl(2)| */
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
 #include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
