@@ -40,20 +40,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<initializer_list>
-#include	<utility>
-#include	<functional>
-#include	<algorithm>
-#include	<queue>
-#include	<vector>
-#include	<list>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<initializer_list>	/* C++STD */
+#include	<utility>		/* C++STD */
+#include	<functional>		/* C++STD */
+#include	<algorithm>		/* C++STD */
+#include	<queue>			/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<list>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dijkstra2.hh"
 
@@ -115,13 +115,13 @@ struct nodeval {
 	    } /* end for */
 	    return (*this) ;
 	} ;
-} ;
+} ; /* end struct */
 
 struct nodevalcmp {
 	bool operator () (const nodeval &nv1,const nodeval &nv2) {
 	     return (nv1.dist > nv2.dist) ;
 	} ;
-} ;
+} ; /* end struct */
 
 typedef priority_queue<nodeval,vector<nodeval>,nodevalcmp>	ourmin ;
 
@@ -187,8 +187,7 @@ int dijkstra2(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	    rs = SR_NOMEM ;
 	}
 	return rs ;
-}
-/* end subroutine (dijkstra2) */
+} /* end subroutine (dijkstra2) */
 
 
 /* local subroutines */
