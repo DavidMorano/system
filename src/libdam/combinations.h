@@ -1,6 +1,6 @@
 /* combinations HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 (conformance reviewed) */
+/* lang=C20 (conformance reviewed) */
 
 /* n-choose-k function WITHOUT repitition */
 /* version %I% last-modified %G% */
@@ -28,7 +28,8 @@
 
 EXTERNC_begin
 
-extern long combinations(int,int) noex ;
+extern long combinations	(int,int) noex ;
+extern long multicombinations	(int,int) noex ;
 
 EXTERNC_end
 
