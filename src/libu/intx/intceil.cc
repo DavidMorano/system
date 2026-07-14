@@ -43,14 +43,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<utypedefs.h>
-#include	<clanguage.h>
-#include	<stdintx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"intceil.h"
 
@@ -75,12 +76,10 @@
 
 /* forward references */
 
-template<typename T>
-T xceil(T v,int m) noex {
+template<typename T> T xceil(T v,int m) noex {
 	const T		n = (v + (m - 1)) / m ;
 	return (n * m) ;
-}
-/* end subroutine-template (xceil) */
+} /* end subroutine-template (xceil) */
 
 
 /* local variables */
@@ -93,18 +92,15 @@ T xceil(T v,int m) noex {
 
 int iceil(int v,int m) noex {
 	return xceil(v,m) ;
-}
-/* end subroutine (iceil) */
+} /* end subroutine (iceil) */
 
 long lceil(long v,int m) noex {
 	return xceil(v,m) ;
-}
-/* end subroutine (lceil) */
+} /* end subroutine (lceil) */
 
 longlong llceil(longlong v,int m) noex {
 	return xceil(v,m) ;
-}
-/* end subroutine (llceil) */
+} /* end subroutine (llceil) */
 
 off_t ofceil(off_t v,int m) noex {
 	return xceil(v,m) ;
@@ -112,24 +108,20 @@ off_t ofceil(off_t v,int m) noex {
 
 intptr_t ipceil(intptr_t v,int m) noex {
 	return xceil(v,m) ;
-}
-/* end subroutine (ipceil) */
+} /* end subroutine (ipceil) */
 
 
 uint uceil(uint v,int m) noex {
 	return xceil(v,m) ;
-}
-/* end subroutine (uceil) */
+} /* end subroutine (uceil) */
 
 ulong ulceil(ulong v,int m) noex {
 	return xceil(v,m) ;
-}
-/* end subroutine (ulceil) */
+} /* end subroutine (ulceil) */
 
 ulonglong ullceil(ulonglong v,int m) noex {
 	return xceil(v,m) ;
-}
-/* end subroutine (ullceil) */
+} /* end subroutine (ullceil) */
 
 size_t szceil(size_t v,int m) noex {
 	return xceil(v,m) ;
@@ -137,7 +129,6 @@ size_t szceil(size_t v,int m) noex {
 
 uintptr_t uipceil(uintptr_t v,int m) noex {
 	return xceil(v,m) ;
-}
-/* end subroutine (uipceil) */
+} /* end subroutine (uipceil) */
 
 
