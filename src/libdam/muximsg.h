@@ -1,10 +1,15 @@
-/* muximsg */
+/* muximsg HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* create and parse the internal messages */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2002 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MUXIMSG_INCLUDE
-#define	MUXIMSG_INCLUDE	1
+#define	MUXIMSG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
