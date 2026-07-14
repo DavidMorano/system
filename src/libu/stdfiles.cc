@@ -1,6 +1,6 @@
 /* stdfiles SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* standard file-names */
 /* version %I% last-modified %G% */
