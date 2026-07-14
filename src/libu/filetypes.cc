@@ -1,6 +1,6 @@
 /* filetypes SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* define file types according to the S_IFMT field of |mode_t| */
 /* version %I% last-modified %G% */
