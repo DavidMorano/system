@@ -40,22 +40,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++) */
-#include	<initializer_list>
-#include	<utility>
-#include	<functional>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<vector>
-#include	<list>
-#include	<array>
-#include	<iostream>
-#include	<iomanip>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<initializer_list>	/* C++STD */
+#include	<utility>		/* C++STD */
+#include	<functional>		/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<vector>		/* C++STD */
+#include	<list>			/* C++STD */
+#include	<array>			/* C++STD */
+#include	<iostream>		/* C++STD */
+#include	<iomanip>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"msort.h"
 
@@ -167,8 +167,7 @@ int msort_data::dosort(int first,int last) noex {
 	    if ((last - m2) > 1) dosort(m2,last) ;
 	}
 	return ff ;
-}
-/* end method (msort_data::dosort) */
+} /* end method (msort_data::dosort) */
 
 int msort_data::getpivot(int first,int al) noex {
 	int	pvi = (al/2) ;
@@ -177,8 +176,7 @@ int msort_data::getpivot(int first,int al) noex {
 	}
 	loadpivot(first + pvi) ;
 	return pvi ;
-}
-/* end method (msort_data::getpivot) */
+} /* end method (msort_data::getpivot) */
 
 local int partpred1(int e,int pv) noex {
 	return (e < pv) ;
