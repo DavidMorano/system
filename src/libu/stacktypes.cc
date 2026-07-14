@@ -1,6 +1,6 @@
 /* stacktypes SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* enumerate the various stack types */
 /* version %I% last-modified %G% */
