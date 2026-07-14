@@ -36,6 +36,7 @@
 #define	CH_CR		0x0D		/* control-M */
 #define	CH_SO		0x0E		/* contrll-N */
 #define	CH_SI		0x0F		/* control-O */
+
 #define	CH_DLE		0x10		/* control-P */
 #define	CH_DC1		0x11		/* control-Q */
 #define	CH_DC2		0x12		/* control-R */
@@ -54,7 +55,7 @@
 #define	CH_US		0x1F		/* unit separator */
 
 #define	CH_SP		0x20		/* space */
-#define	CH_STAR		0x2A		/* star (asterisk)plus */
+#define	CH_STAR		0x2A		/* star (asterisk) */
 #define	CH_PLUS		0x2B		/* plus */
 #define	CH_MINUS	0x2D		/* minus */
 #define	CH_SQUOTE	0x27		/* quote single (') */
@@ -130,6 +131,7 @@
 #define	CH_SLASH	CH_FSLASH	/* slash forward */
 #define	CH_DELETE	CH_DEL		/* delete */
 #define	CH_RIND		CH_RI		/* reverse index */
+#define	CH_DID		CH_DECID	/* DEC-ID */
 
 
 #endif /* ASCII_INCLUDE */
