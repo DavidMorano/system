@@ -46,19 +46,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cinttypes>
-#include	<new>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<functional>
-#include	<list>
-#include	<vector>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cinttypes>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<functional>		/* C++STD */
+#include	<list>			/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfs1.hh"
 
@@ -118,7 +118,6 @@ int bfs1(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	    vq.pop_front() ;
 	} /* end while */
 	return rs ;
-}
-/* end subroutine (bfs1) */
+} /* end subroutine (bfs1) */
 
 
