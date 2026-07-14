@@ -1,6 +1,6 @@
 /* itimers HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* constants used in identifying internal-timers */
 /* version %I% last-modified %G% */
