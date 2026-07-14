@@ -92,7 +92,7 @@ OBJ35= utmptypes.o utmpsizes.o ascii.o
 
 OBJ36= mapex.o deb.o
 OBJ37= syspredefined.o
-OBJ38= typecodes.o
+OBJ38= typecodes.o charnames.o
 OBJ39=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -161,7 +161,7 @@ so:			$(T).so
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ) Makefile $(INCS)
@@ -519,7 +519,7 @@ ustream.dir:
 	makesubdir $@
 
 usigblock.o:		usigblock.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 ucodenames.o:		ucodenames.cc	ucodenames.h	$(INCS)
 
@@ -545,10 +545,10 @@ deb.dir:
 
 # misc-objects
 chrset.o:		chrset.ccm					$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 bitgrp.o:		bitgrp.ccm					$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 nulstr.o:		nulstr.cc	nulstr.h			$(INCS)
 posixdirent.o:		posixdirent.cc	posixdirent.hh			$(INCS)
@@ -584,10 +584,10 @@ funcodes.o:		funcodes.cc	funcodes.h			$(INCS)
 baops.o:		baops.c		baops.h				$(INCS)
 
 bitmanip.o:		bitmanip.ccm					$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 findbit.o:		findbit.ccm					$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # STRING handling
 strtox.o:		strtox.cc	strtox.h bitmanip.o		$(INCS)
@@ -607,16 +607,16 @@ ischx.o:		ischx0.o ischx1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 ischx0.o:		ischx.ccm	ischx.hh			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-ischx1.o:		ischx1.cc	ischx0.o	ischx.hh	$(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $^
+ischx1.o:		ischx1.cc	ischx0.o			$(INCS)
+	$(COMPILE.cc) $<
 
 udiv.o:			udiv.ccm	udiv.hh				$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 typecodes.o:		typecodes.ccm	ffbs.h				$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # singles
 conintx.o:		conintx.cc		conintx.hh		$(INCS)
@@ -632,6 +632,7 @@ localmisc.o:		localmisc.cc		localmisc.h		$(INCS)
 mapex.o:		mapex.cc		mapex.h			$(INCS)
 sysconfcmds.o:		sysconfcmds.cc		sysconfcmds.h		$(INCS)
 ascii.o:		ascii.cc		ascii.h			$(INCS)
+charnames.o:		charnames.cc		charnames.h		$(INCS)
 syspredefined.o:	syspredefined.cc	syspredefined.h		$(INCS)
 
 
