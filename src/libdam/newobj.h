@@ -1,6 +1,9 @@
-/* newobj */
+/* newobj HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
 
 /* new-object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,35 +16,27 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	NEWOBJ_INCLUDE
-#define	NEWOBJ_INCLUDE	1
+#define	NEWOBJ_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 /* object defines */
+#define	newobj(otype,n)		(otype*) newobjsub((n),szof(otype))
 
-#define	newobj(otype,n)		(otype*)newobjsub((n),sizeof(otype))
+EXTERNC_begin
 
+extern void	*newobjsub(int,int) noex ;
 
-#if	(! defined(NEWOBJ_MASTER)) || (NEWOBJ_MASTER == 0)
+EXTERNC_end
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern void	*newobjsub(int,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* NEWOBJ_MASTER */
 
 #endif /* NEWOBJ_INCLUDE */
 
