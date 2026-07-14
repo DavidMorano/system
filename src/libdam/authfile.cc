@@ -41,20 +41,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<linebuffer.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<strdcpyx.h>
-#include	<mkchar.h>
-#include	<localmisc.h>		/* |LINEBUFLEN| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<linebuffer.h>		/* CSTD */
+#include	<fieldterminit.hh>	/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<strdcpyx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |LINEBUFLEN| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"authfile.h"
 
@@ -78,17 +80,14 @@ namespace {
     struct suber {
 	char		*username ;
 	char		*password ;
-	cchar		*fname ;
 	linebuffer	lb ;
-	suber(char *up,char *pp,cchar *fn) noex : username(up), password(pp) {
-	    fname = fn ;
-	} ;
-	int start() noex ;
-	int finish() noex ;
-	int procfile(cchar *) noex ;
-	int procline(int) noex ;
+	suber(char *up,char *pp) noex : username(up), password(pp) { } ;
+	int start	() noex ;
+	int finish	() noex ;
+	int procfile	(cchar *) noex ;
+	int procline	(int) noex ;
     } ; /* end struct (suber) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -96,16 +95,7 @@ namespace {
 
 /* local variables */
 
-constexpr cchar		fterms[32] = {
-	0x00, 0x02, 0x00, 0x00,
-	0x09, 0x00, 0x00, 0x20,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ;
+constexpr fieldterminit		ft("\t #=") ;
 
 
 /* exported variables */
@@ -113,18 +103,17 @@ constexpr cchar		fterms[32] = {
 
 /* exported subroutines */
 
-int authfile(char *username,char *password,cchar *fname) noex {
+int authfile(char *username,char *password,cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (fname && username && password) {
+	if (username && password) {
 	    rs = SR_INVALID ;
 	    username[0] = '\0' ;
 	    password[0] = '\0' ;
-	    if (fname[0]) {
-		suber	so(username,password,fname) ;
-		if ((rs = so.start()) >= 0) {
+	    if (fn[0]) {
+		if (suber so(username,password) ; (rs = so.start()) >= 0) {
 		    {
-			rs = so.procfile(fname) ;
+			rs = so.procfile(fn) ;
 		    } /* end block */
 		    rs1 = so.finish() ;
 		    if (rs >= 0) rs = rs1 ;
@@ -132,24 +121,23 @@ int authfile(char *username,char *password,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (authfile) */
+} /* end subroutine (authfile) */
 
 
 /* local subroutines */
 
 int suber::start() noex {
 	return lb.start ;
-}
+} /* end method */
 
 int suber::finish() noex {
 	return lb.finish ;
-}
+} /* end method */
 
-int suber::procfile(cchar *fname) noex {
+int suber::procfile(cchar *fn) noex {
 	int		rs ;
 	int		rs1 ;
-	if (bfile af ; (rs = bopen(&af,fname,"r",0666)) >= 0) {
+	if (bfile af ; (rs = bopen(&af,fn,"r",0666)) >= 0) {
 	    while ((rs = breadln(&af,lb.lbuf,lb.llen)) > 0) {
 		{
 		    rs = procline(rs) ;
@@ -161,8 +149,7 @@ int suber::procfile(cchar *fname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bfile) */
 	return rs ;
-}
-/* end method (suber::procfile) */
+} /* end method (suber::procfile) */
 
 int suber::procline(int len) noex {
 	int		rs ;
@@ -170,10 +157,10 @@ int suber::procline(int len) noex {
 	if (field fsb ; (rs = field_start(&fsb,lb.lbuf,len)) >= 0) {
 	    int		fl ;
 	    cchar	*fp ;
-	    while ((rs = field_get(&fsb,fterms,&fp)) >= 0) {
+	    while ((rs = field_get(&fsb,ft.terms,&fp)) >= 0) {
 		if (rs > 0) {
 		    cint	type = mkchar(fp[0]) ;
-		    if ((rs = field_get(&fsb,fterms,&fp)) > 0) {
+		    if ((rs = field_get(&fsb,ft.terms,&fp)) > 0) {
 			fl = rs ;
 	                switch (type) {
 	                case 'u':
@@ -193,7 +180,6 @@ int suber::procline(int len) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return rs ;
-}
-/* end method (suber::procline) */
+} /* end method (suber::procline) */
 
 
