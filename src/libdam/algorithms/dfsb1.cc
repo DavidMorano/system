@@ -49,17 +49,19 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cinttypes>
-#include	<new>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<functional>
-#include	<list>
-#include	<stack>
-#include	<vector>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cinttypes>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<functional>		/* C++STD */
+#include	<list>			/* C++STD */
+#include	<stack>			/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 module dfsb ;
 
@@ -111,27 +113,25 @@ int dfsb(res_t *resp,edges_t &edges,int vertices) {
 	for (int i = 0 ; i < vertices ; i += 1) {
 	    resp[i].dist = -1 ; /* "level" */
 	    resp[i].prev = -1 ;
-	}
+	} /* end for */
 	for (int i = 0 ; i < vertices ; i += 1) {
 	    resp[i].dist = 0 ; /* level */
 	    rs = dfsb_visit(resp,edges,i) ;
 	    if (rs < 0) break ;
-	}
+	} /* end for */
 	return rs ;
-}
-/* end subroutine (dfsb) */
+} /* end subroutine (dfsb) */
 
 int dfsb_one(res_t *resp,edges_t &edges,int vertices,int u) {
 	int		rs = SR_OK ;
 	for (int i = 0 ; i < vertices ; i += 1) {
 	    resp[i].dist = -1 ; /* "level" */
 	    resp[i].prev = -1 ;
-	}
+	} /* end for */
 	resp[u].dist = 0 ; /* level */
 	rs = dfsb_visit(resp,edges,u) ;
 	return rs ;
-}
-/* end subroutine (dfsb_one) */
+} /* end subroutine (dfsb_one) */
 
 int dfsb_visit(res_t *resp,edges_t &edges,int u) {
 	stack<int>	vs ;
@@ -154,7 +154,6 @@ int dfsb_visit(res_t *resp,edges_t &edges,int u) {
 	    } /* end while */
 	} /* end while */
 	return 0 ;
-}
-/* end subroutine (dfsb_visit) */
+} /* end subroutine (dfsb_visit) */
 
 
