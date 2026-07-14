@@ -91,11 +91,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).so:		$(OBJ_LIBSECDB)
-	$(CXX) -shared $(LDFLAGS) -o $@ $(OBJ_LIBSECDB) $(RUNINFO) $(LIBINFO)
+	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(RUNINFO) $(LIBINFO)
 
 $(T).o:			$(OBJ_LIBSECDB)
 	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LIBSECDB)
