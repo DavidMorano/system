@@ -1,6 +1,6 @@
 /* ulibvals HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UNIX® library values (constants) */
 /* version %I% last-modified %G% */
