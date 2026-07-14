@@ -1,6 +1,6 @@
 /* uselect SUPPORT (UNIX®-At-Xntthing) */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
 /* version %I% last-modified %G% */
