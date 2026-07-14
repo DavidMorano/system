@@ -33,19 +33,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<initializer_list>
-#include	<utility>
-#include	<functional>
-#include	<algorithm>
-#include	<vector>
-#include	<list>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<initializer_list>	/* C++STD */
+#include	<utility>		/* C++STD */
+#include	<functional>		/* C++STD */
+#include	<algorithm>		/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<list>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dijkstra1.hh"
 
@@ -131,8 +131,7 @@ int dijkstra1(res_t *resp,edges_t &edges,int vertices,int vstart) {
 	    rs = SR_NOMEM ;
 	}
 	return rs ;
-}
-/* end subroutine (dijkstra1) */
+} /* end subroutine (dijkstra1) */
 
 
 /* local subroutines */
@@ -147,9 +146,8 @@ local int minvertex(bool *visited,res_t *resp,int n) {
 		    v = i ;
 		}
 	    }
-	}
+	} /* end for */
    	return v ;
-}
-/* end subroutine (minvertex) */
+} /* end subroutine (minvertex) */
 
 
