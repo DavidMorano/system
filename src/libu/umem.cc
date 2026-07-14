@@ -29,19 +29,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cerrno>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdckdint>		/* |ckd_mu(3c++)| */
-#include	<cstring>		/* |strncpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<utimeout.h>
-#include	<errtimer.hh>
-#include	<sysconfcmds.h>
-#include	<localmisc.h>
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
+#include	<cstdckdint>		/* CSTD |ckd_mu(3c++)| */
+#include	<cstring>		/* CSTD |strncpy(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<utimeout.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"umem.hh"
 
