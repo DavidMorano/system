@@ -44,14 +44,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<utypedefs.h>
-#include	<clanguage.h>
-#include	<stdintx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"intfloor.h"
 
@@ -67,55 +69,45 @@
 
 /* local subroutine-templates */
 
-template<typename T>
-T xfloor(T v,int m) noex {
+template<typename T> T xfloor(T v,int m) noex {
 	const T		n = v / m ;
 	return (n * m) ;
-}
-/* end subroutine-template (xfloor) */
+} /* end subroutine-template (xfloor) */
 
 
 /* exported subroutines */
 
 int ifloor(int v,int m) noex {
 	return xfloor(v,m) ;
-}
-/* end subroutine (ifloor) */
+} /* end subroutine (ifloor) */
 
 long lfloor(long v,int m) noex {
 	return xfloor(v,m) ;
-}
-/* end subroutine (lfloor) */
+} /* end subroutine (lfloor) */
 
 longlong llfloor(longlong v,int m) noex {
 	return xfloor(v,m) ;
-}
-/* end subroutine (llfloor) */
+} /* end subroutine (llfloor) */
 
 intptr_t ipfloor(intptr_t v,int m) noex {
 	return xfloor(v,m) ;
-}
-/* end subroutine (ipfloor) */
+} /* end subroutine (ipfloor) */
 
 
 uint ufloor(uint v,int m) noex {
 	return xfloor(v,m) ;
-}
-/* end subroutine (ufloor) */
+} /* end subroutine (ufloor) */
 
 ulong ulfloor(ulong v,int m) noex {
 	return xfloor(v,m) ;
-}
-/* end subroutine (ulfloor) */
+} /* end subroutine (ulfloor) */
 
 ulonglong ullfloor(ulonglong v,int m) noex {
 	return xfloor(v,m) ;
-}
-/* end subroutine (ullfloor) */
+} /* end subroutine (ullfloor) */
 
 uintptr_t uipfloor(uintptr_t v,int m) noex {
 	return xfloor(v,m) ;
-}
-/* end subroutine (uipfloor) */
+} /* end subroutine (uipfloor) */
 
 
