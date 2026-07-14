@@ -47,12 +47,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stdint.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 /* on char(acter) (byte) organized bit arrays */
@@ -88,19 +87,19 @@
 
 /* on 64-bit longs */
 #define	BASETL(array,bn) \
-	((array)[(bn) >> 6] |= (((uint64_t) 1) << ((bn) & 63)))
+	((array)[(bn) >> 6] |= (((ulong) 1) << ((bn) & 63)))
 #define	BACLRL(array,bn) \
-	((array)[(bn) >> 6] &= (~ (((uint64_t) 1) << ((bn) & 63))))
+	((array)[(bn) >> 6] &= (~ (((ulong) 1) << ((bn) & 63))))
 #define	BATSTL(array,bn) \
-	(((array)[(bn) >> 6] >> ((bn) & 63)) & ((uint64_t) 1))
+	(((array)[(bn) >> 6] >> ((bn) & 63)) & ((ulong) 1))
 
 /* on 128-bit longlongs */
 #define	BASETLL(array,bn) \
-	((array)[(bn) >> 7] |= (((uint128_t) 1) << ((bn) & 127)))
+	((array)[(bn) >> 7] |= (((ulonglong) 1) << ((bn) & 127)))
 #define	BACLRLL(array,bn) \
-	((array)[(bn) >> 7] &= (~ (((uint128_t) 1) << ((bn) & 127))))
+	((array)[(bn) >> 7] &= (~ (((ulonglong) 1) << ((bn) & 127))))
 #define	BATSTLL(array,bn) \
-	(((array)[(bn) >> 7] >> ((bn) & 127)) & ((uint128_t) 1))
+	(((array)[(bn) >> 7] >> ((bn) & 127)) & ((ulonglong) 1))
 
 /* on 256-bit intmax (IM) */
 #define	BASETIM(array,bn) \
