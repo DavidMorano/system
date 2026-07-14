@@ -114,6 +114,42 @@ extern longlong		llabs	(longlong) noex attrconst ;
 
 #endif /* __cplusplus */
 
+#ifndef	TYPEDEF_SINTX
+#define	TYPEDEF_SINTX
+typedef signed char		sint8 ;
+typedef signed short		sint16 ;
+typedef signed int		sint32 ;
+typedef signed long		sint64 ;
+typedef signed __int128		sint128 ;
+#endif /* TYPEDEF_SINTX */
+
+#ifndef	TYPEDEF_UINTX
+#define	TYPEDEF_UINTX
+typedef unsigned char		uint8 ;
+typedef unsigned short		uint16 ;
+typedef unsigned int		uint32 ;
+typedef unsigned long		uint64 ;
+typedef unsigned __int128	uint128 ;
+#endif /* TYPEDEF_UINTX */
+
+#ifndef	TYPEDEF_CSINTX
+#define	TYPEDEF_CSINTX
+typedef const signed char	csint8 ;
+typedef const signed short	csint16 ;
+typedef const signed int	csint32 ;
+typedef const signed long	csint64 ;
+typedef const signed __int128	csint128 ;
+#endif /* TYPEDEF_CSINTX */
+
+#ifndef	TYPEDEF_CUINTX
+#define	TYPEDEF_CUINTX
+typedef const unsigned char	cuint8 ;
+typedef const unsigned short	cuint16 ;
+typedef const unsigned int	cuint32 ;
+typedef const unsigned long	cuint64 ;
+typedef const unsigned __int128	cuint128 ;
+#endif /* TYPEDEF_CUINTX */
+
 
 #endif /* STDINTX_INCLUDE */
 
