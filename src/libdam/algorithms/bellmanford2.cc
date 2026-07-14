@@ -34,20 +34,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cinttypes>
-#include	<new>
-#include	<initializer_list>
-#include	<utility>
-#include	<functional>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cinttypes>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<initializer_list>	/* C++STD */
+#include	<utility>		/* C++STD */
+#include	<functional>		/* C++STD */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<vector>
-#include	<list>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<vector>		/* C++STD */
+#include	<list>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bellmanford2.hh"
 
@@ -125,7 +125,6 @@ int bellmanford2(res_t *resp,edger_t *edges,int vertices,int vstart) {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (bellmanford2) */
+} /* end subroutine (bellmanford2) */
 
 
