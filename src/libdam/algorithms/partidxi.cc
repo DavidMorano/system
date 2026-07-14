@@ -38,12 +38,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<arrswap.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<arrswap.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"partidxi.h"
 
@@ -95,7 +95,6 @@ int partidxi(int *a,int first,int last,int idx) noex {
 	    arrswapi(a,pi,(last - 1)) ;
 	}
 	return pi ;
-}
-/* end subroutine (partidxi) */
+} /* end subroutine (partidxi) */
 
 
