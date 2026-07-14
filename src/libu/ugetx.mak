@@ -42,7 +42,7 @@ LIBS +=
 
 OBJ00= getfdfile.o
 OBJ01= getenver.o getev.o getourenv.o
-OBJ02=
+OBJ02= getusmtime.o getustime.o
 OBJ03=
 OBJ04=
 OBJ05=
@@ -57,7 +57,7 @@ OBJ13=
 OBJ14=
 OBJ15=
 
-OBJA= obj00.o obj01.o
+OBJA= obj00.o obj01.o obj02.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
@@ -109,11 +109,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -196,5 +196,7 @@ getfdfile.o:		getfdfile.cc		getfdfile.h		$(INCS)
 getenver.o:		getenver.cc		getenver.h		$(INCS)
 getev.o:		getev.cc		getev.h			$(INCS)
 getourenv.o:		getourenv.cc		getourenv.h		$(INCS)
+getusmtime.o:		getusmtime.cc		getusmtime.hh		$(INCS)
+getustime.o:		getustime.cc		getustime.hh		$(INCS)
 
 
