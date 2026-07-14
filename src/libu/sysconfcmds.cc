@@ -1,6 +1,6 @@
 /* sysconfcmds SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* system-configuation-commands */
 /* version %I% last-modified %G% */
