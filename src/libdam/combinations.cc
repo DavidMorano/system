@@ -131,10 +131,8 @@ long combinations(int n,int k) noex {
 	return ans ;
 } /* end subroutine (combinations) */
 
-#ifdef	COMMENT
 long multicombinations(int n,int k) noex {
 	return combinations((n + k - 1),k) ;
 } /* end subroutine (multicombinations) */
-#endif /* COMMENT */
 
 
