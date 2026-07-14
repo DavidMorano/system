@@ -135,25 +135,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/resource.h>
-#include	<sys/wait.h>
-#include	<sys/times.h>		/* |times(2)| */
-#include	<ulimit.h>		/* commands for |ulimit(2)| */
-#include	<climits>		/* |INT_MAX| + |LONG_MAX| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>		/* |uintptr_t| */
-#include	<cstdarg>		/* |uintptr_t| */
-#include	<utility>		/* |unreachable(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<intsat.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/resource.h>	/* POSIX® */
+#include	<sys/wait.h>		/* POSIX® */
+#include	<sys/times.h>		/* POSIX® |times(2)| */
+#include	<ulimit.h>		/* P§SIX® commands for |ulimit(2)| */
+#include	<climits>		/* CSTD |INT_MAX| + |LONG_MAX| */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
+#include	<cstdarg>		/* CSTD */
+#include	<utility>		/* C++STD |unreachable(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uprocess.h"
 
