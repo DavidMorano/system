@@ -5,7 +5,7 @@
 /* process a 'xpath' file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
 #define	CF_PATHCLEAN	1		/* clean up the path */
 #define	CF_STAT		0		/* directory needs to be there */
 
@@ -26,9 +26,7 @@
 	(one by one) to the specified list.
 
 	Synopsis:
-	int procxpath(lp,fname)
-	VECSTR		*lp ;
-	const char	fname[] ;
+	int procxpath(vecstr *lp,cchar *fname) noex
 
 	Arguments:
 	lp		pointer to VECSTR list
@@ -41,37 +39,50 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<vecstr.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<cassert>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<bufsizevar.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<pathclean.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
 
+#include	<field.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+
+#include	"procxpath.h"
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
+#define	PATHMULT	4		/* four (4) times path-len */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debug print-outs */P
 #endif
 
-#define	PATHBUFLEN	(MAXPATHLEN * 2)
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
-
-extern int	pathclean(char *,const char *,int) ;
 
 
 /* externals variables */
@@ -82,101 +93,114 @@ extern int	pathclean(char *,const char *,int) ;
 
 /* local structures */
 
+namespace {
+    struct pather {
+	vecstr *lp ;
+	char	*pbuf ;
+	int	plen ;
+	pather(vecstr *p) noex : lp(p) {
+	    pbuf = nullptr ;
+	    lbuf = nullptr ;
+	} ; /* end ctor */
+	int operator () (cchar *) noex ;
+	int procfile	(cchar *) noex ;
+	int procln	(cchar *,int) noex ;
+    } ; /* end struct */
+} /* end namespace */
+
 
 /* local variables */
 
-static const uchar	fterms[32] = {
-	0x00, 0x00, 0x00, 0x00,
-	0x08, 0x00, 0x00, 0x04,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-} ;
+constexpr fieldterminit		ft("#:;") ;
+static bufsizevar		maxpathlen(bufsize_mp) ;
+cbool				f_debug		= CF_DEBUG ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int procxpath(VECSTR *lp,cchar *fname)
-{
-
-#if	CF_STAT
-	USTAT		sb ;
-#endif
-
-	FIELD		fsb ;
-	bfile		pathfile, *pfp = &pathfile ;
-	int		rs ;
-	int		len ;
-	int		pl ;
+int procxpath(vecstr *lp,cchar *fname) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	int		f_add ;
-	char		pathbuf[PATHBUFLEN + 1] ;
-	cchar		*pp ;
+	assert(lp && fname) ;
+	if (lp && fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+	        pather po(lp) ;
+	        rs = po(fname) ;
+	        c = rs ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (procxpath) */
 
-	if (lp == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
 
-	if (fname[0] == '\0') return SR_INVALID ;
+/* local subroutines */
 
-	if ((rs = bopen(pfp,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
-	    int		cl ;
-	    cchar	*cp ;
-	    char	lbuf[LINEBUFLEN + 1] ;
+int pather::operator(cchar *fn) noex 
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if ((rs = maxpathlen) >= 0) {
+	    cint sz = (PATHMULT * rs) ;
+	    if ((rs = mem.mall(sz,&pbuf)) >= 0) {
+		plen = rs ;
+		{
+		    rs = file(fn) ;
+		    c = rs ;
+		}
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (maxpathlen) */
+	return (rs >= 0) ? c : rs ;
+} /* end method (pather::operator) */
 
-	    while ((rs = breadln(pfp,lbuf,llen)) > 0) {
-	        len = rs ;
+int pather::procfile(cchar *fn) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
+	    cint llen = rs ;
+	    if (bfile pf ; (rs = pf.open(fname,"r")) >= 0) {
+	        while ((rs = pf.readlns(lbuf,llen)) > 0) {
+		    cchar *cp ;
+		    if (int cl = (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+		        rs = procln(cp,cl) ;
+		        c += rs ;
+		    }
+	        } /* end while */
+	        rs1 = pf.close ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (bfile) */
+	    rs1 = mem.free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? c : rs ;
+} /* end method (pather::procfile) */
 
-	        if (lbuf[len - 1] == '\n') len -= 1 ;
-	        lbuf[len] = '\0' ;
+int pather::procln(cchar *lp,int ll) noex {
+    	int		rs ;
+	int		rs1 ;
+	if (field fsb ; (rs = fsb.start(cp,cl)) >= 0) {
+	    cchar	*fp ;
+	    for (int fl ; (fl = fsb.get(ft.terms,&fp)) >= 0 ; ) {
+		if (fl > 0) {
+		    rs = procent(fp,fl) ;
+		}
+	        if (fsb.term == '#') break ;
+	    } /* end for */
+	    rs1 = fsb.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (field) */
+	return rs ;
+} /* end method (pather::procln) */
 
-#if	CF_DEBUGS
-	        debugprintf("procxpath: line> %r\n",lbuf,len) ;
-#endif
-
-	        cp = lbuf ;
-	        cl = len ;
-	        while ((cl > 0) && CHAR_ISWHITE(*cp)) {
-	            cp += 1 ;
-	            cl -= 1 ;
-	        }
-
-	        if ((cp[0] == '\0') || (cp[0] == '#'))
-	            continue ;
-
-	        if ((rs = field_start(&fsb,cp,cl)) >= 0) {
-	            int		fl ;
-		    cchar	*fp ;
-
-	            while ((fl = field_get(&fsb,fterms,&fp)) >= 0) {
-
-#if	CF_DEBUGS
-	                debugprintf("procxpath: flen=%d\n",fsb.flen) ;
-	                debugprintf("procxpath: 1 field> %r\n",fp,fl) ;
-#endif
-
-	                pp = fp ;
-	                pl = fl ;
-	                if (fl > 0) {
-
-#if	CF_PATHCLEAN
-	                    pp = pathbuf ;
-	                    pl = pathclean(pathbuf,fp,fl) ;
-#else
-	                    pp = fp ;
-	                    pl = fl ;
-	                    while ((pl > 1) && (pp[pl - 1] == '/')) {
-	                        pl -= 1 ;
-	                    }
-	                    pp[pl] = '\0' ;	/* should be able to do this */
-#endif /* CF_PATHCLEAN */
-
-#if	CF_STAT && 0
-	                    rs = u_stat(pp,&sb) ;
+int pather::procent(cchar *,int) noex {
+    	int		rs = SR_OK ;
+	if ((rs = pathclean(pbuf,fp,fl)) > 0) {
+	    if (ustat sb ; (rs = u_stat(pbuf,&sb) ;
 
 	                    f_add = ((rs >= 0) && S_ISDIR(sb.st_mode)) ;
 #else
@@ -189,7 +213,7 @@ int procxpath(VECSTR *lp,cchar *fname)
 
 	                if (f_add && (vecstr_findn(lp,pp,pl) == SR_NOTFOUND)) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                    debugprintf("procxpath: add=%r\n",pp,pl) ;
 #endif
 
@@ -206,20 +230,11 @@ int procxpath(VECSTR *lp,cchar *fname)
 
 	                } /* end if (needed to add) */
 
-	                if (fsb.term == '#') break ;
 	            } /* end while (reading fields) */
 
 	            field_finish(&fsb) ;
 	        } /* end if (field) */
 
-	        if (rs < 0) break ;
-	    } /* end while (reading lines) */
-
-	    bclose(pfp) ;
-	} /* end if (bfile) */
-
-	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procxpath) */
+#endif /* COMMENT */
 
 
