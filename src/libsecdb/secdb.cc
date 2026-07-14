@@ -1,6 +1,6 @@
 /* secdb SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* Security Data-Base (SecDB) management support */
 /* version %I% last-modified %G% */
