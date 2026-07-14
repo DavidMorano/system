@@ -1,6 +1,6 @@
 /* syshas SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* specify what features each operating system has */
 /* version %I% last-modified %G% */
