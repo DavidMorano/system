@@ -26,10 +26,7 @@
 	owned by our effective UID.
 
 	Synopsis:
-	int securefile(name,euid,egid)
-	const char	name[] ;
-	uid_t		euid ;
-	gid_t		egid ;
+	int securefile(cchar *name,uid_t euid,gid_t egid) noex
 
 	Arguments:
 	name		filename
@@ -44,21 +41,48 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"securefile.h"
 
 
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+local bool isux(mode_t fm) noex {
+        return ((fm & S_IXUSR) && (fm & S_ISUID)) ;
+} /* end subroutine */
+local bool isgx(mode_t fm) noex {
+        return ((fm & S_IXGRP) && (fm & S_ISGID)) ;
+} /* end subroutine */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -68,20 +92,14 @@
 
 int securefile(cchar *name,uid_t euid,gid_t egid) noex {
 	int		rs = SR_FAULT ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if (name) {
-	    if (USTAT sb ; (rs = u_stat(name,&sb)) >= 0) {
-
-	    f = f || ((sb.st_uid == euid) && 
-		(sb.st_mode & S_IXUSR) && (sb.st_mode & S_ISUID)) ;
-
-	    f = f || ((sb.st_gid == egid) && 
-		(sb.st_mode & S_IXGRP) && (sb.st_mode & S_ISGID)) ;
-
+	    if (ustat sb ; (rs = u_stat(name,&sb)) >= 0) {
+	        f = f || ((sb.st_uid == euid) && isux(sb.st_mode)) ;
+	        f = f || ((sb.st_gid == egid) && isgx(sb.st_mode)) ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (securefile) */
+} /* end subroutine (securefile) */
 
 
