@@ -1,18 +1,16 @@
-/* readignore */
+/* readignore SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* read data while ignoring it */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUGN	0		/* special debugging */
-
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
 	= 1999-07-21, David A­D­ Morano
-
 	This module was originally written.
-
 
 */
 
@@ -22,21 +20,44 @@
 
 	Read a specified amount of data ignoring it.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	<sys/types.h>
-#include	<usystem.h>
-#include	<localmisc.h>
-
+#include	"readignore.h"
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+
+
+/* imported namespaces */
+
+using std::min ;			/* subroutine */
+using std::max ;			/* subroutine */
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -48,25 +69,24 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int readignore(int fd,off_t amount)
-{
-	const int	rlen = getpagesize() ;
+int readignore(int fd,int amount) noex {
 	int		rs ;
-	char		*rbuf ;
-	if ((rs = uc_malloc(rlen,&rbuf)) >= 0) {
-	    int		ml ;
-	    while ((rs >= 0) && (amount > 0)) {
-		ml = (int) MIN(rlen,amount) ;
+	int		rs1 ;
+	if (char *rbuf ; (rs = mem.ps(&rbuf)) >= 0) {
+	    cint rlen = rs ;
+	    for (int ml ; (rs >= 0) && (amount > 0) ; amount -= rs) {
+		ml = min(rlen,amount) ;
 		rs = u_read(fd,rbuf,ml) ;
-	 	amount -= rs ;
 	    } /* end while */
-	    uc_free(rbuf) ;
+	    rs1 = mem.free(rbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (readignore) */
+} /* end subroutine (readignore) */
 
 
