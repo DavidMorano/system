@@ -38,12 +38,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>		/* |INT_MAX */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nthai.h"
 
@@ -62,7 +64,6 @@ typedef int	(*partpred_f)(int,int) noex ;
 /* external subroutines */
 
 extern "C" int	nthai(int *,int,int,int) noex ;
-
 extern "C" int	partitionai(int *,int,partpred_f,int) noex ;
 
 
@@ -98,8 +99,7 @@ int nthai(int *a,int ri,int rl,int n) noex {
 	    ans = r.nrecurse(0,rl) ;
 	} /* end if (needed) */
 	return ans ;
-}
-/* end subroutine (nthai) */
+} /* end subroutine (nthai) */
 
 
 /* local subroutines */
@@ -126,8 +126,7 @@ int recurser::nrecurse(int ri,int rl) noex {
 	    }
 	} /* end if (valid) */
 	return ans ;
-}
-/* end subroutine (recursoer::nrecurse) */
+} /* end subroutine (recursoer::nrecurse) */
 
 local int partpred1(int e,int pv) noex {
 	return (e < pv) ;
