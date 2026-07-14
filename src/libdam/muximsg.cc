@@ -1,10 +1,11 @@
-/* muximsg */
+/* muximsg SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* create and parse the internal messages */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,26 +18,23 @@
 
 /*******************************************************************************
 
-        This module contains the code to make and parse the internal messages
-        that are used in this whole server facility.
+  	Object:
 
+	Description:
+	This module contains the code to make and parse the internal
+	messages that are used in this whole server facility.
 
 *******************************************************************************/
 
-
-#define	MUXIMSG_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-
-#include	<usystem.h>
-#include	<stdorder.h>
-#include	<serialbuf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdorder.h>		/* LIBU */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"muximsg.h"
 
@@ -53,8 +51,10 @@
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 /* general response message */
 int muximsg_response(sp,f,mbuf,mlen)
