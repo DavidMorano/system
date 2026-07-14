@@ -31,14 +31,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<initializer_list>	/* C++11 */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"editdistance.h"
 
@@ -72,8 +72,7 @@ template<typename T> static void ourswap(T &a,T &b) noex {
 	T tmp = a ;
 	a = b ;
 	b = tmp ;
-}
-/* end subroutine (ourswap) */
+} /* end subroutine (ourswap) */
 
 
 /* forward references */
@@ -125,7 +124,7 @@ int editdistance(cchar *as,cchar *bs) noex {
 		    for (int j = 0 ; j <= bl ; j += 1) {
 		        previous[j] = current[j] ;
 		        current[j] = 0 ;
-		    }
+		    } /* end for */
 	       }  /* end for */
 	       el = previous[bl] ;
 	       delete [] ibuf ;
@@ -134,8 +133,7 @@ int editdistance(cchar *as,cchar *bs) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? el : rs ;
-}
-/* end subroutine (editdistance) */
+} /* end subroutine (editdistance) */
 
 
 /* local subroutines */
