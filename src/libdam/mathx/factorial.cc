@@ -82,15 +82,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cmath>			/* |tgamma(3m++)| */
-#include	<numbers>		/* |pi(3c++)| + |e(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cmath>			/* CSTD  |tgamma(3m++)| */
+#include	<numbers>		/* C++STD |pi(3c++)| + |e(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"factorial.h"
 
@@ -144,8 +144,7 @@ template<typename T> static T factorialx(int n) noex {
 	    } /* end if */
 	}
 	return res ;
-}
-/* end subroutine-template (factorialx) */
+} /* end subroutine-template (factorialx) */
 
 
 /* exported variables */
@@ -161,8 +160,7 @@ long factorial(int n) noex {
 	    }
 	}
 	return res ;
-}
-/* end subroutine (factorial) */
+} /* end subroutine (factorial) */
 
 double		dfactorial(int n) noex {
     	return factorialx<double>(n) ;
