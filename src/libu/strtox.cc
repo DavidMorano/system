@@ -41,9 +41,13 @@
 	strtoxui
 	strtoxul
 	strtoxull
+	atosll
+	atoull
 
 	Synopsis:
 	{x} strtox{x}(cchar *sp,char **endp,int base) noex
+	slonglong atosll(cchar *sp) noex
+	ulonglong atoull(cchar *sp) noex
 
 	Arguments:
 	{x}		one of: i, l, ll, ui, ul, ull
@@ -75,7 +79,7 @@
 	to create the |strtol(3c)| subroutine.
 	3. Further thanks are due to Gwynne "Gwyn" Morgan (of BSD
 	fame) for possibly being the inventor of the specific
-	'cutoff-curlim' overflow-prevention algorithm (which, as you
+	'cutoff-cutlim' overflow-prevention algorithm (which, as you
 	know, is widely used now-a-days).
 
 	Notes:
@@ -135,7 +139,7 @@
 	Q. What is the basic algorithm used below for conversions 
 	(signed and unsigned)?
 
-	A. I use the "cutoff-curlim" algorithm; the same is used
+	A. I use the "cutoff-cutlim" algorithm; the same is used
 	in all (known) current UNIXi (or POSIXi) implementations.
 
 	Q. Do you optimize even-power-of-two bases for faster
@@ -467,8 +471,7 @@ int		strtoxi(cchar *sp,char **epp,int b) noex {
 	    errno = EFAULT ;
 	}
 	return res ;
-}
-/* end subroutine (strtoxi) */
+} /* end subroutine (strtoxi) */
 
 long		strtoxl(cchar *sp,char **epp,int b) noex {
     	long		res{} ;
@@ -478,8 +481,7 @@ long		strtoxl(cchar *sp,char **epp,int b) noex {
 	    errno = EFAULT ;
 	}
 	return res ;
-}
-/* end subroutine (strtoxl) */
+} /* end subroutine (strtoxl) */
 
 longlong	strtoxll(cchar *sp,char **epp,int b) noex {
     	strer_sigll so(sp,epp,b) ;
@@ -494,8 +496,7 @@ uint		strtoxui(cchar *sp,char **epp,int b) noex {
 	    errno = EFAULT ;
 	}
 	return ures ;
-}
-/* end subroutine (strtoxui) */
+} /* end subroutine (strtoxui) */
 
 ulong		strtoxul(cchar *sp,char **epp,int b) noex {
     	ulong		ures{} ;
@@ -505,8 +506,7 @@ ulong		strtoxul(cchar *sp,char **epp,int b) noex {
 	    errno = EFAULT ;
 	}
 	return ures ;
-}
-/* end subroutine (strtoxul) */
+} /* end subroutine (strtoxul) */
 
 ulonglong	strtoxull(cchar *sp,char **epp,int b) noex {
     	strer_unsll so(sp,epp,b) ;
@@ -527,7 +527,7 @@ slonglong	atosll(cchar *s) noex {
 	} /* end if (non-null) */
 	if (ec) errno = ec ;
     	return res ;
-} /* end subroutine (atoill) */
+} /* end subroutine (atosll) */
 
 ulonglong	atoull(cchar *s) noex {
     	longlong	res = 0 ;
