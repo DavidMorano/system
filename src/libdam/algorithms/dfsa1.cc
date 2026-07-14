@@ -49,16 +49,18 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cinttypes>
-#include	<new>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<functional>
-#include	<list>
-#include	<vector>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cinttypes>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<functional>		/* C++STD */
+#include	<list>			/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 module dfsa ;
 
@@ -116,8 +118,7 @@ int dfsa(res_t *resp,edges_t &edges,int vertices) noex {
 	    if (rs < 0) break ;
 	}
 	return rs ;
-}
-/* end subroutine (dfsa) */
+} /* end subroutine (dfsa) */
 
 int dfsa_one(res_t *resp,edges_t &edges,int vertices,int u) noex {
 	int		rs = SR_OK ;
@@ -128,8 +129,7 @@ int dfsa_one(res_t *resp,edges_t &edges,int vertices,int u) noex {
 	resp[u].dist = 0 ; /* level */
 	rs = dfsa_visit(resp,edges,u) ;
 	return rs ;
-}
-/* end subroutine (dfsa_one) */
+} /* end subroutine (dfsa_one) */
 
 int dfsa_visit(res_t *resp,edges_t &edges,int u) noex {
 	edgeit_t	elit ; /* edge-list-iterator */
@@ -148,7 +148,6 @@ int dfsa_visit(res_t *resp,edges_t &edges,int u) noex {
 	    if (rs < 0) break ;
 	} /* end while */
 	return rs ;
-}
-/* end subroutine (dfsa_visit) */
+} /* end subroutine (dfsa_visit) */
 
 
