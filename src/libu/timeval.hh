@@ -1,6 +1,6 @@
 /* timeval HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* time-value object methods */
 /* version %I% last-modified %G% */
