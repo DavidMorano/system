@@ -1,6 +1,6 @@
 /* conintx SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* concepts related to extended integer types (and operations on them) */
 /* version %I% last-modified %G% */
