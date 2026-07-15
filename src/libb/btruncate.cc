@@ -73,7 +73,6 @@ int btruncate(bfile *op,off_t off) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (btruncate) */
+} /* end subroutine (btruncate) */
 
 
