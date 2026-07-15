@@ -28,13 +28,13 @@
 
 
 struct calyear_q {
-	ushort	y ;
-	uchar	m, d ;
+	ushort		y ;
+	uchar		m, d ;
 } ; /* end struct */
 
 struct calyear_c {
-	uint	magic ;
-	void	*scp ;
+	void		*scp ;
+	uint		magval ;
 } ; /* end struct */
 
 struct calyear_calls {
@@ -53,7 +53,7 @@ struct calyear_head {
 	modload		loader ;
 	void		*obj ;		/* object pointer */
 	CALYEAR_CALLS	call ;
-	uint		magic ;
+	uint		magval ;
 	int		objsz ;		/* object size */
 	int		cursz ;		/* cursor size */
 } ; /* end struct */
