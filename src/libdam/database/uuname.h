@@ -40,7 +40,7 @@
 
 struct uuname_cursor {
 	void		*scp ;		/* SO-cursor pointer */
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct uuname_flags {
@@ -52,7 +52,7 @@ struct uuname_head {
 	void		*obj ;		/* object pointer */
 	void		*callp ;
 	UUNAME_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		objsz ;		/* object size */
 	int		cursz ;		/* cursor size */
 } ; /* end struct */
