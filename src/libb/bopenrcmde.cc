@@ -364,8 +364,7 @@ badhost:
 badcmd:
 	rs = SR_INVALID ;
 	goto badret ;
-}
-/* end subroutine (bopenrcmde) */
+} /* end subroutine (bopenrcmde) */
 
 
 /* local subroutines */
@@ -419,8 +418,7 @@ void fixdisplay(char *remotehost) noex {
 
 	   }
 	}
-}
-/* end subroutine (fixdisplay) */
+} /* end subroutine (fixdisplay) */
 
 #endif /* COMMENT */
 
@@ -529,8 +527,7 @@ badalloc:
 		uc_free(curbuf) ;
 
 	return BAD ;
-}
-/* end subroutine (quotevalue) */
+} /* end subroutine (quotevalue) */
 
 
 local int newbuf(char *curbuf,int curbuflen,int f,char **nbpp) noex {
@@ -554,8 +551,7 @@ local int newbuf(char *curbuf,int curbuflen,int f,char **nbpp) noex {
 	    *nbpp = (char *) p ;
 
 	return (rs >= 0) ? newbuflen : rs ;
-}
-/* end subroutine (newbuf) */
+} /* end subroutine (newbuf) */
 
 #ifdef	COMMENT /* in some standard library now */
 /* compare host names */
