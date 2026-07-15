@@ -76,7 +76,7 @@
 
 /* forward references */
 
-template<typename T> T xceil(T v,int m) noex {
+template<typename T> local T xceil(T v,int m) noex {
 	const T		n = (v + (m - 1)) / m ;
 	return (n * m) ;
 } /* end subroutine-template (xceil) */
