@@ -63,7 +63,6 @@ int btell(bfile *op,off_t *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (btell) */
+} /* end subroutine (btell) */
 
 
