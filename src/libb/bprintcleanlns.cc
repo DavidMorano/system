@@ -101,8 +101,7 @@ int bprintcleanlns(bfile *op,int linelen,cchar *lp,int ll) noex {
 	    } /* end if (writig) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bprintcleanlines) */
+} /* end subroutine (bprintcleanlines) */
 
 
 /* local subroutines */
