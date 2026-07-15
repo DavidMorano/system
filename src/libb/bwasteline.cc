@@ -63,7 +63,6 @@ int bwasteln(bfile *fp,char *linebuf,int linelen) noex {
 	    if (linebuf[len - 1] == '\n') break ;
 	} /* end while */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (bwasteln) */
+} /* end subroutine (bwasteln) */
 
 
