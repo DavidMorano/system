@@ -58,7 +58,7 @@ struct uunames_head {
 	time_t		ti_map ;		/* map */
 	time_t		ti_lastcheck ;
 	UUNAMES_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 } ; /* end struct */
 
