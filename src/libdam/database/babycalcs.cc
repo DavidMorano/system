@@ -194,7 +194,7 @@ template<typename ... Args>
 local inline int babycalcs_magic(babycalcs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == BABYCALCS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == BABYCALCS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (babycalcs_magic) */
@@ -320,7 +320,7 @@ local int babycalcs_opens(BC *op,cchar *dbname) noex {
                              rs = babycalcs_loadtxt(op) ;
                          } /* end if */
                          if (rs >= 0) {
-                             op->magic = BABYCALCS_MAGIC ;
+                             op->magval = BABYCALCS_MAGIC ;
                          }
                          if (rs < 0) {
                              if (op->fl.txt && (op->table != nullptr)) {
@@ -380,7 +380,7 @@ int babycalcs_close(BC *op) noex {
 	        rs1 = babycalcs_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
