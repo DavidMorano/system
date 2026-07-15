@@ -80,6 +80,7 @@
 #include	<expandline.h>
 #include	<fhm.h>
 #include	<filecounts.h>
+#include	<findinline.h>
 #include	<finduid.h>
 #include	<freadln.h>
 #include	<fsdirtreestat.h>
@@ -177,7 +178,6 @@
 #include	<rijndael.h>
 #include	<rmsesfiles.h>
 #include	<rsaglobal.h>
-#include	<rsaref.h>
 #include	<rtags.h>
 #include	<schedvar.h>
 #include	<searchkeys.h>
