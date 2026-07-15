@@ -199,13 +199,11 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 	} /* end if (non-null) */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (bopene) */
+} /* end subroutine (bopene) */
 
 int bopen(bfile *op,cchar *fn,cchar *os,mode_t om) noex {
 	return bopene(op,fn,os,om,-1) ;
-}
-/* end subroutine (bopen) */
+} /* end subroutine (bopen) */
 
 int bopenmod(bfile *fp,cchar *fname,cchar *of,mode_t om) noex {
 	int		rs ;
@@ -261,8 +259,7 @@ int bclose(bfile *op) noex {
 	} /* end if (magic) */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (bclose) */
+} /* end subroutine (bclose) */
 
 
 /* local subroutines */
