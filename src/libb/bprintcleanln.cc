@@ -80,7 +80,6 @@ int bprintcleanln(bfile *op,cchar *lp,int ll) noex {
 	    } /* end if (linebuffer) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bprintcleanln) */
+} /* end subroutine (bprintcleanln) */
 
 
