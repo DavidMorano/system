@@ -214,7 +214,6 @@ badpipe:
 	}
 
 	return rs ;
-}
-/* end subroutine (bopenrcmd) */
+} /* end subroutine (bopenrcmd) */
 
 
