@@ -75,7 +75,7 @@ struct cmimk_head {
 	size_t		size_db ;
 	time_t		ti_db ;
 	CMIMK_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	uint		pcn ;		/* previous command-number (PCN) */
 	uint		maxent ;
 	uint		nents ;
