@@ -187,7 +187,7 @@ template<typename ... Args>
 local inline int cmimk_magic(cmimk *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CMIMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CMIMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (cmimk_magic) */
@@ -246,7 +246,7 @@ int cmimk_open(cmimk *op,cchar *dbname,int of,mode_t om) noex {
 	            if ((rs = cmimk_filesbegin(op)) >= 0) {
 	                c = rs ;
 	                if ((rs = cmimk_listbegin(op,n)) >= 0) {
-	                    op->magic = CMIMK_MAGIC ;
+	                    op->magval = CMIMK_MAGIC ;
 	                }
 	                if (rs < 0) {
 	                    cmimk_filesend(op) ;
@@ -309,7 +309,7 @@ int cmimk_close(cmimk *op) noex {
 	    rs1 = cmimk_dtor(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	op->magic = 0 ;
+	op->magval = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? nents : rs ;
 } /* end subroutine (cmimk_close) */
