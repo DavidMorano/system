@@ -114,7 +114,7 @@ so:			$(T).so
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_UMODS) Makefile
@@ -218,31 +218,31 @@ objf_umods.o:		$(OBJF_UMODS)
 
 # VARIOUS (module)
 digtab.o:		digtab.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 constdiv.o:		constdiv.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 builtin.o:		builtin.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 bitop.o:		bitop.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # VALUELIMS (module)
 valuelims.o:		valuelims.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # DIGBUFSIZES (module)
 digbufsizes.o:		digbufsizes.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # UNIXFNAMES
 unixfnames.o:		unixfnames0.o unixfnames1.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 unixfnames0.o:		unixfnames.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 unixfnames1.o:		unixfnames1.cc unixfnames0.o
 	$(COMPILE.cc) $<
@@ -252,13 +252,13 @@ usysbasic.o:		usysbasic0.o usysbasic1.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 usysbasic0.o:		usysbasic.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 usysbasic1.o:		usysbasic1.cc usysbasic0.o
 	$(COMPILE.cc) $<
 
 # NUMBASEDIGS (module)
 numbasedigs.o:		numbasedigs.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
