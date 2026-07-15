@@ -367,8 +367,7 @@ int bcontrolv(bfile *op,int cmd,va_list ap) noex {
 	    } /* end if (bflush) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (bcontrol) */
+} /* end subroutine (bcontrol) */
 
 int bsize(bfile *op) noex {
 	int		rs ;
@@ -376,13 +375,11 @@ int bsize(bfile *op) noex {
 	    rs = (sb.st_size & INT_MAX) ;
 	}
 	return rs ;
-}
-/* end subroutine (bsize) */
+} /* end subroutine (bsize) */
 
 int bstat(bfile *op,ustat *sbp) noex {
 	return bcontrol(op,BC_STAT,sbp) ;
-}
-/* end subroutine (bstat) */
+} /* end subroutine (bstat) */
 
 
 /* private subroutines */
