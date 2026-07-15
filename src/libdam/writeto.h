@@ -2,13 +2,13 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* performa write operation with a timeout */
+/* perform a write operation with a timeout */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
+	= 1998-02-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -20,11 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
