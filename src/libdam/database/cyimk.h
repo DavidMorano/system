@@ -68,7 +68,7 @@ struct cyimk_head {
 	gid_t		gid ;
 	uid_t		uid ;
 	CYIMK_FL	fl ;
-	uint		magic ;
+	uint		mafval ;
 	uint		pcitation ;
 	int		nentries ;
 	int		nfd ;
