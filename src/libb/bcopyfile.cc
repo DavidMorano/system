@@ -90,7 +90,6 @@ int bcopyfile(bfile *ifp,bfile *ofp,char *ubuf,int ulen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (bcopyfile) */
+} /* end subroutine (bcopyfile) */
 
 
