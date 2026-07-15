@@ -13,11 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ids.h>
-#include	<vechand.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ids.h>			/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
 
 #include	"holidays.h"
 
@@ -32,12 +32,12 @@
 
 struct holidayer_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct holidayer_cursor {
-	holidays_cur	hcur ;
+	holidays_cur	*hcurp ;
 	holidays	*hop ;
 	uint		magval ;
 	uint		year ;
@@ -49,8 +49,8 @@ struct holidayer_flags {
 
 struct holidayer_head {
 	cchar		*pr ;
-	ids		id ;
-	vechand		hols ;
+	ids		*idp ;
+	vechand		*hlp ;
 	HOLIDAYER_FL	fl ;
 	uint		magval ;
 	uint		year ;
@@ -72,7 +72,7 @@ extern int holidayer_fetchcite(holidayer *,holidayer_cite *,
 		holidayer_cur *,char *,int) noex ;
 extern int holidayer_fetchname(holidayer *,uint,cchar *,int,
 		holidayer_cur *,holidayer_cite *,char *,int) noex ;
-extern int holidayer_enum(holidayer *,holidayer_cur *,
+extern int holidayer_curenum(holidayer *,holidayer_cur *,
 		holidayer_cite *,char *,int,uint) noex ;
 extern int holidayer_check(holidayer *,time_t) noex ;
 extern int holidayer_audit(holidayer *) noex ;
