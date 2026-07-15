@@ -139,7 +139,7 @@ template<typename ... Args>
 local inline int babycalc_magic(babycalc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == BABYCALC_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == BABYCALC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (babycalc_magic) */
@@ -189,7 +189,7 @@ int babycalc_open(BC *op,cchar *pr,cchar *dbname) noex {
 	        if ((rs = babycalc_objloadbegin(op,pr,objname)) >= 0) {
 		    callsp p = callsp(op->callp) ;
 	            if ((rs = p->open(op->obj,pr,dbname)) >= 0) {
-	                op->magic = BABYCALC_MAGIC ;
+	                op->magval = BABYCALC_MAGIC ;
 	            }
 	            if (rs < 0) {
 		        babycalc_objloadend(op) ;
@@ -221,7 +221,7 @@ int babycalc_close(BC *op) noex {
 		rs1 = babycalc_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
