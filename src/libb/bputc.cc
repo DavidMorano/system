@@ -57,7 +57,6 @@ int bputc(bfile *op,int ch) noex {
 	    }
 	} /* end if (bwrite) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bputc) */
+} /* end subroutine (bputc) */
 
 
