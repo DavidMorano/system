@@ -115,8 +115,7 @@ int bseek(bfile *op,off_t wo,int w) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ro : rs ;
-}
-/* end subroutine (bseek) */
+} /* end subroutine (bseek) */
 
 
 /* local subroutines */
