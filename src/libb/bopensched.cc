@@ -212,8 +212,7 @@ ret1:
 
 ret0:
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (bopensched) */
+} /* end subroutine (bopensched) */
 
 
 /* local subroutines */
