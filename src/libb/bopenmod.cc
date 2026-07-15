@@ -82,7 +82,6 @@ int bopenmod(bfile *fp,cchar *fname,cchar *of,mode_t om) noex {
 	    } /* end if (bopen) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end routine (bopenmod) */
+} /* end routine (bopenmod) */
 
 
