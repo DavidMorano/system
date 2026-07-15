@@ -66,7 +66,6 @@
 
 int bisterm(bfile *fp) noex {
 	return bcontrol(fp,BC_ISTERMINAL,0) ;
-}
-/* end subroutine (bisterm) */
+} /* end subroutine (bisterm) */
 
 
