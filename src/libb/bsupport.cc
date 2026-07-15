@@ -72,8 +72,7 @@ int bfile_acc(bfile *op,bool fwr) noex {
 	    rs = bfile_ckwr(op) ;
 	}
 	return rs ;
-}
-/* end subroutine (bfile_acc) */
+} /* end subroutine (bfile_acc) */
 
 int bfile_ckrd(bfile *op) noex {	
 	int		rs = SR_BADF ;
@@ -85,8 +84,7 @@ int bfile_ckrd(bfile *op) noex {
 	    }
 	} /* end if (access allowed) */
 	return rs ;
-}
-/* end subroutine (bfile_ckrd) */
+} /* end subroutine (bfile_ckrd) */
 
 int bfile_ckwr(bfile *op) noex {	
 	int		rs = SR_BADF ;
@@ -102,8 +100,7 @@ int bfile_ckwr(bfile *op) noex {
 	    } /* end if (not previously writing */
 	} /* end if (access allowed) */
 	return rs ;
-}
-/* end subroutine (bfile_ckwr) */
+} /* end subroutine (bfile_ckwr) */
 
 int bfile_flushn(bfile *op,int n) noex {
 	int		rs = SR_OK ;
@@ -133,13 +130,11 @@ int bfile_flushn(bfile *op,int n) noex {
 	    } /* end if (flush needed) */
 	} /* end if (not-zero) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (bfile_flushn) */
+} /* end subroutine (bfile_flushn) */
 
 int bfile_flush(bfile *op) noex {
 	return bfile_flushn(op,-1) ;
-}
-/* end subroutine (bfile_flush) */
+} /* end subroutine (bfile_flush) */
 
 int bfile_pagein(bfile *op,off_t off,int i) noex {
 	cnullptr	np{} ;
@@ -161,7 +156,6 @@ int bfile_pagein(bfile *op,off_t off,int i) noex {
 	    } /* end if (u_mapbegin) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bfile_pagein) */
+} /* end subroutine (bfile_pagein) */
 
 
