@@ -125,8 +125,7 @@ int bwrite(bfile *op,cvoid *abuf,int alen) noex {
 	    } /* end if (access) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (bwrite) */
+} /* end subroutine (bwrite) */
 
 int bfile_write(bfile *op,cvoid *abuf,int alen) noex {
 	int		rs ;
@@ -142,8 +141,7 @@ int bfile_write(bfile *op,cvoid *abuf,int alen) noex {
 	} /* end if */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (bfile_write) */
+} /* end subroutine (bfile_write) */
 
 
 /* local subroutines */
