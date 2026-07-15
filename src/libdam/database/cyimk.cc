@@ -232,7 +232,7 @@ int cyimk_open(CYIMK *op,int year,cc *dname,cc *cname,int of,mode_t om) noex {
 	            if ((rs = cyimk_filesbegin(op)) >= 0) {
 	                c = rs ;
 	                if ((rs = cyimk_listbegin(op,n)) >= 0) {
-	                    op->magic = CYIMK_MAGIC ;
+	                    op->magval = CYIMK_MAGIC ;
 	                }
 	                if (rs < 0)
 	                    cyimk_filesend(op) ;
@@ -258,7 +258,7 @@ int cyimk_close(CYIMK *op) noex {
 	int		n = 0 ; /* return-value */
 	bool		f_go = false ;
 	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != CYIMK_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CYIMK_MAGIC) return SR_NOTOPEN ;
 	f_go = (! op->fl.abort) ;
 	n = op->nentries ;
 	if (n > 0) {
@@ -293,7 +293,7 @@ int cyimk_close(CYIMK *op) noex {
 	    rs1 = cyimk_idend(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (cyimk_close) */
 
@@ -304,7 +304,7 @@ int cyimk_add(CYIMK *op,CYIMK_ENT *bvp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (bvp == nullptr) return SR_FAULT ;
 
-	if (op->magic != CYIMK_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CYIMK_MAGIC) return SR_NOTOPEN ;
 
 	if ((bvp->lines != nullptr) && (bvp->nlines > 0)) {
 	    blentry	ble ;
