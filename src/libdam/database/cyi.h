@@ -70,7 +70,7 @@ struct cyi_entry {
 } ; /* end struct */
 
 struct cyi_cursor {
-	uint		magic ;
+	uint		magval ;
 	uint		citekey ;
 	int		i ;
 } ; /* end struct */
@@ -89,7 +89,7 @@ struct cyi_head {
 	CYI_FMI		fmi ;		/* file-map information */
 	cyihdr		fhi ;		/* file-header information */
 	time_t		ti_lastcheck ;	/* time last check of file */
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 	int		year ;
 } ; /* end struct */
