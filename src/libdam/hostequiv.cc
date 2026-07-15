@@ -28,12 +28,12 @@
 **************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<strings.h>		/* |strcasecmp(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<strings.h>		/* POSIX® |strcasecmp(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hostequiv.h"
 
