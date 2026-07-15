@@ -97,8 +97,7 @@ int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bopenprog) */
+} /* end subroutine (bopenprog) */
 
 int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
 	int		rs = SR_OK ;
@@ -150,9 +149,7 @@ int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
 	    } /* end if (error) */
 	} /* end if (opened) */
 	} /* end if (ok) */
-
 	return rs ;
-}
-/* end subroutine (bopenprog) */
+} /* end subroutine (bopenprog) */
 
 
