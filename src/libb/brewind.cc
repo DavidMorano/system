@@ -47,7 +47,6 @@
 
 int brewind(bfile *fp) noex {
 	return bseek(fp,0z,SEEK_SET) ;
-}
-/* end subroutine (brewind) */
+} /* end subroutine (brewind) */
 
 
