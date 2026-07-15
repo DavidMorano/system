@@ -78,7 +78,6 @@ cchar *bfilestfname(int w,cchar *atf) noex {
 	    }
 	}
 	return atf ;
-}
-/* end subroutine (strstdfname) */
+} /* end subroutine (strstdfname) */
 
 
