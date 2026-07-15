@@ -1,6 +1,6 @@
 /* utmpsizes HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UTMP entry (field buffer) sizes */
 /* version %I% last-modified %G% */
