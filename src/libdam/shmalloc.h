@@ -1,6 +1,6 @@
 /* SHMALLOC (Shared-Memory Allocator) */
 /* charset=ISO8859-1 */
-/* lang=C++20 (conformance reviewed) */
+/* lang=C20 (conformance reviewed) */
 
 /* Shared-Memory-Allocation management */
 /* version %I% last-modified %G% */
