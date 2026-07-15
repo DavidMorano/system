@@ -86,7 +86,6 @@ int bwritefile(bfile *op,cchar *fname) noex {
 	    } /* end if (bfile) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bwritefile) */
+} /* end subroutine (bwritefile) */
 
 
