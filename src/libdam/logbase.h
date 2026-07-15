@@ -53,9 +53,9 @@
 
 EXTERNC_begin
 
-extern float		logbasef(float,float)			noex ;
-extern double		logbase(double,double)			noex ;
-extern long double	logbasel(long double,long double)	noex ;
+extern float		logbasef	(float,float)			noex ;
+extern double		logbase		(double,double)			noex ;
+extern long double	logbasel	(long double,long double)	noex ;
 
 EXTERNC_end
 
