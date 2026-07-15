@@ -80,13 +80,11 @@ int bprintf(bfile *op,cchar *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bprintf) */
+} /* end subroutine (bprintf) */
 
 int bvprintf(bfile *op,cchar *fmt,va_list ap) noex {
 	return bwritefmt(op,fmt,ap) ;
-}
-/* end subroutine (bvprintf) */
+} /* end subroutine (bvprintf) */
 
 
 /* local subroutines */
