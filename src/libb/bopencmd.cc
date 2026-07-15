@@ -376,7 +376,6 @@ badpipe:
 	}
 
 	goto done ;
-}
-/* end subroutine (bopencmd) */
+} /* end subroutine (bopencmd) */
 
 
