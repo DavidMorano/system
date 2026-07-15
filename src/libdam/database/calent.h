@@ -42,7 +42,7 @@ struct calent_head {
 	CALENT_LN	*lines ;
 	CALENT_Q	q ;
 	CALENT_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	uint		voff ;
 	uint		vlen ;
 	uint		hash ;
