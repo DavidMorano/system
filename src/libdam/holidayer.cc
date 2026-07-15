@@ -5,6 +5,8 @@
 /* access for the HOLIDAYER database */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
+#define	CF_RESTYEAR	0		/* restriction on specified year */
 
 /* revision history:
 
@@ -36,17 +38,18 @@
 #include	<sys/param.h>		/* POSIX */
 #include	<sys/stat.h>		/* POSIX */
 #include	<unistd.h>		/* POSIX */
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
+#include	<tzfile.h>		/* POIX® TM_YEAR_BASE */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<uclibmem.h>		/* LIBUC */
+#include	<ucmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
-#include	<ufileop.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<estrings.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
@@ -57,6 +60,7 @@
 #include	<char.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"holidayer.h"
 
@@ -66,13 +70,27 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	HOLIDAYER_HOL	struct holidayer_hol
-#define	HOLIDAYER_FPR	"holidays"
-
 #define	HO		holidayer
 #define	HO_CUR		holidayer_cur
 #define	HO_CITE		holidayer_cite
-#define	HO_H		HOLIDAYER_HOL
+#define	HO_H		holidayer_hol
+#define	HO_FPR		"holidays"
+#define	HO_MAG		HOLIDAYER_MAGIC
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+#ifndef	CF_RESTYEAR
+#define	CF_RESTYEAR	0		/* restriction on specified year */
+#endif
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -96,22 +114,72 @@ typedef holidayer_hol *	holptr ;
 
 /* forward references */
 
-local int holidayer_holbegin(HO *,HO_H *,int,cchar *) noex ;
-local int holidayer_holend(HO *,HO_H *) noex ;
-local int holidayer_holfins(HO *) noex ;
-local int holidayer_holaudit(HO *,HO_H *) noex ;
+template<typename ... Args>
+local inline int holidayer_ctor(holidayer *op,Args ... args) noex {
+    	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = SR_OK ;
+	    op->pr = nullptr ;
+	    op->idp = nullptr ;
+	    op->hlp = nullptr ;
+	    op->fl = {} ;
+	    if (op->idp = new(nt) ids ; op->idp) {
+		if (op->hlp = new(nt) vechand ; op->hlp) {
+		    rs = SR_OK ;
+	        } /* end if (new-vechand) */
+		if (rs < 0) {
+		    delete op->idp ;
+		    op->idp = nullptr ;
+		} /* end if (error) */
+	    } /* end if (new-ids) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (holidayer_ctor) */
 
-local int holidayer_yearfind(HO *,uint,holidays **) noex ;
-local int holidayer_yearfinder(HO *,int,HO_H **) noex ;
-local int holidayer_yearfile(HO *,char *,uint) noex ;
-local int holidayer_yearadd(HO *,HO_H *) noex ;
-local int holidayer_dirok(HO *,cchar *) noex ;
-local int holidayer_mkdir(HO *,char *,cchar *) noex ;
-local int holidayer_mkfname(HO *,char *,cchar *,uint) noex ;
-local int holidayer_holaudit(HO *,HO_H *) noex ;
-local int holidayer_yearq(HO *,HO_CITE *) noex ;
-local int holidayer_year(HO *,uint) noex ;
-local int holidayer_yearmk(HO *) noex ;
+local int holidayer_dtor(holidayer *op) noex {
+	int		rs = SR_OK ;
+	if (op->hlp) ylikely {
+	    delete op->hlp ;
+	    op->hlp = nullptr ;
+	}
+	if (op->idp) ylikely {
+	    delete op->idp ;
+	    op->idp = nullptr ;
+	}
+	return rs ;
+} /* end subroutine (holidayer_dtor) */
+
+template<typename ... Args>
+local inline int holidayer_magic(holidayer *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == HO_MAG) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (holidayer_magic) */
+
+local int holidayer_liststart	(HO *) noex ;
+local int holidayer_listfinish	(HO *) noex ;
+
+local int holidayer_holbegin	(HO *,HO_H *,int,cchar *) noex ;
+local int holidayer_holend	(HO *,HO_H *) noex ;
+local int holidayer_holfins	(HO *) noex ;
+local int holidayer_holaudit	(HO *,HO_H *) noex ;
+
+local int holidayer_yearfind	(HO *,uint,holidays **) noex ;
+local int holidayer_yearfinder	(HO *,int,HO_H **) noex ;
+local int holidayer_yearfile	(HO *,char *,uint) noex ;
+local int holidayer_yearadd	(HO *,HO_H *) noex ;
+local int holidayer_dirok	(HO *,cchar *) noex ;
+local int holidayer_mkdir	(HO *,char *,cchar *) noex ;
+local int holidayer_mkfname	(HO *,char *,cchar *,uint) noex ;
+local int holidayer_holaudit	(HO *,HO_H *) noex ;
+local int holidayer_yearq	(HO *,HO_CITE *) noex ;
+local int holidayer_year	(HO *,uint) noex ;
+local int holidayer_yearmk	(HO *) noex ;
+
+local inline int restyear(int) noex ;
 
 local bool	isOurMode(mode_t) noex ;
 
@@ -123,6 +191,10 @@ constexpr cpcchar	holdnames[] = {
 	"/etc/acct",
 	nullptr
 } ; /* end array */
+
+static bufsizevar	maxpathlen(bufsize_mp) ;
+cbool			f_debug		= CF_DEBUG ;
+cbool			f_restyear	= CF_RESTYEAR ;
 
 
 /* exported variables */
@@ -138,263 +210,256 @@ const holidayer_obj	holidayer_modinfo = {
 
 int holidayer_open(HO *op,cchar *pr) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-	if (cchar *cp{} ; (rs = lm_strw(pr,-1,&cp)) >= 0) {
-	    op->pr = cp ;
-	    if ((rs = ids_load(&op->id)) >= 0) {
-	        op->magval = HOLIDAYER_MAGIC ;
-	    }
-	}
-
+	if ((rs = holidayer_ctor(op,pr)) >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if (pr[0]) ylikely {
+		if ((rs = maxpathlen) >= 0) ylikely {
+	            if (cchar *cp ; (rs = mem.strw(pr,-1,&cp)) >= 0) ylikely {
+			ids *idp = op->idp ;
+	                op->pr = cp ;
+	                if ((rs = idp->load) >= 0) ylikely {
+	                    op->magval = HO_MAG ;
+	                } /* end if (ids_load) */
+			if (rs < 0) {
+			    voidp vp = voidp(op->pr) ;
+			    mem.free(vp) ;
+			    op->pr = nullptr ;
+			} /* end if (error) */
+	            } /* end if (memory-acquire) */
+		} /* end if (maxpathlen) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		holidayer_dtor(op) ;
+	    } /* end if (error) */
+	} /* end if (lastlogfile_ctor) */
 	return rs ;
 } /* end subroutine (holidayer_open) */
 
 int holidayer_close(HO *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("holidayer_close: ent\n") ;
-#endif
-
-	if (op->fl.hols) {
-	    rs1 = holidayer_holfins(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->fl.hols = false ;
-	    rs1 = vechand_finish(&op->hols) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	rs1 = ids_release(&op->id) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->pr != nullptr) {
-	    void *vp = voidp(op->pr) ;
-	    rs1 = lm_free(vp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->pr = nullptr ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("holidayer_close: ret rs=%d\n",rs) ;
-#endif
-
-	op->magval = 0 ;
+	if ((rs = holidayer_magic(op)) >= 0) ylikely {
+	    if (op->fl.hols) {
+	        if (vechand *hlp = op->hlp ; hlp) {
+	            {
+	                rs1 = holidayer_holfins(op) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	            {
+			rs1 = holidayer_listfinish(op) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	        } /* end if (non-null) */
+	    } /* end if */
+	    if (op->idp) {
+	        rs1 = ids_release(op->idp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->pr) {
+	        void *vp = voidp(op->pr) ;
+	        rs1 = mem.free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->pr = nullptr ;
+	    } /* end if (memory-release) */
+	    {
+		rs1 = holidayer_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
+	} /* end if (holidayer_magic) */
 	return rs ;
 } /* end subroutine (holidayer_close) */
 
 int holidayer_audit(HO *op) noex {
-	int		rs = SR_OK ;
-	int		c = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-
-	if (op->fl.hols) {
-	    vechand	*hlp = &op->hols ;
-	    if ((rs = vechand_audit(hlp)) >= 0) {
-		void	*vp{} ;
-	        for (int i = 0 ; vechand_get(hlp,i,&vp) >= 0 ; i += 1) {
-	      	    HOLIDAYER_HOL	*hep = holptr(vp) ;
-	            if (vp) {
-			c += 1 ;
-	                rs = holidayer_holaudit(op,hep) ;
-	            }
-	            if (rs < 0) break ;
-	        } /* end for */
-	    } /* end if (vechand_audit) */
-	} /* end if */
-
+	int		rs ;
+	int		c = 0 ; /* return-value */
+	if ((rs = holidayer_magic(op)) >= 0) ylikely {
+	    if (op->fl.hols) {
+	        vechand	*hlp = op->hlp ;
+	        if ((rs = hlp->audit) >= 0) ylikely {
+		    void	*vp{} ;
+	            for (int i = 0 ; hlp->get(i,&vp) >= 0 ; i += 1) {
+	      	        HO_H	*hep = holptr(vp) ;
+	                if (vp) {
+			    c += 1 ;
+	                    rs = holidayer_holaudit(op,hep) ;
+	                }
+	                if (rs < 0) break ;
+	            } /* end for */
+	        } /* end if (vechand_audit) */
+	    } /* end if */
+	} /* end if (holidayer_magic) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (holidayer_audit) */
 
 int holidayer_curbegin(HO *op,HO_CUR *curp) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-
-	memclear(curp) ;
-	curp->magval = HOLIDAYER_MAGIC ;
-
-	op->ncursors += 1 ;
-	return SR_OK ;
-} /* end subroutine (HO_CURbegin) */
+    	cnothrow	nt{} ;
+    	int		rs ;
+	if ((rs = holidayer_magic(op,curp)) >= 0) ylikely {
+	    memclear(curp) ;
+	    rs = SR_NOMEM ;
+	    if (holidays_cur *hcurp = new(nt) holidays_cur ; hcurp) ylikely {
+		rs = SR_OK ;
+	        curp->magval = HO_MAG ;
+	        op->ncursors += 1 ;
+	    } /* end if (new-holidays_cur) */
+	} /* end if (holidayer_magic) */
+	return rs ;
+} /* end subroutine (holidayer_curbegin) */
 
 int holidayer_curend(HO *op,HO_CUR *curp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-	if (curp->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-
-	if (op->ncursors > 0) {
-	    if (curp->hop != nullptr) {
-	        holidays	*hop = curp->hop ;
-	        holidays_cur	*hcp = &curp->hcur ;
-	        if ((rs = holidays_curend(hop,hcp)) >= 0) {
-	            op->ncursors -= 1 ;
-	            curp->hop = nullptr ;
-	            curp->year = 0 ;
-	            curp->magval = 0 ;
-	        }
-	    } /* end if (cursor was used) */
-	} else {
-	    rs = SR_PROTO ;
-	}
-
+	int		rs ;
+	int		rs1 ;
+	if ((rs = holidayer_magic(op,curp)) >= 0) ylikely {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magval == HO_MAG) ylikely {
+		rs = SR_BUGCHECK ;
+		if (holidays_cur *hcp = curp->hcurp ; hcp) ylikely {
+	            if (op->ncursors > 0) ylikely {
+	                if (curp->hop) ylikely {
+	                    holidays	*hop = curp->hop ;
+		            rs = SR_OK ;
+	                    if ((rs1 = holidays_curend(hop,hcp)) >= 0) ylikely {
+	                        op->ncursors -= 1 ;
+	                        curp->hop = nullptr ;
+	                        curp->year = 0 ;
+	                        curp->magval = 0 ;
+	                    } /* end if */
+			    if (rs >= 0) rs = rs1 ;
+	                } /* end if (cursor was used) */
+	            } else {
+	                rs = SR_PROTO ;
+	            }
+		    {
+			delete hcp ;
+			curp->hcurp = nullptr ;
+		    } /* end block (memory-release) */
+		    curp->magval = 0 ;
+	        } /* end if (non-null) */
+	    } /* end if (cursor-magic) */
+	} /* end if (holidayer_magic) */
 	return rs ;
-} /* end subroutine (HO_CURend) */
+} /* end subroutine (holidayer_curend) */
+
+local int holidayer_fetchcites(HO *op,HO_CITE *qp,
+		HO_CUR *curp,char *rp,int rl) noex {
+    	int		rs ;
+	int		vl = 0 ; /* return-value */
+        if ((rs = holidayer_yearq(op,qp)) >= 0) ylikely {
+            const uint  y = rs ;
+            if (curp->year == 0) {
+                if (curp->hop == nullptr) {
+                    holidays            *holp ;
+                    holidays_cur        *hcp = curp->hcurp ;
+                    if ((rs = holidayer_yearfind(op,y,&holp)) >= 0) {
+                        if ((rs = holidays_curbegin(holp,hcp)) >= 0) {
+                            curp->hop = holp ;
+                            curp->year = y ;
+                            rs = holidays_fetchcite(holp,qp,hcp,rp,rl) ;
+                            vl = rs ;
+                        } /* end if (holidays_curbegin) */
+                    } /* end if (holidayer_yearfind) */
+                } else {
+                    rs = SR_PROTO ;
+                }
+            } else if (curp->year == qp->y) {
+                if (curp->hop != nullptr) {
+                    holidays            *holp = curp->hop ;
+                    holidays_cur        *hcp = curp->hcurp ;
+                    rs = holidays_fetchcite(holp,qp,hcp,rp,rl) ;
+                    vl = rs ;
+                } else {
+                    rs = SR_PROTO ;
+                }
+            } else {
+                rs = SR_PROTO ;
+            }
+        } /* end if (holidayer_year) */
+	return (rs >= 0) ? vl : rs ;
+} /* end subroutine (holidayer_fetchcites) */
 
 int holidayer_fetchcite(HO *op,HO_CITE *qp,
 		HO_CUR *curp,char *rp,int rl) noex {
 	int		rs ;
-	int		vl = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (qp == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-	if (curp->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("holidayer_fetchcite: ent %u:%u:%u\n",
-	    qp->y,qp->m,qp->d) ;
-#endif
-
-	if ((rs = holidayer_yearq(op,qp)) >= 0) {
-	    const uint	y = rs ;
-	    if (curp->year == 0) {
-	        if (curp->hop == nullptr) {
-	            holidays		*holp ;
-	            holidays_cur	*hcp = &curp->hcur ;
-	            if ((rs = holidayer_yearfind(op,y,&holp)) >= 0) {
-	                if ((rs = holidays_curbegin(holp,hcp)) >= 0) {
-	                    curp->hop = holp ;
-	                    curp->year = y ;
-	                    rs = holidays_fetchcite(holp,qp,hcp,rp,rl) ;
-	                    vl = rs ;
-	                } /* end if (holidays_curbegin) */
-	            } /* end if (holidayer_yearfind) */
-	        } else {
-	            rs = SR_PROTO ;
-		}
-	    } else if (curp->year == qp->y) {
-	        if (curp->hop != nullptr) {
-	            holidays		*holp = curp->hop ;
-	            holidays_cur	*hcp = &curp->hcur ;
-	            rs = holidays_fetchcite(holp,qp,hcp,rp,rl) ;
-	            vl = rs ;
-	        } else {
-	            rs = SR_PROTO ;
-		}
-	    } else {
-	        rs = SR_PROTO ;
-	    }
-	} /* end if (holidayer_year) */
-
-#if	CF_DEBUGS
-	debugprintf("holidayer_fetchcite: ret rs=%d bl=%u\n",rs,vl) ;
-#endif
-
+	int		vl = 0 ; /* return-value */
+	if ((rs = holidayer_magic(op,qp,curp)) >= 0) ylikely {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magval == HO_MAG) ylikely {
+		rs = holidayer_fetchcites(op,qp,curp,rp,rl) ;
+		vl = rs ;
+	    } /* end if (cursor-magic) */
+	} /* end if (holidayer_magic) */
 	return (rs >= 0) ? vl : rs ;
 } /* end subroutine (holidayer_fetchcite) */
+
+local int holidayer_fetchnames(HO *op,uint y,cc *kp,int kl,
+		HO_CUR *curp,HO_CITE *qp,char *rp,int rl) noex {
+    	int		rs ;
+	int		vl = 0 ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
+        if ((rs = holidayer_year(op,y)) >= 0) ylikely {
+            const uint  my = rs ;
+            if (curp->year == 0) ylikely {
+                if (curp->hop == nullptr) {
+                    holidays            *holp ;
+                    holidays_cur        *hcp = curp->hcurp ;
+                    if ((rs = holidayer_yearfind(op,y,&holp)) >= 0) {
+                        if ((rs = holidays_curbegin(holp,hcp)) >= 0) {
+                            cauto hof = holidays_fetchname ;
+                            curp->hop = holp ;
+                            curp->year = my ;
+                            rs = hof(holp,kp,kl,hcp,qp,rp,rl) ;
+                            vl = rs ;
+                        } /* end if (holidays_curbegin) */
+                    } /* end if (holidayer_yearfind) */
+                } else {
+                    rs = SR_PROTO ;
+                }
+            } else if (curp->year == y) {
+                if (curp->hop != nullptr) {
+                    holidays            *holp = curp->hop ;
+                    holidays_cur        *hcp = curp->hcurp ;
+                    rs = holidays_fetchname(holp,kp,kl,hcp,qp,rp,rl) ;
+                    vl = rs ;
+                } else {
+                    rs = SR_PROTO ;
+                }
+            } else {
+                rs = SR_PROTO ;
+            }
+        } /* end if (holidayer_year) */
+	DEBUGPRINTF("ret rs=%d bl=%u\n",rs,vl) ;
+	return (rs >= 0) ? vl : rs ;
+} /* end subroutine (holidayer_fetchnames) */
 
 int holidayer_fetchname(HO *op,uint y,cc *kp,int kl,
 		HO_CUR *curp,HO_CITE *qp,char *rp,int rl) noex {
 	int		rs ;
-	int		vl = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (qp == nullptr) return SR_FAULT ;
-
-	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("holidayer_fetchname: ent y=%d k=>%r<\n",y,kp,kl) ;
-	debugprintf("holidayer_fetchname: cur y=%u hop{%p}\n",
-	    curp->year,curp->hop) ;
-#endif
-
-	if ((rs = holidayer_year(op,y)) >= 0) {
-	    const uint	my = rs ;
-	    if (curp->year == 0) {
-	        if (curp->hop == nullptr) {
-	            holidays		*holp ;
-	            holidays_cur	*hcp = &curp->hcur ;
-	            if ((rs = holidayer_yearfind(op,y,&holp)) >= 0) {
-	                if ((rs = holidays_curbegin(holp,hcp)) >= 0) {
-	                    curp->hop = holp ;
-	                    curp->year = my ;
-	                    rs = holidays_fetchname(holp,kp,kl,hcp,qp,rp,rl) ;
-	                    vl = rs ;
-	                } /* end if (holidays_curbegin) */
-	            } /* end if (holidayer_yearfind) */
-	        } else {
-	            rs = SR_PROTO ;
-		}
-	    } else if (curp->year == y) {
-	        if (curp->hop != nullptr) {
-	            holidays		*holp = curp->hop ;
-	            holidays_cur	*hcp = &curp->hcur ;
-	            rs = holidays_fetchname(holp,kp,kl,hcp,qp,rp,rl) ;
-	            vl = rs ;
-	        } else {
-	            rs = SR_PROTO ;
-		}
-	    } else {
-	        rs = SR_PROTO ;
-	    }
-	} /* end if (holidayer_year) */
-
-#if	CF_DEBUGS
-	debugprintf("holidayer_fetchname: ret rs=%d bl=%u\n",rs,vl) ;
-#endif
-
+	int		vl = 0 ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
+	if ((rs = holidayer_magic(op,kp,curp,qp)) >= 0) ylikely {
+	    rs = SR_NOTOPEN ;
+	    if (op->magval == HO_MAG) ylikely {
+	        DEBUGPRINTF("ent y=%d k=>%r<\n",y,kp,kl) ;
+	        DEBUGPRINTF("cur y=%u hop{%p}\n",curp->year,curp->hop) ;
+		rs = holidayer_fetchnames(op,y,kp,kl,curp,qp,rp,rl) ;
+		vl = rs ;
+	    } /* end if (cursor-magic) */
+	} /* end if (holidayer_magic) */
+	DEBUGPRINTF("ret rs=%d bl=%u\n",rs,vl) ;
 	return (rs >= 0) ? vl : rs ;
 } /* end subroutine (holidayer_fetchname) */
 
-int holidayer_enum(HO *op,HO_CUR *curp,HO_CITE *qp,
+local int holidayer_curenums(HO *op,HO_CUR *curp,HO_CITE *qp,
 		char *vbuf,int vlen,uint y) noex {
-	int		rs = SR_OK ;
-	int		vl = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (qp == nullptr) return SR_FAULT ;
-
-	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-	if (curp->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-
-	if (op->ncursors == 0) return SR_INVALID ;
-
-	if (vbuf != nullptr) vbuf[0] = '\0' ;
-
-#if	CF_DEBUGS
-	debugprintf("holidayer_enum: ent y=%u\n",y) ;
-#endif
-
-	if ((rs = holidayer_year(op,y)) >= 0) {
+    	int		rs ;
+	int		vl = 0 ; /* return-value */
+	if ((rs = holidayer_year(op,y)) >= 0) ylikely {
 	    const uint	my = rs ;
 	    if (curp->year == 0) {
 	        if (curp->hop == nullptr) {
 	            holidays		*holp ;
-	            holidays_cur	*hcp = &curp->hcur ;
+	            holidays_cur	*hcp = curp->hcurp ;
 	            if ((rs = holidayer_yearfind(op,y,&holp)) >= 0) {
 	                if ((rs = holidays_curbegin(holp,hcp)) >= 0) {
 	                    curp->hop = holp ;
@@ -409,7 +474,7 @@ int holidayer_enum(HO *op,HO_CUR *curp,HO_CITE *qp,
 	    } else if (curp->year == y) {
 	        if (curp->hop != nullptr) {
 	            holidays		*holp = curp->hop ;
-	            holidays_cur	*hcp = &curp->hcur ;
+	            holidays_cur	*hcp = curp->hcurp ;
 	            rs = holidays_enum(holp,hcp,qp,vbuf,vlen) ;
 	            vl = rs ;
 	        } else {
@@ -419,52 +484,84 @@ int holidayer_enum(HO *op,HO_CUR *curp,HO_CITE *qp,
 	        rs = SR_PROTO ;
 	    }
 	} /* end if (holidayer_year) */
-
-#if	CF_DEBUGS
-	debugprintf("holidayer_enum: ret rs=%d vl=%u\n",rs,vl) ;
-#endif
-
 	return (rs >= 0) ? vl : rs ;
-} /* end subroutine (holidayer_enum) */
+} /* end subroutine (holidayer_curenums) */
+
+int holidayer_curenum(HO *op,HO_CUR *curp,HO_CITE *qp,
+		char *vbuf,int vlen,uint y) noex {
+	int		rs ;
+	int		vl = 0 ; /* return-value */
+	if ((rs = holidayer_magic(op,curp,qp)) >= 0) ylikely {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magval == HO_MAG) ylikely {
+	        rs = SR_INVALID ;
+	        if (op->ncursors > 0) ylikely {
+		    if (vbuf) vbuf[0] = '\0' ;
+		    rs = holidayer_curenums(op,curp,qp,vbuf,vlen,y) ;
+		    vl = rs ;
+	        }
+	    } /* end if (cursor-magic) */
+	} /* end if (holidayer_magic) */
+	return (rs >= 0) ? vl : rs ;
+} /* end subroutine (holidayer_curenum) */
 
 int holidayer_check(HO *op,time_t dt) noex {
-	int		rs = SR_OK ;
-	int		f_changed = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != HOLIDAYER_MAGIC) return SR_NOTOPEN ;
-
-	if (dt == 0) dt = time(nullptr) ;
-
-#ifdef	COMMENT
-#else
-	if (dt == 1) f_changed = true ;
-#endif
-
+	int		rs ;
+	int		f_changed = false ; /* return-value */
+	if ((rs = holidayer_magic(op)) >= 0) {
+	    if (dt == 0) dt = time(nullptr) ;
+	    if (dt == 1) f_changed = true ;
+	} /* end if (holidayer_magic) */
 	return (rs >= 0) ? f_changed : rs ;
 } /* end subroutine (holidayer_check) */
 
 
 /* private subroutines */
 
+local int holidayer_liststart(HO *op) noex {
+    	int		rs = SR_OK ;
+	if (! op->fl.hols) ylikely {
+	    rs = SR_BUGCHECK ;
+	    if (vechand *hlp = op->hlp ; hlp) ylikely {
+	        cint	vn = 2 ;
+	        cint	vo = vechandm.stationary ;
+	        if ((rs = hlp->start(vn,vo)) >= 0) ylikely {
+	            op->fl.hols = true ;
+	        }
+	    } /* end if (bug-check) */
+	} /* end if (needed to be opened) */
+	return rs ;
+} /* end subroutine (holidayer_liststart) */
+
+local int holidayer_listfinish(HO *op) noex {
+    	int		rs = SR_OK ;
+	if (op->fl.hols) ylikely {
+	    rs = SR_BUGCHECK ;
+	    if (vechand *hlp = op->hlp ; hlp) ylikely {
+	        if ((rs = hlp->finish) >= 0) ylikely {
+	            op->fl.hols = true ;
+	        }
+	    } /* end if (bug-check) */
+	} /* end if (needed to be opened) */
+	return rs ;
+} /* end subroutine (holidayer_listfinish) */
+
 local int holidayer_holfins(HO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->fl.hols) {
-	    vechand	*hlp = &op->hols ;
+	if (op->fl.hols) ylikely {
+	    vechand	*hlp = op->hlp ;
 	    void	*vp{} ;
-	    for (int i = 0 ; vechand_get(hlp,i,&vp) >= 0 ; i += 1) {
-	        HOLIDAYER_HOL	*hep = holptr(vp) ;
-	        if (vp) {
+	    for (int i = 0 ; hlp->get(i,&vp) >= 0 ; i += 1) {
+	        if (HO_H *hep = holptr(vp) ; hep) {
 		    {
 	                rs1 = holidayer_holend(op,hep) ;
 	                if (rs >= 0) rs = rs1 ;
 		    }
 		    {
-	                rs1 = lm_free(hep) ;
+	                rs1 = mem.free(hep) ;
 	                if (rs >= 0) rs = rs1 ;
-		    }
+		    } /* end block (memory-release) */
 	        }
 	    } /* end for */
 	} /* end if (activated) */
@@ -472,38 +569,33 @@ local int holidayer_holfins(HO *op) noex {
 } /* end subroutine (holidayer_holfins) */
 
 local int holidayer_holbegin(HO *op,HO_H *hep,int y,cchar *fn) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    if ((rs = holidays_open(&hep->hol,op->pr,y,fn)) >= 0) {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    if ((rs = holidays_open(&hep->hol,op->pr,y,fn)) >= 0) ylikely {
 	        hep->year = y ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (holidayer_holbegin) */
 
 local int holidayer_holend(HO *op,HO_H *hep) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (op == nullptr) return SR_FAULT ;
-#if	CF_DEBUGS
-	debugprintf("holidayer_holend: ent y=%u\n",hep->year) ;
-#endif
-	rs1 = holidays_close(&hep->hol) ;
-	if (rs >= 0) rs = rs1 ;
-	hep->year = 0 ;
-#if	CF_DEBUGS
-	debugprintf("holidayer_holend: ret rs=%d\n",rs) ;
-#endif
+	if (op) ylikely {
+	    rs1 = holidays_close(&hep->hol) ;
+	    if (rs >= 0) rs = rs1 ;
+	    hep->year = 0 ;
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (holidayer_holend) */
 
 local int holidayer_yearfind(HO *op,uint y,holidays **rpp) noex {
-	HOLIDAYER_HOL	*hep{} ;
+	HO_H		*hep{} ;
 	int		rs = SR_NOTFOUND ;
-	if (op->fl.hols) {
-	    vechand	*hlp = &op->hols ;
+	if (op->fl.hols) ylikely {
+	    vechand	*hlp = op->hlp ;
 	    void	*vp{} ;
-	    for (int i = 0 ; (rs = vechand_get(hlp,i,&vp)) >= 0 ; i += 1) {
+	    for (int i = 0 ; (rs = hlp->get(i,&vp)) >= 0 ; i += 1) {
 	        if (vp) {
 		    hep = holptr(vp) ;
 	            if (hep->year == y) break ;
@@ -512,53 +604,53 @@ local int holidayer_yearfind(HO *op,uint y,holidays **rpp) noex {
 	} /* end if (hols) */
 	if (rs == SR_NOTFOUND) {
 	    if ((rs = holidayer_yearfinder(op,y,&hep)) >= 0) {
-	        if (rpp != nullptr) *rpp = &hep->hol ;
+	        if (rpp) *rpp = &hep->hol ;
 	    }
 	} else {
-	    if (rpp != nullptr) *rpp = &hep->hol ;
+	    if (rpp) *rpp = &hep->hol ;
 	}
 	return rs ;
 } /* end subroutine (holidayer_yearfind) */
 
 local int holidayer_yearfinder(HO *op,int y,HO_H **rpp) noex {
 	int		rs ;
-	char		hfname[MAXPATHLEN+1] ;
-	if ((rs = holidayer_yearfile(op,hfname,y)) >= 0) {
-	    HOLIDAYER_HOL	*hep ;
-	    cint		esize = szof(HOLIDAYER_HOL) ;
-	    if ((rs = lm_mall(esize,&hep)) >= 0) {
-	        if ((rs = holidayer_holbegin(op,hep,y,hfname)) >= 0) {
-	            if ((rs = holidayer_yearadd(op,hep)) >= 0) {
-	                if (rpp != nullptr) *rpp = hep ;
+	int		rs1 ;
+	if (char *hfname ; (rs = mem.mp(&hfname)) >= 0) ylikely {
+	    if ((rs = holidayer_yearfile(op,hfname,y)) >= 0) ylikely {
+	        cint	esz = szof(HO_H) ;
+	        if (void *vp ; (rs = mem.mall(esz,&vp)) >= 0) ylikely {
+	            HO_H *hep = resumelife<HO_H>(vp) ;
+	            if ((rs = holidayer_holbegin(op,hep,y,hfname)) >= 0) {
+	                if ((rs = holidayer_yearadd(op,hep)) >= 0) {
+	                    if (rpp != nullptr) *rpp = hep ;
+	                }
+	                if (rs < 0) {
+	                    holidayer_holend(op,hep) ;
+		        } /* end if (error) */
 	            }
 	            if (rs < 0) {
-	                holidayer_holend(op,hep) ;
-		    }
-	        }
-	        if (rs < 0) {
-	            lm_free(hep) ;
-		}
-	    } /* end if (m-a) */
-	} /* end if (holidayer_yearfile) */
-#if	CF_DEBUGS
-	debugprintf("holidayer_yearfinder: ret rs=%d\n",rs) ;
-#endif
+	                mem.free(hep) ;
+		    } /* end if (error) */
+	        } /* end if (memory-acquire) */
+	    } /* end if (holidayer_yearfile) */
+	    rs1 = mem.free(hfname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 } /* end subroutine (holidayer_yearfinder) */
 
 local int holidayer_yearfile(HO *op,char *hfname,uint y) noex {
 	int		rs = SR_OK ;
-	int		len = 0 ;
-	for (int i = 0 ; holdnames[i] != nullptr ; i += 1) {
+	int		len = 0 ; /* return-value */
+	for (int i = 0 ; holdnames[i] ; i += 1) {
 	    cchar	*dn = holdnames[i] ;
 	    if ((rs = holidayer_dirok(op,dn)) > 0) {
 	        if ((rs = holidayer_mkfname(op,hfname,dn,y)) > 0) {
-	            ustat	sb ;
-	            cint		pl = rs ;
-	            if ((rs = uc_stat(hfname,&sb)) >= 0) {
+	            cint	pl = rs ;
+	            if (ustat sb ; (rs = uc_stat(hfname,&sb)) >= 0) {
 	                if (isOurMode(sb.st_mode)) {
 	                    cint	am = (R_OK) ;
-	                    if ((rs = permid(&op->id,&sb,am)) >= 0) {
+	                    if ((rs = permid(op->idp,&sb,am)) >= 0) {
 	                        len = pl ;
 	                    } else if (isNotAccess(rs)) {
 	                        rs = SR_OK ;
@@ -576,15 +668,9 @@ local int holidayer_yearfile(HO *op,char *hfname,uint y) noex {
 } /* end subroutine (holidayer_yearfile) */
 
 local int holidayer_yearadd(HO *op,HO_H *hep) noex {
-	vechand		*hlp = &op->hols ;
-	int		rs = SR_OK ;
-	if (! op->fl.hols) {
-	    cint	vo = vechandm.stationary ;
-	    if ((rs = vechand_start(hlp,2,vo)) >= 0) {
-	        op->fl.hols = true ;
-	    }
-	}
-	if (rs >= 0) {
+	int		rs ;
+	if ((rs = holidayer_liststart(op)) >= 0) ylikely {
+	    vechand	*hlp = op->hlp ;
 	    rs = vechand_add(hlp,hep) ;
 	}
 	return rs ;
@@ -592,25 +678,29 @@ local int holidayer_yearadd(HO *op,HO_H *hep) noex {
 
 local int holidayer_dirok(HO *op,cchar *dn) noex {
 	int		rs ;
-	int		f = false ;
-	char		dbuf[MAXPATHLEN+1] ;
-	if ((rs = holidayer_mkdir(op,dbuf,dn)) >= 0) {
-	    if (ustat sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
-	        if (S_ISDIR(sb.st_mode)) {
-	            cint	am = (R_OK|X_OK) ;
-	            if ((rs = permid(&op->id,&sb,am)) >= 0) {
-	                f = true ;
-	            }
+	int		rs1 ;
+	int		f = false ; /* return-value */
+	if (char *dbuf ; (rs = mem.mp(&dbuf)) >= 0) ylikely {
+	    if ((rs = holidayer_mkdir(op,dbuf,dn)) >= 0) ylikely {
+	        if (ustat sb ; (rs = uc_stat(dbuf,&sb)) >= 0) ylikely {
+	            if (S_ISDIR(sb.st_mode)) {
+	                cint	am = (R_OK|X_OK) ;
+	                if ((rs = permid(op->idp,&sb,am)) >= 0) {
+	                    f = true ;
+	                }
+	            } /* end if (is-dir) */
+	        } else if (isNotPresent(rs)) {
+	            rs = SR_OK ;
 	        }
-	    } else if (isNotPresent(rs)) {
-	        rs = SR_OK ;
-	    }
-	} /* end if (holidayer_mkdir) */
+	    } /* end if (holidayer_mkdir) */
+	    rs1 = mem.free(dbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (holidayer_dirok) */
 
 local int holidayer_mkdir(HO *op,char *rbuf,cchar *dn) noex {
-	cint		rlen = MAXPATHLEN ;
+	cint		rlen = maxpathlen ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if (dn[0] != '/') {
@@ -623,21 +713,20 @@ local int holidayer_mkdir(HO *op,char *rbuf,cchar *dn) noex {
 	            i += rs ;
 	        }
 	    }
-	}
-	if (rs >= 0) {
+	} /* end if (leading slash character) */
+	if (rs >= 0) ylikely {
 	    rs = storebuf_strw(rbuf,rlen,i,dn,-1) ;
 	    i += rs ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (holidayer_mkdir) */
 
 local int holidayer_mkfname(HO *op,char *rbuf,cchar *dn,uint y) noex {
-	cint		rlen = MAXPATHLEN ;
+	cint		rlen = maxpathlen ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	cchar		*pr = op->pr ;
-	cchar		*prefix = HOLIDAYER_FPR ;
-
+	cchar		*prefix = HO_FPR ;
 	if (dn[0] != '/') {
 	    cint	prl = lenstr(pr) ;
 	    if ((rs = storebuf_strw(rbuf,rlen,i,pr,prl)) >= 0) {
@@ -647,23 +736,19 @@ local int holidayer_mkfname(HO *op,char *rbuf,cchar *dn,uint y) noex {
 	            i += rs ;
 	        }
 	    }
-	}
-
+	} /* end if */
 	if (rs >= 0) {
 	    rs = storebuf_strw(rbuf,rlen,i,dn,-1) ;
 	    i += rs ;
-	}
-
+	} /* end if */
 	if (rs >= 0) {
 	    rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	    i += rs ;
-	}
-
+	} /* end if */
 	if (rs >= 0) {
 	    rs = storebuf_strw(rbuf,rlen,i,prefix,-1) ;
 	    i += rs ;
-	}
-
+	} /* end if */
 	if ((rs >= 0) && (y > 0)) {
 	    cint	dlen = DIGBUFLEN ;
 	    char	dbuf[DIGBUFLEN+1] ;
@@ -671,19 +756,20 @@ local int holidayer_mkfname(HO *op,char *rbuf,cchar *dn,uint y) noex {
 	        rs = storebuf_strw(rbuf,rlen,i,dbuf,rs) ;
 	        i += rs ;
 	    }
-	}
-
+	} /* end if */
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (holidayer_mkfname) */
 
 local int holidayer_holaudit(HO *op,HO_H *hep) noex {
-	int		rs ;
-	if (op == nullptr) return SR_FAULT ;
-	if (hep->year > 0) {
-	    rs = holidays_audit(&hep->hol) ;
-	} else {
-	    rs = SR_BADFMT ;
-	}
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+	    if (hep->year > 0) {
+	        rs = holidays_audit(&hep->hol) ;
+	    } else {
+	        rs = SR_BADFMT ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (holidayer_holaudit) */
 
@@ -697,9 +783,9 @@ local int holidayer_yearq(HO *op,HO_CITE *qp) noex {
 	    if (rs >= 0) {
 	        qp->y = ushort(op->year) ;
 	        y = op->year ;
-	    }
+	    } /* end if (ok) */
 	} else {
-	    if (qp->y >= 2038) rs = SR_INVALID ;
+	    rs = restyear(qp->y) ;
 	} /* end if (needed) */
 	return (rs >= 0) ? y : rs ;
 } /* end subroutine (holidayer_yearq) */
@@ -713,27 +799,35 @@ local int holidayer_year(HO *op,uint ay) noex {
 	    }
 	    if (rs >= 0) {
 	        y = op->year ;
-	    }
+	    } /* end if (ok) */
 	} else {
-	    if (y >= 2038) {
-		rs = SR_INVALID ;
-	    }
+	    rs = restyear(y) ;
 	} /* end if */
 	return (rs >= 0) ? y : rs ;
 } /* end subroutine (holidayer_year) */
 
 local int holidayer_yearmk(HO *op) noex {
 	int		rs = SR_OK ;
-	int		y = 0 ;
+	int		y = 0 ; /* return-value */
 	if (op->year == 0) {
-	    custime	t = time(nullptr) ;
-	    if (tmtime m ; (rs = tmtime_timelocal(&m,t)) >= 0) {
+	    custime	dt = time(nullptr) ;
+	    if (tmtime m ; (rs = tmtime_timelocal(&m,dt)) >= 0) {
 	        y = (m.year + TM_YEAR_BASE) ;
 	        op->year = y ;
 	    }
-	}
+	} /* end if (zero) */
 	return (rs >= 0) ? y : rs ;
 } /* end subroutine (holidayer_yearmk) */
+
+local inline int restyear(int y) noex {
+    	int		rs = SR_OK ;
+	if_constexpr (f_restyear) {
+	    if (y >= 2038) {
+	        rs = SR_INVALID ;
+	    }
+	} /* end if_constexpr (f_restyear) */
+	return rs ;
+} /* end subroutine (restyear) */
 
 local bool isOurMode(mode_t m) noex {
 	bool	f = false ;
