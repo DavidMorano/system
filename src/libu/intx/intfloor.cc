@@ -69,7 +69,7 @@
 
 /* local subroutine-templates */
 
-template<typename T> T xfloor(T v,int m) noex {
+template<typename T> local T xfloor(T v,int m) noex {
 	const T		n = v / m ;
 	return (n * m) ;
 } /* end subroutine-template (xfloor) */
