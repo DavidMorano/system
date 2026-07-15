@@ -37,11 +37,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MIN| + |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<stdintx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MIN| + |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<stdintx.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"intsat.h"
 
@@ -75,16 +77,14 @@ local int intsatsx(T v) noex {
 	    r = INT_MIN ;
 	}
 	return r ;
-}
-/* end subroutine-template (intsatsx) */
+} /* end subroutine-template (intsatsx) */
 
 template<typename UT>
 local int intsatux(UT v) noex {
 	UT	im = UT(INT_MAX) ;
 	if (v > im) v = im ;
 	return int(v) ;
-}
-/* end subroutine-template (intsatux) */
+} /* end subroutine-template (intsatux) */
 
 
 /* exported variables */
