@@ -95,7 +95,7 @@ template<typename ... Args>
 static inline int calent_magic(calent *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CALENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CALENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -123,7 +123,7 @@ int calent_start(calent *op,calent_q *qp,uint loff,int llen) noex {
 	        op->lines = elp ;
 	        op->e = ne ;
 	        op->i += 1 ;
-	        op->magic = CALENT_MAGIC ;
+	        op->magval = CALENT_MAGIC ;
 	        elp->loff = loff ;
 	        elp->llen = llen ;
 	    } /* end if (memory-acquire) */
@@ -157,7 +157,7 @@ int calent_finish(calent *op) noex {
 		rs1 = calent_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
