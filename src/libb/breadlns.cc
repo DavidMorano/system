@@ -44,16 +44,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
 
 /* local defines */
 
-#define	ISCONT(b,bl)	iscont(b,bl)
+#define	ISCONT(bp,bl)	iscont(bp,bl)	/* definition below */
 
 
 /* external subroutines */
@@ -67,13 +67,13 @@
 
 /* forward references */
 
-static bool iscont(cchar *lp,int ll) noex {
+local bool iscont(cchar *lp,int ll) noex {
 	bool		f = true ;
 	f = f && (ll >= 2) ;
 	f = f && (lp[ll - 1] == '\n') ;
 	f = f && (lp[ll - 2] == '\\') ;
 	return f ;
-}
+} /* end subroutine (iscont) */
 
 
 /* local variables */
@@ -102,7 +102,6 @@ int breadlns(bfile *op,char *lbuf,int llen,int to,int *lcp) noex {
 	} /* end if (magic) */
 	if (lcp) *lcp  = lines ;
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (breadlns) */
+} /* end subroutine (breadlns) */
 
 
