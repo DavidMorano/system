@@ -102,7 +102,6 @@ int bprintlns(bfile *op,int flen,cchar *lbuf,int llen) noex {
 	    } /* end if (writing) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bprintlns) */
+} /* end subroutine (bprintlns) */
 
 
