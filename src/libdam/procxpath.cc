@@ -49,16 +49,16 @@
 #include	<cassert>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
-#include	<bufsizevar.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<pathclean.h>		/* LIBUC */
 #include	<fieldterminit.hh>	/* LIBUC */
-
 #include	<field.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
-
 #include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
@@ -95,16 +95,16 @@ using libuc::mem ;			/* variable */
 
 namespace {
     struct pather {
-	vecstr *lp ;
+	vecstr *plp ;
 	char	*pbuf ;
 	int	plen ;
-	pather(vecstr *p) noex : lp(p) {
+	pather(vecstr *p) noex : plp(p) {
 	    pbuf = nullptr ;
-	    lbuf = nullptr ;
 	} ; /* end ctor */
 	int operator () (cchar *) noex ;
 	int procfile	(cchar *) noex ;
 	int procln	(cchar *,int) noex ;
+	int procent	(cchar *,int) noex ;
     } ; /* end struct */
 } /* end namespace */
 
@@ -121,14 +121,14 @@ cbool				f_debug		= CF_DEBUG ;
 
 /* exported subroutines */
 
-int procxpath(vecstr *lp,cchar *fname) noex {
+int procxpath(vecstr *plp,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	assert(lp && fname) ;
-	if (lp && fname) {
+	assert(plp && fname) ;
+	if (plp && fname) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        pather po(lp) ;
+	        pather po(plp) ;
 	        rs = po(fname) ;
 	        c = rs ;
 	    } /* end if (valid) */
@@ -139,7 +139,7 @@ int procxpath(vecstr *lp,cchar *fname) noex {
 
 /* local subroutines */
 
-int pather::operator(cchar *fn) noex 
+int pather::operator () (cchar *fn) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
@@ -148,9 +148,10 @@ int pather::operator(cchar *fn) noex
 	    if ((rs = mem.mall(sz,&pbuf)) >= 0) {
 		plen = rs ;
 		{
-		    rs = file(fn) ;
+		    rs = procfile(fn) ;
 		    c = rs ;
 		}
+		rs1 = mem.free(pbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (maxpathlen) */
@@ -163,10 +164,10 @@ int pather::procfile(cchar *fn) noex {
 	int		c = 0 ; /* return-value */
 	if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
 	    cint llen = rs ;
-	    if (bfile pf ; (rs = pf.open(fname,"r")) >= 0) {
+	    if (bfile pf ; (rs = pf.open(fn,"r")) >= 0) {
 	        while ((rs = pf.readlns(lbuf,llen)) > 0) {
 		    cchar *cp ;
-		    if (int cl = (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+		    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
 		        rs = procln(cp,cl) ;
 		        c += rs ;
 		    }
@@ -183,7 +184,7 @@ int pather::procfile(cchar *fn) noex {
 int pather::procln(cchar *lp,int ll) noex {
     	int		rs ;
 	int		rs1 ;
-	if (field fsb ; (rs = fsb.start(cp,cl)) >= 0) {
+	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
 	    cchar	*fp ;
 	    for (int fl ; (fl = fsb.get(ft.terms,&fp)) >= 0 ; ) {
 		if (fl > 0) {
@@ -197,44 +198,17 @@ int pather::procln(cchar *lp,int ll) noex {
 	return rs ;
 } /* end method (pather::procln) */
 
-int pather::procent(cchar *,int) noex {
+int pather::procent(cchar *fp,int fl) noex {
     	int		rs = SR_OK ;
 	if ((rs = pathclean(pbuf,fp,fl)) > 0) {
-	    if (ustat sb ; (rs = u_stat(pbuf,&sb) ;
-
-	                    f_add = ((rs >= 0) && S_ISDIR(sb.st_mode)) ;
-#else
-	                    f_add = (pl > 0) ;
-#endif /* CF_STAT */
-
-	                } else {
-	                    f_add = ((pl == 0) && (fsb.term == ':')) ;
-	                }
-
-	                if (f_add && (vecstr_findn(lp,pp,pl) == SR_NOTFOUND)) {
-
-#if	CF_DEBUG
-	                    debugprintf("procxpath: add=%r\n",pp,pl) ;
-#endif
-
-#if	CF_STAT
-	                    rs = u_stat(pp,&sb) ;
-	                    f_add = ((rs >= 0) && S_ISDIR(sb.st_mode)) ;
-#endif
-
-	                    if (f_add) {
-	                        c += 1 ;
-	                        rs = vecstr_add(lp,pp,pl) ;
-	                        if (rs < 0) break ;
-	                    }
-
-	                } /* end if (needed to add) */
-
-	            } /* end while (reading fields) */
-
-	            field_finish(&fsb) ;
-	        } /* end if (field) */
-
-#endif /* COMMENT */
+	    cint pl = rs ;
+	    if (ustat sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
+		rs = plp->adduniq(pbuf,pl) ;
+	    } else if (isNotPresent(rs)) {
+		rs = SR_OK ;
+	    }
+	} /* end if (pathclean) */
+	return rs ;
+} /* end method (pather::procent) */
 
 
