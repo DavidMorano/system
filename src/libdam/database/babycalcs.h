@@ -68,7 +68,7 @@ struct babycalcs_head {
 	time_t		ti_lastcheck ;
 	size_t		mapsize ;	/* SHM map-size */
 	BABYCALCS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		pagesize ;
 	int		dbsize ;
 	int		shmsize ;
