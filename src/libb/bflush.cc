@@ -56,12 +56,10 @@ int bflushn(bfile *op,int n) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (bflushn) */
+} /* end subroutine (bflushn) */
 
 int bflush(bfile *op) noex {
 	return bflushn(op,-1) ;
-}
-/* end subroutine (bflush) */
+} /* end subroutine (bflush) */
 
 
