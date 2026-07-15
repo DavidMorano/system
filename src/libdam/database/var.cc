@@ -151,7 +151,7 @@ int var_open(VAR *op,cchar *dbname) noex {
 
 	if ((rs = var_objloadbegin(op,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,dbname)) >= 0) {
-		op->magic = VAR_MAGIC ;
+		op->magval = VAR_MAGIC ;
 	    }
 	    if (rs < 0)
 		var_objloadend(op) ;
@@ -180,7 +180,7 @@ int var_opena(VAR *op,cchar **narr) noex {
 	        if ((rs >= 0) || (! isNotPresent(rs))) break ;
 	    } /* end for */
 	    if (rs >= 0) {
-		op->magic = VAR_MAGIC ;
+		op->magval = VAR_MAGIC ;
 	    }
 	    if (rs < 0)
 		var_objloadend(op) ;
@@ -196,7 +196,7 @@ int var_close(VAR *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
@@ -204,7 +204,7 @@ int var_close(VAR *op) noex {
 	rs1 = var_objloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (var_close) */
@@ -216,7 +216,7 @@ int var_getinfo(VAR *op,VAR_INFO *vip) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (vip == nullptr) return SR_FAULT ;
 
-	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
 
 	memclear(vip) ;
 
@@ -238,7 +238,7 @@ int var_audit(VAR *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.audit != nullptr) {
 	    rs = (*op->call.audit)(op->obj) ;
@@ -253,7 +253,7 @@ int var_count(VAR *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.count != nullptr) {
 	    rs = (*op->call.count)(op->obj) ;
@@ -269,7 +269,7 @@ int var_curbegin(VAR *op,VAR_CUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
 
 	memclear(curp) ;
 
@@ -277,7 +277,7 @@ int var_curbegin(VAR *op,VAR_CUR *curp) noex {
 	    if (void *vp ; (rs = uc_malloc(op->cursz,&vp)) >= 0) {
 		curp->scp = vp ;
 	        if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
-	            curp->magic = VAR_MAGIC ;
+	            curp->magval = VAR_MAGIC ;
 		}
 	        if (rs < 0) {
 	            uc_free(curp->scp) ;
@@ -298,8 +298,8 @@ int var_curend(VAR *op,VAR_CUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != VAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != VAR_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->scp != nullptr) {
 	    if (op->call.curend != nullptr) {
@@ -317,7 +317,7 @@ int var_curend(VAR *op,VAR_CUR *curp) noex {
 	    rs = SR_NOANODE ;
 	}
 
-	curp->magic = 0 ;
+	curp->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (var_curend) */
@@ -329,8 +329,8 @@ int var_fetch(VAR *op,cc *kp,int kl,VAR_CUR *curp,char *vbuf,int vlen) noex {
 	if (curp == nullptr) return SR_FAULT ;
 	if (kp == nullptr) return SR_FAULT ;
 
-	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != VAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != VAR_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.fetch != nullptr) {
 	    rs = (*op->call.fetch)(op->obj,kp,kl,curp->scp,vbuf,vlen) ;
@@ -348,8 +348,8 @@ int var_curenum(VAR *op,VAR_CUR *curp,char *kbuf,int klen,
 	if (curp == nullptr) return SR_FAULT ;
 	if (kbuf == nullptr) return SR_FAULT ;
 
-	if (op->magic != VAR_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != VAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != VAR_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.enumerate != nullptr) {
 	    rs = (*op->call.enumerate)(op->obj,curp->scp,
