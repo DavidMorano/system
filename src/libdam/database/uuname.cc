@@ -147,7 +147,7 @@ template<typename ... Args>
 local inline int uuname_magic(uuname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == UUNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == UUNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (uuname_magic) */
@@ -203,7 +203,7 @@ int uuname_open(uuname *op,cchar *pr,cchar *dbname) noex {
 	        if ((rs = uuname_objloadbegin(op,pr,objname)) >= 0) {
 		    calls *callp = (calls *) op->callp ;
 	            if ((rs = callp->open(op->obj,pr,dbname)) >= 0) {
-	                op->magic = UUNAME_MAGIC ;
+	                op->magval = UUNAME_MAGIC ;
 	            }
 	            if (rs < 0) {
 		        uuname_objloadend(op) ;
@@ -235,7 +235,7 @@ int uuname_close(uuname *op) noex {
 		rs1 = uuname_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -274,7 +274,7 @@ int uuname_curbegin(uuname *op,UUNAME_CUR *curp) noex {
 	        if (void *p ; (rs = uc_malloc(op->cursz,&p)) >= 0) {
 	            curp->scp = p ;
 	            if ((rs = callp->curbegin(op->obj,curp->scp)) >= 0) {
-	                curp->magic = UUNAME_MAGIC ;
+	                curp->magval = UUNAME_MAGIC ;
 	            }
 	            if (rs < 0) {
 		        uc_free(curp->scp) ;
@@ -292,7 +292,7 @@ int uuname_curend(uuname *op,UUNAME_CUR *curp) noex {
 	int		rs1 ;
 	if ((rs = uuname_magic(op,curp)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == UUNAME_MAGIC) {
+	    if (curp->magval == UUNAME_MAGIC) {
 		rs = SR_BUGCHECK ;
 	        if (curp->scp) {
 		    calls *callp = (calls *) op->callp ;
@@ -307,7 +307,7 @@ int uuname_curend(uuname *op,UUNAME_CUR *curp) noex {
 	                curp->scp = nullptr ;
 	            }
 		} /* end if (cursor) */
-	        curp->magic = 0 ;
+	        curp->magval = 0 ;
 	    } /* end if (cursor-magic) */
 	} /* end if (magic) */
 	return rs ;
@@ -330,7 +330,7 @@ int uuname_enum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = uuname_magic(op,curp,rbuf)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic) {
+	    if (curp->magval) {
 		calls *callp = (calls *) op->callp ;
 		rs = SR_NOSYS ;
 	        if (callp->curenum) {
