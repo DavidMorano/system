@@ -53,7 +53,7 @@ struct babycalc_head {
 	void		*obj ;		/* object pointer */
 	void		*callp ;	/* calls-structure pointer */
 	BABYCALC_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		objsz ;
 	int		cursz ;
 } ; /* end struct */
