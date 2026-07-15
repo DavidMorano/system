@@ -57,7 +57,6 @@ int bgetc(bfile *op) noex {
 	    rs = SR_EOF ;
 	}
 	return (rs > 0) ? ch : rs ;
-}
-/* end subroutine (bgetc) */
+} /* end subroutine (bgetc) */
 
 
