@@ -1,6 +1,6 @@
 /* utmpsizes SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UTMP entry types */
 /* version %I% last-modified %G% */
