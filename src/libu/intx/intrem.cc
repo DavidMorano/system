@@ -38,13 +38,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"intrem.h"
 
@@ -63,10 +63,10 @@
 
 /* forward references */
 
-template<typename T> T remx(T v,int m) noex {
+template<typename T> local T remx(T v,int m) noex {
 	const T	q = (v/m) ;
 	return (v-(q*m)) ;
-}
+} /* end subroutine */
 
 
 /* local variables */
