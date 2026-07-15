@@ -185,7 +185,6 @@ done:
 
 ret0:
 	return rs ;
-}
-/* end subroutine (bopenroot) */
+} /* end subroutine (bopenroot) */
 
 
