@@ -23,12 +23,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysnative.h>		/* useful native system headers */
-#include	<clanguage.h>		/* <- necessary inclusion */
-#include	<stdintx.h>		/* extended integer types */
-#include	<syspredefined.h>	/* system pre-defined types */
+#include	<stdint.h>		/* POSIX® integer types */
+#include	<usysnative.h>		/* LIBU useful native system headers */
+#include	<clanguage.h>		/* LIBU <- necessary inclusion */
+#include	<stdintx.h>		/* LIBU extended integer types */
+#include	<syspredefined.h>	/* LIBU system pre-defined types */
 
 #include	<utypedefs_ints.h>
+#include	<utypedefs_intp.h>
 
 
 /* for |stat(2)| and its many friends */
