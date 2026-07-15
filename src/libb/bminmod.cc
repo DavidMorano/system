@@ -68,7 +68,6 @@ int bminmod(bfile *op,mode_t om) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end routine (bminmod) */
+} /* end routine (bminmod) */
 
 
