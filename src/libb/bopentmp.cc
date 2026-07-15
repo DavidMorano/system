@@ -130,8 +130,7 @@ int bopentmp(bfile *fp,cchar *tname,cchar *ostr,mode_t om) noex {
 	} /* end if (ok) */
 
 	return rs ;
-}
-/* end subroutine (bopentmp) */
+} /* end subroutine (bopentmp) */
 
 
 /* local subroutines */
