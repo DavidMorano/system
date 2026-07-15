@@ -1,6 +1,6 @@
 /* usysdefs SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* standard (relatively) UNIX® preprocessor defiitions */
 /* version %I% last-modified %G% */
