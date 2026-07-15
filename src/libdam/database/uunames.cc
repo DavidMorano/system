@@ -278,7 +278,7 @@ template<typename ... Args>
 local inline int uunames_magic(uunames *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == UUNAMES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == UUNAMES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (uunames_magic) */
@@ -410,7 +410,7 @@ int uunames_open(UU *op,cchar *pr,cchar *dbname) noex {
 	            cint	ne = DEFNAMES ;
 	            if ((rs = vecobj_start(op->nlp,sz,ne,0)) >= 0) {
 			if ((rs = uunames_indopen(op,dt)) >= 0) {
-			    op->magic = UUNAMES_MAGIC ;
+			    op->magval = UUNAMES_MAGIC ;
 			}
 			if (rs < 0) {
 			    vecobj_finish(op->nlp) ;
@@ -449,7 +449,7 @@ int uunames_close(UU *op) noex {
 		rs1 = uunames_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
