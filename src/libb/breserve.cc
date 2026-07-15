@@ -63,7 +63,6 @@ int breserve(bfile *op,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (breserve) */
+} /* end subroutine (breserve) */
 
 
