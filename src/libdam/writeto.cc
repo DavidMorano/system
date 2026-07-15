@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* perform timed write operation */
+/* perform a write operation with a timeout */
 /* version %I% last-modified %G% */
 
 
@@ -18,6 +18,10 @@
 
 /******************************************************************************
 
+  	Name:
+	writeto
+
+	Description:
 	This subroutine performs a timed write operation (to an FD).
 	It is very much like |u_write(3u)| but can take an optional
 	time-out operand.
@@ -25,10 +29,15 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"writeto.h"
 
 
 /* local defines */
@@ -54,9 +63,8 @@
 
 /* exported subroutines */
 
-int writeto(int wfd,cchar *wbuf,int wlen,int wto) noex {
+int writeto(int wfd,cvoid *wbuf,int wlen,int wto) noex {
 	return uc_writeto(wfd,wbuf,wlen,wto) ;
-}
-/* end subroutine (writeto) */
+} /* end subroutine (writeto) */
 
 
