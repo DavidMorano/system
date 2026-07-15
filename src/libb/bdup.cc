@@ -100,7 +100,6 @@ int bdup(bfile *op,bfile *fnewp) noex {
 	    } /* end if (bfile_flush) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (bdup) */
+} /* end subroutine (bdup) */
 
 
