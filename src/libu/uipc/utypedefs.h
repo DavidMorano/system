@@ -30,6 +30,7 @@
 #include	<syspredefined.h>	/* LIBU system pre-defined types */
 
 #include	<utypedefs_ints.h>
+#include	<utypedefs_intp.h>
 
 
 /* for |stat(2)| and its many friends */
