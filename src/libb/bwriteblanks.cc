@@ -102,8 +102,7 @@ int bwriteblanks(bfile *op,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bwriteblanks) */
+} /* end subroutine (bwriteblanks) */
 
 int bwritechrs(bfile *op,int ch,int n) noex {
 	int		rs ;
@@ -123,8 +122,7 @@ int bwritechrs(bfile *op,int ch,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bwritechrs) */
+} /* end subroutine (bwritechrs) */
 
 
 /* local subroutines */
