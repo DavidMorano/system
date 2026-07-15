@@ -1,6 +1,6 @@
 /* utmptypes SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UTMP entry types */
 /* version %I% last-modified %G% */
@@ -89,18 +89,18 @@ enum missingutmptypes {
 
 /* exported variables */
 
-cint utmptypes::empty		= EMPTY ;
-cint utmptypes::runlevel	= RUN_LVL ;
-cint utmptypes::boottime	= BOOT_TIME ;
-cint utmptypes::timeold		= OLD_TIME ;
-cint utmptypes::timenew		= NEW_TIME ;
-cint utmptypes::procinit	= INIT_PROCESS ;
-cint utmptypes::proclogin	= LOGIN_PROCESS ;
-cint utmptypes::procuser	= USER_PROCESS ;
-cint utmptypes::procdead	= DEAD_PROCESS ;
-cint utmptypes::account		= ACCOUNTING ;
-cint utmptypes::signature	= SIGNATURE ;
-cint utmptypes::timeshut	= SHUTDOWN_TIME ;
+cshort utmptypes::empty		= EMPTY ;
+cshort utmptypes::runlevel	= RUN_LVL ;
+cshort utmptypes::boottime	= BOOT_TIME ;
+cshort utmptypes::timeold	= OLD_TIME ;
+cshort utmptypes::timenew	= NEW_TIME ;
+cshort utmptypes::procinit	= INIT_PROCESS ;
+cshort utmptypes::proclogin	= LOGIN_PROCESS ;
+cshort utmptypes::procuser	= USER_PROCESS ;
+cshort utmptypes::procdead	= DEAD_PROCESS ;
+cshort utmptypes::account	= ACCOUNTING ;
+cshort utmptypes::signature	= SIGNATURE ;
+cshort utmptypes::timeshut	= SHUTDOWN_TIME ;
 
 const utmptypes			utmptype ;
 
