@@ -108,13 +108,11 @@ int breade(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 	} /* end if (magic) */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end routine (breade) */
+} /* end routine (breade) */
 
 int bread(bfile *op,void *ubuf,int ulen) noex {
 	return breade(op,ubuf,ulen,-1,0) ;
-}
-/* end routine (bread) */
+} /* end routine (bread) */
 
 
 /* local subroutines */
