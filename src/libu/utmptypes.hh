@@ -1,6 +1,6 @@
 /* utmptypes HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UTMP entry types */
 /* version %I% last-modified %G% */
@@ -36,18 +36,18 @@
 
 
 struct utmptypes {
-    static cint	empty ;
-    static cint	runlevel ;
-    static cint	boottime ;
-    static cint	timeold ;
-    static cint	timenew ;
-    static cint	procinit ;
-    static cint	proclogin ;
-    static cint	procuser ;
-    static cint	procdead ;
-    static cint	account ;
-    static cint	signature ;
-    static cint	timeshut ;
+    static cshort	empty ;
+    static cshort	runlevel ;
+    static cshort	boottime ;
+    static cshort	timeold ;
+    static cshort	timenew ;
+    static cshort	procinit ;
+    static cshort	proclogin ;
+    static cshort	procuser ;
+    static cshort	procdead ;
+    static cshort	account ;
+    static cshort	signature ;
+    static cshort	timeshut ;
 } ; /* end struct (utmptypes) */
 
 extern const utmptypes	utmptype ;
