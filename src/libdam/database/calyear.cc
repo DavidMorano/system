@@ -134,7 +134,7 @@ int calyear_open(calyear *op,cc *pr,cc *dirnames,cc *calnames) noex {
 	memclear(op) ;
 	if ((rs = calyear_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dirnames,calnames)) >= 0) {
-		op->magic = CALYEAR_MAGIC ;
+		op->magval = CALYEAR_MAGIC ;
 	    }
 	    if (rs < 0)
 		calyear_objloadend(op) ;
@@ -157,7 +157,7 @@ int calyear_close(CALYEAR *op)
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
@@ -165,7 +165,7 @@ int calyear_close(CALYEAR *op)
 	rs1 = calyear_objloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (calyear_close) */
@@ -177,7 +177,7 @@ int calyear_count(CALYEAR *op)
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.count != nullptr) {
 	    rs = (*op->call.count)(op->obj) ;
@@ -194,7 +194,7 @@ int calyear_audit(CALYEAR *op)
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.audit != nullptr) {
 	    rs = (*op->call.audit)(op->obj) ;
@@ -211,7 +211,7 @@ int calyear_check(CALYEAR *op,time_t dt)
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.check != nullptr) {
 	    rs = (*op->call.check)(op->obj,dt) ;
@@ -227,7 +227,7 @@ int calyear_curbegin(CALYEAR *op,CALYEAR_CUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.curbegin != nullptr)  {
 	    void	*p ;
@@ -256,7 +256,7 @@ int calyear_curend(CALYEAR *op,CALYEAR_CUR *curp)
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->scp != nullptr)  {
 	    if (op->call.curend != nullptr) {
@@ -283,7 +283,7 @@ int calyear_lookcite(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp)
 	if (curp == nullptr) return SR_FAULT ;
 	if (qp == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->scp != nullptr) {
 	    if (op->call.lookcite != nullptr) {
@@ -317,7 +317,7 @@ int calyear_read(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp,
 	if (curp == nullptr) return SR_FAULT ;
 	if (qp == nullptr) return SR_FAULT ;
 
-	if (op->magic != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->scp != nullptr) {
 	    if (op->call.read != nullptr) {
