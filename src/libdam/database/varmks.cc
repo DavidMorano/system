@@ -219,7 +219,7 @@ int varmks_open(VARMKS *op,cchar *dbname,int of,mode_t om,int n) noex {
 	    if ((rs = varmks_filesbegin(op)) >= 0) {
 		c = rs ;
 	        if ((rs = varmks_listbegin(op,n)) >= 0) {
-	            op->magic = VARMKS_MAGIC ;
+	            op->magval = VARMKS_MAGIC ;
 	        }
 	        if (rs < 0) {
 	            varmks_filesend(op) ;
@@ -247,7 +247,7 @@ int varmks_close(VARMKS *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARMKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
 	debugprintf("varmks_close: nvars=%u\n",op->nvars) ;
@@ -297,7 +297,7 @@ int varmks_close(VARMKS *op) noex {
 	debugprintf("varmks_close: ret=%d\n",rs) ;
 #endif /* CF_DEBUGS */
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return (rs >= 0) ? nvars : rs ;
 }
 /* end subroutine (varmks_close) */
@@ -309,7 +309,7 @@ int varmks_addvar(VARMKS *op,cchar *k,cchar *vp,int vl) noex {
 	if (k == nullptr) return SR_FAULT ;
 	if (vp == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARMKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
 	debugprintf("varmks_addvar: k=%s v=>%r<\n",k,vp,vl) ;
@@ -335,7 +335,7 @@ int varmks_addvar(VARMKS *op,cchar *k,cchar *vp,int vl) noex {
 
 int varmks_abort(VARMKS *op) noex {
 	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != VARMKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
 	op->fl.abort = true ;
 	return SR_OK ;
 }
@@ -343,7 +343,7 @@ int varmks_abort(VARMKS *op) noex {
 
 int varmks_chgrp(VARMKS *op,gid_t gid) noex {
 	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != VARMKS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
 	op->gid = gid ;
 	return SR_OK ;
 }
