@@ -456,7 +456,6 @@ badtmpopen:
 
 bad0:
 	goto ret0 ;
-}
-/* end subroutine (bopenshell) */
+} /* end subroutine (bopenshell) */
 
 
