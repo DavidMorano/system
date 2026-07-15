@@ -111,8 +111,7 @@ int breadlnto(bfile *op,char *ubuf,int ulen,int to) noex {
 	    } /* end if (reading) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rlen : rs ;
-}
-/* end subroutine (breadlnto) */
+} /* end subroutine (breadlnto) */
 
 
 /* local subroutines */
