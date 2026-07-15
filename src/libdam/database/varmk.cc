@@ -134,7 +134,7 @@ int varmk_open(VARMK *op,cchar *dbname,int of,mode_t om,int n) noex {
 	    if ((rs = mkpr(prbuf,prlen,pn,dn)) >= 0) {
 	        if ((rs = varmk_objloadbegin(op,prbuf,objname)) >= 0) {
 	            if ((rs = (*op->call.open)(op->obj,dbname,of,om,n)) >= 0) {
-	                op->magic = VARMK_MAGIC ;
+	                op->magval = VARMK_MAGIC ;
 	            }
 	            if (rs < 0) {
 	                varmk_objloadend(op) ;
@@ -154,7 +154,7 @@ int varmk_close(VARMK *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARMK_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARMK_MAGIC) return SR_NOTOPEN ;
 	{
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
@@ -163,7 +163,7 @@ int varmk_close(VARMK *op) noex {
 	rs1 = varmk_objloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
 	}
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (varmk_close) */
@@ -173,7 +173,7 @@ int varmk_addvar(VARMK *op,cchar *k,cchar *vp,int vl) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARMK_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARMK_MAGIC) return SR_NOTOPEN ;
 
 	rs = (*op->call.addvar)(op->obj,k,vp,vl) ;
 
@@ -186,7 +186,7 @@ int varmk_abort(VARMK *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARMK_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARMK_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.abort != nullptr) {
 	    rs = (*op->call.abort)(op->obj) ;
@@ -201,7 +201,7 @@ int varmk_chgrp(VARMK *op,gid_t gid) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARMK_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARMK_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.chgrp != nullptr) {
 	    rs = (*op->call.chgrp)(op->obj,gid) ;
