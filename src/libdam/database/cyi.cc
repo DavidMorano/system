@@ -147,7 +147,7 @@ template<typename ... Args>
 local inline int cyi_magic(cyi *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CYI_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CYI_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (cyi_magic) */
@@ -209,7 +209,7 @@ int cyi_open(cyi *op,int year,cchar *dname,cchar *cname) noex {
 	            if ((rs = cyi_dbfind(op,dt,dname,cname,year)) >= 0) {
 	                op->ti_lastcheck = dt ;
 	                op->year = year ;
-	                op->magic = CYI_MAGIC ;
+	                op->magval = CYI_MAGIC ;
 	            }
 		} /* end if (vars::mkvars) */
 	    } /* end if (valid) */
@@ -233,7 +233,7 @@ int cyi_close(cyi *op) noex {
 	        rs1 = cyi_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -283,7 +283,7 @@ int cyi_curbegin(cyi *op,cyi_cur *curp) noex {
 	    memclear(curp) ;
 	    curp->citekey = UINT_MAX ;
 	    curp->i = -1 ;
-	    curp->magic = CYI_MAGIC ;
+	    curp->magval = CYI_MAGIC ;
 	    op->ncursors += 1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -294,11 +294,11 @@ int cyi_curend(cyi *op,cyi_cur *curp) noex {
     	int		rs ;
 	if ((rs = cyi_magic(op,curp)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == CYI_MAGIC) {
+	    if (curp->magval == CYI_MAGIC) {
 	        if (op->ncursors > 0) {
 	            op->ncursors -= 1 ;
 	        }
-	        curp->magic = 0 ;
+	        curp->magval = 0 ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
@@ -312,7 +312,7 @@ int cyi_curcite(cyi *op,cyi_cur *curp,cyi_q *qp) noex {
 	    cyi_fmi	*mip = &op->fmi ;
 	    cyihdr	*hip = &op->fhi ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == CYI_MAGIC) {
+	    if (curp->magval == CYI_MAGIC) {
 	        uint		(*vt)[5] ;
 	        uint		vte[5] ;
 	        uint		citekey ;
@@ -351,7 +351,7 @@ int cyi_curread(cyi *op,cyi_cur *curp,cyi_ent *ep,char *ebuf,int elen) noex {
 	    cyi_fmi	*mip = &op->fmi ;
 	    cyihdr	*hip = &op->fhi ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == CYI_MAGIC) {
+	    if (curp->magval == CYI_MAGIC) {
 		rs = SR_INVALID ;
 		if (op->ncursors > 0) {
 		    rs = SR_NOTFOUND ;
