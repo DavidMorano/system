@@ -43,22 +43,20 @@ LIBS +=
 DEPS= uconstants.o
 
 OBJ0= intminmax.o
-OBJ1= intsat.o intrem.o intceil.o intfloor.o
-OBJ2= willaddover.o satarith.o 
-OBJ3=
+OBJ1= intsat.o intrem.o intcmp.o
+OBJ2= intceil.o intfloor.o
+OBJ3= willaddover.o satarith.o 
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB=
 
 OBJ= $(OBJA)
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -103,7 +101,7 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -137,6 +135,7 @@ intrem.o:		intrem.cc	intrem.h	$(DEPS) $(INCS)
 intsat.o:		intsat.cc	intsat.h	$(DPES) $(INCS)
 intfloor.o:		intfloor.cc	intfloor.h	$(DEPS) $(INCS)
 intceil.o:		intceil.cc	intceil.h	$(DEPS) $(INCS)
+intcmp.o:		intcmp.cc	intcmp.h	$(DEPS) #(INCS)
 
 # UCONSTANTS
 uconstants.o:		uconstants.dir
