@@ -111,7 +111,6 @@ int bopenlock(bfile *lfp,cc *filename,int timeout,int oldtime) noex {
 	if ((rs >= 0) && (timeout <= 0)) rs = SR_LOCKED ;
 
 	return rs ;
-}
-/* end subroutine (bopenlock) */
+} /* end subroutine (bopenlock) */
 
 
