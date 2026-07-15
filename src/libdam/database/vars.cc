@@ -158,7 +158,7 @@ int vars_open(VARS *op,cchar *dbname) noex {
 	            op->dbname = cp ;
 		    if ((rs = vars_dbloadbegin(op,dt)) >= 0) {
 			op->ti_lastcheck = dt ;
-			op->magic = VARS_MAGIC ;
+			op->magval = VARS_MAGIC ;
 		    }
 		    if (rs < 0) {
 	    		lm_free(op->dbname) ;
@@ -178,7 +178,7 @@ int vars_close(VARS *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARS_MAGIC) return SR_NOTOPEN ;
 	{
 	rs1 = vars_dbloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
@@ -189,7 +189,7 @@ int vars_close(VARS *op) noex {
 	    op->dbname = nullptr ;
 	}
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (vars_close) */
@@ -202,7 +202,7 @@ int vars_getinfo(VARS *op,VARS_INFO *vip) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (vip == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARS_MAGIC) return SR_NOTOPEN ;
 
 	memclear(vip) ;
 
@@ -224,7 +224,7 @@ int vars_audit(VARS *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARS_MAGIC) return SR_NOTOPEN ;
 
 /* verify that all list pointers and list entries are valid */
 
@@ -240,7 +240,7 @@ int vars_count(VARS *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARS_MAGIC) return SR_NOTOPEN ;
 
 	hip = &op->ifi ;
 
@@ -253,7 +253,7 @@ int vars_curbegin(VARS *op,VARS_CUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARS_MAGIC) return SR_NOTOPEN ;
 
 	curp->i = 0 ;
 	curp->chash = 0 ;
@@ -268,7 +268,7 @@ int vars_curend(VARS *op,VARS_CUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARS_MAGIC) return SR_NOTOPEN ;
 
 	curp->i = 0 ;
 	if (op->ncursors > 0) {
@@ -300,7 +300,7 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,
 	if (op == nullptr) return SR_FAULT ;
 	if (kp == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARS_MAGIC) return SR_NOTOPEN ;
 
 	if (curp == nullptr) {
 	    curp = &dcur ;
@@ -433,7 +433,7 @@ int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,
 	if (curp == nullptr) return SR_FAULT ;
 	if (kbuf == nullptr) return SR_FAULT ;
 
-	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != VARS_MAGIC) return SR_NOTOPEN ;
 
 	if (op->ncursors == 0) return SR_INVALID ;
 
