@@ -73,7 +73,6 @@
 #include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdint>		/* CSTD |uint32_t| */
 #include	<bit>			/* C++STD |countl_zero(3c++)| */
 #include	<concepts>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
@@ -197,8 +196,7 @@ int base64_e(cchar *inbuf,int inlen,char *outbuf) noex {
 	    } /* end switch */
 	} /* end block */
 	return ol ;
-}
-/* end subroutine (base64_e) */
+} /* end subroutine (base64_e) */
 
 /* decode */
 int base64_d(cchar *inbuf,int len,char *outbuf) noex {
@@ -213,16 +211,15 @@ int base64_d(cchar *inbuf,int len,char *outbuf) noex {
 	    }
 	} /* end for */
 	return j ;
-}
-/* end subroutine (base64_d) */
+} /* end subroutine (base64_d) */
 
 int base64_enc(int v) noex {
     	return int(base64_et[v & bmask]) ;
-}
+} /* end subroutine */
 
 int base64_dec(int v) noex {
     	return int(base64decode.tab[v & UCHAR_MAX]) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -239,8 +236,7 @@ local void base64_eg(cchar *inbuf,char *outbuf) noex {
 	    cint	idx = int((hold >> ((n - i) * bits)) & bmask) ;
 	    outbuf[i] = base64_et[idx] ;
 	} /* end for */
-}
-/* end subroutine (base64_eg) */
+} /* end subroutine (base64_eg) */
 
 /* decode a group */
 local int base64_dg(cchar *inbuf,char *outbuf) noex {
@@ -275,7 +271,6 @@ local int base64_dg(cchar *inbuf,char *outbuf) noex {
 	    } /* end if_constexpr (f_comment) */
 	} /* end if (ok) */
 	return (rs >= 0) ? dlen : rs ;
-}
-/* end subroutine (base64_dg) */
+} /* end subroutine (base64_dg) */
 
 
