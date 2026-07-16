@@ -36,11 +36,11 @@
 #include	<cstddef>		/* CSTD |nullptr_t| */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
-#include	<clanguage.h>		/* LINU */
-#include	<usyscalls.h>		/* LINU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<funcodes.h>		/* LIBU |FM_{x}(3uc)| */
-#include	<intfloor.h>		/* LINU */
-#include	<localmisc.h>		/* LINU */
+#include	<intfloor.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ustream.hh"
 
