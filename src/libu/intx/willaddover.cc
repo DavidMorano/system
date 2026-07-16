@@ -75,7 +75,7 @@ import intminmax ;
 
 /* forward references */
 
-template<typename T> bool willaddoverx(T n1,T n2) noex {
+template<typename T> local bool willaddoverx(T n1,T n2) noex {
 	bool	f = false ;
 	if (n1 > 0) {
 	    f = ((n2 > 0) && (n1 > (vsmax<T> - n2))) ;
@@ -83,8 +83,7 @@ template<typename T> bool willaddoverx(T n1,T n2) noex {
 	    f = ((n2 < 0) && (n1 < (vsmin<T> - n2))) ;
 	}
 	return f ;
-}
-/* end subroutine (willaddoverx) */
+} /* end subroutine (willaddoverx) */
 
 
 /* local variables */
@@ -97,17 +96,14 @@ template<typename T> bool willaddoverx(T n1,T n2) noex {
 
 bool willaddoveri(int n1,int n2) noex {
     	return willaddoverx(n1,n2) ;
-}
-/* end subroutine (willaddoveri) */
+} /* end subroutine (willaddoveri) */
 
 bool willaddoverl(long n1,long n2) noex {
     	return willaddoverx(n1,n2) ;
-}
-/* end subroutine (willaddoverl) */
+} /* end subroutine (willaddoverl) */
 
 bool willaddoverll(longlong n1,longlong n2) noex {
     	return willaddoverx(n1,n2) ;
-}
-/* end subroutine (willaddoverll) */
+} /* end subroutine (willaddoverll) */
 
 
