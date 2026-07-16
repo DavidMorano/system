@@ -40,13 +40,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"buffer.h"
 
@@ -110,8 +110,7 @@ int buffer_chrs(buffer *op,int ch,int n) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (buffer_chrs) */
+} /* end subroutine (buffer_chrs) */
 
 int buffer_blanks(buffer *op,int n) noex {
 	int		rs = SR_FAULT ;
@@ -128,7 +127,6 @@ int buffer_blanks(buffer *op,int n) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (buffer_blanks) */
+} /* end subroutine (buffer_blanks) */
 
 
