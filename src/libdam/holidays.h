@@ -78,11 +78,11 @@ extern int holidays_open(holidays *,cchar *,int,cchar *) noex ;
 extern int holidays_count(holidays *) noex ;
 extern int holidays_curbegin(holidays *,holidays_cur *) noex ;
 extern int holidays_curend(holidays *,holidays_cur *) noex ;
+extern int holidays_curenum(holidays *,holidays_cur *,
+		holidays_cite *,char *,int) noex ;
 extern int holidays_fetchcite(holidays *,holidays_cite *,holidays_cur *,
 		char *,int) noex ;
 extern int holidays_fetchname(holidays *,cchar *,int,holidays_cur *,
-		holidays_cite *,char *,int) noex ;
-extern int holidays_enum(holidays *,holidays_cur *,
 		holidays_cite *,char *,int) noex ;
 extern int holidays_check(holidays *,time_t) noex ;
 extern int holidays_audit(holidays *) noex ;
