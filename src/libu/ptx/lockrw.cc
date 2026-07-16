@@ -157,8 +157,7 @@ int lockrw_create(lockrw *op,int f_shared) noex {
 	    }
 	} /* end if (lockrw_ctor) */
 	return rs ;
-}
-/* end subroutine (lockrw_create) */
+} /* end subroutine (lockrw_create) */
 
 int lockrw_destroy(lockrw *op) noex {
 	int		rs ;
@@ -181,8 +180,7 @@ int lockrw_destroy(lockrw *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lockrw_destroy) */
+} /* end subroutine (lockrw_destroy) */
 
 int lockrw_rdlock(lockrw *op,int to) noex {
 	int		rs ;
@@ -216,8 +214,7 @@ int lockrw_rdlock(lockrw *op,int to) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (lockrw_rdlock) */
+} /* end subroutine (lockrw_rdlock) */
 
 int lockrw_wrlock(lockrw *op,int to) noex {
 	int		rs ;
@@ -249,8 +246,7 @@ int lockrw_wrlock(lockrw *op,int to) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lockrw_wrlock) */
+} /* end subroutine (lockrw_wrlock) */
 
 int lockrw_unlock(lockrw *op) noex {
 	int		rs ;
@@ -269,8 +265,7 @@ int lockrw_unlock(lockrw *op) noex {
 	    } /* end if (mutex-lock) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lockrw_unlock) */
+} /* end subroutine (lockrw_unlock) */
 
 int lockrw_readers(lockrw *op) noex {
 	int		rs ;
@@ -287,8 +282,7 @@ int lockrw_readers(lockrw *op) noex {
 	    } /* end if (mutex-lock) */
 	} /* end if (magic) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (lockrw_readers) */
+} /* end subroutine (lockrw_readers) */
 
 
 /* private subroutines */
@@ -314,8 +308,7 @@ local int lockrw_ptminit(lockrw *op,int f_shared) noex {
 	    }
 	} /* end if (ptma) */
 	return rs ;
-}
-/* end subroutine (lockrw_ptminit) */
+} /* end subroutine (lockrw_ptminit) */
 
 local int lockrw_ptcinit(lockrw *op,int f_shared) noex {
 	int		rs ;
@@ -338,8 +331,7 @@ local int lockrw_ptcinit(lockrw *op,int f_shared) noex {
 	    }
 	} /* end if (ptca) */
 	return rs ;
-}
-/* end subroutine (lockrw_ptcinit) */
+} /* end subroutine (lockrw_ptcinit) */
 
 local int lockrw_notready(lockrw *op,int f_read) noex {
 	bool	f_notready = (op->writers > 0) ;
@@ -349,8 +341,7 @@ local int lockrw_notready(lockrw *op,int f_read) noex {
 	    f_notready = f_notready || (op->readers > 0) ;
 	} /* end if */
 	return f_notready ;
-}
-/* end subroutine (lockrw_notready) */
+} /* end subroutine (lockrw_notready) */
 
 int lockrw_co::operator () (int to) noex {
 	int		rs = SR_BUGCHECK ;
@@ -377,8 +368,7 @@ int lockrw_co::operator () (int to) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (lockrw_co::operator) */
+} /* end method (lockrw_co::operator) */
 
 void lockrw::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
