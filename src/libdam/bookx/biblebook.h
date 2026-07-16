@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>		/* LINU */
-#include	<usysbase.h>		/* LINU */
-#include	<modload.h>		/* LINUC */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
 
 
 #define	BIBLEBOOK		struct biblebook_head
