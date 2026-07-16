@@ -79,7 +79,7 @@ import intminmax ;
 
 /* forward references */
 
-template<typename T> static T xsaddsat(T v1,T v2) noex {
+template<typename T> local T xsaddsat(T v1,T v2) noex {
     	T		vr = 0 ;
     	if (willaddover(v1,v2)) {
 	    if (v1 >= 0) {
@@ -95,15 +95,13 @@ template<typename T> static T xsaddsat(T v1,T v2) noex {
 	    vr = (v1 + v2) ;
 	}
 	return vr ;
-}
-/* end subroutine (xsaddsat) */
+} /* end subroutine (xsaddsat) */
 
-template<typename T> static T xuaddsat(T v1,T v2) noex {
+template<typename T> local T xuaddsat(T v1,T v2) noex {
 	T		vr = (v1 + v2) ;
 	if ((vr < v1) || (vr < v2)) vr = vumax<T> ;
 	return vr ;
-}
-/* end subroutine (xuaddsat) */
+} /* end subroutine (xuaddsat) */
 
 
 /* local variables */
@@ -116,32 +114,26 @@ template<typename T> static T xuaddsat(T v1,T v2) noex {
 
 int iaddsat(int v1,int v2) noex {
     	return xsaddsat(v1,v2) ;
-}
-/* end subroutine (iaddsat) */
+} /* end subroutine (iaddsat) */
 
 long laddsat(long v1,long v2) noex {
     	return xsaddsat(v1,v2) ;
-}
-/* end subroutine (laddsat) */
+} /* end subroutine (laddsat) */
 
 longlong lladdsat(longlong v1,longlong v2) noex {
     	return xsaddsat(v1,v2) ;
-}
-/* end subroutine (lladdsat) */
+} /* end subroutine (lladdsat) */
 
 uint uiaddsat(uint v1,uint v2) noex {
 	return xuaddsat(v1,v2) ;
-}
-/* end subroutine (uaddsat) */
+} /* end subroutine (uaddsat) */
 
 ulong uladdsat(ulong v1,ulong v2) noex {
 	return xuaddsat(v1,v2) ;
-}
-/* end subroutine (uladdsat) */
+} /* end subroutine (uladdsat) */
 
 ulonglong ulladdsat(ulonglong v1,ulonglong v2) noex {
 	return xuaddsat(v1,v2) ;
-}
-/* end subroutine (ulladdsat) */
+} /* end subroutine (ulladdsat) */
 
 
