@@ -196,7 +196,7 @@ enum sysconfcmds {
 
 /* value requests but with no-limit */
 #ifndef	_SC_AIO_MAX
-#define	_SC_AIO_MAX		 sysconfcmd_maxaio
+#define	_SC_AIO_MAX		sysconfcmd_maxaio
 #endif
 #ifndef	_SC_ATEXIT_MAX
 #define	_SC_ATEXIT_MAX		sysconfcmd_maxatexit
