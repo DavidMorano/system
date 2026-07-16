@@ -51,23 +51,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<stdintx.h>
-#include	<fmtstr.h>
-#include	<strwcpy.h>
-#include	<ctbin.h>
-#include	<ctoct.h>
-#include	<ctdec.h>
-#include	<cthex.h>
-#include	<mkchar.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<algorithm>		/* CSTD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<ctbin.h>		/* LIBUC */
+#include	<ctoct.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<cthex.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"buffer.h"
 
@@ -147,8 +147,7 @@ int buffer_start(buffer *op,int startlen) noex {
 	    } /* end if_constexpr (f_bufstart) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (buffer_start) */
+} /* end subroutine (buffer_start) */
 
 int buffer_finish(buffer *op) noex {
 	int		rs = SR_FAULT ;
@@ -167,8 +166,7 @@ int buffer_finish(buffer *op) noex {
 	    op->clen = 0 ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (buffer_finish) */
+} /* end subroutine (buffer_finish) */
 
 int buffer_reset(buffer *op) noex {
 	int		rs = SR_FAULT ;
@@ -178,8 +176,7 @@ int buffer_reset(buffer *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (buffer_reset) */
+} /* end subroutine (buffer_reset) */
 
 int buffer_adv(buffer *op,int advlen) noex {
 	int		rs = SR_FAULT ;
@@ -194,8 +191,7 @@ int buffer_adv(buffer *op,int advlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? advlen : rs ;
-}
-/* end subroutine (buffer_adv) */
+} /* end subroutine (buffer_adv) */
 
 int buffer_strw(buffer *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
@@ -212,8 +208,7 @@ int buffer_strw(buffer *op,cchar *sp,int 탎l) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (buffer_strw) */
+} /* end subroutine (buffer_strw) */
 
 int buffer_chr(buffer *op,int ch) noex {
 	int		rs = SR_FAULT ;
@@ -226,8 +221,7 @@ int buffer_chr(buffer *op,int ch) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? 1 : rs ;
-}
-/* end subroutine (buffer_chr) */
+} /* end subroutine (buffer_chr) */
 
 int buffer_buf(buffer *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
@@ -245,8 +239,7 @@ int buffer_buf(buffer *op,cchar *sp,int 탎l) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (buffer_buf) */
+} /* end subroutine (buffer_buf) */
 
 int buffer_vprintf(buffer *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
@@ -266,8 +259,7 @@ int buffer_vprintf(buffer *op,cchar *fmt,va_list ap) noex {
 	    } /* end if (maxlinelen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (buffer_vprintf) */
+} /* end subroutine (buffer_vprintf) */
 
 /* PRINTFLIKE2 */
 int buffer_printf(buffer *op,cchar *fmt,...) noex {
@@ -279,8 +271,7 @@ int buffer_printf(buffer *op,cchar *fmt,...) noex {
 	    va_end(ap) ;
 	}
 	return rs ;
-}
-/* end subroutine (buffer_printf) */
+} /* end subroutine (buffer_printf) */
 
 /* get the address of the byte array from the buffer object */
 int buffer_get(buffer *op,cchar **spp) noex {
@@ -295,8 +286,7 @@ int buffer_get(buffer *op,cchar **spp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (buffer_get) */
+} /* end subroutine (buffer_get) */
 
 int buffer_getprev(buffer *op) noex {
 	int		rs = SR_FAULT ;
@@ -308,8 +298,7 @@ int buffer_getprev(buffer *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (buffer_getprev) */
+} /* end subroutine (buffer_getprev) */
 
 int buffer_len(buffer *op) noex {
 	int		rs = SR_FAULT ;
