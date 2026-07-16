@@ -1,6 +1,6 @@
 /* cfutil HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* convert a decimal digit string to its binary floating value */
 /* version %I% last-modified %G% */
