@@ -43,7 +43,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<userinfo.h>		/* LIBUC */
-#include	<mkui.h>		/* LINUC |mkuibang(3dam)| */
+#include	<mkui.h>		/* LIBUC |mkuibang(3dam)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"mkbangname.h"
