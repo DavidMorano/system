@@ -113,8 +113,6 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	TO_OLDFILE	(5 * 60)
 
-#define	MODP2(v,n)	((v) & ((n) - 1))
-
 #define	BVENT		bventry
 
 #ifndef	CF_DEBUG
