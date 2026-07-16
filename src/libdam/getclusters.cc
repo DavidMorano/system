@@ -57,13 +57,13 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
-#include	<bufsizeget.h>		/* LINUC */
-#include	<vecstr.h>		/* LINUC */
-#include	<mkpathx.h>		/* LINUC */
-#include	<isnot.h>		/* LINUC */
-#include	<nodedb.h>		/* LINUC */
-#include	<clusterdb.h>		/* LINUC */
-#include	<localmisc.h>		/* LINU */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<nodedb.h>		/* LIBUC */
+#include	<clusterdb.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getclusters.h"
 
