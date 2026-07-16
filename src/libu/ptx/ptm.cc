@@ -106,8 +106,7 @@ int ptm_create(ptm *op,ptma *ap) noex {
 	    rs = pmo(op) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptm_create) */
+} /* end subroutine (ptm_create) */
 
 int ptm_destroy(ptm *op) noex {
 	int		rs = SR_FAULT ;
@@ -121,8 +120,7 @@ int ptm_destroy(ptm *op) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptm_destroy) */
+} /* end subroutine (ptm_destroy) */
 
 int ptm_setprioceiling(ptm *op,int npri,int *oldp) noex {
 	int		rs = SR_FAULT ;
@@ -136,8 +134,7 @@ int ptm_setprioceiling(ptm *op,int npri,int *oldp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptm_setprioceiling) */
+} /* end subroutine (ptm_setprioceiling) */
 
 int ptm_getprioceiling(ptm *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
@@ -151,8 +148,7 @@ int ptm_getprioceiling(ptm *op,int *oldp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptm_getprioceiling) */
+} /* end subroutine (ptm_getprioceiling) */
 
 int ptm_lockbegin(ptm *op) noex {
 	int		rs = SR_FAULT ;
@@ -162,8 +158,7 @@ int ptm_lockbegin(ptm *op) noex {
 	    rs = pmo(op) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptm_lockbegin) */
+} /* end subroutine (ptm_lockbegin) */
 
 int ptm_lockbeginto(ptm *op,int to) noex {
     	cint		rsb = SR_BUSY ;
@@ -193,8 +188,7 @@ int ptm_lockbeginto(ptm *op,int to) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptm_lockbeginto) */
+} /* end subroutine (ptm_lockbeginto) */
 
 int ptm_locktry(ptm *op) noex {
 	int		rs = SR_FAULT ;
@@ -204,8 +198,7 @@ int ptm_locktry(ptm *op) noex {
 	    rs = pmo(op) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptm_locktry) */
+} /* end subroutine (ptm_locktry) */
 
 int ptm_lockend(ptm *op) noex {
 	int		rs = SR_FAULT ;
