@@ -26,9 +26,9 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysdefs.h>
-#include	<usysflag.h>		/* |F_DARWIN| + |F_LINUX| */
+#include	<usysflag.h>		/* |F_DARWIN| + |F_LIBUX| */
 
-#if	F_DARWIN || F_LINUX
+#if	F_DARWIN || F_LIBUX
 
 EXTERNC_begin
 
@@ -36,7 +36,7 @@ extern cchar	*getexecname() noex ;
 
 EXTERNC_end
 
-#endif /* F_DARWIN || F_LINUX */
+#endif /* F_DARWIN || F_LIBUX */
 
 
 #endif /* GETEXECNAME_INCLUDE */
