@@ -49,22 +49,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<stdintx.h>
-#include	<fmtstr.h>
-#include	<strwcpy.h>
-#include	<ctbin.h>
-#include	<ctoct.h>
-#include	<ctdec.h>
-#include	<cthex.h>
-#include	<mkchar.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<ctbin.h>		/* LIBUC */
+#include	<ctoct.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<cthex.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"buffer.h"
 
@@ -123,14 +123,12 @@ int buffer_octx(buffer *op,T v) noex {
 template<typename T>
 int buffer_decx(buffer *op,T v) noex {
 	return buffer_xxxx(op,ctdec,v) ;
-}
-/* end subroutine-template (buffer_decx) */
+} /* end subroutine-template (buffer_decx) */
 
 template<typename T>
 int buffer_hexx(buffer *op,T v) noex {
 	return buffer_xxxx(op,cthex,v) ;
-}
-/* end subroutine-template (buffer_hexx) */
+} /* end subroutine-template (buffer_hexx) */
 
 
 /* local variables */
@@ -143,136 +141,110 @@ int buffer_hexx(buffer *op,T v) noex {
 
 int buffer_bini(buffer *op,int v) noex {
 	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_bini) */
+} /* end subroutine (buffer_bini) */
 
 int buffer_binl(buffer *op,long v) noex {
 	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_binl) */
+} /* end subroutine (buffer_binl) */
 
 int buffer_binll(buffer *op,longlong v) noex {
 	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_binll) */
+} /* end subroutine (buffer_binll) */
 
 int buffer_binui(buffer *op,uint v) noex {
 	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_binui) */
+} /* end subroutine (buffer_binui) */
 
 int buffer_binul(buffer *op,ulong v) noex {
 	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_binul) */
+} /* end subroutine (buffer_binul) */
 
 int buffer_binull(buffer *op,ulonglong v) noex {
 	return buffer_binx(op,v) ;
-}
-/* end subroutine (buffer_binull) */
+} /* end subroutine (buffer_binull) */
 
 int buffer_octi(buffer *op,int v) noex {
 	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octi) */
+} /* end subroutine (buffer_octi) */
 
 int buffer_octl(buffer *op,long v) noex {
 	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octl) */
+} /* end subroutine (buffer_octl) */
 
 int buffer_octll(buffer *op,longlong v) noex {
 	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octll) */
+} /* end subroutine (buffer_octll) */
 
 int buffer_octui(buffer *op,uint v) noex {
 	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octui) */
+} /* end subroutine (buffer_octui) */
 
 int buffer_octul(buffer *op,ulong v) noex {
 	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octul) */
+} /* end subroutine (buffer_octul) */
 
 int buffer_octull(buffer *op,ulonglong v) noex {
 	return buffer_octx(op,v) ;
-}
-/* end subroutine (buffer_octull) */
+} /* end subroutine (buffer_octull) */
 
 int buffer_deci(buffer *op,int v) noex {
 	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_deci) */
+} /* end subroutine (buffer_deci) */
 
 int buffer_decl(buffer *op,long v) noex {
 	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_decl) */
+} /* end subroutine (buffer_decl) */
 
 int buffer_decll(buffer *op,longlong v) noex {
 	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_decll) */
+} /* end subroutine (buffer_decll) */
 
 int buffer_decui(buffer *op,uint v) noex {
 	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_decui) */
+} /* end subroutine (buffer_decui) */
 
 int buffer_decul(buffer *op,ulong v) noex {
 	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_decul) */
+} /* end subroutine (buffer_decul) */
 
 int buffer_decull(buffer *op,ulonglong v) noex {
 	return buffer_decx(op,v) ;
-}
-/* end subroutine (buffer_decull) */
+} /* end subroutine (buffer_decull) */
 
 int buffer_hexc(buffer *op,int v) noex {
 	uint		uv = uint(v) ;
 	return buffer_hexuc(op,uv) ;
-}
-/* end subroutine (buffer_hexc) */
+} /* end subroutine (buffer_hexc) */
 
 int buffer_hexi(buffer *op,int v) noex {
 	uint		uv = uint(v) ;
 	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexi) */
+} /* end subroutine (buffer_hexi) */
 
 int buffer_hexl(buffer *op,long v) noex {
 	ulong		uv = ulong(v) ;
 	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexl) */
+} /* end subroutine (buffer_hexl) */
 
 int buffer_hexll(buffer *op,longlong v) noex {
 	ulonglong	uv = ulonglong(v) ;
 	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexll) */
+} /* end subroutine (buffer_hexll) */
 
 int buffer_hexuc(buffer *op,uint uv) noex {
 	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexc) */
+} /* end subroutine (buffer_hexc) */
 
 int buffer_hexui(buffer *op,uint uv) noex {
 	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexui) */
+} /* end subroutine (buffer_hexui) */
 
 int buffer_hexul(buffer *op,ulong uv) noex {
 	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexul) */
+} /* end subroutine (buffer_hexul) */
 
 int buffer_hexull(buffer *op,ulonglong uv) noex {
 	return buffer_hexx(op,uv) ;
-}
-/* end subroutine (buffer_hexull) */
+} /* end subroutine (buffer_hexull) */
 
 
