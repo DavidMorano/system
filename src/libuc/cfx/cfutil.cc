@@ -39,6 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -68,6 +69,11 @@ import libutil ;			/* |getlenstr(3u)| */
 
 /* forward references */
 
+local bool isourlead(int ch) noex {
+   	ch &= UCHAR_MAX ;
+    	return iswht(ch) || iszero(ch) ;
+} /* end subroutine (isourlead) */
+
 
 /* local variables */
 
@@ -78,20 +84,24 @@ import libutil ;			/* |getlenstr(3u)| */
 /* exported subroutines */
 
 namespace cfx {
-    int rmleadzero(cchar *sp,int sl) noex {		/* used internally */
-	if ((sl > 1) && iszero(*sp++)) ylikely {
+    int sileadzero(cchar *sp,int sl) noex {		/* used internally */
+	int	si = 0 ;
+	while ((sl > 1) && isourlead(sp[si])) {
 	    sl -= 1 ;
-	}
-	return sl ;
-    } /* end subroutine (rmleadzero) */
+	    si += 1 ;
+	} /* end while */
+	return si ;
+    } /* end subroutine (sileadzero) */
     int sfdigs(cchar *nsp,int nsl,cchar **rpp) noex {
 	int	rl = nsl ;
 	cchar	*sp = nsp ;
 	if (int sl ; (sl = sfshrink(nsp,nsl,&sp)) > 0) ylikely {
 	    rl = sl ;
 	    if (sl > 1) {
-		rl = rmleadzero(sp,sl) ;
-		sp += (sl - rl) ;
+		if (int si = sileadzero(sp,sl) ; si > 0) {
+		    sp += si ;
+		    rl = (sl - si) ;
+		}
 	    }
 	} /* end if (sfshrink) */
 	*rpp = sp ;
@@ -101,9 +111,9 @@ namespace cfx {
 	int	rl = 0 ;
 	cchar	*sp = nsp ;
 	if (int sl ; (sl = sfshrink(nsp,nsl,&sp)) > 0) ylikely {
-	    cauto islead = [] (char ch) noex {
+	    cauto islead = [] (char ch) noex -> bool {
 		return ((ch == ' ') || (ch == '+') || (ch == '0')) ;
-	    } ; /* end lambda */
+	    } ; /* end lambda (islead) */
 	    while ((sl > 0) && islead(*sp)) {
 		sp += 1 ;
 		sl -= 1 ;
