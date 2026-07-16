@@ -206,35 +206,4 @@ int checker::host2c() noex {
 	return f ;
 } /* end method (checker::host2c) */
 
-#ifdef	COMMENT
-int checker::full() noex {
-	bool	f_h1 = false ;
-	bool	f_h2 = false ;
-	int	len1, len2 ;
-	char	*cp1, *cp2 ;
-	if ((cp1 = strchr(h1,'.')) != nullptr) f_h1 = true ;
-	if ((cp2 = strchr(h2,'.')) != nullptr) f_h2 = true ;
-	if (LEQUIV(f_h1,f_h2)) {
-	    return (! strcasecmp(h1,h2)) ;
-	}
-	if (f_h1) {
-	    len1 = intconv(cp1 - h1) ;
-	    len2 = lenstr(h2) ;
-	    if (len1 != len2) return false ;
-	    cp1 += 1 ;
-	    if (strcasecmp(cp1,ld) != 0) return false ;
-	    return (strncasecmp(h1,h2,len1) == 0) ;
-	}
-	if (f_h2) {
-	    len1 = lenstr(h1) ;
-	    len2 = intconv(cp2 - h2) ;
-	    if (len1 != len2) return false ;
-	    cp2 += 1 ;
-	    if (strcasecmp(cp2,ld) != 0) return false ;
-	    return (strncasecmp(h1,h2,len2) == 0) ;
-	}
-	return 0 ;
-} /* end method (checker::full) */
-#endif /* COMMENT */
-
 
