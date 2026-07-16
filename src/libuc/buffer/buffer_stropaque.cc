@@ -41,12 +41,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"buffer.h"
 
@@ -96,7 +96,6 @@ int buffer_stropaque(buffer *op,cchar *sp,int µsl) noex {
 	    } /* end for */
 	} /* end if (getlenstr) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (buffer_stropaque) */
+} /* end subroutine (buffer_stropaque) */
 
 
