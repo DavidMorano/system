@@ -74,8 +74,6 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	SHIFTINT	(6 * 60)	/* possible time-shift */
 
-#define	MODP2(v,n)	((v) & ((n) - 1))
-
 #define	TO_CHECK	4
 
 #ifndef	CF_DEBUG
@@ -586,18 +584,19 @@ local int bvi_auditvt(bvi *op) noex {
 local int bvi_search(bvi *op,bvi_q *qp) noex {
 	bvi_fmi		*mip = op->fmip ;
 	bvihdr		*hip = op->fhip ;
+	cint		nents = 4 ;
 	int		rs = SR_OK ;
 	int		vi = 0 ; /* return-value */
 	{
 	    int		vtlen = hip->vilen ;
-	    uint	(*vt)[4] = mip->vt ;
-	    uint	vte[4] ;
+	    uint	(*vt)[nents] = mip->vt ;
+	    uint	vte[nents] ;
 	    /* search for entry */
 	    if (uint citekey ; (rs = mkcitekey(&citekey,qp)) >= 0) {
 	        vte[3] = citekey ;
 	        if_constexpr (f_search) {
 	            uint	*vtep ;
-	            csize	vtesize = (4 * szof(uint)) ;
+	            csize	vtesize = (nents * szof(uint)) ;
 	            {
 	                vtep = (uint *) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
 	            }
