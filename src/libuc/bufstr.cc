@@ -135,8 +135,7 @@ int bufstr_start(bufstr *op) noex {
 	    op->sbuf[0] = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bufstr_start) */
+} /* end subroutine (bufstr_start) */
 
 int bufstr_finish(bufstr *op) noex {
 	int		rs = SR_FAULT ;
@@ -154,8 +153,7 @@ int bufstr_finish(bufstr *op) noex {
 	    op->len = 0 ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (bufstr_finish) */
+} /* end subroutine (bufstr_finish) */
 
 int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -169,8 +167,7 @@ int bufstr_strw(bufstr *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (bufstr_strw) */
+} /* end subroutine (bufstr_strw) */
 
 int bufstr_chr(bufstr *op,int ch) noex {
 	int		rs = SR_FAULT ;
@@ -179,8 +176,7 @@ int bufstr_chr(bufstr *op,int ch) noex {
 	    rs = bufstr_strw(op,buf,1) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bufstr_chr) */
+} /* end subroutine (bufstr_chr) */
 
 int bufstr_get(bufstr *op,cchar **spp) noex {
 	int		rs = SR_FAULT ;
@@ -193,131 +189,106 @@ int bufstr_get(bufstr *op,cchar **spp) noex {
 	    len = op->len ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (bufstr_get) */
+} /* end subroutine (bufstr_get) */
 
 int bufstr_bini(bufstr *sbp,int v) noex {
 	return bufstr_binx(sbp,v) ;
-}
-/* end subroutine (bufstr_bini) */
+} /* end subroutine (bufstr_bini) */
 
 int bufstr_binl(bufstr *sbp,long v) noex {
 	return bufstr_binx(sbp,v) ;
-}
-/* end subroutine (bufstr_binl) */
+} /* end subroutine (bufstr_binl) */
 
 int bufstr_binll(bufstr *sbp,longlong v) noex {
 	return bufstr_binx(sbp,v) ;
-}
-/* end subroutine (bufstr_binll) */
+} /* end subroutine (bufstr_binll) */
 
 int bufstr_binui(bufstr *sbp,uint v) noex {
 	return bufstr_binx(sbp,v) ;
-}
-/* end subroutine (bufstr_binui) */
+} /* end subroutine (bufstr_binui) */
 
 int bufstr_binul(bufstr *sbp,ulong v) noex {
 	return bufstr_binx(sbp,v) ;
-}
-/* end subroutine (bufstr_binul) */
+} /* end subroutine (bufstr_binul) */
 
 int bufstr_binull(bufstr *sbp,ulonglong v) noex {
 	return bufstr_binx(sbp,v) ;
-}
-/* end subroutine (bufstr_binull) */
+} /* end subroutine (bufstr_binull) */
 
 int bufstr_octi(bufstr *sbp,int v) noex {
 	return bufstr_octx(sbp,v) ;
-}
-/* end subroutine (bufstr_octi) */
+} /* end subroutine (bufstr_octi) */
 
 int bufstr_octl(bufstr *sbp,long v) noex {
 	return bufstr_octx(sbp,v) ;
-}
-/* end subroutine (bufstr_octl) */
+} /* end subroutine (bufstr_octl) */
 
 int bufstr_octll(bufstr *sbp,longlong v) noex {
 	return bufstr_octx(sbp,v) ;
-}
-/* end subroutine (bufstr_octll) */
+} /* end subroutine (bufstr_octll) */
 
 int bufstr_octui(bufstr *sbp,uint v) noex {
 	return bufstr_octx(sbp,v) ;
-}
-/* end subroutine (bufstr_octui) */
+} /* end subroutine (bufstr_octui) */
 
 int bufstr_octul(bufstr *sbp,ulong v) noex {
 	return bufstr_octx(sbp,v) ;
-}
-/* end subroutine (bufstr_octul) */
+} /* end subroutine (bufstr_octul) */
 
 int bufstr_octull(bufstr *sbp,ulonglong v) noex {
 	return bufstr_octx(sbp,v) ;
-}
-/* end subroutine (bufstr_octull) */
+} /* end subroutine (bufstr_octull) */
 
 int bufstr_deci(bufstr *sbp,int v) noex {
 	return bufstr_decx(sbp,v) ;
-}
-/* end subroutine (bufstr_deci) */
+} /* end subroutine (bufstr_deci) */
 
 int bufstr_decl(bufstr *sbp,long v) noex {
 	return bufstr_decx(sbp,v) ;
-}
-/* end subroutine (bufstr_decl) */
+} /* end subroutine (bufstr_decl) */
 
 int bufstr_decll(bufstr *sbp,longlong v) noex {
 	return bufstr_decx(sbp,v) ;
-}
-/* end subroutine (bufstr_decll) */
+} /* end subroutine (bufstr_decll) */
 
 int bufstr_decui(bufstr *sbp,uint v) noex {
 	return bufstr_decx(sbp,v) ;
-}
-/* end subroutine (bufstr_decui) */
+} /* end subroutine (bufstr_decui) */
 
 int bufstr_decul(bufstr *sbp,ulong v) noex {
 	return bufstr_decx(sbp,v) ;
-}
-/* end subroutine (bufstr_decul) */
+} /* end subroutine (bufstr_decul) */
 
 int bufstr_decull(bufstr *sbp,ulonglong v) noex {
 	return bufstr_decx(sbp,v) ;
-}
-/* end subroutine (bufstr_decull) */
+} /* end subroutine (bufstr_decull) */
 
 int bufstr_hexi(bufstr *sbp,int v) noex {
 	uint		uv = uint(v) ;
 	return bufstr_hexx(sbp,uv) ;
-}
-/* end subroutine (bufstr_hexi) */
+} /* end subroutine (bufstr_hexi) */
 
 int bufstr_hexl(bufstr *sbp,long v) noex {
 	ulong		uv = ulong(v) ;
 	return bufstr_hexx(sbp,uv) ;
-}
-/* end subroutine (bufstr_hexl) */
+} /* end subroutine (bufstr_hexl) */
 
 int bufstr_hexll(bufstr *sbp,longlong v) noex {
 	ulonglong	uv = ulonglong(v) ;
 	return bufstr_hexx(sbp,uv) ;
-}
-/* end subroutine (bufstr_hexll) */
+} /* end subroutine (bufstr_hexll) */
 
 int bufstr_hexui(bufstr *sbp,uint uv) noex {
 	return bufstr_hexx(sbp,uv) ;
-}
-/* end subroutine (bufstr_hexui) */
+} /* end subroutine (bufstr_hexui) */
 
 int bufstr_hexul(bufstr *sbp,ulong uv) noex {
 	return bufstr_hexx(sbp,uv) ;
-}
-/* end subroutine (bufstr_hexul) */
+} /* end subroutine (bufstr_hexul) */
 
 int bufstr_hexull(bufstr *sbp,ulonglong uv) noex {
 	return bufstr_hexx(sbp,uv) ;
-}
-/* end subroutine (bufstr_hexull) */
+} /* end subroutine (bufstr_hexull) */
 
 
 /* private subroutines */
