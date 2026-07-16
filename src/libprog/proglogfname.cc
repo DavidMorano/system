@@ -46,7 +46,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<localmisc.h>		/* LINU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	<proginfo.hh>
 
