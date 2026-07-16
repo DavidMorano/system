@@ -47,10 +47,10 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<sysval.hh>		/* LIBUC */
-#include	<strwcpy.h>		/* LINUC */
-#include	<ismisc.h>		/* LINUC */
-#include	<utmpsizes.hh>		/* LINUC */
-#include	<localmisc.h>		/* LINU */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<ismisc.h>		/* LIBUC */
+#include	<utmpsizes.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"lastlogfile.h"
 
