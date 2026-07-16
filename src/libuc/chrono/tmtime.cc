@@ -132,7 +132,8 @@ constexpr bool		f_linux		= F_LINUX ;
 
 /* exported variables */
 
-cint tmtime::znlen	= getznlen() ;
+cint	tmtime::znlen	= getznlen() ;
+cint	baseyear	= TMTIME_BASEYEAR ;
 
 
 /* exported subroutines */
@@ -148,8 +149,7 @@ int tmtime_timex(tmtime *op,bool fz,time_t t) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (tmtime_timex) */
+} /* end subroutine (tmtime_timex) */
 
 int tmtime_timegm(tmtime *op,time_t t) noex {
 	int		rs ;
@@ -167,8 +167,7 @@ int tmtime_timegm(tmtime *op,time_t t) noex {
 	    }
 	} /* end if (tmtime_zinit) */
 	return rs ;
-}
-/* end subroutine (tmtime_timegm) */
+} /* end subroutine (tmtime_timegm) */
 
 int tmtime_timelocal(tmtime *op,time_t t) noex {
 	int		rs ;
@@ -182,8 +181,7 @@ int tmtime_timelocal(tmtime *op,time_t t) noex {
 	    }
 	} /* end if (tmtime_zinit) */
 	return rs ;
-}
-/* end subroutine (tmtime_timelocal) */
+} /* end subroutine (tmtime_timelocal) */
 
 /* tmtime <- tm */
 int tmtime_insert(tmtime *op,CTM *tmp) noex {
@@ -220,8 +218,7 @@ int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	    }
 	} /* end if (tmtime_zinit) */
 	return rs ;
-}
-/* end subroutine (tmtime_insert) */
+} /* end subroutine (tmtime_insert) */
 
 /* tmtime -> tm */
 int tmtime_extract(tmtime *op,TM *tmp) noex {
@@ -248,18 +245,15 @@ int tmtime_extract(tmtime *op,TM *tmp) noex {
 	    }
 	} /* end if (tmtime_zinit) */
 	return rs ;
-}
-/* end subroutine (tmtime_extract) */
+} /* end subroutine (tmtime_extract) */
 
 int tmtime_mktime(tmtime *op,time_t *tp) noex {
 	return tmtime_mktimer(op,0,tp) ;
-}
-/* end subroutine (tmtime_mktime) */
+} /* end subroutine (tmtime_mktime) */
 
 int tmtime_adjtime(tmtime *op,time_t *tp) noex {
 	return tmtime_mktimer(op,1,tp) ;
-}
-/* end subroutine (tmtime_adjtime) */
+} /* end subroutine (tmtime_adjtime) */
 
 int tmtime_getzn(tmtime *op,char *rbuf,int rlen) noex {
     	int		rs ;
@@ -270,8 +264,7 @@ int tmtime_getzn(tmtime *op,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (tmtime_getzn) */
+} /* end subroutine (tmtime_getzn) */
 
 int tmtime_loadzn(tmtime *op,cchar *sp,int sl) noex {
     	int		rs ;
@@ -280,8 +273,7 @@ int tmtime_loadzn(tmtime *op,cchar *sp,int sl) noex {
 	    rs = intconv(p - op->znbuf) ;
 	} /* end if (tmtime_zinit) */
 	return rs ;
-}
-/* end subroutine (tmtime_loadzn) */
+} /* end subroutine (tmtime_loadzn) */
 
 
 /* local subroutines */
