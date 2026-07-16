@@ -50,6 +50,9 @@
 
 /* local typedefs */
 
+template<typename T>
+using cfx_f = T (*)(cc *,char **,int) noex ;
+
 
 /* external subroutines */
 
@@ -73,7 +76,7 @@
 
 namespace libu {
     template<typename T>
-    local int cfdecx(T (*cfx)(cc *,char **,int),cc *sp,int sl,T *rp) noex {
+    local int cfdecx(cfx_f<T> cfx,cc *sp,int sl,T *rp) noex {
 	[[maybe_unused]] char	*endp{} ; /* <- unused */
 	cint		b = CFBASE ;	/* conversion number base */
 	int		rs = SR_FAULT ;
