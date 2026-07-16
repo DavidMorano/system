@@ -31,6 +31,7 @@
 
 #include	<utypedefs_ints.h>
 #include	<utypedefs_intp.h>
+#include	<utypedefs_intpp.h>
 
 
 /* for |stat(2)| and its many friends */
