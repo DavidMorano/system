@@ -68,8 +68,6 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	SHIFTINT	(6 * 60)	/* possible time-shift */
 
-#define	MODP2(v,n)	((v) & ((n) - 1))
-
 #define	TO_CHECK	4
 
 #ifndef	CF_SEARCH
