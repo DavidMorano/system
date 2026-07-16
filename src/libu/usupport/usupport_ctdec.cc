@@ -48,6 +48,9 @@ using libu::sncpy ;			/* subroutine */
 
 /* local typedefs */
 
+template<typename T>
+using ctx_f = charp (*)(T,char *) noex ;
+
 
 /* external subroutines */
 
@@ -71,7 +74,7 @@ using libu::sncpy ;			/* subroutine */
 
 namespace libu {
     template<typename T>
-    local int ctdecx(charp (*ctx)(T,char *),char *dp,int dl,T uv) noex {
+    local int ctdecx(ctx_f<T> ctx,char *dp,int dl,T uv) noex {
 	int		rs = SR_FAULT ;
 	if (dp) {
 	    cint	dlen = DECBUFLEN ;
