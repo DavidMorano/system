@@ -101,12 +101,12 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strw.h>		/* LIBUC |strwblanks(3uc)| */
 #include	<strn.h>		/* LIBUC |strnblanks(3uc)| */
-#include	<lockfile.h>		/* LINUC */
-#include	<cfdec.h>		/* LINUC */
-#include	<ctdec.h>		/* LINUC */
-#include	<hasx.h>		/* LINUC */
-#include	<isfiledesc.h>		/* LINUC |isfsremote(3uc)| */
-#include	<ischarx.h>		/* LINUC */
+#include	<lockfile.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<isfiledesc.h>		/* LIBUC |isfsremote(3uc)| */
+#include	<ischarx.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
