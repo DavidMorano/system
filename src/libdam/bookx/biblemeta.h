@@ -24,7 +24,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<vecstr.h>		/* LINUC */
+#include	<vecstr.h>		/* LIBUC */
 
 
 #define	BIBLEMETA		struct biblemeta_head
