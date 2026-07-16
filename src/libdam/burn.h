@@ -21,7 +21,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LINU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
