@@ -21,12 +21,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	TMTIME			tmtime
@@ -35,8 +34,8 @@
 
 struct tmtime {
     	static cint	znlen ;
+	static cint	baseyear ;
 	char	*znbuf{} ;	/* time-zone name abbreviation (allocated) */
-	cint	baseyear = TMTIME_BASEYEAR ;
 	int	sec ;		/* 0-61 (for up to two leap-seconds) */
 	int	min ;		/* 0-59 */
 	int	hour ;		/* 0-23 */
