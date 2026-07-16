@@ -498,9 +498,7 @@ int holidays_fetchname(HOS *op,cc *kp,int kl,HOS_CUR *curp,HOS_CITE *qp,
 	    itlen = op->itlen ;
     
 	    if (curp->i <= 0) {
-    
-    /* unhappy or not, the index-table uses same-hash-linking! */
-    
+    		/* unhappy or not, the index-table uses same-hash-linking! */
 	        khash = hash_elf(kp,kl) ;
     
 	        nhash = khash ;
@@ -590,7 +588,8 @@ int holidays_fetchname(HOS *op,cc *kp,int kl,HOS_CUR *curp,HOS_CITE *qp,
 	return (rs >= 0) ? vl : rs ;
 } /* end subroutine (holidays_fetchname) */
 
-int holidays_enum(HOS *op,HOS_CUR *curp,HOS_CITE *qp,char *vbuf,int vlen) noex {
+int holidays_curenum(HOS *op,HOS_CUR *curp,HOS_CITE *qp,
+		char *vbuf,int vlen) noex {
 	int		rs ;
 	int		vl = 0 ; /* return-value */
 	if ((rs = holidays_magic(op,curp)) >= 0) {
@@ -629,7 +628,7 @@ int holidays_enum(HOS *op,HOS_CUR *curp,HOS_CITE *qp,char *vbuf,int vlen) noex {
 	    }
 	} /* end if (holidays_magic) */
 	return (rs >= 0) ? vl : rs ;
-} /* end subroutine (holidays_enum) */
+} /* end subroutine (holidays_curenum) */
 
 int holidays_check(HOS *op,time_t dt) noex {
 	int		rs ;
