@@ -39,15 +39,15 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |abs(3c)| */
-#include	<bit>			/* |rotr(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |abs(3c)| */
+#include	<bit>			/* C++STD |rotr(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bitrotate.h"
 
@@ -96,8 +96,7 @@ template<typename UT> static UT bitrotatex(UT v,int n) noex {
 	    }
 	} /* end if_constexpr (f_rot) */
 	return rv ;
-}
-/* end subroutine (bitrotate) */
+} /* end subroutine (bitrotate) */
 
 
 /* local variables */
