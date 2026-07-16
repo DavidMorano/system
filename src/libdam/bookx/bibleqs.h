@@ -17,7 +17,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>		/* LINU */
+#include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<fieldterms.h>		/* LIBUC */
 #include	<eigendb.h>		/* LIBUC */
