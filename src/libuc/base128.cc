@@ -55,17 +55,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>		/* |uint64_t| */
-#include	<bit>			/* |countl_zero(3c++)| */
-#include	<concepts>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnset(3uc)| */
-#include	<mkchar.h>		/* |mkchar(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bit>			/* C++STD |countl_zero(3c++)| */
+#include	<concepts>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnset(3uc)| */
+#include	<mkchar.h>		/* LIBUC |mkchar(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"base128.h"
 
@@ -190,8 +189,7 @@ int base128_e(cchar *inbuf,int inlen,char *obuf) noex {
 	    }
 	} /* end if (residue) */
 	return ol ;
-}
-/* end subroutine (base128_e) */
+} /* end subroutine (base128_e) */
 
 /* decode */
 int base128_d(cchar *inbuf,int len,char *outbuf) noex {
@@ -206,30 +204,29 @@ int base128_d(cchar *inbuf,int len,char *outbuf) noex {
 	    }
 	} /* end for */
 	return j ;
-}
-/* end subroutine (base128_d) */
+} /* end subroutine (base128_d) */
 
 int base128_enc(int v) noex {
     	return int(base128mgr.enc[v & bmask]) ;
-}
+} /* end subroutine */
 
 int base128_dec(int v) noex {
     	return int(base128mgr.dec[v & UCHAR_MAX]) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
 
-local uint64_t mkhold(cchar *inbuf,int n) noex {
-    	uint64_t	hold = 0 ;
+local ulong mkhold(cchar *inbuf,int n) noex {
+    	ulong	hold = 0 ;
 	for (int i = (n - 1) ; i >= 0 ; i -= 1) {
 	    hold <<= CHAR_BIT ;
-	    hold |= uint64_t(inbuf[i] & UCHAR_MAX) ;
+	    hold |= ulong(inbuf[i] & UCHAR_MAX) ;
 	} /* end for */
 	return hold ;
 } /* end subroutine (mkhold) */
 
-local void encbuf(char *obuf,int olen,const uint64_t hold) noex {
+local void encbuf(char *obuf,int olen,const ulong hold) noex {
 	for (int i = 0 ; i < olen ; i += 1) {
 	    cint idx = intconv((hold >> (i * bits)) & bmask) ;
 	    obuf[i] = base128mgr.enc[idx] ;
@@ -238,13 +235,13 @@ local void encbuf(char *obuf,int olen,const uint64_t hold) noex {
 
 /* encode a group */
 local void base128_eg(cchar *inbuf,char *obuf) noex {
-	const uint64_t	hold = mkhold(inbuf,stagelen) ;
+	const ulong	hold = mkhold(inbuf,stagelen) ;
 	encbuf(obuf,outlen,hold) ;
 } /* end subroutine (base128_eg) */
 
 namespace {
     struct dger {
-	uint64_t	hold = 0 ;
+	ulong		hold = 0 ;
 	char		*outbuf ;
 	cchar		*inbuf ;
 	int		rl = 0 ; /* return-value */
@@ -295,7 +292,7 @@ int dger::loadhold() noex {
 
 void dger::loadout() noex {
 	for (int i = 0 ; i < stagelen ; i += 1) {
-	    uint64_t val = (hold >> (i * CHAR_BIT)) ;
+	    ulong val = (hold >> (i * CHAR_BIT)) ;
 	    outbuf[i] = char(val) ;
 	} /* end for */
 	rl -= 1 ;
