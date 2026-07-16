@@ -62,7 +62,7 @@
 #include	<filer.h>
 #include	<ctdec.h>
 #include	<cthex.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"preload.h"
