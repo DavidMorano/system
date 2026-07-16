@@ -49,21 +49,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<stdintx.h>
-#include	<format.h>
-#include	<strwcpy.h>
-#include	<ctbin.h>
-#include	<ctoct.h>
-#include	<ctdec.h>
-#include	<cthex.h>
-#include	<mkchar.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<ctbin.h>		/* LIBUC */
+#include	<ctoct.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<cthex.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"buffer.h"
 
