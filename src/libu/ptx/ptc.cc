@@ -53,7 +53,7 @@
 
 /* forward references */
 
-template<typename ... Args> int ptc_ma::operator () (Args ... args) noex {
+template<typename ... Args> local int ptc_ma::operator () (Args ... args) noex {
         int             rs = SR_FAULT ;
         if ((... && args)) {
             rs = (op->magval == ptc_magicval) ? SR_OK : SR_NOTOPEN ;
@@ -121,8 +121,7 @@ int ptc_create(ptc *op,ptca *ap) noex {
 	    } until ((rs >= 0) || r.fexit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptc_create) */
+} /* end subroutine (ptc_create) */
 
 int ptc_destroy(ptc *op) noex {
 	int		rs = SR_FAULT ;
@@ -136,8 +135,7 @@ int ptc_destroy(ptc *op) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptc_destroy) */
+} /* end subroutine (ptc_destroy) */
 
 int ptc_broadcast(ptc *op) noex {
 	int		rs = SR_FAULT ;
@@ -151,8 +149,7 @@ int ptc_broadcast(ptc *op) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptc_broadcast) */
+} /* end subroutine (ptc_broadcast) */
 
 int ptc_signal(ptc *op) noex {
 	int		rs = SR_FAULT ;
@@ -166,8 +163,7 @@ int ptc_signal(ptc *op) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptc_signal) */
+} /* end subroutine (ptc_signal) */
 
 int ptc_wait(ptc *op,ptm *mp) noex {
 	int		rs = SR_FAULT ;
@@ -181,8 +177,7 @@ int ptc_wait(ptc *op,ptm *mp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptc_wait) */
+} /* end subroutine (ptc_wait) */
 
 int ptc_waiting(ptc *op,ptm *mp,int to) noex {
 	int		rs = SR_FAULT ;
@@ -198,8 +193,7 @@ int ptc_waiting(ptc *op,ptm *mp,int to) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptc_waiting) */
+} /* end subroutine (ptc_waiting) */
 
 int ptc_waiter(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	int		rs = SR_FAULT ;
@@ -217,8 +211,7 @@ int ptc_waiter(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptc_waiter) */
+} /* end subroutine (ptc_waiter) */
 
 int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	int		rs = SR_NOSYS ;
