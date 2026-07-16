@@ -53,11 +53,11 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |stpcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<intsat.h>
-#include	<stdintx.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usupport_prime.h"
 
