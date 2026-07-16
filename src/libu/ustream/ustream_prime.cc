@@ -191,8 +191,7 @@ local int ustream_opener(ustream *op) noex {
         } /* end if (ustream_adjbuf) */
 	DPRINTF("ret rs=%d \n",rs) ;
 	return rs ;
-}
-/* end subroutine (ustream_opener) */
+} /* end subroutine (ustream_opener) */
 
 namespace ustream_ns {
     int ustream_close(ustream *op) noex {
