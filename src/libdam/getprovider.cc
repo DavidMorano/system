@@ -89,8 +89,8 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucinfo.h>		/* LIBUC */
 #include	<estrings.h>		/* LIBUC |sf{x}(3uc)| + |snwcpy(3uc)| */
-#include	<nleadstr.h>		/* LINUC */
-#include	<localmisc.h>		/* LINU */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getprovider.h"
 
