@@ -63,7 +63,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LINU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #endif /* CFALPHAX_INCLUDE */
