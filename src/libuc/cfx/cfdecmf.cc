@@ -81,7 +81,6 @@
 #include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdint>		/* CSTD |int64_t| */
 #include	<cstdckdint>		/* |ckd_mul(3c++)| (global namespace) */
 #include	<utility>		/* C++STD |in_range(3c++)| */
 #include	<clanguage.h>		/* LIBU */
