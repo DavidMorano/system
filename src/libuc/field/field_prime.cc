@@ -94,7 +94,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -102,10 +102,10 @@
 #include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
 #include	<ascii.h>		/* LIBU */
 #include	<baops.h>		/* LIBU */
-#include	<strop.h>
+#include	<strop.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
-#include	<char.h>
-#include	<fieldterminit.hh>
 #include	<localmisc.h>		/* LIBU */
 
 #include	"field.h"
@@ -180,8 +180,7 @@ int field_start(field *fsbp,cchar *lp,int ll) noex {
 	    fsbp->ll = ll ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (field_start) */
+} /* end subroutine (field_start) */
 
 int field_finish(field *fsbp) noex {
 	int		rs = SR_FAULT ;
@@ -194,8 +193,7 @@ int field_finish(field *fsbp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (field_finish) */
+} /* end subroutine (field_finish) */
 
 int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		rs = SR_FAULT ;
@@ -251,8 +249,7 @@ int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 	    } /* end if (strop) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (field_get) */
+} /* end subroutine (field_get) */
 
 int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		rs = SR_FAULT ;
@@ -292,8 +289,7 @@ int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 	    } /* end if (so) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (field_getterm) */
+} /* end subroutine (field_getterm) */
 
 int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 	int		rs = SR_FAULT ;
@@ -394,8 +390,7 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 	    } /* end if (so) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (field_sharg) */
+} /* end subroutine (field_sharg) */
 
 int field_remaining(field *fsbp,cchar **lpp) noex {
 	int		rs = SR_FAULT ;
@@ -411,7 +406,6 @@ int field_remaining(field *fsbp,cchar **lpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (field_remaining) */
+} /* end subroutine (field_remaining) */
 
 
