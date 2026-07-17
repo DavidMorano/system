@@ -48,14 +48,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<baops.h>
-#include	<mkchar.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"field.h"
 
@@ -152,7 +152,6 @@ int field_word(field *op,cchar *terms,cchar **fpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (field_word) */
+} /* end subroutine (field_word) */
 
 
