@@ -27,14 +27,14 @@
 
 EXTERNC_begin
 
-extern int cthexc	(char *,int,int)		noex ;
-extern int cthexs	(char *,int,int)		noex ;
+extern int cthexc	(char *,int,char)		noex ;
+extern int cthexs	(char *,int,short)		noex ;
 extern int cthexi	(char *,int,int)		noex ;
 extern int cthexl	(char *,int,long)		noex ;
 extern int cthexll	(char *,int,longlong)		noex ;
 
-extern int cthexuc	(char *,int,uint)		noex ;
-extern int cthexus	(char *,int,uint)		noex ;
+extern int cthexuc	(char *,int,uchar)		noex ;
+extern int cthexus	(char *,int,ushort)		noex ;
 extern int cthexui	(char *,int,uint)		noex ;
 extern int cthexul	(char *,int,ulong)		noex ;
 extern int cthexull	(char *,int,ulonglong)		noex ;
@@ -53,14 +53,20 @@ inline int cthex(char *bp,int bl,longlong v)		noex {
 	return cthexll(bp,bl,v) ;
 }
 
+inline int cthex(char *bp,int bl,uchar v)		noex {
+	return cthexuc	(bp,bl,v) ;
+}
+inline int cthex(char *bp,int bl,ushort v)		noex {
+	return cthexus	(bp,bl,v) ;
+}
 inline int cthex(char *bp,int bl,uint v)		noex {
-	return cthexui(bp,bl,v) ;
+	return cthexui	(bp,bl,v) ;
 }
 inline int cthex(char *bp,int bl,ulong v)		noex {
-	return cthexul(bp,bl,v) ;
+	return cthexul	(bp,bl,v) ;
 }
 inline int cthex(char *bp,int bl,ulonglong v)		noex {
-	return cthexull(bp,bl,v) ;
+	return cthexull	(bp,bl,v) ;
 }
 
 #endif /* __cplusplus */
