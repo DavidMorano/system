@@ -40,15 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
-#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"inittimezone.h"
 
@@ -60,10 +60,6 @@ import uconstants ;			/* |varname(3u)| */
 
 #ifndef	DEFINITFNAME
 #define	DEFINITFNAME	"/etc/default/init"
-#endif
-
-#ifndef	VARTZ
-#define	VARTZ		"TZ"
 #endif
 
 
@@ -88,11 +84,10 @@ import uconstants ;			/* |varname(3u)| */
 /* exported subroutines */
 
 int inittimezone(char *rbuf,int rlen,cchar *fname) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_OVERFLOW ;
 	    rbuf[0] = '\0' ;
 	    if (rs > 0) {
@@ -101,13 +96,13 @@ int inittimezone(char *rbuf,int rlen,cchar *fname) noex {
 	        if (fname == nullptr) {
 	    	    fname = DEFINITFNAME ;
 	        }
-	        if (vecstr defs ; (rs = defs.start(vn,vo)) >= 0) {
-	            if ((rs = defs.envfile(fname)) >= 0) {
+	        if (vecstr defs ; (rs = defs.start(vn,vo)) >= 0) ylikely {
+	            if ((rs = defs.envfile(fname)) >= 0) ylikely {
 			cchar	*var = varname.tz ;
 			cchar	*sp ;
 	        	if ((rs = defs.finder(var,vstrkeycmp,&sp)) >= 0) {
 	                    if (sp && sp[0]) {
-			        if (cchar *tp ; (tp = strchr(sp,'=')) != np) {
+			        if (cchar *tp = strchr(sp,'=') ; tp) {
 	                           rs = sncpy(rbuf,rlen,(tp+1)) ;
 			           len = rs ;
 			       }
@@ -122,7 +117,6 @@ int inittimezone(char *rbuf,int rlen,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (inittimezone) */
+} /* end subroutine (inittimezone) */
 
 
