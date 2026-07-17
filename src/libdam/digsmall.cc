@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* format a number for a three-column-wide field for the VMAIL program */
+/* format a num for a three-column-wide field for the VMAIL program */
 /* version %I% last-modified %G% */
 
 
@@ -10,7 +10,7 @@
 
 	= 1992-03-01, Walter Pitio
 	This code module was originally written (to bring some
-	sanity to the way large numbers of lines are displayed
+	sanity to the way large nums of lines are displayed
 	within the VMAIL program).
 
 	= 1992-03-10, David A­D­ Morano
@@ -28,17 +28,17 @@
 
 	Description:
 	This subroutine creates a little string (stored in a
-	caller-supplied buffer) that indicates the specified number
-	passed.  The number is supposed to be the number of lines
+	caller-supplied buffer) that indicates the specified num
+	passed.  The num is supposed to be the num of lines
 	in a message, but that does not really matter to us what
 	it represents.
 
 	Synopsis:
-	int digsmall(char *dbuf,int number) noex
+	int digsmall(char *dbuf,int num) noex
 
 	Arguments:
 	dbuf		result buffer pointer (to store resulting string)
-	number		number to represent in buffer
+	num		num to represent in buffer
 
 	Returns:
 	>=0		OK
@@ -47,13 +47,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
-#include	<usystem.h>
-#include	<snx.h>			/* |snwprintf(3uc)| */
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<snx.h>			/* LIBUC |snwprintf(3uc)| */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"digsmall.h"
 
@@ -85,54 +87,54 @@ constexpr int		dlen = DIGSTRLEN ;
 
 /* exported subroutines */
 
-int digsmall(char *dbuf,int number) noex {
+int digsmall(char *dbuf,int num) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf) {
-	    int		temp = number ;
+	    int		temp = num ;
 	    int		digits = 0 ;
 	    /* Handle negative and zero */
-	    if (number < 0) {
+	    if (num < 0) {
 	        rs = sncpy1(dbuf,dlen,"---") ;
-	    } else if (number == 0) {
+	    } else if (num == 0) {
 	        rs = sncpy1(dbuf,dlen,"  0") ;
 	    } else {
-	        /* Count the number of digits in the number */
+	        /* Count the num of digits in the num */
 	        while (temp > 0) {
 	            temp /= 10 ;
 	            digits += 1 ;
 	        } /* end while */
-	        /* process output based on number of digits in number */
+	        /* process output based on num of digits in num */
 	        switch (digits) {
 	        /*	0 - 999:			"nnn" */
 	        case 1:
 	        case 2:
 	        case 3:
-	            rs = snwprintf(dbuf,dlen,"%3u",number) ;
+	            rs = snwprintf(dbuf,dlen,"%3u",num) ;
 	            break ;
 	        /*	1,000 - 9,999:			" nK" */
 	        /*	10,000 - 99,999:		"nnK" */
 	        case 4:
 	        case 5:
-	            rs = snwprintf(dbuf,dlen,"%2dk",(number/1000)) ;
+	            rs = snwprintf(dbuf,dlen,"%2dk",(num/1000)) ;
 	            break ;
 	        /* 	100,000 - 999,999:		".nM" */
 	        case 6:
-	            rs = snwprintf(dbuf,dlen,".%1dm",(number/100000)) ;
+	            rs = snwprintf(dbuf,dlen,".%1dm",(num/100000)) ;
 	            break ;
     
 	        /*	1,000,000 - 9,999,999:		" nM" */
 	        /*	10,000,000 - 99,999,999:	"nnM" */
 	        case 7:
 	        case 8:
-	            rs = snwprintf(dbuf,dlen,"%2dm",(number/1000000)) ;
+	            rs = snwprintf(dbuf,dlen,"%2dm",(num/1000000)) ;
 	            break ;
 	        /*	100,000,000 - 999,999,999:	".nG" */
 	        case 9:
-	            rs = snwprintf(dbuf,dlen,".%1dg",(number/100000000)) ;
+	            rs = snwprintf(dbuf,dlen,".%1dg",(num/100000000)) ;
 	            break ;
 	        /*	1,000,000,000 - max long int:	" nG" */
 	        case 10:
-	            rs = snwprintf(dbuf,dlen,"%2dg",(number/1000000000)) ;
+	            rs = snwprintf(dbuf,dlen,"%2dg",(num/1000000000)) ;
 	            break ;
 	        default:
 	            rs = sncpy1(dbuf,dlen,"***") ;
@@ -144,7 +146,6 @@ int digsmall(char *dbuf,int number) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (digsmall) */
+} /* end subroutine (digsmall) */
 
 
