@@ -243,7 +243,7 @@ int filelinker::ifinish() noex {
 		dlen = 0 ;
 	    }
 	    {
-		rs = filelinker_dtor(this) ;
+		rs1 = filelinker_dtor(this) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (non-null) */
 	    magval = 0 ;
