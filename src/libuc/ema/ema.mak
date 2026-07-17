@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += ema.h
 
-MODS += ema_asstr.ccm ema_entry.ccm ema_parts.ccm
+MODS += ema_asstr.o ema_entry.o ema_parts.o
 
 LIBS +=
 
@@ -54,7 +54,6 @@ OBJ_EMA= obja.o objb.o
 
 
 INCDIRS=
-
 LIBDIRS= -L$(LIBDIR)
 
 RUNINFO= -rpath $(RUNDIR)
