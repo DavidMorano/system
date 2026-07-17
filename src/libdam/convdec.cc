@@ -5,7 +5,7 @@
 /* convert a long (signed or unsigned) integer to its decimal string */
 /* version %I% last-modified %G% */
 
-#define	CF_ULTOSTR	1	/* use |ultostr(3u)| subroutine */
+#define	CF_XTOSTR	1	/* use |ultostr(3u)| subroutine */
 
 /* revision history:
 
@@ -26,23 +26,23 @@
 	CPU circuit board for the so-called "data-base" processor
 	complex of the AT&T Audix® Voice-Mail product.  Let us see.
 	How long ago was that?  2025-1983=42 years ago now.  I am
-	cracking myself up a little bit.  Yes, I am an older man
-	now.  This code was used by my |printf| subroutine that I
-	wrote at that time also (also for the Audix® product).  I
-	had assembly language convert-integer-to-string subroutines
-	for both decimal and hexadecimal (very heavily used back
-	then for hardware development), but for some reason this
-	code (below) was still used within |printf|.
+	cracking myself up a little bit.  This code was used by my
+	|printf| subroutine that I wrote at that time also (also
+	for the Audix® product).  I had assembly language
+	convert-integer-to-string subroutines for both decimal and
+	hexadecimal (very heavily used back then for hardware
+	development), but for some reason this code (below) was
+	still used within |printf|.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2025 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
   	Names:
-	convdecu
-	convdecs
+	convdecu{x}
+	convdecs{x}
 
   	Description:
 	The |convdec{x}()| subroutines convert the {unsigned|signed}
@@ -56,8 +56,8 @@
 	purposes.
 
 	Synopsis:
-	char *convdecu(ulong lval,char *endptr) noex
-	char *convdecs(ulong lval,char *endptr) noex
+	char *convdecu{x}(ulong lval,char *endptr) noex
+	char *convdecs{x}(ulong lval,char *endptr) noex
 
 	Arguments:
 	lval		value (unsigned or signed) to be converted
@@ -95,24 +95,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<xxtostr.h>		/* |ultostr(3u)| */
-#include	<stdintx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<xxtostr.h>		/* LIBU |xtostr(3u)| */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"convdec.h"
 
 
 /* local defines */
 
-#ifndef	CF_ULTOSTR
-#define	CF_ULTOSTR	1	/* use |ultostr(3u)| subroutine */
+#ifndef	CF_XTOSTR
+#define	CF_XTOSTR	1	/* use |ultostr(3u)| subroutine */
 #endif
 
 
@@ -127,54 +128,17 @@
 
 /* forward references */
 
-local char	*local_ultostr(ulong,char *) noex ;
+cbool		f_xtostr = CF_XTOSTR ;
 
-
-/* local variables */
-
-cbool		f_ultostr = CF_ULTOSTR ;
-
-
-/* exported variables */
-
-
-/* exported subroutines */
-
-char *convdecu(ulong unum,char *endptr) noex {
-	char		*bp = endptr ;
-	if (endptr) ylikely {
-	    *endptr = '\0' ;
-	    if_constexpr (f_ultostr) {
-	        bp = ultostr(unum,endptr) ;
-	    } else {
-	        bp = local_ultostr(unum,endptr) ;
-	    }
-	} /* end if (non-null) */
-	return bp ;
-} /* end subroutine (convdec) */
-
-char *convdecs(long snum,char *endptr) noex {
-	char		*bp = nullptr ;
-	if (endptr) {
-	    ulong	unum = ulong(snum) ;
-	    if (snum < 0) unum = (neg unum) ;
-	    bp = convdecu(unum,endptr) ;
-	    if (snum < 0) *--bp = '-' ;
-	} /* end if (non-null) */
-	return bp ;
-} /* end subroutine (convdecs) */
-
-
-/* local subroutines */
-
-local char *local_ultostr(ulong unum,char *endptr) noex {
+template<typename UT>
+local char *local_xtostrux(UT unum,char *endptr) noex {
+    	UT		lval = unum ;
     	cuint		b10 = 10 ;	/* base-10 */
-    	ulong		lval = unum ;
     	char		*bp = endptr ; /* return-value */
 	/* zero is a special case */
 	if (lval > 0) {
 	    /* first loop to get value down to <= INT_MAX */
-	    for (ulong nv ; lval > INT_MAX ; lval = nv) {
+	    for (UT nv ; lval > INT_MAX ; lval = nv) {
 	        nv = (lval / b10) ;
 	        *--bp = char((lval - (nv * b10)) + '0') ;
 	    } /* end for */
@@ -187,6 +151,64 @@ local char *local_ultostr(ulong unum,char *endptr) noex {
 	    *--bp = '0' ;
 	}
 	return bp ;
-} /* end subroutine (local_convdecu) */
+} /* end subroutine (local_xtostrux) */
+
+template<typename UT>
+char *convdecux(UT unum,char *endptr) noex {
+	char		*bp = nullptr ;
+	if (endptr) ylikely {
+	    *endptr = '\0' ;
+	    if_constexpr (f_xtostr) {
+	        bp = xtostr(unum,endptr) ;
+	    } else {
+	        bp = local_xtostr(unum,endptr) ;
+	    }
+	} /* end if (non-null) */
+	return bp ;
+} /* end subroutine (convdecux) */
+
+template<typename UT,typename ST>
+char *convdecsx(ST snum,char *endptr) noex {
+	char		*bp = nullptr ;
+	if (endptr) {
+	    UT	unum = UT(snum) ;
+	    if (snum < 0) unum = (neg unum) ;
+	    bp = convdecux(unum,endptr) ;
+	    if (snum < 0) *--bp = '-' ;
+	} /* end if (non-null) */
+	return bp ;
+} /* end subroutine (convdecsx) */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+extern char	*convdecsi	(sint sv,	char *endp) noex {
+    	return convdecsx<uint>		(sv,endp) ;
+}
+extern char	*convdecsl	(slong sv,	char *endp) noex {
+    	return convdecsx<ulong>		(sv,endp) ;
+}
+extern char	*convdecsll	(slonglong sv,	char *endp) noex {
+    	return convdecsx<ulonglong>	(sv,endp) ;
+}
+
+extern char	*convdecui	(uint uv,	char *endp) noex {
+    	return convdecux(uv,endp) ;
+}
+extern char	*convdecul	(ulong uv,	char *endp) noex {
+    	return convdecux(uv,endp) ;
+}
+extern char	*convdecull	(ulonglong uv,	char *endp) noex {
+    	return convdecux(uv,endp) ;
+}
+
+
+/* local subroutines */
 
 
