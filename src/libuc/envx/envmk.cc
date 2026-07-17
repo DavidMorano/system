@@ -80,7 +80,7 @@
 #include	<getpwd.h>		/* LIBUC */
 #include	<gethz.h>		/* LIBUC */
 #include	<getxname.h>		/* LIBUC */
-#include	<getnisdomain.h>	/* LINUC |getnisdomain(3uc)| */
+#include	<getnisdomain.h>	/* LIBUC |getnisdomain(3uc)| */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<envlist.h>		/* LIBUC */
