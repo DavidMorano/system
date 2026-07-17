@@ -228,8 +228,8 @@
 #define	INADDR6		struct in6_addr
 #endif
 
-#ifndef	INADDRX
-#define	INADDRX		struct in4in6_addr
+#ifndef	INADDR46
+#define	INADDR46	struct in4in6_addr
 #endif
 
 /* UTMPX */
