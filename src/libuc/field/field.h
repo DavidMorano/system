@@ -35,12 +35,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
 
 
 #define	FIELD		struct field_head
@@ -77,20 +77,20 @@ struct field : field_head {
 	field_co	finish ;
 	field_co	rem ;
 	field() noex {
-	    rem(this,fieldmem_rem) ;
-	    finish(this,fieldmem_finish) ;
+	    rem		(this,fieldmem_rem) ;
+	    finish	(this,fieldmem_finish) ;
 	    lp = nullptr ;
 	} ; /* end ctor */
 	field(const field &) = delete ;
 	field &operator = (const field &) = delete ;
-	int start(cchar *,int = -1) noex ;
-	int get(cchar *,cchar **) noex ;
-	int getterm(cchar *,cchar **) noex ;
-	int word(cchar *,cchar **) noex ;
-	int wordphrase(cchar *,char *,int) noex ;
-	int sharg(cchar *,char *,int) noex ;
-	int srvarg(cchar *,char *,int) noex ;
-	int remaining(cchar ** = nullptr) noex ;
+	int start	(cchar *,int = -1) noex ;
+	int get		(cchar *,cchar **) noex ;
+	int getterm	(cchar *,cchar **) noex ;
+	int word	(cchar *,cchar **) noex ;
+	int wordphrase	(cchar *,char *,int) noex ;
+	int sharg	(cchar *,char *,int) noex ;
+	int srvarg	(cchar *,char *,int) noex ;
+	int remaining	(cchar ** = nullptr) noex ;
 	void dtor() noex ;
 	destruct field() {
 	    if (lp) dtor() ;
