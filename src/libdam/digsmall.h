@@ -6,18 +6,18 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1992 Walter Pitio and David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DIGSMALL_INCLUDE
 #define	DIGSMALL_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 EXTERNC_begin
