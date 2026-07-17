@@ -20,18 +20,44 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern char	*convdecs(long,		char *) noex ;
-extern char	*convdecu(ulong,	char *) noex ;
+extern char	*convdecsi	(sint,		char *) noex ;
+extern char	*convdecsl	(slong,		char *) noex ;
+extern char	*convdecsll	(slonglong,	char *) noex ;
+
+extern char	*convdecui	(uint,		char *) noex ;
+extern char	*convdecul	(ulong,		char *) noex ;
+extern char	*convdecull	(ulonglong,	char *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+inline char	*convdec(sint		sv,char *endp) noex {
+    	return convdecsi(sv,endp) ;
+}
+inline char	*convdec(slong		sv,char *endp) noex {
+    	return convdecsl(sv,endp) ;
+}
+inline char	*convdec(slonglong	sv,char *endp) noex {
+    	return convdecsll(sv,endp) ;
+}
+inline char	*convdec(uint		uv,char *endp) noex {
+    	return convdecui(uv,endp) ;
+}
+inline char	*convdec(ulong		uv,char *endp) noex {
+    	return convdecul(uv,endp) ;
+}
+inline char	*convdec(ulonglong	uv,char *endp) noex {
+    	return convdecull(uv,endp) ;
+}
+#endif /* __cplusplus */
 
 
 #endif /* CONVDEC_INCLUDE */
