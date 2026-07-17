@@ -54,6 +54,9 @@
 #include	"sd_ussnls.h"
 #include	"envs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -73,8 +76,6 @@
 #ifndef	SVCNAMELEN
 #define	SVCNAMELEN	32
 #endif
-
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
 
 #define	NPARG		2	/* number of positional arguments */
 #define	MAXARGINDEX	100
@@ -104,13 +105,13 @@ static int ussnls_logstuff(USSNLS *,USSINFO *) ;
 
 /* exported variables */
 
-SYSDIALER_INFO	ussnls = {
+SYSDIALER_INFO	sd_ussnls = {
 	USSNLS_MNAME,
 	USSNLS_VERSION,
 	USSNLS_INAME,
-	sizeof(USSNLS),
+	szof(USSNLS),
 	USSNLS_MF
-} ;
+} ; /* end object */
 
 
 /* exported subroutines */
@@ -135,7 +136,7 @@ cchar	*av[] ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(USSNLS)) ;
+	memclear(op) ; /* dangerous */
 
 #if	CF_DEBUGS
 	{
