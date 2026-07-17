@@ -23,7 +23,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ptm.h>			/* LIBU */
-#include	<txtindexhdr.h>		/* LINDAM hash-file-header */
+#include	<txtindexhdr.h>		/* LIBDAM hash-file-header */
 
 
 #define	TXTINDEXES		struct txtindexes_head
