@@ -30,10 +30,11 @@
 	Initialize a field-terminator (character array) block.
 
 	Synopsis:
-	int fieldterms(char *terms,cchar *strterms) noex
+	int fieldterms(char *terms,int fret,cchar *strterms) noex
 
 	Arguments:
 	terms		field-terminator character) block (of 32 bytes)
+	fret		flag to retain existing or to clear-init
 	strterms	c-string of terminator characters
 
 	Returns:
@@ -44,7 +45,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -94,15 +95,12 @@ int fieldterms(char *terms,int f_retain,cchar *s) noex {
 	    if (! f_retain) {
 		memclear(terms,fieldterms_termsize) ;
 	    } /* end if */
-	    while (*s) {
-		cint	ch = mkchar(*s++) ;
+	    for (int ch ; ((ch = mkchar(*s++))) ; c += 1) {
 	        baset(terms,ch) ;
-	        c += 1 ;
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (fieldterms) */
+} /* end subroutine (fieldterms) */
 
 int fieldtermsx(char *terms,int f,int na,...) noex {
 	va_list		ap ;
@@ -125,7 +123,6 @@ int fieldtermsx(char *terms,int f,int na,...) noex {
 	    } /* end if (non-zero-positive) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (fieldtermx) */
+} /* end subroutine (fieldtermx) */
 
 
