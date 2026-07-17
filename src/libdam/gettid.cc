@@ -35,13 +35,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<upt.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"gettid.h"
 
@@ -73,7 +73,6 @@ pthread_t gettid() noex {
 	pthread_t	tid ;
 	uptself(&tid) ;
 	return tid ;
-}
-/* end subroutine (gettid) */
+} /* end subroutine (gettid) */
 
 
