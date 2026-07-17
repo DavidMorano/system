@@ -98,7 +98,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			objprime.o objimpl.o
@@ -148,7 +148,7 @@ objimpl.o:		$(OBJIMPL)
 
 
 deb0.o:		deb.ccm					$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 deb1.o:		deb1.cc deb0.o				$(INCS)
 	$(COMPILE.cc) $<
