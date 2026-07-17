@@ -37,11 +37,17 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"havenis.h"
 
 
 /* local defines */
@@ -51,27 +57,46 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+cchar	dname[] = NISDATADNAME ;
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int havenis()
-{
-	ustat	sb ;
-	const int	nrs = SR_NOENT ;
+int havenis() noex {
+	cint		rsn = SR_NOENT ;
 	int		rs ;
-	int		f = FALSE ;
-	const char	*dname = NISDATADNAME ;
-
-	if ((rs = u_stat(dname,&sb)) >= 0) {
+	int		f = false ; /* return-value */
+	if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
-		f = TRUE ;
+		f = true ;
 	    }
-	} else if (rs == nrs) {
+	} else if (rs == rsn) {
 	    rs = SR_OK ;
 	}
-
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (havenis) */
+} /* end subroutine (havenis) */
 
 
