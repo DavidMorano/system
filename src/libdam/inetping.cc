@@ -41,33 +41,33 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<sys/wait.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<csignal>		/* |SIG{x}| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uinet.h>
-#include	<uclibmem.h>
-#include	<bufsizevar.hh>
-#include	<hostent.h>
-#include	<inetaddr.h>
-#include	<spawnproc.h>		/* |spawnproc_con(3uc)| */
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<sfx.h>			/* |sfnext(3uc)| */
-#include	<ctdec.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
-#include	<deb.hh>		/* |DEBPRINTF(3u)| */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<sys/wait.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<csignal>		/* CSTD |SIG{x}| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<inetaddr.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC |spawnproc_con(3uc)| */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<sfx.h>			/* LIBUC |sfnext(3uc)| */
+#include	<ctdec.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
+#include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
 
 #include	"inetping.h"
 
@@ -158,9 +158,9 @@ namespace {
 
 /* forward reference */
 
-local int	pingone(cchar *,const in4_addr_t *,int) noex ;
-local int	pingoneresp(int,int) noex ;
-local int	pingoneparse(cchar *,int) noex ;
+local int	pingone		(cchar *,const in4_addr_t *,int) noex ;
+local int	pingoneresp	(int,int) noex ;
+local int	pingoneparse	(cchar *,int) noex ;
 
 #if	CF_DEBUG & CF_DEBUGINT
 local int	makeint(void *) noex ;
@@ -327,8 +327,7 @@ local int pingone(cchar *pingprog,const in4_addr_t *ap,int to) noex {
 	} /* end if (inetaddr) */
 	CDEBPR("ret rs=%d rv=%d\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (pingone) */
+} /* end subroutine (pingone) */
 
 local int pingoneresp(int fd,int to) noex {
 	cnullptr	np{} ;
@@ -361,15 +360,14 @@ local int pingoneresp(int fd,int to) noex {
 	        } /* end while (reading response from PING program) */
 	        if (rs >= 0) {
 	            rs = pingoneparse(rbuf,tl) ;
-	        }
+	        } /* end if (ok) */
 		rs1 = lm_free(rbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (rbuflen) */
 	CDEBPR("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (pingoneresp) */
+} /* end subroutine (pingoneresp) */
 
 local int pingoneparse(cchar *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
@@ -382,8 +380,7 @@ local int pingoneparse(cchar *rbuf,int rlen) noex {
 	    rs = SR_HOSTDOWN ;
 	}
 	return rs ;
-}
-/* end subroutine (pingoneparse) */
+} /* end subroutine (pingoneparse) */
 
 #if	CF_DEBUG & CF_DEBUGINT
 local int makeint(void *addr) noex {
