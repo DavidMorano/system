@@ -66,16 +66,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>
-#include	<baops.h>
-#include	<fieldterms.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<baops.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"field.h"
 
@@ -138,8 +138,7 @@ int field_srvarg(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 	    } /* end if (terminit) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ; 
-}
-/* end subroutine (field_srvarg) */
+} /* end subroutine (field_srvarg) */
 
 
 /* local subroutines */
@@ -157,7 +156,7 @@ local int field_srvarger(field *fsbp,cchar *terms,char *abuf,int alen) noex {
         while ((ll > 0) && char_iswhite(*lp)) {
             lp += 1 ;
             ll -= 1 ;
-        }
+        } /* end while */
         while (ll > 0) {
             ch = mkchar(*lp) ;
             if (batst(terms,ch)) break ;
