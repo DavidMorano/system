@@ -42,19 +42,34 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<mkpathx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"chowns.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -67,13 +82,13 @@ namespace {
 	uid_t		uid ;
 	gid_t		gid ;
 	mode_t		mode ; /* not used here */
-    } ;
+    } ; /* end struct (checkinfo) */
 } /* end namespace */
 
 
 /* forward references */
 
-static int	checkdir(checkinfo *,cchar *) noex ;
+local int	checkdir(checkinfo *,cchar *) noex ;
 
 
 /* local variables */
@@ -90,19 +105,22 @@ constexpr gid_t		gidend = -1 ;
 int chowns(cchar *dname,uid_t uid,gid_t gid) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (dname) {
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if (dname) ylikely {
 	    rs = SR_INVALID ;
-	    if (dname[0]) {
-	        if (char *dbuf ; (rs = malloc_mp(&dbuf)) >= 0) {
+	    if (dname[0]) ylikely {
+	        if (char *dbuf ; (rs = libmem.mp(&dbuf)) >= 0) ylikely {
 	            checkinfo	ci{} ;
 	            ci.uid = uid ;
 	            ci.gid = gid ;
-	            if ((rs = mkpath(dbuf,dname)) >= 0) {
+	            if ((rs = mkpath(dbuf,dname)) >= 0) ylikely {
 	                cchar	*cp = dbuf ;
 	                for (char *bp ; (bp = strchr(cp,'/')) != np ; ) {
 	                    *bp = '\0' ;
 	                    if (((bp - cp) > 0) && (strcmp(cp,".") != 0)) {
 	                        rs = checkdir(&ci,dbuf) ;
+			        c += 1 ;
 	                    } /* end if */
 	                    *bp = '/' ;
 	                    cp = bp + 1 ;
@@ -110,22 +128,23 @@ int chowns(cchar *dname,uid_t uid,gid_t gid) noex {
 	                } /* end while */
 	                if ((rs >= 0) && (*cp != '\0')) {
 	                    rs = checkdir(&ci,dbuf) ;
-	                }
+			    c += 1 ;
+	                } /* end if */
 	            } /* end if (mkpath) */
-		    rs = rsfree(rs,dbuf) ;
+		    rs1 = libmem.free(dbuf) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (chowns) */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (chowns) */
 
 
 /* local subroutines */
 
-static int checkdir(checkinfo *cip,cchar *dirbuf) noex {
+local int checkdir(checkinfo *cip,cchar *dirbuf) noex {
 	int		rs ;
-	if (ustat sb ; (rs = u_stat(dirbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(dirbuf,&sb)) >= 0) ylikely {
 	    bool	f = false ;
 	    f = f || ((cip->uid != uidend) && (sb.st_uid != cip->uid)) ;
 	    f = f || ((cip->gid != gidend) && (sb.st_gid != cip->gid)) ;
@@ -134,7 +153,6 @@ static int checkdir(checkinfo *cip,cchar *dirbuf) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (checkdir) */
+} /* end subroutine (checkdir) */
 
 
