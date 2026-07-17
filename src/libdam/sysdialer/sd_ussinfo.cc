@@ -55,6 +55,9 @@
 #include	"envs.h"
 #include	"inetaddrparse.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -67,7 +70,7 @@
 #define	SVCNAMELEN	32
 #endif
 
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
+#define	SI		subinfo
 
 
 /* external subroutines */
@@ -87,8 +90,7 @@ local int	ussinfo_userinfo(USSINFO *) ;
 local int	ussinfo_addrparseunix(USSINFO *,int) ;
 local int	ussinfo_addrparseinet(USSINFO *) ;
 local int	ussinfo_dirok(USSINFO *,cchar *,int) ;
-local int	ussinfo_setentry(USSINFO *,cchar **,
-			cchar *,int) ;
+local int	ussinfo_setentry(USSINFO *,cchar **,cchar *,int) ;
 
 
 /* external variables (module information) */
@@ -150,8 +152,7 @@ cchar	svcname[] ;
 {
 	int	rs = SR_OK ;
 
-
-	memset(sip,0,sizeof(USSINFO)) ;
+	memclear(sip) ; /* dangerous */
 
 	sip->envv = (cchar **) environ ;
 	sip->op = op ;
@@ -242,7 +243,7 @@ USSINFO		*sip ;
 int ussinfo_procargs(sip)
 USSINFO		*sip ;
 {
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 
 	SYSDIALER_ARGS	*ap = sip->ap ;
 
@@ -654,9 +655,9 @@ badkopts:
 
 int ussinfo_procopts(sip,kop)
 USSINFO		*sip ;
-KEYOPT		*kop ;
+keyopt		*kop ;
 {
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 	int		rs ;
 	int		c = 0 ;
 
