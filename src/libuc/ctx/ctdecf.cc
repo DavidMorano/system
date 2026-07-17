@@ -140,8 +140,7 @@ int ctdecf(char *dbuf,int dlen,double dv,int fcode,int w,int p,int fill) noex {
 	    if (rs >= 0) rs = len ;
 	} /* end if (subinfo) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ctdecf) */
+} /* end subroutine (ctdecf) */
 
 
 /* local subroutines */
@@ -157,8 +156,7 @@ int subinfo::start(char *bufp,int bufl,int am) noex {
 	    f.mnooverr = !!(am & FORMAT_ONOOVERR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (subinfo::start) */
+} /* end method (subinfo::start) */
 
 int subinfo::finish() noex {
 	int		rs = SR_OK ;
@@ -167,8 +165,7 @@ int subinfo::finish() noex {
 	    if (! f.mnooverr) rs = SR_OVERFLOW ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (subinfo::finish) */
+} /* end method (subinfo::finish) */
 
 int subinfo::addfloat(int fcode,double v,
 		int width,int prec,int fill,char *buf) noex {
@@ -194,13 +191,13 @@ int subinfo::addfloat(int fcode,double v,
 	    f_varwidth = true ;
 	}
 	if (prec > MAXPREC) prec = MAXPREC ;
-/* fill up extra field width which may be specified (for some reason) */
+	/* fill up extra field width which may be specified */
 	while ((rs >= 0) && (width > DOFLOAT_STAGELEN)) {
 	    rs = addchr(' ') ;
 	    width -= 1 ;
 	} /* end while */
 	if (rs >= 0) {
-/* do the floating decimal conversion */
+	    /* do the floating decimal conversion */
 	    switch (fcode) {
 	    case 'e':
 	        converte(v, prec, &dpp,&f_sign,buf) ;
@@ -219,7 +216,7 @@ int subinfo::addfloat(int fcode,double v,
 	    stagelen = prec + dpp ;
 	    i = DOFLOAT_STAGELEN ;
 	    j = stagelen ;
-/* output any characters after the decimal point */
+	    /* output any characters after the decimal point */
 	    outlen = min(stagelen,prec) ;
 	    while ((remlen > 0) && (outlen > 0)) {
 	        if ((! f_varprec) || (buf[j - 1] != '0')) {
@@ -232,7 +229,7 @@ int subinfo::addfloat(int fcode,double v,
 	            outlen -= 1 ;
 	        }
 	    } /* end while */
-/* output any needed zeros after the decimal point */
+	    /* output any needed zeros after the decimal point */
 	    outlen = -dpp ;
 	    while ((remlen > 0) && (outlen > 0)) {
 	        if ((! f_varprec) || (outlen == 1)) {
@@ -241,12 +238,12 @@ int subinfo::addfloat(int fcode,double v,
 	        }
 	        outlen -= 1 ;
 	    } /* end while */
-/* output a decimal point */
+	    /* output a decimal point */
 	    if (remlen > 0) {
 	        stage[--i] = '.' ;
 	        remlen -= 1 ;
 	    }
-/* output any digits from the float conversion before the decimal point */
+	    /* output any digits before the decimal point */
 	    outlen = dpp ;
 	    f_leading = (outlen > 0) ;
 	    while ((remlen > 0) && (outlen > 0)) {
@@ -254,39 +251,38 @@ int subinfo::addfloat(int fcode,double v,
 	        remlen -= 1 ;
 	        outlen -= 1 ;
 	    }
-/* output any leading zero digit if needed */
+	    /* output any leading zero digit if needed */
 	    if ((! f_leading) && (remlen > 0)) {
 	        stage[--i] = '0' ;
 	        remlen -= 1 ;
 	    }
-/* output any leading fill zeros if called for */
+	    /* output any leading fill zeros if called for */
 	    while ((! f_varwidth) && (fill == 0) && (remlen > 1)) {
 	        stage[--i] = '0' ;
 	        remlen -= 1 ;
 	    }
-/* output any sign if called for */
+	    /* output any sign if called for */
 	    if (f_sign && (remlen > 0)) {
 	        stage[--i] = '-' ;
 	        remlen -= 1 ;
 	    }
-/* output any leading fill zeros if called for */
+	    /* output any leading fill zeros if called for */
 	    while ((! f_varwidth) && (fill == 0) && (remlen > 0)) {
 	        stage[--i] = '0' ;
 	        remlen -= 1 ;
-	    }
-/* output any leading blanks */
+	    } /* end while */
+	    /* output any leading blanks */
 	    while ((! f_varwidth) && (remlen > 0)) {
 	        stage[--i] = ' ' ;
 	        remlen -= 1 ;
-	    }
-/* copy the stage buffer to the output buffer */
+	    } /* end while */
+	    /* copy the stage buffer to the output buffer */
 	    while ((rs >= 0) && (i < DOFLOAT_STAGELEN)) {
 	        rs = addchr(stage[i++]) ;
-	    }
+	    } /* end while */
 	} /* end if (ok) */
 	return rs ;
-}
-/* end method (subinfo::addfloat) */
+} /* end method (subinfo::addfloat) */
 
 int subinfo::addchr(int ch) noex {
 	int		rs = SR_OK ;
@@ -296,8 +292,7 @@ int subinfo::addchr(int ch) noex {
 	    rs = addstrw(buf,1) ;
 	}
 	return rs ;
-}
-/* end method (subinfo::addchr) */
+} /* end method (subinfo::addchr) */
 
 int subinfo::addstrw(cchar *sp,int sl) noex {
 	int		rs = SR_OVERFLOW ;
@@ -316,7 +311,6 @@ int subinfo::addstrw(cchar *sp,int sl) noex {
 	    if (f.ov) rs = SR_OVERFLOW ;
 	} /* end if (noy overflow) */
 	return (rs >= 0) ? ml : rs ;
-}
-/* end method (subinfo::addstrw) */
+} /* end method (subinfo::addstrw) */
 
 
