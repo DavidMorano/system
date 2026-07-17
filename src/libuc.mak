@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += usystem.h localmisc.h
+INCS += usystem.h
 INCS += uclibsubs.h
 
 MODS += bstree.ccm sview.ccm strfilter.ccm
@@ -112,7 +112,7 @@ OBJ25= ucdescread.o ucdescwrite.o ucdescsock.o
 OBJ26= ucdescmisc.o ucdesclock.o
 OBJ27= ucproc.o ucdata.o
 
-OBJ28= uctc.o ucsysconf.o
+OBJ28= uctc.o ucsysconf.o ucsysmisc.o
 OBJ29= uclibmem.o ucyserattr.o
 OBJ30= ucsys.o ucatexit.o ucatfork.o
 OBJ31= tcx.o ucpts.o ucpwcache.o
@@ -159,7 +159,7 @@ a:			$(T).a
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).so:		$(OBJ) Makefile
@@ -324,7 +324,7 @@ objz.o:			$(OBJZ)
 
 
 # base
-OBJ0_BASE= uctimeout.o
+OBJ0_BASE= uctime.o
 OBJ1_BASE= ucsysconf.o 
 OBJ2_BASE=
 OBJ3_BASE=
@@ -364,8 +364,7 @@ character.o:	$(OBJ_CHAR)
 
 
 # LIBUC
-ucsysmisc.o:		ucsysmisc.cc
-ucnprocs.o:		ucnprocs.cc
+ucsysmisc.o:		ucsysmisc.cc	ucsysmisc.h		$(INCS)
 ucpathconf.o:		ucpathconf.cc
 ucmain.o:		ucmain.cc
 ucatfork.o:		ucatfork.cc	ucatfork.h		$(INCS)
@@ -380,9 +379,6 @@ ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
 ucinfo.o:		ucinfo.cc	ucinfo.h		$(INCS)
 
 ucdescbase.o:		ucdescbase.cc	ucdescbase.hh		$(INCS)
-
-# uctimeout (time-out call-backs)
-uctimeout.o:		uctimeout.cc
 
 # SYSTEM
 ucsysauxinfo.o:		ucsysauxinfo.cc ucsysauxinfo.h
@@ -454,7 +450,7 @@ ucproject.o:		ucproject.cc ucproject.h
 
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.ccm
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # MEMTRACK
 memtrack.o:		memtrack.dir
@@ -463,10 +459,6 @@ memtrack.dir:
 
 ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h ucmallreg.h
 ucmemalloc.o:		addrset.o
-
-# UNIX C-language system library timer management
-uctim.o:		uctim.cc uctim.h itcontrol.h
-uctimer.o:		uctimer.cc uctimer.h
 
 # misc-character
 toxc.o:			toxc.cc toxc.h
@@ -486,6 +478,11 @@ ucsupport.dir:
 # UCSYSCONF
 ucsysconf.o:		ucsysconf.dir
 ucsysconf.dir:
+	makesubdir $@
+
+# UCOPEN
+ucopen.o:		ucopen.dir
+ucopen.dir:
 	makesubdir $@
 
 # UCDESCREAD
@@ -513,14 +510,14 @@ ucdescmisc.o:		ucdescmisc.dir
 ucdescmisc.dir:
 	makesubdir $@
 
-# UCIDS
-ucdata.o:		ucdata.dir
-ucdata.dir:
-	makesubdir $@
-
 # UCFILEOP
 ucfileop.o:		ucfileop.dir
 ucfileop.dir:
+	makesubdir $@
+
+# UCIDS
+ucdata.o:		ucdata.dir
+ucdata.dir:
 	makesubdir $@
 
 # UCPROC
@@ -531,6 +528,36 @@ ucproc.dir:
 # UCSTREAM
 ucstream.o:		ucstream.dir
 ucstream.dir:
+	makesubdir $@
+
+# UCSYS
+ucsys.o:		ucsys.dir
+ucsys.dir:
+	makesubdir $@
+
+# UCENT
+ucent.o:		ucent.dir
+ucent.dir:
+	makesubdir $@
+
+# UCGET
+ucget.o:		ucget.dir
+ucget.dir:
+	makesubdir $@
+
+# UCENUM
+ucenum.o:		ucenum.dir
+ucenum.dir:
+	makesubdir $@
+
+# UCGETX
+ucgetx.o:		ucgetx.dir
+ucgetx.dir:
+	makesubdir $@
+
+# UCTIME
+uctime.o:		uctime.dir
+uctime.dir:
 	makesubdir $@
 
 # ADDRSET
@@ -613,36 +640,6 @@ matxstr.dir:
 # HASH
 hash.o:			hash.dir
 hash.dir:
-	makesubdir $@
-
-# UCSYS
-ucsys.o:		ucsys.dir
-ucsys.dir:
-	makesubdir $@
-
-# UCENT
-ucent.o:		ucent.dir
-ucent.dir:
-	makesubdir $@
-
-# UCGET
-ucget.o:		ucget.dir
-ucget.dir:
-	makesubdir $@
-
-# UCENUM
-ucenum.o:		ucenum.dir
-ucenum.dir:
-	makesubdir $@
-
-# UCGETX
-ucgetx.o:		ucgetx.dir
-ucgetx.dir:
-	makesubdir $@
-
-# UCOPEN
-ucopen.o:		ucopen.dir
-ucopen.dir:
 	makesubdir $@
 
 # STRN
@@ -1107,15 +1104,15 @@ strenv.o:		strenv.cc	strenv.hh	$(INCS)
 
 # BSTREE
 bstree.o:		bstree.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # SVIEW
 sview.o:		sview.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # BUFSIZEDATA
 bufsizedata.o:		bufsizedata.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 obj00_mod.o:		$(OBJ00_MOD)
