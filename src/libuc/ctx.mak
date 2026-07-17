@@ -35,7 +35,7 @@ DEFS=
 
 INCS= ctx.h
 
-MODS += uconstants.ccm digtab.ccm cvtdig.ccm cvtfloat.ccm
+MODS += uconstants.o digtab.o cvtdig.o cvtfloat.o
 
 LIBS=
 
@@ -100,11 +100,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_CTX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_CTX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -170,13 +170,13 @@ ctwords.o:		mods.o ctwords.cc ctwords.hh	$(INCS)
 MOBJ += uconstants.o umods.o cvtdig.o cvtfloat.o
 
 mods.o:			$(MOBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 cvtdig.o:		cvtdig.ccm 			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 cvtfloat.o:		cvtfloat.ccm fmtflag.o		$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 convertx.o:		convertx.cc	convertx.h	$(INCS)
 
