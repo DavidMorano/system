@@ -267,7 +267,7 @@ int filesyner::ifinish() noex {
 		dlen = 0 ;
 	    }
 	    {
-		rs = filesyner_dtor(this) ;
+		rs1 = filesyner_dtor(this) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (non-null) */
 	    magval = 0 ;
