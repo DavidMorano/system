@@ -136,9 +136,9 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<usysflag.h>		/* LIBU */
 #include	<endian.h>		/* LIBU */
-#include	<uclibmem.h>		/* LINBUC */
-#include	<getfstype.h>		/* LINBUC */
-#include	<sysval.hh>		/* LINBUC */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getfstype.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<mapstrint.h>		/* LIBUC */
 #include	<stdorder.h>		/* LIBUC */
