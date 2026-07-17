@@ -27,9 +27,9 @@
 #include	<sysdialer.h>
 
 
-#define	USSMUX_MAGIC		31415926
 #define	USSMUX			struct ussmux_head
 #define	USSMUX_FL		struct ussmux_flags
+#define	USSMUX_MAGIC		31415926
 
 
 struct ussmux_flags {
