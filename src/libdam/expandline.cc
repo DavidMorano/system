@@ -5,7 +5,7 @@
 /* subroutine to expand a line out for TROFF rendering */
 /* version %I% last-modified %G% */
 
-#define	CF_PREFIX	1
+#define	CF_PREFIX	1		/* prefix mode */
 
 /*******************************************************************************
 
@@ -46,15 +46,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"expandline.h"
 
@@ -97,7 +97,8 @@ int expandline(cchar *ibp,int il,char *obp,int ol,int *flagp) noex {
 	        int	op = 0  ;
 	        int	j, k ;
 	        int	cur_l, last_l ;
-	        char	*cur_obp, *last_obp ;
+	        char	*cur_obp ;
+	        char	*last_obp ;
 		rs = SR_OK ;
 		*flagp = false ;
 	        if (il && ((*ibp == '.') || (*ibp == '\''))) {
@@ -107,7 +108,7 @@ int expandline(cchar *ibp,int il,char *obp,int ol,int *flagp) noex {
 		        *obp++ = '&' ;
 		        ol -= 2 ;
 		    } /* end if_constexpr (f_prefix) */
-	        }
+	        } /* end if */
 	        for (int i = 0 ; (i < il) && (len < (ol - 8)) ; i += 1) {
 	            int		c = *ibp ;
 	            last_obp = cur_obp ;
@@ -125,7 +126,7 @@ int expandline(cchar *ibp,int il,char *obp,int ol,int *flagp) noex {
 	                k = 8 - (op & 7) ;
 	                for (j = 0 ; j < k ; j += 1) {
 	                    *obp++ = ' ' ;
-	                }
+	                } /* end for */
 	                len += k ;
 	                ibp += 1 ;
 	                op += k ;
@@ -152,12 +153,11 @@ int expandline(cchar *ibp,int il,char *obp,int ol,int *flagp) noex {
 	                *obp++ = *ibp++ ;
 	                len += 1 ;
 	                op += 1 ;
-	            }
+	            } /* end if */
 	        } /* end for */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (expandline) */
+} /* end subroutine (expandline) */
 
 
