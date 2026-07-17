@@ -40,16 +40,18 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
+#include	"checksecure.h"
 
 /* local defines */
 
@@ -58,6 +60,19 @@
 
 
 /* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+local bool isxu(cmode fm) noex {
+    	return (fm & S_IXUSR) && (fm & S_ISUID) ;
+}
+local bool isxg(cmode fm) noex {
+    	return (fm & S_IXGRP) && (fm & S_ISGID) ;
+}
 
 
 /* local variables */
@@ -69,27 +84,19 @@
 /* exported subroutines */
 
 int securefile(cchar *name,uid_t euid,gid_t egid) noex {
-	USTAT		sb ;
-	int		rs ;
-	int		f = FALSE ;
-
-	if (name == NULL)
-	    return SR_INVALID ;
-
-	if ((rs = u_stat(name,&sb)) >= 0) {
-
-	    f = (sb.st_uid == euid) && 
-		(sb.st_mode & S_IXUSR) && (sb.st_mode & S_ISUID) ;
-
-	    if (! f)
-	    f = (sb.st_gid == egid) && 
-		(sb.st_mode & S_IXGRP) && (sb.st_mode & S_ISGID) ;
-
-	} /* end if */
-
+	int		rs = SR_FAULT ;
+	int		f = false ; /* return-value */
+	if (name) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+	        if (ustat sb ; (rs = u_stat(name,&sb)) >= 0) {
+	            cmode fm = sb.st_mode ;
+	            f = f || ((sb.st_uid == euid) && isxu(fm)) ;
+	            f = f || ((sb.st_gid == egid) && isxg(fm)) ;
+	        } /* end if */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (securefile) */
-
+} /* end subroutine (securefile) */
 
 
