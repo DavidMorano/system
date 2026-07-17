@@ -13,17 +13,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecstr.h>
-#include	<sockaddress.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
 
 
 #define	CONNECTION		struct connection_head
@@ -75,11 +72,11 @@ struct connection : connection_head {
 	} ;
 	connection(const connection &) = delete ;
 	connection &operator = (const connection &) = delete ;
-	int start(cchar *) noex ;
-	int socklocname(char *,int,int) noex ;
-	int sockremname(char *,int,int) noex ;
-	int peername(sockaddress *,int,char *,int) noex ;
-	int mknames(vecstr *) noex ;
+	int start	(cchar *) noex ;
+	int socklocname	(char *,int,int) noex ;
+	int sockremname	(char *,int,int) noex ;
+	int peername	(sockaddress *,int,char *,int) noex ;
+	int mknames	(vecstr *) noex ;
 	void dtor() noex ;
 	destruct connection() {
 	    if (sap) dtor() ;
