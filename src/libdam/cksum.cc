@@ -98,15 +98,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cksum.h"
 
@@ -199,37 +202,34 @@ constexpr uint		table[] = {
 
 int cksum_start(cksum *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = memclear(op) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cksum_start) */
+} /* end subroutine (cksum_start) */
 
 int cksum_finish(cksum *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cksum_finish) */
+} /* end subroutine (cksum_finish) */
 
 int cksum_begin(cksum *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->fl.loc = true ;
 	    op->loc.len = 0 ;
 	    op->loc.sum = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cksum_begin) */
+} /* end subroutine (cksum_begin) */
 
 int cksum_accum(cksum *op,void *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
-	if (op && abuf) {
+	if (op && abuf) ylikely {
 	    uint	ch ;
 	    uchar	*olp ;
 	    uchar	*bp = (uchar *) abuf ;
@@ -251,36 +251,32 @@ int cksum_accum(cksum *op,void *abuf,int alen) noex {
 	            bp += 1 ;
 	        } /* end while */
 	    } /* end if (started) */
-
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cksum_accum) */
+} /* end subroutine (cksum_accum) */
 
 int cksum_end(cksum *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->fl.loc = false ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cksum_end) */
+} /* end subroutine (cksum_end) */
 
 int cksum_getlen(cksum *op,uint *rp) noex {
 	int		rs = SR_FAULT ;
-	if (op && rp) {
+	if (op && rp) ylikely {
 	    rs = SR_OK ;
 	    *rp = op->loc.len ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cksum_getlen) */
+} /* end subroutine (cksum_getlen) */
 
 /* get the cksum accummulated so far */
 int cksum_getsum(cksum *op,uint *rp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    uint	sum = op->loc.sum ;
 	    uint	v = op->loc.len ;
 	    cint	n = szof(uint) ;
@@ -293,13 +289,12 @@ int cksum_getsum(cksum *op,uint *rp) noex {
 	    rs = (op->loc.len & INT_MAX) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cksum_getsum) */
+} /* end subroutine (cksum_getsum) */
 
 /* get the total checksum and total length */
 int cksum_getsumall(cksum *op,uint *rp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    uint	sum = op->total.sum ;
 	    uint	v = op->total.len ;
 	    cint	n = szof(uint) ;
@@ -312,7 +307,6 @@ int cksum_getsumall(cksum *op,uint *rp) noex {
 	    rs = (op->total.len & INT_MAX) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cksum_getsumall) */
+} /* end subroutine (cksum_getsumall) */
 
 
