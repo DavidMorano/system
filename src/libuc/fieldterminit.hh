@@ -53,7 +53,7 @@
 #include	<baops.h>		/* LIBU */
 
 
-constexpr int	fieldterminit_size = ((UCHAR_MAX+1)/CHAR_BIT) ;
+constexpr int	fieldterminit_size = ((UCHAR_MAX + 1) / CHAR_BIT) ;
 
 struct fieldterminit {
 	char		terms[fieldterminit_size] = {} ;
