@@ -38,10 +38,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<localmisc.h>		/* more types */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"igcd.h"
 
 
 /* local defines */
@@ -73,7 +78,6 @@ int igcd(int a,int b) noex {
 	    b = r ;
 	} /* end while */
 	return b ;
-}
-/* end subroutine (igcd) */
+} /* end subroutine (igcd) */
 
 
