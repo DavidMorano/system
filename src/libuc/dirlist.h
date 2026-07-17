@@ -37,7 +37,7 @@ struct dirlist_cursor {
 
 struct dirlist_head {
 	vecobj		*dbp ;
-	uint		magic ;
+	uint		magval ;
 	int		tlen ;
 } ; /* end struct */
 
