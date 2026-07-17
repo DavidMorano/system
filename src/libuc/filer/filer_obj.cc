@@ -29,10 +29,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD |nullptr_t| */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>		/* LINU */
-#include	<usysbase.h>		/* LINU */
-#include	<ulogerror.h>		/* LINU */
-#include	<localmisc.h>		/* LINU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"filer.h"
 
