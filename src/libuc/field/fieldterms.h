@@ -56,7 +56,7 @@ constexpr int	fieldterms_termsize = ((UCHAR_MAX + 1) / CHAR_BIT) ;
 
 template<typename ... Args>
 local inline int fieldterms(char *t,int f,Args ... args) noex {
-	cint		na = npack(Args) ;
+	cint na = npack(Args) ;
 	return fieldtermsx(t,f,na,args ...) ;
 } /* end subroutine-template */
 
