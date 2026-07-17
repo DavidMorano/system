@@ -114,7 +114,7 @@ local inline int dirlist_ctor(dirlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->tlen = 0 ;
 	    if ((op->dbp = new(nothrow) vecobj) != np) ylikely {
 		rs = SR_OK ;
@@ -136,7 +136,7 @@ template<typename ... Args>
 local int dirlist_magic(dirlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == DIRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == DIRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (dirlist_magic) */
@@ -167,7 +167,7 @@ int dirlist_start(dirlist *op) noex {
 	    cint	ne = DIRLIST_NDEF ;
 	    cint	vo = VECOBJ_OORDERED ;
 	    if ((rs = vecobj_start(op->dbp,esz,ne,vo)) >= 0) ylikely {
-	        op->magic = DIRLIST_MAGIC ;
+	        op->magval = DIRLIST_MAGIC ;
 	    }
 	    if (rs < 0) {
 		dirlist_dtor(op) ;
@@ -202,7 +202,7 @@ int dirlist_finish(dirlist *op) noex {
 	        rs1 = dirlist_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
