@@ -60,7 +60,7 @@ OBJ13_USYS= usys_eaccess.o usys_stat.o usys_xti.o
 OBJ14_USYS= usys_environ.o usys_onc.o usys_getnetname.o
 OBJ15_USYS= usys_getauid.o usys_atox.o usys_strtox.o
 
-OBJ16_USYS= usys_getprocuid.o
+OBJ16_USYS= usys_getprocuid.o usys_in4in6addr.o
 OBJ17_USYS=
 OBJ18_USYS=
 OBJ19_USYS=
@@ -275,6 +275,7 @@ usys_atox.o:		usys_atox.cc		usys_atox.h		$(INCS)
 usys_strtox.o:		usys_strtox.cc		usys_strtox.h		$(INCS)
 usys_nprocs.o:		usys_nprocs.cc		usys_nprocs.h		$(INCS)
 usys_getprocuid.o:	usys_getprocuid.cc	usys_getprocuid.h	$(INCS)
+usys_in4in6addr.o:	usys_in4in6addr.cc	usys_in4in6addr.h	$(INCS)
 
 # special
 usysargz.o:		usysargz.cc		usysargz.hh		$(INCS)
