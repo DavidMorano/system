@@ -29,13 +29,13 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<buffer.h>		/* dynamically allocated buffer */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC dynamically allocated buffer */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -74,9 +74,9 @@ export {
 	parts_co	getprev ;
 	parts_co	finish ;
 	buffer		*as ;
-	uint		magic ;
+	uint		magval ;
 	int		nbufs ;
-	parts() noex : as(nullptr), magic(0), nbufs(0) { 
+	parts() noex : as(nullptr), magval(0), nbufs(0) { 
 	    len		(this,partsmem_len) ;
 	    getprev	(this,partsmem_getprev) ;
 	    finish	(this,partsmem_finish) ;
@@ -86,7 +86,7 @@ export {
 	int		get(int,ccharpp) noex ;
 	void dtor() noex ;
 	destruct parts() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
     private:
 	int bufalloc() noex ;
@@ -104,7 +104,7 @@ int parts::start(int n) noex {
 	    nbufs = n ;
 	    if ((rs = bufalloc()) >= 0) {
 		if ((rs = bufstart()) >= 0) {
-		    magic = PARTS_MAGIC ;
+		    magval = PARTS_MAGIC ;
 		}
 	    } /* end if (bufalloc) */
 	} /* end if (valid) */
@@ -124,20 +124,20 @@ int parts::addchr(int idx,int ch) noex {
 
 int parts::ilen(int idx) noex {
 	int		rs = SR_BUGCHECK ;
-	int		len = 0 ; /* return-value */
+	int		rl = 0 ; /* return-value */
 	if (as) {
 	    if (idx >= 0) {
 		rs = buffer_len(as + idx) ;
-		len = rs ;
+		rl = rs ;
 	    } else {
 		rs = SR_OK ;
 	        for (int i = 0 ; (rs >= SR_OK) && (i < nbufs) ; i += 1) {
 	            rs = buffer_len(as + i) ;
-		    len += rs ;
+		    rl += rs ;
 	        } /* end for */
 	    } /* end if */
-	} /* end if */
-	return (rs >= 0) ? len : rs ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
 } /* end method (parts::ilen) */
 
 int parts::igetprev(int idx) noex {
@@ -151,7 +151,7 @@ int parts::igetprev(int idx) noex {
 int parts::get(int idx,ccharpp rpp) noex {
     	int		rs = SR_FAULT ;
 	if (rpp) {
-    	    int		rs = SR_INVALID ;
+    	    rs = SR_INVALID ;
 	    if ((idx >= 0) && (idx < nbufs)) {
 	        rs = buffer_get((as + idx),rpp) ;
 	    } /* end if (valid) */
@@ -162,19 +162,19 @@ int parts::get(int idx,ccharpp rpp) noex {
 int parts::ifinish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	    if (as) {
-		{
-		    rs1 = finbufs() ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-		{
-		    rs1 = lm_free(as) ;
-		    if (rs >= 0) rs = rs1 ;
-		    as = nullptr ;
-		    nbufs = 0 ;
-		}
-	    } /* end if (as) */
-	    magic = 0 ;
+	if (as) {
+	   {
+		rs1 = finbufs() ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = lm_free(as) ;
+		if (rs >= 0) rs = rs1 ;
+		as = nullptr ;
+		nbufs = 0 ;
+	    } /* end if (memory-release) */
+	} /* end if (as) */
+	magval = 0 ;
 	return rs ;
 } /* end method (parts::ifinish) */
 
