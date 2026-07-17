@@ -109,7 +109,6 @@ int cthexstr(char *dbuf,int dlen,int f,cchar *sp,int µsl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (cthexstr) */
+} /* end subroutine (cthexstr) */
 
 
