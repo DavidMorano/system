@@ -1,4 +1,4 @@
-/* fsi SUPPORT */
+/* fsi SUPPORT (FIFO-String-Interlocked) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -26,12 +26,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<ptm.h>
-#include	<fifostr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<fifostr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fsi.h"
 
@@ -62,17 +63,17 @@ template<typename ... Args>
 local int fsi_ctor(fsi *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->qsp = nullptr ;
-	    if ((op->mxp = new(nothrow) ptm) != np) {
-	        if ((op->qsp = new(nothrow) fifostr) != np) {
+	    if ((op->mxp = new(nothrow) ptm) != np) ylikely {
+	        if ((op->qsp = new(nothrow) fifostr) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-fifostr) */
 	        if (rs < 0) {
 		    delete op->mxp ;
 		    op->mxp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
@@ -80,7 +81,7 @@ local int fsi_ctor(fsi *op,Args ... args) noex {
 
 local int fsi_dtor(fsi *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->qsp) {
 		delete op->qsp ;
@@ -105,7 +106,7 @@ local int fsi_dtor(fsi *op) noex {
 
 int fsi_start(fsi *op) noex {
 	int		rs ;
-	if ((rs = fsi_ctor(op)) >= 0) {
+	if ((rs = fsi_ctor(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
 	    if ((rs = mxp->create) >= 0) {
 	        rs = fifostr_start(op->qsp) ;
@@ -118,13 +119,12 @@ int fsi_start(fsi *op) noex {
 	    }
 	} /* end if (fsi_ctor) */
 	return rs ;
-}
-/* end subroutine (fsi_start) */
+} /* end subroutine (fsi_start) */
 
 int fsi_finish(fsi *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->qsp) {
 	        rs1 = fifostr_finish(op->qsp) ;
@@ -141,15 +141,14 @@ int fsi_finish(fsi *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fsi_finish) */
+} /* end subroutine (fsi_finish) */
 
 int fsi_add(fsi *op,cchar *sbuf,int slen) noex {
 	ptm		*mxp = op->mxp ;
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = mxp->lockbegin) >= 0) {
+	if ((rs = mxp->lockbegin) >= 0) ylikely {
 	    {
 	        rs = fifostr_add(op->qsp,sbuf,slen) ;
 		rv = rs ;
@@ -158,15 +157,14 @@ int fsi_add(fsi *op,cchar *sbuf,int slen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (fsi_add) */
+} /* end subroutine (fsi_add) */
 
 int fsi_remove(fsi *op,char *sbuf,int slen) noex {
 	ptm		*mxp = op->mxp ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if ((rs = mxp->lockbegin) >= 0) {
+	if ((rs = mxp->lockbegin) >= 0) ylikely {
 	    {
 	        rs = fifostr_rem(op->qsp,sbuf,slen) ;
 	        rl = rs ;
@@ -175,20 +173,18 @@ int fsi_remove(fsi *op,char *sbuf,int slen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (fsi_remove) */
+} /* end subroutine (fsi_remove) */
 
 int fsi_rem(fsi *op,char *sbuf,int slen) noex {
 	return fsi_remove(op,sbuf,slen) ;
-}
-/* end subroutine (fsi_rem) */
+} /* end subroutine (fsi_rem) */
 
 int fsi_count(fsi *op) noex {
 	ptm		*mxp = op->mxp ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = mxp->lockbegin) >= 0) {
+	if ((rs = mxp->lockbegin) >= 0) ylikely {
 	    {
 	        rs = fifostr_count(op->qsp) ;
 	        c = rs ;
@@ -197,7 +193,6 @@ int fsi_count(fsi *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (fsi_count) */
+} /* end subroutine (fsi_count) */
 
 
