@@ -83,6 +83,7 @@
 #include	<usys_strtox.h>
 #include	<usys_nprocs.h>
 #include	<usys_getprocuid.h>
+#include	<usys_in4in6addr.h>
 
 
 #endif /* USYS_INCLUDE */
