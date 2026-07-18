@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<hmatch.h>
-#include	<vecstr.h>
-#include	<ids.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<hmatch.h>		/* LIBMAILMSG */
+#include	<vecstr.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
 
 
 #define	MAILALIAS		struct mailalias_head
