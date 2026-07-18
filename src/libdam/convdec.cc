@@ -21,18 +21,17 @@
 	I am reviewing this code file again since I found it somewhere
 	and copied it into the LIBDAM library source code area
 	(really for no particular reason).  I remember writing this
-	originally in 1983 (in C-language just as shown below).
-	Yes, that is when I first wrote this.  This was used in the
-	CPU circuit board for the so-called "data-base" processor
-	complex of the AT&T Audix® Voice-Mail product.  Let us see.
-	How long ago was that?  2025-1983=42 years ago now.  I am
-	cracking myself up a little bit.  This code was used by my
-	|printf| subroutine that I wrote at that time also (also
-	for the Audix® product).  I had assembly language
-	convert-integer-to-string subroutines for both decimal and
-	hexadecimal (very heavily used back then for hardware
-	development), but for some reason this code (below) was
-	still used within |printf|.
+	originally in 1983 (in C-language pretty much as shown
+	below).  This was used in the CPU circuit board for the
+	so-called "data-base" processor complex of the AT&T Audix®
+	Voice-Mail product.  Let us see.  How long ago was that?
+	2025-1983=42 years ago now.  I am cracking myself up a
+	little bit.  This code was used by my |printf| subroutine
+	that I wrote at that time also (also for the Audix® product).
+	I had assembly language convert-integer-to-string subroutines
+	for both decimal and hexadecimal (very heavily used back
+	then for hardware development), but for some reason this
+	code (below) was still used within |printf|.
 
 */
 
@@ -45,23 +44,26 @@
 	convdecs{x}
 
   	Description:
-	The |convdec{x}()| subroutines convert the {unsigned|signed}
-	long (64-bit) integer "lval" to printable decimal and places
-	it in a buffer identified as relative to 'endptr' (a pointer
-	to a char buffer).  The value returned is the address of
-	the first non-zero character.  Short of assembly language
-	magical smart stuff (which I have coded elsewhere), this
-	implementation of decimal conversion should be reasonably
-	fast (or fast enough), despite its simplicity, for our
-	purposes.
+	The |convdec{x}()| subroutines convert {unsigned|signed}
+	integers to printable decimal (base-10 digis) and places
+	the resulting characters in a buffer relative to 'endptr'
+	(a pointer to the end of a char buffer).  The value returned
+	is the address of the first non-zero character.  Short of
+	assembly language magical smart stuff (which I have coded
+	elsewhere), this implementation of decimal conversion should
+	be reasonably fast (or fast enough), despite its simplicity,
+	for our purposes.
 
 	Synopsis:
-	char *convdecu{x}(ulong lval,char *endptr) noex
-	char *convdecs{x}(ulong lval,char *endptr) noex
+	char *convdecs{x}(s{xx} val,char *endptr) noex
+	char *convdecu{x}(u{xx} val,char *endptr) noex
 
 	Arguments:
-	lval		value (unsigned or signed) to be converted
-	endptr		pointer to one byte beyond the end of a result buffer
+	{x}		one of: i, l, ll
+	{xx}		one of: int, long, longlong
+	val		value (unsigned or signed) to be converted
+	endptr		pointer to one byte beyond the end the filled
+			part of the result buffer
 	
 	Returns:
 	-		pointer to start of convered string
