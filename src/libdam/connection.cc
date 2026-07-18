@@ -193,18 +193,18 @@ int connection_finish(CON *op) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->inetdomain = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->name) {
 	        void *vp = voidp(op->name) ;
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->name = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->sap) {
 		rs1 = lm_free(op->sap) ;
 	        if (rs >= 0) rs = rs1 ;
 		op->sap = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (connection_finish) */
