@@ -281,7 +281,7 @@ int defvar_check(DF *op,time_t dt) noex {
 	            f_changed = true ;
 	            rs = vlp->envfile(op->fname) ;
 		}
-	    }
+	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_changed : rs ;
 } /* end subroutine (defvar_check) */
