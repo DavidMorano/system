@@ -20,33 +20,30 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<time.h>		/* |time_t| */
-#include	<fcntl.h>		/* |off_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® |off_t| */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LINUC */
 
 
-#define	MAILFILES_MAGIC		0x21658252
 #define	MAILFILES		struct mailfiles_head
 #define	MAILFILES_ENT		struct mailfiles_entry
+#define	MAILFILES_MAGIC		0x21658252
 
 
 struct mailfiles_head {
     	vecobj		*elp ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 struct mailfiles_entry {
 	cchar		*mailfname ;
 	time_t		lasttime ;
 	off_t		lastsize ;
 	int		f_changed ;
-} ;
+} ; /* end struct */
 
 typedef	MAILFILES		mailfiles ;
 typedef	MAILFILES_ENT		mailfiles_ent ;
@@ -73,8 +70,7 @@ static inline int mailfiles_magic(mailfiles *op,Args ... args) noex {
 	    rs = (op->magic == MAILFILES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mailfiles_magic) */
+} /* end subroutine (mailfiles_magic) */
 
 #endif /* __cplusplus */
 
