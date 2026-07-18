@@ -91,7 +91,7 @@ module ;
 #include	<climits>		/* CSTD |CHAR_BIT| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdint>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
 #include	<cstdio>		/* CSTD */
 #include	<cstring>		/* CSTD |strchr(3c)| */
