@@ -69,26 +69,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucdesc.h>
-#include	<ucgetx.h>		/* |uc_getipnodebyname(3uc)| */
-#include	<uchostent.h>
-#include	<ucsig.h>
-#include	<getproto.h>
-#include	<getpf.h>
-#include	<getportnum.h>
-#include	<hostinfo.h>
-#include	<hostaddr.h>
-#include	<hostent.h>
-#include	<sockaddress.h>
-#include	<inetconv.h>
-#include	<iserror.h>
-#include	<openaddrinfo.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC |uc_getipnodebyname(3uc)| */
+#include	<uchostent.h>		/* LIBUC */
+#include	<ucsig.h>		/* LIBUC */
+#include	<ucinet.h>		/* LIBUC */
+#include	<getproto.h>		/* LIBUC */
+#include	<getpf.h>		/* LIBUC */
+#include	<getportnum.h>		/* LIBUC */
+#include	<hostinfo.h>		/* LIBUC */
+#include	<hostaddr.h>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<inetconv.h>		/* LIBUC */
+#include	<openaddrinfo.h>	/* LIBUC */
+#include	<iserror.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialtcp.h"
 
@@ -106,8 +108,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 #define	RETRIES		1		/* Sun-Solaris® problem */
 
-#define	SUBINFO		struct subinfo
-#define	SUBINFO_FL	struct subinfo_flags
+#define	SI		subinfo
+#define	SI_FL		subinfo_fl
 
 #ifndef	CF_PROTO
 #define	CF_PROTO	0		/* need dynamic protocol number */
@@ -123,10 +125,6 @@ import libutil ;			/* |lenstr(3u)| */
 /* external subroutines */
 
 extern "C" {
-    extern int uc_writen(int,cvoid *,int) noex ;
-}
-
-extern "C" {
     extern int	opensockaddr(int,int,int,SOCKADDR *,int) noex ;
 }
 
@@ -139,15 +137,15 @@ extern "C" {
 
 /* local structures */
 
-struct subinfo_flags {
+struct subinfo_fl {
 	uint		address:1 ;
-} ;
+} ; /* end struct */
 
 struct subinfo {
 	cchar		*hn ;
 	cchar		*ps ;
 	cchar		*pn ;
-	SUBINFO_FL	fl ;
+	subinfo_fl	fl ;
 	int		count ;
 	int		type ;
 	int		proto ;
@@ -155,26 +153,26 @@ struct subinfo {
 	int		port ;
 	int		to ;
 	uchar		addrbuf[ADDRBUFLEN + 1] ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar *,cchar *,int) noex ;
-static int	subinfo_proto(SUBINFO *) noex ;
-static int	subinfo_svc(SUBINFO *) noex ;
-static int	subinfo_finish(SUBINFO *) noex ;
+local int	subinfo_start	(SI *,cchar *,cchar *,int) noex ;
+local int	subinfo_proto	(SI *) noex ;
+local int	subinfo_svc	(SI *) noex ;
+local int	subinfo_finish	(SI *) noex ;
 
-static int	subinfo_addr(SUBINFO *,int) noex ;
-static int	subinfo_try(SUBINFO *) noex ;
-static int	subinfo_tryone(SUBINFO *) noex ;
+local int	subinfo_addr	(SI *,int) noex ;
+local int	subinfo_try	(SI *) noex ;
+local int	subinfo_tryone	(SI *) noex ;
 
-static int	try_inet4(SUBINFO *) noex ;
-static int	try_inet6(SUBINFO *) noex ;
-static int	try_addr(SUBINFO *) noex ;
-static int	try_inet(SUBINFO *) noex ;
+local int	try_inet4	(SI *) noex ;
+local int	try_inet6	(SI *) noex ;
+local int	try_addr	(SI *) noex ;
+local int	try_inet	(SI *) noex ;
 
-static int	subinfo_makeconn(SUBINFO *,int,SOCKADDR *) noex ;
+local int	subinfo_makeconn(SI *,int,SOCKADDR *) noex ;
 
 
 /* local variables */
@@ -195,7 +193,7 @@ int dialtcp(cchar *hn,cchar *ps,int af,int to,int opts) noex {
 	if (hn && ps) {
 	    rs = SR_INVALID ;
 	    if (hn[0] && ps[0]) {
-	        SUBINFO		si, *sip = &si ;
+	        SI	si, *sip = &si ;
 	        if (to == 0) to = 1 ;
 	        if ((rs = subinfo_start(sip,hn,ps,to)) >= 0) {
 	            if ((rs = subinfo_proto(sip)) >= 0) {
@@ -220,13 +218,12 @@ int dialtcp(cchar *hn,cchar *ps,int af,int to,int opts) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialtcp) */
+} /* end subroutine (dialtcp) */
 
 
 /* local subroutines */
 
-static int subinfo_start(SUBINFO *sip,cchar *hn,cchar *ps,int to) noex {
+local int subinfo_start(SI *sip,cchar *hn,cchar *ps,int to) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = memclear(sip) ;
@@ -237,19 +234,17 @@ static int subinfo_start(SUBINFO *sip,cchar *hn,cchar *ps,int to) noex {
 	    sip->to = to ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
-static int subinfo_proto(SUBINFO *sip) noex {
+local int subinfo_proto(SI *sip) noex {
 	int		rs = SR_OK ;
 	if_constexpr (f_proto) {
 	    cchar	*pn = sip->pn ;
@@ -260,10 +255,9 @@ static int subinfo_proto(SUBINFO *sip) noex {
 	    sip->proto = IPPROTO_TCP ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_proto) */
+} /* end subroutine (subinfo_proto) */
 
-static int subinfo_svc(SUBINFO *sip) noex {
+local int subinfo_svc(SI *sip) noex {
 	int		rs ;
 	cchar		*pn = sip->pn ;
 	cchar		*ps = sip->ps ;
@@ -271,10 +265,9 @@ static int subinfo_svc(SUBINFO *sip) noex {
 	    sip->port = rs ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_svc) */
+} /* end subroutine (subinfo_svc) */
 
-static int subinfo_addr(SUBINFO *sip,int af) noex {
+local int subinfo_addr(SI *sip,int af) noex {
 	cint		addrlen = ADDRBUFLEN ;
 	int		rs ;
 	cchar		*hn = sip->hn ;
@@ -286,10 +279,9 @@ static int subinfo_addr(SUBINFO *sip,int af) noex {
 	}
 	sip->af = af ;
 	return (rs >= 0) ? af : rs ;
-}
-/* end subroutine (subinfo_addr) */
+} /* end subroutine (subinfo_addr) */
 
-static int subinfo_try(SUBINFO *sip) noex {
+local int subinfo_try(SI *sip) noex {
 	int		rs ;
 	if ((rs = subinfo_tryone(sip)) == SR_TIMEDOUT) {
 	    int		c = RETRIES ;
@@ -298,10 +290,9 @@ static int subinfo_try(SUBINFO *sip) noex {
 	    } /* end while */
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_try) */
+} /* end subroutine (subinfo_try) */
 
-static int subinfo_tryone(SUBINFO *sip) noex {
+local int subinfo_tryone(SI *sip) noex {
 	int		rs = SR_HOSTUNREACH ;
 	int		rs1 ;
 	int		af = sip->af ;
@@ -333,10 +324,9 @@ static int subinfo_tryone(SUBINFO *sip) noex {
 	    } /* end if_constexpr (f_tryinet) */
 	} /* end if */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (subinfo_tryone) */
+} /* end subroutine (subinfo_tryone) */
 
-static int try_inet4(SUBINFO *sip) noex {
+local int try_inet4(SI *sip) noex {
 	cint		af = AF_INET4 ;
 	int		rs ;
 	int		rs1 ;
@@ -373,10 +363,9 @@ static int try_inet4(SUBINFO *sip) noex {
 	} /* end if (hostinfo) */
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (try_inet4) */
+} /* end subroutine (try_inet4) */
 
-static int try_inet6(SUBINFO *sip) noex {
+local int try_inet6(SI *sip) noex {
 	HOSTENT		*hep ;
 	cint		af = AF_INET6 ;
 	int		rs ;
@@ -418,10 +407,9 @@ static int try_inet6(SUBINFO *sip) noex {
 	    uc_close(fd) ;
 	}
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (try_inet6) */
+} /* end subroutine (try_inet6) */
 
-static int try_addr(SUBINFO *sip) noex {
+local int try_addr(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = 0 ;
@@ -443,10 +431,9 @@ static int try_addr(SUBINFO *sip) noex {
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (getpf) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (try_addr) */
+} /* end subroutine (try_addr) */
 
-static int try_inet(SUBINFO *sip) noex {
+local int try_inet(SI *sip) noex {
 	ADDRINFO	hint{} ;
 	ADDRINFO	*aip{} ;
 	int		rs = SR_OK ;
@@ -493,16 +480,14 @@ static int try_inet(SUBINFO *sip) noex {
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (ok) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (try_inet) */
+} /* end subroutine (try_inet) */
 
 /* make a connection (with protocol family and socket-address) */
-static int subinfo_makeconn(SUBINFO *sip,int pf,SOCKADDR *sap) noex {
+local int subinfo_makeconn(SI *sip,int pf,SOCKADDR *sap) noex {
 	cint	st = sip->type ;
 	cint	proto = sip->proto ;
 	cint	to = sip->to ;
 	return opensockaddr(pf,st,proto,sap,to) ;
-}
-/* end subroutine (subinfo_makeconn) */
+} /* end subroutine (subinfo_makeconn) */
 
 
