@@ -1,8 +1,8 @@
-/* graph HEADER */
+/* graph MODULE (primary) */
 /* charset=ISO8859-1 */
 /* lang=C++11 */
 
-/* Dijkstra (shortest path through graph) */
+/* a graph object for graph-traveral algorithms */
 /* version %I% last-modified %G% */
 
 
@@ -25,33 +25,32 @@
 
 *******************************************************************************/
 
-#ifndef	GRAPH_INCLUDE
-#define	GRAPH_INCLUDE
-#ifdef	__cplusplus
-
+module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<vector>
-#include	<list>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<vector>		/* C++STD */
+#include	<list>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
+export module graph ;
 
 struct graph_edger {
 	int		src ;	/* source vertex */
 	int		dst ;	/* destination vertex */
 	int		weight ; /* weight of edge to this vertex */
-} ;
+} ; /* end struct */
 
 struct graph_edge {
 	int		dst ;	/* destination vertex */
 	int		weight ; /* weight of edge to this vertex */
 	graph_edge() noex : dst(0), weight(0) { } ;
 	graph_edge(int ad,int aw = 0) noex : dst(ad), weight(aw) { } ;
-} ;
+} ; /* end struct */
 
 struct graph_res {
 	int		dist ; /* distance (summed weight) to present vertex */
@@ -68,10 +67,6 @@ struct graph_res {
 	    prev = -1 ;
 	    return (*this) ;
 	} ;
-} ;
-
-
-#endif /* __cplusplus */
-#endif /* GRAPH_INCLUDE */
+} ; /* end struct */
 
 
