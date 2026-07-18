@@ -31,14 +31,14 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	getaf(cchar *,int) noex ;
-extern int	getaflen(int) noex ;
+extern int	getaf		(cchar *,int) noex ;
+extern int	getaflen	(int) noex ;
 extern cchar	*strafname(int) noex ;
 
 EXTERNC_end
@@ -47,7 +47,7 @@ EXTERNC_end
 
 inline int getaf(cchar *sp) noex {
 	return getaf(sp,-1) ;
-}
+} /* end subroutine */
 
 #endif /* __cplusplus */
 
