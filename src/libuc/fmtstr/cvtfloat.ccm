@@ -73,7 +73,7 @@ import fmtflag ;
 constexpr int		wmax	= 256 ;
 constexpr int		pmax	= 256 ;
 constexpr int		fmtlen	= 30 ;
-constexpr int		dlen	= DECBUFLEN ;
+constexpr int		declen	= DECBUFLEN ;
 constexpr char		codes[]	= "aefgAEFG" ;
 
 int ctstr(char *dbuf,int dlen,char *fp,int rl,int v) noex {
@@ -92,43 +92,47 @@ int ctstr(char *dbuf,int dlen,char *fp,int rl,int v) noex {
 } /* end subroutine (ctstr) */
 
 int mkflags(char *fbuf,int flen,int fg) noex {
-    	fmtflag		ff(fg) ;
-    	int		rs = SR_OK ;
+    	int		rs = SR_OVERFLOW ;
 	int		fl = 0 ; /* return-value */
 	char		*fp = fbuf ;
-	for (int i = 0 ; i < fmtflag_overlast ; i += 1) {
-	    if (ff[i]) ylikely {
-	        int	ch = 0 ;
-	        switch (i) {
-	        case fmtflag_alternate:
-		    ch = '#' ;
-		    break ;
-	        case fmtflag_zerofill:
-		    ch = '0' ;
-		    break ;
-	        case fmtflag_pluser:
-		    ch = '+' ;
-		    break ;
-	        case fmtflag_left:
-		    ch = '-' ;
-		    break ;
-	        case fmtflag_space:
-		    ch = ' ' ;
-		    break ;
-	        case fmtflag_thousands:
-		    ch = '\'' ;
-		    break ;
-	        } /* end switch */
-	        if (ch) {
-		    *fp++ = char(ch) ;
-	        }
-	    } /* end if (had flag) */
-	} /* end for */
-	fl = intconv(fp - fbuf) ;
+	if (flen > 0) {
+    	    fmtflag	ff(fg) ;
+	    rs = SR_OK ;
+	    for (int i = 0 ; i < fmtflag_overlast ; i += 1) {
+	        if (ff[i]) ylikely {
+	            int	ch = 0 ;
+	            switch (i) {
+	            case fmtflag_alternate:
+		        ch = '#' ;
+		        break ;
+	            case fmtflag_zerofill:
+		        ch = '0' ;
+		        break ;
+	            case fmtflag_pluser:
+		        ch = '+' ;
+		        break ;
+	            case fmtflag_left:
+		        ch = '-' ;
+		        break ;
+	            case fmtflag_space:
+		        ch = ' ' ;
+		        break ;
+	            case fmtflag_thousands:
+		        ch = '\'' ;
+		        break ;
+	            } /* end switch */
+	            if (ch) {
+		        *fp++ = char(ch) ;
+	            }
+	        } /* end if (had flag) */
+	    } /* end for */
+	    fl = intconv(fp - fbuf) ;
+	} /* end if (valid) */
 	return (rs >= 0) ? fl : rs ;
 } /* end subroutine (mkflags) */
 
 int mkfmt(char *fbuf,int flen,int fc,int fg,int w,int p,int sz) noex {
+    	cint		dlen = declen ;
     	int		rs ;
 	int		fl = 0 ; /* return-value */
 	char		*fp = fbuf ;
@@ -140,7 +144,7 @@ int mkfmt(char *fbuf,int flen,int fc,int fg,int w,int p,int sz) noex {
 	    fp += rs ;
 	    fl += rs ;
 	    {
-	        char	dbuf[dlen + 1] = {} ;
+	        char	dbuf[declen + 1] = {} ;
 	        cint	alen = (flen - 10) ;
 	        if ((rs >= 0) && (w >= 0)) {
 		    if ((rs = ctstr(dbuf,dlen,fp,(alen -fl),w)) >= 0) {
