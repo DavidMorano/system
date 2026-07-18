@@ -55,7 +55,6 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstdint>
 #include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<bitset>
@@ -286,8 +285,7 @@ int fsdirtree_open(fsdirtree *op,cchar *dname,int opts) noex {
 	    }
 	} /* end if (fsdirtree_ctor) */
 	return rs ;
-}
-/* end subroutine (fsdirtree_open) */
+} /* end subroutine (fsdirtree_open) */
 
 local int fsdirtree_opener(fsdirtree *op,cchar *dname) noex {
     	cint		maxpath = var.maxpathlen ;
@@ -327,8 +325,7 @@ local int fsdirtree_opener(fsdirtree *op,cchar *dname) noex {
             } /* end if (ok) */
         } /* end if (ok) */
 	return rs ;
-}
-/* end ubroutine (fsdirtree_opener) */
+} /* end ubroutine (fsdirtree_opener) */
 
 int fsdirtree_close(fsdirtree *op) noex {
 	int		rs ;
@@ -347,19 +344,19 @@ int fsdirtree_close(fsdirtree *op) noex {
                 rs1 = lm_free(op->bnbuf) ;
                 if (rs >= 0) rs = rs1 ;
                 op->bnbuf = nullptr ;
-            }
+            } /* end if (memory-release) */
             if (op->nbuf) ylikely {
                 rs1 = lm_free(op->nbuf) ;
                 if (rs >= 0) rs = rs1 ;
                 op->nbuf = nullptr ;
                 op->nlen = 0 ;
-            }
+            } /* end if (memory-release) */
             if (op->lbuf) ylikely {
                 rs1 = lm_free(op->lbuf) ;
                 if (rs >= 0) rs = rs1 ;
                 op->lbuf = nullptr ;
                 op->llen = 0 ;
-            }
+            } /* end if (memory-release) */
             if (op->dqp) ylikely {
                 rs1 = fifostr_finish(op->dqp) ;
                 if (rs >= 0) rs = rs1 ;
@@ -371,8 +368,7 @@ int fsdirtree_close(fsdirtree *op) noex {
             op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdirtree_close) */
+} /* end subroutine (fsdirtree_close) */
 
 namespace {
     struct reader {
@@ -396,8 +392,7 @@ int fsdirtree_read(fsdirtree *op,ustat *sbp,char *rbuf,int rlen) noex {
 	    rs = ro ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdirtree_read) */
+} /* end subroutine (fsdirtree_read) */
 
 reader::operator int () noex {
 	ustat		se ;
@@ -517,8 +512,7 @@ reader::operator int () noex {
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (reader::operator) */
+} /* end method (reader::operator) */
 
 int fsdirtree_prune(fsdirtree *op,cchar **prune) noex {
     	int		rs ;
@@ -526,8 +520,7 @@ int fsdirtree_prune(fsdirtree *op,cchar **prune) noex {
 	    op->prunearr = prune ;
 	}
 	return rs ;
-}
-/* end subroutine (fsdirtree_prune) */
+} /* end subroutine (fsdirtree_prune) */
 
 
 /* private subroutines */
@@ -597,8 +590,7 @@ local int fsdirtree_dirbegin(fsdirtree *op) noex {
 	    op->fl.dirids = true ;
 	}
 	return rs ;
-}
-/* end subroutine (fsdirtree_dirbegin) */
+} /* end subroutine (fsdirtree_dirbegin) */
 
 local int fsdirtree_dirend(fsdirtree *op) noex {
 	int		rs = SR_OK ;
@@ -628,8 +620,7 @@ local int fsdirtree_dirend(fsdirtree *op) noex {
 	    }
 	} /* end if (was activated) */
 	return rs ;
-}
-/* end subroutine (fsdirtree_dirend) */
+} /* end subroutine (fsdirtree_dirend) */
 
 local int fsdirtree_diradd(fsdirtree *op,dev_t dev,ino_t ino) noex {
 	hdb		*dbp = op->dip ;
@@ -653,8 +644,7 @@ local int fsdirtree_diradd(fsdirtree *op,dev_t dev,ino_t ino) noex {
 	    }
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (fsdirtree_diradd) */
+} /* end subroutine (fsdirtree_diradd) */
 
 local int fsdirtree_dirhave(fsdirtree *op,dev_t d,ui ino,dirid **rpp) noex {
 	hdb		*dbp = op->dip ;
@@ -670,8 +660,7 @@ local int fsdirtree_dirhave(fsdirtree *op,dev_t d,ui ino,dirid **rpp) noex {
 	    if (rpp) *rpp = (dirid *) val.buf ;
 	}
 	return rs ;
-}
-/* end subroutine (fsdirtree_dirhave) */
+} /* end subroutine (fsdirtree_dirhave) */
 
 local int dirid_start(dirid *dip,dev_t dev,ino_t ino) noex {
 	int		rs = SR_FAULT ;
@@ -681,8 +670,7 @@ local int dirid_start(dirid *dip,dev_t dev,ino_t ino) noex {
 	    dip->ino = ino ;
 	}
 	return rs ;
-}
-/* end subroutine (dirid_start) */
+} /* end subroutine (dirid_start) */
 
 local int dirid_finish(dirid *dip) noex {
 	int		rs = SR_FAULT ;
@@ -690,8 +678,7 @@ local int dirid_finish(dirid *dip) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (dirid_finish) */
+} /* end subroutine (dirid_finish) */
 
 int fsdirtree::open(cchar *dname,int fo) noex {
 	return fsdirtree_open(this,dname,fo) ;
@@ -730,8 +717,7 @@ vars::operator int () noex {
 	    maxlinklen = (rs * MAXLINKLEN_MULT) ;
 	}
     	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 local uint diridhash(cvoid *vp,int vl) noex {
 	uint		h = 0 ;
@@ -751,8 +737,7 @@ local uint diridhash(cvoid *vp,int vl) noex {
 	    }
 	}
 	return h ;
-}
-/* end subroutine (diridhash) */
+} /* end subroutine (diridhash) */
 
 local int diridcmp(dirid *e1p,dirid *e2p,int len) noex {
 	int64_t		d = int64_t(e1p->dev - e2p->dev) ;
@@ -769,7 +754,6 @@ local int diridcmp(dirid *e1p,dirid *e2p,int len) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (diridcmp) */
+} /* end subroutine (diridcmp) */
 
 
