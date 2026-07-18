@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 enum mons {
@@ -39,7 +39,6 @@ enum mons {
 	mon_dec,
 	mon_overlast
 } ; /* end enum (mons) */
-
 
 EXTERNC_begin
 
