@@ -38,7 +38,6 @@ module ;
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdint>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<cstring>		/* CSTD */
 #include	<cwchar>		/* CSTD */
@@ -122,8 +121,7 @@ int fmtsub_strw(fmtsub *op,cchar *sp,int sl) noex {
 	    rs = SR_OVERFLOW ;
 	}
 	return (rs >= 0) ? ml : rs ;
-}
-/* end subroutine (fmtsub_strw) */
+} /* end subroutine (fmtsub_strw) */
 
 int fmtsub_chr(fmtsub *op,int ch) noex {
 	int		rs = SR_OK ;
@@ -133,8 +131,7 @@ int fmtsub_chr(fmtsub *op,int ch) noex {
 	    rs = fmtsub_strw(op,buf,1) ;
 	}
 	return rs ;
-}
-/* end subroutine (fmtsub_chr) */
+} /* end subroutine (fmtsub_chr) */
  
 int fmtsub_blanks(fmtsub *op,int n) noex {
 	cint		nb = blankn ;
@@ -144,8 +141,7 @@ int fmtsub_blanks(fmtsub *op,int n) noex {
 	    rs = fmtsub_strw(op,blanka,m) ;
 	} /* end for */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (fmtsub_blanks) */
+} /* end subroutine (fmtsub_blanks) */
 
 int fmtsub_strclean(fmtsub *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -185,8 +181,7 @@ int fmtsub_strclean(fmtsub *op,cchar *sp,int sl) noex {
 	    umem.free(abuf) ;
 	} /* end if (memory-release) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (fmtsub_strclean) */
+} /* end subroutine (fmtsub_strclean) */
 
 int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	int		rs = SR_OK ;
@@ -290,7 +285,6 @@ int fmtsub_formstr(fmtsub *op,fmtspec *fsp,fmtstrdata *sdp) noex {
 	    umem.free(bp) ;
 	} /* end if (memory-release) */
 	return (rs >= 0) ? fcode : rs ;
-}
-/* end subroutine (fmtsub_formstr) */
+} /* end subroutine (fmtsub_formstr) */
 
 
