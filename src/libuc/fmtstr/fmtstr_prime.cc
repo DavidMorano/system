@@ -96,7 +96,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdint>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
 #include	<cstdio>		/* CSTD */
 #include	<new>			/* C++STD |nothrow(3c++)| */
@@ -151,7 +150,6 @@ int fmtstr(char *ubuf,int ulen,int fm,cchar *fmt,va_list ap) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (fmtstr) */
+} /* end subroutine (fmtstr) */
 
 
