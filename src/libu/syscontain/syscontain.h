@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
-/* Integer-Remaider */
+/* system containers */
 /* version %I% last-modified %G% */
 
 
@@ -20,11 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #endif /* CONTAIN_INCLUDE */
