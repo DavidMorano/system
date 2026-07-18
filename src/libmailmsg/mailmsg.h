@@ -20,15 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* |off_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
-#include	<strpack.h>
-#include	<mailbox.h>
+#include	<unistd.h>		/* POSIX® |off_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LINUC */
+#include	<strpack.h>		/* LINUC */
+#include	<mailbox.h>		/* LIBMAILSG */
 
 
 #define	MAILMSG		struct mailmsg_head
@@ -75,8 +72,7 @@ inline int mailmsg_magic(mailmsg *op,Args ... args) noex {
 	    rs = (op->magval == MAILMSG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsg_magic) */
+} /* end subroutine (mailmsg_magic) */
 
 #endif /* __cplusplus */
 
