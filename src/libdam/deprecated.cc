@@ -30,12 +30,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |system(3c)| + |abort(3c)| */
-#include	<cstdio>		/* |gets(3stdio)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |system(3c)| + |abort(3c)| */
+#include	<cstdio>		/* CSTD |gets(3stdio)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"deprecated.h"
 
@@ -66,13 +66,11 @@
 int system(cchar *) noex {
     abort() ;
     return 0 ;
-}
-/* end subroutine (system) */
+} /* end subroutine (system) */
 
 char *gets(char *) noex {
     abort() ;
     return 0 ;
-}
-/* end subroutine (gets) */
+} /* end subroutine (gets) */
 
 
