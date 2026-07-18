@@ -28,14 +28,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkpathx.h>
-#include	<ischarx.h>		/* |iseol(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cmbuf.h"
 
@@ -102,8 +102,7 @@ int cmbuf_start(CB *op,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cmbuf_start) */
+} /* end subroutine (cmbuf_start) */
 
 int cmbuf_finish(CB *op) noex {
     	int		rs ;
@@ -111,8 +110,7 @@ int cmbuf_finish(CB *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cmbuf_finish) */
+} /* end subroutine (cmbuf_finish) */
 
 int cmbuf_getspace(CB *op,CB_SP *bdrp) noex {
     	int		rs ;
@@ -127,8 +125,7 @@ int cmbuf_getspace(CB *op,CB_SP *bdrp) noex {
 	    len = bdrp->bl ;
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (cmbuf_space) */
+} /* end subroutine (cmbuf_space) */
 
 int cmbuf_added(CB *op,int len) noex {
     	int		rs ;
@@ -137,8 +134,7 @@ int cmbuf_added(CB *op,int len) noex {
 	    len = op->bl ;
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (cmbuf_added) */
+} /* end subroutine (cmbuf_added) */
 
 int cmbuf_getline(CB *op,int llen,cchar **lpp) noex {
     	int		rs ;
@@ -187,8 +183,7 @@ int cmbuf_getline(CB *op,int llen,cchar **lpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (cmbuf_getline) */
+} /* end subroutine (cmbuf_getline) */
 
 int cmbuf_getlastline(CB *op,cchar **lpp) noex {
 	int		rs ;
@@ -200,8 +195,7 @@ int cmbuf_getlastline(CB *op,cchar **lpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (cmbuf_getlastline) */
+} /* end subroutine (cmbuf_getlastline) */
 
 
 /* local subroutines */
