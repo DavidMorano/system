@@ -38,7 +38,6 @@ module ;
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdint>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<cwchar>		/* CSTD */
