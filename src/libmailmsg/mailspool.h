@@ -20,12 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<fcntl.h>		/* file types |mode_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<fcntl.h>		/* POSIX® file types |mode_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	MAILSPOOL	struct mailspool_head
@@ -37,7 +34,7 @@ struct mailspool_head {
 	int		mfd ;		/* mail-file descriptor */
 	int		f_created ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 typedef	MAILSPOOL	mailspool ;
 
