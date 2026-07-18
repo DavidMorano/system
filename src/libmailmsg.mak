@@ -236,11 +236,6 @@ hdrx.o:		hdrx.dir
 hdrx.dir:
 	makesubdir $@
 
-# RECIP
-recip.o:	recip.dir
-recip.dir:
-	makesubdir $@
-
 contypevals.o:		contypevals.cc contypevals.h		$(INCS)
 contentencodings.o:	contentencodings.cc contentencodings.h	$(INCS)
 
