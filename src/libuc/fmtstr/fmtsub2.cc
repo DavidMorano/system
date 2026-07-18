@@ -37,7 +37,6 @@ module ;
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdint>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -100,8 +99,7 @@ int fmtsub_start(fmtsub *op,char *ubuf,int ulen,int fm) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fmtsub_start) */
+} /* end subroutine (fmtsub_start) */
 
 int fmtsub_finish(fmtsub *op) noex {
 	int		rs = SR_FAULT ;
@@ -119,8 +117,7 @@ int fmtsub_finish(fmtsub *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (fmtsub_finish) */
+} /* end subroutine (fmtsub_finish) */
 
 int fmtsub_reserve(fmtsub *op,int n) noex {
 	int		rs = SR_OVERFLOW ;
@@ -132,8 +129,7 @@ int fmtsub_reserve(fmtsub *op,int n) noex {
 	    }
 	} /* end if (not overflow) */
 	return rs ;
-}
-/* end subroutine (fmtsub_reserve) */
+} /* end subroutine (fmtsub_reserve) */
 
 int fmtsub_audit(fmtsub *op) noex {
 	int		rs = SR_FAULT ;
@@ -141,7 +137,6 @@ int fmtsub_audit(fmtsub *op) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (fmtsub_audit) */
+} /* end subroutine (fmtsub_audit) */
 
 
