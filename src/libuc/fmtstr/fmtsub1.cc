@@ -38,14 +38,13 @@ module ;
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdint>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<cstring>		/* CSTD */
-#include	<clanguage.h>		/* LINU */
-#include	<usysbase.h>		/* LINU */
-#include	<usyscalls.h>		/* LINU */
-#include	<stdintx.h>		/* LINU */
-#include	<localmisc.h>		/* LINU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fmtsub.hh"
 
