@@ -46,23 +46,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<dlfcn.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
-#include	<mkpr.h>
-#include	<mkpathx.h>
-#include	<mkfnamesuf.h>
-#include	<sncpyx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC |getinetdomain(3uc)| */
+#include	<mkpr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkfnamesuf.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cpuspeed.h"
 
@@ -229,7 +229,7 @@ int loadmgr::defvals() noex {
 } /* end method (loadmgr::defvals) */
 
 int loadmgr::defpr(cc *pr) noex {
-    	int		rs ;
+    	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pr && pr[0]) {
 	    prn = pr ;
@@ -297,7 +297,7 @@ int loadmgr::modbegin(cc *name) noex {
 
 int loadmgr::modend() noex {
     	int		rs = SR_OK ;
-	if (dhp) {
+	if (dhp) ylikely {
 	    dlclose(dhp) ;
 	    dhp = nullptr ;
 	}
