@@ -29,22 +29,6 @@
 #ifndef	scharconv
 #define	scharconv		schar
 #endif
-#ifndef	sshortconv
-#define	sshortconv		sshort
-#endif
-#ifndef	sintconv
-#define	sintconv		sint
-#endif
-#ifndef	slongconv
-#define	slongconv		slong
-#endif
-#ifndef	slonglongconv
-#define	slonglongconv		slonglong
-#endif
-
-#ifndef	scharconv
-#define	scharconv		schar
-#endif
 #ifndef	shortconv
 #define	shortconv		short
 #endif
@@ -56,6 +40,22 @@
 #endif
 #ifndef	longlongconv
 #define	longlongconv		longlong
+#endif
+
+#ifndef	scharconv
+#define	scharconv		schar
+#endif
+#ifndef	sshortconv
+#define	sshortconv		sshort
+#endif
+#ifndef	sintconv
+#define	sintconv		sint
+#endif
+#ifndef	slongconv
+#define	slongconv		slong
+#endif
+#ifndef	slonglongconv
+#define	slonglongconv		slonglong
 #endif
 
 #ifndef	ucharconv
@@ -76,6 +76,10 @@
 
 #ifndef	floatconv
 #define	floatconv		float
+#endif
+
+#ifndef	doubleconv
+#define	doubleconv		double
 #endif
 
 
