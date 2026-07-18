@@ -38,14 +38,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<arpa/inet.h>		/* |ntohs(3inet)| */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<arpa/inet.h>		/* POSIX® |ntohs(3inet)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uinet.h"
 
@@ -84,8 +84,7 @@ bool isin4mapped(ushort *in6addr) noex {
 	    f = ((v == 0) || (v == 0xFFFF)) ;
 	}
 	return f ;
-}
-/* end subroutine (isin4mapped) */
+} /* end subroutine (isin4mapped) */
 
 bool isin6loopback(ushort *in6addr) noex {
 	bool		f = false ;
@@ -98,7 +97,6 @@ bool isin6loopback(ushort *in6addr) noex {
 	    f = (v == 0x0001) ;
 	}
 	return f ;
-}
-/* end subroutine (isin6loopback) */
+} /* end subroutine (isin6loopback) */
 
 
