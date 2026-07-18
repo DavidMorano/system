@@ -21,16 +21,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<fcntl.h>		/* |open(2)| definitions */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
-#include	<vecstr.h>
-#include	<dater.h>
-#include	<mailmsgfrom.h>
+#include	<fcntl.h>		/* POSIX® |open(2)| definitions */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
+#include	<mailmsgfrom.h>		/* LIBMAILMSG */
 
 
 /* object defines */
