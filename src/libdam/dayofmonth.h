@@ -61,9 +61,9 @@ struct dayofmonth : dayofmonth_head {
 	} ; /* end ctor */
 	dayofmonth(const dayofmonth &) = delete ;
 	dayofmonth &operator = (const dayofmonth &) = delete ;
-	int start(int) noex ;
-	int lookup(int,int,int) noex ;
-	int mkday(int,cchar *,int) noex ;
+	int start	(int) noex ;
+	int lookup	(int,int,int) noex ;
+	int mkday	(int,cchar *,int) noex ;
 	void dtor() noex ;
 	destruct dayofmonth() {
 	    if (magval) dtor() ;
