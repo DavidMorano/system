@@ -20,13 +20,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
-#define	CMBUF_MAGIC	31815926
 #define	CMBUF		struct cmbuf_head
 #define	CMBUF_SP	struct cmbuf_space
+#define	CMBUF_MAGIC	31815926
 
 
 struct cmbuf_space {
@@ -47,12 +47,12 @@ typedef	CMBUF_SP	cmbuf_sp ;
 
 EXTERNC_begin
 
-extern int cmbuf_start(cmbuf *,cchar *,int) noex ;
-extern int cmbuf_added(cmbuf *,int) noex ;
-extern int cmbuf_getspace(cmbuf *,cmbuf_sp *) noex ;
-extern int cmbuf_getline(cmbuf *,int,cchar **) noex ;
-extern int cmbuf_getlastline(cmbuf *,cchar **) noex ;
-extern int cmbuf_finish(cmbuf *) noex ;
+extern int cmbuf_start		(cmbuf *,cchar *,int) noex ;
+extern int cmbuf_added		(cmbuf *,int) noex ;
+extern int cmbuf_getspace	(cmbuf *,cmbuf_sp *) noex ;
+extern int cmbuf_getline	(cmbuf *,int,cchar **) noex ;
+extern int cmbuf_getlastline	(cmbuf *,cchar **) noex ;
+extern int cmbuf_finish		(cmbuf *) noex ;
 
 EXTERNC_end
 
