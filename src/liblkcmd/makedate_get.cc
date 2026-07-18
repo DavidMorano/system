@@ -37,15 +37,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>
-#include	<mkchar.h>
-#include	<char.h>		/* |CHAR_ISWHUTE(3cu)| */
-#include	<ischarx.h>		/* |isdigitlatin(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<char.h>		/* LIBUC |CHAR_ISWHUTE(3cu)| */
+#include	<ischarx.h>		/* LIBUC |isdigitlatin(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"makedate_get.h"
 
@@ -76,19 +76,18 @@
 /* exported subroutines */
 
 int makedate_get(cchar *md,cchar **rpp) noex {
-    	cnullptr	np{} ;
     	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (md) {
+	if (md) ylikely {
 	    rs = SR_NOTFOUND ;
-	    if (cchar *cp ; (cp = strchr(md,CH_RPAREN)) != np) {
+	    if (cchar *cp = strchr(md,CH_RPAREN) ; cp) ylikely {
 		rs = SR_OK ;
 	        if (rpp) {
 	            *rpp = nullptr ;
 	        }
 	        while (ISWHT(*cp)) {
 	            cp += 1 ;
-	        }
+	        } /* end while */
 		{
 	            cint ch = mkchar(*cp) ;
 	            if (! isdigitlatin(ch)) {
@@ -111,7 +110,6 @@ int makedate_get(cchar *md,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (makedate_get) */
+} /* end subroutine (makedate_get) */
 
 
