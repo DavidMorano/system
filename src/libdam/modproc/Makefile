@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += modproc.h
+INCS += modproc.hh
 
 MODS +=
 
@@ -149,14 +149,14 @@ objimpl.o:	$(OBJIMPL)
 
 
 # module primary
-modproc0.o:		modproc.ccm $(OBJPART)
+modproc0.o:		modproc.ccm $(OBJPART)			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implemetation
-modproc1.o:		modproc1.cc modproc.ccm
+modproc1.o:		modproc1.cc modproc0.o			$(INCS)
 	$(COMPILE.cc) $<
 
-modproc2.o:		modproc2.cc modproc.ccm
+modproc2.o:		modproc2.cc modproc0.o			$(INCS)
 	$(COMPILE.cc) $<
 
 strmgr.o:		strmgr.cc	strmgr.h
