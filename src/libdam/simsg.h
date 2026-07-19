@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 #define	SIMSG_SYSMISCGET	struct simsg_msggetsysmisc
@@ -36,7 +36,7 @@ enum simsgtypes {
 	simsgtype_sysmiscget,
 	simsgtype_sysmisc,
 	simsgtype_overlast
-} ;
+} ; /* end enum */
 
 /* response codes */
 enum simsgrcs {
@@ -44,13 +44,13 @@ enum simsgrcs {
 	simsgrc_invalid,
 	simsgrc_notavail,
 	simsgrc_overlast
-} ;
+} ; /* end enum */
 
 struct simsg_msggetsysmisc {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 struct simsg_msgsysmisc {
 	uint	msglen ;
@@ -64,7 +64,7 @@ struct simsg_msgsysmisc {
 	uint	nproc ;
 	uchar	msgtype ;		/* message type */
 	uchar	rc ;
-} ;
+} ; /* end struct */
 
 EXTERNC_begin
 
