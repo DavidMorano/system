@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += algorithms.h
 
-MODS += dfsa.ccm dfsb.ccm
+MODS += dfsa.o dfsb.o
 
 LIBS +=
 
