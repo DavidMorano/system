@@ -30,15 +30,15 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<vecitem.h>
-#include	<ema.h>
-#include	<sfx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecitem.h>		/* LIBUC */
+#include	<ema.h>			/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ng.h"
 
@@ -71,17 +71,16 @@ import libutil ;			/* |lenstr(3u)| */
 
 int ng_start(NG *ngp) noex {
 	int		rs = SR_FAULT ;
-	if (ngp) {
+	if (ngp) ylikely {
 	    rs = vecitem_start(ngp,10,0) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ng_start) */
+} /* end subroutine (ng_start) */
 
 int ng_finish(NG *ngp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (ngp) {
+	if (ngp) ylikely {
 	    void *vp{} ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; vecitem_get(ngp,i,&vp) >= 0 ; i += 1) {
@@ -92,13 +91,13 @@ int ng_finish(NG *ngp) noex {
 	                rs1 = lm_free(vp) ;
 		        if (rs >= 0) rs = rs1 ;
 		        ep->name = nullptr ;
-	            }
+	            } /* end if (memory-release) */
 	            if (ep->dir) {
 			vp = voidp(ep->dir) ;
 	                rs1 = lm_free(vp) ;
 		        if (rs >= 0) rs = rs1 ;
 		        ep->dir = nullptr ;
-	            }
+	            } /* end if (memory-release) */
 	        }
 	    } /* end for */
 	    {
@@ -107,14 +106,13 @@ int ng_finish(NG *ngp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mg_finish) */
+} /* end subroutine (mg_finish) */
 
 int ng_search(NG *ngp,cchar *name,ng_ent **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ; /* return-value */
 	if (rpp) *rpp = nullptr ;
-	if (ngp) {
+	if (ngp) ylikely {
 	    void *vp{} ;
 	    rs = SR_OK ;
 	    for (i = 0 ; (rs = vecitem_get(ngp,i,&vp)) >= 0 ; i += 1) {
@@ -128,13 +126,12 @@ int ng_search(NG *ngp,cchar *name,ng_ent **rpp) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (ng_search) */
+} /* end subroutine (ng_search) */
 
 int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname) noex {
 	int		rs = SR_FAULT ;
-	if (ngp && ngbuf) {
-	    if (cchar *cp ; (rs = lm_strw(ngbuf,nglen,&cp)) >= 0) {
+	if (ngp && ngbuf) ylikely {
+	    if (cchar *cp ; (rs = lm_strw(ngbuf,nglen,&cp)) >= 0) ylikely {
 	        ng_ent	ne{} ;
 	        ne.dir = nullptr ;
 	        ne.len = rs ;
@@ -147,7 +144,7 @@ int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname) noex {
 	        if (rs >= 0) {
 		    cint	nsz = szof(ng_ent) ;
 	            rs = vecitem_add(ngp,&ne,nsz) ;
-	        }
+	        } /* end if (ok) */
 	        if (rs < 0) {
 		    if (ne.dir != nullptr) {
 			void *vp = voidp(ne.dir) ;
@@ -161,13 +158,12 @@ int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname) noex {
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ng_add) */
+} /* end subroutine (ng_add) */
 
 int ng_copy(NG *ngp1,NG *ngp2) noex {
 	int		rs = SR_FAULT ;
 	int		count = 0 ;
-	if (ngp1 && ngp2) {
+	if (ngp1 && ngp2) ylikely {
 	    void	*vp{} ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; vecitem_get(ngp2,i,&vp) >= 0 ; i += 1) {
@@ -180,33 +176,30 @@ int ng_copy(NG *ngp1,NG *ngp2) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? count : rs ;
-}
-/* end subroutine (ng_copy) */
+} /* end subroutine (ng_copy) */
 
 int ng_count(NG *ngp) noex {
     	int		rs = SR_FAULT ;
-	if (ngp) {
+	if (ngp) ylikely {
 	    rs = vecitem_count(ngp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ng_count) */
+} /* end subroutine (ng_count) */
 
 int ng_get(NG *ngp,int i,ng_ent **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (ngp) {
+	if (ngp) ylikely {
 	    rs = vecitem_get(ngp,i,rpp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ng_get) */
+} /* end subroutine (ng_get) */
 
 /* extract newsgroup names from the "newsgroups" header string */
 int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		n = 0 ; /* return-value */
-	if (ngp && sp) {
+	if (ngp && sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (ema aid ; (rs = ema_start(&aid)) >= 0) {
 	        if ((rs = ema_parse(&aid,sp,sl)) > 0) {
@@ -238,16 +231,14 @@ int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 	    } /* end if (ema) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (ng_addparse) */
+} /* end subroutine (ng_addparse) */
 
 int ng_parse(NG *ngp,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (ngp) {
+	if (ngp) ylikely {
 	    rs = ng_addparse(ngp,sp,sl) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ng_parse) */
+} /* end subroutine (ng_parse) */
 
 
