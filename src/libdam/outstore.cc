@@ -86,17 +86,17 @@ using libuc::mem ;			/* variable */
 int outstore_start(outstore *op) noex {
     	OUTSTORE	*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = memclear(hop) ;
 	    op->fl.open = true ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (outstore_start) */
 
 int outstore_finish(outstore *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->dbuf) {
 	        op->dbuf[0] = '\0' ; /* cute safety trick */
@@ -113,7 +113,7 @@ int outstore_finish(outstore *op) noex {
 
 int outstore_get(outstore *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->len ;
 	    if (rpp) {
 	        *rpp = (op->dbuf) ? op->dbuf : op->sbuf ;
@@ -124,7 +124,7 @@ int outstore_get(outstore *op,cchar **rpp) noex {
 
 int outstore_clear(outstore *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->len = 0 ;
 	} /* end if (non-null) */
@@ -133,7 +133,7 @@ int outstore_clear(outstore *op) noex {
 
 int outstore_strw(outstore *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    cint	slen = OUTSTORE_SLEN ;
 	    int		rlen ;
 	    if (sl < 0) sl = lenstr(sp) ;
@@ -203,7 +203,7 @@ outstore::operator int () noex {
 
 outstore_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case outstoremem_start:
 	        rs = outstore_start(op) ;
