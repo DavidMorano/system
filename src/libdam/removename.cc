@@ -122,6 +122,8 @@ extern "C" {
 
 /* exported variables */
 
+constexpr removenameoms		removenamem ;
+
 
 /* exported subroutines */
 
@@ -129,12 +131,12 @@ int removename(cchar *name,int rno,randomvar *rvp,int bcount) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
-		if (ustat sb ; (rs = u_lstat(name,&sb)) >= 0) {
+	    if (name[0]) ylikely {
+		if (ustat sb ; (rs = u_lstat(name,&sb)) >= 0) ylikely {
 		    remover	ro(name,rvp,bcount) ;
-		    if ((rs = ro.start(rno)) >= 0) {
+		    if ((rs = ro.start(rno)) >= 0) ylikely {
 			{
 			    rs = ro.decider(&sb) ;
 			    c = rs ;
@@ -146,8 +148,7 @@ int removename(cchar *name,int rno,randomvar *rvp,int bcount) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutinte (removename) */
+} /* end subroutinte (removename) */
 
 
 /* local subroutines */
@@ -163,28 +164,26 @@ int remover::start(int rno) noex {
 	    }
 	} /* end if (we need our own random variable) */
 	return rs ;
-}
-/* end method (remover::start) */
+} /* end method (remover::start) */
 
 int remover::finish() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-	if (fl.randomvar && rvp) {
+	if (fl.randomvar && rvp) ylikely {
 	    rs1 = x.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	    rvp = nullptr ;
 	    fl.randomvar = false ;
-	}
+	} /* end if (non-null) */
 	return (rs >= 0) ? crem : rs ;
-}
-/* end method (remover::finish) */
+} /* end method (remover::finish) */
 
 int remover::decider(ustat *sbp) noex {
     	cint		vn = 10 ;
 	cint		vo = 0 ;
     	int		rs ;
 	int		rs1 ;
-	if ((rs = dirs.start(vn,0,vo)) >= 0) {
+	if ((rs = dirs.start(vn,0,vo)) >= 0) ylikely {
 	    wdt_f	wuf = remover_co ;
 	    int		wopts = 0 ;
 	    wopts |= ((fl.follow) ? WDT_MFOLLOW : 0) ;
@@ -212,13 +211,12 @@ int remover::decider(ustat *sbp) noex {
 	    /* remove the directories */
 	    if (rs >= 0) {
 	        rs = rmdirs() ;
-	    }
+	    } /* end if (ok) */
 	    rs1 = dirs.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecpstr) */
 	return (rs >= 0) ? crem : rs ;
-}
-/* end subroutine (remover::decider) */
+} /* end subroutine (remover::decider) */
 
 int remover::removelink(cchar *n,ustat *) noex {
     	int		rs = SR_OK ;
@@ -253,8 +251,7 @@ int remover::removeit(cchar *n,ustat *sbp) noex {
 	    } /* end if */
 	} /* end if */
 	return rs ;
-}
-/* end method (remover::removeit) */
+} /* end method (remover::removeit) */
 
 int remover::rmdirs() noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -281,13 +278,11 @@ int remover::rmdirs() noex {
 	    } /* end if */
 	} /* end if (vecpstr_count) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end method (remover::rmdirs) */
+} /* end method (remover::rmdirs) */
 
 local int remover_co(cchar *name,ustat *sbp,void *vop) noex {
     	remover		*op = (remover *) vop ;
 	return op->removeit(name,sbp) ;
-}
-/* end subroutine (remover_co) */
+} /* end subroutine (remover_co) */
 
 
