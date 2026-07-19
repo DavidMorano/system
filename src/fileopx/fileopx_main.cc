@@ -47,7 +47,6 @@
 #include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<uclibmem.h>
-#include	<getourenv.h>
 #include	<estrings.h>
 #include	<sighand.h>
 #include	<sigblocker.h>
@@ -68,7 +67,7 @@
 #include	<cfdec.h>
 #include	<field.h>
 #include	<nulstr.h>
-#include	<vstrcmpx.h>
+#include	<vstrcmp.h>
 #include	<strwcmp.h>
 #include	<nleadstr.h>
 #include	<matxstr.h>
@@ -76,6 +75,7 @@
 #include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"proginfo.h"
@@ -114,10 +114,6 @@ import libutil ;			/* |lenstr(3u)| + |memclear(3u)| */
 
 /* local typedefs */
 
-extern "C" {
-    typedef int (*qsort_f)(cvoid **,cvoid **) noex ;
-}
-
 
 /* external subroutines */
 
@@ -125,15 +121,6 @@ extern "C" int	mkpathuser(char *,cchar *,cchar *,int) noex ;
 
 extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) noex ;
 extern "C" int	proginfo_setpiv(PI *,cchar *,const pivars *) noex ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern "C" int	debugopen(cchar *) noex ;
-extern "C" int	debugprintf(cchar *,...) noex ;
-extern "C" int	debugprinthexblock(cchar *,int,cvoid *,int) noex ;
-extern "C" int	debugclose() noex ;
-extern "C" int	strlinelen(cchar *,int,int) noex ;
-extern "C" int	nprintf(cchar *,cchar *,...) noex ;
-#endif
 
 
 /* external variables */
@@ -350,13 +337,13 @@ enum progmodes {
 } ; /* end enum (progmodes) */
 
 constexpr cpcchar	prognames[] = {
-	"filesize",
-	"filefind",
-	"filelinker",
-	"filesyncer",
-	"filerm",
-	"filelines",
-	nullptr
+	[progmode_filesize]	= "filesize",
+	[progmode_filefind]	= "filefind",
+	[progmode_filelinker]	= "filelinker",
+	[progmode_filesyncer]	= "filesyncer",
+	[progmode_filerm]	= "filerm",
+	[progmode_filelines]	= "filelines",
+	[progmode_overlast]	= nullptr
 } ; /* end array (prognames) */
 
 enum argopts {
@@ -575,10 +562,10 @@ enum sufs {
 } ; /* end enum (sufs) */
 
 constexpr cpcchar	sufs[] = {
-	PO_SUFREQ,
-	PO_SUFACC,
-	PO_SUFREJ,
-	nullptr
+	[suf_req]	= PO_SUFREQ,
+	[suf_acc]	= PO_SUFACC,
+	[suf_rej]	= PO_SUFREJ,
+	[suf_overlast]	= nullptr
 } ; /* end array (sufs) */
 
 constexpr int		rsnostat[] = {
@@ -697,17 +684,18 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* process program arguments */
 
-	if (rs >= 0) rs = bits_start(&pargs,1) ;
-	if (rs < 0) goto badpargs ;
-
-	rs = keyopt_start(&akopts) ;
-	pip->open.akopts = (rs >= 0) ;
-
+	{
+	    if (rs >= 0) rs = bits_start(&pargs,1) ;
+	    if (rs < 0) goto badpargs ;
+	}
+	{
+	    rs = keyopt_start(&akopts) ;
+	    pip->open.akopts = (rs >= 0) ;
+	}
 	if (rs >= 0) {
 	    rs = paramopt_start(&pip->aparams) ;
 	    pip->open.aparams = (rs >= 0) ;
 	}
-
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
@@ -1979,16 +1967,14 @@ local int loadfnos(PI *pip) noex {
 /* end if (loadfnos) */
 
 local int procopts(PI *pip,keyopt *kop) noex {
-	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
-
 	if ((cp = getenv(VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
-
 	if (rs >= 0) {
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -2769,7 +2755,7 @@ local int procdir(PI *pip,cchar *np,ustat *sbp) noex {
 }
 /* end subroutine (procdir) */
 
-local int procdirs(PI *pip,cchar *sp,int nl,ustat *sbp) noex {
+local int procdirs(PI *pip,cchar *namp,int naml,ustat *sbp) noex {
 	bfile		*efp = (bfile *) pip->efp ;
 	cint		sz = (nl + 1 + MAXPATHLEN + 1) ;
 	int		rs ;
@@ -2781,25 +2767,25 @@ local int procdirs(PI *pip,cchar *sp,int nl,ustat *sbp) noex {
 	    debugprintf("main/procdirs: ent\n") ;
 #endif
 	if ((rs = lm_mall(sz,&p)) >= 0) {
-	    ustat	fsb ;
 	    int		opts = 0 ;
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 	    char	*fname = p ;
 	    char	*bp ;
 
-	    bp = strwcpy(fname,sp,nl) ;
+	    bp = strwcpy(fname,namp,naml) ;
 	    *bp++ = '/' ;
 
 	    if (pip->fl.follow) {
-	        opts |= FSDIRTREE_MFOLLOW ;
-	        opts |= FSDIRTREE_MUNIQDIR ;
+	        fdo |= fsdirtreem.follow ;
+	        fdo |= fsdirtreem.uniqdir ;
 	    }
 	    if (pip->fl.f_uniq) {
-	        opts |= FSDIRTREE_MUNIQDIR ;
+	        fdo |= fsdirtreem.uniqdir ;
 	    }
 
-	    if (fsdirtree d ; (rs = fsdirtree_open(&d,sp,opts)) >= 0) {
+	    ustat	fsb ;
+	    if (fsdirtree d ; (rs = fsdirtree_open(&d,namp,fdo)) >= 0) {
 	        cint	mpl = MAXPATHLEN ;
 	        if (pip->fl.prune) {
 	            rs = fsdirtree_prune(&d,pip->prune) ;
@@ -2861,7 +2847,7 @@ local int procdirs(PI *pip,cchar *sp,int nl,ustat *sbp) noex {
 /* end subroutine (procdirs) */
 
 local int procother(PI *pip,cchar *name,ustat *sbp) noex {
-	FILEINFO	ck, *ckp = &ck ;
+	FILEINFO	ck{}, *ckp = &ck ;
 #if	CF_FOLLOWFILES
 	ustat		ssb ;
 #endif
@@ -2873,8 +2859,6 @@ local int procother(PI *pip,cchar *name,ustat *sbp) noex {
 	int		f_islink = false ;
 	int		f_suf ;
 	cchar		*bnp ;
-
-	memclear(ckp,szof(FILEINFO)) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
@@ -4682,9 +4666,9 @@ local int procsyncer(PI *pip,cchar *name,ustat *sbp) noex {
 #endif
 
 	if ((! S_ISDIR(sbp->st_mode)) && (sbp->st_nlink > 1)) {
-	    dev_t	dev = sbp->st_dev ;
-	    ino_t	ino = sbp->st_ino ;
-	    mode_t	m = sbp->st_mode ;
+	    const dev_t		dev = sbp->st_dev ;
+	    const ino_t		ino = sbp->st_ino ;
+	    const mode_t	m = sbp->st_mode ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
@@ -5204,9 +5188,8 @@ local int procsyncer_lnk(PI *pip,cchar *name,ustat *sbp) noex {
 	    cchar	*dnp ;
 	    if ((dnl = sfdirname(dstfname,-1,&dnp)) > 0) {
 	        if ((rs = mkpath1w(tmpfname,dnp,dnl)) >= 0) {
-	            ustat	sb ;
 	            int		f = false ;
-	            if ((rs = u_lstat(tmpfname,&sb)) >= 0) {
+	            if (ustat sb ; (rs = u_lstat(tmpfname,&sb)) >= 0) {
 	                if (S_ISLNK(sb.st_mode)) {
 	                    if ((rs = u_stat(tmpfname,&sb)) >= 0) {
 	                        f = (! S_ISDIR(sb.st_mode)) ;
@@ -5533,27 +5516,10 @@ local int fileidcmp(FILEID *e1p,FILEID *e2p,int len) noex {
 }
 /* end subroutine (fileidcmp) */
 
-local int vcmprstr(cchar **e1pp,cchar **e2pp) noex {
-	int		rc = 0 ;
-	if (*e1pp || *e2pp) {
-	    if (*e1pp) {
-	        if (*e2pp) {
-	            rc = (- strcmp(*e1pp,*e2pp)) ;
-	        } else {
-	            rc = -1 ;
-		}
-	    } else  {
-	        rc = 1 ;
-	    }
-	}
-	return rc ;
-}
-/* end subroutine (vcmprstr) */
-
 local book isNotStat(int rs) noex {
 	return isOneOf(rsnostat,rs) ;
 }
-/* end subroutine (vcmprstr) */
+/* end subroutine (isNotStat) */
 
 
 #if	CF_DEBUG
