@@ -82,11 +82,11 @@ int chownsame(cchar *dname,cchar *ref) noex {
 	cint		cmd = _PC_CHOWN_RESTRICTED ;
 	int		rs = SR_FAULT ;
 	int		f = false ; /* return-value */
-	if (dname && ref) {
+	if (dname && ref) ylikely {
 	    rs = SR_INVALID ;
-	    if (dname[0] && ref[0]) {
-	        if ((rs = uc_pathconf(dname,cmd,np)) == 0) {
-	            if (ustat sb ; (rs = uc_stat(ref,&sb)) >= 0) {
+	    if (dname[0] && ref[0]) ylikely {
+	        if ((rs = uc_pathconf(dname,cmd,np)) == 0) ylikely {
+	            if (ustat sb ; (rs = uc_stat(ref,&sb)) >= 0) ylikely {
 	                f = true ;
 	                rs = uc_chown(dname,sb.st_uid,sb.st_gid) ;
 	            } /* end if (uc_stat) */
