@@ -14,18 +14,16 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
-#include	<ids.h>
-#include	<logfile.h>
-
-#include	<proglog.hh>
-#include	<progmsgid.hh>
-#include	<proguserlist.hh>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
 
 
-#define	PROGINFO_FL	struct proginfo_flags
+#define	PI		proginfo
+#define	PI_FL		proginfo_fl
+#define	PI_VALS		proginfo_vals
 
 
 enum proginfomems {
@@ -35,7 +33,7 @@ enum proginfomems {
 
 struct proginfo ;
 
-struct proginfo_flags {
+struct proginfo_fl {
 	uint		progdash:1 ;	/* leading dash on program-name */
 	uint		akopts:1 ;
 	uint		aparams:1 ;
@@ -70,7 +68,7 @@ struct proginfo_flags {
 	uint		intdis:1 ;
 	uint		reuseaddr:1 ;
 	uint		to:1 ;
-} ; /* end struct (proginfo_flags) */
+} ; /* end struct (proginfo_fl) */
 
 struct proginfo_hwser {
 	proginfo	*op = nullptr ;
@@ -97,6 +95,7 @@ struct proginfo_vals {
 	cchar		*execname ;	/* execution filename */
 	cchar		*progname ;	/* program name */
 	cchar		*progdname ;	/* dirname of arg[0] */
+	cchar		*progename ;	/* execution file-name */
 	cchar		*searchname ;
 	cchar		*pr ;		/* program root */
 	cchar		*rootname ;	/* distribution name */
@@ -129,12 +128,15 @@ struct proginfo_vals {
 	cchar		*groupname ;
 	cchar		*hostname ;
 	cchar		*tmpdname ;
+	cchar		*random ;	/* SHELL */
+	cchar		*seconds ;	/* SHELL */
 	cchar		*newsdname ;
 	cchar		*hfname ;
 	cchar		*cfname ;
 	cchar		*lfname ;
 	cchar		*pidfname ;
-	cchar		*zname ;
+	cchar		*zname ;	/* time-zone abbreviation */
+	cchar		*pwd ;		/* present-wirkubg-directory */
 	void		*efp ;
 	void		*buffer ;	/* general buffer */
 	void		*contextp ;	/* SHELL context */
@@ -171,29 +173,27 @@ struct proginfo : proginfo_vals {
 	proginfo_co	ncpu ;
 	proginfo_co	finish ;
 	proginfo_co	rootdname ;
-	proginfo_co	progename ;
-	proginfo_co	nodename ;
 	vecstr		*sdp ;		/* store-data-pointer */
 	ids		*idp ;
 	logfile		*lhp ;
 	mainv		argv ;
 	mainv		envv ;
-	PROGINFO_FL	have{} ;
-	PROGINFO_FL	pf{} ;
-	PROGINFO_FL	changed{} ;
-	PROGINFO_FL	open{} ;
+	ulong		randvar ;
 	TIMEB		now ;
 	time_t		daytime ;
 	pid_t		pid ;
 	uid_t		uid, euid ;
 	gid_t		gid, egid ;
+	PI_FL		pfhave{} ;
+	PI_FL		pf{} ;
+	PI_FL		pfchanged{} ;
+	PI_FL		pfopen{} ;
 	int		argc ;
-	proginfo() noex ;
 	void args(int ac,mainv av,mainv ev) noex ;
 	int start(mainv,mainv,cchar *) noex ;
 	int setprogroot(cchar *,int) noex ;
 	int rootexecname(cchar *) noex ;
-	int setentry(cchar **,cchar *,int) noex ;
+	int setent(cchar **,cchar *,int) noex ;
 	int setversion(cchar *) noex ;
 	int setbanner(cchar *) noex ;
 	int setsearchname(cchar *,cchar *) noex ;
@@ -201,23 +201,14 @@ struct proginfo : proginfo_vals {
 	int setexecname(cchar *) noex ;
 	int getpwd(char *,int) noex ;
 	int getename(char *,int) noex ;
-	int finish() noex ;
 	int expand(char *,int,cchar *,int) noex ;
    private:
-	int incpu() noex ;
-	int irootdname() noex ;
-	int iprogename() noex ;
-	int inodename() noex ;
-} /* end struct (proginfo) */
+	int incpu	() noex ;
+	int irootdname	() noex ;
+} ; /* end struct (proginfo) */
 
-typedef	PROGINFO_FL	proginfo_fl ;
-
-EXTERNC_begin
-
-extern int	proginfo_realbegin(proginfo *) noex ;
-extern int	proginfo_realend(proginfo *) noex ;
-
-EXTERNC_end
+extern int	proginfo_realbegin	(proginfo *) noex ;
+extern int	proginfo_realend	(proginfo *) noex ;
 
 
 #endif /* __cplusplus */
