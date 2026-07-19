@@ -30,7 +30,7 @@
 #include	<sys/socket.h>		/* POSIX */
 #include	<netinet/in.h>		/* POSIX */
 #include	<arpa/inet.h>		/* POSIX */
-#include	<netdb.h>
+#include	<netdb.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
