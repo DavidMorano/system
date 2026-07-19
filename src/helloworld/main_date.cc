@@ -1,5 +1,5 @@
 /* main (date) */
-/* lang=C20 */
+/* lang=C++20 */
 
 
 /* revision history:
@@ -11,9 +11,9 @@
 
 /* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdio>
 #include	<utypedefs.h>
 #include	<clanguage.h>
