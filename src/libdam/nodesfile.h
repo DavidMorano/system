@@ -30,11 +30,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<hdb.h>
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
 
 
 #define	NODESFILE		struct nodesfile_head
