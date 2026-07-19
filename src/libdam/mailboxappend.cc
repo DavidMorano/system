@@ -41,17 +41,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<sigblocker.h>
-#include	<lockfile.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sigblocker.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucsafesleep.h>		/* LIBUC */
+#include	<lockfile.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailboxappend.h"
 
@@ -74,8 +78,8 @@
 
 /* forward references */
 
-static int	mailboxappender(cchar *,int,int,int) noex ;
-static int	mblock(int,int,int) noex ;
+local int	mailboxappender(cchar *,int,int,int) noex ;
+local int	mblock(int,int,int) noex ;
 
 
 /* local variables */
@@ -91,11 +95,11 @@ int mailboxappend(cchar *mbfname,int sfd,int slen,int to) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (mbfname) {
+	if (mbfname) ylikely {
 	    rs = SR_INVALID ;
-	    if (mbfname[0]) {
+	    if (mbfname[0]) ylikely {
 	    	rs = SR_BADF ;
-		if (sfd >= 0) {
+		if (sfd >= 0) ylikely {
 	            if ((rs = mailboxappender(mbfname,sfd,slen,to)) == nrs) {
 	                if ((rs = u_access(mbfname,W_OK)) >= 0) {
 	                    const uid_t	uid = getuid() ;
@@ -118,32 +122,31 @@ int mailboxappend(cchar *mbfname,int sfd,int slen,int to) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mailboxappend) */
+} /* end subroutine (mailboxappend) */
 
 
 /* local subroutines */
 
-static int mailboxappender(cchar *mbfname,int sfd,int slen,int to) noex {
+local int mailboxappender(cchar *mbfname,int sfd,int slen,int to) noex {
 	cmode		om = 0666 ;
 	cint		of = (O_CREAT|O_WRONLY|O_APPEND) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = uc_open(mbfname,of,om)) >= 0) {
+	if ((rs = uc_open(mbfname,of,om)) >= 0) ylikely {
 	    cint	tfd = rs ;
-	    if ((rs = mblock(tfd,true,to)) >= 0) {
+	    if ((rs = mblock(tfd,true,to)) >= 0) ylikely {
 		cint	w = SEEK_END ;
 		if (off_t offend ; (rs = uc_seeko(tfd,0L,w,&offend)) >= 0) {
 		    int	cmd ;
-		    if (sigblocker sb ; (rs = sb.start) >= 0) {
+		    if (sigblocker sb ; (rs = sb.start) >= 0) ylikely {
 		        {
 	                    rs = uc_writedesc(tfd,sfd,slen) ;
 	                    wlen = rs ;
 		        }
 	                if (rs < 0) {
 	                    uc_ftruncate(tfd,offend) ;
-		        }
+		        } /* end if (error) */
 	                rs1 = sb.finish ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end block (sigblock) */
@@ -152,14 +155,13 @@ static int mailboxappender(cchar *mbfname,int sfd,int slen,int to) noex {
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (uc_seeko) */
 	    } /* end if (lock) */
-	    rs1 = u_close(tfd) ;
+	    rs1 = uc_close(tfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (open) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mailboxappender) */
+} /* end subroutine (mailboxappender) */
 
-static int mblock(int fd,int f_lock,int to) noex {
+local int mblock(int fd,int f_lock,int to) noex {
 	FLOCK		fl{} ;
 	int		rs = SR_OK ;
 	fl.l_type = (f_lock) ? F_WRLCK : F_UNLCK ;
@@ -168,7 +170,7 @@ static int mblock(int fd,int f_lock,int to) noex {
 	fl.l_len = 0 ;
 	if (to < 0) to = TO_LOCK ;
 	for (int i = 0 ; i < (to + 1) ; i += 1) {
-	    rs = u_fcntl(fd,F_SETLK,&fl) ;
+	    rs = uc_fcntl(fd,F_SETLK,&fl) ;
 	    if ((rs != SR_AGAIN) && (rs != SR_ACCES))
 	        break ;
 	    if (i < to) {
@@ -176,7 +178,6 @@ static int mblock(int fd,int f_lock,int to) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (mblock) */
+} /* end subroutine (mblock) */
 
 
