@@ -108,7 +108,7 @@ int ba_finish(ba *op) noex {
 	        rs1 = libmem.free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->nbits = 0 ;
 	    op->nwords = 0 ;
 	} /* end if (non-null) */
@@ -160,7 +160,7 @@ int ba_and(ba *op1,ba *op2) noex {
 	    rs = SR_OK ;
 	    for (int i = 0 ; i < nw ; i += 1) {
 	        op1->a[i] = op1->a[i] & op2->a[i] ;
-	    }
+	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ba_and) */
