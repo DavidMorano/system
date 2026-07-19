@@ -56,9 +56,9 @@
 
 	+ lm_mall(3uc)
 	+ lm_free(3uc)
-	+ libmalloc{xx}
+	+ libmem{xx}
 
-	These subroutines are need when we deal with data that is
+	These subroutines are needed when we deal with data that is
 	persistent across full instances of command executions.
 	That is: these subroutine are need when our data stays valid
 	throughout the start and complete exit of a command program.
@@ -138,21 +138,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<utmpacc.h>
-#include	<getxname.h>		/* |getnodename(3uc)| */
-#include	<getx.h>		/* |getnodedomain(3uc)| */
-#include	<libmallocxx.h>
-#include	<localget.h>
-#include	<strwcpy.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucproc.h>		/* LIBUC */
+#include	<ucnprocs.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC */
+#include	<utmpacc.h>		/* LIBUC */
+#include	<getxname.h>		/* LIBUC |getnodename(3uc)| */
+#include	<getx.h>		/* LIBUC |getnodedomain(3uc)| */
+#include	<localget.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"percache.h"
 
@@ -161,6 +166,8 @@
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -185,19 +192,19 @@ namespace {
 	    dt = t ;
 	    pr = p ;
 	    rpp = r ;
-	} ;
+	} ; /* end if (ctor) */
 	int operator () (int) noex ;
-	int getval(int) noex ;
-	int getstr(int) noex ;
-	int getx(int,char *,int) noex ;
-	int getv(int) noex ;
+	int getval	(int) noex ;
+	int getstr	(int) noex ;
+	int getx	(int,char *,int) noex ;
+	int getv	(int) noex ;
     } ; /* end struct (geter) */
 } /* end namespace */
 
 
 /* forward references */
 
-static bool	isNoProcs(int) noex ;
+local bool	isNoProcs(int) noex ;
 
 
 /* local variables */
@@ -224,7 +231,7 @@ constexpr cint	timeouts[] = {
 
 int percache_init(percache *pcp) noex {
 	int		rs = SR_FAULT ;
-	if (pcp) {
+	if (pcp) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (! pcp->f_void) {
 		rs = SR_OK ;
@@ -235,13 +242,12 @@ int percache_init(percache *pcp) noex {
 	    } /* end if (not voided) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (percache_init) */
+} /* end subroutine (percache_init) */
 
 int percache_fini(percache *pcp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (pcp) {
+	if (pcp) ylikely {
 	    rs = SR_NXIO ;
 	    if (! pcp->f_void) {
 		pcp->f_void = true ;
@@ -250,7 +256,7 @@ int percache_fini(percache *pcp) noex {
 		    for (int i = 0 ; i < pertype_overlast ; i += 1) {
 		        char	*dp = pcp->items[i].data ;
 	                if (dp) {
-		            rs1 = lm_free(dp) ;
+		            rs1 = libmem.free(dp) ;
 		            if (rs >= 0) rs = rs1 ;
 		            pcp->items[i].data = nullptr ;
 	                }
@@ -263,14 +269,13 @@ int percache_fini(percache *pcp) noex {
 	    } /* end if (not-voided) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (percache_fini) */
+} /* end subroutine (percache_fini) */
 
 /* is a "fini" registration required? false=no, true=yes */
 int percache_finireg(percache *pcp) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (pcp) {
+	if (pcp) ylikely {
 	    rs = SR_OK ;
 	    if (pcp->f_init) {
 		if ((f = (! pcp->f_finireg)) > 0) {
@@ -279,19 +284,18 @@ int percache_finireg(percache *pcp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (percache_finireg) */
+} /* end subroutine (percache_finireg) */
 
 int percache_invalidate(percache *pcp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (pcp) {
+	if (pcp) ylikely {
 	    rs = SR_OK ;
 	    if (pcp->f_init) {
 		for (int i = 0 ; i < pertype_overlast ; i += 1) {
 		    char	*dp = pcp->items[i].data ;
 	            if (dp) {
-		        rs1 = lm_free(dp) ;
+		        rs1 = libmem.free(dp) ;
 		        if (rs >= 0) rs = rs1 ;
 		        pcp->items[i].data = nullptr ;
 	            }
@@ -301,14 +305,13 @@ int percache_invalidate(percache *pcp) noex {
 	    } /* end if (initialized) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (percache_invalidate) */
+} /* end subroutine (percache_invalidate) */
 
 int percache_gethostid(percache *pcp,time_t dt,uint *hip) noex {
 	cint		pt = pertype_hostid ;
 	int		rs = SR_FAULT ;
-	if (pcp && hip) {
-	    if ((rs = percache_init(pcp)) >= 0) {
+	if (pcp && hip) ylikely {
+	    if ((rs = percache_init(pcp)) >= 0) ylikely {
 	        custime		vt = pcp->items[pt].t ;
 	        cint		to = timeouts[pt] ;
 	        if ((dt - vt) > to) {
@@ -320,14 +323,13 @@ int percache_gethostid(percache *pcp,time_t dt,uint *hip) noex {
 	    } /* end if (init) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (percache_gethostid) */
+} /* end subroutine (percache_gethostid) */
 
 int percache_getbtime(percache *pcp,time_t dt,time_t *btp) noex {
 	cint		pt = pertype_btime ;
 	int		rs = SR_FAULT ;
-	if (pcp && btp) {
-	    if ((rs = percache_init(pcp)) >= 0) {
+	if (pcp && btp) ylikely {
+	    if ((rs = percache_init(pcp)) >= 0) ylikely {
 	        custime		vt = pcp->items[pt].t ;
 	        cint		to = timeouts[pt] ;
 	        if ((dt - vt) > to) {
@@ -340,93 +342,85 @@ int percache_getbtime(percache *pcp,time_t dt,time_t *btp) noex {
 	    } /* end if (init) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (percache_getbtime) */
+} /* end subroutine (percache_getbtime) */
 
 int percache_getnprocs(percache *pcp,time_t dt) noex {
 	cint		pt = pertype_nprocs ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (pcp) {
+	if (pcp) ylikely {
     	    geter go(pcp,dt,nullptr,nullptr) ;
 	    rs = go(pt) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (percache_getnprocs) */
+} /* end subroutine (percache_getnprocs) */
 
 int percache_getrunlevel(percache *pcp,time_t dt) noex {
 	cint		pt = pertype_runlevel ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (pcp) {
+	if (pcp) ylikely {
     	    geter go(pcp,dt,nullptr,nullptr) ;
 	    rs = go(pt) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (percache_getrunlevel) */
+} /* end subroutine (percache_getrunlevel) */
 
 int percache_getnusers(percache *pcp,time_t dt) noex {
 	cint		pt = pertype_nusers ;
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (pcp) {
+	if (pcp) ylikely {
     	    geter go(pcp,dt,nullptr,nullptr) ;
 	    rs = go(pt) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (percache_getnusers) */
+} /* end subroutine (percache_getnusers) */
 
 int percache_getnodename(percache *pcp,time_t dt,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
-	if (pcp) {
+	if (pcp) ylikely {
     	    geter go(pcp,dt,nullptr,rpp) ;
 	    rs = go(pertype_nodename) ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
 int percache_getnetdomain(percache *pcp,time_t dt,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
-	if (pcp) {
+	if (pcp) ylikely {
     	    geter go(pcp,dt,nullptr,rpp) ;
 	    rs = go(pertype_netdomain) ;
 	}
 	return rs ;
-}
-/* end subroutine (percache_getnetdomain) */
+} /* end subroutine (percache_getnetdomain) */
 
 int percache_getnisdomain(percache *pcp,time_t dt,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
-	if (pcp) {
+	if (pcp) ylikely {
     	    geter go(pcp,dt,nullptr,rpp) ;
 	    rs = go(pertype_nisdomain) ;
 	}
 	return rs ;
-}
-/* end subroutine (percache_getnisdomain) */
+} /* end subroutine (percache_getnisdomain) */
 
 int percache_getnetload(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
-	if (pcp && pr) {
+	if (pcp && pr) ylikely {
     	    geter go(pcp,dt,pr,rpp) ;
 	    rs = go(pertype_netload) ;
 	}
 	return rs ;
-}
-/* end subroutine (percache_getnetload) */
+} /* end subroutine (percache_getnetload) */
 
 int percache_getsystat(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
-	if (pcp && pr) {
+	if (pcp && pr) ylikely {
     	    geter go(pcp,dt,pr,rpp) ;
 	    rs = go(pertype_systat) ;
 	}
 	return rs ;
-}
-/* end subroutine (percache_getsystat) */
+} /* end subroutine (percache_getsystat) */
 
 
 /* local subroutines */
@@ -434,7 +428,7 @@ int percache_getsystat(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 int geter::operator () (int pt) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = percache_init(pcp)) >= 0) {
+	if ((rs = percache_init(pcp)) >= 0) ylikely {
 	    if (dt == 0) dt = getustime ;
 	    switch (pt) {
 	    case pertype_nprocs:
@@ -452,8 +446,7 @@ int geter::operator () (int pt) noex {
 	    } /* end switch */
 	} /* end if (init) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (geter::operator) */
+} /* end method (geter::operator) */
 
 int geter::getval(int pt) noex {
     	int		rs = SR_OK ;
@@ -469,8 +462,7 @@ int geter::getval(int pt) noex {
 	    }
 	} /* end if (update needed) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end method (geter::gerval) */
+} /* end method (geter::gerval) */
 
 int geter::getstr(int pt) noex {
 	int		rs ;
@@ -481,22 +473,22 @@ int geter::getstr(int pt) noex {
 	char	*dp = pcp->items[pt].data ;
 	len = pcp->items[pt].v ;
 	if (((dt - vt) > to) || (dp == nullptr)) {
-	    if (char *dbuf ; (rs = libmalloc_nn(&dbuf)) >= 0) {
+	    if (char *dbuf ; (rs = libmem.nn(&dbuf)) >= 0) {
 	        cint	dlen = rs ;
 		if (dp) {
-		    lm_free(dp) ;
+		    libmem.free(dp) ;
 		    pcp->items[pt].data = nullptr ;
-		}
-	        if ((rs = getx(pt,dbuf,dlen)) >= 0) {
+		} /* end if (memory-release) */
+	        if ((rs = getx(pt,dbuf,dlen)) >= 0) ylikely {
 		    len = rs ;
-		    if (char *bp ; (rs = lm_mall((len+1),&bp)) >= 0) {
+		    if (char *bp ; (rs = libmem.mall((len+1),&bp)) >= 0) {
 			strwcpy(bp,dbuf,len) ;
 		        pcp->items[pt].data = bp ;
 	                pcp->items[pt].t = uint(dt) ;
 		        pcp->items[pt].v = len ;
 	            } /* end if (memory-acquire) */
 		} /* end if (getx) */
-		rs1 = lm_free(dbuf) ;
+		rs1 = libmem.free(dbuf) ;
 		if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	} /* end if (update needed) */
@@ -504,8 +496,7 @@ int geter::getstr(int pt) noex {
 	    *rpp = (rs >= 0) ? pcp->items[pt].data : nullptr ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (geter::getstr) */
+} /* end method (geter::getstr) */
 
 int geter::getv(int pt) noex {
     	int		rs = SR_BUGCHECK ;
@@ -525,8 +516,7 @@ int geter::getv(int pt) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end method (geter::getv) */
+} /* end method (geter::getv) */
 
 /* this (below) kind-of serves as our "virtual" function w/o the b*llsh*t */
 int geter::getx(int pt,char *dbuf,int dlen) noex {
@@ -549,15 +539,13 @@ int geter::getx(int pt,char *dbuf,int dlen) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end method (geter::getx) */
+} /* end method (geter::getx) */
 
-static bool isNoProcs(int rs) noex {
+local bool isNoProcs(int rs) noex {
 	bool		f = false ;
 	f = f || isNotPresent(rs) ;
 	f = f || (rs == SR_NOSYS) ;
 	return f ;
-}
-/* end subroutine (isNoProcs) */
+} /* end subroutine (isNoProcs) */
 
 
