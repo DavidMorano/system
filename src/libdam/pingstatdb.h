@@ -1,32 +1,39 @@
-/* pingstatdb */
+/* pingstatdb HEADER (Ping-Status-Database) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
+/* object to manipulate a PINGSTATDB file */
+/* version %I% last-modified %G% */
+
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PINGSTATDB_INCLUDE
-#define	PINGSTATDB_INCLUDE	1
+#define	PINGSTATDB_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-#include	<sys/types.h>
-#include	<sys/timeb.h>
-#include	<netdb.h>
-
-#include	<bfile.h>
-#include	<vecitem.h>
-#include	<dater.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/timeb.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<vecitem.h>		/* LIUC */
+#include	<dater.h>		/* LIUC */
+#include	<localmisc.h>		/* LIU */
+#include	<bfile.h>		/* LIBB */
 
 
-/* object defines */
-
-#define	PINGSTATDB_MAGIC	0x31415926
 #define	PINGSTATDB		struct pingstatdb_head
-#define	PINGSTATDB_CUR		struct pingstatdb_cursor
-#define	PINGSTATDB_ENT		struct pingstatdb_entry
-#define	PINGSTATDB_UP		struct pingstatdb_upper
 #define	PINGSTATDB_FL		struct pingstatdb_flags
+#define	PINGSTATDB_ENT		struct pingstatdb_entry
+#define	PINGSTATDB_CUR		struct pingstatdb_cursor
+#define	PINGSTATDB_UP		struct pingstatdb_upper
+#define	PINGSTATDB_MAGIC	0x31415926
 
 
 struct pingstatdb_flags {
@@ -36,7 +43,7 @@ struct pingstatdb_flags {
 	uint		writable:1 ;		/* file is writable */
 	uint		cursor:1 ;		/* cursor is out */
 	uint		tzset:1 ;		/* was tzset() called */
-} ;
+} ; /* end struct */
 
 struct pingstatdb_head {
 	cchar		*fname ;
@@ -47,11 +54,11 @@ struct pingstatdb_head {
 	time_t		mtime ;
 	PINGSTATDB_FL	fl ;
 	uint		magval ;
-} ;
+} ; /* end struct */
 
 struct pingstatdb_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct pingstatdb_entry {
 	time_t		ti_change ;	/* last change */
@@ -59,14 +66,19 @@ struct pingstatdb_entry {
 	uint		count ;
 	int		f_up ;		/* UP-DOWN status */
 	char		hostname[MAXHOSTNAMELEN+1] ;
-} ;
+} ; /* end struct */
 
 struct pingstatdb_upper {
 	uint		timestamp ;
 	uint		timechange ;
 	uint		count ;
-} ;
+} ; /* end struct */
 
+typedef	PINGSTATDB		pingstatdb ;
+typedef	PINGSTATDB_FL		pingstatdb_fl ;
+typedef	PINGSTATDB_ENT		pingstatdb_ent ;
+typedef	PINGSTATDB_CUR		pingstatdb_cur ;
+typedef	PINGSTATDB_UP		pingstatdb_up ;
 
 EXTERNC_begin
 
