@@ -51,13 +51,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkdirs.h>
-#include	<strnul.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkdirs.h>		/* LIBUC */
+#include	<strnul.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"makedirs.h"
 
@@ -87,17 +87,18 @@
 
 int makedirs(cchar *dirp,int dirl,mode_t dm) noex {
 	int		rs = SR_FAULT ;
-	int		c = 0 ;
-	if (dirp) {
+	int		c = 0 ; /* return-value */
+	if (dirp) ylikely {
 	    rs = SR_INVALID ;
-	    if (dirp[0]) {
-	        strnul	ds(dirp,dirl) ;
-		rs = mkdirs(ds,dm) ;
-		c = rs ;
+	    if (dirp[0]) ylikely {
+		rs = SR_NOMEM ;
+	        if (strnul ds(dirp,dirl) ; ds.fok) ylikely {
+		    rs = mkdirs(ds,dm) ;
+		    c = rs ;
+		} /* end if (strnul) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (makedirs) */
+} /* end subroutine (makedirs) */
 
 
