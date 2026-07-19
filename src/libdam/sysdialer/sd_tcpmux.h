@@ -14,15 +14,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<sysdialer.h>
 
 
-#define	TCPMUX_MAGIC	31415926
 #define	TCPMUX		struct tcpmux_head
+#define	TCPMUX_MAGIC	31415926
 
 
 struct tcpmux_head {
