@@ -1,5 +1,5 @@
 RCMDS
 
-Thses functions are all related to the old Berkley r-cmds family
+These functions are all related to the old Berkeley r-cmds family
 of remote network access APIs.
 
