@@ -42,17 +42,17 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
-extern void	arrswapi(int *,int,int) noex ;
-extern void	arrswapl(long *,int,int) noex ;
-extern void	arrswapll(longlong *,int,int) noex ;
+extern void	arrswapi	(int *,int,int) noex ;
+extern void	arrswapl	(long *,int,int) noex ;
+extern void	arrswapll	(longlong *,int,int) noex ;
 EXTERNC_end
 
 
