@@ -39,30 +39,32 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uinet.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<gethe.h>
-#include	<hostent.h>
-#include	<sockaddress.h>
-#include	<inetaddr.h>
-#include	<strwcpy.h>
-#include	<cfhex.h>
-#include	<cfhexstr.h>
-#include	<isindomain.h>
-#include	<localmisc.h>
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<gethe.h>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<inetaddr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<cfhex.h>		/* LIBUC */
+#include	<cfhexstr.h>		/* LIBUC */
+#include	<isindomain.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"nlspeername.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -129,8 +131,7 @@ int nlspeername(cchar *addr,cchar *dn,char *pn) noex {
 	    } /* end if (good) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (nlspeername) */
+} /* end subroutine (nlspeername) */
 
 
 /* local subroutines */
@@ -150,8 +151,7 @@ local int nlspeername_unix(char *pn,cchar *dn,cchar *addr,int al) noex {
 	    rs = SR_TOOBIG ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (nlspeername_unix) */
+} /* end subroutine (nlspeername_unix) */
 
 local int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	uint		uv ;
@@ -203,8 +203,7 @@ local int nlspeername_inet4(char *pn,cchar *dn,cchar *ap,int al) noex {
 	    } /* end if (m-a,-f) */
 	} /* end if (cfhexui) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (nlspeername_inet4) */
+} /* end subroutine (nlspeername_inet4) */
 
 vars::operator int () noex {
 	int		rs ;
