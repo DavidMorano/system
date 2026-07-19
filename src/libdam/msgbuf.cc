@@ -26,16 +26,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucmem.h>
-#include	<ucsysmisc.h>		/* |ucpagesize(3uc)| */
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC |ucpagesize(3uc)| */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"msgbuf.h"
 
@@ -62,10 +65,6 @@ using libuc::mem ;			/* variable */
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_reade(int,void *,int,int,int) noex ;
-}
-
 
 /* external variables */
 
@@ -86,48 +85,46 @@ extern "C" {
 
 int msgbuf_start(msgbuf *mbp,int fd,int bufsz,int to) noex {
 	int		rs = SR_FAULT ;
-	if (mbp) {
+	if (mbp) ylikely {
 	    rs = SR_INVALID ;
 	    memclear(mbp) ;
-	    if (fd >= 0) {
-		if ((rs = ucpagesize) >= 0) {
+	    if (fd >= 0) ylikely {
+		if ((rs = ucpagesize) >= 0) ylikely {
 	            if (bufsz <= 0) bufsz = rs ;
 	            if (to < 1) to = TO_READ ;
 	            mbp->fd = fd ;
 	            mbp->mlen = bufsz ;
 	            mbp->to = to ;
-	            if (char *bp ; (rs = mem.mall(bufsz,&bp)) >= 0) {
+	            if (char *bp ; (rs = mem.mall(bufsz,&bp)) >= 0) ylikely {
 	                mbp->mbuf = bp ;
 	            }
 		} /* end if (ucpagesize) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msgbuf_start) */
+} /* end subroutine (msgbuf_start) */
 
 int msgbuf_finish(msgbuf *mbp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (mbp) {
+	if (mbp) ylikely {
 	    rs = SR_OK ;
 	    if (mbp->mbuf) {
 	        rs1 = mem.free(mbp->mbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        mbp->mbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    mbp->bp = nullptr ;
 	    mbp->bl = 0 ;
 	    mbp->fd = -1 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msgbuf_finish) */
+} /* end subroutine (msgbuf_finish) */
 
 int msgbuf_read(msgbuf *mbp,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (mbp && rpp) {
+	if (mbp && rpp) ylikely {
 	    rs = SR_OK ;
 	    if ((mbp->bl == 0) && (mbp->neof < NEOF)) {
 	        int	ro = 0 ;
@@ -135,7 +132,7 @@ int msgbuf_read(msgbuf *mbp,cchar **rpp) noex {
 	        mbp->bp = mbp->mbuf ;
 	        mbp->bl = rs ;
 	        mbp->neof = (rs == 0) ? (mbp->neof+1) : 0 ;
-	    }
+	    } /* end if */
 	    if (rs >= 0) {
 	        *rpp = mbp->bp ;
 	        len = mbp->bl ;
@@ -144,13 +141,12 @@ int msgbuf_read(msgbuf *mbp,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (msgbuf_read) */
+} /* end subroutine (msgbuf_read) */
 
 int msgbuf_adv(msgbuf *mbp,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (mbp) {
+	if (mbp) ylikely {
 	    int		rlen ;
 	    int		opts = 0 ;
 	    char	*rbuf ;
@@ -178,20 +174,18 @@ int msgbuf_adv(msgbuf *mbp,int mlen) noex {
 	            rs = uc_reade(mbp->fd,rbuf,rlen,mbp->to,opts) ;
 	            len = rs ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            mbp->neof = (rs == 0) ? (mbp->neof+1) : 0 ;
 	            mbp->bl += len ;
 	            len = mbp->bl ;
-	        }
+	        } /* end if (ok) */
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (msgbuf_adv) */
+} /* end subroutine (msgbuf_adv) */
 
 int msgbuf_update(msgbuf *mbp,int mlen) noex {
 	return msgbuf_adv(mbp,mlen) ;
-}
-/* end subroutine (msgbuf_update) */
+} /* end subroutine (msgbuf_update) */
 
 
