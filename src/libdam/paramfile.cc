@@ -535,7 +535,7 @@ local int paramfile_bufbegin(PF *op) noex {
 	cint		nlines = 2 ;
 	int		rs ;
 	int		llen = 0 ;
-	if ((rs = maxlinelen) >= 0) {
+	if ((rs = maxlinelen) >= 0) ylikely {
 	    cint	bsz = (nlines * (rs + 1)) ;
 	    llen = rs ;
 	    if (void *vp ; (rs = lm_mall(bsz,&vp)) >= 0) ylikely {
