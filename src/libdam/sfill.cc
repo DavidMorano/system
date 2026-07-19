@@ -27,15 +27,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<estrings.h>
-#include	<bfile.h>
-#include	<fifostr.h>
-#include	<sfx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<ucmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<fifostr.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"sfill.h"
 
@@ -48,6 +50,14 @@ import libutil ;			/* |memclear(3u)| */
 #ifndef	WORDBUFLEN
 #define	WORDBUFLEN	100
 #endif
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -75,61 +85,58 @@ constexpr int		wordlen = WORDBUFLEN ;
 int sfill_start(sfill *op,int indent,bfile *ofp) noex {
     	SFILL		*hop = op ;
 	int		rs = SR_FAULT ;
-	if (op && ofp) {
+	if (op && ofp) ylikely {
 	    cint	osz = szof(fifostr) ;
 	    memclear(hop) ;
 	    op->ofp = ofp ;
 	    op->indent = indent ;
-	    if (void *vp{} ; (rs = uc_malloc(osz,&vp)) >= 0) {
+	    if (void *vp ; (rs = mem.mall(osz,&vp)) >= 0) ylikely {
 		op->fsp = (fifostr *) vp ;
 	        rs = fifostr_start(op->fsp) ;
 		if (rs < 0) {
-		    uc_free(vp) ;
+		    mem.free(vp) ;
 		    op->fsp = nullptr ;
-		}
+		} /* end if (wrror) */
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sfill_start) */
+} /* end subroutine (sfill_start) */
 
 int sfill_finish(sfill *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (op->fsp) {
+	    if (op->fsp) ylikely {
 	        {
 	            rs1 = fifostr_finish(op->fsp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	        {
-		    rs1 = uc_free(op->fsp) ;
+		    rs1 = mem.free(op->fsp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    op->fsp = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	    } /* end if (non-null) */
 	    {
 		op->ofp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sfill_finish) */
+} /* end subroutine (sfill_finish) */
 
 int sfill_remaining(sfill *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->clen ;
 	}
 	return rs ;
-}
-/* end subroutine (sfill_remaining) */
+} /* end subroutine (sfill_remaining) */
 
 int sfill_proc(sfill *op,int olinelen,cchar *linebuf,int linelen) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	if (op && linebuf) {
+	if (op && linebuf) ylikely {
 	    cchar	*sp = linebuf ;
 	    cchar	*cp ;
 	    int		sl = linelen ;
@@ -138,25 +145,24 @@ int sfill_proc(sfill *op,int olinelen,cchar *linebuf,int linelen) noex {
 	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	        rs = fifostr_add(op->fsp,cp,cl) ;
 	        op->clen += (cl + 1) ;
-	        sl -= ((cp + cl) - sp) ;
+	        sl -= intconv((cp + cl) - sp) ;
 	        sp = (cp + cl) ;
 	        if (rs < 0) break ;
 	    } /* end while */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        while ((rs >= 0) && (op->clen > olinelen)) {
 	            rs = sfill_wline(op,olinelen) ;
 	            wlen += rs ;
 	        } /* end while */
-	    } /* end if */
-	}
+	    } /* end if (ok) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (sfill_proc) */
+} /* end subroutine (sfill_proc) */
 
 int sfill_wline(sfill *op,int olinelen) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    bfile	*ofp = op->ofp ;
 	    int		cl ;
 	    int		c_words = 0 ;
@@ -178,25 +184,24 @@ int sfill_wline(sfill *op,int olinelen) noex {
 	            rs = bputc(ofp,' ') ;
 	            wlen += 1 ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = bwrite(ofp,cp,cl) ;
 	            wlen += rs ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = fifostr_rem(op->fsp,nullptr,0) ;
 	        }
 	        if (rs < 0) break ;
 	    } /* end while (getting words) */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = bputc(ofp,'\n') ;
 	        wlen += 1 ;
-	    }
-	    if (rs >= 0) {
+	    } /* end if (ok) */
+	    if (rs >= 0) ylikely {
 	        op->clen -= wlen ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (sfill_wline) */
+} /* end subroutine (sfill_wline) */
 
 
