@@ -13,15 +13,28 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<randomvar.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<randomvar.h>		/* LIBUC */
 
+
+enum removenameos {
+    	removenameo_burn,			/* "burn" the file */
+    	removenameo_follow,			/* follow symbolic links */
+    	removenameo_overflow
+} ; /* end enum */
+
+#ifdef	__cplusplus
+struct removenameoms {
+    	static constexpr int removenameom_burn	 = (1 << removenameo_burn) ;
+    	static constexpr int removenameom_follow = (1 << removenameo_follow) ;
+} ; /* end struct */
+#endif /* __cplusplus */
 
 /* object defines (options) */
 #define	REMOVENAME_MDEFAULT	0
-#define	REMOVENAME_MBURN	(1 << 0)	/* "burn" the file */
-#define	REMOVENAME_MFOLLOW	(1 << 1)	/* follow symbolic links */
+#define	REMOVENAME_MBURN	(1 << removenameo_burn)
+#define	REMOVENAME_MFOLLOW	(1 << removenameo_follow)
 
 
 EXTERNC_begin
@@ -35,8 +48,12 @@ EXTERNC_end
 inline int removename(cchar *n,int o = 0,randomvar *p = nullptr) noex {
 	cint		bc = (o & REMOVENAME_MBURN) ? 1 : 0 ;
 	return removename(n,o,p,bc) ;
-}
+} /* end subroutine */
 
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+extern const removenameoms	removenamem ;
 #endif /* __cplusplus */
 
 
