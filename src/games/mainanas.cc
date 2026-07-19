@@ -21,7 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<climits>
 #include	<cstring>		/* for |strlen(3c)| */
@@ -58,8 +58,6 @@ typedef set<string>	res_t ;
 
 
 /* external subroutines */
-
-extern "C" cchar	*getourenv(cchar **,cchar *)  noex ;
 
 
 /* local structures */
