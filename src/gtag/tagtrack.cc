@@ -1,6 +1,6 @@
-/* tagtrack */
+/* tagtrack SUPPORT */
 /* charset=ISO8859-1 */
-/* version %I% last-modified %G% */
+/* lang=C++20 */
 
 /* track tags in DWB documents */
 /* version %I% last-modified %G% */
@@ -21,6 +21,7 @@
 
 /******************************************************************************
 
+  	Description:
 	This code module (object) maintains a citation database.
 	It stores the citation keys, and a count for each, that are
 	found within the document text.  No emumeration is required
@@ -29,17 +30,20 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<nulstr.h>
-#include	<strn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"tagtrack.h"
 #include	"findinline.h"
@@ -53,16 +57,11 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfnext(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfnext(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
 
 
 /* external variables */
@@ -73,24 +72,24 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	tagtrack_addmac(TAGTRACK *,const char *,int) ;
-static int	tagtrack_scanescapes(TAGTRACK *,int,uint,const char *,int) ;
-static int	tagtrack_search(TAGTRACK *,TAGTRACK_TAG **,const char *,int) ;
-static int	tagtrack_addesc(TAGTRACK *,TAGTRACK_TAG *,int,uint,int) ;
+local int	tagtrack_addmac(TAGTRACK *,cchar *,int) ;
+local int	tagtrack_scanescapes(TAGTRACK *,int,uint,cchar *,int) ;
+local int	tagtrack_search(TAGTRACK *,TAGTRACK_TAG **,cchar *,int) ;
+local int	tagtrack_addesc(TAGTRACK *,TAGTRACK_TAG *,int,uint,int) ;
 
-int		tagtrack_add(TAGTRACK *,int,uint,int,const char *,int) ;
+int		tagtrack_add(TAGTRACK *,int,uint,int,cchar *,int) ;
 
-static int	tag_start(TAGTRACK_TAG *,const char *,int) ;
-static int	tag_addnum(TAGTRACK_TAG *,int,int) ;
-static int	tag_finish(TAGTRACK_TAG *) ;
+local int	tag_start(TAGTRACK_TAG *,cchar *,int) ;
+local int	tag_addnum(TAGTRACK_TAG *,int,int) ;
+local int	tag_finish(TAGTRACK_TAG *) ;
 
-static int	entry_load(TAGTRACK_ENT *,TAGTRACK_ESC *) ;
+local int	entry_load(TAGTRACK_ENT *,TAGTRACK_ESC *) ;
 
 #ifdef	COMMENT
-static int	mkcitestr(char *,int) ;
+local int	mkcitestr(char *,int) ;
 #endif /* COMMENT */
 
-static int	vcmpfor(const void **,const void **) ;
+local int	vcmpfor(cvoid **,cvoid **) ;
 
 
 /* local variables */
@@ -104,13 +103,13 @@ enum ourmacs {
 	ourmac_overlast
 } ;
 
-static const char	*ourmacs[] = {
+static cchar	*ourmacs[] = {
 	"TE",
 	"EE",
 	"FG",
 	"EN",
 	"TAG",
-	NULL
+	nullptr
 } ;
 
 enum ourescapes {
@@ -119,10 +118,10 @@ enum ourescapes {
 	ourescape_overlast
 } ;
 
-static const char	*ourescapes[] = {
+static cchar	*ourescapes[] = {
 	"tag",
 	"_",
-	NULL
+	nullptr
 } ;
 
 
@@ -134,7 +133,7 @@ int tagtrack_start(TAGTRACK *op)
 	const int	n = TAGTRACK_DEFENTRIES ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("tagtrack_start: ent\n") ;
@@ -167,7 +166,7 @@ int tagtrack_finish(TAGTRACK *op)
 	int		rs1 ;
 	int		i ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
 
@@ -175,7 +174,7 @@ int tagtrack_finish(TAGTRACK *op)
 	if (rs >= 0) rs = rs1 ;
 
 	for (i = 0 ; vechand_get(&op->tags,i,&tagp) >= 0 ; i += 1) {
-	    if (tagp != NULL) {
+	    if (tagp != nullptr) {
 	        rs1 = tag_finish(tagp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        rs1 = uc_free(tagp) ;
@@ -196,7 +195,7 @@ int tagtrack_scanline(op,fi,loff,lp,ll)
 TAGTRACK	*op ;
 int		fi ;
 uint		loff ;
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 {
 	const int	ch = MKCHAR(lp[0]) ;
@@ -223,7 +222,7 @@ int		ll ;
 		        f_macro = TRUE ;
 			{
 			    cchar	*tp ;
-			    while ((tp = strnbrk(lp,ll," ,\t")) != NULL) {
+			    while ((tp = strnbrk(lp,ll," ,\t")) != nullptr) {
 				if ((nl = sfnext(lp,(tp-lp),&np)) > 0) {
 			    	    rs = tagtrack_addmac(op,np,nl) ;
 				}
@@ -266,16 +265,16 @@ TAGTRACK	*op ;
 int		fi ;
 uint		eoff ;
 int		elen ;
-const char	kp[] ;
+cchar	kp[] ;
 int		kl ;
 {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
-	const char	*cp ;
-	const char	*tp ;
+	cchar	*cp ;
+	cchar	*tp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
 
@@ -288,7 +287,7 @@ int		kl ;
 	if (kl < 0)
 	    kl = strlen(kp) ;
 
-	while ((tp = strnchr(kp,kl,',')) != NULL) {
+	while ((tp = strnchr(kp,kl,',')) != nullptr) {
 	    if ((cl = sfshrink(kp,(tp - kp),&cp)) > 0) {
 		c += 1 ;
 	        rs = tagtrack_add(op,fi,eoff,elen,cp,cl) ;
@@ -316,14 +315,14 @@ TAGTRACK	*op ;
 int		fi ;
 uint		eoff ;
 int		elen ;
-const char	np[] ;
+cchar	np[] ;
 int		nl ;
 {
 	TAGTRACK_TAG	*tagp ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (np == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (np == nullptr) return SR_FAULT ;
 
 	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
 
@@ -374,8 +373,8 @@ int tagtrack_curbegin(TAGTRACK *op,TAGTRACK_CUR *curp)
 	debugprintf("tagtrack_curbegin: ent\n") ;
 #endif
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
 
@@ -392,8 +391,8 @@ int tagtrack_curend(TAGTRACK *op,TAGTRACK_CUR *curp)
 	debugprintf("tagtrack_curend: ent \n") ;
 #endif
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
 
@@ -413,9 +412,9 @@ int tagtrack_enum(TAGTRACK *op,TAGTRACK_CUR *curp,TAGTRACK_ENT *ep)
 	debugprintf("tagtrack_enum: ent\n") ;
 #endif
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (ep == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
 
@@ -424,7 +423,7 @@ int tagtrack_enum(TAGTRACK *op,TAGTRACK_CUR *curp,TAGTRACK_ENT *ep)
 /* do the lookup */
 
 	while ((rs = vecobj_get(&op->list,i,&offp)) >= 0) {
-	    if (offp != NULL) break ;
+	    if (offp != nullptr) break ;
 	    i += 1 ;
 	} /* end while */
 
@@ -432,8 +431,8 @@ int tagtrack_enum(TAGTRACK *op,TAGTRACK_CUR *curp,TAGTRACK_ENT *ep)
 	debugprintf("tagtrack_enum: vecobj_get() rs=%d\n",rs) ;
 #endif
 
-	if ((rs >= 0) && (offp != NULL)) {
-	    if (ep != NULL) {
+	if ((rs >= 0) && (offp != nullptr)) {
+	    if (ep != nullptr) {
 	        rs = entry_load(ep,offp) ;
 	    }
 	    curp->i = i ;
@@ -448,7 +447,7 @@ int tagtrack_audit(TAGTRACK *op)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
 
@@ -466,7 +465,7 @@ int tagtrack_audit(TAGTRACK *op)
 /* private subroutines */
 
 
-static int tagtrack_addmac(TAGTRACK *op,const char *np,int nl)
+local int tagtrack_addmac(TAGTRACK *op,cchar *np,int nl)
 {
 	TAGTRACK_TAG	*tagp ;
 	int		rs ;
@@ -513,7 +512,7 @@ static int tagtrack_addmac(TAGTRACK *op,const char *np,int nl)
 /* end subroutine (tagtrack_addmac) */
 
 
-static int tagtrack_scanescapes(TAGTRACK *op,int fi,uint loff,cchar *lp,int ll)
+local int tagtrack_scanescapes(TAGTRACK *op,int fi,uint loff,cchar *lp,int ll)
 {
 	FINDINLINE	esc ;
 	uint		eoff ;
@@ -521,7 +520,7 @@ static int tagtrack_scanescapes(TAGTRACK *op,int fi,uint loff,cchar *lp,int ll)
 	int		sl ;
 	int		ei ;
 	int		c = 0 ;
-	const char	*linestart = lp ;
+	cchar	*linestart = lp ;
 
 #if	CF_DEBUGS
 	debugprintf("tagtrack_scanescapes: fi=%u loff=%u\n",fi,loff) ;
@@ -560,12 +559,12 @@ static int tagtrack_scanescapes(TAGTRACK *op,int fi,uint loff,cchar *lp,int ll)
 /* end subroutine (tagtrack_scanescapes) */
 
 
-static int tagtrack_search(TAGTRACK *op,TAGTRACK_TAG **tagpp,cchar *np,int nl)
+local int tagtrack_search(TAGTRACK *op,TAGTRACK_TAG **tagpp,cchar *np,int nl)
 {
 	NULSTR		tn ;
 	int		rs ;
 	int		rs1 ;
-	cchar		*name = NULL ;
+	cchar		*name = nullptr ;
 
 	if ((rs = nulstr_start(&tn,np,nl,&name)) >= 0) {
 	    {
@@ -578,11 +577,9 @@ static int tagtrack_search(TAGTRACK *op,TAGTRACK_TAG **tagpp,cchar *np,int nl)
 	} /* end if (nulstr) */
 
 	return rs ;
-}
-/* end subroutine (tagtrack_search) */
+} /* end subroutine (tagtrack_search) */
 
-
-static int tagtrack_addesc(op,tagp,fi,eoff,elen)
+local int tagtrack_addesc(op,tagp,fi,eoff,elen)
 TAGTRACK	*op ;
 TAGTRACK_TAG	*tagp ;
 int		fi ;
@@ -609,50 +606,38 @@ int		elen ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (tagtrack_addesc) */
+} /* end subroutine (tagtrack_addesc) */
 
-
-static int tag_start(TAGTRACK_TAG *tagp,cchar *kp,int kl)
-{
+local int tag_start(TAGTRACK_TAG *tagp,cchar *kp,int kl) noex {
 	int		rs ;
-	const char	*cp ;
 
-	if (tagp == NULL) return SR_FAULT ;
-	if (kp == NULL) return SR_FAULT ;
+	if (tagp == nullptr) return SR_FAULT ;
+	if (kp == nullptr) return SR_FAULT ;
 
 	memset(tagp,0,sizeof(TAGTRACK_TAG)) ;
 	tagp->tagtype = -1 ;
 
+	cchar	*cp ;
 	if ((rs = uc_mallocstrw(kp,kl,&cp)) >= 0) {
 	    tagp->name = cp ;
 	}
 
 	return rs ;
-}
-/* end subroutine (tag_start) */
+} /* end subroutine (tag_start) */
 
-
-static int tag_finish(TAGTRACK_TAG *sp)
-{
+local int tag_finish(TAGTRACK_TAG *sp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (sp == NULL) return SR_FAULT ;
-
-	if (sp->name != NULL) {
+	if (sp == nullptr) return SR_FAULT ;
+	if (sp->name) {
 	    rs1 = uc_free(sp->name) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sp->name = NULL ;
+	    sp->name = nullptr ;
 	}
-
 	return rs ;
-}
-/* end subroutine (tag_finish) */
+} /* end subroutine (tag_finish) */
 
-
-static int tag_addnum(TAGTRACK_TAG *tagp,int ltt,int lc)
-{
+local int tag_addnum(TAGTRACK_TAG *tagp,int ltt,int lc) noex {
 	int	rs = SR_OK ;
 	if (tagp->c <= 0) {
 	    tagp->tagtype = ltt ;
@@ -661,33 +646,25 @@ static int tag_addnum(TAGTRACK_TAG *tagp,int ltt,int lc)
 	    rs = SR_INVALID ;
 	}
 	return rs ;
-}
-/* end subroutine (tag_addnum) */
+} /* end subroutine (tag_addnum) */
 
-
-static int entry_load(TAGTRACK_ENT *ep,TAGTRACK_ESC *offp)
-{
+local int entry_load(TAGTRACK_ENT *ep,TAGTRACK_ESC *offp) noex {
 	TAGTRACK_TAG	*tagp = offp->tagp ;
 	int		rs = SR_OK ;
-
 	ep->fi = offp->fi ;
 	ep->eoff = offp->eoff ;
 	ep->elen = offp->elen ;
 	ep->v = tagp->c ;
-
 	return rs ;
-}
-/* end subroutine (entry_load) */
+} /* end subroutine (entry_load) */
 
-
-static int vcmpfor(const void **v1pp,const void **v2pp)
-{
+local int vcmpfor(cvoid **v1pp,cvoid **v2pp) noex {
 	TAGTRACK_TAG	**e1pp = (TAGTRACK_TAG **) v1pp ;
 	TAGTRACK_TAG	**e2pp = (TAGTRACK_TAG **) v2pp ;
 	int		rc = 0 ;
-	if ((*e1pp != NULL) || (*e2pp != NULL)) {
-	    if (*e1pp != NULL) {
-		if (*e2pp != NULL) {
+	if ((*e1pp != nullptr) || (*e2pp != nullptr)) {
+	    if (*e1pp != nullptr) {
+		if (*e2pp != nullptr) {
 		    if ((rc = ((*e1pp)->name[0] - (*e2pp)->name[0])) == 0) {
 	    		rc = strcmp((*e1pp)->name,(*e2pp)->name) ;
 		    }
@@ -699,7 +676,6 @@ static int vcmpfor(const void **v1pp,const void **v2pp)
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpfor) */
+} /* end subroutine (vcmpfor) */
 
 
