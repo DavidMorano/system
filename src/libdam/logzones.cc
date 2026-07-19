@@ -151,7 +151,6 @@ import libutil ;			/* |lenstr(3u)| */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::mem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -186,11 +185,11 @@ local int	logzones_updater(LZ *,cc *,int,int,cc *) noex ;
 local int	logzones_search(LZ *,char *,int,int,char **) noex ;
 local int	logzones_enteropen(LZ *,time_t) noex ;
 
-local int entry_start(LZ_ENT *,cchar *,int,int,cchar *) noex ;
+local int entry_start	(LZ_ENT *,cchar *,int,int,cchar *) noex ;
 local int entry_startbuf(LZ_ENT *,cchar *,int) noex ;
-local int entry_update(LZ_ENT *,cchar *) noex ;
-local int entry_write(LZ_ENT *,char *,int) noex ;
-local int entry_finish(LZ_ENT *) noex ;
+local int entry_update	(LZ_ENT *,cchar *) noex ;
+local int entry_write	(LZ_ENT *,char *,int) noex ;
+local int entry_finish	(LZ_ENT *) noex ;
 
 local bool	hasoffset(int) noex ;
 local bool	fieldmatch(cchar *,cchar *,int,int) noex ;
