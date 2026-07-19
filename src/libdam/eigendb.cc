@@ -162,11 +162,11 @@ constexpr int	keybuflen = KEYBUFLEN ;
 int eigendb_open(eigendb *op,cchar *fname) noex {
 	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = eigendb_ctor(op)) >= 0) {
+	if ((rs = eigendb_ctor(op)) >= 0) ylikely {
 	    cint	ne = EIGENDB_DEFENT ;
 	    cint	chsz = EIGENDB_CHUNKSIZE ;
-	    if ((rs = strpack_start(op->spp,chsz)) >= 0) {
-	        if ((rs = hdb_start(op->dbp,ne,1,np,np)) >= 0) {
+	    if ((rs = strpack_start(op->spp,chsz)) >= 0) ylikely {
+	        if ((rs = hdb_start(op->dbp,ne,1,np,np)) >= 0) ylikely {
 	            op->magval = EIGENDB_MAGIC ;
 	            if (fname) {
 		        if (fname[0] != '\0') {
@@ -194,7 +194,7 @@ int eigendb_open(eigendb *op,cchar *fname) noex {
 int eigendb_close(eigendb *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = eigendb_magic(op)) >= 0) {
+	if ((rs = eigendb_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = hdb_finish(op->dbp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -214,7 +214,7 @@ int eigendb_close(eigendb *op) noex {
 
 int eigendb_addfile(eigendb *op,cchar *fname) noex {
 	int		rs ;
-	if ((rs = eigendb_magic(op,fname)) >= 0) {
+	if ((rs = eigendb_magic(op,fname)) >= 0) ylikely {
 	    rs = eigendb_fileparse(op,fname) ;
 	} /* end if (magic) */
 	return rs ;
@@ -225,7 +225,7 @@ int eigendb_addword(eigendb *op,cchar *wp,int wl) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	if ((rs = eigendb_magic(op,wp)) >= 0) {
+	if ((rs = eigendb_magic(op,wp)) >= 0) ylikely {
 	    if (wl < 0) wl = lenstr(wp) ;
 	    if (wl > 0) {
 	        hdb_dat		key ;
@@ -257,7 +257,7 @@ int eigendb_addword(eigendb *op,cchar *wp,int wl) noex {
 int eigendb_exists(eigendb *op,cchar *wp,int wl) noex {
 	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = eigendb_magic(op,wp)) >= 0) {
+	if ((rs = eigendb_magic(op,wp)) >= 0) ylikely {
 	    if (wl < 0) wl = lenstr(wp) ;
 	    if (wl > 0) {
 	        hdb_dat		key ;
@@ -279,7 +279,7 @@ int eigendb_exists(eigendb *op,cchar *wp,int wl) noex {
 
 int eigendb_count(eigendb *op) noex {
 	int		rs ;
-	if ((rs = eigendb_magic(op)) >= 0) {
+	if ((rs = eigendb_magic(op)) >= 0) ylikely {
 	    rs = hdb_count(op->dbp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -289,9 +289,9 @@ int eigendb_curbegin(eigendb *op,eigendb_cur *curp) noex {
     	cnullptr	np{} ;
     	cnothrow	nt{} ;
 	int		rs ;
-	if ((rs = eigendb_magic(op,curp)) >= 0) {
+	if ((rs = eigendb_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((curp->hcp = new(nt) hdb_cur) != np) {
+	    if ((curp->hcp = new(nt) hdb_cur) != np) ylikely {
 		rs = hdb_curbegin(op->dbp,curp->hcp) ;
 	    } /* end if (new-hdb_cur) */
 	} /* end if (magic) */
@@ -301,8 +301,8 @@ int eigendb_curbegin(eigendb *op,eigendb_cur *curp) noex {
 int eigendb_curend(eigendb *op,eigendb_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = eigendb_magic(op,curp)) >= 0) {
-	    if (curp->hcp) {
+	if ((rs = eigendb_magic(op,curp)) >= 0) ylikely {
+	    if (curp->hcp) ylikely {
 	        {
 	            rs1 = hdb_curend(op->dbp,curp->hcp) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -320,9 +320,9 @@ int eigendb_curenum(eigendb *op,eigendb_cur *curp,cchar **rpp) noex {
 	int		rs ;
 	int		len = 0 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if ((rs = eigendb_magic(op,curp)) >= 0) {
+	if ((rs = eigendb_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (curp->hcp) {
+	    if (curp->hcp) ylikely {
 		hdb_cur		*hcp = curp->hcp ;
 	        hdb_dat 	key ;
 	        hdb_dat		val ;
@@ -345,7 +345,7 @@ local int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	cmode		om = 0666 ;
-	if ((rs = uc_open(fname,of,om)) >= 0) {
+	if ((rs = uc_open(fname,of,om)) >= 0) ylikely {
 	    cint	fd = rs ;
 	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	        if (! S_ISDIR(sb.st_mode)) {
@@ -378,8 +378,8 @@ local int eigendb_fileparsereg(eigendb *op,int fd,int fsz) noex {
 	if (fsz >= 0) {
 	    bsz = iceil(fsz,1024) ;
 	}
-	if (linebuffer lb ; (rs = lb.start) >= 0) {
-	    if (filer fb ; (rs = filer_start(&fb,fd,0z,bsz,0)) >= 0) {
+	if (linebuffer lb ; (rs = lb.start) >= 0) ylikely {
+	    if (filer fb ; (rs = filer_start(&fb,fd,0z,bsz,0)) >= 0) ylikely {
 	        cint	llen = lb.llen ;
 	        char	*lbuf = lb.lbuf ;
 	        while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {
@@ -424,7 +424,7 @@ local int eigendb_fileline(eigendb *op,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*sp{} ;
-	if (int sl ; (sl = sfcontent(lbuf,llen,&sp)) > 0) {
+	if (int sl ; (sl = sfcontent(lbuf,llen,&sp)) > 0) ylikely {
 	    sif		sfo(sp,sl) ;
 	    cchar	*cp{} ;
 	    for (int cl ; (cl = sfo.next(&cp)) > 0 ; ) {
