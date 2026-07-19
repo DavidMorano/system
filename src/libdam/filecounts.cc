@@ -217,10 +217,10 @@ constexpr char		total[] = "TOTAL" ;
 
 int filecounts_open(FC *op,cchar *fn,int of,mode_t om) noex {
 	int		rs ;
-	if ((rs = filecounts_ctor(op,fn)) >= 0) {
+	if ((rs = filecounts_ctor(op,fn)) >= 0) ylikely {
 	    if (static cint rsv = var ; (rs = rsv) >= 0) {
 	        op->fl.rdonly = ((of & O_ACCMODE) == O_RDONLY) ;
-	        if ((rs = u_open(fn,of,om)) >= 0) {
+	        if ((rs = u_open(fn,of,om)) >= 0) ylikely {
 	            op->fd = rs ;
 	            if (cchar *cp{} ; (rs = lm_strw(fn,-1,&cp)) >= 0) {
 		        op->fname = cp ;
@@ -242,7 +242,7 @@ int filecounts_open(FC *op,cchar *fn,int of,mode_t om) noex {
 int filecounts_close(FC *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = filecounts_magic(op)) >= 0) {
+	if ((rs = filecounts_magic(op)) >= 0) ylikely {
 	    if (op->fname) {
 	        void *vp = voidp(op->fname) ;
 	        rs1 = lm_free(vp) ;
@@ -273,7 +273,7 @@ int filecounts_process(FC *op,FC_N *nlp) noex {
 
 int filecounts_curbegin(FC *op,FC_CUR *curp) noex {
 	int		rs ;
-	if ((rs = filecounts_magic(op,curp)) >= 0) {
+	if ((rs = filecounts_magic(op,curp)) >= 0) ylikely {
 	    memclear(curp) ;
 	    curp->magval = FILECOUNTS_MAGIC ;
 	    op->ncursors += 1 ;
@@ -284,9 +284,9 @@ int filecounts_curbegin(FC *op,FC_CUR *curp) noex {
 int filecounts_curend(FC *op,FC_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = filecounts_magic(op,curp)) >= 0) {
+	if ((rs = filecounts_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magval == FILECOUNTS_MAGIC) {
+	    if (curp->magval == FILECOUNTS_MAGIC) ylikely {
 	        if ((curp->listn > 0) && (curp->listp != nullptr)) {
 	            FC_II	*rlp = curp->listp ;
 	            for (int i = 0 ; i < curp->listn ; i += 1) {
@@ -316,9 +316,9 @@ int filecounts_cursnap(FC *op,FC_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = filecounts_magic(op,curp)) >= 0) {
+	if ((rs = filecounts_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_BADSLOT ;
-	    if (op->ncursors > 0) {
+	    if (op->ncursors > 0) ylikely {
 	        cint	iisz = szof(FC_II) ;
 	        cint	to = TO_LOCK ;
 	        int	vn = DEFENTS ;
@@ -363,9 +363,9 @@ int filecounts_curread(FC *op,FC_CUR *curp,FC_I *fcip,
 		char *nbuf,int nlen) noex {
 	int		rs ;
 	int		rl = 0 ;
-	if ((rs = filecounts_magic(op,curp,fcip,nbuf)) >= 0) {
+	if ((rs = filecounts_magic(op,curp,fcip,nbuf)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magval == FILECOUNTS_MAGIC) {
+	    if (curp->magval == FILECOUNTS_MAGIC) ylikely {
 	        int	ei = (curp->i >= 0) ? curp->i : 0 ;
 		rs = SR_OK ;
 	        if (ei < curp->listn) {
@@ -386,8 +386,7 @@ int filecounts_curread(FC *op,FC_CUR *curp,FC_I *fcip,
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (filecounts_curread) */
+} /* end subroutine (filecounts_curread) */
 
 
 /* private subroutines */
@@ -396,11 +395,11 @@ local int filecounts_proclist(FC *op,FC_N *nlp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		vo = 0 ;
-	if (WKR work ; (rs = worker_start(&work,nlp)) >= 0) {
-	    if ((rs = filecounts_lockbegin(op)) >= 0) {
+	if (WKR work ; (rs = worker_start(&work,nlp)) >= 0) ylikely {
+	    if ((rs = filecounts_lockbegin(op)) >= 0) ylikely {
 		cint	fd = op->fd ;
-	        if (filer fb ; (rs = fb.start(fd,0z,0,vo)) >= 0) {
-	            if ((rs = filecounts_scan(op,&work,&fb)) >= 0) {
+	        if (filer fb ; (rs = fb.start(fd,0z,0,vo)) >= 0) ylikely {
+	            if ((rs = filecounts_scan(op,&work,&fb)) >= 0) ylikely {
 	                if (! op->fl.rdonly) {
 	                    rs = filecounts_update(op,&work) ;
 	                } /* end if */
@@ -423,7 +422,7 @@ local int filecounts_proclist(FC *op,FC_N *nlp) noex {
 local int filecounts_scan(FC *op,WKR *wp,filer *fbp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (linebuffer lb ; (rs = lb.start) >= 0) {
+	if (linebuffer lb ; (rs = lb.start) >= 0) ylikely {
 	    cint	to = TO_LOCK ;
 	    int		foff = 0 ;
 	    int		rn = 1 ;
@@ -477,7 +476,7 @@ local int filecounts_update(FC *op,WKR *wp) noex {
 	/* create the time-string to put in the DB file */
 	timestr_logz(dt,tbuf) ;
 	/* sort the entries by offset (w/ new ones at the rear) */
-	if ((rs = worker_sort(wp)) >= 0) {
+	if ((rs = worker_sort(wp)) >= 0) ylikely {
 	    FC_N	*nlp = wp->nlp ;
 	    WKR_ENT	*wep{} ;
 	    for (int i = 0 ; worker_get(wp,i,&wep) >= 0 ; i += 1) {
@@ -597,11 +596,11 @@ local int filecounts_snaper(FC *op,vecobj *ilp) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
-	if (dater dm ; (rs = dater_start(&dm,np,np,0)) >= 0) {
+	if (dater dm ; (rs = dater_start(&dm,np,np,0)) >= 0) ylikely {
 	    cint	fd = op->fd ;
-	    if (linebuffer lb ; (rs = lb.start) >= 0) {
+	    if (linebuffer lb ; (rs = lb.start) >= 0) ylikely {
 	        cint	vo = 0 ;
-	        if (filer fb ; (rs = fb.start(fd,0z,0,vo)) >= 0) {
+	        if (filer fb ; (rs = fb.start(fd,0z,0,vo)) >= 0) ylikely {
 	            cint	to = -1 ;
 	            cint	llen = lb.llen ;
 	            char	*lbuf = lb.lbuf ;
@@ -694,7 +693,7 @@ local int worker_start(WKR *wp,FC_N *nlp) noex  {
 	int		vo = vecobjm.compact ;
 	memclear(wp) ;
 	wp->nlp = nlp ;
-	if ((rs = vecobj_start(&wp->wlist,wesz,vn,vo)) >= 0) {
+	if ((rs = vecobj_start(&wp->wlist,wesz,vn,vo)) >= 0) ylikely {
 	    WKR_ENT	we{} ;
 	    int		i ; /* used-afterwards */
 	    int		na ;
@@ -730,7 +729,7 @@ local int worker_start(WKR *wp,FC_N *nlp) noex  {
 	    } /* end if (ok) */
 	    if (rs < 0) {
 	        vecobj_finish(&wp->wlist) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (vecobj_start) */
 	return rs ;
 } /* end subroutine (worker_start) */
@@ -767,7 +766,7 @@ local int worker_record(WKR *wp,int ei,int eoff,uint v) noex {
     	vecobj		*wlp = &wp->wlist ;
 	FC_N		*nlp = wp->nlp ;
 	int		rs ;
-	if (void *vp{} ; (rs = wlp->get(ei,&vp)) >= 0) {
+	if (void *vp{} ; (rs = wlp->get(ei,&vp)) >= 0) ylikely {
 	    WKR_ENT	*wep = (WKR_ENT *) vp ;
 	    if (vp) {
 	        cint	ni = wep->ni ;
@@ -885,7 +884,7 @@ local int vcmpoff(cvoid **v1pp,cvoid **v2pp) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 	    maxnamelen = rs ;
 	    uentlen = (rs + UENTADDER) ;
 	}
