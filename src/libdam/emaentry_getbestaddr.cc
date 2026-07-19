@@ -19,6 +19,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	emaentry_getbestaddr
+
   	Description:
 	This subroutine extracts the "best" address out of an
 	EMA-entry address specification (given in raw string form).
@@ -26,21 +29,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<ema.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ema.h>			/* LICUC */
+#include	<localmisc.h>		/* LICU */
 
+#include	"emaentry_getbestaddr.h"
 
 /* local defines */
 
-#ifndef	EMAENTRY
-#define	EMAENTRY	EMA_ENT
+#ifndef	EMAENT
+#define	EMAENT		ema_ent
 #endif
 
 
@@ -55,28 +60,21 @@
 
 /* exported subroutines */
 
-int emaentry_getbestaddr(EMAENTRY *ep,const char **rpp) noex {
-	int	rs = SR_OK ;
-	int	cl = 0 ;
-
-	cchar	*cp = NULL ;
-
-
-	if (ep == NULL) return SR_FAULT ;
-	if (rpp == NULL) return SR_FAULT ;
-
-	            if ((ep->rp != NULL) && (ep->rl > 0)) {
-	                cp = ep->rp ;
-	                cl = ep->rl ;
-	            } else if ((ep->ap != NULL) && (ep->al > 0)) {
-	                cp = ep->ap ;
-	                cl = ep->al ;
-	            }
-
+int emaentry_getbestaddr(EMAENT *ep,cchar **rpp) noex {
+	int		rs = SR_OK ;
+	int		cl = 0 ; /* return-value */
+	cchar		*cp = nullptr ;
+	if (ep && rpp) ylikely {
+	    if (ep->rp && (ep->rl > 0)) {
+	        cp = ep->rp ;
+	        cl = ep->rl ;
+	    } else if (ep->ap && (ep->al > 0)) {
+	        cp = ep->ap ;
+	        cl = ep->al ;
+	    } /* end if */
+	} /* end if (non-null) */
 	*rpp = cp ;
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (emaentry_getbestaddr) */
-
+} /* end subroutine (emaentry_getbestaddr) */
 
 
