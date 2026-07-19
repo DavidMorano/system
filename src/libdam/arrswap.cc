@@ -41,14 +41,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<stdintx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"arrswap.h"
 
@@ -66,8 +66,7 @@ void arrswapx(T *a,int i1,int i2) noex {
 	T	t = a[i1] ;
 	a[i1] = a[i2] ;
 	a[i2] = t ;
-}
-/* end subroutine-template (arrswapx) */
+} /* end subroutine-template (arrswapx) */
 
 
 /* local variables */
@@ -80,17 +79,14 @@ void arrswapx(T *a,int i1,int i2) noex {
 
 void arrswapi(int *a,int i1,int i2) noex {
 	return arrswapx(a,i1,i2) ;
-}
-/* end subroutine (arrswapi) */
+} /* end subroutine (arrswapi) */
 
 void arrswapl(long *a,int i1,int i2) noex {
 	return arrswapx(a,i1,i2) ;
-}
-/* end subroutine (arrswapl) */
+} /* end subroutine (arrswapl) */
 
 void arrswapll(longlong *a,int i1,int i2) noex {
 	return arrswapx(a,i1,i2) ;
-}
-/* end subroutine (arrswapll) */
+} /* end subroutine (arrswapll) */
 
 
