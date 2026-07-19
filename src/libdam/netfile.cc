@@ -50,23 +50,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<vecitem.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<fieldterminit.hh>
-#include	<sfx.h>
-#include	<matxstr.h>
-#include	<strwcpy.h>
-#include	<strwcmp.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<vecitem.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"netfile.h"
 
@@ -86,6 +91,7 @@ import libutil ;
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -108,44 +114,62 @@ enum netitems {
 	netitem_password,
 	netitem_account,
 	netitem_overlast
-} ;
+} ; /* end enum */
 
 struct netstate {
 	cchar		*item[netitem_overlast] ;
 	int		c ;
-} ;
+} ; /* end struct */
+
+constexpr uchar		termvals[] = {
+	CH_NUL, CH_SOH, CH_STX, CH_ETX, CH_EOT, CH_ENQ, CH_ACK, CH_SO,
+	CH_SI, CH_SYN, CH_ETB, CH_EM, CH_SUB, CH_ESC, CH_FS, CH_GS,
+	CH_RS, CH_US, CH_DEL
+} ; /* end array */
+
+constexpr uchar		termchrs[] = "\t\n\v\f\r !#':=" ;
+
+namespace {
+    struct terminiter {
+	char	terms[fieldterminit_size] = {} ;
+	consteval void mkvals() noex {
+	    for (cauto ch : termvals) {
+		baset(terms,ch) ;
+	    } /* end for */
+	} ; /* end method */
+	consteval void mkchrs() noex {
+	    uchar uc ;
+	    for (con uchar *ucp = termchrs ; ((uc = *ucp)) ; ucp += 1) {
+		baset(terms,uc) ;
+	    } /* end for */
+	} ; /* end ctor */
+	consteval terminiter() noex {
+	    mkvals() ;
+	    mkchrs() ;
+	} ; /* end ctor */
+    } ; /* end struct (terminiter) */
+} /* end namespace */
 
 
 /* forward references */
 
-static int	netfile_parse(NF *,netstate *,cchar *) noex ;
-static int	netfile_parseln(NF *,netstate *,cchar *,int) noex ;
-static int	netfile_item(NF *,netstate *,int,cchar *,int) noex ;
+local int	netfile_parse(NF *,netstate *,cchar *) noex ;
+local int	netfile_parseln(NF *,netstate *,cchar *,int) noex ;
+local int	netfile_item(NF *,netstate *,int,cchar *,int) noex ;
 
-static int	netstate_start(netstate *) noex ;
-static int	netstate_reset(netstate *) noex ;
-static int	netstate_item(netstate *,int,cchar *,int) noex ;
-static int	netstate_ready(netstate *) noex ;
-static int	netstate_finish(netstate *) noex ;
+local int	netstate_start(netstate *) noex ;
+local int	netstate_reset(netstate *) noex ;
+local int	netstate_item(netstate *,int,cchar *,int) noex ;
+local int	netstate_ready(netstate *) noex ;
+local int	netstate_finish(netstate *) noex ;
 
-static int	entry_start(NF_ENT *,netstate *) noex ;
-static int	entry_finish(NF_ENT *) noex ;
+local int	entry_start(NF_ENT *,netstate *) noex ;
+local int	entry_finish(NF_ENT *) noex ;
 
-static int	getnii(int) noex ;
+local int	getnii(int) noex ;
 
 
 /* local variables */
-
-constexpr char		fterms[32] = {
-	0x7F, 0xFE, 0xC0, 0xFE,
-	0x8B, 0x00, 0x00, 0x24, 
-	0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x80,
-	0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x00, 
-} ;
 
 enum netkeys {
 	netkey_machine,
@@ -156,9 +180,9 @@ enum netkeys {
 	netkey_macdef,
 	netkey_default,
 	netkey_overlast
-} ;
+} ; /* end enum */
 
-constexpr cpcchar	netkeys[] = {
+constexpr cpcchar	netnames[] = {
 	"machine",
 	"login",
 	"username",
@@ -167,12 +191,14 @@ constexpr cpcchar	netkeys[] = {
 	"macdef",
 	"default",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr int		readies[] = {
 	netitem_machine,
 	netitem_login
-} ;
+} ; /* end array */
+
+constexpr terminiter	ft ;
 
 
 /* exported variables */
@@ -180,124 +206,128 @@ constexpr int		readies[] = {
 
 /* exported subroutines */
 
-int netfile_open(NF *vep,cchar *netfname) noex {
-	int		rs = SR_FAULT ;
+
+local int netfile_opens(NF *op,cchar *fn) noex {
+	cint		vn = 10 ;
+	cint		vo = 0 ;
+	int		rs ;
 	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if ((rs = vecitem_start(op,vn,vo)) >= 0) {
+	    if (ustat sb ; (rs = uc_stat(fn,&sb)) >= 0) {
+	        if (! S_ISDIR(sb.st_mode)) {
+	            if (netstate ns ; (rs = netstate_start(&ns)) >= 0) {
+			{
+	                    rs = netfile_parse(op,&ns,fn) ;
+	                    c = rs ;
+			}
+	                rs1 = netstate_finish(&ns) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (netstate) */
+	        } else {
+	            rs = SR_ISDIR ;
+		}
+	    } /* end if (stat) */
+	    if (rs < 0) {
+	        vecitem_finish(op) ;
+	    }
+	} /* end if (vecitem) */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (netfile_opens) */
+
+int netfile_open(NF *op,cchar *netfname) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (vep && netfname) {
+	if (op && netfname) {
 	    rs = SR_INVALID ;
 	    if (netfname[0]) {
-		cint	vn = 10 ;
-		cint	vo = 0 ;
-	        if ((rs = vecitem_start(vep,vn,vo)) >= 0) {
-	            if (ustat sb ; (rs = uc_stat(netfname,&sb)) >= 0) {
-	                if (! S_ISDIR(sb.st_mode)) {
-	                    if (netstate ns ; (rs = netstate_start(&ns)) >= 0) {
-				{
-	                            rs = netfile_parse(vep,&ns,netfname) ;
-	                            c = rs ;
-				}
-	                        rs1 = netstate_finish(&ns) ;
-	                        if (rs >= 0) rs = rs1 ;
-	                    } /* end if (netstate) */
-	                } else {
-	                    rs = SR_ISDIR ;
-		        }
-	            } /* end if (stat) */
-	            if (rs < 0) {
-	                vecitem_finish(vep) ;
-	            }
-	        } /* end if (vecitem) */
+		    rs = netfile_opens(op,netfname) ;
+		    c = rs ;
 	    } /* end if (valid) */
-	} /* end if (magic) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (netfile_open) */
+} /* end subroutine (netfile_open) */
 
-int netfile_close(NF *vep) noex {
+int netfile_close(NF *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (vep) {
+	if (op) {
 	    rs = SR_OK ;
 	    void	*vp{} ;
-	    for (int i = 0 ; vecitem_get(vep,i,&vp) >= 0 ; i += 1) {
-	        NF_ENT	*ep = entp(vp) ;
-	        if (vp) {
+	    for (int i = 0 ; vecitem_get(op,i,&vp) >= 0 ; i += 1) {
+	        if (NF_ENT *ep = entp(vp) ; ep) {
 	            rs1 = entry_finish(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	    } /* end while */
 	    {
-	        rs1 = vecitem_finish(vep) ;
+	        rs1 = vecitem_finish(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (netfile_close) */
+} /* end subroutine (netfile_close) */
 
-int netfile_get(NF *vep,int i,NF_ENT **epp) noex {
+int netfile_get(NF *op,int i,NF_ENT **epp) noex {
 	int		rs = SR_FAULT ;
-	if (vep) {
-	    if (void *vp{} ; (rs = vecitem_get(vep,i,&vp)) >= 0) {
+	if (op) {
+	    if (void *vp{} ; (rs = vecitem_get(op,i,&vp)) >= 0) {
 		if (epp) *epp = entp(vp) ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (netfile_get) */
+} /* end subroutine (netfile_get) */
 
-int netfile_fetch(NF *vep,cchar *mp,int ml,NF_ENT **epp) noex {
+int netfile_fetch(NF *op,cchar *mp,int ml,NF_ENT **epp) noex {
 	int		rs = SR_FAULT ;
-	if (vep && mp) {
+	if (op && mp) {
 	    void	*vp{} ;
-	    for (int i = 0 ; (rs = vecitem_get(vep,i,&vp)) >= 0 ; i += 1) {
-		NF_ENT	*ep = entp(vp) ;
-		if (vp) {
-		    if (ep->machine && (strwcmp(ep->machine,mp,ml) == 0)) {
+	    for (int i = 0 ; (rs = vecitem_get(op,i,&vp)) >= 0 ; i += 1) {
+		if (NF_ENT *ep = entp(vp) ; ep) {
+		    cchar *mach = ep->machine ;
+		    if (mach && (strwcmp(mach,mp,ml) == 0)) {
 		        if (epp) *epp = entp(vp) ;
 			break ;
 		    }
-		}
+		} /* end if (resumelife) */
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (netfile_fetch) */
+} /* end subroutine (netfile_fetch) */
 
 
 /* private subroutines */
 
-static int netfile_parse(NF *vep,netstate *nsp,cchar *netfname) noex {
+local int netfile_parse(NF *op,netstate *nsp,cchar *netfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
+	if (char *lbuf{} ; (rs = mem.ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    if (bfile nf ; (rs = bopen(&nf,netfname,"r",0)) >= 0) {
 	        while ((rs = breadln(&nf,lbuf,llen)) > 0) {
 		    cchar	*cp{} ;
 		    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
-			rs = netfile_parseln(vep,nsp,cp,cl) ;
+			rs = netfile_parseln(op,nsp,cp,cl) ;
 			c += rs ;
 		    }
 		    if (rs < 0) break ;
 	        } /* end while (reading lines) */
 	        if (rs >= 0) {
-	            if ((rs = netfile_item(vep,nsp,-1,nullptr,0)) >= 0) {
-	                rs = vecitem_count(vep) ;
+	            if ((rs = netfile_item(op,nsp,-1,nullptr,0)) >= 0) {
+	                rs = vecitem_count(op) ;
 		    }
-	        }
+	        } /* end if (ok) */
 	        rs1 = bclose(&nf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (bfile) */
-	    rs = rsfree(rs,lbuf) ;
+	    rs1 = mem.free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (netfile_parse) */
+} /* end subroutine (netfile_parse) */
 
-static int netfile_parseln(NF *vep,netstate *nsp,cchar *lp,int ll) noex {
+local int netfile_parseln(NF *op,netstate *nsp,cchar *lp,int ll) noex {
 	cint		klen = KEYBUFLEN ;
     	int		rs ;
 	int		rs1 ;
@@ -305,13 +335,12 @@ static int netfile_parseln(NF *vep,netstate *nsp,cchar *lp,int ll) noex {
 	char		kbuf[KEYBUFLEN+1] ;
 	bool		f_macdef = false ;
         if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
-            cchar   *ft = fterms ;
             cchar   *fp ;
             bool    f_default = false ;
-            for (int fl ; (fl = fsb.get(ft,&fp)) > 0 ; ) {
+            for (int fl ; (fl = fsb.get(ft.terms,&fp)) > 0 ; ) {
                 cint        ml = min(klen,fl) ;
                 strwcpylc(kbuf,fp,ml) ;
-                if (int nki ; (nki = matpstr(netkeys,2,kbuf,ml)) >= 0) {
+                if (int nki ; (nki = matpstr(netnames,2,kbuf,ml)) >= 0) {
                     int     cl = 0 ;
                     cchar   *cp = nullptr ;
                     switch (nki) {
@@ -321,7 +350,7 @@ static int netfile_parseln(NF *vep,netstate *nsp,cchar *lp,int ll) noex {
                     case netkey_password:
                     case netkey_account:
                         if (fsb.term == '#') break ;
-                        if ((cl = fsb.get(ft,&fp)) >= 0) {
+                        if ((cl = fsb.get(ft.terms,&fp)) >= 0) {
                             cp = fp ;
                         }
                         break ;
@@ -338,7 +367,7 @@ static int netfile_parseln(NF *vep,netstate *nsp,cchar *lp,int ll) noex {
                         f = f && (! f_macdef) ;
                         f = f && (! f_default) ;
                         if (f) {
-                            rs = netfile_item(vep,nsp,nki,cp,cl) ;
+                            rs = netfile_item(op,nsp,nki,cp,cl) ;
 			    c += rs ;
                         }
                     } /* end if (had value) */
@@ -351,71 +380,69 @@ static int netfile_parseln(NF *vep,netstate *nsp,cchar *lp,int ll) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (field) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (netfile_parseln) */
+} /* end subroutine (netfile_parseln) */
 
-static int netfile_item(NF *vep,netstate *nsp,int nki,cc *sp,int sl) noex {
+local int netfile_item(NF *op,netstate *nsp,int nki,cc *sp,int sl) noex {
 	cint		nii = getnii(nki) ;
 	int		rs = SR_OK ;
 	if ((nii == netitem_machine) || (nii < 0)) {
 	    if ((rs = netstate_ready(nsp)) > 0) {
 		if (NF_ENT e ; (rs = entry_start(&e,nsp)) >= 0) {
 		    cint	esz = szof(NF_ENT) ;
-	            if ((rs = vecitem_add(vep,&e,esz)) >= 0) {
+	            if ((rs = vecitem_add(op,&e,esz)) >= 0) {
 	                cint	ei = rs ;
 	                rs = netstate_reset(nsp) ;
 	                if (rs < 0) {
-	                    vecitem_del(vep,ei) ;
-			}
+	                    vecitem_del(op,ei) ;
+			} /* end if (error) */
 	            } /* end if (vecitem_add) */
 	            if (rs < 0) {
 	                entry_finish(&e) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (entry_start) */
 	    } /* end if (netstate_ready) */
 	} /* end if */
 	if ((rs >= 0) && (nii >= 0) && sp) {
 	    rs = netstate_item(nsp,nii,sp,sl) ;
-	}
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (netfile_item) */
+} /* end subroutine (netfile_item) */
 
-static int netstate_start(netstate *nsp) noex {
+local int netstate_start(netstate *nsp) noex {
 	int		rs = SR_FAULT ;
 	if (nsp) {
 	   rs = memclear(nsp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (netstate_start) */
+} /* end subroutine (netstate_start) */
 
-static int netstate_reset(netstate *nsp) noex {
+local int netstate_reset(netstate *nsp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	for (int i = 0 ; i < netitem_overlast ; i += 1) {
 	    if (nsp->item[i] != nullptr) {
-	        rs1 = uc_free(nsp->item[i]) ;
+	        voidp vp = voidp(nsp->item[i]) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        nsp->item[i] = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end for */
 	nsp->c = 0 ;
 	return rs ;
-}
-/* end subroutine (netstate_reset) */
+} /* end subroutine (netstate_reset) */
 
-static int netstate_item(netstate *nsp,int ki,cchar *sp,int sl) noex {
+local int netstate_item(netstate *nsp,int ki,cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
 	if ((ki >= 0) && (ki < netitem_overlast)) {
 	    rs = SR_OK ;
 	    if (sp) {
 	        if (nsp->item[ki] != nullptr) {
-	            rs = uc_free(nsp->item[ki]) ;
+	            voidp vp = voidp(nsp->item[ki]) ;
+	            rs = mem.free(vp) ;
 	            nsp->item[ki] = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 		if (rs >= 0) {
-	            if (cchar *cp{} ; (rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = mem.strw(sp,sl,&cp)) >= 0) {
 	                nsp->item[ki] = cp ;
 	                nsp->c += 1 ;
 	            } /* end if (memory-acquire) */
@@ -423,10 +450,9 @@ static int netstate_item(netstate *nsp,int ki,cchar *sp,int sl) noex {
 	    } /* end if (non-null) */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (netstate_item) */
+} /* end subroutine (netstate_item) */
 
-static int netstate_ready(netstate *nsp) noex {
+local int netstate_ready(netstate *nsp) noex {
     	int		rs = SR_BUGCHECK ;
     	int		f = false ;
 	if (nsp) {
@@ -438,25 +464,24 @@ static int netstate_ready(netstate *nsp) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (netstate_ready) */
+} /* end subroutine (netstate_ready) */
 
-static int netstate_finish(netstate *nsp) noex {
+local int netstate_finish(netstate *nsp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	for (int i = 0 ; i < netitem_overlast ; i += 1) {
 	    if (nsp->item[i] != nullptr) {
-	        rs1 = uc_free(nsp->item[i]) ;
+	        voidp vp = voidp(nsp->item[i]) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        nsp->item[i] = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end for */
 	nsp->c = 0 ;
 	return rs ;
-}
-/* end subroutine (netstate_finish) */
+} /* end subroutine (netstate_finish) */
 
-static int entry_start(NF_ENT *ep,netstate *nsp) noex {
+local int entry_start(NF_ENT *ep,netstate *nsp) noex {
     	int		rs = SR_BUGCHECK ;
 	if (ep && nsp) {
 	    rs = memclear(ep) ;
@@ -479,40 +504,42 @@ static int entry_start(NF_ENT *ep,netstate *nsp) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
-static int entry_finish(NF_ENT *ep) noex {
+local int entry_finish(NF_ENT *ep) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	if (ep) {
 	    rs = SR_OK ;
 	    if (ep->machine) {
-	        rs1 = uc_free(ep->machine) ;
+	        voidp vp = voidp(ep->machine) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->machine = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (ep->login) {
-	        rs1 = uc_free(ep->login) ;
+	        voidp vp = voidp(ep->login) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->login = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (ep->password) {
-	        rs1 = uc_free(ep->password) ;
+	        voidp vp = voidp(ep->password) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->password = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (ep->account) {
-	        rs1 = uc_free(ep->account) ;
+	        voidp vp = voidp(ep->account) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->account = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
-static int getnii(int nki) noex {
+local int getnii(int nki) noex {
 	int		nii = -1 ;
 	switch (nki) {
 	case netkey_machine:
@@ -530,7 +557,6 @@ static int getnii(int nki) noex {
 	    break ;
 	} /* end switch */
 	return nii ;
-}
-/* end subroutine (getnii) */
+} /* end subroutine (getnii) */
 
 
