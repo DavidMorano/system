@@ -24,6 +24,10 @@
 
 /*******************************************************************************
 
+  	Group:
+	librandom
+
+	Description:
 	This is a knock-off of the UNIX® System |librandom(3)|
 	library RNG.  I support the same "types" as it did ; namely
 	five in all with type zero being the old Linear-Congruent
@@ -32,12 +36,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<randlc.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |INT_MAX| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<randlc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"librandom.h"
 
@@ -88,7 +92,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local variables */
 
-constexpr uint randtbl[] = {
+constexpr uint		randtbl[] = {
 	0x991539b1, 0x16a5bce3, 0x6774a4cd, 0x3e01511e, 
 	0x4e508aaa, 0x61048c05, 0xf5500617, 0x846b7115, 
 	0x6a19892c, 0x896a97af, 0xdb48f936, 0x14898454,
@@ -97,15 +101,15 @@ constexpr uint randtbl[] = {
 	0xc3db71be, 0x39b44e1c, 0xf8a44ef9, 0x4c8b80b1,
 	0x19edc328, 0x87bf4bdd, 0xc9b240e5, 0xe9ee4b1b, 
 	0x4382aee7, 0x535b6b41, 0xf3bec5da, 0
-} ;
+} ; /* end array */
 
 constexpr int degrees[LIBRANDOM_NTYPES] = {
 	DEG_0, DEG_1, DEG_2, DEG_3, DEG_4 
-} ;
+} ; /* end array */
 
 constexpr int seps[LIBRANDOM_NTYPES] = {
 	SEP_0, SEP_1, SEP_2, SEP_3, SEP_4 
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -115,7 +119,7 @@ constexpr int seps[LIBRANDOM_NTYPES] = {
 
 int librandom_start(librandom *rp,int type,uint seed) noex {
 	int		rs = SR_FAULT ;
-	if (rp) {
+	if (rp) ylikely {
 	    rs = SR_NOTSUP ;
 	    if (type < LIBRANDOM_NTYPES) {
 	        ulong	hi, lo ;
@@ -151,30 +155,28 @@ int librandom_start(librandom *rp,int type,uint seed) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (librandom_start) */
+} /* end subroutine (librandom_start) */
 
 int librandom_finish(librandom *rp) noex {
 	int		rs = SR_FAULT ;
-	if (rp) {
+	if (rp) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (librandom_finish) */
+} /* end subroutine (librandom_finish) */
 
 int librandom_getuint(librandom *rp,uint *uip) noex {
 	int		rs = SR_FAULT ;
-	if (rp && uip) {
-	    uint	rv ;
+	if (rp && uip) ylikely {
+	    uint	riv ;
 	    rs = SR_OK ;
 	    if (rp->rand_type == TYPE_0) {
-	        rv = rp->state[0] ;
-	        rv = uint(randlc(rv)) ;
-	        rp->state[0] = rv ;
+	        riv = uintconv(rp->state[0]) ;
+	        riv = uint(randlc(riv)) ;
+	        rp->state[0] = riv ;
 	    } else {
 	        *rp->fptr += *rp->rptr ;
-	        rv = uint(*rp->fptr) ;
+	        riv = uint(*rp->fptr) ;
 	        if (++rp->fptr >= rp->end_ptr) {
 	            rp->fptr = rp->state ;
 	            rp->rptr += 1 ;
@@ -182,24 +184,23 @@ int librandom_getuint(librandom *rp,uint *uip) noex {
 	            rp->rptr = rp->state ;
 	        }
 	    } /* end if */
-	    *uip = rv ;
+	    *uip = riv ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (librandom_getuint) */
+} /* end subroutine (librandom_getuint) */
 
 int librandom_getint(librandom *rp,int *ip) noex {
 	int		rs = SR_FAULT ;
-	if (rp && ip) {
-	    int		rv ;
+	if (rp && ip) ylikely {
+	    int		riv ;
 	    rs = SR_OK ;
 	    if (rp->rand_type == TYPE_0) {
-	        rv = int(rp->state[0]) ;
-	        rv = int(randlc(rv)) ;
-	        rp->state[0] = ulong(rv) ;
+	        riv = int(rp->state[0]) ;
+	        riv = int(randlc(riv)) ;
+	        rp->state[0] = ulong(riv) ;
 	    } else {
 	        *rp->fptr += *rp->rptr ;
-	        rv = int((*rp->fptr >> 1) & INT_MAX) ;
+	        riv = int((*rp->fptr >> 1) & INT_MAX) ;
 	        if (++rp->fptr >= rp->end_ptr) {
 	            rp->fptr = rp->state ;
 	            rp->rptr += 1 ;
@@ -207,15 +208,14 @@ int librandom_getint(librandom *rp,int *ip) noex {
 	            rp->rptr = rp->state ;
 	        }
 	    } /* end if */
-	    *ip = int(rv) ;
+	    *ip = riv ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (librandom_getint) */
+} /* end subroutine (librandom_getint) */
 
 int librandom_getulong(librandom *rp,ulong *ulp) noex {
 	int		rs = SR_FAULT ;
-	if (rp && ulp) {
+	if (rp && ulp) ylikely {
 	    ulong	rv, hi, lo ;
 	    uint	ihi, ilo ;
 	    rs = SR_OK ;
@@ -241,7 +241,6 @@ int librandom_getulong(librandom *rp,ulong *ulp) noex {
 	    *ulp = rv ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (librandom_getulong) */
+} /* end subroutine (librandom_getulong) */
 
 
