@@ -61,27 +61,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<getpwd.h>
-#include	<ids.h>
-#include	<permx.h>
-#include	<strlibval.hh>
-#include	<vecstr.h>
-#include	<mkpath.h>
-#include	<mknpath.h>
-#include	<pathadd.h>
-#include	<strwcpy.h>
-#include	<sfx.h>
-#include	<mkx.h>
-#include	<mkchar.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getpwd.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<mkpath.h>		/* LIBUC */
+#include	<mknpath.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getfiledirs.h"
 
@@ -126,25 +126,26 @@ namespace {
 	    dlp = vp ;
 	} ; /* end ctor */
 	operator int () noex ;
-	int tryabs() noex ;
-	int tryrel() noex ;
-	int checkfile(int) noex ;
-	int trypath() noex ;
-	int checks(cc *,int) noex ;
-	int checker(cc *,int) noex ;
-	int checkname(bool,int) noex ;
+	int tryabs	() noex ;
+	int tryrel	() noex ;
+	int checkfile	(int) noex ;
+	int trypath	() noex ;
+	int checks	(cc *,int) noex ;
+	int checker	(cc *,int) noex ;
+	int checkname	(bool,int) noex ;
     } ; /* end struct (getter) */
 } /* end namespace */
 
 enum nametypes : uchar {
 	nametype_dir,
-	nametype_file
-} ;
+	nametype_file,
+	nametype_overlast
+} ; /* end enum */
 
 
 /* forward references */
 
-static int	getmode(cchar *) noex ;
+local int	getmode(cchar *) noex ;
 
 
 /* local variables */
@@ -170,8 +171,7 @@ int getfiledirs(cc *path,cc *fname,cc *modestr,vecstr *dlp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (getfiledirs) */
+} /* end subroutine (getfiledirs) */
 
 
 /* local subroutines */
@@ -180,11 +180,11 @@ getter::operator int () noex {
     	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (path) {
+	if (path) ylikely {
     	    rs = SR_INVALID ;
-	    if (path[0]) {
-                if ((rs = id.load) >= 0) {
-                    if ((rs = lm_mp(&pbuf)) >= 0) {
+	    if (path[0]) ylikely {
+                if ((rs = id.load) >= 0) ylikely {
+                    if ((rs = lm_mp(&pbuf)) >= 0) ylikely {
                         plen = rs ;
 		        if (fname[0] == '/') {
 		            rs = tryabs() ;
@@ -207,32 +207,29 @@ getter::operator int () noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
     	return (rs >= 0) ? c : rs ;
-}
-/* end method (getter::operator) */
+} /* end method (getter::operator) */
 
 int getter::tryabs() noex {
     	int		rs ;
 	int		c = 0 ;
-	if ((rs = mknpath(pbuf,plen,fname)) >= 0) {
+	if ((rs = mknpath(pbuf,plen,fname)) >= 0) ylikely {
 	    rs = checkfile(rs) ;
 	    c = rs ;
 	} /* end if (mknpath) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (getter::tryabs) */
+} /* end method (getter::tryabs) */
 
 int getter::tryrel() noex {
     	int		rs ;
 	int		c = 0 ;
-	if ((rs = getpwd(pbuf,plen)) >= 0) {
-	    if ((rs = pathnadd(pbuf,plen,rs,fname)) >= 0) {
+	if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
+	    if ((rs = pathnadd(pbuf,plen,rs,fname)) >= 0) ylikely {
 		rs = checkfile(rs) ;
 		c = rs ;
 	    } /* end if (pathnadd) */
 	} /* end if (getpwd) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (getter::tryrel) */
+} /* end method (getter::tryrel) */
 
 int getter::checkfile(int pl) noex {
     	int		rs ;
@@ -246,8 +243,7 @@ int getter::checkfile(int pl) noex {
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (getter::checkfile) */
+} /* end method (getter::checkfile) */
 
 int getter::trypath() noex {
 	sif		po(path,-1,":;") ;
@@ -260,8 +256,7 @@ int getter::trypath() noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (getter::trypath) */
+} /* end method (getter::trypath) */
 
 int getter::checks(cc *dp,int dl) noex {
     	int		rs ;
@@ -271,15 +266,14 @@ int getter::checks(cc *dp,int dl) noex {
 	    rs = dlp->adduniq(pbuf,dlen) ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (getter::checks) */
+} /* end method (getter::checks) */
 
 int getter::checker(cc *dp,int dl) noex {
     	int		rs = SR_OK ;
 	int		c = 0 ; /* return-value */
 	bool		ty{} ; /* used-multiple */
 	if (dl > 0) {
-	    if ((rs = mknpathw(pbuf,plen,dp,dl)) >= 0) {
+	    if ((rs = mknpathw(pbuf,plen,dp,dl)) >= 0) ylikely {
 		cint	dm = (R_OK|X_OK) ;
 		dlen = rs ;
 		ty = nametype_dir ;
@@ -293,7 +287,7 @@ int getter::checker(cc *dp,int dl) noex {
 	    }
 	} else if (! fpwd) {
 	    dlen = 0 ;
-	    if ((rs = mknpath(pbuf,plen,fname)) >= 0) {
+	    if ((rs = mknpath(pbuf,plen,fname)) >= 0) ylikely {
 	        ty = nametype_file ;
 	        if ((rs = checkname(ty,am)) > 0) {
 	            c = rs ;
@@ -304,8 +298,7 @@ int getter::checker(cc *dp,int dl) noex {
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (getter::checker) */
+} /* end method (getter::checker) */
 
 int getter::checkname(bool fdir,int um) noex {
     	int		rs ;
@@ -323,13 +316,12 @@ int getter::checkname(bool fdir,int um) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (getter::checkname) */
+} /* end method (getter::checkname) */
 
-static int getmode(cchar *modestr) noex {
+local int getmode(cchar *modestr) noex {
 	int		am = (R_OK|X_OK) ;
-	if (modestr) {
-	    if (modestr[0]) {
+	if (modestr) ylikely {
+	    if (modestr[0]) ylikely {
 	        cchar	*cp = modestr ;
 	        am = 0 ;
 	        for (int kch ; (kch = mkchar(*cp++)) != 0 ; ) {
@@ -348,11 +340,10 @@ static int getmode(cchar *modestr) noex {
 	    } /* end if (not-empty) */
 	} /* end if (non-null) */
 	return am ;
-}
-/* end subroutine (getmode) */
+} /* end subroutine (getmode) */
 
 local cchar *getdefpath() noex {
     	return defpath ;
-}
+} /* end subroutine */
 
 
