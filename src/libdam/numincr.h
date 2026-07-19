@@ -20,11 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 /* object defines */
@@ -37,26 +34,26 @@
 struct numincr_flags {
 	uint		uc:1 ;		/* upper case */
 	uint		alpha:1 ;	/* alpha numbers */
-} ;
+} ; /* end struct */
 
 struct numincr_head {
 	NUMINCR_FL	fl ;
 	int		v ;		/* value */
 	int		b ;		/* base (not used?) */
 	int		prec ;		/* precision */
-} ;
+} ; /* end struct */
 
 typedef	NUMINCR		numincr ;
 typedef	NUMINCR_FL	numincr_fl ;
 
 EXTERNC_begin
 
-extern int numincr_start(numincr *,cchar *,int) noex ;
-extern int numincr_load(numincr *,cchar *,int) noex ;
-extern int numincr_setprec(numincr *,int) noex ;
-extern int numincr_incr(numincr *,int) noex ;
-extern int numincr_cvtstr(numincr *,char *,int,int) noex ;
-extern int numincr_finish(numincr *) noex ;
+extern int numincr_start	(numincr *,cchar *,int) noex ;
+extern int numincr_load		(numincr *,cchar *,int) noex ;
+extern int numincr_setprec	(numincr *,int) noex ;
+extern int numincr_incr		(numincr *,int) noex ;
+extern int numincr_cvtstr	(numincr *,char *,int,int) noex ;
+extern int numincr_finish	(numincr *) noex ;
 
 EXTERNC_end
 
