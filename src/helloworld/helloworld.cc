@@ -28,7 +28,7 @@
 *****************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #undef	CF_SFIO
 #if	defined(SFIO) || (defined(KSHBUILTIN) && (KSHBUILTIN > 0))
@@ -49,7 +49,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctype.h>
-#include	<time.h>
+#include	<ctime>
 #include	<pwd.h>
 
 #include	<usystem.h>
