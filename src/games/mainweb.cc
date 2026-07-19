@@ -12,7 +12,7 @@
 /* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<new>
 #include	<initializer_list>
 #include	<utility>
