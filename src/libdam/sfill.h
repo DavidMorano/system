@@ -20,9 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<fifostr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<fifostr.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBB */
 
 
 #define	SFILL		struct sfill_head
@@ -33,17 +34,17 @@ struct sfill_head {
 	fifostr		*fsp ;
 	int		clen ;
 	int		indent ;
-} ;
+} ; /* end struct */
 
 typedef SFILL		sfill ;
 
 EXTERNC_begin
 
-extern int	sfill_start(sfill *,int,bfile *) noex ;
-extern int	sfill_remaining(sfill *) noex ;
-extern int	sfill_proc(sfill *,int,cchar *,int) noex ;
-extern int	sfill_wline(sfill *,int) noex ;
-extern int	sfill_finish(sfill *) noex ;
+extern int	sfill_start	(sfill *,int,bfile *) noex ;
+extern int	sfill_remaining	(sfill *) noex ;
+extern int	sfill_proc	(sfill *,int,cchar *,int) noex ;
+extern int	sfill_wline	(sfill *,int) noex ;
+extern int	sfill_finish	(sfill *) noex ;
 
 EXTERNC_end
 
