@@ -12,6 +12,13 @@
 #define	ISMATSTAR_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+
+
 EXTERNC_begin
 
 extern bool	ismatstar(cchar *,cchar *) noex ;
