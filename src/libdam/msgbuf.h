@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	MSGBUF		struct msgbuf_head
@@ -41,11 +41,11 @@ typedef	MSGBUF		msgbuf ;
 
 EXTERNC_begin
 
-extern int	msgbuf_start(msgbuf *,int,int,int) noex ;
-extern int	msgbuf_read(msgbuf *,cchar **) noex ;
-extern int	msgbuf_adv(msgbuf *,int) noex ;
-extern int	msgbuf_update(msgbuf *,int) noex ;
-extern int	msgbuf_finish(msgbuf *) noex ;
+extern int	msgbuf_start	(msgbuf *,int,int,int) noex ;
+extern int	msgbuf_read	(msgbuf *,cchar **) noex ;
+extern int	msgbuf_adv	(msgbuf *,int) noex ;
+extern int	msgbuf_update	(msgbuf *,int) noex ;
+extern int	msgbuf_finish	(msgbuf *) noex ;
 
 EXTERNC_end
 
