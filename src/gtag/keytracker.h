@@ -41,7 +41,7 @@
 
 
 struct keytracker_head {
-	BITS		dones ;
+	bits		dones ;
 	const char	*(*keyvals)[2] ;
 	int		n ;
 } ;
