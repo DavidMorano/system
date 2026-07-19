@@ -82,20 +82,20 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<initializer_list>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<functional>
-#include	<stack>
-#include	<vector>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<initializer_list>	/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<functional>		/* C++STD */
+#include	<stack>			/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module bstree ;
 
@@ -251,7 +251,7 @@ export {
 	typedef bstree_node<T,Comp>	node ;
 	bstree_node<T,Comp>	*root = nullptr ;
 	Comp			keycmp ;
-	int			c = 0 ;
+	int			cnt = 0 ;
         bstree_iter<T,Comp> FindNodeByVal(node *n,const T &v) const noex {
 	    bstree_iter<T,Comp>	it ;
 	    if (root != nullptr) {
@@ -269,30 +269,30 @@ export {
 	    } /* end if non-null root) */
 	    return it ;
         } ;
-	void ReplaceUsInParent(node *np,node *c) noex {
-	    node 	*p = np->parent ;
-	    if (p->left == np) {
-		p->left = c ;
+	void ReplaceUsInParent(node *nop,node *oop) noex {
+	    node 	*p = nop->parent ;
+	    if (p->left == nop) {
+		p->left = oop ;
 	    } else {
-		p->right = c ;
+		p->right = oop ;
 	    }
-	    if (c != nullptr) c->parent = p ;
+	    if (oop != nullptr) oop->parent = p ;
 	} ;
-	node *GetChild(node *np) const noex {
-	    return (np->left != nullptr) ? np->left : np->right ;
+	node *GetChild(node *nop) const noex {
+	    return (nop->left != nullptr) ? nop->left : nop->right ;
 	} ;
-	node *FindMinNode(node *np) const noex {
-	    while (np->left != nullptr) {
-		np = np->left ;
+	node *FindMinNode(node *nop) const noex {
+	    while (nop->left != nullptr) {
+		nop = nop->left ;
 	    }
-	    return np ;
+	    return nop ;
 	} ;
 	int delnodes(node *n) noex {
 	    int		i = 0 ;
 	    if (n != nullptr) {
 		i += 1 ;
-	        c += delnodes(n->left) ;
-	        c += delnodes(n->right) ;
+	        cnt += delnodes(n->left) ;
+	        cnt += delnodes(n->right) ;
 		delete n ;
 	    }
 	    return i ;
@@ -347,16 +347,16 @@ public:
 	        while (an != nullptr) {
 		    add(an->val) ;
 	            an = an->next ;
-	        }
+	        } /* end while */
 	    }
 	} ;
 	bstree(bstree<T,Comp> &&al) noex {
 	    if (this != &al) {
 	        if (root != nullptr) clear() ;
 	        root = al.root ;
-	        c = al.c ;
+	        cnt = al.cnt ;
 	        al.root = nullptr ;
-	        al.c = 0 ;
+	        al.cnt = 0 ;
 	    }
 	} ;
 	bstree &operator = (const bstree<T,Comp> &al) noex {
@@ -366,7 +366,7 @@ public:
 	        while (an != nullptr) {
 		    add(an->val) ;
 	            an = an->next ;
-	        }
+	        } /* end while */
 	    }
 	    return (*this) ;
 	} ;
@@ -374,9 +374,9 @@ public:
 	    if (this != &al) {
 	        if (root != nullptr) clear() ;
 	        root = al.root ;
-	        c = al.c ;
+	        cnt = al.cnt ;
 	        al.root = nullptr ;
-	        al.c = 0 ;
+	        al.cnt = 0 ;
 	    }
 	    return (*this) ;
 	} ;
@@ -390,33 +390,33 @@ public:
 	    if (root != nullptr) clear() ;
 	    for (const T &v : il) {
 		add(v) ;
-	    }
+	    } /* end for */
 	    return (*this) ;
 	} ;
 	bstree &operator += (const std::initializer_list<T> &il) noex {
 	    for (const T &v : il) {
 		add(v) ;
-	    }
+	    } /* end for */
 	    return (*this) ;
 	} ;
 	bstree &operator += (const T &v) noex {
 	    add(v) ;
 	    return (*this) ;
 	} ;
-	~bstree() {
+	destruct bstree() {
 	    if (root != nullptr) {
 	        delnodes(root) ;
 	        root = nullptr ;
 	    }
-	    c = 0 ;
+	    cnt = 0 ;
 	} ;
 	int clear() noex {
-	    int		rc = c ;
+	    int		rc = cnt ;
 	    if (root != nullptr) {
 	        delnodes(root) ;
 	        root = nullptr ;
 	    }
-	    c = 0 ;
+	    cnt = 0 ;
 	    return rc ;
 	} ;
 	int add(const T &v) noex {
@@ -428,21 +428,21 @@ public:
 		} else {
 		    root = nn ;
 		}
-	        rc = ++c ;
+	        rc = ++cnt ;
 	    }
 	    return rc ;
 	} ;
 	int add(const std::initializer_list<T> &il) noex {
 	    for (const T &v : il) {
 		add(v) ;
-	    }
-	    return c ;
+	    } /* end for */
+	    return cnt ;
 	} ;
 	int add(const bstree<T,Comp> &other) noex {
-	    for(const T &v : other) {
+	    for (const T &v : other) {
 		add(v) ;
-	    }
-	    return c ;
+	    } /* end for */
+	    return cnt ;
 	} ;
 	int del(iterator &it) noex {
 	    int		rc = -1 ;
@@ -453,10 +453,10 @@ public:
 		r = n->right ;
 		if (l || r) { /* 1 or 2 children */
 		    if (l  && r) { /* two children */
-			node *np = FindMinNode(n->right) ;
-			n->SetVal(np->val) ;
-	    		ReplaceUsInParent(np,np->right) ;
-	    	        delete np ;
+			node *nop = FindMinNode(n->right) ;
+			n->SetVal(nop->val) ;
+	    		ReplaceUsInParent(nop,nop->right) ;
+	    	        delete nop ;
 		    } else { /* one child */
 			node	*child = GetChild(n) ;
 		        if (n->parent != nullptr) {
@@ -478,7 +478,7 @@ public:
 		    }
 		    delete n ;
 		}
-		rc = --c ;
+		rc = --cnt ;
 	    } /* end if (iterator not at end) */
 	    return rc ;
 	} ;
@@ -499,7 +499,7 @@ public:
 	    } else {
 	        *rpp = nullptr ;
 	    }
-	    return c ;
+	    return cnt ;
 	} ;
 	int minval(const T **rpp) const noex {
 	    if (root != nullptr) {
@@ -511,7 +511,7 @@ public:
 	    } else {
 	        *rpp = nullptr ;
 	    }
-	    return c ;
+	    return cnt ;
 	} ;
 	int maxval(const T **rpp) const noex {
 	    if (root != nullptr) {
@@ -523,19 +523,19 @@ public:
 	    } else {
 	        *rpp = nullptr ;
 	    }
-	    return c ;
+	    return cnt ;
 	} ;
 	int count() const noex {
-	    return c ;
+	    return cnt ;
 	} ;
 	int empty() const noex {
-	    return (c == 0) ;
+	    return (cnt == 0) ;
 	} ;
 	operator int() const noex {
-	    return c ;
+	    return cnt ;
 	} ;
 	operator bool() const noex {
-	    return (c != 0) ;
+	    return (cnt != 0) ;
 	} ;
 	int storevec(std::vector<T> &vl) const noex {
 	    int		c = 0 ;
@@ -543,7 +543,7 @@ public:
 	        c = walk(vl,root) ;
 	    }
 	    return c ;
-	} ;
+	} ; /* end method (storevec) */
 	iterator begin() const noex {
 	    iterator 	it ;
 	    if (root != nullptr) {
