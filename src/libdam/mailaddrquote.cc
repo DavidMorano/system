@@ -144,7 +144,7 @@ int mailaddrquote_start(MAQ *op,cc *abuf,int alen,cc **rpp) noex {
 	int		rs ;
 	int		len = 0 ;
 	cchar		*rp = nullptr ;
-	if ((rs = mailaddrquote_ctor(op,abuf)) >= 0) {
+	if ((rs = mailaddrquote_ctor(op,abuf)) >= 0) ylikely {
 	    static cint		rsf = fieldterms(qterms,0,qchars) ;
 	    if (alen < 0) alen = lenstr(abuf) ;
 	    if ((rs = rsf) >= 0) {
@@ -175,7 +175,7 @@ int mailaddrquote_finish(MAQ *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = mailaddrquote_magic(op)) >= 0) {
+	if ((rs = mailaddrquote_magic(op)) >= 0) ylikely {
 	    if (op->bsp && op->fl.qaddr) {
 		bufstr *bsp = op->bsp ;
 	        op->fl.qaddr = false ;
@@ -196,7 +196,7 @@ int mailaddrquote_finish(MAQ *op) noex {
 local int mailaddrquote_quote(MAQ *op,cc *abuf,int alen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (bufstr *bsp = op->bsp ; (rs = bsp->start) >= 0) {
+	if (bufstr *bsp = op->bsp ; (rs = bsp->start) >= 0) ylikely {
 	    op->fl.qaddr = true ;
 	    {
 	        int	al = alen ;
