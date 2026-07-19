@@ -13,12 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecitem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecitem.h>		/* LIBU */
 
 
 #define	NETFILE		vecitem
@@ -30,17 +27,17 @@ struct netfile_entry {
 	cchar		*login ;		/* login name */
 	cchar		*password ;
 	cchar		*account ;		/* account name */
-} ;
+} ; /* end struct */
 
 typedef	NETFILE		netfile ;
 typedef	NETFILE_ENT	netfile_ent ;
 
 EXTERNC_begin
 
-extern int netfile_open(netfile *,cchar *) noex ;
-extern int netfile_get(netfile *,int,netfile_ent **) noex ;
-extern int netfile_fetch(netfile *,cchar *,int,netfile_ent **) noex ;
-extern int netfile_close(netfile *) noex ;
+extern int netfile_open		(netfile *,cchar *) noex ;
+extern int netfile_get		(netfile *,int,netfile_ent **) noex ;
+extern int netfile_fetch	(netfile *,cchar *,int,netfile_ent **) noex ;
+extern int netfile_close	(netfile *) noex ;
 
 EXTERNC_end
 
