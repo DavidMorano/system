@@ -13,13 +13,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 extern cpcchar	outfmts[] ;
 
-enum ofis {
+enum outfmts {
 	outfmt_raw,
 	outfmt_fill,
 	outfmt_bible,
