@@ -5,7 +5,7 @@
 /* convert a long (signed or unsigned) integer to its decimal string */
 /* version %I% last-modified %G% */
 
-#define	CF_XTOSTR	1	/* use |ultostr(3u)| subroutine */
+#define	CF_XTOSTR	1	/* use |xtostr(3u)| subroutine */
 
 /* revision history:
 
@@ -48,11 +48,7 @@
 	integers to printable decimal (base-10 digis) and places
 	the resulting characters in a buffer relative to 'endptr'
 	(a pointer to the end of a char buffer).  The value returned
-	is the address of the first non-zero character.  Short of
-	assembly language magical smart stuff (which I have coded
-	elsewhere), this implementation of decimal conversion should
-	be reasonably fast (or fast enough), despite its simplicity,
-	for our purposes.
+	is the address of the first non-zero character.
 
 	Synopsis:
 	char *convdecs{x}(s{xx} val,char *endptr) noex
@@ -190,23 +186,23 @@ char *convdecsx(ST snum,char *endptr) noex {
 
 /* exported subroutines */
 
-extern char	*convdecsi	(sint sv,	char *endp) noex {
+extern char *convdecsi	(sint sv,	char *endp) noex {
     	return convdecsx<uint>		(sv,endp) ;
 }
-extern char	*convdecsl	(slong sv,	char *endp) noex {
+extern char *convdecsl	(slong sv,	char *endp) noex {
     	return convdecsx<ulong>		(sv,endp) ;
 }
-extern char	*convdecsll	(slonglong sv,	char *endp) noex {
+extern char *convdecsll	(slonglong sv,	char *endp) noex {
     	return convdecsx<ulonglong>	(sv,endp) ;
 }
 
-extern char	*convdecui	(uint uv,	char *endp) noex {
+extern char *convdecui	(uint uv,	char *endp) noex {
     	return convdecux(uv,endp) ;
 }
-extern char	*convdecul	(ulong uv,	char *endp) noex {
+extern char *convdecul	(ulong uv,	char *endp) noex {
     	return convdecux(uv,endp) ;
 }
-extern char	*convdecull	(ulonglong uv,	char *endp) noex {
+extern char *convdecull	(ulonglong uv,	char *endp) noex {
     	return convdecux(uv,endp) ;
 }
 
