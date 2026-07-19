@@ -36,7 +36,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -79,8 +79,6 @@ using namespace	std ;
 
 
 /* external subroutines */
-
-extern "C" cchar	*getourenv(mainv,cchar *) noex ;
 
 
 /* local structures */
