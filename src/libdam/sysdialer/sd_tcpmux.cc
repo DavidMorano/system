@@ -29,7 +29,7 @@
 	tcpmux [[<host>:]<port>] [-f <af>]
 
 	Arguments:
-	+ host		override hostname
+	+ host		hostname
 	+ port		service port
 	+ af		address family
 
@@ -53,6 +53,9 @@
 #include	"sd_tcpmux.h"
 #include	"sd_tcp.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -71,8 +74,6 @@
 #define	SVCNAMELEN	32
 #endif
 
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
-
 #define	NPARG		2	/* number of positional arguments */
 #define	MAXARGINDEX	100
 #define	NARGPRESENT	(MAXARGINDEX/8 + 1)
@@ -87,7 +88,7 @@
 /* local structures */
 
 struct afamily {
-	cchar	*name ;
+	cchar		*name ;
 	int		af ;
 } ; /* end struct */
 
@@ -121,13 +122,13 @@ constexpr afamily	afs[] = {
 
 /* external variables (module information) */
 
-SYSDIALER_INFO	tcpmux = {
+SYSDIALER_INFO	sd_tcpmux = {
 	TCPMUX_MNAME,
 	TCPMUX_VERSION,
 	TCPMUX_INAME,
 	szof(TCPMUX),
 	TCPMUX_MF
-} ;
+} ; /* end if (object) */
 
 
 /* exported subroutines */
