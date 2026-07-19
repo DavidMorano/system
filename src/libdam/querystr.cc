@@ -102,7 +102,7 @@ namespace {
 		lm_free(tbuf) ;
 		tbuf = nullptr ;
 		tlen = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	    op = nullptr ;
 	} ; /* end dtor */
 	int tsize(int nlen) noex {
@@ -111,17 +111,17 @@ namespace {
 	        if (tbuf != nullptr) {
 		    lm_free(tbuf) ;
 		    tbuf = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 		tlen = nlen ;
 		rs = lm_mall((tlen + 1),&tbuf) ;
-	     }
+	     } /* end if (memory-acquire) */
 	     return rs ;
 	} ; /* end if (tsize) */
-	int split(cchar *,int) noex ;
-	int procpair(cchar *,int) noex ;
-	int fixval(char *,int,cchar *,int) noex ;
-	int load() noex ;
-	int store(cchar *,int,cchar *,int) noex ;
+	int split	(cchar *,int) noex ;
+	int procpair	(cchar *,int) noex ;
+	int fixval	(char *,int,cchar *,int) noex ;
+	int load	() noex ;
+	int store	(cchar *,int,cchar *,int) noex ;
     } ; /* end struct (subinfo) */
 } /* end namespace */
 
@@ -133,7 +133,7 @@ local int querystr_ctor(querystr *op,Args ... args) noex {
     	QUERYSTR	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ; /* dangerous */
 	    if ((op->spp = new(nothrow) strpack) != np) {
@@ -145,7 +145,7 @@ local int querystr_ctor(querystr *op,Args ... args) noex {
 
 local int querystr_dtor(querystr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->spp) {
 		delete op->spp ;
@@ -168,10 +168,10 @@ local char	*strwebhex(char *,cchar *,int) noex ;
 
 int querystr_start(querystr *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = querystr_ctor(op,sp)) >= 0) {
+	if ((rs = querystr_ctor(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if ((rs = bufsizeget(bufsize_mn)) >= 0) {
-	        if ((rs = strpack_start(op->spp,rs)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
+	        if ((rs = strpack_start(op->spp,rs)) >= 0) ylikely {
 	            op->open.packer = true ;
 	            if (subinfo si(op) ; (rs = si.split(sp,sl)) >= 0) {
 		        rs = si.load() ;
@@ -192,13 +192,13 @@ int querystr_start(querystr *op,cchar *sp,int sl) noex {
 int querystr_finish(querystr *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->kv) {
 	        rs1 = lm_free(op->kv) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->kv = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->open.packer) {
 	        op->open.packer = false ;
 	        rs1 = strpack_finish(op->spp) ;
@@ -214,7 +214,7 @@ int querystr_finish(querystr *op) noex {
 
 int querystr_count(querystr *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->n ;
 	} /* end if (non-null) */
 	return rs ;
@@ -223,7 +223,7 @@ int querystr_count(querystr *op) noex {
 int querystr_already(querystr *op,cchar *kstr,int klen) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (op && kstr) {
+	if (op && kstr) ylikely {
 	    cint	n = op->n ;
 	    rs = SR_OK ;
 	    if (klen < 0) klen = lenstr(kstr) ;
@@ -237,7 +237,7 @@ int querystr_already(querystr *op,cchar *kstr,int klen) noex {
 
 int querystr_curbegin(querystr *op,cur *curp) noex {
 	int		rs = SR_FAULT ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    curp->i = -1 ;
 	    rs = SR_OK ;
 	} /* end if (non-null) */
@@ -246,7 +246,7 @@ int querystr_curbegin(querystr *op,cur *curp) noex {
 
 int querystr_curend(querystr *op,cur *curp) noex {
 	int		rs = SR_FAULT ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    curp->i = -1 ;
 	    rs = SR_OK ;
 	} /* end if (non-null) */
@@ -257,7 +257,7 @@ int querystr_curend(querystr *op,cur *curp) noex {
 int querystr_fetch(querystr *op,cc *kstr,int klen,cur *curp,cc **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		vl = 0 ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    rs = SR_OK ;
 	    if (klen < 0) klen = lenstr(kstr) ;
 	    if (op->n > 0) {
@@ -291,7 +291,7 @@ int querystr_fetch(querystr *op,cc *kstr,int klen,cur *curp,cc **rpp) noex {
 int querystr_curenum(querystr *op,cur *curp,cc **kpp,cc **vpp) noex {
 	int		rs = SR_FAULT ;
 	int		vl = 0 ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    rs = SR_OK ;
 	    if (op->n > 0) {
 	        cint	i = (curp->i + 1) ;
@@ -315,8 +315,7 @@ int querystr_curenum(querystr *op,cur *curp,cc **kpp,cc **vpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (querystr_curenum) */
+} /* end subroutine (querystr_curenum) */
 
 
 /* private subroutines */
@@ -337,8 +336,7 @@ int subinfo::split(cchar *sp,int sl) noex {
 	    rs = procpair(sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo::split) */
+} /* end subroutine (subinfo::split) */
 
 int subinfo::procpair(cchar *sbuf,int slen) noex {
 	int		rs = SR_OK ;
@@ -373,8 +371,7 @@ int subinfo::procpair(cchar *sbuf,int slen) noex {
 	    } /* end if (key) */
 	} /* end if (sfshrink) */
 	return rs ;
-}
-/* end subroutine (subinfo::procpair) */
+} /* end subroutine (subinfo::procpair) */
 
 int subinfo::fixval(char *rbuf,int rlen,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
@@ -419,8 +416,7 @@ int subinfo::fixval(char *rbuf,int rlen,cchar *vp,int vl) noex {
 	} /* end if (positive) */
 	rbuf[i] = '\0' ;
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (subinfo::fixval) */
+} /* end subroutine (subinfo::fixval) */
 
 int subinfo::store(cchar *kp,int kl,cchar *vp,int vl) noex {
 	strpack		*spp = op->spp ;
@@ -446,8 +442,7 @@ int subinfo::store(cchar *kp,int kl,cchar *vp,int vl) noex {
 	    } /* end if (ok) */
 	} /* end if (strpack_store) */
 	return rs ;
-}
-/* end subroutine (subinfo::store) */
+} /* end subroutine (subinfo::store) */
 
 int subinfo::load() noex {
 	cint		n = intsat(kvs.size()) ;
@@ -464,10 +459,9 @@ int subinfo::load() noex {
 	    }
 	    op->kv[n][0] = nullptr ;
 	    op->kv[n][1] = nullptr ;
-	} /* end if (m-a) */
+	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (subinfo::load) */
+} /* end subroutine (subinfo::load) */
 
 local char *strwebhex(char *rp,cchar *tp,int tl) noex {
 	if ((tl >= 3) && (*tp == '%')) {
