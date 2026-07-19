@@ -42,11 +42,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"satcount.h"
+
 
 /* local defines */
 
@@ -79,7 +84,6 @@ uint satcount(uint v,uint n,int f_up) noex {
 	    r = (v == 0) ? 0 : (v - 1) ;
 	}
 	return r ;
-}
-/* end subroutine (satcount) */
+} /* end subroutine (satcount) */
 
 
