@@ -21,7 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -43,9 +43,10 @@
 #include	<iostream>
 #include	<ostream>
 #include	<iomanip>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<ctdec.h>
-#include	<getourenv.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 
