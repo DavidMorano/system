@@ -5,21 +5,29 @@
 /* right-shift an integer and return the shifted result */
 /* lang=C++20 (conformance reviewed) */
 
+
+/* revision history:
+
+	= 2020-05-02, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module rshiftx ;
 
 export {
-    template<typename T> static T rshiftx(T v,int n) noex {
+    template<typename T> inline T rshiftx(T v,int n) noex {
 	T res ;
 	if (n >= 0) {
 	    (v >> n) ;
