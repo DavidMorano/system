@@ -42,20 +42,20 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/statvfs.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<fsdir.h>
-#include	<mkpathx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/statvfs.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"statvfsdir.h"
 
@@ -101,8 +101,7 @@ int statvfsdir(cchar *fname,ustatvfs *sbp) noex {
 	    } /* end if (uc_statvfs) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (statvfsdir) */
+} /* end subroutine (statvfsdir) */
 
 
 /* local subroutines */
@@ -135,8 +134,7 @@ local int trydive(cchar *fname,ustatvfs *sbp) noex {
             } /* end if (is-dir) */
         } /* end if (uc_stat) */
 	return rs ;
-}
-/* end subroutine (trydive) */
+} /* end subroutine (trydive) */
 
 local int trytouch(cchar *fname) noex {
 	int		rs ;
@@ -157,7 +155,6 @@ local int trytouch(cchar *fname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (trytouch) */
+} /* end subroutine (trytouch) */
 
 
