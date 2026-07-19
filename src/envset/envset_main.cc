@@ -81,7 +81,7 @@
 #include	<tmtime.hh>		/* is NOT thread-safe */
 #include	<filereadln.h>
 #include	<sysvar.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<exitcodes.h>
