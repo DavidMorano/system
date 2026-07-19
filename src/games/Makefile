@@ -1,460 +1,287 @@
-# MAKEFILE
+# MAKEFILE (testenv)
 
-T= testcplus
+T= testenv
 
-ALL= $(T)
-
-SRCROOT= $(LOCAL)
+ALL= $(T).x
 
 
-BINDIR= $(SRCROOT)/bin
-INCDIR= $(SRCROOT)/include
-LIBDIR= $(SRCROOT)/lib
-HELPDIR= $(SRCROOT)/share/help
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
-LDCRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-
-
-CC= $(CGS_CC)
-GPP= $(CGS_GPP)
-
-GPPFLAGS= $(CGS_CXXFLAGS)
-CCOPTS_GCCALL= -pthreads -fexceptions 
-CCOPTS_CCALL= -MT
-
-CCOPTS_GCCOPTSGPP= $(CGS_CXXFLAGS)
-CCOPTS_GCCOPTSPARC= -mcpu=ultrasparc
-CCOPTS_GCCLIBSPARC= -mno-app-regs
-
-#CCOPTS= $(CCOPTS_GCCALL) -O $(CCOPTS_GCCOPTSPARC)
-#CCOPTS= $(CCOPTS_GCCALL) -g -O
-#CCOPTS= $(CCOPTS_GCCALL) -g -pg
-#CCOPTS= $(CCOPTS_GCCALL) -g -Wstrict-aliasing
-CCOPTS= $(CCOPTS_GCCALL) -g -Wall
-
-CCOPTS_GCCLIB= -fpic $(CCOPTS_GCCLIBSPARC)
-
-#CCOPTS= $(CCOPTS_CCALL) -g -xs
-
-# HyperSPARC
-#CCOPTS= -xO5 -xtarget=ss20/hs22 -dalign -xdepend
-
-# UltraSPARC
-#CCOPTS= -xO5 -xtarget=ultra -xsafe=mem -dalign -xdepend
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
-DEF0=
-DEF1=
-DEF2=
-DEF3=
-DEF4=
-DEF5=
-DEF6=
-DEF7= $(LF_DEFS)
+DEFS +=
 
-DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
+INCS +=
+
+MODS +=
+
+LIBS += -luo -lf -lu
 
 
-INCDIRS= -I$(INCDIR)
+DEPS_MAIN += 
+DEPS_MAIN +=
+DEPS_MAIN += 
 
-CPPFLAGS= $(DEFS) $(INCDIRS)
+OBJ0= testenv_main.o
+OBJ1= strkeycmp.o matkeystr.o
+OBJ2=
+OBJ3= 
+OBJ4=
+OBJ5=
+OBJ6=
+OBJ7=
 
-XFLAGS= $(CCOPTS_GCCALL)
-XXFLAGS= $(CCOPTS_GCCOPTSGPP) $(CCOPTS_GCCALL) 
+OBJA= obj0.o obj1.o
+OBJB= obj4.o 
+#OBJB= obj4.o obj5.o obj6.o obj7.o
 
-CFLAGS= $(CCOPTS)
-CXXFLAGS= $(CCOPTS_GCCOPTSGPP) $(CCOPTS) 
-GPPFLAGS= $(CCOPTS_GCCOPTSGPP) $(CCOPTS) 
-
-#LD= $(CC)
-#LD= cc
-LD= ld
-
-
-LDRPATH=
-
-LDFLAGS= -m -R$(LIBDIR):$(CGS_RPATH)
+OBJ= obja.o
 
 
-LIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
+INCDIRS=
+LIBDIRS= -L lib
 
-LIB0=
-LIB1= -ldam -lb
-LIB2= -ldebug
-LIB3= -luc -lu
-LIB4= $(CGS_LIBS)
-LIB5= -lm
-LIB6= -lsecdb -lproject -lpthread -lrt -lxnet -lsocket -lnsl
-LIB7= -ldl -lc
-
-LIBS= $(LIB0) $(LIB1) $(LIB2) $(LIB3) $(LIB4) $(LIB5) $(LIB6) $(LIB7)
-
+RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
-
-TLIBDIRS= -L$(CGS_LIBDIR) -L$(LIBDIR)
-
-TLIB0=
-TLIB1= -ldam -lb
-TLIB2= -ldebug
-TLIB3= -luc -lu
-TLIB4= $(CGS_LIBS)
-TLIB5= -lm
-TLIB6= -lsecdb -lproject -lpthread -lthread -lrt -lxnet -lsocket -lnsl
-TLIB7= -ldl -lc
-
-TLIBS= $(TLIB0) $(TLIB1) $(TLIB2) $(TLIB3) $(TLIB4) $(TLIB5) $(TLIB6) $(TLIB7)
-
-TLIBINFO= $(TLIBDIRS) $(TLIBS)
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS) -g
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
-VALUES= $(VALDIR)/$(CGS_VALUES)
-
-CRT1= $(LDCRTDIR)/crt1.o
-CRTI= $(LDCRTDIR)/crti.o
-CRTBEGIN= $(LDCRTDIR)/crtbegin.o
-MCRT1= $(LDCRTDIR)/mcrt1.o
-GCRT1= $(LDCRTDIR)/gcrt1.o
-CRTEND= $(LDCRTDIR)/crtend.o
-CRTN= $(LDCRTDIR)/crtn.o
-
-CRTFRONT= $(CRT1) $(CRTI) $(VALUES) $(CRTBEGIN)
-CRTBACK= $(CRTEND) $(CRTN)
-
-CRT0= $(CRT1) $(CRTI) $(VALUES)
-CRTC= makedate.o
-
-LINT= lint
-LINTFLAGS= -uxn -Dlint
-
-NM= nm
-NMFLAGS= -xs
-
-CPP= cpp
-
-
-INCS= config.h defs.h
-
-
-OBJ00= main.o
-OBJ01=
-OBJ02=
-OBJ03=
-OBJ04=
-OBJ05=
-OBJ06=
-OBJ07=
-
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
-OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
-
-OBJ= $(OBJA) $(OBJB)
-
-OBJS= $(CRTFRONT) $(OBJ) $(CRTC) $(CRTBACK)
-
-
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).x
 
 all:			$(ALL)
 
-.cc.o:
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-.c.o:
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $<
-
-.c.ln:
-	$(LINT) -c -u $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
-.c.cx:
-	$(CXREF) -C $(CXREFFLAGS) $(CPPFLAGS) $<
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
-.c.cs:
-	$(CXREF) $(CXREFFLAGS) $(CPPFLAGS) -o $(*).cs $<
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
+.c.o:
+	$(COMPILE.c) $<
+
+.cc.o:
+	$(COMPILE.cc) $<
+
+.ccm.o:
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T):			$(T).ee
-	cp -p $(T).ee $(T)
+$(T).x:			obj.o
+	$(CXX) -o $@ $(LDFLAGS) $(RUNINFO) $^ $(LIBINFO)
 
-$(T).x:			$(OBJ) Makefile
-	echo LDCRTDIR=$(LDCRTDIR)
-	makedate -m $(T) > makedate.c
-	$(CC) -c $(CFLAGS) makedate.c
-	$(LD) -o $@ $(LDFLAGS) $(OBJS) $(LIBINFO) > $(T).lm
-
-$(T).$(OFF) $(OFF):	$(T).x
-	cp -p $(T).x $(T).$(OFF)
-
-$(T).nm nm:		$(T).x
+$(T).nm:		$(T).x
 	$(NM) $(NMFLAGS) $(T).x > $(T).nm
 
-strip:			$(T).x
-	strip $(T).x
-	rm -f $(T).$(OFF) $(T)
-
-install:		$(ALL)
-	bsdinstall $(ALL) $(BINDIR)
-
-install-raw:		$(T).x
-	cp -p $(T).x $(T)
-	rm -f $(BINDIR)/$(T).$(OFF)
-	bsdinstall $(T) $(BINDIR)
-
 again:
-	rm -f $(ALL) $(T).x
+	rm -f $(T).x
 
-clean:			again
-	makeclean
+clean:
+	makeclean $(ALL)
 
 control:
-	uname -n > Control
-	date >> Control
+	(uname -n ; date) > Control
 
 
-main.o:			main.cc $(INCS)
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main.cc
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-whatinfo.o:		whatinfo.c config.h
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-dijkstra1.o:		dijkstra1.cc dijkstra1.hh
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) dijkstra1.cc
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-dijkstra2.o:		dijkstra2.cc dijkstra2.hh
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) dijkstra2.cc
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-bellmanford1.o:		bellmanford1.cc bellmanford1.hh
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) bellmanford1.cc
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-bellmanford2.o:		bellmanford2.cc bellmanford2.hh
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) bellmanford2.cc
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-# testing
 
-T01= testsethand
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-T01OBJa= $(T01).o
-T01OBJb=
-T01OBJc=
-T01OBJd=
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-T01OBJ= $(T01OBJa) $(T01OBJb) $(T01OBJc) $(T01OBJd)
 
-T02OBJS= $(CRTFRONT) $(T01OBJ) $(CRTBACK)
+obj.o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-$(T01).x:		Makefile $(T01OBJ)
-	$(GPP) -o $@ $(T01OBJS) $(TLIBINFO)
 
-$(T01).o:		testsethand.cc sethand.h
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) testsethand.cc
+testenv_main.o:		testenv_main.cc $(DEPS_MAIN)	$(INCS)
 
+# USTREAM
+ustream.o:		ustream.dir
+ustream.dir:
+	makesubdir $@
 
-T02= testsetint
+# STRN
+strn.o:			strn.dir
+strn.dir:
+	makesubdir $@
 
-T02OBJa= $(T02).o
-T02OBJb=
-T02OBJc=
-T02OBJd=
+# SFX
+sfx.o:			sfx.dir
+sfx.dir:
+	makesubdir $@
 
-T02OBJ= $(T02OBJa) $(T02OBJb) $(T02OBJc) $(T02OBJd)
+# SIX
+games.o:			games.dir
+games.dir:
+	makesubdir $@
 
-T02OBJS= $(CRTFRONT) $(T02OBJ) $(CRTBACK)
+# RMX
+rmx.o:			rmx.dir
+rmx.dir:
+	makesubdir $@
 
-$(T02).x:		Makefile $(T02OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T02OBJS) $(TLIBINFO) > $(T02).lm
+# HASX
+hasx.o:			hasx.dir
+hasx.dir:
+	makesubdir $@
 
-$(T02).o:		testsetint.cc setint.h
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) testsetint.cc
+# ISX
+isx.o:			isx.dir
+isx.dir:
+	makesubdir $@
 
+# BUFOS
+bufos.o:		bufos.dir
+bufos.dir:
+	makesubdir $@
 
-T03= testop
+# STRCPTX
+strcpyx.o:		strcpyx.dir
+strcpyx.dir:
+	makesubdir $@
 
-T03OBJa= $(T03).o
-T03OBJb=
-T03OBJc=
-T03OBJd=
+# STRWCPY
+strwcpy.o:		strwcpy.dir
+strwcpy.dir:
+	makesubdir $@
 
-T03OBJ= $(T03OBJa) $(T03OBJb) $(T03OBJc) $(T03OBJd)
+# STRW
+strw.o:			strw.dir
+strw.dir:
+	makesubdir $@
 
-T03OBJS= $(CRTFRONT) $(T03OBJ) $(CRTBACK)
+# STRX
+strx.o:			strx.dir
+strx.dir:
+	makesubdir $@
 
-$(T03).x:		Makefile $(T03OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T03OBJS) $(TLIBINFO) > $(T03).lm
+# NLEADX
+nleadx.o:		nleadx.dir
+nleadx.dir:
+	makesubdir $@
 
-$(T03).o:		$(T03).cc setint.h
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) $(T03).cc
+# MATXSTR
+matxstr.o:		matxstr.dir
+matxstr.dir:
+	makesubdir $@
 
+# STRNXCMP
+strnxcmp.o:		strnxcmp.dir
+strnxcmp.dir:
+	makesubdir $@
 
-T04= choose
+# STRXCMP
+strxcmp.o:		strxcmp.dir
+strxcmp.dir:
+	makesubdir $@
 
-T04OBJa= main$(T04).o permutations.o combinations.o
-T04OBJb=
-T04OBJc=
-T04OBJd=
+# VARITHMETIC
+varithmetic.o:		varithmetic.dir
+varithmetic.dir:
+	makesubdir $@
 
-T04OBJ= $(T04OBJa) $(T04OBJb) $(T04OBJc) $(T04OBJd)
+# DIGTAB
+digtab.o:		digtab.dir
+digtab.dir:
+	makesubdir $@
 
-T04OBJS= $(CRTFRONT) $(T04OBJ) $(CRTBACK)
 
-$(T04).x:		Makefile $(T04OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T04OBJS) $(TLIBINFO) > $(T04).lm
+char.o:			char.cc		char.h
+inetconv.o:		inetconv.cc	inetconv.h
+base64.o:		base64.cc	base64.h
+base128.o:		base128.cc	base128.h
+dictdiff.o:		dictdiff.cc	dictdiff.h
 
-main$(T04).o:		main$(T04).cc
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T04).cc
+ccfile.o:		ccfile.cc	ccfile.hh
+readln.o:		readln.cc	readln.hh
 
+ureade.o:		ureade.cc	ureade.h
+ucinetconv.o:		ucinetconv.cc	ucinetconv.h
 
-T05= graph
+timeval.o:		timeval.cc	timeval.hh
 
-T05OBJa= main$(T05).o 
-T05OBJb= dijkstra1.o dijkstra2.o 
-T05OBJc= bellmanford1.o bellmanford2.o
-T05OBJd=
+# TESTINT
+testint.o:		testint.ccm	intext.o varithmetic.o loadvals.o
 
-T05OBJ= $(T05OBJa) $(T05OBJb) $(T05OBJc) $(T05OBJd)
+# INTX
+intext.o:		intext.ccm	loadvals.o
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-T05OBJS= $(CRTFRONT) $(T05OBJ) $(CRTBACK)
+graph.o:		graph.ccm	graph.hh
 
-$(T05).x:		Makefile $(T05OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T05OBJS) $(TLIBINFO) > $(T05).lm
+arithsteps.o:		arithsteps.ccm
 
-main$(T05).o:		main$(T05).cc
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T05).cc
+loadvals.o:		loadvals.ccm
 
+xxtostr.o:		xxtostr.cc	xxtostr.h
 
-T06= trailing
-
-T06OBJa= main$(T06).o
-T06OBJb=
-T06OBJc=
-T06OBJd=
-
-T06OBJ= $(T06OBJa) $(T06OBJb) $(T06OBJc) $(T06OBJd)
-
-T06OBJS= $(CRTFRONT) $(T06OBJ) $(CRTBACK)
-
-$(T06).x:		Makefile $(T06OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T06OBJS) $(TLIBINFO) > $(T06).lm
-
-main$(T06).o:		main$(T06).cc
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T06).cc
-
-
-T07= web
-
-T07OBJa= main$(T07).o
-T07OBJb=
-T07OBJc=
-T07OBJd=
-
-T07OBJ= $(T07OBJa) $(T07OBJb) $(T07OBJc) $(T07OBJd)
-
-T07OBJS= $(CRTFRONT) $(T07OBJ) $(CRTBACK)
-
-$(T07).x:		Makefile $(T07OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T07OBJS) $(TLIBINFO) > $(T07).lm
-
-main$(T07).o:		main$(T07).cc
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T07).cc
-
-
-T08= bal
-
-T08OBJa= main$(T08).o
-T08OBJb=
-T08OBJc=
-T08OBJd=
-
-T08OBJ= $(T08OBJa) $(T08OBJb) $(T08OBJc) $(T08OBJd)
-
-T08OBJS= $(CRTFRONT) $(T08OBJ) $(CRTBACK)
-
-$(T08).x:		Makefile $(T08OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T08OBJS) $(TLIBINFO) > $(T08).lm
-
-main$(T08).o:		main$(T08).cc
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T08).cc
-
-
-T09= strs
-
-T09OBJa= main$(T09).o
-T09OBJb=
-T09OBJc=
-T09OBJd=
-
-T09OBJ= $(T09OBJa) $(T09OBJb) $(T09OBJc) $(T09OBJd)
-
-T09OBJS= $(CRTFRONT) $(T09OBJ) $(CRTBACK)
-
-$(T09).x:		Makefile $(T09OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T09OBJS) $(TLIBINFO) > $(T09).lm
-
-main$(T09).o:		main$(T09).cc
-	$(GPP) -c $(CXXFLAGS) $(CPPFLAGS) main$(T09).cc
-
-
-T10= minsquares
-
-T10OBJa= main$(T10).o
-T10OBJb= igcd.o
-T10OBJc=
-T10OBJd=
-
-T10OBJ= $(T10OBJa) $(T10OBJb) $(T10OBJc) $(T10OBJd)
-
-T10OBJS= $(CRTFRONT) $(T10OBJ) $(CRTBACK)
-
-$(T10).x:		Makefile $(T10OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T10OBJS) $(TLIBINFO) > $(T10).lm
-
-main$(T10).o:		main$(T10).cc
-	$(GPP) -c $(XXFLAGS) $(CPPFLAGS) main$(T10).cc
-
-
-T11= anas
-
-T11OBJa= main$(T11).o
-T11OBJb=
-T11OBJc=
-T11OBJd=
-
-T11OBJ= $(T11OBJa) $(T11OBJb) $(T11OBJc) $(T11OBJd)
-
-T11OBJS= $(CRTFRONT) $(T11OBJ) $(CRTBACK)
-
-$(T11).x:		Makefile $(T11OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T11OBJS) $(TLIBINFO) > $(T11).lm
-
-main$(T11).o:		main$(T11).cc
-	$(GPP) -c $(XXFLAGS) $(CPPFLAGS) main$(T11).cc
-
-
-T12= cir
-
-T12OBJa= main$(T12).o
-T12OBJb=
-T12OBJc=
-T12OBJd=
-
-T12OBJ= $(T12OBJa) $(T12OBJb) $(T12OBJc) $(T12OBJd)
-
-T12OBJS= $(CRTFRONT) $(T12OBJ) $(CRTBACK)
-
-$(T12).x:		Makefile $(T12OBJ) 
-	$(LD) -o $@ $(LDFLAGS) -z defs $(T12OBJS) $(TLIBINFO) > $(T12).lm
-
-main$(T12).o:		main$(T12).cc
-	$(GPP) -c $(XXFLAGS) $(CPPFLAGS) main$(T12).cc
+strkeycmp.o:		strkeycmp.cc	strkeycmp.h
+matkeystr.o:		matkeystr.cc	matkeystr.h
 
 
