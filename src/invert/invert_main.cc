@@ -1,6 +1,6 @@
 /* invert_main SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* program to invert a line coded file */
 /* version %I% last-modified %G% */
