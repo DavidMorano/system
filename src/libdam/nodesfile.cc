@@ -37,30 +37,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |caddr_t| */
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>			/* |time(2)| */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<memory>		/* |destroy_at(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<estrings.h>
-#include	<sfx.h>
-#include	<hdb.h>
-#include	<linebuffer.h>
-#include	<bfile.h>
-#include	<strwcpy.h>
-#include	<hash.h>		/* |hash_elf(3uc)| */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® |caddr_t| */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSYD |time(2)| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<memory>		/* C++STD |destroy_at(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<linebuffer.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC |hash_elf(3uc)| */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"nodesfile.h"
 
@@ -104,16 +104,16 @@ namespace {
 	ino_t		ino ;
 	time_t		timod ;
 	dev_t		dev ;
-	int start(cc *,dev_t,ino_t,time_t) noex ;
-	int finish() noex ;
-    } ;
+	int start	(cc *,dev_t,ino_t,time_t) noex ;
+	int finish	() noex ;
+    } ; /* end struct */
     struct nodesfile_ent {
     	cchar		*name ;
 	int		fi ;
-	int start(cc *,int,int) noex ;
-	int finish() noex ;
-    } ;
-}
+	int start	(cc *,int,int) noex ;
+	int finish	() noex ;
+    } ; /* end struct */
+} /* end mamespace */
 
 int nodesfile_fi::start(cc *sp,dev_t d,ino_t i,time_t t) noex {
     	int		rs = SR_OK ;
@@ -124,10 +124,10 @@ int nodesfile_fi::start(cc *sp,dev_t d,ino_t i,time_t t) noex {
 	if (sp) ylikely {
 	    if (cchar *cp ; (rs = lm_strw(sp,-1,&cp)) >= 0) {
 	        fname = cp ;
-	    }
-	}
+	    } /* end if (memory-acquire) */
+	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method */
 
 int nodesfile_fi::finish() noex {
     	int		rs = SR_FAULT ;
@@ -140,9 +140,9 @@ int nodesfile_fi::finish() noex {
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    fname = nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method */
 
 int nodesfile_ent::start(cc *sp,int sl,int idx) noex {
     	int		rs = SR_FAULT ;
@@ -150,10 +150,10 @@ int nodesfile_ent::start(cc *sp,int sl,int idx) noex {
 	    fi = idx ;
 	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) ylikely {
 	        name = cp ;
-	    }
-	}
+	    } /* end if (memory-acquire) */
+	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method */
 
 int nodesfile_ent::finish() noex {
     	int		rs = SR_OK ;
@@ -163,9 +163,9 @@ int nodesfile_ent::finish() noex {
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    name = nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method */
 
 
 /* forward references */
@@ -184,12 +184,11 @@ local inline int nodesfile_ctor(nodesfile *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->flp ;
 		    op->flp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (nodesfile_ctor) */
+} /* end subroutine (nodesfile_ctor) */
 
 local int nodesfile_dtor(nodesfile *op) noex {
 	int		rs = SR_FAULT ;
@@ -205,8 +204,7 @@ local int nodesfile_dtor(nodesfile *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (nodesfile_dtor) */
+} /* end subroutine (nodesfile_dtor) */
 
 template<typename ... Args>
 local inline int nodesfile_magic(nodesfile *op,Args ... args) noex {
@@ -215,8 +213,7 @@ local inline int nodesfile_magic(nodesfile *op,Args ... args) noex {
 	    rs = (op->magval == NODESFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (nodesfile_magic) */
+} /* end subroutine (nodesfile_magic) */
 
 local int	nodesfile_fnparse(NF *,cchar *) noex ;
 local int	nodesfile_fnparseln(NF *,int,cchar *,int) noex ;
@@ -269,20 +266,19 @@ int nodesfile_open(NF *op,cchar *fname,int maxsz) noex {
 			if (rs < 0) {
 			    nlp->finish() ;
 			    op->magval = 0 ;
-			}
+			} /* end if (error) */
 	            } /* end if (hdb_start) */
 		    if (rs < 0) {
 			flp->finish() ;
-		    }
+		    } /* end if (error) */
 		} /* end if (vechand_start) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		nodesfile_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (nodesfile_ctor) */
 	return rs ;
-}
-/* end subroutine (nodesfile_open) */
+} /* end subroutine (nodesfile_open) */
 
 int nodesfile_close(NF *op) noex {
 	int		rs = SR_FAULT ;
@@ -308,8 +304,7 @@ int nodesfile_close(NF *op) noex {
 	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (nodesfile_close) */
+} /* end subroutine (nodesfile_close) */
 
 local int nodesfile_fins(NF *op) noex {
     	int		rs = SR_OK ;
@@ -323,8 +318,7 @@ local int nodesfile_fins(NF *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (nodesfile_fins) */
+} /* end subroutine (nodesfile_fins) */
 
 local int nodesfile_finents(NF *op) noex {
     	hdb		*elp = op->elp ;
@@ -355,8 +349,7 @@ local int nodesfile_finents(NF *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hdb-cur) */
 	return rs ;
-}
-/* end subroutine (nodesfile_finents) */
+} /* end subroutine (nodesfile_finents) */
 
 local int nodesfile_finfis(NF *op) noex {
     	vechand		*flp = op->flp ;
@@ -366,8 +359,7 @@ local int nodesfile_finfis(NF *op) noex {
 	int		rs2 ;
 	void *vp ;
 	for (int i = 0 ; (rs2 = flp->get(i,&vp)) >= 0 ; i += 1) {
-	    if (vp) {
-	        NF_FI	*fep = resumelife<NF_FI>(vp) ;
+	    if (NF_FI	*fep = resumelife<NF_FI>(vp) ; fep) {
 		{
 		    rs1 = fep->finish() ;
 		    if (rs >= 0) rs = rs1 ;
@@ -381,8 +373,7 @@ local int nodesfile_finfis(NF *op) noex {
 	} /* end for */
 	if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	return rs ;
-}
-/* end subroutine (nodesfile_finfis) */
+} /* end subroutine (nodesfile_finfis) */
 
 int nodesfile_add(NF *op,cchar *fn) noex {
     	int		rs ;
@@ -393,8 +384,7 @@ int nodesfile_add(NF *op,cchar *fn) noex {
 	    }
 	} /* end if (magic) */
     	return rs ;
-}
-/* end subroutine (nodesfile_add) */
+} /* end subroutine (nodesfile_add) */
 
 int nodesfile_check(NF *op,time_t dt) noex {
 	int		rs ;
@@ -406,8 +396,7 @@ int nodesfile_check(NF *op,time_t dt) noex {
 	    } /* end if (timeout) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (nodesfile_check) */
+} /* end subroutine (nodesfile_check) */
 
 int nodesfile_have(NF *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -428,8 +417,7 @@ int nodesfile_have(NF *op,cchar *sp,int sl) noex {
 	    } /* end if (ent-) */
 	} /* end if (magic) */
 	return (rs >= 0) ? fal : rs ;
-}
-/* end subroutine (nodesfile_have) */
+} /* end subroutine (nodesfile_have) */
 
 int nodesfile_curbegin(NF *op,NF_CUR *curp) noex {
     	cnullptr	np{} ;
@@ -453,8 +441,7 @@ int nodesfile_curbegin(NF *op,NF_CUR *curp) noex {
 	    } /* end if (m-a) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodesfile_curbegin) */
+} /* end subroutine (nodesfile_curbegin) */
 
 int nodesfile_curend(NF *op,NF_CUR *curp) noex {
 	int		rs ;
@@ -471,12 +458,11 @@ int nodesfile_curend(NF *op,NF_CUR *curp) noex {
 		    rs1 = lm_free(vp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    curp->hcp = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	    } /* end if (non-null cursor) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodesfile_curend) */
+} /* end subroutine (nodesfile_curend) */
 
 int nodesfile_curenum(NF *op,NF_CUR *curp,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -494,8 +480,7 @@ int nodesfile_curenum(NF *op,NF_CUR *curp,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (nodesfile_curenum) */
+} /* end subroutine (nodesfile_curenum) */
 
 
 /* private subroutines */
