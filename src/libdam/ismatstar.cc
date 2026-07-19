@@ -43,17 +43,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |str{x}(3c)| |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* C++STD |str{x}(3c)| |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ismatstar.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -85,21 +88,20 @@
 /* exported subroutines */
 
 bool ismatstar(cchar *se,cchar *s) noex {
-	bool		f ;
-	if (cchar *tp ; (tp = strchr(se,'*')) != nullptr) {
+	bool		f = false ; /* return-value */
+	if (cchar *tp = strchr(se,'*') ; tp) {
 	    f = false ;
 	    if (int sl ; strncmp(s,se,(tp - se)) == 0) {
 	        cint	sl1 = lenstr(s) ;
 	        cint	sl2 = lenstr(se) ;
 	        tp += 1 ;
-	        sl = (se + sl2) - tp ;
+	        sl = intconv((se + sl2) - tp) ;
 	        f = (strncmp((s + sl1 - sl),tp,sl) == 0) ;
 	    } /* end if */
 	} else {
 	    f = (strcmp(se,s) == 0) ;
 	}
 	return f ;
-}
-/* end subroutine (ismatstar) */
+} /* end subroutine (ismatstar) */
 
 
