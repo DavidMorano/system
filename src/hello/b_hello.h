@@ -1,4 +1,9 @@
-/* config */
+/* b_hello HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* Korn-Shell built-in |hello| */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,7 +14,6 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
-
 
 #define	VERSION		"0"
 #define	WHATINFO	"@(#)HELLO"
