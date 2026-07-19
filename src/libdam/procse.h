@@ -13,13 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<varsub.h>
-#include	<expcook.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<varsub.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
 
 
 #define	PROCSE		struct procse_head
@@ -39,7 +36,7 @@ struct procse_arguments {
 } ; /* end struct */
 
 struct procse_head {
-	cchar		**envv ;
+	mainv		envv ;
 	varsub		*vsp ;
 	PROCSE_ARGS	*ap ;
 	PROCSE_ARGS	a ;
@@ -50,7 +47,7 @@ typedef	PROCSE_ARGS	procse_args ;
 
 EXTERNC_begin
 
-extern int procse_start(procse *,cchar **,varsub *,procse_args *) noex ;
+extern int procse_start(procse *,con mainv,varsub *,procse_args *) noex ;
 extern int procse_process(procse *,expcook *) noex ;
 extern int procse_finish(procse *) noex ;
 
