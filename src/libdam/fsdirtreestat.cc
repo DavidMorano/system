@@ -40,11 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibsubs.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBU */
+#include	<ucfileop.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fsdirtreestat.h"
 
@@ -74,9 +78,9 @@
 
 int fsdirtreestat(cchar *fname,int type,ustat *sbp) noex {
 	int		rs = SR_FAULT ;
-	if (fname && sbp) {
+	if (fname && sbp) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        if (type == 0) {
 	            rs = uc_stat(fname,sbp) ;
 	        } else {
@@ -85,7 +89,6 @@ int fsdirtreestat(cchar *fname,int type,ustat *sbp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fsdirtreestat) */
+} /* end subroutine (fsdirtreestat) */
 
 
