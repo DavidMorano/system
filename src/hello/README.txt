@@ -1,9 +1,9 @@
-HELLOWORLD
+HELLO
 
-This is similar to 'print(1ksh)', but much simpler.
+This is a simple test of a KornShell built-in command.
 
 Synopsis:
-$ helloworld {<text>] [-V]
+$ hello {<text>] [-V]
 
 Arguments:
 <text>		optional text to print out
