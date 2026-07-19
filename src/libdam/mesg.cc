@@ -37,8 +37,9 @@
  	int mesg(int flag) noex
 
 	Arguments:
-	!= 0	allow messages
-	0	forbid messages
+	flag	switch:
+			!= 0	allow messages
+			0	forbid messages
 
 	Returns:
 	1  	if messages were previously ON
@@ -48,15 +49,17 @@
 ****************************************************************************/
 
 #include	<envstandards.h>	/* must be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mesg.h"
 
@@ -65,6 +68,8 @@
 
 
 /* local namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -92,8 +97,9 @@
 
 int mesg(int flag) noex {
 	int		rs ;
+	int		rs1 ;
 	int		rc = 0 ; /* return-value */
-	if (char *tbuf ; (rs = malloc_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = libmem.mp(&tbuf)) >= 0) {
 	    cint	tlen = rs ;
 	    for (int i = 0 ; i < 3 ; i += 1) {
 	        rs = ttyname_r(i,tbuf,tlen) ;
@@ -110,16 +116,16 @@ int mesg(int flag) noex {
 	                }
 	            } else {
 	                if (rc) {
-	                    fm &= (~ S_IWGRP) ;
+	                    fm &= (compl S_IWGRP) ;
 	                    rs = u_chmod(tbuf,fm) ;
 	                }
 	            } /* end if */
 	        } /* end if (u_stat) */
 	    } /* end if (OK) */
-	    rs = rsfree(rs,tbuf) ;
+	    rs1 = libmem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (mesg) */
+} /* end subroutine (mesg) */
 
 
