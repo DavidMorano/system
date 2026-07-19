@@ -29,37 +29,34 @@
 #define __RIJNDAEL_H
 
 
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 #define	RIJNDAEL	rijndael_ctx
-
 
 #define RIJNDAEL_MAXKC	(256/32)
 #define RIJNDAEL_MAXKB	(256/8)
 #define RIJNDAEL_MAXNR	14
 
-
 #ifndef	TYPEDEF_U8
-#define	TYPEDEF_U8	1
-
+#define	TYPEDEF_U8
 typedef unsigned char	u8 ;
-
 #endif /* TYPEDEF_U8 */
 
 #ifndef	TYPEDEF_U16
-#define	TYPEDEF_U16	1
-
+#define	TYPEDEF_U16
 typedef unsigned short	u16 ;
-
 #endif
 
 #ifndef	TYPEDEF_U32
-#define	TYPEDEF_U32	1
-
+#define	TYPEDEF_U32
 typedef unsigned int	u32 ;
-
 #endif
 
 
@@ -71,20 +68,13 @@ typedef struct {
 	u32	dk[4*(RIJNDAEL_MAXNR + 1)] ;	/* decrypt key schedule */
 } rijndael_ctx ;
 
+EXTERNC_begin
 
+extern int	rijndael_set_key(rijndael_ctx *, u_char *, int, int) noex ;
+extern int	rijndael_decrypt(rijndael_ctx *, u_char *, u_char *) noex ;
+extern int	rijndael_encrypt(rijndael_ctx *, u_char *, u_char *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int	rijndael_set_key(rijndael_ctx *, u_char *, int, int) ;
-extern int	rijndael_decrypt(rijndael_ctx *, u_char *, u_char *) ;
-extern int	rijndael_encrypt(rijndael_ctx *, u_char *, u_char *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
+EXTERNC_end
 
 
 #endif /* __RIJNDAEL_H */
