@@ -78,13 +78,13 @@ template<typename ... Args>
 local int clientinfo_ctor(clientinfo *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    clientinfo_head	*hop = cast_static<clientinfo_head *>(op) ;
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->sap = new(nothrow) sockaddress) != np) {
-	        if ((op->nlp = new(nothrow) vecstr) != np) {
-	            if ((op->slp = new(nothrow) vecstr) != np) {
+	    if ((op->sap = new(nothrow) sockaddress) != np) ylikely {
+	        if ((op->nlp = new(nothrow) vecstr) != np) ylikely {
+	            if ((op->slp = new(nothrow) vecstr) != np) ylikely {
 			rs = SR_OK ;
 	            } /* end if (new-vecstr) */
 		    if (rs < 0) {
@@ -103,7 +103,7 @@ local int clientinfo_ctor(clientinfo *op,Args ... args) noex {
 
 local int clientinfo_dtor(clientinfo *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->slp) {
 		delete op->slp ;
@@ -134,7 +134,7 @@ local int	clientinfo_load(clientinfo *,cchar *,vecstr *) noex ;
 
 int clientinfo_start(clientinfo *cip) noex {
 	int		rs ;
-	if ((rs = clientinfo_ctor(cip)) >= 0) {
+	if ((rs = clientinfo_ctor(cip)) >= 0) ylikely {
 	    cip->nnames = -1 ;
 	    cip->fd_input = -1 ;
 	    cip->fd_output = -1 ;
@@ -149,7 +149,7 @@ int clientinfo_start(clientinfo *cip) noex {
 int clientinfo_finish(clientinfo *cip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (cip) {
+	if (cip) ylikely {
 	    rs = SR_OK ;
 	    if (cip->fd_input >= 0) {
 	        rs1 = u_close(cip->fd_input) ;
@@ -180,9 +180,9 @@ int clientinfo_finish(clientinfo *cip) noex {
 
 int clientinfo_loadnames(clientinfo *cip,cchar *dname) noex {
 	int		rs = SR_FAULT ;
-	if (cip && dname) {
+	if (cip && dname) ylikely {
 	    rs = SR_INVALID ;
-	    if (dname[0]) {
+	    if (dname[0]) ylikely {
 	        rs = SR_OK ;
 	        if (cip->nnames < 0) {
 	            cint	vo = vecstrm.compact ;
@@ -191,7 +191,7 @@ int clientinfo_loadnames(clientinfo *cip,cchar *dname) noex {
 	        }
 	        if (rs >= 0) {
 	            rs = clientinfo_load(cip,dname,cip->nlp) ;
-	        }
+	        } /* end if (ok) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -204,11 +204,11 @@ local int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (cip && nlp) {
-	    if (char *hnbuf ; (rs = mem.hostname(&hnbuf)) >= 0) {
+	if (cip && nlp) ylikely {
+	    if (char *hnbuf ; (rs = mem.hostname(&hnbuf)) >= 0) ylikely {
 		cint		hnlen = rs ;
 	        connection	conn, *cnp = &conn ;
-	        if ((rs = connection_start(cnp,dname)) >= 0) {
+	        if ((rs = connection_start(cnp,dname)) >= 0) ylikely {
 	            if (cip->salen > 0) {
 	                sockaddress	*sap = cip->sap ;
 	                int		sal = cip->salen ;
@@ -217,18 +217,18 @@ local int clientinfo_load(clientinfo *cip,cchar *dname,vecstr *nlp) noex {
 	                cint		ifd = cip->fd_input ;
 	                rs1 = connection_sockremname(cnp,hnbuf,hnlen,ifd) ;
 	            }
-	            if (rs1 >= 0) {
+	            if (rs1 >= 0) ylikely {
 	                rs1 = connection_mknames(&conn,nlp) ;
 	                if (rs1 >= 0) {
 		            c += rs1 ;
 		        }
-	            }
-	            if (rs1 >= 0) {
+	            } /* end if (ok) */
+	            if (rs1 >= 0) ylikely {
 	                rs1 = vecstr_adduniq(nlp,hnbuf,-1) ;
 	                if ((rs1 >= 0) && (rs1 < INT_MAX)) {
 		            c += 1 ;
 		        }
-	            } /* end if */
+	            } /* end if (ok) */
 	            rs1 = connection_finish(&conn) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (connection_start) */
