@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<inttypes.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<inttypes.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
