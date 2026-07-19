@@ -5,7 +5,7 @@
 /* quick-select function */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -39,13 +39,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"quickselect.h"
+
+
+/* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
 
 
 /* external subroutines */
@@ -65,6 +72,8 @@ extern "C" {
 
 
 /* local variables */
+
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -108,7 +117,6 @@ void quickselect(int *a,int low,int n,int k) noex {
 	    }
 
 	} /* end if (needed) */
-}
-/* end subroutine (quickselect) */
+} /* end subroutine (quickselect) */
 
 
