@@ -464,7 +464,7 @@ local int holidayer_curenums(HO *op,HO_CUR *curp,HO_CITE *qp,
 	                if ((rs = holidays_curbegin(holp,hcp)) >= 0) {
 	                    curp->hop = holp ;
 	                    curp->year = my ;
-	                    rs = holidays_enum(holp,hcp,qp,vbuf,vlen) ;
+	                    rs = holidays_curenum(holp,hcp,qp,vbuf,vlen) ;
 	                    vl = rs ;
 	                } /* end if (holidays_curbegin) */
 	            } /* end if (holidayer_yearfind) */
@@ -475,7 +475,7 @@ local int holidayer_curenums(HO *op,HO_CUR *curp,HO_CITE *qp,
 	        if (curp->hop != nullptr) {
 	            holidays		*holp = curp->hop ;
 	            holidays_cur	*hcp = curp->hcurp ;
-	            rs = holidays_enum(holp,hcp,qp,vbuf,vlen) ;
+	            rs = holidays_curenum(holp,hcp,qp,vbuf,vlen) ;
 	            vl = rs ;
 	        } else {
 	            rs = SR_PROTO ;
