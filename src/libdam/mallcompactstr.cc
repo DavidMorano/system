@@ -71,21 +71,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucmem.h>
-#include	<mallocstuff.h>
-#include	<strn.h>
-#include	<ascii.h>		/* |CH_{xx}| */
-#include	<mkchar.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_{xx}| */
+#include	<ucmem.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mallcompactstr.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 
@@ -133,15 +132,14 @@ local int mallcompactstr_reg(cchar *,int,char **) noex ;
 int mallcompactstr(cchar *sp,int sl,char **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
-	if (sp && rpp) {
+	if (sp && rpp) ylikely {
 	    if ((rs = getlen(sp,sl)) >= 0) {
 		rs = mallcompactstr_reg(sp,sl,rpp) ;
 		len = rs ;
 	    }  /* end if (getlen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mallcompactstr) */
+} /* end subroutine (mallcompactstr) */
 
 
 /* local subroutines */
@@ -151,7 +149,7 @@ local int mallcompactstr_reg(cchar *sp,int sl,char **rpp) noex {
     	int		rs = SR_OK ;
 	int		len = 0 ; /* return-value */
         bool    	f_quote = false ;
-        if (char *buf ; (rs = mem.mall(sz,&buf)) >= 0) {
+        if (char *buf ; (rs = mem.mall(sz,&buf)) >= 0) ylikely {
             char        *bp = buf ;
             while (sl > 0) {
                 switch (cint ch = mkchar(*sp) ; ch) {
