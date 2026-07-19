@@ -81,12 +81,12 @@ int getsrcname(char *rbuf,int rlen,int s) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if ((rlen > 0) && (s >= 0)) {
-		if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) {
+	    if ((rlen > 0) && (s >= 0)) ylikely {
+		if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) ylikely {
 		    cint	dlen = rs ;
-	            if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
+	            if ((rs = getinetdomain(dbuf,dlen)) >= 0) ylikely {
 	                if (conn cn ; (rs = connection_start(&cn,dbuf)) >= 0) {
             		    {
 	                        rs = connection_socklocname(&cn,rbuf,rlen,s) ;
