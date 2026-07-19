@@ -11,7 +11,7 @@
 
 /* revision history:
 
-	= 1998-06-01, David A­D­ Morano
+	= 1998-04-13, David A-D- Morano
 	This code was originally written.
 
 */
