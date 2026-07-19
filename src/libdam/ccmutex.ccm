@@ -41,12 +41,15 @@
 module ;
 
 #include	<envstandards.h>	/* must be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<usystem.h>
-#include	<ptm.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"ccmutex.hh"
 
 export module ccmutex ;
 
