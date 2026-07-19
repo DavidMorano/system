@@ -41,49 +41,49 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>		/* |UINT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |environ| */
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdescread.h>
-#include	<ucdescwrite.h>
-#include	<getax.h>
-#include	<getusername.h>
-#include	<getuserhome.h>
-#include	<getxid.h>
-#include	<bufsizeget.h>
-#include	<estrings.h>
-#include	<ids.h>
-#include	<vecstr.h>
-#include	<vechand.h>
-#include	<ptm.h>
-#include	<lockrw.h>
-#include	<paramfile.h>
-#include	<strpack.h>
-#include	<bfile.h>
-#include	<fsdir.h>
-#include	<ascii.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<snx.h>
-#include	<mkx.h>			/* |mkpathuser(3uc)| */
-#include	<strwcpy.h>
-#include	<nleadstr.h>
-#include	<permx.h>
-#include	<writeto.h>
-#include	<matxstr.h>
-#include	<ctdec.h>
-#include	<mkchar.h>
-#include	<hasx.h>
-#include	<isnot.h>
-#include	<localmisc.h>		/* |DECBUFLEN| */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |UINT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |environ| */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdescread.h>		/* LIBUC */
+#include	<ucdescwrite.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getuserhome.h>		/* LIBUC */
+#include	<getxid.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<lockrw.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<strpack.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<ascii.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<mkx.h>			/* LIBUC |mkpathuser(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<writeto.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |DECBUFLEN| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"statmsg.h"
 
