@@ -34,15 +34,12 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<stddef.h>
-#include	<stdlib.h>
-#include	<stdarg.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<bfile.h>
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<stdarg.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 
 #define	OUTLINE		struct outline_head
@@ -51,7 +48,7 @@
 
 struct outline_flags {
 	uint		comma:1 ;
-} ;
+} ; /* end struct */
 
 struct outline_head {
 	bfile		*ofp ;
@@ -62,13 +59,13 @@ struct outline_head {
 	int		wlen ;
 	int		c_values ;
 	int		c_items ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum outlinemems {
 	outlinemem_finish,
 	outlinemem_overlast
-} ;
+} ; /* end enum */
 struct outline ;
 struct outline_co {
 	outline		*op = nullptr ;
@@ -90,13 +87,13 @@ struct outline : outline_head {
 	} ;
 	outline(const outline &) = delete ;
 	outline &operator = (const outline &) = delete ;
-	int start(bfile *,int = 0) noex ;
-	int write(cchar *,int = -1) noex ;
-	int vprintf(cchar *,va_list) noex ;
-	int printf(cchar *,...) noex ;
-	int item(cchar *,int = -1) noex ;
-	int value(cchar *,int = -1) noex ;
-	int needlength(int) noex ;
+	int start	(bfile *,int = 0) noex ;
+	int write	(cchar *,int = -1) noex ;
+	int vprintf	(cchar *,va_list) noex ;
+	int printf	(cchar *,...) noex ;
+	int item	(cchar *,int = -1) noex ;
+	int value	(cchar *,int = -1) noex ;
+	int needlength	(int) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct outline() {
@@ -111,14 +108,14 @@ typedef	OUTLINE_FL	outline_fl ;
 
 EXTERNC_begin
 
-extern int	outline_start(outline *,bfile *,int) noex ;
-extern int	outline_finish(outline *) noex ;
-extern int	outline_write(outline *,cchar *,int) noex ;
-extern int	outline_vprintf(outline *,cchar *,va_list) noex ;
-extern int	outline_printf(outline *,cchar *,...) noex ;
-extern int	outline_item(outline *,cchar *,int) noex ;
-extern int	outline_value(outline *,cchar *,int) noex ;
-extern int	outline_needlength(outline *,int) noex ;
+extern int	outline_start		(outline *,bfile *,int) noex ;
+extern int	outline_finish		(outline *) noex ;
+extern int	outline_write		(outline *,cchar *,int) noex ;
+extern int	outline_vprintf		(outline *,cchar *,va_list) noex ;
+extern int	outline_printf		(outline *,cchar *,...) noex ;
+extern int	outline_item		(outline *,cchar *,int) noex ;
+extern int	outline_value		(outline *,cchar *,int) noex ;
+extern int	outline_needlength	(outline *,int) noex ;
 
 EXTERNC_end
 
