@@ -50,8 +50,8 @@ EXTERNC_begin
 extern int cmbuf_start		(cmbuf *,cchar *,int) noex ;
 extern int cmbuf_added		(cmbuf *,int) noex ;
 extern int cmbuf_getspace	(cmbuf *,cmbuf_sp *) noex ;
-extern int cmbuf_getline	(cmbuf *,int,cchar **) noex ;
-extern int cmbuf_getlastline	(cmbuf *,cchar **) noex ;
+extern int cmbuf_getln		(cmbuf *,int,cchar **) noex ;
+extern int cmbuf_getlastln	(cmbuf *,cchar **) noex ;
 extern int cmbuf_finish		(cmbuf *) noex ;
 
 EXTERNC_end
