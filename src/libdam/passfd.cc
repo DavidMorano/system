@@ -37,14 +37,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"passfd.h"
 
@@ -76,26 +80,25 @@ int passfd(cchar *fname,int fd) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 		rs = SR_BADFD ;
-	        if (fd >= 0) {
+	        if (fd >= 0) ylikely {
 		    cint	of = (O_WRONLY) ;
-		    if ((rs = uc_open(fname,of,0666)) >= 0) {
+		    if ((rs = uc_open(fname,of,0666)) >= 0) ylikely {
 	    	        cint	pfd = rs ;
 			{
 	    	            rs = uc_fpassfd(pfd,fd) ;
 			    rv = rs ;
 			}
-	    	        rs1 = u_close(pfd) ;
+	    	        rs1 = uc_close(pfd) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (open) */
 	        } /* end if (good-FD) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (passfd) */
+} /* end subroutine (passfd) */
 
 
