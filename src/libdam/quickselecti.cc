@@ -5,7 +5,7 @@
 /* this is a Qucik-Selection function */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -44,16 +44,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"quickselecti.h"
 
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
 
 
 /* name-spaces */
@@ -87,9 +91,14 @@ local int	getpivot(cint *,int) noex ;
 local int	partpred1(int,int) noex ;
 local int	partpred2(int,int) noex ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 local int debugprinta(cint *a,int al) noex ;
 #endif
+
+
+/* local variables */
+
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -120,8 +129,7 @@ int quickselecti(int *a,int first,int last,int k) noex {
 	    }
 	} /* end if (in range) */
 	return kv ;
-}
-/* end subroutine (quickselecti) */
+} /* end subroutine (quickselecti) */
 
 
 /* local subroutines */
@@ -132,17 +140,17 @@ local int getpivot(cint *a,int al) noex {
 	    if (al > 1) pvi = 1 ;
 	}
 	return a[pvi] ;
-}
+} /* end subroutine */
 
 local int partpred1(int e,int pv) noex {
 	return (e < pv) ;
-}
+} /* end subroutine */
 
 local int partpred2(int e,int pv) noex {
 	return (e <= pv) ;
-}
+} /* end subroutine */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 local int debugprinta(cint *a,int al) noex {
 	int		i ;
 	for (i = 0 ; i < al ; i += 1) {
@@ -150,8 +158,7 @@ local int debugprinta(cint *a,int al) noex {
 	}
 	debugprintf("\n") ;
 	return 0 ;
-}
-/* end subroutine (debugprinta) */
-#endif /* CF_DEBUGS */
+} /* end subroutine (debugprinta) */
+#endif /* CF_DEBUG */
 
 
