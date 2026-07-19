@@ -22,21 +22,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<new>
-#include	<initializer_list>
-#include	<utility>
-#include	<functional>
-#include	<algorithm>
-#include	<set>
-#include	<vector>
-#include	<list>
-#include	<stack>
-#include	<deque>
-#include	<string>
-#include	<iostream>
-#include	<iomanip>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<initializer_list>	/* C++STD */
+#include	<utility>		/* C++STD */
+#include	<functional>		/* C++STD */
+#include	<algorithm>		/* C++STD */
+#include	<set>			/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<list>			/* C++STD */
+#include	<stack>			/* C++STD */
+#include	<deque>			/* C++STD */
+#include	<string>		/* C++STD */
+#include	<iostream>		/* C++STD */
+#include	<iomanip>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -60,7 +63,7 @@ struct StrRecurse {
 	    return (*this) ;
 	} ;
 	bool mkstr(set<string> &,string &,int,int,int) ;
-} ;
+} ; /* end struct */
 
 bool StrRecurse::mkstr(res_t &res,string &s,int c,int i,int w) noex {
 	bool		f = false ;
@@ -234,7 +237,7 @@ struct bal2_item {
 static void bal2_push(stack<bal2_item> &s,int c,int i,int w) noex {
    bal2_item	wi(c,i,w) ;
    s.push(wi) ;
-}
+} /* end subroutine */
 
 static res_t bal2(cint N) noex {
   res_t		res ;
