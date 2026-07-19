@@ -26,20 +26,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<cfdec.h>
-#include	<cfa26.h>
-#include	<ctdec.h>
-#include	<ctdecp.h>
-#include	<cta26.h>
-#include	<ischarx.h>		/* |isupperlatin(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<cfdec.h>		/* LIBUC */
+#include	<cfa26.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<ctdecp.h>		/* LIBUC */
+#include	<cta26.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC |isupperlatin(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"numincr.h"
 
-import libutil ;
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -70,19 +73,17 @@ int numincr_start(numincr *op,cchar *sp,int sl) noex {
 	    memclear(op) ;
 	    op->prec = 1 ;
 	    rs = numincr_load(op,sp,sl) ;
-	} /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (numincr_start) */
+} /* end subroutine (numincr_start) */
 
 int numincr_finish(numincr *op) noex {
     	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	} /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (numincr_finish) */
+} /* end subroutine (numincr_finish) */
 
 int numincr_load(numincr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -106,10 +107,9 @@ int numincr_load(numincr *op,cchar *sp,int sl) noex {
 	    } else {
 	        rs = SR_INVALID ;
 	    }
-	} /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (numincr_load) */
+} /* end subroutine (numincr_load) */
 
 int numincr_setprec(numincr *op,int prec) noex {
     	int		rs = SR_FAULT ;
@@ -122,20 +122,18 @@ int numincr_setprec(numincr *op,int prec) noex {
 	    if (prec > op->prec) {
 	        op->prec = prec ;
 	    }
-	} /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (numincr_setprec) */
+} /* end subroutine (numincr_setprec) */
 
 int numincr_incr(numincr *op,int incr) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	    op->v += incr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (numincr_incr) */
+} /* end subroutine (numincr_incr) */
 
 int numincr_cvtstr(numincr *op,char *rbuf,int rlen,int prec) noex {
 	int		rs = SR_FAULT ;
@@ -147,9 +145,8 @@ int numincr_cvtstr(numincr *op,char *rbuf,int rlen,int prec) noex {
 	    } else {
 	        rs = ctdecp(rbuf,rlen,op->prec,op->v) ;
 	    } /* end if */
-	} /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (numincr_cvtstr) */
+} /* end subroutine (numincr_cvtstr) */
 
 
