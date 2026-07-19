@@ -60,6 +60,8 @@ INCF= $(I20) $(I21) $(I22) $(I32)
 #INCS= $(INCA) $(INCB) $(INCC) $(INCD) $(INCE) $(INCF) 
 INCS= libdam.h
 
+MODS += rshiftx.o binchar.o
+
 LIBS += -lb -luc
 
 
@@ -117,8 +119,8 @@ OBJ21= strwcpy.o strwcpyxc.o strwcpyrev.o
 OBJ22= strwcpycompact.o strwcpyopaque.o strwcpyblanks.o strwcpywide.o
 OBJ23= strncpyfc.o strncpyuc.o strncpyfc.o strncpyblanks.o
 
-OBJ24= rexecl.o rcmdu.o
-OBJ25= rex.o rfile.o lockfile.o lockend.o
+OBJ24=
+OBJ25= lockfile.o lockend.o
 OBJ26= timestr_date.o timestr_nist.o timestr_elapsed.o timevalstr_ulog.o 
 OBJ27= timestr_scandate.o 
 OBJ28=
@@ -653,8 +655,8 @@ memfile.o:		memfile.cc memfile.h
 
 baops.o:		baops.cc baops.h
 
-rijndael.o:		rijndael.c rijndael.h
-librandom.o:		librandom.cc librandom.h
+rijndael.o:		rijndael.cc	rijndael.h		$(INCS)
+librandom.o:		librandom.cc	librandom.h		$(INCS)
 
 optval.o:		optval.cc optval.h
 mesg.o:			mesg.cc mesg.h
@@ -666,7 +668,6 @@ hostaddr.o:		hostaddr.cc hostaddr.h
 hostent.o:		hostent.cc hostent.h
 inetaddr.o:		inetaddr.c inetaddr.h
 lfm.o:			lfm.cc lfm.h
-bfliner.o:		bfliner.cc bfliner.h
 codebal.o:		codebal.cc codebal.h
 strpack.o:		strpack.cc strpack.h
 userattr.o:		userattr.c userattr.h
@@ -919,51 +920,64 @@ permutations.o:		permutations.cc		permutations.h		$(INCS)
 combinations.o:		combinations.cc		combinations.h		$(INCS)
 msgsub.o:		msgsub.cc		msgsub.hh		$(INCS)
 termcharsetx.o:		termcharsets.cc		termcharsets.h		$(INCS)
-findinline.o:		findline.cc		findinline.h		$(INCS)
+findinline.o:		findinline.cc		findinline.h		$(INCS)
+havenis.o:		havenis.cc		havenis.h		$(INCS)
+checksecure.o:		checksecure.cc		checksecure.h		$(INCS)
+rijndael.o:		rijndael.cc		rijndael.h		$(INCS)
+readn.o:		readn.cc		readn.h			$(INCS)
+writen.o:		writen.cc		writen.h		$(INCS)
+writeto.o:		writeto.cc		writeto.h		$(INCS)
 
 # DFSA
-dfsa.o:			dfsa0.o dfsa1.o			$(INCS)
+dfsa.o:			dfsa0.o dfsa1.o				$(INCS)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
-dfsa0.o:		dfsa.ccm			$(INCS)
+dfsa0.o:		dfsa.ccm				$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-dfsa1.o:		dfsa1.cc dfsa0.o		$(INCS)
+dfsa1.o:		dfsa1.cc dfsa0.o			$(INCS)
 	$(COMPILE.cc) $<
 
 # DFSB
-dfsb.o:			dfsb0.o dfsb1.o			$(INCS)
+dfsb.o:			dfsb0.o dfsb1.o				$(INCS)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
-dfsb0.o:		dfsb.ccm			$(INCS)
+dfsb0.o:		dfsb.ccm				$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-dfsb1.o:		dfsb1.cc dfsb0.o		$(INCS)
+dfsb1.o:		dfsb1.cc dfsb0.o			$(INCS)
 	$(COMPILE.cc) $<
 
-sort_merge.o:		sort_merge.ccm			$(INCS)
+sort_merge.o:		sort_merge.ccm				$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-sort_insertion.o:	sort_insertion.ccm		$(INCS)
+sort_insertion.o:	sort_insertion.ccm			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # CCMUTEX
-ccmutex.o:		ccmutex.ccm			$(INCS)
+ccmutex.o:		ccmutex.ccm				$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # MINMAXELEM
-minmaxelem.o:		minmaxelem.ccm			$(INCS)
+minmaxelem.o:		minmaxelem.ccm				$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # HASDUPLICATE
-hascount.o:		hascount.ccm			$(INCS)
+hascount.o:		hascount.ccm				$(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
+# RSHIFTX
+rshiftx.o:		rshiftx.ccm rshiftx.hh			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # BINCHAR
-binchar.o:		binchar.ccm			$(INCS)
+binchar.o:		binchar.ccm binchar.hh rshiftx.o	$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-filemagic.o:		filemagic.ccm	filemagic.hh	$(INCS)
+filemagic.o:		filemagic.ccm	filemagic.hh		$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
+ccmutex.o:		ccmutex.ccm	ccmutex.hh		$(INCS)
+progval.o:		progval.cc	progbal.h		$(INCS)
 
 
