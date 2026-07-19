@@ -17,19 +17,24 @@
 
 /*******************************************************************************
 
+  	Gruop:
+	simsg
+
+	Description:
 	This module contains the subroutines to make and parse the
 	SIMSG family of messages.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<serialbuf.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<stdorder.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"simsg.h"
 
@@ -73,8 +78,7 @@ int simsg_sysmiscget(SIMSG_SYSMISCGET *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (simsg_getsysmisc) */
+} /* end subroutine (simsg_getsysmisc) */
 
 int simsg_sysmisc(SIMSG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	msgbuf ;
@@ -115,7 +119,6 @@ int simsg_sysmisc(SIMSG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (simsg_sysmisc) */
+} /* end subroutine (simsg_sysmisc) */
 
 
