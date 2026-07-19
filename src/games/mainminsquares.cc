@@ -22,7 +22,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |INT_MAX| */
 #include	<cstdlib>		/* |EXIT_SUCCESS| */
 #include	<cstring>
@@ -59,8 +59,6 @@ using namespace	std ;
 /* external subroutines */
 
 extern "C" int		igcd(int,int) noex ;
-
-extern "C" cchar	*getourenv(cchar **,cchar *) noex ;
 
 
 /* local structures */
