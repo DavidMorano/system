@@ -27,13 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<sfx.h>
-#include	<strn.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"siletter.h"
 
@@ -75,7 +76,7 @@ int siletter(siletter_res *lsp,cchar *sp,int sl) noex {
 	if (lsp && sp) {
 	    rs = memclear(hop) ;
 	    if (sl > 0) {
-	        if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != nullptr) {
+	        if (cchar *tp = strnchr(sp,sl,'.') ; tp) {
 	            cchar	*cp{} ;
 		    cint	tl = intconv(tp - cp) ;
 	            if (int cl ; (cl = sfshrink(sp,tl,&cp)) > 0) {
@@ -89,7 +90,6 @@ int siletter(siletter_res *lsp,cchar *sp,int sl) noex {
 	    } /* end if (positive) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (siletter) */
+} /* end subroutine (siletter) */
 
 
