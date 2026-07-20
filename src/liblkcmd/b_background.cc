@@ -1,13 +1,13 @@
-/* main */
+/* b_background SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* update the machine status for the current machine */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_CPUSPEED	1		/* calculate CPU speed */
-
 
 /* revision history:
 
@@ -18,26 +18,29 @@
 	I enhanced the program a little to to do something (I forget what).
 
 	= 2004-01-10, David A­D­ Morano
-        The KSH program switched to using a fakey "large file" (64-bit fake-out
-        mode) compilation mode on Solaris. This required some checking to see if
-        any references to 'u_stat()' had to be updated to work with the new KSH.
-        Although we call 'u_stat()' here, its structure is not passed to other
-        subroutines expecting the regular 32-bit structure.
+	The KSH program switched to using a fakey "large file"
+	(64-bit fake-out mode) compilation mode on Solaris. This
+	required some checking to see if any references to 'u_stat()'
+	had to be updated to work with the new KSH.  Although we
+	call 'u_stat()' here, its structure is not passed to other
+	subroutines expecting the regular 32-bit structure.
 
 	= 2005-04-20, David A­D­ Morano
-        I changed the program so that the configuration file is consulted even
-        if the program is not run in daemon-mode. Previously, the configuration
-        file was only consulted when run in daemon-mode. The thinking was that
-        running the program in regular (non-daemon) mode should be quick. The
-        problem is that the MS file had to be guessed without the aid of
-        consulting the configuration file. Although not a problem in most
-        practice, it was not aesthetically appealing. It meant that if the
-        administrator changed the MS file in the configuration file, it also had
-        to be changed by specifying it explicitly at invocation in
-        non-daemon-mode of the program. This is the source of some confusion
-        (which the world really doesn't need). So now the configuration is
-        always consulted. The single one-time invocation is still fast enough
-        for the non-smoker aged under 40! :-) :-)
+	I changed the program so that the configuration file is
+	consulted even if the program is not run in daemon-mode.
+	Previously, the configuration file was only consulted when
+	run in daemon-mode. The thinking was that running the program
+	in regular (non-daemon) mode should be quick. The problem
+	is that the MS file had to be guessed without the aid of
+	consulting the configuration file. Although not a problem
+	in most practice, it was not aesthetically appealing. It
+	meant that if the administrator changed the MS file in the
+	configuration file, it also had to be changed by specifying
+	it explicitly at invocation in non-daemon-mode of the
+	program. This is the source of some confusion (which the
+	world really doesn't need). So now the configuration is
+	always consulted. The single one-time invocation is still
+	fast enough for the non-smoker aged under 40! :-) :-)
 
 */
 
@@ -45,18 +48,19 @@
 
 /*******************************************************************************
 
-        This is a built-in command to the KSH shell. It should also be able to
-        be made into a stand-alone program without much (if almost any)
-        difficulty, but I have not done that yet (we already have a MSU program
-        out there).
+	This is a built-in command to the KSH shell. It should also
+	be able to be made into a stand-alone program without much
+	(if almost any) difficulty, but I have not done that yet
+	(we already have a MSU program out there).
 
-        Note that special care needed to be taken with the child processes
-        because we cannot let them ever return normally! They cannot return
-        since they would be returning to a KSH program that thinks it is alive
-        (!) and that geneally causes some sort of problem or another. That is
-        just some weird thing asking for trouble. So we have to take care to
-        force child processes to exit explicitly. Child processes are only
-        created when run in "daemon" mode.
+	Note that special care needed to be taken with the child
+	processes because we cannot let them ever return normally!
+	They cannot return since they would be returning to a KSH
+	program that thinks it is alive (!) and that geneally causes
+	some sort of problem or another. That is just some weird
+	thing asking for trouble. So we have to take care to force
+	child processes to exit explicitly. Child processes are
+	only created when run in "daemon" mode.
 
 	Synopsis:
 
@@ -65,17 +69,16 @@
 
 	Implementation note:
 
-        It is difficult to close files when run as a SHELL builtin! We want to
-        close files when we run in the background, but when running as a SHELL
-        builtin, we cannot close file descriptors untill after we fork (else we
-        corrupt the enclosing SHELL). However, we want to keep the files
-        associated with persistent objects open across the fork. This problem is
-        under review. Currently, there is not an adequate self-contained
-        solution.
-
+	It is difficult to close files when run as a SHELL builtin!
+	We want to close files when we run in the background, but
+	when running as a SHELL builtin, we cannot close file
+	descriptors untill after we fork (else we corrupt the
+	enclosing SHELL). However, we want to keep the files
+	associated with persistent objects open across the fork.
+	This problem is under review. Currently, there is not an
+	adequate self-contained solution.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -93,12 +96,13 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
-#include	<time.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 
 #include	<usystem.h>
@@ -142,26 +146,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	getrootdname(char *,int,const char *,const char *) ;
 extern int	batch(struct proginfo *,void *,vecstr *) ;
@@ -169,14 +153,6 @@ extern int	batch(struct proginfo *,void *,vecstr *) ;
 #if	CF_CPUSPEED
 extern int	cpuspeed(const char *,const char *,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_loga(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -321,14 +297,12 @@ static const struct errormap	errormaps[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv)
 	struct proginfo	pi, *pip = &pi ;
 
 	struct sigaction	san ;
@@ -1006,7 +980,7 @@ const char	*envv[] ;
 	if (msfname == NULL) {
 
 	    if ((cp = getenv(VARMSFNAME)) != NULL) {
-		pip->final.msfile = TRUE ;
+		pip->finval.msfile = TRUE ;
 	        msfname = cp ;
 	    }
 
