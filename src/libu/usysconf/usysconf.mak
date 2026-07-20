@@ -49,9 +49,9 @@ OBJPRIME= usysconf0.o
 OBJ0= usysconf1.o
 OBJ1= usysconfcheck.o
 OBJ2= sysconfcmds.o
-OBJ3=
+OBJ3= unprocessors.o
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB=
 
 OBJIMPL= obja.o
@@ -168,5 +168,6 @@ usysconfcheck1.o:	usysconfcheck1.cc usysconfcheck0.o	$(INCS)
 	$(COMPILE.cc) $<
 
 sysconfcmds.o:		sysconfcmds.cc	sysconfcmds.h		$(INCS)
+unprocessors.o:		unprocessors.cc				$(INCS)
 
 
