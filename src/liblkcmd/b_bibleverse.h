@@ -15,7 +15,6 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	BIBLEVERSECONFIG_INCLUDE
 #define	BIBLEVERSECONFIG_INCLUDE
 
