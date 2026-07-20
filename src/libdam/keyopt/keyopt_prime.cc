@@ -60,6 +60,7 @@ import libutil ;			/* |lenstr(3u)| */
 #define	CUR		keyopt_cur
 #define	VAL		keyopt_val
 #define	NAM		keyopt_na
+#define	KO_MAG		KEYOPT_MAGIC
 
 
 /* imported namespaces */
@@ -110,7 +111,7 @@ int keyopt_start(keyopt *op) noex {
 	    op->head = nullptr ;
 	    op->tail = nullptr ;
 	    op->cnt = 0 ;
-	    op->magval = keyopt_MAGIC ;
+	    op->magval = KO_MAG ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -501,7 +502,7 @@ void keyopt::dtor() noex {
 
 keyopt::operator int () noex {
     	int		rs = SR_NOTOPEN ;
-	if (magval == keyopt_MAGIC) {
+	if (magval == KO_MAG) {
 	    rs = cnt ;
 	}
 	return rs ;
