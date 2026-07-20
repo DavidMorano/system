@@ -49,6 +49,7 @@
 #include	<ustd.h>	/* <- converted system calls */
 #include	<uatexit.h>
 #include	<ucomposite.h>
+#include	<uexec.h>
 #include	<ugetloadavg.h>	/* load-average retrieval |u_getloadavg| */
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
@@ -56,10 +57,10 @@
 #include	<ufdlock.h>
 #include	<ufiledesc.h>	/* file-descriptor */
 #include	<ufileop.h>	/* file-operations */
+#include	<upt.h>
 #include	<usig.h>
 #include	<uprocess.h>
 #include	<uatfork.h>
-#include	<uexec.h>
 #include	<ulogerror.h>
 #include	<umem.hh>
 #include	<utimeoutdefs.h>
@@ -71,6 +72,7 @@
 #include	<ucodenames.h>
 #include	<ugetx.h>
 
+#include	<atox.h>
 #include	<varnames.hh>
 #include	<syswords.hh>
 #include	<sysconfcmds.h>
