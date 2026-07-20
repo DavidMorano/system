@@ -1,4 +1,4 @@
-/* b_fieldwords SUPPORT */
+/* b_fieldwords SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -19,6 +19,9 @@
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_fieldwords
 
 	Synopsis:
 	$ fieldwords [<word>,<word>, ...] [-V]
@@ -78,36 +81,8 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfsub(const char *,int,const char *,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strshrink(char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -128,25 +103,25 @@ struct locinfo {
 } ;
 
 struct searchinfo {
-	const char	*searchstr ;
+	cchar	*searchstr ;
 	int		fn ;
 } ;
 
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,
+local int	procargs(PROGINFO *,ARGINFO *,bits *,
 			SEARCHINFO *,cchar *,cchar *,cchar *) ;
-static int	procwords(PROGINFO *,SEARCHINFO *,void *,cchar *) ;
+local int	procwords(PROGINFO *,SEARCHINFO *,void *,cchar *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -221,7 +196,7 @@ int b_fieldwords(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -245,14 +220,14 @@ int p_fieldwords(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	SEARCHINFO	si ;
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -269,16 +244,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*searchstr = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*searchstr = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -588,7 +563,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 				} else
@@ -729,7 +704,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	memset(&si,0,sizeof(SEARCHINFO)) ;
 	si.fn = fn ;
-	si.searchstr = (const char *) searchstr ;
+	si.searchstr = (cchar *) searchstr ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -747,9 +722,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    const char	*ofn = ofname ;
-	    const char	*ifn = ifname ;
-	    const char	*afn = afname ;
+	    cchar	*ofn = ofname ;
+	    cchar	*ifn = ifname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,&si,ofn,ifn,afn) ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
@@ -812,12 +787,12 @@ badprogstart:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<word>,<word>, ...] [-af <afile>] \n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -832,14 +807,14 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(pip,aip,bop,sip,ofn,ifn,afn)
+local int procargs(pip,aip,bop,sip,ofn,ifn,afn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-BITS		*bop ;
+bits		*bop ;
 SEARCHINFO	*sip ;
-const char	*ofn ;
-const char	*ifn ;
-const char	*afn ;
+cchar	*ofn ;
+cchar	*ifn ;
+cchar	*afn ;
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
@@ -935,13 +910,13 @@ const char	*afn ;
 
 
 /* process a file */
-static int procwords(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar *words)
+local int procwords(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar *words)
 {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
-	const char	*tp, *sp ;
-	const char	*cp ;
+	cchar	*tp, *sp ;
+	cchar	*cp ;
 
 	if (words == NULL) return SR_FAULT ;
 
