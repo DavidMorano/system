@@ -527,11 +527,11 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	                if (ew.count == 0) ew.count = 1 ;
 	                if (ew.utime == 0) ew.utime = uint(dt) ;
 	                if (ew.ctime == 0) ew.ctime = uint(dt) ;
-	                if (ew.keyname[0] == '\0') {
-		            strdcpy1w(ew.keyname,TSE_LKEYNAME,nnp,nnl) ;
+	                if (ew.keynam[0] == '\0') {
+		            strdcpy1w(ew.keynam,TSE_LKEYNAME,nnp,nnl) ;
 	                }
 	                if (ew.hash == 0) {
-		            ew.hash = hash_elf(ew.keyname,-1) ;
+		            ew.hash = hash_elf(ew.keynam,-1) ;
 	                }
 	                if ((rs = ew.rd(bp,var.entsz)) >= 0) {
 	                    rs = entbuf_write(op->ebmp,ei,nullptr) ; /* sync */
@@ -546,11 +546,11 @@ int ts_write(ts *op,time_t dt,cchar *nnp,int nnl,ts_ent *ep) noex {
 	                    if (ew.count == 0) ew.count = 1 ;
 	                    if (ew.utime == 0) ew.utime = uint(dt) ;
 	                    if (ew.ctime == 0) ew.ctime = uint(dt) ;
-	                    if (ew.keyname[0] == '\0') {
+	                    if (ew.keynam[0] == '\0') {
 		                rs = ew.loadkey(nnp,nnl) ;
 	                    }
 	                    if (ew.hash == 0) {
-			        ew.hash = hash_elf(ew.keyname,-1) ;
+			        ew.hash = hash_elf(ew.keynam,-1) ;
 			    }
 			    if (rs >= 0) {
 	                        if ((rs = ew.rd(ebuf,var.entsz)) >= 0) {
@@ -651,7 +651,7 @@ local int ts_updater(ts *op,time_t dt,ts_ent *ep,cc *nnp,int nnl) noex {
 	            if (ew.count == 0) ew.count = 1 ;
 	            if (ew.utime == 0) ew.utime = uint(dt) ;
 	            if (ew.ctime == 0) ew.ctime = uint(dt) ;
-	            ew.hash = hash_elf(ew.keyname,-1) ;
+	            ew.hash = hash_elf(ew.keynam,-1) ;
 	            ew.rd(ebuf,var.entsz) ;
 	            ei = op->h.nentries ;
 	            rs = entbuf_write(op->ebmp,ei,ebuf) ;
@@ -698,7 +698,7 @@ local int ts_findname(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	    if ((rs = entbuf_read(op->ebmp,ei,&bp)) > 0) {
 		if (tse ew ; (rs = ew.start) >= 0) {
 		    if ((rs = ew.wr(bp)) >= 0) {
-	                if (! namematch(ew.keyname,nnp,nnl)) {
+	                if (! namematch(ew.keynam,nnp,nnl)) {
 	                    rs = SR_NOTFOUND ;
 	                    mapstrint_delkey(op->nip,nnp,nnl) ;
 	                } /* end if */
@@ -736,7 +736,7 @@ local int ts_search(ts *op,cchar *nnp,int nnl,char **rpp) noex {
 	        if (rs <= 0) break ;
 	        for (i = 0 ; (rs >= 0) && (i < ne) ; i += 1) {
 		    if ((rs = ew.wr(bp)) >= 0) {
-	                f_found = namematch(ew.keyname,nnp,nnl) ;
+	                f_found = namematch(ew.keynam,nnp,nnl) ;
 		    }
 		    if (f_found) break ;
 	        } /* end for (looping through entries) */
@@ -1152,8 +1152,8 @@ local int ts_readentry(ts *op,int ei,char **rpp) noex {
 		if (tse ew ; (rs = ew.start) >= 0) {
 		    if ((rs = ew.wr(bp)) >= 0) {
 		        {
-	                    cchar	*kp = ew.keyname ;
-			    cint	kl = lenstr(ew.keyname) ;
+	                    cchar	*kp = ew.keynam ;
+			    cint	kl = lenstr(ew.keynam) ;
 	                    rs = ts_index(op,kp,kl,ei) ;
 		        }
 		    } /* end if (tse_wr) */
@@ -1224,7 +1224,7 @@ local int tsent_load(tsent *ep,cc *bp,char *rb,int rl) noex {
 		ep->utime = e.utime ;
 		ep->ctime = e.ctime ;
 		if (rb) {
-		    rs = sncpy(rb,rl,e.keyname) ;
+		    rs = sncpy(rb,rl,e.keynam) ;
 		}
 	    }
 	    rs1 = e.finish ;
