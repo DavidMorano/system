@@ -26,8 +26,8 @@
 #include	<sysdialer.h>
 
 
-#define	TCPNLS_MAGIC	31415926
 #define	TCPNLS		struct tcpnls_head
+#define	TCPNLS_MAGIC	31415926
 
 
 struct tcpnls_head {
