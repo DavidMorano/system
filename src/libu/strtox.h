@@ -2,18 +2,18 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* numeric-character conversion */
+/* convert a c-string of various number bases to an integer type */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2005-10-02, David A­D­ Morano
+	= 1998-09-03, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2005 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STRTOX_INCLUDE
 #define	STRTOX_INCLUDE
@@ -53,13 +53,6 @@ extern int512_t		strtos256(cchar *,char **,int) noex ;	/* 512-bits */
 extern uint512_t	strtou256(cchar *,char **,int) noex ;	/* 512-bits */
 #endif /* __cplusplus */
 #endif /* COMMENT */
-
-EXTERNC_begin
-
-extern slonglong	atosll(cchar *) noex ;
-extern ulonglong	atoull(cchar *) noex ;
-
-EXTERNC_end
 
 
 #endif /* STRTOX_INCLUDE */
