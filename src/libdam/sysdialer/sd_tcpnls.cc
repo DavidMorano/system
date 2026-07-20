@@ -27,7 +27,7 @@
 	tcpnls [[<host>:]<port>] [-f <af>]
 
 	Arguments:
-	host		override hostname
+	host		hostname
 	port		service port
 	af		address family
 
@@ -52,6 +52,9 @@
 #include	"sd_tcpnls.h"
 #include	"sd_tcp.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -85,7 +88,7 @@
 /* local structures */
 
 struct afamily {
-	cchar	*name ;
+	cchar		*name ;
 	int		af ;
 } ; /* end struct */
 
@@ -119,13 +122,13 @@ constexpr afamily	afs[] = {
 
 /* external variables (module information) */
 
-SYSDIALER_INFO	tcpnls = {
+SYSDIALER_INFO	sd_tcpnls = {
 	TCPNLS_MNAME,
 	TCPNLS_VERSION,
 	TCPNLS_INAME,
 	szof(TCPNLS),
 	TCPNLS_MF
-} ;
+} ; /* end object */
 
 
 /* exported subroutines */
