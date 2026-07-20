@@ -42,14 +42,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<cfdec.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<cfdec.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getnprocessors.h"
 
@@ -131,8 +131,7 @@ int getnprocessors(mainv envv,int w) noex {
 	    } /* end for */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (getnprocessors) */
+} /* end subroutine (getnprocessors) */
 
 
 /* local subroutines */
