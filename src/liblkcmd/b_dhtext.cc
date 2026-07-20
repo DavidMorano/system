@@ -1,8 +1,9 @@
-/* b_dhtext */
+/* b_dhtext SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a SHELL built-in command to print text to a terminal */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -10,7 +11,6 @@
 #define	CF_BUFLINEIN	1		/* line-buffering for STDIN */
 #define	CF_LINERCLEAR	0		/* using |liner_clear()| */
 #define	CF_LOCSETENT	0		/* using |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -23,20 +23,19 @@
 
 /*******************************************************************************
 
-	Synopsis:
+	Name:
+	b_dhtext
 
-	$ doubletext [-af <afile>] [-of <ofile>] <word(s)> [-V]
+	Synopsis:
+	$ dhtext [-af <afile>] [-of <ofile>] <word(s)> [-V]
 
 	Arguments:
-
 	<word(s)>	words to print
 	-af <afile>	file containing file names to read as input
 	-of <ofile>	write to this file instead of to standard-output
 	-V		print command version to standard-error and then exit
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -111,23 +110,6 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	termescseq(char *,int,int,int,int,int,int) ;
-extern int	shio_printdline(SHIO *,cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -138,10 +120,6 @@ extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -163,7 +141,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	TERMOUT		outer ;
 	vecstr		stores ;
@@ -188,9 +166,9 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
 static int	procsetcase(PROGINFO *,const char *,int) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procline(PROGINFO *,void *,cchar *,int) ;
 static int	procword(PROGINFO *,void *,const char *) ;
 static int	procdata(PROGINFO *,char *,int) ;
@@ -313,11 +291,12 @@ static const char	*cases[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int b_dhtext(int argc,cchar *argv[],void *contextp)
-{
+int b_dhtext(int argc,cchar *argv[],void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
@@ -352,8 +331,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -713,7 +692,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -737,7 +716,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'u':
 	                        pip->have.bufnone = TRUE ;
 	                        pip->fl.bufnone = TRUE ;
-	                        pip->final.bufnone = TRUE ;
+	                        pip->finval.bufnone = TRUE ;
 	                        break ;
 
 /* verbose mode */
@@ -760,7 +739,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                lip->have.linelen = TRUE ;
-	                                lip->final.linelen = TRUE ;
+	                                lip->finval.linelen = TRUE ;
 	                                rs = optvalue(argp,argl) ;
 	                                lip->linelen = rs ;
 	                            }
@@ -925,7 +904,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (rs >= 0) {
 	    ARGINFO	*aip = &ainfo ;
-	    BITS	*bop = &pargs ;
+	    bits	*bop = &pargs ;
 	    cchar	*ofn = ofname ;
 	    cchar	*afn = afname ;
 	    rs = process(pip,aip,bop,ofn,afn) ;
@@ -1032,7 +1011,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1044,7 +1023,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -1060,9 +1039,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_cvtcase:
 	                case akoname_casecvt:
 	                case akoname_cc:
-	                    if (! lip->final.cvtcase) {
+	                    if (! lip->finval.cvtcase) {
 	                        lip->have.cvtcase = TRUE ;
-	                        lip->final.cvtcase = TRUE ;
+	                        lip->finval.cvtcase = TRUE ;
 	                        lip->fl.cvtcase = TRUE ;
 	                        if (vl > 0)
 	                            rs = procsetcase(pip,vp,vl) ;
@@ -1070,9 +1049,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 	                case akoname_bufwhole:
 	                case akoname_whole:
-	                    if (! pip->final.bufwhole) {
+	                    if (! pip->finval.bufwhole) {
 	                        pip->have.bufwhole = TRUE ;
-	                        pip->final.bufwhole = TRUE ;
+	                        pip->finval.bufwhole = TRUE ;
 	                        pip->fl.bufwhole = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1082,9 +1061,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 	                case akoname_bufline:
 	                case akoname_line:
-	                    if (! pip->final.bufline) {
+	                    if (! pip->finval.bufline) {
 	                        pip->have.bufline = TRUE ;
-	                        pip->final.bufline = TRUE ;
+	                        pip->finval.bufline = TRUE ;
 	                        pip->fl.bufline = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1095,9 +1074,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_bufnone:
 	                case akoname_none:
 	                case akoname_un:
-	                    if (! pip->final.bufnone) {
+	                    if (! pip->finval.bufnone) {
 	                        pip->have.bufnone = TRUE ;
-	                        pip->final.bufnone = TRUE ;
+	                        pip->finval.bufnone = TRUE ;
 	                        pip->fl.bufnone = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1106,9 +1085,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_termout:
-	                    if (! lip->final.termout) {
+	                    if (! lip->finval.termout) {
 	                        lip->have.termout = TRUE ;
-	                        lip->final.termout = TRUE ;
+	                        lip->finval.termout = TRUE ;
 	                        lip->fl.termout = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1117,9 +1096,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_double:
-	                    if (! lip->final.dbl) {
+	                    if (! lip->finval.dbl) {
 	                        lip->have.dbl = TRUE ;
-	                        lip->final.dbl = TRUE ;
+	                        lip->finval.dbl = TRUE ;
 	                        lip->fl.dbl = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1128,9 +1107,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_linelen:
-	                    if (! lip->final.linelen) {
+	                    if (! lip->finval.linelen) {
 	                        lip->have.linelen = TRUE ;
-	                        lip->final.linelen = TRUE ;
+	                        lip->finval.linelen = TRUE ;
 	                        lip->fl.linelen = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1188,7 +1167,7 @@ static int procsetcase(PROGINFO *pip,cchar *vp,int vl)
 /* end subroutine (procsetcase) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	const int	to = pip->to_open ;
