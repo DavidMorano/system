@@ -1,4 +1,4 @@
-/* b_conslog SUPPORT */
+/* b_conslog SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -26,7 +26,6 @@
 	corresponding string.
 
 	Synopsis:
-
 	$ conslog <conslog> [-c[=<b>]] [-n <name>[:<version>]] 
 		[-s <logsize>] [-if <infile>] [-V]
 
@@ -106,33 +105,6 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	snscs(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	nleadcasestr(cchar *,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matcasestr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	matpcasestr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	hasalluc(cchar *,int) ;
-extern int	isalphalatin(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -142,11 +114,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -168,7 +135,7 @@ struct locinfo_flags {
 struct locinfo {
 	PROGINFO	*pip ;
 	vecstr		stores ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	cchar		*fac ;
 	cchar		*pri ;
@@ -201,7 +168,7 @@ static int	mainsub(int,cchar *[],cchar *[],void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
 static int	procisexit(PROGINFO *) ;
 static int	proclog(PROGINFO *,cchar *) ;
 static int	process(PROGINFO *,CONSLOG *,cchar *) ;
@@ -325,8 +292,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	PARAMOPT	aparams ;
 	SHIO		errfile ;
 
@@ -606,7 +573,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* create-conslog */
 	                    case 'c':
 	                        lip->have.create = TRUE ;
-	                        lip->final.create = TRUE ;
+	                        lip->finval.create = TRUE ;
 	                        lip->fl.create = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -625,7 +592,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                lip->have.facspec = TRUE ;
-	                                lip->final.facspec = TRUE ;
+	                                lip->finval.facspec = TRUE ;
 	                                facspec = argp ;
 	                            }
 	                        } else
@@ -639,7 +606,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -654,7 +621,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                lip->have.prispec = TRUE ;
-	                                lip->final.prispec = TRUE ;
+	                                lip->finval.prispec = TRUE ;
 	                                prispec = argp ;
 	                            }
 	                        } else
@@ -794,7 +761,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    rs = procopts(pip,&akopts) ;
 	}
 
-	if ((! pip->final.ignore) && hasalluc(pip->progname,-1))
+	if ((! pip->finval.ignore) && hasalluc(pip->progname,-1))
 	    pip->fl.ignore = TRUE ;
 
 	if (afname == NULL) afname = getourenv(pip->envv,VARAFNAME) ;
@@ -974,7 +941,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -986,7 +953,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
@@ -1001,9 +968,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 
 	                case akoname_fac:
-	                    if (! lip->final.facspec) {
+	                    if (! lip->finval.facspec) {
 	                        lip->have.facspec = TRUE ;
-	                        lip->final.facspec = TRUE ;
+	                        lip->finval.facspec = TRUE ;
 	                        if (vl > 0) {
 				    cchar	**vpp = &lip->fac ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -1012,9 +979,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_pri:
-	                    if (! lip->final.prispec) {
+	                    if (! lip->finval.prispec) {
 	                        lip->have.prispec = TRUE ;
-	                        lip->final.prispec = TRUE ;
+	                        lip->finval.prispec = TRUE ;
 	                        if (vl > 0) {
 				    cchar	**vpp = &lip->pri ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -1023,9 +990,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_ignore:
-	                    if (! pip->final.ignore) {
+	                    if (! pip->finval.ignore) {
 	                        pip->have.ignore = TRUE ;
-	                        pip->final.ignore = TRUE ;
+	                        pip->finval.ignore = TRUE ;
 	                        pip->fl.ignore = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1035,9 +1002,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_audit:
-	                    if (! lip->final.audit) {
+	                    if (! lip->finval.audit) {
 	                        lip->have.audit = TRUE ;
-	                        lip->final.audit = TRUE ;
+	                        lip->finval.audit = TRUE ;
 	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1047,9 +1014,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_create:
-	                    if (! lip->final.create) {
+	                    if (! lip->finval.create) {
 	                        lip->have.create= TRUE ;
-	                        lip->final.create = TRUE ;
+	                        lip->finval.create = TRUE ;
 	                        lip->fl.create = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
