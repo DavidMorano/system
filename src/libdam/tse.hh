@@ -14,11 +14,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	TSE		struct tse
@@ -48,34 +45,34 @@ struct tse_co {
 
 struct tse {
     	friend		tse_co ;
+	tse_co		start ;
+	tse_co		finish ;
 	uint		count ;		/* count */
 	uint		utime ;		/* update time-stamp */
 	uint		ctime ;		/* creation time-stamp */
 	uint		hash ;
 	int		entsz{} ;
 	int		keylen = TSE_LKEYNAME ;
-	tse_co		start ;
-	tse_co		finish ;
-	char		keyname[TSE_LKEYNAME+ 1] ;
+	char		keynam[TSE_LKEYNAME + 1] ;
 	tse() noex {
 	    start(this,tsemem_start) ;
 	    finish(this,tsemem_finish) ;
-	} ;
-	int rd(char *,int = -1) noex ;
-	int wr(cchar *,int = -1) noex ;
-	int rdu(char *,int = -1) noex ;
-	int wru(cchar *,int = -1) noex ;
-	int loadkey(cchar *,int = -1) noex ;
+	} ; /* end ctor */
+	int rd		(char *,int = -1) noex ;
+	int wr		(cchar *,int = -1) noex ;
+	int rdu		(char *,int = -1) noex ;
+	int wru		(cchar *,int = -1) noex ;
+	int loadkey	(cchar *,int = -1) noex ;
 	operator int () noex ;
 	void dtor() noex ;
-	~tse() {
+	destruct tse() {
 	    dtor() ;
-	} ;
+	} ; /* end destruct */
     private:
-	int all(bool,char *,int) noex ;
-	int update(bool,char *,int) noex ;
-	int istart() noex ;
-	int ifinish() noex ;
+	int all		(bool,char *,int) noex ;
+	int update	(bool,char *,int) noex ;
+	int istart	() noex ;
+	int ifinish	() noex ;
 } ; /* end struct (tse) */
 
 typedef	TSE		tse ;
