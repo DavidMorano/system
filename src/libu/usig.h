@@ -30,24 +30,24 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usys.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usys.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int u_kill(pid_t,int) noex ;
-extern int u_killpg(pid_t,int) noex ;
-extern int u_sigaction(int,SIGACTION *,SIGACTION *) noex ;
-extern int u_sigaltstack(const stack_t *,stack_t *) noex ;
-extern int u_sigpending(sigset_t *) noex ;
-extern int u_sigprocmask(int,sigset_t *,sigset_t *) noex ;
-extern int u_sigsuspend(const sigset_t *) noex ;
-extern int u_sigsend(idtype_t,id_t,int) noex ;
-extern int u_sigsendset(procset_t *,int) noex ;
-extern int u_sigwait(const sigset_t *,int *) noex ;
-extern int u_sigmask(int,sigset_t *,sigset_t *) noex ;
+extern int u_kill		(pid_t,int) noex ;
+extern int u_killpg		(pid_t,int) noex ;
+extern int u_sigaction		(int,SIGACTION *,SIGACTION *) noex ;
+extern int u_sigaltstack	(const stack_t *,stack_t *) noex ;
+extern int u_sigpending		(sigset_t *) noex ;
+extern int u_sigprocmask	(int,sigset_t *,sigset_t *) noex ;
+extern int u_sigsuspend		(const sigset_t *) noex ;
+extern int u_sigsend		(idtype_t,id_t,int) noex ;
+extern int u_sigsendset		(procset_t *,int) noex ;
+extern int u_sigwait		(const sigset_t *,int *) noex ;
+extern int u_sigmask		(int,sigset_t *,sigset_t *) noex ;
 
 EXTERNC_end
 
