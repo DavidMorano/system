@@ -51,7 +51,7 @@ OBJ02= timewatch.o timecount.o clanguage.o
 OBJ03= libutil.o usysconf.o umods.o 
 
 OBJ04= utimeout.o utimeouts.o utimeoutdefs.o
-OBJ05= ulogerror.o ischx.o strtox.o ulimits.o
+OBJ05= ulogerror.o ischx.o ulimits.o
 OBJ06= ulibvals.o uconstants.o usupport.o
 OBJ07= umem.o usigsets.o usigblock.o umisc.o
 
@@ -78,7 +78,7 @@ OBJ23= syscontain.o stdfnames.o stdfiles.o
 OBJ24= posixdirent.o nulstr.o
 OBJ25= fonce.o filerec.o
 OBJ26= ustd.o ugetx.o
-OBJ27= ucomposite.o
+OBJ27= ucomposite.o upt.o
 
 OBJ28= bitmanip.o findbit.o baops.o
 OBJ29= clockids.o itimers.o filetypes.o funcodes.o 
@@ -93,7 +93,7 @@ OBJ35= utmptypes.o utmpsizes.o ascii.o
 OBJ36= mapex.o deb.o
 OBJ37= syspredefined.o
 OBJ38= typecodes.o charnames.o
-OBJ39=
+OBJ39= strtox.o atox.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -104,7 +104,7 @@ OBJF= obj20.o obj21.o obj22.o obj23.o
 OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJH= obj28.o obj29.o obj30.o obj31.o
 OBJI= obj32.o obj33.o obj34.o obj35.o
-OBJJ= obj36.o obj37.o obj38.o
+OBJJ= obj36.o obj37.o obj38.o obj39.o
 
 OBJ += obja.o objb.o objc.o objd.o 
 OBJ += obje.o objf.o objg.o objh.o
@@ -438,6 +438,11 @@ usysauxinfo.o:		usysauxinfo.dir
 usysauxinfo.dir:
 	makesubdir $@
 
+# UPT
+upt.o:		upt.dir
+upt.dir:
+	makesubdir $@
+
 # USYNC
 ugetx.o:		ugetx.dir
 ugetx.dir:
@@ -592,6 +597,7 @@ findbit.o:		findbit.ccm					$(INCS)
 # STRING handling
 strtox.o:		strtox.cc	strtox.h bitmanip.o		$(INCS)
 strnul.o:		strnul.cc	strnul.hh			$(INCS)
+atox.o:			atox.cc		atox.h				$(INCS)
 
 # MISC
 stdclib.o:		stdclib.cc	stdclib.hh			$(INCS)
