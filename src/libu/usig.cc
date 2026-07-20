@@ -47,21 +47,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<csignal>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usig.h"
 
@@ -92,56 +88,50 @@
 int u_kill(pid_t pid,int sig) noex {
 	int		rs ;
 	if ((rs = kill(pid,sig)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_kill) */
+} /* end subroutine (u_kill) */
 
 int u_killpg(pid_t pid,int sig) noex {
 	int		rs ;
 	if ((rs = killpg(pid,sig)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_killpg) */
+} /* end subroutine (u_killpg) */
 
 int u_sigaction(int sn,SIGACTION *nsp,SIGACTION *osp) noex {
 	int		rs ;
 	if ((rs = sigaction(sn,nsp,osp)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_sigaction) */
+} /* end subroutine (u_sigaction) */
 
 int u_sigaltstack(const stack_t *ssp,stack_t *ossp) noex {
 	int		rs ;
 	if ((rs = sigaltstack(ssp,ossp)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_sigaltstack) */
+} /* end subroutine (u_sigaltstack) */
 
 int u_sigpending(sigset_t *ssp) noex {
 	int		rs ;
 	if ((rs = sigpending(ssp)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_sigpending) */
+} /* end subroutine (u_sigpending) */
 
 int u_sigprocmask(int how,sigset_t *setp,sigset_t *osetp) noex {
 	int		rs ;
 	if ((rs = sigprocmask(how,setp,osetp)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_sigprocmask) */
+} /* end subroutine (u_sigprocmask) */
 
 int u_sigsuspend(const sigset_t *ssp) noex {
 	int		rs ;
@@ -150,7 +140,7 @@ int u_sigsuspend(const sigset_t *ssp) noex {
 	repeat {
 	    rs = SR_OK ;
 	    if (sigsuspend(ssp) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 		switch (rs) {
 	        case SR_INTR:
 	            if (to_intr-- > 0) {
@@ -166,59 +156,55 @@ int u_sigsuspend(const sigset_t *ssp) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (u_sigsuspend) */
+} /* end subroutine (u_sigsuspend) */
 
 int u_pause() noex {
 	int		rs = SR_OK ;
 	if (pause() < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_pause) */
-
-
-/* these below are NOT on all systems (like MacOS Darwin!) */
-
-int u_sigsend(idtype_t idtype,id_t id,int sig) noex {
-	int		rs ;
-	if ((rs = sigsend(idtype,id,sig)) < 0) { rs = (- errno) ;
-	}
-	return rs ;
-}
-/* end subroutine (u_sigsend) */
-
-int u_sigsendset(procset_t *psp,int sig) noex {
-	int		rs ;
-	if ((rs = sigsendset(psp,sig)) < 0) {
-	    rs = (- errno) ;
-	}
-	return rs ;
-}
-/* end subroutine (u_sigsendset) */
-
-int u_sigwait(const sigset_t *ssp,int *rp) noex {
-	int		rs ;
-	int		sig ;
-	if ((rs = sigwait(ssp,&sig)) < 0) {
-	    rs = (- errno) ;
-	}
-	if (rp) *rp = sig ;
-	sig &= INT_MAX ;
-	return (rs >= 0) ? sig : rs ;
-}
-/* end subroutine (u_sigwait) */
+} /* end subroutine (u_pause) */
 
 int u_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
 	int		rs = SR_INVALID ;
 	if (how >= 0) {
 	    rs = SR_OK ;
 	    if (errno_t ec ; (ec = pthread_sigmask(how,setp,osetp)) > 0) {
-	        rs = (- ec) ;
+	        rs = (neg ec) ;
 	    }
 	} /* end if (valid) */
 	return rs ;
 } /* end subroutine (u_sigmask) */
+
+
+/* these below are NOT on all systems (like MacOS Darwin!) */
+
+int u_sigsend(idtype_t idtype,id_t id,int sig) noex {
+	int		rs ;
+	if ((rs = sigsend(idtype,id,sig)) < 0) { 
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (u_sigsend) */
+
+int u_sigsendset(procset_t *psp,int sig) noex {
+	int		rs ;
+	if ((rs = sigsendset(psp,sig)) < 0) {
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (u_sigsendset) */
+
+int u_sigwait(const sigset_t *ssp,int *rp) noex {
+	int		rs ;
+	int		sig ;
+	if ((rs = sigwait(ssp,&sig)) < 0) {
+	    rs = (neg errno) ;
+	}
+	if (rp) *rp = sig ;
+	sig &= INT_MAX ;
+	return (rs >= 0) ? sig : rs ;
+} /* end subroutine (u_sigwait) */
 
 
