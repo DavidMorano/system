@@ -13,17 +13,17 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX® |pid_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	getlogid(char *,int,pid_t) noex ;
-extern int	getlogname(char *,int,pid_t) noex ;
-extern int	getlogterm(char *,int,pid_t) noex ;
-extern int	getloghost(char *,int,pid_t) noex ;
+extern int	getlogid	(char *,int,pid_t) noex ;
+extern int	getlogname	(char *,int,pid_t) noex ;
+extern int	getlogterm	(char *,int,pid_t) noex ;
+extern int	getloghost	(char *,int,pid_t) noex ;
 
 EXTERNC_end
 
