@@ -20,12 +20,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>		/* |USTAT(2)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<sys/stat.h>		/* POSIX® |USTAT(2)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 /* mode values for call */
@@ -44,7 +44,6 @@ typedef	int	(*wdt_f)(cchar *,USTAT *,void *) noex ;
 extern int	wdt(cchar *,int,wdt_f,void *) noex ;
 
 EXTERNC_end
-
 
 
 #endif /* WDT_INCLUDE */
