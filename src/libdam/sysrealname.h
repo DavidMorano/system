@@ -61,7 +61,7 @@ struct sysrealname_head {
 	void		*callp ;
 	void		*obj ;		/* object pointer */
 	SYSREALNAME_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
 } ; /* end struct */
