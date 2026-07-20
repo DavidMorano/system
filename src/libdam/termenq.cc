@@ -40,8 +40,13 @@
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<intceil.h>		/* LIBU */
 #include	<intfloor.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"termenq.h"
@@ -66,7 +71,6 @@ import libutil ;			/* |memclear(3u)| */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
