@@ -1,4 +1,4 @@
-/* b_chacl SUPPORT */
+/* b_chacl SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -21,6 +21,9 @@
 /* Copyright © 2005 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_chacl
 
 	Synopsis:
 	$ chacl <acl(s)> [<file(s) ...>]
@@ -46,11 +49,13 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<ugetpw.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<getpwx.h>
 #include	<getax.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -59,10 +64,12 @@
 #include	<field.h>
 #include	<vecobj.h>
 #include	<fsdirtree.h>
+#include	<fsdirtreestat.h>
 #include	<strn.h>
 #include	<mkchar.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -70,6 +77,9 @@
 #include	"defs.h"
 #include	"aclinfo.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -123,46 +133,17 @@
 #define	PO_TYPE		"type"
 #define	PO_SUFFIX	"suffix"
 
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FT	struct locinfo_ftypes
-#define	LOCINFO_FL	struct locinfo_flags
+#define	PI		proginfo
+
+#define	LOCINFO		locinfo
+#define	LOCINFO_FT	locinfo_ftypes
+#define	LOCINFO_FL	locinfo_flags
 
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	fsdirtreestat(cchar *,int,FSDIRTREE_STAT *) ;
-extern int	getuid_user(cchar *,int) ;
-extern int	getgid_group(cchar *,int) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isInvalid(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strdcp1w(char *,int,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern int	proginfo_setpiv(PI *,cchar *,const pivars *) ;
 
 
 /* external variables */
@@ -201,12 +182,12 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	vecobj		acls ;
 	aclent_t	*aclbuf ;	/* new ACLs being applied */
 	PROGINFO	*pip ;
-	LOCINFO_FL	have, f, final ;
+	LOCINFO_FL	have, f, finval ;
 	LOCINFO_FT	ft ;
 	gid_t		gid_owner, gid_new ;
 	uid_t		uid_owner, uid_new ;
@@ -219,66 +200,46 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PI *) ;
 
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
-static int	procacls(PROGINFO *,cchar *) ;
-static int	procacl(PROGINFO *,cchar *,int) ;
-static int	procname(PROGINFO *,cchar *) ;
-static int	procnamer(PROGINFO *,cchar *) ;
-static int	checkname(PROGINFO *,cchar *,FSDIRTREE_STAT *) ;
-static int	checkowner(PROGINFO *,FSDIRTREE_STAT *,cchar *) ;
-static int	procoutverbose(PROGINFO *,LOCINFO *,cchar *,int) ;
+local int	process(PI *,ARGINFO *,bits *,cchar *) ;
+local int	procacls(PI *,cchar *) ;
+local int	procacl(PI *,cchar *,int) ;
+local int	procname(PI *,cchar *) ;
+local int	procnamer(PI *,cchar *) ;
+local int	checkname(PI *,cchar *,ustat *) ;
+local int	checkowner(PI *,ustat *,cchar *) ;
+local int	procoutverbose(PI *,LOCINFO *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_procopts(LOCINFO *) ;
-static int	locinfo_ftypes(LOCINFO *) ;
-static int	locinfo_isfsuffix(LOCINFO *,cchar *) ;
-static int	locinfo_isftype(LOCINFO *,cchar *,FSDIRTREE_STAT *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_addacl(LOCINFO *,aclinfo *) ;
-static int	locinfo_mksol(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PI *) ;
+local int	locinfo_procopts(LOCINFO *) ;
+local int	locinfo_ftypes(LOCINFO *) ;
+local int	locinfo_isfsuffix(LOCINFO *,cchar *) ;
+local int	locinfo_isftype(LOCINFO *,cchar *,ustat *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_addacl(LOCINFO *,aclinfo *) ;
+local int	locinfo_mksol(LOCINFO *) ;
 
-static int	aclents_match(aclent_t *,int,aclinfo *) ;
-static int	aclents_minmax(aclent_t *,int,int *,int *) ;
-static int	aclents_compact(aclent_t *,int) ;
-static int	aclents_maskmat(aclent_t *,int) ;
-static int	aclents_maskneed(aclent_t *,int) ;
-static int	aclents_defmaskneed(aclent_t *,int) ;
+local int	aclents_match(aclent_t *,int,aclinfo *) ;
+local int	aclents_minmax(aclent_t *,int,int *,int *) ;
+local int	aclents_compact(aclent_t *,int) ;
+local int	aclents_maskmat(aclent_t *,int) ;
+local int	aclents_maskneed(aclent_t *,int) ;
+local int	aclents_defmaskneed(aclent_t *,int) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-static int aclents_print(aclent_t *,int) ;
+local int aclents_print(aclent_t *,int) ;
 #endif
 
-static int	aclent_empty(aclent_t *) ;
-static int	aclent_idtype(aclent_t *) ;
+local int	aclent_empty(aclent_t *) ;
+local int	aclent_idtype(aclent_t *) ;
 
-static int	parseperms(cchar *,int) ;
+local int	parseperms(cchar *,int) ;
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"min",
-	"max",
-	"mm",
-	"mc",
-	"suid",
-	"sgid",
-	"cu",
-	"cg",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -300,7 +261,27 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const PIVARS	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"min",
+	"max",
+	"mm",
+	"mc",
+	"suid",
+	"sgid",
+	"cu",
+	"cg",
+	nullptr
+} ;
+
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -308,7 +289,7 @@ static const PIVARS	initvars = {
 	VARPRNAME
 } ;
 
-static const MAPEX	mapexs[] = {
+constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -322,13 +303,6 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
-	"nhf",
-	"suid",
-	"sgid",
-	NULL
-} ;
-
 enum progopts {
 	progopt_nhf,
 	progopt_suid,
@@ -336,24 +310,11 @@ enum progopts {
 	progopt_overlast
 } ;
 
-enum aclops {
-	aclop_add,
-	aclop_subtract,
-	aclop_overlast
-} ;
-
-static const char	*ftypes[] = {
-	"file",
-	"directory",
-	"block",
-	"character",
-	"pipe",
-	"fifo",
-	"socket",
-	"link",
-	"door",
-	"regular",
-	NULL
+constexpr cpcchar	progopts[] = {
+	"nhf",
+	"suid",
+	"sgid",
+	nullptr
 } ;
 
 enum ftypes {
@@ -370,7 +331,21 @@ enum ftypes {
 	ftype_overlast
 } ;
 
-static const uchar	aclterms[] = {
+constexpr cpcchar	ftypes[] = {
+	"file",
+	"directory",
+	"block",
+	"character",
+	"pipe",
+	"fifo",
+	"socket",
+	"link",
+	"door",
+	"regular",
+	nullptr
+} ;
+
+constexpr char		aclterms[] = {
 	0x00, 0x3E, 0x00, 0x00,
 	0x01, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -381,24 +356,33 @@ static const uchar	aclterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
+enum aclops {
+	aclop_add,
+	aclop_subtract,
+	aclop_overlast
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int b_chacl(int argc,cchar *argv[],void *contextp)
-{
+int b_chacl(int argc,mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
 
-	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
+	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
 	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ksh) */
 
-	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
+	if ((rs < 0) && (ex == EX_OK)) {
+	    ex = EX_DATAERR ;
+	}
 
 	return ex ;
 }
@@ -414,14 +398,11 @@ int p_chacl(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
-	PROGINFO	pi, *pip = &pi ;
+local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
+	PI		pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
-	ARGINFO		ainfo ;
-	BITS		pargs ;
+	ARGINFO		ainfo{} ;
+	bits		pargs ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -440,18 +421,18 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f ;
 
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*pr = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*afname = NULL ;
-	cchar		*efname = NULL ;
-	cchar		*ofname = NULL ;
-	cchar		*aclspec = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*pr = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*afname = nullptr ;
+	cchar		*efname = nullptr ;
+	cchar		*ofname = nullptr ;
+	cchar		*aclspec = nullptr ;
 	cchar		*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("chacl: starting DFD=%d\n",rs) ;
 	}
@@ -468,7 +449,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
@@ -494,7 +475,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -505,7 +486,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -522,14 +503,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = false ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -698,7 +679,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_suid:
 	                    lip->have.suid = true ;
-	                    lip->final.suid = true ;
+	                    lip->finval.suid = true ;
 	                    lip->fl.suid = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
@@ -711,7 +692,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_sgid:
 	                    lip->have.sgid = true ;
-	                    lip->final.sgid = true ;
+	                    lip->finval.sgid = true ;
 	                    lip->fl.sgid = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
@@ -760,7 +741,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -839,7 +820,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &lip->akopts ;
+					keyopt	*kop = &lip->akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -848,7 +829,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* file suffixes */
 	                    case 's':
-	                        cp = NULL ;
+	                        cp = nullptr ;
 	                        cl = -1 ;
 	                        lip->fl.fsuffixes = true ;
 	                        if (argr > 0) {
@@ -859,8 +840,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                                cp = argp ;
 	                                cl = argl ;
 	                            }
-	                            if (cp != NULL) {
-	                                PARAMOPT	*plp = &lip->aparams ;
+	                            if (cp != nullptr) {
+	                                paramopt	*plp = &lip->aparams ;
 	                                cchar		*po = PO_SUFFIX ;
 	                                rs = paramopt_loads(plp,po,cp,cl) ;
 	                            }
@@ -870,7 +851,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* file types */
 	                    case 't':
-	                        cp = NULL ;
+	                        cp = nullptr ;
 	                        cl = -1 ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
@@ -880,8 +861,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                                cp = argp ;
 	                                cl = argl ;
 	                            }
-	                            if (cp != NULL) {
-	                                PARAMOPT	*plp = &lip->aparams ;
+	                            if (cp != nullptr) {
+	                                paramopt	*plp = &lip->aparams ;
 	                                cchar		*po = PO_TYPE ;
 	                                rs = paramopt_loads(plp,po,cp,cl) ;
 	                            }
@@ -944,8 +925,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDFNERR ;
+	if (efname == nullptr) efname = getourenv(envv,VAREFNAME) ;
+	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = true ;
@@ -993,7 +974,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_SFIO
 	    printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	}
 
@@ -1005,12 +986,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* some initialization */
 
-	if ((rs >= 0) && (pip->n == 0) && (argval != NULL)) {
+	if ((rs >= 0) && (pip->n == 0) && (argval != nullptr)) {
 	    rs = optvalue(argval,-1) ;
 	    pip->n = rs ;
 	}
 
-	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
+	if (afname == nullptr) afname = getourenv(envv,VARAFNAME) ;
 
 	if ((rs = locinfo_procopts(lip)) >= 0) {
 	    rs = locinfo_ftypes(lip) ;
@@ -1020,7 +1001,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (rs >= 0) {
 	    for (ai = ai_continue ; ai < argc ; ai += 1) {
 	        f = (ai <= ai_max) && (bits_test(&pargs,ai) > 0) ;
-	        f = f || ((ai > ai_pos) && (argv[ai] != NULL)) ;
+	        f = f || ((ai > ai_pos) && (argv[ai] != nullptr)) ;
 	        if (f) {
 	            aclspec = argv[ai] ;
 	            ai_continue = (ai + 1) ;
@@ -1029,7 +1010,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    } /* end for */
 	} /* end if (ok) */
 
-	if ((rs >= 0) && ((aclspec == NULL) || (aclspec[0] == '\0'))) {
+	if ((rs >= 0) && ((aclspec == nullptr) || (aclspec[0] == '\0'))) {
 	    ex = EX_USAGE ;
 	    rs = SR_INVALID ;
 	    shio_printf(pip->efp,
@@ -1059,7 +1040,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    rs = locinfo_mksol(lip) ;
 	}
 
-/* OK, finally do it */
+/* OK, finvally do it */
 
 #if	CF_DEFMAXACLS
 	pip->n = MAXACLS ;
@@ -1067,7 +1048,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	pip->n = DEFACLS ;
 #endif
 
-	memset(&ainfo,0,sizeof(ARGINFO)) ;
 	ainfo.argc = argc ;
 	ainfo.ai = ai ;
 	ainfo.argv = argv ;
@@ -1131,10 +1111,10 @@ retearly:
 	    debugprintf("chacl: exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	bits_finish(&pargs) ;
@@ -1174,7 +1154,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1206,7 +1186,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procacls(PROGINFO *pip,cchar *aclspec)
+local int procacls(PI *pip,cchar *aclspec)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1260,19 +1240,19 @@ static int procacls(PROGINFO *pip,cchar *aclspec)
 /* end subroutine (procacls) */
 
 
-static int procacl(PROGINFO *pip,cchar *abuf,int alen)
+local int procacl(PI *pip,cchar *abuf,int alen)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	cchar		*tp ;
 
-	if ((tp = strnbrk(abuf,alen,"=+-")) != NULL) {
+	if ((tp = strnbrk(abuf,alen,"=+-")) != nullptr) {
 	    aclinfo	ai ;
 	    int		idlen = 0 ;
 	    int		typelen = (tp - abuf) ;
 	    int		permlen ;
 	    cchar	*typespec = abuf ;
-	    cchar	*idspec = NULL ;
+	    cchar	*idspec = nullptr ;
 	    cchar	*permspec ;
 
 #if	CF_DEBUG
@@ -1284,7 +1264,7 @@ static int procacl(PROGINFO *pip,cchar *abuf,int alen)
 	        cchar	*sp = (tp + 1) ;
 	        int	sl = ((abuf + alen) - idspec) ;
 	        idspec = (tp + 1) ;
-	        if ((tp = strnbrk(sp,sl,"+-")) != NULL) {
+	        if ((tp = strnbrk(sp,sl,"+-")) != nullptr) {
 	            idlen = (tp - idspec) ;
 	        }
 #if	CF_DEBUG
@@ -1293,7 +1273,7 @@ static int procacl(PROGINFO *pip,cchar *abuf,int alen)
 #endif
 	    } /* end if (had an ID) */
 
-	    if (tp != NULL) {
+	    if (tp != nullptr) {
 
 	        ai.op = (tp[0] == '+') ? aclop_add : aclop_subtract ;
 
@@ -1335,7 +1315,7 @@ static int procacl(PROGINFO *pip,cchar *abuf,int alen)
 
 /* get the UID or GID */
 
-	            if ((idspec != NULL) && (idlen > 0)) {
+	            if ((idspec != nullptr) && (idlen > 0)) {
 
 	                if ((ai.type == acltype_user) ||
 	                    (ai.type == acltype_defuser)) {
@@ -1380,14 +1360,14 @@ static int procacl(PROGINFO *pip,cchar *abuf,int alen)
 /* end subroutine (procacl) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
+local int process(PI *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 
 	if ((rs = ids_load(&pip->id)) >= 0) {
-	    const int	size = (pip->n * sizeof(aclent_t)) ;
+	    cint	size = (pip->n * sizeof(aclent_t)) ;
 	    char	*bp ;
 	    if ((rs = uc_malloc(size,&bp)) >= 0) {
 	        LOCINFO		*lip = pip->lip ;
@@ -1402,7 +1382,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	            cchar	**argv = aip->argv ;
 	            for (ai = aip->ai_continue ; ai < aip->argc ; ai += 1) {
 	                f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	                f = f || ((ai > aip->ai_pos) && (argv[ai] != NULL)) ;
+	                f = f || ((ai > aip->ai_pos) && (argv[ai] != nullptr)) ;
 	                if (f) {
 	                    cp = argv[ai] ;
 	                    if (cp[0] != '\0') {
@@ -1418,13 +1398,13 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 	            } /* end for */
 	        } /* end if (ok) */
 
-	        if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
+	        if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
 	            SHIO	afile, *afp = &afile ;
 
 	            if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	            if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	                const int	llen = LINEBUFLEN ;
+	                cint	llen = LINEBUFLEN ;
 	                int		len ;
 	                char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1463,7 +1443,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 
 	        rs1 = uc_free(pip->buffer) ;
 	        if (rs >= 0) rs = rs1 ;
-	        pip->buffer = NULL ;
+	        pip->buffer = nullptr ;
 	    } /* end if (m-a-f) */
 	    rs1 = ids_release(&pip->id) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1474,13 +1454,13 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procname(PROGINFO *pip,cchar *fname)
+local int procname(PI *pip,cchar *fname)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		c = 0 ;
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1488,11 +1468,10 @@ static int procname(PROGINFO *pip,cchar *fname)
 #endif
 
 	if (fname[0] != '-') {
-	    FSDIRTREE_STAT	sb, ssb ;
-	    int			f_done = false ;
-	    int			f_islnk = false ;
-	    int			f_dir ;
-
+	    int		f_done = false ;
+	    int		f_islnk = false ;
+	    int		f_dir ;
+	    ustat	sb, ssb ;
 	    if ((rs = fsdirtreestat(fname,1,&sb)) >= 0) {
 	        f_dir = S_ISDIR(sb.st_mode) ;
 	        if (S_ISLNK(sb.st_mode)) {
@@ -1575,14 +1554,12 @@ static int procname(PROGINFO *pip,cchar *fname)
 }
 /* end subroutine (procname) */
 
-
-static int procnamer(PROGINFO *pip,cchar *fname)
-{
+local int procnamer(PI *pip,cchar *fname) noex {
 	LOCINFO		*lip = pip->lip ;
-	FSDIRTREE	dt ;
+	fsdirtree	dt ;
 	int		rs ;
 	int		rs1 ;
-	int		dtopts = 0 ;
+	int		fdo = 0 ;
 	int		c = 0 ;
 
 #if	CF_DEBUG
@@ -1590,13 +1567,12 @@ static int procnamer(PROGINFO *pip,cchar *fname)
 	    debugprintf("process: ent\n") ;
 #endif
 
-	dtopts |= ((lip->fl.follow) ? FSDIRTREE_MFOLLOW : 0) ;
-	if ((rs = fsdirtree_open(&dt,fname,dtopts)) >= 0) {
+	fdo |= ((lip->fl.follow) ? fsdirtreem.follow : 0) ;
+	if ((rs = fsdirtree_open(&dt,fname,fdo)) >= 0) {
 	    ustat	esb ;
-	    const int		mpl = MAXPATHLEN ;
-	    char		dename[MAXPATHLEN + 1] ;
-	    char		tmpfname[MAXPATHLEN + 1] ;
-
+	    cint	mpl = MAXPATHLEN ;
+	    char	dename[MAXPATHLEN + 1] ;
+	    char	tmpfname[MAXPATHLEN + 1] ;
 	    while ((rs = fsdirtree_read(&dt,&esb,dename,mpl)) > 0) {
 
 #if	CF_DEBUG
@@ -1640,7 +1616,7 @@ static int procnamer(PROGINFO *pip,cchar *fname)
 /* end subroutine (procnamer) */
 
 
-static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
+local int checkname(PI *pip,cchar *fname,ustat *sbp)
 {
 	LOCINFO		*lip = pip->lip ;
 	aclinfo	*ap ;
@@ -1768,7 +1744,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 /* apply the specified perms */
 
 	    for (i = 0 ; vecobj_get(&lip->acls,i,&ap) >= 0 ; i += 1) {
-	        if (ap == NULL) continue ;
+	        if (ap == nullptr) continue ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -1931,7 +1907,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 #endif
 
 	        for (i = 0 ; vecobj_get(&lip->acls,i,&ap) >= 0 ; i += 1) {
-	            if (ap == NULL) continue ;
+	            if (ap == nullptr) continue ;
 
 	            if (aclinfo_isidtype(ap) > 0) {
 
@@ -2222,7 +2198,7 @@ ret0:
 
 
 /* check ownership (needed for any changes) */
-static int checkowner(PROGINFO *pip,FSDIRTREE_STAT *sbp,cchar fname[])
+local int checkowner(PI *pip,ustat *sbp,cchar fname[])
 {
 	int		rs = SR_OK ;
 	if ((pip->id.uid != 0) && (sbp->st_uid != pip->id.uid)) {
@@ -2242,15 +2218,15 @@ static int checkowner(PROGINFO *pip,FSDIRTREE_STAT *sbp,cchar fname[])
 
 
 /* output verbose information */
-static int procoutverbose(PROGINFO *pip,LOCINFO *lip,cchar *ofn,int c)
+local int procoutverbose(PI *pip,LOCINFO *lip,cchar *ofn,int c)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if (ofn == NULL) ofn = getourenv(pip->envv,VAROFNAME) ;
-	if (ofn == NULL) ofn = STDFNOUT ;
+	if (ofn == nullptr) ofn = getourenv(pip->envv,VAROFNAME) ;
+	if (ofn == nullptr) ofn = STDFNOUT ;
 
 	if (pip->debuglevel > 0) {
 	    shio_printf(pip->efp,"%s: ofile=%s (%u)\n",
@@ -2280,9 +2256,7 @@ static int procoutverbose(PROGINFO *pip,LOCINFO *lip,cchar *ofn,int c)
 }
 /* end subroutine (procoutverbose) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+local int locinfo_start(LOCINFO *lip,PI *pip) noex {
 	int		rs ;
 
 	memset(lip,0,sizeof(LOCINFO)) ;
@@ -2315,7 +2289,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2345,16 +2319,16 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 /* process the program options */
-static int locinfo_procopts(LOCINFO *lip)
+local int locinfo_procopts(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
-	KEYOPT		*kop = &lip->akopts ;
-	KEYOPT_CUR	kcur ;
+	keyopt		*kop = &lip->akopts ;
+	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
 
-	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
+	if ((cp = getourenv(pip->envv,VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
@@ -2368,12 +2342,12 @@ static int locinfo_procopts(LOCINFO *lip)
 
 	            if ((oi = matostr(progopts,2,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 	                case progopt_nhf:
-			    if (! lip->final.nhf) {
-	                        lip->final.nhf = true ;
+			    if (! lip->finval.nhf) {
+	                        lip->finval.nhf = true ;
 	                        lip->have.nhf = true ;
 	                        lip->fl.nhf = true ;
 	                        if (vl > 0) {
@@ -2383,8 +2357,8 @@ static int locinfo_procopts(LOCINFO *lip)
 			    }
 	                    break ;
 	                case progopt_suid:
-			    if (! lip->final.suid) {
-	                        lip->final.suid = true ;
+			    if (! lip->finval.suid) {
+	                        lip->finval.suid = true ;
 	                        lip->have.suid = true ;
 	                        lip->fl.suid = true ;
 	                        if (vl > 0) {
@@ -2394,8 +2368,8 @@ static int locinfo_procopts(LOCINFO *lip)
 			    }
 	                    break ;
 	                case progopt_sgid:
-			    if (! lip->final.sgid) {
-	                        lip->final.sgid = true ;
+			    if (! lip->finval.sgid) {
+	                        lip->finval.sgid = true ;
 	                        lip->have.sgid = true ;
 	                        lip->fl.sgid = true ;
 	                        if (vl > 0) {
@@ -2420,13 +2394,13 @@ static int locinfo_procopts(LOCINFO *lip)
 }
 /* end subroutine (locinfo_procopts) */
 
-static int locinfo_ftypes(LOCINFO *lip) noex {
+local int locinfo_ftypes(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = paramopt_curbegin(&lip->aparams,&cur)) >= 0) {
-	    PARAMOPT_CUR	cur ;
+	    paramopt_cur	cur ;
 	    int			sl ;
 	    int			fti ;
 	    cchar		*sp ;
@@ -2491,10 +2465,10 @@ static int locinfo_ftypes(LOCINFO *lip) noex {
 }
 /* end subroutine (locinfo_ftypes) */
 
-static int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
+local int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
 	PROGINFO	*pip = lip->pip ;
-	PARAMOPT	*pp = &lip->aparams ;
-	PARAMOPT_CUR	cur ;
+	paramopt	*pp = &lip->aparams ;
+	paramopt_cur	cur ;
 	int		rs = SR_OK ;
 	int		sl ;
 	int		bl ;
@@ -2505,7 +2479,7 @@ static int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
 	cchar		*cp ;
 	cchar		*bp ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if ((bl = sfbasename(fname,-1,&bp)) > 0) {
 
@@ -2514,7 +2488,7 @@ static int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
 	        debugprintf("locinfo_isfsuffix: bn=%r\n",bp,bl) ;
 #endif
 
-	    if ((tp = strnrchr(bp,bl,'.')) != NULL) {
+	    if ((tp = strnrchr(bp,bl,'.')) != nullptr) {
 	        cp = (tp + 1) ;
 
 #if	CF_DEBUG
@@ -2565,7 +2539,7 @@ static int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
 }
 /* end subroutine (locinfo_isfsuffix) */
 
-static int locinfo_isftype(LOCINFO *lip,cc *fn,FSDIRTREE_STAT *sbp) noex {
+local int locinfo_isftype(LOCINFO *lip,cc *fn,ustat *sbp) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (fn) {
@@ -2595,12 +2569,12 @@ static int locinfo_isftype(LOCINFO *lip,cc *fn,FSDIRTREE_STAT *sbp) noex {
 }
 /* end subroutine (locinfo_isftype) */
 
-static int locinfo_addacl(LOCINFO *lip,aclinfo *aip) noex {
+local int locinfo_addacl(LOCINFO *lip,aclinfo *aip) noex {
 	return vecobj_add(&lip->acls,aip) ;
 }
 /* end subroutine (locinfo_addacl) */
 
-static int locinfo_mksol(LOCINFO *lip) noex {
+local int locinfo_mksol(LOCINFO *lip) noex {
 	vecobj		*alp = &lip->acls ;
 	aclinfo		*ap ;
 	for (int i = 0 ; vecobj_get(alp,i,&ap) >= 0 ; i += 1) {
@@ -2613,7 +2587,7 @@ static int locinfo_mksol(LOCINFO *lip) noex {
 /* end subroutine (locinfo_mksol) */
 
 /* aclents (ACL entries) */
-static int aclents_match(aclent_t *aclbuf,int nacls,aclinfo *ap) noex {
+local int aclents_match(aclent_t *aclbuf,int nacls,aclinfo *ap) noex {
 	int		j ; /* used-afterwards */
 	bool		f = false ;
 	for (j = 0 ; j < nacls ; j += 1) {
@@ -2637,7 +2611,7 @@ static int aclents_match(aclent_t *aclbuf,int nacls,aclinfo *ap) noex {
 }
 /* end subroutine (aclents_match) */
 
-static int aclents_maskmat(aclent_t *aclbuf,int nacls) noex {
+local int aclents_maskmat(aclent_t *aclbuf,int nacls) noex {
 	int		j ; /* used-afterwards */
 	for (j = 0 ; j < nacls ; j += 1) {
 	    if (aclbuf[j].a_type == ACLTYPE_CLASSOBJ) break ;
@@ -2655,7 +2629,7 @@ static int aclents_maskmat(aclent_t *aclbuf,int nacls) noex {
 	-2	did not have mask and need one
 ****/
 
-static int aclents_maskneed(aclent_t aclbuf[],int nacls) noex {
+local int aclents_maskneed(aclent_t aclbuf[],int nacls) noex {
 	int		j ; /* used-afterwards */
 	bool		f_need = false ;
 	for (j = 0 ; j < nacls ; j += 1) {
@@ -2678,7 +2652,7 @@ static int aclents_maskneed(aclent_t aclbuf[],int nacls) noex {
 	-2	did not have mask and need one
 ****/
 
-static int aclents_defmaskneed(aclent_t *aclbuf,int nacls) noex {
+local int aclents_defmaskneed(aclent_t *aclbuf,int nacls) noex {
 	int		j ; /* used-afterwards */
 	bool		f_need = false ;
 	for (int j = 0 ; j < nacls ; j += 1) {
@@ -2693,7 +2667,7 @@ static int aclents_defmaskneed(aclent_t *aclbuf,int nacls) noex {
 /* end subroutine (aclents_defmaskneed) */
 
 /* find the minimum and maximum permissions for this set */
-static int aclents_minmax(aclent_t *abuf,int nacls,int *pminp,int *pmaxp) noex {
+local int aclents_minmax(aclent_t *abuf,int nacls,int *pminp,int *pmaxp) noex {
 	int		c = 0 ;
 	*pminp = -1 ;
 	*pmaxp = -1 ;
@@ -2712,12 +2686,12 @@ static int aclents_minmax(aclent_t *abuf,int nacls,int *pminp,int *pmaxp) noex {
 
 #if	CF_DEBUGS || CF_DEBUG
 
-static int aclents_print(aclent_t *aclbuf,int nacls) noex {
+local int aclents_print(aclent_t *aclbuf,int nacls) noex {
 	cchar		*textbuf ;
 	cchar		*tp, *sp ;
-	if ((textbuf = acltotext(aclbuf,nacls)) != NULL) {
+	if ((textbuf = acltotext(aclbuf,nacls)) != nullptr) {
 	    sp = textbuf ;
-	    while ((tp = strchr(sp,',')) != NULL) {
+	    while ((tp = strchr(sp,',')) != nullptr) {
 	        debugprintf("chacl/aclents_print: | %r\n",
 	            sp,(tp - sp)) ;
 	        sp = (tp + 1) ;
@@ -2735,7 +2709,7 @@ static int aclents_print(aclent_t *aclbuf,int nacls) noex {
 
 #endif /* CF_DEBUGS || CF_DEBUG */
 
-static int aclents_compact(aclent_t *aclbuf,int nacls) noex {
+local int aclents_compact(aclent_t *aclbuf,int nacls) noex {
 	int		c = 0 ;
 	bool		f_flipped = false ;
 	while ((nacls > 0) && (aclbuf[nacls - 1].a_type < 0)) {
@@ -2754,7 +2728,7 @@ static int aclents_compact(aclent_t *aclbuf,int nacls) noex {
 /* end subroutine (aclents_compact) */
 
 /* aclent (ACL entry, a single entry) */
-static int aclent_empty(aclent_t *aclp) noex {
+local int aclent_empty(aclent_t *aclp) noex {
 	int		f = false ;
 	if (aclp->a_perm == 0) {
 	    switch (aclp->a_type) {
@@ -2770,7 +2744,7 @@ static int aclent_empty(aclent_t *aclp) noex {
 }
 /* end subroutine (aclent_empty) */
 
-static int aclent_idtype(aclent_t *aclp) noex {
+local int aclent_idtype(aclent_t *aclp) noex {
 	int		f = false ;
 	switch (aclp->a_type) {
 	case USER:
@@ -2784,11 +2758,10 @@ static int aclent_idtype(aclent_t *aclp) noex {
 }
 /* end subroutine (aclent_idtype) */
 
-static int parseperms(cchar *psp,int psl) noex {
+local int parseperms(cchar *psp,int psl) noex {
 	int		rc = 0 ;
 	for (int i = 0 ; (rc >= 0) && (i < psl) && (psp[i] != '\0') ; i += 1) {
-	    cint	ch = mkchar(psp[i]) ;
-	    switch (ch) {
+	    switch (cint ch = mkchar(psp[i]) ; ch) {
 	    case 't':
 	        rc |= T_OK ;
 	        break ;
