@@ -298,7 +298,7 @@ sysret_t umgr::stdmalloc(int sz,void *vp) noex {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	    *rpp = nullptr ;
 	}
 	return rs ;
@@ -314,7 +314,7 @@ sysret_t umgr::stdvalloc(int sz,void *vp) noex {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	    *rpp = nullptr ;
 	}
 	return rs ;
@@ -330,7 +330,7 @@ sysret_t umgr::stdrealloc(int sz,void *vp) noex {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	    *rpp = nullptr ;
 	}
 	return rs ;
@@ -341,7 +341,7 @@ sysret_t umgr::stdfree(int,void *) noex {
 	errno = 0 ;
 	free(cp) ;
 	if (errno) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (umgr::stdfree) */
