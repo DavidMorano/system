@@ -118,7 +118,7 @@ local constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
 	char		*rp = (dbuf + dlen) ;
 	int		rl = 0 ; /* return-value */
 	*rp = '\0' ;
-	if (v != 0) {
+	if (v != 0) ylikely {
 	    int di ;
 	    if_constexpr (szof(UT) > szof(ulong)) {
                 const UT vmask = (compl UT(ULONG_MAX)) ;
@@ -162,7 +162,7 @@ local int ctdecsx(char *dp,int dl,const ST &v) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	if (v < 0) uv = (neg uv) ;
-	if (dp) {
+	if (dp) ylikely {
 	    {
 	        cint	dlen = digbufsize.bufsize[tc][base] ;
 		int	len ;
@@ -183,7 +183,7 @@ local int ctdecux(char *dp,int dl,const UT &uv) noex {
 	cint		tc = typecode<UT> ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (dp) {
+	if (dp) ylikely {
 	    {
 	        cint	dlen = digbufsize.bufsize[tc][base] ;
 		int	len ;
