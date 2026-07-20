@@ -37,21 +37,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<usystem.h>
-#include	<getnodename.h>
-#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
-#include	<mallocxx.h>
-#include	<estrings.h>		/* |sncpy{x}(3uc)| */
-#include	<mkpr.h>
-#include	<permx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC |getinetdomain(3uc)| */
+#include	<estrings.h>		/* LIBUC |sncpy{x}(3uc)| */
+#include	<mkpr.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"tmpmailboxes.h"
 
@@ -71,6 +75,14 @@ import uconstants ;
 #endif
 
 
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -82,8 +94,8 @@ import uconstants ;
 
 /* forward references */
 
-static int	deftmpdir(char *,int) noex ;
-static int	chownpcs(cchar *) noex ;
+local int	deftmpdir(char *,int) noex ;
+local int	chownpcs(cchar *) noex ;
 
 
 /* local variables */
@@ -97,10 +109,10 @@ static int	chownpcs(cchar *) noex ;
 int tmpmailboxes(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    cchar	*tmpmb = TMPMAILBOXES ;
 	    rbuf[0] = '\0' ;
-	    if (ustat sb ; (rs = uc_stat(tmpmb,&sb)) >= 0) {
+	    if (ustat sb ; (rs = uc_stat(tmpmb,&sb)) >= 0) ylikely {
 	        if (S_ISDIR(sb.st_mode)) {
 		    cint	am = (R_OK|W_OK|X_OK) ;
 		    if ((rs = perm(tmpmb,-1,-1,nullptr,am)) >= 0) {
@@ -138,13 +150,12 @@ int tmpmailboxes(char *rbuf,int rlen) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (tmpmailboxes) */
+} /* end subroutine (tmpmailboxes) */
 
 
 /* local subroutine */
 
-static int deftmpdir(char *rbuf,int rlen) noex {
+local int deftmpdir(char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	static cchar	*evp = getenv(varname.tmpdir) ;
 	cchar		*tmpdir = sysword.w_tmpdir ;
@@ -167,34 +178,32 @@ static int deftmpdir(char *rbuf,int rlen) noex {
 	    rs = sncpy(rbuf,rlen,tmpdir) ;
 	}
 	return rs ;
-}
-/* end subroutine (deftmpdir) */
+} /* end subroutine (deftmpdir) */
 
-static int chownpcs(cchar *dname) noex {
+local int chownpcs(cchar *dname) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *dbuf{} ; (rs = malloc_hn(&dbuf)) >= 0) {
+	if (char *dbuf ; (rs = mem.hostname(&dbuf)) >= 0) ylikely {
 	    cint	dlen = rs ;
-	    if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
-		if (char *prbuf{} ; (rs = malloc_mp(&prbuf)) >= 0) {
+	    if ((rs = getinetdomain(dbuf,dlen)) >= 0) ylikely {
+		if (char *prbuf ; (rs = mem.mp(&prbuf)) >= 0) ylikely {
 	             cint	prlen = rs ;
 	    	     cchar	*prname = PRNAME ;
-	             if ((rs = mkpr(prbuf,prlen,prname,dname)) >= 0) {
+	             if ((rs = mkpr(prbuf,prlen,prname,dname)) >= 0) ylikely {
 	 	         if (ustat sb ; (rs = uc_stat(prbuf,&sb)) >= 0) {
 		             const uid_t	uid_pcs = sb.st_uid ;
 		             const gid_t	gid_pcs = sb.st_gid ;
 		             rs = uc_chown(dname,uid_pcs,gid_pcs) ;
 		        } /* end if (uc_stat) */
 	            } /* end if (mkpr) */
-	    	    rs1 = uc_free(prbuf) ;
+	    	    rs1 = mem.free(prbuf) ;
 	    	    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (getinetdomain) */
-	    rs1 = uc_free(dbuf) ;
+	    rs1 = mem.free(dbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (chownpcs) */
+} /* end subroutine (chownpcs) */
 
 
