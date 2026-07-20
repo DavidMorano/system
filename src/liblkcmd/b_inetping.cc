@@ -1,18 +1,19 @@
-/* b_inetping */
+/* b_inetping SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* fairly generic program front-end subroutine */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* comapile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory allocations */
 
-
 /* revision history:
 
 	= 2000-02-01, David A­D­ Morano
-	The program was written from scratch for network (INET) maintenance
-	purposes.
+	The program was written from scratch for network (INET)
+	maintenance purposes.
 
 	= 2017-03-19, David A­D­ Morano
 	This was converted into a KSH built-in command.
@@ -23,11 +24,13 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_inetping
+
+	Description:
 	This is a fairly generic front-end subroutine for a program.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -46,7 +49,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 
 #include	<usystem.h>
 #include	<paramopt.h>
@@ -74,32 +77,8 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	inetping(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -115,7 +94,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
@@ -126,25 +105,25 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procoutopen(PROGINFO *,void *,const char *) ;
-static int	procoutclose(PROGINFO *,void *) ;
+local int	procoutopen(PROGINFO *,void *,const char *) ;
+local int	procoutclose(PROGINFO *,void *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,PARAMOPT *,
+local int	procargs(PROGINFO *,ARGINFO *,bits *,paramopt *,
 			cchar *,cchar *) ;
-static int	prochosts(PROGINFO *,PARAMOPT *,void *,cchar *,int) ;
-static int	prochost(PROGINFO *,PARAMOPT *,void *,cchar *,int) ;
+local int	prochosts(PROGINFO *,paramopt *,void *,cchar *,int) ;
+local int	prochost(PROGINFO *,paramopt *,void *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_result(LOCINFO * ,int) ;
-static int	locinfo_failed(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_result(LOCINFO * ,int) ;
+local int	locinfo_failed(LOCINFO *) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
 
@@ -270,13 +249,13 @@ int p_inetping(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	PARAMOPT	aparams ;
+	bits		pargs ;
+	paramopt	aparams ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -546,7 +525,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-	                            PARAMOPT	*pop = &aparams ;
+	                            paramopt	*pop = &aparams ;
 	                            cchar	*po = PO_OPTION ;
 	                            rs = paramopt_loads(pop,po,argp,argl) ;
 	                        }
@@ -561,7 +540,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-	                            PARAMOPT	*pop = &aparams ;
+	                            paramopt	*pop = &aparams ;
 	                            rs = paramopt_loadu(pop,argp,argl) ;
 	                        }
 	                    } else
@@ -608,7 +587,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					PARAMOPT	*pop = &aparams ;
+					paramopt	*pop = &aparams ;
 	                                const char	*po = PO_OPTION ;
 	                                rs = paramopt_loads(pop,po,argp,argl) ;
 	                            }
@@ -781,7 +760,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (rs >= 0) {
 	if ((rs = paramopt_havekey(&aparams,PO_OPTION)) > 0) {
-	    PARAMOPT_CUR	cur ;
+	    paramopt_cur	cur ;
 	    const char		*po = PO_OPTION ;
 	    if ((rs = paramopt_curbegin(&aparams,&cur)) >= 0) {
 	        while (paramopt_curenumval(&aparams,po,&cur,&cp) >= 0) {
@@ -918,7 +897,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -938,7 +917,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procoutopen(PROGINFO *pip,void *ofp,const char *ofname)
+local int procoutopen(PROGINFO *pip,void *ofp,const char *ofname)
 {
 	int		rs = SR_OK ;
 	if (pip->verboselevel > 0) {
@@ -949,7 +928,7 @@ static int procoutopen(PROGINFO *pip,void *ofp,const char *ofname)
 /* end subroutine (procoutopen) */
 
 
-static int procoutclose(PROGINFO *pip,void *ofp)
+local int procoutclose(PROGINFO *pip,void *ofp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -962,7 +941,7 @@ static int procoutclose(PROGINFO *pip,void *ofp)
 /* end subroutine (procoutclose) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *pop,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
 		cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
@@ -1061,7 +1040,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *pop,
 /* end subroutine (procargs) */
 
 
-static int prochosts(PROGINFO *pip,PARAMOPT *pop,void *ofp,cchar *lbuf,int llen)
+local int prochosts(PROGINFO *pip,paramopt *pop,void *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1084,7 +1063,7 @@ static int prochosts(PROGINFO *pip,PARAMOPT *pop,void *ofp,cchar *lbuf,int llen)
 /* end subroutine (prochosts) */
 
 
-int prochost(PROGINFO *pip,PARAMOPT *pop,void *ofp,cchar *hp,int hl)
+int prochost(PROGINFO *pip,paramopt *pop,void *ofp,cchar *hp,int hl)
 {
 	NULSTR		s ;
 	int		rs ;
@@ -1161,7 +1140,7 @@ int prochost(PROGINFO *pip,PARAMOPT *pop,void *ofp,cchar *hp,int hl)
 /* end subroutine (prochost) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1173,7 +1152,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1192,7 +1171,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1229,7 +1208,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int locinfo_result(LOCINFO * lip,int f_up)
+local int locinfo_result(LOCINFO * lip,int f_up)
 {
 	lip->c_hosts += 1 ;
 	if (f_up) lip->c_up += 1 ;
@@ -1237,11 +1216,11 @@ static int locinfo_result(LOCINFO * lip,int f_up)
 }
 /* end subroutine (locinfo_result) */
 
-
-static int locinfo_failed(LOCINFO *lip)
-{
-	int	rs = 
-	(lip->c_up != lip->c_hosts) ;
+local int locinfo_failed(LOCINFO *lip) noex {
+	int	rs = SR_FAULT ;
+	if (lip) {
+	    rs = int(lip->c_up != lip->c_hosts) ;
+	}
 	return rs ;
 }
 /* end subroutine (locinfo_failed) */
