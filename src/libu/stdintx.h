@@ -107,6 +107,38 @@ typedef const slonglong *	cslonglongp ;
 typedef const ulonglong *	culonglongp ;
 #endif
 
+/* pinter-to-pointer */
+#ifndef	TYPEDEF_LONGLONGPP
+#define	TYPEDEF_LONGLONGPP
+typedef __int128 *		longlongpp ;
+#endif /* TYPEDEF_LONGLONGPP */
+
+#ifndef	TYPEDEF_SLONGLONGPP
+#define	TYPEDEF_SLONGLONGPP
+typedef signed __int128 *	slonglongpp ;
+#endif /* TYPEDEF_ULONGLONGPP */
+
+#ifndef	TYPEDEF_ULONGLONGPP
+#define	TYPEDEF_ULONGLONGPP
+typedef unsigned __int128 *	ulonglongpp ;
+#endif /* TYPEDEF_ULONGLONGPP */
+
+/* pointers-to-constant */
+
+#ifndef	TYPEDEF_CLONGLONGPP
+#define	TYPEDEF_CLONGLONGPP
+typedef const longlong *	clonglongpp ;
+#endif
+
+#ifndef	TYPEDEF_CSLONGLONGPP
+#define	TYPEDEF_CSLONGLONGPP
+typedef const slonglong *	cslonglongpp ;
+#endif
+
+#ifndef	TYPEDEF_CULONGLONGPP
+#define	TYPEDEF_CULONGLONGPP
+typedef const ulonglong *	culonglongpp ;
+#endif
 
 #ifdef	__cplusplus
 
