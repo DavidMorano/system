@@ -20,13 +20,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	getnprocessors(mainv,int) noex ;
+extern int	getnprocessors(con mainv,int) noex ;
 
 EXTERNC_end
 
