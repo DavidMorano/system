@@ -125,7 +125,7 @@ const gid_t		gidend = -1 ;
 
 int userid_start(userid *op,cc *un,cc *gn,uid_t uid,gid_t gid) noex {
     	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    submgr so(op,un,gn,uid,gid) ;
 	    rs = so ;
 	} /* end if (non-null) */
@@ -135,7 +135,7 @@ int userid_start(userid *op,cc *un,cc *gn,uid_t uid,gid_t gid) noex {
 int userid_finish(userid *op) noex {
     	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->username) {
 		char *bp = cast_const<charp>(op->username) ;
@@ -153,7 +153,7 @@ int userid_finish(userid *op) noex {
 
 submgr::operator int () noex {
     	int		rs = SR_OK ;
-	if (un) {
+	if (un) ylikely {
 	    op->username = un ;
 	    if (gn) {
 		op->groupname = gn ;
@@ -172,9 +172,9 @@ submgr::operator int () noex {
 int submgr::getgn() noex {
     	int		rs ;
 	int		rs1 ;
-	if (char *pwbuf ; (rs = mem.pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = mem.pw(&pwbuf)) >= 0) ylikely {
 	    cint	pwlen = rs ;
-	    if (ucentpw pw ; (rs = pw.getnam(pwbuf,pwlen,un)) >= 0) {
+	    if (ucentpw pw ; (rs = pw.getnam(pwbuf,pwlen,un)) >= 0) ylikely {
 		if (gn == nullptr) {
 		    rs = loadgn(pw.pw_gid) ;
 		} /* end if (pw.getnam) */
@@ -189,7 +189,7 @@ int submgr::getgn() noex {
 int submgr::getun() noex {
     	int		rs ;
 	int		rs1 ;
-	if (char *pwbuf ; (rs = mem.pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = mem.pw(&pwbuf)) >= 0) ylikely {
 	    cint	pwlen = rs ;
 	    if (ucentpw pw ; (rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
 		{
@@ -210,8 +210,8 @@ int submgr::getun() noex {
 int submgr::loadgn(gid_t pwgid) noex {
     	int		rs ;
 	int		rs1 ;
-        if (char *gnbuf ; (rs = mem.gn(&gnbuf)) >= 0) {
-            if ((rs = getgroupname(gnbuf,rs,pwgid)) >= 0) {
+        if (char *gnbuf ; (rs = mem.gn(&gnbuf)) >= 0) ylikely {
+            if ((rs = getgroupname(gnbuf,rs,pwgid)) >= 0) ylikely {
                 try {
                     tgn = gnbuf ;
                     fl.tgn = true ;
@@ -244,7 +244,7 @@ int submgr::alloc() noex {
 	    sz += int(tgn.size() + 1) ;
 	    gcp = tgn.c_str() ;
 	}
-	if (char *a ; (rs = mem.mall(sz,&a)) >= 0) {
+	if (char *a ; (rs = mem.mall(sz,&a)) >= 0) ylikely {
 	    op->username = a ;
 	    a = (stpcpy(a,ucp) + 1) ;
 	    op->groupname = a ;
@@ -266,7 +266,7 @@ void userid::dtor() noex {
 
 userid_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case useridmem_finish:
 	        rs = userid_finish(op) ;
