@@ -33,9 +33,12 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usys_atox.h"
 
+
+constexpr int		base10 = 10 ;	/* base-10 */
 
 sint	atosi(cchar *s) noex {
 	return atoi(s) ;
@@ -46,7 +49,7 @@ uint	atoui(cchar *s) noex {
 	errno_t		ec = 0 ;
 	if (s) {
 	    if (s[0]) {
-	        con ulong resl = strtoul(s,nullptr,10) ;
+	        con ulong resl = strtoul(s,nullptr,base10) ;
 		if ((resl >> (szof(uint) * CHAR_BIT)) == 0L) {
 	            res = uintconv(resl) ;
 		} else {
@@ -71,7 +74,7 @@ ulong	atoul(cchar *s) noex {
 	errno_t		ec = 0 ;
 	if (s) {
 	    if (s[0]) {
-	        res = strtoul(s,nullptr,10) ;
+	        res = strtoul(s,nullptr,base10) ;
 	    } else {
 		ec = EINVAL ;
 	    }
