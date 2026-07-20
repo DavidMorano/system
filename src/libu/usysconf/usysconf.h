@@ -29,8 +29,17 @@ EXTERNC_begin
 
 extern int	u_sysconfval(int,long *) noex ;
 extern int	u_sysconfstr(int,char *,int) noex ;
+extern int	u_nprocessors(int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+    struct unprocer {
+	operator int () noex ;
+	int operator () (int = 0) noex ;
+    } ; /* end struct */
+    extern unprocer unprocessors ;
+#endif /* __cplusplus */
 
 
 #endif /* USYSCONF_INCLUDE */
