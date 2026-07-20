@@ -34,7 +34,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* POSIX |_SC_xx| */
-#include	<stddef.h>		/* CSTD |nullptr_t| */
+#include	<stddef.h>		/* CSTD */
 #include	<stdlib.h>		/* CSTD */
 #include	<clanguage.h>		/* CSTD */
 #include	<usysbase.h>		/* CSTD */
