@@ -1,14 +1,14 @@
-/* b_fsinfo */
+/* b_fsinfo SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to return file-system information */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_HEXID	1		/* print a HEX FS-ID */
-
 
 /* revision history:
 
@@ -21,16 +21,17 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_fsinfo
+
+	Description:
 	Create a string (that is then printed out) that summarizes the
 	file-system usage on the file-system of the calling user.
 
 	Synopsis:
-
 	$ fsinfo <file> <spec(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -47,14 +48,16 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/statvfs.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<estrings.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
@@ -83,40 +86,8 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snfsflags(cchar *,int,ulong) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	statvfsdir(cchar *,STATVFS *) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern int	proginfo_setpiv(proginfo *,cchar *,const struct pivars *) ;
 
 
 /* external variables */
@@ -131,9 +102,9 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	PROGINFO	*pip ;
+	proginfo	*pip ;
 	LOCINFO_FL	f, init ;
-	STATVFS	fss ;
+	ustatvfs	fss ;
 	cchar		*homedname ;	/* allocated */
 	cchar		*filepath ;
 } ;
@@ -141,21 +112,21 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(proginfo *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,void *,cchar *,int) ;
-static int	procspec(PROGINFO *,void *, cchar *,int) ;
-static int	procout(PROGINFO *,SHIO *,cchar *) ;
+local int	procargs(proginfo *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procspecs(proginfo *,void *,cchar *,int) ;
+local int	procspec(proginfo *,void *, cchar *,int) ;
+local int	procout(proginfo *,shio *,cchar *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_sethome(LOCINFO *,cchar *,int) ;
-static int	locinfo_setpath(LOCINFO *,cchar *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,proginfo *) ;
+local int	locinfo_sethome(LOCINFO *,cchar *,int) ;
+local int	locinfo_setpath(LOCINFO *,cchar *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
-static int	matextra(cchar **,int,cchar *,int) ;
+local int	matextra(cchar **,int,cchar *,int) ;
 
 
 /* local variables */
@@ -285,14 +256,14 @@ int p_fsinfo(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
-	PROGINFO	pi, *pip = &pi ;
+	proginfo	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	SHIO		errfile ;
+	bits		pargs ;
+	keyopt		akopts ;
+	shio		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
@@ -375,7 +346,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -525,7 +496,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -581,7 +552,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -724,7 +695,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        if (un == NULL) un = "-" ;
 	        if (un[0] == '\0') rs = SR_INVALID ;
 	        if (rs >= 0) {
-	            const int	hlen = MAXPATHLEN ;
+	            cint	hlen = MAXPATHLEN ;
 	            char	hbuf[MAXPATHLEN+1] ;
 	            if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
 	                if ((rs = locinfo_sethome(lip,hbuf,rs)) >= 0) {
@@ -856,7 +827,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(proginfo *pip)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -911,9 +882,9 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+local int procargs(proginfo *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
-	SHIO		ofile, *ofp = &ofile ;
+	shio		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -951,13 +922,13 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    } /* end if (ok) */
 
 	    if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
-	        SHIO	afile, *afp = &afile ;
+	        shio	afile, *afp = &afile ;
 
 	        if (strcmp(afn,"-") == 0)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1014,7 +985,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
+local int procspecs(proginfo *pip,void *ofp,cchar *lbuf,int len)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1038,13 +1009,13 @@ static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
 
 
 /* process a specification name */
-static int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
+local int procspec(proginfo *pip,void *ofp,cchar *rp,int rl)
 {
 	LOCINFO		*lip = pip->lip ;
-	STATVFS	*fssp = &lip->fss ;
-	LONG		vt ;
-	LONG		v = -1 ;
-	const int	cvtlen = CVTBUFLEN ;
+	ustatvfs	*fssp = &lip->fss ;
+	long		vt ;
+	long		v = -1 ;
+	cint	cvtlen = CVTBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ri ;
@@ -1145,7 +1116,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
 	    if (DEBUGLEVEL(2)) 
 	        debugprintf("b_fsinfo/procspec: flags=%04lx\n",fssp->f_flag) ;
 #endif
-	    rs = snfsflags(cvtbuf,cvtlen,fssp->f_flag) ;
+	    rs = snflagsfs(cvtbuf,cvtlen,fssp->f_flag) ;
 	    break ;
 	case qopt_fspath:
 	    cbp = lip->filepath ;
@@ -1177,7 +1148,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
 /* end subroutine (procspec) */
 
 
-static int procout(PROGINFO *pip,SHIO *ofp,cchar *buf)
+local int procout(proginfo *pip,shio *ofp,cchar *buf)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1192,10 +1163,7 @@ static int procout(PROGINFO *pip,SHIO *ofp,cchar *buf)
 }
 /* end subroutine (procout) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
-
+local int locinfo_start(LOCINFO *lip,proginfo *pip) noex {
 	if (lip == NULL)
 	    return SR_FAULT ;
 
@@ -1207,7 +1175,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1226,7 +1194,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_sethome(LOCINFO *lip,cchar *hbuf,int hlen)
+local int locinfo_sethome(LOCINFO *lip,cchar *hbuf,int hlen)
 {
 	int		rs = SR_OK ;
 
@@ -1244,7 +1212,7 @@ static int locinfo_sethome(LOCINFO *lip,cchar *hbuf,int hlen)
 /* end subroutine (locinfo_sethome) */
 
 
-static int locinfo_setpath(LOCINFO *lip,cchar *fpath)
+local int locinfo_setpath(LOCINFO *lip,cchar *fpath)
 {
 
 	if (lip == NULL)
@@ -1258,10 +1226,10 @@ static int locinfo_setpath(LOCINFO *lip,cchar *fpath)
 
 
 /* this is our extra little surprise */
-static int matextra(cchar *a[],int n,cchar *s,int slen)
+local int matextra(cchar *a[],int n,cchar *s,int slen)
 {
-	const int	lc = s[0] ;
-	const int	shift = 2 ;
+	cint	lc = s[0] ;
+	cint	shift = 2 ;
 	int		i ;
 	int		m ;
 	cchar		*asp ;
