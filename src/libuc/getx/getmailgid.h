@@ -21,9 +21,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |gid_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* LIBU |gid_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
