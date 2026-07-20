@@ -1,14 +1,14 @@
-/* b_chunk (KSH builtin) */
+/* b_chunk SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to chunk-a-size up a large file into smaller ones */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_LOCSETENT	0		/* allow |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -26,15 +26,16 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_chunk
+
+	Description:
 	This program is used to binary-chunkasize files into parts.
 
 	Synopsis:
-
 	$ chunk [-V] [-p <prefix>] [-<size>] [<file(s)>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -53,6 +54,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 
@@ -92,17 +94,6 @@
 
 /* external subroutines */
 
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	readignore(int,off_t) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -112,10 +103,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -134,7 +121,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
@@ -163,7 +150,7 @@ static int	usage(PROGINFO *) ;
 static int	makedate_get(const char *,const char **) ;
 #endif /* CF_MAKEDATE */
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
 static int	procfile(PROGINFO *,PROCOUT *,cchar *) ;
 static int	procdata(PROGINFO *,PROCOUT *,int) ;
 
@@ -278,7 +265,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	SHIO		errfile, *efp = &errfile ;
 
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -872,7 +859,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	PROCOUT		po ;
 	int		rs ;
