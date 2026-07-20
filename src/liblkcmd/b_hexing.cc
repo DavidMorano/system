@@ -1,18 +1,17 @@
-/* b_hexing (hexing) */
+/* b_hexing SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* part of the HEX family of commands */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
-
 
 /* revision history:
 
 	= 1998-11-19, David A­D­ Morano
-	The program was written from scratch to do what the previous program by
-	the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 	= 2017-08-15, David A­D­ Morano
 	I changed this into a KSH built-in command.
@@ -23,6 +22,10 @@
 
 /*******************************************************************************
 
+	Name:
+	b_hexing
+
+	Description:
 	This is the front-end subroutine for the HEX and DEHEX program.
 
 *******************************************************************************/
@@ -44,7 +47,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 
 #include	<usystem.h>
 #include	<ascii.h>
@@ -72,20 +75,6 @@
 
 /* external subroutines */
 
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfhexi(const char *,int,int *) ;
-extern int	cthexstr(char *,int,cchar *,int) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isalphalatin(int) ;
-extern int	isalnumlatin(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -96,8 +85,6 @@ extern int	debugprinthex(const char *,int,const char *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
 
 
 /* external variables */
@@ -116,7 +103,7 @@ int		b_hexing(int,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procfiles(PROGINFO *,SHIO *,cchar *,int) ;
 static int	procfile(PROGINFO *,SHIO *,cchar *,int) ;
 static int	procencode(PROGINFO *,SHIO *,cchar *) ;
@@ -288,7 +275,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	PARAMOPT	aparams ;
 	SHIO		errfile ;
 	SHIO		outfile, *ofp = &outfile ;
@@ -594,7 +581,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	                        break ;
 
 	                    case 'e':
-				pip->final.encode = TRUE ;
+				pip->finval.encode = TRUE ;
 				pip->have.encode = TRUE ;
 				pip->fl.encode = TRUE ;
 	                        if (f_optequal) {
@@ -895,7 +882,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
