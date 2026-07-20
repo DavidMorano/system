@@ -41,9 +41,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<opendials.h>		/* these are the return-values */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<opendials.h>		/* LIBUC these are the return-values */
 
 
 EXTERNC_begin
