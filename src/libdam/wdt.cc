@@ -26,7 +26,7 @@
 	|ftw(3c)| this subroutine is NOT recursive!
 
 	Synopsis:
-	typedef	int	(*wdt_f)(cchar *,USTAT *,void *) noex
+	typedef	int	(*wdt_f)(cchar *,ustat *,void *) noex
 	int wdt(cchar *basedir,int wopts,wdt_f auf,void *uarg) noex
 
 	Arguments:
@@ -62,22 +62,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<fifostr.h>
-#include	<fsdir.h>
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<hasx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<fifostr.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"wdt.h"
 
@@ -89,6 +93,8 @@ import libutil ;
 
 
 /* imported namespaces */
+
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -102,23 +108,25 @@ import libutil ;
 
 /* local structures */
 
-struct subinfo {
+namespace {
+   struct subinfo {
 	wdt_f		uf ;
 	void		*uarg ;
 	fifostr		fs ;
 	int		wopts ;
 	bool		f_exit ;
-} ;
+   } ; /* end struct */
+} /* end namespace */
 
 
 /* forward references */
 
-static int subinfo_start(SI *,int,wdt_f,void *) noex ;
-static int subinfo_finish(SI *) noex ;
-static int subinfo_procdir(SI *,char *,int) noex ;
-static int subinfo_procdirents(SI *,char *,int) noex ;
-static int subinfo_procname(SI *,cchar *,int) noex ;
-static int subinfo_procout(SI *,cchar *,USTAT *) noex ;
+local int subinfo_start		(SI *,int,wdt_f,void *) noex ;
+local int subinfo_finish	(SI *) noex ;
+local int subinfo_procdir	(SI *,char *,int) noex ;
+local int subinfo_procdirents	(SI *,char *,int) noex ;
+local int subinfo_procname	(SI *,cchar *,int) noex ;
+local int subinfo_procout	(SI *,cchar *,ustat *) noex ;
 
 
 /* local variables */
@@ -134,15 +142,15 @@ int wdt(cchar *basedir,int wopts,wdt_f auf,void *uarg) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (basedir && auf) {
+	if (basedir && auf) ylikely {
 	    rs = SR_INVALID ;
-	    if (basedir[0]) {
+	    if (basedir[0]) ylikely {
 	        SI	si, *sip = &si ;
-	        if ((rs = subinfo_start(sip,wopts,auf,uarg)) >= 0) {
+	        if ((rs = subinfo_start(sip,wopts,auf,uarg)) >= 0) ylikely {
 		    fifostr	*fsp = &sip->fs ;
-	            if (char *dbuf{} ; (rs = malloc_mp(&dbuf)) >= 0) {
+	            if (char *dbuf ; (rs = mem.mp(&dbuf)) >= 0) ylikely {
 			cint	dlen = rs ;
-	                if ((rs = mkpath1(dbuf,basedir)) >= 0) {
+	                if ((rs = mkpath1(dbuf,basedir)) >= 0) ylikely {
 	                    if ((rs = subinfo_procdir(sip,dbuf,rs)) >= 0) {
 	                        c += rs ;
 	                        while ((rs >= 0) && (! sip->f_exit)) {
@@ -157,7 +165,8 @@ int wdt(cchar *basedir,int wopts,wdt_f auf,void *uarg) noex {
 	                        } /* end while */
 	                    } /* end if (subinfo_procdir) */
 	                } /* end if (mkpath) */
-		    	rs = rsfree(rs,dbuf) ;
+		    	rs1 = mem.free(dbuf) ;
+			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 	            rs1 = subinfo_finish(sip) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -165,29 +174,27 @@ int wdt(cchar *basedir,int wopts,wdt_f auf,void *uarg) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (wdt) */
+} /* end subroutine (wdt) */
 
 
 /* private subroutines */
 
-static int subinfo_start(SI *sip,int wopts,wdt_f uf,void *uarg) noex {
+local int subinfo_start(SI *sip,int wopts,wdt_f uf,void *uarg) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    memclear(sip) ;
 	    sip->wopts = wopts ;
 	    sip->uf = uf ;
 	    sip->uarg = uarg ;
 	    rs = fifostr_start(&sip->fs) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SI *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	    {
 	        rs1 = fifostr_finish(&sip->fs) ;
@@ -195,33 +202,30 @@ static int subinfo_finish(SI *sip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
-static int subinfo_procdir(SI *sip,char *dbuf,int dlen) noex {
+local int subinfo_procdir(SI *sip,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = subinfo_procdirents(sip,dbuf,dlen)) >= 0) {
-	    USTAT	sb ;
+	if ((rs = subinfo_procdirents(sip,dbuf,dlen)) >= 0) ylikely {
 	    c += rs ;
-	    if ((rs = uc_stat(dbuf,&sb)) >= 0) {
+	    if (ustat sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
 	        rs = subinfo_procout(sip,dbuf,&sb) ;
 		c += rs ;
 	    }
 	} /* end if (subinfo_procdirents) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo_procdir) */
+} /* end subroutine (subinfo_procdir) */
 
-static int subinfo_procdirents(SI *sip,char *dbuf,int dlen) noex {
+local int subinfo_procdirents(SI *sip,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *nbuf{} ; (rs = malloc_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = mem.mn(&nbuf)) >= 0) ylikely {
 	    fsdir	d ;
 	    fsdir_ent	de ;
 	    cint	nlen = rs ;
-	    if ((rs = fsdir_open(&d,dbuf)) >= 0) {
+	    if ((rs = fsdir_open(&d,dbuf)) >= 0) ylikely {
 	        while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
 	            if (hasNotDots(de.name,-1)) {
 	                if ((rs = pathadd(dbuf,dlen,de.name)) >= 0) {
@@ -236,23 +240,20 @@ static int subinfo_procdirents(SI *sip,char *dbuf,int dlen) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (fsdir) */
 	    dbuf[dlen] = '\0' ;
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = mem.free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo_procdirents) */
+} /* end subroutine (subinfo_procdirents) */
 
-static int subinfo_procname(SI *sip,cchar *dbuf,int dlen) noex {
-	USTAT		sb ;
+local int subinfo_procname(SI *sip,cchar *dbuf,int dlen) noex {
 	int		rs ;
-	if ((rs = lstat(dbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = lstat(dbuf,&sb)) >= 0) ylikely {
 	    if (S_ISDIR(sb.st_mode)) {
 	        rs = fifostr_add(&sip->fs,dbuf,dlen) ;
 	    } else if (S_ISLNK(sb.st_mode)) {
 	        if (sip->wopts & WDT_MFOLLOW) {
-	            ustat	sbb ;
-	            if ((rs = u_stat(dbuf,&sbb)) >= 0) {
+	            if (ustat sbb ; (rs = u_stat(dbuf,&sbb)) >= 0) {
 	                if (S_ISDIR(sbb.st_mode)) {
 	                    rs = fifostr_add(&sip->fs,dbuf,dlen) ;
 	                } else {
@@ -267,16 +268,15 @@ static int subinfo_procname(SI *sip,cchar *dbuf,int dlen) noex {
 	        }
 	    } else {
 	            rs = subinfo_procout(sip,dbuf,&sb) ;
-	    }
+	    } /* end if */
 	} else if (rs == SR_NOENT) {
 	    sb = {} ;
 	    rs = subinfo_procout(sip,dbuf,&sb) ;
-	}
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (subinfo_procname) */
+} /* end subroutine (subinfo_procname) */
 
-static int subinfo_procout(SI *sip,cchar *dbuf,USTAT *sbp) noex {
+local int subinfo_procout(SI *sip,cchar *dbuf,ustat *sbp) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (sip->uf) {
@@ -287,7 +287,6 @@ static int subinfo_procout(SI *sip,cchar *dbuf,USTAT *sbp) noex {
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo_procout) */
+} /* end subroutine (subinfo_procout) */
 
 
