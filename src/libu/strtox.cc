@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* convert a decimal c-string to the type |longlong| */
+/* convert a c-string of various number bases to an integer type */
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* debugging */
@@ -41,13 +41,9 @@
 	strtoxui
 	strtoxul
 	strtoxull
-	atosll
-	atoull
 
 	Synopsis:
 	{x} strtox{x}(cchar *sp,char **endp,int base) noex
-	slonglong atosll(cchar *sp) noex
-	ulonglong atoull(cchar *sp) noex
 
 	Arguments:
 	{x}		one of: i, l, ll, ui, ul, ull
@@ -61,7 +57,7 @@
 
 	Description:
 	This code converts a c-string of decimal digits into the
-	integer types |longlong| and |ulonglong|.  The API and
+	integer types |slonglong| or |ulonglong|.  The API and
 	semantics of this code is intentionally modeled after the
 	API and semantics of the existing UNIX® standard C-language
 	library conversion subroutines |strtol(3c)| and |strtoul(3c)|.
@@ -86,6 +82,11 @@
 	1. This code is limited (for standards compliance) to a
 	maximum base of 36.  This is the standard for the standard
 	C-language library subroutines.
+	2. When the standard C library subroutine |strtol(3c)|
+	is given a NULL string, it seg-faults.  So I here below,
+	check for that (a NULL pointer).  But at least when the 
+	|strtol(3c)| subroutine is given an empty string, it 
+	returns an EINVAL (as desired).
 
 	Questions-Answers:
 
@@ -172,7 +173,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>		/* CSTD */
 #include	<climits>		/* CSTD |CHAR_BIT| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD |strtol(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -232,13 +233,13 @@ namespace {
 	consteval void mkcuts() noex {
 	    for (uint b = 2 ; b <= uint(maxbase) ; b += 1) {
 		cutoff[b] = (ullmax / b) ;
-		cutlim[b] = intconv(ullmax % b) ;
+		cutlim[b] = conv<int>(ullmax % b) ;
 	    } /* end for */
 	} ; /* end method (mkcuts) */
 	consteval void mkpos() noex {
 	    for (uint b = 2 ; b <= uint(maxbase) ; b += 1) {
                 pcutoff[b] = (llmax / b) ;
-                pcutlim[b] = intconv(llmax % b) ;
+                pcutlim[b] = conv<int>(llmax % b) ;
 	    } /* end for */
 	} ; /* end method (mkpos) */
 	consteval void mkneg() noex {
@@ -246,7 +247,7 @@ namespace {
 	    int		ncl ;
 	    for (uint b = 2 ; b <= uint(maxbase) ; b += 1) {
                 nco = (llmin / b) ;
-                ncl = intconv(llmin % b) ;
+                ncl = conv<int>(llmin % b) ;
                 if (ncl > 0) {
                     ncl -= b ;
                     nco += 1 ;
@@ -349,10 +350,10 @@ namespace {
 } /* end namespace */
 
 namespace {
-    struct strer_sigll : strer { /* "signed-longlong" */
+    struct strer_sll : strer { /* "signed-longlong" */
 	longlong	res{} ;
 	longlong	cutoff ;
-	strer_sigll(cc *s,char **e,int b) noex : strer(s,e,b) { } ;
+	strer_sll(cc *s,char **e,int b) noex : strer(s,e,b) { } ;
 	operator longlong ()	noex ;
 	void cookprep()		noex override final ;
 	void cvt(int)		noex override final ;
@@ -360,10 +361,10 @@ namespace {
 	void cvtneg(int)	noex ;
 	void reterr()		noex override final ;
     } ; /* end struct */
-    struct strer_unsll : strer { /* "unsigned-longlong" */
+    struct strer_ull : strer { /* "unsigned-longlong" */
 	ulonglong	ures{} ;
 	ulonglong	cutoff ;
-	strer_unsll(cc *s,char **e,int b) noex : strer(s,e,b) { } ;
+	strer_ull(cc *s,char **e,int b) noex : strer(s,e,b) { } ;
 	operator ulonglong ()	noex ;
 	void cookprep()		noex override final ;
 	void cvt(int)		noex override final ;
@@ -455,6 +456,9 @@ local bool iserr(TU co,int cl,TU ures,int val) noex attrconst {
 
 constexpr llhelper	llhelp ;
 constexpr charbase	chbase ;
+constexpr int		base8	= 8 ;		/* base-8 */
+constexpr int		base10	= 10 ;		/* base-10 */
+constexpr int		base16	= 16 ;		/* base-16 */
 constexpr bool		f_debug = CF_DEBUG ;
 
 
@@ -484,7 +488,7 @@ long		strtoxl(cchar *sp,char **epp,int b) noex {
 } /* end subroutine (strtoxl) */
 
 longlong	strtoxll(cchar *sp,char **epp,int b) noex {
-    	strer_sigll so(sp,epp,b) ;
+    	strer_sll so(sp,epp,b) ;
 	return so ;
 } /* end subroutine (strtoxll) */
 
@@ -509,41 +513,9 @@ ulong		strtoxul(cchar *sp,char **epp,int b) noex {
 } /* end subroutine (strtoxul) */
 
 ulonglong	strtoxull(cchar *sp,char **epp,int b) noex {
-    	strer_unsll so(sp,epp,b) ;
+    	strer_ull so(sp,epp,b) ;
 	return so ;
 } /* end subroutine (strtoxull) */
-
-slonglong	atosll(cchar *s) noex {
-    	longlong	res = 0 ;
-	int		ec = 0 ;
-	if (s) {
-	    if (s[0]) {
-		res = strtoxll(s,nullptr,10) ;
-	    } else {
-		ec = EINVAL ;
-	    }
-	} else {
-	    ec = EFAULT ;
-	} /* end if (non-null) */
-	if (ec) errno = ec ;
-    	return res ;
-} /* end subroutine (atosll) */
-
-ulonglong	atoull(cchar *s) noex {
-    	longlong	res = 0 ;
-	int		ec = 0 ;
-	if (s) {
-	    if (s[0]) {
-		res = strtoxull(s,nullptr,10) ;
-	    } else {
-		ec = EINVAL ;
-	    }
-	} else {
-	    ec = EFAULT ;
-	} /* end if (non-null) */
-	if (ec) errno = ec ;
-    	return res ;
-} /* end subroutine (atoull) */
 
 
 /* local subroutines */
@@ -567,15 +539,15 @@ void strer::suber() noex {
 
 void strer::baser() noex {
     	int ch = *sp ;
-	if ((ch == '0') && (base == 0 || base == 16)) {
+	if ((ch == '0') && (base == 0 || base == base16)) {
 	    if (cint b = getbase(sp[1]) ; b > 0) {
 		base = b ;
-		sp += 2 ;
+		sp += 2 ; /* advance two characters */
 		ch = *sp ;
 	    } /* end if (getbase) */
 	} /* end if */
 	if (base == 0) {
-	    base = ((ch == '0') ? 8 : 10) ;
+	    base = ((ch == '0') ? base8 : base10) ;
 	}
 } /* end method (strer::baser) */
 
@@ -585,7 +557,7 @@ local inline int getval(int b,cchar *sp) noex {
 	    if (cint v = chbase.val[ch] ; v < b) {
 		val = v ;
 	    }
-	}
+	} /* end if */
 	return val ;
 } /* end subroutine (getval) */
 
@@ -602,17 +574,17 @@ void strer::cooker() noex {
 	} /* end if (valid base) */
 } /* end method (strer::cooker) */
 
-strer_sigll::operator longlong () noex {
+strer_sll::operator longlong () noex {
     	suber() ;
     	return res ;
-} /* end method (strer_sigll::operator) */
+} /* end method (strer_sll::operator) */
 
-void strer_sigll::cookprep() noex {
+void strer_sll::cookprep() noex {
 	cutoff = llhelp.getcutoff(base,fneg) ;
 	cutlim = llhelp.getcutlim(base,fneg) ;
 } /* end method */
 
-void strer_sigll::cvt(int val) noex {
+void strer_sll::cvt(int val) noex {
 	if (fneg) {
 	    cvtneg(val) ;
 	} else {
@@ -620,7 +592,7 @@ void strer_sigll::cvt(int val) noex {
 	}
 } /* end method */
 
-void strer_sigll::cvtneg(int val) noex {
+void strer_sll::cvtneg(int val) noex {
 	if (iserrneg(cutoff,cutlim,res,val)) {
 	    verr = -1 ;
 	} else {
@@ -630,7 +602,7 @@ void strer_sigll::cvtneg(int val) noex {
 	} /* end if */
 } /* end method */
 
-void strer_sigll::cvtpos(int val) noex {
+void strer_sll::cvtpos(int val) noex {
 	if (iserrpos(cutoff,cutlim,res,val)) {
 	    verr = -1 ;
 	} else {
@@ -640,24 +612,24 @@ void strer_sigll::cvtpos(int val) noex {
 	} /* end if */
 } /* end method */
 
-void strer_sigll::reterr() noex {
+void strer_sll::reterr() noex {
     	if (verr < 0) {
 	    res = (fneg) ? llhelp.llmin : llhelp.llmax ;
 	    errno = ERANGE ;
 	}
-} /* end method (strer_sigll::reterr) */
+} /* end method (strer_sll::reterr) */
 
-strer_unsll::operator ulonglong () noex {
+strer_ull::operator ulonglong () noex {
     	suber() ;
     	return ures ;
 } /* end method */
 
-void strer_unsll::cookprep() noex {
+void strer_ull::cookprep() noex {
 	cutoff = llhelp.cutoff[base] ;
 	cutlim = llhelp.cutlim[base] ;
 } /* end method */
 
-void strer_unsll::cvt(int val) noex {
+void strer_ull::cvt(int val) noex {
 	if (iserr(cutoff,cutlim,ures,val)) {
 	    verr = -1 ;
 	} else {
@@ -667,17 +639,17 @@ void strer_unsll::cvt(int val) noex {
 	} /* end if */
 } /* end method */
 
-void strer_unsll::negator() noex {
+void strer_ull::negator() noex {
 	if (fneg && verr > 0) {
 	    ures = (neg ures) ;
 	}
-} /* end method (strer_unsll::negator) */
+} /* end method (strer_ull::negator) */
 
-void strer_unsll::reterr() noex {
+void strer_ull::reterr() noex {
     	if (verr < 0) {
 	    ures = llhelp.ullmax ;
 	    errno = ERANGE ;
 	}
-} /* end method (strer_unsll::reterr) */
+} /* end method (strer_ull::reterr) */
 
 
