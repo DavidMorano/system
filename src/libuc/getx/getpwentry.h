@@ -14,9 +14,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |uid_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<pwentry.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<pwentry.h>		/* LIBUC */
 
 
 EXTERNC_begin
