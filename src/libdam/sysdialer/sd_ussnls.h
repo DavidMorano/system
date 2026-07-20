@@ -27,9 +27,9 @@
 #include	<sysdialer.h>
 
 
-#define	USSNLS_MAGIC		31415926
 #define	USSNLS			struct ussnls_head
 #define	USSNLS_FL		struct ussnls_flags
+#define	USSNLS_MAGIC		31415926
 
 
 struct ussnls_flags {
