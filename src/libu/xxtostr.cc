@@ -117,7 +117,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cerrno>		/* CSTD |errno| */
 #include	<climits>		/* CSTD |ULONG_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -154,13 +154,13 @@ template<typename UT>
 constexpr int uxxtostr(char *endp,int b,UT v) noex {
     int             rs = SR_FAULT ;
     char            *rp = endp ;
-    if (endp) {
+    if (endp) ylikely {
         rs = SR_INVALID ;
         *rp = '\0' ;
-        if ((b >= 2) && (b <= xxtostr_maxbase)) {
+        if ((b >= 2) && (b <= xxtostr_maxbase)) ylikely {
             const uint ub = uint(b) ;
 	    rs = SR_OK ;
-            if (v != 0) {
+            if (v != 0) ylikely {
                 int di ;
                 if_constexpr (szof(UT) > szof(ulong)) {
                     const UT vmask = (compl UT(ULONG_MAX)) ;
@@ -195,7 +195,7 @@ constexpr int sxxtostr(char *endp,int b,ST v) noex {
     int             rs = SR_FAULT ;
     char            *rp = nullptr ;
     if (v < 0) uv = (neg uv) ;
-    if (endp) {
+    if (endp) ylikely {
         if ((rs = uxxtostr(endp,b,uv)) >= 0) {
             rp = (endp - rs) ;
             if (v < 0) *--rp = '-' ;
@@ -209,10 +209,10 @@ constexpr int uxxtostr10(char *endp,UT v) noex {
     constexpr uint	udiv100	= uint(div100) ;
     int             rs = SR_FAULT ;
     char            *rp = endp ;
-    if (endp) {
+    if (endp) ylikely {
         rs = SR_OK ;
         *rp = '\0' ;
-        if (v != 0) {
+        if (v != 0) ylikely {
             int di ;
             if_constexpr (szof(UT) > szof(ulong)) {
                 const UT vmask = (compl UT(ULONG_MAX)) ;
@@ -255,7 +255,7 @@ constexpr int sxxtostr10(char *endp,ST v) noex {
     int             rs = SR_FAULT ;
     char            *rp = nullptr ;
     if (v < 0) uv = (neg uv) ;
-    if (endp) {
+    if (endp) ylikely {
         if ((rs = uxxtostr10(endp,uv)) >= 0) {
             rp = (endp - rs) ;
             if (v < 0) *--rp = '-' ;
@@ -277,10 +277,10 @@ constexpr char *stostr(T v,char *endp,int b) noex {
         }
         return rsl ;
     } ; /* end lambda (sxx) */
-    if ((rs = sxx(v)) >= 0) {
+    if ((rs = sxx(v)) >= 0) ylikely {
         rp = (endp - rs) ;
     } else {
-        errno = (- rs) ;
+        errno = (neg rs) ;
     }
     return (rs >= 0) ? rp : nullptr ;
 } /* end subroutine (stostr) */
@@ -298,7 +298,7 @@ constexpr char *utostr(UT uv,char *endp,int b) noex {
         }
         return rsl ;
     } ; /* end lambda (uxx) */
-    if ((rs = uxx(uv)) >= 0) {
+    if ((rs = uxx(uv)) >= 0) ylikely {
         rp = (endp - rs) ;
     } else {
         errno = (neg rs) ;
