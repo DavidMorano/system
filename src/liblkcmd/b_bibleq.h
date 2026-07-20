@@ -19,6 +19,13 @@
 #define	BIBLEQCONFIG_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+
+
 #define	VERSION		"0"
 #define	WHATINFO	"@(#)bibleq "
 #define	BANNER		"Bible Query"
