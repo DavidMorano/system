@@ -92,7 +92,7 @@ int xwords_start(xwords *op,cchar *wbuf,int wlen) noex {
     	XWORDS		*hop = op ; /* <- head */
 	int		rs = SR_FAULT ;
 	int		i = 0 ; /* return-value */
-	if (op && wbuf) {
+	if (op && wbuf) ylikely {
 	    rs = memclear(hop) ;
             /* always enter the whole word */
 	    op->words[i].wp = wbuf ;
@@ -133,7 +133,7 @@ int xwords_start(xwords *op,cchar *wbuf,int wlen) noex {
 int xwords_get(xwords *op,int i,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		wl = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_INVALID ;
 	    if (i >= 0) {
 	        xwords_word	*w = op->words ;
@@ -152,7 +152,7 @@ int xwords_get(xwords *op,int i,cchar **rpp) noex {
 int xwords_finish(xwords *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->xa) {
 	        rs1 = lm_free(op->xa) ;
@@ -174,8 +174,8 @@ local int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ; /* return-value */
-	if (vecobj wil ; (rs = wil.start(esz,vn,vo)) >= 0) {
-	    if (xwords_wi wi(wbuf,si) ; (rs = wil.add(&wi)) >= 0) {
+	if (vecobj wil ; (rs = wil.start(esz,vn,vo)) >= 0) ylikely {
+	    if (xwords_wi wi(wbuf,si) ; (rs = wil.add(&wi)) >= 0) ylikely {
 		int	wl = (wlen - (si + 1)) ;
 		cchar	*wp = (wbuf + (si + 1)) ;
 		while ((si = sichr(wp,wl,'-')) >= 0) {
@@ -192,8 +192,8 @@ local int xwords_more(xwords *op,cchar *wbuf,int wlen,int si) noex {
 	    	    wi.wp = wp ;
 	    	    wi.wl = wl ;
 	    	    rs = vecobj_add(&wil,&wi) ;
-		}
-		if ((rs >= 0) && ((rs = wil.count) >= 0)) {
+		} /* end if */
+		if ((rs >= 0) && ((rs = wil.count) >= 0)) ylikely {
 		    int		j ; /* used-afterwards */
 		    n = (op->nwords + rs) ;
 		    if (n > XWORDS_MAX) {
@@ -245,7 +245,7 @@ void xwords::dtor() noex {
 
 xwords_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case xwordsmem_finish:
 	        rs = xwords_finish(op) ;
