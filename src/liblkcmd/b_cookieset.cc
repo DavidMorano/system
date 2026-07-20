@@ -1,14 +1,15 @@
-/* b_cookieset (KSH builtin) */
+/* b_cookieset SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* typeset a cookie file to TROFF source */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_NOFILL	0		/* turn on no-fill mode */
 #define	CF_LEADER	0		/* print leader */
 #define	CF_LOCSETENT	0		/* compile |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -26,16 +27,17 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_cookieset
+
+	Description:
         This program will read the input file and format it into 'troff'
         constant width font style source input language.
 
 	Synopsis:
-
 	$ cookieset <input_file> > <out.dwb>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -94,15 +96,6 @@
 
 /* external subroutines */
 
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optvalue(cchar *,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 
@@ -113,10 +106,6 @@ extern int	debugclose() ;
 extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -132,7 +121,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
@@ -161,8 +150,8 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,SHIO *,cchar *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,SHIO *,cchar *) ;
 static int	procfile(PROGINFO *,SHIO *,cchar *,int,int) ;
 
 static int	procout_begin(PROGINFO *,SHIO *) ;
@@ -267,7 +256,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	SHIO		efile ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
@@ -778,7 +767,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 	if (rs >= 0) {
 	    ARGINFO	*aip = &ainfo ;
-	    BITS	*bop = &pargs ;
+	    bits	*bop = &pargs ;
 	    cchar	*afn = afname ;
 	    cchar	*ofn = ofname ;
 	    rs = process(pip,aip,bop,ofn,afn) ;
@@ -888,7 +877,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -916,7 +905,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,SHIO *ofp,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
