@@ -116,6 +116,10 @@
 #define	vol			volatile
 #endif /* __cplusplus */
 
+#ifndef	conv
+#define	conv			static_cast
+#endif
+
 
 #endif /* CLANGUAGEKEYWORDS_INCLUDE */
 
