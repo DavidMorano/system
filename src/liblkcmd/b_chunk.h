@@ -1,4 +1,9 @@
-/* config */
+/* chunk_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* program to chunk-a-size up a large file into smaller ones */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,6 +15,15 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
+#ifndef	CHUNKCONFIG_INCLUDE
+#define	CHUNKCONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #define	VERSION		"0c"
@@ -73,5 +87,8 @@
 
 #define	PO_SUFFIX	"suffix"
 #define	PO_OPTION	"option"
+
+
+#endif /* CHUNKCONFIG_INCLUDE */
 
 
