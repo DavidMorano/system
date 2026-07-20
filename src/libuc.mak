@@ -117,6 +117,11 @@ OBJ29= uclibmem.o ucyserattr.o
 OBJ30= ucsys.o ucatexit.o ucatfork.o
 OBJ31= tcx.o ucpts.o ucpwcache.o
 
+OBJ32= ucinet.o
+OBJ33=
+OBJ34=
+OBJ35=
+
 OBJ=
 OBJ += $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
 OBJ += $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
@@ -162,11 +167,11 @@ a:			$(T).a
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).so:		$(OBJ) Makefile
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(RUNINFO) $(LIBINFO)
-
 $(T).o:			$(OBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+$(T).so:		$(OBJ)
+	$(LD) -shared -o $@ $(LDFLAGS) $^ $(RUNINFO) $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
@@ -409,7 +414,6 @@ stdorder.o:		stdorder.cc stdorder.h
 
 sigevent.o:		sigevent.cc sigevent.h
 timeout.o:		timeout.cc timeout.h
-upt.o:			upt.cc upt.h
 spawnproc.o:		spawnproc.cc spawnproc.h
 
 memfile.o:		memfile.cc memfile.h
@@ -928,7 +932,9 @@ ucmem.dir:
 	makesubdir $@
 
 # UCINET
-ucinetconv.o:		ucinetconv.cc ucinetconv.h
+ucinet.o:		ucinet.dir
+ucinet.dir:
+	makesubdir $@
 
 # tab and character column handling
 tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h
