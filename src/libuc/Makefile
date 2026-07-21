@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += usystem.h localmisc.h
+INCS += usystem.h
 INCS += uclibsubs.h
 
 MODS += bstree.ccm sview.ccm strfilter.ccm
@@ -112,10 +112,15 @@ OBJ25= ucdescread.o ucdescwrite.o ucdescsock.o
 OBJ26= ucdescmisc.o ucdesclock.o
 OBJ27= ucproc.o ucdata.o
 
-OBJ28= uctc.o ucsysconf.o
+OBJ28= uctc.o ucsysconf.o ucsysmisc.o
 OBJ29= uclibmem.o ucyserattr.o
 OBJ30= ucsys.o ucatexit.o ucatfork.o
 OBJ31= tcx.o ucpts.o ucpwcache.o
+
+OBJ32= ucinet.o
+OBJ33=
+OBJ34=
+OBJ35=
 
 OBJ=
 OBJ += $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
@@ -162,11 +167,11 @@ a:			$(T).a
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).so:		$(OBJ) Makefile
-	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(RUNINFO) $(LIBINFO)
-
 $(T).o:			$(OBJ)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+$(T).so:		$(OBJ)
+	$(LD) -shared -o $@ $(LDFLAGS) $^ $(RUNINFO) $(LIBINFO)
 
 $(T).a:			$(OBJ)
 	$(AR) -rc $@ $?
@@ -324,7 +329,7 @@ objz.o:			$(OBJZ)
 
 
 # base
-OBJ0_BASE= uctimeout.o
+OBJ0_BASE= uctime.o
 OBJ1_BASE= ucsysconf.o 
 OBJ2_BASE=
 OBJ3_BASE=
@@ -364,8 +369,7 @@ character.o:	$(OBJ_CHAR)
 
 
 # LIBUC
-ucsysmisc.o:		ucsysmisc.cc
-ucnprocs.o:		ucnprocs.cc
+ucsysmisc.o:		ucsysmisc.cc	ucsysmisc.h		$(INCS)
 ucpathconf.o:		ucpathconf.cc
 ucmain.o:		ucmain.cc
 ucatfork.o:		ucatfork.cc	ucatfork.h		$(INCS)
@@ -380,9 +384,6 @@ ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
 ucinfo.o:		ucinfo.cc	ucinfo.h		$(INCS)
 
 ucdescbase.o:		ucdescbase.cc	ucdescbase.hh		$(INCS)
-
-# uctimeout (time-out call-backs)
-uctimeout.o:		uctimeout.cc
 
 # SYSTEM
 ucsysauxinfo.o:		ucsysauxinfo.cc ucsysauxinfo.h
@@ -413,7 +414,6 @@ stdorder.o:		stdorder.cc stdorder.h
 
 sigevent.o:		sigevent.cc sigevent.h
 timeout.o:		timeout.cc timeout.h
-upt.o:			upt.cc upt.h
 spawnproc.o:		spawnproc.cc spawnproc.h
 
 memfile.o:		memfile.cc memfile.h
@@ -464,10 +464,6 @@ memtrack.dir:
 ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h ucmallreg.h
 ucmemalloc.o:		addrset.o
 
-# UNIX C-language system library timer management
-uctim.o:		uctim.cc uctim.h itcontrol.h
-uctimer.o:		uctimer.cc uctimer.h
-
 # misc-character
 toxc.o:			toxc.cc toxc.h
 char.o:			char.cc char.h
@@ -486,6 +482,11 @@ ucsupport.dir:
 # UCSYSCONF
 ucsysconf.o:		ucsysconf.dir
 ucsysconf.dir:
+	makesubdir $@
+
+# UCOPEN
+ucopen.o:		ucopen.dir
+ucopen.dir:
 	makesubdir $@
 
 # UCDESCREAD
@@ -513,14 +514,14 @@ ucdescmisc.o:		ucdescmisc.dir
 ucdescmisc.dir:
 	makesubdir $@
 
-# UCIDS
-ucdata.o:		ucdata.dir
-ucdata.dir:
-	makesubdir $@
-
 # UCFILEOP
 ucfileop.o:		ucfileop.dir
 ucfileop.dir:
+	makesubdir $@
+
+# UCIDS
+ucdata.o:		ucdata.dir
+ucdata.dir:
 	makesubdir $@
 
 # UCPROC
@@ -531,6 +532,36 @@ ucproc.dir:
 # UCSTREAM
 ucstream.o:		ucstream.dir
 ucstream.dir:
+	makesubdir $@
+
+# UCSYS
+ucsys.o:		ucsys.dir
+ucsys.dir:
+	makesubdir $@
+
+# UCENT
+ucent.o:		ucent.dir
+ucent.dir:
+	makesubdir $@
+
+# UCGET
+ucget.o:		ucget.dir
+ucget.dir:
+	makesubdir $@
+
+# UCENUM
+ucenum.o:		ucenum.dir
+ucenum.dir:
+	makesubdir $@
+
+# UCGETX
+ucgetx.o:		ucgetx.dir
+ucgetx.dir:
+	makesubdir $@
+
+# UCTIME
+uctime.o:		uctime.dir
+uctime.dir:
 	makesubdir $@
 
 # ADDRSET
@@ -613,36 +644,6 @@ matxstr.dir:
 # HASH
 hash.o:			hash.dir
 hash.dir:
-	makesubdir $@
-
-# UCSYS
-ucsys.o:		ucsys.dir
-ucsys.dir:
-	makesubdir $@
-
-# UCENT
-ucent.o:		ucent.dir
-ucent.dir:
-	makesubdir $@
-
-# UCGET
-ucget.o:		ucget.dir
-ucget.dir:
-	makesubdir $@
-
-# UCENUM
-ucenum.o:		ucenum.dir
-ucenum.dir:
-	makesubdir $@
-
-# UCGETX
-ucgetx.o:		ucgetx.dir
-ucgetx.dir:
-	makesubdir $@
-
-# UCOPEN
-ucopen.o:		ucopen.dir
-ucopen.dir:
 	makesubdir $@
 
 # STRN
@@ -931,7 +932,9 @@ ucmem.dir:
 	makesubdir $@
 
 # UCINET
-ucinetconv.o:		ucinetconv.cc ucinetconv.h
+ucinet.o:		ucinet.dir
+ucinet.dir:
+	makesubdir $@
 
 # tab and character column handling
 tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h
