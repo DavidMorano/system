@@ -40,8 +40,8 @@ MODS +=
 LIBS +=
 
 
-OBJ00= systypenames.o
-OBJ01=
+OBJ00= systypenames.o getsystypenum.o
+OBJ01= getdefzdata.o
 OBJ02= getaddr.o getaf.o getarch.o 
 OBJ03= gethz.o getlogx.o getmailgid.o getmjd.o
 OBJ04= getnfile.o getngroups.o getnodedomain.o
@@ -50,7 +50,7 @@ OBJ06= getpassword.o getportnum.o getprogpath.o
 OBJ07= getproto.o getpf.o getpwd.o getprogexec.o
 OBJ08= getpwentry.o getpwlogname.o getpwx.o 
 OBJ09= getseed.o getserial.o getserv.o
-OBJ10= getsocktype.o getsyslogx.o getsystypenum.o
+OBJ10= getsocktype.o getsyslogx.o 
 OBJ11= getuserhome.o getuserorg.o getuserterms.o
 OBJ12= getxid.o getopendial.o getmaxpid.o
 OBJ13= getnisdomain.o getfstype.o getuserterm.o
@@ -66,8 +66,7 @@ OBJ= obja.o objb.o objc.o objd.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
