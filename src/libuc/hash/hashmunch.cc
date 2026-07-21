@@ -1,6 +1,6 @@
 /* hashmunch SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* create an index from a hash value */
 /* version %I% last-modified %G% */
@@ -38,7 +38,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |CHAR_BIT| */
-#include	<cstdint>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<concepts>		/* C++CSTD */
