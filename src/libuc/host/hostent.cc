@@ -47,20 +47,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<string>		/* |memcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<storeitem.h>
-#include	<intceil.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<string>		/* CSTD |memcpy(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<storeitem.h>		/* LIBUC */
+#include	<intceil.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hostent.h"
 
@@ -96,10 +96,10 @@ typedef const hostent	chostent ;
 
 /* forward references */
 
-static int	si_copyaliases(SI *,HE *,CHE *) noex ;
-static int	si_copyaddrs(SI *,HE *,CHE *) noex ;
-static int	si_copystr(SI *,char **,cchar *) noex ;
-static int	si_copybuf(SI *,char **,cchar *,int) noex ;
+local int	si_copyaliases(SI *,HE *,CHE *) noex ;
+local int	si_copyaddrs(SI *,HE *,CHE *) noex ;
+local int	si_copystr(SI *,char **,cchar *) noex ;
+local int	si_copybuf(SI *,char **,cchar *,int) noex ;
 
 
 /* local variables */
@@ -127,8 +127,7 @@ int hostent_getofficial(HE *hep,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? nlen : rs ;
-}
-/* end subroutine (hostent_getofficial) */
+} /* end subroutine (hostent_getofficial) */
 
 /* get address family type (assume it is in host byte order) */
 int hostent_getaf(HE *hep) noex {
@@ -137,8 +136,7 @@ int hostent_getaf(HE *hep) noex {
 	    rs = hep->h_addrtype ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (hostent_getaf) */
+} /* end subroutine (hostent_getaf) */
 
 int hostent_getalen(HE *hep) noex {
 	int		rs = SR_FAULT ;
@@ -146,8 +144,7 @@ int hostent_getalen(HE *hep) noex {
 	    rs = hep->h_length ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (hostent_getalen) */
+} /* end subroutine (hostent_getalen) */
 
 int hostent_curbegin(HE *hep,hostent_cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -156,8 +153,7 @@ int hostent_curbegin(HE *hep,hostent_cur *curp) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (hostent_curbegin) */
+} /* end subroutine (hostent_curbegin) */
 
 int hostent_curend(HE *hep,hostent_cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -166,8 +162,7 @@ int hostent_curend(HE *hep,hostent_cur *curp) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (hostent_curend) */
+} /* end subroutine (hostent_curend) */
 
 /* enumerate the next hostname */
 int hostent_curenumname(HE *hep,hostent_cur *curp,cchar **rpp) noex {
@@ -206,8 +201,7 @@ int hostent_curenumname(HE *hep,hostent_cur *curp,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? nlen : rs ;
-}
-/* end subroutine (hostent_curenumname) */
+} /* end subroutine (hostent_curenumname) */
 
 /* enumerate the next host address */
 int hostent_curenumaddr(HE *hep,hostent_cur *curp,cuchar **rpp) noex {
@@ -240,8 +234,7 @@ int hostent_curenumaddr(HE *hep,hostent_cur *curp,cuchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? alen : rs ;
-}
-/* end subroutine (hostent_curenumaddr) */
+} /* end subroutine (hostent_curenumaddr) */
 
 int hostent_getcanonical(HE *hep,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -270,14 +263,12 @@ int hostent_getcanonical(HE *hep,cchar **rpp) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? nlen : rs ;
-}
-/* end subroutine (hostent_getcanonical) */
+} /* end subroutine (hostent_getcanonical) */
 
 /* get a fully qualified domain name */
 int hostent_getfqdn(HE *hep,cchar **rpp) noex {
 	return hostent_getcanonical(hep,rpp) ;
-}
-/* end subroutine (hostent_getfqdn) */
+} /* end subroutine (hostent_getfqdn) */
 
 int hostent_size(HE *hep) noex {
 	int		rs = SR_FAULT ;
@@ -302,8 +293,7 @@ int hostent_size(HE *hep) noex {
 	    sz = iceil(sz,szof(cchar *)) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (hostent_size) */
+} /* end subroutine (hostent_size) */
 
 int hostent_load(HE *hep,char *hebuf,int helen,HOSTENT *lp) noex {
 	int		rs = SR_FAULT ;
@@ -319,13 +309,12 @@ int hostent_load(HE *hep,char *hebuf,int helen,HOSTENT *lp) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (hostent_load) */
+} /* end subroutine (hostent_load) */
 
 
 /* private subroutines */
 
-static int si_copyaliases(SI *ibp,HE *hep,CHE *lp) noex {
+local int si_copyaliases(SI *ibp,HE *hep,CHE *lp) noex {
 	int		rs = SR_OK ;
 	if (lp->h_aliases != nullptr) ylikely {
 	    int		n{} ;
@@ -344,10 +333,9 @@ static int si_copyaliases(SI *ibp,HE *hep,CHE *lp) noex {
 	    hep->h_aliases = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (si_copyaliases) */
+} /* end subroutine (si_copyaliases) */
 
-static int si_copyaddrs(SI *ibp,HE *hep,CHE *lp) noex {
+local int si_copyaddrs(SI *ibp,HE *hep,CHE *lp) noex {
 	int		rs = SR_OK ;
 	if (lp->h_addr_list != nullptr) ylikely {
 	    int		n{} ; /* used-afterwards */
@@ -367,10 +355,9 @@ static int si_copyaddrs(SI *ibp,HE *hep,CHE *lp) noex {
 	    hep->h_addr_list = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (si_copyaddrs) */
+} /* end subroutine (si_copyaddrs) */
 
-static int si_copystr(SI *ibp,char **pp,cchar *s1) noex {
+local int si_copystr(SI *ibp,char **pp,cchar *s1) noex {
 	int		rs = SR_OK ;
 	cchar		**cpp = ccharpp(pp) ;
 	*cpp = nullptr ;
@@ -378,10 +365,9 @@ static int si_copystr(SI *ibp,char **pp,cchar *s1) noex {
 	    rs = ibp->strw(s1,-1,cpp) ;
 	}
 	return rs ;
-}
-/* end subroutine (si_copystr) */
+} /* end subroutine (si_copystr) */
 
-static int si_copybuf(SI *ibp,char **pp,cchar *bp,int bl) noex {
+local int si_copybuf(SI *ibp,char **pp,cchar *bp,int bl) noex {
 	int		rs = SR_OK ;
 	cchar		**cpp = ccharpp(pp) ;
 	*cpp = nullptr ;
@@ -389,8 +375,7 @@ static int si_copybuf(SI *ibp,char **pp,cchar *bp,int bl) noex {
 	    rs = ibp->buf(bp,bl,cpp) ;
 	}
 	return rs ;
-}
-/* end subroutine (si_copybuf) */
+} /* end subroutine (si_copybuf) */
 
 #ifdef	COMMENT
 using typename storeitem {
