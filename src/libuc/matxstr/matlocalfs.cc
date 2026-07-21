@@ -40,16 +40,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |sort(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<strwcmp.h>
-#include	<localmisc.h>
+#include	<climits>		/* LIBU |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |sort(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"matlocalfs.h"
 
@@ -179,7 +179,6 @@ int matlocalfs(cchar *sp,int µsl) noex {
  	    idx = nametab(sp,sl) ;
 	}
 	return idx ;
-}
-/* end subroutine (matlocalfs) */
+} /* end subroutine (matlocalfs) */
 
 
