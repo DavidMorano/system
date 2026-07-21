@@ -35,9 +35,9 @@
 	strto{x}
 
 	Names:
-	strtoxi
-	strtoxl
-	strtoxll
+	strtoxsi
+	strtoxsl
+	strtoxsll
 	strtoxui
 	strtoxul
 	strtoxull
@@ -467,30 +467,30 @@ constexpr bool		f_debug = CF_DEBUG ;
 
 /* exported subroutines */
 
-int		strtoxi(cchar *sp,char **epp,int b) noex {
-	int		res{} ;
+sint		strtoxsi(cchar *sp,char **epp,int b) noex {
+	sint		res{} ;
 	if (sp) {
 	    strtox(sp,epp,b,&res) ;
 	} else {
 	    errno = EFAULT ;
 	}
 	return res ;
-} /* end subroutine (strtoxi) */
+} /* end subroutine (strtoxsi) */
 
-long		strtoxl(cchar *sp,char **epp,int b) noex {
-    	long		res{} ;
+slong		strtoxsl(cchar *sp,char **epp,int b) noex {
+    	slong		res{} ;
 	if (sp) {
 	    res = strtol(sp,epp,b) ;
 	} else {
 	    errno = EFAULT ;
 	}
 	return res ;
-} /* end subroutine (strtoxl) */
+} /* end subroutine (strtoxsl) */
 
-longlong	strtoxll(cchar *sp,char **epp,int b) noex {
+slonglong	strtoxsll(cchar *sp,char **epp,int b) noex {
     	strer_sll so(sp,epp,b) ;
 	return so ;
-} /* end subroutine (strtoxll) */
+} /* end subroutine (strtoxsll) */
 
 uint		strtoxui(cchar *sp,char **epp,int b) noex {
 	uint		ures{} ;
