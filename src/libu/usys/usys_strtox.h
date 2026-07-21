@@ -41,18 +41,20 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-#ifndef	DECLARATION_STRTOX
-#define	DECLARATION_STRTOX
 EXTERNC_begin
 extern sint	strtosi(cchar *,char **,int) noex ;
 extern uint	strtoui(cchar *,char **,int) noex ;
 EXTERNC_end
+
+EXTERNC_begin
+extern slong	strtosl(cchar *,char **,int) noex ;
+EXTERNC_end
+
 EXTERNC_begin
 local inline int strtoi(cchar *s,char **endpp,int b) noex {
 	return strtosi(s,endpp,b) ;
 } /* end subroutine (strtoi) */
 EXTERNC_end
-#endif /* DECLARATION_STRTOX */
 
 
 #endif /* USYSSTRTOX_INCLUDE */
