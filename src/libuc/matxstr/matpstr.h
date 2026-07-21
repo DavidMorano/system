@@ -1,4 +1,4 @@
-/* matpstr HEADER */
+/* matpstr HEADER (Match Prefix String) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -39,7 +39,7 @@ inline int matpstr(con mainv bs,int n,cchar *sp,int sl = -1) noex {
 	return matpbasestr(bs,n,sp,sl) ;
 }
 #else
-static inline int matpstr(con mainv bs,int n,cchar *sp,int sl) noex {
+local inline int matpstr(con mainv bs,int n,cchar *sp,int sl) noex {
 	return matpbasestr(bs,n,sp,sl) ;
 }
 #endif /* __cplusplus */
