@@ -55,24 +55,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |getustime(3u)| */
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizevar.hh>
-#include	<base64.h>		/* |base64_enc(3uc)| */
-#include	<snx.h>
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |getustime(3u)| */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<base64.h>		/* LIBUC |base64_enc(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkfile.h"
 
@@ -119,14 +119,13 @@ namespace {
 
 /* forward reference */
 
-local uint64_t		mkbits(uint,int,int) noex ;
+local ulong		mkbits(uint,int,int) noex ;
 local int		mkoutname(char *,int,cc *,uint,int,int) noex ;
 
 
 /* local variables */
 
 static bufsizevar	maxpathlen(bufsize_mp) ;
-
 cint			outnamelen = 14 ; /* (7 + 7) */
 
 
@@ -145,9 +144,7 @@ int mkfileart(char *rbuf,cc *dname,cc *prefix,int serial,mode_t om) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkfileart) */
-
+} /* end subroutine (mkfileart) */
 
 /* local subroutines */
 
@@ -177,8 +174,7 @@ trier::operator int () noex {
 	    } /* end if (mkpath) */
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end mrthod (trier::operator) */
+} /* end mrthod (trier::operator) */
 
 int trier::mktry(uint ts,int ss,int es) noex {
 	cint		of = (O_CREAT|O_EXCL|O_CLOEXEC) ;
@@ -194,8 +190,7 @@ int trier::mktry(uint ts,int ss,int es) noex {
             }
         } /* end if (mkoutname) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (trier::mktry) */
+} /* end method (trier::mktry) */
 
 /* load up to 7 prefix characters into output buffer */
 /* encode the 'bits' above into the output buffer using BASE-64 encoding */
@@ -203,7 +198,7 @@ local int mkoutname(char *obuf,int olen,cc *pre,uint ts,int ss,int es) noex {
 	int		rs = SR_NAMETOOLONG ;
 	int		rl = 0 ; /* return-value */
 	if (olen >= outnamelen) ylikely {
-	    uint64_t	bits = mkbits(ts,ss,es) ;
+	    ulong	bits = mkbits(ts,ss,es) ;
 	    char	*bp = obuf ;
 	    rs = SR_OK ;
 	    {
@@ -228,22 +223,20 @@ local int mkoutname(char *obuf,int olen,cc *pre,uint ts,int ss,int es) noex {
 	    *bp = '\0' ;
 	} /* end if (valid) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mkoutname) */
+} /* end subroutine (mkoutname) */
 
-/* load the 42 bits into the 'bits' variable (of type |uint64_t|) */
-local uint64_t mkbits(uint ts,int ss,int es) noex {
-	uint64_t	bits = uint64_t(ts) ;	/* load in 32 bits */
+/* load the 42 bits into the 'bits' variable (of type |ulong|) */
+local ulong mkbits(uint ts,int ss,int es) noex {
+	ulong	bits = ulong(ts) ;	/* load in 32 bits */
 	{
 	    bits <<= 8 ;
-	    bits |= uint64_t(ss & UCHAR_MAX) ;	/* OR in eight (8) bits */
+	    bits |= ulong(ss & UCHAR_MAX) ;	/* OR in eight (8) bits */
 	}
 	{
 	    bits <<= 2 ;
-	    bits |= uint64_t(es & 3) ;		/* OR in two (2) bits */
+	    bits |= ulong(es & 3) ;		/* OR in two (2) bits */
 	}
 	return bits ;
-} 
-/* end subroutine (mkbits) */
+} /* end subroutine (mkbits) */
 
 
