@@ -23,8 +23,6 @@
 #include	<sys/timeb.h>		/* POSIX® */
 #include	<netdb.h>		/* POSIX® */
 #include	<vecitem.h>		/* LIUC */
-#include	<dater.h>		/* LIUC */
-#include	<localmisc.h>		/* LIU */
 #include	<bfile.h>		/* LIBB */
 
 
@@ -48,8 +46,8 @@ struct pingstatdb_flags {
 struct pingstatdb_head {
 	cchar		*fname ;
 	char		*zname ;
-	bfile		pfile ;
-	vecitem		entries ;
+	bfile		*pfp ;
+	vecitem		*elp ;
 	TIMEB		now ;
 	time_t		mtime ;
 	PINGSTATDB_FL	fl ;
