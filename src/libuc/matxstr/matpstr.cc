@@ -1,4 +1,4 @@
-/* matpstr SUPPORT */
+/* matpstr SUPPORT (Match Prefix String) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -55,15 +55,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<toxc.h>
-#include	<nleadstr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<toxc.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"matstr.h"		/* <- needed for one case */
 #include	"matpstr.h"
