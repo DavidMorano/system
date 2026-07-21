@@ -142,8 +142,7 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 	}
 	if (res < 0) res = 0 ;
 	return (rs >= 0) ? res : rs ;
-}
-/* end subroutine (cfdecti) */
+} /* end subroutine (cfdecti) */
 
 
 /* local subroutines */
