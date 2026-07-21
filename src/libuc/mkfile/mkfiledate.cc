@@ -41,25 +41,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uctimeconv.h>
-#include	<gettmpdir.h>
-#include	<bufsizevar.hh>
-#include	<mkpathx.h>
-#include	<mkfnamesuf.h>
-#include	<sncpyx.h>
-#include	<snaddw.h>
-#include	<snx.h>
-#include	<ctdec.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uctimeconv.h>		/* LIBUC */
+#include	<gettmpdir.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkfnamesuf.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snaddw.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkfile.h"
 
@@ -144,8 +144,7 @@ int mkfiledate(char *rbuf,cchar *dname,cchar *fs,mode_t fm) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkfiledate) */
+} /* end subroutine (mkfiledate) */
 
 
 /* local subroutines */
@@ -171,8 +170,7 @@ tryer::operator int () noex {
 	    } /* end if (localtime) */
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (tryer::operator) */
+} /* end method (tryer::operator) */
 
 int tryer::looper() noex {
 	cint		nalpha = 26 ;
@@ -209,8 +207,7 @@ int tryer::looper() noex {
 	    rs = SR_TIMEDOUT ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (tryer::looper) */
+} /* end method (tryer::looper) */
 
 local int sntmymd(char *rbuf,int rlen,TM *tmp) noex {
 	cint		yr = tmp->tm_year ;
@@ -222,7 +219,6 @@ local int sntmymd(char *rbuf,int rlen,TM *tmp) noex {
 	    rs = snprintf(rbuf,rlen,fmt,yr,mo,da) ;
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (sntmymd) */
+} /* end subroutine (sntmymd) */
 
 
