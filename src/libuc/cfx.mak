@@ -199,19 +199,19 @@ MOBJ= cfalphax.o cfcharsx.o cfdigx.o cfpowx.o cfsysx.o
 mods.o:			$(MOBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $(MOBJ)
 
-cfalphax.o:		cfalphax.ccm	cfutil.hh
+cfalphax.o:		cfalphax.ccm	cfalphax.hh cfutil.hh
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-cfcharsx.o:		cfcharsx.ccm	cfutil.hh
+cfcharsx.o:		cfcharsx.ccm	cfcharsx.hh cfutil.hh
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-cfdigx.o:		cfdigx.ccm	cfutil.hh
+cfdigx.o:		cfdigx.ccm	cfdigx.hh cfutil.hh
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-cfpowx.o:		cfpowx.ccm	cfutil.hh
+cfpowx.o:		cfpowx.ccm	cfpowx.hh cfutil.hh
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-cfsysx.o:		cfsysx.ccm	cfutil.hh
+cfsysx.o:		cfsysx.ccm	cfsysx.hh cfutil.hh
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
