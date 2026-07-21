@@ -65,14 +65,14 @@
 #include	<netdb.h>		/* POSIX */
 #include	<cstddef>		/* CSDT |nullptr_t| */
 #include	<cstdlib>		/* CSTD */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<usupport.h>		/* |cfinet(3u)| */
+#include	<usupport.h>		/* LIBU |cfinet(3u)| */
 #include	<uinet.h>		/* LIBU */
-#include	<inaddrbad.hh>		/* local */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<inaddrbad.hh>		/* local */
 
 #include	"inetaddr.h"
 
@@ -159,8 +159,7 @@ int inetaddr_start(inetaddr *ip,inetaddrs at,cvoid *abuf,int alen) noex {
 	} /* end if (non-null) */
 	(void) alen ;
 	return rs ;
-}
-/* end subroutine (inetaddr_start) */
+} /* end subroutine (inetaddr_start) */
 
 local int inetaddr_startbin(inetaddr *ip,cchar *addrp,int addrl) noex {
     	int		rs = SR_FAULT ;
@@ -182,7 +181,7 @@ local int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	    while (ISWHT(*ap)) {
 	        ap += 1 ;
 	        addrl -= 1 ;
-	    }
+	    } /* end while */
 	    if (hasaddrspecial(ap,addrl)) {
 	        if (uint uiw ; (rs = cfinet(ap,addrl,&uiw)) >= 0) {
 	            ip->a.s_addr = htonl(uiw) ;
@@ -190,7 +189,7 @@ local int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	    } else {
 	        while ((addrl > 0) && ISWHT(ap[addrl - 1])) {
 	            addrl -= 1 ;
-	        }
+	        } /* end while */
 	        if (addrl > 0) {
 	            if (ap != addrp) {
 	                strwcpy(abuf,ap,addrl) ;
@@ -219,7 +218,7 @@ local int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
 	    while (ISWHT(*ap)) {
 	        ap += 1 ;
 	        addrl -= 1 ;
-	    }
+	    } /* end while */
 	    while ((addrl > 0) && ISWHT(ap[addrl-1])) {
 	        addrl -= 1 ;
 	    }
@@ -247,8 +246,7 @@ int inetaddr_finish(inetaddr *ip) noex {
 	    ip->a = {} ;
 	}
 	return rs ;
-}
-/* end subroutine (inetaddr_finish) */
+} /* end subroutine (inetaddr_finish) */
 
 int inetaddr_gethexaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -269,8 +267,7 @@ int inetaddr_gethexaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	    rbuf[j] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? j : rs ;
-}
-/* end subroutine (inetaddr_gethexaddr) */
+} /* end subroutine (inetaddr_gethexaddr) */
 
 int inetaddr_getdotaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -296,8 +293,7 @@ int inetaddr_getdotaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	    rl = intconv(bp - rbuf) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (inetaddr_getdotaddr) */
+} /* end subroutine (inetaddr_getdotaddr) */
 
 
 /* local subroutines */
@@ -316,15 +312,15 @@ inetaddr_co::operator int () noex {
 
 int inetaddr::start(inetaddrs at,cvoid *addr,int alen) noex {
 	return inetaddr_start(this,at,addr,alen) ;
-}
+} /* end method */
 
 int inetaddr::gethexaddr(char *bp,int bl) noex {
 	return inetaddr_gethexaddr(this,bp,bl) ;
-}
+} /* end method */
 
 int inetaddr::getdotaddr(char *bp,int bl) noex {
 	return inetaddr_getdotaddr(this,bp,bl) ;
-}
+} /* end method */
 
 local bool hasaddrspecial(cchar *ap,int al) noex {
     	bool f = false;
