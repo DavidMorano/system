@@ -119,13 +119,13 @@ OBJ21= strwcpy.o strwcpyxc.o strwcpyrev.o
 OBJ22= strwcpycompact.o strwcpyopaque.o strwcpyblanks.o strwcpywide.o
 OBJ23= strncpyfc.o strncpyuc.o strncpyfc.o strncpyblanks.o
 
-OBJ24= rexecl.o rcmdu.o
-OBJ25= rex.o rfile.o lockfile.o lockend.o
+OBJ24=
+OBJ25= lockfile.o lockend.o
 OBJ26= timestr_date.o timestr_nist.o timestr_elapsed.o timevalstr_ulog.o 
 OBJ27= timestr_scandate.o 
 OBJ28=
 OBJ29= 
-OBJ30= chmods.o chowns.o readignore.o inetping.o termdevice.o 
+OBJ30= chmodispmgr.o chowns.o readignore.o inetping.o termdevice.o 
 OBJ31= pathclean.o makedirs.o mkdirs.o chownsame.o tmpmailboxes.o 
 
 OBJ32=
@@ -143,7 +143,7 @@ OBJ42=
 OBJ43=
 OBJ44= dialticotsord.o dialticotsordnls.o
 OBJ45=
-OBJ46= opentermnote.o openport.o opendefstds.o
+OBJ46= opentermnote.o openport.o
 OBJ47= openusd.o
 
 OBJ48= wdt.o base64.o netorder.o stdorder.o getserial.o log2.o logbase.o
@@ -210,7 +210,7 @@ OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
 OBJ100= rijndael.o expcook.o
 OBJ101= termnote.o egs.o librandom.o
 OBJ102= loadave.o modload.o userinfo.o
-OBJ103= dw.o fmq.o useraccdb.o csem.o
+OBJ103= dirwatch.o fmq.o useraccdb.o csem.o
 
 OBJ104= sesmsg.o msgdata.o msgbuf.o
 OBJ105= date.o cachetime.o
@@ -684,8 +684,8 @@ sysnamedb.o:		sysnamedb.cc sysnamedb.h
 dirdb.o:		dirdb.cc dirdb.h
 cgi.o:			cgi.cc cgi.h
 termenq.o:		termenq.cc termenq.h
-ds.o:			ds.cc ds.h
-dw.o:			dw.cc dw.h
+dispmgr.o:			dispmgr.cc dispmgr.h
+dirwatch.o:		dirwatch.cc dirwatch.h
 nodesfile.o:		nodesfile.cc nodesfile.h
 nodesearch.o:		nodesearch.cc nodesearch.h
 termtrans.o:		termtrans.cc termtrans.h
@@ -920,7 +920,7 @@ permutations.o:		permutations.cc		permutations.h		$(INCS)
 combinations.o:		combinations.cc		combinations.h		$(INCS)
 msgsub.o:		msgsub.cc		msgsub.hh		$(INCS)
 termcharsetx.o:		termcharsets.cc		termcharsets.h		$(INCS)
-findinline.o:		findline.cc		findinline.h		$(INCS)
+findinline.o:		findinline.cc		findinline.h		$(INCS)
 havenis.o:		havenis.cc		havenis.h		$(INCS)
 checksecure.o:		checksecure.cc		checksecure.h		$(INCS)
 rijndael.o:		rijndael.cc		rijndael.h		$(INCS)
@@ -976,5 +976,8 @@ binchar.o:		binchar.ccm binchar.hh rshiftx.o	$(INCS)
 
 filemagic.o:		filemagic.ccm	filemagic.hh		$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
+ccmutex.o:		ccmutex.ccm	ccmutex.hh		$(INCS)
+progval.o:		progval.cc	progbal.h		$(INCS)
 
 
