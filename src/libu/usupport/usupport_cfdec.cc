@@ -98,13 +98,13 @@ namespace libu {
 
 namespace libu {
     int cfdec(cchar *sp,int sl,int *rp)		noex {
-	return cfdecx(strtoxi,sp,sl,rp) ;
+	return cfdecx(strtoxsi,sp,sl,rp) ;
     }
     int cfdec(cchar *sp,int sl,long *rp)	noex {
-	return cfdecx(strtoxl,sp,sl,rp) ;
+	return cfdecx(strtoxsl,sp,sl,rp) ;
     }
     int cfdec(cchar *sp,int sl,longlong *rp)	noex {
-	return cfdecx(strtoxll,sp,sl,rp) ;
+	return cfdecx(strtoxsll,sp,sl,rp) ;
     }
     int cfdec(cchar *sp,int sl,uint *rp)	noex {
 	return cfdecx(strtoxui,sp,sl,rp) ;
