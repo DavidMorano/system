@@ -79,7 +79,6 @@ bool isoneof(cint *a,int rs) noex {
 	    if ((f = (rs == a[i]))) break ;
 	} /* end if */
 	return f ;
-}
-/* end subroutine (isoneof) */
+} /* end subroutine (isoneof) */
 
 
