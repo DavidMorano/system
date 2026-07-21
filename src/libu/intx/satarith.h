@@ -20,22 +20,22 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int		iaddsat(int,int) noex ;
-extern long		laddsat(long,long) noex ;
-extern longlong		lladdsat(longlong,longlong) noex ;
+extern int		iaddsat		(int,int) noex ;
+extern long		laddsat		(long,long) noex ;
+extern longlong		lladdsat	(longlong,longlong) noex ;
 
-extern uint		uiaddsat(uint,uint) noex ;
-extern ulong		uladdsat(ulong,ulong) noex ;
-extern ulonglong	ulladdsat(ulonglong,ulonglong) noex ;
+extern uint		uiaddsat	(uint,uint) noex ;
+extern ulong		uladdsat	(ulong,ulong) noex ;
+extern ulonglong	ulladdsat	(ulonglong,ulonglong) noex ;
 
 EXTERNC_end
 
