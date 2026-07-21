@@ -39,15 +39,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<uinet.h>		/* |INETX_ADDRSTRLEN| */
-#include	<inaddrbad.hh>		/* |mkinaddrbad(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU |INETX_ADDRSTRLEN| */
+#include	<ucinet.h>		/* LIBUC */
+#include	<inetaddrx.h>		/* LIBUC |inetpton(3uc)| */
+#include	<inaddrbad.hh>		/* LIBUC |mkinaddrbad(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"isinetaddr.h"
 
@@ -66,10 +66,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	inetpton(char *,int,int,cchar *,int) noex ;
-}
 
 
 /* external variables */
@@ -110,7 +106,6 @@ bool isinetaddr(cchar *name) noex {
 	    } /* end if (value) */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (isinetaddr) */
+} /* end subroutine (isinetaddr) */
 
 
