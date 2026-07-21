@@ -114,7 +114,6 @@ int inetaddrparse_load(inetaddrparse *ap,cchar *sp,int sl) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (inetaddrparse_load) */
+} /* end subroutine (inetaddrparse_load) */
 
 
