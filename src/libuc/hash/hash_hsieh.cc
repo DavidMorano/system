@@ -1,6 +1,6 @@
 /* hash_hsieh SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* this is the "super-fast" hash function by Paul Hsieh (2004-2008) */
 /* version %I% last-modified %G% */
@@ -39,14 +39,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hash.h"
 
@@ -56,12 +55,12 @@
 #undef get16bits
 #if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) \
   || defined(_MSC_VER) || defined (__BORLANDC__) || defined (__TURBOC__)
-#define get16bits(d) (*((const uint16_t *) (d)))
+#define get16bits(d) (*((const ushort *) (d)))
 #endif
 
 #if !defined (get16bits)
-#define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8)\
-                       +(uint32_t)(((const uint8_t *)(d))[0]) )
+#define get16bits(d) ((((uint)(((const uchar *)(d))[1])) << 8)\
+                       +(uint)(((const uchar *)(d))[0]) )
 #endif
 
 
@@ -94,7 +93,7 @@ uint hash_hsieh(cchar *data,int len) noex {
                 hash  += get16bits (data);
                 tmp    = (get16bits (data+2) << 11) ^ hash;
                 hash   = (hash << 16) ^ tmp;
-                data  += 2 * szof(uint16_t) ;
+                data  += 2 * szof(ushort) ;
                 hash  += hash >> 11 ;
             } /* end for */
             /* handle end cases */
@@ -102,7 +101,7 @@ uint hash_hsieh(cchar *data,int len) noex {
             case 3:
 		hash += get16bits(data) ;
                 hash ^= hash << 16 ;
-                hash ^= (schar(data[szof(uint16_t)])) << 18 ;
+                hash ^= (schar(data[szof(ushort)])) << 18 ;
                 hash += hash >> 11 ;
                 break ;
 	    case 2:
@@ -125,7 +124,6 @@ uint hash_hsieh(cchar *data,int len) noex {
             hash += hash >> 6 ;
 	} /* end if (valid) */
 	return hash ;
-}
-/* end subroutine (hash_hsieh) */
+} /* end subroutine (hash_hsieh) */
 
 
