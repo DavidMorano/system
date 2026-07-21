@@ -44,7 +44,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<ucstrto.h>		/* LIBUC |ucstrto{x}(3u)| */
+#include	<ucstrto.h>		/* LIBUC |uc_strto{x}(3u)| */
 #include	<sfx.h>			/* LIBUC |sfdigs(3uc)| */
 #include	<strnul.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -81,8 +81,10 @@ template<typename T> local int cfdecfx(cchar *snp,int snl,T *rp) noex {
 	    cchar	*sp{} ;
 	    rs = SR_DOM ;
 	    if (int sl ; (sl = sfdigs(snp,snl,&sp)) > 0) ylikely {
-		strnul	str(sp,sl) ;
-	        rs = uc_strto(str,nullptr,rp) ;
+		rs = SR_NOMEM ;
+		if (strnul str(sp,sl) ; str) {
+	            rs = uc_strto(str,nullptr,rp) ;
+		}
 	    } /* end if (sfdigs) */
 	} /* end if (non-null) */
 	return rs ;
