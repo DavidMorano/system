@@ -101,7 +101,6 @@ all:			$(ALL)
 
 
 $(T).o:			$(OBJ)
-	makemodule memtrack
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
