@@ -95,22 +95,22 @@ template<typename T> inline int cfsystox(cc *,int,T *)		noex {
 	return SR_BUGCHECK ;
 }
 template<> inline int cfsystox(cc *sp,int b,int *rp)		noex {
-	return uc_strtoi(sp,nullptr,b,rp) ;
+	return uc_strto(sp,nullptr,b,rp) ;
 }
 template<> inline int cfsystox(cc *sp,int b,long *rp)		noex {
-	return uc_strtol(sp,nullptr,b,rp) ;
+	return uc_strto(sp,nullptr,b,rp) ;
 }
 template<> inline int cfsystox(cc *sp,int b,longlong *rp)	noex {
-	return uc_strtoll(sp,nullptr,b,rp) ;
+	return uc_strto(sp,nullptr,b,rp) ;
 }
 template<> inline int cfsystox(cc *sp,int b,uint *rp)		noex {
-	return uc_strtoui(sp,nullptr,b,rp) ;
+	return uc_strto(sp,nullptr,b,rp) ;
 }
 template<> inline int cfsystox(cc *sp,int b,ulong *rp)		noex {
-	return uc_strtoul(sp,nullptr,b,rp) ;
+	return uc_strto(sp,nullptr,b,rp) ;
 }
 template<> inline int cfsystox(cc *sp,int b,ulonglong *rp)	noex {
-	return uc_strtoull(sp,nullptr,b,rp) ;
+	return uc_strto(sp,nullptr,b,rp) ;
 }
 
 export {
