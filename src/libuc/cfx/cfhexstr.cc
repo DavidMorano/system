@@ -107,7 +107,6 @@ int cfhexstr(cchar *sp,int sl,uchar *rp) noex {
 	    rl = intconv(rp - rbuf) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (cfhexstr) */
+} /* end subroutine (cfhexstr) */
 
 
