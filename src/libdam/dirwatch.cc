@@ -211,11 +211,11 @@ const bool		f_fnamecmp = CF_FNAMECMP ;
 int dirwatch_start(DW *op,cchar *dirname,int intck) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dirwatch_ctor(op,dirname)) >= 0) {
+	if ((rs = dirwatch_ctor(op,dirname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (dirname[0]) {
+	    if (dirname[0]) ylikely {
 		cchar	*dn ;
-		if (absfn d ; (rs = d.start(dirname,-1,&dn)) >= 0) {
+		if (absfn d ; (rs = d.start(dirname,-1,&dn)) >= 0) ylikely {
 		    {
 	    		op->intcheck = (intck > 2) ? intck : DW_INTCK ;
 		        rs = dirwatch_starter(op,dn) ;
@@ -233,7 +233,7 @@ int dirwatch_start(DW *op,cchar *dirname,int intck) noex {
 
 local int dirwatch_starter(DW *op,cchar *dn) noex {
 	int		rs ;
-	if (static cint	rsv = var ; (rs = rsv) >= 0) {
+	if (static cint	rsv = var ; (rs = rsv) >= 0) ylikely {
 	    cint	sz = szof(DW_ENT) ;
 	    cint	vn = 10 ;
 	    cint	vo = (vecobjm.stationary | vecobjm.conserve) ;
@@ -241,13 +241,13 @@ local int dirwatch_starter(DW *op,cchar *dn) noex {
 	    op->count_new = 0 ;
 	    op->count_checkable = 0 ;
             /* initialize */
-	    if ((rs = vecobj_start(op->elp,sz,vn,vo)) >= 0) {
+	    if ((rs = vecobj_start(op->elp,sz,vn,vo)) >= 0) ylikely {
 	        custime		dt = getustime ;
 	        op->timod = 0 ;
 	        op->tiopen = 0 ;
 	        op->ticheck = dt ;
 	        op->tiremove = dt ;
-	        if (cchar *cp ; (rs = lm_strw(dn,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(dn,-1,&cp)) >= 0) ylikely {
 	            if (rs <= var.maxpathlen) {
 	                op->dirname = cp ;
 	                rs = dirwatch_scan(op,dt) ;
@@ -274,7 +274,7 @@ local int dirwatch_starter(DW *op,cchar *dn) noex {
 int dirwatch_finish(DW *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dirwatch_magic(op)) >= 0) {
+	if ((rs = dirwatch_magic(op)) >= 0) ylikely {
 	    {
 		rs1 = dirwatch_finents(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -306,7 +306,7 @@ local int dirwatch_finents(DW *op) noex {
     	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	int		rs2 ;
-	if (op->elp) {
+	if (op->elp) ylikely {
 	    vecobj	*elp = op->elp ;
 	    void	*vp{} ;
 	    rs = SR_OK ;
@@ -324,7 +324,7 @@ local int dirwatch_finents(DW *op) noex {
 
 int dirwatch_curbegin(DW *op,DW_CUR *curp) noex {
     	int		rs ;
-	if ((rs = dirwatch_magic(op,curp)) >= 0) {
+	if ((rs = dirwatch_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -332,7 +332,7 @@ int dirwatch_curbegin(DW *op,DW_CUR *curp) noex {
 
 int dirwatch_curend(DW *op,DW_CUR *curp) noex {
     	int		rs ;
-	if ((rs = dirwatch_magic(op)) >= 0) {
+	if ((rs = dirwatch_magic(op)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -341,9 +341,9 @@ int dirwatch_curend(DW *op,DW_CUR *curp) noex {
 int dirwatch_curenum(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		nlen = 0 ;
-	if ((rs = dirwatch_magic(op,curp)) >= 0) {
+	if ((rs = dirwatch_magic(op,curp)) >= 0) ylikely {
 	    IENT	*iep = nullptr ;
-	    int		i ;
+	    int		i ; /* used-afterwards */
 	    if ((curp == nullptr) || (curp->i < 0)) {
 	        i = 0 ;
 	    } else {
@@ -373,10 +373,11 @@ int dirwatch_curenum(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 } /* end subroutine (dirwatch_curenum) */
 
 /* enumerate those entries that are "checkable" */
-int dirwatch_curenumcheck(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
+int dirwatch_curenumcheck(DW *op,DW_CUR *curp,DW_ENT *dep,
+		char *rbuf,int rlen) noex {
 	int		rs ;
-	int		i = 0 ;
-	if ((rs = dirwatch_magic(op)) >= 0) {
+	int		i = 0 ; /* return-value */
+	if ((rs = dirwatch_magic(op)) >= 0) ylikely {
 	    IENT	*iep = nullptr ; /* used across blocks */
 	    /* get the next entry with a checkable file */
 	    if ((curp == nullptr) || (curp->i < 0)) {
@@ -410,9 +411,9 @@ int dirwatch_curenumcheck(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) n
 int dirwatch_del(DW *op,DW_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dirwatch_magic(op,curp)) >= 0) {
+	if ((rs = dirwatch_magic(op,curp)) >= 0) ylikely {
 	    void	*vp{} ;
-	    if ((rs = vecobj_get(op->elp,curp->i,&vp)) >= 0) {
+	    if ((rs = vecobj_get(op->elp,curp->i,&vp)) >= 0) ylikely {
 		IENT	*iep = (IENT *) vp ;
 	        if (vp) {
 		    {
@@ -431,8 +432,8 @@ int dirwatch_del(DW *op,DW_CUR *curp) noex {
 
 int dirwatch_find(DW *op,cchar *name,DW_ENT *dep,char *rbuf,int rlen) noex {
 	int		rs ;
-	int		i = 0 ;
-	if ((rs = dirwatch_magic(op,name)) >= 0) {
+	int		i = 0 ; /* return-value */
+	if ((rs = dirwatch_magic(op,name)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
 		vecobj	*elp = op->elp ;
@@ -468,7 +469,7 @@ int dirwatch_find(DW *op,cchar *name,DW_ENT *dep,char *rbuf,int rlen) noex {
 int dirwatch_check(DW *op,time_t dt) noex {
     	int		rs ;
 	int		n = 0 ;
-	if ((rs = dirwatch_magic(op)) >= 0) {
+	if ((rs = dirwatch_magic(op)) >= 0) ylikely {
 	    if (dt == 0) dt = getustime ;
 	    if ((dt - op->ticheck) >= intval.mincheck) {
 		op->ticheck = dt ;
@@ -484,7 +485,7 @@ int dirwatch_check(DW *op,time_t dt) noex {
 local int dirwatch_checker(DW *op,time_t dt) noex {
     	int		rs ;
 	int		n = 0 ;
-	if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_fstat(op->fd,&sb)) >= 0) ylikely {
 	    bool	f = false ;
 	    f = f || (sb.st_mtime >= op->timod) ;
 	    f = f || ((dt = op->ticheck) >= intval.maxidle) ;
@@ -495,10 +496,10 @@ local int dirwatch_checker(DW *op,time_t dt) noex {
 	    } else if ((dt = op->tiopen) >= intval.maxopen) {
 		uc_close(op->fd) ;
 		op->fd = -1 ;
-	    }
-	    if (rs >= 0) {
+	    } /* end if */
+	    if (rs >= 0) ylikely {
 	        rs = dirwatch_checkx(op,dt) ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (stat) */
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (dirwatch_checker) */
@@ -507,7 +508,7 @@ local int dirwatch_checkx(DW *op,time_t dt) noex {
     	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) {
+	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) ylikely {
 	    if ((rs = dirwatch_checknew(op,dt,dbuf)) >= 0) {
 	        rs = dirwatch_checkrm(op,dt,dbuf) ;
 		n = rs ;
@@ -521,7 +522,7 @@ local int dirwatch_checkx(DW *op,time_t dt) noex {
 local int dirwatch_checknew(DW *op,time_t dt,char *dbuf) noex {
     	int		rs = SR_OK ;
 	int		rs2 ;
-	if (op->count_new > 0) {
+	if (op->count_new > 0) ylikely {
 		vecobj	*elp = op->elp ;
 	        void	*vp{} ;
 	        for (int i = 0 ; (rs2 = elp->get(i,&vp)) >= 0 ; i += 1) {
@@ -541,7 +542,7 @@ local int dirwatch_checknew(DW *op,time_t dt,char *dbuf) noex {
 local int dirwatch_checknewent(DW *op,time_t dt,IENT *iep,char *dbuf) noex {
 	int		rs ;
 	int		n = 0 ;
-	if (ustat sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_stat(dbuf,&sb)) >= 0) ylikely {
 	    if ((dt - sb.st_mtime) >= op->intcheck) {
 		iep->state = DW_SCHECK ;
 		op->count_new -= 1 ;
@@ -556,7 +557,7 @@ local int dirwatch_checknewent(DW *op,time_t dt,IENT *iep,char *dbuf) noex {
 
 local int dirwatch_checkrm(DW *op,time_t dt,char *dbuf) noex {
     	int		rs = SR_OK ;
-	if ((dt - op->tiremove) >= intval.maxidle) {
+	if ((dt - op->tiremove) >= intval.maxidle) ylikely {
 	    vecobj	*elp = op->elp ;
 	    op->tiremove = dt ;
 	    if ((rs = elp->count) > 0) {
@@ -608,7 +609,7 @@ local int dirwatch_checkrment(DW *op,time_t dt,IENT *iep,cchar *dbuf) noex {
 int dirwatch_state(DW *op,int i,int state) noex {
 	int		rs ;
 	int		state_prev = 0 ;
-	if ((rs = dirwatch_magic(op)) >= 0) {
+	if ((rs = dirwatch_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (state >= 0) {
 	        void	*vp{} ;
@@ -629,9 +630,9 @@ local int dirwatch_scan(DW *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) {
-	    if ((rs = mkpath(dbuf,op->dirname)) >= 0) {
-		if ((rs = dirwatch_scaner(op,dbuf,rs,dt)) >= 0) {
+	if (char *dbuf ; (rs = lm_mp(&dbuf)) >= 0) ylikely {
+	    if ((rs = mkpath(dbuf,op->dirname)) >= 0) ylikely {
+		if ((rs = dirwatch_scaner(op,dbuf,rs,dt)) >= 0) ylikely {
 		    n = rs ;
 		}
 	    } /* end if (mkpath) */
@@ -646,9 +647,9 @@ local int dirwatch_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
     	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) ylikely {
 	    cint	nlen = rs ;
-	    if (fsdir d ; (rs = d.open(dbuf)) >= 0) {
+	    if (fsdir d ; (rs = d.open(dbuf)) >= 0) ylikely {
 	        fsdir_ent	ds ;
 		while ((rs = d.read(&ds,nbuf,nlen)) > 0) {
 		    if (nbuf[0] != '.') {
@@ -669,8 +670,8 @@ local int dirwatch_scaner(DW *op,char *dbuf,int dl,time_t dt) noex {
 
 local int dirwatch_scanent(DW *op,cchar *dbuf,cchar *dn,time_t dt) noex {
 	int		rs ;
-	int		n = 0 ;
-	if (ustat sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
+	int		n = 0 ; /* return-value */
+	if (ustat sb ; (rs = u_stat(dbuf,&sb)) >= 0) ylikely {
 	    if (S_ISREG(sb.st_mode)) {
 	        if (IENT *iep ; (rs = dirwatch_findi(op,dn,&iep)) >= 0) {
                     if (iep->state == DW_SNEW) {
@@ -763,7 +764,7 @@ local int ient_start(IENT *iep,DW *op,cchar *name,ustat *sbp) noex {
 	int		rs ;
 	int		rs1 ;
 	iep->state = DW_SNEW ;
-	if (cchar *cp ; (rs = lm_strw(name,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = lm_strw(name,-1,&cp)) >= 0) ylikely {
 	    iep->name = cp ;
 	    /* do we need to get some status on the file? */
 	    if (sbp == nullptr) {
@@ -817,7 +818,7 @@ local int entry_load(DW_ENT *dep,IENT *iep,cchar *rbuf) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	} /* end if (bufsizeget) */
     	return rs ;
@@ -830,7 +831,7 @@ local int vcmpfn(cvoid **v1pp,cvoid **v2pp) noex {
 	{
 	    IENT	*e1p = *e1pp ;
 	    IENT	*e2p = *e2pp ;
-	    if (e1p || e2p) {
+	    if (e1p || e2p) ylikely {
 	        if (e1p) {
 	            if (e2p) {
 	                rc = strcmp(e1p->name,e2p->name) ;
