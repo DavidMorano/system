@@ -78,12 +78,12 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU |strwcpy(3u)| */
-#include	<ucinetconv.h>		/* LIBUC */
+#include	<ucinet.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
 #include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
-#include	<uinet.h>		/* LINU */
+#include	<uinet.h>		/* LIBU */
 #include	<inaddrbad.hh>		/* LIBUC */
-#include	<localmisc.h>		/* LINU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"inetconv.h"
 
@@ -145,8 +145,7 @@ int inetnetpton(void *dbuf,int dlen,int af,cchar *srcbuf,int srclen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (inetnetpton) */
+} /* end subroutine (inetnetpton) */
 
 int inetpton(void *addrbuf,int addrlen,int af,cchar *srcbuf,int srclen) noex {
 	int		rs = SR_FAULT ;
@@ -187,8 +186,7 @@ int inetpton(void *addrbuf,int addrlen,int af,cchar *srcbuf,int srclen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? af : rs ;
-}
-/* end subroutine (inetpton) */
+} /* end subroutine (inetpton) */
 
 int inetntop(char *rbuf,int rlen,int af,cvoid *binaddr) noex {
 	int		rs = SR_FAULT ;
@@ -200,7 +198,6 @@ int inetntop(char *rbuf,int rlen,int af,cvoid *binaddr) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (inetntop) */
+} /* end subroutine (inetntop) */
 
 
