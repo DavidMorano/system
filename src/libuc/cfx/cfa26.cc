@@ -97,35 +97,29 @@ constexpr int		base = OURBASE ;
 
 int cfa26i(cchar *sp,int sl,int *rp) noex {
 	return cfalphax(sp,sl,base,rp) ;
-}
-/* end subroutine (cfa26i) */
+} /* end subroutine (cfa26i) */
 
 int cfa26l(cchar *sp,int sl,long *rp) noex {
 	return cfalphax(sp,sl,base,rp) ;
-}
-/* end subroutine (cfa26l) */
+} /* end subroutine (cfa26l) */
 
 int cfa26ll(cchar *sp,int sl,longlong *rp) noex {
 	return cfalphax(sp,sl,base,rp) ;
-}
-/* end subroutine (cfa26ll) */
+} /* end subroutine (cfa26ll) */
 
 int cfa26ui(cchar *sp,int sl,uint *rp) noex {
 	int		*rrp = cast_reinterpret<int *>(rp) ;
 	return cfalphax(sp,sl,base,rrp) ;
-}
-/* end subroutine (cfa26ui) */
+} /* end subroutine (cfa26ui) */
 
 int cfa26ul(cchar *sp,int sl,ulong *rp) noex {
 	long		*rrp = cast_reinterpret<long *>(rp) ;
 	return cfalphax(sp,sl,base,rrp) ;
-}
-/* end subroutine (cfa26ul) */
+} /* end subroutine (cfa26ul) */
 
 int cfa26ull(cchar *sp,int sl,ulonglong *rp) noex {
 	longlong	*rrp = cast_reinterpret<longlong *>(rp) ;
 	return cfalphax(sp,sl,base,rrp) ;
-}
-/* end subroutine (cfa26ull) */
+} /* end subroutine (cfa26ull) */
 
 
