@@ -13,12 +13,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	HOSTADDR		struct hostaddr_head
@@ -30,7 +30,7 @@ struct hostaddr_head {
 	ADDRINFO	*aip ;
 	ADDRINFO	**resarr ;
 	cchar		*ehostname ;
-	uint		magic ;
+	uint		magval ;
 	int		n ;
 } ; /* end struct (hostaddr_head) */
 
