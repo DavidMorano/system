@@ -52,7 +52,7 @@
 
 /* forward references */
 
-local int	conv(cchar *,int,ulonglong *) noex ;
+local int	romconv(cchar *,int,ulonglong *) noex ;
 local int	toval(int) noex ;
 
 
@@ -67,61 +67,55 @@ local int	toval(int) noex ;
 int cfromani(cchar *sp,int sl,int *rp) noex {
 	ulonglong	val ;
 	int		rs ;
-	rs = conv(sp,sl,&val) ;
+	rs = romconv(sp,sl,&val) ;
 	if (rp) *rp = int(val) ;
 	return rs ;
-}
-/* end subroutine (cfromani) */
+} /* end subroutine (cfromani) */
 
 int cfromanl(cchar *sp,int sl,long *rp) noex {
 	ulonglong	val ;
 	int		rs ;
-	rs = conv(sp,sl,&val) ;
+	rs = romconv(sp,sl,&val) ;
 	if (rp) *rp = long(val) ;
 	return rs ;
-}
-/* end subroutine (cfromanl) */
+} /* end subroutine (cfromanl) */
 
 int cfromanll(cchar *sp,int sl,longlong *rp) noex {
 	ulonglong	val ;
 	int		rs ;
-	rs = conv(sp,sl,&val) ;
+	rs = romconv(sp,sl,&val) ;
 	if (rp) *rp = longlong(val) ;
 	return rs ;
-}
-/* end subroutine (cfromanll) */
+} /* end subroutine (cfromanll) */
 
 int cfromanui(cchar *sp,int sl,uint *rp) noex {
 	ulonglong	val ;
 	int		rs ;
-	rs = conv(sp,sl,&val) ;
+	rs = romconv(sp,sl,&val) ;
 	if (rp) *rp = uint(val) ;
 	return rs ;
-}
-/* end subroutine (cfromanui) */
+} /* end subroutine (cfromanui) */
 
 int cfromanul(cchar *sp,int sl,ulong *rp) noex {
 	ulonglong	val ;
 	int		rs ;
-	rs = conv(sp,sl,&val) ;
+	rs = romconv(sp,sl,&val) ;
 	if (rp) *rp = ulong(val) ;
 	return rs ;
-}
-/* end subroutine (cfromanul) */
+} /* end subroutine (cfromanul) */
 
 int cfromanull(cchar *sp,int sl,ulonglong *rp) noex {
 	ulonglong	val ;
 	int		rs ;
-	rs = conv(sp,sl,&val) ;
+	rs = romconv(sp,sl,&val) ;
 	if (rp) *rp = ulonglong(val) ;
 	return rs ;
-}
-/* end subroutine (cfromanull) */
+} /* end subroutine (cfromanull) */
 
 
 /* local subroutines */
 
-local int conv(cchar *sbuf,int slen,ulonglong *rp) noex {
+local int romconv(cchar *sbuf,int slen,ulonglong *rp) noex {
 	int		val = 0 ;
 	cchar		*sp ;
 	if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) ylikely {
@@ -139,7 +133,7 @@ local int conv(cchar *sbuf,int slen,ulonglong *rp) noex {
 	    *rp = val ;
 	} /* end if (positive) */
 	return 0 ;
-} /* end subroutine (conv) */
+} /* end subroutine (romconv) */
 
 local int toval(int ch) noex {
 	int		val = 0 ;
