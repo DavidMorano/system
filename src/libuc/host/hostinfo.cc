@@ -38,39 +38,40 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(4c)| */
-#include	<new>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucgetx.h>		/* |uc_getipnode{x}(3uc)| */
-#include	<uchostent.h>		/* |uc_hostent{x}(3uc)| */
-#include	<getnodedomain.h>
-#include	<getnodename.h>
-#include	<getaf.h>
-#include	<getxx.h>
-#include	<bufsizevar.hh>
-#include	<hostent.h>
-#include	<vecobj.h>
-#include	<strwcpy.h>
-#include	<strn.h>
-#include	<snxxx.h>
-#include	<sncpyx.h>
-#include	<snwcpy.h>
-#include	<nleadstr.h>
-#include	<inetconv.h>
-#include	<isinetaddr.h>
-#include	<isindomain.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(4c)| */
+#include	<new>			/* C++SYD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucinet.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC |uc_getipnode{x}(3uc)| */
+#include	<uchostent.h>		/* LIBUC |uc_hostent{x}(3uc)| */
+#include	<getnodedomain.h>	/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<getaf.h>		/* LIBUC */
+#include	<getxx.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<snxxx.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<inetconv.h>		/* LIBUC */
+#include	<isinetaddr.h>		/* LIBUC */
+#include	<isindomain.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hostinfo.h"
 
@@ -144,7 +145,7 @@ local inline int hostinfo_ctor(hostinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->init = {} ;
 	    op->fl = {} ;
 	    op->arg = {} ;
@@ -184,7 +185,7 @@ template<typename ... Args>
 local int hostinfo_magic(hostinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	rs = (op->magic == HOSTINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	rs = (op->magval == HOSTINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (hostinfo_magic) */
@@ -230,7 +231,7 @@ constexpr int		(*getinets[])(hostinfo *,int) = {
 	getinet_add,
 	getinet_known,
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr known		knowns[] = {
 	{ "localhost",	0x7F000001 },
@@ -288,40 +289,39 @@ int hostinfo_start(hostinfo *op,int af,cchar *hn) noex {
 			            if (isaf6(af)) {
 	                                rs = getinet(op,af6) ;
 			            }
-	                        }
+	                        } /* end if (ok) */
 	                        if (rs >= 0) {
-	                            op->magic = HOSTINFO_MAGIC ;
+	                            op->magval = HOSTINFO_MAGIC ;
 	                        } else { /* error */
 	                            if (op->domainname) {
 				        void *vp = voidp(op->domainname) ;
 	                                libmem.free(vp) ;
 	                                op->domainname = nullptr ;
-	                            }
+	                            } /* end if (memory-release) */
 	                            hostinfo_addrend(op) ;
 	                            vecobj_finish(op->alp) ;
-	                        }
+	                        } /* end if */
 	                    } /* end if (vecobj-addrs) */
 	                    if (rs < 0) {
 	                        hostinfo_finishnames(op) ;
 	                        vecobj_finish(op->nlp) ;
-	                    }
+	                    } /* end if (error) */
 	                } /* end if (vecobj-names) */
 	                if (rs < 0) {
 	                    hostinfo_argsend(op) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (hostinfo_argsbegin) */
 	            if (rs < 0) {
 	                hostinfo_bufend(op) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (hostinfo_bufbegin) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		hostinfo_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (hostinfo_ctor) */
 	return rs ;
-}
-/* end subroutine (hostinfo_start) */
+} /* end subroutine (hostinfo_start) */
 
 int hostinfo_finish(hostinfo *op) noex {
 	int		rs ;
@@ -336,7 +336,7 @@ int hostinfo_finish(hostinfo *op) noex {
                 rs1 = libmem.free(vp) ;
                 if (rs >= 0) rs = rs1 ;
                 op->domainname = nullptr ;
-            }
+            } /* end if (memory-release) */
             {
                 rs1 = hostinfo_finishnames(op) ;
                 if (rs >= 0) rs = rs1 ;
@@ -361,11 +361,10 @@ int hostinfo_finish(hostinfo *op) noex {
 		rs1 = hostinfo_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hostinfo_finish) */
+} /* end subroutine (hostinfo_finish) */
 
 int hostinfo_getoffical(hostinfo *op,cchar **rpp) noex {
 	int		rs ;
@@ -383,8 +382,7 @@ int hostinfo_getoffical(hostinfo *op,cchar **rpp) noex {
 	}
 	} /* end if (magic) */
 	return (rs >= 0) ? nlen : rs ;
-}
-/* end subroutine (hostinfo_getofficial) */
+} /* end subroutine (hostinfo_getofficial) */
 
 int hostinfo_geteffective(hostinfo *op,cchar **rpp) noex {
 	int		rs ;
@@ -400,8 +398,7 @@ int hostinfo_geteffective(hostinfo *op,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? nlen : rs ;
-}
-/* end subroutine (hostinfo_geteffective) */
+} /* end subroutine (hostinfo_geteffective) */
 
 int hostinfo_getcanonical(hostinfo *op,cchar **rpp) noex {
 	int		rs ;
@@ -423,8 +420,7 @@ int hostinfo_getcanonical(hostinfo *op,cchar **rpp) noex {
 	}
 	} /* end if (magic) */
 	return (rs >= 0) ? nlen : rs ;
-}
-/* end subroutine (hostinfo_getcanonical) */
+} /* end subroutine (hostinfo_getcanonical) */
 
 int hostinfo_curbegin(hostinfo *op,hostinfo_cur *curp) noex {
 	int		rs ;
@@ -432,8 +428,7 @@ int hostinfo_curbegin(hostinfo *op,hostinfo_cur *curp) noex {
 	curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hostinfo_curbegin) */
+} /* end subroutine (hostinfo_curbegin) */
 
 int hostinfo_curend(hostinfo *op,hostinfo_cur *curp) noex {
 	int		rs ;
@@ -441,8 +436,7 @@ int hostinfo_curend(hostinfo *op,hostinfo_cur *curp) noex {
 	curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hostinfo_curend) */
+} /* end subroutine (hostinfo_curend) */
 
 /* enumerate the next hostname */
 int hostinfo_curenumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
@@ -502,8 +496,7 @@ int hostinfo_curenumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? nlen : rs ;
-}
-/* end subroutine (hostinfo_curenumname) */
+} /* end subroutine (hostinfo_curenumname) */
 
 /* enumerate the next host address */
 int hostinfo_curenumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
@@ -563,8 +556,7 @@ int hostinfo_curenumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? alen : rs ;
-}
-/* end subroutine (hostinfo_curenumaddr) */
+} /* end subroutine (hostinfo_curenumaddr) */
 
 
 /* private subroutines */
@@ -583,8 +575,7 @@ local int hostinfo_bufbegin(hostinfo *op) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (maxhostlen) */
 	return rs ;
-}
-/* end subroutine (hostinfo_bufbegin) */
+} /* end subroutine (hostinfo_bufbegin) */
 
 local int hostinfo_bufend(hostinfo *op) noex {
 	int		rs = SR_OK ;
@@ -595,10 +586,9 @@ local int hostinfo_bufend(hostinfo *op) noex {
 	    op->a = nullptr ;
 	    op->ehostname = nullptr ;
 	    op->chostname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (hostinfo_bufend) */
+} /* end subroutine (hostinfo_bufend) */
 
 local int hostinfo_argsbegin(hostinfo *op,uint af,cchar *name) noex {
 	int		rs = SR_FAULT ;
@@ -613,19 +603,18 @@ local int hostinfo_argsbegin(hostinfo *op,uint af,cchar *name) noex {
 	        while ((sl > 0) && (name[sl - 1] == '.')) {
 	            f = true ;
 	            sl -= 1 ;
-	        }
+	        } /* end while */
 	        if (f) {
 	            if (cchar *sp{} ; (rs = libmem.strw(name,sl,&sp)) >= 0) {
 	                op->arg.f_alloc = true ;
 	                op->arg.hostnamelen = sl ;
 	                op->arg.hostname = sp ;
-	            }
-	        }
+	            } /* end if (memory-acquire) */
+	        } /* end if */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end if (hostinfo_argsbegin) */
+} /* end if (hostinfo_argsbegin) */
 
 local int hostinfo_argsend(hostinfo *op) noex {
 	int		rs = SR_OK ;
@@ -634,12 +623,11 @@ local int hostinfo_argsend(hostinfo *op) noex {
 	    void *vp = voidp(op->arg.hostname) ;
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end if (memory-release) */
 	op->arg.f_alloc = false ;
 	op->arg.hostname = nullptr ;
 	return rs ;
-}
-/* end if (hostinfo_argsend) */
+} /* end if (hostinfo_argsend) */
 
 local int hostinfo_domain(hostinfo *op) noex {
 	int		rs ;
@@ -652,7 +640,7 @@ local int hostinfo_domain(hostinfo *op) noex {
 	            len = lenstr(domainname) ;
 	            if ((rs = libmem.strw(domainname,len,&dp)) >= 0) {
 	                op->domainname = dp ;
-		    }
+		    } /* end if (memory-acquire) */
 	        } /* end if (getnodedomain) */
 	    } else {
 	        len = lenstr(op->domainname) ;
@@ -661,8 +649,7 @@ local int hostinfo_domain(hostinfo *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (hostinfo_domain) */
+} /* end subroutine (hostinfo_domain) */
 
 local int hostinfo_findcanonical(hostinfo *op) noex {
 	int		rs = SR_OK ;
@@ -726,8 +713,7 @@ local int hostinfo_findcanonical(hostinfo *op) noex {
 	    rs = lenstr(op->chostname) ;
 	} /* end if (needed) */
 	return rs ;
-}
-/* end subroutine (hostinfo_findcanonical) */
+} /* end subroutine (hostinfo_findcanonical) */
 
 local int hostinfo_getname(hostinfo *op,int af,cchar *name) noex {
 	int		rs ;
@@ -772,8 +758,7 @@ local int hostinfo_getname(hostinfo *op,int af,cchar *name) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (hostinfo_getname) */
+} /* end subroutine (hostinfo_getname) */
 
 local int hostinfo_getaddr(hostinfo *op,int af) noex {
 	int		rs = SR_NOTFOUND ;
@@ -822,8 +807,7 @@ local int hostinfo_getaddr(hostinfo *op,int af) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (enabled) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (hostinfo_getaddr) */
+} /* end subroutine (hostinfo_getaddr) */
 
 local int hostinfo_loadaddrs(hostinfo *op,int af,HOSTENT *hep) noex {
 	cnullptr	np{} ;
@@ -855,8 +839,7 @@ local int hostinfo_loadaddrs(hostinfo *op,int af,HOSTENT *hep) noex {
 	    } /* end if (hostent) */
 	} /* end if */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (hostinfo_loadaddrs) */
+} /* end subroutine (hostinfo_loadaddrs) */
 
 local int hostinfo_loadnames(hostinfo *op,int af,HOSTENT *hep) noex {
 	HOSTENT_CUR	hc ;
@@ -894,8 +877,7 @@ local int hostinfo_loadnames(hostinfo *op,int af,HOSTENT *hep) noex {
 	    } /* end if (hostent) */
 	} /* end if (ok) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (hostinfo_loadnames) */
+} /* end subroutine (hostinfo_loadnames) */
 
 local int hostinfo_addname(hostinfo *op,cchar *sp,int sl,int af) noex {
 	int		rs = SR_FAULT ;
@@ -916,13 +898,12 @@ local int hostinfo_addname(hostinfo *op,cchar *sp,int sl,int af) noex {
 	                ne.name = cp ;
 	                c += 1 ;
 	                rs = vecobj_add(op->nlp,&ne) ;
-	            } /* end if (allocated) */
+	            } /* end if (memory-acquire) */
 	        } /* end if (entry not found) */
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (hostinfo_addname) */
+} /* end subroutine (hostinfo_addname) */
 
 local int hostinfo_finishnames(hostinfo *op) noex {
 	vecobj		*vlp = op->nlp ;
@@ -937,38 +918,37 @@ local int hostinfo_finishnames(hostinfo *op) noex {
 	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            nep->name = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (hostinfo_finishnames) */
+} /* end subroutine (hostinfo_finishnames) */
 
 local int hostinfo_addrbegin(hostinfo *op,int af) noex {
 	int		rs = SR_OK ;
-	int		rs1 ;
+	int		faddr = false ; /* return-value */
 	if (! op->init.addr) {
-	    cint	ilen = INETXADDRLEN ;
-	    int		inetaddrlen ;
-	    char	inetaddr[INETXADDRLEN + 1] ;
+	    cchar	*hn = op->arg.hostname ;
+	    cint	ialen = INETXADDRLEN ;
+	    char	iabuf[INETXADDRLEN + 1] ;
 	    op->init.addr = true ;
-	    rs1 = inetpton(inetaddr,ilen,af,op->arg.hostname,-1) ;
-	    if (rs1 >= 0) {
+	    if ((rs = inetpton(iabuf,ialen,af,hn,-1)) >= 0) {
+		cint raf = rs ;
+	        cint len = getaflen(rs) ;
 	        cchar *cp ;
-	        inetaddrlen = getaflen(rs1) ;
-	        if ((rs = libmem.strw(inetaddr,inetaddrlen,&cp)) >= 0) {
-	            op->addr.addr = cp ;
-	            op->fl.addr = true ;
-	            op->addr.af = rs1 ;
-	            op->addr.addrlen = inetaddrlen ;
-	        } else {
+	        if ((rs = libmem.strw(iabuf,len,&cp)) >= 0) {
+	            op->addr.addr	= cp ;
+	            op->fl.addr		= true ;
+	            op->addr.af		= raf ;
+	            op->addr.addrlen	= len ;
+		    faddr = true ;
+	        } else { /* (memory-acquire) */
 	            op->addr.addr = nullptr ;
 	        }
-	    } /* end if (allocating space for ADDR) */
+	    } /* end if (inetpton) */
 	} /* end if */
-	return (rs >= 0) ? op->fl.addr : rs ;
-}
-/* end subroutine (hostinfo_addrbegin) */
+	return (rs >= 0) ? faddr : rs ;
+} /* end subroutine (hostinfo_addrbegin) */
 
 local int hostinfo_addrend(hostinfo *op) noex {
 	int		rs = SR_OK ;
@@ -978,10 +958,9 @@ local int hostinfo_addrend(hostinfo *op) noex {
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->addr.addr = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (hostinfo_addrend) */
+} /* end subroutine (hostinfo_addrend) */
 
 local int hostinfo_loadknownaddr(hostinfo *op,int af,uint ka) noex {
 	HOSTINFO_A	a{} ;
@@ -998,8 +977,7 @@ local int hostinfo_loadknownaddr(hostinfo *op,int af,uint ka) noex {
 	    rs = vecobj_add(op->alp,&a) ;
 	} /* end if (entry not found) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (hostinfo_loadknownaddr) */
+} /* end subroutine (hostinfo_loadknownaddr) */
 
 local int getinet(hostinfo *op,int af) noex {
 	int		rs = SR_OK ;
@@ -1022,8 +1000,7 @@ local int getinet(hostinfo *op,int af) noex {
 	    } /* end if */
 	} /* end if (have AF) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (getinet) */
+} /* end subroutine (getinet) */
 
 local int getinet_straight(hostinfo *op,int af) noex {
 	int		rs = SR_OK ;
@@ -1044,8 +1021,7 @@ local int getinet_straight(hostinfo *op,int af) noex {
 	    }
 	} /* end if (ok) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (getinet_straight) */
+} /* end subroutine (getinet_straight) */
 
 /* try adding our own domain on the end if it does not already have one */
 local int getinet_add(hostinfo *op,int af) noex {
@@ -1082,8 +1058,7 @@ local int getinet_add(hostinfo *op,int af) noex {
 	    } /* end if (continue) */
 	} /* end if (possible address) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (getinet_add) */
+} /* end subroutine (getinet_add) */
 
 /* try removing our own domain from the end if it is the same as we */
 local int getinet_rem(hostinfo *op,int af) noex {
@@ -1123,8 +1098,7 @@ local int getinet_rem(hostinfo *op,int af) noex {
 	    } /* end if (possible something) */
 	} /* end if (continue) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (getinet_rem) */
+} /* end subroutine (getinet_rem) */
 
 /* try removing a "LOCAL" domain from the end */
 local int getinet_remlocal(hostinfo *op,int af) noex {
@@ -1162,8 +1136,7 @@ local int getinet_remlocal(hostinfo *op,int af) noex {
 	    } /* end if */
 	} /* end if (continue) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (getinet_remlocal) */
+} /* end subroutine (getinet_remlocal) */
 
 local int getinet_known(hostinfo *op,int af) noex {
 	int		rs = SR_OK ;
@@ -1185,8 +1158,7 @@ local int getinet_known(hostinfo *op,int af) noex {
 	    } /* end if (address space ours) */
 	} /* end if (continue) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (getinet_known) */
+} /* end subroutine (getinet_known) */
 
 local int getinet_knowner(hostinfo *op,int af) noex {
 	cnullptr	np{} ;
@@ -1243,8 +1215,7 @@ local int getinet_knowner(hostinfo *op,int af) noex {
             rs = hostinfo_loadknownaddr(op,af,knowns[i].a) ;
         } /* end if (loading known address) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (getinet_knowner) */
+} /* end subroutine (getinet_knowner) */
 
 local int matknown(cchar *name,int nl) noex {
 	int		i = 0 ;
@@ -1254,8 +1225,7 @@ local int matknown(cchar *name,int nl) noex {
 	    if ((m > 0) && (knowns[i].name[m] == '\0') && (m == nl)) break ;
 	} /* end for */
 	return (knowns[i].name != nullptr) ? i : -1 ;
-}
-/* end subroutine (matknown) */
+} /* end subroutine (matknown) */
 
 local int vmatname(cvoid **v1pp,cvoid **v2pp) noex {
 	HOSTINFO_N	*ne1p = (HOSTINFO_N *) *v1pp ;
@@ -1265,8 +1235,7 @@ local int vmatname(cvoid **v1pp,cvoid **v2pp) noex {
 	f = f && (ne1p->namelen == ne2p->namelen) ;
 	f = f && (strcmp(ne1p->name,ne2p->name) == 0) ;
 	return (f) ? 0 : 1 ;	/* <- reversed sense */
-}
-/* end subroutine (vmatname) */
+} /* end subroutine (vmatname) */
 
 local int vmataddr(cvoid **v1pp,cvoid **v2pp) noex {
 	HOSTINFO_A	*ae1p = (HOSTINFO_A *) *v1pp ;
@@ -1280,8 +1249,7 @@ local int vmataddr(cvoid **v1pp,cvoid **v2pp) noex {
 	}
 	f = f && (memcmp(ae1p->addr,ae2p->addr,ae1p->addrlen) == 0) ;
 	return (f) ? 0 : 1 ;	/* <- reversed sense */
-}
-/* end subroutine (vmataddr) */
+} /* end subroutine (vmataddr) */
 
 #if	defined(COMMENT) && defined(CF_DEBUGS) && (CF_DEBUGS > 0)
 local int debugprintaliases(cchar *s,HOSTENT *hep) noex {
@@ -1293,7 +1261,7 @@ local int debugprintaliases(cchar *s,HOSTENT *hep) noex {
 	            s,i,hep->h_aliases[i]) ;
 	}
 	return i ;
-}
+} /* end subroutine */
 local int debugprintinetaddr(cchar *s,int af,cvoid *binaddr) noex {
 	cint		slen = INETX_ADDRSTRLEN ;
 	int		rs1 ;
@@ -1302,7 +1270,7 @@ local int debugprintinetaddr(cchar *s,int af,cvoid *binaddr) noex {
 	if (rs1 < 0) strcpy(sbuf,"BAD") ;
 	debugprintf("%s af=%d addr=%s\n",s,af,sbuf) ;
 	return rs1 ;
-}
+} /* end subroutine */
 #endif /* CF_DEBUGS */
 
 
