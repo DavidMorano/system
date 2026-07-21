@@ -98,13 +98,13 @@ namespace libu {
 
 namespace libu {
     int cfhex(cchar *sp,int sl,int *rp)		noex {
-	return cfhexx(strtoxi,sp,sl,rp) ;
+	return cfhexx(strtoxsi,sp,sl,rp) ;
     }
     int cfhex(cchar *sp,int sl,long *rp)	noex {
-	return cfhexx(strtoxl,sp,sl,rp) ;
+	return cfhexx(strtoxsl,sp,sl,rp) ;
     }
     int cfhex(cchar *sp,int sl,longlong *rp)	noex {
-	return cfhexx(strtoxll,sp,sl,rp) ;
+	return cfhexx(strtoxsll,sp,sl,rp) ;
     }
     int cfhex(cchar *sp,int sl,uint *rp)	noex {
 	return cfhexx(strtoxui,sp,sl,rp) ;
