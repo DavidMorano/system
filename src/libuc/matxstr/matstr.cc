@@ -54,15 +54,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<nleadstr.h>
-#include	<toxc.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<nleadstr.h>		/* LIBUU */
+#include	<toxc.h>		/* LIBUU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"matstr.h"
 
@@ -129,17 +129,14 @@ local int matxstr(con mainv a,cchar *sp,int sl) noex {
 
 int matbasestr(con mainv a,cchar *sp,int sl) noex {
 	return matxstr<tobc,nleadbasestr>(a,sp,sl) ;
-}
-/* end subroutine (matbasestr) */
+} /* end subroutine (matbasestr) */
 
 int matcasestr(con mainv a,cchar *sp,int sl) noex {
 	return matxstr<touc,nleadcasestr>(a,sp,sl) ;
-}
-/* end subroutine (matcasestr) */
+} /* end subroutine (matcasestr) */
 
 int matfoldstr(con mainv a,cchar *sp,int sl) noex {
 	return matxstr<tofc,nleadfoldstr>(a,sp,sl) ;
-}
-/* end subroutine (matfoldstr) */
+} /* end subroutine (matfoldstr) */
 
 
