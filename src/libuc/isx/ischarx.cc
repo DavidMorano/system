@@ -332,13 +332,11 @@ bool isalnumlatin(int ch) noex attrpure {
 	    f = ischarx_data.isalnum[ch] ;
 	}
 	return f ;
-}
-/* end subroutine (isalnumlatin) */
+} /* end subroutine (isalnumlatin) */
 
 bool isdigitlatin(int ch) noex attrpure {
     	return ((ch >= '0') && (ch <= '9')) ;
-}
-/* end subroutine (isdigitlatin) */
+} /* end subroutine (isdigitlatin) */
 
 bool isdigexlatin(int ch) noex attrpure {
 	bool		f = false ;
@@ -346,8 +344,7 @@ bool isdigexlatin(int ch) noex attrpure {
 	    f = ischarx_data.isdigex[ch] ;
 	}
 	return f ;
-}
-/* end subroutine (isdigexlatin) */
+} /* end subroutine (isdigexlatin) */
 
 bool iswhitelatin(int ch) noex attrpure {
 	bool		f = false ;
@@ -355,8 +352,7 @@ bool iswhitelatin(int ch) noex attrpure {
 	    f = CHAR_ISWHITE(ch) ;
 	}
 	return f ;
-}
-/* end subroutine (iswhitelatin) */
+} /* end subroutine (iswhitelatin) */
 
 bool islowerlatin(int ch) noex attrpure {
 	bool		f = false ;
@@ -364,8 +360,7 @@ bool islowerlatin(int ch) noex attrpure {
 	    f = CHAR_ISLC(ch) ;
 	}
 	return f ;
-}
-/* end subroutine (islowerlatin) */
+} /* end subroutine (islowerlatin) */
 
 bool isupperlatin(int ch) noex attrpure {
 	bool		f = false ;
@@ -373,8 +368,7 @@ bool isupperlatin(int ch) noex attrpure {
 	    f = CHAR_ISUC(ch) ;
 	}
 	return f ;
-}
-/* end subroutine (isupperlatin) */
+} /* end subroutine (isupperlatin) */
 
 bool isprintlatin(int ch) noex attrpure {
 	bool		f = false ;
@@ -382,8 +376,7 @@ bool isprintlatin(int ch) noex attrpure {
 	    f = ischarx_data.isprint[ch] ;
 	}
 	return f ;
-}
-/* end subroutine (isprintlatin) */
+} /* end subroutine (isprintlatin) */
 
 bool istermlatin(int ch) noex attrpure {
     	return isprintterm(ch) ;
@@ -395,13 +388,11 @@ bool isprintterm(int ch) noex attrpure {
 	    f = ischarx_data.isterm[ch] ;
 	}
 	return f ;
-}
-/* end subroutine (isprintterm) */
+} /* end subroutine (isprintterm) */
 
 bool isprintbad(int ch) noex attrpure {
 	return (! isprintlatin(ch)) ;
-}
-/* end subroutine (isprintbad) */
+} /* end subroutine (isprintbad) */
 
 bool isdict(int ch) noex attrpure {
 	bool		f = false ;
@@ -409,8 +400,7 @@ bool isdict(int ch) noex attrpure {
 	    f = ischarx_data.isalnum[ch] || (ch == CH_SP) ;
 	}
 	return f ;
-}
-/* end subroutine (isdict) */
+} /* end subroutine (isdict) */
 
 namespace {
     struct cmdstarter {
@@ -445,13 +435,11 @@ constexpr cmdstarter	cmd_data ;
 
 bool iscmdstart(int ch) noex attrpure {
     	return cmd_data[ch] ;
-}
-/* end subroutine (iscmdstart) */
+} /* end subroutine (iscmdstart) */
 
 bool ishdrkey(int ch) noex attrpure {
 	return (isalnumlatin(ch) || (ch == '-') || (ch == '_')) ;
-}
-/* end subroutine (ishdrkey) */
+} /* end subroutine (ishdrkey) */
 
 
 /* COMMENTS */
@@ -486,8 +474,7 @@ bool isdigexlatin(int ch) noex {
 	f = f || ((ch >= 'a') && (ch <= 'f')) ;
 	f = f || ((ch >= 'A') && (ch <= 'F')) ;
 	return f ;
-}
-/* end subroutine (issigexlatin) */
+} /* end subroutine (issigexlatin) */
 #endif /* COMMENT */
 
 
