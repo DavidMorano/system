@@ -102,7 +102,7 @@ slonglong	atosll(cchar *s) noex {
 	errno_t		ec = 0 ;
 	if (s) {
 	    if (s[0]) {
-		res = strtoxll(s,nullptr,base10) ;
+		res = strtoxsll(s,nullptr,base10) ;
 	    } else {
 		ec = EINVAL ;
 	    }
