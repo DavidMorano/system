@@ -40,14 +40,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<six.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<six.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"matxstr.h"
 
@@ -90,8 +90,7 @@ local int matxsubstr(con mainv a,cchar *sp,int µsl) noex {
 	    rc = (a[i] != nullptr) ? i : -1 ;
 	} /* end if (getlenstr) */
 	return rc ;
-}
-/* end subroutine (matxsubstr) */
+} /* end subroutine (matxsubstr) */
 
 
 /* local variables */
@@ -104,17 +103,14 @@ local int matxsubstr(con mainv a,cchar *sp,int µsl) noex {
 
 int matbasesubstr(con mainv a,cchar *sp,int sl) noex {
     	return matxsubstr<sibasesub>(a,sp,sl) ;
-}
-/* end subroutine (matbasesubstr) */
+} /* end subroutine (matbasesubstr) */
 
 int matcasesubstr(con mainv a,cchar *sp,int sl) noex {
     	return matxsubstr<sicasesub>(a,sp,sl) ;
-}
-/* end subroutine (matcasesubstr) */
+} /* end subroutine (matcasesubstr) */
 
 int matfoldsubstr(con mainv a,cchar *sp,int sl) noex {
     	return matxsubstr<sifoldsub>(a,sp,sl) ;
-}
-/* end subroutine (matfoldsubstr) */
+} /* end subroutine (matfoldsubstr) */
 
 
