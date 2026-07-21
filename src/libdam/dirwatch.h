@@ -64,7 +64,7 @@ struct dw_head {
 	time_t		timod ;			/* directory mod-time */
 	time_t		ticheck ;		/* time last checked */
 	time_t		tiremove ;		/* last checked for removed */
-	DIRWATCH_FL		fl ;
+	DIRWATCH_FL	fl ;
 	uint		magval ;
 	int		intcheck ;		/* file check interval */
 	int		fd ;			/* cached directory FD */
