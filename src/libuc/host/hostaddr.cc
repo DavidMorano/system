@@ -83,17 +83,17 @@ ADDRINFO {
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucaddrinfo.h>
-#include	<localmisc.h>
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucaddrinfo.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hostaddr.h"
 
@@ -128,42 +128,41 @@ extern "C" {
 /* forward references */
 
 template<typename ... Args>
-static inline int hostaddr_ctor(hostaddr *op,Args ... args) noex {
+local inline int hostaddr_ctor(hostaddr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->aip = nullptr ;
 	    op->resarr = nullptr ;
 	    op->ehostname = nullptr ;
 	    op->n = 0 ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
-static inline int hostaddr_dtor(hostaddr *op) noex {
+local inline int hostaddr_dtor(hostaddr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (hostaddr_dtor) */
+} /* end subroutine (hostaddr_dtor) */
 
 template<typename ... Args>
-static inline int hostaddr_magic(hostaddr *op,Args ... args) noex {
+local inline int hostaddr_magic(hostaddr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == HOSTADDR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == HOSTADDR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
-static int	hostaddr_resultbegin(hostaddr *) noex ;
-static int	hostaddr_resultend(hostaddr *) noex ;
+local int	hostaddr_resultbegin(hostaddr *) noex ;
+local int	hostaddr_resultend(hostaddr *) noex ;
 
 extern "C" {
-    static int	vcmpaddr(cvoid *,cvoid *) noex ;	/* for |qsort(3c)| */
+    local int	vcmpaddr(cvoid *,cvoid *) noex ;	/* for |qsort(3c)| */
 }
 
 
@@ -179,7 +178,7 @@ int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hostaddr_ctor(op,hn,svc)) >= 0) ylikely {
-	    if (char *ehostname{} ; (rs = lm_hostname(&ehostname)) >= 0) ylikely {
+	    if (char *ehostname{} ; (rs = lm_hostname(&ehostname)) >= 0) {
 	        ADDRINFO	*aip{} ;
 	        if ((rs = geteaddrinfo(hn,svc,hintp,ehostname,&aip)) >= 0) {
 	            op->aip = aip ;
@@ -187,7 +186,7 @@ int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 	                cchar	*cp{} ;
 	                if ((rs = lm_strw(ehostname,-1,&cp)) >= 0) {
 		            op->ehostname = cp ;
-		            op->magic = HOSTADDR_MAGIC ;
+		            op->magval = HOSTADDR_MAGIC ;
 	                }
 		        if (rs < 0) {
 		            hostaddr_resultend(op) ;
@@ -206,8 +205,7 @@ int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 	    }
 	} /* end if (hostaddr_ctor) */
 	return rs ;
-}
-/* end subroutine (hostaddr_start) */
+} /* end subroutine (hostaddr_start) */
 
 int hostaddr_finish(hostaddr *op) noex {
 	int		rs ;
@@ -232,11 +230,10 @@ int hostaddr_finish(hostaddr *op) noex {
 	        rs1 = hostaddr_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hostaddr_finish) */
+} /* end subroutine (hostaddr_finish) */
 
 int hostaddr_getcanonical(hostaddr *op,cchar **rpp) noex {
 	int		rs ;
@@ -246,8 +243,7 @@ int hostaddr_getcanonical(hostaddr *op,cchar **rpp) noex {
 	    rs = lenstr(aip->ai_canonname) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hostaddr_cannonical) */
+} /* end subroutine (hostaddr_cannonical) */
 
 int hostaddr_curbegin(hostaddr *op,hostaddr_cur *curp) noex {
 	int		rs ;
@@ -255,8 +251,7 @@ int hostaddr_curbegin(hostaddr *op,hostaddr_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hostaddr_curbegin) */
+} /* end subroutine (hostaddr_curbegin) */
 
 int hostaddr_curend(hostaddr *op,hostaddr_cur *curp) noex {
 	int		rs ;
@@ -264,8 +259,7 @@ int hostaddr_curend(hostaddr *op,hostaddr_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hostaddr_curend) */
+} /* end subroutine (hostaddr_curend) */
 
 int hostaddr_curenum(hostaddr *op,hostaddr_cur *curp,ADDRINFO **rpp) noex {
 	int		rs ;
@@ -281,13 +275,12 @@ int hostaddr_curenum(hostaddr *op,hostaddr_cur *curp,ADDRINFO **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (hostaddr_curenum) */
+} /* end subroutine (hostaddr_curenum) */
 
 
 /* private subroutines */
 
-static int hostaddr_resultbegin(hostaddr *op) noex {
+local int hostaddr_resultbegin(hostaddr *op) noex {
 	ADDRINFO	*aip = op->aip ;
 	cint		esz = szof(ADDRINFO) ;
 	int		rs ;
@@ -317,10 +310,9 @@ static int hostaddr_resultbegin(hostaddr *op) noex {
 	    }
 	} /* end if (memory-acquire) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (hostaddr_resultbegin) */
+} /* end subroutine (hostaddr_resultbegin) */
 
-static int hostaddr_resultend(hostaddr *op) noex {
+local int hostaddr_resultend(hostaddr *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->resarr) ylikely {
@@ -328,13 +320,12 @@ static int hostaddr_resultend(hostaddr *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->resarr = nullptr ;
 	    op->n = 0 ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (hostaddr_resultend) */
+} /* end subroutine (hostaddr_resultend) */
 
 /* this is for |qsort(3c)| */
-static int vcmpaddr(cvoid *v1p,cvoid *v2p) noex {
+local int vcmpaddr(cvoid *v1p,cvoid *v2p) noex {
 	ADDRINFO	**a1pp = (ADDRINFO **) v1p ;
 	ADDRINFO	**a2pp = (ADDRINFO **) v2p ;
 	int		rc = 0 ;
@@ -352,7 +343,6 @@ static int vcmpaddr(cvoid *v1p,cvoid *v2p) noex {
 	    }
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (vcmpaddr) */
+} /* end subroutine (vcmpaddr) */
 
 
