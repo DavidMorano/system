@@ -13,15 +13,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecobj.h>
-#include	<uinet.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<uinet.h>		/* LIBU */
 
 
 #define	HOSTINFO		struct hostinfo_head
@@ -62,7 +62,7 @@ struct hostinfo_head {
 	char		*chostname ;	/* allocated on start */
 	HOSTINFO_FL	init ;
 	HOSTINFO_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct (hostinfo_head) */
 
 struct hostinfo_cursor {
