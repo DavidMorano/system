@@ -26,7 +26,7 @@
 #include	<inetaddrs.h>		/* LIBU */
 
 
-#define	INETADDR	union inetaddr_head
+#define	INETADDR	struct inetaddr_head
 
 
 struct inetaddr_head {
@@ -34,7 +34,7 @@ struct inetaddr_head {
 	    INADDR4	a ;
 	    char	straddr[szof(INADDR4)] ;
 	} ;
-} ; /* end struct */
+} ; /* end struct (inetaddr_head) */
 
 #ifdef	__cplusplus
 enum inetaddrmems {
@@ -57,7 +57,7 @@ struct inetaddr_co {
 struct inetaddr : inetaddr_head {
 	inetaddr_co	finish ;
 	inetaddr() noex {
-	    finish(this,inetaddrmem_finish) ;
+	    finish	(this,inetaddrmem_finish) ;
 	} ;
 	inetaddr(const inetaddr &) = delete ;
 	inetaddr &operator = (const inetaddr &) = delete ;
