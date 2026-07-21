@@ -27,10 +27,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"keyopt.h"
 
@@ -83,7 +84,6 @@ int keyopt_lastvalue(keyopt *op,cchar *kp,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (keyopt_lastvalue) */
+} /* end subroutine (keyopt_lastvalue) */
 
 
