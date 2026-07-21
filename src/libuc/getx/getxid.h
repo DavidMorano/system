@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usys.h>		/* |projid_t| */
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usys.h>		/* LIBU |projid_t| */
 
 
 EXTERNC_begin
