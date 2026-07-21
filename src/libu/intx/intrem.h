@@ -20,20 +20,21 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int		irem(int,int) noex ;
-extern long		lrem(long,int) noex ;
-extern longlong		llrem(longlong,int) noex ;
-extern uint		urem(uint,int) noex ;
-extern ulong		ulrem(ulong,int) noex ;
-extern ulonglong	ullrem(ulonglong,int) noex ;
+extern int		irem	(int,int) noex ;
+extern long		lrem	(long,int) noex ;
+extern longlong		llrem	(longlong,int) noex ;
+
+extern uint		urem	(uint,int) noex ;
+extern ulong		ulrem	(ulong,int) noex ;
+extern ulonglong	ullrem	(ulonglong,int) noex ;
 
 EXTERNC_end
 
