@@ -1,4 +1,4 @@
-/* isort SUPPORT */
+/* isort SUPPORT (Insertion-Sort) */
 /* charset=ISO8859-1 */
 /* lang=C++98 */
 
@@ -39,12 +39,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<new>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memcpy(3c)| */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"isort.h"
 
@@ -53,8 +54,6 @@
 
 
 /* local name-spaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -84,7 +83,6 @@ extern "C" int	isort(void *,int,int,sortcmp_f) noex ;
 /* exported subroutines */
 
 int isort(void *base,int ne,int esz,sortcmp_f cmp) noex {
-    	cnullptr	np{} ;
 	cnothrow	nt{} ;
     	csize		esize = size_t(esz) ;
 	int		rs = SR_FAULT ;
@@ -93,15 +91,15 @@ int isort(void *base,int ne,int esz,sortcmp_f cmp) noex {
 	    if ((esz > 0) && (ne > 0)) {
 	        char	*arr = charp(base) ;
 	        rs = SR_NOMEM ;
-	        if (char *key ; (key = new(nt) char[esz]) != np) {
+	        if (char *key = new(nt) char[esz] ; key) {
 	            rs = SR_OK ;
    	            for (int i = 1 ; i < ne ; i += 1) {
-		        int	j = (i-1) ;
+		        int	j = (i - 1) ;
                         memcpy(key,arr+(i*esz),esz) ;
                         while ((j >= 0) && (cmp(arr+(j*esz),key) > 0)) {
 		            memcpy(arr+((j+1)*esz),arr+(j*esz),esize) ;
                             j = (j - 1) ;
-                        }
+                        } /* end while */
                         memcpy(arr+((j+1)*esize),key,esize) ;
                     } /* end for */
 	            delete [] key ;
@@ -109,7 +107,6 @@ int isort(void *base,int ne,int esz,sortcmp_f cmp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (isort) */
+} /* end subroutine (isort) */
 
 
