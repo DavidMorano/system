@@ -32,7 +32,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<ucpwcache.h>		/* LINUC |ucpwcache_name(3uc)| */
+#include	<ucpwcache.h>		/* LIBUC |ucpwcache_name(3uc)| */
 #include	<getax.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
