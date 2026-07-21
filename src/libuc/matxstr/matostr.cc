@@ -43,15 +43,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<toxc.h>
-#include	<nleadstr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<toxc.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"matstr.h"		/* <- needed for default case */
 #include	"matostr.h"
@@ -112,20 +112,17 @@ namespace {
 int matobasestr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tobc,nleadbasestr,matbasestr) ;
 	return mo.matoxstr(a,n,sp,sl) ;
-}
-/* end subroutine (matobasestr) */
+} /* end subroutine (matobasestr) */
 
 int matocasestr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tolc,nleadcasestr,matcasestr) ;
 	return mo.matoxstr(a,n,sp,sl) ;
-}
-/* end subroutine (matocasestr) */
+} /* end subroutine (matocasestr) */
 
 int matofoldstr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tofc,nleadfoldstr,matfoldstr) ;
 	return mo.matoxstr(a,n,sp,sl) ;
-}
-/* end subroutine (matofoldstr) */
+} /* end subroutine (matofoldstr) */
 
 
 /* local subroutines */
