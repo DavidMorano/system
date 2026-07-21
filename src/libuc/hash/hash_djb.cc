@@ -44,14 +44,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hash.h"
 
@@ -95,8 +94,7 @@ uint hash_djb(cvoid *vp,int sl) noex {
             h = h * 33 + c ;
         } /* end for */
 	return h ;
-}
-/* end subroutine (hash_djb) */
+} /* end subroutine (hash_djb) */
 
 #ifdef	COMMENT
 uint hash_djb1 (cvoid *sp,int sl) {
@@ -106,7 +104,7 @@ uint hash_djb1 (cvoid *sp,int sl) {
             h = (h << 5) + h + c ;	/* h * 33 + c */
 	} /* end for */
 	return h ;
-}
+} /* end subroutine */
 #endif /* COMMENT */
 
 #ifdef	COMMENT
@@ -123,7 +121,7 @@ uint hash_djb2(cvoid *sp,int sl) {
             h = (h << 5) + h + c ;
 	} /* end for */
 	return h ;
-}
+} /* end subroutine */
 #endif /* COMMENT */
 
 
