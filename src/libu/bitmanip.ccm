@@ -37,7 +37,7 @@ export module bitmanip ;
 
 export {
     template<typename T>
-    constexpr int nbits = (szof(T) * CHAR_BIT)  ;
+    constexpr int nbits = (szof(T) * CHAR_BIT) ;
 } /* end export */
 
 
