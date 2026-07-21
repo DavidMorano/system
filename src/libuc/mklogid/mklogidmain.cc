@@ -41,18 +41,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| + |PID_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* for |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sbuf.h>
-#include	<ctdec.h>
-#include	<ndigit.h>
-#include	<pow.h>
-#include	<getmaxpid.h>
-#include	<localmisc.h>		/* |LOGIDLEN| + |DIGBUFLEN| */
+#include	<climits>		/* CSTD |INT_MAX| + |PID_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<ndigit.h>		/* LIBUC */
+#include	<pow.h>			/* LIBUC */
+#include	<getmaxpid.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |LOGIDLEN| + |DIGBUFLEN| */
 
 #include	"mklogid.h"
 
@@ -67,7 +67,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -98,12 +97,12 @@ namespace {
 	int valcvt(int,int) noex ;
 	int layout(cchar *,int,int,int) noex ;
     } ; /* end struct (loghelp) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
-static int	mkmalenstr(int,int) noex ;
+local int	mkmalenstr(int,int) noex ;
 
 
 /* local variables */
@@ -138,8 +137,7 @@ int mklogid(char *rbuf,int rlen,cchar *sp,int sl,int v) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mklogid) */
+} /* end subroutine (mklogid) */
 
 
 /* local subroutines */
@@ -165,8 +163,7 @@ int loghelp::valcvt(int maxdigs,int malenstr) noex {
 	    }
 	} /* end if (cfdec) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (loghelp::valcvt) */
+} /* end method (loghelp::valcvt) */
 
 int loghelp::layout(cchar *dp,int dl,int malenstr,int ml) noex {
 	int		rs ;
@@ -195,10 +192,9 @@ int loghelp::layout(cchar *dp,int dl,int malenstr,int ml) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (sbuf) */
 	return rs ;
-}
-/* end method (loghelp::layout) */
+} /* end method (loghelp::layout) */
 
-static int mkmalenstr(int maxdigs,int rlen) noex {
+local int mkmalenstr(int maxdigs,int rlen) noex {
 	int		rs = SR_OK ;
 	int		malenstr = 0 ;
 	if (rlen > maxdigs) {
@@ -210,8 +206,7 @@ static int mkmalenstr(int maxdigs,int rlen) noex {
 	    rs = SR_OVERFLOW ;
 	}
 	return (rs >= 0) ? malenstr : rs ;
-}
-/* end subroutine (mkmalenstr) */
+} /* end subroutine (mkmalenstr) */
 
 namespace libuc {
     int logdigmaxer::mkdigmax() noex {
@@ -221,6 +216,6 @@ namespace libuc {
 	}
 	return rs ;
     } /* end method (logdigmaxer::mkdigmax) */
-}
+} /* end namespace */
 
 
