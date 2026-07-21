@@ -181,32 +181,26 @@ int cfnumsx(cchar *bp,int bl,T *rp) noex {
 
 int cfnumi(cchar *bp,int bl,int *rp) noex {
 	return cfnumsx<uint>(bp,bl,rp) ;
-}
-/* end subroutine (cfnumi) */
+} /* end subroutine (cfnumi) */
 
 int cfnuml(cchar *bp,int bl,long *rp) noex {
 	return cfnumsx<ulong>(bp,bl,rp) ;
-}
-/* end subroutine (cfnuml) */
+} /* end subroutine (cfnuml) */
 
 int cfnumll(cchar *bp,int bl,longlong *rp) noex {
 	return cfnumsx<ulonglong>(bp,bl,rp) ;
-}
-/* end subroutine (cfnumll) */
+} /* end subroutine (cfnumll) */
 
 int cfnumui(cchar *bp,int bl,uint *rp) noex {
 	return cfnumx(bp,bl,rp) ;
-}
-/* end subroutine (cfnumui) */
+} /* end subroutine (cfnumui) */
 
 int cfnumul(cchar *bp,int bl,ulong *rp) noex {
 	return cfnumx(bp,bl,rp) ;
-}
-/* end subroutine (cfnumul) */
+} /* end subroutine (cfnumul) */
 
 int cfnumull(cchar *bp,int bl,ulonglong *rp) noex {
 	return cfnumx(bp,bl,rp) ;
-}
-/* end subroutine (cfnumull) */
+} /* end subroutine (cfnumull) */
 
 
