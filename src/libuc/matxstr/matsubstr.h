@@ -39,7 +39,7 @@ inline int matsubstr(con mainv bs,int n,cchar *sp,int sl = -1) noex {
 	return matbasesubstr(bs,n,sp,sl) ;
 }
 #else
-static inline int matsubstr(con mainv bs,int n,cchar *sp,int sl) noex {
+local inline int matsubstr(con mainv bs,int n,cchar *sp,int sl) noex {
 	return matbasesubstr(bs,n,sp,sl) ;
 }
 #endif /* __cplusplus */
