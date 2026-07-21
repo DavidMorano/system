@@ -41,23 +41,28 @@
 constexpr int		base10 = 10 ;	/* base-10 */
 
 sint	atosi(cchar *s) noex {
-	return atoi(s) ;
+    	sint		res = 0 ; /* return-value */
+	errno_t		ec = 0 ;
+	if (s) {
+	    res = atoi(s) ;
+	} else {
+	    ec = EFAULT ;
+	} /* end if (non-null) */
+	if (ec) errno = ec ;
+	return res ;
 } /* end subroutine (atosi) */
 
 uint	atoui(cchar *s) noex {
     	uint		res = 0 ; /* return-value */
 	errno_t		ec = 0 ;
 	if (s) {
-	    if (s[0]) {
-	        con ulong resl = strtoul(s,nullptr,base10) ;
-		if ((resl >> (szof(uint) * CHAR_BIT)) == 0L) {
-	            res = uintconv(resl) ;
-		} else {
+	    con ulong resl = strtoul(s,nullptr,base10) ;
+	    res = conv<uint>(resl) ;
+	    if (errno == 0) {
+	        if ((resl >> (szof(uint) * CHAR_BIT)) != 0L) {
 		    ec = ERANGE ;
-		}
-	    } else {
-		ec = EINVAL ;
-	    }
+	        }
+	    } /* end if (not error) */
 	} else {
 	    ec = EFAULT ;
 	}
@@ -66,18 +71,22 @@ uint	atoui(cchar *s) noex {
 } /* end subroutine (atoui) */
 
 slong	atosl(cchar *s) noex {
-	return atol(s) ;
+    	slong		res = 0 ; /* return-value */
+	errno_t		ec = 0 ;
+	if (s) {
+	    res = atol(s) ;
+	} else {
+	    ec = EFAULT ;
+	} /* end if (non-null) */
+	if (ec) errno = ec ;
+	return res ;
 } /* end subroutine (atosl) */
 
 ulong	atoul(cchar *s) noex {
     	ulong		res = 0 ;
 	errno_t		ec = 0 ;
 	if (s) {
-	    if (s[0]) {
-	        res = strtoul(s,nullptr,base10) ;
-	    } else {
-		ec = EINVAL ;
-	    }
+	    res = strtoul(s,nullptr,base10) ;
 	} else {
 	    ec = EFAULT ;
 	}
