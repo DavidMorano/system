@@ -125,19 +125,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| + |memcmp(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<uclibmem.h>
-#include	<lookaside.h>
-#include	<strn.h>
-#include	<hash.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| + |memcmp(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<lookaside.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hdb.h"
 
@@ -353,8 +353,7 @@ int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	    }
 	} /* end if (hdn_ctor) */
 	return rs ;
-}
-/* end subroutine (hdb_start) */
+} /* end subroutine (hdb_start) */
 
 int hdb_finish(hdb *op) noex {
 	int		rs ;
@@ -380,8 +379,7 @@ int hdb_finish(hdb *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_finish) */
+} /* end subroutine (hdb_finish) */
 
 int hdb_delall(hdb *op) noex {
 	int		rs ;
@@ -411,8 +409,7 @@ int hdb_delall(hdb *op) noex {
 	    op->count = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_delall) */
+} /* end subroutine (hdb_delall) */
 
 int hdb_store(hdb *op,HDB_D key,DAT val) noex {
 	int		rs ;
@@ -449,8 +446,7 @@ int hdb_store(hdb *op,HDB_D key,DAT val) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_store) */
+} /* end subroutine (hdb_store) */
 
 /* determine if we have a key in the database already; 0=not-have, 1=have */
 int hdb_have(hdb *op,hdb_dat key) noex {
@@ -461,8 +457,7 @@ int hdb_have(hdb *op,hdb_dat key) noex {
 	    rs = (nextp != nullptr) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_have) */
+} /* end subroutine (hdb_have) */
 
 /* delete all entries with a specified key */
 
@@ -506,8 +501,7 @@ int hdb_delkey(hdb *op,HDB_D key) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (hdb_delkey) */
+} /* end subroutine (hdb_delkey) */
 
 /* count of items in container */
 int hdb_count(hdb *op) noex {
@@ -516,8 +510,7 @@ int hdb_count(hdb *op) noex {
 	    rs = op->count ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_count) */
+} /* end subroutine (hdb_count) */
 
 int hdb_curbegin(hdb *op,CUR *curp) noex {
 	int		rs ;
@@ -525,8 +518,7 @@ int hdb_curbegin(hdb *op,CUR *curp) noex {
 	    *curp = icur ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_curbegin) */
+} /* end subroutine (hdb_curbegin) */
 
 int hdb_curdone(hdb *op,CUR *curp) noex {
 	int		rs ;
@@ -535,8 +527,7 @@ int hdb_curdone(hdb *op,CUR *curp) noex {
 	    fret = (curp->i >= op->htlen) ;
 	} /* end if (magic) */
 	return (rs >= 0) ? fret : rs ;
-}
-/* end subroutine (hdb_curdone) */
+} /* end subroutine (hdb_curdone) */
 
 int hdb_curend(hdb *op,CUR *curp) noex {
 	int		rs ;
@@ -544,8 +535,7 @@ int hdb_curend(hdb *op,CUR *curp) noex {
 	    *curp = icur ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_curend) */
+} /* end subroutine (hdb_curend) */
 
 int hdb_curcopy(hdb *op,CUR *curp,CUR *othp) noex {
 	int		rs ;
@@ -553,8 +543,7 @@ int hdb_curcopy(hdb *op,CUR *curp,CUR *othp) noex {
 	    *othp = *curp ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_curcopy) */
+} /* end subroutine (hdb_curcopy) */
 
 /* delete an entry by its cursor */
 
@@ -658,20 +647,17 @@ int hdb_curdel(hdb *op,CUR *curp,int f_adv) noex {
             } /* end if (hdb_getentry) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_curdel) */
+} /* end subroutine (hdb_curdel) */
 
 /* advance the cursor to the next entry matching the key-cursor pair */
 int hdb_nextrec(hdb *op,HDB_D key,CUR *curp) noex {
 	return hdb_fetchrec(op,key,curp,nullptr,nullptr) ;
-}
-/* end subroutine (hdb_nextrec) */
+} /* end subroutine (hdb_nextrec) */
 
 /* subroutine to fetch the next data corresponding to a key */
 int hdb_fetch(hdb *op,HDB_D key,CUR *curp,DAT *valp) noex {
 	return hdb_fetchrec(op,key,curp,nullptr,valp) ;
-}
-/* end subroutine (hdb_fetch) */
+} /* end subroutine (hdb_fetch) */
 
 /* fetch the next whole record by key-cursor ('curp' ptr optional) */
 int hdb_fetchrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
@@ -709,26 +695,22 @@ int hdb_fetchrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
             } /* end if (error) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_fetchrec) */
+} /* end subroutine (hdb_fetchrec) */
 
 /* get the current record under the CURRENT cursor regardless of key */
 int hdb_curget(hdb *op,CUR *curp,DAT *keyp,DAT *valp) noex {
 	return hdb_get(op,false,nulldatum,curp,keyp,valp) ;
-}
-/* end subroutine (hdb_curget) */
+} /* end subroutine (hdb_curget) */
 
 /* get the current record under the cursor but only if it matches the key */
 int hdb_getkeyrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	return hdb_get(op,true,key,curp,keyp,valp) ;
-}
-/* end subroutine (hdb_getkeyrec) */
+} /* end subroutine (hdb_getkeyrec) */
 
 /* advance the cursor to the next entry regardless of key */
 int hdb_curnext(hdb *op,CUR *curp) noex {
 	return hdb_curenum(op,curp,nullptr,nullptr) ;
-}
-/* end subroutine (hdb_curnext) */
+} /* end subroutine (hdb_curnext) */
 
 /* subroutine to enumerate all entries */
 
@@ -793,8 +775,7 @@ int hdb_curenum(hdb *op,CUR *curp,HDB_D *keyp,DAT *valp) noex {
             } /* end if (found an entry) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_curenum) */
+} /* end subroutine (hdb_curenum) */
 
 int hdb_hashtablen(hdb *op,uint *rp) noex {
 	int		rs ;
@@ -802,8 +783,7 @@ int hdb_hashtablen(hdb *op,uint *rp) noex {
 	    *rp = op->htlen ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_hashtablen) */
+} /* end subroutine (hdb_hashtablen) */
 
 int hdb_hashtabcounts(hdb *op,int *rp,int n) noex {
 	int		rs ;
@@ -831,8 +811,7 @@ int hdb_hashtabcounts(hdb *op,int *rp,int n) noex {
             } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? tc : rs ;
-}
-/* end subroutine (hdb_hashtabcounts) */
+} /* end subroutine (hdb_hashtabcounts) */
 
 int hdb_audit(hdb *op) noex {
 	int		rs ;
@@ -874,19 +853,20 @@ local int hdb_entnew(hdb *op,ENT **epp) noex {
 	     rs = lookaside_get(op->esp,epp) ;
 	}
 	return rs ;
-}
-/* end subroutine (hdb_entnew) */
+} /* end subroutine (hdb_entnew) */
 
 local int hdb_entdel(hdb *op,ENT *ep) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	if (op->at == 0) {
-	    rs = libmem.free(ep) ;
+	    rs1 = libmem.free(ep) ;
+	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    rs = lookaside_release(op->esp,ep) ;
+	    rs1 = lookaside_release(op->esp,ep) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (hdb_entdel) */
+} /* end subroutine (hdb_entdel) */
 
 local int hdb_findkeye(hdb *op,FETCUR *fcp,HDB_D *kp,ENT **epp) noex {
 	CUR		*curp = fcp->curp ;
@@ -926,8 +906,7 @@ local int hdb_findkeye(hdb *op,FETCUR *fcp,HDB_D *kp,ENT **epp) noex {
 	    } /* end if (j-keyed) */
 	} /* end if (was found) */
 	return rs ;
-}
-/* end subroutine (hdb_findkeye) */
+} /* end subroutine (hdb_findkeye) */
 
 local int hdb_get(hdb *op,int f,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	int		rs ;
@@ -957,8 +936,7 @@ local int hdb_get(hdb *op,int f,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	        } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_get) */
+} /* end subroutine (hdb_get) */
 
 /* extend the hash-table itself */
 local int hdb_ext(hdb *op) noex {
@@ -1008,8 +986,7 @@ local int hdb_ext(hdb *op) noex {
 	    } /* end block (success) */
 	} /* end if (m-a) */
 	return rs ;
-}
-/* end subroutine (hdb_extend) */
+} /* end subroutine (hdb_extend) */
 
 local int hdb_extinsert(hdb *op,ENT **htaddr,int htlen,ENT *hep) noex {
 	ENT		*nhep = nullptr ;
@@ -1031,8 +1008,7 @@ local int hdb_extinsert(hdb *op,ENT **htaddr,int htlen,ENT *hep) noex {
 	    }
 	} /* end if (hdb_entnew) */
 	return rs ;
-}
-/* end subroutine (hdb_extinsert) */
+} /* end subroutine (hdb_extinsert) */
 
 local int hdb_extkeyfree(hdb *op,ENT *shep) noex {
 	int		rs = SR_OK ;
@@ -1041,8 +1017,7 @@ local int hdb_extkeyfree(hdb *op,ENT *shep) noex {
 	    hdb_entdel(op,hep) ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (hdb_extkeyfree) */
+} /* end subroutine (hdb_extkeyfree) */
 
 local int hdb_getentry(hdb *op,ENTRYINFO *eip,CUR *curp) noex {
 	int		rs = SR_OK ;
@@ -1102,8 +1077,7 @@ local int hdb_getentry(hdb *op,ENTRYINFO *eip,CUR *curp) noex {
 	    rs = SR_NOTFOUND ;
 	} /* end if (in bounds) */
 	return rs ;
-}
-/* end subroutine (hdb_getentry) */
+} /* end subroutine (hdb_getentry) */
 
 local int entry_load(ENT *ep,hdbhv hv,DAT *keyp,DAT *valp) noex {
 	int		rs = SR_FAULT ;
@@ -1116,8 +1090,7 @@ local int entry_load(ENT *ep,hdbhv hv,DAT *keyp,DAT *valp) noex {
 	    ep->val = *valp ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_load) */
+} /* end subroutine (entry_load) */
 
 local int entry_match(ENT *ep,hdbcmp_f cmpfunc,uint hv,DAT *keyp) noex {
 	int		ekeylen = ep->key.len ;
@@ -1127,8 +1100,7 @@ local int entry_match(ENT *ep,hdbcmp_f cmpfunc,uint hv,DAT *keyp) noex {
 	f = f && (ekeylen == keyp->len) ;
 	f = f && ((*cmpfunc)(ekeybuf,keyp->buf,keyp->len) == 0) ;
 	return f ;
-}
-/* end subroutine (entry_match) */
+} /* end subroutine (entry_match) */
 
 local int cursor_stabilize(CUR *curp) noex {
 	int		rs = SR_FAULT ;
@@ -1146,8 +1118,7 @@ local int cursor_stabilize(CUR *curp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cursor_stabilize) */
+} /* end subroutine (cursor_stabilize) */
 
 local int cursor_inc(CUR *curp) noex {
 	int		rs = SR_FAULT ;
@@ -1171,8 +1142,7 @@ local int cursor_inc(CUR *curp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cursor_inc) */
+} /* end subroutine (cursor_inc) */
 
 local int fetchcur_load(FETCUR *fcp,fc_f hfp,int htl,CUR *curp,DAT *kp) noex {
 	int		rs = SR_NOTFOUND ;
@@ -1199,8 +1169,7 @@ local int fetchcur_load(FETCUR *fcp,fc_f hfp,int htl,CUR *curp,DAT *kp) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (fetchcur_load) */
+} /* end subroutine (fetchcur_load) */
 
 local int fetchcur_adv(FETCUR *fcp) noex {
 	int		rs = SR_ALREADY ;
@@ -1222,8 +1191,7 @@ local int fetchcur_adv(FETCUR *fcp) noex {
 	    idx = curp->i ;
 	} /* end if (needed) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (fetchcur_adv) */
+} /* end subroutine (fetchcur_adv) */
 
 /* see if an entry is in the database */
 
@@ -1254,7 +1222,6 @@ local ENT **getpoint(hdb *op,uint hv,HDB_D *keyp) noex {
 	    }
 	} /* end for */
 	return (pep) ? &pep->next : hepp ;
-}
-/* end subroutine (getpoint) */
+} /* end subroutine (getpoint) */
 
 
