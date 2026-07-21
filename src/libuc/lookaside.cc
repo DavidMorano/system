@@ -31,16 +31,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<new>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<pq.h>
-#include	<intceil.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBU */
+#include	<pq.h>			/* LIBUC */
+#include	<intceil.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"lookaside.h"
 
@@ -71,7 +71,7 @@ typedef lookaside_ch	*chunkp ;
 
 struct lookaside_ch {
 	pq_ent		dummy ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -153,8 +153,7 @@ int lookaside_start(lookaside *op,int esize,int n) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookaside_start) */
+} /* end subroutine (lookaside_start) */
 
 int lookaside_finish(lookaside *op) noex {
 	int		rs = SR_FAULT ;
@@ -169,8 +168,10 @@ int lookaside_finish(lookaside *op) noex {
 	        lookaside_ch	*cp = chunkp(rep) ;
 	        c += 1 ;
 	        op->nchunks -= 1 ;
+		{
 	        rs1 = libmem.free(cp) ;
 	        if (rs >= 0) rs = rs1 ;
+		} /* end block (memory-release) */
 	    } /* end while */
 	    {
 		rs1 = pq_finish(op->esp) ;
@@ -186,8 +187,7 @@ int lookaside_finish(lookaside *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (lookaside_finish) */
+} /* end subroutine (lookaside_finish) */
 
 int lookaside_get(lookaside *op,void *p) noex {
 	int		rs = SR_FAULT ;
@@ -211,8 +211,7 @@ int lookaside_get(lookaside *op,void *p) noex {
 	    if (rs >= 0) op->nused += 1 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookaside_get) */
+} /* end subroutine (lookaside_get) */
 
 int lookaside_release(lookaside *op,void *p) noex {
 	int		rs = SR_FAULT ;
@@ -224,8 +223,7 @@ int lookaside_release(lookaside *op,void *p) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookaside_release) */
+} /* end subroutine (lookaside_release) */
 
 int lookaside_count(lookaside *op) noex {
 	int		rs = SR_FAULT ;
@@ -244,8 +242,7 @@ int lookaside_audit(lookaside *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookaside_audit) */
+} /* end subroutine (lookaside_audit) */
 
 
 /* private subroutines */
@@ -267,7 +264,6 @@ local int lookaside_newchunk(lookaside *op) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookaside_newchunk) */
+} /* end subroutine (lookaside_newchunk) */
 
 
