@@ -41,7 +41,7 @@ inline int matstr(con mainv bs,cchar *sp,int sl = -1) noex {
 	return matbasestr(bs,sp,sl) ;
 }
 #else
-static inline int matstr(con mainv bs,cchar *sp,int sl) noex {
+local inline int matstr(con mainv bs,cchar *sp,int sl) noex {
 	return matbasestr(bs,sp,sl) ;
 }
 #endif /* __cplusplus */
