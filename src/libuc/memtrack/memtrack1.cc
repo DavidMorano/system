@@ -56,15 +56,16 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* |uintptr_t| */
-#include	<utility>		/* |std::unreachable()| */
-#include	<new>			/* |nothrow| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
+#include	<utility>		/* C++STD |std::unreachable()| */
+#include	<new>			/* C++STD |nothrow| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 module memtrack ;
 
@@ -113,8 +114,7 @@ int memtrack::ins(cvoid *addr,int asize) noex {
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (memtrack::ins) */
+} /* end method (memtrack::ins) */
 
 int memtrack::rem(cvoid *addr) noex {
 	int		rs ;
@@ -126,8 +126,7 @@ int memtrack::rem(cvoid *addr) noex {
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (memtrack::rem) */
+} /* end method (memtrack::rem) */
 
 int memtrack::present(cvoid *addr) noex {
 	int		rs ;
@@ -141,8 +140,7 @@ int memtrack::present(cvoid *addr) noex {
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (memtrack::present) */
+} /* end method (memtrack::present) */
 
 int memtrack::get(cvoid *addr,memtrack_ent *ep) noex {
 	int		rs ;
@@ -157,8 +155,7 @@ int memtrack::get(cvoid *addr,memtrack_ent *ep) noex {
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (memtrack::get) */
+} /* end method (memtrack::get) */
 
 
 /* local subroutines */
@@ -178,8 +175,7 @@ int memtrack::istart(int n) noex {
 	    } /* end if (new-mapblock) */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end method (memtrack::istart) */
+} /* end method (memtrack::istart) */
 
 int memtrack::ifinish() noex {
 	int		rs ;
@@ -197,8 +193,7 @@ int memtrack::ifinish() noex {
 	    magval = 0 ;
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (memtrack::ifinish) */
+} /* end method (memtrack::ifinish) */
 
 int memtrack::icount() noex {
 	int		rs ;
@@ -206,8 +201,7 @@ int memtrack::icount() noex {
 	    rs = tp->count() ;
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (memtrack::icount) */
+} /* end method (memtrack::icount) */
 
 void memtrack::dtor() noex {
 	ulogerror("memtrack",SR_BUGCHECK,"dtor called") ;
@@ -236,7 +230,6 @@ int memtrack_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end method (memtrack_co::operator) */
+} /* end method (memtrack_co::operator) */
 
 
