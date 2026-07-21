@@ -84,7 +84,6 @@ bool isindomain(cchar *name,cchar *domainname) noex {
 	    } /* end if */
 	} /* end if */
 	return f ;
-}
-/* end subroutine (isindomain) */
+} /* end subroutine (isindomain) */
 
 
