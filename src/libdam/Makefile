@@ -125,7 +125,7 @@ OBJ26= timestr_date.o timestr_nist.o timestr_elapsed.o timevalstr_ulog.o
 OBJ27= timestr_scandate.o 
 OBJ28=
 OBJ29= 
-OBJ30= chmods.o chowns.o readignore.o inetping.o termdevice.o 
+OBJ30= chmodispmgr.o chowns.o readignore.o inetping.o termdevice.o 
 OBJ31= pathclean.o makedirs.o mkdirs.o chownsame.o tmpmailboxes.o 
 
 OBJ32=
@@ -143,7 +143,7 @@ OBJ42=
 OBJ43=
 OBJ44= dialticotsord.o dialticotsordnls.o
 OBJ45=
-OBJ46= opentermnote.o openport.o opendefstds.o
+OBJ46= opentermnote.o openport.o
 OBJ47= openusd.o
 
 OBJ48= wdt.o base64.o netorder.o stdorder.o getserial.o log2.o logbase.o
@@ -210,7 +210,7 @@ OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
 OBJ100= rijndael.o expcook.o
 OBJ101= termnote.o egs.o librandom.o
 OBJ102= loadave.o modload.o userinfo.o
-OBJ103= dw.o fmq.o useraccdb.o csem.o
+OBJ103= dirwatch.o fmq.o useraccdb.o csem.o
 
 OBJ104= sesmsg.o msgdata.o msgbuf.o
 OBJ105= date.o cachetime.o
@@ -684,8 +684,8 @@ sysnamedb.o:		sysnamedb.cc sysnamedb.h
 dirdb.o:		dirdb.cc dirdb.h
 cgi.o:			cgi.cc cgi.h
 termenq.o:		termenq.cc termenq.h
-ds.o:			ds.cc ds.h
-dw.o:			dw.cc dw.h
+dispmgr.o:			dispmgr.cc dispmgr.h
+dirwatch.o:		dirwatch.cc dirwatch.h
 nodesfile.o:		nodesfile.cc nodesfile.h
 nodesearch.o:		nodesearch.cc nodesearch.h
 termtrans.o:		termtrans.cc termtrans.h
