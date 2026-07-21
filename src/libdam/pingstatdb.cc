@@ -5,7 +5,7 @@
 /* object to manipulate a PINGSTATDB file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_CREATE	0		/* always create the file? */
 #define	CF_UNLOCK	1		/* always unlock after an operation */
 
@@ -64,22 +64,24 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bfile.h>
-#include	<vecitem.h>
-#include	<dater.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<vecitem.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
+#include	<bfile.h>		/* LIBB */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"pingstatdb.h"
 
@@ -89,7 +91,12 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	PINGSTATDB_REC		struct pingstatdb_r
+#define	PSD		pingstatdb
+#define	PSD_FL		pingstatdb_fl
+#define	PSD_ENT		pingstatdb_ent
+#define	PSD_CUR		pingstatdb_cur
+#define	PSD_UP		pingstatdb_up
+#define	PSD_REC		pingstatdb_rec
 
 /* record-format (RF) paramters */
 #define	RF_NUMDIGITS	8		/* RF count field width */
@@ -106,9 +113,17 @@ import libutil ;			/* |lenstr(3u)| */
 
 #define	LASTUPDATE	"*LAST_UPDATE*"
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #endif
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -119,60 +134,107 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local structures */
 
-struct pingstatdb_r {
-	DATER		cdate ;		/* last change date */
-	DATER		pdate ;		/* last ping date */
-	cchar	*hostname ;	/* host name */
+struct pingstatdb_rec {
+	dater		cdate ;		/* last change date */
+	dater		pdate ;		/* last ping date */
+	cchar		*hostname ;	/* host name */
 	uint		roff ;		/* record offset (within file) */
 	int		len ;		/* length of file record */
 	int		count ;		/* count since last change */
 	int		hostlen ;
 	int		f_up ;		/* UP-DOWN status */
-} ;
+} ; /* end struct (pingstatdb_rec) */
 
 
 /* forward references */
 
-local int	pingstatdb_checkcache(PINGSTATDB *) ;
-local int	pingstatdb_readrecords(PINGSTATDB *) ;
-local int	pingstatdb_fes(PINGSTATDB *) ;
-local int	pingstatdb_getrec(PINGSTATDB *,cchar *,
-			PINGSTATDB_REC **) ;
-local int	pingstatdb_updrec(PINGSTATDB *,time_t,DATER *,cchar *,
-			int,time_t) ;
+template<typename ... Args>
+local inline int pingstatdb_ctor(pingstatdb *op,Args ... args) noex {
+    	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = SR_NOMEM ;
+	    memclear(op) ;
+	    if (bfile *bfp = new(nt) bfile ; bfp) {
+		op->bfp = bfp ;
+	        if (vecitem *elp = new(nt) vecitem ; elp) {
+		    op->elp = elp ;
+		    rs = SR_OK ;
+	        } /* end if (new-bfile) */
+	        if (rs < 0) {
+		    delete bfp ;
+		    op->bfp = nullptr ;
+		}
+	    } /* end if (new-bfile) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (pingstatdb_ctor) */
 
-local int	record_start(PINGSTATDB_REC *,TIMEB *,cchar *,
-			uint,cchar *,DATER *) ;
-local int	record_startbuf(PINGSTATDB_REC *,TIMEB *,cchar *,
-			uint,cchar *,int) ;
-local int	record_update(PINGSTATDB_REC *,bfile *,DATER *,int) ;
-local int	record_write(PINGSTATDB_REC *,bfile *,
-			DATER *,DATER *,int,int) ;
-local int	record_finish(PINGSTATDB_REC *) ;
+local int pingstatdb_dtor(pingstatdb *op) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+	    if (vecitem *elp = resumelife<vecitem>(op->ep) ; elp) {
+	        delete elp ;
+	        op->clp = nullptr ;
+	    }
+	    if (bfile *bfp = resumelife<bfile>(op->bfp) ; bfp) {
+		delete bfp ;
+		op->bfp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (pingstatdb_dtor) */
 
-local int	entry_load(PINGSTATDB_ENT *,PINGSTATDB_REC *) ;
+template<typename ... Args>
+local inline int pingstatdb_magic(pingstatdb *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == PINGSTATDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (pingstatdb_magic) */
 
-local int	mkbstr(mode_t,char *) ;
+local int	pingstatdb_checkcache(PSD *) noex ;
+local int	pingstatdb_readrecords(PSD *) noex ;
+local int	pingstatdb_fes(PSD *) noex ;
+local int	pingstatdb_getrec(PSD *,cchar *,PSD_REC **) noex ;
+local int	pingstatdb_updrec(PSD *,time_t,dater *,cchar *,
+			int,time_t) noex ;
+
+local int	record_start(PSD_REC *,TIMEB *,cchar *,
+			uint,cchar *,dater *) noex ;
+local int	record_startbuf(PSD_REC *,TIMEB *,cchar *,
+			uint,cchar *,int) noex ;
+local int	record_update(PSD_REC *,bfile *,dater *,int) noex ;
+local int	record_write(PSD_REC *,bfile *,
+			dater *,dater *,int,int) noex ;
+local int	record_finish(PSD_REC *) noex ;
+
+local int	entry_load(PSD_ENT *,PSD_REC *) noex ;
+
+local int	mkbstr(mode_t,char *) noex ;
 
 
 /* local variables */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 static cchar	*hostname = "EMPTY" ;
 #endif
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int pingstatdb_open(PINGSTATDB *op,cchar *fname,mode_t omode,int fperm)
-{
+int pingstatdb_open(PSD *op,cchar *fname,mode_t omode,int fperm) noex {
 	int		rs = SR_OK ;
 	cchar		*cp ;
 	char		bstr[10] ;
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_open: ent\n") ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_open: ent\n") ;
 #endif
 
 	if (op == nullptr) return SR_FAULT ;
@@ -180,13 +242,11 @@ int pingstatdb_open(PINGSTATDB *op,cchar *fname,mode_t omode,int fperm)
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(PINGSTATDB)) ;
-
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_open: omode=%4o fname=%s\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_open: omode=%4o fname=%s\n",
 	    omode,fname) ;
 	if (omode & O_CREAT)
-	    debugprintf("pingstatdb_open: creating as needed\n") ;
+	    DEBUGPRINTF("pingstatdb_open: creating as needed\n") ;
 #endif
 
 #if	CF_CREATE
@@ -200,10 +260,10 @@ int pingstatdb_open(PINGSTATDB *op,cchar *fname,mode_t omode,int fperm)
 	    if ((rs = bopen(&op->pfile,op->fl.ame,bstr,fperm)) >= 0) {
 	        cint	cmd = BC_CLOSEONEXEC ;
 	        if ((rs = bcontrol(&op->pfile,cmd,true)) >= 0) {
-	            if ((rs = vecitem_start(&op->entries,0,0)) >= 0) {
+	            if ((rs = vecitem_start(op->elp,0,0)) >= 0) {
 			rs = pingstatdb_opener(op) ;
 	                if (rs < 0) {
-	                    vecitem_finish(&op->entries) ;
+	                    vecitem_finish(op->elp) ;
 			}
 	            }
 	        } /* end if (bcontrol) */
@@ -227,7 +287,7 @@ local int pingstatdb_opener(pingstatdb *op) noex {
 	    if ((rs = initnow(&op->now,znbuf,znlen)) >= 0) {
 		if (char *a ; (rs = uc_mallocstrw(znbuf,rs,&a)) >= 0) {
 		    op->zname = a ;
-		    op->magval = PINGSTATDB_MAGIC ;
+		    op->magval = PSD_MAGIC ;
 		} /* end if (memory-acquire) */
 	    }
 	    rs = rsfree(rs,znbuf) ;
@@ -236,13 +296,13 @@ local int pingstatdb_opener(pingstatdb *op) noex {
 }
 /* end subroutine (pingstatdb_opener) */
 
-int pingstatdb_close(PINGSTATDB *op) noex {
+int pingstatdb_close(PSD *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PSD_MAGIC) return SR_NOTOPEN ;
 	{
 	rs1 = pingstatdb_fes(op) ;
 	if (rs >= 0) rs = rs1 ;
@@ -252,7 +312,7 @@ int pingstatdb_close(PINGSTATDB *op) noex {
 	if (rs >= 0) rs = rs1 ;
 	}
 	{
-	rs1 = vecitem_finish(&op->entries) ;
+	rs1 = vecitem_finish(op->elp) ;
 	if (rs >= 0) rs = rs1 ;
 	}
 	if (op->fl.ame != nullptr) {
@@ -272,13 +332,13 @@ int pingstatdb_close(PINGSTATDB *op) noex {
 
 
 /* initialize a cursor */
-int pingstatdb_curbegin(PINGSTATDB *op,PINGSTATDB_CUR *curp)
+int pingstatdb_curbegin(PSD *op,PSD_CUR *curp)
 {
 
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PSD_MAGIC) return SR_NOTOPEN ;
 
 	op->fl.cursor = true ;
 	curp->i = -1 ;
@@ -288,7 +348,7 @@ int pingstatdb_curbegin(PINGSTATDB *op,PINGSTATDB_CUR *curp)
 
 
 /* free up a cursor */
-int pingstatdb_curend(PINGSTATDB *op,PINGSTATDB_CUR *curp)
+int pingstatdb_curend(PSD *op,PSD_CUR *curp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -296,7 +356,7 @@ int pingstatdb_curend(PINGSTATDB *op,PINGSTATDB_CUR *curp)
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PSD_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.readlocked || op->fl.writelocked) {
 	    op->fl.readlocked = false ;
@@ -313,15 +373,15 @@ int pingstatdb_curend(PINGSTATDB *op,PINGSTATDB_CUR *curp)
 
 
 /* enumerate the entries */
-int pingstatdb_enum(PINGSTATDB *op,PINGSTATDB_CUR *curp,PINGSTATDB_ENT *ep)
+int pingstatdb_enum(PSD *op,PSD_CUR *curp,PSD_ENT *ep)
 {
-	PINGSTATDB_REC	*rp ;
+	PSD_REC	*rp ;
 	int		rs = SR_OK ;
 	int		hl = 0 ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PSD_MAGIC) return SR_NOTOPEN ;
 
 	if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
 	    rs = bcontrol(&op->pfile,BC_LOCKREAD,TO_LOCK) ;
@@ -331,7 +391,7 @@ int pingstatdb_enum(PINGSTATDB *op,PINGSTATDB_CUR *curp,PINGSTATDB_ENT *ep)
 	if (rs >= 0) {
 	    if ((rs = pingstatdb_checkcache(op)) >= 0) {
 	        const int	i = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	        if ((rs = vecitem_get(&op->entries,i,&rp)) >= 0) {
+	        if ((rs = vecitem_get(op->elp,i,&rp)) >= 0) {
 	            curp->i = i ;
 	            if (rp != nullptr) {
 	                if (ep != nullptr) {
@@ -356,21 +416,21 @@ int pingstatdb_enum(PINGSTATDB *op,PINGSTATDB_CUR *curp,PINGSTATDB_ENT *ep)
 
 
 /* match on a hostname */
-int pingstatdb_match(PINGSTATDB *op,cchar *hostname,PINGSTATDB_ENT *ep)
+int pingstatdb_match(PSD *op,cchar *hostname,PSD_ENT *ep)
 {
-	PINGSTATDB_REC	*rp ;
+	PSD_REC	*rp ;
 	int		rs = SR_OK ;
 	int		hl = 0 ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (hostname == nullptr) return SR_FAULT ;
 
-	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PSD_MAGIC) return SR_NOTOPEN ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_match: name=%s\n",hostname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_match: name=%s\n",hostname) ;
 #endif
 
 	if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
@@ -381,8 +441,8 @@ int pingstatdb_match(PINGSTATDB *op,cchar *hostname,PINGSTATDB_ENT *ep)
 	if (rs >= 0) {
 	    if ((rs = pingstatdb_checkcache(op)) >= 0) {
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_match: name=%s\n", hostname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_match: name=%s\n", hostname) ;
 #endif
 
 /* return SR_NOTFOUND if we fall off of the end */
@@ -411,8 +471,8 @@ int pingstatdb_match(PINGSTATDB *op,cchar *hostname,PINGSTATDB_ENT *ep)
 	    } /* end if (pingstatdb_checkcache) */
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_match: ret rs=%d hl=%u\n",rs,hl) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_match: ret rs=%d hl=%u\n",rs,hl) ;
 #endif
 
 	return (rs >= 0) ? hl : rs ;
@@ -421,9 +481,9 @@ int pingstatdb_match(PINGSTATDB *op,cchar *hostname,PINGSTATDB_ENT *ep)
 
 
 /* update an entry */
-int pingstatdb_update(PINGSTATDB *op,cchar *hostname,int f_up,time_t timestamp)
+int pingstatdb_update(PSD *op,cchar *hostname,int f_up,time_t timestamp)
 {
-	DATER		d ;
+	dater		d ;
 	const time_t	daytime = time(nullptr) ;
 	int		rs = SR_OK ;
 	int		f_changed = false ;
@@ -431,12 +491,12 @@ int pingstatdb_update(PINGSTATDB *op,cchar *hostname,int f_up,time_t timestamp)
 	if (op == nullptr) return SR_FAULT ;
 	if (hostname == nullptr) return SR_FAULT ;
 
-	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PSD_MAGIC) return SR_NOTOPEN ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_update: hostname=%s\n",hostname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_update: hostname=%s\n",hostname) ;
 #endif
 
 	if (! op->fl.writable) {
@@ -470,11 +530,11 @@ int pingstatdb_update(PINGSTATDB *op,cchar *hostname,int f_up,time_t timestamp)
 	if ((timestamp == 0) || (timestamp > daytime))
 	    timestamp = daytime ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
-	    debugprintf("pingstatdb_update: about to match\n") ;
-	    rs = vecitem_count(&op->entries) ;
-	    debugprintf("pingstatdb_update: entries in cache %d\n",rs) ;
+	    DEBUGPRINTF("pingstatdb_update: about to match\n") ;
+	    rs = vecitem_count(op->elp) ;
+	    DEBUGPRINTF("pingstatdb_update: entries in cache %d\n",rs) ;
 	}
 #endif
 
@@ -500,8 +560,8 @@ ret1:
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_update: ret rs=%d f_changed=%u\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_update: ret rs=%d f_changed=%u\n",
 	    rs,f_changed) ;
 #endif
 
@@ -511,10 +571,10 @@ ret0:
 
 
 /* write an entry */
-int pingstatdb_uptime(PINGSTATDB *op,cchar *hostname,PINGSTATDB_UP *up)
+int pingstatdb_uptime(PSD *op,cchar *hostname,PSD_UP *up)
 {
-	PINGSTATDB_REC	e, *rp ;
-	DATER		cd, ud, *cdp ;
+	PSD_REC	e, *rp ;
+	dater		cd, ud, *cdp ;
 	off_t	boff ;
 	const time_t	daytime = time(nullptr) ;
 	time_t		ptime = 0 ;
@@ -530,7 +590,7 @@ int pingstatdb_uptime(PINGSTATDB *op,cchar *hostname,PINGSTATDB_UP *up)
 	if (hostname == nullptr) return SR_FAULT ;
 	if (up == nullptr) return SR_FAULT ;
 
-	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PSD_MAGIC) return SR_NOTOPEN ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
@@ -539,8 +599,8 @@ int pingstatdb_uptime(PINGSTATDB *op,cchar *hostname,PINGSTATDB_UP *up)
 	    goto ret0 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_uptime: lock stuff\n") ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_uptime: lock stuff\n") ;
 #endif
 
 	if (op->fl.readlocked) {
@@ -574,29 +634,29 @@ int pingstatdb_uptime(PINGSTATDB *op,cchar *hostname,PINGSTATDB_UP *up)
 	if ((up->timestamp == 0) || (up->timestamp > daytime))
 	    timestamp = daytime ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	timebuf[TIMEBUFLEN+1] ;
-	    debugprintf("pingstatedb_uptime: now=%s\n",
+	    DEBUGPRINTF("pingstatedb_uptime: now=%s\n",
 	        timestr_logz(op->now.time,timebuf)) ;
-	    debugprintf("pingstatedb_uptime: dater_start() rs=%d cur_date=%s\n",
+	    DEBUGPRINTF("pingstatedb_uptime: dater_start() rs=%d cur_date=%s\n",
 	        rs,timestr_logz(ud.b.time,timebuf)) ;
 	}
 #endif
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
-	    debugprintf("pingstatedb_uptime: about to match\n") ;
-	    rs = vecitem_count(&op->entries) ;
-	    debugprintf("pingstatedb_uptime: entries in cache %d\n",rs) ;
+	    DEBUGPRINTF("pingstatedb_uptime: about to match\n") ;
+	    rs = vecitem_count(op->elp) ;
+	    DEBUGPRINTF("pingstatedb_uptime: entries in cache %d\n",rs) ;
 	}
 #endif
 
 	if ((rs = pingstatdb_getrec(op,hostname,&rp)) >= 0) {
 	    int	f_greater = (! LEQUIV(f_up,rp->f_up)) ;
 
-#if	CF_DEBUGS
-	    debugprintf("pingstatedb_uptime: found match rs=%d\n",rs) ;
+#if	CF_DEBUG
+	    DEBUGPRINTF("pingstatedb_uptime: found match rs=%d\n",rs) ;
 #endif
 
 	    rs = dater_gettime(&rp->pdate,&ptime) ;
@@ -627,18 +687,18 @@ int pingstatdb_uptime(PINGSTATDB *op,cchar *hostname,PINGSTATDB_UP *up)
 
 /* force a change */
 
-#if	CF_DEBUGS
-	    debugprintf("pingstatedb_uptime: count=%d\n",
+#if	CF_DEBUG
+	    DEBUGPRINTF("pingstatedb_uptime: count=%d\n",
 	        up->count) ;
 #endif
 
 	    if ((! f_changed) && (up->count != rp->count))
 	        f_changed = true ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    {
 	        char	timebuf[TIMEBUFLEN + 1] ;
-	        debugprintf("pingstatedb_uptime: dater_gettime() ptime=%s\n",
+	        DEBUGPRINTF("pingstatedb_uptime: dater_gettime() ptime=%s\n",
 	            timestr_logz(ptime,timebuf)) ;
 	    }
 #endif
@@ -651,8 +711,8 @@ int pingstatdb_uptime(PINGSTATDB *op,cchar *hostname,PINGSTATDB_UP *up)
 
 	        rs = record_write(rp,&op->pfile,cdp,&ud,up->count,f_up) ;
 
-#if	CF_DEBUGS
-	        debugprintf("pingstatedb_uptime: record_write() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("pingstatedb_uptime: record_write() rs=%d\n",rs) ;
 #endif
 
 	    } /* end if (did the update) */
@@ -663,8 +723,8 @@ int pingstatdb_uptime(PINGSTATDB *op,cchar *hostname,PINGSTATDB_UP *up)
 	    cchar	*zn = op->zname ;
 	    cchar	*hn = hostname ;
 
-#if	CF_DEBUGS
-	    debugprintf("pingstatedb_uptime: no match found rs=%d\n",rs) ;
+#if	CF_DEBUG
+	    DEBUGPRINTF("pingstatedb_uptime: no match found rs=%d\n",rs) ;
 #endif
 
 	    dater_settimezn(&ud,timestamp,op->zname,-1) ;
@@ -684,23 +744,23 @@ int pingstatdb_uptime(PINGSTATDB *op,cchar *hostname,PINGSTATDB_UP *up)
 	        f_rec = true ;
 	    }
 
-#if	CF_DEBUGS
-	    debugprintf("pingstatedb_uptime: record_start() rs=%d\n",rs) ;
-	    debugprintf("pingstatedb_uptime: hostname=%s\n", hostname) ;
+#if	CF_DEBUG
+	    DEBUGPRINTF("pingstatedb_uptime: record_start() rs=%d\n",rs) ;
+	    DEBUGPRINTF("pingstatedb_uptime: hostname=%s\n", hostname) ;
 #endif
 
 	    if (rs >= 0) {
 	        rs = record_write(&e,&op->pfile,&ud,&cd,up->count,f_up) ;
 	    }
 
-#if	CF_DEBUGS
-	    debugprintf("pingstatedb_uptime: record_write() rs=%d\n",
+#if	CF_DEBUG
+	    DEBUGPRINTF("pingstatedb_uptime: record_write() rs=%d\n",
 	        rs) ;
 #endif
 
 	    if (rs >= 0) {
-	        size = sizeof(PINGSTATDB_REC) ;
-	        rs = vecitem_add(&op->entries,&e,size) ;
+	        size = sizeof(PSD_REC) ;
+	        rs = vecitem_add(op->elp,&e,size) ;
 	    }
 
 	    if ((rs < 0) && f_rec) {
@@ -731,8 +791,8 @@ ret1:
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("pingstatedb_uptime: ret rs=%d f_changed=%u\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatedb_uptime: ret rs=%d f_changed=%u\n",
 	    rs,f_changed) ;
 #endif
 
@@ -741,13 +801,13 @@ ret0:
 /* end subroutine (pingstatdb_uptime) */
 
 
-int pingstatdb_check(PINGSTATDB *op,time_t daytime)
+int pingstatdb_check(PSD *op,time_t daytime)
 {
 	int		rs = SR_OK ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magval != PINGSTATDB_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PSD_MAGIC) return SR_NOTOPEN ;
 
 	if (daytime == 0)
 	    daytime = time(nullptr) ;
@@ -778,14 +838,14 @@ int pingstatdb_check(PINGSTATDB *op,time_t daytime)
 
 
 /* check on the status of the file entry cache */
-local int pingstatdb_checkcache(PINGSTATDB *op)
+local int pingstatdb_checkcache(PSD *op)
 {
 	ustat	sb ;
 	int		rs ;
 	int		f_cached = op->fl.cached ;
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_checkcache: ent f_cached=%d\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_checkcache: ent f_cached=%d\n",
 	    f_cached) ;
 #endif
 
@@ -802,12 +862,12 @@ local int pingstatdb_checkcache(PINGSTATDB *op)
 	            op->fl.cached = true ;
 	        }
 	    } else {
-	        rs = vecitem_count(&op->entries) ;
+	        rs = vecitem_count(op->elp) ;
 	    }
 	} /* end if (bcontrol) */
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_checkcache: ret rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_checkcache: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -816,19 +876,19 @@ local int pingstatdb_checkcache(PINGSTATDB *op)
 
 
 /* read file entries */
-local int pingstatdb_readrecords(PINGSTATDB *op)
+local int pingstatdb_readrecords(PSD *op)
 {
 	int		rs ;
 	int		c = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_readrecords: ent\n") ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_readrecords: ent\n") ;
 #endif
 
 	if ((rs = brewind(&op->pfile)) >= 0) {
-	    PINGSTATDB_REC	e ;
+	    PSD_REC	e ;
 	    uint	roff = 0 ;
-	    const int	size = sizeof(PINGSTATDB_REC) ;
+	    const int	size = sizeof(PSD_REC) ;
 	    const int	rlen = BUFLEN ;
 	    int		line = 1 ;
 	    int		len ;
@@ -847,13 +907,13 @@ local int pingstatdb_readrecords(PINGSTATDB *op)
 	            TIMEB	*nowp = &op->now ;
 	            cchar	*zn = op->zname ;
 
-#if	CF_DEBUGS
-	            debugprintf("pingstatdb_readrecords: line=%u\n",line) ;
+#if	CF_DEBUG
+	            DEBUGPRINTF("pingstatdb_readrecords: line=%u\n",line) ;
 #endif
 
 	            if ((rs = record_startbuf(&e,nowp,zn,roff,rbuf,bl)) >= 0) {
 	                c += 1 ;
-	                rs = vecitem_add(&op->entries,&e,size) ;
+	                rs = vecitem_add(op->elp,&e,size) ;
 	                if (rs < 0)
 	                    record_finish(&e) ;
 	            } /* end if (record_startbuf) */
@@ -867,8 +927,8 @@ local int pingstatdb_readrecords(PINGSTATDB *op)
 	    } /* end while (reading file records) */
 	} /* end if (brewind) */
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_readrecords: ret rs=%d c=%u\n",rs,c) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_readrecords: ret rs=%d c=%u\n",rs,c) ;
 #endif
 
 	return (rs >= 0) ? c : rs ;
@@ -877,10 +937,10 @@ local int pingstatdb_readrecords(PINGSTATDB *op)
 
 
 /* free up the entries in the cache */
-local int pingstatdb_fes(PINGSTATDB *op)
+local int pingstatdb_fes(PSD *op)
 {
-	PINGSTATDB_REC	*ep ;
-	VECITEM		*elp = &op->entries ;
+	PSD_REC	*ep ;
+	VECITEM		*elp = op->elp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -890,7 +950,7 @@ local int pingstatdb_fes(PINGSTATDB *op)
 	for (i = 0 ; vecitem_get(elp,i,&ep) >= 0 ; i += 1) {
 	    if (ep != nullptr) {
 	        record_finish(ep) ;
-	        vecitem_del(&op->entries,i) ;
+	        vecitem_del(op->elp,i) ;
 	    }
 	} /* end for */
 
@@ -907,8 +967,8 @@ local int pingstatdb_fes(PINGSTATDB *op)
 	} /* end while */
 	if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_fes: ret rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_fes: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -919,32 +979,32 @@ local int pingstatdb_fes(PINGSTATDB *op)
 local int pingstatdb_updrec(op,dt,dp,hostname,f_up,timestamp)
 PINGSTATDB	*op ;
 time_t		dt ;
-DATER		*dp ;
+dater		*dp ;
 cchar	hostname[] ;
 int		f_up ;
 time_t		timestamp ;
 {
-	PINGSTATDB_REC	*rp ;
+	PSD_REC	*rp ;
 	off_t	boff ;
 	int		rs ;
 	int		f_changed = false ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	timebuf[TIMEBUFLEN+1] ;
-	    debugprintf("pingstatdb_updrec: hostname=%s\n",hostname) ;
-	    debugprintf("pingstatdb_updrec: f_up=%u\n",f_up) ;
-	    debugprintf("pingstatdb_updrec: timestamp=%s\n",
+	    DEBUGPRINTF("pingstatdb_updrec: hostname=%s\n",hostname) ;
+	    DEBUGPRINTF("pingstatdb_updrec: f_up=%u\n",f_up) ;
+	    DEBUGPRINTF("pingstatdb_updrec: timestamp=%s\n",
 	        timestr_logz(timestamp,timebuf)) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	if ((rs = pingstatdb_getrec(op,hostname,&rp)) >= 0) {
 	    time_t	ptime ;
 	    int		f_greater = (! LEQUIV(f_up,rp->f_up)) ;
 
-#if	CF_DEBUGS
-	    debugprintf("pingstatdb_updrec: found match rs=%d\n",rs) ;
+#if	CF_DEBUG
+	    DEBUGPRINTF("pingstatdb_updrec: found match rs=%d\n",rs) ;
 #endif
 
 	    rs = dater_gettime(&rp->pdate,&ptime) ;
@@ -956,10 +1016,10 @@ time_t		timestamp ;
 
 	    dater_settimezn(dp,timestamp,op->zname,-1) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    {
 	        char	timebuf[TIMEBUFLEN + 1] ;
-	        debugprintf("pingstatdb_updrec: dater_gettime() ptime=%s\n",
+	        DEBUGPRINTF("pingstatdb_updrec: dater_gettime() ptime=%s\n",
 	            timestr_logz(ptime,timebuf)) ;
 	    }
 #endif
@@ -972,21 +1032,21 @@ time_t		timestamp ;
 
 	        rs = record_update(rp,&op->pfile,dp,f_up) ;
 
-#if	CF_DEBUGS
-	        debugprintf("pingstatdb_updrec: record_updrec() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("pingstatdb_updrec: record_updrec() rs=%d\n",rs) ;
 #endif
 
 	    } /* end if (did the update) */
 
 	} else if (rs == SR_NOTFOUND) {
-	    PINGSTATDB_REC	r ;
+	    PSD_REC	r ;
 	    uint	roff ;
-	    const int	size = sizeof(PINGSTATDB_REC) ;
+	    const int	size = sizeof(PSD_REC) ;
 	    int		f_rec = false ;
 
-#if	CF_DEBUGS
-	    debugprintf("pingstatdb_updrec: no match found rs=%d\n",rs) ;
-	    debugprintf("pingstatdb_updrec: zname=%s\n",op->zname) ;
+#if	CF_DEBUG
+	    DEBUGPRINTF("pingstatdb_updrec: no match found rs=%d\n",rs) ;
+	    DEBUGPRINTF("pingstatdb_updrec: zname=%s\n",op->zname) ;
 #endif
 
 	    if ((rs = dater_settimezn(dp,timestamp,op->zname,-1)) >= 0) {
@@ -1004,8 +1064,8 @@ time_t		timestamp ;
 	            f_rec = true ;
 		}
 
-#if	CF_DEBUGS
-	        debugprintf("pingstatdb_updrec: record_start() rs=%d hn=%s\n",
+#if	CF_DEBUG
+	        DEBUGPRINTF("pingstatdb_updrec: record_start() rs=%d hn=%s\n",
 	            rs,hostname) ;
 #endif
 
@@ -1014,15 +1074,15 @@ time_t		timestamp ;
 	    if (rs >= 0) {
 	        rs = record_update(&r,&op->pfile,dp,f_up) ;
 
-#if	CF_DEBUGS
-	        debugprintf("pingstatdb_updrec: record_update() rs=%d\n",
+#if	CF_DEBUG
+	        DEBUGPRINTF("pingstatdb_updrec: record_update() rs=%d\n",
 	            rs) ;
 #endif
 
 	    } /* end if */
 
 	    if (rs >= 0) {
-	        rs = vecitem_add(&op->entries,&r,size) ;
+	        rs = vecitem_add(op->elp,&r,size) ;
 	    }
 
 	    if ((rs < 0) && f_rec) {
@@ -1030,8 +1090,8 @@ time_t		timestamp ;
 	    }
 	} /* end if (target entry) */
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb_updrec: ret rs=%d f_changed=%u\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb_updrec: ret rs=%d f_changed=%u\n",
 	    rs,f_changed) ;
 #endif
 
@@ -1040,12 +1100,12 @@ time_t		timestamp ;
 /* end subroutine (pingstatdb_updrec) */
 
 
-local int pingstatdb_getrec(PINGSTATDB *op,cchar *hostname,
-		PINGSTATDB_REC **rpp)
+local int pingstatdb_getrec(PSD *op,cchar *hostname,
+		PSD_REC **rpp)
 {
 	int		rs ;
 	int		i ; /* return-value */
-	for (i = 0 ; (rs = vecitem_get(&op->entries,i,rpp)) >= 0 ; i += 1) {
+	for (i = 0 ; (rs = vecitem_get(op->elp,i,rpp)) >= 0 ; i += 1) {
 	    if (*rpp == nullptr) continue ;
 	    if (strcmp(hostname,(*rpp)->hostname) == 0) break ;
 	} /* end for */
@@ -1057,12 +1117,12 @@ local int pingstatdb_getrec(PINGSTATDB *op,cchar *hostname,
 /* initialize a fresh entry */
 /* ARGSUSED */
 local int record_start(ep,nowp,zname,roff,hostname,dp)
-PINGSTATDB_REC	*ep ;
+PSD_REC	*ep ;
 TIMEB		*nowp ;
 cchar	zname[] ;
 uint		roff ;
 cchar	hostname[] ;
-DATER		*dp ;
+dater		*dp ;
 {
 	int		rs ;
 	int		hl ;
@@ -1072,19 +1132,19 @@ DATER		*dp ;
 	if (hostname == nullptr) return SR_FAULT ;
 	if (dp == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("record_start: hostname=%s\n",hostname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("record_start: hostname=%s\n",hostname) ;
 #endif
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	timebuf[TIMEBUFLEN + 1] ;
-	    debugprintf("record_start: given time=%s\n",
+	    DEBUGPRINTF("record_start: given time=%s\n",
 	        timestr_logz(dp->b.time,timebuf)) ;
 	}
 #endif
 
-	memset(ep,0,sizeof(PINGSTATDB_REC)) ;
+	memset(ep,0,sizeof(PSD_REC)) ;
 	ep->roff = roff ;
 	ep->count = 1 ;
 	ep->f_up = false ;
@@ -1108,7 +1168,7 @@ DATER		*dp ;
 
 /* initialize an entry from a buffer (w/ 'logz' string) */
 local int record_startbuf(ep,nowp,zname,roff,buf,buflen)
-PINGSTATDB_REC	*ep ;
+PSD_REC	*ep ;
 TIMEB		*nowp ;
 cchar	zname[] ;
 uint		roff ;
@@ -1123,14 +1183,14 @@ int		buflen ;
 	if (zname == nullptr) return SR_FAULT ;
 	if (buf == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("record_startbuf: 1 name=%s\n",hostname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("record_startbuf: 1 name=%s\n",hostname) ;
 #endif
 
-	memset(ep,0,sizeof(PINGSTATDB_REC)) ;
+	memset(ep,0,sizeof(PSD_REC)) ;
 
-#if	CF_DEBUGS
-	debugprintf("record_startbuf: 2 name=%s\n",hostname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("record_startbuf: 2 name=%s\n",hostname) ;
 #endif
 
 	rs = dater_start(&ep->cdate,nowp,zname,-1) ;
@@ -1141,8 +1201,8 @@ int		buflen ;
 	if (rs < 0)
 	    goto bad1 ;
 
-#if	CF_DEBUGS
-	debugprintf("record_startbuf: 3 name=%s\n",hostname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("record_startbuf: 3 name=%s\n",hostname) ;
 #endif
 
 	ep->roff = roff ;
@@ -1170,8 +1230,8 @@ int		buflen ;
 	    goto bad2 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("record_startbuf: 4 name=%s\n",hostname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("record_startbuf: 4 name=%s\n",hostname) ;
 #endif
 
 	ep->f_up = (toupper(*bp) == 'U') ;
@@ -1183,9 +1243,9 @@ int		buflen ;
 	    goto bad2 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("record_startbuf: 4a name=%s\n",hostname) ;
-	debugprintf("record_startbuf: bl=%u ext_name=%r\n",bl,bp,bl) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("record_startbuf: 4a name=%s\n",hostname) ;
+	DEBUGPRINTF("record_startbuf: bl=%u ext_name=%r\n",bl,bp,bl) ;
 #endif
 
 	ep->hostlen = bl ;
@@ -1193,8 +1253,8 @@ int		buflen ;
 	if (rs < 0)
 	    goto bad2 ;
 
-#if	CF_DEBUGS
-	debugprintf("record_startbuf: 5 name=%s\n",hostname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("record_startbuf: 5 name=%s\n",hostname) ;
 #endif
 
 ret0:
@@ -1215,9 +1275,9 @@ bad0:
 
 /* update this entry to the file */
 local int record_update(ep,fp,dp,f_up)
-PINGSTATDB_REC	*ep ;
+PSD_REC	*ep ;
 bfile		*fp ;
-DATER		*dp ;
+dater		*dp ;
 int		f_up ;
 {
 	int		rs = SR_OK ;
@@ -1226,29 +1286,29 @@ int		f_up ;
 
 	if (ep == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	timebuf[TIMEBUFLEN + 1] ;
-	    debugprintf("record_update: ent, host=%s\n",ep->hostname) ;
-	    debugprintf("record_update: cur_date=%s\n",
+	    DEBUGPRINTF("record_update: ent, host=%s\n",ep->hostname) ;
+	    DEBUGPRINTF("record_update: cur_date=%s\n",
 	        timestr_log(dp->b.time,timebuf)) ;
 	}
 #endif
 
 	if (! LEQUIV(ep->f_up,f_up)) {
 
-#if	CF_DEBUGS
-	    debugprintf("record_update: changed status\n") ;
+#if	CF_DEBUG
+	    DEBUGPRINTF("record_update: changed status\n") ;
 #endif
 
 	    ep->f_up = f_up ;
 	    ep->count = 1 ;
 	    dater_setcopy(&ep->cdate,dp) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    {
 	        char	timebuf[TIMEBUFLEN + 1] ;
-	        debugprintf("record_update: status change cdate=%s\n",
+	        DEBUGPRINTF("record_update: status change cdate=%s\n",
 	            timestr_logz(ep->cdate.b.time,timebuf)) ;
 	    }
 #endif
@@ -1257,18 +1317,18 @@ int		f_up ;
 	    ep->count += 1 ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	timebuf[TIMEBUFLEN + 1] ;
-	    debugprintf("record_update: cdate=%s\n",
+	    DEBUGPRINTF("record_update: cdate=%s\n",
 	        timestr_logz(ep->cdate.b.time,timebuf)) ;
 	}
 #endif
 
 	dater_mklogz(&ep->cdate,cdate,(RF_LOGZLEN + 1)) ;
 
-#if	CF_DEBUGS
-	debugprintf("record_update: cdate mklogz=%s\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("record_update: cdate mklogz=%s\n",
 	    cdate) ;
 #endif
 
@@ -1276,19 +1336,19 @@ int		f_up ;
 
 	dater_setcopy(&ep->pdate,dp) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	timebuf[TIMEBUFLEN + 1] ;
-	    debugprintf("record_update: pdate=%s\n",
+	    DEBUGPRINTF("record_update: pdate=%s\n",
 	        timestr_logz(ep->pdate.b.time,timebuf)) ;
 	}
 #endif
 
 	dater_mklogz(&ep->pdate,pdate,RF_LOGZLEN + 1) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
-	    debugprintf("record_update: pdate mklogz=%s\n",
+	    DEBUGPRINTF("record_update: pdate mklogz=%s\n",
 	        pdate) ;
 	}
 #endif
@@ -1301,16 +1361,15 @@ int		f_up ;
 	    ep->hostname) ;
 
 	return rs ;
-}
-/* end subroutine (record_update) */
+} /* end subroutine (record_update) */
 
 
 /* write out this entry to the file */
 local int record_write(ep,fp,cp,dp,count,f_up)
-PINGSTATDB_REC	*ep ;
+PSD_REC	*ep ;
 bfile		*fp ;
-DATER		*cp ;
-DATER		*dp ;
+dater		*cp ;
+dater		*dp ;
 int		count ;
 int		f_up ;
 {
@@ -1320,15 +1379,15 @@ int		f_up ;
 
 	if (ep == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	timebuf[TIMEBUFLEN + 1] ;
-	    debugprintf("record_write: ent host=%s\n",ep->hostname) ;
-	    debugprintf("record_write: count=%d\n",count) ;
-	    debugprintf("record_write: cur_date=%s\n",
+	    DEBUGPRINTF("record_write: ent host=%s\n",ep->hostname) ;
+	    DEBUGPRINTF("record_write: count=%d\n",count) ;
+	    DEBUGPRINTF("record_write: cur_date=%s\n",
 	        timestr_log(dp->b.time,timebuf)) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	ep->f_up = f_up ;
 	if (count != 0) {
@@ -1364,7 +1423,7 @@ int		f_up ;
 
 
 /* free up an entry */
-local int record_finish(PINGSTATDB_REC *ep)
+local int record_finish(PSD_REC *ep)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1387,7 +1446,7 @@ local int record_finish(PINGSTATDB_REC *ep)
 }
 /* end subroutine (record_finish) */
 
-local int entry_load(PINGSTATDB_ENT *ep,PINGSTATDB_REC *rp)
+local int entry_load(PSD_ENT *ep,PSD_REC *rp)
 {
 	int		rs = SR_OK ;
 	int		hl = 0 ;
@@ -1424,26 +1483,26 @@ int mkbstr(mode_t omode,char *ostr)
 {
 	char		*bp = ostr ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	int		f_read = true ;
 #endif
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb/mkbstr: omode=%04o\n",omode) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb/mkbstr: omode=%04o\n",omode) ;
 #endif
 
 	if ((omode & O_RDWR) || (omode & O_WRONLY)) {
 
 	    *bp++ = 'w' ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    if ((omode & O_WRONLY) && (! (omode & O_RDWR)))
 	        f_read = false ;
 #endif
 
 	}
 
-#if	CF_DEBUGS
-	debugprintf("pingstatdb/mkbstr: f_read=%d\n",f_read) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pingstatdb/mkbstr: f_read=%d\n",f_read) ;
 #endif
 
 	if (omode & O_APPEND)
