@@ -93,7 +93,6 @@ uint inet4int(cvoid *ap) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return v ;
-}
-/* end subroutine (inet4int) */
+} /* end subroutine (inet4int) */
 
 
