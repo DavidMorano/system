@@ -31,20 +31,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sfx.h>
-#include	<strn.h>
-#include	<strkeycmp.h>
-#include	<strwcpy.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strkeycmp.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"keyopt.h"
 
@@ -114,8 +114,7 @@ int keyopt_start(keyopt *op) noex {
 	    op->magval = KO_MAG ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (keyopt_start) */
+} /* end subroutine (keyopt_start) */
 
 int keyopt_finish(keyopt *op) noex {
 	int		rs ;
@@ -149,8 +148,7 @@ int keyopt_finish(keyopt *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_finish) */
+} /* end subroutine (keyopt_finish) */
 
 int keyopt_loads(keyopt *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
@@ -174,8 +172,7 @@ int keyopt_loads(keyopt *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (keyopt_loads) */
+} /* end subroutine (keyopt_loads) */
 
 int keyopt_load(keyopt *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -183,8 +180,7 @@ int keyopt_load(keyopt *op,cchar *sp,int sl) noex {
 	    rs = keyopt_loadpair(op,sp,sl) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_load) */
+} /* end subroutine (keyopt_load) */
 
 int keyopt_loadvalue(keyopt *op,cchar *key,cchar *vbuf,int vlen) noex {
 	int		rs ;
@@ -252,8 +248,7 @@ int keyopt_loadvalue(keyopt *op,cchar *key,cchar *vbuf,int vlen) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_loadvalue) */
+} /* end subroutine (keyopt_loadvalue) */
 
 int keyopt_count(keyopt *op) noex {
 	int		rs ;
@@ -261,8 +256,7 @@ int keyopt_count(keyopt *op) noex {
 	    rs = op->cnt ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_count) */
+} /* end subroutine (keyopt_count) */
 
 int keyopt_enumkeys(keyopt *op,CUR *curp,cchar **rpp) noex {
 	int		rs ;
@@ -284,8 +278,7 @@ int keyopt_enumkeys(keyopt *op,CUR *curp,cchar **rpp) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_enumkeys) */
+} /* end subroutine (keyopt_enumkeys) */
 
 int keyopt_fetch(keyopt *op,cchar *kname,CUR *curp,cchar **rpp) noex {
 	int		rs ;
@@ -331,8 +324,7 @@ int keyopt_fetch(keyopt *op,cchar *kname,CUR *curp,cchar **rpp) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_fetch) */
+} /* end subroutine (keyopt_fetch) */
 
 int keyopt_enumvalues(keyopt *op,cchar *key,CUR *curp,cchar **rpp) noex {
 	int		rs ;
@@ -340,8 +332,7 @@ int keyopt_enumvalues(keyopt *op,cchar *key,CUR *curp,cchar **rpp) noex {
 	    rs = keyopt_fetch(op,key,curp,rpp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_enumvalues) */
+} /* end subroutine (keyopt_enumvalues) */
 
 int keyopt_incr(keyopt *op) noex {
 	int		rs ;
@@ -364,8 +355,7 @@ int keyopt_incr(keyopt *op) noex {
 	    } /* end if (not found) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_incr) */
+} /* end subroutine (keyopt_incr) */
 
 int keyopt_curbegin(keyopt *op,CUR *curp) noex {
 	int		rs ;
@@ -374,8 +364,7 @@ int keyopt_curbegin(keyopt *op,CUR *curp) noex {
 	    curp->valuep = nullptr ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_curbegin) */
+} /* end subroutine (keyopt_curbegin) */
 
 int keyopt_curend(keyopt *op,CUR *curp) noex {
 	int		rs ;
@@ -384,8 +373,7 @@ int keyopt_curend(keyopt *op,CUR *curp) noex {
 	    curp->valuep = nullptr ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_curend) */
+} /* end subroutine (keyopt_curend) */
 
 int keyopt_findvalue(keyopt *op,cc *key,cc *valp,int µvall,VAL **rpp) noex {
 	int		rs ;
@@ -402,8 +390,7 @@ int keyopt_findvalue(keyopt *op,cc *key,cc *valp,int µvall,VAL **rpp) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (keyopt_findvalue) */
+} /* end subroutine (keyopt_findvalue) */
 
 
 /* private subroutines */
@@ -424,8 +411,7 @@ local int keyopt_findkey(keyopt *op,cchar *keyp,int keyl,NAM **rpp) noex {
 	} /* end for */
 	if (rpp) *rpp = pp ;
 	return (pp) ? SR_OK : SR_NOTFOUND ;
-}
-/* end subroutine (keyopt_findkey) */
+} /* end subroutine (keyopt_findkey) */
 
 local int keyopt_loadpair(keyopt *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
@@ -455,8 +441,7 @@ local int keyopt_loadpair(keyopt *op,cchar *sp,int sl) noex {
 	    } /* end if (positive) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (keyopt_loadpair) */
+} /* end subroutine (keyopt_loadpair) */
 
 int keyopt::loads(cchar *sp,int sl) noex {
 	return keyopt_loads(this,sp,sl) ;
