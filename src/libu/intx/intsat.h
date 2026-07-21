@@ -20,13 +20,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>
-#include	<stdint.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
+#include	<stddef.h>		/* CSYD */
+#include	<stdint.h>		/* CSYD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
@@ -35,12 +35,12 @@ static inline int intsati(cint v) noex {
 	return v ;
 }
 
-extern int intsatl(clong) noex ;
-extern int intsatll(clonglong) noex ;
+extern int intsatl	(clong) noex ;
+extern int intsatll	(clonglong) noex ;
 
-extern int intsatui(cuint) noex ;
-extern int intsatul(culong) noex ;
-extern int intsatull(culonglong) noex ;
+extern int intsatui	(cuint) noex ;
+extern int intsatul	(culong) noex ;
+extern int intsatull	(culonglong) noex ;
 
 EXTERNC_end
 
