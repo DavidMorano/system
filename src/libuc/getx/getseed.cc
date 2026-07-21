@@ -43,7 +43,9 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<ucsysmisc.h>		/* |uc_gettieofday(3uc)| */
+#include	<ucsysmisc.h>		
+#include	<uclibmem.h>
+#include	<ucgetx.h>		/* |uc_gettieofday(3uc)| */
 #include	<cfdec.h>
 #include	<randlc.h>
 #include	<localmisc.h>
