@@ -41,15 +41,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<nleadkeystr.h>
-#include	<strkeycmp.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<nleadkeystr.h>		/* LIBUC */
+#include	<strkeycmp.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"matkeystr.h"
 
@@ -114,7 +114,6 @@ int matkeystr(con mainv a,cchar *sp,int sl) noex {
 	    rc = (f) ? i : -1 ;
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (matkeystr) */
+} /* end subroutine (matkeystr) */
 
 
