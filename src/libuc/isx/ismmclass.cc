@@ -100,8 +100,7 @@ bool ismmclass_7bit(int ch) noex {
 	    f = f || (ch == CH_SP) ;
 	}
 	return f ;
-}
-/* end subroutine (ismmclass_7bit) */
+} /* end subroutine (ismmclass_7bit) */
 
 /* does it *require* 8-bit but *only* 8-bit */
 bool ismmclass_8bit(int ch) noex {
@@ -111,8 +110,7 @@ bool ismmclass_8bit(int ch) noex {
 	    f = ((ch & 0x7f) >= 0x20) ;
 	}
 	return f ;
-}
-/* end subroutine (ismmclass_8bit) */
+} /* end subroutine (ismmclass_8bit) */
 
 /* does it *require* binary */
 bool ismmclass_binary(int ch) noex {
@@ -125,7 +123,6 @@ bool ismmclass_binary(int ch) noex {
 	    f = f && (ch != '\r') ;
 	}
 	return f ;
-}
-/* end subroutine (ismmclass_binary) */
+} /* end subroutine (ismmclass_binary) */
 
 
