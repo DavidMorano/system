@@ -62,12 +62,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* for |abs(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdlib>		/* CSTD |abs(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"zoffparts.h"
 
@@ -83,7 +84,7 @@
 
 /* forward references */
 
-static int	storebuf_twodig(char *,int,int,int) noex ;
+local int	storebuf_twodig(char *,int,int,int) noex ;
 
 
 /* local variables */
@@ -104,8 +105,7 @@ int zoffparts_set(zoffparts *zop,int zo) noex {
 	    zop->mins = (v % 60) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (zoffparts_set) */
+} /* end subroutine (zoffparts_set) */
 
 int zoffparts_get(zoffparts *zop,int *vp) noex {
 	int		rs = SR_FAULT ;
@@ -118,8 +118,7 @@ int zoffparts_get(zoffparts *zop,int *vp) noex {
 	    v = abs(v) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (zoffparts_get) */
+} /* end subroutine (zoffparts_get) */
 
 int zoffparts_mkstr(zoffparts *zop,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -141,13 +140,12 @@ int zoffparts_mkstr(zoffparts *zop,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (zoffparts_mkstr) */
+} /* end subroutine (zoffparts_mkstr) */
 
 
 /* private subroutines */
 
-static int storebuf_twodig(char *rbuf,int rlen,int i,int v) noex {
+local int storebuf_twodig(char *rbuf,int rlen,int i,int v) noex {
 	cint		n = 2 ;
 	int		rs = SR_OVERFLOW ;
 	if ((i+n) <= rlen) ylikely {
@@ -156,8 +154,7 @@ static int storebuf_twodig(char *rbuf,int rlen,int i,int v) noex {
 	    rs = n ;
 	}
 	return rs ;
-}
-/* end subroutine (storebuf_twodig) */
+} /* end subroutine (storebuf_twodig) */
 
 int zoffparts::set(int zo) noex {
 	return zoffparts_set(this,zo) ;
