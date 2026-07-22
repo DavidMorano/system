@@ -23,8 +23,8 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<mkpathxw.h>		/* LIBUC */
-#include	<mknpathx.h>		/* LINUC */
-#include	<mknpathxw.h>		/* LINUC */
+#include	<mknpathx.h>		/* LIBUC */
+#include	<mknpathxw.h>		/* LIBUC */
 
 
 EXTERNC_begin
