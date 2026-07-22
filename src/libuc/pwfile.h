@@ -51,7 +51,7 @@ struct pwfile_head {
 	hdb		*ulp ;		/* user-list-pointer */
 	time_t		readtime ;
 	PWFILE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		lfd ;
 } ; /* end struct (pwfile_head) */
 
