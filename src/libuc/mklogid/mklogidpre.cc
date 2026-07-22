@@ -44,16 +44,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| + |PID_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ctdec.h>
-#include	<strwcpy.h>
-#include	<ndigit.h>
-#include	<pow.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<climits>		/* CSTD |INT_MAX| + |PID_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ctdec.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<ndigit.h>		/* LIBUC */
+#include	<pow.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"mklogid.h"
 
@@ -65,8 +65,6 @@ import libutil ;
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -148,7 +146,6 @@ int mklogidpre(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? tl : rs ;
-}
-/* end subroutine (mklogidpre) */
+} /* end subroutine (mklogidpre) */
 
 
