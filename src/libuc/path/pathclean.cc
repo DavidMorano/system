@@ -39,13 +39,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bufsizevar.hh>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pathclean.h"
 
@@ -93,7 +93,7 @@ namespace {
 
 /* forward references */
 
-static int	nextname(cchar *,int,cchar **) noex ;
+local int	nextname(cchar *,int,cchar **) noex ;
 
 
 /* local variables */
@@ -106,7 +106,7 @@ static bufsizevar	maxpathlen(bufsize_mp) ;
 
 /* exported subroutines */
 
-static int pathnclean(char *,int,cc *,int) noex ;
+local int pathnclean(char *,int,cc *,int) noex ;
 
 int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	int		rs = SR_FAULT ;
@@ -120,13 +120,12 @@ int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	    } /* end if (maxpathlen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pathclean) */
+} /* end subroutine (pathclean) */
 
 
 /* local subroutines */
 
-static int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
+local int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -197,8 +196,7 @@ int pathbuf::start(char *sp,int sl) noex {
 	    PATHBUF_IDX = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (pathbuf_start) */
+} /* end subroutine (pathbuf_start) */
 
 int pathbuf::finish() noex {
 	int		rs ;
@@ -212,8 +210,7 @@ int pathbuf::finish() noex {
 	    PATHBUF_IDX = SR_NOTOPEN ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (pathbuf::finish) */
+} /* end method (pathbuf::finish) */
 
 int pathbuf::strw(cchar *sp,int sl) noex {
 	int		rs ;
@@ -255,16 +252,14 @@ int pathbuf::strw(cchar *sp,int sl) noex {
 	    }
 	} /* end if (ok) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (pathbuf::strw) */
+} /* end method (pathbuf::strw) */
 
 int pathbuf::chr(int ch) noex {
 	char		buf[2] ;
 	buf[0] = char(ch) ;
 	buf[1] = '\0' ;
 	return strw(buf,1) ;
-}
-/* end method (pathbuf::chr) */
+} /* end method (pathbuf::chr) */
 
 int pathbuf::remslash() noex {
 	int		rs ;
@@ -285,10 +280,9 @@ int pathbuf::remslash() noex {
 	    PATHBUF_IDX = intconv(bp - PATHBUF_BUFP) ;
 	} /* end if (ok) */
 	return rs ;
-}
-/* end method (pathbuf::remslash) */
+} /* end method (pathbuf::remslash) */
 
-static int nextname(cchar *sp,int sl,cchar **rpp) noex {
+local int nextname(cchar *sp,int sl,cchar **rpp) noex {
     	int		rl = 0 ;
 	bool		f_len = (sl >= 0) ;
 	while (((! f_len) || (sl > 0)) && (*sp == '/')) {
@@ -302,7 +296,6 @@ static int nextname(cchar *sp,int sl,cchar **rpp) noex {
 	} /* end while */
 	rl = intconv(sp - (*rpp)) ;
 	return rl ;
-}
-/* end subroutine (nextname) */
+} /* end subroutine (nextname) */
 
 
