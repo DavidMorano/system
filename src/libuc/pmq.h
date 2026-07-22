@@ -33,8 +33,8 @@
 struct pmq_head {
 	char		*name ;		/* allocated */
 	mqd_t		pq ;
-	uint		magic ;
-} ;
+	uint		magva ;
+} ; /* end struct */
 
 typedef PMQ		pmq ;
 typedef PMQ_ATTR	pmq_attr ;
