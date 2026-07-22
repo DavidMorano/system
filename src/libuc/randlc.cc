@@ -41,11 +41,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 #include	"randlc.h"
 
@@ -81,7 +83,6 @@ int randlc(int v) noex {
 	v = (16807 * lo) - (2836 * hi) ;
 	if (v <= 0) v += INT_MAX ;
 	return v ;
-}
-/* end subroutine (randlc) */
+} /* end subroutine (randlc) */
 
 
