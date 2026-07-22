@@ -27,16 +27,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<vecitem.h>
-#include	<strwcpy.h>
-#include	<strwcmp.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecitem.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"recip.h"
 
@@ -131,8 +131,7 @@ int recip_start(recip *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (recip_ctor) */
 	return rs ;
-}
-/* end subroutine (recip_start) */
+} /* end subroutine (recip_start) */
 
 int recip_finish(recip *op) noex {
 	int		rs ;
@@ -171,8 +170,7 @@ int recip_finish(recip *op) noex {
 	    op->magic = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (recip_finish) */
+} /* end subroutine (recip_finish) */
 
 int recip_get(recip *op,cchar **rpp) noex {
 	int		rs ;
@@ -189,8 +187,7 @@ int recip_get(recip *op,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recip_get) */
+} /* end subroutine (recip_get) */
 
 int recip_setuser(recip *op,uid_t uid) noex {
 	int		rs ;
@@ -199,8 +196,7 @@ int recip_setuser(recip *op,uid_t uid) noex {
 	    op->uid = uid ;
 	}
 	return rs ;
-}
-/* end subroutine (recip_setuser) */
+} /* end subroutine (recip_setuser) */
 
 int recip_setname(recip *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -219,8 +215,7 @@ int recip_setname(recip *op,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recip_setuser) */
+} /* end subroutine (recip_setuser) */
 
 int recip_setmailspool(recip *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -239,8 +234,7 @@ int recip_setmailspool(recip *op,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (recip_setmailspool) */
+} /* end subroutine (recip_setmailspool) */
 
 int recip_mbo(recip *op,int mbo) noex {
 	int		rs ;
@@ -248,8 +242,7 @@ int recip_mbo(recip *op,int mbo) noex {
 	    op->mbo = mbo ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recip_mbo) */
+} /* end subroutine (recip_mbo) */
 
 int recip_mo(recip *op,int moff,int mlen) noex {
 	int		rs ;
@@ -262,8 +255,7 @@ int recip_mo(recip *op,int moff,int mlen) noex {
 	    rs = vecitem_add(op->mdp,&mo,esz) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recip_mo) */
+} /* end subroutine (recip_mo) */
 
 int recip_ds(recip *op,int ds) noex {
 	int		rs ;
@@ -271,8 +263,7 @@ int recip_ds(recip *op,int ds) noex {
 	    op->ds = ds ;		/* delivery-status */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recip_ds) */
+} /* end subroutine (recip_ds) */
 
 int recip_match(recip *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -288,8 +279,7 @@ int recip_match(recip *op,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (recip_match) */
+} /* end subroutine (recip_match) */
 
 int recip_getmbo(recip *op) noex {
 	int		rs ;
@@ -302,8 +292,7 @@ int recip_getmbo(recip *op) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? mbo : rs ;
-}
-/* end subroutine (recip_getmbo) */
+} /* end subroutine (recip_getmbo) */
 
 int recip_getmo(recip *op,int i,int *offp) noex {
 	int		rs ;
@@ -324,8 +313,7 @@ int recip_getmo(recip *op,int i,int *offp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? ml : rs ;
-}
-/* end subroutine (recip_getmo) */
+} /* end subroutine (recip_getmo) */
 
 int recip_getname(recip *op,cchar **rpp) noex {
 	int		rs ;
@@ -338,8 +326,7 @@ int recip_getname(recip *op,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recip_getname) */
+} /* end subroutine (recip_getname) */
 
 int recip_getmailspool(recip *op,cchar **rpp) noex {
 	int		rs ;
@@ -352,8 +339,7 @@ int recip_getmailspool(recip *op,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (recip_getmailspool) */
+} /* end subroutine (recip_getmailspool) */
 
 int recip_isuser(recip *op) noex {
 	int		rs ;
@@ -362,8 +348,7 @@ int recip_isuser(recip *op) noex {
 	    f = op->fl.user ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (recip_isuser) */
+} /* end subroutine (recip_isuser) */
 
 int recip_getuser(recip *op,uid_t *up) noex {
 	int		rs ;
@@ -373,7 +358,6 @@ int recip_getuser(recip *op,uid_t *up) noex {
 	    f = op->fl.user ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (recip_getuser) */
+} /* end subroutine (recip_getuser) */
 
 
