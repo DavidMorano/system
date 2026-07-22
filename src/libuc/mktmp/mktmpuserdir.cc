@@ -45,21 +45,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getusername.h>
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<removes.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<removes.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mktmp.h"
 
@@ -89,7 +89,7 @@ extern "C" {
 
 /* forward references */
 
-static int mkourdir(cchar *,mode_t) noex ;
+local int mkourdir(cchar *,mode_t) noex ;
 
 
 /* local variables */
@@ -117,8 +117,7 @@ int mktmpuser(char *rbuf) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mktmpuser) */
+} /* end subroutine (mktmpuser) */
 
 int mktmpuserx(char *rbuf,cchar *un) noex {
 	int		rs = SR_FAULT ;
@@ -143,8 +142,7 @@ int mktmpuserx(char *rbuf,cchar *un) noex {
 	    } /* end if (mktmpusers) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mktmpuserx) */
+} /* end subroutine (mktmpuserx) */
 
 int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t dm) noex {
 	int		rs = SR_FAULT ;
@@ -163,19 +161,17 @@ int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t dm) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mktmpuserdir) */
+} /* end subroutine (mktmpuserdir) */
 
 
 /* local subroutines */
 
-static int mkourdir(cchar *rbuf,cmode dm) noex {
+local int mkourdir(cchar *rbuf,cmode dm) noex {
 	int		rs ;
 	if ((rs = u_mkdir(rbuf,dm)) >= 0) ylikely {
 	    rs = uc_minmod(rbuf,dm) ;
 	}
 	return rs ;
-}
-/* end subroutine (mkourdir) */
+} /* end subroutine (mkourdir) */
 
 
