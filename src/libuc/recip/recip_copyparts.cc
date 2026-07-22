@@ -27,16 +27,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"recip.h"
 
@@ -112,7 +112,6 @@ int recip_copyparts(recip *rp,int tfd,int sfd) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (recip_copyparts) */
+} /* end subroutine (recip_copyparts) */
 
 
