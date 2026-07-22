@@ -15,14 +15,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |caddr_t| */
 #include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ptm.h>
-#include	<shmalloc.h>
-#include	<votdchdr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<shmalloc.h>		/* LIBUC */
+#include	<votdchdr.h>		/* LIBUC */
 
 
 #ifndef	SVCBUFLEN
@@ -125,8 +122,8 @@ struct votdc_head {
 	VOTDC_TC	tcs[VOTDC_NBOOKS] ;
 	VOTDC_FL	fl ;
 	uint		magval ;
-	int		pagesize ;
-	int		shmsize ;
+	int		pagesz ;
+	int		shmsz ;
 	int		nents ;	
 	int		fd ;
 } ; /* end struct */
