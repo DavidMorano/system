@@ -35,6 +35,7 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"usys_strtox.h"
 #include	"usys_atox.h"
 
 
@@ -52,22 +53,34 @@ sint	atosi(cchar *s) noex {
 	return res ;
 } /* end subroutine (atosi) */
 
+sint	atosi(cchar *s,int b) noex {
+    	return strtosi(s,nullptr,b) ;
+} /* end subroutine (atosi) */
+
 uint	atoui(cchar *s) noex {
     	uint		res = 0 ; /* return-value */
 	errno_t		ec = 0 ;
 	if (s) {
 	    con ulong resl = strtoul(s,nullptr,base10) ;
-	    res = conv<uint>(resl) ;
 	    if (errno == 0) {
-	        if ((resl >> (szof(uint) * CHAR_BIT)) != 0L) {
+	        if ((resl >> (szof(uint) * CHAR_BIT)) == 0L) {
+	    	    res = conv<uint>(resl) ;
+		} else {
+		    res = UINT_MAX ;
 		    ec = ERANGE ;
 	        }
+	    } else {
+	        res = UINT_MAX ;
 	    } /* end if (not error) */
 	} else {
 	    ec = EFAULT ;
-	}
+	} /* end if (non-null) */
 	if (ec) errno = ec ;
 	return res ;
+} /* end subroutine (atoui) */
+
+uint	atoui(cchar *s,int b) noex {
+    	return strtoui(s,nullptr,b) ;
 } /* end subroutine (atoui) */
 
 slong	atosl(cchar *s) noex {
@@ -82,14 +95,22 @@ slong	atosl(cchar *s) noex {
 	return res ;
 } /* end subroutine (atosl) */
 
+slong	atosl(cchar *s,int b) noex {
+    	return strtosl(s,nullptr,b) ;
+} /* end subroutine (atosl) */
+
 ulong	atoul(cchar *s) noex {
-    	ulong		res = 0 ;
+    	return atoul(s,base10) ;
+} /* end subroutine (atoul) */
+
+ulong	atoul(cchar *s,int b) noex {
+    	ulong		res = 0 ; /* return-value */
 	errno_t		ec = 0 ;
 	if (s) {
-	    res = strtoul(s,nullptr,base10) ;
+	    res = strtoul(s,nullptr,b) ;
 	} else {
 	    ec = EFAULT ;
-	}
+	} /* end if (non-null) */
 	if (ec) errno = ec ;
 	return res ;
 } /* end subroutine (atoul) */
