@@ -30,10 +30,13 @@
 
 	Synopsis:
 	slonglong atosll(cchar *sp) noex
+	slonglong atosll(cchar *sp,int b) noex
 	ulonglong atoull(cchar *sp) noex
+	ulonglong atoull(cchar *sp,int b) noex
 
 	Arguments:
 	sp		c-string to convert
+	b		number base
 
 	Returns:
 	typeof({x})	resulting value in desired integer type
@@ -97,37 +100,21 @@ constexpr bool		f_debug = CF_DEBUG ;
 
 /* exported subroutines */
 
-slonglong	atosll(cchar *s) noex {
-    	slonglong	res = 0 ;
-	errno_t		ec = 0 ;
-	if (s) {
-	    if (s[0]) {
-		res = strtoxsll(s,nullptr,base10) ;
-	    } else {
-		ec = EINVAL ;
-	    }
-	} else {
-	    ec = EFAULT ;
-	} /* end if (non-null) */
-	if (ec) errno = ec ;
-    	return res ;
+slonglong	atosll(cchar *s,int b) noex {
+	return strtoxsll(s,nullptr,b) ;
 } /* end subroutine (atosll) */
 
-ulonglong	atoull(cchar *s) noex {
-    	ulonglong	res = 0 ;
-	errno_t		ec = 0 ;
-	if (s) {
-	    if (s[0]) {
-		res = strtoxull(s,nullptr,base10) ;
-	    } else {
-		ec = EINVAL ;
-	    }
-	} else {
-	    ec = EFAULT ;
-	} /* end if (non-null) */
-	if (ec) errno = ec ;
-    	return res ;
+slonglong	atosll(cchar *s) noex {
+    	return atosll(s,base10) ;
+} /* end subroutine */
+
+ulonglong	atoull(cchar *s,int b) noex {
+	return strtoxull(s,nullptr,b) ;
 } /* end subroutine (atoull) */
+
+ulonglong	atoull(cchar *s) noex {
+    	return atoull(s,base10) ;
+} /* end subroutine */
 
 
 /* local subroutines */
