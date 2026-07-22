@@ -51,21 +51,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<matstr.h>
-#include	<toxc.h>		/* |tolc(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<matstr.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC |tolc(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dater.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import dater_mag ;
 
 /* local defines */
 
@@ -152,8 +153,7 @@ int dater_setkey(dater *op,cc *dsp,int dsl,TIMEB *nowp,cc *zn) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dater_setkey) */
+} /* end subroutine (dater_setkey) */
 
 
 /* local subroutines */
@@ -180,8 +180,7 @@ datehelp::operator int () noex {
 	    rs = procval(dsp,dsl) ;
 	}
 	return rs ;
-}
-/* end method (datehelp::operator) */
+} /* end method (datehelp::operator) */
 
 int datehelp::procval(cchar *sp,int sl) noex {
     	int		rs = SR_OK ;
@@ -203,8 +202,7 @@ int datehelp::procval(cchar *sp,int sl) noex {
 	    rs = SR_NOMSG ;
 	}
 	return rs ;
-}
-/* end method (datehelp::procval) */
+} /* end method (datehelp::procval) */
 
 int datehelp::prockey(datetypes dt,cc *sp,int sl) noex {
     	int		rs = SR_NOTSUP ;
@@ -238,7 +236,6 @@ int datehelp::prockey(datetypes dt,cc *sp,int sl) noex {
 	    break ;
         } /* end switch */
 	return rs ;
-}
-/* end method (datehelp::prockey) */
+} /* end method (datehelp::prockey) */
 
 
