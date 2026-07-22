@@ -1,0 +1,135 @@
+/* pingstatdb_rec MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* object to manipulate a PINGSTATDB file */
+/* version %I% last-modified %G% */
+
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#define	CF_CREATE	0		/* always create the file? */
+#define	CF_UNLOCK	1		/* always unlock after an operation */
+
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	This code was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Object:
+	pingstatdb
+
+  	Description:
+	This subroutine maintains a PINGSTATDB file. These files
+	are used to maintain the names and status of a PING event.
+
+	Synopsis:
+
+	Arguments:
+	op		ping status_file pointer
+	fname		filename
+
+	Returns:
+	<0		error
+	==0		record written
+	==1		record created
+
+	Format of file records:
+
+	- eight digits of a decimal count number field
+	- the time of the last status change
+	- the time of the last entry update
+	- the UP/DOWN status
+	- the hostname
+
+	Format example:
+
+       3 000505_1018:55_EDT 000505_2233:28_EDT U rcb
+       5 000505_1018:55_EDT 000505_2234:43_EDT U *LAST_UPDATE*
+       1 000505_2234:37_EDT 000505_2234:37_EDT U bars
+       1 000505_2234:40_EDT 000505_2234:40_EDT U amps
+       1 000505_2234:43_EDT 000505_2234:43_EDT U farads
+       1 000505_2234:46_EDT 000505_2234:46_EDT U ergs
+
+	Oh, and finally, since file record locking sucks, that is: it is
+	very often BROKEN.  On the stupid Sun platforms, we attempt to
+	lock to be a nice guy but we have relatively small timeouts
+	after which we proceed anyway!  This strategy is applied to
+	all record lockes used throughout this subroutine.
+
+******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<vecitem.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
+#include	<ismisc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |timebUFLEN| */
+#include	<bfile.h>		/* LIBB */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+
+#include	"pingstatdb.h"
+#include	"pingstatdb_rec.hh"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+export module pingstatdb_rec ;
+
+import libutil ;			/* |lenstr(3u)| */
+
+/* local defines */
+
+#define	PSD		pingstatdb
+#define	PSD_FL		pingstatdb_fl
+#define	PSD_ENT		pingstatdb_ent
+#define	PSD_CUR		pingstatdb_cur
+#define	PSD_UP		pingstatdb_up
+#define	PSD_REC		pingstatdb_rec
+
+/* record-format (RF) paramters */
+#define	RF_NUMDIGITS	8		/* RF count field width */
+#define	RF_LOGZLEN	23		/* RF time log field width */
+#define	RF_UPSTAT	1		/* RF up status field width */
+#define	RF_LEAD0	(RF_NUMDIGITS + (2*RF_LOGZLEN))
+#define	RF_LEAD1	(RF_UPSTAT + 4)
+#define	RF_LEAD		(RF_LEAD0 + RF_LEAD1)
+
+
+export {
+    struct pingstatdb_rec {
+	cchar		*hostname ;	/* host name */
+	dater		*cdp ;		/* last date - change */
+	dater		*pdp ;		/* last date - ping */
+	uint		roff ;		/* record offset (within file) */
+	int		len ;		/* length of file record */
+	int		cnt ;		/* count since last change */
+	int		hostlen ;
+	int		f_up ;		/* UP-DOWN status */
+    } ; /* end struct (pingstatdb_rec) */
+} /* end export */
+
+export {
+    int record_start(PSD_REC *,timeb *,cchar *,uint,cchar *,dater *) noex ;
+    int record_startbuf(PSD_REC *,timeb *,cchar *,uint,cchar *,int) noex ;
+    int record_update(PSD_REC *,bfile *,dater *,int) noex ;
+    int record_write(PSD_REC *,bfile *,dater *,dater *,int,int) noex ;
+    int record_finish(PSD_REC *) noex ;
+} /* end export */
+
+
