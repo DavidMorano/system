@@ -29,6 +29,7 @@
 #include	<climits>		/* CSTD |UINT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<numeric>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -36,7 +37,6 @@
 #include	<localmisc.h>		/* LIBU */
 
 #include	"usys_strtox.h"
-
 
 template<typename T>
 constexpr int nbits = (szof(T) * CHAR_BIT) ;
@@ -46,32 +46,37 @@ template<typename T> constexpr inline bool bit(T v,int n) noex {
 } /* end subroutine (bit) */
 
 sint	strtosi(cchar *s,char **epp,int b) noex {
-    	sint		res = 0 ;
+	cint		nb = nbits<long> ;
+    	sint		res = 0 ; /* return-value */
 	errno_t		ec = 0 ;
+	bool		fneg ;
     	if (s) {
 	    clong	v = strtol(s,epp,b) ;
-	    res	= conv<sint>(v) ;
+	    fneg = bit(v,(nb - 1)) ;
 	    if (errno == 0) {
 	        ulong	uv = conv<ulong>(v) ;
-	        cint	nb = nbits<long> ;
-	        {
-	            cbool	fneg = bit(v,(nb - 1)) ;
-		    if (fneg) {	/* test negative value */
-		        uv = (compl uv) ;
-	                uv >>= (nb / 2) ;
-		        if (uv || (! bit(v,((nb / 2) - 1)))) {
-			    res = INT_MIN ;
-			    ec = ERANGE ;
-		        }
-		    } else {	/* test poitive value */
-	                uv >>= (nb / 2) ;
-		        if (uv || bit(v,((nb / 2) - 1))) {
-			    res = INT_MAX ;
-			    ec = ERANGE ;
-		        }
-		    } /* end if */
-	        } /* end block */
-	    } /* end if (no error so far) */
+		res = conv<sint>(v) ;
+	        if (fneg) {
+		    uv = (compl uv) ;
+	            uv >>= (nb / 2) ;
+		    if (uv || (! bit(v,((nb / 2) - 1)))) {
+			res = INT_MIN ;
+			ec = ERANGE ;
+		    }
+		} else {	/* test poitive value */
+	            uv >>= (nb / 2) ;
+		    if (uv || bit(v,((nb / 2) - 1))) {
+			res = INT_MAX ;
+			ec = ERANGE ;
+		    }
+		} /* end if */
+	    } else {
+		if (fneg) {
+	            res = UINT_MIN ;
+		} else {
+	            res = UINT_MAX ;
+		}
+	    } /* end if */
 	} else {
 	    ec = EFAULT ;
 	} /* end if (non-null) */
@@ -84,14 +89,19 @@ uint	strtoui(cchar *s,char **epp,int b) noex {
 	errno_t		ec = 0 ;
 	if (s) {
 	    con ulong resl = strtoul(s,epp,b) ;
-	    if ((resl >> (szof(uint) * CHAR_BIT)) == 0L) {
-	        res = conv<uint>(resl) ;
+	    if (errno == 0) {
+	        if ((resl >> (szof(uint) * CHAR_BIT)) == 0L) {
+	            res = conv<uint>(resl) ;
+		} else {
+		    res = UINT_MAX ;
+		    ec = ERANGE ;
+	        } /* end if */
 	    } else {
-		ec = ERANGE ;
-	    }
+	        res = UINT_MAX ;
+	    } /* end if (errno) */
 	} else {
 	    ec = EFAULT ;
-	}
+	} /* end if (non-null) */
 	if (ec) errno = ec ;
 	return res ;
 } /* end subroutine (strtoui) */
