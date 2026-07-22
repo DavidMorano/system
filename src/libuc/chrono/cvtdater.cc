@@ -32,18 +32,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>			/* |time_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |getustime(3u)| */
-#include	<dayspec.h>
-#include	<tmz.hh>
-#include	<tmtime.hh>
-#include	<hasx.h>		/* |hasalpha(3uc)| */
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD |time_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |getustime(3u)| */
+#include	<dayspec.h>		/* LIBUC */
+#include	<tmz.hh>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasalpha(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cvtdater.h"
 
@@ -116,8 +116,7 @@ int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 	    } /* end if (ok - TMZ scope) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cvtdater_load) */
+} /* end subroutine (cvtdater_load) */
 
 int cvtdater_finish(cvtdater *op) noex {
 	int		rs = SR_FAULT ;
@@ -125,8 +124,7 @@ int cvtdater_finish(cvtdater *op) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cvtdater_finish) */
+} /* end subroutine (cvtdater_finish) */
 
 
 /* private subroutines */
@@ -143,8 +141,7 @@ local int cvtdater_daytime(cvtdater *op,time_t *rp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cvtdater_daytime) */
+} /* end subroutine (cvtdater_daytime) */
 
 int cvtdater::start(time_t t) noex {
 	return cvtdater_start(this,t) ;
