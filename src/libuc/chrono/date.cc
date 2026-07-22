@@ -47,20 +47,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/timeb.h>		/* |TIMEB| */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizevar.hh>		/* for |za| */
-#include	<snwcpy.h>
-#include	<strn.h>		/* |strnwcpy(3uc)| */
-#include	<sncpyx.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<sys/timeb.h>		/* POSIX® |TIMEB| */
+#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC |za| */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnwcpy(3uc)| */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"date.h"
 #include	"tmz.hh"
@@ -123,8 +123,7 @@ int date_start(date *op,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 	    } /* end if (znlen) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (date_start) */
+} /* end subroutine (date_start) */
 
 int date_finish(date *op) noex {
 	int		rs = SR_FAULT ;
@@ -139,8 +138,7 @@ int date_finish(date *op) noex {
 	    op->time = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (date_finish) */
+} /* end subroutine (date_finish) */
 
 int date_setzname(date *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -149,8 +147,7 @@ int date_setzname(date *op,cchar *sp,int sl) noex {
 	    rs = intconv(strnwcpy(zp,znlen,sp,sl) - zp) ;
 	}
 	return rs ;
-}
-/* end subroutine (date_setzname) */
+} /* end subroutine (date_setzname) */
 
 int date_copy(date *op,date *d2p) noex {
 	int		rs = SR_FAULT ;
@@ -162,8 +159,7 @@ int date_copy(date *op,date *d2p) noex {
 	    op->zname = znp ;			/* restore */
 	}
 	return rs ;
-}
-/* end subroutine (date_copy) */
+} /* end subroutine (date_copy) */
 
 int date_gettime(date *op,time_t *tp) noex {
 	int		rs = SR_FAULT ;
@@ -172,8 +168,7 @@ int date_gettime(date *op,time_t *tp) noex {
 	    *tp = op->time ;
 	}
 	return rs ;
-}
-/* end subroutine (date_gettime) */
+} /* end subroutine (date_gettime) */
 
 int date_getzoff(date *op,int *zop) noex {
 	int		rs = SR_FAULT ;
@@ -182,8 +177,7 @@ int date_getzoff(date *op,int *zop) noex {
 	    *zop = op->zoff ;
 	}
 	return rs ;
-}
-/* end subroutine (date_getzoff) */
+} /* end subroutine (date_getzoff) */
 
 int date_getisdst(date *op,int *dstp) noex {
 	int		rs = SR_FAULT ;
@@ -192,8 +186,7 @@ int date_getisdst(date *op,int *dstp) noex {
 	    *dstp = int(op->isdst) ;
 	}
 	return rs ;
-}
-/* end subroutine (date_getisdst) */
+} /* end subroutine (date_getisdst) */
 
 int date_getzname(date *op,char *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
@@ -201,8 +194,7 @@ int date_getzname(date *op,char *zbuf,int zlen) noex {
 	    rs = sncpy(zbuf,zlen,op->zname) ;
 	}
 	return rs ;
-}
-/* end subroutine (date_getzname) */
+} /* end subroutine (date_getzname) */
 
 
 /* local subroutines */
