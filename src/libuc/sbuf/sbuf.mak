@@ -42,17 +42,16 @@ LIBS +=
 
 OBJ0_SBUF= sbuf_prime.o sbuf_addquoted.o
 OBJ1_SBUF= sbuf_termconseq.o sbuf_hexp.o
-OBJ2_SBUF=
+OBJ2_SBUF= rebuf.o
 OBJ3_SBUF=
 
-OBJA_SBUF= obj0_sbuf.o obj1_sbuf.o
+OBJA_SBUF= obj0_sbuf.o obj1_sbuf.o obj2_sbuf.o
 
 OBJ_SBUF= $(OBJA_SBUF)
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -131,5 +130,7 @@ sbuf_prime.o:		sbuf_prime.cc		$(INCS)
 sbuf_addquoted.o:	sbuf_addquoted.cc	$(INCS)
 sbuf_termconseq.o:	sbuf_termconseq.cc	$(INCS)
 sbuf_hexp.o:		sbuf_hexp.cc		$(INCS)
+
+rebuf.o:		rebuf.cc	rebuf.hh		$(INCS)
 
 
