@@ -31,6 +31,7 @@
 #define	cast_bit		bit_cast
 #define	cast_saturate		saturate_cast
 #define	cast_sat		saturate_cast
+#define	saturate		saturate_cast
 #define	cast_any		any_cast
 #endif
 #endif /* __cplusplus */
