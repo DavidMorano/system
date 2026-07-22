@@ -53,21 +53,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<fmtstr.h>
-#include	<ctbin.h>
-#include	<ctoct.h>
-#include	<ctdec.h>
-#include	<cthex.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<ctbin.h>		/* LIBUC */
+#include	<ctoct.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<cthex.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sbuf.h"
 
@@ -87,7 +87,6 @@ import uconstants ;
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -139,37 +138,32 @@ local inline int sbuf_xxxx(sbuf *op,ctxxx_f<T> ctxxx,T v) noex {
 	    } /* end if (not in error mode) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine-template (sbuf_xxxx) */
+} /* end subroutine-template (sbuf_xxxx) */
 
 template<typename T>
 local inline int sbuf_binx(sbuf *op,T v) noex {
 	return sbuf_xxxx(op,ctbin,v) ;
-}
-/* end subroutine-template (sbuf_binx) */
+} /* end subroutine-template (sbuf_binx) */
 
 template<typename T>
 local inline int sbuf_octx(sbuf *op,T v) noex {
 	return sbuf_xxxx(op,ctoct,v) ;
-}
-/* end subroutine-template (sbuf_octx) */
+} /* end subroutine-template (sbuf_octx) */
 
 template<typename T>
 local inline int sbuf_decx(sbuf *op,T v) noex {
 	return sbuf_xxxx(op,ctdec,v) ;
-}
-/* end subroutine-template (sbuf_decx) */
+} /* end subroutine-template (sbuf_decx) */
 
 template<typename T>
 local inline int sbuf_hexx(sbuf *op,T v) noex {
 	return sbuf_xxxx(op,cthex,v) ;
-}
-/* end subroutine-template (sbuf_hexx) */
+} /* end subroutine-template (sbuf_hexx) */
 
 
 /* local variables */
 
-static blanker			bo ;	/* so-called "blank" object */
+static blanker		bo ;	/* so-called "blank" object */
 
 
 /* exported variables */
@@ -190,8 +184,7 @@ int sbuf_start(sbuf *op,char *dbuf,int dlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf_start) */
+} /* end subroutine (sbuf_start) */
 
 int sbuf_finish(sbuf *op) noex {
 	int		rs = SR_FAULT ;
@@ -206,8 +199,7 @@ int sbuf_finish(sbuf *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf_finish) */
+} /* end subroutine (sbuf_finish) */
 
 int sbuf_reset(sbuf *op) noex {
 	int		rs = SR_FAULT ;
@@ -218,8 +210,7 @@ int sbuf_reset(sbuf *op) noex {
 	    *bp = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf_reset) */
+} /* end subroutine (sbuf_reset) */
 
 int sbuf_buf(sbuf *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -257,8 +248,7 @@ int sbuf_buf(sbuf *op,cchar *sp,int sl) noex {
 	    } /* end if (not in error-mode) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sbuf_buf) */
+} /* end subroutine (sbuf_buf) */
 
 int sbuf_strw(sbuf *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -268,8 +258,7 @@ int sbuf_strw(sbuf *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf_strw) */
+} /* end subroutine (sbuf_strw) */
 
 int sbuf_strs(sbuf *bp,int sch,mainv sv) noex {
 	int		rs = SR_FAULT ;
@@ -292,122 +281,99 @@ int sbuf_strs(sbuf *bp,int sch,mainv sv) noex {
 	    } /* end for */
 	} /* end if (non-null vector) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sbuf_strs) */
+} /* end subroutine (sbuf_strs) */
 
 int sbuf_bini(sbuf *op,int v) noex {
 	return sbuf_binx(op,v) ;
-}
-/* end subroutine (sbuf_bini) */
+} /* end subroutine (sbuf_bini) */
 
 int sbuf_binl(sbuf *op,long v) noex {
 	return sbuf_binx(op,v) ;
-}
-/* end subroutine (sbuf_binl) */
+} /* end subroutine (sbuf_binl) */
 
 int sbuf_binll(sbuf *op,longlong v) noex {
 	return sbuf_binx(op,v) ;
-}
-/* end subroutine (sbuf_binll) */
+} /* end subroutine (sbuf_binll) */
 
 int sbuf_binui(sbuf *op,uint v) noex {
 	return sbuf_binx(op,v) ;
-}
-/* end subroutine (sbuf_binui) */
+} /* end subroutine (sbuf_binui) */
 
 int sbuf_binul(sbuf *op,ulong v) noex {
 	return sbuf_binx(op,v) ;
-}
-/* end subroutine (sbuf_binul) */
+} /* end subroutine (sbuf_binul) */
 
 int sbuf_binull(sbuf *op,ulonglong v) noex {
 	return sbuf_binx(op,v) ;
-}
-/* end subroutine (sbuf_binull) */
+} /* end subroutine (sbuf_binull) */
 
 int sbuf_octi(sbuf *op,int v) noex {
 	return sbuf_octx(op,v) ;
-}
-/* end subroutine (sbuf_octi) */
+} /* end subroutine (sbuf_octi) */
 
 int sbuf_octl(sbuf *op,long v) noex {
 	return sbuf_octx(op,v) ;
-}
-/* end subroutine (sbuf_octl) */
+} /* end subroutine (sbuf_octl) */
 
 int sbuf_octll(sbuf *op,longlong v) noex {
 	return sbuf_octx(op,v) ;
-}
-/* end subroutine (sbuf_octll) */
+} /* end subroutine (sbuf_octll) */
 
 int sbuf_octui(sbuf *op,uint v) noex {
 	return sbuf_octx(op,v) ;
-}
-/* end subroutine (sbuf_octui) */
+} /* end subroutine (sbuf_octui) */
 
 int sbuf_octul(sbuf *op,ulong v) noex {
 	return sbuf_octx(op,v) ;
-}
-/* end subroutine (sbuf_octul) */
+} /* end subroutine (sbuf_octul) */
 
 int sbuf_octull(sbuf *op,ulonglong v) noex {
 	return sbuf_octx(op,v) ;
-}
-/* end subroutine (sbuf_octull) */
+} /* end subroutine (sbuf_octull) */
 
 int sbuf_deci(sbuf *op,int v) noex {
 	return sbuf_decx(op,v) ;
-}
-/* end subroutine (sbuf_deci) */
+} /* end subroutine (sbuf_deci) */
 
 int sbuf_decl(sbuf *op,long v) noex {
 	return sbuf_decx(op,v) ;
-}
-/* end subroutine (sbuf_decl) */
+} /* end subroutine (sbuf_decl) */
 
 int sbuf_decll(sbuf *op,longlong v) noex {
 	return sbuf_decx(op,v) ;
-}
-/* end subroutine (sbuf_decll) */
+} /* end subroutine (sbuf_decll) */
 
 int sbuf_decui(sbuf *op,uint v) noex {
 	return sbuf_decx(op,v) ;
-}
-/* end subroutine (sbuf_decui) */
+} /* end subroutine (sbuf_decui) */
 
 int sbuf_decul(sbuf *op,ulong v) noex {
 	return sbuf_decx(op,v) ;
-}
-/* end subroutine (sbuf_decul) */
+} /* end subroutine (sbuf_decul) */
 
 int sbuf_decull(sbuf *op,ulonglong v) noex {
 	return sbuf_decx(op,v) ;
-}
-/* end subroutine (sbuf_decull) */
+} /* end subroutine (sbuf_decull) */
 
 int sbuf_hexc(sbuf *op,char v) noex {
 	uchar		uv = uchar(v) ;
 	return sbuf_hexuc(op,uv) ;
-}
-/* end subroutine (sbuf_hexc) */
+} /* end subroutine (sbuf_hexc) */
 
 int sbuf_hexi(sbuf *op,int v) noex {
 	uint		uv = uint(v) ;
 	return sbuf_hexx(op,uv) ;
-}
-/* end subroutine (sbuf_hexi) */
+} /* end subroutine (sbuf_hexi) */
 
 int sbuf_hexl(sbuf *op,long v) noex {
 	ulong		uv = ulong(v) ;
 	return sbuf_hexx(op,uv) ;
-}
-/* end subroutine (sbuf_hexl) */
+} /* end subroutine (sbuf_hexl) */
 
 int sbuf_hexll(sbuf *op,longlong v) noex {
 	ulonglong	uv = ulonglong(v) ;
 	return sbuf_hexx(op,uv) ;
-}
-/* end subroutine (sbuf_hexll) */
+} /* end subroutine (sbuf_hexll) */
 
 int sbuf_hexuc(sbuf *op,uchar v) noex {
 	cint		hlen = (2 * szof(uchar)) ; /* unsigned character */
@@ -429,23 +395,19 @@ int sbuf_hexuc(sbuf *op,uchar v) noex {
 	    } /* end if (not in error mode) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sbuf_hexuc) */
+} /* end subroutine (sbuf_hexuc) */
 
 int sbuf_hexui(sbuf *op,uint v) noex {
 	return sbuf_hexx(op,v) ;
-}
-/* end subroutine (sbuf_hexui) */
+} /* end subroutine (sbuf_hexui) */
 
 int sbuf_hexul(sbuf *op,ulong v) noex {
 	return sbuf_hexx(op,v) ;
-}
-/* end subroutine (sbuf_hexul) */
+} /* end subroutine (sbuf_hexul) */
 
 int sbuf_hexull(sbuf *op,ulonglong v) noex {
 	return sbuf_hexx(op,v) ;
-}
-/* end subroutine (sbuf_hexull) */
+} /* end subroutine (sbuf_hexull) */
 
 int sbuf_chr(sbuf *op,int ch) noex {
 	cint		len = 1 ;
@@ -466,8 +428,7 @@ int sbuf_chr(sbuf *op,int ch) noex {
 	    } /* end if (not in error mode) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sbuf_chr) */
+} /* end subroutine (sbuf_chr) */
 
 /* store a character (n-times) */
 int sbuf_chrs(sbuf *op,int ch,int len) noex {
@@ -493,8 +454,7 @@ int sbuf_chrs(sbuf *op,int ch,int len) noex {
 	   } /* end if (not in error-mode) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sbuf_chrs) */
+} /* end subroutine (sbuf_chrs) */
 
 int sbuf_blanks(sbuf *op,int n) noex {
 	int		rs = SR_FAULT ;
@@ -511,8 +471,7 @@ int sbuf_blanks(sbuf *op,int n) noex {
 	    } /* end if (not in error-mode) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sbuf_blanks) */
+} /* end subroutine (sbuf_blanks) */
 
 int sbuf_vprintf(sbuf *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
@@ -534,8 +493,7 @@ int sbuf_vprintf(sbuf *op,cchar *fmt,va_list ap) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sbuf_vprintf) */
+} /* end subroutine (sbuf_vprintf) */
 
 /* PRINTFLIKE2 */
 int sbuf_printf(sbuf *op,cchar *fmt,...) noex {
@@ -547,8 +505,7 @@ int sbuf_printf(sbuf *op,cchar *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf_printf) */
+} /* end subroutine (sbuf_printf) */
 
 int sbuf_adv(sbuf *op,int adv,char **dpp) noex {
 	int		rs = SR_FAULT ;
@@ -564,8 +521,7 @@ int sbuf_adv(sbuf *op,int adv,char **dpp) noex {
 	    } /* end if (not error mode) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? adv : rs ;
-}
-/* end subroutine (sbuf_adv) */
+} /* end subroutine (sbuf_adv) */
 
 /* get the remaining length in the buffer */
 int sbuf_rem(sbuf *op) noex {
@@ -576,8 +532,7 @@ int sbuf_rem(sbuf *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf_rem) */
+} /* end subroutine (sbuf_rem) */
 
 /* get the length filled so far */
 int sbuf_getlen(sbuf *op) noex {
@@ -586,8 +541,7 @@ int sbuf_getlen(sbuf *op) noex {
 	    rs = SBUF_INDEX ;
 	}
 	return rs ;
-}
-/* end subroutine (sbuf_getlen) */
+} /* end subroutine (sbuf_getlen) */
 
 /* get the length filled so far */
 int sbuf_getbuf(sbuf *op,cchar **rpp) noex {
@@ -597,8 +551,7 @@ int sbuf_getbuf(sbuf *op,cchar **rpp) noex {
 	    rs = SBUF_INDEX ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf_getbuf) */
+} /* end subroutine (sbuf_getbuf) */
 
 /* get the pointer in the buffer to the next character */
 int sbuf_getpoint(sbuf *op,cchar **rpp) noex {
@@ -610,8 +563,7 @@ int sbuf_getpoint(sbuf *op,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf_getpoint) */
+} /* end subroutine (sbuf_getpoint) */
 
 /* get (retrieve) the previous character (if there is one) */
 int sbuf_getprev(sbuf *op) noex {
@@ -622,28 +574,23 @@ int sbuf_getprev(sbuf *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf_getprev) */
+} /* end subroutine (sbuf_getprev) */
 
 int sbuf::start(char *rp,int rl) noex {
 	return sbuf_start(this,rp,rl) ;
-}
-/* end subroutine (sbuf::start) */
+} /* end method (sbuf::start) */
 
 int sbuf::chrs(int ch,int nc) noex {
 	return sbuf_chrs(this,ch,nc) ;
-}
-/* end subroutine (sbuf::chrs) */
+} /* end method (sbuf::chrs) */
 
 int sbuf::strs(int sch,mainv sv) noex {
 	return sbuf_strs(this,sch,sv) ;
-}
-/* end subroutine (sbuf::strs) */
+} /* end method (sbuf::strs) */
 
 int sbuf::vprintf(cchar *fmt,va_list ap) noex {
     	return sbuf_vprintf(this,fmt,ap) ;
-}
-/* end subroutine (sbuf::vprintf) */
+} /* end method (sbuf::vprintf) */
 
 int sbuf::printf(cchar *fmt,...) noex {
     	va_list		ap ;
@@ -654,34 +601,25 @@ int sbuf::printf(cchar *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf::printf) */
+} /* end method (sbuf::printf) */
 
 int sbuf::buf(cchar *sp,int sl) noex {
 	return sbuf_buf(this,sp,sl) ;
-}
-/* end subroutine (sbuf::buf) */
+} /* end method (sbuf::buf) */
 
 int sbuf::getpoint(cchar **rpp) noex {
 	return sbuf_getpoint(this,rpp) ;
-}
-/* end subroutine (sbuf::getpoint) */
-
-int sbuf::hexp(uint64_t v,int n) noex {
-    	return sbuf_hexp(this,v,n) ;
-}
-/* end subroutine (sbuf::hexp) */
+} /* end method (sbuf::getpoint) */
 
 int sbuf::decl(long v) noex {
     	return sbuf_decl(this,v) ;
-}
+} /* end method */
 
 void sbuf::dtor() noex {
 	if (cint rs = sbuf_finish(this) ; rs < 0) {
 	   ulogerror("sbuf",rs,"dtor-finish") ;
 	}
-}
-/* end subroutine (sbuf::dtor) */
+} /* end method (sbuf::dtor) */
 
 
 /* private subroutines */
@@ -719,8 +657,7 @@ local int sbuf_addstrw(sbuf *op,cchar *sp,int sl) noex {
 	len = intconv(bp - (SBUF_RBUF + SBUF_INDEX)) ;
 	SBUF_INDEX = (rs >= 0) ? intconv(bp - SBUF_RBUF) : rs ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sbuf_addstrw) */
+} /* end subroutine (sbuf_addstrw) */
 
 int sbuf_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
@@ -765,7 +702,6 @@ int sbuf_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (sbuf_co::operator) */
+} /* end method (sbuf_co::operator) */
 
 
