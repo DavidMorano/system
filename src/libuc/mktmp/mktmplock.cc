@@ -44,19 +44,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<strwcpy.h>
-#include	<mkpathx.h>
-#include	<dirseen.h>
-#include	<isoneof.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<dirseen.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mktmp.h"
 
@@ -85,8 +85,8 @@ extern "C" {
 
 /* forward references */
 
-static int		mktmptry(char *,cchar *,cchar *,mode_t) noex ;
-static int		lockable(cchar *,mode_t) noex ;
+local int		mktmptry(char *,cchar *,cchar *,mode_t) noex ;
+local int		lockable(cchar *,mode_t) noex ;
 
 
 /* local variables */
@@ -95,7 +95,7 @@ static constexpr cchar	*tmpdirs[] = {
 	"/tmp",
 	"/var/tmp",
 	nullptr
-} ;
+} ; /* end array */
 
 static constexpr int	rslock[] = {
 	SR_AGAIN,
@@ -105,7 +105,7 @@ static constexpr int	rslock[] = {
 	SR_NOLCK,
 	SR_OPNOTSUPP,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -127,13 +127,12 @@ int mktmplock(char *rbuf,cchar *fn,mode_t fm) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mktmplock) */
+} /* end subroutine (mktmplock) */
 
 
 /* local subroutines */
 
-static int mktmptry(char *rbuf,cchar *tmpdir,cchar *fn,mode_t fm) noex {
+local int mktmptry(char *rbuf,cchar *tmpdir,cchar *fn,mode_t fm) noex {
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = mkpath(rbuf,tmpdir,fn)) >= 0) ylikely {
@@ -144,10 +143,9 @@ static int mktmptry(char *rbuf,cchar *tmpdir,cchar *fn,mode_t fm) noex {
 	    u_unlink(rbuf) ;
 	} /* end if (mkpath) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mktmptry) */
+} /* end subroutine (mktmptry) */
 
-static int lockable(cchar *fname,mode_t fm) noex {
+local int lockable(cchar *fname,mode_t fm) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = u_open(fname,O_RDWR,fm)) >= 0) ylikely {
@@ -160,7 +158,6 @@ static int lockable(cchar *fname,mode_t fm) noex {
 	    u_close(fd) ;
 	} /* end if (u_open) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (lockable) */
+} /* end subroutine (lockable) */
 
 
