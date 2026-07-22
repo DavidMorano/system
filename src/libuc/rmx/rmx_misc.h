@@ -30,8 +30,27 @@ EXTERNC_begin
 
 extern int	rmext		(cchar *,int) noex ;
 extern int	rmcomment	(cchar *,int) noex ;
+extern int	rmslashes	(cchar *,int) noex ;
+extern int	rmdot		(cchar *,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+inline int	rmext		(cchar *sp) noex {
+    	return rmext(sp,-1) ;
+}
+inline int	rmcomment	(cchar *sp) noex {
+    	return rmcomment(sp,-1) ;
+}
+inline int	rmslashes	(cchar *sp) noex {
+    	return rmslashes(sp,-1) ;
+}
+inline int	rmdot		(cchar *sp) noex {
+    	return rmdot(sp,-1) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* RMXMISC_INCLUDE */
