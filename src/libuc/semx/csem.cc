@@ -52,14 +52,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>			/* |clock_{x}(3c++)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD |clock_{x}(3c++)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cassert>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"csem.h"
 
@@ -144,6 +145,7 @@ local int	csem_ptcinit(csem *,int) noex ;
 
 int csem_create(csem *op,int f_shared,int count) noex {
 	int		rs ;
+	assert(op) ;
 	if ((rs = csem_ctor(op)) >= 0) ylikely {
 	    op->cnt = (count > 0) ? count : 0 ;
 	    if ((rs = csem_ptminit(op,f_shared)) >= 0) ylikely {
@@ -160,12 +162,12 @@ int csem_create(csem *op,int f_shared,int count) noex {
 	    }
 	} /* end if (csem_ctor) */
 	return rs ;
-}
-/* end subroutine (csem_start) */
+} /* end subroutine (csem_start) */
 
 int csem_destroy(csem *op) noex {
 	int		rs ;
 	int		rs1 ;
+	assert(op) ;
 	if ((rs = csem_magic(op)) >= 0) ylikely {
 	    if (op->cvp) ylikely {
 		ptc *cvp = op->cvp ;
@@ -184,13 +186,13 @@ int csem_destroy(csem *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csem_destroy) */
+} /* end subroutine (csem_destroy) */
 
 int csem_decr(csem *op,int c,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ocount = 0 ;
+	assert(op) ;
 	if ((rs = csem_magic(op)) >= 0) ylikely {
             if (c > 0) {
                 timespec    ts{} ; /* used-afterwards */
@@ -225,13 +227,13 @@ int csem_decr(csem *op,int c,int to) noex {
             } /* end if (valid decrement count) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ocount : rs ;
-}
-/* end subroutine (csem_decr) */
+} /* end subroutine (csem_decr) */
 
 int csem_incr(csem *op,int c) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ocount = 0 ;
+	assert(op) ;
 	if ((rs = csem_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
 	    ptc *cvp = op->cvp ;
@@ -253,17 +255,18 @@ int csem_incr(csem *op,int c) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? ocount : rs ;
-}
-/* end subroutine (csem_incr) */
+} /* end subroutine (csem_incr) */
 
 int csem_post(csem *op) noex {
+	assert(op) ;
     	return csem_incr(op,1) ;
-}
+} /* end subroutine */
 
 int csem_count(csem *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ocount = 0 ;
+	assert(op) ;
 	if ((rs = csem_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
 	    if ((rs = mxp->lockbegin) >= 0) ylikely {
@@ -275,13 +278,13 @@ int csem_count(csem *op) noex {
 	    } /* end if (mutex-lock) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ocount : rs ;
-}
-/* end subroutine (csem_count) */
+} /* end subroutine (csem_count) */
 
 int csem_waiters(csem *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
+	assert(op) ;
 	if ((rs = csem_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
 	    if ((rs = mxp->lockbegin) >= 0) ylikely {
@@ -293,8 +296,7 @@ int csem_waiters(csem *op) noex {
 	    } /* end if (mutex-lock) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (csem_waiters) */
+} /* end subroutine (csem_waiters) */
 
 
 /* private subroutines */
@@ -323,14 +325,12 @@ local int csem_ptminit(csem *op,int f_shared) noex {
 	    }
 	} /* end if (ptma) */
 	return rs ;
-}
-/* end subroutine (csem_ptminit) */
+} /* end subroutine (csem_ptminit) */
 
 local int csem_ptcinit(csem *op,int f_shared) noex {
-	ptca		a ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptca_create(&a)) >= 0) ylikely {
+	if (ptca a ; (rs = ptca_create(&a)) >= 0) ylikely {
 	    ptc		*cvp = op->cvp ;
 	    bool	f_ptc = false ;
 	    {
@@ -350,8 +350,7 @@ local int csem_ptcinit(csem *op,int f_shared) noex {
 	    }
 	} /* end if (ptca) */
 	return rs ;
-}
-/* end subroutine (csem_ptcinit) */
+} /* end subroutine (csem_ptcinit) */
 
 int csem::create(int fshared,int sc) noex {
     	return csem_create(this,fshared,sc) ;
