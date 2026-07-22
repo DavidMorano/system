@@ -39,15 +39,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<date.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<date.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dater.h"
 
+import dater_mag ;
 
 /* local defines */
 
@@ -82,7 +83,6 @@ int dater_getdate(dater *op,date *dop) noex {
 	    rs = date_start(dop,t,zoff,isdst,zp,-1) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dater_getdate) */
+} /* end subroutine (dater_getdate) */
 
 
