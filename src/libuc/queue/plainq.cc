@@ -1,6 +1,6 @@
 /* plainq SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* plain self-relative double-linked queue */
 /* version %I% last-modified %G% */
