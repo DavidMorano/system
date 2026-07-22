@@ -1,6 +1,6 @@
 /* quoteshellarg SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to quote arguments for safe passage through a SHELL */
 /* version %I% last-modified %G% */
