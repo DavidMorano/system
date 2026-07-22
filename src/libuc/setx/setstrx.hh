@@ -1,6 +1,6 @@
 /* setstrx HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* set-string container (Set-String) */
 /* version %I% last-modified %G% */
