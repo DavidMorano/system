@@ -51,6 +51,13 @@ extern slong	atosl(cchar *) noex ;
 extern ulong	atoul(cchar *) noex ;
 EXTERNC_end
 
+#ifdef	__cplusplus
+extern sint	atosi(cchar *,int) noex ;
+extern uint	atoui(cchar *,int) noex ;
+extern slong	atosl(cchar *,int) noex ;
+extern ulong	atoul(cchar *,int) noex ;
+#endif /* __cplusplus */
+
 
 #endif /* USYSATOX_INCLUDE */
 
