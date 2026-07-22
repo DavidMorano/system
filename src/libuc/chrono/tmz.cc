@@ -75,24 +75,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<tzfile.h>		/* for |TM_YEAR_BASE| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<estrings.h>		/* |osalpha(3uc)| */
-#include	<field.h>
-#include	<tmstrs.h>
-#include	<cfdec.h>
-#include	<mkchar.h>
-#include	<char.h>		/* |CHAR_{x}(3uc)| */
-#include	<hasx.h>
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |NYEARS_CENTURY| */
+#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC |isalphalatin(3uc)| */
+#include	<field.h>		/* LIBUC */
+#include	<tmstrs.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC |CHAR_{x}(3uc)| */
+#include	<hasx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |NYEARS_CENTURY| */
 
 #include	"tmz.hh"
 
@@ -212,8 +212,7 @@ int tmz_init(tmz *op) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_init) */
+} /* end subroutine (tmz_init) */
 
 /* format> [Wed] Nov 14 19:24[:04] [EST] [[19]99] [±0400] */
 int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
@@ -252,8 +251,7 @@ int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_xstd) */
+} /* end subroutine (tmz_xstd) */
 
 /* format> [Weekday,] DD MMM [CC]YY hh:mm[:ss] [Â±hhmm] [zname] */
 int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
@@ -310,8 +308,7 @@ int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? zl : rs ;
-}
-/* end subroutine (tmz_xmsg) */
+} /* end subroutine (tmz_xmsg) */
 
 /* convert from a TOUCH (original) format> MMDDhhmm[YY] */
 int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
@@ -372,8 +369,7 @@ int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_xtouch) */
+} /* end subroutine (tmz_xtouch) */
 
 /* convert from a TOUCH-t (new '-t') format> [[CC]YY]MMDDhhmm[.SS] */
 int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
@@ -455,8 +451,7 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (date_toucht) */
+} /* end subroutine (date_toucht) */
 
 /* format> [[CC]]YYMMDDhhmm[ss][Â±hhmm][zname] */
 int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
@@ -556,8 +551,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? zl : rs ;
-}
-/* end subroutine (tmz_xstrdig) */
+} /* end subroutine (tmz_xstrdig) */
 
 /* format> [CC]YYMMDD_hhmm[:ss][_][zname] */
 int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
@@ -650,8 +644,7 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? zl : rs ;
-}
-/* end subroutine (tmz_xlogz) */
+} /* end subroutine (tmz_xlogz) */
 
 /* format> [CC]YYMMDD (like abbreviated variation of "touch") */
 int tmz_xday(tmz *op,cchar *sp,int sl) noex {
@@ -708,8 +701,7 @@ int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_xday) */
+} /* end subroutine (tmz_xday) */
 
 int tmz_isset(tmz *op) noex {
 	int		rs ;
@@ -720,8 +712,7 @@ int tmz_isset(tmz *op) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_isset) */
+} /* end subroutine (tmz_isset) */
 
 int tmz_hasyear(tmz *op) noex {
 	int		rs ;
@@ -732,8 +723,7 @@ int tmz_hasyear(tmz *op) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_hasyear) */
+} /* end subroutine (tmz_hasyear) */
 
 int tmz_haszoff(tmz *op) noex {
 	int		rs ;
@@ -744,8 +734,7 @@ int tmz_haszoff(tmz *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (tmz_haszoff) */
+} /* end subroutine (tmz_haszoff) */
 
 int tmz_haszone(tmz *op) noex {
 	int		rs ;
@@ -756,8 +745,7 @@ int tmz_haszone(tmz *op) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_haszone) */
+} /* end subroutine (tmz_haszone) */
 
 int tmz_setday(tmz *op,int y,int m,int d) noex {
 	int		rs ;
@@ -776,8 +764,7 @@ int tmz_setday(tmz *op,int y,int m,int d) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_setday) */
+} /* end subroutine (tmz_setday) */
 
 int tmz_setyear(tmz *op,int year) noex {
 	int		rs ;
@@ -789,8 +776,7 @@ int tmz_setyear(tmz *op,int year) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_setyear) */
+} /* end subroutine (tmz_setyear) */
 
 int tmz_setzone(tmz *op,cchar *zp,int zl) noex {
 	int		rs ;
@@ -803,8 +789,7 @@ int tmz_setzone(tmz *op,cchar *zp,int zl) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_setzone) */
+} /* end subroutine (tmz_setzone) */
 
 int tmz_gettm(tmz *op,TM *tmp) noex {
 	int		rs ;
@@ -815,8 +800,7 @@ int tmz_gettm(tmz *op,TM *tmp) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_gettm) */
+} /* end subroutine (tmz_gettm) */
 
 int tmz_getdst(tmz *op) noex {
     	int		rs ;
@@ -827,8 +811,7 @@ int tmz_getdst(tmz *op) noex {
 	    }
 	} /* end if (tmz_zinit) */
 	return rs ;
-}
-/* end subroutine (tmz_getdst) */
+} /* end subroutine (tmz_getdst) */
 
 int tmz_getzoff(tmz *op,short *rp) noex {
     	int		rs ;
@@ -838,8 +821,7 @@ int tmz_getzoff(tmz *op,short *rp) noex {
 	    f = op->fl.zoff ;
 	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (tmz_getzoff) */
+} /* end subroutine (tmz_getzoff) */
 
 int tmz_getzone(tmz *op,char *rbuf,int rlen) noex {
     	int		rs ;
@@ -849,8 +831,7 @@ int tmz_getzone(tmz *op,char *rbuf,int rlen) noex {
 	    zl = rs ;
 	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? zl : rs ;
-}
-/* end subroutine (tmz_getzone) */
+} /* end subroutine (tmz_getzone) */
 
 int tmz_fini(tmz *op) noex {
     	int		rs = SR_OK ;
@@ -860,8 +841,7 @@ int tmz_fini(tmz *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (tmz_fini) */
+} /* end subroutine (tmz_fini) */
 
 
 /* private subroutines */
@@ -903,8 +883,7 @@ local int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (tmz_timeparts) */
+} /* end subroutine (tmz_timeparts) */
 
 local int tmz_xstdtrailing(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -928,8 +907,7 @@ local int tmz_xstdtrailing(tmz *op,cchar *sp,int sl) noex {
 	    } /* end if (non-zero string) */
 	} /* end if (siskipwhite) */
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (tmz_xstdtrailing) */
+} /* end subroutine (tmz_xstdtrailing) */
 
 /* parse out> dd */
 local int tmz_procday(tmz *op,cchar *sp,int sl) noex {
@@ -954,8 +932,7 @@ local int tmz_procday(tmz *op,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	}
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (tmz_procday) */
+} /* end subroutine (tmz_procday) */
 
 /* parse out> [DDD] MMM */
 local int tmz_procmonth(tmz *op,cchar *sp,int sl) noex {
@@ -991,8 +968,7 @@ local int tmz_procmonth(tmz *op,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	}
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (tmz_procmonth) */
+} /* end subroutine (tmz_procmonth) */
 
 local int tmz_procyear(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -1008,8 +984,7 @@ local int tmz_procyear(tmz *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (sfnext) */
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (tmz_procyear) */
+} /* end subroutine (tmz_procyear) */
 
 local int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -1029,8 +1004,7 @@ local int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
 	    } /* end if (have) */
 	} /* end if (sfnext) */
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (tmz_proczoff) */
+} /* end subroutine (tmz_proczoff) */
 
 local int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -1046,8 +1020,7 @@ local int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 	    } /* end if (isalpha) */
 	} /* end if (sfnext) */
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (tmz_proczname) */
+} /* end subroutine (tmz_proczname) */
 
 local int tmz_yearadj(tmz *op,int sc) noex {
 	TM		*stp = &op->st ;
@@ -1136,8 +1109,7 @@ local int getzoff(int *zop,cchar *sp,int sl) noex {
 	    }
 	} /* end if (getting timezone offset) */
 	return rs ;
-}
-/* end subroutine (getzoff) */
+} /* end subroutine (getzoff) */
 
 local int tmz_clear(tmz *op) noex {
     	int		rs = SR_BUGCHECK ;
@@ -1147,8 +1119,7 @@ local int tmz_clear(tmz *op) noex {
 	    op->zoff = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (tmz::clæar) */
+} /* end method (tmz::clæar) */
 
 int tmz::xstd(cchar *sp,int sl) noex {
 	return tmz_xstd(this,sp,sl) ;
@@ -1259,8 +1230,7 @@ local int val(cchar *sp) noex {
 	v += (10 * (sp[0] - '0')) ;
 	v += ( 1 * (sp[1] - '0')) ;
 	return v ;
-}
-/* end subroutine (val) */
+} /* end subroutine (val) */
 
 local int silogend(cchar *sp,int sl) noex {
 	int		i ; /* used-afterwards */
@@ -1272,8 +1242,7 @@ local int silogend(cchar *sp,int sl) noex {
 	    if (f) break ;
 	} /* end while */
 	return i ;
-}
-/* end subroutine (silogend) */
+} /* end subroutine (silogend) */
 
 local cchar *strnzone(cchar *sp,int sl) noex {
 	bool		f = false ;
@@ -1286,8 +1255,7 @@ local cchar *strnzone(cchar *sp,int sl) noex {
 	    sl -= 1 ;
 	} /* end while */
 	return sp ;
-}
-/* end subroutine (strnzone) */
+} /* end subroutine (strnzone) */
 
 #ifdef	COMMENT
 local bool	isgoodname(cchar *,int) noex ;
