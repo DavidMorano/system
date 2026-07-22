@@ -43,15 +43,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucdesc.h>
-#include	<opentmp.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mktmp.h"
 
@@ -91,7 +91,6 @@ int mktmpfile(char *rbuf,cchar *inname,mode_t om) noex {
 	    }
 	} /* end if (opentmpfile) */
 	return rs ;
-}
-/* end subroutine (mktmpfile) */
+} /* end subroutine (mktmpfile) */
 
 
