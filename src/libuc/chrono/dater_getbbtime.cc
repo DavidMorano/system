@@ -45,17 +45,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>			/* |time_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>
-#include	<cfdec.h>
+#include	<ctime>			/* CSTD |time_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* |NYEARS_CENTURY| + |TIMEBUFLEN| */
 
 #include	"dater.h"
 
+import dater_mag ;
 
 /* local defines */
 
@@ -97,7 +98,6 @@ int dater_getbbtime(dater *op,cchar *sp,int sl,time_t *tp) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dater_getbbtime) */
+} /* end subroutine (dater_getbbtime) */
 
 
