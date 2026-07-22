@@ -127,7 +127,6 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (shellunder_load) */
+} /* end subroutine (shellunder_load) */
 
 
