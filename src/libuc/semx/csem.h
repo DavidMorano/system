@@ -20,14 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<pthread.h>
-#include	<ptm.h>
-#include	<ptc.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<pthread.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
 
 
 #define	CSEM		struct csem_head
@@ -94,13 +91,13 @@ typedef CSEM		csem ;
 
 EXTERNC_begin
 
-extern int	csem_create(csem *,int,int) noex ;
-extern int	csem_decr(csem *,int,int) noex ;
-extern int	csem_incr(csem *,int) noex ;
-extern int	csem_post(csem *) noex ;
-extern int	csem_count(csem *) noex ;
-extern int	csem_waiters(csem *) noex ;
-extern int	csem_destroy(csem *) noex ;
+extern int	csem_create	(csem *,int,int) noex ;
+extern int	csem_decr	(csem *,int,int) noex ;
+extern int	csem_incr	(csem *,int) noex ;
+extern int	csem_post	(csem *) noex ;
+extern int	csem_count	(csem *) noex ;
+extern int	csem_waiters	(csem *) noex ;
+extern int	csem_destroy	(csem *) noex ;
 
 EXTERNC_end
 
