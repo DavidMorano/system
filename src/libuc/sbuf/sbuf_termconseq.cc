@@ -41,13 +41,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<termconseq.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<termconseq.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sbuf.h"
 
@@ -104,7 +104,6 @@ int sbuf_termconseq(sbuf *op,int name,cchar *is,int na,...) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? tl : rs ;
-}
-/* end subroutine (sbuf_termconseq) */
+} /* end subroutine (sbuf_termconseq) */
 
 
