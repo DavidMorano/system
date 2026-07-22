@@ -63,7 +63,7 @@
 
 namespace {
     struct maxpather {
-	static int operator () (int) noex ;
+	local int operator () (int) noex ;
     } ; /* end struct (maxpather) */
 } /* end namespace */
 
