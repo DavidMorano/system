@@ -20,15 +20,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int tmstrsday(cchar *,int) noex ;
-extern int tmstrsmonth(cchar *,int) noex ;
-extern int tmstrsyear(cchar *,int) noex ;
+extern int tmstrsday	(cchar *,int) noex ;
+extern int tmstrsmonth	(cchar *,int) noex ;
+extern int tmstrsyear	(cchar *,int) noex ;
 
 EXTERNC_end
 
