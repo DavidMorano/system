@@ -48,6 +48,8 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
+#include	<ugetx.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
