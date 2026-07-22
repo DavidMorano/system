@@ -62,8 +62,8 @@ struct sysrealname_head {
 	void		*obj ;		/* object pointer */
 	SYSREALNAME_FL	fl ;
 	uint		magval ;
-	int		objsize ;	/* object size */
-	int		cursize ;	/* cursor size */
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
 } ; /* end struct */
 
 typedef SYSREALNAME		sysrealname ;
