@@ -26,16 +26,16 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<six.h>
-#include	<snwcpyx.h>
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |REALNAME| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<six.h>			/* LIBUC */
+#include	<snwcpyx.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |REALNAME| */
 
 #include	"namestr.h"
 
@@ -80,8 +80,7 @@ int namestr_start(namestr *op,cchar *sp,int sl) noex {
 	    op->strl = getlenstr(sp,sl) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (namestr_start) */
+} /* end subroutine (namestr_start) */
 
 int namestr_finish(namestr *op) noex {
     	int		rs = SR_FAULT ;
@@ -91,8 +90,7 @@ int namestr_finish(namestr *op) noex {
 	    op->strl = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (namestr_finish) */
+} /* end subroutine (namestr_finish) */
 
 int namestr_skipwhite(namestr *op) noex {
     	int		rs = SR_FAULT ;
@@ -112,8 +110,7 @@ int namestr_skipwhite(namestr *op) noex {
 	    len = op->strl ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (namestr_skipwhite) */
+} /* end subroutine (namestr_skipwhite) */
 
 int namestr_brk(namestr *op,cchar *bs,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
@@ -125,8 +122,7 @@ int namestr_brk(namestr *op,cchar *bs,cchar **rpp) noex {
 	    idx = si ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (namestr_brk) */
+} /* end subroutine (namestr_brk) */
 
 int namestr_next(namestr *op,cchar **npp,int *fap,int *flp) noex {
 	int		rs = SR_FAULT ;
@@ -189,8 +185,7 @@ int namestr_next(namestr *op,cchar **npp,int *fap,int *flp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? nlen : rs ;
-}
-/* end subroutine (namestr_next) */
+} /* end subroutine (namestr_next) */
 
 int namestr::start(cchar *sp,int sl) noex {
     	return namestr_start(this,sp,sl) ;
@@ -208,7 +203,7 @@ void namestr::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("namestr",rs,"fini-finish") ;
 	}
-}
+} /* end method (namestr::dtor) */
 
 namestr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -223,7 +218,6 @@ namestr_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (namestr_co::operator) */
+} /* end method (namestr_co::operator) */
 
 
