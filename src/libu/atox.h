@@ -34,6 +34,11 @@ extern ulonglong	atoull(cchar *) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+extern slonglong	atosll(cchar *,int) noex ;
+extern ulonglong	atoull(cchar *,int) noex ;
+#endif /* __cplusplus */
+
 
 #endif /* ATOX_INCLUDE */
 
