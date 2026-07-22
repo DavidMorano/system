@@ -50,17 +50,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ctdec.h>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ctdec.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mklogid.h"
 
@@ -97,7 +97,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int	mkjoin(char *,int,cchar *,int,cchar *,int) noex ;
+local int	mkjoin(char *,int,cchar *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -183,13 +183,12 @@ int mklogidsub(char *dbuf,int dlen,cchar *bname,int v) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mklogidsub) */
+} /* end subroutine (mklogidsub) */
 
 
 /* local subroutines */
 
-static int mkjoin(char *dbuf,int dlen,cchar *bp,int bl,cchar *vp,int vl) noex {
+local int mkjoin(char *dbuf,int dlen,cchar *bp,int bl,cchar *vp,int vl) noex {
 	int		rs ;
 	int		idx = 0 ;
 	if (storebuf sb(dbuf,dlen) ; (rs = sb.strw(bp,bl)) >= 0) {
@@ -202,7 +201,6 @@ static int mkjoin(char *dbuf,int dlen,cchar *bp,int bl,cchar *vp,int vl) noex {
 	    } /* end if (trailing part) */
 	} /* end if (base part) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (mkjoin) */
+} /* end subroutine (mkjoin) */
 
 
