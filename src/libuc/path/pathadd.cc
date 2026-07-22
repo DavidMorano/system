@@ -133,8 +133,7 @@ int pathnaddw(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (pathnaddw) */
+} /* end subroutine (pathnaddw) */
 
 int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 	va_list		ap ;
@@ -152,8 +151,7 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (pathnaddx) */
+} /* end subroutine (pathnaddx) */
 
 int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -168,8 +166,7 @@ int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (pathaddw) */
+} /* end subroutine (pathaddw) */
 
 int pathaddx(char *pbuf,int pl,int n,...) noex {
 	va_list		ap ;
@@ -190,8 +187,7 @@ int pathaddx(char *pbuf,int pl,int n,...) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (pathaddx) */
+} /* end subroutine (pathaddx) */
 
 
 /* local subroutines */
