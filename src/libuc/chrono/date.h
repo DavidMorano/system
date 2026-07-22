@@ -13,9 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<time.h>		/* POSIX® |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	DATE		struct date_head
@@ -72,14 +72,14 @@ typedef DATE		date ;
 
 EXTERNC_begin
 
-extern int date_start(date *,time_t,int,int,cchar *,int) noex ;
-extern int date_setzname(date *,cchar *,int) noex ;
-extern int date_copy(date *,date *) noex ;
-extern int date_gettime(date *,time_t *) noex ;
-extern int date_getzoff(date *,int *) noex ;
-extern int date_getisdst(date *,int *) noex ;
-extern int date_getzname(date *,char *,int) noex ;
-extern int date_finish(date *) noex ;
+extern int date_start		(date *,time_t,int,int,cchar *,int) noex ;
+extern int date_setzname	(date *,cchar *,int) noex ;
+extern int date_copy		(date *,date *) noex ;
+extern int date_gettime		(date *,time_t *) noex ;
+extern int date_getzoff		(date *,int *) noex ;
+extern int date_getisdst	(date *,int *) noex ;
+extern int date_getzname	(date *,char *,int) noex ;
+extern int date_finish		(date *) noex ;
 
 EXTERNC_end
 
