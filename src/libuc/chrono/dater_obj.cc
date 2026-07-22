@@ -60,17 +60,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/timeb.h>		/* |TIMEB| */
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<ctime>			/* |time_t| */
-#include	<climits>		/* |SHORT_MIN| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<uctimeconv.h>		/* |uc_mktime(3uc)| */
+#include	<sys/timeb.h>		/* POSIX® |TIMEB| */
+#include	<tzfile.h>		/* POSIC® TM_YEAR_BASE */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<climits>		/* CSTD |SHORT_MIN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<uctimeconv.h>		/* LIBUC |uc_mktime(3uc)| */
 #include	<getdefzdata.h>
 #include	<bufsizevar.hh>
 #include	<calstrs.h>
@@ -89,7 +89,7 @@
 #include	<mkchar.h>
 #include	<hasx.h>		/* |hasalldig(3uc)| */
 #include	<ischarx.h>		/* |isdigitlatin(3uc)| */
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"dater.h"
 
