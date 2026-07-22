@@ -46,21 +46,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |geustime(3u)| */
-#include	<uclibmem.h>
-#include	<uctimeconv.h>
-#include	<bufsizevar.hh>
-#include	<strn.h>		/* |strnwcpy(3uc)| */
-#include	<strdcpy.h>
-#include	<strwcpy.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |geustime(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<uctimeconv.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnwcpy(3uc)| */
+#include	<strdcpy.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"tmtime.hh"
 
