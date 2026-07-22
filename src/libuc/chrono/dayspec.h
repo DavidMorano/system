@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	DAYSPEC		struct dayspec_head
@@ -30,7 +30,7 @@
 struct dayspec_head {
 	short		y ;
 	schar		m, d ;
-} ;
+} ; /* end struct (dayspec_head) */
 
 #ifdef	__cplusplus
 enum dayspecmems {
@@ -68,9 +68,9 @@ typedef DAYSPEC		dayspec ;
 
 EXTERNC_begin
 
-extern int dayspec_def(dayspec *) noex ;
-extern int dayspec_load(dayspec *,cchar *,int) noex ;
-extern int dayspec_yday(dayspec *) noex ;
+extern int dayspec_def	(dayspec *) noex ;
+extern int dayspec_load	(dayspec *,cchar *,int) noex ;
+extern int dayspec_yday	(dayspec *) noex ;
 
 EXTERNC_end
 
