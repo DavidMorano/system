@@ -50,13 +50,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<tzfile.h>		/* for |TM_YEAR_BASE| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<cfdec.h>
-#include	<localmisc.h>
+#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<cfdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"tmstrs.h"
 
@@ -137,8 +137,7 @@ int tmstrsday(cchar *sp,int sl) noex {
 	    } /* end switch */
 	} /* end if (possible) */
 	return rs ;
-}
-/* end subroutine (tmstrsday) */
+} /* end subroutine (tmstrsday) */
 
 int tmstrsmonth(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
@@ -178,8 +177,7 @@ int tmstrsmonth(cchar *sp,int sl) noex {
 	    } /* end switch */
 	} /* end if (possible) */
 	return rs ;
-}
-/* end subroutine (tmstrsmonth) */
+} /* end subroutine (tmstrsmonth) */
 
 /* calclate the year based on the number of digits given */
 int tmstrsyear(cchar *sp,int sl) noex {
@@ -210,7 +208,6 @@ int tmstrsyear(cchar *sp,int sl) noex {
 	    } /* end if (cfdec) */
 	} /* end if (possible) */
 	return (rs >= 0) ? year : rs ;
-}
-/* end subroutine (tmstrsyear) */
+} /* end subroutine (tmstrsyear) */
 
 
