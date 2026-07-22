@@ -32,12 +32,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cassert>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"epsem.h"
 
@@ -73,23 +74,19 @@
 
 int epsem_create(epsem *op,int pshared,int cnt) noex {
 	return csem_create(op,pshared,cnt) ;
-}
-/* end subroutine (epsem_create) */
+} /* end subroutine (epsem_create) */
 
 int epsem_destroy(epsem *op) noex {
 	return csem_destroy(op) ;
-}
-/* end subroutine (epsem_destroy) */
+} /* end subroutine (epsem_destroy) */
 
 int epsem_wait(epsem *op) noex {
 	return csem_decr(op,1,-1) ;
-}
-/* end subroutine (epsem_wait) */
+} /* end subroutine (epsem_wait) */
 
 int epsem_waiter(epsem *op,int to) noex {
 	return csem_decr(op,1,to) ;
-}
-/* end subroutine (epsem_waiter) */
+} /* end subroutine (epsem_waiter) */
 
 int epsem_trywait(epsem *op) noex {
 	cint		rsto = SR_TIMEDOUT ;
@@ -98,18 +95,15 @@ int epsem_trywait(epsem *op) noex {
 	    rs = SR_AGAIN ;		/* <- required by |epsem(3uc)| */
 	}
 	return rs ;
-}
-/* end subroutine (epsem_trywait) */
+} /* end subroutine (epsem_trywait) */
 
 int epsem_post(epsem *op) noex {
 	return csem_incr(op,1) ;
-}
-/* end subroutine (epsem_post) */
+} /* end subroutine (epsem_post) */
 
 int epsem_count(epsem *op) noex {
 	return csem_count(op) ;
-}
-/* end subroutine (epsem_count) */
+} /* end subroutine (epsem_count) */
 
 
 /* local subroutines */
@@ -153,7 +147,6 @@ int epsem_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (epsem_co::operator) */
+} /* end method (epsem_co::operator) */
 
 
