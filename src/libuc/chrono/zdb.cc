@@ -27,19 +27,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>		/* |SHORT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<estrings.h>
-#include	<nulstr.h>
-#include	<strwcpy.h>
-#include	<strwcmp.h>		/* |strwcasecmp(3uc)| */
-#include	<toxc.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
+#include	<climits>		/* CSTD |SHORT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC |strwcasecmp(3uc)| */
+#include	<toxc.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"zdb.h"
 
@@ -241,8 +241,7 @@ int zdb_nameoff(zdb *op,cchar *sp,int µsl,int zoff) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (zdb_nameoff) */
+} /* end subroutine (zdb_nameoff) */
 
 /* set from 'name' only */
 int zdb_setname(zdb *op,cchar *sp,int µsl) noex {
@@ -261,8 +260,7 @@ int zdb_setname(zdb *op,cchar *sp,int µsl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (zdb_setname) */
+} /* end subroutine (zdb_setname) */
 
 /* set from 'offset' only */
 int zdb_setoff(zdb *op,int zoff) noex {
@@ -284,8 +282,7 @@ int zdb_setoff(zdb *op,int zoff) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (zdb_setoff) */
+} /* end subroutine (zdb_setoff) */
 
 /* set from 'offset' and 'isdst' */
 int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
@@ -315,8 +312,7 @@ int zdb_offisdst(zdb *op,int zoff,int isdst) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (zdb_offisdst) */
+} /* end subroutine (zdb_offisdst) */
 
 int zdb_count(zdb *op) noex {
 	int		rs = SR_FAULT ;
@@ -325,8 +321,7 @@ int zdb_count(zdb *op) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (zdb_count) */
+} /* end subroutine (zdb_count) */
 
 
 /* local subroutines */
@@ -352,8 +347,7 @@ local int findname(cchar *sp,int sl) noex {
 	    }
 	} /* end while */
 	return (rc == 0) ? i : -1 ;
-}
-/* end subroutine (findname) */
+} /* end subroutine (findname) */
 
 int zdb::nameoff(cchar *sp,int sl,int zoff) noex {
 	return zdb_nameoff(this,sp,sl,zoff) ;
