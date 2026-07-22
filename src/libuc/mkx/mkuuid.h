@@ -13,9 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdint.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	UUID_VERSION	4		/* default UUID version */
@@ -23,11 +22,11 @@
 
 
 struct uuid_data {
-	uint64_t	time ;		/* 60-bits */
-	uint64_t	node ;		/* 48-bits */
-	uint16_t	clk ;		/* 14 (or 13¹) bits */
-	uint8_t		version ;	/* 4-bits */
-} ;
+	uint64		time ;		/* 60-bits */
+	uint64		node ;		/* 48-bits */
+	uint64		clk ;		/* 14 (or 13¹) bits */
+	uint8		version ;	/* 4-bits */
+} ; /* end struct (uuid_data) */
 
 /* Note ¹: Micro$oft used 13 bits in the past (we always use 14 bits) */
 
