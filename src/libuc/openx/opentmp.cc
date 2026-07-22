@@ -82,6 +82,7 @@
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<aflag.hh>		/* LIBU */
 #include	<filetypes.h>		/* LIBU */
