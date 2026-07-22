@@ -39,13 +39,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<mkquoted.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mkquoted.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sbuf.h"
 
@@ -91,7 +91,6 @@ int sbuf_addquoted(sbuf *sbp,cchar *sp,int µsl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sbuf_addquoted) */
+} /* end subroutine (sbuf_addquoted) */
 
 
