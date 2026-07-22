@@ -133,7 +133,7 @@ template<typename ... Args>
 local int pwfile_magic(PF *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == PWFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == PWFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (pwfile_magic) */
@@ -165,7 +165,7 @@ int pwfile_open(PF *op,cchar *pwfname) noex {
 	            op->lfd = -1 ;
 	            if ((rs = pwfile_loadbegin(op)) >= 0) ylikely {
 	                op->fl = {} ;
-	                op->magic = PWFILE_MAGIC ;
+	                op->magval = PWFILE_MAGIC ;
 	            }
 	            if (rs < 0) {
 			void *vp = voidp(op->fname) ;
@@ -205,7 +205,7 @@ int pwfile_close(PF *op) noex {
 		rs1 = pwfile_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
