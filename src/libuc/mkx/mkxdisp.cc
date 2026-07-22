@@ -105,7 +105,7 @@ namespace {
 
 /* forward references */
 
-static bool havevar(cchar *v) noex {
+local bool havevar(cchar *v) noex {
     	return (v && v[0]) ;
 }
 
