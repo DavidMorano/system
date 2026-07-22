@@ -61,42 +61,43 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/timeb.h>		/* |TIMEB| */
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<ctime>			/* |time_t| */
-#include	<climits>		/* |SHORT_MIN| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<uctimeconv.h>		/* |uc_mktime(3uc)| */
-#include	<getdefzdata.h>
-#include	<bufsizevar.hh>
-#include	<calstrs.h>
-#include	<sbuf.h>
+#include	<sys/timeb.h>		/* POSIX® |TIMEB| */
+#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<climits>		/* CSTD |SHORT_MIN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<uctimeconv.h>		/* LIBUC |uc_mktime(3uc)| */
+#include	<getdefzdata.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<calstrs.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
 #include	<tmtime.hh>		/* CHRONO */
 #include	<zos.h>			/* CHRONO */
 #include	<comparse.h>		/* CHRONO */
 #include	<tmz.hh>		/* CHRONO */
 #include	<zdb.h>			/* CHRONO */
-#include	<snwcpy.h>
-#include	<sncpyx.h>
-#include	<snwcpyx.h>
-#include	<sntmtime.h>
-#include	<strn.h>		/* |strnwcpyxc(3uc)| */
-#include	<strwcpy.h>
-#include	<mkchar.h>
-#include	<hasx.h>		/* |hasalldig(3uc)| */
-#include	<ischarx.h>		/* |isdigitlatin(3uc)| */
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpyx.h>		/* LIBUC */
+#include	<sntmtime.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnwcpyxc(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasalldig(3uc)| */
+#include	<ischarx.h>		/* LIBUC |isdigitlatin(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"dater.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| */
+import dater_mag ;
 
 /* local defines */
 
@@ -126,21 +127,21 @@ import libutil ;			/* |memclear(3u)| */
 
 /* forward references */
 
-local int	dater_initcur(dater *) noex ;
-local int	dater_ldname(dater *,cchar *,int) noex ;
-local int	dater_pname(dater *) noex ;
-local int	dater_pnum(dater *) noex ;
-local int	dater_findzname(dater *) noex ;
-local int	dater_findzoff(dater *,TM *) noex ;
-local int	dater_mkptime(dater *,TM *,int) noex ;
-local int	dater_mktime(dater *,TM *) noex ;
-local int	dater_mkpzoff(dater *,TM *,int) noex ;
+local int	dater_initcur	(dater *) noex ;
+local int	dater_ldname	(dater *,cchar *,int) noex ;
+local int	dater_pname	(dater *) noex ;
+local int	dater_pnum	(dater *) noex ;
+local int	dater_findzname	(dater *) noex ;
+local int	dater_findzoff	(dater *,TM *) noex ;
+local int	dater_mkptime	(dater *,TM *,int) noex ;
+local int	dater_mktime	(dater *,TM *) noex ;
+local int	dater_mkpzoff	(dater *,TM *,int) noex ;
 
-local int	dater_initbase(dater *) noex ;
-local int	dater_ldtmz(dater *,tmz *) noex ;
-local int	dater_ldcomzone(dater *,comparse *) noex ;
-local int	dater_ldzname(dater *,cchar *,int) noex ;
-local int	dater_defs(dater *,tmz *) noex ;
+local int	dater_initbase	(dater *) noex ;
+local int	dater_ldtmz	(dater *,tmz *) noex ;
+local int	dater_ldcomzone	(dater *,comparse *) noex ;
+local int	dater_ldzname	(dater *,cchar *,int) noex ;
+local int	dater_defs	(dater *,tmz *) noex ;
 
 local inline int znwcpy(char *zb,int zl,cc *zsp,int zsl = -1) noex {
 	cint rs = intconv(strnwcpylc(zb,zl,zsp,zsl) - zb) ; /* <- lower-case */
@@ -190,8 +191,7 @@ int dater_start(dater *op,TIMEB *nowp,cchar *zsp,int zsl) noex {
 	    } /* end if (memclear) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dater_start) */
+} /* end subroutine (dater_start) */
 
 int dater_startcopy(dater *op,dater *d2p) noex {
     	cnullptr	np{} ;
@@ -208,8 +208,7 @@ int dater_startcopy(dater *op,dater *d2p) noex {
 	    } /* end if (dater_start) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dater_startcopy) */
+} /* end subroutine (dater_startcopy) */
 
 int dater_finish(dater *op) noex {
 	int		rs ;
@@ -225,8 +224,7 @@ int dater_finish(dater *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dater_finish) */
+} /* end subroutine (dater_finish) */
 
 /* copy one dater to another */
 int dater_setcopy(dater *op,dater *d2p) noex {
@@ -241,8 +239,7 @@ int dater_setcopy(dater *op,dater *d2p) noex {
 	    op->cyear = d2p->cyear ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dater_setcopy) */
+} /* end subroutine (dater_setcopy) */
 
 int dater_setstd(dater *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -259,8 +256,7 @@ int dater_setstd(dater *op,cchar *sp,int sl) noex {
 	    } /* end if (tmz_xstd) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_setstd) */
+} /* end subroutine (dater_setstd) */
 
 /* set the dater from a message-type string */
 int dater_setmsg(dater *op,cchar *sp,int sl) noex {
@@ -288,8 +284,7 @@ int dater_setmsg(dater *op,cchar *sp,int sl) noex {
 	    } /* end if (comparse) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_setmsg) */
+} /* end subroutine (dater_setmsg) */
 
 /* set from a dater-like or decimal digit time string */
 /* format> [CC]YYMMDDhhmm[ss][±<zoff>][<zname>] */
@@ -308,8 +303,7 @@ int dater_setstrdig(dater *op,cchar *sp,int sl) noex {
 	    } /* end if tmz_xstrdig) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_setstrdig) */
+} /* end subroutine (dater_setstrdig) */
 
 /* set from a LOGZ-type string */
 
@@ -334,8 +328,7 @@ int dater_setlogz(dater *op,cchar *sp,int sl) noex {
 	    } /* end if (tmz_xlogz) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_setlogz) */
+} /* end subroutine (dater_setlogz) */
 
 /* set from TOUCH (original) time string */
 int dater_settouch(dater *op,cchar *sp,int sl) noex {
@@ -353,8 +346,7 @@ int dater_settouch(dater *op,cchar *sp,int sl) noex {
 	    } /* end if (tmz_xtouch) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_settouch) */
+} /* end subroutine (dater_settouch) */
 
 /* set from TOUCH-t (new '-t' version) time string */
 int dater_settoucht(dater *op,cchar *sp,int sl) noex {
@@ -372,8 +364,7 @@ int dater_settoucht(dater *op,cchar *sp,int sl) noex {
 	    } /* end if (tmz_xtoucht) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_settoucht) */
+} /* end subroutine (dater_settoucht) */
 
 /* set from a split-out time, zone offset, and zone-name */
 int dater_settmzon(dater *op,TM *stp,int zoff,cchar *zstr,int zlen) noex {
@@ -417,8 +408,7 @@ int dater_settmzon(dater *op,TM *stp,int zoff,cchar *zstr,int zlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_settmzon) */
+} /* end subroutine (dater_settmzon) */
 
 /* set from split-out time and zone offset only (minutes west of GMT) */
 int dater_settmzo(dater *op,TM *stp,int zoff) noex {
@@ -437,8 +427,7 @@ int dater_settmzo(dater *op,TM *stp,int zoff) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_settmzo) */
+} /* end subroutine (dater_settmzo) */
 
 /* set from a split-out time and zone-name only */
 int dater_settmzn(dater *op,TM *stp,cchar *zstr,int zlen) noex {
@@ -476,8 +465,7 @@ int dater_settmzn(dater *op,TM *stp,cchar *zstr,int zlen) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_settmzn) */
+} /* end subroutine (dater_settmzn) */
 
 /* set from ( time, timezone_name, DST_indication ) */
 int dater_settimezn(dater *op,time_t t,cchar *zname,int isdst) noex {
@@ -515,8 +503,7 @@ int dater_settimezn(dater *op,time_t t,cchar *zname,int isdst) noex {
 	    } /* end if (dater_initbase) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_settimezn) */
+} /* end subroutine (dater_settimezn) */
 
 /* set from ( time, tz-offset, tz-name, tz-DST_indication ) */
 int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
@@ -557,8 +544,7 @@ int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
 	    } /* end if (znlen) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (dater_settimezon) */
+} /* end subroutine (dater_settimezon) */
 
 int dater_mkdatestr(dater *op,daterdts dt,char *dbuf,int dlen) noex {
 	int		rs ;
@@ -638,50 +624,42 @@ int dater_mkdatestr(dater *op,daterdts dt,char *dbuf,int dlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (dater_mkdatestr) */
+} /* end subroutine (dater_mkdatestr) */
 
 /* make a mail envelope-type dater string */
 int dater_mkstd(dater *op,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(op,daterdt_std,dbuf,dlen) ;
-}
-/* end subroutine (dater_mkstd) */
+} /* end subroutine (dater_mkstd) */
 
 /* make a mail envelope-type dater string */
 int dater_mkenv(dater *op,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(op,daterdt_std,dbuf,dlen) ;
-}
-/* end subroutine (dater_mkenv) */
+} /* end subroutine (dater_mkenv) */
 
 /* make a mail envelope-type dater string */
 int dater_mkmsg(dater *op,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(op,daterdt_msg,dbuf,dlen) ;
-}
-/* end subroutine (dater_mkmsg) */
+} /* end subroutine (dater_mkmsg) */
 
 /* make a mail header dater string */
 int dater_mkhdr(dater *op,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(op,daterdt_msg,dbuf,dlen) ;
-}
-/* end subroutine (dater_mkhdr) */
+} /* end subroutine (dater_mkhdr) */
 
 /* make the old STRDIG type of dater string */
 int dater_mkstrdig(dater *op,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(op,daterdt_strdig,dbuf,dlen) ;
-}
-/* end subroutine (dater_mkstrdig) */
+} /* end subroutine (dater_mkstrdig) */
 
 /* make the familiar LOGZ-type dater string */
 int dater_mklogz(dater *op,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(op,daterdt_logz,dbuf,dlen) ;
-}
-/* end subroutine (dater_mklogz) */
+} /* end subroutine (dater_mklogz) */
 
 /* make the familiar LOGZ-type dater string */
 int dater_mkgmtlogz(dater *op,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(op,daterdt_gmlogz,dbuf,dlen) ;
-}
-/* end subroutine (dater_mkgmlogz) */
+} /* end subroutine (dater_mkgmlogz) */
 
 int dater_zinfoset(dater *op,dater_zi *zip,cchar *zn,int zl) noex {
 	int		rs ;
@@ -694,8 +672,7 @@ int dater_zinfoset(dater *op,dater_zi *zip,cchar *zn,int zl) noex {
 	    } /* end if (znlen) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dater_zinfoset) */
+} /* end subroutine (dater_zinfoset) */
 
 /* return the UNIX® time out of dater object */
 int dater_gettime(dater *op,time_t *tp) noex {
@@ -704,8 +681,7 @@ int dater_gettime(dater *op,time_t *tp) noex {
 	    *tp = op->b.time ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dater_gettime) */
+} /* end subroutine (dater_gettime) */
 
 /* return the timezone in minutes west of GMT */
 int dater_getzoneoff(dater *op,int *zp) noex {
@@ -719,8 +695,7 @@ int dater_getzoneoff(dater *op,int *zp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dater_getzoneoff) */
+} /* end subroutine (dater_getzoneoff) */
 
 /* return the timezone in minutes west of GMT */
 int dater_getzonename(dater *op,char *rbuf,int rlen) noex {
@@ -736,8 +711,7 @@ int dater_getzonename(dater *op,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? zl : rs ;
-}
-/* end subroutine (dater_getzonename) */
+} /* end subroutine (dater_getzonename) */
 
 int dater_zinfoget(dater *op,dater_zi *zip,char *zbuf,int zlen) noex {
 	int		rs ;
@@ -753,8 +727,7 @@ int dater_zinfoget(dater *op,dater_zi *zip,char *zbuf,int zlen) noex {
 	    } /* end if (sncpy) */
 	} /* end if (magic) */
 	return (rs >= 0) ? zl : rs ;
-}
-/* end subroutine (dater_zinfoget) */
+} /* end subroutine (dater_zinfoget) */
 
 /* get the difference in seconds between two daters */
 int dater_diff(dater *op,dater *d2p,time_t *rp) noex {
@@ -765,8 +738,7 @@ int dater_diff(dater *op,dater *d2p,time_t *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (dater_diff) */
+} /* end subroutine (dater_diff) */
 
 #ifdef	COMMENT
 
@@ -778,8 +750,7 @@ int dater_nzones(dater *op) noex {
 	    rs  = zr.count(&zr) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dater_nzones) */
+} /* end subroutine (dater_nzones) */
 
 int dater_zi(dater *op,dater_zi *zip,int ei) noex {
 	cint		n = DATER_NZONES ;
@@ -799,8 +770,7 @@ int dater_zi(dater *op,dater_zi *zip,int ei) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? zl : rs ;
-}
-/* end subroutine (dater_zi) */
+} /* end subroutine (dater_zi) */
 
 #endif /* COMMENT */
 
@@ -829,8 +799,7 @@ local int dater_initcur(dater *op) noex {
 	    } /* end if (tmtime_timelocal) */
 	} /* end if (need current time) */
 	return rs ;
-}
-/* end subroutine (dater_initcur) */
+} /* end subroutine (dater_initcur) */
 
 /* get any possible zone-name information from the zone offset */
 local int dater_mkpzoff(dater *op,TM *stp,int zoff) noex {
@@ -845,8 +814,7 @@ local int dater_mkpzoff(dater *op,TM *stp,int zoff) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (dater_mkpzoff) */
+} /* end subroutine (dater_mkpzoff) */
 
 local int dater_ldtmz(dater *op,tmz *tp) noex {
     	int		rs ;
@@ -865,8 +833,7 @@ local int dater_ldtmz(dater *op,tmz *tp) noex {
 	    } /* end if (tmz_getzoff) */
 	} /* end if (tmz_getdst) */
 	return rs ;
-}
-/* end subroutine (dater_ldtmz) */
+} /* end subroutine (dater_ldtmz) */
 
 local int dater_ldzname(dater *op,cchar *sp,int sl) noex {
     	int		rs = SR_OK ;
@@ -879,8 +846,7 @@ local int dater_ldzname(dater *op,cchar *sp,int sl) noex {
 	    len = znwcpy(op->zname,znl,sp,sl) ;
 	} /* end if (znlen) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (dater_ldzname) */
+} /* end subroutine (dater_ldzname) */
 
 local int dater_ldcomzone(dater *op,comparse *cpp) noex {
 	int		rs = SR_OK ;
@@ -891,8 +857,7 @@ local int dater_ldcomzone(dater *op,comparse *cpp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (dater_ldcomzone) */
+} /* end subroutine (dater_ldcomzone) */
 
 local int dater_defs(dater *op,tmz *tp) noex {
 	cbool		f_year = tmz_hasyear(tp) ;
@@ -921,8 +886,7 @@ local int dater_defs(dater *op,tmz *tp) noex {
 	    }
 	} /* end if (ok) */
 	return rs ;
-}
-/* end subroutine (dater_defs) */
+} /* end subroutine (dater_defs) */
 
 /* store a time zone-name into the object */
 local int dater_ldname(dater *op,cchar *zstrp,int zstrl) noex {
@@ -942,8 +906,7 @@ local int dater_ldname(dater *op,cchar *zstrp,int zstrl) noex {
 	    } /* end if (needed zone offset from name) */
 	} /* end if (znlen) */
 	return rs ;
-}
-/* end subroutine (dater_ldname) */
+} /* end subroutine (dater_ldname) */
 
 /* parse a time zone-name */
 
@@ -974,8 +937,7 @@ local int dater_pname(dater *op) noex {
 	    op->fl.zoff = true ;
 	} /* end if (zdb_setname) */
 	return rs ;
-}
-/* end subroutine (dater_pname) */
+} /* end subroutine (dater_pname) */
 
 /* get the timezone information out of an RFC822-type number string */
 local int dater_pnum(dater *op) noex {
@@ -988,8 +950,7 @@ local int dater_pnum(dater *op) noex {
 	    }
 	} /* end if (already extracted) */
 	return rs ;
-}
-/* end subroutine (dater_pnum) */
+} /* end subroutine (dater_pnum) */
 
 local int dater_findzname(dater *op) noex {
 	int		rs = SR_OK ;
@@ -1009,8 +970,7 @@ local int dater_findzname(dater *op) noex {
 	    } /* end if (ok) */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (dater_findzname) */
+} /* end subroutine (dater_findzname) */
 
 local int dater_findzoff(dater *op,TM *stp) noex {
 	int		rs = SR_FAULT ;
@@ -1038,8 +998,7 @@ local int dater_findzoff(dater *op,TM *stp) noex {
 	    zoff = op->fl.zoff ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? zoff : rs ;
-}
-/* end subroutine (dater_findzoff) */
+} /* end subroutine (dater_findzoff) */
 
 /* try to make a time for the given date */
 local int dater_mkptime(dater *op,TM *stp,int zoff) noex {
@@ -1060,8 +1019,7 @@ local int dater_mkptime(dater *op,TM *stp,int zoff) noex {
 	    } /* end if (tmtime) */
 	} /* end if (ok) */
 	return rs ;
-}
-/* end subroutine (dater_mkptime) */
+} /* end subroutine (dater_mkptime) */
 
 /* try to make a time for the given date */
 local int dater_mktime(dater *op,TM *stp) noex {
@@ -1098,8 +1056,7 @@ local int dater_mktime(dater *op,TM *stp) noex {
 	    rs = dater_findzname(op) ;
 	}
 	return rs ;
-}
-/* end subroutine (dater_mktime) */
+} /* end subroutine (dater_mktime) */
 
 local int dater_initbase(dater *op) noex {
 	int		rs = SR_FAULT ;
@@ -1112,7 +1069,6 @@ local int dater_initbase(dater *op) noex {
 	    op->fl.zoff = false ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dater_initbase) */
+} /* end subroutine (dater_initbase) */
 
 
