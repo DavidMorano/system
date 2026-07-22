@@ -36,11 +36,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<csem.h>		/* <- counting semaphore (DAM) */
 
 
@@ -102,13 +99,13 @@ typedef EPSEM		epsem ;
 
 EXTERNC_begin
 
-extern int	epsem_create(epsem *,int,int) noex ;
-extern int	epsem_destroy(epsem *) noex ;
-extern int	epsem_wait(epsem *) noex ;
-extern int	epsem_waiter(epsem *,int) noex ;
-extern int	epsem_trywait(epsem *) noex ;
-extern int	epsem_post(epsem *) noex ;
-extern int	epsem_count(epsem *) noex ;
+extern int	epsem_create	(epsem *,int,int) noex ;
+extern int	epsem_destroy	(epsem *) noex ;
+extern int	epsem_wait	(epsem *) noex ;
+extern int	epsem_waiter	(epsem *,int) noex ;
+extern int	epsem_trywait	(epsem *) noex ;
+extern int	epsem_post	(epsem *) noex ;
+extern int	epsem_count	(epsem *) noex ;
 
 EXTERNC_end
 
