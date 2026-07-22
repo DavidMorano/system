@@ -49,12 +49,12 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/utsname.h>
-#include	<sys/timeb.h>
-#include	<unistd.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/utsname.h>		/* POSIX® */
+#include	<sys/timeb.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
 #include	<ctime>			/* CSTD */
 #include	<csignal>		/* CSTD */
 #include	<cstddef>		/* CSTD */
