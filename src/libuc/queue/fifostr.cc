@@ -29,15 +29,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<usupport.h>		/* |libu::snwcpy(3u)| */
-#include	<uclibmem.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |libu::snwcpy(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fifostr.h"
 
@@ -77,8 +77,7 @@ local inline int fifostr_magic(fifostr *op,Args ... args) noex {
 	    rs = (op->magval == FIFOSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (fifostr_magic) */
+} /* end subroutine (fifostr_magic) */
 
 local int	fifostr_mat(fifostr *,fifostr_ent *) noex ;
 
@@ -106,8 +105,7 @@ int fifostr_start(fifostr *op) noex {
 	    op->magval = FIFOSTR_MAGIC ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fifostr_start) */
+} /* end subroutine (fifostr_start) */
 
 int fifostr_finish(fifostr *op) noex {
 	int		rs ;
@@ -117,8 +115,7 @@ int fifostr_finish(fifostr *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifostr_finish) */
+} /* end subroutine (fifostr_finish) */
 
 int fifostr_add(fifostr *op,cchar *sp,int µsl) noex {
 	int		rs ;
@@ -150,8 +147,7 @@ int fifostr_add(fifostr *op,cchar *sp,int µsl) noex {
 	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (fifostr_add) */
+} /* end subroutine (fifostr_add) */
 
 int fifostr_headread(fifostr *op,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -169,8 +165,7 @@ int fifostr_headread(fifostr *op,char *rbuf,int rlen) noex {
             }
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (fifostr_headread) */
+} /* end subroutine (fifostr_headread) */
 
 int fifostr_headlen(fifostr *op) noex {
 	int		rs ;
@@ -182,8 +177,7 @@ int fifostr_headlen(fifostr *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifostr_headlen) */
+} /* end subroutine (fifostr_headlen) */
 
 int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
 	int		rs ;
@@ -211,8 +205,7 @@ int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
             } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (fifostr_entread) */
+} /* end subroutine (fifostr_entread) */
 
 int fifostr_entlen(fifostr *op,int n) noex {
 	int		rs ;
@@ -234,12 +227,12 @@ int fifostr_entlen(fifostr *op,int n) noex {
             } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (fifostr_entlen) */
+} /* end subroutine (fifostr_entlen) */
 
 int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
 	int		rs ;
-	int		sl = 0 ;
+	int		rs1 ;
+	int		sl = 0 ; /* return-value */
 	if ((rs = fifostr_magic(op)) >= 0) ylikely {
             if (op->head != nullptr) {
                 fifostr_ent *ep = op->head ;
@@ -256,7 +249,8 @@ int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
                     } else {
                         (op->head)->prev = nullptr ;
                     }
-                    rs = libmem.free(ep) ;
+                    rs1 = libmem.free(ep) ;
+	    	    if (rs >= 0) rs = rs1 ;
                     op->ic -= 1 ;
                     op->cnt -= sl ;
                 } /* end if (successful removal) */
@@ -265,8 +259,7 @@ int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (fifostr_rem) */
+} /* end subroutine (fifostr_rem) */
 
 int fifostr_curbegin(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
@@ -274,8 +267,7 @@ int fifostr_curbegin(fifostr *op,fifostr_cur *curp) noex {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifostr_curbegin) */
+} /* end subroutine (fifostr_curbegin) */
 
 int fifostr_curend(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
@@ -283,8 +275,7 @@ int fifostr_curend(fifostr *op,fifostr_cur *curp) noex {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifostr_curend) */
+} /* end subroutine (fifostr_curend) */
 
 int fifostr_curenum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -316,8 +307,7 @@ int fifostr_curenum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
             } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (fifostr_curenum) */
+} /* end subroutine (fifostr_curenum) */
 
 int fifostr_curdel(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
@@ -361,8 +351,7 @@ int fifostr_curdel(fifostr *op,fifostr_cur *curp) noex {
             }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (fifostr_curdel) */
+} /* end subroutine (fifostr_curdel) */
 
 int fifostr_count(fifostr *op) noex {
 	int		rs ;
@@ -370,8 +359,7 @@ int fifostr_count(fifostr *op) noex {
 	    rs = op->ic ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifostr_count) */
+} /* end subroutine (fifostr_count) */
 
 #ifdef	COMMENT
 /* search for a string in the FIFO string object */
@@ -390,8 +378,7 @@ int fifostr_finder(fifostr *op,char *s,fifostr_cmp cmpfunc,char **rpp) noex {
 	    } /* end if (fifostr-cur) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifostr_finder) */
+} /* end subroutine (fifostr_finder) */
 #endif /* COMMENT */
 
 
@@ -408,8 +395,7 @@ local int fifostr_mat(fifostr *op,fifostr_ent *mep) noex {
 	    ep = ep->next ;
 	} /* end while */
 	return rs ;
-}
-/* end subroutine (fifostr_mat) */
+} /* end subroutine (fifostr_mat) */
 
 int fifostr::add(cchar *sp,int sl) noex {
 	return fifostr_add(this,sp,sl) ;
