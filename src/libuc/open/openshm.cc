@@ -42,23 +42,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>			/* <- |time(2)| */
-#include	<climits>		/* <- for |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucsysmisc.h>
-#include	<ucgetpid.h>
-#include	<bufsizevar.hh>
-#include	<sigblocker.h>
-#include	<cthex.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD |time(2)| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<ugetx.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<ucgetpid.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<sigblocker.h>		/* LIBUC */
+#include	<cthex.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"openshm.h"
 
