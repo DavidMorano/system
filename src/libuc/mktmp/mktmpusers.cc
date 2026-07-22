@@ -39,20 +39,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<strlibval.hh>
-#include	<mkpathx.h>
-#include	<removes.h>
-#include	<isnot.h>		/* |isNotPresent(3uc)| */
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<removes.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC |isNotPresent(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mktmp.h"
 
@@ -89,7 +89,7 @@ extern "C" {
 
 /* forward references */
 
-static int		tmpusers(char *rbuf) noex ;
+local int		tmpusers(char *rbuf) noex ;
 
 
 /* local variables */
@@ -125,20 +125,18 @@ int mktmpusers(char *rbuf) noex {
             } /* end if (strtmpdir) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mktmpusers) */
+} /* end subroutine (mktmpusers) */
 
 
 /* local subroutines */
 
-static int tmpusers(char *rbuf) noex {
+local int tmpusers(char *rbuf) noex {
 	cmode		dm = TMPUSERDMODE ;
 	int		rs ;
 	if ((rs = u_mkdir(rbuf,dm)) >= 0) ylikely {
 	    rs = uc_minmod(rbuf,dm) ;
 	} /* end if (ok) */
 	return rs ;
-}
-/* end subroutine (mktmpuser) */
+} /* end subroutine (mktmpuser) */
 
 
