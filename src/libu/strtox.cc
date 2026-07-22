@@ -383,42 +383,66 @@ local inline void strtox(cchar *,char **,int,T *rp) noex {
 
 template<>
 inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
-	clong	v = strtol(sp,epp,b) ;
-	*rp = int(v) ;
-	if (errno == 0) {
-	    ulong	uv = ulong(v) ;
-	    cint	nb = nbits<long> ;
-	    {
-	        cbool	fneg = bit(v,(nb - 1)) ;
+	cint		nb = nbits<long> ;
+	int		res = 0 ;
+	errno_t		ec = 0 ;
+	bool		fneg ;
+	if (sp) ylikely {
+	    clong	v = strtol(sp,epp,b) ;
+	    fneg = bit(v,(nb - 1)) ;
+	    if (errno == 0) {
+	        ulong	uv = conv<ulong>(v) ;
+	        res = conv<int>(v) ;
 		if (fneg) {	/* test negative value */
 		    uv = (compl uv) ;
 	            uv >>= (nb / 2) ;
 		    if (uv || (! bit(v,((nb / 2) - 1)))) {
-			*rp = INT_MIN ;
-			errno = ERANGE ;
+			res = INT_MIN ;
+			ec = ERANGE ;
 		    }
 		} else {	/* test poitive value */
 	            uv >>= (nb / 2) ;
 		    if (uv || bit(v,((nb / 2) - 1))) {
-			*rp = INT_MAX ;
-			errno = ERANGE ;
+			res = INT_MAX ;
+			ec = ERANGE ;
 		    }
 		} /* end if */
-	    } /* end block */
-	} /* end if (no error so far) */
+	    } else {
+                if (fneg) {
+                    res = UINT_MIN ;
+                } else {
+                    res = UINT_MAX ;
+                }
+	    } /* end if (no error so far) */
+	} else {
+	    ec = EFAULT ;
+	}
+	if (ec) errno = ec ;
+	*rp = res ;
 } /* end subroutine-template (strtox) */
 
 template<>
 inline void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
-	ulong	uv = strtoul(sp,epp,b) ;
-	*rp = uint(uv) ;
-	if (errno == 0) {
-	    cint nb = nbits<ulong> ;
-	    uv >>= (nb / 2) ;
-	    if (uv) {
-		errno = ERANGE ;
-	    }
-	} /* end if (no-error) */
+	uint		res = 0 ;
+	errno_t		ec = 0 ;
+	if (sp) ylikely {
+	    ulong	uv = strtoul(sp,epp,b) ;
+	    if (errno == 0) {
+	        cint nb = nbits<ulong> ;
+	        res = conv<uint>(uv) ;
+	        uv >>= (nb / 2) ;
+	        if (uv) {
+		    res = UINT_MAX ;
+		    ec = ERANGE ;
+	        }
+	    } else {
+	        res = UINT_MAX ;
+	    } /* end if (no-error) */
+	} else {
+	    ec = EFAULT ;
+	} /* end if */
+	if (ec) errno = ec ;
+	*rp = res ;
 } /* end subroutine-template (strtox) */
 
 local inline int getbase(int) noex attrpure ;
