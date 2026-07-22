@@ -24,12 +24,12 @@
 	Add a shell-quoted string to the sbuf object.
 
 	Synopsis:
-	int sbuf_hexp(sbuf *,uint64_t,int) noex
+	int sbuf_hexp(sbuf *op,{ux} v,int n) noex
 
 	Arguments:
-	sop		pointer to the buffer object
-	ap		string to add
-	al		length of string to add
+	op		pointer to the buffer object
+	v		value to convert
+	n		number of bytes to render
 
 	Returns:
 	>=0		amount of new space used by the newly stored item
@@ -39,18 +39,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<cthex.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<concepts>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<cthex.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sbuf.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using std::integral_signed ;		/* concept */
+using std::integral_unsigned ;		/* concept */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -64,6 +73,23 @@
 
 /* forward references */
 
+template<integral_unsigned UT>
+int sbuf_hexpx(sbuf *op,int n,UT v) noex {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    cint	dlen = HEXBUFLEN ;
+	    char	dbuf[HEXBUFLEN+1] ;
+	    if ((rs = cthex(dbuf,dlen,v)) >= 0) ylikely {
+	        cchar	*dp = dbuf ;
+	        if (n == 6) {
+		    dp += ((8 - n) * 2) ;
+		}
+	        rs = op->strw(dp,(n * 2)) ;
+	    } /* end if (cthex) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (sbuf_hexpx) */
+
 
 /* local variables */
 
@@ -73,36 +99,27 @@
 
 /* exported subroutines */
 
-int sbuf_hexp(sbuf *op,uint64_t v,int n) noex {
-	int		rs = SR_FAULT ;
-	if (op) ylikely {
-	    uint	vi ;
-	    cint	dlen = DIGBUFLEN ;
-	    char	dbuf[DIGBUFLEN+1] ;
-	    switch (n) {
-	    case 2:
-	        vi = uint(v) ;
-	        rs = cthexus(dbuf,dlen,vi) ;
-	        break ;
-	    case 4:
-	        vi = uint(v) ;
-	        rs = cthexui(dbuf,dlen,vi) ;
-	        break ;
-	    case 6:
-	        rs = cthexull(dbuf,dlen,v) ;
-	        break ;
-	    default:
-	        rs = SR_INVALID ;
-	        break ;
-	    } /* end switch */
-	    if (rs >= 0) ylikely {
-	        cchar	*dp = dbuf ;
-	        if (n == 6) dp += ((8 - n) * 2) ;
-	        rs = op->strw(dp,(n * 2)) ;
-	    } /* end if */
-	} /* end if (non-null) */
-	return rs ;
+int sbuf_hexpuc		(sbuf *op,int n,uchar v) noex {
+    	return sbuf_hexpx(op,n,v) ;
 }
-/* end subroutine (sbuf_hexp) */
+
+int sbuf_hexpus		(sbuf *op,int n,ushort v) noex {
+    	return sbuf_hexpx(op,n,v) ;
+}
+
+int sbuf_hexpui		(sbuf *op,int n,uint v) noex {
+    	return sbuf_hexpx(op,n,v) ;
+}
+
+int sbuf_hexpul		(sbuf *op,int n,ulong v) noex {
+    	return sbuf_hexpx(op,n,v) ;
+}
+
+int sbuf_hexpull	(sbuf *op,int n,ulonglong v) noex {
+    	return sbuf_hexpx(op,n,v) ;
+}
+
+
+/* local subroutines */
 
 
