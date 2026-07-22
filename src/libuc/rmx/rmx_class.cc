@@ -30,11 +30,11 @@
 	and return the remaining length of the up until that point.
 
 	Synopsis:
-	int rmeol(cchar *sp,int sl) noex
-	int rmwht(cchar *sp,int sl) noex
-	int rmblk(cchar *sp,int sl) noex
-	int rmtailclass(cchar *sp,int sl,cchar *ss) noex
-	int rmtrailchr(cchar *sp,int sl,int sch) noex
+	int rmeol	(cchar *sp,int sl) noex
+	int rmwht	(cchar *sp,int sl) noex
+	int rmblk	(cchar *sp,int sl) noex
+	int rmtailclass	(cchar *sp,int sl,cchar *ss) noex
+	int rmtrailchr	(cchar *sp,int sl,int sch) noex
 
 	Arguments:
 	sp		counted c-string pinter
