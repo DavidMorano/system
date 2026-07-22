@@ -65,13 +65,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |abs(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |abs(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"zos.h"
 
@@ -127,8 +127,7 @@ int zos_set(char *rbuf,int rlen,int zo) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (zos_set) */
+} /* end subroutine (zos_set) */
 
 int zos_get(cchar *sp,int sl,int *zop) noex {
 	int		rs = SR_FAULT ;
@@ -164,7 +163,6 @@ int zos_get(cchar *sp,int sl,int *zop) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (zos_get) */
+} /* end subroutine (zos_get) */
 
 
