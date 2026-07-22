@@ -31,8 +31,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	ZOFFPARTS	struct zoffparts_head
@@ -60,9 +60,9 @@ typedef ZOFFPARTS	zoffparts ;
 
 EXTERNC_begin
 
-extern int	zoffparts_set(zoffparts *,int) noex ;
-extern int	zoffparts_get(zoffparts *,int *) noex ;
-extern int	zoffparts_mkstr(zoffparts *,char *,int) noex ;
+extern int zoffparts_set	(zoffparts *,int) noex ;
+extern int zoffparts_get	(zoffparts *,int *) noex ;
+extern int zoffparts_mkstr	(zoffparts *,char *,int) noex ;
 
 EXTERNC_end
 
