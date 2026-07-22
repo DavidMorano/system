@@ -53,20 +53,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/time.h>		/* |TIMEVAL| */
-#include	<stdint.h>
-#include	<climits>		/* |UINT_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucsysmisc.h>		/* |uc_gettimeofday(3uc)| */
-#include	<getnodename.h>
-#include	<getrand.h>
-#include	<mkuuid.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<sys/time.h>		/* POSIX® |TIMEVAL| */
+#include	<climits>		/* CSTD |UINT_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC |uc_gettimeofday(3uc)| */
+#include	<getnodename.h>		/* LIBUC */
+#include	<getrand.h>		/* LIBUC */
+#include	<mkuuid.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkuuid.h"
 
@@ -104,7 +104,7 @@ namespace {
 
 /* forward references */
 
-local uint64_t		loadbytes(cc *,int) noex ;
+local ulong		loadbytes(cc *,int) noex ;
 
 
 /* local variables */
@@ -126,10 +126,9 @@ int mkuuid(uuid_dat *up,int ver) noex {
 	if (up) ylikely {
     	    mkuu uu(up) ;
 	    rs = uu(ver) ;
-	}
+	} /* end if (non-null) */
     	return rs ;
-}
-/* end subroutine (mkuuid) */
+} /* end subroutine (mkuuid) */
 
 
 /* local subroutines */
@@ -144,7 +143,7 @@ int mkuu::operator () (int ver) noex {
 	    for (cauto &m : makes) {
 		rs = (this->*m)() ;
 		if (rs < 0) break ;
-	    }
+	    } /* end for */
 	} /* end if (reading random) */
 	return rs ;
 } /* end method (mkuu::operator) */
@@ -152,8 +151,8 @@ int mkuu::operator () (int ver) noex {
 int mkuu::mkuutime() noex {
     	int		rs ;
     	if (timeval tv ; (rs = uc_gettimeofday(&tv,nullptr)) >= 0) ylikely {
-	    uint64_t	rt = 0 ;	/* resulting-time */
-	    uint64_t	v ;
+	    ulong	rt = 0 ;	/* resulting-time */
+	    ulong	v ;
 	    {
 	        v = tv.tv_sec ;
 	        rt |= (v << 32) ;
@@ -170,7 +169,7 @@ int mkuu::mkuutime() noex {
 } /* end method (mkuu::mkuutime) */
 
 int mkuu::mkuuclk() noex {
-	uint64_t	v ;
+	ulong	v ;
 	{
 	    v = rwords[rwi++] ;
 	    v >>= 16 ;
@@ -185,8 +184,8 @@ int mkuu::mkuunode() noex {
 	int		rs1 ;
 	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) ylikely {
 	    if ((rs = getnodename(nbuf,rs)) >= 0) ylikely {
-	        uint64_t	nv = loadbytes(nbuf,rs) ;
-	        uint64_t	v ;
+	        ulong	nv = loadbytes(nbuf,rs) ;
+	        ulong	v ;
 	        {
 	            v = rwords[rwi++] ;
 	            v &= USHORT_MAX ;
@@ -205,13 +204,13 @@ int mkuu::mkuunode() noex {
 } /* end method (mkuu::mkuunode) */
 
 /* only need six significant bytes */
-local uint64_t loadbytes(cc *nbuf,int nl) noex {
+local ulong loadbytes(cc *nbuf,int nl) noex {
     	cint		six = 6 ; /* <- six bytes */
-    	uint64_t	rv = 0 ;
-	uint64_t	v ;
+    	ulong	rv = 0 ;
+	ulong	v ;
 	for (int i = 0 ; i < nl ; i += 1) {
 	    cint	ch = mkchar(nbuf[i]) ;
-	    v = uint64_t(ch) ;
+	    v = ulong(ch) ;
 	    v <<= ((i % six) * CHAR_BIT) ;
 	    rv |= v ;
 	}
