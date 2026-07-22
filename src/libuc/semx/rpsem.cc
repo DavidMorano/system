@@ -48,17 +48,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
 #include	<semaphore.h>		/* POSIX® semaphores */
-#include	<cerrno>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cassert>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"rpsem.h"
 
@@ -120,6 +121,7 @@ local inline int rpsem_magic(rpsem *op,Args ... args) noex {
 
 int rpsem_create(rpsem *op,int pshared,int acnt) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_INVALID ;
 	    if (acnt > 0) {
@@ -134,11 +136,11 @@ int rpsem_create(rpsem *op,int pshared,int acnt) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (rpsem_create) */
+} /* end subroutine (rpsem_create) */
 
 int rpsem_destroy(rpsem *op) noex {
 	int		rs ;
+	assert(op) ;
 	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_destroy(&op->ps)) < 0) {
@@ -148,11 +150,11 @@ int rpsem_destroy(rpsem *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (rpsem_destroy) */
+} /* end subroutine (rpsem_destroy) */
 
 int rpsem_wait(rpsem *op) noex {
 	int		rs ;
+	assert(op) ;
 	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_wait(&op->ps)) < 0) {
@@ -161,11 +163,11 @@ int rpsem_wait(rpsem *op) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (rpsem_wait) */
+} /* end subroutine (rpsem_wait) */
 
 int rpsem_trywait(rpsem *op) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
+	assert(op) ;
 	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_trywait(&op->ps)) < 0) {
@@ -174,12 +176,12 @@ int rpsem_trywait(rpsem *op) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (rpsem_trywait) */
+} /* end subroutine (rpsem_trywait) */
 
 int rpsem_waiter(rpsem *op,int to) noex {
 	int		rs ;
 	int		c = 0 ;
+	assert(op) ;
 	if (to < 0) {
 	    to = (INT_MAX / (2 * NLPS)) ;
 	}
@@ -209,11 +211,11 @@ int rpsem_waiter(rpsem *op,int to) noex {
 	    } until ((rs >= 0) || f_exit) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (rpsem_waiter) */
+} /* end subroutine (rpsem_waiter) */
 
 int rpsem_post(rpsem *op) noex {
 	int		rs ;
+	assert(op) ;
 	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_post(&op->ps)) < 0) {
@@ -222,12 +224,12 @@ int rpsem_post(rpsem *op) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (rpsem_post) */
+} /* end subroutine (rpsem_post) */
 
 int rpsem_count(rpsem *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	assert(op) ;
 	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    while ((rs = rpsem_trywait(op)) >= 0) {
 		c += 1 ;
@@ -240,8 +242,7 @@ int rpsem_count(rpsem *op) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (rpsem_count) */
+} /* end subroutine (rpsem_count) */
 
 
 /* local subroutines */
