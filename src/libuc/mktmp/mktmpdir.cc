@@ -38,16 +38,16 @@
 *****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkfile.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIC® */
+#include	<unistd.h>		/* POSIC® */
+#include	<fcntl.h>		/* POSIC® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkfile.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mktmp.h"
 
@@ -96,7 +96,6 @@ int mktmpdir(char *rbuf,cchar *dname,mode_t om) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mktmpdir) */
+} /* end subroutine (mktmpdir) */
 
 
