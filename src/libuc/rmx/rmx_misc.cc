@@ -49,12 +49,13 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<strn.h>		/* LINUC |strn{x}chr(3uc)| */
-#include	<six.h>			/* LINUC |siext(3uc)| */
+#include	<strn.h>		/* LIBUC |strn{x}chr(3uc)| */
+#include	<six.h>			/* LIBUC |siext(3uc)| */
 #include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"rmx.h"
+#include	"rmx_misc.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -111,5 +112,29 @@ int rmcomment(cchar *lp,int ll) noex {
 	} /* end if (non-null) */
 	return rl ;
 } /* end subroutine (rmcomment) */
+
+int rmslashes(cchar *lp,int ll) noex {
+	if (lp) ylikely {
+	    if (ll < 0) ll = lenstr(lp) ;
+	    while (lp[ll - 1] == '/') {
+		ll -= 1 ;
+	    } /* end while */
+	} else {
+	    ll = -1 ;
+	} /* end if (non-null) */
+	return ll ;
+} /* end subroutine (rmslashes) */
+
+int rmdot(cchar *sp,int sl) noex {
+    	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+    	    if ((sl > 0) && (sp[sl - 1] == '.')) {
+	        sl -= 1 ;
+	    } /* end if */
+	} else {
+	    sl = -1 ;
+	} /* end if (non-null) */
+    	return sl ;
+} /* end subroutine (rmdot) */
 
 
