@@ -48,13 +48,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cassert>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	<rpsem.h>		/* POSIX® semaphore -- real */
 #include	<epsem.h>		/* POSIX® semaphore -- enumulated */
@@ -104,6 +105,7 @@ cbool		f_psem = F_PSEM ;
 int psem_create(psem *op,int pshared,int acnt) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    if_constexpr (f_psem) {
@@ -129,12 +131,12 @@ int psem_create(psem *op,int pshared,int acnt) noex {
 	    } /* end if_constexpr (f_psem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (psem_create) */
+} /* end subroutine (psem_create) */
 
 int psem_destroy(psem *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->subobj) ylikely {
@@ -163,11 +165,11 @@ int psem_destroy(psem *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (psem_destroy) */
+} /* end subroutine (psem_destroy) */
 
 int psem_wait(psem *op) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->subobj) ylikely {
@@ -181,11 +183,11 @@ int psem_wait(psem *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (psem_wait) */
+} /* end subroutine (psem_wait) */
 
 int psem_trywait(psem *op) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->subobj) ylikely {
@@ -199,11 +201,11 @@ int psem_trywait(psem *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (psem_trywait) */
+} /* end subroutine (psem_trywait) */
 
 int psem_waiter(psem *op,int to) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->subobj) ylikely {
@@ -217,11 +219,11 @@ int psem_waiter(psem *op,int to) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (psem_waiter) */
+} /* end subroutine (psem_waiter) */
 
 int psem_post(psem *op) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->subobj) ylikely {
@@ -235,12 +237,12 @@ int psem_post(psem *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (psem_post) */
+} /* end subroutine (psem_post) */
 
 int psem_count(psem *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->subobj) ylikely {
@@ -255,8 +257,7 @@ int psem_count(psem *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (psem_count) */
+} /* end subroutine (psem_count) */
 
 
 /* local subroutines */
