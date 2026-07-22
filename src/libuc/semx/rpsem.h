@@ -31,11 +31,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<semaphore.h>		/* POSIX® semaphores */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	RPSEM		struct rpsem_head
@@ -71,19 +68,19 @@ struct rpsem_co {
 	} ;
 } ; /* end struct (rpsem_co) */
 struct rpsem : rpsem_head {
-	rpsem_co		wait ;
-	rpsem_co		waiter ;
-	rpsem_co		trywait ;
-	rpsem_co		post ;
-	rpsem_co		count ;
-	rpsem_co		destroy ;
+	rpsem_co	wait ;
+	rpsem_co	waiter ;
+	rpsem_co	trywait ;
+	rpsem_co	post ;
+	rpsem_co	count ;
+	rpsem_co	destroy ;
 	rpsem() noex {
-	    wait(this,rpsemmem_wait) ;
-	    waiter(this,rpsemmem_waiter) ;
-	    trywait(this,rpsemmem_trywait) ;
-	    post(this,rpsemmem_post) ;
-	    count(this,rpsemmem_count) ;
-	    destroy(this,rpsemmem_destroy) ;
+	    wait	(this,rpsemmem_wait) ;
+	    waiter	(this,rpsemmem_waiter) ;
+	    trywait	(this,rpsemmem_trywait) ;
+	    post	(this,rpsemmem_post) ;
+	    count	(this,rpsemmem_count) ;
+	    destroy	(this,rpsemmem_destroy) ;
 	    magic = 0 ;
 	} ; /* end ctor */
 	rpsem(const rpsem &) = delete ;
@@ -101,13 +98,13 @@ typedef RPSEM		rpsem ;
 
 EXTERNC_begin
 
-extern int	rpsem_create(rpsem *,int,int) noex ;
-extern int	rpsem_destroy(rpsem *) noex ;
-extern int	rpsem_wait(rpsem *) noex ;
-extern int	rpsem_waiter(rpsem *,int) noex ;
-extern int	rpsem_trywait(rpsem *) noex ;
-extern int	rpsem_post(rpsem *) noex ;
-extern int	rpsem_count(rpsem *) noex ;
+extern int	rpsem_create	(rpsem *,int,int) noex ;
+extern int	rpsem_destroy	(rpsem *) noex ;
+extern int	rpsem_wait	(rpsem *) noex ;
+extern int	rpsem_waiter	(rpsem *,int) noex ;
+extern int	rpsem_trywait	(rpsem *) noex ;
+extern int	rpsem_post	(rpsem *) noex ;
+extern int	rpsem_count	(rpsem *) noex ;
 
 EXTERNC_end
 
