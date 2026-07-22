@@ -299,6 +299,7 @@ mkunique.o:		mkunique.cc				$(INCS)
 mkfmtphone.o:		mkfmtphone.cc				$(INCS)
 mkfingerquery.o:	mkfingerquery.cc			$(INCS)
 mklineclean.o:		mklineclean.cc	mklineclean.h		$(INCS)
+mkuuid.o:		mkuuid.cc	mkuuid.h		$(INCS)
 
 mkpr.o:			mkpr.cc		mkpr.h			$(INCS)
 mkxdisp.o:		mkxdisp.cc	mkxdisp.h		$(INCS)
