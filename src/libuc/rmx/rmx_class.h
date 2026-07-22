@@ -50,6 +50,7 @@ inline int rmblk		(cchar *sp) noex {
 
 #endif /* __cplusplus */
 
+
 #endif /* RMXCLASS_INCLUDE */
 
 
