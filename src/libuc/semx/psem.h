@@ -37,11 +37,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	PSEM		struct psem_head
@@ -83,12 +80,12 @@ struct psem : psem_head {
 	psem_co		count ;
 	psem_co		destroy ;
 	psem() noex {
-	    wait(this,psemmem_wait) ;
-	    waiter(this,psemmem_waiter) ;
-	    trywait(this,psemmem_trywait) ;
-	    post(this,psemmem_post) ;
-	    count(this,psemmem_count) ;
-	    destroy(this,psemmem_destroy) ;
+	    wait	(this,psemmem_wait) ;
+	    waiter	(this,psemmem_waiter) ;
+	    trywait	(this,psemmem_trywait) ;
+	    post	(this,psemmem_post) ;
+	    count	(this,psemmem_count) ;
+	    destroy	(this,psemmem_destroy) ;
 	    subobj = nullptr ;
 	} ; /* end ctor */
 	psem(const psem &) = delete ;
@@ -106,13 +103,13 @@ typedef PSEM		psem ;
 
 EXTERNC_begin
 
-extern int	psem_create(psem *,int,int) noex ;
-extern int	psem_destroy(psem *) noex ;
-extern int	psem_wait(psem *) noex ;
-extern int	psem_waiter(psem *,int) noex ;
-extern int	psem_trywait(psem *) noex ;
-extern int	psem_post(psem *) noex ;
-extern int	psem_count(psem *) noex ;
+extern int	psem_create	(psem *,int,int) noex ;
+extern int	psem_destroy	(psem *) noex ;
+extern int	psem_wait	(psem *) noex ;
+extern int	psem_waiter	(psem *,int) noex ;
+extern int	psem_trywait	(psem *) noex ;
+extern int	psem_post	(psem *) noex ;
+extern int	psem_count	(psem *) noex ;
 
 EXTERNC_end
 
