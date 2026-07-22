@@ -160,7 +160,7 @@ static inline int pmq_ctor(pmq *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 	    op->name = nullptr ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	}
 	return rs ;
 }
@@ -178,7 +178,7 @@ template<typename ... Args>
 static inline int pmq_magic(pmq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == PMQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == PMQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -224,7 +224,7 @@ int pmq_open(pmq *op,cchar *name,int of,mode_t om,const pmq_attr *attr) noex {
 		    po.m = &posixhelp::open ;
 		    if ((rs = po(op)) >= 0) ylikely {
 			rc = rs ;
-			op->magic = PMQ_MAGIC ;
+			op->magval = PMQ_MAGIC ;
 		    }
 		    if (rs < 0) {
 			pmq_nameclean(op) ;
@@ -257,7 +257,7 @@ int pmq_close(pmq *op) noex {
 		rs1 = pmq_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
