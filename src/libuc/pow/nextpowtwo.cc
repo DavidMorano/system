@@ -46,22 +46,22 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<concepts>
-#include	<bit>			/* |countl_zero(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<concepts>		/* C++STD */
+#include	<bit>			/* C++STD |countl_zero(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nextpowtwo.h"
 
-#pragma		GCC dependency		"mod/flbs.ccm"
+#pragma		GCC dependency		"mod/findbit.ccm"
 
-import flbs ;				/* |flbsi(3u)| */
+import findbit ;				/* |flbsi(3u)| */
 
 /* local defines */
 
@@ -121,7 +121,6 @@ int nextpowtwo(int v) noex {
 	    } /* end if */
 	} /* end if_constexpr (f_powceil) */
 	return nn ;
-}
-/* end subroutine (nextpowtwo) */
+} /* end subroutine (nextpowtwo) */
 
 
