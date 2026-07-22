@@ -40,8 +40,10 @@ MODS +=
 LIBS +=
 
 
-OBJ0_DATER= dater_prime.o dater_setkey.o
-OBJ1_DATER= dater_getbbtime.o dater_getdate.o
+DEPS= dater_mag.o
+
+OBJ0_DATER= dater_getbbtime.o 
+OBJ1_DATER= dater_getdate.o
 OBJ2_DATER= dater_obj.o
 OBJ3_DATER=
 
@@ -83,8 +85,6 @@ default:		$(T).o
 
 all:			$(ALL)
 
-so:			$(T).so
-
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
@@ -110,9 +110,6 @@ so:			$(T).so
 .ccm.o:
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-
-$(T).so:		$(OBJ_CHRONO)
-	$(LD) -shared -fpic -o $@ $(LDFLAGS) $^ $(LIBINFO)
 
 $(T).o:			$(OBJ_CHRONO)
 	$(LD) -r -o $@ $(LDFLAGS) $^ $(LIBINFO)
@@ -168,23 +165,25 @@ obj3_dater.o:		$(OBJ3_DATER)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 dater.o:		$(OBJ_DATER)
-	$(LD) -r -o $@ $(LDFLAGS) $(OBJ_DATER) $(LIBINFO)
+	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
-date.o:			date.cc	date.h			$(INCS)
-tmstrs.o:		tmstrs.cc tmstrs.h		$(INCS)
-tmtime.o:		tmtime.cc tmtime.hh		$(INCS)
-tmz.o:			tmz.cc tmz.hh			$(INCS)
-zdb.o:			zdb.cc zdb.h			$(INCS)
-zos.o:			zos.cc zos.h			$(INCS)
-zoffparts.o:		zoffparts.cc zoffparts.h	$(INCS)
-dayspec.o:		dayspec.cc dayspec.h		$(INCS)
-cvtdater.o:		cvtdater.cc cvtdater.h		$(INCS)
+date.o:			date.cc			date.h			$(INCS)
+tmstrs.o:		tmstrs.cc		tmstrs.h		$(INCS)
+tmtime.o:		tmtime.cc		tmtime.hh		$(INCS)
+tmz.o:			tmz.cc			tmz.hh			$(INCS)
+zdb.o:			zdb.cc			zdb.h			$(INCS)
+zos.o:			zos.cc			zos.h			$(INCS)
+zoffparts.o:		zoffparts.cc		zoffparts.h		$(INCS)
+dayspec.o:		dayspec.cc		dayspec.h		$(INCS)
+cvtdater.o:		cvtdater.cc		cvtdater.h		$(INCS)
 
-dater_prime.o:		dater_prime.cc		dater.h	$(INCS)
-dater_getdate.o:	dater_getdate.cc	dater.h	$(INCS)
-dater_getbbtime.o:	dater_getbbtime.cc	dater.h	$(INCS)
-dater_setkey.o:		dater_setkey.cc		dater.h	$(INCS)
-dater_obj.o:		dater_obj.cc		dater.h	$(INCS)
+dater_prime.o:		dater_prime.cc		dater.h	$(DEPS) $(INCS)
+dater_getdate.o:	dater_getdate.cc	dater.h	$(DEPS) $(INCS)
+dater_getbbtime.o:	dater_getbbtime.cc	dater.h	$(DEPS) $(INCS)
+dater_setkey.o:		dater_setkey.cc		dater.h	$(DEPS) $(INCS)
+dater_obj.o:		dater_obj.cc		dater.h	$(DEPS) $(INCS)
+
+dater_mag.o:		dater_mag.ccm		dater.h $(INCS)
 
 
