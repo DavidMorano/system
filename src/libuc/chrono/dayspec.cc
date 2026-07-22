@@ -69,23 +69,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<getmjd.h>		/* |getyrd(3uc)| */
-#include	<calstrs.h>
-#include	<estrings.h>
-#include	<cfdec.h>
-#include	<six.h>
-#include	<matxstr.h>		/* |matpcasestr(3uc)| */
-#include	<char.h>
-#include	<mkchar.h>
-#include	<hasx.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<getmjd.h>		/* LIBUC {|getyrd(3uc)| */
+#include	<calstrs.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<matxstr.h>		/* LIBUC |matpcasestr(3uc)| */
+#include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dayspec.h"
 
@@ -139,8 +139,7 @@ int dayspec_def(dayspec *op) noex {
 	    op->d = -1 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dayspec_def) */
+} /* end subroutine (dayspec_def) */
 
 int dayspec_load(dayspec *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -154,8 +153,7 @@ int dayspec_load(dayspec *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dayspec_load) */
+} /* end subroutine (dayspec_load) */
 
 int dayspec_yday(dayspec *op) noex {
 	int		rs = SR_FAULT ;
@@ -166,8 +164,7 @@ int dayspec_yday(dayspec *op) noex {
 	    } /* end if (valid-domain) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dayspec_yday) */
+} /* end subroutine (dayspec_yday) */
 
 
 /* private subroutines */
