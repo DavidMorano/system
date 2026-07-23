@@ -1,0 +1,35 @@
+/* libutil-operators MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module libutil:operators ;
+
+export {
+    template<typename TA,typename TB>
+    constexpr inline bool logequiva(TA a,TB b) noex {
+	return LEQUIV(a,b) ;
+    }
+    template<typename TA,typename TB>
+    constexpr inline bool logdiffer(TA a,TB b) noex {
+	return (! LEQUIV(a,b)) ;
+    }
+} /* end export */
+
+
