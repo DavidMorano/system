@@ -2,14 +2,17 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* clear out the TERMCMD object */
+/* standard (relatively) UNIX® preprocessor defiitions */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services.
+	= 1998-02-15, David A­D­ Morano
+	This code is newly written but modeled after some code that
+	was originally written to get some standardized variable
+	serialization for the Ethernet-Controller (ETHCON) development
+	work.
 
 */
 
@@ -17,38 +20,34 @@
 
 /*******************************************************************************
 
-	Name:
-	termcmd_clear
+  	Name:
+	termcmd
 
-	Descrption:
-	This subroutine clears out the TERMCMD object.
-
-	Synopsis:
-	int termcmd_clear(termcmd *ckp) noex
-
-	Arguments:
-	ckp		TERMCMD object pointer (for clearing)
-
-	Returns:
-	>=0		OK
-	<0		error (system-return)
+	Description:
+	This contains miscellaneious support subroutines.
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"termcmd.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -60,7 +59,7 @@
 /* local structures */
 
 
-/* forward subroutines */
+/* forward references */
 
 
 /* local variables */
@@ -71,22 +70,16 @@
 
 /* exported subroutines */
 
-int termcmd_clear(termcmd *ckp) noex {
-	int		rs = SR_FAULT ;
-	if (ckp) ylikely {
-	    ckp->type = 0 ;
-	    ckp->name = 0 ;
-	    ckp->istr[0] = '\0' ;
-	    ckp->dstr[0] = '\0' ;
-	    ckp->fl.fpriv = false ;
-	    ckp->fl.iover = false ;
-	    ckp->fl.dover = false ;
+extern int termcmd_clear(termcmd *op) noex {
+	TERMCMD		*hop = op ;
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = memclear(hop) ;
 	    for (int i = 0 ; i < TERMCMD_NP ; i += 1) {
-	        ckp->p[i] = TERMCMD_PEOL ;
-	    }
+	        op->p[i] = TERMCMD_PEOL ;
+	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termcmd_clear) */
+} /* end subroutine (termcmd_clear) */
 
 
