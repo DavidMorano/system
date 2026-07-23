@@ -141,8 +141,7 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 	    }
 	} /* end if (non-null) */
 	return rp ;
-}
-/* end subroutine (strnbasesub) */
+} /* end subroutine (strnbasesub) */
 
 char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
@@ -155,8 +154,7 @@ char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 	    } /* end if (positive) */
 	} /* end if (non-null) */
 	return rp ;
-}
-/* end subroutine (strncasesub) */
+} /* end subroutine (strncasesub) */
 
 char *strnfoldsub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
@@ -169,8 +167,7 @@ char *strnfoldsub(cchar *sp,int sl,cchar *ss) noex {
 	    } /* end if (positive) */
 	} /* end if (non-null) */
     	return rp ;
-}
-/* end subroutine (strnfoldsub) */
+} /* end subroutine (strnfoldsub) */
 
 
 /* local subroutines */
