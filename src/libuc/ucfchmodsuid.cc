@@ -1,6 +1,6 @@
 /* ucfchmodsuid SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* set or clear the SUID bit on the file permissions mode */
