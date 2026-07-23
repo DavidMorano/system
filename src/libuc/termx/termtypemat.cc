@@ -43,12 +43,12 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |SHORT_MIN| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<matparam.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<matparam.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"termtypemat.h"
 #include	"termcmd.h"
@@ -117,7 +117,6 @@ static int isMatch(cshort *vp,cshort *pp) noex {
 	    if (! f) break ;
 	} /* end for */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (isMatch) */
+} /* end subroutine (isMatch) */
 
 
