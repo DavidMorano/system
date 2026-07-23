@@ -93,34 +93,28 @@
 
 int sncpy1w(char *dp,int dl,cc *s1,int sl) noex {
 	return sncpyxw(dp,dl,1,s1,sl) ;
-}
-/* end subroutine (sncpy1w) */
+} /* end subroutine (sncpy1w) */
 
 int sncpy2w(char *dp,int dl,cc *s1,cc *s2,int sl) noex {
 	return sncpyxw(dp,dl,2,s1,s2,sl) ;
-}
-/* end subroutine (sncpy2w) */
+} /* end subroutine (sncpy2w) */
 
 int sncpy3w(char *dp,int dl,cc *s1,cc *s2,cc *s3,int sl) noex {
 	return sncpyxw(dp,dl,3,s1,s2,s3,sl) ;
-}
-/* end subroutine (sncpy3w) */
+} /* end subroutine (sncpy3w) */
 
 int sncpy4w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
 	return sncpyxw(dp,dl,4,s1,s2,s3,s4,sl) ;
-}
-/* end subroutine (sncpy4w) */
+} /* end subroutine (sncpy4w) */
 
 int sncpy5w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl) noex {
 	return sncpyxw(dp,dl,5,s1,s2,s3,s4,s5,sl) ;
-}
-/* end subroutine (sncpy5w) */
+} /* end subroutine (sncpy5w) */
 
 int sncpy6w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,
 		cc *s6,int sl) noex {
 	return sncpyxw(dp,dl,6,s1,s2,s3,s4,s5,s6,sl) ;
-}
-/* end subroutine (sncpy6w) */
+} /* end subroutine (sncpy6w) */
 
 int sncpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
@@ -145,7 +139,7 @@ int sncpyxw(char *dp,int dl,int n,...) noex {
 		    while ((ml < (rmlen - 1)) && sl-- && *sp) {
 		        *bp++ = *sp++ ;
 		        ml += 1 ;
-		    }
+		    } /* end while */
 		    *bp = '\0' ;
 		    if ((sl != 0) && *sp) ml += 1 ; /* error condition */
 	        } /* end if */
@@ -159,7 +153,6 @@ int sncpyxw(char *dp,int dl,int n,...) noex {
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (sncpyxw) */
+} /* end subroutine (sncpyxw) */
 
 
