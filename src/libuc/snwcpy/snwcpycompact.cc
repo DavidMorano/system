@@ -1,6 +1,6 @@
 /* snwcpycompact SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* counted-string copy while compacting white-space from the source */
 /* version %I% last-modified %G% */
