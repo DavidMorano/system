@@ -76,6 +76,14 @@
 #define	LXOR(a,b)	(((a) && (! (b))) || ((! (a)) && (b)))
 #endif
 
+#ifndef	LOGEQUIVA /* should be operator » !^^ « */
+#define	LOGEQUIVA(a,b)	(((a) && (b)) || ((! (a)) && (! (b))))
+#endif
+
+#ifndef	LOGDIFFER /* should be operator » ^^ « */
+#define	LOGDIFFER(a,b)	(! LOGEQUIVA(a,b))
+#endif
+
 #ifndef	BFLOOR
 #define	BFLOOR(v,m)	((v) & (~ ((m) - 1)))
 #endif
