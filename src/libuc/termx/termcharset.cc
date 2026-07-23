@@ -47,15 +47,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBUC */
 
 
 /* local defines */
@@ -80,7 +77,7 @@ static cint	inter[4][2] = {
 	{ '\051', '-' },		/* G1 */
 	{ '*', '.' },			/* G2 */
 	{ '+', '/' }			/* G3 */
-} ; /* intermediate characters */
+} ; /* end array (intermediate characters) */
 
 
 /* exported variables */
@@ -118,7 +115,6 @@ int termcharset(char *dp,int dl,int setnum,int f96,cchar *fontname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (termcharset) */
+} /* end subroutine (termcharset) */
 
 
