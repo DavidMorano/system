@@ -43,16 +43,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<stdintx.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<stdintx.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"stdorder.h"
 
@@ -90,7 +89,7 @@ local int stdorder_rxx(cchar *buf,T *wp) noex {
 	for (int i = 0 ; i < n ; i += 1) {
 	     T	v = ubuf[i] ;
 	     stage |= (v << (i * nb)) ;
-	}
+	} /* end for */
 	*wp = stage ;
 	return n ;
 } /* end subroutine-template (stdorder_rxx) */
@@ -101,7 +100,7 @@ local int stdorder_wxx(char *buf,T w) noex {
 	uchar		*ubuf = ucharp(buf) ;
 	for (int i = 0 ; i < n ; i += 1) {
 	    ubuf[i] = uchar(w >> (i * nb)) ;
-	}
+	} /* end for */
 	return n ;
 } /* end subroutine-template (stdorder_wxx) */
 
@@ -112,28 +111,28 @@ local int stdorder_wxx(char *buf,T w) noex {
 /* exported subroutines */
 
 int stdorder_rc(cchar *buf,char *wp) noex {
-	uchar		*ubuf = (uchar *) buf ;
+	uchar		*ubuf = ucharp(buf) ;
 	*wp = ubuf[0] ;
 	return 1 ;
 }
 
 int stdorder_rs(cchar *buf,short *sp) noex {
-	ushort		*up = (ushort *) sp ;
+	ushort		*up = ushortp(sp) ;
 	return stdorder_rus(buf,up) ;
 }
 
 int stdorder_ri(cchar *buf,int *sp) noex {
-	uint		*up = (uint *) sp ;
+	uint		*up = uintp(sp) ;
 	return stdorder_rui(buf,up) ;
 }
 
 int stdorder_rl(cchar *buf,long *sp) noex {
-	ulong		*up = (ulong *) sp ;
+	ulong		*up = ulongp(sp) ;
 	return stdorder_rul(buf,up) ;
 }
 
 int stdorder_rll(cchar *buf,longlong *sp) noex {
-	ulonglong	*up = (ulonglong *) sp ;
+	ulonglong	*up = ulonglongp(sp) ;
 	return stdorder_rull(buf,up) ;
 }
 
@@ -160,13 +159,13 @@ int stdorder_rull(cchar *buf,ulonglong *wp) noex {
 }
 
 int stdorder_wc(char *buf,char cw) noex {
-	uchar		*ubuf = (uchar *) buf ;
+	uchar		*ubuf = ucharp(buf) ;
 	ubuf[0] = uchar(cw) ;
 	return 1 ;
 }
 
 int stdorder_ws(char *buf,short sw) noex {
-	uchar		*ubuf = (uchar *) buf ;
+	uchar		*ubuf = ucharp(buf) ;
 	ubuf[0] = uchar(sw >> (0 * nb)) ;
 	ubuf[1] = uchar(sw >> (1 * nb)) ;
 	return 2 ;
@@ -188,13 +187,13 @@ int stdorder_wll(char *buf,longlong sw) noex {
 }
 
 int stdorder_wuc(char *buf,uchar uw) noex {
-	uchar		*ubuf = (uchar *) buf ;
+	uchar		*ubuf = ucharp(buf) ;
 	ubuf[0] = uchar(uw) ;
 	return 1 ;
 }
 
 int stdorder_wus(char *buf,ushort uw) noex {
-	uchar		*ubuf = (uchar *) buf ;
+	uchar		*ubuf = ucharp(buf) ;
 	ubuf[0] = uchar(uw >> (0 * nb)) ;
 	ubuf[1] = uchar(uw >> (1 * nb)) ;
 	return 2 ;
