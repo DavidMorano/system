@@ -57,8 +57,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<storebuf.h>
@@ -117,7 +117,6 @@ int snrealname(char *dbuf,int dlen,mainv a,int n) noex {
 	    len = sb.idx ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (snrealname) */
+} /* end subroutine (snrealname) */
 
 
