@@ -45,17 +45,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
 #include	<bit>			/* |has_single_bit(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ctdec.h>
-#include	<intceil.h>
-#include	<snwcpy.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"storeitem.h"
 
@@ -107,8 +108,7 @@ int storeitem_start(storeitem *op,char *dbuf,int dlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (storeitem_start) */
+} /* end subroutine (storeitem_start) */
 
 int storeitem_finish(storeitem *op) noex {
 	int		rs = SR_FAULT ;
@@ -124,8 +124,7 @@ int storeitem_finish(storeitem *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (storeitem_finish) */
+} /* end subroutine (storeitem_finish) */
 
 int storeitem_strw(storeitem *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -158,8 +157,7 @@ int storeitem_strw(storeitem *op,cchar *sp,int sl,cchar **rpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (storeitem_strw) */
+} /* end subroutine (storeitem_strw) */
 
 int storeitem_buf(storeitem *op,cvoid *vbp,int vbl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -194,8 +192,7 @@ int storeitem_buf(storeitem *op,cvoid *vbp,int vbl,cchar **rpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (storeitem_buf) */
+} /* end subroutine (storeitem_buf) */
 
 int storeitem_dec(storeitem *op,int v,cchar **rpp) noex {
 	int		rs = SR_OK ;
@@ -234,8 +231,7 @@ int storeitem_dec(storeitem *op,int v,cchar **rpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (storeitem_dec) */
+} /* end subroutine (storeitem_dec) */
 
 int storeitem_chr(storeitem *op,int ch,cchar **rpp) noex {
 	cint		wlen = 1 ;
@@ -263,13 +259,11 @@ int storeitem_chr(storeitem *op,int ch,cchar **rpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (storeitem_chr) */
+} /* end subroutine (storeitem_chr) */
 
 int storeitem_nul(storeitem *op,cchar **rpp) noex {
 	return storeitem_strw(op,op->dbuf,0,rpp) ;
-}
-/* end subroutine (storeitem_nul) */
+} /* end subroutine (storeitem_nul) */
 
 int storeitem_block(storeitem *op,int bsize,int align,void **vpp) noex {
 	int		rs = SR_FAULT ;
@@ -307,8 +301,7 @@ int storeitem_block(storeitem *op,int bsize,int align,void **vpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? inc : rs ;
-}
-/* end subroutine (storeitem_block) */
+} /* end subroutine (storeitem_block) */
 
 int storeitem_ptab(storeitem *op,int n,void ***vppp) noex {
 	cint		align = szof(void *) ;
@@ -324,8 +317,7 @@ int storeitem_ptab(storeitem *op,int n,void ***vppp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (storeitem_ptab) */
+} /* end subroutine (storeitem_ptab) */
 
 int storeitem_getlen(storeitem *op) noex {
 	int		rs = SR_FAULT ;
@@ -341,8 +333,7 @@ int storeitem_getlen(storeitem *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (storeitem_getlen) */
+} /* end subroutine (storeitem_getlen) */
 
 int storeitem::start(char *rbuf,int rlen) noex {
 	return storeitem_start(this,rbuf,rlen) ;
@@ -395,7 +386,6 @@ storeitem_co::operator int () noex {
 	    } /* end switch */
 	} /* end if */
 	return rs ;
-}
-/* end method (storeitem::operator) */
+} /* end method (storeitem::operator) */
 
 
