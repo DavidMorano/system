@@ -63,7 +63,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ctoct.h>		/* LIBUC */
-#include	<snflager.h>		/* LINUC */
+#include	<snflager.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |OCTBUFLEN| */
 
 #include	"snx.h"
@@ -172,7 +172,6 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 	    } /* end if (snflags) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (snfilemode) */
+} /* end subroutine (snfilemode) */
 
 
