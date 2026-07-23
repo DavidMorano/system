@@ -47,7 +47,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU |ctdec(3u)| */
 #include	<ucodenames.h>		/* LIBU */
-#include	<localmisc.h>		/* |DECBUFLEN| */
+#include	<localmisc.h>		/* LIBU |DECBUFLEN| */
 
 #include	"strabbrerr.h"
 
@@ -100,7 +100,6 @@ cchar *strabbrerr(int rsv) noex {
 	    }
 	} /* end if */
 	return s ;
-}
-/* end subroutine (strabbrerr) */
+} /* end subroutine (strabbrerr) */
 
 
