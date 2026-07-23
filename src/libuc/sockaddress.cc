@@ -224,8 +224,7 @@ int sockaddress_finish(SA  *sap) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sockaddress_finish) */
+} /* end subroutine (sockaddress_finish) */
 
 /* get the address family type for this sockaddress */
 int sockaddress_getaf(SA *sap) noex {
@@ -235,8 +234,7 @@ int sockaddress_getaf(SA *sap) noex {
 	    rs = extp->afget() ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sockaddress_getaf) */
+} /* end subroutine (sockaddress_getaf) */
 
 /* get the port for this sockaddress (based on address family type) */
 int sockaddress_getport(SA *sap) noex {
@@ -269,8 +267,7 @@ int sockaddress_getport(SA *sap) noex {
 	    port &= USHORT_MAX ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? port : rs ;
-}
-/* end subroutine (sockaddress_getport) */
+} /* end subroutine (sockaddress_getport) */
 
 /* get the address for this sockaddress (based on address type) */
 int sockaddress_getaddr(SA *sap,void *abuf,int alen) noex {
@@ -318,8 +315,7 @@ int sockaddress_getaddr(SA *sap,void *abuf,int alen) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sockaddress_getaddr) */
+} /* end subroutine (sockaddress_getaddr) */
 
 int sockaddress_getflow(SA *sap,uint *rp) noex {
 	sa		*extp = (sa *) sap ;
@@ -346,8 +342,7 @@ int sockaddress_getflow(SA *sap,uint *rp) noex {
 	    if (rp) *rp = flow ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sockaddress_getflow) */
+} /* end subroutine (sockaddress_getflow) */
 
 int sockaddress_getscope(SA *sap,uint *rp) noex {
 	sa		*extp = (sa *) sap ;
@@ -374,8 +369,7 @@ int sockaddress_getscope(SA *sap,uint *rp) noex {
 	    if (rp) *rp = v ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sockaddress_getscope) */
+} /* end subroutine (sockaddress_getscope) */
 
 int sockaddress_getextra(SA *sap,uint *rp) noex {
 	sa		*extp = (sa *) sap ;
@@ -402,8 +396,7 @@ int sockaddress_getextra(SA *sap,uint *rp) noex {
 	    if (rp) *rp = v ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sockaddress_getextra) */
+} /* end subroutine (sockaddress_getextra) */
 
 /* get the entire socket address (the TLI address) in HEXADECIMAL */
 int sockaddress_gethex(SA *sap,char *rbuf,int rlen) noex {
@@ -448,8 +441,7 @@ int sockaddress_gethex(SA *sap,char *rbuf,int rlen) noex {
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? j : rs ;
-}
-/* end subroutine (sockaddress_gethex) */
+} /* end subroutine (sockaddress_gethex) */
 
 /* get the entire socket address length (like for a TPI address) */
 int sockaddress_getlen(SA *sap) noex {
@@ -481,8 +473,7 @@ int sockaddress_getlen(SA *sap) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return (rs >= 0) ? salen : rs ;
-}
-/* end subroutine (sockaddress_getlen) */
+} /* end subroutine (sockaddress_getlen) */
 
 int sockaddress_getaddrlen(SA *sap) noex {
 	sa		*extp = (sa *) sap ;
@@ -513,8 +504,7 @@ int sockaddress_getaddrlen(SA *sap) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return (rs >= 0) ? addrlen : rs ;
-}
-/* end subroutine (sockaddress_getaddrlen) */
+} /* end subroutine (sockaddress_getaddrlen) */
 
 /* write the address family field */
 int sockaddress_putaf(SA *sap,int af) noex {
@@ -533,8 +523,7 @@ int sockaddress_putaf(SA *sap,int af) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sockaddress_putaf) */
+} /* end subroutine (sockaddress_putaf) */
 
 /* put a port number in there */
 int sockaddress_putport(SA *sap,int port) noex {
@@ -566,8 +555,7 @@ int sockaddress_putport(SA *sap,int port) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sockaddress_putport) */
+} /* end subroutine (sockaddress_putport) */
 
 /* put a transport-specific-part address */
 int sockaddress_putaddr(SA *sap,cvoid *vaddr) noex {
