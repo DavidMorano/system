@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* initialize both TIMEB and ZNAME */
+/* initialize both timeb and ZNAME */
 /* version %I% last-modified %G% */
 
 #define	CF_FTIME	1		/* actually call |uc_ftime(3uc)| */
@@ -23,14 +23,14 @@
 
 	Description:
 	This subroutine initializes a couple of time-related
-	variables.  One of these variables is a TIMEB structure.  The
+	variables.  One of these variables is a timeb structure.  The
 	other is a time-zone string.
 
 	Synopsis:
-	int initnow(TIMEB *tbp,char *zbuf,int zlen) noex
+	int initnow(timeb *tbp,char *zbuf,int zlen) noex
 
 	Arguments:
-	tbp		pointer to TIMEB structure
+	tbp		pointer to timeb structure
 	zbuf		zone-name buffer pointer (returned to caller)
 	zlen		zone-name buffer length of result
 
@@ -55,7 +55,7 @@
 #include	<sys/param.h>
 #include	<sys/timeb.h>		/* <- the money shot! */
 #include	<unistd.h>
-#include	<ctime>			/* structure |TIMEB| */
+#include	<ctime>			/* structure |timeb| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<clanguage.h>
@@ -86,8 +86,8 @@ import libutil ;			/* |memclear(3u)| */
 /* external subroutines */
 
 extern "C" {
-    extern int uc_ftime(TIMEB *) noex ;
-    extern int uc_gettimeofday(TIMEVAL *,void *) noex ;
+    extern int uc_ftime(timeb *) noex ;
+    extern int uc_gettimeofday(timeval *,void *) noex ;
 }
 
 
@@ -99,8 +99,8 @@ extern "C" {
 
 /* forward references */
 
-local int initnow_ftime(TIMEB *,char *,int) noex ;
-local int initnow_gettime(TIMEB *,char *,int) noex ;
+local int initnow_ftime(timeb *,char *,int) noex ;
+local int initnow_gettime(timeb *,char *,int) noex ;
 
 
 /* local variables */
@@ -113,7 +113,7 @@ constexpr bool		f_ftime = CF_FTIME ;
 
 /* exported subroutines */
 
-int initnow(TIMEB *tbp,char *zbuf,int zlen) noex {
+int initnow(timeb *tbp,char *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (tbp) ylikely {
@@ -130,13 +130,12 @@ int initnow(TIMEB *tbp,char *zbuf,int zlen) noex {
 	    } /* end if (error) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (initnow) */
+} /* end subroutine (initnow) */
 
 
 /* local subroutines */
 
-local int initnow_ftime(TIMEB *tbp,char *zbuf,int zlen) noex {
+local int initnow_ftime(timeb *tbp,char *zbuf,int zlen) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = uc_ftime(tbp)) >= 0) ylikely {
@@ -148,14 +147,13 @@ local int initnow_ftime(TIMEB *tbp,char *zbuf,int zlen) noex {
 	    } /* end if (zbuf) */
 	} /* end if (uc_ftime) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (initnow_ftime) */
+} /* end subroutine (initnow_ftime) */
 
-local int initnow_gettime(TIMEB *tbp,char *zbuf,int zlen) noex {
+local int initnow_gettime(timeb *tbp,char *zbuf,int zlen) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		len = 0 ;
-	if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,np)) >= 0) ylikely {
+	if (timeval tv ; (rs = uc_gettimeofday(&tv,np)) >= 0) ylikely {
             tbp->time = tv.tv_sec ;
             tbp->millitm = ushortconv(tv.tv_usec / 1000) ;
             if (tmtime tmt ; (rs = tmt.timelocal(tbp->time)) >= 0) {
@@ -168,7 +166,6 @@ local int initnow_gettime(TIMEB *tbp,char *zbuf,int zlen) noex {
             } /* end if (tmtime_timelocal) */
 	} /* end if (uc_gettimeofday) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (initnow_gettime) */
+} /* end subroutine (initnow_gettime) */
 
 
