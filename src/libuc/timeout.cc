@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* UNIX® signal event initialization */
+/* time-out interface */
 /* version %I% last-modified %G% */
 
 
@@ -38,12 +38,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>			/* |time_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD |time_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"timeout.h"
 
@@ -91,7 +91,6 @@ int timeout_load(timeout *top,time_t v,void *o,t_f m,uint tag,int arg) noex {
 	    top->arg = arg ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (timeout_load) */
+} /* end subroutine (timeout_load) */
 
 
