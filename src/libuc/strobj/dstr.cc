@@ -81,8 +81,7 @@ int dstr_start(dstr *sop,cchar *sp,int sl) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (dstr_start) */
+} /* end subroutine (dstr_start) */
 
 int dstr_finish(dstr *sop) noex {
 	int		rs = SR_FAULT ;
@@ -97,8 +96,7 @@ int dstr_finish(dstr *sop) noex {
 	    sop->slen = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dstr_finish) */
+} /* end subroutine (dstr_finish) */
 
 int dstr_assign(dstr *sop,dstr *sop2) noex {
 	int		rs = SR_FAULT ;
@@ -108,7 +106,6 @@ int dstr_assign(dstr *sop,dstr *sop2) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dstr_assign) */
+} /* end subroutine (dstr_assign) */
 
 
