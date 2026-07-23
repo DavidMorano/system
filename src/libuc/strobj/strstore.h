@@ -52,9 +52,9 @@ struct strstore_head {
 	vechand		*nlp ;		/* number-list-pointer */
 	lookaside	*lap ;		/* look-aside-pointer */
 	hdb		*hlp ;		/* hash-list-pointer */
-	uint		magic ;
-	int		chsize ;
-	int		totalsize ;
+	uint		magval ;
+	int		chsz ;
+	int		totalsz ;
 	int		c ;		/* total count */
 } ; /* end struct (strstore_head) */
 
