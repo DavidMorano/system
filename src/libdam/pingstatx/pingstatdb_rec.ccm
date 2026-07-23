@@ -44,7 +44,7 @@
 	- the time of the last status change
 	- the time of the last entry update
 	- the UP/DOWN status
-	- the hostname
+	- the hostbuf
 
 	Format example:
 
@@ -62,6 +62,8 @@
 	all record lockes used throughout this subroutine.
 
 ******************************************************************************/
+
+module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* POSIX® */
@@ -112,21 +114,30 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 export {
-    struct pingstatdb_rec {
-	cchar		*hostname ;	/* host name */
+    struct pingstatdb_rechead {
+	cchar		*hostbuf ;	/* host name */
 	dater		*cdp ;		/* last date - change */
 	dater		*pdp ;		/* last date - ping */
 	uint		roff ;		/* record offset (within file) */
-	int		len ;		/* length of file record */
+	int		len ;		/* record length */
 	int		cnt ;		/* count since last change */
 	int		hostlen ;
 	int		f_up ;		/* UP-DOWN status */
+    } ; /* end struct (pingstatdb_rechead) */
+    struct pingstatdb_rec : pingstatdb_rechead {
+	pingstatdb_rec() noex ;
+	destruct pingstatdb_rec() noex {
+	    if (cdp || pdp || hostbuf) dtor() ;
+	} ;
+	int init() noex ;
+	int fini() noex ;
+	void dtor() noex ;
     } ; /* end struct (pingstatdb_rec) */
 } /* end export */
 
 export {
-    int record_start(PSD_REC *,timeb *,cchar *,uint,cchar *,dater *) noex ;
-    int record_startbuf(PSD_REC *,timeb *,cchar *,uint,cchar *,int) noex ;
+    int record_start(PSD_REC *,timeb *,cchar *,uint,cchar *) noex ;
+    int record_load(PSD_REC *,uint,cchar *,int) noex ;
     int record_update(PSD_REC *,bfile *,dater *,int) noex ;
     int record_write(PSD_REC *,bfile *,dater *,dater *,int,int) noex ;
     int record_finish(PSD_REC *) noex ;
