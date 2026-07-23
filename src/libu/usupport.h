@@ -13,25 +13,24 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<time.h>		/* |time_t| */
-#include	<stddef.h>
-#include	<stdlib.h>
-#include	<stdint.h>
-#include	<string.h>		/* |memset(3c)| + |memcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usys.h>		/* <- auxillary OS support */
-#include	<utimeout.h>
-#include	<ulogerror.h>
-#include	<usysutility.hh>
-#include	<timecount.hh>
-#include	<filetypes.h>
-#include	<aflag.hh>
-#include	<stdintx.h>
-#include	<intx.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<stdint.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usys.h>		/* LIBU <- auxillary OS support */
+#include	<utimeout.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<usysutility.hh>	/* LIBU */
+#include	<timecount.hh>		/* LIBU */
+#include	<filetypes.h>		/* LIBU */
+#include	<aflag.hh>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<intx.h>		/* LIBU */
 
-#include	<vstrorders.h>
+#include	<vstrorders.h>		/* LIBU */
 
 #include	<usupport_ctdec.hh>
 #include	<usupport_cfdec.hh>
