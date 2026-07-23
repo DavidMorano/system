@@ -1,6 +1,6 @@
 /* snwcpyopaque SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* special (excellent) string-copy type of subroutine! */
 /* version %I% last-modified %G% */
