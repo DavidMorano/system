@@ -106,8 +106,7 @@ int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine-template (sncpyxc) */
+} /* end subroutine-template (sncpyxc) */
 
 
 /* local variables */
