@@ -34,12 +34,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* types? */
-#include	<fcntl.h>		/* types? */
-#include	<stddef.h>		/* |nullptr_t| */
-#include	<stdlib.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<unistd.h>		/* POSIX® types? */
+#include	<fcntl.h>		/* POSIX® types? */
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	<uccloseonexec.h>
 #include	<ucfminmod.h>
