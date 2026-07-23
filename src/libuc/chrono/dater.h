@@ -80,7 +80,7 @@ struct dater_head {
 	TIMEB		cb ;		/* current */
 	TIMEB		b ;
 	DATER_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		znamelen ;	/* public variable */
 	short		cyear ;		/* current */
 } ; /* end struct */
@@ -110,13 +110,13 @@ struct dater : dater_head {
 	dater_co	finish ;
 	dater() noex {
 	    finish(this,datermem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	    zname = nullptr ;
 	    cname = nullptr ;
 	} ; /* end ctor */
 	dater(const dater &) = delete ;
 	dater &operator = (const dater &) = delete ;
-	int start	(TIMEB *,cchar *,int) noex ;
+	int start	(TIMEB *,cchar *,int = -1) noex ;
 	int startcopy	(dater *) noex ;
 	int setcopy	(dater *) noex ;
 	int setstd	(cchar *,int) noex ;
@@ -151,7 +151,7 @@ struct dater : dater_head {
 	int getbbtime	(cchar *,int,time_t *) noex ;
 	void dtor() noex ;
 	destruct dater() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (dater) */
 #else	/* __cplusplus */
