@@ -102,7 +102,6 @@ int snaddslash(char *rbuf,int rlen,int rl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (snaddslash) */
+} /* end subroutine (snaddslash) */
 
 
