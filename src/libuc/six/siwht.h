@@ -1,6 +1,6 @@
 /* siwht HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* find a character or white-space */
 /* version %I% last-modified %G% */
