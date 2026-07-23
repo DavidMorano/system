@@ -79,7 +79,8 @@ module ;
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
-#include	<vecitem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
 #include	<timestr.h>		/* LIBUC */
 #include	<ismisc.h>		/* LIBUC */
@@ -95,6 +96,7 @@ module ;
 module pingstatdb_com ;
 
 import libutil ;			/* |lenstr(3u)| */
+import pingstatdb_rec ;
 
 /* local defines */
 
@@ -113,7 +115,9 @@ import libutil ;			/* |lenstr(3u)| */
 #define	RF_LEAD1	(RF_UPSTAT + 4)
 #define	RF_LEAD		(RF_LEAD0 + RF_LEAD1)
 
-#define	BUFLEN		(RF_LEAD + MAXHOSTNAMELEN + 3)
+#define	DTR		dater
+
+#define	RLENMULT	2		/* HostNameLen multiplier */
 
 #define	TO_LOCK		30		/* seconds */
 #define	TO_MINUPDATE	3		/* minimum time between updates */
@@ -147,17 +151,148 @@ using libuc::mem ;			/* variable */
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int	hostnamelen ;
+	int	rlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 
 /* forward references */
 
 
 /* local variables */
 
+static vars		var ;
+
 
 /* exported variables */
 
-int pingstatdb_updrec(PSB *op,time_t dt,dater *dp,
-		cchar *hostname,int f_up,time_t timestamp) noex {
+int pingstatdb_cominit(PSD *op) noex {
+    	int		rs = SR_BUGCHECK ;
+	if (op) {
+    	    static cint rsv = var ;
+	    rs = rsv ;
+	} /* end if (non-null) */
+    	return rs ;
+} /* end subroutine */
+
+int pingstatdb_comfini(PSD *op) noex {
+    	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+    	return rs ;
+} /* end subroutine */
+
+int pingstatdb_checkcache(PSD *op) noex {
+	int		rs ;
+	bool		f_cached = op->fl.cached ;
+	DEBUGPRINTF("ent f_cached=%d\n", f_cached) ;
+	if (ustat sb ; (rs = bcontrol(op->pfp,BC_STAT,&sb)) >= 0) {
+	    if (f_cached) {
+	        if (sb.st_mtime > op->mtime) {
+	            f_cached = false ;
+	            pingstatdb_fes(op) ;
+	        }
+	    } /* end if */
+	    if (! f_cached) {
+	        if ((rs = pingstatdb_readrecs(op)) >= 0) {
+	            op->mtime = sb.st_mtime ;
+	            op->fl.cached = true ;
+	        }
+	    } else {
+	        rs = vechand_count(op->rlp) ;
+	    }
+	} /* end if (bcontrol) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end subroutine (pingstatdb_checkcache) */
+
+local int pingstatdb_readrecln(PSD *op,uint roff,cchar *rbuf,int rl) noex {
+    	vechand		*rlp = op->rlp ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
+    	int		rs ;
+	int		c = 0 ; /* return-value */
+	if (PSD_REC *rep = new(nt) PSD_REC ; rep) {
+	    timeb	*nowp = op->nowp ;
+	    cchar	*zn = op->znbuf ;
+	    if ((rs = record_start(rep,nowp,zn,roff,np)) >= 0) {
+	        if ((rs = record_load(rep,roff,rbuf,rl)) >= 0) {
+	            c += 1 ;
+	            rs = rlp->add(rep) ;
+	        } /* end if (record_load) */
+	        if (rs < 0) {
+		    record_finish(rep) ;
+	    	} /* end if (error) */
+	    } /* end if (record_start) */
+	    if (rs < 0) {
+		delete rep ;
+	    } /* end if (error) */
+	} /* end if (new-pingstatdb_rec) */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (pingstatdb_readrecln) */
+
+int pingstatdb_readrecs(PSD *op) noex {
+    	cint		rsz = var.rlen ;
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
+	if (char *rbuf ; (rs = mem.mall(rsz,&rbuf)) >= 0) {
+	    cint rlen = rs ;
+	    if ((rs = brewind(op->pfp)) >= 0) {
+	        uint	roff = 0 ;
+	        int	line = 1 ;
+	        int	f_eol ;
+	        int	f_bol = true ;
+	        while ((rs = breadln(op->pfp,rbuf,rlen)) > 0) {
+	            cint len = rs ;
+	            cint rl = (rs - 1) ;
+	            f_eol = (rbuf[rl] == '\n') ;
+	            rbuf[rl] = '\0' ;
+	            if (f_bol && (rl > RF_LEAD)) {
+		        DEBUGPRINTF("line=%u\n",line) ;
+		        rs = pingstatdb_readrecln(op,roff,rbuf,rl) ;
+		        c += rs ;
+	            } /* end if (a live one) */
+	            roff += len ;
+	            line += 1 ;
+	            f_bol = f_eol ;
+	            if (rs < 0) break ;
+	        } /* end while (reading file records) */
+	    } /* end if (brewind) */
+	    rs1 = mem.free(rbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (pingstatdb_readrecs) */
+
+int pingstatdb_fes(PSD *op) noex {
+	vechand		*rlp = op->rlp ;
+	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	void *vp ;
+	for (int i = 0 ; (rs1 = rlp->get(i,&vp)) >= 0 ; i += 1) {
+	    if (PSD_REC *rep = resumelife<PSD_REC>(vp) ; rep) {
+	        record_finish(rep) ;
+	        vechand_del(op->rlp,i) ;
+		delete rep ;
+	    }
+	} /* end for */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end subroutine (pingstatdb_fes) */
+
+#ifdef	COMMENT
+int pingstatdb_recupd(PSD *op,time_t dt,DTR *dp,
+		cchar *hn,int f_up,time_t ts) noex {
 	PSD_REC	*rp ;
 	off_t	boff ;
 	int		rs ;
@@ -165,13 +300,13 @@ int pingstatdb_updrec(PSB *op,time_t dt,dater *dp,
 
 	{
 	    char	timebuf[TIMEBUFLEN+1] ;
-	    DEBUGPRINTF("hostname=%s\n",hostname) ;
+	    DEBUGPRINTF("hn=%s\n",hn) ;
 	    DEBUGPRINTF("f_up=%u\n",f_up) ;
-	    DEBUGPRINTF("timestamp=%s\n",
-	        timestr_logz(timestamp,timebuf)) ;
+	    DEBUGPRINTF("ts=%s\n",
+	        timestr_logz(ts,timebuf)) ;
 	}
 
-	if ((rs = pingstatdb_getrec(op,hostname,&rp)) >= 0) {
+	if ((rs = pingstatdb_recget(op,hn,&rp)) >= 0) {
 	    time_t	ptime ;
 	    int		f_greater = (! LEQUIV(f_up,rp->f_up)) ;
 
@@ -179,12 +314,12 @@ int pingstatdb_updrec(PSB *op,time_t dt,dater *dp,
 
 	    rs = dater_gettime(&rp->pdate,&ptime) ;
 
-	    f_greater = ((rs >= 0) && (timestamp > ptime)) ;
+	    f_greater = ((rs >= 0) && (ts > ptime)) ;
 
-	    if (ptime > timestamp)
-	        timestamp = ptime ;
+	    if (ptime > ts)
+	        ts = ptime ;
 
-	    dater_settimezn(dp,timestamp,op->zname,-1) ;
+	    dater_settimezn(dp,ts,op->znbuf,-1) ;
 
 	    {
 	        char	timebuf[TIMEBUFLEN + 1] ;
@@ -199,7 +334,7 @@ int pingstatdb_updrec(PSB *op,time_t dt,dater *dp,
 	        bseek(op->pfp,boff,SEEK_SET) ;
 
 	        rs = record_update(rp,op->pfp,dp,f_up) ;
-	        DEBUGPRINTF("record_updrec() rs=%d\n",rs) ;
+	        DEBUGPRINTF("record_recupd() rs=%d\n",rs) ;
 	    } /* end if (did the update) */
 
 	} else if (rs == SR_NOTFOUND) {
@@ -209,11 +344,10 @@ int pingstatdb_updrec(PSB *op,time_t dt,dater *dp,
 	    int		f_rec = false ;
 
 	    DEBUGPRINTF("no match found rs=%d\n",rs) ;
-	    DEBUGPRINTF("zname=%s\n",op->zname) ;
-	    if ((rs = dater_settimezn(dp,timestamp,op->zname,-1)) >= 0) {
-		TIMEB	*nowp = &op->now ;
-		cchar	*zn = op->zname ;
-		cchar	*hn = hostname ;
+	    DEBUGPRINTF("zname=%s\n",op->znbuf) ;
+	    if ((rs = dater_settimezn(dp,ts,op->znbuf,-1)) >= 0) {
+		timeb	*nowp = op->nowp ;
+		cchar	*zn = op->znbuf ;
 
 	        f_changed = true ;
 	        bseek(op->pfp,0L,SEEK_END) ;
@@ -225,21 +359,17 @@ int pingstatdb_updrec(PSB *op,time_t dt,dater *dp,
 	            f_rec = true ;
 		}
 
-	        DEBUGPRINTF("record_start() rs=%d hn=%s\n",
-	            rs,hostname) ;
+	        DEBUGPRINTF("record_start() rs=%d hn=%s\n",rs,hn) ;
 
 	    } /* end if */
 
 	    if (rs >= 0) {
 	        rs = record_update(&r,op->pfp,dp,f_up) ;
-
-	        DEBUGPRINTF("record_update() rs=%d\n",
-	            rs) ;
-
+	        DEBUGPRINTF("record_update() rs=%d\n", rs) ;
 	    } /* end if */
 
 	    if (rs >= 0) {
-	        rs = vecitem_add(op->elp,&r,sz) ;
+	        rs = vechand_add(op->rlp,&r,sz) ;
 	    }
 
 	    if ((rs < 0) && f_rec) {
@@ -248,18 +378,39 @@ int pingstatdb_updrec(PSB *op,time_t dt,dater *dp,
 	} /* end if (target entry) */
 	DEBUGPRINTF("ret rs=%d f_changed=%u\n", rs,f_changed) ;
 	return (rs >= 0) ? f_changed : rs ;
-} /* end subroutine (pingstatdb_updrec) */
+} /* end subroutine (pingstatdb_recupd) */
+#endif /* COMMENT */
 
-int pingstatdb_getrec(PSD *op,cchar *hostname,PSD_REC **rpp) noex {
-    	vecitem *elp = op->elp ;
-	int		rs ;
-	int		i ; /* return-value */
-	void *vp ;
-	for (i = 0 ; (rs = elp->get(i,&vp)) >= 0 ; i += 1) {
-	    if (vp == nullptr) continue ;
-	    if (strcmp(hostname,(*rpp)->hostname) == 0) break ;
-	} /* end for */
+local bool ishostmat(cc *h1,cc *h2) noex {
+    	return (strcmp(h1,h2) == 0) ;
+} /* end subroutine (ishostmat) */
+
+int pingstatdb_recget(PSD *op,cchar *hn,PSD_REC **rpp) noex {
+	int		rs = SR_BUGCHECK ;
+	int		i = 0 ; /* return-value */
+	if (op && hn && rpp) {
+    	    vechand	*rlp = op->rlp ;
+	    rs = SR_OK ;
+	    void *vp ;
+	    for (i = 0 ; (rs = rlp->get(i,&vp)) >= 0 ; i += 1) {
+	        if (PSD_REC *rep = resumelife<PSD_REC>(vp) ; rep) {
+	            if (ishostmat(hn,rep->hostbuf)) {
+		        *rpp = rep ;
+		        break ;
+		    } /* end if (ishostmat) */
+	        }
+	    } /* end for */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-} /* end subroutine (pingstatdb_getrecord) */
+} /* end subroutine (pingstatdb_get) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
+	    hostnamelen = rs ;
+	    rlen = (rs * RLENMULT) ;
+	} /* end if (bufsizeget) */
+	return rs ;
+} /* end method (vars::operator) */
 
 
