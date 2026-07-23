@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uconcepts.hh>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
 
 #include	<sncpyxc.h>
 #include	<sncpyxw.h>
