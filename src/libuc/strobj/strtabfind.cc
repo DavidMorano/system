@@ -49,7 +49,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -118,7 +118,7 @@ int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex {
             for (j = 0 ; (j < nmax) && ((si = it[hi][0]) > 0) ; j += 1) {
 	        f_mathash = ((it[hi][1] & INT_MAX) == chash) ;
 	        if (f_mathash) break ;
-	        if ((it[hi][1] & (~ INT_MAX)) == 0) {
+	        if ((it[hi][1] & (compl INT_MAX)) == 0) {
 		    break ;
 	        }
 	        nhash = hash_again(nhash,j,nskip) ;
@@ -139,8 +139,7 @@ int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex {
 	    if (! f_mat) rs = SR_NOTFOUND ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? sc : rs ;
-}
-/* end subroutine (strtabfind) */
+} /* end subroutine (strtabfind) */
 
 
 /* local subroutines */
