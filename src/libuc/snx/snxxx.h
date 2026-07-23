@@ -20,24 +20,24 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int snsds(char *,int,cchar *,cchar *) noex ;
-extern int snscs(char *,int,cchar *,cchar *) noex ;
-extern int snses(char *,int,cchar *,cchar *) noex ;
-extern int snsdd(char *,int,cchar *,uint) noex ;
-extern int snddd(char *,int,uint,uint) noex ;
-extern int snsd(char *,int,cchar *,uint) noex ;
-extern int snchrs(char *,int,int,int) noex ;
+extern int snsds	(char *,int,cchar *,cchar *) noex ;
+extern int snscs	(char *,int,cchar *,cchar *) noex ;
+extern int snses	(char *,int,cchar *,cchar *) noex ;
+extern int snsdd	(char *,int,cchar *,uint) noex ;
+extern int snddd	(char *,int,uint,uint) noex ;
+extern int snsd		(char *,int,cchar *,uint) noex ;
+extern int snchrs	(char *,int,int,int) noex ;
 
-static inline int snchr(char *dp,int dl,int ch) noex {
+local inline int snchr(char *dp,int dl,int ch) noex {
     return snchrs(dp,dl,ch,1) ;
 }
-static inline int snblanks(char *dp,int dl,int n) noex {
+local inline int snblanks(char *dp,int dl,int n) noex {
     return snchrs(dp,dl,' ',n) ;
 }
 
