@@ -498,9 +498,11 @@ local int entry_finish(UCPD_ENT *ep) noex {
 
 local int entry_reload(UCPD_ENT *ep,cc *vp,int vl,int ttl) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	if (ep->vp) {
 	    void *p = voidp(ep->vp) ;
-	    rs = libmem.free(p) ;
+	    rs1 = libmem.free(p) ;
+	    if (rs >= 0) rs = rs1 ;
 	    ep->vp = nullptr ;
 	} /* end if (memory-release) */
 	if (rs >= 0) {
