@@ -80,7 +80,7 @@
 
 /* forward references */
 
-static inline bool	ischarok(int) noex ;
+local inline bool	ischarok(int) noex ;
 
 
 /* local variables */
@@ -114,17 +114,15 @@ int snclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    dbuf[dl] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (snclean) */
+} /* end subroutine (snclean) */
 
 
 /* local subroutines */
 
-static bool ischarok(int ch) noex {
+local bool ischarok(int ch) noex {
     	bool	f = isprintlatin(ch) ;
 	f = f || (ch == '\t') || (ch == '\n') ;
 	return f ;
-}
-/* end subroutine (ischarok) */
+} /* end subroutine (ischarok) */
 
 
