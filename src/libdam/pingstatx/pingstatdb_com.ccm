@@ -69,6 +69,7 @@ module ;
 export module pingstatdb_com ;
 
 import libutil ;			/* |lenstr(3u)| */
+import pingstatdb_rec ;
 
 /* local defines */
 
@@ -110,8 +111,13 @@ export {
 } /* end export */
 
 export {
-    int pingstatdb_updrec(PSB *,time_t,dater *,cchar *,int,time_t) noex ;
-    int pingstatdb_getrec(PSD *,cchar *,PSD_REC **) noex ;
+    int pingstatdb_cominit	(PSD *) noex ;
+    int pingstatdb_comfini	(PSD *) noex ;
+    int pingstatdb_checkcache	(PSD *) noex ;
+    int pingstatdb_readrecs	(PSD *) noex ;
+    int pingstatdb_fes		(PSD *) noex ;
+    int pingstatdb_recupd	(PSD *,time_t,dater *,cchar *,int,time_t) noex ;
+    int pingstatdb_recget	(PSD *,cchar *,PSD_REC **) noex ;
 } /* end export */
 
 
