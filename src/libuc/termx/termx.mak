@@ -45,7 +45,7 @@ OBJ1= termcmd.o
 OBJ2= termconseq.o
 OBJ3= termdevice.o
 OBJ4= termescseq.o
-OBJ5= termios.o
+OBJ5= termios_cf.o
 OBJ6= termstr.o
 OBJ7= termtypemat.o
 
@@ -56,8 +56,7 @@ OBJ= obja.o objb.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -100,11 +99,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -156,7 +155,7 @@ termcmd.o:		termcmd.cc	termcmd.h		$(INCS)
 termconseq.o:		termconseq.cc	termconseq.h		$(INCS)
 termdevice.o:		termdevice.cc	termdevice.h		$(INCS)
 termescseq.o:		termescseq.cc	termescseq.h		$(INCS)
-termios.o:		termios.cc	termios_cf.h		$(INCS)
+termios_cf.o:		termios_cf.cc	termios_cf.h		$(INCS)
 termstr.o:		termstr.cc	termstr.h		$(INCS)
 termtypemat.o:		termtypemat.cc	termtypemat.h		$(INCS)
 
