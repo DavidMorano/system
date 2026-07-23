@@ -192,8 +192,8 @@ siwht.o:		siwht0.o siwht1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 # module primary
-siwht0.o:		siwht.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+siwht0.o:		siwht.ccm	siwht.h		$(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
 siwht1.o:		siwht1.cc siwht0.o strn.o	$(INCS)
@@ -205,6 +205,5 @@ strn.dir:
 	makesubdir $@
 
 substring.o:		substring.cc	substring.h	$(INCS)
-
 
 
