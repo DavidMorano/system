@@ -105,8 +105,7 @@ int strop_start(strop *sop,cchar *sp,int µsl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strop_start) */
+} /* end subroutine (strop_start) */
 
 int strop_finish(strop *sop) noex {
 	int		rs = SR_FAULT ;
@@ -116,8 +115,7 @@ int strop_finish(strop *sop) noex {
 	    sop->sl = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (strop_finish) */
+} /* end subroutine (strop_finish) */
 
 int strop_shrink(strop *sop) noex {
     	int		rl ; /* return-value */
@@ -138,8 +136,7 @@ int strop_white(strop *sop) noex {
 	}
 	rl = sop->sl ;
 	return rl ;
-}
-/* end subroutine (strop_white) */
+} /* end subroutine (strop_white) */
 
 int strop_whitechr(strop *sop,int tch) noex {
     	int		rl = 0 ; /* return-value */
@@ -149,20 +146,17 @@ int strop_whitechr(strop *sop,int tch) noex {
 	}
 	rl = sop->sl ;
 	return rl ;
-}
-/* end subroutine (strop_whitechr) */
+} /* end subroutine (strop_whitechr) */
 
 int strop_fieldwht(strop *sop,cchar **rpp) noex {
     	cchar	wht[] = " \t\r\f\v" ;
     	return strop_fieldbrk(sop,wht,rpp) ;
-}
-/* end subroutine (strop_fieldwht) */
+} /* end subroutine (strop_fieldwht) */
 
 int strop_fieldchr(strop *sop,int sch,cchar **rpp) noex {
     	char	bstr[2] = { char(sch) } ;
 	return strop_fieldbrk(sop,bstr,rpp) ;
-}
-/* end subroutine (strop_fieldchr) */
+} /* end subroutine (strop_fieldchr) */
 
 int strop_fieldbrk(strop *sop,cchar *ss,cchar **rpp) noex {
     	cnullptr	np{} ;
@@ -196,8 +190,7 @@ int strop_fieldbrk(strop *sop,cchar *ss,cchar **rpp) noex {
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (strop_fieldbrk) */
+} /* end subroutine (strop_fieldbrk) */
 
 int strop_findchr(strop *sop,int tch) noex {
     	int		rl = 0 ; /* return-value */
@@ -218,8 +211,7 @@ int strop_findterm(strop *sop,cchar *terms) noex {
 	}
 	rl = sop->sl ;
 	return rl ;
-}
-/* end subroutine (strop_findterm) */
+} /* end subroutine (strop_findterm) */
 
 int strop_spanterm(strop *sop,cchar *terms) noex {
     	int		rl = 0 ; /* return-value */
@@ -229,8 +221,7 @@ int strop_spanterm(strop *sop,cchar *terms) noex {
 	}
 	rl = sop->sl ;
 	return rl ;
-}
-/* end subroutine (strop_spanterm) */
+} /* end subroutine (strop_spanterm) */
 
 int strop_span(strop *sop,cchar *ss) noex {
     	int		rl = 0 ; /* return-value */
@@ -240,8 +231,7 @@ int strop_span(strop *sop,cchar *ss) noex {
 	}
 	rl = sop->sl ;
 	return rl ;
-}
-/* end subroutine (strop_span) */
+} /* end subroutine (strop_span) */
 
 
 /* local subroutines */
