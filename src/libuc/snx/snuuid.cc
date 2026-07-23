@@ -55,15 +55,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UINT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>		/* |uint64_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sbuf.h>
-#include	<mkuuid.h>		/* |uuid_dat| below */
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<climits>		/* CSTD |UINT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<mkuuid.h>		/* LIBUC |uuid_dat| below */
+#include	<localmisc.h>		/* LIBNU |DIGBUFLEN| */
 
 #include	"snx.h"
 
@@ -102,14 +101,14 @@ int snuuid(char *dbuf,int dlen,uuid_dat *up) noex {
 	int		len = 0 ;
 	if (dbuf && up) ylikely {
 	    if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) ylikely {
-	        uint64_t	v = (up->time & UINT_MAX) ;
-	        if (rs >= 0) rs = b.hexp(v,4) ;
+	        ulonglong v = (up->time & UINT_MAX) ;
+	        if (rs >= 0) rs = b.hexp(4,v) ;
 	        if (rs >= 0) rs = b.chr('-') ;
 	        v = ((up->time >> 32) & UINT_MAX) ;
-	        if (rs >= 0) rs = b.hexp(v,2) ;
+	        if (rs >= 0) rs = b.hexp(2,v) ;
 	        if (rs >= 0) rs = b.chr('-') ;
 	        if (rs >= 0) ylikely {
-		    uint64_t	tv ;
+		    ulong tv ;
 		    v = 0 ;
 		    tv = ((up->time >> 48) & UINT_MAX) ;
 		    v |= (tv & UCHAR_MAX) ;
@@ -117,22 +116,21 @@ int snuuid(char *dbuf,int dlen,uuid_dat *up) noex {
 		    v |= (tv << 8) ;
 		    tv = ((up->time >> 48) & UINT_MAX) ;
 		    v |= (tv << (8+4)) ;
-	            rs = b.hexp(v,2) ;
+	            rs = b.hexp(2,v) ;
 	        } /* end if (ok) */
 	        if (rs >= 0) rs = b.chr('-') ;
 	        v = (up->clk & UINT_MAX) ;
 	        v &= (~ (3 << 14)) ;
 	        v |= (2 << 14) ;		/* standardized variant */
-	        if (rs >= 0) rs = b.hexp(v,2) ;
+	        if (rs >= 0) rs = b.hexp(2,v) ;
 	        if (rs >= 0) rs = b.chr('-') ;
 	        v = up->node ;
-	        if (rs >= 0) rs = b.hexp(v,6) ;
+	        if (rs >= 0) rs = b.hexp(6,v) ;
 	        len = b.finish ;
 	        if (rs >= 0) rs = len ;
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (snuuid) */
+} /* end subroutine (snuuid) */
 
 
