@@ -38,5 +38,6 @@ export import :strlen ;
 export import :strxspn ;
 export import :strcmp ;
 export import :getbyte ;
+export import :operators ;
 
 
