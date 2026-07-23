@@ -6,8 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* non-switchable debug print-outs */
-#define	CF_CREATE	0		/* always create the file? */
-#define	CF_UNLOCK	1		/* always unlock after an operation */
 
 /* revision history:
 
@@ -83,7 +81,12 @@ module ;
 #include	<vecitem.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
 #include	<timestr.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
 #include	<ismisc.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 #include	<bfile.h>		/* LIBB */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
@@ -96,7 +99,7 @@ module ;
 module pingstatdb_rec ;
 
 import libutil ;			/* |lenstr(3u)| */
-import pingstatdb_com ;
+import sif ;
 
 /* local defines */
 
@@ -125,12 +128,8 @@ import pingstatdb_com ;
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #endif
-#ifndef	CF_CREATE
-#define	CF_CREATE	0		/* always create the file? */
-#endif
-#ifndef	CF_UNLOCK
-#define	CF_UNLOCK	1		/* always unlock after an operation */
-#endif
+
+#define	TOUC(ch)		CHAR_TOUC(ch)
 
 
 /* imported namespaces */
@@ -139,6 +138,8 @@ using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
+
+typedef pingstatdb_rec	record ;
 
 
 /* external subroutines */
@@ -154,65 +155,55 @@ using libuc::mem ;			/* variable */
 
 template<typename ... Args>
 local inline int record_ctor(record *op,Args ... args) noex {
-    	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = SR_NOMEM ;
-	    memclear(ep) ;
-	    if (ep->cdp = new(nt) dater ; op->cdp) {
-	        if (ep->pdp = new(nt) dater ; op->pdp) {
-		    rs = SR_OK ;
-	        } /* end if (new-dater) */
-	        if (rs < 0) {
-		    delete op->cdp ;
-		    op->cdp = nullptr ;
-		} /* end if (error) */
-	    } /* end if (new-dater) */
+	    rs = op->init() ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (record_ctor) */
 
 local int record_dtor(record *op) noex {
 	int		rs = SR_OK ;
-	if (op->pdp) ylikely {
-	    delete op->pdp ;
-	    op->pdp = nullptr ;
-	}
-	if (op->cdp) ylikely {
-	    delete op->cdp ;
-	    op->cdp = nullptr ;
-	}
+	if (op) ylikely {
+	    rs = op->fini() ;
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (record_dtor) */
 
 
+/* local variables */
+
+cbool		f_debug		= CF_DEBUG ;
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-int record_start(PSD_RED *ep,timeb *nowp,cc *zn,uint roff,
-		cc *hn,dater *dp) noex {
+int record_start(PSD_REC *ep,timeb *nowp,cc *zn,uint roff,cc *hn) noex {
 	int		rs = SR_OK ;
-	int		hl ;
 	DEBUGPRINTF("ent hn=%s\n",hn) ;
-	if ((rs = record_ctor(ep,nowp,zn,hn,dp)) >= ) ylikely {
-	    dater *cdp = op->cdp ;
+	if ((rs = record_ctor(ep,nowp,zn,hn)) >= 0) ylikely {
+	    dater *cdp = ep->cdp ;
 	    ep->roff	= roff ;
 	    ep->cnt	= 1 ;
 	    ep->f_up	= false ;
-	    if ((rs = cdp->startcopy(dp)) >= 0) {
-	        if ((rs = pdp->startcopy(dp)) >= 0) {
-	            hl = lenstr(hn) ;
-	            ep->hostlen = hl ;
-	            if (char *cp ; (rs = mem.strw(hn,hl,&cp)) >= 0) {
-		        ep->hostname = cp ;
-		    }
+	    if ((rs = cdp->start(nowp,zn)) >= 0) ylikely {
+		dater *pdp = ep->pdp ;
+	        if ((rs = pdp->start(nowp,zn)) >= 0) ylikely {
+	            if (cchar *cp ; (rs = mem.strw(hn,-1,&cp)) >= 0) ylikely {
+		        ep->hostbuf = cp ;
+			ep->hostlen = rs ;
+		    } /* end if (memory-acquire) */
 	            if (rs < 0) {
 	                pdp->finish() ;
 		    } /* end if (error) */
-	        } /* end if (dater_startcopy) */
+	        } /* end if (dater_start) */
 	        if (rs < 0) {
 	            cdp->finish() ;
 	        } /* end if (error) */
-	    } /* end if (dater_startcopy) */
+	    } /* end if (dater_start) */
 	    if (rs < 0) {
 	        record_dtor(ep) ;
 	    } /* end if (error) */
@@ -224,19 +215,19 @@ int record_start(PSD_RED *ep,timeb *nowp,cc *zn,uint roff,
 int record_finish(PSD_REC *ep) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (ep) {
+	if (ep) ylikely {
 	    rs = SR_OK ;
-	    if (ep->hostname) {
-	        voidp vp = voidp(ep->hostname) ;
+	    if (ep->hostbuf) {
+	        voidp vp = voidp(ep->hostbuf) ;
 	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
-	        ep->hostname = nullptr ;
+	        ep->hostbuf = nullptr ;
 	    } /* end if (memory-release) */
-	    if (dater *pdp = ep->pfp ; pdp) {
+	    if (dater *pdp = ep->pdp ; pdp) {
 	        rs1 = pdp->finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (dater *cdp = ep->cfp ; cdp) {
+	    if (dater *cdp = ep->cdp ; cdp) {
 	        rs1 = cdp->finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -248,191 +239,247 @@ int record_finish(PSD_REC *ep) noex {
 	return rs ;
 } /* end subroutine (record_finish) */
 
-int record_startbuf(PSD_REC *ep,time *nowp,cc *zname,uint roff,
-		char *buf,int buflen) noex {
-	int		rs ;
-	int		bl = buflen ;
-	cchar	*bp = buf ;
+namespace {
+    struct loader {
+	PSD_REC		*rep ;		/* caller-supplied */
+	ccharp		srcp ;		/* caller-supplied */
+	int		srcl ;		/* caller-supplied */
+	loader(PSD_REC *o,ccp p,int l) noex : rep(o) {
+	    srcp = p ;
+	    srcl = l ;
+	} ; /* end ctor */
+	operator int () noex ;
+	int loadcnt	(cchar *,int) noex ;
+	int loadcdate	(cchar *,int) noex ;
+	int loadpdate	(cchar *,int) noex ;
+	int loadstat	(cchar *,int) noex ;
+	int loadhn	(cchar *,int) noex ;
+    } ; /* end struct (loader) */
+} /* end namespace */
 
-	if (ep == nullptr) return SR_FAULT ;
-	if (zname == nullptr) return SR_FAULT ;
-	if (buf == nullptr) return SR_FAULT ;
-
-	DEBUGPRINTF("name=%s\n",hostname) ;
-
-	rs = dater_start(ep->cdp,nowp,zname,-1) ;
-	if (rs < 0)
-	    goto bad0 ;
-
-	rs = dater_start(ep->pdp,nowp,zname,-1) ;
-	if (rs < 0)
-	    goto bad1 ;
-
-	DEBUGPRINTF("3 name=%s\n",hostname) ;
-
-	ep->roff = roff ;
-	ep->len = buflen ;
-	rs = cfdeci(bp,RF_NUMDIGITS,&ep->cnt) ;
-	if (rs < 0)
-	    goto bad2 ;
-
-	bp += (RF_NUMDIGITS + 1) ;
-	bl -= (RF_NUMDIGITS + 1) ;
-	rs = dater_setlogz(ep->cdp,bp,bl) ;
-	if (rs < 0)
-	    goto bad2 ;
-
-	bp += (RF_LOGZLEN + 1) ;
-	bl -= (RF_LOGZLEN + 1) ;
-	rs = dater_setlogz(ep->pdp,bp,bl) ;
-	if (rs < 0)
-	    goto bad2 ;
-
-	bp += (RF_LOGZLEN + 1) ;
-	bl -= (RF_LOGZLEN + 1) ;
-	if (bl <= 0) {
-	    rs = SR_INVALID ;
-	    goto bad2 ;
-	}
-
-	DEBUGPRINTF("4 name=%s\n",hostname) ;
-	ep->f_up = (toupper(*bp) == 'U') ;
-
-	bp += (RF_UPSTAT + 1) ;
-	bl -= (RF_UPSTAT + 1) ;
-	if (bl <= 0) {
-	    rs = SR_INVALID ;
-	    goto bad2 ;
-	}
-
-#if	CF_DEBUG
-	DEBUGPRINTF("4a name=%s\n",hostname) ;
-	DEBUGPRINTF("bl=%u ext_name=%r\n",bl,bp,bl) ;
-#endif
-
-	ep->hostlen = bl ;
-	rs = uc_mallocstrw(bp,bl,&ep->hostname) ;
-	if (rs < 0)
-	    goto bad2 ;
-
-	DEBUGPRINTF("5 name=%s\n",hostname) ;
-ret0:
+int record_load(PSD_REC *rep,uint roff,cchar *sp,int sl) noex {
+	int		rs = SR_BUGCHECK ;
+	DEBUGPRINTF("ent\n") ;
+	if (rep && sp) ylikely {
+	    if (loader lo(rep,sp,sl) ; (rs = lo) >= 0) {
+		rep->roff = roff ;
+		rep->len = sl ;
+	    } /* end if (loader) */
+	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
+} /* end subroutine (record_load) */
 
-/* bad stuff */
-bad2:
-	dater_finish(ep->pdp) ;
+loader::operator int () noex {
+    	sif		so(srcp,srcl) ;
+    	int		rs = SR_OK ;
+	cchar *cp ;
+	for (int cl, i = 0 ; (cl = so(&cp)) > 0 ; i += 1) {
+	    switch (i) {
+	    case 0:
+		rs = loadcnt(cp,cl) ;
+		break ;
+	    case 1:
+		rs = loadcdate(cp,cl) ;
+		break ;
+	    case 2:
+		rs = loadpdate(cp,cl) ;
+		break ;
+	    case 3:
+		rs = loadstat(cp,cl) ;
+		break ;
+	    case 4:
+		rs = loadhn(cp,cl) ;
+		break ;
+	    } /* end switch */
+	    if (rs < 0) break ;
+	} /* end for */
+	return rs ;
+} /* end method (loader::operator) */
 
-bad1:
-	dater_finish(ep->cdp) ;
+int loader::loadcnt(cchar *cp,int cl) noex {
+    	int		rs ;
+	if (int v ; (rs = cfdeci(cp,cl,&v)) >= 0) {
+	    rep->cnt = v ;
+	}
+	return rs ;
+} /* end method (loader::loadcnt) */
 
-bad0:
-	goto ret0 ;
-} /* end subroutine (record_startbuf) */
+int loader::loadcdate(cchar *cp,int cl) noex {
+    	return dater_setlogz(rep->cdp,cp,cl) ;
+} /* end method (loader::loadcdate) */
+
+int loader::loadpdate(cchar *cp,int cl) noex {
+    	return dater_setlogz(rep->pdp,cp,cl) ;
+} /* end method (loader::loadpdate) */
+
+int loader::loadstat(cchar *cp,int cl) noex {
+    	int		rs = SR_OK ;
+	for (int i = 0 ; i < cl ; i += 1) {
+	    switch (int ch = mkchar(cp[i]) ; ch) {
+	    case 'U':
+		rep->f_up = true ;
+		break ;
+	    case 'D':
+		rep->f_up = false ;
+		break ;
+	    } /* end switch */
+	} /* end for */
+    	return rs ;
+} /* end method (loader::loadstat) */
+
+int loader::loadhn(cchar *cp,int cl) noex {
+    	int		rs = SR_OK ;
+	cchar *hp ;
+	if (int hl = sfshrink(cp,cl,&hp) ; hl > 0) {
+	    if (cchar *ap ; (rs = mem.strw(hp,hl,&ap)) >= 0) {
+		rep->hostbuf = ap ;
+		rep->hostlen = rs ;
+	    } /* end if (memory-acquire) */
+	} /* end if */
+    	return rs ;
+} /* end method (loader::loadhn) */
 
 int record_update(PSD_REC *ep,bfile *fp,dater *dp,int f_up) noex {
-	int		rs = SR_OK ;
-	char		cdate[RF_LOGZLEN + 2] ;
-	char		pdate[RF_LOGZLEN + 2] ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	{
-	    char	timebuf[TIMEBUFLEN + 1] ;
-	    DEBUGPRINTF("ent, host=%s\n",ep->hostname) ;
-	    DEBUGPRINTF("cur_date=%s\n",
-	        timestr_log(dp->b.time,timebuf)) ;
-	}
-
-	if (! LEQUIV(ep->f_up,f_up)) {
-
-	    DEBUGPRINTF("changed status\n") ;
-	    ep->f_up = f_up ;
-	    ep->cnt = 1 ;
-	    dater_setcopy(ep->cdp,dp) ;
-
-	    {
+	int		rs = SR_BUGCHECK ;
+	DEBUGPRINTF("ent\n") ;
+	if (ep && fp && dp) {
+	    dater	*cdp = ep->cdp ;
+	    dater	*pdp = ep->pdp ;
+	    char	cdbuf[RF_LOGZLEN + 2] ;
+	    char	pdbuf[RF_LOGZLEN + 2] ;
+	    rs = SR_OK ;
+	    if_constexpr (f_debug) {
 	        char	timebuf[TIMEBUFLEN + 1] ;
-	        DEBUGPRINTF("status change cdate=%s\n",
-	            timestr_logz(ep->cdate.b.time,timebuf)) ;
+	        DEBUGPRINTF("host=%s\n",ep->hostbuf) ;
+	        DEBUGPRINTF("cur_date=%s\n",
+	            timestr_log(dp->b.time,timebuf)) ;
 	    }
-
-	} else {
-	    ep->cnt += 1 ;
-	}
-
-	{
-	    char	timebuf[TIMEBUFLEN + 1] ;
-	    DEBUGPRINTF("cdate=%s\n",
-	        timestr_logz(ep->cdate.b.time,timebuf)) ;
-	}
-
-	dater_mklogz(ep->cdp,cdate,(RF_LOGZLEN + 1)) ;
-
-	DEBUGPRINTF("cdate mklogz=%s\n",
-	    cdate) ;
-
-/* always update the last-update-date for the record */
-
-	dater_setcopy(ep->pdp,dp) ;
-
-	{
-	    char	timebuf[TIMEBUFLEN + 1] ;
-	    DEBUGPRINTF("pdate=%s\n",
-	        timestr_logz(ep->pdate.b.time,timebuf)) ;
-	}
-
-	dater_mklogz(ep->pdp,pdate,RF_LOGZLEN + 1) ;
-	{
-	    DEBUGPRINTF("pdate mklogz=%s\n",
-	        pdate) ;
-	}
-	rs = bprintf(fp,"%*d %-*s %-*s %c %s\n",
-	    RF_NUMDIGITS,ep->cnt,
-	    RF_LOGZLEN,cdate,
-	    RF_LOGZLEN,pdate,
-	    ((ep->f_up) ? 'U' : 'D'),
-	    ep->hostname) ;
-
+	    if (logdiffer(ep->f_up,f_up)) {
+	        DEBUGPRINTF("changed status\n") ;
+	        ep->f_up = f_up ;
+	        ep->cnt = 1 ;
+	        dater_setcopy(ep->cdp,dp) ;
+	        if_constexpr (f_debug) {
+	            char	timebuf[TIMEBUFLEN + 1] ;
+	            DEBUGPRINTF("status change cdbuf=%s\n",
+	                timestr_logz(cdp->b.time,timebuf)) ;
+	        }
+	    } else {
+	        ep->cnt += 1 ;
+	    }
+	    if_constexpr (f_debug) {
+	        char	timebuf[TIMEBUFLEN + 1] ;
+	        DEBUGPRINTF("cddate=%s\n",
+	            timestr_logz(cdp->b.time,timebuf)) ;
+	    }
+	    dater_mklogz(ep->cdp,cdbuf,(RF_LOGZLEN + 1)) ;
+	    DEBUGPRINTF("cdbuf mklogz=%s\n", cdbuf) ;
+	    /* always update the last-update-date for the record */
+	    dater_setcopy(ep->pdp,dp) ;
+	    if_constexpr (f_debug) {
+	        char	timebuf[TIMEBUFLEN + 1] ;
+	        DEBUGPRINTF("pdate=%s\n",
+	            timestr_logz(pdp->b.time,timebuf)) ;
+	    }
+	    dater_mklogz(ep->pdp,pdbuf,RF_LOGZLEN + 1) ;
+	    DEBUGPRINTF("pdbuf mklogz=%s\n", pdbuf) ;
+	    {
+		cchar *fmt = "%*d %-*s %-*s %c %s\n" ;
+		rs = bprintf(fp,fmt,
+	    	    RF_NUMDIGITS,ep->cnt,
+	    	    RF_LOGZLEN,cdbuf,
+	    	    RF_LOGZLEN,pdbuf,
+	    	    ((ep->f_up) ? 'U' : 'D'),
+	    	    ep->hostbuf) ;
+	    } /* end block */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (record_update) */
 
 int record_write(PSD_REC *ep,bfile *fp,dater *cp,dater *dp,
-		int count,int f_up) noex {
+		int cnt,int f_up) noex {
 	int		rs = SR_BUGCHECK ;
-	if (ep) ylikely {
-	char		cdate[RF_LOGZLEN + 2] ;
-	char		pdate[RF_LOGZLEN + 2] ;
-	{
-	    char	timebuf[TIMEBUFLEN + 1] ;
-	    DEBUGPRINTF("ent host=%s\n",ep->hostname) ;
-	    DEBUGPRINTF("count=%d\n",count) ;
-	    DEBUGPRINTF("cur_date=%s\n",
-	        timestr_log(dp->b.time,timebuf)) ;
-	}
-	ep->f_up = f_up ;
-	if (count != 0) {
-	    ep->cnt = count ;
-	} else {
-	    ep->cnt += 1 ;
-	}
-	/* the "change" date */
-	dater_setcopy(ep->cdp,cp) ;
-	dater_mklogz(ep->cdp,cdate,(RF_LOGZLEN + 1)) ;
-	/* always update the last-update-date for the record */
-	dater_setcopy(ep->pdp,dp) ;
-	dater_mklogz(ep->pdp,pdate,RF_LOGZLEN + 1) ;
-	/* pop it */
-	{
-	    cchar *fmt = "%*d %-*s %-*s %c %s\n" ;
-	    rs = bprintf(fp,fmt,
-	        RF_NUMDIGITS,ep->cnt,
-	        RF_LOGZLEN,cdate,
-	        RF_LOGZLEN,pdate,
-	        ((ep->f_up) ? 'U' : 'D'),
-	        ep->hostname) ;
-	} /* end block */
+	if (ep && fp && dp) ylikely {
+	    char	cdbuf[RF_LOGZLEN + 2] ;
+	    char	pdbuf[RF_LOGZLEN + 2] ;
+	    rs = SR_OK ;
+	    {
+	        char	timebuf[TIMEBUFLEN + 1] ;
+	        DEBUGPRINTF("ent host=%s\n",ep->hostbuf) ;
+	        DEBUGPRINTF("count=%d\n",cnt) ;
+	        DEBUGPRINTF("cur_date=%s\n",
+	            timestr_log(dp->b.time,timebuf)) ;
+	    }
+	    ep->f_up = f_up ;
+	    if (cnt != 0) {
+	        ep->cnt = cnt ;
+	    } else {
+	        ep->cnt += 1 ;
+	    }
+	    /* the "change" date */
+	    dater_setcopy(ep->cdp,cp) ;
+	    dater_mklogz(ep->cdp,cdbuf,(RF_LOGZLEN + 1)) ;
+	    /* always update the last-update-date for the record */
+	    dater_setcopy(ep->pdp,dp) ;
+	    dater_mklogz(ep->pdp,pdbuf,RF_LOGZLEN + 1) ;
+	    /* pop it */
+	    {
+	        cchar *fmt = "%*d %-*s %-*s %c %s\n" ;
+	        rs = bprintf(fp,fmt,
+	            RF_NUMDIGITS,ep->cnt,
+	            RF_LOGZLEN,cdbuf,
+	            RF_LOGZLEN,pdbuf,
+	            ((ep->f_up) ? 'U' : 'D'),
+	            ep->hostbuf) ;
+	    } /* end block */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (record_write) */
+
+
+/* private subroutines */
+
+pingstatdb_rec::pingstatdb_rec() noex {
+	hostbuf		= nullptr ;
+	cdp		= nullptr ;
+	pdp		= nullptr ;
+	roff		= 0 ;
+	len		= 0 ;
+	cnt		= 0 ;
+	hostlen		= 0 ;
+} /* end ctor (record) */
+
+void pingstatdb_rec::dtor() noex {
+    	(void) record_finish(this) ;
+} /* end method */
+
+int record::init() noex {
+    	cnothrow	nt{} ;
+    	int		rs = SR_NOMEM ;
+	if (cdp = new(nt) dater ; cdp) {
+	    if (pdp = new(nt) dater ; pdp) {
+		rs = SR_OK ;
+	    } /* end if (new-dater) */
+	    if (rs < 0) {
+		delete cdp ;
+		cdp = nullptr ;
+	    } /* end if (error) */
+	} /* end if (new-dater) */
+	return rs ;
+} /* end method (record::init) */
+
+int record::fini() noex {
+    	int		rs = SR_OK ;
+	if (pdp) {
+	    delete pdp ;
+	    pdp = nullptr ;
+	}
+	if (cdp) {
+	    delete cdp ;
+	    cdp = nullptr ;
+	}
+    	return rs ;
+} /* end method (record::fini) */
 
 
