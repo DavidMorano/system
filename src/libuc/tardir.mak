@@ -106,7 +106,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			objprime.o objpart.o objimpl.o
@@ -171,14 +171,14 @@ objimpl.o:		$(OBJIMPL)
 
 # module partitions
 tardir-prime.o:		tardir-prime.ccm		$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 tardir-vecent.o:	tardir-vecent.ccm		$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module primary
 tardir0.o:		tardir.ccm objpart.o		$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementations
 tardir1.o:		tardir1.cc tardir0.o		$(INCS)
