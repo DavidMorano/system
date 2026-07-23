@@ -61,8 +61,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |pid_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<storebuf.h>
@@ -119,7 +119,6 @@ int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *execfname) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (snshellunder) */
+} /* end subroutine (snshellunder) */
 
 
