@@ -20,15 +20,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int snabbrerr(char *,int,int) noex ;
-extern int snabbrsig(char *,int,int) noex ;
-extern int snabbrname(char *,int,cchar *,int) noex ;
+extern int snabbrerr	(char *,int,int) noex ;
+extern int snabbrsig	(char *,int,int) noex ;
+extern int snabbrname	(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 
