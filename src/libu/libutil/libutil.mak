@@ -53,7 +53,7 @@ OBJPART07= libutil-memload.o libutil-strcmp.o
 
 OBJPART08= libutil-getbyte.o
 OBJPART09= libutil-memnset.o
-OBJPART10=
+OBJPART10= libutil-operators.o
 OBJPART11=
 
 OBJPARTA= objpart00.o objpart01.o 
@@ -61,9 +61,10 @@ OBJPARTB= objpart02.o objpart03.o
 OBJPARTC= objpart04.o objpart05.o 
 OBJPARTD= objpart06.o objpart07.o
 OBJPARTE= objpart08.o objpart09.o
+OBJPARTF= objpart10.o
 
 OBJPART+= objparta.o objpartb.o objpartc.o objpartd.o
-OBJPART+= objparte.o
+OBJPART+= objparte.o objpartf.o
 
 OBJPRIME= libutil0.o
 
@@ -342,6 +343,9 @@ libutil-getbyte.o:	libutil-getbyte.ccm			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 libutil-memnset.o:	libutil-memnset.ccm			$(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
+libutil-operators.o:	libutil-operators.ccm			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
