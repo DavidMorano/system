@@ -111,7 +111,6 @@ int snaddx(char *rbuf,int rlen,int rl,int n,...) noex {
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (snaddx) */
+} /* end subroutine (snaddx) */
 
 
