@@ -53,16 +53,16 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<climits>		/* CSTD |CHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<new>			/* |nullptr_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<char.h>		/* |CHAR_ISWHT(3uc)| */
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |iswht(3uc)| */
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<char.h>		/* LIBYC |CHAR_ISWHT(3uc)| */
+#include	<ischarx.h>		/* LIBYC |iswht(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/strnwht.ccm"
 #pragma		GCC dependency		"mod/libutil.ccm"
@@ -75,7 +75,7 @@ import chrset ;
 
 /* local defines */
 
-#define	ISW(c)		CHAR_ISWHT(c)
+#define	ISWHT(c)	CHAR_ISWHT(c)
 
 
 /* local namespaces */
@@ -112,7 +112,7 @@ extern "C" {
 	    bool	f = false ;
 	    while ((sp < lsp) && *sp && (*sp != '\n')) {
 		cint	ch = mkchar(*sp) ;
-		if ((f = ISW(ch))) break ;
+		if ((f = ISWHT(ch))) break ;
 		sp += 1 ;
 	    } /* end while */
 	    rsp = (f) ? charp(sp) : nullptr ;
@@ -144,12 +144,12 @@ extern "C" {
 extern "C++" {
     char *strnwhtbrk(cchar *sp,int µsl,con chrset *setp) noex {
 	char		*rsp = nullptr ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
+	if (int sl ; setp && (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    cchar	*lsp = (sp + sl) ;
 	    bool	fwht = false ;
 	    while ((sp < lsp) && *sp) {
 		cint	ch = mkchar(*sp) ;
-		if (((fwht = ISW(ch))) || setp->tst(ch)) {
+		if (((fwht = ISWHT(ch))) || setp->tst(ch)) {
 		    rsp = charp(sp) ;
 		    break ;
 		}
@@ -159,7 +159,7 @@ extern "C++" {
 		bool fchr = false ;
 	        while ((sp < lsp) && *sp) {
 		    cint	ch = mkchar(*sp) ;
-		    if (((fchr = setp->tst(ch))) || (! ISW(ch))) break ;
+		    if (((fchr = setp->tst(ch))) || (! ISWHT(ch))) break ;
 		    sp += 1 ;
 		} /* end while */
 		if (fchr) rsp = charp(sp) ;
