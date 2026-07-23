@@ -109,7 +109,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 struct openstate {
 	uint		f_created ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
