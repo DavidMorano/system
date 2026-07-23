@@ -120,7 +120,6 @@ int snabbrname(char *dp,int dl,cchar *sp,int sl) noex {
 	    dp[i] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (snabbrname) */
+} /* end subroutine (snabbrname) */
 
 
