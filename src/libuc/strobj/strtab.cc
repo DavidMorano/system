@@ -136,8 +136,6 @@ import libutil ;			/* |lenstr(3u)| */
 #define	STRTAB_AOREL(o,pp)	lookaside_release((o),(pp))
 #define	STRTAB_AOFINISH(o)	lookaside_finish((o))
 
-#define	MODP2(v,n)	((v) & ((n) - 1))
-
 #define	VALBOGUS	(250000 * 10)
 
 
@@ -165,7 +163,7 @@ struct strentry {
 	uint	khash ;
 	uint	hi ;
 	uint	si ;
-} ;
+} ; /* end struct (strentry) */
 
 
 /* forward references */
@@ -176,10 +174,10 @@ local inline int strtab_ctor(strtab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->chp = nullptr ;
-	    op->chsize = 0 ;
-	    op->stsize = 0 ;
+	    op->chsz = 0 ;
+	    op->stsz = 0 ;
 	    op->count = 0 ;
 	    if ((op->clp = new(nothrow) vechand) != np) ylikely {
 		if ((op->hlp = new(nothrow) hdb) != np) ylikely {
@@ -189,12 +187,12 @@ local inline int strtab_ctor(strtab *op,Args ... args) noex {
 		    if (rs < 0) {
 			delete op->hlp ;
 			op->hlp = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (new-hdb) */
 		if (rs < 0) {
 		    delete op->clp ;
 		    op->clp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
@@ -221,7 +219,7 @@ template<typename ... Args>
 local int strtab_magic(strtab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == STRTAB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == STRTAB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (strtab_magic) */
@@ -246,13 +244,11 @@ static sysval		pagesize(sysval_ps) ;
 
 local inline int indexlen(int n) noex {
 	return nextpowtwo(n) ;
-}
-/* end subroutine (indexlen) */
+} /* end subroutine (indexlen) */
 
 local inline int indexsize(int il) noex {
 	return ((il + 1) * 3 * szof(int)) ;
-}
-/* end subroutine (indexsize) */
+} /* end subroutine (indexsize) */
 
 
 /* exported variables */
@@ -268,35 +264,34 @@ int strtab_start(strtab *op,int startsz) noex {
 	    if ((rs = pagesize) >= 0) ylikely {
 		cint	ne = (startsz / 4) ;
 		int	opts = 0 ;
-	        op->chsize = iceil(startsz,pagesize) ;
+	        op->chsz = iceil(startsz,pagesize) ;
 	        if ((rs = vechand_start(op->clp,ne,opts)) >= 0) ylikely {
 	            if ((rs = hdb_start(op->hlp,ne,true,np,np)) >= 0) {
 	                cint	sz = szof(int) ;
 	                if ((rs = STRTAB_AOSTART(op->lap,sz,ne)) >= 0) {
 	                    op->count = 0 ;
 	                    if ((rs = strtab_newchunk(op,0)) >= 0) {
-	                        op->magic = STRTAB_MAGIC ;
+	                        op->magval = STRTAB_MAGIC ;
 	                    }
 	                    if (rs < 0) {
 	                        STRTAB_AOFINISH(op->lap) ;
-			    }
+			    } /* end if (error) */
 	                } /* end if (strab-aostart) */
 	                if (rs < 0) {
 		            hdb_finish(op->hlp) ;
-			}
+			} /* end if (error) */
 	            } /* end if (hdb-start) */
 	            if (rs < 0) {
 	                vechand_finish(op->clp) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (vechand-start) */
 	    } /* end if (pagesize) */
 	    if (rs < 0) {
 		strtab_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (strtab_ctor) */
 	return rs ;
-}
-/* end subroutine (strtab_start) */
+} /* end subroutine (strtab_start) */
 
 int strtab_finish(strtab *op) noex {
 	int		rs ;
@@ -322,11 +317,10 @@ int strtab_finish(strtab *op) noex {
                 rs1 = strtab_dtor(op) ;
                 if (rs >= 0) rs = rs1 ;
             }
-            op->magic = 0 ;
+            op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strtab_finish) */
+} /* end subroutine (strtab_finish) */
 
 int strtab_add(strtab *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -348,8 +342,7 @@ int strtab_add(strtab *op,cchar *sp,int sl) noex {
 	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? vi : rs ;
-}
-/* end subroutine (strtab_add) */
+} /* end subroutine (strtab_add) */
 
 int strtab_addfast(strtab *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -360,8 +353,7 @@ int strtab_addfast(strtab *op,cchar *sp,int sl) noex {
 		vi = rs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? vi : rs ;
-}
-/* end subroutine (strtab_addfast) */
+} /* end subroutine (strtab_addfast) */
 
 int strtab_already(strtab *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -380,8 +372,7 @@ int strtab_already(strtab *op,cchar *sp,int sl) noex {
 	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? vi : rs ;
-}
-/* end subroutine (strtab_already) */
+} /* end subroutine (strtab_already) */
 
 int strtab_count(strtab *op) noex {
 	int		rs ;
@@ -389,17 +380,15 @@ int strtab_count(strtab *op) noex {
 	    rs = op->count ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strtab_count) */
+} /* end subroutine (strtab_count) */
 
 int strtab_strsize(strtab *op) noex {
 	int		rs ;
 	if ((rs = strtab_magic(op)) >= 0) ylikely {
-	    rs = iceil(op->stsize,szof(int)) ;
+	    rs = iceil(op->stsz,szof(int)) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strtab_strsize) */
+} /* end subroutine (strtab_strsize) */
 
 int strtab_strmk(strtab *op,char *tabdata,int tabsize) noex {
 	int		rs ;
@@ -407,7 +396,7 @@ int strtab_strmk(strtab *op,char *tabdata,int tabsize) noex {
 	if ((rs = strtab_magic(op,tabdata)) >= 0) ylikely {
 		rs = SR_INVALID ;
 		if (tabsize > 0) {
-		    cint	stsize = iceil(op->stsize,szof(int)) ;
+		    cint	stsize = iceil(op->stsz,szof(int)) ;
 	   	    rs = SR_OVERFLOW ;
 		    if (tabsize >= stsize) {
 			vechand		*vlp = op->clp ;
@@ -432,8 +421,7 @@ int strtab_strmk(strtab *op,char *tabdata,int tabsize) noex {
 		} /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (strtab_strmk) */
+} /* end subroutine (strtab_strmk) */
 
 int strtab_recsize(strtab *op) noex {
 	int		rs ;
@@ -442,8 +430,7 @@ int strtab_recsize(strtab *op) noex {
 	    rs = (n + 1) * szof(int) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strtab_recsize) */
+} /* end subroutine (strtab_recsize) */
 
 int strtab_recmk(strtab *op,int *rec,int recsize) noex {
 	int		rs ;
@@ -471,8 +458,7 @@ int strtab_recmk(strtab *op,int *rec,int recsize) noex {
 	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (strtab_recmk) */
+} /* end subroutine (strtab_recmk) */
 
 int strtab_indlen(strtab *op) noex {
 	int		rs ;
@@ -480,8 +466,7 @@ int strtab_indlen(strtab *op) noex {
 	    rs = indexlen(op->count + 1) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strtab_indlen) */
+} /* end subroutine (strtab_indlen) */
 
 int strtab_indsize(strtab *op) noex {
 	int		rs ;
@@ -490,8 +475,7 @@ int strtab_indsize(strtab *op) noex {
 	    rs = indexsize(il) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strtab_indsize) */
+} /* end subroutine (strtab_indsize) */
 
 int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 	int		rs ;
@@ -590,8 +574,7 @@ int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? sc : rs ;
-}
-/* end subroutine (strtab_indmk) */
+} /* end subroutine (strtab_indmk) */
 
 
 /* private subroutines */
@@ -602,7 +585,7 @@ local int strtab_stuff(strtab *op,cchar *sp,int sl) noex {
 	int		vi = 0 ;
 	if ((rs = strtab_extend(op,amount)) >= 0) ylikely {
 	    cchar	*vp = nullptr ;
-	    vi = op->stsize ;
+	    vi = op->stsz ;
 	    if ((rs = chunk_add(op->chp,sp,sl,&vp)) >= 0) {
 		int	*ip ;
 	        if ((rs = STRTAB_AOGET(op->lap,&ip)) >= 0) {
@@ -614,7 +597,7 @@ local int strtab_stuff(strtab *op,cchar *sp,int sl) noex {
 	            val.buf = ip ;
 	            val.len = szof(int) ;
 	            if ((rs = hdb_store(op->hlp,key,val)) >= 0) {
-	                op->stsize += amount ;
+	                op->stsz += amount ;
 	                op->count += 1 ;
 	            }
 	        } /* end if (AOGET) */
@@ -640,7 +623,7 @@ local int strtab_finishchunks(strtab *op) noex {
 		{
 	            rs1 = lm_free(chp) ;
 	            if (rs >= 0) rs = rs1 ;
-		}
+		} /* end if (memory-release) */
 	    }
 	} /* end for */
 	op->chp = nullptr ;
@@ -666,25 +649,26 @@ local int strtab_newchunk(strtab *op,int amount) noex {
 	cint		sz = szof(strtab_ch) ;
 	int		rs ;
 	int		start = 0 ;
-	if (amount < op->chsize) {
-	    amount = op->chsize ;
+	if (amount < op->chsz) {
+	    amount = op->chsz ;
 	}
 	op->chp = nullptr ;
 	if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 	    op->chp = chunkp(vp) ;
-	    if (op->stsize == 0) {
-	        op->stsize = 1 ;
+	    if (op->stsz == 0) {
+	        op->stsz = 1 ;
 	        start = 1 ;
 	    }
 	    if ((rs = chunk_start(op->chp,amount,start)) >= 0) {
 		rs = vechand_add(op->clp,op->chp) ;
-		if (rs < 0)
+		if (rs < 0) {
 		    chunk_finish(op->chp) ;
+		} /* end if (error) */
 	    }
 	    if (rs < 0) {
 	        lm_free(op->chp) ;
 	        op->chp = nullptr ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (strtab_newchunk) */
@@ -711,7 +695,7 @@ local int chunk_finish(strtab_ch *chp) noex {
 	    rs1 = lm_free(chp->cdata) ;
 	    if (rs >= 0) rs = rs1 ;
 	    chp->cdata = nullptr ;
-	}
+	} /* end if (memory-release) */
 	chp->csz = 0 ;
 	chp->cl = 0 ;
 	return rs ;
