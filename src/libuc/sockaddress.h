@@ -74,7 +74,7 @@ struct sockaddress_head {
 	    SOCKADDR_IN4	a_in4 ;
 	    SOCKADDR_IN6	a_in6 ;
 	    unsigned char	str[SOCKADDRESS_STRSIZE] ;
-	} ;
+	} ; /* end union */
 } ; /* end struct (sockaddress_head) */
 
 #ifdef	__cplusplus
@@ -84,7 +84,7 @@ enum sockaddressmems {
 	sockaddressmem_addrlen,
 	sockaddressmem_finish,
 	sockaddressmem_overlast
-} ;
+} ; /* end enum */
 struct sockaddress ;
 struct sockaddress_co {
 	sockaddress	*op = nullptr ;
