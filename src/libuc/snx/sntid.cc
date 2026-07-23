@@ -54,15 +54,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<pthread.h>		/* |pthread_t| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<pthread.h>		/* POSIX® |pthread_t| */
 #include	<climits>		/* UINT_MAX */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* |uintptr_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ctdec.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ctdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snx.h"
 
@@ -98,7 +99,6 @@ int sntid(char *dp,int dl,pthread_t tid) noex {
 	    rs = ctdecui(dp,dl,uv) ;
 	}
 	return rs ;
-}
-/* end subroutine (sntid) */
+} /* end subroutine (sntid) */
 
 
