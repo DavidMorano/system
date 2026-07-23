@@ -181,11 +181,11 @@ int dater_start(dater *op,TIMEB *nowp,cchar *zsp,int zsl) noex {
 	                    op->fl.cb = true ;
 	                    op->cb = *nowp ;
 	                } /* end if (time-offset) */
-	                if ((zsp != nullptr) && (zsl != 0)) {
+	                if (zsp) {
 	                    op->fl.czn = true ;
 	                    znwcpy(op->cname,znl,zsp,zsl) ;
-	                }
-	                op->magic = DATER_MAGIC ;
+	                } /* end if (loading a zone-name) */
+	                op->magval = DATER_MAGIC ;
 		    } /* end if (memory-acquire) */
 		} /* end if (znlen) */
 	    } /* end if (memclear) */
@@ -221,7 +221,7 @@ int dater_finish(dater *op) noex {
 		op->zname = nullptr ;
 	    }
 	    op->b.time = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (dater_finish) */
@@ -403,7 +403,7 @@ int dater_settmzon(dater *op,TM *stp,int zoff,cchar *zstr,int zlen) noex {
 	            rs = dater_mkpzoff(op,stp,zoff) ;
 	        }
 	        if (rs >= 0) {
-		    op->magic = DATER_MAGIC ;
+		    op->magval = DATER_MAGIC ;
 		}
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -421,7 +421,7 @@ int dater_settmzo(dater *op,TM *stp,int zoff) noex {
 		    /* calculate the time */
 	            if ((rs = dater_mkptime(op,stp,zoff)) >= 0) {
 		        rv = rs ;
-	                op->magic = DATER_MAGIC ;
+	                op->magval = DATER_MAGIC ;
 		    }
 		}
 	    } /* end if (valid) */
@@ -459,7 +459,7 @@ int dater_settmzn(dater *op,TM *stp,cchar *zstr,int zlen) noex {
 	        if (rs >= 0) ylikely {
 	            if ((rs = dater_mkptime(op,stp,zoff)) >= 0) {
 		        rv = rs ;
-	                op->magic = DATER_MAGIC ;
+	                op->magval = DATER_MAGIC ;
 		    }
 	        } /* end if */
 	    } /* end if */
@@ -498,7 +498,7 @@ int dater_settimezn(dater *op,time_t t,cchar *zname,int isdst) noex {
 	            op->b.timezone = 0 ;
 	        } /* end if */
 	        if (rs >= 0) {
-		    op->magic = DATER_MAGIC ;
+		    op->magval = DATER_MAGIC ;
 		}
 	    } /* end if (dater_initbase) */
 	} /* end if (magic) */
@@ -539,8 +539,8 @@ int dater_settimezon(dater *op,time_t t,int zoff,cchar *zname,int isdst) noex {
 	            op->b.timezone = 0 ;
 	        } /* end if */
 	        if (rs >= 0) {
-		    op->magic = DATER_MAGIC ;
-		}
+		    op->magval = DATER_MAGIC ;
+		} /* end if (ok) */
 	    } /* end if (znlen) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
