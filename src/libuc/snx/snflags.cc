@@ -48,10 +48,10 @@
 #include	<poll.h>		/* POSIX */
 #include	<cstddef>		/* CSTD |nullptr_t| */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>		/* LINU */
-#include	<usysbase.h>		/* LINU */
-#include	<snflager.h>		/* LINUC */
-#include	<localmisc.h>		/* LINU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<snflager.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snflags.h"
 
@@ -194,8 +194,7 @@ constexpr flent		fl_poll[] = {
 
 int snflagsfs(char *dbuf,int dlen,ulong fl) noex {
     	return snflx(fl_fs,dbuf,dlen,fl) ;
-}
-/* end subroutine (snflagsfs) */
+} /* end subroutine (snflagsfs) */
 
 int snflagsopen(char *dbuf,int dlen,ulong fl) noex {
 	int		rs = SR_FAULT ;
@@ -231,12 +230,10 @@ int snflagsopen(char *dbuf,int dlen,ulong fl) noex {
 	    } /* end if (snflager) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (snflagsopen) */
+} /* end subroutine (snflagsopen) */
 
 int snflagspoll(char *dbuf,int dlen,ulong fl) noex {
     	return snflx(fl_poll,dbuf,dlen,fl) ;
-}
-/* end subroutine (snflagspoll) */
+} /* end subroutine (snflagspoll) */
 
 
