@@ -578,6 +578,11 @@ typedef const mode_t		cfsperm ;
 typedef time_t			ustime ;
 #endif
 
+#ifndef	TYPEDEF_MTIME
+#define	TYPEDEF_MTIME
+typedef long			mtime_t ;
+#endif
+
 #ifndef	TYPEDEF_CUSTIME
 #define	TYPEDEF_CUSTIME
 typedef const time_t		custime ;
