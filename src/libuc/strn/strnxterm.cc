@@ -98,8 +98,7 @@ char *strnoterm(cchar *sp,int µsl,cchar *terms) noex {
 	    if (f) rsp = charp(sp) ;
 	} /* end if (getlenstr) */
 	return rsp ;
-}
-/* end subroutine (strnoterm) */
+} /* end subroutine (strnoterm) */
 
 char *strnrterm(cchar *sp,int µsl,cchar *terms) noex {
 	char		*rsp = nullptr ;
@@ -113,7 +112,6 @@ char *strnrterm(cchar *sp,int µsl,cchar *terms) noex {
 	    if (! f) rsp = nullptr ;
 	} /* end if (getlenstr) */
 	return rsp ;
-}
-/* end subroutine (strnrterm) */
+} /* end subroutine (strnrterm) */
 
 
