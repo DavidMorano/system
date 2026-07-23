@@ -116,8 +116,7 @@ int snwvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (snwvprintf) */
+} /* end subroutine (snwvprintf) */
 
 int snwprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
 	va_list		ap ;
@@ -133,8 +132,7 @@ int snwprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (snwprintf) */
+} /* end subroutine (snwprintf) */
 
 namespace libuc {
     int snprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
