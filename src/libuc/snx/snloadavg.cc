@@ -61,13 +61,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>		/* |FSCALE| + |FSHIFT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storebuf.h>
-#include	<ctdec.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBU */
+#include	<ctdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"snx.h"
 
@@ -87,8 +87,8 @@ namespace {
     struct parts {
 	uint		parti ;
 	uint		partf ;
-	int load(uint) noex ;
-	int round(int) noex ;
+	int load	(uint) noex ;
+	int round	(int) noex ;
     } ; /* end struct (parts) */
 } /* end namespace */
 
@@ -156,8 +156,7 @@ int snloadavg(char *rbuf,int rlen,uint la,int w,int p,int fill) noex {
 	    len = buf.idx ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (snloadavg) */
+} /* end subroutine (snloadavg) */
 
 
 /* local subroutines */
@@ -168,8 +167,7 @@ int parts::load(uint la) noex {
 	partf = (partf / FSCALE) ;
 	parti = (la >> FSHIFT) ;
 	return 0 ;
-}
-/* end method (parts::load) */
+} /* end method (parts::load) */
 
 int parts::round(int prec) noex {
 	int		r{} ;
@@ -194,7 +192,6 @@ int parts::round(int prec) noex {
 	    parti += 1 ;
 	}
 	return 0 ;
-}
-/* end method (parts::round) */
+} /* end method (parts::round) */
 
 
