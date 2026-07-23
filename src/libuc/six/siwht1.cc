@@ -98,30 +98,27 @@ import strnwht ;			/* |strnwhtbrk(3uc)| */
 
 extern "C" {
     int siwht(cchar *sp,int sl) noex {
-    	cnullptr	np{} ;
     	int		si = -1 ;
 	if (sp) ylikely {
-	    if (cchar *tp ; (tp = strnwht(sp,sl)) != np) {
+	    if (cchar *tp = strnwht(sp,sl) ; tp) {
 	        si = intconv(tp - sp) ;
 	    }
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwht) */
     int siwhtchr(cchar *sp,int sl,int sch) noex {
-    	cnullptr	np{} ;
     	int		si = -1 ;
 	if (sp) ylikely {
-	    if (cchar *tp ; (tp = strnwhtchr(sp,sl,sch)) != np) {
+	    if (cchar *tp = strnwhtchr(sp,sl,sch) ; tp) {
 	        si = intconv(tp - sp) ;
 	    }
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtchr) */
     int siwhtbrk(cchar *sp,int sl,cchar *ss) noex {
-    	cnullptr	np{} ;
     	int		si = -1 ;
 	if (sp) ylikely {
-	    if (cchar *tp ; (tp = strnwhtbrk(sp,sl,ss)) != np) {
+	    if (cchar *tp = strnwhtbrk(sp,sl,ss) ; tp) {
 	        si = intconv(tp - sp) ;
 	    }
 	} /* end if (non-null) */
