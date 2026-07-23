@@ -136,7 +136,6 @@ int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (snaddw) */
+} /* end subroutine (snaddw) */
 
 
