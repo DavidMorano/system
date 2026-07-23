@@ -58,8 +58,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<storebuf.h>
@@ -168,8 +168,7 @@ int snchrs(char *dp,int dl,int ch,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (snchrs) */
+} /* end subroutine (snchrs) */
 
 
 /* local subroutines */
@@ -200,7 +199,6 @@ int snxxx::operator () (char *dbuf,int dlen) noex {
 	    rl = sb.idx ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end method (snxxx::operator) */
+} /* end method (snxxx::operator) */
 
 
