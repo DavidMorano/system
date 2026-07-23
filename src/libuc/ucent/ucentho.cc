@@ -27,23 +27,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uinet.h>		/* |AF_INT{x}(3u)| */
-#include	<storeitem.h>
-#include	<sbuf.h>
-#include	<vechand.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<intceil.h>
-#include	<cfdec.h>
-#include	<inetconv.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU |AF_INT{x}(3u)| */
+#include	<ucinet.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<intceil.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<inetconv.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetho.h"		/* |uc_getho{x}(3uc)| */
 #include	"ucentho.h"
@@ -256,7 +257,7 @@ int ucentho::getadd(char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 /* local subroutines */
 
 local int ucentho_parseaddr(ucentho *hep,SI *sip,cchar *sp,int sl) noex {
-	constexpr int	alen = inetxaddrlen ;
+	cint		alen = inetxaddrlen ;
 	int		rs ;
 	char		abuf[inetxaddrlen+1] ;
 	if ((rs = inetpton(abuf,alen,0,sp,sl)) >= 0) {
