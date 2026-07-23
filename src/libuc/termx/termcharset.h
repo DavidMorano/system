@@ -20,16 +20,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int termcharset(char *,int,int,int,cchar *) noex ;
+extern int	termcharset(char *,int,int,int,cchar *) noex ;
 
 EXTERNC_end
 
