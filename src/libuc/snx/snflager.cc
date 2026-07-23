@@ -94,12 +94,11 @@ int snflager_start(snflager *op,char *bp,int bl) noex {
 	    *bp = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (snflager_start) */
+} /* end subroutine (snflager_start) */
 
 int snflager_addstr(snflager *op,cchar *sp) noex {
 	return snflager_addstrw(op,sp,-1) ;
-}
+} /* end subroutine */
 
 int snflager_addstrw(snflager *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -121,8 +120,7 @@ int snflager_addstrw(snflager *op,cchar *sp,int sl) noex {
 	    } /* end if (non-empty) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (snflager_addstrw) */
+} /* end subroutine (snflager_addstrw) */
 
 int snflager_count(snflager *op) noex {
 	int		rs = SR_FAULT ;
@@ -130,8 +128,7 @@ int snflager_count(snflager *op) noex {
 	    rs = op->c ;
 	}
 	return rs ;
-}
-/* end subroutine (snflager_count) */
+} /* end subroutine (snflager_count) */
 
 int snflager_len(snflager *op) noex {
 	int		rs = SR_FAULT ;
@@ -139,8 +136,7 @@ int snflager_len(snflager *op) noex {
 	    rs = op->bi ;
 	}
 	return rs ;
-}
-/* end subroutine (snflager_count) */
+} /* end subroutine (snflager_count) */
 
 int snflager_finish(snflager *op) noex {
 	int		rs = SR_FAULT ;
@@ -150,8 +146,7 @@ int snflager_finish(snflager *op) noex {
 	    op->bl = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (snflager_finish) */
+} /* end subroutine (snflager_finish) */
 
 
 /* local subroutines */
