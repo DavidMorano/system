@@ -13,9 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkuuid.h>		/* |uuid_dat| below */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkuuid.h>		/* LIBUC |uuid_dat| below */
 
 
 EXTERNC_begin
