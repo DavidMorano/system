@@ -100,33 +100,27 @@
 
 int sncpy1(char *dp,int dl,cc *s1) noex {
 	return sncpyx(dp,dl,1,s1) ;
-}
-/* end subroutine (sncpy1) */
+} /* end subroutine (sncpy1) */
 
 int sncpy2(char *dp,int dl,cc *s1,cc *s2) noex {
 	return sncpyx(dp,dl,2,s1,s2) ;
-}
-/* end subroutine (sncpy2) */
+} /* end subroutine (sncpy2) */
 
 int sncpy3(char *dp,int dl,cc *s1,cc *s2,cc *s3) noex {
 	return sncpyx(dp,dl,3,s1,s2,s3) ;
-}
-/* end subroutine (sncpy3) */
+} /* end subroutine (sncpy3) */
 
 int sncpy4(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4) noex {
 	return sncpyx(dp,dl,4,s1,s2,s3,s4) ;
-}
-/* end subroutine (sncpy4) */
+} /* end subroutine (sncpy4) */
 
 int sncpy5(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
 	return sncpyx(dp,dl,5,s1,s2,s3,s4,s5) ;
-}
-/* end subroutine (sncpy5) */
+} /* end subroutine (sncpy5) */
 
 int sncpy6(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 	return sncpyx(dp,dl,6,s1,s2,s3,s4,s5,s6) ;
-}
-/* end subroutine (sncpy6) */
+} /* end subroutine (sncpy6) */
 
 int sncpyx(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
@@ -153,7 +147,6 @@ int sncpyx(char *dp,int dl,int n,...) noex {
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (sncpyx) */
+} /* end subroutine (sncpyx) */
 
 
