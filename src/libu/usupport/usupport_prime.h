@@ -13,12 +13,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<time.h>		/* |time_t| */
-#include	<string.h>		/* |memset(3c)| + |memcpy(3c)| */
-#include	<stdint.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<stdint.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #ifndef	SUBROUTINE_MSLEEP
@@ -26,11 +25,6 @@
 EXTERNC_begin
 extern int	msleep(int) noex ;
 EXTERNC_end
-#endif
-
-#ifndef	TYPEDEF_MTIME
-#define	TYPEDEF_MTIME
-typedef int64_t	mtime_t ;
 #endif
 
 #ifndef	SUBROUTINE_UMTIME
