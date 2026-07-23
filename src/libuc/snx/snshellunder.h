@@ -20,14 +20,14 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX® |pid_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	snshellunder(char *,int,pid_t,cchar *) noex ;
+extern int snshellunder(char *,int,pid_t,cchar *) noex ;
 
 EXTERNC_end
 
