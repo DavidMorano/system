@@ -110,7 +110,6 @@ int sncpyarray(char *dbuf,int dlen,cchar **a,int n) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (sncpyarray) */
+} /* end subroutine (sncpyarray) */
 
 
