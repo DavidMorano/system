@@ -35,8 +35,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	<snaddw.h>
 #include	<snaddslash.h>
@@ -46,7 +46,7 @@ EXTERNC_begin
 
 extern int snaddx(char *,int,int,int,...) noex ;
 
-static inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
+local inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
 	return snaddw(dbuf,dlen,dl,sp,-1) ;
 }
 
