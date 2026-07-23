@@ -42,12 +42,12 @@ LIBS +=
 
 DEPS= dater_mag.o
 
-OBJ0_DATER= dater_getbbtime.o 
+OBJ0_DATER= dater_prime.o
 OBJ1_DATER= dater_getdate.o
-OBJ2_DATER= dater_obj.o
-OBJ3_DATER=
+OBJ2_DATER= dater_obj.o dater_mag.o
+OBJ3_DATER= dater_getbbtime.o dater_setkey.o
 
-OBJ_DATER= obj0_dater.o obj1_dater.o obj2_dater.o
+OBJ_DATER= obj0_dater.o obj1_dater.o obj2_dater.o obj3_dater.o
 
 OBJ0_CHRONO= tmstrs.o zdb.o
 OBJ1_CHRONO= date.o dater.o
@@ -185,5 +185,6 @@ dater_setkey.o:		dater_setkey.cc		dater.h	$(DEPS) $(INCS)
 dater_obj.o:		dater_obj.cc		dater.h	$(DEPS) $(INCS)
 
 dater_mag.o:		dater_mag.ccm		dater.h $(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
