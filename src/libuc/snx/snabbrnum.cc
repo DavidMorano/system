@@ -114,12 +114,10 @@ local int snabbrx(ucode_f get,char *dbuf,int dlen,int n) noex {
 
 int snabbrerr(char *dbuf,int dlen,int n) noex {
     	return snabbrx(ucodename_sr,dbuf,dlen,n) ;
-}
-/* end subroutine (snabbrerr) */
+} /* end subroutine (snabbrerr) */
 
 int snabbrsig(char *dbuf,int dlen,int n) noex {
     	return snabbrx(ucodename_sig,dbuf,dlen,n) ;
-}
-/* end subroutine (snabbrsig) */
+} /* end subroutine (snabbrsig) */
 
 
