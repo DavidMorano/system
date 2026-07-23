@@ -130,8 +130,7 @@ char *strnochr(cchar *sp,int sl,int sch) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rsp ;
-}
-/* end subroutine (strnochr) */
+} /* end subroutine (strnochr) */
 
 char *strnrchr(cchar *sp,int sl,int sch) noex {
 	char		*rsp = nullptr ;
@@ -154,7 +153,6 @@ char *strnrchr(cchar *sp,int sl,int sch) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rsp ;
-}
-/* end subroutine (strnrchr) */
+} /* end subroutine (strnrchr) */
 
 
