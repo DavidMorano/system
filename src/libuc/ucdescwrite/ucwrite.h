@@ -49,8 +49,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* CSTD |nullptr_t| */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>		/* LINU */
-#include	<usysbase.h>		/* LINU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 EXTERNC_begin
 
