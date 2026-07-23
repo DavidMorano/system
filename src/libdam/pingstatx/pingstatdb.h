@@ -22,7 +22,7 @@
 #include	<sys/types.h>		/* POSIX® */
 #include	<sys/timeb.h>		/* POSIX® */
 #include	<netdb.h>		/* POSIX® */
-#include	<vecitem.h>		/* LIUC */
+#include	<vechand.h>		/* LIBUC */
 #include	<bfile.h>		/* LIBB */
 
 
@@ -44,11 +44,11 @@ struct pingstatdb_flags {
 } ; /* end struct */
 
 struct pingstatdb_head {
+	bfile		*pfp ;		/* ??-file-pointer */
+	vechand		*rlp ;		/* record-list-pointer */
+	TIMEB		*nowp ;
 	cchar		*fname ;
-	char		*zname ;
-	bfile		*pfp ;
-	vecitem		*elp ;
-	TIMEB		now ;
+	cchar		*znbuf ;	/* zone-name buffer */
 	time_t		mtime ;
 	PINGSTATDB_FL	fl ;
 	uint		magval ;
@@ -61,9 +61,9 @@ struct pingstatdb_cursor {
 struct pingstatdb_entry {
 	time_t		ti_change ;	/* last change */
 	time_t		ti_ping ;	/* last ping */
-	uint		count ;
+	uint		cnt ;
 	int		f_up ;		/* UP-DOWN status */
-	char		hostname[MAXHOSTNAMELEN+1] ;
+	char		hostbuf[MAXHOSTNAMELEN+1] ;
 } ; /* end struct */
 
 struct pingstatdb_upper {
@@ -80,7 +80,7 @@ typedef	PINGSTATDB_UP		pingstatdb_up ;
 
 EXTERNC_begin
 
-extern int pingstatdb_open(pingstatdb *,cchar *,mode_t,int) noex ;
+extern int pingstatdb_open(pingstatdb *,cchar *,int,mode_t) noex ;
 extern int pingstatdb_close(pingstatdb *) noex ;
 extern int pingstatdb_match(pingstatdb *,cchar *,pingstatdb_ent *) noex ;
 extern int pingstatdb_curbegin(pingstatdb *,pingstatdb_cur *) noex ;
