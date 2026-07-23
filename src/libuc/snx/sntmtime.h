@@ -21,14 +21,14 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<tmtime.hh>		/* <- the money shot! */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<tmtime.hh>		/* LIBUC <- the money shot! */
 
 
 EXTERNC_begin
 
-extern int	sntmtime(char *,int,tmtime *,cchar *) noex ;
+extern int sntmtime(char *,int,tmtime *,cchar *) noex ;
 
 EXTERNC_end
 
