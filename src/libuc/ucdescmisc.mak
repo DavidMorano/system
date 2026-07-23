@@ -47,7 +47,7 @@ OBJ3= ucnonblock.o ucndelay.o ucfsync.o
 
 OBJ4= ucttyname.o ucsetappend.o
 OBJ5= ucclose.o
-OBJ6= ucpeek.o
+OBJ6= ucpeek.o ucfpassfd.o
 OBJ7= 
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
@@ -100,11 +100,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -164,5 +164,6 @@ ucnonblock.o:		ucnonblock.cc		ucnonblock.h		$(INCS)
 ucpeek.o:		ucpeek.cc		ucpeek.h		$(INCS)
 ucttyname.o:		ucttyname.cc		ucttyname.h		$(INCS)
 ucsetappend.o:		ucsetappend.cc		ucsetappend.h		$(INCS)
+ucfpassfd.o:		ucfpassfd.cc		ucfpassfd.h		$(INCS)
 
 
