@@ -59,18 +59,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
-#include	<ucsysho.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<ucsysho.h>		/* LIBUC */
 
 #include	"ucgetho.h"
 #include	"ucgetxx.hh"
@@ -145,22 +144,19 @@ int uc_gethobegin(int stayopen) noex {
 	errno = 0 ;
 	sethostent(stayopen) ;
 	return (- errno) ;
-}
-/* end subroutine (uc_gethobegin) */
+} /* end subroutine (uc_gethobegin) */
 
 int uc_gethoend() noex {
 	errno = 0 ;
 	endhostent() ;
 	return (- errno) ;
-}
-/* end subroutine (uc_gethoend) */
+} /* end subroutine (uc_gethoend) */
 
 int uc_gethoent(ucentho *hop,char *hobuf,int holen) noex {
 	ucgetho		hoo(nullptr) ;
 	hoo.m = &ucgetho::getho_ent ;
 	return hoo(hop,hobuf,holen) ;
-}
-/* end subroutine (uc_gethoent) */
+} /* end subroutine (uc_gethoent) */
 
 int uc_gethonam(ucentho *hop,char *hobuf,int holen,cchar *name) noex {
     	int		rs = SR_FAULT ;
@@ -173,8 +169,7 @@ int uc_gethonam(ucentho *hop,char *hobuf,int holen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_gethonam) */
+} /* end subroutine (uc_gethonam) */
 
 int uc_gethoadd(ucentho *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
     	int		rs = SR_FAULT ;
@@ -187,8 +182,7 @@ int uc_gethoadd(ucentho *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_gethoadd) */
+} /* end subroutine (uc_gethoadd) */
 
 
 /* local subroutines */
@@ -206,8 +200,7 @@ int ucgetho::operator () (ucentho *hop,char *hobuf,int holen) noex {
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucgetho::operator) */
+} /* end method (ucgetho::operator) */
 
 int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
 	cnullptr	np{} ;
@@ -230,8 +223,7 @@ int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetho::getho_ent) */
+} /* end method (ucgetho::getho_ent) */
 
 int ucgetho::getho_nam(ucentho *hop,char *hobuf,int holen) noex {
 	cnullptr	np{} ;
@@ -254,8 +246,7 @@ int ucgetho::getho_nam(ucentho *hop,char *hobuf,int holen) noex {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetho::getho_nam) */
+} /* end method (ucgetho::getho_nam) */
 
 int ucgetho::getho_add(ucentho *hop,char *hobuf,int holen) noex {
 	cnullptr	np{} ;
@@ -278,7 +269,6 @@ int ucgetho::getho_add(ucentho *hop,char *hobuf,int holen) noex {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetho::getho_add) */
+} /* end method (ucgetho::getho_add) */
 
 
