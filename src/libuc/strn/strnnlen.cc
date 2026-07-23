@@ -101,7 +101,6 @@ int strnnlen(cchar *sp,int sl,int mlen) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return len ;
-}
-/* end subroutine (strnnlen) */
+} /* end subroutine (strnnlen) */
 
 
