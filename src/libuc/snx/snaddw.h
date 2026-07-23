@@ -35,8 +35,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
@@ -47,7 +47,7 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline int snaddw(char *dbuf,int dlen,int dl,cchar *sp) noex {
+local inline int snaddw(char *dbuf,int dlen,int dl,cchar *sp) noex {
 	return snaddw(dbuf,dlen,dl,sp,-1) ;
 }
 
