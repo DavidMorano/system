@@ -13,16 +13,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<hdb.h>
-#include	<lookaside.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
+#include	<lookaside.h>		/* LIBU */
 
 
 #define	STRTAB			struct strtab_head
 #define	STRTAB_CH		struct strtab_chunk
-
 #define	STRTAB_AOBJ		lookaside
 #define	STRTAB_MAGIC		0x88776215
 #define	STRTAB_MINCHUNKSIZE	40
@@ -40,9 +39,9 @@ struct strtab_head {
 	vechand		*clp ;		/* chunk-list-pointer */
 	hdb		*hlp ;		/* hash-list-pointer */
 	lookaside	*lap ;		/* lookaside-list-pointer */
-	uint		magic ;
-	int		chsize ;
-	int		stsize ;	/* "string table" size */
+	uint		magval ;
+	int		chsz ;
+	int		stsz ;		/* "string table" size */
 	int		count ;		/* total item count */
 } ; /* end struct (strtab_head) */
 
@@ -51,19 +50,19 @@ typedef STRTAB_CH	strtab_ch ;
 
 EXTERNC_begin
 
-extern int	strtab_start(strtab *,int) noex ;
-extern int	strtab_finish(strtab *) noex ;
-extern int	strtab_add(strtab *,cchar *,int) noex ;
-extern int	strtab_addfast(strtab *,cchar *,int) noex ;
-extern int	strtab_already(strtab *,cchar *,int) noex ;
-extern int	strtab_count(strtab *) noex ;
-extern int	strtab_strsize(strtab *) noex ;
-extern int	strtab_strmk(strtab *,char *,int) noex ;
-extern int	strtab_recsize(strtab *) noex ;
-extern int	strtab_recmk(strtab *,int *,int) noex ;
-extern int	strtab_indlen(strtab *) noex ;
-extern int	strtab_indsize(strtab *) noex ;
-extern int	strtab_indmk(strtab *,int (*)[3],int,int) noex ;
+extern int	strtab_start	(strtab *,int) noex ;
+extern int	strtab_finish	(strtab *) noex ;
+extern int	strtab_add	(strtab *,cchar *,int) noex ;
+extern int	strtab_addfast	(strtab *,cchar *,int) noex ;
+extern int	strtab_already	(strtab *,cchar *,int) noex ;
+extern int	strtab_count	(strtab *) noex ;
+extern int	strtab_strsize	(strtab *) noex ;
+extern int	strtab_strmk	(strtab *,char *,int) noex ;
+extern int	strtab_recsize	(strtab *) noex ;
+extern int	strtab_recmk	(strtab *,int *,int) noex ;
+extern int	strtab_indlen	(strtab *) noex ;
+extern int	strtab_indsize	(strtab *) noex ;
+extern int	strtab_indmk	(strtab *,int (*)[3],int,int) noex ;
 
 EXTERNC_end
 
