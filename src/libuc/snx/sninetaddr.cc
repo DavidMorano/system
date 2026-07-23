@@ -61,42 +61,18 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<uinet.h>		/* |AF_INET4| */
-#include	<inetaddr.h>
-#include	<sncpyx.h>
-#include	<strdcpyx.h>
-#include	<cthex.h>
-#include	<mkchar.h>
-#include	<localmisc.h>		/* |MAX| + |HEXBUFLEN| */
+#include	<uinet.h>		/* LIBU |AF_INET4| */
+#include	<inetaddr.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strdcpyx.h>		/* LIBUC */
+#include	<cthex.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |MAX| + |HEXBUFLEN| */
 
 #include	"snx.h"
 
 
 /* local defines */
-
-#ifndef	INET4ADDRLEN
-#define	INET4ADDRLEN		szof(in_addr_t)
-#endif
-
-#ifndef	INET6ADDRLEN
-#define	INET6ADDRLEN		16
-#endif
-
-#ifndef	INETXADDRLEN
-#define	INETXADDRLEN		MAX(INET4ADDRLEN,INET6ADDRLEN)
-#endif /* INETXADDRLEN */
-
-#ifndef	INET4_ADDRSTRLEN
-#define	INET4_ADDRSTRLEN	16
-#endif
-
-#ifndef	INET6_ADDRSTRLEN
-#define	INET6_ADDRSTRLEN	46	/* Solaris® says this is 46! */
-#endif
-
-#ifndef	INETX_ADDRSTRLEN
-#define	INETX_ADDRSTRLEN	MAX(INET4_ADDRSTRLEN,INET6_ADDRSTRLEN)
-#endif
 
 #ifndef	CF_CTHEXUC
 #define	CF_CTHEXUC		0
@@ -120,15 +96,14 @@
 
 /* forward references */
 
-local int snunix(char *,int,cchar *) noex ;
-local int sninet4(char *,int,cchar *) noex ;
-local int sninet6(char *,int,cchar *) noex ;
+local int snunix	(char *,int,cchar *) noex ;
+local int sninet4	(char *,int,cchar *) noex ;
+local int sninet6	(char *,int,cchar *) noex ;
 
 
 /* local variables */
 
 constexpr int		diglen = HEXBUFLEN ;
-
 constexpr bool		f_cthexuc = CF_CTHEXUC ;
 
 
@@ -156,8 +131,7 @@ int sninetaddr(char *dbuf,int dlen,int af,cchar *addr) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sninetaddr) */
+} /* end subroutine (sninetaddr) */
 
 
 /* local subroutines */
@@ -170,8 +144,7 @@ local int snunix(char *dbuf,int dlen,cchar *addr) noex {
 	    rs = sncpy(dbuf,dlen,addr) ;
 	}
 	return rs ;
-}
-/* end subroutine (snunix) */
+} /* end subroutine (snunix) */
 
 local int sninet4(char *dbuf,int dlen,cchar *addr) noex {
     	con inetaddrs	at = inetaddr_str ;
@@ -187,8 +160,7 @@ local int sninet4(char *dbuf,int dlen,cchar *addr) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (inetaddr) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sninet4) */
+} /* end subroutine (sninet4) */
 
 local int sninet6(char *dbuf,int dlen,cchar *addr) noex {
 	cint		astrlen = INETX_ADDRSTRLEN ;
@@ -216,7 +188,6 @@ local int sninet6(char *dbuf,int dlen,cchar *addr) noex {
 	}
 	dbuf[pl] = '\0' ;
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (sninet6) */
+} /* end subroutine (sninet6) */
 
 
