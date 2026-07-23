@@ -27,14 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<six.h>
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<six.h>			/* LIBUC */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strman.h"
 
@@ -82,8 +82,7 @@ int strman_start(strman *sop,cchar *sp,int sl) noex {
 	    sop->sl = sl ;
 	}
 	return rs ;
-}
-/* end subroutine (strman_start) */
+} /* end subroutine (strman_start) */
 
 int strman_finish(strman *sop) noex {
 	int		rs = SR_FAULT ;
@@ -93,8 +92,7 @@ int strman_finish(strman *sop) noex {
 	    sop->sl = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (strman_finish) */
+} /* end subroutine (strman_finish) */
 
 int strman_breakfield(strman *sop,cchar *ss,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -122,8 +120,7 @@ int strman_breakfield(strman *sop,cchar *ss,cchar **rpp) noex {
 	    } /* end if (greater-than-zero) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (strman_breakfield) */
+} /* end subroutine (strman_breakfield) */
 
 /* skip white-space until reach terminator character */
 int strman_whitechr(strman *sop,int sch) noex {
@@ -138,8 +135,7 @@ int strman_whitechr(strman *sop,int sch) noex {
 	    sl = sop->sl ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (strman_whitecolon) */
+} /* end subroutine (strman_whitecolon) */
 
 int strman_span(strman *sop,cchar *stuff) noex {
     	int		rs = SR_FAULT ;
@@ -153,7 +149,6 @@ int strman_span(strman *sop,cchar *stuff) noex {
 	    sl = sop->sl ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (strman_span) */
+} /* end subroutine (strman_span) */
 
 
