@@ -76,9 +76,12 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ugetx.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
-#include	<vecitem.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<initnow.h>		/* LIBUC */
 #include	<ismisc.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 #include	<bfile.h>		/* LIBB */
@@ -100,6 +103,7 @@ import pingstatdb_rec ;
 #define	PSD_CUR		pingstatdb_cur
 #define	PSD_UP		pingstatdb_up
 #define	PSD_REC		pingstatdb_rec
+#define	PSD_MAG		PINGSTATDB_MAGIC
 
 /* record-format (RF) paramters */
 #define	RF_NUMDIGITS	8		/* RF count field width */
@@ -153,15 +157,21 @@ local inline int pingstatdb_ctor(pingstatdb *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(op) ;
-	    if (bfile *bfp = new(nt) bfile ; bfp) {
-		op->bfp = bfp ;
-	        if (vecitem *elp = new(nt) vecitem ; elp) {
-		    op->elp = elp ;
-		    rs = SR_OK ;
-	        } /* end if (new-bfile) */
+	    if (bfile *pfp = new(nt) bfile ; pfp) {
+		op->pfp = pfp ;
+	        if (vechand *rlp = new(nt) vechand ; rlp) {
+		    op->rlp = rlp ;
+	            if (timeb *nowp = new(nt) timeb ; nowp) {
+		        rs = SR_OK ;
+		    } /* end if (new-timeb) */
+		    if (rs < 0) {
+			delete rlp ;
+			op->rlp = nullptr ;
+		    } /* end if (error) */
+	        } /* end if (new-vecelem) */
 	        if (rs < 0) {
-		    delete bfp ;
-		    op->bfp = nullptr ;
+		    delete pfp ;
+		    op->pfp = nullptr ;
 		} /* end if (error) */
 	    } /* end if (new-bfile) */
 	} /* end if (non-null) */
@@ -172,28 +182,23 @@ local int pingstatdb_dtor(pingstatdb *op) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
 	    rs = SR_OK ;
-	    if (vecitem *elp = resumelife<vecitem>(op->ep) ; elp) {
-	        delete elp ;
-	        op->clp = nullptr ;
+	    if (vechand *rlp = resumelife<vechand>(op->rlp) ; rlp) {
+	        delete rlp ;
+	        op->rlp = nullptr ;
 	    }
-	    if (bfile *bfp = resumelife<bfile>(op->bfp) ; bfp) {
-		delete bfp ;
-		op->bfp = nullptr ;
+	    if (bfile *pfp = resumelife<bfile>(op->pfp) ; pfp) {
+		delete pfp ;
+		op->pfp = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pingstatdb_dtor) */
 
-local int	pingstatdb_checkcache(PSD *) noex ;
-local int	pingstatdb_readrecords(PSD *) noex ;
-local int	pingstatdb_fes(PSD *) noex ;
-local int	pingstatdb_getrec(PSD *,cchar *,PSD_REC **) noex ;
-local int	pingstatdb_updrec(PSD *,time_t,dater *,cchar *,
-			int,time_t) noex ;
+local int	pingstatdb_opener(pingstatdb *) noex ;
 
 local int	entry_load(PSD_ENT *,PSD_REC *) noex ;
 
-local int	mkbstr(mode_t,char *) noex ;
+local int	mkbstr(char *,int) noex ;
 
 
 /* local variables */
@@ -202,17 +207,13 @@ cbool		f_debug		= CF_DEBUG ;
 cbool		f_create	= CF_CREATE ;
 cbool		f_unlock	= CF_UNLOCK ;
 
-#if	CF_DEBUG
-static cchar	hostname[] = "EMPTY" ;
-#endif
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int pingstatdb_open(PSD *op,cchar *fname,mode_t omode,int fperm) noex {
+int pingstatdb_open(PSD *op,cchar *fname,int omode,mode_t fperm) noex {
 	int		rs ;
 	DEBUGPRINTF("ent omode=%4o fname=%s\n",omode,fname) ;
 	if (omode & O_CREAT) {
@@ -221,37 +222,39 @@ int pingstatdb_open(PSD *op,cchar *fname,mode_t omode,int fperm) noex {
 	if ((rs = pingstatdb_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	        char	bstr[10] ;
-	        if_constexpr (f_create) {
-		    omode |= O_CREAT ;
-	        }
-	        if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
-		    bfile *pfp = op->pfp ;
-	            op->fname = cp ;
-	            op->fl.writable = isaccmode.wr(omode) ;
-	            mkbstr(omode,bstr) ;
-	            if ((rs = pfp->open(op->fname,bstr,fperm)) >= 0) {
-	                cint	cmd = BC_CLOSEONEXEC ;
-	                if ((rs = bfp->control(cmd,true)) >= 0) {
-			    vecitem *elp = op->elp ;
-	                    if ((rs = elp->start(0,0)) >= 0) {
-			        rs = pingstatdb_opener(op) ;
-	                        if (rs < 0) {
-	                            elp->finish() ;
-			        } /* end if (error) */
-	                    } /* end if (vecitem_start) */
-	                } /* end if (bcontrol) */
+		if ((rs = pingstatdb_cominit(op)) >= 0) {
+	            char	bstr[10] ;
+	            if_constexpr (f_create) {
+		        omode |= O_CREAT ;
+	            }
+	            if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
+		        bfile *pfp = op->pfp ;
+	                op->fname = cp ;
+	                op->fl.writable = isaccmode.wr(omode) ;
+	                mkbstr(bstr,omode) ;
+	                if ((rs = pfp->open(op->fname,bstr,fperm)) >= 0) {
+	                    cint	cmd = BC_CLOSEONEXEC ;
+	                    if ((rs = pfp->control(cmd,true)) >= 0) {
+			        vechand *rlp = op->rlp ;
+	                        if ((rs = rlp->start(0,0)) >= 0) {
+			            rs = pingstatdb_opener(op) ;
+	                            if (rs < 0) {
+	                                rlp->finish() ;
+			            } /* end if (error) */
+	                        } /* end if (vechand_start) */
+	                    } /* end if (bcontrol) */
+	                    if (rs < 0) {
+	                        pfp->close() ;
+		            } /* end if (error) */
+	                } /* end if (bopen) */
 	                if (rs < 0) {
-	                    pfp->close() ;
-		        } /* end if (error) */
-	            } /* end if (bopen) */
-	            if (rs < 0) {
-			voidp vp = voidp(op->fname) ;
-	                mem.free(vp) ;
-	                op->fname = nullptr ;
-	            } /* end if (error) */
-	        } /* end if (memory-acquire) */
-	    } /* end if (valid) */
+			    voidp vp = voidp(op->fname) ;
+	                    mem.free(vp) ;
+	                    op->fname = nullptr ;
+	                } /* end if (error) */
+	            } /* end if (memory-acquire) */
+	        } /* end if (valid) */
+	    } /* end if (pingstatdb_cominit) */
 	    if (rs < 0) {
 		pingstatdb_dtor(op) ;
 	    } /* end if (error) */
@@ -264,10 +267,10 @@ local int pingstatdb_opener(pingstatdb *op) noex {
 	int		rs1 ;
 	if (char *znbuf ; (rs = mem.zn(&znbuf)) >= 0) {
 	    cint	znlen = rs ;
-	    if ((rs = initnow(&op->now,znbuf,znlen)) >= 0) {
-		if (char *a ; (rs = mem.strw(znbuf,rs,&a)) >= 0) {
-		    op->zname = a ;
-		    op->magval = PSD_MAGIC ;
+	    if ((rs = initnow(op->nowp,znbuf,znlen)) >= 0) {
+		if (cchar *cp ; (rs = mem.strw(znbuf,rs,&cp)) >= 0) {
+		    op->znbuf = cp ;
+		    op->magval = PSD_MAG ;
 		} /* end if (memory-acquire) */
 	    } /* end if (initnow) */
 	    rs1 = mem.free(znbuf) ;
@@ -288,8 +291,8 @@ int pingstatdb_close(PSD *op) noex {
 	        rs1 = pfp->close ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (vecitem *elp = op->elp ; elp) {
-	        rs1 = elp->finish ;
+	    if (vechand *rlp = op->rlp ; rlp) {
+	        rs1 = rlp->finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->fname) {
@@ -298,13 +301,18 @@ int pingstatdb_close(PSD *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
 	    } /* end if (memory-release) */
-	    if (op->zname) {
-	        rs1 = mem.free(op->zname) ;
+	    if (op->znbuf) {
+	        voidp vp = voidp(op->znbuf) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->zname = nullptr ;
+	        op->znbuf = nullptr ;
 	    } /* end if (memory-release) */
 	    {
-		rs1 = pingstatb_dtor(op) ;
+		rs1 = pingstatdb_comfini(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = pingstatdb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magval = 0 ;
@@ -349,17 +357,17 @@ int pingstatdb_curenum(PSD *op,PSD_CUR *curp,PSD_ENT *ep) noex {
 	        if ((rs = pingstatdb_checkcache(op)) >= 0) {
 	            cint	i = (curp->i < 0) ? 0 : (curp->i + 1) ;
 		    void *vp ;
-	            if ((rs = vecitem_get(op->elp,i,&vp)) >= 0) {
+	            if ((rs = vechand_get(op->rlp,i,&vp)) >= 0) {
 		        if (PSD_REC *rp = resumelife<PSD_REC>(vp) ; rp) {
 	                    curp->i = i ;
 	                    if (ep) {
 	                        rs = entry_load(ep,rp) ;
 	                        hl = rs ;
 	                    } else {
-	                        hl = lenstr(ep->hostname) ;
+	                        hl = lenstr(ep->hostbuf) ;
 			    }
 	                } /* end if (non-null) */
-	            } /* end if (vecitem_get) */
+	            } /* end if (vechand_get) */
 	            if (rs < 0) {
 	                op->fl.readlocked = false ;
 	                op->fl.writelocked = false ;
@@ -371,13 +379,13 @@ int pingstatdb_curenum(PSD *op,PSD_CUR *curp,PSD_ENT *ep) noex {
 	return (rs >= 0) ? hl : rs ;
 } /* end subroutine (pingstatdb_curenum) */
 
-int pingstatdb_match(PSD *op,cchar *hostname,PSD_ENT *ep) noex {
+int pingstatdb_match(PSD *op,cchar *hn,PSD_ENT *ep) noex {
 	int		rs ;
 	int		hl = 0 ; /* return-value */
-	DEBUGPRINTF("ent name=%s\n",hostname) ;
-	if ((rs = pingstatdb_magic(op,hostname)) >= 0) {
+	DEBUGPRINTF("ent hn=%s\n",hn) ;
+	if ((rs = pingstatdb_magic(op,hn)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (hostname[0]) {
+	    if (hn[0]) {
 		rs = SR_OK ;
 	        if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
 	            rs = bcontrol(op->pfp,BC_LOCKREAD,TO_LOCK) ;
@@ -385,19 +393,18 @@ int pingstatdb_match(PSD *op,cchar *hostname,PSD_ENT *ep) noex {
 	        }
 	        if (rs >= 0) {
 	            if ((rs = pingstatdb_checkcache(op)) >= 0) {
-			DEBUGPRINTF("name=%s\n", hostname) ;
 			/* return SR_NOTFOUND if we fall off of the end */
 			PSD_REC	*rp ;
-	    		if ((rs = pingstatdb_getrec(op,hostname,&rp)) >= 0) {
+	    		if ((rs = pingstatdb_recget(op,hn,&rp)) >= 0) {
 	        	    if (rp) {
 	                        if (ep) {
 	                            rs = entry_load(ep,rp) ;
 	                            hl = rs ;
 	                        } else {
-	                            hl = lenstr(ep->hostname) ;
+	                            hl = lenstr(ep->hostbuf) ;
 	                        }
 	                    } /* end if (non-null) */
-	                } /* end if (pingstatdb_getrec) */
+	                } /* end if (pingstatdb_recget) */
 	                if_constexpr (f_unlock) {
 	    		    op->fl.readlocked = false ;
 	    		    op->fl.writelocked = false ;
@@ -415,30 +422,31 @@ int pingstatdb_match(PSD *op,cchar *hostname,PSD_ENT *ep) noex {
 	return (rs >= 0) ? hl : rs ;
 } /* end subroutine (pingstatdb_match) */
 
-local int pingstatsb_updates(PSD *op,cc *hn,int f_up,cchar *hn,time_t ts) noex {
-	custime		dt = time(nullptr) ;
+local int pingstatsb_updates(PSD *op,cc *hn,int f_up,time_t ts) noex {
+	custime		dt = getustime ;
+	timeb		*nowp = op->nowp ;
 	int		rs ;
 	int		rs1 ;
 	int		fchanged = false ; /* return-value */
-	op->now.time = dt ;
-	if ((dater d ; rs = d.start(&op->now,op->zname,-1)) >= 0) {
+	nowp->time = dt ;
+	if (dater d ; (rs = d.start(nowp,op->znbuf,-1)) >= 0) {
 	    if ((ts == 0) || (ts > dt)) {
 	        ts = dt ;
 	    }
 	    {
 	        DEBUGPRINTF("about to match\n") ;
-	        rs = vecitem_count(op->elp) ;
+	        rs = vechand_count(op->rlp) ;
 	        DEBUGPRINTF("entries in cache %d\n",rs) ;
 	    }
-	    if ((rs = pingstatdb_updrec(op,dt,&d,hn,f_up,ts)) >= 0) {
+	    if ((rs = pingstatdb_recupd(op,dt,&d,hn,f_up,ts)) >= 0) {
 		cchar *luh = LASTUPDATE ;
-	        f_changed = (rs > 0) ;
+	        fchanged = (rs > 0) ;
                 /* update the LASTUPDATE record */
-	        rs = pingstatdb_updrec(op,dt,&d,luh,f_up,ts) ;
+	        rs = pingstatdb_recupd(op,dt,&d,luh,f_up,ts) ;
                 /* udpate our last modification time */
 	        op->mtime = dt ;
 	        bcontrol(op->pfp,BC_SYNC,0) ;
-	    } /* end if (pingstatdb_updrec) */
+	    } /* end if (pingstatdb_recupd) */
 	    rs1 = dater_finish(&d) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dater) */
@@ -450,7 +458,7 @@ local int pingstatsb_updates(PSD *op,cc *hn,int f_up,cchar *hn,time_t ts) noex {
 int pingstatdb_update(PSD *op,cchar *hn,int f_up,time_t ts) noex {
 	int		rs ;
 	int		f_changed = false ; /* return-value */
-	DEBUGPRINTF("ent hostname=%s\n",hn) ;
+	DEBUGPRINTF("ent hn=%s\n",hn) ;
 	if ((rs = pingstatdb_magic(op,hn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (hn[0]) {
@@ -479,240 +487,11 @@ int pingstatdb_update(PSD *op,cchar *hn,int f_up,time_t ts) noex {
 	return (rs >= 0) ? f_changed : rs ;
 } /* end subroutine (pingstatdb_update) */
 
-int pingstatdb_uptime(PSD *op,cchar *hostname,PSD_UP *up) noex {
-	PSD_REC		e, *rp ;
-	dater		cd, ud, *cdp ;
-	off_t		boff ;
-	custime		dt = time(nullptr) ;
-	time_t		ptime = 0 ;
-	uint		timestamp ;
-	uint		ctimeange ;
-	uint		roff ;
-	int		rs = SR_OK ;
-	int		sz ;
-	int		f_up = true ;
-	int		f_changed = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (hostname == nullptr) return SR_FAULT ;
-	if (up == nullptr) return SR_FAULT ;
-
-	if (op->magval != PSD_MAGIC) return SR_NOTOPEN ;
-
-	if (hostname[0] == '\0') return SR_INVALID ;
-
-	if (! op->fl.writable) {
-	    rs = SR_BADF ;	/* not open for writing */
-	    goto ret0 ;
-	}
-
-#if	CF_DEBUG
-	DEBUGPRINTF("pingstatdb_uptime: lock stuff\n") ;
-#endif
-
-	if (op->fl.readlocked) {
-	    op->fl.readlocked = false ;
-	    op->fl.writelocked = false ;
-	    bcontrol(op->pfp,BC_UNLOCK,0) ;
-	}
-
-	if (! op->fl.writelocked) {
-	    rs = bcontrol(op->pfp,BC_LOCKWRITE,TO_LOCK) ;
-	    op->fl.writelocked = (rs >= 0) ;
-	} /* end if (we did not already have a lock on the file) */
-
-	if (rs < 0)
-	    goto ret0 ;
-
-	rs = pingstatdb_checkcache(op) ;
-	if (rs < 0)
-	    goto ret1 ;
-
-	op->now.time = dt ;
-	rs = dater_start(&ud,&op->now,op->zname,-1) ;
-	if (rs < 0)
-	    goto ret1 ;
-
-	rs = dater_start(&cd,&op->now,op->zname,-1) ;
-	if (rs < 0)
-	    goto ret2 ;
-
-	timestamp = up->timestamp ;
-	if ((up->timestamp == 0) || (up->timestamp > dt)) {
-	    timestamp = dt ;
-	}
-
-#if	CF_DEBUG
-	{
-	    char	timebuf[TIMEBUFLEN+1] ;
-	    DEBUGPRINTF("pingstatedb_uptime: now=%s\n",
-	        timestr_logz(op->now.time,timebuf)) ;
-	    DEBUGPRINTF("pingstatedb_uptime: dater_start() rs=%d cur_date=%s\n",
-	        rs,timestr_logz(ud.b.time,timebuf)) ;
-	}
-#endif
-
-#if	CF_DEBUG
-	{
-	    DEBUGPRINTF("pingstatedb_uptime: about to match\n") ;
-	    rs = vecitem_count(op->elp) ;
-	    DEBUGPRINTF("pingstatedb_uptime: entries in cache %d\n",rs) ;
-	}
-#endif
-
-	if ((rs = pingstatdb_getrec(op,hostname,&rp)) >= 0) {
-	    int	f_greater = (! LEQUIV(f_up,rp->f_up)) ;
-
-#if	CF_DEBUG
-	    DEBUGPRINTF("pingstatedb_uptime: found match rs=%d\n",rs) ;
-#endif
-
-	    rs = dater_gettime(&rp->pdate,&ptime) ;
-
-	    f_greater = ((rs >= 0) && (timestamp > ptime)) ;
-
-/* the update (ping) time */
-
-	    if (ptime > timestamp)
-	        timestamp = ptime ;
-
-	    dater_settimezn(&ud,timestamp,op->zname,-1) ;
-
-/* the change time */
-
-	    if (f_changed || (up->ctimeange != 0)) {
-
-	        ctimeange = up->ctimeange ;
-	        if (up->ctimeange == 0) {
-	            ctimeange = dt ;
-		}
-
-	        cdp = &cd ;
-	        dater_settimezn(&cd,(time_t) ctimeange,op->zname,-1) ;
-
-	    } else {
-	        cdp = &rp->cdate ;
-	    }
-
-/* force a change */
-
-#if	CF_DEBUG
-	    DEBUGPRINTF("pingstatedb_uptime: count=%d\n",
-	        up->count) ;
-#endif
-
-	    if ((! f_changed) && (up->count != rp->count))
-	        f_changed = true ;
-
-#if	CF_DEBUG
-	    {
-	        char	timebuf[TIMEBUFLEN + 1] ;
-	        DEBUGPRINTF("pingstatedb_uptime: dater_gettime() ptime=%s\n",
-	            timestr_logz(ptime,timebuf)) ;
-	    }
-#endif
-
-	    if ((rs < 0) || f_changed ||
-	        (((dt - ptime) > TO_MINUPDATE) && f_greater)) {
-
-	        boff = rp->roff ;
-	        bseek(op->pfp,boff,SEEK_SET) ;
-
-	        rs = record_write(rp,op->pfp,cdp,&ud,up->count,f_up) ;
-
-#if	CF_DEBUG
-	        DEBUGPRINTF("pingstatedb_uptime: record_write() rs=%d\n",rs) ;
-#endif
-
-	    } /* end if (did the update) */
-
-	} else {
-	    TIMEB	*nowp = &op->now ;
-	    int		f_rec = false ;
-	    cchar	*zn = op->zname ;
-	    cchar	*hn = hostname ;
-
-#if	CF_DEBUG
-	    DEBUGPRINTF("pingstatedb_uptime: no match found rs=%d\n",rs) ;
-#endif
-
-	    dater_settimezn(&ud,timestamp,op->zname,-1) ;
-
-	    if ((ctimeange = up->ctimeange) == 0) {
-	        ctimeange = dt ;
-	    }
-	    dater_settimezn(&cd,(time_t) ctimeange,op->zname,-1) ;
-
-	    f_changed = true ;
-	    bseek(op->pfp,0L,SEEK_END) ;
-
-	    btell(op->pfp,&boff) ;
-	    roff = boff ;
-
-	    if ((rs = record_start(&e,nowp,zn,roff,hn,&ud)) >= 0) {
-	        f_rec = true ;
-	    }
-
-#if	CF_DEBUG
-	    DEBUGPRINTF("pingstatedb_uptime: record_start() rs=%d\n",rs) ;
-	    DEBUGPRINTF("pingstatedb_uptime: hostname=%s\n", hostname) ;
-#endif
-
-	    if (rs >= 0) {
-	        rs = record_write(&e,op->pfp,&ud,&cd,up->count,f_up) ;
-	    }
-
-#if	CF_DEBUG
-	    DEBUGPRINTF("pingstatedb_uptime: record_write() rs=%d\n",
-	        rs) ;
-#endif
-
-	    if (rs >= 0) {
-	        sz = szof(PSD_REC) ;
-	        rs = vecitem_add(op->elp,&e,sz) ;
-	    }
-
-	    if ((rs < 0) && f_rec) {
-	        record_finish(&e) ;
-	    } /* end if (error) */
-	} /* end if (target entry) */
-
-/* update the LASTUPDATE entry */
-
-	if (rs >= 0) {
-	    rs = pingstatdb_updrec(op,dt,&cd,LASTUPDATE,f_up,timestamp) ;
-	}
-
-/* udpate our last modification time to keep our cache current */
-
-	op->mtime = dt ;
-	bcontrol(op->pfp,BC_SYNC,0) ;
-
-	dater_finish(&cd) ;
-
-ret2:
-	dater_finish(&ud) ;
-
-/* unlock it */
-ret1:
-	op->fl.writelocked = false ;
-	bcontrol(op->pfp,BC_UNLOCK,0) ;
-
-ret0:
-
-#if	CF_DEBUG
-	DEBUGPRINTF("pingstatedb_uptime: ret rs=%d f_changed=%u\n",
-	    rs,f_changed) ;
-#endif
-
-	return (rs >= 0) ? f_changed : rs ;
-} /* end subroutine (pingstatdb_uptime) */
-
 int pingstatdb_check(PSD *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = pingstatdb_magic(op)) >= 0) {
-	    if (dt == 0) dt = time(nullptr) ;
+	    if (dt == 0) dt = getustime ;
 	    if (op->fl.readlocked) {
 	        op->fl.readlocked = false ;
 	        op->fl.writelocked = false ;
@@ -740,112 +519,22 @@ int pingstatdb_check(PSD *op,time_t dt) noex {
 
 /* local subroutines */
 
-local int pingstatdb_checkcache(PSD *op) noex {
-	int		rs ;
-	int		f_cached = op->fl.cached ;
-	DEBUGPRINTF("ent f_cached=%d\n", f_cached) ;
-	if (ustat sb ; (rs = bcontrol(op->pfp,BC_STAT,&sb)) >= 0) {
-	    if (f_cached) {
-	        if (sb.st_mtime > op->mtime) {
-	            f_cached = false ;
-	            pingstatdb_fes(op) ;
-	        }
-	    } /* end if */
-	    if (! f_cached) {
-	        if ((rs = pingstatdb_readrecords(op)) >= 0) {
-	            op->mtime = sb.st_mtime ;
-	            op->fl.cached = true ;
-	        }
-	    } else {
-	        rs = vecitem_count(op->elp) ;
-	    }
-	} /* end if (bcontrol) */
-	DEBUGPRINTF("ret rs=%d\n",rs) ;
-	return rs ;
-} /* end subroutine (pingstatdb_checkcache) */
-
-local int pingstatdb_readrecords(PSD *op) noex {
-	int		rs ;
-	int		c = 0 ; /* return-value */
-	DEBUGPRINTF("ent\n") ;
-	if ((rs = brewind(op->pfp)) >= 0) {
-	    PSD_REC	e ;
-	    uint	roff = 0 ;
-	    cint	sz = szof(PSD_REC) ;
-	    cint	rlen = BUFLEN ;
-	    int		line = 1 ;
-	    int		bl ;
-	    int		f_eol ;
-	    int		f_bol = true ;
-	    char	rbuf[BUFLEN + 1] ;
-	    while ((rs = breadln(op->pfp,rbuf,rlen)) > 0) {
-	        int len = rs ;
-	        bl = (len - 1) ;
-	        f_eol = (rbuf[bl] == '\n') ;
-	        rbuf[bl] = '\0' ;
-	        if (f_bol && (bl > RF_LEAD)) {
-	            timeb	*nowp = &op->now ;
-	            cchar	*zn = op->zname ;
-	            DEBUGPRINTF("line=%u\n",line) ;
-	            if ((rs = record_startbuf(&e,nowp,zn,roff,rbuf,bl)) >= 0) {
-	                c += 1 ;
-	                rs = vecitem_add(op->elp,&e,sz) ;
-	                if (rs < 0) {
-	                    record_finish(&e) ;
-			} /* end if (error) */
-	            } /* end if (record_startbuf) */
-	        } /* end if (a live one) */
-	        roff += len ;
-	        line += 1 ;
-	        f_bol = f_eol ;
-	        if (rs < 0) break ;
-	    } /* end while (reading file records) */
-	} /* end if (brewind) */
-	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
-	return (rs >= 0) ? c : rs ;
-} /* end subroutine (pingstatdb_readrecords) */
-
-local int pingstatdb_fes(PSD *op) noex {
-	vecitem		*elp = op->elp ;
-	cint		rsn = SR_NOTFOUND ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-	/* delete for an uncompacted vector */
-	void *vp ;
-	for (int i = 0 ; elp->get(i,&vp) >= 0 ; i += 1) {
-	    if (PSD_REC *ep = resumelife<PSD_REC>(vp) ; ep) {
-	        record_finish(ep) ;
-	        vecitem_del(op->elp,i) ;
-	    }
-	} /* end for */
-	/* delete for a compacted vector */
-	for (int i = 0 ; (rs1 = elp->get(i,&vp)) >= 0 ; i += 1) {
-	    if (PSD_REC *ep = resumelife<PSD_REC>(vp) ; ep) {
-	        record_finish(ep) ;
-	        vecitem_del(elp,i) ;
-	    }
-	} /* end for */
-	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-	DEBUGPRINTF("ret rs=%d\n",rs) ;
-	return rs ;
-} /* end subroutine (pingstatdb_fes) */
-
-local int entry_load(PSD_ENT *ep,PSD_REC *rp) noex {
+local int entry_load(PSD_ENT *ep,PSD_REC *rep) noex {
 	int		rs = SR_BUGCHECK ;
 	int		hl = 0 ; /* return-value */
-	if (ep && rp) {
-	    dater *pdp = &rp->pdate ;
-	    dater *cdp = &rp->cdate ;
-	    ep->ti_change = 0 ;
-	    ep->ti_ping  = 0 ;
-	    ep->count = 0 ;
-	    ep->f_up = 0 ;
-	    ep->hostname[0] = '\0' ;
-	    if ((rs dater_gettime(pdp,&ep->ti_ping)) >= 0) {
+	if (ep && rep) {
+	    dater *pdp = rep->pdp ;
+	    dater *cdp = rep->cdp ;
+	    ep->ti_change	= 0 ;
+	    ep->ti_ping		= 0 ;
+	    ep->cnt		= 0 ;
+	    ep->f_up		= 0 ;
+	    ep->hostbuf[0]	= '\0' ;
+	    if ((rs = dater_gettime(pdp,&ep->ti_ping)) >= 0) {
 	        if ((rs = dater_gettime(cdp,&ep->ti_change)) >= 0) {
-	            ep->count = rp->count ;
-	            ep->f_up = rp->f_up ;
-	            rs = mkpath1(ep->hostname,rp->hostname) ;
+	            ep->cnt = rep->cnt ;
+	            ep->f_up = rep->f_up ;
+	            rs = mkpath(ep->hostbuf,rep->hostbuf) ;
 	            hl = rs ;
 		} /* end if */
 	    } /* end if */
@@ -854,18 +543,22 @@ local int entry_load(PSD_ENT *ep,PSD_REC *rp) noex {
 } /* end subroutine (entry_load) */
 
 /* make the open mode string for BIO, remember O_RDONLY is the fake */
-int mkbstr(mode_t omode,char *ostr) noex {
-	char		*bp = ostr ;
+int mkbstr(char *ostr,int omode) noex {
+    	int		rl = -1 ; /* return-value */
 	DEBUGPRINTF("omode=%04o\n",omode) ;
-	if (isaccmode.wr(omode)) {
-	    *bp++ = 'w' ;
-	}
-	if (omode & O_APPEND)	*bp++ = 'a' ;
-	if (omode & O_CREAT)	*bp++ = 'c' ;
-	if (omode & O_TRUNC)	*bp++ = 't' ;
-	*bp++ = 'r' ;		/* ALWAYS need for locking */
-	*bp = '\0' ;
-	return (bp - ostr) ;
+	if (ostr) {
+	    char *bp = ostr ;
+	    if (isaccmode.wr(omode)) {
+	        *bp++ = 'w' ;
+	    }
+	    if (omode & O_APPEND)	*bp++ = 'a' ;
+	    if (omode & O_CREAT)	*bp++ = 'c' ;
+	    if (omode & O_TRUNC)	*bp++ = 't' ;
+	    *bp++ = 'r' ;		/* ALWAYS need for locking */
+	    *bp = '\0' ;
+	    rl = conv<int>(bp - ostr) ;
+	} /* end if (non-null) */
+	return rl ;
 } /* end subroutine (mkbstr) */
 
 
