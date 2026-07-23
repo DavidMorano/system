@@ -176,8 +176,7 @@ int sntmtime(char *dbuf,int dlen,tmtime *tmp,cchar *fmt) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sntmtime) */
+} /* end subroutine (sntmtime) */
 
 
 /* local subroutines */
@@ -340,8 +339,7 @@ local int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sbuf_fmtstrs) */
+} /* end subroutine (sbuf_fmtstrs) */
 
 local int sbuf_twodig(sbuf *ssp,int v) noex {
 	char		dbuf[2+1] ;
@@ -378,8 +376,7 @@ local int sbuf_digs(sbuf *ssp,int v,int n,int f_space) noex {
 	    rs = sbuf_strw(ssp,dbuf,n) ;
 	}
 	return rs ;
-}
-/* end subroutine (sbuf_digs) */
+} /* end subroutine (sbuf_digs) */
 
 local int sbuf_year(sbuf *ssp,tmtime *tmp) noex {
 	cint		y = ((tmp->year + TM_YEAR_BASE)%10000) ;
@@ -390,8 +387,7 @@ local int sbuf_year(sbuf *ssp,tmtime *tmp) noex {
 	    rs = sbuf_strw(ssp,dbuf,rs) ;
 	}
 	return rs ;
-}
-/* end subroutine (sbuf_year) */
+} /* end subroutine (sbuf_year) */
 
 local int sbuf_coder(sbuf *ssp,tmtime *tmp,int f_sec) noex {
 	int		rs ;
@@ -407,8 +403,7 @@ local int sbuf_coder(sbuf *ssp,tmtime *tmp,int f_sec) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (sbuf_coder) */
+} /* end subroutine (sbuf_coder) */
 
 local int sbuf_zoff(sbuf *ssp,tmtime *tmp) noex {
 	cint		zo = (tmp->gmtoff / 60) ; /* minutes west of GMT */
@@ -424,8 +419,7 @@ local int sbuf_zoff(sbuf *ssp,tmtime *tmp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (sbuf_zoff) */
+} /* end subroutine (sbuf_zoff) */
 
 local int sbuf_dated(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
@@ -440,8 +434,7 @@ local int sbuf_dated(sbuf *ssp,tmtime *tmp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (sbuf_dated) */
+} /* end subroutine (sbuf_dated) */
 
 local int sbuf_dater(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
@@ -455,8 +448,7 @@ local int sbuf_dater(sbuf *ssp,tmtime *tmp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (sbuf_dater) */
+} /* end subroutine (sbuf_dater) */
 
 local int sbuf_datex(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
@@ -471,7 +463,6 @@ local int sbuf_datex(sbuf *ssp,tmtime *tmp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (sbuf_datex) */
+} /* end subroutine (sbuf_datex) */
 
 
