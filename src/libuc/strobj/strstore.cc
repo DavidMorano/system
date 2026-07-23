@@ -50,7 +50,7 @@
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<uclibmem.h>		/* LINUC */
+#include	<uclibmem.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<intceil.h>		/* LIBU */
 #include	<hash.h>		/* LIBUC */
@@ -70,8 +70,6 @@ import libutil ;			/* |lenstr(3u)| */
 #ifndef	CF_PREALLOC
 #define	CF_PREALLOC	0
 #endif
-
-#define	MODP2(v,n)	((v) & ((n) - 1))
 
 
 /* imported namespaces */
@@ -111,10 +109,10 @@ local inline int strstore_ctor(strstore *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->csp = nullptr ;
-	    op->chsize = 0 ;
-	    op->totalsize = 0 ;
+	    op->chsz = 0 ;
+	    op->totalsz = 0 ;
 	    op->c = 0 ;
 	    if ((op->clp = new(nothrow) vechand) != np) ylikely {
 	        if ((op->nlp = new(nothrow) vechand) != np) ylikely {
@@ -125,17 +123,17 @@ local inline int strstore_ctor(strstore *op,Args ... args) noex {
 		        if (rs < 0) {
 		            delete op->lap ;
 		            op->lap = nullptr ;
-		        }
+		        } /* end if (error) */
 	            } /* end if (new-lookaside) */
 		    if (rs < 0) {
 		        delete op->nlp ;
 		        op->nlp = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (new-vechand) */
 		if (rs < 0) {
 		    delete op->clp ;
 		    op->clp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
@@ -166,7 +164,7 @@ template<typename ... Args>
 local inline int strstore_magic(strstore *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == STRSTORE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == STRSTORE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (strstore_magic) */
@@ -189,13 +187,11 @@ constexpr bool		f_prealloc = CF_PREALLOC ;
 
 local inline int indexlen(int n) noex {
 	return nextpowtwo(n) ;
-}
-/* end subroutine (indexlen) */
+} /* end subroutine (indexlen) */
 
 local inline int indexsize(int il) noex {
 	return ((il + 1) * 3 * szof(int)) ;
-}
-/* end subroutine (indexsize) */
+} /* end subroutine (indexsize) */
 
 
 /* exported subroutines */
@@ -209,41 +205,40 @@ int strstore_start(strstore *op,int n,int csz) noex {
 	    vechand	*clp = op->clp ;
 	    cint	vo = VECHAND_OORDERED ;
 	    cint	nch = max((n/6),6) ;
-	    op->chsize = csz ;
+	    op->chsz = csz ;
 	    if ((rs = vechand_start(clp,nch,vo)) >= 0) ylikely {
 	        if ((rs = vechand_start(op->nlp,n,vo)) >= 0) ylikely {
 		    cint	isz = szof(int) ;
 	            if ((rs = lookaside_start(op->lap,isz,n)) >= 0) ylikely {
 		        cint	hn = ((n*3)/2) ;
 	                if ((rs = hdb_start(op->hlp,hn,true,np,np)) >= 0) {
-	                    op->magic = STRSTORE_MAGIC ;
+	                    op->magval = STRSTORE_MAGIC ;
 			    if_constexpr (f_prealloc) {
 	                        rs = strstore_chunknew(op,0) ;
 	                        if (rs < 0)  {
 	                            hdb_finish(op->hlp) ;
-	                            op->magic = 0 ;
-	                        }
+	                            op->magval = 0 ;
+	                        } /* end if (error) */
 			    } /* end if_constexpr (f_prealloc) */
 	                } /* end if (hdb-start) */
 	                if (rs < 0) {
 	                    lookaside_finish(op->lap) ;
-			}
+			} /* end if (error) */
 	            } /* end if (lookaside_start) */
 	            if (rs < 0) {
 		        vechand_finish(op->nlp) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (vechand) */
 	        if (rs < 0) {
 		    vechand_finish(op->clp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (vechand) */
 	    if (rs < 0) {
 		strstore_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (strstore_ctor) */
 	return rs ;
-}
-/* end subroutine (strstore_start) */
+} /* end subroutine (strstore_start) */
 
 int strstore_finish(strstore *op) noex {
 	int		rs ;
@@ -274,16 +269,14 @@ int strstore_finish(strstore *op) noex {
                 if (rs >= 0) rs = rs1 ;
             }
             op->csp = nullptr ;
-            op->magic = 0 ;
+            op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strstore_finish) */
+} /* end subroutine (strstore_finish) */
 
 int strstore_add(strstore *op,cchar *sp,int sl) noex {
 	return strstore_store(op,sp,sl,nullptr) ;
-}
-/* end subroutine (strstore_add) */
+} /* end subroutine (strstore_add) */
 
 int strstore_adduniq(strstore *op,cchar *sp,int sl) noex {
 	cint		nrs = SR_NOTFOUND ;
@@ -292,8 +285,7 @@ int strstore_adduniq(strstore *op,cchar *sp,int sl) noex {
 	    rs = strstore_store(op,sp,sl,nullptr) ;
 	}
 	return rs ;
-}
-/* end subroutine (strstore_adduniq) */
+} /* end subroutine (strstore_adduniq) */
 
 int strstore_store(strstore *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
@@ -310,7 +302,7 @@ int strstore_store(strstore *op,cchar *sp,int sl,cchar **rpp) noex {
 	        }
 	        if (rs >= 0) ylikely {
 		    ep = (cckp->cdata + cckp->i) ;
-	            si = op->totalsize ;
+	            si = op->totalsz ;
 	            strwcpy(ep,sp,sl) ;
 	            if ((rs = vechand_add(op->nlp,ep)) >= 0) {
 	                cint	i = rs ;
@@ -322,8 +314,8 @@ int strstore_store(strstore *op,cchar *sp,int sl,cchar **rpp) noex {
 	            cckp->i += amount ;
 	            cckp->c += 1 ;		/* count in chunk */
 	            op->c += 1 ;		/* count in object */
-	            op->totalsize += amount ;
-	        }
+	            op->totalsz += amount ;
+	        } /* end if (ok) */
 		if (rpp) {
 		    cchar	*cep = charp(ep) ;
 		    *rpp = (rs >= 0) ? cep : nullptr ;
@@ -331,8 +323,7 @@ int strstore_store(strstore *op,cchar *sp,int sl,cchar **rpp) noex {
 	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (strstore_store) */
+} /* end subroutine (strstore_store) */
 
 int strstore_curbegin(strstore *op,strstore_cur *curp) noex {
 	int		rs ;
@@ -340,8 +331,7 @@ int strstore_curbegin(strstore *op,strstore_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strstore_curbegin) */
+} /* end subroutine (strstore_curbegin) */
 
 int strstore_curend(strstore *op,strstore_cur *curp) noex {
 	int		rs ;
@@ -349,8 +339,7 @@ int strstore_curend(strstore *op,strstore_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strstore_curend) */
+} /* end subroutine (strstore_curend) */
 
 int strstore_enum(strstore *op,strstore_cur *curp,cchar **rpp) noex {
 	int		rs ;
@@ -368,8 +357,7 @@ int strstore_enum(strstore *op,strstore_cur *curp,cchar **rpp) noex {
 	        } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (strstore_enum) */
+} /* end subroutine (strstore_enum) */
 
 int strstore_already(strstore *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -386,8 +374,7 @@ int strstore_already(strstore *op,cchar *sp,int sl) noex {
 	        } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? si : rs ;
-}
-/* end subroutine (strstore_already) */
+} /* end subroutine (strstore_already) */
 
 int strstore_count(strstore *op) noex {
 	int		rs ;
@@ -395,33 +382,30 @@ int strstore_count(strstore *op) noex {
 	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strstore_count) */
+} /* end subroutine (strstore_count) */
 
 int strstore_size(strstore *op) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op)) >= 0) ylikely {
-	    rs = op->totalsize ;
+	    rs = op->totalsz ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strstore_size) */
+} /* end subroutine (strstore_size) */
 
 int strstore_strsize(strstore *op) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op)) >= 0) ylikely {
 	    cint	vsz = szof(int) ;
-	    rs = iceil(op->totalsize,vsz) ;
+	    rs = iceil(op->totalsz,vsz) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strstore_strsize) */
+} /* end subroutine (strstore_strsize) */
 
 int strstore_strmk(strstore *op,char *tabp,int tabl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = strstore_magic(op,tabp)) >= 0) ylikely {
-		cint	size = iceil(op->totalsize,szof(int)) ;
+		cint	size = iceil(op->totalsz,szof(int)) ;
 		rs = SR_OVERFLOW ;
 		if (tabl >= size) ylikely {
 		    vechand	*vhp = op->clp ;
@@ -440,12 +424,11 @@ int strstore_strmk(strstore *op,char *tabp,int tabl) noex {
 		    } /* end for */
 		    while (bp < (tabp + tabl)) {
 	    		*bp++ = '\0' ;
-		    }
+		    } /* end while */
 		} /* end if (sized OK) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (strstore_strmk) */
+} /* end subroutine (strstore_strmk) */
 
 int strstore_recsize(strstore *op) noex {
 	int		rs ;
@@ -454,8 +437,7 @@ int strstore_recsize(strstore *op) noex {
 	    rs = (n + 1) * szof(int) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strstore_recsize) */
+} /* end subroutine (strstore_recsize) */
 
 int strstore_recmk(strstore *op,int *rdata,int rsize) noex {
 	int		rs ;
@@ -483,8 +465,7 @@ int strstore_recmk(strstore *op,int *rdata,int rsize) noex {
 	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (strstore_recmk) */
+} /* end subroutine (strstore_recmk) */
 
 int strstore_indlen(strstore *op) noex {
 	int		rs ;
@@ -492,8 +473,7 @@ int strstore_indlen(strstore *op) noex {
 	    rs = indexlen(op->c+1) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strstore_indlen) */
+} /* end subroutine (strstore_indlen) */
 
 int strstore_indsize(strstore *op) noex {
 	int		rs ;
@@ -502,8 +482,7 @@ int strstore_indsize(strstore *op) noex {
 	    rs = indexsize(il) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strstore_indsize) */
+} /* end subroutine (strstore_indsize) */
 
 int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 	int		rs ;
@@ -597,8 +576,7 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 	    } /* end if (size OK) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sc : rs ;
-}
-/* end subroutine (strstore_indmk) */
+} /* end subroutine (strstore_indmk) */
 
 
 /* private subroutines */
@@ -606,15 +584,15 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 local int strstore_chunknew(strstore *op,int amount) noex {
 	cint		csize = szof(strstore_ch) ;
 	int		rs ;
-	if (op->chsize > amount) amount = op->chsize ;
+	if (op->chsz > amount) amount = op->chsz ;
 	if (void *vp ; (rs = lm_mall(csize,&vp)) >= 0) ylikely {
 	    strstore_ch		*cep = (strstore_ch *) vp ;
 	    if ((rs = chunk_start(cep,(amount + 1))) >= 0) ylikely {
 	        if ((rs = vechand_add(op->clp,cep)) >= 0) ylikely {
 	    	    op->csp = cep ;
-	            if (op->totalsize == 0) {
+	            if (op->totalsz == 0) {
 	                chunk_adv(cep) ;
-	                op->totalsize = 1 ;
+	                op->totalsz = 1 ;
 		    }
 		} /* end if (vechand_add) */
 		if (rs < 0) {
@@ -643,7 +621,7 @@ local int strstore_chunkfins(strstore *op) noex {
 		{
 	            rs1 = lm_free(cckp) ;
 	            if (rs >= 0) rs = rs1 ;
-		}
+		} /* end if (memory-release) */
 	    }
 	} /* end for */
 	return rs ;
