@@ -113,7 +113,7 @@ local int tmtime_zfini(tmtime *op) noex {
 		rs1 = lm_free(op->znbuf) ;
 		if (rs >= 0) rs = rs1 ;
 		op->znbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (tmtime_zfini) */
@@ -215,7 +215,7 @@ int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	    } /* end if (getting zone-name) */
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmtime_zinit) */
 	return rs ;
 } /* end subroutine (tmtime_insert) */
@@ -242,7 +242,7 @@ int tmtime_extract(tmtime *op,TM *tmp) noex {
 	    } /* end if_constexpr (f_darwin) */
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmtime_zinit) */
 	return rs ;
 } /* end subroutine (tmtime_extract) */
