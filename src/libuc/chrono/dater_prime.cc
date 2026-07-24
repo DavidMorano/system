@@ -404,7 +404,7 @@ int dater_settmzon(dater *op,TM *stp,int zoff,cchar *zstr,int zlen) noex {
 	        }
 	        if (rs >= 0) {
 		    op->magval = DATER_MAGIC ;
-		}
+		} /* end if (ok) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
@@ -461,7 +461,7 @@ int dater_settmzn(dater *op,TM *stp,cchar *zstr,int zlen) noex {
 		        rv = rs ;
 	                op->magval = DATER_MAGIC ;
 		    }
-	        } /* end if */
+	        } /* end if (ok) */
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
@@ -499,7 +499,7 @@ int dater_settimezn(dater *op,time_t t,cchar *zname,int isdst) noex {
 	        } /* end if */
 	        if (rs >= 0) {
 		    op->magval = DATER_MAGIC ;
-		}
+		} /* end if (ok) */
 	    } /* end if (dater_initbase) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
