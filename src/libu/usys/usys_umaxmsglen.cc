@@ -46,13 +46,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cerrno>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usysflag.h>
+#include	<cerrno>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
 
 #include	"usys_umaxmsglen.h"
 
@@ -69,11 +68,11 @@ namespace libu {
 	if ((rs = sysctlbyname(name,&val,&vsize,nullptr,0uz)) >= 0) {
 	    rs = val ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
     } /* end subroutine (umaxmsglen) */
-}
+} /* end namespace (libu) */
 
 #else /* all other OSes */
 
@@ -81,7 +80,7 @@ namespace libu {
     sysret_t umaxmsglen() noex {
 	return SR_NOSYS ;
     } /* end subroutine (umaxmsglen) */
-}
+} /* end namespace (libu) */
 
 #endif /* which OS */
 
