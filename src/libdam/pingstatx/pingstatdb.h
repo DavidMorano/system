@@ -69,7 +69,7 @@ struct pingstatdb_entry {
 struct pingstatdb_upper {
 	uint		timestamp ;
 	uint		timechange ;
-	uint		count ;
+	int		count ;
 } ; /* end struct */
 
 typedef	PINGSTATDB		pingstatdb ;
