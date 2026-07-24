@@ -54,17 +54,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |ulogerror(3u)| */
-#include	<snx.h>			/* |sntmtime(3uc)| */
-#include	<sncpyx.h>
-#include	<tmtime.hh>
-#include	<zoffparts.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| + |NYEARS_CENTURY| */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |ulogerror(3u)| */
+#include	<snx.h>			/* LIBUC |sntmtime(3uc)| */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<zoffparts.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |NYEARS_CENTURY| */
 
 #include	"timestr.h"
 
@@ -99,72 +99,61 @@
 /* exported subroutines */
 
 char *timestr_std(time_t t,char *buf) noex {
-	return timestr_date(t,timestrtype_std,buf) ;
-}
-/* end subroutine (timestr_std) */
+	return timestr_date(t,buf,timestrtype_std) ;
+} /* end subroutine (timestr_std) */
 
 char *timestr_edate(time_t t,char *buf) noex {
-	return timestr_date(t,timestrtype_std,buf) ;
-}
-/* end subroutine (timestr_edate) */
+	return timestr_date(t,buf,timestrtype_std) ;
+} /* end subroutine (timestr_edate) */
 
 char *timestr_gmtstd(time_t t,char *buf) noex {
-	return timestr_date(t,timestrtype_gmstd,buf) ;
-}
-/* end subroutine (timestr_gmtstd) */
+	return timestr_date(t,buf,timestrtype_gmstd) ;
+} /* end subroutine (timestr_gmtstd) */
 
 char *timestr_msg(time_t t,char *buf) noex {
-	return timestr_date(t,timestrtype_msg,buf) ;
-}
-/* end subroutine (timestr_msg) */
+	return timestr_date(t,buf,timestrtype_msg) ;
+} /* end subroutine (timestr_msg) */
 
 char *timestr_hdate(time_t t,char *buf) noex {
-	return timestr_date(t,timestrtype_msg,buf) ;
-}
-/* end subroutine (timestr_hdate) */
+	return timestr_date(t,buf,timestrtype_msg) ;
+} /* end subroutine (timestr_hdate) */
 
 char *timestr_log(time_t t,char *buf) noex {
-	return timestr_date(t,timestrtype_log,buf) ;
-}
-/* end subroutine (timestr_log) */
+	return timestr_date(t,buf,timestrtype_log) ;
+} /* end subroutine (timestr_log) */
 
 #ifdef	COMMENT
-char *timestr_loggm(time-t t,char *buf) noex {
-	return timestr_date(t,timestrtype_gmlog,buf) ;
-}
-/* end subroutine (timestr_loggm) */
+char *timestr_loggm(time_t t,char *buf) noex {
+	return timestr_date(t,buf,timestrtype_gmlog) ;
+} /* end subroutine (timestr_loggm) */
 #endif /* COMMENT */
 
 char *timestr_gmlog(time_t t,char *buf) noex {
-	return timestr_date(t,timestrtype_gmlog,buf) ;
-}
-/* end subroutine (timestr_gmlog) */
+	return timestr_date(t,buf,timestrtype_gmlog) ;
+} /* end subroutine (timestr_gmlog) */
 
 char *timestr_logz(time_t t,char *buf) noex {
-	return timestr_date(t,timestrtype_logz,buf) ;
-}
-/* end subroutine (timestr_logz) */
+	return timestr_date(t,buf,timestrtype_logz) ;
+} /* end subroutine (timestr_logz) */
 
 #ifdef	COMMENT
 char *timestr_loggmz(time_t t,char *buf) noex {
-	return timestr_date(t,timestrtype_gmlogz,buf) ;
-}
-/* end subroutine (timestr_loggmz) */
+	return timestr_date(t,buf,timestrtype_gmlogz) ;
+} /* end subroutine (timestr_loggmz) */
 #endif /* COMMENT */
 
 char *timestr_gmlogz(time_t t,char *buf) noex {
-	return timestr_date(t,timestrtype_gmlogz,buf) ;
-}
-/* end subroutine (timestr_gmlogz) */
+	return timestr_date(t,buf,timestrtype_gmlogz) ;
+} /* end subroutine (timestr_gmlogz) */
 
 /* create a date-string as specified by its type-code */
-char *timestr_date(time_t t,int type,char *tbuf) noex {
+char *timestr_date(time_t t,char *tbuf,int type) noex {
 	cint		tlen = TIMEBUFLEN ;
 	int		rs = SR_FAULT ;
-	if (tbuf) {
+	if (tbuf) ylikely {
 	    tbuf[0] = '\0' ;
 	    rs = SR_DOM ;
-	    if (t >= 0) {
+	    if (t >= 0) ylikely {
 	        tmtime	tmt ;
 	        bool	f_gmt = false ;
 	        switch (type) {
@@ -181,7 +170,7 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 	            rs = tmtime_timelocal(&tmt,t) ;
 	        }
         	/* create the appropriate string based on the type-code */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    cchar	*fmt = nullptr ;
 	            switch (type) {
 	            case timestrtype_std:
@@ -203,18 +192,19 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 	                rs = sncpy1(tbuf,tlen,"** invalid type **") ;
 	                break ;
 	            } /* end switch */
-		    if (fmt) {
+		    if (fmt) ylikely {
 	                rs = sntmtime(tbuf,tlen,&tmt,fmt) ;
 		    }
 	        } /* end if (ok) */
 	    } /* end if (valid) */
-	    if (rs < 0) tbuf[0] = '\0' ;
+	    if (rs < 0) {
+		tbuf[0] = '\0' ;
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	if (rs < 0) {
 	    ulogerror("timestr",rs,"date") ;
-	}
+	} /* end if (error) */
 	return (rs >= 0) ? tbuf : nullptr ;
-}
-/* end subroutine (timestr_date) */
+} /* end subroutine (timestr_date) */
 
 
