@@ -118,7 +118,7 @@ int date_start(date *op,time_t t,int zoff,int isdst,cchar *zbuf,int zlen) noex {
 		    if (rs < 0) {
 		        lm_free(op->zname) ;
 		        op->zname = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (memory-acquire) */
 	    } /* end if (znlen) */
 	} /* end if (non-null) */
@@ -134,9 +134,9 @@ int date_finish(date *op) noex {
 		rs1 = lm_free(op->zname) ;
 		if (rs >= 0) rs = rs1 ;
 		op->zname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->time = 0 ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (date_finish) */
 
@@ -145,7 +145,7 @@ int date_setzname(date *op,cchar *sp,int sl) noex {
 	if (op && sp) ylikely {
 	    char	*zp = op->zname ; /* "write" buffer */
 	    rs = intconv(strnwcpy(zp,znlen,sp,sl) - zp) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (date_setzname) */
 
@@ -157,7 +157,7 @@ int date_copy(date *op,date *d2p) noex {
 	    rs = SR_OK ;
 	    memcpy(hop,d2p) ;			/* shallow-copy */
 	    op->zname = znp ;			/* restore */
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (date_copy) */
 
@@ -166,7 +166,7 @@ int date_gettime(date *op,time_t *tp) noex {
 	if (op && tp) ylikely {
 	    rs = SR_OK ;
 	    *tp = op->time ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (date_gettime) */
 
@@ -175,7 +175,7 @@ int date_getzoff(date *op,int *zop) noex {
 	if (op && zop) ylikely {
 	    rs = SR_OK ;
 	    *zop = op->zoff ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (date_getzoff) */
 
@@ -184,7 +184,7 @@ int date_getisdst(date *op,int *dstp) noex {
 	if (op && dstp) ylikely {
 	    rs = SR_OK ;
 	    *dstp = int(op->isdst) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (date_getisdst) */
 
@@ -192,7 +192,7 @@ int date_getzname(date *op,char *zbuf,int zlen) noex {
 	int		rs = SR_FAULT ;
 	if (op && zbuf) ylikely {
 	    rs = sncpy(zbuf,zlen,op->zname) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (date_getzname) */
 
