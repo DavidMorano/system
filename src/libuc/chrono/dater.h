@@ -125,12 +125,12 @@ struct dater : dater_head {
 	int setlogz	(cchar *,int) noex ;
 	int settouch	(cchar *,int) noex ;
 	int settoucht	(cchar *,int) noex ;
-	int settmzon	(TM *,int,cchar *,int) noex ;
+	int settmzon	(TM *,int,cchar *,int = 1) noex ;
 	int settmzo	(TM *,int) noex ;
-	int settmzn	(TM *,cchar *,int) noex ;
-	int settimezn	(time_t,cchar *,int) noex ;
-	int settimezon	(time_t,int,cchar *,int) noex ;
-	int setzinfo	(dater_zi *,cc *,int) noex ;
+	int settmzn	(TM *,cchar *,int = -1) noex ;
+	int settimezn	(time_t,cchar *,int = -1) noex ;
+	int settimezon	(time_t,int,cchar *,int = -1) noex ;
+	int setzinfo	(dater_zi *,cc *,int = -1) noex ;
 	int setkey	(cc *,int,TIMEB *,cc *) noex ;
 	int tzinfo	(dater_zi *) noex ;
 	int mkdatestr	(daterdts,char *,int) noex ;
