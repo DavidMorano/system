@@ -5,6 +5,7 @@
 /* handle parsing a supplied date string using a key format identifier */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -70,6 +71,10 @@ import dater_mag ;
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0
+#endif
+
 
 /* imported namespaces */
 
@@ -123,18 +128,29 @@ namespace {
 
 /* local variables */
 
-constexpr cpcchar	datenames[] = {
-	[datetype_current]	= "current",
-	[datetype_now]		= "now",
-	[datetype_touch]	= "touch",
-	[datetype_tt]		= "tt",
-	[datetype_ttouch]	= "ttouch",
-	[datetype_toucht]	= "toucht",
-	[datetype_log]		= "log",
-	[datetype_logz]		= "logz",
-	[datetype_strdig]	= "strdig",
-	[datetype_overlast]	=  nullptr
-} ; /* end array (datenames) */
+namespace {
+    struct datetyper {
+	ccharp		n[datetype_overlast + 1] ;
+	consteval void mktab() noex {
+	    n[datetype_current]		= "current" ;
+	    n[datetype_now]		= "now" ;
+	    n[datetype_touch]		= "touch" ;
+	    n[datetype_tt]		= "tt" ;
+	    n[datetype_ttouch]		= "ttouch" ;
+	    n[datetype_toucht]		= "toucht" ;
+	    n[datetype_log]		= "log" ;
+	    n[datetype_logz]		= "logz" ;
+	    n[datetype_strdig]		= "strdig" ;
+	    n[datetype_overlast]	= nullptr ;
+	} ; /* end method (mktab) */
+	consteval datetyper() noex {
+	    mktab() ;
+	} ; /* end ctor */
+    } ; /* end struct (datetyper) */
+} /* end namespace */
+
+constexpr datetyper	datename ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -167,7 +183,7 @@ datehelp::operator int () noex {
             cc		*valp = (tp + 1) ;
 	    cchar	*kp ;
             if (int kl ; (kl = sfshrink(dsp,tl,&kp)) > 0) {
-                if (cint ti = matstr(datenames,kp,kl) ; ti >= 0) {
+                if (cint ti = matstr(datename.n,kp,kl) ; ti >= 0) {
 		    datetypes dt = datetypes(ti) ;
 		    rs = prockey(dt,valp,vall) ;
 		} else {
@@ -188,7 +204,7 @@ int datehelp::procval(cchar *sp,int sl) noex {
 	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	    cint	ch = tolc(cp[0]) ;
             if ((ch == 'c') || (ch == 'n')) {
-		if (cint ti = matstr(datenames,cp,cl) ; ti >= 0) {
+		if (cint ti = matstr(datename.n,cp,cl) ; ti >= 0) {
 		    datetypes dt = datetypes(ti) ;
 		    rs = prockey(dt,cp,cl) ;
 		} else {
