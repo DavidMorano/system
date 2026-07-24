@@ -22,7 +22,7 @@
 	pingstatdb_rec
 
   	Description:
-	This subroutine maintains a PINGSTATDB file. These files
+	This subroutine maintains a PINGSTATDB file.  These files
 	are used to maintain the names and status of a PING event.
 
 	Synopsis:
@@ -299,7 +299,7 @@ loader::operator int () noex {
 
 int loader::loadcnt(cchar *cp,int cl) noex {
     	int		rs ;
-	if (int v ; (rs = cfdeci(cp,cl,&v)) >= 0) {
+	if (int v ; (rs = cfdeci(cp,cl,&v)) >= 0) ylikely {
 	    rep->cnt = v ;
 	}
 	return rs ;
@@ -331,8 +331,8 @@ int loader::loadstat(cchar *cp,int cl) noex {
 int loader::loadhn(cchar *cp,int cl) noex {
     	int		rs = SR_OK ;
 	cchar *hp ;
-	if (int hl = sfshrink(cp,cl,&hp) ; hl > 0) {
-	    if (cchar *ap ; (rs = mem.strw(hp,hl,&ap)) >= 0) {
+	if (int hl = sfshrink(cp,cl,&hp) ; hl > 0) ylikely {
+	    if (cchar *ap ; (rs = mem.strw(hp,hl,&ap)) >= 0) ylikely {
 		rep->hostbuf = ap ;
 		rep->hostlen = rs ;
 	    } /* end if (memory-acquire) */
@@ -343,7 +343,7 @@ int loader::loadhn(cchar *cp,int cl) noex {
 int record_update(PSD_REC *ep,bfile *fp,dater *dp,int f_up) noex {
 	int		rs = SR_BUGCHECK ;
 	DEBUGPRINTF("ent\n") ;
-	if (ep && fp && dp) {
+	if (ep && fp && dp) ylikely {
 	    dater	*cdp = ep->cdp ;
 	    dater	*pdp = ep->pdp ;
 	    char	cdbuf[RF_LOGZLEN + 2] ;
@@ -457,8 +457,8 @@ void pingstatdb_rec::dtor() noex {
 int record::init() noex {
     	cnothrow	nt{} ;
     	int		rs = SR_NOMEM ;
-	if (cdp = new(nt) dater ; cdp) {
-	    if (pdp = new(nt) dater ; pdp) {
+	if (cdp = new(nt) dater ; cdp) ylikely {
+	    if (pdp = new(nt) dater ; pdp) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-dater) */
 	    if (rs < 0) {
