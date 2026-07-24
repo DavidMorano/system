@@ -22,15 +22,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
@@ -54,7 +54,7 @@
 
 int btell(bfile *op,off_t *rp) noex {
 	int		rs ;
-	if ((rs = bfile_magic(op)) > 0) {
+	if ((rs = bfile_magic(op)) > 0) ylikely {
 	    coff	ro = op->offset ;
 	    if (rp) *rp = ro ;
 	    {
