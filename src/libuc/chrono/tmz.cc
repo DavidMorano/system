@@ -133,8 +133,7 @@ template<typename ... Args>
 local int tmz_zinit(tmz *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-    	    static cint		rsv = mkvars() ;
-	    if ((rs = rsv) >= 0) ylikely {
+    	    if (static cint rsv = mkvars() ; (rs = rsv) >= 0) ylikely {
 	        if (op->zname == nullptr) ylikely {
 	            if (char *a ; (rs = lm_zn(&a)) >= 0) ylikely {
 		        op->zname = a ;
@@ -150,13 +149,13 @@ local int tmz_zinit(tmz *op,Args ... args) noex {
 local int tmz_zfini(tmz *op) noex {
     	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	     rs = SR_OK ;
              if (op->zname) ylikely {
 	         rs1 = lm_free(op->zname) ;
 	         if (rs >= 0) rs = rs1 ;
 	         op->zname = nullptr ;
-             }
+             } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (tmz_zfini) */
@@ -209,7 +208,7 @@ int tmz_init(tmz *op) noex {
 	    op->zoff = SHORT_MIN ;
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_init) */
@@ -245,10 +244,10 @@ int tmz_xstd(tmz *op,cchar *sp,int sl) noex {
 	    if (rs >= 0) {
 		cint	znl = var.znlen ;
 	        rs = lenstr(op->zname,znl) ;
-	    }
+	    } /* end if (ok) */
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_xstd) */
@@ -305,7 +304,7 @@ int tmz_xmsg(tmz *op,cchar *sp,int sl) noex {
 	    }
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? zl : rs ;
 } /* end subroutine (tmz_xmsg) */
@@ -325,10 +324,10 @@ int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 	    while (sl && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    while (sl && CHAR_ISWHITE(sp[sl-1])) {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    if (hasalldig(sp,sl)) ylikely {
 	        cint	n = 5 ;
 	        int	i = 0 ;
@@ -366,7 +365,7 @@ int tmz_xtouch(tmz *op,cchar *sp,int sl) noex {
 	    }
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_xtouch) */
@@ -386,10 +385,10 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
             while (sl && CHAR_ISWHITE(*sp)) {
                 sp += 1 ;
                 sl -= 1 ;
-            }
+            } /* end while */
             while (sl && CHAR_ISWHITE(sp[sl-1])) {
                 sl -= 1 ;
-            }
+            } /* end while */
             if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != nullptr) ylikely {
                 cint        cl = intconv(sl-((tp+1)-sp)) ;
                 cchar       *cp = (tp+1) ;
@@ -448,7 +447,7 @@ int tmz_xtoucht(tmz *op,cchar *sp,int sl) noex {
 	    } /* end if (ok) */
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (date_toucht) */
@@ -469,10 +468,10 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	    while (sl && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    while (sl && CHAR_ISWHITE(sp[sl-1])) {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    if (cchar *tp ; (tp = strnzone(sp,sl)) != nullptr) ylikely {
 	        cchar	*cp = tp ;
 	        int	cl = intconv(sl - (tp - sp)) ;
@@ -548,7 +547,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	    } /* end if (ok) */
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? zl : rs ;
 } /* end subroutine (tmz_xstrdig) */
@@ -569,10 +568,10 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
             while (sl && CHAR_ISWHITE(*sp)) {
                 sp += 1 ;
                 sl -= 1 ;
-            }
+            } /* end while */
             while (sl && CHAR_ISWHITE(sp[sl-1])) {
                 sl -= 1 ;
-            }
+            } /* end while */
             if (cchar *tp ; (tp = strnchr(sp,sl,'_')) != nullptr) ylikely {
                 int         si = intconv(tp - sp) ;
                 if (hasalldig(sp,si)) ylikely {
@@ -641,7 +640,7 @@ int tmz_xlogz(tmz *op,cchar *sp,int sl) noex {
             } /* end if (ok) */
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return (rs >= 0) ? zl : rs ;
 } /* end subroutine (tmz_xlogz) */
@@ -660,10 +659,10 @@ int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 	    while (sl && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    while (sl && CHAR_ISWHITE(sp[sl-1])) {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    if (hasalldig(sp,sl)) ylikely {
 	        cint	n = 3 ;
 	        int	i = 0 ;
@@ -698,7 +697,7 @@ int tmz_xday(tmz *op,cchar *sp,int sl) noex {
 	    }
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_xday) */
@@ -709,7 +708,7 @@ int tmz_isset(tmz *op) noex {
 	    rs = op->st.tm_mday ;
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_isset) */
@@ -731,7 +730,7 @@ int tmz_haszoff(tmz *op) noex {
 	    rs = op->fl.zoff ;
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (tmz_haszoff) */
@@ -742,7 +741,7 @@ int tmz_haszone(tmz *op) noex {
 	    rs = (op->zname[0] != '\0') ;
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_haszone) */
@@ -761,7 +760,7 @@ int tmz_setday(tmz *op,int y,int m,int d) noex {
 	    rs = tmz_yearadj(op,sc) ;
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_setday) */
@@ -773,7 +772,7 @@ int tmz_setyear(tmz *op,int year) noex {
 	    op->fl.year = true ;
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_setyear) */
@@ -786,7 +785,7 @@ int tmz_setzone(tmz *op,cchar *zp,int zl) noex {
 	    rs = intconv(strnwcpy(op->zname,znl,zp,zl) - znp) ;
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_setzone) */
@@ -797,7 +796,7 @@ int tmz_gettm(tmz *op,TM *tmp) noex {
 	    *tmp = op->st ;
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_gettm) */
@@ -808,7 +807,7 @@ int tmz_getdst(tmz *op) noex {
 	    rs = op->st.tm_isdst ;
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_getdst) */
@@ -956,11 +955,11 @@ local int tmz_procmonth(tmz *op,cchar *sp,int sl) noex {
 	                ml = cl ;
 	                si += intconv((cp + cl) - sp) ;
 	            }
-	        }
+	        } /* end if */
 	        if (rs >= 0) ylikely {
 	            rs = tmstrsmonth(mp,ml) ;
 	            op->st.tm_mon = rs ;
-	        }
+	        } /* end if (ok) */
 	    } else {
 	        rs = SR_INVALID ;
 	    }
@@ -1038,8 +1037,7 @@ local int tmz_yearadj(tmz *op,int sc) noex {
 	    } /* end if */
 	} /* end if (had a year) */
 	return SR_OK ;
-}
-/* end subroutine (tmz_yearadj) */
+} /* end subroutine (tmz_yearadj) */
 
 /* parse minutes west of GMT */
 local int getzoff(int *zop,cchar *sp,int sl) noex {
@@ -1106,14 +1104,14 @@ local int getzoff(int *zop,cchar *sp,int sl) noex {
 	    }
 	    if (rs >= 0) {
 	        rs = intconv(cp - sp) ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (getting timezone offset) */
 	return rs ;
 } /* end subroutine (getzoff) */
 
 local int tmz_clear(tmz *op) noex {
     	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    op->st = {} ;
 	    op->fl = {} ;
 	    op->zoff = 0 ;
@@ -1223,7 +1221,7 @@ vars::operator int () noex {
 
 local int mkvars() noex {
     	return var ;
-}
+} /* end subroutine */
 
 local int val(cchar *sp) noex {
 	int		v = 0 ;
@@ -1240,7 +1238,7 @@ local int silogend(cchar *sp,int sl) noex {
 	    f = f || (ch == '_') ;
 	    f = f || isalphalatin(ch) ;
 	    if (f) break ;
-	} /* end while */
+	} /* end for */
 	return i ;
 } /* end subroutine (silogend) */
 
