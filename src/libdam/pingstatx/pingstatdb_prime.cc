@@ -24,7 +24,7 @@
 	pingstatdb
 
   	Description:
-	This subroutine maintains a PINGSTATDB file. These files
+	This subroutine maintains a PINGSTATDB file.  These files
 	are used to maintain the names and status of a PING event.
 
 	Synopsis:
@@ -157,11 +157,11 @@ local inline int pingstatdb_ctor(pingstatdb *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(op) ;
-	    if (bfile *pfp = new(nt) bfile ; pfp) {
+	    if (bfile *pfp = new(nt) bfile ; pfp) ylikely {
 		op->pfp = pfp ;
-	        if (vechand *rlp = new(nt) vechand ; rlp) {
+	        if (vechand *rlp = new(nt) vechand ; rlp) ylikely {
 		    op->rlp = rlp ;
-	            if (timeb *nowp = new(nt) timeb ; nowp) {
+	            if (timeb *nowp = new(nt) timeb ; nowp) ylikely {
 		        rs = SR_OK ;
 		    } /* end if (new-timeb) */
 		    if (rs < 0) {
@@ -219,10 +219,10 @@ int pingstatdb_open(PSD *op,cchar *fname,int omode,mode_t fperm) noex {
 	if (omode & O_CREAT) {
 	    DEBUGPRINTF("creating as needed\n") ;
 	}
-	if ((rs = pingstatdb_ctor(op,fname)) >= 0) {
+	if ((rs = pingstatdb_ctor(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-		if ((rs = pingstatdb_cominit(op)) >= 0) {
+	    if (fname[0]) ylikely {
+		if ((rs = pingstatdb_cominit(op)) >= 0) ylikely {
 	            char	bstr[10] ;
 	            if_constexpr (f_create) {
 		        omode |= O_CREAT ;
@@ -265,10 +265,10 @@ int pingstatdb_open(PSD *op,cchar *fname,int omode,mode_t fperm) noex {
 local int pingstatdb_opener(pingstatdb *op) noex {
     	int		rs ;
 	int		rs1 ;
-	if (char *znbuf ; (rs = mem.zn(&znbuf)) >= 0) {
+	if (char *znbuf ; (rs = mem.zn(&znbuf)) >= 0) ylikely {
 	    cint	znlen = rs ;
-	    if ((rs = initnow(op->nowp,znbuf,znlen)) >= 0) {
-		if (cchar *cp ; (rs = mem.strw(znbuf,rs,&cp)) >= 0) {
+	    if ((rs = initnow(op->nowp,znbuf,znlen)) >= 0) ylikely {
+		if (cchar *cp ; (rs = mem.strw(znbuf,rs,&cp)) >= 0) ylikely {
 		    op->znbuf = cp ;
 		    op->magval = PSD_MAG ;
 		} /* end if (memory-acquire) */
@@ -282,7 +282,7 @@ local int pingstatdb_opener(pingstatdb *op) noex {
 int pingstatdb_close(PSD *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pingstatdb_magic(op)) >= 0) {
+	if ((rs = pingstatdb_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = pingstatdb_fes(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -322,7 +322,7 @@ int pingstatdb_close(PSD *op) noex {
 
 int pingstatdb_curbegin(PSD *op,PSD_CUR *curp) noex {
     	int		rs ;
-	if ((rs = pingstatdb_magic(op,curp)) >= 0) {
+	if ((rs = pingstatdb_magic(op,curp)) >= 0) ylikely {
 	    op->fl.cursor = true ;
 	    curp->i = -1 ;
 	} /* end if (pingstatdb_magic) */
@@ -332,7 +332,7 @@ int pingstatdb_curbegin(PSD *op,PSD_CUR *curp) noex {
 int pingstatdb_curend(PSD *op,PSD_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pingstatdb_magic(op,curp)) >= 0) {
+	if ((rs = pingstatdb_magic(op,curp)) >= 0) ylikely {
 	    if (op->fl.readlocked || op->fl.writelocked) {
 	        op->fl.readlocked = false ;
 	        op->fl.writelocked = false ;
@@ -348,13 +348,13 @@ int pingstatdb_curend(PSD *op,PSD_CUR *curp) noex {
 int pingstatdb_curenum(PSD *op,PSD_CUR *curp,PSD_ENT *ep) noex {
 	int		rs ;
 	int		hl = 0 ; /* return-value */
-	if ((rs = pingstatdb_magic(op,curp)) >= 0) {
+	if ((rs = pingstatdb_magic(op,curp)) >= 0) ylikely {
 	    if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
 	        rs = bcontrol(op->pfp,BC_LOCKREAD,TO_LOCK) ;
 	        op->fl.readlocked = (rs >= 0) ;
 	    }
-	    if (rs >= 0) {
-	        if ((rs = pingstatdb_checkcache(op)) >= 0) {
+	    if (rs >= 0) ylikely {
+	        if ((rs = pingstatdb_checkcache(op)) >= 0) ylikely {
 	            cint	i = (curp->i < 0) ? 0 : (curp->i + 1) ;
 		    void *vp ;
 	            if ((rs = vechand_get(op->rlp,i,&vp)) >= 0) {
@@ -383,16 +383,16 @@ int pingstatdb_match(PSD *op,cchar *hn,PSD_ENT *ep) noex {
 	int		rs ;
 	int		hl = 0 ; /* return-value */
 	DEBUGPRINTF("ent hn=%s\n",hn) ;
-	if ((rs = pingstatdb_magic(op,hn)) >= 0) {
+	if ((rs = pingstatdb_magic(op,hn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (hn[0]) {
+	    if (hn[0]) ylikely {
 		rs = SR_OK ;
 	        if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
 	            rs = bcontrol(op->pfp,BC_LOCKREAD,TO_LOCK) ;
 	            op->fl.readlocked = (rs >= 0) ;
 	        }
-	        if (rs >= 0) {
-	            if ((rs = pingstatdb_checkcache(op)) >= 0) {
+	        if (rs >= 0) ylikely {
+	            if ((rs = pingstatdb_checkcache(op)) >= 0) ylikely {
 			/* return SR_NOTFOUND if we fall off of the end */
 			PSD_REC	*rp ;
 	    		if ((rs = pingstatdb_recget(op,hn,&rp)) >= 0) {
@@ -459,11 +459,11 @@ int pingstatdb_update(PSD *op,cchar *hn,int f_up,time_t ts) noex {
 	int		rs ;
 	int		f_changed = false ; /* return-value */
 	DEBUGPRINTF("ent hn=%s\n",hn) ;
-	if ((rs = pingstatdb_magic(op,hn)) >= 0) {
+	if ((rs = pingstatdb_magic(op,hn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (hn[0]) {
+	    if (hn[0]) ylikely {
 		rs = SR_BADF ;
-	        if (op->fl.writable) {
+	        if (op->fl.writable) ylikely {
 		    rs = SR_OK ;
 	            if (op->fl.readlocked) {
 	                op->fl.readlocked = false ;
@@ -474,8 +474,8 @@ int pingstatdb_update(PSD *op,cchar *hn,int f_up,time_t ts) noex {
 	               rs = bcontrol(op->pfp,BC_LOCKWRITE,TO_LOCK) ;
 	    	       op->fl.writelocked = (rs >= 0) ;
 		    } /* end if (we did not already have a lock on the file) */
-		    if (rs >= 0) {
-			if ((rs = pingstatdb_checkcache(op)) >= 0) {
+		    if (rs >= 0) ylikely {
+			if ((rs = pingstatdb_checkcache(op)) >= 0) ylikely {
 			    rs = pingstatsb_updates(op,hn,f_up,ts) ;
 			    f_changed = rs ;
 			}
@@ -522,7 +522,7 @@ int pingstatdb_check(PSD *op,time_t dt) noex {
 local int entry_load(PSD_ENT *ep,PSD_REC *rep) noex {
 	int		rs = SR_BUGCHECK ;
 	int		hl = 0 ; /* return-value */
-	if (ep && rep) {
+	if (ep && rep) ylikely {
 	    dater *pdp = rep->pdp ;
 	    dater *cdp = rep->cdp ;
 	    ep->ti_change	= 0 ;
@@ -530,8 +530,8 @@ local int entry_load(PSD_ENT *ep,PSD_REC *rep) noex {
 	    ep->cnt		= 0 ;
 	    ep->f_up		= 0 ;
 	    ep->hostbuf[0]	= '\0' ;
-	    if ((rs = dater_gettime(pdp,&ep->ti_ping)) >= 0) {
-	        if ((rs = dater_gettime(cdp,&ep->ti_change)) >= 0) {
+	    if ((rs = pdp->gettime(&ep->ti_ping)) >= 0) ylikely {
+	        if ((rs = cdp->gettime(&ep->ti_change)) >= 0) ylikely {
 	            ep->cnt = rep->cnt ;
 	            ep->f_up = rep->f_up ;
 	            rs = mkpath(ep->hostbuf,rep->hostbuf) ;
@@ -546,7 +546,7 @@ local int entry_load(PSD_ENT *ep,PSD_REC *rep) noex {
 int mkbstr(char *ostr,int omode) noex {
     	int		rl = -1 ; /* return-value */
 	DEBUGPRINTF("omode=%04o\n",omode) ;
-	if (ostr) {
+	if (ostr) ylikely {
 	    char *bp = ostr ;
 	    if (isaccmode.wr(omode)) {
 	        *bp++ = 'w' ;
