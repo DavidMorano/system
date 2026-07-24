@@ -49,8 +49,6 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<getfdfile.h>		/* for |FD_STDIN| */
-#include	<getourenv.h>
 #include	<sfx.h>
 #include	<rmx.h>
 #include	<strwcpy.h>
