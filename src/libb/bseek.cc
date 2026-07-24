@@ -38,15 +38,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
 
@@ -85,7 +85,7 @@ local int	notappend(bfile *op,off_t wo,int w) noex ;
 int bseek(bfile *op,off_t wo,int w) noex {
 	int		rs ;
 	int		ro = 0 ;
-	if ((rs = bfile_magic(op)) > 0) {
+	if ((rs = bfile_magic(op)) > 0) ylikely {
 	    rs = SR_NOTSEEK ;
 	    if (! op->fl.notseek) {
 		ro = intsat(op->offset) ;
@@ -97,10 +97,10 @@ int bseek(bfile *op,off_t wo,int w) noex {
 	                }
 		    } else {
 			if (w == SEEK_CUR) {
-	                    ao = (- op->len) ;
+	                    ao = (neg op->len) ;
 	                }
 	            } /* end if */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 		        coff	co = (wo + ao) ;
 			cint	fd = op->fd ;
 	                op->bp = op->bdata ;
