@@ -64,9 +64,9 @@ typedef CVTDATER	cvtdater ;
 
 EXTERNC_begin
 
-extern int	cvtdater_start(cvtdater *,time_t) noex ;
-extern int	cvtdater_load(cvtdater *,time_t *,cchar *,int) noex ;
-extern int	cvtdater_finish(cvtdater *) noex ;
+extern int	cvtdater_start	(cvtdater *,time_t) noex ;
+extern int	cvtdater_load	(cvtdater *,time_t *,cchar *,int) noex ;
+extern int	cvtdater_finish	(cvtdater *) noex ;
 
 EXTERNC_end
 
