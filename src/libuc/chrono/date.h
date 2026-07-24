@@ -32,7 +32,7 @@ struct date_head {
 enum datemems {
 	datemem_finish,
 	datemem_overlast
-} ;
+} ; /* end enum (datemems) */
 struct date ;
 struct date_co {
 	date		*op = nullptr ;
@@ -54,13 +54,13 @@ struct date : date_head {
 	} ;
 	date(const date &) = delete ;
 	date &operator = (const date &) = delete ;
-	int start(time_t,int,int,cchar *,int) noex ;
-	int setzname(cchar *,int) noex ;
-	int copy(date *) noex ;
-	int gettime(time_t *) noex ;
-	int getzoff(int *) noex ;
-	int getisdst(int *) noex ;
-	int getzname(char *,int) noex ;
+	int start	(time_t,int,int,cchar *,int) noex ;
+	int setzname	(cchar *,int) noex ;
+	int copy	(date *) noex ;
+	int gettime	(time_t *) noex ;
+	int getzoff	(int *) noex ;
+	int getisdst	(int *) noex ;
+	int getzname	(char *,int) noex ;
 	void dtor() noex ;
 	destruct date() {
 	    if (zname) dtor() ;
