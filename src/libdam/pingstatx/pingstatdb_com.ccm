@@ -22,7 +22,7 @@
 	pingstatdb
 
   	Description:
-	This subroutine maintains a PINGSTATDB file. These files
+	This subroutine maintains a PINGSTATDB file.  These files
 	are used to maintain the names and status of a PING event.
 
 	Synopsis:
