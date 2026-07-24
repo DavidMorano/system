@@ -234,14 +234,14 @@ int usysconf::getval(int req) noex {
 int usysconf::getvalcache(int req,int ci) noex {
 	int		rs ;
 	DPRINTF("ent req=%d ci=%dn",req,ci) ;
-	    if ((rs = udata.d[ci].load(memord_relaxed)) == 0) {
-		if ((rs = getvalsys(req)) > 0) {
-		    udata.d[ci].store(rs,memord_relaxed) ;
-		}
-	    } /* end if (filling cache) */
-	    if (rs >= 0) {
-		if (lp) *lp = long(rs) ;
-	    } /* end if (result) */
+	if ((rs = udata.d[ci].load(memord_relaxed)) == 0) {
+	    if ((rs = getvalsys(req)) > 0) {
+		udata.d[ci].store(rs,memord_relaxed) ;
+	    }
+	} /* end if (filling cache) */
+	if (rs >= 0) {
+	    if (lp) *lp = long(rs) ;
+	} /* end if (result) */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (usysconf::getvalcache) */
