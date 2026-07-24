@@ -243,7 +243,7 @@ local int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 			    dp += si ;
 			    dl -= si ;
 		        }
-		    }
+		    } /* end if (non-zero positive) */
 	        } else {
 		    switch (sl) {
 		    case 4:
