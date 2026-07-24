@@ -24,7 +24,7 @@
 	pingstatdb_rec
 
   	Description:
-	This subroutine maintains a PINGSTATDB file. These files
+	This subroutine maintains a PINGSTATDB file.  These files
 	are used to maintain the names and status of a PING event.
 
 	Synopsis:
@@ -172,7 +172,7 @@ static vars		var ;
 
 int pingstatdb_cominit(PSD *op) noex {
     	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
     	    static cint rsv = var ;
 	    rs = rsv ;
 	} /* end if (non-null) */
@@ -181,7 +181,7 @@ int pingstatdb_cominit(PSD *op) noex {
 
 int pingstatdb_comfini(PSD *op) noex {
     	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
     	return rs ;
@@ -191,7 +191,7 @@ int pingstatdb_checkcache(PSD *op) noex {
 	int		rs ;
 	bool		f_cached = op->fl.cached ;
 	DEBUGPRINTF("ent f_cached=%d\n", f_cached) ;
-	if (ustat sb ; (rs = bcontrol(op->pfp,BC_STAT,&sb)) >= 0) {
+	if (ustat sb ; (rs = bcontrol(op->pfp,BC_STAT,&sb)) >= 0) ylikely {
 	    if (f_cached) {
 	        if (sb.st_mtime > op->mtime) {
 	            f_cached = false ;
@@ -217,11 +217,11 @@ local int pingstatdb_readrecln(PSD *op,uint roff,cchar *rbuf,int rl) noex {
 	cnothrow	nt{} ;
     	int		rs ;
 	int		c = 0 ; /* return-value */
-	if (PSD_REC *rep = new(nt) PSD_REC ; rep) {
+	if (PSD_REC *rep = new(nt) PSD_REC ; rep) ylikely {
 	    timeb	*nowp = op->nowp ;
 	    cchar	*zn = op->znbuf ;
-	    if ((rs = record_start(rep,nowp,zn,roff,np)) >= 0) {
-	        if ((rs = record_load(rep,roff,rbuf,rl)) >= 0) {
+	    if ((rs = record_start(rep,nowp,zn,roff,np)) >= 0) ylikely {
+	        if ((rs = record_load(rep,roff,rbuf,rl)) >= 0) ylikely {
 	            c += 1 ;
 	            rs = rlp->add(rep) ;
 	        } /* end if (record_load) */
@@ -242,9 +242,9 @@ int pingstatdb_readrecs(PSD *op) noex {
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
 	DEBUGPRINTF("ent\n") ;
-	if (char *rbuf ; (rs = mem.mall(rsz,&rbuf)) >= 0) {
+	if (char *rbuf ; (rs = mem.mall(rsz,&rbuf)) >= 0) ylikely {
 	    cint rlen = rs ;
-	    if ((rs = brewind(op->pfp)) >= 0) {
+	    if ((rs = brewind(op->pfp)) >= 0) ylikely {
 	        uint	roff = 0 ;
 	        int	line = 1 ;
 	        int	f_eol ;
@@ -388,7 +388,7 @@ local bool ishostmat(cc *h1,cc *h2) noex {
 int pingstatdb_recget(PSD *op,cchar *hn,PSD_REC **rpp) noex {
 	int		rs = SR_BUGCHECK ;
 	int		i = 0 ; /* return-value */
-	if (op && hn && rpp) {
+	if (op && hn && rpp) ylikely {
     	    vechand	*rlp = op->rlp ;
 	    rs = SR_OK ;
 	    void *vp ;
@@ -406,7 +406,7 @@ int pingstatdb_recget(PSD *op,cchar *hn,PSD_REC **rpp) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
+	if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 	    hostnamelen = rs ;
 	    rlen = (rs * RLENMULT) ;
 	} /* end if (bufsizeget) */
