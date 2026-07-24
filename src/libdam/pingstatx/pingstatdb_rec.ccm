@@ -24,7 +24,7 @@
 	pingstatdb
 
   	Description:
-	This subroutine maintains a PINGSTATDB file. These files
+	This subroutine maintains a PINGSTATDB file.  These files
 	are used to maintain the names and status of a PING event.
 
 	Synopsis:
@@ -117,7 +117,7 @@ export {
     struct pingstatdb_rechead {
 	cchar		*hostbuf ;	/* host name */
 	dater		*cdp ;		/* last date - change */
-	dater		*pdp ;		/* last date - ping */
+	dater		*pdp ;		/* last date - previous-ping */
 	uint		roff ;		/* record offset (within file) */
 	int		len ;		/* record length */
 	int		cnt ;		/* count since last change */
@@ -136,11 +136,11 @@ export {
 } /* end export */
 
 export {
-    int record_start(PSD_REC *,timeb *,cchar *,uint,cchar *) noex ;
-    int record_load(PSD_REC *,uint,cchar *,int) noex ;
-    int record_update(PSD_REC *,bfile *,dater *,int) noex ;
-    int record_write(PSD_REC *,bfile *,dater *,dater *,int,int) noex ;
-    int record_finish(PSD_REC *) noex ;
+    int record_start	(PSD_REC *,timeb *,cchar *,uint,cchar *) noex ;
+    int record_load	(PSD_REC *,uint,cchar *,int) noex ;
+    int record_update	(PSD_REC *,bfile *,dater *,int) noex ;
+    int record_write	(PSD_REC *,bfile *,dater *,dater *,int,int) noex ;
+    int record_finish	(PSD_REC *) noex ;
 } /* end export */
 
 
