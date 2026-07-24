@@ -38,9 +38,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */
@@ -91,22 +91,22 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* exported subroutines */
 
-char *timestr_nist(time_t t,nistinfo *nip,char *tbuf) noex {
+char *timestr_nist(time_t t,char *tbuf,nistinfo *nip) noex {
 	cint		tlen = NISTINFO_BUFLEN ;
 	int		rs = SR_FAULT ;
-	if (nip && tbuf) {
+	if (nip && tbuf) ylikely {
 	    tbuf[0] = '\0' ;
 	    rs = SR_DOM ;
-	    if (t >= 0) {
+	    if (t >= 0) ylikely {
 	        TM	tsz, *tszp = &tsz ;
 	        TM	tsl, *tslp = &tsl ;
 	        if (t == 0) t = time(nullptr) ;
-	        if ((rs = uc_timegm(&t,tszp)) >= 0) {
-	            if ((rs = uc_timelocal(&t,tslp)) >= 0) {
+	        if ((rs = uc_timegm(&t,tszp)) >= 0) ylikely {
+	            if ((rs = uc_timelocal(&t,tslp)) >= 0) ylikely {
 	                cint	y = tszp->tm_year ;
 	                cint	m = tszp->tm_mon ;
 	                cint	d = tszp->tm_mday ;
-	                if ((rs = getmjd(y,m,d)) >= 0) {
+	                if ((rs = getmjd(y,m,d)) >= 0) ylikely {
 	                    cint	mjd = rs ;
 	                    cint	adv_int = (nip->adv / 10) ;
 	                    cint	adv_fra = (nip->adv % 10) ;
@@ -148,9 +148,8 @@ char *timestr_nist(time_t t,nistinfo *nip,char *tbuf) noex {
 	} /* end if (non-null) */
 	if (rs < 0) {
 	    ulogerror("timestr",rs,"nist") ;
-	}
+	} /* end if (error) */
 	return (rs >= 0) ? tbuf : nullptr ;
-}
-/* end subroutine (timest_nist) */
+} /* end subroutine (timest_nist) */
 
 
