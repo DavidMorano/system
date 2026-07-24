@@ -61,7 +61,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<ucproc.h>		/* LIBUC */
-#include	<getehostname.h>	/* LIUC */
+#include	<getehostname.h>	/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
