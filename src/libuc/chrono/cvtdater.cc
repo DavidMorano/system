@@ -82,8 +82,7 @@ int cvtdater_start(cvtdater *op,time_t dt) noex {
 	    op->daytime = dt ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cvtdater_start) */
+} /* end subroutine (cvtdater_start) */
 
 int cvtdater_load(cvtdater *op,time_t *dp,cchar *cp,int cl) noex {
 	int		rs = SR_FAULT ;
@@ -145,11 +144,11 @@ local int cvtdater_daytime(cvtdater *op,time_t *rp) noex {
 
 int cvtdater::start(time_t t) noex {
 	return cvtdater_start(this,t) ;
-}
+} /* end method */
 
 int cvtdater::load(time_t *tp,cchar *sp,int sl) noex {
 	return cvtdater_load(this,tp,sp,sl) ;
-}
+} /* end method */
 
 void cvtdater::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
