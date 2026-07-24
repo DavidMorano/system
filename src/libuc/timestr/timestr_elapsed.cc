@@ -77,9 +77,9 @@ namespace {
 char *timestr_elapsed(time_t t,char *rbuf) noex {
 	cint		rlen = TIMEBUFLEN ;
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_DOM ;
-	    if (t >= 0) {
+	    if (t >= 0) ylikely {
 		timepieces te(rbuf,rlen) ;
 	        cuint	tmins = uint(t / 60) ; /* conversion */
 	        te.secs = uint(t % 60) ; /* conversion */
@@ -100,8 +100,7 @@ char *timestr_elapsed(time_t t,char *rbuf) noex {
 	    ulogerror("timestr",rs,"elapsed") ;
 	}
 	return (rs >= 0) ? rbuf : nullptr ;
-}
-/* end subroutine (timestr_elapsed) */
+} /* end subroutine (timestr_elapsed) */
 
 
 /* local subroutines */
