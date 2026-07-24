@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += pingstatx.h
+INCS += pingstatx.h pingstatdb.h
 
 MODS +=
 
@@ -41,8 +41,9 @@ LIBS +=
 
 
 DEPS= pingstatdb_com.o pingstatdb_rec.o
+DEPS_C= pingstatdb_rec.o
 
-PSDH= pingstatdb_com.hh pingstatdb_rec.hh
+PSDH= pingstatdb.h pingstatdb_com.hh pingstatdb_rec.hh
 
 OBJ0= pingstatdb_prime.o
 OBJ1= pingstatdb_uptime.o
@@ -170,10 +171,10 @@ pingstatdb_uptime.o:	pingstatdb_uptime.cc $(DEPS)			$(INCS)
 pingstatdb_com.o:	pingstatdb_com0.o pingstatdb_com1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-pingstatdb_com0.o:	pingstatdb_com.ccm pingstatdb_com.hh		$(INCS)
+pingstatdb_com0.o:	pingstatdb_com.ccm pingstatdb_com.hh $(DEPS_C)	$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-pingstatdb_com1.o:	pingstatdb_com1.cc pingstatdb_com0.o		$(INCS)
+pingstatdb_com1.o:	pingstatdb_com1.cc pingstatdb_com0.o ${DEPS_C}	$(INCS)
 	$(COMPILE.cc) $<
 
 pingstatdb_rec.o:	pingstatdb_rec0.o pingstatdb_rec1.o		
