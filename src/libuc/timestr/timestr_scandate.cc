@@ -40,15 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>			/* |time_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |ulogerror(3u)| */
-#include	<tmtime.hh>
-#include	<sntmtime.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |ulogerror(3u)| */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<sntmtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"timestr.h"
 
@@ -85,21 +85,22 @@
 char *timestr_scandate(time_t t,char *tbuf) noex {
 	cint		tlen = TIMEBUFLEN ;
 	int		rs = SR_FAULT ;
-	if (tbuf) {
+	if (tbuf) ylikely {
 	    rs = SR_DOM ;
-	    if (t >= 0) {
-	        if (tmtime ts ; (rs = tmtime_timelocal(&ts,t)) >= 0) {
+	    if (t >= 0) ylikely {
+	        if (tmtime ts ; (rs = tmtime_timelocal(&ts,t)) >= 0) ylikely {
 		    cchar	*fmt = "%e %b %R %y" ;
 	            rs = sntmtime(tbuf,tlen,&ts,fmt) ;
 	        }
 	    } /* end if (valid) */
-	    if (rs < 0) tbuf[0] = '\0' ;
+	    if (rs < 0) {
+		tbuf[0] = '\0' ;
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	if (rs < 0) {
 	    ulogerror("timestr",rs,"scandate") ;
-	}
+	} /* end if (error) */
 	return (rs >= 0) ? tbuf : nullptr ;
-}
-/* end subroutine (timestr_scandate) */
+} /* end subroutine (timestr_scandate) */
 
 
