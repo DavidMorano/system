@@ -1,6 +1,6 @@
 /* ucprocpid SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get a process ID by searching for its command string */
 /* version %I% last-modified %G% */
