@@ -17,15 +17,12 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |strto{x}(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |strto{x}(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucstrtof.h"
 
@@ -52,7 +49,7 @@
 
 template<typename T> local T strtox(cchar *,char **) noex {
     	return T(0.0) ;
-}
+} /* end subroutine-template */
 
 template<> float strtox(cchar *stp,char **epp) noex {
 	return strtof(stp,epp) ;
@@ -73,7 +70,7 @@ template<typename T> local int strtoxx(cchar *startp,cchar **epp,T *rp) noex {
 	    errno = 0 ;
 	    *rp = strtox<T>(startp,&ep) ;
 	    if (errno) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    } else {
 		rs = intconv(ep - startp) ;
 		if (epp) *epp = ep ;
