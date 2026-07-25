@@ -101,14 +101,14 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			obj.o
-	$(LD) -r $(LDFLAGS) -o $@ obj.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).so:		obj.o
-	$(LD) -shared -o $@ $(LDFLAGS) obj.o $(RUNINFO) $(LIBINFO)
+	$(LD) -shared -o $@ $(LDFLAGS) $^ $(RUNINFO) $(LIBINFO)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
