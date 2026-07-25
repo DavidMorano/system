@@ -1,6 +1,6 @@
 /* ucexit */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* regular exit (like |exit(3c)|) */
 /* version %I% last-modified %G% */
