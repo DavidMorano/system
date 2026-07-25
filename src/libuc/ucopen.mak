@@ -107,11 +107,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -201,24 +201,20 @@ ucopenprog.o:		ucopenprog.cc				$(INCS)
 ucopenproto.o:		ucopenproto.cc				$(INCS)
 
 ucopenfsvc.o:		ucopenfsvc.cc openxsvc.o		$(INCS)
-	makemodule openxsvc
 	$(COMPILE.cc) $<
 
 ucopenisvc.o:		ucopenisvc.cc openxsvc.o		$(INCS)
-	makemodule openxsvc
 	$(COMPILE.cc) $<
 
 ucopenusvc.o:		ucopenusvc.cc openxsvc.o		$(INCS)
-	makemodule openxsvc
 	$(COMPILE.cc) $<
 
 # UTILITY
 ucopenxsvc.o:		ucopenxsvc.cc openxsvc.o 		$(INCS)
-	makemodule openxsvc
 	$(COMPILE.cc) $<
 
 mods.o:			openxsvc.o
-	$(LD) -r $(LDFLAGS) -o $@ openxsvc.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 # MODS
 openxsvc.o:		openxsvc.ccm				$(INCS)
