@@ -121,41 +121,22 @@
 	>=0		OK
 	<0		error (system-return)
 
-
-  	Name:
-	uc_gettimeofday
-
-	Description:
-	This routine calls the system's (library) 'gettimeofday'
-	subroutine.
-
-	Synopsis:
-	int uc_gettimeofday(struct timeval *tvp,void *np) noex
-	
-	Arguments:
-	tvp		pointer to TIMEVAL object to hold result
-	np		NULL pointer (currently required)
-
-	Returns:
-	>=0		success
-	<0		error (system-return)
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/timeb.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucsysconf.h>
-#include	<tmtime.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/timeb.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucsysconf.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsysmisc.h"
 
@@ -223,6 +204,10 @@ import libutil ;			/* |memclear(3u)| */
 
 /* external subroutines */
 
+extern "C" {
+    extern int uc_gettimeofday(TIMEVAL *,void *) noex ;
+}
+
 
 /* external variables */
 
@@ -250,6 +235,7 @@ constexpr bool		f_pagesall	= F_PAGESALL ;
 /* exported variables */
 
 libuc::ucpagesizer	ucpagesize ;
+libuc::ucnprocesser	ucnprocessors ;
 
 
 /* exported subroutines */
@@ -283,8 +269,7 @@ int uc_nprocessors(int w) noex {
 	    }
 	}
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (uc_nprocessors) */
+} /* end subroutine (uc_nprocessors) */
 
 int uc_gethz(int w) noex {
 	int		hz = -1 ;
@@ -309,8 +294,7 @@ int uc_gethz(int w) noex {
 	    }
 	} /* end if_constexpr (f_sctck) */
 	return (rs >= 0) ? hz : rs ;
-}
-/* end subroutine (uc_gethz) */
+} /* end subroutine (uc_gethz) */
 
 int uc_syspages(int w) noex {
 	int		rs = SR_NOTSUP ;
@@ -339,16 +323,14 @@ int uc_syspages(int w) noex {
 	    } else if (rs == SR_INVALID) {
 		rs = SR_NOTSUP ;
 	    }
-	}
+	} /* end if */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (uc_syspages) */
+} /* end subroutine (uc_syspages) */
 
 int uc_pagesize() noex {
 	cint		cmd = _SC_PAGESIZE ;
 	return uc_sysconfval(cmd,nullptr) ;
-}
-/* end subroutine (uc_pagesize) */
+} /* end subroutine (uc_pagesize) */
 
 int uc_ftime(TIMEB *tbp) noex {
 	int		rs = SR_FAULT ;
@@ -361,20 +343,7 @@ int uc_ftime(TIMEB *tbp) noex {
 	    } /* end if (syshas.ftime) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_ftime) */
-
-int uc_gettimeofday(TIMEVAL *tvp,void *dp) noex {
-	int		rs = SR_FAULT ;
-	if (tvp) {
-	    rs = SR_OK ;
-	    if (gettimeofday(tvp,dp) == -1) {
-		rs = (- errno) ;
-	    }
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (uc_gettimeofday) */
+} /* end subroutine (uc_ftime) */
 
 
 /* local subrouties */
