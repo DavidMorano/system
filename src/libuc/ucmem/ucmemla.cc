@@ -41,17 +41,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sysval.hh>
-#include	<intceil.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<intceil.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucmemla.h"
 
@@ -73,7 +73,6 @@ using libuc::libmem ;			/* variable */
 /* local variables */
 
 constexpr int		uslarge = UCMEMLA_LARGE	;
-
 static sysval		pagesz(sysval_ps) ;
 
 
@@ -82,7 +81,7 @@ static sysval		pagesz(sysval_ps) ;
 
 /* forward references */
 
-static int	ucmemla_map(ucmemla *,size_t,void **) noex ;
+local int	ucmemla_map(ucmemla *,size_t,void **) noex ;
 
 
 /* exported variables */
@@ -114,28 +113,29 @@ int ucmemla_acquire(ucmemla *op,size_t us,void *rp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucmemla_acquire) */
+} /* end subroutine (ucmemla_acquire) */
 
 int ucmemla_release(ucmemla *op) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (op) ylikely {
 	    if (op->f_large) {
-		rs = u_mmapend(op->ma,op->ms) ;
+		rs1 = u_mmapend(op->ma,op->ms) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } else {
-		rs = libmem.free(op->ma) ;
+		rs1 = libmem.free(op->ma) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->ma = nullptr ;
 	    op->ms = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucmemla_release) */
+} /* end subroutine (ucmemla_release) */
 
 
 /* local subroutines */
 
-static int ucmemla_map(ucmemla *op,size_t us,void **rpp) noex {
+local int ucmemla_map(ucmemla *op,size_t us,void **rpp) noex {
 	cnullptr	np{} ;
 	size_t		ms ;
 	int		rs ;
@@ -153,7 +153,6 @@ static int ucmemla_map(ucmemla *op,size_t us,void **rpp) noex {
 	    } /* end if (u_mmapbegin) */
 	} /* end if (pagesz) */
 	return rs ;
-}
-/* end subroutine (ucmemla_map) */
+} /* end subroutine (ucmemla_map) */
 
 
