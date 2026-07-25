@@ -30,13 +30,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"vecsorthand.h"
 
@@ -110,8 +110,7 @@ int vecsorthand_start(vecsorthand *op,cmp_f cmpfunc,int vn) noex {
 	    } /* end if (m-a) */
 	} /* end if (vecsorthand_ctor) */
 	return rs ;
-}
-/* end subroutine (vecsorthand_start) */
+} /* end subroutine (vecsorthand_start) */
 
 int vecsorthand_finish(vecsorthand *op) noex {
 	int		rs = SR_FAULT ;
