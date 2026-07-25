@@ -55,8 +55,7 @@ OBJWSIX= obja.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -99,11 +98,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJWSIX)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJWSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -130,11 +129,11 @@ obj2_sfx.o:		$(OBJ2WSIX)
 obj3_sfx.o:		$(OBJ3WSIX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj4_sfx.o:		$(OBJ4WSIX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ4WSIX)
+obj4_sfx.o:		$(OBJ4WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj5_sfx.o:		$(OBJ5WSIX) $(INCS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ5WSIX)
+obj5_sfx.o:		$(OBJ5WSIX)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 obja.o:			$(OBJAWSIX)
