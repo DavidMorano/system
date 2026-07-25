@@ -467,7 +467,8 @@ int uptimer::enter(uint roff) noex {
 } /* end method (uptimer::enter) */
 
 int uptimer::uplast() noex {
-	return pingstatdb_recupd(op,dt,cdp,LASTUPDATE,f_up,ts) ;
+    	custime t = time_t(ts) ;
+	return pingstatdb_recupd(op,dt,cdp,LASTUPDATE,f_up,t) ;
 } /* end method (uptimer::uplast) */
 
 int uptimer::done() noex {
