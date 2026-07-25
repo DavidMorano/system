@@ -45,19 +45,18 @@ OBJ1= ucfork.o ucforkdet.o
 OBJ2= ucexec.o ucisaexec.o ucexit.o
 OBJ3= ucsafesleep.o
 OBJ4= ucatexit.o ucatfork.o
-OBJ5= 
+OBJ5= ucnprocs.o
 OBJ6= 
 OBJ7= 
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o
+OBJB= obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -100,11 +99,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -165,5 +164,6 @@ ucprochave.o:		ucprochave.cc	ucprochave.h		$(INCS)
 ucprocpid.o:		ucprocpid.cc	ucprocpid.h		$(INCS)
 ucfork.o:		ucfork.cc	ucfork.h		$(INCS)
 ucforkdet.o:		ucforkdet.cc	ucforkdet.h		$(INCS)
+ucnprocs.o:		ucnprocs.cc	ucnprocs.h		$(INCS)
 
 
