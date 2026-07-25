@@ -82,8 +82,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cerrno>		/* CSTD */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
 #include	<new>			/* C++STD |nothrow(3c++)| */
 #include	<functional>		/* C++STD |mem_fn(3c++)| */
 #include	<numeric>		/* C++STD |sat_mul(3c++)| */
@@ -340,9 +341,9 @@ namespace libuc {
     int mems::strw(cchar *sp,int µsl,cchar **vpp) noex {
 	int		rs = SR_FAULT ;
 	int		ml = 0 ; /* return-value */
-	if (sp && vpp) {
-	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
-		if (char *bp ; (rs = mall((sl + 1),&bp)) >= 0) {
+	if (sp && vpp) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
+		if (char *bp ; (rs = mall((sl + 1),&bp)) >= 0) ylikely {
 		    cchar **rpp = ccharpp(vpp) ;
 		    ml = intconv(strwcpy(bp,sp,sl) - bp) ;
 		    *rpp = bp ;
@@ -353,11 +354,14 @@ namespace libuc {
     } /* end method (mems::strw) */
     int mems::mall(int sz,void *vpp) noex {
 	submgr		*uip = &submgr_data ;
-	int		rs ;
+	int		rs = SR_OK ;
+	int		rs1 ;
 	if (uip->ftrack) {
-	    rs = uip->trackmall(sz,vpp) ;
+	    rs1 = uip->trackmall(sz,vpp) ;
+	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    rs = libmem.mall(sz,vpp) ;
+	    rs1 = libmem.mall(sz,vpp) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	return (rs >= 0) ? sz : rs ;
     } /* end method (mems::mall) */
@@ -374,11 +378,11 @@ namespace libuc {
     int mems::call(int ne,int esz,void *vpp) noex {
 	int		rs = SR_TOOBIG ;
 	int		sz = 0 ; /* return-value */
-	if (ckd_mul(&sz,ne,esz) == false) {
-	    if ((rs = mall(sz,vpp)) >= 0) {
+	if (ckd_mul(&sz,ne,esz) == false) ylikely {
+	    if ((rs = mall(sz,vpp)) >= 0) ylikely {
 		caddr_t	*epp = caddrp(vpp) ;
 		rs = SR_BUGCHECK ;
-		if (caddr_t ca = caddr_t(*epp) ; ca) {
+		if (caddr_t ca = caddr_t(*epp) ; ca) ylikely {
 	            rs = memclear(ca,sz) ;
 		}
 	    } /* end if (mem.mall) */
@@ -397,11 +401,14 @@ namespace libuc {
     } /* end method (mems::rall) */
     int mems::free(void *vp) noex {
 	submgr		*uip = &submgr_data ;
-	int		rs ;
+	int		rs = SR_OK ;
+	int		rs1 ;
 	if (uip->ftrack) {
-	    rs = uip->trackfree(vp) ;
+	    rs1 = uip->trackfree(vp) ;
+	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    rs = libmem.free(vp) ;
+	    rs1 = libmem.free(vp) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
     } /* end method (mems::free) */
@@ -526,16 +533,16 @@ namespace libuc {
     	cnothrow	nt{} ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (curp) {
+	if (curp) ylikely {
 	    rs = SR_NOMEM ;
-	    if (addrset_cur *acp ; (acp = new(nt) addrset_cur) != np) {
+	    if (addrset_cur *acp = new(nt) addrset_cur ; acp) ylikely {
 	        addrset		*aop = &submgr_data.mt ;
-		if ((rs = aop->curbegin(acp)) >= 0) {
+		if ((rs = aop->curbegin(acp)) >= 0) ylikely {
 		   curp->mcp = acp ;
-		}
+		} /* end if */
 		if (rs < 0) {
 		    delete acp ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-addrset_cur) */
 	} /* end if (non-null) */
 	return rs ;
@@ -543,9 +550,9 @@ namespace libuc {
     int mems::curend(ucmem_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (curp) {
+	if (curp) ylikely {
 	    rs = SR_OK ;
-	    if (curp->mcp) {
+	    if (curp->mcp) ylikely {
 	        addrset		*aop = &submgr_data.mt ;
 	        addrset_cur	*acp = (addrset_cur *) curp->mcp ;
 		{
@@ -572,7 +579,7 @@ namespace libuc {
 int submgr::iinit() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
-	if (!fvoid) {
+	if (!fvoid) ylikely {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {		/* <- the money shot */
@@ -639,7 +646,7 @@ int submgr::ifini() noex {
 
 int submgr::mallcount(ulong *rp) noex {
 	const ulong	out = (st.num_allocs = st.num_frees) ;
-	if (rp) {
+	if (rp) ylikely {
 	    *rp = out ;
 	}
 	return intsat(out) ;
@@ -647,7 +654,7 @@ int submgr::mallcount(ulong *rp) noex {
 
 int submgr::mallset(int cmd) noex {
 	int		rs ;
-	if ((rs = init) >= 0) {
+	if ((rs = init) >= 0) ylikely {
 	    switch (cmd) {
 	    case ucmallset_off:
 	        rs = trackfinish() ;
@@ -667,8 +674,8 @@ int submgr::trackstart(int opts) noex {
 	int		rs = SR_INPROGRESS ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if (! ftrack) {
-	    if ((rs = mx.lockbegin) >= 0) {
+	if (! ftrack) ylikely {
+	    if ((rs = mx.lockbegin) >= 0) ylikely {
 	        {
 	            rs = trackstarter(opts) ;
 		    rv = rs ;
@@ -692,8 +699,8 @@ int submgr::trackstarter(int) noex {
 int submgr::trackfinish() noex {
 	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
-	if (ftrack) {
-	    if ((rs = mx.lockbegin) >= 0) {
+	if (ftrack) ylikely {
+	    if ((rs = mx.lockbegin) >= 0) ylikely {
 		{
 	            ftrack = false ;
 		    rs1 = mt.finish ;
@@ -710,9 +717,9 @@ int submgr::trackcall(void *cp,int sz,void *vp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = init) >= 0) {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) {
-		if ((rs = mx.lockbegin) >= 0) {
+	if ((rs = init) >= 0) ylikely {
+	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+		if ((rs = mx.lockbegin) >= 0) ylikely {
 		    {
 		        rs = (this->*m)(cp,sz,vp) ;
 			rv = rs ;
@@ -760,9 +767,9 @@ int submgr::trackcurenum(ucmem_cur *curp,ucmem_ent *rp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rsz = 0 ;
-	if ((rs = init) >= 0) {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) {
-	        if ((rs = mx.lockbegin) >= 0) {
+	if ((rs = init) >= 0) ylikely {
+	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+	        if ((rs = mx.lockbegin) >= 0) ylikely {
 		    {
 			rs = callcurenum(curp,rp) ;
 			rsz = rs ;
@@ -780,7 +787,7 @@ int submgr::trackcurenum(ucmem_cur *curp,ucmem_ent *rp) noex {
 int submgr::callxalloc(void *,int sz,void *vp) noex {
 	int		rs ;
 	int		rv = 0 ;
-	if ((rs = pagesz) >= 0) {
+	if ((rs = pagesz) >= 0) ylikely {
 	    const uintptr_t	ps = uintptr_t(rs) ;
 	    const uintptr_t	ma = uintptr_t(vp) ;
 	    rs = SR_BADFMT ;
@@ -799,8 +806,8 @@ int submgr::callrealloc(void *cp,int sz,void *vp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = trackrel(cp)) >= 0) {
-	    if ((rs = libmem.rall(cp,sz,vp)) >= 0) {
+	if ((rs = trackrel(cp)) >= 0) ylikely {
+	    if ((rs = libmem.rall(cp,sz,vp)) >= 0) ylikely {
 	        caddr_t	a = *((caddr_t *) vp) ;
 	        rv = rs ;
 	        {
@@ -814,11 +821,13 @@ int submgr::callrealloc(void *cp,int sz,void *vp) noex {
 
 int submgr::callfree(void *cp,int,void *) noex {
 	int		rs ;
-	int		rv = 0 ;
-	if ((rs = trackrel(cp)) >= 0) {
-	    rs = libmem.free(cp) ;
-	    rv = rs ;
-	}
+	int		rs1 ;
+	int		rv = 0 ; /* return-value */
+	if ((rs = trackrel(cp)) >= 0) ylikely {
+	    rs1 = libmem.free(cp) ;
+	    if (rs >= 0) rs = rs1 ;
+	    rv = rs1 ;
+	} /* end if */
 	return (rs >= 0) ? rv : rs ;
 } /* end method (submgr::callfree) */
 
@@ -877,9 +886,9 @@ int submgr::mallstats(ucmem_stats *statp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = init) >= 0) {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) {
-	        if ((rs = mx.lockbegin) >= 0) {
+	if ((rs = init) >= 0) ylikely {
+	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+	        if ((rs = mx.lockbegin) >= 0) ylikely {
 		    {
 		        *statp = st ;
 	    	        rv = intsat(st.out_size) ;
@@ -908,7 +917,7 @@ local void submgr_exit() noex {
 
 submgr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case submgrmem_init:
 	        rs = op->iinit() ;
