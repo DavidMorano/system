@@ -94,7 +94,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
@@ -134,7 +134,7 @@ objb.o:			$(OBJB)
 
 
 ucsysconf0.o:		ucsysconf.ccm				$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 ucsysconf1.o:		ucsysconf1.cc ucsysconf0.o		$(INCS)
 	$(COMPILE.cc) $<
@@ -143,6 +143,15 @@ ucsysconf2.o:		ucsysconf2.cc ucsysconf0.o		$(INCS)
 	$(COMPILE.cc) $<
 
 ucsysconf3.o:		ucsysconf3.cc ucsysconf0.o		$(INCS)
+	$(COMPILE.cc) $<
+
+usysconfcheck.o:	usysconfcheck0.o usysconfcheck1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+usysconfcheck0.o:	usysconfcheck.ccm usysconfcheck.hh	$(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
+usysconfcheck1.o:	usysconfcheck1.cc usysconfcheck0.o	$(INCS)
 	$(COMPILE.cc) $<
 
 
