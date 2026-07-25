@@ -41,12 +41,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucprochave.h"
 
@@ -74,7 +74,7 @@
 
 /* exported subroutines */
 
-int ucprochave(pid_t pid) noex {
+int uc_prochave(pid_t pid) noex {
 	int		rs = SR_INVALID ;
 	int		f = false ;
 	if (pid >= 0) {
@@ -88,7 +88,6 @@ int ucprochave(pid_t pid) noex {
 	    }
 	} /* end if (valid) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ucprochave) */
+} /* end subroutine (ucprochave) */
 
 
