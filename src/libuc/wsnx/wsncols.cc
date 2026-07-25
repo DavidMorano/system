@@ -44,16 +44,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| + |wchar_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ascii.h>		/* |CH_TAB| */
-#include	<tabcols.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD + |wchar_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_TAB| */
+#include	<tabcols.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"wsnx.h"
 
@@ -95,7 +95,6 @@ int wsncolstr(int ntab,int scol,const wchar_t *wsp,int wsl) noex {
 	    nc = (col - scol) ;
 	} /* end if (non-null) */
 	return nc ;
-}
-/* end subroutine (wsncols) */
+} /* end subroutine (wsncols) */
 
 
