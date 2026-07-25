@@ -82,7 +82,7 @@ struct vars_head {
 	VARS_FM		vf ;
 	VARS_MI		mi ;
 	VARS_FL		fl ;
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 } ; /* end struct */
 
