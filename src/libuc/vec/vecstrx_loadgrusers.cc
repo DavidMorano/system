@@ -34,21 +34,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>		/* |O_{xx}| */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<strn.h>
-#include	<cfdec.h>
-#include	<ascii.h>
-#include	<numsign.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® |O_{xx}| */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<numsign.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"vecstrx.hh"
 
