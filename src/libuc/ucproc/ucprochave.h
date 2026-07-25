@@ -20,15 +20,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
 extern int	uc_prochave(pid_t) noex ;
 
-static inline int isproc(pid_t pid) noex {
+local inline int isproc(pid_t pid) noex {
 	return uc_prochave(pid) ;
 }
 
