@@ -27,19 +27,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>		/* |mode_t| */
-#include	<csignal>		/* |sig_atomic_t| */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<aflag.hh>
-#include	<timewatch.hh>
-#include	<sigblocker.h>
-#include	<ptm.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® |mode_t| */
+#include	<csignal>		/* CSTD |sig_atomic_t| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<aflag.hh>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<sigblocker.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<ucfork.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"umask.h"
 
@@ -89,9 +93,9 @@ namespace {
 /* forward references */
 
 extern "C" {
-    static void	umask_atforkbefore() noex ;
-    static void	umask_atforkafter() noex ;
-    static void	umask_exit() noex ;
+    local void	umask_atforkbefore() noex ;
+    local void	umask_atforkafter() noex ;
+    local void	umask_exit() noex ;
 }
 
 
@@ -107,13 +111,11 @@ static umasker	umask_data ;
 
 int umask_init() noex {
 	return umask_data.init() ;
-}
-/* end subroutine (umask_init) */
+} /* end subroutine (umask_init) */
 
 int umask_fini() noex {
 	return umask_data.fini() ;
-}
-/* end subroutine (umask_fini) */
+} /* end subroutine (umask_fini) */
 
 int umaskget() noex {
 	int		rs ;
@@ -128,8 +130,7 @@ int umaskget() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
 	return (rs >= 0) ? cmask : rs ;
-}
-/* end subroutine (umaskget) */
+} /* end subroutine (umaskget) */
 
 int umaskset(mode_t cmask) noex {
 	int		rs ;
@@ -144,8 +145,7 @@ int umaskset(mode_t cmask) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
 	return (rs >= 0) ? omask : rs ;
-}
-/* end subroutine (umaskset) */
+} /* end subroutine (umaskset) */
 
 
 /* local subroutines */
@@ -168,18 +168,18 @@ int umasker::init() noex {
 		        }
 		        if (rs < 0) {
 		            uc_atforkexp(b,a,a) ;
-			}
+			} /* end if (error) */
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
             } else if (! finitdone) { 
                 timewatch       tw(to) ;
-                auto lamb = [this] () -> int {
+                cauto lamb = [this] () -> int {
                     int         rsl = SR_OK ;
                     if (!finit) {
                         rsl = SR_LOCKFAIL ;              /* <- failure */
@@ -192,8 +192,7 @@ int umasker::init() noex {
 	    } /* end if */
 	} /* end if (not-voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (umask_init) */
+} /* end subroutine (umask_init) */
 
 int umasker::fini() noex {
 	int		rs = SR_OK ;
@@ -213,8 +212,7 @@ int umasker::fini() noex {
 	    finitdone = false ;
 	} /* end if (atexit registered) */
 	return rs ;
-}
-/* end method (umasker::fini) */
+} /* end method (umasker::fini) */
 
 int umasker::get() noex {
 	int		rs ;
@@ -237,8 +235,7 @@ int umasker::get() noex {
 	} /* end if (init) */
 	omask &= INT_MAX ;
 	return (rs >= 0) ? omask : rs ;
-}
-/* end method (umasker::get) */
+} /* end method (umasker::get) */
 
 int umasker::setmode(mode_t cmask) noex {
 	int		rs ;
@@ -259,22 +256,18 @@ int umasker::setmode(mode_t cmask) noex {
 	} /* end if (init) */
 	omask &= INT_MAX ;
 	return (rs >= 0) ? omask : rs ;
-}
-/* end subroutine (umasker::set) */
+} /* end subroutine (umasker::set) */
 
-static void umask_atforkbefore() noex {
+local void umask_atforkbefore() noex {
 	umask_data.forkbefore() ;
-}
-/* end subroutine (umask_atforkbefore) */
+} /* end subroutine (umask_atforkbefore) */
 
-static void umask_atforkafter() noex {
+local void umask_atforkafter() noex {
 	umask_data.forkafter() ;
-}
-/* end subroutine (umask_atforkafter) */
+} /* end subroutine (umask_atforkafter) */
 
-static void umask_exit() noex {
+local void umask_exit() noex {
 	umask_data.fini() ;
-}
-/* end subroutine (umask_exit) */
+} /* end subroutine (umask_exit) */
 
 
