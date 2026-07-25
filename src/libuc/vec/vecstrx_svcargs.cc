@@ -28,20 +28,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* for |CHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<strn.h>
-#include	<strwcmp.h>
-#include	<toxc.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"vecstrx.hh"
 
@@ -92,8 +92,7 @@ int vecstrx::svcargs(int *fp,cchar *abuf) noex {
 	if (fp && abuf) ylikely {
             rs = SR_INVALID ;
 	    if (abuf[0]) ylikely {
-	        static cint	rst = mkterms() ;
-	        if ((rs = rst) >= 0) ylikely {
+	        if (static cint	rst = mkterms() ; (rs = rst) >= 0) ylikely {
 		    rs = vecstrx_arger(this,fp,abuf) ;
 		    c = rs ;
 		} /* end if (terms) */
