@@ -108,8 +108,8 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
 	T		cutoff ;
-	T		tmax = 0 ;	/* type-maximum value */
-	T		tmin{} ;	/* type-minimum value */
+	T		tmax ;		/* type-maximum value */
+	T		tmin ;		/* type-minimum value */
 	int		cutlim ;
 	int		sl ;
 	int		base ;
@@ -118,7 +118,7 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	cfdshelp(cchar *asp,int asl,int b,T *arp) noex : sp(asp), sl(asl) {
 	    const T	one = 1 ;
 	    tmin = (one << (nb - 1)) ;
-	    tmax = (compl tmax) & (compl tmin) ;
+	    tmax = (compl tmin) ;
 	    base = b ;
 	    rp = arp ;
 	} ; /* end ctor */
