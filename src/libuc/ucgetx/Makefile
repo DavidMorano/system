@@ -46,18 +46,17 @@ OBJ2= ucgetlogin.o ucgetnameinfo.o ucgetnisdomain.o
 OBJ3= ucgetpid.o ucgetpuid.o ucgetrandom.o
 OBJ4= ucgetrusage.o ucgetsocktype.o ucgetnetname.o
 OBJ5= ucgetauid.o ucgetprojdef.o ucgetpriority.o
-OBJ6=
+OBJ6= ucgettimeofday.o
 OBJ7=
 
-OBJA= obj0.o obj1.o obj2.o 
-OBJB= obj3.o obj4.o obj5.o
+OBJA= obj0.o obj1.o obj2.o obj3.o 
+OBJB= obj4.o obj5.o obj6.o
 
 OBJ= obja.o objb.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -97,11 +96,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
@@ -166,5 +165,5 @@ ucgetpuid.o:		ucgetpuid.cc				$(INCS)
 ucgetrandom.o:		ucgetrandom.cc		ucgetrandom.h	$(INCS)
 ucgetrusage.o:		ucgetrusage.cc				$(INCS)
 ucgetsocktype.o:	ucgetsocktype.cc			$(INCS)
-
+gettimeofday.o:		ucgettimeofday.cc			$(INCS)
 
