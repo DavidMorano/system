@@ -222,6 +222,7 @@ struct vecstr : vecstr_head {
 	vecstr(const vecstr &) = delete ;
 	vecstr &operator = (const vecstr &) = delete ;
 	int add		(cchar *,int = -1) noex ;
+	int addkeyval	(cchar *,int,cchar *,int = -1) noex ;
 	int adduniq	(cchar *,int = -1) noex ;
 	int addsyms	(cchar *,mainv) noex ;
 	int addpath	(cchar *,int = -1) noex ;
