@@ -38,9 +38,9 @@ class strnul {
 	cchar		*rp = nullptr ;
 	char		*as = nullptr ;	/* allocated memory */
 	char		buf[STRNUL_SHORTLEN + 1] ;
-	void clear() noex ;
-	void alloc(cchar *,int) noex ;
-	ccharp proc(cchar *,int = -1) noex ;
+	void clear	() noex ;
+	void alloc	(cchar *,int) noex ;
+	ccharp proc	(cchar *,int = -1) noex ;
 	void dtor() noex ;
     public:
 	bool		fok = true ;
@@ -56,7 +56,7 @@ class strnul {
 	operator ccharp () const noex {
 	    return rp ;
 	} ;
-	operator bool () const noex {
+	operator bool	() const noex {
 	    return fok ;
 	} ;
 	destruct strnul() {
