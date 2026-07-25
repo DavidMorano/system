@@ -52,18 +52,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
 #include	<cstdckdint>		/* |ckd_mul(3c)| */
-#include	<cstring>		/* |stpncpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<utimeout.h>		/* |uto{x}(3u)| */
-#include	<bufsizeget.h>
-#include	<sysval.hh>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<cstring>		/* CSTD |stpncpy(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<utimeout.h>		/* LIBU |uto{x}(3u)| */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uclibmem.h"
 
