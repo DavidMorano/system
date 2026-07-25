@@ -95,7 +95,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ)
@@ -135,7 +135,7 @@ objb.o:			$(OBJB)
 
 
 ucstream0.o:		ucstream.ccm			$(INCS)
-	gxx -c -x c++ -o $@ -O $<
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 ucstream1.o:		ucstream1.cc ucstream0.o	$(INCS)
 	$(COMPILE.cc) $<
