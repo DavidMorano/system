@@ -23,7 +23,7 @@
 	Description:
 	These subroutines are suitable for the sorting of c-strings
 	using other subroutines like |qsort(3c)| or |bsearch(3c)|
-	and |vecstr_finder(3dam)|.
+	and |vecstr_finder(3uc)|.
 
 	Arguments:
 	int vstrbasecmp(cchar **,cchar **) noex
@@ -44,7 +44,7 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<stdclib.hh>		/* LIBU |std_strcasecmp(3u)| */
 #include	<mkchar.h>		/* LIBU */
-#include	<strxcmp.h>		/* LINUC */
+#include	<strxcmp.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<vstrorders.h>		/* LIBU */
 
