@@ -56,18 +56,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
-#include	<ucsyssv.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<ucsyssv.h>		/* LIBUC */
 
 #include	"ucgetsv.h"
 #include	"ucgetxx.hh"
@@ -137,22 +136,19 @@ int uc_getsvbegin(int stayopen) noex {
 	errno = 0 ;
 	setservent(stayopen) ;
 	return (- errno) ;
-}
-/* end subroutine (uc_getsvbegin) */
+} /* end subroutine (uc_getsvbegin) */
 
 int uc_getsvend() noex {
 	errno = 0 ;
 	endservent() ;
 	return (- errno) ;
-}
-/* end subroutine (uc_getsvend) */
+} /* end subroutine (uc_getsvend) */
 
 int uc_getsvent(ucentsv *svp,char *svbuf,int svlen) noex {
 	ucgetsv		svo(nullptr) ;
 	svo.m = &ucgetsv::getsv_ent ;
 	return svo(svp,svbuf,svlen) ;
-}
-/* end subroutine (uc_getsvent) */
+} /* end subroutine (uc_getsvent) */
 
 int uc_getsvnam(ucentsv *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
     	int		rs = SR_FAULT ;
@@ -164,8 +160,7 @@ int uc_getsvnam(ucentsv *svp,char *svbuf,int svlen,cchar *n,cchar *p) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getsvnam) */
+} /* end subroutine (uc_getsvnam) */
 
 int uc_getsvnum(ucentsv *svp,char *svbuf,int svlen,int n,cchar *p) noex {
     	int		rs = SR_FAULT ;
@@ -178,8 +173,7 @@ int uc_getsvnum(ucentsv *svp,char *svbuf,int svlen,int n,cchar *p) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getsvnum) */
+} /* end subroutine (uc_getsvnum) */
 
 
 /* local subroutines */
@@ -197,8 +191,7 @@ int ucgetsv::operator () (ucentsv *svp,char *svbuf,int svlen) noex {
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucgetsv::operator) */
+} /* end method (ucgetsv::operator) */
 
 int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
     	cnullptr	np{} ;
@@ -221,8 +214,7 @@ int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetsv::getsv_ent) */
+} /* end method (ucgetsv::getsv_ent) */
 
 int ucgetsv::getsv_nam(ucentsv *svp,char *svbuf,int svlen) noex {
     	cnullptr	np{} ;
@@ -245,8 +237,7 @@ int ucgetsv::getsv_nam(ucentsv *svp,char *svbuf,int svlen) noex {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetsv::getsv_nam) */
+} /* end method (ucgetsv::getsv_nam) */
 
 int ucgetsv::getsv_num(ucentsv *svp,char *svbuf,int svlen) noex {
     	cnullptr	np{} ;
@@ -269,7 +260,6 @@ int ucgetsv::getsv_num(ucentsv *svp,char *svbuf,int svlen) noex {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetsv::getsv_num) */
+} /* end method (ucgetsv::getsv_num) */
 
 
