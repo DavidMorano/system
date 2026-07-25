@@ -21,16 +21,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int uc_strtoi	(cchar *,cchar **,int,int *)		noex ;
-extern int uc_strtol	(cchar *,cchar **,int,long *)		noex ;
-extern int uc_strtoll	(cchar *,cchar **,int,longlong *)	noex ;
+extern int uc_strtosi	(cchar *,cchar **,int,sint *)		noex ;
+extern int uc_strtosl	(cchar *,cchar **,int,slong *)		noex ;
+extern int uc_strtosll	(cchar *,cchar **,int,slonglong *)	noex ;
 extern int uc_strtoui	(cchar *,cchar **,int,uint *)		noex ;
 extern int uc_strtoul	(cchar *,cchar **,int,ulong *)		noex ;
 extern int uc_strtoull	(cchar *,cchar **,int,ulonglong *)	noex ;
@@ -40,13 +40,13 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 inline int uc_strto(cchar *sp,cchar **endpp,int b,int *rp)		noex {
-	return uc_strtoi(sp,endpp,b,rp) ;
+	return uc_strtosi(sp,endpp,b,rp) ;
 }
 inline int uc_strto(cchar *sp,cchar **endpp,int b,long *rp)		noex {
-	return uc_strtol(sp,endpp,b,rp) ;
+	return uc_strtosl(sp,endpp,b,rp) ;
 }
 inline int uc_strto(cchar *sp,cchar **endpp,int b,longlong *rp) 	noex {
-	return uc_strtoll(sp,endpp,b,rp) ;
+	return uc_strtosll(sp,endpp,b,rp) ;
 }
 inline int uc_strto(cchar *sp,cchar **endpp,int b,uint *rp)		noex {
 	return uc_strtoui(sp,endpp,b,rp) ;
