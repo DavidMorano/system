@@ -84,14 +84,14 @@
 #include	<ptm.h>			/* LIBU */
 #include	<ptc.h>			/* LIBU */
 #include	<sigblocker.h>		/* LIBU */
-#include	<opentmp.h>		/* LINUC */
-#include	<filemap.h>		/* LINUC */
-#include	<filer.h>		/* LINUC */
-#include	<snx.h>			/* LINUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<filemap.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
 #include	<strnxcmp.h>		/* LIBUC |strnncmp(3uc)| */
 #include	<mkchar.h>		/* LIBU */
-#include	<isoneof.h>		/* LINUC */
-#include	<isnot.h>		/* LINUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
