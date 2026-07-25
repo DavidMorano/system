@@ -53,15 +53,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| + |wchar_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSYD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD + |wchar_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"wsfx.h"
 
@@ -88,10 +88,10 @@ typedef const wchar_t		cwchar ;
 
 /* forward references */
 
-static bool iswwhite(cwchar wch) noex {
+local bool iswwhite(cwchar wch) noex {
     	cint ch = int(wch) ;
 	return (((ch) <= UCHAR_MAX) && CHAR_ISWHITE(ch)) ;
-}
+} /* end subroutine */
 
 
 /* local variables */
@@ -103,7 +103,7 @@ static bool iswwhite(cwchar wch) noex {
 /* exported subroutines */
 
 int wsfnext(cwchar *wsp,int wsl,cwchar **rpp) noex {
-    	int		rl = -1 ;
+    	int		rl = -1 ; /* return-value */
 	cwchar		*rp = nullptr ;
 	if (wsp && rpp) {
 	    wchar_t	ch ; /* used-multiple */
@@ -125,7 +125,6 @@ int wsfnext(cwchar *wsp,int wsl,cwchar **rpp) noex {
 	    *rpp = rp ;
 	} /* end if (non-null) */
 	return rl ;
-}
-/* end subroutine (wsfnext) */
+} /* end subroutine (wsfnext) */
 
 
