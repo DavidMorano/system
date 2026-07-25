@@ -32,16 +32,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* <- |memcmp(3c)| */
-#include	<new>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memcmp(3c)| */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"vecobj.h"
 
@@ -480,8 +480,7 @@ int vecobj_curend(vecobj *op,vecobj_cur *curp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecobj_curend) */
+} /* end subroutine (vecobj_curend) */
 
 namespace {
     struct sub_fetch {
@@ -613,8 +612,7 @@ int vecobj_audit(vecobj *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecobj_audit) */
+} /* end subroutine (vecobj_audit) */
 
 
 /* private subroutines */
