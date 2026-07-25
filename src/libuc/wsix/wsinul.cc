@@ -36,13 +36,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| + {wchar_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD + |wchar_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"wsix.h"
 
@@ -82,7 +82,6 @@ int wsinul(const wchar_t *wsp) noex {
 	    for (i = 0 ; wsp[i] ; i += 1) ;
 	}
 	return i ;
-}
-/* end subroutine (wsinul) */
+} /* end subroutine (wsinul) */
 
 
