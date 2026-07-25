@@ -26,11 +26,11 @@
 
 EXTERNC_begin
 
-extern int	uc_nprocessors(int) noex ;
-extern int	uc_gethz(int) noex ;
-extern int	uc_syspages(int) noex ;
-extern int	uc_pagesize() noex ;
-extern int	uc_ftime(TIMEB *) noex ;
+extern int	uc_nprocessors	(int) noex ;
+extern int	uc_gethz	(int) noex ;
+extern int	uc_syspages	(int) noex ;
+extern int	uc_pagesize	() noex ;
+extern int	uc_ftime	(TIMEB *) noex ;
 
 EXTERNC_end
 
