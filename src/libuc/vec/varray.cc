@@ -352,8 +352,7 @@ int varray_audit(varray *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (varray_audit) */
+} /* end subroutine (varray_audit) */
 
 
 /* local subroutines */
