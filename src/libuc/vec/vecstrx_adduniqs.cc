@@ -40,14 +40,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnbrk(3uc)| */
-#include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* LIBU |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnbrk(3uc)| */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"vecstrx.hh"
 
