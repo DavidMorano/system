@@ -71,7 +71,15 @@ import libutil ;			/* |lenstr(3u)| */
 /* exported subroutines */
 
 extern int termcmd_clear(termcmd *op) noex {
-	return memclear(op) ;
+	TERMCMD		*hop = op ;
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = memclear(hop) ;
+	    for (int i = 0 ; i < TERMCMD_NP ; i += 1) {
+	        op->p[i] = TERMCMD_PEOL ;
+	    } /* end for */
+	} /* end if (non-null) */
+	return rs ;
 } /* end subroutine (termcmd_clear) */
 
 
