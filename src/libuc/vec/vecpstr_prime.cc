@@ -73,6 +73,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uintptr_t| */
 #include	<new>			/* C++STD |nothrow(3c++)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<string>		/* C++STD */
@@ -1105,6 +1106,10 @@ local int indexsize(int il) noex {
 
 int vecpstr::add(cchar *sp,int sl) noex {
 	return vecpstr_add(this,sp,sl) ;
+}
+
+int vecpstr::addkeyval(cchar *kp,int kl,cchar *vp,int vl) noex {
+	return vecpstr_addkeyval(this,kp,kl,vp,vl) ;
 }
 
 int vecpstr::adduniq(cchar *sp,int sl) noex {
