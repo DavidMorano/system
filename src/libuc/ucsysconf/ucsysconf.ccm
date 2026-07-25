@@ -61,7 +61,7 @@ module ;
 
 export module ucsysconf ;
 
-import usysconfitems ;			/* |dataitem_overlast| */
+import usysconfcheck ;			/* |dataitem_overlast| */
 
 /* local defines */
 
@@ -103,7 +103,7 @@ using std::atomic_int ;			/* type */
 	int mconfstr	(int) noex ;
 	int operator ()	(int) noex ;
 	int getval	(int) noex ;
-	int getvalcache	(int) noex ;
+	int getvalcache	(int,int) noex ;
 	int getvalsyn	(int) noex ;
 	int getstr	(int) noex ;
 	int getstrsyn	(int) noex ;
@@ -130,7 +130,6 @@ export extern "C++" {
 export extern "C" {
     int uc_sysconfval(int req,long *rp) noex {
 	ucsysconf	sco(rp) ;
-	int		rs = SR_OK ;
 	sco.m = &ucsysconf::mconfval ;
 	return sco.sysconfval(req) ;
     } /* end subroutine (uc_sysconfval) */
@@ -158,7 +157,7 @@ namespace libuc {
 	    cint cmd = _SC_NGROUPS_MAX ;
 	    rs = uc_sysconfval(cmd,nullptr) ;
             ng = rs ;
-        }
+        } /* end if */
         return rs ;
     } /* end method (ucmaxgrouper::operator) */
 } /* end namespace (libuc) */
