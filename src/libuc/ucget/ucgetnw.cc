@@ -72,18 +72,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
-#include	<ucsysnw.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<ucsysnw.h>		/* LIBUC */
 
 #include	"ucgetnw.h"
 #include	"ucgetxx.hh"
@@ -154,22 +153,19 @@ int uc_getnwbegin(int stayopen) noex {
 	errno = 0 ;
 	setnetent(stayopen) ;
 	return (- errno) ;
-}
-/* end subroutine (uc_getnwbegin) */
+} /* end subroutine (uc_getnwbegin) */
 
 int uc_getnwend() noex {
 	errno = 0 ;
 	endnetent() ;
 	return (- errno) ;
-}
-/* end subroutine (uc_getnwend) */
+} /* end subroutine (uc_getnwend) */
 
 int uc_getnwent(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	ucgetnw		nwo(nullptr) ;
 	nwo.m = &ucgetnw::getnw_ent ;
 	return nwo(nwp,nwbuf,nwlen) ;
-}
-/* end subroutine (uc_getnwent) */
+} /* end subroutine (uc_getnwent) */
 
 int uc_getnwnam(ucentnw *nwp,char *nwbuf,int nwlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
@@ -182,8 +178,7 @@ int uc_getnwnam(ucentnw *nwp,char *nwbuf,int nwlen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getnwnam) */
+} /* end subroutine (uc_getnwnam) */
 
 int uc_getnwnum(ucentnw *nwp,char *nwbuf,int nwlen,int af,uint32_t num) noex {
     	int		rs = SR_INVALID ;
@@ -193,8 +188,7 @@ int uc_getnwnum(ucentnw *nwp,char *nwbuf,int nwlen,int af,uint32_t num) noex {
 	    rs = nwo(nwp,nwbuf,nwlen) ;
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (uc_getnwnum) */
+} /* end subroutine (uc_getnwnum) */
 
 
 /* local subroutines */
@@ -212,8 +206,7 @@ int ucgetnw::operator () (ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucgetnw::operator) */
+} /* end method (ucgetnw::operator) */
 
 int ucgetnw::getnw_ent(ucentnw *nwp,char *nwbuf,int nwlen) noex {
     	cnullptr	np{} ;
@@ -236,8 +229,7 @@ int ucgetnw::getnw_ent(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetnw::getnw_ent) */
+} /* end method (ucgetnw::getnw_ent) */
 
 int ucgetnw::getnw_nam(ucentnw *nwp,char *nwbuf,int nwlen) noex {
     	cnullptr	np{} ;
@@ -259,8 +251,7 @@ int ucgetnw::getnw_nam(ucentnw *nwp,char *nwbuf,int nwlen) noex {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetnw::getnw_nam) */
+} /* end method (ucgetnw::getnw_nam) */
 
 int ucgetnw::getnw_num(ucentnw *nwp,char *nwbuf,int nwlen) noex {
     	cnullptr	np{} ;
@@ -283,7 +274,6 @@ int ucgetnw::getnw_num(ucentnw *nwp,char *nwbuf,int nwlen) noex {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetnw::getnw_num) */
+} /* end method (ucgetnw::getnw_num) */
 
 
