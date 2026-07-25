@@ -89,21 +89,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |sort(3c++)| */
-#include	<string>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<nulstr.h>
-#include	<nleadstr.h>
-#include	<strwcpy.h>
-#include	<vstrcmp.h>
-#include	<intceil.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cassert>		/* CSTD */
+#include	<algorithm>		/* C++STD |sort(3c++)| */
+#include	<string>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<vstrcmp.h>		/* LIBUC */
+#include	<intceil.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"vecstr.h"
 
@@ -173,6 +174,7 @@ constexpr vecstrms	vecstrm ;
 int vecstr_start(vecstr *op,int vn,int vo) noex {
 	int		rs ;
 	if (vn <= 1) vn = defents ;
+	assert(op) ;
 	if ((rs = vecstr_ctor(op)) >= 0) ylikely {
 	    op->n = vn ;
 	    if ((rs = vecstr_setopts(op,vo)) >= 0) ylikely {
@@ -194,6 +196,7 @@ int vecstr_start(vecstr *op,int vn,int vo) noex {
 int vecstr_finish(vecstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
@@ -225,6 +228,7 @@ int vecstr_finish(vecstr *op) noex {
 int vecstr_audit(vecstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
@@ -243,11 +247,13 @@ int vecstr_audit(vecstr *op) noex {
 } /* end subroutine (vecstr_audit) */
 
 int vecstr_add(vecstr *op,cchar *sp,int sl) noex {
+	assert(op) ;
 	return vecstr_store(op,sp,sl,nullptr) ;
 } /* end subroutine (vecstr_add) */
 
 int vecstr_adduniq(vecstr *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	        if ((rs = vecstr_findn(op,sp,sl)) >= 0) {
@@ -263,6 +269,7 @@ int vecstr_adduniq(vecstr *op,cchar *sp,int 탎l) noex {
 int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
+	assert(op) ;
 	if (op && kp) ylikely {
 	    rs = SR_OK ;
 	    if (kl < 0) kl = lenstr(kp) ;
@@ -291,6 +298,7 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 int vecstr_insert(vecstr *op,int ii,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
+	assert(op) ;
 	if (op) ylikely {
 	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	        if ((rs = vecstr_validx(op,ii)) >= 0) ylikely {
@@ -314,6 +322,7 @@ int vecstr_insert(vecstr *op,int ii,cchar *sp,int 탎l) noex {
 int vecstr_store(vecstr *op,cchar *sp,int 탎l,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
+	assert(op) ;
 	if (op) ylikely {
 	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 		rs = SR_OK ;
@@ -336,11 +345,13 @@ int vecstr_store(vecstr *op,cchar *sp,int 탎l,cchar **rpp) noex {
 } /* end subroutine (vecstr_store) */
 
 int vecstr_already(vecstr *op,cchar *sp,int sl) noex {
+	assert(op) ;
 	return vecstr_findn(op,sp,sl) ;
 } /* end subroutine (vecstr_already) */
 
 int vecstr_get(vecstr *op,int i,cchar **spp) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (op->va) ylikely {
@@ -356,13 +367,14 @@ int vecstr_get(vecstr *op,int i,cchar **spp) noex {
 int vecstr_getlast(vecstr *op,cchar **spp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (op->va && (op->c > 0)) {
 	        i = (op->i-1) ;
 	        while ((i >= 0) && (op->va[i] == nullptr)) {
 		    i -= 1 ;
-	        }
+	        } /* end while */
 	        if (i >= 0) rs = SR_OK ;
 	    } /* end if (populated) */
 	    if (spp) {
@@ -375,6 +387,7 @@ int vecstr_getlast(vecstr *op,cchar **spp) noex {
 int vecstr_del(vecstr *op,int i) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (op->va) ylikely {
@@ -438,6 +451,7 @@ int vecstr_del(vecstr *op,int i) noex {
 int vecstr_delall(vecstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
@@ -460,6 +474,7 @@ int vecstr_delall(vecstr *op) noex {
 
 int vecstr_count(vecstr *op) noex {
 	int	rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = op->c ;
 	} /* end if (non-null) */
@@ -469,6 +484,7 @@ int vecstr_count(vecstr *op) noex {
 int vecstr_sort(vecstr *op,vecstr_vcmp vcf) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
@@ -485,6 +501,7 @@ int vecstr_sort(vecstr *op,vecstr_vcmp vcf) noex {
 
 int vecstr_search(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	int		rs  = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (op->va) ylikely {
@@ -528,6 +545,7 @@ int vecstr_searchl(vecstr *op,cc *sp,int sl,vecstr_vcmp vcf,cc **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		i = -1 ;
+	assert(op) ;
 	if (op && sp) ylikely {
 	    cchar	*s{} ;
 	    if (nulstr ns ; (rs = ns.start(sp,sl,&s)) >= 0) ylikely {
@@ -548,6 +566,7 @@ int vecstr_searchl(vecstr *op,cc *sp,int sl,vecstr_vcmp vcf,cc **rpp) noex {
 
 int vecstr_finder(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (vcf == nullptr) vcf = vstrcmp ;
@@ -569,6 +588,7 @@ int vecstr_finder(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 
 int vecstr_find(vecstr *op,cchar *sp) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op && sp) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (op->va) ylikely {
@@ -584,10 +604,11 @@ int vecstr_find(vecstr *op,cchar *sp) noex {
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (vecstr_find) */
+} /* end subroutine (vecstr_find) */
+
 int vecstr_findn(vecstr *op,cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	        rs = SR_NOTFOUND ;
@@ -610,6 +631,7 @@ int vecstr_findn(vecstr *op,cchar *sp,int 탎l) noex {
 
 int vecstr_findaddr(vecstr *op,cchar *addr) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (op->va) ylikely {
@@ -627,6 +649,7 @@ int vecstr_findaddr(vecstr *op,cchar *addr) noex {
 
 int vecstr_getvec(vecstr *op,mainv *rppp) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op && rppp) ylikely {
 	    if ((rs = vecstr_extvec(op)) >= 0) ylikely {
 	        if (op->va) ylikely {
@@ -641,6 +664,7 @@ int vecstr_getvec(vecstr *op,mainv *rppp) noex {
 int vecstr_strsize(vecstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		stsz = 1 ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
@@ -663,6 +687,7 @@ int vecstr_strsize(vecstr *op) noex {
 int vecstr_strmk(vecstr *op,char *tab,int tabs) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	assert(op) ;
 	if (op && tab) ylikely {
 	    cint 	stsz = iceil(op->stsz,resz) ;
 	    rs = SR_OVERFLOW ;
@@ -691,6 +716,7 @@ int vecstr_strmk(vecstr *op,char *tab,int tabs) noex {
 int vecstr_recsize(vecstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		rsz = (2 * resz) ;
+	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
@@ -702,6 +728,7 @@ int vecstr_recsize(vecstr *op) noex {
 
 int vecstr_cksize(vecstr *op) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op) ylikely {
 	    if ((rs = op->stsz) == 0) {
 	        rs = vecstr_strsize(op) ;
@@ -713,6 +740,7 @@ int vecstr_cksize(vecstr *op) noex {
 int vecstr_recmk(vecstr *op,int *rec,int recs) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	assert(op) ;
 	if (op && rec) ylikely {
 	    cint	rsz = ((op->c + 2) * resz) ;
 	    rs = SR_OVERFLOW ;
@@ -739,6 +767,7 @@ int vecstr_recmk(vecstr *op,int *rec,int recs) noex {
 int vecstr_recmkstr(vecstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	assert(op) ;
 	if (op && rec && tab) ylikely {
 	    rs = SR_OK ;
 	    if (op->stsz == 0) {
@@ -771,6 +800,7 @@ int vecstr_recmkstr(vecstr *op,int *rec,int recs,char *tab,int tabs) noex {
 int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	assert(op) ;
 	if (op && av && tab) ylikely {
 	    if ((rs = op->cksize) >= 0) ylikely {
 		int	sz = iceil(op->stsz,szof(int)) ;
@@ -798,6 +828,7 @@ int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 
 int vecstr_add(vecstr *op,string *strp) noex {
 	int		rs = SR_FAULT ;
+	assert(op) ;
 	if (op && strp) ylikely {
 	    cchar	*sp = strp->c_str() ;
 	    cint	sl = intconv(strp->size()) ;
@@ -946,6 +977,10 @@ local void vecstr_arrsort(vecstr *op,vecstr_vcmp vcf) noex {
 
 int vecstr::add(cchar *sp,int sl) noex {
 	return vecstr_add(this,sp,sl) ;
+}
+
+int vecstr::addkeyval(cchar *kp,int kl,cchar *vp,int vl) noex {
+	return vecstr_addkeyval(this,kp,kl,vp,vl) ;
 }
 
 int vecstr::adduniq(cchar *sp,int sl) noex {
