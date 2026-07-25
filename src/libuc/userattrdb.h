@@ -49,7 +49,7 @@ struct userattrdb_head {
 	cchar		*username ;	/* passed argument */
 	cchar		*domain ;	/* cached */
 	userattr	*uap ;		/* returned (allocated) */
-	uint		mgval ;
+	uint		magval ;
 	USERATTRDB_FL	init, have ;
 } ; /* end struct (userattrdb_head) */
 
