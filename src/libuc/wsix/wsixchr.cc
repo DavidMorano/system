@@ -101,7 +101,6 @@ int wsirchr(const wchar_t *wsp,int wsl,int sch) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return (f) ? i : -1 ;
-}
-/* end subroutine (wsirchr) */
+} /* end subroutine (wsirchr) */
 
 
