@@ -1,6 +1,6 @@
 /* vstrsort SUPPORT (V-String-Sort) */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* a shell-sort on array of pointers to c-strings */
 /* version %I% last-modified %G% */
