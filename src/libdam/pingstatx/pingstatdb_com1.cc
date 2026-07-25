@@ -134,6 +134,11 @@ import pingstatdb_rec ;
 #define	CF_UNLOCK	1		/* always unlock after an operation */
 #endif
 
+#define	DEBUGPRINTT(str,tval)		\
+    	if_constexpr (f_debug) {	\
+	    debugprintt(str,tval) ;	\
+	}
+
 
 /* imported namespaces */
 
@@ -161,6 +166,8 @@ namespace {
 
 
 /* forward references */
+
+local int debugprintt(cchar *,time_t) noex ;
 
 
 /* local variables */
@@ -291,21 +298,31 @@ int pingstatdb_fes(PSD *op) noex {
 } /* end subroutine (pingstatdb_fes) */
 
 #ifdef	COMMENT
-int pingstatdb_recupd(PSD *op,time_t dt,DTR *dp,
-		cchar *hn,int f_up,time_t ts) noex {
-	PSD_REC	*rp ;
-	off_t	boff ;
-	int		rs ;
-	int		f_changed = false ;
 
-	{
-	    char	timebuf[TIMEBUFLEN+1] ;
+int pingstatdb_recupd(PSD *op,time_t dt,DTR *dp,
+		cc *hn,int f_up,time_t ta) noex {
+	int		rs ;
+	int		fchanged = false ;
+
+
+	DEBUGPRINTF("ret rs=%d fchanged=%u\n", rs,fchanged) ;
+	return (rs >= 0) ? fchanged : rs ;
+} /* end subroutine (pingstatdb_recupd) */
+
+#endif /* COMMENT */
+
+#ifdef	COMMENT
+int pingstatdb_recupd(PSD *op,time_t dt,DTR *dp,
+		cchar *hn,int f_up,time_t tt) noex {
+	off_t	boff ;
+	int		rs = SR_BUGCHECK ;
+	int		f_changed = false ;
 	    DEBUGPRINTF("hn=%s\n",hn) ;
 	    DEBUGPRINTF("f_up=%u\n",f_up) ;
-	    DEBUGPRINTF("ts=%s\n",
-	        timestr_logz(ts,timebuf)) ;
-	}
+	    DEBUGPRINTT("tt=%s",tt) ;
+	if (op && hn && dp) ylikely {
 
+	PSD_REC	*rp ;
 	if ((rs = pingstatdb_recget(op,hn,&rp)) >= 0) {
 	    time_t	ptime ;
 	    int		f_greater = (! LEQUIV(f_up,rp->f_up)) ;
@@ -316,17 +333,12 @@ int pingstatdb_recupd(PSD *op,time_t dt,DTR *dp,
 
 	    f_greater = ((rs >= 0) && (ts > ptime)) ;
 
-	    if (ptime > ts)
+	    if (ptime > ts) {
 	        ts = ptime ;
-
-	    dater_settimezn(dp,ts,op->znbuf,-1) ;
-
-	    {
-	        char	timebuf[TIMEBUFLEN + 1] ;
-	        DEBUGPRINTF("dater_gettime() ptime=%s\n",
-	            timestr_logz(ptime,timebuf)) ;
 	    }
 
+	    dater_settimezn(dp,ts,op->znbuf,-1) ;
+	    DEBUGPRINTT("ptime=%s",ptime) ;
 	    if ((rs < 0) || f_changed ||
 	        (((dt - ptime) > TO_MINUPDATE) && f_greater)) {
 
@@ -376,8 +388,9 @@ int pingstatdb_recupd(PSD *op,time_t dt,DTR *dp,
 	        record_finish(&r) ;
 	    } /* end if (error) */
 	} /* end if (target entry) */
-	DEBUGPRINTF("ret rs=%d f_changed=%u\n", rs,f_changed) ;
-	return (rs >= 0) ? f_changed : rs ;
+	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d fchanged=%u\n", rs,f_changed) ;
+	return (rs >= 0) ? fchanged : rs ;
 } /* end subroutine (pingstatdb_recupd) */
 #endif /* COMMENT */
 
@@ -412,5 +425,16 @@ vars::operator int () noex {
 	} /* end if (bufsizeget) */
 	return rs ;
 } /* end method (vars::operator) */
+
+local int debugprintt(cchar *str,time_t tval) noex {
+    	int		rs = SR_OK ;
+	if_constexpr (f_debug) {
+    	    cchar	*fmt = "%s %s\n" ;
+	    char	tbuf[TIMEBUFLEN + 1] ;
+	    timestr_logz(tval,tbuf) ;
+	    rs = DEBUGPRINTF(fmt,str,tbuf) ;
+	} /* end if_constexpr (f_debug) */
+    	return rs ; 
+} /* end subroutine (debugprintt) */
 
 
