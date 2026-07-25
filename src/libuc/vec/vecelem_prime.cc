@@ -35,6 +35,7 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD |nullptr_t| */
 #include	<cstdlib>		/* CSTD |qsort(3c)| */
+#include	<cstdint>		/* CSTD |uintptr_t| */
 #include	<cstring>		/* CSTD |memcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -383,8 +384,7 @@ int vecelem_audit(vecelem *op) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecelem_audit) */
+} /* end subroutine (vecelem_audit) */
 
 
 /* private subroutines */
