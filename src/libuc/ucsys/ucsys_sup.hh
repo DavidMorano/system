@@ -1,6 +1,6 @@
 /* ucsys_sup HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UCSYSSUP object management */
 /* version %I% last-modified %G% */
