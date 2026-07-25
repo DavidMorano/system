@@ -118,8 +118,7 @@ int veclong_start(veclong *op,int vn,int vo) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? vn : rs ;
-}
-/* end subroutine (veclong_start) */
+} /* end subroutine (veclong_start) */
 
 int veclong_finish(veclong *op) noex {
 	int		rs ;
@@ -460,8 +459,7 @@ int veclong_audit(veclong *op) noex {
 	    rs = (i == c) ? SR_OK : SR_BADFMT ;
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (veclong_audit) */
+} /* end subroutine (veclong_audit) */
 
 
 /* private subroutines */
