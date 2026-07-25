@@ -57,7 +57,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/utsname.h>		/* POSIX */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<new>			/* C++STD plavement-new(c++) */
 #include	<memory>		/* C++STD |destroy_a(3c++)| */
@@ -66,12 +66,12 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 #include	<umem.hh>		/* LIBU */
-#include	<ucsysauxinfo.h>	/* |SAI_{xx}| */
-#include	<ucfork.h>
-#include	<ucatfork.h>
-#include	<ucatexit.h>
-#include	<bufsizeget.h>
-#include	<sigblocker.h>		/* LIBU */
+#include	<ucsysauxinfo.h>	/* LIBUC |SAI_{xx}| */
+#include	<ucfork.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<sigblocker.h>		/* LIBUC */
 #include	<ptm.h>			/* LIBU */
 #include	<timewatch.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -203,19 +203,19 @@ constexpr int		sais[] = {
 
 int ucinfo_init() noex {
 	return ucinfo_data.init() ;
-}
+} /* end subroutine */
 
 int ucinfo_fini() noex {
 	return ucinfo_data.fini() ;
-}
+} /* end subroutine */
 
 int ucinfo_name(ucinfo_infoname *unp) noex {
 	return ucinfo_data.getname(unp) ;
-}
+} /* end subroutine */
 
 int ucinfo_aux(ucinfo_infoaux *uxp) noex {
 	return ucinfo_data.getaux(uxp) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -227,25 +227,25 @@ int ucinfo::init() noex {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
-	        if ((rs = mx.create) >= 0) {
+	        if ((rs = mx.create) >= 0) ylikely {
 	            void_f	b = ucinfo_atforkbefore ;
 	            void_f	a = ucinfo_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
-	                if ((rs = uc_atexit(ucinfo_exit)) >= 0) {
+	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	                if ((rs = uc_atexit(ucinfo_exit)) >= 0) ylikely {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
 	                    uc_atforkexp(b,a,a) ;
-			}
+			} /* end if (error) */
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        cauto lamb = [this] () -> int {
@@ -299,11 +299,11 @@ int ucinfo::fini() noex {
 int ucinfo::getname(ucinfo_infoname *unp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (unp) {
+	if (unp) ylikely {
 	    memclear(unp) ;
-	    if (sigblocker b ; (rs = b.start) >= 0) {
-	        if ((rs = init()) >= 0) {
-		    if ((rs = getname_setup()) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	        if ((rs = init()) >= 0) ylikely {
+		    if ((rs = getname_setup()) >= 0) ylikely {
 			*unp = name ;
 		    }
 	        } /* end if (init) */
@@ -317,7 +317,7 @@ int ucinfo::getname(ucinfo_infoname *unp) noex {
 int ucinfo::getname_setup() noex {
 	int		rs = SR_OK ;
 	if (ao.name == nullptr) {
-	    if (setname tmp ; (rs = getname_load(&tmp)) >= 0) {
+	    if (setname tmp ; (rs = getname_load(&tmp)) >= 0) ylikely {
 		rs = getname_install(&tmp) ;
 	    } /* end if (ok) */
 	} /* end if (setup needed) */
@@ -328,9 +328,9 @@ int ucinfo::getname_load(setname *setp) noex {
 	cint		usz = szof(utsname) ;
 	int		rs ;
 	int		rs1 ;
-	if (void *vp ; (rs = umem.mall(usz,&vp)) >= 0) {
-	    if (utsname *utsp = new(vp) utsname ; utsp) {
-                if ((rs = u_uname(utsp)) >= 0) {
+	if (void *vp ; (rs = umem.mall(usz,&vp)) >= 0) ylikely {
+	    if (utsname *utsp = new(vp) utsname ; utsp) ylikely {
+                if ((rs = u_uname(utsp)) >= 0) ylikely {
                     cint    nlen = (szof(utsp->sysname) - 1) ;
                     int     sz = 0 ;
                     sz += (lenstr(utsp->sysname,nlen) + 1) ;
@@ -338,7 +338,7 @@ int ucinfo::getname_load(setname *setp) noex {
                     sz += (lenstr(utsp->release,nlen) + 1) ;
                     sz += (lenstr(utsp->version,nlen) + 1) ;
                     sz += (lenstr(utsp->machine,nlen) + 1) ;
-                    if (char *bp ; (rs = umem.mall(sz,&bp)) >= 0) {
+                    if (char *bp ; (rs = umem.mall(sz,&bp)) >= 0) ylikely {
                         setp->strp = bp ;
                         setp->tmpname.sysname = bp ;
                         bp = (strwcpy(bp,utsp->sysname,nlen) + 1) ;
@@ -363,8 +363,8 @@ int ucinfo::getname_load(setname *setp) noex {
 int ucinfo::getname_install(setname *setp) noex {
 	int		rs ;
 	int		rs1 ;
-        if ((rs = uc_forklockbegin(-1)) >= 0) {
-            if ((rs = mx.lockbegin) >= 0) {
+        if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+            if ((rs = mx.lockbegin) >= 0) ylikely {
                 if (ao.name == nullptr) {
                     ao.name = setp->strp ;
                     name = setp->tmpname ;
@@ -385,11 +385,11 @@ int ucinfo::getname_install(setname *setp) noex {
 int ucinfo::getaux(ucinfo_infoaux *uxp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (uxp) {
+	if (uxp) ylikely {
 	    memclear(uxp) ;
-	    if (sigblocker b ; (rs = b.start) >= 0) {
-	        if ((rs = init()) >= 0) {
-		    if ((rs = getaux_setup()) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	        if ((rs = init()) >= 0) ylikely {
+		    if ((rs = getaux_setup()) >= 0) ylikely {
 			*uxp = aux ;
 		    }
 	        } /* end if (init) */
@@ -403,7 +403,7 @@ int ucinfo::getaux(ucinfo_infoaux *uxp) noex {
 int ucinfo::getaux_setup() noex {
 	int		rs = SR_OK ;
 	if (ao.name == nullptr) {
-	    if (setaux tmp ; (rs = getaux_load(&tmp)) >= 0) {
+	    if (setaux tmp ; (rs = getaux_load(&tmp)) >= 0) ylikely {
 		rs = getaux_install(&tmp) ;
 	    } /* end if (ok) */
 	} /* end if (setup needed) */
@@ -414,10 +414,10 @@ int ucinfo::getaux_load(setaux *setp) noex {
 	cint		usz = szof(auxinfo) ;
 	int		rs ;
 	int		rs1 ;
-	if (void *vp ; (rs = umem.mall(usz,&vp)) >= 0) {
-	    if (auxinfo *tap = new(vp) auxinfo ; tap) {
-	        if ((rs = tap->start()) >= 0) {
-                    if ((rs = tap->load()) >= 0) {
+	if (void *vp ; (rs = umem.mall(usz,&vp)) >= 0) ylikely {
+	    if (auxinfo *tap = new(vp) auxinfo ; tap) ylikely {
+	        if ((rs = tap->start()) >= 0) ylikely {
+                    if ((rs = tap->load()) >= 0) ylikely {
                         cint    nlen = tap->flen ;
                         int     sz = 0 ;
                         sz += (lenstr(tap->architecture,nlen) + 1) ;
@@ -469,8 +469,8 @@ int ucinfo::getaux_load(setaux *setp) noex {
 int ucinfo::getaux_install(setaux *setp) noex {
 	int		rs ;
 	int		rs1 ;
-        if ((rs = uc_forklockbegin(-1)) >= 0) {
-            if ((rs = mx.lockbegin) >= 0) {
+        if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+            if ((rs = mx.lockbegin) >= 0) ylikely {
                 if (ao.aux == nullptr) {
                     ao.aux = setp->strp ;
                     aux = setp->tmpaux ;
@@ -492,10 +492,10 @@ int auxinfo::start() noex {
     	int		rs ;
 	a = nullptr ;
 	flen = 0 ;
-	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) ylikely {
 	    cint	sz = (nfields * (rs + 1)) ;
 	    flen = rs ;
-	    if (void *vp ; (rs = umem.mall(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = umem.mall(sz,&vp)) >= 0) ylikely {
 		int	ai = 0 ;
 		a = charp(vp) ;
 		{
@@ -513,7 +513,7 @@ int auxinfo::start() noex {
 int auxinfo::finish() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-	if (a) {
+	if (a) ylikely {
 	    rs1 = umem.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
@@ -526,13 +526,13 @@ int auxinfo::load() noex {
 	cint    	nlen = flen ;
 	int		rs = SR_BUGCHECK ;
 	int		sz = 0 ;
-	if (a) {
+	if (a) ylikely {
 	    rs = SR_OK ;
-	    architecture[0] = '\0' ;
-	    platform[0] = '\0' ;
-	    hwprovider[0] = '\0' ;
-	    hwserial[0] = '\0' ;
-	    nisdomain[0] = '\0' ;
+	    architecture	[0] = '\0' ;
+	    platform		[0] = '\0' ;
+	    hwprovider		[0] = '\0' ;
+	    hwserial		[0] = '\0' ;
+	    nisdomain		[0] = '\0' ;
 	    for (cauto &req : sais) {
 	        char	*nbuf = nullptr ;
 	        switch (req) {
@@ -559,7 +559,7 @@ int auxinfo::load() noex {
 		        rs = SR_OK ;
 		        sz += 1 ;		/* for the NUL character */
 	                nbuf[0] = '\0' ;
-		    }
+		    } /* end if */
 	        } else {
 		    sz += 1 ;
 	        } /* end if */
@@ -571,11 +571,11 @@ int auxinfo::load() noex {
 
 local void ucinfo_atforkbefore() noex {
 	ucinfo_data.atforkbefore() ;
-}
+} /* end subroutine */
 
 local void ucinfo_atforkafter() noex {
 	ucinfo_data.atforkafter() ;
-}
+} /* end subroutine */
 
 local void ucinfo_exit() noex {
 	if (cint rs = ucinfo_data.fini() ; rs < 0) {
