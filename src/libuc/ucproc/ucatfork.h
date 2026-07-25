@@ -53,8 +53,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>		/* |void_f(3u)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU |void_f(3u)| */
 
 
 EXTERNC_begin
