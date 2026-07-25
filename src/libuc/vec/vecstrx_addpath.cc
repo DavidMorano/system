@@ -63,18 +63,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<usysconf.h>
-#include	<uclibmem.h>
-#include	<strn.h>		/* |strnbrk(3uc)| */
-#include	<pathclean.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<usysconf.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnbrk(3uc)| */
+#include	<pathclean.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"vecstrx.hh"
 
