@@ -177,6 +177,9 @@ pingstatdb_com0.o:	pingstatdb_com.ccm pingstatdb_com.hh $(DEPS_C)	$(INCS)
 pingstatdb_com1.o:	pingstatdb_com1.cc pingstatdb_com0.o ${DEPS_C}	$(INCS)
 	$(COMPILE.cc) $<
 
+pingstatdb_com2.o:	pingstatdb_com2.cc pingstatdb_com0.o ${DEPS_C}	$(INCS)
+	$(COMPILE.cc) $<
+
 pingstatdb_rec.o:	pingstatdb_rec0.o pingstatdb_rec1.o		
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
