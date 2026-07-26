@@ -111,8 +111,6 @@ import pingstatdb_rec ;
 #define	RF_LEAD1	(RF_UPSTAT + 4)
 #define	RF_LEAD		(RF_LEAD0 + RF_LEAD1)
 
-#define	BUFLEN		(RF_LEAD + MAXHOSTNAMELEN + 3)
-
 #define	TO_LOCK		30		/* seconds */
 #define	TO_MINUPDATE	3		/* minimum time between updates */
 
@@ -479,10 +477,10 @@ int uptimer::done() noex {
 	return rs ;
 } /* end method (uptimer::done) */
 
-int uptimer::seekend(off_t *offp) noex {
+int uptimer::seekend(off_t *fop) noex {
     	int		rs ;
 	if ((rs = pfp->seek(0z,SEEK_END)) >= 0) {
-	    rs = pfp->tell(offp) ;
+	    rs = pfp->tell(fop) ;
 	}
 	return rs ;
 } /* end method (uptimer::seekend) */
