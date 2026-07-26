@@ -129,7 +129,10 @@ import sif ;
 #define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #endif
 
-#define	TOUC(ch)		CHAR_TOUC(ch)
+#define	DEBUGPRINTT(str,tval)		\
+    	if_constexpr (f_debug) {	\
+	    debugprintt(str,tval) ;	\
+	}
 
 
 /* imported namespaces */
@@ -169,6 +172,8 @@ local int record_dtor(record *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (record_dtor) */
+
+local int debugprintt(cchar *,time_t) noex ;
 
 
 /* local variables */
@@ -350,10 +355,8 @@ int record_update(PSD_REC *ep,bfile *fp,dater *dp,int f_up) noex {
 	    char	pdbuf[RF_LOGZLEN + 2] ;
 	    rs = SR_OK ;
 	    if_constexpr (f_debug) {
-	        char	timebuf[TIMEBUFLEN + 1] ;
 	        DEBUGPRINTF("host=%s\n",ep->hostbuf) ;
-	        DEBUGPRINTF("cur_date=%s\n",
-	            timestr_log(dp->b.time,timebuf)) ;
+	        DEBUGPRINTT("cur_date=",dp->b.time) ;
 	    }
 	    if (logdiffer(ep->f_up,f_up)) {
 	        DEBUGPRINTF("changed status\n") ;
@@ -361,26 +364,20 @@ int record_update(PSD_REC *ep,bfile *fp,dater *dp,int f_up) noex {
 	        ep->cnt = 1 ;
 	        dater_setcopy(ep->cdp,dp) ;
 	        if_constexpr (f_debug) {
-	            char	timebuf[TIMEBUFLEN + 1] ;
-	            DEBUGPRINTF("status change cdbuf=%s\n",
-	                timestr_logz(cdp->b.time,timebuf)) ;
+	            DEBUGPRINTT("status change cdbuf=",cdp->b.time) ;
 	        }
 	    } else {
 	        ep->cnt += 1 ;
 	    }
 	    if_constexpr (f_debug) {
-	        char	timebuf[TIMEBUFLEN + 1] ;
-	        DEBUGPRINTF("cddate=%s\n",
-	            timestr_logz(cdp->b.time,timebuf)) ;
+	        DEBUGPRINTT("cddate=",cdp->b.time) ;
 	    }
 	    dater_mklogz(ep->cdp,cdbuf,(RF_LOGZLEN + 1)) ;
-	    DEBUGPRINTF("cdbuf mklogz=%s\n", cdbuf) ;
+	    DEBUGPRINTF("cdbuf mklogz=%s\n",cdbuf) ;
 	    /* always update the last-update-date for the record */
 	    dater_setcopy(ep->pdp,dp) ;
 	    if_constexpr (f_debug) {
-	        char	timebuf[TIMEBUFLEN + 1] ;
-	        DEBUGPRINTF("pdate=%s\n",
-	            timestr_logz(pdp->b.time,timebuf)) ;
+	        DEBUGPRINTT("pdate=",pdp->b.time) ;
 	    }
 	    dater_mklogz(ep->pdp,pdbuf,RF_LOGZLEN + 1) ;
 	    DEBUGPRINTF("pdbuf mklogz=%s\n", pdbuf) ;
@@ -405,11 +402,9 @@ int record_write(PSD_REC *ep,bfile *fp,dater *cp,dater *dp,
 	    char	pdbuf[RF_LOGZLEN + 2] ;
 	    rs = SR_OK ;
 	    {
-	        char	timebuf[TIMEBUFLEN + 1] ;
 	        DEBUGPRINTF("ent host=%s\n",ep->hostbuf) ;
 	        DEBUGPRINTF("count=%d\n",cnt) ;
-	        DEBUGPRINTF("cur_date=%s\n",
-	            timestr_log(dp->b.time,timebuf)) ;
+	        DEBUGPRINTT("cur_date=",dp->b.time) ;
 	    }
 	    ep->f_up = f_up ;
 	    if (cnt != 0) {
@@ -481,5 +476,16 @@ int record::fini() noex {
 	}
     	return rs ;
 } /* end method (record::fini) */
+
+local int debugprintt(cchar *str,time_t tval) noex {
+    	int		rs = SR_OK ;
+	if_constexpr (f_debug) {
+    	    cchar	*fmt = "%s %s\n" ;
+	    char	tbuf[TIMEBUFLEN + 1] ;
+	    timestr_logz(tval,tbuf) ;
+	    rs = DEBUGPRINTF(fmt,str,tbuf) ;
+	} /* end if_constexpr (f_debug) */
+    	return rs ; 
+} /* end subroutine (debugprintt) */
 
 
