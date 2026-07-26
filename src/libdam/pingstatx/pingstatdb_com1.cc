@@ -134,11 +134,6 @@ import pingstatdb_rec ;
 #define	CF_UNLOCK	1		/* always unlock after an operation */
 #endif
 
-#define	DEBUGPRINTT(str,tval)		\
-    	if_constexpr (f_debug) {	\
-	    debugprintt(str,tval) ;	\
-	}
-
 
 /* imported namespaces */
 
@@ -167,12 +162,11 @@ namespace {
 
 /* forward references */
 
-local int debugprintt(cchar *,time_t) noex ;
-
 
 /* local variables */
 
 static vars		var ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -297,103 +291,6 @@ int pingstatdb_fes(PSD *op) noex {
 	return rs ;
 } /* end subroutine (pingstatdb_fes) */
 
-#ifdef	COMMENT
-
-int pingstatdb_recupd(PSD *op,time_t dt,DTR *dp,
-		cc *hn,int f_up,time_t ta) noex {
-	int		rs ;
-	int		fchanged = false ;
-
-
-	DEBUGPRINTF("ret rs=%d fchanged=%u\n", rs,fchanged) ;
-	return (rs >= 0) ? fchanged : rs ;
-} /* end subroutine (pingstatdb_recupd) */
-
-#endif /* COMMENT */
-
-#ifdef	COMMENT
-int pingstatdb_recupd(PSD *op,time_t dt,DTR *dp,
-		cchar *hn,int f_up,time_t tt) noex {
-	off_t	boff ;
-	int		rs = SR_BUGCHECK ;
-	int		f_changed = false ;
-	    DEBUGPRINTF("hn=%s\n",hn) ;
-	    DEBUGPRINTF("f_up=%u\n",f_up) ;
-	    DEBUGPRINTT("tt=%s",tt) ;
-	if (op && hn && dp) ylikely {
-
-	PSD_REC	*rp ;
-	if ((rs = pingstatdb_recget(op,hn,&rp)) >= 0) {
-	    time_t	ptime ;
-	    int		f_greater = (! LEQUIV(f_up,rp->f_up)) ;
-
-	    DEBUGPRINTF("found match rs=%d\n",rs) ;
-
-	    rs = dater_gettime(&rp->pdate,&ptime) ;
-
-	    f_greater = ((rs >= 0) && (ts > ptime)) ;
-
-	    if (ptime > ts) {
-	        ts = ptime ;
-	    }
-
-	    dater_settimezn(dp,ts,op->znbuf,-1) ;
-	    DEBUGPRINTT("ptime=%s",ptime) ;
-	    if ((rs < 0) || f_changed ||
-	        (((dt - ptime) > TO_MINUPDATE) && f_greater)) {
-
-	        boff = rp->roff ;
-	        bseek(op->pfp,boff,SEEK_SET) ;
-
-	        rs = record_update(rp,op->pfp,dp,f_up) ;
-	        DEBUGPRINTF("record_recupd() rs=%d\n",rs) ;
-	    } /* end if (did the update) */
-
-	} else if (rs == SR_NOTFOUND) {
-	    PSD_REC	r ;
-	    uint	roff ;
-	    cint	sz = szof(PSD_REC) ;
-	    int		f_rec = false ;
-
-	    DEBUGPRINTF("no match found rs=%d\n",rs) ;
-	    DEBUGPRINTF("zname=%s\n",op->znbuf) ;
-	    if ((rs = dater_settimezn(dp,ts,op->znbuf,-1)) >= 0) {
-		timeb	*nowp = op->nowp ;
-		cchar	*zn = op->znbuf ;
-
-	        f_changed = true ;
-	        bseek(op->pfp,0L,SEEK_END) ;
-
-	        btell(op->pfp,&boff) ;
-	        roff = boff ;
-
-	        if ((rs = record_start(&r,nowp,zn,roff,hn,dp)) >= 0) {
-	            f_rec = true ;
-		}
-
-	        DEBUGPRINTF("record_start() rs=%d hn=%s\n",rs,hn) ;
-
-	    } /* end if */
-
-	    if (rs >= 0) {
-	        rs = record_update(&r,op->pfp,dp,f_up) ;
-	        DEBUGPRINTF("record_update() rs=%d\n", rs) ;
-	    } /* end if */
-
-	    if (rs >= 0) {
-	        rs = vechand_add(op->rlp,&r,sz) ;
-	    }
-
-	    if ((rs < 0) && f_rec) {
-	        record_finish(&r) ;
-	    } /* end if (error) */
-	} /* end if (target entry) */
-	} /* end if (non-null) */
-	DEBUGPRINTF("ret rs=%d fchanged=%u\n", rs,f_changed) ;
-	return (rs >= 0) ? fchanged : rs ;
-} /* end subroutine (pingstatdb_recupd) */
-#endif /* COMMENT */
-
 local bool ishostmat(cc *h1,cc *h2) noex {
     	return (strcmp(h1,h2) == 0) ;
 } /* end subroutine (ishostmat) */
@@ -425,16 +322,5 @@ vars::operator int () noex {
 	} /* end if (bufsizeget) */
 	return rs ;
 } /* end method (vars::operator) */
-
-local int debugprintt(cchar *str,time_t tval) noex {
-    	int		rs = SR_OK ;
-	if_constexpr (f_debug) {
-    	    cchar	*fmt = "%s %s\n" ;
-	    char	tbuf[TIMEBUFLEN + 1] ;
-	    timestr_logz(tval,tbuf) ;
-	    rs = DEBUGPRINTF(fmt,str,tbuf) ;
-	} /* end if_constexpr (f_debug) */
-    	return rs ; 
-} /* end subroutine (debugprintt) */
 
 
