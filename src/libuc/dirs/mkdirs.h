@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<fcntl.h>		/* |mode_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<fcntl.h>		/* POSIX® |mode_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
