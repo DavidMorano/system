@@ -81,6 +81,7 @@
 #include	<vechand.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
+#include	<mknpathx.h>		/* LIBUC */
 #include	<initnow.h>		/* LIBUC */
 #include	<ismisc.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
@@ -196,7 +197,7 @@ local int pingstatdb_dtor(pingstatdb *op) noex {
 
 local int	pingstatdb_opener(pingstatdb *) noex ;
 
-local int	entry_load(PSD_ENT *,PSD_REC *) noex ;
+local int	entry_load(PSD_ENT *,char *,int,PSD_REC *) noex ;
 
 local int	mkbstr(char *,int) noex ;
 
@@ -345,10 +346,11 @@ int pingstatdb_curend(PSD *op,PSD_CUR *curp) noex {
 	return rs ;
 } /* end subroutine (pingstatdb_curend) */
 
-int pingstatdb_curenum(PSD *op,PSD_CUR *curp,PSD_ENT *ep) noex {
+int pingstatdb_curenum(PSD *op,PSD_CUR *curp,
+		PSD_ENT *ep,char *ebuf,int elen) noex {
 	int		rs ;
 	int		hl = 0 ; /* return-value */
-	if ((rs = pingstatdb_magic(op,curp)) >= 0) ylikely {
+	if ((rs = pingstatdb_magic(op,curp,ebuf)) >= 0) ylikely {
 	    if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
 	        rs = bcontrol(op->pfp,BC_LOCKREAD,TO_LOCK) ;
 	        op->fl.readlocked = (rs >= 0) ;
@@ -358,13 +360,13 @@ int pingstatdb_curenum(PSD *op,PSD_CUR *curp,PSD_ENT *ep) noex {
 	            cint	i = (curp->i < 0) ? 0 : (curp->i + 1) ;
 		    void *vp ;
 	            if ((rs = vechand_get(op->rlp,i,&vp)) >= 0) {
-		        if (PSD_REC *rp = resumelife<PSD_REC>(vp) ; rp) {
+		        if (PSD_REC *rep = resumelife<PSD_REC>(vp) ; rep) {
 	                    curp->i = i ;
 	                    if (ep) {
-	                        rs = entry_load(ep,rp) ;
+	                        rs = entry_load(ep,ebuf,elen,rep) ;
 	                        hl = rs ;
 	                    } else {
-	                        hl = lenstr(ep->hostbuf) ;
+	                        hl = lenstr(rep->hostbuf) ;
 			    }
 	                } /* end if (non-null) */
 	            } /* end if (vechand_get) */
@@ -379,11 +381,11 @@ int pingstatdb_curenum(PSD *op,PSD_CUR *curp,PSD_ENT *ep) noex {
 	return (rs >= 0) ? hl : rs ;
 } /* end subroutine (pingstatdb_curenum) */
 
-int pingstatdb_match(PSD *op,cchar *hn,PSD_ENT *ep) noex {
+int pingstatdb_match(PSD *op,cchar *hn,PSD_ENT *ep,char *ebuf,int elen) noex {
 	int		rs ;
 	int		hl = 0 ; /* return-value */
 	DEBUGPRINTF("ent hn=%s\n",hn) ;
-	if ((rs = pingstatdb_magic(op,hn)) >= 0) ylikely {
+	if ((rs = pingstatdb_magic(op,hn,ebuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (hn[0]) ylikely {
 		rs = SR_OK ;
@@ -394,14 +396,14 @@ int pingstatdb_match(PSD *op,cchar *hn,PSD_ENT *ep) noex {
 	        if (rs >= 0) ylikely {
 	            if ((rs = pingstatdb_checkcache(op)) >= 0) ylikely {
 			/* return SR_NOTFOUND if we fall off of the end */
-			PSD_REC	*rp ;
-	    		if ((rs = pingstatdb_recget(op,hn,&rp)) >= 0) {
-	        	    if (rp) {
+			PSD_REC	*rep ;
+	    		if ((rs = pingstatdb_recget(op,hn,&rep)) >= 0) {
+	        	    if (rep) {
 	                        if (ep) {
-	                            rs = entry_load(ep,rp) ;
+	                            rs = entry_load(ep,ebuf,elen,rep) ;
 	                            hl = rs ;
 	                        } else {
-	                            hl = lenstr(ep->hostbuf) ;
+	                            hl = lenstr(rep->hostbuf) ;
 	                        }
 	                    } /* end if (non-null) */
 	                } /* end if (pingstatdb_recget) */
@@ -519,22 +521,21 @@ int pingstatdb_check(PSD *op,time_t dt) noex {
 
 /* local subroutines */
 
-local int entry_load(PSD_ENT *ep,PSD_REC *rep) noex {
+local int entry_load(PSD_ENT *ep,char *ebuf,int elen,PSD_REC *rep) noex {
 	int		rs = SR_BUGCHECK ;
 	int		hl = 0 ; /* return-value */
-	if (ep && rep) ylikely {
+	if (ep && ebuf && rep) ylikely {
 	    dater *pdp = rep->pdp ;
 	    dater *cdp = rep->cdp ;
 	    ep->ti_change	= 0 ;
 	    ep->ti_ping		= 0 ;
 	    ep->cnt		= 0 ;
 	    ep->f_up		= 0 ;
-	    ep->hostbuf[0]	= '\0' ;
 	    if ((rs = pdp->gettime(&ep->ti_ping)) >= 0) ylikely {
 	        if ((rs = cdp->gettime(&ep->ti_change)) >= 0) ylikely {
 	            ep->cnt = rep->cnt ;
 	            ep->f_up = rep->f_up ;
-	            rs = mkpath(ep->hostbuf,rep->hostbuf) ;
+	            rs = mknpath(ebuf,elen,rep->hostbuf) ;
 	            hl = rs ;
 		} /* end if */
 	    } /* end if */
