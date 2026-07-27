@@ -711,6 +711,11 @@ chrono.o:		chrono.dir
 chrono.dir:
 	makesubdir $@
 
+# CALENDAR
+calendar.o:		calendar.dir
+calendar.dir:
+	makesubdir $@
+
 # SBUF
 sbuf.o:			sbuf.dir
 sbuf.dir:
@@ -1080,7 +1085,6 @@ isort.o:		isort.cc isort.h
 sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h		$(INCS)
 findxfile.o:		findxfile.cc	findxfile.h		$(INCS)
-calstrs.o:		calstrs.cc	calstrs.h		$(INCS)
 ipow.o:			ipow.cc		ipow.h			$(INCS)
 base64.o:		base64.cc	base64.h		$(INCS)
 shellunder.o:		shellunder.cc	shellunder.h		$(INCS)
