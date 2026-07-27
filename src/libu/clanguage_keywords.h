@@ -48,6 +48,12 @@
 #endif /* conex */
 
 #ifdef	__cplusplus
+#ifndef	typeof
+#define	typeof			decltype
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 #ifndef	typealias
 #define	typealias		typedef
 #endif
