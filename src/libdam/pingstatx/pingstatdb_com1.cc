@@ -5,9 +5,6 @@
 /* object to manipulate a PINGSTATDB file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* non-switchable debug print-outs */
-#define	CF_CREATE	0		/* always create the file? */
-#define	CF_UNLOCK	1		/* always unlock after an operation */
 
 /* revision history:
 
@@ -20,8 +17,8 @@
 
 /*******************************************************************************
 
-  	Object:
-	pingstatdb_rec
+  	Group:
+	pingstatdb_com
 
   	Description:
 	This subroutine maintains a PINGSTATDB file.  These files
@@ -124,16 +121,6 @@ import pingstatdb_rec ;
 
 #define	LASTUPDATE	"*LAST_UPDATE*"
 
-#ifndef	CF_DEBUG
-#define	CF_DEBUG	0		/* non-switchable debug print-outs */
-#endif
-#ifndef	CF_CREATE
-#define	CF_CREATE	0		/* always create the file? */
-#endif
-#ifndef	CF_UNLOCK
-#define	CF_UNLOCK	1		/* always unlock after an operation */
-#endif
-
 
 /* imported namespaces */
 
@@ -166,7 +153,6 @@ namespace {
 /* local variables */
 
 static vars		var ;
-cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
