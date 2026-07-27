@@ -45,6 +45,8 @@ DEPS_C= pingstatdb_rec.o
 
 PSDH= pingstatdb.h pingstatdb_com.hh pingstatdb_rec.hh
 
+OBJ_COMS= pingstatdb_com0.o pingstatdb_com1.o pingstatdb_com2.o
+
 OBJ0= pingstatdb_prime.o
 OBJ1= pingstatdb_uptime.o
 OBJ2= $(DEPS)
@@ -168,7 +170,7 @@ obj.o:			$(OBJ)
 pingstatdb_prime.o:	pingstatdb_prime.cc $(DEPS)			$(INCS)
 pingstatdb_uptime.o:	pingstatdb_uptime.cc $(DEPS)			$(INCS)
 
-pingstatdb_com.o:	pingstatdb_com0.o pingstatdb_com1.o
+pingstatdb_com.o:	$(OBJ_COMS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 pingstatdb_com0.o:	pingstatdb_com.ccm pingstatdb_com.hh $(DEPS_C)	$(INCS)
