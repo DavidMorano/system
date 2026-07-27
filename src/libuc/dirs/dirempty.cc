@@ -37,14 +37,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<fsdir.h>
-#include	<hasx.h>		/* |hasNotDots(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<hasx.h>		/* LINUC |hasNotDots(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dirempty.h"
 
@@ -104,7 +104,6 @@ int dirempty(cchar *dname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (dirempty) */
+} /* end subroutine (dirempty) */
 
 
