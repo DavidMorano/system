@@ -43,18 +43,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| + |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ids.h>
-#include	<mkpathx.h>
-#include	<permx.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| + |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkdirs.h"
 
@@ -94,7 +94,7 @@ int mkdirs(cchar *dname,mode_t dm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	dm &= (~ S_IFMT) ;
+	dm &= (compl S_IFMT) ;
 	if (dname) ylikely {
 	    rs = SR_INVALID ;
 	    if (dname[0]) ylikely {
@@ -111,8 +111,7 @@ int mkdirs(cchar *dname,mode_t dm) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkdirs) */
+} /* end subroutine (mkdirs) */
 
 
 /* local subroutines */
@@ -131,8 +130,7 @@ local int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
 	    if (rs >= 0) rs = 1 ;
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (procdir) */
+} /* end subroutine (procdir) */
 
 local int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
     	cnullptr	np{} ;
@@ -164,7 +162,6 @@ local int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkdirer) */
+} /* end subroutine (mkdirer) */
 
 
