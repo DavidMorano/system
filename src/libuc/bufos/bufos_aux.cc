@@ -29,7 +29,7 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<string>		/* C++STD |string(3c++)| */
-#include	<string_view>		/* C__STD */
+#include	<string_view>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
