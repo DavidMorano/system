@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mknpathxw.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mknpathxw.h>		/* LIBUC */
 
 #ifdef	__cplusplus
 
