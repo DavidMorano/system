@@ -53,13 +53,13 @@ OBJ0_CHRONO= tmstrs.o zdb.o
 OBJ1_CHRONO= date.o dater.o
 OBJ2_CHRONO= tmz.o zos.o zoffparts.o
 OBJ3_CHRONO= tmtime.o dayspec.o cvtdater.o
-OBJ4_CHRONO= 
+OBJ4_CHRONO= initnow.o
 OBJ5_CHRONO= 
 OBJ6_CHRONO= 
 OBJ7_CHRONO= 
 
-OBJA_CHRONO= obj0.o obj1.o
-OBJB_CHRONO= obj2.o obj3.o
+OBJA_CHRONO= obj0.o obj1.o obj2.o 
+OBJB_CHRONO= obj3.o obj4.o
 
 OBJ_CHRONO= $(OBJA_CHRONO) $(OBJB_CHRONO)
 
@@ -178,13 +178,15 @@ zoffparts.o:		zoffparts.cc		zoffparts.h		$(INCS)
 dayspec.o:		dayspec.cc		dayspec.h		$(INCS)
 cvtdater.o:		cvtdater.cc		cvtdater.h		$(INCS)
 
-dater_prime.o:		dater_prime.cc		dater.h	$(DEPS) $(INCS)
-dater_getdate.o:	dater_getdate.cc	dater.h	$(DEPS) $(INCS)
-dater_getbbtime.o:	dater_getbbtime.cc	dater.h	$(DEPS) $(INCS)
-dater_setkey.o:		dater_setkey.cc		dater.h	$(DEPS) $(INCS)
-dater_obj.o:		dater_obj.cc		dater.h	$(DEPS) $(INCS)
+dater_prime.o:		dater_prime.cc		dater.h	$(DEPS)		$(INCS)
+dater_getdate.o:	dater_getdate.cc	dater.h	$(DEPS)		$(INCS)
+dater_getbbtime.o:	dater_getbbtime.cc	dater.h	$(DEPS)		$(INCS)
+dater_setkey.o:		dater_setkey.cc		dater.h	$(DEPS)		$(INCS)
+dater_obj.o:		dater_obj.cc		dater.h	$(DEPS)		$(INCS)
 
-dater_mag.o:		dater_mag.ccm		dater.h $(INCS)
+dater_mag.o:		dater_mag.ccm		dater.h			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
+initnow.o:		initnow.cc		initnow.h		$(INCS)
 
 
