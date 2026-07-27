@@ -37,14 +37,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<fsdir.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dircount.h"
 
@@ -85,8 +85,7 @@ int dircount(cchar *dname) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (dircount) */
+} /* end subroutine (dircount) */
 
 
 /* local subroutines */
@@ -110,7 +109,6 @@ local int dircounts(cchar *dname) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (dircounts) */
+} /* end subroutine (dircounts) */
 
 
