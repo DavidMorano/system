@@ -93,7 +93,7 @@ local inline int csem_ctor(csem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->cnt = 0 ;
 	    op->nwaiting = 0 ;
 	    if ((op->mxp = new(nothrow) ptm) != np) ylikely {
@@ -126,7 +126,7 @@ template<typename ... Args>
 local inline int csem_magic(csem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CSEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CSEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (csem_magic) */
@@ -151,7 +151,7 @@ int csem_create(csem *op,int f_shared,int count) noex {
 	    if ((rs = csem_ptminit(op,f_shared)) >= 0) ylikely {
 		ptm *mxp = op->mxp ;
 	        if ((rs = csem_ptcinit(op,f_shared)) >= 0) ylikely {
-		    op->magic = CSEM_MAGIC ;
+		    op->magval = CSEM_MAGIC ;
 	        } /* end if (csem_ptcinit) */
 	        if (rs < 0) {
 		    mxp->destroy() ;
@@ -183,7 +183,7 @@ int csem_destroy(csem *op) noex {
 		rs1 = csem_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (csem_destroy) */
@@ -216,7 +216,7 @@ int csem_decr(csem *op,int c,int to) noex {
                         if (rs >= 0) ylikely {
                             ocount = op->cnt ;
                             op->cnt -= c ;
-                        }
+                        } /* end if (ok) */
                         op->nwaiting -= 1 ;
 		    } /* end block */
                     rs1 = mxp->lockend ;
@@ -341,13 +341,13 @@ local int csem_ptcinit(csem *op,int f_shared) noex {
 	        if (rs >= 0) ylikely {
 	            rs = cvp->create(&a) ;
 		    f_ptc = (rs >= 0) ;
-	        }
+	        } /* end if (ok) */
 	    } /* end block */
 	    rs1 = ptca_destroy(&a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_ptc) {
 		cvp->destroy() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ptca) */
 	return rs ;
 } /* end subroutine (csem_ptcinit) */
