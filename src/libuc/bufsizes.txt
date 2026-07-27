@@ -6,7 +6,6 @@ bufsize_mp
 bufsize_ml
 bufsize_mm
 bufsize_nn
-bufsize_hn
 bufsize_un
 bufsize_gn
 bufsize_pn
@@ -23,5 +22,9 @@ bufsize_fs
 bufsize_sn
 bufsize_zn
 bufsize_zi
+bufsize_protname
+bufsize_netwname
+bufsize_hostname
+bufsize_servname
 bufsize_mailaddr
 bufsize_overlast
