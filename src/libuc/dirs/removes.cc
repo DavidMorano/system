@@ -49,22 +49,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<fsdir.h>
-#include	<vecpstr.h>
-#include	<mkpathx.h>
-#include	<mkx.h>
-#include	<pathadd.h>
-#include	<prefixfn.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<vecpstr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<prefixfn.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"removes.h"
 
@@ -133,8 +133,7 @@ int removes(cchar *tardname) noex {
 	    } /* end if (prefixfn) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (removes) */
+} /* end subroutine (removes) */
 
 
 /* local subroutines */
