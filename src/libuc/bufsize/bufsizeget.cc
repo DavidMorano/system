@@ -182,8 +182,7 @@ int bufsizeget(int w) noex {
 	}
     	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (busizeget) */
+} /* end subroutine (busizeget) */
 
 
 /* local subroutines */
