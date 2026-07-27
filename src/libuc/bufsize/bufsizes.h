@@ -31,8 +31,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 enum bufsizes {
@@ -47,8 +47,8 @@ enum bufsizes {
 	bufsize_nn,		/* name system node-name */
 	bufsize_un,		/* name system user-name */
 	bufsize_gn,		/* name system group-name */
-	bufsize_pn,		/* name system roject-name */
-	bufsize_protname,	/* name network prot-name (protocl-name) */
+	bufsize_pn,		/* name system project-name */
+	bufsize_protname,	/* name network prot-name (protocol-name) */
 	bufsize_netwname,	/* name network host-name (host-name) */
 	bufsize_hostname,	/* name network host-name (host-name) */
 	bufsize_servname,	/* name network serv-name (service-name) */
