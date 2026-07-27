@@ -5,7 +5,7 @@
 /* object to manipulate a PINGSTATDB file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -18,8 +18,8 @@
 
 /*******************************************************************************
 
-  	Object:
-	pingstatdb
+  	Group:
+	pingstatdb_com
 
   	Description:
 	This subroutine maintains a PINGSTATDB file.  These files
@@ -119,5 +119,7 @@ export {
     int pingstatdb_recupd	(PSD *,time_t,dater *,cchar *,int,time_t) noex ;
     int pingstatdb_recget	(PSD *,cchar *,PSD_REC **) noex ;
 } /* end export */
+
+cbool		f_debug		= CF_DEBUG ;
 
 
