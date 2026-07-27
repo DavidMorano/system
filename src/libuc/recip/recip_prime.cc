@@ -73,7 +73,7 @@ local inline int recip_ctor(recip *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    if ((op->mdp = new(nothrow) vecitem) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecitem) */
@@ -88,7 +88,7 @@ local inline int recip_dtor(recip *op) noex {
 	    if (op->mdp) ylikely {
 		delete op->mdp ;
 	        op->mdp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (recip_dtor) */
@@ -97,7 +97,7 @@ template<typename ... Args>
 local int recip_magic(recip *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == RECIP_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == RECIP_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (recip_magic) */
@@ -118,8 +118,8 @@ int recip_start(recip *op,cchar *sp,int sl) noex {
 	    if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) ylikely {
 	        op->recipient = cp ;
 	        if ((rs = vecitem_start(op->mdp,10,0)) >= 0) ylikely {
-	            op->magic = RECIP_MAGIC ;
-	        }
+	            op->magval = RECIP_MAGIC ;
+	        } /* end if */
 	        if (rs < 0) {
 		    void *vp = voidp(cp) ;
 	            libmem.free(vp) ;
@@ -128,7 +128,7 @@ int recip_start(recip *op,cchar *sp,int sl) noex {
 	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 		recip_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (recip_ctor) */
 	return rs ;
 } /* end subroutine (recip_start) */
@@ -143,19 +143,19 @@ int recip_finish(recip *op) noex {
 	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->recipient = nullptr ;
-		}
+		} /* end if (memory-release) */
 	        if (op->name) ylikely {
 		    void *vp = voidp(op->name) ;
 	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->name = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	        if (op->maildname) ylikely {
 		    void *vp = voidp(op->maildname) ;
 	            rs1 = libmem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->maildname = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 		{
 	            rs1 = vecitem_finish(op->mdp) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -167,7 +167,7 @@ int recip_finish(recip *op) noex {
 		rs1 = recip_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (recip_finish) */
@@ -206,12 +206,12 @@ int recip_setname(recip *op,cchar *sp,int sl) noex {
 		void *vp = voidp(op->name) ;
 	        libmem.free(vp) ;
 	        op->name = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (sp[0]) {
 	        if (sl < 0) sl = lenstr(sp) ;
 	        if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
 	            op->name = cp ;
-	        } /* end if (m-a) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
@@ -294,7 +294,7 @@ int recip_getmbo(recip *op) noex {
 	return (rs >= 0) ? mbo : rs ;
 } /* end subroutine (recip_getmbo) */
 
-int recip_getmo(recip *op,int i,int *offp) noex {
+int recip_getmo(recip *op,int i,int *fop) noex {
 	int		rs ;
 	int		ml = 0 ;
 	if ((rs = recip_magic(op)) >= 0) ylikely {
@@ -308,8 +308,8 @@ int recip_getmo(recip *op,int i,int *offp) noex {
 	    } else {
 	        rs = op->ds ;
 	    }
-	    if (offp) {
-	        *offp = (rs >= 0) ? mo : 0 ;
+	    if (fop) {
+	        *fop = (rs >= 0) ? mo : 0 ;
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? ml : rs ;
