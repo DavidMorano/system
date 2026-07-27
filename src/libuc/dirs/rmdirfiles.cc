@@ -45,24 +45,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<fsdir.h>
-#include	<vecstr.h>
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<prefixfn.h>
-#include	<nleadstr.h>
-#include	<hasx.h>		/* |hasNotDots(3uc)| */
-#include	<isnot.h>		/* |isNotPresent(3uc)| */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<prefixfn.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasNotDots(3uc)| */
+#include	<isnot.h>		/* LIBUC |isNotPresent(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"rmdirfiles.h"
 
@@ -123,8 +123,7 @@ int rmdirfiles(cchar *dname,cchar *pre,int to) noex {
 	    } /* end if (prefixfn) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (rmdirfiles) */
+} /* end subroutine (rmdirfiles) */
 
 
 /* local subroutines */
@@ -176,8 +175,7 @@ local int vecstr_load(vecstr *flp,cchar *dn,cchar *pre,int to) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstr_loaddirfiles) */
+} /* end subroutine (vecstr_loaddirfiles) */
 
 local int vecstr_dirsdel(vecstr *flp) noex {
     	int		rsn = SR_NOTFOUND ;
@@ -194,8 +192,7 @@ local int vecstr_dirsdel(vecstr *flp) noex {
 	} /* end for */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecstr_dirsdel) */
+} /* end subroutine (vecstr_dirsdel) */
 
 local bool premat(cchar *prefix,int prelen,cchar *sp,int sl) noex {
 	bool		f = true ;
@@ -204,7 +201,6 @@ local bool premat(cchar *prefix,int prelen,cchar *sp,int sl) noex {
 	    f = (m == prelen) ;
 	}
 	return f ;
-}
-/* end subroutine (premat) */
+} /* end subroutine (premat) */
 
 
