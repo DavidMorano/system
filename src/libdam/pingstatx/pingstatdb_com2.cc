@@ -5,9 +5,6 @@
 /* object to manipulate a PINGSTATDB file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* non-switchable debug print-outs */
-#define	CF_CREATE	0		/* always create the file? */
-#define	CF_UNLOCK	1		/* always unlock after an operation */
 
 /* revision history:
 
@@ -20,8 +17,8 @@
 
 /*******************************************************************************
 
-  	Object:
-	pingstatdb_rec
+  	Group:
+	pingstatdb_com
 
   	Description:
 	This subroutine maintains a PINGSTATDB file.  These files
@@ -124,16 +121,6 @@ import pingstatdb_rec ;
 
 #define	LASTUPDATE	"*LAST_UPDATE*"
 
-#ifndef	CF_DEBUG
-#define	CF_DEBUG	0		/* non-switchable debug print-outs */
-#endif
-#ifndef	CF_CREATE
-#define	CF_CREATE	0		/* always create the file? */
-#endif
-#ifndef	CF_UNLOCK
-#define	CF_UNLOCK	1		/* always unlock after an operation */
-#endif
-
 #define	DEBUGPRINTT(str,tval)		\
     	if_constexpr (f_debug) {	\
 	    debugprintt(str,tval) ;	\
@@ -165,20 +152,22 @@ namespace {
 	cchar		*hn ;
 	time_t		dt ;
 	time_t		ta ;
-	int		f_up ;
+	uint		f_up:1 ;
 	updater(PSD *o,DTR *d,cc *h,time_t ªdt,time_t ªta,int f) noex {
 	    op = o ;
 	    dp = d ;
 	    hn = h ;
 	    dt = ªdt ;
 	    ta = ªta ;
-	    f_up = f ;
+	    f_up = !!f ;
 	} ; /* end ctor */
 	operator int () noex ;
-	int decide	() noex ;
-	int updold	(PSD_REC *) noex ;
+	int updolder	(PSD_REC *) noex ;
+	int updnewer	() noex ;
 	int updnew	() noex ;
+	int updold	(PSD_REC *) noex ;
 	int seekend	(off_t *) noex ;
+	int enter	(PSD_REC *) noex ;
     } ; /* end struct (updater) */
 } /* end namespace */
 
@@ -191,7 +180,6 @@ local int debugprintt(cchar *,time_t) noex ;
 /* local variables */
 
 cint			to_upd		= TO_MINUPDATE ;
-cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -221,27 +209,23 @@ updater::operator int () noex {
 	int		fchanged = false ;
 	DEBUGPRINTF("ent\n") ;
 	if (PSD_REC *rep ; (rs = pingstatdb_recget(op,hn,&rep)) >= 0) {
-	    rs = updold(rep) ;
+	    rs = updolder(rep) ;
+	    fchanged = int(rs > 0) ;
 	} else if (rs == rsn) {
-	    rs = updnew() ;
+	    rs = updnewer() ;
+	    fchanged = true ;
 	} /* end if (printstatdb) */
 	DEBUGPRINTF("ret rs=%d fchanged=%u\n",rs,fchanged) ;
 	return (rs >= 0) ? fchanged : rs ;
 } /* end method updater::operator) */
 
-int updater::decide() noex {
-    	cint		rsn SR_NOTFOUND ;
+int updater::updolder(PSD_REC *rep) noex {
 	int		rs ;
-	int		fchanged = false ;
-	if (PSD_REC *rep ; (rs = pingstatdb_recget(op,hn,&rep)) >= 0) {
-	    rs = updold(rep) ;
-	    fchanged = int(rs > 0) ;
-	} else if (rs == rsn) {
-	    rs = updnew() ;
-	    fchanged = true ;
-	} /* end if (printstatdb) */
-	return (rs >= 0) ? fchanged : rs ;
-} /* end method updater::decide) */
+	if ((rs = updold(rep)) >= 0) {
+	    rs = enter(rep) ;
+	}
+	return rs ;
+} /* end method updater::updolder) */
 
 int updater::updold(PSD_REC *rep) noex {
     	dater		*pdp = rep->pdp ;
@@ -259,7 +243,7 @@ int updater::updold(PSD_REC *rep) noex {
 		    bfile *pfp = op->pfp ;
                     coff boff = rep->roff ;
                     if ((rs = pfp->seek(boff,SEEK_SET)) >= 0) ylikely {
-                        rs = record_update(rep,op->pfp,dp,f_up) ;
+                        rs = record_update(rep,op->pfp,dp,int(f_up)) ;
                         DEBUGPRINTF("record_recupd() rs=%d\n",rs) ;
 		    } /* end if (bseek) */
                 } /* end if (did the update) */
@@ -268,99 +252,55 @@ int updater::updold(PSD_REC *rep) noex {
 	return (rs >= 0) ? fchanged : rs ;
 } /* end method (updater::updold) */
 
+int updater::updnewer() noex {
+    	int		rs ;
+	if ((rs = dp->settimezn(ta,op->znbuf)) >= 0) {
+	    rs = updnew() ;
+	} /* end if (dater_settimezn) */
+	return rs ;
+} /* end method (updater::upnewer) */
+
 int updater::updnew() noex {
-    	return SR_OK ;
-} /* end method (updater::updold) */
+	timeb		*nowp = op->nowp ;
+	cnothrow	nt{} ;
+	cchar		*zn = op->znbuf ;
+	int		rs ;
+	if (off_t off ; (rs = seekend(&off)) >= 0) {
+	    const uint	roff = conv<uint>(off) ;
+	    rs = SR_NOMEM ;
+	    if (PSD_REC *rep = new(nt) PSD_REC ; rep) {
+	        if ((rs = record_start(rep,nowp,zn,roff,hn)) >= 0) {
+		    rs = enter(rep) ;
+		    if (rs < 0) {
+	    	        record_finish(rep) ;
+	            } /* end if (error) */
+	        } /* end if (record_start) */
+	        if (rs < 0) {
+		    delete rep ;
+	        } /* end if (error) */
+	    } /* end if (new-PSD_REC) */
+	} /* end if (seekend) */
+	return rs ;
+} /* end method updater::upnew) */
 
 int updater::seekend(off_t *fop) noex {
     	bfile		*pfp = op->pfp ;
     	int		rs ;
 	if ((rs = pfp->seek(0z,SEEK_END)) >= 0) {
 	    rs = pfp->tell(fop) ;
+	}
 	return rs ;
-} /* end ethod (updater::seekend) */
+} /* end method (updater::seekend) */
 
-#ifdef	COMMENT
-int pingstatdb_recupd(PSD *op,time_t dt,DTR *dp,
-		cchar *hn,int f_up,time_t tt) noex {
-	int		rs = SR_BUGCHECK ;
-	int		f_changed = false ;
-	    DEBUGPRINTF("hn=%s\n",hn) ;
-	    DEBUGPRINTF("f_up=%u\n",f_up) ;
-	    DEBUGPRINTT("tt=%s",tt) ;
-	if (op && hn && dp) ylikely {
-
-	PSD_REC	*rp ;
-	if ((rs = pingstatdb_recget(op,hn,&rp)) >= 0) {
-	off_t	boff ;
-	    int		f_greater = (! LEQUIV(f_up,rp->f_up)) ;
-
-	    DEBUGPRINTF("found match rs=%d\n",rs) ;
-	    time_t	ptime ;
-	    rs = dater_gettime(&rp->pdate,&ptime) ;
-
-	    f_greater = ((rs >= 0) && (ts > ptime)) ;
-
-	    if (ptime > ts) {
-	        ts = ptime ;
-	    }
-
-	    dater_settimezn(dp,ts,op->znbuf,-1) ;
-	    DEBUGPRINTT("ptime=%s",ptime) ;
-	    if ((rs < 0) || f_changed ||
-	        (((dt - ptime) > TO_MINUPDATE) && f_greater)) {
-
-	        boff = rp->roff ;
-	        bseek(op->pfp,boff,SEEK_SET) ;
-
-	        rs = record_update(rp,op->pfp,dp,f_up) ;
-	        DEBUGPRINTF("record_recupd() rs=%d\n",rs) ;
-	    } /* end if (did the update) */
-
-	} else if (rs == SR_NOTFOUND) {
-	    uint	roff ;
-	    cint	sz = szof(PSD_REC) ;
-	    int		f_rec = false ;
-
-	    DEBUGPRINTF("no match found rs=%d\n",rs) ;
-	    DEBUGPRINTF("zname=%s\n",op->znbuf) ;
-	    if ((rs = dater_settimezn(dp,ts,op->znbuf,-1)) >= 0) {
-		timeb	*nowp = op->nowp ;
-		cchar	*zn = op->znbuf ;
-
-	        f_changed = true ;
-	        bseek(op->pfp,0L,SEEK_END) ;
-
-	        btell(op->pfp,&boff) ;
-	        roff = boff ;
-
-	    PSD_REC	r ;
-	        if ((rs = record_start(&r,nowp,zn,roff,hn,dp)) >= 0) {
-	            f_rec = true ;
-		}
-
-	        DEBUGPRINTF("record_start() rs=%d hn=%s\n",rs,hn) ;
-
-	    } /* end if */
-
-	    if (rs >= 0) {
-	        rs = record_update(&r,op->pfp,dp,f_up) ;
-	        DEBUGPRINTF("record_update() rs=%d\n", rs) ;
-	    } /* end if */
-
-	    if (rs >= 0) {
-	        rs = vechand_add(op->rlp,&r,sz) ;
-	    }
-
-	    if ((rs < 0) && f_rec) {
-	        record_finish(&r) ;
-	    } /* end if (error) */
-	} /* end if (target entry) */
-	} /* end if (non-null) */
-	DEBUGPRINTF("ret rs=%d fchanged=%u\n", rs,f_changed) ;
-	return (rs >= 0) ? fchanged : rs ;
-} /* end subroutine (pingstatdb_recupd) */
-#endif /* COMMENT */
+int updater::enter(PSD_REC *rep) noex {
+    	int		rs ;
+	if ((rs = record_update(rep,op->pfp,dp,int(f_up))) >= 0) {
+	    vechand *rlp = op->rlp ;
+	    DEBUGPRINTF("record_update() rs=%d\n", rs) ;
+	    rs = rlp->add(rep) ;
+	} /* end if (record_update) */
+	return rs ;
+} /* end method (updater::enter) */
 
 local int debugprintt(cchar *str,time_t tval) noex {
     	int		rs = SR_OK ;
