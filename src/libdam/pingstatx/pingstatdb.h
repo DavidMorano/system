@@ -63,7 +63,6 @@ struct pingstatdb_entry {
 	time_t		ti_ping ;	/* last ping */
 	uint		cnt ;
 	int		f_up ;		/* UP-DOWN status */
-	char		hostbuf[MAXHOSTNAMELEN+1] ;
 } ; /* end struct */
 
 struct pingstatdb_upper {
@@ -82,11 +81,12 @@ EXTERNC_begin
 
 extern int pingstatdb_open(pingstatdb *,cchar *,int,mode_t) noex ;
 extern int pingstatdb_close(pingstatdb *) noex ;
-extern int pingstatdb_match(pingstatdb *,cchar *,pingstatdb_ent *) noex ;
+extern int pingstatdb_match(pingstatdb *,cchar *,
+		pingstatdb_ent *,char *,int) noex ;
 extern int pingstatdb_curbegin(pingstatdb *,pingstatdb_cur *) noex ;
 extern int pingstatdb_curend(pingstatdb *,pingstatdb_cur *) noex ;
 extern int pingstatdb_curenum(pingstatdb *,pingstatdb_cur *,
-		pingstatdb_ent *) noex ;
+		pingstatdb_ent *,char *,int) noex ;
 extern int pingstatdb_update(pingstatdb *,cchar *,int,time_t) noex ;
 extern int pingstatdb_uptime(pingstatdb *,cchar *,pingstatdb_up *) noex ;
 extern int pingstatdb_check(pingstatdb *,time_t) noex ;
