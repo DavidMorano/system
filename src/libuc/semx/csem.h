@@ -34,7 +34,7 @@
 struct csem_head {
 	ptm		*mxp ;
 	ptc		*cvp ;
-	uint		magic ;
+	uint		magval ;
 	int		cnt ;		/* this is the real data! */
 	int		nwaiting ;	/* number waiting */
 } ; /* end struct */
@@ -77,12 +77,12 @@ struct csem : csem_head {
 	} ; /* end ctor */
 	csem(const csem &) = delete ;
 	csem &operator = (const csem &) = delete ;
-	int create(int = 0,int = 0) noex ;
-	int decr(int = 1,int = -1) noex ;
-	operator int () noex ;
+	int create	(int = 0,int = 0) noex ;
+	int decr	(int = 1,int = -1) noex ;
+	operator int 	() noex ;
 	void dtor() noex ;
 	destruct csem() {
-	    if (mxp) dtor() ;
+	    if (magval || mxp) dtor() ;
 	} ;
 } ; /* end struct (csem) */
 #else	/* __cplusplus */
