@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	ABSFN		struct absfn_head
@@ -31,13 +31,13 @@
 struct absfn_head {
 	cchar		*as ;	/* allocated string */
 	char		buf[ABSFN_SHORTLEN+1] ;
-} ;
+} ; /* end struct (absfn_head) */
 
 #ifdef	__cplusplus
 enum absfnmems {
 	absfnmem_finish,
 	absfnmem_overlast
-} ;
+} ; /* end enum (absfnmems) */
 struct absfn ;
 struct absfn_co {
 	absfn		*op = nullptr ;
