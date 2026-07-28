@@ -31,16 +31,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucsysconf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucsysconf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysmemutil.h"
 
@@ -72,8 +72,8 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local variables */
 
-constexpr int	cmd = _SC_PHYS_PAGES ;
-constexpr int	acmd = _SC_AVPHYS_PAGES ;
+constexpr int	cmd		= _SC_PHYS_PAGES ;
+constexpr int	acmd		= _SC_AVPHYS_PAGES ;
 
 
 /* exported variables */
@@ -83,7 +83,7 @@ constexpr int	acmd = _SC_AVPHYS_PAGES ;
 
 int sysmemutil(sysmemutil_dat *mup) noex {
 	int		rs ;
-	int		percent = 0 ;
+	int		percent = 0 ; /* return-value */
 	if_constexpr ((cmd >= 0) && (acmd >= 0)) {
 	    if (long mt{} ; (rs = uc_sysconfval(cmd,&mt)) >= 0) ylikely {
 	        if (long ma{} ; (rs = uc_sysconfval(acmd,&ma)) >= 0) ylikely {
@@ -105,7 +105,6 @@ int sysmemutil(sysmemutil_dat *mup) noex {
 	    if (mup) memclear(mup) ;
 	} /* end if_constexpr (_SC_PHUS_PAGES) */
 	return (rs >= 0) ? percent : rs ;
-}
-/* end subroutine (sysmemutil) */
+} /* end subroutine (sysmemutil) */
 
 
