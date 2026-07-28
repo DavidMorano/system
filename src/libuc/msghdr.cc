@@ -26,12 +26,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/uio.h>		/* |IOVEC| */
-#include	<sys/socket.h>		/* |MSHGDR| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/uio.h>		/* POSIX® |IOVEC| */
+#include	<sys/socket.h>		/* POSIX® |MSHGDR| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"msghdr.h"
 
@@ -59,15 +59,14 @@
 int msghdr_sz(MSGHDR *mhp) noex {
     	int		rs = SR_FAULT ;
 	int		sz = 0 ;
-	if (mhp) {
+	if (mhp) ylikely {
 	    IOVEC	*vlp = mhp->msg_iov ;
 	    cint	vll = mhp->msg_iovlen ;
 	    for (int i = 0 ; i < vll ; i += 1) {
 	       sz += intconv(vlp->iov_len) ;
-	    }
+	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (msghdr_sz) */
+} /* end subroutine (msghdr_sz) */
 
 
