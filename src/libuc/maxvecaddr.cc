@@ -27,12 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 #include	"maxvecaddr.h"
 
@@ -69,7 +69,7 @@ import libutil ;
 
 cchar *maxvecaddr(mainv va) noex {
 	cchar	*maxp = nullptr ;
-	if (va != nullptr) {
+	if (va != nullptr) ylikely {
 	    cchar	*lp ;
 	    int		n{} ;
 	    for (n = 0 ; va[n] != nullptr ; n += 1) ;
@@ -88,7 +88,6 @@ cchar *maxvecaddr(mainv va) noex {
 	    } /* end block */
 	} /* end if (non-null) */
 	return maxp ;
-}
-/* end subroutine (maxvecaddr) */
+} /* end subroutine (maxvecaddr) */
 
 
