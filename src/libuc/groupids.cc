@@ -54,15 +54,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |gid_t| */
-#include	<unistd.h>		/* for |getgroups(2)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® |gid_t| */
+#include	<unistd.h>		/* POSIX® |getgroups(2)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"groupids.hh"
 
@@ -105,8 +105,7 @@ int groupids::get(gid_t **gpp) noex {
 	    rs = ng ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (groupids::get) */
+} /* end method (groupids::get) */
 
 void groupids::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
@@ -130,16 +129,15 @@ int groupids::istart(gid_t **gpp) noex {
 		    if (gpp) {
 			*gpp = gids ;
 		    }
-		}
+		} /* end if (ok) */
 		if (rs < 0) {
 		    lm_free(gids) ;
 		    gids = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (u_getgroups) */
 	return (rs >= 0) ? ng : rs ;
-}
-/* end method (groupids::istart) */
+} /* end method (groupids::istart) */
 
 int groupids::ifinish() noex {
 	int		rs = SR_OK ;
@@ -148,21 +146,18 @@ int groupids::ifinish() noex {
 	    rs1 = lm_free(gids) ;
 	    if (rs >= 0) rs = rs1 ;
 	    gids = nullptr ;
-	} /* end if (non-null) */
+	} /* end if (memory-release) */
 	ng = 0 ;
 	return rs ;
-}
-/* end subroutine (groupids::ifinish) */
+} /* end subroutine (groupids::ifinish) */
 
 groupids_st::operator int () noex {
 	return op->istart(nullptr) ;
-}
-/* end method (groupids_st::operator) */
+} /* end method (groupids_st::operator) */
 
 int groupids_st::operator () (gid_t **gpp) noex {
 	return op->istart(gpp) ;
-}
-/* end method (groupids_st::operator) */
+} /* end method (groupids_st::operator) */
 
 groupids_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -177,7 +172,6 @@ groupids_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (groupids_co::operator) */
+} /* end method (groupids_co::operator) */
 
 
