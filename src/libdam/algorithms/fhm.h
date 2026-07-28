@@ -1,8 +1,8 @@
-/* fhm HEADER */
+/* fhm HEADER (Floating-Harmonic-Mean) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* -c-string comparisons */
+/* this calculates a floating-point harmonic mean of a set of numbers */
 /* version %I% last-modified %G% */
 
 
