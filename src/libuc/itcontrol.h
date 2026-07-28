@@ -32,12 +32,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<psem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<psem.h>		/* LIBU */
 
 
 #define	ITCONTROL	struct itcontrol_head
@@ -56,7 +53,7 @@ struct itcontrol_head {
 	ITIMERVAL	it ;		/* i-timer-value */
 	int		id ;		/* timer-ID */
 	int		arg ;		/* function argument */
-} ;
+} ; /* end struct (itcontrol_head) */
 
 typedef ITCONTROL	itcontrol ;
 
