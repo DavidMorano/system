@@ -45,17 +45,20 @@
 #include	<sys/timeb.h>		/* for 'struct timeb' */
 #include	<netinet/in.h>
 #include	<termios.h>
+#include	<syslog.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
+#include	<netdb.h>
 #include	<ctime>
+#include	<csignal>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdlib>
 #include	<cstring>
-#include	<syslog.h>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibsubs.h>
 #include	<getportnum.h>
 #include	<mallocxx.h>
 #include	<sighand.h>
@@ -77,12 +80,15 @@
 #include	<strn.h>		/* |strnrbrk(3uc)| */
 #include	<mnw.h>			/* |mnwcpy(3uc)| */
 #include	<timestr.h>
+#include	<getpf.h>
+#include	<inetaddrx.h>		/* |inet4int(3uc)| */
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<isfiledesc.h>
 #include	<isnot.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<mapex.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"config.h"
 #include	"defs.h"
@@ -131,54 +137,27 @@ typedef unsigned int	in_addr_t ;
 
 #define	PROTONAME	"udp"
 
+#ifndef	PI
+#define	PI		proginfo
+#endif
+
 
 /* external subroutines */
 
-extern uint	inet4int(const void *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) noex ;
+extern int	proginfo_setpiv(PI *,cchar *,const pivars *) noex ;
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(cchar *,int,cchar *) ;
-extern int	sncpy2(cchar *,int,cchar *,cchar *) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	mklogidpre(char *,int,cchar *,int) ;
-extern int	getprotofamily(int) ;
-extern int	listenudp(int,cchar *,cchar *,int) ;
-extern int	opentermnote(cchar *,cchar **,int,int) ;
-extern int	pcsgetprogpath(cchar *,char *,cchar *) ;
-extern int	isasocket(int) ;
+extern int	progerr_begin(PI *) noex ;
+extern int	progerr_end(PI *) noex ;
+extern int	progerr_printf(PI *) noex ;
 
-extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
+extern int	progloglock_begin(PI *) noex ;
+extern int	progloglock_end(PI *) noex ;
 
-extern int	progerr_begin(PROGINFO *) ;
-extern int	progerr_end(PROGINFO *) ;
-extern int	progerr_printf(PROGINFO *) ;
+extern int	prognote_begin(PI *) noex ;
+extern int	prognote_end(PI *) noex ;
 
-extern int	progloglock_begin(PROGINFO *) ;
-extern int	progloglock_end(PROGINFO *) ;
-
-extern int	prognote_begin(PROGINFO *) ;
-extern int	prognote_end(PROGINFO *) ;
-
-extern int	progcs(PROGINFO *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
+extern int	progcs(PI *) noex ;
 
 
 /* external variables */
@@ -189,92 +168,71 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* local structures */
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef cchar	cchar ;
-#endif
-
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PI *) noex ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procopts(PI *,keyopt *) noex ;
+local int	procuserinfo_begin(PI *,userinfo *) noex ;
+local int	procuserinfo_end(PI *) noex ;
+local int	procuserinfo_logid(PI *) noex ;
 
 #ifdef	COMMENT
-static int	procourconf_begin(PROGINFO *,PARAMOPT *,const char *) ;
-static int	procourconf_end(PROGINFO *) ;
+local int	procourconf_begin(PI *,PARAMOPT *,cchar *) noex ;
+local int	procourconf_end(PI *) noex ;
 #endif /* COMMENT */
 
-static int	procdaemonbegin(PROGINFO *) ;
-static int	procdaemonend(PROGINFO *) ;
-static int	procdaemonaddr(PROGINFO *,void *,int,cchar *) ;
+local int	procdaemonbegin(PI *) noex ;
+local int	procdaemonend(PI *) noex ;
+local int	procdaemonaddr(PI *,void *,int,cchar *) noex ;
 
-static int	process(PROGINFO *) ;
-static int	procback(PROGINFO *) ;
-static int	procbacker(PROGINFO *,cchar *,cchar **) ;
-static int	procbackenv(PROGINFO *,SPAWNER *) ;
-static int	procdaemon(PROGINFO *) ;
-static int	procreg(PROGINFO *) ;
-static int	openaddr(int,cchar *,int) ;
+local int	process(PI *) noex ;
+local int	procback(PI *) noex ;
+local int	procbacker(PI *,cchar *,mainv) noex ;
+local int	procbackenv(PI *,SPAWNER *) noex ;
+local int	procdaemon(PI *) noex ;
+local int	procreg(PI *) noex ;
+local int	openaddr(int,cchar *,int) noex ;
 
 #if	CF_DEBUG && CF_DEBUGPROC
-static int proctest(PROGINFO *) ;
+local int proctest(PI *) noex ;
 #if	CF_DEBUGTN
-static int proctesttn(PROGINFO *) ;
+local int proctesttn(PI *) noex ;
 #endif
 #if	CF_DEBUGOT
-static int proctestot(PROGINFO *) ;
+local int proctestot(PI *) noex ;
 #endif
 #endif
 
-static int	hostinfo_findaf(HOSTINFO *,char *,int,int) ;
+local int	hostinfo_findaf(HOSTINFO *,char *,int,int) noex ;
 
-static void	main_sighand(int,siginfo_t *,void *) ;
+local void	main_sighand(int,siginfo_t *,void *) noex ;
 
 
 /* local variables */
 
-static volatile int	if_int ;
-static volatile int	if_exit ;
+local volatile int	if_int ;
+local volatile int	if_exit ;
 
-static const int	sigblocks[] = {
+constexpr int	sigblocks[] = {
 	0
-} ;
+} ; /* end array */
 
-static const int	sigignores[] = {
+constexpr int	sigignores[] = {
 	SIGPIPE,
 	SIGPOLL,
 	SIGHUP,
 	0
-} ;
+} ; /* end array */
 
-static const int	sigints[] = {
+constexpr int	sigints[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGINT,
 	SIGTERM,
 	0
-} ;
-
-static cchar *argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"ef",
-	"cf",
-	"lf",
-	"md",
-	"wto",
-	"ra",
-	"daemon",
-	NULL
-} ;
+} ; /* end array */
 
 enum argopts {
 	argopt_root,
@@ -290,17 +248,33 @@ enum argopts {
 	argopt_ra,
 	argopt_daemon,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static const struct pivars	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"ef",
+	"cf",
+	"lf",
+	"md",
+	"wto",
+	"ra",
+	"daemon",
+	nullptr
+} ; /* end array */
+
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPREXTRA
-} ;
+} ; /* end array */
 
-static const struct mapex	mapexs[] = {
+constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -314,19 +288,7 @@ static const struct mapex	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
-
-static cchar *akonames[] = {
-	"ra",
-	"cf",
-	"lf",
-	"daemon",
-	"intrun",
-	"intidle",
-	"hostspec",
-	"portspec",
-	NULL
-} ;
+} ; /* end array */
 
 enum akonames {
 	akoname_ra,
@@ -338,25 +300,28 @@ enum akonames {
 	akoname_hostspec,
 	akoname_portspec,
 	akoname_overlast
-} ;
+} ; /* end enum */
+
+constexpr cpcchar	akonames[] = {
+	"ra",
+	"cf",
+	"lf",
+	"daemon",
+	"intrun",
+	"intidle",
+	"hostspec",
+	"portspec",
+	nullptr
+} ; /* end array */
 
 #ifdef	COMMENT
-static const char	*sched1[] = {
+constexpr cpcchar	sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	"%p/%n.%f",
-	NULL
-} ;
-#endif /* COMMENT */
-
-#ifdef	COMMENT
-static const char	*cparams[] = {
-	"maildir",
-	"logsize",
-	"logfile",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 #endif /* COMMENT */
 
 enum cparams {
@@ -364,28 +329,38 @@ enum cparams {
 	cparam_logsize,
 	cparam_logfile,
 	cparam_overlast
-} ;
+} ; /* end enum */
 
 #ifdef	COMMENT
-static const char	*varmaildirs[] = {
+constexpr cpcchar	cparams[] = {
+	"maildir",
+	"logsize",
+	"logfile",
+	nullptr
+} ; /* end array */
+#endif /* COMMENT */
+
+#ifdef	COMMENT
+constexpr cpcchar	varmaildirs[] = {
 	VARMAILDNAMESP,
 	VARMAILDNAMES,
 	VARMAILDNAME,
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 #endif /* COMMENT */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int main(int argc,cchar *argv[],cchar *envv[])
-{
-	PROGINFO	pi, *pip = &pi ;
+int main(int argc,con mainv argv,con mainv envv) {
+	PI	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
 	SIGHAND		sm ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	PARAMOPT	aparams ;
 	bfile		errfile ;
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -399,11 +374,11 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	int		f_usage = false ;
 	int		f_help = false ;
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*pr = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*efname = NULL ;
-	cchar		*idlespec = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*pr = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*efname = nullptr ;
+	cchar		*idlespec = nullptr ;
 	cchar		*cp ;
 
 
@@ -414,7 +389,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (rs < 0) goto badsighand ;
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getenv(VARDEBUGFNAME)) != NULL) {
+	if ((cp = getenv(VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -426,7 +401,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    goto badprogstart ;
 	}
 
-	if ((cp = getenv(VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getenv(VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
@@ -456,7 +431,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -467,11 +442,11 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
-	            argval = NULL ;
+	            argval = nullptr ;
 
 	        } else if (ach == '-') {
 
@@ -484,14 +459,14 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = false ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -608,7 +583,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* mail directory(s) */
 	                case argopt_md:
-	                    cp = NULL ;
+	                    cp = nullptr ;
 	                    cl = -1 ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
@@ -628,7 +603,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                        } else
 	                            rs = SR_INVALID ;
 	                    }
-	                    if ((rs >= 0) && (cp != NULL) && (cl > 0)) {
+	                    if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
 	                        PARAMOPT	*pop = &aparams ;
 	                        cchar		*po = PO_MAILDIRS ;
 	                        rs = paramopt_loads(pop,po,cp,cl) ;
@@ -655,7 +630,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* re-use address */
 	                case argopt_ra:
-	                    pip->final.reuseaddr = TRUE ;
+	                    pip->finval.reuseaddr = TRUE ;
 	                    pip->have.reuseaddr = TRUE ;
 	                    pip->fl.reuseaddr = TRUE ;
 	                    if (f_optequal) {
@@ -669,7 +644,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* daemon mode */
 	                case argopt_daemon:
-	                    pip->final.daemon = TRUE ;
+	                    pip->finval.daemon = TRUE ;
 	                    pip->have.daemon = TRUE ;
 	                    pip->fl.daemon = TRUE ;
 	                    if (f_optequal) {
@@ -691,7 +666,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -743,7 +718,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* daemon mode */
 	                    case 'd':
-	                        pip->final.background = TRUE ;
+	                        pip->finval.background = TRUE ;
 	                        pip->fl.background = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
@@ -799,7 +774,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -859,9 +834,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getenv(VAREFNAME) ;
-	if (efname == NULL) efname = getenv(VARERRORFNAME) ;
-	if (efname == NULL) efname = BFILE_STDERR ;
+	if (efname == nullptr) efname = getenv(VAREFNAME) ;
+	if (efname == nullptr) efname = getenv(VARERRORFNAME) ;
+	if (efname == nullptr) efname = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -917,7 +892,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 /* get help if requested */
 
 	if (f_help)
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	if (f_version || f_help || f_usage)
 	    goto retearly ;
@@ -932,8 +907,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* process program options */
 
-	if (pip->hostspec == NULL) pip->hostspec = getenv(VARHOSTSPEC) ;
-	if (pip->portspec == NULL) pip->portspec = getenv(VARPORTSPEC) ;
+	if (pip->hostspec == nullptr) pip->hostspec = getenv(VARHOSTSPEC) ;
+	if (pip->portspec == nullptr) pip->portspec = getenv(VARPORTSPEC) ;
 
 	if (rs >= 0) {
 	    rs = procopts(pip,&akopts) ;
@@ -950,15 +925,15 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* some initialization */
 
-	if (pip->tmpdname == NULL) pip->tmpdname = getenv(VARTMPDNAME) ;
-	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = getenv(VARTMPDNAME) ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = TMPDNAME ;
 
-	if (pip->maildname == NULL) pip->maildname = getenv(VARMAILDNAME) ;
-	if (pip->maildname == NULL) pip->maildname = MAILDNAME ;
+	if (pip->maildname == nullptr) pip->maildname = getenv(VARMAILDNAME) ;
+	if (pip->maildname == nullptr) pip->maildname = MAILDNAME ;
 
 /* any idle specification? */
 
-	if ((rs >= 0) && (idlespec != NULL)) {
+	if ((rs >= 0) && (idlespec != nullptr)) {
 	    int		ch = MKCHAR(*idlespec) ;
 	    cp = idlespec ;
 	    cl = -1 ;
@@ -977,7 +952,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    pip->intrun = DEFINTEUN ;
 #endif
 
-	if ((rs >= 0) && (pip->intidle < 0) && (argval != NULL)) {
+	if ((rs >= 0) && (pip->intidle < 0) && (argval != nullptr)) {
 	    rs = cfdecti(argval,-1,&v) ;
 	    pip->intidle = v ;
 	}
@@ -1028,11 +1003,11 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    USERINFO	u ;
+	    userinfo	u ;
 	    cchar	*pn = pip->progname ;
-	    if ((rs = userinfo_start(&u,NULL)) >= 0) {
+	    if ((rs = userinfo_start(&u,nullptr)) >= 0) {
 	        if ((rs = procuserinfo_begin(pip,&u)) >= 0) {
-	            if (pip->cfname != NULL) {
+	            if (pip->cfname != nullptr) {
 	                if (pip->euid != pip->uid) u_seteuid(pip->uid) ;
 	                if (pip->egid != pip->gid) u_setegid(pip->gid) ;
 	            }
@@ -1090,10 +1065,10 @@ retearly:
 	    debugprintf("main: exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    pip->open.errfile = false ;
 	    bclose(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.aparams) {
@@ -1133,11 +1108,9 @@ badarg:
 }
 /* end subroutine (main) */
 
-
-int progexit(PROGINFO *pip)
-{
+int progexit(PI *pip) noex {
 	int		rs = SR_OK ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	if (if_exit) {
 	    rs = SR_EXIT ;
 	} else if (if_int) {
@@ -1150,10 +1123,8 @@ int progexit(PROGINFO *pip)
 
 /* local subroutines */
 
-
 /* ARGSUSED */
-static void main_sighand(int sn,siginfo_t *sip,void *vcp)
-{
+local void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	switch (sn) {
 	case SIGINT:
 	    if_int = TRUE ;
@@ -1162,12 +1133,9 @@ static void main_sighand(int sn,siginfo_t *sip,void *vcp)
 	    if_exit = TRUE ;
 	    break ;
 	} /* end switch */
-}
-/* end subroutine (main_sighand) */
+} /* end subroutine (main_sighand) */
 
-
-static int usage(PROGINFO *pip)
-{
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -1186,23 +1154,20 @@ static int usage(PROGINFO *pip)
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
-
+} /* end subroutine (usage) */
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
-{
+local int procopts(PI *pip,keyopt *kop) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
 
-	if ((cp = getenv(VAROPTS)) != NULL) {
+	if ((cp = getenv(VAROPTS)) != nullptr) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
@@ -1211,13 +1176,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            int	oi ;
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	                switch (oi) {
 	                case akoname_ra:
-	                    if (! pip->final.reuseaddr) {
+	                    if (! pip->finval.reuseaddr) {
 	                        pip->have.reuseaddr = TRUE ;
-	                        pip->final.reuseaddr = TRUE ;
+	                        pip->finval.reuseaddr = TRUE ;
 	                        pip->fl.reuseaddr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1226,7 +1191,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_cf:
-	                    if (pip->cfname == NULL) {
+	                    if (pip->cfname == nullptr) {
 	                        if (vl > 0) {
 	                            cchar	**vpp = &pip->cfname ;
 	                            rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -1234,7 +1199,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_lf:
-	                    if (pip->lfname == NULL) {
+	                    if (pip->lfname == nullptr) {
 	                        if (vl > 0) {
 	                            cchar	**vpp = &pip->lfname ;
 	                            rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -1242,9 +1207,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_daemon:
-	                    if (! pip->final.daemon) {
+	                    if (! pip->finval.daemon) {
 	                        pip->have.daemon= TRUE ;
-	                        pip->final.daemon = TRUE ;
+	                        pip->finval.daemon = TRUE ;
 	                        pip->fl.daemon = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1253,9 +1218,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_intrun:
-	                    if (! pip->final.intrun) {
+	                    if (! pip->finval.intrun) {
 	                        pip->have.intrun = TRUE ;
-	                        pip->final.intrun = TRUE ;
+	                        pip->finval.intrun = TRUE ;
 	                        if (vl > 0) {
 	                            int	v ;
 	                            rs = cfdecti(vp,vl,&v) ;
@@ -1264,9 +1229,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_intidle:
-	                    if (! pip->final.intidle) {
+	                    if (! pip->finval.intidle) {
 	                        pip->have.intidle = TRUE ;
-	                        pip->final.intidle = TRUE ;
+	                        pip->finval.intidle = TRUE ;
 	                        if (vl > 0) {
 	                            int	v ;
 	                            rs = cfdecti(vp,vl,&v) ;
@@ -1275,7 +1240,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_hostspec:
-	                    if (pip->hostspec == NULL) {
+	                    if (pip->hostspec == nullptr) {
 	                        if (vl > 0) {
 	                            cchar	**vpp = &pip->hostspec ;
 	                            rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -1283,7 +1248,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_portspec:
-	                    if (pip->portspec == NULL) {
+	                    if (pip->portspec == nullptr) {
 	                        if (vl > 0) {
 	                            cchar	**vpp = &pip->portspec ;
 	                            rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -1304,12 +1269,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	} /* end if (ok) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procopts) */
+} /* end subroutine (procopts) */
 
-
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
-{
+local int procuserinfo_begin(PI *pip,userinfo *uip) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUG
@@ -1334,7 +1296,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1350,12 +1312,12 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 
 #if	CF_PRLOCAL
 	if (rs >= 0) {
-	    const int	dlen = MAXPATHLEN ;
+	    cint	dlen = MAXPATHLEN ;
 	    cchar	*un = pip->username ;
 	    char	dbuf[MAXPATHLEN+1] ;
 	    if ((rs = mkpr(dbuf,dlen,VARPRLOCAL,un)) >= 0) {
 	        cchar		**vpp = &pip->prlocal ;
-	        const int	dl = rs ;
+	        cint	dl = rs ;
 	        rs = proginfo_setentry(pip,vpp,dbuf,dl) ;
 	    }
 	} /* end if (ok) */
@@ -1371,17 +1333,13 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
-{
+local int procuserinfo_end(PI *pip) noex {
 	int		rs = SR_OK ;
-
-	if (pip == NULL) return SR_FAULT ;
-
+	if (pip == nullptr) return SR_FAULT ;
 	return rs ;
-}
-/* end subroutine (procuserinfo_end) */
+} /* end subroutine (procuserinfo_end) */
 
-static int procuserinfo_logid(proginfo *pip) noex {
+local int procuserinfo_logid(proginfo *pip) noex {
 	cint		plen = LOGIDLEN ;
 	cint		pv = pip->pid ;
 	int		rs ;
@@ -1392,10 +1350,9 @@ static int procuserinfo_logid(proginfo *pip) noex {
 	    rs = proginfo_setentry(pip,vpp,pbuf,rs) ;
 	}
 	return rs ;
-}
-/* end subroutine (procuserinfo_logid) */
+} /* end subroutine (procuserinfo_logid) */
 
-static int process(proginfo *pip) noex {
+local int process(proginfo *pip) noex {
 	int		rs ;
 	int		rs1 ;
 	if (char *znbuf ; (rs = malloc_zn(&znbuf)) >= 0) {
@@ -1425,10 +1382,9 @@ static int process(proginfo *pip) noex {
 	    rs = rsfree(rs,znbuf) ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (process) */
+} /* end subroutine (process) */
 
-static int procback(PROGINFO *pip) noex {
+local int procback(PI *pip) noex {
 	cint		elen = MAXPATHLEN ;
 	int		rs ;
 	char		ebuf[MAXPATHLEN+1] ;
@@ -1451,7 +1407,7 @@ static int procback(PROGINFO *pip) noex {
 /* do the spawn */
 
 	if ((rs = proginfo_getename(pip,ebuf,elen)) >= 0) {
-	    const int	el = rs ;
+	    cint	el = rs ;
 	    cchar	*pf = ebuf ;
 	    cchar	*tp ;
 	    char	pbuf[MAXPATHLEN+1] ;
@@ -1461,7 +1417,7 @@ static int procback(PROGINFO *pip) noex {
 	    debugprintf("main/procback: mid2 rs=%d\n",rs) ;
 #endif
 
-	    if ((tp = strnrbrk(ebuf,el,"/.")) != NULL) {
+	    if ((tp = strnrbrk(ebuf,el,"/.")) != nullptr) {
 	        if (tp[0] == '.') ebuf[tp-ebuf] = '\0' ;
 	    }
 
@@ -1484,7 +1440,7 @@ static int procback(PROGINFO *pip) noex {
 	            bufprintf(dbuf,10,"-D=%u",pip->debuglevel) ;
 	            av[i++] = dbuf ;
 	        }
-	        av[i++] = NULL ;
+	        av[i++] = nullptr ;
 	        rs = procbacker(pip,pf,av) ;
 	    } /* end if (ok) */
 	} /* end if (proginfo_getename) */
@@ -1495,12 +1451,9 @@ static int procback(PROGINFO *pip) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (procback) */
+} /* end subroutine (procback) */
 
-
-static int procbacker(PROGINFO *pip,cchar *pf,cchar **av)
-{
+local int procbacker(PI *pip,cchar *pf,mainv av) noex {
 	SPAWNER		s ;
 	int		rs ;
 	int		rs1 ;
@@ -1541,78 +1494,73 @@ static int procbacker(PROGINFO *pip,cchar *pf,cchar **av)
 	    debugprintf("main/procbacker: ret rs=%d pid=%u\n",rs,pid) ;
 #endif
 	return (rs >= 0) ? pid : rs ;
-}
-/* end subroutine (procbacker) */
+} /* end subroutine (procbacker) */
 
-
-static int procbackenv(PROGINFO *pip,SPAWNER *srp)
-{
-	BUFFER		b ;
+local int procbackenv(PI *pip,SPAWNER *srp) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*varopts = VAROPTS ;
+	buffer		b ;
 	if ((rs = buffer_start(&b,ENVBUFLEN)) >= 0) {
-	    cchar	*np ;
+	    cchar	*namp ;
 	    int		v ;
-	    int		i ;
 	    int		c = 0 ;
-
-	    for (i = 0 ; i < 3 ; i += 1) {
-	        np = NULL ;
+	    for (int i = 0 ; i < 3 ; i += 1) {
+	        namp = nullptr ;
 	        switch (i) {
 	        case 0:
 	            v = pip->intrun ;
-	            if (v > 0) np = "intrun" ;
+	            if (v > 0) namp = "intrun" ;
 	            break ;
 	        case 1:
 	            v = pip->intidle ;
-	            if (v > 0) np = "intidle" ;
+	            if (v > 0) namp = "intidle" ;
 	            break ;
 	        case 2:
 	            v = (pip->fl.reuseaddr&1) ;
-	            if (v > 0) np = "resueaddr" ;
+	            if (v > 0) namp = "resueaddr" ;
 	            break ;
 	        } /* end switch */
-	        if (np != NULL) {
+	        if (namp != nullptr) {
 	            if (c++ > 0) {
 	                buffer_chr(&b,CH_COMMA) ;
 	            }
-	            rs = buffer_printf(&b,"%s=%d",np,v) ;
+	            rs = buffer_printf(&b,"%s=%d",namp,v) ;
 	        }
 	        if (rs < 0) break ;
 	    } /* end for */
 
 	    if (rs >= 0) {
 	        cchar	*vp ;
-	        for (i = 0 ; i < 2 ; i += 1) {
-	            np = NULL ;
+	        for (int i = 0 ; i < 2 ; i += 1) {
+	            namp = nullptr ;
 	            switch (i) {
 	            case 0:
-	                if (pip->hostspec != NULL) {
-	                    np = "hostspec" ;
+	                if (pip->hostspec != nullptr) {
+	                    namp = "hostspec" ;
 	                    vp = pip->hostspec ;
 	                }
 	                break ;
 	            case 1:
-	                if (pip->portspec != NULL) {
-	                    np = "portspec" ;
+	                if (pip->portspec != nullptr) {
+	                    namp = "portspec" ;
 	                    vp = pip->portspec ;
 	                }
 	                break ;
 	            } /* end switch */
-	            if (np != NULL) {
+	            if (namp != nullptr) {
 	                if (c++ > 0) {
 	                    buffer_chr(&b,CH_COMMA) ;
 	                }
-	                rs = buffer_printf(&b,"%s=%s",np,vp) ;
+	                rs = buffer_printf(&b,"%s=%s",namp,vp) ;
 	            } /* end if (non-null) */
 	            if (rs < 0) break ;
 	        } /* end for */
 	    } /* end if (ok) */
 
 	    if ((rs >= 0) && (c > 0)) {
-	        if ((rs = buffer_get(&b,&np)) >= 0) {
-	            rs = spawner_envset(srp,varopts,np,rs) ;
+	        if ((rs = buffer_get(&b,&namp)) >= 0) {
+	            rs = spawner_envset(srp,varopts,namp,rs) ;
 	        }
 	    }
 
@@ -1626,12 +1574,9 @@ static int procbackenv(PROGINFO *pip,SPAWNER *srp)
 #endif
 
 	return rs ;
-}
-/* end subroutine (procbackenv) */
+} /* end subroutine (procbackenv) */
 
-
-static int procdaemon(PROGINFO *pip)
-{
+local int procdaemon(PI *pip) noex {
 	int		rs ;
 	int		rs1 ;
 #if	CF_DEBUG
@@ -1660,18 +1605,15 @@ static int procdaemon(PROGINFO *pip)
 	    bprintf(pip->efp,fmt,pn,rs) ;
 	} /* end if (procdaemon) */
 	return rs ;
-}
-/* end subroutine (procdaemon) */
+} /* end subroutine (procdaemon) */
 
-
-static int procdaemonbegin(PROGINFO *pip)
-{
+local int procdaemonbegin(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		af = AF_UNSPEC ;
 	cchar		*pn = pip->progname ;
 	cchar		*protoname = PROTONAME ;
-	cchar		*hostname = NULL ;
-	cchar		*portname = NULL ;
+	cchar		*hostname = nullptr ;
+	cchar		*portname = nullptr ;
 	cchar		*tp ;
 	char		hostbuf[MAXHOSTNAMELEN+1] ;
 
@@ -1682,9 +1624,9 @@ static int procdaemonbegin(PROGINFO *pip)
 	}
 #endif
 
-	if ((pip->hostspec != NULL) && (pip->hostspec[0] != '\0')) {
+	if ((pip->hostspec != nullptr) && (pip->hostspec[0] != '\0')) {
 	    hostname = pip->hostspec ;
-	    if ((tp = strchr(pip->hostspec,':')) != NULL) {
+	    if ((tp = strchr(pip->hostspec,':')) != nullptr) {
 	        int	ml = (tp - pip->hostspec) ;
 	        portname = (tp + 1) ;
 	        hostname = hostbuf ;
@@ -1694,13 +1636,13 @@ static int procdaemonbegin(PROGINFO *pip)
 
 	if (rs >= 0) {
 
-	    if ((pip->portspec != NULL) && (pip->portspec[0] != '\0')) {
+	    if ((pip->portspec != nullptr) && (pip->portspec[0] != '\0')) {
 	        portname = pip->portspec ;
 	    }
 
 /* defaults */
 
-	    if ((portname == NULL) || (portname[0] == '\0')) {
+	    if ((portname == nullptr) || (portname[0] == '\0')) {
 	        portname = SVCSPEC_COMSAT ;
 	    }
 
@@ -1754,7 +1696,7 @@ static int procdaemonbegin(PROGINFO *pip)
 #endif
 
 	            memset(addr,0,INETXADDRLEN) ;
-	            if (hostname != NULL) {
+	            if (hostname != nullptr) {
 	                rs = procdaemonaddr(pip,addr,af,hostname) ;
 	                af = rs ;
 	                if (rs == SR_NOTFOUND) rs = SR_HOSTUNREACH ;
@@ -1762,7 +1704,7 @@ static int procdaemonbegin(PROGINFO *pip)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3)) {
-	                uint	iv = inet4int(addr) ;
+	                cuint	iv = inet4int(addr) ;
 	                debugprintf("main/procdaemonbegin: rs=%d af=%u\n",
 	                    rs,af) ;
 	                debugprintf("main/procdaemonbegin: "
@@ -1783,7 +1725,7 @@ static int procdaemonbegin(PROGINFO *pip)
 	} /* end if (ok) */
 
 	if ((rs >= 0) && (pip->pid > 0)) {
-	    if ((pip->efp != NULL) && (pip->debuglevel > 0)) {
+	    if ((pip->efp != nullptr) && (pip->debuglevel > 0)) {
 	        bprintf(pip->efp,"%s: daemon pid=%u\n",pn,pip->pid) ;
 	    }
 	    if (pip->open.logprog) {
@@ -1800,34 +1742,26 @@ static int procdaemonbegin(PROGINFO *pip)
 #endif /* CF_DEBUG */
 
 	return rs ;
-}
-/* end subroutine (procdaemonbegin) */
+} /* end subroutine (procdaemonbegin) */
 
-
-static int procdaemonend(PROGINFO *pip)
-{
+local int procdaemonend(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (pip->open.listen && (pip->fd_msg >= 0)) {
 	    pip->open.listen = false ;
 	    rs1 = u_close(pip->fd_msg) ;
 	    if (rs >= 0) rs = rs1 ;
 	    pip->fd_msg = -1 ;
 	}
-
 	return rs ;
-}
-/* end subroutine (procdaemonend) */
+} /* end subroutine (procdaemonend) */
 
-
-static int procdaemonaddr(PROGINFO *pip,void *hap,int af,cchar *hn)
-{
+local int procdaemonaddr(PI *pip,void *hap,int af,cchar *hn) noex {
 	HOSTINFO	hi ;
 	int		rs ;
 	int		raf = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	memset(hap,0,INETXADDRLEN) ;
 
 	if ((rs = hostinfo_start(&hi,af,hn)) >= 0) {
@@ -1851,12 +1785,9 @@ static int procdaemonaddr(PROGINFO *pip,void *hap,int af,cchar *hn)
 
 	if (rs == 0) rs = SR_HOSTUNREACH ;
 	return (rs >= 0) ? raf : rs ;
-}
-/* end subroutine (procdaemonaddr) */
+} /* end subroutine (procdaemonaddr) */
 
-
-static int procreg(PROGINFO *pip)
-{
+local int procreg(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -1902,12 +1833,9 @@ static int procreg(PROGINFO *pip)
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procreg) */
+} /* end subroutine (procreg) */
 
-
-static int openaddr(int af,cchar *addr,int port)
-{
+local int openaddr(int af,cchar *addr,int port) noex {
 	int		rs ;
 	int		rs1 ;
 	int		s = -1 ;
@@ -1916,12 +1844,12 @@ static int openaddr(int af,cchar *addr,int port)
 #else
 	if (af == AF_UNSPEC) af = AF_INET4 ;
 #endif /* CF_INET6 */
-	if ((rs = getprotofamily(af)) >= 0) {
+	if ((rs = getpf(af)) >= 0) {
 	    SOCKADDRESS	sa ;
-	    const int	pf = rs ;
+	    cint	pf = rs ;
 	    if ((rs = sockaddress_start(&sa,af,addr,port,0)) >= 0) {
-	        const int	st = SOCK_DGRAM ;
-	        const int	proto = IPPROTO_UDP ;
+	        cint	st = SOCK_DGRAM ;
+	        cint	proto = IPPROTO_UDP ;
 	        {
 	            rs = openport(pf,st,proto,&sa) ;
 	            s = rs ;
@@ -1929,13 +1857,12 @@ static int openaddr(int af,cchar *addr,int port)
 	        rs1 = sockaddress_finish(&sa) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sockaddress) */
-	} /* end if (getprotofamily) */
+	} /* end if (getpf) */
 	if ((rs < 0) && (s >= 0)) u_close(s) ;
 	return (rs >= 0) ? s : rs ;
-}
-/* end subroutine (openaddr) */
+} /* end subroutine (openaddr) */
 
-static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
+local int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
 	HOSTINFO_CUR	cur ;
 	int		rs ;
 	int		rs1 ;
@@ -1972,13 +1899,10 @@ static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
 	} /* end if (cursor) */
 
 	return (rs >= 0) ? al : rs ;
-}
-/* end subroutine (hostinfo_findaf) */
-
+} /* end subroutine (hostinfo_findaf) */
 
 #if	CF_DEBUG && CF_DEBUGPROC
-static int proctest(PROGINFO *pip)
-{
+local int proctest(PI *pip) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUGTN
@@ -1997,13 +1921,11 @@ static int proctest(PROGINFO *pip)
 /* end subroutine (proctest) */
 #endif /* CF_DEBUG && CF_DEBUGPROC */
 
-
 #if	CF_DEBUG && CF_DEBUGTN
-static int proctesttn(PROGINFO *pip)
-{
+local int proctesttn(PI *pip) noex {
 	TERMNOTE	tn ;
-	const int	max = 3 ;
-	const int	opts = 0 ;
+	cint	max = 3 ;
+	cint	opts = 0 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i = 0 ;
@@ -2011,7 +1933,7 @@ static int proctesttn(PROGINFO *pip)
 	cchar		*sp = "hello world!" ;
 	cchar		*recips[3] ;
 	recips[i++] = "dam" ;
-	recips[i] = NULL ;
+	recips[i] = nullptr ;
 	rs = termnote_open(&tn,pip->pr) ;
 	debugprintf("main/proctesttn: termnote_open() rs=%d\n",rs) ;
 	if (rs >= 0) {
@@ -2023,14 +1945,11 @@ static int proctesttn(PROGINFO *pip)
 	} /* end if (termnote) */
 	debugprintf("main/proctestrn: ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (proctesttn) */
+} /* end subroutine (proctesttn) */
 #endif /* CF_DEBUG && CF_DEBUGTN */
 
-
 #if	CF_DEBUG && CF_DEBUGOT
-static int proctestot(PROGINFO *pip)
-{
+local int proctestot(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		max = 3 ;
 	int		opts = 0 ;
@@ -2039,7 +1958,7 @@ static int proctestot(PROGINFO *pip)
 	cchar		*recips[3] ;
 	cchar		*sp = "from the underworld!" ;
 	recips[i++] = "dam" ;
-	recips[i] = NULL ;
+	recips[i] = nullptr ;
 	opts |= TERMNOTE_OBIFF ;
 	rs = opentermnote(pip->pr,recips,max,opts) ;
 	debugprintf("main/proctestot: opentermnote() rs=%d\n",rs) ;
@@ -2051,8 +1970,7 @@ static int proctestot(PROGINFO *pip)
 	} /* end if (opentermnote) */
 	debugprintf("main/proctestot: ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (proctestot) */
+} /* end subroutine (proctestot) */
 #endif /* CF_DEBUG && CF_DEBUGOT */
 
 
