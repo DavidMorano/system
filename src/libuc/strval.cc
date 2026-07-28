@@ -62,13 +62,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* for |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strdcpyx.h>
-#include	<ctdec.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strdcpyx.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* for |DECBUFLEN| */
 
 #include	"strval.h"
@@ -120,7 +120,6 @@ cchar *strval(char *rbuf,cint val) noex {
 	    strdcpy(rbuf,rlen,"negative") ;
 	}
 	return rbuf ;
-}
-/* end subroutine (strval) */
+} /* end subroutine (strval) */
 
 
