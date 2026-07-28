@@ -42,7 +42,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
