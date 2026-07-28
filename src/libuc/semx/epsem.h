@@ -82,7 +82,7 @@ struct epsem : csem {
 	    post(this,epsemmem_post) ;
 	    count(this,epsemmem_count) ;
 	    destroy(this,epsemmem_destroy) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	epsem(const epsem &) = delete ;
 	epsem &operator = (const epsem &) = delete ;
@@ -90,7 +90,7 @@ struct epsem : csem {
 	void dtor() noex ;
 	operator int () noex ;
 	destruct epsem() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (epsem) */
 #else	/* __cplusplus */
