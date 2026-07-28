@@ -39,35 +39,35 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>			/* |time_t| */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getpwd.h>
-#include	<vecobj.h>
-#include	<hdb.h>
-#include	<field.h>
-#include	<fieldterminit.hh>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getpwd.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
+#include	<field.h>		/* LIBUC */
 #include	<absfn.h>		/* absolute-file-name */
-#include	<hash.h>
-#include	<sncpyx.h>
-#include	<snwcpy.h>
-#include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<sfx.h>
-#include	<intsat.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<hash.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<intsat.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"kvsfile.h"
 
@@ -159,17 +159,17 @@ local int kvsfile_ctor(kvsfile *op,Args ... args) noex {
 		        if (rs < 0) {
 		            delete op->kvlp ;
 		            op->kvlp = nullptr ;
-		        }
+		        } /* end if (error) */
 	            } /* end if (new-hdb) */
 		    if (rs < 0) {
 		        delete op->klp ;
 		        op->klp = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (new-vecobj) */
 		if (rs < 0) {
 		    delete op->flp ;
 		    op->flp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
@@ -283,27 +283,26 @@ int kvsfile_open(kvsfile *op,int ndef,cchar *atfname) noex {
 	                    } /* end if (adding first file) */
 	                    if (rs < 0) {
 	                        hdb_finish(op->elp) ;
-			    }
+			    } /* end if (error) */
 	                } /* end if (entries) */
 	                if (rs < 0) {
 	                    hdb_finish(op->kvlp) ;
-		        }
+		        } /* end if (error) */
 	            } /* end if (keyvals) */
 	            if (rs < 0) {
 	                vecobj_finish(op->klp) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (keys) */
 	        if (rs < 0) {
 	            vecobj_finish(op->flp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (files) */
 	    if (rs < 0) {
 		kvsfile_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (kvsfile_ctor) */
 	return rs ;
-}
-/* end subroutine (kvsfile_open) */
+} /* end subroutine (kvsfile_open) */
 
 int kvsfile_close(kvsfile *op) noex {
 	int		rs ;
@@ -344,8 +343,7 @@ int kvsfile_close(kvsfile *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (kvsfile_close) */
+} /* end subroutine (kvsfile_close) */
 
 int kvsfile_fileadd(kvsfile *op,cchar *atfname) noex {
 	cnullptr	np{} ;
@@ -360,8 +358,8 @@ int kvsfile_fileadd(kvsfile *op,cchar *atfname) noex {
 	            if (KF_FILE	fe ; (rs = file_start(&fe,fp)) >= 0) ylikely {
 	                vecobj		*flp = op->flp ;
 		        vecobj_vcf	vcf = vecobj_vcf(vcmpfname) ;
-	                cint		nrs = SR_NOTFOUND ;
-	                if ((rs = flp->search(&fe,vcf,np)) == nrs) {
+	                cint		rsn = SR_NOTFOUND ;
+	                if ((rs = flp->search(&fe,vcf,np)) == rsn) {
 	                    if ((rs = flp->add(&fe)) >= 0) {
 	                        fi = rs ;
 	                        rs = kvsfile_fparse(op,fi) ;
@@ -383,8 +381,7 @@ int kvsfile_fileadd(kvsfile *op,cchar *atfname) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? fi : rs ;
-}
-/* end subroutine (kvsfile_fileadd) */
+} /* end subroutine (kvsfile_fileadd) */
 
 int kvsfile_curbegin(kvsfile *op,KF_CUR *curp) noex {
 	int		rs ;
@@ -396,8 +393,7 @@ int kvsfile_curbegin(kvsfile *op,KF_CUR *curp) noex {
 	    } /* end if (new-hdb_cur) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (kvsfile_curbegin) */
+} /* end subroutine (kvsfile_curbegin) */
 
 int kvsfile_curend(kvsfile *op,KF_CUR *curp) noex {
 	int		rs ;
@@ -415,8 +411,7 @@ int kvsfile_curend(kvsfile *op,KF_CUR *curp) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (kvsfile_curend) */
+} /* end subroutine (kvsfile_curend) */
 
 int kvsfile_curenumkey(kvsfile *op,KF_CUR *curp,char *kbuf,int klen) noex {
 	int		rs ;
@@ -438,8 +433,7 @@ int kvsfile_curenumkey(kvsfile *op,KF_CUR *curp,char *kbuf,int klen) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (kvsfile_curenumkey) */
+} /* end subroutine (kvsfile_curenumkey) */
 
 int kvsfile_curenum(kvsfile *op,KF_CUR *curp,
 		char *kbuf,int klen,char *vbuf,int vlen) noex {
@@ -464,8 +458,7 @@ int kvsfile_curenum(kvsfile *op,KF_CUR *curp,
 	    } /* end if (had an entry) */
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (kvsfile_curenum) */
+} /* end subroutine (kvsfile_curenum) */
 
 int kvsfile_fetch(KF *op,cc *kbuf,KF_CUR *curp,char *vbuf,int vlen) noex {
 	int		rs ;
@@ -491,8 +484,7 @@ int kvsfile_fetch(KF *op,cc *kbuf,KF_CUR *curp,char *vbuf,int vlen) noex {
 	    } /* end if (had an entry) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (kvsfile_fetch) */
+} /* end subroutine (kvsfile_fetch) */
 
 int kvsfile_check(kvsfile *op,time_t dt) noex {
 	int		rs ;
@@ -505,8 +497,7 @@ int kvsfile_check(kvsfile *op,time_t dt) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (kvsfile_check) */
+} /* end subroutine (kvsfile_check) */
 
 
 /* private subroutines */
@@ -524,8 +515,7 @@ local int kvsfile_keyfins(kvsfile *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (kvsfile_keyfins) */
+} /* end subroutine (kvsfile_keyfins) */
 
 local int kvsfile_filefins(kvsfile *op) noex {
 	vecobj		*flp = op->flp ;
@@ -540,8 +530,7 @@ local int kvsfile_filefins(kvsfile *op) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (kvsfile_filefins) */
+} /* end subroutine (kvsfile_filefins) */
 
 local int kvsfile_checkfiles(kvsfile *op,time_t dt) noex {
 	vecobj		*flp = op->flp ;
@@ -566,8 +555,7 @@ local int kvsfile_checkfiles(kvsfile *op,time_t dt) noex {
 	} /* end for */
 	op->ti_check = dt ;
 	return (rs >= 0) ? c_changed : rs ;
-}
-/* end subroutine (kvsfile_checkfiles) */
+} /* end subroutine (kvsfile_checkfiles) */
 
 local int kvsfile_fh(kvsfile *op,dev_t dev,ino_t ino) noex {
 	vecobj		*flp = op->flp ;
@@ -580,11 +568,11 @@ local int kvsfile_fh(kvsfile *op,dev_t dev,ino_t ino) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (kvsfile_fh) */
+} /* end subroutine (kvsfile_fh) */
 
 local int kvsfile_fparse(kvsfile *op,int fi) noex {
 	vecobj		*flp = op->flp ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -596,10 +584,9 @@ local int kvsfile_fparse(kvsfile *op,int fi) noex {
 			csize fsize = size_t(sb.st_size) ;
 	                if (! S_ISDIR(sb.st_mode)) {
 	                    if (sb.st_mtime > fep->mtime) {
-	                        cint		nrs = SR_NOTFOUND ;
 	                        const dev_t	dev = sb.st_dev ;
 	                        const ino_t	ino = sb.st_ino ;
-	                        if ((rs = kvsfile_fh(op,dev,ino)) == nrs) {
+	                        if ((rs = kvsfile_fh(op,dev,ino)) == rsn) {
 	                            fep->dev = dev ;
 	                            fep->ino = ino ;
 	                            fep->mtime = sb.st_mtime ;
@@ -623,8 +610,7 @@ local int kvsfile_fparse(kvsfile *op,int fi) noex {
 	    }
 	} /* end if (vec-get) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (kvsfile_fparse) */
+} /* end subroutine (kvsfile_fparse) */
 
 local int kvsfile_fparser(kvsfile *op,int fi,ucstream *kfp) noex {
 	int		rs ;
@@ -644,8 +630,7 @@ local int kvsfile_fparser(kvsfile *op,int fi,ucstream *kfp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (kvsfile_fparser) */
+} /* end subroutine (kvsfile_fparser) */
 
 local int kvsfile_fparsel(kvsfile *op,int fi,cc *lp,int ll) noex {
 	int		rs ;
@@ -673,8 +658,8 @@ local int kvsfile_fparsel(kvsfile *op,int fi,cc *lp,int ll) noex {
                     if ((rs >= 0) && (kep != nullptr)) {
                         bool        f = true ;
                         if ((rs = entry_start(&ve,fi,ki,kep,fp,fl)) >= 0) {
-                            cint    nrs = SR_NOTFOUND ;
-                            if ((rs = kvsfile_already(op,&ve)) == nrs) {
+                            cint    rsn = SR_NOTFOUND ;
+                            if ((rs = kvsfile_already(op,&ve)) == rsn) {
                                 if ((rs = kvsfile_addentry(op,&ve)) >= 0) {
                                     f = false ;
                                     c_added += 1 ;
@@ -691,19 +676,18 @@ local int kvsfile_fparsel(kvsfile *op,int fi,cc *lp,int ll) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? c_added : rs ;
-}
-/* end subroutine (kvsfile_fparsel) */
+} /* end subroutine (kvsfile_fparsel) */
 
 local int kvsfile_getkeyp(kvsfile *op,cchar *kbuf,KF_KEY **kpp) noex {
 	KF_KEY		*kep = nullptr ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		ki = 0 ;
 	if (KF_KEY ke ; (rs = key_start(&ke,kbuf)) >= 0) ylikely {
 	    vecobj	*klp = op->klp ;
 	    vecobj_vcf	vcf = vecobj_vcf(vcmpkey) ;
-	    cint	nrs = SR_NOTFOUND ;
 	    bool	f = true ;
-	    if (void *vp ; (rs = klp->search(&ke,vcf,&vp)) == nrs) {
+	    if (void *vp ; (rs = klp->search(&ke,vcf,&vp)) == rsn) {
 	        kep = nullptr ;
 	        if ((rs = klp->add(&ke)) >= 0) {
 	            ki = rs ;
@@ -724,8 +708,7 @@ local int kvsfile_getkeyp(kvsfile *op,cchar *kbuf,KF_KEY **kpp) noex {
 	    *kpp = (rs >= 0) ? kep : nullptr ;
 	}
 	return (rs >= 0) ? ki : rs ;
-}
-/* end subroutine (kvsfile_getkeyp) */
+} /* end subroutine (kvsfile_getkeyp) */
 
 local int kvsfile_already(kvsfile *op,KF_ENT *nep) noex {
 	hdb_datum	key ;
@@ -749,8 +732,7 @@ local int kvsfile_already(kvsfile *op,KF_ENT *nep) noex {
 	rs = hdb_fetch(op->kvlp,key,nullptr,&val) ;
 #endif /* COMMENT */
 	return rs ;
-}
-/* end subroutine (kvsfile_already) */
+} /* end subroutine (kvsfile_already) */
 
 local int kvsfile_addentry(kvsfile *op,KF_ENT *nep) noex {
 	cint		esz = szof(KF_ENT) ;
@@ -787,11 +769,10 @@ local int kvsfile_addentry(kvsfile *op,KF_ENT *nep) noex {
 	    } /* end if (keyvals-store) */
 	    if (rs < 0) {
 	        lm_free(ep) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (kvsfile_addentry) */
+} /* end subroutine (kvsfile_addentry) */
 
 local int kvsfile_filedump(kvsfile *op,int fi) noex {
 	KF_ENT		*ep ;
@@ -834,8 +815,7 @@ local int kvsfile_filedump(kvsfile *op,int fi) noex {
 	    } /* end if (cursor) */
 	} /* end if (ok) */
 	return rs ;
-}
-/* end subroutine (kvsfile_filedump) */
+} /* end subroutine (kvsfile_filedump) */
 
 #ifdef	COMMENT
 /* delete a KF_FILE from the list of files (that is all) */
@@ -850,8 +830,7 @@ local int kvsfile_filedel(kvsfile *op,int fi) noex {
 	    rs = flp->del(fi) ;
 	}
 	return rs ;
-}
-/* end subroutine (kvsfile_filedel) */
+} /* end subroutine (kvsfile_filedel) */
 #endif /* COMMENT */
 
 local int file_start(KF_FILE *fep,cchar *fname) noex {
@@ -863,8 +842,7 @@ local int file_start(KF_FILE *fep,cchar *fname) noex {
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_start) */
+} /* end subroutine (file_start) */
 
 local int file_finish(KF_FILE *fep) noex {
 	int		rs = SR_FAULT ;
@@ -876,11 +854,10 @@ local int file_finish(KF_FILE *fep) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        fep->fname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (file_finish) */
+} /* end subroutine (file_finish) */
 
 local int key_start(KF_KEY *kep,cchar *kname) noex {
 	int		rs = SR_FAULT ;
@@ -894,8 +871,7 @@ local int key_start(KF_KEY *kep,cchar *kname) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (key_start) */
+} /* end subroutine (key_start) */
 
 local int key_finish(KF_KEY *kep) noex {
 	int		rs = SR_FAULT ;
@@ -907,12 +883,11 @@ local int key_finish(KF_KEY *kep) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        kep->kname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    kep->count = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (key_finish) */
+} /* end subroutine (key_finish) */
 
 local int key_increment(KF_KEY *kep) noex {
 	int		rs = SR_FAULT ;
@@ -920,8 +895,7 @@ local int key_increment(KF_KEY *kep) noex {
 	    rs = ++kep->count ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (key_increment) */
+} /* end subroutine (key_increment) */
 
 local int key_decrement(KF_KEY *kep) noex {
 	int		rs = SR_FAULT ;
@@ -932,8 +906,7 @@ local int key_decrement(KF_KEY *kep) noex {
 	    rs = kep->count ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (key_decrement) */
+} /* end subroutine (key_decrement) */
 
 local int entry_start(KF_ENT *ep,int fi,int ki,
 		KF_KEY *kep,cchar *vp,int vl) noex {
@@ -950,8 +923,7 @@ local int entry_start(KF_ENT *ep,int fi,int ki,
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 local int entry_finish(KF_ENT *ep) noex {
 	int		rs = SR_FAULT ;
@@ -971,8 +943,7 @@ local int entry_finish(KF_ENT *ep) noex {
 	    } /* end if (occupied) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 local int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
 	KF_FILE		*e1p = (KF_FILE *) *v1pp ;
@@ -990,8 +961,7 @@ local int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpfname) */
+} /* end subroutine (vcmpfname) */
 
 local int vcmpkey(cvoid **v1pp,cvoid **v2pp) noex {
 	KF_KEY		*e1p = (KF_KEY *) *v1pp ;
@@ -1009,8 +979,7 @@ local int vcmpkey(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpkey) */
+} /* end subroutine (vcmpkey) */
 
 local int cmpkeyval(cvoid *v1p,cvoid *v2p,int) noex {
 	KF_ENT		*e1p = (KF_ENT *) v1p ;
@@ -1020,8 +989,7 @@ local int cmpkeyval(cvoid *v1p,cvoid *v2p,int) noex {
 	    rc = strcmp(e1p->vname,e2p->vname) ;
 	}
 	return rc ;
-}
-/* end subroutine (cmpkeyval) */
+} /* end subroutine (cmpkeyval) */
 
 local uint hashkeyval(cvoid *vp,int) noex {
 	KF_ENT		*ep = entp(vp) ;
@@ -1032,7 +1000,6 @@ local uint hashkeyval(cvoid *vp,int) noex {
 	    hv += hash_elf(ep->vname,-1) ;
 	}
 	return hv ;
-}
-/* end subroutine (hashkeyval) */
+} /* end subroutine (hashkeyval) */
 
 
