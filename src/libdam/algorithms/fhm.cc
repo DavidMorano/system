@@ -1,4 +1,4 @@
-/* fhm SUPPORT */
+/* fhm SUPPORT (Floating-Harmonic-Mean) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
