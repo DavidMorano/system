@@ -40,19 +40,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LINU */
+#include	<utypedefs.h>		/* LINU */
+#include	<utypealiases.h>	/* LINU */
+#include	<usysdefs.h>		/* LINU */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<mkchar.h>		/* LINU */
+#include	<localmisc.h>		/* LINU */
 
 #include	"nchr.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
@@ -93,8 +93,8 @@ constexpr bool		f_strnchr = CF_STRNCHR ;
 
 int nchr(cchar *sp,int sl,int sch) noex {
     	cnullptr	np{} ;
-	int		n = -1 ;
-	if (sp) {
+	int		n = -1 ; /* return-value */
+	if (sp) ylikely {
 	    n = 0 ;
 	    if_constexpr (f_strnchr) {
 	        if (sl < 0) sl = lenstr(sp) ;
@@ -112,7 +112,6 @@ int nchr(cchar *sp,int sl,int sch) noex {
 	    } /* end if_constexpr (f_strnchr) */
 	} /* end if (non-null) */
 	return n ;
-}
-/* end subroutine (nchr) */
+} /* end subroutine (nchr) */
 
 
