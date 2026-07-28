@@ -431,7 +431,7 @@ local int pingstatsb_updates(PSD *op,cc *hn,int f_up,time_t ts) noex {
 	int		rs1 ;
 	int		fchanged = false ; /* return-value */
 	nowp->time = dt ;
-	if (dater d ; (rs = d.start(nowp,op->znbuf,-1)) >= 0) {
+	if (dater d ; (rs = d.start(nowp,op->znbuf,-1)) >= 0) ylikely {
 	    if ((ts == 0) || (ts > dt)) {
 	        ts = dt ;
 	    }
@@ -440,20 +440,24 @@ local int pingstatsb_updates(PSD *op,cc *hn,int f_up,time_t ts) noex {
 	        rs = vechand_count(op->rlp) ;
 	        DEBUGPRINTF("entries in cache %d\n",rs) ;
 	    }
-	    if ((rs = pingstatdb_recupd(op,dt,&d,hn,f_up,ts)) >= 0) {
+	    if ((rs = pingstatdb_recupd(op,dt,&d,hn,f_up,ts)) >= 0) ylikely {
 		cchar *luh = LASTUPDATE ;
 	        fchanged = (rs > 0) ;
                 /* update the LASTUPDATE record */
-	        rs = pingstatdb_recupd(op,dt,&d,luh,f_up,ts) ;
-                /* udpate our last modification time */
-	        op->mtime = dt ;
-	        bcontrol(op->pfp,BC_SYNC,0) ;
+	        if ((rs = pingstatdb_recupd(op,dt,&d,luh,f_up,ts)) >= 0) {
+                    /* udpate our last modification time */
+	            op->mtime = dt ;
+	            rs = bcontrol(op->pfp,BC_SYNC,0) ;
+		}
 	    } /* end if (pingstatdb_recupd) */
-	    rs1 = dater_finish(&d) ;
+	    rs1 = d.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dater) */
-	op->fl.writelocked = false ;
-	bcontrol(op->pfp,BC_UNLOCK,0) ;
+	{
+	    op->fl.writelocked = false ;
+	    rs1 = bcontrol(op->pfp,BC_UNLOCK,0) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return (rs >= 0) ? fchanged : rs ;
 } /* end subroutine (pingstatdb_updates) */
 
@@ -492,7 +496,7 @@ int pingstatdb_update(PSD *op,cchar *hn,int f_up,time_t ts) noex {
 int pingstatdb_check(PSD *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pingstatdb_magic(op)) >= 0) {
+	if ((rs = pingstatdb_magic(op)) >= 0) ylikely {
 	    if (dt == 0) dt = getustime ;
 	    if (op->fl.readlocked) {
 	        op->fl.readlocked = false ;
@@ -503,7 +507,7 @@ int pingstatdb_check(PSD *op,time_t dt) noex {
 	        rs = bcontrol(op->pfp,BC_LOCKWRITE,TO_LOCK) ;
 	        op->fl.writelocked = (rs >= 0) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        {
 	            rs1 = pingstatdb_checkcache(op) ;
 	            if (rs >= 0) rs = rs1 ;
