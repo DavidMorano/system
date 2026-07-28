@@ -5,7 +5,6 @@
 /* object to manipulate a PINGSTATDB file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -125,10 +124,6 @@ import sif ;
 
 #define	LASTUPDATE	"*LAST_UPDATE*"
 
-#ifndef	CF_DEBUG
-#define	CF_DEBUG	0		/* non-switchable debug print-outs */
-#endif
-
 #define	DEBUGPRINTT(str,tval)		\
     	if_constexpr (f_debug) {	\
 	    debugprintt(str,tval) ;	\
@@ -177,8 +172,6 @@ local int debugprintt(cchar *,time_t) noex ;
 
 
 /* local variables */
-
-cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -266,7 +259,7 @@ int record_load(PSD_REC *rep,uint roff,cchar *sp,int sl) noex {
 	int		rs = SR_BUGCHECK ;
 	DEBUGPRINTF("ent\n") ;
 	if (rep && sp) ylikely {
-	    if (loader lo(rep,sp,sl) ; (rs = lo) >= 0) {
+	    if (loader lo(rep,sp,sl) ; (rs = lo) >= 0) ylikely {
 		rep->roff = roff ;
 		rep->len = sl ;
 	    } /* end if (loader) */
