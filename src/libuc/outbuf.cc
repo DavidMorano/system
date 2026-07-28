@@ -32,14 +32,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizevar.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"outbuf.h"
 
@@ -89,8 +89,7 @@ int outbuf_start(outbuf *op,char *obuf,int olen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (outbuf_start) */
+} /* end subroutine (outbuf_start) */
 
 int outbuf_finish(outbuf *op) noex {
 	int		rs = SR_FAULT ;
@@ -101,12 +100,11 @@ int outbuf_finish(outbuf *op) noex {
 	        rs1 = lm_free(op->obuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->obuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->falloc = false ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (outbuf_finish) */
+} /* end subroutine (outbuf_finish) */
 
 int outbuf_get(outbuf *op,cchar **onpp) noex {
 	int		rs = SR_FAULT ;
@@ -123,7 +121,7 @@ int outbuf_get(outbuf *op,cchar **onpp) noex {
 	                op->falloc = true ;
 	                op->obuf[0] = '\0' ;
 	                *onpp = op->obuf ;
-	            }
+	            } /* end if (memory-acquire) */
 	        } else {
 	            op->obuf[0] = '\0' ;
 	            *onpp = op->obuf ;
@@ -132,8 +130,7 @@ int outbuf_get(outbuf *op,cchar **onpp) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (outbuf_get) */
+} /* end subroutine (outbuf_get) */
 
 int outbuf::start(char *ob,int ol) noex {
 	return outbuf_start(this,ob,ol) ;
