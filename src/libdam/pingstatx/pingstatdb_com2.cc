@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* object to manipulate a PINGSTATDB file */
+/* common subroutines for PINGSTATDB */
 /* version %I% last-modified %G% */
 
 
@@ -21,8 +21,7 @@
 	pingstatdb_com
 
   	Description:
-	This subroutine maintains a PINGSTATDB file.  These files
-	are used to maintain the names and status of a PING event.
+	These are support subroutines for the PINGSTATDB object.
 
 	Synopsis:
 
@@ -221,7 +220,7 @@ updater::operator int () noex {
 
 int updater::updolder(PSD_REC *rep) noex {
 	int		rs ;
-	if ((rs = updold(rep)) >= 0) {
+	if ((rs = updold(rep)) >= 0) ylikely {
 	    rs = enter(rep) ;
 	}
 	return rs ;
@@ -254,7 +253,7 @@ int updater::updold(PSD_REC *rep) noex {
 
 int updater::updnewer() noex {
     	int		rs ;
-	if ((rs = dp->settimezn(ta,op->znbuf)) >= 0) {
+	if ((rs = dp->settimezn(ta,op->znbuf)) >= 0) ylikely {
 	    rs = updnew() ;
 	} /* end if (dater_settimezn) */
 	return rs ;
@@ -265,11 +264,11 @@ int updater::updnew() noex {
 	cnothrow	nt{} ;
 	cchar		*zn = op->znbuf ;
 	int		rs ;
-	if (off_t off ; (rs = seekend(&off)) >= 0) {
+	if (off_t off ; (rs = seekend(&off)) >= 0) ylikely {
 	    const uint	roff = conv<uint>(off) ;
 	    rs = SR_NOMEM ;
-	    if (PSD_REC *rep = new(nt) PSD_REC ; rep) {
-	        if ((rs = record_start(rep,nowp,zn,roff,hn)) >= 0) {
+	    if (PSD_REC *rep = new(nt) PSD_REC ; rep) ylikely {
+	        if ((rs = record_start(rep,nowp,zn,roff,hn)) >= 0) ylikely {
 		    rs = enter(rep) ;
 		    if (rs < 0) {
 	    	        record_finish(rep) ;
@@ -286,7 +285,7 @@ int updater::updnew() noex {
 int updater::seekend(off_t *fop) noex {
     	bfile		*pfp = op->pfp ;
     	int		rs ;
-	if ((rs = pfp->seek(0z,SEEK_END)) >= 0) {
+	if ((rs = pfp->seek(0z,SEEK_END)) >= 0) ylikely {
 	    rs = pfp->tell(fop) ;
 	}
 	return rs ;
@@ -294,7 +293,7 @@ int updater::seekend(off_t *fop) noex {
 
 int updater::enter(PSD_REC *rep) noex {
     	int		rs ;
-	if ((rs = record_update(rep,op->pfp,dp,int(f_up))) >= 0) {
+	if ((rs = record_update(rep,op->pfp,dp,int(f_up))) >= 0) ylikely {
 	    vechand *rlp = op->rlp ;
 	    DEBUGPRINTF("record_update() rs=%d\n", rs) ;
 	    rs = rlp->add(rep) ;
