@@ -35,18 +35,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<ascii.h>
-#include	<buffer.h>
-#include	<mkchar.h>
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"comparse.h"
 
@@ -138,8 +138,7 @@ int comparse_start(comparse *op,cchar *sp,int µsl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (comparse_start) */
+} /* end subroutine (comparse_start) */
 
 int comparse_finish(comparse *op) noex {
 	int		rs ;
@@ -150,18 +149,17 @@ int comparse_finish(comparse *op) noex {
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->val.sp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->com.sp) ylikely {
 		void *vp = voidp(op->com.sp) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->com.sp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (comparse_finish) */
+} /* end subroutine (comparse_finish) */
 
 int comparse_getval(comparse *op,cchar **rpp) noex {
 	int		rs ;
@@ -170,8 +168,7 @@ int comparse_getval(comparse *op,cchar **rpp) noex {
 	    if (op->val.sp) rs = op->val.sl ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (comparse_getval) */
+} /* end subroutine (comparse_getval) */
 
 int comparse_getcom(comparse *op,cchar **rpp) noex {
 	int		rs ;
@@ -180,8 +177,7 @@ int comparse_getcom(comparse *op,cchar **rpp) noex {
 	    if (op->com.sp) rs = op->com.sl ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (comparse_getcom) */
+} /* end subroutine (comparse_getcom) */
 
 
 /* private subroutines */
@@ -196,7 +192,7 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	while ((sl > 0) && chiswh(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
-	}
+	} /* end while */
 	if ((rs = buffer_start(&as[0],defsz)) >= 0) ylikely {
 	    if ((rs = buffer_start(&as[1],defsz)) >= 0) ylikely {
 	        int	pstate = state_value ;
@@ -290,13 +286,13 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	            } /* end switch */
 		    if (rs < 0) break ;
 	        } /* end while (scanning characters) */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            int		w = state_comment ;
 	            if (cchar *bp ; (rs = buffer_get((as+w),&bp)) >= 0) {
 	                int	bl = rs ;
 	                while (bl && chiswh(bp[bl-1])) {
 			    bl -= 1 ;
-			}
+			} /* end while */
 	                if (cchar *cp ; (rs = libmem.strw(bp,bl,&cp)) >= 0) {
 	                    op->com.sp = cp ;
 	                    op->com.sl = bl ;
@@ -326,8 +322,7 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = vl ;
 	} /* end if (buffer) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (comparse_bake) */
+} /* end subroutine (comparse_bake) */
 
 int comparse::start(cchar *sp,int sl) noex {
 	return comparse_start(this,sp,sl) ;
@@ -345,11 +340,11 @@ void comparse::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("comparse",rs,"fini-finish") ;
 	}
-}
+} /* end method (comparse::dtor) */
 
 comparse_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case comparsemem_finish:
 	        rs = comparse_finish(op) ;
@@ -357,8 +352,7 @@ comparse_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (comparse_co::operator) */
+} /* end method (comparse_co::operator) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -369,7 +363,6 @@ vars::operator int () noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
