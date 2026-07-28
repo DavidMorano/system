@@ -41,7 +41,7 @@
 
 struct rpsem_head {
 	sem_t		ps ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 #ifdef	__cplusplus
@@ -81,15 +81,15 @@ struct rpsem : rpsem_head {
 	    post	(this,rpsemmem_post) ;
 	    count	(this,rpsemmem_count) ;
 	    destroy	(this,rpsemmem_destroy) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	rpsem(const rpsem &) = delete ;
 	rpsem &operator = (const rpsem &) = delete ;
-	int create(int = 0,int = -1) noex ;
-	operator int () noex ;
+	int create	(int = 0,int = -1) noex ;
+	operator int 	() noex ;
 	void dtor() noex ;
 	destruct rpsem() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (rpsem) */
 #else	/* __cplusplus */
