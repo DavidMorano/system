@@ -75,13 +75,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<char.h>		/* |char_toval(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<char.h>		/* LIBUC |char_toval(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"digval.h"
 
@@ -155,30 +155,25 @@ int digval(int ch) noex {
 	int		v = char_toval(ch) ; /* base-64 decode */
 	if (v == UCHAR_MAX) v = SR_DOM ;
 	return v ;
-}
-/* end subroutine (digval) */
+} /* end subroutine (digval) */
 
 int digvalbin(int ch) noex {
     	return digvalx('1',ch) ;
-}
-/* end subroutine (digvalbin) */
+} /* end subroutine (digvalbin) */
 
 int digvaloct(int ch) noex {
     	return digvalx('7',ch) ;
-}
-/* end subroutine (digvaloct) */
+} /* end subroutine (digvaloct) */
 
 int digvaldec(int ch) noex {
     	return digvalx('9',ch) ;
-}
-/* end subroutine (digvaldec) */
+} /* end subroutine (digvaldec) */
 
 int digvalhex(int ch) noex {
 	int		v = hexdecode.hextab[ch & UCHAR_MAX] ;
 	if (v == UCHAR_MAX) v = SR_DOM ;
 	return v ;
-}
-/* end subroutine (digvalhex) */
+} /* end subroutine (digvalhex) */
 
 #ifdef	COMMENT /* previous code */
 int digvalhex(int ch) noex {
@@ -191,8 +186,7 @@ int digvalhex(int ch) noex {
 	    }
 	}
 	return v ;
-}
-/* end subroutine (digvalhex) */
+} /* end subroutine (digvalhex) */
 #endif /* COMMENT */
 
 
