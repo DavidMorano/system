@@ -1,4 +1,4 @@
-/* fam SUPPORT */
+/* fam SUPPORT (Floating-Arithmetic-Mean) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
