@@ -26,11 +26,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"conmsghdr.h"
 
@@ -66,17 +66,20 @@
 
 int conmsghdr_passed(CONMSGHDR *cmp) noex {
 	cint		fdlen = sizeof(int) ;
-	int		fd = -1 ;
-	int		*ip = (int *) CMSG_DATA(cmp) ;
-	int		f = true ;
-	f = f && (cmp->cmsg_level == SOL_SOCKET) ;
-	f = f && (cmp->cmsg_len == CMSG_LEN(fdlen)) ;
-	f = f && (cmp->cmsg_type == SCM_RIGHTS) && ip ;
-	if (f) {
-	    fd = *ip ;
-	}
-	return fd ;
-}
-/* end subroutine (conmsghdr_passed) */
+	int		rs = SR_FAULT ;
+	int		fd = -1 ; /* return-value */
+	if (cmp) ylikely {
+	    int		*ip = (int *) CMSG_DATA(cmp) ;
+	    bool	f = true ;
+	    rs = SR_OK ;
+	    f = f && (cmp->cmsg_level == SOL_SOCKET) ;
+	    f = f && (cmp->cmsg_len == CMSG_LEN(fdlen)) ;
+	    f = f && (cmp->cmsg_type == SCM_RIGHTS) && ip ;
+	    if (f) {
+	        fd = *ip ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? fd : rs ;
+} /* end subroutine (conmsghdr_passed) */
 
 
