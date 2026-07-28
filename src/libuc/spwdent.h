@@ -13,20 +13,20 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<spwd.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<spwd.h>		/* ?? */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int spwdent_load(SPWD *,char *,int,CSPWD *) noex ;
-extern int spwdent_parse(SPWD *,char *,int,cchar *,int) noex ;
-extern int spwdent_size(CSPWD *) noex ;
-extern int spwdent_format(CSPWD *,char *,int) noex ;
+extern int spwdent_load		(SPWD *,char *,int,CSPWD *) noex ;
+extern int spwdent_parse	(SPWD *,char *,int,cchar *,int) noex ;
+extern int spwdent_size		(CSPWD *) noex ;
+extern int spwdent_format	(CSPWD *,char *,int) noex ;
 
 EXTERNC_end
 
