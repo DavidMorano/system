@@ -46,29 +46,30 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>
-#include	<usystem.h>
-#include	<vecstr.h>
-#include	<bfile.h>
-#include	<uterm.h>
-#include	<ascii.h>
-#include	<sbuf.h>
-#include	<spawnproc.h>
-#include	<keysym.h>
-#include	<mktmp.h>
-#include	<mailmsg.h>
-#include	<keysymer.h>
-#include	<toxc.h>
-#include	<hasx.h>
-#include	<ischarx.h>
-#include	<instr.h>
-#include	<localmisc.h>
-#include	<debug.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uterm.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<keysym.h>		/* LIBUC */
+#include	<mktmp.h>		/* LIBUC */
+#include	<mailmsg.h>		/* LIBUC */
+#include	<keysymer.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<instr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"defs.h"
@@ -77,8 +78,6 @@
 #include	"mailmsgfile.h"
 #include	"mailmsgviewer.h"
 #include	"cmdmap.h"
-#include	"readcmdkey.h"
-#include	"termcmd.h"
 
 
 /* local defines */
