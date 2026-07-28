@@ -1,4 +1,5 @@
 /* stubrpc SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* stub RPC functions */
@@ -30,10 +31,10 @@
 
 
 struct key_netstarg {
-	char		st_priv_key[STUBRPC_HEXKEYBYTES+1] ;
-	char		st_pub_key[STUBRPC_HEXKEYBYTES+1] ;
+	char		st_priv_key	[STUBRPC_HEXKEYBYTES+1] ;
+	char		st_pub_key	[STUBRPC_HEXKEYBYTES+1] ;
 	char		*st_netname ;
-} ;
+} ; /* end struct (key_netstarg) */
 
 typedef STUBRPC_KEYNETSTARG	key_netstarg ;
 
