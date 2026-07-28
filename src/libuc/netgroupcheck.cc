@@ -40,17 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<netdb.h>		/* |innetgr(3nsl)| */
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<netdb.h>		/* POSIXO |innetgr(3nsl)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"netgroupcheck.h"
 
@@ -77,15 +75,16 @@
 
 int netgroupcheck(cchar *dname,vecstr *glp,vecstr *nlp) noex {
 	int		rs = SR_FAULT ;
-	int		f = false ;
-	if (dname && glp && nlp) {
+	int		f = false ; /* return-value */
+	if (dname && glp && nlp) ylikely {
 	    rs = SR_INVALID ;
-	    if (dname[0]) {
-	        cchar		*ngp ;
-	        for (int i = 0 ; vecstr_get(glp,i,&ngp) >= 0 ; i += 1) {
+	    if (dname[0]) ylikely {
+	        cchar	*ngp ;
+		rs = SR_OK ;
+	        for (int i = 0 ; glp->get(i,&ngp) >= 0 ; i += 1) {
 	            if (ngp) {
-		        cchar		*mnp ;
-	                for (int j = 0 ; vecstr_get(nlp,j,&mnp) >= 0 ; j += 1) {
+		        cchar	*mnp ;
+	                for (int j = 0 ; nlp->get(j,&mnp) >= 0 ; j += 1) {
 	                    if (mnp) {
 			        cint	ch = mkchar(mnp[0]) ;
 	                        if (! isdigitlatin(ch)) {
@@ -94,13 +93,12 @@ int netgroupcheck(cchar *dname,vecstr *glp,vecstr *nlp) noex {
 			        }
 		            }
 	                } /* end for (machine names) */
-		    }
+		    } /* end if */
 		    if (f || (rs < 0)) break ;
 	        } /* end for (netgroups) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (netgroupcheck) */
+} /* end subroutine (netgroupcheck) */
 
 
