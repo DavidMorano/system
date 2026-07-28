@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	GECOS		struct gecos_head
@@ -94,10 +94,10 @@ typedef GECOS		gecos ;
 
 EXTERNC_begin
 
-extern int	gecos_start(gecos *,cchar *,int) noex ;
-extern int	gecos_compose(gecos *,char *,int) noex ;
-extern int	gecos_getval(gecos *,int,cchar **) noex ;
-extern int	gecos_finish(gecos *) noex ;
+extern int	gecos_start	(gecos *,cchar *,int) noex ;
+extern int	gecos_compose	(gecos *,char *,int) noex ;
+extern int	gecos_getval	(gecos *,int,cchar **) noex ;
+extern int	gecos_finish	(gecos *) noex ;
 
 EXTERNC_end
 
