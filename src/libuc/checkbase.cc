@@ -41,12 +41,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"checkbase.h"
 
@@ -91,7 +91,6 @@ int checkbase(cchar *sp,int sl,int b) noex {
 	    rs = (hasallbase(sp,sl,b)) ? SR_OK : SR_DOM ;
 	}
 	return rs ;
-}
-/* end subroutine (checkbase) */
+} /* end subroutine (checkbase) */
 
 
