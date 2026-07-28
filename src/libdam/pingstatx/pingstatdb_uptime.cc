@@ -222,8 +222,8 @@ uptimer::operator int () noex {
 	if ((rs = readoff()) >= 0) ylikely {
 	    if ((rs = lockon()) >= 0) ylikely {
 		if ((rs = pingstatdb_checkcache(op)) >= 0) ylikely {
-		    if ((rs = daterbeg()) >= 0) {
-			if ((rs = decide()) >= 0) {
+		    if ((rs = daterbeg()) >= 0) ylikely {
+			if ((rs = decide()) >= 0) ylikely {
 			    fchanged = int(rs > 0) ;
 			    rs = done() ;
 			} /* end if (decide) */
@@ -262,7 +262,7 @@ int uptimer::lockoff() noex {
     	int		rs = SR_OK ;
 	if (op->fl.writelocked) {
 	    op->fl.writelocked = false ;
-	    rs = bcontrol(op->pfp,BC_UNLOCK,0) ;
+	    rs = pfp->control(BC_UNLOCK,0) ;
 	}
 	return rs ;
 } /* end method (uptimer::lockoff) */
@@ -272,10 +272,10 @@ int uptimer::daterbeg() noex {
 	timeb		*nowp = op->nowp ;
     	int		rs = SR_NOMEM ;
 	cchar		*zn = op->znbuf ;
-	if (cdp = new(nt) dater ; cdp) {
-	    if (cdp = new(nt) dater ; cdp) {
-		if ((rs = cdp->start(nowp,zn)) >= 0) {
-		    if ((rs = udp->start(nowp,zn)) >= 0) {
+	if (cdp = new(nt) dater ; cdp) ylikely {
+	    if (cdp = new(nt) dater ; cdp) ylikely {
+		if ((rs = cdp->start(nowp,zn)) >= 0) ylikely {
+		    if ((rs = udp->start(nowp,zn)) >= 0) ylikely {
 			ts = conv<uint>(cdp->cb.time) ;
 		    } /* end if (dater_start) */
 		    if (rs < 0) {
@@ -323,7 +323,7 @@ int uptimer::daterend() noex {
 
 int uptimer::sync() noex {
     	int		rs = SR_BUGCHECK ;
-	if (pfp) {
+	if (pfp) ylikely {
 	    op->mtime = dt ;
 	    rs = pfp->control(BC_SYNC,0) ;
 	} /* end if (non-null) */
@@ -344,7 +344,7 @@ int uptimer::decide() noex {
     	int		rsn = SR_NOTFOUND ;
     	int		rs = SR_BUGCHECK ;
 	int		fchanged = false ;
-	if ((rs = timestamp()) >= 0) {
+	if ((rs = timestamp()) >= 0) ylikely {
 	    if (PSD_REC *rep ; (rs = pingstatdb_recget(op,hn,&rep)) >= 0) {
 		rs = upold(rep) ;
 		fchanged = int(rs > 0) ;
@@ -397,7 +397,7 @@ int uptimer::upold(PSD_REC *rep) noex {
 	        f = f || ((intconv(dt - ptime) > to_upd) && f_greater) ;
 		if ((rs >= 0) && f) {
 	            coff boff = rep->roff ;
-	            if ((rs = bseek(op->pfp,boff,SEEK_SET)) >= 0) {
+	            if ((rs = pfp->seek(boff,SEEK_SET)) >= 0) {
 			cauto rec_wr = bind_front(record_write,rep) ;
 	                rs = rec_wr(op->pfp,tdp,udp,up->count,f_up) ;
 	                DEBUGPRINTF("record_write() rs=%d\n",rs) ;
@@ -412,19 +412,17 @@ int uptimer::upold(PSD_REC *rep) noex {
 int uptimer::upnew() noex {
     	int		rs ;
 	int		fchanged = false ; /* return-value */
-	bool		f_rec = false ;
 	cchar		*zn = op->znbuf ;
 	DEBUGPRINTF("ent\n") ;
-	(void) f_rec ;
 	if (time_t t = time_t(ts) ; (rs = udp->settimezn(t,op->znbuf)) >= 0) {
 	    uint ts_chg = 0 ;
 	    if ((ts_chg = up->timechange) == 0) {
 	        ts = conv<uint>(dt) ;
 	    }
 	    t = time_t(ts_chg) ;
-	    if ((rs = cdp->settimezn(t,zn)) >= 0) {
+	    if ((rs = cdp->settimezn(t,zn)) >= 0) ylikely {
 	        fchanged = true ;
-		if (off_t off ; (rs = seekend(&off)) >= 0) {
+		if (off_t off ; (rs = seekend(&off)) >= 0) ylikely {
 		    con uint roff = conv<uint>(off) ;
 		    rs = enter(roff) ;
 		} /* end if (seekend) */
@@ -440,19 +438,18 @@ int uptimer::enter(uint roff) noex {
     	int		rs = SR_NOMEM ;
 	cchar		*zn = op->znbuf ;
 	DEBUGPRINTF("ent\n") ;
-	if (PSD_REC *rep = new(nt) PSD_REC ; rep) {
+	if (PSD_REC *rep = new(nt) PSD_REC ; rep) ylikely {
 	    cauto 	rec_st = bind_front(record_start,rep) ;
 	    cauto 	rec_wr = bind_front(record_write,rep) ;
 	    cauto 	rec_fi = bind_front(record_finish,rep) ;
-	    if ((rs = rec_st(nowp,zn,roff,hn)) >= 0) {
+	    if ((rs = rec_st(nowp,zn,roff,hn)) >= 0) ylikely {
 		cint cnt = up->count ;
-	        bool f_rec = true ;
-	        if ((rs = rec_wr(op->pfp,udp,cdp,cnt,f_up)) >= 0) {
+	        if ((rs = rec_wr(op->pfp,udp,cdp,cnt,f_up)) >= 0) ylikely {
 		    vechand *rlp = op->rlp ;
 	            DEBUGPRINTF("record_write() rs=%d\n", rs) ;
 	            rs = rlp->add(rep) ;
 		} /* end if (record_write) */
-	        if ((rs < 0) && f_rec) {
+	        if (rs < 0) {
 	            rec_fi() ;
 	        } /* end if (error) */
 	    } /* end if (record_start) */
@@ -471,7 +468,7 @@ int uptimer::uplast() noex {
 
 int uptimer::done() noex {
     	int		rs ;
-	if ((rs = uplast()) >= 0) {
+	if ((rs = uplast()) >= 0) ylikely {
 	    rs = sync() ;
 	}
 	return rs ;
@@ -479,7 +476,7 @@ int uptimer::done() noex {
 
 int uptimer::seekend(off_t *fop) noex {
     	int		rs ;
-	if ((rs = pfp->seek(0z,SEEK_END)) >= 0) {
+	if ((rs = pfp->seek(0z,SEEK_END)) >= 0) ylikely {
 	    rs = pfp->tell(fop) ;
 	}
 	return rs ;
