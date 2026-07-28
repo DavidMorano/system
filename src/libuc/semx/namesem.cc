@@ -107,7 +107,7 @@ template<typename ... Args>
 local inline int namesem_magic(namesem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == NAMESEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == NAMESEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (namesem_magic) */
@@ -152,8 +152,8 @@ int namesem_open(namesem *op,cchar *name,int of,mode_t om,uint c) noex {
 				rs = namesemdiradd(nn,om) ;
 			    }
 			    if (rs >= 0) {
-	                        op->magic = NAMESEM_MAGIC ;
-			    }
+	                        op->magval = NAMESEM_MAGIC ;
+			    } /* end if (ok) */
 			    if (rs < 0) {
 				lm_free(op->name) ;
 				op->name = nullptr ;
@@ -181,8 +181,8 @@ int namesem_close(namesem *op) noex {
 		rs1 = lm_free(op->name) ;
 		if (rs >= 0) rs = rs1 ;
 		op->name = nullptr ;
-	    }
-	    op->magic = 0 ;
+	    } /* end if (error) */
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (namesem_close) */
@@ -193,7 +193,7 @@ int namesem_wait(namesem *op) noex {
 	if ((rs = namesem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_wait(op->sp)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
@@ -206,7 +206,7 @@ int namesem_waiti(namesem *op) noex {
 	assert(op) ;
 	if ((rs = namesem_magic(op)) >= 0) ylikely {
 	   if ((rs = sem_wait(op->sp)) < 0) {
-	       rs = (- errno) ;
+	       rs = (neg errno) ;
 	   }
 	} /* end if (magic) */
 	return rs ;
@@ -223,7 +223,7 @@ int namesem_waiter(namesem *op,int to) noex {
 	    bool	f_exit = false ;
 	    repeat {
 	        if ((rs = sem_trywait(op->sp)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		    switch (rs) {
 	    	    case SR_AGAIN:
 		        if (c++ < cto) {
@@ -251,7 +251,7 @@ int namesem_trywait(namesem *op) noex {
 	if ((rs = namesem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_trywait(op->sp)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
@@ -264,7 +264,7 @@ int namesem_post(namesem *op) noex {
 	if ((rs = namesem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_post(op->sp)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
@@ -317,10 +317,10 @@ int namesemunlink(cchar *name) noex {
 	    rs = SR_INVALID ;
 	    if (name[0]) ylikely {
 		cchar	*nn ;
-		if (posname pn ; (rs = pn.start(name,-1,&nn)) >= 0) {
+		if (posname pn ; (rs = pn.start(name,-1,&nn)) >= 0) ylikely {
 	            repeat {
 	                if ((rs = sem_unlink(nn)) < 0) {
-			    rs = (- errno) ;
+			    rs = (neg errno) ;
 			}
 	            } until (rs != SR_INTR) ;
 		    if_constexpr (f_condunlink) {
@@ -355,7 +355,7 @@ local int namesemopen(namesem *op,cc *name,int of,mode_t om,int c) noex {
         repeat {
             rs = SR_OK ;
 	    if ((op->sp = sem_open(name,of,om,c)) == SEM_FAILED) {
-                rs = (- errno) ;
+                rs = (neg errno) ;
                 r(rs) ;                 /* <- default causes exit */
 	        switch (rs) {
 	        case SR_MFILE:
@@ -385,7 +385,7 @@ local int namesemclose(namesem *op) noex {
 	if (op->sp) ylikely {
 	    repeat {
 	        if ((rs = sem_close(op->sp)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    } until (rs != SR_INTR) ;
 	    op->sp = nullptr ;
