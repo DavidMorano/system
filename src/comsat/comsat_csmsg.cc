@@ -104,6 +104,9 @@
 #include	"defs.h"
 #include	"progcs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -662,7 +665,7 @@ static int getdateinfo(PI *pip,char *abuf,int alen,cchar *ap,int al,
 	        time_t	mt ;
 	        if ((rs = dater_gettime(&pip->d,&mt)) >= 0) {
 		    TMTIME	tm ;
-		    if ((rs = tmtime_localtime(&tm,mt)) >= 0) {
+		    if ((rs = tmtime_timelocal(&tm,mt)) >= 0) {
 			rs = sntmtime(abuf,alen,&tm,"%R") ;
 			len = rs ;
 #if	CF_DEBUG
