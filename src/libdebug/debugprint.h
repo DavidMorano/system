@@ -25,8 +25,17 @@
 #include	<usysbase.h>		/* LIBU */
 
 
+#ifdef	__cplusplus
+#define DEBUGPRINTF(FMT, ...)	({ 				\
+	int rsdebug = 0 ;					\
+        if_constexpr (f_debug) {				\
+            rsdebug = debugprintx(__func__, FMT __VA_OPT__(,) __VA_ARGS__) ; \
+        } ; rsdebug ; \
+    })
+#else /* __cplusplus */
 #define DEBUGPRINTF(FMT, ...)					\
     debugprintx(__func__,FMT __VA_OPT__(,) __VA_ARGS__)
+#endif /* __cplusplus */
 
 #define DEBUGCLOSE(FMT, ...)					\
 	debugclose() ;
@@ -64,6 +73,7 @@ inline int debugprint(cchar *sp) noex {
 }
 
 #endif /* __cplusplus */
+
 
 #endif /* DEBUGPRINT_INCLUDE */
 
