@@ -85,16 +85,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<sbuf.h>
-#include	<ascii.h>
-#include	<strn.h>		/* |strnbrk(3uc)| */
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnbrk(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"gecos.h"
 
@@ -158,19 +158,19 @@ namespace {
 
 /* forward references */
 
-static int	gecos_storeit(gecos *,sbuf *,int) noex ;
-static int	gecos_storename(gecos *,sbuf *,cchar *) noex ;
+local int	gecos_storeit(gecos *,sbuf *,int) noex ;
+local int	gecos_storename(gecos *,sbuf *,cchar *) noex ;
 
 
 /* local variables */
 
 constexpr cchar		brkleft[] = {
 	CH_COMMA, CH_LPAREN, '\0'
-} ;
+} ; /* end array */
 
 constexpr cchar		brkright[] = {
 	CH_COMMA, CH_RPAREN, '\0'
-} ;
+} ; /* end array */
 
 constexpr gecoshelp_m	gmems[] = {
 	&gecoshelp::organization,
@@ -204,8 +204,7 @@ int gecos_start(gecos *op,cchar *sp,int sl) noex {
 	    } /* end if (ho) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (gecos_start) */
+} /* end subroutine (gecos_start) */
 
 int gecos_finish(gecos *op) noex {
 	int		rs = SR_FAULT ;
@@ -213,8 +212,7 @@ int gecos_finish(gecos *op) noex {
 	    rs = memclear(op->vals) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (gecos_finish) */
+} /* end subroutine (gecos_finish) */
 
 int gecos_getval(gecos *op,int i,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -228,8 +226,7 @@ int gecos_getval(gecos *op,int i,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (gecos_getval) */
+} /* end subroutine (gecos_getval) */
 
 /* create a c-string from the stored object data */
 int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
@@ -295,18 +292,16 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
             } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (gecos_compose) */
+} /* end subroutine (gecos_compose) */
 
 
 /* private subroutines */
 
-static int gecos_storeit(gecos *op,sbuf *bp,int vi) noex {
+local int gecos_storeit(gecos *op,sbuf *bp,int vi) noex {
 	return bp->strw(op->vals[vi].vp,op->vals[vi].vl) ;
-}
-/* end subroutine (gecos_storeit) */
+} /* end subroutine (gecos_storeit) */
 
-static int gecos_storename(gecos *op,sbuf *bp,cchar *tp) noex {
+local int gecos_storename(gecos *op,sbuf *bp,cchar *tp) noex {
 	int		rs = SR_OK ;
 	int		vi = gecosval_realname ;
 	int		sl ;
@@ -339,8 +334,7 @@ static int gecos_storename(gecos *op,sbuf *bp,cchar *tp) noex {
 	    rs = bp->strw(sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (gecos_storename) */
+} /* end subroutine (gecos_storename) */
 
 int gecoshelp::start() noex {
 	return sl ;
@@ -369,8 +363,7 @@ void gecoshelp::organization() noex {
 	        bl = intconv((sp + sl) - (tp + 1)) ;
 	    } /* end if */
 	} /* end if (organization) */
-}
-/* end method (gecoshelp::organization) */
+} /* end method (gecoshelp::organization) */
 
 void gecoshelp::realname() noex {
 	if (cchar *tp ; (tp = strnbrk(bp,bl,brkleft)) != np) {
@@ -386,8 +379,7 @@ void gecoshelp::realname() noex {
 	    op->vals[gecosval_realname].vl = bl ;
 	    bl = 0 ;
 	} /* end if */
-}
-/* end method (gecoshelp::realname) */
+} /* end method (gecoshelp::realname) */
 
 void gecoshelp::account() noex {
 	if (cchar *tp ; fparen && ((tp = strnbrk(bp,bl,brkright)) != np)) {
@@ -405,8 +397,7 @@ void gecoshelp::account() noex {
 	    op->vals[gecosval_bin].vl = bl ;
 	    bl = 0 ;
 	} /* end if */
-}
-/* end method (gecoshelp::account) */
+} /* end method (gecoshelp::account) */
 
 void gecoshelp::bin() noex {
 	if (fparen) {
@@ -426,8 +417,7 @@ void gecoshelp::bin() noex {
 	        bl = 0 ;
 	    } /* end if */
 	} /* end if (possible printer-bin item) */
-}
-/* end method (gecoshelp::bin) */
+} /* end method (gecoshelp::bin) */
 
 void gecoshelp::office() noex {
 	if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
@@ -444,8 +434,7 @@ void gecoshelp::office() noex {
 	    op->vals[gecosval_office].vl = bl ;
 	    bl = 0 ;
 	} /* end if */
-}
-/* end method (gecoshelp::office) */
+} /* end method (gecoshelp::office) */
 
 void gecoshelp::wphone() noex {
 	if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
@@ -462,8 +451,7 @@ void gecoshelp::wphone() noex {
 	    op->vals[gecosval_office].vl = bl ;
 	    bl = 0 ;
 	} /* end if */
-}
-/* end method (gecoshelp::wphone) */
+} /* end method (gecoshelp::wphone) */
 
 void gecoshelp::hphone() noex {
 	if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
@@ -480,8 +468,7 @@ void gecoshelp::hphone() noex {
 	    op->vals[gecosval_hphone].vl = bl ;
 	    bl = 0 ;
 	} /* end if */
-}
-/* end method (gecoshelp::hphone) */
+} /* end method (gecoshelp::hphone) */
 
 void gecoshelp::printer() noex {
 	if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
@@ -498,16 +485,14 @@ void gecoshelp::printer() noex {
 	    op->vals[gecosval_printer].vl = bl ;
 	    bl = 0 ;
 	} /* end if */
-}
-/* end method (gecoshelp::printer) */
+} /* end method (gecoshelp::printer) */
 
 void gecoshelp::proc() noex {
 	for (cauto &m : gmems) {
 	    (this->*m)() ;
 	    if (bl == 0) break ;
 	} /* end for */
-}
-/* end method (gecoshelp::proc) */
+} /* end method (gecoshelp::proc) */
 
 int gecos::start(cchar *sp,int sl) noex {
 	return gecos_start(this,sp,sl) ;
