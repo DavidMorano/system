@@ -86,11 +86,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucdesclock.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucdesclock.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"lockfile.h"
 
@@ -117,7 +119,6 @@
 
 int lockfile(int fd,int cmd,off_t start,off_t off,int to) noex {
 	return uc_lockfile(fd,cmd,start,off,to) ;
-}
-/* end subroutine (lockfile) */
+} /* end subroutine (lockfile) */
 
 
