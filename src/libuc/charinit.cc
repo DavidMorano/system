@@ -54,15 +54,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bitset>		/* <- the money shot! */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>		/* |UC(3misc)| */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bitset>		/* C++STD the money shot! */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"charinit.h"
 
@@ -120,9 +120,8 @@ constexpr void charinfo::mkiswhite() noex {
 	for (int i = 0 ; w[i] ; i += 1) {
 	    cint	ch = w[i] ;
 	    iswhite.set(ch,true) ;
-	}
-}
-/* end method (charinfo::mkiswhite) */
+	} /* end for */
+} /* end method (charinfo::mkiswhite) */
 
 constexpr void charinfo::mkislc() noex {
 	for (int ch = 'a' ; ch <= 'z' ; ch += 1) {
@@ -133,8 +132,7 @@ constexpr void charinfo::mkislc() noex {
 	}
 	islc.set(UC('÷'),false) ;
 	islc.set(UC('ß'),true) ; 	/* <- this is 'ss' in German */
-}
-/* end method (charinfo::mkislc) */
+} /* end method (charinfo::mkislc) */
 
 constexpr void charinfo::mkisuc() noex {
 	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
@@ -144,8 +142,7 @@ constexpr void charinfo::mkisuc() noex {
 	    isuc.set(ch,true) ;
 	}
 	isuc.set(UC('×'),false) ;
-}
-/* end method (charinfo::mkisuc) */
+} /* end method (charinfo::mkisuc) */
 
 constexpr void charinfo::mktolc() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
@@ -157,8 +154,7 @@ constexpr void charinfo::mktolc() noex {
 	    if (f) nch += 0x20 ;
 	    tolc[ch] = uchar(nch) ;
 	} /* end for */
-}
-/* end method (charinfo::mktolc) */
+} /* end method (charinfo::mktolc) */
 
 constexpr void charinfo::mktouc() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
@@ -170,15 +166,13 @@ constexpr void charinfo::mktouc() noex {
 	    if (f) nch -= 0x20 ;
 	    touc[ch] = uchar(nch) ;
 	} /* end for */
-}
-/* end method (charinfo::mktouc) */
+} /* end method (charinfo::mktouc) */
 
 constexpr void charinfo::mktofc() noex {
     	for (int ch = 0 ; ch < chtablen ; ch += 1) {
 	    tofc[ch] = uchar(ch) ;
-	}
-}
-/* end method (charinfo::mktofc) */
+	} /* end for */
+} /* end method (charinfo::mktofc) */
 
 constexpr void charinfo::mktoval() noex {
         for (int ch = 0 ; ch < chtablen ; ch += 1) {
@@ -196,8 +190,7 @@ constexpr void charinfo::mktoval() noex {
                 toval[ch] = UCHAR_MAX ;
             }
         } /* end for */
-}
-/* end method (charinfo::mktoval) */
+} /* end method (charinfo::mktoval) */
 
 
 /* local variables */
