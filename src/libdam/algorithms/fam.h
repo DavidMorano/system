@@ -1,8 +1,8 @@
-/* fam HEADER */
+/* fam HEADER (Floating-Arithmatic-Mean) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* -c-string comparisons */
+/* this calculates a floating-point arithmetic mean of a set of numbers */
 /* version %I% last-modified %G% */
 
 
