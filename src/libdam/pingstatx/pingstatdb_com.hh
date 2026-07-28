@@ -1,8 +1,8 @@
-/* pingstatdb_util HEADER */
+/* pingstatdb_com HEADER */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* command utilities */
+/* common subroutines for PINGSTATDB */
 /* version %I% last-modified %G% */
 
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	PINGSTATDBUTIL_INCLUDE
-#define	PINGSTATDBUTIL_INCLUDE
+#ifndef	PINGSTATDBCOM_INCLUDE
+#define	PINGSTATDBCOM_INCLUDE
 #ifdef	__cplusplus
 
 
@@ -26,6 +26,6 @@
 
 
 #endif /* __cplusplus */
-#endif /* PINGSTATDBUTIL_INCLUDE */
+#endif /* PINGSTATDBCOM_INCLUDE */
 
 
