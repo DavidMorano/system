@@ -168,7 +168,7 @@ char *convdecux(UT unum,char *endptr) noex {
 template<typename UT,typename ST>
 char *convdecsx(ST snum,char *endptr) noex {
 	char		*bp = nullptr ;
-	if (endptr) {
+	if (endptr) ylikely {
 	    UT	unum = UT(snum) ;
 	    if (snum < 0) unum = (neg unum) ;
 	    bp = convdecux(unum,endptr) ;
