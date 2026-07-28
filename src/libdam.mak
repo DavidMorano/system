@@ -260,9 +260,9 @@ OBJ143=
 OBJ144=
 OBJ145= cfhulian.o
 OBJ146= ctb26.o cthexstr.o ctroman.o ctwords.o
-OBJ147= quickselecti.o igcd.o minmax.o isort.o
-OBJ148= fam.o fhm.o
-OBJ149= permutations.o combinations.o msgsub.o
+OBJ147= quickselecti.o igcd.o minmax.o 
+OBJ148= isort.o
+OBJ149= msgsub.o
 OBJ150= wsnwcpynarrow.o termcharsets.o
 OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
 
@@ -886,7 +886,6 @@ kcparse.o:		kvparse.dir
 kvparse.dir:
 	makesubdir $@
 
-fhm.o:			fhm.cc fhm.h
 ba.o:			ba.cc ba.h
 
 # SINGLES
@@ -916,8 +915,6 @@ termcmdkey.o:		termcmdkey.cc		termcmdkey.h		$(INCS)
 vetus.o:		vetus.cc		vetus.h			$(INCS)
 nettime.o:		nettime.cc		nettime.h		$(INCS)
 taginfo.o:		taginfo.cc		taginfo.h		$(INCS)
-permutations.o:		permutations.cc		permutations.h		$(INCS)
-combinations.o:		combinations.cc		combinations.h		$(INCS)
 msgsub.o:		msgsub.cc		msgsub.hh		$(INCS)
 termcharsetx.o:		termcharsets.cc		termcharsets.h		$(INCS)
 findinline.o:		findinline.cc		findinline.h		$(INCS)
