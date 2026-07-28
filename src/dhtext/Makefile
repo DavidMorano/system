@@ -322,8 +322,6 @@ lastlogfile.o:		lastlogfile.c lastlogfile.h
 
 tmpx.o:			tmpx.c tmpx.h
 
-keyopt.o:		keyopt.c keyopt.h
-
 namecache.o:		namecache.c namecache.h
 
 hdb.o:			hdb.c hdb.h
