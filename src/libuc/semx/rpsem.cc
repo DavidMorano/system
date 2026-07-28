@@ -105,7 +105,7 @@ template<typename ... Args>
 local inline int rpsem_magic(rpsem *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == RPSEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == RPSEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (rpsem_magic) */
@@ -127,12 +127,12 @@ int rpsem_create(rpsem *op,int pshared,int acnt) noex {
 	    if (acnt > 0) {
 	        repeat {
 	            if ((rs = sem_init(&op->ps,pshared,acnt)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until (rs != SR_INTR) ;
 		if (rs >= 0) {
-		    op->magic = RPSEM_MAGIC ;
-		}
+		    op->magval = RPSEM_MAGIC ;
+		} /* end if (ok) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -144,10 +144,10 @@ int rpsem_destroy(rpsem *op) noex {
 	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_destroy(&op->ps)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (rpsem_destroy) */
@@ -158,7 +158,7 @@ int rpsem_wait(rpsem *op) noex {
 	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_wait(&op->ps)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
@@ -171,7 +171,7 @@ int rpsem_trywait(rpsem *op) noex {
 	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_trywait(&op->ps)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
@@ -191,7 +191,7 @@ int rpsem_waiter(rpsem *op,int to) noex {
 	    bool	f_exit = false ;
 	    repeat {
 	        if ((rs = sem_trywait(&op->ps)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		    switch (rs) {
 	    	    case SR_AGAIN:
 		        if (c++ < cto) {
@@ -219,7 +219,7 @@ int rpsem_post(rpsem *op) noex {
 	if ((rs = rpsem_magic(op)) >= 0) ylikely {
 	    repeat {
 	        if ((rs = sem_post(&op->ps)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
 	} /* end if (magic) */
