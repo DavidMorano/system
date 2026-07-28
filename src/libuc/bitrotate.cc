@@ -74,7 +74,7 @@
 
 constexpr cbool		f_rot = CF_ROT ;
 
-template<typename UT> static UT bitrotatex(UT v,int n) noex {
+template<typename UT> local UT bitrotatex(UT v,int n) noex {
 	UT		rv ;
 	if_constexpr (f_rot) {
 	    rv = std::rotr(v,n) ;
