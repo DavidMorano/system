@@ -81,7 +81,7 @@ int posname_start(posname *op,cchar *sp,int 탎l,cchar **rpp) noex {
 	if (op && sp && rpp) ylikely {
 	    rs = SR_INVALID ;
 	    op->as = nullptr ;
-	    if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
 	        *rpp = sp ;
 		rs = SR_OK ;
 	        if (sp[0] != '/') {
@@ -96,8 +96,7 @@ int posname_start(posname *op,cchar *sp,int 탎l,cchar **rpp) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (posname_start) */
+} /* end subroutine (posname_start) */
 
 int posname_finish(posname *op) noex {
 	int		rs = SR_FAULT ;
@@ -114,8 +113,7 @@ int posname_finish(posname *op) noex {
 	    op->buf[0] = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (posname_finish) */
+} /* end subroutine (posname_finish) */
 
 
 /* local subroutines */
@@ -164,7 +162,7 @@ local int posname_loadnul(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 
 int posname::start(cchar *sp,int sl,cchar **rpp) noex {
 	return posname_start(this,sp,sl,rpp) ;
-}
+} /* end method */
 
 void posname::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
