@@ -57,21 +57,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<functional>		/* |mem_fn(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucatexit.h>
-#include	<ucatfork.h>
-#include	<timewatch.hh>
-#include	<ptm.h>
-#include	<mkpathx.h>
-#include	<sysdbfiles.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<functional>		/* C++STD |mem_fn(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sysdbfiles.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysdbfn.h"
 
@@ -134,9 +134,9 @@ namespace {
 /* forward references */
 
 extern "C" {
-    static void	sysdbmgr_atforkbefore() noex ;
-    static void	sysdbmgr_atforkafter() noex ;
-    static void	sysdbmgr_exit() noex ;
+    local void	sysdbmgr_atforkbefore() noex ;
+    local void	sysdbmgr_atforkafter() noex ;
+    local void	sysdbmgr_exit() noex ;
 }
 
 
@@ -174,8 +174,7 @@ int sysdbfn_get(enum sysdbfiles w,cchar *fname,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysdbfn_get) */
+} /* end subroutine (sysdbfn_get) */
 
 
 /* local subroutines */
@@ -197,15 +196,15 @@ int sysdbmgr::init() noex {
 	                }
 	                if (rs < 0) {
 	                    uc_atforkexp(b,a,a) ;
-			}
+			} /* end if (error) */
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
@@ -258,8 +257,8 @@ int sysdbmgr::get(int w,cchar **rpp) noex {
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
 	if ((*rpp = strs[w]) == nullptr) {
-	    if ((rs = init()) >= 0) {
-		if ((rs = mx.lockbegin) >= 0) {
+	    if ((rs = init()) >= 0) ylikely {
+		if ((rs = mx.lockbegin) >= 0) ylikely {
 		    if ((*rpp = strs[w]) == nullptr) {
 			rs = gets(w,rpp) ;
 			len = rs ;
@@ -276,11 +275,11 @@ int sysdbmgr::gets(int w,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
 	    cchar	*sysdbdir = sysword.w_sysdbdir ;
 	    cchar	*fn = sysdbfile[w] ;
-	    if ((rs = mkpath(pbuf,sysdbdir,fn)) >= 0) {
-		if (cc *rp ; (rs = libmem.strw(pbuf,rs,&rp)) >= 0) {
+	    if ((rs = mkpath(pbuf,sysdbdir,fn)) >= 0) ylikely {
+		if (cc *rp ; (rs = libmem.strw(pbuf,rs,&rp)) >= 0) ylikely {
 		    strs[w] = rp ;
 		    *rpp = rp ;
 		    len = lenstr(rp) ;
@@ -292,15 +291,15 @@ int sysdbmgr::gets(int w,cchar **rpp) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end method (sysdbmgr::gets) */
 
-static void sysdbmgr_atforkbefore() noex {
+local void sysdbmgr_atforkbefore() noex {
 	sysdbmgr_data.atforkbefore() ;
 } /* end subroutine (sysdbmgr_atforkbefore) */
 
-static void sysdbmgr_atforkafter() noex {
+local void sysdbmgr_atforkafter() noex {
 	sysdbmgr_data.atforkafter() ;
 } /* end subroutine (sysdbmgr_atforkafter) */
 
-static void sysdbmgr_exit() noex {
+local void sysdbmgr_exit() noex {
 	if (cint rs = sysdbmgr_data.fini() ; rs < 0) {
 	    ulogerror("sysdbmgr",rs,"exit-fini") ;
 	}
