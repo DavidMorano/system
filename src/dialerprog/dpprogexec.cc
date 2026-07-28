@@ -1,4 +1,5 @@
 /* dpprogexec SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* progexec the execution request */
@@ -18,22 +19,28 @@
 
 */
 
+/* Copyright © 1990,2001 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
 /**************************************************************************
 
+  	Description:
 	This subroutine performs an |exec(2)| on the given program
 	with its environment and arguments.
 
 **************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<keyopt.h>
 #include	<ids.h>
 #include	<vecstr.h>
@@ -42,18 +49,16 @@
 #include	<hasx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"defs.h"
 #include	"envs.h"
 
 
-
 /* local defines */
 
-#ifndef	elementsof
-#define	elementsof(a)	(sizeof(a) / sizeof((a)[0]))
-#endif
+#define	PI	proginfo
 
 #ifndef	VARPATH
 #define	VARPATH	"PATH"
@@ -66,26 +71,6 @@
 
 
 /* external subroutines */
-
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	ctdecl(char *,int,long) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	getgroupname(char *,int,gid_t) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -115,21 +100,15 @@ struct intprog {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progexec(pip,progfname,argv,argr)
-struct proginfo	*pip ;
-const char	*progfname ;
-char		*argv[] ;
-int		argr ;
-{
+int progexec(PI *pip,cchar *progfname,int argv,mainv argr) noex {
 	VECHAND	avs ;
-
 	BUFFER	b ;
-
 	vecstr	*elp ;
-
 	int	rs = SR_OK ;
 	int	i ;
 	int	si ;
@@ -138,18 +117,16 @@ int		argr ;
 	int	start = 10 ;
 	int	f_m = FALSE ;
 	int	f_sa = FALSE ;
-
-	const char	**av ;
-	const char	**ev ;
-
-	const char	*abuf = NULL ;
-	const char	*cp ;
+	cchar	**av ;
+	cchar	**ev ;
+	cchar	*abuf = nullptr ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 		debugprintf("progexec: argr=%d\n",argr) ;
-		for (i = 0 ; argv[i] != NULL ; i += 1)
+		for (i = 0 ; argv[i] != nullptr ; i += 1)
 		debugprintf("progexec: arg[%u]=>%s<\n",i,argv[i]) ;
 	}
 #endif
@@ -171,8 +148,8 @@ int		argr ;
 	si = 0 ;
 	cp = argv[0] ;
 	cl = -1 ;
-	f_sa = (argv[0] == NULL) ;
-	f_sa = f_sa || ((argv[0] != NULL) && hasonlyplusminus(argv[0],-1)) ;
+	f_sa = (argv[0] == nullptr) ;
+	f_sa = f_sa || ((argv[0] != nullptr) && hasonlypm(argv[0],-1)) ;
 	f_sa = f_sa || pip->fl.shell ;
 	if (f_sa) {
 	    si = pip->fl.shell ? 0 : 1 ;
@@ -186,9 +163,9 @@ int		argr ;
 #endif
 
 	f_m = FALSE ;
-	f_m = f_m || ((argv[0] == NULL) && pip->fl.progminus) ;
-	f_m = f_m || ((argv[0] == NULL) && pip->fl.progdash) ;
-	f_m = f_m || ((argv[0] != NULL) && hasonlyminus(argv[0],-1)) ;
+	f_m = f_m || ((argv[0] == nullptr) && pip->fl.progminus) ;
+	f_m = f_m || ((argv[0] == nullptr) && pip->fl.progdash) ;
+	f_m = f_m || ((argv[0] != nullptr) && hasonlymi(argv[0],-1)) ;
 
 	rs = buffer_start(&b,start) ;
 	if (rs < 0)
@@ -219,7 +196,7 @@ int		argr ;
 
 /* setup all remaining arguments */
 
-	for (i = si ; (rs >= 0) && (argr > 0) && (argv[i] != NULL) ; i += 1) {
+	for (i = si ; (rs >= 0) && (argr > 0) && (argv[i] != nullptr) ; i += 1) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -234,7 +211,7 @@ int		argr ;
 	vechand_getvec(&avs,&av) ;
 
 	if (rs >= 0) {
-	    const char	*pfn = progfname ;
+	    cchar	*pfn = progfname ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 	    if (progfname[0] != '/') {
 		rs = proginfo_pwd(pip) ;
@@ -256,7 +233,7 @@ int		argr ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 		int	i ;
-		for (i = 0 ; av[i] != NULL ; i += 1)
+		for (i = 0 ; av[i] != nullptr ; i += 1)
 		debugprintf("progexec: av[%u]=>%s<\n",i,av[i]) ;
 	}
 #endif
@@ -264,8 +241,8 @@ int		argr ;
 	vecstr_getvec(elp,&ev) ;
 
 	{
-	    const char **eav = (const char **) av ;
-	    const char **eev = (const char **) ev ;
+	    cchar **eav = (cchar **) av ;
+	    cchar **eev = (cchar **) ev ;
 	    rs = u_execve(progfname,eav,eev) ;
 	}
 
