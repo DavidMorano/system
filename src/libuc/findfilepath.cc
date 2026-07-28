@@ -47,24 +47,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<aflag.hh>
-#include	<bufsizevar.hh>
-#include	<strlibval.hh>
-#include	<storebuf.h>
-#include	<mkpathx.h>
-#include	<ids.h>
-#include	<getpwd.h>
-#include	<permx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<aflag.hh>		/* LIBU */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<getpwd.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"findfilepath.h"
 
@@ -92,17 +92,16 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int	checkone(ids *,char *,cchar *,int,cchar *,int) noex ;
-static int	fileperm(ids *,cchar *,int) noex ;
-static int	mkourpath(char *,cc *,int,cc *) noex ;
+local int	checkone(ids *,char *,cchar *,int,cchar *,int) noex ;
+local int	fileperm(ids *,cchar *,int) noex ;
+local int	mkourpath(char *,cc *,int,cc *) noex ;
 
-static bool	isendslash(cc *,int) noex ;
+local bool	isendslash(cc *,int) noex ;
 
 
 /* local variables */
 
 static bufsizevar	maxpathlen(bufsize_mp) ;
-
 static strlibval	pathval(strlibval_path) ;
 
 
@@ -150,13 +149,12 @@ int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
 	    if ((rs < 0) || (len == 0)) rbuf[0] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (findfilepath) */
+} /* end subroutine (findfilepath) */
 
 
 /* local subroutines */
 
-static int checkone(ids *idp,char *pbuf,cc *dnp,int dnl,cc *fn,int am) noex {
+local int checkone(ids *idp,char *pbuf,cc *dnp,int dnl,cc *fn,int am) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 	if (dnl != 0) {
@@ -172,11 +170,10 @@ static int checkone(ids *idp,char *pbuf,cc *dnp,int dnl,cc *fn,int am) noex {
 	    } /* end if (fileperm) */
 	} /* end if */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (checkone) */
+} /* end subroutine (checkone) */
 
 /* is it a file and are the permissions what we want? */
-static int fileperm(ids *idp,cchar *fn,int am) noex {
+local int fileperm(ids *idp,cchar *fn,int am) noex {
 	int		rs ;
 	int		f = false ;
 	if (ustat sb ; (rs = u_stat(fn,&sb)) >= 0) ylikely {
@@ -191,10 +188,9 @@ static int fileperm(ids *idp,cchar *fn,int am) noex {
 	    rs = SR_OK ;
 	} /* end if */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (fileperm) */
+} /* end subroutine (fileperm) */
 
-static int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex {
+local int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if ((rs = maxpathlen) >= 0) ylikely {
@@ -213,13 +209,11 @@ static int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex {
 	    }
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mkourpath) */
+} /* end subroutine (mkourpath) */
 
-static bool isendslash(cc *dp,int dl) noex {
+local bool isendslash(cc *dp,int dl) noex {
 	if (dl < 0) dl = lenstr(dp) ;
 	return ((dl > 0) && (dp[dl-1] == '/')) ;
-}
-/* end subroutine (isendslash) */
+} /* end subroutine (isendslash) */
 
 
