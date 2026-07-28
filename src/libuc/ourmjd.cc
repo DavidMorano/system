@@ -44,14 +44,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<cfdec.h>
-#include	<hasx.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<cfdec.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ourmjd.h"
 
@@ -90,7 +90,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 int ourmjd(cchar *sp,int 탎l) noex {
 	int		rs = SR_FAULT ;
-	if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if ((sl > 1) && (CHAR_TOLC(sp[0]) == 'm')) {
 	        sp += 1 ;
@@ -103,7 +103,6 @@ int ourmjd(cchar *sp,int 탎l) noex {
 	    } /* end if (valid: has our 'm' marker) */
 	} /* end if (getlenstr) */
 	return rs ;
-}
-/* end subroutine (ourmjd) */
+} /* end subroutine (ourmjd) */
 
 
