@@ -111,7 +111,7 @@ template<typename T> local int ndivx(T v,int b) noex {
 	            while (v != 0) {
 	                n += 1 ;
 	                v = (v / ub) ;
-	            }
+	            } /* end while */
 		} /* end if (non-zero positive) */
 	    } /* end if (valid base) */
 	} /* end if (valid) */
