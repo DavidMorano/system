@@ -6,8 +6,6 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* non-switchable debug print-outs */
-#define	CF_CREATE	0		/* always create the file? */
-#define	CF_UNLOCK	1		/* always unlock after an operation */
 
 /* revision history:
 
@@ -112,6 +110,10 @@ import libutil ;			/* |lenstr(3u)| */
 #define	RF_LEAD1	(RF_UPSTAT + 4)
 #define	RF_LEAD		(RF_LEAD0 + RF_LEAD1)
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
+
 
 export {
     struct pingstatdb_rechead {
@@ -142,5 +144,7 @@ export {
     int record_write	(PSD_REC *,bfile *,dater *,dater *,int,int) noex ;
     int record_finish	(PSD_REC *) noex ;
 } /* end export */
+
+cbool		f_debug		= CF_DEBUG ;
 
 
