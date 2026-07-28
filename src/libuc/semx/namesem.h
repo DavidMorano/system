@@ -26,7 +26,7 @@
 struct namesem_head {
 	sem_t		*sp ;
 	char		*name ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 #ifdef	__cplusplus
@@ -71,7 +71,7 @@ struct namesem : namesem_head {
 	    post(this,namesemmem_post) ;
 	    unlink(this,namesemmem_unlink) ;
 	    count(this,namesemmem_count) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	namesem(const namesem &) = delete ;
 	namesem &operator = (const namesem &) = delete ;
@@ -79,7 +79,7 @@ struct namesem : namesem_head {
 	operator int () noex ;
 	void dtor() noex ;
 	destruct namesem() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (namesem) */
 #else	/* __cplusplus */
@@ -88,15 +88,15 @@ typedef NAMESEM		namesem ;
 
 EXTERNC_begin
 
-extern int	namesem_open(namesem *,cchar *,int,mode_t,uint) noex ;
-extern int	namesem_close(namesem *) noex ;
-extern int	namesem_wait(namesem *) noex ;
-extern int	namesem_waiti(namesem *) noex ;
-extern int	namesem_waiter(namesem *,int) noex ;
-extern int	namesem_trywait(namesem *) noex ;
-extern int	namesem_post(namesem *) noex ;
-extern int	namesem_unlink(namesem *) noex ;
-extern int	namesem_count(namesem *) noex ;
+extern int	namesem_open	(namesem *,cchar *,int,mode_t,uint) noex ;
+extern int	namesem_close	(namesem *) noex ;
+extern int	namesem_wait	(namesem *) noex ;
+extern int	namesem_waiti	(namesem *) noex ;
+extern int	namesem_waiter	(namesem *,int) noex ;
+extern int	namesem_trywait	(namesem *) noex ;
+extern int	namesem_post	(namesem *) noex ;
+extern int	namesem_unlink	(namesem *) noex ;
+extern int	namesem_count	(namesem *) noex ;
 
 extern int	namesemunlink(cchar *) noex ;
 extern int	unlinknamesem(cchar *) noex ;
