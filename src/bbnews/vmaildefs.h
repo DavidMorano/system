@@ -224,7 +224,7 @@ struct proginfo {
 	void		*ofp ;
 	void		*pcp ;
 	struct timeb	now ;
-	PROGINFO_FL	have, f, changed, final ;
+	PROGINFO_FL	have, f, changed, finval ;
 	PROGINFO_FL	open ;
 	time_t		daytime ;
 	time_t		ti_start ;
