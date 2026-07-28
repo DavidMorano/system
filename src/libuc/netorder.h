@@ -13,12 +13,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 #define	NETORDER	char *
@@ -26,29 +26,29 @@
 
 EXTERNC_begin
 
-extern int netorder_rc(char *,char *) noex ;
-extern int netorder_rs(char *,short *) noex ;
-extern int netorder_ri(char *,int *) noex ;
-extern int netorder_rl(char *,long *) noex ;
-extern int netorder_rll(char *,longlong *) noex ;
+extern int netorder_rc		(char *,char *) noex ;
+extern int netorder_rs		(char *,short *) noex ;
+extern int netorder_ri		(char *,int *) noex ;
+extern int netorder_rl		(char *,long *) noex ;
+extern int netorder_rll		(char *,longlong *) noex ;
 
-extern int netorder_ruc(char *,uchar *) noex ;
-extern int netorder_rus(char *,ushort *) noex ;
-extern int netorder_rui(char *,uint *) noex ;
-extern int netorder_rul(char *,ulong *) noex ;
-extern int netorder_rull(char *,ulonglong *) noex ;
+extern int netorder_ruc		(char *,uchar *) noex ;
+extern int netorder_rus		(char *,ushort *) noex ;
+extern int netorder_rui		(char *,uint *) noex ;
+extern int netorder_rul		(char *,ulong *) noex ;
+extern int netorder_rull	(char *,ulonglong *) noex ;
 
-extern int netorder_wc(char *,int) noex ;
-extern int netorder_ws(char *,int) noex ;
-extern int netorder_wi(char *,int) noex ;
-extern int netorder_wl(char *,long) noex ;
-extern int netorder_wll(char *,longlong) noex ;
+extern int netorder_wc		(char *,int) noex ;
+extern int netorder_ws		(char *,int) noex ;
+extern int netorder_wi		(char *,int) noex ;
+extern int netorder_wl		(char *,long) noex ;
+extern int netorder_wll		(char *,longlong) noex ;
 
-extern int netorder_wuc(char *,uint) noex ;
-extern int netorder_wus(char *,uint) noex ;
-extern int netorder_wui(char *,uint) noex ;
-extern int netorder_wul(char *,ulong) noex ;
-extern int netorder_wull(char *,ulonglong) noex ;
+extern int netorder_wuc		(char *,uint) noex ;
+extern int netorder_wus		(char *,uint) noex ;
+extern int netorder_wui		(char *,uint) noex ;
+extern int netorder_wul		(char *,ulong) noex ;
+extern int netorder_wull	(char *,ulonglong) noex ;
 
 EXTERNC_end
 
