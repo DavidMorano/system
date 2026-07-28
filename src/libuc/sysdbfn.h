@@ -22,9 +22,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sysdbfiles.h>		/* <- the money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sysdbfiles.h>		/* LIBUC <- the money shot */
 
 
 EXTERNC_begin
