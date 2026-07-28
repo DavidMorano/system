@@ -40,13 +40,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSYD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"netorder.h"
 
@@ -83,8 +84,7 @@ template<typename T> local int netorder_rxx(cchar *buf,T *wp) noex {
 	}
 	*wp = stage ;
 	return n ;
-}
-/* end subroutine-template (netorder_rxx) */
+} /* end subroutine-template (netorder_rxx) */
 
 template<typename T> local int netorder_wxx(char *buf,T w) noex {
 	cint		n = szof(T) ;
@@ -94,8 +94,7 @@ template<typename T> local int netorder_wxx(char *buf,T w) noex {
 	    w >>= nb ;
 	}
 	return n ;
-}
-/* end subroutine-template (netorder_wxx) */
+} /* end subroutine-template (netorder_wxx) */
 
 
 /* local variables */
@@ -111,8 +110,7 @@ int netorder_rc(char *buf,char *cwp) noex {
 	uchar		*ubuf = (uchar *) buf ;
 	*cwp = ubuf[0] ;
 	return rs ;
-}
-/* end subroutine (netorder_rc) */
+} /* end subroutine (netorder_rc) */
 
 int netorder_rs(char *buf,short *swp) noex {
 	cint		rs = szof(short) ;
@@ -121,8 +119,7 @@ int netorder_rs(char *buf,short *swp) noex {
 	*swp |= (ubuf[0] << 8) ;
 	*swp |= (ubuf[1] << 0) ;
 	return rs ;
-}
-/* end subroutine (netorder_rs) */
+} /* end subroutine (netorder_rs) */
 
 int netorder_ri(char *buf,int *iwp) noex {
 	cint		rs = szof(int) ;
@@ -133,26 +130,22 @@ int netorder_ri(char *buf,int *iwp) noex {
 	*iwp |= (ubuf[2] << 8) ;
 	*iwp |= (ubuf[3] << 0) ;
 	return rs ;
-}
-/* end subroutine (netorder_ri) */
+} /* end subroutine (netorder_ri) */
 
 int netorder_rl(char *buf,long *lwp) noex {
 	return netorder_rxx(buf,lwp) ;
-}
-/* end subroutine (netorder_rl) */
+} /* end subroutine (netorder_rl) */
 
 int netorder_rll(char *buf,longlong *llwp) noex {
 	return netorder_rxx(buf,llwp) ;
-}
-/* end subroutine (netorder_rll) */
+} /* end subroutine (netorder_rll) */
 
 int netorder_ruc(char *buf,uchar *cwp) noex {
 	cint		rs = szof(uchar) ;
 	uchar		*ubuf = (uchar *) buf ;
 	*cwp = ubuf[0] ;
 	return rs ;
-}
-/* end subroutine (netorder_ruc) */
+} /* end subroutine (netorder_ruc) */
 
 int netorder_rus(char *buf,ushort *swp) noex {
 	cint		rs = szof(ushort) ;
@@ -161,8 +154,7 @@ int netorder_rus(char *buf,ushort *swp) noex {
 	*swp |= (ubuf[0] << 8) ;
 	*swp |= (ubuf[1] << 0) ;
 	return rs ;
-}
-/* end subroutine (netorder_rus) */
+} /* end subroutine (netorder_rus) */
 
 int netorder_rui(char *buf,uint *iwp) noex {
 	cint		rs = szof(uint) ;
@@ -173,68 +165,55 @@ int netorder_rui(char *buf,uint *iwp) noex {
 	*iwp |= (ubuf[2] << 8) ;
 	*iwp |= (ubuf[3] << 0) ;
 	return rs ;
-}
-/* end subroutine (netorder_rui) */
+} /* end subroutine (netorder_rui) */
 
 int netorder_rul(char *buf,ulong *lwp) noex {
 	return netorder_rxx(buf,lwp) ;
-}
-/* end subroutine (netorder_rul) */
+} /* end subroutine (netorder_rul) */
 
 int netorder_rull(char *buf,ulonglong *llwp) noex {
 	return netorder_rxx(buf,llwp) ;
-}
-/* end subroutine (netorder_rull) */
+} /* end subroutine (netorder_rull) */
 
 int netorder_wc(char *buf,int cw) noex {
 	return netorder_wxx(buf,cw) ;
-}
-/* end subroutine (netorder_wc) */
+} /* end subroutine (netorder_wc) */
 
 int netorder_ws(char *buf,int sw) noex {
 	return netorder_wxx(buf,sw) ;
-}
-/* end subroutine (netorder_ws) */
+} /* end subroutine (netorder_ws) */
 
 int netorder_wi(char *buf,int iw) noex {
 	return netorder_wxx(buf,iw) ;
-}
-/* end subroutine (netorder_wi) */
+} /* end subroutine (netorder_wi) */
 
 int netorder_wl(char *buf,long lw) noex {
 	return netorder_wxx(buf,lw) ;
-}
-/* end subroutine (netorder_wl) */
+} /* end subroutine (netorder_wl) */
 
 int netorder_wll(char *buf,longlong llw) noex {
 	return netorder_wxx(buf,llw) ;
-}
-/* end subroutine (netorder_wll) */
+} /* end subroutine (netorder_wll) */
 
 int netorder_wuc(char *buf,uint ucw) noex {
 	return netorder_wxx(buf,ucw) ;
-}
-/* end subroutine (netorder_wuc) */
+} /* end subroutine (netorder_wuc) */
 
 int netorder_wus(char *buf,uint usw) noex {
 	return netorder_wxx(buf,usw) ;
-}
-/* end subroutine (netorder_wus) */
+} /* end subroutine (netorder_wus) */
 
 int netorder_wui(char *buf,uint uiw) noex {
 	return netorder_wxx(buf,uiw) ;
-}
-/* end subroutine (netorder_wui) */
+} /* end subroutine (netorder_wui) */
 
 int netorder_wul(char *buf,ulong ulw) noex {
 	return netorder_wxx(buf,ulw) ;
-}
-/* end subroutine (netorder_wul) */
+} /* end subroutine (netorder_wul) */
 
 int netorder_wull(char *buf,ulonglong ullw) noex {
 	return netorder_wxx(buf,ullw) ;
-}
-/* end subroutine (netorder_wull) */
+} /* end subroutine (netorder_wull) */
 
 
 /* older API */
