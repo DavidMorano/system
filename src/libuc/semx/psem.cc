@@ -104,29 +104,30 @@ cbool		f_psem = F_PSEM ;
 
 int psem_create(psem *op,int pshared,int acnt) noex {
     	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    if_constexpr (f_psem) {
-		if (rpsem *semp ; (semp = new(nothrow) rpsem) != np) {
+		if (rpsem *semp = new(nt) rpsem ; semp) {
 		    if ((rs = rpsem_create(semp,pshared,acnt)) >= 0) {
 			op->subobj = semp ;
 		    } /* end if (rpsem_create) */
 		    if (rs < 0) {
 			delete semp ;
-			op->subobj = nullptr ;
-		    }
+			op->subobj = np ;
+		    } /* end if (error) */
 		} /* end if (new-rpsem) */
 	    } else {
-		if (epsem *semp ; (semp = new(nothrow) epsem) != np) {
+		if (epsem *semp = new(nt) epsem ; semp) {
 		    if ((rs = epsem_create(semp,pshared,acnt)) >= 0) {
 			op->subobj = semp ;
 		    } /* end if (rpsem_create) */
 		    if (rs < 0) {
 			delete semp ;
-			op->subobj = nullptr ;
-		    }
+			op->subobj = np ;
+		    } /* end if (error) */
 		} /* end if (new-epsem) */
 	    } /* end if_constexpr (f_psem) */
 	} /* end if (non-null) */
