@@ -43,7 +43,7 @@
 struct posname_head {
 	cchar		*as ;	/* allocated string */
 	char		buf[POSNAME_SHORTLEN+1] ;
-} ;
+} ; /* end struct (posname_head) */
 
 #ifdef	__cplusplus
 enum posnamemems {
