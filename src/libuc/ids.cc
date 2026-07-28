@@ -40,17 +40,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<unistd.h>		/* for |getgroups(2)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucsysconf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<unistd.h>		/* POSIX® |getgroups(2)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsysconf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ids.h"
 
@@ -112,7 +112,7 @@ int ids_load(ids *op) noex {
 		    if ((rs = u_getgroups(nmax,op->gids)) >= 0) ylikely {
 			ng = rs ;
 		        op->gids[ng] = gidend ;
-		    }
+		    } /* end if */
 		    if (rs < 0) {
 		        libmem.free(op->gids) ;
 		        op->gids = nullptr ;
@@ -124,8 +124,7 @@ int ids_load(ids *op) noex {
 	    } /* end if (error) */
 	} /* end if (ids_ctor) */
 	return (rs >= 0) ? ng : rs ;
-}
-/* end subroutine (ids_load) */
+} /* end subroutine (ids_load) */
 
 int ids_release(ids *op) noex {
 	int		rs = SR_FAULT ;
@@ -136,15 +135,14 @@ int ids_release(ids *op) noex {
 	        rs1 = libmem.free(op->gids) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->gids = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 	        rs1 = ids_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ids_release) */
+} /* end subroutine (ids_release) */
 
 int ids_ngroups(ids *op) noex {
 	int		rs = SR_FAULT ;
@@ -156,8 +154,7 @@ int ids_ngroups(ids *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? ng : rs ;
-}
-/* end subroutine (ids_ngroups) */
+} /* end subroutine (ids_ngroups) */
 
 int ids_refresh(ids *op) noex {
 	int		rs = SR_FAULT ;
@@ -168,14 +165,13 @@ int ids_refresh(ids *op) noex {
 	        rs1 = libmem.free(op->gids) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->gids = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (rs >= 0) {
 		rs = ids_load(op) ;
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ids_refresh) */
+} /* end subroutine (ids_refresh) */
 
 int ids_copy(ids *op,const ids *otherp) noex {
 	int		rs = SR_FAULT ;
@@ -199,8 +195,7 @@ int ids_copy(ids *op,const ids *otherp) noex {
 	    } /* end if (ids_ngids) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ids_copy) */
+} /* end subroutine (ids_copy) */
 
 
 /* private subroutines */
@@ -216,8 +211,7 @@ local int ids_ctor(ids *op) noex {
 	    op->egid = getegid() ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ids_ctor) */
+} /* end subroutine (ids_ctor) */
 
 local int ids_dtor(ids *op) noex {
 	int		rs = SR_FAULT ;
@@ -226,8 +220,7 @@ local int ids_dtor(ids *op) noex {
 	    op->gids = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ids_dtor) */
+} /* end subroutine (ids_dtor) */
 
 local int ids_ngids(const ids *op) noex {
 	int		n = 0 ;
@@ -235,8 +228,7 @@ local int ids_ngids(const ids *op) noex {
 	    for (n = 0 ; op->gids[n] != gidend ; n += 1) ;
 	}
 	return n ;
-}
-/* end subroutine (ids_ngids) */
+} /* end subroutine (ids_ngids) */
 
 ids_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -257,8 +249,7 @@ ids_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ids_co::operator) */
+} /* end method (ids_co::operator) */
 
 int ids::copy(const ids *oip) noex {
 	return ids_copy(this,oip) ;
