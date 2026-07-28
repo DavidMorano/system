@@ -43,9 +43,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"itcontrol.h"
 
@@ -84,7 +84,7 @@ typedef itcontrol_f	itc_f ;
 
 int itcontrol_load(itc *op,void *objp,psem *sp,itc_f f,int arg) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->objp = objp ;		/* object pointer */
 	    op->psemp = sp ;		/* semæphore (POSIX®) pointer */
@@ -92,7 +92,6 @@ int itcontrol_load(itc *op,void *objp,psem *sp,itc_f f,int arg) noex {
 	    op->arg = arg ;		/* optional argument */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (itcontrol_load) */
+} /* end subroutine (itcontrol_load) */
 
 
