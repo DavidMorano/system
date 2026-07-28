@@ -624,7 +624,7 @@ namespace {
 		p = nullptr ;
 	    } /* end if (memory-release) */
 	} ; /* end method */
-	operator int () noex {
+	operator int () const noex {
 	    return rs ;
 	} ; /* end method */
     } ; /* end struct */
