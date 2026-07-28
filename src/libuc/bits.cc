@@ -34,18 +34,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* <- for |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bit>			/* <- |countr_zero(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<stdintx.h>
-#include	<baops.h>
-#include	<intceil.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD <- for |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bit>			/* C++STD <- |countr_zero(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<stdintx.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bits.h"
 
@@ -101,10 +101,10 @@ local int		ffbsarr(digit *,int) noex ;
 
 /* local variables */
 
-constexpr int		minwords = BITS_MINWORDS ;
-constexpr int		nawords = BITS_SHORTDIGS ;
-constexpr int		nabits = (BITS_SHORTDIGS * BITS_BPW) ;
-constexpr int		dsz = int(szof(digit)) ;
+constexpr int		minwords	= BITS_MINWORDS ;
+constexpr int		nawords		= BITS_SHORTDIGS ;
+constexpr int		nabits		= (BITS_SHORTDIGS * BITS_BPW) ;
+constexpr int		dsz		= int(szof(digit)) ;
 
 
 /* exported variables */
@@ -129,8 +129,7 @@ int bits_start(bits *op,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bits_start) */
+} /* end subroutine (bits_start) */
 
 int bits_finish(bits *op) noex {
 	int		rs = SR_FAULT ;
@@ -141,14 +140,13 @@ int bits_finish(bits *op) noex {
 	        rs1 = libmem.free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->nwords = 0 ;
 	    op->nbits = 0 ;
 	    op->n = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bits_finish) */
+} /* end subroutine (bits_finish) */
 
 int bits_set(bits *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -173,8 +171,7 @@ int bits_set(bits *op,int i) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bits_set) */
+} /* end subroutine (bits_set) */
 
 int bits_clear(bits *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -204,8 +201,7 @@ int bits_clear(bits *op,int i) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bits_clear) */
+} /* end subroutine (bits_clear) */
 
 int bits_test(bits *op,int i) noex {
 	int		rs = SR_FAULT ;
@@ -224,8 +220,7 @@ int bits_test(bits *op,int i) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bits_test) */
+} /* end subroutine (bits_test) */
 
 int bits_anyset(bits *op) noex {
 	int		rs = SR_FAULT ; 
@@ -246,8 +241,7 @@ int bits_anyset(bits *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (bits_anyset) */
+} /* end subroutine (bits_anyset) */
 
 int bits_ffbs(bits *op) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -263,8 +257,7 @@ int bits_ffbs(bits *op) noex {
 	   } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bits_ffbs) */
+} /* end subroutine (bits_ffbs) */
 
 int bits_extent(bits *op) noex {
 	int		rs = SR_FAULT ;
@@ -272,8 +265,7 @@ int bits_extent(bits *op) noex {
 	    rs = op->n ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bits_extent) */
+} /* end subroutine (bits_extent) */
 
 int bits_count(bits *op) noex {
 	int		rs = SR_FAULT ;
@@ -287,17 +279,15 @@ int bits_count(bits *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bits_count) */
+} /* end subroutine (bits_count) */
 
 
 /* private subroutines */
 
-static void bits_naclear(bits *op) noex {
+local void bits_naclear(bits *op) noex {
 	cint	nabytes = (nawords * szof(digit)) ;
 	memclear(op->na,nabytes) ;
-}
-/* end subroutine (bits_naclear) */
+} /* end subroutine (bits_naclear) */
 
 local int bits_alloc(bits *op,int nn) noex {
 	cint		bpw = BITS_BPW ;
@@ -313,15 +303,13 @@ local int bits_alloc(bits *op,int nn) noex {
 	    }
 	} /* end if (needed) */
 	return rs ;
-}
-/* end subroutine (bits_alloc) */
+} /* end subroutine (bits_alloc) */
 
 void bits::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("bits",rs,"dtor-finish") ;
 	}
-}
-/* end subroutine (bits::dtor) */
+} /* end subroutine (bits::dtor) */
 
 int bits_co::operator () (int a) noex {
 	int	rs = SR_BUGCHECK ;
@@ -357,13 +345,11 @@ int bits_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (bits_co::operator) */
+} /* end method (bits_co::operator) */
 
 int bits_co::operator [] (int a) noex {
 	return (*this)(a) ;
-}
-/* end method (bits_co::operator) */
+} /* end method (bits_co::operator) */
 
 int alloc::resize(int nsz) noex {
 	int		rs = SR_OK ;
@@ -386,8 +372,7 @@ int alloc::resize(int nsz) noex {
 	    } /* end if (ok) */
 	} /* end if (allocation or re-allocation needed) */
 	return (rs >= 0) ? rsize : rs ;
-}
-/* end method (alloc::resize) */
+} /* end method (alloc::resize) */
 
 local int nsizecalc(int obits,int nbits) noex {
 	int		nw = iceil((nbits - obits),BITS_BPW) ;
@@ -398,8 +383,7 @@ local int nsizecalc(int obits,int nbits) noex {
 	    nsz = (nw * dsz) ;
 	}
 	return nsz ;
-}
-/* end subroutine (nsizecalc) */
+} /* end subroutine (nsizecalc) */
 
 local int ffbsarr(digit *a,int an) noex {
 	int		rs = SR_NOTFOUND ;
@@ -411,7 +395,6 @@ local int ffbsarr(digit *a,int an) noex {
 	    rs = countr_zero(a[w]) + (w * BITS_BPW) ;
 	}
 	return rs ;
-}
-/* end subroutine (ffbsarr) */
+} /* end subroutine (ffbsarr) */
 
 
