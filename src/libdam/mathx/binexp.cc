@@ -120,13 +120,13 @@ template<typename T> static T binexpx(T x,int n) noex {
 
 /* exported subroutines */
 
-float		binexpf(float x,int n) noex {
+float		binexpf	(float x,int n)		noex {
     	return binexpx(x,n) ;
 }
-double		binexp(double x,int n) noex {
+double		binexp	(double x,int n)	noex {
     	return binexpx(x,n) ;
 }
-longdouble	binexpl(longdouble x,int n) noex {
+longdouble	binexpl	(longdouble x,int n)	noex {
     	return binexpx(x,n) ;
 }
 
