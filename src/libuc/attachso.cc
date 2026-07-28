@@ -43,26 +43,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<dlfcn.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<storebuf.h>
-#include	<mkx.h>
-#include	<ids.h>
-#include	<permx.h>
-#include	<isoneof.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"attachso.h"
 
@@ -99,7 +99,7 @@ extern "C" {
 
 struct subinfo_fl {
 	uint		id:1 ;
-} ;
+} ; /* end struct */
 
 struct subinfo {
 	void		**ropp ;
@@ -111,19 +111,19 @@ struct subinfo {
 	ids		id ;
 	subinfo_fl	f ;
 	int		dlmode ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	subinfo_start(SI *,mv,cchar *,mv,mv,int,void **) noex ;
-static int	subinfo_soload(SI *) noex ;
-static int	subinfo_finish(SI *,int) noex ;
+local int	subinfo_start(SI *,mv,cchar *,mv,mv,int,void **) noex ;
+local int	subinfo_soload(SI *) noex ;
+local int	subinfo_finish(SI *,int) noex ;
 
-static int	subinfo_sofind(SI *) noex ;
-static int	subinfo_socheck(SI *,ids *,cchar *) noex ;
-static int	subinfo_checksyms(SI *) noex ;
-static int	subinfo_modclose(SI *) noex ;
+local int	subinfo_sofind(SI *) noex ;
+local int	subinfo_socheck(SI *,ids *,cchar *) noex ;
+local int	subinfo_checksyms(SI *) noex ;
+local int	subinfo_modclose(SI *) noex ;
 
 
 /* local variables */
@@ -133,7 +133,7 @@ constexpr cpcchar	defexts[] = {
 	"o",
 	"",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr int		rsterm[] = {
 	SR_FAULT,
@@ -176,13 +176,12 @@ int attachso(mv dnames,cc *oname,mv exts,mv syms,int m,void **ropp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (attachso) */
+} /* end subroutine (attachso) */
 
 
 /* private subroutines */
 
-static int subinfo_start(SI *sip,mv dnames,cc *oname,mv exts,mv syms,
+local int subinfo_start(SI *sip,mv dnames,cc *oname,mv exts,mv syms,
 			int m,void **ropp) noex {
     	int		rs = SR_FAULT ;
 	if (exts == nullptr) exts = defexts ;
@@ -196,10 +195,9 @@ static int subinfo_start(SI *sip,mv dnames,cc *oname,mv exts,mv syms,
 	    sip->ropp = ropp ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SI *sip,int f_abort) noex {
+local int subinfo_finish(SI *sip,int f_abort) noex {
     	int		rs = SR_FAULT ;
 	if (sip) ylikely {
     	    rs = SR_OK ;
@@ -212,10 +210,9 @@ static int subinfo_finish(SI *sip,int f_abort) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
-static int subinfo_soload(SI *sip) noex {
+local int subinfo_soload(SI *sip) noex {
 	int		rs ;
 	if ((rs = subinfo_sofind(sip)) >= 0) ylikely {
 	    if (sip->ropp) {
@@ -223,10 +220,9 @@ static int subinfo_soload(SI *sip) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (subinfo_soload) */
+} /* end subroutine (subinfo_soload) */
 
-static int subinfo_sofind(SI *sip) noex {
+local int subinfo_sofind(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	if (ids id ; (rs = id.load) >= 0) ylikely {
@@ -260,10 +256,9 @@ static int subinfo_sofind(SI *sip) noex {
 	    }
 	} /* end if (IDs) */
 	return rs ;
-}
-/* end subroutine (subinfo_sofind) */
+} /* end subroutine (subinfo_sofind) */
 
-static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
+local int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	int		rs ;
 	int		rs1 = SR_NOTFOUND ;
 	int		f = false ;
@@ -314,10 +309,9 @@ static int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (subinfo_socheck) */
+} /* end subroutine (subinfo_socheck) */
 
-static int subinfo_checksyms(SI *sip) noex {
+local int subinfo_checksyms(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip->sop) ylikely {
 	    mainv	syms = sip->syms ;
@@ -331,10 +325,9 @@ static int subinfo_checksyms(SI *sip) noex {
 	    } /* end if (syms) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_checksyms) */
+} /* end subroutine (subinfo_checksyms) */
 
-static int subinfo_modclose(SI *sip) noex {
+local int subinfo_modclose(SI *sip) noex {
     	int		rs = SR_FAULT ;
 	if (sip) ylikely {
 	    rs = SR_OK ;
@@ -346,7 +339,6 @@ static int subinfo_modclose(SI *sip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_modclose) */
+} /* end subroutine (subinfo_modclose) */
 
 
