@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* object to manipulate a PINGSTATDB file */
+/* common subroutines for PINGSTATDB */
 /* version %I% last-modified %G% */
 
 
@@ -21,8 +21,7 @@
 	pingstatdb_com
 
   	Description:
-	This subroutine maintains a PINGSTATDB file.  These files
-	are used to maintain the names and status of a PING event.
+	These are support subroutines for the PINGSTATDB object.
 
 	Synopsis:
 
