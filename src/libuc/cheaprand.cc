@@ -52,19 +52,39 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cheaprand.h"
 
 
 /* local defines */
 
+#define	MAGICNUMBER	1967773755	/* <- magic number */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
 
 /* forward references */
 
-static uint	randmac(uint) noex ;
+local uint	randmac(uint) noex ;
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -86,22 +106,20 @@ ulong cheaprand(ulong ow) noex {
 	lo = (ulong) elo ;
 	result = (hi << 32) | lo ;
 	return result ;
-}
-/* end subroutine (cheaprand) */
+} /* end subroutine (cheaprand) */
 
 
 /* local subroutines */
 
-static uint randmac(uint v) noex {
+local uint randmac(uint v) noex {
 	ulong		x = (ulong) v ;
 	ulong		sum, prod ;
-	ulong		a = 1967773755 ;
+	ulong		a = MAGICNUMBER ;
 	uint		nv ;
 	prod = a * x ;
 	sum = prod + (prod >> 32) ;
 	nv = (uint) sum ;
 	return nv ;
-}
-/* end subroutine (randmac) */
+} /* end subroutine (randmac) */
 
 
