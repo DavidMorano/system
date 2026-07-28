@@ -20,12 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<inttypes.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<inttypes.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 #endif /* INTTYPESX_INCLUDE */
