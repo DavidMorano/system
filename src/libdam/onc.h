@@ -1,4 +1,4 @@
-/* onc SUPPORT */
+/* onc SUPPORT (Open-Network-Computing) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
