@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	OUTBUF		struct outbuf_head
@@ -50,7 +47,7 @@ struct outbuf_co {
 struct outbuf : outbuf_head {
 	outbuf_co	finish ;
 	outbuf() noex {
-	    finish(this,outbufmem_finish) ;
+	    finish	(this,outbufmem_finish) ;
 	    obuf = nullptr ;
 	    falloc = false ;
 	} ; /* end ctor */
@@ -70,9 +67,9 @@ typedef OUTBUF		outbuf ;
 
 EXTERNC_begin
 
-extern int	outbuf_start(outbuf *,char *,int) noex ;
-extern int	outbuf_get(outbuf *,cchar **) noex ;
-extern int	outbuf_finish(outbuf *) noex ;
+extern int	outbuf_start	(outbuf *,char *,int) noex ;
+extern int	outbuf_get	(outbuf *,cchar **) noex ;
+extern int	outbuf_finish	(outbuf *) noex ;
 
 EXTERNC_end
 
