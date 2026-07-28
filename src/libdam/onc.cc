@@ -1,4 +1,4 @@
-/* onc SUPPORT */
+/* onc SUPPORT (Open-Network-Computing) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -178,7 +178,7 @@ cint		passlen = PASSPHRASELEN ;
 
 int onckeyalready(cchar *netname) noex {
 	int		rs = SR_FAULT ;
-	if (netname) {
+	if (netname) ylikely {
 	    if ((rs = key_secretkey_is_set()) < 0) {
 	        rs = SR_NOPKG ;
 	    }
@@ -188,26 +188,26 @@ int onckeyalready(cchar *netname) noex {
 
 int onckeygetset(cchar *netname,cchar *pass) noex {
 	int		rs = SR_FAULT ;
-	if (netname && pass) {
+	if (netname && pass) ylikely {
 	    rs = SR_INVALID ;
-	    if (netname[0]) {
-		if ((rs = oncinit()) >= 0) {
+	    if (netname[0]) ylikely {
+		if ((rs = oncinit()) >= 0) ylikely {
 	            key_netstarg	sna{} ;
 	            cchar		*nnp = netname ;
 	            char		passbuf[passlen + 1] ;
 		    rs = SR_OK ;
 	            strncpy(passbuf,pass,passlen) ;
 	            passbuf[passlen] = '\0' ;	/* truncate */
-	            memnset(sna.st_priv_key,0,HEXKEYBYTES) ;
+	            memclear(sna.st_priv_key,HEXKEYBYTES) ;
 	            sna.st_pub_key[0] = '\0' ;
 	            sna.st_netname = charp(netname) ;
 		    /* decrypt and retrieve the private key */
 	            if (getsecretkey(nnp,sna.st_priv_key,passbuf) > 0) {
 	                if (sna.st_priv_key[0] != '\0') {
-			/* we have successfully decrypted our private ONC key */
+			/* have decrypted our private ONC key */
 			/* give it to KEYSERV */
 	                    if ((rs = key_setnet(&sna)) > 0) {
-	                        memnset(sna.st_priv_key,0,HEXKEYBYTES) ;
+	                        memclear(sna.st_priv_key,HEXKEYBYTES) ;
 		            } else if (rs == 0) {
 		                rs = SR_PROTO ;
 		            } else {
@@ -219,8 +219,8 @@ int onckeygetset(cchar *netname,cchar *pass) noex {
 	            } else {
 	                rs = SR_NOENT ;
 	            }
-	            memnset(passbuf,0,passlen) ;
-		} /* end if (vars) */
+	            memclear(passbuf,passlen) ;
+		} /* end if (oncinit) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -243,7 +243,7 @@ int onckeylogin(cchar *pass) noex {
 		        /* truncate at maximum */
 	                passbuf[passlen] = '\0' ; 
 	                strcpy(netname3,nnp) ;
-	                memnset(sna.st_priv_key,0,HEXKEYBYTES) ;
+	                memclear(sna.st_priv_key,HEXKEYBYTES) ;
 	                sna.st_pub_key[0] = '\0' ;
 	                sna.st_netname = netname3 ;
 		        bool f = true ;
@@ -257,9 +257,9 @@ int onckeylogin(cchar *pass) noex {
 	                        rs = SR_ACCESS ;
 		            }
 			    /* destroy the private key */
-	                    memnset(sna.st_priv_key,0,HEXKEYBYTES) ;
+	                    memclear(sna.st_priv_key,HEXKEYBYTES) ;
 	                } /* end if (decrypted and retrieved private key) */
-	                memnset(passbuf,0,passlen) ;
+	                memclear(passbuf,passlen) ;
 	            } /* end if (key-is-already-set) */
 	        } else {
 	            rs = SR_NOTSUP ;
