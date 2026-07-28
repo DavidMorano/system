@@ -31,16 +31,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>		/* |strlen(3c)| + |memcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<stdintx.h>		/* |longlong| */
-#include	<stdorder.h>
-#include	<strwcpy.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<stdintx.h>		/* LIBU |longlong| */
+#include	<stdorder.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"serialbuf.h"
 
@@ -70,7 +70,7 @@ typedef longlong *	longlongp ;
 
 /* forward references */
 
-static int serialbuf_wok(serialbuf *op,cvoid *wp,int wl) noex {
+local int serialbuf_wok(serialbuf *op,cvoid *wp,int wl) noex {
 	int		rs = SR_FAULT ;
 	if (op && wp) ylikely {
 	    if (op->sbuf) ylikely {
@@ -84,15 +84,13 @@ static int serialbuf_wok(serialbuf *op,cvoid *wp,int wl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (serialbuf_wok) */
+} /* end subroutine (serialbuf_wok) */
 
-static int serialbuf_rok(serialbuf *op,void *rp,int rl) noex {
+local int serialbuf_rok(serialbuf *op,void *rp,int rl) noex {
 	return serialbuf_wok(op,rp,rl) ;
-}
-/* end subroutine (serialbuf_rok) */
+} /* end subroutine (serialbuf_rok) */
 
-static int serialbuf_szok(serialbuf *op,int sz) noex {
+local int serialbuf_szok(serialbuf *op,int sz) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if (op->sbuf) ylikely {
@@ -106,11 +104,10 @@ static int serialbuf_szok(serialbuf *op,int sz) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (serialbuf_szok) */
+} /* end subroutine (serialbuf_szok) */
 
 template<typename T>
-static int serialbuf_rx(serialbuf *op,T *rp) noex {
+local int serialbuf_rx(serialbuf *op,T *rp) noex {
 	cint		sz = szof(T) ;
 	int		rs ;
 	if ((rs = serialbuf_rok(op,rp,sz)) >= 0) ylikely {
@@ -119,11 +116,10 @@ static int serialbuf_rx(serialbuf *op,T *rp) noex {
 	    op->i += sz ;
 	}
 	return rs ;
-}
-/* end subroutine-template (serialbuf_rx) */
+} /* end subroutine-template (serialbuf_rx) */
 
 template<typename T>
-static int serialbuf_rxa(serialbuf *op,T *rp,int n) noex {
+local int serialbuf_rxa(serialbuf *op,T *rp,int n) noex {
 	cint		sz = szof(T) ;
 	for (int i = 0 ; (op->i >= 0) && (i < n) ; i += 1) {
 	    if ((op->slen - op->i) >= sz) {
@@ -135,11 +131,10 @@ static int serialbuf_rxa(serialbuf *op,T *rp,int n) noex {
 	    }
 	} /* end for */
 	return op->i ;
-}
-/* end subroutine-template (serialbuf_rxa) */
+} /* end subroutine-template (serialbuf_rxa) */
 
 template<typename T>
-static int serialbuf_wx(serialbuf *op,T v) noex {
+local int serialbuf_wx(serialbuf *op,T v) noex {
 	cint		sz = szof(T) ;
 	int		rs ;
 	if ((rs = serialbuf_szok(op,sz)) >= 0) ylikely {
@@ -148,11 +143,10 @@ static int serialbuf_wx(serialbuf *op,T v) noex {
 	    op->i += sz ;
 	}
 	return rs ;
-}
-/* end subroutine-template (serialbuf_wx) */
+} /* end subroutine-template (serialbuf_wx) */
 
 template<typename T>
-static int serialbuf_wxa(serialbuf *op,T *wa,int n) noex {
+local int serialbuf_wxa(serialbuf *op,T *wa,int n) noex {
 	cint		sz = szof(T) ;
 	for (int i = 0 ; (op->i >= 0) && (i < n) ; i += 1) {
 	    if ((op->slen - op->i) >= sz) {
@@ -164,8 +158,7 @@ static int serialbuf_wxa(serialbuf *op,T *wa,int n) noex {
 	    }
 	} /* end for */
 	return op->i ;
-}
-/* end subroutine-template (serialbuf_wxa) */
+} /* end subroutine-template (serialbuf_wxa) */
 
 
 /* local variables */
@@ -195,8 +188,7 @@ int serialbuf_start(serialbuf *op,char *sbuf,int slen) noex {
 	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (serialbuf_start) */
+} /* end subroutine (serialbuf_start) */
 
 int serialbuf_finish(serialbuf *op) noex {
 	int		rs = SR_FAULT ;
@@ -210,8 +202,7 @@ int serialbuf_finish(serialbuf *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (serialbuf_finish) */
+} /* end subroutine (serialbuf_finish) */
 
 /* "advance" the buffer-index as if we wrote something in there */
 int serialbuf_adv(serialbuf *op,int sz) noex {
@@ -220,8 +211,7 @@ int serialbuf_adv(serialbuf *op,int sz) noex {
 	    op->i += sz ;
 	}
 	return rs ;
-}
-/* end subroutine (serialbuf_adv) */
+} /* end subroutine (serialbuf_adv) */
 
 int serialbuf_getlen(serialbuf *op) noex {
 	int		rs = SR_FAULT ;
@@ -232,8 +222,7 @@ int serialbuf_getlen(serialbuf *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (serialbuf_getlen) */
+} /* end subroutine (serialbuf_getlen) */
 
 int serialbuf_reset(serialbuf *op) noex {
 	int		rs = SR_FAULT ;
@@ -245,8 +234,7 @@ int serialbuf_reset(serialbuf *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (serialbuf_reset) */
+} /* end subroutine (serialbuf_reset) */
 
 int serialbuf_robj(serialbuf *op,void *rp,int rl) noex {
 	char		*rb = charp(rp) ;
@@ -257,8 +245,7 @@ int serialbuf_robj(serialbuf *op,void *rp,int rl) noex {
 	    op->i += rl ;
 	}
 	return rs ;
-}
-/* end subroutine (serialbuf_robj) */
+} /* end subroutine (serialbuf_robj) */
 
 int serialbuf_rc(serialbuf *op,char *rp) noex {
 	cint		sz = szof(char) ;
@@ -269,43 +256,35 @@ int serialbuf_rc(serialbuf *op,char *rp) noex {
 	    op->i += sz ;
 	}
 	return rs ;
-}
-/* end subroutine (serialbuf_rc) */
+} /* end subroutine (serialbuf_rc) */
 
 int serialbuf_rs(serialbuf *op,short *rp) noex {
 	return serialbuf_rx(op,rp) ;
-}
-/* end subroutine (serialbuf_rshort) */
+} /* end subroutine (serialbuf_rshort) */
 
 int serialbuf_ri(serialbuf *op,int *rp) noex {
 	return serialbuf_rx(op,rp) ;
-}
-/* end subroutine (serialbuf_ri) */
+} /* end subroutine (serialbuf_ri) */
 
 int serialbuf_rl(serialbuf *op,long *rp) noex {
 	return serialbuf_rx(op,rp) ;
-}
-/* end subroutine (serialbuf_rl) */
+} /* end subroutine (serialbuf_rl) */
 
 int serialbuf_rll(serialbuf *op,longlong *rp) noex {
 	return serialbuf_rx(op,rp) ;
-}
-/* end subroutine (serialbuf_rll) */
+} /* end subroutine (serialbuf_rll) */
 
 int serialbuf_ria(serialbuf *op,int *rp,int n) noex {
 	return serialbuf_rxa(op,rp,n) ;
-}
-/* end subroutine (serialbuf_ria) */
+} /* end subroutine (serialbuf_ria) */
 
 int serialbuf_rla(serialbuf *op,long *rp,int n) noex {
 	return serialbuf_rxa(op,rp,n) ;
-}
-/* end subroutine (serialbuf_rla) */
+} /* end subroutine (serialbuf_rla) */
 
 int serialbuf_rlla(serialbuf *op,longlong *rp,int n) noex {
 	return serialbuf_rxa(op,rp,n) ;
-}
-/* end subroutine (serialbuf_rlla) */
+} /* end subroutine (serialbuf_rlla) */
 
 /* read a fixed length string (possibly not NUL-terminated) */
 int serialbuf_rstrn(serialbuf *op,char *rbuf,int rlen) noex {
@@ -317,8 +296,7 @@ int serialbuf_rstrn(serialbuf *op,char *rbuf,int rlen) noex {
 	    op->i += rl ;
 	} /* end if (valid) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (serialbuf_rstrn) */
+} /* end subroutine (serialbuf_rstrn) */
 
 /* read a NUL-terminated variable length string */
 int serialbuf_rstrw(serialbuf *op,char *rbuf,int rlen) noex {
@@ -332,8 +310,7 @@ int serialbuf_rstrw(serialbuf *op,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (valid) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (serialbuf_rstrw) */
+} /* end subroutine (serialbuf_rstrw) */
 
 int serialbuf_rbuf(serialbuf *op,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -345,74 +322,62 @@ int serialbuf_rbuf(serialbuf *op,char *rbuf,int rlen) noex {
 	    op->i += rl ;
 	} /* end if (valid) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (serialbuf_rbuf) */
+} /* end subroutine (serialbuf_rbuf) */
 
 int serialbuf_ruc(serialbuf *op,uchar *rp) noex {
 	char		*p = charp(rp) ;
 	return serialbuf_rx(op,p) ;
-}
-/* end subroutine (serialbuf_ruc) */
+} /* end subroutine (serialbuf_ruc) */
 
 int serialbuf_rus(serialbuf *op,ushort *rp) noex {
 	short		*p = shortp(rp) ;
 	return serialbuf_rx(op,p) ;
-}
-/* end subroutine (serialbuf_rus) */
+} /* end subroutine (serialbuf_rus) */
 
 int serialbuf_rui(serialbuf *op,uint *rp) noex {
 	int		*p = intp(rp) ;
 	return serialbuf_rx(op,p) ;
-}
-/* end subroutine (serialbuf_rui) */
+} /* end subroutine (serialbuf_rui) */
 
 int serialbuf_rul(serialbuf *op,ulong *rp) noex {
 	long		*p = longp(rp) ;
 	return serialbuf_rx(op,p) ;
-}
-/* end subroutine (serialbuf_rul) */
+} /* end subroutine (serialbuf_rul) */
 
 int serialbuf_rull(serialbuf *op,ulonglong *rp) noex {
 	longlong	*p = longlongp(rp) ;
 	return serialbuf_rx(op,p) ;
-}
-/* end subroutine (serialbuf_rull) */
+} /* end subroutine (serialbuf_rull) */
 
 int serialbuf_ruia(serialbuf *op,uint *rp,int n) noex {
 	int		*p = intp(rp) ;
 	return serialbuf_rxa(op,p,n) ;
-}
-/* end subroutine (serialbuf_ruia) */
+} /* end subroutine (serialbuf_ruia) */
 
 int serialbuf_rula(serialbuf *op,ulong *rp,int n) noex {
 	long		*p = longp(rp) ;
 	return serialbuf_rxa(op,p,n) ;
-}
-/* end subroutine (serialbuf_rula) */
+} /* end subroutine (serialbuf_rula) */
 
 int serialbuf_rulla(serialbuf *op,ulonglong *rp,int n) noex {
 	longlong	*p = longlongp(rp) ;
 	return serialbuf_rxa(op,p,n) ;
-}
-/* end subroutine (serialbuf_rulla) */
+} /* end subroutine (serialbuf_rulla) */
 
 int serialbuf_rustrn(serialbuf *op,uchar *rbuf,int rlen) noex {
 	char		*rb = charp(rbuf) ;
 	return serialbuf_rstrn(op,rb,rlen) ;
-}
-/* end subroutine (serialbuf_rustrn) */
+} /* end subroutine (serialbuf_rustrn) */
 
 int serialbuf_rustrw(serialbuf *op,uchar *rbuf,int rlen) noex {
 	char		*rb = charp(rbuf) ;
 	return serialbuf_rstrw(op,rb,rlen) ;
-}
-/* end subroutine (serialbuf_rustrw) */
+} /* end subroutine (serialbuf_rustrw) */
 
 int serialbuf_rubuf(serialbuf *op,uchar *rbuf,int rlen) noex {
 	char		*rb = charp(rbuf) ;
 	return serialbuf_rbuf(op,rb,rlen) ;
-}
-/* end subroutine (serialbuf_rubuf) */
+} /* end subroutine (serialbuf_rubuf) */
 
 int serialbuf_wobj(serialbuf *op,cvoid *wp,int wl) noex {
 	char		*wb = charp(wp) ;
@@ -423,8 +388,7 @@ int serialbuf_wobj(serialbuf *op,cvoid *wp,int wl) noex {
 	    op->i += wl ;
 	}
 	return rs ;
-}
-/* end subroutine (serialbuf_wobj) */
+} /* end subroutine (serialbuf_wobj) */
 
 int serialbuf_wc(serialbuf *op,char ch) noex {
 	cint		sz = szof(char) ;
@@ -435,43 +399,35 @@ int serialbuf_wc(serialbuf *op,char ch) noex {
 	    op->i += sz ;
 	}
 	return rs ;
-}
-/* end subroutine (serialbuf_wc) */
+} /* end subroutine (serialbuf_wc) */
 
 int serialbuf_ws(serialbuf *op,short sw) noex {
 	return serialbuf_wx(op,sw) ;
-}
-/* end subroutine (serialbuf_ws) */
+} /* end subroutine (serialbuf_ws) */
 
 int serialbuf_wi(serialbuf *op,int iw) noex {
 	return serialbuf_wx(op,iw) ;
-}
-/* end subroutine (serialbuf_wi) */
+} /* end subroutine (serialbuf_wi) */
 
 int serialbuf_wl(serialbuf *op,long lw) noex {
 	return serialbuf_wx(op,lw) ;
-}
-/* end subroutine (serialbuf_wl) */
+} /* end subroutine (serialbuf_wl) */
 
 int serialbuf_wll(serialbuf *op,longlong llw) noex {
 	return serialbuf_wx(op,llw) ;
-}
-/* end subroutine (serialbuf_wll) */
+} /* end subroutine (serialbuf_wll) */
 
 int serialbuf_wia(serialbuf *op,cint *iwa,int n) noex {
 	return serialbuf_wxa(op,iwa,n) ;
-}
-/* end subroutine (serialbuf_wia) */
+} /* end subroutine (serialbuf_wia) */
 
 int serialbuf_wla(serialbuf *op,clong *lwa,int n) noex {
 	return serialbuf_wxa(op,lwa,n) ;
-}
-/* end subroutine (serialbuf_wla) */
+} /* end subroutine (serialbuf_wla) */
 
 int serialbuf_wlla(serialbuf *op,const longlong *llwa,int n) noex {
 	return serialbuf_wxa(op,llwa,n) ;
-}
-/* end subroutine (serialbuf_wlla) */
+} /* end subroutine (serialbuf_wlla) */
 
 /* write a fixed length string (possibly not NUL-terminated) */
 int serialbuf_wstrn(serialbuf *op,cchar *wbuf,int wlen) noex {
@@ -484,8 +440,7 @@ int serialbuf_wstrn(serialbuf *op,cchar *wbuf,int wlen) noex {
 	    op->i += wl ;
 	}
 	return (rs >= 0) ? wl : rs ;
-}
-/* end subroutine (serialbuf_wstrn) */
+} /* end subroutine (serialbuf_wstrn) */
 
 /* write a NUL-terminated variable length string */
 int serialbuf_wstrw(serialbuf *op,cchar *wbuf,int wlen) noex {
@@ -497,8 +452,7 @@ int serialbuf_wstrw(serialbuf *op,cchar *wbuf,int wlen) noex {
 	    op->i += wl ;
 	}
 	return (rs >= 0) ? wl : rs ;
-}
-/* end subroutine (serialbuf_wstrw) */
+} /* end subroutine (serialbuf_wstrw) */
 
 int serialbuf_wbuf(serialbuf *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
@@ -510,74 +464,62 @@ int serialbuf_wbuf(serialbuf *op,cchar *wbuf,int wlen) noex {
 	    op->i += wl ;
 	}
 	return (rs >= 0) ? wl : rs ;
-}
-/* end subroutine (serialbuf_wbuf) */
+} /* end subroutine (serialbuf_wbuf) */
 
 int serialbuf_wuc(serialbuf *op,uchar uch) noex {
 	char		ch = char(uch) ;
 	return serialbuf_wx(op,ch) ;
-}
-/* end subroutine (serialbuf_wuchar) */
+} /* end subroutine (serialbuf_wuchar) */
 
 int serialbuf_wus(serialbuf *op,ushort usw) noex {
 	short		sw = short(usw) ;
 	return serialbuf_wx(op,sw) ;
-}
-/* end subroutine (serialbuf_wus) */
+} /* end subroutine (serialbuf_wus) */
 
 int serialbuf_wui(serialbuf *op,uint uiw) noex {
 	int		iw = int(uiw) ;
 	return serialbuf_wx(op,iw) ;
-}
-/* end subroutine (serialbuf_wui) */
+} /* end subroutine (serialbuf_wui) */
 
 int serialbuf_wul(serialbuf *op,ulong ulw) noex {
 	long		lw = long(ulw) ;
 	return serialbuf_wx(op,lw) ;
-}
-/* end subroutine (serialbuf_wul) */
+} /* end subroutine (serialbuf_wul) */
 
 int serialbuf_wull(serialbuf *op,ulonglong ullw) noex {
 	longlong	llw = longlong(ullw) ;
 	return serialbuf_wx(op,llw) ;
-}
-/* end subroutine (serialbuf_wull) */
+} /* end subroutine (serialbuf_wull) */
 
 int serialbuf_wuia(serialbuf *op,cuint *uiwa,int n) noex {
 	int		*iwa = intp(uiwa) ;
 	return serialbuf_wxa(op,iwa,n) ;
-}
-/* end subroutine (serialbuf_wuia) */
+} /* end subroutine (serialbuf_wuia) */
 
 int serialbuf_wula(serialbuf *op,culong *ulwa,int n) noex {
 	long		*lwa = longp(ulwa) ;
 	return serialbuf_wxa(op,lwa,n) ;
-}
-/* end subroutine (serialbuf_wula) */
+} /* end subroutine (serialbuf_wula) */
 
 int serialbuf_wulla(serialbuf *op,const ulonglong *ullwa,int n) noex {
 	longlong	*llwa = longlongp(ullwa) ;
 	return serialbuf_wxa(op,llwa,n) ;
-}
-/* end subroutine (serialbuf_wulla) */
+} /* end subroutine (serialbuf_wulla) */
 
 int serialbuf_wustrn(serialbuf *op,const uchar *wbuf,int wlen) noex {
 	char		*wb = charp(wbuf) ;
 	return serialbuf_wstrn(op,wb,wlen) ;
-}
-/* end subroutine (serialbuf_wustrn) */
+} /* end subroutine (serialbuf_wustrn) */
 
 int serialbuf_wustrw(serialbuf *op,const uchar *wbuf,int wlen) noex {
 	char		*wb = charp(wbuf) ;
 	return serialbuf_wstrw(op,wb,wlen) ;
-}
-/* end subroutine (serialbuf_wustrw) */
+} /* end subroutine (serialbuf_wustrw) */
 
 int serialbuf_wubuf(serialbuf *op,const uchar *wbuf,int wlen) noex {
 	char		*wb = charp(wbuf) ;
 	return serialbuf_wbuf(op,wb,wlen) ;
-}
-/* end subroutine (serialbuf_wubuf) */
+} /* end subroutine (serialbuf_wubuf) */
 
 
 /* local subroutines */
@@ -752,7 +694,6 @@ serialbuf_co::operator int () noex {
 	    } /* end switch */
 	}
 	return rs ;
-}
-/* end method (serialbuf_co::operator) */
+} /* end method (serialbuf_co::operator) */
 
 
