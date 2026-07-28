@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* find number of users (logged-in) on system */
+/* retrieve the number of users (logged-in) on system */
 /* version %I% last-modified %G% */
 
 
@@ -24,27 +24,42 @@
 
 /*******************************************************************************
 
-	We try to figure out the number of users logged into the
-	system.  Sadly (tragically) not all systems support the
-	UTMPX interface!!  Can you believe it?  Why can't those
-	systems that do not support UTMPX get their tragic butt-acts
-	together?
+  	Name:
+	nusers
 
+	Description:
+	I calculate the number of users logged into the system.
+	Sadly (tragically) not all systems support the UTMPX
+	interface!!  Can you believe it?  Why can not those systems
+	that do not support UTMPX get their tragic butt-acts together?
 	Of course, unless the TMPX object (or some other MT-safe
 	API) is used in the implementation of this subroutine (which
 	TMPX object is not even presently coded up here to be
 	conditionally compiled), it is not MT-safe nor reentrant.
 
-	Notes: Why some subroutine like this was not provided by
+	Synopsis:
+	int nusers() noex
+
+	Arguments:
+	-		no arguements
+
+	Returns:
+	>=0		number of logged in users on the system
+	<0		error (system-return)
+
+	Notes: 
+	1. Why some subroutine like this was not provided by
 	the UNIX® developers themselves is a mystery.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<utmpacc.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<utmpacc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"nusers.h"
 
 
 /* local defines */
@@ -69,7 +84,6 @@
 
 int nusers() noex {
 	return utmpacc_users(0) ;
-}
-/* end subroutine (nusers) */
+} /* end subroutine (nusers) */
 
 
