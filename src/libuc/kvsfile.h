@@ -20,12 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* <- for |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecobj.h>
-#include	<hdb.h>
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<time.h>		/* CSTD <- for |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
 
 #define	KVSFILE			struct kvsfile_head
