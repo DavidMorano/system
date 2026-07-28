@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>		/* |CONMSGHDR| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/socket.h>		/* POSIX® |CONMSGHDR| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #ifndef	TYPEDEF_CONMSGHDR
