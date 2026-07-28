@@ -52,20 +52,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<snx.h>
-#include	<snwcpy.h>
-#include	<storeitem.h>
-#include	<gecos.h>
-#include	<cfdec.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<snx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<gecos.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pwentry.h"
 
@@ -80,6 +80,13 @@ import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 #ifndef	F_OPTIONAL
 #define	F_OPTIONAL	0		/* <- why this choice? */
 #endif
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -103,20 +110,10 @@ namespace {
 local int	pwentry_loadname(PE *,cc *,int) noex ;
 local int	loaditem(cchar **,cchar *,int) noex ;
 
-#ifdef	COMMENT
-local int rscfree(int rs,cchar *sp) noex {
-    	int rs1 ;
-    	void *vp = voidp(sp) ;
-    	rs1 = lm_free(vp) ;
-	if (rs >= 0) rs = rs1 ;
-    	return rs ;
-}
-#endif /* COMNENT */
 
 /* local variables */
 
 static vars	var ;
-
 cbool		f_optional = F_OPTIONAL ;
 
 
@@ -133,8 +130,7 @@ int pwentry_start(pwentry *op) noex {
 	    op->lstchg = -1 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pwentry_start) */
+} /* end subroutine (pwentry_start) */
 
 int pwentry_fieldpw(pwentry *op,int fn,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -226,12 +222,11 @@ int pwentry_fieldpw(pwentry *op,int fn,cchar *sp,int sl) noex {
 		break ;
 	    } /* end switch */
 	    if ((rs >= 0) && cpp) {
-		rs = lm_strw(sp,sl,cpp) ;
-	    }
+		rs = libmem.strw(sp,sl,cpp) ;
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pwentry_fieldpw) */
+} /* end subroutine (pwentry_fieldpw) */
 
 int pwentry_mkextras(pwentry *op) noex {
 	int		rs = SR_FAULT ;
@@ -280,8 +275,7 @@ int pwentry_mkextras(pwentry *op) noex {
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pwentry_mkextras) */
+} /* end subroutine (pwentry_mkextras) */
 
 int pwentry_mkcopy(pwentry *op,pwentry *uop,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -341,93 +335,59 @@ int pwentry_mkcopy(pwentry *op,pwentry *uop,char *rbuf,int rlen) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pwentry_mkcopy) */
+} /* end subroutine (pwentry_mkcopy) */
+
+namespace {
+    struct memfreer {
+	int	rs = SR_OK ;
+	int	rs1 ;
+	void operator () (ccharp &p) noex {
+	    if (p) ylikely {
+		voidp vp = voidp(p) ;
+	        rs1 = libmem.free(vp) ;
+		if (rs >= 0) rs = rs1 ;
+		p = nullptr ;
+	    } /* end if (memory-release) */
+	} ; /* end method */
+	operator int () const noex {
+	    return rs ;
+	} ; /* end method */
+    } ; /* end struct */
+} /* end namespace */
 
 int pwentry_finish(pwentry *op) noex {
     	PWENTRY		*hop = op ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) ylikely {
+	    memfreer fo ;
 	    rs = SR_OK ;
-	    if (op->username != nullptr) {
-		void *vp = voidp(op->username) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->password != nullptr) {
-		void *vp = voidp(op->password) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->gecos != nullptr) {
-		void *vp = voidp(op->gecos) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->dir != nullptr) {
-		void *vp = voidp(op->dir) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->shell != nullptr) {
-	        void *vp = voidp(op->shell) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
+	    fo(op->username) ;
+	    fo(op->password) ;
+	    fo(op->gecos) ;
+	    fo(op->dir) ;
+	    fo(op->shell) ;
 	    /* the AT&T standard extras */
-	    if (op->organization != nullptr) {
-	        void *vp = voidp(op->organization) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->realname != nullptr) {
-	        void *vp = voidp(op->realname) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->account != nullptr) {
-	        void *vp = voidp(op->account) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->bin != nullptr) {
-	        void *vp = voidp(op->bin) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    /* the sometimes pseudo-standard finger information fields */
-	    if (op->office != nullptr) {
-	        void *vp = voidp(op->office) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->wphone != nullptr) {
-	        void *vp = voidp(op->wphone) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->hphone != nullptr) {
-	        void *vp = voidp(op->hphone) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
-	    if (op->printer != nullptr) {
-	        void *vp = voidp(op->printer) ;
-	        rs1 = lm_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
+	    fo(op->organization) ;
+	    fo(op->realname) ;
+	    fo(op->account) ;
+	    fo(op->bin) ;
+	    /* BSD fields */
+	    fo(op->office) ;
+	    fo(op->wphone) ;
+	    fo(op->hphone) ;
+	    fo(op->printer) ;
+	    rs1 = fo ;
+	    if (rs >= 0) rs = rs1 ;
 	    memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pwentry_finish) */
+} /* end subroutine (pwentry_finish) */
 
 int pwentrybufsize() noex {
     	static cint	rs = var ;
 	return rs ;
-}
-/* end subroutine (pwentrybufsize) */
+} /* end subroutine (pwentrybufsize) */
 
 
 /* local subroutines */
@@ -450,8 +410,7 @@ local int pwentry_loadname(PE *op,cc *vp,int vl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? tl : rs ;
-}
-/* end subroutine (pwentry_loadname) */
+} /* end subroutine (pwentry_loadname) */
 
 int pwentry::fieldpw(int fn,cchar *sp,int sl) noex {
 	return pwentry_fieldpw(this,fn,sp,sl) ;
@@ -483,8 +442,7 @@ pwentry_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (pwentry_co::operator) */
+} /* end method (pwentry_co::operator) */
 
 local int loaditem(cchar **rpp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
@@ -492,8 +450,7 @@ local int loaditem(cchar **rpp,cchar *vp,int vl) noex {
 	    rs = lm_strw(vp,vl,rpp) ;
 	}
 	return rs ;
-}
-/* end subroutine (loaditem) */
+} /* end subroutine (loaditem) */
 
 vars::operator int () noex {
 	int		rs ;
