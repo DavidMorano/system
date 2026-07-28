@@ -120,7 +120,7 @@ void epsem::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("epsem",rs,"fini-destroy") ;
 	}
-}
+} /* end method (epsem_co::dtor) */
 
 int epsem_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
