@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	COMPARSE	struct comparse_head
@@ -85,10 +85,10 @@ typedef COMPARSE	comparse ;
 
 EXTERNC_begin
 
-extern int comparse_start(comparse *,cchar *,int) noex ;
-extern int comparse_getval(comparse *,cchar **) noex ;
-extern int comparse_getcom(comparse *,cchar **) noex ;
-extern int comparse_finish(comparse *) noex ;
+extern int comparse_start	(comparse *,cchar *,int) noex ;
+extern int comparse_getval	(comparse *,cchar **) noex ;
+extern int comparse_getcom	(comparse *,cchar **) noex ;
+extern int comparse_finish	(comparse *) noex ;
 
 EXTERNC_end
 
