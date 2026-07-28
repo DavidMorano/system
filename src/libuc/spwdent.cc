@@ -27,16 +27,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<cfdec.h>
-#include	<storeitem.h>
-#include	<sbuf.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<cfdec.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"spwd.h"
 #include	"spwdent.h"
@@ -55,9 +55,9 @@ import libutil ;			/* |lenstr(3u)| */
 /* external subroutines */
 
 extern "C" {
-    extern int	sfshrink(cchar *,int,cchar **) noex ;
-    extern int	sichr(cchar *,int,int) noex ;
-    extern char	*strnchr(cchar *,int,int) noex ;
+    extern int	sfshrink	(cchar *,int,cchar **) noex ;
+    extern int	sichr		(cchar *,int,int) noex ;
+    extern char	*strnchr	(cchar *,int,int) noex ;
 }
 
 
@@ -69,9 +69,9 @@ extern "C" {
 
 /* forward references */
 
-static int spwdent_parseone(SPWD *,SI *,int,cchar *,int) noex ;
-static int spwdent_parsedefs(SPWD *,SI *,int) noex ;
-static int si_copystr(SI *,char **,cchar *) noex ;
+local int spwdent_parseone	(SPWD *,SI *,int,cchar *,int) noex ;
+local int spwdent_parsedefs	(SPWD *,SI *,int) noex ;
+local int si_copystr		(SI *,char **,cchar *) noex ;
 
 
 /* local variables */
@@ -82,11 +82,11 @@ static int si_copystr(SI *,char **,cchar *) noex ;
 int spwdent_parse(SPWD *spp,char *spbuf,int splen,cchar *sp,int sl) noex {
 	int		rs  = SR_FAULT ;
 	int		rs1 ;
-	if (spp && spbuf && sp) {
+	if (spp && spbuf && sp) ylikely {
 	    storeitem	ib, *ibp = &ib ;
 	    if (sl < 0) sl = lenstr(sp) ;
 	    memclear(spp) ;
-	    if ((rs = storeitem_start(ibp,spbuf,splen)) >= 0) {
+	    if ((rs = storeitem_start(ibp,spbuf,splen)) >= 0) ylikely {
 	        int		fi = 0 ;
 	        int		si ;
 	        while ((si = sichr(sp,sl,':')) >= 0) {
@@ -108,16 +108,15 @@ int spwdent_parse(SPWD *spp,char *spbuf,int splen,cchar *sp,int sl) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (spwdent_parse) */
+} /* end subroutine (spwdent_parse) */
 
 int spwdent_load(SPWD *spp,char *spbuf,int splen,CSPWD *sspp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (spp && spbuf && sspp) {
+	if (spp && spbuf && sspp) ylikely {
 	    memcopy(spp,sspp) ;
 	    storeitem	ib ;
-	    if ((rs = storeitem_start(&ib,spbuf,splen)) >= 0) {
+	    if ((rs = storeitem_start(&ib,spbuf,splen)) >= 0) ylikely {
 	        si_copystr(&ib,&spp->sp_namp,sspp->sp_namp) ;
 	        si_copystr(&ib,&spp->sp_pwdp,sspp->sp_pwdp) ;
 	        rs1 = storeitem_finish(&ib) ;
@@ -125,14 +124,13 @@ int spwdent_load(SPWD *spp,char *spbuf,int splen,CSPWD *sspp) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (spwdent_load) */
+} /* end subroutine (spwdent_load) */
 
 int spwdent_format(CSPWD *spp,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (spp && rbuf) {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if (spp && rbuf) ylikely {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 9 ; i += 1) {
 	            long	v  = 0 ;
 	            if (i > 0) rs = b.chr(':') ;
@@ -188,8 +186,7 @@ int spwdent_format(CSPWD *spp,char *rbuf,int rlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (spwdent_format) */
+} /* end subroutine (spwdent_format) */
 
 int spwdent_size(CSPWD *pp) noex {
 	int		sz = 1 ;
@@ -200,13 +197,12 @@ int spwdent_size(CSPWD *pp) noex {
 	    sz += (lenstr(pp->sp_pwdp) + 1) ;
 	}
 	return sz ;
-}
-/* end subroutine (spwdent_size) */
+} /* end subroutine (spwdent_size) */
 
 
 /* local subroutines */
 
-static int spwdent_parseone(SPWD *spp,SI *ibp,int fi,cchar *vp,int vl) noex {
+local int spwdent_parseone(SPWD *spp,SI *ibp,int fi,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	long		v  = 0 ;
 	cchar		**vpp = nullptr ;
@@ -223,7 +219,7 @@ static int spwdent_parseone(SPWD *spp,SI *ibp,int fi,cchar *vp,int vl) noex {
 	case 5:
 	case 6:
 	case 7:
-	    if ((vl > 0) && ((rs = cfdecl(vp,vl,&v)) >= 0)) {
+	    if ((vl > 0) && ((rs = cfdecl(vp,vl,&v)) >= 0)) ylikely {
 	        switch (fi) {
 	        case 2:
 	            spp->sp_lstchg = v ;
@@ -248,7 +244,7 @@ static int spwdent_parseone(SPWD *spp,SI *ibp,int fi,cchar *vp,int vl) noex {
 	    break ;
 	case 8:
 	    if (vl > 0) {
-	        if (ulong uv ; (rs = cfdecul(vp,vl,&uv)) >= 0) {
+	        if (ulong uv ; (rs = cfdecul(vp,vl,&uv)) >= 0) ylikely {
 	            spp->sp_flag = uv ;
 		} else if (isNotValid(rs)) {
 		    rs = SR_OK ;
@@ -256,17 +252,16 @@ static int spwdent_parseone(SPWD *spp,SI *ibp,int fi,cchar *vp,int vl) noex {
 	    }
 	    break ;
 	} /* end switch */
-	if ((rs >= 0) && (vpp != nullptr)) {
+	if ((rs >= 0) && vpp) {
 	    cchar	*cp ;
-	    if (int cl ; (cl = sfshrink(vp,vl,&cp)) >= 0) {
+	    if (int cl ; (cl = sfshrink(vp,vl,&cp)) >= 0) ylikely {
 	        rs = storeitem_strw(ibp,cp,cl,vpp) ;
 	    }
-	}
+	} /* end if (ok) */
 	return rs ;
-}
-/* end subroutine (spwdent_parseone) */
+} /* end subroutine (spwdent_parseone) */
 
-static int spwdent_parsedefs(SPWD *spp,SI *ibp,int sfi) noex {
+local int spwdent_parsedefs(SPWD *spp,SI *ibp,int sfi) noex {
 	int		rs = SR_OK ;
 	if (sfi == 1) {
 	    cchar	**vpp = (cchar **) &spp->sp_pwdp ;
@@ -277,10 +272,9 @@ static int spwdent_parsedefs(SPWD *spp,SI *ibp,int sfi) noex {
 	    rs = storeitem_strw(ibp,valp,0,vpp) ;
 	}
 	return (rs >= 0) ? sfi : rs ;
-}
-/* end subroutine (spwdent_parsedefs) */
+} /* end subroutine (spwdent_parsedefs) */
 
-static int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
+local int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
 	int		rs = SR_OK ;
 	cchar		**cpp = (cchar **) pp ;
 	*cpp = nullptr ;
@@ -288,7 +282,6 @@ static int si_copystr(SI *ibp,char **pp,cchar *p1) noex {
 	    rs = storeitem_strw(ibp,p1,-1,cpp) ;
 	}
 	return rs ;
-}
-/* end subroutine (si_copystr) */
+} /* end subroutine (si_copystr) */
 
 
