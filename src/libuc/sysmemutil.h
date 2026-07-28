@@ -13,8 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	SYSMEMUTIL_DAT		struct sysmemutil_data
@@ -24,7 +24,8 @@ struct sysmemutil_data {
 	long		mt ;		/* pages "total" */
 	long		ma ;		/* pages "available" */
 	int		mu ;		/* as a percentage */
-} ;
+} ; /* end struct (sysmemutil_data) */
+
 
 typedef SYSMEMUTIL_DAT	sysmemutil_dat ;
 
