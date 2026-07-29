@@ -42,14 +42,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ulogerror.h>
-#include	<binchunk.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<binchunk.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bufslide.hh"
 
@@ -125,7 +125,7 @@ int bufslide::ifinish() noex {
 		    delete bp ;
 		    bp = nullptr ;
 		    chunkp = nullptr ;
-		}
+		} /* end if (memory-release) */
 	    } /* end if (chunkp) */
 	    oi = 0 ;
     	    fl.open = false ;
