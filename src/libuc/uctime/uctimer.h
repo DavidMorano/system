@@ -28,11 +28,11 @@
 
 EXTERNC_begin
 
-extern int uc_timercreate(clockid_t,SIGEVENT *,timer_t *) noex ;
-extern int uc_timerdestroy(timer_t) noex ;
-extern int uc_timerset(timer_t,int,CITIMERSPEC *,ITIMERSPEC *) noex ;
-extern int uc_timerget(timer_t,ITIMERSPEC *) noex ;
-extern int uc_timerover(timer_t) noex ;
+extern int uc_timercreate	(clockid_t,SIGEVENT *,timer_t *) noex ;
+extern int uc_timerdestroy	(timer_t) noex ;
+extern int uc_timerset		(timer_t,int,CITIMERSPEC *,ITIMERSPEC *) noex ;
+extern int uc_timerget		(timer_t,ITIMERSPEC *) noex ;
+extern int uc_timerover		(timer_t) noex ;
 
 EXTERNC_end
 
