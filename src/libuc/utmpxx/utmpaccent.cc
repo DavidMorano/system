@@ -113,9 +113,9 @@ const int 	szhost = utmpsize.host ;
 int utmpaccent_load(utmpaccent *uep,char *uebuf,int uelen,CFENT *suep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (uep && uebuf && suep) {
+	if (uep && uebuf && suep) ylikely {
 	    memclear(uep) ;
-	    if (storeitem si ; (rs = si.start(uebuf,uelen)) >= 0) {
+	    if (storeitem si ; (rs = si.start(uebuf,uelen)) >= 0) ylikely {
 		{
 	            uep->ctime = suep->ut_tv.tv_sec ;
 	            uep->sid = suep->ut_pid ;	/* session ID */
@@ -146,7 +146,7 @@ int utmpaccent_load(utmpaccent *uep,char *uebuf,int uelen,CFENT *suep) noex {
 int utmpaccent_size(cutmpaccent *uep) noex {
 	int		rs = SR_FAULT ;
 	int		sz = 0 ;
-	if (uep) {
+	if (uep) ylikely {
 	    if (uep->id) {
 	        sz += (lenstr(uep->id) + 1) ;
 	    }
@@ -170,8 +170,8 @@ int utmpaccent_size(cutmpaccent *uep) noex {
 local int si_copystr(storeitem *sip,uent *uep,strs w,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ; /* return-value */
-	if (sp) {
-	    if (cchar *rp ; (rs = sip->strw(sp,sl,&rp)) >= 0) {
+	if (sp) ylikely {
+	    if (cchar *rp ; (rs = sip->strw(sp,sl,&rp)) >= 0) ylikely {
 		len = rs ;
 		switch (w) {
 		case str_id:
