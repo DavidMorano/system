@@ -39,7 +39,7 @@ I02=
 I03=
 I04= egs.h randmwc.h librandom.h
 I05= zdb.h zos.h tmz.h zoffparts.h
-I06= termstr.h
+I06=
 I07= kinfo.h loadave.h
 I08= logfile.h lfm.h tmpx.h
 I09=
@@ -208,7 +208,7 @@ OBJ97= comparse.o mhcom.o zos.o tmz.o zdb.o zoffparts.o snflags.o
 OBJ98= openportmsg.o varsub.o userattr.o 
 OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
 OBJ100= rijndael.o expcook.o
-OBJ101= termnote.o egs.o librandom.o
+OBJ101= egs.o librandom.o
 OBJ102= loadave.o modload.o userinfo.o
 OBJ103= dirwatch.o fmq.o useraccdb.o csem.o
 
@@ -221,7 +221,7 @@ OBJ109=
 OBJ110= 
 OBJ111= 
 
-OBJ112= dayspec.o bcspec.o termtrans.o uiconv.o chartrans.o
+OBJ112= dayspec.o bcspec.o uiconv.o chartrans.o
 OBJ113=
 OBJ114= 
 OBJ115=
@@ -236,7 +236,7 @@ OBJ122=
 OBJ123=
 OBJ124=
 OBJ125=
-OBJ126= netfile.o termstr.o filecounts.o
+OBJ126= netfile.o filecounts.o
 OBJ127= pwcache.o grcache.o gncache.o namecache.o grmems.o
 
 OBJ128=
@@ -263,14 +263,14 @@ OBJ146= ctb26.o cthexstr.o ctroman.o ctwords.o
 OBJ147= quickselecti.o igcd.o minmax.o 
 OBJ148= isort.o
 OBJ149= msgsub.o
-OBJ150= wsnwcpynarrow.o termcharsets.o
+OBJ150= wsnwcpynarrow.o
 OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
 
 OBJ152= getuserorg.o getdefzinfo.o getrealname.o getprojname.o
 OBJ153= getaflen.o getprotofamily.o getlogfac.o getlogpri.o getmjd.o 
 OBJ154= msghdr.o cmsghdr.o
 OBJ155= mailboxappend.o
-OBJ156= termescseq.o termconseq.o termconseqi.o hdrextid.o hdrextnum.o 
+OBJ156= hdrextid.o hdrextnum.o 
 OBJ157= localset.o
 OBJ158= localget.o
 OBJ159= inetpton.o inetntop.o inet_ntoa_r.o inet4int.o
@@ -683,13 +683,10 @@ netfile.o:		netfile.cc netfile.h
 sysnamedb.o:		sysnamedb.cc sysnamedb.h
 dirdb.o:		dirdb.cc dirdb.h
 cgi.o:			cgi.cc cgi.h
-termenq.o:		termenq.cc termenq.h
 dispmgr.o:			dispmgr.cc dispmgr.h
 dirwatch.o:		dirwatch.cc dirwatch.h
 nodesfile.o:		nodesfile.cc nodesfile.h
 nodesearch.o:		nodesearch.cc nodesearch.h
-termtrans.o:		termtrans.cc termtrans.h
-termout.o:		termout.cc termout.h
 modload.o:		modload.cc modload.h
 shmalloc.o:		shmalloc.cc shmalloc.h
 kbdinfo.o:		kbdinfo.cc	kbdinfo.h		$(INCS)
@@ -882,8 +879,13 @@ keyopt.dir:
 	makesubdir $@
 
 # KVPARSE
-kcparse.o:		kvparse.dir
+kvparse.o:		kvparse.dir
 kvparse.dir:
+	makesubdir $@
+
+# TERM
+term.o:			term.dir
+term.dir:
 	makesubdir $@
 
 ba.o:			ba.cc ba.h
@@ -911,12 +913,10 @@ quickselecti.o:		quickselecti.cc		quickselecti.h		$(INCS)
 fsdirtreestat.o:	fsdirtreestat.cc	fsdirtreestat.h		$(INCS)
 makedirs.o:		makedirs.cc		makedirs.h		$(INCS)
 naturalwords.o:		naturalwords.cc		naturalwords.h		$(INCS)
-termcmdkey.o:		termcmdkey.cc		termcmdkey.h		$(INCS)
 vetus.o:		vetus.cc		vetus.h			$(INCS)
 nettime.o:		nettime.cc		nettime.h		$(INCS)
 taginfo.o:		taginfo.cc		taginfo.h		$(INCS)
 msgsub.o:		msgsub.cc		msgsub.hh		$(INCS)
-termcharsetx.o:		termcharsets.cc		termcharsets.h		$(INCS)
 findinline.o:		findinline.cc		findinline.h		$(INCS)
 havenis.o:		havenis.cc		havenis.h		$(INCS)
 checksecure.o:		checksecure.cc		checksecure.h		$(INCS)
