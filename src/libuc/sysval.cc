@@ -26,14 +26,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucsysconf.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucsysconf.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysval.hh"
 
@@ -69,7 +69,7 @@ namespace {
 	    cmd[sysval_ct] = _SC_CLK_TCK ;
 	    cmd[sysval_pc] = _SC_NPROCESSORS_CONF ;
 	    cmd[sysval_po] = _SC_NPROCESSORS_ONLN ;
-	} ;
+	} ; /* end ctor */
     } ; /* end struct (sysvalcmds) */
     struct sysvaldata {
 	time_t		last = 0 ;
@@ -77,7 +77,7 @@ namespace {
 	constexpr void cktimeout(int name) noex ;
 	constexpr int operator [] (int) noex ;
     } ; /* end struct (sysvaldata) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -86,7 +86,6 @@ namespace {
 /* local variables */
 
 static constexpr sysvalcmds	cmds ;
-
 static constinit sysvaldata	data ;
 
 
@@ -106,8 +105,7 @@ sysval::operator int () noex {
 	    rs = data[name] ;
 	} /* end if (valid) */
 	return rs ;
-}
-/* end method (sysval::operator) */
+} /* end method (sysval::operator) */
 
 
 /* local subroutines */
@@ -121,8 +119,7 @@ constexpr void sysvaldata::cktimeout(int name) noex {
 	        last = now ;
 	    }
 	} /* end if (active value) */
-}
-/* end method (sysvaldata::cktimeout) */
+} /* end method (sysvaldata::cktimeout) */
 
 constexpr int sysvaldata::operator [] (int name) noex {
 	int		rs = vals[name] ;
@@ -136,7 +133,6 @@ constexpr int sysvaldata::operator [] (int name) noex {
 	    } /* end if (valid command) */
 	} /* end if (value needed) */
 	return rs ;
-}
-/* end method (sysvaldata::operator) */
+} /* end method (sysvaldata::operator) */
 
 
