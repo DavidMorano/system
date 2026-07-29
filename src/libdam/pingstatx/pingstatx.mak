@@ -50,11 +50,11 @@ OBJ_COMS= pingstatdb_com0.o pingstatdb_com1.o pingstatdb_com2.o
 OBJ0= pingstatdb_prime.o
 OBJ1= pingstatdb_uptime.o
 OBJ2= $(DEPS)
-OBJ3=
+OBJ3= pinghost.o pingtab.o
 
 OBJ8=
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 OBJC= obj8.o
 
@@ -190,5 +190,8 @@ pingstatdb_rec0.o:	pingstatdb_rec.ccm $(PSDH) 			$(INCS)
 
 pingstatdb_rec1.o:	pingstatdb_rec1.cc pingstatdb_rec0.o $(PSDH)	$(INCS)
 	$(COMPILE.cc) $<
+
+pinghost.o:		pinghost.cc	pinghost.h			$(INCS)
+pingtab.o:		pingtab.cc	pingtab.h			$(INCS)
 
 
