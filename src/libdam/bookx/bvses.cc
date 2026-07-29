@@ -190,6 +190,8 @@ const bvses_obj		vcses_modinfo = {
 	0
 } ; /* end initializætion */
 
+cbool			f_debug		= CF_DEBUG ;
+
 
 /* exported subroutines */
 
@@ -256,7 +258,7 @@ int bvses_open(bvses *op,cchar *pr,cchar *dbname) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		bvses_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (bvses_ctor) */
 	return rs ;
 } /* end subroutine (bvses_open) */
