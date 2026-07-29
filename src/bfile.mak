@@ -57,7 +57,7 @@ OBJ11=
 
 OBJ12= bread.o breadln.o breadlns.o bgetc.o 
 OBJ13= bwasteln.o
-OBJ14= linex.o
+OBJ14= bfliner.o
 OBJ15=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -112,7 +112,7 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).so:		$(OBJ)
@@ -238,9 +238,6 @@ bminmod.o:		bminmod.cc		$(INCS)
 bsupport.o:		bsupport.cc		$(INCS)
 bobj.o:			bobj.cc			$(INCS)
 
-# LINEX
-linex.o:		linex.dir
-linex.dir:
-	makesubdir $@
+bfliner.o:		bfliner.cc	bfliner.h	$(INCS)
 
 
