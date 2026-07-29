@@ -103,7 +103,7 @@ local inline int pwcache_ctor(pwcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->s = {} ;
 	    op->ti_check = 0 ;
 	    op->wcount = 0 ;
@@ -116,7 +116,7 @@ local inline int pwcache_ctor(pwcache *op,Args ... args) noex {
 	        if (rs < 0) {
 		    delete op->dbp ;
 		    op->dbp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-hdb) */
 	} /* end if (non-null) */
 	return rs ;
@@ -143,7 +143,7 @@ template<typename ... Args>
 local int pwcache_magic(pwcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == PWCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == PWCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end method (pwcache_magic) */
@@ -189,19 +189,18 @@ int pwcache_start(pwcache *op,int nmax,int ttl) noex {
                     op->nmax = nmax ;
                     op->ttl = ttl ;
                     op->ti_check = getustime ;
-                    op->magic = PWCACHE_MAGIC ;
+                    op->magval = PWCACHE_MAGIC ;
                 }
                 if (rs < 0) {
                     hdb_finish(op->dbp) ;
-		}
+		} /* end if (error) */
             } /* end if (hdb-start) */
 	    if (rs < 0) {
 		pwcache_dtor(op) ;
-	    }
+	    } /* end if (error) */
         } /* end if (non-null) */
         return rs ;
-}
-/* end subroutine (pwcache_start) */
+} /* end subroutine (pwcache_start) */
 
 int pwcache_finish(pwcache *op) noex {
         int             rs ;
@@ -223,11 +222,10 @@ int pwcache_finish(pwcache *op) noex {
 		rs1 = pwcache_dtor(op) ;
                 if (rs >= 0) rs = rs1 ;
 	    }
-            op->magic = 0 ;
+            op->magval = 0 ;
 	} /* end if (magic) */
         return rs ;
-}
-/* end subroutine (pwcache_finish) */
+} /* end subroutine (pwcache_finish) */
 
 int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
         custime    	dt = getustime ;
@@ -265,8 +263,7 @@ int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
             } /* end if (valid) */
 	} /* end if (magic) */
         return rs ;
-}
-/* end subroutine (pwcache_lookup) */
+} /* end subroutine (pwcache_lookup) */
 
 int pwcache_uid(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
         custime		dt = getustime ;
@@ -296,8 +293,7 @@ int pwcache_uid(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
             }
 	} /* end if (magic) */
         return rs ;
-}
-/* end subroutine (pwcache_uid) */
+} /* end subroutine (pwcache_uid) */
 
 int pwcache_invalidate(pwcache *op,cchar *un) noex {
 	int             rs ;
@@ -336,8 +332,7 @@ int pwcache_invalidate(pwcache *op,cchar *un) noex {
             } /* end if (valid) */
 	} /* end if (magic) */
         return (rs >= 0) ? f_found : rs ;
-}
-/* end subroutine (pwcache_invalidate) */
+} /* end subroutine (pwcache_invalidate) */
 
 int pwcache_check(pwcache *op,time_t dt) noex {
         int             rs ;
@@ -369,8 +364,7 @@ int pwcache_check(pwcache *op,time_t dt) noex {
             } /* end if (hdb-cur) */
 	} /* end if (magic) */
         return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (pwcache_check) */
+} /* end subroutine (pwcache_check) */
 
 int pwcache_getstat(pwcache *op,pwcache_st *sp) noex {
         int             rs ;
@@ -381,8 +375,7 @@ int pwcache_getstat(pwcache *op,pwcache_st *sp) noex {
             }
 	} /* end if (magic) */
         return rs ;
-}
-/* end subroutine (pwcache_getstat) */
+} /* end subroutine (pwcache_getstat) */
 
 
 /* private subroutines */
@@ -418,13 +411,12 @@ local int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
                     }
 		    if ((rs < 0) && *epp) {
 			pwcache_oldrec(op,*epp) ;
-		    }
+		    } /* end if (error) */
                 } /* end if (new-entry) */
             } /* end if */
         } /* end if (hdb_count) */
         return (rs >= 0) ? pwl : rs ;
-}
-/* end subroutine (pwcache_mkrec) */
+} /* end subroutine (pwcache_mkrec) */
 
 local int pwcache_newrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
         int             rs = SR_BUGCHECK ;
@@ -435,13 +427,12 @@ local int pwcache_newrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
                 rs = pwcache_recstart(op,dt,ep,rp) ;
                 if (rs < 0) {
 		    lm_free(ep) ;
-		}
+		} /* end if (error) */
             } /* end if (memory-acquire) */
             *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
         return rs ;
-}
-/* end subroutine (pwcache_newrec) */
+} /* end subroutine (pwcache_newrec) */
 
 local int pwcache_oldrec(pwcache *op,rec *ep) noex {
 	int		rs = SR_OK ;
@@ -457,8 +448,7 @@ local int pwcache_oldrec(pwcache *op,rec *ep) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (pwcache_newrec) */
+} /* end subroutine (pwcache_newrec) */
 
 local int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
         cint		wc = op->wcount++ ;
@@ -476,11 +466,10 @@ local int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
             rs = hdb_store(op->dbp,key,val) ;
             if (rs < 0) {
                 record_finish(ep) ;
-	    }
+	    } /* end if (error) */
         } /* end if (entry-start) */
         return (rs >= 0) ? pwl : rs ;
-}
-/* end subroutine (pwcache_recstart) */
+} /* end subroutine (pwcache_recstart) */
 
 local int pwcache_recaccess(pwcache *op,time_t dt,rec *ep) noex {
         int             rs ;
@@ -494,8 +483,7 @@ local int pwcache_recaccess(pwcache *op,time_t dt,rec *ep) noex {
             }
         } /* end if */
         return rs ;
-}
-/* end subroutine (pwcache_recaccess) */
+} /* end subroutine (pwcache_recaccess) */
 
 local int pwcache_recrear(pwcache *op,rec *ep) noex {
         pq_ent          *pcp = (pq_ent *) ep ;
@@ -509,13 +497,12 @@ local int pwcache_recrear(pwcache *op,rec *ep) noex {
 			rec	*rep = (rec *) pep ;
                         record_finish(rep) ;
                         lm_free(pep) ;
-                    }
+                    } /* end if (error) */
                 }
             }
         } /* end if (pq-gettail) */
         return rs ;
-}
-/* end subroutine (pwcache_recrear) */
+} /* end subroutine (pwcache_recrear) */
 
 local int pwcache_recdel(pwcache *op,rec *ep) noex {
         int             rs = SR_OK ;
@@ -532,8 +519,7 @@ local int pwcache_recdel(pwcache *op,rec *ep) noex {
             if (rs >= 0) rs = rs1 ;
 	}
         return rs ;
-}
-/* end subroutine (pwcache_recdel) */
+} /* end subroutine (pwcache_recdel) */
 
 local int pwcache_recfins(pwcache *op) noex {
         int             rs = SR_OK ;
@@ -551,8 +537,7 @@ local int pwcache_recfins(pwcache *op) noex {
         } /* end if */
         if (rs >= 0) rs = rs1 ;
         return rs ;
-}
-/* end subroutine (pwcache_recfins) */
+} /* end subroutine (pwcache_recfins) */
 
 local int pwcache_record(pwcache *op,int ct,int rs) noex {
 	if (rs >= 0) ylikely {
@@ -569,8 +554,7 @@ local int pwcache_record(pwcache *op,int ct,int rs) noex {
             } /* end switch */
 	} /* end if (ok) */
         return SR_OK ;
-}
-/* end subroutine (pwcache_record) */
+} /* end subroutine (pwcache_record) */
 
 local int pwcache_finduid(pwcache *op,rec **rpp,uid_t uid) noex {
 	hdb		*dbp = op->dbp ;
@@ -597,8 +581,7 @@ local int pwcache_finduid(pwcache *op,rec **rpp,uid_t uid) noex {
 	    *rpp = (ffound) ? ep : nullptr ;
 	}
 	return (rs >= 0) ? ffound : rs ;
-}
-/* end subroutine (pwcache_finduid) */
+} /* end subroutine (pwcache_finduid) */
 
 local int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
         int             rs = SR_FAULT ;
@@ -622,7 +605,7 @@ local int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
                             }
                             if (rs < 0) {
 				lm_free(vp) ;
-			    }
+			    } /* end if (error) */
                         } /* end if (memory-acquire - pwbuf) */
 	    	    } /* end if (memory-acquire - un) */
                 } else if (rs == SR_NOTFOUND) {
@@ -639,11 +622,10 @@ local int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
             }
 	    if (rs < 0) {
 		record_finish(ep) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
         return (rs >= 0) ? pwl : rs ;
-}
-/* end subroutine (record_start) */
+} /* end subroutine (record_start) */
 
 local int record_loadun(rec *ep,ucentpw *pwp) noex {
 	int		rs ;
@@ -652,8 +634,7 @@ local int record_loadun(rec *ep,ucentpw *pwp) noex {
 	    ep->un = cast_const<charp>(cp) ;
 	}
 	return rs ;
-}
-/* end subroutine (record_loadun) */
+} /* end subroutine (record_loadun) */
 
 local int record_finish(rec *ep) noex {
         int             rs = SR_FAULT ;
@@ -673,8 +654,7 @@ local int record_finish(rec *ep) noex {
             ep->pwl = 0 ;
 	} /* end if (non-null) */
         return rs ;
-}
-/* end subroutine (record_finish) */
+} /* end subroutine (record_finish) */
 
 local int record_access(rec *ep,time_t dt) noex {
         int             rs = SR_FAULT ;
@@ -685,8 +665,7 @@ local int record_access(rec *ep,time_t dt) noex {
             pwl  = ep->pwl ;
 	} /* end if (non-null) */
         return (rs >= 0) ? pwl : rs ;
-}
-/* end subroutine (record_access) */
+} /* end subroutine (record_access) */
 
 local int record_refresh(rec *ep,time_t dt,int wc) noex {
         int             rs = SR_FAULT ;
@@ -713,7 +692,7 @@ local int record_refresh(rec *ep,time_t dt,int wc) noex {
                         rs = pwp->load(mbuf,pwl,opwp) ;
                         if (rs < 0) {
 			    lm_free(vp) ;
-			}
+			} /* end if (error) */
                     } /* end if (ok) */
                 } else if (rs == SR_NOTFOUND) {
                     if (ep->pwbuf != nullptr) {
@@ -733,8 +712,7 @@ local int record_refresh(rec *ep,time_t dt,int wc) noex {
             }
 	} /* end if (non-null) */
         return (rs >= 0) ? pwl : rs ;
-}
-/* end subroutine (record_refresh) */
+} /* end subroutine (record_refresh) */
 
 local int record_old(rec *ep,time_t dt,int ttl) noex {
 	int		rs = SR_FAULT ;
@@ -744,8 +722,7 @@ local int record_old(rec *ep,time_t dt,int ttl) noex {
             f_old = ((dt - ep->ti_create) >= ttl) ;
 	}
         return (rs >= 0) ? f_old : rs ;
-}
-/* end subroutine (record_old) */
+} /* end subroutine (record_old) */
 
 local int getpw(ucentpw *pwp,char *pwbuf,int pwlen,ureq *rp) noex {
 	ucentpw		*pp = pwentp(pwp) ;
@@ -756,10 +733,10 @@ local int getpw(ucentpw *pwp,char *pwbuf,int pwlen,ureq *rp) noex {
 	    rs = uc_getpwuid(pp,pwbuf,pwlen,rp->uid) ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
 local int getpw_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	return uc_getpwnam(pwp,pwbuf,pwlen,un) ;
-}
+} /* end subroutine */
 
 
