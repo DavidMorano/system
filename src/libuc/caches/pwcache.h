@@ -13,11 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |uid_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
-#include	<pq.h>
+#include	<sys/types.h>		/* POSIX® |uid_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
+#include	<pq.h>			/* LIBUC */
 
 
 #define	PWCACHE			struct pwcache_head
@@ -41,7 +41,7 @@ struct pwcache_head {
 	pq		*lrup ;		/* least-recently-used */
 	time_t		ti_check ;
 	PWCACHE_ST	s ;
-	uint		magic ;
+	uint		magval ;
 	uint		wcount ;	/* write-count */
 	int		ttl ;		/* time-to-live */
 	int		nmax ;		/* maximum entries */
