@@ -49,10 +49,10 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucgetpw.h>		/* LIBUC */
 #include	<getxid.h>		/* LIBUC */
-#include	<errtimer.hh>		/* LIBUC */
 #include	<posname.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
