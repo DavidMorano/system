@@ -42,13 +42,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>		/* LINU */
-#include	<utypedefs.h>		/* LINU */
-#include	<utypealiases.h>	/* LINU */
-#include	<usysdefs.h>		/* LINU */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
-#include	<mkchar.h>		/* LINU */
-#include	<localmisc.h>		/* LINU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nchr.h"
 
