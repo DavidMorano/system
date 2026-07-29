@@ -49,6 +49,7 @@
 #include	<ptma.h>		/* LIBU */
 #include	<ptm.h>			/* LIBU */
 #include	<intceil.h>		/* LIBU */
+#include	<sigblocker.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucsysmisc.h>		/* LIBUC |ucpagesize(3uc)| */
@@ -57,7 +58,6 @@
 #include	<ucfileop.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<getax.h>		/* LIBUC */
-#include	<sigblocker.h>		/* LIBUC */
 #include	<estrings.h>		/* LIBUC */
 #include	<filer.h>		/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
