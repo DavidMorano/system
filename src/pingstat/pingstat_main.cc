@@ -11,12 +11,12 @@
 
 /* revision history:
 
-	= 2001-09-01, David A­D­ Morano
+	= 2000-05-14, David A­D­ Morano
 	This program was originally written.
 
 */
 
-/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -36,47 +36,48 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<getportnum.h>
-#include	<gethe.h>
-#include	<bits.h>
-#include	<keyopt.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<userinfo.h>
-#include	<vecstr.h>
-#include	<char.h>
-#include	<ascii.h>
-#include	<hostent.h>
-#include	<dater.h>
-#include	<sockaddress.h>
-#include	<lfm.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
-#include	<libdebug.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<getportnum.h>		/* LIBUC */
+#include	<gethe.h>		/* LIBUC */
+#include	<bits.h>		/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<lfm.h>			/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
+#include	<libdebug.h>		/* LIBDEBUG */
 
-#include	"pinghost.h"
-#include	"pingstatdb.h"
-#include	"pingtab.h"
-#include	"config.h"
+#include	<proguserlist.h>
+#include	<pinghost.h>
+#include	<pingstatdb.h">
+#include	<pingtab.h>
+
+#include	"pingstat_config.h"
 #include	"defs.h"
 #include	"proglog.h"
-#include	"proguserlist.h"
 #include	"configfile.h"
 
 
