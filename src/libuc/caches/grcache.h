@@ -13,17 +13,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<cq.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<time.h>		/* POSIX® |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<cq.h>			/* LIBUC */
 
 
 #define	GRCACHE			struct grcache_head
 #define	GRCACHE_ST		struct grcache_stats
-
 #define	GRCACHE_MAGIC		0x98643162
 #define	GRCACHE_DEFENTS		10
 #define	GRCACHE_DEFMAX		20	/* default maximum entries */
@@ -44,7 +43,7 @@ struct grcache_head {
 	vechand		*rlp ;		/* record-list-pointer */
 	time_t		ti_check ;
 	GRCACHE_ST	s ;
-	uint		magic ;
+	uint		magval ;
 	uint		wcount ;
 	int		ttl ;		/* time-to-live */
 	int		nmax ;		/* maximum entries */
