@@ -1,6 +1,6 @@
 /* bbspec SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* load a bible-book-specification */
 /* version %I% last-modified %G% */
