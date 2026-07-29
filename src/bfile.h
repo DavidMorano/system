@@ -292,7 +292,7 @@ struct bfile : bfile_head {
 	int readln	(char *lp,int ll) noex {
 	    return readlnto(lp,ll,-1) ;
 	} ;
-	int readlns	(char *,int,int,int *) noex ;
+	int readlns	(char *,int,int = -1,int * = nullptr) noex ;
 	int seek	(off_t,int) noex ;
 	int tell	(off_t *) noex ;
 	int write	(cvoid *,int) noex ;
