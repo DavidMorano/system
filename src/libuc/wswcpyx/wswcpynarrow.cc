@@ -38,15 +38,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| + |wchar_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD |wchar_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -90,7 +90,6 @@ int wswcpynarrow(wchar_t *rarr,cchar *sp,int sl) noex {
 	    rarr[c] = '\0' ;
 	} /* end if (non-null) */
 	return (c >= 0) ? c : rs ;
-}
-/* end subroutine (wswcpynarrow) */
+} /* end subroutine (wswcpynarrow) */
 
 
