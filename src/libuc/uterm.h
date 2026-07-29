@@ -23,7 +23,7 @@
 #include	<sys/types.h>		/* POSIX system types |uid_t| */
 #include	<termios.h>		/* POSIX */
 #include	<time.h>		/* CSTD |time_t| */
-#include	<limits.h>		/* CSTD */
+#include	<limits.h>		/* CSTD |UCHAR_MAX| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<charq.h>		/* LIBUC */
@@ -35,6 +35,7 @@
 #define	UTERM_LD	struct uterm_loader
 #define	UTERM_PR	struct uterm_prompter
 #define	UTERM_MAGIC	0x33442281
+#define	UTERM_TSZ	((UCHAR_MAX + 1) / szof(char))
 
 
 enum utermcmds {
@@ -101,7 +102,7 @@ struct uterm_head {
 	int		ch_read ;
 	int		ch_write ;
 	int		status ;
-	uchar		rterms[32] ;
+	uchar		rterms[UTERM_TSZ] ;
 } ; /* end struct (uterm_head) */
 
 typedef UTERM		uterm ;
@@ -111,22 +112,23 @@ typedef	UTERM_PR	uterm_pr ;
 
 EXTERNC_begin
 
-extern int uterm_start(uterm *,int) noex ;
-extern int uterm_control(uterm *,int,...) noex ;
-extern int uterm_status(uterm *,int,...) noex ;
-extern int uterm_read(uterm *,char *,int) noex ;
-extern int uterm_reade(uterm *,char *,int,int,int,uterm_pr *,uterm_ld *) noex ;
-extern int uterm_readcmd(uterm *,termcmd *,int,int) noex ;
-extern int uterm_write(uterm *,cchar *,int) noex ;
-extern int uterm_suspend(uterm *) noex ;
-extern int uterm_resume(uterm *) noex ;
-extern int uterm_restore(uterm *) noex ;
-extern int uterm_ensure(uterm *) noex ;
-extern int uterm_getmesg(uterm *) noex ;
-extern int uterm_getbiff(uterm *) noex ;
-extern int uterm_getpop(uterm *) noex ;
-extern int uterm_setpop(uterm *,int) noex ;
-extern int uterm_finish(uterm *) noex ;
+extern int uterm_start		(uterm *,int) noex ;
+extern int uterm_control	(uterm *,int,...) noex ;
+extern int uterm_status		(uterm *,int,...) noex ;
+extern int uterm_read		(uterm *,char *,int) noex ;
+extern int uterm_reade		(uterm *,char *,int,int,int,
+					uterm_pr *,uterm_ld *) noex ;
+extern int uterm_readcmd	(uterm *,termcmd *,int,int) noex ;
+extern int uterm_write		(uterm *,cchar *,int) noex ;
+extern int uterm_suspend	(uterm *) noex ;
+extern int uterm_resume		(uterm *) noex ;
+extern int uterm_restore	(uterm *) noex ;
+extern int uterm_ensure		(uterm *) noex ;
+extern int uterm_getmesg	(uterm *) noex ;
+extern int uterm_getbiff	(uterm *) noex ;
+extern int uterm_getpop		(uterm *) noex ;
+extern int uterm_setpop		(uterm *,int) noex ;
+extern int uterm_finish		(uterm *) noex ;
 
 EXTERNC_end
 
