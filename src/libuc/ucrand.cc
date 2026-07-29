@@ -40,27 +40,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucatexit.h>
-#include	<ucatfork.h>
-#include	<ucgetrandom.h>
-#include	<sigblocker.h>
-#include	<timewatch.hh>
-#include	<ptm.h>
-#include	<ptc.h>
-#include	<randomvar.h>
-#include	<stdintx.h>
-#include	<mkchar.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<sigblocker.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<ucgetrandom.h>		/* LIBUC */
+#include	<randomvar.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucrand.h"
 
@@ -191,8 +191,7 @@ sysret_t uc_rand(void *arbuf,int arlen) noex {
 	cint		rlen = arlen ;
 	char		*rbuf = charp(arbuf) ;
 	return rander_data.get(rbuf,rlen) ;
-}
-/* end subroutine (uc_rand) */
+} /* end subroutine (uc_rand) */
 
 
 /* local subroutines */
