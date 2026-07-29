@@ -124,7 +124,7 @@ template<typename ... Args>
 local int namecache_magic(namecache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == NAMECACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == NAMECACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (namecache_magic) */
@@ -165,22 +165,21 @@ int namecache_start(NC *op,cchar *vname,int nmax,int ttl) noex {
 	            if ((rs = hdb_start(op->dbp,ne,1,np,np)) >= 0) {
 	                op->nmax = nmax ;
 	                op->ttl = ttl ;
-	                op->magic = NAMECACHE_MAGIC ;
+	                op->magval = NAMECACHE_MAGIC ;
 	            } /* end if (hdb-start) */
 	            if (rs < 0) {
 			void *vp = voidp(op->vname) ;
 		        lm_free(vp) ;
 		        op->vname = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		namecache_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (namecache_ctor) */
 	return rs ;
-}
-/* end subroutine (namecache_start) */
+} /* end subroutine (namecache_start) */
 
 int namecache_finish(NC *op) noex {
 	int		rs ;
@@ -204,11 +203,10 @@ int namecache_finish(NC *op) noex {
 	        rs1 = namecache_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (namecache_finish) */
+} /* end subroutine (namecache_finish) */
 
 int namecache_add(NC *op,cchar *un,cchar *rnp,int rnl) noex {
 	int		rs ;
@@ -232,8 +230,7 @@ int namecache_add(NC *op,cchar *un,cchar *rnp,int rnl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (namecache_add) */
+} /* end subroutine (namecache_add) */
 
 int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 	int		rs ;
@@ -304,8 +301,7 @@ int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (namecache_lookup) */
+} /* end subroutine (namecache_lookup) */
 
 int namecache_stats(NC *op,NC_ST *sp) noex {
 	int		rs ;
@@ -316,8 +312,7 @@ int namecache_stats(NC *op,NC_ST *sp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (namecache_stats) */
+} /* end subroutine (namecache_stats) */
 
 
 /* private subroutines */
@@ -339,15 +334,14 @@ local int namecache_newent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 		} /* end if (hdb-store) */
 		if (rs < 0) {
 		    entry_finish(ep) ;
-		}
+		} /* end if (error) */
 	    } /* end if (entry-start) */
 	    if (rs < 0) {
 		lm_free(ep) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (namecache_newent) */
+} /* end subroutine (namecache_newent) */
 
 local int namecache_repent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 	NC_ENT		*ep = nullptr ; /* used-afterwards */
@@ -375,8 +369,7 @@ local int namecache_repent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 	}
 	if (epp) *epp = ep ;
 	return rs ;
-}
-/* end subroutine (namecache_repent) */
+} /* end subroutine (namecache_repent) */
 
 local int namecache_entfins(NC *op) noex {
 	hdb		*elp = op->dbp ;
@@ -401,8 +394,7 @@ local int namecache_entfins(NC *op) noex {
 	} /* end if */
 	if (rs >= 0) rs = rs1 ;
 	return rs ;
-}
-/* end subroutine (namecache_entfins) */
+} /* end subroutine (namecache_entfins) */
 
 local int entry_start(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 	custime		dt = getustime ;
@@ -419,8 +411,7 @@ local int entry_start(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 local int entry_finish(NC_ENT *ep) noex {
 	int		rs = SR_FAULT ;
@@ -436,8 +427,7 @@ local int entry_finish(NC_ENT *ep) noex {
 	    ep->realname = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 local int entry_update(NC_ENT *ep,cchar *rp,int rl) noex {
 	int		rs = SR_FAULT ;
@@ -464,8 +454,7 @@ local int entry_update(NC_ENT *ep,cchar *rp,int rl) noex {
 	    } /* end if (changed) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (entry_update) */
+} /* end subroutine (entry_update) */
 
 local int entry_loadnames(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 	int		rs ;
@@ -484,8 +473,7 @@ local int entry_loadnames(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 	    bp = (strwcpy(bp,rp,rl)+1) ;
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (entry_loadnames) */
+} /* end subroutine (entry_loadnames) */
 
 /* make a real name from a GECOS name */
 local int mkaname(char *nbuf,int nlen,cchar *gecos) noex {
@@ -508,7 +496,6 @@ local int mkaname(char *nbuf,int nlen,cchar *gecos) noex {
 	    } /* end if (realname) */
 	} /* end if (mkgeoxname) */
 	return (rs >= 0) ? rl : 0 ;
-}
-/* end subroutine (mkaname) */
+} /* end subroutine (mkaname) */
 
 
