@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 struct pingstatmsg_update {
@@ -66,7 +66,7 @@ enum pingstatmsgrcs {
 	pingstatmsgrc_done,
 	pingstatmsgrc_goingdown,
 	pingstatmsgrc_overlast
-} ;} ; /* end enum */
+} ; /* end enum */
 
 /* message sizes */
 #define	PINGSTATMSG_SUPDATE		sizeof(struct pingstatmsg_update) ;
