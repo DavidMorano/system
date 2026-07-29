@@ -29,15 +29,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<usysutility.hh>	/* |snprintf(3u)| */
-#include	<uctimeconv.h>		/* |uctimelocal(3uc)| */
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<usysutility.hh>	/* LIBU |snprintf(3u)| */
+#include	<uctimeconv.h>		/* LIBUC |uctimelocal(3uc)| */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"timevalstr.h"
 
@@ -73,6 +73,7 @@ using libu::snprintf ;			/* subroutine */
 
 constexpr int		tlen = TIMEBUFLEN ;
 
+
 /* exported variables */
 
 
@@ -80,13 +81,13 @@ constexpr int		tlen = TIMEBUFLEN ;
 
 char *timevalstr_ulog(TIMEVAL *tvp,char *tbuf) noex {
 	TM		*timep = nullptr ;
-	if (tvp && tbuf) {
+	if (tvp && tbuf) ylikely {
 	    int	rs ; ;
 	    custime secs = tvp->tv_sec ;
-	    if (TM ts ; (rs = uc_timelocal(&secs,&ts)) >= 0) {
+	    if (TM ts ; (rs = uc_timelocal(&secs,&ts)) >= 0) ylikely {
 	        /* this (below) reallly cannot fail */
 	        cchar *fmt = "%02u%02u%02u_%02u%02u:%02u.%06u" ;
-	        snprintf(tbuf,tlen,fmt,
+	        rs = snprintf(tbuf,tlen,fmt,
 	            (timep->tm_year % NYEARS_CENTURY),
 	            (timep->tm_mon + 1),
 	            timep->tm_mday,
@@ -94,12 +95,12 @@ char *timevalstr_ulog(TIMEVAL *tvp,char *tbuf) noex {
 	            timep->tm_min,
 	            timep->tm_sec,
 	            tvp->tv_usec) ;
-	    } else {
+	    } /* end if (TM) */
+	    if (rs < 0) {
 		ulogerror("timevalstr_ulog",rs,"timelocal") ;
 	    } /* end if (uc_timelocal) */
 	} /* end if (non-null) */
 	return (timep) ? tbuf : nullptr ;
-}
-/* end subroutine (timevalstr_ulog) */
+} /* end subroutine (timevalstr_ulog) */
 
 
