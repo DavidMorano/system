@@ -70,6 +70,10 @@ import libutil ;			/* |memclear(3u)| */
 #define	BVSS_C		bibleverses_cur
 #define	BVSS_I		bibleverses_info
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
+
 
 /* imported namespaces */
 
@@ -218,6 +222,7 @@ namespace {
 } /* end namespace */
 
 constexpr subnamer	subname ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
