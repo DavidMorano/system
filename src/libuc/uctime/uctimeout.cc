@@ -64,14 +64,14 @@
 #include	<ptc.h>			/* LIBU */
 #include	<pta.h>			/* LIBU */
 #include	<intsat.h>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<upt.h>			/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucsig.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
 #include	<ucatfork.h>		/* LIBUC */
 #include	<uctimer.h>		/* LIBUC */
 #include	<sigevent.h>		/* LIBUC */
-#include	<timewatch.hh>		/* LIBUC */
-#include	<upt.h>			/* LIBUC */
 #include	<vechand.h>		/* LIBUC vector-handles */
 #include	<vecsorthand.h>		/* LIBUC vector-sorted-handles */
 #include	<ciq.h>			/* LIBUC container-interlocked-queue */
