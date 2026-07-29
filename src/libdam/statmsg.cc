@@ -52,6 +52,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<ptm.h>			/* LIBU */
+#include	<ascii.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucdescread.h>		/* LIBUC */
 #include	<ucdescwrite.h>		/* LIBUC */
@@ -68,7 +69,6 @@
 #include	<paramfile.h>		/* LIBUC */
 #include	<strpack.h>		/* LIBUC */
 #include	<fsdir.h>		/* LIBUC */
-#include	<ascii.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<snx.h>			/* LIBUC */
