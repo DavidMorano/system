@@ -101,7 +101,7 @@ int uc_timelocal(custime *tp,TM *tsp) noex {
 	    errno = 0 ;
 	    if (syshas.localtimer) ylikely {
 	        if (TM *rp ; (rp = localtime_r(tp,tsp)) == np) {
-	            rs = (- errno) ;
+	            rs = (neg errno) ;
 		}
 	    } else {
 		rs = SR_NOSYS ;
@@ -111,15 +111,14 @@ int uc_timelocal(custime *tp,TM *tsp) noex {
 } /* end subroutine (uc_timelocal) */
 
 int uc_timegm(custime *tp,TM *tsp) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	assert(tp && tsp) ;
 	if (tp && tsp) ylikely {
 	    rs = SR_OK ;
 	    errno = 0 ;
 	    if (syshas.gmtimer) ylikely {
-	        if (TM *rp ; (rp = gmtime_r(tp,tsp)) == np) {
-	            rs = (- errno) ;
+	        if (TM *rp = gmtime_r(tp,tsp) ; rp) {
+	            rs = (neg errno) ;
 		}
 	    } else {
 		rs = SR_NOSYS ;
@@ -147,7 +146,7 @@ int uc_mktime(TM *tmp,time_t *rp) noex {
 	    rs = SR_OK ;
 	    errno = 0 ;
 	    if ((res = mktime(tmp)) < 0) {
-	        if (errno) rs = (- errno) ;
+	        if (errno) rs = (neg errno) ;
 	    } /* end if (error) */
 	    if (rp) {
 	        *rp = (rs >= 0) ? res : 0 ;
