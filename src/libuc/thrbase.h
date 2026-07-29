@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<thrcomm.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<thrcomm.h>		/* LIBUC */
 
 
 #define	THRBASE		struct thrbase_head
@@ -70,14 +70,14 @@ EXTERNC_begin
 
 typedef int (*thrbase_sub)(thrbase *,void *) noex ;
 
-extern int	thrbase_start(thrbase *,thrbase_sub,void *) noex ;
-extern int	thrbase_cmdsend(thrbase *,int,int) noex ;
-extern int	thrbase_cmdexit(thrbase *) noex ;
-extern int	thrbase_cmdrecv(thrbase *,int) noex ;
-extern int	thrbase_exiting(thrbase *) noex ;
+extern int	thrbase_start	(thrbase *,thrbase_sub,void *) noex ;
+extern int	thrbase_cmdsend	(thrbase *,int,int) noex ;
+extern int	thrbase_cmdexit	(thrbase *) noex ;
+extern int	thrbase_cmdrecv	(thrbase *,int) noex ;
+extern int	thrbase_exiting	(thrbase *) noex ;
 extern int	thrbase_waitexit(thrbase *) noex ;
-extern int	thrbase_infoget(thrbase *,thrbase_info *) noex ;
-extern int	thrbase_finish(thrbase *) noex ;
+extern int	thrbase_infoget	(thrbase *,thrbase_info *) noex ;
+extern int	thrbase_finish	(thrbase *) noex ;
 
 EXTERNC_end
 
