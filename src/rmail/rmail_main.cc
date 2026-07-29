@@ -1,4 +1,4 @@
-/* rmail_main SUPPORT (DMAIL) */
+/* dmail_main SUPPORT (DMAIL) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -35,6 +35,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is the front-end subroutine (main) for the DMAIL and
 	DMAILBOX pograms.
 
@@ -46,17 +47,18 @@
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
-#include	<unistd.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-#include	<csignal>
+#include	<unistd.h>
 #include	<ctime>
+#include	<csignal>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<usystem.h>
-#include	<ugetpw.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<getpwx.h>
 #include	<getportnum.h>
-#include	<getourenv.h>
 #include	<getx.h>
 #include	<getxname.h>
 #include	<getax.h>
@@ -92,6 +94,7 @@
 #include	<strx.h>
 #include	<matxstr.h>
 #include	<isnot.h>
+#include	<headkeymat.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -99,16 +102,13 @@
 #include	"defs.h"
 #include	"proglog.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#if	CF_UCPWCACHE
-#define	GETPW_NAME	ucpwcache_name
-#define	GETPW_UID	ucpwcache_uid
-#else
-#define	GETPW_NAME	getpw_name
-#define	GETPW_UID	getpw_uid
-#endif /* CF_UCPWCACHE */
+#define	PI		proginfo
 
 #define	BUFLEN		MAX((2 * MAXHOSTNAMELEN),MSGBUFLEN)
 
@@ -128,47 +128,35 @@
 
 /* external subroutines */
 
-extern int	headkeymat(cchar *,cchar *,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	pcstrustuser(cchar *,cchar *) ;
-extern int	initnow(struct timeb *,cchar *,int) ;
+extern int	printhelp(bfile *,cchar *,cchar *,cchar *) noex ;
+extern int	proginfo_setpiv(PI *,cchar *,const pivars *) noex ;
 
-extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
+extern int	prognamecache_begin(PI *,userinfo *) noex ;
+extern int	prognamecache_end(PI *) noex ;
 
-extern int	prognamecache_begin(PROGINFO *,USERINFO *) ;
-extern int	prognamecache_end(PROGINFO *) ;
+extern int	proguserlist_begin(PI *) noex ;
+extern int	proguserlist_end(PI *) noex ;
 
-extern int	proguserlist_begin(PROGINFO *) ;
-extern int	proguserlist_end(PROGINFO *) ;
+extern int	proglogenv_begin(PI *) noex ;
+extern int	proglogenv_end(PI *) noex ;
 
-extern int	proglogenv_begin(PROGINFO *) ;
-extern int	proglogenv_end(PROGINFO *) ;
+extern int	proglogzone_begin(PI *) noex ;
+extern int	proglogzone_end(PI *) noex ;
 
-extern int	proglogzone_begin(PROGINFO *) ;
-extern int	proglogzone_end(PROGINFO *) ;
+local int	procmsgid_begin(PI *) noex ;
+local int	procmsgid_end(PI *) noex ;
+local int	procmsgid_update(PI *,MSGINFO *,cchar *) noex ;
 
-static int	procmsgid_begin(PROGINFO *) ;
-static int	procmsgid_end(PROGINFO *) ;
-static int	procmsgid_update(PROGINFO *,MSGINFO *,cchar *) ;
+extern int	progexpand(PI *,char *,int,cchar *,int) noex ;
+extern int	progmsgs(PI *,bfile *,bfile *,vecobj *,vecobj *) noex ;
+extern int	progcomsat(PI *,VECOBJ *) noex ;
+extern int	progdeliver(PI *,int,RECIP *) noex ;
+extern int	progboxer(PI *,int,RECIP *) noex ;
+extern int	parsenodespec(PI *,int,char *,int,char *,cchar *) noex ;
+extern int	mkrealname(char *,int,cchar *,int) noex ;
 
-extern int	progexpand(PROGINFO *,char *,int,cchar *,int) ;
-extern int	progmsgs(PROGINFO *,bfile *,bfile *,vecobj *,vecobj *) ;
-extern int	progcomsat(PROGINFO *,VECOBJ *) ;
-extern int	progdeliver(PROGINFO *,int,RECIP *) ;
-extern int	progboxer(PROGINFO *,int,RECIP *) ;
-extern int	parsenodespec(PROGINFO *,int,char *,int,char *,cchar *) ;
-extern int	mkrealname(char *,int,cchar *,int) ;
-
-extern int	vecobj_recipadd(vecobj *,cchar *,int) ;
-extern int	vecobj_recipfins(vecobj *) ;
-
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern int	vecobj_recipadd(vecobj *,cchar *,int) noex ;
+extern int	vecobj_recipfins(vecobj *) noex ;
 
 
 /* external variables */
@@ -179,144 +167,129 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PI *) noex ;
 
 #if	CF_LOGRECIP
-static int	logrecip(PROGINFO *,cchar *,struct passwd *) ;
+local int	logrecip(PI *,cchar *,PASSWD *) noex ;
 #endif /* CF_LOGRECIP */
 
-static int	mkrecipname(char *,int,cchar *) ;
+local int	mkrecipname(char *,int,cchar *) noex ;
 
-static int	loadrecips(PROGINFO *,VECOBJ *,cchar *,int) ;
-static int	loadrecip(PROGINFO *,VECOBJ *,cchar *,int) ;
+local int	loadrecips(PI *,VECOBJ *,cchar *,int) noex ;
+local int	loadrecip(PI *,VECOBJ *,cchar *,int) noex ;
 
 #if	CF_SETPCS
-static int	procopts_setpcs(PROGINFO *,KEYOPT *,vecstr *) ;
+local int	procopts_setpcs(PI *,keyopt *,vecstr *) noex ;
 #endif /* CF_SETPCS */
 
-static int	procopts(PROGINFO *,KEYOPT *,PARAMOPT *) ;
-static int	procnodecluster(PROGINFO *pip) ;
-static int	procuucpinfo(PROGINFO *) ;
-static int	procenvfromaddr(PROGINFO *) ;
-static int	procprotospec(PROGINFO *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,PARAMOPT *,
-			cchar *,cchar *,cchar *) ;
-static int	processing(PROGINFO *,ARGINFO *,BITS *,
-			cchar *,cchar *,cchar *) ;
-static int	processings(PROGINFO *,VECOBJ *,VECOBJ *,cchar *) ;
-static int	procfindfiles(PROGINFO *) ;
-static int	procfindsched(PROGINFO *,vecstr *) ;
-static int	procfindcomsat(PROGINFO *,vecstr *) ;
-static int	procfindspam(PROGINFO *,vecstr *) ;
-static int	procfindmbtab(PROGINFO *,vecstr *) ;
-static int	procdefs(PROGINFO *) ;
-static int	procuserboxes(PROGINFO *pip) ;
-static int	procloginfo(PROGINFO *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,VECOBJ *,cchar *) ;
-static int	procin(PROGINFO *,vecobj *,bfile *,vecobj *,cchar *) ;
-static int	procmaildirdead(PROGINFO *,cchar *,int) ;
-static int	procmaildircopy(PROGINFO *,cchar *,int) ;
-static int	procmaildirs(PROGINFO *,PARAMOPT *) ;
-static int	procmaildir(PROGINFO *,PARAMOPT *,cchar *,int) ;
+local int	procopts(PI *,keyopt *,paramopt *) noex ;
+local int	procnodecluster(PI *pip) noex ;
+local int	procuucpinfo(PI *) noex ;
+local int	procenvfromaddr(PI *) noex ;
+local int	procprotospec(PI *) noex ;
+local int	process(PI *,ARGINFO *,bits *,paramopt *,
+			cchar *,cchar *,cchar *) noex ;
+local int	processing(PI *,ARGINFO *,bits *,
+			cchar *,cchar *,cchar *) noex ;
+local int	processings(PI *,VECOBJ *,VECOBJ *,cchar *) noex ;
+local int	procfindfiles(PI *) noex ;
+local int	procfindsched(PI *,vecstr *) noex ;
+local int	procfindcomsat(PI *,vecstr *) noex ;
+local int	procfindspam(PI *,vecstr *) noex ;
+local int	procfindmbtab(PI *,vecstr *) noex ;
+local int	procdefs(PI *) noex ;
+local int	procuserboxes(PI *pip) noex ;
+local int	procloginfo(PI *) noex ;
+local int	procargs(PI *,ARGINFO *,bits *,VECOBJ *,cchar *) noex ;
+local int	procin(PI *,vecobj *,bfile *,vecobj *,cchar *) noex ;
+local int	procmaildirdead(PI *,cchar *,int) noex ;
+local int	procmaildircopy(PI *,cchar *,int) noex ;
+local int	procmaildirs(PI *,paramopt *) noex ;
+local int	procmaildir(PI *,paramopt *,cchar *,int) noex ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_begin(PI *,userinfo *) noex ;
+local int	procuserinfo_end(PI *) noex ;
 
-static int	procstuff_begin(PROGINFO *,cchar *) ;
-static int	procstuff_end(PROGINFO *) ;
+local int	procstuff_begin(PI *,cchar *) noex ;
+local int	procstuff_end(PI *) noex ;
 
-static int	procourconf_begin(PROGINFO *,PARAMOPT *) ;
-static int	procourconf_end(PROGINFO *) ;
+local int	procourconf_begin(PI *,paramopt *) noex ;
+local int	procourconf_end(PI *) noex ;
 
-static int	proclogs_begin(PROGINFO *) ;
-static int	proclogs_end(PROGINFO *) ;
-static int	proclogs_log(PROGINFO *) ;
+local int	proclogs_begin(PI *) noex ;
+local int	proclogs_end(PI *) noex ;
+local int	proclogs_log(PI *) noex ;
 
-static int	procmaildname_begin(PROGINFO *,PARAMOPT *) ;
-static int	procmaildname_add(PROGINFO *,cchar *,int) ;
-static int	procmaildname_end(PROGINFO *) ;
+local int	procmaildname_begin(PI *,paramopt *) noex ;
+local int	procmaildname_add(PI *,cchar *,int) noex ;
+local int	procmaildname_end(PI *) noex ;
 
-static int	proctmp_begin(PROGINFO *,bfile *,char *) ;
-static int	proctmp_end(PROGINFO *,bfile *,char *) ;
+local int	proctmp_begin(PI *,bfile *,char *) noex ;
+local int	proctmp_end(PI *,bfile *,char *) noex ;
 
-static int	procspamsetup(PROGINFO *,vecobj *) ;
-static int	procspambox(PROGINFO *,vecobj *,vecobj *,int) ;
-static int	procspamboxing(PROGINFO *,vecobj *,RECIP *) ;
-static int	procspamprogboxer(PROGINFO *,RECIP *,MSGINFO *) ;
-static int	procrecips(PROGINFO *,vecobj *,vecobj *,int) ;
-static int	procrecip(PROGINFO *,vecobj *,RECIP *,int) ;
-static int	procrecipvalid(PROGINFO *,RECIP *) ;
+local int	procspamsetup(PI *,vecobj *) noex ;
+local int	procspambox(PI *,vecobj *,vecobj *,int) noex ;
+local int	procspamboxing(PI *,vecobj *,RECIP *) noex ;
+local int	procspamprogboxer(PI *,RECIP *,MSGINFO *) noex ;
+local int	procrecips(PI *,vecobj *,vecobj *,int) noex ;
+local int	procrecip(PI *,vecobj *,RECIP *,int) noex ;
+local int	procrecipvalid(PI *,RECIP *) noex ;
 
-static int	procrecip_mailspool(PROGINFO *,RECIP *) ;
-static int	procrecip_hasmailfile(PROGINFO *,RECIP *) ;
-static int	procrecip_defmaildir(PROGINFO *,RECIP *) ;
+local int	procrecip_mailspool(PI *,RECIP *) noex ;
+local int	procrecip_hasmailfile(PI *,RECIP *) noex ;
+local int	procrecip_defmaildir(PI *,RECIP *) noex ;
 
-static int	procrecip_addropen(PROGINFO *) ;
-static int	procrecip_addrbegin(PROGINFO *,LOOKADDR_USER *,cchar *) ;
-static int	procrecip_addrend(PROGINFO *,LOOKADDR_USER *) ;
-static int	procrecip_addrclose(PROGINFO *) ;
+local int	procrecip_addropen(PI *) noex ;
+local int	procrecip_addrbegin(PI *,LOOKADDR_USER *,cchar *) noex ;
+local int	procrecip_addrend(PI *,LOOKADDR_USER *) noex ;
+local int	procrecip_addrclose(PI *) noex ;
 
 #if	CF_ADDRCHECK
-static int	procrecip_addrcheck(PROGINFO *,LOOKADDR_USER *,MSGINFO *,int) ;
-static int	procrecip_addrchecker(PROGINFO *,LOOKADDR_USER *,cchar *,int) ;
+local int	procrecip_addrcheck(PI *,LOOKADDR_USER *,MSGINFO *,int) ;
+local int	procrecip_addrchecker(PI *,LOOKADDR_USER *,cchar *,int) ;
 #endif /* CF_ADDRCHECK */
 
-static int	procmboxes(PROGINFO *,cchar *,int) ;
-static int	procportcomsat(PROGINFO *pip) ;
+local int	procmboxes(PI *,cchar *,int) noex ;
+local int	procportcomsat(PI *pip) noex ;
 
 #ifdef	COMMENT
-static int	procunavail(PROGINFO *,int) ;
+local int	procunavail(PI *,int) noex ;
 #endif /* COMMENT */
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_mboxadd(LOCINFO *,cchar *,int) ;
-static int	locinfo_mboxcount(LOCINFO *) ;
-int		locinfo_rncurbegin(LOCINFO *,LOCINFO_RNCUR *) ;
-int		locinfo_rncurend(LOCINFO *,LOCINFO_RNCUR *) ;
-int		locinfo_rnlook(LOCINFO *,LOCINFO_RNCUR *,cchar *,int) ;
-int		locinfo_rnread(LOCINFO *,LOCINFO_RNCUR *,char *,int) ;
-int		locinfo_gmcurbegin(LOCINFO *,LOCINFO_GMCUR *) ;
-int		locinfo_gmcurend(LOCINFO *,LOCINFO_GMCUR *) ;
-int		locinfo_gmlook(LOCINFO *,LOCINFO_GMCUR *,cchar *,int) ;
-int		locinfo_gmread(LOCINFO *,LOCINFO_GMCUR *,char *,int) ;
+local int	locinfo_start(LOCINFO *,PI *) noex ;
+local int	locinfo_finish(LOCINFO *) noex ;
+local int	locinfo_mboxadd(LOCINFO *,cchar *,int) noex ;
+local int	locinfo_mboxcount(LOCINFO *) noex ;
+int		locinfo_rncurbegin(LOCINFO *,LOCINFO_RNCUR *) noex ;
+int		locinfo_rncurend(LOCINFO *,LOCINFO_RNCUR *) noex ;
+int		locinfo_rnlook(LOCINFO *,LOCINFO_RNCUR *,cchar *,int) noex ;
+int		locinfo_rnread(LOCINFO *,LOCINFO_RNCUR *,char *,int) noex ;
+int		locinfo_gmcurbegin(LOCINFO *,LOCINFO_GMCUR *) noex ;
+int		locinfo_gmcurend(LOCINFO *,LOCINFO_GMCUR *) noex ;
+int		locinfo_gmlook(LOCINFO *,LOCINFO_GMCUR *,cchar *,int) noex ;
+int		locinfo_gmread(LOCINFO *,LOCINFO_GMCUR *,char *,int) noex ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) noex ;
 #endif /* CF_LOCSETENT */
 
-int		locinfo_mboxget(LOCINFO *,int,cchar **) ;
+int		locinfo_mboxget(LOCINFO *,int,cchar **) noex ;
 
-static int	mkreport(PROGINFO *,int,cchar **,int) ;
-static int	mkreportfile(PROGINFO *,char *,cchar *) ;
-static int	mkreportout(PROGINFO *,cchar *,cchar *,int,cchar **,int) ;
-static int	mktmpreportdir(char *,cchar *,cchar *,mode_t) ;
+local int	mkreport(PI *,int,cchar **,int) noex ;
+local int	mkreportfile(PI *,char *,cchar *) noex ;
+local int	mkreportout(PI *,cchar *,cchar *,int,cchar **,int) noex ;
+local int	mktmpreportdir(char *,cchar *,cchar *,mode_t) noex ;
 
 
 /* local variables */
 
-static cchar *argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"pm",
-	"sn",
-	"rf",
-	"af",
-	"ef",
-	"of",
-	"if",
-	"cf",
-	"lf",
-	"ms",
-	"md",
-	"mr",
-	"nm",
-	"cp",
-	nullptr
-} ;
+constexpr pivars	initvars = {
+	VARPROGRAMROOT1,
+	VARPROGRAMROOT2,
+	VARPROGRAMROOT3,
+	PROGRAMROOT,
+	VARPRPCS
+} ; /* end array */
 
 enum argopts {
 	argopt_root,
@@ -339,17 +312,32 @@ enum argopts {
 	argopt_nm,
 	argopt_cp,
 	argopt_overlast
-} ;
+} ; /* end enum (argopts) */
 
-static const struct pivars	initvars = {
-	VARPROGRAMROOT1,
-	VARPROGRAMROOT2,
-	VARPROGRAMROOT3,
-	PROGRAMROOT,
-	VARPRPCS
-} ;
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"pm",
+	"sn",
+	"rf",
+	"af",
+	"ef",
+	"of",
+	"if",
+	"cf",
+	"lf",
+	"ms",
+	"md",
+	"mr",
+	"nm",
+	"cp",
+	nullptr
+} ; /* end array (argopts) */
 
-static const struct mapex	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -360,30 +348,19 @@ static const struct mapex	mapexs[] = {
 	{ SR_NOSPC, EX_NOSPACE },
 	{ SR_INVALID, EX_USAGE },
 	{ 0, 0 }
-} ;
-
-static cchar	*progmodes[] = {
-	"dmail",
-	"dmailbox",
-	nullptr
-} ;
+} ; /* end array (mapexs) */
 
 enum progmodes {
 	progmode_dmail,
 	progmode_dmailbox,
 	progmode_overlast
-} ;
+} ; /* end enum (progmodes) */
 
-static cchar *pcsopts[] = {
-	"cluster",
-	"pcsadmin",
-	"maildir",
-	"logsize",
-	"pcspoll",
-	"syslog",
-	"mailhist",
+constexpr cpcchar	progmodes[] = {
+	"dmail",
+	"dmailbox",
 	nullptr
-} ;
+} ; /* end array (progmodes) */
 
 enum pcsopts {
 	pcsopt_cluster,
@@ -394,33 +371,18 @@ enum pcsopts {
 	pcsopt_logsys,
 	pcsopt_mailhist,
 	pcsopt_overlast
-} ;
+} ; /* end enum (pcsopts) */
 
-static cchar *locopts[] = {
-	"deadmaildir",
-	"comsat",
-	"spam",
-	"logconf",
-	"logmsg",
-	"logzone",
-	"logenv",
-	"logmsgid",
-	"divert",
-	"forward",
-	"nospam",
-	"norepeat",
-	"nopollmsg",
-	"mbtab",
-	"boxdir",
-	"boxname",
-	"tospool",
-	"tomsgread",
-	"spambox",
+constexpr cpcchar	pcsopts[] = {
+	"cluster",
+	"pcsadmin",
+	"maildir",
+	"logsize",
+	"pcspoll",
+	"syslog",
 	"mailhist",
-	"deliver",
-	"finish",
 	nullptr
-} ;
+} ; /* end array (pcsopts) */
 
 enum locopts {
 	locopt_deadmaildir,
@@ -446,16 +408,42 @@ enum locopts {
 	locopt_deliver,
 	locopt_finish,
 	locopt_overlast
-} ;
+} ; /* end enum (locopts) */
 
-static cchar	*varmaildirs[] = {
+constexpr cpcchar	locopts[] = {
+	"deadmaildir",
+	"comsat",
+	"spam",
+	"logconf",
+	"logmsg",
+	"logzone",
+	"logenv",
+	"logmsgid",
+	"divert",
+	"forward",
+	"nospam",
+	"norepeat",
+	"nopollmsg",
+	"mbtab",
+	"boxdir",
+	"boxname",
+	"tospool",
+	"tomsgread",
+	"spambox",
+	"mailhist",
+	"deliver",
+	"finish",
+	nullptr
+} ; /* end array (locopts) */
+
+constexpr cpcchar	varmaildirs[] = {
 	VARMAILDNAMEP,
 	VARMAILDNAME,
 	VARMAILDNAMES,
 	nullptr
-} ;
+} ; /* end array (varmaildirs) */
 
-static const uchar	aterms[] = {
+constexpr char		terms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -464,19 +452,20 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array (terms) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int main(int argc,cchar *argv[],cchar *envv[])
-{
+int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	PARAMOPT	akparams ;
 	bfile		errfile ;
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -954,7 +943,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -1168,7 +1157,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    if ((rs = proglog_begin(pip,&u)) >= 0) {
 	                        {
 	                            ARGINFO	*aip = &ainfo ;
-	                            BITS	*bop = &pargs ;
+	                            bits	*bop = &pargs ;
 	                            PARAMOPT	*aop = &akparams ;
 	                            cchar	*ofn = ofname ;
 	                            cchar	*afn = afname ;
@@ -1311,9 +1300,7 @@ badarg:
 
 /* local subroutines */
 
-
-static int usage(PROGINFO *pip)
-{
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -1337,11 +1324,10 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
 #if	CF_SETPCS
-static int procopts_setpcs(PROGINFO *pip,KEYOPT *kop,vecstr *setsp)
-{
-	cint	rsn = SR_NOTFOUND ;
+local int procopts_setpcs(PI *pip,keyopt *kop,vecstr *setsp) noex {
+    	cnullptr	np{} ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		fi, oi ;
@@ -1371,8 +1357,10 @@ static int procopts_setpcs(PROGINFO *pip,KEYOPT *kop,vecstr *setsp)
 	        oi = matostr(locopts,3,kp,kl) ;
 	        if (oi >= 0) kp = locopts[oi] ;
 
-	        if ((oi >= 0) && (keyopt_fetch(kop,kp,nullptr,nullptr) == rsn)) {
-	            rs = keyopt_loadvalue(kop,kp,vp,vl) ;
+	        if (oi >= 0) {
+		    if (keyopt_fetch(kop,kp,np,np) == rsn) {
+	                rs = keyopt_loadvalue(kop,kp,vp,vl) ;
+		    }
 	        }
 
 	        if (rs < 0) break ;
@@ -1401,8 +1389,10 @@ static int procopts_setpcs(PROGINFO *pip,KEYOPT *kop,vecstr *setsp)
 	        oi = matostr(pcsopts,3,kp,kl) ;
 	        if (oi >= 0) kp = pcsopts[oi] ;
 
-	        if ((oi >= 0) && (keyopt_fetch(kop,kp,nullptr,nullptr) == rsn)) {
-	            rs = keyopt_loadvalue(kop,kp,vp,vl) ;
+	        if (oi >= 0) {
+		    if (keyopt_fetch(kop,kp,np,np) == rsn) {
+	                rs = keyopt_loadvalue(kop,kp,vp,vl) ;
+		    }
 	        }
 
 	        if (rs < 0) break ;
@@ -1414,10 +1404,8 @@ static int procopts_setpcs(PROGINFO *pip,KEYOPT *kop,vecstr *setsp)
 /* end subroutine (procopts_setpcs) */
 #endif /* CF_SETPCS */
 
-
 /* process program options */
-static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *aop)
-{
+local int procopts(PI *pip,keyopt *kop,paramopt *aop) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar		*cp ;
@@ -1427,7 +1415,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *aop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi, v ;
 	        int	kl, vl ;
@@ -1641,16 +1629,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *aop)
 }
 /* end subroutine (procopts) */
 
-
-static int process(pip,aip,bop,aop,ofn,afn,ifn)
-PROGINFO	*pip ;
-ARGINFO		*aip ;
-BITS		*bop ;
-PARAMOPT	*aop ;
-cchar		*ofn ;
-cchar		*afn ;
-cchar		*ifn ;
-{
+local int process(PI *pip,ARGINFO *aip,bits *bop,paramopt *aop,
+		cchar *ofn,cchar *afn,cchar *ifn) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pn = pip->progname ;
@@ -1687,9 +1667,7 @@ cchar		*ifn ;
 }
 /* end subroutine (process) */
 
-
-static int procstuff_begin(PROGINFO *pip,cchar *argval)
-{
+local int procstuff_begin(PI *pip,cchar *argval) noex {
 	int		rs = SR_OK ;
 	if ((pip->logsize == 0) && (argval != nullptr)) {
 	    int		v ;
@@ -1701,17 +1679,16 @@ static int procstuff_begin(PROGINFO *pip,cchar *argval)
 }
 /* end subroutine (procstuff_begin) */
 
-
-static int procstuff_end(PROGINFO *pip)
-{
-	if (pip == nullptr) return SR_FAULT ;
-	return SR_OK ;
+local int procstuff_end(PI *pip) noex {
+    	int		rs = SR_FAULT ;
+	if (pip) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (procstuff_end) */
 
-
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
-{
+local int procuserinfo_begin(PI *pip,userinfo *uip) noex {
 	int		rs = SR_OK ;
 
 	pip->pid = uip->pid ;
@@ -1769,7 +1746,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end if (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1782,7 +1759,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procourconf_begin(PROGINFO *pip,PARAMOPT *aop)
+local int procourconf_begin(PI *pip,paramopt *aop)
 {
 	int		rs ;
 	if ((rs = procmaildirdead(pip,DEADMAILDNAME,-1)) >= 0) {
@@ -1807,7 +1784,7 @@ static int procourconf_begin(PROGINFO *pip,PARAMOPT *aop)
 /* end subroutine (procourconf_begin) */
 
 
-static int procourconf_end(PROGINFO *pip)
+local int procourconf_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	if (pip == nullptr) return SR_FAULT ;
@@ -1816,7 +1793,7 @@ static int procourconf_end(PROGINFO *pip)
 /* end subroutine (procourconf_begin) */
 
 
-static int proclogs_begin(PROGINFO *pip)
+local int proclogs_begin(PI *pip)
 {
 	int		rs = SR_OK ;
 	if ((rs = proglogenv_begin(pip)) >= 0) {
@@ -1831,7 +1808,7 @@ static int proclogs_begin(PROGINFO *pip)
 /* end subroutine (proclogs_begin) */
 
 
-static int proclogs_end(PROGINFO *pip)
+local int proclogs_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1844,7 +1821,7 @@ static int proclogs_end(PROGINFO *pip)
 /* end subroutine (proclogs_end) */
 
 
-static int proclogs_log(PROGINFO *pip)
+local int proclogs_log(PI *pip)
 {
 	cint	dl = pip->debuglevel ;
 	int		rs = SR_OK ;
@@ -1888,7 +1865,7 @@ static int proclogs_log(PROGINFO *pip)
 /* end subroutine (proclogs_log) */
 
 
-static int proctmp_begin(PROGINFO *pip,bfile *tfp,char *tbuf)
+local int proctmp_begin(PI *pip,bfile *tfp,char *tbuf)
 {
 	int		rs ;
 	cchar		*n = "dmailXXXXXXXXX" ;
@@ -1905,7 +1882,7 @@ static int proctmp_begin(PROGINFO *pip,bfile *tfp,char *tbuf)
 /* end subroutine (proctmp_begin) */
 
 
-static int proctmp_end(PROGINFO *pip,bfile *tfp,char *tbuf)
+local int proctmp_end(PI *pip,bfile *tfp,char *tbuf)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1921,7 +1898,7 @@ static int proctmp_end(PROGINFO *pip,bfile *tfp,char *tbuf)
 }
 /* end subroutine (proctmp_end) */
 
-static int procmsgid_begin(PROGINFO *pip) noex {
+local int procmsgid_begin(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (pip->fl.optlogmsgid) {
@@ -1949,7 +1926,7 @@ static int procmsgid_begin(PROGINFO *pip) noex {
 /* end subroutine (procmsgid_begin) */
 
 
-static int procmsgid_end(PROGINFO *pip)
+local int procmsgid_end(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1963,7 +1940,7 @@ static int procmsgid_end(PROGINFO *pip)
 }
 /* end subroutine (procmsgid_end) */
 
-static int procmsgid_update(PROGINFO *pip,MSGINFO *mop,cchar *r) noex {
+local int procmsgid_update(PI *pip,MSGINFO *mop,cchar *r) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1995,7 +1972,7 @@ static int procmsgid_update(PROGINFO *pip,MSGINFO *mop,cchar *r) noex {
 }
 /* end subroutine (procmsgid_update) */
 
-static int procnodecluster(PROGINFO *pip) noex {
+local int procnodecluster(PI *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->cluster == nullptr) {
 	    cchar	*tp ;
@@ -2010,21 +1987,21 @@ static int procnodecluster(PROGINFO *pip) noex {
 }
 /* end subroutine (procnodecluster) */
 
-static int procuucpinfo(PROGINFO *pip) noex {
+local int procuucpinfo(PI *pip) noex {
 	pip->uu_machine = getenv(VARUUMACHINE) ;
 	pip->uu_user = getenv(VARUUUSER) ;
 	return SR_OK ;
 }
 /* end subroutine (procuucpinfo) */
 
-static int procenvfromaddr(PROGINFO *pip) noex {
+local int procenvfromaddr(PI *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->addenvfrom != nullptr) {
 	    cint	elen = strlen(pip->addenvfrom) ;
 	    char	*ebuf ;
 	    if ((rs = uc_malloc((elen+1),&ebuf)) >= 0) {
 	        cchar	*envfrom = pip->addenvfrom ;
-	        if ((rs = mkbestaddr(ebuf,elen,envfrom,-1)) >= 0) {
+	        if ((rs = mkaddrbest(ebuf,elen,envfrom,-1)) >= 0) {
 	            cchar	**vpp = &pip->envfrom ;
 	            rs = proginfo_setentry(pip,vpp,ebuf,rs) ;
 		}
@@ -2042,13 +2019,13 @@ static int procenvfromaddr(PROGINFO *pip) noex {
 /* end subroutine (procenvfromaddr) */
 
 /* find the mail spool directory, as dynamically as possible */
-static int procmaildname_begin(PROGINFO *pip,PARAMOPT *aop) noex {
+local int procmaildname_begin(PI *pip,paramopt *aop) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (pip->progmode == progmode_dmail) {
 	    if ((rs = vecstr_start(&pip->maildirs,1,0)) >= 0) {
-	        PARAMOPT_CUR	cur ;
+	        paramopt_cur	cur ;
 	        int		vl ;
 	        cchar		*vp ;
 	        if ((rs = paramopt_curbegin(aop,&cur)) >= 0) {
@@ -2075,14 +2052,13 @@ static int procmaildname_begin(PROGINFO *pip,PARAMOPT *aop) noex {
 }
 /* end subroutine (procmaildname_begin) */
 
-static int procmaildname_add(PROGINFO *pip,cchar *vp,int vl) noex {
+local int procmaildname_add(PI *pip,cchar *vp,int vl) noex {
 	nulstr		md ;
 	int		rs ;
 	int		c = 0 ;
 	cchar		*dname ;
 	if ((rs = nulstr_start(&md,vp,vl,&dname)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = uc_stat(dname,&sb)) >= 0) {
+	    if (ustat sb ; (rs = uc_stat(dname,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 		    IDS		*idp = &pip->id ;
 	            if ((rs = permid(idp,&sb,W_OK)) >= 0) {
@@ -2107,7 +2083,7 @@ static int procmaildname_add(PROGINFO *pip,cchar *vp,int vl) noex {
 /* end subroutine (procmaildname_add) */
 
 
-static int procmaildname_end(PROGINFO *pip)
+local int procmaildname_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2120,7 +2096,7 @@ static int procmaildname_end(PROGINFO *pip)
 /* end subroutine (procmaildname_end) */
 
 
-static int procprotospec(PROGINFO *pip)
+local int procprotospec(PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -2144,7 +2120,7 @@ static int procprotospec(PROGINFO *pip)
 /* end subroutine (procprotospec) */
 
 
-static int procuserboxes(PROGINFO *pip)
+local int procuserboxes(PI *pip)
 {
 	int		rs = SR_OK ;
 	if (pip->progmode == progmode_dmailbox) {
@@ -2159,7 +2135,7 @@ static int procuserboxes(PROGINFO *pip)
 /* end subroutine (procuserboxes) */
 
 
-static int procloginfo(PROGINFO *pip)
+local int procloginfo(PI *pip)
 {
 	cint	dl = pip->debuglevel ;
 	int		rs = SR_OK ;
@@ -2219,7 +2195,7 @@ static int procloginfo(PROGINFO *pip)
 /* end subroutine (procloginfo) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *app,VECOBJ *rlp,cchar *afn)
+local int procargs(PI *pip,ARGINFO *aip,bits *app,VECOBJ *rlp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2293,9 +2269,8 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *app,VECOBJ *rlp,cchar *afn)
 }
 /* end subroutine (procargs) */
 
-
 #if	CF_LOGRECIP
-static int logrecip(PROGINFO *pip,cchar recip[],struct passwd *pwp)
+local int logrecip(PI *pip,cchar recip[],PASSWD *pwp)
 {
 	int		rs = SR_OK ;
 	if (pip->open.logmsg) {
@@ -2317,7 +2292,7 @@ static int logrecip(PROGINFO *pip,cchar recip[],struct passwd *pwp)
 
 
 /* extract the real name from a GECOS name */
-static int mkrecipname(char rbuf[],int rlen,cchar gecos[])
+local int mkrecipname(char rbuf[],int rlen,cchar gecos[])
 {
 	cint	glen = GNAMELEN ;
 	int		rs ;
@@ -2331,7 +2306,7 @@ static int mkrecipname(char rbuf[],int rlen,cchar gecos[])
 /* end subroutine (mkrecipname) */
 
 
-static int loadrecips(PROGINFO *pip,VECOBJ *rlp,cchar sp[],int sl)
+local int loadrecips(PI *pip,VECOBJ *rlp,cchar sp[],int sl)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -2354,7 +2329,7 @@ static int loadrecips(PROGINFO *pip,VECOBJ *rlp,cchar sp[],int sl)
 /* end subroutine (loadrecips) */
 
 
-static int loadrecip(PROGINFO *pip,VECOBJ *nlp,cchar np[],int nl)
+local int loadrecip(PI *pip,VECOBJ *nlp,cchar np[],int nl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2439,10 +2414,10 @@ static int loadrecip(PROGINFO *pip,VECOBJ *nlp,cchar np[],int nl)
 
 
 /* ARGSUSED */
-static int processing(pip,aip,bop,ofn,afn,ifn)
+local int processing(pip,aip,bop,ofn,afn,ifn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-BITS		*bop ;
+bits		*bop ;
 cchar		*ofn ;
 cchar		*afn ;
 cchar		*ifn ;
@@ -2493,7 +2468,7 @@ cchar		*ifn ;
 /* end subroutine (processing) */
 
 
-static int processings(PROGINFO *pip,VECOBJ *mip,VECOBJ *rip,cchar *tfn)
+local int processings(PI *pip,VECOBJ *mip,VECOBJ *rip,cchar *tfn)
 {
 	int		rs ;
 	if ((rs = procspamsetup(pip,mip)) >= 0) {
@@ -2532,7 +2507,7 @@ static int processings(PROGINFO *pip,VECOBJ *mip,VECOBJ *rip,cchar *tfn)
 /* end subroutine (processings) */
 
 
-static int procin(PROGINFO *pip,vecobj *mip,bfile *tfp,vecobj *rip,cchar *ifn)
+local int procin(PI *pip,vecobj *mip,bfile *tfp,vecobj *rip,cchar *ifn)
 {
 	bfile		infile, *ifp = &infile ;
 	int		rs ;
@@ -2564,7 +2539,7 @@ static int procin(PROGINFO *pip,vecobj *mip,bfile *tfp,vecobj *rip,cchar *ifn)
 /* end subroutine (procin) */
 
 
-static int procfindfiles(PROGINFO *pip)
+local int procfindfiles(PI *pip)
 {
 	VECSTR		svars ;
 	int		rs ;
@@ -2587,7 +2562,7 @@ static int procfindfiles(PROGINFO *pip)
 
 /* do we have a COMSAT file? */
 /* ARGSUSED */
-static int procfindcomsat(PROGINFO *pip,vecstr *slp)
+local int procfindcomsat(PI *pip,vecstr *slp)
 {
 	int		rs = SR_OK ;
 	if (pip->progmode == progmode_dmail) {
@@ -2630,7 +2605,7 @@ static int procfindcomsat(PROGINFO *pip,vecstr *slp)
 
 /* do we have a spam filter file? */
 /* ARGSUSED */
-static int procfindspam(PROGINFO *pip,vecstr *slp)
+local int procfindspam(PI *pip,vecstr *slp)
 {
 	int		rs = SR_OK ;
 	cchar		*fn = nullptr ;
@@ -2671,7 +2646,7 @@ static int procfindspam(PROGINFO *pip,vecstr *slp)
 
 /* do we have a MBTAB file? */
 /* ARGSUSED */
-static int procfindmbtab(PROGINFO *pip,vecstr *slp)
+local int procfindmbtab(PI *pip,vecstr *slp)
 {
 	int		rs = SR_OK ;
 	cchar		*fn = nullptr ;
@@ -2710,7 +2685,7 @@ static int procfindmbtab(PROGINFO *pip,vecstr *slp)
 /* end subroutine (procfindmbtab) */
 
 
-static int procdefs(PROGINFO *pip)
+local int procdefs(PI *pip)
 {
 	int		rs = SR_OK ;
 	if (pip->spambox == nullptr) pip->spambox = SPAMUSER ;
@@ -2727,7 +2702,7 @@ static int procdefs(PROGINFO *pip)
 /* end subroutine (procdefs) */
 
 
-static int procspamsetup(PROGINFO *pip,vecobj *ilp)
+local int procspamsetup(PI *pip,vecobj *ilp)
 {
 	MSGINFO		*mop ;
 	int		rs = SR_OK ;
@@ -2745,7 +2720,7 @@ static int procspamsetup(PROGINFO *pip,vecobj *ilp)
 
 #if	CF_SPAMBOX
 
-static int procspambox(PROGINFO *pip,vecobj *ilp,vecobj *rlp,int tfd)
+local int procspambox(PI *pip,vecobj *ilp,vecobj *rlp,int tfd)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2797,7 +2772,7 @@ static int procspambox(PROGINFO *pip,vecobj *ilp,vecobj *rlp,int tfd)
 /* end subroutine (procspambox) */
 
 
-static int procspamboxing(PROGINFO *pip,vecobj *ilp,RECIP *rp)
+local int procspamboxing(PI *pip,vecobj *ilp,RECIP *rp)
 {
 	MSGINFO		*mop ;
 	int		rs = SR_OK ;
@@ -2815,7 +2790,7 @@ static int procspamboxing(PROGINFO *pip,vecobj *ilp,RECIP *rp)
 /* end subroutine (procspamboxing) */
 
 
-static int procspamprogboxer(PROGINFO *pip,RECIP *rp,MSGINFO *mop)
+local int procspamprogboxer(PI *pip,RECIP *rp,MSGINFO *mop)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -2833,7 +2808,7 @@ static int procspamprogboxer(PROGINFO *pip,RECIP *rp,MSGINFO *mop)
 #endif /* CF_SPAMBOX */
 
 
-static int procrecips(PROGINFO *pip,vecobj *mip,vecobj *rlp,int tfd)
+local int procrecips(PI *pip,vecobj *mip,vecobj *rlp,int tfd)
 {
 	int		rs ;
 	int		rs1 ;
@@ -2886,7 +2861,7 @@ static int procrecips(PROGINFO *pip,vecobj *mip,vecobj *rlp,int tfd)
 /* end subroutine (procrecips) */
 
 
-static int procrecip(PROGINFO *pip,vecobj *mip,RECIP *rp,int tfd)
+local int procrecip(PI *pip,vecobj *mip,RECIP *rp,int tfd)
 {
 	LOCINFO		*lip = pip->lip ;
 	LOOKADDR_USER	lcur ;
@@ -3037,7 +3012,7 @@ static int procrecip(PROGINFO *pip,vecobj *mip,RECIP *rp,int tfd)
 }
 /* end subroutine (procrecip) */
 
-static int procrecipvalid(PROGINFO *pip,RECIP *rp) noex {
+local int procrecipvalid(PI *pip,RECIP *rp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -3046,7 +3021,7 @@ static int procrecipvalid(PROGINFO *pip,RECIP *rp) noex {
 	    cint	pwlen = rs ;
 	    cint	rsn = SR_NOTFOUND ;
 	    cchar	*r = rp->recipient ;
-	    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,r)) >= 0) {
+	    if ((rs = getpwx_name(&pw,pwbuf,pwlen,r)) >= 0) {
 	        c = 1 ;
 	        if ((rs = recip_setuser(rp,pw.pw_uid)) >= 0) {
 	            cint	nlen = REALNAMELEN ;
@@ -3075,7 +3050,7 @@ static int procrecipvalid(PROGINFO *pip,RECIP *rp) noex {
 
 #if	CF_LOOKADDR
 
-static int procrecip_addropen(PROGINFO *pip)
+local int procrecip_addropen(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -3089,7 +3064,7 @@ static int procrecip_addropen(PROGINFO *pip)
 /* end subroutine (procrecip_addropen) */
 
 
-static int procrecip_addrclose(PROGINFO *pip)
+local int procrecip_addrclose(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -3104,7 +3079,7 @@ static int procrecip_addrclose(PROGINFO *pip)
 /* end subroutine (procrecip_addrclose) */
 
 
-static int procrecip_addrbegin(PROGINFO *pip,LOOKADDR_USER *curp,cchar *un)
+local int procrecip_addrbegin(PI *pip,LOOKADDR_USER *curp,cchar *un)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -3120,7 +3095,7 @@ static int procrecip_addrbegin(PROGINFO *pip,LOOKADDR_USER *curp,cchar *un)
 
 #if	CF_ADDRCHECK
 
-static int procrecip_addrcheck(PROGINFO *pip,LOOKADDR_USER *curp,
+local int procrecip_addrcheck(PI *pip,LOOKADDR_USER *curp,
 		MSGINFO *mop,int f_spam)
 {
 	LOCINFO		*lip = pip->lip ;
@@ -3153,7 +3128,7 @@ static int procrecip_addrcheck(PROGINFO *pip,LOOKADDR_USER *curp,
 /* end subroutine (procrecip_addrcheck) */
 
 
-static int procrecip_addrchecker(PROGINFO *pip,LOOKADDR_USER *curp,
+local int procrecip_addrchecker(PI *pip,LOOKADDR_USER *curp,
 		cchar *a,int f_spam)
 {
 	LOCINFO		*lip = pip->lip ;
@@ -3170,7 +3145,7 @@ static int procrecip_addrchecker(PROGINFO *pip,LOOKADDR_USER *curp,
 #endif /* CF_ADDRCHECK */
 
 
-static int procrecip_addrend(PROGINFO *pip,LOOKADDR_USER *curp)
+local int procrecip_addrend(PI *pip,LOOKADDR_USER *curp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -3185,7 +3160,7 @@ static int procrecip_addrend(PROGINFO *pip,LOOKADDR_USER *curp)
 #endif /* CF_LOOKADDR */
 
 
-static int procrecip_mailspool(PROGINFO *pip,RECIP *rp)
+local int procrecip_mailspool(PI *pip,RECIP *rp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -3211,19 +3186,19 @@ static int procrecip_mailspool(PROGINFO *pip,RECIP *rp)
 /* end subroutine (procrecip_mailspool) */
 
 
-static int procrecip_hasmailfile(PROGINFO *pip,RECIP *rp)
+local int procrecip_hasmailfile(PI *pip,RECIP *rp)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (pip->progmode == progmode_dmail) {
-	    USTAT	sb ;
 	    vecstr		*mlp = &pip->maildirs ;
 	    int			i ;
 	    cchar		*r = rp->recipient ;
 	    cchar		*mdp ;
 	    char		tbuf[MAXPATHLEN+1] ;
+	    ustat	sb ;
 	    for (i = 0 ; vecstr_get(mlp,i,&mdp) >= 0 ; i += 1) {
-	        if (mdp != nullptr) {
+	        if (mdp) {
 	            if ((rs = mkpath2(tbuf,mdp,r)) >= 0) {
 	                if ((rs = uc_stat(tbuf,&sb)) >= 0) {
 	                    if (S_ISREG(sb.st_mode)) {
@@ -3244,7 +3219,7 @@ static int procrecip_hasmailfile(PROGINFO *pip,RECIP *rp)
 /* end subroutine (procrecip_hasmailfile) */
 
 
-static int procrecip_defmaildir(PROGINFO *pip,RECIP *rp)
+local int procrecip_defmaildir(PI *pip,RECIP *rp)
 {
 	vecstr		*mlp = &pip->maildirs ;
 	int		rs = SR_OK ;
@@ -3266,7 +3241,7 @@ static int procrecip_defmaildir(PROGINFO *pip,RECIP *rp)
 
 
 #ifdef	COMMENT
-static int procunavail(PROGINFO *pip,int rstat)
+local int procunavail(PI *pip,int rstat)
 {
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
@@ -3330,7 +3305,7 @@ static int procunavail(PROGINFO *pip,int rstat)
 #endif /* COMMENT */
 
 
-static int procmboxes(PROGINFO *pip,cchar *sp,int sl)
+local int procmboxes(PI *pip,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -3366,7 +3341,7 @@ static int procmboxes(PROGINFO *pip,cchar *sp,int sl)
 
 
 #ifdef	COMMENT
-static int procmultierror(PROGINFO *pip,cchar *mfn)
+local int procmultierror(PI *pip,cchar *mfn)
 {
 	int		rs = SR_OK ;
 	if (pip->fl.multirecip) {
@@ -3385,7 +3360,7 @@ static int procmultierror(PROGINFO *pip,cchar *mfn)
 #endif /* COMMENT */
 
 
-static int procfindsched(PROGINFO *pip,vecstr *slp)
+local int procfindsched(PI *pip,vecstr *slp)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -3422,7 +3397,7 @@ static int procfindsched(PROGINFO *pip,vecstr *slp)
 }
 /* end subroutine (procfindsched) */
 
-static int procportcomsat(PROGINFO *pip) noex {
+local int procportcomsat(PI *pip) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	if (pip->portspec == nullptr) pip->portspec = PORTSPEC_COMSAT ;
@@ -3436,16 +3411,13 @@ static int procportcomsat(PROGINFO *pip) noex {
 }
 /* end subroutine (procportcomsat) */
 
-
-static int procmaildirdead(PROGINFO *pip,cchar *dp,int dl)
-{
+local int procmaildirdead(PI *pip,cchar *dp,int dl) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	if (pip->deadmaildname == nullptr) {
-	    nulstr	ds ;
 	    cchar	*dname ;
-	    if ((rs = nulstr_start(&ds,dp,dl,&dname)) >= 0) {
-	        USTAT	sb ;
-	        if ((rs = u_stat(dname,&sb)) >= 0) {
+	    if (nulstr ds ; (rs = ds.start(dp,dl,&dname)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
 		    if (S_ISDIR(sb.st_mode)) {
 			cint	pm = (W_OK|W_OK) ;
 	                if ((rs = perm(dname,-1,-1,nullptr,pm)) >= 0) {
@@ -3458,23 +3430,21 @@ static int procmaildirdead(PROGINFO *pip,cchar *dp,int dl)
 	        } else if (isNotPresent(rs)) {
 		    rs = SR_OK ;
 	        }
-		nulstr_finish(&ds) ;
+		rs1 = ds.finish ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (nulstr) */
-	}
+	} /* end if (was null) */
 	return rs ;
 }
 /* end subroutine (procmaildirdead) */
 
-
-static int procmaildircopy(PROGINFO *pip,cchar *dp,int dl)
-{
+local int procmaildircopy(PI *pip,cchar *dp,int dl) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	if (pip->copymaildname == nullptr) {
-	    nulstr	ds ;
 	    cchar	*dname ;
-	    if ((rs = nulstr_start(&ds,dp,dl,&dname)) >= 0) {
-	        USTAT	sb ;
-	        if ((rs = u_stat(dname,&sb)) >= 0) {
+	    if (nulstr ds ; (rs = ds.start(dp,dl,&dname)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
 		    if (S_ISDIR(sb.st_mode)) {
 			cint	pm = (W_OK|W_OK) ;
 	                if ((rs = perm(dname,-1,-1,nullptr,pm)) >= 0) {
@@ -3487,16 +3457,15 @@ static int procmaildircopy(PROGINFO *pip,cchar *dp,int dl)
 	        } else if (isNotPresent(rs)) {
 		    rs = SR_OK ;
 	        }
-		nulstr_finish(&ds) ;
+		rs1 = ds.finish ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (nulstr) */
-	}
+	} /* end if (was null) */
 	return rs ;
 }
 /* end subroutine (procmaildircopy) */
 
-
-static int procmaildirs(PROGINFO *pip,PARAMOPT *pop)
-{
+local int procmaildirs(PI *pip,paramopt *pop) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (pip->progmode == progmode_dmail) {
@@ -3529,9 +3498,7 @@ static int procmaildirs(PROGINFO *pip,PARAMOPT *pop)
 }
 /* end subroutine (procmaildirs) */
 
-
-static int procmaildir(PROGINFO *pip,PARAMOPT *pop,cchar *dp,int dl)
-{
+local int procmaildir(PI *pip,paramopt *pop,cchar *dp,int dl) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*po = PO_MAILDIRS ;
@@ -3543,8 +3510,7 @@ static int procmaildir(PROGINFO *pip,PARAMOPT *pop,cchar *dp,int dl)
 	if ((rs = paramopt_haveval(pop,po,dp,dl)) == 0) {
 	    char	dname[MAXPATHLEN+1] ;
 	    if (mkpath1w(dname,dp,dl) > 0) {
-	        USTAT	sb ;
-	        if ((rs = u_stat(dname,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
 	            rs = paramopt_loads(pop,po,dp,dl) ;
 	            c += rs ;
 	        } else if (isNotPresent(rs))
@@ -3556,14 +3522,12 @@ static int procmaildir(PROGINFO *pip,PARAMOPT *pop,cchar *dp,int dl)
 }
 /* end subroutine (procmaildir) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+local int locinfo_start(LOCINFO *lip,PI *pip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == nullptr) return SR_FAULT ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memclear(lip) ;
 	lip->pip = pip ;
 	lip->to = -1 ;
 
@@ -3576,9 +3540,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+local int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -3618,10 +3580,8 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
 #if	CF_LOCSETENT
-int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar vp[],int vl)
-{
+int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -3655,9 +3615,7 @@ int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar vp[],int vl)
 /* end subroutine (locinfo_setentry) */
 #endif /* CF_LOCSETENT */
 
-
-int locinfo_gmcurbegin(LOCINFO *lip,LOCINFO_GMCUR *curp)
-{
+int locinfo_gmcurbegin(LOCINFO *lip,LOCINFO_GMCUR *curp) noex {
 	int		rs = SR_OK ;
 
 	if (curp == nullptr) return SR_FAULT ;
@@ -3677,9 +3635,7 @@ int locinfo_gmcurbegin(LOCINFO *lip,LOCINFO_GMCUR *curp)
 }
 /* end subroutine (locinfo_gmcurbegin) */
 
-
-int locinfo_gmcurend(LOCINFO *lip,LOCINFO_GMCUR *curp)
-{
+int locinfo_gmcurend(LOCINFO *lip,LOCINFO_GMCUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -3692,37 +3648,33 @@ int locinfo_gmcurend(LOCINFO *lip,LOCINFO_GMCUR *curp)
 }
 /* end subroutine (locinfo_gmcurend) */
 
-
-int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl)
-{
+int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl) noex {
 	int		rs ;
 
 	if (curp == nullptr) return SR_FAULT ;
 	if (gnp == nullptr) return SR_FAULT ;
-
-	rs = grmems_lookup(&lip->gm,&curp->gmcur,gnp,gnl) ;
+	{
+	    rs = grmems_lookup(&lip->gm,&curp->gmcur,gnp,gnl) ;
+	}
 
 	return rs ;
 }
 /* end subroutine (locinfo_gmlook) */
 
-
-int locinfo_gmread(LOCINFO *lip,LOCINFO_GMCUR *curp,char ubuf[],int ulen)
-{
+int locinfo_gmread(LOCINFO *lip,LOCINFO_GMCUR *curp,char *ubuf,int ulen) noex {
 	int		rs ;
 
 	if (curp == nullptr) return SR_FAULT ;
 	if (ubuf == nullptr) return SR_FAULT ;
-
-	rs = grmems_lookread(&lip->gm,&curp->gmcur,ubuf,ulen) ;
+	{
+	    rs = grmems_lookread(&lip->gm,&curp->gmcur,ubuf,ulen) ;
+	}
 
 	return rs ;
 }
 /* end subroutine (locinfo_gmread) */
 
-
-int locinfo_rncurbegin(LOCINFO *lip,LOCINFO_RNCUR *curp)
-{
+int locinfo_rncurbegin(LOCINFO *lip,LOCINFO_RNCUR *curp) noex {
 	int		rs = SR_OK ;
 
 	if (curp == nullptr) return SR_FAULT ;
@@ -3740,24 +3692,20 @@ int locinfo_rncurbegin(LOCINFO *lip,LOCINFO_RNCUR *curp)
 }
 /* end subroutine (locinfo_rncurbegin) */
 
-
-int locinfo_rncurend(LOCINFO *lip,LOCINFO_RNCUR *curp)
-{
+int locinfo_rncurend(LOCINFO *lip,LOCINFO_RNCUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (curp == nullptr) return SR_FAULT ;
-
-	rs1 = sysrealname_curend(&lip->rn,&curp->rncur) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = sysrealname_curend(&lip->rn,&curp->rncur) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (locinfo_rncurend) */
 
-
-int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl)
-{
+int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl) noex {
 	PROGINFO	*pip = lip->pip ;
 	cint	fo = 0 ;
 	int		rs ;
@@ -3765,16 +3713,15 @@ int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl)
 	if (pip == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 	if (gnp == nullptr) return SR_FAULT ;
-
-	rs = sysrealname_look(&lip->rn,&curp->rncur,fo,gnp,gnl) ;
+	{
+	    rs = sysrealname_look(&lip->rn,&curp->rncur,fo,gnp,gnl) ;
+	}
 
 	return rs ;
 }
 /* end subroutine (locinfo_rnlook) */
 
-
-int locinfo_rnread(LOCINFO *lip,LOCINFO_RNCUR *curp,char ubuf[],int ulen)
-{
+int locinfo_rnread(LOCINFO *lip,LOCINFO_RNCUR *curp,char *ubuf,int ulen) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
 
@@ -3790,9 +3737,7 @@ int locinfo_rnread(LOCINFO *lip,LOCINFO_RNCUR *curp,char ubuf[],int ulen)
 }
 /* end subroutine (locinfo_rnread) */
 
-
-static int locinfo_mboxadd(LOCINFO *lip,cchar *mp,int ml)
-{
+local int locinfo_mboxadd(LOCINFO *lip,cchar *mp,int ml) noex {
 	int		rs = SR_OK ;
 
 	if (lip == nullptr) return SR_FAULT ;
@@ -3811,9 +3756,7 @@ static int locinfo_mboxadd(LOCINFO *lip,cchar *mp,int ml)
 }
 /* end subroutine (locinfo_mboxadd) */
 
-
-static int locinfo_mboxcount(LOCINFO *lip)
-{
+local int locinfo_mboxcount(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == nullptr) return SR_FAULT ;
@@ -3826,9 +3769,7 @@ static int locinfo_mboxcount(LOCINFO *lip)
 }
 /* end subroutine (locinfo_mboxcount) */
 
-
-int locinfo_mboxget(LOCINFO *lip,int i,cchar **rpp)
-{
+int locinfo_mboxget(LOCINFO *lip,int i,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 	cchar		*rp = nullptr ;
@@ -3848,9 +3789,7 @@ int locinfo_mboxget(LOCINFO *lip,int i,cchar **rpp)
 }
 /* end subroutine (locinfo_mboxget) */
 
-
-static int mkreport(PROGINFO *pip,int argc,cchar **argv,int rrs)
-{
+local int mkreport(PI *pip,int argc,cchar **argv,int rrs) noex {
 	cint	ulen = USERNAMELEN ;
 	int		rs ;
 	char		ubuf[USERNAMELEN+1] ;
@@ -3891,14 +3830,12 @@ static int mkreport(PROGINFO *pip,int argc,cchar **argv,int rrs)
 }
 /* end subroutine (mkreport) */
 
-
-static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
-{
-	TMTIME		mt ;
-	custime	dt = pip->daytime ;
+local int mkreportfile(PI *pip,char *fbuf,cchar *rbuf) noex {
+	tmtime		mt ;
+	custime		dt = pip->daytime ;
 	int		rs ;
 
-	if ((rs = tmtime_localtime(&mt,dt)) >= 0) {
+	if ((rs = tmtime_timelocal(&mt,dt)) >= 0) {
 	    cint	tlen = TIMEBUFLEN ;
 	    cchar	*fmt = "r%y%m%d%H%M%S" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
@@ -3911,12 +3848,13 @@ static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
 }
 /* end subroutine (mkreportfile) */
 
-static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,int ac,
+local int mkreportout(PI *pip,cchar *fbuf,cchar *id,int ac,
 		cchar **av, int rrs) noex {
 	bfile		rfile, *rfp = &rfile ;
 	custime		dt = pip->daytime ;
 	cmode		om = 0644 ;
 	int		rs ;
+	int		rs1 ;
 	cchar		*fmt ;
 	char		tbuf[TIMEBUFLEN+1] ;
 	timestr_logz(dt,tbuf) ;
@@ -3924,7 +3862,6 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,int ac,
 	    if ((rs = bminmod(rfp,om)) >= 0) {
 	    cint	al = DISARGLEN ;
 	    int		v = pip->pid ;
-	    int		i ;
 
 	    fmt = "%-15s %s junk report (%d)\n" ;
 	    bprintf(rfp,fmt,id,tbuf,rrs) ;
@@ -3953,7 +3890,7 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,int ac,
 	    bprintf(rfp,fmt,id,ac) ;
 
 	    fmt = "%-15s a%02u=>%r<\n" ;
-	    for (i = 0 ; (i < ac) && (av[i] != nullptr) ; i += 1) {
+	    for (int i = 0 ; (i < ac) && av[i] ; i += 1) {
 		cchar	*ap = av[i] ;
 	        rs = bprintf(rfp,fmt,id,i,ap,al) ;
 		if (rs < 0) break ;
@@ -3963,20 +3900,20 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,int ac,
 	    bprintf(rfp,fmt,id) ;
 
 	    } /* end if (bminmod) */
-	    bclose(rfp) ;
+	    rs1 = bclose(rfp) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file) */
 	return rs ;
 }
 /* end subroutine (mkreportout) */
 
 /* ARGSUSED */
-static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m) noex {
+local int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m) noex {
 	cchar		*rdname = REPORTDNAME ;
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = mkdirs(rdname,m)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = uc_stat(rdname,&sb)) >= 0) {
+	    if (ustat sb ; (rs = uc_stat(rdname,&sb)) >= 0) {
 		const uid_t	uid = getuid() ;
 		const uid_t	u = sb.st_uid ;
 		uid_t		uid_admin = -1 ;
@@ -4002,7 +3939,7 @@ static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m) noex {
 			    }
 	    	        }
 		    }
-		}
+		} /* end if (ok) /
 	    } /* end if (stat) */
 	} /* end if (mkdirs) */
 	return (rs >= 0) ? rl : rs ;
