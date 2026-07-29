@@ -64,10 +64,10 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<sigblocker.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC |uc_lockf(3uc)| */
 #include	<ucprochave.h>		/* LIBUC |uc_prochave(3uc)| */
-#include	<sigblocker.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<fsdir.h>		/* LIBUC */
