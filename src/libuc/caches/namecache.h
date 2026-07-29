@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
 
 
 #define	NAMECACHE		struct namecache_head
@@ -45,7 +45,7 @@ struct namecache_head {
 	hdb		*dbp ;
 	cchar		*vname ;
 	NAMECACHE_ST	s ;
-	uint		magic ;
+	uint		magval ;
 	int		nmax ;		/* maximum number of entries */
 	int		ttl ;		/* time-to-live (in seconds) */
 } ; /* end struct (namecache_head) */
