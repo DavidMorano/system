@@ -20,17 +20,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system-types */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<cq.h>
+#include	<sys/types.h>		/* POSIX® system-types */
+#include	<time.h>		/* POSIX® |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<cq.h>			/* LIBUC */
 
 
 #define	GNCACHE			struct gncache_head
 #define	GNCACHE_ST		struct gncache_stats
-
 #define	GNCACHE_MAGIC		0x98643162
 #define	GNCACHE_DEFENT		10
 #define	GNCACHE_DEFMAX		20	/* default maximum entries */
@@ -51,7 +50,7 @@ struct gncache_head {
 	vechand		*rlp ;
 	time_t		ti_check ;
 	GNCACHE_ST	s ;
-	uint		magic ;
+	uint		magval ;
 	int		ttl ;		/* time-to-live in seconds */
 	int		nmax ;		/* maximum entries */
 } ; /* end struct (gncache_head) */
