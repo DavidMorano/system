@@ -1,10 +1,12 @@
+/* SCRATCH junk */
 
 
-int progconfig(pip)
-struct proginfo	*pip ;
-{
+/* for auditing purposes */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
+
+
+int progconfig(proginfo *pip) noex {
 	int	rs = SR_OK ;
-
 
 /* prepare to store configuration variable lists */
 
