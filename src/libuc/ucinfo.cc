@@ -66,12 +66,12 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 #include	<umem.hh>		/* LIBU */
+#include	<sigblocker.h>		/* LIBU */
 #include	<ucsysauxinfo.h>	/* LIBUC |SAI_{xx}| */
 #include	<ucfork.h>		/* LIBUC */
 #include	<ucatfork.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
-#include	<sigblocker.h>		/* LIBUC */
 #include	<ptm.h>			/* LIBU */
 #include	<timewatch.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
