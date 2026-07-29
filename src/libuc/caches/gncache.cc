@@ -111,7 +111,7 @@ local int gncache_ctor(gncache *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->flp ;
 		    op->flp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-cq) */
 	} /* end if (non-null) */
 	return rs ;
@@ -137,7 +137,7 @@ template<typename ... Args>
 local inline int gncache_magic(gncache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == GNCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == GNCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (gncache_magic) */
@@ -189,20 +189,19 @@ int gncache_start(GN *op,int nmax,int to) noex {
 	                op->nmax = nmax ;
 	                op->ttl = to ;
 	                op->ti_check = time(nullptr) ;
-	                op->magic = GNCACHE_MAGIC ;
+	                op->magval = GNCACHE_MAGIC ;
 	            }
 	            if (rs < 0) {
 	                cq_finish(op->flp) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (cq-start) */
 	    } /* end if (mkvars) */
 	    if (rs < 0) {
 		gncache_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (gncache_ctor) */
 	return rs ;
-}
-/* end subroutine (gncache_start) */
+} /* end subroutine (gncache_start) */
 
 int gncache_finish(GN *op) noex {
 	int		rs ;
@@ -243,11 +242,10 @@ int gncache_finish(GN *op) noex {
 		rs1 = gncache_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (gncache_finish) */
+} /* end subroutine (gncache_finish) */
 
 int gncache_add(GN *op,gid_t gid,cchar *gn) noex {
 	time_t		dt = time(nullptr) ;
@@ -267,8 +265,7 @@ int gncache_add(GN *op,gid_t gid,cchar *gn) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (gncache_add) */
+} /* end subroutine (gncache_add) */
 
 int gncache_lookgid(GN *op,char *rbuf,int rlen,gid_t gid) noex {
 	custime		dt = getustime ;
@@ -308,8 +305,7 @@ int gncache_lookgid(GN *op,char *rbuf,int rlen,gid_t gid) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (gncache_lookgid) */
+} /* end subroutine (gncache_lookgid) */
 
 int gncache_getstats(GN *op,gncache_st *sp) noex {
 	int		rs ;
@@ -320,8 +316,7 @@ int gncache_getstats(GN *op,gncache_st *sp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (gncache_getstats) */
+} /* end subroutine (gncache_getstats) */
 
 int gncache_check(GN *op,time_t dt) noex {
 	int		rs ;
@@ -335,8 +330,7 @@ int gncache_check(GN *op,time_t dt) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (gncache_check) */
+} /* end subroutine (gncache_check) */
 
 
 /* private subroutines */
@@ -351,18 +345,17 @@ local int gncache_newrec(GN *op,time_t dt,rec **rpp,gid_t gid,cc *gn) noex {
 	        rs = vechand_add(op->rlp,rp) ;
 	        if (rs < 0) {
 	            record_finish(rp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (record-start) */
 	    if (rs < 0) {
 	        lm_free(rp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? rp : nullptr ;
 	}
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (gncache_newrec) */
+} /* end subroutine (gncache_newrec) */
 
 local int gncache_recaccess(GN *op,rec *rp,time_t dt) noex {
 	int		rs ;
@@ -375,8 +368,7 @@ local int gncache_recaccess(GN *op,rec *rp,time_t dt) noex {
 	    gl = rs ;
 	}
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (gncache_recaccess) */
+} /* end subroutine (gncache_recaccess) */
 
 local int gncache_searchgid(GN *op,rec **rpp,gid_t gid) noex {
 	vechand		*rlp = op->rlp ;
@@ -399,8 +391,7 @@ local int gncache_searchgid(GN *op,rec **rpp,gid_t gid) noex {
 	    *rpp = ((rs >= 0) && f) ? rp : nullptr ;
 	}
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (gncache_searchgid) */
+} /* end subroutine (gncache_searchgid) */
 
 local int gncache_maintenance(GN *op,time_t dt) noex {
 	vechand		*rlp = op->rlp ;
@@ -438,8 +429,7 @@ local int gncache_maintenance(GN *op,time_t dt) noex {
 	    } /* end if (vechand_get) */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (gncache_maintenance) */
+} /* end subroutine (gncache_maintenance) */
 
 local int gncache_allocrec(GN *op,rec **rpp) noex {
 	int		rs ;
@@ -450,8 +440,7 @@ local int gncache_allocrec(GN *op,rec **rpp) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (cq_rem) */
 	return rs ;
-}
-/* end subroutine (gncache_allocrec) */
+} /* end subroutine (gncache_allocrec) */
 
 #ifdef	COMMENT
 local int gncache_recdel(GN *op,rec *ep) noex {
@@ -466,8 +455,7 @@ local int gncache_recdel(GN *op,rec *ep) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (gncache_recdel) */
+} /* end subroutine (gncache_recdel) */
 #endif /* COMMENT */
 
 local int gncache_recfree(GN *op,rec *rp) noex {
@@ -477,13 +465,12 @@ local int gncache_recfree(GN *op,rec *rp) noex {
 	    rs = cq_ins(op->flp,rp) ;
 	    if (rs < 0) {
 	        lm_free(rp) ;
-	    }
+	    } /* end if (error) */
 	} else {
 	    lm_free(rp) ;
 	}
 	return rs ;
-}
-/* end subroutine (gncache_recfree) */
+} /* end subroutine (gncache_recfree) */
 
 local int gncache_record(GN *op,int ct,int rs) noex {
 	int		f_got = (rs > 0) ;
@@ -498,8 +485,7 @@ local int gncache_record(GN *op,int ct,int rs) noex {
 	    break ;
 	} /* end switch */
 	return SR_OK ;
-}
-/* end subroutine (gncache_record) */
+} /* end subroutine (gncache_record) */
 
 local int record_start(rec *rp,time_t dt,gid_t gid,cchar *gn) noex {
 	int		rs = SR_FAULT ;
@@ -520,8 +506,7 @@ local int record_start(rec *rp,time_t dt,gid_t gid,cchar *gn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (record_start) */
+} /* end subroutine (record_start) */
 
 local int record_finish(rec *rp) noex {
 	int		rs = SR_FAULT ;
@@ -537,8 +522,7 @@ local int record_finish(rec *rp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (record_finish) */
+} /* end subroutine (record_finish) */
 
 local int record_old(rec *rp,time_t dt,int ttl) noex {
 	int		rs = SR_FAULT ;
@@ -548,8 +532,7 @@ local int record_old(rec *rp,time_t dt,int ttl) noex {
 	    f = ((dt - rp->ti_create) >= ttl) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (record_old) */
+} /* end subroutine (record_old) */
 
 local int record_refresh(rec *rp,time_t dt) noex {
 	int		rs ;
@@ -565,8 +548,7 @@ local int record_refresh(rec *rp,time_t dt) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (record_refresh) */
+} /* end subroutine (record_refresh) */
 
 local int record_update(rec *rp,time_t dt,cchar *gn) noex {
 	int		rs = SR_FAULT ;
@@ -581,15 +563,13 @@ local int record_update(rec *rp,time_t dt,cchar *gn) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (record_update) */
+} /* end subroutine (record_update) */
 
 local int record_access(rec *rp,time_t dt) noex {
 	cint		gl = lenstr(rp->gn) ;
 	rp->ti_access = dt ;
 	return gl ;
-}
-/* end subroutine (record_access) */
+} /* end subroutine (record_access) */
 
 local int mkvars() noex {
 	int		rs ;
@@ -597,7 +577,6 @@ local int mkvars() noex {
 	    var.groupnamelen = rs ;
 	}
 	return rs ;
-}
-/* end subroutine (mkvars) */
+} /* end subroutine (mkvars) */
 
 
