@@ -80,8 +80,7 @@ int utmpent_start(utmpent *op) noex {
 	    rs = memclear(hop) ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_start) */
+} /* end subroutine (utmpent_start) */
 
 int utmpent_finish(utmpent *op) noex {
 	int		rs = SR_FAULT ;
@@ -89,8 +88,7 @@ int utmpent_finish(utmpent *op) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_finish) */
+} /* end subroutine (utmpent_finish) */
 
 int utmpent_settype(utmpent *op,int type) noex {
 	int		rs = SR_FAULT ;
@@ -99,8 +97,7 @@ int utmpent_settype(utmpent *op,int type) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_settype) */
+} /* end subroutine (utmpent_settype) */
 
 int utmpent_setpid(utmpent *op,pid_t sid) noex {
 	int		rs = SR_FAULT ;
@@ -109,8 +106,7 @@ int utmpent_setpid(utmpent *op,pid_t sid) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_setpid) */
+} /* end subroutine (utmpent_setpid) */
 
 int utmpent_setsession(utmpent *op,int lines) noex {
 	int		rs = SR_FAULT ;
@@ -123,8 +119,7 @@ int utmpent_setsession(utmpent *op,int lines) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_setsession) */
+} /* end subroutine (utmpent_setsession) */
 
 int utmpent_setid(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -133,8 +128,7 @@ int utmpent_setid(utmpent *op,cchar *sp,int sl) noex {
 	    rs = intconv(strnwcpy(up,szid,sp,sl) - up) ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_setid) */
+} /* end subroutine (utmpent_setid) */
 
 int utmpent_setline(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -143,8 +137,7 @@ int utmpent_setline(utmpent *op,cchar *sp,int sl) noex {
 	    rs = intconv(strnwcpy(up,szline,sp,sl) - up) ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_setline) */
+} /* end subroutine (utmpent_setline) */
 
 int utmpent_setuser(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -153,8 +146,7 @@ int utmpent_setuser(utmpent *op,cchar *sp,int sl) noex {
 	    rs = intconv(strnwcpy(up,szuser,sp,sl) - up) ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_setuser) */
+} /* end subroutine (utmpent_setuser) */
 
 int utmpent_sethost(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -166,8 +158,7 @@ int utmpent_sethost(utmpent *op,cchar *sp,int sl) noex {
 #endif /* CF_SYSLEN */
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_sethost) */
+} /* end subroutine (utmpent_sethost) */
 
 int utmpent_gettype(utmpent *op) noex {
 	int		rs = SR_FAULT ;
@@ -175,8 +166,7 @@ int utmpent_gettype(utmpent *op) noex {
 	    rs = mkchar(op->ut_type) ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_gettype) */
+} /* end subroutine (utmpent_gettype) */
 
 int utmpent_getpid(utmpent *op) noex {
 	int		rs = SR_FAULT ;
@@ -184,8 +174,7 @@ int utmpent_getpid(utmpent *op) noex {
 	    rs = op->ut_pid ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_getpid) */
+} /* end subroutine (utmpent_getpid) */
 
 int utmpent_getsession(utmpent *op) noex {
 	int		rs = SR_FAULT ;
@@ -197,8 +186,7 @@ int utmpent_getsession(utmpent *op) noex {
 #endif /* CF_SESSION */
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_getsession) */
+} /* end subroutine (utmpent_getsession) */
 
 int utmpent_getid(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -207,8 +195,7 @@ int utmpent_getid(utmpent *op,cchar **rpp) noex {
 	    if (rpp) *rpp = op->ut_id ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_getid) */
+} /* end subroutine (utmpent_getid) */
 
 int utmpent_getline(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -217,8 +204,7 @@ int utmpent_getline(utmpent *op,cchar **rpp) noex {
 	    if (rpp) *rpp = op->ut_line ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_getline) */
+} /* end subroutine (utmpent_getline) */
 
 int utmpent_getuser(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -227,8 +213,7 @@ int utmpent_getuser(utmpent *op,cchar **rpp) noex {
 	    if (rpp) *rpp = op->ut_user ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_getuser) */
+} /* end subroutine (utmpent_getuser) */
 
 int utmpent_gethost(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -242,7 +227,6 @@ int utmpent_gethost(utmpent *op,cchar **rpp) noex {
 	    if (rpp) *rpp = op->ut_host ;
 	}
 	return rs ;
-}
-/* end subroutine (utmpent_gethost) */
+} /* end subroutine (utmpent_gethost) */
 
 
