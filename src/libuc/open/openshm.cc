@@ -50,13 +50,13 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 #include	<ugetx.h>		/* LIBU */
+#include	<sigblocker.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucsysmisc.h>		/* LIBUC */
 #include	<ucgetpid.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
-#include	<sigblocker.h>		/* LIBUC */
 #include	<cthex.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
