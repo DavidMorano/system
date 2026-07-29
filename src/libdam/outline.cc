@@ -37,7 +37,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
-#include	<estrings.h>		/* LINUC */
+#include	<estrings.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |NTABCOLS| + |COLUMNS| */
 
 #include	"outline.h"
