@@ -363,7 +363,7 @@ struct proginfo	*pip ;
 {
 	struct proginfo_config	*op = &pip->config ;
 
-	PARAMFILE_CUR	cur ;
+	paramfile_cur	cur ;
 
 	int	rs = SR_NOTOPEN, rs1, i ;
 	int	ml, vl, el ;
@@ -474,25 +474,25 @@ struct proginfo	*pip ;
 	                            break ;
 
 	                        case param_pollint:
-				    if (! pip->final.pollint)
+				    if (! pip->finval.pollint)
 	                                pip->pollint = v ;
 
 	                            break ;
 
 	                        case param_lockint:
-				    if (! pip->final.lockint)
+				    if (! pip->finval.lockint)
 	                                pip->lockint = v ;
 
 	                            break ;
 
 	                        case param_markint:
-				    if (! pip->final.markint)
+				    if (! pip->finval.markint)
 	                                pip->markint = v ;
 
 	                            break ;
 
 	                        case param_runint:
-				    if (! pip->final.runint)
+				    if (! pip->finval.runint)
 	                            	pip->runint = v ;
 
 	                            break ;
@@ -504,7 +504,7 @@ struct proginfo	*pip ;
 	                    break ;
 
 	                case param_msfile:
-			    if (! pip->final.msfile) {
+			    if (! pip->finval.msfile) {
 
 	                        setfname(pip,tmpfname,ebuf,el,TRUE,
 	                            MSDNAME,MSFNAME,"") ;
@@ -519,7 +519,7 @@ struct proginfo	*pip ;
 	                    break ;
 
 	                case param_pidfile:
-			    if (! pip->final.pidfile) {
+			    if (! pip->finval.pidfile) {
 
 	                        setfname(pip,tmpfname,ebuf,el,TRUE,
 	                            RUNDNAME,pip->nodename,PIDFNAME) ;
@@ -534,7 +534,7 @@ struct proginfo	*pip ;
 	                    break ;
 
 	                case param_logfile:
-			    if (! pip->final.logfile) {
+			    if (! pip->finval.logfile) {
 
 	                        setfname(pip,tmpfname,ebuf,el,TRUE,
 	                            LOGDNAME,pip->searchname,"") ;
