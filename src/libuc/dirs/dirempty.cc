@@ -43,7 +43,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<fsdir.h>		/* LIBUC */
-#include	<hasx.h>		/* LINUC |hasNotDots(3uc)| */
+#include	<hasx.h>		/* LIBUC |hasNotDots(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"dirempty.h"
