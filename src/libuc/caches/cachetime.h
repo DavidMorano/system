@@ -20,18 +20,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
-#include	<ptm.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<hdb.h>			/* LIBUC */
 
 
-#define	CACHETIME_MAGIC		0x79854123
-#define	CACHETIME_NENTS		400
 #define	CACHETIME		struct cachetime_head
 #define	CACHETIME_CUR		struct cachetime_cursor
 #define	CACHETIME_ENT		struct cachetime_entry
 #define	CACHETIME_ST		struct cachetime_statistics
+#define	CACHETIME_MAGIC		0x40096056
+#define	CACHETIME_NENTS		400
 
 
 struct cachetime_statistics {
@@ -52,7 +52,7 @@ struct cachetime_entry {
 struct cachetime_head {
 	hdb		*dbp ;
 	ptm		*mxp ;
-	uint		magic ;
+	uint		magval ;
 	uint		c_req ;
 	uint		c_hit ;
 	uint		c_miss ;
@@ -69,7 +69,7 @@ extern int cachetime_start(cachetime *) noex ;
 extern int cachetime_lookup(cachetime *,cchar *,int,time_t *) noex ;
 extern int cachetime_curbegin(cachetime *,cachetime_cur *) noex ;
 extern int cachetime_curend(cachetime *,cachetime_cur *) noex ;
-extern int cachetime_enum(cachetime *,cachetime_cur *,char *,int,
+extern int cachetime_curenum(cachetime *,cachetime_cur *,char *,int,
 		time_t *) noex ;
 extern int cachetime_stats(cachetime *,cachetime_st *) noex ;
 extern int cachetime_finish(cachetime *) noex ;
