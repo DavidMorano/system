@@ -80,7 +80,7 @@
 double fhm(double *a,int n) noex {
 	double		ans = 0.0 ;
 	if (n > 0) {
-	    double	fn = (double) n ;
+	    double	fn = double(n) ;
 	    double	e = 0.00001 ;
 	    double	d = 0.0 ;
 	    for (int i = 0 ; i < n ; i += 1) {
