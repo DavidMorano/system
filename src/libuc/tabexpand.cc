@@ -27,14 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sbuf.h>
-#include	<tabcols.h>
-#include	<char.h>
-#include	<localmisc.h>		/* |NTABCOLS| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<tabcols.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |NTABCOLS| */
 
 #include	"tabexpand.h"
 
@@ -65,9 +65,9 @@ struct dstore {
 
 /* forward references */
 
-static int	dstore_start(dstore *,char *,int) noex ;
-static int	dstore_add(dstore *,int) noex ;
-static int	dstore_finish(dstore *) noex ;
+local int	dstore_start(dstore *,char *,int) noex ;
+local int	dstore_add(dstore *,int) noex ;
+local int	dstore_finish(dstore *) noex ;
 
 
 /* local variables */
@@ -81,8 +81,8 @@ static int	dstore_finish(dstore *) noex ;
 int tabexpand(char *dbuf,int dlen,int ntabcols,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	int		dcol = 0 ;
-	if (dbuf && sbuf) {
-	    if (dstore d ; (rs = dstore_start(&d,dbuf,dlen)) >= 0) {
+	if (dbuf && sbuf) ylikely {
+	    if (dstore d ; (rs = dstore_start(&d,dbuf,dlen)) >= 0) ylikely {
 	        int	sl = slen ;
 	        cchar	*sp = sbuf ;
 	        while ((dcol >= 0) && sl && sp[0]) {
@@ -102,25 +102,23 @@ int tabexpand(char *dbuf,int dlen,int ntabcols,cchar *sbuf,int slen) noex {
 	    } /* end if (dstore) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? dcol : rs ;
-}
-/* end subroutine (tabexpand) */
+} /* end subroutine (tabexpand) */
 
 
 /* local subroutines */
 
-static int dstore_start(dstore *dp,char *dbuf,int dlen) noex {
+local int dstore_start(dstore *dp,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
-	if (dp && dbuf) {
+	if (dp && dbuf) ylikely {
 	    rs = SR_OK ;
 	    dp->dlen = dlen ;
 	    dp->dp = dbuf ;
 	    dp->dl = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dstore_start) */
+} /* end subroutine (dstore_start) */
 
-static int dstore_add(dstore *dp,int ch) noex {
+local int dstore_add(dstore *dp,int ch) noex {
 	int		rs = SR_OVERFLOW ;
 	if (dp->dl < dp->dlen) {
 	    *(dp->dp)++ = charconv(ch) ;
@@ -128,18 +126,16 @@ static int dstore_add(dstore *dp,int ch) noex {
 	    rs = dp->dl ;
 	}
 	return rs ;
-}
-/* end subroutine (dstore_add) */
+} /* end subroutine (dstore_add) */
 
-static int dstore_finish(dstore *dp) noex {
+local int dstore_finish(dstore *dp) noex {
 	int		rs = SR_FAULT ;
-	if (dp) {
+	if (dp) ylikely {
 	    char	*bp = dp->dp ;
 	    *bp = '\0' ;
 	    rs = dp->dl ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dstore_finish) */
+} /* end subroutine (dstore_finish) */
 
 
