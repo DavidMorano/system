@@ -1,4 +1,5 @@
-/* main SUPPORT */
+/* showfieldterms_main SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* show the bits set representing terminating characters */
@@ -19,25 +20,27 @@
 
 /******************************************************************************
 
+  	Description:
 	This is a program to show the field terminator characters
 	from the C language syntax of the terminator block code.
 
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<csignal>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<baops.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<ascii.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<csignal>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<ascii.h>		/* LIBU */
+#include	<mapex.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -52,12 +55,19 @@
 #define	LINEBUFLEN	2048
 #endif
 
+#ifndef	PI
+#define	PI	proginfo
+#endif
+
+#ifndef	AD
+#define	AD	adesc
+#endif
+
 
 /* external subroutines */
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-extern int	proginfo_setpiv(PROGINFO *,const char *,
-			const struct pivars *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) noex ;
+extern int	proginfo_setpiv(PI *,cchar *,const pivars *) noex ;
 
 
 /* external variables */
@@ -66,18 +76,18 @@ extern int	proginfo_setpiv(PROGINFO *,const char *,
 /* local structures */
 
 struct adesc {
-	uchar	array[32] ;
+	uchar	vals[32] ;
 	int	i ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PI *) noex ;
 
-static int	adesc_start(struct adesc *) ;
-static int	adesc_line(struct adesc *,cchar *,int) ;
-static int	adesc_finish(struct adesc *) ;
+local int	adesc_start(AD *) noex ;
+local int	adesc_line(AD *,cchar *,int) noex ;
+local int	adesc_finish(AD *) noex ;
 
 
 /* local variables */
@@ -89,26 +99,26 @@ enum argopts {
 	argopt_tmpdname,
 	argopt_help,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static constexpr cpcchar	argopts[] = {
+constexpr cpcchar	argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
 	"TMPDIR",
 	"HELP",
 	nullptr
-} ;
+} ; /* end array */
 
-static const struct pivars	initvars = {
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRLOCAL
-} ;
+} ; /* end array */
 
-static const struct mapex	mapexs[] = {
+constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -118,7 +128,7 @@ static const struct mapex	mapexs[] = {
 	{ SR_REMOTE, EX_PROTOCOL },
 	{ SR_NOSPC, EX_TEMPFAIL },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -126,9 +136,9 @@ static const struct mapex	mapexs[] = {
 
 /* exported subroutines */
 
-int main(int argc,mainv argv,mainv envv) {
+int main(int argc,con mainv argv,con mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
-	struct adesc	array ;
+	AD 	termarr ;
 	bfile		errfile ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		infile, *ifp = &infile ;
@@ -146,12 +156,12 @@ int main(int argc,mainv argv,mainv envv) {
 	int		f_usage = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*afname = nullptr ;
-	const char	*ofname = nullptr ;
-	const char	*ifname = nullptr ;
-	const char	*pr = nullptr ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*afname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*ifname = nullptr ;
+	cchar	*pr = nullptr ;
+	cchar	*cp ;
 	char		argpresent[MAXARGGROUPS] ;
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -172,8 +182,9 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if ((cp = getenv(VARERRORFNAME)) != nullptr) {
 	    rs = bopen(&errfile,cp,"wca",0666) ;
-	} else
+	} else {
 	    rs = bopen(&errfile,BFILE_STDERR,"dwca",0666) ;
+	}
 	if (rs >= 0) {
 	    pip->efp = &errfile ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
@@ -426,7 +437,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    goto badoutopen ;
 	}
 
-	adesc_start(&array) ;
+	adesc_start(&termarr) ;
 
 /* read in the array */
 
@@ -451,7 +462,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        if (cp[0] == '\0') continue ;
 
-	        adesc_line(&array,cp,-1) ;
+	        adesc_line(&termarr,cp,-1) ;
 
 	    } /* end while */
 
@@ -462,7 +473,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	for (i = 0 ; i < 256 ; i += 1) {
 
-	    if (BATST(array.array,i)) {
+	    if (BATST(termarr.array,i)) {
 
 	        bprintf(ofp,"\t%3d\t",i) ;
 
@@ -541,7 +552,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	} /* end for */
 
-	adesc_finish(&array) ;
+	adesc_finish(&termarr) ;
 
 	bclose(ofp) ;
 
@@ -586,13 +597,12 @@ badarg:
 
 	goto retearly ;
 
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
 
-static int usage(PROGINFO *pip) noex {
+local int usage(PI *pip) noex {
 	int	rs = SR_OK ;
 	int	wlen = 0 ;
 	if (pip->efp) {
@@ -602,25 +612,18 @@ static int usage(PROGINFO *pip) noex {
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
-static int adesc_start(struct adesc *adp)
-{
-	int		i ;
-	for (i = 0 ; i < 32 ; i += 1) {
-	    adp->array[i] = 0 ;
+local int adesc_start(AD *adp) noex {
+	for (int i = 0 ; i < 32 ; i += 1) {
+	    adp->vals[i] = 0 ;
 	}
 	adp->i = 0 ;
 	return SR_OK ;
-}
-/* end subroutine (adesc_start) */
-
+} /* end subroutine (adesc_start) */
 
 /* process a line of input */
-static int adesc_line(struct adesc *adp,cchar *lbuf,int llen)
-{
-	FIELD		fsb ;
+local int adesc_line(AD *adp,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		ai = adp->i ;
 	uchar		bterms[32] ;
@@ -630,8 +633,7 @@ static int adesc_line(struct adesc *adp,cchar *lbuf,int llen)
 #endif
 
 	fieldterms(bterms,0,",# \t") ;
-
-	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
+	if (field fsb ; (rs = field_start(&fsb,lbuf,llen)) >= 0) {
 	int		f_hex ;
 	int		v ;
 	int		fl ;
@@ -659,13 +661,13 @@ static int adesc_line(struct adesc *adp,cchar *lbuf,int llen)
 #endif
 
 	            if (rs >= 0)
-	                adp->array[ai++] = v & 0xFF ;
+	                adp->vals[ai++] = v & 0xFF ;
 
 	        }
 
 	    } else {
 	        if ((rs = cfdeci(fp,fl,&v)) >= 0) {
-	            adp->array[ai++] = v & 0xFF ;
+	            adp->vals[ai++] = v & 0xFF ;
 		}
 	    }
 
@@ -685,13 +687,9 @@ static int adesc_line(struct adesc *adp,cchar *lbuf,int llen)
 
 	adp->i = ai ;
 	return (rs >= 0) ? ai : rs ;
-}
-/* end subroutine (adesc_line) */
+} /* end subroutine (adesc_line) */
 
-
-static int adesc_finish(struct adesc *adp)
-{
-
+local int adesc_finish(AD *adp) noex {
 	return SR_OK ;
 }
 /* end subroutine (adesc_finish) */
