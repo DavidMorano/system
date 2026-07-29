@@ -58,20 +58,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<sncpyx.h>
-#include	<snwcpy.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"termdevice.h"
 
@@ -143,11 +143,11 @@ int termdevice(char *dbuf,int dlen,int fd) noex {
 	int		rs1 ;
 	if (dbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (dlen >= MINBUFLEN) {
+	    if (dlen >= MINBUFLEN) ylikely {
 		rs = SR_BADF ;
-		if (fd >= 0) {
+		if (fd >= 0) ylikely {
 		    rs = SR_NOTTY ;
-	            if (isatty(fd)) {
+	            if (isatty(fd)) ylikely {
 	                dbuf[0] = '\0' ;
 	                if (subinfo si ; (rs = si.start(dbuf,dlen,fd)) >= 0) {
 	                    for (cauto &m : getnames) {
@@ -162,8 +162,7 @@ int termdevice(char *dbuf,int dlen,int fd) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termdevice) */
+} /* end subroutine (termdevice) */
 
 
 /* local subroutines */
@@ -177,13 +176,11 @@ int subinfo::start(char *db,int dl,int afd) noex {
 	    dlen = dl ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 int subinfo::finish() noex {
 	return SR_OK ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 int subinfo::var() noex {
 	cchar		*vn = VARTERMDEV ;
@@ -204,8 +201,7 @@ int subinfo::var() noex {
 	    } /* end if (environment variable worked out!) */
 	} /* end if (stat) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getname_var) */
+} /* end subroutine (getname_var) */
 
 int subinfo::ttyname() noex {
 	int		rs ;
@@ -216,7 +212,6 @@ int subinfo::ttyname() noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getname_ttyname) */
+} /* end subroutine (getname_ttyname) */
 
 
