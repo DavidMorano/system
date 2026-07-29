@@ -383,11 +383,11 @@ local int icur_dtor(icur *icp) noex {
 
 int icur::start() noex {
     	int		rs ;
-	if ((rs = icur_ctor(this)) >= 0) {
-	    if ((rs = entbegin()) >= 0) {
-		if ((rs = openbegin()) >= 0) {
-		    if ((rs = bufbegin()) >= 0) {
-			if ((rs = extract()) >= 0) {
+	if ((rs = icur_ctor(this)) >= 0) ylikely {
+	    if ((rs = entbegin()) >= 0) ylikely {
+		if ((rs = openbegin()) >= 0) ylikely {
+		    if ((rs = bufbegin()) >= 0) ylikely {
+			if ((rs = extract()) >= 0) ylikely {
 			    magval = magicvalue ;
 			} /* end if (extract) */
 		        if (rs < 0) {
@@ -412,7 +412,7 @@ int icur::start() noex {
 int icur::finish() noex {
     	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
-	if (magval == magicvalue) {
+	if (magval == magicvalue) ylikely {
 	    rs = SR_OK ;
 	    if (fbp) {
 	        rs1 = bufend() ;
@@ -463,7 +463,7 @@ int icur::bufbegin() noex {
     	int		rs = SR_NOTOPEN ;
 	if (fd >= 0) {
 	    cint	fsz = szof(filer) ;
-	    if (void *vp ; (rs = libmem.call(1,fsz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.call(1,fsz,&vp)) >= 0) ylikely {
 	        rs = SR_BUGCHECK ;
 	        if ((fbp = new(vp) filer) != nullptr) {
 		    rs = fbp->start(fd,0z,0,0) ;
@@ -484,7 +484,7 @@ int icur::bufend() noex {
     	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	DPRINTF("ent\n") ;
-	if (fbp) {
+	if (fbp) ylikely {
 	    rs = SR_OK ;
 	    {
 		rs1 = fbp->finish ;
@@ -506,9 +506,9 @@ int icur::bufend() noex {
 int icur::entbegin() noex {
     	cint		esz = szof(utmpx) ;
     	int		rs ;
-	if (void *vp ; (rs = libmem.call(1,esz,&vp)) >= 0) {
+	if (void *vp ; (rs = libmem.call(1,esz,&vp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if ((entp = new(vp) utmpx) != nullptr) {
+	    if ((entp = new(vp) utmpx) != nullptr) ylikely {
 		rs = SR_OK ;
 	    }
 	    if (rs < 0) {
@@ -522,7 +522,7 @@ int icur::entend() noex {
     	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	DPRINTF("ent\n") ;
-	if (entp) {
+	if (entp) ylikely {
 	    rs = SR_OK ;
 	    {
 		destroy_at(entp) ;
@@ -549,7 +549,7 @@ int icur::entenum(utmpx **epp) noex {
     	int		rs = SR_BUGCHECK ;
 	int		len = 0 ; /* return-value */
 	DPRINTF("ent\n") ;
-	if (fbp && epp) {
+	if (fbp && epp) ylikely {
     	    cint esz = szof(utmpx) ;
 	    DPRINTF("esz=%d\n",esz) ;
 	    *epp = nullptr ;
@@ -572,17 +572,17 @@ void icur::dtor() noex {
 int utmpacc_curbegin(utmpacc_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	DPRINTF("ent\n") ;
-	if (curp) {
+	if (curp) ylikely {
 	    cint	csz = szof(utmpacc_icur) ;
 	    curp->icursorp = nullptr ;
 	    DPRINTF("-> mail csz=%d\n",csz) ;
-	    if (void *vp ; (rs = libmem.mall(csz,&vp)) >= 0) {
+	    if (void *vp ; (rs = libmem.mall(csz,&vp)) >= 0) ylikely {
 		rs = SR_BUGCHECK ;
-		if (icur *icurp = new(vp) icur ; icurp) {
-		    if ((rs = icurp->start()) >= 0) {
+		if (icur *icurp = new(vp) icur ; icurp) ylikely {
+		    if ((rs = icurp->start()) >= 0) ylikely {
 			cint fd = icurp->fd ;
-			if ((rs = utmpacc_extract(fd)) >= 0) {
-			    if ((rs = uc_rewind(fd)) >= 0) {
+			if ((rs = utmpacc_extract(fd)) >= 0) ylikely {
+			    if ((rs = uc_rewind(fd)) >= 0) ylikely {
 	    			curp->icursorp = icurp ;
 				if_constexpr (f_debug) {
 				    debsize(fd) ;
@@ -611,13 +611,13 @@ int utmpacc_curenum(utmpacc_cur *curp,utmpacc_ent *ep,char *eb,int el) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
 	DPRINTF("ent\n") ;
-	if (curp && ep && eb) {
+	if (curp && ep && eb) ylikely {
 	    utmpacc_icur *icurp = resumelife<utmpacc_icur>(curp->icursorp) ;
 	    rs = SR_NOTOPEN ;
 	    memclear(ep) ;
 	    memclear(eb,el) ;
-	    if (icurp) {
-		if (utmpx *uep ; (rs = icurp->entenum(&uep)) > 0) {
+	    if (icurp) ylikely {
+		if (utmpx *uep ; (rs = icurp->entenum(&uep)) > 0) ylikely {
 		    DPRINTF("ent.type=%hu\n",uep->ut_type) ;
 		    DPRINTF("ent.user=%s\n",uep->ut_user) ;
 		    rs = utmpaccent_load(ep,eb,el,uep) ;
@@ -633,9 +633,9 @@ int utmpacc_curend(utmpacc_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	DPRINTF("ent\n") ;
-	if (curp) {
+	if (curp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->icursorp) {
+	    if (curp->icursorp) ylikely {
 	        utmpacc_icur *icurp = resumelife<utmpacc_icur>(curp->icursorp) ;
 		rs = SR_OK ;
 		{
@@ -775,7 +775,7 @@ int utmpacc::ifini() noex {
 int utmpacc::icapbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = omx.lockbegin(to)) >= 0) {
+	if ((rs = omx.lockbegin(to)) >= 0) ylikely {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
 	        rs = ocv.wait(&omx,to) ;
@@ -793,7 +793,7 @@ int utmpacc::icapbegin(int to) noex {
 int utmpacc::icapend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = omx.lockbegin) >= 0) {
+	if ((rs = omx.lockbegin) >= 0) ylikely {
 	    fcapture = false ;
 	    if (waiters > 0) {
 	        rs = ocv.signal ;
@@ -815,12 +815,12 @@ int utmpacc::iend() noex {
 int utmpacc::boottime(time_t *rp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (rp) {
+	if (rp) ylikely {
 	    *rp = 0 ;
-	    if (sigblocker b ; (rs = b.start) >= 0) {
-	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin) >= 0) {
-		        if ((rs = begin) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	        if ((rs = init) >= 0) ylikely {
+	            if ((rs = capbegin) >= 0) ylikely {
+		        if ((rs = begin) >= 0) ylikely {
 	                    custime	dt = time(nullptr) ;
 	                    cint	to = UTMPACC_INTBOOT ;
 	                    if ((dt - btime.t) >= to) {
@@ -845,10 +845,10 @@ int utmpacc::irunlevel() noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (sigblocker b ; (rs = b.start) >= 0) {
-	    if ((rs = init) >= 0) {
-	        if ((rs = capbegin) >= 0) {
-		    if ((rs = begin) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	    if ((rs = init) >= 0) ylikely {
+	        if ((rs = capbegin) >= 0) ylikely {
+		    if ((rs = begin) >= 0) ylikely {
 	                custime		dt = time(nullptr) ;
 	                cint		to = UTMPACC_INTRUNLEVEL ;
 	                if ((dt - rlevel.t) >= to) {
@@ -872,11 +872,11 @@ int utmpacc::iusers(int w) noex {
 	int		rs = SR_INVALID ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((w >= 0) && (w < UTMPACC_NTYPES)) {
-	    if (sigblocker b ; (rs = b.start) >= 0) {
-	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin) >= 0) {
-		        if ((rs = begin) >= 0) {
+	if ((w >= 0) && (w < UTMPACC_NTYPES)) ylikely {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	        if ((rs = init) >= 0) ylikely {
+	            if ((rs = capbegin) >= 0) ylikely {
+		        if ((rs = begin) >= 0) ylikely {
 	                    custime	dt = time(nullptr) ;
 	                    cint	to = UTMPACC_INTUSERS ;
 	                    if ((dt - nusers[w].t) >= to) {
@@ -901,14 +901,14 @@ int utmpacc::entsid(ARG *ap,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		ffound = false ;
-	if (ap && ap->uep && ap->uebuf) {
+	if (ap && ap->uep && ap->uebuf) ylikely {
 	    memclear(ap->uep) ;
 	    ap->uebuf[0] = '\0' ;
 	    if (sid <= 0) sid = getsid(0) ;
-	    if (sigblocker b ; (rs = b.start) >= 0) {
-	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin) >= 0) {
-		        if ((rs = begin) >= 0) {	
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	        if ((rs = init) >= 0) ylikely {
+	            if ((rs = capbegin) >= 0) ylikely {
+		        if ((rs = begin) >= 0) ylikely {	
 	                    ap->dt = time(nullptr) ;
 	                    rs = getentsid(ap,sid) ;
 			    ffound = rs ;
@@ -929,14 +929,14 @@ int utmpacc::entstat(ARG *ap,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		ffound = false ;
-	if (ap && ap->uep && ap->uebuf) {
+	if (ap && ap->uep && ap->uebuf) ylikely {
 	    memclear(ap->uep) ;
 	    ap->uebuf[0] = '\0' ;
 	    if (sid <= 0) sid = getsid(0) ;
-	    if (sigblocker b ; (rs = b.start) >= 0) {
-	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin) >= 0) {
-		        if ((rs = begin) >= 0) {	
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	        if ((rs = init) >= 0) ylikely {
+	            if ((rs = capbegin) >= 0) ylikely {
+		        if ((rs = begin) >= 0) ylikely {	
 	                    ap->dt = time(nullptr) ;
 	                    rs = getentstat(ap,sid) ;
 			    ffound = rs ;
@@ -959,13 +959,13 @@ int utmpacc::entline(ARG *ap,cchar *lp,int ll) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		ffound = false ;
-	if (ap && ap->uep && ap->uebuf && lp) {
+	if (ap && ap->uep && ap->uebuf && lp) ylikely {
 	    memclear(ap->uep) ;
 	    ap->uebuf[0] = '\0' ;
-	    if (sigblocker b ; (rs = b.start) >= 0) {
-	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin) >= 0) {
-		        if ((rs = begin) >= 0) {	
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	        if ((rs = init) >= 0) ylikely {
+	            if ((rs = capbegin) >= 0) ylikely {
+		        if ((rs = begin) >= 0) ylikely {	
 	                    ap->dt = time(nullptr) ;
 	                    rs = getentline(ap,lp,ll) ;
 			    ffound = rs ;
@@ -988,12 +988,12 @@ int utmpacc::stats(utmpacc_sb *usp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		mu = 0 ;
-	if (usp) {
+	if (usp) ylikely {
 	    memclear(usp) ;
-	    if (sigblocker b ; (rs = b.start) >= 0) {
-	        if ((rs = init) >= 0) {
-	            if ((rs = capbegin) >= 0) {
-		        if ((rs = begin) >= 0) {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	        if ((rs = init) >= 0) ylikely {
+	            if ((rs = capbegin) >= 0) ylikely {
+		        if ((rs = begin) >= 0) ylikely {
 	                    usp->maxusers = maxusers ;
 	                    usp->maxents = maxents ;
 			    mu = maxusers ;
@@ -1014,14 +1014,14 @@ int utmpacc::extract(int fd) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	DPRINTF("ent fd=%d\n",fd) ;
-	if (fd >= 0) {
-	    if (sigblocker b ; (rs = b.start) >= 0) {
+	if (fd >= 0) ylikely {
+	    if (sigblocker b ; (rs = b.start) >= 0) ylikely {
 		DPRINTF("-> init\n") ;
-	        if ((rs = init) >= 0) {
+	        if ((rs = init) >= 0) ylikely {
 		    DPRINTF("-> cap\n") ;
-	            if ((rs = capbegin) >= 0) {
+	            if ((rs = capbegin) >= 0) ylikely {
 		        DPRINTF("-> begin\n") ;
-		        if ((rs = begin) >= 0) {
+		        if ((rs = begin) >= 0) ylikely {
 			    {
 		        	DPRINTF("-> getextract\n") ;
 			        rs = getextract(fd) ;
@@ -1095,7 +1095,7 @@ int utmpacc::scan(time_t dt) noex {
 int utmpacc::getentsid(ARG *ap,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	int		ffound = false ; /* return-value */
-	if (ap) {
+	if (ap) ylikely {
 	    time_t	dt = 0z ;
 	    rs = SR_OK ;
 	    setutxent() ;
@@ -1135,7 +1135,7 @@ int utmpacc::getentstat(ARG *ap,pid_t sid) noex {
 	int		ffound = false ;
 	cchar		*devprefix = DEVPREFIX ;
 	char		tbuf[tlen+1] ;
-	if ((rs = sncpy(tbuf,tlen,devprefix)) >= 0) {
+	if ((rs = sncpy(tbuf,tlen,devprefix)) >= 0) ylikely {
 	    cint	tl = rs ;
 	    setutxent() ;
 	    for (utmpx *up ; (up = getutxent()) != np ; ) {
@@ -1171,7 +1171,7 @@ int utmpacc::getentline(ARG *ap,cchar *lp,int ll) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		ffound = false ; /* return-value */
-	if (ap) {
+	if (ap) ylikely {
 	    time_t	dt = 0z ;
 	    setutxent() ;
 	    for (CUTMPX *up ; (up = getutxent()) != np ; ) {
@@ -1244,7 +1244,7 @@ int utmpacc::getextract(int fd) noex {
 
 int utmpacc::load_runlevel(custime dt,con utmpx *up) noex {
     	int		rs ;
-	if ((rs = utmpx_eterm(up)) >= 0) {
+	if ((rs = utmpx_eterm(up)) >= 0) ylikely {
 	    cint eterm = (rs > 0) ? rs : mkchar('×') ;
 	    rlevel.v = mkchar(eterm) ;
 	    rlevel.t = dt ;
@@ -1294,7 +1294,7 @@ local int utmpx_eterm(CUTMPX *) noex {
 
 utmpacc_enter::operator int () noex {
     	int		rs ;
-    	if (static cint	rsv = var ; (rs = rsv) >= 0) {
+    	if (static cint	rsv = var ; (rs = rsv) >= 0) ylikely {
 	    rs = var.entbuflen ;
 	}
     	return rs ;
@@ -1308,8 +1308,8 @@ vars::operator int () noex {
 local int debflags(int of) noex {
     	int		rs ;
 	int		rs1 ;
-	if (char *lbuf ; (rs = libmem.ml(&lbuf)) >= 0) {
-	    if ((rs = snflagsopen(lbuf,rs,of)) >= 0) {
+	if (char *lbuf ; (rs = libmem.ml(&lbuf)) >= 0) ylikely {
+	    if ((rs = snflagsopen(lbuf,rs,of)) >= 0) ylikely {
 		DPRINTF("ofl %s\n",lbuf) ;
 	    } /* end if (snflagsopen) */
 	    rs1 = libmem.free(lbuf) ;
@@ -1320,7 +1320,7 @@ local int debflags(int of) noex {
 
 local int debdesc(int fd) noex {
     	int		rs ;
-	if ((rs = u_fgetfl(fd)) >= 0) {
+	if ((rs = u_fgetfl(fd)) >= 0) ylikely {
 	    debflags(rs) ;
 	} /* end if (u_fgetfl) */
 	return rs ;
@@ -1328,7 +1328,7 @@ local int debdesc(int fd) noex {
 
 local int debsize(int fd) noex {
     	int		rs ;
-	if ((rs = u_fsize(fd)) >= 0) {
+	if ((rs = u_fsize(fd)) >= 0) ylikely {
 	    DPRINTF("fsz=%d\n",rs) ;
 	} /* end if (u_fsize) */
 	return rs ;
