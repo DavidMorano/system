@@ -242,16 +242,20 @@ import uconstants ;			/* |varname(3u)| + |sysword(3u)| */
 
 #define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
-#define	NDF		"/tmp/bibleqs.deb"
-
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+#ifndef	CF_EMPTYTERM
+#define	CF_EMPTYTERM	1		/* empty line terminates entry */
 #endif
 #ifndef	CF_EXTRASTRONG
 #define	CF_EXTRASTRONG	0		/* do not use Strong's eigen-words */
 #endif
 #ifndef	CF_EXTRAEIGEN
 #define	CF_EXTRAEIGEN	0		/* perform extra EIGEN-DB check */
+#endif
+#ifndef	CF_SINGLEWORD
+#define	CF_SINGLEWORD	1		/* treat extra words as single */
 #endif
 
 
@@ -459,8 +463,10 @@ static char		wterms[fieldterms_termsize] ;
 cint			nchars		= (UCHAR_MAX + 1) ;
 cint			nstrongeigens	= lenstrarr(strongeigens) ;
 cbool			f_debug		= CF_DEBUG ;
+cbool			f_emptyterm	= CF_EMPTYTERM ;
 cbool			f_extrastrong	= CF_EXTRASTRONG ;
 cbool			f_extraeigen	= CF_EXTRAEIGEN ;
+cbool			f_singleword	= CF_SINGLEWORD	;
 
 
 /* exported variables */
@@ -1161,7 +1167,7 @@ local int bibleqs_indmkdata(BQS *op,TIM *tip) noex {
 		    }
 	        } /* end if (entry start of add) */
 	    } else {
-#if	CF_EMPTYTERM
+		if_constexpr (f_emptyterm) {
 	        if (f_ent) {
 	            f_ent = false ;
 	            c += 1 ;
@@ -1171,9 +1177,9 @@ local int bibleqs_indmkdata(BQS *op,TIM *tip) noex {
 	            f_ent = false ;
 	            ktag_finish(&e) ;
 	        }
-#else
+		} else {
 	        rs = SR_OK ;
-#endif /* CF_EMPTYTERM */
+		} /* end if_constexpr (f_emptyterm) */
 	    } /* end if (not empty) */
 	    foff += len ;
 	    ml -= len ;
@@ -1219,7 +1225,7 @@ local int bibleqs_mkbibleqsi(BQS *op,cchar *dname) noex {
 	char		dbname[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
-	debugprintf("bibleqs_mkbibleqsi: dname=%s\n",dname) ;
+	DEBUGPRINTF("bibleqs_mkbibleqsi: dname=%s\n",dname) ;
 #endif
 
 	if (dname == nullptr) return SR_FAULT ;
@@ -1240,9 +1246,9 @@ local int bibleqs_mkbibleqsi(BQS *op,cchar *dname) noex {
 	} /* end for */
 
 #if	CF_DEBUG
-	debugprintf("bibleqs_mkbibleqsi: pr=%s\n",op->pr) ;
-	debugprintf("bibleqs_mkbibleqsi: pbuf=%s\n",pbuf) ;
-	debugprintf("bibleqs_mkbibleqsi: perm() rs=%d\n",rs) ;
+	DEBUGPRINTF("bibleqs_mkbibleqsi: pr=%s\n",op->pr) ;
+	DEBUGPRINTF("bibleqs_mkbibleqsi: pbuf=%s\n",pbuf) ;
+	DEBUGPRINTF("bibleqs_mkbibleqsi: perm() rs=%d\n",rs) ;
 #endif
 
 	if (rs >= 0) {
@@ -1315,7 +1321,7 @@ local int bibleqs_mkbibleqsi(BQS *op,cchar *dname) noex {
 	} /* end if (mkpath) */
 
 #if	CF_DEBUG
-	debugprintf("bibleqs_mkbibleqsi: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("bibleqs_mkbibleqsi: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -1418,58 +1424,41 @@ local int bibleqs_havekeysline(BQS *op,SK *skp,
 /* do the keys match? */
 local int bibleqs_matchkeys(BQS *op,SK *skp,
 		SK_P *pkp,cchar *sp,int sl) noex {
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		f = false ;
-
-#if	CF_DEBUG 
-	debugprintf("bibleqs_matchkeys: ent s=>%r<\n",sp,sl) ;
-#endif
-
-	if (op == nullptr) return SR_FAULT ;
-
-/* deal with extra (ex: possessive) words */
-
-#if	CF_SINGLEWORD
-	xwords		xw ;
-	if ((rs = xwords_start(&xw,sp,sl)) >= 0) {
+	int		f = false ; /* return-value */
+	if (op) {
+	   /* deal with extra (ex: possessive) words */
+	    if_constexpr (f_singleword) {
+	        if (xwords xw ; (rs = xw.start(sp,sl)) >= 0) {
 	    {
 	    rs = searchkeys_processxw(skp,pkp,&xw) ;
 	    f = (rs > 0) ;
 	    }
-	    rs1 = xwords_finish(&xw) ;
+	    rs1 = xw.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (xwords) */
-#else /* CF_SINGLEWORD */
-	xwords		xw ;
-	if ((rs = xwords_start(&xw,sp,sl)) >= 0) {
+	    } else {
+	        if (xwords xw ; (rs = xw.start(sp,sl)) >= 0) {
 	    int		wi ;
 	    int		cl ;
 	    cchar	*cp ;
-
 	    f = false ;
-	    for (wi = 0 ; ((cl = xwords_get(&xw,wi,&cp)) > 0) ; wi += 1) {
-
-#if	CF_DEBUG 
-	        debugprintf("bibleqs_matchkeys: xwords_get() rs=%d\n",cl) ;
-	        if (cl >= 0)
-	            debugprintf("bibleqs_matchkeys: c=>%r<\n",cp,cl) ;
-#endif
-
+	    for (wi = 0 ; ((cl = xw.get(wi,&cp)) > 0) ; wi += 1) {
+	        DEBUGPRINTF("xwords_get() rs=%d\n",cl) ;
+	        if (cl >= 0) {
+	            DEBUGPRINTF("c=>%r<\n",cp,cl) ;
+		}
 	        rs1 = searchkeys_process(skp,pkp,cp,cl) ;
 	        f = (rs1 > 0) ;
-
-#if	CF_DEBUG 
-	        debugprintf("bibleqs_matchkeys: searchkeys_process() f=%u\n",
-	            f) ;
-#endif
-
+	        DEBUGPRINTF("searchkeys_process() f=%u\n", f) ;
 	        if (f) break ;
 	    } /* end for (matching words) */
-	    rs1 = xwords_finish(&xw) ;
+	    rs1 = xw.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (xwords) */
-#endif /* CF_SINGLEWORD */
+	} /* end if (f_singleword) */
+	} /* end if (non-null) */
 	DEBUGPRINTF("ret rs=%d f=%u\n",rs,f) ;
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (bibleqs_matchkeys) */
