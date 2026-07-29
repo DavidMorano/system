@@ -24,6 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 #include	<pingstatdb.h>
+#include	<pinghost.h>
+#include	<pingtab.h>
 
 
 #endif /* PINGSTATX_INCLUDE */
