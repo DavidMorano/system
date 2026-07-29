@@ -28,17 +28,17 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<serialbuf.h>
-#include	<stdorder.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<stdorder.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pingstatmsg.h"
 
@@ -47,6 +47,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -116,9 +119,7 @@ int			mlen ;
 	} /* end if (serialbuf) */
 
 	return rs ;
-}
-/* end subroutine (pingstatmsg_update) */
-
+} /* end subroutine (pingstatmsg_update) */
 
 int pingstatmsg_uptime(sp,f,mbuf,mlen)
 struct pingstatmsg_uptime	*sp ;
@@ -184,9 +185,7 @@ int			mlen ;
 	} /* end if (serialbuf) */
 
 	return rs ;
-}
-/* end subroutine (pingstatmsg_uptime) */
-
+} /* end subroutine (pingstatmsg_uptime) */
 
 /* unknown message */
 int pingstatmsg_unknown(sp,f,mbuf,mlen)
@@ -226,8 +225,7 @@ int			mlen ;
 	} /* end if (serialbuf) */
 
 	return rs ;
-}
-/* end subroutine (pingstatmsg_unknown) */
+} /* end subroutine (pingstatmsg_unknown) */
 
 #ifdef	COMMENT
 int pingstatmsg_msglen(int type) noex {
@@ -244,8 +242,7 @@ int pingstatmsg_msglen(int type) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end subroutine (pingstatmsg_msglen) */
+} /* end subroutine (pingstatmsg_msglen) */
 #endif /* COMMENT */
 
 
