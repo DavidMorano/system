@@ -52,7 +52,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<storebuf.h>		/* LIBUC */
-#include	<localmisc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
