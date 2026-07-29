@@ -59,43 +59,43 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>		/* Memory Management */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<bufsizeget.h>
-#include	<sysval.hh>
-#include	<endian.h>
-#include	<mkfnamesuf.h>
-#include	<storeitem.h>
-#include	<realname.h>
-#include	<pwihdr.h>
-#include	<hash.h>
-#include	<hashindex.h>
-#include	<strn.h>
-#include	<mkpath.h>
-#include	<mkfnamesuf.h>
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<intceil.h>
-#include	<intsat.h>
-#include	<randlc.h>
-#include	<matxstr.h>
-#include	<mkx.h>
-#include	<isfiledesc.h>
-#include	<hasx.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® Memory Management */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<mkfnamesuf.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<realname.h>		/* LIBUC */
+#include	<pwihdr.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC */
+#include	<hashindex.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<mkpath.h>		/* LIBUC */
+#include	<mkfnamesuf.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<randlc.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<isfiledesc.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ipasswd.h"
 
@@ -195,18 +195,14 @@ local int	ipasswd_keymatchlast(ipasswd *,int,int,char *,int) noex ;
 #endif
 
 local int	mkourfname(char *,cchar *) noex ;
-
 local int	detOurSuf(cchar *,cchar *,int) noex ;
-
 local int	mkvars() noex ;
 
 
 /* local variables */
 
 static sysval		pagesz(sysval_ps) ;
-
 static vars		var ;
-
 constexpr bool		f_usefl3 = CF_USEFL3 ;
 
 
@@ -248,7 +244,7 @@ int ipasswd_open(ipasswd *op,cchar *dbname) noex {
 	                                }
 	                                if (rs < 0) {
 	                                    ipasswd_mapend(op) ;
-	                                }
+	                                } /* end if (error) */
 	                            } /* end if (ipasswd_mapbegin) */
 	                            rs1 = ipasswd_fileclose(op) ;
 	                            if (rs >= 0) rs = rs1 ;
@@ -257,7 +253,7 @@ int ipasswd_open(ipasswd *op,cchar *dbname) noex {
 				    void *vp = voidp(op->fname) ;
 	                            lm_free(vp) ;
 	                            op->fname = nullptr ;
-	                        }
+	                        } /* end if (error) */
 	                    } /* end if (store) */
 	                } /* end if (mk-filename) */
 		        rs1 = lm_free(dbfname) ;
@@ -267,8 +263,7 @@ int ipasswd_open(ipasswd *op,cchar *dbname) noex {
 	    } /* end if (mkvars) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ipasswd_open) */
+} /* end subroutine (ipasswd_open) */
 
 int ipasswd_close(ipasswd *op) noex {
 	int		rs ;
@@ -292,8 +287,7 @@ int ipasswd_close(ipasswd *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ipasswd_close) */
+} /* end subroutine (ipasswd_close) */
 
 int ipasswd_count(ipasswd *op) noex {
 	int		rs ;
@@ -301,8 +295,7 @@ int ipasswd_count(ipasswd *op) noex {
 	    rs = (op->rtlen - 1) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ipasswd_count) */
+} /* end subroutine (ipasswd_count) */
 
 int ipasswd_countindex(ipasswd *op) noex {
 	int		rs ;
@@ -310,8 +303,7 @@ int ipasswd_countindex(ipasswd *op) noex {
 	    rs = op->rilen ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ipasswd_countindex) */
+} /* end subroutine (ipasswd_countindex) */
 
 /* fetch an entry by a real-name key lookup */
 int ipasswd_fetch(ipasswd *op,realname *rp,ipasswd_cur *curp,
@@ -477,8 +469,7 @@ int ipasswd_fetch(ipasswd *op,realname *rp,ipasswd_cur *curp,
             } /* end if (ipasswd-enter) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (ipasswd_fetch) */
+} /* end subroutine (ipasswd_fetch) */
 
 int ipasswd_curbegin(ipasswd *op,ipasswd_cur *curp) noex {
 	int		rs ;
@@ -491,8 +482,7 @@ int ipasswd_curbegin(ipasswd *op,ipasswd_cur *curp) noex {
 	    curp->magval = IPASSWD_CURMAGIC ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ipasswd_curbegin) */
+} /* end subroutine (ipasswd_curbegin) */
 
 int ipasswd_curend(ipasswd *op,ipasswd_cur *curp) noex {
 	custime		dt = getustime ;
@@ -508,8 +498,7 @@ int ipasswd_curend(ipasswd *op,ipasswd_cur *curp) noex {
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ipasswd_curend) */
+} /* end subroutine (ipasswd_curend) */
 
 int ipasswd_curenum(ipasswd *op,ipasswd_cur *curp,char *ubuf,cc **sa,
 		char *rbuf,int rlen) noex {
@@ -590,8 +579,7 @@ int ipasswd_curenum(ipasswd *op,ipasswd_cur *curp,char *ubuf,cc **sa,
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (ipasswd_curenum) */
+} /* end subroutine (ipasswd_curenum) */
 
 int ipasswd_curfetch(ipasswd *op,ipasswd_cur *curp,int opts,char *ubuf,
 		cchar **sa,int sn) noex {
@@ -817,8 +805,7 @@ int ipasswd_curfetch(ipasswd *op,ipasswd_cur *curp,int opts,char *ubuf,
 	} /* end if (ipasswd-enter) */
 
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (ipasswd_curfetch) */
+} /* end subroutine (ipasswd_curfetch) */
 
 int ipasswd_getinfo(ipasswd *op,ipasswd_info *rp) noex {
 	int		rs ;
@@ -846,8 +833,7 @@ int ipasswd_check(ipasswd *op,time_t dt) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ipasswd_check) */
+} /* end subroutine (ipasswd_check) */
 
 
 /* private subroutines */
@@ -882,8 +868,7 @@ local int ipasswd_hdrload(ipasswd *op) noex {
 	    rs = SR_NXIO ;
 	} /* end if (magic matched) */
 	return rs ;
-}
-/* end subroutine (ipasswd_hdrload) */
+} /* end subroutine (ipasswd_hdrload) */
 
 local int ipasswd_hdrloader(ipasswd *op) noex {
 	uint		*table = (uint *) (op->mapdata + IPASSWD_IDLEN) ;
@@ -902,8 +887,7 @@ local int ipasswd_hdrloader(ipasswd *op) noex {
 	op->recind[3] = (uint (*)[2]) (op->mapdata + table[pwihdr_idxfl3]) ;
 	op->recind[4] = (uint (*)[2]) (op->mapdata + table[pwihdr_idxun]) ;
 	return rs ;
-}
-/* end subroutine (ipasswd_hdrloader) */
+} /* end subroutine (ipasswd_hdrloader) */
 
 local int ipasswd_enterbegin(ipasswd *op,time_t dt) noex {
 	int		rs ;
@@ -913,8 +897,7 @@ local int ipasswd_enterbegin(ipasswd *op,time_t dt) noex {
 	    f = true ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ipasswd_enterbegin) */
+} /* end subroutine (ipasswd_enterbegin) */
 
 local int ipasswd_enterend(ipasswd *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -923,8 +906,7 @@ local int ipasswd_enterend(ipasswd *op,time_t dt) noex {
 	    op->fl.held = false ;
 	}
 	return rs ;
-}
-/* end subroutine (ipasswd_enterend) */
+} /* end subroutine (ipasswd_enterend) */
 
 local int ipasswd_fileopen(ipasswd *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -955,8 +937,7 @@ local int ipasswd_fileopen(ipasswd *op,time_t dt) noex {
 	    } /* end if (u_open) */
 	} /* end if (needed) */
 	return (rs >= 0) ? op->fd : rs ;
-}
-/* end subroutine (ipasswd_fileopen) */
+} /* end subroutine (ipasswd_fileopen) */
 
 local int ipasswd_fileclose(ipasswd *op) noex {
 	int		rs = SR_OK ;
@@ -965,8 +946,7 @@ local int ipasswd_fileclose(ipasswd *op) noex {
 	    op->fd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (ipasswd_fileclose) */
+} /* end subroutine (ipasswd_fileclose) */
 
 local int ipasswd_mapbegin(ipasswd *op,time_t dt) noex {
 	cnullptr	np{} ;
@@ -987,8 +967,7 @@ local int ipasswd_mapbegin(ipasswd *op,time_t dt) noex {
 	    }
 	} /* end if (needed) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ipasswd_mapbegin) */
+} /* end subroutine (ipasswd_mapbegin) */
 
 local int ipasswd_mapend(ipasswd *op) noex {
 	int		rs = SR_OK ;
@@ -1000,8 +979,7 @@ local int ipasswd_mapend(ipasswd *op) noex {
 	    op->mapsize = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (ipasswd_mapend) */
+} /* end subroutine (ipasswd_mapend) */
 
 local int ipasswd_remotefs(ipasswd *op) noex {
 	int		rs ;
@@ -1011,8 +989,7 @@ local int ipasswd_remotefs(ipasswd *op) noex {
 	    op->fl.remote = !!f ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ipasswd_remotefs) */
+} /* end subroutine (ipasswd_remotefs) */
 
 local int ipasswd_keymatchfl3(ipasswd *op,int opts,int ri,realname *rp) noex {
 	int		si = op->rectab[ri].last ;
@@ -1024,8 +1001,7 @@ local int ipasswd_keymatchfl3(ipasswd *op,int opts,int ri,realname *rp) noex {
 	    f = ((op->stab + si)[0] == rp->first[0]) ;
 	}
 	return f ;
-}
-/* end subroutine (ipasswd_keymatchfl3) */
+} /* end subroutine (ipasswd_keymatchfl3) */
 
 local int ipasswd_keymatchl3(ipasswd *op,int opts,int ri,realname *rp) noex {
 	cint		si = op->rectab[ri].last ;
@@ -1035,8 +1011,7 @@ local int ipasswd_keymatchl3(ipasswd *op,int opts,int ri,realname *rp) noex {
 	    f = (strncmp((op->stab + si),rp->last,3) == 0) ;
 	}
 	return f ;
-}
-/* end subroutine (ipasswd_keymatchl3) */
+} /* end subroutine (ipasswd_keymatchl3) */
 
 local int ipasswd_keymatchl1(ipasswd *op,int opts,int ri,realname *rp) noex {
 	cint		si = op->rectab[ri].last ;
@@ -1046,8 +1021,7 @@ local int ipasswd_keymatchl1(ipasswd *op,int opts,int ri,realname *rp) noex {
 	    f = ((op->stab + si)[0] == rp->last[0]) ;
 	}
 	return f ;
-}
-/* end subroutine (ipasswd_keymatchl1) */
+} /* end subroutine (ipasswd_keymatchl1) */
 
 local int ipasswd_keymatchf(ipasswd *op,int opts,int ri,realname *rp) noex {
 	cint		si = op->rectab[ri].first ;
@@ -1057,8 +1031,7 @@ local int ipasswd_keymatchf(ipasswd *op,int opts,int ri,realname *rp) noex {
 	    f = ((op->stab + si)[0] == rp->first[0]) ;
 	}
 	return f ;
-}
-/* end subroutine (ipasswd_keymatchf) */
+} /* end subroutine (ipasswd_keymatchf) */
 
 #ifdef	COMMENT
 local int ipasswd_keymatchlast(ipasswd *op,int opts,int ri,
@@ -1071,8 +1044,7 @@ local int ipasswd_keymatchlast(ipasswd *op,int opts,int ri,
 	    f = (strncmp((op->stab + si),sp,hl) == 0) ;
 	}
 	return f ;
-}
-/* end subroutine (ipasswd_keymatchlast) */
+} /* end subroutine (ipasswd_keymatchlast) */
 
 #endif /* COMMENT */
 
@@ -1119,8 +1091,7 @@ local int ipasswd_keymatchall(ipasswd *op,int opts,int ri,realname *rp) noex {
 	    }
 	}
 	return f ;
-}
-/* end subroutine (ipasswd_keymatchall) */
+} /* end subroutine (ipasswd_keymatchall) */
 
 local int ipaswd_mapcheck(ipasswd *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -1137,8 +1108,7 @@ local int ipaswd_mapcheck(ipasswd *op,time_t dt) noex {
 	    }
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ipaswd_mapcheck) */
+} /* end subroutine (ipaswd_mapcheck) */
 
 local int mkourfname(char *dbfname,cchar *dbname) noex {
 	int		rs ;
@@ -1150,8 +1120,7 @@ local int mkourfname(char *dbfname,cchar *dbname) noex {
 	    rs = mkfnamesuf2(dbfname,dbname,suf,endstr) ;
 	}
 	return rs ;
-}
-/* end subroutine (mkourfname) */
+} /* end subroutine (mkourfname) */
 
 local int detOurSuf(cchar *suf,cchar *fname,int fl) noex {
 	int		len = 0 ;
@@ -1167,8 +1136,7 @@ local int detOurSuf(cchar *suf,cchar *fname,int fl) noex {
 	    }
 	} /* end if (sfbasename) */
 	return len ;
-}
-/* end subroutine (detOurSuf) */
+} /* end subroutine (detOurSuf) */
 
 local int mkvars() noex {
 	int		rs ;
@@ -1176,7 +1144,6 @@ local int mkvars() noex {
 	    var.usernamelen = rs ;
 	}
 	return rs ;
-}
-/* end subroutine (mkvars) */
+} /* end subroutine (mkvars) */
 
 
