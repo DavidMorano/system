@@ -52,6 +52,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<endian.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
