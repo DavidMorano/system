@@ -58,21 +58,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<estrings.h>
-#include	<snwcpy.h>
-#include	<mkpathx.h>
-#include	<filemap.h>
-#include	<filer.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<filemap.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"udomain.h"
 
@@ -143,11 +146,11 @@ namespace {
 int udomain(cchar *pr,char *dbuf,int dlen,cchar *username) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		len = 0 ;
-	if (dbuf && username) {
+	int		len = 0 ; /* return-value */
+	if (dbuf && username) ylikely {
 	    rs = SR_INVALID ;
 	    dbuf[0] = '\0' ;
-	    if (username[0]) {
+	    if (username[0]) ylikely {
 	        uargs	a(dbuf,dlen,username,MAXFILESIZE) ;
 	        cchar	*fname = UDOMASTDFNIN ;
 	        if (pr && (pr[0] != '\0') && (strcmp(pr,"/") != 0)) {
@@ -166,8 +169,7 @@ int udomain(cchar *pr,char *dbuf,int dlen,cchar *username) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (udomain) */
+} /* end subroutine (udomain) */
 
 
 /* local subroutines */
@@ -185,8 +187,7 @@ int uargs::udomainer(cchar *fname) noex {
 	    } /* end if (type of file) */
 	} /* end if (stat) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (uargs::udomainer) */
+} /* end subroutine (uargs::udomainer) */
 
 int uargs::udomainerm(cchar *fname) noex {
 	csize		mfsize = size_t(maxfilesize) ;
@@ -208,18 +209,17 @@ int uargs::udomainerm(cchar *fname) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (opened file) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (uargs::udomainerm) */
+} /* end method (uargs::udomainerm) */
 
 int uargs::udomainerf(cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 	    cint	llen = rs ;
-	    if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
+	    if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) ylikely {
 	        cint	fd = rs ;
-	        if (filer b ; (rs = b.start(fd,0L,0,0)) >= 0) {
+	        if (filer b ; (rs = b.start(fd,0L,0,0)) >= 0) ylikely {
 	            while ((rs = b.readln(lbuf,llen,-1)) > 0) {
 			{
 	                    rs = parseline(lbuf,rs) ;
@@ -238,8 +238,7 @@ int uargs::udomainerf(cchar *fname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (uargs::udomainerf) */
+} /* end method (uargs::udomainerf) */
 
 int uargs::parseline(cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
@@ -266,7 +265,6 @@ int uargs::parseline(cchar *lbuf,int llen) noex {
 	    } /* end if (username match) */
 	} /* end if (sfnext) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (uargs::parseline) */
+} /* end subroutine (uargs::parseline) */
 
 
