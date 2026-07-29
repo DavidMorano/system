@@ -74,10 +74,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucrand.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucrand.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysnoise.h"
 
@@ -107,7 +107,6 @@
 
 int sysnoise(uchar *a,int alen) noex {
 	return uc_rand(a,alen) ;
-}
-/* end subroutine (sysnoise) */
+} /* end subroutine (sysnoise) */
 
 
