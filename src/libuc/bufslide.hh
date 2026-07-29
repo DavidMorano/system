@@ -73,11 +73,11 @@ class bufslide {
 	void		*chunkp ;	/* chunk-object pointer */
 	int		oi ;		/* output index */
 	int push(int) noex ;
-	int istart() noex ;
-	int ifinish() noex ;
-	int iadv(int) noex ;
-	int ilen() const noex ;
-	int iextent() const noex ;
+	int istart	() noex ;
+	int ifinish	() noex ;
+	int iadv	(int) noex ;
+	int ilen	() const noex ;
+	int iextent	() const noex ;
 public:
 	bufslide_co	start ;
 	bufslide_co	finish ;
