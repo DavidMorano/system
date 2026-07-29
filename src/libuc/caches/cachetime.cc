@@ -111,7 +111,7 @@ template<typename ... Args>
 local inline int cachetime_magic(cachetime *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CACHETIME_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CACHETIME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (cachetime_magic) */
@@ -138,7 +138,7 @@ int cachetime_start(CT *op) noex {
 	    if ((rs = hdb_start(op->dbp,ne,1,np,np)) >= 0) ylikely {
 	        ptm *mxp = op->mxp ;
 	        if ((rs = mxp->create) >= 0) ylikely {
-		    op->magic = CACHETIME_MAGIC ;
+		    op->magval = CACHETIME_MAGIC ;
 	        }
 	        if (rs < 0) {
 		    hdb_finish(op->dbp) ;
@@ -149,8 +149,7 @@ int cachetime_start(CT *op) noex {
 	    }
 	} /* end if (cachetime_ctor) */
 	return rs ;
-}
-/* end subroutine (cachetime_start) */
+} /* end subroutine (cachetime_start) */
 
 int cachetime_finish(CT *op) noex {
 	int		rs ;
@@ -191,11 +190,10 @@ int cachetime_finish(CT *op) noex {
 		rs1 = cachetime_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cachetime_finish) */
+} /* end subroutine (cachetime_finish) */
 
 int cachetime_lookup(CT *op,cchar *sp,int µsl,time_t *timep) noex {
 	int		rs ;
@@ -215,8 +213,7 @@ int cachetime_lookup(CT *op,cchar *sp,int µsl,time_t *timep) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (cachetime_lookup) */
+} /* end subroutine (cachetime_lookup) */
 
 int cachetime_curbegin(CT *op,CT_CUR *curp) noex {
     	cnullptr	np{} ;
@@ -240,8 +237,7 @@ int cachetime_curbegin(CT *op,CT_CUR *curp) noex {
 	    } /* end if (new-hdb_cur) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cachetime_curbegin) */
+} /* end subroutine (cachetime_curbegin) */
 
 int cachetime_curend(CT *op,CT_CUR *curp) noex {
 	int		rs ;
@@ -262,8 +258,7 @@ int cachetime_curend(CT *op,CT_CUR *curp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cachetime_curend) */
+} /* end subroutine (cachetime_curend) */
 
 int cachetime_enum(CT *op,CT_CUR *curp,char *pbuf,int plen,time_t *timep) noex {
 	int		rs ;
@@ -280,8 +275,7 @@ int cachetime_enum(CT *op,CT_CUR *curp,char *pbuf,int plen,time_t *timep) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cachetime_enum) */
+} /* end subroutine (cachetime_enum) */
 
 int cachetime_stats(CT *op,st *statp) noex {
 	int		rs ;
@@ -300,8 +294,7 @@ int cachetime_stats(CT *op,st *statp) noex {
 	    } /* end if (mutex) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (cachetime_stats) */
+} /* end subroutine (cachetime_stats) */
 
 
 /* private subroutines */
@@ -314,7 +307,7 @@ local int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 	int		f_hit = false ;
 	key.buf = sp ;
 	key.len = sl ;
-/* now see if it is already in the list by NAME */
+	/* now see if it is already in the list by NAME */
 	op->c_req += 1 ;
 	if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
 	    op->c_hit += 1 ;
@@ -343,8 +336,7 @@ local int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if */
 	return (rs >= 0) ? f_hit : rs ;
-}
-/* end subroutine (cachetime_lookup) */
+} /* end subroutine (cachetime_lookup) */
 
 local int entry_start(ent *ep,cchar *sp,int sl) noex {
 	int		rs ;
@@ -361,8 +353,7 @@ local int entry_start(ent *ep,cchar *sp,int sl) noex {
 	    }
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 local int entry_finish(ent *ep) noex {
 	int		rs = SR_OK ;
@@ -374,7 +365,6 @@ local int entry_finish(ent *ep) noex {
 	    ep->name = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 
