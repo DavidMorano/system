@@ -40,14 +40,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ids.h>
-#include	<permx.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ids.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"xfile.h"
 
@@ -91,7 +91,6 @@ int xfile(ids *idp,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (xfile) */
+} /* end subroutine (xfile) */
 
 
