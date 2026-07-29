@@ -41,17 +41,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cerrno>
-#include	<ctime>			/* |strftime(3v)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD |strftime(3v)| */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucstrftime.h"
 
@@ -89,14 +89,14 @@ int uc_strftime(char *dbuf,int dlen,cc *fmt,CTM *tmp) noex {
 	int		rl = 0 ; /* return-value */
 	if (dbuf && fmt && tmp) ylikely {
 	    rs = SR_INVALID ;
-	    if ((dlen > 0) && fmt[0]) {
+	    if ((dlen > 0) && fmt[0]) ylikely {
 		csize	dsize = size_t(dlen) ;
 		errno = 0 ;
 		if (size_t res ; (res = strftime(dbuf,dsize,fmt,tmp)) > 0) {
 		    rs = SR_OK ;
 		    rl = intsat(res) ;
 		} else if (res == 0) {
-		    rs = (errno) ? (- errno) : SR_OK ;
+		    rs = (errno) ? (neg errno) : SR_OK ;
 		} else {
 		    rs = SR_BADFMT ;
 	        } /* end if (strftime) */
