@@ -39,18 +39,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"instrrev.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
@@ -68,7 +68,7 @@ import libutil ;
 
 /* forward references */
 
-static inline void swapends(char *bp,int bl,int i) noex {
+local inline void swapends(char *bp,int bl,int i) noex {
 	cchar chr = bp[i] ;
 	bp[i] = bp[bl-i-1] ;
 	bp[bl-i-1] = chr ;
@@ -93,7 +93,6 @@ int instrrev(char *bp,int bl) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? bl : rs ;
-}
-/* end subroutine (instrrev) */
+} /* end subroutine (instrrev) */
 
 
