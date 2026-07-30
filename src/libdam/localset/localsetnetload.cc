@@ -44,15 +44,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucprogdata.h>
-#include	<bfile.h>
-#include	<mkpathx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucprogdata.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"localset.h"
 
@@ -66,6 +66,8 @@
 
 
 /* imported namespaces */
+
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -97,35 +99,34 @@ int localsetnetload(cchar *pr,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (pr && sbuf) {
+	if (pr && sbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0]) {
+	    if (pr[0]) ylikely {
 	        cint		di = UCPROGDATA_DNETLOAD ;
 	        cint		ttl = TO_TTL ;
 	        cchar		*vardname = VARDNAME ;
-	        cchar		*netloadname = NETLOADFNAME ;
-	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
-	            if ((rs = mkpath(tbuf,pr,vardname,netloadname)) >= 0) {
+	        cchar		*nlfn = NETLOADFNAME ;
+	        if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) ylikely {
+	            if ((rs = mkpath(tbuf,pr,vardname,nlfn)) >= 0) ylikely {
 	                cmode	om = 0664 ;
-	                if (bfile df ; (rs = bopen(&df,tbuf,"wct",om)) >= 0) {
+	                if (bfile df ; (rs = df.open(tbuf,"wct",om)) >= 0) {
 		            cchar	*fmt = filetitle ;
-		            if ((rs = bprintln(&df,fmt,-1)) >= 0) {
-	                        if ((rs = bprintln(&df,sbuf,slen)) >= 0) {
+		            if ((rs = df.println(fmt,-1)) >= 0) {
+	                        if ((rs = df.println(sbuf,slen)) >= 0) {
 		                    rs = ucprogdata_set(di,sbuf,slen,ttl) ;
 			            rc = rs ;
 		                }
 		            }
-		            rs1 = bclose(&df) ;
+		            rs1 = df.close ;
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (file-write) */
 	            } /* end if (mkpath) */
-		    rs1 = lm_free(tbuf) ;
+		    rs1 = mem.free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (localsetnetload) */
+} /* end subroutine (localsetnetload) */
 
 
