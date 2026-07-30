@@ -42,7 +42,7 @@
 #include	<sys/mman.h>		/* POSIX® */
 #include	<unistd.h>		/* POSIX® */
 #include	<fcntl.h>		/* POSIX® */
-#include	<ctime>			/* CSYD |time(2)| */
+#include	<ctime>			/* CSTD |time(2)| */
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
