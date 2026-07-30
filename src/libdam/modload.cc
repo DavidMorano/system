@@ -134,24 +134,24 @@ struct subinfo {
 	    modfn = afn ;
 	    opts = aso ;
 	    syms = asyms ;
-	} ;
-	int start() noex ;
-	int finish(int f_abort) noex ;
-	int setopts() noex ;
-	int objload() noex ;
+	} ; /* end ctor */
+	int start	() noex ;
+	int finish	(int f_abort) noex ;
+	int setopts	() noex ;
+	int objload	() noex ;
 	int objloadbegin() noex ;
-	int objloadend() noex ;
-	int sofind() noex ;
-	int sofindprs(dirseen *dsp,int dlm) noex ;
-	int sofindroot(dirseen *dsp,int dlm,cchar *) noex ;
-	int sofindsdirs(dirseen *dsp,int dlm) noex ;
-	int sofindvar(dirseen *dsp,int dlm) noex ;
-	int socheckvarc(dirseen *dsp,cc *ldnp,int ldnl,int dlm) noex ;
-	int sochecklib(dirseen *dsp,cchar *ldname,int dlm) noex ;
-	int sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex ;
-	int sotest(char *tbuf,int tlen) noex ;
-	int checksyms() noex ;
-} ; /* end struct */
+	int objloadend	() noex ;
+	int sofind	() noex ;
+	int sofindprs	(dirseen *dsp,int dlm) noex ;
+	int sofindroot	(dirseen *dsp,int dlm,cchar *) noex ;
+	int sofindsdirs	(dirseen *dsp,int dlm) noex ;
+	int sofindvar	(dirseen *dsp,int dlm) noex ;
+	int socheckvarc	(dirseen *dsp,cc *ldnp,int ldnl,int dlm) noex ;
+	int sochecklib	(dirseen *dsp,cchar *ldname,int dlm) noex ;
+	int sockliber	(dirseen *dsp,cchar *ldnp,int dlm) noex ;
+	int sotest	(char *tbuf,int tlen) noex ;
+	int checksyms	() noex ;
+} ; /* end struct (subinfo) */
 
 namespace {
     struct vars {
@@ -245,15 +245,14 @@ constexpr modloadms	modloadm ;
 int modload_open(ML *op,cc *pr,cc *modfn,cc *modname,int opts,mv syms) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = modload_ctor(op,modfn,modname)) >= 0) {
+	if ((rs = modload_ctor(op,modfn,modname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (modfn[0] && modname[0]) {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+	    if (modfn[0] && modname[0]) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	            subinfo si(op,pr,modfn,opts,syms) ;
 	            op->modname = modname ;
-	            if ((rs = si.start()) >= 0) {
-	                if ((rs = si.objload()) >= 0) {
+	            if ((rs = si.start()) >= 0) ylikely {
+	                if ((rs = si.objload()) >= 0) ylikely {
 	                    op->magval = MODLOAD_MAGIC ;
 	                }
 	                rs1 = si.finish((rs < 0)) ;
@@ -263,16 +262,15 @@ int modload_open(ML *op,cc *pr,cc *modfn,cc *modname,int opts,mv syms) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		modload_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (modload_ctor) */
 	return rs ;
-}
-/* end subroutine (modload_open) */
+} /* end subroutine (modload_open) */
 
 int modload_close(ML *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = modload_magic(op)) >= 0) {
+	if ((rs = modload_magic(op)) >= 0) ylikely {
 	    {
 		rs1 = modload_objloadclose(op) ;
 		if (rs >= 0) rs = rs1 ;
@@ -284,15 +282,14 @@ int modload_close(ML *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (modload_close) */
+} /* end subroutine (modload_close) */
 
 int modload_getsym(ML *op,cchar *symname,cvoid **vpp) noex {
 	int		rs ;
 	cvoid		*rp = nullptr ;
 	if ((rs = modload_magic(op,symname)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (symname[0]) {
+	    if (symname[0]) ylikely {
 		rs = SR_NOTFOUND ;
 	        if (op->sop) {
 	            if ((rp = dlsym(op->sop,symname)) != nullptr) {
@@ -305,15 +302,14 @@ int modload_getsym(ML *op,cchar *symname,cvoid **vpp) noex {
 	    *vpp = (rs >= 0) ? rp : nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (modload_getsym) */
+} /* end subroutine (modload_getsym) */
 
 int modload_getmv(ML *op,int vi) noex {
 	int		rs ;
 	int		v = 0 ;
-	if ((rs = modload_magic(op)) >= 0) {
+	if ((rs = modload_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (vi >= 0) {
+	    if (vi >= 0) ylikely {
 	        if (op->midp != nullptr) {
 	            ML_MI	*mip = op->midp ;
 		    rs = SR_OK ;
@@ -322,14 +318,13 @@ int modload_getmv(ML *op,int vi) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (modload_getmv) */
+} /* end subroutine (modload_getmv) */
 
 int modload_getmva(ML *op,int *mva,int mvn) noex {
 	int		rs ;
 	int		v = 0 ;
-	if ((rs = modload_magic(op,mva)) >= 0) {
-	    if (op->midp) {
+	if ((rs = modload_magic(op,mva)) >= 0) ylikely {
+	    if (op->midp) ylikely {
 	        modload_mi	*mip = op->midp ;
 	        v = mip->mv[0] ;
 	        for (int i = 0 ; i < mvn ; i += 1) {
@@ -340,31 +335,28 @@ int modload_getmva(ML *op,int *mva,int mvn) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (modload_getmva) */
+} /* end subroutine (modload_getmva) */
 
 
 /* private subroutines */
 
 local int modload_objloadclose(ML *op) noex {
-	if (op->sop != nullptr) {
-	    if ((op->sop != RTLD_DEFAULT) && (op->sop != RTLD_SELF)) {
+	if (op->sop != nullptr) ylikely {
+	    if ((op->sop != RTLD_DEFAULT) && (op->sop != RTLD_SELF)) ylikely {
 	        dlclose(op->sop) ;
 	    }
 	    op->sop = nullptr ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (modload_objloadclose) */
+} /* end subroutine (modload_objloadclose) */
 
 int subinfo::start() noex {
 	int		rs ;
-	if ((rs = setopts()) >= 0) {
+	if ((rs = setopts()) >= 0) ylikely {
 	    rs = id.load ;
 	} /* end if (subinfo::setopts) */
 	return rs ;
-}
-/* end subroutine (subinfo::start) */
+} /* end subroutine (subinfo::start) */
 
 int subinfo::finish(int f_abort) noex {
 	int		rs = SR_OK ;
@@ -378,8 +370,7 @@ int subinfo::finish(int f_abort) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 int subinfo::setopts() noex {
     	const modloadms	sdm ;
@@ -408,34 +399,30 @@ int subinfo::setopts() noex {
 	    fl.liball = true ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo::setopts) */
+} /* end subroutine (subinfo::setopts) */
 
 int subinfo::objload() noex {
 	int		rs ;
-	if ((rs = objloadbegin()) >= 0) {
+	if ((rs = objloadbegin()) >= 0) ylikely {
 	    rs = checksyms() ;
 	    if (rs < 0) {
 	        objloadend() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (objload-begin) */
 	return rs ;
-}
-/* end subroutine (subinfo::objload) */
+} /* end subroutine (subinfo::objload) */
 
 int subinfo::objloadbegin() noex {
     	int		rs ;
-	if ((rs = sofind()) == 0) {
+	if ((rs = sofind()) == 0) ylikely {
 	    rs = SR_NOTFOUND ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo::objloadbegin) */
+} /* end subroutine (subinfo::objloadbegin) */
 
 int subinfo::objloadend() noex {
 	return modload_objloadclose(mlp) ;
-}
-/* end subroutine (subinfo::objloadend) */
+} /* end subroutine (subinfo::objloadend) */
 
 int subinfo::sofind() noex {
 	int		dlm = RTLD_LAZY ;
@@ -443,13 +430,13 @@ int subinfo::sofind() noex {
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
 	dlm |= (opts & MODLOAD_OAVAIL) ? RTLD_GLOBAL : RTLD_LOCAL ;
-	if (dirseen ds ; (rs = dirseen_start(&ds)) >= 0) {
+	if (dirseen ds ; (rs = dirseen_start(&ds)) >= 0) ylikely {
 	    rs = 0 ;
 	    if (pr) {
 	        if ((rs = sofindroot(&ds,dlm,pr)) > 0) {
 		    len = rs ;
 		}
-	    }
+	    } /* end if (have program-root) */
 	    if ((rs == 0) && (len == 0)) {
 	        if ((rs = sofindvar(&ds,dlm)) > 0) {
 		    len = rs ;
@@ -462,13 +449,12 @@ int subinfo::sofind() noex {
 			}
 		    }
 		}
-	    }
+	    } /* end if (ok) */
 	    rs1 = dirseen_finish(&ds) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dirseen) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo::sofind) */
+} /* end subroutine (subinfo::sofind) */
 
 int subinfo::sofindroot(dirseen *dsp,int dlm,cchar *apr) noex {
 	cint		maxpath = var.maxpathlen ;
@@ -477,9 +463,9 @@ int subinfo::sofindroot(dirseen *dsp,int dlm,cchar *apr) noex {
 	int		rs1 ;
 	int		ai = 0 ;
 	int		len = 0 ; /* return-value */
-	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 	    char	*lbuf = (a + ((maxpath + 1) * ai++)) ;
-	    if ((rs = mkpath(lbuf,apr,LIBCNAME)) >= 0) {
+	    if ((rs = mkpath(lbuf,apr,LIBCNAME)) >= 0) ylikely {
 	        cint	rsn = SR_NOTFOUND ;
 		len = rs ;
 	        if ((rs = dirseen_havename(dsp,lbuf,-1)) == rsn) {
@@ -516,8 +502,7 @@ int subinfo::sofindroot(dirseen *dsp,int dlm,cchar *apr) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo::sofindpr) */
+} /* end subroutine (subinfo::sofindpr) */
 
 int subinfo::sofindvar(dirseen *dsp,int dlm) noex {
 	int		rs = SR_OK ;
@@ -552,8 +537,7 @@ int subinfo::sofindvar(dirseen *dsp,int dlm) noex {
 	    } /* end if (getenv) */
 	} /* end if (selected && valid) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo::sofindvar) */
+} /* end subroutine (subinfo::sofindvar) */
 
 int subinfo::sofindprs(dirseen *dsp,int dlm) noex {
 	int		rs = SR_OK ;
@@ -583,8 +567,7 @@ int subinfo::sofindprs(dirseen *dsp,int dlm) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (selected) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo::sofindprs) */
+} /* end subroutine (subinfo::sofindprs) */
 
 int subinfo::sofindsdirs(dirseen *dsp,int dlm) noex {
 	int		rs = SR_OK ;
@@ -599,15 +582,14 @@ int subinfo::sofindsdirs(dirseen *dsp,int dlm) noex {
 	    } /* end for */
 	} /* end if (selected) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo::sofindsdirs) */
+} /* end subroutine (subinfo::sofindsdirs) */
 
 int subinfo::socheckvarc(dirseen *dsp,cc *ldnp,int ldnl,int dlm) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
-	    if ((rs = pathclean(tbuf,ldnp,ldnl)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
+	    if ((rs = pathclean(tbuf,ldnp,ldnl)) >= 0) ylikely {
 	        cint	rsn = SR_NOTFOUND ;
 	        cint	pl = rs ;
 	        cchar	*pp = cast_const<cchar *>(tbuf) ;
@@ -643,8 +625,7 @@ int subinfo::socheckvarc(dirseen *dsp,cc *ldnp,int ldnl,int dlm) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo::socheckvarc) */
+} /* end subroutine (subinfo::socheckvarc) */
 
 int subinfo::sochecklib(dirseen *dsp,cchar *ldname,int dlm) noex {
 	int		rs = SR_FAULT ;
@@ -685,14 +666,13 @@ int subinfo::sochecklib(dirseen *dsp,cchar *ldname,int dlm) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo::sochecklib) */
+} /* end subroutine (subinfo::sochecklib) */
 
 int subinfo::sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
-	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 	    ids		*idp = &id ;
 	    cint	tlen = rs ;
 	    cint	am = (X_OK | R_OK) ;
@@ -730,8 +710,7 @@ int subinfo::sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (subinfo::sockliber) */
+} /* end subroutine (subinfo::sockliber) */
 
 int subinfo::sotest(char *tbuf,int tlen) noex {
 	cnullptr	np{} ;
@@ -749,8 +728,7 @@ int subinfo::sotest(char *tbuf,int tlen) noex {
 	    } /* end if (sncpy) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo::sotest) */
+} /* end subroutine (subinfo::sotest) */
 
 int subinfo::checksyms() noex {
 	int		rs = SR_OK ;
@@ -767,9 +745,9 @@ int subinfo::checksyms() noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    var.maxpathlen = rs ;
-	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 		var.maxhostlen = rs ;
 	    }
 	}
@@ -800,7 +778,7 @@ void modload::dtor() noex {
 
 modload_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case modloadmem_close:
 	        rs = modload_close(op) ;
