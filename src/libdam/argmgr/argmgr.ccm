@@ -32,14 +32,14 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/vecbool.ccm"
 
@@ -49,7 +49,7 @@ import vecbool ;
 
 /* local defines */
 
-#define	ARGMGR_MAGIC		0x97873787
+#define	ARGMGR_MAGIC	0x97873787
 
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
@@ -172,12 +172,12 @@ export {
 	    argv = av ;
 	    cntpos = ((ac > 0) ? (ac - 1) : 0) ;
 	} ;
-	int argopt(ccharpp) noex ;
-	int argoptlong(ccharpp) noex ;
-	int argoptval(ccharp) noex ;		/* optional value */
-	int argval(ccharpp) noex ;
-	int get(int,ccharpp) noex ;
-	int present(int) noex ;
+	int argopt	(ccharpp) noex ;
+	int argoptlong	(ccharpp) noex ;
+	int argoptval	(ccharp) noex ;		/* optional value */
+	int argval	(ccharpp) noex ;
+	int get		(int,ccharpp) noex ;
+	int present	(int) noex ;
 	argmgr_iter begin() noex ;
 	argmgr_iter end() noex ;
 	void dtor() noex ;
@@ -186,11 +186,11 @@ export {
 	    if (magval) dtor() ;
 	} ;
     private:
-	int istart() noex ;
-	int ifinish() noex ;
-	int iarg() noex ;
-	int iargopt(cchar *,int,cchar **) noex ;
-	int icount() noex ;
+	int istart	() noex ;
+	int ifinish	() noex ;
+	int iarg	() noex ;
+	int iargopt	(cchar *,int,cchar **) noex ;
+	int icount	() noex ;
     } ; /* end struct (argmgr) */
 } /* end export */
 
