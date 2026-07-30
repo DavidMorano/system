@@ -5,6 +5,7 @@
 /* STRFILEMK management */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -28,19 +29,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<dlfcn.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<vecstr.h>
-#include	<modload.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system-types */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<modload.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strfilemk.h"
 #include	"strfilemks.h"
@@ -51,29 +55,37 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	STRFILEMK_MODBNAME	"strfilemks"
-#define	STRFILEMK_OBJNAME	"strfilemks"
-#define	STRFILEMK_PRLOCAL	"LOCAL"
 
-#ifndef	SYMNAMELEN
-#define	SYMNAMELEN	60
+#define	SFM		strfilemk
+#define	SFM_FL		strfilemk_fl
+#define	SFM_CA		strfilemk_calls
+#define	SFM_MAG		STRFILEMK_MAGIC
+#define	SFM_MOD		"strfilemks"
+#define	SFM_OBJN	"strfilemks"
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
 #endif
 
 
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
+extern "C" {
+        typedef int     (*soopen_f)	(void *,cchar *,int,mode_t,int) noex ;
+        typedef int     (*soaddfile_f)	(void *,cchar *,int) noex ;
+        typedef int     (*socount_f)	(void *) noex ;
+        typedef int     (*sochgrp_f)	(void *,gid_t) noex ;
+        typedef int     (*soabort_f)	(void *) noex ;
+        typedef int     (*soclose_f)	(void *) noex ;
+} ; /* end extern (C) */
+
+
 /* external subroutines */
-
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,
-			cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mksofname(char *,cchar *,cchar *,cchar *) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -81,14 +93,75 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* local structures */
 
+struct strfilemk_calls {
+    soopen_f            open ;
+    soaddfile_f		addfile ;
+    socount_f           count ;
+    sochgrp_f           chgrp ;
+    soabort_f           abort ;
+    soclose_f           close ;
+} ; /* end struct (strfilemk_calls) */
+
+typedef strfilemk_calls *	callsp ;
+
 
 /* forward references */
 
-static int	strfilemk_objloadbegin(STRFILEMK *,cchar *,cchar *) noex ;
-static int	strfilemk_objloadend(STRFILEMK *) noex ;
-static int	strfilemk_loadcalls(STRFILEMK *,cchar *) noex ;
+template<typename ... Args>
+local int strfilemk_ctor(SFM *op,Args ... args) noex {
+	STRFILEMK	*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->mlp = new(nt) modload) != np) ylikely {
+		strfilemk_calls    *callp ;
+                if ((callp = new(nt) strfilemk_calls) != np) ylikely {
+                    op->callp = callp ;
+                    rs = SR_OK ;
+                } /* end if (new-strfilemk_calls) */
+                if (rs < 0) {
+                    delete op->mlp ;
+                    op->mlp = nullptr ;
+                } /* end if (error) */
+	    } /* end if (new-modload) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (strfilemk_ctor) */
 
-static bool	isrequired(int) noex ;
+local int strfilemk_dtor(SFM *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+            if (op->callp) ylikely {
+                strfilemk_calls    *callp = callsp(op->callp) ;
+                delete callp ;
+                op->callp = nullptr ;
+            }
+	    if (op->mlp) ylikely {
+		delete op->mlp ;
+		op->mlp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (strfilemk_dtor) */
+
+template<typename ... Args>
+local inline int strfilemk_magic(SFM *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == SFM_MAG) ? SR_OK : SR_NOTOPEN ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (strfilemk_magic) */
+
+local int	strfilemk_objloadbegin	(SFM *,cchar *,cchar *) noex ;
+local int	strfilemk_objloadend	(SFM *) noex ;
+local int	strfilemk_loadcalls	(SFM *,vecstr *) noex ;
+
+local bool	isrequired(int) noex ;
 
 
 /* local variables */
@@ -96,20 +169,30 @@ static bool	isrequired(int) noex ;
 enum subs {
 	sub_open,
 	sub_addfile,
-	sub_abort,
+	sub_count,
 	sub_chgrp,
+	sub_abort,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum */
 
-constexpr cpcchar	subs[] = {
-	"open",
-	"addfile",
-	"abort",
-	"chgrp",
-	"close",
-	nullptr
-} ;
+namespace {
+    struct subnamer {
+	cchar		*n[sub_overlast + 1] = {} ;
+        consteval subnamer() noex {
+	    n[sub_open]		= "open" ;
+	    n[sub_addfile]	= "addfile" ;
+	    n[sub_count]	= "count" ;
+	    n[sub_chgrp]	= "chgrp" ;
+	    n[sub_abort]	= "abort" ;
+	    n[sub_close]	= "close" ;
+	    n[sub_overlast]	= nullptr ;
+	} ; /* end ctor */
+    } ; /* end struct (subnamer) */
+} /* end namespace */
+
+static subnamer		subname ;
+cbool                   f_debug         = CF_DEBUG ;
 
 
 /* exported variables */
@@ -117,275 +200,214 @@ constexpr cpcchar	subs[] = {
 
 /* exported subroutines */
 
-int strfilemk_open(op,pr,dbname,of,om,n)
-STRFILEMK	*op ;
-cchar	pr[] ;
-cchar	dbname[] ;
-int		of ;
-mode_t		om ;
-int		n ;
-{
-	int	rs ;
+int strfilemk_open(SFM *op,cc *dbn,int of,mode_t om,int n) noex {
+	int		rs ;
+        if ((rs = strfilemk_ctor(op,dbn)) >= 0) ylikely {
+	    cchar	*pr = nullptr ;
+            cchar       *objname = SFM_OBJN ;
+            if (pr[0] && dbn[0]) ylikely {
+                if ((rs = strfilemk_objloadbegin(op,pr,objname)) >= 0) ylikely {
+                    strfilemk_calls *callp = callsp(op->callp) ;
+                    rs = SR_NOSYS ;
+                    if (cauto co = callp->open ; co) ylikely {
+                        if ((rs = co(op->obj,dbn,of,om,n)) >= 0) ylikely {
+                            op->magval = SFM_MAG ;
+                        }
+                    } /* end if (non-null) */
+                    if (rs < 0) {
+                        strfilemk_objloadend(op) ;
+                    } /* end if (error) */
+                } /* end if (objload-begin) */
+            } /* end if (valid) */
+            if (rs < 0) {
+                strfilemk_dtor(op) ;
+            } /* end if (error) */
+        } /* end if (strfilemk_ctor) */
+	return rs ;
+} /* end subroutine (strfilemk_open) */
 
-	cchar	*objname = STRFILEMK_OBJNAME ;
+int strfilemk_close(SFM *op) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = strfilemk_magic(op)) >= 0) {
+            rs = SR_BUGCHECK ;
+            if (strfilemk_calls *callp = callsp(op->callp) ; callp) ylikely {
+                rs = SR_OK ;
+                if (cauto co = callp->close ; co) ylikely {
+                    rs1 = co(op->obj) ;
+                    if (rs >= 0) rs = rs1 ;
+                } else {
+                    rs = SR_NOSYS ;
+                }
+                {
+                    rs1 = strfilemk_objloadend(op) ;
+                    if (rs >= 0) rs = rs1 ;
+                }
+                {
+                    rs1 = strfilemk_dtor(op) ;
+                    if (rs >= 0) rs = rs1 ;
+                }
+                op->magval = 0 ;
+            } /* end if (valid) */
+	} /* end if (strfilemk_magic) */
+	return rs ;
+} /* end subroutine (strfilemk_close) */
 
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-	if (dbname == nullptr) return SR_FAULT ;
-
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-	if ((rs = strfilemk_objloadbegin(op,pr,objname)) >= 0) {
-	    if ((rs = (*op->call.open)(op->obj,dbname,of,om,n)) >= 0) {
-		op->magic = STRFILEMK_MAGIC ;
+int strfilemk_addfile(SFM *op,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = strfilemk_magic(op,sp)) >= 0) {
+            strfilemk_calls   *callp = callsp(op->callp) ;
+            if (cauto co = callp->addfile ; co) ylikely {
+                rs = co(op->obj,sp,sl) ;
 	    }
-	    if (rs < 0)
-		strfilemk_objloadend(op) ;
-	} /* end if (objloadbegin) */
-
+	} /* end if (strfilemk_magic) */
 	return rs ;
-}
-/* end subroutine (strfilemk_open) */
+} /* end subroutine (strfilemk_addfile) */
 
+int strfilemk_count(SFM *op) noex {
+        int             rs ;
+        if ((rs = strfilemk_magic(op)) >= 0) ylikely {
+            strfilemk_calls   *callp = callsp(op->callp) ;
+	    rs = SR_NOSYS ;
+            if (cauto co = callp->count ; co) ylikely {
+                rs = co(op->obj) ;
+            }
+        } /* end if (strfilemk_magic) */
+        return rs ;
+} /* end subroutine (strfilemk_count) */
 
-/* free up the entire vector string data structure object */
-int strfilemk_close(op)
-STRFILEMK	*op ;
-{
-	int	rs = SR_OK ;
-	int	rs1 ;
-
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (op->magic != STRFILEMK_MAGIC)
-	    return SR_NOTOPEN ;
-
-	rs1 = (*op->call.close)(op->obj) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = strfilemk_objloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+int strfilemk_chgrp(SFM *op,gid_t gid) noex {
+	int		rs ;
+	if ((rs = strfilemk_magic(op)) >= 0) {
+            strfilemk_calls   *callp = callsp(op->callp) ;
+	    rs = SR_NOSYS ;
+            if (cauto co = callp->chgrp ; co) ylikely {
+                rs = co(op->obj,gid) ;
+            }
+	} /* end if (strfilemk_magic) */
 	return rs ;
-}
-/* end subroutine (strfilemk_close) */
+} /* end subroutine (strfilemk_chgrp) */
 
-
-int strfilemk_addfile(op,sp,sl)
-STRFILEMK	*op ;
-cchar	sp[] ;
-int		sl ;
-{
-	int	rs ;
-
-
-	if (op == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-
-	if (op->magic != STRFILEMK_MAGIC) return SR_NOTOPEN ;
-
-	rs = (*op->call.addfile)(op->obj,sp,sl) ;
-
+int strfilemk_abort(SFM *op) noex {
+	int		rs ;
+	if ((rs = strfilemk_magic(op)) >= 0) {
+            strfilemk_calls   *callp = callsp(op->callp) ;
+	    rs = SR_NOSYS ;
+            if (cauto co = callp->abort ; co) ylikely {
+                rs = co(op->obj) ;
+            }
+	} /* end if (strfilemk_magic) */
 	return rs ;
-}
-/* end subroutine (strfilemk_addfile) */
-
-
-int strfilemk_abort(op)
-STRFILEMK	*op ;
-{
-	int	rs = SR_NOSYS ;
-
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (op->magic != STRFILEMK_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (op->call.abort != nullptr)
-	    rs = (*op->call.abort)(op->obj) ;
-
-	return rs ;
-}
-/* end subroutine (strfilemk_abort) */
-
-
-int strfilemk_chgrp(op,gid)
-STRFILEMK	*op ;
-gid_t		gid ;
-{
-	int	rs = SR_NOSYS ;
-
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (op->magic != STRFILEMK_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (op->call.chgrp != nullptr)
-	    rs = (*op->call.chgrp)(op->obj,gid) ;
-
-	return rs ;
-}
-/* end subroutine (strfilemk_chgrp) */
+} /* end subroutine (strfilemk_abort) */
 
 
 /* private subroutines */
 
-
-/* find and load the DB-access object */
-static int strfilemk_objloadbegin(op,pr,objname)
-STRFILEMK	*op ;
-cchar	*pr ;
-cchar	*objname ;
-{
-	MODLOAD	*lp = &op->loader ;
-
-	int	rs ;
-
-
-	{
-		VECSTR		syms ;
-	        const int	n = nelem(subs) ;
-		int		opts = vecstrm.compact ;
-	        if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
-		    const int	symlen = SYMNAMELEN ;
-	            int		i ;
-		    int		snl ;
-		    cchar	**sv ;
-		    char	symname[SYMNAMELEN + 1] ;
-
-	            for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
-	                if (isrequired(i)) {
-	                    rs = sncpy3(symname,symlen,objname,"_",subs[i]) ;
-		            snl = rs ;
-		            if (rs >= 0) 
-			        rs = vecstr_add(&syms,symname,snl) ;
-		        }
-		        if (rs < 0) break ;
-	            } /* end for */
-        
-	            if (rs >= 0)
-	                rs = vecstr_getvec(&syms,&sv) ;
-        
-	            if (rs >= 0) {
-	                cchar	*modbname = STRFILEMK_MODBNAME ;
-			opts = 0 ;
-	                opts |= MODLOAD_OLIBVAR ;
-			opts |= MODLOAD_OPRS ;
-			opts |= MODLOAD_OSDIRS ;
-	                rs = modload_open(lp,pr,modbname,objname,opts,sv) ;
-	            }
-
-	            vecstr_finish(&syms) ;
-	        } /* end if (allocation) */
-		if (rs >= 0) {
-		    int		mv[2] ;
-		    if ((rs = modload_getmva(lp,mv,1)) >= 0) {
-			void	*p ;
-			op->objsize = mv[0] ;
-			    if ((rs = uc_malloc(op->objsize,&p)) >= 0) {
-			        op->obj = p ;
-			        rs = strfilemk_loadcalls(op,objname) ;
-			        if (rs < 0) {
-	    			    uc_free(op->obj) ;
-	    			    op->obj = nullptr ;
-			        }
-			    } /* end if (memory-allocation) */
-		    } /* end if (modload_getmva) */
-		    if (rs < 0)
-			modload_close(lp) ;
-		} /* end if (modload_open) */
-	} /* end block */
-
+local int strfilemk_objloadbegin(SFM *op,cchar *pr,cchar *objn) noex {
+	modload		*mlp = op->mlp ;
+	cint		vn = sub_overlast ;
+	cint		vo = vecstrm.compact ;
+	int		rs ;
+	int		rs1 ;
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subname.n)) >= 0) ylikely {
+	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) ylikely {
+	            cchar	*mn = SFM_MOD ;
+	            cchar	*on = objn ;
+	            int		mo = 0 ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libprs ;
+	            mo |= modloadm.libsdirs ;
+	            mo |= modloadm.avail ;
+	            if ((rs = modload_open(mlp,pr,mn,on,mo,sv)) >= 0) ylikely {
+		        op->fl.modload = true ;
+	                if (int mv[2] ; (rs = modload_getmva(mlp,mv,2)) >= 0) {
+			    cint	osz = mv[0] ;
+	                    op->objsz = mv[0] ;
+	                    op->cursz = mv[1] ;
+			    if (void *vp ; (rs = mem.mall(osz,&vp)) >= 0) {
+	                        op->obj = vp ;
+	                        rs = strfilemk_loadcalls(op,&syms) ;
+	                        if (rs < 0) {
+	                            mem.free(op->obj) ;
+	                            op->obj = nullptr ;
+	                        } /* end if (error) */
+	                    } /* end if (memory-allocation) */
+	                } /* end if (modload_getmva) */
+	                if (rs < 0) {
+		            op->fl.modload = false ;
+	                    modload_close(mlp) ;
+	                } /* end if (error) */
+	            } /* end if (modload_open) */
+		} /* end if (vecstr_getvec) */
+	    } /* end if (vecstr_addsyms) */
+	    rs1 = syms.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	    if ((rs < 0) && op->fl.modload) {
+		op->fl.modload = false ;
+		modload_close(mlp) ;
+	    } /* end if (error) */
+	} /* end if (vecstr-syms) */
 	return rs ;
-}
-/* end subroutine (strfilemk_objloadbegin) */
+} /* end subroutine (strfilemk_objloadbegin) */
 
-
-static int strfilemk_objloadend(op)
-STRFILEMK	*op ;
-{
-	int	rs = SR_OK ;
-	int	rs1 ;
-
-
-	if (op->obj != nullptr) {
-	    rs1 = uc_free(op->obj) ;
+local int strfilemk_objloadend(SFM *op) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (op->obj) {
+	    rs1 = mem.free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
-	}
-
-	rs1 = modload_close(&op->loader) ;
-	if (rs >= 0) rs = rs1 ;
-
+	} /* end if (memory-release) */
+	if (op->mlp && op->fl.modload) {
+	    op->fl.modload = false ;
+	    rs1 = modload_close(op->mlp) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (strfilemk_objloadend) */
+} /* end subroutine (strfilemk_objloadend) */
 
-
-static int strfilemk_loadcalls(op,soname)
-STRFILEMK	*op ;
-cchar	soname[] ;
-{
-	MODLOAD	*lp = &op->loader ;
-
-	int	rs = SR_NOTFOUND ;
-	int	i ;
-	int	c = 0 ;
-
-	char	symname[SYMNAMELEN + 1] ;
-
-	const void	*snp ;
-
-
-	for (i = 0 ; subs[i] != nullptr ; i += 1) {
-
-	    if ((rs = sncpy3(symname,SYMNAMELEN,soname,"_",subs[i])) >= 0) {
-	         if ((rs = modload_getsym(lp,symname,&snp)) == SR_NOTFOUND) {
-		     snp = nullptr ;
-		     if (! isrequired(i)) rs = SR_OK ;
-		}
-	    }
-
+local int strfilemk_loadcalls(SFM *op,vecstr *slp) noex {
+	modload		*mlp = op->mlp ;
+	cint		rsn = SR_NOTFOUND ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ;
+	cchar		*sname{} ;
+	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) ylikely {
+	    if (cvoid *snp{} ; (rs = modload_getsym(mlp,sname,&snp)) >= 0) {
+                strfilemk_calls   *callp = callsp(op->callp) ;
+                c += 1 ;
+                switch (i) {
+                case sub_open:
+                    callp->open		= soopen_f(snp) ;
+                    break ;
+                case sub_chgrp:
+                    callp->chgrp	= sochgrp_f(snp) ;
+                    break ;
+                case sub_addfile:
+                    callp->addfile	= soaddfile_f(snp) ;
+                    break ;
+                case sub_count:
+                    callp->count	= socount_f(snp) ;
+                    break ;
+                case sub_abort:
+                    callp->abort	= soabort_f(snp) ;
+                    break ;
+                case sub_close:
+                    callp->close	= soclose_f(snp) ;
+                    break ;
+                } /* end switch */
+            } else if (rs == rsn) {
+                if (! isrequired(i)) rs = SR_OK ;
+            } /* end if (it had the call) */
 	    if (rs < 0) break ;
-
-	    if (snp != nullptr) {
-	        c += 1 ;
-		switch (i) {
-		case sub_open:
-		    op->call.open = (int (*)(void *,cchar *,
-			int,mode_t,int)) snp ;
-		    break ;
-		case sub_addfile:
-		    op->call.addfile = (int (*)(void *,cchar *,int)) snp ;
-		    break ;
-		case sub_abort:
-		    op->call.abort = (int (*)(void *)) snp ;
-		    break ;
-		case sub_chgrp:
-		    op->call.chgrp = (int (*)(void *,gid_t)) snp ;
-		    break ;
-		case sub_close:
-		    op->call.close = (int (*)(void *)) snp ;
-		    break ;
-		} /* end switch */
-	    } /* end if (it had the call) */
-
-	} /* end for (subs) */
-
+	} /* end for (vecstr_get) */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (strfilemk_loadcalls) */
+} /* end subroutine (strfilemk_loadcalls) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
@@ -395,7 +417,6 @@ static bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
