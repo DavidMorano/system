@@ -57,7 +57,6 @@
 #ifndef	CF_FULLNAME
 #define	CF_FULLNAME	0		/* use full-name */
 #endif
-
 #ifndef	CF_MAILNAME
 #define	CF_MAILNAME	1		/* use mail-name */
 #endif
@@ -83,8 +82,8 @@
 
 /* local variables */
 
-constexpr bool		f_fullname = CF_FULLNAME ;
-constexpr bool		f_mailname  = CF_MAILNAME ;
+constexpr bool		f_fullname	= CF_FULLNAME ;
+constexpr bool		f_mailname	= CF_MAILNAME ;
 
 
 /* exported variables */
@@ -137,7 +136,6 @@ int mkuibang(char *rbuf,int rlen,userinfo *uip) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkuibang) */
+} /* end subroutine (mkuibang) */
 
 
