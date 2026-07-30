@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	HEXDECODER		struct hexdecoder_head
@@ -40,10 +40,10 @@ typedef HEXDECODER	hexdecoder ;
 
 EXTERNC_begin
 
-extern int hexdecoder_start(hexdecoder *) noex ;
-extern int hexdecoder_load(hexdecoder *,cchar *,int) noex ;
-extern int hexdecoder_read(hexdecoder *,char *,int) noex ;
-extern int hexdecoder_finish(hexdecoder *) noex ;
+extern int hexdecoder_start	(hexdecoder *) noex ;
+extern int hexdecoder_load	(hexdecoder *,cchar *,int) noex ;
+extern int hexdecoder_read	(hexdecoder *,char *,int) noex ;
+extern int hexdecoder_finish	(hexdecoder *) noex ;
 
 EXTERNC_end
 
