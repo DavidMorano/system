@@ -200,8 +200,7 @@ int strop_findchr(strop *sop,int tch) noex {
 	}
 	rl = sop->sl ;
 	return rl ;
-}
-/* end subroutine (strop_findchr) */
+} /* end subroutine (strop_findchr) */
 
 int strop_findterm(strop *sop,cchar *terms) noex {
     	int		rl = 0 ; /* return-value */

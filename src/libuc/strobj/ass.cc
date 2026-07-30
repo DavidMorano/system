@@ -79,8 +79,7 @@ int ass_start(ass *asp) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ass_start) */
+} /* end subroutine (ass_start) */
 
 int ass_addchr(ass *asp,int ch) noex {
 	int		rs = SR_FAULT ;
@@ -105,8 +104,7 @@ int ass_addchr(ass *asp,int ch) noex {
 	    len = asp->rlen ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ass_addchr) */
+} /* end subroutine (ass_addchr) */
 
 int ass_len(ass *asp) noex {
     	int		rs = SR_FAULT ;
@@ -114,8 +112,7 @@ int ass_len(ass *asp) noex {
 	    rs = asp->rlen ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ass_len) */
+} /* end subroutine (ass_len) */
 
 int ass_finish(ass *asp) noex {
 	int		rs = SR_FAULT ;
@@ -126,20 +123,19 @@ int ass_finish(ass *asp) noex {
 	        rs1 = lm_free(asp->rbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        asp->rbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    asp->rlen = 0 ;
 	    asp->ext = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ass_finish) */
+} /* end subroutine (ass_finish) */
 
 
 /* local subroutines */
 
 int ass::addchr(int ch) noex {
 	return ass_addchr(this,ch) ;
-}
+} /* end method */
 
 void ass::dtor() noex {
 	if (cint rs = finish ; rs < 0) {

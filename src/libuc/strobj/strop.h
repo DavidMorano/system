@@ -35,7 +35,7 @@ enum stropmems {
 	stropmem_whitecolon,
 	stropmem_finish,
 	stropmem_overlast
-} ;
+} ; /* end enum */
 struct strop ;
 struct strop_co {
 	strop		*op = nullptr ;

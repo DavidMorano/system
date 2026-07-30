@@ -41,6 +41,8 @@ LIBS +=
 
 
 OBJ0= strpack_prime.o strpack_envstore.o strpack_obj.o
+OBJ1=
+
 
 OBJA= obj0.o
 OBJB=
@@ -49,9 +51,7 @@ OBJ= $(OBJA)
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)

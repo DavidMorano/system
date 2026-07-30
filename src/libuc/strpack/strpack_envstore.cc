@@ -42,14 +42,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strpack.h"
 
@@ -88,8 +88,7 @@ extern "C" {
 
 int strpack_envstore(SP *op,cc *kp,cc *vp,int vl,cc **rpp) noex {
 	return strpack_envstorer(op,kp,-1,vp,vl,rpp) ;
-}
-/* end subroutine (strpack_envstore) */
+} /* end subroutine (strpack_envstore) */
 
 int strpack_envstorer(SP *op,cc *kp,int kl,cc *vp,int vl,cc **rpp) noex {
 	int		rs ;
@@ -120,7 +119,6 @@ int strpack_envstorer(SP *op,cc *kp,int kl,cc *vp,int vl,cc **rpp) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (strpack_envstorer) */
+} /* end subroutine (strpack_envstorer) */
 
 

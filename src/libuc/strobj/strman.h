@@ -36,10 +36,10 @@ extern int	strman_span(strman *,cchar *) noex ;
 extern int	strman_whitechr(strman *,int) noex ;	/* skip wht until */
 extern int	strman_finish(strman *) noex ;
 
-static inline int strman_whitecolon(strman *sop) noex {
+local inline int strman_whitecolon(strman *sop) noex {
 	return strman_whitechr(sop,':') ;
 }
-static inline int strman_whitedash(strman *sop) noex {
+local inline int strman_whitedash(strman *sop) noex {
 	return strman_whitechr(sop,'-') ;
 }
 

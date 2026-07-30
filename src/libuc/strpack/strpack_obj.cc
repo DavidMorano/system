@@ -45,13 +45,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strpack.h"
 
@@ -60,8 +60,6 @@
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -89,7 +87,7 @@ using std::nothrow ;			/* constant */
 
 int strpack::store(cchar *sp,int sl,cchar **rpp) noex {
 	return strpack_store(this,sp,sl,rpp) ;
-}
+} /* end method */
 
 void strpack::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
@@ -116,7 +114,6 @@ int strpack_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (strpack_co::operator) */
+} /* end method (strpack_co::operator) */
 
 

@@ -65,7 +65,7 @@ struct ass : ass_head {
 	} ; /* end ctor */
 	ass(const ass &) = delete ;
 	ass &operator = (const ass &) = delete ;
-	int addchr(int) noex ;
+	int addchr	(int) noex ;
 	void dtor() noex ;
 	destruct ass() {
 	    if (rbuf) dtor() ;

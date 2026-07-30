@@ -92,7 +92,7 @@ int asstr_finish(asstr *op) noex {
 	return rs ;
 } /* end subroutine (asstr_finish) */
 
-    int asstr_get(asstr *op) noex {
+int asstr_get(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		ch = 0 ; /* return-value */
 	if (op) {
@@ -104,9 +104,9 @@ int asstr_finish(asstr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? ch : rs ;
-    } /* end subroutine (asstr_get) */
+} /* end subroutine (asstr_get) */
 
-    int asstr_getprev(asstr *op) noex {
+int asstr_getprev(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		ch = 0 ; /* return-value */
 	if (op) {
@@ -118,9 +118,9 @@ int asstr_finish(asstr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? ch : rs ;
-    } /* end subroutine (asstr_getprev) */
+} /* end subroutine (asstr_getprev) */
 
-    int asstr_adv(asstr *op) noex {
+int asstr_adv(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		ch = 0 ; /* return-value */
 	if (op) {
@@ -136,17 +136,17 @@ int asstr_finish(asstr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? ch : rs ;
-    } /* end subroutine (asstr_adv) */
+} /* end subroutine (asstr_adv) */
 
-    int asstr_len(asstr *op) noex {
+int asstr_len(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = op->sl ;
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (asstr_len) */
+} /* end subroutine (asstr_len) */
 
-    int asstr_skipwhite(asstr *op) noex {
+int asstr_skipwhite(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ; /* return-value */
 	if (op->sp) {
@@ -158,9 +158,9 @@ int asstr_finish(asstr *op) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-    } /* end subroutine (asstr_skipwhite) */
+} /* end subroutine (asstr_skipwhite) */
 
-    int asstr_backwhite(asstr *op) noex {
+int asstr_backwhite(asstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ; /* return-value */
 	if (op) {
@@ -173,7 +173,7 @@ int asstr_finish(asstr *op) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-    } /* end subroutine (asstr_backwhite) */
+} /* end subroutine (asstr_backwhite) */
 
 void asstr::dtor() noex {
     	if (sp) {

@@ -46,16 +46,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<vechand.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strpack.h"
 
@@ -97,13 +97,13 @@ local int strpack_ctor(strpack *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->chp = nullptr ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->chsize = 0 ;
 	    op->totalsize = 0 ;
 	    op->c = 0 ;
 	    if ((op->clp = new(nothrow) vechand) != np) ylikely {
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (strpack_ctor) */
@@ -113,16 +113,16 @@ local int strpack_dtor(strpack *op) noex {
 	if (op->clp) ylikely {
 	    delete op->clp ;
 	    op->clp = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (strpack_dtor) */
 
 local int	strpack_chunknew(strpack *,int) noex ;
 local int	strpack_chunkfins(strpack *) noex ;
 
-local int	chunk_start(strpack_ch *,int) noex ;
-local int	chunk_adv(strpack_ch *) noex ;
-local int	chunk_finish(strpack_ch *) noex ;
+local int	chunk_start	(strpack_ch *,int) noex ;
+local int	chunk_adv	(strpack_ch *) noex ;
+local int	chunk_finish	(strpack_ch *) noex ;
 
 
 /* local variables */
@@ -146,19 +146,18 @@ int strpack_start(strpack *op,int chsize) noex {
 	    	    rs = strpack_chunknew(op,0) ;
 		}
 	        if (rs >= 0) {
-		    op->magic = STRPACK_MAGIC ;
-	        }
+		    op->magval = STRPACK_MAGIC ;
+	        } /* end if (ok) */
 	        if (rs < 0) {
 		    vechand_finish(op->clp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (vechand_start) */
 	    if (rs < 0) {
 		strpack_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (strpack_ctor) */
 	return rs ;
-}
-/* end subroutine (strpack_start) */
+} /* end subroutine (strpack_start) */
 
 int strpack_finish(strpack *op) noex {
 	int		rs ;
@@ -177,11 +176,10 @@ int strpack_finish(strpack *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->chp = nullptr ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strpack_finish) */
+} /* end subroutine (strpack_finish) */
 
 int strpack_store(strpack *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
@@ -206,8 +204,7 @@ int strpack_store(strpack *op,cchar *sp,int sl,cchar **rpp) noex {
 	    } /* end blck */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (strpack_store) */
+} /* end subroutine (strpack_store) */
 
 int strpack_count(strpack *op) noex {
 	int		rs  ;
@@ -215,8 +212,7 @@ int strpack_count(strpack *op) noex {
 	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strpack_count) */
+} /* end subroutine (strpack_count) */
 
 int strpack_size(strpack *op) noex {
 	int		rs ;
@@ -224,8 +220,7 @@ int strpack_size(strpack *op) noex {
 	    rs = op->totalsize ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strpack_size) */
+} /* end subroutine (strpack_size) */
 
 
 /* private subroutines */
@@ -246,15 +241,14 @@ local int strpack_chunknew(strpack *op,int amount) noex {
 		} /* end if (vechand) */
 	        if (rs < 0) {
 	            chunk_finish(cep) ;
-		}
+		} /* end if (error) */
 	    } /* end if (chunk) */
 	    if (rs < 0) {
 	        lm_free(cep) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (strpack_chunknew) */
+} /* end subroutine (strpack_chunknew) */
 
 local int strpack_chunkfins(strpack *op) noex {
 	vechand		*clp = op->clp ;
@@ -271,12 +265,11 @@ local int strpack_chunkfins(strpack *op) noex {
 		{
 	            rs1 = lm_free(chp) ;
 	            if (rs >= 0) rs = rs1 ;
-		}
+		} /* end if (memory-release) */
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (strpack_chunkfins) */
+} /* end subroutine (strpack_chunkfins) */
 
 local int chunk_start(strpack_ch *cnp,int csz) noex {
 	int		rs = SR_INVALID ;
@@ -285,11 +278,10 @@ local int chunk_start(strpack_ch *cnp,int csz) noex {
 	    cnp->csz = csz ;
 	    if (void *vp ; (rs = lm_mall(csz,&vp)) >= 0) {
 	        cnp->cdata = charp(vp) ;
-	    }
+	    } /* end if (memory-acquire) */
 	}
 	return rs ;
-}
-/* end subroutine (chunk_start) */
+} /* end subroutine (chunk_start) */
 
 local int chunk_adv(strpack_ch *cnp) noex {
 	int		rs = SR_FAULT ;
@@ -299,8 +291,7 @@ local int chunk_adv(strpack_ch *cnp) noex {
 	    cnp->i += 1 ;
 	}
 	return rs ;
-}
-/* end subroutine (chunk_adv) */
+} /* end subroutine (chunk_adv) */
 
 local int chunk_finish(strpack_ch *cnp) noex {
 	int		rs = SR_OK ;
@@ -309,12 +300,11 @@ local int chunk_finish(strpack_ch *cnp) noex {
 	    rs1 = lm_free(cnp->cdata) ;
 	    if (rs >= 0) rs = rs1 ;
 	    cnp->cdata = nullptr ;
-	}
+	} /* end if (memory-release) */
 	cnp->csz = 0 ;
 	cnp->i = 0 ;
 	cnp->c = 0 ;
 	return rs ;
-}
-/* end subroutine (chunk_finish) */
+} /* end subroutine (chunk_finish) */
 
 
