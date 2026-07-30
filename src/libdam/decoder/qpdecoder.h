@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	QPDECODER		struct qpdecoder_head
@@ -48,10 +48,10 @@ typedef	QPDECODER_FL	qpdecoder_fl ;
 
 EXTERNC_begin
 
-extern int qpdecoder_start(qpdecoder *,int) noex ;
-extern int qpdecoder_load(qpdecoder *,cchar *,int) noex ;
-extern int qpdecoder_read(qpdecoder *,char *,int) noex ;
-extern int qpdecoder_finish(qpdecoder *) noex ;
+extern int qpdecoder_start	(qpdecoder *,int) noex ;
+extern int qpdecoder_load	(qpdecoder *,cchar *,int) noex ;
+extern int qpdecoder_read	(qpdecoder *,char *,int) noex ;
+extern int qpdecoder_finish	(qpdecoder *) noex ;
 
 EXTERNC_end
 
