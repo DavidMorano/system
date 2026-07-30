@@ -20,21 +20,18 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<strlisthdr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strlisthdr.h>		/* LIBUC */
 
 
-#define	STRLIST_MAGIC	0x88773421
 #define	STRLIST		struct strlist_head
 #define	STRLIST_INFO	struct strlist_informtion
 #define	STRLIST_OBJ	struct strlist_object
 #define	STRLIST_CUR	struct strlist_cursor
 #define	STRLIST_FM	struct strlist_filemap
 #define	STRLIST_MI	struct strlist_mapidx
+#define	STRLIST_MAGIC	0x88773421
 
 
 struct strlist_informtion {
@@ -47,8 +44,8 @@ struct strlist_informtion {
 /* this is the shared-object description */
 struct strlist_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct strlist_cursor {
@@ -75,7 +72,7 @@ struct strlist_head {
 	STRLIST_FM	vf ;		/* file map */
 	STRLIST_MI	mi ;		/* memory index */
 	time_t		ti_lastcheck ;	/* time last check of file */
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 } ; /* end struct */
 
