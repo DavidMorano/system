@@ -53,7 +53,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* CSYD |UCHAR_MAX| */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD + |wchar_t| */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
