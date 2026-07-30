@@ -40,10 +40,18 @@ MODS +=
 LIBS +=
 
 
+OBJ0= strfilemk.o strfilemks.o
+OBJ1= 
+OBJ2= 
+OBJ3= 
+
+OBJA= obj0.o 
+
+OBJ= obja.o 
+
+
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -54,16 +62,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-OBJ0= strfilemk.o strfilemks.o
-OBJ1= 
-OBJ2= 
-OBJ3= 
-
-OBJA= obj0.o 
-
-OBJ= obja.o 
 
 
 .SUFFIXES:		.hh .ii .ccm
