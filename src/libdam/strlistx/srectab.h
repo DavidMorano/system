@@ -1,4 +1,4 @@
-/* srectab HEADER */
+/* srectab HEADER (String-Record-Table) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	SRECTAB		struct srectab_head
@@ -33,13 +30,13 @@ typedef	SRECTAB		srectab ;
 
 EXTERNC_begin
 
-extern int	srectab_start(srectab *,int) noex ;
-extern int	srectab_add(srectab *,uint) noex ;
-extern int	srectab_done(srectab *) noex ;
-extern int	srectab_getvec(srectab *,uint **) noex ;
-extern int	srectab_extend(srectab *) noex ;
-extern int	srectab_finish(srectab *) noex ;
-extern int	srectab_count(srectab *) noex ;
+extern int	srectab_start	(srectab *,int) noex ;
+extern int	srectab_add	(srectab *,uint) noex ;
+extern int	srectab_done	(srectab *) noex ;
+extern int	srectab_getvec	(srectab *,uint **) noex ;
+extern int	srectab_extend	(srectab *) noex ;
+extern int	srectab_finish	(srectab *) noex ;
+extern int	srectab_count	(srectab *) noex ;
 
 EXTERNC_end
 
