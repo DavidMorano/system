@@ -5,7 +5,7 @@
 /* enumerate filenames */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* debug */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -37,42 +37,44 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstdio>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<string>
-#include	<string_view>
-#include	<filesystem>
-#include	<iostream>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |cfdec(3u)| */
-#include	<getfdfile.h>		/* |FD_STDERR| */
-#include	<varnames.hh>
-#include	<strn.h>
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstdio>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<string>		/* C++STD */
+#include	<string_view>		/* C++STD */
+#include	<filesystem>		/* C++STD */
+#include	<iostream>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |cfdec(3u)| */
+#include	<strn.h>		/* LIBUC */
 #include	<strx.h>		/* |strabbrerr(3uc)| */
 #include	<strw.h>		/* |strwcmp(3uc)| */
 #include	<sfx.h>			/* |sfbasename(3uc)| + |sfext(3uc)| */
 #include	<six.h>			/* |sisub(3uc)| */
-#include	<rmx.h>
-#include	<strwcpy.h>
-#include	<strnul.hh>
-#include	<ccfile.hh>
-#include	<readln.hh>
-#include	<filetype.h>
-#include	<matstr.h>
-#include	<mkchar.h>
-#include	<isnot.h>
-#include	<mapex.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
-#include	<debprintf.h>		/* |DEBPRINTF| */
+#include	<rmx.h>			/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strnul.hh>		/* LIBU */
+#include	<ccfile.hh>		/* LIBU */
+#include	<readln.hh>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
+#include	<filetypes.h>		/* LIBU */
+#include	<matstr.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<isnot.h>		/* LIBUC */
+#include	<prognamevar.hh>	/* LIBU */
+#include	<mapex.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* |DEBPRINTF| */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #pragma		GCC dependency	"mod/libutil.ccm"
 #pragma		GCC dependency	"mod/ulibvals.ccm"
@@ -86,7 +88,7 @@
 #pragma		GCC dependency	"mod/filerec.ccm"
 #pragma		GCC dependency	"mod/modproc.ccm"
 #pragma		GCC dependency	"mod/cmdutils.ccm"
-#pragma		GCC dependency	"mod/debug.ccm"
+#pragma		GCC dependency	"mod/deb.ccm"
 
 import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 import ulibvals ;
@@ -100,7 +102,7 @@ import tardir ;
 import filerec ;
 import modproc ;
 import cmdutils ;
-import debug ;				/* |debprintf(3uc)| */
+import deb ;				/* |debprintf(3uc)| */
 
 /* local defines */
 
@@ -119,6 +121,7 @@ using fs::recursive_directory_iterator ; /* type */
 using std::string ;			/* type */
 using std::string_view ;		/* type */
 using std::istream ;			/* type */
+using std::bit_ceil ;			/* subroutine-template */
 using libu::snprintf ;			/* subroutine */
 using libu::snvprintf ;			/* subroutine */
 using libu::cfdec ;			/* subroutine */
@@ -155,6 +158,7 @@ namespace {
     } ; /* end enum (proginfomems) */
     struct proginfo ;
     struct proginfo_fl {
+	uint		ot:4 ;			/* module-name type-out */
 	uint		uniqfile:1 ;		/* 'u' arg-opt */
 	uint		uniqdir:1 ;		/* 'ud' arg-opt */
 	uint		followarg:1 ;		/* 'H' arg-opt */
@@ -174,7 +178,6 @@ namespace {
 	uint		seens:1 ;
 	uint		recs:1 ;
 	uint		mods:1 ;
-	uint		ot:2 ;			/* type-out */
     } ; /* end struct (proginfo_fl) */
     struct proginfo_co {
 	proginfo	*op = nullptr ;
@@ -206,7 +209,7 @@ namespace {
 	string		pnstr ;
 	mainv		argv ;
 	mainv		envv ;
-	cchar		*pn = nullptr ;
+	cchar		*pname = nullptr ;
 	char		*lbuf = nullptr ;
 	FILE		*ofp ;		/* output-file-pointer */
 	int		argc ;
@@ -232,44 +235,44 @@ namespace {
 	    argv = a ;
 	    envv = e ;
 	} ;
-	int argproc() noex ;
-	int args(argmgr *) noex ;
-	int argoptstr(argmgr *,int) noex ;
-	int argoptlong(argmgr *,cchar *,int) noex ;
-	int argoptchr(argmgr *,cchar *,int) noex ;
-	int argpm(argmgr *) noex ;
-	int argfile(argmgr *) noex ;
-	int argfileread() noex ;
-	int argsuf(argmgr *) noex ;
-	int argtype(argmgr *) noex ;
-	int argtardir(argmgr *) noex ;
-	int argprocer(argmgr *) noex ;
-	int argreadin() noex ;
-	int argprocname(cchar *,int = -1) noex ;
-	int argdebug(argmgr *) noex ;
-	int preamble() noex ;
+	int argproc	() noex ;
+	int args	(argmgr *) noex ;
+	int argoptstr	(argmgr *,int) noex ;
+	int argoptlong	(argmgr *,cchar *,int) noex ;
+	int argoptchr	(argmgr *,cchar *,int) noex ;
+	int argpm	(argmgr *) noex ;
+	int argfile	(argmgr *) noex ;
+	int argfileread	() noex ;
+	int argsuf	(argmgr *) noex ;
+	int argtype	(argmgr *) noex ;
+	int argtardir	(argmgr *) noex ;
+	int argprocer	(argmgr *) noex ;
+	int argreadin	() noex ;
+	int argprocname	(cchar *,int = -1) noex ;
+	int argdebug	(argmgr *) noex ;
+	int preamble	() noex ;
 	int process_pmbegin() noex ;
 	int process_pmend() noex ;
 	int procitem_strerr(cchar *,int = -1) noex ;
-	int procitem(cchar *,int = -1) noex ;
-	int sufadd(cchar *,int = -1) noex ;
-	int sufready() noex ;
-	int modeadd(cchar *,int) noex ;
-	int tardirbegin() noex ;
-	int tardirend() noex ;
-	int tardiravail() noex ;
-	int tardiradd(cchar *,int) noex ;
-	int typeout(cchar *,int) noex ;
-	int printf(cchar *,...) noex ;
+	int procitem	(cchar *,int = -1) noex ;
+	int sufadd	(cchar *,int = -1) noex ;
+	int sufready	() noex ;
+	int modeadd	(cchar *,int) noex ;
+	int tardirbegin	() noex ;
+	int tardirend	() noex ;
+	int tardiravail	() noex ;
+	int tardiradd	(cchar *,int) noex ;
+	int modtypeout	(cchar *,int) noex ;
+	int printf	(cchar *,...) noex ;
     private:
-	int istart() noex ;
-	int ifinish() noex ;
-	int getpnames(mainv,cc *,int) noex ;
-	int getpn(mainv) noex ;
-	int iargbegin() noex ;
-	int iargend() noex ;
-	int iflistbegin() noex ;
-	int iflistend() noex ;
+	int istart	() noex ;
+	int ifinish	() noex ;
+	int getpnames	(mainv,cc *,int) noex ;
+	int getpn	(mainv) noex ;
+	int iargbegin	() noex ;
+	int iargend	() noex ;
+	int iflistbegin	() noex ;
+	int iflistend	() noex ;
     } ; /* end struct (proginfo) */
 } /* end namespace */
 
@@ -285,8 +288,8 @@ enum progmodes {
 } ; /* end enum (progmodes) */
 
 constexpr cpcchar	prognames[] = {
-	[progmode_strerr]	= "strerr",
-	[progmode_overlast]	= nullptr
+	"strerr",
+	nullptr
 } ; /* end array (prognames) */
 
 enum argopts {
@@ -304,17 +307,17 @@ enum argopts {
 } ; /* end enum (argopts) */
 
 constexpr cpcchar	argopts[] = {
-    	[argopt_debug]		= "DEBUG",
-    	[argopt_help]		= "HELP",
-    	[argopt_version]	= "VERSION",
-    	[argopt_pm]		= "pm",
-    	[argopt_sn]		= "sn",
-    	[argopt_ef]		= "ef",
-    	[argopt_of]		= "of",
-    	[argopt_af]		= "af",
-    	[argopt_ud]		= "ud",
-    	[argopt_ot]		= "ot",
-	[argopt_overlast]	= nullptr
+    	"DEBUG",
+    	"HELP",
+    	"VERSION",
+    	"pm",
+    	"sn",
+    	"ef",
+    	"of",
+    	"af",
+    	"ud",
+    	"ot",
+	nullptr
 } ; /* end array (argopts) */
 
 enum argoptlongs {
@@ -323,8 +326,8 @@ enum argoptlongs {
 } ; /* end enum (argoptlongs) */
 
 constexpr cpcchar	argoptlongs[] = {
-    	[argoptlong_version]	= "version",
-	[argoptlong_overlast]	= nullptr
+    	"version",
+	nullptr
 } ; /* end array (argoptlongs) */
 
 constexpr MAPEX		mapexs[] = {
@@ -359,24 +362,28 @@ constexpr bool		f_debug		= CF_DEBUG ;
 /* exported subroutines */
 
 int main(int argc,mainv argv,mainv envv) {
+    	prognamevar	pnv(argc,argv,envv) ;
     	constexpr int	dfd = (f_debug) ? FD_STDERR : -1 ;
-	string		spn ;
 	int		ex = EX_OK ;
 	int		rs ;
 	int		rs1 ;
+	string		spn = "strerr" ;
 	debfd(dfd) ;
 	DEBPRINTF("ent\n") ;
+	spn = pnv ;
 	if (proginfo pi(argc,argv,envv) ; (rs = pi.start) >= 0) {
 	    {
                 rs = pi.argproc() ;
-	        spn = pi.pn ;
+	        if (pi.pname) spn = pi.pname ;
 	    }
 	    rs1 = pi.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (proginfo) */
 	if ((ex == EX_OK) && (rs < 0)) {
+            cchar fmt[] = "%s: error %s (%d)\n" ;
 	    cchar *cp = spn.c_str() ;
-            fprintf(stderr,"%s: error (%d)\n",cp,rs) ;
+	    DEBPRINTF("err cp=>%s<\n",cp) ;
+            fprintf(stderr,fmt,ccp(cp),strabbrerr(rs),rs) ;
 	    ex = mapex(mapexs,rs) ;
 	}
 	DEBPRINTF("ret ex=%d\n",ex) ;
@@ -436,9 +443,9 @@ int proginfo::ifinish() noex {
 /* end method (proginfo::ifinish) */
 
 int proginfo::getpnames(mainv names,cc *sp,int sl) noex {
-    	int		rs = SR_NOSYS ;
+    	int		rs = SR_NOMSG ;
 	if ((pm = matstr(names,sp,sl)) >= 0) {
-	    pn = names[pm] ;
+	    pname = names[pm] ;
 	    rs = pm ;
 	}
 	return rs ;
@@ -450,10 +457,12 @@ int proginfo::getpn(mainv names) noex {
 	cchar		*bp{} ; /* used-multiple */
 	DEBPRINTF("ent\n") ;
 	if (int bl = pnlen ; bl > 0) {
+	DEBPRINTF("opt-1\n") ;
 	    bp = pnstr.c_str() ;
 	    rs = getpnames(names,bp,bl) ;
 	} else if ((argc > 0) && argv[0]) {
 	    cchar	*argz = argv[0] ;
+	DEBPRINTF("opt-2\n") ;
 	    if ((bl = sfbasename(argz,-1,&bp)) > 0) {
 		if (cint rl = rmchr(bp,bl,'.') ; rl > 0) {
 		    rs = getpnames(names,bp,rl) ;
@@ -591,7 +600,7 @@ int proginfo::argoptstr(argmgr *amp,int wi) noex {
 	    break ;
 	case argopt_ot:
 	    if (cc *cp ; (rs = amp->argval(&cp)) > 0) {
-	        rs = typeout(cp,rs) ;
+	        rs = modtypeout(cp,rs) ;
 	    }
 	    break ;
 	} /* end switch */
@@ -608,7 +617,7 @@ int proginfo::argoptlong(argmgr *amp,cchar *sp,int sl) noex {
 		break ;
 	    } /* end switch */
 	} else {
-	    cerr << pn << ": " << "invalid option" << eol ;
+	    cerr << pname << ": " << "invalid option" << eol ;
 	    rs = SR_INVALID ;
 	} /* end if (matostr) */
 	return rs ;
@@ -736,7 +745,7 @@ int proginfo::preamble() noex {
             } else {
                 if (debuglevel) {
                     if (rs >= 0) {
-                        rs = printf("pm=%s\n",pn) ;
+                        rs = printf("pm=%s\n",pname) ;
                     }
                     if (rs >= 0) {
                         rs = printf("debuglevel=%d\n",debuglevel) ;
@@ -804,8 +813,7 @@ int proginfo::process_pmbegin() noex {
 	    break ;
 	} /* end switch */
 	return (rs >= 0) ? fcontinue : rs ;
-}
-/* end subroutine (proginfo::process_pmbegin) */
+} /* end subroutine (proginfo::process_pmbegin) */
 
 int proginfo::process_pmend() noex {
 	int		rs = SR_OK ;
@@ -819,8 +827,7 @@ int proginfo::process_pmend() noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end subroutine (proginfo::process_pmend) */
+} /* end subroutine (proginfo::process_pmend) */
 
 int proginfo::argreadin() noex {
 	cnullptr	np{} ;
@@ -841,13 +848,12 @@ int proginfo::argreadin() noex {
 	    } /* end if (m-a-f) */
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (proginfo::argreadin) */
+} /* end method (proginfo::argreadin) */
 
 int proginfo::argprocname(cchar *sp,int µsl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	DEBPRINTF("ent pn=%s\n",pn) ;
+	DEBPRINTF("ent pn=%s\n",pname) ;
 	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
 		rs = procitem(sp,sl) ;
 		c = rs ;
@@ -859,7 +865,7 @@ int proginfo::argprocname(cchar *sp,int µsl) noex {
 int proginfo::procitem(cchar *sp,int sl) noex {
     	int		rs = SR_OK ;
 	int		c = 0 ;
-	DEBPRINTF("ent pn=%s\n",pn) ;
+	DEBPRINTF("ent pn=%s\n",pname) ;
 	if (pm == progmode_strerr) {
 	    rs = procitem_strerr(sp,sl) ;
 	    c = rs ;
@@ -881,23 +887,34 @@ int proginfo::procitem_strerr(cchar *sp,int sl) noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
+	DEBPRINTF("ent sl=%d\n",sl) ;
+	{
+	    string str(sp,sl) ;
+	    cchar *cp = str.c_str() ;
+	    DEBPRINTF("arg s=>%s<\n",cp) ;
+	}
 	if (sp) {
 	    if (fl.verbose) {
 		strnul s(sp,sl) ;
+		DEBPRINTF("strnul s=>%s<\n",ccp(s)) ;
 		if (int v ; (rs = cfdec(s,-1,&v)) >= 0) {
+		    DEBPRINTF("strabbr begin\n") ;
 		    if (cchar *rp ; (rp = strabbrerr(-v)) != np) {
+		        DEBPRINTF("strabbr end ok\n") ;
 			rs = strerr_print(lbuf,llen,v,rp) ;
 		    } else {
+		        DEBPRINTF("strabbr end err\n") ;
 			rp = "not-found" ;
 			rs = strerr_print(lbuf,llen,v,rp) ;
 		    }
 		} /* end if (cfdec) */
+		DEBPRINTF("if-out s=>%s<\n",ccp(s)) ;
 	    } /* end if (verbose) */
 	    c += 1 ;
 	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (proginfo::procitem_strerr) */
+} /* end method (proginfo::procitem_strerr) */
 
 int proginfo::sufadd(cchar *sp,int sl) noex {
     	int		rs = SR_OK ;
@@ -1030,25 +1047,16 @@ int proginfo::tardiradd(cchar *dp,int dl) noex {
     	return rs ;
 } /* end method (proginfo::tardiradd) */
 
-int proginfo::typeout(cchar *cp,int cl)  noex {
+int proginfo::modtypeout(cchar *cp,int cl)  noex {
+    	constexpr uint	nouts = modout_overlast ;
     	int		rs = SR_INVALID ;
-	if_constexpr (f_debug) {
-	    strnul s(cp,cl) ;
-	    DEBPRINTF("ot=%s\n",ccp(s)) ;
-	}
-	if (int mi ; (mi = matostr(typeouts,1,cp,cl)) >= 0) {
-	    if_constexpr (f_debug) {
-	        DEBPRINTF(__func__,"mi=%d\n",mi) ;
-	    }
+	if (cint mi = matostr(modoutnames,1,cp,cl) ; mi >= 0) {
+	    cint tmask = (bit_ceil(nouts) - 1) ;
 	    rs = SR_OK ;
-	    fl.ot = uchar(mi & 0x03) ;	/* avoiding GCC complaint */
-	} else {
-	    if_constexpr (f_debug) {
-	        DEBPRINTF(__func__,"err mi=%d\n",mi) ;
-	    }
+	    fl.ot = uchar(mi & tmask) ;	/* avoiding GCC complaint */
 	} /* end if (matostr) */
 	return rs ;
-} /* end method (proginfo::typeout) */
+} /* end method (proginfo::modtypeout) */
 
 int proginfo::argdebug(argmgr *amp) noex {
     	int		rs = SR_OK ;
@@ -1077,7 +1085,7 @@ int proginfo::printf(cchar *fmt,...) noex {
 		    cint µllen = rs ;
 		    if (char *µlbuf ; (µlbuf = new(nt) char[µllen + 1]) != np) {
 			if ((rs = snvprintf(µlbuf,µllen,fmt,ap)) >= 0) {
-			    cerr << pn << ": " << µlbuf ;
+			    cerr << pname << ": " << µlbuf ;
 			    len = rs ;
 			} /* end if (snvprintf) */
 			delete [] µlbuf ;
@@ -1114,7 +1122,6 @@ int proginfo_co::operator () (int) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (proginfo_co::operator) */
+} /* end method (proginfo_co::operator) */
 
 
