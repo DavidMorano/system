@@ -41,21 +41,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<sfx.h>			/* |sfnext(3uc)| */
-#include	<strwcpy.h>
-#include	<hasx.h>		/* |hasdoublewhite(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC |sfnext(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasdoublewhite(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"instrcompact.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;
 
@@ -112,7 +112,6 @@ int instrcompact(char *sbuf,int slen) noex {
 	    } /* end if (hasdouble) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? bl : rs ;
-}
-/* end subroutine (instrcompact) */
+} /* end subroutine (instrcompact) */
 
 
