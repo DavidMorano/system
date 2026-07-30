@@ -29,7 +29,7 @@
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdint>		/* CSYD */
+#include	<cstdint>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
