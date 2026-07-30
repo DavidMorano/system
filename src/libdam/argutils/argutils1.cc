@@ -47,20 +47,20 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<utility>		/* |pair(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucfileop.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
-#include	<libdebug.h>		/* LIBDEBUG */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<utility>		/* C++STD |pair(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBUC */
+#include	<libdebug.h>		/* LIBU LIBDEBUG */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
