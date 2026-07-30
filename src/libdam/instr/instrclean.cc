@@ -52,17 +52,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ascii.h>		/* |CH_{xx}| */
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |isprintlatin(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_{xx}| */
+#include	<mkchar.h>		/* LIBU */
+#include	<ischarx.h>		/* LIBUC |isprintlatin(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"instrclean.h"
 
@@ -88,17 +88,17 @@ import libutil ;
 struct mflags {
 	uint	subnul:1 ;
 	uint	subbad:1 ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	clean1(mflags *,char *,int) noex ;
-static int	clean2(mflags *,char *,int) noex ;
+local int	clean1(mflags *,char *,int) noex ;
+local int	clean2(mflags *,char *,int) noex ;
 
-static int	isshift(int) noex ;
-static int	ischarok(int) noex ;
-static int	isend(int) noex ;
+local bool	isshift	(int) noex ;
+local bool	ischarok(int) noex ;
+local bool	isend	(int) noex ;
 
 
 /* local variables */
@@ -130,13 +130,12 @@ int instrclean(char *lp,int ll,int m) noex {
 	    } /* end if_constexpr (f_clean1) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (instrclean) */
+} /* end subroutine (instrclean) */
 
 
 /* local subroutines */
 
-static int clean1(mflags *mfp,char *lp,int ll) noex {
+local int clean1(mflags *mfp,char *lp,int ll) noex {
 	int		oli = 0 ; /* return-value */
 	bool		f_flipped = false ;
 	bool		f_rem = false ;
@@ -168,10 +167,9 @@ static int clean1(mflags *mfp,char *lp,int ll) noex {
 	} /* end for */
 	lp[oli] = '\0' ;
 	return oli ;
-}
-/* end subroutine (clean1) */
+} /* end subroutine (clean1) */
 
-static int clean2(mflags *mfp,char *lp,int ll) noex {
+local int clean2(mflags *mfp,char *lp,int ll) noex {
 	int		oli = 0 ; /* return-value */
 	bool		f_flipped = false ;
 	bool		f ;
@@ -193,25 +191,21 @@ static int clean2(mflags *mfp,char *lp,int ll) noex {
 	} /* end for */
 	lp[oli] = '\0' ;
 	return oli ;
-}
-/* end subroutine (clean2) */
+} /* end subroutine (clean2) */
 
-static int isshift(int ch) noex {
-	int		f = false ;
+local bool isshift(int ch) noex {
+	bool		f = false ;
 	f = f || (ch == CH_SS2) ;
 	f = f || (ch == CH_SS3) ;
 	return f ;
-}
-/* end subroutine (isshift) */
+} /* end subroutine (isshift) */
 
-static int ischarok(int ch) noex {
+local bool ischarok(int ch) noex {
 	return (ch == '\t') || (ch == '\n') ;
-}
-/* end subroutine (ischarok) */
+} /* end subroutine (ischarok) */
 
-static int isend(int ch) noex {
+local bool isend(int ch) noex {
 	return (ch == '\n') || (ch == '\r') ;
-}
-/* end subroutine (isend) */
+} /* end subroutine (isend) */
 
 
