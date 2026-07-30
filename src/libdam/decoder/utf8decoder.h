@@ -22,8 +22,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stddef.h>		/* for |wchar_t| */
 #include	<wchar.h>		/* for |wchar_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	UTF8DECODER		struct utf8decoder_head
@@ -41,10 +41,10 @@ typedef UTF8DECODER	utf8decoder ;
 
 EXTERNC_begin
 
-extern int utf8decoder_start(utf8decoder *) noex ;
-extern int utf8decoder_load(utf8decoder *,cchar *,int) noex ;
-extern int utf8decoder_read(utf8decoder *,wchar_t *,int) noex ;
-extern int utf8decoder_finish(utf8decoder *) noex ;
+extern int utf8decoder_start	(utf8decoder *) noex ;
+extern int utf8decoder_load	(utf8decoder *,cchar *,int) noex ;
+extern int utf8decoder_read	(utf8decoder *,wchar_t *,int) noex ;
+extern int utf8decoder_finish	(utf8decoder *) noex ;
 
 EXTERNC_end
 
