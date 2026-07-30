@@ -1,6 +1,6 @@
 /* cmdutils HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* command utilities */
 /* version %I% last-modified %G% */
@@ -17,13 +17,15 @@
 
 #ifndef	CMDUTILS_INCLUDE
 #define	CMDUTILS_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
+#endif /* __cplusplus */
 #endif /* CMDUTILS_INCLUDE */
 
 
