@@ -123,7 +123,7 @@ int terment_setcols(terment *op,int cols) noex {
 
 int terment_setid(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op && sp) {
 	    cint	dl = TERMENT_LID ;
 	    rs = snwcpy(op->id,dl,sp,sl) ;
 	}
@@ -132,7 +132,7 @@ int terment_setid(terment *op,cchar *sp,int sl) noex {
 
 int terment_setline(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op && sp) {
 	    cint	dl = TERMENT_LLINE ;
 	    rs = snwcpy(op->line,dl,sp,sl) ;
 	}
@@ -141,7 +141,7 @@ int terment_setline(terment *op,cchar *sp,int sl) noex {
 
 int terment_settermtype(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op && sp) {
 	    cint	dl = TERMENT_LTERMTYPE ;
 	    rs = snwcpy(op->termtype,dl,sp,sl) ;
 	}
@@ -150,7 +150,7 @@ int terment_settermtype(terment *op,cchar *sp,int sl) noex {
 
 int terment_setanswer(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op && sp) {
 	    cint	dl = TERMENT_LANSWER ;
 	    rs = snwcpy(op->answer,dl,sp,sl) ;
 	}
