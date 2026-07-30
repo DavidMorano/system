@@ -28,8 +28,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
-#include	<cstdlib>		/* CSYD */
-#include	<cstdlib>		/* CSYD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<new>			/* C++STD |nothrow(3c++) */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
