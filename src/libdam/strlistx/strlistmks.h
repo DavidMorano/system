@@ -13,14 +13,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* systems IDs */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<strtab.h>
-#include	<srectab.h>
+#include	<sys/types.h>		/* POSIX® systems IDs */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strtab.h>		/* LIBUC */
+#include	<srectab.h>		/* LIBUC */
 
 
 #define	STRLISTMKS		struct strlistmks_head
@@ -33,8 +30,8 @@
 
 struct strlistmks_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		dummy ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct strlistmks_flags {
@@ -55,7 +52,7 @@ struct strlistmks_head {
 	srectab		*rtp ;		/* string-record-table-pointer */
 	gid_t		gid ;
 	STRLISTMKS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		nstrs ;
 	int		nfd ;
 	mode_t		om ;
@@ -78,15 +75,17 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 template<typename ... Args>
-static inline int strlistmks_magic(strlistmks *op,Args ... args) noex {
+local inline int strlistmks_magic(strlistmks *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == STRLISTMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == STRLISTMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (strlistmks_magic) */
 
 #endif /* __cplusplus */
+
+extern const strlistmks_obj	strlistmks_modinfo ;
 
 
 #endif /* STRLISTMKS_INCLUDE */
