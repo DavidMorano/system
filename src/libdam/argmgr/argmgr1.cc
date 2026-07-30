@@ -31,23 +31,23 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<string_view>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>		/* |msleep(3u)| */
-#include	<ulogerror.h>
-#include	<sfx.h>
-#include	<strn.h>
-#include	<strnul.hh>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<string_view>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |msleep(3u)| */
+#include	<ulogerror.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<strnul.hh>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"argmgr.h"
 
