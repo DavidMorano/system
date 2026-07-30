@@ -73,7 +73,6 @@
 
 int mkbangname(char *rbuf,int rlen,userinfo *uip) noex {
     	return mkuibang(rbuf,rlen,uip) ;
-}
-/* end subroutine (mkbangname) */
+} /* end subroutine (mkbangname) */
 
 
