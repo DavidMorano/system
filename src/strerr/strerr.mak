@@ -37,16 +37,41 @@ INCS +=
 
 MODS += argmgr.ccm filerec.ccm
 MODS += cmdutils.ccm
-MODS += modproc.ccm 
+MODS +=
 
-LIBS += -luo -lu
+LIBS += -lf -lu
+
+
+DEPS_MAIN += cmdutils.o
+DEPS_MAIN += argmgr.o filerec.o 
+DEPS_MAIN += ureserve.o fonce.o
+DEPS_MAIN += strfilter.o tardir.o
+DEPS_MAIN +=
+
+OBJ0= strerr_main.o cmdutils.o
+OBJ1= argmgr.o filerec.o
+OBJ2= tardir.o modproc.o
+OBJ3= ischarx.o
+
+OBJ4= strx.o six.o rmx.o strn.o strx.o
+OBJ5= prognamevar.o shellunder.o
+OBJ6= matxstr.o
+OBJ7= strxcmp.o strcpyx.o nleadx.o
+
+OBJ8= char.o
+OBJ9= strw.o strwcpy.o
+OBJ10= sif.o strnxcmp.o
+OBJ11= sfx.o strfilter.o
+
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o obj5.o obj6.o obj7.o
+OBJC= obj8.o obj9.o obj10.o obj11.o
+
+OBJ= obja.o objb.o objc.o
 
 
 INCDIRS=
-#INCDIRS= -I$(INCDIR)
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -57,28 +82,6 @@ CFLAGS		?= $(MAKECFLAGS)
 CXXFLAGS	?= $(MAKECXXFLAGS)
 ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
-
-
-DEPS_MAIN += cmdutils.o
-DEPS_MAIN += argmgr.o filerec.o 
-DEPS_MAIN += ureserve.o fonce.o
-DEPS_MAIN += strfilter.o tardir.o
-DEPS_MAIN += langx.o modproc.o
-
-OBJ0= strerr_main.o cmdutils.o
-OBJ1= argmgr.o filerec.o tardir.o
-OBJ2= modproc.o langx.o
-OBJ3= shortq.o ischarx.o
-
-OBJ4= strx.o
-OBJ5=
-OBJ6=
-OBJ7=
-
-OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o
-
-OBJ_MAIN= obja.o objb.o
 
 
 .SUFFIXES:		.hh .ii .iim .ccm
@@ -111,11 +114,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).x:			$(OBJ_MAIN)
-	$(CXX) -o $@ $(LDFLAGS) $(RUNINFO) $(OBJ_MAIN) $(LIBINFO)
+$(T).x:			obj.o
+	$(CXX) -o $@ $(LDFLAGS) $(RUNINFO) $^ $(LIBINFO)
 
 $(T).nm:		$(T).x
 	$(NM) $(NMFLAGS) $(T).x > $(T).nm
@@ -133,10 +136,6 @@ install:		$(T).x
 	makeinstall $(T).x
 
 
-obj_main.o:		$(OBJ_MAIN)
-	$(CXX) -r -o $@ $(LDFLAGS) $^
-
-
 obj0.o:			$(OBJ0)
 	$(CXX) -r -o $@ $(LDFLAGS) $^
 
@@ -152,6 +151,40 @@ obj3.o:			$(OBJ3)
 obj4.o:			$(OBJ4)
 	$(CXX) -r -o $@ $(LDFLAGS) $^
 
+obj5.o:			$(OBJ5)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj8.o:			$(OBJ8)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj9.o:			$(OBJ9)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj10.o:		$(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj11.o:		$(OBJ11)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj12.o:		$(OBJ12)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj13.o:		$(OBJ13)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj14.o:		$(OBJ14)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj15.o:		$(OBJ15)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obja.o:			$(OBJA)
 	$(CXX) -r -o $@ $(LDFLAGS) $^
@@ -159,9 +192,18 @@ obja.o:			$(OBJA)
 objb.o:			$(OBJB)
 	$(CXX) -r -o $@ $(LDFLAGS) $^
 
+objc.o:			$(OBJC)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
+
+objd.o:			$(OBJD)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
+
+
+obj.o:			$(OBJ)
+	$(CXX) -r -o $@ $(LDFLAGS) $^
+
 
 strerr_main.o:		strerr_main.cc $(DEPS_MAIN)		$(INCS)
-	sleep 1
 	$(COMPILE.cc) $<
 
 # MODS
@@ -184,8 +226,8 @@ filerec.dir:
 	makesubdir $@
 
 # DEBUG		(libu)
-debug.o:		debug.dir
-debug.dir:
+deb.o:		deb.dir
+deb.dir:
 	makesubdir $@
 
 # STRFILER	(libuc)
@@ -208,9 +250,14 @@ tardir.o:		tardir.dir
 tardir.dir:
 	makesubdir $@
 
-# LANGX		(libdam)
-langx.o:		langx.dir
-langx.dir:
+# SIX		(libuc)
+six.o:			six.dir
+six.dir:
+	makesubdir $@
+
+# RMX		(libuc)
+rmx.o:			rmx.dir
+rmx.dir:
 	makesubdir $@
 
 # MODPROC	(libdam)
@@ -223,12 +270,69 @@ cmdutils.o:		cmdutils.dir
 cmdutils.dir:
 	makesubdir $@
 
+# SFX
+sfx.o:			sfx.dir
+sfx.dir:
+	makesubdir $@
+
+# STRW
+strw.o:			strw.dir
+strw.dir:
+	makesubdir $@
+
+# STRWCPY
+strwcpy.o:			strwcpy.dir
+strwcpy.dir:
+	makesubdir $@
+
+# STRN
+strn.o:			strn.dir
+strn.dir:
+	makesubdir $@
+
+# STRNXCMP
+strnxcmp.o:		strnxcmp.dir
+strnxcmp.dir:
+	makesubdir $@
+
 # STRX
 strx.o:			strx.dir
 strx.dir:
 	makesubdir $@
 
+# STRXCMP
+strxcmp.o:		strxcmp.dir
+strxcmp.dir:
+	makesubdir $@
+
+# STRWCMP
+strwcmp.o:		strwcmp.dir
+strwcmp.dir:
+	makesubdir $@
+
+# STRCPYX
+strcpyx.o:		strcpyx.dir
+strcpyx.dir:
+	makesubdir $@
+
+# MATXSTR
+matxstr.o:		matxstr.dir
+matxstr.dir:
+	makesubdir $@
+
+# NLEADX
+nleadx.o:		nleadx.dir
+nleadx.dir:
+	makesubdir $@
+
+# SINGLES
 shortq.o:		shortq.cc	shortq.h		$(INCS)
 ischarx.o:		ischarx.cc	ischarx.h		$(INCS)
 strabbrerr.o:		strabbrerr.cc	strabbrerr.h		$(INCS)
+
+prognamevar.o:		prognamevar.cc	prognamevar.hh
+shellunder.o:		shellunder.cc	shellunder.h
+strerr.o:		strnul.cc	strnul.hh
+char.o:			char.cc		char.h
+
 
