@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* CSYD */
-#include	<stdint.h>		/* CSYD */
+#include	<stddef.h>		/* CSTD */
+#include	<stdint.h>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
