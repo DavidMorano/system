@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += argutils.h
+INCS += argutils.hh
 
 MODS +=
 
