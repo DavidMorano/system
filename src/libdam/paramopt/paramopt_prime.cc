@@ -49,16 +49,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<estrings.h>
-#include	<strn.h>
-#include	<strwcpy.h>
-#include	<strwcmp.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"paramopt.h"
 
@@ -76,6 +79,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
+using libuc::mem ;			/* variable */
+
 
 /* local typedefs */
 
@@ -91,10 +96,10 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int	paramopt_findkey(PO *,cchar *,PO_NAME **) noex ;
+local int	paramopt_findkey(PO *,cchar *,PO_NAME **) noex ;
 
-static int	name_incri(PO_NAME *) noex ;
-static int	name_vfind(PO_NAME *,cchar *,int,PO_VAL **) noex ;
+local int	name_incri(PO_NAME *) noex ;
+local int	name_vfind(PO_NAME *,cchar *,int,PO_VAL **) noex ;
 
 
 /* local variables */
@@ -112,13 +117,12 @@ int paramopt_start(PO *op) noex {
 	    if ((rs = memclear(hop)) >= 0) ylikely {
 	        op->head = nullptr ;
 	        op->tail = nullptr ;
-	        op->magval = paramopt_MAGIC ;
+	        op->magval = PARAMOPT_MAGIC ;
 	        op->f_inited = true ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (paramopt_start) */
+} /* end subroutine (paramopt_start) */
 
 int paramopt_finish(PO *op) noex {
 	int		rs ;
@@ -152,8 +156,7 @@ int paramopt_finish(PO *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (paramopt_finish) */
+} /* end subroutine (paramopt_finish) */
 
 /* load a parameter with an unknown "name" and values all in string 's' */
 
@@ -190,8 +193,7 @@ int paramopt_loadu(PO *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (paramopt_loadu) */
+} /* end subroutine (paramopt_loadu) */
 
 /* load parameter with a known "name" and string of values (in 's') */
 
@@ -224,8 +226,7 @@ int paramopt_loads(PO *op,cchar *name,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (paramopt_loads) */
+} /* end subroutine (paramopt_loads) */
 
 /* load a single key=value pair */
 int paramopt_load(PO *op,cchar *name,cchar *vbuf,int vlen) noex {
@@ -264,7 +265,7 @@ int paramopt_load(PO *op,cchar *name,cchar *vbuf,int vlen) noex {
 	                    }
 	                    if (rs < 0) {
 	                        lm_free(pp) ;
-		            }
+		            } /* end if (error) */
 	                } /* end if */
 	            } /* end if (adding a new parameter block on the list) */
 		    /* OK, now we have the parameter block in 'pp' */
@@ -289,7 +290,7 @@ int paramopt_load(PO *op,cchar *name,cchar *vbuf,int vlen) noex {
 	                        }
 	                        if (rs < 0) {
 	                            lm_free(nvp) ;
-			        }
+			        } /* end if (error) */
 	                    } /* end if (new value) */
 		        } /* end if (name_vfind) */
 	            } /* end if (ok) */
@@ -297,8 +298,7 @@ int paramopt_load(PO *op,cchar *name,cchar *vbuf,int vlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (paramopt_load) */
+} /* end subroutine (paramopt_load) */
 
 int paramopt_loaduniq(PO *op,cchar *name,cchar *vp,int vl) noex {
 	int		rs ;
@@ -306,8 +306,7 @@ int paramopt_loaduniq(PO *op,cchar *name,cchar *vp,int vl) noex {
 	    rs = paramopt_load(op,name,vp,vl) ;
 	}
 	return rs ;
-}
-/* end subroutine (paramopt_loaduniq) */
+} /* end subroutine (paramopt_loaduniq) */
 
 int paramopt_havekey(PO *op,cchar *name) noex {
 	int		rs ;
@@ -323,8 +322,7 @@ int paramopt_havekey(PO *op,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (paramopt_havekey) */
+} /* end subroutine (paramopt_havekey) */
 
 int paramopt_haveval(PO *op,cchar *key,cchar *vp,int vl) noex {
 	int		rs ;
@@ -350,8 +348,7 @@ int paramopt_haveval(PO *op,cchar *key,cchar *vp,int vl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (paramopt_haveval) */
+} /* end subroutine (paramopt_haveval) */
 
 /* increment the parameters */
 int paramopt_incr(PO *op) noex {
@@ -376,8 +373,7 @@ int paramopt_incr(PO *op) noex {
 	    } /* end if (error) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (paramopt_incr) */
+} /* end subroutine (paramopt_incr) */
 
 /* initialize a cursor */
 int paramopt_curbegin(PO *op,PO_CUR *curp) noex {
@@ -425,13 +421,11 @@ int paramopt_curenumkey(PO *op,PO_CUR *curp,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (paramopt_curenumkey) */
+} /* end subroutine (paramopt_curenumkey) */
 
 int paramopt_curenumval(PO *op,cchar *key,PO_CUR *curp,cchar **rpp) noex {
 	return paramopt_curfetch(op,key,curp,rpp) ;
-}
-/* end subroutine (paramopt_curenumval) */
+} /* end subroutine (paramopt_curenumval) */
 
 int paramopt_curfetch(PO *op,cchar *key,PO_CUR *curp,cchar **rpp) noex {
 	int		rs ;
@@ -468,8 +462,7 @@ int paramopt_curfetch(PO *op,cchar *key,PO_CUR *curp,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (paramopt_curfetch) */
+} /* end subroutine (paramopt_curfetch) */
 
 /* find the number of values for a given key */
 int paramopt_countvals(PO *op,cchar *key) noex {
@@ -487,14 +480,13 @@ int paramopt_countvals(PO *op,cchar *key) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (paramopt_countvals) */
+} /* end subroutine (paramopt_countvals) */
 
 
 /* private subroutines */
 
 /* find a parameter by key-name */
-static int paramopt_findkey(PO *op,cc *name,PO_NAME **rpp) noex {
+local int paramopt_findkey(PO *op,cc *name,PO_NAME **rpp) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = paramopt_magic(op,name)) >= 0) {
@@ -507,13 +499,12 @@ static int paramopt_findkey(PO *op,cc *name,PO_NAME **rpp) noex {
 	    if (pp == nullptr) rs = SR_NOTFOUND ;
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (paramopt_findkey) */
+} /* end subroutine (paramopt_findkey) */
 
 #ifdef	COMMENT
 
 /* find a paramter by key-value pair */
-static int paramopt_findvalue(PO *op,cc *key,cc *val,int vlen,
+local int paramopt_findvalue(PO *op,cc *key,cc *val,int vlen,
 		PO_VAL **rpp) noex {
 	int		rs ;
 	if ((rs = paramopt_magic(op)) >= 0) {
@@ -524,12 +515,11 @@ static int paramopt_findvalue(PO *op,cc *key,cc *val,int vlen,
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (paramopt_findvalue) */
+} /* end subroutine (paramopt_findvalue) */
 
 #endif /* COMMENT */
 
-static int name_incri(PO_NAME *pp) noex {
+local int name_incri(PO_NAME *pp) noex {
 	PO_VAL		*vp ;
 	int		rs = SR_NOSYS ;
 	if (pp->next != nullptr) {
@@ -545,13 +535,12 @@ static int name_incri(PO_NAME *pp) noex {
 	        pp->current = vp->next ;
 	        rs = 0 ;
 	    }
-	}
+	} /* end if (error) */
 	return rs ;
-}
-/* end subroutine (name_incri) */
+} /* end subroutine (name_incri) */
 
 /* find a paramter by value? */
-static int name_vfind(PO_NAME *pp,cchar *vp,int vl,PO_VAL **rpp) noex {
+local int name_vfind(PO_NAME *pp,cchar *vp,int vl,PO_VAL **rpp) noex {
 	PO_VAL		*vep = nullptr ;
 	int		c = 0 ;
 	bool		f = false ;
@@ -564,7 +553,6 @@ static int name_vfind(PO_NAME *pp,cchar *vp,int vl,PO_VAL **rpp) noex {
 	} /* end for */
 	if (rpp) *rpp = vep ;
 	return (f) ? c : SR_NOTFOUND ;
-}
-/* end subroutine (name_vfind) */
+} /* end subroutine (name_vfind) */
 
 
