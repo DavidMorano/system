@@ -13,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	STRFILEMKS		struct strfilemks_head
@@ -25,14 +22,15 @@
 #define	STRFILEMKS_FL		struct strfilemks_flags
 #define	STRFILEMKS_IM		struct strfilemks_imap
 #define	STRFILEMKS_MAGIC	0x88773423
-#define	STEFILEMKS_MAXFILESIZE	(10*1024*1024)
+#define	STEFILEMKS_MAXFILESIZE	(10 * 1024 * 1024)
 #define	STRFILEMKS_NENTRIES	(2 * 1024)
 
 
 struct strfilemks_object {
 	char		*name ;
-	uint		objsize ;
-} ;
+	uint		objsz ;
+	uint		cursz ;
+} ; /* end struct */
 
 struct strfilemks_flags {
 	uint		viopen:1 ;
@@ -42,12 +40,12 @@ struct strfilemks_flags {
 	uint		none:1 ;
 	uint		inprogress:1 ;
 	uint		created:1 ;
-} ;
+} ; /* end struct */
 
 struct strfilemks_imap {
 	void		*mdata ;
 	size_t		msize ;
-} ;
+} ; /* end struct */
 
 struct strfilemks_head {
 	cchar 		*dbname ;
@@ -55,15 +53,15 @@ struct strfilemks_head {
 	char		*nfname ;
 	void		*recorder ;
 	void		*idx ;
-	STRFILEMKS_IMAP	imap ;
+	STRFILEMKS_IM	imap ;
 	STRFILEMKS_FL	fl ;
 	gid_t		gid ;
-	uint		magic ;
-	int		pagesize ;
+	uint		magval ;
+	int		pagesz ;
 	int		nstrs ;
 	int		nfd ;
 	mode_t		om ;
-} ;
+} ; /* end struct */
 
 typedef	STRFILEMKS	strfilemks ;
 typedef	STRFILEMKS_OBJ	strfilemks_obj ;
@@ -72,13 +70,15 @@ typedef	STRFILEMKS_IM	strfilemks_im ;
 
 EXTERNC_begin
 
-extern int	strfilemks_open(strfilemks *,cchar *,int,mode_t,int) noex ;
-extern int	strfilemks_addfile(strfilemks *,cchar *,int) noex ;
-extern int	strfilemks_abort(strfilemks *) noex ;
-extern int	strfilemks_chgrp(strfilemks *,gid_t) noex ;
-extern int	strfilemks_close(strfilemks *) noex ;
+extern int strfilemks_open	(strfilemks *,cchar *,int,mode_t,int) noex ;
+extern int strfilemks_addfile	(strfilemks *,cchar *,int) noex ;
+extern int strfilemks_abort	(strfilemks *) noex ;
+extern int strfilemks_chgrp	(strfilemks *,gid_t) noex ;
+extern int strfilemks_close	(strfilemks *) noex ;
 
 EXTERNC_end
+
+extern const strfilemks_obj	strfilemks_modinfo ;
 
 
 #endif /* STRFILEMKS_INCLUDE */
