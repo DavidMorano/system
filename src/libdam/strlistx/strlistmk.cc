@@ -28,19 +28,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<dlfcn.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<modload.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<modload.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strlistmk.h"
 #include	"strlistmks.h"
@@ -110,7 +110,7 @@ local int strlistmk_ctor(strlistmk *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->mlp ;
 		    op->mlp = nullptr ;
-		} 
+		} /* end if (error) */
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
@@ -137,7 +137,7 @@ template<typename ... Args>
 local inline int strlistmk_magic(strlistmk *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == STRLISTMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == STRLISTMK_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (strlistmk_magic) */
@@ -185,20 +185,19 @@ int strlistmk_open(SLM *op,cc *pr,cc *dbn,cc *lfn,int of,om_t om,int n) noex {
 	        if ((rs = strlistmk_objloadbegin(op,pr,objn)) >= 0) ylikely {
 		    auto	co = callp->open ;
 	            if ((rs = co(op->obj,dbn,lfn,of,om,n)) >= 0) {
-		        op->magic = STRLISTMK_MAGIC ;
+		        op->magval = STRLISTMK_MAGIC ;
 	            }
 	            if (rs < 0) {
 			strlistmk_objloadend(op) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (objloadbegin) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		strlistmk_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (strlistmk_ctor) */
 	return rs ;
-}
-/* end subroutine (strlistmk_open) */
+} /* end subroutine (strlistmk_open) */
 
 int strlistmk_close(SLM *op) noex {
 	int		rs ;
@@ -218,15 +217,14 @@ int strlistmk_close(SLM *op) noex {
 		rs1 = strlistmk_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strlistmk_close) */
+} /* end subroutine (strlistmk_close) */
 
 int strlistmk_add(SLM *op,cc *sp,int sl) noex {
 	int		rs ;
-	if ((rs = strlistmk_magic(op,sp)) >= 0) {
+	if ((rs = strlistmk_magic(op,sp)) >= 0) ylikely {
 	    strlistmk_calls		*callp = callsp(op->callp) ;
 	    if (callp->add) {
 		auto co = callp->add ;
@@ -234,12 +232,11 @@ int strlistmk_add(SLM *op,cc *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strlistmk_add) */
+} /* end subroutine (strlistmk_add) */
 
 int strlistmk_abort(SLM *op) noex {
 	int		rs ;
-	if ((rs = strlistmk_magic(op)) >= 0) {
+	if ((rs = strlistmk_magic(op)) >= 0) ylikely {
 	    strlistmk_calls		*callp = callsp(op->callp) ;
 	    if (callp->abort) {
 		auto co = callp->abort ;
@@ -249,8 +246,7 @@ int strlistmk_abort(SLM *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strlistmk_abort) */
+} /* end subroutine (strlistmk_abort) */
 
 int strlistmk_chgrp(SLM *op,gid_t gid) noex {
 	int		rs ;
@@ -264,8 +260,7 @@ int strlistmk_chgrp(SLM *op,gid_t gid) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strlistmk_chgrp) */
+} /* end subroutine (strlistmk_chgrp) */
 
 
 /* private subroutines */
@@ -276,9 +271,9 @@ local int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
 	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
-                if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subs)) >= 0) ylikely {
+                if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) ylikely {
                     cchar	*modbn = STRLISTMK_MODBNAME ;
                     int		mo = 0 ;
                     mo |= modloadm.libvar ;
@@ -295,13 +290,13 @@ local int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
                                 if (rs < 0) {
                                     lm_free(op->obj) ;
                                     op->obj = nullptr ;
-                                }
+                                } /* end if (error) */
                             } /* end if (memory-allocation) */
                         } /* end if (modload_getmva) */
                         if (rs < 0) {
 			    op->fl.modload = false ;
                             modload_close(lp) ;
-                        }
+                        } /* end if (error) */
                     } /* end if (modload-open) */
 		} /* end if (vecstr_getvec) */
             } /* end if (vecstr_addsyms) */
@@ -310,11 +305,10 @@ local int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objn) noex {
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
 		modload_close(lp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (vecstr) */
 	return rs ;
-}
-/* end subroutine (strlistmk_objloadbegin) */
+} /* end subroutine (strlistmk_objloadbegin) */
 
 local int strlistmk_objloadend(SLM *op) noex {
 	int		rs = SR_OK ;
@@ -330,8 +324,7 @@ local int strlistmk_objloadend(SLM *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (strlistmk_objloadend) */
+} /* end subroutine (strlistmk_objloadend) */
 
 local int strlistmk_loadcalls(SLM *op,vecstr *slp) noex {
 	modload		*lp = op->mlp ;
@@ -368,8 +361,7 @@ local int strlistmk_loadcalls(SLM *op,vecstr *slp) noex {
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (strlistmk_loadcalls) */
+} /* end subroutine (strlistmk_loadcalls) */
 
 local bool isrequired(int i) noex {
 	bool		f = false ;
@@ -381,7 +373,6 @@ local bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
