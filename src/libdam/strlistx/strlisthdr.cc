@@ -40,18 +40,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<endian.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memset(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strlisthdr.h"
 
@@ -93,9 +93,9 @@ enum his {
 
 /* local variables */
 
-constexpr cint		hdrsz = hi_overlast * szof(uint) ;
-constexpr cint		magicsize = STRLISTHDR_MAGICSIZE ;
-constexpr cchar		magicstr[] = STRLISTHDR_MAGICSTR ;
+constexpr cint		hdrsz		= hi_overlast * szof(uint) ;
+constexpr cint		magicsize	= STRLISTHDR_MAGICSIZE ;
+constexpr cchar		magicstr[]	= STRLISTHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -107,11 +107,11 @@ constexpr cchar		magicstr[] = STRLISTHDR_MAGICSTR ;
 int strlisthdr_rd(strlisthdr *ep,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (ep && hbuf) {
+	if (ep && hbuf) ylikely {
 	    char	*bp = hbuf ;
 	    int		bl = hlen ;
-	    if (bl >= (magicsize + 4)) {
-	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
+	    if (bl >= (magicsize + 4)) ylikely {
+	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) ylikely {
 	            bp += magicsize ;
 	            bl -= magicsize ;
 	            memcpy(bp,ep->vetu,4) ;
@@ -142,14 +142,13 @@ int strlisthdr_rd(strlisthdr *ep,char *hbuf,int hlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (strlisthdr_rd) */
+} /* end subroutine (strlisthdr_rd) */
 
 /* write to the object from the supplied buffer */
 int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (ep && hbuf) {
+	if (ep && hbuf) ylikely {
             int         bl = hlen ;
             cchar       *bp = hbuf ;
             if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
@@ -195,7 +194,6 @@ int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (strlisthdr_wr) */
+} /* end subroutine (strlisthdr_wr) */
 
 
