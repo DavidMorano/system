@@ -33,7 +33,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSYD |strncmp(3c)| */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
