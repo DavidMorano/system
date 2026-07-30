@@ -51,7 +51,7 @@
 #include	<sys/types.h>		/* POSIX® */
 #include	<unistd.h>		/* POSIX® */
 #include	<fcntl.h>		/* POSIX® */
-#include	<cerrno>		/* CSYD */
+#include	<cerrno>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdint>		/* CSTD |uintptr_t| */
