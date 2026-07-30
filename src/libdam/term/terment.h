@@ -62,10 +62,10 @@ struct terment_head {
 	uchar		termcode ;	/* ANSI terminal code */
 	uchar		lines ;
 	uchar		cols ;
-	char		id[TERMENT_LID] ;	/* UTMP ID */
-	char		line[TERMENT_LLINE] ;
-	char		termtype[TERMENT_LTERMTYPE] ;
-	char		answer[TERMENT_LANSWER] ;
+	char		id		[TERMENT_LID] ;	/* UTMP ID */
+	char		line		[TERMENT_LLINE] ;
+	char		termtype	[TERMENT_LTERMTYPE] ;
+	char		answer		[TERMENT_LANSWER] ;
 } ; /* end struct */
 
 typedef TERMENT		terment ;
