@@ -97,7 +97,7 @@ all:			$(ALL)
 
 
 $(T).o:			objprime.o objimpl.o
-	$(CXX) -r -o $@ $(LDFLAGS) objprime.o objimpl.o
+	$(CXX) -r -o $@ $(LDFLAGS) $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
