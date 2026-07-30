@@ -163,10 +163,10 @@ namespace {
     struct termtrans_terminfo {
 	cchar		*name ;
 	int		attr ;
-    } ;
+    } ; /* end struct */
     struct termtrans_sch {
 	uchar		ch1, ch2, ft, ch ;
-    } ;
+    } ; /* end struct */
     struct termtrans_gch {
 	uchar		gr ;
 	uchar		ft ;
@@ -175,24 +175,24 @@ namespace {
 	    gr = charconv(i) ;
 	    ft = charconv(i) ;
 	    ch = charconv(i) ;
-	} ;
+	} ; /* end ctor */
 	termtrans_gch(uchar ngr,uchar nft,uchar nch) noex {
 	    gr = ngr ;
 	    ft = nft ;
 	    ch = nch ;
-	} ;
+	} ; /* end ctor */
 	termtrans_gch &set(int i = 0) noex {
 		gr = charconv(i) ;
 		ft = charconv(i) ;
 		ch = charconv(i) ;
 		return (*this) ;
-	} ;
+	} ; /* end ctor */
 	termtrans_gch &set(uchar ngr,uchar nft,uchar nch) noex {
 		gr = ngr ;
 		ft = nft ;
 		ch = nch ;
 		return (*this) ;
-	} ;
+	} ; /* end ctor */
     } ; /* end struct (termstrans) */
 } /* end namespace */
 
@@ -330,8 +330,7 @@ int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 	if ((rs = termtrans_ctor(op,pr,tstr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (ncols > 0) ylikely {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	            op->ncols = ncols ;
 	            op->termattr = gettermattr(tstr,tlen) ;
 		    op->pr = pr ;
@@ -343,8 +342,7 @@ int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 	    }
 	} /* end if (termtrans_ctor) */
 	return rs ;
-}
-/* end subroutine (termtrans_start) */
+} /* end subroutine (termtrans_start) */
 
 local int termtrans_starts(TT *op) noex {
     	cnullptr	np{} ;
@@ -373,8 +371,7 @@ local int termtrans_starts(TT *op) noex {
 	    rs = SR_NOMEM ;
 	}
 	return rs ;
-}
-/* end subroutine (termtrans_starts) */
+} /* end subroutine (termtrans_starts) */
 
 int termtrans_finish(TT *op) noex {
 	int		rs ;
@@ -401,8 +398,7 @@ int termtrans_finish(TT *op) noex {
 	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termtrans_finish) */
+} /* end subroutine (termtrans_finish) */
 
 int termtrans_load(TT *op,const wchar_t *wbuf,int wlen) noex {
     	cnullptr	np{} ;
@@ -428,8 +424,7 @@ int termtrans_load(TT *op,const wchar_t *wbuf,int wlen) noex {
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ln : rs ;
-}
-/* end subroutine (termtrans_load) */
+} /* end subroutine (termtrans_load) */
 
 int termtrans_getline(TT *op,int li,cchar **lpp) noex {
 	int		rs ;
@@ -446,8 +441,7 @@ int termtrans_getline(TT *op,int li,cchar **lpp) noex {
 	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (termtrans_getline) */
+} /* end subroutine (termtrans_getline) */
 
 
 /* private subroutines */
@@ -475,8 +469,7 @@ local int termtrans_process(TT *op,const wchar_t *wbuf,int wlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-acquire) */
 	return (rs >= 0) ? ln : rs ;
-}
-/* end subroutine (termtrans_process) */
+} /* end subroutine (termtrans_process) */
 
 local int termtrans_procline(TT *op,char *obuf,int olen,
 		const wchar_t *wbuf,int wlen) noex {
@@ -497,11 +490,9 @@ local int termtrans_procline(TT *op,char *obuf,int olen,
 		rs = termtrans_proclinepost(op,obuf,ofill) ;
 		ln += rs ;
 	    }
-
 	} /* end block */
 	return (rs >= 0) ? ln : rs ;
-}
-/* end subroutine (termtrans_procline) */
+} /* end subroutine (termtrans_procline) */
 
 local int termtrans_proclinepost(TT *op,cchar *obuf,int olen) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
@@ -600,8 +591,7 @@ local int termtrans_proclinepost(TT *op,cchar *obuf,int olen) noex {
 	    len += rs ;
 	}
 	return (rs >= 0) ? ln : rs ;
-}
-/* end subroutine (termtrans_proclinepost) */
+} /* end subroutine (termtrans_proclinepost) */
 
 local int termtrans_loadline(TT *op,int ln,int nmax) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
@@ -638,8 +628,7 @@ local int termtrans_loadline(TT *op,int ln,int nmax) noex {
 	    rs = SR_NOMEM ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (termtrans_loadline) */
+} /* end subroutine (termtrans_loadline) */
 
 local int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
 	cint		grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
@@ -721,8 +710,7 @@ local int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
 	    rs = SR_NOMEM ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (termtrans_loadgr) */
+} /* end subroutine (termtrans_loadgr) */
 
 local int termtrans_loadcs(TT *op,string &line,int n,cc *pp,int pl) noex {
 	int		rs = SR_FAULT ;
@@ -771,8 +759,7 @@ local int termtrans_loadcs(TT *op,string &line,int n,cc *pp,int pl) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (termtrans_loadcs) */
+} /* end subroutine (termtrans_loadcs) */
 
 local int termtrans_loadch(TT *op,string &line,int ft,int ach) noex {
 	int		rs = SR_OK ;
@@ -804,8 +791,7 @@ local int termtrans_loadch(TT *op,string &line,int ft,int ach) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (termtrans_loadch) */
+} /* end subroutine (termtrans_loadch) */
 
 local int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
@@ -820,8 +806,7 @@ local int gettermattr(cchar *tstr,int tlen) noex {
 	    } /* end for */
 	} /* end if (non-nullptr terminal-string) */
 	return ta ;
-}
-/* end subroutine (gettermattr) */
+} /* end subroutine (gettermattr) */
 
 local int wsgetline(const wchar_t *wbuf,int wlen) noex {
 	int		wl ; /* used afterwards */
@@ -832,8 +817,7 @@ local int wsgetline(const wchar_t *wbuf,int wlen) noex {
 	} /* end for */
 	if (f) wl += 1 ;
 	return (f) ? wl : 0 ;
-}
-/* end subroutine (wsgetline) */
+} /* end subroutine (wsgetline) */
 
 local bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
 	int		i ; /* used afterwards */
@@ -847,8 +831,7 @@ local bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
 	    scp->ch = specials[i].ch ;
 	}
 	return f ;
-}
-/* end subroutine (isspecial) */
+} /* end subroutine (isspecial) */
 
 vars::operator int () noex {
 	int		rs ;
@@ -859,7 +842,6 @@ vars::operator int () noex {
 	    }
 	} /* end if (bufsizeget) */
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
