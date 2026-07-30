@@ -1,4 +1,4 @@
-/* srectab SUPPORT */
+/* srectab SUPPORT (String-Record-Table) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -17,7 +17,7 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	srectab
 
 	Description:
@@ -34,28 +34,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sysval.hh>
-#include	<bufsizevar.hh>
-#include	<endian.h>
-#include	<hash.h>
-#include	<sfx.h>
-#include	<sncpyx.h>
-#include	<mkx.h>
-#include	<isnot.h>
-#include	<localmisc.h>		/* LIBU |MODP2(3u)| */
+#include	<climits>		/* CSTD |UINT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"srectab.h"
 
@@ -65,7 +52,7 @@
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -105,10 +92,9 @@ int srectab_start(srectab *rtp,int n) noex {
 	    rtp->rt = uintp(vp) ;
 	    rtp->rt[0] = 0 ;
 	    rtp->i = 1 ;
-	}
+	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (srectab_start) */
+} /* end subroutine (srectab_start) */
 
 int srectab_finish(srectab *rtp) noex {
 	int		rs = SR_OK ;
@@ -117,10 +103,9 @@ int srectab_finish(srectab *rtp) noex {
 	    rs1 = lm_free(rtp->rt) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rtp->rt = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (srectab_finish) */
+} /* end subroutine (srectab_finish) */
 
 int srectab_add(srectab *rtp,uint ki) noex {
 	int		rs = SR_OK ;
@@ -131,10 +116,9 @@ int srectab_add(srectab *rtp,uint ki) noex {
 	if (rs >= 0) {
 	    rtp->rt[i] = ki ;
 	    rtp->i += 1 ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (srectab_add) */
+} /* end subroutine (srectab_add) */
 
 int srectab_extend(srectab *rtp) noex {
 	int		nn = (rtp->n * 2) ;
@@ -147,25 +131,21 @@ int srectab_extend(srectab *rtp) noex {
 	    } /* end if (memory-reallocation) */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (srectab_extend) */
+} /* end subroutine (srectab_extend) */
 
 int srectab_done(srectab *rtp) noex {
 	int		i = rtp->i ;
 	rtp->rt[i] = UINT_MAX ;
 	return i ;
-}
-/* end subroutine (srectab_done) */
+} /* end subroutine (srectab_done) */
 
 int srectab_count(srectab *rtp) noex {
 	return rtp->i ;
-}
-/* end subroutine (srectab_count) */
+} /* end subroutine (srectab_count) */
 
 int srectab_getvec(srectab *rtp,uint **rpp) noex {
 	*rpp = rtp->rt ;
 	return rtp->i ;
-}
-/* end subroutine (srectab_getvec) */
+} /* end subroutine (srectab_getvec) */
 
 
