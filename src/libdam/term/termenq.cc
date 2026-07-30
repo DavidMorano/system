@@ -47,6 +47,7 @@
 #include	<ucsysmisc.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
+#include	<ismisc.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"termenq.h"
@@ -114,14 +115,14 @@ local inline int termenq_magic(termenq *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (termenq_magic) */
 
-local int	termenq_initstuff(TE *,int) noex ;
-local int	termenq_filesz(TE *,time_t = 0L) noex ;
-local int	termenq_fileopen(TE *,time_t = 0L) noex ;
-local int	termenq_fileclose(TE *) noex ;
-local int	termenq_mapents(TE *,int,TE_ENT **) noex ;
-local int	termenq_mapper(TE *,int,uint,uint) noex ;
+local int	termenq_initstuff	(TE *,int) noex ;
+local int	termenq_filesz		(TE *,time_t = 0L) noex ;
+local int	termenq_fileopen	(TE *,time_t = 0L) noex ;
+local int	termenq_fileclose	(TE *) noex ;
+local int	termenq_mapents		(TE *,int,TE_ENT **) noex ;
+local int	termenq_mapper		(TE *,int,uint,uint) noex ;
 
-static bool	isproctype(int) noex ;
+local bool	isproctype(int) noex ;
 
 
 /* local variables */
@@ -159,19 +160,19 @@ int termenq_open(TE *op,cchar *dbfn,int oflags) noex {
                             } /* end if (stat) */
                             if (rs < 0) {
                                 termenq_fileclose(op) ;
-                            }
+                            } /* end if (error) */
                         } /* end if (termenq-fileopen) */
                         if (rs < 0) {
 			    void *vp = voidp(op->fname) ;
                             libmem.free(vp) ;
                             op->fname = nullptr ;
-                        }
+                        } /* end if (error) */
                     } /* end if (memory-acquire) */
 		} /* end if (termenq_initstuff) */
 	    } /* end if (pagesize) */
 	    if (rs < 0) {
 		termenq_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (termenq_ctor) */
 	return rs ;
 } /* end subroutine (termenq_open) */
@@ -203,7 +204,7 @@ int termenq_write(TE *op,int ei,TE_ENT *ep) noex {
 	int		rs ;
 	if ((rs = termenq_magic(op,ep)) >= 0) ylikely {
 	    cint	am = (op->oflags & O_ACCMODE) ;
-	    if ((am == SR_WRONLY) || (am == O_RDWR)) {
+	    if (isaccmode.wr(am)) {
 	        cint	esz = szof(TE_ENT) ;
 	        if (op->fd < 0) {
 	            rs = termenq_fileopen(op,0L) ;
@@ -211,7 +212,7 @@ int termenq_write(TE *op,int ei,TE_ENT *ep) noex {
 	        if (rs >= 0) {
 	            coff	poff = off_t(ei * esz) ;
 	            rs = u_writep(op->fd,ep,esz,poff) ;
-	        }
+	        } /* end if (ok) */
 	    } else {
 	        rs = SR_BADF ;
 	    }
@@ -266,7 +267,7 @@ int termenq_curbegin(TE *op,TE_CUR *curp) noex {
 	    }
 	    if (rs >= 0) {
 	        op->ncursors += 1 ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (termenq_curbegin) */
@@ -336,7 +337,7 @@ int termenq_fetchsid(TE *op,TE_ENT *ep,pid_t pid) noex {
 
 int termenq_curfetchln(TE *op,TE_CUR *curp,TE_ENT *ep,cchar *name) noex {
 	int		rs ;
-	int		ei = 0 ;
+	int		ei = 0 ; /* return-value */
 	if ((rs = termenq_magic(op,curp,name)) >= 0) ylikely {
 	    ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	    if (op->ncursors == 0) {
@@ -496,63 +497,53 @@ local int termenq_mapents(TE *op,int ei,TE_ENT **rpp) noex {
 	cint		esz = szof(TE_ENT) ;
 	int		en ;
 	int		rs = SR_OK ;
-	int		n = 0 ;
-
+	int		n = 0 ; /* return-value */
 	{
 	    csize	esize = size_t(esz) ;
 	    cint	nents = int((op->fsize / esize) + 1) ;
 	    en = min(nents,TERMENQ_NENTS) ;
-	}
-
+	} /* end block */
 	if (en != 0) {
-
-	if (op->mapdata) {
-	    if ((ei >= op->mapei) && (ei < (op->mapei + op->mapen))) {
-	        n = ((op->mapei + op->mapen) - ei) ;
+	    if (op->mapdata) {
+	        if ((ei >= op->mapei) && (ei < (op->mapei + op->mapen))) {
+	            n = ((op->mapei + op->mapen) - ei) ;
+	        } /* end if */
+	    } /* end if (old map was sufficient) */
+	    if ((rs >= 0) && (n == 0)) {
+	        uint	fsz = uint(op->fsize) ;
+	        uint	eoff = (ei * esz) ;
+	        uint	elen = (en * esz) ;
+	        uint	eext = (eoff + elen) ;
+	        if (eext > fsz) eext = fsz ;
+	        n = (eext - eoff) / esz ;
+	        if (n > 0) {
+	            uint	wsize ;
+	            uint	woff = ufloor(eoff,op->pagesz) ;
+	            uint	wext = uceil(eext,op->pagesz) ;
+	            wsize = (wext - woff) ;
+	            if (wsize > 0) {
+	                bool	f = (woff < op->mapoff) ;
+	                f = f || (woff >= (op->mapoff + op->mapsize)) ;
+	                if (! f) {
+	                    f = (((op->mapoff + op->mapsize) - eoff) < esz) ;
+	                }
+	                if (f) {
+	                    rs = termenq_mapper(op,ei,woff,wsize) ;
+	                    n = rs ;
+	                } /* end if */
+	            } else {
+	                n = 0 ;
+		    }
+	        } /* end if (need a map) */
+	    } /* end if (new map needed) */
+	    if (rpp) {
+	        caddr_t	ep = nullptr ;
+	        if ((rs >= 0) && (n > 0)) {
+	            ep = (((ei * esz) - op->mapoff) + op->mapdata) ;
+	        }
+	        *rpp = (TE_ENT *) ep ;
 	    } /* end if */
-	} /* end if (old map was sufficient) */
-
-	if ((rs >= 0) && (n == 0)) {
-	    uint	fsz = uint(op->fsize) ;
-	    uint	eoff = (ei * esz) ;
-	    uint	elen = (en * esz) ;
-	    uint	eext = (eoff + elen) ;
-
-	    if (eext > fsz) eext = fsz ;
-
-	    n = (eext - eoff) / esz ;
-
-	    if (n > 0) {
-	        uint	wsize ;
-	        uint	woff = ufloor(eoff,op->pagesz) ;
-	        uint	wext = uceil(eext,op->pagesz) ;
-	        wsize = (wext - woff) ;
-	        if (wsize > 0) {
-	            bool	f = (woff < op->mapoff) ;
-	            f = f || (woff >= (op->mapoff + op->mapsize)) ;
-	            if (! f) {
-	                f = (((op->mapoff + op->mapsize) - eoff) < esz) ;
-	            }
-	            if (f) {
-	                rs = termenq_mapper(op,ei,woff,wsize) ;
-	                n = rs ;
-	            } /* end if */
-	        } else {
-	            n = 0 ;
-		}
-	    } /* end if (need a map) */
-	} /* end if (new map needed) */
-
-	if (rpp) {
-	    caddr_t	ep = nullptr ;
-	    if ((rs >= 0) && (n > 0)) {
-	        ep = (((ei * esz) - op->mapoff) + op->mapdata) ;
-	    }
-	    *rpp = (TE_ENT *) ep ;
-	} /* end if */
-
 	} /* end if (non-equal-zero) */
-
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (termenq_mapents) */
 
@@ -603,7 +594,7 @@ local int termenq_mapper(TE *op,int ei,uint woff,uint wsize) noex {
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (termenq_mapper) */
 
-static bool isproctype(int type) noex {
+local bool isproctype(int type) noex {
 	bool		f = false ;
 	for (int i = 0 ; proctypes[i] >= 0 ; i += 1) {
 	    f = (type == proctypes[i]) ;
