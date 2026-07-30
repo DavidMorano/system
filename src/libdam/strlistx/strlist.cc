@@ -39,28 +39,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getpwd.h>
-#include	<absfn.h>
-#include	<endian.h>
-#include	<hash.h>
-#include	<hashindex.h>
-#include	<sncpyx.h>
-#include	<mkx.h>
-#include	<mkpathx.h>
-#include	<mkfnamesuf.h>
-#include	<nleadstr.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getpwd.h>		/* LIBUC */
+#include	<absfn.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC */
+#include	<hashindex.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkfnamesuf.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
 #include	<localmisc.h>		/* |NATURAULWORDLEN| */
 
 #include	"strlist.h"
@@ -84,10 +84,6 @@ import libutil ;			/* |memset(3u)| */
 #define	SL_MI		strlist_mi
 
 #define	SHIFTINT	(6 * 60)	/* possible time-shift */
-
-#ifndef	MODP2
-#define	MODP2(v,n)	((v) & ((n) - 1))
-#endif
 
 #ifndef	MAXMAPSIZE
 #define	MAXMAPSIZE	(512*1024*1024)
@@ -115,7 +111,7 @@ enum itentries {
 	itentry_info,
 	itentry_nhi,
 	itentry_overlast
-} ;
+} ; /* end enum (itentries) */
 
 
 /* forward references */
@@ -151,7 +147,7 @@ template<typename ... Args>
 local inline int strlist_magic(strlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == STRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == STRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (strlist_magic) */
@@ -166,7 +162,7 @@ local int strlist_dbproc(SL *,time_t) noex ;
 local int strlist_viverify(SL *,time_t) noex ;
 local int strlist_ouraudit(SL *) noex ;
 
-static bool	ismatkey(cchar *,cchar *,int) noex ;
+local bool	ismatkey(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -174,11 +170,11 @@ static bool	ismatkey(cchar *,cchar *,int) noex ;
 
 /* exported variables */
 
-SL_OBJ	strlist_modinfo = {
+const SL_OBJ	strlist_modinfo = {
 	"strlist",
 	szof(strlist),
 	szof(strlist_cur)
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -193,17 +189,17 @@ int strlist_open(SL *op,cchar *dbname) noex {
 		cchar	*fnp{} ;
 		if (absfn db ; (rs = db.start(dbname,-1,&fnp)) >= 0) ylikely {
 		    cint	fnl = rs ;
-	            if (cchar *cp{} ; (rs = lm_strw(fnp,fnl,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = lm_strw(fnp,fnl,&cp)) >= 0) {
 	                op->dbname = cp ;
 		        if ((rs = strlist_dbloadbegin(op,dt)) >= 0) {
 			    op->ti_lastcheck = dt ;
-			    op->magic = STRLIST_MAGIC ;
+			    op->magval = STRLIST_MAGIC ;
 		        }
 		        if (rs < 0) {
 	    		    void *vp = voidp(op->dbname) ;
 	    		    lm_free(vp) ;
 	    		    op->dbname = nullptr ;
-		        }
+		        } /* end if (error) */
 		    } /* end if (memory-allocation) */
 		    rs1 = db.finish ;
 		    if (rs >= 0) rs = rs1 ;
@@ -211,11 +207,10 @@ int strlist_open(SL *op,cchar *dbname) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		strlist_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (strlist_ctor) */
 	return rs ;
-}
-/* end subroutine (strlist_open) */
+} /* end subroutine (strlist_open) */
 
 int strlist_close(SL *op) noex {
 	int		rs ;
@@ -235,15 +230,14 @@ int strlist_close(SL *op) noex {
 		rs1 = strlist_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strlist_close) */
+} /* end subroutine (strlist_close) */
 
 int strlist_getinfo(SL *op,SL_INFO *vip) noex {
 	int		rs ;
-	if ((rs = strlist_magic(op,vip)) >= 0) {
+	if ((rs = strlist_magic(op,vip)) >= 0) ylikely {
 	    SL_FM	*fip = &op->vf ;
 	    strlisthdr	*hip = op->fhp ;
 	    memclear(vip) ;
@@ -257,56 +251,51 @@ int strlist_getinfo(SL *op,SL_INFO *vip) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strlist_info) */
+} /* end subroutine (strlist_info) */
 
 int strlist_audit(SL *op) noex {
 	int		rs ;
-	if ((rs = strlist_magic(op)) >= 0) {
+	if ((rs = strlist_magic(op)) >= 0) ylikely {
 	    rs = strlist_ouraudit(op) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strlist_audit) */
+} /* end subroutine (strlist_audit) */
 
 int strlist_count(SL *op) noex {
 	int		rs ;
 	int		nstrs = 0 ;
-	if ((rs = strlist_magic(op)) >= 0) {
+	if ((rs = strlist_magic(op)) >= 0) ylikely {
 	    strlisthdr	*hip = op->fhp ;
 	    nstrs = hip->nstrs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? nstrs : rs ;
-}
-/* end subroutine (strlist_count) */
+} /* end subroutine (strlist_count) */
 
 int strlist_curbegin(SL *op,SL_CUR *curp) noex {
 	int		rs ;
-	if ((rs = strlist_magic(op,curp)) >= 0) {
+	if ((rs = strlist_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	    curp->chash = 0 ;
 	    op->ncursors += 1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strlist_curbegin) */
+} /* end subroutine (strlist_curbegin) */
 
 int strlist_curend(SL *op,SL_CUR *curp) noex {
 	int		rs ;
-	if ((rs = strlist_magic(op,curp)) >= 0) {
+	if ((rs = strlist_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strlist_curend) */
+} /* end subroutine (strlist_curend) */
 
 int strlist_curlook(SL *op,SL_CUR *curp,cchar *kp,int kl) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if ((rs = strlist_magic(op,curp,kp)) >= 0) {
+	if ((rs = strlist_magic(op,curp,kp)) >= 0) ylikely {
             SL_CUR          dcur ;
             SL_MI           *mip = &op->mi ;
             strlisthdr      *hip = op->fhp ;
@@ -387,14 +376,13 @@ int strlist_curlook(SL *op,SL_CUR *curp,cchar *kp,int kl) noex {
             } /* end if (got one) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (strlist_curlook) */
+} /* end subroutine (strlist_curlook) */
 
 int strlist_curenum(SL *op,SL_CUR *curp,char *kbuf,int klen) noex {
 	int		rs ;
-	if ((rs = strlist_magic(op,curp,kbuf)) >= 0) {
+	if ((rs = strlist_magic(op,curp,kbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (op->ncursors > 0) {
+	    if (op->ncursors > 0) ylikely {
 	        SL_MI		*mip = &op->mi ;
 	        strlisthdr	*hip = op->fhp ;
 	        uint		ri = (curp->i < 1) ? 1 : (curp->i + 1) ;
@@ -417,35 +405,32 @@ int strlist_curenum(SL *op,SL_CUR *curp,char *kbuf,int klen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (strlist_curenum) */
+} /* end subroutine (strlist_curenum) */
 
 
 /* private subroutines */
 
 local int strlist_dbloadbegin(SL *op,time_t dt) noex {
 	int		rs ;
-	if ((rs = strlist_dbmapcreate(op,dt)) >= 0) {
+	if ((rs = strlist_dbmapcreate(op,dt)) >= 0) ylikely {
 	    rs = strlist_dbproc(op,dt) ;
 	    if (rs < 0) {
 		strlist_dbmapdestroy(op) ;
-	    }
+	    } /* end if (error) */
 	}
 	return rs ;
-}
-/* end subroutine (strlist_dbloadbegin) */
+} /* end subroutine (strlist_dbloadbegin) */
 
 local int strlist_dbloadend(SL *op) noex {
 	int		rs ;
-	if ((rs = strlist_dbmapdestroy(op)) >= 0) {
+	if ((rs = strlist_dbmapdestroy(op)) >= 0) ylikely {
 	    SL_MI	*mip = &op->mi ;
 	    mip->rt = nullptr ;
 	    mip->it = nullptr ;
 	    mip->kst = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (strlist_dbloadend) */
+} /* end subroutine (strlist_dbloadend) */
 
 local int strlist_dbmapcreate(SL *op,time_t dt) noex {
 	int		rs ;
@@ -460,8 +445,7 @@ local int strlist_dbmapcreate(SL *op,time_t dt) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (strlist_dbmapcreate) */
+} /* end subroutine (strlist_dbmapcreate) */
 
 local int strlist_dbmapdestroy(SL *op) noex {
 	int		rs = SR_OK ;
@@ -471,18 +455,17 @@ local int strlist_dbmapdestroy(SL *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (strlist_dbmapdestroy) */
+} /* end subroutine (strlist_dbmapdestroy) */
 
 local int strlist_filemapcreate(SL *op,SL_FM *fip,cchar *fn,time_t dt) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op && fip) {
+	if (op && fip) ylikely {
 	    cint	of = O_RDONLY ;
 	    cmode	om = 0666 ;
-	    if ((rs = u_open(fn,of,om)) >= 0) {
+	    if ((rs = u_open(fn,of,om)) >= 0) ylikely {
 	        cint	fd = rs ;
-	        if (USTAT sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
 		    cnullptr	np{} ;
 	  	    if (sb.st_size <= MAXMAPSIZE) {
 	                csize	ms = size_t(sb.st_size) ;
@@ -504,12 +487,11 @@ local int strlist_filemapcreate(SL *op,SL_FM *fip,cchar *fn,time_t dt) noex {
 	    } /* end if (mapped file) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strlist_filemapcreate) */
+} /* end subroutine (strlist_filemapcreate) */
 
 local int strlist_filemapdestroy(SL *op,SL_FM *fip) noex {
 	int		rs = SR_FAULT ;
-	if (op && fip) {
+	if (op && fip) ylikely {
 	    rs = R_OK ;
 	    if (fip->mdata) {
 		void	*md = fip->mdata ;
@@ -521,14 +503,13 @@ local int strlist_filemapdestroy(SL *op,SL_FM *fip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strlist_filemapdestroy) */
+} /* end subroutine (strlist_filemapdestroy) */
 
 local int strlist_dbproc(SL *op,time_t dt) noex {
 	SL_FM		*fip = &op->vf ;
 	SL_MI		*mip = &op->mi ;
 	int		rs = SR_FAULT ;
-	if (strlisthdr *hip = op->fhp ; hip) {
+	if (strlisthdr *hip = op->fhp ; hip) ylikely {
 	    cint	hl = int(fip->msize) ;
 	    cchar	*hp = charp(fip->mdata) ;
 	    if ((rs = strlisthdr_wr(hip,hp,hl)) >= 0) { /* write-object */
@@ -540,8 +521,7 @@ local int strlist_dbproc(SL *op,time_t dt) noex {
 	    } /* end if (strlsthdr_wr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (strlist_dbproc) */
+} /* end subroutine (strlist_dbproc) */
 
 local int strlist_viverify(SL *op,time_t dt) noex {
 	SL_FM		*fip = &op->vf ;
@@ -566,7 +546,7 @@ local int strlist_viverify(SL *op,time_t dt) noex {
 	    sz = (hip->itlen + 1) * 3 * szof(int) ;
 	    f = f && ((hip->itoff + sz) <= fip->msize) ;
 	}
-/* an extra (redundant) value */
+	/* an extra (redundant) value */
 	{
 	    f = f && (hip->nstrs == (hip->rtlen - 1)) ;
 	}
@@ -574,8 +554,7 @@ local int strlist_viverify(SL *op,time_t dt) noex {
 	    rs = SR_BADFMT ;
 	}
 	return rs ;
-}
-/* end subroutine (strlist_viverify) */
+} /* end subroutine (strlist_viverify) */
 
 local int strlist_ouraudit(SL *op) noex {
 	SL_MI		*mip = &op->mi ;
@@ -642,10 +621,9 @@ local int strlist_ouraudit(SL *op) noex {
 	    } /* end if */
 	} /* end for (index table entries) */
 	return rs ;
-}
-/* end subroutine (strlist_ouraudit) */
+} /* end subroutine (strlist_ouraudit) */
 
-static bool ismatkey(cchar *key,cchar *kp,int kl) noex {
+local bool ismatkey(cchar *key,cchar *kp,int kl) noex {
 	int		m ;
 	int		f = (key[0] == kp[0]) ;
 	if (f) {
@@ -653,7 +631,6 @@ static bool ismatkey(cchar *key,cchar *kp,int kl) noex {
 	    f = (m == kl) && (key[m] == '\0') ;
 	}
 	return f ;
-}
-/* end subroutine (ismatkey) */
+} /* end subroutine (ismatkey) */
 
 
