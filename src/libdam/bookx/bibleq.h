@@ -39,8 +39,8 @@ struct bibleq_flags {
 } ; /* end struct */
 
 struct bibleq_cursor  {
-	void	*scp ;		/* SO-cursor pointer */
-	uint	magval ;
+	void		*scp ;		/* SO-cursor pointer */
+	uint		magval ;
 } ; /* end struct */
 
 struct bibleq_head {
