@@ -37,16 +37,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<matostr.h>
-#include	<cfnum.h>
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |isnumlatin(3uc) */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<matostr.h>		/* LIBUC */
+#include	<cfnum.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC |isnumlatin(3uc) */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"optval.h"
 
@@ -107,7 +107,6 @@ int optval(cchar *sp,int µsl) noex {
 	    } /* end if */
 	} /* end if (getlenstr) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (optval) */
+} /* end subroutine (optval) */
 
 
