@@ -13,15 +13,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* systems types */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-
-#include	<strlistmks.h>
+#include	<sys/types.h>		/* POSIX® systems types */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
+#include	<strlistmks.h>		/* LIBUC */
 
 
 #define	STRLISTMK		struct strlistmk_head
@@ -40,7 +36,7 @@ struct strlistmk_head {
 	void		*callp ;	/* calls-structure-pointer */
 	void		*obj ;		/* object pointer */
 	STRLISTMK_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		objsize ;	/* object size */
 } ; /* end struct */
 
