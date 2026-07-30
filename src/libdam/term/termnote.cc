@@ -453,9 +453,9 @@ int termnote_write(TN *op,cc **rpp,int mw,int o,cc *sbuf,int slen) noex {
 	            char	tbuf[TIMEBUFLEN+1] ;
 	            if ((rs = snsdd(sublogid,LOGIDLEN,op->logid,op->sn)) >= 0) {
 		        if ((rs = logfile_setid(op->lfp,sublogid)) >= 0) {
-		            cbool	fbel = !!(o & TERMNOTE_OBELL) ;
-		            cbool	fbiff = !!(o & TERMNOTE_OBIFF) ;
-		            cbool	fall = !!(o & TERMNOTE_OALL) ;
+		            cbool	fbel	= !!(o & TERMNOTE_OBELL) ;
+		            cbool	fbiff	= !!(o & TERMNOTE_OBIFF) ;
+		            cbool	fall	 = !!(o & TERMNOTE_OALL) ;
 		            cchar	*fmt ;
 		            if (dt == 0) dt = getustime ;
 		            timestr_logz(dt,tbuf),
