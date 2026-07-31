@@ -55,12 +55,12 @@
 
 	int progmailget(pip,app)
 	PROGINFO	*pip ;
-	PARAMOPT	*app ;
+	paramopt	*app ;
 
 	Arguments:
 
 	pip		program information pointer
-	app		pointer to argument PARAMOPT object
+	app		pointer to argument paramopt object
 
 	Returns:
 
@@ -90,7 +90,7 @@
 #include	<spawnproc.h>
 #include	<localmisc.h>
 
-#include	"config.h"
+#include	"vmail_config.h"
 #include	"defs.h"
 
 
@@ -149,10 +149,10 @@ struct muinfo {
 
 /* forward references */
 
-static int	procmailgeter(PROGINFO *,PARAMOPT *) ;
-static int	procmailgeteruc(PROGINFO *,PARAMOPT *,vechand *) ;
+static int	procmailgeter(PROGINFO *,paramopt *) ;
+static int	procmailgeteruc(PROGINFO *,paramopt *,vechand *) ;
 static int	procmailgeterux(PROGINFO *,vechand *,cchar *,cchar *) ;
-static int	procmuc(PROGINFO *,PARAMOPT *,const char *) ;
+static int	procmuc(PROGINFO *,paramopt *,const char *) ;
 static int	procmailgeteru(PROGINFO *,vechand *) ;
 static int	procmailgeterum(PROGINFO *,vechand *,int,const char *) ;
 static int	procmkenvusers(PROGINFO *,vechand *,ENVHELP *,struct muinfo *) ;
@@ -178,7 +178,7 @@ static cchar	*envbads[] = { /* these are not really necessary */
 /* exported subroutines */
 
 
-int progmailget(PROGINFO *pip,PARAMOPT *app)
+int progmailget(PROGINFO *pip,paramopt *app)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -260,7 +260,7 @@ int progmailget(PROGINFO *pip,PARAMOPT *app)
 /* local subroutines */
 
 
-static int procmailgeter(PROGINFO *pip,PARAMOPT *app)
+static int procmailgeter(PROGINFO *pip,paramopt *app)
 {
 	vecstr		*mlp = &pip->mailusers ;
 	int		rs ;
@@ -322,7 +322,7 @@ static int procmailgeter(PROGINFO *pip,PARAMOPT *app)
 /* end subroutine (procmailgeter) */
 
 
-static int procmailgeteruc(PROGINFO *pip,PARAMOPT *app,vechand *mlp)
+static int procmailgeteruc(PROGINFO *pip,paramopt *app,vechand *mlp)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -374,9 +374,9 @@ static int procmailgeteruc(PROGINFO *pip,PARAMOPT *app,vechand *mlp)
 /* end subroutine (procmailgeteruc) */
 
 
-static int procmuc(PROGINFO *pip,PARAMOPT *app,const char *mup)
+static int procmuc(PROGINFO *pip,paramopt *app,const char *mup)
 {
-	PARAMOPT_CUR	cur ;
+	paramopt_cur	cur ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
