@@ -1,4 +1,4 @@
-/* progterm SUPPORT */
+/* vmail_term SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -8,7 +8,6 @@
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_TERMSTORE	0		/* use 'termstore()' */
-#define	CF_INTERCMD	1		/* alloc inter-commands */
 
 /* revision history:
 
@@ -48,8 +47,9 @@
 #include	<bfile.h>
 #include	<uterm.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
-#include	"config.h"
+#include	"vmail_config.h"
 #include	"defs.h"
 #include	"inter.h"
 
@@ -58,26 +58,6 @@
 
 
 /* external subroutines */
-
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	tcgetlines(int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -88,9 +68,9 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int proctermlines(PROGINFO *,UTERM *) ;
-static int procmesg_begin(PROGINFO *,UTERM *) ;
-static int procmesg_end(PROGINFO *,UTERM *) ;
+local int proctermlines(PROGINFO *,uterm *) noex ;
+local int procmesg_begin(PROGINFO *,uterm *) noex ;
+local int procmesg_end(PROGINFO *,uterm *) noex ;
 
 
 /* local variables */
@@ -106,7 +86,6 @@ int progterm(progifo *pip) noex {
 	int		rs1 ;
 
 	if (isatty(pip->tfd)) {
-	UTERM		ut ;
 
 /* part one -- get a terminal type */
 
@@ -116,25 +95,21 @@ int progterm(progifo *pip) noex {
 
 /* terminal input-manager initialization and GO */
 
-	if ((rs = uterm_start(&ut,pip->tfd)) >= 0) {
+	if (uterm ut ; (rs = uterm_start(&ut,pip->tfd)) >= 0) {
 	    if ((rs = proctermlines(pip,&ut)) >= 0) {
 		if ((rs = procmesg_begin(pip,&ut)) >= 0) {
 		    cint	ucmd = utermcmd_setmode ;
 		    cint	fm = fm_notecho ;
 	            if ((rs = uterm_control(&ut,ucmd,fm)) >= 0) {
-			INTER		ia ;
-
 	        	pip->iap = &ia ;
-	        	if ((rs = inter_start(&ia,pip,&ut)) >= 0) {
-
-#if	CF_INTERCMD
-	                    while ((rs = inter_cmd(&ia)) > 0) ;
-#endif /* CF_INTERCMD */
-
+			if (INTER ia ; (rs = inter_start(&ia,pip,&ut)) >= 0) {
+			    {
+	                        while ((rs = inter_cmd(&ia)) > 0) ;
+			    }
 	                    rs1 = inter_finish(&ia) ;
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (inter) */
-	                pip->iap = NULL ;
+	                pip->iap = nullptr ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -176,25 +151,26 @@ int progterm(progifo *pip) noex {
 
 /* local subroutines */
 
-static int proctermlines(PROGINFO *pip,UTERM *utp) noex {
+local int proctermlines(PROGINFO *pip,uterm *utp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		v ;
 	cchar	*cp ;
 
 #ifdef	COMMENT
-	if (pip->termtype == NULL) pip->termtype = getenv(VARTERM) ;
-	if (pip->termtype == NULL) pip->termtype = DEFTERMTYPE ;
+	if (pip->termtype == nullptr) pip->termtype = getenv(VARTERM) ;
+	if (pip->termtype == nullptr) pip->termtype = DEFTERMTYPE ;
 #endif /* COMMENT */
 
 /* actual terminal lines */
 
 	if (pip->lines_term <= 0) {
-	    if ((cp = getenv(VARLINES)) != NULL) {
+	    static cchar *varp = getenv(VARLINES) ;
+	    if (varp) {
 	        if (cfdeci(cp,-1,&v) >= 0) {
 		    pip->lines_term = v ;
 		}
-	    }
+	    } /* end if (getenv-varlines) */
 	}
 
 	if (pip->lines_term <= 0) {
@@ -225,25 +201,25 @@ static int proctermlines(PROGINFO *pip,UTERM *utp) noex {
 /* ensure a minimum number of viewable terminal lines */
 
 	if (pip->lines_req < (MINSCANLINES + MINVIEWLINES + FRAMELINES)) {
+	    cchar *fmt = "%s: not enough terminal lines for program\n" ;
 	    rs = SR_DOM ;
-	    bprintf(pip->efp,"%s: not enough terminal lines for program\n",
-		pip->progname) ;
+	    bprintf(pip->efp,fmt,pip->progname) ;
 	}
 
 	return rs ;
 }
 /* end subroutine (proctermlines) */
 
-
-static int procmesg_begin(PROGINFO *pip,UTERM *utp)
-{ 
+local int procmesg_begin(PROGINFO *pip,uterm *utp) noex {
+    	int		ucmd ;
 	int		rs ;
-	if ((rs = uterm_control(utp,utermcmd_getuid,0)) >= 0) {
+	ucmd = utermcmd_getuid ;
+	if ((rs = uterm_control(utp,ucmd,0)) >= 0) {
 	    if (pip->euid == rs) {
-		cint	ucmd = utermcmd_setmesg ;
-		if ((rs = uterm_control(utp,ucmd,FALSE)) >= 0) {
+		ucmd = utermcmd_setmesg ;
+		if ((rs = uterm_control(utp,ucmd,false)) >= 0) {
 	    	    pip->fl.mesgs = (rs > 0) ;
-		    if (rs > 0) pip->changed.mesgs = TRUE ;
+		    if (rs > 0) pip->changed.mesgs = true ;
 		}
 	    }
 	}
@@ -251,9 +227,7 @@ static int procmesg_begin(PROGINFO *pip,UTERM *utp)
 }
 /* end subroutine (procmesg_begin) */
 
-
-static int procmesg_end(PROGINFO *pip,UTERM *utp)
-{
+local int procmesg_end(PROGINFO *pip,uterm *utp) noex {
 	int		rs = SR_OK ;
 	if (pip->changed.mesgs) {
 	    cint	ucmd = utermcmd_setmesg ;
