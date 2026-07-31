@@ -40,13 +40,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfxname.h"
 
@@ -86,7 +86,7 @@ import libutil ;			/* |lenstr(3u)| */
 int sfbasename(cchar *sp,int 탎l,cchar **rpp) noex {
 	int		rl = -1 ; /* return-value */
 	cchar		*rp = nullptr ;
-	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
+	if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
 	    while ((sl > 1) && (sp[sl - 1] == '/')) {
 	        sl -= 1 ;
 	    }
@@ -94,7 +94,7 @@ int sfbasename(cchar *sp,int 탎l,cchar **rpp) noex {
 	        int	si ; /* used-afterwards */
 	        for (si = sl ; si > 0 ; si -= 1) {
 	            if (sp[si - 1] == '/') break ;
-	        }
+	        } /* end for */
 	        if ((sl == 1) && (si == 1) && (sp[0] == '/')) {
 	            si -= 1 ;
 	        }
