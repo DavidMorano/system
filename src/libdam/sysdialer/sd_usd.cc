@@ -59,6 +59,9 @@
 #include	"envs.h"
 #include	"inetaddrparse.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -76,11 +79,11 @@
 #define	USD_LOGDNAME	"log"
 #define	USD_LOGFNAME	SYSDIALER_LF
 
+#define	SI		subinfo
+
 #ifndef	SVCNAMELEN
 #define	SVCNAMELEN	32
 #endif
-
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
 
 #define	NPARG		2	/* number of positional arguments */
 #define	MAXARGINDEX	100
@@ -180,27 +183,27 @@ struct intprog {
 } ; /* end struct */
 
 struct afamily {
-	cchar	*name ;
+	cchar		*name ;
 	int		af ;
 } ; /* end struct */
 
 
 /* forward references */
 
-static int	subinfo_start(struct subinfo *,USD *,SYSDIALER_ARGS *,
+local int	subinfo_start(SI *,USD *,SYSDIALER_ARGS *,
 			cchar *,cchar *) ;
-static int	subinfo_procargs(struct subinfo *) ;
-static int	subinfo_procopts(struct subinfo *,KEYOPT *) ;
-static int	subinfo_defaults(struct subinfo *) ;
-static int	subinfo_userinfo(struct subinfo *) ;
-static int	subinfo_logfile(struct subinfo *) ;
-static int	subinfo_addrparse(struct subinfo *) ;
-static int	subinfo_addrparseunix(struct subinfo *,int) ;
-static int	subinfo_addrparseinet(struct subinfo *) ;
-static int	subinfo_dirok(struct subinfo *,cchar *,int) ;
-static int	subinfo_setentry(struct subinfo *,cchar **,
+local int	subinfo_procargs(SI *) ;
+local int	subinfo_procopts(SI *,keyopt *) ;
+local int	subinfo_defaults(SI *) ;
+local int	subinfo_userinfo(SI *) ;
+local int	subinfo_logfile(SI *) ;
+local int	subinfo_addrparse(SI *) ;
+local int	subinfo_addrparseunix(SI *,int) ;
+local int	subinfo_addrparseinet(SI *) ;
+local int	subinfo_dirok(SI *,cchar *,int) ;
+local int	subinfo_setentry(SI *,cchar **,
 			cchar *,int) ;
-static int	subinfo_finish(struct subinfo *) ;
+local int	subinfo_finish(SI *) ;
 
 
 /* local variables */
@@ -246,13 +249,13 @@ constexpr cpcchar	procopts[] = {
 
 /* external variables (module information) */
 
-SYSDIALER_INFO	usd = {
+SYSDIALER_INFO	sd_usd = {
 	USD_MNAME,
 	USD_VERSION,
 	USD_INAME,
-	sizeof(USD),
+	szof(USD),
 	USD_MF
-} ;
+} ; /* end object */
 
 
 /* exported subroutines */
@@ -264,7 +267,7 @@ cchar	hostname[] ;
 cchar	svcname[] ;
 cchar	*av[] ;
 {
-	struct subinfo	si, *sip = &si ;
+	SI		si, *sip = &si ;
 	int		rs ;
 	int		rs1 ;
 	int		opts = 0 ;
@@ -279,7 +282,7 @@ cchar	*av[] ;
 	if (hostname[0] == '\0')
 	    return SR_INVALID ;
 
-	memset(op,0,sizeof(USD)) ;
+	memclear(op) ;
 
 #if	CF_DEBUGS
 	{
@@ -630,8 +633,7 @@ USD		*op ;
 
 /* local subroutines */
 
-
-static int subinfo_start(sip,op,ap,hostname,svcname)
+local int subinfo_start(sip,op,ap,hostname,svcname)
 struct subinfo	*sip ;
 USD		*op ;
 SYSDIALER_ARGS	*ap ;
@@ -639,7 +641,7 @@ cchar	hostname[], svcname[] ;
 {
 	int		rs = SR_OK ;
 
-	memset(sip,0,sizeof(struct subinfo)) ;
+	memclear(sip) ; /* dangerous */
 
 	sip->envv = (cchar **) environ ;
 	sip->op = op ;
@@ -671,7 +673,7 @@ cchar	hostname[], svcname[] ;
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(sip)
+local int subinfo_finish(sip)
 struct subinfo	*sip ;
 {
 	int		rs = SR_OK ;
@@ -718,10 +720,10 @@ struct subinfo	*sip ;
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_procargs(sip)
+local int subinfo_procargs(sip)
 struct subinfo	*sip ;
 {
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	SYSDIALER_ARGS	*ap = sip->ap ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1210,11 +1212,11 @@ ret0:
 /* end subroutine (subinfo_procargs) */
 
 
-static int subinfo_procopts(sip,kop)
+local int subinfo_procopts(sip,kop)
 struct subinfo	*sip ;
-KEYOPT		*kop ;
+keyopt		*kop ;
 {
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 	int		rs ;
 	int		oi ;
 	int		kl, vl ;
@@ -1258,7 +1260,7 @@ KEYOPT		*kop ;
 /* end subroutine (subinfo_procopts) */
 
 
-static int subinfo_setentry(sip,epp,v,vlen)
+local int subinfo_setentry(sip,epp,v,vlen)
 struct subinfo	*sip ;
 cchar	**epp ;
 cchar	v[] ;
@@ -1314,7 +1316,7 @@ int		vlen ;
 /* end subroutine (subinfo_setentry) */
 
 
-static int subinfo_defaults(sip)
+local int subinfo_defaults(sip)
 struct subinfo	*sip ;
 {
 	SYSDIALER_ARGS	*ap = sip->ap ;
@@ -1408,7 +1410,7 @@ struct subinfo	*sip ;
 /* end subroutine (subinfo_defaults) */
 
 
-static int subinfo_userinfo(sip)
+local int subinfo_userinfo(sip)
 struct subinfo	*sip ;
 {
 	USERINFO	*uip = &sip->u ;
@@ -1447,7 +1449,7 @@ bad0:
 /* end subroutine (subinfo_userinfo) */
 
 
-static int subinfo_logfile(sip)
+local int subinfo_logfile(sip)
 struct subinfo	*sip ;
 {
 	USD		*op = sip->op ;
@@ -1513,7 +1515,7 @@ ret0:
 /* end subroutine (subinfo_logfile) */
 
 
-static int subinfo_dirok(sip,d,dlen)
+local int subinfo_dirok(sip,d,dlen)
 struct subinfo	*sip ;
 cchar	d[] ;
 int		dlen ;
@@ -1551,7 +1553,7 @@ int		dlen ;
 /* end subroutine (subinfo_dirok) */
 
 
-static int subinfo_addrparse(sip)
+local int subinfo_addrparse(sip)
 struct subinfo	*sip ;
 {
 	int		rs = SR_OK ;
@@ -1583,7 +1585,7 @@ ret0:
 }
 /* end subroutine (subinfo_addrparse) */
 
-static int subinfo_addrparseunix(subinfo *sip,int f) noex {
+local int subinfo_addrparseunix(subinfo *sip,int f) noex {
 	int		rs = SR_OK ;
 	int		pslen = -1 ;
 	cchar		*ps = sip->portspec ;
@@ -1613,10 +1615,7 @@ ret0:
 }
 /* end subroutine (subinfo_addrparseunix) */
 
-
-static int subinfo_addrparseinet(sip)
-struct subinfo	*sip ;
-{
+local int subinfo_addrparseinet(SI *sip) noex {
 	INETADDRPARSE	a ;
 	int		rs ;
 	int		rs1 ;
@@ -1638,14 +1637,17 @@ struct subinfo	*sip ;
 
 	} /* end if */
 
-	if ((rs >= 0) && (a.host.sp != nullptr) && a.host.sl)
+	if ((rs >= 0) && (a.host.sp != nullptr) && a.host.sl) {
 	    rs = subinfo_setentry(sip,&sip->hostname,a.host.sp,a.host.sl) ;
+	}
 
-	if ((rs >= 0) && (a.port.sp != nullptr) && a.port.sl)
+	if ((rs >= 0) && (a.port.sp != nullptr) && a.port.sl) {
 	    rs = subinfo_setentry(sip,&sip->portspec,a.port.sp,a.port.sl) ;
+	}
 
-	if (sip->af < 0)
+	if (sip->af < 0) {
 	    sip->af = AF_INET4 ;
+	}
 
 	} /* end if */
 
