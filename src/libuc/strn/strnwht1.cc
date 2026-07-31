@@ -56,7 +56,7 @@ module ;
 #include	<climits>		/* CSTD |CHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* |nullptr_t| */
+#include	<new>			/* C++STD |nullptr_t| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<char.h>		/* LIBYC |CHAR_ISWHT(3uc)| */
