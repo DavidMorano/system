@@ -109,7 +109,7 @@ int sfweirdo(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
 int sfxbrk::operator () (cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
 	bool		f = false ;
 	cchar		*rp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if ((rp = xbrk(sp,sl,sb)) != nullptr) {
 		f = true ;
