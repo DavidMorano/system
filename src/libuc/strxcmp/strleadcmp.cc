@@ -27,17 +27,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* |strcasecmp(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
-#include	<cmporders.h>
+#include	<strings.h>		/* CSTD |strcasecmp(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<cmporders.h>		/* LIBU */
 
 #include	"strleadcmp.h"
 
@@ -75,7 +75,7 @@ typedef cmporders	co ;
 
 int strleadcmp(cchar *s1,cchar *s2) noex {
 	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    while (*s2) {
 		cint ch1 = mkchar(*s1++) ;
 		cint ch2 = mkchar(*s2++) ;
@@ -84,12 +84,11 @@ int strleadcmp(cchar *s1,cchar *s2) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (strleadcmp) */
+} /* end subroutine (strleadcmp) */
 
 int strxleadcmp(cchar *s1,cchar *s2) noex {
     	int		rc = 0 ;
-	if (s1 || s2) {
+	if (s1 || s2) ylikely {
 	    rc = +1 ;
 	    if (s1) {
 		rc = -1 ;
