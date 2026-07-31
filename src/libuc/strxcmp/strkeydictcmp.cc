@@ -43,19 +43,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* |strcasecmp(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<dictdiff.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
-#include	<cmporders.h>
+#include	<strings.h>		/* CSTD |strcasecmp(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<dictdiff.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<cmporders.h>		/* LIBU */
 
 #include	"strkeycmp.h"
 
@@ -93,7 +93,7 @@ typedef cmporders	co ;
 
 int strkeydictcmp(cchar *s1,cchar *s2) noex {
 	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
             while (*s1 && *s2) {
                 if ((*s1 == '=') || (*s2 == '=')) break ;
                 if (! isdict(*s1)) {
@@ -117,7 +117,6 @@ int strkeydictcmp(cchar *s1,cchar *s2) noex {
             if (*s2 == '=') rc = (*s1 == '\0') ? 0 : +1 ;
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (strkeydictcmp) */
+} /* end subroutine (strkeydictcmp) */
 
 
