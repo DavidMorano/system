@@ -15,27 +15,27 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<csignal>
-#include	<cstring>
-#include	<ctime>
+#include	<curses.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<curses.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>
+#include	<cstdlib>
 #include	<cstdio>
-
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<logfile.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 
-#include	"config.h"
+#include	"vmail_config.h"
 #include	"defs.h"
 #include	"profile.h"
 
@@ -77,38 +77,27 @@ const char	opt[];
 }
 /* end subroutine (profile) */
 
-
-
-/* initializes the various profile options.
+/****
+	initializes the various profile options.
    any user-specified ones are contained in the shell variable RDMAILOPTS.
-   these options then override the defaults in the global profile structure
+   these options then over-ride the defaults in the global profile structure
     "userprof".  this structure is defined in "defs.c" and declared
     in "config.h" (which is included into every function file).
    set options (+) have value 1, not set (-) have value 0.
- */
+****/
 
-
-int profinit()
-{
+int profinit() noex {
 	int i,val;
-
 	char 	opts[MAXPATHLEN + 1],*opt;
-
-
-/* check for user overrides */
-
+	/* check for user over-rides */
 	opt = getenv("RDMAILOPTS");
-
-	if ((opt == NULL) || (*opt == '\0'))
+	if ((opt == NULL) || (*opt == '\0')) {
 	    strcpy(opts,DRDMAILOPTS);
-
-	else
+	} else {
 	    strcpy(opts, opt );
-
+	}
 	opt = strtok(opts,":");
-
 	if (opt != NULL) {
-
 	    do {
 
 #if	CF_DEBUG
