@@ -39,13 +39,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnrchr(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnrchr(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
