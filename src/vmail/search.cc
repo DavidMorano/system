@@ -32,12 +32,9 @@
    However, evaluation and matching must be done on internal.
   Returns 0 if can do matching, 1 if expression improperly formed.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -45,12 +42,15 @@
 #include	<cstring>
 #include	<curses.h>
 #include	<cstdio>
-
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<bfile.h>
 #include	<localmisc.h>
 
-#include	"config.h"
-#include	"defs.h"
+#include	"vmail_config.h"
+#include	"vmail_defs.h"
 #include	"mb.h"
 
 
