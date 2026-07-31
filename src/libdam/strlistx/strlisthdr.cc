@@ -42,7 +42,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |memset(3c)| */
+#include	<cstring>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -94,11 +94,13 @@ enum his {
 /* local variables */
 
 constexpr cint		hdrsz		= hi_overlast * szof(uint) ;
-constexpr cint		magicsize	= STRLISTHDR_MAGICSIZE ;
+constexpr cint		magicsz		= STRLISTHDR_MAGICSZ ;
 constexpr cchar		magicstr[]	= STRLISTHDR_MAGICSTR ;
 
 
 /* exported variables */
+
+const strlisthdr_params	strlisthdr_param ;
 
 
 /* exported subroutines */
@@ -110,10 +112,10 @@ int strlisthdr_rd(strlisthdr *ep,char *hbuf,int hlen) noex {
 	if (ep && hbuf) ylikely {
 	    char	*bp = hbuf ;
 	    int		bl = hlen ;
-	    if (bl >= (magicsize + 4)) ylikely {
-	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) ylikely {
-	            bp += magicsize ;
-	            bl -= magicsize ;
+	    if (bl >= (magicsz + 4)) ylikely {
+	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) ylikely {
+	            bp += magicsz ;
+	            bl -= magicsz ;
 	            memcpy(bp,ep->vetu,4) ;
 	            *bp = STRLISTHDR_VERSION ;
 	            bp += 4 ;
@@ -151,10 +153,10 @@ int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
 	if (ep && hbuf) ylikely {
             int         bl = hlen ;
             cchar       *bp = hbuf ;
-            if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+            if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) {
                 rs = SR_OK ;
-                bp += magicsize ;
-                bl -= magicsize ;
+                bp += magicsz ;
+                bl -= magicsz ;
                 /* read out the VETU information */
                 if (bl >= 4) {
                     memcpy(ep->vetu,bp,4) ;
