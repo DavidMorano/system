@@ -10,23 +10,6 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
-#include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<csignal>
-#include	<cstring>
-#include	<ctime>
-
-#include	<bfile.h>
-
-#include	"config.h"
-#include	"defs.h"
-
-
 /*******************************************************************************
 
  parses the specified logical expression, placing the tokens into
@@ -41,8 +24,24 @@
 
   Returns 0 if successful, 1 if error.
 
-
 *******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
+#include	<sys/param.h>
+#include	<sys/stat.h>
+#include	<unistd.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bfile.h>
+
+#include	"vmail_config.h"
+#include	"vmail_defs.h"
 
 
 /* local defines */
