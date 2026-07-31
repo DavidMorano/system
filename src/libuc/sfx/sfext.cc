@@ -42,13 +42,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<six.h>			/* |sirchr(3uc)| */
-#include	<ascii.h>		/* |CH_DOT| + |CH_SLASH| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<six.h>			/* LIBUC |sirchr(3uc)| */
+#include	<ascii.h>		/* LIBU |CH_DOT| + |CH_SLASH| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 #include	"sfext.h"
@@ -110,7 +110,7 @@ int sfext(cchar *sp,int µsl,cchar **rpp) noex {
 	if (sp && rpp) ylikely {
 	    cchar	*ep = nullptr ;
 	    if_constexpr (f_sirchr) {
-		if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+		if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 		    while ((sl > 0) && (sp[sl - 1] == CH_SLASH)) {
 		        sl -= 1 ;
 		    }
