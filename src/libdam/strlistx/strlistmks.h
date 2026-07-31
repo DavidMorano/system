@@ -28,6 +28,14 @@
 #define	STRLISTMKS_VERSION	0
 
 
+#ifdef	__cplusplus
+struct strlistmks_params {
+	static constexpr int	magic	= 0x88773423 ;
+	static constexpr int	nents	= (2 * 1024) ;
+	static constexpr int	version	= 0 ;
+} ; /* end struct */
+#endif /* __cplusplus */
+
 struct strlistmks_object {
 	cchar		*name ;
 	uint		objsz ;
@@ -64,11 +72,11 @@ typedef	STRLISTMKS_OBJ	strlistmks_obj ;
 
 EXTERNC_begin
 
-extern int	strlistmks_open(strlistmks *,cchar *,int,mode_t,int) noex ;
-extern int	strlistmks_addvar(strlistmks *,cchar *,int) noex ;
-extern int	strlistmks_abort(strlistmks *) noex ;
-extern int	strlistmks_chgrp(strlistmks *,gid_t) noex ;
-extern int	strlistmks_close(strlistmks *) noex ;
+extern int strlistmks_open	(strlistmks *,cchar *,int,mode_t,int) noex ;
+extern int strlistmks_addvar	(strlistmks *,cchar *,int) noex ;
+extern int strlistmks_abort	(strlistmks *) noex ;
+extern int strlistmks_chgrp	(strlistmks *,gid_t) noex ;
+extern int strlistmks_close	(strlistmks *) noex ;
 
 EXTERNC_end
 
@@ -86,6 +94,10 @@ local inline int strlistmks_magic(strlistmks *op,Args ... args) noex {
 #endif /* __cplusplus */
 
 extern const strlistmks_obj	strlistmks_modinfo ;
+
+#ifdef	__cplusplus
+extern const strlistmks_params strlistmks_param ;
+#endif /* __cplusplus */
 
 
 #endif /* STRLISTMKS_INCLUDE */
