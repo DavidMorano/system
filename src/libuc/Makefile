@@ -1070,11 +1070,6 @@ gethe.o:		gethe.dir
 gethe.dir:
 	makesubdir $@
 
-# CACHES
-caches.o:		caches.dir
-caches.dir:
-	makesubdir $@
-
 # string-constants
 sysdbfiles.o:		sysdbfiles.cc	sysdbfiles.h
 sysdbfn.o:		sysdbfn.cc	sysdbfn.h
