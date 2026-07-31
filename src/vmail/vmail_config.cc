@@ -1,4 +1,5 @@
 /* progconfig SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* program configuration */
@@ -18,6 +19,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This module contains the subroutines that manage program
 	configuration.
 
@@ -32,18 +34,24 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
 #include	<ascii.h>
+#include	<prmkfname.h>		/* LIBPR */
 #include	<localmisc.h>
 
-#include	"prmkfname.h"
-#include	"config.h"
+#include	"vmail_config.h"
 #include	"defs.h"
 
 
 /* local defines */
+
+#define	PI		proginfo
+
+#define	PCONF		struct pconf
+#define	PCONF_FL	struct pconf_flags
 
 #ifndef	KBUFLEN
 #define	KBUFLEN		(4 * MAXPATHLEN)
@@ -61,36 +69,13 @@
 #define	EBUFLEN		(4 * MAXPATHLEN)
 #endif
 
-#define	PCONF		struct pconf
-#define	PCONF_FL	struct pconf_flags
-
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	cfdecmfu(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	hasalldig(const char *,int) ;
-extern int	isNotPresent(int) ;
-
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) noex ;
+extern int	strlinelen(cchar *,int,int) noex ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* local structures */
@@ -100,48 +85,48 @@ struct pconf_flags {
 } ;
 
 struct pconf {
-	PROGINFO	*pip ;
-	const char	**envv ;
+	proginfo	*pip ;
+	cchar	**envv ;
 	PCONF_FL	f ;
-	PARAMFILE	params ;
+	paramfile	params ;
 	int		nf ;		/* n-files */
 } ;
 
 
 /* forward references */
 
-static int procfile(PROGINFO *,const char **,const char *) ;
-static int procfile_begin(PROGINFO *) ;
-static int procfile_end(PROGINFO *) ;
-static int procfile_load(PROGINFO *,const char *) ;
-static int procauxprog(PROGINFO *,const char *,int) ;
+local int procfile(PI *,cchar **,cchar *) ;
+local int procfile_begin(PI *) ;
+local int procfile_end(PI *) ;
+local int procfile_load(PI *,cchar *) ;
+local int procauxprog(PI *,cchar *,int) ;
 
-static int pconf_start(PCONF *,PROGINFO *,const char **) ;
-static int pconf_fileadd(PCONF *,const char *) ;
-static int pconf_check(PCONF *,time_t) ;
-static int pconf_load(PCONF *) ;
-static int pconf_loader(PCONF *,char *,int) ;
-static int pconf_finish(PCONF *) ;
+local int pconf_start(PCONF *,PI *,cchar **) ;
+local int pconf_fileadd(PCONF *,cchar *) ;
+local int pconf_check(PCONF *,time_t) ;
+local int pconf_load(PCONF *) ;
+local int pconf_loader(PCONF *,char *,int) ;
+local int pconf_finish(PCONF *) ;
 
 
 /* local variables */
 
-static const char	*sysconfs[] = {
+static cchar	*sysconfs[] = {
 	"%p/etc/%n/%n.%f",
 	"%p/etc/%n/%f",
 	"%p/etc/%n.%f",
 	"%p/%n.%f",
-	NULL
+	nullptr
 } ;
 
-static const char	*usrconfs[] = {
+static cchar	*usrconfs[] = {
 	"%h/etc/%n/%n.%f",
 	"%h/etc/%n/%f",
 	"%h/etc/%n.%f",
-	NULL
+	nullptr
 } ;
 
-static const char	*params[] = {
+static cchar	*params[] = {
 	"cmdkey",
 	"logfile",
 	"loglen",
@@ -153,7 +138,7 @@ static const char	*params[] = {
 	"mbinput",
 	"mbspam",
 	"mbtrash",
-	NULL
+	nullptr
 } ;
 
 enum params {
@@ -171,7 +156,7 @@ enum params {
 	param_overlast
 } ;
 
-static const char	*prognames[] = {
+static cchar	*prognames[] = {
 	"shell",
 	"getmail",
 	"mailer",
@@ -179,7 +164,7 @@ static const char	*prognames[] = {
 	"metamail",
 	"pager",
 	"postspam",
-	NULL
+	nullptr
 } ;
 
 enum prognames {
@@ -197,7 +182,7 @@ enum prognames {
 /* exported subroutines */
 
 
-int progconf_begin(PROGINFO *pip)
+int progconf_begin(PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -220,7 +205,7 @@ int progconf_begin(PROGINFO *pip)
 
 	if (rs >= 0) {
 	    cchar	*cfn = pip->cfname ;
-	    if (cfn == NULL) cfn = CONFIGFNAME ;
+	    if (cfn == nullptr) cfn = CONFIGFNAME ;
 	    rs = procfile(pip,usrconfs,cfn) ;
 	}
 
@@ -229,7 +214,7 @@ int progconf_begin(PROGINFO *pip)
 	    debugprintf("progconf_begin: 2 rs=%d\n",rs) ;
 #endif
 
-	if ((rs >= 0) && (pip->config != NULL)) {
+	if ((rs >= 0) && (pip->config != nullptr)) {
 	    PCONF	*csp = pip->config ;
 	    rs = pconf_load(csp) ;
 	}
@@ -248,12 +233,12 @@ int progconf_begin(PROGINFO *pip)
 /* end subroutine (progconf_begin) */
 
 
-int progconf_end(PROGINFO *pip)
+int progconf_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip->config != NULL) {
+	if (pip->config != nullptr) {
 	    rs1 = procfile_end(pip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
@@ -263,12 +248,12 @@ int progconf_end(PROGINFO *pip)
 /* end subroutine (progconf_end) */
 
 
-int progconf_check(PROGINFO *pip)
+int progconf_check(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
-	if (pip->config != NULL) {
+	if (pip->config != nullptr) {
 	    PCONF	*csp = pip->config ;
 
 	    rs = pconf_check(csp,pip->daytime) ;
@@ -284,7 +269,7 @@ int progconf_check(PROGINFO *pip)
 /* local subroutines */
 
 
-static int procfile(PROGINFO *pip,cchar **confs,cchar *cfn)
+local int procfile(PI *pip,cchar **confs,cchar *cfn)
 {
 	vecstr		*svp = &pip->svars ;
 	const int	tlen = MAXPATHLEN ;
@@ -303,21 +288,21 @@ static int procfile(PROGINFO *pip,cchar **confs,cchar *cfn)
 /* end subroutine (procfile) */
 
 
-static int procfile_begin(PROGINFO *pip)
+local int procfile_begin(PI *pip)
 {
 	int		rs = SR_OK ;
 
-	if (pip->config == NULL) {
+	if (pip->config == nullptr) {
 	    const int	size = sizeof(PCONF) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 	        PCONF		*csp = p ;
-	        const char	**envv = pip->envv ;
+	        cchar	**envv = pip->envv ;
 	        pip->config = p ;
 	        rs = pconf_start(csp,pip,envv) ;
 	        if (rs < 0) {
 	            uc_free(pip->config) ;
-	            pip->config = NULL ;
+	            pip->config = nullptr ;
 	        }
 	    } /* end if (memory-allocation) */
 	} /* end if (instatiation) */
@@ -327,18 +312,18 @@ static int procfile_begin(PROGINFO *pip)
 /* end subroutine (procfile_begin) */
 
 
-static int procfile_end(PROGINFO *pip)
+local int procfile_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip->config != NULL) {
+	if (pip->config != nullptr) {
 	    PCONF	*csp = pip->config ;
 	    rs1 = pconf_finish(csp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(pip->config) ;
 	    if (rs >= 0) rs = rs1 ;
-	    pip->config = NULL ;
+	    pip->config = nullptr ;
 	} /* end if */
 
 	return rs ;
@@ -346,11 +331,11 @@ static int procfile_end(PROGINFO *pip)
 /* end subroutine (procfile_end) */
 
 
-static int procfile_load(PROGINFO *pip,const char *fname)
+local int procfile_load(PI *pip,cchar *fname)
 {
 	int		rs = SR_OK ;
 
-	if (pip->config == NULL) {
+	if (pip->config == nullptr) {
 	    rs = procfile_begin(pip) ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
@@ -359,7 +344,7 @@ static int procfile_load(PROGINFO *pip,const char *fname)
 #endif
 	} /* end if (instatiation) */
 
-	if ((rs >= 0) && (pip->config != NULL)) {
+	if ((rs >= 0) && (pip->config != nullptr)) {
 	    PCONF	*csp = pip->config ;
 	    rs = pconf_fileadd(csp,fname) ;
 #if	CF_DEBUG
@@ -374,7 +359,7 @@ static int procfile_load(PROGINFO *pip,const char *fname)
 /* end subroutine (procfile_load) */
 
 
-static int pconf_start(PCONF *csp,PROGINFO *pip,const char **envv)
+local int pconf_start(PCONF *csp,PI *pip,cchar **envv)
 {
 
 	memset(csp,0,sizeof(PCONF)) ;
@@ -386,7 +371,7 @@ static int pconf_start(PCONF *csp,PROGINFO *pip,const char **envv)
 /* end subroutine (pconf_start) */
 
 
-static int pconf_finish(PCONF *csp)
+local int pconf_finish(PCONF *csp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -402,12 +387,12 @@ static int pconf_finish(PCONF *csp)
 /* end subroutine (pconf_finish) */
 
 
-static int pconf_fileadd(PCONF *csp,const char *fname)
+local int pconf_fileadd(PCONF *csp,cchar *fname)
 {
-	PARAMFILE	*pfp = &csp->params ;
+	paramfile	*pfp = &csp->params ;
 	int		rs ;
 	if (csp->nf == 0) {
-	    const char	**envv = csp->envv ;
+	    cchar	**envv = csp->envv ;
 	    rs = paramfile_open(pfp,envv,fname) ;
 	} else {
 	    rs = paramfile_fileadd(pfp,fname) ;
@@ -418,7 +403,7 @@ static int pconf_fileadd(PCONF *csp,const char *fname)
 /* end subroutine (pconf_fileadd) */
 
 
-static int pconf_check(PCONF *csp,time_t dt)
+local int pconf_check(PCONF *csp,time_t dt)
 {
 	int		rs ;
 	int		f = FALSE ;
@@ -435,14 +420,14 @@ static int pconf_check(PCONF *csp,time_t dt)
 /* end subroutine (pconf_check) */
 
 
-static int pconf_load(PCONF *csp)
+local int pconf_load(PCONF *csp)
 {
 	PROGINFO	*pip = csp->pip ;
-	PARAMFILE	*pfp = &csp->params ;
+	paramfile	*pfp = &csp->params ;
 	int		rs = SR_OK ;
 
-	if (pip == NULL) return SR_FAULT ; /* ¥ GCC false complaint */
-	if (pfp == NULL) return SR_FAULT ; /* ¥ GCC false complaint */
+	if (pip == nullptr) return SR_FAULT ; /* ¥ GCC false complaint */
+	if (pfp == nullptr) return SR_FAULT ; /* ¥ GCC false complaint */
 
 	if (csp->nf > 0) {
 	    const int	plen = PBUFLEN ;
@@ -460,18 +445,18 @@ static int pconf_load(PCONF *csp)
 /* end subroutine (pconf_load) */
 
 
-static int pconf_loader(PCONF *csp,char *pbuf,int plen)
+local int pconf_loader(PCONF *csp,char *pbuf,int plen)
 {
 	PROGINFO	*pip = csp->pip ;
-	PARAMFILE	*pfp = &csp->params ;
-	PARAMFILE_CUR	cur ;
-	PARAMFILE_ENT	pe ;
+	paramfile	*pfp = &csp->params ;
+	paramfile_cur	cur ;
+	paramfile_ent	pe ;
 	int		rs ;
 	int		rs1 ;
 
 	if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
 	    const int	elen = EBUFLEN ;
-	    const char	*kp, *vp ;
+	    cchar	*kp, *vp ;
 	    int		pi ;
 	    int		kl, vl ;
 	    int		el, tl ;
@@ -527,13 +512,13 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 	        switch (pi) {
 
 	        case param_mailcheck:
-	            if ((el > 0) && (! pip->final.mailcheck)) {
+	            if ((el > 0) && (! pip->finval.mailcheck)) {
 	                if (hasalldig(ebuf,el)) {
 	                    if ((rs = cfdecti(ebuf,el,&v)) >= 0) {
 	                        if (v >= 0) {
 	                            pip->have.mailcheck = TRUE ;
 	                            pip->changed.mailcheck = TRUE ;
-	                            pip->final.mailcheck = TRUE ;
+	                            pip->finval.mailcheck = TRUE ;
 	                            pip->mailcheck = v ;
 	                        }
 	                    }
@@ -543,13 +528,13 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 
 	        case param_loglen:
 	        case param_logsize:
-	            if ((el > 0) && (! pip->final.logsize)) {
+	            if ((el > 0) && (! pip->finval.logsize)) {
 	                if (hasalldig(ebuf,el)) {
 	                    rs1 = cfdecmfi(ebuf,el,&v) ;
 	                    if ((rs1 >= 0) && (v >= 0)) {
 	                        pip->have.logsize = TRUE ;
 	                        pip->changed.logsize = TRUE ;
-	                        pip->final.logsize = TRUE ;
+	                        pip->finval.logsize = TRUE ;
 	                        pip->logsize = v ;
 	                    }
 	                }
@@ -557,15 +542,15 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 	            break ;
 
 	        case param_cmdkey:
-	            if (! pip->final.cmdfname) {
+	            if (! pip->finval.cmdfname) {
 	                pip->have.cmdfname = TRUE ;
-	                tl = prsetfname(pr,tfname,ebuf,el,TRUE,
+	                tl = prmkfname(pr,tfname,ebuf,el,TRUE,
 	                    CMDMAPFNAME,pip->searchname,"") ;
-	                f = (pip->cmdfname == NULL) ;
+	                f = (pip->cmdfname == nullptr) ;
 	                f = f || (strcmp(pip->cmdfname,tfname) != 0) ;
 	                if (f) {
-	                    const char	**vpp = &pip->cmdfname ;
-	                    pip->final.cmdfname = TRUE ;
+	                    cchar	**vpp = &pip->cmdfname ;
+	                    pip->finval.cmdfname = TRUE ;
 	                    pip->changed.cmdfname = TRUE ;
 	                    rs = proginfo_setentry(pip,vpp,tfname,tl) ;
 	                }
@@ -573,15 +558,15 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 	            break ;
 
 	        case param_logfile:
-	            if (! pip->final.lfname) {
+	            if (! pip->finval.lfname) {
 	                pip->have.lfname = TRUE ;
-	                tl = prsetfname(pr,tfname,ebuf,el,TRUE,
+	                tl = prmkfname(pr,tfname,ebuf,el,TRUE,
 	                    LOGCNAME,pip->searchname,"") ;
-	                f = (pip->lfname == NULL) ;
+	                f = (pip->lfname == nullptr) ;
 	                f = f || (strcmp(pip->lfname,tfname) != 0) ;
 	                if (f) {
-	                    const char	**vpp = &pip->lfname ;
-	                    pip->final.lfname = TRUE ;
+	                    cchar	**vpp = &pip->lfname ;
+	                    pip->finval.lfname = TRUE ;
 	                    pip->changed.lfname = TRUE ;
 	                    rs = proginfo_setentry(pip,vpp,tfname,tl) ;
 	                }
@@ -590,7 +575,7 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 
 	        case param_testmsg:
 	            if (el > 0) {
-	                const char	**vpp = &pip->testmsg ;
+	                cchar	**vpp = &pip->testmsg ;
 	                if (el > 76) el = 76 ;
 	                rs = proginfo_setentry(pip,vpp,ebuf,el) ;
 	            }
@@ -607,7 +592,7 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 	        case param_mbspam:
 	        case param_mbtrash:
 	            if (el > 0) {
-	                const char	**vpp = NULL ;
+	                cchar	**vpp = nullptr ;
 	                switch (pi) {
 	                case param_mbdefault:
 	                    vpp = &pip->mbname_def ;
@@ -638,26 +623,24 @@ static int pconf_loader(PCONF *csp,char *pbuf,int plen)
 }
 /* end subroutine (pconf_loader) */
 
-
-static int procauxprog(PROGINFO *pip,cchar *sp,int sl)
-{
+local int procauxprog(PI *pip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		vl = 0 ;
 	int		kl ;
 	int		pi ;
-	const char	*tp ;
-	const char	*kp = sp ;
-	const char	*vp ;
+	cchar	*tp ;
+	cchar	*kp = sp ;
+	cchar	*vp ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
-	if ((tp = strnchr(sp,sl,CH_FS)) != NULL) {
+	if ((tp = strnchr(sp,sl,CH_FS)) != nullptr) {
 	    kl = (tp-sp) ;
 	    vp = (tp+1) ;
 	    vl = ((sp+sl)-vp) ;
 	    if (vl > 0) {
 	        if ((pi = matstr(prognames,kp,kl)) >= 0) {
-	            const char	**vpp = NULL ;
+	            cchar	**vpp = nullptr ;
 	            switch (pi) {
 	            case progname_shell:
 	                vpp = &pip->prog_shell ;
