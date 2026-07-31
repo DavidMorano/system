@@ -61,6 +61,7 @@
 #include	<nulstr.h>
 #include	<logfile.h>
 #include	<strx.h>
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -116,10 +117,6 @@ import libutil ;			/* |memclear(3u)| */
 #define	ARCHBUFLEN	80
 #endif
 
-#ifndef	ARGBUFLEN
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
-#endif
-
 #ifndef	PATHBUFLEN
 #define	PATHBUFLEN	((4 * MAXPATHLEN) + 3)
 #endif
@@ -164,6 +161,8 @@ import libutil ;			/* |memclear(3u)| */
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_FL	struct subinfo_flags
 #define	SUBINFO_ALLOCS	struct subinfo_allocs
+
+#define	SI		subinfo
 
 
 /* imported namespaces */
@@ -236,11 +235,12 @@ struct subinfo {
 	cchar		*defprog ;
 	PROG		*op ;
 	SD_ARGS	*ap ;
-	IDS		id ;
+	ids		id ;
 	vecstr		aenvs ;
 	vecstr		stores ;
 	vecstr		defs ;
-	vecstr		pvars, exports ;
+	vecstr		pvars ;
+	vecstr		exports ;
 	EXPCOOK		cooks ;
 	vecstr		svars ;
 	ENVS		xenvs ;
@@ -263,65 +263,65 @@ struct intprog {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,PROG *,SD_ARGS *,
+local int	subinfo_start(SI *,PROG *,SD_ARGS *,
 			cchar *,cchar *) noex ;
-static int	subinfo_procargs(SUBINFO *) noex ;
-static int	subinfo_procopts(SUBINFO *,KEYOPT *) noex ;
-static int	subinfo_defaults(SUBINFO *) noex ;
-static int	subinfo_userinfo(SUBINFO *) noex ;
-static int	subinfo_findprog(SUBINFO *,char *) noex ;
-static int	subinfo_search(SUBINFO *,vecstr *,char *,cchar *) noex ;
-static int	subinfo_envdialer(SUBINFO *) noex ;
-static int	subinfo_sasize(SUBINFO *) noex ;
-static int	subinfo_sabuild(SUBINFO *,char *) noex ;
-static int	subinfo_exec(SUBINFO *,cchar *,cchar **) noex ;
-static int	subinfo_logfile(SUBINFO *) noex ;
-static int	subinfo_dirok(SUBINFO *,cchar *,int) noex ;
-static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) noex ;
-static int	subinfo_finish(SUBINFO *) noex ;
+local int	subinfo_procargs(SI *) noex ;
+local int	subinfo_procopts(SI *,keyopt *) noex ;
+local int	subinfo_defaults(SI *) noex ;
+local int	subinfo_userinfo(SI *) noex ;
+local int	subinfo_findprog(SI *,char *) noex ;
+local int	subinfo_search(SI *,vecstr *,char *,cchar *) noex ;
+local int	subinfo_envdialer(SI *) noex ;
+local int	subinfo_sasize(SI *) noex ;
+local int	subinfo_sabuild(SI *,char *) noex ;
+local int	subinfo_exec(SI *,cchar *,cchar **) noex ;
+local int	subinfo_logfile(SI *) noex ;
+local int	subinfo_dirok(SI *,cchar *,int) noex ;
+local int	subinfo_setentry(SI *,cchar **,cchar *,int) noex ;
+local int	subinfo_finish(SI *) noex ;
 
-static int	loadgroupname(SUBINFO *) noex ;
-static int	loadarchitecture(SUBINFO *) noex ;
-static int	loadhz(SUBINFO *) noex ;
-static int	loadcooks(SUBINFO *) noex ;
+local int	loadgroupname(SI *) noex ;
+local int	loadarchitecture(SI *) noex ;
+local int	loadhz(SI *) noex ;
+local int	loadcooks(SI *) noex ;
 
-static int	loadpathlist(SUBINFO *,vecstr *,vecstr *) noex ;
-static int	loadpathcomp(SUBINFO *,vecstr *,cchar *) noex ;
+local int	loadpathlist(SI *,vecstr *,vecstr *) noex ;
+local int	loadpathcomp(SI *,vecstr *,cchar *) noex ;
 
-static int	loaddefsfile(SUBINFO *,cchar *) noex ;
-static int	loaddefs(SUBINFO *,cchar **) noex ;
-static int	loadxfile(SUBINFO *,cchar *) noex ;
-static int	loadxsched(SUBINFO *,cchar **) noex ;
-static int	loadpvars(SUBINFO *,cchar **,cchar *) noex ;
-static int	loadpvarsdef(SUBINFO *,cchar **) noex ;
+local int	loaddefsfile(SI *,cchar *) noex ;
+local int	loaddefs(SI *,cchar **) noex ;
+local int	loadxfile(SI *,cchar *) noex ;
+local int	loadxsched(SI *,cchar **) noex ;
+local int	loadpvars(SI *,cchar **,cchar *) noex ;
+local int	loadpvarsdef(SI *,cchar **) noex ;
 
-static int	pvars_begin(SUBINFO *,cchar **,cchar *) noex ;
-static int	pvars_end(SUBINFO *) noex ;
+local int	pvars_begin(SI *,cchar **,cchar *) noex ;
+local int	pvars_end(SI *) noex ;
 
-static int	sched_begin(SUBINFO *) noex ;
-static int	sched_end(SUBINFO *) noex ;
+local int	sched_begin(SI *) noex ;
+local int	sched_end(SI *) noex ;
 
-static int	procenvextra(SUBINFO *) noex ;
-static int	procenvdef(SUBINFO *) noex ;
-static int	procenvsys(SUBINFO *,cchar *) noex ;
-static int	procdefprog(SUBINFO *,cchar **) noex  ;
+local int	procenvextra(SI *) noex ;
+local int	procenvdef(SI *) noex ;
+local int	procenvsys(SI *,cchar *) noex ;
+local int	procdefprog(SI *,cchar **) noex  ;
 
-static int	xfile(IDS *,cchar *) noex ;
+local int	xfile(IDS *,cchar *) noex ;
 
 #ifdef	COMMENT
-static int	loadpath(vecstr *,cchar *) noex ;
-static int	intprog(struct intprog *,cchar *) noex ;
-static int	xfile(IDS *,cchar *) noex ;
-static int	setdefpath(vecstr *,cchar *) noex ;
-static int	createsearchpath(vecstr *,cchar *) noex ;
+local int	loadpath(vecstr *,cchar *) noex ;
+local int	intprog(struct intprog *,cchar *) noex ;
+local int	xfile(IDS *,cchar *) noex ;
+local int	setdefpath(vecstr *,cchar *) noex ;
+local int	createsearchpath(vecstr *,cchar *) noex ;
 #endif /* COMMENT */
 
 #ifdef	COMMENT
-static int	mkpathvar(SUBINFO *,vecstr *,cchar *,char **) noex ;
+local int	mkpathvar(SI *,vecstr *,cchar *,char **) noex ;
 #endif
 
-static bool	haspmz(cchar *) noex ;
-static bool	hasmz(cchar *) noex ;
+local bool	haspmz(cchar *) noex ;
+local bool	hasmz(cchar *) noex ;
 
 
 /* local variables */
@@ -509,13 +509,13 @@ constexpr cpcchar	envdialers[] = {
 
 /* exported variables */
 
-SYSDIALER_INFO	prog_modinfo = {
+const SYSDIALER_INFO	sd_prog = {
 	PROG_MNAME,
 	PROG_VERSION,
 	PROG_INAME,
 	szof(PROG),
 	PROG_FLAGS
-} ;
+} ; /* end if (object) */
 
 
 /* exported variables */
@@ -949,7 +949,7 @@ int prog_close(PROG *op)
 /* private subroutines */
 
 
-static int subinfo_start(sip,op,ap,hostname,svcname)
+local int subinfo_start(sip,op,ap,hostname,svcname)
 SUBINFO		*sip ;
 PROG		*op ;
 SD_ARGS	*ap ;
@@ -990,7 +990,7 @@ cchar		svcname[] ;
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SI *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1032,9 +1032,9 @@ static int subinfo_finish(SUBINFO *sip)
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_procargs(SUBINFO *sip)
+local int subinfo_procargs(SI *sip)
 {
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	SD_ARGS	*ap = sip->ap ;
 	int		rs ;
 	int		argc ;
@@ -1332,9 +1332,9 @@ ret0:
 /* end subroutine (subinfo_procargs) */
 
 
-static int subinfo_procopts(SUBINFO *sip,KEYOPT *kop)
+local int subinfo_procopts(SI *sip,keyopt *kop)
 {
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
@@ -1372,7 +1372,7 @@ static int subinfo_procopts(SUBINFO *sip,KEYOPT *kop)
 /* end subroutine (subinfo_procopts) */
 
 
-static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar v[],int vlen)
+local int subinfo_setentry(SI *sip,cchar **epp,cchar v[],int vlen)
 {
 	int		rs ;
 	int		oi, i ;
@@ -1420,7 +1420,7 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar v[],int vlen)
 /* end subroutine (subinfo_setentry) */
 
 
-static int subinfo_defaults(SUBINFO *sip)
+local int subinfo_defaults(SI *sip)
 {
 	SD_ARGS	*ap = sip->ap ;
 	int		rs = SR_OK ;
@@ -1499,7 +1499,7 @@ static int subinfo_defaults(SUBINFO *sip)
 /* end subroutine (subinfo_defaults) */
 
 
-static int subinfo_userinfo(SUBINFO *sip)
+local int subinfo_userinfo(SI *sip)
 {
 	USERINFO	*uip = &sip->u ;
 	int		rs = SR_OK ;
@@ -1537,7 +1537,7 @@ bad0:
 /* end subroutine (subinfo_userinfo) */
 
 
-static int subinfo_findprog(SUBINFO *sip,char progfname[])
+local int subinfo_findprog(SI *sip,char progfname[])
 {
 	vecstr		*elp ;
 	int		rs = SR_OK ;
@@ -1565,7 +1565,7 @@ ret0:
 /* end subroutine (subinfo_findprog) */
 
 
-static int subinfo_search(SUBINFO *sip,vecstr *elp,char progfname[],cchar pn[])
+local int subinfo_search(SI *sip,vecstr *elp,char progfname[],cchar pn[])
 {
 	vecstr		pathlist ;
 	int		rs ;
@@ -1592,7 +1592,7 @@ static int subinfo_search(SUBINFO *sip,vecstr *elp,char progfname[],cchar pn[])
 /* end subroutine (subinfo_search) */
 
 
-static int subinfo_envdialer(SUBINFO *sip)
+local int subinfo_envdialer(SI *sip)
 {
 	vecstr		*elp = &sip->exports ;
 	int		rs = SR_OK ;
@@ -1640,7 +1640,7 @@ static int subinfo_envdialer(SUBINFO *sip)
 /* end subroutine (subinfo_envdialer) */
 
 
-static int subinfo_sasize(SUBINFO *sip)
+local int subinfo_sasize(SI *sip)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -1661,7 +1661,7 @@ static int subinfo_sasize(SUBINFO *sip)
 /* end subroutine (subinfo_sasize) */
 
 
-static int subinfo_sabuild(SUBINFO *sip,char sabuf[])
+local int subinfo_sabuild(SI *sip,char sabuf[])
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -1684,7 +1684,7 @@ static int subinfo_sabuild(SUBINFO *sip,char sabuf[])
 /* end subroutine (subinfo_sabuild) */
 
 
-static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
+local int subinfo_exec(SI *sip,cchar *progfname,cchar **dav)
 {
 	VECHAND		avs ;
 	BUFFER		b ;
@@ -1719,7 +1719,7 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 	if (rs < 0)
 	    goto ret0 ;
 
-	opts = VECHAND_OCOMPACT ;
+	opts = vechandm.compact ;
 	rs = vechand_start(&avs,10,opts) ;
 	if (rs < 0)
 	    goto ret0 ;
@@ -1806,7 +1806,7 @@ ret0:
 /* end subroutine (subinfo_exec) */
 
 
-static int subinfo_logfile(SUBINFO *sip)
+local int subinfo_logfile(SI *sip)
 {
 	PROG		*op = sip->op ;
 	int		rs = SR_OK ;
@@ -1856,7 +1856,7 @@ ret0:
 /* end subroutine (subinfo_logfile) */
 
 
-static int subinfo_dirok(SUBINFO *sip,cchar d[],int dlen)
+local int subinfo_dirok(SI *sip,cchar d[],int dlen)
 {
 	ustat		sb ;
 	NULSTR		ss ;
@@ -1889,7 +1889,7 @@ static int subinfo_dirok(SUBINFO *sip,cchar d[],int dlen)
 /* end subroutine (subinfo_dirok) */
 
 
-static int loadgroupname(SUBINFO *sip)
+local int loadgroupname(SI *sip)
 {
 	int		rs ;
 	int		gnlen = 0 ;
@@ -1906,7 +1906,7 @@ static int loadgroupname(SUBINFO *sip)
 /* end subroutine (loadgroupname) */
 
 
-static int loadarchitecture(SUBINFO *sip)
+local int loadarchitecture(SI *sip)
 {
 	int		rs = SR_NOSYS ;
 	int		cl = -1 ;
@@ -1931,7 +1931,7 @@ static int loadarchitecture(SUBINFO *sip)
 }
 /* end subroutine (loadarchitecture) */
 
-static int loadhz(SUBINFO *sip) noex {
+local int loadhz(SI *sip) noex {
 	int		rs ;
 	if ((rs = gethz(0)) >= 0) {
 	    const int	dlen = DIGBUFLEN ;
@@ -1946,7 +1946,7 @@ static int loadhz(SUBINFO *sip) noex {
 /* end subroutine (loadhz) */
 
 
-static int loadcooks(SUBINFO *sip)
+local int loadcooks(SI *sip)
 {
 	EXPCOOK		*ckp = &sip->cooks ;
 	int		rs = SR_OK ;
@@ -2051,7 +2051,7 @@ static int loadcooks(SUBINFO *sip)
 /* end subroutine (loadcooks) */
 
 
-static int sched_begin(SUBINFO *sip)
+local int sched_begin(SI *sip)
 {
 	int		rs ;
 
@@ -2082,7 +2082,7 @@ ret0:
 /* end subroutine (sched_begin) */
 
 
-static int sched_end(SUBINFO *sip)
+local int sched_end(SI *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2098,10 +2098,10 @@ static int sched_end(SUBINFO *sip)
 /* end subroutine (sched_end) */
 
 
-static int loadparams(SUBINFO *sip)
+local int loadparams(SI *sip)
 {
-	PARAMFILE	pf ;
-	PARAMFILE_CUR	cur ;
+	paramfile	pf ;
+	paramfile_cur	cur ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		vl ;
@@ -2195,7 +2195,7 @@ ret0:
 /* end subroutine (loadparams) */
 
 
-static int loaddefsfile(SUBINFO *sip,cchar *dfname)
+local int loaddefsfile(SI *sip,cchar *dfname)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2218,7 +2218,7 @@ static int loaddefsfile(SUBINFO *sip,cchar *dfname)
 /* end subroutine (loaddefsfile) */
 
 
-static int loaddefs(SUBINFO *sip,cchar **sched)
+local int loaddefs(SI *sip,cchar **sched)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2237,7 +2237,7 @@ static int loaddefs(SUBINFO *sip,cchar **sched)
 /* end subroutine (loaddefs) */
 
 
-static int loadxfile(SUBINFO *sip,cchar *xfname)
+local int loadxfile(SI *sip,cchar *xfname)
 {
 	ustat		sb ;
 	int		rs = SR_OK ;
@@ -2264,7 +2264,7 @@ static int loadxfile(SUBINFO *sip,cchar *xfname)
 /* end subroutine (loadxfile) */
 
 
-static int loadxsched(sip,sched)
+local int loadxsched(sip,sched)
 SUBINFO		*sip ;
 cchar		*sched[] ;
 {
@@ -2289,7 +2289,7 @@ cchar		*sched[] ;
 /* end subroutine (loadxsched) */
 
 
-static int pvars_begin(sip,pathvars,fname)
+local int pvars_begin(sip,pathvars,fname)
 SUBINFO		*sip ;
 cchar		**pathvars ;
 cchar		fname[] ;
@@ -2314,7 +2314,7 @@ cchar		fname[] ;
 /* end subroutine (pvars_begin) */
 
 
-static int pvars_end(sip)
+local int pvars_end(sip)
 SUBINFO		*sip ;
 {
 	vecstr		*pvp ;
@@ -2333,7 +2333,7 @@ SUBINFO		*sip ;
 /* end subroutine (pvars_end) */
 
 
-static int procenvextra(sip)
+local int procenvextra(sip)
 SUBINFO		*sip ;
 {
 	NULSTR		ns ;
@@ -2375,7 +2375,7 @@ SUBINFO		*sip ;
 /* end subroutine (procenvextra) */
 
 
-static int procenvdef(sip)
+local int procenvdef(sip)
 SUBINFO		*sip ;
 {
 	vecstr		*elp = &sip->exports ;
@@ -2441,7 +2441,7 @@ SUBINFO		*sip ;
 /* end subroutine (procenvdef) */
 
 
-static int procenvsys(sip,sysvardb)
+local int procenvsys(sip,sysvardb)
 SUBINFO		*sip ;
 cchar		sysvardb[] ;
 {
@@ -2502,7 +2502,7 @@ cchar		**rpp ;
 /* end subroutine (procdefprog) */
 
 
-static int loadpvars(sip,sched,fname)
+local int loadpvars(sip,sched,fname)
 SUBINFO		*sip ;
 cchar		*sched[] ;
 cchar		fname[] ;
@@ -2527,7 +2527,7 @@ cchar		fname[] ;
 /* end subroutine (loadpvars) */
 
 
-static int loadpvarsdef(sip,pnames)
+local int loadpvarsdef(sip,pnames)
 SUBINFO		*sip ;
 cchar		*pnames[] ;
 {
@@ -2550,7 +2550,7 @@ cchar		*pnames[] ;
 /* end subroutine (loadpvarsdef) */
 
 
-static int loadpathlist(sip,plp,elp)
+local int loadpathlist(sip,plp,elp)
 SUBINFO		*sip ;
 vecstr		*plp ;
 vecstr		*elp ;
@@ -2574,7 +2574,7 @@ vecstr		*elp ;
 /* end subroutine (loadpathlist) */
 
 
-static int loadpathcomp(sip,lp,pp)
+local int loadpathcomp(sip,lp,pp)
 SUBINFO		*sip ;
 vecstr		*lp ;
 cchar		*pp ;
@@ -2622,7 +2622,7 @@ cchar		*pp ;
 
 #ifdef	COMMENT
 
-static int createsearchpath(lp,pr)
+local int createsearchpath(lp,pr)
 vecstr		*lp ;
 cchar		pr[] ;
 {
@@ -2653,7 +2653,7 @@ cchar		pr[] ;
 /* end subroutine (createsearchpath) */
 
 
-static int loadpath(vecstr *lp,cchar *pp)
+local int loadpath(vecstr *lp,cchar *pp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2695,7 +2695,7 @@ static int loadpath(vecstr *lp,cchar *pp)
 /* end subroutine (loadpath) */
 
 
-static int setdefpath(vecstr *elp,cchar *pvp)
+local int setdefpath(vecstr *elp,cchar *pvp)
 {
 	int		rs = SR_OK ;
 	cchar		*vp ;
@@ -2712,7 +2712,7 @@ static int setdefpath(vecstr *elp,cchar *pvp)
 
 #endif /* COMMENT */
 
-static int xfile(IDS *idp,cchar *fname) noex {
+local int xfile(IDS *idp,cchar *fname) noex {
 	int		rs ;
 	if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	    rs = SR_NOTFOUND ;
@@ -2724,7 +2724,7 @@ static int xfile(IDS *idp,cchar *fname) noex {
 }
 /* end subroutine (xfile) */
 
-static bool haspmz(cchar *s) noex {
+local bool haspmz(cchar *s) noex {
 	bool	f ;
 	f = (s[0] == '+') || (s[0] == '-') ;
 	f = f && (s[1] == '\0') ;
@@ -2732,7 +2732,7 @@ static bool haspmz(cchar *s) noex {
 }
 /* end subroutine (haspmz) */
 
-static bool hasmz(cchar *s) noex {
+local bool hasmz(cchar *s) noex {
 	bool f ;
 	f = (s[0] == '-') ;
 	f = f && (s[1] == '\0') ;
