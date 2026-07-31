@@ -129,8 +129,7 @@ bool hasinet4addrstr(cchar *sp,int µsl) noex {
 	} /* end if (getlenstr) */
 	DPRINTF("ret f=%u\n",f) ;
 	return f ;
-}
-/* end subroutine (hasnet4addrstr) */
+} /* end subroutine (hasnet4addrstr) */
 
 bool hasinet6addrstr(cchar *sp,int µsl) noex {
     	cnullptr	np{} ;
