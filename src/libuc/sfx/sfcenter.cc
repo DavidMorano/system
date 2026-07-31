@@ -40,13 +40,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIUC |strnchr(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
@@ -78,18 +78,19 @@ import libutil ;			/* |lenstr(3u)| */
 /* exported subroutines */
 
 int sfcenter(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
+    	cnullptr	np{} ;
 	int		cl = -1 ; /* return-value */
 	cchar		*cp = nullptr ;
-	if (sp && ss) {
+	if (sp && ss) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (sl >= 2) {
 	        int	sch = mkchar(ss[0]) ;
-	        if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
+	        if (cchar *tp = strnchr(sp,sl,sch) ; tp) {
 	            sch = mkchar(ss[1]) ;
 		    cp = (tp + 1) ;
 	            sl -= intconv((tp + 1)-sp) ;
 	            sp = (tp + 1) ;
-	            if ((tp = strnchr(sp,sl,sch)) != nullptr) {
+	            if ((tp = strnchr(sp,sl,sch)) != np) {
 	                cl = intconv(tp - sp) ;
 	            }
 	        }
