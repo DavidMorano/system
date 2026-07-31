@@ -102,7 +102,6 @@ int hasallof(cchar *sp,int sl,cchar *tstr) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (hasallof) */
+} /* end subroutine (hasallof) */
 
 
