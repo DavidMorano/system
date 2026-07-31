@@ -28,7 +28,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -123,7 +123,7 @@ const char	*envv[] ;
 	bfile	outfile, *ofp = &outfile ;
 	bfile	argfile, *afp = &argfile ;
 
-	PARAMOPT	aparams ;
+	paramopt	aparams ;
 
 	int	argr, argl, aol, akl, avl, kwi ;
 	int	ai, ai_max, ai_pos ;
@@ -521,7 +521,7 @@ const char	*envv[] ;
 /* set the options for processing */
 
 	{
-		PARAMOPT_CUR	cur ;
+		paramopt_cur	cur ;
 
 
 	paramopt_curbegin(&aparams,&cur) ;
