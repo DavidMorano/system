@@ -44,12 +44,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
@@ -86,14 +86,15 @@ local int	getkey(cchar *,int,cchar *,cchar **) noex ;
 /* exported subroutines */
 
 int sfcookkey(cchar *sp,int sl,cchar **rpp) noex {
+    	cnullptr	np{} ;
 	cint		sch = CHX_COOK ;
 	int		cl = -1 ; /* return-value */
 	cchar		*cp = nullptr ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (sl >= 1) {
+	    if (sl >= 1) ylikely {
 	        cchar	ss[] = "{}" ;
-	        for (cc *tp ; (tp = strnchr(sp,sl,sch)) != nullptr ; ) {
+	        for (cc *tp ; (tp = strnchr(sp,sl,sch)) != np ; ) {
 	            sl -= intconv((tp + 1) - sp) ;
 	            sp = (tp + 1) ;
 	            if (sl > 0) {
@@ -104,7 +105,7 @@ int sfcookkey(cchar *sp,int sl,cchar **rpp) noex {
 	                sp += 1 ;
 	                sl -= 1 ;
 	            } /* end if */
-	        } /* end while */
+	        } /* end for */
 	    } /* end if */
 	} /* end if (non-null) */
 	if (rpp) {
@@ -119,12 +120,12 @@ int sfcookkey(cchar *sp,int sl,cchar **rpp) noex {
 local int getkey(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = -1 ; /* return-value */
 	cchar		*cp = nullptr ;
-	if (sp && ss) {
-	    if (sl > 0) {
+	if (sp && ss) ylikely {
+	    if (sl > 0) ylikely {
 	        if (sp[0] == ss[0]) {
 	            sp += 1 ;
 	            sl -= 1 ;
-	            if (cc *tp ; (tp = strnchr(sp,sl,ss[1])) != nullptr) {
+	            if (cc *tp = strnchr(sp,sl,ss[1]) ; tp) {
 	                cp = sp ;
 	                cl = intconv(tp - sp) ;
 	            }
@@ -139,4 +140,5 @@ local int getkey(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	}
 	return cl ;
 } /* end subroutine (getkey) */
+
 
