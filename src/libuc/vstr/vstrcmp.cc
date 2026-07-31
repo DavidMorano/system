@@ -36,7 +36,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
@@ -83,10 +83,10 @@ extern "C" {
 
 local int vstrxcmp(strxcmp_f vx,cchar **s1pp,cchar **s2pp) noex {
 	int		rc = 0 ;
-	if (s1pp && s2pp) {
+	if (s1pp && s2pp) ylikely {
 	    cchar	*s1 = *s1pp ;
 	    cchar	*s2 = *s2pp ;
-	    if (s1 || s2) {
+	    if (s1 || s2) ylikely {
 	        rc = +1 ;
 	        if (s1) {
 		    rc = -1 ;
