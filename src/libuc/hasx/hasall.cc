@@ -170,63 +170,51 @@ static cint		maxbase = ulibval.maxbase ;
 
 bool hasallalpha(cchar *sp,int sl) noex {
     	return hasallx(isalphalatin,sp,sl) ;
-}
-/* end subroutine (hasallalpha) */
+} /* end subroutine (hasallalpha) */
 
 bool hasallalnum(cchar *sp,int sl) noex {
     	return hasallx(isalnumlatin,sp,sl) ;
-}
-/* end subroutine (hasallalnum) */
+} /* end subroutine (hasallalnum) */
 
 bool hasalldigit(cchar *sp,int sl) noex {
     	return hasallx(isdigitlatin,sp,sl) ;
-}
-/* end subroutine (hasalldigit) */
+} /* end subroutine (hasalldigit) */
 
 bool hasalldigex(cchar *sp,int sl) noex {
     	return hasallx(isdigexlatin,sp,sl) ;
-}
-/* end subroutine (hasalldigex) */
+} /* end subroutine (hasalldigex) */
 
 bool hasalloctal(cchar *sp,int sl) noex {
     	return hasallx(isoctallatin,sp,sl) ;
-}
-/* end subroutine (hasalloctal) */
+} /* end subroutine (hasalloctal) */
 
 bool hasallwhite(cchar *sp,int sl) noex {
     	return hasallx(iswhitelatin,sp,sl) ;
-}
-/* end subroutine (hasallwhite) */
+} /* end subroutine (hasallwhite) */
 
 bool hasallblank(cchar *sp,int sl) noex {
     	return hasallx(isblanklatin,sp,sl) ;
-}
-/* end subroutine (hasallwhite) */
+} /* end subroutine (hasallwhite) */
 
 bool hasallprint(cchar *sp,int sl) noex {
     	return hasallx(isprintlatin,sp,sl) ;
-}
-/* end subroutine (hasallprint) */
+} /* end subroutine (hasallprint) */
 
 bool hasalllc(cchar *sp,int sl) noex {
     	return hasallx(islowerlatin,sp,sl) ;
-}
-/* end subroutine (hasalllc) */
+} /* end subroutine (hasalllc) */
 
 bool hasalluc(cchar *sp,int sl) noex {
     	return hasallx(isupperlatin,sp,sl) ;
-}
-/* end subroutine (hasalluc) */
+} /* end subroutine (hasalluc) */
 
 bool hasallhdrkey(cchar *sp,int sl) noex {
     	return hasallx(ishdrkey,sp,sl) ;
-}
-/* end subroutine (hasallhdrkey) */
+} /* end subroutine (hasallhdrkey) */
 
 bool hasallterm(cchar *sp,int sl) noex {
     	return hasallx(istermlatin,sp,sl) ;
-}
-/* end subroutine (hasallterm) */
+} /* end subroutine (hasallterm) */
 
 bool hasallbase(cchar *sp,int sl,int b) noex {
 	bool		f = false ;
@@ -243,8 +231,7 @@ bool hasallbase(cchar *sp,int sl,int b) noex {
 	    } /* end if (valid base) */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (hasallbase) */
+} /* end subroutine (hasallbase) */
 
 namespace {
     struct haser {
@@ -281,8 +268,7 @@ bool haser::operator () (cchar *sp,int sl) const noex {
 bool hasallchr(cchar *sp,int sl,int chx_s) noex {
     	haser_chr ho(chx_s) ;
 	return ho(sp,sl) ;
-}
-/* end subroutine (hasallchr) */
+} /* end subroutine (hasallchr) */
 
 bool hasallset(cchar *sp,int sl,cchar *sstr) noex {
     	bool		f = false ;
@@ -291,8 +277,7 @@ bool hasallset(cchar *sp,int sl,cchar *sstr) noex {
 	    f = ho(sp,sl) ;
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (hasallset) */
+} /* end subroutine (hasallset) */
 
 
 /* local subroutines */
