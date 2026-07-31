@@ -27,9 +27,9 @@
 #include	<sysdialer.h>
 
 
-#define	USD_MAGIC	31415926
 #define	USD		struct usd_head
 #define	USD_FL		struct usd_flags
+#define	USD_MAGIC	31415926
 
 
 struct usd_flags {
