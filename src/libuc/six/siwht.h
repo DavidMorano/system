@@ -26,9 +26,9 @@
 
 EXTERNC_begin
 
-extern int	siwht(cchar *,int) noex ;
-extern int	siwhtchr(cchar *,int,int) noex ;
-extern int	siwhtbrk(cchar *,int,cchar *) noex ;
+extern int	siwht		(cchar *,int) noex ;
+extern int	siwhtchr	(cchar *,int,int) noex ;
+extern int	siwhtbrk	(cchar *,int,cchar *) noex ;
 
 EXTERNC_end
 
