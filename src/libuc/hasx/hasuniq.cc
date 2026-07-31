@@ -42,12 +42,12 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<bitset>		/* C++STD |bitset(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hasuniq.h"
 
@@ -98,8 +98,7 @@ bool hasuniq(cchar *bp,int µbl) noex {
 	    } /* end for */
 	} /* end if (getlenstr) */
 	return f ;
-}
-/* end subroutine (hasuniq) */
+} /* end subroutine (hasuniq) */
 
 
 /* local subroutines */
