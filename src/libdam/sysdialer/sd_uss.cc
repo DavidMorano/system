@@ -53,12 +53,16 @@
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
+#include	<libdebug.h>
 
 #include	"sysdialer.h"
 #include	"sd_uss.h"
 #include	"envs.h"
 #include	"inetaddrparse.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -80,19 +84,14 @@
 #define	SVCNAMELEN	32
 #endif
 
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
-
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_ALLOCS	struct subinfo_allocs
 #define	SUBINFO_FL	struct subinfo_flags
 
+#define	SI		subinfo
+
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -180,7 +179,7 @@ struct intprog {
 } ; /* end struct */
 
 struct afamily {
-	cchar	*name ;
+	cchar		*name ;
 	int		af ;
 } ; /* end struct */
 
@@ -196,7 +195,7 @@ static int	subinfo_start(SUBINFO *,USS *,
 			SYSDIALER_ARGS *,
 			cchar *,cchar *) ;
 static int	subinfo_procargs(SUBINFO *) ;
-static int	subinfo_procopts(SUBINFO *,KEYOPT *) ;
+static int	subinfo_procopts(SUBINFO *,keyopt *) ;
 static int	subinfo_defaults(SUBINFO *) ;
 static int	subinfo_userinfo(SUBINFO *) ;
 static int	subinfo_logfile(SUBINFO *) ;
@@ -251,13 +250,13 @@ constexpr cpcchar	procopts[] = {
 
 /* external variables (module information) */
 
-SYSDIALER_INFO	uss = {
+SYSDIALER_INFO	sd_uss = {
 	USS_MNAME,
 	USS_VERSION,
 	USS_INAME,
 	szof(USS),
 	USS_MF
-} ;
+} ; /* end object */
 
 
 /* exported subroutines */
@@ -280,7 +279,7 @@ cchar	*av[] ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(USS)) ;
+	memclear(op) ; /* dangerous */
 
 #if	CF_DEBUGS
 	{
@@ -783,7 +782,7 @@ static int subinfo_finish(SUBINFO *sip)
 
 static int subinfo_procargs(SUBINFO *sip)
 {
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	SYSDIALER_ARGS	*ap = sip->ap ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1054,7 +1053,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -1191,9 +1190,9 @@ badkopts:
 /* end subroutine (subinfo_procargs) */
 
 
-static int subinfo_procopts(SUBINFO *sip,KEYOPT *kop)
+static int subinfo_procopts(SUBINFO *sip,keyopt *kop)
 {
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
