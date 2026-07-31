@@ -56,14 +56,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strnstr(3c)| + |strstr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<nleadstr.h>
-#include	<toxc.h>		/* |tobc(3u)| + |touc(3u)| + ... */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strnstr(3c)| + |strstr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC |toxc(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sixsub.h"
 
