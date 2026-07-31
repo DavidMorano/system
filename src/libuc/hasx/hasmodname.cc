@@ -52,7 +52,7 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<localmisc.h>		/* LIBU |UC(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hasmodname.h"
 
