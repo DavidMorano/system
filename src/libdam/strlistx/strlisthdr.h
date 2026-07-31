@@ -18,10 +18,20 @@
 
 
 #define	STRLISTHDR		struct strlisthdr_head
-#define	STRLISTHDR_MAGICSIZE	16	/* the standard (pretty much) */
 #define	STRLISTHDR_MAGICSTR	"STRLIST"
-#define	STRLISTHDR_VERSION	0	/* file (string-list) version */
 #define	STRLISTHDR_FSUF		"si"	/* String-Index */
+#define	STRLISTHDR_MAGICSZ	16	/* the standard (pretty much) */
+#define	STRLISTHDR_VERSION	0	/* file (string-list) version */
+
+
+#ifdef	__cplusplus
+struct strlisthdr_params {
+	static constexpr char	magicstr[]	= "STRLIST" ;
+	static constexpr char	fsuf[]		= "si" ;
+	static constexpr int	magicsz		= 16 ;
+	static constexpr int	version		= 0 ;
+} ; /* end struct */
+#endif /* __cplusplus */
 
 
 struct strlisthdr_head {
@@ -48,6 +58,10 @@ extern int strlisthdr_rd(strlisthdr *,char *,int) noex ;
 extern int strlisthdr_wr(strlisthdr *,cchar *,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const strlisthdr_params strlisthdr_param ;
+#endif /* __cplusplus */
 
 
 #endif /* STRLISTHDR_INCLUDE */
