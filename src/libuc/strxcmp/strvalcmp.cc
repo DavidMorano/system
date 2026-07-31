@@ -43,16 +43,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* |strcasecmp(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| + |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
-#include	<cmporders.h>
+#include	<strings.h>		/* CSTD |strcasecmp(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| + |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<cmporders.h>		/* LIBU */
 
 #include	"strvalcmp.h"
 
@@ -93,19 +93,18 @@ typedef cmporders	co ;
 
 int strvalcmp(cchar *sp,cchar *vp) noex {
 	int		rc = 0 ;
-	if (sp && vp) {
+	if (sp && vp) ylikely {
 	    if (cchar *tp ; (tp = strchr(sp,'=')) != nullptr) {
 	        sp = (tp + 1) ;
 		rc = strcmp(sp,vp) ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (strvalcmp) */
+} /* end subroutine (strvalcmp) */
 
 int strxvalcmp(cchar *sp,cchar *vp) noex {
     	int		rc = 0 ;
-	if (sp || vp) {
+	if (sp || vp) ylikely {
 	    rc = +1 ;
 	    if (sp) {
 		rc = -1 ;
