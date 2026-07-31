@@ -66,7 +66,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<climits>
@@ -699,7 +699,7 @@ ret2:
 	    rs = bvifu(&hf,0,buf,BUFLEN) ;
 	    bl = rs ;
 	    if (rs >= 0)
-	        rs = u_pwrite(op->nfd,buf,bl,0L) ;
+	        rs = u_writep(op->nfd,buf,bl,0L) ;
 
 #if	CF_MINMOD
 	    if (rs >= 0)
