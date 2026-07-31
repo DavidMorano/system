@@ -59,13 +59,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |is{x}latin(3u)| */
-#include	<localmisc.h>
+#include	<stdfnames.h>		/* LIBU |stdfname| used below */
+#include	<mkchar.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<ischarx.h>		/* LIBUC |is{x}latin(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sichar.h"
 
