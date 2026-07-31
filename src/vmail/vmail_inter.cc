@@ -1,4 +1,4 @@
-/* inter SUPPORT */
+/* vmail_inter SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -52,46 +52,50 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<csignal>
-#include	<ctime>
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>
-#include	<usystem.h>
-#include	<estrings.h>
-#include	<vecstr.h>
-#include	<bfile.h>
-#include	<ascii.h>
-#include	<sbuf.h>
-#include	<spawnproc.h>
-#include	<keysym.h>
-#include	<toxc.h>
-#include	<ansigr.h>
-#include	<opentmp.h>
-#include	<ischarx.h>
-#include	<iserror.h>
-#include	<isnot.h>
-#include	<localmisc.h>
-#include	<debug.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<uterm.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<keysym.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC */
+#include	<ansigr.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<iserror.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
+#include	<libdebug.h>		/* LIBDEBUG */
 
-#include	"config.h"
-#include	"defs.h"
+#include	"vmail_config.h"
+#include	"vmail_defs.h"
 #include	"display.h"
 #include	"help.h"
 #include	"mailmsgfile.h"
 #include	"mailmsgviewer.h"
-#include	"readcmdkey.h"
-#include	"termcmd.h"
 #include	"kshlib.h"
 
 #include	"inter.h"
 #include	"inter_trans.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -107,14 +111,6 @@
 
 #undef	CNTRL
 #define CNTRL(x)	((x) & 037)
-
-#ifndef	CH_BELL
-#define CH_BELL		'\07'
-#endif
-
-#ifndef	CH_DELETE
-#define CH_DELETE	'\177'
-#endif
 
 #ifndef	SCANMARGIN
 #define	SCANMARGIN	2
@@ -141,194 +137,146 @@
 
 /* local structures */
 
-INTER_FSTR {
-	cchar	*fp ;
-	int		fl ;
-} ;
-
 enum infotags {
 	infotag_empty,
 	infotag_unspecified,
 	infotag_mailfrom,
 	infotag_welcome,
 	infotag_overlast
-} ;
+} ; /* end enum */
+
+struct inter_fieldstr {
+	cchar		*fp ;
+	int		fl ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	inter_starter(INTER *) ;
+local int	inter_starter(INTER *) noex ;
 
-static int	inter_sigbegin(INTER *) ;
-static int	inter_sigend(INTER *) ;
+local int	inter_sigbegin(INTER *) noex ;
+local int	inter_sigend(INTER *) noex ;
 
-static int	inter_prefixbegin(INTER *) ;
-static int	inter_prefixer(INTER *,cchar *) ;
-static int	inter_prefixend(INTER *) ;
+local int	inter_prefixbegin(INTER *) noex ;
+local int	inter_prefixer(INTER *,cchar *) noex ;
+local int	inter_prefixend(INTER *) noex ;
 
-static int	inter_cmdbegin(INTER *) ;
-static int	inter_cmdend(INTER *) ;
-static int	inter_cmdkbd(INTER *,KEYSYMER *) ;
+local int	inter_cmdbegin(INTER *) noex ;
+local int	inter_cmdend(INTER *) noex ;
+local int	inter_cmdkbd(INTER *,KEYSYMER *) noex ;
 
-static int	inter_msgerbegin(INTER *) ;
-static int	inter_msgerend(INTER *) ;
+local int	inter_msgerbegin(INTER *) noex ;
+local int	inter_msgerend(INTER *) noex ;
 
-static int	inter_displaybegin(INTER *iap) ;
-static int	inter_displayend(INTER *iap) ;
+local int	inter_displaybegin(INTER *iap) noex ;
+local int	inter_displayend(INTER *iap) noex ;
 
-static int	inter_linescalc(INTER *) ;
-static int	inter_loadcmdmap(INTER *) ;
-static int	inter_loadcmdmapsc(INTER *,vecstr *) ;
-static int	inter_loadcmdmapfile(INTER *,cchar *) ;
-static int	inter_loadcmdkey(INTER *,cchar *,int) ;
-static int	inter_loadcmdkeyone(INTER *,INTER_FSTR *) ;
-static int	inter_startclear(INTER *) ;
-static int	inter_startwelcome(INTER *) ;
-static int	inter_refresh(INTER *) ;
-static int	inter_cmdin(INTER *) ;
-static int	inter_cmdinesc(INTER *,int) ;
-static int	inter_cmddig(INTER *,int) ;
-static int	inter_cmdhandle(INTER *,int) ;
+local int	inter_linescalc(INTER *) noex ;
+local int	inter_loadcmdmap(INTER *) noex ;
+local int	inter_loadcmdmapsc(INTER *,vecstr *) noex ;
+local int	inter_loadcmdmapfile(INTER *,cchar *) noex ;
+local int	inter_loadcmdkey(INTER *,cchar *,int) noex ;
+local int	inter_loadcmdkeyone(INTER *,INTER_FSTR *) noex ;
+local int	inter_startclear(INTER *) noex ;
+local int	inter_startwelcome(INTER *) noex ;
+local int	inter_refresh(INTER *) noex ;
+local int	inter_cmdin(INTER *) noex ;
+local int	inter_cmdinesc(INTER *,int) noex ;
+local int	inter_cmddig(INTER *,int) noex ;
+local int	inter_cmdhandle(INTER *,int) noex ;
 #ifdef	COMMENT
-static int	inter_charin(INTER *,cchar *,...) ;
+local int	inter_charin(INTER *,cchar *,...) noex ;
 #endif /* COMMENT */
-static int	inter_done(INTER *) ;
-static int	inter_welcome(INTER *) ;
-static int	inter_version(INTER *) ;
-static int	inter_user(INTER *) ;
-static int	inter_cmdhelp(INTER *) ;
-static int	inter_testmsg(INTER *) ;
-static int	inter_poll(INTER *) ;
-static int	inter_checkconfig(INTER *) ;
-static int	inter_checkwinsize(INTER *) ;
-static int	inter_checksusp(INTER *) ;
-static int	inter_checkclock(INTER *) ;
-static int	inter_checkmail(INTER *) ;
-static int	inter_checkmailinfo(INTER *,cchar *) ;
-static int	inter_checkchild(INTER *,int) ;
-static int	inter_info(INTER *,int,cchar *,...) ;
-static int	inter_winfo(INTER *,int,cchar *,int) ;
+local int	inter_done(INTER *) noex ;
+local int	inter_welcome(INTER *) noex ;
+local int	inter_version(INTER *) noex ;
+local int	inter_user(INTER *) noex ;
+local int	inter_cmdhelp(INTER *) noex ;
+local int	inter_testmsg(INTER *) noex ;
+local int	inter_poll(INTER *) noex ;
+local int	inter_checkconfig(INTER *) noex ;
+local int	inter_checkwinsize(INTER *) noex ;
+local int	inter_checksusp(INTER *) noex ;
+local int	inter_checkclock(INTER *) noex ;
+local int	inter_checkmail(INTER *) noex ;
+local int	inter_checkmailinfo(INTER *,cchar *) noex ;
+local int	inter_checkchild(INTER *,int) noex ;
+local int	inter_info(INTER *,int,cchar *,...) noex ;
+local int	inter_winfo(INTER *,int,cchar *,int) noex ;
 
-static int	inter_mailbeginer(INTER *,cchar *,int) ;
-static int	inter_mailscan(INTER *) ;
-static int	inter_mailender(INTER *,int) ;
+local int	inter_mailbeginer(INTER *,cchar *,int) noex ;
+local int	inter_mailscan(INTER *) noex ;
+local int	inter_mailender(INTER *,int) noex ;
 
-static int	inter_mbopen(INTER *,cchar *,int) ;
-static int	inter_mbclose(INTER *) ;
+local int	inter_mbopen(INTER *,cchar *,int) noex ;
+local int	inter_mbclose(INTER *) noex ;
 
-static int	inter_msgargvalid(INTER *,int) ;
-static int	inter_msgnum(INTER *) ;
-static int	inter_msgpoint(INTER *,int) ;
-static int	inter_scancheck(INTER *,int,int) ;
-static int	inter_change(INTER *) ;
-static int	inter_input(INTER *,char *,int,cchar *,...) ;
-static int	inter_response(INTER *,char *,int,cchar *,...) ;
-static int	inter_havemb(INTER *,cchar *,int) ;
-static int	inter_mailempty(INTER *) ;
-static int	inter_viewtop(INTER *,int) ;
-static int	inter_viewnext(INTER *,int) ;
+local int	inter_msgargvalid(INTER *,int) noex ;
+local int	inter_msgnum(INTER *) noex ;
+local int	inter_msgpoint(INTER *,int) noex ;
+local int	inter_scancheck(INTER *,int,int) noex ;
+local int	inter_change(INTER *) noex ;
+local int	inter_input(INTER *,char *,int,cchar *,...) noex ;
+local int	inter_response(INTER *,char *,int,cchar *,...) noex ;
+local int	inter_havemb(INTER *,cchar *,int) noex ;
+local int	inter_mailempty(INTER *) noex ;
+local int	inter_viewtop(INTER *,int) noex ;
+local int	inter_viewnext(INTER *,int) noex ;
 
-static int	inter_cmdpathprefix(INTER *) ;
-static int	inter_cmdwrite(INTER *,int,int) ;
-static int	inter_cmdpipe(INTER *,int,int) ;
-static int	inter_cmdpage(INTER *,int) ;
-static int	inter_cmdbody(INTER *,int) ;
-static int	inter_cmdbodyer(INTER *,int,cchar *,int) ;
-static int	inter_msgviewfile(INTER *,MBCACHE_SCAN *,cchar *,cchar **) ;
-static int	inter_setscanlines(INTER *,int,MBCACHE_SCAN *,int,int) ;
-static int	inter_cmdmove(INTER *,int) ;
-static int	inter_cmdmsgtrash(INTER *,int) ;
-static int	inter_cmdmsgdel(INTER *,int,int) ;
-static int	inter_cmdmsgdelnum(INTER *,int,int) ;
-static int	inter_cmdsubject(INTER *,int) ;
-static int	inter_cmdshell(INTER *) ;
-static int	inter_cmdmarkspam(INTER *,int) ;
-static int	inter_cmdmarkspamer(INTER *,int,cchar *,cchar *) ;
+local int	inter_cmdpathprefix(INTER *) noex ;
+local int	inter_cmdwrite(INTER *,int,int) noex ;
+local int	inter_cmdpipe(INTER *,int,int) noex ;
+local int	inter_cmdpage(INTER *,int) noex ;
+local int	inter_cmdbody(INTER *,int) noex ;
+local int	inter_cmdbodyer(INTER *,int,cchar *,int) noex ;
+local int	inter_msgviewfile(INTER *,MBCACHE_SCAN *,cc *,cc **) noex ;
+local int	inter_setscanlines(INTER *,int,MBCACHE_SCAN *,int,int) noex ;
+local int	inter_cmdmove(INTER *,int) noex ;
+local int	inter_cmdmsgtrash(INTER *,int) noex ;
+local int	inter_cmdmsgdel(INTER *,int,int) noex ;
+local int	inter_cmdmsgdelnum(INTER *,int,int) noex ;
+local int	inter_cmdsubject(INTER *,int) noex ;
+local int	inter_cmdshell(INTER *) noex ;
+local int	inter_cmdmarkspam(INTER *,int) noex ;
+local int	inter_cmdmarkspamer(INTER *,int,cchar *,cchar *) noex ;
 
-static int	inter_msgoutfile(INTER *,cchar *,int,off_t,int) ;
-static int	inter_msgoutpipe(INTER *,cchar *,off_t,int) ;
-static int	inter_msgoutprog(INTER *,cchar *,off_t,int) ;
-static int	inter_msgoutproger(INTER *,cchar *,off_t,int) ;
-static int	inter_msgoutview(INTER *,cchar *,cchar *) ;
-static int	inter_msgappend(INTER *,int,cchar *) ;
-static int	inter_msgdel(INTER *,int,int) ;
-static int	inter_msgdelnum(INTER *,int,int,int) ;
-static int	inter_subproc(INTER *,pid_t) ;
+local int	inter_msgoutfile(INTER *,cchar *,int,off_t,int) noex ;
+local int	inter_msgoutpipe(INTER *,cchar *,off_t,int) noex ;
+local int	inter_msgoutprog(INTER *,cchar *,off_t,int) noex ;
+local int	inter_msgoutproger(INTER *,cchar *,off_t,int) noex ;
+local int	inter_msgoutview(INTER *,cchar *,cchar *) noex ;
+local int	inter_msgappend(INTER *,int,cchar *) noex ;
+local int	inter_msgdel(INTER *,int,int) noex ;
+local int	inter_msgdelnum(INTER *,int,int,int) noex ;
+local int	inter_subproc(INTER *,pid_t) noex ;
 
-static int	inter_msgviewopen(INTER *) ;
-static int	inter_msgviewopener(INTER *,int,MBCACHE_SCAN *) ;
-static int	inter_msgviewtop(INTER *,int) ;
-static int	inter_msgviewadj(INTER *,int) ;
-static int	inter_msgviewnext(INTER *,int) ;
-static int	inter_msgviewclose(INTER *) ;
-static int	inter_msgviewrefresh(INTER *) ;
-static int	inter_msgviewload(INTER *,int,int,int) ;
-static int	inter_msgviewsetlines(INTER *,int) ;
+local int	inter_msgviewopen(INTER *) noex ;
+local int	inter_msgviewopener(INTER *,int,MBCACHE_SCAN *) noex ;
+local int	inter_msgviewtop(INTER *,int) noex ;
+local int	inter_msgviewadj(INTER *,int) noex ;
+local int	inter_msgviewnext(INTER *,int) noex ;
+local int	inter_msgviewclose(INTER *) noex ;
+local int	inter_msgviewrefresh(INTER *) noex ;
+local int	inter_msgviewload(INTER *,int,int,int) noex ;
+local int	inter_msgviewsetlines(INTER *,int) noex ;
 
-static int	inter_mbviewopen(INTER *) ;
-static int	inter_mbviewclose(INTER *) ;
-static int	inter_filecopy(INTER *,cchar *,cchar *) ;
+local int	inter_mbviewopen(INTER *) noex ;
+local int	inter_mbviewclose(INTER *) noex ;
+local int	inter_filecopy(INTER *,cchar *,cchar *) noex ;
 #if	CF_SUSPEND
-static int	inter_suspend(INTER *) ;
+local int	inter_suspend(INTER *) noex ;
 #endif /* CF_SUSPEND */
 #if	CF_SIGPENDING
-static int	inter_pending(INTER *) ;
+local int	inter_pending(INTER *) noex ;
 #endif
 
 #if	CF_INITTEST
-static int	inter_test(INTER *) ;
+local int	inter_test(INTER *) noex ;
 #endif
 
 
 /* local variables */
-
-static cchar	*cmds[] = {
-	"quitquick",
-	"refresh",
-	"msginfo",
-	"username",
-	"version",
-	"welcome",
-	"quit",
-	"zero",
-	"scanfirst",
-	"scanlast",
-	"scannext",
-	"scanprev",
-	"scannextmult",
-	"scanprevmult",
-	"scantop",
-	"return",
-	"space",
-	"viewtop",
-	"viewnext",
-	"viewprev",
-	"viewnextmult",
-	"viewprevmult",
-	"change",
-	"mbend",
-	"cwd",
-	"msgwrite", /* w */
-	"bodywrite", /* B */
-	"pagewrite", /* b */
-	"msgpipe", /* | */
-	"bodypipe", /* ¦ */
-	"pagebody", /* v */
-	"shell",
-	"msgmove", /* m */
-	"goto",
-	"msgundeletenum",
-	"msgdeletenum",
-	"msgundelete",
-	"msgdeleter",
-	"msgdelete",
-	"msgsubject",
-	"help",
-	"searchnext",
-	"testmsg",
-	"markspam",
-	NULL
-} ;
 
 enum cmds {
 	cmd_quitquick,
@@ -376,9 +324,57 @@ enum cmds {
 	cmd_testmsg,
 	cmd_markspam,
 	cmd_overlast
-} ;
+} ; /* end enum */
 
-static const CMDMAP_E	defcmds[] = {
+constexpr cpcchar	cmds[] = {
+	"quitquick",
+	"refresh",
+	"msginfo",
+	"username",
+	"version",
+	"welcome",
+	"quit",
+	"zero",
+	"scanfirst",
+	"scanlast",
+	"scannext",
+	"scanprev",
+	"scannextmult",
+	"scanprevmult",
+	"scantop",
+	"return",
+	"space",
+	"viewtop",
+	"viewnext",
+	"viewprev",
+	"viewnextmult",
+	"viewprevmult",
+	"change",
+	"mbend",
+	"cwd",
+	"msgwrite", /* w */
+	"bodywrite", /* B */
+	"pagewrite", /* b */
+	"msgpipe", /* | */
+	"bodypipe", /* ¦ */
+	"pagebody", /* v */
+	"shell",
+	"msgmove", /* m */
+	"goto",
+	"msgundeletenum",
+	"msgdeletenum",
+	"msgundelete",
+	"msgdeleter",
+	"msgdelete",
+	"msgsubject",
+	"help",
+	"searchnext",
+	"testmsg",
+	"markspam",
+	nullptr
+} ; /* end array */
+
+constexpr CMDMAP_E	defcmds[] = {
 	{ 'F',			cmd_scanfirst },
 	{ 'L',			cmd_scanlast },
 	{ 'P',			cmd_scanprevmult },
@@ -432,9 +428,9 @@ static const CMDMAP_E	defcmds[] = {
 	{ KEYSYM_Find,		cmd_searchnext },
 	{ KEYSYM_Remove,	cmd_msgtrash },
 	{ -1, -1 },
-} ;
+} ; /* end array */
 
-static cchar	*grterms[] = {
+constexpr cpcchar	grterms[] = {
 	"screen",
 	"vt520",
 	"vt540",
@@ -442,35 +438,36 @@ static cchar	*grterms[] = {
 	"vt440",
 	"vt320",
 	"vt340",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
-static cchar	*syscmdmap[] = {
+constexpr cpcchar	syscmdmap[] = {
 	"%p/etc/%s/%s.%f",
 	"%p/etc/%s/%f",
 	"%p/etc/%s.%f",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
-static cchar	*usrcmdmap[] = {
+constexpr cpcchar	usrcmdmap[] = {
 	"%h/etc/%s/%s.%f",
 	"%h/etc/%s/%f",
 	"%h/etc/%s.%f",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int inter_start(INTER *iap,PROGINFO *pip,UTERM *utp)
-{
+int inter_start(INTER *iap,PROGINFO *pip,UTERM *utp) noex {
 	int		rs ;
 
-	if (iap == NULL) return SR_FAULT ;
-	if (utp == NULL) return SR_FAULT ;
+	if (iap == nullptr) return SR_FAULT ;
+	if (utp == nullptr) return SR_FAULT ;
 
-	memset(iap,0,sizeof(struct inter_head)) ;
+	memclear(iap) ;
 	iap->pip = pip ;
 	iap->utp = utp ;
 	iap->ti_start = pip->daytime ;
@@ -489,23 +486,29 @@ int inter_start(INTER *iap,PROGINFO *pip,UTERM *utp)
 			    if ((rs = inter_displaybegin(iap)) >= 0) {
 				if ((rs = inter_transbegin(iap)) >= 0) {
 				    rs = inter_starter(iap) ;
-				    if (rs < 0)
+				    if (rs < 0) {
 					inter_transend(iap) ;
+				    }
 				} /* end if (inter-trans) */
-				if (rs < 0)
+				if (rs < 0) {
 				    inter_displayend(iap) ;
+				}
 			    } /* end if (inter-display) */
-			    if (rs < 0)
+			    if (rs < 0) {
 				inter_msgerend(iap) ;
+			    }
 			} /* end if (inter-mail) */
-			if (rs < 0)
+			if (rs < 0) {
 			    inter_cmdend(iap) ;
+			}
 		    } /* end if (inter-cmd) */
-		    if (rs < 0)
+		    if (rs < 0) {
 			inter_prefixend(iap) ;
+		    }
 		} /* end if (inter_prefixer) */
-		if (rs < 0)
+		if (rs < 0) {
 	    	    inter_sigend(iap) ;
+		}
 	    } /* end if (inter-sig) */
 	} /* end if (inter_linescalc) */
 
@@ -513,18 +516,15 @@ int inter_start(INTER *iap,PROGINFO *pip,UTERM *utp)
 }
 /* end subroutine (inter_start) */
 
-
-int inter_finish(INTER *iap)
-{
+int inter_finish(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (iap == NULL) return SR_FAULT ;
-
+	if (iap == nullptr) return SR_FAULT ;
 	if (iap->magic != INTER_MAGIC) return SR_NOTOPEN ;
 
-	if (iap->trans != NULL) {
+	if (iap->trans != nullptr) {
 	    rs1 = inter_transend(iap) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -532,11 +532,11 @@ int inter_finish(INTER *iap)
 	rs1 = inter_mbviewclose(iap) ;
 	if (rs >= 0) rs = rs1 ;
 
-	rs1 = inter_mailender(iap,TRUE) ;
+	rs1 = inter_mailender(iap,true) ;
 	if (rs >= 0) rs = rs1 ;
 
 	if (iap->open.mv) {
-	    iap->open.mv = FALSE ;
+	    iap->open.mv = false ;
 	    rs1 = mailmsgviewer_close(&iap->mv) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -546,10 +546,10 @@ int inter_finish(INTER *iap)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (iap->mbname != NULL) {
+	if (iap->mbname != nullptr) {
 	    rs1 = uc_free(iap->mbname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    iap->mbname = NULL ;
+	    iap->mbname = nullptr ;
 	}
 
 	rs1 = inter_displayend(iap) ;
@@ -584,7 +584,7 @@ int inter_cmd(INTER *iap)
 	int		rs = SR_OK ;
 	int		rc = 1 ;
 
-	if (iap == NULL) return SR_FAULT ;
+	if (iap == nullptr) return SR_FAULT ;
 
 	if (iap->magic != INTER_MAGIC) return SR_NOTOPEN ;
 
@@ -601,8 +601,8 @@ int inter_cmd(INTER *iap)
 	    f = f && (pip->daytime > (ts + 7)) ;
 	    f = f && (pip->daytime > (iap->ti_start + 3)) ;
 	    if (f && (! iap->fl.welcome)) {
-	        iap->fl.cmdprompt = FALSE ;
-	        iap->fl.welcome = TRUE ;
+	        iap->fl.cmdprompt = false ;
+	        iap->fl.welcome = true ;
 	        rs = inter_welcome(iap) ;
 	    }
 	}
@@ -610,7 +610,7 @@ int inter_cmd(INTER *iap)
 
 	if (rs >= 0) {
 	    if ((rs = lib_issig(SIGINT)) > 0) {
-	        iap->fl.cmdprompt = FALSE ;
+	        iap->fl.cmdprompt = false ;
 	        rs = inter_refresh(iap) ;
 	    }
 	}
@@ -625,7 +625,7 @@ int inter_cmd(INTER *iap)
 	    cchar	*fmt ;
 	    cchar	*pp = INTER_IPROMPT ;
 	    char	*np = iap->numbuf ;
-	    iap->fl.cmdprompt = TRUE ;
+	    iap->fl.cmdprompt = true ;
 	    fmt = "%s %r\v" ;
 	    rs = display_input(&iap->di,fmt,pp,np,nl) ;
 	}
@@ -636,7 +636,7 @@ int inter_cmd(INTER *iap)
 	        if (isdigitlatin(cmd) || (cmd == CH_DEL) || (cmd == CH_BS)) {
 	            rs = inter_cmddig(iap,cmd) ;
 	        } else {
-	            iap->fl.cmdprompt = FALSE ;
+	            iap->fl.cmdprompt = false ;
 	            rs = inter_cmdhandle(iap,cmd) ;
 	        }
 	    }
@@ -648,7 +648,7 @@ int inter_cmd(INTER *iap)
 	if (DEBUGLEVEL(3))
 	    debugprintf("inter_cmd: SIGTERM\n") ;
 #endif
-	        iap->fl.exit = TRUE ;
+	        iap->fl.exit = true ;
 	    }
 	}
 
@@ -656,7 +656,7 @@ int inter_cmd(INTER *iap)
 	if ((rs >= 0) && (! iap->fl.exit)) {
 	    rs = inter_poll(iap) ;
 	    if (rs > 0)
-	        iap->fl.cmdprompt = FALSE ;
+	        iap->fl.cmdprompt = false ;
 	}
 #endif
 
@@ -681,7 +681,7 @@ int inter_cmd(INTER *iap)
 /* private subroutines */
 
 
-static int inter_starter(INTER *iap)
+local int inter_starter(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -704,7 +704,7 @@ static int inter_starter(INTER *iap)
 		}
 
 	        if (rs < 0) {
-	           inter_mailender(iap,TRUE) ;
+	           inter_mailender(iap,true) ;
 	        }
 	    } /* end if (inter_mailbeginer) */
 	} /* end if (ok) */
@@ -714,12 +714,12 @@ static int inter_starter(INTER *iap)
 /* end subroutine (inter_starter) */
 
 
-static int inter_linescalc(INTER *iap)
+local int inter_linescalc(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	double		percent = 0.0 ;
 	int		rs = SR_OK ;
-	int		f_percent = FALSE ;
+	int		f_percent = false ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -734,12 +734,12 @@ static int inter_linescalc(INTER *iap)
 #endif
 
 	iap->scanlines = pip->svlines ;
-	f_percent = FALSE ;
+	f_percent = false ;
 	if (pip->svlines == 0) {
-	    f_percent = TRUE ;
+	    f_percent = true ;
 	    percent = SCANPERCENT ;
 	} else if (pip->fl.svpercent) {
-	    f_percent = TRUE ;
+	    f_percent = true ;
 	    percent = pip->svlines ;
 	}
 
@@ -757,12 +757,12 @@ static int inter_linescalc(INTER *iap)
 
 /* jump-lines */
 
-	f_percent = FALSE ;
+	f_percent = false ;
 	iap->jumplines = pip->sjlines ;
 	if (pip->sjlines == 0) {
 	    iap->jumplines = (iap->scanlines - 1) ;
 	} else if (pip->fl.sjpercent) {
-	    f_percent = TRUE ;
+	    f_percent = true ;
 	    percent = pip->sjlines ;
 	}
 
@@ -787,15 +787,13 @@ static int inter_linescalc(INTER *iap)
 }
 /* end subroutine (inter_linescalc) */
 
-
-static int inter_sigbegin(INTER	 *iap)
-{
+local int inter_sigbegin(INTER	 *iap) noex {
 	PROGINFO	*pip = iap->pip ;
 	UTERM		*utp = iap->utp ;
-	cint	ucmd = utermcmd_getpgrp ;
+	cint		ucmd = utermcmd_getpgrp ;
 	int		rs ;
 	if ((rs = uterm_control(utp,ucmd,0)) >= 0) {
-	    iap->fl.ctty = TRUE ;
+	    iap->fl.ctty = true ;
 	    iap->pgrp = rs ;
 	} else if (rs == SR_NOTTY) {
 	    cchar	*pn = pip->progname ;
@@ -810,13 +808,13 @@ static int inter_sigbegin(INTER	 *iap)
 /* end subroutine (inter_sigbegin) */
 
 
-static int inter_sigend(INTER *iap)
+local int inter_sigend(INTER *iap)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (iap->fl.subprocs) {
-	    iap->fl.subprocs = FALSE ;
+	    iap->fl.subprocs = false ;
 	    rs1 = subprocs_finish(&iap->sp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -826,7 +824,7 @@ static int inter_sigend(INTER *iap)
 /* end subroutine (inter_sigend) */
 
 
-static int inter_prefixbegin(INTER *iap)
+local int inter_prefixbegin(INTER *iap)
 {
 	int		rs ;
 	if ((rs = proginfo_pwd(iap->pip)) >= 0) {
@@ -837,15 +835,15 @@ static int inter_prefixbegin(INTER *iap)
 /* end subroutine (inter_prefixbegin) */
 
 
-static int inter_prefixend(INTER *iap)
+local int inter_prefixend(INTER *iap)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (iap->pathprefix != NULL) {
+	if (iap->pathprefix != nullptr) {
 	    rs1 = uc_free(iap->pathprefix) ;
 	    if (rs >= 0) rs = rs1 ;
-	    iap->pathprefix = NULL ;
+	    iap->pathprefix = nullptr ;
 	}
 
 	return rs ;
@@ -853,17 +851,17 @@ static int inter_prefixend(INTER *iap)
 /* end subroutine (inter_prefixend) */
 
 
-static int inter_prefixer(INTER *iap,cchar *pathprefix)
+local int inter_prefixer(INTER *iap,cchar *pathprefix)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
-	int		f_ok = FALSE ;
+	int		f_ok = false ;
 	cchar	*ndp ;
 	char		tmpdname[MAXPATHLEN + 1] ;
 	char		newdname[MAXPATHLEN + 1] = { 0 } ;
 
-	if (pathprefix == NULL)
+	if (pathprefix == nullptr)
 	    return SR_FAULT ;
 
 #if	CF_DEBUG
@@ -893,7 +891,7 @@ static int inter_prefixer(INTER *iap,cchar *pathprefix)
 
 	if ((rs >= 0) && (rs1 >= 0)) {
 	    cchar	*px = iap->pathprefix ;
-	    if ((px == NULL) || (strcmp(px,ndp) != 0)) {
+	    if ((px == nullptr) || (strcmp(px,ndp) != 0)) {
 		ustat	sb ;
 
 	        rs1 = u_stat(ndp,&sb) ;
@@ -904,10 +902,10 @@ static int inter_prefixer(INTER *iap,cchar *pathprefix)
 	        if (rs1 >= 0) {
 		    cchar	*cp ;
 
-	            f_ok = TRUE ;
-	            if (iap->pathprefix != NULL) {
+	            f_ok = true ;
+	            if (iap->pathprefix != nullptr) {
 	                uc_free(iap->pathprefix) ;
-	                iap->pathprefix = NULL ;
+	                iap->pathprefix = nullptr ;
 	            }
 
 	            if ((rs = uc_mallocstrw(ndp,-1,&cp)) >= 0) {
@@ -917,7 +915,7 @@ static int inter_prefixer(INTER *iap,cchar *pathprefix)
 	        } /* end if */
 
 	    } else
-	        f_ok = TRUE ;
+	        f_ok = true ;
 	} /* end if (ok) */
 
 #if	CF_DEBUG
@@ -930,19 +928,19 @@ static int inter_prefixer(INTER *iap,cchar *pathprefix)
 /* end subroutine (inter_prefixer) */
 
 
-static int inter_cmdbegin(INTER *iap)
+local int inter_cmdbegin(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
 	if ((rs = cmdmap_start(&iap->cm,defcmds)) >= 0) {
 	    KEYSYMER	*ksp = &iap->ks ;
 	    cchar	*pr = pip->pr ;
-	    iap->open.cmdmap = TRUE ;
+	    iap->open.cmdmap = true ;
 	    if ((rs = keysymer_open(ksp,pr)) >= 0) {
-	        iap->open.keysymer = TRUE ;
+	        iap->open.keysymer = true ;
 		rs = inter_cmdkbd(iap,ksp) ;
 		if (rs < 0) {
-		    iap->open.keysymer = FALSE ;
+		    iap->open.keysymer = false ;
 	    	    keysymer_close(&iap->ks) ;
 		}
 	    } else {
@@ -951,7 +949,7 @@ static int inter_cmdbegin(INTER *iap)
 		bprintf(pip->efp,fmt,pn,rs) ;
 	    } /* end if (keysymer_open) */
 	    if (rs < 0) {
-	    	iap->open.cmdmap = FALSE ;
+	    	iap->open.cmdmap = false ;
 		cmdmap_finish(&iap->cm) ;
 	    }
 	} /* end if (cmdmap_start) */
@@ -960,25 +958,25 @@ static int inter_cmdbegin(INTER *iap)
 /* end subroutine (inter_cmdbegin) */
 
 
-static int inter_cmdend(INTER *iap)
+local int inter_cmdend(INTER *iap)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (iap->open.kbdinfo) {
-	    iap->open.kbdinfo = FALSE ;
+	    iap->open.kbdinfo = false ;
 	    rs1 = kbdinfo_close(&iap->ki) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (iap->open.keysymer) {
-	    iap->open.keysymer = FALSE ;
+	    iap->open.keysymer = false ;
 	    rs1 = keysymer_close(&iap->ks) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (iap->open.cmdmap) {
-	    iap->open.cmdmap = FALSE ;
+	    iap->open.cmdmap = false ;
 	    rs1 = cmdmap_finish(&iap->cm) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -988,13 +986,13 @@ static int inter_cmdend(INTER *iap)
 /* end subroutine (inter_cmdend) */
 
 
-static int inter_cmdkbd(INTER *iap,KEYSYMER *ksp)
+local int inter_cmdkbd(INTER *iap,KEYSYMER *ksp)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	cchar		*kt ;
 	kt = pip->kbdtype ;
-	if ((kt != NULL) && (kt[0] != '\0')) {
+	if ((kt != nullptr) && (kt[0] != '\0')) {
 	    cchar	*pr = pip->pr ;
 	    cchar	*kd = KBDNAME ;
 	    char	tbuf[MAXPATHLEN+1] ;
@@ -1005,10 +1003,10 @@ static int inter_cmdkbd(INTER *iap,KEYSYMER *ksp)
 		    if ((rs = permid(&pip->id,&sb,am)) >= 0) {
 			KBDINFO	*kip = &iap->ki ;
 			if ((rs = kbdinfo_open(kip,ksp,tbuf)) >= 0) {
-			    iap->open.kbdinfo = TRUE ;
+			    iap->open.kbdinfo = true ;
 			    rs = inter_loadcmdmap(iap) ;
 			    if (rs < 0) {
-				iap->open.kbdinfo = FALSE ;
+				iap->open.kbdinfo = false ;
 				kbdinfo_close(kip) ;
 			    }
 			} else {
@@ -1030,7 +1028,7 @@ static int inter_cmdkbd(INTER *iap,KEYSYMER *ksp)
 /* end subroutine (inter_cmdkbd) */
 
 
-static int inter_msgerbegin(INTER *iap)
+local int inter_msgerbegin(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
@@ -1041,7 +1039,7 @@ static int inter_msgerbegin(INTER *iap)
 		MAILMSGFILE	*mmp = &iap->msgfiles ;
 	        cint	cols = pip->linelen ;
 	        if ((rs = mailmsgfile_start(mmp,tbuf,cols,-1)) >= 0) {
-	    	    iap->open.msger = TRUE ;
+	    	    iap->open.msger = true ;
 		}
 	    }
 	}
@@ -1050,12 +1048,12 @@ static int inter_msgerbegin(INTER *iap)
 /* end subroutine (inter_msgerbegin) */
 
 
-static int inter_msgerend(INTER *iap)
+local int inter_msgerend(INTER *iap)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (iap->open.msger) {
-	    iap->open.msger = FALSE ;
+	    iap->open.msger = false ;
 	    rs1 = mailmsgfile_finish(&iap->msgfiles) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1065,7 +1063,7 @@ static int inter_msgerend(INTER *iap)
 
 
 /* initialize display manager */
-static int inter_displaybegin(INTER *iap)
+local int inter_displaybegin(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	DISPLAY		*dip = &iap->di ;
@@ -1078,7 +1076,7 @@ static int inter_displaybegin(INTER *iap)
 	da.displines = iap->displines ;
 	da.scanlines = iap->scanlines ;
 	if ((rs = display_start(dip,pip,&da)) >= 0) {
-	    iap->open.display = TRUE ;
+	    iap->open.display = true ;
 
 #if	CF_STARTCLEAR
 	    rs = inter_startclear(iap) ;
@@ -1089,7 +1087,7 @@ static int inter_displaybegin(INTER *iap)
 	    }
 
 	    if (rs < 0) {
-	        iap->open.display = FALSE ;
+	        iap->open.display = false ;
 		display_finish(dip) ;
 	    }
 	} /* end if (display_start) */
@@ -1099,12 +1097,12 @@ static int inter_displaybegin(INTER *iap)
 /* end subroutine (inter_displaybegin) */
 
 
-static int inter_displayend(INTER *iap)
+local int inter_displayend(INTER *iap)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (iap->open.display) {
-	    iap->open.display = FALSE ;
+	    iap->open.display = false ;
 	    rs1 = display_finish(&iap->di) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1113,7 +1111,7 @@ static int inter_displayend(INTER *iap)
 /* end subroutine (inter_displayend) */
 
 
-static int inter_loadcmdmap(INTER *iap)
+local int inter_loadcmdmap(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	VECSTR		sc ;
@@ -1161,7 +1159,7 @@ static int inter_loadcmdmap(INTER *iap)
 /* end subroutine (inter_loadcmdmap) */
 
 
-static int inter_loadcmdmapsc(INTER *iap,vecstr *scp)
+local int inter_loadcmdmapsc(INTER *iap,vecstr *scp)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -1173,7 +1171,7 @@ static int inter_loadcmdmapsc(INTER *iap,vecstr *scp)
 	for (i = 0 ; keys[i] != '\0' ; i += 1) {
 	    kbuf[0] = (keys[i] & 0xff) ;
 	    kbuf[1] = '\0' ;
-	    vp = NULL ;
+	    vp = nullptr ;
 	    switch (i) {
 	    case 0:
 	        vp = pip->userhome ;
@@ -1185,7 +1183,7 @@ static int inter_loadcmdmapsc(INTER *iap,vecstr *scp)
 	        vp = pip->searchname ;
 	        break ;
 	    } /* end switch */
-	    if (vp != NULL) rs = vecstr_envadd(scp,kbuf,vp,-1) ;
+	    if (vp != nullptr) rs = vecstr_envadd(scp,kbuf,vp,-1) ;
 	    if (rs < 0) break ;
 	} /* end for */
 
@@ -1194,7 +1192,7 @@ static int inter_loadcmdmapsc(INTER *iap,vecstr *scp)
 /* end subroutine (inter_loadcmdmapsc) */
 
 
-static int inter_loadcmdmapfile(INTER *iap,cchar *fname)
+local int inter_loadcmdmapfile(INTER *iap,cchar *fname)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -1205,7 +1203,7 @@ static int inter_loadcmdmapfile(INTER *iap,cchar *fname)
 	    debugprintf("inter_loadcmdmapfile: fname=%s\n",fname) ;
 #endif
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	if (iap->open.kbdinfo) {
@@ -1225,7 +1223,7 @@ static int inter_loadcmdmapfile(INTER *iap,cchar *fname)
 
 	            if ((sl = sfshrink(lbuf,len,&sp)) > 0) {
 		        if (sp[0] != '#') {
-	         	    if ((tp = strnchr(sp,sl,'#')) != NULL) {
+	         	    if ((tp = strnchr(sp,sl,'#')) != nullptr) {
 				sl = (tp-sp) ;
 			    }
 	                    rs = inter_loadcmdkey(iap,sp,sl) ;
@@ -1250,14 +1248,14 @@ static int inter_loadcmdmapfile(INTER *iap,cchar *fname)
 /* end subroutine (inter_loadcmdmapfile) */
 
 
-static int inter_loadcmdkey(INTER *iap,cchar *sp,int sl)
+local int inter_loadcmdkey(INTER *iap,cchar *sp,int sl)
 {
 	INTER_FSTR	fs[4] ;
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		fl ;
-	int		f_loaded = FALSE ;
+	int		f_loaded = false ;
 	cchar	*fp ;
 
 #ifdef	COMMENT
@@ -1271,7 +1269,7 @@ static int inter_loadcmdkey(INTER *iap,cchar *sp,int sl)
 	    debugprintf("inter_loadcmdkey: v=>%r<\n",sp,sl) ;
 #endif
 
-	if (sl < 0) sl = ((sp != NULL) ? strlen(sp) : 0) ;
+	if (sl < 0) sl = ((sp != nullptr) ? strlen(sp) : 0) ;
 
 	for (i = 0 ; (i < nelem(fs)) && sl && *sp &&
 	    ((fl = sfnext(sp,sl,&fp)) >= 0) ; i += 1) {
@@ -1295,7 +1293,7 @@ static int inter_loadcmdkey(INTER *iap,cchar *sp,int sl)
 #endif
 
 	if (i >= 3) {
-	    f_loaded = TRUE ;
+	    f_loaded = true ;
 	    rs = inter_loadcmdkeyone(iap,fs) ;
 	}
 
@@ -1309,7 +1307,7 @@ static int inter_loadcmdkey(INTER *iap,cchar *sp,int sl)
 /* end subroutine (inter_loadcmdkey) */
 
 
-static int inter_loadcmdkeyone(INTER *iap,INTER_FSTR *fs)
+local int inter_loadcmdkeyone(INTER *iap,INTER_FSTR *fs)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -1392,7 +1390,7 @@ static int inter_loadcmdkeyone(INTER *iap,INTER_FSTR *fs)
 
 #if	CF_INITTEST
 
-static int inter_test(INTER *iap)
+local int inter_test(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
@@ -1413,7 +1411,7 @@ static int inter_test(INTER *iap)
 #endif /* CF_INITTEST */
 
 
-static int inter_startclear(INTER *iap)
+local int inter_startclear(INTER *iap)
 {
 	DISPLAY		*dop = &iap->di ;
 	int		rs ;
@@ -1425,7 +1423,7 @@ static int inter_startclear(INTER *iap)
 /* end subroutine (inter_startclear) */
 
 
-static int inter_startwelcome(INTER *iap)
+local int inter_startwelcome(INTER *iap)
 {
 	int		rs = SR_OK ;
 	if (! iap->fl.welcome) {
@@ -1433,7 +1431,7 @@ static int inter_startwelcome(INTER *iap)
 	    time_t		ts ;
 	    if ((rs = display_infots(&iap->di,&ts)) >= 0) {
 	        if ((ts == 0) || (dt > (ts + 5))) {
-	            iap->fl.welcome = TRUE ;
+	            iap->fl.welcome = true ;
 	            rs = inter_welcome(iap) ;
 		}
 	    }
@@ -1443,7 +1441,7 @@ static int inter_startwelcome(INTER *iap)
 /* end subroutine (inter_startwelcome) */
 
 
-static int inter_refresh(INTER *iap)
+local int inter_refresh(INTER *iap)
 {
 	int		rs ;
 
@@ -1459,28 +1457,27 @@ static int inter_refresh(INTER *iap)
 }
 /* end subroutine (inter_refresh) */
 
-
-static int inter_cmdin(INTER *iap)
-{
+local int inter_cmdin(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
+	cnullptr	np{} ;
 	int		rs ;
-	int		cmd = 0 ;
+	int		cmd = 0 ; /* return-value */
 
 	if ((rs = display_flush(&iap->di)) >= 0) {
 	    cint	to = pip->to_read ;
 	    cint	ropts = UTOPTS ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 	    lbuf[0] = '\0' ;
-	    if ((rs = uterm_reade(iap->utp,lbuf,1,to,ropts,NULL,NULL)) > 0) {
+	    if ((rs = uterm_reade(iap->utp,lbuf,1,to,ropts,np,np)) > 0) {
 	        cmd = MKCHAR(lbuf[0]) ;
 	        if (iscmdstart(cmd)) {
 	            rs = inter_cmdinesc(iap,cmd) ;
 	            cmd = rs ;
 	        }
 	    }
-	    pip->daytime = time(NULL) ;
+	    pip->daytime = time(nullptr) ;
 	    pip->now.time = pip->daytime ;
-	}
+	} /* end if (display_flush) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1491,9 +1488,7 @@ static int inter_cmdin(INTER *iap)
 }
 /* end subroutine (inter_cmdin) */
 
-
-static int inter_cmdinesc(INTER *iap,int ch)
-{
+local int inter_cmdinesc(INTER *iap,int ch) noex {
 	PROGINFO	*pip = iap->pip ;
 	TERMCMD		ck ;
 	int		rs ;
@@ -1506,7 +1501,7 @@ static int inter_cmdinesc(INTER *iap,int ch)
 		if (iap->open.kbdinfo) {
 		    KBDINFO	*kip = &iap->ki ;
 		    cint	rsn = SR_NOTFOUND ;
-		    if ((rs = kbdinfo_lookup(kip,NULL,0,&ck)) >= 0) {
+		    if ((rs = kbdinfo_lookup(kip,nullptr,0,&ck)) >= 0) {
 		        keynum = rs ;
 		    } else if (rs == rsn) {
 	    		rs = SR_OK ;
@@ -1526,9 +1521,7 @@ static int inter_cmdinesc(INTER *iap,int ch)
 }
 /* end subroutine (inter_cmdinesc) */
 
-
-static int inter_cmddig(INTER *iap,int cmd)
-{
+local int inter_cmddig(INTER *iap,int cmd) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		pl = (iap->plen + 1) ;
@@ -1558,9 +1551,7 @@ static int inter_cmddig(INTER *iap,int cmd)
 }
 /* end subroutine (inter_cmddig) */
 
-
-static int inter_cmdhandle(INTER *iap,int key)
-{
+local int inter_cmdhandle(INTER *iap,int key) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1568,9 +1559,9 @@ static int inter_cmdhandle(INTER *iap,int key)
 	int		cmd ;
 	int		mult = 1 ;
 	int		nmsg = 0 ;
-	int		f_nomailbox = FALSE ;
+	int		f_nomailbox = false ;
 	int		f_errinfo = iap->fl.info_err ;
-	int		f = FALSE ;
+	int		f = false ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
@@ -1580,7 +1571,7 @@ static int inter_cmdhandle(INTER *iap,int key)
 	}
 #endif
 
-	iap->fl.info_err = FALSE ;
+	iap->fl.info_err = false ;
 	if (iap->numlen > 0) {
 	    rs1 = cfdeci(iap->numbuf,iap->numlen,&argnum) ;
 	    if (rs1 < 0)
@@ -1597,59 +1588,49 @@ static int inter_cmdhandle(INTER *iap,int key)
 #endif
 
 	switch (cmd) {
-
 	case cmd_refresh:
 	    rs = inter_refresh(iap) ;
 	    if (rs >= 0) {
-	        rs = inter_info(iap,FALSE,"refreshed\v") ;
+	        rs = inter_info(iap,false,"refreshed\v") ;
 	    }
 	    break ;
-
 	case cmd_msginfo:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
 	    rs = inter_msgnum(iap) ;
 	    break ;
-
 	case cmd_welcome:
 	    rs = inter_welcome(iap) ;
 	    break ;
-
 	case cmd_version:
 	    rs = inter_version(iap) ;
 	    break ;
-
 	case cmd_username:
 	    rs = inter_user(iap) ;
 	    break ;
-
 	case cmd_help:
 	    rs = inter_cmdhelp(iap) ;
 	    break ;
-
 	case cmd_testmsg:
 	    rs = inter_testmsg(iap) ;
 	    break ;
-
 	case cmd_quitquick:
 	case cmd_quit:
-	    iap->fl.exit = TRUE ;
+	    iap->fl.exit = true ;
 	    if (iap->open.mbcache) {
 	        int f = (cmd == cmd_quitquick) ;
 	        rs = inter_mailender(iap,f) ;
 	    }
 	    if (rs >= 0) {
-		rs = display_setdate(&iap->di,TRUE) ;
+		rs = display_setdate(&iap->di,true) ;
 	    }
 	    break ;
-
 	case cmd_zero:
 	    rs = display_scanclear(&iap->di) ;
 	    if (rs >= 0) {
 	        rs = display_viewclear(&iap->di) ;
 	    }
 	    break ;
-
 	case cmd_scanfirst:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1658,7 +1639,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_msgpoint(iap,nmsg) ;
 	    }
 	    break ;
-
 	case cmd_scanlast:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1670,7 +1650,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_msgpoint(iap,nmsg) ;
 	    }
 	    break ;
-
 	case cmd_scannext:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1683,7 +1662,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_msgpoint(iap,nmsg) ;
 	    }
 	    break ;
-
 	case cmd_scanprev:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1696,7 +1674,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_msgpoint(iap,nmsg) ;
 	    }
 	    break ;
-
 	case cmd_scannextmult:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1710,7 +1687,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_msgpoint(iap,nmsg) ;
 	    }
 	    break ;
-
 	case cmd_scanprevmult:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1724,12 +1700,10 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_msgpoint(iap,nmsg) ;
 	    }
 	    break ;
-
 	case cmd_goto:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
-
-/* FALLTHROUGH */
+	    falldown ;
 	case cmd_return:
 	    if (argnum > 0) {
 	        nmsg = (argnum - 1) ;
@@ -1737,7 +1711,7 @@ static int inter_cmdhandle(INTER *iap,int key)
 	            nmsg = (iap->nmsgs - 1) ;
 		}
 	        if (nmsg != iap->miscanpoint) {
-	            iap->fl.viewchange = TRUE ;
+	            iap->fl.viewchange = true ;
 	            rs = inter_msgpoint(iap,nmsg) ;
 	        }
 	    }
@@ -1746,13 +1720,11 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_viewnext(iap,(iap->viewlines-1)) ;
 	    }
 	    break ;
-
 	case cmd_space:
 	    if ((rs >= 0) && (iap->miscanpoint >= 0)) {
 	        rs = inter_viewnext(iap,(iap->viewlines-1)) ;
 	    }
 	    break ;
-
 	case cmd_viewtop:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1760,11 +1732,10 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_viewtop(iap,argnum) ;
 	    }
 	    break ;
-
 	case cmd_viewnextmult:
-	    f = TRUE ;
-
-/* FALLTHROUGH */
+	    f = true ;
+	    falldown ;
+	    /* FALLTHROUGH */
 	case cmd_viewnext:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1780,11 +1751,10 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_viewnext(iap,(+ argnum)) ;
 	    }
 	    break ;
-
 	case cmd_viewprevmult:
-	    f = TRUE ;
-
-/* FALLTHROUGH */
+	    f = true ;
+	    falldown ;
+	    /* FALLTHROUGH */
 	case cmd_viewprev:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1800,22 +1770,18 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_viewnext(iap,(- argnum)) ;
 	    }
 	    break ;
-
 	case cmd_change:
 	    rs = inter_change(iap) ;
 	    break ;
-
 	case cmd_mbend:
-	    rs = inter_mailender(iap,FALSE) ;
+	    rs = inter_mailender(iap,false) ;
 	    if (rs >= 0) {
 	        rs = inter_mailempty(iap) ;
 	    }
 	    break ;
-
 	case cmd_cwd:
 	    rs = inter_cmdpathprefix(iap) ;
 	    break ;
-
 	case cmd_msgwrite:
 	case cmd_bodywrite:
 	    f_nomailbox = (! iap->open.mbcache) ;
@@ -1825,7 +1791,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_cmdwrite(iap,f_wr,argnum) ;
 	    }
 	    break ;
-
 	case cmd_pagewrite:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1833,7 +1798,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_cmdbody(iap,argnum) ;
 	    }
 	    break ;
-
 	case cmd_msgpipe:
 	case cmd_bodypipe:
 	    f_nomailbox = (! iap->open.mbcache) ;
@@ -1842,7 +1806,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_cmdpipe(iap,(cmd == cmd_msgpipe),argnum) ;
 	    }
 	    break ;
-
 	case cmd_markspam:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1858,11 +1821,9 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_cmdpage(iap,argnum) ;
 	    }
 	    break ;
-
 	case cmd_shell:
 	    rs = inter_cmdshell(iap) ;
 	    break ;
-
 	case cmd_msgmove:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1870,7 +1831,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_cmdmove(iap,argnum) ;
 	    }
 	    break ;
-
 	case cmd_msgtrash:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1878,7 +1838,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_cmdmsgtrash(iap,argnum) ;
 	    }
 	    break ;
-
 	case cmd_msgundelete:
 	case cmd_msgdelete:
 	    f_nomailbox = (! iap->open.mbcache) ;
@@ -1888,7 +1847,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_cmdmsgdel(iap,f,argnum) ;
 	    }
 	    break ;
-
 	case cmd_msgundeletenum:
 	case cmd_msgdeletenum:
 	    f_nomailbox = (! iap->open.mbcache) ;
@@ -1898,7 +1856,6 @@ static int inter_cmdhandle(INTER *iap,int key)
 	        rs = inter_cmdmsgdelnum(iap,f,argnum) ;
 	    }
 	    break ;
-
 	case cmd_msgsubject:
 	    f_nomailbox = (! iap->open.mbcache) ;
 	    if (f_nomailbox) break ;
@@ -1908,7 +1865,7 @@ static int inter_cmdhandle(INTER *iap,int key)
 	    break ;
 
 	default:
-	    rs = inter_info(iap,TRUE,"invalid command\v") ;
+	    rs = inter_info(iap,true,"invalid command\v") ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3)) {
 	        int ch = (isprintlatin(cmd)) ? key : ' ' ;
@@ -1917,118 +1874,92 @@ static int inter_cmdhandle(INTER *iap,int key)
 	    }
 #endif
 	    break ;
-
 	} /* end switch */
-
 /* error-info message handling */
-
 	if (f_nomailbox) {
-	    inter_info(iap,TRUE,"no current mailbox\v") ;
+	    inter_info(iap,true,"no current mailbox\v") ;
 	}
-
 	if (f_errinfo && (! iap->fl.info_msg)) {
 	    display_info(&iap->di,"\v") ;
 	}
-
-	iap->fl.info_msg = FALSE ;
-
-/* done */
-
+	iap->fl.info_msg = false ;
+	/* done */
 	iap->numlen = 0 ;
 	iap->numbuf[0] = '\0' ;
 	return rs ;
 }
 /* end subroutine (inter_cmdhandle) */
 
-
-static int inter_info(INTER *iap,int f_err,cchar *fmt,...)
-{
+local int inter_info(INTER *iap,int f_err,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs ;
-
-	iap->fl.info_msg = TRUE ;
+	iap->fl.info_msg = true ;
 	iap->fl.info_err = f_err ;
-
 	{
-	    va_list	ap ;
 	    va_begin(ap,fmt) ;
 	    rs = display_vinfo(&iap->di,fmt,ap) ;
 	    va_end(ap) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (inter_info) */
 
-
-static int inter_winfo(INTER *iap,int f_err,cchar *sp,int sl)
-{
+local int inter_winfo(INTER *iap,int f_err,cchar *sp,int sl) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
-
-	iap->fl.info_msg = TRUE ;
+	{
+	iap->fl.info_msg = true ;
 	iap->fl.info_err = f_err ;
 	rs = display_winfo(&iap->di,sp,sl) ;
-
+	}
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("inter_winfo: display_winfo() rs=%d\n",rs) ;
 #endif
-
 	return rs ;
 }
 /* end subroutine (inter_winfo) */
 
-
-static int inter_done(INTER *iap)
-{
+local int inter_done(INTER *iap) noex {
 	int		rs ;
-
+	{
 	rs = display_done(&iap->di) ;
-
+	}
 	return rs ;
 }
 /* end subroutine (inter_done) */
 
-
-static int inter_welcome(INTER *iap)
-{
+local int inter_welcome(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
-
 	iap->ti_info = pip->daytime ;
 	pip->to_info = 3 ;
 	if (iap->taginfo != infotag_welcome) {
 	    cchar	*fmt = "welcome %s - type ? for help\v" ;
 	    iap->taginfo = infotag_welcome ;
-	    rs = inter_info(iap,FALSE,fmt,pip->name) ;
+	    rs = inter_info(iap,false,fmt,pip->name) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (inter_welcome) */
 
-
-static int inter_version(INTER *iap)
-{
+local int inter_version(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
 	cchar	*pn = pip->progname ;
 	cchar	*org = pip->org ;
-	cchar	*fmt ;
-
+	{
+	cchar	*fmt = "%s PCS VMAIL(%s) v=%s\v" ;
 	iap->taginfo = infotag_unspecified ;
-	fmt = "%s PCS VMAIL(%s) v=%s\v" ;
-	rs = inter_info(iap,FALSE,fmt,org,pn,VERSION) ;
-
+	rs = inter_info(iap,false,fmt,org,pn,VERSION) ;
+	}
 	return rs ;
 }
 /* end subroutine (inter_version) */
 
-
-static int inter_user(INTER *iap)
-{
+local int inter_user(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
-	SBUF		b ;
+	sbuf		b ;
 	cint	dlen = DISBUFLEN ;
 	int		rs ;
 	int		rs1 ;
@@ -2037,12 +1968,12 @@ static int inter_user(INTER *iap)
 	char		dbuf[DISBUFLEN + 1] ;
 
 	if ((rs = sbuf_start(&b,dbuf,dlen)) >= 0) {
-	    if ((org != NULL) && (org[0] != '\0')) {
+	    if ((org != nullptr) && (org[0] != '\0')) {
 	        sbuf_strw(&b,org,-1) ;
 	        sbuf_strw(&b," - ",3) ;
 	    }
 	    sbuf_printf(&b,"%s!%s",pip->nodename,pip->username) ;
-	    if (pip->name != NULL)
+	    if (pip->name != nullptr)
 	        sbuf_printf(&b," (%s)",pip->name) ;
 	    rs1 = sbuf_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -2052,7 +1983,7 @@ static int inter_user(INTER *iap)
 	    iap->ti_info = pip->daytime ;
 	    pip->to_info = 7 ;
 	    iap->taginfo = infotag_unspecified ;
-	    rs = inter_info(iap,FALSE,"%s\v",dbuf) ;
+	    rs = inter_info(iap,false,"%s\v",dbuf) ;
 	    len = rs ;
 	}
 
@@ -2061,12 +1992,12 @@ static int inter_user(INTER *iap)
 /* end subroutine (inter_user) */
 
 
-static int inter_cmdhelp(INTER *iap)
+local int inter_cmdhelp(INTER *iap)
 {
 	int		rs ;
 	int		len = 0 ;
 
-	rs = inter_info(iap,FALSE,"hello there\v") ;
+	rs = inter_info(iap,false,"hello there\v") ;
 	len = rs ;
 
 	return (rs >= 0) ? len : rs ;
@@ -2074,28 +2005,28 @@ static int inter_cmdhelp(INTER *iap)
 /* end subroutine (inter_cmdhelp) */
 
 
-static int inter_testmsg(INTER *iap)
+local int inter_testmsg(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
 	cchar	*tm = pip->testmsg ;
 
 	iap->taginfo = infotag_unspecified ;
-	if (tm == NULL) tm = "" ;
-	rs = inter_info(iap,FALSE,"testmsg> %s\v",tm) ;
+	if (tm == nullptr) tm = "" ;
+	rs = inter_info(iap,false,"testmsg> %s\v",tm) ;
 
 	return rs ;
 }
 /* end subroutine (inter_testmsg) */
 
 
-static int inter_poll(INTER *iap)
+local int inter_poll(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
-	if ((rs >= 0) && (pip->config != NULL)) {
+	if ((rs >= 0) && (pip->config != nullptr)) {
 	    rs = inter_checkconfig(iap) ;
 	    c += rs ;
 	}
@@ -2135,7 +2066,7 @@ static int inter_poll(INTER *iap)
 	if ((rs >= 0) && iap->fl.subprocs) {
 	    if ((pip->daytime % 4) == 0) {
 	        if ((rs = lib_issig(SIGCHLD)) > 0) {
-	            rs = inter_checkchild(iap,TRUE) ;
+	            rs = inter_checkchild(iap,true) ;
 	            c += rs ;
 		}
 	    }
@@ -2143,9 +2074,9 @@ static int inter_poll(INTER *iap)
 
 /* what is this (next part) supposed to do? (do not know!) */
 
-	if ((rs >= 0) && iap->fl.setmbname && (iap->mbname == NULL)) {
+	if ((rs >= 0) && iap->fl.setmbname && (iap->mbname == nullptr)) {
 	    char	zbuf[2] = { 0 } ;
-	    iap->fl.setmbname = FALSE ;
+	    iap->fl.setmbname = false ;
 	    rs = display_setmbname(&iap->di,zbuf,-1) ;
 	    c += 1 ;
 	}
@@ -2171,20 +2102,20 @@ static int inter_poll(INTER *iap)
 /* end subroutine (inter_poll) */
 
 
-static int inter_checkconfig(INTER *iap)
+local int inter_checkconfig(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	time_t		dt ;
 	time_t		ct = iap->ti_config ;
 	int		rs = SR_OK ;
 	int		to ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	dt = pip->daytime ;
 	to = pip->to_config ;
 	if ((dt-ct) >= to) {
 	    iap->ti_config = dt ;
-	    f = TRUE ;
+	    f = true ;
 	    rs = progconf_check(pip) ;
 	} /* end if */
 
@@ -2193,20 +2124,20 @@ static int inter_checkconfig(INTER *iap)
 /* end subroutine (inter_checkconfig) */
 
 
-static int inter_checkwinsize(INTER *iap)
+local int inter_checkwinsize(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	UTERM		*utp = iap->utp ;
 	int		ucmd ;
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	ucmd = utermcmd_getlines ;
 	if ((rs = uterm_control(utp,ucmd,0)) >= 0) {
 	    cint	nlines = rs ;
 	    if (nlines != iap->displines) { /* lines changed */
 	        iap->displines = nlines ;
-	        f = TRUE ;
+	        f = true ;
 	        if ((rs = inter_linescalc(iap)) >= 0) {
 	            cint	dlines = iap->displines ;
 	            cint	slines = iap->scanlines ;
@@ -2214,7 +2145,7 @@ static int inter_checkwinsize(INTER *iap)
 	                if ((rs = inter_refresh(iap)) >= 0) {
 	                    cchar	*fmt ;
 	                    fmt = "window-size changed - %d\v" ;
-	                    rs = inter_info(iap,FALSE,fmt,nlines) ;
+	                    rs = inter_info(iap,false,fmt,nlines) ;
 	                    if (pip->debuglevel > 0) {
 	                        cchar	*pn = pip->progname ;
 	                        bfile	*efp = pip->efp ;
@@ -2232,16 +2163,16 @@ static int inter_checkwinsize(INTER *iap)
 /* end subroutine (inter_checkwinsize) */
 
 
-static int inter_checksusp(INTER *iap)
+local int inter_checksusp(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	UTERM		*utp = iap->utp ;
-	SBUF		b ;
+	sbuf		b ;
 	cint	dlen = DISBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		dl = 0 ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar	*msg = "VMAIL suspended" ;
 	cchar	*pn ;
 	cchar	*fmt ;
@@ -2267,11 +2198,11 @@ static int inter_checksusp(INTER *iap)
 	} /* end if (sbuf) */
 
 	if (rs >= 0) {
-	    if ((rs = inter_winfo(iap,FALSE,dbuf,dl)) >= 0) {
+	    if ((rs = inter_winfo(iap,false,dbuf,dl)) >= 0) {
 	        if ((rs = display_suspend(&iap->di)) >= 0) {
 	            if ((rs = uterm_suspend(utp)) >= 0) {
 	                bfile	*efp = pip->efp ;
-	                f = TRUE ;
+	                f = true ;
 
 	                if (pip->debuglevel > 0) {
 	                    fmt = "%s: program suspended\n",
@@ -2300,7 +2231,7 @@ static int inter_checksusp(INTER *iap)
 	    if (rs >= 0) {
 	        if ((rs = inter_refresh(iap)) >= 0) {
 	            fmt = "VMAIL resumed\v" ;
-	            rs = inter_info(iap,FALSE,fmt) ;
+	            rs = inter_info(iap,false,fmt) ;
 	        }
 	    } /* end if (ok) */
 	} /* end if (ok) */
@@ -2310,21 +2241,21 @@ static int inter_checksusp(INTER *iap)
 /* end subroutine (inter_checksusp) */
 
 
-static int inter_checkclock(INTER *iap)
+local int inter_checkclock(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	time_t		dt ;
 	time_t		ct = iap->ti_clock ;
 	int		rs = SR_OK ;
 	int		to ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	to = pip->to_clock ;
 	dt = pip->daytime ;
 	if ((dt-ct) >= to) {
 	    iap->ti_clock = dt ;
-	    f = TRUE ;
-	    rs = display_setdate(&iap->di,FALSE) ;
+	    f = true ;
+	    rs = display_setdate(&iap->di,false) ;
 	} /* end if (needed) */
 
 	return (rs >= 0) ? f : rs ;
@@ -2332,13 +2263,13 @@ static int inter_checkclock(INTER *iap)
 /* end subroutine (inter_checkclock) */
 
 
-static int inter_checkmail(INTER *iap)
+local int inter_checkmail(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		to ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if ((to = pip->mailcheck) > 0) {
 	    time_t	dt = pip->daytime ;
@@ -2351,14 +2282,14 @@ static int inter_checkmail(INTER *iap)
 	        iap->ti_mailcheck = pip->daytime ;
 	        rs1 = pcsmailcheck(pip->pr,buf,BUFLEN,un) ;
 	        if (rs1 > 0) {
-	            f = TRUE ;
-	            iap->fl.mailnew = TRUE ;
+	            f = true ;
+	            iap->fl.mailnew = true ;
 	            if ((rs = inter_checkmailinfo(iap,buf)) >= 0) {
 	                rs = display_setnewmail(&iap->di,rs1) ;
 		    }
 	        } else {
 	            if (iap->fl.mailnew) {
-	                iap->fl.mailnew = FALSE ;
+	                iap->fl.mailnew = false ;
 	                buf[0] = '\0' ;
 	                if ((rs = inter_checkmailinfo(iap,buf)) >= 0) {
 	                    rs = display_setnewmail(&iap->di,0) ;
@@ -2374,7 +2305,7 @@ static int inter_checkmail(INTER *iap)
 /* end subroutine (inter_checkmail) */
 
 
-static int inter_checkmailinfo(INTER *iap,cchar *buf)
+local int inter_checkmailinfo(INTER *iap,cchar *buf)
 {
 	PROGINFO	*pip = iap->pip ;
 	time_t		dt ;
@@ -2393,17 +2324,17 @@ static int inter_checkmailinfo(INTER *iap,cchar *buf)
 	    ct = iap->ti_mailinfo ;
 	    if ((dt-ct) >= to) {
 	        iap->ti_mailinfo = pip->daytime ;
-	        iap->fl.mailinfo = TRUE ;
+	        iap->fl.mailinfo = true ;
 	        iap->taginfo = infotag_mailfrom ;
-	        rs = inter_info(iap,FALSE,"mailfrom> %s\v",buf) ;
+	        rs = inter_info(iap,false,"mailfrom> %s\v",buf) ;
 	    } /* end if (time-out) */
 
 	} else if (iap->fl.mailinfo) {
 
-	    iap->fl.mailinfo = FALSE ;
+	    iap->fl.mailinfo = false ;
 	    if (iap->taginfo == infotag_mailfrom) {
 	        iap->taginfo = 0 ;
-	        rs = inter_info(iap,FALSE,"\v") ;
+	        rs = inter_info(iap,false,"\v") ;
 	    }
 
 	} /* end if */
@@ -2416,7 +2347,7 @@ static int inter_checkmailinfo(INTER *iap,cchar *buf)
 
 
 /* ARGSUSED */ /* but really what do we do w/ 'f_check' */
-static int inter_checkchild(INTER *iap,int f_check)
+local int inter_checkchild(INTER *iap,int f_check)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -2443,14 +2374,14 @@ static int inter_checkchild(INTER *iap,int f_check)
 /* end subroutine (inter_checkchild) */
 
 
-static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
+local int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 {
 	PROGINFO	*pip = iap->pip ;
 	ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f_access = FALSE ;
-	int		f_readonly = FALSE ;
+	int		f_access = false ;
+	int		f_readonly = false ;
 	char		mbfname[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
@@ -2461,9 +2392,9 @@ static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 	}
 #endif
 
-	if (mbname == NULL) return SR_FAULT ;
+	if (mbname == nullptr) return SR_FAULT ;
 
-	iap->fl.viewchange = TRUE ;
+	iap->fl.viewchange = true ;
 
 /* form mailbox filename */
 
@@ -2488,7 +2419,7 @@ static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 	    goto ret1 ;
 
 	if (iap->open.mbcache) {
-	    rs = inter_mailender(iap,FALSE) ;
+	    rs = inter_mailender(iap,false) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
@@ -2500,7 +2431,7 @@ static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 	if (rs >= 0) {
 	    DISPLAY	*dip = &iap->di ;
 	    if ((rs = display_input(dip,"mb=%r\v",mbname,mblen)) >= 0) {
-	        iap->fl.setmbname = TRUE ;
+	        iap->fl.setmbname = true ;
 	        rs = display_setmbname(dip,mbname,mblen) ;
 	    }
 	    if (rs >= 0)
@@ -2537,9 +2468,9 @@ static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 	        if (rs < 0) {
 	            iap->miscantop = -1 ;
 	            iap->miscanpoint = -1 ;
-	            if (iap->mbname != NULL) {
+	            if (iap->mbname != nullptr) {
 	                uc_free(iap->mbname) ;
-	                iap->mbname = NULL ;
+	                iap->mbname = nullptr ;
 	            }
 	        }
 	    } /* end if (mailbox opened) */
@@ -2548,7 +2479,7 @@ static int inter_mailbeginer(INTER *iap,cchar *mbname,int mblen)
 
 ret1:
 	if ((rs >= 0) && (! f_access)) {
-	    rs = inter_info(iap,TRUE,"inaccessible mb=%s\v",mbname) ;
+	    rs = inter_info(iap,true,"inaccessible mb=%s\v",mbname) ;
 	}
 
 #if	CF_DEBUG
@@ -2561,12 +2492,12 @@ ret1:
 /* end subroutine (inter_mailbeginer) */
 
 
-static int inter_mailscan(INTER *iap)
+local int inter_mailscan(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	if (iap->open.mbcache) {
 	    int		si = iap->miscantop ;
 	    int		n = iap->scanlines ;
@@ -2597,15 +2528,15 @@ static int inter_mailscan(INTER *iap)
 /* end subroutine (inter_mailscan) */
 
 
-static int inter_mailender(INTER *iap,int f_quick)
+local int inter_mailender(INTER *iap,int f_quick)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rl, cl ;
 	int		i ;
-	int		f_yes = TRUE ;
-	cchar	*ccp ;
+	int		f_yes = true ;
+	cchar	*cnp ;
 	cchar	*cp ;
 
 #if	CF_DEBUG
@@ -2620,14 +2551,14 @@ static int inter_mailender(INTER *iap,int f_quick)
 	    debugprintf("inter_mailend: f_quick=%u\n",f_quick) ;
 #endif
 
-	if (f_quick) f_yes = FALSE ;
+	if (f_quick) f_yes = false ;
 
 	if ((rs >= 0) && (! f_quick) && (iap->nmsgdels > 0)) {
 	    cint	rlen = RBUFLEN ;
 	    char	rbuf[RBUFLEN+ 1] ;
-	    f_yes = TRUE ;
-	    ccp = "delete marked messages? [yes] \v" ;
-	    rs = inter_input(iap,rbuf,rlen,ccp) ;
+	    f_yes = true ;
+	    cnp = "delete marked messages? [yes] \v" ;
+	    rs = inter_input(iap,rbuf,rlen,cnp) ;
 	    rl = rs ;
 	    if ((rs >= 0) && (rl > 0) && (rbuf[rl-1] == '\n')) rl -= 1 ;
 #if	CF_DEBUG
@@ -2645,7 +2576,7 @@ static int inter_mailender(INTER *iap,int f_quick)
 #endif
 	        f_yes = ((cl == 0) || (tolc(cp[0]) == 'y')) ;
 	    }
-	    pip->daytime = time(NULL) ;
+	    pip->daytime = time(nullptr) ;
 	} /* end if (user input) */
 
 #if	CF_DEBUG
@@ -2662,7 +2593,7 @@ static int inter_mailender(INTER *iap,int f_quick)
 #endif
 
 	    for (i = 0 ; (rs >= 0) && (i < iap->nmsgs) ; i += 1) {
-	        rs = mbcache_msgdel(&iap->mc,i,FALSE) ;
+	        rs = mbcache_msgdel(&iap->mc,i,false) ;
 	    } /* end for */
 
 #if	CF_DEBUG
@@ -2671,7 +2602,7 @@ static int inter_mailender(INTER *iap,int f_quick)
 #endif
 
 	    if (rs >= 0) {
-	        rs = inter_info(iap,FALSE,"deletions canceled\v") ;
+	        rs = inter_info(iap,false,"deletions canceled\v") ;
 	    }
 
 #if	CF_DEBUG
@@ -2728,10 +2659,10 @@ static int inter_mailender(INTER *iap,int f_quick)
 	    debugprintf("inter_mailend: 9 rs=%d\n",rs) ;
 #endif
 
-	if (iap->mbname != NULL) {
+	if (iap->mbname != nullptr) {
 	    rs1 = uc_free(iap->mbname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    iap->mbname = NULL ;
+	    iap->mbname = nullptr ;
 	}
 
 #if	CF_DEBUG
@@ -2750,11 +2681,11 @@ static int inter_mailender(INTER *iap,int f_quick)
 }
 /* end subroutine (inter_mailender) */
 
-
 #ifdef	COMMENT
-int inter_charin(INTER *iap,cchar *fmt,...)
-{
+int inter_charin(INTER *iap,cchar *fmt,...) noex {
 	PROGINFO	*pip = iap->pip ;
+	va_list		ap ;
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	int		to ;
@@ -2763,21 +2694,18 @@ int inter_charin(INTER *iap,cchar *fmt,...)
 	char		lbuf[LINEBUFLEN + 1] ;
 
 	{
-	    va_list	ap ;
 	    va_begin(ap,fmt) ;
 	    rs = bufvprintf(lbuf,LINEBUFLEN,fmt,ap) ;
 	    len += rs ;
 	    va_end(ap) ;
 	}
-
 	if (rs >= 0) {
 	    rs = display_input(&iap->di,lbuf) ;
 	}
-
 	if (rs >= 0) {
 	    cint	to = pip->to_read ;
 	    lbuf[0] = '\0' ;
-	    if ((rs = uterm_reade(iap->utp,lbuf,1,to,ropts,NULL,NULL)) > 0) {
+	    if ((rs = uterm_reade(iap->utp,lbuf,1,to,ropts,np,np)) > 0) {
 	        cmd = MKCHAR(lbuf[0]) ;
 	        if (iscmdstart(cmd)) {
 	            rs = inter_cmdinesc(iap,cmd) ;
@@ -2791,9 +2719,7 @@ int inter_charin(INTER *iap,cchar *fmt,...)
 /* end subroutine (inter_charin) */
 #endif /* COMMENT */
 
-
-static int inter_mbopen(INTER *iap,cchar *mbfname,int f_ro)
-{
+local int inter_mbopen(INTER *iap,cchar *mbfname,int f_ro) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2806,22 +2732,22 @@ static int inter_mbopen(INTER *iap,cchar *mbfname,int f_ro)
 	mf |= (! pip->fl.useclen) ? MAILBOX_ONOCLEN : 0 ;
 	mf |= (pip->fl.useclines) ? MAILBOX_OUSECLINES : 0 ;
 	if ((rs1 = mailbox_open(&iap->mb,mbfname,mf)) >= 0) {
-	    iap->open.mailbox = TRUE ;
+	    iap->open.mailbox = true ;
 	    iap->fl.mbreadonly = f_ro ;
 	    if ((rs = mbcache_start(&iap->mc,mbfname,mf,&iap->mb)) >= 0) {
 		MBCACHE_INFO	mcinfo ;
-	        iap->open.mbcache = TRUE ;
+	        iap->open.mbcache = true ;
 	        if ((rs = mbcache_mbinfo(&iap->mc,&mcinfo)) >= 0) {
 	            iap->nmsgs = mcinfo.nmsgs ;
 	            iap->miscanpoint = (mcinfo.nmsgs > 0) ? 0 : -1 ;
 	        }
 	        if (rs < 0) {
-	            iap->open.mbcache = FALSE ;
+	            iap->open.mbcache = false ;
 	            mbcache_finish(&iap->mc) ;
 	        }
-	    }
+	    } /* end if (mbcache_start) */
 	    if (rs < 0) {
-	        iap->open.mailbox = FALSE ;
+	        iap->open.mailbox = false ;
 	        mailbox_close(&iap->mb) ;
 	    }
 	} /* end if (mbcache_start) */
@@ -2836,9 +2762,7 @@ static int inter_mbopen(INTER *iap,cchar *mbfname,int f_ro)
 }
 /* end subroutine (inter_mbopen) */
 
-
-static int inter_mbclose(INTER *iap)
-{
+local int inter_mbclose(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2859,7 +2783,7 @@ static int inter_mbclose(INTER *iap)
 #endif
 
 	if (iap->open.mbcache) {
-	    iap->open.mbcache = FALSE ;
+	    iap->open.mbcache = false ;
 	    rs1 = mbcache_finish(&iap->mc) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2870,7 +2794,7 @@ static int inter_mbclose(INTER *iap)
 #endif
 
 	if (iap->open.mailbox) {
-	    iap->open.mailbox = FALSE ;
+	    iap->open.mailbox = false ;
 	    rs1 = mailbox_close(&iap->mb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2886,26 +2810,20 @@ static int inter_mbclose(INTER *iap)
 }
 /* end subroutine (inter_mbclose) */
 
-
-static int inter_msgnum(INTER *iap)
-{
+local int inter_msgnum(INTER *iap) noex {
 	int		rs ;
-
 	if (iap->open.mbcache) {
 	    cchar	*fmt = "mb=%s msg=%u:%u\v" ;
 	    cint	mi = MAX(iap->miscanpoint,0) ;
-	    rs = inter_info(iap,FALSE,fmt,iap->mbname,(mi+1),iap->nmsgs) ;
+	    rs = inter_info(iap,false,fmt,iap->mbname,(mi+1),iap->nmsgs) ;
 	} else {
-	    rs = inter_info(iap,TRUE,"÷ no current mailbox\v") ;
+	    rs = inter_info(iap,true,"÷ no current mailbox\v") ;
 	}
-
 	return rs ;
 }
 /* end subroutine (inter_msgnum) */
 
-
-static int inter_msgpoint(INTER *iap,int sipointnext)
-{
+local int inter_msgpoint(INTER *iap,int sipointnext) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		nmsgs = iap->nmsgs ;
@@ -3062,14 +2980,12 @@ ret0:
 }
 /* end subroutine (inter_msgpoint) */
 
-
-static int inter_cmdwrite(INTER *iap,int f_whole,int argnum)
-{
+local int inter_cmdwrite(INTER *iap,int f_whole,int argnum) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -3081,9 +2997,9 @@ static int inter_cmdwrite(INTER *iap,int f_whole,int argnum)
 	    if (argnum >= 0) mi = (argnum - 1) ;
 	    if ((mi >= 0) && (mi < iap->nmsgs)) {
 		cint	rlen = RBUFLEN ;
-	        cchar		*ccp = "file: " ;
+	        cchar		*cnp = "file: " ;
 	        char		rbuf[RBUFLEN+1] ;
-	        if ((rs = inter_response(iap,rbuf,rlen,ccp)) > 0) {
+	        if ((rs = inter_response(iap,rbuf,rlen,cnp)) > 0) {
 		    MBCACHE_SCAN	*msp ;
 		    rl = rs ;
 	            if ((rs = mbcache_msgscan(&iap->mc,mi,&msp)) >= 0) {
@@ -3111,9 +3027,7 @@ static int inter_cmdwrite(INTER *iap,int f_whole,int argnum)
 }
 /* end subroutine (inter_cmdwrite) */
 
-
-static int inter_cmdpipe(INTER *iap,int f_whole,int argnum)
-{
+local int inter_cmdpipe(INTER *iap,int f_whole,int argnum) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 
@@ -3122,15 +3036,15 @@ static int inter_cmdpipe(INTER *iap,int f_whole,int argnum)
 	    debugprintf("inter_cmdpipe: ent\n") ;
 #endif
 
-	if (pip == NULL) return SR_FAULT ; /* lint */
+	if (pip == nullptr) return SR_FAULT ; /* lint */
 	if (iap->open.mbcache) {
 	    cint	rlen = RBUFLEN ;
 	    int		mi = iap->miscanpoint ;
-	    cchar	*ccp = "cmd: " ;
+	    cchar	*cnp = "cmd: " ;
 	    char	rbuf[RBUFLEN + 1] ;
 	    if (argnum >= 0) mi = (argnum - 1) ;
 	    if ((mi >= 0) && (mi < iap->nmsgs))
-	    if ((rs = inter_response(iap,rbuf,rlen,ccp)) > 0) {
+	    if ((rs = inter_response(iap,rbuf,rlen,cnp)) > 0) {
 		    MBCACHE_SCAN	*msp ;
 
 		    if ((rs = mbcache_msgscan(&iap->mc,mi,&msp)) >= 0) {
@@ -3153,9 +3067,7 @@ static int inter_cmdpipe(INTER *iap,int f_whole,int argnum)
 }
 /* end subroutine (inter_cmdpipe) */
 
-
-static int inter_msgargvalid(INTER *iap,int argnum)
-{
+local int inter_msgargvalid(INTER *iap,int argnum) noex {
 	int		rs = SR_NOMSG ;
 	int		mi = 0 ;
 
@@ -3169,17 +3081,15 @@ static int inter_msgargvalid(INTER *iap,int argnum)
 
 	if (rs == SR_NOMSG) {
 	    cchar	*fmt = "msg#%u ÷ %s\v" ;
-	    cchar	*ccp = "no such message in mailbox" ;
-	    inter_info(iap,FALSE,fmt,(mi+1),ccp) ;
+	    cchar	*cnp = "no such message in mailbox" ;
+	    inter_info(iap,false,fmt,(mi+1),cnp) ;
 	}
 
 	return (rs >= 0) ? mi : rs ;
 }
 /* end subroutine (inter_msgargvalid) */
 
-
-static int inter_cmdmarkspam(INTER *iap,int argnum)
-{
+local int inter_cmdmarkspam(INTER *iap,int argnum) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
 
@@ -3197,19 +3107,20 @@ static int inter_cmdmarkspam(INTER *iap,int argnum)
 	        cint	mf = rs ;
 	        if (! (mf & MBCACHE_MFMSPAM)) {
 	            cint	w = MBCACHE_MFVSPAM ;
-	            if ((rs = mbcache_msgsetflag(mcp,mi,w,TRUE)) >= 0) {
+	            if ((rs = mbcache_msgsetflag(mcp,mi,w,true)) >= 0) {
 	        	cchar	*mbname = pip->mbname_spam ;
 	                rs = inter_cmdmarkspamer(iap,mi,mbname,cmd) ;
 	            }
 	        } else {
 	            cchar	*fmt = "msg#%u ÷ %s\v" ;
-	            cchar	*ccp = "already spam-processed" ;
-	            rs = inter_info(iap,FALSE,fmt,(mi+1),ccp) ;
+	            cchar	*cnp = "already spam-processed" ;
+	            rs = inter_info(iap,false,fmt,(mi+1),cnp) ;
 	        } /* end if (msg spammed or not) */
 	    } /* end if (msg-flags) */
 
-	} else if (rs == SR_NOMSG)
+	} else if (rs == SR_NOMSG) {
 	    rs = SR_OK ;
+	}
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -3219,11 +3130,9 @@ static int inter_cmdmarkspam(INTER *iap,int argnum)
 }
 /* end subroutine (inter_cmdmarkspam) */
 
-
-static int inter_cmdmarkspamer(INTER *iap,int mi,cchar *mbname,cchar *cmd)
-{
+local int inter_cmdmarkspamer(INTER *iap,int mi,cc *mbname,cchar *cmd) noex {
 	PROGINFO	*pip = iap->pip ;
-	off_t	moff ;
+	off_t		moff ;
 	int		rs ;
 
 	if ((rs = mbcache_msgoff(&iap->mc,mi,&moff)) >= 0) {
@@ -3234,15 +3143,15 @@ static int inter_cmdmarkspamer(INTER *iap,int mi,cchar *mbname,cchar *cmd)
 	        debugprintf("inter_cmdmarkspamer: moff=%lld mlen=%d\n",
 		moff,mlen) ;
 #endif
-	    if (mbname != NULL) {
+	    if (mbname != nullptr) {
 	        rs = inter_msgappend(iap,mi,mbname) ;
 	    }
-	    if ((rs >= 0) && (cmd != NULL)) {
+	    if ((rs >= 0) && (cmd != nullptr)) {
 	        if ((rs = inter_msgoutprog(iap,cmd,moff,mlen)) >= 0) {
-	            if ((rs = inter_msgdel(iap,mi,TRUE)) >= 0) {
+	            if ((rs = inter_msgdel(iap,mi,true)) >= 0) {
 	                cchar	*fmt = "msg#%u ÷ %s\v" ;
-	                cchar	*ccp = "processed as spam" ;
-	                rs = inter_info(iap,FALSE,fmt,(mi+1),ccp) ;
+	                cchar	*cnp = "processed as spam" ;
+	                rs = inter_info(iap,false,fmt,(mi+1),cnp) ;
 	            }
 	        } /* end if (msg-out-pipe) */
 	    } /* end if */
@@ -3252,9 +3161,7 @@ static int inter_cmdmarkspamer(INTER *iap,int mi,cchar *mbname,cchar *cmd)
 }
 /* end subroutine (inter_cmdmarkspamer) */
 
-
-static int inter_cmdpage(INTER *iap,int argnum)
-{
+local int inter_cmdpage(INTER *iap,int argnum) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
 
@@ -3265,19 +3172,19 @@ static int inter_cmdpage(INTER *iap,int argnum)
 	        if (msp->boff >= 0) {
 		    cint	ilen = MAILA-D-LEN ;
 		    cchar	*midp = msp->vs[mbcachemf_hdrmid] ;
-		    cchar	*mfp = NULL ;
+		    cchar	*mfp = nullptr ;
 		    char	ibuf[MAILA-D-LEN + 1] ;
 
-	            if ((midp == NULL) || (midp[0] == '\0')) {
+	            if ((midp == nullptr) || (midp[0] == '\0')) {
 	                midp = ibuf ;
 	                snsdd(ibuf,ilen,iap->mbname,iap->miscanpoint) ;
 	            }
 
 	            if ((rs = inter_msgviewfile(iap,msp,midp,&mfp)) >= 0) {
-		        cint	f = FALSE ;
+		        cint	f = false ;
 	                cint	nl = rs ;
 		        if ((rs = inter_setscanlines(iap,mi,msp,nl,f)) >= 0) {
-	        	    if (mfp != NULL) {
+	        	    if (mfp != nullptr) {
 	            	        cchar	*cmd = pip->prog_pager ;
 	            	        rs = inter_msgoutview(iap,cmd,mfp) ;
 			    } /* end if (non-null msg-body file) */
@@ -3286,7 +3193,7 @@ static int inter_cmdpage(INTER *iap,int argnum)
 
 	        } else {
 	            cchar	*fmt = "msg#%u ÷ no msg-body\v" ;
-	            rs = inter_info(iap,FALSE,fmt,(mi+1)) ;
+	            rs = inter_info(iap,false,fmt,(mi+1)) ;
 	        }
 	    } /* end if (mbcache_msgscan) */
 	} else if (rs == SR_NOMSG)
@@ -3296,21 +3203,19 @@ static int inter_cmdpage(INTER *iap,int argnum)
 }
 /* end subroutine (inter_cmdpage) */
 
-
-static int inter_cmdbody(INTER *iap,int argnum)
-{
+local int inter_cmdbody(INTER *iap,int argnum) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 
-	if (pip == NULL) return SR_FAULT ; /* lint */
+	if (pip == nullptr) return SR_FAULT ; /* lint */
 	if (iap->open.mbcache) {
 	    int		mi = iap->miscanpoint ;
 	    if (argnum >= 0) mi = (argnum - 1) ;
 	    if ((mi >= 0) && (mi < iap->nmsgs)) {
 		cint	rlen = RBUFLEN ;
-		cchar		*ccp = "file: " ;
+		cchar		*cnp = "file: " ;
 		char		rbuf[RBUFLEN + 1] ;
-	        if ((rs = inter_response(iap,rbuf,rlen,ccp)) > 0) {
+	        if ((rs = inter_response(iap,rbuf,rlen,cnp)) > 0) {
 		    rs = inter_cmdbodyer(iap,mi,rbuf,rs) ;
 		}
 	   } /* end if (valid) */
@@ -3320,9 +3225,7 @@ static int inter_cmdbody(INTER *iap,int argnum)
 }
 /* end subroutine (inter_cmdbody) */
 
-
-static int inter_cmdbodyer(INTER *iap,int mi,cchar *rp,int rl)
-{
+local int inter_cmdbodyer(INTER *iap,int mi,cchar *rp,int rl) noex {
 	MBCACHE_SCAN	*msp ;
 	int		rs ;
 	if ((rs = mbcache_msgscan(&iap->mc,mi,&msp)) >= 0) {
@@ -3332,16 +3235,16 @@ static int inter_cmdbodyer(INTER *iap,int mi,cchar *rp,int rl)
 		cchar	*mfp ;
 		char		ibuf[MAILA-D-LEN + 1] ;
 
-	        if ((midp == NULL) || (midp[0] == '\0')) {
+	        if ((midp == nullptr) || (midp[0] == '\0')) {
 	            midp = ibuf ;
 	            snsdd(ibuf,ilen,iap->mbname,iap->miscanpoint) ;
 	        }
 
 	        if ((rs = inter_msgviewfile(iap,msp,midp,&mfp)) >= 0) {
 	            cint	nl = rs ;
-		    cint	f = TRUE ;
+		    cint	f = true ;
 		    if ((rs = inter_setscanlines(iap,mi,msp,nl,f)) >= 0) {
-	        	if (mfp != NULL) {
+	        	if (mfp != nullptr) {
 	            	    if ((rs = inter_filecopy(iap,mfp,rp)) >= 0) {
 	  			DISPLAY_BOTINFO	bi ;
 	                	cchar 	*vp = msp->vs[mbcachemf_scanfrom] ;
@@ -3358,17 +3261,15 @@ static int inter_cmdbodyer(INTER *iap,int mi,cchar *rp,int rl)
 
 	    } else {
 		cchar	*fmt = "msg#%u ÷ no msg-body\v" ;
-		rs = inter_info(iap,FALSE,fmt,(mi+1)) ;
+		rs = inter_info(iap,false,fmt,(mi+1)) ;
 	    }
 	} /* end if (mbcache_msgscan) */
 	return rs ;
 }
 /* end subroutine (inter_cmdbodyer) */
 
-
-static int inter_msgviewfile(INTER *iap,MBCACHE_SCAN *msp,cchar *mid,
-		cchar **rpp)
-{
+local int inter_msgviewfile(INTER *iap,MBCACHE_SCAN *msp,cchar *mid,
+		cchar **rpp) noex {
 	PROGINFO	*pip = iap->pip ;
 	MAILMSGFILE	*mmfp = &iap->msgfiles ;
 	cint	nrs = SR_NOTFOUND ;
@@ -3381,10 +3282,10 @@ static int inter_msgviewfile(INTER *iap,MBCACHE_SCAN *msp,cchar *mid,
 	debugprintf("inter_msgviewfile: ent\n") ;
 #endif
 
-	if (pip == NULL) return SR_FAULT ;
-	if (msp == NULL) return SR_FAULT ;
-	if (mid == NULL) return SR_FAULT ;
-	if (rpp == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
+	if (msp == nullptr) return SR_FAULT ;
+	if (mid == nullptr) return SR_FAULT ;
+	if (rpp == nullptr) return SR_FAULT ;
 	if (mid[0] == '\0') return SR_INVALID ;
 
 	if ((rs = mailmsgfile_get(mmfp,mid,rpp)) == nrs) {
@@ -3413,9 +3314,8 @@ static int inter_msgviewfile(INTER *iap,MBCACHE_SCAN *msp,cchar *mid,
 }
 /* end if (inter_msgviewfile) */
 
-
-static int inter_setscanlines(INTER *iap,int mi,MBCACHE_SCAN *msp,int nl,int f)
-{
+local int inter_setscanlines(INTER *iap,int mi,MBCACHE_SCAN *msp,
+		int nl,int f) noex {
 	int		rs = SR_OK ;
 	int		vlines = msp->vlines ;
 	if (vlines < 0) vlines = msp->nlines ;
@@ -3428,9 +3328,7 @@ static int inter_setscanlines(INTER *iap,int mi,MBCACHE_SCAN *msp,int nl,int f)
 }
 /* end subroutine (inter_setscanlines) */
 
-
-static int inter_cmdmove(INTER *iap,int argnum)
-{
+local int inter_cmdmove(INTER *iap,int argnum) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -3439,8 +3337,8 @@ static int inter_cmdmove(INTER *iap,int argnum)
 	int		mi ;
 	int		m ;
 	int		mblen ;
-	int		f_same = FALSE ;
-	cchar	*ccp ;
+	int		f_same = false ;
+	cchar	*cnp ;
 	cchar	*cp ;
 	char		response[LINEBUFLEN + 1] ;
 	char		mbname[MAXNAMELEN + 1] ;
@@ -3451,8 +3349,8 @@ static int inter_cmdmove(INTER *iap,int argnum)
 	if (argnum >= 0) mi = (argnum - 1) ;
 	if ((mi < 0) || (mi >= iap->nmsgs)) /* user error */ goto ret0 ;
 
-	ccp = "mailbox: " ;
-	rs = inter_input(iap,response,LINEBUFLEN, ccp) ;
+	cnp = "mailbox: " ;
+	rs = inter_input(iap,response,LINEBUFLEN, cnp) ;
 	rl = rs ;
 	if ((rs >= 0) && (rl > 0) && (response[rl-1] == '\n')) rl -= 1 ;
 	if (rs < 0)
@@ -3469,13 +3367,13 @@ static int inter_cmdmove(INTER *iap,int argnum)
 /* is the mailbox-name well formed? */
 
 	if (hasprintbad(cp,cl)) {
-	    rs = inter_info(iap,TRUE,"mailbox name is not well formed\v") ;
+	    rs = inter_info(iap,true,"mailbox name is not well formed\v") ;
 	    goto ret0 ;
 	}
 
 /* does the other mailbox exist? */
 
-	if (iap->mbname != NULL) {
+	if (iap->mbname != nullptr) {
 	    m = nleadstr(iap->mbname,cp,cl) ;
 	    f_same = (iap->mbname[m] == '\0') && (m == cl) ;
 	}
@@ -3483,14 +3381,14 @@ static int inter_cmdmove(INTER *iap,int argnum)
 /* return if moving to the same mailbox? */
 
 	if (f_same) {
-	    rs = inter_info(iap,TRUE,"same mailbox specified\v") ;
+	    rs = inter_info(iap,true,"same mailbox specified\v") ;
 	    goto ret0 ;
 	}
 
 	rs1 = snwcpy(mbname,MAXNAMELEN,cp,cl) ;
 	mblen = rs1 ;
 	if (rs1 < 0) {
-	    rs = inter_info(iap,TRUE,"invalid mailbox specified\v") ;
+	    rs = inter_info(iap,true,"invalid mailbox specified\v") ;
 	    goto ret0 ;
 	}
 
@@ -3503,8 +3401,8 @@ static int inter_cmdmove(INTER *iap,int argnum)
 
 	    mkdisplayable(disname,MAXNAMELEN,cp,cl) ;
 
-	    ccp = "create new mailbox=%s [yes] " ;
-	    rs = inter_input(iap,response,LINEBUFLEN, ccp,disname) ;
+	    cnp = "create new mailbox=%s [yes] " ;
+	    rs = inter_input(iap,response,LINEBUFLEN, cnp,disname) ;
 	    rl = rs ;
 	    if ((rs >= 0) && (rl > 0) && (response[rl-1] == '\n')) {
 	        rl -= 1 ;
@@ -3520,7 +3418,7 @@ static int inter_cmdmove(INTER *iap,int argnum)
 
 	        cl = sfshrink(response,rl,&cp) ;
 	        if ((cl > 0) && (tolc(*cp) != 'y')) {
-	            inter_info(iap,TRUE,"canceled\v") ;
+	            inter_info(iap,true,"canceled\v") ;
 	            goto ret0 ;
 	        }
 	    }
@@ -3530,10 +3428,10 @@ static int inter_cmdmove(INTER *iap,int argnum)
 
 	if (rs >= 0) {
 	    if ((rs = inter_msgappend(iap,mi,mbname)) >= 0) {
-	        if (pip->fl.nextmov) rs = inter_msgdel(iap,mi,TRUE) ;
+	        if (pip->fl.nextmov) rs = inter_msgdel(iap,mi,true) ;
 	        if (rs >= 0) {
 	            cchar	*fmt = "msg#%u -> %s\v" ;
-	            rs = inter_info(iap,FALSE,fmt,(mi+1),mbname) ;
+	            rs = inter_info(iap,false,fmt,(mi+1),mbname) ;
 	        }
 	    } /* end if (msg-append) */
 	} /* end if */
@@ -3544,56 +3442,55 @@ ret0:
 /* end subroutine (inter_cmdmove) */
 
 
-static int inter_cmdmsgtrash(INTER *iap,int argnum)
+local int inter_cmdmsgtrash(INTER *iap,int argnum)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
-	int		f_del = TRUE ;
+	int		f_del = true ;
 	cchar	*fmt ;
 	cchar	*mbname = pip->mbname_trash ;
 
-	if ((mbname != NULL) && (mbname[0] != '\0')) {
+	if ((mbname != nullptr) && (mbname[0] != '\0')) {
 	    if ((rs = inter_msgargvalid(iap,argnum)) >= 0) {
 	        MBCACHE		*mcp = &iap->mc ;
 	        cint	mi = rs ;
 	        cint	w = MBCACHE_MFVTRASH ;
-	        int		f_delprev = FALSE ;
-	        cchar	*ccp = NULL ;
+	        int		f_delprev = false ;
+	        cchar	*cnp = nullptr ;
 	        fmt = "msg#%u ÷ %s\v" ;
-	        if ((rs = mbcache_msgsetflag(mcp,mi,w,TRUE)) == 0) {
+	        if ((rs = mbcache_msgsetflag(mcp,mi,w,true)) == 0) {
 	            if ((rs = inter_msgappend(iap,mi,mbname)) >= 0) {
 	                if ((rs = inter_msgdel(iap,mi,f_del)) >= 0) {
 	                    f_delprev = (rs > 0) ;
 	                    if (! LEQUIV(f_del,f_delprev)) {
-	                        ccp = "deletion canceled" ;
-	                        if (f_del) ccp = "deletion scheduled" ;
-	                    } else
-	                        ccp = "no change" ;
+	                        cnp = "deletion canceled" ;
+	                        if (f_del) cnp = "deletion scheduled" ;
+	                    } else {
+	                        cnp = "no change" ;
+			    }
 	                }
 	            } /* end if (msg-append) */
 	        } else if (rs > 0) {
-	            ccp = "already trashed" ;
+	            cnp = "already trashed" ;
 	            if (pip->fl.nextdel && ((mi+1) < iap->nmsgs)) {
 	                rs = inter_msgpoint(iap,(mi+1)) ;
 		    }
 	        } /* end if (msg-trash) */
-	        if ((rs >= 0) && (ccp != NULL)) {
-	            rs = inter_info(iap,FALSE,fmt,(mi+1),ccp) ;
+	        if ((rs >= 0) && (cnp != nullptr)) {
+	            rs = inter_info(iap,false,fmt,(mi+1),cnp) ;
 		}
 	    } else if (rs == SR_NOMSG)
 	        rs = SR_OK ;
 	} else {
 	    fmt = "no trash mailbox configured" ;
-	    rs = inter_info(iap,FALSE,fmt) ;
+	    rs = inter_info(iap,false,fmt) ;
 	}
 
 	return rs ;
 }
 /* end subroutine (inter_cmdmsgtrash) */
 
-
-static int inter_cmdmsgdel(INTER *iap,int f_del,int argnum)
-{
+local int inter_cmdmsgdel(INTER *iap,int f_del,int argnum) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
 
@@ -3605,16 +3502,17 @@ static int inter_cmdmsgdel(INTER *iap,int f_del,int argnum)
 
 	if ((rs = inter_msgargvalid(iap,argnum)) >= 0) {
 	    cint	mi = rs ;
-	    int		f_delprev = FALSE ;
+	    int		f_delprev = false ;
 	    if ((rs = inter_msgdel(iap,mi,f_del)) >= 0) {
 	        cchar	*fmt = "msg#%u ­ %s\v" ;
-	        cchar	*ccp ;
+	        cchar	*cnp ;
 	        f_delprev = (rs > 0) ;
 	        if (! LEQUIV(f_del,f_delprev)) {
-	            ccp = (f_del) ? "deletion scheduled" : "deletion canceled" ;
-	        } else
-	            ccp = "no change" ;
-	        rs = inter_info(iap,FALSE,fmt,(mi+1),ccp) ;
+	            cnp = (f_del) ? "deletion scheduled" : "deletion canceled" ;
+	        } else {
+	            cnp = "no change" ;
+		}
+	        rs = inter_info(iap,false,fmt,(mi+1),cnp) ;
 	    }
 	} else if (rs == SR_NOMSG)
 	    rs = SR_OK ;
@@ -3623,9 +3521,7 @@ static int inter_cmdmsgdel(INTER *iap,int f_del,int argnum)
 }
 /* end subroutine (inter_cmdmsgdel) */
 
-
-static int inter_cmdmsgdelnum(INTER *iap,int f_del,int argnum)
-{
+local int inter_cmdmsgdelnum(INTER *iap,int f_del,int argnum) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 
@@ -3645,7 +3541,7 @@ static int inter_cmdmsgdelnum(INTER *iap,int f_del,int argnum)
 	            int		c = rs ;
 	            cchar	*s = ((f_del) ? "scheduled" : "canceled") ;
 	            cchar	*fmt = "deletions %s=%u\v" ;
-	            rs = inter_info(iap,FALSE,fmt,s,c) ;
+	            rs = inter_info(iap,false,fmt,s,c) ;
 	        }
 	    }
 	}
@@ -3655,7 +3551,7 @@ static int inter_cmdmsgdelnum(INTER *iap,int f_del,int argnum)
 /* end subroutine (inter_cmdmsgdelnum) */
 
 
-static int inter_cmdsubject(INTER *iap,int argnum)
+local int inter_cmdsubject(INTER *iap,int argnum)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		mi = iap->miscanpoint ;
@@ -3684,7 +3580,7 @@ static int inter_cmdsubject(INTER *iap,int argnum)
 			debugprintf("inter/cmdsubject: b=>%r<\n",
 			vp,strlinelen(vp,vl,40)) ;
 #endif
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 #if	CF_TRANSPROC
 		{
 		    cint	n = COLUMNS ;
@@ -3706,7 +3602,7 @@ static int inter_cmdsubject(INTER *iap,int argnum)
 	    if (rs >= 0) {
 	        cint	ml = MIN(pip->linelen,dl) ;
 	        disbuf[ml] = '\0' ;
-	        rs = inter_info(iap,FALSE,"s> %s\v",disbuf) ;
+	        rs = inter_info(iap,false,"s> %s\v",disbuf) ;
 	    }
 	} /* end if (mbcache_msgscan) */
 
@@ -3717,9 +3613,7 @@ static int inter_cmdsubject(INTER *iap,int argnum)
 }
 /* end subroutine (inter_cmdsubject) */
 
-
-static int inter_msgoutfile(INTER *iap,cchar *cp,int cl,off_t moff,int mlen)
-{
+local int inter_msgoutfile(INTER *iap,cc *cp,int cl,off_t moff,int mlen) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -3737,14 +3631,15 @@ static int inter_msgoutfile(INTER *iap,cchar *cp,int cl,off_t moff,int mlen)
 	    cchar	*fmt ;
 	    char	ofname[MAXPATHLEN + 1] ;
 	    if (cp[0] != '/') {
-	        cchar	*ccp = iap->pathprefix ;
-	        if (ccp == NULL) {
+	        cchar	*cnp = iap->pathprefix ;
+	        if (cnp == nullptr) {
 	            proginfo_pwd(pip) ;
-	            ccp = pip->pwd ;
+	            cnp = pip->pwd ;
 	        }
-	        rs1 = mkpath2w(ofname,ccp,cp,cl) ;
-	    } else
+	        rs1 = mkpath2w(ofname,cnp,cp,cl) ;
+	    } else {
 	        rs1 = mkpath1w(ofname,cp,cl) ;
+	    }
 	    if (rs1 >= 0) {
 		cmode	om = 0666 ;
 		cint	of = (O_WRONLY | O_CREAT | O_TRUNC) ;
@@ -3754,20 +3649,21 @@ static int inter_msgoutfile(INTER *iap,cchar *cp,int cl,off_t moff,int mlen)
 	                if ((rs = u_seek(iap->mfd,moff,SEEK_SET)) >= 0) {
 	                    if ((rs1 = uc_copy(iap->mfd,ofd,mlen)) >= 0) {
 	                        fmt = "size=%u file=%r\v" ;
-	                        rs = inter_info(iap,FALSE,fmt,rs1,cp,cl) ;
+	                        rs = inter_info(iap,false,fmt,rs1,cp,cl) ;
 	                    } else {
 	                        fmt = "file-copy-error (%d)\v" ;
-	                        rs = inter_info(iap,TRUE,fmt,rs1) ;
+	                        rs = inter_info(iap,true,fmt,rs1) ;
 		            }
 	                } /* end if (copy) */
 		    } /* end if (have data) */
 	            u_close(ofd) ;
 	        } else {
 	            fmt = "inaccessible (%d) file=%s\v" ;
-	            rs = inter_info(iap,TRUE,fmt,rs1,ofname) ;
+	            rs = inter_info(iap,true,fmt,rs1,ofname) ;
 	        }
-	    } else
-	        inter_info(iap,TRUE,"invalid file=%r\v",cp,cl) ;
+	    } else {
+	        inter_info(iap,true,"invalid file=%r\v",cp,cl) ;
+	    }
 	} /* end if (ok) */
 
 #if	CF_DEBUG
@@ -3779,15 +3675,13 @@ static int inter_msgoutfile(INTER *iap,cchar *cp,int cl,off_t moff,int mlen)
 }
 /* end subroutine (inter_msgoutfile) */
 
-
-static int inter_msgoutpipe(INTER *iap,cchar *cmd,off_t outoff,int outlen)
-{
+local int inter_msgoutpipe(INTER *iap,cc *cmd,off_t outoff,int outlen) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rs2 ;
 
-	if (cmd == NULL) return SR_NOANODE ;
+	if (cmd == nullptr) return SR_NOANODE ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -3877,20 +3771,20 @@ static int inter_msgoutpipe(INTER *iap,cchar *cmd,off_t outoff,int outlen)
 
 	    if (rs >= 0) {
 	        cint	rlen = RBUFLEN ;
-	        cchar	*ccp ;
+	        cchar	*cnp ;
 	        char		rbuf[RBUFLEN + 1] ;
-	        ccp = "resume> \v" ;
-	        if ((rs = inter_response(iap,rbuf,rlen,ccp)) >= 0) {
+	        cnp = "resume> \v" ;
+	        if ((rs = inter_response(iap,rbuf,rlen,cnp)) >= 0) {
 	            if ((rs = inter_refresh(iap)) >= 0) {
 	                if (rs1 >= 0) {
-	                    rs = inter_info(iap,FALSE,"bytes=%u\v",rs1) ;
+	                    rs = inter_info(iap,false,"bytes=%u\v",rs1) ;
 	                } else {
 	                    if (rs1 == SR_PIPE) {
-	                        ccp = "not all data transfered (%d)\v" ;
+	                        cnp = "not all data transfered (%d)\v" ;
 	                    } else {
-	                        ccp = "file-copy-error (%d)\v" ;
+	                        cnp = "file-copy-error (%d)\v" ;
 			    }
-	                    rs = inter_info(iap,TRUE,ccp,rs1) ;
+	                    rs = inter_info(iap,true,cnp,rs1) ;
 			}
 	            } /* end if (inter_refresh) */
 	        } /* end if (inter_response) */
@@ -3909,13 +3803,11 @@ ret0:
 }
 /* end subroutine (inter_msgoutpipe) */
 
-
-static int inter_msgoutprog(INTER *iap,cchar *cmd,off_t ooff,int olen)
-{
+local int inter_msgoutprog(INTER *iap,cchar *cmd,off_t ooff,int olen) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
 
-	if (cmd == NULL) return SR_NOANODE ;
+	if (cmd == nullptr) return SR_NOANODE ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
@@ -3933,7 +3825,7 @@ static int inter_msgoutprog(INTER *iap,cchar *cmd,off_t ooff,int olen)
 	    cchar	**ev = pip->envv ;
 	    cchar	*av[2] ;
 	    av[0] = cmd ;
-	    av[1] = NULL ;
+	    av[1] = nullptr ;
 	    if ((rs = uc_openprog(cmd,of,av,ev)) >= 0) {
 	        cint	ofd = rs ;
 	        rs1 = uc_copy(iap->mfd,ofd,olen) ;
@@ -3961,7 +3853,7 @@ static int inter_msgoutprog(INTER *iap,cchar *cmd,off_t ooff,int olen)
 
 
 /* ARGSUSED */
-static int inter_msgoutproger(INTER *iap,cchar *cmd,off_t off,int olen)
+local int inter_msgoutproger(INTER *iap,cchar *cmd,off_t off,int olen)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
@@ -3990,7 +3882,7 @@ static int inter_msgoutproger(INTER *iap,cchar *cmd,off_t off,int olen)
 	        ps.disp[2] = SPAWNPROC_DINHERIT ;
 
 #if	CF_TESTGO1
-	    if ((rs1 = spawnproc(&ps,cmd,NULL,NULL)) >= 0) {
+	    if ((rs1 = spawnproc(&ps,cmd,nullptr,nullptr)) >= 0) {
 	        pid_t	pid = rs1 ;
 
 #if	CF_MARKSPAMSYNC
@@ -4017,7 +3909,7 @@ static int inter_msgoutproger(INTER *iap,cchar *cmd,off_t off,int olen)
 /* end subroutine (inter_msgoutproger) */
 
 
-static int inter_subproc(INTER *iap,pid_t pid)
+local int inter_subproc(INTER *iap,pid_t pid)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -4040,7 +3932,7 @@ static int inter_subproc(INTER *iap,pid_t pid)
 /* end subroutine (inter_subproc) */
 
 
-static int inter_msgoutview(INTER *iap,cchar *cmd,cchar *vfname)
+local int inter_msgoutview(INTER *iap,cchar *cmd,cchar *vfname)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -4052,7 +3944,7 @@ static int inter_msgoutview(INTER *iap,cchar *cmd,cchar *vfname)
 	    debugprintf("inter_msgoutview: ent cmd=%s\n",cmd) ;
 #endif
 
-	if (cmd == NULL) return SR_NOANODE ;
+	if (cmd == nullptr) return SR_NOANODE ;
 
 /* to the viewing */
 
@@ -4074,7 +3966,7 @@ static int inter_msgoutview(INTER *iap,cchar *cmd,cchar *vfname)
 
 	            av[0] = cp ;
 	            av[1] = vfname ;
-	            av[2] = NULL ;
+	            av[2] = nullptr ;
 
 	            memset(&ps,0,sizeof(SPAWNPROC)) ;
 	            ps.opts |= SPAWNPROC_OSETPGRP ;
@@ -4087,7 +3979,7 @@ static int inter_msgoutview(INTER *iap,cchar *cmd,cchar *vfname)
 	                ps.pgrp = iap->pgrp ;
 	            }
 
-	            if ((rs1 = spawnproc(&ps,cmd,av,NULL)) >= 0) {
+	            if ((rs1 = spawnproc(&ps,cmd,av,nullptr)) >= 0) {
 	                const pid_t	pid = rs1 ;
 	                int		cs ;
 
@@ -4108,9 +4000,9 @@ static int inter_msgoutview(INTER *iap,cchar *cmd,cchar *vfname)
 	        if (rs >= 0) {
 	            if ((rs = inter_refresh(iap)) >= 0) {
 			if (rs1 >= 0) {
-	                    rs = inter_info(iap,FALSE,"\v") ;
+	                    rs = inter_info(iap,false,"\v") ;
 			} else {
-	                    rs = inter_info(iap,FALSE,"failed (%d)\v",rs1) ;
+	                    rs = inter_info(iap,false,"failed (%d)\v",rs1) ;
 			}
 		    }
 		}
@@ -4128,7 +4020,7 @@ static int inter_msgoutview(INTER *iap,cchar *cmd,cchar *vfname)
 /* end subroutine (inter_msgoutview) */
 
 
-static int inter_filecopy(INTER *iap,cchar *srcfname,cchar *dstfname)
+local int inter_filecopy(INTER *iap,cchar *srcfname,cchar *dstfname)
 {
 	cint	of = O_RDONLY ;
 	cmode	om = 0666 ;
@@ -4147,7 +4039,7 @@ static int inter_filecopy(INTER *iap,cchar *srcfname,cchar *dstfname)
 	    } /* end if (dst-file) */
 
 	    if ((rs >= 0) && (rs1 < 0))
-	        rs = inter_info(iap,TRUE, "file-copy-error (%d)\v",rs1) ;
+	        rs = inter_info(iap,true, "file-copy-error (%d)\v",rs1) ;
 
 	    u_close(sfd) ;
 	} /* end if (src-file) */
@@ -4157,7 +4049,7 @@ static int inter_filecopy(INTER *iap,cchar *srcfname,cchar *dstfname)
 /* end subroutine (inter_filecopy) */
 
 
-static int inter_msgappend(INTER *iap,int mi,cchar *mbname)
+local int inter_msgappend(INTER *iap,int mi,cchar *mbname)
 {
 	PROGINFO	*pip = iap->pip ;
 	off_t	moff ;
@@ -4167,7 +4059,7 @@ static int inter_msgappend(INTER *iap,int mi,cchar *mbname)
 	char		mbfname[MAXPATHLEN + 1] ;
 
 	if (mi < 0) return SR_NOANODE ;
-	if (mbname == NULL) return SR_NOANODE ;
+	if (mbname == nullptr) return SR_NOANODE ;
 	if (mbname[0] == '\0') return SR_NOANODE ;
 
 	if ((rs = mbcache_msgoff(&iap->mc,mi,&moff)) >= 0) {
@@ -4180,7 +4072,7 @@ static int inter_msgappend(INTER *iap,int mi,cchar *mbname)
 	                rs1 = mailboxappend(mbfname,iap->mfd,mlen) ;
 	                if (rs1 < 0) {
 	                    cchar	*fmt = "file-copy-error (%d)\v" ;
-	                    rs = inter_info(iap,TRUE,fmt,rs1) ;
+	                    rs = inter_info(iap,true,fmt,rs1) ;
 	                }
 	            } /* end if (mkpath) */
 	        } /* end if (seek) */
@@ -4192,11 +4084,11 @@ static int inter_msgappend(INTER *iap,int mi,cchar *mbname)
 /* end subroutine (inter_msgappend) */
 
 
-static int inter_msgdel(INTER *iap,int mi,int delcmd)
+local int inter_msgdel(INTER *iap,int mi,int delcmd)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
-	int		f_delprev = FALSE ;
+	int		f_delprev = false ;
 
 	if ((mi >= 0) && (mi < iap->nmsgs)) {
 	    int		mark ;
@@ -4233,7 +4125,7 @@ static int inter_msgdel(INTER *iap,int mi,int delcmd)
 
 
 /* delete a number of messages rather than a message by-msg-number */
-static int inter_msgdelnum(INTER *iap,int mi,int num,int delcmd)
+local int inter_msgdelnum(INTER *iap,int mi,int num,int delcmd)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -4248,7 +4140,7 @@ static int inter_msgdelnum(INTER *iap,int mi,int num,int delcmd)
 	if ((mi >= 0) && (mi < iap->nmsgs) && (delcmd >= 0)) {
 	    int		mark ;
 	    int		i ;
-	    int		f_delprev = FALSE ;
+	    int		f_delprev = false ;
 
 	for (i = 0 ; (rs >= 0) && (i < num) ; i += 1) {
 	    if (mi >= iap->nmsgs) break ;
@@ -4284,7 +4176,7 @@ static int inter_msgdelnum(INTER *iap,int mi,int num,int delcmd)
 /* end subroutine (inter_msgdelnum) */
 
 
-static int inter_scancheck(INTER *iap,int si,int n)
+local int inter_scancheck(INTER *iap,int si,int n)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -4396,17 +4288,16 @@ static int inter_scancheck(INTER *iap,int si,int n)
 }
 /* end subroutine (inter_scancheck) */
 
-
 /* get input */
-int inter_input(INTER *iap,char *lbuf,int llen,cchar *fmt,...)
-{
+int inter_input(INTER *iap,char *lbuf,int llen,cchar *fmt,...) noex {
 	PROGINFO	*pip = iap->pip ;
 	DISPLAY		*dip = &iap->di ;
+	va_list		ap ;
 	int		rs = SR_OK ;
 	int		cmd ;
 	int		len = 0 ;
 
-	if (lbuf == NULL)
+	if (lbuf == nullptr)
 	    return SR_FAULT ;
 
 	lbuf[0] = '\0' ;
@@ -4414,7 +4305,6 @@ int inter_input(INTER *iap,char *lbuf,int llen,cchar *fmt,...)
 /* output prompt (on the "input" line) and flush to device */
 
 	{
-	    va_list	ap ;
 	    va_begin(ap,fmt) ;
 	    if ((rs = display_vinput(dip,fmt,ap)) >= 0) {
 	        rs = display_flush(&iap->di) ;
@@ -4451,22 +4341,20 @@ int inter_input(INTER *iap,char *lbuf,int llen,cchar *fmt,...)
 }
 /* end subroutine (inter_input) */
 
-
 /* get input */
-int inter_response(INTER *iap,char *lbuf,int llen,cchar *fmt,...)
-{
+int inter_response(INTER *iap,char *lbuf,int llen,cchar *fmt,...) noex {
 	DISPLAY		*dip = &iap->di ;
+	va_list		ap ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
-	if (lbuf == NULL) return SR_FAULT ;
+	if (lbuf == nullptr) return SR_FAULT ;
 
 	lbuf[0] = '\0' ;
 
 /* output prompt (on the "input" line) and flush to device */
 
 	{
-	    va_list	ap ;
 	    va_begin(ap,fmt) ;
 	    if ((rs = display_vinput(dip,fmt,ap)) >= 0) {
 	        rs = display_flush(&iap->di) ;
@@ -4506,23 +4394,21 @@ int inter_response(INTER *iap,char *lbuf,int llen,cchar *fmt,...)
 }
 /* end subroutine (inter_response) */
 
-
-static int inter_change(INTER *iap)
-{
+local int inter_change(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
 	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rl ;
 	int		m ;
 	int		cl = 0 ;
-	int		f_same = FALSE ;
-	int		f_changed = FALSE ;
-	cchar	*ccp  ;
+	int		f_same = false ;
+	int		f_changed = false ;
+	cchar	*cnp  ;
 	cchar	*cp ;
 	char		response[LINEBUFLEN + 1] ;
 
-	ccp = "change to mailbox: " ;
-	rs = inter_input(iap,response,llen, ccp) ;
+	cnp = "change to mailbox: " ;
+	rs = inter_input(iap,response,llen, cnp) ;
 	rl = rs ;
 	if ((rs >= 0) && (rl > 0) && (response[rl-1] == '\n')) rl -= 1 ;
 
@@ -4549,24 +4435,24 @@ static int inter_change(INTER *iap)
 
 /* are we changing to the same mailbox? */
 
-	if (iap->open.mbcache && (iap->mbname != NULL)) {
+	if (iap->open.mbcache && (iap->mbname != nullptr)) {
 	    m = nleadstr(iap->mbname,cp,cl) ;
 	    f_same = (iap->mbname[m] == '\0') && (m == cl) ;
 	}
 
 	if (f_same && (strcmp(iap->mbname,"new") == 0))
-	    f_same = FALSE ;
+	    f_same = false ;
 
 /* does the new mailbox exist? */
 
 	if (! f_same) {
 	    if ((rs = inter_havemb(iap,cp,cl)) > 0) {
-	        f_changed = TRUE ;
+	        f_changed = true ;
 	        rs = inter_mailbeginer(iap,cp,cl) ;
 	    } else if (rs == 0) {
 	        char	disname[MAXNAMELEN + 1] ;
 	        mkdisplayable(disname,MAXNAMELEN,cp,cl) ;
-	        inter_info(iap,TRUE,
+	        inter_info(iap,true,
 	            "inaccessible mb=%s\v",disname) ;
 	    }
 	} /* end if (not the same MBOX) */
@@ -4582,22 +4468,20 @@ ret0:
 }
 /* end subroutine (inter_change) */
 
-
 /* do we have the specified mailbox? */
-static int inter_havemb(INTER *iap,cchar *mbname,int mblen)
-{
+local int inter_havemb(INTER *iap,cchar *mbname,int mblen) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 	char		mbfname[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("inter_havemb: mbname=>%r<\n",mbname,mblen) ;
 #endif
-	if ((mbname != NULL) && (mbname[0] != '\0')) {
-	    if (pip->folderdname != NULL) {
+	if ((mbname != nullptr) && (mbname[0] != '\0')) {
+	    if (pip->folderdname != nullptr) {
 	        cchar	*fdn = pip->folderdname ;
 	        if ((rs1 = mkpath2w(mbfname,fdn,mbname,mblen)) >= 0) {
 	            ustat	sb ;
@@ -4625,7 +4509,7 @@ static int inter_havemb(INTER *iap,cchar *mbname,int mblen)
 /* end subroutine (inter_havemb) */
 
 
-static int inter_mailempty(INTER *iap)
+local int inter_mailempty(INTER *iap)
 {
 	int		rs = SR_OK ;
 	int		f = ((! iap->open.mbcache) && (! iap->fl.exit)) ;
@@ -4635,7 +4519,7 @@ static int inter_mailempty(INTER *iap)
 	    if ((rs >= 0) && iap->fl.setmbname) {
 	        char	mbname[3] ;
 	        mbname[0] = '\0' ;
-	        iap->fl.setmbname = FALSE ;
+	        iap->fl.setmbname = false ;
 	        rs = display_setmbname(&iap->di,mbname,0) ;
 	    } /* end if */
 
@@ -4652,12 +4536,12 @@ static int inter_mailempty(INTER *iap)
 /* end subroutine (inter_mailempty) */
 
 
-static int inter_cmdpathprefix(INTER *iap)
+local int inter_cmdpathprefix(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	cint	rlen = LINEBUFLEN ;
 	int		rs ;
-	int		f_ok = TRUE ;
+	int		f_ok = true ;
 	cchar	*ps = "change path-prefix: " ;
 	char		rbuf[LINEBUFLEN + 1] ;
 
@@ -4687,12 +4571,12 @@ static int inter_cmdpathprefix(INTER *iap)
 	            } /* end if (mkpath) */
 	        } /* end if (non-zero string) */
 	        if (f_ok) {
-	            if (px != NULL) {
-	                rs = inter_info(iap,FALSE,"dir=%s\v",px) ;
+	            if (px != nullptr) {
+	                rs = inter_info(iap,false,"dir=%s\v",px) ;
 		    }
 	        } else {
 	            cchar	*fmt = "inaccessible dir=%r\v" ;
-	            rs = inter_info(iap,TRUE,fmt,cp,cl) ;
+	            rs = inter_info(iap,true,fmt,cp,cl) ;
 	        } /* end if */
 	    } /* end if (positive response) */
 	} /* end if (inter_input) */
@@ -4702,7 +4586,7 @@ static int inter_cmdpathprefix(INTER *iap)
 /* end subroutine (inter_cmdpathprefix) */
 
 
-static int inter_cmdshell(INTER *iap)
+local int inter_cmdshell(INTER *iap)
 {
 	PROGINFO	*pip = iap->pip ;
 	cint	rlen = RBUFLEN ;
@@ -4710,19 +4594,17 @@ static int inter_cmdshell(INTER *iap)
 	int		rs1 ;
 	int		rs2 ;
 	int		rs3 ;
-	cchar		*ccp = "cmd: " ;
+	cchar		*cnp = "cmd: " ;
 	char		rbuf[RBUFLEN + 1] ;
 
-	if ((rs = inter_response(iap,rbuf,rlen,ccp)) > 0) {
+	if ((rs = inter_response(iap,rbuf,rlen,cnp)) > 0) {
 	    if ((rs = display_suspend(&iap->di)) >= 0) {
 		rs2 = SR_OK ;
 		rs3 = SR_OK ;
 
 	        if ((rs = uterm_suspend(iap->utp)) >= 0) {
 	            cchar	*cmdshell = pip->prog_shell ;
-	            SPAWNPROC	ps ;
-
-	            memset(&ps,0,sizeof(SPAWNPROC)) ;
+	            SPAWNPROC	ps{} ;
 	            ps.opts |= SPAWNPROC_OSETPGRP ;
 	            ps.disp[0] = SPAWNPROC_DINHERIT ;
 	            ps.disp[1] = SPAWNPROC_DINHERIT ;
@@ -4750,14 +4632,14 @@ static int inter_cmdshell(INTER *iap)
 	        display_resume(&iap->di) ;
 
 	        if (rs >= 0) {
-	            ccp = "resume> \v" ;
-	            if ((rs = inter_response(iap,rbuf,rlen,ccp)) >= 0) {
+	            cnp = "resume> \v" ;
+	            if ((rs = inter_response(iap,rbuf,rlen,cnp)) >= 0) {
 	                if ((rs = inter_refresh(iap)) >= 0) {
 			    if (rs1 >= 0) rs1 = rs2 ;
 			    if (rs1 >= 0) rs1 = rs3 ;
 			    if (rs1 < 0) {
 	            	        cchar	*fmt = "command error (%d)\v" ;
-	            		rs = inter_info(iap,TRUE,fmt,rs1) ;
+	            		rs = inter_info(iap,true,fmt,rs1) ;
 			    }
 			}
 		    }
@@ -4770,9 +4652,7 @@ static int inter_cmdshell(INTER *iap)
 }
 /* end subroutine (inter_cmdshell) */
 
-
-static int inter_viewtop(INTER *iap,int vln)
-{
+local int inter_viewtop(INTER *iap,int vln) noex {
 	int		rs = SR_OK ;
 
 	if (vln < 1) vln = 1 ;
@@ -4787,7 +4667,7 @@ static int inter_viewtop(INTER *iap,int vln)
 	    int	f = iap->fl.viewchange ;
 	    f = f || (iap->miscanpoint != iap->miviewpoint) ;
 	    if (f) {
-	        iap->fl.viewchange = FALSE ;
+	        iap->fl.viewchange = false ;
 	        rs = inter_msgviewclose(iap) ;
 	    }
 	}
@@ -4809,9 +4689,7 @@ static int inter_viewtop(INTER *iap,int vln)
 }
 /* end subroutine (inter_viewtop) */
 
-
-static int inter_viewnext(INTER *iap,int inc)
-{
+local int inter_viewnext(INTER *iap,int inc) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		f ;
@@ -4832,7 +4710,8 @@ static int inter_viewnext(INTER *iap,int inc)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	    debugprintf("inter_viewnext: f_mvinit=%u\n",iap->open.mv) ;
-	    debugprintf("inter_viewnext: f_viewchange=%u\n",iap->fl.viewchange) ;
+	    debugprintf("inter_viewnext: f_viewchange=%u\n",
+		iap->fl.viewchange) ;
 	    debugprintf("inter_viewnext: miscanpoint=%d miviewpoint=%d\n",
 	        iap->miscanpoint,iap->miviewpoint) ;
 	}
@@ -4842,7 +4721,7 @@ static int inter_viewnext(INTER *iap,int inc)
 	    f = iap->fl.viewchange ;
 	    f = f || (iap->miscanpoint != iap->miviewpoint) ;
 	    if (f) {
-	        iap->fl.viewchange = FALSE ;
+	        iap->fl.viewchange = false ;
 	        rs = inter_msgviewclose(iap) ;
 	    }
 	}
@@ -4896,16 +4775,14 @@ ret0:
 }
 /* end subroutine (inter_viewnext) */
 
-
-static int inter_msgviewopen(INTER *iap)
-{
+local int inter_msgviewopen(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
 	MBCACHE_SCAN	*msp ;
-	cint	mi = iap->miscanpoint ;
+	cint		mi = iap->miscanpoint ;
 	int		rs = SR_OK ;
 	int		nlines = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
@@ -4916,9 +4793,9 @@ static int inter_msgviewopen(INTER *iap)
 	}
 #endif
 
-	iap->fl.viewchange = FALSE ;
+	iap->fl.viewchange = false ;
 	if ((! iap->open.mv) && (iap->miscanpoint >= 0)) {
-	    if (iap->mbname != NULL) {
+	    if (iap->mbname != nullptr) {
 	        iap->miviewpoint = mi ;
 	        iap->lnviewtop = -1 ;
 	        if ((rs = mbcache_msgscan(&iap->mc,mi,&msp)) >= 0) {
@@ -4927,10 +4804,12 @@ static int inter_msgviewopen(INTER *iap)
 			nlines = rs ;
 	            }
 	        } /* end if (mbcache_msgscan) */
-	    } else
+	    } else {
 	        rs = SR_NOANODE ;
-	} else
+	    }
+	} else {
 	    rs = SR_NOANODE ;
+	}
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -4941,9 +4820,7 @@ static int inter_msgviewopen(INTER *iap)
 }
 /* end subroutine (inter_msgviewopen) */
 
-
-static int inter_msgviewopener(INTER *iap,int mi,MBCACHE_SCAN *msp)
-{
+local int inter_msgviewopener(INTER *iap,int mi,MBCACHE_SCAN *msp) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		nl = 0 ;
@@ -4959,7 +4836,7 @@ static int inter_msgviewopener(INTER *iap,int mi,MBCACHE_SCAN *msp)
 	}
 #endif
 
-	if ((midp == NULL) || (midp[0] == '\0')) {
+	if ((midp == nullptr) || (midp[0] == '\0')) {
 	    midp = msgid ;
 	    rs = snsdd(msgid,MAILA-D-LEN,iap->mbname,iap->miscanpoint) ;
 	}
@@ -4970,12 +4847,12 @@ static int inter_msgviewopener(INTER *iap,int mi,MBCACHE_SCAN *msp)
 #endif
 
 	if (rs >= 0) {
-	    cchar	*mfp = NULL ;
+	    cchar	*mfp = nullptr ;
 	    if ((rs = inter_msgviewfile(iap,msp,midp,&mfp)) >= 0) {
-	        cint	f = TRUE ;
+	        cint	f = true ;
 	        nl = rs ;
 	        if ((rs = inter_setscanlines(iap,mi,msp,nl,f)) >= 0) {
-	            if (mfp != NULL) {
+	            if (mfp != nullptr) {
 	                if ((rs = mailmsgviewer_open(&iap->mv,mfp)) >= 0) {
 	                    DISPLAY_BOTINFO	bi ;
 		            cint	lmsgfrom = DISPLAY_LMSGFROM ;
@@ -4989,15 +4866,15 @@ static int inter_msgviewopener(INTER *iap,int mi,MBCACHE_SCAN *msp)
 	                }
 #endif
 
-	                iap->open.mv = TRUE ;
+	                iap->open.mv = true ;
 	                memset(&bi,0,sizeof(DISPLAY_BOTINFO)) ;
-	                if (mfrom != NULL) strwcpy(bi.msgfrom,mfrom,lmsgfrom) ;
+	                if (mfrom != nullptr) strwcpy(bi.msgfrom,mfrom,lmsgfrom) ;
 	                bi.msgnum = (mi+1) ;
 	                bi.msglines = nl ;
 	                bi.msgline = 1 ;
 	                rs = display_botinfo(&iap->di,&bi) ;
 		        if (rs < 0) {
-	        	    iap->open.mv = FALSE ;
+	        	    iap->open.mv = false ;
 	        	    mailmsgviewer_close(&iap->mv) ;
 		        }
 	            } /* end if (mailmsgviewer_open) */
@@ -5020,9 +4897,7 @@ static int inter_msgviewopener(INTER *iap,int mi,MBCACHE_SCAN *msp)
 }
 /* end subroutine (inter_msgviewopener) */
 
-
-static int inter_msgviewclose(INTER *iap)
-{
+local int inter_msgviewclose(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 
@@ -5035,7 +4910,7 @@ static int inter_msgviewclose(INTER *iap)
 	    iap->lnviewtop = -1 ;
 	    iap->miviewpoint = -1 ;
 	    if (iap->open.mv) {
-	        iap->open.mv = FALSE ;
+	        iap->open.mv = false ;
 	        rs = mailmsgviewer_close(&iap->mv) ;
 	    }
 	} else
@@ -5045,36 +4920,33 @@ static int inter_msgviewclose(INTER *iap)
 }
 /* end subroutine (inter_msgviewclose) */
 
-
-static int inter_msgviewsetlines(INTER *iap,int nlines)
-{
+local int inter_msgviewsetlines(INTER *iap,int nlines) noex {
 	PROGINFO	*pip = iap->pip ;
-	cint	mi = iap->miviewpoint ;
+	cint		mi = iap->miviewpoint ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if (mi >= 0) {
 	    int	vlines ;
 	    if ((rs = mbcache_msglines(&iap->mc,mi,&vlines)) >= 0) {
 	        if (vlines < 0) {
-	            f = TRUE ;
+	            f = true ;
 	            if ((rs = mbcache_msgsetlines(&iap->mc,mi,nlines)) >= 0) {
-	                rs = display_scanloadlines(&iap->di,mi,nlines,TRUE) ;
+	                rs = display_scanloadlines(&iap->di,mi,nlines,true) ;
 		    }
 	        } /* end if (setting lines) */
 	    } /* end if (mbcache_msglines) */
-	} else
+	} else {
 	    rs = SR_INVALID ;
+	}
 
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (inter_msgviewsetlines) */
 
-
-static int inter_msgviewtop(INTER *iap,int lntop)
-{
+local int inter_msgviewtop(INTER *iap,int lntop) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -5103,8 +4975,9 @@ static int inter_msgviewtop(INTER *iap,int lntop)
 	    c = rs ;
 	} /* end if */
 
-	if ((rs >= 0) && (c > 0))
+	if ((rs >= 0) && (c > 0)) {
 	    rs = display_botline(&iap->di,(lntop+1)) ;
+	}
 
 ret0:
 
@@ -5117,16 +4990,14 @@ ret0:
 }
 /* end subroutine (inter_msgviewtop) */
 
-
-static int inter_msgviewadj(INTER *iap,int lntop)
-{
+local int inter_msgviewadj(INTER *iap,int lntop) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		mi ;
 	int		lines ;
 	int		c = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -5209,8 +5080,9 @@ static int inter_msgviewadj(INTER *iap,int lntop)
 	        }
 	    }
 
-	    if (rs >= 0)
+	    if (rs >= 0) {
 	        iap->lnviewtop = lntop ;
+	    }
 
 	} /* end if */
 
@@ -5228,9 +5100,7 @@ ret0:
 }
 /* end subroutine (inter_msgviewadj) */
 
-
-static int inter_msgviewnext(INTER *iap,int inc)
-{
+local int inter_msgviewnext(INTER *iap,int inc) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -5255,26 +5125,22 @@ static int inter_msgviewnext(INTER *iap,int inc)
 }
 /* end subroutine (inter_msgviewnext) */
 
-
-static int inter_msgviewrefresh(INTER *iap)
-{
+local int inter_msgviewrefresh(INTER *iap) noex {
 	int		rs ;
-
+	{
 	rs = inter_msgviewload(iap,0,iap->viewlines,iap->lnviewtop) ;
-
+	}
 	return rs ;
 }
 /* end subroutine (inter_msgviewrefresh) */
 
-
-static int inter_msgviewload(INTER *iap,int vi,int vn,int ln)
-{
+local int inter_msgviewload(INTER *iap,int vi,int vn,int ln) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		ll = -1 ;
 	int		i = 0 ;
 	int		c = 0 ;
-	cchar	*lp = NULL ;
+	cchar	*lp = nullptr ;
 	char		dum[2] ;
 
 #if	CF_DEBUG
@@ -5347,9 +5213,7 @@ ret0:
 }
 /* end subroutine (inter_msgviewload) */
 
-
-static int inter_mbviewopen(INTER *iap)
-{
+local int inter_mbviewopen(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 	int		fd = -1 ;
@@ -5360,7 +5224,7 @@ static int inter_mbviewopen(INTER *iap)
 #endif
 
 	if (iap->mfd < 0) {
-	    if (iap->mbname != NULL) {
+	    if (iap->mbname != nullptr) {
 		cmode	om = 0666 ;
 		cint	of = O_RDONLY ;
 	        cchar	*folder = pip->folderdname ;
@@ -5384,29 +5248,24 @@ static int inter_mbviewopen(INTER *iap)
 }
 /* end subroutine (inter_mbviewopen) */
 
-
-static int inter_mbviewclose(INTER *iap)
-{
+local int inter_mbviewclose(INTER *iap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (iap->mfd >= 0) {
 	    rs1 = u_close(iap->mfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    iap->mfd = -1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (inter_mbviewclose) */
 
-
 #if	CF_SUSPEND
-static int inter_suspend(INTER *iap)
-{
+local int inter_suspend(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
-	sigset_t	nsm, osm ;
-	cint	sig = SIGTSTP ;
+	sigset_t	nsm ;
+	sigset_t	osm ;
+	cint		sig = SIGTSTP ;
 	int		rs ;
 
 #if	CF_DEBUG
@@ -5417,10 +5276,10 @@ static int inter_suspend(INTER *iap)
 	uc_sigsetempty(&nsm) ;
 	if ((rs = uc_sigsetadd(&nsm,sig)) >= 0) {
 	    if ((rs = u_sigmask(SIG_UNBLOCK,&nsm,&osm)) >= 0) {
-	        struct sigaction	sao, san ;
+	        SIGACTION	sao ;
+	        SIGACTION	san{} ;
 
 	        uc_sigsetfill(&nsm) ;
-	        memset(&san,0,sizeof(struct sigaction)) ;
 	        san.sa_handler = SIG_DFL ;
 	        san.sa_mask = nsm ;
 	        san.sa_flags = 0 ;
@@ -5438,10 +5297,10 @@ static int inter_suspend(INTER *iap)
 	            inter_pending(iap) ;
 #endif
 
-	            u_sigaction(sig,&sao,NULL) ;
+	            u_sigaction(sig,&sao,nullptr) ;
 	        } /* end if (sigaction) */
 
-	        u_sigmask(SIG_SETMASK,&osm,NULL) ;
+	        u_sigmask(SIG_SETMASK,&osm,nullptr) ;
 	    } /* end if (sigmask) */
 	} /* end if */
 
@@ -5455,10 +5314,8 @@ static int inter_suspend(INTER *iap)
 /* end subroutine (inter_suspend) */
 #endif /* CF_SUSPEND */
 
-
 #if	CF_SIGPENDING
-static int inter_pending(INTER *iap)
-{
+local int inter_pending(INTER *iap) noex {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
 
@@ -5468,8 +5325,7 @@ static int inter_pending(INTER *iap)
 	    debugprintf("inter_pending: ¬\n") ;
 	    uc_sigsetempty(&psm) ;
 	    if ((rs = u_sigpending(&psm)) >= 0) {
-	        int	i ;
-	        for (i = 0 ; i < SIGRTMIN ; i += 1) {
+	        for (int i = 0 ; i < SIGRTMIN ; i += 1) {
 	            if ((rs = uc_sigsetismem(&psm,i)) > 0) {
 	                debugprintf("inter_pending: sig=%d\n",i) ;
 	            }
