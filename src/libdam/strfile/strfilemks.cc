@@ -81,6 +81,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<nulstr.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<strtab.h>		/* LIBUC */
@@ -1012,7 +1013,7 @@ local int strfilemks_fexists(SFM *op) noex {
 local int strfilemks_listbegin(SFM *op,int n) noex {
 	cint		sz = (n * SFM_SIZEMULT) ;
 	int		rs ;
-	if ((rs = strtab_start(&op->strs,size)) >= 0) {
+	if ((rs = strtab_start(&op->strs,sz)) >= 0) {
 	    rs = rectab_start(&op->rectab,n) ;
 	    if (rs < 0) {
 		strtab_finish(&op->strs) ;
@@ -1340,10 +1341,10 @@ local int rectab_extend(RECTAB *rtp) noex {
 	if ((rtp->i + 1) > rtp->n) {
 	    uint	(*va)[2] ;
 	    int		nn ;
-	    int		size ;
+	    int		sz ;
 	    nn = (rtp->n + 1) * 2 ;
-	    size = (nn + 1) * 2 * szof(int) ;
-	    if ((rs = mem.real(rtp->rectab,size,&va)) >= 0) {
+	    sz = (nn + 1) * 2 * szof(int) ;
+	    if ((rs = mem.real(rtp->rectab,sz,&va)) >= 0) {
 	        rtp->rectab = va ;
 	        rtp->n = nn ;
 	    } /* end if (memory-reallocation) */
@@ -1371,25 +1372,26 @@ local int rectab_getvec(RECTAB *rtp,uint (**rpp)[2]) noex {
 	return rs ;
 } /* end subroutine (rectab_getvec) */
 
-local int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl) noex {
-	nulstr	fn ;
-	int	rs ;
-	cchar	*fname ;
-
+local int mapfile_start(MAPFILE *mfp,int msz,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
+	int		rs ;
+	int		rs1 ;
+	cchar		*fname ;
 	memclear(mfp) ;
-	if ((rs = nulstr_start(&fn,sp,sl,&fname)) >= 0) {
+	if (nulstr fn ; (rs = nulstr_start(&fn,sp,sl,&fname)) >= 0) {
 	    cint	of = O_RDONLY ;
 	if ((rs = uc_open(fname,of,0666)) >= 0) {
-	    int	fd = rs ;
+	    cint	fd = rs ;
 	    if (ustat db ; (rs = u_fstat(fd,&sb)) >= 0) {
+		csize fsize = size_t(sb.st_size) ;
 		if (S_ISREG(sb.st_mode)) {
-		    csize	ps = op->pagesz ;
+		    csize	psize = size_t(op->pagesz) ;
 		    if ((max > 0) && (sb.st_size <= max)) {
-	    	        size_t	ms = MAX(ps,sbp->st_size) ;
+	    	        size_t	ms = MAX(psize,fsize) ;
 	    	        int	mp = PROT_READ ;
 	    	        int	mf = MAP_SHARED ;
 	    	        void	*md ;
-		        if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
+		        if ((rs = u_mmap(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 			    cint		madv = MADV_SEQUENTIAL ;
 			    const caddr_t	ma = md ;
 	    		    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
@@ -1409,7 +1411,8 @@ local int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl) noex {
 	    } /* end if (stat) */
 	    u_close(fd) ;
 	} /* end if (file-open) */
-	    nulstr_finish(&fn) ;
+	    rs1 = nulstr_finish(&fn) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file-name) */
 	return rs ;
 } /* end subroutine (mapfile_begin) */
