@@ -47,11 +47,11 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<char.h>		/* |CHAR_TOLC(3uc)| */
-#include	<hasall.h>		/* |hasalldig(3uc)| */
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<char.h>		/* LIBUC |CHAR_TOLC(3uc)| */
+#include	<hasall.h>		/* LIBUC |hasalldig(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hasourmjd.h"
 
@@ -98,7 +98,6 @@ bool hasourmjd(cchar *sp,int µsl) noex {
 	    } /* end if (valid: has our 'm' marker) */
 	} /* end if (getlenstr) */
 	return f ;
-}
-/* end subroutine (hasourmjd) */
+} /* end subroutine (hasourmjd) */
 
 
