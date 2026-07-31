@@ -61,7 +61,7 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>		/* |is{x}(3uc)| */
+#include	<ischarx.h>		/* LIBUC |is{x}(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"hasonly.h"
@@ -114,26 +114,22 @@ namespace {
 bool hasonlypl(cchar *sp,int 탎l) noex {
     	owner oo(ispl) ;
 	return oo(sp,탎l) ;
-}
-/* end subroutine (hasonlypl) */
+} /* end subroutine (hasonlypl) */
 
 bool hasonlymi(cchar *sp,int 탎l) noex {
     	owner oo(ismi) ;
 	return oo(sp,탎l) ;
-}
-/* end subroutine (hasonlymi) */
+} /* end subroutine (hasonlymi) */
 
 bool hasonlypm(cchar *sp,int 탎l) noex {
     	owner oo(ispm) ;
 	return oo(sp,탎l) ;
-}
-/* end subroutine (hasonlypm) */
+} /* end subroutine (hasonlypm) */
 
 bool hasonlyme(cchar *sp,int 탎l) noex {
     	owner oo(isme) ;
 	return oo(sp,탎l) ;
-}
-/* end subroutine (hasonlyme) */
+} /* end subroutine (hasonlyme) */
 
 
 /* local subroutines */
