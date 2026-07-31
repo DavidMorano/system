@@ -1,11 +1,12 @@
-/* termstore */
+/* termstore SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* store terminal attributes */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_TCATTR	1		/* use |tcXXXattr(3termion)| */
-
 
 /* revision history:
 
@@ -16,17 +17,15 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/time.h>
 #include	<unistd.h>
 #include	<termios.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 
@@ -39,21 +38,17 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int termstore_save(tsp,tfd)
-struct termstore	*tsp ;
-int			tfd ;
-{
+int termstore_save(termstore *tsp,int tfd) noex {
 	ustat	sb ;
-
 	int		rs ;
 
-
-/* save the terminal mode first */
-
-	tsp->f_stored = FALSE ;
+	/* save the terminal mode first */
+	tsp->f_stored = false ;
 	if ((rs = u_fstat(tfd,&sb)) < 0) 
 		return rs ;
 
@@ -68,7 +63,7 @@ int			tfd ;
 	if (rs < 0) 
 		return rs ;
 
-	tsp->f_stored = TRUE ;
+	tsp->f_stored = true ;
 	return rs ;
 }
 /* end subroutine (termstore_save) */
@@ -97,12 +92,12 @@ int			tfd ;
 
 /* restore the terminal mode */
 
-	if ((u_fstat(tfd,&sb) < 0) || (sb.st_mode != tsp->mode))
+	if ((u_fstat(tfd,&sb) < 0) || (sb.st_mode != tsp->mode)) {
 		rs = u_fchmod(tfd,tsp->mode) ;
+	}
 
 	return rs ;
 }
 /* end subroutine (termstore_restore) */
-
 
 
