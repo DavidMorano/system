@@ -44,13 +44,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 #include	"sfkey.h"
@@ -86,9 +86,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 int sfkey(cchar *sp,int sl,cchar **rpp) noex {
 	int		kl = -1 ; /* return-value */
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
+	    if (cchar *tp = strnchr(sp,sl,'=') ; tp) {
 	        kl = intconv(tp - sp) ;
 	        while ((kl > 0) && ISWHT(sp[kl - 1])) {
 	            kl -= 1 ;
