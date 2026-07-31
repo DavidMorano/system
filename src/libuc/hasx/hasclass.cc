@@ -63,14 +63,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<mkchar.h>
-#include	<char.h>
-#include	<ischarx.h>
-#include	<localmisc.h>		/* LIBU |UC(3u)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hasclass.h"
 
@@ -123,58 +123,47 @@ local bool hasx(ischar_f isx,cchar *sp,int sl) noex {
 
 bool hasalpha(cchar *sp,int sl) noex {
     	return hasx(isalphalatin,sp,sl) ;
-}
-/* end subroutine (hasalpha) */
+} /* end subroutine (hasalpha) */
 
 bool hasalnum(cchar *sp,int sl) noex {
     	return hasx(isalnumlatin,sp,sl) ;
-}
-/* end subroutine (hasalnum) */
+} /* end subroutine (hasalnum) */
 
 bool hasdigit(cchar *sp,int sl) noex {
     	return hasx(isdigitlatin,sp,sl) ;
-}
-/* end subroutine (hasdigit) */
+} /* end subroutine (hasdigit) */
 
 bool hasdigex(cchar *sp,int sl) noex {
     	return hasx(isdigexlatin,sp,sl) ;
-}
-/* end subroutine (hasdigex) */
+} /* end subroutine (hasdigex) */
 
 bool hasoctal(cchar *sp,int sl) noex {
     	return hasx(isoctallatin,sp,sl) ;
-}
-/* end subroutine (hasoctal) */
+} /* end subroutine (hasoctal) */
 
 bool haswhite(cchar *sp,int sl) noex {
     	return hasx(iswhitelatin,sp,sl) ;
-}
-/* end subroutine (haswhite) */
+} /* end subroutine (haswhite) */
 
 bool hasblank(cchar *sp,int sl) noex {
     	return hasx(isblanklatin,sp,sl) ;
-}
-/* end subroutine (hasblank) */
+} /* end subroutine (hasblank) */
 
 bool hasprint(cchar *sp,int sl) noex {
     	return hasx(isprintlatin,sp,sl) ;
-}
-/* end subroutine (hasprint) */
+} /* end subroutine (hasprint) */
 
 bool hasterm(cchar *sp,int sl) noex {
     	return hasx(istermlatin,sp,sl) ;
-}
-/* end subroutine (hasterm) */
+} /* end subroutine (hasterm) */
 
 bool haslc(cchar *sp,int sl) noex {
     	return hasx(islowerlatin,sp,sl) ;
-}
-/* end subroutine (haslc) */
+} /* end subroutine (haslc) */
 
 bool hasuc(cchar *sp,int sl) noex {
     	return hasx(isupperlatin,sp,sl) ;
-}
-/* end subroutine (hasuc) */
+} /* end subroutine (hasuc) */
 
 
 /* local subroutines */
