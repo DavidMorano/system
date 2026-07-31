@@ -179,13 +179,11 @@ bool hasprintcmd(cchar *sp,int sl) noex {
 	    f = hasx(isprintcmd,sp,sl) ;
 	}
 	return f ;
-}
-/* end subroutine (hasprintcmd) */
+} /* end subroutine (hasprintcmd) */
 
 bool hasprintbad(cchar *sp,int sl) noex {
 	return hasx(isprintbad,sp,sl) ;
-}
-/* end subroutine (hasprintbad) */
+} /* end subroutine (hasprintbad) */
 
 
 /* local subroutines */
