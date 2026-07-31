@@ -97,7 +97,7 @@ local int lookaside_ctor(lookaside *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->cqp ;
 		    op->cqp = np ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-pq) */
 	} /* end if (non-null) */
 	return rs ;
@@ -145,12 +145,12 @@ int lookaside_start(lookaside *op,int esize,int n) noex {
 	    	    rs = pq_start(op->esp) ;
 	    	    if (rs < 0) {
 			pq_finish(op->cqp) ;
-		    }
+		    } /* end if (error) */
 		} /* end if (pq_start) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		lookaside_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (lookaside_start) */
@@ -260,7 +260,7 @@ local int lookaside_newchunk(lookaside *op) noex {
 	        } /* end if (pq_ins) */
 	        if (rs < 0) {
 		    libmem.free(a) ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
