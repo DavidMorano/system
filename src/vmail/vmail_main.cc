@@ -40,14 +40,16 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/timeb.h>
+#include	<tzfile.h>
 #include	<unistd.h>
+#include	<netdb.h>
 #include	<csignal>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<tzfile.h>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<gethz.h>
 #include	<userinfo.h>
 #include	<bits.h>
@@ -69,9 +71,10 @@
 #include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"kshlib.h"
-#include	"config.h"
+#include	"vmail_config.h"
 #include	"defs.h"
 #include	"proglog.h"
 
@@ -88,24 +91,13 @@ extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	progconf_begin(PROGINFO *) ;
 extern int	progconf_end(PROGINFO *) ;
 
-extern int	progopts(PROGINFO *,KEYOPT *) ;
-extern int	progmailget(PROGINFO *,PARAMOPT *) ;
+extern int	progopts(PROGINFO *,keyopt *) ;
+extern int	progmailget(PROGINFO *,paramopt *) ;
 extern int	progterm(PROGINFO *) ;
 extern int	defproc(vecstr *,cchar **,EXPCOOK *,cchar *) ;
 
 extern int	proguserlist_begin(PROGINFO *) ;
 extern int	proguserlist_end(PROGINFO *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -116,59 +108,59 @@ extern char	*timestr_elapsed(time_t,char *) ;
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **) ;
+local int	mainsub(int,cchar **,cchar **) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procmain(PROGINFO *,PARAMOPT *) ;
-static int	procterm(PROGINFO *,PARAMOPT *) ;
-static int	procvarload(PROGINFO *) ;
-static int	procuserdir(PROGINFO *) ;
-static int	procfolder(PROGINFO *) ;
-static int	prochelpcmd(PROGINFO *) ;
-static int	procmailcheck(PROGINFO *) ;
-static int	procscanspec(PROGINFO *) ;
-static int	procmaildname(PROGINFO *) ;
-static int	procmbnames(PROGINFO *) ;
-static int	procmaildirs_report(PROGINFO *,PARAMOPT *) ;
-static int	procmaildirs(PROGINFO *,PARAMOPT *) ;
-static int	procmaildir(PROGINFO *,PARAMOPT *,cchar *,int) ;
-static int	procutil(PROGINFO *) ;
-static int	proclog_session(PROGINFO *pip) ;
+local int	procmain(PROGINFO *,paramopt *) ;
+local int	procterm(PROGINFO *,paramopt *) ;
+local int	procvarload(PROGINFO *) ;
+local int	procuserdir(PROGINFO *) ;
+local int	procfolder(PROGINFO *) ;
+local int	prochelpcmd(PROGINFO *) ;
+local int	procmailcheck(PROGINFO *) ;
+local int	procscanspec(PROGINFO *) ;
+local int	procmaildname(PROGINFO *) ;
+local int	procmbnames(PROGINFO *) ;
+local int	procmaildirs_report(PROGINFO *,paramopt *) ;
+local int	procmaildirs(PROGINFO *,paramopt *) ;
+local int	procmaildir(PROGINFO *,paramopt *,cchar *,int) ;
+local int	procutil(PROGINFO *) ;
+local int	proclog_session(PROGINFO *pip) ;
 
-static int	procexp_begin(PROGINFO *) ;
-static int	procexp_end(PROGINFO *) ;
+local int	procexp_begin(PROGINFO *) ;
+local int	procexp_end(PROGINFO *) ;
 
-static int	procsched_begin(PROGINFO *) ;
-static int	procsched_end(PROGINFO *) ;
+local int	procsched_begin(PROGINFO *) ;
+local int	procsched_end(PROGINFO *) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_org(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_org(PROGINFO *) ;
 
 #if	CF_LOGID
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_logid(PROGINFO *) ;
 #endif /* CF_LOGID */
 
-static int	procpcsconf_begin(PROGINFO *,PCSCONF *) ;
-static int	procpcsconf_end(PROGINFO *) ;
+local int	procpcsconf_begin(PROGINFO *,PCSCONF *) ;
+local int	procpcsconf_end(PROGINFO *) ;
 
-static int	procmailusers_begin(PROGINFO *,PARAMOPT *) ;
-static int	procmailusers_end(PROGINFO *) ;
-static int	procmailusers_load(PROGINFO *,PARAMOPT *) ;
-static int	procmailusers_env(PROGINFO *,cchar *) ;
-static int	procmailusers_arg(PROGINFO *,PARAMOPT *) ;
-static int	procmailusers_def(PROGINFO *,cchar *) ;
-static int	procmailusers_add(PROGINFO *,cchar *,int) ;
+local int	procmailusers_begin(PROGINFO *,paramopt *) ;
+local int	procmailusers_end(PROGINFO *) ;
+local int	procmailusers_load(PROGINFO *,paramopt *) ;
+local int	procmailusers_env(PROGINFO *,cchar *) ;
+local int	procmailusers_arg(PROGINFO *,paramopt *) ;
+local int	procmailusers_def(PROGINFO *,cchar *) ;
+local int	procmailusers_add(PROGINFO *,cchar *,int) ;
 
-static int	procmail_begin(PROGINFO *,PARAMOPT *) ;
-static int	procmail_end(PROGINFO *) ;
+local int	procmail_begin(PROGINFO *,paramopt *) ;
+local int	procmail_end(PROGINFO *) ;
 
-static int	loadschedvars(PROGINFO *) ;
-static int	loadgroupname(PROGINFO *) ;
-static int	loadarchitecture(PROGINFO *) ;
-static int	loadhz(PROGINFO *) ;
-static int	loadcooks(PROGINFO *) ;
+local int	loadschedvars(PROGINFO *) ;
+local int	loadgroupname(PROGINFO *) ;
+local int	loadarchitecture(PROGINFO *) ;
+local int	loadhz(PROGINFO *) ;
+local int	loadcooks(PROGINFO *) ;
 
 
 /* local variables */
@@ -200,9 +192,9 @@ enum argopts {
 	argopt_pcf,
 	argopt_sl,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static cchar	*argopts[] = {
+constexpr cpcchar	argopts[] = {
 	"ROOT",
 	"VERSION",
 	"HELP",
@@ -229,15 +221,15 @@ static cchar	*argopts[] = {
 	"pcf",
 	"sl",
 	nullptr
-} ;
+} ; /* end array */
 
-static const struct pivars	initvars = {
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRLOCAL
-} ;
+} ; /* end array */
 
 static const struct mapex	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
@@ -251,7 +243,7 @@ static const struct mapex	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
 enum cooks {
 	cook_machine,
@@ -279,9 +271,9 @@ enum cooks {
 	cook_osnum,
 	cook_s,
 	cook_overlast
-} ;
+} ; /* end enum */
 
-static cchar	*cooks[] = {
+constexpr cpcchar	cooks[] = {
 	"MACHINE",	/* machine-name */
 	"ARCHITECTURE",	/* machine-architecture */
 	"NCPU",		/* number of machine CPUs */
@@ -307,24 +299,26 @@ static cchar	*cooks[] = {
 	"OSNUM",	/* OS-name */
 	"S",		/* searchname */
 	nullptr
-} ;
+} ; /* end array */
 
-static cchar	*varmaildirs[] = {
+constexpr cpcchar	varmaildirs[] = {
 	VARMAILDNAMEP,
 	VARMAILDNAME,
 	VARMAILDNAMES,
 	nullptr
-} ;
+} ; /* end array */
 
-static cchar	*varmailusers[] = {
+constexpr cpcchar	varmailusers[] = {
 	VARMAILUSERSP,
 	VARMAILUSERS,
 	nullptr
-} ;
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int main(int argc,cchar *argv[],cchar *envv[])
 {
@@ -348,9 +342,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 int mainsub(int argc,cchar **argv,cchar **envv)
 {
 	PROGINFO	pi, *pip = &pi ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	PARAMOPT	akparams ;
+	bits		pargs ;
+	keyopt		akopts ;
+	paramopt	akparams ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -604,7 +598,7 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 	                            rs = SR_INVALID ;
 	                    }
 	                    if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
-				PARAMOPT	*pop = &akparams ;
+				paramopt	*pop = &akparams ;
 	                        cchar		*po = PO_MAILDIRS ;
 	                        rs = paramopt_loads(pop,po,cp,cl) ;
 	                    }
@@ -841,7 +835,7 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-	                            pip->final.svspec = TRUE ;
+	                            pip->finval.svspec = TRUE ;
 	                            pip->have.svspec = TRUE ;
 	                            pip->svspec = argp ;
 	                        }
@@ -1014,7 +1008,7 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -1044,7 +1038,7 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 	                                rs = SR_INVALID ;
 	                        }
 	                        if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
-				    PARAMOPT	*pop = &akparams ;
+				    paramopt	*pop = &akparams ;
 	                            cchar	*po = PO_MAILUSERS ;
 	                            rs = paramopt_loads(pop,po,cp,cl) ;
 	                        }
@@ -1069,7 +1063,7 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                pip->have.linelen = TRUE ;
-	                                pip->final.linelen = TRUE ;
+	                                pip->finval.linelen = TRUE ;
 	                                rs = optvalue(argp,argl) ;
 	                                pip->linelen = rs ;
 	                            }
@@ -1213,9 +1207,9 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 	    }
 	}
 
-	if ((rs >= 0) && (! pip->final.linelen)) {
+	if ((rs >= 0) && (! pip->finval.linelen)) {
 	    if ((cp = getourenv(envv,VARCOLUMNS)) != nullptr) {
-	        pip->final.linelen = TRUE ;
+	        pip->finval.linelen = TRUE ;
 	        rs = optvalue(cp,-1) ;
 		pip->linelen = rs ;
 	    }
@@ -1277,7 +1271,7 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 	                    if ((rs = proglog_begin(pip,&u)) >= 0) {
 	                        if ((rs = proguserlist_begin(pip)) >= 0) {
 				    {
-					PARAMOPT	*pop = &akparams ;
+					paramopt	*pop = &akparams ;
 					rs = procmain(pip,pop) ;
 				    }
 	                            rs1 = proguserlist_end(pip) ;
@@ -1424,7 +1418,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1456,7 +1450,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procmain(PROGINFO *pip,PARAMOPT *pop)
+local int procmain(PROGINFO *pip,paramopt *pop)
 {
 	int		rs ;
 	int		rs1 ;
@@ -1488,7 +1482,7 @@ static int procmain(PROGINFO *pip,PARAMOPT *pop)
 /* end subroutine (procmain) */
 
 
-static int procterm(PROGINFO *pip,PARAMOPT *pop)
+local int procterm(PROGINFO *pip,paramopt *pop)
 {
 	int		rs = SR_OK ;
 
@@ -1520,7 +1514,7 @@ static int procterm(PROGINFO *pip,PARAMOPT *pop)
 /* end subroutine (procterm) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1585,7 +1579,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1601,7 +1595,7 @@ static int procuserinfo_end(PROGINFO *pip)
 
 
 #if	CF_LOGID
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -1629,7 +1623,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 #endif /* CF_LOGID */
 
 
-static int procuserinfo_org(PROGINFO *pip)
+local int procuserinfo_org(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if ((pip->org == nullptr) || (pip->org[0] == '\0')) {
@@ -1647,7 +1641,7 @@ static int procuserinfo_org(PROGINFO *pip)
 /* end subroutine (procuserinfo_org) */
 
 
-static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
+local int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 {
 	int		rs = SR_OK ;
 
@@ -1709,7 +1703,7 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 /* end subroutine (procpcsconf_begin) */
 
 
-static int procpcsconf_end(PROGINFO *pip)
+local int procpcsconf_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1730,7 +1724,7 @@ static int procpcsconf_end(PROGINFO *pip)
 /* end subroutine (procpcsconf_end) */
 
 
-static int procmail_begin(PROGINFO *pip,PARAMOPT *pop)
+local int procmail_begin(PROGINFO *pip,paramopt *pop)
 {
 	int		rs ;
 	if ((rs = procmaildname(pip)) >= 0) {
@@ -1749,7 +1743,7 @@ static int procmail_begin(PROGINFO *pip,PARAMOPT *pop)
 /* end subroutine (procmail_begin) */
 
 
-static int procmail_end(PROGINFO *pip)
+local int procmail_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1761,7 +1755,7 @@ static int procmail_end(PROGINFO *pip)
 /* end subroutine (procmail_end) */
 
 
-static int procvarload(PROGINFO *pip)
+local int procvarload(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = loadgroupname(pip)) >= 0) {
@@ -1778,7 +1772,7 @@ static int procvarload(PROGINFO *pip)
 /* end subroutine (procvarload) */
 
 
-static int procuserdir(PROGINFO *pip)
+local int procuserdir(PROGINFO *pip)
 {
 	int		rs ;
 	cchar		*pn = pip->progname ;
@@ -1793,7 +1787,7 @@ static int procuserdir(PROGINFO *pip)
 /* end subroutine (procuserdir) */
 
 
-static int proclog_session(PROGINFO *pip)
+local int proclog_session(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
@@ -1811,7 +1805,7 @@ static int proclog_session(PROGINFO *pip)
 /* end subroutine (proclog_session) */
 
 
-static int procscanspec(PROGINFO *pip)
+local int procscanspec(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		cl = -1 ;
@@ -1859,7 +1853,7 @@ static int procscanspec(PROGINFO *pip)
 /* end subroutine (procscanspec) */
 
 
-static int procexp_begin(PROGINFO *pip)
+local int procexp_begin(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = expcook_start(&pip->cooks)) >= 0) {
@@ -1870,7 +1864,7 @@ static int procexp_begin(PROGINFO *pip)
 /* end subroutine (procexp_begin) */
 
 
-static int procexp_end(PROGINFO *pip)
+local int procexp_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1881,7 +1875,7 @@ static int procexp_end(PROGINFO *pip)
 /* end subroutine (procexp_end) */
 
 
-static int procsched_begin(PROGINFO *pip)
+local int procsched_begin(PROGINFO *pip)
 {
 	int		rs ;
 
@@ -1901,7 +1895,7 @@ static int procsched_begin(PROGINFO *pip)
 /* end subroutine (procsched_begin) */
 
 
-static int procsched_end(PROGINFO *pip)
+local int procsched_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1917,7 +1911,7 @@ static int procsched_end(PROGINFO *pip)
 /* end subroutine (procsched_end) */
 
 
-static int procmailusers_begin(PROGINFO *pip,PARAMOPT *pop)
+local int procmailusers_begin(PROGINFO *pip,paramopt *pop)
 {
 	int		rs ;
 	if ((rs = vecstr_start(&pip->mailusers,5,0)) >= 0) {
@@ -1933,7 +1927,7 @@ static int procmailusers_begin(PROGINFO *pip,PARAMOPT *pop)
 /* end subroutine (procmailusers_begin) */
 
 
-static int procmailusers_end(PROGINFO *pip)
+local int procmailusers_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1947,7 +1941,7 @@ static int procmailusers_end(PROGINFO *pip)
 /* end subroutine (procmailusers_end) */
 
 
-static int procmailusers_load(PROGINFO *pip,PARAMOPT *app)
+local int procmailusers_load(PROGINFO *pip,paramopt *app)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -1996,7 +1990,7 @@ static int procmailusers_load(PROGINFO *pip,PARAMOPT *app)
 /* end subroutine (procmailusers_load) */
 
 
-static int procmailusers_env(PROGINFO *pip,cchar *var)
+local int procmailusers_env(PROGINFO *pip,cchar *var)
 {
 	VECSTR		*vlp = &pip->mailusers ;
 	int		rs  = SR_OK ;
@@ -2038,14 +2032,14 @@ static int procmailusers_env(PROGINFO *pip,cchar *var)
 /* end subroutine (procmailusers_env) */
 
 
-static int procmailusers_arg(PROGINFO *pip,PARAMOPT *app)
+local int procmailusers_arg(PROGINFO *pip,paramopt *app)
 {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*po = PO_MAILUSERS ;
 
 	if ((rs = paramopt_havekey(app,po)) > 0) {
-	    PARAMOPT_CUR	cur ;
+	    paramopt_cur	cur ;
 
 	    if ((rs = paramopt_curbegin(app,&cur)) >= 0) {
 	        int	cl ;
@@ -2073,7 +2067,7 @@ static int procmailusers_arg(PROGINFO *pip,PARAMOPT *app)
 /* end subroutine (procmailusers_arg) */
 
 
-static int procmailusers_def(PROGINFO *pip,cchar *varmail)
+local int procmailusers_def(PROGINFO *pip,cchar *varmail)
 {
 	VECSTR		*vlp = &pip->mailusers ;
 	int		rs ;
@@ -2147,7 +2141,7 @@ static int procmailusers_def(PROGINFO *pip,cchar *varmail)
 /* end subroutine (procmailusers_def) */
 
 
-static int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
+local int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
 {
 	vecstr		*mlp = &pip->mailusers ;
 	int		rs = SR_OK ;
@@ -2181,7 +2175,7 @@ static int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
 
 #ifdef	COMMENT
 
-static int procprogs_begin(PROGINFO *pip)
+local int procprogs_begin(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = procprogs_mailer(pip)) >= 0) {
@@ -2192,7 +2186,7 @@ static int procprogs_begin(PROGINFO *pip)
 /* end subroutine (procprogs_begin) */
 
 
-static int procprogs_end(PROGINFO *pip)
+local int procprogs_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	return rs ;
@@ -2200,7 +2194,7 @@ static int procprogs_end(PROGINFO *pip)
 /* end subroutine (procprogs_end) */
 
 
-static int procprogs_mailer(PROGINFO *pip)
+local int procprogs_mailer(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -2223,9 +2217,9 @@ static int procprogs_mailer(PROGINFO *pip)
 #endif /* COMMENT */
 
 
-static int procmaildirs_report(PROGINFO *pip,PARAMOPT *pop)
+local int procmaildirs_report(PROGINFO *pip,paramopt *pop)
 {
-	PARAMOPT_CUR	cur ;
+	paramopt_cur	cur ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*po = PO_MAILDIRS ;
@@ -2248,7 +2242,7 @@ static int procmaildirs_report(PROGINFO *pip,PARAMOPT *pop)
 /* end subroutine (procmaildirs_report) */
 
 
-static int procmaildirs(PROGINFO *pip,PARAMOPT *pop)
+local int procmaildirs(PROGINFO *pip,paramopt *pop)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -2285,7 +2279,7 @@ static int procmaildirs(PROGINFO *pip,PARAMOPT *pop)
 /* end subroutine (procmaildirs) */
 
 
-static int procmaildir(PROGINFO *pip,PARAMOPT *pop,cchar *dp,int dl)
+local int procmaildir(PROGINFO *pip,paramopt *pop,cchar *dp,int dl)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -2313,7 +2307,7 @@ static int procmaildir(PROGINFO *pip,PARAMOPT *pop,cchar *dp,int dl)
 /* end subroutine (procmaildir) */
 
 
-static int procutil(PROGINFO *pip)
+local int procutil(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = procuserdir(pip)) >= 0) {
@@ -2328,7 +2322,7 @@ static int procutil(PROGINFO *pip)
 /* end subroutine (procutil) */
 
 
-static int procfolder(PROGINFO *pip)
+local int procfolder(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -2381,7 +2375,7 @@ static int procfolder(PROGINFO *pip)
 /* end subrouroutine (procfolder) */
 
 
-static int prochelpcmd(PROGINFO *pip)
+local int prochelpcmd(PROGINFO *pip)
 {
 	int		rs ;
 	cchar		*cmd = CMDHELPFNAME ;
@@ -2395,7 +2389,7 @@ static int prochelpcmd(PROGINFO *pip)
 /* end subroutine (prochelpcmd) */
 
 
-static int procmailcheck(PROGINFO *pip)
+local int procmailcheck(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if (! pip->have.mailcheck) {
@@ -2421,7 +2415,7 @@ static int procmailcheck(PROGINFO *pip)
 /* end subroutine (procmailcheck) */
 
 
-static int procmaildname(PROGINFO *pip)
+local int procmaildname(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if (pip->maildname == nullptr) {
@@ -2432,7 +2426,7 @@ static int procmaildname(PROGINFO *pip)
 /* end subroutine (procmaildname) */
 
 
-static int procmbnames(PROGINFO *pip)
+local int procmbnames(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	cchar		**envv = pip->envv ;
@@ -2482,7 +2476,7 @@ static int procmbnames(PROGINFO *pip)
 /* end subroutine (procmbnames) */
 
 
-static int loadschedvars(PROGINFO *pip)
+local int loadschedvars(PROGINFO *pip)
 {
 	VECSTR		*svp = &pip->svars ;
 	int		rs = SR_OK ;
@@ -2520,7 +2514,7 @@ static int loadschedvars(PROGINFO *pip)
 /* end subroutine (loadschedvars) */
 
 
-static int loadgroupname(PROGINFO *pip)
+local int loadgroupname(PROGINFO *pip)
 {
 	cint	gnlen = GROUPNAMELEN ;
 	int		rs ;
@@ -2536,13 +2530,13 @@ static int loadgroupname(PROGINFO *pip)
 /* end subroutine (loadgroupname) */
 
 
-static int loadarchitecture(PROGINFO *pip)
+local int loadarchitecture(PROGINFO *pip)
 {
 	cint	alen = ARCHBUFLEN ;
 	int		rs ;
 	char		abuf[ARCHBUFLEN+1] ;
 
-	if ((rs = getarchitecture(abuf,alen)) > 0) {
+	if ((rs = getarch(abuf,alen)) > 0) {
 	    cchar	**vpp = &pip->architecture ;
 	    rs = proginfo_setentry(pip,vpp,abuf,rs) ;
 	}
@@ -2551,7 +2545,7 @@ static int loadarchitecture(PROGINFO *pip)
 }
 /* end subroutine (loadarchitecture) */
 
-static int loadhz(PROGINFO *pip) noex {
+local int loadhz(PROGINFO *pip) noex {
 	int		rs ;
 	if ((rs = gethz(0)) >= 0) {
 	    cint	dlen = DIGBUFLEN ;
@@ -2566,8 +2560,7 @@ static int loadhz(PROGINFO *pip) noex {
 }
 /* end subroutine (loadhz) */
 
-
-static int loadcooks(PROGINFO *pip)
+local int loadcooks(PROGINFO *pip)
 {
 	EXPCOOK		*cop = &pip->cooks ;
 	int		rs = SR_OK ;
