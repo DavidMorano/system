@@ -70,17 +70,17 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strcmp(3c)| + |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<matstr.h>		/* |matstr(3uc)| used below */
-#include	<stdfnames.h>		/* |stdfname| used below */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<matstr.h>		/* LIBUC |matstr(3uc)| used below */
+#include	<char.h>		/* LIBUC */
+#include	<stdfnames.h>		/* LIBU |stdfname| used below */
 #include	<mkchar.h>		/* LIBU */
-#include	<char.h>
-#include	<localmisc.h>		/* LIBU |UC(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hasmisc.h"
 
@@ -134,8 +134,7 @@ bool hasempty(cchar *sp,int sl) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (hasempty) */
+} /* end subroutine (hasempty) */
 
 bool hasdots(cchar *sp,int sl) noex {
 	bool		f = false ;
@@ -147,8 +146,7 @@ bool hasdots(cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (hasdots) */
+} /* end subroutine (hasdots) */
 
 bool haseoh(cchar *sp,int sl) noex {
 	bool		f = false ;
@@ -159,8 +157,7 @@ bool haseoh(cchar *sp,int sl) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (haseoh) */
+} /* end subroutine (haseoh) */
 
 bool hasdoublewhite(cchar *sp,int sl) noex {
 	bool		f = false ;
@@ -178,8 +175,7 @@ bool hasdoublewhite(cchar *sp,int sl) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (hasdoublewhite) */
+} /* end subroutine (hasdoublewhite) */
 
 bool hasmacro(cchar *lp,int ll) noex {
 	bool		f = false ;
@@ -191,8 +187,7 @@ bool hasmacro(cchar *lp,int ll) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (hasmacro) */
+} /* end subroutine (hasmacro) */
 
 bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
 	bool		f = false ;
@@ -204,8 +199,7 @@ bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (hasvalidmagic) */
+} /* end subroutine (hasvalidmagic) */
 
 bool hasfnamespecial(cchar *fp,int fl) noex {
 	return (getstdfname(fp,fl) >= 0) ;
