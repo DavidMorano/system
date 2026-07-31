@@ -34,31 +34,36 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>
-#include	<usystem.h>
-#include	<estrings.h>
-#include	<ascii.h>
-#include	<strn.h>		/* |strnset(3uc)| */
-#include	<sbuf.h>
-#include	<tmtime.hh>
-#include	<sntmtime.h>
-#include	<ncol.h>		/* |ncolchar(3uc)| */
-#include	<tabexpand.h>
-#include	<char.h>
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |NTABCOLS| */
+#include	<sys/param.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnset(3uc)| */
+#include	<sbuf.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<sntmtime.h>		/* LIBUC */
+#include	<ncol.h>		/* LIBUC |ncolchar(3uc)| */
+#include	<tabexpand.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |NTABCOLS| */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	"config.h"
+#include	"vmail_config.h"
 #include	"defs.h"
 #include	"ds.h"
 #include	"display.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -92,30 +97,10 @@
 
 /* external subroutines */
 
-extern int	sfsubstance(cchar *,int,cchar **) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	ctdecpi(char *,int,int,int) ;
-extern int	iceil(int,int) ;
-extern int	strwcmp(cchar *,cchar *,int) ;
-extern int	mkaddrdisp(char *,int,cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	bufvprintf(char *,int,cchar *,va_list) ;
-
-extern int	mkdisplayable(char *,int,cchar *,int) ;
-extern int	digsmall(char *,int) noex ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strsub(cchar *,cchar *) ;
-extern char	*strwcpyblanks(char *,int) ;	/* NUL-terminaed */
-extern char	*strdfill1(char *,int,cchar *) ;
-extern char	*strdfill2(char *,int,cchar *,cchar *) ;
-extern char	*strdfill3(char *,int,cchar *,cchar *,cchar *) ;
+extern "C" {
+    extern int	mkdisplayable(char *,int,cchar *,int) noex ;
+    extern int	digsmall(char *,int) noex ;
+}
 
 
 /* external variables */
@@ -126,69 +111,71 @@ extern char	*strdfill3(char *,int,cchar *,cchar *,cchar *) ;
 struct scanline {
 	int		mark ;		/* the "mark" */
 	char		*data ;		/* all data preformatted */
-} ;
+} ; /* end struct */
 
 struct scantitle {
 	char		*name ;
 	int		col ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-int		display_refresh(DISPLAY *) ;
-int		display_rtop(DISPLAY *) ;
-int		display_rmid(DISPLAY *) ;
-int		display_rbot(DISPLAY *) ;
-int		display_rscantitle(DISPLAY *) ;
-int		display_rscan(DISPLAY *,int) ;
-int		display_beep(DISPLAY *) ;
-int		display_scanblanks(DISPLAY *,int) ;
+int		display_refresh(DISPLAY *) noex ;
+int		display_rtop(DISPLAY *) noex ;
+int		display_rmid(DISPLAY *) noex ;
+int		display_rbot(DISPLAY *) noex ;
+int		display_rscantitle(DISPLAY *) noex ;
+int		display_rscan(DISPLAY *,int) noex ;
+int		display_beep(DISPLAY *) noex ;
+int		display_scanblanks(DISPLAY *,int) noex ;
 
-static int	display_linesload(DISPLAY *,int,int) ;
-static int	display_linescalc(DISPLAY *) ;
-static int	display_subwinbegin(DISPLAY *) ;
-static int	display_subwinend(DISPLAY *) ;
-static int	display_subwinadj(DISPLAY *) ;
-static int	display_scanfins(DISPLAY *) ;
-static int	display_rscanscroll(DISPLAY *,int) ;
-static int	display_scanprint(DISPLAY *,int) ;
-static int	display_nnbscans(DISPLAY *,int,int) ;
-static int	display_setstzone(DISPLAY *) ;
-static int	display_scantitlemk(DISPLAY *) ;
-static int	display_scanpointclear(DISPLAY *,int,int) ;
-static int	display_scanpointset(DISPLAY *,int,int,int) ;
-static int	display_scanmarkset(DISPLAY *,int,int) ;
+local int	display_linesload(DISPLAY *,int,int) noex ;
+local int	display_linescalc(DISPLAY *) noex ;
+local int	display_subwinbegin(DISPLAY *) noex ;
+local int	display_subwinend(DISPLAY *) noex ;
+local int	display_subwinadj(DISPLAY *) noex ;
+local int	display_scanfins(DISPLAY *) noex ;
+local int	display_rscanscroll(DISPLAY *,int) noex ;
+local int	display_scanprint(DISPLAY *,int) noex ;
+local int	display_nnbscans(DISPLAY *,int,int) noex ;
+local int	display_setstzone(DISPLAY *) noex ;
+local int	display_scantitlemk(DISPLAY *) noex ;
+local int	display_scanpointclear(DISPLAY *,int,int) noex ;
+local int	display_scanpointset(DISPLAY *,int,int,int) noex ;
+local int	display_scanmarkset(DISPLAY *,int,int) noex ;
 
-static int	display_botloadnum(DISPLAY *,int) ;
-static int	display_botloadfrom(DISPLAY *,cchar *) ;
-static int	display_botloadline(DISPLAY *,int) ;
-static int	display_botloadlines(DISPLAY *,int) ;
+local int	display_botloadnum(DISPLAY *,int) noex ;
+local int	display_botloadfrom(DISPLAY *,cchar *) noex ;
+local int	display_botloadline(DISPLAY *,int) noex ;
+local int	display_botloadlines(DISPLAY *,int) noex ;
 
-static int	display_hdcheck(DISPLAY *,int) ;
-static int	display_hd(DISPLAY *) ;
-static int	display_hdfin(DISPLAY *) ;
-static int	display_scancvtbegin(DISPLAY *,DISPLAY_SS *,DISPLAY_SDATA *) ;
-static int	display_scancvtend(DISPLAY *,DISPLAY_SS *,DISPLAY_SDATA *) ;
-static int	display_scancvtalt(DISPLAY *,DISPLAY_SDATA *) ;
-static int	display_hdcvt(DISPLAY *,cchar *,int) ;
+local int	display_hdcheck(DISPLAY *,int) noex ;
+local int	display_hd(DISPLAY *) noex ;
+local int	display_hdfin(DISPLAY *) noex ;
+local int	display_scancvtbegin(DISPLAY *,DISPLAY_SS *,
+			DISPLAY_SDATA *) noex ;
+local int	display_scancvtend(DISPLAY *,DISPLAY_SS *,
+			DISPLAY_SDATA *) noex ;
+local int	display_scancvtalt(DISPLAY *,DISPLAY_SDATA *) noex ;
+local int	display_hdcvt(DISPLAY *,cchar *,int) noex ;
 
-static int	scanline_start(SCANLINE *,DISPLAY_SDATA *) ;
-static int	scanline_fill(SCANLINE *,DISPLAY_SDATA *) ;
-static int	scanline_blank(SCANLINE *) ;
-static int	scanline_mark(SCANLINE *,int) ;
-static int	scanline_setlines(SCANLINE *,int) ;
-static int	scanline_checkblank(SCANLINE *) ;
-static int	scanline_finish(SCANLINE *) ;
+local int	scanline_start(SCANLINE *,DISPLAY_SDATA *) noex ;
+local int	scanline_fill(SCANLINE *,DISPLAY_SDATA *) noex ;
+local int	scanline_blank(SCANLINE *) noex ;
+local int	scanline_mark(SCANLINE *,int) noex ;
+local int	scanline_setlines(SCANLINE *,int) noex ;
+local int	scanline_checkblank(SCANLINE *) noex ;
+local int	scanline_finish(SCANLINE *) noex ;
 
-static int	nstrcols(int,int,cchar *,int) ;
+local int	nstrcols(int,int,cchar *,int) noex ;
 
 #if	CF_SFEND
-static int	sfend(cchar *,int,int,cchar **) ;
+local int	sfend(cchar *,int,int,cchar **) noex ;
 #endif
 
 #if	CF_DEBUGS
-static char	*stridig(char *,int,int) ;
+local char	*stridig(char *,int,int) noex ;
 #endif /* CF_DEBUGS */
 
 
@@ -197,29 +184,20 @@ static char	*stridig(char *,int,int) ;
 #if	CF_BLINKER
 #else /* CF_BLINKER */
 
-static cchar	*months[] = {
+constexpr cpcchar	months[] = {
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
-static cchar	*days[] = {
-	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", NULL
-} ;
+constexpr cpcchar	days[] = {
+	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", nullptr
+} ; /* end array */
 
 #endif /* CF_BLINKER */
 
-static cchar	dashes[] = "----------------" ;
-
-static cchar	blanks[] = "                    " ;
-
-static const struct scantitle	scantitles[] = {
-	{ "FROM", COL_SCANFROM },
-	{ "SUBJECT", COL_SCANSUBJECT },
-	{ "DATE", COL_SCA-D-TE },
-	{ "LINES", COL_SCANLINES },
-	{ NULL, 0 }
-} ;
+constexpr char	dashes[] = "----------------" ;
+constexpr char	blanks[] = "                    " ;
 
 enum scantitles {
 	scantitle_from,
@@ -227,7 +205,15 @@ enum scantitles {
 	scantitle_date,
 	scantitle_lines,
 	scantitle_overlast
-} ;
+} ; /* end enum */
+
+constexpr scantitle	scantitles[] = {
+	{ "FROM", COL_SCANFROM },
+	{ "SUBJECT", COL_SCANSUBJECT },
+	{ "DATE", COL_SCA-D-TE },
+	{ "LINES", COL_SCANLINES },
+	{ nullptr, 0 }
+} ; /* end array */
 
 constexpr int		ntabcols = NTABCOLS ;
 constexpr int		digbuflen = DIGBUFLEN ;
@@ -246,10 +232,10 @@ int display_start(DISPLAY *op,PROGINFO *pip,DISPLAY_ARGS *dap) noex {
 	cchar	*termtype ;
 	cchar	*cp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pip == NULL) return SR_FAULT ;
-	if (dap == NULL) return SR_FAULT ;
-	if (dap->termtype == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
+	if (dap == nullptr) return SR_FAULT ;
+	if (dap->termtype == nullptr) return SR_FAULT ;
 
 	if (dap->termtype[0] == '\0') return SR_INVALID ;
 	if (dap->displines <= 0) return SR_INVALID ;
@@ -288,7 +274,7 @@ int display_start(DISPLAY *op,PROGINFO *pip,DISPLAY_ARGS *dap) noex {
 	                op->rl_scan = 2 ;
 	                if ((rs = display_linescalc(op)) >= 0) {
 	                    if ((rs = display_subwinbegin(op)) >= 0) {
-	                        op->fl.scanfull = TRUE ;
+	                        op->fl.scanfull = true ;
 	                        op->magic = DISPLAY_MAGIC ;
 	                    }
 	                    if (rs < 0)
@@ -302,7 +288,7 @@ int display_start(DISPLAY *op,PROGINFO *pip,DISPLAY_ARGS *dap) noex {
 	        } /* end if (vecstr_start) */
 	        if (rs < 0) {
 	            uc_free(op->termtype) ;
-	            op->termtype = NULL ;
+	            op->termtype = nullptr ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (display_linesload) */
@@ -316,69 +302,62 @@ int display_start(DISPLAY *op,PROGINFO *pip,DISPLAY_ARGS *dap) noex {
 }
 /* end subroutine (display_start) */
 
-
-int display_finish(DISPLAY *op)
-{
+int display_finish(DISPLAY *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
-
+	{
 	rs1 = display_hdfin(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = display_subwinend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = ds_finish(&op->ds) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = display_scanfins(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = varray_finish(&op->scans) ;
 	if (rs >= 0) rs = rs1 ;
-
-	if (op->termtype != NULL) {
+	}
+	if (op->termtype) {
 	    rs1 = uc_free(op->termtype) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->termtype = NULL ;
-	}
-
+	    op->termtype = nullptr ;
+	} /* end if (memory-release) */
 	op->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (display_finish) */
 
-
-int display_flush(DISPLAY *op)
-{
+int display_flush(DISPLAY *op) noex {
 	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
-
+	{
 	rs = ds_flush(&op->ds) ;
-
+	}
 	return rs ;
 }
 /* end subroutine (display_flush) */
 
-
 /* display some information */
-int display_info(DISPLAY *op,cchar *fmt,...)
-{
+int display_info(DISPLAY *op,cchar *fmt,...) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		x, y ;
 	int		w = 0 ;
 	int		len = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (fmt == nullptr) return SR_FAULT ;
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 	if (fmt[0] == '\0') return SR_INVALID ;
 
@@ -405,17 +384,15 @@ int display_info(DISPLAY *op,cchar *fmt,...)
 }
 /* end subroutine (display_info) */
 
-
-int display_winfo(DISPLAY *op,cchar *sp,int sl)
-{
+int display_winfo(DISPLAY *op,cchar *sp,int sl) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		x, y ;
 	int		w = 0 ;
 	int		len = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -439,17 +416,15 @@ int display_winfo(DISPLAY *op,cchar *sp,int sl)
 }
 /* end subroutine (display_winfo) */
 
-
-int display_vinfo(DISPLAY *op,cchar *fmt,va_list ap)
-{
+int display_vinfo(DISPLAY *op,cchar *fmt,va_list ap) noex {
 	PROGINFO	*pip ;
 	int		rs ;
 	int		x, y ;
 	int		w = 0 ;
 	int		len = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (fmt == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -473,17 +448,15 @@ int display_vinfo(DISPLAY *op,cchar *fmt,va_list ap)
 }
 /* end subroutine (display_vinfo) */
 
-
 /* display in the input area */
-int display_input(DISPLAY *op,cchar *fmt,...)
-{
+int display_input(DISPLAY *op,cchar *fmt,...) noex {
 	int		rs = SR_OK ;
 	int		x, y ;
 	int		w ;
 	int		len = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (fmt == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -510,17 +483,15 @@ int display_input(DISPLAY *op,cchar *fmt,...)
 }
 /* end subroutine (display_input) */
 
-
 /* display in the input area */
-int display_vinput(DISPLAY *op,cchar *fmt,va_list ap)
-{
+int display_vinput(DISPLAY *op,cchar *fmt,va_list ap) noex {
 	int		rs ;
 	int		x, y ;
 	int		w = 0 ;
 	int		len = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (fmt == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -542,9 +513,7 @@ int display_vinput(DISPLAY *op,cchar *fmt,va_list ap)
 }
 /* end subroutine (display_vinput) */
 
-
-int display_done(DISPLAY *op)
-{
+int display_done(DISPLAY *op) noex {
 	int		rs ;
 	int		w, x, y ;
 
@@ -557,22 +526,20 @@ int display_done(DISPLAY *op)
 }
 /* end subroutine (display_done) */
 
-
 /* update the time string on the display */
-int display_setdate(DISPLAY *op,int f_end)
-{
+int display_setdate(DISPLAY *op,int f_end) noex {
 	PROGINFO	*pip ;
 	TMTIME		d ;
 	int		rs ;
 	int		len = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
 	if (pip->daytime == 0)
-	    pip->daytime = time(NULL) ;
+	    pip->daytime = time(nullptr) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -581,7 +548,7 @@ int display_setdate(DISPLAY *op,int f_end)
 
 /* get current time */
 
-	if ((rs = tmtime_localtime(&d,pip->daytime)) >= 0) {
+	if ((rs = tmtime_timelocal(&d,pip->daytime)) >= 0) {
 	    cint	tlen = TIMEBUFLEN ;
 	    cint	w = 0 ;
 	    int		timelen = 0 ; /* ¥ GCC false complaint */
@@ -599,10 +566,10 @@ int display_setdate(DISPLAY *op,int f_end)
 
 #if	CF_BLINKER
 	if (rs >= 0) {
-	    int	f = FALSE ;
+	    int	f = false ;
 
 	    if ((op->datestr[0] == '\0') || (d.hour != op->date.d.hour)) {
-	        f = TRUE ;
+	        f = true ;
 	        fmt = "%a %e %b %T" ;
 	        timelen = 13 ;
 	        rs = sntmtime(tbuf,tlen,&d,fmt) ;
@@ -620,7 +587,7 @@ int display_setdate(DISPLAY *op,int f_end)
 	        dp = (op->datestr + m) ;	/* update stored state */
 	        dl = (tl-m) ;
 	        if (dl > 0) {
-	            f = TRUE ;
+	            f = true ;
 	            strwcpy(dp,(tp+m),dl) ;
 	            x = (COL_DATESTR + m) ;
 	            y = op->rl_top ;
@@ -738,7 +705,7 @@ int display_setdate(DISPLAY *op,int f_end)
 
 	} /* end if (tzname) */
 
-	} /* end if (tmtime_localtime) */
+	} /* end if (tmtime_timelocal) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -749,23 +716,21 @@ int display_setdate(DISPLAY *op,int f_end)
 }
 /* end subroutine (display_setdate) */
 
-
 /* load up the new mailbox name */
-int display_setmbname(DISPLAY *op,cchar *mbname,int mblen)
-{
+int display_setmbname(DISPLAY *op,cchar *mbname,int mblen) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		fl ;
 	int		mbleadlen ;
 	int		w, x, y ;
-	int		f_change = FALSE ;
+	int		f_change = false ;
 	cchar	*mbleadstr = DISPLAY_MBSTRLEAD ;
 	cchar	*ccp ;
 	cchar	*cp ;
 	char		*fp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (mbname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (mbname == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -774,7 +739,7 @@ int display_setmbname(DISPLAY *op,cchar *mbname,int mblen)
 
 /* has the field changed? */
 
-	mbleadlen = strlen(mbleadstr) ;
+	mbleadlen = lenstr(mbleadstr) ;
 	ccp = (fp + mbleadlen) ;
 	f_change = (strwcmp(ccp,mbname,mblen) != 0) ;
 
@@ -807,17 +772,15 @@ int display_setmbname(DISPLAY *op,cchar *mbname,int mblen)
 }
 /* end subroutine (display_setmbname) */
 
-
 /* update the new-mail indicator on the display */
-int display_setnewmail(DISPLAY *op,int nmsgs)
-{
+int display_setnewmail(DISPLAY *op,int nmsgs) noex {
 	int		rs = SR_OK ;
 	int		w, x, y ;
 	int		f_newmail ;
-	int		f_change = FALSE ;
+	int		f_change = false ;
 	cchar	*sp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -826,10 +789,10 @@ int display_setnewmail(DISPLAY *op,int nmsgs)
 	if (f_newmail) {
 	    sp = "new mail arrived" ;
 	    if (! op->fl.newmail) rs = display_beep(op) ;
-	    op->fl.newmail = TRUE ;
+	    op->fl.newmail = true ;
 	} else {
 	    sp = "----------------" ;
-	    op->fl.newmail = FALSE ;
+	    op->fl.newmail = false ;
 	} /* end if */
 
 	if ((rs >= 0) && f_change) {
@@ -844,12 +807,10 @@ int display_setnewmail(DISPLAY *op,int nmsgs)
 }
 /* end subroutine (display_setnewmail) */
 
-
-int display_setscanlines(DISPLAY *op,int slines)
-{
+int display_setscanlines(DISPLAY *op,int slines) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -862,14 +823,12 @@ int display_setscanlines(DISPLAY *op,int slines)
 }
 /* end subroutine (display_setscanlines) */
 
-
-int display_beep(DISPLAY *op)
-{
+int display_beep(DISPLAY *op) noex {
 	int		rs ;
 	int		w ;
 	char		buf[10] ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -883,13 +842,11 @@ int display_beep(DISPLAY *op)
 }
 /* end subroutine (display_beep) */
 
-
-int display_scanclear(DISPLAY *op)
-{
+int display_scanclear(DISPLAY *op) noex {
 	int		rs ;
 	int		w ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -905,13 +862,11 @@ int display_scanclear(DISPLAY *op)
 }
 /* end subroutine (display_scanclear) */
 
-
-int display_viewclear(DISPLAY *op)
-{
+int display_viewclear(DISPLAY *op) noex {
 	int		rs = SR_OK ;
 	int		w ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -927,9 +882,7 @@ int display_viewclear(DISPLAY *op)
 }
 /* end subroutine (display_viewclear) */
 
-
-int display_viewload(DISPLAY *op,int ln,cchar *sp,int sl)
-{
+int display_viewload(DISPLAY *op,int ln,cchar *sp,int sl) noex {
 	PROGINFO	*pip ;
 	cint	dislen = DISPLAY_LSCANLINE ;
 	int		rs = SR_OK ;
@@ -937,19 +890,19 @@ int display_viewload(DISPLAY *op,int ln,cchar *sp,int sl)
 	int		dl ;
 	cchar	*dp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	if ((ln < 0) || (ln >= op->viewlines))
 	    return SR_INVALID ;
 
-	if ((sp == NULL) && (sl > 0))
+	if ((sp == nullptr) && (sl > 0))
 	    return SR_FAULT ;
 
 	pip = op->pip ;
 	if (sl < 0)
-	    sl = strlen(sp) ;
+	    sl = lenstr(sp) ;
 
 	while ((sl > 0) && isspace(sp[sl-1] & 0xff))
 	    sl -= 1 ;
@@ -960,7 +913,7 @@ int display_viewload(DISPLAY *op,int ln,cchar *sp,int sl)
 	if (rs >= 0) {
 	    char	disbuf[DISPLAY_LSCANLINE + 1] ;
 	    if (sl > dislen) sl = dislen ;
-	    if (strnchr(sp,sl,'\t') != NULL) {
+	    if (strnchr(sp,sl,'\t') != nullptr) {
 	        dp = disbuf ;
 	        dl = tabexpand(disbuf,dislen,ntabcols,sp,sl) ;
 	    } else {
@@ -974,13 +927,11 @@ int display_viewload(DISPLAY *op,int ln,cchar *sp,int sl)
 }
 /* end subroutine (display_viewload) */
 
-
-int display_viewscroll(DISPLAY *op,int inc)
-{
+int display_viewscroll(DISPLAY *op,int inc) noex {
 	cint	ainc = abs(inc) ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -995,16 +946,14 @@ int display_viewscroll(DISPLAY *op,int inc)
 }
 /* end subroutine (display_viewscroll) */
 
-
-int display_cmddig(DISPLAY *op,int pos,int dig)
-{
+int display_cmddig(DISPLAY *op,int pos,int dig) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		w = 0 ;
 	int		x, y ;
 	char		buf[10] ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -1034,15 +983,13 @@ int display_cmddig(DISPLAY *op,int pos,int dig)
 }
 /* end subroutine (display_cmddig) */
 
-
-int display_scanload(DISPLAY *op,int si,DISPLAY_SDATA *ddp)
-{
+int display_scanload(DISPLAY *op,int si,DISPLAY_SDATA *ddp) noex {
 	PROGINFO	*pip ;
 	DISPLAY_SS	ss ;
 	int		rs ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -1058,7 +1005,7 @@ int display_scanload(DISPLAY *op,int si,DISPLAY_SDATA *ddp)
 	if ((rs = display_scancvtbegin(op,&ss,ddp)) >= 0) {
 	    SCANLINE	*slp ;
 	    if ((rs = varray_acc(&op->scans,si,&slp)) >= 0) {
-	        if (slp != NULL) {
+	        if (slp != nullptr) {
 	            rs = scanline_fill(slp,ddp) ;
 	        } else {
 	            if ((rs = varray_mk(&op->scans,si,&slp)) >= 0) {
@@ -1081,14 +1028,13 @@ int display_scanload(DISPLAY *op,int si,DISPLAY_SDATA *ddp)
 }
 /* end subroutine (display_scanload) */
 
-
-static int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
-{
+local int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,
+		DISPLAY_SDATA *ddp) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
 	cchar		*ss = "=?" ;
-	if (ddp == NULL) return SR_FAULT ;
-	if (pip == NULL) return SR_FAULT ;
+	if (ddp == nullptr) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	ssp->fbuf = ddp->fbuf ;
 	ssp->flen = ddp->flen ;
 	ssp->sbuf = ddp->sbuf ;
@@ -1108,8 +1054,8 @@ static int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
 	    debugprintf("display_scancvtbegin: fcols=%u flen=%d\n",
 		fcols,flen) ;
 #endif
-	    if ((fbuf != NULL) && (strsub(fbuf,ss) != NULL)) {
-	        if (flen < 0) flen = strlen(fbuf) ;
+	    if ((fbuf != nullptr) && (strsub(fbuf,ss) != nullptr)) {
+	        if (flen < 0) flen = lenstr(fbuf) ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("display_scancvtbegin: flen=%d\n",flen) ;
@@ -1148,8 +1094,8 @@ static int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
 	    debugprintf("display_scancvtbegin: fcols=%u slen=%d\n",
 		fcols,slen) ;
 #endif
-	    if ((sbuf != NULL) && (strsub(sbuf,ss) != NULL)) {
-	        if (slen < 0) slen = strlen(sbuf) ;
+	    if ((sbuf != nullptr) && (strsub(sbuf,ss) != nullptr)) {
+	        if (slen < 0) slen = lenstr(sbuf) ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("display_scancvtbegin: slen=%d\n",slen) ;
@@ -1184,15 +1130,13 @@ static int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
 }
 /* end subroutine (display_scancvtbegin) */
 
-
-static int display_scancvtalt(DISPLAY *op,DISPLAY_SDATA *ddp)
-{
+local int display_scancvtalt(DISPLAY *op,DISPLAY_SDATA *ddp) noex {
 	DISPLAY_SALT	*sap = &ddp->alt ;
 	cint	flen = (2*DISPLAY_LFROM) ;
 	cint	slen = (2*DISPLAY_LSUBJ) ;
 	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (sap->a == NULL) {
+	if (op == nullptr) return SR_FAULT ;
+	if (sap->a == nullptr) {
 	    int		size = 0 ;
 	    char	*bp ;
 	    size += (flen+1) ;
@@ -1209,17 +1153,16 @@ static int display_scancvtalt(DISPLAY *op,DISPLAY_SDATA *ddp)
 }
 /* end subroutine (display_scancvtalt) */
 
-
-static int display_scancvtend(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
-{
+local int display_scancvtend(DISPLAY *op,DISPLAY_SS *ssp,
+		DISPLAY_SDATA *ddp) noex {
 	DISPLAY_SALT	*sap = &ddp->alt ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op == NULL) return SR_FAULT ;
-	if (sap->a != NULL) {
+	if (op == nullptr) return SR_FAULT ;
+	if (sap->a != nullptr) {
 	    rs1 = uc_free(sap->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sap->a = NULL ;
+	    sap->a = nullptr ;
 	}
 	ddp->sbuf = ssp->sbuf ;
 	ddp->slen = ssp->slen ;
@@ -1229,12 +1172,10 @@ static int display_scancvtend(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
 }
 /* end subroutine (display_scancvtend) */
 
-
-static int display_hdcvt(DISPLAY *op,cchar *sp,int sl)
-{
+local int display_hdcvt(DISPLAY *op,cchar *sp,int sl) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    debugprintf("display_hdcvt: ent sl=%d\n",sl) ;
@@ -1257,14 +1198,12 @@ static int display_hdcvt(DISPLAY *op,cchar *sp,int sl)
 }
 /* end subroutine (display_hdcvt) */
 
-
-int display_scanloadlines(DISPLAY *op,int si,int lines,int f_upd)
-{
+int display_scanloadlines(DISPLAY *op,int si,int lines,int f_upd) noex {
 	PROGINFO	*pip ;
 	SCANLINE	*slp ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -1279,7 +1218,7 @@ int display_scanloadlines(DISPLAY *op,int si,int lines,int f_upd)
 #endif
 
 	if ((rs = varray_acc(&op->scans,si,&slp)) >= 0) {
-	    if (slp != NULL) {
+	    if (slp != nullptr) {
 	        if ((rs = scanline_setlines(slp,lines)) >= 0) {
 	            cint	ns = op->scanlines ;
 	            cint	top = op->si_top ;
@@ -1311,19 +1250,17 @@ int display_scanloadlines(DISPLAY *op,int si,int lines,int f_upd)
 }
 /* end subroutine (display_scanloadlines) */
 
-
-int display_scanblank(DISPLAY *op,int si)
-{
+int display_scanblank(DISPLAY *op,int si) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		rc = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1331,12 +1268,12 @@ int display_scanblank(DISPLAY *op,int si)
 #endif
 
 	if (si < 0) {
-	    op->fl.scanfull = TRUE ;
+	    op->fl.scanfull = true ;
 	    rs = display_scanblanks(op,-1) ;
 	} else {
 	    SCANLINE	*slp ;
 	    if ((rs = varray_acc(&op->scans,si,&slp)) >= 0) {
-	        if (slp != NULL) {
+	        if (slp != nullptr) {
 	            rs = scanline_blank(slp) ;
 	            rc = rs ;
 	        }
@@ -1352,20 +1289,17 @@ int display_scanblank(DISPLAY *op,int si)
 }
 /* end subroutine (display_scanblank) */
 
-
-int display_scanblanks(DISPLAY *op,int n)
-{
+int display_scanblanks(DISPLAY *op,int n) noex {
 	PROGINFO	*pip ;
 	SCANLINE	*slp ;
 	int		rs = SR_OK ;
-	int		i = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1373,15 +1307,15 @@ int display_scanblanks(DISPLAY *op,int n)
 #endif
 
 	if (n < 0) {
-	    op->fl.scanfull = TRUE ;
+	    op->fl.scanfull = true ;
 	    n = INT_MAX ;
 	}
 
-	while ((i < n) && (varray_enum(&op->scans,i,&slp) >= 0)) {
-	    if (slp != NULL) {
+	varray *slp = &cp->scans ;
+	for (int i = 0 ; (i < n) && (slp->enumer(i,&slp) >= 0) ; i++) {
+	    if (slp) {
 	        rs = scanline_blank(slp) ;
 	    }
-	    i += 1 ;
 	    if (rs < 0) break ;
 	} /* end while */
 
@@ -1391,47 +1325,42 @@ int display_scanblanks(DISPLAY *op,int n)
 #endif
 
 	return rs ;
-}
-/* end subroutine (display_scanblanks) */
+} /* end subroutine (display_scanblanks) */
 
-
-int display_scanfull(DISPLAY *op)
-{
+int display_scanfull(DISPLAY *op) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("display_scanfull: ent\n") ;
 #endif
 
-	op->fl.scanfull = TRUE ;
+	op->fl.scanfull = true ;
 	return rs ;
 }
 /* end subroutine (display_scanfull) */
 
-
 /* delete? one or more scan lines (whatever this means?) */
-int display_scandel(DISPLAY *op,int si)
-{
+int display_scandel(DISPLAY *op,int si) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rc = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1443,7 +1372,7 @@ int display_scandel(DISPLAY *op,int si)
 	} else {
 	    SCANLINE	*slp ;
 	    if ((rs = varray_acc(&op->scans,si,&slp)) >= 0) {
-	        if (slp != NULL) {
+	        if (slp != nullptr) {
 	            rs1 = scanline_finish(slp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            rc = rs1 ;
@@ -1462,15 +1391,13 @@ int display_scandel(DISPLAY *op,int si)
 }
 /* end subroutine (display_scandel) */
 
-
-int display_scanmark(DISPLAY *op,int si,int mark)
-{
+int display_scanmark(DISPLAY *op,int si,int mark) noex {
 	PROGINFO	*pip ;
 	SCANLINE	*slp ;
 	int		rs ;
 	int		rc = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -1484,7 +1411,7 @@ int display_scanmark(DISPLAY *op,int si,int mark)
 #endif
 
 	if ((rs = varray_acc(&op->scans,si,&slp)) >= 0) {
-	    if (slp != NULL) {
+	    if (slp != nullptr) {
 	        rs = scanline_mark(slp,mark) ;
 	        rc = rs ;
 	        if (rs >= 0)
@@ -1501,19 +1428,17 @@ int display_scanmark(DISPLAY *op,int si,int mark)
 }
 /* end subroutine (display_scanmark) */
 
-
-int display_scanpoint(DISPLAY *op,int nsi)
-{
+int display_scanpoint(DISPLAY *op,int nsi) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		rc = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
@@ -1531,8 +1456,8 @@ int display_scanpoint(DISPLAY *op,int nsi)
 	if (nsi >= 0) {
 	    SCANLINE	*slp ;
 	    if ((rs = varray_acc(&op->scans,nsi,&slp)) >= 0) {
-	        if (slp != NULL) {
-	            rc = (slp->data != NULL) ? 1 : 0 ;
+	        if (slp != nullptr) {
+	            rc = (slp->data != nullptr) ? 1 : 0 ;
 	        }
 	    } /* end if (varray_acc) */
 	} /* end if */
@@ -1549,23 +1474,21 @@ int display_scanpoint(DISPLAY *op,int nsi)
 }
 /* end subroutine (display_scanpoint) */
 
-
 /* check if a scan-line has any data with it */
-int display_scancheck(DISPLAY *op,int si)
-{
+int display_scancheck(DISPLAY *op,int si) noex {
 	PROGINFO	*pip ;
 	SCANLINE	*slp ;
 	int		rs ;
 	int		rc = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	if (si < 0) return SR_INVALID ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1573,8 +1496,8 @@ int display_scancheck(DISPLAY *op,int si)
 #endif
 
 	if ((rs = varray_acc(&op->scans,si,&slp)) >= 0) {
-	    if (slp != NULL) {
-	        rc = (slp->data != NULL) ? 1 : 0 ;
+	    if (slp != nullptr) {
+	        rc = (slp->data != nullptr) ? 1 : 0 ;
 	    }
 	} /* end if (varray_acc) */
 
@@ -1587,10 +1510,8 @@ int display_scancheck(DISPLAY *op,int si)
 }
 /* end subroutine (display_scancheck) */
 
-
 /* set a new scan-top and display any resulting scan-lines */
-int display_scandisplay(DISPLAY *op,int sitopnext)
-{
+int display_scandisplay(DISPLAY *op,int sitopnext) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		ndiff ;
@@ -1598,12 +1519,12 @@ int display_scandisplay(DISPLAY *op,int sitopnext)
 	int		n = 0 ;
 	int		f ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
@@ -1630,7 +1551,7 @@ int display_scandisplay(DISPLAY *op,int sitopnext)
 
 	if (f) { /* no overlap */
 
-	    op->fl.scanfull = FALSE ;
+	    op->fl.scanfull = false ;
 	    rs = display_rscan(op,sitopnext) ;
 	    n = rs ;
 
@@ -1667,20 +1588,16 @@ int display_scandisplay(DISPLAY *op,int sitopnext)
 }
 /* end subroutine (display_scandisplay) */
 
-
 /* retrieve the "info" field time-stamp */
-int display_infots(DISPLAY *op,time_t *tp)
-{
-	if (op == NULL) return SR_FAULT ;
+int display_infots(DISPLAY *op,time_t *tp) noex {
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
-	if (tp != NULL) *tp = op->ti_info ;
+	if (tp != nullptr) *tp = op->ti_info ;
 	return SR_OK ;
 }
 /* end subroutine (display_infots) */
 
-
-int display_midmsgs(DISPLAY *op,int total,int current)
-{
+int display_midmsgs(DISPLAY *op,int total,int current) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		fl ;
@@ -1690,12 +1607,12 @@ int display_midmsgs(DISPLAY *op,int total,int current)
 	char		nmsgbuf[NMSGBUFLEN + 1] ;
 	char		*fp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1744,39 +1661,37 @@ int display_midmsgs(DISPLAY *op,int total,int current)
 }
 /* end subroutine (display_midmsgs) */
 
-
-int display_botclear(DISPLAY *op)
-{
+int display_botclear(DISPLAY *op) noex {
 	PROGINFO	*pip ;
 	DISPLAY_VALS	*dvp ;
 	int		rs = SR_OK ;
-	int		f_change = FALSE ;
+	int		f_change = false ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	dvp = &op->v ;
 	if (dvp->fbuf[0] != '\0') {
-	    f_change = TRUE ;
+	    f_change = true ;
 	    dvp->fbuf[0] = '\0' ;
 	}
 
 	if (dvp->msgnum >= 0) {
-	    f_change = TRUE ;
+	    f_change = true ;
 	    dvp->msgnum = -1 ;
 	}
 
 	if (dvp->msgline >= 0) {
-	    f_change = TRUE ;
+	    f_change = true ;
 	    dvp->msgline = -1 ;
 	}
 
 	if (dvp->msglines >= 0) {
-	    f_change = TRUE ;
+	    f_change = true ;
 	    dvp->msglines = -1 ;
 	}
 
@@ -1793,19 +1708,17 @@ int display_botclear(DISPLAY *op)
 }
 /* end subroutine (display_botclear) */
 
-
-int display_botinfo(DISPLAY *op,DISPLAY_BOTINFO *mip)
-{
+int display_botinfo(DISPLAY *op,DISPLAY_BOTINFO *mip) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
-	int		f_change = FALSE ;
+	int		f_change = false ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1840,13 +1753,11 @@ int display_botinfo(DISPLAY *op,DISPLAY_BOTINFO *mip)
 }
 /* end subroutine (display_botinfo) */
 
-
 /* refresh the line number at the bottom of the display */
-int display_botline(DISPLAY *op,int msgline)
-{
+int display_botline(DISPLAY *op,int msgline) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -1876,13 +1787,11 @@ int display_botline(DISPLAY *op,int msgline)
 }
 /* end subroutine (display_botline) */
 
-
-int display_allclear(DISPLAY *op)
-{
+int display_allclear(DISPLAY *op) noex {
 	int		rs ;
 	int		w = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
@@ -1893,19 +1802,17 @@ int display_allclear(DISPLAY *op)
 }
 /* end subroutine (display_allclear) */
 
-
 /* change the number of display lines and-or scanlines */
-int display_winadj(DISPLAY *op,int dlines,int slines)
-{
+int display_winadj(DISPLAY *op,int dlines,int slines) noex {
 	PROGINFO	*pip ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1944,20 +1851,18 @@ int display_winadj(DISPLAY *op,int dlines,int slines)
 }
 /* end subroutine (display_winadj) */
 
-
 /* refresh the whole display */
-int display_refresh(DISPLAY *op)
-{
+int display_refresh(DISPLAY *op) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1979,20 +1884,18 @@ int display_refresh(DISPLAY *op)
 }
 /* end subroutine (display_refresh) */
 
-
 /* refresh the frame only */
-int display_rframe(DISPLAY *op)
-{
+int display_rframe(DISPLAY *op) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -2022,9 +1925,7 @@ int display_rframe(DISPLAY *op)
 }
 /* end subroutine (display_rframe) */
 
-
-int display_rtop(DISPLAY *op)
-{
+int display_rtop(DISPLAY *op) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		w, x, y ;
@@ -2035,12 +1936,12 @@ int display_rtop(DISPLAY *op)
 	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -2091,9 +1992,7 @@ int display_rtop(DISPLAY *op)
 }
 /* end subroutine (display_rtop) */
 
-
-int display_rmid(DISPLAY *op)
-{
+int display_rmid(DISPLAY *op) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		w, x, y ;
@@ -2104,12 +2003,12 @@ int display_rmid(DISPLAY *op)
 	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -2149,21 +2048,19 @@ int display_rmid(DISPLAY *op)
 }
 /* end subroutine (display_rmid) */
 
-
-int display_rbot(DISPLAY *op)
-{
+int display_rbot(DISPLAY *op) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		w, x, y ;
 	int		ll = 0 ;
 	char		*lp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -2199,9 +2096,7 @@ int display_rbot(DISPLAY *op)
 }
 /* end subroutine (display_rbot) */
 
-
-int display_rscantitle(DISPLAY *op)
-{
+int display_rscantitle(DISPLAY *op) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		sl ;
@@ -2209,12 +2104,12 @@ int display_rscantitle(DISPLAY *op)
 	int		len = 0 ;
 	cchar	*sp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DISPLAY_MAGIC) return SR_NOTOPEN ;
 
 	pip = op->pip ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -2260,9 +2155,7 @@ int display_rscantitle(DISPLAY *op)
 }
 /* end subroutine (display_rscantitle) */
 
-
-int display_rscan(DISPLAY *op,int si)
-{
+int display_rscan(DISPLAY *op,int si) noex {
 	PROGINFO	*pip = op->pip ;
 	DS		*dsp = &op->ds ;
 	int		rs = SR_OK ;
@@ -2270,7 +2163,7 @@ int display_rscan(DISPLAY *op,int si)
 	int		w, x, y ;
 	int		c = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -2309,12 +2202,10 @@ int display_rscan(DISPLAY *op,int si)
 }
 /* end subroutine (display_rscan) */
 
-
-int display_suspend(DISPLAY *op)
-{
+int display_suspend(DISPLAY *op) noex {
 	cint	r = op->rl_input ;
 	cint	c = 0 ;
-	int		rs ;
+	int	rs ;
 
 	if ((rs = display_flush(op)) >= 0) {
 	    if ((rs = ds_pwrite(&op->ds,0,r,c,"\v",1)) >= 0) {
@@ -2326,18 +2217,14 @@ int display_suspend(DISPLAY *op)
 }
 /* end subroutine (display_suspend) */
 
-
-int display_resume(DISPLAY *op)
-{
-	if (op == NULL) return SR_FAULT ;
+int display_resume(DISPLAY *op) noex {
+	if (op == nullptr) return SR_FAULT ;
 	return SR_OK ;
 }
 /* end subroutine (display_resume) */
 
-
-int scandata_init(DISPLAY_SDATA *sdp)
-{
-	memset(sdp,0,sizeof(DISPLAY_SDATA)) ;
+int scandata_init(DISPLAY_SDATA *sdp) noex {
+	memclear(sdp) ;
 	sdp->fcol = -1 ;
 	sdp->scol = -1 ;
 	return SR_OK ;
@@ -2347,9 +2234,7 @@ int scandata_init(DISPLAY_SDATA *sdp)
 
 /* private subroutines */
 
-
-static int display_linesload(DISPLAY *op,int dlines,int slines)
-{
+local int display_linesload(DISPLAY *op,int dlines,int slines) noex {
 	int		rs = SR_OK ;
 	op->displines = dlines ;
 	op->scanlines = (slines > 0) ? slines : (dlines/4) ;
@@ -2358,18 +2243,15 @@ static int display_linesload(DISPLAY *op,int dlines,int slines)
 	    rs = SR_INVALID ;
 	}
 	return rs ;
-}
-/* end subroutine (display_linesload) */
+} /* end subroutine (display_linesload) */
 
-
-static int display_linescalc(DISPLAY *op)
-{
+local int display_linescalc(DISPLAY *op) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
 	int		dlines = op->displines ;
 	int		slines = op->scanlines ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	op->rl_middle = (op->rl_scan + slines) ;
 	op->rl_viewer = (op->rl_middle + 1) ;
@@ -2388,13 +2270,10 @@ static int display_linescalc(DISPLAY *op)
 #endif /* CF_DEBUG */
 
 	return rs ;
-}
-/* end subroutine (display_linescalc) */
-
+} /* end subroutine (display_linescalc) */
 
 /* create the "scan" and "viewer" sub-windows */
-static int display_subwinbegin(DISPLAY *op)
-{
+local int display_subwinbegin(DISPLAY *op) noex {
 	int		rs = SR_OK ;
 	int		sr, sc ;
 	int		rows, cols ;
@@ -2418,12 +2297,9 @@ static int display_subwinbegin(DISPLAY *op)
 	}
 
 	return rs ;
-}
-/* end subroutine (display_subwinbegin) */
+} /* end subroutine (display_subwinbegin) */
 
-
-static int display_subwinend(DISPLAY *op)
-{
+local int display_subwinend(DISPLAY *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -2440,12 +2316,9 @@ static int display_subwinend(DISPLAY *op)
 	}
 
 	return rs ;
-}
-/* end subroutine (display_subwinend) */
+} /* end subroutine (display_subwinend) */
 
-
-static int display_subwinadj(DISPLAY *op)
-{
+local int display_subwinadj(DISPLAY *op) noex {
 	int		rs ;
 
 	if ((rs = display_subwinend(op)) >= 0) {
@@ -2453,27 +2326,23 @@ static int display_subwinadj(DISPLAY *op)
 	}
 
 	return rs ;
-}
-/* end subroutine (display_subwinadj) */
+} /* end subroutine (display_subwinadj) */
 
-
-static int display_scanfins(DISPLAY *op)
-{
+local int display_scanfins(DISPLAY *op) noex {
 	PROGINFO	*pip = op->pip ;
 	SCANLINE	*slp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("display_scanfins: ent\n") ;
 #endif
 
-	for (i = 0 ; varray_enum(&op->scans,i,&slp) >= 0 ; i += 1) {
-	    if (slp != NULL) {
+	for (int i = 0 ; varray_enumer(&op->scans,i,&slp) >= 0 ; i += 1) {
+	    if (slp != nullptr) {
 	        rs1 = scanline_finish(slp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -2485,12 +2354,9 @@ static int display_scanfins(DISPLAY *op)
 #endif
 
 	return rs ;
-}
-/* end subroutine (display_scanfins) */
+} /* end subroutine (display_scanfins) */
 
-
-static int display_rscanscroll(DISPLAY *op,int sitopnext)
-{
+local int display_rscanscroll(DISPLAY *op,int sitopnext) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2503,7 +2369,7 @@ static int display_rscanscroll(DISPLAY *op,int sitopnext)
 	int		w ;
 	int		n = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
@@ -2610,14 +2476,11 @@ static int display_rscanscroll(DISPLAY *op,int sitopnext)
 #endif
 
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (display_rscanscroll) */
+} /* end subroutine (display_rscanscroll) */
 
-
-static int display_scanprint(DISPLAY *op,int si)
-{
+local int display_scanprint(DISPLAY *op,int si) noex {
 	PROGINFO	*pip = op->pip ;
-	SCANLINE	*slp = NULL ;
+	SCANLINE	*slp = nullptr ;
 	DS		*dsp = &op->ds ;
 	int		rs ;
 	int		w = op->wscan ;
@@ -2629,7 +2492,7 @@ static int display_scanprint(DISPLAY *op,int si)
 	    debugprintf("display_scanprint: ent si=%d\n",si) ;
 #endif
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	ch_point = ' ' ;
 	if (si == op->si_point) {
@@ -2639,10 +2502,10 @@ static int display_scanprint(DISPLAY *op,int si)
 
 	if ((rs = varray_acc(&op->scans,si,&slp)) >= 0) {
 	    cchar	*fmt ;
-	    if (slp != NULL) {
+	    if (slp != nullptr) {
 	        int	ch_mark = (isprintlatin(slp->mark)) ? slp->mark : ' ' ;
 	        c += 1 ;
-	        fmt = (slp->data != NULL) ? "%c%c%s\n" : "%c%c\v\n" ;
+	        fmt = (slp->data != nullptr) ? "%c%c%s\n" : "%c%c\v\n" ;
 	        rs = ds_printf(dsp,w,fmt,ch_mark,ch_point,(slp->data + 2)) ;
 	    } else {
 	        rs = ds_printf(dsp,w," %c\v\n",ch_point) ;
@@ -2655,28 +2518,24 @@ static int display_scanprint(DISPLAY *op,int si)
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (display_scanprint) */
+} /* end subroutine (display_scanprint) */
 
-
-static int display_nnbscans(DISPLAY *op,int si,int ni)
-{
+local int display_nnbscans(DISPLAY *op,int si,int ni) noex {
 	PROGINFO	*pip = op->pip ;
 	SCANLINE	*slp ;
 	int		rs = SR_OK ;
-	int		i ;
 	int		n = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("display_nnbscans: ent si=%d\n",si) ;
 #endif
 
-	for (i = 0 ; i < ni ; i += 1) {
+	for (int i = 0 ; i < ni ; i += 1) {
 	    if ((rs = varray_acc(&op->scans,(si+i),&slp)) >= 0) {
-	        if (slp != NULL) {
+	        if (slp != nullptr) {
 	            if ((rs = scanline_checkblank(slp)) > 0) {
 	                n += 1 ;
 	            }
@@ -2691,12 +2550,9 @@ static int display_nnbscans(DISPLAY *op,int si,int ni)
 #endif
 
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (display_nnbscans) */
+} /* end subroutine (display_nnbscans) */
 
-
-static int display_setstzone(DISPLAY *op)
-{
+local int display_setstzone(DISPLAY *op) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
 	int		fl ;
@@ -2704,7 +2560,7 @@ static int display_setstzone(DISPLAY *op)
 	char		stbuf[DISPLAY_STZLEN + 1] ;
 	char		*fp ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -2742,17 +2598,14 @@ static int display_setstzone(DISPLAY *op)
 #endif
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (display_setstzone) */
+} /* end subroutine (display_setstzone) */
 
-
-static int display_scanpointclear(DISPLAY *op,int si_keep,int nkeep)
-{
+local int display_scanpointclear(DISPLAY *op,int si_keep,int nkeep) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
 	int		rc = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
@@ -2782,17 +2635,15 @@ static int display_scanpointclear(DISPLAY *op,int si_keep,int nkeep)
 	} /* end if */
 
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (display_scanpointclear) */
+} /* end subroutine (display_scanpointclear) */
 
-
-static int display_scanpointset(DISPLAY *op,int si_keep,int nkeep,int sitopnext)
-{
+local int display_scanpointset(DISPLAY *op,int si_keep,int nkeep,
+		int sitopnext) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
 	int		rc = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
@@ -2820,17 +2671,14 @@ static int display_scanpointset(DISPLAY *op,int si_keep,int nkeep,int sitopnext)
 	} /* end if */
 
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (display_scanpointset) */
+} /* end subroutine (display_scanpointset) */
 
-
-static int display_scanmarkset(DISPLAY *op,int si,int mark)
-{
+local int display_scanmarkset(DISPLAY *op,int si,int mark) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
 	int		rc = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if (op->si_point >= 0) {
 	    if ((si >= op->si_point) && (si < (op->si_point+op->scanlines))) {
@@ -2847,73 +2695,62 @@ static int display_scanmarkset(DISPLAY *op,int si,int mark)
 	} /* end if */
 
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (display_scanmarkset) */
+} /* end subroutine (display_scanmarkset) */
 
-
-static int display_scantitlemk(DISPLAY *op)
-{
+local int display_scantitlemk(DISPLAY *op) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		tcol ;
-	int		i ;
 	cchar	*cp ;
 	char		*bp = op->scantitle ;
-
 	strwcpyblanks(bp,DISPLAY_LSCANLINE) ;
-
-	for (i = 0 ; scantitles[i].name != NULL ; i += 1) {
+	for (int i = 0 ; scantitles[i].name != nullptr ; i += 1) {
 	    cp = scantitles[i].name ;
-	    cl = strlen(cp) ;
+	    cl = lenstr(cp) ;
 	    tcol = scantitles[i].col ;
 	    strncpy((bp + tcol),cp,cl) ;
 	} /* end for */
 
 	return rs ;
-}
-/* end subroutine (display_scantitlemk) */
+} /* end subroutine (display_scantitlemk) */
 
-
-static int display_botloadfrom(DISPLAY *op,cchar *msgfrom)
-{
+local int display_botloadfrom(DISPLAY *op,cchar *msgfrom) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
 	int		fi ;
 	int		fl, bl ;
-	int		f_change = FALSE ;
+	int		f_change = false ;
 	char		*fp, *bp ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	fi = COL_MSGFROM ;
 	fl = DISPLAY_LMSGFROM ;
 	fp = (op->linebot + fi) ;
 	if (strncmp(msgfrom,fp,fl) != 0) {
-	    f_change = TRUE ;
+	    f_change = true ;
 	    if (msgfrom[0] != '\0') {
 	        bp = strdfill1(fp,fl,msgfrom) ;
 	        bl = ((fp + fl) - bp) ;
 	        memset(bp,'-',bl) ;
-	    } else
+	    } else {
 	        memset(fp,'-',fl) ;
+	    }
 	} /* end if (not-equal) */
 
 	return (rs >= 0) ? f_change : rs ;
-}
-/* end subroutine (display_botloadfrom) */
+} /* end subroutine (display_botloadfrom) */
 
-
-static int display_botloadnum(DISPLAY *op,int msgnum)
-{
+local int display_botloadnum(DISPLAY *op,int msgnum) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
-	int		f_change = FALSE ;
+	int		f_change = false ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if (msgnum != op->v.msgnum) {
 	    int		fi = COL_MSGNUM ;
-	    f_change = TRUE ;
+	    f_change = true ;
 	    op->v.msgnum = msgnum ;
 	    {
 	        int	bl = MIN(5,DISPLAY_LMSGNUM) ;
@@ -2930,17 +2767,14 @@ static int display_botloadnum(DISPLAY *op,int msgnum)
 	} /* end if (needed replacement) */
 
 	return (rs >= 0) ? f_change : rs ;
-}
-/* end subroutine (display_botloadnum) */
+} /* end subroutine (display_botloadnum) */
 
-
-static int display_botloadline(DISPLAY *op,int msgline)
-{
+local int display_botloadline(DISPLAY *op,int msgline) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
-	int		f_change = FALSE ;
+	int		f_change = false ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -2952,7 +2786,7 @@ static int display_botloadline(DISPLAY *op,int msgline)
 	    int		fi ;
 	    int		fl ;
 	    char	*fp ;
-	    f_change = TRUE ;
+	    f_change = true ;
 	    op->v.msgline = msgline ;
 	    fi = COL_MSGLINES ;
 	    fp = (op->linebot + fi) ;
@@ -2963,12 +2797,13 @@ static int display_botloadline(DISPLAY *op,int msgline)
 	        char		digbuf[DIGBUFLEN + 1] ;
 	        if ((rs = ctdeci(digbuf,DIGBUFLEN,v)) >= 0) {
 	            ml = rs ;
-	            i = (fl-ml) ;
+	            i = (fl - ml) ;
 	            memset(fp,' ',i) ;
 	            strncpy((fp+i),digbuf,ml) ;
 	        }
-	    } else
+	    } else {
 	        memset(fp,'-',fl) ;
+	    }
 	} /* end if (needed replacement) */
 
 #if	CF_DEBUG
@@ -2978,22 +2813,19 @@ static int display_botloadline(DISPLAY *op,int msgline)
 #endif
 
 	return (rs >= 0) ? f_change : rs ;
-}
-/* end subroutine (display_botloadline) */
+} /* end subroutine (display_botloadline) */
 
-
-static int display_botloadlines(DISPLAY *op,int msglines)
-{
+local int display_botloadlines(DISPLAY *op,int msglines) noex {
 	PROGINFO	*pip = op->pip ;
-	cint	n = 4 ;
+	cint		n = 4 ;
 	int		rs = SR_OK ;
-	int		f_change = FALSE ;
+	int		f_change = false ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if (msglines != op->v.msglines) {
 	    int		fi = (COL_MSGLINES + n) ;
-	    f_change = TRUE ;
+	    f_change = true ;
 	    op->v.msglines = msglines ;
 	    {
 	        int	bl = (DISPLAY_LMSGLINES - n) ;
@@ -3004,26 +2836,24 @@ static int display_botloadlines(DISPLAY *op,int msglines)
 	            if ((rs = ctdeci(dbuf,DIGBUFLEN,v)) >= 0) {
 	                strdfill3(bp,bl,":",dbuf,blanks) ;
 		    }
-	        } else
+	        } else {
 	            memset(bp,'-',bl) ;
+		}
 	    } /* end block */
 	} /* end if (need replacement) */
 
 	return (rs >= 0) ? f_change : rs ;
-}
-/* end subroutine (display_botloadlines) */
+} /* end subroutine (display_botloadlines) */
 
-
-static int display_hdcheck(DISPLAY *op,int wlen)
-{
+local int display_hdcheck(DISPLAY *op,int wlen) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	if ((rs = display_hd(op)) >= 0) {
 	    if (wlen > op->wlen) {
-	        if (op->wbuf != NULL) {
+	        if (op->wbuf != nullptr) {
 		    rs = uc_free(op->wbuf) ;
-		    op->wbuf = NULL ;
+		    op->wbuf = nullptr ;
 		    op->wlen = 0 ;
 	        }
 	        if (rs >= 0) {
@@ -3046,20 +2876,17 @@ static int display_hdcheck(DISPLAY *op,int wlen)
 	    debugprintf("display_hdcheck: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (display_hdcheck) */
+} /* end subroutine (display_hdcheck) */
 
-
-static int display_hd(DISPLAY *op)
-{
+local int display_hd(DISPLAY *op) noex {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	if (! op->open.hd) {
 	    PROGINFO	*pip = op->pip ;
 	    HDRDECODE	*hdp = &op->hd ;
 	    if ((rs = hdrdecode_start(hdp,pip->pr)) >= 0) {
-		op->open.hd = TRUE ;
+		op->open.hd = true ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
 	    debugprintf("display_hd: hdrdecode_start() rs=%d\n",rs) ;
@@ -3071,49 +2898,36 @@ static int display_hd(DISPLAY *op)
 	    debugprintf("display_hd: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (display_hd) */
+} /* end subroutine (display_hd) */
 
-
-static int display_hdfin(DISPLAY *op)
-{
+local int display_hdfin(DISPLAY *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->wbuf != NULL) {
+	if (op->wbuf) {
 	    rs1 = uc_free(op->wbuf) ;
 	    if (rs >= 0) rs = rs1 ;	
-	    op->wbuf = NULL ;
-	}
+	    op->wbuf = nullptr ;
+	} /* end if (memory-release) */
 	if (op->open.hd) {
 	    HDRDECODE	*hdp = &op->hd ;
-	    op->open.hd = FALSE ;
+	    op->open.hd = false ;
 	    rs1 = hdrdecode_finish(hdp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (display_hdfin) */
+} /* end subroutine (display_hdfin) */
 
-
-static int scanline_start(SCANLINE *slp,DISPLAY_SDATA *ddp)
-{
+local int scanline_start(SCANLINE *slp,DISPLAY_SDATA *ddp) noex {
 	int		rs = SR_OK ;
-
-	if (slp == NULL) return SR_FAULT ;
-
-	memset(slp,0,sizeof(SCANLINE)) ;
-
-	if (ddp != NULL) {
+	if (slp == nullptr) return SR_FAULT ;
+	memclear(slp) ;
+	if (ddp) {
 	    rs = scanline_fill(slp,ddp) ;
 	}
-
 	return rs ;
-}
-/* end subroutine (scanline_start) */
+} /* end subroutine (scanline_start) */
 
-
-static int scanline_finish(SCANLINE *slp)
-{
+local int scanline_finish(SCANLINE *slp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rc = 0 ;
@@ -3122,45 +2936,42 @@ static int scanline_finish(SCANLINE *slp)
 	debugprintf("display/scanline_finish: ent slp{%p}\n",slp) ;
 #endif
 
-	if (slp == NULL) return SR_FAULT ;
+	if (slp == nullptr) return SR_FAULT ;
 
-	if (slp->data != NULL) {
+	if (slp->data) {
 	    rs1 = uc_free(slp->data) ;
 	    if (rs >= 0) rs = rs1 ;
-	    slp->data = NULL ;
+	    slp->data = nullptr ;
 	    rc = 1 ;
-	}
+	} /* end if (memory-release) */
 
 #if	CF_DEBUGS
 	debugprintf("display/scanline_finish: ret rs=%d rc=%d\n",rs,rc) ;
 #endif
 
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (scanline_finish) */
+} /* end subroutine (scanline_finish) */
 
-
-static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
-{
+local int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ll = 0 ;
 
-	if (slp == NULL) return SR_FAULT ;
+	if (slp == nullptr) return SR_FAULT ;
 
-	if (slp->data != NULL) {
+	if (slp->data != nullptr) {
 	    uc_free(slp->data) ;
-	    slp->data = NULL ;
+	    slp->data = nullptr ;
 	}
 
-	if (ddp != NULL) {
+	if (ddp != nullptr) {
 	    sbuf	b ;
 	    int		cl ;
 	    int		icols ;
 	    int		nblank ;
 	    int		nncol ;
 	    int		dl = 0 ;
-	    int		f_check = FALSE ;
+	    int		f_check = false ;
 	    cchar	*dp ;
 	    cchar	*cp ;
 	    cchar	*ccp ;
@@ -3173,10 +2984,10 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 		int	fcol ;
 	        int	ncol = 0 ;
 
-	        for (fi = 0 ; scantitles[fi].name != NULL ; fi += 1) {
-		    char	*abuf = NULL ;
-	            f_check = TRUE ;
-	            dp = NULL ;
+	        for (fi = 0 ; scantitles[fi].name != nullptr ; fi += 1) {
+		    char	*abuf = nullptr ;
+	            f_check = true ;
+	            dp = nullptr ;
 	            dl = -1 ;
 
 	            nncol = scantitles[fi].col ;
@@ -3200,8 +3011,8 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 	            case scantitle_subject:
 	                dp = ddp->sbuf ;
 	                dl = ddp->slen ;
-			if (dp != NULL) {
-			    if (dl < 0) dl = strlen(dp) ;
+			if (dp != nullptr) {
+			    if (dl < 0) dl = lenstr(dp) ;
 			    if ((rs = uc_malloc((dl+1),&abuf)) >= 0) {
 			        if ((rs = snwcpycompact(abuf,dl,dp,dl)) >= 0) {
 				    dl = rs ;
@@ -3209,20 +3020,20 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 			        }
 			        if (rs < 0) {
 				    uc_free(abuf) ;
-				    abuf = NULL ;
+				    abuf = nullptr ;
 			        }
 			    } /* end if (m-a) */
 			} /* end if (non-null) */
 	                break ;
 
 	            case scantitle_date:
-	                f_check = FALSE ;
+	                f_check = false ;
 	                dp = ddp->date ;
 	                dl = DISPLAY_LDATE ;
 	                break ;
 
 	            case scantitle_lines:
-	                f_check = FALSE ;
+	                f_check = false ;
 	                dl = DISPLAY_LLINES ;
 	                if (ddp->lines >= 0) {
 	                    rs1 = digsmall(linesbuf,ddp->lines) ;
@@ -3240,8 +3051,8 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 			fi,fl,dl) ;
 #endif
 
-	            if ((rs >= 0) && (dp != NULL)) {
-	                if (dl < 0) dl = strlen(dp) ;
+	            if ((rs >= 0) && (dp != nullptr)) {
+	                if (dl < 0) dl = lenstr(dp) ;
 
 #if	CF_DEBUGS
 	                debugprintf("scanline_fill: d=>%r<\n",dp,dl) ;
@@ -3256,14 +3067,14 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 	                    cl = dl ;
 	                }
 
-	                if ((rs >= 0) && (cp != NULL) && (cl > 0)) {
+	                if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
 	                    rs = sbuf_strw(&b,cp,cl) ;
 	                    icols = nstrcols(ntabcols,ncol,cp,cl) ;
 	                    ncol += icols ;
 	                }
 	            } /* end if (non-empty field) */
 
-		    if (abuf != NULL) uc_free(abuf) ;
+		    if (abuf != nullptr) uc_free(abuf) ;
 	            if (rs < 0) break ;
 	        } /* end for */
 
@@ -3309,49 +3120,38 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 	} /* end if (non-null) */
 
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (scanline_fill) */
+} /* end subroutine (scanline_fill) */
 
-
-static int scanline_blank(SCANLINE *slp)
-{
+local int scanline_blank(SCANLINE *slp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rc = 0 ;
 
-	if (slp == NULL) return SR_FAULT ;
+	if (slp == nullptr) return SR_FAULT ;
 
 	slp->mark = 0 ;
-	if (slp->data != NULL) {
+	if (slp->data != nullptr) {
 	    rs1 = uc_free(slp->data) ;
 	    if (rs >= 0) rs = rs1 ;
-	    slp->data = NULL ;
+	    slp->data = nullptr ;
 	    rc = 1 ;
-	}
+	} /* end if (memory-release) */
 
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (scanline_blank) */
+} /* end subroutine (scanline_blank) */
 
-
-static int scanline_mark(SCANLINE *slp,int mark)
-{
+local int scanline_mark(SCANLINE *slp,int mark) noex {
 	int		rs = SR_OK ;
 	int		rc = 0 ;
-
-	if (slp == NULL) return SR_FAULT ;
-
+	if (slp == nullptr) return SR_FAULT ;
 	slp->mark = mark ;
-	if (slp->data != NULL)
+	if (slp->data) {
 	    rc = 1 ;
-
+	}
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (scanline_mark) */
+} /* end subroutine (scanline_mark) */
 
-
-static int scanline_setlines(SCANLINE *slp,int lines)
-{
+local int scanline_setlines(SCANLINE *slp,int lines) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		di ;
@@ -3360,7 +3160,7 @@ static int scanline_setlines(SCANLINE *slp,int lines)
 	char		linesbuf[LINESBUFLEN + 1] ;
 	char		*dp ;
 
-	if (slp == NULL) return SR_FAULT ;
+	if (slp == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("display/scanline_setlines: lines=%u\n",lines) ;
@@ -3368,7 +3168,7 @@ static int scanline_setlines(SCANLINE *slp,int lines)
 
 	dp = slp->data ;
 	di = COL_SCANLINES ;
-	if (dp != NULL) {
+	if (dp != nullptr) {
 	    rs1 = digsmall(linesbuf,lines) ;
 	    if ((rs1 >= 0) && (strncmp((dp+di),linesbuf,n) != 0)) {
 	        rc = 1 ;
@@ -3377,48 +3177,40 @@ static int scanline_setlines(SCANLINE *slp,int lines)
 	}
 
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (scanline_setlines) */
+} /* end subroutine (scanline_setlines) */
 
-
-static int scanline_checkblank(SCANLINE *slp)
-{
+local int scanline_checkblank(SCANLINE *slp) noex {
 	int		rs = SR_OK ;
 	int		rc = 0 ;
-
-	if (slp == NULL) return SR_FAULT ;
-
-	if (slp->data != NULL)
+	if (slp == nullptr) return SR_FAULT ;
+	if (slp->data) {
 	    rc = 1 ;
-
+	}
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (scanline_checkblank) */
-
+} /* end subroutine (scanline_checkblank) */
 
 #if	CF_SFEND
 
 /* string-find-end */
-static int sfend(cchar *sp,int sl,int n,cchar **rpp) noex {
+local int sfend(cchar *sp,int sl,int n,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		ml ;
-	if (sl < 0) sl = strlen(sp) ;
+	if (sl < 0) sl = lenstr(sp) ;
 	ml = MIN(sl,n) ;
 	if (rpp) {
-	    *rpp = (rs >= 0) ? (sp + sl - ml) : NULL ;
+	    *rpp = (rs >= 0) ? (sp + sl - ml) : nullptr ;
 	}
 	return (rs >= 0) ? ml : rs ;
-}
-/* end subroutine (sfend) */
+} /* end subroutine (sfend) */
 
 #endif /* CF_SFEND */
 
 /* number-string-colums (numer of columns a string takes up) */
-static int nstrcols(int ntabcols,int nc,cchar *sp,int sl) noex {
+local int nstrcols(int ntabcols,int nc,cchar *sp,int sl) noex {
 	int		n = 0 ;
-	if (sp != NULL) {
+	if (sp) {
 	    int		scols = nc ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl < 0) sl = lenstr(sp) ;
 	    for (int i = 0 ; i < sl ; i += 1) {
 	        cint	icols = ncolchar(ntabcols,nc,sp[i]) ;
 	        nc += icols ;
@@ -3426,11 +3218,10 @@ static int nstrcols(int ntabcols,int nc,cchar *sp,int sl) noex {
 	    n = (nc - scols) ;
 	} /* end if (non-null) */
 	return n ;
-}
-/* end subroutine (nstrcols) */
+} /* end subroutine (nstrcols) */
 
 #if	CF_DEBUGS
-static char *stridig(char *ip,int il,int n) noex {
+local char *stridig(char *ip,int il,int n) noex {
 	int		nd ;
 	char		digbuf[DIGBUFLEN + 1] ;
 	nd = ctdecui(digbuf,DIGBUFLEN,n) ;
@@ -3443,8 +3234,7 @@ static char *stridig(char *ip,int il,int n) noex {
 	    ip = strnblanks(ip,il) ;
 	}
 	return ip ;
-}
-/* end subroutine (stridig) */
+} /* end subroutine (stridig) */
 #endif /* CF_DEBUGS */
 
 
