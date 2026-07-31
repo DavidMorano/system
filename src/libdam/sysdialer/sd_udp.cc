@@ -26,7 +26,7 @@
 	udp [[<host>:]<port>] [-f af] [-bp <backupport>]
 
 	Arguments:
-	+ host		override hostname
+	+ host		hostname
 	+ port		service port
 	+ af		address family
 
@@ -49,6 +49,9 @@
 #include	"sysdialer.h"
 #include	"sd_udp.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -64,8 +67,6 @@
 #define	SVCNAMELEN	32
 #endif
 
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
-
 #define	NPARG		2	/* number of positional arguments */
 #define	MAXARGINDEX	100
 #define	NARGPRESENT	(MAXARGINDEX/8 + 1)
@@ -80,7 +81,7 @@
 /* local structures */
 
 struct afamily {
-	cchar	*name ;
+	cchar		*name ;
 	int		af ;
 } ; /* end struct */
 
@@ -118,13 +119,13 @@ constexpr afamily	afs[] = {
 
 /* external variables (module information) */
 
-SYSDIALER_INFO	udp = {
+SYSDIALER_INFO	sd_udp = {
 	UDP_MNAME,
 	UDP_VERSION,
 	UDP_INAME,
-	sizeof(UDP),
+	szof(UDP),
 	UDP_MF
-} ;
+} ; /* end object */
 
 
 /* exported subroutines */
