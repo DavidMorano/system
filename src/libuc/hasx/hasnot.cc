@@ -55,8 +55,8 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<char.h>
-#include	<localmisc.h>		/* LIBU |UC(3u)| */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hasnot.h"
 
@@ -110,8 +110,7 @@ bool hasnotdots(cchar *sp,int µsl) noex {
 	    } /* end if (had a dot) */
 	} /* end if (getlenstr) */
 	return f ;
-}
-/* end subroutine (hasnotdots) */
+} /* end subroutine (hasnotdots) */
 
 bool hasnotempty(cchar *sp,int sl) noex {
 	bool		f = false ;
@@ -121,8 +120,7 @@ bool hasnotempty(cchar *sp,int sl) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (hasnotempty) */
+} /* end subroutine (hasnotempty) */
 
 
 /* local subroutines */
