@@ -20,17 +20,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	strvalcmp(cchar *,cchar *) noex ;
-
-extern int	strxvalcmp(cchar *,cchar *) noex ;
+extern int	strvalcmp	(cchar *,cchar *) noex ;
+extern int	strxvalcmp	(cchar *,cchar *) noex ;
 
 EXTERNC_end
 
