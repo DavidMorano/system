@@ -42,10 +42,67 @@ struct strtab_head {
 	uint		magval ;
 	int		chsz ;
 	int		stsz ;		/* "string table" size */
-	int		count ;		/* total item count */
+	int		cnt ;		/* total item count */
 } ; /* end struct (strtab_head) */
 
+#ifdef	__cplusplus
+enum strtabmems {
+    	strtabmem_start,
+	strtabmem_finish,
+	strtabmem_count,
+	strtabmem_strsize,
+	strtabmem_recsize,
+	strtabmem_indlen,
+	strtabmem_indsize,
+	strtabmem_overlast
+} ; /* end enum (strtabmems) */
+struct strtab ;
+struct strtab_co {
+	strtab		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (strtab *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () (int) noex ;
+} ; /* end struct (strtab_co) */
+struct strtab : strtab_head {
+	strtab_co	start ;
+	strtab_co	finish ;
+	strtab_co	count ;
+	strtab_co	strsize ;
+	strtab_co	recsize ;
+	strtab_co	indlen ;
+	strtab_co	indsize ;
+	strtab() noex {
+	    start	(this,strtabmem_start) ;
+	    finish	(this,strtabmem_finish) ;
+	    count	(this,strtabmem_count) ;
+	    strsize	(this,strtabmem_strsize) ;
+	    recsize	(this,strtabmem_recsize) ;
+	    indlen	(this,strtabmem_indlen) ;
+	    indsize	(this,strtabmem_indsize) ;
+	    clp		= nullptr ;
+	} ; /* end ctor */
+	strtab(const strtab &) = delete ;
+	strtab &operator = (const strtab &) = delete ;
+	int add		(cchar *,int) noex ;
+	int addfast	(cchar *,int) noex ;
+	int already	(cchar *,int) noex ;
+	int strmk	(char *,int) noex ;
+	int recmk	(int *,int) noex ;
+	int indmk	(int (*)[3],int,int) noex ;
+	operator int () noex ;
+	void dtor() noex ;
+	destruct strtab() {
+	    if (clp) dtor() ;
+	} ;
+} ; /* end struct (strtab) */
+#else	/* __cplusplus */
 typedef STRTAB		strtab ;
+#endif /* __cplusplus */
+
 typedef STRTAB_CH	strtab_ch ;
 
 EXTERNC_begin
