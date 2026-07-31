@@ -46,13 +46,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<nleadstr.h>		/* |nleadcasestr(3uc)| */
-#include	<toxc.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<nleadstr.h>		/* LIBUC |nleadcasestr(3uc)| */
+#include	<toxc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfcasesub.h"
 
