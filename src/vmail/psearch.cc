@@ -31,8 +31,8 @@
 #include	<estrings.h>
 #include	<localmisc.h>
 
-#include	"config.h"
-#include	"defs.h"
+#include	"vmail_config.h"
+#include	"vmail_defs.h"
 #include	"mb.h"
 
 
