@@ -55,15 +55,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>		/* |CH_{xx}| */
-#include	<strn.h>		/* |strnrchr(3uc)| */
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_{xx}| */
+#include	<strn.h>		/* LIBUC |strnrchr(3uc)| */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"			/* |sfshrink(3uc)| */
 
@@ -151,7 +151,7 @@ int sfword(cchar *sp,int sl,cchar **rpp) noex {
 	        } /* end if (more than one character) */
 	        if ((! f) && (cp[cl - 1] == CH_SQUOTE)) {
 	            cl -= 1 ;
-	        }
+	        } /* end if */
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	if (rpp) *rpp = cp ;
@@ -168,11 +168,11 @@ local int sfshrinkmore(cchar *sp,int sl,cchar **rpp) noex {
 	    while (cl && iswhitemore(cp[0])) {
 		cp += 1 ;
 		cl -= 1 ;
-	    }
+	    } /* end while */
 	    *rpp = cp ;
 	    while (cl && iswhitemore(cp[cl-1])) {
 		cl -= 1 ;
-	    }
+	    } /* end while */
 	} /* end if (sfshrink) */
 	return cl ;
 } /* end subroutine (sfshrinkmore) */
