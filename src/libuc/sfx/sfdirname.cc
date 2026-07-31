@@ -59,13 +59,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfxname.h"
 
@@ -105,14 +105,14 @@ import libutil ;			/* |lenstr(3u)| */
 int sfdirname(cchar *sp,int µsl,cchar **rpp) noex {
 	int		rl = -1 ;
 	cchar		*rp = nullptr ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
+	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    int		i ; /* used-afterwards */
 	    while ((sl > 0) && (sp[sl - 1] == '/'))  {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    for (i = sl ; i > 0 ; i -= 1) {
 	        if (sp[i - 1] == '/') break ;
-	    }
+	    } /* end for */
 	    rp = sp ;
 	    if (i == 1) {
 	        rl = 1 ;
