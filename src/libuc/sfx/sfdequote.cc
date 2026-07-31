@@ -39,13 +39,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>		/* |CH_{xx}| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_{xx}| */
 #include	<char.h>		/* |CHAR_ISHWITE(3uc)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
@@ -86,12 +86,12 @@ int sfdequote(cchar *sp,int sl,cchar **rpp) noex {
 	    while (sl && isours(sp[0])) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    if (sp[0] == '\0') sl = 0 ;
 	    if (rpp) *rpp = sp ;
 	    while (sl && isours(sp[sl - 1])) {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	} else {
 	    sl = -1 ;
 	} /* end if (non-null) */
