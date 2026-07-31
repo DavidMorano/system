@@ -13,17 +13,16 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	strpcmp(cchar *,cchar *) noex ;
-
-extern int	strxpcmp(cchar *,cchar *) noex ;
+extern int	strpcmp		(cchar *,cchar *) noex ;
+extern int	strxpcmp	(cchar *,cchar *) noex ;
 
 EXTERNC_end
 
