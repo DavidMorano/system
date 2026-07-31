@@ -24,12 +24,8 @@
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<logfile.h>
-#include	<localmisc.h>		/* |MAXPATHLEN| */
-
-#include	"sysdialer.h"
+#include	<usysbase.h>
+#include	<sysdialer.h>
 
 
 #define	SDPROG		struct sdprog_head
