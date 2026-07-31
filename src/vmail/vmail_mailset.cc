@@ -89,7 +89,7 @@
 #include	<spawnproc.h>
 #include	<localmisc.h>
 
-#include	"config.h"
+#include	"vmail_config.h"
 #include	"defs.h"
 #include	"mb.h"
 #include	"ds.h"
