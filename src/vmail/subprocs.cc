@@ -45,7 +45,8 @@
 #include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<localmisc.h>
 #include	<exitcodes.h>
 
@@ -53,10 +54,6 @@
 
 
 /* local defines */
-
-#ifndef	NOFILE
-#define	NOFILE		20
-#endif
 
 #define	DEFENTRIES	4
 #define	DEFPATH		"/usr/preroot/bin:/usr/xpg4/bin:/usr/bin:/usr/extra/bin"
@@ -75,21 +72,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,cchar *,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	snshellunder(char *,int,pid_t,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	matkeystr(cchar **,cchar *,int) ;
-extern int	strkeycmp(cchar *,cchar *) ;
-extern int	vstrkeycmp(cvoid **,cvoid **) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	dupup(int,int) ;
-extern int	isIOError(int) ;
-extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
