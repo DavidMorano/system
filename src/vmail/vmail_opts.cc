@@ -25,12 +25,12 @@
 
 	int progopts(pip,kop)
 	PROGINFO	*pip ;
-	KEYOPT		*kop ;
+	keyopt		*kop ;
 
 	Arguments:
 
 	pip		pointer to program information
-	kop		pointer to KEYOPT object
+	kop		pointer to keyopt object
 
 	Returns:
 
@@ -54,7 +54,7 @@
 #include	<keyopt.h>
 #include	<localmisc.h>
 
-#include	"config.h"
+#include	"vmail_config.h"
 #include	"defs.h"
 
 
@@ -63,19 +63,10 @@
 
 /* external subroutines */
 
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	headkeymat(const char *,const char *,int) ;
-
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
 
 
 /* external variables */
@@ -141,7 +132,7 @@ enum akopts {
 /* exported subroutines */
 
 
-int progopts(PROGINFO *pip,KEYOPT *kop)
+int progopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -157,7 +148,7 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 #endif
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 		int	oi, v ;
 		int	kl, vl ;
@@ -176,17 +167,17 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 
 	                case akopt_cf:
-	                    if ((vl > 0) && (! pip->final.cfname)) {
+	                    if ((vl > 0) && (! pip->finval.cfname)) {
 	                        const char	**vpp = &pip->cfname ;
-	                        pip->final.cfname = TRUE ;
+	                        pip->finval.cfname = TRUE ;
 	                        pip->have.cfname = TRUE ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 
 	                case akopt_pcspoll:
-	                    if (! pip->final.pcspoll) {
-	                        pip->final.pcspoll = TRUE ;
+	                    if (! pip->finval.pcspoll) {
+	                        pip->finval.pcspoll = TRUE ;
 	                        pip->have.pcspoll = TRUE ;
 	                        pip->fl.pcspoll = TRUE ;
 	                        if (vl > 0) {
@@ -198,8 +189,8 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 
 	                case akopt_clen:
 	                case akopt_useclen:
-	                    if (! pip->final.useclen) {
-	                        pip->final.useclen = TRUE ;
+	                    if (! pip->finval.useclen) {
+	                        pip->finval.useclen = TRUE ;
 	                        pip->have.useclen = TRUE ;
 	                        pip->fl.useclen = TRUE ;
 	                        if (vl > 0) {
@@ -211,8 +202,8 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 
 	                case akopt_clines:
 	                case akopt_useclines:
-	                    if (! pip->final.useclines) {
-	                        pip->final.useclines = TRUE ;
+	                    if (! pip->finval.useclines) {
+	                        pip->finval.useclines = TRUE ;
 	                        pip->have.useclines = TRUE ;
 	                        pip->fl.useclines = TRUE ;
 	                        if (vl > 0) {
@@ -224,8 +215,8 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 
 	                case akopt_getmail:
 	                case akopt_mailget:
-	                    if (! pip->final.mailget) {
-	                        pip->final.mailget = TRUE ;
+	                    if (! pip->finval.mailget) {
+	                        pip->finval.mailget = TRUE ;
 	                        pip->have.mailget = TRUE ;
 	                        pip->fl.mailget = TRUE ;
 	                        if (vl > 0) {
@@ -236,8 +227,8 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akopt_clock:
-	                    if (! pip->final.clock) {
-	                        pip->final.clock = TRUE ;
+	                    if (! pip->finval.clock) {
+	                        pip->finval.clock = TRUE ;
 	                        pip->have.clock = TRUE ;
 	                        pip->fl.clock = TRUE ;
 	                        if (vl > 0) {
@@ -248,8 +239,8 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akopt_nextdel:
-	                    if (! pip->final.nextdel) {
-	                        pip->final.nextdel = TRUE ;
+	                    if (! pip->finval.nextdel) {
+	                        pip->finval.nextdel = TRUE ;
 	                        pip->have.nextdel = TRUE ;
 	                        pip->fl.nextdel = TRUE ;
 	                        if (vl > 0) {
@@ -260,8 +251,8 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akopt_nextmov:
-	                    if (! pip->final.nextmov) {
-	                        pip->final.nextmov = TRUE ;
+	                    if (! pip->finval.nextmov) {
+	                        pip->finval.nextmov = TRUE ;
 	                        pip->have.nextmov = TRUE ;
 	                        pip->fl.nextmov = TRUE ;
 	                        if (vl > 0) {
@@ -272,8 +263,8 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akopt_winadj:
-	                    if (! pip->final.winadj) {
-	                        pip->final.winadj = TRUE ;
+	                    if (! pip->finval.winadj) {
+	                        pip->finval.winadj = TRUE ;
 	                        pip->have.winadj = TRUE ;
 	                        pip->fl.winadj = TRUE ;
 	                        if (vl > 0) {
@@ -284,8 +275,8 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akopt_deldup:
-	                    if (! pip->final.deldup) {
-	                        pip->final.deldup = TRUE ;
+	                    if (! pip->finval.deldup) {
+	                        pip->finval.deldup = TRUE ;
 	                        pip->have.deldup = TRUE ;
 	                        pip->fl.deldup = TRUE ;
 	                        if (vl > 0) {
@@ -296,8 +287,8 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akopt_nosysconf:
-	                    if (! pip->final.nosysconf) {
-	                        pip->final.nosysconf = TRUE ;
+	                    if (! pip->finval.nosysconf) {
+	                        pip->finval.nosysconf = TRUE ;
 	                        pip->have.nosysconf = TRUE ;
 	                        pip->fl.nosysconf = TRUE ;
 	                        if (vl > 0) {
@@ -308,8 +299,8 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akopt_mailcheck:
-	                    if (! pip->final.mailcheck) {
-	                        pip->final.mailcheck = TRUE ;
+	                    if (! pip->finval.mailcheck) {
+	                        pip->finval.mailcheck = TRUE ;
 	                        pip->have.mailcheck = TRUE ;
 	                        if (vl > 0) {
 	                            rs = cfdecti(vp,vl,&v) ;
@@ -333,27 +324,27 @@ int progopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akopt_scanline:
-	                    if ((vl > 0) && (! pip->final.svspec)) {
+	                    if ((vl > 0) && (! pip->finval.svspec)) {
 	                        const char	**vpp = &pip->svspec ;
-	                        pip->final.svspec = TRUE ;
+	                        pip->finval.svspec = TRUE ;
 	                        pip->have.svspec = TRUE ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 
 	                case akopt_scanjump:
-	                    if ((vl > 0) && (! pip->final.sjspec)) {
+	                    if ((vl > 0) && (! pip->finval.sjspec)) {
 	                        const char	**vpp = &pip->sjspec ;
-	                        pip->final.sjspec = TRUE ;
+	                        pip->finval.sjspec = TRUE ;
 	                        pip->have.sjspec = TRUE ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
 	                    break ;
 
 	                case akopt_shell:
-	                    if ((vl > 0) && (! pip->final.shell)) {
+	                    if ((vl > 0) && (! pip->finval.shell)) {
 	                        const char	**vpp = &pip->prog_shell ;
-	                        pip->final.shell = TRUE ;
+	                        pip->finval.shell = TRUE ;
 	                        pip->have.shell = TRUE ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 	                    }
