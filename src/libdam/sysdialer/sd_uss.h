@@ -27,9 +27,9 @@
 #include	<sysdialer.h>
 
 
-#define	USS_MAGIC	31415926
 #define	USS		struct uss_head
 #define	USS_FL		struct uss_flags
+#define	USS_MAGIC	31415926
 
 
 struct uss_flags {
