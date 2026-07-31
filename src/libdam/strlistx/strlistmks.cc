@@ -89,23 +89,22 @@ import libutil ;
 
 /* local defines */
 
-#define	STRLISTMKS_SIZEMULT	4
-#define	STRLISTMKS_NSKIP	5
-#define	STRLISTMKS_INDPERMS	0664
-#define	STRLISTMKS_FSUF		STRLISTHDR_FSUF
-#define	STRLISTMKS_MAGICSTR	STRLISTHDR_MAGICSTR
-#define	STRLISTMKS_MAGICSIZE	STRLISTHDR_MAGICSIZE
-
 #define	SLM		strlistmks
 #define	SLM_OBJ		strlistmks_obj
-#define	SLM_RT		strlistmks_rt
 #define	SLM_FL		strlistmks_fl
-#define	RT		strlistmks_rt
-#define	VE		varentry
+#define	SLM_SIZEMULT	4
+#define	SLM_SKIP	5
+#define	SLM_INDPERMS	0664
+#define	SLM_MAG		STRLISTMKS_MAGIC
+#define	SLM_NENTS	STRLISTMKS_NENTRIES
+#define	SLM_VER		STRLISTMKS_VERSION
 
-#ifndef	KEYBUFLEN
-#define	KEYBUFLEN	120
-#endif
+#define	SLH_MAGICSTR	STRLISTHDR_MAGICSTR
+#define	SLH_MAGICSZ	STRLISTHDR_MAGICSZ
+#define	SLH_VERSION	STRLISTHDR_VERSION
+#define	SLH_FSUF	STRLISTHDR_FSUF
+
+#define	VE		varentry
 
 #define	HDRBUFLEN	(szof(strlisthdr) + 128)
 
@@ -219,15 +218,15 @@ local int	mkvars() noex ;
 
 /* local variables */
 
-static sysval		pagesize(sysval_ps) ;
+static sysval		pagesz(sysval_ps) ;
 static vars		var ;
-static cchar		*end		= ENDIANSTR ;
+static cchar		*strend		= ENDIANSTR ;
 constexpr gid_t		gidend		= -1 ;
-constexpr int		maglen		= STRLISTMKS_MAGICSIZE ;
-constexpr cchar		pre[]		= STRLISTMKS_FSUF ;
-constexpr cchar		pat[]		= "XXXXXXXX" ;
-constexpr cchar		suf[]		= STRLISTMKS_FSUF ;
-constexpr cchar		magstr[]	= STRLISTMKS_MAGICSTR ;
+constexpr int		maglen		= SLH_MAGICSZ ;
+constexpr cchar		strpre[]	= SLH_FSUF ;
+constexpr cchar		strpat[]	= "XXXXXXXX" ;
+constexpr cchar		strsuf[]	= SLH_FSUF ;
+constexpr cchar		magstr[]	= SLH_MAGICSTR ;
 constexpr bool		f_minmod	= CF_MINMOD ;
 constexpr bool		f_usesbuf	= CF_USESBUF ;
 
@@ -240,6 +239,8 @@ const strlistmks_obj	strlistmks_modinfo = {
 	0
 } ; /* end initialization */
 
+const strlistmks_params	strlistmks_param ;
+
 
 /* exported subroutines */
 
@@ -249,8 +250,8 @@ int strlistmks_open(SLM *op,cc *dbname,int of,mode_t om,int n) noex {
 	    rs = SR_INVALID ;
 	    if (dbname[0]) ylikely {
 		if (static cint rsv = mkvars() ; (rs = rsv) >= 0) ylikely {
-	            if (n < STRLISTMKS_NENTRIES) {
-	                n = STRLISTMKS_NENTRIES ;
+	            if (n < SLM_NENTS) {
+	                n = SLM_NENTS ;
 	            }
 	            op->om = om ;
 	            op->nfd = -1 ;
@@ -262,7 +263,7 @@ int strlistmks_open(SLM *op,cc *dbname,int of,mode_t om,int n) noex {
 		        op->dbname = cp ;
 		        if ((rs = strlistmks_filesbegin(op)) >= 0) {
 		            if ((rs = strlistmks_listbegin(op,n)) >= 0) {
-			        op->magval = STRLISTMKS_MAGIC ;
+			        op->magval = SLM_MAG ;
 		            }
 		            if (rs < 0) {
 			        strlistmks_filesend(op) ;
@@ -465,16 +466,15 @@ local int strlistmks_mknfn(SLM *op,char *tbuf,int tlen) noex {
 	int		rs1 ;
 	int		i = 0 ;
 	if_constexpr (f_usesbuf) {
-	    sbuf	b ;
-	    if ((rs = b.start(tbuf,tlen)) >= 0) {
+	    if (sbuf b ; (rs = b.start(tbuf,tlen)) >= 0) {
 		{
 		    b << op->idname ;
 		    b << '/' ;
-		    b << pre ;
-		    b << pat ;
+		    b << strpre ;
+		    b << strpat ;
 		    b << '.' ;
-		    b << suf ;
-		    b << end ;
+		    b << strsuf ;
+		    b << strend ;
 		    b << 'n' ;
 		} /* end block */
 		rs1 = b.finish ;
@@ -492,11 +492,11 @@ local int strlistmks_mknfn(SLM *op,char *tbuf,int tlen) noex {
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = snadd(tbuf,tlen,i,pre) ;
+	        rs = snadd(tbuf,tlen,i,strpre) ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = snadd(tbuf,tlen,i,pat) ;
+	        rs = snadd(tbuf,tlen,i,strpat) ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
@@ -504,11 +504,11 @@ local int strlistmks_mknfn(SLM *op,char *tbuf,int tlen) noex {
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = snadd(tbuf,tlen,i,suf) ;
+	        rs = snadd(tbuf,tlen,i,strsuf) ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = snadd(tbuf,tlen,i,end) ;
+	        rs = snadd(tbuf,tlen,i,strend) ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
@@ -531,7 +531,7 @@ local int strlistmks_nfstore(SLM *op,char *outfname) noex {
 	if (rs >= 0) {
 	    if (cchar *cp ; (rs = lm_strw(outfname,-1,&cp)) >= 0) {
 		op->nfname = charp(cp) ;
-	    }
+	    } /* end if (memory-acquire) */
 	} /* end if (ok) */
 	return rs ;
 } /* end subroutine (strlistmks_nfstore) */
@@ -541,9 +541,8 @@ local int strlistmks_fexists(SLM *op,char *tbuf) noex {
 	int		rs = SR_OK ;
 	if (op->fl.ofcreat && op->fl.ofexcl) {
 	    cchar	*dbn = op->dbname ;
-	    if ((rs = mkfnamesuf2(tbuf,dbn,suf,end)) >= 0) {
-		USTAT	sb ;
-		if ((rs = u_stat(tbuf,&sb)) >= 0) {
+	    if ((rs = mkfnamesuf2(tbuf,dbn,strsuf,strend)) >= 0) {
+		if (ustat sb ; (rs = u_stat(tbuf,&sb)) >= 0) {
 	            rs = SR_EXIST ;
 		} else if (isNotPresent(rs)) {
 		    rs = SR_OK ;
@@ -554,7 +553,7 @@ local int strlistmks_fexists(SLM *op,char *tbuf) noex {
 } /* end subroutine (strlistmks_fexists) */
 
 local int strlistmks_listbegin(SLM *op,int n) noex {
-	cint		sz = (n * STRLISTMKS_SIZEMULT) ;
+	cint		sz = (n * SLM_SIZEMULT) ;
 	int		rs ;
 	if ((rs = strtab_start(op->stp,sz)) >= 0) {
 	    rs = srectab_start(op->rtp,n) ;
@@ -589,8 +588,7 @@ local int strlistmks_mksfile(SLM *op) noex {
 	    }
 	}
 	return (rs >= 0) ? nstrs : rs ;
-}
-/* end subroutine (strlistmks_mksfile) */
+} /* end subroutine (strlistmks_mksfile) */
 
 namespace {
     struct sub_wrsfile {
@@ -600,12 +598,12 @@ namespace {
 	cint		hlen = HDRBUFLEN ;
 	char		hbuf[HDRBUFLEN+1] ;
 	uint		foff = 0 ;
-	int		ps ;		/* pagesize */
+	int		ps ;		/* page-size */
 	sub_wrsfile(strlistmks *p) noex : op(p) { } ;
 	operator int () noex ;
 	int mkfile(rectab_t,int) noex ;
 	int mkkstab(filer *,int,int) noex ;
-    } ;
+    } ; /* end struct (wrsfile) */
 } /* end namespace */
 
 local int strlistmks_wrsfile(SLM *op) noex {
@@ -615,15 +613,14 @@ local int strlistmks_wrsfile(SLM *op) noex {
 
 sub_wrsfile::operator int () noex {
 	int		rs ;
-	if ((rs = pagesize) >= 0) {
-	    rectab_t	rt ;
+	if ((rs = pagesz) >= 0) {
 	    ps = rs ;
-	    if ((rs = srectab_getvec(op->rtp,&rt)) >= 0) {
+	    if (rectab_t rt ; (rs = srectab_getvec(op->rtp,&rt)) >= 0) {
 	        cint	rtl = rs ;
 		if ((rs = mkfile(rt,rtl)) >= 0) {
 	    	    hf.fsize = foff ;
 	  	    if ((rs = strlisthdr_rd(&hf,hbuf,hlen)) >= 0) {
-			coff	moff = STRLISTHDR_MAGICSIZE ;
+			coff	moff = STRLISTHDR_MAGICSZ ;
 	        	cint	hl = rs ;
 	        	if ((rs = u_writep(op->nfd,hbuf,hl,moff)) >= 0) {
 			    if_constexpr (f_minmod) {
@@ -636,7 +633,7 @@ sub_wrsfile::operator int () noex {
 		    } /* end if (strlisthdr_rd) */
 		} /* end if (mkfile) */
 	    } /* end if (srectab_getvec) */
-	} /* end if (pagesize) */
+	} /* end if (pagesz) */
 	return rs ;
 } /* end method (sub_wrsfile::operator) */ 
 
@@ -652,13 +649,13 @@ int sub_wrsfile::mkfile(rectab_t rt,int rtl) noex {
 		foff += rs ;
 		if ((rs = filer_write(sfp,mbuf,rs)) >= 0) {
 	            /* prepare the file-header */
-	            hf.vetu[0] = STRLISTMKS_VERSION ;
+	            hf.vetu[0] = strlisthdr_param.version ;
 	            hf.vetu[1] = char(ENDIAN) ;
 	            hf.vetu[2] = 0 ;
 	            hf.vetu[3] = 0 ;
 	            hf.wtime = uint(dt) ;
 	            hf.nstrs = op->nstrs ;
-	            hf.nskip = STRLISTMKS_NSKIP ;
+	            hf.nskip = SLM_SKIP ;
 	            if ((rs = strlisthdr_rd(&hf,hbuf,hlen)) >= 0) {
 		        cint	hl = rs ;
 	                if ((rs = filer_writefill(sfp,hbuf,hl)) >= 0) {
@@ -756,7 +753,7 @@ local int strlistmks_renamefiles(SLM *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
-	    if ((rs = mkfnamesuf2(tbuf,op->dbname,suf,end)) >= 0) {
+	    if ((rs = mkfnamesuf2(tbuf,op->dbname,strsuf,strend)) >= 0) {
 	        if ((rs = u_rename(op->nfname,tbuf)) >= 0) {
 	            op->nfname[0] = '\0' ;
 		}
@@ -781,7 +778,7 @@ local int indinsert(rectab_t rt,uint (*it)[3],int il,VE *vep) noex {
 	    uint	ki = rt[ri] ;
 	    if (ki == vep->ki) break ;
 	    it[hi][1] |= (~ INT_MAX) ;
-	    nhash = hash_again(nhash,c++,STRLISTMKS_NSKIP) ;
+	    nhash = hash_again(nhash,c++,SLM_SKIP) ;
 	    hi = hashindex(nhash,il) ;
 	} /* end while */
 	if (it[hi][0] > 0) {
