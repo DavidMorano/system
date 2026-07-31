@@ -27,13 +27,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<char.h>		/* |CAHR_{x}(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<char.h>		/* LIBUC |CAHR_{x}(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
@@ -62,11 +62,12 @@
 /* exported subroutines */
 
 int sfbracketval(cchar *sp,int sl,cchar **rpp) noex {
+    	cnullptr	np{} ;
     	if (sp) ylikely {
-	    if (cc *tp ; (tp = strnchr(sp,sl,'<')) != nullptr) {
+	    if (cc *tp ; (tp = strnchr(sp,sl,'<')) != np) {
 	        tp += 1 ;
 	        sl = intconv((sp + sl) - tp) ;
-	        if (cc *t2p ; (t2p = strnchr(tp,sl,'>')) != nullptr) {
+	        if (cc *t2p ; (t2p = strnchr(tp,sl,'>')) != np) {
 	            sl = intconv(t2p - tp) ;
 	        }
 	        sp = tp ;
@@ -77,7 +78,7 @@ int sfbracketval(cchar *sp,int sl,cchar **rpp) noex {
 	    } /* end while */
 	    while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	} else {
 	    sl = -1 ;
 	} /* end if (non-null) */
