@@ -45,13 +45,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<ischarx.h>		/* |ispm(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<ischarx.h>		/* LIBUC |ispm(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
 
@@ -89,16 +89,16 @@ int sfsign(cchar *sp,int sl,cchar **rpp,bool *bp) noex {
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    if ((sl > 0) && ispm(*sp)) {
 	        fneg = (*sp == '-') ;
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end if */
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	} else {
 	    sl = -1 ;
 	} /* end if (non-null) */
