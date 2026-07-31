@@ -48,13 +48,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<mkchar.h>
-#include	<char.h>
-#include	<localmisc.h>		/* LIBU |UC(3u)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hasnon.h"
 
@@ -101,8 +101,7 @@ bool hasnonwhite(cchar *sp,int sl) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (hasnonwhite) */
+} /* end subroutine (hasnonwhite) */
 
 
 /* local subroutines */
