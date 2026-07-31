@@ -26,8 +26,8 @@
 #include	<sysdialer.h>
 
 
-#define	UDP_MAGIC	31415926
 #define	UDP		struct udp_head
+#define	UDP_MAGIC	31415926
 
 
 struct udp_head {
