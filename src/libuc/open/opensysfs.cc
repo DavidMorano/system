@@ -50,34 +50,34 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<bufsizeget.h>
-#include	<endian.h>		/* |ENDIANSTR(3u)| */
-#include	<ids.h>
-#include	<vecpstr.h>
-#include	<dirseen.h>
-#include	<envhelp.h>
-#include	<ctdec.h>
-#include	<stdfnames.h>
-#include	<sysdbfiles.h>
-#include	<spawnproc.h>
-#include	<sfx.h>
-#include	<snx.h>
-#include	<mkpathx.h>
-#include	<permx.h>
-#include	<ischarx.h>
-#include	<isnot.h>
-#include	<opensysdbs.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU |ENDIANSTR(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<vecpstr.h>		/* LIBUC */
+#include	<dirseen.h>		/* LIBUC */
+#include	<envhelp.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<stdfnames.h>		/* LIBUC */
+#include	<sysdbfiles.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<opensysdbs.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"opensysfs.hh"
 
@@ -125,15 +125,15 @@ namespace {
 
 /* forward references */
 
-static int	mkrealpath(char *,int,cchar *,cchar *) noex ;
-static int	opencfile(int,int,int) noex ;
-static int	checkperms(cchar *,ustat *,mode_t) noex ;
+local int	mkrealpath(char *,int,cchar *,cchar *) noex ;
+local int	opencfile(int,int,int) noex ;
+local int	checkperms(cchar *,ustat *,mode_t) noex ;
 
-static int	findprog(ids *,char *,cchar *) noex ;
-static int	findprogbin(ids *,dirseen *,char *,cchar *,cchar *) noex ;
+local int	findprog(ids *,char *,cchar *) noex ;
+local int	findprogbin(ids *,dirseen *,char *,cchar *,cchar *) noex ;
 
-static int	runmkpwi(int,cchar *,int) noex ;
-static int	runsysfs(int) noex ;
+local int	runmkpwi(int,cchar *,int) noex ;
+local int	runsysfs(int) noex ;
 
 
 /* local variables */
@@ -222,7 +222,7 @@ namespace libuc {
 
 /* local subroutines */
 
-static int opencfile(int w,int of,int ttl) noex {
+local int opencfile(int w,int of,int ttl) noex {
     	cint		sz = ((var.maxpathlen + 1) * 2) ;
 	cint		maxpath = var.maxpathlen ;
 	int		rs ;
@@ -326,10 +326,9 @@ static int opencfile(int w,int of,int ttl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opencfile) */
+} /* end subroutine (opencfile) */
 
-static int mkrealpath(char *gfname,int w,cchar *sdname,cchar *gcname) noex {
+local int mkrealpath(char *gfname,int w,cchar *sdname,cchar *gcname) noex {
 	int		rs ;
 	int		rs1 ;
 	if (char *cbuf ; (rs = lm_mp(&cbuf)) >= 0) {
@@ -356,10 +355,9 @@ static int mkrealpath(char *gfname,int w,cchar *sdname,cchar *gcname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (mkrealpath) */
+} /* end subroutine (mkrealpath) */
 
-static int checkperms(cchar *gfname,ustat *sbp,mode_t mm) noex {
+local int checkperms(cchar *gfname,ustat *sbp,mode_t mm) noex {
 	int		rs = SR_OK ;
 	if ((sbp->st_mode & mm) != mm) {
 	    const uid_t		uid = getuid() ;
@@ -372,10 +370,9 @@ static int checkperms(cchar *gfname,ustat *sbp,mode_t mm) noex {
 	    }
 	} /* end if (problem) */
 	return rs ;
-}
-/* end subroutine (checkperms) */
+} /* end subroutine (checkperms) */
 
-static int runmkpwi(int w,cchar *dbp,int dbl) noex {
+local int runmkpwi(int w,cchar *dbp,int dbl) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
@@ -441,10 +438,9 @@ static int runmkpwi(int w,cchar *dbp,int dbl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 	return rs ;
-}
-/* end subroutine (runmkpwi) */
+} /* end subroutine (runmkpwi) */
 
-static int runsysfs(int w) noex {
+local int runsysfs(int w) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pn = OPENSYSFS_PROGSYSFS ;
@@ -491,10 +487,9 @@ static int runsysfs(int w) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 	return rs ;
-}
-/* end subroutine (runsysfs) */
+} /* end subroutine (runsysfs) */
 
-static int findprog(ids *idp,char *pfname,cchar *pn) noex {
+local int findprog(ids *idp,char *pfname,cchar *pn) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
@@ -543,10 +538,9 @@ static int findprog(ids *idp,char *pfname,cchar *pn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (dirseen) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (findprog) */
+} /* end subroutine (findprog) */
 
-static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
+local int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 	int		rs ;
 	int		pl = 0 ; /* return-value */
 	bool		f = false ;
@@ -581,8 +575,7 @@ static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 	} /* end if (stat) */
 	if ((rs >= 0) && (! f)) pl = 0 ;
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (findprogbin) */
+} /* end subroutine (findprogbin) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -596,7 +589,6 @@ vars::operator int () noex {
 	    }
 	}
     	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
