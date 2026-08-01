@@ -50,9 +50,9 @@ struct zoffparts : zoffparts_head {
 	zoffparts() = default ;
 	zoffparts(const zoffparts &) = delete ;
 	zoffparts &operator = (const zoffparts &) = delete ;
-	int	set(int) noex ;
-	int	get(int *) noex ;
-	int	mkstr(char *,int) noex ;
+	int set		(int) noex ;
+	int get		(int *) noex ;
+	int mkstr	(char *,int) noex ;
 } ; /* end struct (zoffparts) */
 #else	/* __cplusplus */
 typedef ZOFFPARTS	zoffparts ;
