@@ -34,9 +34,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<new>			/* C++STD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -165,9 +165,7 @@ local bool isNotDir(int) noex ;
 /* local variables */
 
 static cint		maxpathlen = ulibval.maxpathlen ;
-
 static vars		var ;
-
 cbool			f_debug = CF_DEBUG ;
 
 constexpr int		rsnotdir[] = {
@@ -486,7 +484,7 @@ vars::operator int () noex {
 
 local mode_t	getdm(const ustat *sbp) noex {
     	return (sbp->st_mode | S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) ;
-}
+} /* end subroutine */
 
 local bool isNotDir(int rs) noex {
     	return isOneOf(rsnotdir,rs) ;
