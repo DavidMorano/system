@@ -27,17 +27,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<filer.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fbliner.h"
 
@@ -49,7 +49,6 @@
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -77,8 +76,8 @@ using std::nothrow ;			/* constant */
 
 int fbliner_start(fbliner *lsp,filer *fbp,off_t foff,int to) noex {
 	int		rs = SR_FAULT ;
-	if (lsp && fbp) {
-	    if (char *lp ; (rs = lm_ml(&lp)) >= 0) {
+	if (lsp && fbp) ylikely {
+	    if (char *lp ; (rs = lm_ml(&lp)) >= 0) ylikely {
 		lp[0] = '\0' ;
 	        lsp->llen = rs ;
 	        lsp->lbuf = lp ;
@@ -89,13 +88,12 @@ int fbliner_start(fbliner *lsp,filer *fbp,off_t foff,int to) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fbliner_start) */
+} /* end subroutine (fbliner_start) */
 
 int fbliner_finish(fbliner *lsp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (lsp) {
+	if (lsp) ylikely {
 	    rs = SR_OK ;
 	    lsp->llen = 0 ;
 	    lsp->lbuf[0] = '\0' ;
@@ -103,16 +101,15 @@ int fbliner_finish(fbliner *lsp) noex {
 	        rs1 = lm_free(lsp->lbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	        lsp->lbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fbliner_finish) */
+} /* end subroutine (fbliner_finish) */
 
 int fbliner_getln(fbliner *lsp,cchar **lpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (lsp) {
+	if (lsp) ylikely {
 	    filer	*fbp = lsp->fbp ;
 	    rs = SR_OK ;
 	    if (lsp->llen < 0) {
@@ -130,24 +127,22 @@ int fbliner_getln(fbliner *lsp,cchar **lpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (fbliner_getln) */
+} /* end subroutine (fbliner_getln) */
 
 int fbliner_done(fbliner *lsp) noex {
 	int		rs = SR_FAULT ;
-	if (lsp) {
+	if (lsp) ylikely {
 	    rs = SR_OK ;
 	    lsp->poff = lsp->foff ;
 	    lsp->llen = -1 ;
 	    lsp->lbuf[0] = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fbliner_done) */
+} /* end subroutine (fbliner_done) */
 
 int fbliner_adv(fbliner *lsp,int inc) noex {
     	int		rs = SR_FAULT ;
-	if (lsp) {
+	if (lsp) ylikely {
 	    rs = SR_OK ;
 	    lsp->poff = lsp->foff ;
 	    if (inc > 0) {
@@ -159,8 +154,7 @@ int fbliner_adv(fbliner *lsp,int inc) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fbliner_adv) */
+} /* end subroutine (fbliner_adv) */
 
 int fbliner::start(filer *p,off_t off,int ato) noex {
 	return fbliner_start(this,p,off,ato) ;
@@ -174,11 +168,11 @@ void fbliner::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("fbliner",rs,"fini-finish") ;
 	}
-}
+} /* end method (fbliner::dtor */
 
 int fbliner_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case fblinermem_done:
 	        rs = fbliner_done(op) ;
@@ -192,7 +186,6 @@ int fbliner_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (fbliner_co::operator) */
+} /* end method (fbliner_co::operator) */
 
 
