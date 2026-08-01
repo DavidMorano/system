@@ -48,7 +48,7 @@ extern int snaddx(char *,int,int,int,...) noex ;
 
 local inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
 	return snaddw(dbuf,dlen,dl,sp,-1) ;
-}
+} /* end subroutine */
 
 EXTERNC_end
 
@@ -58,7 +58,7 @@ template<typename ... Args>
 inline int snadd(char *dbuf,int dlen,int dl,Args ... args) noex {
 	cint		na = npack(Args) ;
 	return snaddx(dbuf,dlen,dl,na,args ...) ;
-}
+} /* end subroutine */
 
 #endif /* __cplusplus */
 
