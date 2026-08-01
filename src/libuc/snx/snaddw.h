@@ -49,7 +49,7 @@ EXTERNC_end
 
 local inline int snaddw(char *dbuf,int dlen,int dl,cchar *sp) noex {
 	return snaddw(dbuf,dlen,dl,sp,-1) ;
-}
+} /* end subroutine */
 
 #endif /* __cplusplus */
 
