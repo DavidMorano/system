@@ -28,15 +28,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<hdb.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mapstrint.h"
 
@@ -52,7 +52,6 @@ import libutil ;			/* |getlenstr(3u)| */
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -86,8 +85,7 @@ int mapstrint_start(MSI *dbp,int nitems) noex {
 	    rs = hdb_start(dbp,nitems,0,nullptr,nullptr) ;
 	}
 	return rs ;
-}
-/* end subroutine (mapstrint_start) */
+} /* end subroutine (mapstrint_start) */
 
 int mapstrint_count(MSI *dbp) noex {
 	int		rs = SR_FAULT ;
@@ -95,8 +93,7 @@ int mapstrint_count(MSI *dbp) noex {
 	    rs = hdb_count(dbp) ;
 	}
 	return rs ;
-}
-/* end subroutine (mapstrint_count) */
+} /* end subroutine (mapstrint_count) */
 
 int mapstrint_finish(MSI *dbp) noex {
 	int		rs = SR_FAULT ;
@@ -128,8 +125,7 @@ int mapstrint_finish(MSI *dbp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (mapstrint_finish) */
+} /* end subroutine (mapstrint_finish) */
 
 int mapstrint_add(MSI *dbp,cchar *kstr,int 탃len,int ival) noex {
 	int		rs = SR_FAULT ;
@@ -156,8 +152,7 @@ int mapstrint_add(MSI *dbp,cchar *kstr,int 탃len,int ival) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapstrint_add) */
+} /* end subroutine (mapstrint_add) */
 
 int mapstrint_already(MSI *op,cchar *kstr,int 탃len) noex {
 	cnullptr	np{} ;
@@ -171,8 +166,7 @@ int mapstrint_already(MSI *op,cchar *kstr,int 탃len) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end if (mapstrint_already) */
+} /* end if (mapstrint_already) */
 
 int mapstrint_curenum(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	int		rs = SR_FAULT ;
@@ -193,8 +187,7 @@ int mapstrint_curenum(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	    } /* end if (hdb_curenum) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? klen : rs ;
-}
-/* end subroutine (mapstrint_curenum) */
+} /* end subroutine (mapstrint_curenum) */
 
 int mapstrint_fetch(MSI *dbp,cchar *kstr,int 탃len,cur *curp,int *vp) noex {
 	int		rs = SR_FAULT ;
@@ -216,8 +209,7 @@ int mapstrint_fetch(MSI *dbp,cchar *kstr,int 탃len,cur *curp,int *vp) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (mapstrint_fetch) */
+} /* end subroutine (mapstrint_fetch) */
 
 int mapstrint_fetchrec(MSI *dbp,cc *kstr,int 탃len,cur *curp,
 		cc **kpp,int *vp) noex {
@@ -245,8 +237,7 @@ int mapstrint_fetchrec(MSI *dbp,cc *kstr,int 탃len,cur *curp,
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mapstrint_fetchrec) */
+} /* end subroutine (mapstrint_fetchrec) */
 
 int mapstrint_curget(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	int		rs = SR_FAULT ;
@@ -267,8 +258,7 @@ int mapstrint_curget(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	    } /* end if (hdb_curget) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? klen : rs ;
-}
-/* end subroutine (mapstrint_curget) */
+} /* end subroutine (mapstrint_curget) */
 
 int mapstrint_curnext(MSI *dbp,mapstrint_cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -276,8 +266,7 @@ int mapstrint_curnext(MSI *dbp,mapstrint_cur *curp) noex {
 	    rs = hdb_curnext(dbp,curp) ;
 	}
 	return rs ;
-}
-/* end subroutine (mapstrint_curnext) */
+} /* end subroutine (mapstrint_curnext) */
 
 /* advance the cursor to the next entry with the given key */
 int mapstrint_nextkey(MSI *dbp,cchar *kstr,int 탃len,mapstrint_cur *curp) noex {
@@ -292,8 +281,7 @@ int mapstrint_nextkey(MSI *dbp,cchar *kstr,int 탃len,mapstrint_cur *curp) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapstrint_nextkey) */
+} /* end subroutine (mapstrint_nextkey) */
 
 /* delete all of the entries that match a key */
 int mapstrint_delkey(MSI *dbp,cchar *kstr,int 탃len) noex {
@@ -343,8 +331,7 @@ int mapstrint_delkey(MSI *dbp,cchar *kstr,int 탃len) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapstrint_delkey) */
+} /* end subroutine (mapstrint_delkey) */
 
 int mapstrint_curdel(MSI *dbp,mapstrint_cur *curp,int f_adv) noex {
 	int		rs = SR_FAULT ;
@@ -360,18 +347,15 @@ int mapstrint_curdel(MSI *dbp,mapstrint_cur *curp,int f_adv) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapstrint_curdel) */
+} /* end subroutine (mapstrint_curdel) */
 
 int mapstrint_curbegin(MSI *dbp,mapstrint_cur *curp) noex {
 	return hdb_curbegin(dbp,curp) ;
-}
-/* end subroutine (mapstrint_curbegin) */
+} /* end subroutine (mapstrint_curbegin) */
 
 int mapstrint_curend(MSI *dbp,mapstrint_cur *curp) noex {
 	return hdb_curend(dbp,curp) ;
-}
-/* end subroutine (mapstrint_curend) */
+} /* end subroutine (mapstrint_curend) */
 
 int mapstrint_cursetval(MSI *dbp,mapstrint_cur *curp,int ival) noex {
 	int		rs = SR_FAULT ;
@@ -386,8 +370,7 @@ int mapstrint_cursetval(MSI *dbp,mapstrint_cur *curp,int ival) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (mapstrint_cursetval) */
+} /* end subroutine (mapstrint_cursetval) */
 
 
 /* private subroutines */
