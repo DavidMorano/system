@@ -122,8 +122,7 @@ int filebinary(cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (filebinary) */
+} /* end subroutine (filebinary) */
 
 
 /* local subroutines */
