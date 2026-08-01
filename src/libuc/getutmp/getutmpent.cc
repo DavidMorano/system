@@ -43,19 +43,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>		/* |getsid(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucgetpid.h>
-#include	<utmpacc.h>
-#include	<strwcpy.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® |getsid(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetpid.h>		/* LIBUC */
+#include	<utmpacc.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getutmpent.h"
 
@@ -105,17 +105,16 @@ namespace {
 
 /* forward references */
 
-static int getusid(pid_t sid) noex {
+local int getusid(pid_t sid) noex {
     	int		rs = int(sid) ;
 	if (sid < 0) {
 	    rs = ucsid ;
 	}
 	return rs ;
-}
-/* end subroutine (getusid) */
+} /* end subroutine (getusid) */
 
-static int utmpent_utmpacc(utmpentx *,pid_t) noex ;
-static int utmpent_load(utmpentx *,utmpacc_ent *) noex ;
+local int utmpent_utmpacc	(utmpentx *,pid_t) noex ;
+local int utmpent_load		(utmpentx *,utmpacc_ent *) noex ;
 
 
 /* local variables */
@@ -124,17 +123,17 @@ constexpr ufinder_m	mems[] = {
 	&ufinder::trysid,
 	&ufinder::tryline,
 	&ufinder::trystat
-} ;
+} ; /* end array */
 
 constexpr cpcchar	utmpenvs[] = {
 	varname.utmpline,
 	varname.logline
-} ;
+} ; /* end array */
 
-constexpr int		lid = UTMPACC_LID ;
-constexpr int		luser = UTMPACC_LUSER ;
-constexpr int		lline = UTMPACC_LLINE ;
-constexpr int		lhost = UTMPACC_LHOST ;
+constexpr int		lid	= UTMPACC_LID ;
+constexpr int		luser	= UTMPACC_LUSER ;
+constexpr int		lline	= UTMPACC_LLINE ;
+constexpr int		lhost	= UTMPACC_LHOST ;
 
 
 /* exported variables */
@@ -144,8 +143,8 @@ constexpr int		lhost = UTMPACC_LHOST ;
 
 int getutmpent(utmpentx *ep,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (ep) {
-	    if ((rs = getusid(sid)) >= 0) {
+	if (ep) ylikely {
+	    if ((rs = getusid(sid)) >= 0) ylikely {
 	        ep->id[0] = '\0' ;
 	        ep->line[0] = '\0' ;
 	        ep->user[0] = '\0' ;
@@ -157,21 +156,19 @@ int getutmpent(utmpentx *ep,pid_t sid) noex {
 	    } /* end if (getusid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getutmpent) */
+} /* end subroutine (getutmpent) */
 
 int getutmpname(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    if (rlen < 0) rlen = GETUTMPENT_LUSER ;
 	    rbuf[0] = '\0' ;
-	    if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) > 0) {
+	    if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) > 0) ylikely {
 	        rs = sncpy(rbuf,rlen,ue.user) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getutmpname) */
+} /* end subroutine (getutmpname) */
 
 int getutmphost(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
@@ -183,21 +180,19 @@ int getutmphost(char *rbuf,int rlen,pid_t sid) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getutmphost) */
+} /* end subroutine (getutmphost) */
 
 int getutmpline(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    if (rlen < 0) rlen = GETUTMPENT_LLINE ;
 	    rbuf[0] = '\0' ;
-	    if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) > 0) {
+	    if (utmpentx ue{} ; (rs = getutmpent(&ue,sid)) > 0) ylikely {
 	        rs = sncpy(rbuf,rlen,ue.line) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getutmpline) */
+} /* end subroutine (getutmpline) */
 
 
 /* local subroutines */
@@ -209,8 +204,7 @@ ufinder::operator int () noex {
 	    if (rs != 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end method (ufinder::operator) */
+} /* end method (ufinder::operator) */
 
 int ufinder::start() noex {
 	return lm_mall(aelen,&aebuf) ;
@@ -225,7 +219,7 @@ int ufinder::finish() noex {
 	        rs1 = lm_free(aebuf) ;
 		if (rs >= 0) rs = rs1 ;
 	        aebuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -252,11 +246,11 @@ int ufinder::trystat() noex {
 	return utmpacc_entstat(&ae,aebuf,aelen,sid) ;
 }
 
-static int utmpent_utmpacc(utmpentx *ep,pid_t sid) noex {
+local int utmpent_utmpacc(utmpentx *ep,pid_t sid) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ffound = false ;
-	if (ufinder fo(sid) ; (rs = fo.start()) >= 0) {
+	if (ufinder fo(sid) ; (rs = fo.start()) >= 0) ylikely {
 	    if ((rs = fo) > 0) {
 		ffound = true ;
 	        rs = utmpent_load(ep,&fo.ae) ;
@@ -265,12 +259,11 @@ static int utmpent_utmpacc(utmpentx *ep,pid_t sid) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ufinder) */
 	return (rs >= 0) ? ffound : rs ;
-}
-/* end subroutine (utmpent_utmpacc) */
+} /* end subroutine (utmpent_utmpacc) */
 
-static int utmpent_load(utmpentx *ep,utmpacc_ent *aep) noex {
+local int utmpent_load(utmpentx *ep,utmpacc_ent *aep) noex {
 	int		rs = SR_FAULT ;
-	if (ep && aep) {
+	if (ep && aep) ylikely {
 	    rs = SR_OK ;
 	    strwcpy(ep->id,aep->id,min(GETUTMPENT_LID,lid)) ;
 	    strwcpy(ep->user,aep->user,min(GETUTMPENT_LUSER,luser)) ;
@@ -281,8 +274,7 @@ static int utmpent_load(utmpentx *ep,utmpacc_ent *aep) noex {
 	    ep->sid = aep->sid ;
 	} /* end if (utmpacc_entsid) */
 	return rs ;
-}
-/* end subroutine (utmpent_load) */
+} /* end subroutine (utmpent_load) */
 
 int utmpentx::get(pid_t pid) noex {
 	return getutmpent(this,pid) ;
