@@ -71,24 +71,24 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<uctimeconv.h>		/* LIBUC |uc_mktime(3uc)| */
-#include	<getdefzdata.h>
-#include	<bufsizevar.hh>
-#include	<calstrs.h>
-#include	<sbuf.h>
+#include	<getdefzdata.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<calstrs.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
 #include	<tmtime.hh>		/* CHRONO */
 #include	<zos.h>			/* CHRONO */
 #include	<comparse.h>		/* CHRONO */
 #include	<tmz.hh>		/* CHRONO */
 #include	<zdb.h>			/* CHRONO */
-#include	<sncpyx.h>
-#include	<snwcpyx.h>
-#include	<sntmtime.h>
-#include	<strn.h>		/* |strnwcpyxc(3uc)| */
-#include	<strwcpy.h>
-#include	<snwcpy.h>
-#include	<mkchar.h>
-#include	<hasx.h>		/* |hasalldig(3uc)| */
-#include	<ischarx.h>		/* |isdigitlatin(3uc)| */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpyx.h>		/* LIBUC */
+#include	<sntmtime.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnwcpyxc(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasalldig(3uc)| */
+#include	<ischarx.h>		/* LIBUC |isdigitlatin(3uc)| */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"dater.h"
