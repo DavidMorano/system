@@ -40,16 +40,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* CSTD */
+#include	<usysbase.h>		/* CSTD */
+#include	<usyscalls.h>		/* CSTD */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* CSTD */
 
 #include	"open.h"
 
@@ -99,7 +99,6 @@ int opendefstds(int n) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (opendefstds) */
+} /* end subroutine (opendefstds) */
 
 
