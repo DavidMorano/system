@@ -49,7 +49,7 @@ struct date_co {
 struct date : date_head {
 	date_co	finish ;
 	date() noex {
-	    finish(this,datemem_finish) ;
+	    finish	(this,datemem_finish) ;
 	    zname = nullptr ;
 	} ;
 	date(const date &) = delete ;
