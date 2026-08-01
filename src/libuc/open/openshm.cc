@@ -98,14 +98,13 @@ extern "C" {
 
 /* forward references */
 
-static int	randinit(ulong *) noex ;
-static int	mktmpname(char *,int,ulong) noex ;
+local int	randinit(ulong *) noex ;
+local int	mktmpname(char *,int,ulong) noex ;
 
 
 /* local variables */
 
 static bufsizevar	maxnamelen(bufsize_mn) ;
-
 static cint		tmplen = lenstr(sysword.w_tmpdir) ;
 
 
@@ -131,8 +130,7 @@ int openshmtmpx(mode_t om) noex {
 	    uc_close(fd) ;
 	}
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (openshmtmpx) */
+} /* end subroutine (openshmtmpx) */
 
 int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 	int		rs = SR_FAULT ;
@@ -166,30 +164,28 @@ int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 	    } /* end if (maxnamelen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (openshmtmp) */
+} /* end subroutine (openshmtmp) */
 
 
 /* local subroutines */
 
-static int randinit(ulong *rvp) noex {
+local int randinit(ulong *rvp) noex {
 	int		rs = SR_FAULT ;
 	if (rvp) {
 	    custime	dt = getustime ;
 	    if ((rs = ucpid) >= 0) {
 	        ulong	rv = rs ;
 	        ulong	sv = ulong(dt) ;
-	        rv += (sv << 8) ;
+	        rv += (sv << CHAR_BIT) ;
 	        rv += sv ;
 	        *rvp = rv ;
 	        rs = int(rv & INT_MAX) ;
 	    } /* end if (ucpid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (randinit) */
+} /* end subroutine (randinit) */
 
-static int mktmpname(char *rbuf,int rlen,ulong rv) noex {
+local int mktmpname(char *rbuf,int rlen,ulong rv) noex {
 	cint		elen = EBUFLEN ;
 	int		rs ;
 	cchar		*tpre = sysword.w_tmpdir ;
@@ -200,7 +196,6 @@ static int mktmpname(char *rbuf,int rlen,ulong rv) noex {
 	    rs = sncpy2w(rbuf,rlen,tpre,(ebuf + i),el) ;
 	}
 	return rs ;
-}
-/* end subroutine (mktmpname) */
+} /* end subroutine (mktmpname) */
 
 
