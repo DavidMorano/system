@@ -90,7 +90,7 @@ struct psem : psem_head {
 	} ; /* end ctor */
 	psem(const psem &) = delete ;
 	psem &operator = (const psem &) = delete ;
-	int create(int = 0,int = -1) noex ;
+	int create	(int = 0,int = -1) noex ;
 	operator int () noex ;
 	void dtor() noex ;
 	destruct psem() {
