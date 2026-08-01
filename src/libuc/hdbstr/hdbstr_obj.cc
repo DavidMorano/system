@@ -26,15 +26,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<hdb.h>
-#include	<strwcpy.h>
-#include	<strdcpyx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strdcpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hdbstr.h"
 
@@ -123,14 +123,14 @@ void hdbstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("hdbstr",rs,"fini-finish") ;
 	}
-}
+} /* end method (hdbstr::dtor) */
 
 int hdbstr_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case hdbstrmem_start:
-	        if ((rs = hdbstr_start(op,a)) >= 0) {
+	        if ((rs = hdbstr_start(op,a)) >= 0) ylikely {
 		    op->fopen = true ;
 		}
 	        break ;
@@ -147,7 +147,6 @@ int hdbstr_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (hdbstr_co::operator) */
+} /* end method (hdbstr_co::operator) */
 
 
