@@ -26,16 +26,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<hdb.h>
-#include	<strwcpy.h>
-#include	<strdcpyx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strdcpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hdbstr.h"
 
@@ -47,8 +47,6 @@
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -65,13 +63,12 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static int	hdbstriter_finish(hdbstr_iter *) noex ;
+local int	hdbstriter_finish(hdbstr_iter *) noex ;
 
 
 /* local variables */
 
 constexpr char		objname[] = "hdbstr_iter" ;
-
 constexpr nullptr_t	np{} ;
 
 
@@ -82,7 +79,7 @@ constexpr nullptr_t	np{} ;
 
 hdbstr_iter::hdbstr_iter(const hdbstr_iter &oit) noex {
     	int		rs = SR_OK ;
-	if (oit.op && oit.curp) {
+	if (oit.op && oit.curp) ylikely {
 	    op = oit.op ;
     	    if (curp) {
 	        if ((rs = hdbstr_curend(op,curp)) >= 0) {
@@ -90,25 +87,24 @@ hdbstr_iter::hdbstr_iter(const hdbstr_iter &oit) noex {
 	        }
 	    } else {
 	        cint csz = szof(hdbstr_cur) ;
-	        if (void *vp{} ; (rs = lm_mall(csz,&vp)) >= 0) {
+	        if (void *vp{} ; (rs = lm_mall(csz,&vp)) >= 0) ylikely {
 		    curp = (hdb_cur *) vp ;
 		    rs = hdbstr_curcopy(op,curp,oit.curp) ;
 		    if (rs < 0) {
 			lm_free(curp) ;
 			curp = nullptr ;
 		    } /* end if (error handling) */
-	        }
+	        } /* end if (memory-acquire) */
 	    }
 	    if (rs < 0) {
 		ulogerror(objname,rs,"direct-initialization") ;
 	    }
-	}
-}
-/* end ctor */
+	} /* end if (non-null) */
+} /* end ctor */
 
 hdbstr_iter &hdbstr_iter::operator = (const hdbstr_iter &oit) noex {
     	int		rs = SR_OK ;
-	if (oit.op && oit.curp) {
+	if (oit.op && oit.curp) ylikely {
 	    op = oit.op ;
     	    if (curp) {
 	        if ((rs = hdbstr_curend(op,curp)) >= 0) {
@@ -128,9 +124,9 @@ hdbstr_iter &hdbstr_iter::operator = (const hdbstr_iter &oit) noex {
 	    if (rs < 0) {
 		ulogerror(objname,rs,"copy") ;
 	    }
-	}
+	} /* end if (non-null) */
 	return *this ;
-}
+} /* end method */
 
 bool hdbstr_iter::operator != (const hdbstr_iter &) noex {
     	int		rs ;
@@ -141,7 +137,7 @@ bool hdbstr_iter::operator != (const hdbstr_iter &) noex {
 	    ulogerror(objname,rs,"neq") ;
 	}
     	return f ;
-}
+} /* end method */
 
 bool hdbstr_iter::operator == (const hdbstr_iter &) noex {
     	int		rs ;
@@ -152,7 +148,7 @@ bool hdbstr_iter::operator == (const hdbstr_iter &) noex {
 	    ulogerror(objname,rs,"neq") ;
 	}
     	return f ;
-}
+} /* end method */
 
 cchar *hdbstr_iter::operator * () noex {
     	cint		rsn = SR_NOTFOUND ;
@@ -166,7 +162,7 @@ cchar *hdbstr_iter::operator * () noex {
 	    }
 	}
     	return rp ;
-}
+} /* end method */
 
 hdbstr_iter hdbstr_iter::operator + (int inc) const noex {
     	hdbstr_iter	it(*this) ;
@@ -174,21 +170,21 @@ hdbstr_iter hdbstr_iter::operator + (int inc) const noex {
 	    ulogerror(objname,rs,"add-inc") ;
 	}
 	return it ;
-}
+} /* end method */
 
 hdbstr_iter &hdbstr_iter::operator += (int inc) noex {
     	if (cint rs = increment(inc) ; rs < 0) {
 	    ulogerror(objname,rs,"add-inc") ;
 	}
 	return *this ;
-}
+} /* end method */
 
 hdbstr_iter &hdbstr_iter::operator ++ () noex {
     	if (cint rs = increment(1) ; rs < 0) {
 	    ulogerror(objname,rs,"pre-inc") ;
 	}
 	return *this ;
-}
+} /* end method */
 
 hdbstr_iter hdbstr_iter::operator ++ (int) noex {
     	hdbstr_iter	it(*this) ;
@@ -196,7 +192,7 @@ hdbstr_iter hdbstr_iter::operator ++ (int) noex {
 	    ulogerror(objname,rs,"post-inc") ;
 	}
 	return it ;
-}
+} /* end method */
 
 int hdbstr_iter::increment(int inc) noex {
     	int		rs = SR_OK ;
@@ -204,15 +200,15 @@ int hdbstr_iter::increment(int inc) noex {
 	    rs = hdbstr_curnext(op,curp) ;
 	} /* end for */
 	return rs ;
-}
+} /* end method */
 
 void hdbstr_iter::dtor() noex {
 	if (cint rs = hdbstriter_finish(this) ; rs < 0) {
 	    ulogerror(objname,rs,"fini-finish") ;
 	}
-}
+} /* end method */
 
-static int hdbstriter_finish(hdbstr_iter *itp) noex {
+local int hdbstriter_finish(hdbstr_iter *itp) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	if (itp->op && itp->curp) {
@@ -224,10 +220,10 @@ static int hdbstriter_finish(hdbstr_iter *itp) noex {
 		rs1 = lm_free(itp->curp) ;
 		if (rs >= 0) rs = rs1 ;
 		itp->curp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    itp->op = nullptr ;
 	}
 	return rs ;
-}
+} /* end method */
 
 
