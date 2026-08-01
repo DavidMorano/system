@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<sys/param.h>
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX® |pid_t| */
+#include	<sys/param.h>		/* POSIX® */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	UTMPENTX	struct utmpentx_head
@@ -74,12 +74,12 @@ typedef	UTMPENTX	utmpentx ;
 
 EXTERNC_begin
 
-extern int getutmpent(utmpentx *,pid_t) noex ;
+extern int getutmpent	(utmpentx *,pid_t) noex ;
 
-extern int getutmpid(char *,int,pid_t) noex ;
-extern int getutmpname(char *,int,pid_t) noex ;
-extern int getutmpline(char *,int,pid_t) noex ;
-extern int getutmphost(char *,int,pid_t) noex ;
+extern int getutmpid	(char *,int,pid_t) noex ;
+extern int getutmpname	(char *,int,pid_t) noex ;
+extern int getutmpline	(char *,int,pid_t) noex ;
+extern int getutmphost	(char *,int,pid_t) noex ;
 
 EXTERNC_end
 
