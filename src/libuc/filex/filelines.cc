@@ -43,7 +43,7 @@
 #include	<sys/mman.h>		/* PPSIX */
 #include	<unistd.h>		/* PPSIX */
 #include	<fcntl.h>		/* PPSIX */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |memchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
@@ -114,8 +114,7 @@ int filelines(cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? lines : rs ;
-}
-/* end subroutine (filelines) */
+} /* end subroutine (filelines) */
 
 
 /* local subroutines */
