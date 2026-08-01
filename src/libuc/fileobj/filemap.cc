@@ -129,8 +129,7 @@ int filemap_open(filemap *op,cchar *fname,size_t nmax) noex {
 	    }
 	} /* end if (filemap_ctor) */
 	return rs ;
-}
-/* end subroutine (filemap_open) */
+} /* end subroutine (filemap_open) */
 
 int filemap_close(filemap *op) noex {
 	int		rs = SR_FAULT ;
@@ -152,8 +151,7 @@ int filemap_close(filemap *op) noex {
 	    op->bp = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (filemap_close) */
+} /* end subroutine (filemap_close) */
 
 int filemap_stat(filemap *op,ustat *sbp) noex {
 	int		rs = SR_FAULT ;
@@ -165,8 +163,7 @@ int filemap_stat(filemap *op,ustat *sbp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (filemap_stat) */
+} /* end subroutine (filemap_stat) */
 
 int filemap_read(filemap *op,int rlen,void *vp) noex {
 	int		rs = SR_FAULT ;
@@ -188,8 +185,7 @@ int filemap_read(filemap *op,int rlen,void *vp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (filemap_read) */
+} /* end subroutine (filemap_read) */
 
 int filemap_getln(filemap *op,cchar **bpp) noex {
 	size_t		fsize ;
@@ -213,8 +209,7 @@ int filemap_getln(filemap *op,cchar **bpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (filemap_getln) */
+} /* end subroutine (filemap_getln) */
 
 int filemap_seek(filemap *op,off_t off,int w) noex {
 	int		rs = SR_FAULT ;
@@ -254,8 +249,7 @@ int filemap_seek(filemap *op,off_t off,int w) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (filemap_seek) */
+} /* end subroutine (filemap_seek) */
 
 int filemap_tell(filemap *op,off_t *offp) noex {
 	int		rs = SR_FAULT ;
@@ -268,8 +262,7 @@ int filemap_tell(filemap *op,off_t *offp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (filemap_tell) */
+} /* end subroutine (filemap_tell) */
 
 int filemap_rewind(filemap *op) noex {
 	int		rs = SR_FAULT ;
@@ -281,8 +274,7 @@ int filemap_rewind(filemap *op) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (filemap_rewind) */
+} /* end subroutine (filemap_rewind) */
 
 
 /* local subroutines */
