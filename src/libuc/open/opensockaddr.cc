@@ -49,14 +49,14 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/socket.h>
 #include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<sockaddress.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"opensockaddr.h"
 
@@ -118,12 +118,11 @@ int opensockaddr(int pf,int st,int proto,SOCKADDR *sap,int to) noex {
 	            } /* end if (sockaddress_getlen) */
 	            if ((rs < 0) && (fd >= 0)) {
 	                uc_close(fd) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (u_socket) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opensockaddr) */
+} /* end subroutine (opensockaddr) */
 
 
