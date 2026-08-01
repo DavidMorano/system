@@ -47,7 +47,7 @@
 #include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdckdint>		/* |ckd_mul(3c++)| (global namespace) */
+#include	<cstdckdint>		/* CSTD |ckd_mul(3c++)| */
 #include	<bitset>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -98,7 +98,8 @@ namespace {
 	    mkisval() ;
 	} ; /* end ctor */
 	int operator [] (int ch) const noex {
-	    return (isval[ch & UCHAR_MAX]) ? SR_OK : SR_INVALID ;
+	    ch &= UCHAR_MAX ;
+	    return (isval[ch]) ? SR_OK : SR_INVALID ;
 	} ; /* end method (operator) */
     } ; /* end struct (chvalie) */
 } /* end namespace */
@@ -112,7 +113,8 @@ local int	cfloop(cchar *,int,int *) noex ;
 /* local variables */
 
 constexpr chvalid	tabval ;
-const bool		f_debug	= CF_DEBUG ;
+const int		oneday		= 24 * 60 * 60 ;
+const bool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -161,18 +163,18 @@ template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 	    T		mf = 1 ;
 	    switch (mc) {
 	    case 'Y':
-	        mf = 365 * 24 * 60 * 60 ;
+	        mf = oneday * 365 ;
 	        break ;
 	    case 'M':
-	        mf = 31 * 24 * 60 * 60 ;
+	        mf = oneday * 31 ;
 	        break ;
 	    case 'W':
 	    case 'w':
-	        mf = 7 * 24 * 60 * 60 ;
+	        mf = oneday * 7 ;
 	        break ;
 	    case 'D':
 	    case 'd':
-	        mf = 24 * 60 * 60 ;
+	        mf = oneday * 1 ;
 	        break ;
 	    case 'h':
 	        mf = 60 * 60 ;
