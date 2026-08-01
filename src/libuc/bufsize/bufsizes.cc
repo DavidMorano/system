@@ -30,8 +30,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	"bufsizes.h"
 
@@ -91,9 +91,7 @@ consteval void bufsizer::mknames() noex {
 /* exported variables */
 
 cpcchar			*bufsizenames ;
-
 constexpr bufsizer	bufsize_data ;
-
 static initer		initer_data ;
 
 
