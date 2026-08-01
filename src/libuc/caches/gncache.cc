@@ -26,22 +26,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* system-types */
-#include	<ctime>			/* |time(2)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |geustime(3u)| */
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getgroupname.h>
-#include	<vechand.h>
-#include	<cq.h>
-#include	<sncpy.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>		/* |GROUPNAMELEN| + |TIME_MAX| */
+#include	<sys/types.h>		/* POSIX® system-types */
+#include	<ctime>			/* CSTD |time(2)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |geustime(3u)| */
+#include	<uclibmem.h>		/* LIBU */
+#include	<bufsizeget.h>		/* LIBU */
+#include	<getgroupname.h>	/* LIBU */
+#include	<vechand.h>		/* LIBU */
+#include	<cq.h>			/* LIBU */
+#include	<sncpy.h>		/* LIBU */
+#include	<strwcpy.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |GROUPNAMELEN| + |TIME_MAX| */
 
 #include	"gncache.h"
 
@@ -76,14 +76,14 @@ enum cts {
 	ct_miss,
 	ct_hit,
 	ct_overlast
-} ;
+} ; /* end enum */
 
 struct gncache_rec {
 	char		*gn ;			/* memory-allocated */
 	time_t		ti_create ;		/* creation time */
 	time_t		ti_access ;		/* last access time */
 	gid_t		gid ;
-} ;
+} ; /* end struct */
 
 typedef	gncache_rec	rec ;
 typedef	gncache_rec *	recp ;
