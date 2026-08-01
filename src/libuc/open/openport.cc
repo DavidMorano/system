@@ -48,29 +48,29 @@
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<bufsizeget.h>
-#include	<getusername.h>
-#include	<nulstr.h>
-#include	<sockaddress.h>
-#include	<sfx.h>
-#include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<vecstr.h>
-#include	<spawnproc.h>
-#include	<permx.h>
-#include	<matxstr.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"openport.h"
 #include	"openportmsg.h"
@@ -127,10 +127,10 @@ namespace {
 	    sap = s ;
 	} ;
 	operator int () noex ;
-	int start() noex ;
-	int finish() noex ;
-	int opener() noex ;
-	int progproc(cchar *,int) noex ;
+	int start	() noex ;
+	int finish	() noex ;
+	int opener	() noex ;
+	int progproc	(cchar *,int) noex ;
     } ; /* end struct (openporter) */
 } /* end namespace */
 
@@ -175,8 +175,7 @@ int openport(int pf,int pt ,int proto,SA *sap) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (openport) */
+} /* end subroutine (openport) */
 
 
 /* local subroutines */
@@ -234,7 +233,7 @@ int openporter::finish() noex {
 	    a = nullptr ;
 	    pbuf = nullptr ;
 	    ubuf = nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end method (openporter::finish) */
 
@@ -251,8 +250,7 @@ int openporter::opener() noex {
 	    }
 	} /* end if (progfind) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end if (openporter::opener) */
+} /* end method (openporter::opener) */
 
 int openporter::progproc(cchar *bn,int bl) noex {
 	int		rs ;
