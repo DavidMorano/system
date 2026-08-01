@@ -1,4 +1,4 @@
-/* cfdect HEADER */
+/* cfdect HEADER (Convert-From-Decimal-Time) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -35,13 +35,13 @@ EXTERNC_end
 
 local inline int cfdect(cchar *sp,int sl,int *rp = nullptr)	noex {
 	return cfdecti(sp,sl,rp) ;
-}
+} /* end subroutine */
 
 #else /* __cplusplus */
 
 local inline int cfdect(cchar *sp,int sl,int *rp)		noex {
 	return cfdecti(sp,sl,rp) ;
-}
+} /* end subroutine */
 
 #endif /* __cplusplus */
 
