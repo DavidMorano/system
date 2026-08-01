@@ -38,15 +38,16 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/socket.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<sockaddress.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -59,15 +60,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_mkdir(cchar *,mode_t) noex ;
-    extern int uc_mkfifo(cchar *,mode_t) noex ;
-    extern int uc_chmod(cchar *,mode_t) noex ;
-    extern int uc_stat(cchar *,ustat *) noex ;
-    extern int uc_unlink(cchar *) noex ;
-    extern int uc_unlinkshm(cchar *) noex ;
-} /* end extern */
 
 
 /* external variables */
@@ -112,12 +104,11 @@ int openusd(cchar *sfn,int of,mode_t om) noex {
 	            if (rs < 0) {
 	                uc_close(fd) ;
 		        fd = -1 ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (socket) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (openusd) */
+} /* end subroutine (openusd) */
 
 
