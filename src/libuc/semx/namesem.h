@@ -63,19 +63,19 @@ struct namesem : namesem_head {
 	namesem_co	unlink ;
 	namesem_co	count ;
 	namesem() noex {
-	    close(this,namesemmem_close) ;
-	    wait(this,namesemmem_wait) ;
-	    waiti(this,namesemmem_waiti) ;
-	    waiter(this,namesemmem_waiter) ;
-	    trywait(this,namesemmem_trywait) ;
-	    post(this,namesemmem_post) ;
-	    unlink(this,namesemmem_unlink) ;
-	    count(this,namesemmem_count) ;
+	    close	(this,namesemmem_close) ;
+	    wait	(this,namesemmem_wait) ;
+	    waiti	(this,namesemmem_waiti) ;
+	    waiter	(this,namesemmem_waiter) ;
+	    trywait	(this,namesemmem_trywait) ;
+	    post	(this,namesemmem_post) ;
+	    unlink	(this,namesemmem_unlink) ;
+	    count	(this,namesemmem_count) ;
 	    magval = 0 ;
 	} ; /* end ctor */
 	namesem(const namesem &) = delete ;
 	namesem &operator = (const namesem &) = delete ;
-	int open(cchar *,int,mode_t,uint) noex ;
+	int open	(cchar *,int,mode_t,uint) noex ;
 	operator int () noex ;
 	void dtor() noex ;
 	destruct namesem() {
