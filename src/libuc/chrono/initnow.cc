@@ -51,18 +51,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* <- Apple says this is necessary! */
-#include	<sys/param.h>
-#include	<sys/timeb.h>		/* <- the money shot! */
-#include	<unistd.h>
-#include	<ctime>			/* structure |timeb| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<tmtime.hh>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® <- Apple says necessary! */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/timeb.h>		/* POSIX® <- the money shot! */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD |timeb| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"initnow.h"
 
