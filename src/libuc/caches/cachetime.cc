@@ -33,14 +33,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |trullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |u_stat(3u)| */
-#include	<uclibmem.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |u_stat(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cachetime.h"
 
@@ -260,7 +260,8 @@ int cachetime_curend(CT *op,CT_CUR *curp) noex {
 	return rs ;
 } /* end subroutine (cachetime_curend) */
 
-int cachetime_enum(CT *op,CT_CUR *curp,char *pbuf,int plen,time_t *timep) noex {
+int cachetime_curenum(CT *op,CT_CUR *curp,char *pbuf,int plen,
+		time_t *timep) noex {
 	int		rs ;
 	if ((rs = cachetime_magic(op,curp,pbuf)) >= 0) ylikely {
 	    hdb_dat	key ;
