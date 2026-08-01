@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
 
 
 #define	SETSTR		hdb
@@ -60,19 +60,19 @@ struct setstr : setstr_head {
 	setstr_co	finish ;
 	bool		fopen{} ;
 	setstr() noex {
-	    start(this,setstrmem_start) ;
-	    delall(this,setstrmem_delall) ;
-	    count(this,setstrmem_count) ;
-	    finish(this,setstrmem_finish) ;
-	} ;
+	    start	(this,setstrmem_start) ;
+	    delall	(this,setstrmem_delall) ;
+	    count	(this,setstrmem_count) ;
+	    finish	(this,setstrmem_finish) ;
+	} ; /* end ctor */
 	setstr(const setstr &) = delete ;
 	setstr &operator = (const setstr &) = delete ;
-	int already(cchar *,int = -1) noex ;
-	int add(cchar *,int = -1) noex ;
-	int del(cchar *,int = -1) noex ;
-	int curbegin(setstr_cur *) noex ;
-	int curenum(setstr_cur *,cchar **) noex ;
-	int curend(setstr_cur *) noex ;
+	int already	(cchar *,int = -1) noex ;
+	int add		(cchar *,int = -1) noex ;
+	int del		(cchar *,int = -1) noex ;
+	int curbegin	(setstr_cur *) noex ;
+	int curenum	(setstr_cur *,cchar **) noex ;
+	int curend	(setstr_cur *) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct setstr() {
