@@ -31,14 +31,14 @@
 *****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ccfile.hh>
-#include	<field.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ccfile.hh>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hdbstr.h"
 
@@ -57,7 +57,7 @@
 
 /* forward references */
 
-static int	loadline(hdbstr *,cchar *,int) noex ;
+local int	loadline(hdbstr *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -82,14 +82,13 @@ static constexpr char	fterms[32] = {
 int hdbstr_loadpairs(hdbstr *op,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		c = 0 ;
-	if (op && fname) {
+	int		c = 0 ; /* return-values */
+	if (op && fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-		if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
-	            ccfile	pf ;
+	    if (fname[0]) ylikely {
+		if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 	            cint	llen = rs ;
-	            if ((rs = pf.open(fname)) >= 0) {
+	            if (ccfile pf ; (rs = pf.open(fname)) >= 0) ylikely {
 	                while ((rs = pf.readln(lbuf,llen)) > 0) {
 			    rs = loadline(op,lbuf,rs) ;
 			    c += rs ;
@@ -104,19 +103,18 @@ int hdbstr_loadpairs(hdbstr *op,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (hdbstr_loadpairs) */
+} /* end subroutine (hdbstr_loadpairs) */
 
 
 /* local subroutines */
 
-static int loadline(hdbstr *op,cchar *lbuf,int ll) noex {
+local int loadline(hdbstr *op,cchar *lbuf,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (field fsb ; (rs = field_start(&fsb,lbuf,ll)) >= 0) {
+	if (field fsb ; (rs = field_start(&fsb,lbuf,ll)) >= 0) ylikely {
 	    cchar	*kp{} ;
-	    if (int kl ; (kl = field_get(&fsb,fterms,&kp)) > 0) {
+	    if (int kl ; (kl = field_get(&fsb,fterms,&kp)) > 0) ylikely {
 		int	vl = 0 ;
 		cchar	*vp{} ;
 		bool	f = true ;
@@ -131,7 +129,6 @@ static int loadline(hdbstr *op,cchar *lbuf,int ll) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fields) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (loadline) */
+} /* end subroutine (loadline) */
 
 
