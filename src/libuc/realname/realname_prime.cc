@@ -33,22 +33,22 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<sbuf.h>
-#include	<storeitem.h>
-#include	<dstr.h>
-#include	<six.h>
-#include	<snwcpyx.h>
-#include	<toxc.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<dstr.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<snwcpyx.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
 #include	"realname.h"
 #include	"namestr.h"
@@ -92,7 +92,7 @@ struct names {
 /* forward references */
 
 template<typename ... Args>
-static int realname_ctor(realname *op,Args ... args) noex {
+local int realname_ctor(realname *op,Args ... args) noex {
     	REALNAME	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
@@ -106,10 +106,9 @@ static int realname_ctor(realname *op,Args ... args) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (realname_ctor) */
+} /* end subroutine (realname_ctor) */
 
-static int realname_dtor(realname *op) noex {
+local int realname_dtor(realname *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) ylikely {
@@ -122,25 +121,23 @@ static int realname_dtor(realname *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (realname_dtor) */
+} /* end subroutine (realname_dtor) */
 
 template<typename ... Args>
-static inline int realname_magic(realname *op,Args ... args) noex {
+local inline int realname_magic(realname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == REALNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (realname_magic) */
+} /* end subroutine (realname_magic) */
 
-static int	realname_avail(realname *) noex ;
-static int	realname_parse(realname *,cchar *,int) noex ;
+local int	realname_avail(realname *) noex ;
+local int	realname_parse(realname *,cchar *,int) noex ;
 
-static int	names_start(names *,char *) noex ;
-static int	names_add(names *,cchar *,int,int,int) noex ;
-static int	names_finish(names *) noex ;
+local int	names_start(names *,char *) noex ;
+local int	names_add(names *,cchar *,int,int,int) noex ;
+local int	names_finish(names *) noex ;
 
 
 /* local variables */
@@ -164,11 +161,10 @@ int realname_start(realname *op,cchar *sp,int sl) noex {
 	    }
 	    if (rs < 0) {
 		realname_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (realname_ctor) */
 	return rs ;
-}
-/* end subroutine (realname_start) */
+} /* end subroutine (realname_start) */
 
 int realname_finish(realname *op) noex {
 	int		rs ;
@@ -181,8 +177,7 @@ int realname_finish(realname *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (realname_finish) */
+} /* end subroutine (realname_finish) */
 
 int realname_loadparts(realname *op,dstr *stp) noex {
 	int		rs ;
@@ -231,8 +226,7 @@ int realname_loadparts(realname *op,dstr *stp) noex {
 	    } /* end if (storeitem_avail) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (realname_loadparts) */
+} /* end subroutine (realname_loadparts) */
 
 int realname_loadpieces(realname *op,cchar **sa,int sn) noex {
 	int		rs ;
@@ -313,8 +307,7 @@ int realname_loadpieces(realname *op,cchar **sa,int sn) noex {
 	    } /* end if (storeitem_avail) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (realname_loadpieces) */
+} /* end subroutine (realname_loadpieces) */
 
 int realname_getfirst(realname *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -323,8 +316,7 @@ int realname_getfirst(realname *op,cchar **rpp) noex {
 	    rs = op->len.first ;
 	}
 	return rs ;
-}
-/* end subroutine (realname_getfirst) */
+} /* end subroutine (realname_getfirst) */
 
 int realname_getm1(realname *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -333,8 +325,7 @@ int realname_getm1(realname *op,cchar **rpp) noex {
 	    rs = op->len.m1 ;
 	}
 	return rs ;
-}
-/* end subroutine (realname_getm1) */
+} /* end subroutine (realname_getm1) */
 
 int realname_getm2(realname *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -343,8 +334,7 @@ int realname_getm2(realname *op,cchar **rpp) noex {
 	    rs = op->len.m2 ;
 	}
 	return rs ;
-}
-/* end subroutine (realname_getm2) */
+} /* end subroutine (realname_getm2) */
 
 int realname_getm3(realname *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -353,8 +343,7 @@ int realname_getm3(realname *op,cchar **rpp) noex {
 	    rs = op->len.m3 ;
 	}
 	return rs ;
-}
-/* end subroutine (realname_getm3) */
+} /* end subroutine (realname_getm3) */
 
 int realname_getlast(realname *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -363,8 +352,7 @@ int realname_getlast(realname *op,cchar **rpp) noex {
 	    rs = op->len.last ;
 	}
 	return rs ;
-}
-/* end subroutine (realname_getlast) */
+} /* end subroutine (realname_getlast) */
 
 int realname_getpieces(realname *op,cchar **parts) noex {
 	int		rs = SR_FAULT ;
@@ -399,8 +387,7 @@ int realname_getpieces(realname *op,cchar **parts) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (realname_getpieces) */
+} /* end subroutine (realname_getpieces) */
 
 int realname_name(realname *op,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -474,8 +461,7 @@ int realname_name(realname *op,char *rbuf,int rlen) noex {
 	    } /* end if (buffer) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (realname_name) */
+} /* end subroutine (realname_name) */
 
 int realname_fullname(realname *op,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -513,8 +499,7 @@ int realname_fullname(realname *op,char *rbuf,int rlen) noex {
 	    } /* end if (buffer) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (realname_fullname) */
+} /* end subroutine (realname_fullname) */
 
 int realname_mailname(realname *op,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -553,22 +538,20 @@ int realname_mailname(realname *op,char *rbuf,int rlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (realname_mailname) */
+} /* end subroutine (realname_mailname) */
 
 
 /* private subroutines */
 
-static int realname_avail(realname *op) noex {
+local int realname_avail(realname *op) noex {
     	int		rs = SR_OK ;
 	if (op->abv.last) {
 	    rs = SR_ALREADY ;
 	}
 	return rs ;
-}
-/* end subroutine (realname_avail) */
+} /* end subroutine (realname_avail) */
 
-static int realname_parse(realname *op,cchar *sbuf,int slen) noex {
+local int realname_parse(realname *op,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -643,10 +626,9 @@ static int realname_parse(realname *op,cchar *sbuf,int slen) noex {
 	    } /* end if (names) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (realname_parse) */
+} /* end subroutine (realname_parse) */
 
-static int names_start(names *op,char *rbuf) noex {
+local int names_start(names *op,char *rbuf) noex {
 	cint		rlen = REALNAME_STORELEN ;
 	int		rs ;
 	if ((rs = op->s.start(rbuf,rlen)) >= 0) ylikely {
@@ -658,10 +640,9 @@ static int names_start(names *op,char *rbuf) noex {
 	    } /* end for */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (names_start) */
+} /* end subroutine (names_start) */
 
-static int names_add(names *op,cchar *nbuf,int nlen,int f_abv,int f_last) noex {
+local int names_add(names *op,cchar *nbuf,int nlen,int f_abv,int f_last) noex {
 	int		rs = SR_INVALID ;
 	int		count = 0 ;
 	if ((nlen > 0) && ((op->li < 0) || (op->i != op->li))) {
@@ -686,10 +667,9 @@ static int names_add(names *op,cchar *nbuf,int nlen,int f_abv,int f_last) noex {
 	    } /* end if (storeitem) */
 	} /* end if (valid) */
 	return (rs >= 0) ? count : rs ;
-}
-/* end subroutine (names_add) */
+} /* end subroutine (names_add) */
 
-static int names_finish(names *op) noex {
+local int names_finish(names *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -697,7 +677,6 @@ static int names_finish(names *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (names_finish) */
+} /* end subroutine (names_finish) */
 
 
