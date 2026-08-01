@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types |gid_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<cq.h>
+#include	<sys/types.h>		/* POSIX® system types |gid_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<cq.h>			/* LIBUC */
 
 
 #define	FILEGRP			struct filegrp_head
