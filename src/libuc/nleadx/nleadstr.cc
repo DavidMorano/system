@@ -60,16 +60,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<toxc.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<toxc.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nleadstr.h"
 
@@ -123,17 +123,14 @@ local int nleadxxxxstr(cchar *bs,cchar *sp,int sl) noex {
 
 int nleadbasestr(cchar *bs,cchar *sp,int sl) noex {
 	return nleadxxxxstr<tobc>(bs,sp,sl) ;
-}
-/* end subroutine (nleadbasestr) */
+} /* end subroutine (nleadbasestr) */
 
 int nleadcasestr(cchar *bs,cchar *sp,int sl) noex {
 	return nleadxxxxstr<touc>(bs,sp,sl) ;
-}
-/* end subroutine (nleadcasestr) */
+} /* end subroutine (nleadcasestr) */
 
 int nleadfoldstr(cchar *bs,cchar *sp,int sl) noex {
 	return nleadxxxxstr<tofc>(bs,sp,sl) ;
-}
-/* end subroutine (nleadfoldstr) */
+} /* end subroutine (nleadfoldstr) */
 
 
