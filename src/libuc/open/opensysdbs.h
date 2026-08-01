@@ -20,9 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* ?? */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 enum opensysdbs {
