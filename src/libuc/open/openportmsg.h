@@ -13,10 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sockaddress.h>
-#include	<localmisc.h>		/* |USERNAMELEN| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |USERNAMELEN| */
 
 
 #define	OPENPORTMSG_REQ		struct openportmsg_request
@@ -32,19 +32,19 @@ struct openportmsg_request {
 	uint		msglen ;
 	uchar		msgtype ;
 	char		username[OPENPORTMSG_UNLEN + 1] ;
-} ;
+} ; /* end struct */
 
 struct openportmsg_response {
 	int		rs ;
 	uint		msglen ;
 	uchar		msgtype ;
-} ;
+} ; /* end struct */
 
 enum openportmsgtypes {
 	openportmsgtype_request,
 	openportmsgtype_response,
 	openportmsgtype_overlast
-} ;
+} ; /* end struct */
 
 typedef	OPENPORTMSG_REQ		openportmsg_req ;
 typedef	OPENPORTMSG_RES		openportmsg_res ;
