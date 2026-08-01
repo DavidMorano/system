@@ -26,20 +26,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<ctime>			/* |time_t| */
-#include	<cstddef>		/* |nullptr_t(3c++)| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<getgroupname.h>
-#include	<bufsizevar.hh>
-#include	<vechand.h>
-#include	<cq.h>
-#include	<snx.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getgroupname.h>	/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<cq.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"filegrp.h"
 
@@ -188,8 +188,7 @@ int filegrp_start(FG *op,int nmax,int ttl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (filegrp_start) */
+} /* end subroutine (filegrp_start) */
 
 int filegrp_finish(FG *op) noex {
 	int		rs ;
@@ -235,8 +234,7 @@ int filegrp_finish(FG *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (filegrp_finish) */
+} /* end subroutine (filegrp_finish) */
 
 int filegrp_add(FG *op,gid_t gid,cc *gn) noex {
 	custime		dt = time(nullptr) ;
@@ -256,8 +254,7 @@ int filegrp_add(FG *op,gid_t gid,cc *gn) noex {
 	        } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (filegrp_add) */
+} /* end subroutine (filegrp_add) */
 
 int filegrp_lookgid(FG *op,char *rbuf,int rlen,gid_t gid) noex {
 	custime		dt = time(nullptr) ;
@@ -291,8 +288,7 @@ int filegrp_lookgid(FG *op,char *rbuf,int rlen,gid_t gid) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (filegrp_lookgid) */
+} /* end subroutine (filegrp_lookgid) */
 
 int filegrp_stats(FG *op,FG_ST *sp) noex {
 	int		rs ;
@@ -303,8 +299,7 @@ int filegrp_stats(FG *op,FG_ST *sp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (filegrp_stats) */
+} /* end subroutine (filegrp_stats) */
 
 int filegrp_check(FG *op,time_t dt) noex {
 	int		rs ;
@@ -318,8 +313,7 @@ int filegrp_check(FG *op,time_t dt) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (filegrp_check) */
+} /* end subroutine (filegrp_check) */
 
 
 /* private subroutines */
@@ -342,8 +336,7 @@ local int filegrp_newrec(FG *op,time_t dt,FG_REC **rpp,gid_t gid,cc *gn) noex {
 	} /* end if */
 	if (rpp) *rpp = (rs >= 0) ? rp : nullptr ;
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (filegrp_newrec) */
+} /* end subroutine (filegrp_newrec) */
 
 local int filegrp_recaccess(FG *op,FG_REC *rp,time_t dt) noex {
 	int		rs ;
@@ -356,8 +349,7 @@ local int filegrp_recaccess(FG *op,FG_REC *rp,time_t dt) noex {
 	    gl = rs ;
 	}
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (filegrp_recaccess) */
+} /* end subroutine (filegrp_recaccess) */
 
 local int filegrp_searchgid(FG *op,FG_REC **rpp,gid_t gid) noex {
 	FG_REC		*rp = nullptr ;
@@ -377,8 +369,7 @@ local int filegrp_searchgid(FG *op,FG_REC **rpp,gid_t gid) noex {
 	    gl = lenstr(rp->gn) ;
 	}
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (filegrp_searchgid) */
+} /* end subroutine (filegrp_searchgid) */
 
 local int filegrp_maintenance(FG *op,time_t dt) noex {
 	vechand		*rlp = op->alp ;
@@ -416,8 +407,7 @@ local int filegrp_maintenance(FG *op,time_t dt) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (filegrp_maintenance) */
+} /* end subroutine (filegrp_maintenance) */
 
 local int filegrp_allocrec(FG *op,FG_REC **rpp) noex {
 	cint		sz = szof(FG_REC) ;
@@ -428,8 +418,7 @@ local int filegrp_allocrec(FG *op,FG_REC **rpp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (filegrp_allocrec) */
+} /* end subroutine (filegrp_allocrec) */
 
 local int filegrp_recfree(FG *op,FG_REC *rp) noex {
 	int		rs = SR_FAULT ;
@@ -449,8 +438,7 @@ local int filegrp_recfree(FG *op,FG_REC *rp) noex {
 	    } /* end if (cq_count) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (filegrp_recfree) */
+} /* end subroutine (filegrp_recfree) */
 
 local int filegrp_record(FG *op,int ct,int rs) noex {
 	cbool		f_got = (rs > 0) ;
@@ -465,8 +453,7 @@ local int filegrp_record(FG *op,int ct,int rs) noex {
 	    break ;
 	} /* end switch */
 	return SR_OK ;
-}
-/* end subroutine (filegrp_record) */
+} /* end subroutine (filegrp_record) */
 
 local int record_start(FG_REC *rp,time_t dt,gid_t gid,cc *gn) noex {
 	int		rs = SR_FAULT ;
@@ -486,8 +473,7 @@ local int record_start(FG_REC *rp,time_t dt,gid_t gid,cc *gn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (record_start) */
+} /* end subroutine (record_start) */
 
 local int record_finish(FG_REC *rp) noex {
 	int		rs = SR_FAULT ;
@@ -502,8 +488,7 @@ local int record_finish(FG_REC *rp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (record_finish) */
+} /* end subroutine (record_finish) */
 
 local int record_old(FG_REC *rp,time_t dt,int ttl) noex {
 	int		rs = SR_FAULT ;
@@ -511,8 +496,7 @@ local int record_old(FG_REC *rp,time_t dt,int ttl) noex {
 	    rs = ((dt - rp->ti_create) >= ttl) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (record_old) */
+} /* end subroutine (record_old) */
 
 local int record_refresh(FG_REC *rp,time_t dt) noex {
 	int		rs ;
@@ -523,8 +507,7 @@ local int record_refresh(FG_REC *rp,time_t dt) noex {
 	    rs = record_update(rp,dt,gn) ;
 	}
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (record_refresh) */
+} /* end subroutine (record_refresh) */
 
 local int record_update(FG_REC *rp,time_t dt,cc *gn) noex {
 	int		rs = SR_FAULT ;
@@ -539,8 +522,7 @@ local int record_update(FG_REC *rp,time_t dt,cc *gn) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_changed : rs ;
-}
-/* end subroutine (record_update) */
+} /* end subroutine (record_update) */
 
 local int record_access(FG_REC *rp,time_t dt) noex {
     	int		rs = SR_FAULT ;
@@ -550,7 +532,6 @@ local int record_access(FG_REC *rp,time_t dt) noex {
 	    rp->ti_access = dt ;
 	} /* end if (getlenstr) */
 	return (rs >= 0) ? gl : rs ;
-}
-/* end subroutine (record_access) */
+} /* end subroutine (record_access) */
 
 
