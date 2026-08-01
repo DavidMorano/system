@@ -27,15 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<string>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<string>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"setstr.h"
 
@@ -65,7 +65,7 @@ using libuc::libmem ;			/* variable */
 
 /* forward references */
 
-static int	setstr_finents(setstr *) noex ;
+local int	setstr_finents(setstr *) noex ;
 
 
 /* local variables */
@@ -81,14 +81,13 @@ const int	rsn = SR_NOTFOUND ;
 int setstr_start(setstr *op,int n) noex {
 	cint		at = true ;
 	return hdb_start(op,n,at,nullptr,nullptr) ;
-}
-/* end subroutine (setstr_start) */
+} /* end subroutine (setstr_start) */
 
 int setstr_finish(setstr *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    {
 		rs1 = setstr_finents(op) ;
@@ -101,37 +100,35 @@ int setstr_finish(setstr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (setstr_finish) */
+} /* end subroutine (setstr_finish) */
 
 int setstr_already(setstr *op,cchar *sp,int 탎l) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		f = true ;
-	if (op && sp) {
-	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	if (op && sp) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
 	       hdb_dat	key ;
 	       hdb_dat	val ;
 	       key.buf = sp ;
 	       key.len = sl ;
 	       val.buf = sp ;
 	       val.len = sl ;
-	       if ((rs = hdb_fetch(op,key,np,&val)) == rsn) {
+	       if ((rs = hdb_fetch(op,key,np,&val)) == rsn) ylikely {
 	           f = false ;
 	           rs = SR_OK ;
 	       }
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (setstr_already) */
+} /* end subroutine (setstr_already) */
 
 int setstr_add(setstr *op,cchar *sp,int 탎l) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (op && sp) {
-	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	if (op && sp) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
 	        hdb_dat	key ;
 	        hdb_dat	val ;
 	        key.buf = sp ;
@@ -153,16 +150,15 @@ int setstr_add(setstr *op,cchar *sp,int 탎l) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (setstr_add) */
+} /* end subroutine (setstr_add) */
 
 int setstr_del(setstr *op,cchar *sp,int 탎l) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f = false ;
-	if (op && sp) {
-	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	if (op && sp) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
 	        hdb_dat	key ;
 	        hdb_dat	val{} ;
 	        key.buf = sp ;
@@ -185,8 +181,7 @@ int setstr_del(setstr *op,cchar *sp,int 탎l) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (setstr_del) */
+} /* end subroutine (setstr_del) */
 
 int setstr_delall(setstr *op) noex {
     	return hdb_delall(op) ;
@@ -199,19 +194,17 @@ int setstr_count(setstr *op) noex {
 
 int setstr_curbegin(setstr *op,setstr_cur *curp) noex {
 	return hdb_curbegin(op,curp) ;
-}
-/* end subroutine (setstr_curbegin) */
+} /* end subroutine (setstr_curbegin) */
 
 int setstr_curend(setstr *op,setstr_cur *curp) noex {
 	return hdb_curend(op,curp) ;
-}
-/* end subroutine (setstr_curend) */
+} /* end subroutine (setstr_curend) */
 
 int setstr_curenum(setstr *op,setstr_cur *curp,cchar **rpp) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (op && curp && rpp) {
+	if (op && curp && rpp) ylikely {
 	    hdb_dat	val{} ;
 	    if ((rs = hdb_curenum(op,curp,np,&val)) >= 0) {
 	        rl = val.len ;
@@ -223,8 +216,7 @@ int setstr_curenum(setstr *op,setstr_cur *curp,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (setstr_curenum) */
+} /* end subroutine (setstr_curenum) */
 
 int setstr::already(cchar *sp,int sl) noex {
 	return setstr_already(this,sp,sl) ;
@@ -262,7 +254,7 @@ setstr::operator int () noex {
 
 int setstr_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case setstrmem_start:
 	        if ((rs = setstr_start(op,a)) >= 0) {
@@ -282,18 +274,17 @@ int setstr_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (setstr_co::operator) */
+} /* end method (setstr_co::operator) */
 
 
 /* local subroutines */
 
-static int setstr_finents(setstr *op) noex {
+local int setstr_finents(setstr *op) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rs2 ;
 	int		c = 0 ; /* return-value */
-	if (hdb_cur cur ; (rs1 = hdb_curbegin(op,&cur)) >= 0) {
+	if (hdb_cur cur ; (rs1 = hdb_curbegin(op,&cur)) >= 0) ylikely {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    while ((rs2 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
@@ -310,7 +301,6 @@ static int setstr_finents(setstr *op) noex {
 	} /* end if (cursor) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (setstr_finents) */
+} /* end subroutine (setstr_finents) */
 
 
