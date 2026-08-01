@@ -52,14 +52,16 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<memory>		/* |destroy_at(3c++)| */
-#include	<usyscalls.h>
-#include	<intsat.h>
-#include	<localmisc.h>
-#include	<posixdirent.hh>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<memory>		/* C++STD |destroy_at(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<posixdirent.hh>	/* LIBUC */
 
 #include	"fsdir.h"
 
@@ -95,7 +97,7 @@ static inline int fsdir_magic(fsdir *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->magic == FSDIR_MAGIC) ylikely {
+	    if (op->magval == FSDIR_MAGIC) ylikely {
 		if (op->posixp) {
 		    rs = SR_OK ;
 		}
@@ -120,20 +122,19 @@ int fsdir_open(fsdir *op,cchar *dname) noex {
 	int		rs = SR_FAULT ;
 	if (op && dname) ylikely {
 	    rs = SR_INVALID ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->posixp = nullptr ;
 	    op->fl = {} ;
 	    if (dname[0]) ylikely {
 		if ((rs = op->isdir(dname)) >= 0) ylikely {
 	            if ((rs = fsdir_begin(op,dname)) >= 0) ylikely {
-			op->magic = FSDIR_MAGIC ;
+			op->magval = FSDIR_MAGIC ;
 		    } /* end if (fsdir_begin) */
 		} /* end if (isdir) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fsdir_open) */
+} /* end subroutine (fsdir_open) */
 
 int fsdir_close(fsdir *op) noex {
 	int		rs ;
@@ -143,11 +144,10 @@ int fsdir_close(fsdir *op) noex {
 	        rs1 = fsdir_end(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_close) */
+} /* end subroutine (fsdir_close) */
 
 #ifdef	COMMENT
 typedef struct dirent {
@@ -173,8 +173,7 @@ int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_read) */
+} /* end subroutine (fsdir_read) */
 
 int fsdir_tell(fsdir *op,off_t *rp) noex {
 	int		rs ;
@@ -187,8 +186,7 @@ int fsdir_tell(fsdir *op,off_t *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_tell) */
+} /* end subroutine (fsdir_tell) */
 
 int fsdir_seek(fsdir *op,off_t o) noex {
 	int		rs ;
@@ -197,8 +195,7 @@ int fsdir_seek(fsdir *op,off_t o) noex {
 	    rs = objp->seek(o) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_seek) */
+} /* end subroutine (fsdir_seek) */
 
 int fsdir_rewind(fsdir *op) noex {
 	int		rs ;
@@ -216,8 +213,7 @@ int fsdir_audit(fsdir *op) noex {
 	    rs = 1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_audit) */
+} /* end subroutine (fsdir_audit) */
 
 
 /* private subroutines */
