@@ -155,11 +155,11 @@ int csem_create(csem *op,int f_shared,int count) noex {
 	        } /* end if (csem_ptcinit) */
 	        if (rs < 0) {
 		    mxp->destroy() ;
-		}
+		} /* end if (error) */
 	    } /* end if (csem_ptminit) */
 	    if (rs < 0) {
 		csem_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (csem_ctor) */
 	return rs ;
 } /* end subroutine (csem_start) */
@@ -322,7 +322,7 @@ local int csem_ptminit(csem *op,int f_shared) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_ptm) {
 		mxp->destroy() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ptma) */
 	return rs ;
 } /* end subroutine (csem_ptminit) */
