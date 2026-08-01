@@ -124,17 +124,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* <- |strlen(3c)| + |memcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<lookaside.h>
-#include	<strn.h>
-#include	<hash.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<lookaside.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hdb.h"
 
@@ -259,7 +259,6 @@ hdb_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (hdb_co::operator) */
+} /* end method (hdb_co::operator) */
 
 
