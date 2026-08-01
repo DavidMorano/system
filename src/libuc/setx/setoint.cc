@@ -32,15 +32,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<utility>
-#include	<set>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<utility>		/* C++STD */
+#include	<set>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"setoint.h"
 
@@ -76,12 +76,12 @@ typedef set<int>::iterator *	setitp ;
 /* exported subroutines */
 
 int setoint_start(setoint *op) noex {
-	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    try {
-	        if (setint *setp ; (setp = new(nothrow) setint) != np) {
+	        if (setint *setp = new(nt) setint ; setp) ylikely {
 	            op->setp = setp ;
 		    rs = SR_OK ;
 	        } /* end if (new-setint) */
@@ -90,14 +90,13 @@ int setoint_start(setoint *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setoint_start) */
+} /* end subroutine (setoint_start) */
 
 int setoint_finish(setoint *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        setint		*setp  = setintp(op->setp) ;
 	        delete setp ;
 	        op->setp = nullptr ;
@@ -105,15 +104,14 @@ int setoint_finish(setoint *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setoint_finish) */
+} /* end subroutine (setoint_finish) */
 
 int setoint_addval(setoint *op,int v) noex {
 	int		rs = SR_FAULT ;
 	int		f = INT_MAX ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 		try {
 	            setint	*setp  = setintp(op->setp) ;
 	            pair<setint::iterator,bool>	ret ;
@@ -126,29 +124,27 @@ int setoint_addval(setoint *op,int v) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (setoint_addval) */
+} /* end subroutine (setoint_addval) */
 
 int setoint_delval(setoint *op,int v) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        setint	*setp  = setintp(op->setp) ;
 	        setp->erase(v) ;
 		rs = SR_OK ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setoint_delval) */
+} /* end subroutine (setoint_delval) */
 
 int setoint_count(setoint *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        setint	*setp  = setintp(op->setp) ;
 		{
 		    csize	sz = setp->size() ;
@@ -158,15 +154,14 @@ int setoint_count(setoint *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (setoint_count) */
+} /* end subroutine (setoint_count) */
 
 int setoint_extent(setoint *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        setint	*setp  = setintp(op->setp) ;
 		{
 		    csize	sz = setp->max_size() ;
@@ -176,15 +171,14 @@ int setoint_extent(setoint *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (setoint_extent) */
+} /* end subroutine (setoint_extent) */
 
 int setoint_mkvec(setoint *op,int *va) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op && va) {
+	if (op && va) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 		setint	*setp = setintp(op->setp) ;
 		rs = SR_OK ;
 	        if (va) {
@@ -200,15 +194,14 @@ int setoint_mkvec(setoint *op,int *va) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (setoint_mkvec) */
+} /* end subroutine (setoint_mkvec) */
 
 int setoint_curbegin(setoint *op,setoint_cur *curp) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 		setint		*setp = setintp(op->setp) ;
 	        setint::iterator	*interp ;
 		rs = SR_NOMEM ;
@@ -220,16 +213,15 @@ int setoint_curbegin(setoint *op,setoint_cur *curp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setoint_curbegin) */
+} /* end subroutine (setoint_curbegin) */
 
 int setoint_curend(setoint *op,setoint_cur *curp) noex {
 	int		rs = SR_FAULT ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 		rs = SR_BUGCHECK ;
-	        if (curp->interp) {
+	        if (curp->interp) ylikely {
 		    setit	*interp = setitp(curp->interp) ;
 	            delete interp ;
 	            curp->interp = nullptr ;
@@ -238,17 +230,16 @@ int setoint_curend(setoint *op,setoint_cur *curp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setoint_curend) */
+} /* end subroutine (setoint_curend) */
 
 int setoint_curenum(setoint *op,setoint_cur *curp,int *rp) noex {
 	int		rs = SR_FAULT ;
-	if (op && curp && rp) {
+	if (op && curp && rp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 		rs = SR_BUGCHECK ;
 	        setint		*setp  = setintp(op->setp) ;
-	        if (curp->interp) {
+	        if (curp->interp) ylikely {
 		    setit	*interp = setitp(curp->interp) ;
 	            setit	it_end = setp->end() ;
 		    rs = SR_NOTFOUND ;
@@ -261,7 +252,6 @@ int setoint_curenum(setoint *op,setoint_cur *curp,int *rp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setoint_curenum) */
+} /* end subroutine (setoint_curenum) */
 
 
