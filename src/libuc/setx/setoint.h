@@ -13,8 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	SETOINT		struct setoint_head
@@ -23,11 +23,11 @@
 
 struct setoint_cursor {
 	void		*interp ;
-} ;
+} ; /* end struct */
 
 struct setoint_head {
 	void		*setp ;
-} ;
+} ; /* end struct */
 
 typedef SETOINT		setoint ;
 typedef SETOINT_CUR	setoint_cur ;
