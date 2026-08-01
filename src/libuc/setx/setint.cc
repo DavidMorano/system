@@ -76,24 +76,23 @@ typedef unordered_set<int>::iterator *	usetintitp ;
 /* exported subroutines */
 
 int setint_start(setint *op) noex {
-	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOMEM ;
-	    if (usetint *setp ; (setp = new(nothrow) usetint) != np) {
+	    if (usetint *setp = new(nt) usetint ; setp) ylikely {
 	        op->setp = voidp(setp) ;
 	        rs = SR_OK ;
 	    } /* end if (new-usetint) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setint_start) */
+} /* end subroutine (setint_start) */
 
 int setint_finish(setint *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        usetint		*setp = usetintp(op->setp) ;
 	        delete setp ;
 	        op->setp = nullptr ;
@@ -101,15 +100,14 @@ int setint_finish(setint *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setint_finish) */
+} /* end subroutine (setint_finish) */
 
 int setint_addval(setint *op,int v) noex {
 	int		rs = SR_FAULT ;
 	int		f = INT_MAX ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        usetint		*setp = usetintp(op->setp) ;
 	        pair<usetint::iterator,bool>	ret ;
 	        ret = setp->insert(v) ;
@@ -118,30 +116,28 @@ int setint_addval(setint *op,int v) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (setint_addval) */
+} /* end subroutine (setint_addval) */
 
 int setint_delval(setint *op,int v) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        usetint		*setp = usetintp(op->setp) ;
 	        setp->erase(v) ;
 		rs = SR_OK ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setint_delval) */
+} /* end subroutine (setint_delval) */
 
 /* return the count of the number of items in this list */
 int setint_count(setint *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        usetint		*setp = usetintp(op->setp) ;
 		{
 		    csize	sz = setp->size() ;
@@ -151,16 +147,15 @@ int setint_count(setint *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (setint_count) */
+} /* end subroutine (setint_count) */
 
 /* return the extent of the number of items in this list */
 int setint_extent(setint *op) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        usetint		*setp = usetintp(op->setp) ;
 		{
 	            csize	sz = setp->max_size() ;
@@ -170,15 +165,14 @@ int setint_extent(setint *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (setint_extent) */
+} /* end subroutine (setint_extent) */
 
 int setint_mkvec(setint *op,int *va) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        usetint		*setp = usetintp(op->setp) ;
 		rs = SR_OK ;
 	        if (va) {
@@ -194,19 +188,18 @@ int setint_mkvec(setint *op,int *va) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (setint_mkvec) */
+} /* end subroutine (setint_mkvec) */
 
 int setint_curbegin(setint *op,setint_cur *curp) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 	        usetint		*setp = usetintp(op->setp) ;
 	        usetintit	*interp ;
 		rs = SR_NOMEM ;
-	        if ((interp = new(nothrow) usetintit) != np) {
+	        if ((interp = new(nothrow) usetintit) != np) ylikely {
 	            *interp = setp->begin() ;
 	            curp->interp = voidp(interp) ;
 		    rs = SR_OK ;
@@ -214,16 +207,15 @@ int setint_curbegin(setint *op,setint_cur *curp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setint_curbegin) */
+} /* end subroutine (setint_curbegin) */
 
 int setint_curend(setint *op,setint_cur *curp) noex {
 	int		rs = SR_FAULT ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 		rs = SR_BUGCHECK ;
-	        if (curp->interp) {
+	        if (curp->interp) ylikely {
 		    usetintit	*interp = usetintitp(curp->interp) ;
 	            delete interp ;
 	            curp->interp = nullptr ;
@@ -232,16 +224,15 @@ int setint_curend(setint *op,setint_cur *curp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setint_curend) */
+} /* end subroutine (setint_curend) */
 
 int setint_curenum(setint *op,setint_cur *curp,int *rp) noex {
 	int		rs = SR_FAULT ;
-	if (op && curp && rp) {
+	if (op && curp && rp) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->setp) {
+	    if (op->setp) ylikely {
 		rs = SR_BUGCHECK ;
-	        if (curp->interp) {
+	        if (curp->interp) ylikely {
 		    usetint	*setp = usetintp(op->setp) ;
 		    usetintit	it_end = setp->end() ;
 		    usetintit	*interp = usetintitp(curp->interp) ;
@@ -255,7 +246,6 @@ int setint_curenum(setint *op,setint_cur *curp,int *rp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (setint_curenum) */
+} /* end subroutine (setint_curenum) */
 
 
