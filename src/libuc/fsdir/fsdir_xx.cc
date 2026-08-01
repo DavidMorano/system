@@ -39,24 +39,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/dirent.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<memory>		/* |destroy_at(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<intsat.h>
-#include	<snwcpy.h>
-#include	<cfdec.h>
-#include	<localmisc.h>
-#include	<posixdirent.hh>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/dirent.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<memory>		/* C++STD |destroy_at(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<posixdirent.hh>	/* LIBUC */
 
 #include	"fsdir.h"
 
@@ -98,7 +98,7 @@ using std::destroy_at ;			/* subroutine */
 int fsdir::isdir(cchar *dname) noex {
 	int		rs ;
 	int		f = false ;
-	if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) ylikely {
 	    rs = SR_NOTDIR ;
 	    if (S_ISDIR(sb.st_mode)) {
 		dev = sb.st_dev ;
@@ -112,17 +112,15 @@ int fsdir::isdir(cchar *dname) noex {
 int fsdir_opener::operator () (cchar *n) noex {
 	if (n == nullptr) n = name ;
 	return fsdir_open(op,n) ;
-}
-/* end method (fsdir_opener:operator) */
+} /* end method (fsdir_opener:operator) */
 
 fsdir_opener::operator int () noex {
 	return fsdir_open(op,name) ;
-}
-/* end method (fsdir_opener:operator) */
+} /* end method (fsdir_opener:operator) */
 
 int fsdir_te::operator () (off_t *offp) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case fsdirmem_tell:
 	        rs = fsdir_tell(op,offp) ;
@@ -130,12 +128,11 @@ int fsdir_te::operator () (off_t *offp) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (fsdir_co::operator) */
+} /* end method (fsdir_co::operator) */
 
 fsdir_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case fsdirmem_rewind:
 	        rs = fsdir_rewind(op) ;
@@ -149,8 +146,7 @@ fsdir_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (fsdir_co::operator) */
+} /* end method (fsdir_co::operator) */
 
 int fsdir::read(fsdir_ent *ep,char *ebuf,int elen) noex {
 	return fsdir_read(this,ep,ebuf,elen) ;
@@ -164,6 +160,6 @@ void fsdir::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("fsdir",rs,"dtor-close") ;
 	}
-}
+} /* end method (fsdir::dtor) */
 
 
