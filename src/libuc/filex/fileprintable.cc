@@ -109,7 +109,6 @@ int fileprintable(cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? int(!f) : rs ;
-}
-/* end subroutine (fileprintable) */
+} /* end subroutine (fileprintable) */
 
 
