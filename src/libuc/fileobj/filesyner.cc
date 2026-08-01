@@ -34,18 +34,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<umem.hh>
-#include	<ulogerror.h>
-#include	<strnul.hh>
-#include	<localmisc.h>
-#include	<dprint.hh>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<umem.hh>		/* LIBUC */
+#include	<strnul.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU */
 
 #include	"filesyner.hh"
 
