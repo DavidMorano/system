@@ -47,14 +47,14 @@ struct zdb_co {
 struct zdb : zdb_head {
 	zdb_co		count ;
 	zdb() noex {
-	    count(this,zdbmem_count) ;
+	    count	(this,zdbmem_count) ;
 	} ;
 	zdb(const zdb &) = delete ;
 	zdb &operator = (const zdb &) = delete ;
-	int nameoff(cchar *,int,int) noex ;
-	int setname(cchar *,int) noex ;
-	int setoff(int) noex ;
-	int offisdst(int,int) noex ;
+	int nameoff	(cchar *,int,int) noex ;
+	int setname	(cchar *,int) noex ;
+	int setoff	(int) noex ;
+	int offisdst	(int,int) noex ;
 } ; /* end struct (zdb) */
 #else	/* __cplusplus */
 typedef ZDB		zdb ;
