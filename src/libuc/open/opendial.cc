@@ -47,15 +47,15 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<dial.h>		/* <- money shot! */
-#include	<opendials.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<dial.h>		/* LIBUC <- money shot! */
+#include	<opendials.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"opendial.h"
 
@@ -165,7 +165,6 @@ int opendial(int di,int af,cc *hn,cc *ps,cc *svc,
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (opendial) */
+} /* end subroutine (opendial) */
 
 
