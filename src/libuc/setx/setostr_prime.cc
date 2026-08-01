@@ -27,16 +27,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++) */
-#include	<utility>		/* |pair(3c++)| */
-#include	<string>		/* |string(3c++)| */
-#include	<set>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++) */
+#include	<utility>		/* C++STD |pair(3c++)| */
+#include	<string>		/* C++STD |string(3c++)| */
+#include	<set>			/* C++SYD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"setostr.h"
 
@@ -75,7 +75,7 @@ typedef	set<string>::iterator *	iterp ;
 template<typename ... Args>
 local inline int setostr_magic(setostr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == setostr_magicval) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -91,28 +91,27 @@ local inline int setostr_magic(setostr *op,Args ... args) noex {
 /* exported subroutines */
 
 int setostr_start(setostr *op,int n) noex {
-	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (n < 0) n = 0 ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
-	    if (setstr *setp ; (setp = new(nothrow) setstr) != np) ylikely {
+	    if (setstr *setp = new(nt) setstr ; setp) ylikely {
 	        op->setp = setp ;
 		op->magval = setostr_magicval ;
 		rs = SR_OK ;
 	    } /* end if (new-setsrt) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (setostr_start) */
+} /* end subroutine (setostr_start) */
 
 int setostr_finish(setostr *op) noex {
 	int		rs ;
 	if ((rs = setostr_magic(op)) >= 0) ylikely {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    rs = SR_BADFMT ;
-	    if (setp) {
+	    if (setp) ylikely {
 		rs = SR_OK ;
 	        delete setp ;
 	        op->setp = nullptr ;
@@ -120,17 +119,16 @@ int setostr_finish(setostr *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (setostr_finish) */
+} /* end subroutine (setostr_finish) */
 
 int setostr_already(setostr *op,cchar *sp,int sl) noex {
-	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs ;
 	int		f = true ;
 	if ((rs = setostr_magic(op,sp)) >= 0) ylikely {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (string *strp ; (strp = new(nothrow) string(sp,sl)) != np) {
+	    if (string *strp = new(nt) string(sp,sl) ; strp) ylikely {
 	        iter	ite = setp->end() ;
 	        if (iter it ; (it = setp->find(*strp)) == ite) {
 	            f = false ;
@@ -141,8 +139,7 @@ int setostr_already(setostr *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (setostr_already) */
+} /* end subroutine (setostr_already) */
 
 int setostr_add(setostr *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -156,8 +153,7 @@ int setostr_add(setostr *op,cchar *sp,int sl) noex {
 	    f = (ret.second == false) ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (setostr_add) */
+} /* end subroutine (setostr_add) */
 
 int setostr_del(setostr *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -175,8 +171,7 @@ int setostr_del(setostr *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (setostr_del) */
+} /* end subroutine (setostr_del) */
 
 int setostr_delall(setostr *op) noex {
 	int		rs ;
@@ -190,8 +185,7 @@ int setostr_delall(setostr *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (setostr_delall) */
+} /* end subroutine (setostr_delall) */
 
 int setostr_count(setostr *op) noex {
 	int		rs ;
@@ -204,8 +198,7 @@ int setostr_count(setostr *op) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (setostr_count) */
+} /* end subroutine (setostr_count) */
 
 int setostr_curbegin(setostr *op,setostr_cur *curp) noex {
 	cnullptr	np{} ;
@@ -220,8 +213,7 @@ int setostr_curbegin(setostr *op,setostr_cur *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (setostr_curbegin) */
+} /* end subroutine (setostr_curbegin) */
 
 int setostr_curend(setostr *op,setostr_cur *curp) noex {
 	int		rs ;
@@ -235,8 +227,7 @@ int setostr_curend(setostr *op,setostr_cur *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (setostr_curend) */
+} /* end subroutine (setostr_curend) */
 
 int setostr_curenum(setostr *op,setostr_cur *curp,cchar **rpp) noex {
 	int		rs ;
@@ -258,8 +249,7 @@ int setostr_curenum(setostr *op,setostr_cur *curp,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (setostr_curenum) */
+} /* end subroutine (setostr_curenum) */
 
 int setostr::already(cchar *sp,int sl) noex {
 	return setostr_already(this,sp,sl) ;
