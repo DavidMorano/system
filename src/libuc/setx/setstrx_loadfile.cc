@@ -66,16 +66,17 @@
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<intsat.h>
-#include	<filer.h>
-#include	<field.h>
-#include	<fieldterminit.hh>
-#include	<sfx.h>			/* |sfcontent(3uc)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<intsat.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC |sfcontent(3uc)| */
 #include	<localmisc.h>		/* LIBU |BCEIL(3u)| */
 
 #include	"setstrx.hh"
@@ -97,11 +98,6 @@ using std::max ;			/* subroutine-template */
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-} /* end extern */
-
 
 /* external variables */
 
@@ -118,11 +114,11 @@ namespace {
 	    fd = FD_STDIN ;
 	} ;
 	int operator () (cchar *) noex ;
-	int fileopen(cchar *) noex ;
-	int fileclose() noex ;
-	int loadfd() noex ;
-	int loadfds(int,int,int) noex ;
-	int loadln(cchar *,int) noex ;
+	int fileopen	(cchar *) noex ;
+	int fileclose	() noex ;
+	int loadfd	() noex ;
+	int loadfds	(int,int,int) noex ;
+	int loadln	(cchar *,int) noex ;
     } ; /* end struct (suber) */
 } /* end namespace */
 
@@ -143,9 +139,9 @@ static constexpr fieldterminit		ft("\n#") ;
 int setstrx::loadfile(int fu,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 		suber sub(this,fu) ;
 		rs = sub(fname) ;
 		c = rs ;
@@ -226,16 +222,15 @@ int suber::loadfd() noex {
 	    }
 	} /* end if (stat) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (suber::loadfd) */
+} /* end method (suber::loadfd) */
 
 int suber::loadfds(int fbsz,int fbo,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 	    cint	llen = rs ;
-	    if (filer fb ; (rs = fb.start(fd,0z,fbsz,fbo)) >= 0) {
+	    if (filer fb ; (rs = fb.start(fd,0z,fbsz,fbo)) >= 0) ylikely {
 	        while ((rs = fb.readln(lbuf,llen,to)) > 0) {
 		    cchar	*cp{} ;
 		    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
@@ -257,7 +252,7 @@ int suber::loadln(cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
+	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) ylikely {
 	    cchar	*fp ;
 	    for (int fl ; (fl = fsb.get(ft.terms,&fp)) >= 0 ; ) {
 		if (fl > 0) {
