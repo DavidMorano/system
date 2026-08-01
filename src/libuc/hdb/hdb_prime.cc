@@ -838,8 +838,7 @@ int hdb_audit(hdb *op) noex {
             } /* end if (OK) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdb_audit) */
+} /* end subroutine (hdb_audit) */
 
 
 /* private subroutines */
