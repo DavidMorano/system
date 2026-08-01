@@ -54,15 +54,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<utmpent.h>
-#include	<mknpathx.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<utmpent.h>		/* LIBUC */
+#include	<mknpathx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getutmpent.h"
 #include	"getutmpterm.h"
@@ -102,8 +102,7 @@ int getutmpterm(char *rbuf,int rlen,pid_t sid) noex {
 	    } /* end if (getutmpent) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getutmpterm) */
+} /* end subroutine (getutmpterm) */
 
 
 /* local subroutines */
