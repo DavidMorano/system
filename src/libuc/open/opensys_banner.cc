@@ -29,23 +29,23 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucfileop.h>
-#include	<tmtime.hh>
-#include	<sntmtime.h>
-#include	<filer.h>
-#include	<filemap.h>
-#include	<rmx.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| + |COLUMNS| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<sntmtime.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<filemap.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| + |COLUMNS| */
 
 #include	"opensys.h"
 
@@ -82,16 +82,16 @@ using std::max ;			/* subroutine-template */
 
 /* forward references */
 
-static int	process(cchar *,int) noex ;
-static int	procfiler(filer *,cchar *,int) noex ;
-static int	procfile_map(filer *,cchar *,int) noex ;
-static int	procfile_reg(filer *,cchar *,int) noex ;
-static int	printend(filer *,cchar *,cchar *,int) noex ;
-static int	printsub(filer *,cchar *,cchar *,int) noex ;
+local int	process(cchar *,int) noex ;
+local int	procfiler(filer *,cchar *,int) noex ;
+local int	procfile_map(filer *,cchar *,int) noex ;
+local int	procfile_reg(filer *,cchar *,int) noex ;
+local int	printend(filer *,cchar *,cchar *,int) noex ;
+local int	printsub(filer *,cchar *,cchar *,int) noex ;
 
-static int	filer_char(filer *,int) noex ;
+local int	filer_char(filer *,int) noex ;
 
-static bool	isreadable(int) noex ;
+local bool	isreadable(int) noex ;
 
 
 /* local variables */
@@ -127,26 +127,24 @@ int opensys_banner(cchar *fname,int of,mode_t om) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opensys_banner) */
+} /* end subroutine (opensys_banner) */
 
 
 /* local subroutines */
 
-static int process(cchar *ds,int f_top) noex {
+local int process(cchar *ds,int f_top) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	int		pipes[2] ;
-	if ((rs = uc_pipe(pipes)) >= 0) {
-	    filer	wfile, *wfp = &wfile ;
+	if (int pipes[2] ; (rs = uc_pipe(pipes)) >= 0) {
 	    cint	wfd = pipes[1] ;
 	    fd = pipes[0] ;
-	    if ((rs = filer_start(wfp,wfd,0z,0,0)) >= 0) {
+	    if (filer wf ;
+	    (rs = wf.start(wfd,0z,0,0)) >= 0) {
 		{
-	            rs = procfiler(wfp,ds,f_top) ;
+	            rs = procfiler(&wf,ds,f_top) ;
 		}
-	        rs1 = filer_finish(wfp) ;
+	        rs1 = wf.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
 	    rs1 = uc_close(wfd) ;
@@ -154,12 +152,11 @@ static int process(cchar *ds,int f_top) noex {
 	} /* end if (pipes) */
 	if ((rs < 0) && (fd >= 0)) {
 	    uc_close(fd) ;
-	}
+	} /* end if (error) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (process) */
+} /* end subroutine (process) */
 
-static int procfiler(filer *wfp,cchar *ds,int f_top) noex {
+local int procfiler(filer *wfp,cchar *ds,int f_top) noex {
 	int		rs ;
 	if_constexpr (f_filemap) {
 	    rs = procfile_map(wfp,ds,f_top) ;
@@ -167,9 +164,9 @@ static int procfiler(filer *wfp,cchar *ds,int f_top) noex {
 	    rs = procfile_reg(wfp,ds,f_top) ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
-static int procfile_map(filer *wfp,cchar *ds,int f_top) noex {
+local int procfile_map(filer *wfp,cchar *ds,int f_top) noex {
 	filemap		sysban, *sfp = &sysban ;
 	cint		maxsize = (5*1024) ;
 	int		rs ;
@@ -197,10 +194,9 @@ static int procfile_map(filer *wfp,cchar *ds,int f_top) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filemap) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procfile_map) */
+} /* end subroutine (procfile_map) */
 
-static int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
+local int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -239,10 +235,9 @@ static int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procfile_reg) */
+} /* end subroutine (procfile_reg) */
 
-static int printend(filer *wfp,cchar *ds,cchar *lbuf,int len) noex {
+local int printend(filer *wfp,cchar *ds,cchar *lbuf,int len) noex {
 	cint		cols = COLUMNS ;
 	cint		dl = lenstr(ds) ;
 	int		rs = SR_OK ;
@@ -272,10 +267,9 @@ static int printend(filer *wfp,cchar *ds,cchar *lbuf,int len) noex {
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (printend) */
+} /* end subroutine (printend) */
 
-static int printsub(filer *wfp,cchar *ds,cchar *lbuf,int llen) noex {
+local int printsub(filer *wfp,cchar *ds,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		di = 0 ;
 	int		wlen = 0 ;
@@ -291,25 +285,22 @@ static int printsub(filer *wfp,cchar *ds,cchar *lbuf,int llen) noex {
 	if (rs >= 0) {
 	    rs = filer_char(wfp,'\n') ;
 	    wlen += rs ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (printsub) */
+} /* end subroutine (printsub) */
 
-static int filer_char(filer *wfp,int ch) noex {
+local int filer_char(filer *wfp,int ch) noex {
 	char		wbuf[2] ;
 	wbuf[0] = charconv(ch) ;
 	wbuf[1] = '\0' ;
 	return filer_write(wfp,wbuf,1) ;
-}
-/* end subroutine (filer_char) */
+} /* end subroutine (filer_char) */
 
-static bool isreadable(int of) noex {
+local bool isreadable(int of) noex {
 	bool		f = false ;
 	f = f || ((of & O_RDONLY) == O_RDONLY) ;
 	f = f || ((of & O_RDWR) == O_RDWR ) ;
 	return f ;
-}
-/* end subroutine (isreadable) */
+} /* end subroutine (isreadable) */
 
 
