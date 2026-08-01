@@ -26,21 +26,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<filer.h>
-#include	<intsat.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fdliner.h"
 
@@ -65,8 +65,8 @@
 
 /* forward references */
 
-static int	fdliner_starter(fdliner *,int) noex ;
-static int	fdliner_bufsize(fdliner *,int) noex ;
+local int	fdliner_starter(fdliner *,int) noex ;
+local int	fdliner_bufsize(fdliner *,int) noex ;
 
 
 /* local variables */
@@ -79,9 +79,9 @@ static int	fdliner_bufsize(fdliner *,int) noex ;
 
 int fdliner_start(fdliner *op,int mfd,off_t foff,int to) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_BADF ;
-	    if (mfd >= 0) {
+	    if (mfd >= 0) ylikely {
 		cint	osz = szof(filer) ;
 	        op->poff = 0 ;
 	        op->foff = foff ;
@@ -89,9 +89,9 @@ int fdliner_start(fdliner *op,int mfd,off_t foff,int to) noex {
 	        op->to = to ;
 	        op->llen = 0 ;
 	        op->lbuf = nullptr ;
-		if (void *vp{} ; (rs = lm_mall(osz,&vp)) >= 0) {
+		if (void *vp ; (rs = lm_mall(osz,&vp)) >= 0) ylikely {
 		    op->fbp = (filer *) vp ;
-		    if (char *lp ; (rs = lm_ml(&lp)) >= 0) {
+		    if (char *lp ; (rs = lm_ml(&lp)) >= 0) ylikely {
 			op->lbuf = lp ;
 			op->llen = rs ;
 			rs = fdliner_starter(op,mfd) ;
@@ -99,23 +99,22 @@ int fdliner_start(fdliner *op,int mfd,off_t foff,int to) noex {
 			    lm_free(op->lbuf) ;
 			    op->lbuf = nullptr ;
 			    op->llen = 0 ;
-			}
+			} /* end if (error) */
 		    } /* end if (m-a) */
 		    if (rs < 0) {
 			lm_free(op->fbp) ;
 			op->fbp = nullptr ;
-		    }
+		    } /* end if (error) */
 		} /* end if (m-a) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fdliner_start) */
+} /* end subroutine (fdliner_start) */
 
 int fdliner_finish(fdliner *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->lbuf) {
 	        op->lbuf[0] = '\0' ;
@@ -123,7 +122,7 @@ int fdliner_finish(fdliner *op) noex {
 		if (rs >= 0) rs = rs1 ;
 		op->lbuf = nullptr ;
 	        op->llen = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->fbp) {
 		{
 		    rs1 = filer_finish(op->fbp) ;
@@ -137,13 +136,12 @@ int fdliner_finish(fdliner *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fdliner_finish) */
+} /* end subroutine (fdliner_finish) */
 
 int fdliner_getln(fdliner *op,cchar **lpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && lpp) {
+	if (op && lpp) ylikely {
 	    filer	*fbp = op->fbp ;
 	    rs = SR_OK ;
 	    if (op->llen < 0) {
@@ -161,23 +159,21 @@ int fdliner_getln(fdliner *op,cchar **lpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (fdliner_getln) */
+} /* end subroutine (fdliner_getln) */
 
 int fdliner_done(fdliner *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->llen = 0 ;
 	    op->lbuf[0] = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fdliner_done) */
+} /* end subroutine (fdliner_done) */
 
 int fdliner_adv(fdliner *lsp,int inc) noex {
     	int		rs = SR_FAULT ;
-	if (lsp) {
+	if (lsp) ylikely {
 	    rs = SR_OK ;
 	    lsp->poff = lsp->foff ;
 	    if (inc > 0) {
@@ -192,31 +188,28 @@ int fdliner_adv(fdliner *lsp,int inc) noex {
 }
 /* end subroutine (fdliner_adv) */
 
-
 /* local subroutines */
 
-static int fdliner_starter(fdliner *op,int mfd) noex {
+local int fdliner_starter(fdliner *op,int mfd) noex {
 	int		rs ;
-	if ((rs = fdliner_bufsize(op,mfd)) >= 0) {
+	if ((rs = fdliner_bufsize(op,mfd)) >= 0) ylikely {
 	    coff	foff = op->foff ;
 	    cint	bs = rs ;
 	    cint	fbo = op->fbo ;
 	    rs = filer_start(op->fbp,mfd,foff,bs,fbo) ;
 	}
 	return rs ;
-}
-/* end subroutine (fdliner_starter) */
+} /* end subroutine (fdliner_starter) */
 
-static int fdliner_bufsize(fdliner *op,int mfd) noex {
-	USTAT		sb ;
+local int fdliner_bufsize(fdliner *op,int mfd) noex {
 	int		rs ;
 	int		bs = 0 ;
-	if ((rs = u_fstat(mfd,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_fstat(mfd,&sb)) >= 0) ylikely {
 	    csize	im(INT_MAX) ;
-	    csize	fsz = size_t(sb.st_size) ;
+	    csize	fsize = size_t(sb.st_size) ;
 	    rs = SR_TOOBIG ;
-	    if (fsz <= im) {
-		cint	fs = intsat(fsz) ;
+	    if (fsize <= im) {
+		cint	fs = intsat(fsize) ;
 	        cmode	m = sb.st_mode ;
 	        bs = FDLINER_BUFSIZEDEF ;
 	        op->fl.fnet = S_ISCHR(m) || S_ISSOCK(m) || S_ISFIFO(m) ;
@@ -228,8 +221,7 @@ static int fdliner_bufsize(fdliner *op,int mfd) noex {
 	    } /* end if (can-handle) */
 	} /* end if (uc_fstat) */
 	return (rs >= 0) ? bs : rs ;
-}
-/* end subroutine (fdliner_bufsize) */
+} /* end subroutine (fdliner_bufsize) */
 
 int fdliner::start(int mfd,off_t off,int ato) noex {
 	return fdliner_start(this,mfd,off,ato) ;
@@ -243,11 +235,11 @@ void fdliner::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("fdliner",rs,"fini-finish") ;
 	}
-}
+} /* end method (fdliner::dtor) */
 
 int fdliner_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case fdlinermem_done:
 	        rs = fdliner_done(op) ;
@@ -261,7 +253,6 @@ int fdliner_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (fdliner_co::operator) */
+} /* end method (fdliner_co::operator) */
 
 
