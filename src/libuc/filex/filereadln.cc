@@ -41,7 +41,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -101,8 +101,7 @@ int filereadln(cchar *fname,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (filereadln) */
+} /* end subroutine (filereadln) */
 
 
 /* local subroutines */
