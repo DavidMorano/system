@@ -55,12 +55,12 @@ struct dayspec : dayspec_head {
 	dayspec_co	def ;
 	dayspec_co	yday ;
 	dayspec() noex {
-	    def(this,dayspecmem_def) ;
-	    yday(this,dayspecmem_yday) ;
+	    def		(this,dayspecmem_def) ;
+	    yday	(this,dayspecmem_yday) ;
 	} ;
 	dayspec(const dayspec &) = delete ;
 	dayspec &operator = (const dayspec &) = delete ;
-	int load(cchar *,int = -1) noex ;
+	int load	(cchar *,int = -1) noex ;
 } ; /* end struct (dayspec) */
 #else	/* __cplusplus */
 typedef DAYSPEC		dayspec ;
