@@ -28,24 +28,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* system-types */
-#include	<sys/param.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<string>		/* |string(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucentgr.h>
-#include	<getax.h>
-#include	<vechand.h>
-#include	<cq.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system-types */
+#include	<sys/param.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<new>			/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<string>		/* C++STD |string(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucentgr.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<cq.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"grcache.h"
 
