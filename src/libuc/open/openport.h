@@ -13,10 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sockaddress.h>
-#include	<openportmsg.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<openportmsg.h>		/* LIBUC */
 
 
 #define	OPERPORT_PROGNAME	"openport"
