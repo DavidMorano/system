@@ -28,16 +28,16 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<sockaddress.h>
-#include	<stdorder.h>
-#include	<serialbuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<stdorder.h>		/* LIBUC */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"openportmsg.h"
 
@@ -112,8 +112,7 @@ int openportmsg_msgrequest(OPM_REQ *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (openportmsg_msgrequest) */
+} /* end subroutine (openportmsg_msgrequest) */
 
 /* general response message */
 int openportmsg_msgresponse(OPM_RES *sp,int f,char *mbuf,int mlen) noex {
@@ -139,9 +138,7 @@ int openportmsg_msgresponse(OPM_RES *sp,int f,char *mbuf,int mlen) noex {
 	    rs1 = sb.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
-
 	return rs ;
-}
-/* end subroutine (openportmsg_msgresponse) */
+} /* end subroutine (openportmsg_msgresponse) */
 
 
