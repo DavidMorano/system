@@ -38,7 +38,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<csem.h>		/* <- counting semaphore (DAM) */
+#include	<csem.h>		/* LIBUC <- counting semaphore (DAM) */
 
 
 #define	EPSEM		csem		/* <- the "money" shot */
@@ -69,24 +69,24 @@ struct epsem_co {
 	} ;
 } ; /* end struct (epsem_co) */
 struct epsem : csem {
-	epsem_co		wait ;
-	epsem_co		waiter ;
-	epsem_co		trywait ;
-	epsem_co		post ;
-	epsem_co		count ;
-	epsem_co		destroy ;
+	epsem_co	wait ;
+	epsem_co	waiter ;
+	epsem_co	trywait ;
+	epsem_co	post ;
+	epsem_co	count ;
+	epsem_co	destroy ;
 	epsem() noex {
-	    wait(this,epsemmem_wait) ;
-	    waiter(this,epsemmem_waiter) ;
-	    trywait(this,epsemmem_trywait) ;
-	    post(this,epsemmem_post) ;
-	    count(this,epsemmem_count) ;
-	    destroy(this,epsemmem_destroy) ;
+	    wait	(this,epsemmem_wait) ;
+	    waiter	(this,epsemmem_waiter) ;
+	    trywait	(this,epsemmem_trywait) ;
+	    post	(this,epsemmem_post) ;
+	    count	(this,epsemmem_count) ;
+	    destroy	(this,epsemmem_destroy) ;
 	    magval = 0 ;
 	} ; /* end ctor */
 	epsem(const epsem &) = delete ;
 	epsem &operator = (const epsem &) = delete ;
-	int create(int = 0,int = -1) noex ;
+	int create	(int = 0,int = -1) noex ;
 	void dtor() noex ;
 	operator int () noex ;
 	destruct epsem() {
