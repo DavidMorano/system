@@ -27,22 +27,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |getustime(3u)| */
-#include	<uclibmem.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<realname.h>
-#include	<mkgecosname.h>
-#include	<strwcpy.h>
-#include	<strdcpy.h>
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |getustime(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<realname.h>		/* LIBUC */
+#include	<mkgecosname.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strdcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
 #include	"namecache.h"
 
