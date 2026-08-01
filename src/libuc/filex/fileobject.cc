@@ -39,7 +39,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |CHAR_BIT| | |UCHAR_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |memcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
@@ -138,8 +138,7 @@ int fileobject(cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (fileobject) */
+} /* end subroutine (fileobject) */
 
 
 /* local subroutines */
