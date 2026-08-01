@@ -5,7 +5,7 @@
 /* does the given string have all of the given characters? */
 /* version %I% last-modified %G% */
 
-#define	CF_bitsET	1		/* compile in alternative version */
+#define	CF_BITSET	1		/* compile in alternative version */
 
 /* revision history:
 
@@ -42,7 +42,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<bitset>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
@@ -57,8 +57,8 @@
 
 /* local defines */
 
-#ifndef	CF_bitsET
-#define	CF_bitsET	1		/* compile in alternative version */
+#ifndef	CF_BITSET
+#define	CF_BITSET	1		/* compile in alternative version */
 #endif
 
 
@@ -88,7 +88,7 @@ local int conallof_dupstr(cchar *,int,cchar *) noex ;
 /* local variables */
 
 cint		nchars		= (UCHAR_MAX + 1) ;
-cbool		f_bitset	= CF_bitsET ;
+cbool		f_bitset	= CF_BITSET ;
 
 
 /* exported variables */
@@ -112,8 +112,7 @@ int conallof(cchar *sp,int sl,cchar *tstr) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (conallof) */
+} /* end subroutine (conallof) */
 
 
 /* local subroutines */
