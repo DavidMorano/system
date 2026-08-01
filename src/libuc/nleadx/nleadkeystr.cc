@@ -41,15 +41,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<mkchar.h>		/* **currently unused** */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU **currently unused** */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nleadkeystr.h"
 
@@ -87,7 +87,6 @@ int nleadkeystr(cchar *bs,cchar *sp,int sl) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return i ;
-}
-/* end subroutine (nleadkeystr) */
+} /* end subroutine (nleadkeystr) */
 
 
