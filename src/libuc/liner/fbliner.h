@@ -31,11 +31,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |off_t| */
-#include	<unistd.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<filer.h>
+#include	<sys/types.h>		/* POSIX® |off_t| */
+#include	<unistd.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<filer.h>		/* LIBUC */
 
 
 #define	FBLINER		struct fbliner_head
@@ -75,15 +75,15 @@ struct fbliner : fbliner_head {
 	fbliner_co	adv ;
 	fbliner_co	finish ;
 	fbliner() noex {
-	    done(this,fblinermem_done) ;
-	    adv(this,fblinermem_adv) ;
-	    finish(this,fblinermem_finish) ;
+	    done	(this,fblinermem_done) ;
+	    adv		(this,fblinermem_adv) ;
+	    finish	(this,fblinermem_finish) ;
 	    fbp = nullptr ;
 	} ; /* end ctor */
 	fbliner(const fbliner &) = delete ;
 	fbliner &operator = (const fbliner &) = delete ;
-	int start(filer *,off_t = 0z,int = -1) noex ;
-	int getln(cchar **) noex ;
+	int start	(filer *,off_t = 0z,int = -1) noex ;
+	int getln	(cchar **) noex ;
 	void dtor() noex ;
 	destruct fbliner() {
 	    if (fbp) dtor() ;
@@ -95,11 +95,11 @@ typedef FBLINER		fbliner ;
 
 EXTERNC_begin
 
-extern int fbliner_start(fbliner *,filer *,off_t,int) noex ;
-extern int fbliner_getln(fbliner *,cchar **) noex ;
-extern int fbliner_done(fbliner *) noex ;
-extern int fbliner_adv(fbliner *,int) noex ;
-extern int fbliner_finish(fbliner *) noex ;
+extern int fbliner_start	(fbliner *,filer *,off_t,int) noex ;
+extern int fbliner_getln	(fbliner *,cchar **) noex ;
+extern int fbliner_done		(fbliner *) noex ;
+extern int fbliner_adv		(fbliner *,int) noex ;
+extern int fbliner_finish	(fbliner *) noex ;
 
 EXTERNC_end
 
