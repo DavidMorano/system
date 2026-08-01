@@ -42,17 +42,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* <- for |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<bufsizevar.hh>
-#include	<ccfile.hh>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<ccfile.hh>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hdbstr.h"
 
@@ -78,17 +78,14 @@
 
 /* forward references */
 
-static int	hdbstr_load(hdbstr *,char *,int,cchar *) noex ;
-
-static int	mkterms() noex ;
+local int	hdbstr_load(hdbstr *,char *,int,cchar *) noex ;
+local int	mkterms() noex ;
 
 
 /* local variables */
 
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
 static bufsizevar	maxlinelen(bufsize_ml) ;
-
 static char		fterms[termsize] ;
 
 
@@ -101,12 +98,11 @@ int hdbstr_loadkeys(hdbstr *op,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (op && fname) {
+	if (op && fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-		static cint	srs = mkterms() ;
-	        if ((rs = srs) >= 0) {
-		    if ((rs = maxlinelen) >= 0) {
+	    if (fname[0]) ylikely {
+		if (static cint srs = mkterms() ; (rs = srs) >= 0) ylikely {
+		    if ((rs = maxlinelen) >= 0) ylikely {
 		        cint	llen = (rs * NLINES) ;
 		        char	*lbuf{} ;
 		        if ((rs = lm_mall((llen+1),&lbuf)) >= 0) {
@@ -122,20 +118,19 @@ int hdbstr_loadkeys(hdbstr *op,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end suberoutine (hdbstr_loadkeys) */
+} /* end suberoutine (hdbstr_loadkeys) */
 
 
 /* local subroutines */
 
-static int hdbstr_load(hdbstr *op,char *lbuf,int llen,cchar *fn) noex {
+local int hdbstr_load(hdbstr *op,char *lbuf,int llen,cchar *fn) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (ccfile kf ; (rs = kf.open(fn)) >= 0) {
+	if (ccfile kf ; (rs = kf.open(fn)) >= 0) ylikely {
 	    while ((rs = kf.readln(lbuf,llen)) > 0) {
-	        if (field fsb ; (rs = fsb.start(lbuf,rs)) >= 0) {
+	        if (field fsb ; (rs = fsb.start(lbuf,rs)) >= 0) ylikely {
 		    cchar	*fp{} ;
 	            for (int fl ; (fl = fsb.get(fterms,&fp)) >= 0 ; ) {
 	                if (fl > 0) {
@@ -154,12 +149,10 @@ static int hdbstr_load(hdbstr *op,char *lbuf,int llen,cchar *fn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ccfile) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (hdbstr_load) */
+} /* end subroutine (hdbstr_load) */
 
-static int mkterms() noex {
+local int mkterms() noex {
 	return fieldterms(fterms,false,',','#') ;
-}
-/* end subroutine (mkterms) */
+} /* end subroutine (mkterms) */
 
 
