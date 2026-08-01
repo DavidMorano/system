@@ -20,18 +20,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	ipow(int,int) noex ;
-extern long	lpow(long,int) noex ;
-extern longlong	llpow(longlong,int) noex ;
+extern int	ipow	(int,int) noex ;
+extern long	lpow	(long,int) noex ;
+extern longlong	llpow	(longlong,int) noex ;
 
 static inline int ipowell(int b,int e) noex {
 	return ipow(b,e) ;
