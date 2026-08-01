@@ -26,17 +26,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include        <sys/types.h>		/* |uid_t| */
-#include        <ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include        <cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |getustime(3u)| */
-#include	<uclibmem.h>
-#include        <ucgetpw.h>
-#include        <strwcpy.h>
-#include        <localmisc.h>
+#include        <sys/types.h>		/* POSIX® |uid_t| */
+#include        <ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |getustime(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include        <ucgetpw.h>		/* LIBUC */
+#include        <strwcpy.h>		/* LIBUC */
+#include        <localmisc.h>		/* LIBU */
 
 #include        "pwcache.h"
 
@@ -71,7 +71,7 @@ enum cts {
         ct_miss,
         ct_hit,
         ct_overlast
-} ;
+} ; /* end enum */
 
 struct pwcache_rec : pq_ent {
         char            *un ;		/* allocated: username */
@@ -81,7 +81,7 @@ struct pwcache_rec : pq_ent {
         time_t          ti_access ;
         uint            wcount ;
         int             pwl ;
-} ;
+} ; /* end struct */
 
 typedef pwcache_rec	rec ;
 typedef pwcache_rec *	recp ;
@@ -120,8 +120,7 @@ local inline int pwcache_ctor(pwcache *op,Args ... args) noex {
 	    } /* end if (new-hdb) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (pwcache_ctor) */
+} /* end method (pwcache_ctor) */
 
 local inline int pwcache_dtor(pwcache *op) noex {
 	int		rs = SR_FAULT ;
@@ -619,7 +618,7 @@ local int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
                 ep->ti_create = dt ;
                 ep->ti_access = dt ;
                 ep->wcount = wc ;
-            }
+            } /* end if (ok) */
 	    if (rs < 0) {
 		record_finish(ep) ;
 	    } /* end if (error) */
@@ -632,7 +631,7 @@ local int record_loadun(rec *ep,ucentpw *pwp) noex {
 	cchar		*un = pwp->pw_name ;
 	if (cchar *cp ; (rs = lm_strw(un,-1,&cp)) >= 0) ylikely {
 	    ep->un = cast_const<charp>(cp) ;
-	}
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (record_loadun) */
 
@@ -645,12 +644,12 @@ local int record_finish(rec *ep) noex {
                 rs1 = lm_free(ep->pwbuf) ;
                 if (rs >= 0) rs = rs1 ;
                 ep->pwbuf = nullptr ;
-            }
+            } /* end if (memory-release) */
 	    if (ep->un) ylikely {
                 rs1 = lm_free(ep->un) ;
                 if (rs >= 0) rs = rs1 ;
                 ep->un = nullptr ;
-	    }
+	    } /* end if (memory-release) */
             ep->pwl = 0 ;
 	} /* end if (non-null) */
         return rs ;
@@ -698,7 +697,7 @@ local int record_refresh(rec *ep,time_t dt,int wc) noex {
                     if (ep->pwbuf != nullptr) {
                         lm_free(ep->pwbuf) ;
                         ep->pwbuf = nullptr ;
-                    }
+                    } /* end if (memory-release) */
                     ep->pwl = 0 ;
                     pwl = 0 ; /* indicates an empty (not-found) entry */
                 } /* end if (getpw_name) */
@@ -709,7 +708,7 @@ local int record_refresh(rec *ep,time_t dt,int wc) noex {
                 ep->ti_create = dt ;
                 ep->ti_access = dt ;
                 ep->wcount = wc ;
-            }
+            } /* end if (ok) */
 	} /* end if (non-null) */
         return (rs >= 0) ? pwl : rs ;
 } /* end subroutine (record_refresh) */
