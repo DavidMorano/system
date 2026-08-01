@@ -32,15 +32,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
-#include	<strpack.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
+#include	<strpack.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mapstrs.h"
 
@@ -89,8 +89,7 @@ local int mapstrs_ctor(mapstrs *op,Args ... args) noex {
 	    } /* end if (new_hdb) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapstrs_ctor) */
+} /* end subroutine (mapstrs_ctor) */
 
 local int mapstrs_dtor(mapstrs *op) noex {
 	int		rs = SR_FAULT ;
@@ -106,18 +105,16 @@ local int mapstrs_dtor(mapstrs *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapstrs_dtor) */
+} /* end subroutine (mapstrs_dtor) */
 
 template<typename ... Args>
 local inline int mapstrs_magic(mapstrs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MAPSTRS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAPSTRS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mapstrs_magic) */
+} /* end subroutine (mapstrs_magic) */
 
 
 /* local variables */
@@ -137,7 +134,7 @@ int mapstrs_start(mapstrs *op,int n) noex {
 	        strpack	*spp = op->spp ;
 	        cint	csz = MAPSTRS_CHUNKSZ ;
 	        if ((rs = strpack_start(spp,csz)) >= 0) ylikely {
-		    op->magic = MAPSTRS_MAGIC ;
+		    op->magval = MAPSTRS_MAGIC ;
 		}
 	        if (rs < 0) {
 		    hdb_finish(op->dbp) ;
@@ -148,8 +145,7 @@ int mapstrs_start(mapstrs *op,int n) noex {
 	    }
 	} /* end if (mapstrs_ctor) */
 	return rs ;
-}
-/* end subroutine (mapstrs_start) */
+} /* end subroutine (mapstrs_start) */
 
 int mapstrs_finish(mapstrs *op) noex {
 	int		rs ;
@@ -164,11 +160,10 @@ int mapstrs_finish(mapstrs *op) noex {
 	        rs1 = hdb_finish(op->dbp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mapstrs_finish) */
+} /* end subroutine (mapstrs_finish) */
 
 int mapstrs_add(mapstrs *op,cchar *kp,int µkl,cchar *vp,int vl) noex {
 	int		rs ;
@@ -201,8 +196,7 @@ int mapstrs_add(mapstrs *op,cchar *kp,int µkl,cchar *vp,int vl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mapstrs_add) */
+} /* end subroutine (mapstrs_add) */
 
 int mapstrs_del(mapstrs *op,cchar *kp,int kl) noex {
 	int		rs ;
@@ -215,8 +209,7 @@ int mapstrs_del(mapstrs *op,cchar *kp,int kl) noex {
 	    rs = hdb_delkey(hlp,key) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mapstrs_del) */
+} /* end subroutine (mapstrs_del) */
 
 int mapstrs_count(mapstrs *op) noex {
 	int		rs ;
@@ -224,8 +217,7 @@ int mapstrs_count(mapstrs *op) noex {
 	    rs = hdb_count(op->dbp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mapstrs_count) */
+} /* end subroutine (mapstrs_count) */
 
 int mapstrs_present(mapstrs *op,cchar *kp,int kl,cchar **rpp) noex {
     	cnullptr	np{} ;
@@ -250,7 +242,6 @@ int mapstrs_present(mapstrs *op,cchar *kp,int kl,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (mapstrs_present) */
+} /* end subroutine (mapstrs_present) */
 
 
