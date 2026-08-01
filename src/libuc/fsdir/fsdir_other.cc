@@ -41,26 +41,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysflag.h>
+#include	<usysflag.h>		/* LINU */
 
 #if	F_SUNOS || F_LINUX || (defined(CF_TEST) && (CF_TEST > 0))
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<dirent.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<intsat.h>
-#include	<snwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<dirent.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fsdir.h"
 
@@ -233,8 +233,7 @@ int fsdir_close(fsdir *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_close) */
+} /* end subroutine (fsdir_close) */
 
 #ifdef	COMMENT
 typedef struct dirent {
@@ -257,8 +256,7 @@ int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_read) */
+} /* end subroutine (fsdir_read) */
 
 int fsdir_tell(fsdir *op,off_t *offp) noex {
 	int		rs ;
@@ -270,8 +268,7 @@ int fsdir_tell(fsdir *op,off_t *offp) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_tell) */
+} /* end subroutine (fsdir_tell) */
 
 int fsdir_seek(fsdir *op,off_t o) noex {
 	int		rs ;
@@ -283,8 +280,7 @@ int fsdir_seek(fsdir *op,off_t o) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_seek) */
+} /* end subroutine (fsdir_seek) */
 
 int fsdir_rewind(fsdir *op) noex {
 	int		rs ;
@@ -296,8 +292,7 @@ int fsdir_rewind(fsdir *op) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_rewind) */
+} /* end subroutine (fsdir_rewind) */
 
 int fsdir_audit(fsdir *op) noex {
 	int		rs ;
@@ -309,15 +304,14 @@ int fsdir_audit(fsdir *op) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fsdir_audit) */
+} /* end subroutine (fsdir_audit) */
 
 
 /* private subroutines */
 
 int othermgr::open(cchar *dname) noex {
     	int		rs ;
-	if ((rs = fdbegin(dname)) >= 0) {
+	if ((rs = fdbegin(dname)) >= 0) ylikely {
 	    if (ustat sb ; (rs = u_fstat(dfd,&sb)) >= 0) ylikely {
 		rs = SR_NOTDIR ;
 		if (S_ISDIR(sb.st_mode)) ylikely {
@@ -339,7 +333,7 @@ int othermgr::open(cchar *dname) noex {
 	    } /* end if (stat) */
 	    if (rs < 0) {
 	        fdend() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (othermgr_begin) */
 	return rs ;
 } /* end method (othermgr::open) */
@@ -351,7 +345,7 @@ int othermgr::close() noex {
 	    rs1 = lm_free(bdata) ;
 	    if (rs >= 0) rs = rs1 ;
 	    bdata = nullptr ;
-	}
+	} /* end if (memory-release) */
 	{
 	    rs1 = fdend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -402,7 +396,7 @@ int othermgr::seek(off_t o) noex {
 	    doff = intoff_t(o) ;
 	    eoff = intoff_t(o) ;
 	    ei = 0 ;
-	}
+	} /* end if */
 	return rs ;
 } /* end method (othermgr::seek) */
 
