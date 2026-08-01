@@ -57,17 +57,17 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<utility>		/* |unreachable()| + |pair(3c++)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<unordered_set>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<utility>		/* CSTD |pair(3c++)| */
+#include	<new>			/* C++STD */
+#include	<unordered_set>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/addrset.ccm"
 
@@ -139,8 +139,7 @@ int addrset::ins(cvoid *addr,size_t asize) noex {
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (addrset::ins) */
+} /* end method (addrset::ins) */
 
 int addrset::rem(cvoid *addr) noex {
 	int		rs = SR_NOTOPEN ;
@@ -154,8 +153,7 @@ int addrset::rem(cvoid *addr) noex {
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (addrset::present) */
+} /* end method (addrset::present) */
 
 int addrset::present(cvoid *addr) noex {
 	int		rs = SR_NOTOPEN ;
@@ -172,8 +170,7 @@ int addrset::present(cvoid *addr) noex {
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (addrset::present) */
+} /* end method (addrset::present) */
 
 int addrset::get(cvoid *addr,addrset_ent *ep) noex {
 	int		rs = SR_NOTOPEN ;
@@ -194,8 +191,7 @@ int addrset::get(cvoid *addr,addrset_ent *ep) noex {
 	    if (ep) *ep = e ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end method (addrset::get) */
+} /* end method (addrset::get) */
 
 int addrset::curbegin(cur *curp) noex {
 	int		rs = SR_NOTOPEN ;
@@ -226,8 +222,7 @@ int addrset::curbegin(cur *curp) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end method (addrset::curbegin) */
+} /* end method (addrset::curbegin) */
 
 int addrset::curend(cur *curp) noex {
 	int		rs = SR_NOTOPEN ;
@@ -243,8 +238,7 @@ int addrset::curend(cur *curp) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end method (addrset::curend) */
+} /* end method (addrset::curend) */
 
 int addrset::curenum(cur *curp,ent *ep) noex {
 	int		rs = SR_NOTOPEN ;
@@ -270,8 +264,7 @@ int addrset::curenum(cur *curp,ent *ep) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end method (addrset::curenum) */
+} /* end method (addrset::curenum) */
 
 
 /* local subroutines */
@@ -290,8 +283,7 @@ int addrset::istart(int n) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end method (addrset::istart) */
+} /* end method (addrset::istart) */
 
 int addrset::ifinish() noex {
 	int		rs = SR_NOTOPEN ;
@@ -305,8 +297,7 @@ int addrset::ifinish() noex {
 	    magval = 0 ;
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (addrset::ifinish) */
+} /* end method (addrset::ifinish) */
 
 int addrset::icount() noex {
 	int		rs = SR_NOTOPEN ;
@@ -315,8 +306,7 @@ int addrset::icount() noex {
 	    rs = int(tp->size()) ;
 	} /* end if (was open) */
 	return rs ;
-}
-/* end method (addrset::icount) */
+} /* end method (addrset::icount) */
 
 void addrset::dtor() noex {
 	if (magval) {
