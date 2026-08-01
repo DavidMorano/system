@@ -1061,7 +1061,7 @@ local int getzoff(int *zop,cchar *sp,int sl) noex {
 	        cp += 1 ;
 	        cl -= 1 ;
 	    }
-	    auto lamb = [&cp,&cl] (int &idx) {
+	    cauto lamb = [&cp,&cl] (int &idx) {
 		cint	ich = mkchar(cp[idx]) ;
 		bool	lf = true ;
 		lf = lf && (idx < cl) ;
