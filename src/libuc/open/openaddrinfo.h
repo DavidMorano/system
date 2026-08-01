@@ -36,8 +36,8 @@
 #include	<sys/types.h>		/* |ADDRINFO| */
 #include	<sys/socket.h>		/* |ADDRINFO| */
 #include	<netdb.h>		/* |ADDRINFO| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
