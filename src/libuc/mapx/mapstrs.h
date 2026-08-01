@@ -13,10 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
-#include	<strpack.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBU */
+#include	<strpack.h>		/* LIBU */
 
 
 /* object defines */
@@ -28,8 +28,8 @@
 struct mapstrs_head {
 	hdb		*dbp ;
 	strpack		*spp ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef MAPSTRS		mapstrs ;
 
