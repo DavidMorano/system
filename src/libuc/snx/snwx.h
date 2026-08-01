@@ -20,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stdarg.h>		/* |va_list| */
+#include	<stdarg.h>		/* CSTD |va_list| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
