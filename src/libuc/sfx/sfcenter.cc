@@ -44,7 +44,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<strn.h>		/* LIUC |strnchr(3uc)| */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
