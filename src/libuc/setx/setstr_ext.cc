@@ -26,11 +26,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"setstr.h"
 #include	"setstrx.hh"
@@ -72,8 +72,7 @@ namespace {
 int setstr_loadfile(setstr *op,int fu,cchar *fname) noex {
     	setstrer	vo(op) ;
 	return vo.loadfile(fu,fname) ;
-}
-/* end subroutine (setstr_loadfile) */
+} /* end subroutine (setstr_loadfile) */
 
 
 /* local subroutines */
