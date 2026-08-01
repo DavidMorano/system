@@ -30,11 +30,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |off_t| */
-#include	<unistd.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<filer.h>
+#include	<sys/types.h>		/* POSIX® |off_t| */
+#include	<unistd.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<filer.h>		/* LIBUC */
 
 
 #define	FDLINER			struct fdliner_head
@@ -84,15 +84,15 @@ struct fdliner : fdliner_head {
 	fdliner_co	adv ;
 	fdliner_co	finish ;
 	fdliner() noex {
-	    done(this,fdlinermem_done) ;
-	    adv(this,fdlinermem_adv) ;
-	    finish(this,fdlinermem_finish) ;
+	    done	(this,fdlinermem_done) ;
+	    adv		(this,fdlinermem_adv) ;
+	    finish	(this,fdlinermem_finish) ;
 	    fbp = nullptr ;
 	} ; /* end ctor */
 	fdliner(const fdliner &) = delete ;
 	fdliner &operator = (const fdliner &) = delete ;
-	int start(int,off_t = 0z,int = -1) noex ;
-	int getln(cchar **) noex ;
+	int start	(int,off_t = 0z,int = -1) noex ;
+	int getln	(cchar **) noex ;
 	void dtor() noex ;
 	destruct fdliner() {
 	    if (fbp) dtor() ;
@@ -106,11 +106,11 @@ typedef FDLINER_FL	fdliner_fl ;
 
 EXTERNC_begin
 
-extern int fdliner_start(fdliner *,int,off_t,int) noex ;
-extern int fdliner_getln(fdliner *,cchar **) noex ;
-extern int fdliner_done(fdliner *) noex ;
-extern int fdliner_adv(fdliner *,int) noex ;
-extern int fdliner_finish(fdliner *) noex ;
+extern int fdliner_start	(fdliner *,int,off_t,int) noex ;
+extern int fdliner_getln	(fdliner *,cchar **) noex ;
+extern int fdliner_done		(fdliner *) noex ;
+extern int fdliner_adv		(fdliner *,int) noex ;
+extern int fdliner_finish	(fdliner *) noex ;
 
 EXTERNC_end
 
