@@ -33,19 +33,19 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<sbuf.h>
-#include	<storeitem.h>
-#include	<dstr.h>
-#include	<six.h>
-#include	<snwcpyx.h>
-#include	<toxc.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<sbuf.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<dstr.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<snwcpyx.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* |REALNAME| */
 
 #include	"realname.h"
@@ -178,7 +178,6 @@ realname_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (realname_co::operator) */
+} /* end method (realname_co::operator) */
 
 
