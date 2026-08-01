@@ -72,7 +72,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* POSIX */
 #include	<climits>		/* POSIX */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strstr(3c)| */
 #include	<clanguage.h>		/* LIBU */
@@ -83,9 +83,9 @@
 #include	<strnul.hh>		/* LIBU */
 #include	<matostr.h>		/* LIBUC */
 #include	<cfdecmf.h>		/* LIBUC */
-#include	<mailvalues.hh>		/* |hostnamemult| + |nodenamemult| */
 #include	<bufsizes.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
+#include	<mailvalues.hh>		/* LIBU |{x}namemult| */
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
