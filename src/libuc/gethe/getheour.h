@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucent.h>		/* |ucentho(3uc)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucent.h>		/* LIBUC |ucentho(3uc)| */
 
 
 EXTERNC_begin
