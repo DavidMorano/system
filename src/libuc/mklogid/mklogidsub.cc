@@ -112,11 +112,11 @@ constexpr int	vlen = DIGBUFLEN ;
 
 int mklogidsub(char *dbuf,int dlen,cchar *bname,int v) noex {
 	int		rs = SR_FAULT ;
-	if (dbuf && bname) {
+	if (dbuf && bname) ylikely {
 	    rs = SR_INVALID ;
 	    if (dlen < 0) dlen = LOGIDLEN ;
       	    dbuf[0] = '\0' ;
-	    if (v >= 0) {
+	    if (v >= 0) ylikely {
         	int		dmax ;
         	int		al ;
         	int		bl ;
@@ -130,7 +130,7 @@ int mklogidsub(char *dbuf,int dlen,cchar *bname,int v) noex {
         	    rs = ctdeci(vbuf,vlen,v) ;
         	    vl = rs ;
         	}
-        	if (rs >= 0) {
+        	if (rs >= 0) ylikely {
         	    bp = bname ;
         	    bl = lenstr(bname) ;
         	    if ((bl + 1 + vl) > dlen) {
@@ -191,10 +191,10 @@ int mklogidsub(char *dbuf,int dlen,cchar *bname,int v) noex {
 local int mkjoin(char *dbuf,int dlen,cchar *bp,int bl,cchar *vp,int vl) noex {
 	int		rs ;
 	int		idx = 0 ;
-	if (storebuf sb(dbuf,dlen) ; (rs = sb.strw(bp,bl)) >= 0) {
+	if (storebuf sb(dbuf,dlen) ; (rs = sb.strw(bp,bl)) >= 0) ylikely {
 	    if ((vl >= 0) && vp[0]) {
-	        if ((rs = sb.chr(MIDDLECHAR)) >= 0) {
-	            if ((rs = sb.strw(vp,vl)) >= 0) {
+	        if ((rs = sb.chr(MIDDLECHAR)) >= 0) ylikely {
+	            if ((rs = sb.strw(vp,vl)) >= 0) ylikely {
 		    	idx = sb.idx ;
 		    }
 		}
