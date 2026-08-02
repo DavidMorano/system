@@ -27,12 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |u_fstype(3u)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |u_fstype(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getfstype.h"
 
@@ -62,7 +62,6 @@
 
 int getfstype(char *nbuf,int nlen,int fd) noex {
 	return u_fstype(fd,nbuf,nlen) ;
-}
-/* end subroutine (getfstype) */
+} /* end subroutine (getfstype) */
 
 
