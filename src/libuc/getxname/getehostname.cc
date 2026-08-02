@@ -72,15 +72,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<gethe.h>
-#include	<localmisc.h>
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<gethe.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getehostname.h"
 
@@ -116,7 +116,7 @@ int getehostname(char *hbuf,cchar *name) noex {
 	    if (char *hebuf ; (rs = lm_ho(&hebuf)) >= 0) ylikely {
 		ucentho he ; 
 		cint	helen = rs ;
-		if ((rs = getheour(&he,hebuf,helen,hbuf,name)) >= 0) {
+		if ((rs = getheour(&he,hebuf,helen,hbuf,name)) >= 0) ylikely {
 		    len = rs ;
 		}
 		rs1 = lm_free(hebuf) ;
@@ -124,7 +124,6 @@ int getehostname(char *hbuf,cchar *name) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getehostname) */
+} /* end subroutine (getehostname) */
 
 
