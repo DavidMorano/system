@@ -29,24 +29,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucpwcache.h>
-#include	<ucentpw.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<getusername.h>
-#include	<gecos.h>
-#include	<storeitem.h>
-#include	<strn.h>
-#include	<snwcpy.h>
-#include	<isoneof.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucpwcache.h>		/* LIBUC */
+#include	<ucentpw.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<gecos.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pwentry.h"
 #include	"getpwentry.h"
@@ -114,11 +114,11 @@ int getpwentry_name(pwentry *uep,char *ebuf,int elen,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if (uep && ebuf && name) {
-	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
+	if (uep && ebuf && name) ylikely {
+	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
 	        ucentpw		pw ;
 	        cint		pwlen = rs ;
-	        if ((rs = getpwx_name(&pw,pwbuf,pwlen,name)) >= 0) {
+	        if ((rs = getpwx_name(&pw,pwbuf,pwlen,name)) >= 0) ylikely {
 	            rs = getpwentry_load(uep,ebuf,elen,&pw) ;
 		    rv = rs ;
 	        }
@@ -127,18 +127,17 @@ int getpwentry_name(pwentry *uep,char *ebuf,int elen,cchar *name) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (getpwentry_name) */
+} /* end subroutine (getpwentry_name) */
 
 int getpwentry_uid(pwentry *uep,char *ebuf,int elen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if (uep && ebuf) {
-	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
+	if (uep && ebuf) ylikely {
+	    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
 	        ucentpw		pw ;
 		cint		pwlen = rs ;
-	        if ((rs = getpwusername(&pw,pwbuf,pwlen,uid)) >= 0) {
+	        if ((rs = getpwusername(&pw,pwbuf,pwlen,uid)) >= 0) ylikely {
 	            rs = getpwentry_load(uep,ebuf,elen,&pw) ;
 		    rv = rs ;
 	        }
@@ -147,8 +146,7 @@ int getpwentry_uid(pwentry *uep,char *ebuf,int elen,uid_t uid) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (getpwentry_uid) */
+} /* end subroutine (getpwentry_uid) */
 
 
 /* local subroutines */
@@ -156,11 +154,11 @@ int getpwentry_uid(pwentry *uep,char *ebuf,int elen,uid_t uid) noex {
 local int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (uep && ebuf && pep) {
+	if (uep && ebuf && pep) ylikely {
 	    memclear(uep) ;		 /* noted potentially dangerous */
 	    if (pep->pw_name) {
 	        cchar	*emptyp = nullptr ;
-	        if (SI ub ; (rs = ub.start(ebuf,elen)) >= 0) {
+	        if (SI ub ; (rs = ub.start(ebuf,elen)) >= 0) ylikely {
 		    cchar	**vpp = &uep->username ;
 		    /* fill in the stuff that we got from the system */
 	            rs = ub.strw(pep->pw_name,-1,vpp) ;
@@ -213,7 +211,7 @@ local int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 local int getpwentry_gecos(pwentry *uep,SI *sip,cchar *gecosdata) noex {
 	int		rs ;
 	int		rs1 ;
-	if (gecos g ; (rs = gecos_start(&g,gecosdata,-1)) >= 0) {
+	if (gecos g ; (rs = gecos_start(&g,gecosdata,-1)) >= 0) ylikely {
 	    for (int i = 0 ; i < gecosval_overlast ; i += 1) {
 	        cchar	*vp{} ;	/* "Value-Pointer" */
 	        if (int vl ; (vl = gecos_getval(&g,i,&vp)) >= 0) {
@@ -268,14 +266,13 @@ local int getpwentry_gecos(pwentry *uep,SI *sip,cchar *gecosdata) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (gecos) */
 	return rs ;
-}
-/* end subroutine (getpwentry_gecos) */
+} /* end subroutine (getpwentry_gecos) */
 
 local int getpwentry_shadow(pwentry *uep,SI *sip,ucentpw *pep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if_constexpr (f_shadow) {
-	    if (char *spbuf ; (rs = lm_sp(&spbuf)) >= 0) {
+	    if (char *spbuf ; (rs = lm_sp(&spbuf)) >= 0) ylikely {
 		cint	splen = rs ;
 	        cchar	*pn = pep->pw_name ;
 	        cchar	**vpp = &uep->password ;
