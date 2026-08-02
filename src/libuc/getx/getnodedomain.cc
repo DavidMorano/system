@@ -33,15 +33,18 @@
 
 	Returns:
 	SR_OK		if OK
-	SR_NOTFOUND	if could not get something needed for correct operation
+	SR_NOTFOUND	if could not get something needed for 
+			correct operation
 
 	The algorithm for finding the local nodename is:
 	1. use the first component of the environment variable NODE
-	2. use the first component of the nodename returned from the system
+	2. use the first component of the nodename returned from
+	the system
 
-	NOTE: Searching for the "current" domain is not an easy task and never
-	has been.  There is no easy way to find out the domain part of the
-	hostname for the current machine node.
+	NOTE: Searching for the "current" domain is not an easy
+	task and never has been.  There is no easy way to find out
+	the domain part of the hostname for the current machine
+	node.
 
 	We use the following algorithm for finding the local domain:
 
@@ -63,38 +66,40 @@
 	7. use the first component of the 'search' keyword from the
 	   resolver configuration file (NOT YET IMPLEMENTED!)
 
-	8. we try to guess what the domain name is from the given node name
+	8. we try to guess what the domain name is from the given
+	   node name
 
 	9. return that we couln't find a domain for the current node!
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<fcntl.h>		/* for |O_RDONLY| */
-#include	<climits>		/* for |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucinfo.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<ucgetho.h>
-#include	<bufsizevar.hh>
-#include	<estrings.h>		/* most all string subroutines */
-#include	<filer.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<sncpyx.h>
-#include	<snwcpy.h>
-#include	<strdcpyx.h>
-#include	<nleadstr.h>
-#include	<char.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<fcntl.h>		/* POSIX® |O_RDONLY| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucinfo.h>		/* LIBUC */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucgetho.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC most all string subroutines */
+#include	<filer.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<strdcpyx.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getnodedomain.h"
 
@@ -124,17 +129,12 @@ import uconstants ;			/* |varname(3u)| */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-}
 
 
 /* external variables */
@@ -266,8 +266,7 @@ int getnodedomain(char *nbuf,char *dbuf) noex {
 	    } /* end if (try) */
 	} /* end if (maxhostlen) */
 	return rs ;
-}
-/* end subroutine (getnodedomain) */
+} /* end subroutine (getnodedomain) */
 
 int getsysdomain(char *dbuf,int dlen) noex {
     	cnullptr	np{} ;
@@ -292,8 +291,7 @@ int getsysdomain(char *dbuf,int dlen) noex {
 	    } /* end if (try) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getsysdomain) */
+} /* end subroutine (getsysdomain) */
 
 int getuserdomain(char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
@@ -311,8 +309,7 @@ int getuserdomain(char *dbuf,int dlen) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getuserdomain) */
+} /* end subroutine (getuserdomain) */
 
 
 /* local subroutines */
