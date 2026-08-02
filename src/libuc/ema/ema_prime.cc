@@ -27,14 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>		/* |libmem(3uc)| */
-#include	<vechand.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC |libmem(3uc)| */
+#include	<vechand.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ema.h"
 
@@ -132,8 +132,7 @@ int ema_start(ema *op) noex {
 	    }
 	} /* end if (ema_ctor) */
 	return rs ;
-}
-/* end subroutine (ema_start) */
+} /* end subroutine (ema_start) */
 
 int ema_finish(ema *op) noex {
 	int		rs ;
@@ -168,8 +167,7 @@ int ema_finish(ema *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ema_finish) */
+} /* end subroutine (ema_finish) */
 
 int ema_parse(ema *op,cchar *sp,int µsl) noex {
 	int		rs ;
@@ -186,8 +184,7 @@ int ema_parse(ema *op,cchar *sp,int µsl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ema_parse) */
+} /* end subroutine (ema_parse) */
 
 /* whew! this is not easy to implement (like any of this was)! */
 int ema_addent(ema *op,ema_ent *ep) noex {
@@ -196,8 +193,7 @@ int ema_addent(ema *op,ema_ent *ep) noex {
 	    rs = ema_addentone(op,ep) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ema_addent) */
+} /* end subroutine (ema_addent) */
 
 /* get the ema under the current cursor */
 int ema_get(ema *op,int i,ema_ent **epp) noex {
@@ -209,8 +205,7 @@ int ema_get(ema *op,int i,ema_ent **epp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ema_get) */
+} /* end subroutine (ema_get) */
 
 int ema_getbestaddr(ema *op,int i,cchar **rpp) noex {
 	int		rs ;
@@ -236,8 +231,7 @@ int ema_getbestaddr(ema *op,int i,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (ema_getbestaddr) */
+} /* end subroutine (ema_getbestaddr) */
 
 /* return the number of EMAs we have so far */
 int ema_count(ema *op) noex {
@@ -247,8 +241,7 @@ int ema_count(ema *op) noex {
 	    rs = elp->count ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ema_count) */
+} /* end subroutine (ema_count) */
 
 int ema_addents(ema *op,ema *oop) noex {
 	int		rs ;
@@ -262,8 +255,7 @@ int ema_addents(ema *op,ema *oop) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ema_addents) */
+} /* end subroutine (ema_addents) */
 
 
 /* private subroutines */
@@ -302,7 +294,6 @@ local int ema_addentone(ema *op,ema_ent *ep) noex {
 	    }
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (ema_addentone) */
+} /* end subroutine (ema_addentone) */
 
 
