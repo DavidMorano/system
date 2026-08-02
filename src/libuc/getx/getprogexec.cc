@@ -34,13 +34,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<getexecname.h>
-#include	<sncpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<getexecname.h>		/* LIBUC */
+#include	<sncpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getprogexec.h"
 
@@ -76,7 +76,7 @@
 
 int getprogexec(char *ebuf,int elen) noex {
 	int		rs = SR_FAULT ;
-	if (ebuf) {
+	if (ebuf) ylikely {
 	    static cchar *en = getexecname() ;
 	    rs = SR_NOSYS ;
 	    ebuf[0] = '\0' ;
@@ -85,7 +85,6 @@ int getprogexec(char *ebuf,int elen) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getprogexec) */
+} /* end subroutine (getprogexec) */
 
 
