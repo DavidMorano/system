@@ -38,18 +38,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucentpw.h>
-#include	<getax.h>
-#include	<getpwx.h>		/* |getpwx_name(3uc)| */
-#include	<getutmpent.h>		/* |getutmpname(3uc)| */
-#include	<bufsizevar.hh>		/* <- currently unused */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucentpw.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC |getpwx_name(3uc)| */
+#include	<getutmpent.h>		/* LIBUC |getutmpname(3uc)| */
+#include	<bufsizevar.hh>		/* LIBUC <- currently unused */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/uconstants.ccm"
 
@@ -113,9 +113,9 @@ constexpr tryer_m	tries[] = {
 int getpwlogname(ucentpw *pwp,char *pwbuf,int pwlen) noex {
     	int		rs = SR_FAULT ;
 	int		pwl = 0 ; /* return-value */
-	if (pwp && pwbuf) {
+	if (pwp && pwbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (pwlen >= PWBUF_MIN) {
+	    if (pwlen >= PWBUF_MIN) ylikely {
 		if (tryer to(pwp,pwbuf,pwlen) ; (rs = to) >= 0) {
 		    pwl = rs ;
 		}
@@ -155,9 +155,9 @@ int tryer::try_utmp() noex {
     	int		rs ;
 	int		rs1 ;
 	int		pwl = 0 ; /* return-value */
-	if (char *nbuf ; (rs = lm_un(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = lm_un(&nbuf)) >= 0) ylikely {
 	    cint nlen = rs ;
-	    if ((rs = getutmpname(nbuf,nlen,sid)) >= 0) {
+	    if ((rs = getutmpname(nbuf,nlen,sid)) >= 0) ylikely {
 		rs = check(nbuf) ;
 		pwl = rs ;
 	    } /* end if (getutmpname) */
@@ -174,8 +174,8 @@ int tryer::try_uid() noex {
 int tryer::check(cchar *namep) noex {
     	int		rs = SR_OK ;
 	int		pwl = 0 ; /* return-value */
-	if (namep && namep[0]) {
-	    if ((rs = getpwx_name(pwp,pwbuf,pwlen,namep)) >= 0) {
+	if (namep && namep[0]) ylikely {
+	    if ((rs = getpwx_name(pwp,pwbuf,pwlen,namep)) >= 0) ylikely {
 		pwl = rs ;
 	        if (pwp->pw_uid != uid) {
 	            pwl = 0 ;
