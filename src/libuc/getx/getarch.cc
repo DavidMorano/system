@@ -37,17 +37,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucsysauxinfo.h>	/* |usysauxinforeq_architecture| */
-#include	<ucgetx.h>		/* |uc_getarch(3uc)| */
-#include	<sfx.h>
-#include	<snwcpy.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucsysauxinfo.h>	/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC |uc_getarch(3uc)| */
+#include	<sfx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getarch.h"
 
@@ -118,8 +118,7 @@ int getarch(char *rbuf,int rlen) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getarch) */
+} /* end subroutine (getarch) */
 
 
 /* local subroutines */
@@ -136,7 +135,7 @@ archer::operator int () noex {
 int archer::tryenv() noex {
 	static cchar	*valp = getenver(varname.architecture) ;
 	int		rs = SR_OK ;
-	if (valp) {
+	if (valp) ylikely {
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfshrink(valp,-1,&cp)) > 0) ylikely {
 	        rs = snwcpy(rbuf,rlen,cp,cl) ;
