@@ -26,14 +26,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>
-#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC */
+#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"envmgr.h"
 
@@ -73,7 +73,7 @@ local int envmgr_ctor(envmgr *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->listp ;
 		    op->listp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
@@ -117,7 +117,7 @@ local int envmgr_envv(envmgr *op,mainv ev) noex {
 int envmgr_start(envmgr *op) noex {
 	int		rs ;
 	if ((rs = envmgr_ctor(op)) >= 0) ylikely {
-	    if ((rs = envmgr_envv(op,nullptr)) >= 0) {
+	    if ((rs = envmgr_envv(op,nullptr)) >= 0) ylikely {
 	        vechand	*elp = op->listp ;
 	        cint	vn = 10 ;
 	        cint	vo = (vechandm.compact | vechandm.sorted) ;
@@ -141,8 +141,7 @@ int envmgr_start(envmgr *op) noex {
 	    } /* end if (envmgr_envv) */
 	} /* end if (envmgr_ctor) */
 	return rs ;
-}
-/* end subroutine (envmgr_start) */
+} /* end subroutine (envmgr_start) */
 
 int envmgr_finish(envmgr *op) noex {
 	int		rs = SR_FAULT ;
@@ -163,8 +162,7 @@ int envmgr_finish(envmgr *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (envmgr_finish) */
+} /* end subroutine (envmgr_finish) */
 
 int envmgr_set(envmgr *op,cchar *kp,cchar *vp,int vl) noex {
 	cnullptr	np{} ;
@@ -184,13 +182,12 @@ int envmgr_set(envmgr *op,cchar *kp,cchar *vp,int vl) noex {
 		    }
 	            if (rs >= 0) {
 		        rs = vechand_add(elp,ep) ;
-	            }
+	            } /* end if (ok) */
 	        } /* end if (vecstr_get) */
 	    } /* end if (vecstr_envset) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (envmgr_set) */
+} /* end subroutine (envmgr_set) */
 
 int envmgr_getvec(envmgr *op,cchar ***rppp) noex {
 	int		rs = SR_FAULT ;
@@ -199,7 +196,6 @@ int envmgr_getvec(envmgr *op,cchar ***rppp) noex {
 	    rs = vechand_getvec(elp,rppp) ;
 	}
 	return rs ;
-}
-/* end subroutine (envmgr_getvec) */
+} /* end subroutine (envmgr_getvec) */
 
 
