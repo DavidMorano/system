@@ -83,7 +83,6 @@ bool hasourbad(cchar *sp,int sl) noex {
 	    sl -= 1 ;
 	} /* end while */
 	return f ;
-}
-/* end subroutine (hasourbad) */
+} /* end subroutine (hasourbad) */
 
 
