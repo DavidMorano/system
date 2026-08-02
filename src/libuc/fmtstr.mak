@@ -35,8 +35,8 @@ DEFS +=
 
 INCS += fmtstr.h fmtopts.h
 
-MODS += fmtutil.ccm fmtstrdata.ccm fmtspec.ccm 
-MODS += fmtsub.ccm fmtobj.ccm
+MODS += fmtutil.o fmtstrdata.o fmtspec.o
+MODS += fmtsub.o fmtobj.o
 
 LIBS +=
 
