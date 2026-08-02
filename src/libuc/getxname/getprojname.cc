@@ -39,16 +39,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucgetpj.h>
-#include	<bufsizeget.h>
-#include	<getusername.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetpj.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getprojname.h"
 
@@ -87,16 +87,15 @@ local int	getprojnamer(char *,int,cchar *) noex ;
 int getprojname(char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (rbuf && un) {
+	if (rbuf && un) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen > 0) {
+	    if (rlen > 0) ylikely {
 		rs = getprojnamer(rbuf,rlen,un) ;
 		rl = rs ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (getprojname) */
+} /* end subroutine (getprojname) */
 
 
 /* local subroutines */
@@ -105,15 +104,15 @@ local int getprojnamer(char *rbuf,int rlen,cchar *un) noex {
     	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ; /* return-value */
-        if ((rs = bufsizeget(bufsize_un)) >= 0) {
+        if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
             cint        ulen = rs ;
             char        ubuf[rs + 1] ;
             if ((un[0] == '-') || (un[0] == '\0')) {
                 un = ubuf ;
                 rs = getusername(ubuf,ulen,-1) ;
             } /* end if */
-            if (rs >= 0) {
-                if (char *pjbuf ; (rs = lm_pj(&pjbuf)) >= 0) {
+            if (rs >= 0) ylikely {
+                if (char *pjbuf ; (rs = lm_pj(&pjbuf)) >= 0) ylikely {
                     cint        pjlen = rs ;
                     if (ucentpj pj ; (rs = pj.getdef(pjbuf,pjlen,un)) >= 0) {
                         rs = sncpy(rbuf,rlen,pj.pj_name) ;
