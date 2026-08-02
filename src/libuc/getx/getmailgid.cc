@@ -38,13 +38,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<getxid.h>		/* |getgid_group(3uc)| */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<getxid.h>		/* LIBUC |getgid_group(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getmailgid.h"
 
@@ -83,7 +83,7 @@ constexpr gid_t		gidend = -1 ;
 int getmailgid(cchar *gname,gid_t gid) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_FAULT ;
-	if (gname) {
+	if (gname) ylikely {
 	    if ((rs = getgid_group(gname,-1)) == rsn) {
 	        if (gid != gidend) {
 	            rs = gid ;
@@ -93,7 +93,6 @@ int getmailgid(cchar *gname,gid_t gid) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getmailgid) */
+} /* end subroutine (getmailgid) */
 
 
