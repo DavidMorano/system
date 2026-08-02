@@ -34,21 +34,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/time.h>		/* |gettimeofday(3c)| */
-#include	<unistd.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucsysmisc.h>		
-#include	<uclibmem.h>
-#include	<ucgetx.h>		/* |uc_gettieofday(3uc)| */
-#include	<cfdec.h>
-#include	<randlc.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/time.h>		/* POSIX® |gettimeofday(3c)| */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC |uc_gettieofday(3uc)| */
+#include	<cfdec.h>		/* LIBUC */
+#include	<randlc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getseed.h"
 
@@ -95,7 +95,7 @@ int getseed(int seed) noex {
 	cint		v1 = getppid() ;
 	cint		v2 = getpgrp() ;
 	int		rs ;
-	if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,np)) >= 0) {
+	if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,np)) >= 0) ylikely {
 	    cint	usec = intconv(tv.tv_usec) ;
 	    cint	rsec = intconv(tv.tv_sec) ;
 	    uint	rv = 0 ;
@@ -120,7 +120,6 @@ int getseed(int seed) noex {
 	    rs = (rv & INT_MAX) ;
 	} /* end if (uc_gettimeofday) */
 	return rs ;
-}
-/* end subroutine (getseed) */
+} /* end subroutine (getseed) */
 
 
