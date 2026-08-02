@@ -43,20 +43,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |gid_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<grp.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getax.h>
-#include	<snx.h>
-#include	<sncpyx.h>
-#include	<isoneof.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® |gid_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<grp.h>			/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getgroupname.h"
 
@@ -138,9 +138,9 @@ int getgroupname(char *gbuf,int glen,gid_t gid) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	cchar		*vn = varname.groupname ;
-	if (gbuf) {
+	if (gbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if (glen > 0) {
+	    if (glen > 0) ylikely {
 	        static cchar	*vgn = getenver(vn) ;
 		if (helper ho(gbuf,glen,gid) ; (rs = ho.start(vgn)) >= 0) {
 		    {
@@ -153,8 +153,7 @@ int getgroupname(char *gbuf,int glen,gid_t gid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getgroupname) */
+} /* end subroutine (getgroupname) */
 
 
 /* local subroutines */
@@ -177,7 +176,7 @@ int helper::finish() noex {
 	    if (rs >= 0) rs = rs1 ;
 	    grbuf = nullptr ;
 	    grlen = 0 ;
-	} /* end if (non-null) */
+	} /* end if (memory-release) */
 	return rs ;
 } /* end method */
 
@@ -193,7 +192,7 @@ helper::operator int () noex {
 int helper::tryus() noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if ((gid == ourgid) && vgn) {
+	if ((gid == ourgid) && vgn) ylikely {
 	    if ((rs = getgr_name(&gr,grbuf,grlen,vgn)) >= 0) {
 		if (gr.gr_gid == gid) {
 	            rs = sncpy(rbuf,rlen,vgn) ;
