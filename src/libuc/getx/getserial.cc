@@ -46,26 +46,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucfileop.h>
-#include	<lockfile.h>
-#include	<estrings.h>
-#include	<cfnum.h>
-#include	<ctdec.h>
-#include	<isnot.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<lockfile.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<cfnum.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"getserial.h"
 
@@ -128,13 +128,13 @@ int getserial(cchar *sfname) noex {
 	int		rs1 ;
 	int		serial = 0 ;
 	if ((sfname == nullptr) || (sfname[0] == '\0')) {
-		sfname = DEFSERIAL ;
+	    sfname = DEFSERIAL ;
 	}
-	if ((rs = getserial_open(sfname)) >= 0) {
+	if ((rs = getserial_open(sfname)) >= 0) ylikely {
 	    cint	to = TO_LOCK ;
 	    cint	cmd = F_LOCK ;
 	    cint	fd = rs ;
-	    if ((rs = lockfile(fd,cmd,0z,0z,to)) >= 0) {
+	    if ((rs = lockfile(fd,cmd,0z,0z,to)) >= 0) ylikely {
 		cint	dlen = DIGBUFLEN ;
 		char	dbuf[DIGBUFLEN+1] ;
 	        if ((rs = getserial_read(fd,dbuf,dlen)) >= 0) {
@@ -146,8 +146,7 @@ int getserial(cchar *sfname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (opened successfully) */
 	return (rs >= 0) ? serial : rs ;
-}
-/* end subroutine (getserial) */
+} /* end subroutine (getserial) */
 
 
 /* local subroutines */
@@ -166,9 +165,9 @@ local int getserial_open(cchar *sfname) noex {
 	}
 	if (rs == SR_NOENT) {
 	    cint	of = (O_RDWR|O_CREAT) ;
-	    if ((rs = uc_open(sfname,of,m)) >= 0) {
+	    if ((rs = uc_open(sfname,of,m)) >= 0) ylikely {
 	        fd = rs ;
-	        if ((rs = uc_fminmod(fd,m)) >= 0) {
+	        if ((rs = uc_fminmod(fd,m)) >= 0) ylikely {
 	            cint	cmd = _PC_CHOWN_RESTRICTED ;
 	            if ((rs = uc_fpathconf(fd,cmd,nullptr)) == 0) {
 	                cchar	*cp{} ;
@@ -196,10 +195,10 @@ local int getserial_open(cchar *sfname) noex {
 local int getserial_read(int fd,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		serial = 0 ;
-	if ((rs = u_read(fd,dbuf,dlen)) > 0) {
+	if ((rs = u_read(fd,dbuf,dlen)) > 0) ylikely {
 	    cint	dl = rs ;
 	    cchar	*cp{} ;
-	    if (int cl ; (cl = sfnext(dbuf,dl,&cp)) > 0) {
+	    if (int cl ; (cl = sfnext(dbuf,dl,&cp)) > 0) ylikely {
 	        if ((rs = cfnum(cp,cl,&serial)) >= 0) {
 	            rs = uc_rewind(fd) ;
 	        } else if (isNotValid(rs)) {
@@ -214,9 +213,9 @@ local int getserial_read(int fd,char *dbuf,int dlen) noex {
 local int getserial_write(int fd,char *dbuf,int dlen,int serial) noex {
 	cint		nserial = ((serial+1) & INT_MAX) ;
 	int		rs ;
-	if ((rs = ctdec(dbuf,dlen,nserial)) >= 0) {
+	if ((rs = ctdec(dbuf,dlen,nserial)) >= 0) ylikely {
 	    dbuf[rs++] = '\n' ;
-	    if ((rs = uc_write(fd,dbuf,rs)) >= 0) {
+	    if ((rs = uc_write(fd,dbuf,rs)) >= 0) ylikely {
 	        coff	uoff = off_t(rs) ;
 	        rs = uc_ftruncate(fd,uoff) ;
 	    }
