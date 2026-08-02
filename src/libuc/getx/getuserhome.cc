@@ -62,31 +62,31 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<pwd.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX */
+#include	<cstddef>		/* POSIX® |nullptr_t| */
+#include	<cstdlib>		/* LIBU */
+#include	<cstring>		/* LIBU |strcmp(3c)| */
+#include	<pwd.h>			/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBU */
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<aflag.hh>
-#include	<bufsizeget.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<getusername.h>
-#include	<fsdir.h>
-#include	<sfx.h>
-#include	<mkpathx.h>
-#include	<hasx.h>
-#include	<cfdec.h>
-#include	<strwcmp.h>
-#include	<strlibval.hh>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<aflag.hh>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getuserhome.h"
 
@@ -181,11 +181,11 @@ int getuserhome(char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (rbuf && un) {
+	if (rbuf && un) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (un[0]) {
-	        if (subinfo si ; (rs = subinfo_start(&si,un)) >= 0) {
+	    if (un[0]) ylikely {
+	        if (subinfo si ; (rs = subinfo_start(&si,un)) >= 0) ylikely {
 	            for (int i = 0 ; gethomes[i] ; i += 1) {
 	                rs = (*gethomes[i])(&si,rbuf,rlen) ;
 	                rl = rs ;
@@ -198,8 +198,7 @@ int getuserhome(char *rbuf,int rlen,cchar *un) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (getuserhome) */
+} /* end subroutine (getuserhome) */
 
 
 /* local subroutines */
@@ -209,9 +208,9 @@ local int subinfo_start(subinfo *sip,cchar *un) noex {
 	memclear(sip) ;			/* <- noted (dangerous?) */
 	sip->un = un ;
 	sip->uid = -1 ;
-	if ((rs = bufsizeget(bufsize_pw)) >= 0) {
+	if ((rs = bufsizeget(bufsize_pw)) >= 0) ylikely {
 	    cint	pwlen = rs ;
-	    if (char *pwbuf ; (rs = lm_mall((pwlen+1),&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = lm_mall((pwlen+1),&pwbuf)) >= 0) ylikely {
 	        sip->pwbuf = pwbuf ;
 	        sip->pwlen = pwlen ;
 	    }
@@ -222,13 +221,13 @@ local int subinfo_start(subinfo *sip,cchar *un) noex {
 local int subinfo_finish(subinfo *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
-	    if (sip->pwbuf) {
+	    if (sip->pwbuf) ylikely {
 	        rs1 = lm_free(sip->pwbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        sip->pwbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (subinfo_finish) */
@@ -318,10 +317,10 @@ local int subinfo_getsysdb(subinfo *sip,char *rbuf,int rlen) noex {
 	if (! sip->init.pw) {
 	    rs = subinfo_getpw(sip) ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = mknpath1(rbuf,rlen,sip->pw.pw_dir) ;
 	    len = rs ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (subinfo_getsysdb) */
 
@@ -329,9 +328,9 @@ local int dirsearch(cchar *basedname,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_found = false ;
-	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) ylikely {
 	    cint	nlen = rs ;
-	    if (fsdir dir ; (rs = fsdir_open(&dir,basedname)) >= 0) {
+	    if (fsdir dir ; (rs = fsdir_open(&dir,basedname)) >= 0) ylikely {
 	        fsdir_ent	ds ;
 	        while ((rs = fsdir_read(&dir,&ds,nbuf,nlen)) > 0) {
 	            cchar	*fnp = ds.name ;
