@@ -54,7 +54,7 @@
 #include	<sys/types.h>		/* POSIX */
 #include	<sys/param.h>		/* POSIX */
 #include	<unistd.h>		/* POSIX */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<atomic>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
@@ -109,13 +109,11 @@ static groupmgr		getngroups_data ;
 
 int getngroups() noex {
 	return getngroups_data ;
-}
-/* end subroutine (getngroups) */
+} /* end subroutine (getngroups) */
 
 int getngroupsx(grouptypes x) noex {
 	return getngroups_data(x) ;
-}
-/* end subroutine (getngroups) */
+} /* end subroutine (getngroups) */
 
 
 /* local subroutines */
