@@ -44,17 +44,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<getusername.h>
-#include	<mkx.h>			/* |getgecosname(3uc)| */
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC |getgecosname(3uc)| */
+#include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
 #include	"getrealname.h"
 
@@ -94,13 +94,13 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen > 0) {
-	        if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
+	    if (rlen > 0) ylikely {
+	        if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
 	            ucentpwx	pw ;
 	            cint	pwlen = rs ;
-	            if ((rs = getpwname(&pw,pwbuf,pwlen,un)) >= 0) {
+	            if ((rs = getpwname(&pw,pwbuf,pwlen,un)) >= 0) ylikely {
 			cauto gc = getgecosname ;
 			cchar *gecos = pw.pw_gecos ;
 	                if (cchar *gp ; (rs = gc(gecos,-1,&gp)) > 0) {
@@ -114,8 +114,7 @@ int getrealname(char *rbuf,int rlen,cchar *un) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (getrealname) */
+} /* end subroutine (getrealname) */
 
 
 /* local subroutines */
