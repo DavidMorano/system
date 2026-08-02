@@ -98,18 +98,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usys.h>		/* |projid_t| */
-#include	<uclibmem.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<nulstr.h>
-#include	<cfdec.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usys.h>		/* LIBU |projid_t| */
+#include	<nulstr.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getxid.h"
 
@@ -165,8 +165,7 @@ int getuid_name(cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? uid : rs ;
-}
-/* end subroutine (getuid_name) */
+} /* end subroutine (getuid_name) */
 
 int getuid_user(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -183,8 +182,7 @@ int getuid_user(cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getuid_user) */
+} /* end subroutine (getuid_user) */
 
 int getgid_name(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -210,8 +208,7 @@ int getgid_name(cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? gid : rs ;
-}
-/* end subroutine (getgid_name) */
+} /* end subroutine (getgid_name) */
 
 int getgid_group(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -228,8 +225,7 @@ int getgid_group(cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getgid_group) */
+} /* end subroutine (getgid_group) */
 
 int getgid_def(cchar *gname,gid_t gid) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -244,8 +240,7 @@ int getgid_def(cchar *gname,gid_t gid) noex {
 	    } /* end if (getgid_group) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getgid_def) */
+} /* end subroutine (getgid_def) */
 
 int getpjid_name(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -271,8 +266,7 @@ int getpjid_name(cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pjid : rs ;
-}
-/* end subroutine (getpjid_name) */
+} /* end subroutine (getpjid_name) */
 
 int getpjid_proj(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -289,8 +283,7 @@ int getpjid_proj(cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getpjid_proj) */
+} /* end subroutine (getpjid_proj) */
 
 int getpjid_def(cchar *name,projid_t pjid) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -305,7 +298,6 @@ int getpjid_def(cchar *name,projid_t pjid) noex {
 	    } /* end if (getpjid_proj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getpjid_def) */
+} /* end subroutine (getpjid_def) */
 
 
