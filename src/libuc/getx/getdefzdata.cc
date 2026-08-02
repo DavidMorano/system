@@ -39,16 +39,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>			/* <- for |time(2)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<uctimeconv.h>		/* uc_time{xx}(3uc)| */
-#include	<bufsizevar.hh>		/* |zn| */
-#include	<snwcpy.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD |time(2)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<uctimeconv.h>		/* LIBUC uc_time{xx}(3uc)| */
+#include	<bufsizevar.hh>		/* LIBUC |zn| */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getdefzdata.h"
 
@@ -108,8 +108,7 @@ int getdefzdata(defzdata *zip,char *zbuf,int zlen,int isdst) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? znl : rs ;
-}
-/* end subroutine (getdefzdata) */
+} /* end subroutine (getdefzdata) */
 
 int defzdata::get(char *zbuf,int zlen,int dst) noex {
 	return getdefzdata(this,zbuf,zlen,dst) ;
