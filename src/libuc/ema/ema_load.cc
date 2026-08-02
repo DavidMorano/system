@@ -27,16 +27,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<vechand.h>
-#include	<rmx.h>
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* LIBU |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ema.h"
 
@@ -135,11 +135,11 @@ loader::operator int () noex {
                 rs = loads(ep) ;
                 if (rs < 0) {
                     entry_finish(ep) ;
-                }
+                } /* end if (error) */
             } /* end if (entry_start) */
             if (rs < 0) {
                 libmem.free(ep) ;
-            }
+            } /* end if (error) */
         } /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (ema_load) */
@@ -147,7 +147,7 @@ loader::operator int () noex {
 local bool ispcs(int ch) noex {
     	ch &= UCHAR_MAX ;
     	return (ch == '~') || (ch == '_') ;
-}
+} /* end subroutine */
 
 int loader::loads(ema_ent *ep) noex {
     	int		rs ;
