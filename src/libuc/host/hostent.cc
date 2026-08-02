@@ -96,10 +96,10 @@ typedef const hostent	chostent ;
 
 /* forward references */
 
-local int	si_copyaliases(SI *,HE *,CHE *) noex ;
-local int	si_copyaddrs(SI *,HE *,CHE *) noex ;
-local int	si_copystr(SI *,char **,cchar *) noex ;
-local int	si_copybuf(SI *,char **,cchar *,int) noex ;
+local int	si_copyaliases	(SI *,HE *,CHE *) noex ;
+local int	si_copyaddrs	(SI *,HE *,CHE *) noex ;
+local int	si_copystr	(SI *,char **,cchar *) noex ;
+local int	si_copybuf	(SI *,char **,cchar *,int) noex ;
 
 
 /* local variables */
