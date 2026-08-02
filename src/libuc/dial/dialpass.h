@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<dialopts.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<dialopts.h>		/* LIBUC */
 
 
 EXTERNC_begin
