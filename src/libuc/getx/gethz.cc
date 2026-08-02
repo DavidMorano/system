@@ -237,7 +237,7 @@ int hzmgr::tryguess(gethzes w) noex {
 local int decval(cchar *s) noex {
 	int		rs ;
 	int		rv = 0 ; /* return-value */
-	if ((rs = cfdeci(s,-1,&rv)) >= 0) {
+	if ((rs = cfdeci(s,-1,&rv)) >= 0) ylikely {
 	    if (rv < 0) rs = SR_DOM ;
 	}
 	return (rs >= 0) ? rv : rs ;
