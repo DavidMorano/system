@@ -34,7 +34,7 @@
 #include	<sys/stat.h>		/* POSIX */
 #include	<sys/mman.h>		/* POSIX */
 #include	<unistd.h>		/* POSIX */
-#include	<strings.h>		/* CSTD |strcasecmp(3c)| */
+#include	<strings.h>		/* BSD |strcasecmp(3c)| */
 #include	<climits>		/* CSTD |INT_MAX| + |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
