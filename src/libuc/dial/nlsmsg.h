@@ -58,6 +58,19 @@
 #define	NLSPROVIDER	"NLSPROVIDER"
 #endif /* NLSADDR */
 
+#ifdef	__cplusplus
+struct nlsaddrs {
+    static constexpr char addr[]	= NLSADDR ;
+    static constexpr char opt[]		= NLSOPT ;
+    static constexpr char udata[]	= NLSUDATA ;
+    static constexpr char provider[]	= NLSPROVIDER ;
+} ; /* end struct */
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+extern const nlsaddrs	nlsaddr ;
+#endif /* __cplusplus */
+
 
 #endif /* NLSMSG_INCLUDE */
 
