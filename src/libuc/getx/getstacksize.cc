@@ -51,16 +51,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<csignal>		/* |sig_atomic_t| */
-#include	<climits>		/* |PTHREAD_STACK_MIN| */
-#include	<cstddef>		/* |nullptrptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucsysconf.h>
-#include	<sysconfcmds.h>		/* |_SC_THREAD_STACK_MIN| */
-#include	<localmisc.h>
-#include	<stacktypes.h>
+#include	<csignal>		/* CSTD |sig_atomic_t| */
+#include	<climits>		/* CSTD |PTHREAD_STACK_MIN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucsysconf.h>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU |_SC_THREAD_STACK_MIN| */
+#include	<localmisc.h>		/* LIBU */
+#include	<stacktypes.h>		/* LIBU */
 
 #include	"getstacksize.h"
 
@@ -107,7 +107,7 @@ static GETSTACKSIZE	getstacksize_data ;
 int getstacksize(stacktypes w) noex {
 	GETSTACKSIZE	*op = &getstacksize_data ;
 	int		rs = SR_INVALID ;
-	if ((w >= 0) && (w < stacktype_overlast)) {
+	if ((w >= 0) && (w < stacktype_overlast)) ylikely {
 	    if (op->ss[w] == 0) {
 	        if ((rs = getval(w)) >= 0) {
 	            op->ss[w] = rs ;
@@ -117,8 +117,7 @@ int getstacksize(stacktypes w) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (getstacksize) */
+} /* end subroutine (getstacksize) */
 
 
 /* local subroutines */
