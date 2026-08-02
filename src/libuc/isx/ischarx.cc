@@ -183,7 +183,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<bitset>		/* C++STD */
@@ -323,8 +323,7 @@ bool isalphalatin(int ch) noex attrpure {
 	    f = ischarx_data.isalpha[ch] ;
 	}
 	return f ;
-}
-/* end subroutine (isalphalatin) */
+} /* end subroutine (isalphalatin) */
 
 bool isalnumlatin(int ch) noex attrpure {
 	bool		f = false ;
@@ -380,7 +379,7 @@ bool isprintlatin(int ch) noex attrpure {
 
 bool istermlatin(int ch) noex attrpure {
     	return isprintterm(ch) ;
-}
+} /* end subroutine */
 
 bool isprintterm(int ch) noex attrpure {
 	bool		f = false ;
