@@ -45,22 +45,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<bufsizevar.hh>
-#include	<vecstr.h>
-#include	<buffer.h>
-#include	<sbuf.h>
-#include	<expcook.h>
-#include	<strn.h>
-#include	<pathclean.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<pathclean.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"envs.h"
 
@@ -82,7 +82,6 @@
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -102,11 +101,11 @@ namespace {
 	expcook		*clp ;
 	vecstr		*pvp ;
 	vecstr		*evp ;
-	int procvar(cchar *,int) noex ;
-	int procvarnorm(cchar *,int) noex ;
-	int procvarpath(cchar *,int) noex ;
+	int procvar	(cchar *,int) noex ;
+	int procvarnorm	(cchar *,int) noex ;
+	int procvarpath	(cchar *,int) noex ;
 	int procpathsplit(vecstr *,cchar *,int) noex ;
-	int procsub(buffer *,cchar *,int) noex ;
+	int procsub	(buffer *,cchar *,int) noex ;
     } ; /* end struct (subinfo) */
     struct vars {
 	int		maxpathlen ;
@@ -118,15 +117,13 @@ namespace {
 
 /* forward references */
 
-static int	vecstr_pathjoin(vecstr *,char *,int) noex ;
+local int	vecstr_pathjoin(vecstr *,char *,int) noex ;
 
 
 /* local variables */
 
 static bufsizevar	maxpathlen(bufsize_mp) ;
-
 static vars		var ;
-
 constexpr bool		f_expand = CF_EXPAND ;
 
 
@@ -139,8 +136,8 @@ int envs_subs(envs *nlp,expcook *clp,vecstr *pvp,vecstr *evp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (nlp && clp && pvp && evp) {
-	    if (static cint rsv = var ; (rs = rsv) >= 0) {
+	if (nlp && clp && pvp && evp) ylikely {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	        subinfo		si ;
 	        si.evp = evp ;
 	        si.clp = clp ;
@@ -164,8 +161,7 @@ int envs_subs(envs *nlp,expcook *clp,vecstr *pvp,vecstr *evp) noex {
 	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (envs_subs) */
+} /* end subroutine (envs_subs) */
 
 
 /* local subroutines */
@@ -181,15 +177,14 @@ int subinfo::procvar(cchar *kp,int kl) noex {
 	    rs = rs1 ;
 	}
 	return rs ;
-}
-/* end method (subinfo::procvar) */
+} /* end method (subinfo::procvar) */
 
 int subinfo::procvarnorm(cchar *kp,int kl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (buffer b ; (rs = b.start(var.elen)) >= 0) {
-	    if (envs_cur cur ; (rs = envs_curbegin(nlp,&cur)) >= 0) {
+	if (buffer b ; (rs = b.start(var.elen)) >= 0) ylikely {
+	    if (envs_cur cur ; (rs = envs_curbegin(nlp,&cur)) >= 0) ylikely {
 	        int	vl ;
 	        cchar	*vp ;
 	        while (rs >= 0) {
@@ -205,8 +200,8 @@ int subinfo::procvarnorm(cchar *kp,int kl) noex {
 	        rs1 = envs_curend(nlp,&cur) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (envs-cursor) */
-	    if (rs >= 0) {
-	        if (cchar *bp{} ; (rs = b.get(&bp)) >= 0) {
+	    if (rs >= 0) ylikely {
+	        if (cchar *bp{} ; (rs = b.get(&bp)) >= 0) ylikely {
 	            rs = vecstr_envadd(evp,kp,bp,rs) ;
 		}
 	    } /* end if (ok) */
@@ -214,8 +209,7 @@ int subinfo::procvarnorm(cchar *kp,int kl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (buffer) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (subinfo::procvarnorm) */
+} /* end method (subinfo::procvarnorm) */
 
 int subinfo::procvarpath(cchar *kp,int kl) noex {
     	cint		vn = DEFNPATHS ;
@@ -223,9 +217,9 @@ int subinfo::procvarpath(cchar *kp,int kl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (vecstr paths ; (rs = paths.start(vn,vo)) >= 0) {
+	if (vecstr paths ; (rs = paths.start(vn,vo)) >= 0) ylikely {
 	    cint	bslen = var.maxpathlen ;
-	    if (buffer b ; (rs = b.start(bslen)) >= 0) {
+	    if (buffer b ; (rs = b.start(bslen)) >= 0) ylikely {
 		if (envs_cur cur ; (rs = envs_curbegin(nlp,&cur)) >= 0) {
 		    int		vl, bl ;
 		    cchar	*vp, *bp ;
@@ -245,7 +239,7 @@ int subinfo::procvarpath(cchar *kp,int kl) noex {
 	            rs1 = envs_curend(nlp,&cur) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (cursor) */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            cint	psz = paths.strsize ;
 		    if ((rs = paths.count) >= 0) {
 			cint	npaths = rs ;
@@ -274,15 +268,14 @@ int subinfo::procvarpath(cchar *kp,int kl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr-paths) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (subinfo::procvarpath) */
+} /* end method (subinfo::procvarpath) */
 
 int subinfo::procpathsplit(vecstr *plp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (plp) {
-	    if (char *pbuf{} ; (rs = lm_mp(&pbuf)) >= 0) {
+	if (plp) ylikely {
+	    if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
 	        int	pl, cl ;
 	        cchar	*tp, *cp ;
 	        while ((tp = strnbrk(vp,vl,":;")) != nullptr) {
@@ -311,12 +304,11 @@ int subinfo::procpathsplit(vecstr *plp,cchar *vp,int vl) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (subinfo::procpathsplit) */
+} /* end method (subinfo::procpathsplit) */
 
 int subinfo::procsub(buffer *bp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-	if (bp) {
+	if (bp) ylikely {
 	    if_constexpr (f_expand) {
 	        int	rs1 = SR_NOTFOUND ;
 	        int	elen = max(var.elen,vl) ;
@@ -341,13 +333,12 @@ int subinfo::procsub(buffer *bp,cchar *vp,int vl) noex {
 	    } /* end if_constexpr (f_expand) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (subinfo::procsub) */
+} /* end method (subinfo::procsub) */
 
-static int vecstr_pathjoin(vecstr *plp,char jbuf[],int jlen) noex {
+local int vecstr_pathjoin(vecstr *plp,char jbuf[],int jlen) noex {
 	int		rs ;
 	int		bl = 0 ;
-	if (sbuf b ; (rs = b.start(jbuf,jlen)) >= 0) {
+	if (sbuf b ; (rs = b.start(jbuf,jlen)) >= 0) ylikely {
 	    int		c = 0 ;
 	    cchar	*cp ;
 	    bool	f_semi = false ;
@@ -378,16 +369,15 @@ static int vecstr_pathjoin(vecstr *plp,char jbuf[],int jlen) noex {
 	} /* end if (sbuf) */
 
 	return (rs >= 0) ? bl : rs ;
-}
-/* end subroutine (vecstr_pathjoin) */
+} /* end subroutine (vecstr_pathjoin) */
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = maxpathlen) >= 0) {
+	if ((rs = maxpathlen) >= 0) ylikely {
 	    maxpathlen = rs ;
 	    elen = (rs * EBUFMULT) ;
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
+
 
