@@ -13,9 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucentho.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucentho.h>		/* LIBUC */
 
 
 EXTERNC_begin
