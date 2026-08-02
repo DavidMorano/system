@@ -73,23 +73,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucclustername.h>
-#include	<bufsizeget.h>
-#include	<getnodename.h>
-#include	<nodedb.h>
-#include	<clusterdb.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<ids.h>
-#include	<permx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucclustername.h>	/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<nodedb.h>		/* LIBUC */
+#include	<clusterdb.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getclustername.h"
 
@@ -168,13 +168,13 @@ namespace {
 
 /* forward references */
 
-local int	subinfo_start(SI *,cchar *,char *,int,cchar *) noex ;
-local int	subinfo_finish(SI *) noex ;
-local int	subinfo_cacheget(SI *) noex ;
-local int	subinfo_cacheset(SI *) noex ;
-local int	subinfo_ndb(SI *) noex ;
-local int	subinfo_ndber(SI *,cchar *) noex ;
-local int	subinfo_cdb(SI *) noex ;
+local int	subinfo_start		(SI *,cchar *,char *,int,cchar *) noex ;
+local int	subinfo_finish		(SI *) noex ;
+local int	subinfo_cacheget	(SI *) noex ;
+local int	subinfo_cacheset	(SI *) noex ;
+local int	subinfo_ndb		(SI *) noex ;
+local int	subinfo_ndber		(SI *,cchar *) noex ;
+local int	subinfo_cdb		(SI *) noex ;
 
 
 /* local variables */
@@ -214,8 +214,7 @@ int getclustername(char *rbuf,int rlen,cchar *nname) noex {
 	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getclustername) */
+} /* end subroutine (getclustername) */
 
 namespace libuc {
     int prgetclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
@@ -227,7 +226,7 @@ namespace libuc {
 	    rbuf[0] = '\0' ;
 	    if (pr[0] && nn[0]) ylikely {
 	        SI	si ;
-	        if ((rs = subinfo_start(&si,pr,rbuf,rlen,nn)) >= 0) {
+	        if ((rs = subinfo_start(&si,pr,rbuf,rlen,nn)) >= 0) ylikely {
 	            if ((rs = subinfo_cacheget(&si)) == 0) {
 	                if ((rs = subinfo_ndb(&si)) == 0) {
 	                    rs = subinfo_cdb(&si) ;
@@ -235,7 +234,7 @@ namespace libuc {
 	                if (rs > 0) {
 	                    len = rs ;
 	                    rs = subinfo_cacheset(&si) ;
-	                }
+	                } /* end if */
 	            } else {
 	                len = rs ;
 	            }
@@ -255,12 +254,12 @@ int searcher::getprs() noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-        if (ids id ; (rs = id.load) >= 0) {
-            if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
+        if (ids id ; (rs = id.load) >= 0) ylikely {
+            if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
                 cint    am = R_OK ;
                 for (cauto &pr : prs) {
-                    if ((rs = mkpath(pbuf,nodefname)) >= 0) {
-                        if (USTAT sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
+                    if ((rs = mkpath(pbuf,nodefname)) >= 0) ylikely {
+                        if (ustat sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
                             if ((rs = permid(&id,&sb,am)) >= 0) {
                                 rs = prgetclustername(pr,rbuf,rlen,nn) ;
                                 len = rs ;
@@ -280,7 +279,7 @@ int searcher::getprs() noex {
 
 local int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *nn) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    sip->pr = pr ;
 	    sip->rbuf = rbuf ;
 	    sip->rlen = rlen ;
@@ -292,7 +291,7 @@ local int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *nn) noex {
 
 local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -312,8 +311,8 @@ local int subinfo_ndb(SI *sip) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	cchar		*pr = sip->pr ;
-	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
-	    if ((rs = mkpath(tbuf,pr,nodefname)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
+	    if ((rs = mkpath(tbuf,pr,nodefname)) >= 0) ylikely {
 		rs = subinfo_ndber(sip,tbuf) ;
 		len = rs ;
 	    } /* end if (mkpath) */
@@ -331,11 +330,11 @@ local int subinfo_ndber(SI *sip,cchar *nfn) noex {
 	cint		rlen = sip->rlen ;
 	cchar		*nn = sip->nn ;
 	char		*rbuf = sip->rbuf ;
-        if (nodedb st ; (rs = nodedb_open(&st,nfn)) >= 0) {
+        if (nodedb st ; (rs = nodedb_open(&st,nfn)) >= 0) ylikely {
 	    cint	elen = st.entbuflen ;
-	    if (char *ebuf ; (rs = lm_mall((elen + 1),&ebuf)) >= 0) {
+	    if (char *ebuf ; (rs = lm_mall((elen + 1),&ebuf)) >= 0) ylikely {
 		cauto curbegin = nodedb_curbegin ;
-                if (nodedb_cur cur ; (rs = curbegin(&st,&cur)) >= 0) {
+                if (nodedb_cur cur ; (rs = curbegin(&st,&cur)) >= 0) ylikely {
                     nodedb_ent  ste ;
                     while (rs >= 0) {
                         rs1 = nodedb_fetch(&st,nn,&cur,&ste,ebuf,elen) ;
@@ -374,12 +373,12 @@ local int subinfo_cdb(SI *sip) noex {
 	cchar		*pr = sip->pr ;
 	cchar		*nn = sip->nn ;
 	char		*rbuf = sip->rbuf ;
-	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 	    rbuf[0] = '\0' ;
-	    if ((rs = mkpath2(tbuf,pr,clusterfname)) >= 0) {
+	    if ((rs = mkpath2(tbuf,pr,clusterfname)) >= 0) ylikely {
 	        if (clusterdb cdb ; (rs = clusterdb_open(&cdb,tbuf)) >= 0) {
 	            cauto	cf = clusterdb_curfetchrev ;
-	            if (char *cbuf ; (rs = lm_nn(&cbuf)) >= 0) {
+	            if (char *cbuf ; (rs = lm_nn(&cbuf)) >= 0) ylikely {
 			cint	clen = rs ;
 	                if ((rs = cf(&cdb,nn,np,cbuf,clen)) >= 0) {
 	                    rs = sncpy(rbuf,rlen,cbuf) ;
@@ -405,10 +404,10 @@ local int subinfo_cdb(SI *sip) noex {
 int searcher::start() noex {
     	int		rs = SR_OK ;
 	if (nn == nullptr) {
-	    if ((rs = lm_nn(&a)) >= 0) {
+	    if ((rs = lm_nn(&a)) >= 0) ylikely {
 		cint	nlen = rs ;
 		char	*nbuf = a ;
-		if ((rs = getnodename(nbuf,nlen)) >= 0) {
+		if ((rs = getnodename(nbuf,nlen)) >= 0) ylikely {
 		    nn = nbuf ;
 		}
 		if (rs < 0) {
@@ -427,13 +426,13 @@ int searcher::finish() noex {
 	    rs1 = lm_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    a = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end method (search::finish) */
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) ylikely {
 	    entlen = (rs * ENTLENMULT) ;
 	}
 	return rs ;
