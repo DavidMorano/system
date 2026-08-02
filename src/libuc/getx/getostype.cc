@@ -41,18 +41,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usysflag.h>
-#include	<uclibmem.h>
-#include	<getsysname.h>
-#include	<sfx.h>
-#include	<matstr.h>
-#include	<strwcmp.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getsysname.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getostype.h"
 
@@ -149,8 +149,7 @@ ccharp			ostypenames[ostype_overlast + 1] ;
 int getostype() noex {
 	static cint	rst = mktype() ;
 	return rst ;
-}
-/* end subroutine (getostype) */
+} /* end subroutine (getostype) */
 
 
 /* local subroutines */
