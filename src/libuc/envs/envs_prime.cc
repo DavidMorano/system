@@ -85,7 +85,7 @@ struct envs_ent {
 	cchar		*kp ;
 	int		kl ;
 	vecstr		elist ;
-} ;
+} ; /* end struct */
 
 typedef envs_ent	*entp ;
 
@@ -155,8 +155,7 @@ int envs_start(envs *op,int ne) noex {
 	    }
 	} /* end if (envs_ctor) */
 	return rs ;
-}
-/* end subroutine (envs_start) */
+} /* end subroutine (envs_start) */
 
 int envs_finish(envs *op) noex {
 	int		rs ;
@@ -176,7 +175,7 @@ int envs_finish(envs *op) noex {
 		    {
 			rs1 = libmem.free(ep) ;
 			if (rs >= 0) rs = rs1 ;
-		    }
+		    } /* end if (memory-release) */
 		}
 	    } /* end while */
 	    {
@@ -194,8 +193,7 @@ int envs_finish(envs *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envs_finish) */
+} /* end subroutine (envs_finish) */
 
 int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 	int		rs ;
@@ -228,17 +226,16 @@ int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 		        rs = ENVS_DBSTORE(op->varp,key,val) ;
 		        if (rs < 0) {
 			    entry_finish(ep) ;
-		        }
+		        } /* end if (error) */
 		    } /* end if (entry_start) */
 		    if (rs < 0) {
 		        libmem.free(ep) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (allocated entry) */
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envs_add) */
+} /* end subroutine (envs_add) */
 
 int envs_count(envs *op) noex {
 	int		rs ;
@@ -246,10 +243,10 @@ int envs_count(envs *op) noex {
 	    rs = ENVS_DBCOUNT(op->varp) ;
 	}
 	return rs ;
-}
-/* end subroutine (envs_count) */
+} /* end subroutine (envs_count) */
 
 int envs_present(envs *op,cchar *kp,int kl) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = envs_magic(op,kp)) >= 0) ylikely {
 	    ENVS_DBDAT	key ;
@@ -257,16 +254,16 @@ int envs_present(envs *op,cchar *kp,int kl) noex {
 	    if (kl < 0) kl = lenstr(kp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
-	    if ((rs = ENVS_DBFETCH(op->varp,key,nullptr,&val)) >= 0) {
+	    if ((rs = ENVS_DBFETCH(op->varp,key,np,&val)) >= 0) {
 	        ENVS_ENT	*ep = (ENVS_ENT *) val.buf ;
 	        rs = entry_count(ep) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envs_present) */
+} /* end subroutine (envs_present) */
 
 int envs_substr(envs *op,cchar *kp,int kl,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = envs_magic(op,kp,sp)) >= 0) ylikely {
 	    hdb		*vlp = op->varp ;
@@ -276,14 +273,13 @@ int envs_substr(envs *op,cchar *kp,int kl,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
-	    if ((rs = ENVS_DBFETCH(vlp,key,nullptr,&val)) >= 0) ylikely {
+	    if ((rs = ENVS_DBFETCH(vlp,key,np,&val)) >= 0) ylikely {
 	        ENVS_ENT	*ep = (ENVS_ENT *) val.buf ;
 	        rs = entry_substr(ep,sp,sl) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envs_substr) */
+} /* end subroutine (envs_substr) */
 
 int envs_curbegin(envs *op,ENVS_CUR *curp) noex {
 	int		rs ;
@@ -297,12 +293,11 @@ int envs_curbegin(envs *op,ENVS_CUR *curp) noex {
 		if (rs < 0) {
 		    libmem.free(curp->curp) ;
 		    curp->curp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envs_curbegin) */
+} /* end subroutine (envs_curbegin) */
 
 int envs_curend(envs *op,ENVS_CUR *curp) noex {
 	int		rs ;
@@ -316,12 +311,11 @@ int envs_curend(envs *op,ENVS_CUR *curp) noex {
 		rs1 = libmem.free(curp->curp) ;
 		if (rs >= 0) rs = rs1 ;
 		curp->curp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envs_curend) */
+} /* end subroutine (envs_curend) */
 
 int envs_curenumkey(envs *op,ENVS_CUR *curp,cchar **kpp) noex {
 	int		rs ;
@@ -337,8 +331,7 @@ int envs_curenumkey(envs *op,ENVS_CUR *curp,cchar **kpp) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (envs_curenumkey) */
+} /* end subroutine (envs_curenumkey) */
 
 int envs_curenum(envs *op,ENVS_CUR *curp,cchar **kpp,cchar **vpp) noex {
 	int		rs ;
@@ -375,8 +368,7 @@ int envs_curenum(envs *op,ENVS_CUR *curp,cchar **kpp,cchar **vpp) noex {
 	    } /* end while */
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (envs_curenum) */
+} /* end subroutine (envs_curenum) */
 
 int envs_fetch(envs *op,cc *kp,int kl,ENVS_CUR *curp,cc **rpp) noex {
 	int		rs ;
@@ -403,8 +395,7 @@ int envs_fetch(envs *op,cc *kp,int kl,ENVS_CUR *curp,cc **rpp) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (envs_fetch) */
+} /* end subroutine (envs_fetch) */
 
 int envs_delname(envs *op,cchar *kp,int kl) noex {
 	int		rs ;
@@ -417,8 +408,7 @@ int envs_delname(envs *op,cchar *kp,int kl) noex {
 	    rs = ENVS_DBFETCH(op->varp,key,nullptr,&val) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envs_delname) */
+} /* end subroutine (envs_delname) */
 
 
 /* private subroutines */
@@ -451,13 +441,12 @@ local int entry_start(ENVS_ENT *ep,cc *kp,cc *vnam,int vnlen,cc**rpp) noex {
 			void *vp = voidp(ep->kp) ;
 		        libmem.free(vp) ;
 		        ep->kp = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 local int entry_finish(ENVS_ENT *ep) noex {
 	int		rs = SR_FAULT ;
@@ -470,21 +459,19 @@ local int entry_finish(ENVS_ENT *ep) noex {
 		rs1 = libmem.free(vp) ;
 		if (rs >= 0) rs = rs1 ;
 		ep->kp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (elp) ylikely {
 		rs1 = elp->finish ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 local int entry_count(ENVS_ENT *ep) noex {
 	vecstr	*elp = &ep->elist ;
 	return elp->count ;
-}
-/* end subroutine (entry_count) */
+} /* end subroutine (entry_count) */
 
 local int entry_set(ENVS_ENT *ep,cchar *vp,int vl) noex {
 	vecstr		*elp = &ep->elist ;
@@ -493,13 +480,11 @@ local int entry_set(ENVS_ENT *ep,cchar *vp,int vl) noex {
 	    rs = elp->add(vp,vl) ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_set) */
+} /* end subroutine (entry_set) */
 
 local int entry_append(ENVS_ENT *ep,cchar *vp,int vl) noex {
 	return vecstr_add(&ep->elist,vp,vl) ;
-}
-/* end subroutine (entry_append) */
+} /* end subroutine (entry_append) */
 
 local int entry_get(ENVS_ENT *ep,int i,cchar **rpp) noex {
 	vecstr		*elp = &ep->elist ;
@@ -510,8 +495,7 @@ local int entry_get(ENVS_ENT *ep,int i,cchar **rpp) noex {
 	    if (*rpp) *rpp = rp ;
 	}
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (entry_get) */
+} /* end subroutine (entry_get) */
 
 local int entry_substr(ENVS_ENT *ep,cchar *sp,int sl) noex {
 	vecstr		*elp = &ep->elist ;
@@ -534,7 +518,6 @@ local int entry_substr(ENVS_ENT *ep,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (entry_substr) */
+} /* end subroutine (entry_substr) */
 
 
