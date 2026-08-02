@@ -29,13 +29,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/resource.h>	/* |RLIMIT_NOFILE| + |RLIM_INFINITY| */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>		/* |NOFILE| */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |NOFILE| */
 
 #include	"getnfile.h"
 
@@ -71,7 +71,7 @@ int getnfile(int w) noex {
 	cint		cmd = RLIMIT_NOFILE ;
 	int		rs ;
 	int		nf = 0 ; /* return-value */
-	if (RLIMIT lim{} ; (rs = u_getrlimit(cmd,&lim)) >= 0) {
+	if (RLIMIT lim{} ; (rs = u_getrlimit(cmd,&lim)) >= 0) ylikely {
 	    typeof(lim.rlim_cur) val{} ;
 	    switch (w) {
 	    case 0:
@@ -98,7 +98,6 @@ int getnfile(int w) noex {
 	    } /* end if (ok) */
 	} /* end if (u_getrlimit) */
 	return (rs >= 0) ? nf : rs ;
-}
-/* end subroutine (getnfile) */
+} /* end subroutine (getnfile) */
 
 
