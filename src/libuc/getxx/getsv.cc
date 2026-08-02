@@ -36,12 +36,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucgetsv.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucgetsv.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getsv.h"
 
@@ -77,13 +77,11 @@
 
 int getsv_begin(int sf) noex {
 	return uc_getsvbegin(sf) ;
-}
-/* end subroutine (getsv_begin) */
+} /* end subroutine (getsv_begin) */
 
 int getsv_end() noex {
 	return uc_getsvend() ;
-}
-/* end subroutine (getsv_end) */
+} /* end subroutine (getsv_end) */
 
 int getsv_ent(ucentsv *sep,char *rbuf,int rlen) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -92,17 +90,14 @@ int getsv_ent(ucentsv *sep,char *rbuf,int rlen) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (getsv_ent) */
+} /* end subroutine (getsv_ent) */
 
 int getsv_name(ucentsv *sep,char *rbuf,int rlen,cchar *svc,cchar *pn) noex {
 	return uc_getsvnam(sep,rbuf,rlen,svc,pn) ;
-}
-/* end subroutine (getsv_name) */
+} /* end subroutine (getsv_name) */
 
 int getsv_port(ucentsv *sep,char *rbuf,int rlen,int num,cchar *pn) noex {
 	return uc_getsvnum(sep,rbuf,rlen,num,pn) ;
-}
-/* end subroutine (getsv_port) */
+} /* end subroutine (getsv_port) */
 
 
