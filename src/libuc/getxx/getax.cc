@@ -34,16 +34,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucgetpw.h>
-#include	<ucgetua.h>
-#include	<ucgetsp.h>
-#include	<ucgetgr.h>
-#include	<ucgetpj.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucgetpw.h>		/* LIBUC */
+#include	<ucgetua.h>		/* LIBUC */
+#include	<ucgetsp.h>		/* LIBUC */
+#include	<ucgetgr.h>		/* LIBUC */
+#include	<ucgetpj.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getax.h"
 
@@ -75,13 +75,11 @@ constexpr int		rsn = SR_NOTFOUND ;
 
 int getpw_begin() noex {
 	return uc_getpwbegin() ;
-}
-/* end subroutine (getpw_begin) */
+} /* end subroutine (getpw_begin) */
 
 int getpw_end() noex {
 	return uc_getpwend() ;
-}
-/* end subroutine (getpw_end) */
+} /* end subroutine (getpw_end) */
 
 int getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	int		rs ;
@@ -89,18 +87,15 @@ int getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (getpw_ent) */
+} /* end subroutine (getpw_ent) */
 
 int getpw_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *name) noex {
 	return uc_getpwnam(pwp,pwbuf,pwlen,name) ;
-}
-/* end subroutine (getpw_name) */
+} /* end subroutine (getpw_name) */
 
 int getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	return uc_getpwuid(pwp,pwbuf,pwlen,uid) ;
-}
-/* end subroutine (getpw_uid) */
+} /* end subroutine (getpw_uid) */
 
 
 int getua_begin() noex {
@@ -126,13 +121,11 @@ int getua_entuid(ucentua *ep,char *ebuf,int elen,uid_t uid) noex {
 
 int getsp_begin() noex {
 	return uc_getspbegin() ;
-}
-/* end subroutine (getsp_begin) */
+} /* end subroutine (getsp_begin) */
 
 int getsp_end() noex {
 	return uc_getspend() ;
-}
-/* end subroutine (getsp_end) */
+} /* end subroutine (getsp_end) */
 
 int getsp_ent(ucentsp *spp,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -140,24 +133,20 @@ int getsp_ent(ucentsp *spp,char *rbuf,int rlen) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (getsp_ent) */
+} /* end subroutine (getsp_ent) */
 
 int getsp_name(ucentsp *spp,char *rbuf,int rlen,cchar *name) noex {
 	return uc_getspnam(spp,rbuf,rlen,name) ;
-}
-/* end subroutine (getsp_name) */
+} /* end subroutine (getsp_name) */
 
 
 int getgr_begin() noex {
 	return uc_getgrbegin() ;
-}
-/* end subroutine (getgr_begin) */
+} /* end subroutine (getgr_begin) */
 
 int getgr_end() noex {
 	return uc_getgrend() ;
-}
-/* end subroutine (getgr_end) */
+} /* end subroutine (getgr_end) */
 
 int getgr_ent(ucentgr *grp,char *grbuf,int grlen) noex {
 	int		rs ;
@@ -165,29 +154,24 @@ int getgr_ent(ucentgr *grp,char *grbuf,int grlen) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (getgr_ent) */
+} /* end subroutine (getgr_ent) */
 
 int getgr_name(ucentgr *grp,char *rbuf,int rlen,cchar *name) noex {
 	return uc_getgrnam(grp,rbuf,rlen,name) ;
-}
-/* end subroutine (getgr_name) */
+} /* end subroutine (getgr_name) */
 
 int getgr_gid(ucentgr *grp,char *rbuf,int rlen,gid_t gid) noex {
 	return uc_getgrgid(grp,rbuf,rlen,gid) ;
-}
-/* end subroutine (getgr_gid) */
+} /* end subroutine (getgr_gid) */
 
 
 int getpj_begin() noex {
 	return uc_getpjbegin() ;
-}
-/* end subroutine (getpj_begin) */
+} /* end subroutine (getpj_begin) */
 
 int getpj_end() noex {
 	return uc_getpjend() ;
-}
-/* end subroutine (getpj_end) */
+} /* end subroutine (getpj_end) */
 
 int getpj_ent(ucentpj *pjp,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -195,22 +179,18 @@ int getpj_ent(ucentpj *pjp,char *rbuf,int rlen) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (getpj_ent) */
+} /* end subroutine (getpj_ent) */
 
 int getpj_name(ucentpj *pjp,char *rbuf,int rlen,cchar *name) noex {
 	return uc_getpjnam(pjp,rbuf,rlen,name) ;
-}
-/* end subroutine (getpj_name) */
+} /* end subroutine (getpj_name) */
 
 int getpj_pid(ucentpj *pjp,char *rbuf,int rlen,projid_t pid) noex {
 	return uc_getpjpid(pjp,rbuf,rlen,pid) ;
-}
-/* end subroutine (getpj_pid) */
+} /* end subroutine (getpj_pid) */
 
 int getpj_def(ucentpj *pjp,char *rbuf,int rlen,cchar *name) noex {
 	return uc_getpjdef(pjp,rbuf,rlen,name) ;
-}
-/* end subroutine (getpj_def) */
+} /* end subroutine (getpj_def) */
 
 
