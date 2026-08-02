@@ -35,10 +35,14 @@ DEFS +=
 
 INCS += dial.h dialopts.h
 
+MODS +=
+
 LIBS +=
 
 
-OBJ0_DIAL= dialopts.o nlsdialassist.o
+OBJ_NLS=	nlsmsg.o nlscodes.o nlsdialassist.o
+
+OBJ0_DIAL= dialopts.o $(OBJ_NLS)
 OBJ1_DIAL= dialpass.o 
 OBJ2_DIAL= dialtcp.o dialtcpmux.o dialtcpnls.o 
 OBJ3_DIAL= dialfinger.o dialhttp.o
@@ -166,20 +170,24 @@ obj11_dial.o:		$(OBJ11_DIAL)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obja_dial.o:	$(OBJA_DIAL)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA_DIAL)
+obja_dial.o:		$(OBJA_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb_dial.o:	$(OBJB_DIAL)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB_DIAL)
+objb_dial.o:		$(OBJB_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objc_dial.o:	$(OBJC_DIAL)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC_DIAL)
+objc_dial.o:		$(OBJC_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objd_dial.o:	$(OBJD_DIAL)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJD_DIAL)
+objd_dial.o:		$(OBJD_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obje_dial.o:	$(OBJE_DIAL)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJE_DIAL)
+obje_dial.o:		$(OBJE_DIAL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+nls.o:			$(OBJ_NLS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 dialopts.o:		dialopts.cc $(INCS)
@@ -205,6 +213,8 @@ dialticotsord.o:	dialticotsord.cc	dialticotsord.h		$(INCS)
 dialticotsordmux.o:	dialticotsordmux.cc	dialticotsord.h		$(INCS)
 dialticotsordnls.o:	dialticotsordnls.cc	dialticotsord.h		$(INCS)
 
+nlsmsg.o:		nlsmsg.cc		nlsmsg.h		$(INCS)
+nlscodes.o:		nlscodes.cc		nlscodes.hh		$(INCS)
 nlsdialassist.o:	nlsdialassist.cc nlsdialassist.h nlsmsg.h	$(INCS)
 
 
