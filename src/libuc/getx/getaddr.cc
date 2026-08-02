@@ -40,18 +40,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uinet.h>		/* |AF_{x}(3u)| */
-#include	<bufsizevar.hh>
-#include	<nleadstr.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU |AF_{x}(3u)| */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getaddr.h"
 
@@ -60,14 +60,6 @@
 
 #ifndef	AFNAMELEN
 #define	AFNAMELEN	12
-#endif
-
-#ifndef	INET4ADDRLEN
-#define	INET4ADDRLEN	szof(in_addr_t)
-#endif
-
-#ifndef	INET6ADDRLEN
-#define	INET6ADDRLEN	16
 #endif
 
 
@@ -131,8 +123,7 @@ int getaddrfamily(cchar *name) noex {
 	    } /* end if */
 	} /* end for */
 	return (si >= 0) ? afs[si].af : SR_AFNOSUPPORT ;
-}
-/* end subroutine (getaddrfamily) */
+} /* end subroutine (getaddrfamily) */
 
 int getaddrlen(int af) noex {
 	int		rs = SR_OK ;
@@ -151,7 +142,6 @@ int getaddrlen(int af) noex {
             break ;
         } /* end switch */
 	return rs ;
-}
-/* end subroutine (getaddrlen) */
+} /* end subroutine (getaddrlen) */
 
 
