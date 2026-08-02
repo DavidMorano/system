@@ -45,14 +45,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<fcntl.h>		/* open flags */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<utmpacc.h>
-#include	<tmpx.h>
-#include	<localmisc.h>
+#include	<fcntl.h>		/* POSIX® open flags */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<utmpacc.h>		/* LIBUC */
+#include	<tmpx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getrunlevel.h"
 
@@ -90,8 +90,7 @@ int getrunlevel(cchar *utmpfname) noex {
 	    rs = utmpacc_runlevel() ;
 	}
 	return rs ;
-}
-/* end subroutine (getrunlevel) */
+} /* end subroutine (getrunlevel) */
 
 
 /* local subroutines */
@@ -101,7 +100,7 @@ local int getrunlevel_tmpx(cchar *utmpfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (tmpx ut ; (rs = tmpx_open(&ut,utmpfname,of)) >= 0) {
+	if (tmpx ut ; (rs = tmpx_open(&ut,utmpfname,of)) >= 0) ylikely {
 	    {
 	        rs = tmpx_getrunlevel(&ut) ;
 	        n = rs ;
