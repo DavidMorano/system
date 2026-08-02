@@ -27,12 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucgetpr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucgetpr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getpr.h"
 
@@ -68,13 +68,11 @@
 
 int getpr_begin(int sf) noex {
 	return uc_getprbegin(sf) ;
-}
-/* end subroutine (getpr_begin) */
+} /* end subroutine (getpr_begin) */
 
 int getpr_end() noex {
 	return uc_getprend() ;
-}
-/* end subroutine (getpr_end) */
+} /* end subroutine (getpr_end) */
 
 int getpr_ent(ucentpr *pp,char *rbuf,int rlen) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -83,17 +81,14 @@ int getpr_ent(ucentpr *pp,char *rbuf,int rlen) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (getpr_ent) */
+} /* end subroutine (getpr_ent) */
 
 int getpr_name(ucentpr *pp,char *rbuf,int rlen,cchar *name) noex {
 	return uc_getprnam(pp,rbuf,rlen,name) ;
-}
-/* end subroutine (getpr_name) */
+} /* end subroutine (getpr_name) */
 
 int getpr_num(ucentpr *pp,char *rbuf,int rlen,int num) noex {
 	return uc_getprnum(pp,rbuf,rlen,num) ;
-}
-/* end subroutine (getpr_num) */
+} /* end subroutine (getpr_num) */
 
 
