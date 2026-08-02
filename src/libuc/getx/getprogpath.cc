@@ -41,19 +41,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<getpwd.h>
-#include	<mkpathxw.h>
-#include	<ids.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<vecstr.h>
-#include	<xfile.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getpwd.h>		/* LIBUC */
+#include	<mkpathxw.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<vecstr.h>		/* LIBUC */
+#include	<xfile.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getprogpath.h"
 
@@ -97,10 +97,10 @@ local int getprogpathrel(ids *,vs *,char *,cc *,int) noex ;
 int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pnp,int pnl) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (idp && plp && rbuf && pnp) {
+	if (idp && plp && rbuf && pnp) ylikely {
 	     rs = SR_INVALID ;
 	     rbuf[0] = '\0' ;
-	     if (pnp[0]) {
+	     if (pnp[0]) ylikely {
 	         if (pnl < 0) pnl = lenstr(pnp) ;
 	         while ((pnl > 0) && (pnp[pnl-1] == '/')) {
 	             pnl -= 1 ;
@@ -118,8 +118,7 @@ int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pnp,int pnl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (getprogpath) */
+} /* end subroutine (getprogpath) */
 
 
 /* local subroutines */
@@ -128,7 +127,7 @@ local int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ; /* return-value */
-	if (char *pwdp ; (rs = lm_mp(&pwdp)) >= 0) {
+	if (char *pwdp ; (rs = lm_mp(&pwdp)) >= 0) ylikely {
 	    cint	pwdl = rs ;
 	    bool	f = false ;
 	    cchar	*pp{} ;
