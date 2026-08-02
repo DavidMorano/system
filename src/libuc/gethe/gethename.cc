@@ -42,19 +42,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uinet.h>
-#include	<ucent.h>		/* |ucentho(3uc)| */
-#include	<getxx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU */
+#include	<ucent.h>		/* LIBUC |ucentho(3uc)| */
+#include	<getxx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"gethename.h"
 
@@ -97,7 +97,6 @@ int gethename(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (gethename) */
+} /* end subroutine (gethename) */
 
 
