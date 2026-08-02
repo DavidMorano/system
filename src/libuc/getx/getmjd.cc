@@ -23,8 +23,9 @@
 	A. Is the the number of days since midnight (morning) of 17 Nov 1858.
 
 	Q. How are Modified-Julian-Days related to Julian-Days?
-        A. The base date for Modified-Julian-Days (17 Nov 1858) is 2400000.5
-        days after the start of day zero (0) of the Julian calendar.
+	A. The base date for Modified-Julian-Days (17 Nov 1858) is
+	2400000.5 days after the start of day zero (0) of the Julian
+	calendar.
 
 	Validity of these subroutines:
         These subroutines are only valid for years starting from 1900.
@@ -95,12 +96,12 @@ define	isleap(y) ((((y) % 4) == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<tzfile.h>		/* for |TM_YEAR_BASE| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getmjd.h"
 
@@ -150,7 +151,7 @@ constexpr int		yrbase = TM_YEAR_BASE ; /* TZFILE 1900 */
 int getmjd(int yr,int mo,int day) noex {
 	int		rs ;
 	int		mjd = 15020 ;	/* MJD of 1900-01-01 */
-	if ((rs = indomain(yr,mo,day)) >= 0) {
+	if ((rs = indomain(yr,mo,day)) >= 0) ylikely {
 	    int		nlyears ;	/* leap years from 1900 */
 	    int		myr = 0 ;	/* modified-year (years since 1900) */
 	    /* adjust year as needed (for convenience to caller) */
@@ -173,13 +174,12 @@ int getmjd(int yr,int mo,int day) noex {
 	    }
 	} /* end if (indomain) */
 	return (rs >= 0) ? mjd : rs ;
-}
-/* end subroutine (getmjd) */
+} /* end subroutine (getmjd) */
 
 int getyrd(int yr,int mo,int day) noex {
 	int		rs ;
 	int		yday = 0 ;
-	if ((rs = indomain(yr,mo,day)) >= 0) {
+	if ((rs = indomain(yr,mo,day)) >= 0) ylikely {
 	    /* calculate */
 	    if (yr < yrbase) yr += yrbase ;
 	    yday += (doy[mo] + (day - 1)) ;
@@ -192,17 +192,16 @@ int getyrd(int yr,int mo,int day) noex {
 	    }
 	} /* end if (indomain) */
 	return (rs >= 0) ? yday : rs ;
-}
-/* end subroutine (getyrd) */
+} /* end subroutine (getyrd) */
 
 
 /* local subroutines */
 
 local int indomain(int yr,int mo,int day) noex {
 	int		rs = SR_DOM ;
-	if (yr >= 0) {
-	    if ((mo >= mon_jan) && (mo < mon_overlast)) {
-	        if ((day >= 1) && (day <= 31)) {
+	if (yr >= 0) ylikely {
+	    if ((mo >= mon_jan) && (mo < mon_overlast)) ylikely {
+	        if ((day >= 1) && (day <= 31)) ylikely {
 		    rs = SR_OK ;
 		}
 	    }
