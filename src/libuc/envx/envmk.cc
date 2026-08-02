@@ -147,7 +147,7 @@ local int envmk_ctor(envmk *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->envp ;
 		    op->envp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
@@ -282,9 +282,7 @@ int envmk_start(envmk *op,mainv ev) noex {
 	int		rs ;
 	DPRINTF("ent\n") ;
 	if ((rs = envmk_ctor(op)) >= 0) ylikely {
-	DPRINTF("1\n") ;
 	    if ((rs = envmk_envv(op,ev)) >= 0) ylikely {
-	DPRINTF("2\n") ;
 	        cint	vn = NENVS ;
 	        cint	vo = vechandm.compact ;
 	        if ((rs = vechand_start(op->envp,vn,vo)) >= 0) ylikely {
@@ -308,8 +306,7 @@ int envmk_start(envmk *op,mainv ev) noex {
 	} /* end if (envmk_ctor) */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (envmk_start) */
+} /* end subroutine (envmk_start) */
 
 int envmk_finish(envmk *op) noex {
 	int		rs ;
@@ -342,8 +339,7 @@ int envmk_finish(envmk *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envmk_finish) */
+} /* end subroutine (envmk_finish) */
 
 int envmk_envset(envmk *op,cchar *kp,cchar *valp,int vall) noex {
     	cnullptr	np{} ;
@@ -385,8 +381,7 @@ int envmk_envset(envmk *op,cchar *kp,cchar *valp,int vall) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envmk_envset) */
+} /* end subroutine (envmk_envset) */
 
 int envmk_getvec(envmk *op,mainv *evp) noex {
 	int		rs ;
@@ -399,8 +394,7 @@ int envmk_getvec(envmk *op,mainv *evp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envmk_getvec) */
+} /* end subroutine (envmk_getvec) */
 
 
 /* private subroutines */
@@ -436,8 +430,7 @@ local int envmk_mkenvpwd(envmk *op,EL *etp) noex {
 	} /* end if (envlist_present) */
 	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (envmk_mkenvpwd) */
+} /* end subroutine (envmk_mkenvpwd) */
 
 local int envmk_mkenv(envmk *op) noex {
 	int		rs ;
@@ -448,9 +441,7 @@ local int envmk_mkenv(envmk *op) noex {
 	    vechand	*elp = op->envp ;
 	    bool	f_path = false ;
 	    cchar	*varpath = varname.path ;
-	DPRINTF("1\n") ;
 	    if ((rs >= 0) && (op->envv != nullptr)) {
-	DPRINTF("2\n") ;
 	        for (int i = 0 ; (rs >= 0) && op->envv[i] ; i += 1) {
 	            cchar	*kp = op->envv[i] ;
 	            if (matkeystr(envbad,kp,-1) < 0) {
@@ -463,7 +454,6 @@ local int envmk_mkenv(envmk *op) noex {
 	                }
 	            } /* end if (good ENV variable) */
 	        } /* end for */
-	DPRINTF("3 rs=%d\n",rs) ;
 	    } /* end if (ENV was specified) */
 	    if ((rs >= 0) && (! f_path)) {
 	        rs = envmk_cspath(op,&et) ;
@@ -471,48 +461,37 @@ local int envmk_mkenv(envmk *op) noex {
 	    } /* end if (PATH) */
 	    /* default environment variables */
 	    if ((rs >= 0) && (op->envv == nullptr)) {
-	DPRINTF("4 rs=%d\n",rs) ;
 	        rs = envmk_mkenvdef(op,&et,envdef) ;
 	        n += rs ;
 	    }
 	    /* system environment variables */
-	DPRINTF("5 rs=%d\n",rs) ;
 	    if (rs >= 0) ylikely {
 	        if ((rs = envmk_mkenvdef(op,&et,envsys)) >= 0) ylikely {
-	DPRINTF("5a rs=%d\n",rs) ;
 		    cint ne = int(nelem(envsys) - 1) ;
 	            n += rs ;
 	            if (rs < ne) {
-	DPRINTF("5b rs=%d\n",rs) ;
 	                rs = envmk_mkenvsys(op,&et,envsys) ;
-	DPRINTF("5c rs=%d\n",rs) ;
 	                n += rs ;
 	            } /* end if */
-	DPRINTF("5d rs=%d\n",rs) ;
 	        } /* end if (envmk_mkenvdef) */
-	DPRINTF("5e rs=%d\n",rs) ;
 	    } /* end if (system environment variables) */
-	DPRINTF("6 rs=%d\n",rs) ;
 	    /* USERNAME and HOME */
 	    if (rs >= 0) ylikely {
 	        rs = envmk_mkenvextras(op,&et,envextra) ;
 	        n += rs ;
 	    } /* end if (extra environment variables) */
-	DPRINTF("7 rs=%d\n",rs) ;
 	    /* PWD */
 	    if (rs >= 0) ylikely {
 		rs = envmk_mkenvpwd(op,&et) ;
 		n += rs ;
 	    } /* end if */
 	    /* done */
-	DPRINTF("8 rs=%d\n",rs) ;
 	    rs1 = et.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (envlist) */
 	DPRINTF("ret rs=%d n=%d\n",rs,n) ;
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (envmk_mkenv) */
+} /* end subroutine (envmk_mkenv) */
 
 local int envmk_mkenvdef(envmk *op,EL *etp,mainv envs) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -527,15 +506,12 @@ local int envmk_mkenvdef(envmk *op,EL *etp,mainv envs) noex {
 	        if (cchar *cp = getourenv(op->envv,kp) ; cp) {
 	            n += 1 ;
 	            rs = envmk_envadd(op,etp,kp,cp,-1) ;
-	DPRINTF("2 rs=%d\n",rs) ;
 	        } /* end if */
-	DPRINTF("2 rs=%d\n",rs) ;
 	    } /* end if (adding a default ENV) */
 	} /* end for (defualt ENVs) */
 	DPRINTF("ret rs=%d n=%d\n",rs,n) ;
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (envmk_mkenvdef) */
+} /* end subroutine (envmk_mkenvdef) */
 
 local int mktz(char *vbuf,int vlen,cchar *un) noex {
     	int		rs ;
@@ -551,8 +527,7 @@ local int mktz(char *vbuf,int vlen,cchar *un) noex {
 	    if (rs1 >= 0) rs = rs1 ;
 	} /* end if (userattr) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mktz) */
+} /* end subroutine (mktz) */
 
 local int envmk_mkenvsys(envmk *op,EL *etp,mainv envs) noex {
     	cnullptr	np{} ;
@@ -644,8 +619,7 @@ local int envmk_mkenvsys(envmk *op,EL *etp,mainv envs) noex {
 	} /* end if (maxhostlen) */
 	DPRINTF("ret rs=%d n=%d\n",rs,n) ;
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (envmk_mkenvsys) */
+} /* end subroutine (envmk_mkenvsys) */
 
 local int envmk_mkenvextras(envmk *op,EL *etp,mainv envs) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -684,8 +658,7 @@ local int envmk_mkenvextras(envmk *op,EL *etp,mainv envs) noex {
 	    } /* end if (user-info) */
 	} /* end if (needed them) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (envmk_mkenvextras) */
+} /* end subroutine (envmk_mkenvextras) */
 
 local int envmk_envadd(envmk *op,EL *etp,cc *kp,cc *vp,int vl) noex {
 	vechand		*elp = op->envp ;
@@ -697,7 +670,7 @@ local int envmk_envadd(envmk *op,EL *etp,cc *kp,cc *vp,int vl) noex {
 	if (vp) {
 	    bl += ((vl >= 0) ? vl : int(lenstr(vp))) ;
 	}
-	if (char *bp ; (rs = lm_mall((bl+1),&bp)) >= 0) {
+	if (char *bp ; (rs = lm_mall((bl+1),&bp)) >= 0) ylikely {
 	    strpack	*spp = op->storep ;
 	    strdcpy3w(bp,bl,kp,"=",vp,vl) ;
 	    if (cchar *ep{} ; (rs = spp->store(bp,bl,&ep)) >= 0) {
@@ -709,18 +682,17 @@ local int envmk_envadd(envmk *op,EL *etp,cc *kp,cc *vp,int vl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-acquire) */
 	return (rs >= 0) ? bl : rs ;
-}
-/* end subroutine (envmk_envadd) */
+} /* end subroutine (envmk_envadd) */
 
 local int envmk_cspath(envmk *op,EL *etp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = maxpathlen) >= 0) {
+	if ((rs = maxpathlen) >= 0) ylikely {
 	    cint	plen = (PATHMULT * rs) ;
-	    if (char *pbuf ; (rs = lm_mall((plen + 1),&pbuf)) >= 0) {
+	    if (char *pbuf ; (rs = lm_mall((plen + 1),&pbuf)) >= 0) ylikely {
 	        cint	req = _CS_PATH ;
-	        if ((rs = uc_sysconfstr(req,pbuf,plen)) >= 0) {
+	        if ((rs = uc_sysconfstr(req,pbuf,plen)) >= 0) ylikely {
 		    cchar	*varpath = varname.path ;
 	            rs = envmk_envadd(op,etp,varpath,pbuf,rs) ;
 	            n += rs ;
@@ -730,8 +702,7 @@ local int envmk_cspath(envmk *op,EL *etp) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (maxpathlen) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (envmk_cspath) */
+} /* end subroutine (envmk_cspath) */
 
 local int envmk_userinfo(envmk *op) noex {
 	int		rs = SR_OK ;
@@ -744,9 +715,9 @@ local int envmk_userinfo(envmk *op) noex {
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) ylikely {
 		    cchar	*un = pw.pw_name ;
 		    cchar	*uh = pw.pw_dir ;
-		    if (cchar *cp ; (rs = lm_strw(un,-1,&cp)) >= 0) {
+		    if (cchar *cp ; (rs = lm_strw(un,-1,&cp)) >= 0) ylikely {
 			op->un = cp ;
-			if ((rs = lm_strw(uh,-1,&cp)) >= 0) {
+			if ((rs = lm_strw(uh,-1,&cp)) >= 0) ylikely {
 	                    op->uh = cp ;
 			} /* end if (memory-acquire) */
 			if (rs < 0) {
@@ -763,7 +734,6 @@ local int envmk_userinfo(envmk *op) noex {
 	} /* end if (needed) */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (envmk_userinfo) */
+} /* end subroutine (envmk_userinfo) */
 
 
