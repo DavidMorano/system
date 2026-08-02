@@ -122,7 +122,7 @@ constexpr procer_m	procers[] = {
 
 int getnprocessors(mainv envv,int w) noex {
 	int		rs = SR_INVALID ;
-	if (w >= 0) {
+	if (w >= 0) ylikely {
 	    procer	po(envv,w) ;
 	    rs = SR_OK ;
 	    for (cauto &m : procers) {
