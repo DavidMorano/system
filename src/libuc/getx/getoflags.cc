@@ -96,9 +96,9 @@ namespace {
 int getoflags(cchar *os) noex {
 	int		rs = SR_OK ;
 	int		of = O_CLOEXEC ;
-	if (os) {
+	if (os) ylikely {
 	    amode	am{} ;
-	    if (os[0]) {
+	    if (os[0]) ylikely {
 	        for (cchar *osp = os ; *osp ; ) {
 	            switch (cint sc = mkchar(*osp++) ; sc) {
 	            case 'r':
@@ -160,7 +160,6 @@ int getoflags(cchar *os) noex {
 	    of |= O_RDONLY ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? of : rs ;
-}
-/* end subroutine (getoflags) */
+} /* end subroutine (getoflags) */
 
 
