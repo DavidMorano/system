@@ -68,15 +68,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<sncpyx.h>
-#include	<snwcpy.h>		/* <- currently unused */
-#include	<isnot.h>		/* isNotPresent(3uc)| */
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC currently unused */
+#include	<isnot.h>		/* LIBUC |isNotPresent(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getpwd.h"
 
@@ -134,8 +134,7 @@ constexpr getter_m	mgets[] = {
 
 int getpwd(char *pwbuf,int pwlen) noex {
 	return getpwds(nullptr,pwbuf,pwlen) ;
-}
-/* end subroutine (getpwd) */
+} /* end subroutine (getpwd) */
 
 int getpwds(ustat *sbp,char *pwbuf,int pwlen) noex {
 	int		rs = SR_FAULT ;
@@ -148,8 +147,7 @@ int getpwds(ustat *sbp,char *pwbuf,int pwlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getpwds) */
+} /* end subroutine (getpwds) */
 
 
 /* local subroutines */
@@ -167,7 +165,7 @@ int getter::getenv() noex {
 	static cchar	*pwd = getenver(varname.pwd) ;
     	int		rs = SR_OK ;
 	int		pl = 0 ; /* return-value */
-        if (pwd) {
+        if (pwd) ylikely {
             ustat       *ssbp, sb1, sb2 ;
             if ((rs = u_stat(pwd,&sb1)) >= 0) {
                 ssbp = (sbp) ? sbp : &sb2 ;
@@ -192,7 +190,7 @@ int getter::getenv() noex {
 int getter::getcwd() noex {
     	int		rs ;
 	int		pl = 0 ; /* return-value */
-	if ((rs = u_getcwd(pwbuf,pwlen)) >= 0) {
+	if ((rs = u_getcwd(pwbuf,pwlen)) >= 0) ylikely {
 	    pl = rs ;
 	    if (sbp) {
 		rs = u_stat(pwbuf,sbp) ;
