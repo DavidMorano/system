@@ -26,11 +26,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ema.h"
 
@@ -89,7 +89,6 @@ int ema_first(ema *op,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (ema_first) */
+} /* end subroutine (ema_first) */
 
 
