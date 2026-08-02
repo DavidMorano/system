@@ -113,8 +113,8 @@ local int envlist_dtor(envlist *op) noex {
 	return rs ;
 } /* end subroutine (envlist_dtor) */
 
-local int	envlist_store(envlist *,cchar *,int) noex ;
-local int	envlist_storer(envlist *) noex ;
+local int	envlist_store	(envlist *,cchar *,int) noex ;
+local int	envlist_storer	(envlist *) noex ;
 
 
 /* local variables */
@@ -139,8 +139,7 @@ int envlist_start(envlist *op,int ne) noex {
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (envlist_start) */
+} /* end subroutine (envlist_start) */
 
 int envlist_finish(envlist *op) noex {
 	int		rs = SR_FAULT ;
@@ -171,8 +170,7 @@ int envlist_finish(envlist *op) noex {
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (envlist_finish) */
+} /* end subroutine (envlist_finish) */
 
 int envlist_addkeyval(envlist *op,cchar *kp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
@@ -201,8 +199,7 @@ int envlist_addkeyval(envlist *op,cchar *kp,cchar *vp,int vl) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ridx : rs ;
-}
-/* end subroutine (envlist_addkeyval) */
+} /* end subroutine (envlist_addkeyval) */
 
 int envlist_add(envlist *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -224,8 +221,7 @@ int envlist_add(envlist *op,cchar *sp,int sl) noex {
 	    ridx = rs ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? ridx : rs ;
-}
-/* end subroutine (envlist_add) */
+} /* end subroutine (envlist_add) */
 
 int envlist_count(envlist *op) noex {
 	int		rs = SR_FAULT ;
@@ -233,8 +229,7 @@ int envlist_count(envlist *op) noex {
 	    rs = EL_DBCOUNT(op->elp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (envlist_count) */
+} /* end subroutine (envlist_count) */
 
 int envlist_present(envlist *op,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -243,34 +238,28 @@ int envlist_present(envlist *op,cchar *kp,int kl,cchar **rpp) noex {
 	if (op && kp) ylikely {
 	    EL_DBDATA	key ;
 	    EL_DBDATA	val{} ;
-	    DPRINTF("elp=%p\n",op->elp) ;
 	    if (kl < 0) kl = lenstr(kp) ;
 	    {
 		strnul ds(kp,kl) ;
-	        DPRINTF("test s=%s\n",ccp(ds)) ;
 	    }
 	    if (cchar *tp = strnchr(kp,kl,'=') ; tp) {
 		kl = intconv(tp - kp) ; /* overwrite previous value */
 	    } /* end if */
 	    {
 		strnul ks(kp,kl) ;
-	        DPRINTF("test s=%s\n",ccp(ks)) ;
 	    }
 	    key.buf = kp ;
 	    key.len = kl ;
 	    if ((rs = EL_DBFETCH(op->elp,key,nullptr,&val)) >= 0) {
-		DPRINTF("el-defetch() rs=%d\n",rs) ;
 		vlen = val.len ;
 	    } /* end if (fetch) */
-		DPRINTF("el-defetch-out rs=%d\n",rs) ;
 	    if (rpp) {
 	        *rpp = (rs >= 0) ? charp(val.buf) : nullptr ;
 	    }
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d vlen=%d\n",rs,vlen) ;
 	return (rs >= 0) ? vlen : rs ;
-}
-/* end subroutine (envlist_present) */
+} /* end subroutine (envlist_present) */
 
 
 /* private subroutines */
