@@ -146,6 +146,7 @@ int mkfileart(char *rbuf,cc *dname,cc *prefix,int serial,mode_t om) noex {
 	return rs ;
 } /* end subroutine (mkfileart) */
 
+
 /* local subroutines */
 
 trier::operator int () noex {
