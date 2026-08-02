@@ -95,13 +95,12 @@ constexpr int		dlen = DIGBUFLEN ;
 int mklogidpre(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	int		rs = SR_FAULT ;
 	int		tl = 0 ;
-	if (rbuf && nodename) {
+	if (rbuf && nodename) ylikely {
 	    int		nl = lenstr(nodename) ;
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (v >= 0) {
-		static cint	rsm = logdigmax ;
-		if ((rs = rsm) >= 0) {
+	    if (v >= 0) ylikely {
+		if (static cint rsm = logdigmax ; (rs = rsm) >= 0) ylikely {
 	            cint	maxdigs = rs ;
 		    int		modval ;
 		    int		ni = 0 ;
