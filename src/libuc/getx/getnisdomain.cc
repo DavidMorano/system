@@ -44,17 +44,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucgetx.h>		/* |uc_getnisdomain(3uc)| */
-#include	<filereadln.h>
-#include	<sncpyx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucgetx.h>		/* LIBUC |uc_getnisdomain(3uc)| */
+#include	<filereadln.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getnisdomain.h"
 
@@ -128,8 +128,7 @@ int getnisdomain(char *rbuf,int rlen) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getnisdomain) */
+} /* end subroutine (getnisdomain) */
 
 
 /* local subroutines */
@@ -158,8 +157,7 @@ int nisfind::tryget() noex {
 
 int nisfind::tryfile() noex {
 	return nisfile(rbuf,rlen,NISFN) ;
-}
-/* end method (nisfind::tryfile) */
+} /* end method (nisfind::tryfile) */
 
 local int nisfile(char *rbuf,int rlen,cchar *fname) noex {
 	int		rs ;
