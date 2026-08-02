@@ -40,7 +40,12 @@ MODS +=
 LIBS +=
 
 
-OBJ= fmtflag0.o fmtflag1.o
+OBJ00= fmtflag0.o
+OBJ01= fmtflag1.o
+OBJ02=
+OBJ03=
+
+OBJ= obj00.o obj01.o
 
 
 INCDIRS=
@@ -116,6 +121,10 @@ obj02.o:		$(OBJ02)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 obj03.o:		$(OBJ03)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+
+obj.o:			$(OBJ)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
