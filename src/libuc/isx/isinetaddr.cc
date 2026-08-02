@@ -92,8 +92,8 @@ constexpr bool		f_inet6 = CF_INET6 ;
 
 bool isinetaddr(cchar *name) noex {
 	bool		f = false ;
-	if (name) {
-	    if (name[0]) {
+	if (name) ylikely {
+	    if (name[0]) ylikely {
 	        if_constexpr (f_inet6) {
 	            cint	af = AF_UNSPEC ;
 	            int		rs1 ;
