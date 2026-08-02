@@ -41,20 +41,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(2u)| */
-#include	<uclibmem.h>
-#include	<nulstr.h>
-#include	<strwcpy.h>
-#include	<matkeystr.h>
-#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSYD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(2u)| */
+#include	<nulstr.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<matkeystr.h>		/* LIBUC */
+#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"envhelp.h"
 
@@ -154,11 +154,10 @@ int envhelp_start(envhelp *op,mainv envbads,mainv envv) noex {
 	        } /* end if (vechand_start) */
 	    if (rs < 0) {
 		envhelp_dtor(op) ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (envhelp_ctor) */
 	return rs ;
-}
-/* end subroutine (envhelp_start) */
+} /* end subroutine (envhelp_start) */
 
 int envhelp_finish(envhelp *op) noex {
 	int		rs = SR_FAULT ;
@@ -179,8 +178,7 @@ int envhelp_finish(envhelp *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (envhelp_finish) */
+} /* end subroutine (envhelp_finish) */
 
 int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
@@ -212,8 +210,7 @@ int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (envhelp_envset) */
+} /* end subroutine (envhelp_envset) */
 
 int envhelp_present(envhelp *op,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -236,8 +233,7 @@ int envhelp_present(envhelp *op,cchar *kp,int kl,cchar **rpp) noex {
 	    } /* end if (nulstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (envhelp_present) */
+} /* end subroutine (envhelp_present) */
 
 int envhelp_sort(envhelp *op) noex {
 	int		rs = SR_FAULT ;
@@ -246,8 +242,7 @@ int envhelp_sort(envhelp *op) noex {
 	    rs = vechand_sort(op->elp,vcf) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (envhelp_sort) */
+} /* end subroutine (envhelp_sort) */
 
 int envhelp_count(envhelp *op) noex {
 	int		rs = SR_FAULT ;
@@ -255,8 +250,7 @@ int envhelp_count(envhelp *op) noex {
 	    rs = vechand_count(op->elp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (envhelp_count) */
+} /* end subroutine (envhelp_count) */
 
 int envhelp_getvec(envhelp *op,mainv *listp) noex {
 	int		rs = SR_FAULT ;
@@ -274,8 +268,7 @@ int envhelp_getvec(envhelp *op,mainv *listp) noex {
 	    } /* end if (vechand_sort) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (envhelp_getvec) */
+} /* end subroutine (envhelp_getvec) */
 
 
 /* private subroutines */
