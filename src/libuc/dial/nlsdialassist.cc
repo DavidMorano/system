@@ -26,19 +26,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<sbuf.h>
-#include	<snwcpy.h>
-#include	<strn.h>
-#include	<cfdec.h>
-#include	<nlscodes.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<nlscodes.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nlsmsg.h"		/* <- NLS dial-response codes */
 #include	"nlsdialassist.h"
