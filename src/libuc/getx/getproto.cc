@@ -37,14 +37,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucgetpr.h>
-#include	<nulstr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetpr.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getproto.h"
 
@@ -96,7 +96,6 @@ int getproto_name(cchar *pnp,int pnl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? proto : rs ;
-}
-/* end subroutine (getproto_name) */
+} /* end subroutine (getproto_name) */
 
 
