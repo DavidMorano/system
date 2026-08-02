@@ -54,28 +54,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<getnodedomain.h>
-#include	<bufsizevar.hh>
-#include	<snx.h>
-#include	<snwcpy.h>
-#include	<isnot.h>
-#include	<isinetaddr.h>
-#include	<isindomain.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<isinetaddr.h>		/* LIBUC */
+#include	<isindomain.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"geteaddrinfo.h"
 
@@ -187,7 +187,7 @@ int geteaddrinfo(cc *hn,cc *svc,AI *hintp,char *ehostname,AI **rpp) noex {
 	int		rs1 ;
 	int		rs_last = SR_NOTFOUND ;
 	int		c = 0 ;
-	if (hn && svc) {
+	if (hn && svc) ylikely {
 	    if (ARI argi ; (rs = arginfo_load(&argi,hn,svc,hintp,rpp)) >= 0) {
 	        if (SI mi ; (rs = subinfo_start(&mi,ehostname,&argi)) >= 0) {
 	            for (int i = 0 ; tries[i] ; i += 1) {
@@ -203,15 +203,14 @@ int geteaddrinfo(cc *hn,cc *svc,AI *hintp,char *ehostname,AI **rpp) noex {
 	    } /* end if (arginfo_load) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end if (geteaddrinfo) */
+} /* end if (geteaddrinfo) */
 
 
 /* local subroutines */
 
 local int subinfo_start(SI *mip,char *ehostname,ARI *aip) noex {
 	int		rs = SR_FAULT ;
-	if (mip && aip) {
+	if (mip && aip) ylikely {
 	    rs = memclear(mip) ;
 	    mip->domainname = nullptr ;
 	    mip->aip = aip ;
@@ -219,21 +218,19 @@ local int subinfo_start(SI *mip,char *ehostname,ARI *aip) noex {
 	    mip->rs_last = SR_NOTFOUND ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
 local int subinfo_finish(SI *mip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (mip->domainname) {
+	if (mip->domainname) ylikely {
 	    void *vp = voidp(mip->domainname) ;
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    mip->domainname = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 local int subinfo_domain(SI *mip) noex {
 	int		rs = SR_OK ;
@@ -254,8 +251,7 @@ local int subinfo_domain(SI *mip) noex {
 	    len = lenstr(mip->domainname) ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo_domain) */
+} /* end subroutine (subinfo_domain) */
 
 local int try_straight(SI *mip) noex {
 	arginfo		*aip = mip->aip ;
@@ -287,8 +283,7 @@ local int try_straight(SI *mip) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (try_straight) */
+} /* end subroutine (try_straight) */
 
 local int try_add(SI *mip) noex {
 	arginfo		*aip = mip->aip ;
@@ -327,8 +322,7 @@ local int try_add(SI *mip) noex {
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (try_add) */
+} /* end subroutine (try_add) */
 
 local int try_rem(SI *mip) noex {
 	arginfo		*aip = mip->aip ;
@@ -371,8 +365,7 @@ local int try_rem(SI *mip) noex {
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (try_rem) */
+} /* end subroutine (try_rem) */
 
 local int try_remlocal(SI *mip) noex {
 	arginfo		*aip = mip->aip ;
@@ -412,12 +405,11 @@ local int try_remlocal(SI *mip) noex {
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (try_remlocal) */
+} /* end subroutine (try_remlocal) */
 
 local int arginfo_load(ARI *aip,cc *hn,cc *svc,AI *hintp,AI **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (aip) {
+	if (aip) ylikely {
 	    rs = SR_OK ;
 	    aip->hostname = hn ;
 	    aip->svcname = svc ;
@@ -425,7 +417,6 @@ local int arginfo_load(ARI *aip,cc *hn,cc *svc,AI *hintp,AI **rpp) noex {
 	    aip->rpp = rpp ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (arginfo_load) */
+} /* end subroutine (arginfo_load) */
 
 
