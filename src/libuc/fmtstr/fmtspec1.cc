@@ -119,8 +119,7 @@ int fmtspec::start(va_list ap,cchar *sp,int µsl) noex {
 	    }
 	} /* end if (getlenstr) */
 	return rs ;
-}
-/* end method (fmtspec::start) */
+} /* end method (fmtspec::start) */
 
 
 /* local subroutines */
