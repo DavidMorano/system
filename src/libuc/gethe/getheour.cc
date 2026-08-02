@@ -49,27 +49,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uinet.h>
-#include	<uclibmem.h>
-#include	<ucent.h>		/* |ucentho(3uc)| */
-#include	<bufsizeget.h>
-#include	<getnodename.h>		/* |getnodename(3uc)| */
-#include	<getxx.h>
-#include	<hostent.h>
-#include	<sncpyx.h>
-#include	<isinetaddr.h>
-#include	<localmisc.h>
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucent.h>		/* LIBUC |ucentho(3uc)| */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC |getnodename(3uc)| */
+#include	<getxx.h>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<isinetaddr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getheour.h"
 
@@ -144,8 +144,7 @@ int getheour(ucentho *hep,char *hebuf,int helen,char *hbuf,cc *hn) noex {
 	    rs = go ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getheour) */
+} /* end subroutine (getheour) */
 
 
 /* private subroutines */
