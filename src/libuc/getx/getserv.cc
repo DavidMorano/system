@@ -41,13 +41,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<getxx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getxx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getserv.h"
 
@@ -99,7 +99,6 @@ int getserv_name(cchar *svc,cchar *pn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? port : rs ;
-}
-/* end subroutine (getserv_name) */
+} /* end subroutine (getserv_name) */
 
 
