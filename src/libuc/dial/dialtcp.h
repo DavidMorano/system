@@ -20,18 +20,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<dialopts.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<dialopts.h>		/* LIBUC */
 
 
 EXTERNC_begin
 
-extern int dialtcp(cchar *,cchar *,int,int,int) noex ;
-extern int dialtcpnls(cc *,cc *,int,cc *,int,int) noex ;
-extern int dialtcpmux(cc *,cc *,int,cc *,mainv,int,int) noex ;
-extern int dialfinger(cc *,cc *,int,cc *,mainv,int,int) noex ;
-extern int dialhttp(cc *,cc *,int,cc *,mainv,int,int) noex ;
+extern int dialtcp	(cchar *,cchar *,int,int,int) noex ;
+extern int dialtcpnls	(cc *,cc *,int,cc *,int,int) noex ;
+extern int dialtcpmux	(cc *,cc *,int,cc *,mainv,int,int) noex ;
+extern int dialfinger	(cc *,cc *,int,cc *,mainv,int,int) noex ;
+extern int dialhttp	(cc *,cc *,int,cc *,mainv,int,int) noex ;
 
 EXTERNC_end
 
