@@ -42,16 +42,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<unistd.h>		/* |sysconf(3c)| */
-#include	<climits>		/* |PID_MAX| (if supplied) */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucsysconf.h>
-#include	<isoneof.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® |pid_t| */
+#include	<unistd.h>		/* POSIX® |sysconf(3c)| */
+#include	<climits>		/* CSTD |PID_MAX| (if supplied) */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucsysconf.h>		/* LIBU */
+#include	<isoneof.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getmaxpid.h"
 
@@ -79,7 +79,7 @@
 
 struct pidmgr {
 	pid_t		pid ;		/* assume this is atomic */
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -117,8 +117,7 @@ int getmaxpid(int w) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end subroutine (getmaxpid) */
+} /* end subroutine (getmaxpid) */
 
 
 /* local subroutines */
