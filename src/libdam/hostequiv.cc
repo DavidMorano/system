@@ -28,7 +28,7 @@
 **************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<strings.h>		/* POSIX® |strcasecmp(3c)| */
+#include	<strings.h>		/* BSD |strcasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
