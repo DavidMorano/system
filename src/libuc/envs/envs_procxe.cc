@@ -56,30 +56,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizevar.hh>
-#include	<expcook.h>
-#include	<vecstr.h>
-#include	<nulstr.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<ascii.h>
-#include	<buffer.h>
-#include	<snwcpy.h>
-#include	<sfx.h>			/* |sfweirdo(3uc)| */
-#include	<strn.h>
-#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<char.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC |sfweirdo(3uc)| */
+#include	<strn.h>		/* LIBUC */
+#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"envs.h"
 
@@ -105,8 +105,6 @@ import ucstream ;
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -139,16 +137,16 @@ namespace {
 	    clp = aclp ;
 	    dlp = adlp ;
 	    envv = ev ;
-	} ; /* end if (ctor) */
-	int procer(cchar *) noex ;
-	int expln(cchar *,int) noex ;
-	int ln(cchar *,int) noex ;
-	int lner(cchar *,int) noex ;
-	int lner(cchar *,int,AT *,int,cchar *,int) noex ;
-	int deps(cchar *,int) noex ;
-	int vals(buffer *,cchar *,cchar *,int) noex ;
-	int val(buffer *,cchar *,cchar *,int) noex ;
-	int def(buffer *,cchar *,int) noex ;
+	} ; /* end ctor */
+	int procer	(cchar *) noex ;
+	int expln	(cchar *,int) noex ;
+	int ln		(cchar *,int) noex ;
+	int lner	(cchar *,int) noex ;
+	int lner	(cchar *,int,AT *,int,cchar *,int) noex ;
+	int deps	(cchar *,int) noex ;
+	int vals	(buffer *,cchar *,cchar *,int) noex ;
+	int val		(buffer *,cchar *,cchar *,int) noex ;
+	int def		(buffer *,cchar *,int) noex ;
     } ; /* end struct (subinfo) */
 } /* end namespace */
 
@@ -169,9 +167,9 @@ local int	mkterms() noex ;
 
 /* local variables */
 
-constexpr int		rsn = SR_NOTFOUND ;
-constexpr int		termsize = ((UCHAR_MAX + 1) / CHAR_BIT) ;
-constexpr int		envnamelen = ENVNAMELEN ;
+constexpr int		rsn		= SR_NOTFOUND ;
+constexpr int		termsize	= ((UCHAR_MAX + 1) / CHAR_BIT) ;
+constexpr int		envnamelen	= ENVNAMELEN ;
 
 static char		vterms[termsize] ;
 static char		dterms[termsize] ;
@@ -182,7 +180,7 @@ constexpr cchar		ssp[] = {
 	CH_LPAREN, 
 	CH_RPAREN,
 	0
-} ;
+} ; /* end array */
 
 constexpr cchar		strassign[] = "+:;¶µ­Ð=-" ;
 
@@ -198,8 +196,7 @@ int envs_procxe(envs *op,EC *clp,mainv ev,VS *dlp,cchar *fn) noex {
 	if ((rs = envs_magic(op,clp,ev,dlp,fn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0]) ylikely {
-		static cint	rst = mkterms() ;
-	        if ((rs = rst) >= 0) ylikely {
+		if (static cint rst = mkterms() ; (rs = rst) >= 0) ylikely {
 		    subinfo	si(op,clp,ev,dlp) ;
 		    rs = si.procer(fn) ;
 		    c = rs ;
@@ -207,8 +204,7 @@ int envs_procxe(envs *op,EC *clp,mainv ev,VS *dlp,cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (envs_procxe) */
+} /* end subroutine (envs_procxe) */
 
 
 /* local subroutines */
@@ -222,7 +218,7 @@ int subinfo::procer(cchar *fn) noex {
 	    cint	sz = ((rs + 1) * NLINES) ;
 	    if (char *lbuf ; (rs = lm_mall((sz + 1),&lbuf)) > 0) ylikely {
 		cint	llen = sz ;
-	        if (ucstream ef ; (rs = ef.open(fn,"r")) >= 0) {
+	        if (ucstream ef ; (rs = ef.open(fn,"r")) >= 0) ylikely {
 	            while ((rs = ef.readlns(lbuf,llen,-1,np)) > 0) {
 	                cchar	*cp{} ;
 			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
@@ -239,8 +235,7 @@ int subinfo::procer(cchar *fn) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (maxlinelen) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (subinfo::procer) */
+} /* end method (subinfo::procer) */
 
 int subinfo::expln(cchar *sp,int sl) noex {
 	int		rs ;
@@ -249,10 +244,10 @@ int subinfo::expln(cchar *sp,int sl) noex {
 	if (sl < 0) sl = lenstr(sp) ;
 	if (strnchr(sp,sl,'%') != nullptr) {
 	    cint	bsz = (sl + 20) ;
-	    if (buffer b ; (rs = b.start(bsz)) >= 0) {
-	        if ((rs = expcook_expbuf(clp,0,&b,sp,sl)) >= 0) {
+	    if (buffer b ; (rs = b.start(bsz)) >= 0) ylikely {
+	        if ((rs = expcook_expbuf(clp,0,&b,sp,sl)) >= 0) ylikely {
 	            cint	bl = rs ;
-	            if (cchar *bp{} ; (rs = b.get(&bp)) >= 0) {
+	            if (cchar *bp{} ; (rs = b.get(&bp)) >= 0) ylikely {
 	                rs = ln(bp,bl) ;
 	                len = rs ;
 	            } /* end if (buffer-get) */
@@ -265,8 +260,7 @@ int subinfo::expln(cchar *sp,int sl) noex {
 	    len = rs ;
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (subinfo::expln) */
+} /* end method (subinfo::expln) */
 
 /****
 	LOCAL ?		PATH ¶= 		$(LOCAL)/bin
@@ -290,7 +284,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	while (sl && char_iswhite(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
-	}
+	} /* end while */
 	/* extract any dependencies (if we have any) */
 	if (((tp = strnbrk(sp,sl,scl)) != np) && (*tp == '?')) {
 	    cint	tl = intconv(tp - sp) ;
@@ -300,7 +294,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	        while (sl && char_iswhite(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
-	        }
+	        } /* end while */
 	    } /* end if (subinfo::deps) */
 	} /* end if (getting dependencies) */
 	if (rs > 0) { /* greater-than */
@@ -313,7 +307,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	        while (sl && char_iswhite(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
-	        }
+	        } /* end while */
 	        while ((tp = strnbrk(sp,1,strassign)) != nullptr) {
 	            cint	ach = mkchar(tp[0]) ;
 	            switch (ach) {
@@ -384,8 +378,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	    } /* end if (sfbrk) */
 	} /* end if (positive) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (subinfo::ln) */
+} /* end method (subinfo::ln) */
 
 int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -444,8 +437,7 @@ int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 	    if (rs >= 0) rs = len ;
 	} /* end if (buffer initialization) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (subinfo::lner) */
+} /* end method (subinfo::lner) */
 
 int subinfo::deps(cchar *sp,int sl) noex {
 	cnullptr	np{} ;
@@ -469,8 +461,7 @@ int subinfo::deps(cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (subinfo::deps) */
+} /* end method (subinfo::deps) */
 
 /* process definition values */
 int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
@@ -502,8 +493,7 @@ int subinfo::vals(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (subinfo::vals) */
+} /* end method (subinfo::vals) */
 
 int subinfo::val(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -529,8 +519,7 @@ int subinfo::val(buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	    len += rs ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (subinfo::val) */
+} /* end method (subinfo::val) */
 
 int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 	int		rs = SR_OK ;
@@ -571,16 +560,15 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 	    } /* end block */
 	} /* end if (non-zero) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (subinfo::def) */
+} /* end method (subinfo::def) */
 
 local int mkterms() noex {
 	int		rs ;
-	if ((rs = fieldterms(vterms,false,'\t',' ','#',':',';')) >= 0) ylikely {
-	    rs = fieldterms(dterms,false,'\t',' ',',') ;
+	cbool		f = false ;
+	if ((rs = fieldterms(vterms,f,'\t',' ','#',':',';')) >= 0) ylikely {
+	    rs = fieldterms(dterms,f,'\t',' ',',') ;
 	}
 	return rs ;
-}
-/* end subroutine (mkterms) */
+} /* end subroutine (mkterms) */
 
 
