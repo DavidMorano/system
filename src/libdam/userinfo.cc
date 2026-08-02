@@ -66,7 +66,7 @@
 #include	<netdb.h>		/* POSIX */
 #include	<pwd.h>			/* POSIX */
 #include	<grp.h>			/* POSIX */
-#include	<strings.h>		/* CSTD |strcasecmp(3c)| */
+#include	<strings.h>		/* BSD |strcasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
