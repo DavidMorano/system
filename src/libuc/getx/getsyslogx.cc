@@ -41,17 +41,17 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/syslog.h>		/* for LOG_XXX numbers */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<nleadstr.h>
-#include	<strwcpy.h>
-#include	<cfdec.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getsyslogx.h"
 
@@ -151,8 +151,7 @@ int getsyslogfac(cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	}
 	return (rs >= 0) ? val : rs ;
-}
-/* end subroutine (getsyslogfac) */
+} /* end subroutine (getsyslogfac) */
 
 int getsyslogpri(cchar *sp,int sl) noex {
 	const logitem	*lfs = logpris ;
@@ -188,13 +187,12 @@ int getsyslogpri(cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	}
 	return (rs >= 0) ? val : rs ;
-}
-/* end subroutine (getlogpri) */
+} /* end subroutine (getlogpri) */
 
 const char *strfacname(int fac) noex {
 	const logitem	*lfs = logfacs ;
 	cchar		*res = nullptr ;
-	if (fac >= 0) {
+	if (fac >= 0) ylikely {
 	    int		i ; /* used-afterwards */
 	    bool	f = false ;
 	    for (i = 0 ; lfs[i].name != nullptr ; i += 1) {
@@ -204,7 +202,6 @@ const char *strfacname(int fac) noex {
 	    if (f) res = lfs[i].name ;
 	} /* end if (valid) */
 	return res ;
-}
-/* end subroutine (strfacname) */
+} /* end subroutine (strfacname) */
 
 
