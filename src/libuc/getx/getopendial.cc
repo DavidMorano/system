@@ -37,14 +37,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<matstr.h>
-#include	<opendials.h>		/* |opendialer(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<matstr.h>		/* LIBUC */
+#include	<opendials.h>		/* LIBUC |opendialer(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getopendial.h"
 
@@ -85,9 +85,9 @@ using libuc::opendial_data ;		/* variable */
 int getopendial(cchar *name) noex {
     	int		rs = SR_FAULT ;
 	int		v = 0 ;
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 		rs = SR_NOTFOUND ;
 		if ((v = matstr(names,name,-1)) >= 0) {
 		    rs = SR_OK ;
@@ -100,7 +100,6 @@ int getopendial(cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (getopendial) */
+} /* end subroutine (getopendial) */
 
 
