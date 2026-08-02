@@ -69,22 +69,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |sort(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |libu::cfdec(3u)| */
-#include	<uinet.h>
-#include	<bufsizevar.hh>
-#include	<strdcpy.h>
-#include	<strwcmp.h>
-#include	<hasx.h>		/* |hasalldig(3uc)| */
-#include	<localmisc.h>
-#include	<dprint.hh>		/* debugging */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* CSTD |sort(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |libu::cfdec(3u)| */
+#include	<uinet.h>		/* LIBU */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<strdcpy.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasalldig(3uc)| */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU debugging */
 
 #include	"getaf.h"
 
@@ -332,8 +332,7 @@ int getaf(cchar *sp,int ªsl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getaf) */
+} /* end subroutine (getaf) */
 
 #if	CF_GETAFLEN
 int getaflen(int af) noex {
@@ -350,8 +349,7 @@ int getaflen(int af) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end subroutine (getaflen) */
+} /* end subroutine (getaflen) */
 #endif /* CF_GETAFLEN */
 
 /* reads out as: str-af-name */
@@ -362,8 +360,7 @@ cchar *strafname(int af) noex {
 	    if (afs[i].af == af) break ;
 	} /* end for */
 	return (afs[i].name) ? afs[i].name : "unknown" ;
-}
-/* end subroutine (strafname) */
+} /* end subroutine (strafname) */
 
 
 /* local subroutines */
