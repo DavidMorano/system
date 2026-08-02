@@ -20,16 +20,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<dialopts.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<dialopts.h>		/* LIBUC */
 
 
 EXTERNC_begin
 
-extern int dialuss(cchar *,int,int) noex ;
-extern int dialussnls(cc *,cc *,int,int) noex ;
-extern int dialussmux(cc *,cc *,mainv,int,int) noex ;
+extern int dialuss	(cchar *,int,int) noex ;
+extern int dialussnls	(cc *,cc *,int,int) noex ;
+extern int dialussmux	(cc *,cc *,mainv,int,int) noex ;
 
 EXTERNC_end
 
