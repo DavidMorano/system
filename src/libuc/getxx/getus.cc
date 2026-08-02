@@ -38,12 +38,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucgetus.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucgetus.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getus.h"
 
@@ -79,17 +79,14 @@
 
 int getus_begin() noex {
 	return uc_getusbegin() ;
-}
-/* end subroutine (getus_begin) */
+} /* end subroutine (getus_begin) */
 
 int getus_end() noex {
 	return uc_getusend() ;
-}
-/* end subroutine (getus_end) */
+} /* end subroutine (getus_end) */
 
 int getus_ent(char *rbuf,int rlen) noex {
 	return uc_getusent(rbuf,rlen) ;
-}
-/* end subroutine (getus_ent) */
+} /* end subroutine (getus_ent) */
 
 
