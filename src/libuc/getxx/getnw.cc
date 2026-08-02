@@ -35,12 +35,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucgetnw.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucgetnw.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getnw.h"
 
@@ -76,13 +76,11 @@
 
 int getnw_begin(int sf) noex {
 	return uc_getnwbegin(sf) ;
-}
-/* end subroutine (getnw_begin) */
+} /* end subroutine (getnw_begin) */
 
 int getnw_end() noex {
 	return uc_getnwend() ;
-}
-/* end subroutine (getnw_end) */
+} /* end subroutine (getnw_end) */
 
 int getnw_ent(ucentnw *nep,char *rbuf,int rlen) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -91,17 +89,14 @@ int getnw_ent(ucentnw *nep,char *rbuf,int rlen) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (getnw_ent) */
+} /* end subroutine (getnw_ent) */
 
 int getnw_name(ucentnw *nep,char *rbuf,int rlen,cchar *name) noex {
 	return uc_getnwnam(nep,rbuf,rlen,name) ;
-}
-/* end subroutine (getnw_name) */
+} /* end subroutine (getnw_name) */
 
 int getnw_addr(ucentnw *nep,char *rbuf,int rlen,int af,int num) noex {
 	return uc_getnwnum(nep,rbuf,rlen,af,num) ;
-}
-/* end subroutine (getnw_addr) */
+} /* end subroutine (getnw_addr) */
 
 
