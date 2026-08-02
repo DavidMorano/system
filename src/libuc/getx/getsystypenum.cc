@@ -46,17 +46,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<bufsizeget.h>
-#include	<matstr.h>
-#include	<snwcpy.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
 #include	<systypenames.h>	/* |systypename| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getsystypenum.h"
 
@@ -91,12 +91,12 @@ local int	getfield(cchar *,int,cchar **) noex ;
 
 int getsystypenum(char *tbuf,char *nbuf,cchar *stn,cchar *release) noex {
 	int		rs = SR_FAULT ;
-	if (tbuf && nbuf && stn && release) {
+	if (tbuf && nbuf && stn && release) ylikely {
 	    rs = SR_INVALID ;
 	    tbuf[0] = '\0' ;
 	    nbuf[0] = '\0' ;
-	    if (stn[0] && release[0]) {
-		if ((rs = bufsizeget(bufsize_un)) >= 0) {
+	    if (stn[0] && release[0]) ylikely {
+		if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 		    cint	olen = rs ;
 	            if (int si ; (si = matstr(systypename,stn,-1)) >= 0) {
 	                int	cl ;
@@ -131,8 +131,7 @@ int getsystypenum(char *tbuf,char *nbuf,cchar *stn,cchar *release) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getsystypenum) */
+} /* end subroutine (getsystypenum) */
 
 
 /* local subroutines */
