@@ -40,25 +40,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<vecobj.h>
-#include	<tmpx.h>
-#include	<strwcpy.h>
-#include	<intsat.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<tmpx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getuserterms.h"
 
@@ -133,17 +133,16 @@ constexpr int	lline = TMPX_LLINE ;
 int getuserterms(vecstr *lp,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (lp && un) {
+	if (lp && un) ylikely {
 	    rs = SR_INVALID ;
-	    if (un[0]) {
+	    if (un[0]) ylikely {
 		userterms	uo(un) ;
 		rs = uo(lp) ;
 		n = rs ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (getuserterms) */
+} /* end subroutine (getuserterms) */
 
 
 /* local subroutines */
@@ -152,8 +151,8 @@ int userterms::operator () (vecstr *tlp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = start()) >= 0) {
-	    if ((rs = proc()) >= 0) {
+	if ((rs = start()) >= 0) ylikely {
+	    if ((rs = proc()) >= 0) ylikely {
 		n = rs ;
 		rs = load(tlp) ;
 	    } /* end if (vecobj_proc) */
@@ -161,7 +160,7 @@ int userterms::operator () (vecstr *tlp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (start-finish) */
 	return (rs >= 0) ? n : rs ;
-}
+} /* end method */
 
 int userterms::start() noex {
 	cint		osz = szof(terment) ;
@@ -175,10 +174,10 @@ int userterms::start() noex {
 	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 		vecobj_finish(&el) ;
-	    }
-	}
+	    } /* end if (error) */
+	} /* end if (vecobj_start) */
 	return rs ;
-}
+} /* end method */
 
 int userterms::finish() noex {
 	int		rs = SR_OK ;
@@ -196,11 +195,11 @@ int userterms::finish() noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
+} /* end method */
 
 int userterms::load(vecstr *tlp) noex {
 	int		rs ;
-	if ((rs = vecobj_sort(&el,revsortfunc)) >= 0) {
+	if ((rs = vecobj_sort(&el,revsortfunc)) >= 0) ylikely {
 	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(&el,i,&vp) >= 0 ; i += 1) {
 		TE	*ep = (TE *) vp ;
@@ -211,7 +210,7 @@ int userterms::load(vecstr *tlp) noex {
 	    } /* end for */
 	} /* end if */
 	return rs ;
-}
+} /* end method */
 
 int userterms::entfins() noex {
 	int		rs = SR_OK ;
@@ -225,15 +224,15 @@ int userterms::entfins() noex {
 	    }
 	} /* end for */
 	return rs ;
-}
+} /* end method */
 
 int userterms::proc() noex {
 	cint		of = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (tmpx tx ; (rs = tmpx_open(&tx,nullptr,of)) >= 0) {
-	    if (tmpx_cur cur ; (rs = tmpx_curbegin(&tx,&cur)) >= 0) {
+	if (tmpx tx ; (rs = tmpx_open(&tx,nullptr,of)) >= 0) ylikely {
+	    if (tmpx_cur cur ; (rs = tmpx_curbegin(&tx,&cur)) >= 0) ylikely {
 	        tmpx_ent	ue ;
 		char		*bp = (tbuf + tl) ;
 	        while ((rs1 = tmpx_fetchuser(&tx,&cur,&ue,un)) > 0) {
@@ -263,18 +262,16 @@ int userterms::proc() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (UTMPX open) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (userterms::proc) */
+} /* end method (userterms::proc) */
 
 local int terment_start(TE *ep,cc *sp,int sl,time_t t) noex {
 	int		rs ;
 	ep->atime = t ;
-	if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) ylikely {
 	    ep->devpath = cp ;
 	} /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (terment_start) */
+} /* end subroutine (terment_start) */
 
 local int terment_finish(TE *ep) noex {
 	int		rs = SR_FAULT ;
@@ -286,16 +283,15 @@ local int terment_finish(TE *ep) noex {
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->devpath = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (terment_finish) */
+} /* end subroutine (terment_finish) */
 
 local int getatime(cc *termdev,time_t *tp) noex {
 	int		rs ;
 	*tp = 0 ;
-	if (USTAT sb ; (rs = u_stat(termdev,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(termdev,&sb)) >= 0) {
 	    *tp = sb.st_atime ;
 	    if ((sb.st_mode & S_IWGRP) != S_IWGRP) {
 	        rs = SR_RDONLY ;
@@ -304,8 +300,7 @@ local int getatime(cc *termdev,time_t *tp) noex {
 	    rs = SR_OK ;
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (getatime) */
+} /* end subroutine (getatime) */
 
 local int revsortfunc(cvoid **v1pp,cvoid **v2pp) noex {
 	TE		**f1pp = (TE **) v1pp ;
@@ -325,7 +320,6 @@ local int revsortfunc(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (revsortfunc) */
+} /* end subroutine (revsortfunc) */
 
 
