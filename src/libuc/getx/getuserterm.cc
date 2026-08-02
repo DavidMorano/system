@@ -40,17 +40,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<tmpx.h>
-#include	<snx.h>
-#include	<mkx.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<tmpx.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getuserterm.h"
 
@@ -105,11 +105,11 @@ int getuserterm(char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (rbuf && un) {
+	if (rbuf && un) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (un[0]) {
-		if (suber so(rbuf,rlen,un) ; (rs = so.start()) >= 0) {
+	    if (un[0]) ylikely {
+		if (suber so(rbuf,rlen,un) ; (rs = so.start()) >= 0) ylikely {
 		    if ((rs = so.tmpenum()) >= 0) {
 			len = rs ;
 		    }
@@ -119,15 +119,14 @@ int getuserterm(char *rbuf,int rlen,cchar *un) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getuserterm) */
+} /* end subroutine (getuserterm) */
 
 
 /* local subroutines */
 
 int suber::start() noex {
 	int		rs ;
-	if (char *p ; (rs = lm_mp(&p)) >= 0) {
+	if (char *p ; (rs = lm_mp(&p)) >= 0) ylikely {
 	    tbuf = p ;
 	    tlen = rs ;
 	} /* end if (memory-acquire) */
@@ -137,7 +136,7 @@ int suber::start() noex {
 int suber::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (tbuf) {
+	if (tbuf) ylikely {
 	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    tbuf = nullptr ;
@@ -153,8 +152,8 @@ int suber::tmpenum() noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (tmpx ut ; (rs = ut.open(np,to)) >= 0) {
-	    if (tmpx_cur cur ; (rs = ut.curbegin(&cur)) >= 0) {
+	if (tmpx ut ; (rs = ut.open(np,to)) >= 0) ylikely {
+	    if (tmpx_cur cur ; (rs = ut.curbegin(&cur)) >= 0) ylikely {
 	        tmpx_ent	ue ;
 	        while (rs >= 0) {
 		    bool	f = true ;
@@ -194,9 +193,9 @@ local int newer(char *termdev,time_t *tp) noex {
 	int		rs1 ;
 	int		f = false ; /* return-value */
 	cmode		om = 0666 ;
-	if ((rs = u_open(termdev,of,om)) >= 0) {
+	if ((rs = u_open(termdev,of,om)) >= 0) ylikely {
 	    cint	fd = rs ;
-	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
 		f = true ;
 	        f = f && ((sb.st_mode & S_IWGRP) == S_IWGRP) ;
 	        f = f && (sb.st_atime > *tp) ;
