@@ -37,17 +37,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucinfo.h>
-#include	<sfx.h>
-#include	<snwcpy.h>
-#include	<sncpyx.h>
-#include	<sncpyxw.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucinfo.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<sncpyxw.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getsysname.h"
 
@@ -98,16 +98,15 @@ constexpr namer_m	tries[] = {
 
 int getsysname(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen >= 0) {
+	    if (rlen >= 0) ylikely {
 	        namer nao(rbuf,rlen) ;
 	        rs = nao ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getsysname) */
+} /* end subroutine (getsysname) */
 
 
 /* local subroutines */
@@ -125,9 +124,9 @@ int namer::tryenv() noex {
 	static cchar	*valp = getenver(varname.sysname) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (valp) {
+	if (valp) ylikely {
 	    cchar	*cp ;
-	    if (int cl ; (cl = sfshrink(valp,-1,&cp)) > 0) {
+	    if (int cl ; (cl = sfshrink(valp,-1,&cp)) > 0) ylikely {
 		rs = snwcpy(rbuf,rlen,cp,cl) ;
 		len = rs ;
 	    }
@@ -138,7 +137,7 @@ int namer::tryenv() noex {
 int namer::trysys() noex {
 	int		rs ;
 	int		len = 0 ;
-	if (ucinfo_names names ; (rs = ucinfo_name(&names)) >= 0) {
+	if (ucinfo_names names ; (rs = ucinfo_name(&names)) >= 0) ylikely {
 	    rs = sncpy(rbuf,rlen,names.sysname) ;
 	    len = rs ;
 	} /* end if (ucinfo) */
