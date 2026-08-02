@@ -27,13 +27,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ema.h"
 
@@ -104,7 +104,7 @@ void ema::dtor() noex {
     if (cint rs = finish ; rs < 0) {
 	ulogerror("ema",rs,"dtor-finish") ;
     }
-}
+} /* end method (ema::dtor) */
 
 int ema_st::operator () (cchar *sp,int sl) noex {
 	int		rs = SR_BUGCHECK ;
@@ -116,8 +116,7 @@ int ema_st::operator () (cchar *sp,int sl) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ema_st::operator) */
+} /* end method (ema_st::operator) */
 
 ema_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -132,7 +131,6 @@ ema_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ema_co::operator) */
+} /* end method (ema_co::operator) */
 
 
