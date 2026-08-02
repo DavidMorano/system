@@ -49,20 +49,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucgetpid.h>		/* |ucsid| */
-#include	<getutmp.h>		/* |getutmpterm(3uc)| */
-#include	<tmpx.h>
-#include	<storebuf.h>
-#include	<mknpath.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucgetpid.h>		/* LIBUC |ucsid| */
+#include	<getutmp.h>		/* LIBUC |getutmpterm(3uc)| */
+#include	<tmpx.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<mknpath.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getlogx.h"
 
@@ -78,8 +78,6 @@ import uconstants ;			/* |sysword(3u)| */
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -131,8 +129,7 @@ int getlogid(char *rbuf,int rlen,pid_t sid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getlogid) */
+} /* end subroutine (getlogid) */
 
 int getlogname(char *rbuf,int rlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
@@ -146,8 +143,7 @@ int getlogname(char *rbuf,int rlen,pid_t sid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getlogname) */
+} /* end subroutine (getlogname) */
 
 local int getlogtermer(char *dbuf,int dlen,int usid) noex {
 	cnullptr	np{} ;
@@ -165,8 +161,7 @@ local int getlogtermer(char *dbuf,int dlen,int usid) noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (TMPX) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getlogtermer) */
+} /* end subroutine (getlogtermer) */
 
 int getlogterm(char *dbuf,int dlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
@@ -187,8 +182,7 @@ int getlogterm(char *dbuf,int dlen,pid_t sid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getlogterm) */
+} /* end subroutine (getlogterm) */
 
 int getloghost(char *dbuf,int dlen,pid_t sid) noex {
 	int		rs = SR_FAULT ;
@@ -202,7 +196,6 @@ int getloghost(char *dbuf,int dlen,pid_t sid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getloghost) */
+} /* end subroutine (getloghost) */
 
 
