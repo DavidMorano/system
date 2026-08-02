@@ -30,8 +30,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	NLPS_REQ0	"NLPS:000:001:"	/* version 0 */
@@ -42,8 +42,8 @@
 
 EXTERNC_begin
 
-extern int	mknlsreq(char *,int,cchar *,int) noex ;
-extern int	readnlsresp(int,char *,int,int) noex ;
+extern int	mknlsreq	(char *,int,cchar *,int) noex ;
+extern int	readnlsresp	(int,char *,int,int) noex ;
 
 EXTERNC_end
 
