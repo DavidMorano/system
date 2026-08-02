@@ -36,7 +36,7 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
-#include	<strings.h>		/* CSTD  |strncasecmp(3c)| */
+#include	<strings.h>		/* BSD |strncasecmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
