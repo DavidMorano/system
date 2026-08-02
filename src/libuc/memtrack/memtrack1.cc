@@ -108,7 +108,7 @@ int memtrack::ins(cvoid *addr,int asize) noex {
 	if ((rs = magic) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
-	    if (addr && (asize > 0)) {
+	    if (addr && (asize > 0)) ylikely {
 		const ent	e = { addr, asize } ;
 		rs = tp->ins(a,e) ;
 	    } /* end if (valid addr) */
@@ -121,7 +121,7 @@ int memtrack::rem(cvoid *addr) noex {
 	if ((rs = magic) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
-	    if (addr) {
+	    if (addr) ylikely {
 		rs = tp->rem(a) ;
 	    } /* end if (valid addr) */
 	} /* end if (was open) */
@@ -133,8 +133,8 @@ int memtrack::present(cvoid *addr) noex {
 	if ((rs = magic) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
-	    if (addr) {
-		if (ent e{} ; (rs = tp->get(a,&e)) >= 0) {
+	    if (addr) ylikely {
+		if (ent e{} ; (rs = tp->get(a,&e)) >= 0) ylikely {
 		    rs = e.asize ;
 		}
 	    } /* end if (valid addr) */
@@ -147,8 +147,8 @@ int memtrack::get(cvoid *addr,memtrack_ent *ep) noex {
 	if ((rs = magic) >= 0) ylikely {
 	    const uintptr_t	a = uintptr_t(addr) ;
 	    rs = SR_INVALID ;
-	    if (addr) {
-		if (ent e{} ; (rs = tp->get(a,&e)) >= 0) {
+	    if (addr) ylikely {
+		if (ent e{} ; (rs = tp->get(a,&e)) >= 0) ylikely {
 		    rs = e.asize ;
 		    if (ep) *ep = e ;
 		}
@@ -164,14 +164,14 @@ int memtrack::istart(int n) noex {
 	int		rs = SR_INVALID ;
 	if (n >= 0) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((tp = new(nothrow) track_t) != nullptr) {
-	        if ((rs = tp->start(n)) >= 0) {
+	    if ((tp = new(nothrow) track_t) != nullptr) ylikely {
+	        if ((rs = tp->start(n)) >= 0) ylikely {
 		    magval = memtrack_magicval ;
 	        }
 		if (rs < 0) {
 		    delete tp ;
 		    tp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-mapblock) */
 	} /* end if (valid) */
 	return rs ;
