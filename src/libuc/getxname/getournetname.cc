@@ -44,19 +44,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucgetnetname.h>
-#include	<getxid.h>		/* |getuid_name(3uc)| */
-#include	<getxname.h>
-#include	<getnisdomain.h>	/* |getnisdomain(3uc)| */
-#include	<sncpyx.h>
-#include	<ctdec.h>
-#include	<localmisc.h>		/* |DECBUFLEN| */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetnetname.h>	/* LIBUC */
+#include	<getxid.h>		/* LIBUC |getuid_name(3uc)| */
+#include	<getxname.h>		/* LIBUC */
+#include	<getnisdomain.h>	/* LIBUC |getnisdomain(3uc)| */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |DECBUFLEN| */
 
 #include	"getournetname.h"
 
@@ -102,7 +102,7 @@ int getournetname(char *nbuf,int nlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (nlen < 0) nlen = netlen ;
-	if (nbuf) {
+	if (nbuf) ylikely {
 	    if ((un == nullptr) || (un[0] == '\0') || (un[0] == '-')) {
 	        if (nlen >= netlen) {
 	            rs = uc_getnetname(nbuf,nlen) ;
@@ -120,8 +120,7 @@ int getournetname(char *nbuf,int nlen,cchar *un) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getournetname) */
+} /* end subroutine (getournetname) */
 
 
 /* local subroutines */
@@ -131,10 +130,10 @@ local int getothernetname(char *nbuf,int nlen,cchar *un) noex {
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
 	cchar		*procname = PROCNAME ;
-	if ((rs = uc_procpid(procname,0)) > 0) {
-	    if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) {
+	if ((rs = uc_procpid(procname,0)) > 0) ylikely {
+	    if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) ylikely {
 		cint	dlen = rs ;
-	        if ((rs = getnisdomain(dbuf,dlen)) >= 0) {
+	        if ((rs = getnisdomain(dbuf,dlen)) >= 0) ylikely {
 	            cint	dl = rs ;
 		    if ((rs = getuid_user(un,-1)) >= 0) {
 	                cint	dilen = DECBUFLEN ;
