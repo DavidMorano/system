@@ -113,7 +113,6 @@ uint hash_again(uint ohash,int c,int nskip) noex {
 	    nhash = (ohash + 1) ;
 	}
 	return nhash ;
-}
-/* end subroutine (hash_again) */
+} /* end subroutine (hash_again) */
 
 
