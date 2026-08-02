@@ -94,8 +94,7 @@ int getpwx_control(int ns) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (getpwx_control) */
+} /* end subroutine (getpwx_control) */
 
 int getpwx_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *name) noex {
 	int		rs = SR_FAULT ;
@@ -107,8 +106,7 @@ int getpwx_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getpwx_name) */
+} /* end subroutine (getpwx_name) */
 
 int getpwx_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
@@ -120,8 +118,7 @@ int getpwx_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getpwx_uid) */
+} /* end subroutine (getpwx_uid) */
 
 int ucentpwx::nam(char *pwbuf,int pwlen,cchar *un) noex {
     	return getnam(pwbuf,pwlen,un) ;
