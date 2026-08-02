@@ -29,18 +29,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<termios.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucdesc.h>
-#include	<uctc.h>		/* terminal-conrol */
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<termios.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<uctc.h>		/* LIBUC terminal-conrol */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getpassword.h"
 
@@ -60,12 +61,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_read(int,void *,int) noex ;
-    extern int uc_write(int,cvoid *,int) noex ;
-}
 
 
 /* external variables */
@@ -89,8 +84,8 @@ int getpassword(cchar *prompt,char *passbuf,int passlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rlen = 0 ;
-	if (prompt && passbuf) {
-	    if ((rs = u_open(TTYFNAME,O_RDWR,0666)) >= 0) {
+	if (prompt && passbuf) ylikely {
+	    if ((rs = u_open(TTYFNAME,O_RDWR,0666)) >= 0) ylikely {
 	        cint	fd = rs ;
 	        if (TERMIOS oterm ; (rs = uc_tcattrget(fd,&oterm)) >= 0) {
 	            TERMIOS	nterm = oterm ;
@@ -116,7 +111,6 @@ int getpassword(cchar *prompt,char *passbuf,int passlen) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rlen : rs ;
-}
-/* end subroutine (getpassword) */
+} /* end subroutine (getpassword) */
 
 
