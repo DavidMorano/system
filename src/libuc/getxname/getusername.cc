@@ -281,8 +281,7 @@ int getusername(char *ubuf,int ulen,uid_t uid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getusername) */
+} /* end subroutine (getusername) */
 
 int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
@@ -290,13 +289,10 @@ int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	DPRINTF("ent uid=%u\n",uid) ;
 	if (pwp && pwbuf) ylikely {
 	    rs = SR_INVALID ;
-	    DPRINTF("1\n") ;
 	    if (pwlen > 0) ylikely {
-	        DPRINTF("2\n") ;
 	        if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 		    getxuser	xu{} ;
 		    cint	ulen = rs ;
-	            DPRINTF("bufsizeget() un rs=%d\n",rs) ;
 		    char	ubuf[rs + 1] ;	/* <- on the stack */
 	            xu.pwp = pwp ;
 	            xu.pwbuf = pwbuf ;
@@ -304,17 +300,14 @@ int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	            xu.ubuf = ubuf ;
 	            xu.ulen = ulen ;
 	            xu.uid = uid ;
-		    DPRINTF("-> getxusername\n") ;
 	            rs = getxusername(&xu) ;
-		    DPRINTF("getxusername() rs=%d\n",rs) ;
 		    len = rs ;
 	        } /* end if (bufsizeget) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getpwusername) */
+} /* end subroutine (getpwusername) */
 
 local int getxusername_µprep(getxuser *) noex ;
 local int getxusername_µtryer(getxuser *) noex ;
@@ -325,25 +318,18 @@ int getxusername(getxuser *xup) noex {
 	int		len = 0 ; /* return-value */
 	DPRINTF("ent\n") ;
 	if (xup) ylikely {
-	DPRINTF("1\n") ;
 	    if (xup->pwp && xup->ubuf) ylikely {
-	DPRINTF("2\n") ;
-	DPRINTF("-> getxusername_uprep\n") ;
 		if ((rs = getxusername_µprep(xup)) >= 0) ylikely {
-	DPRINTF("getxusername_uprep() rs=%d\n",rs) ;
 		    if ((rs = getxusername_µtryer(xup)) > 0) ylikely {
-	DPRINTF("getxusername_utryer() rs=%d\n",rs) ;
 		        len = rs ;
 		        rs = getxusername_µcache(xup) ;
-	DPRINTF("getxusername_ucache() rs=%d\n",rs) ;
 		    } /* end if (got one) */
 		} /* end if (preparation) */
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getxusername) */
+} /* end subroutine (getxusername) */
 
 
 /* local subroutines */
@@ -379,8 +365,7 @@ local int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getusernamer) */
+} /* end subroutine (getusernamer) */
 
 local int getxusername_µprep(getxuser *xup) noex {
     	static const uid_t	uid = getuid() ;
@@ -404,33 +389,25 @@ local int getxusername_µtryer(getxuser *xup) noex {
 	DPRINTF("ent\n") ;
         if (vecstr *nlp ; (nlp = new(nt) vecstr) != np) ylikely {
 	    cint	vn = 10 ;
-	DPRINTF("1\n") ;
 	    xup->nlp = nlp ;
             if ((rs = nlp->start(vn)) >= 0) ylikely {
-	DPRINTF("vecstr_start() rs=%d\n",rs) ;
 		{
                     for (int i = 0 ; getxusernames[i] ; i += 1) {
                         getxuser_f  fun = getxusernames[i] ;
-	DPRINTF("for i=%d\n",i) ;
                         rs = fun(xup) ;
-	DPRINTF("for fun rs=%d\n",rs) ;
                         if (rs) break ;
                     } /* end for */
-	DPRINTF("for-out rs=%d\n",rs) ;
                     len = rs ;
 		} /* end block */
-	DPRINTF("-> vecstr_finish\n") ;
                 rs1 = nlp->finish ;
                 if (rs >= 0) rs = rs1 ;
-	DPRINTF("vecstr_finish() rs=%d\n",rs) ;
             } /* end if (vecstr) */
-	DPRINTF("vecstr_start-out  rs=%d\n",rs) ;
             if ((rs >= 0) && (len == 0)) {
 		rs = SR_NOTFOUND ;
 	    }
 	    {
-            delete nlp ;
-            xup->nlp = nullptr ;
+                delete nlp ;
+                xup->nlp = nullptr ;
 	    } /* end if (memory-release) */
         } /* end if (new-vecstr) */
 	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
@@ -457,16 +434,12 @@ local int getxusername_self(getxuser *xup) noex {
 	    const uid_t	uid = xup->uid ;
 	    char	*ubuf = xup->ubuf ;
 	    cint	ulen = xup->ulen ;
-	    DPRINTF("1\n") ;
 	    if ((rs = ucproguser_nameget(ubuf,ulen,uid)) > 0) {
-	        DPRINTF("ucproguser_nameget() rs=%d\n",rs) ;
 		xup->unl = rs ;
 		len = rs ;
 		if ((rs = getxusername_lookup(xup,xup->ubuf)) == 0) {
-	            DPRINTF("getxusername_lookup() rs=%d\n",rs) ;
 		    len = 0 ;
 		} /* end if */
-	        DPRINTF("getxusername_lookup- out rs=%d\n",rs) ;
 	    } /* end if (ucproguser_nameget) */
 	} /* end if (self) */
 	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
@@ -514,7 +487,7 @@ local int getxusername_utmp(getxuser *xup) noex {
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
 	if_constexpr (f_utmpacc) {
-	    if ((rs = utmpacc_entbuflen) >= 0) {
+	    if ((rs = utmpacc_entbuflen) >= 0) ylikely {
 	        utmpacc_ent	ue{} ; 
 	        cint		uelen = rs ;
 		if (char *uebuf ; (rs = lm_mall((uelen+1),&uebuf)) >= 0) {
