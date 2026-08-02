@@ -38,19 +38,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucfileop.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialopts.h"
 
@@ -93,14 +93,14 @@ namespace {
 	int olinger() noex ;
 	int ocloexec() noex ;
     } ; /* end struct (dialmgr) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 static inline bool	btst(int w,int n) noex {
 	return ((w >> n) & 1) ;
-}
+} /* end subroutine */
 
 
 /* local variables */
@@ -120,8 +120,7 @@ int dialopts(int fd,int opts) noex {
 	    rs = dialopt ;
 	}
 	return rs ;
-}
-/* end subroutine (dialopts) */
+} /* end subroutine (dialopts) */
 
 
 /* local subroutines */
@@ -144,8 +143,7 @@ dialmgr::operator int () noex {
 	    } /* end if (hit) */
 	} /* end for */
 	return rs ;
-}
-/* end method (dialmgr::operator) */
+} /* end method (dialmgr::operator) */
 
 int dialmgr::okeepalive() noex {
 	int		one = 1 ;
@@ -154,8 +152,7 @@ int dialmgr::okeepalive() noex {
 	cint		cmd = SO_KEEPALIVE ;
 	int *const	onep = &one ;
 	return uc_sockoptset(fd,sol,cmd,onep,osz) ;
-}
-/* end method (dialmgr::okeepalive) */
+} /* end method (dialmgr::okeepalive) */
 
 int dialmgr::olinger() noex {
 	int		rs = SR_OK ;
@@ -164,12 +161,10 @@ int dialmgr::olinger() noex {
 	    rs = uc_linger(fd,to) ;
 	} /* end if_constexpr (f_linger) */
 	return rs ;
-}
-/* end method (dialmgr::olinger) */
+} /* end method (dialmgr::olinger) */
 
 int dialmgr::ocloexec() noex {
 	return uc_closeonexec(fd,true) ;
-}
-/* end method (dialmgr::ocloexec) */
+} /* end method (dialmgr::ocloexec) */
 
 
