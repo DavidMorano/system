@@ -28,9 +28,9 @@ EXTERNC_begin
 
 extern int	removes(cchar *) noex ;
 
-static inline int rmdirs(cchar *dn) noex {
+local inline int rmdirs(cchar *dn) noex {
 	return removes(dn) ;
-}
+} /* end subroutine */
 
 EXTERNC_end
 
