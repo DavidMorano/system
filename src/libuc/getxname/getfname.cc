@@ -57,19 +57,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>
-#include	<cstddef>
-#include	<utility>		/* |std::unreachable(c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkpathx.h>
-#include	<permx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<utility>		/* C++STD |std::unreachable(c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getfname.h"
 
@@ -137,7 +137,7 @@ namespace {
 int getfname(cc *pr,char *rbuf,getfnames ft,cc *fn,int am) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (pr && rbuf && fn) {
+	if (pr && rbuf && fn) ylikely {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
 	    if ((ft >= 0) && (ft < getfname_overlast) && fn[0]) ylikely {
@@ -150,8 +150,7 @@ int getfname(cc *pr,char *rbuf,getfnames ft,cc *fn,int am) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getrbuf) */
+} /* end subroutine (getrbuf) */
 
 
 /* local subroutines */
@@ -205,7 +204,7 @@ int subinfo::loc() noex {
 int subinfo::rem() noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (pr) {
+	if (pr) ylikely {
 	    if ((rs = mkpath(rbuf,pr,fname)) >= 0) ylikely {
 		len = rs ;
 	        if ((rs = perm(rbuf,-1,-1,nullptr,am)) >= 0) {
