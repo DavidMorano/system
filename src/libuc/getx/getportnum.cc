@@ -45,19 +45,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<getserv.h>		/* |getserv_name(3uc)| */
-#include	<cfdec.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<getserv.h>		/* LIBUC |getserv_name(3uc)| */
+#include	<cfdec.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getportnum.h"
 
@@ -115,7 +115,6 @@ int getportnum(cchar *pn,cchar *ps) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? port : rs ;
-}
-/* end subroutine (getportnum) */
+} /* end subroutine (getportnum) */
 
 
