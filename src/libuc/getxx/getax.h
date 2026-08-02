@@ -20,13 +20,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucentpw.h>
-#include	<ucentua.h>
-#include	<ucentsp.h>
-#include	<ucentgr.h>
-#include	<ucentpj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucentpw.h>		/* LIBUC */
+#include	<ucentua.h>		/* LIBUC */
+#include	<ucentsp.h>		/* LIBUC */
+#include	<ucentgr.h>		/* LIBUC */
+#include	<ucentpj.h>		/* LIBUC */
 
 
 EXTERNC_begin
