@@ -138,9 +138,9 @@ export {
 	    if (magval) dtor() ;
 	} ; /* end if (dtor) */
     private:
-	int	istart(int = 0) noex ;
-	int	ifinish() noex ;
-	int	icount() noex ;
+	int istart	(int = 0) noex ;
+	int ifinish	() noex ;
+	int icount	() noex ;
     } ; /* end struct (memtrack) */
 } /* end export */
 
