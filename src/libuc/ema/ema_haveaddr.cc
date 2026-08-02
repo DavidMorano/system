@@ -27,12 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ema.h"
 
@@ -91,7 +91,6 @@ int ema_haveaddr(ema *op,cchar *ap,int al) noex {
 	    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-} 
-/* end subroutine (ema_haveaddr) */
+} /* end subroutine (ema_haveaddr) */
 
 
