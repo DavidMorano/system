@@ -49,14 +49,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<getnodename.h>
-#include	<ucgetho.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<ucgetho.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getho.h"
 
@@ -92,31 +92,28 @@
 
 int getho_begin(int stayopen) noex {
 	return uc_gethobegin(stayopen) ;
-}
-/* end subroutine (getho_begin) */
+} /* end subroutine (getho_begin) */
 
 int getho_end() noex {
 	return uc_gethoend() ;
-}
-/* end subroutine (getho_end) */
+} /* end subroutine (getho_end) */
 
 int getho_ent(ucentho *hep,char *hebuf,int helen) noex {
 	return uc_gethoent(hep,hebuf,helen) ;
-}
-/* end subroutine (getho_ent) */
+} /* end subroutine (getho_ent) */
 
 int getho_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
 	char		*nbuf{} ;
-	if ((rs = lm_nn(&nbuf)) >= 0) {
+	if ((rs = lm_nn(&nbuf)) >= 0) ylikely {
 	    cint	nlen = rs ;
 	    if ((name == nullptr) || (name[0] == '\0')) {
 	        rs = getnodename(nbuf,nlen) ;
 	        name = nbuf ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = uc_gethonam(hep,hebuf,helen,name) ;
 		rv = rs ;
 	    }
@@ -124,12 +121,10 @@ int getho_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (getho_name) */
+} /* end subroutine (getho_name) */
 
 int getho_addr(ucentho *hep,char *hb,int hl,int af,cvoid *ap,int al) noex {
 	return uc_gethoadd(hep,hb,hl,af,ap,al) ;
-}
-/* end subroutine (getho_addr) */
+} /* end subroutine (getho_addr) */
 
 
