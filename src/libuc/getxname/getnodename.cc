@@ -46,16 +46,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* <- |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucinfo.h>
-#include	<sncpyx.h>
-#include	<snwcpy.h>
-#include	<rmx.h>			/* <- for |rmchr(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucinfo.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC |rmchr(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"getnodename.h"
 
@@ -112,13 +112,12 @@ constexpr nodeinfo_m	tries[] = {
 
 int getnodename(char *nbuf,int nlen) noex {
 	int		rs = SR_FAULT ;
-	if (nbuf) {
+	if (nbuf) ylikely {
 	    nodeinfo	ni(nbuf,nlen) ;
 	    rs = ni ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (getnodename) */
+} /* end subroutine (getnodename) */
 
 
 /* local subroutines */
@@ -135,8 +134,8 @@ nodeinfo::operator int () noex {
 int nodeinfo::env() noex {
 	int		rs = SR_OK ;
 	cchar		*vn = varname.node ;
-	if (vn) {
-	    if (vn[0]) {
+	if (vn) ylikely {
+	    if (vn[0]) ylikely {
 		static cchar	*vp = getenver(vn) ;
 	 	if (vp) {
 		    if (vp[0]) {
@@ -150,7 +149,7 @@ int nodeinfo::env() noex {
 
 int nodeinfo::uinfo() noex {
 	int		rs ;
-	if (ucinfo_names uin ; (rs = ucinfo_name(&uin)) >= 0) {
+	if (ucinfo_names uin ; (rs = ucinfo_name(&uin)) >= 0) ylikely {
 	    cint	nl = rmchr(uin.nodename,-1,'.') ;
 	    rs = snwcpy(nbuf,nlen,uin.nodename,nl) ;
 	} /* end if (ucinfo_name) */
