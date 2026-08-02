@@ -20,12 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 enum dialopts {
-	dialopt_none,
 	dialopt_keepalive,
 	dialopt_linger,
 	dialopt_long,
@@ -44,19 +43,32 @@ enum dialopts {
 
 
 #define	DIALOPT_NONE		0
-#define	DIALOPT_KEEPALIVE	(1<<0)	/* keep connection alive */
-#define	DIALOPT_LINGER		(1<<1)
-#define	DIALOPT_LONG		(1<<2)	/* for |dialfinger(3uc)| */
-#define	DIALOPT_PWD		(1<<3)	/* same directory as PWD */
-#define	DIALOPT_NOLINGER	(1<<4)	/* do not linger */
-#define	DIALOPT_NOLIGHT		(1<<5)	/* do not go into "light" mode */
-#define	DIALOPT_ERRCHAN		(1<<6)	/* separate error channel */
-#define	DIALOPT_REUSE		(1<<7)	/* reuse address */
-#define	DIALOPT_WAIT		(1<<8)	/* wait for available node */
-#define	DIALOPT_WTIMED		(1<<9)	/* use the time-out for waiting */
-#define	DIALOPT_EMPTY		(1<<10)	/* use an empty machine first */
-#define	DIALOPT_NOCHECK		(1<<11)	/* do not check cluster DB */
-#define	DIALOPT_CLOEXEC		(1<<12)	/* close-on-exec */
+/* keep connection alive */
+#define	DIALOPT_KEEPALIVE	(1 << dialopt_keepalive)
+/* make the connection linger open */
+#define	DIALOPT_LINGER		(1 << dialopt_linger)
+/* for |dialfinger(3uc)| */
+#define	DIALOPT_LONG		(1 << dialopt_long)
+/* same directory as PWD */
+#define	DIALOPT_PWD		(1 << dialopt_pwd)
+/* do not linger */
+#define	DIALOPT_NOLINGER	(1 << dialopt_nolinger)
+/* do not go into "light" mode */
+#define	DIALOPT_NOLIGHT		(1 << dialopt_nolight)
+/* separate error channel */
+#define	DIALOPT_ERRCHAN		(1 << dialopt_errchan)
+/* reuse address */
+#define	DIALOPT_REUSE		(1 << dialopt_reuse)
+/* wait for available node */
+#define	DIALOPT_WAIT		(1 << dialopt_wait)
+/* use the time-out for waiting */
+#define	DIALOPT_WTIMED		(1 << dialopt_wtimed)
+/* use an empty machine first */
+#define	DIALOPT_EMPTY		(1 << dialopt_empty)
+/* do not check cluster DB */
+#define	DIALOPT_NOCHECK		(1 << dialopt_nocheck)
+/* close-on-exec */
+#define	DIALOPT_CLOEXEC		(1 << dialopt_cloexec)
 
 
 EXTERNC_begin
