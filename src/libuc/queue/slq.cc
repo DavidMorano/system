@@ -26,13 +26,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"slq.h"
 
@@ -76,8 +76,7 @@ int slq_start(slq *op) noex {
 	    op->tail = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (slq_start) */
+} /* end subroutine (slq_start) */
 
 int slq_finish(slq *op) noex {
 	int		rs = SR_FAULT ;
@@ -87,8 +86,7 @@ int slq_finish(slq *op) noex {
 	    op->tail = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (slq_finish) */
+} /* end subroutine (slq_finish) */
 
 int slq_ins(slq *op,slq_ent *ep) noex {
 	int		rs = SR_FAULT ;
@@ -109,8 +107,7 @@ int slq_ins(slq *op,slq_ent *ep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (slq_ins) */
+} /* end subroutine (slq_ins) */
 
 int slq_insgroup(slq *op,void *vp,int esz,int n) noex {
 	caddr_t		ca = caddr_t(vp) ;
@@ -127,8 +124,7 @@ int slq_insgroup(slq *op,void *vp,int esz,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (slq_insgroup) */
+} /* end subroutine (slq_insgroup) */
 
 int slq_rem(slq *op,slq_ent **epp) noex {
 	int		rs = SR_FAULT ;
@@ -147,8 +143,7 @@ int slq_rem(slq *op,slq_ent **epp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (slq_rem) */
+} /* end subroutine (slq_rem) */
 
 int slq_gethead(slq *op,slq_ent **epp) noex {
 	int		rs = SR_FAULT ;
@@ -165,8 +160,7 @@ int slq_gethead(slq *op,slq_ent **epp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (slq_gethead) */
+} /* end subroutine (slq_gethead) */
 
 int slq_gettail(slq *op,slq_ent **epp) noex {
 	int		rs = SR_FAULT ;
@@ -183,8 +177,7 @@ int slq_gettail(slq *op,slq_ent **epp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (slq_gettail) */
+} /* end subroutine (slq_gettail) */
 
 int slq_audit(slq *op) noex {
 	int		rs = SR_FAULT ;
@@ -225,8 +218,7 @@ slq_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (slq_co::operator) */
+} /* end method (slq_co::operator) */
 
 int slq::ins(slq_ent *ep) noex {
 	return slq_ins(this,ep) ;
