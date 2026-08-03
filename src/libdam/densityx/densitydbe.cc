@@ -75,7 +75,7 @@ import libutil ;			/* |lenstr(3u)| */
 int densitydbe_start(densitydbe *op) noex {
     	DENSITYDBE	*hop = op ;
     	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -83,7 +83,7 @@ int densitydbe_start(densitydbe *op) noex {
 
 int densitydbe_finish(densitydbe *op) noex {
     	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
@@ -92,10 +92,10 @@ int densitydbe_finish(densitydbe *op) noex {
 int densitydbe_wr(densitydbe *op,cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op && mbuf) {
+	if (op && mbuf) ylikely {
 	    char	*buf = cast_const<charp>(mbuf) ;
 	    if (mlen < 0) mlen = INT_MAX ;
-	    if (serialbuf mb ; (rs = mb.start(buf,mlen)) >= 0) {
+	    if (serialbuf mb ; (rs = mb.start(buf,mlen)) >= 0) ylikely {
 	        {
 	            mb >> op->count ;
 	            mb >> op->utime ;
@@ -110,9 +110,9 @@ int densitydbe_wr(densitydbe *op,cchar *mbuf,int mlen) noex {
 int densitydbe_rd(densitydbe *op,char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    if (mlen < 0) mlen = INT_MAX ;
-	    if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	    if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 		{
 		    mb << op->count ;
 		    mb << op->utime ;
@@ -126,7 +126,7 @@ int densitydbe_rd(densitydbe *op,char *mbuf,int mlen) noex {
 
 int densitydbe_entsz(densitydbe *op) noex {
     	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = szof(densitydbe_head) ;
 	}
 	return rs ;
@@ -168,7 +168,7 @@ densitydbe::operator int () noex {
 
 densitydbe_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case densitydbemem_start:
 	        rs = densitydbe_start(op) ;
