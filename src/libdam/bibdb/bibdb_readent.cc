@@ -183,7 +183,7 @@ namespace bibdbx {
 		BDB_KEY *bkp) noex {
 	int		rs = SR_BUGCHECK ;
 	DEBUGPRINTF("ent\n") ;
-	if (op && bkp && bep && bebuf) {
+	if (op && bkp && bep && bebuf) ylikely {
 	    readenter ro(op,bep,bebuf,belen,bkp) ;
 	    rs = ro ;
 	} /* end if (non-null) */
@@ -201,7 +201,7 @@ readenter::operator int () noex {
 	DEBUGPRINTF("bk ckey=%s\n",bkp->ckey) ;
 	DEBUGPRINTF("bk foff=%u\n",bkp->foff) ;
 	DEBUGPRINTF("bk clen=%d\n",bkp->clen) ;
-	if (void *vp ; (rs = flp->get(fi,&vp)) >= 0) {
+	if (void *vp ; (rs = flp->get(fi,&vp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (bibdb_entfile *bfep = resumelife<bibdb_entfile>(vp) ; bfep) {
 	        rs = procfile(bfep->fname) ;
@@ -216,11 +216,11 @@ int readenter::procfile(cchar *fname) noex {
     	int		rs = SR_NOMEM ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if (bibentry *iep = new(nt) bibentry ; iep) {
-	    if ((rs = bibentry_start(iep,fi)) >= 0) {
-	        if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
+	if (bibentry *iep = new(nt) bibentry ; iep) ylikely {
+	    if ((rs = bibentry_start(iep,fi)) >= 0) ylikely {
+	        if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) ylikely {
 		    cint llen = rs ;
-	            if (bfile bf ; (rs = bf.open(fname,"r")) >= 0) {
+	            if (bfile bf ; (rs = bf.open(fname,"r")) >= 0) ylikely {
 		        coff	boff = off_t(bkp->foff) ;
 	                if ((rs = bf.seek(boff,SEEK_SET)) >= 0) {
 			    {
