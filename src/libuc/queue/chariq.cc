@@ -26,15 +26,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<charq.h>
-#include	<ptm.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<charq.h>		/* LIBUC */
+#include	<ptm.h>			/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"chariq.h"
 
@@ -121,8 +121,7 @@ int chariq_start(chariq *op,int sz) noex {
 	    } /* end if (ptm_create) */
 	} /* end if (chariq_ctor) */
 	return rs ;
-}
-/* end subroutine (chariq_start) */
+} /* end subroutine (chariq_start) */
 
 int chariq_finish(chariq *op) noex {
 	int		rs = SR_FAULT ;
@@ -144,8 +143,7 @@ int chariq_finish(chariq *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (chariq_finish) */
+} /* end subroutine (chariq_finish) */
 
 int chariq_ins(chariq *op,int ch) noex {
 	int		rs = SR_FAULT ;
@@ -163,8 +161,7 @@ int chariq_ins(chariq *op,int ch) noex {
 	    } /* end if (ptm) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (chariq_ins) */
+} /* end subroutine (chariq_ins) */
 
 int chariq_rem(chariq *op,char *chp) noex {
 	int		rs = SR_FAULT ;
@@ -182,8 +179,7 @@ int chariq_rem(chariq *op,char *chp) noex {
 	    } /* end if (ptm) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (chariq_rem) */
+} /* end subroutine (chariq_rem) */
 
 int chariq_remall(chariq *op) noex {
 	int		rs = SR_FAULT ;
@@ -201,8 +197,7 @@ int chariq_remall(chariq *op) noex {
 	    } /* end if (ptm) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (chariq_remall) */
+} /* end subroutine (chariq_remall) */
 
 int chariq_size(chariq *op) noex {
 	int		rs = SR_FAULT ;
@@ -220,8 +215,7 @@ int chariq_size(chariq *op) noex {
 	    } /* end if (ptm) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (chariq_size) */
+} /* end subroutine (chariq_size) */
 
 int chariq_count(chariq *op) noex {
 	int		rs = SR_FAULT ;
@@ -239,8 +233,7 @@ int chariq_count(chariq *op) noex {
 	    } /* end if (ptm) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (chariq_count) */
+} /* end subroutine (chariq_count) */
 
 int chariq::start(int µsz) noex {
 	return chariq_start(this,µsz) ;
@@ -286,7 +279,6 @@ chariq_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (chariq_co::operator) */
+} /* end method (chariq_co::operator) */
 
 
