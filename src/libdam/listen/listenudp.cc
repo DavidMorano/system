@@ -41,45 +41,39 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<getportnum.h>
-#include	<getproto.h>
-#include	<getpf.h>
-#include	<sockaddress.h>
-#include	<inetaddr.h>
-#include	<hostent.h>
-#include	<hostinfo.h>
-#include	<hostaddr.h>
-#include	<mnw.h>			/* |mnwcpy(3uc)| */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<getportnum.h>		/* LIBUC */
+#include	<getproto.h>		/* LIBUC */
+#include	<getpf.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<inetaddr.h>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<hostinfo.h>		/* LIBUC */
+#include	<hostaddr.h>		/* LIBUC */
+#include	<mnw.h>			/* LIBU |mnwcpy(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"listenudp.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
-
-#ifndef	INET4ADDRLEN
-#define	INET4ADDRLEN	szof(in_addr_t)
-#endif
-
-#ifndef	INET6ADDRLEN
-#define	INET6ADDRLEN	16
-#endif
-
-#ifndef	INETXADDRLEN
-#define	INETXADDRLEN	MAX(INET4ADDRLEN,INET6ADDRLEN)
-#endif /* INETXADDRLEN */
 
 #ifndef	PROTONAME_UDP
 #define	PROTONAME_UDP	"udp"
@@ -94,18 +88,6 @@
 
 #ifndef	INETADDRBAD
 #define	INETADDRBAD	((unsigned int) (~ 0))
-#endif
-
-#ifndef	INET4_ADDRSTRLEN
-#define	INET4_ADDRSTRLEN	16
-#endif
-
-#ifndef	INET6_ADDRSTRLEN
-#define	INET6_ADDRSTRLEN	46	/* Solaris® says this is 46! */
-#endif
-
-#ifndef	INETX_ADDRSTRLEN
-#define	INETX_ADDRSTRLEN	MAX(INET4_ADDRSTRLEN,INET6_ADDRSTRLEN)
 #endif
 
 #ifndef	INETOPT_REUSEADDR
@@ -132,9 +114,9 @@ typedef unsigned int	in_addr_t ;
 
 /* forward references */
 
-static int	getaddr(char *,int,cchar *) noex ;
+local int	getaddr(char *,int,cchar *) noex ;
 
-static int	hostinfo_findaf(HOSTINFO *,char *,int,int) noex ;
+local int	hostinfo_findaf(HOSTINFO *,char *,int,int) noex ;
 
 
 /* local variables */
@@ -160,9 +142,7 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 
 	if (portspec == NULL) return SR_FAULT ;
 	if (portspec[0] == '\0') return SR_INVALID ;
-
-/* host */
-
+	/* host */
 	if (hostname && (hostname[0] != '\0') && (hostname[0] != '*')) {
 	    if ((inet4addr = inet_addr(hostname)) != INETADDRBAD) {
 		f_anyhost = (inet4addr == INADDR_ANY) ;
@@ -190,15 +170,13 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 	    memset(addr,0,INETXADDRLEN) ; /* any-host */
 	    if (af == AF_UNSPEC) af = AF_INET6 ;
 	}
-
-/* port */
-
+	/* port */
 	if ((rs >= 0) && (portspec[0] != '*')) {
 	    rs = getportnum(protoname,portspec) ;
 	    port = rs ;
 	} /* end if (getting a port) */
 
-/* get protocol family (from address-family) */
+	/* get protocol family (from address-family) */
 
 	if (rs >= 0) {
 	    if (af == AF_UNSPEC) af = AF_INET6 ;
@@ -206,7 +184,7 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 	    pf = rs ;
 	}
 
-/* get the protocol number */
+	/* get the protocol number */
 
 #if	CF_PROTOLOOKUP
 	if (rs >= 0) {
@@ -229,7 +207,7 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 	    }
 	}
 
-/* opts */
+	/* opts */
 
 	if ((rs >= 0) && (opts & INETOPT_REUSEADDR)) {
 	    cint	osz = szof(int) ;
@@ -251,20 +229,18 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 	    } /* end if (socketet) */
 	} /* end if */
 
-/* done */
+	/* done */
 
 	if ((rs < 0) && (s >= 0)) {
 	    u_close(s) ;
-	}
-
+	} /* end if (error) */
 	return (rs >= 0) ? s : rs ;
-}
-/* end subroutine (listenudp) */
+} /* end subroutine (listenudp) */
 
 
 /* local subroutines */
 
-static int getaddr(char *hap,int af,cchar *hn) noex {
+local int getaddr(char *hap,int af,cchar *hn) noex {
 	HOSTINFO	hi ;
 	int		rs ;
 	int		raf = 0 ;
@@ -288,19 +264,20 @@ static int getaddr(char *hap,int af,cchar *hn) noex {
 	} /* end if (hostinfo) */
 
 #ifdef	COMMENT
-	if ((rs == 0) || (rs == SR_NOTFOUND)) rs = SR_HOSTUNREACH ;
+	if ((rs == 0) || (rs == SR_NOTFOUND)) {
+	    rs = SR_HOSTUNREACH ;
+	}
 #endif
 
 	return (rs >= 0) ? raf : rs ;
-}
-/* end subroutine (getaddr) */
+} /* end subroutine (getaddr) */
 
-static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
-	hostinfo_cur	cur ;
+local int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
 	int		rs ;
 	int		rs1 ;
 	int		al = 0 ;
 	int		f = false ;
+	hostinfo_cur	cur ;
 	if ((rs = hostinfo_curbegin(hip,&cur)) >= 0) {
 	    const uchar	*ap ;
 	    while ((rs = hostinfo_curenumaddr(hip,&cur,&ap)) > 0) {
@@ -325,7 +302,6 @@ static int hostinfo_findaf(HOSTINFO *hip,char *abuf,int alen,int af) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hostinfo-cursor) */
 	return (rs >= 0) ? al : rs ;
-}
-/* end subroutine (hostinfo_findaf) */
+} /* end subroutine (hostinfo_findaf) */
 
 
