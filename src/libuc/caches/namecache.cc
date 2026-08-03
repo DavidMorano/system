@@ -103,7 +103,7 @@ local int namecache_ctor(namecache *op,Args ... args) noex {
 	    memclear(hop) ;
 	    if ((op->dbp = new(nothrow) hdb) != np) ylikely {
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-hdb) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (namecache_ctor) */
@@ -198,7 +198,7 @@ int namecache_finish(NC *op) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->vname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 	        rs1 = namecache_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -387,7 +387,7 @@ local int namecache_entfins(NC *op) noex {
 		{
 	            rs1 = lm_free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
-		}
+		} /* end if (memory-release) */
 	    } /* end while */
 	    rs1 = hdb_curend(elp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -422,7 +422,7 @@ local int entry_finish(NC_ENT *ep) noex {
 	        rs1 = lm_free(ep->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->a = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    ep->username = nullptr ;
 	    ep->realname = nullptr ;
 	} /* end if (non-null) */
@@ -462,7 +462,7 @@ local int entry_loadnames(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 	if (ep->a != nullptr) {
 	    lm_free(ep->a) ;
 	    ep->a = nullptr ;
-	}
+	} /* end if (memory-release) */
 	sz += (lenstr(up)+1) ;
 	sz += (lenstr(rp,rl)+1) ;
 	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) ylikely {
