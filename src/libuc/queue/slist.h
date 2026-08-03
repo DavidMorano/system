@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>
-#include	<stdlib.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	SLIST		struct slist_head
@@ -83,17 +83,17 @@ struct slist : slist_head {
 	} ;
 	slist(const slist &) = delete ;
 	slist &operator = (const slist &) = delete ;
-	int ins(slist_ent *) noex ;
-	int insgroup(slist_ent *,int,int) noex ;
-	int present(slist_ent *) noex ;
-	int gethead(slist_ent **) noex ;
-	int gettail(slist_ent **) noex ;
-	int rem(slist_ent **) noex ;
-	int unlink(slist_ent *) noex ;
-	int curbegin(slist_cur *) noex ;
-	int curenum(slist_cur *,slist_ent **) noex ;
-	int curend(slist_cur *) noex ;
-	void dtor() noex ;
+	int ins		(slist_ent *) noex ;
+	int insgroup	(slist_ent *,int,int) noex ;
+	int present	(slist_ent *) noex ;
+	int gethead	(slist_ent **) noex ;
+	int gettail	(slist_ent **) noex ;
+	int rem		(slist_ent **) noex ;
+	int unlink	(slist_ent *) noex ;
+	int curbegin	(slist_cur *) noex ;
+	int curenum	(slist_cur *,slist_ent **) noex ;
+	int curend	(slist_cur *) noex ;
+	void dtor	() noex ;
 	destruct slist() {
 	    if (head) dtor() ;
 	} ;
