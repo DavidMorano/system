@@ -57,9 +57,7 @@ OBJ_QUEUE= obja_queue.o objb_queue.o objc_queue.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
