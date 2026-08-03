@@ -1,6 +1,6 @@
-# MAKEFILE (libnss)
+# MAKEFILE (libsio)
 
-T= libnss
+T= libsio
 
 ALL= $(T).o $(T).so
 
@@ -33,14 +33,14 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += 
+INCS += libsio.h
 
 MODS +=
 
-LIBS +=
+LIBS += -lnss
 
 
-OBJ_LIBNSS= nss_parse.o
+OBJ= secdb.o
 
 
 INCDIRS=
@@ -61,6 +61,8 @@ LDFLAGS		?= $(MAKELDFLAGS)
 
 
 default:		$(T).o
+
+so:			$(T).so
 
 all:			$(ALL)
 
@@ -90,22 +92,17 @@ all:			$(ALL)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).so:		$(OBJ_LIBNSS)
+$(T).so:		$(OBJ)
 	$(CXX) -shared $(LDFLAGS) -o $@ $(RUNINFO) $^ $(LIBINFO)
 
-$(T).o:			$(OBJ_LIBNSS)
+$(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-$(T).a:			$(OBJ_LIBNSS)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
 	rm -f $(TALL)
@@ -124,6 +121,6 @@ obj1.o:			$(OBJ1)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-nss_parse.o:		nss_parse.cc nss_parse.h
+secdb.o:	secdb.cc	secdb.h				$(INCS)
 
 
