@@ -29,13 +29,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"intiq.h"
 
@@ -138,8 +138,7 @@ int intiq_start(intiq *op) noex {
 	    }
 	} /* end if (intiq_ctor) */
 	return rs ;
-}
-/* end subroutine (intiq_start) */
+} /* end subroutine (intiq_start) */
 
 int intiq_finish(intiq *op) noex {
 	int		rs ;
@@ -161,8 +160,7 @@ int intiq_finish(intiq *op) noex {
 	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (intiq_finish) */
+} /* end subroutine (intiq_finish) */
 
 int intiq_ins(intiq *op,int ch) noex {
 	int		rs ;
@@ -181,8 +179,7 @@ int intiq_ins(intiq *op,int ch) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (intiq_ins) */
+} /* end subroutine (intiq_ins) */
 
 int intiq_rem(intiq *op,int *chp) noex {
 	int		rs ;
@@ -201,8 +198,7 @@ int intiq_rem(intiq *op,int *chp) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (intiq_rem) */
+} /* end subroutine (intiq_rem) */
 
 int intiq_count(intiq *op) noex {
 	int		rs ;
@@ -220,8 +216,7 @@ int intiq_count(intiq *op) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (intiq_count) */
+} /* end subroutine (intiq_count) */
 
 int intiq::ins(int ch) noex {
 	return intiq_ins(this,ch) ;
@@ -257,7 +252,6 @@ intiq_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (intiq_co::operator) */
+} /* end method (intiq_co::operator) */
 
 
