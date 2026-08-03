@@ -21,7 +21,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<csysbase.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
 
 #include	<envhelp.h>
