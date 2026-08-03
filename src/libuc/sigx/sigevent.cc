@@ -39,12 +39,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sigevent.h"
 
@@ -83,14 +83,13 @@ import libutil ;			/* |lenstr(3u)| */
 
 int sigevent_load(SIGEVENT *sep,int notify,int signo,int val) noex {
 	int		rs = SR_FAULT ;
-	if (sep) {
+	if (sep) ylikely {
 	    rs = memclear(sep) ;
 	    sep->sigev_notify = notify ;
 	    sep->sigev_signo = signo ;
 	    sep->sigev_value.sival_int = val ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sigevent_load) */
+} /* end subroutine (sigevent_load) */
 
 
