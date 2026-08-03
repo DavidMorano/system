@@ -2,98 +2,110 @@
 
 T= libsio
 
-ALL= $(T).o $(T).a
+ALL= $(T).o $(T).so
 
 
-BINDIR= $(REPOROOT)/bin
-INCDIR= $(REPOROOT)/include
-LIBDIR= $(REPOROOT)/lib
-MANDIR= $(REPOROOT)/man
-INFODIR= $(REPOROOT)/info
-HELPDIR= $(REPOROOT)/share/help
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
+
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
-CRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+DEFS +=
 
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
+INCS += libsio.h
 
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+MODS +=
+
+LIBS += -lnss
 
 
-DEFS=
+OBJ= secdb.o
 
-LDRPATH= $(EXTRA)/lib
 
-INCDIRS= -I$(INCDIR)
-LIBDIRS= -L$(LIBDIR)
+INCDIRS=
+LIBDIRS= -L lib
 
-LIBS=
-
+RUNINFO= -rpath $(RUNDIR)
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
-CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
-CFLAGS= $(MAKECFLAGS)
-CXXFLAGS= $(MAKECXXFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
-LDFLAGS= $(MAKELDFLAGS)
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS)
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
-INCS= stdsio.h
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
-OBJ_LIBSIO= freadln.o
+default:		$(T).o
 
-
-default:		$(T).a
+so:			$(T).so
 
 all:			$(ALL)
 
-.c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
+
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
+
 .c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+	$(COMPILE.c) $<
 
 .cc.o:
-	$(CXX)  $(CPPFLAGS) $(CXXFLAGS) -c $<
+	$(COMPILE.cc) $<
+
+.ccm.o:
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).o:			$(OBJ_LIBSIO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LIBSIO)
+$(T).so:		$(OBJ)
+	$(CXX) -shared $(LDFLAGS) -o $@ $(RUNINFO) $^ $(LIBINFO)
 
-$(T).a:			$(OBJ_LIBSIO)
+$(T).o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
-$(T).nm:		$(T).so
-	$(NM) $(NMFLAGS) $(T).so > $(T).nm
-
-$(T).order:		$(OBJ) $(T).a
-	$(LORDER) $(T).a | $(TSORT) > $(T).order
-	$(RM) $(T).a
-	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+$(T).nm:		$(T).o
+	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
-	rm -f $(ALL)
+	rm -f $(TALL)
 
 clean:
 	makeclean $(ALL)
@@ -101,19 +113,14 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_LIBSIO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBSIO)
 
-obj1_six.o:	$(OBJ1_LIBSIO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LIBSIO)
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_six.o:	$(OBJ2_LIBSIO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LIBSIO)
-
-obj3_six.o:	$(OBJ3_LIBSIO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBSIO)
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-freadln.o:		freadln.cc stdsio.h
+secdb.o:	secdb.cc	secdb.h				$(INCS)
 
 
