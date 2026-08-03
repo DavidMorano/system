@@ -57,15 +57,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bitset>		/* |bitset(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bitset>		/* C++STD |bitset(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snwcpyx.h"
 
@@ -116,7 +116,7 @@ namespace {
 
 /* forwards references */
 
-static inline bool	isour(int) noex ;
+local inline bool	isour(int) noex ;
 
 
 /* local variables */
@@ -132,9 +132,9 @@ constexpr ourmgr	our_data ;
 int snwcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		dl = 0 ; /* return-value */
-	if (dbuf && sp) {
+	if (dbuf && sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (dlen >= 0) {
+	    if (dlen >= 0) ylikely {
 	        rs = SR_OK ;
 	        while (dlen-- && sl && *sp) {
 	            if (cint ch = mkchar(*sp) ; isour(ch)) {
@@ -150,15 +150,13 @@ int snwcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 	    dbuf[dl] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (snwcpyclean) */
+} /* end subroutine (snwcpyclean) */
 
 
 /* local subroutines */
 
-static bool isour(int ch) noex {
+local bool isour(int ch) noex {
     	return our_data.isour[ch] ;
-}
-/* end subroutine (isour) */
+} /* end subroutine (isour) */
 
 
