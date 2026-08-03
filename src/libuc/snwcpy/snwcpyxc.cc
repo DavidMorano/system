@@ -27,13 +27,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<toxc.h>		/* including |chtoxc(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSYD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<toxc.h>		/* LIBUC |chtoxc(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snwcpyxc.h"
 
@@ -58,22 +58,21 @@
 template<char (*chtoxc)(int)>
 int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
     	int		rs = SR_OVERFLOW ; /* return-value */
-	if (dbuf && sp) {
+	if (dbuf && sp) ylikely {
 	    int		i = 0 ; /* used-afterwards */
 	    char	*dp = dbuf ;
 	    if (dlen < 0) dlen = INT_MAX ;
 	    while ((i < dlen) && sl && sp[i]) {
 	        *dp++ = chtoxc(sp[i++]) ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    *dp = '\0' ;
 	    if ((sl == 0) || (sp[i] == '\0')) {
 	        rs = intconv(dp - dbuf) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine-template (snwcpyxc) */
+} /* end subroutine-template (snwcpyxc) */
 
 
 /* local variables */
