@@ -43,22 +43,22 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<bitset>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ulogerror.h>
-#include	<umem.hh>
-#include	<strn.h>		/* |strnbrk(3uc)| */
-#include	<strnul.hh>
-#include	<mkchar.h>
-#include	<localmisc.h>
-#include	<deb.hh>		/* |DEBPRINTF| */
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<bitset>		/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<umem.hh>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnbrk(3uc)| */
+#include	<strnul.hh>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU |DEBPRINTF| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/ureserve.ccm"
