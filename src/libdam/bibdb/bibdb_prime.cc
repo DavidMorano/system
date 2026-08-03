@@ -6,6 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* compile-time debug print-outs */
+#define	CF_QUERY	1		/* bibdb_query */
 
 /* revision history:
 
@@ -118,6 +119,13 @@ import bibdb_mag ;
 #define	KEYVAL		keyval
 #define	NKVE		2		/* number of K-V array entries */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
+#endif
+#ifndef	CF_QUERY
+#define	CF_QUERY	1		/* bibdb_query */
+#endif
+
 
 /* imported namespaces */
 
@@ -151,9 +159,9 @@ local inline int bibdb_ctor(bibdb *op,Args ... args) noex {
 	    op->qkp	= np ;
 	    op->flp	= np ;		/* pointer file-list */
 	    op->klp	= np ;		/* pointer key-list */
-	    if (vecobj *flp = new(nt) vecobj ; flp) {
+	    if (vecobj *flp = new(nt) vecobj ; flp) ylikely {
 		op->flp = flp ;
-	        if (hdb *klp = new(nt) hdb ; klp) {
+	        if (hdb *klp = new(nt) hdb ; klp) ylikely {
 		    op->klp = klp ;
 		    rs = SR_OK ;
 	        } /* end if (new-hdb) */
@@ -218,19 +226,19 @@ int bibdb_start(bibdb *op,cchar *qkey,int opts) noex {
 	if ((qkey == nullptr) || (qkey[0] == '\0')) {
 	    qkey = BDB_QUERYKEY ;
 	}
-	if ((rs = bibdb_ctor(op)) >= 0) {
+	if ((rs = bibdb_ctor(op)) >= 0) ylikely {
 	    vecobj	*flp = op->flp ;
 	    hdb		*klp = op->klp ;
 	    cint	cl = lenstr(qkey) ;
 	    /* store away stuff */
 	    op->opts = opts ;
-	    if (cc *cp ; (rs = mem.strw(qkey,cl,&cp)) >= 0) {
+	    if (cc *cp ; (rs = mem.strw(qkey,cl,&cp)) >= 0) ylikely {
 	        cint	esz = szof(bibdb_entfile) ;
 	        cint	nf = BDB_DEFFILES ;
 	        cint	vo = (vecobjm.ordered | vecobjm.stationary) ;
 	        op->qkp = cp ;
 	        op->qkl = cl ;
-	        if ((rs = flp->start(esz,nf,vo)) >= 0) {
+	        if ((rs = flp->start(esz,nf,vo)) >= 0) ylikely {
 		    cint	ne = BDB_DEFENTRIES ;
 		    if ((rs = klp->start(ne,1,np,np)) >= 0) {
 		        op->magval = BDB_MAGIC ;
@@ -258,7 +266,7 @@ int bibdb_finish(bibdb *op) noex {
     	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = bibdb_magic(op)) >= 0) {
+	if ((rs = bibdb_magic(op)) >= 0) ylikely {
 	    vecobj	*flp = op->flp ;
 	    if (op->qkp) {
 	        voidp vp = voidp(op->qkp) ;
@@ -315,11 +323,11 @@ int bibdb_finish(bibdb *op) noex {
 
 int bibdb_add(bibdb *op,cchar *fname) noex {
 	int		rs ;
-	if ((rs = bibdb_magic(op,fname)) >= 0) {
+	if ((rs = bibdb_magic(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        /* check if the file actually exists */
-	        if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) ylikely {
 	            if (! S_ISDIR(sb.st_mode)) {
 	                bibdb_entfile	bfe ;
 	                if ((rs = bibdbentfile_start(&bfe,fname)) >= 0) {
@@ -341,7 +349,7 @@ int bibdb_add(bibdb *op,cchar *fname) noex {
 
 int bibdb_count(bibdb *op) noex {
 	int		rs ;
-	if ((rs = bibdb_magic(op)) >= 0) {
+	if ((rs = bibdb_magic(op)) >= 0) ylikely {
 	   rs = hdb_count(op->klp) ;
         } /* end if (bibdb_magic) */
 	return rs ;
@@ -351,18 +359,19 @@ int bibdb_count(bibdb *op) noex {
 	local void dumpkeylist(hdb *) noex ;
 #endif /* CF_DEBUG */
 
-#ifdef	COMMENT
+#if	CF_QUERY /* bibdb_query */
 int bibdb_query(bibdb *op,cc *quep,BDB_ENT *bep,char *bebuf,int belen) noex {
     	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
 	DEBUGPRINTF("ent quep=%s\n",quep) ;
-	if ((rs = bibdb_magic(op,quep,bep,hebuf)) >= 0) {
+	if ((rs = bibdb_magic(op,quep,bep,bebuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (quep[0] && (belen > 0)) {
-		if (vecobj *flp = resumelife<vecobj>(op->flp) ; flp) {
+	    if (quep[0] && (belen > 0)) ylikely {
+		if (vecobj *flp = resumelife<vecobj>(op->flp) ; flp) ylikely {
 		    if ((rs = flp->count) > 0) {
+			BDB_KEY bke{} ;
 	    		n = rs ;
 			/* search the keys and find the highest file-index */
 			hdb_dat key{} ;
@@ -405,7 +414,7 @@ int bibdb_query(bibdb *op,cc *quep,BDB_ENT *bep,char *bebuf,int belen) noex {
 	DEBUGPRINTF("ret rs=%d n=%u\n",rs,n) ;
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (bibdb_query) */
-#endif /* COMMENT */
+#endif /* CF_QUERY */
 
 
 /* private subroutines */
@@ -418,7 +427,7 @@ local int bibdb_scan(bibdb *op,hdb_dat key,BDB_KEY *ubkp) noex {
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
 	DEBUGPRINTF("ent\n") ;
-	if (hdb_cur cur ; (rs = klp->curbegin(&cur)) >= 0) {
+	if (hdb_cur cur ; (rs = klp->curbegin(&cur)) >= 0) ylikely {
 	    hdb_dat	val ;
 	    int		fi = -1 ;
 	    while ((rs1 = klp->fetch(key,&cur,&val)) >= 0) {
@@ -452,12 +461,19 @@ local int bibdb_entfileidx(bibdb *op,int n) noex {
 	if (n > 0) {
 	    /* find the youngest file that has not been indexed */
 	    void *vp ;
-	    rs = SR_OK ;
-	    for (fi = (n - 1) ; 
-	        (fi >= 0) && ((rs = flp->get(fi,&vp)) >= 0) ; fi -= 1) {
-		    if (bfep = resumelife<BDB_FI>(vp) ; bfep) {
-	                if (! bfep->f_indexed) break ;
-	            }
+	    cauto fget = [flp] (int fidx,void **vpp) -> int {
+		int rsl = SR_OK ;
+		if (fidx >= 0) {
+	            if ((rsl = flp->get(fidx,vpp)) >= 0) {
+			rsl = 1 ;
+		    }
+		}
+		return rsl ;
+	    } ; /* end lambda (fget) */
+	    for (fi = (n - 1) ; (rs = fget(fi,&vp)) > 0 ; fi -= 1) {
+		if (bfep = resumelife<BDB_FI>(vp) ; bfep) {
+	            if (! bfep->f_indexed) break ;
+	        }
 	    } /* end for */
 	    DEBUGPRINTF("file to index fi=%u\n",fi) ;
 	    /* something to index? */
