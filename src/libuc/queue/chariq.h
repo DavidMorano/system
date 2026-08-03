@@ -30,10 +30,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<charq.h>
-#include	<ptm.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<charq.h>		/* LIBUC */
+#include	<ptm.h>			/* LIBU */
 
 
 #define	CHARIQ		struct chariq_head
@@ -79,10 +79,10 @@ struct chariq : chariq_head {
 	} ; /* end ctor */
 	chariq(const chariq &) = delete ;
 	chariq &operator = (const chariq &) = delete ;
-	int	start(int) noex ;
-	int	ins(int) noex ;
-	int	rem(char *) noex ;
-	void	dtor() noex ;
+	int start	(int) noex ;
+	int ins		(int) noex ;
+	int rem		(char *) noex ;
+	void dtor	() noex ;
 	operator int () noex ;
 	destruct chariq() {
 	    if (cqp) dtor() ;
