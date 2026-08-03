@@ -34,15 +34,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<ptm.h>
-#include	<pq.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<pq.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ciq.h"
 
@@ -69,7 +69,7 @@ using std::nothrow ;			/* constant */
 
 struct ciq_ent : pq_ent {
 	void		*vp ;		/* caller supplied pointer */
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -163,8 +163,7 @@ int ciq_start(ciq *op) noex {
 	    }
 	} /* end if (ciq_ctor) */
 	return rs ;
-}
-/* end subroutine (ciq_start) */
+} /* end subroutine (ciq_start) */
 
 int ciq_finish(ciq *op) noex {
 	int		rs ;
@@ -190,8 +189,7 @@ int ciq_finish(ciq *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (ciq_finish) */
+} /* end subroutine (ciq_finish) */
 
 int ciq_ins(ciq *op,void *vp) noex {
 	int		rs ;
@@ -217,8 +215,7 @@ int ciq_ins(ciq *op,void *vp) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (ciq_ins) */
+} /* end subroutine (ciq_ins) */
 
 int ciq_rem(ciq *op,void *vrp) noex {
 	int		rs ;
@@ -244,8 +241,7 @@ int ciq_rem(ciq *op,void *vrp) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (ciq_rem) */
+} /* end subroutine (ciq_rem) */
 
 int ciq_gettail(ciq *op,void *vrp) noex {
 	int		rs ;
@@ -267,8 +263,7 @@ int ciq_gettail(ciq *op,void *vrp) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (ciq_gettail) */
+} /* end subroutine (ciq_gettail) */
 
 int ciq_remtail(ciq *op,void *vrp) noex {
 	int		rs ;
@@ -294,8 +289,7 @@ int ciq_remtail(ciq *op,void *vrp) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (ciq_remtail) */
+} /* end subroutine (ciq_remtail) */
 
 int ciq_rement(ciq *op,void *ep) noex {
 	int		rs ;
@@ -320,8 +314,7 @@ int ciq_rement(ciq *op,void *ep) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (ciq_rement) */
+} /* end subroutine (ciq_rement) */
 
 int ciq_count(ciq *op) noex {
 	int		rs ;
@@ -339,8 +332,7 @@ int ciq_count(ciq *op) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (ciq_count) */
+} /* end subroutine (ciq_count) */
 
 int ciq_audit(ciq *op) noex {
 	int		rs ;
@@ -358,8 +350,7 @@ int ciq_audit(ciq *op) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (ciq_audit) */
+} /* end subroutine (ciq_audit) */
 
 
 /* private subroutines */
@@ -384,8 +375,7 @@ local int ciq_findent(ciq *op,pq_ent **rpp,cvoid *vrp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pq-cur) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ciq_findent) */
+} /* end subroutine (ciq_findent) */
 
 local int pq_finishup(pq *qp) noex {
 	int		rs = SR_OK ;
@@ -402,8 +392,7 @@ local int pq_finishup(pq *qp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (pq_finishup) */
+} /* end subroutine (pq_finishup) */
 
 int ciq::ins(void *ep) noex {
 	return ciq_ins(this,ep) ;
@@ -458,8 +447,6 @@ ciq_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ciq_co::operator) */
-
+} /* end method (ciq_co::operator) */
 
 
