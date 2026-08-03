@@ -44,17 +44,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<toxc.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
-#include	<cmporders.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<toxc.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<cmporders.h>		/* LIBU */
 
 #include	"strnkeycmp.h"
 
@@ -103,11 +103,11 @@ local inline int getn(cchar *s1,cchar *s2,int n) noex {
 
 local inline bool isend(int ch) noex {
     	return (ch == '=') || (ch == '\0') ;
-}
+} /* end subroutine */
 
 local int strnkeyxcmp(toxc_f tox,cchar *e1p,cchar *e2p,int n) noex {
 	int		rc = 0 ;
-	if (e1p && e2p) {
+	if (e1p && e2p) ylikely {
 	    if ((n = getn(e1p,e2p,n)) > 0) {
 	        for (int i = 0 ; (i < n) && *e1p && *e2p ; i += 1) {
 		    cint ch1 = mkchar(*e1p) ;
@@ -135,7 +135,7 @@ local int strnkeyxcmp(toxc_f tox,cchar *e1p,cchar *e2p,int n) noex {
 
 local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
     	int		rc = 0 ;
-	if (s1 || s2) {
+	if (s1 || s2) ylikely {
 	    rc = +1 ;
 	    if (s1) {
 		rc = -1 ;
