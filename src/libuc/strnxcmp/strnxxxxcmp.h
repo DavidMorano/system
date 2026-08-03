@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* |strncasecmp(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<strings.h>		/* BSD |strncasecmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
