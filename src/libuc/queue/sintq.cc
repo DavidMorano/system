@@ -28,14 +28,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |um(3u)| */
-#include	<localmisc.h>
-#include	<deb.hh>		/* |DEBPRINTF(3uc)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |um(3u)| */
+#include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU |DEBPRINTF(3uc)| */
 
 #include	"sintq.h"
 
@@ -99,8 +99,7 @@ int sintq_start(sintq *op,int ne) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sintq_start) */
+} /* end subroutine (sintq_start) */
 
 int sintq_finish(sintq *op) noex {
 	int		rs = SR_FAULT ;
@@ -116,8 +115,7 @@ int sintq_finish(sintq *op) noex {
 	    op->cnt = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sintq_finish) */
+} /* end subroutine (sintq_finish) */
 
 int sintq_ins(sintq *op,int ch) noex {
 	int		rs = SR_FAULT ;
@@ -139,8 +137,7 @@ int sintq_ins(sintq *op,int ch) noex {
 	} /* end if (non-null) */
 	DEBPRINTF("ret rs=%d c=%d ql=%d wi=%d\n",rs,op->cnt,op->qlen,op->wi) ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sintq_ins) */
+} /* end subroutine (sintq_ins) */
 
 int sintq_rem(sintq *op,short *rp) noex {
 	int		rs = SR_FAULT ;
@@ -154,8 +151,7 @@ int sintq_rem(sintq *op,short *rp) noex {
 	    } /* end if (not-empty) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sintq_rem) */
+} /* end subroutine (sintq_rem) */
 
 int sintq_remread(sintq *op,short *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -188,8 +184,7 @@ int sintq_remall(sintq *op) noex {
 	    op->cnt = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sintq_remall) */
+} /* end subroutine (sintq_remall) */
 
 int sintq_size(sintq *op) noex {
 	int		rs = SR_FAULT ;
@@ -197,8 +192,7 @@ int sintq_size(sintq *op) noex {
 	    rs = op->qlen ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sintq_size) */
+} /* end subroutine (sintq_size) */
 
 int sintq_count(sintq *op) noex {
 	int		rs = SR_FAULT ;
