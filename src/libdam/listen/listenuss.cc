@@ -1,4 +1,5 @@
 /* listenuss SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to listen on a UNIX® socket file */
@@ -26,20 +27,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<sockaddress.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBUC */
 
 #include	"listenuss.h"
 
@@ -69,16 +73,16 @@
 
 /* exported subroutines */
 
-int listenuss(cchar *ps,int om,int lopts) noex {
+int listenuss(cchar *ps,mode_t om,int lopts) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		s = 0 ;
-	if (ps) {
+	if (ps) ylikely {
 	    rs = SR_INVALID ;
-	    if (ps[0]) {
+	    if (ps[0]) ylikely {
 	        cint	pf = PF_UNIX ;
 	        cint	st = SOCK_STREAM ;
-	        if ((rs = u_socket(pf,st,0)) >= 0) {
+	        if ((rs = u_socket(pf,st,0)) >= 0) ylikely {
 	            s = rs ;
 	            if (lopts & 1) {
 	                cint	so = SO_REUSEADDR ;
@@ -105,12 +109,11 @@ int listenuss(cchar *ps,int om,int lopts) noex {
 	            } /* end if (ok) */
 	            if (rs < 0) {
 	                u_close(s) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (socket) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? s : rs ;
-}
-/* end subroutine (listenuss) */
+} /* end subroutine (listenuss) */
 
 
