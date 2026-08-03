@@ -126,12 +126,12 @@ cbool		f_debug		= CF_DEBUG ;
 namespace bibdbx {
     int bibdbentfile_start(bibdb_entfile *fp,cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fp && fname) {
+	if (fp && fname) ylikely {
 	    rs = SR_INVALID ;
 	    memclear(fp) ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        fp->f_indexed = 0 ;
-	        if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) ylikely {
 	            fp->fname = cp ;
 	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
@@ -141,7 +141,7 @@ namespace bibdbx {
     int bibdbentfile_finish(bibdb_entfile *fp) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (fp) {
+	if (fp) ylikely {
 	    rs = SR_OK ;
 	    if (fp->fname) {
 	        voidp vp = voidp(fp->fname) ;
@@ -154,7 +154,7 @@ namespace bibdbx {
     } /* end subroutine bibdbentfile_finish) */
     int bibdbentfile_indexed(bibdb_entfile *fp) noex {
     	int		rs = SR_BUGCHECK ;
-	if (fp) {
+	if (fp) ylikely {
 	    rs = SR_OK ;
 	    fp->f_indexed = true ;
 	} /* end if (non-null) */
