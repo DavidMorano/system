@@ -93,7 +93,7 @@ local int cachetime_ctor(cachetime *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->dbp ;
 		    op->dbp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-hdb) */
 	} /* end if (non-null) */
 	return rs ;
@@ -139,14 +139,14 @@ int cachetime_start(CT *op) noex {
 	        ptm *mxp = op->mxp ;
 	        if ((rs = mxp->create) >= 0) ylikely {
 		    op->magval = CACHETIME_MAGIC ;
-	        }
+	        } /* end if (ok) */
 	        if (rs < 0) {
 		    hdb_finish(op->dbp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (hdb_start) */
 	    if (rs < 0) {
 		cachetime_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (cachetime_ctor) */
 	return rs ;
 } /* end subroutine (cachetime_start) */
@@ -228,12 +228,12 @@ int cachetime_curbegin(CT *op,CT_CUR *curp) noex {
 	            rs = hdb_curbegin(op->dbp,curp->hcp) ;
 	            if (rs < 0) {
 		        mxp->lockend() ;
-	            }
+	            } /* end if (ok) */
 	        } /* end if (mutex-locked) */
 		if (rs < 0) {
 		    delete curp->hcp ;
 		    curp->hcp = nullptr ;
-		}
+		} /* end if (ok) */
 	    } /* end if (new-hdb_cur) */
 	} /* end if (magic) */
 	return rs ;
@@ -326,14 +326,14 @@ local int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 	    	    if ((rs = hdb_store(op->dbp,key,val)) >= 0) {
 	    		op->c_miss += 1 ;
 	    		if (timep != nullptr) *timep = ep->mtime ;
-		    }
+		    } /* end if (ok) */
 		    if (rs < 0) {
 			entry_finish(ep) ;
-		    }
+		    } /* end if (ok) */
 	        } /* end if (entry) */
 		if (rs < 0) {
 		    libmem.free(ep) ;
-		}
+		} /* end if (ok) */
 	    } /* end if (memory-acquire) */
 	} /* end if */
 	return (rs >= 0) ? f_hit : rs ;
@@ -347,11 +347,11 @@ local int entry_start(ent *ep,cchar *sp,int sl) noex {
 	    if (ustat sb ; (rs = u_stat(cp,&sb)) >= 0) {
 		ep->name = cp ;
 	        ep->mtime = sb.st_mtime ;
-	    }
+	    } /* end if (u_stat) */
 	    if (rs < 0) {
 		void *vp = voidp(cp) ;
 	        libmem.free(vp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (entry_start) */
@@ -364,7 +364,7 @@ local int entry_finish(ent *ep) noex {
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->name = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (entry_finish) */
 
