@@ -23,10 +23,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>
-#include	<stdlib.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	FIFOSTR		struct fifostr_head
