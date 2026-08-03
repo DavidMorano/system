@@ -40,12 +40,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snwcpyx.h"
 
@@ -78,12 +78,12 @@ import libutil ;			/* |lenstr(3u)| */
 
 int snwcpyrev(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (dbuf && sp) {
+	if (dbuf && sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (dlen >= 0) {
+	    if (dlen >= 0) ylikely {
 	        rs = SR_OVERFLOW ;
 	        if (sl < 0) sl = lenstr(sp) ;
-	        if ((dlen < 0) || (dlen >= sl)) {
+	        if ((dlen < 0) || (dlen >= sl)) ylikely {
 	            int	i ; /* used-afterwards */
 	            for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
 	                dbuf[i] = sp[sl-i-1] ;
@@ -94,7 +94,6 @@ int snwcpyrev(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (snwcpyrev) */
+} /* end subroutine (snwcpyrev) */
 
 
