@@ -33,6 +33,14 @@ extern int	mnwcpy(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+inline int mnwcpy(char *dp,int dl,con uchar *usp,int usl) noex {
+    	ccharp	sp = ccharp(usp) ;
+    	cint	sl = usl ;
+    	return mnwcpy(dp,dl,sp,sl) ;
+} /* end subroutine */
+#endif /* __cplusplus */
+
 
 #endif /* MNWPCYINCLUDE */
 
