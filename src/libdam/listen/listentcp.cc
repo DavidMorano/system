@@ -1,4 +1,5 @@
 /* listentcp SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to listen on a TCP port */
@@ -40,24 +41,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<getnodename.h>
-#include	<getpf.h>
-#include	<getproto.h>
-#include	<hostaddr.h>
-#include	<isoneof.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<getpf.h>		/* LIBUC */
+#include	<getproto.h>		/* LIBUC */
+#include	<hostaddr.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"listentcp.h"
 
@@ -124,9 +127,9 @@ constexpr bool		f_protolookup = CF_PROTOLOOKUP ;
 int listentcp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 	int		rs = SR_FAULT ;
 	int		s = -1 ;
-	if (portspec) {
+	if (portspec) ylikely {
 	    rs = SR_INVALID ;
-	    if (portspec[0] && (af >= 0)) {
+	    if (portspec[0] && (af >= 0)) ylikely {
 	        int		proto = IPPROTO_TCP ;
 	        cchar		*hp = hostname ;
                 /* get the protocol number */
@@ -143,7 +146,7 @@ int listentcp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 	                hp = ANYHOST ;
 	            }
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            if ((rs = getpf(af)) >= 0) {
 	                cint	pf = rs ;
 	                cchar	*ps = portspec ;
@@ -154,8 +157,7 @@ int listentcp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? s : rs ;
-}
-/* end subroutine (listentcp) */
+} /* end subroutine (listentcp) */
 
 
 /* local subroutines */
@@ -167,15 +169,15 @@ local int listentcp_lookup(int pf,int proto,cc *hs,cc *ps,int opts) noex {
 	int		rs ;
 	int		rs_last = 0 ;
 	int		rs1 ;
-	int		s = -1 ;
-
-	hint.ai_flags = AI_PASSIVE ;
-	hint.ai_family = pf ;
-	hint.ai_socktype = SOCK_STREAM ;
-	hint.ai_protocol = proto ;
-
-	if ((rs = hostaddr_start(&ha,hs,ps,&hint)) >= 0) {
-	    if ((rs = hostaddr_curbegin(&ha,&hacur)) >= 0) {
+	int		s = -1 ; /* return-value */
+	{
+	hint.ai_flags		= AI_PASSIVE ;
+	hint.ai_family		= pf ;
+	hint.ai_socktype	= SOCK_STREAM ;
+	hint.ai_protocol	= proto ;
+	}
+	if ((rs = hostaddr_start(&ha,hs,ps,&hint)) >= 0) ylikely {
+	    if ((rs = hostaddr_curbegin(&ha,&hacur)) >= 0) ylikely {
 	        while ((rs >= 0) && (s < 0)) {
 	            ADDRINFO	*aip ;
 	            while ((rs = hostaddr_curenum(&ha,&hacur,&aip)) >= 0) {
@@ -196,18 +198,14 @@ local int listentcp_lookup(int pf,int proto,cc *hs,cc *ps,int opts) noex {
 	    rs1 = hostaddr_finish(&ha) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hostaddr) */
-
 	if ((rs < 0) && (s >= 0)) {
 	    u_close(s) ;
 	}
-
 	if ((rs == SR_NOENT) && (rs_last < 0)) {
 	    rs = rs_last ;
 	}
-
 	return (rs >= 0) ? s : rs ;
-}
-/* end subroutine (listentcp_lookup) */
+} /* end subroutine (listentcp_lookup) */
 
 local int listentcp_try(ADDRINFO *aip,int opts) noex {
 	cint		proto = aip->ai_protocol ;
@@ -215,12 +213,10 @@ local int listentcp_try(ADDRINFO *aip,int opts) noex {
 	cint		af = aip->ai_family ;
 	int		rs ;
 	int		s = -1 ;
-
 	if ((rs = getpf(af)) >= 0) {
 	    cint	spf = rs ;
 	    if ((rs = u_socket(spf,st,proto)) >= 0) {
 	        s = rs ;
-
 	        if (opts != 0) {
 	            cint	sz = szof(int) ;
 	            cint	opt = SO_REUSEADDR ;
@@ -245,18 +241,14 @@ local int listentcp_try(ADDRINFO *aip,int opts) noex {
 	                rs = u_listen(s,10) ;
 	            } /* end if (bind) */
 	        } /* end if (ok) */
-
 	        if ((rs < 0) && (s >= 0)) u_close(s) ;
 	    } /* end if (socket) */
 	} /* end if (getpf) */
-
 	return (rs >= 0) ? s : rs ;
-}
-/* end subroutine (listentcp_try) */
+} /* end subroutine (listentcp_try) */
 
 local int isFailListen(int rs) noex {
 	return isOneOf(rsfails,rs) ;
-}
-/* end subroutine (isFailListen) */
+} /* end subroutine (isFailListen) */
 
 
