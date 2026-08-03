@@ -52,13 +52,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSYD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snwcpyx.h"
 
@@ -89,9 +89,9 @@
 int snwcpyhyphen(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		dl = 0 ; /* return-value */
-	if (dbuf && sp) {
+	if (dbuf && sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (dlen >= 0) {
+	    if (dlen >= 0) ylikely {
 	        rs = SR_OK ;
 	        while (dlen-- && sl && *sp) {
 	            int ch = mkchar(*sp++) ;
@@ -104,7 +104,6 @@ int snwcpyhyphen(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (snwcpyhyphen) */
+} /* end subroutine (snwcpyhyphen) */
 
 
