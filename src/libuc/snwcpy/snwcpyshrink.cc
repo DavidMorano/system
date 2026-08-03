@@ -43,15 +43,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>
-#include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snwcpy.h"		/* also for |snwcpy(3uc)| */
 
@@ -87,10 +87,10 @@
 
 int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (dbuf && sp) {
+	if (dbuf && sp) ylikely {
 	    cchar	*cp ;
 	    rs = SR_OK ;
-	    if (cchar *tp ; (tp = strnchr(sp,sl,CH_NL)) != nullptr) {
+	    if (cchar *tp = strnchr(sp,sl,CH_NL) ; tp) {
 	        sl = intconv(tp - sp) ;
 	    }
 	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
@@ -98,7 +98,6 @@ int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (snwcpyshrink) */
+} /* end subroutine (snwcpyshrink) */
 
 
