@@ -30,8 +30,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	SINTQ		struct sintq_head
@@ -87,10 +87,10 @@ struct sintq : sintq_head {
 	} ; /* end ctor */
 	sintq(const sintq &) = delete ;
 	sintq &operator = (const sintq &) = delete ;
-	int	ins(int) noex ;
-	int	rem(short *) noex ;
-	int	remread(short *,int) noex ;
-	void	dtor() noex ;
+	int ins		(int) noex ;
+	int rem		(short *) noex ;
+	int remread	(short *,int) noex ;
+	void dtor	() noex ;
 	operator int () noex ;
 	destruct sintq() {
 	    if (qbuf) dtor() ;
