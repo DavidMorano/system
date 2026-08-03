@@ -1,4 +1,5 @@
 /* svc HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* service (SVC) operations*/
@@ -20,11 +21,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	<svcent.h>
 #include	<svcentry.h>
