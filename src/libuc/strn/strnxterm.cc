@@ -47,8 +47,8 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usys.h>		/* LIBU */
 #include	<strx.h>		/* LIBUC |strbrk(3u)| */
-#include	<mkchar.h>		/* LIBU */
 #include	<baops.h>		/* LIBU |batst(3u)| */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"strnxterm.h"
