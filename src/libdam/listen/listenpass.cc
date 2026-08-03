@@ -1,4 +1,5 @@
 /* listenpass SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* subroutine to listen on a FIFO for pass-FD requests */
@@ -16,6 +17,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	listenpass
+
+	Description:
 	This little subroutine checks for or establishes (if possible)
 	a FIFO for listening for passed file descriptors.  This is
 	a common method for standing servers to receive new client
@@ -24,16 +29,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"listenpass.h"
 
@@ -73,13 +84,12 @@ int listenpass(cchar *passfname,mode_t om,int opts) noex {
 	int		rs = SR_FAULT ;
 	int		fd = -1 ;
 	(void) opts ;
-	if (passfname) {
+	if (passfname) ylikely {
 	    rs = SR_INVALID ;
-	    if (passfname[0]) {
+	    if (passfname[0]) ylikely {
 	        if ((rs = uc_open(passfname,O_FLAGS1,om)) >= 0) {
-	            USTAT	sb ;
 	            fd = rs ;
-	            if ((rs = u_fstat(fd,&sb)) >= 0) {
+	            if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	                if ((sb.st_mode & S_IWOTH) == 0) {
 	                    u_fchmod(fd,om) ;
 		        }
@@ -96,7 +106,6 @@ int listenpass(cchar *passfname,mode_t om,int opts) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (listenpass) */
+} /* end subroutine (listenpass) */
 
 
