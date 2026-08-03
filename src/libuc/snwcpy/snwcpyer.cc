@@ -63,14 +63,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sncpyx.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snwcpy.h"
 
@@ -106,7 +106,7 @@
 
 int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (dp && sp) {
+	if (dp && sp) ylikely {
 	    if (dl >= 0) {
 	        if (sl >= 0) {
 	            if (sl > dl) {
@@ -122,7 +122,6 @@ int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (snwcpy) */
+} /* end subroutine (snwcpy) */
 
 
