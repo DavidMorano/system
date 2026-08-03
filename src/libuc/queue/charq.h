@@ -30,8 +30,8 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	CHARQ		struct charq_head
@@ -86,9 +86,9 @@ struct charq : charq_head {
 	} ; /* end ctor */
 	charq(const charq &) = delete ;
 	charq &operator = (const charq &) = delete ;
-	int	ins(int) noex ;
-	int	rem(char *) noex ;
-	void	dtor() noex ;
+	int ins		(int) noex ;
+	int rem		(char *) noex ;
+	void dtor	() noex ;
 	operator int () noex ;
 	destruct charq() {
 	    if (qbuf) dtor() ;
