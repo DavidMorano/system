@@ -27,22 +27,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucsig.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsig.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sighand.h"
 
@@ -179,8 +175,7 @@ int sighand_start(SH *iap,cint *blocks,cint *igns,cint *cats,SH_F hf) noex {
             }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sighand_start) */
+} /* end subroutine (sighand_start) */
 
 int sighand_finish(SH *iap) noex {
 	int		rs ;
@@ -205,8 +200,7 @@ int sighand_finish(SH *iap) noex {
 	    iap->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sighand_finish) */
+} /* end subroutine (sighand_finish) */
 
 
 /* private subroutines */
