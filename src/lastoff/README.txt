@@ -1,7 +1,7 @@
 LASTOFF
 
-This program is similar to the |cat(1}| program except that the last line of
-each input is not written to standard output.
+This program is similar to the |cat(1)| program except that the
+last line of each input is not written to standard output.
 
 Synopsis:
 $ lastoff [<file(s)> ...] [-af <afile>] [-of <ofile>] [-V]
