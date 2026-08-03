@@ -26,12 +26,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sigaction.h"
 
@@ -92,7 +92,6 @@ int sigaction_load(SIGACTION *sap,sigset_t *ssp,int fl,siginfohand_f h) noex {
 	    sap->sa_handler = cast_reinterpret<sig_f>(voidp(h)) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sigaction_load) */
+} /* end subroutine (sigaction_load) */
 
 
