@@ -28,14 +28,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LINUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fifoelem.h"
 
@@ -103,8 +103,7 @@ int fifoelem_start(FE *op,int esz) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fifoelem_start) */
+} /* end subroutine (fifoelem_start) */
 
 int fifoelem_finish(FE *op) noex {
 	int		rs ;
@@ -114,8 +113,7 @@ int fifoelem_finish(FE *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifoelem_finish) */
+} /* end subroutine (fifoelem_finish) */
 
 int fifoelem_ins(FE *op,void *usp) noex {
     	cnullptr	np{} ;
@@ -150,8 +148,7 @@ int fifoelem_ins(FE *op,void *usp) noex {
 	    } /* end if (m-a) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (fifoelem_ins) */
+} /* end subroutine (fifoelem_ins) */
 
 int fifoelem_rem(FE *op,void *ebuf,int elen) noex {
 	int		rs ;
@@ -184,8 +181,7 @@ int fifoelem_rem(FE *op,void *ebuf,int elen) noex {
 	    } /* end if (empty) */
 	} /* end if (magic) */
 	return (rs >= 0) ? slen : rs ;
-}
-/* end subroutine (fifoelem_rem) */
+} /* end subroutine (fifoelem_rem) */
 
 int fifoelem_get(FE *op,FE_ENT **epp) noex {
     	cnullptr	np{} ;
@@ -204,8 +200,7 @@ int fifoelem_get(FE *op,FE_ENT **epp) noex {
 	    if (epp) *epp = ep ;
 	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (fifoelem_get) */
+} /* end subroutine (fifoelem_get) */
 
 int fifoelem_del(FE *op) noex {
     	cnullptr	np{} ;
@@ -238,8 +233,7 @@ int fifoelem_del(FE *op) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (fifoelem_del) */
+} /* end subroutine (fifoelem_del) */
 
 int fifoelem_count(FE *op) noex {
     	int		rs ;
@@ -248,8 +242,7 @@ int fifoelem_count(FE *op) noex {
 	    n = op->n ;
 	}
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (fifoelem_count) */
+} /* end subroutine (fifoelem_count) */
 
 int fifoelem_present(FE *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
 	int		rs ;
@@ -281,8 +274,7 @@ int fifoelem_present(FE *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
 	    } /* end if (cursor) */
 	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (fifoelem_present) */
+} /* end subroutine (fifoelem_present) */
 
 int fifoelem_curbegin(FE *op,FE_CUR *curp) noex {
     	int		rs ;
@@ -290,8 +282,7 @@ int fifoelem_curbegin(FE *op,FE_CUR *curp) noex {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifoelem_curbegin) */
+} /* end subroutine (fifoelem_curbegin) */
 
 int fifoelem_curend(FE *op,FE_CUR *curp) noex {
     	int		rs ;
@@ -299,8 +290,7 @@ int fifoelem_curend(FE *op,FE_CUR *curp) noex {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifoelem_curend) */
+} /* end subroutine (fifoelem_curend) */
 
 int fifoelem_curdel(FE *op,FE_CUR *curp) noex {
     	cnullptr	np{} ;
@@ -343,8 +333,7 @@ int fifoelem_curdel(FE *op,FE_CUR *curp) noex {
 	    n = op->n ;
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (fifoelem_curdel) */
+} /* end subroutine (fifoelem_curdel) */
 
 int fifoelem_curenum(FE *op,FE_CUR *curp,FE_ENT **epp) noex {
     	cnullptr	np{} ;
@@ -368,8 +357,7 @@ int fifoelem_curenum(FE *op,FE_CUR *curp,FE_ENT **epp) noex {
 	    if (epp) *epp = ep ;
 	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (fifoelem_curenum) */
+} /* end subroutine (fifoelem_curenum) */
 
 
 /* privatesubroutines */
@@ -387,8 +375,7 @@ local int entry_start(FE_ENT *ep,cvoid *vsp,int vsl) noex {
 	    ep->dp = voidp(cp) ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 local int entry_finish(FE_ENT *ep) noex {
 	int		rs = SR_OK ;
@@ -400,8 +387,7 @@ local int entry_finish(FE_ENT *ep) noex {
 	}
 	ep->dl = 0 ;
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 int fifoelem::start(int a) noex {
 	return fifoelem_start(this,a) ;
