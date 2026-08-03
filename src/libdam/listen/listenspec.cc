@@ -28,33 +28,40 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<mallocxx.h>
-#include	<getnodename.h>
-#include	<getproto.h>
-#include	<getaddr.h>
-#include	<getportnum.h>
-#include	<getaf.h>
-#include	<acceptpass.h>
-#include	<openport.h>
-#include	<sockaddress.h>
-#include	<vechand.h>
-#include	<storebuf.h>
-#include	<hostinfo.h>
-#include	<mkpr.h>
-#include	<strn.h>
-#include	<strwcpy.h>
-#include	<matxstr.h>
-#include	<cfdec.h>
-#include	<cfnum.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<getproto.h>		/* LIBUC */
+#include	<getaddr.h>		/* LIBUC */
+#include	<getportnum.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC */
+#include	<getpf.h>		/* LIBUC */
+#include	<getaf.h>		/* LIBUC */
+#include	<acceptpass.h>		/* LIBUC */
+#include	<openport.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<hostinfo.h>		/* LIBUC */
+#include	<mkpr.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<cfnum.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	<listenconn.h>
 #include	<listenpass.h>
@@ -100,9 +107,9 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	TO_RECVFD		10 /* seconds */
 
-#define	TCPADDR			struct tcpaddr
+#define	TA			tcpaddr
 
-#define	ARGINFO			struct arginfo
+#define	AI			arginfo
 
 #ifndef	CF_NONBLOCK
 #define	CF_NONBLOCK		0
@@ -116,6 +123,8 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* imported namespaces */
+
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -137,105 +146,102 @@ struct arginfo {
 	int		slen ;
 	int		argvalue ;
 	int		mode ;
-	int		f_adash ;
-} ;
+	uint		f_adash:1 ;
+} ; /* end struct */
 
 struct ss {
 	cchar		*sp ;
 	int		sl ;
-} ;
+} ; /* end struct */
 
 struct tcpaddr {
-	struct ss	af, host, port ;
-} ;
+	ss		af, host, port ;
+} ; /* end struct */
 
 
 /* forward references */
 
 template<typename ... Args>
-static int listenspec_ctor(listenspec *op,Args ... args) noex {
+local int listenspec_ctor(listenspec *op,Args ... args) noex {
     	LISTENSPEC	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (listenspec_ctor) */
+} /* end subroutine (listenspec_ctor) */
 
-static int listenspec_dtor(listenspec *op) noex {
+local int listenspec_dtor(listenspec *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (listenspec_dtor) */
+} /* end subroutine (listenspec_dtor) */
 
 template<typename ... Args>
-static inline int listenspec_magic(listenspec *op,Args ... args) noex {
+local inline int listenspec_magic(listenspec *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LISTENSPEC_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LISTENSPEC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (listenspec_magic) */
+} /* end subroutine (listenspec_magic) */
 
-static int	listenspec_parse(LS *,int,mainv) noex ;
+local int	listenspec_parse(LS *,int,mainv) noex ;
 
-static int	listenspec_tcpbegin(LS *,int,mainv) noex ;
-static int	listenspec_tcpaddrload(LS *,TCPADDR *,int) noex ;
-static int	listenspec_tcpend(LS *) noex ;
-static int	listenspec_tcpsame(LS *,LISTENSPEC *) noex ;
-static int	listenspec_tcpactive(LS *,int,int) noex ;
-static int	listenspec_tcpaccept(LS *,void *,int *,int) noex ;
-static int	listenspec_tcpinfo(LS *,listenspec_info *) noex ;
+local int	listenspec_tcpbegin(LS *,int,mainv) noex ;
+local int	listenspec_tcpaddrload(LS *,TA *,int) noex ;
+local int	listenspec_tcpend(LS *) noex ;
+local int	listenspec_tcpsame(LS *,LISTENSPEC *) noex ;
+local int	listenspec_tcpactive(LS *,int,int) noex ;
+local int	listenspec_tcpaccept(LS *,void *,int *,int) noex ;
+local int	listenspec_tcpinfo(LS *,listenspec_info *) noex ;
 
-static int	listenspec_ussbegin(LS *,int,mainv) noex ;
-static int	listenspec_ussend(LS *) noex ;
-static int	listenspec_usssame(LS *,LISTENSPEC *) noex ;
-static int	listenspec_ussactive(LS *,int,int) noex ;
-static int	listenspec_ussaccept(LS *,void *,int *,int) noex ;
-static int	listenspec_ussinfo(LS *,listenspec_info *) noex ;
+local int	listenspec_ussbegin(LS *,int,mainv) noex ;
+local int	listenspec_ussend(LS *) noex ;
+local int	listenspec_usssame(LS *,LISTENSPEC *) noex ;
+local int	listenspec_ussactive(LS *,int,int) noex ;
+local int	listenspec_ussaccept(LS *,void *,int *,int) noex ;
+local int	listenspec_ussinfo(LS *,listenspec_info *) noex ;
 
-static int	listenspec_passbegin(LS *,int,mainv) noex ;
-static int	listenspec_passend(LS *) noex ;
-static int	listenspec_passsame(LS *,LISTENSPEC *) noex ;
-static int	listenspec_passactive(LS *,int,int) noex ;
-static int	listenspec_passaccept(LS *,void *,int *,int) noex ;
-static int	listenspec_passinfo(LS *,listenspec_info *) noex ;
+local int	listenspec_passbegin(LS *,int,mainv) noex ;
+local int	listenspec_passend(LS *) noex ;
+local int	listenspec_passsame(LS *,LISTENSPEC *) noex ;
+local int	listenspec_passactive(LS *,int,int) noex ;
+local int	listenspec_passaccept(LS *,void *,int *,int) noex ;
+local int	listenspec_passinfo(LS *,listenspec_info *) noex ;
 
-static int	listenspec_connbegin(LS *,int,mainv) noex ;
-static int	listenspec_connend(LS *) noex ;
-static int	listenspec_connsame(LS *,LISTENSPEC *) noex ;
-static int	listenspec_connactive(LS *,int,int) noex ;
-static int	listenspec_connaccept(LS *,void *,int *,int) noex ;
-static int	listenspec_conninfo(LS *,listenspec_info *) noex ;
+local int	listenspec_connbegin(LS *,int,mainv) noex ;
+local int	listenspec_connend(LS *) noex ;
+local int	listenspec_connsame(LS *,LISTENSPEC *) noex ;
+local int	listenspec_connactive(LS *,int,int) noex ;
+local int	listenspec_connaccept(LS *,void *,int *,int) noex ;
+local int	listenspec_conninfo(LS *,listenspec_info *) noex ;
 
-static int	listenspec_procargs(LS *,ARGINFO *,int,mainv) noex ;
+local int	listenspec_procargs(LS *,AI *,int,mainv) noex ;
 
 #if	CF_OPENPORT
-static int	listenspec_openport(LS *,int,cchar *,cchar *,int) noex ;
-static int	listenspec_openporter(LS *,cchar *,int,
+local int	listenspec_openport(LS *,int,cchar *,cchar *,int) noex ;
+local int	listenspec_openporter(LS *,cchar *,int,
 			cchar *,int,int) noex ;
-static int	listenspec_openportaddr(LS *,cchar *,
+local int	listenspec_openportaddr(LS *,cchar *,
 			ADDRINFO *,char *,int,cchar *) noex ;
-static int	listenspec_openportao(LS *,char *,int,cc *) noex ;
+local int	listenspec_openportao(LS *,char *,int,cc *) noex ;
 #endif /* CF_OPENPORT */
 
-static int	listenspec_prlocal(LS *) noex ;
+local int	listenspec_prlocal(LS *) noex ;
 
 #ifdef	COMMENT
-static int	tcp_nfield(cchar *,int) noex ;
+local int	tcp_nfield(cchar *,int) noex ;
 #endif
 
-static int	tcpaddr_load(TCPADDR *,cchar *,int) noex ;
+local int	tcpaddr_load(TA *,cchar *,int) noex ;
 
-static int	arginfo_start(ARGINFO *) noex ;
-static int	arginfo_add(ARGINFO *,cchar *) noex ;
-static int	arginfo_get(ARGINFO *,int,cchar **) noex ;
-static int	arginfo_finish(ARGINFO *) noex ;
+local int	arginfo_start(AI *) noex ;
+local int	arginfo_add(AI *,cchar *) noex ;
+local int	arginfo_get(AI *,int,cchar **) noex ;
+local int	arginfo_finish(AI *) noex ;
 
 
 /* local variables */
@@ -247,59 +253,60 @@ enum ltypes {
 	ltype_pass,
 	ltype_conn,
 	ltype_overlast
-} ;
+} ; /* end enum */
 
-constexpr cpcchar	ltypes[] = {
+constexpr cpcchar	ltypenames[] = {
 	"none",
 	"tcp",
 	"uss",
 	"pass",
 	"conn",
 	nullptr
-} ;
+} ; /* end array */
 
 enum lopts {
 	lopt_here,
 	lopt_reuse,
 	lopt_ra,
 	lopt_overlast
-} ;
+} ; /* end enum */
 
-constexpr cpcchar	lopts[] = {
+constexpr cpcchar	loptnames[] = {
 	"here",
 	"reuse",
 	"ra",
 	nullptr
-} ;
+} ; /* end array */
 
-constexpr bool		f_nonblock = CF_NONBLOCK ;
-constexpr bool		f_streams = F_STREAMS ;
+constexpr bool		f_nonblock	= CF_NONBLOCK ;
+constexpr bool		f_streams	= F_STREAMS ;
 
 
 /* exported variables */
+
+const listenspecms	listenspecm ;
 
 
 /* exported subroutines */
 
 int listenspec_start(LS *op,int ac,mv av) noex {
 	int		rs ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 	if ((rs = listenspec_ctor(op,av)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (ac > 0) {
 	        memclear(op) ;
 	        if ((rs = listenspec_parse(op,ac,av)) >= 0) {
 	            n = rs ;
-	            op->magic = LISTENSPEC_MAGIC ;
+	            op->magval = LISTENSPEC_MAGIC ;
 	        }
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		listenspec_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (listenspec_start) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (listenspec_start) */
+} /* end subroutine (listenspec_start) */
 
 int listenspec_finish(LS *op) noex {
 	int		rs ;
@@ -326,25 +333,25 @@ int listenspec_finish(LS *op) noex {
 	            break ;
 	        } /* end switch */
 	        if (rs >= 0) rs = rs1 ;
-	        rs1 = uc_free(op->info) ;
+	        rs1 = mem.free(op->info) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->info = nullptr ;
 	    } /* end if */
 	    if (op->prlocal) {
-	        rs1 = uc_free(op->prlocal) ;
+	        voidp vp = voidp(op->prlocal) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->prlocal = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 	        rs1 = listenspec_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->ltype = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (listenspec_finish) */
+} /* end subroutine (listenspec_finish) */
 
 int listenspec_issame(LS *op,LISTENSPEC *otherp) noex {
 	int		rs ;
@@ -376,8 +383,7 @@ int listenspec_issame(LS *op,LISTENSPEC *otherp) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (listenspec_issame) */
+} /* end subroutine (listenspec_issame) */
 
 int listenspec_active(LS *op,int opts,int f) noex {
 	int		rs ;
@@ -411,12 +417,11 @@ int listenspec_active(LS *op,int opts,int f) noex {
 	        } /* end if_constexpr (f_nonblock) */
 	        if ((rs < 0) && f) {
 	            listenspec_active(op,opts,false) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (just activated) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_previous : rs ;
-}
-/* end subroutine (listenspec_active) */
+} /* end subroutine (listenspec_active) */
 
 int listenspec_isactive(LS *op) noex {
 	int		rs ;
@@ -425,17 +430,15 @@ int listenspec_isactive(LS *op) noex {
 	    f = op->fl.active ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (listenspec_isactive) */
+} /* end subroutine (listenspec_isactive) */
 
 int listenspec_delset(LS *op,int f) noex {
 	int		rs ;
 	if ((rs = listenspec_magic(op)) >= 0) {
-	    op->fl.delmark = f ;
+	    op->fl.delmark = !!f ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (listenspec_delset) */
+} /* end subroutine (listenspec_delset) */
 
 int listenspec_delmarked(LS *op) noex {
 	int		rs ;
@@ -444,8 +447,7 @@ int listenspec_delmarked(LS *op) noex {
 	    f = op->fl.delmark ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (listenspec_delmarked) */
+} /* end subroutine (listenspec_delmarked) */
 
 int listenspec_getfd(LS *op) noex {
 	int		rs ;
@@ -453,8 +455,7 @@ int listenspec_getfd(LS *op) noex {
 	    rs = (op->fl.active) ? op->fd : SR_BADFD ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (listenspec_getfd) */
+} /* end subroutine (listenspec_getfd) */
 
 int listenspec_gettype(LS *op) noex {
 	int		rs ;
@@ -462,8 +463,7 @@ int listenspec_gettype(LS *op) noex {
 	    rs = op->ltype ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (listenspec_gettype) */
+} /* end subroutine (listenspec_gettype) */
 
 int listenspec_accept(LS *op,void *fromp,int *fromlenp,int to) noex {
 	int		rs ;
@@ -491,8 +491,7 @@ int listenspec_accept(LS *op,void *fromp,int *fromlenp,int to) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (listenspec_accept) */
+} /* end subroutine (listenspec_accept) */
 
 int listenspec_getinfo(LS *op,listenspec_info *lip) noex {
 	int		rs ;
@@ -521,12 +520,15 @@ int listenspec_getinfo(LS *op,listenspec_info *lip) noex {
 	        if (op->fl.active) lip->state |= LISTENSPEC_MACTIVE ;
 	        if (op->fl.delmark) lip->state |= LISTENSPEC_MDELPEND ;
 	        if (op->fl.broken) lip->state |= LISTENSPEC_MBROKEN ;
-	        strwcpy(lip->type,ltypes[op->ltype],LISTENSPEC_TYPELEN) ;
+		{
+		    cchar *sp = ltypenames[op->ltype] ;
+		    cint sl = LISTENSPEC_TYPELEN ;
+	            strwcpy(lip->type,sp,sl) ;
+		}
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (listenspec_info) */
+} /* end subroutine (listenspec_info) */
 
 int listenspec_geterr(LS *op,int *rp) noex {
 	int		rs ;
@@ -536,8 +538,7 @@ int listenspec_geterr(LS *op,int *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (listenspec_geterr) */
+} /* end subroutine (listenspec_geterr) */
 
 int listenspec_clear(LS *op) noex {
 	int		rs ;
@@ -545,14 +546,13 @@ int listenspec_clear(LS *op) noex {
 	    op->fl.broken = false ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (listenspec_clear) */
+} /* end subroutine (listenspec_clear) */
 
 
 /* private subroutines */
 
-static int listenspec_parse(LS *op,int ac,mv av) noex {
-	cint		ti = matstr(ltypes,av[0],-1) ;
+local int listenspec_parse(LS *op,int ac,mv av) noex {
+	cint		ti = matstr(ltypenames,av[0],-1) ;
 	int		rs = SR_OK ;
 	int		sz = 0 ;
 	int		n = 0 ;
@@ -567,16 +567,15 @@ static int listenspec_parse(LS *op,int ac,mv av) noex {
 	    sz = szof(LISTENSPEC_USS) ;
 	    break ;
 	case ltype_pass:
-	    sz = seof(LISTENSPEC_PASS) ;
+	    sz = szof(LISTENSPEC_PASS) ;
 	    break ;
 	case ltype_conn:
 	    sz = szof(LISTENSPEC_CONN) ;
 	    break ;
 	} /* end switch */
 	if (sz > 0) {
-	    void	*p ;
-	    if ((rs = uc_malloc(sz,&p)) >= 0) {
-	        memset(p,0,sz) ;
+	    if (void *p ; (rs = mem.mall(sz,&p)) >= 0) {
+	        memclear(p,sz) ;
 	        op->info = p ;
 	        switch (ti) {
 	        case ltype_tcp:
@@ -600,20 +599,19 @@ static int listenspec_parse(LS *op,int ac,mv av) noex {
 	            break ;
 	        } /* end switch */
 	        if (rs < 0) {
-	            uc_free(op->info) ;
+	            mem.free(op->info) ;
 	            op->info = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} else {
 	    rs = SR_PROTONOSUPPORT ;
 	}
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (listenspec_parse) */
+} /* end subroutine (listenspec_parse) */
 
-static int listenspec_tcpbegin(LS *op,int ac,mv av) noex {
-	TCPADDR		a ;
-	ARGINFO		ai, *aip = &ai ;
+local int listenspec_tcpbegin(LS *op,int ac,mv av) noex {
+	TA		a ;
+	AI		ai, *aip = &ai ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -631,8 +629,9 @@ static int listenspec_tcpbegin(LS *op,int ac,mv av) noex {
 	                if (al > 0) {
 	                    sz = al ;
 	                    n = tcpaddr_load(&a,ap,al) ;
-	                    if ((n > 0) && (a.port.sp == nullptr))
+	                    if ((n > 0) && (a.port.sp == nullptr)) {
 	                        n = 0 ;
+			    }
 	                }
 	                if (n == 0) {
 	                    cp = LISTENSPEC_DEFPORT ;
@@ -641,7 +640,7 @@ static int listenspec_tcpbegin(LS *op,int ac,mv av) noex {
 	                    a.port.sp = cp ;
 	                    a.port.sl = cl ;
 	                    n = 1 ;
-	                }
+	                } /* end if (equal) */
 	                break ;
 	            } /* end switch */
 	            pan += 1 ;
@@ -654,114 +653,97 @@ static int listenspec_tcpbegin(LS *op,int ac,mv av) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (arginfo) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (listenspec_tcpbegin) */
+} /* end subroutine (listenspec_tcpbegin) */
 
-static int listenspec_tcpaddrload(LS *op,TCPADDR *ap,int sz) noex {
+local int listenspec_tcpaddrload(LS *op,TA *ap,int sz) noex {
 	LISTENSPEC_TCP	*ip = (LISTENSPEC_TCP *) op->info ;
 	int		rs ;
-	char		*abuf = nullptr ;
 	char		*abp ;
-
-	if ((rs = uc_malloc(sz,&abuf)) >= 0) {
-
+	if (char *abuf ; (rs = mem.mall(sz,&abuf)) >= 0) {
 	    ip->a = abuf ;
 	    abp = abuf ;
 	    if (ap->af.sp != nullptr) {
 	        ip->af = abp ;
 	        abp = strwcpy(abp,ap->af.sp,ap->af.sl) + 1 ;
 	    }
-
 	    if (ap->host.sp != nullptr) {
 	        ip->host = abp ;
 	        abp = strwcpy(abp,ap->host.sp,ap->host.sl) + 1 ;
 	    }
-
 	    if (ap->port.sp != nullptr) {
 	        ip->port = abp ;
 	        abp = strwcpy(abp,ap->port.sp,ap->port.sl) + 1 ;
 	    }
-
 	} /* end if (memory-allocation) */
-
 	return rs ;
-}
-/* end subroutine (listenspec_tcpaddrload) */
+} /* end subroutine (listenspec_tcpaddrload) */
 
-static int listenspec_tcpend(LS *op) noex {
+local int listenspec_tcpend(LS *op) noex {
 	LISTENSPEC_TCP	*ip = (LISTENSPEC_TCP *) op->info ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (ip->a != nullptr) {
-	    rs1 = uc_free(ip->a) ;
+	if (ip->a) {
+	    rs1 = mem.free(ip->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ip->a = nullptr ;
-	}
-
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (listenspec_tcpend) */
+} /* end subroutine (listenspec_tcpend) */
 
-static int listenspec_tcpsame(LS *op,LISTENSPEC *otherp) noex {
+local int listenspec_tcpsame(LS *op,LISTENSPEC *otherp) noex {
 	LISTENSPEC_TCP	*ip = (LISTENSPEC_TCP *) op->info ;
 	LISTENSPEC_TCP	*oip ;
 	int		rs = SR_OK ;
 	int		f = true ;
-
 	oip = (LISTENSPEC_TCP *) otherp->info ;
+	{
 	f = f && LEQUIV((ip->af != nullptr),(oip->af != nullptr)) ;
-	if (f && (ip->af != nullptr))
+	if (f && (ip->af != nullptr)) {
 	    f = (strcmp(ip->af,oip->af) == 0) ;
-
+	}
+	}
+	{
 	f = f && LEQUIV((ip->host != nullptr),(oip->host != nullptr)) ;
-	if (f && (ip->host != nullptr))
+	if (f && (ip->host != nullptr)) {
 	    f = (strcmp(ip->host,oip->host) == 0) ;
-
+	}
+	}
+	{
 	f = f && LEQUIV((ip->port != nullptr),(oip->port != nullptr)) ;
-	if (f && (ip->port != nullptr))
+	if (f && (ip->port != nullptr)) {
 	    f = (strcmp(ip->port,oip->port) == 0) ;
-
+	}
+	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (listenspec_tcpsame) */
+} /* end subroutine (listenspec_tcpsame) */
 
 /* f=1 make-active, f=0 make inactive */
-static int listenspec_tcpactive(LS *op,int opts,int f) noex {
+local int listenspec_tcpactive(LS *op,int opts,int f) noex {
 	int		rs = SR_OK ;
 	int		f_a = false ;
-
 	if (f && (! op->fl.active)) {
 	    LISTENSPEC_TCP *ip = (LISTENSPEC_TCP *) op->info ;
 	    int		af ;
 	    cchar	*cp ;
 	    cchar	*hostspec ;
 	    cchar	*portspec ;
-
-/* address family */
-
+	    /* address family */
 	    cp = ip->af ;
 	    af = AF_INET4 ; /* default when none was specified */
 	    if (cp != nullptr) {
 	        rs = getaf(cp,-1) ;
 	        af = rs ;
 	    }
-
-/* hostname */
-
+	    /* hostname */
 	    hostspec = ip->host ;
 	    if (hostspec == nullptr) hostspec = "" ;
-
-/* port */
-
+	    /* port */
 	    portspec = ip->port ;
 	    if (portspec == nullptr) portspec = LISTENSPEC_DEFPORT ;
-
-/* activate */
-
+	    /* activate */
 	    if (rs >= 0) {
-	        int	lopts = (opts & LISTENSPEC_MREUSE) ? 1 : 0 ;
-	        rs = listentcp(af,hostspec,portspec,lopts) ;
+	        cint	o = (opts & LISTENSPEC_MREUSE) ? 1 : 0 ;
+	        rs = listentcp(af,hostspec,portspec,o) ;
 	        op->fd = rs ;
 #if	CF_OPENPORT
 	        if (rs == SR_ACCESS) {
@@ -770,7 +752,6 @@ static int listenspec_tcpactive(LS *op,int opts,int f) noex {
 	        }
 #endif /* CF_OPENPORT */
 	    } /* end if */
-
 	    if (rs >= 0) {
 	        op->fl.active = true ;
 	        op->fl.broken = false ;
@@ -786,18 +767,15 @@ static int listenspec_tcpactive(LS *op,int opts,int f) noex {
 	    }
 	    op->fl.active = false ;
 	} /* end if */
-
 	return (rs >= 0) ? f_a : rs ;
-}
-/* end subroutine (listenspec_tcpactive) */
+} /* end subroutine (listenspec_tcpactive) */
 
-static int listenspec_tcpaccept(LS *op,void *fp,int *flp,int to) noex {
+local int listenspec_tcpaccept(LS *op,void *fp,int *flp,int to) noex {
 	SOCKADDR	*sap = sockaddrp(fp) ;
 	return uc_accepte(op->fd,sap,flp,to) ;
-}
-/* end subroutine (listenspec_tcpaccept) */
+} /* end subroutine (listenspec_tcpaccept) */
 
-static int listenspec_tcpinfo(LS *op,listenspec_info *lip) noex {
+local int listenspec_tcpinfo(LS *op,listenspec_info *lip) noex {
 	LISTENSPEC_TCP	*ip = (LISTENSPEC_TCP *) op->info ;
 	int		rs = SR_OK ;
 	int		bl = LISTENSPEC_ADDRLEN ;
@@ -824,96 +802,84 @@ static int listenspec_tcpinfo(LS *op,listenspec_info *lip) noex {
 	    i += rs ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (listenspec_tcpinfo) */
+} /* end subroutine (listenspec_tcpinfo) */
 
-static int listenspec_ussbegin(LS *op,int ac,mv av) noex {
+local int listenspec_ussbegin(LS *op,int ac,mv av) noex {
 	LISTENSPEC_USS	*ip = (LISTENSPEC_USS *) op->info ;
-	ARGINFO		ai, *aip = &ai ;
+	AI		ai, *aip = &ai ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-
-/* initialize */
-
+	/* initialize */
 	ip->mode = -1 ;
-
 	if ((rs = arginfo_start(aip)) >= 0) {
 	    if ((rs = listenspec_procargs(op,aip,ac,av)) >= 0) {
 		int	pan = 0 ;
 		int	al ;
 		cchar	*ap ;
 		cchar	*cp ;
-
-	        if (aip->mode >= 0)
+	        if (aip->mode >= 0) {
 	            ip->mode = aip->mode ;
-
+		}
 	        while ((al = arginfo_get(aip,pan,&ap)) >= 0) {
-
 	            switch (pan) {
 	            case 0:
 	                if (al > 0) {
 	                    n = 1 ;
-	                    rs = uc_mallocstrw(ap,al,&cp) ;
+	                    rs = mem.strw(ap,al,&cp) ;
 	                    if (rs >= 0) ip->fname = cp ;
-	                }
+	                } /* end if (memory-acquire) */
 	                break ;
 	            } /* end switch */
 	            pan += 1 ;
-
 	            if (rs < 0) break ;
 	        } /* end while (positional arguments) */
-
-/* default arguments */
-
+		/* default arguments */
 	        if (ip->mode < 0) {
 	            ip->mode = 0666 ;
 		}
-
 	    } /* end if (procargs) */
 	    rs1 = arginfo_finish(aip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (arginfo) */
-
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (listenspec_ussbegin) */
+} /* end subroutine (listenspec_ussbegin) */
 
-static int listenspec_ussend(LS *op) noex {
+local int listenspec_ussend(LS *op) noex {
 	LISTENSPEC_USS	*ip = (LISTENSPEC_USS *) op->info ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ip->fname != nullptr) {
-	    rs1 = uc_free(ip->fname) ;
+	    voidp vp = voidp(ip->fname) ;
+	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ip->fname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (listenspec_ussend) */
+} /* end subroutine (listenspec_ussend) */
 
-static int listenspec_usssame(LS *op,LISTENSPEC *otherp) noex {
+local int listenspec_usssame(LS *op,LISTENSPEC *otherp) noex {
 	LISTENSPEC_USS	*ip = (LISTENSPEC_USS *) op->info ;
 	LISTENSPEC_USS	*oip ;
 	int		rs = SR_OK ;
 	int		f = true ;
-
 	oip = (LISTENSPEC_USS *) otherp->info ;
+	{
 	f = f && LEQUIV((ip->fname != nullptr),(oip->fname != nullptr)) ;
-	if (f && (ip->fname != nullptr))
+	if (f && (ip->fname != nullptr)) {
 	    f = (strcmp(ip->fname,oip->fname) == 0) ;
-
+	}
+	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (listenspec_usssame) */
+} /* end subroutine (listenspec_usssame) */
 
-static int listenspec_ussactive(LS *op,int opts,int f) noex {
+local int listenspec_ussactive(LS *op,int opts,int f) noex {
 	LISTENSPEC_USS	*ip = (LISTENSPEC_USS *) op->info ;
 	int		rs = SR_OK ;
 	int		f_a = false ;
-
 	if (f && (! op->fl.active)) {
-	    if ((rs = listenuss(ip->fname,ip->mode,opts)) >= 0) {
+	    cmode om = mode_t(ip->mode) ;
+	    if ((rs = listenuss(ip->fname,om,opts)) >= 0) {
 	        op->fd = rs ;
 	        op->fl.active = true ;
 	        op->fl.broken = false ;
@@ -921,7 +887,7 @@ static int listenspec_ussactive(LS *op,int opts,int f) noex {
 	    } else {
 		op->rs_error = rs ;
 	        op->fl.broken = true ;
-	    }
+	    } /* end if */
 	} else if ((! f) && op->fl.active) {
 	    if (op->fd >= 0) {
 	        u_close(op->fd) ;
@@ -929,125 +895,104 @@ static int listenspec_ussactive(LS *op,int opts,int f) noex {
 	    }
 	    op->fl.active = false ;
 	} /* end if */
-
 	return (rs >= 0) ? f_a : rs ;
-}
-/* end subroutine (listenspec_ussactive) */
+} /* end subroutine (listenspec_ussactive) */
 
-static int listenspec_ussaccept(LS *op,void *fp,int *flp,int to) noex {
+local int listenspec_ussaccept(LS *op,void *fp,int *flp,int to) noex {
 	SOCKADDR	*sap = sockaddrp(fp) ;
 	return uc_accepte(op->fd,sap,flp,to) ;
-}
-/* end subroutine (listenspec_ussaccept) */
+} /* end subroutine (listenspec_ussaccept) */
 
-static int listenspec_ussinfo(LS *op,listenspec_info *lip) noex {
+local int listenspec_ussinfo(LS *op,listenspec_info *lip) noex {
 	LISTENSPEC_USS	*ip = (LISTENSPEC_USS *) op->info ;
 	int		rs = SR_OK ;
 	int		bl = LISTENSPEC_ADDRLEN ;
 	int		len = 0 ;
 	char		*bp = lip->addr ;
-
 	if (ip->fname == nullptr) rs = SR_NOENT ;
-
 	if (rs >= 0) {
-	    len = strwcpy(bp,ip->fname,bl) - bp ;
+	    len = conv<int>(strwcpy(bp,ip->fname,bl) - bp) ;
 	}
-
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (listenspec_ussinfo) */
+} /* end subroutine (listenspec_ussinfo) */
 
-static int listenspec_passbegin(LS *op,int ac,mv av) noex {
+local int listenspec_passbegin(LS *op,int ac,mv av) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
-	ARGINFO		ai, *aip = &ai ;
+	AI		ai, *aip = &ai ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-
 	ip->mode = -1 ;
-
 	if ((rs = arginfo_start(aip)) >= 0) {
 	    if ((rs = listenspec_procargs(op,aip,ac,av)) >= 0) {
 		int	pan = 0 ;
 		int	al ;
 		cchar	*ap ;
 		cchar	*cp ;
-
-/* option arguments */
-
-	        if (aip->mode >= 0)
+		/* option arguments */
+	        if (aip->mode >= 0) {
 	            ip->mode = aip->mode ;
-
-/* positional arguments */
-
+		}
+		/* positional arguments */
 	        pan = 0 ;
 	        while ((al = arginfo_get(aip,pan,&ap)) >= 0) {
-
 	            switch (pan) {
 	            case 0:
 	                if (al > 0) {
 	                    n = 1 ;
-	                    rs = uc_mallocstrw(ap,al,&cp) ;
+	                    rs = mem.strw(ap,al,&cp) ;
 	                    if (rs >= 0) ip->fname = cp ;
-	                }
+	                } /* end if (memory-acquire) */
 	                break ;
 	            } /* end switch */
 	            pan += 1 ;
-
 	            if (rs < 0) break ;
 	        } /* end while (positional arguments) */
-
-/* default arguments */
-
+		/* default arguments */
 	        if (ip->mode < 0) {
 	            ip->mode = 0666 ;
 		}
-
 	    } /* end if (procargs) */
 	    rs1 = arginfo_finish(aip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (arginfo) */
-
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (listenspec_passbegin) */
+} /* end subroutine (listenspec_passbegin) */
 
-static int listenspec_passend(LS *op) noex {
+local int listenspec_passend(LS *op) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (ip->fname != nullptr) {
-	    rs1 = uc_free(ip->fname) ;
+	if (ip->fname) {
+	    voidp vp = voidp(ip->fname) ;
+	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ip->fname = nullptr ;
-	}
-
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (listenspec_passend) */
+} /* end subroutine (listenspec_passend) */
 
-static int listenspec_passsame(LS *op,LISTENSPEC *otherp) noex {
+local int listenspec_passsame(LS *op,LISTENSPEC *otherp) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
 	LISTENSPEC_PASS	*oip = (LISTENSPEC_PASS *) otherp->info ;
 	int		rs = SR_OK ;
 	int		f = true ;
-
+	{
 	f = f && LEQUIV((ip->fname != nullptr),(oip->fname != nullptr)) ;
 	if (f && (ip->fname != nullptr)) {
 	    f = (strcmp(ip->fname,oip->fname) == 0) ;
 	}
-
+	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (listenspec_passsame) */
+} /* end subroutine (listenspec_passsame) */
 
-static int listenspec_passactive(LS *op,int opts,int f) noex {
+local int listenspec_passactive(LS *op,int opts,int f) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
 	int		rs = SR_OK ;
 	int		f_a = false ;
 	if (f && (! op->fl.active)) {
-	    if ((rs = listenpass(ip->fname,ip->mode,opts)) >= 0) {
+	    cmode om = mode_t(ip->mode) ;
+	    if ((rs = listenpass(ip->fname,om,opts)) >= 0) {
 	        op->fd = rs ;
 	        op->fl.active = true ;
 	        op->fl.broken = false ;
@@ -1067,10 +1012,9 @@ static int listenspec_passactive(LS *op,int opts,int f) noex {
 	    op->fl.active = false ;
 	} /* end if */
 	return (rs >= 0) ? f_a : rs ;
-}
-/* end subroutine (listenspec_passactive) */
+} /* end subroutine (listenspec_passactive) */
 
-static int listenspec_passaccept(LS *op,void *fp,int *flp,int to) noex {
+local int listenspec_passaccept(LS *op,void *fp,int *flp,int to) noex {
 	int		rs ;
 	int		fd = -1 ;
 	if (fp) {
@@ -1082,66 +1026,55 @@ static int listenspec_passaccept(LS *op,void *fp,int *flp,int to) noex {
 	    fd = rs ;
 	}
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (listenspec_passaccept) */
+} /* end subroutine (listenspec_passaccept) */
 
-static int listenspec_passinfo(LS *op,listenspec_info *lip) noex {
+local int listenspec_passinfo(LS *op,listenspec_info *lip) noex {
 	LISTENSPEC_PASS	*ip = (LISTENSPEC_PASS *) op->info ;
 	int		rs = SR_OK ;
 	int		bl = LISTENSPEC_ADDRLEN ;
 	int		len = 0 ;
 	char		*bp = lip->addr ;
-
-	if (ip->fname == nullptr) rs = SR_NOENT ;
-
-	if (rs >= 0) {
-	    len = strwcpy(bp,ip->fname,bl) - bp ;
+	if (ip->fname == nullptr) {
+	    rs = SR_NOENT ;
 	}
-
+	if (rs >= 0) {
+	    len = conv<int>(strwcpy(bp,ip->fname,bl) - bp) ;
+	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (listenspec_passinfo) */
+} /* end subroutine (listenspec_passinfo) */
 
-static int listenspec_connbegin(LS *op,int ac,mv av) noex {
+local int listenspec_connbegin(LS *op,int ac,mv av) noex {
 	LISTENSPEC_CONN	*ip = (LISTENSPEC_CONN *) op->info ;
-	ARGINFO		ai, *aip = &ai ;
+	AI		ai, *aip = &ai ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-
 	ip->mode = -1 ;
-
 	if ((rs = arginfo_start(aip)) >= 0) {
 	    if ((rs = listenspec_procargs(op,aip,ac,av)) >= 0) {
 		int	pan = 0 ;
 		int	al ;
 		cchar	*ap ;
 		cchar	*cp ;
-
-/* option arguments */
-
-	        if (aip->mode >= 0)
+		/* option arguments */
+	        if (aip->mode >= 0) {
 	            ip->mode = aip->mode ;
-
-/* positional arguments */
-
+		}
+		/* positional arguments */
 	        while ((al = arginfo_get(aip,pan,&ap)) >= 0) {
-
 	            switch (pan) {
 	            case 0:
 	                if (al > 0) {
 	                    n = 1 ;
-	                    rs = uc_mallocstrw(ap,al,&cp) ;
+	                    rs = mem.strw(ap,al,&cp) ;
 	                    if (rs >= 0) ip->fname = cp ;
-	                }
+	                } /* end if (memory-acquire) */
 	                break ;
 	            } /* end switch */
 	            pan += 1 ;
-
 	            if (rs < 0) break ;
 	        } /* end while (positional arguments) */
-
-/* default arguments */
+		/* default arguments */
 	        if (ip->mode < 0) {
 	            ip->mode = 0666 ;
 		}
@@ -1149,49 +1082,44 @@ static int listenspec_connbegin(LS *op,int ac,mv av) noex {
 	    rs1 = arginfo_finish(aip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (arginfo) */
+return (rs >= 0) ? n : rs ;
+} /* end subroutine (listenspec_connbegin) */
 
-	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (listenspec_connbegin) */
-
-static int listenspec_connend(LS *op) noex {
+local int listenspec_connend(LS *op) noex {
 	LISTENSPEC_CONN	*ip = (LISTENSPEC_CONN *) op->info ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (ip->fname != nullptr) {
-	    rs1 = uc_free(ip->fname) ;
+	if (ip->fname) {
+	    voidp vp = voidp(ip->fname) ;
+	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ip->fname = nullptr ;
-	}
-
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (listenspec_connend) */
+} /* end subroutine (listenspec_connend) */
 
-static int listenspec_connsame(LS *op,LISTENSPEC *otherp) noex {
+local int listenspec_connsame(LS *op,LISTENSPEC *otherp) noex {
 	LISTENSPEC_CONN	*ip = (LISTENSPEC_CONN *) op->info ;
 	LISTENSPEC_CONN	*oip = (LISTENSPEC_CONN *) otherp->info ;
 	int		rs = SR_OK ;
 	int		f = true ;
-
+	{
 	f = f && LEQUIV((ip->fname != nullptr),(oip->fname != nullptr)) ;
 	if (f && (ip->fname != nullptr)) {
 	    f = (strcmp(ip->fname,oip->fname) == 0) ;
 	}
-
+	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (listenspec_connsame) */
+} /* end subroutine (listenspec_connsame) */
 
-static int listenspec_connactive(LS *op,int opts,int f) noex {
+local int listenspec_connactive(LS *op,int opts,int f) noex {
 	LISTENSPEC_CONN	*ip = (LISTENSPEC_CONN *) op->info ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f_a = false ;
-
 	if (f && (! op->fl.active)) {
-	    if ((rs = listenconn(ip->fname,ip->mode,opts)) >= 0) {
+	    cmode om = mode_t(ip->mode) ;
+	    if ((rs = listenconn(ip->fname,om,opts)) >= 0) {
 	        op->fd = rs ;
 	        op->fl.active = true ;
 	        op->fl.broken = false ;
@@ -1205,7 +1133,7 @@ static int listenspec_connactive(LS *op,int opts,int f) noex {
 	    }
 	} else if ((! f) && op->fl.active) {
 	    if (ip->fname[0] != '\0') {
-	        rs1 = uc_fdetach(ip->fname) ;
+	        rs1 = uc_detach(ip->fname) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->fd >= 0) {
@@ -1214,12 +1142,10 @@ static int listenspec_connactive(LS *op,int opts,int f) noex {
 	    }
 	    op->fl.active = false ;
 	} /* end if */
-
 	return (rs >= 0) ? f_a : rs ;
-}
-/* end subroutine (listenspec_connactive) */
+} /* end subroutine (listenspec_connactive) */
 
-static int listenspec_connaccept(LS *op,void *fp,int *flp,int to) noex {
+local int listenspec_connaccept(LS *op,void *fp,int *flp,int to) noex {
 	int		rs ;
 	int		fd = -1 ;
 	if (fp) {
@@ -1231,10 +1157,9 @@ static int listenspec_connaccept(LS *op,void *fp,int *flp,int to) noex {
 	    fd = rs ;
 	}
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (listenspec_connaccept) */
+} /* end subroutine (listenspec_connaccept) */
 
-static int listenspec_conninfo(LS *op,listenspec_info *lip) noex {
+local int listenspec_conninfo(LS *op,listenspec_info *lip) noex {
 	LISTENSPEC_CONN	*ip = (LISTENSPEC_CONN *) op->info ;
 	int		rs = SR_NOTFOUND ;
 	int		len = 0 ;
@@ -1242,13 +1167,12 @@ static int listenspec_conninfo(LS *op,listenspec_info *lip) noex {
 	    int		bl = LISTENSPEC_ADDRLEN ;
 	    char	*bp = lip->addr ;
 	    rs = SR_OK ;
-	    len = strwcpy(bp,ip->fname,bl) - bp ;
+	    len = conv<int>(strwcpy(bp,ip->fname,bl) - bp) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (listenspec_conninfo) */
+} /* end subroutine (listenspec_conninfo) */
 
-static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
+local int listenspec_procargs(LS *op,AI *aip,int ac,mv av) noex {
 	uint		uv ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1283,15 +1207,15 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	            f_optequal = false ;
 	            if ((avp = strchr(akp,'=')) != nullptr) {
 	                f_optequal = true ;
-	                akl = avp - akp ;
+	                akl = conv<int>(avp - akp) ;
 	                avp += 1 ;
-	                avl = akp + (fl - 1) - avp ;
+	                avl = conv<int>(akp + (fl - 1) - avp) ;
 	            } else {
 	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = (fl - 1) ;
-	            }
-	            if ((kwi = matostr(lopts,2,akp,akl)) >= 0) {
+	            } /* end if */
+	            if ((kwi = matostr(loptnames,2,akp,akl)) >= 0) {
 	                switch (kwi) {
 	                case lopt_here:
 	                    break ;
@@ -1340,13 +1264,12 @@ static int listenspec_procargs(LS *op,ARGINFO *aip,int ac,mv av) noex {
 	    if (rs < 0) break ;
 	} /* end while */
 	return rs ;
-}
-/* end subroutine (listenspec_procargs) */
+} /* end subroutine (listenspec_procargs) */
 
 #if	CF_OPENPORT
 
 /* note that the 'opts' argument is ignored; this always REUSEs the port */
-static int listenspec_openport(LS *op,int af,cc *hostspec,cc *portspec,
+local int listenspec_openport(LS *op,int af,cc *hostspec,cc *portspec,
 		int opts) noex {
 	int		rs = SR_INVALID ;
 	int		fd = -1 ;
@@ -1373,11 +1296,10 @@ static int listenspec_openport(LS *op,int af,cc *hostspec,cc *portspec,
 	    }
 	} /* end if (valid) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (listenspec_openport) */
+} /* end subroutine (listenspec_openport) */
 
 /* ARGSUSED */
-static int listenspec_openporter(LS *op,cchar *pr,int af,cchar *hp,
+local int listenspec_openporter(LS *op,cchar *pr,int af,cchar *hp,
 		int port,int opts) noex {
 	ADDRINFO	ai ;
 	int		rs ;
@@ -1398,18 +1320,17 @@ static int listenspec_openporter(LS *op,cchar *pr,int af,cchar *hp,
 		    if ((rs < 0) && (fd >= 0)) {
 			u_close(fd) ;
 			fd = -1 ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (openport) */
 	        rs1 = sockaddress_finish(&sa) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (sockaddress) */
 	} /* end if (open-port-addr) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (listenspec_openporter) */
+} /* end subroutine (listenspec_openporter) */
 
 /* ARGSUSED */
-static int listenspec_openportaddr(LS *op,cchar *pr,ADDRINFO *aip,
+local int listenspec_openportaddr(LS *op,cchar *pr,ADDRINFO *aip,
 		char *addr,int af,cchar	*hn) noex {
 	int		rs = SR_INVALID ;
 	int		addrlen = -1 ;
@@ -1422,14 +1343,14 @@ static int listenspec_openportaddr(LS *op,cchar *pr,ADDRINFO *aip,
 	        raf = AF_INET4 ;
 	        rs = listenspec_openportao(op,addr,raf,hn) ;
 	        addrlen = rs ;
-	    }
+	    } /* end if */
 	    if ((addrlen < 0) || (rs == SR_NOTFOUND)) {
 	        if ((af == AF_UNSPEC) || (af == AF_INET6)) {
 	            raf = AF_INET6 ;
 	            rs = listenspec_openportao(op,addr,raf,hn) ;
 	            addrlen = rs ;
 	        }
-	    }
+	    } /* end if */
 	    if (rs >= 0) {
 	        if (raf > 0) {
 	            if ((rs = getpf(raf)) >= 0) {
@@ -1441,10 +1362,9 @@ static int listenspec_openportaddr(LS *op,cchar *pr,ADDRINFO *aip,
 	    } /* end if (ok) */
 	} /* end if (valid) */
 	return (rs >= 0) ? addrlen : rs ;
-}
-/* end subroutine (listenspec_openportaddr) */
+} /* end subroutine (listenspec_openportaddr) */
 
-static int listenspec_openportao(LS *op,char *addr,int af,cc *hn) noex {
+local int listenspec_openportao(LS *op,char *addr,int af,cc *hn) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	int		addrlen = 0 ;
@@ -1476,44 +1396,40 @@ static int listenspec_openportao(LS *op,char *addr,int af,cc *hn) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? addrlen : rs ;
-}
-/* end subroutine (listenspec_openportao) */
+} /* end subroutine (listenspec_openportao) */
 
 #endif /* CF_OPENPORT */
 
-static int listenspec_prlocal(LS *op) noex {
+local int listenspec_prlocal(LS *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if (op->prlocal == nullptr) {
-	    char	*dbuf{} ;
-	    if ((rs = malloc_hn(&dbuf)) >= 0) {
+	    if (char *dbuf ; (rs = mem.hostname(&dbuf)) >= 0) {
 		cint	dlen = rs ;
 	        if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
-	            char	*pbuf{} ;
-		    if ((rs = malloc_mp(&pbuf)) >= 0) {
+	            if (char *pbuf ; (rs = mem.mp(&pbuf)) >= 0) {
 			cint	plen = rs ;
 	                if ((rs = mkpr(pbuf,plen,PRNAME,dbuf)) >= 0) {
-		            cchar	*cp ;
-		            if ((rs = uc_mallocstrw(pbuf,rs,&cp)) >= 0) {
+		            cc *cp ;
+		            if ((rs = mem.strw(pbuf,rs,&cp)) >= 0) {
 		                op->prlocal = cp ;
 		            } /* end if (memory-allocation) */
 	                } /* end if (mkpr) */
-			rs1 = uc_free(pbuf) ;
+			rs1 = mem.free(pbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 	        } /* end if (getinetdname) */
-		rs1 = uc_free(dbuf) ;
+		rs1 = mem.free(dbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} else {
 	    rs = lenstr(op->prlocal) ;
 	}
 	return rs ;
-}
-/* end subroutine (listenspec_prlocal) */
+} /* end subroutine (listenspec_prlocal) */
 
 #ifdef	COMMENT
-static int tcp_nfield(cchar *fp,int fl) noex {
+local int tcp_nfield(cchar *fp,int fl) noex {
 	int		n = 0 ;
 	if (fl > 0) {
 	    cchar	*cp ;
@@ -1528,33 +1444,30 @@ static int tcp_nfield(cchar *fp,int fl) noex {
 	    } /* end if */
 	} /* end if (non-zero) */
 	return n ;
-}
-/* end subroutine (tcp_nfield) */
+} /* end subroutine (tcp_nfield) */
 #endif /* COMMENT */
 
-static int tcpaddr_load(TCPADDR *ap,cchar *sp,int sl) noex {
+local int tcpaddr_load(TA *ap,cchar *sp,int sl) noex {
 	int		n = 0 ;
 	if (sl < 0) sl = lenstr(sp) ;
 	memclear(ap) ;
 	if (sl > 0) {
-	    int		cl ;
-	    cchar	*cp ;
-	    cchar	*tp ;
 	    n += 1 ;
-	    if ((tp = strnchr(sp,sl,':')) != nullptr) {
+	    if (cchar *tp = strnchr(sp,sl,':') ; tp) {
+	        int	cl ;
+	        cchar	*cp = (tp + 1) ;
 	        n += 1 ;
 	        ap->af.sp = sp ;
-	        ap->af.sl = (tp - sp) ;
+	        ap->af.sl = conv<int>(tp - sp) ;
 	        ap->host.sp = sp ;
-	        ap->host.sl = (tp - sp) ;
-	        cp = (tp + 1) ;
-	        cl = ((sp + sl) - cp) ;
+	        ap->host.sl = conv<int>(tp - sp) ;
+	        cl = conv<int>((sp + sl) - cp) ;
 	        if ((tp = strnchr(cp,cl,':')) != nullptr) {
 	            n += 1 ;
 	            ap->host.sp = cp ;
-	            ap->host.sl = (tp - cp) ;
+	            ap->host.sl = conv<int>(tp - cp) ;
 	            ap->port.sp = (tp + 1) ;
-	            ap->port.sl = ((sp + sl) - (tp + 1)) ;
+	            ap->port.sl = conv<int>((sp + sl) - (tp + 1)) ;
 	        } else {
 	            ap->af.sp = nullptr ;
 	            ap->af.sl = 0 ;
@@ -1567,10 +1480,9 @@ static int tcpaddr_load(TCPADDR *ap,cchar *sp,int sl) noex {
 	    } /* end if */
 	} /* end if (non-zero) */
 	return n ;
-}
-/* end subroutine (tcpaddr_load) */
+} /* end subroutine (tcpaddr_load) */
 
-static int arginfo_start(ARGINFO *aip) noex {
+local int arginfo_start(AI *aip) noex {
 	int		rs ;
 	{
 	    memclear(aip) ;
@@ -1580,19 +1492,17 @@ static int arginfo_start(ARGINFO *aip) noex {
 	    rs = vechand_start(&aip->pargs,0,0) ;
 	}
 	return rs ;
-}
-/* end subroutine (arginfo_start) */
+} /* end subroutine (arginfo_start) */
 
-static int arginfo_add(ARGINFO *aip,cchar *sp) noex {
+local int arginfo_add(AI *aip,cchar *sp) noex {
 	int		rs ;
 	{
 	    rs = vechand_add(&aip->pargs,sp) ;
 	}
 	return rs ;
-}
-/* end subroutine (arginfo_add) */
+} /* end subroutine (arginfo_add) */
 
-static int arginfo_get(ARGINFO *aip,int i,cchar **rpp) noex {
+local int arginfo_get(AI *aip,int i,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (aip && rpp) ylikely {
 	    vechand	*pap = &aip->pargs ;
@@ -1609,10 +1519,9 @@ static int arginfo_get(ARGINFO *aip,int i,cchar **rpp) noex {
 	    } /* end if (vechand_get) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (arginfo_get) */
+} /* end subroutine (arginfo_get) */
 
-static int arginfo_finish(ARGINFO *aip) noex {
+local int arginfo_finish(AI *aip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -1620,7 +1529,6 @@ static int arginfo_finish(ARGINFO *aip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (arginfo_finish) */
+} /* end subroutine (arginfo_finish) */
 
 
