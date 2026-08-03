@@ -46,14 +46,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strdcpy.h"
 
@@ -93,8 +95,7 @@ char *strdcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 	    rp = (dbuf + dl) ;
 	} /* end if (non-null) */
 	return rp ;
-}
-/* end subroutine (strdcpyclean) */
+} /* end subroutine (strdcpyclean) */
 
 
 /* local subroutines */
@@ -106,7 +107,6 @@ local bool isour(int ch) noex {
 	f = f || (ch == CH_BS) ;
 	f = f || (ch == CH_BEL) ;
 	return f ;
-}
-/* end subroutine (isour) */
+} /* end subroutine (isour) */
 
 
