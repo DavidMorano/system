@@ -22,15 +22,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |caddr_t| */
-#include	<sys/stat.h>		/* |USTAT| */
-#include	<time.h>		/* |time_t| */
-#include	<fcntl.h>		/* |mode_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<sys/types.h>		/* POSIX® |caddr_t| */
+#include	<sys/stat.h>		/* POSIX® |USTAT| */
+#include	<time.h>		/* POSIX® |time_t| */
+#include	<fcntl.h>		/* POSIX® |mode_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	LINEINDEX		struct lineindex_head
@@ -40,7 +37,7 @@
 
 #define	LINEINDEX_MAGIC		0x23456787
 #define	LINEINDEX_FILEMAGIC	"LINEINDEX"
-#define	LINEINDEX_FILEMAGICSIZE	16
+#define	LINEINDEX_FILEMAGICSZ	16
 #define	LINEINDEX_FILEMAGICLEN	sizeof(LINEINDEX_FILEMAGIC)
 #define	LINEINDEX_FILEVERSION	1
 #define	LINEINDEX_FILETYPE	0
@@ -80,7 +77,7 @@ struct lineindex_head {
 	time_t		tiaccess ;
 	size_t		mapsize ;
 	LINEINDEX_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		pagesize ;
 	int		filesize ;
 	int		lines ;
