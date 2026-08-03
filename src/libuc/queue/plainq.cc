@@ -49,13 +49,13 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"plainq.h"
 
@@ -104,8 +104,7 @@ int plainq_start(plainq *op) noex {
 	    op->magval = PLAINQ_MAGIC ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (plainq_start) */
+} /* end subroutine (plainq_start) */
 
 int plainq_finish(plainq *op) noex {
 	int		rs ;
@@ -116,8 +115,7 @@ int plainq_finish(plainq *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (plainq_finish) */
+} /* end subroutine (plainq_finish) */
 
 int plainq_ins(plainq *op,plainq_ent *ep) noex {
 	int		rs ;
@@ -141,8 +139,7 @@ int plainq_ins(plainq *op,plainq_ent *ep) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (plainq_ins) */
+} /* end subroutine (plainq_ins) */
 
 int plainq_insgroup(plainq *op,plainq_ent *gp,int esize,int n) noex {
 	int		rs ;
@@ -164,8 +161,7 @@ int plainq_insgroup(plainq *op,plainq_ent *gp,int esize,int n) noex {
 		}
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (plainq_insgroup) */
+} /* end subroutine (plainq_insgroup) */
 
 int plainq_inshead(plainq *op,plainq_ent *ep) noex {
 	int		rs ;
@@ -191,8 +187,7 @@ int plainq_inshead(plainq *op,plainq_ent *ep) noex {
 		}
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (plainq_inshead) */
+} /* end subroutine (plainq_inshead) */
 
 int plainq_unlink(plainq *op,plainq_ent *ep) noex {
 	int		rs ;
@@ -247,8 +242,7 @@ int plainq_unlink(plainq *op,plainq_ent *ep) noex {
 		}
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (plainq_unlink) */
+} /* end subroutine (plainq_unlink) */
 
 int plainq_rem(plainq *op,plainq_ent **epp) noex {
 	int		rs ;
@@ -284,8 +278,7 @@ int plainq_rem(plainq *op,plainq_ent **epp) noex {
 		if (epp && (rs < 0)) *epp = nullptr ;
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (plainq_rem) */
+} /* end subroutine (plainq_rem) */
 
 int plainq_gethead(plainq *op,plainq_ent **epp) noex {
 	int		rs ;
@@ -308,8 +301,7 @@ int plainq_gethead(plainq *op,plainq_ent **epp) noex {
 		} /* end if (not-empty) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (plainq_gethead) */
+} /* end subroutine (plainq_gethead) */
 
 int plainq_remtail(plainq *op,plainq_ent **epp) noex {
 	int		rs ;
@@ -346,8 +338,7 @@ int plainq_remtail(plainq *op,plainq_ent **epp) noex {
 		if (epp && (rs < 0)) *epp = nullptr ;
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (plainq_remtail) */
+} /* end subroutine (plainq_remtail) */
 
 int plainq_gettail(plainq *op,plainq_ent **epp) noex {
 	int		rs ;
@@ -370,8 +361,7 @@ int plainq_gettail(plainq *op,plainq_ent **epp) noex {
 		} /* end if (not-empty) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (plainq_gettail) */
+} /* end subroutine (plainq_gettail) */
 
 int plainq_count(plainq *op) noex {
 	int		rs ;
@@ -379,8 +369,7 @@ int plainq_count(plainq *op) noex {
 		rs = op->cnt ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (plainq_count) */
+} /* end subroutine (plainq_count) */
 
 int plainq_audit(plainq *op) noex {
 	int		rs ;
@@ -408,8 +397,7 @@ int plainq_audit(plainq *op) noex {
 	        }
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (plainq_audit) */
+} /* end subroutine (plainq_audit) */
 
 int plainq::ins(plainq_ent *ep) noex {
 	return plainq_ins(this,ep) ;
@@ -473,6 +461,5 @@ plainq_co::operator int () noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (plainq_co::operator) */
-
 
 
