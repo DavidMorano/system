@@ -140,7 +140,7 @@ namespace bibdbx {
 	bkp->fi = fi ;
 	bkp->foff = foff ;
 	bkp->clen = clen ;
-	if (cchar *cp ; (rs = mem.strw(cbuf,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = mem.strw(cbuf,-1,&cp)) >= 0) ylikely {
 	    bkp->ckey = cp ;
 	} /* end if (memory-acquire) */
 	return rs ;
@@ -148,7 +148,7 @@ namespace bibdbx {
     int bibdbkey_finish(BDB_KEY *bkp) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (bkp) {
+	if (bkp) ylikely {
 	    rs = SR_OK ;
 	    if (bkp->ckey) {
 	        voidp vp = voidp(bkp->ckey) ;
