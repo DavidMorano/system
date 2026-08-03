@@ -128,7 +128,7 @@ cbool		f_debug		= CF_DEBUG ;
 namespace bibdbx {
     int keyval_start(keyval *kvp) noex {
     	int		rs = SR_BUGCHECK ;
-	if (kvp) {
+	if (kvp) ylikely {
 	    rs = memclear(kvp) ;
 	} /* end if (non-null) */
 	return rs ;
