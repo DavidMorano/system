@@ -107,9 +107,9 @@ cint	filemagic::bufsz	= (magsz + szof(uint)) ;
 int filemagic::rd(char *rbuf,int rlen) noex {
     	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_OVERFLOW ;
-	    if ((rlen < 0) || (rlen >= bufsz)) {
+	    if ((rlen < 0) || (rlen >= bufsz)) ylikely {
 	        caddr_t bp = rbuf ;
 		rs = SR_OK ;
 	        bp = caddr_t(memcopy(bp,magic,magsz)) ;
@@ -122,9 +122,9 @@ int filemagic::rd(char *rbuf,int rlen) noex {
 
 int filemagic::wr(cchar *fbuf,int flen) noex {
     	int		rs = SR_FAULT ;
-	if (fbuf) {
+	if (fbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (fbuf[0] && ((flen < 0) || (flen >= bufsz))) {
+	    if (fbuf[0] && ((flen < 0) || (flen >= bufsz))) ylikely {
 		ccharp	bp = fbuf ;
 		bp = charp(memcopy(magic,bp,magsz)) ;
 		memcopy(vetu,bp,szof(uint)) ;
@@ -137,10 +137,10 @@ int filemagic::wr(cchar *fbuf,int flen) noex {
 int filemagic::load(cc *mstr,int mlen,uchar v,uchar e,uchar t,uchar u) noex {
     	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (mstr) {
+	if (mstr) ylikely {
 	    rs = SR_INVALID ;
-	    if (mstr[0]) {
-	        if ((rs = mkmagic(magic,magsz,mstr,mlen)) >= 0) {
+	    if (mstr[0]) ylikely {
+	        if ((rs = mkmagic(magic,magsz,mstr,mlen)) >= 0) ylikely {
 		    len = xstrnlen(mstr,mlen) ;
 	            vetu[0] = v ;
 	            vetu[1] = e ;
@@ -155,10 +155,10 @@ int filemagic::load(cc *mstr,int mlen,uchar v,uchar e,uchar t,uchar u) noex {
 int filemagic::load(cc *mstr,int mlen,uchar *param) noex {
     	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (mstr) {
+	if (mstr) ylikely {
 	    rs = SR_INVALID ;
-	    if (mstr[0]) {
-	        if ((rs = mkmagic(magic,magsz,mstr,mlen)) >= 0) {
+	    if (mstr[0]) ylikely {
+	        if ((rs = mkmagic(magic,magsz,mstr,mlen)) >= 0) ylikely {
 		    cint n = szof(uint) ;
 		    len = xstrnlen(mstr,mlen) ;
 		    for (int i = 0 ; i < n ; i += 1) {
@@ -173,9 +173,9 @@ int filemagic::load(cc *mstr,int mlen,uchar *param) noex {
 int filemagic::verify(cc *msp,int msl) noex {
     	int		rs = SR_FAULT ;
 	int		fok = false ;
-	if (int ml = getlenstr(msp,msl) ; ml >= 0) {
+	if (int ml = getlenstr(msp,msl) ; ml >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if ((ml > 0) && (ml < magsz) && msp[0]) {
+	    if ((ml > 0) && (ml < magsz) && msp[0]) ylikely {
 		rs = SR_OK ;
 		fok = strwcmp(magic,msp,msl) ;
 	    } /* end if (valid) */
