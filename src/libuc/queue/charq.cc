@@ -28,13 +28,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"charq.h"
 
@@ -85,8 +85,7 @@ int charq_start(charq *op,int sz) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (charq_start) */
+} /* end subroutine (charq_start) */
 
 int charq_finish(charq *op) noex {
 	int		rs = SR_FAULT ;
@@ -102,8 +101,7 @@ int charq_finish(charq *op) noex {
 	    op->cnt = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (charq_finish) */
+} /* end subroutine (charq_finish) */
 
 int charq_ins(charq *op,int ch) noex {
 	int		rs = SR_FAULT ;
@@ -117,8 +115,7 @@ int charq_ins(charq *op,int ch) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (charq_ins) */
+} /* end subroutine (charq_ins) */
 
 int charq_rem(charq *op,char *cp) noex {
 	int		rs = SR_FAULT ;
@@ -132,8 +129,7 @@ int charq_rem(charq *op,char *cp) noex {
 	    } /* end if (not-empty) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (charq_rem) */
+} /* end subroutine (charq_rem) */
 
 int charq_remall(charq *op) noex {
 	int		rs = SR_FAULT ;
@@ -144,8 +140,7 @@ int charq_remall(charq *op) noex {
 	    op->cnt = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (charq_remall) */
+} /* end subroutine (charq_remall) */
 
 int charq_size(charq *op) noex {
 	int		rs = SR_FAULT ;
@@ -153,8 +148,7 @@ int charq_size(charq *op) noex {
 	    rs = op->qlen ;
 	}
 	return rs ;
-}
-/* end subroutine (charq_size) */
+} /* end subroutine (charq_size) */
 
 int charq_count(charq *op) noex {
 	int		rs = SR_FAULT ;
@@ -162,8 +156,7 @@ int charq_count(charq *op) noex {
 	    rs = op->cnt ;
 	}
 	return rs ;
-}
-/* end subroutine (charq_count) */
+} /* end subroutine (charq_count) */
 
 int charq::ins(int ch) noex {
 	return charq_ins(this,ch) ;
@@ -212,7 +205,6 @@ int charq_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (charq_co::operator) */
+} /* end method (charq_co::operator) */
 
 
