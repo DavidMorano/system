@@ -324,7 +324,7 @@ int pwcache_invalidate(pwcache *op,cchar *un) noex {
                     {
                         rs1 = lm_free(ep) ;
                         if (rs >= 0) rs = rs1 ;
-                    }
+                    } /* end if (memory-release) */
                 } else if (rs == SR_NOTFOUND) {
                     rs = SR_OK ;
                 }
@@ -444,7 +444,7 @@ local int pwcache_oldrec(pwcache *op,rec *ep) noex {
 	    {
 	        rs1 = lm_free(ep) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if (memory-release) */
 	}
 	return rs ;
 } /* end subroutine (pwcache_newrec) */
