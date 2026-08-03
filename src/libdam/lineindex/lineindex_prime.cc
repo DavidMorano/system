@@ -32,25 +32,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<sys/mman.h>		/* Memory Management */
-#include	<unistd.h>
-#include	<fcntl.h>		/* open-flags */
-#include	<ctime>			/* |time_t| */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sysval.hh>
-#include	<endian.h>
-#include	<intceil.h>
-#include	<intsat.h>
-#include	<isfiledesc.h>
-#include	<isnot.h>
-#include	<localmisc.h>		/* |MODP2| */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® Memory Management */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® open-flags */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBUC */
+#include	<intceil.h>		/* LIBUC */
+#include	<intsat.h>		/* LIBUC */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucmem.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<isfiledesc.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |MODP2| */
 
 #include	"lineindex.h"
 #include	"lineindexhdr.h"
@@ -100,9 +101,9 @@ local int lineindex_ctor(lineindex *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->sbp = new(nothrow) USTAT) != np) ylikely {
+	    if ((op->sbp = new(nothrow) ustat) != np) ylikely {
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-ustat) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (lineindex_ctor) */
@@ -123,7 +124,7 @@ template<typename ... Args>
 local inline int lineindex_magic(lineindex *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LINEINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LINEINDEX_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (lineindex_magic) */
@@ -147,11 +148,9 @@ namespace lineindex_ns {
 
 /* local variables */
 
-static sysval	pagesize(sysval_ps) ;
-
-constexpr int	magicsize = LINEINDEXHDR_MAGICSIZE ;
-
-constexpr off_t	maxfoff = INT_MAX ;
+static sysval		pagesize	(sysval_ps) ;
+constexpr int		magicsz		= LINEINDEXHDR_MAGICSIZE ;
+constexpr off_t		maxfoff		= INT_MAX ;
 
 
 /* exported variables */
@@ -162,55 +161,53 @@ constexpr off_t	maxfoff = INT_MAX ;
 int lineindex_open(LI *op,cc *ifn,int of,om_t om,cc *tfn) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = lineindex_ctor(op,ifn)) >= 0) {
+	if ((rs = lineindex_ctor(op,ifn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (ifn[0] && (of >= 0)) {
+	    if (ifn[0] && (of >= 0)) ylikely {
 	        op->fd = -1 ;
 	        op->of = of ;
 	        op->om = om ;
-		if ((rs = pagesize) >= 0) {
+		if ((rs = pagesize) >= 0) ylikely {
 		    cint	am = (of & O_ACCMODE) ;
 		    op->pagesize = rs ;
 		    op->fl.wantwrite = ((am == O_WRONLY) || (am == O_RDWR)) ;
-		    if ((rs = lineindex_stbegin(op,ifn,tfn)) >= 0) {
+		    if ((rs = lineindex_stbegin(op,ifn,tfn)) >= 0) ylikely {
 		    	{
 		    	    rs = lineindex_opener(op) ;
 			    c = rs ;
 			}
 			if (rs < 0) {
 			    lineindex_stend(op) ;
-			}
+			} /* end if (error) */
 		    } /* end if (store-files) */
 		} /* end if (pagesize) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		lineindex_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (lineindex_ctor) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (lineindex_opne) */
+} /* end subroutine (lineindex_opne) */
 
 local int lineindex_opener(LI *op) noex {
 	custime		dt = getustime ;
 	int		rs ;
-	if ((rs = lineindex_idxmbegin(op,dt)) >= 0) {
-	    if ((rs = lineindex_idxverify(op)) >= 0) {
+	if ((rs = lineindex_idxmbegin(op,dt)) >= 0) ylikely {
+	    if ((rs = lineindex_idxverify(op)) >= 0) ylikely {
 		op->tiaccess = dt ;
-		op->magic = LINEINDEX_MAGIC ;
+		op->magval = LINEINDEX_MAGIC ;
 	    }
 	    if (rs < 0) {
 		lineindex_idxmend(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (lineindex_idxm-) */
 	return rs ;
-}
-/* end subroutine (lineindex_opener) */
+} /* end subroutine (lineindex_opener) */
 
 int lineindex_close(LI *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = lineindex_magic(op)) >= 0) {
+	if ((rs = lineindex_magic(op)) >= 0) ylikely {
 	    if (op->mapdata) {
 		rs1 = lineindex_idxmend(op) ;
 		if (rs >= 0) rs = rs1 ;
@@ -223,47 +220,43 @@ int lineindex_close(LI *op) noex {
 		rs1 = lineindex_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lineindex_close) */
+} /* end subroutine (lineindex_close) */
 
 int lineindex_count(LI *op) noex {
     	int		rs ;
-	if ((rs = lineindex_magic(op)) >= 0) {
+	if ((rs = lineindex_magic(op)) >= 0) ylikely {
 	    rs = op->lines ;
 	}
 	return rs ;
-}
-/* end subroutine (lineindex_count) */
+} /* end subroutine (lineindex_count) */
 
 int lineindex_curbegin(LI *op,lineindex_cur *curp) noex {
     	int		rs ;
-	if ((rs = lineindex_magic(op,curp)) >= 0) {
+	if ((rs = lineindex_magic(op,curp)) >= 0) ylikely {
 	    op->cursors += 1 ;
 	    curp->i = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lineindex_curbegin) */
+} /* end subroutine (lineindex_curbegin) */
 
 int lineindex_curend(LI *op,lineindex_cur *curp) noex {
     	int		rs ;
-	if ((rs = lineindex_magic(op,curp)) >= 0) {
+	if ((rs = lineindex_magic(op,curp)) >= 0) ylikely {
 	    if (op->cursors > 0) {
 	        op->cursors -= 1 ;
 	    }
 	    curp->i = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lineindex_curend) */
+} /* end subroutine (lineindex_curend) */
 
 int lineindex_curenum(LI *op,lineindex_cur *curp,off_t *rop) noex {
 	int		rs ;
 	int		ri = 0 ;
-	if ((rs = lineindex_magic(op,curp,rop)) >= 0) {
+	if ((rs = lineindex_magic(op,curp,rop)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (op->cursors > 0) {
 		rs = SR_NOTFOUND ;
@@ -277,12 +270,11 @@ int lineindex_curenum(LI *op,lineindex_cur *curp,off_t *rop) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ri : rs ;
-}
-/* end subroutine (lineindex_curenum) */
+} /* end subroutine (lineindex_curenum) */
 
 int lineindex_lookup(LI *op,int ri,off_t *rop) noex {
 	int		rs ;
-	if ((rs = lineindex_magic(op,rop)) >= 0) {
+	if ((rs = lineindex_magic(op,rop)) >= 0) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (ri < op->lines) {
 		rs = SR_OK ;
@@ -292,30 +284,28 @@ int lineindex_lookup(LI *op,int ri,off_t *rop) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ri : rs ;
-}
-/* end subroutine (lineindex_lookup) */
+} /* end subroutine (lineindex_lookup) */
 
 int lineindex_check(LI *op,time_t dt) noex {
 	int		rs ;
-	if ((rs = lineindex_magic(op)) >= 0) {
+	if ((rs = lineindex_magic(op)) >= 0) ylikely {
 	    (void) dt ;
 	    rs = SR_NOSYS ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lineindex_check) */
+} /* end subroutine (lineindex_check) */
 
 
 /* private subroutines */
 
 local int lineindex_stbegin(LI *op,cc *ifn,cc *tfn) noex {
     	int		rs ;
-	if (cchar *cp{} ; (rs = lm_strw(ifn,-1,&cp)) >= 0) {
+	if (cchar *cp ; (rs = lm_strw(ifn,-1,&cp)) >= 0) ylikely {
 	    op->ifn = cp ;
-	    if (tfn) {
+	    if (tfn) ylikely {
 	        rs = SR_INVALID ;
-		if (tfn[0]) {
-		    if ((rs = lm_strw(tfn,-1,&cp)) >= 0) {
+		if (tfn[0]) ylikely {
+		    if ((rs = lm_strw(tfn,-1,&cp)) >= 0) ylikely {
 	    		op->tfn = cp ;
 		    } /* end if (memory-alloation) */
 		}
@@ -324,11 +314,10 @@ local int lineindex_stbegin(LI *op,cc *ifn,cc *tfn) noex {
 		void *vp = voidp(op->ifn) ;
 		lm_free(vp) ;
 		op->ifn = nullptr ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (lineindex_stbegin) */
+} /* end subroutine (lineindex_stbegin) */
 
 local int lineindex_stend(LI *op) noex {
 	int		rs = SR_OK ;
@@ -339,16 +328,15 @@ local int lineindex_stend(LI *op) noex {
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->tfn = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (op->ifn) ylikely {
 	    vp = voidp(op->ifn) ;
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->ifn = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (lineindex_stend) */
+} /* end subroutine (lineindex_stend) */
 
 local int lineindex_idxmap(LI *op,time_t dt) noex {
 	cnullptr	np{} ;
@@ -366,8 +354,7 @@ local int lineindex_idxmap(LI *op,time_t dt) noex {
 	    } /* end if (u_mmapbegin) */
 	} /* end if (mapping needed) */
 	return rs ;
-}
-/* end subroutine (lineindex_idxmap) */
+} /* end subroutine (lineindex_idxmap) */
 
 local int lineindex_idxmbegin(LI *op,custime dt) noex {
 	int		rs = SR_OK ;
@@ -382,8 +369,7 @@ local int lineindex_idxmbegin(LI *op,custime dt) noex {
 	    } /* end if (opened the file) */
 	} /* end if (mapping file) */
 	return rs ;
-}
-/* end subroutine (lineindex_idxmbegin) */
+} /* end subroutine (lineindex_idxmbegin) */
 
 local int lineindex_idxmend(LI *op) noex {
 	int		rs = SR_OK ;
@@ -397,8 +383,7 @@ local int lineindex_idxmend(LI *op) noex {
 	    op->mapsize = 0 ;
 	} /* end if (checking existing map) */
 	return rs ;
-}
-/* end subroutine (lineindex_idxmend) */
+} /* end subroutine (lineindex_idxmend) */
 
 local int lineindex_idxopener(LI *op) noex {
 	cint		of = (op->of & (~ (O_TRUNC | O_CREAT))) ;
@@ -416,16 +401,15 @@ local int lineindex_idxopener(LI *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (lineindex_idxopener) */
+} /* end subroutine (lineindex_idxopener) */
 
 local int lineindex_idxopen(LI *op,time_t dt) noex {
 	int		rs ;
-	if ((rs = lineindex_idxopener(op)) >= 0) {
+	if ((rs = lineindex_idxopener(op)) >= 0) ylikely {
 	    cint	fd = op->fd ;
 	    if ((rs = isfsremote(fd)) >= 0) {
 	  	op->fl.remote = (rs > 0) ;
-		if (USTAT *sbp = op->sbp ; (rs = u_fstat(fd,sbp)) >= 0) {
+		if (ustat *sbp = op->sbp ; (rs = u_fstat(fd,sbp)) >= 0) {
 		    if (sbp->st_size <= maxfoff) {
 			if (dt == 0) dt = getustime ;
 	                op->filesize = int(sbp->st_size) ;
@@ -439,11 +423,10 @@ local int lineindex_idxopen(LI *op,time_t dt) noex {
 	    if (rs < 0) {
 		u_close(op->fd) ;
 		op->fd = -1 ;
-	    }
+	    } /* end if (error) */
 	} /* end if (lineindex_idxopener) */
 	return rs ;
-}
-/* end subroutine (lineindex_idxopen) */
+} /* end subroutine (lineindex_idxopen) */
 
 local int lineindex_idxclose(LI *op) noex {
 	int		rs = SR_OK ;
@@ -452,10 +435,9 @@ local int lineindex_idxclose(LI *op) noex {
 	    op->fd = -1 ;
 	    op->tifmod = 0 ;
 	    op->tiopen = 0 ;
-	}
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (lineindex_idxclose) */
+} /* end subroutine (lineindex_idxclose) */
 
 local int lineindex_idxverify(LI *op) noex {
     	int		rs = SR_BUGCHECK ;
@@ -467,17 +449,16 @@ local int lineindex_idxverify(LI *op) noex {
 		cint	end = hdr.vetu[1] ;
 		cuint	typ = hdr.vetu[2] ;
 		bool	fbad = false ;
-		op->rectab = uintp(mp + hdr.rectab) ;
-		op->tiwrite = time_t(hdr.wrtime) ;
-		op->lines = int(hdr.lines) ;
+		op->rectab	= uintp(mp + hdr.rectab) ;
+		op->tiwrite	= time_t(hdr.wrtime) ;
+		op->lines	= int(hdr.lines) ;
 		fbad = fbad || (ver != LINEINDEX_FILEVERSION) ;
 		fbad = fbad || (end != ENDIAN) ;
 		fbad = fbad || (typ != LINEINDEX_FILETYPE) ;
 		if (fbad) rs = SR_BADFMT ;
 	    } /* end if (lineindexhdr_wr) */
-	}
+	} /* end if (need removal) */
 	return rs ;
-}
-/* end subroutine (lineindex_idxverify) */
+} /* end subroutine (lineindex_idxverify) */
 
 
