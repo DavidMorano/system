@@ -31,31 +31,33 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<sys/mman.h>		/* Memory Management */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<sysval.hh>
-#include	<bufsizevar.hh>
-#include	<opentmp.h>		/* |opentmpfile(3uc)| */
-#include	<endian.h>
-#include	<vecint.h>
-#include	<storebuf.h>
-#include	<mkpathx.h>
-#include	<sfx.h>
-#include	<intceil.h>
-#include	<intsat.h>
-#include	<isnot.h>
-#include	<localmisc.h>		/* |MODP2| */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® Memory Management */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC |opentmpfile(3uc)| */
+#include	<vecint.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<intsat.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |MODP2| */
 
 #include	"lineindex.h"
 #include	"lineindexhdr.h"
@@ -66,22 +68,17 @@
 #define	LI		lineindex
 #define	LI_VERSION	LINEINDEX_FILEVERSION
 #define	LI_TYPE		LINEINDEX_FILETYPE
+#define	LI_FILEMAGSZ	LINEINDEX_FILEMAGICSZ
+#define	LI_OV		lineindexhdr_overlast
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-}
 
 
 /* external variables */
@@ -101,34 +98,31 @@ namespace {
 	int		tfd = -1 ;
 	idxer(lineindex *p) noex : op(p) { } ;
 	operator int () noex ;
-	int tmpbegin() noex ;
-	int tmpend() noex ;
-	int scaner() noex ;
-	int scanlines(cchar *) noex ;
-	int liner(int,size_t) noex ;
-	int add(void *,cchar *) noex ;
-	int wridx(int) noex ;
+	int tmpbegin	() noex ;
+	int tmpend	() noex ;
+	int scaner	() noex ;
+	int scanlines	(cchar *) noex ;
+	int liner	(int,size_t) noex ;
+	int add		(void *,cchar *) noex ;
+	int wridx	(int) noex ;
     } ; /* end struct (idxer) */
 } /* end namespace */
 
 
 /* forward references */
 
-static int	mkpatfn(char *,int,cc *,int,cc *) noex ;
+local int	mkpatfn(char *,int,cc *,int,cc *) noex ;
 
 
 /* local variables */
 
 static sysval		pagesize(sysval_ps) ;
-
 static bufsizevar	maxpathlen(bufsize_mp) ;
 
-constexpr int	magicsize = LINEINDEXHDR_MAGICSIZE ;
-constexpr int	headsize = magicsize + 4 + (lineindexhdr_overlast * szof(int)) ;
-
-constexpr off_t	maxfoff = INT_MAX ;
-
-constexpr char	tpat[] = "liXXXXXXXXXXXX" ;
+constexpr int	mmagsz		= LI_FILEMAGSZ ;
+constexpr int	headsize	= mmagsz + 4 + (LI_OV * szof(int)) ;
+constexpr off_t	maxfoff		= INT_MAX ;
+constexpr char	tpat[]		= "liXXXXXXXXXXXX" ;
 
 
 /* exported variables */
@@ -142,44 +136,43 @@ constexpr char	tpat[] = "liXXXXXXXXXXXX" ;
 namespace lineindex_ns {
     int lineindex_mkidx(LI *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
-	    if (op->tfn) {
+	if (op) ylikely {
+	    if (op->tfn) ylikely {
 		rs = SR_INVALID ;
-		if (op->tfn[0]) {
+		if (op->tfn[0]) ylikely {
 		    idxer	io(op) ;
 		    rs = io ;
 	        } /* end if (valid) */
 	    }
 	} /* end if (non-null) */
 	return rs ;
-    }
+    } /* end subroutine (lineindex_mkidx) */
 } /* end namespace (lineindex_ns) */
 
 idxer::operator int () noex {
     	int		rs ;
 	int		rs1 ;
-	if ((rs = tmpbegin()) >= 0) {
-	    if ((rs = scaner()) >= 0) {
+	if ((rs = tmpbegin()) >= 0) ylikely {
+	    if ((rs = scaner()) >= 0) ylikely {
 		rs = u_rename(tbuf,op->ifn) ;
 		if (rs < 0) {
 		    u_unlink(tbuf) ;
 		    tbuf[0] = '\0' ;
-		}
+		} /* end if (error) */
 	    } /* end if (scaner) */
 	    rs1 = tmpend() ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filemap) */
     	return rs ;
-}
-/* end method (idxer::operator) */
+} /* end method (idxer::operator) */
 
 int idxer::tmpbegin() noex {
     	int		rs ;
-	if ((rs = maxpathlen) >= 0) {
+	if ((rs = maxpathlen) >= 0) ylikely {
 	    cint	maxpath = rs ;
 	    cint	sz = ((maxpath + 1) * 2) ;
 	    int		ai = 0 ;
-	    if ((rs = lm_mall(sz,&a)) >= 0) {
+	    if ((rs = lm_mall(sz,&a)) >= 0) ylikely {
 		pbuf = (a + ((maxpath + 1) * ai++)) ;
 		tbuf = (a + ((maxpath + 1) * ai++)) ;
 		plen = maxpath ;
@@ -197,15 +190,15 @@ int idxer::tmpbegin() noex {
 			    tfd = rs ;
 			}
 		    } /* end if (mkpatfn) */
-	        }
+	        } /* end if */
 	        if (rs < 0) {
 	            lm_free(a) ;
 		    a = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end if (bufsizevar) */
 	return rs ;
-}
+} /* end method */
 
 int idxer::tmpend() noex {
     	int		rs = SR_OK ;
@@ -223,35 +216,34 @@ int idxer::tmpend() noex {
 	    pbuf = nullptr ;
 	    tlen = 0 ;
 	    plen = 0 ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
+} /* end method */
 
 int idxer::scaner() noex {
     	int		rs ;
 	int		rs1 ;
-	if ((rs = recs.start) >= 0) {
-	    if ((rs = scanlines(op->tfn)) >= 0) {
+	if ((rs = recs.start) >= 0) ylikely {
+	    if ((rs = scanlines(op->tfn)) >= 0) ylikely {
 		rs = wridx(rs) ;
 	    }
 	    rs1 = recs.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecint) */
     	return rs ;
-}
-/* end method (idxer::scaner) */
+} /* end method (idxer::scaner) */
 
 int idxer::scanlines(cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		lines = 0 ;
-	if (fn) {
+	if (fn) ylikely {
 	    rs = SR_INVALID ;
-	    if (fn[0]) {
+	    if (fn[0]) ylikely {
 		cint	of = O_RDONLY ;
-		if ((rs = uc_open(fn,of,0)) >= 0) {
+		if ((rs = uc_open(fn,of,0)) >= 0) ylikely {
 		    cint	fd = rs ;
-		    if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
+		    if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) ylikely {
 			csize	fsz = size_t(sb.st_size) ;
 			rs = SR_NOTSUP ;
 		        if (S_ISREG(sb.st_mode)) {
@@ -268,8 +260,7 @@ int idxer::scanlines(cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? lines : rs ;
-}
-/* end method (idxer::scanlines) */
+} /* end method (idxer::scanlines) */
 
 int idxer::liner(int fd,size_t ms) noex {
 	cint		mp = PROT_READ ;
@@ -301,8 +292,7 @@ int idxer::liner(int fd,size_t ms) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (map-file) */
 	return (rs >= 0) ? lines : rs ;
-}
-/* end method (idxer::liner) */
+} /* end method (idxer::liner) */
 
 int idxer::add(void *md,cchar *lp) noex {
     	int		rs ;
@@ -312,8 +302,7 @@ int idxer::add(void *md,cchar *lp) noex {
 	    rs = recs.add(off) ;
 	}
 	return rs ;
-}
-/* end method (idxer::add) */
+} /* end method (idxer::add) */
 
 int idxer::wridx(int lines) noex {
     	lineindexhdr	hdr{} ;
@@ -329,10 +318,10 @@ int idxer::wridx(int lines) noex {
 	    hdr.vetu[1] = charconv(ENDIAN) ;
 	    hdr.vetu[2] = LI_TYPE ;
 	}
-	if (char *hbuf ; (rs = lm_mall(sz,&hbuf)) >= 0) {
-	    if ((rs = hdr.rd(hbuf,rs)) >= 0) {
+	if (char *hbuf ; (rs = lm_mall(sz,&hbuf)) >= 0) ylikely {
+	    if ((rs = hdr.rd(hbuf,rs)) >= 0) ylikely {
 		cint	hsz = rs ;
-		if (int *va ; (rs = recs.getvec(&va)) >= 0) {
+		if (int *va ; (rs = recs.getvec(&va)) >= 0) ylikely {
 		    IOVEC	vec[3] = {} ;
 		    vec[0].iov_base = hbuf ;
        		    vec[0].iov_len = hsz ;
@@ -345,19 +334,17 @@ int idxer::wridx(int lines) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end method (idxer::wridx) */
+} /* end method (idxer::wridx) */
 
-static int mkpatfn(char *rb,int rl,cc *dp,int dl,cc *fn) noex {
+local int mkpatfn(char *rb,int rl,cc *dp,int dl,cc *fn) noex {
     	int		rs ;
 	int		idx = 0 ;
-    	if (storebuf sb(rb,rl) ; (rs = sb.strw(dp,dl)) >= 0) {
+    	if (storebuf sb(rb,rl) ; (rs = sb.strw(dp,dl)) >= 0) ylikely {
 	    rs = sb.chr('/') ;
 	    if (rs >= 0) rs = sb.str(fn) ;
 	    idx = sb.idx ;
-	}
+	} /* end if (storebuf) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (mkpatfn) */
+} /* end subroutine (mkpatfn) */
 
 
