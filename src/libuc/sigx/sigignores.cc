@@ -29,12 +29,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucsigx.h>		/* |uc_sigignore(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucsigx.h>		/* LIBUC |uc_sigignore(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sigignores.h"
 
@@ -70,14 +70,13 @@
 
 int sigignores(cint *sigs) noex {
 	int		rs = SR_FAULT ;
-	if (sigs) {
+	if (sigs) ylikely {
 	    rs = SR_OK ;
 	    for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
 		rs = uc_sigignore(sigs[i]) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sigignores) */
+} /* end subroutine (sigignores) */
 
 
