@@ -35,6 +35,8 @@ DEFS +=
 
 INCS += sigx.h
 
+MODS +=
+
 LIBS +=
 
 
@@ -42,6 +44,7 @@ OBJ0= sigaction.o sigdefaults.o
 OBJ1= sigevent.o sigignores.o
 
 OBJA= obj0.o obj1.o
+OBJB=
 
 OBJ= $(OBJA)
 
