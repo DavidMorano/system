@@ -113,4 +113,3 @@ rebuf_co::operator int () noex {
 } /* end method (rebuf_co::operator) */
 
 
-
