@@ -43,16 +43,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<algorithm>		/* |min(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
-#include	<cmporders.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<cmporders.h>		/* LIBU */
 
 #include	"strnxcmp.h"
 
@@ -96,7 +96,7 @@ typedef cmporders	co ;
 
 int strnncmp(cchar *s1,int n1,cchar *s2,int n2) noex {
 	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    if (n1 < 0) n1 = lenstr(s1) ;
 	    if (n2 < 0) n2 = lenstr(s2) ;
 	    if (cint n = min(n1,n2) ; (rc = strncmp(s1,s2,n)) == 0) {
@@ -104,7 +104,6 @@ int strnncmp(cchar *s1,int n1,cchar *s2,int n2) noex {
 	    }
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (strnncmp) */
+} /* end subroutine (strnncmp) */
 
 
