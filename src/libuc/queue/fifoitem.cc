@@ -27,15 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<strwcmp.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fifoitem.h"
 
@@ -79,8 +79,7 @@ local inline int fifoitem_magic(fifoitem *op,Args ... args) noex {
 	    rs = (op->magval == FIFOITEM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (fifoitem_magic) */
+} /* end subroutine (fifoitem_magic) */
 
 local int fifoitem_curfetch(fifoitem *,fifoitem_cur *,fifoitem_ent **) noex ;
 
@@ -105,8 +104,7 @@ int fifoitem_start(fifoitem *op) noex {
 	    op->magval = FIFOITEM_MAGIC ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fifoitem_start) */
+} /* end subroutine (fifoitem_start) */
 
 int fifoitem_finish(fifoitem *op) noex {
 	int		rs ;
@@ -120,8 +118,7 @@ int fifoitem_finish(fifoitem *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifoitem_finish) */
+} /* end subroutine (fifoitem_finish) */
 
 int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
 	int		rs ;
@@ -149,8 +146,7 @@ int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
 	    } /* end if (m-a) */
 	} /* end if (magic) */
 	return (rs >= 0) ? op->n : rs ;
-}
-/* end subroutine (fifoitem_ins) */
+} /* end subroutine (fifoitem_ins) */
 
 int fifoitem_rem(fifoitem *op,void *vbuf,int vlen) noex {
 	int		rs = SR_OK ;
@@ -186,8 +182,7 @@ int fifoitem_rem(fifoitem *op,void *vbuf,int vlen) noex {
 	    } /* end if (not-empty) */
 	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (fifoitem_rem) */
+} /* end subroutine (fifoitem_rem) */
 
 int fifoitem_count(fifoitem *op) noex {
 	int		rs ;
@@ -195,8 +190,7 @@ int fifoitem_count(fifoitem *op) noex {
 	    rs = op->n ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifoitem_count) */
+} /* end subroutine (fifoitem_count) */
 
 int fifoitem_del(fifoitem *op) noex {
 	int		rs ;
@@ -223,8 +217,7 @@ int fifoitem_del(fifoitem *op) noex {
 	    n = op->n ;
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (fifoitem_del) */
+} /* end subroutine (fifoitem_del) */
 
 int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
 	int		rs ;
@@ -255,8 +248,7 @@ int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
 	    } /* end if (cursor) */
 	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (fifoitem_present) */
+} /* end subroutine (fifoitem_present) */
 
 int fifoitem_curbegin(fifoitem *op,fifoitem_cur *curp) noex {
 	int		rs ;
@@ -273,8 +265,7 @@ int fifoitem_curend(fifoitem *op,fifoitem_cur *curp) noex {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifoitem_curend) */
+} /* end subroutine (fifoitem_curend) */
 
 int fifoitem_curdel(fifoitem *op,fifoitem_cur *curp) noex {
 	int		rs ;
@@ -323,8 +314,7 @@ int fifoitem_curdel(fifoitem *op,fifoitem_cur *curp) noex {
 	    n = op->n ;
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (fifoitem_curdel) */
+} /* end subroutine (fifoitem_curdel) */
 
 int fifoitem_curenum(fifoitem *op,fifoitem_cur *curp,void *rvp) noex {
 	int		rs ;
@@ -342,8 +332,7 @@ int fifoitem_curenum(fifoitem *op,fifoitem_cur *curp,void *rvp) noex {
 	    rs = (ep) ? ep->dl : SR_NOTFOUND ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifoitem_curenum) */
+} /* end subroutine (fifoitem_curenum) */
 
 
 /* private subroutines */
@@ -378,8 +367,7 @@ local int entry_start(fifoitem_ent *ep,cvoid *vp,int sl) noex {
 	    ep->dl = sl ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 local int entry_finish(fifoitem_ent *ep) noex {
 	int		rs = SR_OK ;
@@ -392,7 +380,6 @@ local int entry_finish(fifoitem_ent *ep) noex {
 	ep->next = nullptr ;
 	ep->prev = nullptr ;
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 
