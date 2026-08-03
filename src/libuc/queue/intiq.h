@@ -30,12 +30,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>
-#include	<stdlib.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ptm.h>
-#include	<fifoitem.h>
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<fifoitem.h>		/* LIBUC */
 
 
 #define	INTIQ		struct intiq_head
@@ -77,9 +77,9 @@ struct intiq : intiq_head {
 	} ; /* end ctor */
 	intiq(const intiq &) = delete ;
 	intiq &operator = (const intiq &) = delete ;
-	int	ins(int) noex ;
-	int	rem(int *) noex ;
-	void	dtor() noex ;
+	int ins		(int) noex ;
+	int rem		(int *) noex ;
+	void dtor	() noex ;
 	operator int () noex ;
 	destruct intiq() {
 	    if (magval) dtor() ;
