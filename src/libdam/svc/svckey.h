@@ -1,5 +1,6 @@
 /* svckey HEADER */
-/* lang=C++20 */
+/* charset=ISO8859-1 */
+/* lang=C20 */
 
 /* service key data-structure-conversion access */
 /* version %I% last-modified %G% */
@@ -12,11 +13,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<svcfile.h>		/* for type |svcfile_ent| */
 
 
