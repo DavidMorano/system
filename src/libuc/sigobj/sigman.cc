@@ -27,20 +27,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucsig.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsig.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sigman.h"
 
@@ -196,8 +193,7 @@ int sigman_start(sigman *op,cint *blks,cint *igns,cint *cats,
 	    } /* end if (error) */
 	} /* end if (sigman_ctor) */
 	return rs ;
-}
-/* end subroutine (sigman_start) */
+} /* end subroutine (sigman_start) */
 
 int sigman_finish(sigman *op) noex {
 	int		rs ;
@@ -226,8 +222,7 @@ int sigman_finish(sigman *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sigman_finish) */
+} /* end subroutine (sigman_finish) */
 
 
 /* private subroutines */
