@@ -60,18 +60,18 @@ struct envhelp : envhelp_head {
 	envhelp_co	count ;
 	envhelp_co	finish ;
 	envhelp() noex {
-	    sort(this,envhelpmem_sort) ;
-	    count(this,envhelpmem_count) ;
-	    finish(this,envhelpmem_finish) ;
-	    elp = nullptr ;
+	    sort	(this,envhelpmem_sort) ;
+	    count	(this,envhelpmem_count) ;
+	    finish	(this,envhelpmem_finish) ;
+	    elp		= nullptr ;
 	} ; /* end ctor */
 	envhelp(const envhelp &) = delete ;
 	envhelp &operator = (const envhelp &) = delete ;
-	int start(mainv,mainv) noex ;
-	int present(cchar *,int,cchar **) noex ;
-	int envset(cchar *,cchar *,int) noex ;
-	int getvec(mainv *) noex ;
-	void dtor() noex ;
+	int start	(mainv,mainv) noex ;
+	int present	(cchar *,int,cchar **) noex ;
+	int envset	(cchar *,cchar *,int) noex ;
+	int getvec	(mainv *) noex ;
+	void dtor	() noex ;
 	destruct envhelp() {
 	    if (elp) dtor() ;
 	} ;
