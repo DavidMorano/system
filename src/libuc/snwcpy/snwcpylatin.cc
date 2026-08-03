@@ -55,12 +55,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snwcpyx.h"
 
@@ -91,7 +91,6 @@
 int snwcpylatin(char *dbuf,int dlen,cchar *sp,int sl) noex {
     	cint	sch = ('-' + 128) ;
     	return snwcpyclean(dbuf,dlen,sch,sp,sl) ;
-}
-/* end subroutine (snwcpylatin) */
+} /* end subroutine (snwcpylatin) */
 
 
