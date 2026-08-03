@@ -6,7 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	1		/* compile-time debug print-outs */
-#define	CF_NEWTHING	0		/* compile in the new thing */
+#define	CF_NEWTHING	1		/* compile in the new thing */
 
 /* revision history:
 
@@ -160,7 +160,8 @@ namespace {
 	} ; /* end ctor */
 	operator int () noex ;
 	int reader	(rebuf *,charp,int,bfile *) noex ;
-	int readln	(rebuf *,charp,int) noex ;
+	int readln	(rebuf *,ccharp,int) noex ;
+	int readlner	(rebuf *,ccharp,int) noex ;
 	int bufendcheck	(rebuf *) noex ;
     } ; /* end struct (readenter) */
 } /* end namespace */
@@ -198,15 +199,12 @@ cbool		f_debug		= CF_DEBUG ;
 
 /* exported subroutines */
 
-
-/* private subroutines */
-
 #if	CF_NEWTHING
 namespace bibdbx {
     int bibdb_entfileproc(bibdb *op,int fi,BDB_FI *bfep) noex {
 	int		rs = SR_BUGCHECK ;
 	DEBUGPRINTF("ent fi=%u\n",fi) ;
-	if (op && bfep) {
+	if (op && bfep) ylikely {
 	    readenter ro(op,fi,bfep) ;
 	    rs = ro ;
 	} /* end if (non-null) */
@@ -216,16 +214,17 @@ namespace bibdbx {
 } /* end namespace (bibdbx) */
 
 readenter::operator int () noex {
+    	cnothrow	nt{} ;
     	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
 	DEBUGPRINTF("ent fi=%u\n",fi) ;
 	op->unindexed -= 1 ;
-	if ((rs = mem.ml(&cbuf)) >= 0) {
+	if ((rs = mem.ml(&cbuf)) >= 0) ylikely {
 	    clen = rs ;
-	    if (rebuf *rbp = new(nt) rebuf ; rbp) {
-		if ((rs = rbp->start(cbuf,clen)) >= 0) {
-	            if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
+	    if (rebuf *rbp = new(nt) rebuf ; rbp) ylikely {
+		if ((rs = rbp->start(cbuf,clen)) >= 0) ylikely {
+	            if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) ylikely {
 	                cint llen = rs ;
 	                if (bfile ef ; (rs = ef.open(bfep->fname,"r")) >= 0) {
 	                    {
@@ -264,15 +263,19 @@ int readenter::reader(rebuf *rbp,charp lbuf,int llen,bfile *bfp) noex {
 	    pf.fbol = pf.feol ;
 	    if (pf.fdone || (rs < 0)) break ;
 	} /* end while */
+#ifdef	COMMENT
 	if ((rs >= 0) && pf.finkey) {
 	    rs = bibentry_end(iep) ;
 	    pf.finkey = false ;
 	}
+#endif /* COMMENT */
 	/* OK, load this internal entry */
+#ifdef	COMMENT
 	if (rs >= 0) {
 	    rs = entry_load(bep,bebuf,belen,iep) ;
 	    ne += 1 ;
 	} /* end if (ok) */
+#endif /* COMMENT */
 	return (rs >= 0) ? ne : rs ;
 } /* end method (readenter::reader) */
 
@@ -282,13 +285,13 @@ int readenter::readln(rebuf *rbp,cchar *lbuf,int len) noex {
 	cint		ll = (pf.feol) ? (len - 1) : len ;
 	switch (state) {
 	case state_search:
-	    if ((! af.fbol) || (! iskey(lp,ll))) break ;
+	    if ((! pf.fbol) || (! iskey(lp,ll))) break ;
 	    state = state_have ;
 	    citeoff = foff ;
 	    falldown ;
 	    /* FALLTHROUGH */
 	case state_have:
-	    rs = readlner(rbp,ll,lp) ;
+	    rs = readlner(rbp,lp,ll) ;
 	    break ;
 	default:
 	    rs = SR_BUGCHECK ;
@@ -300,31 +303,36 @@ int readenter::readln(rebuf *rbp,cchar *lbuf,int len) noex {
 int readenter::readlner(rebuf *rbp,cchar *lp,int ll) noex {
     	int		rs = SR_OK ;
 	DEBUGPRINTF("ent\n") ;
-	if (pf.fbol && iskey(lp,ll)) {
+	if (pf.fbol && iskey(lp,ll)) ylikely {
 	    DEBUGPRINTF("key=%c\n",lp[1]) ;
 	    DEBUGPRINTF("f_inkey=%u\n",pf.finkey) ;
-	    if ((rs = bufendcheck()) >= 0) {
+	    if ((rs = bufendcheck(rbp)) >= 0) ylikely {
                 lp += 1 ;
                 ll -= 1 ;
-                cl = sfnext(lp,ll,&cp) ;
-                DEBUGPRINTF("cl=%u c=%r\n",cl,cp,cl) ;
-                DEBUGPRINTF("ql=%u q=%r\n",op->qkl,op->qkp,op->qkl) ;
-	        bool f = true ;
-	        f = f && (cl == op->qkl) ;
-                f = f && (strncmp(cp,op->qkp,op->qkl) == 0) ;
-	        if (f) {
-                    ll -= ((cp + cl) - lp) ;
-                    lp = (cp + cl) ;
-                    DEBUGPRINTF("rline=%r\n",lp,ll) ;
-                    kl = sfnext(lp,ll,&kp) ;
-                    DEBUGPRINTF("cite-key start\n") ;
-                    DEBUGPRINTF("k=%r\n",kp,kl) ;
-                    rs = ebp->bufbeg ;
-                    pf.finkey = (rs >= 0) ;
-                    if ((rs >= 0) && (kl > 0)) {
-                        rs = rbp->strw(kp,kl) ;
-                    }
-                } /* end if (found cite-key) */
+		cchar *cp ;
+                if (int cl ; (cl = sfnext(lp,ll,&cp)) > 0) {
+                    DEBUGPRINTF("cl=%u c=%r\n",cl,cp,cl) ;
+                    DEBUGPRINTF("ql=%u q=%r\n",op->qkl,op->qkp,op->qkl) ;
+	            bool f = true ;
+	            f = f && (cl == op->qkl) ;
+                    f = f && (strncmp(cp,op->qkp,op->qkl) == 0) ;
+	            if (f) {
+                        ll -= conv<int>((cp + cl) - lp) ;
+                        lp = (cp + cl) ;
+                        DEBUGPRINTF("rline=%r\n",lp,ll) ;
+			cchar *kp ;
+                        if (int kl ; (kl = sfnext(lp,ll,&kp)) > 0) {
+                            DEBUGPRINTF("cite-key start\n") ;
+                            DEBUGPRINTF("k=%r\n",kp,kl) ;
+                            if ((rs = rbp->bufbeg) >= 0) {
+                                pf.finkey = true ;
+                                if (kl > 0) {
+                                    rs = rbp->strw(kp,kl) ;
+		                }
+                            } /* end if (bufbeg) */
+			} /* end if */
+                    } /* end if (found cite-key) */
+		} /* end if (non-zero positive) */
 	    } /* end if (bufendcheck) */
         } else if (pf.finkey) {
             if ((rs = rbp->getlen) > 0) {
@@ -338,7 +346,7 @@ int readenter::readlner(rebuf *rbp,cchar *lp,int ll) noex {
         DEBUGPRINTF("leaving?\n") ;
         if ((rs >= 0) && ((ll == 0) || (lp[0] == '\n'))) {
             DEBUGPRINTF("end-of-entry \n") ;
-            DEBUGPRINTF("f_inkey=%u\n",f_inkey) ;
+            DEBUGPRINTF("f_inkey=%u\n",pf.finkey) ;
             state = state_search ;
             if (pf.finkey) {
                 pf.finkey = false ;
@@ -379,6 +387,8 @@ namespace bibdbx {
 } /* end namespace (bibdbx) */
 #endif /* CF_NEWTHING */
 
+
+/* private subroutines */
 
 #ifdef	COMMENT
 
@@ -574,10 +584,10 @@ local int bibdb_inskey(bibdb *op,int fi,uint foff,cchar *cbuf,int clen) noex {
 	DEBUGPRINTF("foff=%u\n",foff) ;
 	DEBUGPRINTF("cbuf=%s\n",cbuf) ;
 	DEBUGPRINTF("clen=%d\n",clen) ;
-	if (hdb *klp = resumelife<hdb>(op->klp) ; klp) {
-	    if (void *vp ; (rs = mem.mall(ksz,&vp)) >= 0) {
+	if (hdb *klp = resumelife<hdb>(op->klp) ; klp) ylikely {
+	    if (void *vp ; (rs = mem.mall(ksz,&vp)) >= 0) ylikely {
 	        rs = SR_BUGCHECK ;
-	        if (BDB_KEY *bkp = new(vp) BDB_KEY ; bkp) {
+	        if (BDB_KEY *bkp = new(vp) BDB_KEY ; bkp) ylikely {
 	            if ((rs = bibdbkey_start(bkp,fi,foff,cbuf,clen)) >= 0) {
 	                hdb_dat	key{} ;
 	                hdb_dat	val{} ;
