@@ -30,9 +30,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<signal.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<signal.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #ifndef	TYPEDEF_SIGINFOHAND
