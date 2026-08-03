@@ -43,19 +43,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* |strncasecmp(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdclib.hh>		/* |std_strncasecmp(3u)| */
-#include	<mkchar.h>
-#include	<char.h>
-#include	<localmisc.h>
-#include	<cmporders.h>
+#include	<strings.h>		/* BSD |strncasecmp(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdclib.hh>		/* LIBU |std_strncasecmp(3u)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<cmporders.h>		/* LIBU */
 
 #include	"strnxxxxcmp.h"
 
@@ -93,7 +93,7 @@ extern "C" {
 
 local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
     	int		rc = 0 ;
-	if (s1 || s2) {
+	if (s1 || s2) ylikely {
 	    rc = +1 ;
 	    if (s1) {
 		rc = -1 ;
@@ -126,7 +126,7 @@ local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
 
 int strnbasecmp(cchar *s1,cchar *s2,int slen) noex {
     	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    rc = strncmp(s1,s2,slen) ;
 	} /* end if (non-null) */
 	return rc ;
@@ -134,7 +134,7 @@ int strnbasecmp(cchar *s1,cchar *s2,int slen) noex {
 
 int strnfoldcmp(cchar *e1p,cchar *e2p,int n) noex {
 	int		rc = 0 ;
-	if (e1p && e2p) {
+	if (e1p && e2p) ylikely {
 	    for (int i = 0 ; (i < n) ; i += 1) {
 	        cint ch1 = TOFC(*e1p++) ;
 	        cint ch2 = TOFC(*e2p++) ;
