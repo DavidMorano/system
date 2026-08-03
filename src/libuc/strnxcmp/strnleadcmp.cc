@@ -41,15 +41,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
-#include	<cmporders.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<cmporders.h>		/* LIBU */
 
 #include	"strnxcmp.h"
 
@@ -90,7 +90,7 @@ typedef cmporders	co ;
 
 int strnleadcmp(cchar *s1,cchar *s2,int lr) noex {
 	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    if (lr < 0) lr = lenstr(s2) ;
 	    while (lr-- > 0) {
 		cint ch1 = mkchar(*s1++) ;
@@ -100,7 +100,6 @@ int strnleadcmp(cchar *s1,cchar *s2,int lr) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (strnleadcmp) */
+} /* end subroutine (strnleadcmp) */
 
 
