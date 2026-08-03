@@ -67,7 +67,7 @@
 #include	<sys/types.h>		/* POSIX |mode_t| */
 #include	<sys/stat.h>		/* POSIX */
 #include	<sys/socket.h>		/* POSIX */
-#include	<sys/time.h>		/* for |TIMEVAL| */
+#include	<sys/time.h>		/* POSIX® |TIMEVAL| */
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
 #include	<ctime>			/* CSTD */
@@ -76,6 +76,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucsysmisc.h>		/* LIBUC |uc_gettimeofday(3uc)| */
 #include	<ucgetpid.h>		/* LIBUC */
@@ -214,22 +215,19 @@ constexpr bool		f_splitfname	= CF_SPLITFNAME ;
 int opentmpfile(cchar *inname,int of,mode_t om,char *rbuf) noex {
 	cint		otm = OTM_STREAM ;
 	return opentmpx(inname,of,om,otm,rbuf) ;
-}
-/* end subroutine (opentmpfile) */
+} /* end subroutine (opentmpfile) */
 
 int opentmpusd(cchar *inname,int of,mode_t om,char *rbuf) noex {
 	cint		otm = OTM_DGRAM ;
 	om |= (S_IFSOCK | 0600) ;
 	return opentmpx(inname,of,om,otm,rbuf) ;
-}
-/* end subroutine (opentmpusd) */
+} /* end subroutine (opentmpusd) */
 
 int opentmpuss(cchar *inname,int of,mode_t om,char *rbuf) noex {
 	cint		otm = OTM_STREAM ;
 	om |= (S_IFSOCK | 0600) ;
 	return opentmpx(inname,of,om,otm,rbuf) ;
-}
-/* end subroutine (opentmpuss) */
+} /* end subroutine (opentmpuss) */
 
 int opentmp(cchar *dname,int of,mode_t om) noex {
 	int		rs = SR_INVALID ;
@@ -249,31 +247,25 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 	    DPRINTF("alt dname=%s\n",dname) ;
 	} /* end if (alternative) */
 	DPRINTF("adj dname=%p\n",dname) ;
-	if (dname && dname[0] && (of >= 0)) {
+	if (dname && dname[0] && (of >= 0)) ylikely {
 	    int		ai = 2 ; /* allocated two (2) file-path buffers */
 	    DPRINTF("-> var\n") ;
-	    if (static cint rsv = var ; (rs = rsv) >= 0) {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		cint	maxpath = rs ;
 		cint	sz = (ai * (var.maxpathlen + 1)) ;
-	        DPRINTF("-> mall sz=%d\n",sz) ;
-		if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+		if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 	            char	*ibuf = (a + (--ai * (maxpath + 1))) ;
 	            char	*obuf = (a + (--ai * (maxpath + 1))) ;
-	            DPRINTF("mall() rs=%d\n",rs) ;
-	            if ((rs = mkpath(ibuf,dname,platename)) >= 0) {
-	                DPRINTF("mkpath() rs=%d\n",rs) ;
-	                if (sigblocker b ; (rs = b.start) >= 0) {
+	            if ((rs = mkpath(ibuf,dname,platename)) >= 0) ylikely {
+	                if (sigblocker b ; (rs = b.start) >= 0) ylikely {
 		            cint	otm = OTM_STREAM ;
-	                    DPRINTF("sigblocker_start() rs=%d\n",rs) ;
 	                    if ((rs = opentmpx(ibuf,of,om,otm,obuf)) >= 0) {
 		                fd = rs ;
-	                        DPRINTF("opentmpx() rs=%d\n",rs) ;
 	                        if (obuf[0] != '\0') {
 			            uc_unlink(obuf) ;
 			            obuf[0] = '\0' ;
 			        } /* end if (uc_unlink) */
 	                    } /* end if (opentempx) */
-	                    DPRINTF("sigblocker-out rs=%d\n",rs) ;
 	                    rs1 = b.finish ;
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (sigblock) */
@@ -294,8 +286,7 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 	} /* end if_constexpr (f_debug) */
 	DPRINTF("ret rs=%d fd=%d\n",rs,fd) ;
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opentmp) */
+} /* end subroutine (opentmp) */
 
 
 /* local subroutines */
@@ -305,26 +296,20 @@ local int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	int		rs1 ;
 	int		fd = -1 ;
 	DPRINTF("ent inname=%s\n",inname) ;
-	if (inname && obuf) {
+	if (inname && obuf) ylikely {
 	    rs = SR_INVALID ;
-	    DPRINTF("non-empty inname=%s\n",inname) ;
-	    if (inname[0] && (of >= 0) && (opt >= 0)) {
-	        DPRINTF("-> mall\n") ;
-	        if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
+	    if (inname[0] && (of >= 0) && (opt >= 0)) ylikely {
+	        if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
 	            if ((rs = mkpathexp(pbuf,inname,-1)) > 0) {
-	                DPRINTF("gt rs=%d\n",rs) ;
 		        rs = opentmpxer(pbuf,of,om,opt,obuf) ;
 		        fd = rs ;
 	            } else if (rs == 0) {
-	                DPRINTF("eq rs=%d\n",rs) ;
 		        rs = opentmpxer(inname,of,om,opt,obuf) ;
 		        fd = rs ;
 	            } /* end if */
-	            DPRINTF("out rs=%d\n",rs) ;
 	            rs1 = lm_free(pbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
-	        DPRINTF("mall-out ts=%d\n",rs) ;
 		if ((rs < 0) && (fd >= 0)) {
 		    uc_close(fd) ;
 		} /* end if (error) */
@@ -338,16 +323,13 @@ local int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	int		rs = SR_FAULT ;
 	int		fd = -1 ;
 	DPRINTF("ent inname=%s\n",inname) ;
-	if (inname && obuf) {
+	if (inname && obuf) ylikely {
 	    rs = SR_INVALID ;
 	    obuf[0] = '\0' ;
-	    DPRINTF("valid\n") ;
-	    if (inname[0] && (of >= 0) && (opt >= 0)) {
+	    if (inname[0] && (of >= 0) && (opt >= 0)) ylikely {
 		openmgr oo(of,om,obuf) ;
-		DPRINTF("-> oo\n") ;
 		rs = oo(inname,opt) ;
 		fd = rs ;
-		DPRINTF("oo() rs=%d fd=%d\n",rs,fd) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d fd=%d\n",rs,fd) ;
@@ -429,7 +411,7 @@ int openmgr::split(cchar *inname) noex {
 int openmgr::dirload() noex {
 	int		rs = SR_OK ;
 	if (dirl > 0) {
-	    if ((rs = mkpathw(obuf,dirp,dirl)) >= 0) {
+	    if ((rs = mkpathw(obuf,dirp,dirl)) >= 0) ylikely {
 	        pl = rs ;
 	    }
 	} /* end if */
@@ -439,7 +421,7 @@ int openmgr::dirload() noex {
 int openmgr::obufbegin() noex {
 	int		rs = SR_OK ;
 	if (obuf == nullptr) {
-	    if ((rs = lm_mp(&obuf)) >= 0) {
+	    if ((rs = lm_mp(&obuf)) >= 0) ylikely {
 		obuf[0] = '\0' ;
 		falloc = true ;
 	    } /* end if (memory-acquire) */
@@ -450,7 +432,7 @@ int openmgr::obufbegin() noex {
 int openmgr::obufend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (falloc && obuf) {
+	if (falloc && obuf) ylikely {
 	    obuf[0] = '\0' ;
 	    rs1 = lm_free(obuf) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -464,17 +446,12 @@ int openmgr::operator () (cchar *inname,int opt) noex {
 	int		rs ;
 	int		rs1 ;
 	DPRINTF("ent\n") ;
-	if ((rs = typeinit(opt)) >= 0) {
-	    if ((rs = setft()) >= 0) {
-		DPRINTF("1\n") ;
-	        if ((rs = split(inname)) >= 0) {
-		DPRINTF("2\n") ;
-		    if ((rs = dirload()) >= 0) {
-		DPRINTF("3\n") ;
-	                if ((rs = randload(&rv)) >= 0) {
-		DPRINTF("4\n") ;
-		            if ((rs = obufbegin()) >= 0) {
-		DPRINTF("5\n") ;
+	if ((rs = typeinit(opt)) >= 0) ylikely {
+	    if ((rs = setft()) >= 0) ylikely {
+	        if ((rs = split(inname)) >= 0) ylikely {
+		    if ((rs = dirload()) >= 0) ylikely {
+	                if ((rs = randload(&rv)) >= 0) ylikely {
+		            if ((rs = obufbegin()) >= 0) ylikely {
 		 	        {
 		                    rs = loop() ;
 		                }
@@ -496,7 +473,7 @@ int openmgr::operator () (cchar *inname,int opt) noex {
 
 int openmgr::mkofname() noex {
 	int		rs ;
-	if ((rs = pathadd(obuf,pl,basep,basel)) >= 0) {
+	if ((rs = pathadd(obuf,pl,basep,basel)) >= 0) ylikely {
 	    cint	bl = (rs - pl) ;
 	    char	*bp = (obuf + pl) ;
 	    rs = substr(bp,bl,rv) ;
@@ -566,7 +543,7 @@ int openmgr::oreg() noex {
 	if_constexpr (f_debug) {
 	    debflags(nof) ;
 	} /* end if_constexpr (f_debug) */
-	if ((rs = uc_open(obuf,nof,am)) >= 0) {
+	if ((rs = uc_open(obuf,nof,am)) >= 0) ylikely {
 	    DPRINTF("uc_open() rs=%d\n",rs) ;
 	    if (rs >= 0) debdesc(rs) ;
 	    fd = rs ;
@@ -581,14 +558,14 @@ int openmgr::osock() noex {
 	cint		pf = PF_UNIX ;
 	int		rs ;
 	int		rs1 ;
-        if ((rs = uc_socket(pf,stype,0)) >= 0) {
+        if ((rs = uc_socket(pf,stype,0)) >= 0) ylikely {
             sockaddress sa ;
             cint        af = AF_UNIX ;
             fd = rs ;
-            if ((rs = sockaddress_start(&sa,af,obuf,0,0)) >= 0) {
+            if ((rs = sockaddress_start(&sa,af,obuf,0,0)) >= 0) ylikely {
                 SOCKADDR        *sap = sockaddrp(&sa) ;
                 cint            sal = rs ;
-                if ((rs = uc_bind(fd,sap,sal)) >= 0) {
+                if ((rs = uc_bind(fd,sap,sal)) >= 0) ylikely {
 		    cmode	nom = (om & (compl S_IFMT)) ;
                     rs = uc_chmod(obuf,nom) ;
                     if (rs < 0) {
@@ -610,10 +587,10 @@ int openmgr::osock() noex {
 local int randload(ulong *rvp) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (rvp) {
+	if (rvp) ylikely {
 	    cuint	sid = getsid(0) ;
 	    cuint	uid = getuid() ;
-	    if ((rs = ucpid) >= 0) {
+	    if ((rs = ucpid) >= 0) ylikely {
 		cuint	pid = rs ;
 	        ulong	rv = 0 ;
 	        ulong	v = sid ;	/* mix in |sid| */
@@ -639,7 +616,7 @@ local int substr(char *dp,int dl,ulong rv) noex {
 	cint		randlen = RANDBUFLEN ;
 	int		rs ;
 	char		randbuf[RANDBUFLEN+1] ;
-	if ((rs = cthex(randbuf,randlen,rv)) >= 0) {
+	if ((rs = cthex(randbuf,randlen,rv)) >= 0) ylikely {
 	    for (int j = rs, i = 0 ; i < dl ; i += 1) {
 		if (dp[i] == 'X') {
 		    if (j > 0) {
@@ -653,7 +630,7 @@ local int substr(char *dp,int dl,ulong rv) noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	}
 	return rs ;
@@ -662,8 +639,8 @@ vars::operator int () noex {
 local int debflags(int of) noex {
     	int		rs ;
 	int		rs1 ;
-	if (char *lbuf ; (rs = libmem.ml(&lbuf)) >= 0) {
-	    if ((rs = snflagsopen(lbuf,rs,of)) >= 0) {
+	if (char *lbuf ; (rs = libmem.ml(&lbuf)) >= 0) ylikely {
+	    if ((rs = snflagsopen(lbuf,rs,of)) >= 0) ylikely {
 		DPRINTF("opentmp oflags %s\n",lbuf) ;
 	    } /* end if (snflagsopen) */
 	    rs1 = libmem.free(lbuf) ;
@@ -674,7 +651,7 @@ local int debflags(int of) noex {
 
 local int debdesc(int fd) noex {
     	int		rs ;
-	if ((rs = u_fgetfl(fd)) >= 0) {
+	if ((rs = u_fgetfl(fd)) >= 0) ylikely {
 	    debflags(rs) ;
 	} /* end if (u_fgetfl) */
 	return rs ;
