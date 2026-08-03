@@ -1,4 +1,4 @@
-/* bibdb_prime SUPPORT */
+/* bibdb_bibentry SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -167,12 +167,12 @@ local int bibentry_dtor(bibentry *op) noex {
 namespace bibdbx {
     int bibentry_start(bibentry *iep,int fi) noex {
 	int		rs ;
-	if ((rs = bibentry_ctor(iep)) >= 0) {
+	if ((rs = bibentry_ctor(iep)) >= 0) ylikely {
 	    vecobj	*kvlp = iep->kvlp ;
 	    cint	esz = szof(keyval) ;
 	    cint	vn = 10 ;
 	    cint	vo = 0 ;
-	    if ((rs = kvlp->start(esz,vn,vo)) >= 0) {
+	    if ((rs = kvlp->start(esz,vn,vo)) >= 0) ylikely {
 	        iep->sz = 0 ;
 	        iep->fi = fi ;
 	    } /* end if (vecobj_start) */
@@ -188,10 +188,10 @@ namespace bibdbx {
 	if (kl < 0) kl = lenstr(kp) ;
 	/* key */
 	iep->kp = nullptr ;
-	if (cchar *cp ; (rs = mem.strw(kp,kl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = mem.strw(kp,kl,&cp)) >= 0) ylikely {
 	    iep->kp = cp ;
 	    iep->kl = kl ;
-	    if ((rs = bfp->start(80)) >= 0) {
+	    if ((rs = bfp->start(80)) >= 0) ylikely {
 	        if (val < 0) val = lenstr(vap) ;
 	        while (val && ISWHT(*vap)) {
 	            vap += 1 ;
@@ -218,7 +218,7 @@ namespace bibdbx {
 	    vap += 1 ;
 	    val -= 1 ;
 	} /* end while */
-	if (cchar *bp ; (rs = bfp->get(&bp)) >= 0) {
+	if (cchar *bp ; (rs = bfp->get(&bp)) >= 0) ylikely {
 	    cint bl = rs ;
 	    if (! ISWHT(bp[bl - 1])) {
 	        rs = bfp->chr(' ') ;
@@ -243,25 +243,25 @@ namespace bibdbx {
 	buffer		*bfp = iep->vbp ;
 	int		rs ;
 	int		rs1 ;
-	if (keyval kv ; (rs = keyval_start(&kv)) >= 0) {
+	if (keyval kv ; (rs = keyval_start(&kv)) >= 0) ylikely {
 	    kv.kl = iep->kl ;
 	    kv.kp = iep->kp ;
 	    iep->kp = nullptr ;		/* good!  zapped! */
-	    if (cchar *vap ; (rs = bfp->get(&vap)) >= 0) {
+	    if (cchar *vap ; (rs = bfp->get(&vap)) >= 0) ylikely {
 	        cint val = rs ;
-	        if (cchar *cp ; (rs = mem.strw(vap,val,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = mem.strw(vap,val,&cp)) >= 0) ylikely {
 	            kv.vp = cp ;
 	            kv.vl = val ;
 	        } /* end if (memory-acquire) */
 	    } /* end if */
-	    if (rs >= 0) {
-	        if ((rs = vecobj_add(iep->kvlp,&kv)) >= 0) {
+	    if (rs >= 0) ylikely {
+	        if ((rs = vecobj_add(iep->kvlp,&kv)) >= 0) ylikely {
 	            cint sz = keyval_size(&kv) ;
 	            iep->sz += sz ;
 	        }
 	        if (rs < 0) {
 	            keyval_finish(&kv) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (inserting into DB) */
 	    {
 	        rs1 = bfp->finish ;
@@ -279,7 +279,7 @@ namespace bibdbx {
 	    if (rs >= 0) rs = rs1 ;
 	    iep->kp = nullptr ;
 	} /* end if (memory-release) */
-    	if (vecobj *kvlp = iep->kvlp ; kvlp) {
+    	if (vecobj *kvlp = iep->kvlp ; kvlp) ylikely {
 	    void *vp ;
 	    for (int i = 0 ; kvlp->get(i,&vp) >= 0 ; i += 1) {
 	        keyval *kvp = resumelife<keyval>(vp) ;
@@ -306,10 +306,10 @@ namespace bibdbx {
 
 int bibentry::getkv(int i,keyval **rpp) noex {
     	int		rs = SR_BUGCHECK ;
-	if (kvlp) {
-	    if (void *vp ; (rs = kvlp->get(i,&vp)) >= 0) {
+	if (kvlp) ylikely {
+	    if (void *vp ; (rs = kvlp->get(i,&vp)) >= 0) ylikely {
 		rs = SR_BUGCHECK ;
-	        if (keyval *kvp = resumelife<keyval>(vp) ; kvp) {
+	        if (keyval *kvp = resumelife<keyval>(vp) ; kvp) ylikely {
 		    rs = SR_OK ;
 		    if (rpp) *rpp = kvp ;
 		}
