@@ -41,14 +41,14 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<sigblocker.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sigblocker.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"aiq.h"
 
@@ -124,8 +124,7 @@ int aiq_start(aiq *op,int type) noex {
 	    }
 	} /* end if (aiq_ctor) */
 	return rs ;
-}
-/* end subroutine (aiq_start) */
+} /* end subroutine (aiq_start) */
 
 int aiq_finish(aiq *op) noex {
 	int		rs ;
@@ -142,8 +141,7 @@ int aiq_finish(aiq *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (aiq_finish) */
+} /* end subroutine (aiq_finish) */
 
 int aiq_ins(aiq *op,aiq_ent *ep) noex {
 	int		rs ;
@@ -161,8 +159,7 @@ int aiq_ins(aiq *op,aiq_ent *ep) noex {
 	    } /* end if (sigblock) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (aiq_ins) */
+} /* end subroutine (aiq_ins) */
 
 int aiq_inshead(aiq *op,aiq_ent *ep) noex {
 	int		rs ;
@@ -180,8 +177,7 @@ int aiq_inshead(aiq *op,aiq_ent *ep) noex {
 	    } /* end if (sigblock) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (aiq_inshead) */
+} /* end subroutine (aiq_inshead) */
 
 int aiq_rem(aiq *op,aiq_ent **epp) noex {
 	int		rs ;
@@ -200,8 +196,7 @@ int aiq_rem(aiq *op,aiq_ent **epp) noex {
 	} /* end if (magic) */
 	if (epp && (rs < 0)) *epp = nullptr ;
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (aiq_rem) */
+} /* end subroutine (aiq_rem) */
 
 int aiq_remtail(aiq *op,aiq_ent **epp) noex {
 	int		rs ;
@@ -220,8 +215,7 @@ int aiq_remtail(aiq *op,aiq_ent **epp) noex {
 	} /* end if (magic) */
 	if (epp && (rs < 0)) *epp = nullptr ;
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (aiq_remtail) */
+} /* end subroutine (aiq_remtail) */
 
 int aiq_count(aiq *op) noex {
 	int		rs ;
@@ -229,8 +223,7 @@ int aiq_count(aiq *op) noex {
 	    rs = q_count(op->qp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (aiq_count) */
+} /* end subroutine (aiq_count) */
 
 int aiq::ins(aiq_ent *ep) noex {
 	return aiq_ins(this,ep) ;
@@ -274,8 +267,6 @@ int aiq_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (aiq_co::operator) */
-
+} /* end method (aiq_co::operator) */
 
 
