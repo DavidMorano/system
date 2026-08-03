@@ -250,16 +250,16 @@ local int densitydb_opens(DD *,cc *) noex ;
 int densitydb_open(DD *op,cc *fname,int oflags,mode_t om,int maxent) noex {
 	int		rs ;
 	int		fcreate = false ; /* return-value */
-	if ((rs = densitydb_ctor(op,fname)) >= 0) {
+	if ((rs = densitydb_ctor(op,fname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        if_constexpr (f_creat) {
 	            oflags |= O_CREAT ;
 	        }
 	        op->oflags = (oflags &= (~ O_TRUNC)) ;
-		if ((rs = ucpagesize) >= 0) {
+		if ((rs = ucpagesize) >= 0) ylikely {
 	            op->pagesz = rs ;
-		    if (static cint rsv = var ; (rs = rsv) >= 0) {
+		    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	        	op->om = om ;
 	        	op->maxent = maxent ;
 	        	op->entsz = uceil(var.entsz,szof(int)) ;
@@ -278,17 +278,17 @@ int densitydb_open(DD *op,cc *fname,int oflags,mode_t om,int maxent) noex {
 local int densitydb_opens(DD *op,cc *fname) noex {
     	int		rs ;
 	int		fcreate = false ;
-        if ((rs = densitydb_bufbegin(op)) >= 0) {
-            if ((rs = densitydb_openbegin(op,fname)) >= 0) {
+        if ((rs = densitydb_bufbegin(op)) >= 0) ylikely {
+            if ((rs = densitydb_openbegin(op,fname)) >= 0) ylikely {
 		custime		dt = getustime ;
 		fcreate = (rs > 0) ;
-                if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
+                if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) ylikely {
                     cint	am = (op->oflags & O_ACCMODE) ;
                     op->fname = charp(cp) ;
                     op->fl.writable = isaccmode.wr(am) ;
                     op->tiopen = dt ;
                     op->tiopen = dt ;
-                    if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+                    if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) ylikely {
 			csize fsize = size_t(sb.st_size) ;
                         op->timod = uint(sb.st_mtime) ;
                         op->filesz = intsat(fsize) ;
@@ -319,7 +319,7 @@ local int densitydb_opens(DD *op,cc *fname) noex {
 int densitydb_close(DD *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = densitydb_magic(op)) >= 0) {
+	if ((rs = densitydb_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = densitydb_openend(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -345,7 +345,7 @@ int densitydb_close(DD *op) noex {
 int densitydb_count(DD *op) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = densitydb_magic(op)) >= 0) {
+	if ((rs = densitydb_magic(op)) >= 0) ylikely {
 	    c = (op->filesz - DENSITYDB_FOTAB) / var.entsz ;
 	}
 	return (rs >= 0) ? c : rs ;
@@ -353,7 +353,7 @@ int densitydb_count(DD *op) noex {
 
 int densitydb_curbegin(DD *op,DD_CUR *curp) noex {
     	int		rs ;
-	if ((rs = densitydb_magic(op,curp)) >= 0) {
+	if ((rs = densitydb_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	}
 	return rs ;
@@ -361,7 +361,7 @@ int densitydb_curbegin(DD *op,DD_CUR *curp) noex {
 
 int densitydb_curend(DD *op,DD_CUR *curp) noex {
     	int		rs ;
-	if ((rs = densitydb_magic(op,curp)) >= 0) {
+	if ((rs = densitydb_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	}
 	return rs ;
@@ -372,9 +372,9 @@ local int densitydb_curenums(DD *,DD_CUR *,DD_ENT *) noex ;
 int densitydb_curenum(DD *op,DD_CUR *curp,DD_ENT *ep) noex {
 	int		rs ;
 	int		ei = 0 ; /* return-value */
-	if ((rs = densitydb_magic(op,curp,ep)) >= 0) {
+	if ((rs = densitydb_magic(op,curp,ep)) >= 0) ylikely {
 	    rs = SR_NOTFOUND ;
-	    if (op->fl.fileinited) {
+	    if (op->fl.fileinited) ylikely {
 		rs = SR_LOCKFAIL ;
 		if (! op->fl.cursorlockbroken) {
 		    rs = densitydb_curenums(op,curp,ep) ;
@@ -390,11 +390,11 @@ local int densitydb_curenums(DD *op,DD_CUR *curp,DD_ENT *ep) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	int		ei = 0 ; /* return-value */
-	if ((rs = densitydb_filecheck(op,dt,fc)) >= 0) {
+	if ((rs = densitydb_filecheck(op,dt,fc)) >= 0) ylikely {
 	    cint	fotab = DENSITYDB_FOTAB ;
 	    ei = (curp->i < 0) ? 0 : curp->i + 1 ;
 	    rs = SR_EOF ;
-	    if (op->fl.fileinited) {
+	    if (op->fl.fileinited) ylikely {
 		cint	eoff = uint(fotab + (ei * op->entsz)) ;
 		rs = SR_NOTFOUND ;
 		if ((eoff + op->entsz) <= op->filesz) {
@@ -422,9 +422,9 @@ local int densitydb_updates(DD *,time_t,int,DD_ENT *) noex ;
 int densitydb_update(DD *op,time_t dt,int idx,DD_ENT *ep) noex {
 	int		rs ;
 	int		ei = 0 ; /* return-value */
-	if ((rs = densitydb_magic(op,ep)) >= 0) {
+	if ((rs = densitydb_magic(op,ep)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (idx >= 0) {
+	    if (idx >= 0) ylikely {
 		rs = SR_NOTFOUND ;
 		if (op->fl.fileinited) {
 		    cmsgsub	fc = msgsub::rd ;
@@ -460,7 +460,7 @@ local int densitydb_updates(DD *op,time_t dt,int idx,DD_ENT *ep) noex {
 	}
 	m0.count += 1 ;
 	m0.utime = uint(dt) ;
-	if ((rs = m0.rd(ebuf,entsz)) >= 0) {
+	if ((rs = m0.rd(ebuf,entsz)) >= 0) ylikely {
 	    cint eoff = DENSITYDB_FOTAB + (ei * op->entsz) ;
 	    cint wlen = rs ;
 	    /* update the in-core file buffer */
@@ -491,7 +491,7 @@ local int densitydb_updates(DD *op,time_t dt,int idx,DD_ENT *ep) noex {
 
 int densitydb_check(DD *op,time_t dt) noex {
 	int		rs ;
-	if ((rs = densitydb_magic(op)) >= 0) {
+	if ((rs = densitydb_magic(op)) >= 0) ylikely {
 	   if (op->fd >= 0) {
 	       if (dt == 0) dt = getustime ;
 	       if (! (op->fl.lockedrd || op->fl.lockedwr)) {
@@ -515,7 +515,7 @@ local int densitydb_openbegin(DD *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fcreate = false ; /* return-value */
-	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) ylikely {
 	    if ((rs = densitydb_opener(op,tbuf,fname,of)) >= 0) {
 		rs = 0 ;
 	    } else if (isNotPresent(rs)) {
@@ -535,7 +535,7 @@ local int densitydb_opener(DD *op,char *tbuf,cchar *fname,int of) noex {
 	int		rs ;
 	cchar		*suf = DENSITYDB_FS ;
 	cmode		om = op->om ;
-	if ((rs = mkfnamesuf(tbuf,fname,suf)) >= 0) {
+	if ((rs = mkfnamesuf(tbuf,fname,suf)) >= 0) ylikely {
 	    if ((rs = u_open(tbuf,of,om)) >= 0) {
 	        op->fd = rs ;
 	    } else if (isNotPresent(rs)) {
@@ -572,7 +572,7 @@ local int densitydb_filecheck(DD *op,time_t dt,cmsgsub fc) noex {
 	int		rs ;
 	int		fch = false ;
 	if (dt == 0) dt = getustime ;
-	if ((rs = densitydb_fileopen(op,dt)) >= 0) {
+	if ((rs = densitydb_fileopen(op,dt)) >= 0) ylikely {
 	    if ((! op->fl.lockedrd) && (! op->fl.lockedwr)) {
 	        if ((rs = densitydb_lockacq(op,dt,fc)) >= 0) {
 	    	    rs = densitydb_filechanged(op) ;
@@ -616,7 +616,7 @@ local int densitydb_fileinitz(DD *op,time_t dt) noex {
 	int		rs ;
 	int		rv = 0 ; /* return-value */
 	bool		f_locked = false ;
-	if ((rs = u_seek(op->fd,0z,SEEK_SET)) >= 0) {
+	if ((rs = u_seek(op->fd,0z,SEEK_SET)) >= 0) ylikely {
 	    op->fl.fileinited = false ;
 	    if (op->fl.writable) {
 	        if (! op->fl.lockedwr) {
@@ -647,7 +647,7 @@ local int densitydb_fileinitzw(DD *op,time_t dt) noex {
 	vbuf[1] = uchar(DENSITYDB_ENDIAN) ;
 	vbuf[2] = 0 ;
 	vbuf[3] = 0 ;
-	if (FM fm ; (rs = fm.load(magstr,magsiz,vbuf)) >= 0) {
+	if (FM fm ; (rs = fm.load(magstr,magsiz,vbuf)) >= 0) ylikely {
 	    if (char fbuf[flen + 1] ; (rs = fm.rd(fbuf,flen)) >= 0) {
 	        int bl = rs ;
 	        /* file header */
@@ -681,15 +681,15 @@ local int densitydb_fileinitn(DD *op,time_t dt) noex {
 	        f_locked = true ;
 	    }
 	} /* end if (needed lock) */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    cint	flen = DENSITYDB_FBUFLEN ;
 	    char	fbuf[DENSITYDB_FBUFLEN + 1] ;
-	    if ((rs = u_readp(op->fd,fbuf,flen,0z)) >= 0) {
+	    if ((rs = u_readp(op->fd,fbuf,flen,0z)) >= 0) ylikely {
 		int  bl = 0 ;
-	        if (FM fm ; (rs = fm.rd(fbuf + bl)) >= 0) {
+	        if (FM fm ; (rs = fm.rd(fbuf + bl)) >= 0) ylikely {
 		    bl += rs ;
-		    if ((rs = fm.verify(magstr,magsiz)) > 0) {
-	                if ((rs = fhp->rd(fbuf + bl)) >= 0) {
+		    if ((rs = fm.verify(magstr,magsiz)) > 0) ylikely {
+	                if ((rs = fhp->rd(fbuf + bl)) >= 0) ylikely {
 			    bool f = true ;
 			    bl += rs ;
 	                    f = f && (fm.vetu[0] <= DENSITYDB_FILEVERSION) ;
@@ -712,9 +712,9 @@ local int densitydb_fileinitn(DD *op,time_t dt) noex {
 local int densitydb_filechanged(DD *op) noex {
 	int		rs ;
 	int		fch = false ; /* return-value */
-	if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) ylikely {
 	    csize	fsize = size_t(sb.st_size) ;
-	    if (cint fsz = intsat(fsize) ; fsz >= DENSITYDB_FOTAB) {
+	    if (cint fsz = intsat(fsize) ; fsz >= DENSITYDB_FOTAB) ylikely {
 	        fch = fch || (fsz != op->filesz) ;
 	        fch = fch || (sb.st_mtime != op->timod) ;
 	        if ((! fch) && op->fl.fileinited) {
@@ -757,7 +757,7 @@ local int densitydb_filechanged(DD *op) noex {
 local int densitydb_lockacq(DD *op,time_t dt,cmsgsub fc) noex {
 	int		rs ;
 	bool		falready = false ;
-	if ((rs = densitydb_fileopen(op,dt)) >= 0) {
+	if ((rs = densitydb_fileopen(op,dt)) >= 0) ylikely {
 	    int		lockcmd = -1 ;
 	    if ((fc == msgsub::rd) || (! op->fl.writable)) {
 	        falready = op->fl.lockedrd ;
@@ -824,7 +824,7 @@ local int densitydb_bufbegin(DD *op) noex {
 	dbp->len = 0 ;
 	dbp->bsz = 0 ;
 	dbp->bup = nullptr ;
-	if (char *bp ; (rs = mem.mall(bsz,&bp)) >= 0) {
+	if (char *bp ; (rs = mem.mall(bsz,&bp)) >= 0) ylikely {
 	    dbp->bup = bp ;
 	    dbp->bsz = bsz ;
 	} /* end if (memory-acquire) */
@@ -947,7 +947,7 @@ local int densitydb_writehead(DD *op) noex {
     	dbhdr		*fhp = resumelife<dbhdr>(op->fhp) ;
 	int		rs ;
 	char		fbuf[DENSITYDB_FBUFLEN + 1] ;
-	if ((rs = fhp->rd(fbuf)) >= 0) {
+	if ((rs = fhp->rd(fbuf)) >= 0) ylikely {
 	    coff	uoff = DENSITYDB_FOHEAD ;
 	    cint	bl = rs ;
 	    rs = u_writep(op->fd,fbuf,bl,uoff) ;
@@ -958,7 +958,7 @@ local int densitydb_writehead(DD *op) noex {
 vars::operator int () noex {
     	int		rs ;
 	int		rs1 ;
-	if (densitydbe de ; (rs = de.start) >= 0) {
+	if (densitydbe de ; (rs = de.start) >= 0) ylikely {
 	    {
 	        rs = de.entsz ;
 	        entsz = rs ;
