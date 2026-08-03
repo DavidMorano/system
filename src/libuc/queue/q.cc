@@ -35,14 +35,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<ptma.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ptma.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"q.h"
 
@@ -148,8 +148,7 @@ int q_start(q *op,int type) noex {
 	    }
 	} /* end if (q_ctor) */
 	return rs ;
-}
-/* end subroutine (q_start) */
+} /* end subroutine (q_start) */
 
 int q_finish(q *op) noex {
 	int		rs = SR_FAULT ;
@@ -173,8 +172,7 @@ int q_finish(q *op) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (q_finish) */
+} /* end subroutine (q_finish) */
 
 int q_ins(q *op,Q_ENT *ep) noex {
 	int		rs = SR_FAULT ;
@@ -192,8 +190,7 @@ int q_ins(q *op,Q_ENT *ep) noex {
 	    } /* end if (mutex lock) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (q_ins) */
+} /* end subroutine (q_ins) */
 
 int q_inshead(q *op,Q_ENT *ep) noex {
 	int		rs = SR_FAULT ;
@@ -211,8 +208,7 @@ int q_inshead(q *op,Q_ENT *ep) noex {
 	    } /* end if (mutex lock) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (q_inshead) */
+} /* end subroutine (q_inshead) */
 
 int q_rem(q *op,Q_ENT **epp) noex {
 	int		rs = SR_FAULT ;
@@ -231,8 +227,7 @@ int q_rem(q *op,Q_ENT **epp) noex {
 	    if (epp && (rs < 0)) *epp = nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (q_rem) */
+} /* end subroutine (q_rem) */
 
 int q_remtail(q *op,Q_ENT **epp) noex {
 	int		rs = SR_FAULT ;
@@ -251,8 +246,7 @@ int q_remtail(q *op,Q_ENT **epp) noex {
 	    if (epp && (rs < 0)) *epp = nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (q_remtail) */
+} /* end subroutine (q_remtail) */
 
 int q_count(q *op) noex {
 	int		rs = SR_FAULT ;
@@ -269,8 +263,7 @@ int q_count(q *op) noex {
 	    } /* end if (mutex lock) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (q_count) */
+} /* end subroutine (q_count) */
 
 int q::ins(q_ent *ep) noex {
 	return q_ins(this,ep) ;
@@ -318,8 +311,6 @@ int q_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (q_co::operator) */
-
+} /* end method (q_co::operator) */
 
 
