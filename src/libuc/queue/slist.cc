@@ -30,14 +30,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"slist.h"
 
@@ -82,8 +82,7 @@ int slist_start(slist *qhp) noex {
 	    qhp->cnt = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (slist_start) */
+} /* end subroutine (slist_start) */
 
 int slist_finish(slist *qhp) noex {
 	int		rs = SR_FAULT ;
@@ -94,8 +93,7 @@ int slist_finish(slist *qhp) noex {
 	    qhp->cnt = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (slist_finish) */
+} /* end subroutine (slist_finish) */
 
 int slist_ins(slist *qhp,slist_ent *ep) noex {
 	int		rs = SR_FAULT ;
@@ -125,8 +123,7 @@ int slist_ins(slist *qhp,slist_ent *ep) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (slist_ins) */
+} /* end subroutine (slist_ins) */
 
 int slist_insgroup(slist *qhp,slist_ent *gp,int esz,int n) noex {
 	int		rs = SR_FAULT ;
@@ -161,8 +158,7 @@ int slist_insgroup(slist *qhp,slist_ent *gp,int esz,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (slist_insgroup) */
+} /* end subroutine (slist_insgroup) */
 
 int slist_present(slist *qhp,slist_ent *ep) noex {
 	int		rs = SR_FAULT ;
@@ -176,8 +172,7 @@ int slist_present(slist *qhp,slist_ent *ep) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (slist_present) */
+} /* end subroutine (slist_present) */
 
 int slist_unlink(slist *qhp,slist_ent *ep) noex {
 	int		rs = SR_FAULT ;
@@ -212,8 +207,7 @@ int slist_unlink(slist *qhp,slist_ent *ep) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (slist_unlink) */
+} /* end subroutine (slist_unlink) */
 
 int slist_rem(slist *qhp,slist_ent **epp) noex {
 	int		rs = SR_FAULT ;
@@ -238,8 +232,7 @@ int slist_rem(slist *qhp,slist_ent **epp) noex {
 	    *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (slist_rem) */
+} /* end subroutine (slist_rem) */
 
 int slist_gethead(slist *qhp,slist_ent **epp) noex {
 	int		rs = SR_FAULT ;
@@ -256,8 +249,7 @@ int slist_gethead(slist *qhp,slist_ent **epp) noex {
 	    *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (slist_gethead) */
+} /* end subroutine (slist_gethead) */
 
 int slist_gettail(slist *qhp,slist_ent **epp) noex {
 	int		rs = SR_FAULT ;
@@ -277,8 +269,7 @@ int slist_gettail(slist *qhp,slist_ent **epp) noex {
 	    *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (slist_gettail) */
+} /* end subroutine (slist_gettail) */
 
 int slist_count(slist *qhp) noex {
 	int		rs = SR_FAULT ;
@@ -287,8 +278,7 @@ int slist_count(slist *qhp) noex {
 	    c = qhp->cnt ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (slist_count) */
+} /* end subroutine (slist_count) */
 
 int slist_audit(slist *qhp) noex {
 	int		rs = SR_FAULT ;
@@ -306,8 +296,7 @@ int slist_audit(slist *qhp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (slist_audit) */
+} /* end subroutine (slist_audit) */
 
 
 /* local subroutines */
@@ -337,8 +326,7 @@ slist_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (slist_co::operator) */
+} /* end method (slist_co::operator) */
 
 int slist::ins(slist_ent *ep) noex {
 	return slist_ins(this,ep) ;
