@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>
-#include	<stdlib.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	SLQ		struct slq_head
@@ -73,12 +73,12 @@ struct slq : slq_head {
 	} ;
 	slq(const slq &) = delete ;
 	slq &operator = (const slq &) = delete ;
-	int ins(slq_ent *) noex ;
-	int insgroup(slq_ent *,int,int) noex ;
-	int gethead(slq_ent **) noex ;
-	int gettail(slq_ent **) noex ;
-	int rem(slq_ent **) noex ;
-	void dtor() noex ;
+	int ins		(slq_ent *) noex ;
+	int insgroup	(slq_ent *,int,int) noex ;
+	int gethead	(slq_ent **) noex ;
+	int gettail	(slq_ent **) noex ;
+	int rem		(slq_ent **) noex ;
+	void dtor	() noex ;
 	destruct slq() {
 	    if (head) dtor() ;
 	} ;
@@ -86,7 +86,6 @@ struct slq : slq_head {
 #else	/* __cplusplus */
 typedef SLIST		slq ;
 #endif /* __cplusplus */
-
 
 EXTERNC_begin
 
