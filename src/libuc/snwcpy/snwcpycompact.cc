@@ -56,14 +56,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strmgr.h>
-#include	<sfx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strmgr.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snwcpyx.h"
 
@@ -98,10 +98,10 @@ int snwcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		dl = 0 ; /* return-value */
-	if (dbuf && sp) {
+	if (dbuf && sp) ylikely {
 	    if (dlen < 0) dlen = INT_MAX ;
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (strmgr m ; (rs = m.start(dbuf,dlen)) >= 0) {
+	    if (strmgr m ; (rs = m.start(dbuf,dlen)) >= 0) ylikely {
 	        cchar	*cp ;
 	        for (int cl ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
 	            if (dl > 0) {
@@ -122,7 +122,6 @@ int snwcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    dbuf[dl] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (snwcpycompact) */
+} /* end subroutine (snwcpycompact) */
 
 
