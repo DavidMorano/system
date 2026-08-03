@@ -49,12 +49,12 @@ OBJ1= bibdb_readent.o
 OBJ2= bibdb_entfileproc.o
 OBJ3= bibdb_bibentry.o
 OBJ4= bibdb_entfile.o
-OBJ5= bibdb_key.o
-OBJ6= bibdb_keyval.o
-OBJ7= bibdb_ent.o
+OBJ5= bibdb_key.o bibdb_keyval.o
+OBJ6= bibdb_ent.o
+OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o obj5.o obj6.o obj7.o
+OBJB= obj4.o obj5.o obj6.o
 
 OBJ= obja.o objb.o
 
@@ -173,7 +173,5 @@ bibdb_readent.o:	bibdb_readent.cc	bibdb_readent.hh	$(INCS)
 bibdb_entfileproc.o:	bibdb_entfileproc.cc	bibdb_entfileproc.hh	$(INCS)
 
 bibdb_mag.o:		bibdb_mag.ccm		bibdb_mag.hh		$(INCS)
-
-rebuf.o:		rebuf.cc		rebuf.hh		$(INCS)
 
 
