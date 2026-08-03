@@ -20,12 +20,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* <- for |wchar_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<stddef.h>		/* CSTD |wchar_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 #include	<snwcpyxc.h>
 #include	<snwcpyexpesc.h>
@@ -33,14 +33,14 @@
 
 EXTERNC_begin
 
-extern int snwcpyclean(char *,int,int,cchar *,int) noex ;
-extern int snwcpycompact(char *,int,cchar *,int) noex ;
-extern int snwcpyhyphen(char *,int,cchar *,int) noex ;
-extern int snwcpylatin(char *,int,cchar *,int) noex ;
-extern int snwcpyopaque(char *,int,cchar *,int) noex ;
-extern int snwcpyshrink(char *,int,cchar *,int) noex ;
-extern int snwcpyrev(char *,int,cchar *,int) noex ;
-extern int snwcpywidehdr(char *,int,const wchar_t *,int) noex ;
+extern int snwcpyclean		(char *,int,int,cchar *,int) noex ;
+extern int snwcpycompact	(char *,int,cchar *,int) noex ;
+extern int snwcpyhyphen		(char *,int,cchar *,int) noex ;
+extern int snwcpylatin		(char *,int,cchar *,int) noex ;
+extern int snwcpyopaque		(char *,int,cchar *,int) noex ;
+extern int snwcpyshrink		(char *,int,cchar *,int) noex ;
+extern int snwcpyrev		(char *,int,cchar *,int) noex ;
+extern int snwcpywidehdr	(char *,int,const wchar_t *,int) noex ;
 
 EXTERNC_end
 
