@@ -20,12 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>
-#include	<stdlib.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ptm.h>
-#include	<pq.h>
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<pq.h>			/* LIBUC */
 
 
 #define	PIQ		struct piq_head
