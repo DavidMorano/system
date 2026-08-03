@@ -144,7 +144,7 @@ cbool		f_debug		= CF_DEBUG ;
 
 local int bdbdb_curibeg(BDB *op,hdb_cur *icurp) noex {
     	int		rs = SR_BUGCHECK ;
-	if (hdb *klp = resumelife<hdb>(op->klp) ; klp) {
+	if (hdb *klp = resumelife<hdb>(op->klp) ; klp) ylikely {
 	    rs = klp->curbegin(icurp) ;
 	}
 	return rs ;
@@ -153,9 +153,9 @@ local int bdbdb_curibeg(BDB *op,hdb_cur *icurp) noex {
 int bibdb_curbegin(bibdb *op,bibdb_cur *curp) noex {
     	cnothrow	nt{} ;
 	int		rs ;
-	if ((rs = bibdb_magic(op,curp)) >= 0) {
+	if ((rs = bibdb_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOMEM ;
-	    if (hdb_cur *icurp = new(nt) hdb_cur ; icurp) {
+	    if (hdb_cur *icurp = new(nt) hdb_cur ; icurp) ylikely {
 		curp->icurp = icurp ;
 		rs = bdbdb_curibeg(op,icurp) ;
 		if (rs < 0) {
@@ -169,7 +169,7 @@ int bibdb_curbegin(bibdb *op,bibdb_cur *curp) noex {
 
 local int bdbdb_curiend(BDB *op,hdb_cur *icurp) noex {
     	int		rs = SR_BUGCHECK ;
-	if (hdb *klp = resumelife<hdb>(op->klp) ; klp) {
+	if (hdb *klp = resumelife<hdb>(op->klp) ; klp) ylikely {
 	    rs = klp->curend(icurp) ;
 	}
 	return rs ;
@@ -178,7 +178,7 @@ local int bdbdb_curiend(BDB *op,hdb_cur *icurp) noex {
 int bibdb_curend(bibdb *op,bibdb_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = bibdb_magic(op,curp)) >= 0) {
+	if ((rs = bibdb_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (hdb_cur *icurp = resumelife<hdb_cur>(curp->icurp) ; icurp) {
 		rs = SR_OK ;
@@ -200,7 +200,7 @@ int bibdb_curenum(bibdb *op,BDB_CUR *curp,
 		BDB_ENT *ep,char *rbuf,int rlen) noex {
     	int		rs ;
 	int		rl = 0 ; /* return-value */
-        if ((rs = bibdb_magic(op,curp,ep,rbuf)) >= 0) {
+        if ((rs = bibdb_magic(op,curp,ep,rbuf)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    rbuf[0] = '\0' ;
 	    (void) rlen ;
@@ -218,7 +218,7 @@ int bibdb_curenum(bibdb *op,BDB_CUR *curp,
 
 local int bibdb_icurdel(bibdb *op,hdb_cur *icurp,int f_adv) noex {
     	int		rs = SR_BUGCHECK ;
-        if (hdb *klp = resumelife<hdb>(op->klp) ; klp) {
+        if (hdb *klp = resumelife<hdb>(op->klp) ; klp) ylikely {
             rs = klp->curdel(icurp,f_adv) ;
         }
 	return rs ;
@@ -226,7 +226,7 @@ local int bibdb_icurdel(bibdb *op,hdb_cur *icurp,int f_adv) noex {
 
 int bibdb_curdel(bibdb *op,BDB_CUR *curp,int f_adv) noex {
         int             rs ;
-        if ((rs = bibdb_magic(op,curp)) >= 0) {
+        if ((rs = bibdb_magic(op,curp)) >= 0) ylikely {
             rs = SR_BUGCHECK ;
 	    if (hdb_cur *icurp = resumelife<hdb_cur>(curp->icurp) ; icurp) {
                 rs = bibdb_icurdel(op,icurp,f_adv) ;
