@@ -28,15 +28,15 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<ptm.h>
-#include	<pq.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<pq.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"piq.h"
 
@@ -77,7 +77,7 @@ local inline int piq_ctor(piq *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->mxp ;
 		    op->mxp = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
@@ -133,8 +133,7 @@ int piq_start(piq *op) noex {
 	    }
 	} /* end if (piq_ctor) */
 	return rs ;
-}
-/* end subroutine (piq_start) */
+} /* end subroutine (piq_start) */
 
 int piq_finish(piq *op) noex {
 	int		rs ;
@@ -156,8 +155,7 @@ int piq_finish(piq *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (piq_finish) */
+} /* end subroutine (piq_finish) */
 
 int piq_ins(piq *op,void *vp) noex {
 	int		rs ;
@@ -176,8 +174,7 @@ int piq_ins(piq *op,void *vp) noex {
 	    } /* end if (mutex) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (piq_ins) */
+} /* end subroutine (piq_ins) */
 
 int piq_rem(piq *op,void *vrp) noex {
 	int		rs ;
@@ -196,8 +193,7 @@ int piq_rem(piq *op,void *vrp) noex {
 	    } /* end if (mutex) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (piq_rem) */
+} /* end subroutine (piq_rem) */
 
 int piq_count(piq *op) noex {
 	int		rs ;
@@ -215,8 +211,7 @@ int piq_count(piq *op) noex {
 	    } /* end if (mutex) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (piq_count) */
+} /* end subroutine (piq_count) */
 
 int piq_audit(piq *op) noex {
 	int		rs ;
@@ -234,8 +229,7 @@ int piq_audit(piq *op) noex {
 	    } /* end if (mutex) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (piq_audit) */
+} /* end subroutine (piq_audit) */
 
 int piq::ins(void *ep) noex {
 	return piq_ins(this,ep) ;
@@ -274,8 +268,6 @@ piq_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (piq_co::operator) */
-
+} /* end method (piq_co::operator) */
 
 
