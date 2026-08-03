@@ -31,13 +31,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pq.h"
 
@@ -82,8 +82,7 @@ int pq_start(pq *qhp) noex {
 	    qhp->cnt = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pq_start) */
+} /* end subroutine (pq_start) */
 
 int pq_finish(pq *qhp) noex {
 	int		rs = SR_FAULT ;
@@ -97,8 +96,7 @@ int pq_finish(pq *qhp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pq_finish) */
+} /* end subroutine (pq_finish) */
 
 int pq_ins(pq *qhp,pq_ent *ep) noex {
 	int		rs = SR_FAULT ;
@@ -126,8 +124,7 @@ int pq_ins(pq *qhp,pq_ent *ep) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (pq_ins) */
+} /* end subroutine (pq_ins) */
 
 /* insert a group into queue (at the tail) */
 int pq_insgroup(pq *qhp,pq_ent *gp,int esz,int n) noex {
@@ -172,8 +169,7 @@ int pq_insgroup(pq *qhp,pq_ent *gp,int esz,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (pq_insgroup) */
+} /* end subroutine (pq_insgroup) */
 
 int pq_gethead(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
@@ -193,8 +189,7 @@ int pq_gethead(pq *qhp,pq_ent **epp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (pq_gethead) */
+} /* end subroutine (pq_gethead) */
 
 int pq_gettail(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
@@ -218,8 +213,7 @@ int pq_gettail(pq *qhp,pq_ent **epp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (pq_gettail) */
+} /* end subroutine (pq_gettail) */
 
 int pq_rem(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
@@ -255,8 +249,7 @@ int pq_rem(pq *qhp,pq_ent **epp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (pq_rem) */
+} /* end subroutine (pq_rem) */
 
 /* remove from the TAIL of queue (to get "stack-like" behavior) */
 int pq_remtail(pq *qhp,pq_ent **epp) noex {
@@ -294,8 +287,7 @@ int pq_remtail(pq *qhp,pq_ent **epp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (pq_remtail) */
+} /* end subroutine (pq_remtail) */
 
 /* we apply some special care here to make sure we actually were in the Q */
 int pq_unlink(pq *qhp,pq_ent *ep) noex {
@@ -347,8 +339,7 @@ int pq_unlink(pq *qhp,pq_ent *ep) noex {
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (pq_unlink) */
+} /* end subroutine (pq_unlink) */
 
 int pq_count(pq *qhp) noex {
 	int		rs = SR_FAULT ;
@@ -361,8 +352,7 @@ int pq_count(pq *qhp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (pq_count) */
+} /* end subroutine (pq_count) */
 
 int pq_audit(pq *qhp) noex {
 	int		rs = SR_FAULT ;
@@ -392,8 +382,7 @@ int pq_audit(pq *qhp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pq_audit) */
+} /* end subroutine (pq_audit) */
 
 int pq_curbegin(pq *qhp,pq_cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -402,8 +391,7 @@ int pq_curbegin(pq *qhp,pq_cur *curp) noex {
 	    curp->entp = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pq_curbegin) */
+} /* end subroutine (pq_curbegin) */
 
 int pq_curend(pq *qhp,pq_cur *curp) noex {
 	int		rs = SR_FAULT ;
@@ -412,8 +400,7 @@ int pq_curend(pq *qhp,pq_cur *curp) noex {
 	    curp->entp = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pq_curend) */
+} /* end subroutine (pq_curend) */
 
 int pq_curenum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -437,8 +424,7 @@ int pq_curenum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pq_curenum) */
+} /* end subroutine (pq_curenum) */
 
 int pq::ins(pq_ent *ep) noex {
 	return pq_ins(this,ep) ;
@@ -509,7 +495,6 @@ pq_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (pq_co::operator) */
+} /* end method (pq_co::operator) */
 
 
