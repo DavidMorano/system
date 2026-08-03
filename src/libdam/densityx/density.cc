@@ -101,11 +101,11 @@ local inline int density_magic(density *op,Args ... args) noex {
 
 int density_start(density *op,int len) noex {
 	int		rs ;
-	if ((rs = density_ctor(op)) >= 0) {
+	if ((rs = density_ctor(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (len > 0) {
+	    if (len > 0) ylikely {
 	        cint	sz = (len + 1) * szof(ulong) ;
-	        if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
+	        if (void *p ; (rs = lm_mall(sz,&p)) >= 0) ylikely {
 	            op->a = ulongp(p) ;
 	            memclear(op->a,sz) ;
 	            op->len = len ;
@@ -122,7 +122,7 @@ int density_start(density *op,int len) noex {
 int density_finish(density *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = density_magic(op)) >= 0) {
+	if ((rs = density_magic(op)) >= 0) ylikely {
 	    if (op->a) {
 	        rs1 = lm_free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -139,7 +139,7 @@ int density_finish(density *op) noex {
 
 int density_update(density *op,int ai) noex {
 	int		rs ;
-	if ((rs = density_magic(op)) >= 0) {
+	if ((rs = density_magic(op)) >= 0) ylikely {
 	    if (ai > op->nmax) {
 	        op->nmax = ai ;
 	    }
@@ -156,9 +156,9 @@ int density_update(density *op,int ai) noex {
 
 int density_slot(density *op,int ai,ulong *rp) noex {
     	int		rs ;
-	if ((rs = density_magic(op,rp)) >= 0) {
+	if ((rs = density_magic(op,rp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (ai < op->len) {
+	    if (ai < op->len) ylikely {
 		rs = SR_OK ;
 	        *rp = op->a[ai] ;
 	    } /* end if (valid) */
@@ -168,7 +168,7 @@ int density_slot(density *op,int ai,ulong *rp) noex {
 
 int density_getstats(density *op,density_st *sp) noex {
 	int		rs ;
-	if ((rs = density_magic(op,sp)) >= 0) {
+	if ((rs = density_magic(op,sp)) >= 0) ylikely {
 	    cint	len = int(op->len) ;
 	    sp->mean = 0.0 ;
 	    sp->var = 0.0 ;
