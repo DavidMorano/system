@@ -69,17 +69,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<mkchar.h>
-#include	<char.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
-#include	<cmporders.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<cmporders.h>		/* LIBU */
 
 #include	"strnxcmp.h"
 
@@ -133,13 +133,13 @@ local int	strdocmp(cchar *,cchar *,int) noex ;
 
 int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
 	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    int		rs ; /* used inside here only */
 	    int		rs1 ;
 	    if (s1len < 0) s1len = lenstr(s1) ;
 	    if (s2len < 0) s2len = lenstr(s2) ;
-	    if (DCH dc1 ; (rs = dch_start(&dc1,s1,s1len)) >= 0) {
-	        if (DCH dc2 ; (rs = dch_start(&dc2,s2,s2len)) >= 0) {
+	    if (DCH dc1 ; (rs = dch_start(&dc1,s1,s1len)) >= 0) ylikely {
+	        if (DCH dc2 ; (rs = dch_start(&dc2,s2,s2len)) >= 0) ylikely {
 		    int	fch1 ;
 		    int	fch2 ;
 		    int	i{} ; /* used-afterwards */
@@ -151,7 +151,7 @@ int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
 	                rc = (fch1 - fch2) ;
 	                if ((ch1 == 0) && (ch2 == 0)) /* end-of-str for both */
 	                    break ;
-	            } /* end while */
+	            } /* end for */
 	            if (rc == 0) {
 	                rc = (s1len - s2len) ; /* more determinism */
 		    }
@@ -178,11 +178,10 @@ int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
 	    } /* end if (dc1) */
 	    if (rs < 0) {
 		ulogerror("strnndictcmp",rs,"dch") ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (strnndictcmp) */
+} /* end subroutine (strnndictcmp) */
 
 
 /* local subroutines */
@@ -220,12 +219,12 @@ local int strdocmp(cchar *s1,cchar *s2,int slen) noex {
 	    do1 = 0 ;
 	    while (*s1 && ((do1 = CHAR_DICTORDER(*s1)) == 0)) {
 		s1 += 1 ;
-	    }
+	    } /* end while */
 	    do2 = 0 ;
 	    while ((i < slen) && *s2 && ((do2 = CHAR_DICTORDER(*s2)) == 0)) {
 	        s2 += 1 ;
 	        i += 1 ;
-	    }
+	    } /* end while */
 	    rc = (do1 - do2) ;
 	    if (rc != 0) break ;
 	    if (*s1) s1 += 1 ;
