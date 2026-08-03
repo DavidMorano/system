@@ -57,9 +57,7 @@ OBJ_SNWCPYX= obja.o objb.o objc.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
