@@ -49,13 +49,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 #include	"strdcpyxw.h"
 
@@ -88,35 +88,29 @@
 
 char *strdcpy1w(char *dp,int dl,cc *s1,int sl) noex {
 	return strdcpyxw(dp,dl,1,s1,sl) ;
-}
-/* end subroutine (strdcpy1w) */
+} /* end subroutine (strdcpy1w) */
 
 char *strdcpy2w(char *dp,int dl,cc *s1,cc *s2,int sl) noex {
 	return strdcpyxw(dp,dl,2,s1,s2,sl) ;
-}
-/* end subroutine (strdcpy2w) */
+} /* end subroutine (strdcpy2w) */
 
 char *strdcpy3w(char *dp,int dl,cc *s1,cc *s2,cc *s3,int sl) noex {
 	return strdcpyxw(dp,dl,3,s1,s2,s3,sl) ;
-}
-/* end subroutine (strdcpy3w) */
+} /* end subroutine (strdcpy3w) */
 
 char *strdcpy4w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
 	return strdcpyxw(dp,dl,4,s1,s2,s3,s4,sl) ;
-}
-/* end subroutine (strdcpy4w) */
+} /* end subroutine (strdcpy4w) */
 
 char *strdcpy5w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,
 		cc *s5,int sl) noex {
 	return strdcpyxw(dp,dl,5,s1,s2,s3,s4,s5,sl) ;
-}
-/* end subroutine (strdcpy5w) */
+} /* end subroutine (strdcpy5w) */
 
 char *strdcpy6w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,
 		cc *s5,cc *s6,int sl) noex {
 	return strdcpyxw(dp,dl,6,s1,s2,s3,s4,s5,s6,sl) ;
-}
-/* end subroutine (strdcpy6w) */
+} /* end subroutine (strdcpy6w) */
 
 char *strdcpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
@@ -143,7 +137,6 @@ char *strdcpyxw(char *dp,int dl,int n,...) noex {
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return dp ;
-}
-/* end subroutine (strdcpyxw) */
+} /* end subroutine (strdcpyxw) */
 
 
