@@ -58,19 +58,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
-#include	<sfx.h>
-#include	<strmgr.h>
-#include	<nleadstr.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC */
+#include	<strmgr.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strdcpy.h"
 
@@ -146,7 +146,6 @@ char *strdcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    rp = (rs >= 0) ? (dbuf + dl) : nullptr ;
 	} /* end if (non-null) */
 	return rp ;
-}
-/* end subroutine (strdcpycompact) */
+} /* end subroutine (strdcpycompact) */
 
 
