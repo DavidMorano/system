@@ -50,19 +50,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>
-#include	<storebuf.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<cfx.h>			/* |cf{xxx}(3uc)| */
-#include	<six.h>			/* |isnon{xxx}(3uc)| */
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<cfx.h>			/* LIBUC |cf{xxx}(3uc)| */
+#include	<six.h>			/* LIBUC |isnon{xxx}(3uc)| */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snwcpyexpesc.h"
 
@@ -140,15 +140,14 @@ constexpr cint		chx_sub = mkchar('¿') ;
 
 int snwcpyexpesc(char *dbuf,int dlen,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
-	if (dbuf && sp) {
-	    if (int sl = getlenstr(sp,µsl) ; sl >= 0) {
+	if (dbuf && sp) ylikely {
+	    if (int sl = getlenstr(sp,µsl) ; sl >= 0) ylikely {
 	        expmgr eo(dbuf,dlen,sp,sl) ;
 	        rs = eo ;
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (snwcpyexpesc) */
+} /* end subroutine (snwcpyexpesc) */
 
 
 /* local subroutine */
@@ -176,7 +175,7 @@ expmgr::operator int () noex {
 
 int expmgr::handle() noex {
     	int		rs = SR_OK ;
-	if (sl && *sp) {
+	if (sl && *sp) ylikely {
 	    int	chs = 0 ;
 	    switch (cint ch = mkchar(*sp++) ; (sl-- , ch)) {
 	    case 'a':
@@ -318,7 +317,7 @@ int expmgr::handle_N() noex {
 
 int expmgr::storeval(cfx_f cfx,cc *op,int ol) noex {
     	int		rs ;
-	if (int v ; (rs = cfx(op,ol,&v)) >= 0) {
+	if (int v ; (rs = cfx(op,ol,&v)) >= 0) ylikely {
 	    rs = sb.chr(v) ;
 	}
 	return rs ;
