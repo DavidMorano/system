@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<signal.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<signal.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	SIGMAN		struct sigman_head
