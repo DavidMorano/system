@@ -78,7 +78,7 @@ cint		hundred = 100 ;
 
 template<integral_unsigned T> int denpercentsx(T *a,int n,double *ptab) noex {
     	int		rs = SR_FAULT ;
-	if (a && ptab) {
+	if (a && ptab) ylikely {
 	    rs = SR_NOENT ;
 	    for (int j = 1 ; j <= hundred ; j += 1) {
 	        ptab[j % hundred] = 0.0 ;
@@ -90,14 +90,14 @@ template<integral_unsigned T> int denpercentsx(T *a,int n,double *ptab) noex {
 	        rs = SR_OK ;
 	        for (int j = 1 ; j <= hundred ; j += 1) {
 	            ptab[j % hundred] = double(n) ;
-	        }
+	        } /* end for */
 	        for (int i = 0 ; i < n ; i += 1) {
 	            count += a[i] ;
-	        }
+	        } /* end for */
 	        sum = double(count) ;
 	        for (int j = 1 ; j <= hundred ; j += 1) {
 	            thresh[j % hundred] = sum * 0.01 * double(j) ;
-	        }
+	        } /* end for */
 	        {
 	            int		j = 1 ;
 	            bool	f_done = false ;
