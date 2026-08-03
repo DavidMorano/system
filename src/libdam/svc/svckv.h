@@ -1,4 +1,5 @@
 /* svckv HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* these subroutines perform key-value type functions */
@@ -20,24 +21,21 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
 typedef cchar *(*svckv_t)[2] ;
 
-extern int	svckv_val(	svckv_t,int,cchar *,cchar **) noex ;
-extern int	svckv_dequote(	svckv_t,int,cchar *,cchar **) noex ;
-extern int	svckv_isfile(	svckv_t,int,cchar **) noex ;
-extern int	svckv_ispass(	svckv_t,int,cchar **) noex ;
-extern int	svckv_islib(	svckv_t,int,cchar **) noex ;
-extern int	svckv_isprog(	svckv_t,int,cchar **) noex ;
-extern int	svckv_svcopts(	svckv_t,int) noex ;
+extern int	svckv_val	(svckv_t,int,cchar *,cchar **) noex ;
+extern int	svckv_dequote	(svckv_t,int,cchar *,cchar **) noex ;
+extern int	svckv_isfile	(svckv_t,int,cchar **) noex ;
+extern int	svckv_ispass	(svckv_t,int,cchar **) noex ;
+extern int	svckv_islib	(svckv_t,int,cchar **) noex ;
+extern int	svckv_isprog	(svckv_t,int,cchar **) noex ;
+extern int	svckv_svcopts	(svckv_t,int) noex ;
 
 EXTERNC_end
 
