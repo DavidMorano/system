@@ -1,5 +1,6 @@
 /* svcfile HEADER */
-/* lang=C++20 */
+/* charset=ISO8859-1 */
+/* lang=C20 */
 
 /* service- file manager */
 /* version %I% last-modified %G% */
@@ -20,24 +21,21 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<hdb.h>
-#include	<vecobj.h>
-#include	<vechand.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<limits.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
 
 
-#define	SVCFILE_MAGIC		0x31415926
 #define	SVCFILE			struct svcfile_head
 #define	SVCFILE_CUR		struct svcfile_cursor
 #define	SVCFILE_ENT		struct svcfile_entry
+#define	SVCFILE_MAGIC		0x31415926
 
 
 struct svcfile_cursor {
