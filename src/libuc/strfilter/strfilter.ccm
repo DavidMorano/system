@@ -43,14 +43,14 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<bitset>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<bitset>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/ureserve.ccm"
 
@@ -131,23 +131,23 @@ export {
 	    count	(this,strfiltermem_count) ;
 	    ready	(this,strfiltermem_ready) ;
 	} ; /* end ctor */
-	int add(cchar *,int = -1) noex ;
-	int have(cchar *,int = -1) noex ;
-	int ents() noex ;
-	void dtor() noex ;
+	int add		(cchar *,int = -1) noex ;
+	int have	(cchar *,int = -1) noex ;
+	int ents	() noex ;
+	void dtor	() noex ;
 	operator int () const noex ;
 	destruct strfilter() {
 	    if (magic) dtor() ;
 	} ;
     private:
-	int istart() noex ;
-	int ifinish() noex ;
-	int icount() const noex ;
-	int iaddone(cchar *,int) noex ;
-	int ihave(cchar *,int) noex ;
-	int inschrs(cchar *,int) noex ;
-	int iready() noex ;
-	int extend(int = 1) noex ;
+	int istart	() noex ;
+	int ifinish	() noex ;
+	int icount	() const noex ;
+	int iaddone	(cchar *,int) noex ;
+	int ihave	(cchar *,int) noex ;
+	int inschrs	(cchar *,int) noex ;
+	int iready	() noex ;
+	int extend	(int = 1) noex ;
     } ; /* end struct (strfilter) */
 } /* end export */
 
@@ -155,7 +155,5 @@ export {
 /* local variables */
 
 constexpr bool		f_binsearch = CF_BINSEARCH ;
-
-
 
 
