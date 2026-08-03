@@ -48,11 +48,11 @@ typedef	DENSITY_ST	density_st ;
 
 EXTERNC_begin
 
-extern int	density_start(density *,int) noex ;
-extern int	density_update(density *,int) noex ;
-extern int	density_slot(density *,int,ulong *) noex ;
-extern int	density_getstats(density *,density_st *) noex ;
-extern int	density_finish(density *) noex ;
+extern int	density_start		(density *,int) noex ;
+extern int	density_update		(density *,int) noex ;
+extern int	density_slot		(density *,int,ulong *) noex ;
+extern int	density_getstats	(density *,density_st *) noex ;
+extern int	density_finish		(density *) noex ;
 
 EXTERNC_end
 
