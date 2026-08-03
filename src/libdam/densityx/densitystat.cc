@@ -76,11 +76,11 @@
 template<typename T>
 int densitystatx(T *a,int n,double *mp,double *vp) noex {
     	int		rs = SR_FAULT ;
-	if (a) {
+	if (a) ylikely {
 	    rs = SR_INVALID ;
 	    if (mp) *mp = 0.0 ;
 	    if (vp) *vp = 0.0 ;
-	    if (n > 0) {
+	    if (n > 0) ylikely {
 	        double	s1 = 0.0 ;
 	        double	s2 = 0.0 ;
 	        T	accprob = 0 ;
