@@ -107,7 +107,7 @@ local int gncache_ctor(gncache *op,Args ... args) noex {
 	    if ((op->flp = new(nothrow) cq) != np) ylikely {
 	        if ((op->rlp = new(nothrow) vechand) != np) ylikely {
 		    rs = SR_OK ;
-		}
+		} /* end if (new-vechand) */
 		if (rs < 0) {
 		    delete op->flp ;
 		    op->flp = nullptr ;
@@ -190,7 +190,7 @@ int gncache_start(GN *op,int nmax,int to) noex {
 	                op->ttl = to ;
 	                op->ti_check = time(nullptr) ;
 	                op->magval = GNCACHE_MAGIC ;
-	            }
+	            } /* end if (ok) */
 	            if (rs < 0) {
 	                cq_finish(op->flp) ;
 	            } /* end if (error) */
@@ -425,7 +425,7 @@ local int gncache_maintenance(GN *op,time_t dt) noex {
 	            vechand_del(op->rlp,iold) ;
 	            record_finish(rp) ;
 	            gncache_recfree(op,rp) ;
-	        }
+	        } /* end if */
 	    } /* end if (vechand_get) */
 	} /* end if */
 	return rs ;
@@ -519,7 +519,7 @@ local int record_finish(rec *rp) noex {
 		rs1 = lm_free(rp->gn) ;
 		if (rs >= 0) rs = rs1 ;
 		rp->gn = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (record_finish) */
