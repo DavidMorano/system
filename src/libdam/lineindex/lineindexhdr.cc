@@ -45,14 +45,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<endian.h>
-#include	<mkmagic.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<mkmagic.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"lineindexhdr.h"
 
@@ -77,9 +77,9 @@ import libutil ;			/* |memcopy(3u)| */
 
 /* local variables */
 
-constexpr int		tabsize = (lineindexhdr_overlast * szof(uint)) ;
-constexpr int		magicsize = LINEINDEXHDR_MAGICSIZE ;
-constexpr char		magicstr[] = LINEINDEXHDR_MAGICSTR ;
+constexpr int		tabsize		= (lineindexhdr_overlast * szof(uint)) ;
+constexpr int		magicsz	= LINEINDEXHDR_MAGICSIZE ;
+constexpr char		magicstr[]	= LINEINDEXHDR_MAGICSTR ;
 
 
 /* exported variables */
@@ -90,13 +90,13 @@ constexpr char		magicstr[] = LINEINDEXHDR_MAGICSTR ;
 int lineindexhdr_rd(lineindexhdr *op,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && hbuf) {
+	if (op && hbuf) ylikely {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + 4)) {
-	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
-	            bp += magicsize ;
-	            bl -= magicsize ;
+	    if (bl >= (magicsz + 4)) ylikely {
+	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) ylikely {
+	            bp += magicsz ;
+	            bl -= magicsz ;
 	    	    memcopy(bp,op->vetu,4) ;
 	    	    bp[0] = LINEINDEXHDR_VERSION ;
 	    	    bp[1] = charconv(ENDIAN) ;
@@ -119,19 +119,18 @@ int lineindexhdr_rd(lineindexhdr *op,char *hbuf,int hlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (lineindexhdr_rd) */
+} /* end subroutine (lineindexhdr_rd) */
 
 int lineindexhdr_wr(lineindexhdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && hbuf) {
+	if (op && hbuf) ylikely {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) {
 		rs = SR_OK ;
-	        bp += magicsize ;
-	        bl -= magicsize ;
+	        bp += magicsz ;
+	        bl -= magicsz ;
 	        /* read out the VETU information */
 	        if (bl >= 4) {
 	            memcopy(op->vetu,bp,4) ;
@@ -162,8 +161,7 @@ int lineindexhdr_wr(lineindexhdr *op,cchar *hbuf,int hlen) noex {
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (lineindexhdr_wr) */
+} /* end subroutine (lineindexhdr_wr) */
 
 int lineindexhdr::rd(char *rbuf,int rlen) noex {
     	return lineindexhdr_rd(this,rbuf,rlen) ;
