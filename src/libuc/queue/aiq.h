@@ -23,10 +23,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<pthread.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<q.h>
+#include	<pthread.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<q.h>			/* LIBUC */
 
 
 #define	AIQ		struct aiq_head
