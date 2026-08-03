@@ -44,8 +44,7 @@ OBJ_LIBNSS= nss_parse.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -92,10 +91,10 @@ all:			$(ALL)
 
 
 $(T).so:		$(OBJ_LIBNSS)
-	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(RUNINFO) $(LIBINFO)
+	$(CXX) -shared $(LDFLAGS) -o $@ $(RUNINFO) $^ $(LIBINFO)
 
 $(T).o:			$(OBJ_LIBNSS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ_LIBNSS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).a:			$(OBJ_LIBNSS)
 	$(AR) $(ARFLAGS) -rc $@ $?
@@ -116,6 +115,13 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
+
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 nss_parse.o:		nss_parse.cc nss_parse.h
