@@ -27,19 +27,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucsig.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsig.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sigign.h"
 
@@ -136,8 +133,7 @@ int sigign_start(sigign *iap,cint *ignores) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? nhandles : rs ;
-}
-/* end subroutine (sigign_start) */
+} /* end subroutine (sigign_start) */
 
 int sigign_finish(sigign *iap) noex {
 	int		rs = SR_FAULT ;
@@ -161,8 +157,7 @@ int sigign_finish(sigign *iap) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sigign_finish) */
+} /* end subroutine (sigign_finish) */
 
 
 /* local subroutines */
