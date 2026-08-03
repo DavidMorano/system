@@ -57,18 +57,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* presumably for |wchar_t| type */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>
-#include	<strmgr.h>
-#include	<straltwchar.h>
-#include	<wsfx.h>
-#include	<wsnx.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD|wchar_t| type */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<strmgr.h>		/* LIBUC */
+#include	<straltwchar.h>		/* LIBUC */
+#include	<wsfx.h>		/* LIBUC */
+#include	<wsnx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snwcpyx.h"
 
@@ -103,8 +103,8 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int µwsl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		dl = 0 ; /* return-value */
-	if (int wsl ; (wsl = wsnlen(wsp,µwsl)) >= 0) {
-	    if (strmgr m ; (rs = m.start(dbuf,dlen)) >= 0) {
+	if (int wsl ; (wsl = wsnlen(wsp,µwsl)) >= 0) ylikely {
+	    if (strmgr m ; (rs = m.start(dbuf,dlen)) >= 0) ylikely {
 	        cwchar	*wp ;
 	        for (int wl ; (wl = wsfnext(wsp,wsl,&wp)) > 0 ; ) {
 	            if (dl > 0) {
@@ -139,7 +139,6 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int µwsl) noex {
 	    dbuf[dl] = '\0' ;
 	} /* end if (wsnlen) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (snwcpywidehdr) */
+} /* end subroutine (snwcpywidehdr) */
 
 
