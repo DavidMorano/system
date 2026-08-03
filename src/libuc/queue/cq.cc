@@ -29,14 +29,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<uclibmem.h>
-#include	<vechand.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cq.h"
 
@@ -115,8 +115,7 @@ int cq_start(cq *op) noex {
 	    }
 	} /* end if (cq_ctor) */
 	return rs ;
-}
-/* end subroutine (cq_start) */
+} /* end subroutine (cq_start) */
 
 int cq_finish(cq *op) noex {
 	int		rs ;
@@ -133,8 +132,7 @@ int cq_finish(cq *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cq_finish) */
+} /* end subroutine (cq_finish) */
 
 int cq_ins(cq *op,void *ep) noex {
 	int		rs ;
@@ -142,8 +140,7 @@ int cq_ins(cq *op,void *ep) noex {
 	    rs = vechand_add(op->qp,ep) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cq_ins) */
+} /* end subroutine (cq_ins) */
 
 int cq_rem(cq *op,void *vrp) noex {
 	int		rs ;
@@ -157,8 +154,7 @@ int cq_rem(cq *op,void *vrp) noex {
 	    } /* end if (vechand_get) */
 	} /* end if (magic) */
 	return (rs >= 0) ? count : rs ;
-}
-/* end subroutine (cq_rem) */
+} /* end subroutine (cq_rem) */
 
 int cq_unlink(cq *op,void *ep) noex {
 	int		rs ;
@@ -170,8 +166,7 @@ int cq_unlink(cq *op,void *ep) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? count : rs ;
-}
-/* end subroutine (cq_unlink) */
+} /* end subroutine (cq_unlink) */
 
 int cq_count(cq *op) noex {
 	int		rs ;
@@ -179,8 +174,7 @@ int cq_count(cq *op) noex {
 	    rs = vechand_count(op->qp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cq_count) */
+} /* end subroutine (cq_count) */
 
 int cq_curbegin(cq *op,cq_cur *curp) noex {
 	int		rs ;
@@ -188,8 +182,7 @@ int cq_curbegin(cq *op,cq_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cq_curbegin) */
+} /* end subroutine (cq_curbegin) */
 
 int cq_curend(cq *op,cq_cur *curp) noex {
 	int		rs ;
@@ -197,8 +190,7 @@ int cq_curend(cq *op,cq_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cq_curend) */
+} /* end subroutine (cq_curend) */
 
 int cq_curenum(cq *op,cq_cur *curp,void *vrp) noex {
 	int		rs ;
@@ -211,8 +203,7 @@ int cq_curenum(cq *op,cq_cur *curp,void *vrp) noex {
 	    } /* end if (vechand_get) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cq_curenum) */
+} /* end subroutine (cq_curenum) */
 
 int cq::ins(void *ep) noex {
 	return cq_ins(this,ep) ;
@@ -268,9 +259,6 @@ cq_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (cq_co::operator) */
-
-
+} /* end method (cq_co::operator) */
 
 
