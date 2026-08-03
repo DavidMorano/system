@@ -21,12 +21,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<svcfile.h>		/* <- the money shot */
 
 
@@ -35,9 +31,9 @@
 
 #ifdef	__cplusplus
 struct svcent : svcfile_ent {
-	int islib(cchar **) noex ;
-	int geval(cchar *,cchar **) noex ;
-	int getdeval(cchar *,cchar **) noex ;
+	int islib	(cchar **) noex ;
+	int geval	(cchar *,cchar **) noex ;
+	int getdeval	(cchar *,cchar **) noex ;
 } ; /* end struct (svcent) */
 #else /* __cplusplus */
 typedef	SVCENT		svcent ;
@@ -45,9 +41,9 @@ typedef	SVCENT		svcent ;
 
 EXTERNC_begin
 
-extern int	svcent_islib(svcent *,cchar **) noex ;
-extern int	svcent_getval(svcent *,cchar *,cchar **) noex ;
-extern int	svcent_getdeval(svcent *,cchar *,cchar **) noex ;
+extern int	svcent_islib	(svcent *,cchar **) noex ;
+extern int	svcent_getval	(svcent *,cchar *,cchar **) noex ;
+extern int	svcent_getdeval	(svcent *,cchar *,cchar **) noex ;
 
 EXTERNC_end
 
