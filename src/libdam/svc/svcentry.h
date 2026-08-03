@@ -20,16 +20,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecstr.h>
-#include	<varsub.h>
-#include	<svcfile.h>
+#include	<sys/types.h>		/* POSIX® |pid_t| */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<varsub.h>		/* LIBUC */
+#include	<svcfile.h>		/* LIBUC */
 
 
 #define	SVCENTRY		struct svcentry_head
