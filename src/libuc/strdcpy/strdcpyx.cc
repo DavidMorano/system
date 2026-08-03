@@ -46,13 +46,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* for |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 #include	"strdcpyx.h"
 
@@ -129,7 +129,6 @@ char *strdcpyx(char *dp,int dl,int n,...) noex {
 	    *dp = '\0' ;
 	} /* end if (non-null) */
 	return dp ;
-}
-/* end subroutine (strdcpyx) */
+} /* end subroutine (strdcpyx) */
 
 
