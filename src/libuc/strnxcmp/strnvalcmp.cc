@@ -46,15 +46,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| + |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
-#include	<cmporders.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| + |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<cmporders.h>		/* LIBU */
 
 #include	"strnxcmp.h"
 
@@ -96,9 +96,9 @@ typedef cmporders	co ;
 int strnvalcmp(cchar *sp,cchar *valp,int µvall) noex {
     	cnullptr	np{} ;
 	int		rc = 0 ;
-	if (sp) {
-	    if (int vall ; (vall = getlenstr(valp,µvall)) >= 0) {
-	        if (cchar *tp ; (tp = strchr(sp,'=')) != np) {
+	if (sp) ylikely {
+	    if (int vall ; (vall = getlenstr(valp,µvall)) >= 0) ylikely {
+	        if (cchar *tp = strchr(sp,'=') ; tp) {
 	            sp = (tp + 1) ;
 	            while (*sp) {
 			if (strncmp(sp,valp,vall) == 0) {
@@ -115,8 +115,7 @@ int strnvalcmp(cchar *sp,cchar *valp,int µvall) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (strnvalcmp) */
+} /* end subroutine (strnvalcmp) */
 
 #ifdef	COMMENT
 
@@ -131,8 +130,7 @@ int strnvalcmp(cchar *sp,cchar *vp,int µvl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (strnvalcmp) */
+} /* end subroutine (strnvalcmp) */
 
 #endif /* COMMENT */
 
