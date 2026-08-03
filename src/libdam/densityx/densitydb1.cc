@@ -86,9 +86,9 @@ export {
 
 /* exported variables */
 
-    namespace densityx {
+namespace densityx {
 	inline cint dbhdr::bufsz = (3 * szof(uint)) ;
-    } /* end namespace (densityx) */
+} /* end namespace (densityx) */
 
 
 /* exported subroutines */
@@ -98,7 +98,7 @@ namespace densityx {
 	cint		bufl = bufsz ;
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(bufp,bufl)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(bufp,bufl)) >= 0) ylikely {
 	    {
 		mb << wcount ;
 		mb << wtime ;
@@ -114,7 +114,7 @@ namespace densityx {
 	int		rs ;
 	int		rs1 ;
 	char		*buf = cast_const<charp>(bufp) ;
-	if (serialbuf mb ; (rs = mb.start(buf,bufl)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(buf,bufl)) >= 0) ylikely {
 	    {
 		mb >> wcount ;
 		mb >> wtime ;
