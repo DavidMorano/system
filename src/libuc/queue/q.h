@@ -20,13 +20,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>		/* |ptrdiff_t| */
-#include	<stdlib.h>
-#include	<stdint.h>		/* |intptr_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<plainq.h>
-#include	<ptm.h>
+#include	<stddef.h>		/* CSTD |ptrdiff_t| */
+#include	<stdlib.h>		/* CSTD */
+#include	<stdint.h>		/* CSTD |intptr_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<plainq.h>		/* LIBUC */
 
 
 #define	Q		struct q_head
