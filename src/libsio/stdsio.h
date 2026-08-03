@@ -20,17 +20,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdio.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<stdio.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	freadln(FILE *,char *,int) noex ;
-extern int	fgetline(FILE *,char *,int) noex ;
+extern int	freadln		(FILE *,char *,int) noex ;
+extern int	fgetline	(FILE *,char *,int) noex ;
 
 EXTERNC_end
 
