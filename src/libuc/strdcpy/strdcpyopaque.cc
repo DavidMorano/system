@@ -45,12 +45,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<char.h>
-#include	<mkchar.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 
 #include	"strdcpy.h"
 
@@ -94,7 +94,6 @@ char *strdcpyopaque(char *dp,int dl,cchar *sp,int sl) noex {
 	    dp = nullptr ;
 	} /* end if (non-null) */
 	return dp ;
-}
-/* end subroutine (strdcpyopaque) */
+} /* end subroutine (strdcpyopaque) */
 
 
