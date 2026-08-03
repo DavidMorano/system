@@ -132,7 +132,7 @@ int fdliner_finish(fdliner *op) noex {
 	            rs1 = lm_free(op->fbp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    op->fbp = nullptr ;
-		}
+		} /* end if (memory-release) */
 	    }
 	} /* end if (non-null) */
 	return rs ;
