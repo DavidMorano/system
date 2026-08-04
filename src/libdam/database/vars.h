@@ -52,8 +52,8 @@ struct vars_information {
 /* this is the shared-object description */
 struct vars_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct vars_cursor {
