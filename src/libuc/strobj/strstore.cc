@@ -341,7 +341,7 @@ int strstore_curend(strstore *op,strstore_cur *curp) noex {
 	return rs ;
 } /* end subroutine (strstore_curend) */
 
-int strstore_enum(strstore *op,strstore_cur *curp,cchar **rpp) noex {
+int strstore_curenum(strstore *op,strstore_cur *curp,cchar **rpp) noex {
 	int		rs ;
 	int		cl = 0 ;
 	if ((rs = strstore_magic(op,curp,rpp)) >= 0) ylikely {
@@ -357,7 +357,7 @@ int strstore_enum(strstore *op,strstore_cur *curp,cchar **rpp) noex {
 	        } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? cl : rs ;
-} /* end subroutine (strstore_enum) */
+} /* end subroutine (strstore_curenum) */
 
 int strstore_already(strstore *op,cchar *sp,int sl) noex {
 	int		rs ;
