@@ -40,7 +40,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* CSTD |strcasecmp(3c)| */
+#include	<strings.h>		/* BSD |strcasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strcmp(3c)| */
@@ -91,7 +91,7 @@ extern "C" {
 
 local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
     	int		rc = 0 ;
-	if (s1 || s2) {
+	if (s1 || s2) ylikely {
 	    rc = +1 ;
 	    if (s1) {
 		rc = -1 ;
@@ -118,7 +118,7 @@ local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
 
 int strbasecmp(cchar *s1,cchar *s2) noex {
     	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    rc = strcmp(s1,s2) ;
 	}
 	return rc ;
@@ -126,7 +126,7 @@ int strbasecmp(cchar *s1,cchar *s2) noex {
 
 int strfoldcmp(cchar *s1,cchar *s2) noex {
 	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    while (rc == 0) {
 	        cint ch1 = TOFC(*s1++) ;
 	        cint ch2 = TOFC(*s2++) ;
