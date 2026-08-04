@@ -30,20 +30,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<linefold.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<linefold.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"logfile.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import logfile_mag ;
 
 /* local defines */
 
@@ -65,7 +66,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static int logfile_pfi(logfile *,int,cchar *,int,cchar *,int) noex ;
+local int logfile_pfi(logfile *,int,cchar *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -104,13 +105,12 @@ int logfile_printfold(logfile *lhp,cchar *pre,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (linefold) */
 	return rs ;
-}
-/* end subroutine (logfile_printfold) */
+} /* end subroutine (logfile_printfold) */
 
 
 /* local subroutines */
 
-static int logfile_pfi(logfile *lhp,int li,cc *pp,int pl,cc *sp,int sl) noex {
+local int logfile_pfi(logfile *lhp,int li,cc *pp,int pl,cc *sp,int sl) noex {
 	int		rs ;
 	if (li == 0) {
 	    cchar	*f0 = "%s| %r" ;
@@ -120,7 +120,6 @@ static int logfile_pfi(logfile *lhp,int li,cc *pp,int pl,cc *sp,int sl) noex {
 	    rs = logfile_printf(lhp,f1,pl," ",sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (logfile_pfi) */
+} /* end subroutine (logfile_pfi) */
 
 
