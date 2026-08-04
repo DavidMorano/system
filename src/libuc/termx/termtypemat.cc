@@ -42,7 +42,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |SHORT_MIN| */
+#include	<climits>		/* CSTD |SHORT_MIN| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -76,7 +76,7 @@
 
 /* forward references */
 
-static int	isMatch(cshort *,cshort *) noex ;
+local int	isMatch(cshort *,cshort *) noex ;
 
 
 /* local variables */
@@ -97,13 +97,12 @@ int termtypemat(const termtype *types, cshort *pvp,cshort *svp) noex {
 	    if (f >= 0) break ;
 	} /* end for */
 	return (f >= 0) ? i : -1 ;
-}
-/* end subroutine (termtypemat) */
+} /* end subroutine (termtypemat) */
 
 
 /* local subroutines */
 
-static int isMatch(cshort *vp,cshort *pp) noex {
+local int isMatch(cshort *vp,cshort *pp) noex {
 	cint		n = TERMCMD_NP ;
 	int		i ; /* used afterwards */
 	bool		f = true ;
