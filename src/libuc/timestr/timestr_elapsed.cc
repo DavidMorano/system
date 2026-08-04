@@ -26,14 +26,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>			/* |time_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |ulogerror(3u)| */
-#include	<snx.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |ulogerror(3u)| */
+#include	<snx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"timestr.h"
 
