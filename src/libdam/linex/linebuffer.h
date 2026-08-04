@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	LINEBUFFER	struct linebuffer_head
@@ -55,8 +55,8 @@ struct linebuffer : linebuffer_head {
 	linebuffer_co	start ;
 	linebuffer_co	finish ;
 	linebuffer() noex {
-	    start(this,linebuffermem_start) ;
-	    finish(this,linebuffermem_finish) ;
+	    start	(this,linebuffermem_start) ;
+	    finish	(this,linebuffermem_finish) ;
 	    lbuf = nullptr ;
 	} ; /* end ctor */
 	linebuffer(const linebuffer &) = delete ;
