@@ -39,7 +39,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
@@ -82,7 +82,6 @@ int dictdiff(int ch1,int ch2) noex {
 	    rc = (ch1 - ch2) ;
 	}
 	return rc ;
-}
-/* end subroutine (dictdiff) */
+} /* end subroutine (dictdiff) */
 
 
