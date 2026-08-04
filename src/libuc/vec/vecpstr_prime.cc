@@ -132,7 +132,7 @@ struct strentry {
 	uint	khash ;
 	uint	hi ;
 	uint	si ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
