@@ -444,8 +444,7 @@ int vecitem_audit(vecitem *op) noex {
 	    rs = (c == op->c) ? SR_OK : SR_BADFMT ;
 	} /* end if (valid) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecitem_audit) */
+} /* end subroutine (vecitem_audit) */
 
 
 /* private subroutines */
