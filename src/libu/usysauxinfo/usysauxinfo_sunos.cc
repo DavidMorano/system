@@ -33,24 +33,24 @@
 /* USYSAUXINFO_SUNOS start */
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
-#include	<sys/types.h>
+#include	<sys/types.h>		/* POSIX® */
 #include	<sys/systeminfo.h>	/* <- where the stuff we want is */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<climits>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usupport.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
 
 #include	"usysauxinfo_sunos.h"
 
 using namespace	libu ;
 
-static sysret_t sunos_getauxinfo(char *,int,int) noex ;
+local sysret_t sunos_getauxinfo(char *,int,int) noex ;
 
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
@@ -84,18 +84,18 @@ namespace usysauxinfo {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ugetauxinfo) */
-}
+} /* end namespace (usysauxinfo) */
 
-static sysret_t sunos_getauxinfo(char *rbuf,int rlen,int req) noex {
+local sysret_t sunos_getauxinfo(char *rbuf,int rlen,int req) noex {
 	csize		rsz(rlen + 1) ;
 	int		rs ;
 	if ((rs = sysinfo(req,rbuf,rsz)) > rsz) {
 	    rs = SR_OVERFLOW ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
+} /* end subrutine */
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* USYSAUXINFO_SUNOS finish */
