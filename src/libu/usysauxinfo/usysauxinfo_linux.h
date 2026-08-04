@@ -26,16 +26,15 @@
 
 *******************************************************************************/
 
-#ifndef	USYSAUXINFO_LINUX_INCLUDE
-#define	USYSAUXINFO_LINUX_INCLUDE
+#ifndef	USYSAUXINFOLINUX_INCLUDE
+#define	USYSAUXINFOLINUX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 
-/* USYSAUXINFO_LINUX start */
+/* USYSAUXINFOLINUX start */
 #if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
-#include	<sys/types.h>
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -46,9 +45,9 @@
 
 
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0)*/
-/* USYSAUXINFO_LINUX finish */
+/* USYSAUXINFOLINUX finish */
 
 
-#endif /* USYSAUXINFO_LINUX_INCLUDE */
+#endif /* USYSAUXINFOLINUX_INCLUDE */
 
 
