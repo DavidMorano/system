@@ -58,9 +58,9 @@ struct serialbuf : serialbuf_head {
 	serialbuf_co	reset ;
 	serialbuf_co	finish ;
 	serialbuf() noex {
-	    getlen(this,serialbufmem_getlen) ;
-	    reset(this,serialbufmem_reset) ;
-	    finish(this,serialbufmem_finish) ;
+	    getlen	(this,serialbufmem_getlen) ;
+	    reset	(this,serialbufmem_reset) ;
+	    finish	(this,serialbufmem_finish) ;
 	    sbuf = nullptr ;
 	} ; /* end ctor */
 	serialbuf(const serialbuf &) = delete ;
