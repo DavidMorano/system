@@ -33,10 +33,10 @@
 /* USYSAUXINFO_LINUX start */
 #if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<climits>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* P§SIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -51,7 +51,7 @@ using namespace	libu ;
 extern ugetnisdom(char *,int) noex ;
 
 namespace libu {
-    extern sysret_t loadhostid(char *,int) noex ;
+    extern sysret_t loadhwserial(char *,int) noex ;
 }
 
 namespace usysauxinfo {
@@ -74,7 +74,7 @@ namespace usysauxinfo {
 	 	vp = "Apple" ;
 		break ;
 	    case SAI_HWSERIAL:
-		rs = loadhostid(rbuf,rlen) ;
+		rs = loadhwserial(rbuf,rlen) ;
 		break ;
 	    case SAI_RPCDOMAIN:
 		rs = ugetnisdom(rbuf,rlen) ;
@@ -86,7 +86,7 @@ namespace usysauxinfo {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ugetauxinfo) */
-}
+} /* end namespace (usysauxinfo) */
 
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0) */
 /* USYSAUXINFO_LINUX finish */
