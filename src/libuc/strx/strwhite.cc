@@ -50,18 +50,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strbrk(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>		/* |CH_{x}| */
-#include	<strn.h>		/* |strnbrk(3uc)| */
-#include	<mkchar.h>
-#include	<char.h>		/* |CHAR_{x}(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strbrk(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_{x}| */
+#include	<strn.h>		/* LIBUC |strnbrk(3uc)| */
+#include	<char.h>		/* LIBUC |CHAR_{x}(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strwhite.h"
 
@@ -116,7 +116,6 @@ char *strwht(cchar *sp,int sl) noex {
 	    rsp = charp(sp) ;
 	} /* end if (non-null) */
 	return rsp ;
-}
-/* end subroutine (strwht) */
+} /* end subroutine (strwht) */
 
 
