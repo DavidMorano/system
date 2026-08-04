@@ -13,9 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
 
 
 /* object defines */
@@ -34,7 +34,7 @@ struct linefilter_head {
 	vecstr		*sslp ;	/* select list pointer */
 	vecstr		*sxlp ;	/* exclude list pointer */
 	LINEFILTER_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 #ifdef	__cplusplus
@@ -58,16 +58,16 @@ struct linefilter_co {
 struct linefilter : linefilter_head {
 	linefilter_co	finish ;
 	linefilter() noex {
-	    finish(this,linefiltermem_finish) ;
-	    magic = 0 ;
+	    finish	(this,linefiltermem_finish) ;
+	    magval = 0 ;
 	} ;
 	linefilter(const linefilter &) = delete ;
 	linefilter &operator = (const linefilter &) = delete ;
-	int start(cchar *,cchar *) noex ;
-	int check(cchar *,int) noex ;
-	void dtor() noex ;
+	int start	(cchar *,cchar *) noex ;
+	int check	(cchar *,int) noex ;
+	void dtor	() noex ;
 	destruct linefilter() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (linefilter) */
 #else	/* __cplusplus */
