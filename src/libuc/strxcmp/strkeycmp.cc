@@ -45,7 +45,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* CSTD |strcasecmp(3c)| */
+#include	<strings.h>		/* BSD |strcasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strchr(3c)| */
@@ -90,7 +90,7 @@ extern "C" {
 
 local inline bool isend(int ch) noex {
     	return (ch == '=') || (ch == '\0') ;
-}
+} /* end subroutine */
 
 local int strkeyxcmp(toxc_f tox,cchar *e1p,cchar *e2p) noex {
 	int		rc = 0 ;
