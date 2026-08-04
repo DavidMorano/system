@@ -920,8 +920,7 @@ local int txtindexes_mktaglist(TIS *op,uint **tlpp,vecstr *hlp) noex {
 	    } /* end if (m-a) */
 	} /* end if (positive) */
 	return (rs >= 0) ? tagcount : rs ;
-}
-/* end subroutine (txtindexes_mktaglist) */
+} /* end subroutine (txtindexes_mktaglist) */
 
 int txtindexes_oureigen(TIS *op,cchar *kp,int kl) noex {
 	TIS_MI		*mip = &op->mi ;
@@ -956,13 +955,13 @@ local int txtindexes_hdrverify(TIS *op,time_t dt) noex {
 	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
 	f = f && (hip->sdnoff <= fip->mapsize) ;
 	f = f && (hip->sfnoff <= fip->mapsize) ;
-/* alignment restriction */
+	/* alignment restriction */
 	f = f && ((hip->listoff & (szof(int)-1)) == 0) ;
-/* size restrictions */
+	/* size restrictions */
 	f = f && (hip->listoff <= fip->mapsize) ;
-/* alignment restriction */
+	/* alignment restriction */
 	f = f && ((hip->taboff & (szof(int)-1)) == 0) ;
-/* size restrictions */
+	/* size restrictions */
 	f = f && (hip->taboff <= fip->mapsize) ;
 	f = f && (tabsize <= fip->mapsize) ;
 	f = f && ((hip->taboff + tabsize) <= fip->mapsize) ;
@@ -970,11 +969,11 @@ local int txtindexes_hdrverify(TIS *op,time_t dt) noex {
 	    uint	essize = hip->essize ;
 	    uint	erlen = hip->erlen ;
 	    uint	eilen = hip->eilen ;
-/* alignment restrictions */
+		/* alignment restrictions */
 	    f = f && ((hip->esoff & (szof(int)-1)) == 0) ;
 	    f = f && ((hip->eroff & (szof(int)-1)) == 0) ;
 	    f = f && ((hip->eioff & (szof(int)-1)) == 0) ;
-/* size restrictions */
+		/* size restrictions */
 	    f = f && ((hip->esoff + essize) <= hfsize) ;
 	    f = f && ((hip->eroff + (erlen * szof(int))) <= hfsize) ;
 	    f = f && ((hip->eioff + (eilen * 3 * szof(int))) <= hfsize) ;
@@ -1065,7 +1064,7 @@ local int txtindexes_auditeigen(TIS *op) noex {
 	    eitab = mip->eitab ;
 	    ertab = mip->ertab ;
 	}
-/* some record-table checkes */
+	/* some record-table checkes */
 	if ((rs >= 0) && (ertab[0] != 0)) {
 	    rs = SR_BADFMT ;
 	}
@@ -1095,7 +1094,7 @@ local int txtindexes_auditeigen(TIS *op) noex {
 	        if (rs < 0) break ;
 	    } /* end for */
 	} /* end if (ok) */
-/* some index-table checks */
+	/* some index-table checks */
 	if ((rs >= 0) && (eitab[0][0] != 0)) {
 	    rs = SR_BADFMT ;
 	}
@@ -1113,7 +1112,7 @@ local int txtindexes_auditeigen(TIS *op) noex {
 	        }
 	    } /* end for */
 	} /* end if (ok) */
-/* while we are here, we may as well go all out! (inverted str-tab check) */
+	/* inverted str-tab check */
 	if (rs >= 0) {
 	    cchar	*ecp = (estab + essize) ;
 	    cp = (estab + 1) ;
