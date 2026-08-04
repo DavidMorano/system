@@ -64,8 +64,10 @@ struct strtab_co {
 	    op = p ;
 	    w = m ;
 	} ;
-	operator int () noex ;
-	int operator () (int) noex ;
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () (0) ;
+	} ;
 } ; /* end struct (strtab_co) */
 struct strtab : strtab_head {
 	strtab_co	start ;
