@@ -41,16 +41,16 @@
 #include	<ctime>			/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |ulogerror(3u)| */
-#include	<ucsysmisc.h>
-#include	<uctimeconv.h>
-#include	<estrings.h>
-#include	<snx.h>
-#include	<getmjd.h>
-#include	<nistinfo.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |ulogerror(3u)| */
+#include	<ucsysmisc.h>		/* LIBU */
+#include	<uctimeconv.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<getmjd.h>		/* LIBUC */
+#include	<nistinfo.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"timestr.h"
 
