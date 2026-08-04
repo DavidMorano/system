@@ -78,7 +78,7 @@
 
 int wsinul(const wchar_t *wsp) noex {
 	int	i = -1 ; /* return-value */
-	if (wsp) {
+	if (wsp) ylikely {
 	    for (i = 0 ; wsp[i] ; i += 1) ;
 	}
 	return i ;
