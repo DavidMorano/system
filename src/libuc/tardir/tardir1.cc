@@ -25,18 +25,20 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdio>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<usyscalls.h>		/* |u_stat(3u)| */
-#include	<strnul.hh>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
-#include	<dprint.hh>		/* debugging */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |u_stat(3u)| */
+#include	<strnul.hh>		/* LIBU */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU debugging */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/sif.ccm"
@@ -75,18 +77,18 @@ local int tardir_ctor(tardir *op,Args ... args) noex {
 	cnullptr	np{} ;
 	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (op && (... && args)) {
+	if (op && (... && args)) ylikely {
 	    rs = SR_NOMEM ;
-	    if (vecent *dlp ; (dlp = new(nt) vecent) != np) {
+	    if (vecent *dlp ; (dlp = new(nt) vecent) != np) ylikely {
 		op->dirp = dlp ;
-	        if (fonce *slp ; (slp = new(nt) fonce) != np) {
+	        if (fonce *slp ; (slp = new(nt) fonce) != np) ylikely {
 		    op->seenp = slp ;
 		    rs = SR_OK ;
 	        } /* end if (new-fonce) */
 	        if (rs < 0) {
 		    delete dlp ;
 		    op->dirp = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (new-vecent) */
 	} /* end if (non-null) */
 	return rs ;
@@ -94,7 +96,7 @@ local int tardir_ctor(tardir *op,Args ... args) noex {
 
 local int tardir_dtor(tardir *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->seenp) {
 		fonce *p = foncep(op->seenp) ;
@@ -124,21 +126,21 @@ local int tardir_dtor(tardir *op) noex {
 
 int tardir::istart() noex {
     	int		rs ;
-	if ((rs = tardir_ctor(this)) >= 0) {
+	if ((rs = tardir_ctor(this)) >= 0) ylikely {
 	    vecent *tlp = vecentp(dirp) ;
 	    if ((rs = tlp->start) >= 0) ylikely {
 	        fonce *slp = foncep(seenp) ;
 	        if ((rs = slp->start) >= 0) ylikely {
 		    fl.open = true ;
 		    magval = tardir_magicval ;
-	        }
+	        } /* end if */
 	        if (rs < 0) {
 		    tlp->finish() ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (dirs.start) */
 	    if (rs < 0) {
 		tardir_dtor(this) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tardir_ctor) */
 	return rs ;
 } /* end method (tardir::istart) */
@@ -183,20 +185,20 @@ int tardir::add(cchar *sp,int sl) noex {
 	DPRINTF("ent\n") ;
 	if ((rs = magic(sp)) >= 0) ylikely {
 	    sif so(sp,sl,':') ;
-	    cchar *cp ;
-	    for (int cl ; (cl = so(&cp)) > 0 ; ) {
-	        strnul dn(cp,cl) ; 
-	        DPRINTF("s=>%s<\n",ccp(dn)) ;
-	        if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
-		    rs = SR_NOTDIR ;
-		    if (S_ISDIR(sb.st_mode)) {
-		        rs = iaddone(&sb,cp,cl) ;
-			c += rs ;
-		    }
-	        } /* end if (u_stat) */
-	        DPRINTF("stat-out rs=%d\n",rs) ;
-		if (rs < 0) break ;
-	    } /* end for */
+	        cchar *cp ;
+	        for (int cl ; (cl = so(&cp)) > 0 ; ) {
+	            strnul dn(cp,cl) ; 
+	            DPRINTF("s=>%s<\n",ccp(dn)) ;
+	            if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
+		        rs = SR_NOTDIR ;
+		        if (S_ISDIR(sb.st_mode)) {
+		            rs = iaddone(&sb,cp,cl) ;
+			    c += rs ;
+		        }
+	            } /* end if (u_stat) */
+	            DPRINTF("stat-out rs=%d\n",rs) ;
+		    if (rs < 0) break ;
+	        } /* end for */
 	} /* end if (tardir_magic) */
 	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
@@ -243,13 +245,13 @@ int tardir::curenum(tardir_cur *curp,ccharpp rpp) noex {
     	int		rs ;
 	int		rl = 0 ; /* return-value */
 	if ((rs = magic(curp,rpp)) >= 0) ylikely {
-		cint idx = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-	        if ((rs = get(idx,rpp)) >= 0) {
-		    curp->i = idx ;
-		    rl = lenstr(*rpp) ;
-		} else if (rs == rsn) {
-		    rs = SR_OK ;
-		}
+	    cint idx = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+	    if ((rs = get(idx,rpp)) >= 0) {
+		curp->i = idx ;
+		rl = lenstr(*rpp) ;
+	    } else if (rs == rsn) {
+		rs = SR_OK ;
+	    }
 	} /* end if (tardir_magic) */
 	return (rs >= 0) ? rl : rs ;
 } /* end method (tardir::curenum) */
@@ -281,7 +283,7 @@ void tardir::dtor() noex {
 
 tardir::operator int () noex {
 	return icount() ;
-}
+} /* end method */
 
 int tardir_co::operator () (int) noex {
 	int		rs = SR_BUGCHECK ;
