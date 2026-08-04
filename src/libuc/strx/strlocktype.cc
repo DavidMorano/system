@@ -36,11 +36,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strlocktype.h"
 
@@ -93,7 +95,6 @@ cchar *strlocktype(int t) noex {
 	    }
 	} /* end for */
 	return s ;
-}
-/* end subroutine (strlocktype) */
+} /* end subroutine (strlocktype) */
 
 
