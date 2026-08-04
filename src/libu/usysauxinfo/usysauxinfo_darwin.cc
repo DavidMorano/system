@@ -34,9 +34,9 @@
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
 #include	<sys/sysctl.h>		/* <- Darwin |sysctl(3c)| */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<new>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<new>			/* C++STD */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -51,7 +51,7 @@ using namespace	libu ;
 using usys::darwin_usysctl ;
 
 namespace libu {
-    extern sysret_t loadhostid(char *,int) noex ;
+    extern sysret_t loadhwserial(char *,int) noex ;
 }
 
 namespace usysauxinfo {
@@ -76,7 +76,7 @@ namespace usysauxinfo {
 	 	vp = "Apple" ;
 		break ;
 	    case SAI_HWSERIAL:
-		rs = loadhostid(rbuf,rlen) ;
+		rs = loadhwserial(rbuf,rlen) ;
 		break ;
 	    case SAI_RPCDOMAIN:
 		name = "kern.nisdomainname" ;
@@ -98,7 +98,7 @@ namespace usysauxinfo {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ugetauxinfo) */
-}
+} /* end namespace (usysauxinfo) */
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYSAUXINFO_DARWIN finish */
