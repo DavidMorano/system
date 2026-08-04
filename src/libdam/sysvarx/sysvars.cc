@@ -258,7 +258,7 @@ template<typename ... Args>
 local inline int sysvars_magic(sysvars *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SYSVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SYSVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (sysvars_magic) */
@@ -340,7 +340,6 @@ constexpr cpcchar	dbdirs[] = {
 } ; /* end array (dbdirs) */
 
 static strlibval	tmpdname(strlibval_tmpdir) ;
-
 cbool			f_mksysvars = CF_MKSYSVARS ;
 
 
@@ -365,11 +364,11 @@ int sysvars_open(SVS *op,cchar *pr,cchar *dbname) noex {
 	        if (SI si ; (rs = subinfo_start(&si)) >= 0) ylikely {
 	            if ((rs = sysvars_infoloadbegin(op,pr,dbname)) >= 0) {
 	                if ((rs = sysvars_indopen(op,&si)) >= 0) {
-	            	    op->magic = SYSVARS_MAGIC ;
+	            	    op->magval = SYSVARS_MAGIC ;
 			}
 	                if (rs < 0) {
 	                    sysvars_infoloadend(op) ;
-			}
+			} /* end if (error) */
 	            } /* end if (infoload) */
 	            rs1 = subinfo_finish(&si) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -377,7 +376,7 @@ int sysvars_open(SVS *op,cchar *pr,cchar *dbname) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		sysvars_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (sysvars_ctor) */
 	return rs ;
 } /* end subroutine (sysvars_open) */
@@ -398,7 +397,7 @@ int sysvars_close(SVS *op) noex {
 		rs1 = sysvars_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (sysvars_close) */
@@ -452,7 +451,7 @@ int sysvars_fetch(SVS *op,cc *kp,int kl,SVS_C *curp,char *vbuf,int vlen) noex {
 	} /* end if (magic) */
 	if ((rs < 0) && vbuf) {
 	    vbuf[0] = '\0' ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end subroutine (sysvars_fetch) */
 
@@ -467,7 +466,7 @@ int sysvars_curenum(SVS *op,SVS_C *curp,char *kp,int kl,char *vp,int vl) noex {
 	} /* end if (non-null) */
 	if ((rs < 0) && vp) {
 	    vp[0] = '\0' ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end subroutine (sysvars_curenum) */
 
@@ -602,7 +601,7 @@ local int sysvars_indopenseqer(SVS *op,SI *sip,dirseen *dsp,
 		}
 	        if ((rs < 0) && isNotPresent(rs)) {
 	            rs = sysvars_indopenalt(op,sip,dsp) ;
-		}
+		} /* end if (error) */
 	    }
 	} /* end if (ok) */
 
@@ -669,7 +668,7 @@ local int sysvars_indopenalt(SVS *op,SI *sip,dirseen *dsp) noex {
 
 	            if ((rs < 0) && isNotPresent(rs)) {
 	                rs = sysvars_indmk(op,ebuf) ;
-		    }
+		    } /* end if (error) */
 
 	            if (rs >= 0) {
 	                if ((rs = mkpath2(indname,ebuf,op->dbname)) >= 0) {
@@ -700,10 +699,10 @@ local int sysvars_indmk(SVS *op,cchar *dname) noex {
 	    rs = mkdirs(dname,0775) ;
 	}
 	/* create the index-name */
-	if (rs >= 0) {
-	    if (char *ibuf{} ; (rs = lm_mp(&ibuf)) >= 0) {
+	if (rs >= 0) ylikely {
+	    if (char *ibuf ; (rs = lm_mp(&ibuf)) >= 0) ylikely {
 	        cmode	om = 0664 ;
-	        if ((rs = mkpath(ibuf,dname,op->dbname)) >= 0) {
+	        if ((rs = mkpath(ibuf,dname,op->dbname)) >= 0) ylikely {
 	            rs = sysvars_indmkdata(op,ibuf,om) ;
 	      	    c += rs ;
 	    	}
@@ -821,9 +820,7 @@ local int sysvars_mksysvarsi(SVS *op,SI *sip,cchar *dname) noex {
 	                        if (rs < 0) break ;
 	                    } /* end for */
 			} /* end if (ok) */
-
-/* go */
-
+			/* go */
 	                if (rs >= 0) {
 	                    if (mainv ev ; (rs = envs.getvec(&ev)) >= 0) {
 	                        SPAWNPROC_CON	ps{} ;
@@ -869,7 +866,7 @@ local int sysvars_mksysvarsi(SVS *op,SI *sip,cchar *dname) noex {
 
 local int subinfo_start(SI *sip) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = memclear(sip) ;
 	    sip->daytime = time(nullptr) ;
 	} /* end if (non-null) */
@@ -878,7 +875,7 @@ local int subinfo_start(SI *sip) noex {
 
 local int subinfo_ids(SI *sip) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	    if (! sip->fl.id) {
 	        sip->fl.id = true ;
@@ -891,7 +888,7 @@ local int subinfo_ids(SI *sip) noex {
 local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	    if (sip->fl.id) {
 	        sip->fl.id = false ;
