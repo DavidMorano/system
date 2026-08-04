@@ -38,28 +38,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<strings.h>		/* |strncasecmp(3c)| */
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<linebuffer.h>
-#include	<filer.h>
-#include	<vecstr.h>
-#include	<hdbstr.h>
-#include	<field.h>
-#include	<varmk.h>
-#include	<strn.h>
-#include	<matstr.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIC® */
+#include	<strings.h>		/* BSD |strncasecmp(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<linebuffer.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<hdbstr.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<varmk.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysvars.h"
 
@@ -100,11 +100,11 @@ extern int	strncasecmp(cchar *,cchar *,int) noex ;
 
 /* forward references */
 
-static int	procaddvar(hdbstr *,cchar *,int) noex ;
+local int	procaddvar(hdbstr *,cchar *,int) noex ;
 
 #if	CF_PROCVARFILE
-static int	procvarfile(hdbstr *,cchar *) noex ;
-static bool	hasweird(cchar *,int) noex ;
+local int	procvarfile(hdbstr *,cchar *) noex ;
+local bool	hasweird(cchar *,int) noex ;
 #endif
 
 
@@ -120,7 +120,7 @@ constexpr char		fterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 #endif /* CF_PROCVARFILE */
 
 constexpr cpcchar	wstrs[] = {
@@ -145,9 +145,9 @@ constexpr cpcchar	pstrs[] = {
 int sysvars_procget(hdbstr *vlp,cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (vlp && fn) {
+	if (vlp && fn) ylikely {
 	    rs = SR_INVALID ;
-	    if (fn[0]) {
+	    if (fn[0]) ylikely {
 	        cint	vn = 10 ;
 	        cint	vo = 0 ;
 	        if (vecstr lvars ; (rs = lvars.start(vn,vo)) >= 0) {
@@ -173,8 +173,7 @@ int sysvars_procget(hdbstr *vlp,cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysvars_procget) */
+} /* end subroutine (sysvars_procget) */
 
 int sysvars_procset(hdbstr *vlp,cchar *dbn,mode_t om) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -212,15 +211,14 @@ int sysvars_procset(hdbstr *vlp,cchar *dbn,mode_t om) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sysvars_procset) */
+} /* end subroutine (sysvars_procset) */
 
 
 /* local subroutines */
 
 #if	CF_PROCVARFILE
 
-static int procvarfile(hdbstr *vlp,cchar *fname) noex {
+local int procvarfile(hdbstr *vlp,cchar *fname) noex {
 	cint		to = TO_READ ;
 	int		rs ;
 	int		cl ;
@@ -304,10 +302,9 @@ static int procvarfile(hdbstr *vlp,cchar *fname) noex {
 	} /* end if (file) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procvarfile) */
+} /* end subroutine (procvarfile) */
 
-static bool hasweird(cchar *sp,int sl) noex {
+local bool hasweird(cchar *sp,int sl) noex {
 	bool		f = false ;
 	for (int i = 0 ; (i != sl) && (sp[i] != '\0') ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
@@ -315,12 +312,11 @@ static bool hasweird(cchar *sp,int sl) noex {
 	    if (f) break ;
 	} /* end if */
 	return f ;
-}
-/* end subroutine (hasweird) */
+} /* end subroutine (hasweird) */
 
 #endif /* CF_PROCVARFILE */
 
-static int procaddvar(hdbstr *vlp,cchar *sp,int sl) noex {
+local int procaddvar(hdbstr *vlp,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
     	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
@@ -339,7 +335,6 @@ static int procaddvar(hdbstr *vlp,cchar *sp,int sl) noex {
 	    rs = hdbstr_add(vlp,kp,kl,vp,vl) ;
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procaddvar) */
+} /* end subroutine (procaddvar) */
 
 
