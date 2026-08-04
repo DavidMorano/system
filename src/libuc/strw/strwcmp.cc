@@ -43,7 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* CSTD |strncasecmp(3c)| */
+#include	<strings.h>		/* BSD |strncasecmp(3c)| */
 #include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
