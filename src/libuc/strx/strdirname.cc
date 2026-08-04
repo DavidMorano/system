@@ -42,13 +42,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 import libutil ;
 
@@ -71,7 +71,7 @@ char *strdirname(char *s) noex {
 	/* remove trailing slash characters */
 	while ((sl > 1) && (s[sl - 1] == '/')) {
 	    sl -= 1 ;
-	}
+	} /* end while */
 	/* find the next previous slash character (if there is one) */
 	for (si = sl ; si > 0 ; si -= 1) {
 	    if (s[si - 1] == '/') break ;
@@ -85,7 +85,6 @@ char *strdirname(char *s) noex {
 	    s = (char *) strdirname_dot ;
 	}
 	return s ;
-}
-/* end subroutine (strdirname) */
+} /* end subroutine (strdirname) */
 
 
