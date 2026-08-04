@@ -29,23 +29,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<nulstr.h>
-#include	<sncpyx.h>
-#include	<snwcpy.h>
-#include	<strxcmp.h>
-#include	<matstr.h>
-#include	<strxcmp.h>		/* |strkeycmp(3uc)| */
-#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSYD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<strxcmp.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<strxcmp.h>		/* LIBUC |strkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysvar.h"
 
@@ -97,7 +97,7 @@ extern "C" {
     typedef int	(*sofetch_f)(void *,cchar *,int,void *,char *,int) noex ;
     typedef int	(*soaudit_f)(void *) noex ;
     typedef int	(*soclose_f)(void *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -107,7 +107,7 @@ extern "C" {
 
 struct sysvar_defcur {
 	int		i ;
-} ;
+} ; /* end struct */
 
 struct sysvar_calls {
     soopen_f		open ;
@@ -138,11 +138,11 @@ local int sysvar_ctor(SV *op,Args ... args) noex {
 	        if ((callp = new(nothrow) sysvar_calls) != np) ylikely {
 		    op->callp = callp ;
 		    rs = SR_OK ;
-		}
+		} /* end if (new-sysvars_calls) */
 		if (rs < 0) {
 		    delete op->mlp ;
 		    op->mlp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end new (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
@@ -169,7 +169,7 @@ template<typename ... Args>
 local inline int sysvar_magic(SV *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SYSVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SYSVAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (sysvar_magic) */
@@ -186,7 +186,7 @@ local int	sysvar_defcurend(SV *,SV_CUR *) noex ;
 local int	sysvar_deffetch(SV *,cchar *,int,SV_DC *,char *,int) noex ;
 local int	sysvar_defenum(SV *,SV_DC *,char *,int,char *,int) noex ;
 
-static bool	isrequired(int) noex ;
+local bool	isrequired(int) noex ;
 
 
 /* external variables */
@@ -206,7 +206,7 @@ enum subs {
 	sub_overlast
 } ; /* end enum (subs) */
 
-constexpr cpcchar	subs[] = {
+constexpr cpcchar	subnames[] = {
 	"open",
 	"count",
 	"curbegin",
@@ -216,7 +216,7 @@ constexpr cpcchar	subs[] = {
 	"audit",
 	"close",
 	nullptr
-} ; /* end array (subs) */
+} ; /* end array (subnames) */
 
 constexpr cpcchar	sysfnames[] = {
 	DEFINITFNAME,	
@@ -254,9 +254,9 @@ int sysvar_open(SV *op,cchar *pr,cchar *dbname) noex {
 	            sysvar_calls	*callp = callsp(op->callp) ;
 		    if (op->callp) {
 			if (callp->open) {
-			    auto co = callp->open ;
+			    cauto co = callp->open ;
 	                    if ((rs = co(op->obj,pr,dbname)) >= 0) {
-	    	                op->magic = SYSVAR_MAGIC ;
+	    	                op->magval = SYSVAR_MAGIC ;
 	            	    }
 		        } else {
 			    rs = SR_NOTOPEN ;
@@ -266,21 +266,20 @@ int sysvar_open(SV *op,cchar *pr,cchar *dbname) noex {
 		    }
 	            if (rs < 0) {
 		        sysvar_objloadend(op) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if */
 		if (isNotPresent(rs)) {
 	    	    if ((rs = sysvar_defaults(op)) >= 0) {
-	    		op->magic = SYSVAR_MAGIC ;
+	    		op->magval = SYSVAR_MAGIC ;
 		    }
-		}
+		} /* end if (error) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		sysvar_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (sysvar_ctor) */
 	return rs ;
-}
-/* end subroutine (sysvar_open) */
+} /* end subroutine (sysvar_open) */
 
 int sysvar_close(SV *op) noex {
 	int		rs ;
@@ -292,7 +291,7 @@ int sysvar_close(SV *op) noex {
 	    } else if (op->callp) {
 	        sysvar_calls	*callp = callsp(op->callp) ;
 		if (callp->close) {
-		    auto co = callp->close ;
+		    cauto co = callp->close ;
 	            rs = co(op->obj) ;
 		}
 		{
@@ -304,11 +303,10 @@ int sysvar_close(SV *op) noex {
 		rs1 = sysvar_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvar_close) */
+} /* end subroutine (sysvar_close) */
 
 int sysvar_audit(SV *op) noex {
 	int		rs ;
@@ -318,13 +316,12 @@ int sysvar_audit(SV *op) noex {
 	    if (op->fl.defaults) {
 	        rs = vecstr_audit(op->dlp) ;
 	    } else if (callp->audit) {
-		auto co = callp->audit ;
+		cauto co = callp->audit ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvar_audit) */
+} /* end subroutine (sysvar_audit) */
 
 int sysvar_count(SV *op) noex {
 	int		rs ;
@@ -334,13 +331,12 @@ int sysvar_count(SV *op) noex {
 	    if (op->fl.defaults) {
 	        rs = vecstr_count(op->dlp) ;
 	    } else if (callp->count) {
-		auto co = callp->audit ;
+		cauto co = callp->audit ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvar_count) */
+} /* end subroutine (sysvar_count) */
 
 int sysvar_curbegin(SV *op,sysvar_cur *curp) noex {
 	int		rs ;
@@ -352,72 +348,67 @@ int sysvar_curbegin(SV *op,sysvar_cur *curp) noex {
 	        rs = sysvar_socurbegin(op,curp) ;
 	    }
 	    if (rs >= 0) {
-	        curp->magic = SYSVAR_MAGIC ;
+	        curp->magval = SYSVAR_MAGIC ;
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvar_curbegin) */
+} /* end subroutine (sysvar_curbegin) */
 
 int sysvar_curend(SV *op,sysvar_cur *curp) noex {
 	int		rs ;
 	if ((rs = sysvar_magic(op,curp)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == SYSVAR_MAGIC) {
+	    if (curp->magval == SYSVAR_MAGIC) {
 	        if (op->fl.defaults) {
 	            rs = sysvar_defcurend(op,curp) ;
 	        } else {
 	            rs = sysvar_socurend(op,curp) ;
 	        }
-	        curp->magic = 0 ;
+	        curp->magval = 0 ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvar_curend) */
+} /* end subroutine (sysvar_curend) */
 
 int sysvar_fetch(SV *op,cchar *kp,int kl,SV_CUR *curp,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	if ((rs = sysvar_magic(op,kp,curp)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == SYSVAR_MAGIC) {
+	    if (curp->magval == SYSVAR_MAGIC) {
 		sysvar_calls	*callp = callsp(op->callp) ;
 		rs = SR_NOSYS ;
 	        if (op->fl.defaults) {
 		    SV_DC	*dcurp = (SV_DC *) curp->scp ;
 	            rs = sysvar_deffetch(op,kp,kl,dcurp,vbuf,vlen) ;
 	        } else if (callp->fetch) {
-		    auto co = callp->fetch ;
+		    cauto co = callp->fetch ;
 	    	    rs = co(op->obj,kp,kl,curp->scp,vbuf,vlen) ;
 		}
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvar_fetch) */
+} /* end subroutine (sysvar_fetch) */
 
 int sysvar_curenum(SV *op,SV_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	if ((rs = sysvar_magic(op,curp,kbuf)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == SYSVAR_MAGIC) {
+	    if (curp->magval == SYSVAR_MAGIC) {
 		sysvar_calls	*callp = callsp(op->callp) ;
 		rs = SR_NOSYS ;
 	        if (op->fl.defaults) {
 		    SV_DC	*dcurp = (SV_DC *) curp->scp ;
 	            rs = sysvar_defenum(op,dcurp,kbuf,klen,vbuf,vlen) ;
 	        } else if (callp->curenum) {
-		    auto co = callp->curenum ;
+		    cauto co = callp->curenum ;
 	            rs = co(op->obj,curp->scp,kbuf,klen,vbuf,vlen) ;
 	        }
-
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysvar_curenum) */
+} /* end subroutine (sysvar_curenum) */
 
 
 /* private subroutines */
@@ -429,7 +420,7 @@ local int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
 	        if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = SYSVAR_MODBNAME ;
 	            cchar	*on = objn ;
@@ -449,13 +440,13 @@ local int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
 	                        if (rs < 0) {
 	                            lm_free(op->obj) ;
 	                            op->obj = nullptr ;
-	                        }
+	                        } /* end if (error) */
 	                    } /* end if (memory-allocation) */
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
 		            op->fl.modload = false ;
 	                    modload_close(lp) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
 	    } /* end if (vecstr_addsyms) */
@@ -464,11 +455,10 @@ local int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
 		modload_close(lp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (vecstr-syms) */
 	return rs ;
-}
-/* end subroutine (sysvar_objloadbegin) */
+} /* end subroutine (sysvar_objloadbegin) */
 
 local int sysvar_objloadend(SV *op) noex {
 	int		rs = SR_OK ;
@@ -484,8 +474,7 @@ local int sysvar_objloadend(SV *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (sysvar_objloadend) */
+} /* end subroutine (sysvar_objloadend) */
 
 local int sysvar_loadcalls(SV *op,vecstr *slp) noex {
 	modload		*lp = op->mlp ;
@@ -531,8 +520,7 @@ local int sysvar_loadcalls(SV *op,vecstr *slp) noex {
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (sysvar_loadcalls) */
+} /* end subroutine (sysvar_loadcalls) */
 
 local int sysvar_socurbegin(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
@@ -543,18 +531,17 @@ local int sysvar_socurbegin(SV *op,SV_CUR *curp) noex {
 		curp->scp = vp ;
 		rs = SR_NOSYS ;
 		if (callp->curbegin) {
-		    auto co = callp->curbegin ;
+		    cauto co = callp->curbegin ;
 		    rs = co(op->obj,curp->scp) ;
 		}
 		if (rs < 0) {
 	    	    lm_free(curp->scp) ;
 	    	    curp->scp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysvar_socurbegin) */
+} /* end subroutine (sysvar_socurbegin) */
 
 local int sysvar_socurend(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
@@ -577,8 +564,7 @@ local int sysvar_socurend(SV *op,SV_CUR *curp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysvar_socurend) */
+} /* end subroutine (sysvar_socurend) */
 
 local int sysvar_defaults(SV *op) noex {
 	int		rs ;
@@ -597,11 +583,10 @@ local int sysvar_defaults(SV *op) noex {
 	    if (rs < 0) {
 		op->fl.defaults = false ;
 		vecstr_finish(op->dlp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (vecstr_start) */
 	return rs ;
-}
-/* end subroutine (sysvar_defaults) */
+} /* end subroutine (sysvar_defaults) */
 
 local int sysvar_procsysdef(SV *op,cchar *fname) noex {
     	cnullptr	np{} ;
@@ -635,8 +620,7 @@ local int sysvar_procsysdef(SV *op,cchar *fname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (lvars) */
 	return rs ;
-}
-/* end subroutine (sysvar_procsysdef) */
+} /* end subroutine (sysvar_procsysdef) */
 
 local int sysvar_defcurbegin(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
@@ -649,8 +633,7 @@ local int sysvar_defcurbegin(SV *op,SV_CUR *curp) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysvar_defcurbegin) */
+} /* end subroutine (sysvar_defcurbegin) */
 
 local int sysvar_defcurend(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
@@ -666,8 +649,7 @@ local int sysvar_defcurend(SV *op,SV_CUR *curp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sysvar_defcurend) */
+} /* end subroutine (sysvar_defcurend) */
 
 local int sysvar_deffetch(SV *op,cc *kp,int kl,SV_DC *dcp,
 		char *vbuf,int vlen) noex {
@@ -704,8 +686,7 @@ local int sysvar_deffetch(SV *op,cc *kp,int kl,SV_DC *dcp,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nul-string) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (sysvar_deffetch) */
+} /* end subroutine (sysvar_deffetch) */
 
 local int sysvar_defenum(SV *op,SV_DC *dcp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
@@ -743,10 +724,9 @@ local int sysvar_defenum(SV *op,SV_DC *dcp,char *kbuf,int klen,
 	    vbuf[0] = '\0' ;
 	}
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (sysvar_defenum) */
+} /* end subroutine (sysvar_defenum) */
 
-static bool isrequired(int i) noex {
+local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
@@ -759,7 +739,6 @@ static bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
