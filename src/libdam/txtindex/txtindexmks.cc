@@ -224,7 +224,7 @@ local int txtindexmks_ctor(txtindexmks *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->eigenp ;
 		    op->eigenp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-strtab) */
 	} /* end if (non-null) */
 	return rs ;
@@ -331,11 +331,11 @@ int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	                            }
 	                            if (rs < 0) {
 	                                txtindexmks_filesend(op) ;
-			            }
+			            } /* end if (error) */
 	                        } /* end if (files-begin) */
 	                        if (rs < 0) {
 	                            txtindexmks_idxdirend(op) ;
-		                }
+		                } /* end if (error) */
 	                    } /* end if (txtindexmks_idxdirbegin) */
 	                } /* end if (check-params) */
 	                if (rs < 0) {
@@ -344,13 +344,13 @@ int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	                        libmem.free(vp) ;
 	                        op->dbname = nullptr ;
 	                    }
-	                }
+	                } /* end if (error) */
 	            } /* end if (memory-allocation) */
 		} /* end if (mkvars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		txtindexmks_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (txtindexmks_ctor) */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (txtindexmks_open) */
@@ -394,7 +394,7 @@ int txtindexmks_close(TIM *op) noex {
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 		rs1 = txtindexmks_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -504,19 +504,19 @@ local int txtindexmks_filesbeginc(TIM *op) noex {
 	int		ai = 0 ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_TAG	 ;
-	if (char *ap ; (rs = libmem.mall((szinc * 2),&ap)) >= 0) {
+	if (char *ap ; (rs = libmem.mall((szinc * 2),&ap)) >= 0) ylikely {
 	    char	*tbuf = (ap + (szinc * ai++)) ;
 	    if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
 	        cmode	om = op->om ;
 	        cchar	*tfn = tbuf ;
 	        char	*rbuf = (ap + (szinc * ai++)) ;
 	        if (type) {
-	            if ((rs = mktmpfile(rbuf,tbuf,om)) >= 0) {
+	            if ((rs = mktmpfile(rbuf,tbuf,om)) >= 0) ylikely {
 	    	        op->fl.created = true ;
 	                tfn = rbuf ;
 		    }
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            bfile	*tfp = op->tagfilep ;
 	            char	ostr[8] = "wc" ;
 	            if (op->fl.ofexcl) strcat(ostr,"e") ;
@@ -546,7 +546,7 @@ local int txtindexmks_filesbeginwait(TIM *op) noex {
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_TAG	 ;
 	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) {
+	if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) ylikely {
 		cint	to_stale = TXTINDEXMKS_INTSTALE ;
 		cint	nrs = SR_EXISTS ;
 		int	to = TXTINDEXMKS_INTOPEN ;
@@ -570,9 +570,9 @@ local int txtindexmks_filesbeginopen(TIM *op,cchar *tfn) noex {
 	int		rs ;
 	char		ostr[8] = "wce" ;
 	bfile		*tfp = op->tagfilep ;
-	if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) {
+	if ((rs = bopen(tfp,tfn,ostr,om)) >= 0) ylikely {
 	    op->fl.created = true ;
-	    if (cchar *cp ; (rs = libmem.strw(tfn,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = libmem.strw(tfn,-1,&cp)) >= 0) ylikely {
 		op->ntagfname = (char *) cp ;
 	    }
 	    if (rs < 0) {
@@ -650,7 +650,7 @@ local int txtindexmks_idxdirend(TIM *op) noex {
 local int txtindexmks_listbegin(TIM *op) noex {
 	int		sz = int(op->pi.tablen * szof(LISTOBJ)) ;
 	int		rs ;
-	if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) {
+	if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
 	    LISTOBJ	*lop = (LISTOBJ *) vp ;
 	    cint	lo = LISTOBJ_OORDERED ;
 	    int		n = 0 ;
@@ -666,7 +666,7 @@ local int txtindexmks_listbegin(TIM *op) noex {
 	    } else {
 	        rs = SR_BUGCHECK ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        sz = TXTINDEXMKS_EIGENSIZE ;
 	        rs = strtab_start(op->eigenp,sz) ;
 	    } /* end if (ok) */
@@ -716,12 +716,10 @@ local int txtindexmks_addtag(TIM *op,TIM_TAG *tagp) noex {
 	int		c = 0 ;
 	cchar		*fmt = "%s:%u,%u\n" ;
 	cchar		*fp ;
-
-/* write out the tag to the tag-file */
-
+	/* write out the tag to the tag-file */
 	tagoff = op->tagoff ;
 	fp = (tagp->fname != nullptr) ? tagp->fname : zerobuf ;
-	if ((rs = bprintf(tfp,fmt,fp,roff,rlen)) >= 0) {
+	if ((rs = bprintf(tfp,fmt,fp,roff,rlen)) >= 0) ylikely {
 	    uint	hv ;
 	    cint	maxkl = MIN(op->pi.maxwlen,KEYBUFLEN) ;
 	    int		kl ;
@@ -729,17 +727,13 @@ local int txtindexmks_addtag(TIM *op,TIM_TAG *tagp) noex {
 	    cchar	*kp ;
 	    char	keybuf[KEYBUFLEN + 1] ;
 	    op->tagoff += rs ;
-
-/* process the keys associated with this tag */
-
+	    /* process the keys associated with this tag */
 	    cint	nkeys = int(tagp->nkeys) ;
 	    for (int i = 0 ; i < nkeys ; i += 1) {
 		cint	minwlen = int(op->pi.minwlen) ;
 	        kp = tagp->keys[i].kp ;
 	        kl = tagp->keys[i].kl ;
-
-/* overflow and maximum word length management */
-
+		/* overflow and maximum word length management */
 	        if (kl >= 0) {
 	            if (kl > maxkl) {
 	                kl = maxkl ;
@@ -748,32 +742,23 @@ local int txtindexmks_addtag(TIM *op,TIM_TAG *tagp) noex {
 	            kl = lenstr(kp,maxkl) ;
 		}
 	        if (kl < minwlen) continue ;
-
-/* convert to lower-case as necessary */
-
+		/* convert to lower-case as necessary */
 	        if (hasuc(kp,kl)) {
 	            strwcpylc(keybuf,kp,kl) ; /* can't overflow (see 'maxkl') */
 	            kp = keybuf ;
 	        }
-
-/* hash it */
-
+		/* hash it */
 	        hv = hash_elf(kp,kl) ;
-
 	        hi = (hv % op->pi.tablen) ;
-
 	        if ((rs = LISTOBJ_ADD((lop+hi),tagoff)) >= 0) {
 	            if (rs != INT_MAX) {
 	                c += 1 ;
 	                op->ti.nkeys += 1 ;
 	            }
 	        }
-
 	        if (rs < 0) break ;
 	    } /* end for (processing keys) */
-
 	} /* end if (bprintf) */
-
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (txtindexmks_addtag) */
 
@@ -781,7 +766,7 @@ local int txtindexmks_mkhash(TIM *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		clists = 0 ; /* return-value */
-	if ((rs = txtindexmks_nhashopen(op)) >= 0) {
+	if ((rs = txtindexmks_nhashopen(op)) >= 0) ylikely {
 	    custime	dt = getustime ;
 	    HDR		hdr{} ;
 	    hdr.vetu[0] = TXTINDEXHDR_VERSION ;
@@ -821,27 +806,27 @@ local int txtindexmks_mkhashwrmain(TIM *op,HDR *hdrp) noex {
 	int		rs1 ;
 	int		off = 0 ;
 	bsize = (ps * 4) ;
-	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) ylikely {
 	    if ((rs = txtindexmks_mkhashwrhdr(op,hdrp,hfp,off)) >= 0) {
 	        off += rs ;
-/* write SDN string */
+		/* write SDN string */
 	        if ((rs >= 0) && (op->pi.sdn != nullptr)) {
 	            hdrp->sdnoff = off ;
 	            rs = filer_writefill(hfp,op->pi.sdn,-1) ;
 	            off += rs ;
 	        }
-/* write SFN string */
+		/* write SFN string */
 	        if ((rs >= 0) && (op->pi.sfn != nullptr)) {
 	            hdrp->sfnoff = off ;
 	            rs = filer_writefill(hfp,op->pi.sfn,-1) ;
 	            off += rs ;
 	        }
-/* write out the lists while creating the offset table */
+		/* write out the lists while creating the offset table */
 	        if (rs >= 0) {
 	            rs = txtindexmks_mkhashwrtab(op,hdrp,hfp,off) ;
 	            off += rs ;
 	        }
-/* make and write out the eigen: string, record, and index tables */
+		/* write out eigen: string, record, and index tables */
 	        if (rs >= 0) {
 	            rs = txtindexmks_mkhashwreigen(op,hdrp,hfp,off) ;
 	            off += rs ;
@@ -903,7 +888,7 @@ local int txtindexmks_mkhashwrtabone(TIM *op,HDR *hdrp,
 	int		wlen = 0 ;
 	(void) hdrp ;
 	lop += i ;
-	if ((rs = LISTOBJ_COUNT(lop)) > 0) {
+	if ((rs = LISTOBJ_COUNT(lop)) > 0) ylikely {
 	    cint	c = rs ;
 	    cint	asize = ((c+1)*szof(int)) ;
 	    if (int *va ; (rs = libmem.mall(asize,&va)) >= 0) {
@@ -941,7 +926,7 @@ local int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 	strtab		*elp = op->eigenp ;
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = strtab_strsize(elp)) >= 0) {
+	if ((rs = strtab_strsize(elp)) >= 0) ylikely {
 	    cint	nskip = TXTINDEXMKS_NSKIP ;
 	    int		essize = rs ;
 	    hdrp->eiskip = nskip ;
@@ -988,9 +973,7 @@ local int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 	            int		eisz = 0 ;
 	            int		eilen ;
 	            int		(*eitab)[3] = nullptr ;
-
 	            eilen = strtab_indlen(elp) ;
-
 	            if ((rs = strtab_indsize(elp)) >= 0) {
 	                eisz = rs ;
 	                if (void *vp ; (rs = libmem.mall(eisz,&vp)) >= 0) {
@@ -999,22 +982,17 @@ local int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 	                    hdrp->eioff = off ;
 	                    hdrp->eilen = eilen ;
 	                    rs = strtab_indmk(elp,eitab,eisz,nskip) ;
-
 	                    if (rs >= 0) {
 	                        rs = filer_write(hfp,eitab,eisz) ;
 	                        off += rs ;
 	                        wlen += rs ;
-	                    }
-
+	                    } /* end if (ok) */
 	                    libmem.free(eitab) ;
 	                } /* end if (memory-allocation) */
 	            } /* end if (indsize) */
-
 	        } /* end if (eigen-index table) */
-
 	    } /* end if (positive) */
 	} /* end if (strtab_strsize) */
-
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (txtindexmks_mkhashwreigen) */
 
@@ -1054,7 +1032,7 @@ local int txtindexmks_nhashclose(TIM *op) noex {
 	    rs1 = u_close(op->nfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->nfd = -1 ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (txtindexmks_nhashclose) */
 
@@ -1062,7 +1040,6 @@ local int txtindexmks_renamefiles(TIM *op) noex {
 	int		rs ;
 	cchar		*ends = ENDIANSTR ;
 	char		hashfname[MAXPATHLEN + 1] ;
-
 	if ((rs = mkfnamesuf2(hashfname,op->dbname,FSUF_IND,ends)) >= 0) {
 	    char	tagfname[MAXPATHLEN + 1] ;
 	    if ((rs = mkfnamesuf1(tagfname,op->dbname,FSUF_TAG)) >= 0) {
@@ -1086,7 +1063,6 @@ local int txtindexmks_renamefiles(TIM *op) noex {
 
 	    } /* end if (ok) */
 	} /* end if (ok) */
-
 	return rs ;
 } /* end subroutine (txtindexmks_renamefiles) */
 
@@ -1148,12 +1124,12 @@ local int txtindexmks_printeigener(TIM *op,printeigen *ap) noex {
 	char		*estab = ap->estab ;
 	int		ersz = ap->ersz ;
 	int		erlen = ap->erlen ;
-	if ((rs = strtab_recmk(edp,ertab,ersz)) >= 0) {
-	    if ((rs = strtab_indsize(edp)) >= 0) {
+	if ((rs = strtab_recmk(edp,ertab,ersz)) >= 0) ylikely {
+	    if ((rs = strtab_indsize(edp)) >= 0) ylikely {
 		int	(*eitab)[3] ;
 		int	eisz = rs ;
 		int	eilen = strtab_indlen(edp) ;
-		if ((rs = libmem.mall(eisz,&eitab)) >= 0) {
+		if ((rs = libmem.mall(eisz,&eitab)) >= 0) ylikely {
 		    int	ns = TXTINDEXMKS_NSKIP ;
 		    if ((rs = strtab_indmk(edp,eitab,eisz,ns)) >= 0) {
 			int	si ;
@@ -1207,9 +1183,9 @@ local int unlinkstale(cchar *fn,int to) noex {
 
 local int mkvars() noex {
 	int		rs ;
-	if ((rs = ucpagesize) >= 0) {
+	if ((rs = ucpagesize) >= 0) ylikely {
 	    var.pagesz = rs ;
-	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	        var.maxpathlen = rs ;
 	    } /* end if (bufsizeget) */
 	} /* end if (uc_pagesize) */
