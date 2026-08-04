@@ -27,12 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<sockaddress.h>
-#include	<serialbuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialcprogmsg.h"
 
@@ -83,18 +83,19 @@ int dialcprogmsg_end(char *mbuf,int mlen,bool f,DMSG_END *sp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (dialcprogmsg_end) */
+} /* end subroutine (dialcprogmsg_end) */
 
 int dialcprogmsg_light(char *mbuf,int mlen,bool f,DMSG_LIGHT *sp) noex {
 	int		rs ;
 	int		rs1 ;
 	if (serialbuf sb ; (rs = sb.start(mbuf,mlen)) >= 0) {
-	    ushort	usw ;
+	    ushort	usw = 0 ;
 	    if (f) { /* read (from object) */
 	        sp->type = dialcprogmsgtype_light ;
 	        sb << sp->type ;
-	        usw = sp->salen1 + sp->salen2 + (2 * szof(ushort)) ;
+	        usw += sp->salen1 ;
+	        usw += sp->salen2 ;
+	        usw += (2 * szof(ushort)) ;
 	        sb << usw ;
 	        sb << sp->salen1 ;
 	        sb << sp->salen2 ;
@@ -112,7 +113,6 @@ int dialcprogmsg_light(char *mbuf,int mlen,bool f,DMSG_LIGHT *sp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (dialcprogmsg_light) */
+} /* end subroutine (dialcprogmsg_light) */
 
 
