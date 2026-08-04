@@ -46,7 +46,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
+#include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -72,7 +72,7 @@
 
 /* local variables */
 
-static cint	inter[4][2] = {
+constexpr int	inter[4][2] = {
 	{ '\050', 0 },			/* G0 */
 	{ '\051', '-' },		/* G1 */
 	{ '*', '.' },			/* G2 */
