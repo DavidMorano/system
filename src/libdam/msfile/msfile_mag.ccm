@@ -1,0 +1,59 @@
+/* msfile_mag MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* object to manipulate a MSFILE file */
+/* version %I% last-modified %G% */
+
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+
+/* revision history:
+
+	= 1999-06-01, David A­D­ Morano
+	This code was originally written.
+
+*/
+
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Object:
+	msfile
+
+	Description:
+	This subroutine maintains a MSFILE file.  This file is used
+	to maintain machine status for nodes in the local machine
+	cluster.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+
+#include	"msfile.h"
+
+export module msfile_mag ;
+
+
+export {
+    template<typename ... Args>
+    inline int msfile_magic(msfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == MSFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (msfile_magic) */
+} /* end export */
+
+
