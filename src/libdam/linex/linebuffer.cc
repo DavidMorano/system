@@ -27,13 +27,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"linebuffer.h"
 
@@ -72,8 +72,7 @@ int linebuffer_start(linebuffer *op) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (linebuffer_start) */
+} /* end subroutine (linebuffer_start) */
 
 int linebuffer_finish(linebuffer *op) noex {
 	int		rs = SR_FAULT ;
@@ -86,11 +85,10 @@ int linebuffer_finish(linebuffer *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->lbuf = nullptr ;
 		op->llen = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (linebuffer_finish) */
+} /* end subroutine (linebuffer_finish) */
 
 
 /* local subroutines */
@@ -108,8 +106,7 @@ linebuffer_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (linebuffer_co::operator) */
+} /* end method (linebuffer_co::operator) */
 
 void linebuffer::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
