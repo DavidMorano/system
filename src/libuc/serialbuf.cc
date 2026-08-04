@@ -200,7 +200,7 @@ int serialbuf_finish(serialbuf *op) noex {
 	        rs = op->i ;
 	        op->i = 0 ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (serialbuf_finish) */
 
