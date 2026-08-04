@@ -48,27 +48,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getostype.h>
-#include	<userinfo.h>
-#include	<mkui.h>		/* |mkuiname(3dam)| */
-#include	<timestr.h>
-#include	<isnot.h>
-#include	<iserror.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getostype.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<mkui.h>		/* LIBU |mkuiname(3dam)| */
+#include	<timestr.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<iserror.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"logfile.h"
 
 #pragma		GCC dependency		"mod/uconstants.ccm"
 
 import uconstants ;			/* |varname(3u)| */
+import logfile_mag ;
 
 /* local defines */
 
@@ -153,8 +154,10 @@ int logfile_userinfo(logfile *op,userinfo *uip,time_t dt,cc *pn,cc *vn) noex {
 	    } /* end if (mkvars) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (logfile_userinfo) */
+} /* end subroutine (logfile_userinfo) */
+
+
+/* local subroutines */
 
 loguser::operator int () noex {
 	int		rs = SR_OK ;
@@ -165,8 +168,7 @@ loguser::operator int () noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end method (loguser::operator) */
+} /* end method (loguser::operator) */
 
 int loguser::first() noex {
 	int		rs ;
@@ -188,8 +190,7 @@ int loguser::first() noex {
 	    wlen += rs ;
 	} /* end block */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end method (loguser::first) */
+} /* end method (loguser::first) */
 
 int loguser::second() noex {
 	int		rs = SR_OK ;
@@ -208,8 +209,7 @@ int loguser::second() noex {
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end method (loguser::second) */
+} /* end method (loguser::second) */
 
 int loguser::third() noex {
 	cint		nlen = var.bangnamelen ;
@@ -227,8 +227,7 @@ int loguser::third() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end method (loguser::third) */
+} /* end method (loguser::third) */
 
 local int mkvars() noex {
 	cchar		*vn = varname.architecture ;
@@ -242,7 +241,6 @@ local int mkvars() noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (mkvars) */
+} /* end subroutine (mkvars) */
 
 
