@@ -28,13 +28,13 @@
 
 *******************************************************************************/
 
-#ifndef	USYSAUXINFO_DARWIN_INCLUDE
-#define	USYSAUXINFO_DARWIN_INCLUDE
+#ifndef	USYSAUXINFODARWIN_INCLUDE
+#define	USYSAUXINFODARWIN_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 
-/* USYSAUXINFO_DARWIN start */
+/* USYSAUXINFODARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
 #include	<clanguage.h>
@@ -47,9 +47,9 @@
 
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
-/* USYSAUXINFO_DARWIN finish */
+/* USYSAUXINFODARWIN finish */
 
 
-#endif /* USYSAUXINFO_DARWIN_INCLUDE */
+#endif /* USYSAUXINFODARWIN_INCLUDE */
 
 
