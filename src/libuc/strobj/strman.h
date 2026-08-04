@@ -30,11 +30,11 @@ typedef	STRMAN		strman ;
 
 EXTERNC_begin
 
-extern int	strman_start(strman *,cchar *,int) noex ;
-extern int	strman_breakfield(strman *,cchar *,cchar **) noex ;
-extern int	strman_span(strman *,cchar *) noex ;
-extern int	strman_whitechr(strman *,int) noex ;	/* skip wht until */
-extern int	strman_finish(strman *) noex ;
+extern int	strman_start		(strman *,cchar *,int) noex ;
+extern int	strman_breakfield	(strman *,cchar *,cchar **) noex ;
+extern int	strman_span		(strman *,cchar *) noex ;
+extern int	strman_whitechr		(strman *,int) noex ;
+extern int	strman_finish		(strman *) noex ;
 
 local inline int strman_whitecolon(strman *sop) noex {
 	return strman_whitechr(sop,':') ;
