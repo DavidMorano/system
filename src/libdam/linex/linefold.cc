@@ -43,19 +43,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<vecobj.h>
-#include	<cfdec.h>
-#include	<ncol.h>		/* |ncolchar(3uc)| */
-#include	<rmx.h>			/* |rmeol(3uc)| */
-#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |iseol(3uc)| */
-#include	<localmisc.h>		/* |NTABCOLS| + |COLUMNS| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<ncol.h>		/* LIBUC |ncolchar(3uc)| */
+#include	<rmx.h>			/* LIBUC |rmeol(3uc)| */
+#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
+#include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |NTABCOLS| + |COLUMNS| */
 
 #include	"linefold.h"
 
@@ -130,7 +130,7 @@ template<typename ... Args>
 local int linefold_magic(linefold *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LINEFOLD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LINEFOLD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (linefold_magic) */
@@ -158,26 +158,26 @@ constexpr int	ntabcols = NTABCOLS ;
 int linefold_start(linefold *op,int cols,int ind,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		nlines = 0 ;
-	if ((rs = linefold_ctor(op,lbuf)) >= 0) {
-	    if ((rs = argcols(cols)) >= 0) {
+	if ((rs = linefold_ctor(op,lbuf)) >= 0) ylikely {
+	    if ((rs = argcols(cols)) >= 0) ylikely {
 	        cint	sz = szof(liner) ;
 		cint	ne = 10 ;
 	        cint	vo = (vecobjm.compact) ;
 		cols = rs ;
-	        if ((rs = vecobj_start(op->llp,sz,ne,vo)) >= 0) {
+	        if ((rs = vecobj_start(op->llp,sz,ne,vo)) >= 0) ylikely {
 		    cint	ll = rmeol(lbuf,llen) ;
 	            if ((rs = linefold_process(op,cols,ind,lbuf,ll)) >= 0) {
 	                nlines = rs ;
-	                op->magic = LINEFOLD_MAGIC ;
-	            }
+	                op->magval = LINEFOLD_MAGIC ;
+	            } /* end if (ok) */
 	            if (rs < 0) {
 		        vecobj_finish(op->llp) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (vecobj_start) */
 	    } /* end if (ok) */
 	    if (rs < 0) {
 		linefold_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (linefold_ctor) */
 	return (rs >= 0) ? nlines : rs ;
 } /* end subroutine (linefold_start) */
@@ -185,7 +185,7 @@ int linefold_start(linefold *op,int cols,int ind,cchar *lbuf,int llen) noex {
 int linefold_finish(linefold *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = linefold_magic(op)) >= 0) {
+	if ((rs = linefold_magic(op)) >= 0) ylikely {
 	    if (op->llp) {
 	        rs1 = vecobj_finish(op->llp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -194,7 +194,7 @@ int linefold_finish(linefold *op) noex {
 		rs1 = linefold_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (linefold_finish) */
@@ -203,9 +203,9 @@ int linefold_get(linefold *op,int li,cchar **rpp) noex {
 	int		rs ;
 	int		ll = 0 ;
 	cchar		*rp = nullptr ;
-	if ((rs = linefold_magic(op)) >= 0) {
+	if ((rs = linefold_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (li >= 0) {
+	    if (li >= 0) ylikely {
 	        void	*vp{} ;
 	        if ((rs = vecobj_get(op->llp,li,&vp)) >= 0) {
 	            liner	*lep = linerp(vp) ;
@@ -224,9 +224,9 @@ int linefold_getln(linefold *op,int li,cchar **rpp) noex {
 	int		rs ;
 	int		ll = 0 ;
 	cchar		*rp = nullptr ;
-	if ((rs = linefold_magic(op)) >= 0) {
+	if ((rs = linefold_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (li >= 0) {
+	    if (li >= 0) ylikely {
 	        void	*vp{} ;
 	        if ((rs = vecobj_get(op->llp,li,&vp)) >= 0) {
 	            liner	*lep = linerp(vp) ;
@@ -245,9 +245,9 @@ int linefold_getln(linefold *op,int li,cchar **rpp) noex {
 
 int linefold_count(linefold *op) noex {
 	int		rs ;
-	if ((rs = linefold_magic(op)) >= 0) {
+	if ((rs = linefold_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (op->llp) {
+	    if (op->llp) ylikely {
 	        rs = vecobj_count(op->llp) ;
 	    }
 	} /* end if (magic) */
@@ -262,7 +262,7 @@ local int linefold_process(linefold *op,int cols,int ind,
 	int		rs ;
 	int		nline = 0 ; /* return-value */
 	if (llen < 0) llen = lenstr(lbuf) ;
-	if (params p ; (rs = params_load(&p,cols,ind)) >= 0) {
+	if (params p ; (rs = params_load(&p,cols,ind)) >= 0) ylikely {
 	    liner	le{} ;
 	    int		sl = llen ;
 	    cchar	*sp = lbuf ;
@@ -367,8 +367,7 @@ local int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	*ncp = ncs ;
 	pl = intconv(cp - sp) ;
 	return pl ;
-}
-/* end subroutine (nextpiece) */
+} /* end subroutine (nextpiece) */
 
 int linefold::start(int cols,int ind,cchar *sp,int sl) noex {
 	return linefold_start(this,cols,ind,sp,sl) ;
@@ -390,7 +389,7 @@ void linefold::dtor() noex {
 
 linefold_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case linefoldmem_count:
 	        rs = linefold_count(op) ;
@@ -447,7 +446,6 @@ cchar *linefold_iter::operator * () noex {
 	    rp = cp ;
 	}
 	return rp ;
-}
-/* end method (linefold_iter::operator) */
+} /* end method (linefold_iter::operator) */
 
 
