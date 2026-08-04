@@ -40,13 +40,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<localmisc.h>		/* |COLUMNS| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
 
 #include	"strlinelen.h"
 
@@ -89,7 +89,7 @@ static cint		maxline = ulibval.maxline ;
 int strlinelen(cchar *sp,int sl,int mlen) noex {
 	int		len = 0 ; /* return-value */
 	if (mlen < 0) mlen = COLUMNS ;
-	if (sp && (sl != 0) && (mlen > 0)) {
+	if (sp && (sl != 0) && (mlen > 0)) ylikely {
 	    if (sl < 0) sl = lenstr(sp,maxline) ;
 	    len = min(sl,mlen) ;
 	    if (cchar *tp = strnchr(sp,len,'\n') ; tp) {
@@ -100,13 +100,11 @@ int strlinelen(cchar *sp,int sl,int mlen) noex {
 	    } /* end if (strnchr) */
 	} /* end if (have stuff) */
 	return len ;
-}
-/* end subroutine (strlinelen) */
+} /* end subroutine (strlinelen) */
 
 int strlinelen(cchar *sp,int sl) noex {
     	cint mcols = (COLUMNS - 30) ;
     	return strlinelen(sp,sl,mcols) ;
-}
-/* end subroutine (strlinelen) */
+} /* end subroutine (strlinelen) */
 
 
