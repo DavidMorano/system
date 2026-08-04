@@ -20,34 +20,31 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<langstate.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<langstate.h>		/* LIBUC */
 
 
-#define	LINEHIST_MAGIC		0x13f3c203
 #define	LINEHIST		struct linehist_head
+#define	LINEHIST_MAGIC		0x13f3c203
 
 
 struct linehist_head {
 	langstate	*lsp ;		/* LANGSTAT pointer */
 	void		*lvp ;		/* line history */
-	uint		magic ;
+	uint		magval ;
 	char		ss[2] ;		/* search-characters */
-} ;
+} ; /* end struct */
 
 typedef LINEHIST	linehist ;
 
 EXTERNC_begin
 
-extern int linehist_start(linehist *,cchar *) noex ;
-extern int linehist_proc(linehist *,int,cchar *,int) noex ;
-extern int linehist_count(linehist *) noex ;
-extern int linehist_get(linehist *,int,int *) noex ;
-extern int linehist_finish(linehist *) noex ;
+extern int linehist_start	(linehist *,cchar *) noex ;
+extern int linehist_proc	(linehist *,int,cchar *,int) noex ;
+extern int linehist_count	(linehist *) noex ;
+extern int linehist_get		(linehist *,int,int *) noex ;
+extern int linehist_finish	(linehist *) noex ;
 
 EXTERNC_end
 
