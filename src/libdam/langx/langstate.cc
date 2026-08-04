@@ -44,17 +44,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<ascii.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"langstate.h"
 
@@ -98,7 +95,7 @@ namespace {
 /* forward references */
 
 template<typename ... Args>
-static int langstate_ctor(langstate *op,Args ... args) noex {
+local int langstate_ctor(langstate *op,Args ... args) noex {
     	LANGSTATE	*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
@@ -107,7 +104,7 @@ static int langstate_ctor(langstate *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (langstate_ctor) */
 
-static int langstate_dtor(langstate *op) noex {
+local int langstate_dtor(langstate *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -116,7 +113,7 @@ static int langstate_dtor(langstate *op) noex {
 } /* end subroutine (langstate_dtor) */
 
 template<typename ... Args>
-static int langstate_magic(langstate *op,Args ... args) noex {
+local int langstate_magic(langstate *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == LANGSTATE_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -224,8 +221,7 @@ int langstate_proc(langstate *op,int ln,int ch) noex {
 	    op->pch = ch ;
 	} /* end if (langstate_magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (langstate_proc) */
+} /* end subroutine (langstate_proc) */
 
 int langstate_procln(langstate *op,int ln,cchar *lp,int ll) noex {
 	int		rs ;
@@ -258,8 +254,7 @@ int langstate_getstat(langstate *op,langstate_info *sbp) noex {
 	    sbp->type = type ;
 	} /* end if (magic) */
 	return (rs >= 0) ? type : rs ;
-}
-/* end subroutine (langstate_getstat) */
+} /* end subroutine (langstate_getstat) */
 
 int langstate_code(langstate *op) noex {
 	int		rs ;
