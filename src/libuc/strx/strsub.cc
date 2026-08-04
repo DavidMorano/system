@@ -38,15 +38,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strstr(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<strn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strstr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strsub.h"
 
@@ -76,17 +76,14 @@
 
 char *strbasesub(cchar *sp,cchar *ss) noex {
 	return strstr(sp,ss) ;
-}
-/* end subroutine (strsub) */
+} /* end subroutine (strsub) */
 
 char *strcasesub(cchar *sp,cchar *ss) noex {
 	return strncasesub(sp,-1,ss) ;
-}
-/* end subroutine (strcasesub) */
+} /* end subroutine (strcasesub) */
 
 char *strfoldsub(cchar *sp,cchar *ss) noex {
 	return strnfoldsub(sp,-1,ss) ;
-}
-/* end subroutine (strfoldsub) */
+} /* end subroutine (strfoldsub) */
 
 
