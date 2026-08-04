@@ -46,7 +46,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* POSIX |gethostid(3c)| */
+#include	<unistd.h>		/* POSIX® */
 #include	<ctime>			/* CSTD */
 #include	<cerrno>		/* CSTD */
 #include	<climits>		/* CSTD |INT_MAX| */
