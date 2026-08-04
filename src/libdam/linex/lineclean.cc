@@ -87,7 +87,7 @@ template<typename ... Args>
 local inline int lineclean_magic(lineclean *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LINECLEAN_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LINECLEAN_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (lineclean_magic) */
@@ -112,7 +112,7 @@ int lineclean_start(LC *op,cchar *sp,int sl,int m,cchar **rpp) noex {
 		    op->clen = sl ;
 		    if ((rs = mklineclean(op->cbuf,op->clen,m,sp,sl)) >= 0) {
 			*rpp = op->cbuf ;
-		        op->magic = LINECLEAN_MAGIC ;
+		        op->magval = LINECLEAN_MAGIC ;
 		    } /* end if (mklineclean) */
 		    if (rs < 0) {
 			lm_free(op->cbuf) ;
@@ -122,7 +122,7 @@ int lineclean_start(LC *op,cchar *sp,int sl,int m,cchar **rpp) noex {
 		} /* end if (memory-acquire) */
 	    } else {
 		*rpp = op->cbuf ;
-		op->magic = LINECLEAN_MAGIC ;
+		op->magval = LINECLEAN_MAGIC ;
 	    } /* end if (zero-length) */
 	    if (rs < 0) {
 		lineclean_dtor(op) ;
@@ -145,7 +145,7 @@ int lineclean_finish(LC *op) noex {
 	        rs1 = lineclean_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (lineclean_finish) */
