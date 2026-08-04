@@ -83,7 +83,7 @@
 
 int wsncolstr(int ntab,int scol,const wchar_t *wsp,int wsl) noex {
     	int		nc = -1 ; /* return-value */
-	if (wsp) {
+	if (wsp) ylikely {
 	    int		col = scol ;
 	    while (wsl-- && *wsp) {
 	        if (*wsp++ == CH_TAB) {
