@@ -77,9 +77,9 @@ typedef ASS		ass ;
 
 EXTERNC_begin
 
-extern int ass_start(ass *) noex ;
-extern int ass_addchr(ass *,int) noex ;
-extern int ass_finish(ass *) noex ;
+extern int ass_start	(ass *) noex ;
+extern int ass_addchr	(ass *,int) noex ;
+extern int ass_finish	(ass *) noex ;
 
 EXTERNC_end
 
