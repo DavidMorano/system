@@ -27,18 +27,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<vecstr.h>
-#include	<ascii.h>
-#include	<sfx.h>
-#include	<six.h>			/* |sisub(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC |sisub(3uc)| */
+#include	<ascii.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"linefilter.h"
 
@@ -80,11 +80,11 @@ local int linefilter_ctor(linefilter *op,Args ... args) noex {
     	LINEFILTER	*hop = op ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->sslp = new(nothrow) vecstr) != np) {
-	        if ((op->sxlp = new(nothrow) vecstr) != np) {
+	    if ((op->sslp = new(nothrow) vecstr) != np) ylikely {
+	        if ((op->sxlp = new(nothrow) vecstr) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-vector) */
 		if (rs < 0) {
@@ -98,7 +98,7 @@ local int linefilter_ctor(linefilter *op,Args ... args) noex {
 
 local int linefilter_dtor(linefilter *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->sxlp) {
 		delete op->sxlp ;
@@ -123,7 +123,7 @@ local int linefilter_dtor(linefilter *op) noex {
 
 int linefilter_start(linefilter *op,cchar *ssfname,cchar *sxfname) noex {
 	int		rs ;
-	if ((rs = linefilter_ctor(op)) >= 0) {
+	if ((rs = linefilter_ctor(op)) >= 0) ylikely {
 	    cint	vn = DEFENTS ;
 	    cint	vo = 0 ;
 	    if ((ssfname != nullptr) && (ssfname[0] != '\0')) {
@@ -135,32 +135,31 @@ int linefilter_start(linefilter *op,cchar *ssfname,cchar *sxfname) noex {
 		    }
 	        }
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        if ((sxfname != nullptr) && (sxfname[0] != '\0')) {
 	            op->fl.sxlist = true ;
 	            if ((rs = vecstr_start(op->sxlp,vn,vo)) >= 0) {
 	                rs = vecstr_loadfile(op->sxlp,true,sxfname) ;
 	                if (rs < 0) {
 	                    vecstr_finish(op->sxlp) ;
-		        }
+		        } /* end if (error) */
 	            }
 	        }
 	        if (rs < 0) {
 	            vecstr_finish(op->sslp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (ok) */
 	    if (rs < 0) {
 		linefilter_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (linefilter_ctor) */
 	return rs ;
-}
-/* end subroutine (linefilter_start) */
+} /* end subroutine (linefilter_start) */
 
 int linefilter_finish(linefilter *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->fl.sxlist) {
 	        op->fl.sxlist = false ;
@@ -178,13 +177,12 @@ int linefilter_finish(linefilter *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (linefilter_finish) */
+} /* end subroutine (linefilter_finish) */
 
 int linefilter_check(linefilter *op,cchar *lbuf,int llen) noex {
 	int		rs = SR_FAULT ;
 	int		f = true ; /* return-value */
-	if (op && lbuf) {
+	if (op && lbuf) ylikely {
 	    int		si ;	/* used-multiple */
 	    cchar	*cp ;	/* used-multiple */
 	    rs = SR_OK ;
@@ -213,8 +211,7 @@ int linefilter_check(linefilter *op,cchar *lbuf,int llen) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (linefilter_check) */
+} /* end subroutine (linefilter_check) */
 
 
 /* local subroutines */
