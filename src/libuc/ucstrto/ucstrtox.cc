@@ -95,12 +95,14 @@ template<> void strtox(cchar *sp,char **epp,int b,int *rp)		noex {
 	            uv >>= (n/2) ;
 		    if (uv || (! bit(v,((n/2)-1)))) {
 			errno = ERANGE ;
+			*rp = INT_MIN ;
 		    }
 		} else {	/* test poitive value */
 	    	    ulong	uv = ulong(v) ;
 	            uv >>= (n/2) ;
 		    if (uv || bit(v,((n/2)-1))) {
 			errno = ERANGE ;
+			*rp = INT_MAX ;
 		    }
 		} /* end if */
 	    } /* end block */
@@ -126,6 +128,7 @@ template<> void strtox(cchar *sp,char **epp,int b,uint *rp)		noex {
 	    uv >>= (n/2) ;
 	    if (uv) {
 		errno = ERANGE ;
+		*rp = UINT_MAX ;
 	    }
 	} /* end if (not-error) */
 } /* end subroutine-template (strtox) */
@@ -133,12 +136,12 @@ template<> void strtox(cchar *sp,char **epp,int b,uint *rp)		noex {
 /* |ulong| */
 template<> void strtox(cchar *sp,char **epp,int b,ulong *rp)		noex {
 	*rp = strtoul(sp,epp,b) ;
-}
+} /* end subroutine-template */
 
 /* |ulonglong| */
 template<> void strtox(cchar *sp,char **epp,int b,ulonglong *rp)	noex {
 	*rp = strtoxull(sp,epp,b) ;
-}
+} /* end subroutine-template */
 
 template<typename T>
 local sysret_t ucstrtox(cchar *sp,cchar **epp,int b,T *rp)		noex {
