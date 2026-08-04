@@ -47,42 +47,43 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucfileop.h>
-#include	<getnodename.h>
-#include	<sigblocker.h>
-#include	<ascii.h>
-#include	<lockfile.h>
-#include	<opentmp.h>
-#include	<strn.h>
-#include	<strw.h>		/* |strwset(3uc)| */
-#include	<strwcpy.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<sigblocker.h>		/* LIBUC */
+#include	<lockfile.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strw.h>		/* LIBUC |strwset(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
 #include	<ncol.h>		/* |ncolchar(3uc)| */
-#include	<mkx.h>
-#include	<mklogid.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |NTABCOLS| + |TIMEBUFLEN| */
+#include	<mkx.h>			/* LIBUC */
+#include	<mklogid.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |NTABCOLS| + |TIMEBUFLEN| */
 
 #include	"logfile.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
+import logfile_mag ;
 
 /* local defines */
 
@@ -188,7 +189,6 @@ constexpr int		sigblocks[] = {
 constexpr int		logidlen	= LOGFILE_LOGIDLEN ;
 constexpr int		linelen		= LOGFILE_LINELEN ;
 constexpr int		userlen		= LOGFILE_USERLEN ;
-
 constexpr bool		f_chmod		= CF_CHMOD ;
 
 
@@ -247,8 +247,7 @@ int logfile_open(logfile *op,cc *lfname,int of,mode_t operm,cc *logid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (logfile_open) */
+} /* end subroutine (logfile_open) */
 
 int logfile_close(logfile *op) noex {
 	int		rs ;
@@ -272,8 +271,7 @@ int logfile_close(logfile *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (logfile_close) */
+} /* end subroutine (logfile_close) */
 
 int logfile_printf(logfile *op,cchar *fmt,...) noex {
 	va_list		ap ;
@@ -284,8 +282,7 @@ int logfile_printf(logfile *op,cchar *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (logfile_printf) */
+} /* end subroutine (logfile_printf) */
 
 int logfile_vprintf(logfile *op,cchar *fmt,va_list ap) noex {
     	cnullptr	np{} ;
@@ -314,8 +311,7 @@ int logfile_vprintf(logfile *op,cchar *fmt,va_list ap) noex {
 	    } /* end if (bufvprintf) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (logfile_vprintf) */
+} /* end subroutine (logfile_vprintf) */
 
 int logfile_setid(logfile *op,cchar *logid) noex {
 	int		rs ;
@@ -323,8 +319,7 @@ int logfile_setid(logfile *op,cchar *logid) noex {
 	    rs = logfile_loadid(op,logid) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (logfile_setid) */
+} /* end subroutine (logfile_setid) */
 
 int logfile_chmod(logfile *op,mode_t operm) noex {
 	int		rs ;
@@ -337,8 +332,7 @@ int logfile_chmod(logfile *op,mode_t operm) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (logfile_chmod) */
+} /* end subroutine (logfile_chmod) */
 
 /* exercise some (minimal) control */
 /* ARGSUSED */
@@ -364,8 +358,7 @@ int logfile_control(logfile *op,int cmd,void *ap) noex {
 	    } /* end switch */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (logfile_control) */
+} /* end subroutine (logfile_control) */
 
 /* maintenance a log file with respect to its length */
 int logfile_checksize(logfile *op,int logsz) noex {
@@ -386,8 +379,7 @@ int logfile_checksize(logfile *op,int logsz) noex {
 	    } /* end if (file-open) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_oversize : rs ;
-}
-/* end subroutine (logfile_checksize) */
+} /* end subroutine (logfile_checksize) */
 
 int logfile_check(logfile *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -408,8 +400,7 @@ int logfile_check(logfile *op,time_t dt) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (logfile_check) */
+} /* end subroutine (logfile_check) */
 
 int logfile_flush(logfile *op) noex {
 	int		rs ;
@@ -419,8 +410,7 @@ int logfile_flush(logfile *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (logfile_flush) */
+} /* end subroutine (logfile_flush) */
 
 int logfile_write(logfile *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -454,13 +444,11 @@ int logfile_write(logfile *op,cchar *sp,int sl) noex {
 	    } /* end if (logfile_mkentry) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (logfile_write) */
+} /* end subroutine (logfile_write) */
 
 int logfile_print(logfile *op,cchar *sbuf,int slen) noex {
 	return logfile_write(op,sbuf,slen) ;
-}
-/* end subroutine (logfile_print) */
+} /* end subroutine (logfile_print) */
 
 
 /* private subroutines */
