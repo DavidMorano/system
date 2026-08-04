@@ -48,10 +48,10 @@ OBJ3= ucnonblock.o ucndelay.o ucfsync.o
 OBJ4= ucttyname.o ucsetappend.o
 OBJ5= ucclose.o
 OBJ6= ucpeek.o ucfpassfd.o
-OBJ7= 
+OBJ7= ucfattach.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o obj5.o obj6.o
+OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o objb.o
 
@@ -155,6 +155,7 @@ ucdescmanip.o:		ucdescmanip.cc		ucdescmanip.h		$(INCS)
 ucdescmiscers.o:	ucdescmiscers.cc	ucdescmiscers.h		$(INCS)
 ucclose.o:		ucclose.cc		ucclose.h		$(INCS)
 uccloseonexec.o:	uccloseonexec.cc	uccloseonexec.h		$(INCS)
+ucfattach.o:		ucfattach.cc		ucfattach.h		$(INCS)
 ucftruncate.o:		ucftruncate.cc		ucftruncate.h		$(INCS)
 ucfminmod.o:		ucfminmod.cc		ucfminmod.h		$(INCS)
 ucfstat.o:		ucfstat.cc		ucfstat.h		$(INCS)
