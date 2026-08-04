@@ -32,13 +32,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -81,7 +81,7 @@ char *strbasename(char *sp) noex {
 	   /* remove trailing slash characters */
 	   while ((sl > 1) && (sp[sl - 1] == '/')) {
 	       sl -= 1 ;
-	   }
+	   } /* end while */
 	   sp[sl] = '\0' ;
 	   /* find the next previous slash character */
 	   for (si = sl ; si > 0 ; si -= 1) {
@@ -91,7 +91,6 @@ char *strbasename(char *sp) noex {
 	   rp = (sp + si) ;
 	} /* end if (non-null) */
 	return rp ;
-}
-/* end subroutine (strbasename) */
+} /* end subroutine (strbasename) */
 
 
