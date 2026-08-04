@@ -93,7 +93,6 @@ import ulibvals ;			/* *nothing-right-now* */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
