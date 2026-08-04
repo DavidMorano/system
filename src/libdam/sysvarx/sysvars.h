@@ -13,12 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<var.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<var.h>			/* LIBUC */
 
 
 #define	SYSVARS		struct sysvars_head
@@ -31,8 +28,8 @@
 
 struct sysvars_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct sysvars_cursor {
@@ -50,7 +47,7 @@ struct sysvars_head {
 	var		*vindp ;	/* variable-index-pointer */
 	time_t		ti_db ;		/* DB mtime */
 	SYSVARS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 } ; /* end struct */
 
