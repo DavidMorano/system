@@ -195,3 +195,4 @@ local int si_copystr(storeitem *sip,uent *uep,strs w,cchar *sp,int sl) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (si_copystr) */
 
+
