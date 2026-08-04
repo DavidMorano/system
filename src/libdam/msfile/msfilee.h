@@ -20,18 +20,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
 #include	<sys/utsname.h>		/* for 'SYS_NMLN' */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 /* object defines */
-#define	MSFILEE_ALL		struct msfilee_all
+#define	MSFILEE			struct msfilee_head
 #define	MSFILEE_LA		struct msfilee_la
 #define	MSFILEE_ATIME		struct msfilee_atime
 #define	MSFILEE_UTIME		struct msfilee_utime
@@ -88,15 +85,15 @@
 #define	MSFILEE_ONODENAME	(MSFILEE_OFLAGS + MSFILEE_LFLAGS)
 #define	MSFILEE_OVERLAST	(MSFILEE_ONODENAME + MSFILEE_LNODENAME)
 
-#define	MSFILEE_SIZE		((MSFILEE_OVERLAST + 3) & (~ 3))
+#define	MSFILEE_SZ		((MSFILEE_OVERLAST + 3) & (~ 3))
 
 
-struct msfilee_all {
-	uint	btime ;			/* node boot time */
-	uint	atime ;			/* access time-stamp */
-	uint	utime ;			/* update time-stamp */
-	uint	dtime ;			/* disable time-stamp */
-	uint	stime ;			/* speed time-stamp */
+struct msfilee_head {
+	uint	btime ;			/* time-stamp boot */
+	uint	atime ;			/* time-stamp access */
+	uint	utime ;			/* time-stamp update */
+	uint	dtime ;			/* time-stamp disable */
+	uint	stime ;			/* time-stamp speed */
 	uint	la[3] ;
 	uint	nproc ;			/* current processes */
 	uint	nuser ;			/* logged-in users */
@@ -105,10 +102,20 @@ struct msfilee_all {
 	uint	speed ;			/* machine speed (relative) */
 	uint	ncpu ;
 	uint	nodehash ;		/* hash of nodename */
-	uint	pid ;			/* daemon PID */
+	uint	sysid ;			/* system ID (host-ID) */
+	uint	pid ;			/* daemon PID (per system) */
 	ushort	flags ;			/* flags */
 	char	nodename[MSFILEE_LNODENAME + 1] ;
-} ;
+} ; /* end struct (msfilee_head) */
+
+#ifdef	__cplusplus
+struct msfilee : msfilee_head {
+	int	wr	(cchar *,int) noex ;
+	int	rd	(char *,int) noex ;
+} ; /* end struct (msfilee) */
+#else
+typedef	MSFILE		msfile ;
+#endif /* __cplusplus */
 
 struct msfilee_la {
 	uint	la[3] ;
@@ -132,14 +139,17 @@ struct msfilee_stime {
 
 EXTERNC_begin
 
-extern int msfilee_all(struct msfilee_all *,int,char *,int) noex ;
+extern int msfilee_proc(msfilee *,int,char *,int) noex ;
+
+EXTERNC_end
+
+#ifdef	COMMENT
 extern int msfilee_atime(struct msfilee_atime *,int,char *,int) noex ;
 extern int msfilee_utime(struct msfilee_utime *,int,char *,int) noex ;
 extern int msfilee_dtime(struct msfilee_dtime *,int,char *,int) noex ;
 extern int msfilee_stime(struct msfilee_stime *,int,char *,int) noex ;
 extern int msfilee_la(struct msfilee_la *,int,char *,int) noex ;
-
-EXTERNC_end
+#endif /* COMMENT */
 
 
 #endif /* MSFILEE_INCLUDE */
