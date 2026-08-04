@@ -45,39 +45,40 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucfileop.h>
-#include	<sigblocker.h>
-#include	<ascii.h>
-#include	<lockfile.h>
-#include	<opentmp.h>
-#include	<strn.h>
-#include	<strw.h>		/* |strwset(3uc)| */
-#include	<strwcpy.h>
-#include	<mkx.h>
-#include	<mklogid.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |COLUMNS| */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<sigblocker.h>		/* LIBUC */
+#include	<ascii.h>		/* LIBUC */
+#include	<lockfile.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strw.h>		/* LIBUC |strwset(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<mklogid.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
 
 #include	"logfile.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
+import logfile_mag ;
 
 /* local defines */
 
