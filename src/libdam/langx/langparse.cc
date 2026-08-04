@@ -41,20 +41,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<string>		/* C++ |string| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<string>		/* C++STD |string(3c++)| */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<shortq.h>
+#include	<shortq.h>		/* LIBUC */
 #include	<ascii.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<deb.hh>		/* |DEBPRINTF| */
+#include	<deb.hh>		/* LIBU |DEBPRINTF| */
 
 #include	"langparse.h"
 
@@ -223,8 +223,7 @@ int langparse_start(langparse *op) noex {
 	} /* end if (langparse_ctor) */
 	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (langparse_start) */
+} /* end subroutine (langparse_start) */
 
 int langparse_finish(langparse *op) noex {
 	int		rs ;
@@ -249,8 +248,7 @@ int langparse_finish(langparse *op) noex {
 	} /* end if (magic) */
 	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (langparse_finish) */
+} /* end subroutine (langparse_finish) */
 
 int langparse_load(langparse *op,cchar *sp,int µsl) noex {
 	int		rs ;
@@ -274,8 +272,7 @@ int langparse_load(langparse *op,cchar *sp,int µsl) noex {
 	} /* end if (non-null) */
 	DEBPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (langparse_load) */
+} /* end subroutine (langparse_load) */
 
 int langparse_remread(langparse *op,short *rbuf,int rlen) noex {
     	cnullptr	np{} ;
@@ -306,8 +303,7 @@ int langparse_remread(langparse *op,short *rbuf,int rlen) noex {
 	} /* end if (non-null) */
 	DEBPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (langparse_remread) */
+} /* end subroutine (langparse_remread) */
 
 
 /* private subroutines */
