@@ -21,20 +21,17 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<fifostr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<fifostr.h>		/* LIBUC */
 
 
+#define	LINECENTER		struct linecenter_head
+#define	LINECENTER_CENT		struct linecenter_center
 #define	LINECENTER_MAGIC	0x88442239
 #define	LINECENTER_DEFLINES	7
 #define	LINECENTER_FNLEN	3
 #define	LINECENTER_DEFPERCENT	0.60
-#define	LINECENTER		struct linecenter_head
-#define	LINECENTER_CENT		struct linecenter_center
 
 
 struct linecenter_center {
@@ -45,7 +42,7 @@ struct linecenter_center {
 struct linecenter_head {
 	cchar		**lines ;
 	fifostr		*sqp ;		/* ?? */
-	uint		magic ;
+	uint		magval ;
 	int		li ;		/* line-index */
 	int		le ;		/* line-extent */
 	int		wc ;		/* word-count */
@@ -58,16 +55,16 @@ typedef	LINECENTER_CENT		linecenter_cent ;
 
 EXTERNC_begin
 
-extern int	linecenter_start(linecenter *,cchar *) noex ;
-extern int	linecenter_addword(linecenter *,cchar *,int) noex ;
-extern int	linecenter_addline(linecenter *,cchar *,int) noex ;
-extern int	linecenter_addlines(linecenter *,cchar *,int) noex ;
-extern int	linecenter_mklinefull(linecenter *,char *,int) noex ;
-extern int	linecenter_mklinepart(linecenter *,char *,int) noex ;
-extern int	linecenter_count(linecenter *) noex ;
-extern int	linecenter_mklines(linecenter *,int,int) noex ;
-extern int	linecenter_getline(linecenter *,int,cchar **) noex ;
-extern int	linecenter_finish(linecenter *) noex ;
+extern int	linecenter_start	(linecenter *,cchar *) noex ;
+extern int	linecenter_addword	(linecenter *,cchar *,int) noex ;
+extern int	linecenter_addline	(linecenter *,cchar *,int) noex ;
+extern int	linecenter_addlines	(linecenter *,cchar *,int) noex ;
+extern int	linecenter_mklinefull	(linecenter *,char *,int) noex ;
+extern int	linecenter_mklinepart	(linecenter *,char *,int) noex ;
+extern int	linecenter_count	(linecenter *) noex ;
+extern int	linecenter_mklines	(linecenter *,int,int) noex ;
+extern int	linecenter_getline	(linecenter *,int,cchar **) noex ;
+extern int	linecenter_finish	(linecenter *) noex ;
 
 EXTERNC_end
 
