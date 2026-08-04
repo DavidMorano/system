@@ -105,7 +105,7 @@ local bool iswwhite(cwchar wch) noex {
 int wsfnext(cwchar *wsp,int wsl,cwchar **rpp) noex {
     	int		rl = -1 ; /* return-value */
 	cwchar		*rp = nullptr ;
-	if (wsp && rpp) {
+	if (wsp && rpp) ylikely {
 	    wchar_t	ch ; /* used-multiple */
 	    while (wsl && *wsp) {
 	        ch = *wsp ;
