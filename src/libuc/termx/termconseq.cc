@@ -43,14 +43,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
-#include	<cstdarg>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"termconseq.h"
 
@@ -87,8 +87,7 @@ int termconseqa(char *dp,int dl,int name,cchar *is,int na,...) noex {
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termconseqa) */
+} /* end subroutine (termconseqa) */
 
 int termconseqva(char *dp,int dl,int name,cchar *is,int na,va_list ap) noex {
 	int		rs = SR_FAULT ;
@@ -131,7 +130,6 @@ int termconseqva(char *dp,int dl,int name,cchar *is,int na,va_list ap) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (termconseqva) */
+} /* end subroutine (termconseqva) */
 
 
