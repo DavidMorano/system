@@ -34,7 +34,7 @@
 /* object defines */
 #define	MSFILE			struct msfile_head
 #define	MSFILE_CUR		struct msfile_cursor
-#define	MSFILE_ENT		MSFILEE_ALL
+#define	MSFILE_ENT		msfilee
 #define	MSFILE_FL		struct msfile_flags
 #define	MSFILE_H		struct msfile_her
 /* other */
@@ -57,7 +57,7 @@ struct msfile_her {
 	uint		nentries ;
 	uint		wtime ;
 	uint		wcount ;
-} ;
+} ; /* end struct */
 
 struct msfile_flags {
 	uint		fileinit:1 ;		/* file init'ed */
@@ -75,11 +75,11 @@ struct msfile_head {
 	entbuf		ebm ;		/* entry-buffer-manager */
 	mapstrint	ni ;		/* nodename index */
 	cchar		*fname ;
-	MSFILE_FL	fl ;
 	MSFILE_H	h ;
 	time_t		ti_open ;		/* file open time */
 	time_t		ti_access ;		/* file access time */
 	time_t		ti_mod ;		/* file modification time */
+	MSFILE_FL	fl ;
 	uint		magval ;
 	int		oflags ;
 	int		pagesize ;
@@ -105,7 +105,7 @@ EXTERNC_begin
 extern int msfile_open(msfile *,cchar *,int,mode_t) noex ;
 extern int msfile_curbegin(msfile *,msfile_cur *) noex ;
 extern int msfile_curend(msfile *,msfile_cur *) noex ;
-extern int msfile_enum(msfile *,msfile_cur *,msfile_ent *) noex ;
+extern int msfile_curenum(msfile *,msfile_cur *,msfile_ent *) noex ;
 extern int msfile_match(msfile *,time_t,cchar *,int,msfile_ent *) noex ;
 extern int msfile_write(msfile *,time_t,cchar *,int,msfile_ent *) noex ;
 extern int msfile_update(msfile *,time_t,msfile_ent *) noex ;
