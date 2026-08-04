@@ -16,14 +16,14 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<termios.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<termios.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"termios_cf.h"
 
@@ -61,8 +61,7 @@ int termios_cfsetispeed(TERMIOS *tp,speed_t speed) noex {
 	    } until ((rs >= 0) || ((rs != SR_INTR) && (rs != SR_NOMEM))) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termios_cfsetispeed) */
+} /* end subroutine (termios_cfsetispeed) */
 
 int termios_cfsetospeed(TERMIOS *tp,speed_t speed) noex {
 	int		rs = SR_FAULT ;
@@ -74,7 +73,6 @@ int termios_cfsetospeed(TERMIOS *tp,speed_t speed) noex {
 	    } until ((rs >= 0) || ((rs != SR_INTR) && (rs != SR_NOMEM))) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (termios_cfsetospeed) */
+} /* end subroutine (termios_cfsetospeed) */
 
 
