@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<termios.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<termios.h>		/* LINUC */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
