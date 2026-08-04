@@ -13,12 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<linecleanopt.h>	/* line-cleanint options */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<linecleanopt.h>	/* LIBUC line-cleanint options */
 
 
 #define	LINECLEAN		struct lineclean_head
@@ -35,7 +32,7 @@ struct lineclean_head {
 	char		*cbuf ;
 	int		clen ;
 	LINECLEAN_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct (lineclean_head) */
 
 #ifdef	__cplusplus
@@ -62,12 +59,12 @@ struct lineclean : lineclean_head {
 	lineclean() noex {
 	    finish	(this,linecleanmem_finish) ;
 	    cbuf = nullptr ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	int start(cchar *,int,int,cchar **) noex ;
 	void dtor() noex ;
 	destruct lineclean() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (lineclean) */
 #else
