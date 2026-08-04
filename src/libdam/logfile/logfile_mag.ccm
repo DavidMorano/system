@@ -1,0 +1,54 @@
+/* logfile_mag MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* perform logging operations on a file */
+/* version %I% last-modified %G% */
+
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+
+/* revision history:
+
+	= 1999-06-01, David A­D­ Morano
+	This code was originally written.
+
+*/
+
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Object:
+	logfile
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+
+#include	"logfile.h"
+
+export module logfile_mag ;
+
+
+export {
+    template<typename ... Args>
+    inline int logfile_magic(logfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == LOGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (logfile_magic) */
+} /* end export */
+
+
