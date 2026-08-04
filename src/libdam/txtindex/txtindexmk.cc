@@ -145,7 +145,7 @@ local int txtindexmk_ctor(txtindexmk *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->mlp ;
 		    op->mlp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
@@ -424,9 +424,9 @@ local int txtindexmk_loadcalls(TIM *op,vecstr *slp) noex {
 
 local int mkvars() noex {
 	int		rs ;
-	if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
+	if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 	    var.maxhostlen = rs ;
-	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 		var.maxpathlen = rs ;
 	    }
 	}
