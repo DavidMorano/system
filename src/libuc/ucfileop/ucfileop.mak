@@ -49,15 +49,18 @@ OBJ5= ucresolvepath.o ucrealpath.o
 OBJ6= ucunlink.o ucremove.o uctruncate.o
 OBJ7= ucmkdir.o ucrmdir.o ucfilemode.o
 
+OBJ8= ucdetach.o
+OBJ9=
+
 OBJA= obj0.o obj1.o obj2.o obj3.o 
 OBJB= obj4.o obj5.o obj6.o obj7.o
+OBJC= obj8.o
 
-OBJ= obja.o objb.o
+OBJ= obja.o objb.o objc.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -144,10 +147,29 @@ obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj8.o:			$(OBJ8)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj9.o:			$(OBJ9)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj10.o:		$(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj11.o:		$(OBJ11)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objc.o:			$(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -155,6 +177,7 @@ prefixfn.o:		prefixfn.cc	prefixfn.h		$(INCS)
 
 ucaccess.o:		ucaccess.cc				$(INCS)
 ucchown.o:		ucchown.cc				$(INCS)
+ucdetach.o:		ucdetach.cc	ucdetach.h		$(INCS)
 ucfilemode.o:		ucfilemode.cc				$(INCS)
 ucfiletimes.o:		ucfiletimes.cc	ucfiletimes.h		$(INCS)
 uclink.o:		uclink.cc				$(INCS)
