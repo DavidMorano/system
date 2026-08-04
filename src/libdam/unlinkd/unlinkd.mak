@@ -49,7 +49,7 @@ OBJ= $(OBJA)
 
 
 INCDIRS=
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -143,7 +143,6 @@ obj.o:			$(OBJ)
 
 
 unlinkder.o:		unlinker.cc	rmermsg.h		$(INCS)
-
 rmermsg.o:		rmermsg.cc	rmermsg.h		$(INCS)
 
 
