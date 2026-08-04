@@ -27,22 +27,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<estrings.h>
-#include	<fifostr.h>
-#include	<ascii.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<fifostr.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<ascii.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"linecenter.h"
 
@@ -113,7 +113,7 @@ template<typename ... Args>
 local inline int linecenter_magic(linecenter *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LINECENTER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LINECENTER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (linecenter_magic) */
@@ -128,9 +128,7 @@ local int	lenpercent(int,double) noex ;
 /* local variables */
 
 constexpr int		fnlen = LINECENTER_FNLEN ;
-
 constexpr double	defpercent = LINECENTER_DEFPERCENT ;
-
 cbool			f_comment = false ;
 
 
@@ -142,27 +140,26 @@ cbool			f_comment = false ;
 int linecenter_start(LC *op,cc *fn) noex {
 	cint		ne = LINECENTER_DEFLINES ;
 	int		rs ;
-	if ((rs = linecenter_ctor(op,fn)) >= 0) {
-	    if ((rs = sncpy(op->fn,fnlen,fn)) >= 0) {
-	        if ((rs = fifostr_start(op->sqp)) >= 0) {
+	if ((rs = linecenter_ctor(op,fn)) >= 0) ylikely {
+	    if ((rs = sncpy(op->fn,fnlen,fn)) >= 0) ylikely {
+	        if ((rs = fifostr_start(op->sqp)) >= 0) ylikely {
 	            cint	sz = (ne + 1) * szof(cchar **) ;
-		    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
+		    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 			op->lines = ccharpp(vp) ;
 	                op->le = ne ;
-	                op->magic = LINECENTER_MAGIC ;
-	            }
+	                op->magval = LINECENTER_MAGIC ;
+	            } /* end if (memory-acquire) */
 	            if (rs < 0) {
 	                fifostr_finish(op->sqp) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (fifostr_start) */
 	    } /* end if (sncpy) */
 	    if (rs < 0) {
 		linecenter_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (linecenter_ctor) */
 	return rs ;
-}
-/* end subroutine (linecenter_start) */
+} /* end subroutine (linecenter_start) */
 
 int linecenter_finish(LC *op) noex {
 	int		rs ;
@@ -190,16 +187,15 @@ int linecenter_finish(LC *op) noex {
 		rs1 = linecenter_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (linecenter_magic) */
 	return rs ;
-}
-/* end subroutine (linecenter_finish) */
+} /* end subroutine (linecenter_finish) */
 
 int linecenter_addword(LC *op,cc *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = linecenter_magic(op,lbuf)) >= 0) {
+	if ((rs = linecenter_magic(op,lbuf)) >= 0) ylikely {
 	    if (llen < 0) llen = lenstr(lbuf) ;
 	    if (llen > 0) {
 	        c += 1 ;
@@ -211,13 +207,12 @@ int linecenter_addword(LC *op,cc *lbuf,int llen) noex {
 	    }
 	} /* end if (linecenter_magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (linecenter_addword) */
+} /* end subroutine (linecenter_addword) */
 
 int linecenter_addline(LC *op,cc *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = linecenter_magic(op,lbuf)) >= 0) {
+	if ((rs = linecenter_magic(op,lbuf)) >= 0) ylikely {
 	    int		sl ;
 	    cchar	*sp ;
 	    cchar	*cp ;
@@ -236,13 +231,12 @@ int linecenter_addline(LC *op,cc *lbuf,int llen) noex {
 	    } /* end for */
 	} /* end if (linecenter_magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (linecenter_addline) */
+} /* end subroutine (linecenter_addline) */
 
 int linecenter_addlines(LC *op,cc *lbuf,int llen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = linecenter_magic(op,lbuf)) >= 0) {
+	if ((rs = linecenter_magic(op,lbuf)) >= 0) ylikely {
 	    int		sl, cl ;
 	    cchar	*tp, *sp, *cp ;
 	    if (llen < 0) llen = lenstr(lbuf) ;
@@ -266,23 +260,20 @@ int linecenter_addlines(LC *op,cc *lbuf,int llen) noex {
 	    } /* end while (reading lines) */
 	} /* end if (linecenter_magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (linecenter_addlines) */
+} /* end subroutine (linecenter_addlines) */
 
 int linecenter_mklinefull(LC *op,char *lbuf,int llen) noex {
 	return linecenter_mkline(op,false,lbuf,llen) ;
-}
-/* end subroutine (linecenter_mklinefull) */
+} /* end subroutine (linecenter_mklinefull) */
 
 int linecenter_mklinepart(LC *op,char *lbuf,int llen) noex {
 	return linecenter_mkline(op,true,lbuf,llen) ;
-}
-/* end subroutine (linecenter_mklinepart) */
+} /* end subroutine (linecenter_mklinepart) */
 
 int linecenter_getline(LC *op,int i,cchar **lpp) noex {
 	int		rs ;
 	int		len = 0 ; /* return-value */
-	if ((rs = linecenter_magic(op,lpp)) >= 0) {
+	if ((rs = linecenter_magic(op,lpp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (i >= 0) {
 		*lpp = nullptr ;
@@ -296,17 +287,16 @@ int linecenter_getline(LC *op,int i,cchar **lpp) noex {
 	    } /* end if (OK) */
 	} /* end if (linecenter_magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (linecenter_getline) */
+} /* end subroutine (linecenter_getline) */
 
 int linecenter_mklines(LC *op,int lwidth,int lbrk) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = linecenter_magic(op)) >= 0) {
+	if ((rs = linecenter_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (lwidth >= 1) {
-	        if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
+	    if (lwidth >= 1) ylikely {
+	        if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 	            cint	llen = rs ;
 	            int		linetmplen ;
 	            if (lbrk <= 0) {
@@ -338,15 +328,14 @@ int linecenter_mklines(LC *op,int lwidth,int lbrk) noex {
 	    } /* end if (valid) */
 	} /* end if (linecenter_magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (linecenter_mklines) */
+} /* end subroutine (linecenter_mklines) */
 
 
 /* private subroutines */
 
 local int linecenter_storeline(LC *op,cc *lbuf,int llen) noex {
 	int		rs = SR_INVALID ;
-	if (llen >= 0) {
+	if (llen >= 0) ylikely {
 	    rs = SR_OK ;
 	    if ((op->li + 1) >= op->le) {
 	        int	sz ;
@@ -363,19 +352,18 @@ local int linecenter_storeline(LC *op,cc *lbuf,int llen) noex {
 	            op->lines[op->li] = cp ;
 	            op->li += 1 ;
 	        }
-	    } /* end if */
+	    } /* end if (ok) */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (linecenter_storeline) */
+} /* end subroutine (linecenter_storeline) */
 
 local int linecenter_mkline(LC *op,int f_part,char *lbuf,int llen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ; /* return-value */
-	if ((rs = linecenter_magic(op,lbuf)) >= 0) {
+	if ((rs = linecenter_magic(op,lbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (llen >= 1) {
+	    if (llen >= 1) ylikely {
 		fifostr		*sqp = op->sqp ;
 	        int		wl, nl ;
 	        int		ql = 0 ;
@@ -443,8 +431,7 @@ local int linecenter_mkline(LC *op,int f_part,char *lbuf,int llen) noex {
 	    } /* end if (valid) */
 	} /* end if (linecenter_magic) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (linecenter_mkline) */
+} /* end subroutine (linecenter_mkline) */
 
 local int linecenter_hasbrk(LC *op,int lwidth,int brklen) noex {
 	int		rs = SR_OK ;
@@ -474,14 +461,12 @@ local int linecenter_hasbrk(LC *op,int lwidth,int brklen) noex {
 	    } /* end for */
 	} /* end if (greater) */
 	return (rs >= 0) ? tmplen : rs ;
-}
-/* end subroutine (linecenter_hasbrk) */
+} /* end subroutine (linecenter_hasbrk) */
 
 local int lenpercent(int len,double percent) noex {
 	double		flen = len ;
 	flen *= percent ;
 	return int(flen) ;
-}
-/* end subroutine (lenpercent) */
+} /* end subroutine (lenpercent) */
 
 
