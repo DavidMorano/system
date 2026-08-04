@@ -484,7 +484,7 @@ local int recarr_extend(recarr *op,int n) noex {
 	        op->va = (void **) nva ;
 	        op->n = nn ;
 		op->va[op->i] = nullptr ;
-	    }
+	    } /* end if (ok) */
 	} /* end if */
 	return rs ;
 } /* end subroutine (recarr_extend) */
