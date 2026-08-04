@@ -43,7 +43,7 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
-#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<new>			/* C++STD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -82,7 +82,7 @@ import libutil ;			/* |lenstr(3u)| */
 #define	MSGID_FSA	"msgida"
 #define	MSGID_FSB	"msgidb"
 
-#define	MSGID_FLID	(MSGID_MAGICSIZE + 4)
+#define	MSGID_FLID	(MSGID_MAGICSZ + 4)
 #define	MSGID_FLHEAD	(3 * 4)
 #define	MSGID_FLTOP	(MSGID_FLID + MSGID_FLHEAD)
 
@@ -90,8 +90,8 @@ import libutil ;			/* |lenstr(3u)| */
 #define	MSGID_FOHEAD	(MSGID_FOID + MSGID_FLID)
 #define	MSGID_FOTAB	(MSGID_FOHEAD + MSGID_FLHEAD)
 
-#define	MSGID_BUFSIZE	(64 * 1024)
-#define	MSGID_READSIZE	(16 * 1024)
+#define	MSGID_BUFSZ	(64 * 1024)
+#define	MSGID_READSZ	(16 * 1024)
 
 #define	MSGID_FBUFLEN	(MSGID_FLTOP + 9)
 
@@ -115,7 +115,6 @@ import libutil ;			/* |lenstr(3u)| */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -210,7 +209,7 @@ local uint	keyhash(msgid_key *) noex ;
 /* local variables */
 
 static vars	var ;
-cint		magsz = MSGID_MAGICSIZE ;
+cint		magsz = MSGID_MAGICSZ ;
 cbool		f_creat = CF_CREAT ;
 cbool		f_hash = CF_HASH ;
 
@@ -1043,7 +1042,7 @@ local int msgid_searchemptyrange(msgid *op,int ei,int nmax,
 
 /* buffer mangement stuff */
 local int msgid_bufbegin(msgid *op) noex {
-	cint		bsz =  MSGID_BUFSIZE ;
+	cint		bsz =  MSGID_BUFSZ ;
 	int		rs ;
 	op->b.off = 0 ;
 	op->b.len = 0 ;
@@ -1087,7 +1086,7 @@ local int msgid_bufload(msgid *op,int roff,int rlen,char **rpp) noex {
 	    if ((boff >= op->b.off) && (rext <= bend)) {
 	        foff = op->b.off + op->b.len ;
 	        rbuf = op->b.mbuf + op->b.len ;
-	        ext = roff + max(rlen,MSGID_READSIZE) ;
+	        ext = roff + max(rlen,MSGID_READSZ) ;
 	        fext = uceil(ext,op->pagesz) ;
 	        if (fext > bend) {
 	            fext = bend ;
@@ -1106,7 +1105,7 @@ local int msgid_bufload(msgid *op,int roff,int rlen,char **rpp) noex {
 	        bend = roff + op->b.mlen ;
 	        foff = roff ;
 	        rbuf = op->b.mbuf ;
-	        ext = roff + max(rlen,MSGID_READSIZE) ;
+	        ext = roff + max(rlen,MSGID_READSZ) ;
 	        fext = uceil(ext,op->pagesz) ;
 	        if (fext > bend) {
 	            fext = bend ;
@@ -1172,7 +1171,7 @@ local int msgid_writehead(msgid *op) noex {
 } /* end subroutine (msgid_writehead) */
 
 local int filemagic(MSGID_FM *mp,cfm fm, char *mbuf) noex {
-    	cint		msz = MSGID_MAGICSIZE ;
+    	cint		msz = MSGID_MAGICSZ ;
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (mp && mbuf) ylikely {
