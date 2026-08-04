@@ -13,7 +13,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<strings.h>		/* CSTD |str{x}cmp(3c)| */
+#include	<strings.h>		/* BSD |str{x}cmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
