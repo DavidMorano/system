@@ -20,14 +20,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
-#define	LINEFOLD_MAGIC		0x88431773
 #define	LINEFOLD		struct linefold_head
 #define	LINEFOLD_FL		struct linefold_flags
+#define	LINEFOLD_MAGIC		0x88431773
 #define	LINEFOLD_MCARRIAGE	0x0001
 
 
@@ -38,7 +38,7 @@ struct linefold_flags {
 struct linefold_head {
 	vecobj		*llp ;
 	LINEFOLD_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 #ifdef	__cplusplus
@@ -96,7 +96,7 @@ struct linefold : linefold_head {
 	linefold() noex {
 	    count(this,linefoldmem_count) ;
 	    finish(this,linefoldmem_finish) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ;
 	linefold(const linefold &) = delete ;
 	linefold &operator = (const linefold &) = delete ;
@@ -116,7 +116,7 @@ struct linefold : linefold_head {
 	} ;
 	void dtor() noex ;
 	destruct linefold() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (linefold) */
 #else	/* __cplusplus */
@@ -127,11 +127,11 @@ typedef	LINEFOLD_FL	linefold_fl ;
 
 EXTERNC_begin
 
-extern int linefold_start(linefold *,int,int,cchar *,int) noex ;
-extern int linefold_get(linefold *,int,cchar **) noex ;
-extern int linefold_getln(linefold *,int,cchar **) noex ;
-extern int linefold_count(linefold *) noex ;
-extern int linefold_finish(linefold *) noex ;
+extern int linefold_start	(linefold *,int,int,cchar *,int) noex ;
+extern int linefold_get		(linefold *,int,cchar **) noex ;
+extern int linefold_getln	(linefold *,int,cchar **) noex ;
+extern int linefold_count	(linefold *) noex ;
+extern int linefold_finish	(linefold *) noex ;
 
 EXTERNC_end
 
