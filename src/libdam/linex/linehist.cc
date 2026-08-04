@@ -40,14 +40,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<vector>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<vector>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"linehist.h"
 
@@ -99,7 +99,7 @@ local int linehist_ctor(linehist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->lvp = nullptr ;
 	    if ((op->lsp = new(nothrow) langstate) != np) ylikely {
 		rs = SR_OK ;
@@ -124,7 +124,7 @@ template<typename ... Args>
 local inline int linehist_magic(linehist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LINEHIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LINEHIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (linehist_magic) */
@@ -141,15 +141,15 @@ local inline int linehist_magic(linehist *op,Args ... args) noex {
 int linehist_start(linehist *op,cchar *ss) noex {
 	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = linehist_ctor(op,ss)) >= 0) {
+	if ((rs = linehist_ctor(op,ss)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (ss[0]) {
+	    if (ss[0]) ylikely {
 		rs = SR_NOMEM ;
-	        if (ivec *lvp ; (lvp = new(nothrow) ivec) != np) {
+	        if (ivec *lvp ; (lvp = new(nothrow) ivec) != np) ylikely {
 	            op->lvp = lvp ;
-	            if ((rs = langstate_start(op->lsp)) >= 0) {
+	            if ((rs = langstate_start(op->lsp)) >= 0) ylikely {
 	                strncpy(op->ss,ss,2) ;
-	                op->magic = LINEHIST_MAGIC ;
+	                op->magval = LINEHIST_MAGIC ;
 	            } /* end if (langstate_start) */
 	            if (rs < 0) {
 		        delete lvp ;
@@ -162,13 +162,12 @@ int linehist_start(linehist *op,cchar *ss) noex {
 	    }
 	} /* end if (linehist_ctor) */
 	return rs ;
-}
-/* end subroutine (linehist_start) */
+} /* end subroutine (linehist_start) */
 
 int linehist_finish(linehist *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = linehist_magic(op)) >= 0) {
+	if ((rs = linehist_magic(op)) >= 0) ylikely {
 	    if (op->lvp) {
 	        ivec *lvp = ivecp(op->lvp) ;
 	        delete lvp ;
@@ -182,18 +181,17 @@ int linehist_finish(linehist *op) noex {
 		rs1 = linehist_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (linehist_finish) */
+} /* end subroutine (linehist_finish) */
 
 int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	if ((rs = linehist_magic(op,sp)) >= 0) {
-	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) {
+	if ((rs = linehist_magic(op,sp)) >= 0) ylikely {
+	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) ylikely {
 	        cint	sch0 = mkchar(op->ss[0]) ;
 	        cint	sch1 = mkchar(op->ss[1]) ;
 	        while ((rs >= 0) && sl && *sp) {
@@ -230,32 +228,30 @@ int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (linehist_proc) */
+} /* end subroutine (linehist_proc) */
 
 int linehist_count(linehist *op) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	if ((rs = linehist_magic(op)) >= 0) {
-	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) {
+	if ((rs = linehist_magic(op)) >= 0) ylikely {
+	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) ylikely {
 	        c = intconv(lvp->size()) ;
 	    } else {
 	        rs = SR_BUGCHECK ;
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (linehist_count) */
+} /* end subroutine (linehist_count) */
 
 int linehist_get(linehist *op,int i,int *lnp) noex {
 	cnullptr	np{} ;
 	int		rs ;
 	int		type = 0 ; /* return-value */
-	if ((rs = linehist_magic(op,lnp)) >= 0) {
+	if ((rs = linehist_magic(op,lnp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (i >= 0) {
-	        if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) {
+	    if (i >= 0) ylikely {
+	        if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) ylikely {
 	            cint	len = intconv(lvp->size()) ;
 	            if (i < len) {
 	                item	vi = lvp->at(i) ;
@@ -270,7 +266,6 @@ int linehist_get(linehist *op,int i,int *lnp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? type : rs ;
-}
-/* end subroutine (linehist_get) */
+} /* end subroutine (linehist_get) */
 
 
