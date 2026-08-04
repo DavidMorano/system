@@ -13,13 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/socket.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<sockaddress.h>
+#include	<sys/socket.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sockaddress.h>		/* LIBUC */
 
 
 /* flags */
@@ -38,14 +35,14 @@ enum dialcprogmsgtypes {
 	dialcprogmsgtype_light,
 	dialcprogmsgtype_nodename,
 	dialcprogmsgtype_overlast
-} ;
+} ; /* end enum */
 
 struct dialcprogmsg_end {
 	uchar		type ;
 	ushort		len ;
 	ushort		flags ;
 	int		opts ;
-} ;
+} ; /* end struct */
 
 struct dialcprogmsg_light {
 	uchar		type ;
@@ -54,12 +51,12 @@ struct dialcprogmsg_light {
 	ushort		salen2 ;
 	SOCKADDRESS	saout ;
 	SOCKADDRESS	saerr ;
-} ;
+} ; /* end struct */
 
 EXTERNC_begin
 
-extern int dialcprogmsg_end(char *,int,int,DIALCPROGMSG_END *) noex ;
-extern int dialcprogmsg_light(char *,int,int,DIALCPROGMSG_LIGHT *) noex ;
+extern int dialcprogmsg_end	(char *,int,int,DIALCPROGMSG_END *) noex ;
+extern int dialcprogmsg_light	(char *,int,int,DIALCPROGMSG_LIGHT *) noex ;
 
 EXTERNC_end
 
