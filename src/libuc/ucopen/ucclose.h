@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* get random data from the system */
+/* interface component for UNIX® library-3c */
 /* version %I% last-modified %G% */
 
 
