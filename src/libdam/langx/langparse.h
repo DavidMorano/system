@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>		/* |CHAR_BIT| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<limits.h>		/* CSTD |CHAR_BIT| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	LANGPARSE		struct langparse_head
