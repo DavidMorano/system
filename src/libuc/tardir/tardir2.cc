@@ -31,22 +31,24 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdio>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<stdexcept>
-#include	<vector>
-#include	<string>
-#include	<string_view>
-#include	<usyscalls.h>		/* |u_stat(3u)| */
-#include	<strnul.hh>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
-#include	<dprint.hh>		/* debugging */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<stdexcept>		/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<string>		/* C++STD */
+#include	<string_view>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |u_stat(3u)| */
+#include	<strnul.hh>		/* LIBU */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU debugging */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -97,7 +99,7 @@ int vecent::istart(mainv arr) noex {
     	int		rs = SR_OK ;
 	int		c = 0 ;
     	magval = vecent_magicval ;
-	if (arr) {
+	if (arr) ylikely {
 	    rs = load(arr) ;
 	    c = rs ;
 	} /* end if (non-null) */
@@ -107,7 +109,7 @@ int vecent::istart(mainv arr) noex {
 int vecent::load(mainv arr) noex {
     	int		rs ;
 	int		c = 0 ;
-	if ((rs = magic(arr)) >= 0) {
+	if ((rs = magic(arr)) >= 0) ylikely {
 	    rs = SR_OK ;
 	    for (int i = 0 ; arr[i] ; i += 1) {
 		cchar *dn = arr[i] ;
@@ -124,7 +126,7 @@ int vecent::load(mainv arr) noex {
 
 int vecent::ifinish() noex {
     	int		rs ;
-	if ((rs = magic) >= 0) {
+	if ((rs = magic) >= 0) ylikely {
     	    magval = 0 ;
 	} /* end if (vecent_magic) */
     	return rs ;
@@ -133,9 +135,9 @@ int vecent::ifinish() noex {
 int vecent::add(cchar *sp,int 탎l) noex {
     	int		rs ;
 	int		c = 0 ; /* return-value */
-	if ((rs = magic(sp)) >= 0) {
+	if ((rs = magic(sp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
 		strnul dn(sp,sl) ;
 		if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
 		    rs = SR_NOTDIR ;
@@ -156,7 +158,7 @@ int vecent::add(const ustat *sbp,cchar *dnp,int 킺nl) noex {
 	    strnul s(dnp,킺nl) ;
 	    DPRINTF("ent s=%s\n",ccp(s)) ;
 	}
-	if (int dnl ; sbp && ((dnl = getlenstr(dnp,킺nl)) >= 0)) {
+	if (int dnl ; sbp && ((dnl = getlenstr(dnp,킺nl)) >= 0)) ylikely {
 	    rs = SR_INVALID ;
 	    if (dnl > 0) {
 	        if (vecent_ent e ; (rs = e.load(sbp,dnp,dnl)) >= 0) {
@@ -176,7 +178,7 @@ int vecent::add(const ustat *sbp,cchar *dnp,int 킺nl) noex {
 int vecent::icount() noex {
     	int		rs ;
 	int		c = 0 ;
-	if ((rs = magic) >= 0) {
+	if ((rs = magic) >= 0) ylikely {
 	    csize cnt = size() ;
 	    c = intconv(cnt) ;
 	} /* end if (vecent_magic) */
@@ -186,7 +188,7 @@ int vecent::icount() noex {
 int vecent::iaudit() noex {
     	int		rs ;
 	int		c = 0 ;
-	if ((rs = magic) >= 0) {
+	if ((rs = magic) >= 0) ylikely {
 	    csize cnt = size() ;
 	    c = intconv(cnt) ;
 	} /* end if (vecent_magic) */
@@ -196,7 +198,7 @@ int vecent::iaudit() noex {
 int vecent::get(int idx,ustat *sbp,cchar **rpp) noex {
     	int		rs = SR_INVALID ;
 	DPRINTF("ent idx=%d\n",idx) ;
-	if (idx >= 0) {
+	if (idx >= 0) ylikely {
 	    csize cnt = size() ;
 	    DPRINTF("cnt=%ld\n",cnt) ;
 	    if (cint c = intconv(cnt) ; idx < c) {
@@ -263,7 +265,7 @@ int vecent_ent::load(const ustat *sbp,cchar *dnp,int 킺nl) noex {
     	int		rs = SR_FAULT ;
 	if (int dnl ; (dnl = getlenstr(dnp,킺nl)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (dnl > 0) {
+	    if (dnl > 0) ylikely {
     	        strview dn(dnp,dnl) ;
 	        dev = sbp->st_dev ;
 	        ino = sbp->st_ino ;
