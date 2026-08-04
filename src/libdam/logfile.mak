@@ -40,10 +40,12 @@ MODS +=
 LIBS +=
 
 
+DEPS= logfile_mag.o
+
 OBJ0= logfile_prime.o 
 OBJ1= logfile_printfold.o 
 OBJ2= logfile_userinfo.o
-OBJ3= logfile_copylock.o
+OBJ3= logfile_copylock.o $(DEPS)
 
 OBJA= obj0.o obj1.o
 OBJB= obj2.o obj3.o
@@ -134,9 +136,10 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-logfile_prime.o:	logfile_prime.cc		$(INCS)
-logfile_printfold.o:	logfile_printfold.cc		$(INCS)
-logfile_userinfo.o:	logfile_userinfo.cc		$(INCS)
-logfile_copylock.o:	logfile_copylock.cc		$(INCS)
+logfile_prime.o:	logfile_prime.cc	$(DEPS)		$(INCS)
+logfile_printfold.o:	logfile_printfold.cc	$(DEPS)		$(INCS)
+logfile_userinfo.o:	logfile_userinfo.cc	$(DEPS)		$(INCS)
+logfile_copylock.o:	logfile_copylock.cc	$(DEPS)		$(INCS)
+logfile_mag.o:		logfile_mag.ccm				$(INCS)
 
 
