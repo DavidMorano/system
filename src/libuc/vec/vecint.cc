@@ -459,8 +459,7 @@ int vecint_audit(vecint *op) noex {
 	    rs = (i == c) ? SR_OK : SR_BADFMT ;
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecint_audit) */
+} /* end subroutine (vecint_audit) */
 
 
 /* private subroutines */
