@@ -1,4 +1,4 @@
-/* unlinkd_main SUPPORT */
+/* unlinker SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -39,23 +39,27 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/wait.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t(3c++)| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<getnodename.h>
-#include	<vecstr.h>
-#include	<spawnproc.h>
-#include	<mkpath.h>
-#include	<mkpr.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>		/* |NOFILE| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/wait.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysdata.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<subinfo.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<mkpath.h>		/* LIBUC */
+#include	<mkpr.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |NOFILE| */
 
 #include	"unlinkd.h"
 #include	"rmermsg.h"
@@ -82,11 +86,13 @@ import libutil ;			/* |memclear(3u)| */
 #define	DEFEXECPATH	"/usr/xpg4/bin:/usr/bin:/usr/extra/bin"
 
 #define	SI		subinfo
+#define	SI_FL		subinfo_fl
 #define	SI_ARGS		subinfo_args
-#define	SI_FL		subinfo_flags
 
 
-/* imported subroutines */
+/* imported namespaces */
+
+using libuc::mem ;		/* variable */
 
 
 /* local typedefs */
@@ -104,34 +110,68 @@ extern "C" {
 
 /* local structures */
 
-struct subinfo_args {
+enum subinfomems {
+    subinfomem_start,
+    subinfomem_finish,
+    subinfomem_overlast
+} ; /* end enum (subinfomems) */
+
+namespace {
+    struct vars {
+	uint		sysid ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
+namespace {
+    struct subinfo ;
+    struct subinfo_co {
+	subinfo		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (subinfo *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+    } ; /* end struct (subinfo_co) */
+    struct subinfo_args {
 	cchar		*fname ;
 	uint		delay ;
-} ; /* end struct */
-
-struct subinfo_flags {
+    } ; /* end struct */
+    struct subinfo_fl {
 	uint		here:1 ;
-} ; /* end struct */
-
-struct subinfo {
+    } ; /* end struct */
+    struct subinfo {
+	friend		subinfo_co ;
+	subinfo_co	start ;
+	subinfo_co	finish ;
 	SI_ARGS		arg ;
 	mainv		envv ;
 	time_t		daytime ;
 	SI_FL		fl ;
-} ; /* end struct */
+	subinfo() noex {
+	    start	(this,subinfomem_start) ;
+	    finish	(this,subinfomem_start) ;
+	} ; /* end ctor */
+    private:
+	int ifini	() noex ;
+	int istart	() noex ;
+    } ; /* end struct */
+} /* end namespace */
 
 typedef int (*subinfo_f)(subinfo *) noex ;
-
-cbool		f_setruid = CF_SETRUID ;
 
 
 /* forward references */
 
-static int	subinfo_start(ßubinfo *,cchar *,int) noex ;
-static int	subinfo_finish(ßubinfo *) noex ;
-static int	subinfo_fork(ßubinfo *) noex ;
-static int	subinfo_daemon(ßubinfo *) noex ;
-static int	subinfo_rmer(ßubinfo *) noex ;
+local int	subinfo_start	(SI *,cchar *,int) noex ;
+local int	subinfo_finish	(SI *) noex ;
+local int	subinfo_fork	(SI *) noex ;
+local int	subinfo_daemon	(SI *) noex ;
+local int	subinfo_rmer	(SI *) noex ;
 
 
 /* local variables */
@@ -142,6 +182,9 @@ constexpr subinfo_f	scheds[] = {
 	subinfo_daemon
 } ; /* end array */
 
+static vars	var ;
+cbool		f_setruid = CF_SETRUID ;
+
 
 /* exported variables */
 
@@ -151,11 +194,11 @@ constexpr subinfo_f	scheds[] = {
 int unlinkd(cchar *fname,int delay) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	       if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
-	           if (subinfo si ; (rs = subinfo_start(si,fname,delay)) >= 0) {
+	    if (fname[0]) ylikely {
+	       if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) ylikely {
+	           if (subinfo si ; (rs = subinfo_start(&si,fname,delay)) >= 0) {
 		       for (cauto &fun : scheds) {
 	    	           rs = (*fun)(&si) ;
 	    	           if (rs >= 0) break ;
@@ -169,18 +212,17 @@ int unlinkd(cchar *fname,int delay) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (unlinkd) */
+} /* end subroutine (unlinkd) */
 
 
 /* local subroutines */
 
-static int subinfo_start(ßubinfo *sip,cchar *fname,int delay) noex {
+local int subinfo_start(SI *sip,cchar *fname,int delay) noex {
 	int		rs = SR_FAULT ;
 	if (delay <= 0) delay = DEFDELAY ;
-	if (sip && fname) {
+	if (sip && fname) ylikely {
 	    memclear(sip) ;
-	    if (mainv ev ; (rs = u_getenvon(&ev)) >= 0) {
+	    if (mainv ev ; (rs = u_getenvon(&ev)) >= 0) ylikely {
 		sip->envv = ev ;
 	        sip->daytime = getustime ;
 	        sip->arg.fname = fname ;
@@ -188,23 +230,21 @@ static int subinfo_start(ßubinfo *sip,cchar *fname,int delay) noex {
 	    } /* end if (u_getenviron) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(ßubinfo *sip) noex {
+local int subinfo_finish(SI *sip) noex {
     	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    sip->daytime = 0 ;
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
-static int subinfo_fork(ßubinfo *sip) noex {
+local int subinfo_fork(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = u_fork()) == 0) {
+	if ((rs = u_fork()) == 0) ylikely {
 	    ustat	sb ;
 	    time_t	ti_expire ;
 	    pid_t	pid = rs ;
@@ -240,21 +280,18 @@ static int subinfo_fork(ßubinfo *sip) noex {
 	} /* end if (we got a child off) */
 
 	return rs ;
-}
-/* end subroutine (subinfo_fork) */
+} /* end subroutine (subinfo_fork) */
 
-static int subinfo_daemon(ßubinfo *sip) noex {
+local int subinfo_daemon(SI *sip) noex {
 	int		rs = SR_NOSYS ;
 	if (sip == nullptr) return SR_FAULT ;
 	return rs ;
-}
-/* end subroutine (subinfo_daemon) */
+} /* end subroutine (subinfo_daemon) */
 
-static int subinfo_rmer(ßubinfo *sip) noex {
+local int subinfo_rmer(SI *sip) noex {
 	spawnproc	pg{} ;
 	rmermsg_fname	m0{} ;
 	pid_t		pid ;
-
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		fd ;
@@ -367,7 +404,14 @@ ret1:
 
 ret0:
 	return rs ;
-}
-/* end subroutine (subinfo_rmer) */
+} /* end subroutine (subinfo_rmer) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if (ulong hid ; (rs = u_gethostid(&hid)) >= 0) {
+	    sysid = conv<uint>(hid) ;
+	} /* end if (u_gethostid) */
+	return rs ;
+} /* end method (vars::operator) */
 
 
