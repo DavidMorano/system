@@ -79,19 +79,6 @@ extern int logfile_close	(logfile *) noex ;
 
 EXTERNC_end
 
-#ifdef	__cplusplus
-
-template<typename ... Args>
-inline int logfile_magic(logfile *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == LOGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (logfile_magic) */
-
-#endif /* __cplusplus */
-
 
 #endif /* LOGFILE_INCLUDE */
 
