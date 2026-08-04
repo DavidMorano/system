@@ -13,28 +13,24 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecstr.h>
-#include	<modload.h>
-#include	<sysvars.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<modload.h>		/* LIBUC */
+#include	<sysvars.h>		/* LIBUC */
 
 
-#define	SYSVAR_MAGIC	0x99447243
 #define	SYSVAR		struct sysvar_head
 #define	SYSVAR_FL	struct sysvar_flags
 #define	SYSVAR_CUR	struct sysvar_cursor
 #define	SYSVAR_CALLS	struct sysvar_callsubs
-
+#define	SYSVAR_MAGIC	0x99447243
 #define	SYSVAR_OPREFIX	SYSVARS_OPREFIX		/* prefix match */
 
 
 struct sysvar_cursor {
 	void		*scp ;		/* SO-cursor pointer */
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct sysvar_flags {
@@ -48,7 +44,7 @@ struct sysvar_head {
 	void		*obj ;			/* object pointer */
 	vecstr		*dlp ;			/* default-list-pointer */
 	SYSVAR_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		objsize ;		/* object size */
 	int		cursize ;		/* cursor size */
 } ; /* end struct */
