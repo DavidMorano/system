@@ -79,7 +79,7 @@
 int wsiochr(const wchar_t *wsp,int wsl,int sch) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (wsp) {
+	if (wsp) ylikely {
 	    if (wsl < 0) wsl = wsinul(wsp) ;
 	    for (i = 0 ; wsl-- && wsp[i] ; i += 1) {
 	        f = (wsp[i] == sch) ;
@@ -92,7 +92,7 @@ int wsiochr(const wchar_t *wsp,int wsl,int sch) noex {
 int wsirchr(const wchar_t *wsp,int wsl,int sch) noex {
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
-	if (wsp) {
+	if (wsp) ylikely {
 	    if (wsl < 0) wsl = wsinul(wsp) ;
 	    for (i = (wsl-1) ; i >= 0 ; i -= 1) {
 	        f = (wsp[i] == sch) ;
