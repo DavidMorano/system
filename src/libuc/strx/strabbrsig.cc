@@ -36,15 +36,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ucodenames.h>
-#include	<localmisc.h>
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ucodenames.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strabbrsig.h"
 
@@ -152,7 +152,6 @@ const char *strabbrsig(int n) noex {
 	    }
 	} /* end if */
 	return s ;
-}
-/* end subroutine (strabbrsig) */
+} /* end subroutine (strabbrsig) */
 
 
