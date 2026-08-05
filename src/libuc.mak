@@ -103,7 +103,7 @@ OBJ18 =
 OBJ19 = 
 
 OBJ20= hdb.o hdbstr.o
-OBJ21=
+OBJ21= spawn.o
 OBJ22=
 OBJ23=
 
@@ -403,8 +403,6 @@ storebuf.o:		storebuf.cc storebuf.h
 
 lookaside.o:		lookaside.cc lookaside.h
 
-spawner.o:		spawner.cc spawner.h
-
 csem.o:			csem.cc csem.h
 dirlist.o:		dirlist.cc dirlist.h
 randomvar.o:		randomvar.cc randomvar.h
@@ -414,7 +412,6 @@ stdorder.o:		stdorder.cc stdorder.h
 
 sigevent.o:		sigevent.cc sigevent.h
 timeout.o:		timeout.cc timeout.h
-spawnproc.o:		spawnproc.cc spawnproc.h
 
 memfile.o:		memfile.cc memfile.h
 
@@ -1068,6 +1065,11 @@ host.dir:
 # GETHE
 gethe.o:		gethe.dir
 gethe.dir:
+	makesubdir $@
+
+# SPAWN
+spawn.o:		spawn.dir
+spawn.dir:
 	makesubdir $@
 
 # string-constants
