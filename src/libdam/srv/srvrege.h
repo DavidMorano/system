@@ -13,16 +13,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<sockaddress.h>
-#include	<localmisc.h>		/* |MAXHOSTNAMELEN| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |MAXHOSTNAMELEN| */
 
 
 /* object defines */
@@ -82,7 +79,7 @@ union srvrege_address {
 	sockaddress	sa ;			/* socket address */
 	char		fp[MAXPATHLEN + 1] ;	/* file path */
 	char		nb[MAXPATHLEN + 1] ;	/* net-addr buffer */
-} ;
+} ; /* end union */
 
 struct srvrege_allstuff {
 	uint		utime ;			/* update time */
@@ -98,11 +95,11 @@ struct srvrege_allstuff {
 	char		svc[MAXNAMELEN + 1] ;	/* service name */
 	char		ss[MAXNAMELEN + 1] ;	/* subservice name */
 	char		host[MAXHOSTNAMELEN + 1] ;
-} ;
+} ; /* end struct */
 
 struct srvrege_utime {
-	uint	utime ;
-} ;
+	uint		utime ;
+} ; /* end struct */
 
 typedef	SRVREGE_ALL		srvrege_all ;
 typedef	SRVREGE_UT		srvrege_ut ;
@@ -110,8 +107,8 @@ typedef	SRVREGE_ADDR		srvrege_addr ;
 
 EXTERNC_begin
 
-extern int srvrege_all(char *,int,int,srvrege_all *) noex ;
-extern int srvrege_utime(char *,int,int,srvrege_ut *) noex ;
+extern int srvrege_all		(char *,int,int,srvrege_all *) noex ;
+extern int srvrege_utime	(char *,int,int,srvrege_ut *) noex ;
 
 EXTERNC_end
 
