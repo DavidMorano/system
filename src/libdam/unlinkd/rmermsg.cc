@@ -131,40 +131,40 @@ int rmermsg_proc(rmermsg *op,int f,char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) ylikely {
-	rs = SR_NOTOPEN ;
-	if (op->fname) {
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
-	    uint	hdr ;
-	    int		v ;
-	    if (f) { /* read */
-	        serialbuf_rui(&mb,&hdr) ;
-	        op->msgtype	= conv<uchar>(hdr & UCHAR_MAX) ;
-	        op->msglen	= conv<ushort>(hdr >> CHAR_BIT) ;
-		mb >> op->tag ;
-		mb >> op->delay ;
-		mb >> op->sysid ;
-		mb >> v ;
-		op->uid = v ;
-	        mb.rstrw(op->fname,var.maxpathlen) ;
-	    } else { /* write */
-	        op->msgtype = rmermsgtype_fname ;
-	        hdr = op->msgtype ;
-	        mb << hdr ;
-		mb << op->tag ;
-		mb << op->delay ;
-		mb << op->sysid ;
-	        v = op->uid ;
-	        mb << v ;
-	        mb.wstrw(op->fname,-1) ;
-	        if ((v = mb.getlen) > 0) {
-		    op->msglen = conv<ushort>(v) ;
-	            hdr |= (op->msglen << CHAR_BIT) ;
-	            mb << hdr ;
-	        }
-	    } /* end if */
-	    rs1 = mb.finish ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (serialbuf) */
+	    rs = SR_NOTOPEN ;
+	    if (op->fname) {
+	        if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	            uint	hdr ;
+	            int		v ;
+	            if (f) { /* read */
+	                op->msgtype = rmermsgtype_fname ;
+	                hdr = op->msgtype ;
+	                mb << hdr ;
+		        mb << op->tag ;
+		        mb << op->delay ;
+		        mb << op->sysid ;
+	                v = op->uid ;
+	                mb << v ;
+	                mb.wstrw(op->fname,-1) ;
+	                if ((v = mb.getlen) > 0) {
+		            op->msglen = conv<ushort>(v) ;
+	                    hdr |= (op->msglen << CHAR_BIT) ;
+	                    mb << hdr ;
+	                }
+	            } else { /* write */
+	                mb >> hdr ;
+	                op->msgtype	= conv<uchar>(hdr & UCHAR_MAX) ;
+	                op->msglen	= conv<ushort>(hdr >> CHAR_BIT) ;
+		        mb >> op->tag ;
+		        mb >> op->delay ;
+		        mb >> op->sysid ;
+		        mb >> v ;
+		        op->uid = v ;
+	                mb.rstrw(op->fname,var.maxpathlen) ;
+	            } /* end if */
+	            rs1 = mb.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (serialbuf) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
