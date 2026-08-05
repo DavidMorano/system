@@ -78,7 +78,7 @@
 
 int wsnlen(const wchar_t *wsp,int wsl) noex {
     	int		nc = -1 ; /* return-value */
-	if (wsp) {
+	if (wsp) ylikely {
 	    nc = 0 ;
 	    if (wsl >= 0) {
 	        while (wsl-- && *wsp++) {
