@@ -254,27 +254,23 @@ int u_alarm(cuint secs) noex {
 	    rs = intsat(rem) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_alarm) */
+} /* end subroutine (u_alarm) */
 
 int u_atexit(void_f b) noex {
     	return uatexit(b) ;
-}
-/* end subroutine (u_atexit) */
+} /* end subroutine (u_atexit) */
 
 int u_exit(int ex) noex {
 	_exit(ex) ;
 	unreachable() ;
 	return SR_NOSYS ;
-}
-/* end subroutine (u_exit) */
+} /* end subroutine (u_exit) */
 
 int u_fork() noex {
 	uprocer		po ;
 	po.m = &uprocer::ifork ;
 	return po() ;
-}
-/* end subroutine (u_fork) */
+} /* end subroutine (u_fork) */
 
 int u_getgroups(int n,gid_t *a) noex {
 	int		rs = SR_FAULT ;
@@ -284,8 +280,7 @@ int u_getgroups(int n,gid_t *a) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (u_getgroups) */
+} /* end subroutine (u_getgroups) */
 
 int u_getpgid(pid_t pid) noex {
 	int		rs ;
@@ -293,8 +288,7 @@ int u_getpgid(pid_t pid) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_getpgid) */
+} /* end subroutine (u_getpgid) */
 
 int u_getrlimit(int rn,RLIMIT *rp) noex {
 	int		rs = SR_FAULT ;
@@ -304,8 +298,7 @@ int u_getrlimit(int rn,RLIMIT *rp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (u_getrlimit) */
+} /* end subroutine (u_getrlimit) */
 
 int u_getsid(pid_t pid) noex {
 	int		rs ;
@@ -313,8 +306,7 @@ int u_getsid(pid_t pid) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_getsid) */
+} /* end subroutine (u_getsid) */
 
 int u_nice(int value,int *rip) noex {
 	int		rs = SR_OK ;
@@ -329,71 +321,61 @@ int u_nice(int value,int *rip) noex {
 	    *rip = (rs >= 0) ? v : 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (u_nice) */
+} /* end subroutine (u_nice) */
 
 int u_setuid(uid_t uid) noex {
 	uprocer		po(uid) ;
 	po.m = &uprocer::isetuid ;
 	return po ;
-}
-/* end subroutine (u_setuid) */
+} /* end subroutine (u_setuid) */
 
 int u_setreuid(uid_t ruid,uid_t euid) noex {
 	uprocer		po(ruid,euid) ;
 	po.m = &uprocer::isetreuid ;
 	return po ;
-}
-/* end subroutine (u_setreuid) */
+} /* end subroutine (u_setreuid) */
 
 int u_seteuid(uid_t euid) noex {
 	uprocer		po(euid) ;
 	po.m = &uprocer::iseteuid ;
 	return po ;
-}
-/* end subroutine (u_seteuid) */
+} /* end subroutine (u_seteuid) */
 
 int u_setgid(gid_t gid) noex {
 	uprocer		po(gid) ;
 	po.m = &uprocer::isetgid ;
 	return po ;
-}
-/* end subroutine (u_setgid) */
+} /* end subroutine (u_setgid) */
 
 int u_setregid(gid_t rgid,gid_t egid) noex {
 	uprocer		po(rgid,egid) ;
 	po.m = &uprocer::isetregid ;
 	return po ;
-}
-/* end subroutine (u_setregid) */
+} /* end subroutine (u_setregid) */
 
 int u_setegid(gid_t egid) noex {
 	uprocer		po(egid) ;
 	po.m = &uprocer::isetegid ;
 	return po ;
-}
-/* end subroutine (u_setegid) */
+} /* end subroutine (u_setegid) */
 
 int u_setpgid(pid_t pid,pid_t pgid) noex {
 	uprocer		po(pid,pgid) ;
 	po.m = &uprocer::isetpgid ;
 	return po ;
-}
-/* end subroutine (u_setpgid) */
+} /* end subroutine (u_setpgid) */
 
 int u_setsid() noex {
 	uprocer		po ;
 	po.m = &uprocer::isetsid ;
 	return po ;
-}
-/* end subroutine (u_setsid) */
+} /* end subroutine (u_setsid) */
 
 int u_setgroups(int n,const gid_t *glist) noex {
 	uprocer		po(n,glist) ;
 	po.m = &uprocer::isetgroups ;
 	return po ;
-}
-/* end subroutine (u_setgroups) */
+} /* end subroutine (u_setgroups) */
 
 int u_setrlimit(int rn,CRLIMIT *rp) noex {
 	int		rs ;
@@ -401,8 +383,7 @@ int u_setrlimit(int rn,CRLIMIT *rp) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_setrlimit) */
+} /* end subroutine (u_setrlimit) */
 
 int u_times(TMS *rp) noex {
 	clock_t		tics ;
@@ -413,8 +394,7 @@ int u_times(TMS *rp) noex {
 	    rs = intsat(tics) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_times) */
+} /* end subroutine (u_times) */
 
 int u_ulimit(int cmd,...) noex {
 	va_list		ap ;
@@ -446,15 +426,13 @@ int u_ulimit(int cmd,...) noex {
 	    rs = intsat(rval) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_ulimit) */
+} /* end subroutine (u_ulimit) */
 
 int u_vfork() noex {
 	uprocer		po ;
 	po.m = &uprocer::ivfork ;
 	return po ;
-}
-/* end subroutine (u_vfork) */
+} /* end subroutine (u_vfork) */
 
 int u_wait(int *sp) noex {
 	pid_t		rpid ;
@@ -469,8 +447,7 @@ int u_wait(int *sp) noex {
 	    rs = int(rpid) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_wait) */
+} /* end subroutine (u_wait) */
 
 int u_waitid(idtype_t idtype,id_t id,siginfo_t *sip,int opts) noex {
 	int		rs ;
@@ -480,8 +457,7 @@ int u_waitid(idtype_t idtype,id_t id,siginfo_t *sip,int opts) noex {
 	    }
 	} until (rs != SR_INTR) ;
 	return rs ;
-}
-/* end subroutine (u_waitid) */
+} /* end subroutine (u_waitid) */
 
 int u_waitpid(pid_t pid,int *sp,int flags) noex {
 	pid_t		rpid ;
@@ -496,8 +472,7 @@ int u_waitpid(pid_t pid,int *sp,int flags) noex {
 	    rs = intsat(rpid) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_waitpid) */
+} /* end subroutine (u_waitpid) */
 
 int u_nanosleep(CTIMESPEC *tsp,TIMESPEC *rtsp) noex {
 	int		rs = SR_FAULT ;
@@ -507,17 +482,15 @@ int u_nanosleep(CTIMESPEC *tsp,TIMESPEC *rtsp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_nanosleep) */
+} /* end subroutine (u_nanosleep) */
 
 int u_getcwd(char *pbuf,int plen) noex {
     	return ugetcwd(pbuf,plen) ;
-}
-/* end subroutine (u_getcwd) */
+} /* end subroutine (u_getcwd) */
 
 int u_getenviron(mainv *rp) noex {
 	return libu::usys_environ(rp) ;
-}
+} /* end subroutine (u_getenviron) */
 
 
 /* local subroutines */
@@ -530,8 +503,7 @@ int uprocer::ifork() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uprocer::ifork) */
+} /* end method (uprocer::ifork) */
 
 int uprocer::ivfork() noex {
 	int		rs = SR_OK ;
@@ -541,8 +513,7 @@ int uprocer::ivfork() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uprocer::ivfork) */
+} /* end method (uprocer::ivfork) */
 
 int uprocer::isetuid() noex {
 	int		rs ;
@@ -550,8 +521,7 @@ int uprocer::isetuid() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uprocer::isetuid) */
+} /* end method (uprocer::isetuid) */
 
 int uprocer::isetreuid() noex {
 	int		rs ;
@@ -559,8 +529,7 @@ int uprocer::isetreuid() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (uprocer::isetreuid) */
+} /* end subroutine (uprocer::isetreuid) */
 
 int uprocer::iseteuid() noex {
 	int		rs ;
@@ -568,8 +537,7 @@ int uprocer::iseteuid() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uprocer::iseteuid) */
+} /* end method (uprocer::iseteuid) */
 
 int uprocer::isetgid() noex {
 	int		rs ;
@@ -577,8 +545,7 @@ int uprocer::isetgid() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uprocer::isetgid) */
+} /* end method (uprocer::isetgid) */
 
 int uprocer::isetregid() noex {
 	int		rs ;
@@ -586,8 +553,7 @@ int uprocer::isetregid() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uprocer::isetregid) */
+} /* end method (uprocer::isetregid) */
 
 int uprocer::isetegid() noex {
 	int		rs ;
@@ -595,8 +561,7 @@ int uprocer::isetegid() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uprocer::isetegid) */
+} /* end method (uprocer::isetegid) */
 
 int uprocer::isetpgid() noex {
 	int		rs ;
@@ -604,8 +569,7 @@ int uprocer::isetpgid() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uprocer::isetpgid) */
+} /* end method (uprocer::isetpgid) */
 
 int uprocer::isetsid() noex {
 	int		rs ;
@@ -616,8 +580,7 @@ int uprocer::isetsid() noex {
 	    rs = intsat(pid) ;
 	}
 	return rs ;
-}
-/* end method (uprocer::isetsid) */
+} /* end method (uprocer::isetsid) */
 
 int uprocer::isetgroups() noex {
 	int		rs ;
@@ -625,8 +588,7 @@ int uprocer::isetgroups() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (uprocer::isetgroups) */
+} /* end method (uprocer::isetgroups) */
 
 int uprocessbase::operator () () noex {
         errtimer        to_again        = utimeout[uto_again] ;
@@ -692,8 +654,7 @@ int uprocessbase::operator () () noex {
             } /* end if (error) */
         } until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end method (uprocessbase::operator) */
+} /* end method (uprocessbase::operator) */
 
 namespace libu {
     ungrouper::operator int () noex {
