@@ -81,7 +81,7 @@
 int wswcpynarrow(wchar_t *rarr,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ; /* return-value */
-	if (rarr && sp) {
+	if (rarr && sp) ylikely {
 	    rs = SR_OK ;
 	    while ((c < sl) && sp[c]) {
 	        cint	ch = mkchar(sp[c]) ;
