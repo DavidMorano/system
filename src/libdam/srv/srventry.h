@@ -13,13 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<varsub.h>
-#include	<srvtab.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<varsub.h>		/* LIBUC */
+#include	<srvtab.h>		/* LIBUC */
 
 
 /* local object defines */
@@ -43,7 +40,7 @@ struct srventry_a {
 	cchar		*nethost ;	/* reverse lookup (what is this ??) */
 	cchar		*netuser ;	/* network username if available */
 	cchar		*netpass ;	/* network password (encrypted ?) */
-} ;
+} ; /* end struct */
 
 struct srventry_head {
 	cchar		*program ;	/* server program path */
@@ -52,7 +49,7 @@ struct srventry_head {
 	cchar		*groupname ;
 	cchar		*options ;
 	cchar		*access ;
-} ;
+} ; /* end struct */
 
 typedef	SRVENTRY	srventry ;
 typedef	SRVENTRY_ARGS	srventry_args ;
