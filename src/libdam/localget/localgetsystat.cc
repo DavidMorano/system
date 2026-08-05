@@ -48,17 +48,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucprogdata.h>
-#include	<filereadln.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBUC */
+#include	<usyscalls.h>		/* LIBUC */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucprogdata.h>		/* LIBUC */
+#include	<filereadln.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"localget.h"
 
@@ -133,19 +135,16 @@ typedef int (systater::*systater_m)() noex ;
 
 constexpr int		di = UCPROGDATA_DSYSTAT ;
 constexpr int		ttl = TO_TTL ;
-
+constexpr char		ssn[] = SYSTATFNAME ;
+constexpr cchar		*vardname = sysword.w_vardir ;
 constexpr bool		f_ucprogdata = CF_UCPROGDATA ;
 
-constexpr char		ssn[] = SYSTATFNAME ;
-
-constexpr cchar		*vardname = sysword.w_vardir ;
-
-constexpr systater_m	mems[] = {
+constexpr systater_m	msubs[] = {
 	&systater::env,
 	&systater::cache,
 	&systater::localconf,
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* forward references */
@@ -163,11 +162,11 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (pr && rbuf) {
+	if (pr && rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (pr[0]) {
-		if (systater st(pr,rbuf,rlen) ; (rs = st.start) >= 0) {
+	    if (pr[0]) ylikely {
+		if (systater st(pr,rbuf,rlen) ; (rs = st.start) >= 0) ylikely {
 		    {
 		        rs = st ;
 		        len = rs ;
@@ -178,12 +177,11 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (localgetsystat) */
+} /* end subroutine (localgetsystat) */
 
 /* user environment */
 int systater::env() noex {
-	static cchar	*systat = getenv(varname.systat) ;
+	static cchar	*systat = getenver(varname.systat) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (systat && (systat[0] != '\0')) {
@@ -191,8 +189,7 @@ int systater::env() noex {
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;
-} 
-/* end method (systater::env) */
+} /* end method (systater::env) */
 
 /* program cache */
 int systater::cache() noex {
@@ -204,17 +201,16 @@ int systater::cache() noex {
 	    }
 	} /* end if_constexpr (f_ucprogdata) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (systater::cache) */
+} /* end method (systater::cache) */
 
 /* software facility (LOCAL) configuration */
 int systater::localconf() noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-        if (char *tbuf{} ; (rs = lm_mp(&tbuf)) >= 0) {
-            if ((rs = mkpath(tbuf,pr,vardname,ssn)) >= 0) {
-                if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) {
+        if (char *tbuf{} ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
+            if ((rs = mkpath(tbuf,pr,vardname,ssn)) >= 0) ylikely {
+                if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) ylikely {
                     len = rs ;
                     if_constexpr (f_ucprogdata) {
                         rs = ucprogdata_set(di,rbuf,len,ttl) ;
@@ -227,29 +223,28 @@ int systater::localconf() noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (systater::localconf) */
+} /* end method (systater::localconf) */
 
 int systater::istart() noex {
 	return SR_OK ;
-}
+} /* end method */
 
 int systater::ifinish() noex {
 	return SR_OK ;
-}
+} /* end method */
 
 systater::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
-	    systater_m	m = mems[i] ;
+	for (int i = 0 ; (rs == SR_OK) && msubs[i] ; i += 1) {
+	    systater_m	m = msubs[i] ;
 	    rs = (this->*m)() ;
 	} /* end for */
 	return rs ;
-}
+} /* end method */
 
 systater_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case systaterco_start:
 		rs = op->istart() ;
@@ -258,9 +253,8 @@ systater_co::operator int () noex {
 		rs = op->ifinish() ;
 		break ;
 	    } /* end switch */
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (systater_co::operator) */
+} /* end method (systater_co::operator) */
 
 
