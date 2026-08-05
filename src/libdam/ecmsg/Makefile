@@ -1,6 +1,6 @@
-# MAKEFILE (exmsg)
+# MAKEFILE (ecmsg)
 
-T= exmsg
+T= ecmsg
 
 ALL= $(T).o
 
@@ -33,14 +33,14 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += exmsg.h
+INCS += ecmsg.h
 
 MODS +=
 
 LIBS +=
 
 
-OBJ0= ecmsg_prime.o exmsg_loadfile.o
+OBJ0= ecmsg_prime.o ecmsg_loadfile.o
 OBJ1= 
 OBJ2= 
 OBJ3= 
@@ -135,7 +135,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-exmsg_prime.o:		ecmsg_prime.cc			$(INCS)
-exmsg_loadfile.o:	ecmsg_loadfile.cc		$(INCS)
+ecmsg_prime.o:		ecmsg_prime.cc			$(INCS)
+ecmsg_loadfile.o:	ecmsg_loadfile.cc		$(INCS)
 
 
