@@ -27,14 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ecmsg.h"
 
@@ -73,39 +73,40 @@ import libutil ;			/* |lenstr(3u)| */
 
 int ecmsg_start(ecmsg *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = memclear(op) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ecmsg_start) */
+} /* end subroutine (ecmsg_start) */
 
 int ecmsg_finish(ecmsg *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->ebuf) {
 	        rs1 = lm_free(op->ebuf) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+		op->ebuf = nullptr ;
+	    } /* end if (memory-release) */
 	    memclear(op) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ecmsg_finish) */
+} /* end subroutine (ecmsg_finish) */
 
 int ecmsg_loadbuf(ecmsg *op,cchar *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
-	if (op && mbuf) {
+	if (op && mbuf) ylikely {
 	    rs = SR_OK ;
 	    if (mlen < 0) mlen = lenstr(mbuf) ;
-	    if (mlen > ECMSG_MAXBUFLEN) mlen = ECMSG_MAXBUFLEN ;
+	    if (mlen > ECMSG_MAXBUFLEN) {
+		mlen = ECMSG_MAXBUFLEN ;
+	    }
 	    if (op->ebuf) {
 	        lm_free(op->ebuf) ;
 	        op->ebuf = nullptr ;
 	        op->elen = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	    if (mlen >= 0) {
 	        if (char *bp ; (rs = lm_mall((mlen + 1),&bp)) >= 0) {
 		    op->ebuf = bp ;
@@ -115,8 +116,7 @@ int ecmsg_loadbuf(ecmsg *op,cchar *mbuf,int mlen) noex {
 	    } /* end if (size) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ecmsg_loadbuf) */
+} /* end subroutine (ecmsg_loadbuf) */
 
 int ecmsg_already(ecmsg *op) noex {
 	int		rs = SR_FAULT ;
@@ -124,7 +124,6 @@ int ecmsg_already(ecmsg *op) noex {
 	    rs = (op->ebuf != nullptr) ;
 	}
 	return rs ;
-}
-/* end subroutine (ecmsg_already) */
+} /* end subroutine (ecmsg_already) */
 
 
