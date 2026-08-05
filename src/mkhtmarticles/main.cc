@@ -29,7 +29,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -37,7 +37,7 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
@@ -566,7 +566,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	{
 	    struct tm	cts ;
-	    uc_localtime(&pip->daytime,&cts) ;
+	    uc_timelocal(&pip->daytime,&cts) ;
 	    pip->cyear = cts.tm_year ;
 	}
 
@@ -790,7 +790,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	        if (fi.date != 0) {
 	            struct tm	ts ;
 
-	            rs1 = uc_localtime(&fi.date,&ts) ;
+	            rs1 = uc_timelocal(&fi.date,&ts) ;
 
 	            if (rs1 >= 0) {
 
