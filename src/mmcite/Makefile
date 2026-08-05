@@ -144,8 +144,8 @@ RM= rm -f
 INCS= config.h defs.h citedb.h bdb.h
 
 
-OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o 
-OBJ01= progfile.o progoutfin.o progoutbib.o
+OBJ00= mmcite_main.o whatinfo.o proginfo.o proginfo_setpiv.o 
+OBJ01= mmcite_file.o mmcite_outfin.o mmcite_outbib.o
 OBJ02= bdb.o citedb.o keytracker.o
 OBJ03= 
 OBJ04= sicite.o silbrace.o
