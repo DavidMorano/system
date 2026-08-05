@@ -10,27 +10,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<netdb.h>
-#include	<time.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
-#include	<srvrege.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<time.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<srvrege.h>		/* LIBUC */
 
 
 /* object defines */
-
-#define	SRVREG_MAGIC		1092837456
 #define	SRVREG			struct srvreg_head
 #define	SRVREG_FL		struct srvreg_flags
 #define	SRVREG_FILE		struct srvreg_filehead
 #define	SRVREG_BUF		struct srvreg_buffer
 #define	SRVREG_CUR		struct srvreg_cursor
+#define	SRVREG_MAGIC		1092837456
 #define	SRVREG_ENT		SRVREGE_ALL
 
 #define	SRVREG_FILEPATH		"/tmp/srvreg"
@@ -52,20 +47,20 @@ struct srvreg_buffer {
 	uint		size ;		/* fixed buffer size */
 	uint		len ;		/* length of valid area */
 	uint		off ;		/* file offset of valid area */
-} ;
+} ; /* end struct */
 
 /* decoded file magic */
 struct srvreg_filemagic {
-	char		magic[16] ;
+	char		magbuf[16] ;
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 /* decoded file header values */
 struct srvreg_filehead {
 	uint		wcount ;
 	uint		wtime ;
 	uint		nentries ;
-} ;
+} ; /* end struct */
 
 struct srvreg_flags {
 	uint		fileinit:1 ;		/* file init'ed */
@@ -75,7 +70,7 @@ struct srvreg_flags {
 	uint		cursorlockbroken:1 ;	/* cursor lock broken */
 	uint		cursoracc:1 ;		/* accessed while cursored? */
 	uint		remote:1 ;		/* remote mounted file */
-} ;
+} ; /* end struct */
 
 struct srvreg_head {
 	cchar		*fname ;
@@ -92,11 +87,11 @@ struct srvreg_head {
 	int		filesize ;
 	int		fd ;
 	int		cursors ;
-} ;
+} ; /* end struct */
 
 struct srvreg_cursor {
 	int		i ;
-} ;
+} ; /* end struct */
 
 typedef	SRVREG			srvreg ;
 typedef	SRVREG_FL		srvreg_fl ;
