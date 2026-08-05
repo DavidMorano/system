@@ -13,23 +13,19 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
-#include	<localmisc.h>		/* |MAXPATHLEN| */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |MAXPATHLEN| */
 
 
-#define	CONFIGVARS_MAGIC	0x04311633
 #define	CONFIGVARS		struct configvars_head
-#define	CONFIGVARS_ERR		struct configvars_errline
 #define	CONFIGVARS_VAR		struct configvars_variable
 #define	CONFIGVARS_FILE		struct configvars_filer
 #define	CONFIGVARS_CUR		struct configvars_cursor
 #define	CONFIGVARS_VFL		struct configvars_vflags
+#define	CONFIGVARS_MAGIC	0x04311633
 #define	CONFIGVARS_NFILES	(sizeof(int) * 8)
 
 
@@ -45,7 +41,7 @@ struct configvars_head {
 	vecobj		*expp ;		/* "export" environment variables */
 	vecobj		*unvp ;		/* "unset" environment variables */
 	time_t		checktime ;
-	uint		magic ;		/* magic number */
+	uint		magval ;	/* magic number */
 } ; /* end struct */
 
 struct configvars_filer {
@@ -55,11 +51,6 @@ struct configvars_filer {
 	vecobj		unsets ;	/* unset ENV variables */
 	time_t		mtime ;
 	int		fi ;
-} ; /* end struct */
-
-struct configvars_errline {
-	int		line ;
-	char		filename[MAXPATHLEN + 1] ;
 } ; /* end struct */
 
 struct configvars_vflags {
@@ -84,7 +75,6 @@ typedef CONFIGVARS	configvars ;
 typedef CONFIGVARS_VAR	configvars_var ;
 typedef CONFIGVARS_FILE	configvars_file ;
 typedef CONFIGVARS_CUR	configvars_cur ;
-typedef CONFIGVARS_ERR	configvars_err ;
 typedef CONFIGVARS_VFL	configvars_vfl ;
 
 EXTERNC_begin
