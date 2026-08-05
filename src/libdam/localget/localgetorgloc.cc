@@ -53,20 +53,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<getuserhome.h>
-#include	<filereadln.h>
-#include	<strlibval.hh>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getuserhome.h>		/* LIBUC */
+#include	<filereadln.h>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"localget.h"
 
@@ -131,11 +131,11 @@ namespace {
 	int localconf() noex ;
 	int sysconf() noex ;
 	int ifinish() noex ;
-	~orglocer() {
+	destruct orglocer() {
 	    (void) ifinish() ;
 	} ;
     } ; /* end struct (orglocer) */
-}
+} /* end namespace */
 
 typedef int (orglocer::*orglocer_m)() noex ;
 
@@ -146,12 +146,10 @@ typedef int (orglocer::*orglocer_m)() noex ;
 /* local variables */
 
 static strlibval	orgloc(strlibval_orgloc) ;
-
 static cchar		*etcdname = sysword.w_etcdir ;
-
 constexpr char		oln[] = ORGLOCFNAME ;
 
-constexpr orglocer_m	mems[] = {
+constexpr orglocer_m	msubs[] = {
 	&orglocer::userenv,
 	&orglocer::userconf,
 	&orglocer::localconf,
@@ -169,16 +167,16 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (pr && rbuf) {
+	if (pr && rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if ((un == nullptr) || (un[0] == '\0')) {
 		un = "-" ;
 	    }
-	    if (pr[0]) {
-	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	    if (pr[0]) ylikely {
+	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 		    orglocer	oo(pr,un,rbuf,rlen) ;
-		    if ((rs = oo.start(tbuf)) >= 0) {
+		    if ((rs = oo.start(tbuf)) >= 0) ylikely {
 			{
 			    rs = oo ;
 			    len = rs ;
@@ -192,8 +190,7 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (localgetorgloc) */
+} /* end subroutine (localgetorgloc) */
 
 
 /* local subroutines */
@@ -206,7 +203,7 @@ int orglocer::userenv() noex {
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 
 int orglocer::userconf() noex {
 	int		rs ;
@@ -227,7 +224,7 @@ int orglocer::userconf() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 
 int orglocer::localconf() noex {
 	int		rs ;
@@ -240,7 +237,7 @@ int orglocer::localconf() noex {
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 	
 int orglocer::sysconf() noex {
 	int		rs ;
@@ -253,7 +250,7 @@ int orglocer::sysconf() noex {
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
+} /* end method */
 
 int orglocer::ifinish() noex {
 	return SR_OK ;
@@ -261,12 +258,12 @@ int orglocer::ifinish() noex {
 
 orglocer::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
-	    orglocer_m	m = mems[i] ;
+	for (int i = 0 ; (rs == SR_OK) && msubs[i] ; i += 1) {
+	    orglocer_m	m = msubs[i] ;
 	    rs = (this->*m)() ;
 	} /* end for */
 	return rs ;
-}
+} /* end method */
 
 orglocer_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -278,7 +275,6 @@ orglocer_co::operator int () noex {
 	    } /* end switch */
 	}
 	return rs ;
-}
-/* end method (orglocer_co::operator) */
+} /* end method (orglocer_co::operator) */
 
 
