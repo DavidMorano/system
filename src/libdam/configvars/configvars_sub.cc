@@ -27,19 +27,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"configvarsobj.hh"
 
@@ -75,15 +75,15 @@ enum configkeys {
 	configkey_set,
 	configkey_unset,
 	configkey_overlast
-} ;
+} ; /* end enum */
 
-constexpr cpcchar	configkeys[] = {
+constexpr cpcchar	confignames[] = {
 	"define",
 	"export",
 	"set",
 	"unset",
 	nullptr
-} ;
+} ; /* end array */
 
 enum vartypes {
 	vartype_set,
@@ -106,16 +106,16 @@ namespace configvars_obj {
 		 cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		idx = 0 ;
-	if (cvp && kp) {
+	if (cvp && kp) ylikely {
 	    CV_VAR	v{} ;
-	    if ((rs = var_start(&v,fi,kp,kl,vp,vl)) >= 0) {
+	    if ((rs = var_start(&v,fi,kp,kl,vp,vl)) >= 0) ylikely {
 	        vecobj		*slp = (w) ? cvp->setp : cvp->varp ;
-	        if ((rs = vecobj_add(slp,&v)) >= 0) {
+	        if ((rs = vecobj_add(slp,&v)) >= 0) ylikely {
 		    idx = rs ;
-		}
+		} /* end if (ok) */
 	        if (rs < 0) {
 	            var_finish(&v) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (var-) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? idx : rs ;
