@@ -84,12 +84,12 @@
 int wsnwcpynarrow(wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ; /* return-value */
-	if (rarr && sp) {
+	if (rarr && sp) ylikely {
 	    rs = SR_OK ;
 	    for (c = 0 ; (c < rlen) && (c < sl) && sp[c] ; c += 1) {
 	        cint	ch = mkchar(sp[c]) ;
 	        rarr[c] = ch ;
-	    }
+	    } /* end for */
 	    rarr[c] = '\0' ;
 	    if ((c < sl) && (sp[c] != '\0')) rs = SR_OVERFLOW ;
 	} /* end if (non-null) */
