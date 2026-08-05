@@ -27,20 +27,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"configvarsobj.hh"
 
@@ -55,7 +55,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine (template) */
 using std::max ;			/* subroutine (template) */
-using std::nothrow ;			/* constant */
 
 using namespace		configvars_obj ;
 
@@ -87,34 +86,34 @@ namespace configvars_obj {
 
     int file_start(CV_FILE *cfp,cchar *fn) noex {
 	int		rs = SR_FAULT ;
-	if (cfp && fn) {
+	if (cfp && fn) ylikely {
 	    memclear(cfp) ;
-	    if (cchar *cp ; (rs = lm_strw(fn,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = lm_strw(fn,-1,&cp)) >= 0) ylikely {
 	        vecobj		*vip = &cfp->defines ;
 		cint		vsz = szof(CV_VAR) ;
 		cint		vn = 0 ;
 		cint		vo = 0 ;
 	        cfp->filename = cp ;
-	        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
+	        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) ylikely {
 	            vip = &cfp->exports ;
-	            if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
+	            if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) ylikely {
 	                vip = &cfp->unsets ;
-		        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
+		        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) ylikely {
 			    rs = lenstr(fn) ;
-		        }
+		        } /* end if (ok) */
 		        if (rs < 0) {
 			    vecobj_finish(&cfp->exports) ;
-		        }
+		        } /* end if (error) */
 		    } /* end if (exports) */
 		    if (rs < 0) {
 		        vecobj_finish(&cfp->defines) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (defines) */
 	        if (rs < 0) {
 		    void *vp = voidp(cfp->filename) ;
 		    lm_free(vp) ;
 		    cfp->filename = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (filename) */
 	} /* end if (non-null) */
 	return rs ;
@@ -132,7 +131,7 @@ namespace configvars_obj {
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    cfp->filename = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
     } /* end subroutine (file_finish) */
 
@@ -177,10 +176,10 @@ namespace configvars_obj {
 	    } /* end switch */
 	    if ((rs >= 0) && vlp) {
 	        rs = vecobj_add(vlp,&ve) ;
-	    }
+	    } /* end if (ok) */
 	    if (rs < 0) {
 	        var_finish(&ve) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (var_start) */
 	return rs ;
     } /* end subroutine (file_addvar) */
