@@ -28,17 +28,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"configvarsobj.hh"
 
@@ -47,8 +47,6 @@
 
 
 /* local namespaces */
-
-using std::nothrow ;			/* constant */
 
 using namespace		configvars_obj ;
 
@@ -74,7 +72,7 @@ local inline int configvars_ctor(configvars *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->checktime = getustime ;
 	    if ((op->fesp = new(nt) vecobj) != np) ylikely {
 		if ((op->varp = new(nt) vecobj) != np) ylikely {
@@ -179,27 +177,27 @@ enum vartypes {
 
 int configvars_open(configvars *cvp,cchar *cfn,vecobj *eep) noex {
 	int		rs ;
-	if ((rs = configvars_ctor(cvp,cfn)) >= 0) {
+	if ((rs = configvars_ctor(cvp,cfn)) >= 0) ylikely {
 	    vecobj	*vip ;
 	    cint	vn = 10 ;
 	    int		vsz ;
 	    int		vo = 0 ;
 	    vip = cvp->fesp ;
 	    vsz = szof(CV_FILE) ;
-	    if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
+	    if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) ylikely {
 	  	vsz = szof(CV_VAR) ;
 	        vip = cvp->varp ;
-	        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
+	        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) ylikely {
 	      	    vip = cvp->defp ;
-	            if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
+	            if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) ylikely {
 	                vip = cvp->setp ;
-		        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
+		        if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) ylikely {
 	            	    vip = cvp->expp ;
 			    vo = vecobjm.sorted ;
 			    if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
 	                        vip = cvp->unvp ;
 				if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) {
-				    cvp->magic = CONFIGVARS_MAGIC ;
+				    cvp->magval = CONFIGVARS_MAGIC ;
 				    if (cfn && cfn[0]) {
 					auto ca = configvars_addfile ;
 	    				if ((rs = ca(cvp,cfn,eep)) >= 0) {
@@ -237,7 +235,7 @@ int configvars_open(configvars *cvp,cchar *cfn,vecobj *eep) noex {
 int configvars_close(CV *cvp) noex {
 	int		rs  ;
 	int		rs1 ;
-	if ((rs = configvars_magic(cvp)) >= 0) {
+	if ((rs = configvars_magic(cvp)) >= 0) ylikely {
 	    {
 	        rs1 = configvars_finvars(cvp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -250,17 +248,17 @@ int configvars_close(CV *cvp) noex {
 		rs1 = configvars_dtor(cvp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    cvp->magic = 0 ;
+	    cvp->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (configvars_close) */
 
 int configvars_addfile(CV *cvp,cchar *cfname,vecobj *eep) noex {
 	int		rs ;
-	if ((rs = configvars_magic(cvp,cfname)) >= 0) {
+	if ((rs = configvars_magic(cvp,cfname)) >= 0) ylikely {
 		rs = SR_INVALID ;
-		if (cfname[0]) {
-	            if ((rs = vecobj_count(cvp->fesp)) >= 0) {
+		if (cfname[0]) ylikely {
+	            if ((rs = vecobj_count(cvp->fesp)) >= 0) ylikely {
 			cint	isz = szof(int) ;
 			cint	vr = rs ;
 	    	        rs = SR_TOOBIG ;
@@ -273,18 +271,17 @@ int configvars_addfile(CV *cvp,cchar *cfname,vecobj *eep) noex {
 				    rs = configvars_parse(cvp,fi,eep) ;
 				    if (rs < 0) {
 					vecobj_del(cvp->fesp,fi) ;
-				    }
+				    } /* end if (error) */
 				} /* end if (fe) */
 				if (rs < 0) {
 				    file_finish(&fe) ;
-				}
+				} /* end if (error) */
 			    } /* end if (file-) */
 			} /* end if (size ok) */
 		    } /* end if (count) */
 	        } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (configvars_addfile) */
+} /* end subroutine (configvars_addfile) */
 
 
