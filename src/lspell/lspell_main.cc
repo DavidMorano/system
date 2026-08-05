@@ -1,0 +1,77 @@
+/* lspell_main SUPPORT (lspell) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* generic front-end for SHELL built-ins */
+/* version %I% last-modified %G% */
+
+#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+
+/* revision history:
+
+	= 1998-07-28, David A­D­ Morano
+
+	This subroutine was written for use as a front-end for Korn
+	Shell (KSH) commands that are compiled as stand-alone
+	programs.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Synopsis:
+	$ lspell [<file(s)>]
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"b_lspell.h"
+#include	"defs.h"
+
+
+/* local defines */
+
+
+/* external subroutines */
+
+extern int	p_lspell(int,const char **,const char **,void *) ;
+
+
+/* external variables */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int main(int argc,con mainv argv,con mainv envv) {
+	int	ex ;
+	{
+	    ex = p_lspell(argc,argv,envv,nullptr) ;
+	}
+	return ex ;
+} /* end subroutine (main) */
+
+
