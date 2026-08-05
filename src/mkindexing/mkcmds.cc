@@ -1,5 +1,5 @@
 /* mkcmds SUPPORT */
-/* lang=C20 ( <-MUST be "C-language") */
+/* lang=C++20 ( <-MUST be "C-language") */
 
 /* names string storage: purpose? */
 /* version %I% last-modified %G% */
