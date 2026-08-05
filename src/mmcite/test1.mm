@@ -1,3 +1,5 @@
+/\"_ Levo state trace output
+.\"_ TROFF (Memorandum Macros)
 .\"_
 .BIB levosimxml.rbd
 .\"_
