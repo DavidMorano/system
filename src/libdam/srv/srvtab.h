@@ -13,20 +13,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecitem.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecitem.h>		/* LIBUC */
 
 
-#define	SRVTAB_MAGIC	0x31415926
 #define	SRVTAB		struct srvtab_head
 #define	SRVTAB_FILE	struct srvtab_filer
 #define	SRVTAB_ENT	struct srvtab_entry
+#define	SRVTAB_MAGIC	0x31415926
 
 
 struct srvtab_head {
@@ -37,7 +34,7 @@ struct srvtab_head {
 	time_t		mtime ;		/* last file modification */
 	uint		magic ;
 	int		fd ;		/* cached server file descriptor */
-} ;
+} ; /* end struct */
 
 struct srvtab_filer {
 	cchar		*fname ;
@@ -45,7 +42,7 @@ struct srvtab_filer {
 	time_t		checktime ;	/* time last checked */
 	time_t		mtime ;		/* file modification time */
 	int		fd ;		/* also serves as "open" flag */
-} ;
+} ; /* end struct */
 
 struct srvtab_entry {
 	cchar		*service ;
@@ -63,7 +60,7 @@ struct srvtab_entry {
 	cchar		*project ;
 	int		ngroups ;
 	int		matchlen ;
-} ;
+} ; /* end struct */
 
 typedef SRVTAB		srvtab ;
 typedef SRVTAB_ENT	srvtab_ent ;
@@ -71,12 +68,12 @@ typedef	SRVTAB_FILE	srvtab_file ;
 
 EXTERNC_begin
 
-extern int srvtab_open(srvtab *,cchar *,vecitem *) noex ;
-extern int srvtab_match(srvtab *,cchar *,srvtab_ent **) noex ;
-extern int srvtab_find(srvtab *,cchar *,srvtab_ent **) noex ;
-extern int srvtab_get(srvtab *,int,srvtab_ent **) noex ;
-extern int srvtab_check(srvtab *,time_t,vecitem *) noex ;
-extern int srvtab_close(srvtab *) noex ;
+extern int srvtab_open	(srvtab *,cchar *,vecitem *) noex ;
+extern int srvtab_match	(srvtab *,cchar *,srvtab_ent **) noex ;
+extern int srvtab_find	(srvtab *,cchar *,srvtab_ent **) noex ;
+extern int srvtab_get	(srvtab *,int,srvtab_ent **) noex ;
+extern int srvtab_check	(srvtab *,time_t,vecitem *) noex ;
+extern int srvtab_close	(srvtab *) noex ;
 
 EXTERNC_end
 
