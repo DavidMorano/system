@@ -19,11 +19,8 @@
 #define	ECMSG_INCLUDE
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	ECMSG			struct ecmsg_head
@@ -39,10 +36,10 @@ typedef	ECMSG		ecmsg ;
 
 EXTERNC_begin
 
-extern int ecmsg_start(ecmsg *) noex ;
-extern int ecmsg_loadbuf(ecmsg *,cchar *,int) noex ;
-extern int ecmsg_already(ecmsg *) noex ;
-extern int ecmsg_finish(ecmsg *) noex ;
+extern int ecmsg_start		(ecmsg *) noex ;
+extern int ecmsg_loadbuf	(ecmsg *,cchar *,int) noex ;
+extern int ecmsg_already	(ecmsg *) noex ;
+extern int ecmsg_finish		(ecmsg *) noex ;
 
 EXTERNC_end
 
