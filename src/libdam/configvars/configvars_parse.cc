@@ -27,24 +27,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<uclibmem.h>
-#include	<bfile.h>
-#include	<bfliner.h>
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<field.h>
-#include	<fieldterminit.hh>
-#include	<matostr.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<matostr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
+#include	<bfliner.h>		/* LIBB */
 
 #include	"configvarsobj.hh"
 
@@ -58,7 +58,6 @@
 
 using std::min ;			/* subroutine (template) */
 using std::max ;			/* subroutine (template) */
-using std::nothrow ;			/* constant */
 
 using namespace		configvars_obj ;
 
@@ -85,9 +84,9 @@ namespace {
 	    type[keytype_set]		= "set" ;
 	    type[keytype_unset]		= "unset" ;
 	    type[keytype_overlast]	= nullptr ;
-	} ;
+	} ; /* end vtor */
     } ; /* end struct (keytyper) */
-}
+} /* end namespce */
 
 namespace {
     struct confparser {
@@ -98,15 +97,15 @@ namespace {
 	    fi = idx ;
 	} ;
 	operator int () noex ;
-	int parsing(filep,bfile *) noex ;
-	int parseln(filep,cchar *,int) noex ;
-	int parse_define(filep,field *,cc *,int) noex ;
-	int parse_export(filep,field *,cc *,int) noex ;
-	int parse_set(filep,field *,cc *,int) noex ;
-	int parse_unset(filep,field *,cc *,int) noex ;
-	int parse_addvar(filep,field *,cc *,int,int) noex ;
+	int parsing		(filep,bfile *) noex ;
+	int parseln		(filep,cchar *,int) noex ;
+	int parse_define	(filep,field *,cc *,int) noex ;
+	int parse_export	(filep,field *,cc *,int) noex ;
+	int parse_set		(filep,field *,cc *,int) noex ;
+	int parse_unset		(filep,field *,cc *,int) noex ;
+	int parse_addvar	(filep,field *,cc *,int,int) noex ;
     } ; /* end struct (confparser) */
-}
+} /* end namespce */
 
 
 /* forward references */
@@ -115,9 +114,7 @@ namespace {
 /* local variables */
 
 constexpr fieldterminit	pt("\b\t\v\f ") ;	/* parsing terminators */
-
 static const keytyper	key ;
-
 constexpr int		keylen = KEYBUFLEN ;
 
 
@@ -130,21 +127,21 @@ namespace configvars_obj {
     int configvars_parse(CV *cvp,int fi,vecobj *eep) noex {
 	confparser	po(cvp,fi,eep) ;
 	return po ;
-    }
-}
+    } /* end subroutine */
+} /* end namespace */
 
 confparser::operator int () noex {
 	int		rs ;
 	int		rs1 ;
-	int		rv = 0 ;
+	int		rv = 0 ; /* return-value */
 	void		*vp{} ;
-	if ((rs = vecobj_get(cvp->fesp,fi,&vp)) >= 0) {
+	if ((rs = vecobj_get(cvp->fesp,fi,&vp)) >= 0) ylikely {
 	    CV_FILE	*fep = filep(vp) ;
-	    if (vp) {
+	    if (vp) ylikely {
 	        bfile	cfile, *fp = &cfile ;
 	        cchar	*fn = fep->filename ;
-	        if ((rs = bopen(fp,fn,"r",0664)) >= 0) {
-		    USTAT	sb ;
+	        if ((rs = bopen(fp,fn,"r",0664)) >= 0) ylikely {
+		    ustat sb ;
 		    if ((rs = bcontrol(fp,BC_STAT,&sb)) >= 0) {
 			if (sb.st_mtime >= fep->mtime) {
 			    fep->mtime = sb.st_mtime ;
@@ -161,11 +158,10 @@ confparser::operator int () noex {
 } /* end method (confparser::operator) */
 
 int confparser::parsing(filep fep,bfile *fp) noex {
-	bfliner		bl ;
 	int		rs ;
 	int		rs1 ;
-	int		rv = 0 ;
-	if ((rs = bl.start(fp)) >= 0) {
+	int		rv = 0 ; /* return-value */
+	if (bfliner bl ; (rs = bl.start(fp)) >= 0) ylikely {
 	    cchar	*lp ;
 	    while ((rs = bl.getlns(&lp)) > 0) {
 	        cchar	*cp ;
@@ -182,12 +178,11 @@ int confparser::parsing(filep fep,bfile *fp) noex {
 } /* end mthod (confparser::parsing) */
 
 int confparser::parseln(filep fep,cchar *lp,int ll) noex {
-	field		fsb ;
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = fsb.start(lp,ll)) >= 0) {
-	    if (cchar *fp ; (rs = fsb.get(pt.terms,&fp)) > 0) {
+	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) ylikely {
+	    if (cchar *fp ; (rs = fsb.get(pt.terms,&fp)) > 0) ylikely {
 		char	keybuf[keylen + 1] ;
 	        cint	kl = min(rs,keylen) ;
 	        strwcpylc(keybuf,fp,kl) ;
@@ -211,7 +206,7 @@ int confparser::parseln(filep fep,cchar *lp,int ll) noex {
 		        } /* end switch */
 		    } /* end if (not truncated) */
 		} else {
-		    auto	av = configvars_addvar ;
+		    cauto	av = configvars_addvar ;
 		    cint	w = configvarsw_vars ;
 	            rs = av(cvp,fi,w,keybuf,kl,fsb.lp,fsb.ll) ;
 		    rv = 1 ;
@@ -227,19 +222,19 @@ int confparser::parse_define(filep fep,field *fsbp,cc *,int) noex {
 	cnullptr	np{} ;
 	cint		kt = keytype_define ;
 	return parse_addvar(fep,fsbp,np,0,kt) ;
-}
+} /* end method */
 
 int confparser::parse_export(filep fep,field *fsbp,cc *,int) noex {
 	cnullptr	np{} ;
 	cint		kt = keytype_export ;
 	return parse_addvar(fep,fsbp,np,0,kt) ;
-}
+} /* end method */
 
 int confparser::parse_set(filep fep,field *fsbp,cc *,int) noex {
 	cnullptr	np{} ;
 	cint		kt = keytype_set ;
 	return parse_addvar(fep,fsbp,np,0,kt) ;
-}
+} /* end method */
 
 int confparser::parse_unset(filep fep,field *fsbp,cc *,int) noex {
 	int		rs ;
@@ -254,7 +249,7 @@ int confparser::parse_unset(filep fep,field *fsbp,cc *,int) noex {
 int confparser::parse_addvar(filep fep,field *fsbp,cc *,int,int kt) noex {
 	int		rs ;
 	cchar		*kp{} ;
-	if ((rs = fsbp->get(pt.terms,&kp)) > 0) {
+	if ((rs = fsbp->get(pt.terms,&kp)) > 0) ylikely {
 	    cint	kl = rs ;
 	    int		cl = 0 ;
 	    cchar	*cp = nullptr ;
@@ -262,8 +257,8 @@ int confparser::parse_addvar(filep fep,field *fsbp,cc *,int,int kt) noex {
 		if ((rs = fsbp->get(pt.terms,&cp)) > 0) {
 		    cl = rs ;
 		}
-	    }
-	    if (rs >= 0) {
+	    } /* end if */
+	    if (rs >= 0) ylikely {
 	        if (kt == keytype_set) {
 		    cint	w = CONFIGVARS_WSETS ;
 	            rs = configvars_addvar(cvp,fi,w,kp,kl,cp,cl) ;
