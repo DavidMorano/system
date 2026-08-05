@@ -1,5 +1,5 @@
 /* mkhashfile */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* write out the hash file */
 /* version %I% last-modified %G% */
