@@ -48,19 +48,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucprogdata.h>
-#include	<filereadln.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucprogdata.h>		/* LIBUC */
+#include	<filereadln.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"localget.h"
 
@@ -110,8 +110,8 @@ namespace {
 	netloader_co	start ;
 	netloader_co	finish ;
 	netloader(cc *p,char *rb,int rl) noex : pr(p), rbuf(rb), rlen(rl) {
-	    start(this,netloaderco_start) ;
-	    finish(this,netloaderco_finish) ;
+	    start	(this,netloaderco_start) ;
+	    finish	(this,netloaderco_finish) ;
 	} ;
 	operator int () noex ;
 	int env() noex ;
@@ -119,7 +119,7 @@ namespace {
 	int localconf() noex ;
 	int istart() noex ;
 	int ifinish() noex ;
-	~netloader() {
+	destruct netloader() {
 	    (void) ifinish() ;
 	} ;
     } ; /* end struct (netloader) */
@@ -135,14 +135,11 @@ typedef int (netloader::*netloader_m)() noex ;
 
 constexpr int		di = UCPROGDATA_DNETLOAD ;
 constexpr int		ttl = TO_TTL ;
-
+constexpr char		nlname[] = NETLOADFNAME ;
+constexpr cchar		*vardname = sysword.w_vardir ;
 constexpr bool		f_ucprogdata = CF_UCPROGDATA ;
 
-constexpr char		nlname[] = NETLOADFNAME ;
-
-constexpr cchar		*vardname = sysword.w_vardir ;
-
-constexpr netloader_m	mems[] = {
+constexpr netloader_m	msubs[] = {
 	&netloader::env,
 	&netloader::cache,
 	&netloader::localconf,
@@ -174,8 +171,7 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (localgetnetload) */
+} /* end subroutine (localgetnetload) */
 
 /* user environment */
 int netloader::env() noex {
@@ -187,10 +183,8 @@ int netloader::env() noex {
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;
-} 
-/* end method (netloader::env) */
+} /* end method (netloader::env) */
 
-/* program cache */
 int netloader::cache() noex {
     	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -200,17 +194,16 @@ int netloader::cache() noex {
 	    }
 	} /* end if_constexpr (f_ucprogdata) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (netloader::cache) */
+} /* end method (netloader::cache) */
 
 /* software facility (LOCAL) configuration */
 int netloader::localconf() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
-            if ((rs = mkpath(tbuf,pr,vardname,nlname)) >= 0) {
-                if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) {
+        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
+            if ((rs = mkpath(tbuf,pr,vardname,nlname)) >= 0) ylikely {
+                if ((rs = filereadln(tbuf,rbuf,rlen)) > 0) ylikely {
                     len = rs ;
                     if_constexpr (f_ucprogdata) {
                         rs = ucprogdata_set(di,rbuf,len,ttl) ;
@@ -223,8 +216,7 @@ int netloader::localconf() noex {
             if (rs >= 0) rs = rs1 ;
         } /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-} 
-/* end method (netloader::localconf) */
+} /* end method (netloader::localconf) */
 
 int netloader::istart() noex {
 	return SR_OK ;
@@ -236,16 +228,16 @@ int netloader::ifinish() noex {
 
 netloader::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
-	    netloader_m		m = mems[i] ;
+	for (int i = 0 ; (rs == SR_OK) && msubs[i] ; i += 1) {
+	    netloader_m		m = msubs[i] ;
 	    rs = (this->*m)() ;
 	} /* end for */
 	return rs ;
-}
+} /* end method */
 
 netloader_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case netloaderco_start:
 		rs = op->istart() ;
@@ -256,7 +248,6 @@ netloader_co::operator int () noex {
 	    } /* end switch */
 	}
 	return rs ;
-}
-/* end method (netloader_co::operator) */
+} /* end method (netloader_co::operator) */
 
 
