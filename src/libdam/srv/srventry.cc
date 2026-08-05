@@ -30,19 +30,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<vecstr.h>
-#include	<varsub.h>
-#include	<mallocstuff.h>
-#include	<sfx.h>
-#include	<snx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<varsub.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"srvtab.h"
 #include	"srventry.h"
@@ -59,6 +60,14 @@ import libutil ;			/* |memclear(3u)| */
 #define	SE_ARGS		srventry_args
 
 
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -70,8 +79,8 @@ import libutil ;			/* |memclear(3u)| */
 
 /* forward references */
 
-static int	process(varsub *,cchar *,SE_ARGS *,cchar **) noex ;
-static int	expand(cchar *,int,SE_ARGS *,char *,int) noex ;
+local int	process(varsub *,cchar *,SE_ARGS *,cchar **) noex ;
+local int	expand(cchar *,int,SE_ARGS *,char *,int) noex ;
 
 
 /* local variables */
@@ -205,7 +214,7 @@ int srventry_addoptions(SE *sep,cchar *options) noex {
 
 /* local subroutines */
 
-static int process(varsub *vsp,cchar *inbuf,SE_ARGS *esap,cc **opp) noex {
+local int process(varsub *vsp,cchar *inbuf,SE_ARGS *esap,cc **opp) noex {
 	int		rs ;
 	int		fl = 0 ;
 	char		vbuf[EBUFLEN + 1] ;
@@ -250,7 +259,7 @@ static int process(varsub *vsp,cchar *inbuf,SE_ARGS *esap,cc **opp) noex {
 #
 */
 
-static int expand(cchar *buf,int len,SE_ARGS *esap,
+local int expand(cchar *buf,int len,SE_ARGS *esap,
 		char *rbuf,int rlen) noex {
 	int		elen = 0 ;
 	int		sl ;
