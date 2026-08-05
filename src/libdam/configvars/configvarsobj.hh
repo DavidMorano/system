@@ -14,11 +14,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBU */
 
 #include	"configvars.h"
 
@@ -51,14 +51,13 @@ enum keytypes {
 
 
 template<typename ... Args>
-static inline int configvars_magic(configvars *op,Args ... args) noex {
+local inline int configvars_magic(configvars *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == CONFIGVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CONFIGVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (configvars_magic) */
+} /* end subroutine (configvars_magic) */
 
 namespace configvars_obj {
     extern int configvars_parse(CV *,int,vecobj *) noex ;
