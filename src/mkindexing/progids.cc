@@ -1,5 +1,5 @@
 /* progids */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* manage process IDs */
 /* version %I% last-modified %G% */
