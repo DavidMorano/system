@@ -1,5 +1,5 @@
 /* mktxtindexcmds HEADER */
-/* lang=C20 ( <- MUST be C-language) */
+/* lang=C++20 ( <- MUST be C-language) */
 
 /* these enumerations are commands used in text indexing operations */
 /* version %I% last-modified %G% */
