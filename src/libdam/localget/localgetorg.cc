@@ -41,31 +41,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucprogdata.h>
-#include	<ucpwcache.h>
-#include	<getusername.h>
-#include	<getuserhome.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<gecos.h>
-#include	<aflag.hh>
-#include	<filereadln.h>
-#include	<sfx.h>
-#include	<sncpyx.h>
-#include	<sncpyxw.h>
-#include	<mkpathx.h>
-#include	<strlibval.hh>
-#include	<char.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<aflag.hh>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucprogdata.h>		/* LIBUC */
+#include	<ucpwcache.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getuserhome.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<gecos.h>		/* LIBUC */
+#include	<filereadln.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<sncpyxw.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"localget.h"
 
@@ -113,21 +113,21 @@ struct subinfo {
 
 /* forward references */
 
-static int subinfo_start(SI *,cchar *,cchar *,cchar *,char *,int) noex ;
-static int subinfo_homer(SI *,cchar *) noex ;
-static int subinfo_passwder(SI *,cchar *) noex ;
-static int subinfo_finish(SI *) noex ;
+local int subinfo_start(SI *,cchar *,cchar *,cchar *,char *,int) noex ;
+local int subinfo_homer(SI *,cchar *) noex ;
+local int subinfo_passwder(SI *,cchar *) noex ;
+local int subinfo_finish(SI *) noex ;
 
 #if	CF_USERORG
-static int	localgetorg_var(SI *) noex ;
-static int	localgetorg_home(SI *) noex ;
-static int	localgetorg_passwd(SI *) noex ;
+local int	localgetorg_var(SI *) noex ;
+local int	localgetorg_home(SI *) noex ;
+local int	localgetorg_passwd(SI *) noex ;
 #endif /* CF_USERORG */
 
-static int	localgetorg_prhome(SI *) noex ;
-static int	localgetorg_pretc(SI *) noex ;
-static int	localgetorg_prpasswd(SI *) noex ;
-static int	localgetorg_sys(SI *) noex ;
+local int	localgetorg_prhome(SI *) noex ;
+local int	localgetorg_pretc(SI *) noex ;
+local int	localgetorg_prpasswd(SI *) noex ;
+local int	localgetorg_sys(SI *) noex ;
 
 
 /* local variables */
@@ -188,13 +188,12 @@ int localgetorg(cchar *pr,char *rbuf,int rlen,cchar *username) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (localgetorg) */
+} /* end subroutine (localgetorg) */
 
 
 /* local subroutines */
 
-static int subinfo_start(SI *sip,cc *pr,cc *ofn,cc *un,
+local int subinfo_start(SI *sip,cc *pr,cc *ofn,cc *un,
 		char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		cl ;
@@ -216,10 +215,9 @@ static int subinfo_start(SI *sip,cc *pr,cc *ofn,cc *un,
 	    sip->prn = zp ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SI *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (sip) {
@@ -232,12 +230,11 @@ static int subinfo_finish(SI *sip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 #if	CF_USERORG
 
-static int localgetorg_var(SI *sip) noex {
+local int localgetorg_var(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar		*vnun = varname.username ;
@@ -257,32 +254,27 @@ static int localgetorg_var(SI *sip) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (localgetorg_var) */
+} /* end subroutine (localgetorg_var) */
 
-static int localgetorg_home(SI *sip) noex {
+local int localgetorg_home(SI *sip) noex {
 	return subinfo_homer(sip,sip->un) ;
-}
-/* end subroutine (localgetorg_home) */
+} /* end subroutine (localgetorg_home) */
 
-static int localgetorg_passwd(SI *sip) noex {
+local int localgetorg_passwd(SI *sip) noex {
 	return subinfo_passwder(sip,sip->un) ;
-}
-/* end subroutine (localgetorg_passwd) */
+} /* end subroutine (localgetorg_passwd) */
 
 #endif /* CF_USERORG */
 
-static int localgetorg_prhome(SI *sip) noex {
+local int localgetorg_prhome(SI *sip) noex {
 	return subinfo_homer(sip,sip->prn) ;
-}
-/* end subroutine (localgetorg_prhome) */
+} /* end subroutine (localgetorg_prhome) */
 
-static int localgetorg_prpasswd(SI *sip) noex {
+local int localgetorg_prpasswd(SI *sip) noex {
 	return subinfo_passwder(sip,sip->prn) ;
-}
-/* end subroutine (localgetorg_prpasswd) */
+} /* end subroutine (localgetorg_prpasswd) */
 
-static int localgetorg_pretc(SI *sip) noex {
+local int localgetorg_pretc(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -298,10 +290,9 @@ static int localgetorg_pretc(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (localgetorg_pretc) */
+} /* end subroutine (localgetorg_pretc) */
 
-static int localgetorg_sys(SI *sip) noex {
+local int localgetorg_sys(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -317,10 +308,9 @@ static int localgetorg_sys(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (localgetorg_sys) */
+} /* end subroutine (localgetorg_sys) */
 
-static int subinfo_homer(SI *sip,cchar *un) noex {
+local int subinfo_homer(SI *sip,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -352,10 +342,9 @@ static int subinfo_homer(SI *sip,cchar *un) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo_homer) */
+} /* end subroutine (subinfo_homer) */
 
-static int subinfo_passwder(SI *sip,cchar *un) noex {
+local int subinfo_passwder(SI *sip,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -378,7 +367,6 @@ static int subinfo_passwder(SI *sip,cchar *un) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo_passwder) */
+} /* end subroutine (subinfo_passwder) */
 
 
