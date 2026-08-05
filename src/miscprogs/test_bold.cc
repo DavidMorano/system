@@ -12,7 +12,7 @@
 
 
 
-#include	<time.h>
+#include	<ctime>
 
 #include	<termstr.h>
 #include	<bfile.h>
