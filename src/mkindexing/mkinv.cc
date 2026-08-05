@@ -1,6 +1,6 @@
 /* proginv SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* invert the data (keys to pointers) */
 /* version %I% last-modified %G% */
