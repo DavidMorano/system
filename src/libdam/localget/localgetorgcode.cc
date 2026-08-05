@@ -52,22 +52,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<strlibval.hh>
-#include	<sncpyx.h>
-#include	<snx.h>
-#include	<mkpathx.h>
-#include	<getuserhome.h>
-#include	<getuserorg.h>
-#include	<filereadln.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<getuserhome.h>		/* LIBUC */
+#include	<getuserorg.h>		/* LIBUC */
+#include	<filereadln.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"localget.h"
 
@@ -127,11 +127,11 @@ namespace {
 	int sysconf() noex ;
 	int orgabbr() noex ;
 	int ifinish() noex ;
-	~orgcoder() {
+	destruct orgcoder() {
 	    (void) ifinish() ;
 	} ;
     } ; /* end struct (orgcoder) */
-}
+} /* end namespace */
 
 typedef int (orgcoder::*orgcoder_m)() noex ;
 
@@ -142,19 +142,17 @@ typedef int (orgcoder::*orgcoder_m)() noex ;
 /* local variables */
 
 static strlibval	orgcode(strlibval_orgcode) ;
-
 static cchar		*etcdname = sysword.w_etcdir ;
-
 constexpr char		ocfname[] = ORGCODEFNAME ;
 
-constexpr orgcoder_m	mems[] = {
+constexpr orgcoder_m	msubs[] = {
 	&orgcoder::userenv,
 	&orgcoder::userconf,
 	&orgcoder::localconf,
 	&orgcoder::sysconf,
 	&orgcoder::orgabbr,
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -166,14 +164,16 @@ int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (pr && rbuf) {
+	if (pr && rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if ((un == nullptr) || (un[0] == '\0')) un = "-" ;
-	    if (pr[0]) {
-	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
-		    orgcoder	oo(pr,un,rbuf,rlen) ;
-		    if ((rs = oo.start(tbuf)) >= 0) {
+	    if ((un == nullptr) || (un[0] == '\0')) {
+		un = "-" ;
+	    }
+	    if (pr[0]) ylikely {
+	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
+		    orgcoder oo(pr,un,rbuf,rlen) ;
+		    if ((rs = oo.start(tbuf)) >= 0) ylikely {
 			{
 			    rs = oo ;
 			    len = rs ;
@@ -187,8 +187,7 @@ int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (localgetorgcode) */
+} /* end subroutine (localgetorgcode) */
 
 
 /* local subroutines */
@@ -276,8 +275,8 @@ int orgcoder::ifinish() noex {
 
 orgcoder::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
-	    orgcoder_m	m = mems[i] ;
+	for (int i = 0 ; (rs == SR_OK) && msubs[i] ; i += 1) {
+	    orgcoder_m	m = msubs[i] ;
 	    rs = (this->*m)() ;
 	} /* end for */
 	return rs ;
