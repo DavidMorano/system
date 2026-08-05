@@ -62,7 +62,7 @@ namespace libu {
     } /* end subroutine (usys_environ) */
 } /* end namespace (libu) */
 
-#else /* defined(SYSHAS_XTI) && (SYSHAS_XTI > 0) */
+#else /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 
 namespace libu {
     int usys_environ(mainv *rp) noex {
@@ -78,7 +78,7 @@ namespace libu {
     } /* end subroutine (usys_environ) */
 } /* end namespace (libu) */
 
-#endif /* defined(SYSHAS_XTI) && (SYSHAS_XTI > 0) */
+#endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* UUSYSENVIRON end */
 
 
