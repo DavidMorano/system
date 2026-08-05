@@ -28,21 +28,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<uclibmem.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC[ */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"configvarsobj.hh"
 
@@ -51,8 +51,6 @@
 import libutil ;			/* |lenstr(3u)| */
 
 /* local namespaces */
-
-using std::nothrow ;			/* constant */
 
 using namespace		configvars_obj ;
 
@@ -85,7 +83,7 @@ local void	freeit(char **) noex ;
 namespace configvars_obj {
     int var_start(CV_VAR *cep,int fi,cc *kp,int kl,cc *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-	if (cep && kp) {
+	if (cep && kp) ylikely {
 	    int		len{} ;
 	    memclear(cep) ;
 	    if (kl < 0) kl = lenstr(kp) ;
@@ -95,7 +93,7 @@ namespace configvars_obj {
 		vl = 0 ;
 	    }
 	    len = (kl + vl + 2) ;
-	    if (char *vb ; (rs = lm_mall(len,&vb)) >= 0) {
+	    if (char *vb ; (rs = lm_mall(len,&vb)) >= 0) ylikely {
 	        char	*cp = (strwcpy(vb,kp,kl) + 1) ;
 	        cep->fi = fi ;
 	        cep->key = vb ;
@@ -119,7 +117,7 @@ namespace configvars_obj {
 namespace configvars_obj {
     int var_finish(CV_VAR *cep) noex {
 	int		rs = SR_FAULT ;
-	if (cep) {
+	if (cep) ylikely {
 	    rs = SR_OK ;
 	    freeit(&cep->key) ;
 	}
@@ -128,7 +126,7 @@ namespace configvars_obj {
 } /* end namespace (configvars_obj) */
 
 local void freeit(char **vp) noex {
-	if (*vp) {
+	if (*vp) ylikely {
 	    lm_free(*vp) ;
 	    *vp = nullptr ;
 	}
