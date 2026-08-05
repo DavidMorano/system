@@ -161,8 +161,8 @@ constexpr MAPEX			mapexs[] = {
 int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	USERINFO	u ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	bfile		errfile ;
 	bfile		outfile, *ofp = &outfile ;
 
