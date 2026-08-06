@@ -1,6 +1,6 @@
 /* progprocess SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 (conformance reviewed) */
+/* lang=C++20 */
 
 /* handle some service processing */
 /* version %I% last-modified %G% */
@@ -38,7 +38,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<vecstr.h>
 #include	<bfile.h>
@@ -50,6 +51,7 @@
 #include	<svcfile.h>
 #include	<acctab.h>
 #include	<strx.h>
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -75,27 +77,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	sfshrink(cchar *,int,char **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	getserial(cchar *) ;
-extern int	getfname(cchar *,cchar *,int,char *) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	isNotPresent(int) ;
-
 extern int	progsvcopen(PROGINFO *) ;
 extern int	progsvcclose(PROGINFO *) ;
 extern int	progaccopen(PROGINFO *) ;
@@ -117,9 +98,6 @@ extern int	strlinelen(cchar *,int,int) ;
 extern int	progexports(PROGINFO *,cchar *) ;
 #endif /* CF_DEBUGS */
 
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* external variables */
 
@@ -129,31 +107,29 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	proglog_extra(PROGINFO *) ;
+local int	proglog_extra(PROGINFO *) ;
+local int	procsecurity(PROGINFO *) ;
+local int	procaa(PROGINFO *,ARGINFO *) ;
 
-static int	procsecurity(PROGINFO *) ;
-
-static int	procaa(PROGINFO *,ARGINFO *) ;
-
-static int	loadserial(PROGINFO *) ;
-static int	loadpath(PROGINFO *,vecstr *,cchar *,cchar **,cchar *) ;
-static int	loadpathpr(PROGINFO *,vecstr *,cchar **) ;
-static int	loadpathprdir(PROGINFO *,vecstr *,cchar *) ;
-static int	loadpathcomp(PROGINFO *,vecstr *,cchar *) ;
-static int	loadpather(PROGINFO *,vecstr *,cchar *,int) ;
+local int	loadserial(PROGINFO *) ;
+local int	loadpath(PROGINFO *,vecstr *,cchar *,cchar **,cchar *) ;
+local int	loadpathpr(PROGINFO *,vecstr *,cchar **) ;
+local int	loadpathprdir(PROGINFO *,vecstr *,cchar *) ;
+local int	loadpathcomp(PROGINFO *,vecstr *,cchar *) ;
+local int	loadpather(PROGINFO *,vecstr *,cchar *,int) ;
 
 
 /* local variables */
 
-static cchar	*prbins[] = {
+constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
-	NULL
+	nullptr
 } ;
 
-static cchar	*prlibs[] = {
+constexpr cpcchar	prlibs[] = {
 	"lib",
-	NULL
+	nullptr
 } ;
 
 
@@ -217,15 +193,15 @@ int progprocess(PROGINFO *pip,ARGINFO *aip,USERINFO *uip) noex {
 /* local subroutines */
 
 
-static int proglog_extra(PROGINFO *pip)
+local int proglog_extra(PROGINFO *pip)
 {
 	cint	f = (pip->fl.named || pip->fl.passfd) ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
-	    if ((pip->cfname != NULL) && (rs1 >= 0)) {
+	    if ((pip->cfname != nullptr) && (rs1 >= 0)) {
 	        rs1 = proglog_printf(pip,"cf=%s\n",pip->cfname) ;
 	    }
-	    if ((! f) && (pip->pidfname != NULL) && (rs1 >= 0)) {
+	    if ((! f) && (pip->pidfname != nullptr) && (rs1 >= 0)) {
 	        rs1 = proglog_printf(pip,"pid=%s\n",pip->pidfname) ;
 	    }
 	return rs ;
@@ -233,7 +209,7 @@ static int proglog_extra(PROGINFO *pip)
 /* end subroutine (proglog_extra) */
 
 
-static int procsecurity(PROGINFO *pip)
+local int procsecurity(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		f = TRUE ;
@@ -271,7 +247,7 @@ static int procsecurity(PROGINFO *pip)
 /* end subroutine (procsecurity) */
 
 
-static int procaa(PROGINFO *pip,ARGINFO *aip)
+local int procaa(PROGINFO *pip,ARGINFO *aip)
 {
 	vecstr		snames ;
 	int		rs = SR_OK ;
@@ -320,7 +296,7 @@ static int procaa(PROGINFO *pip,ARGINFO *aip)
 	    for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
 	        f = (ai <= aip->ai_max) && (bits_test(&aip->pargs,ai) > 0) ;
-	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
+	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	        if (! f) continue ;
 
 	        cp = aip->argv[ai] ;
@@ -330,7 +306,7 @@ static int procaa(PROGINFO *pip,ARGINFO *aip)
 	            debugprintf("progprocess/procaa: svc=%s\n",cp) ;
 #endif
 
-	        rs1 = svcfile_fetch(&pip->stab,cp,NULL,NULL,NULL,0) ;
+	        rs1 = svcfile_fetch(&pip->stab,cp,nullptr,nullptr,nullptr,0) ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -384,7 +360,7 @@ static int procaa(PROGINFO *pip,ARGINFO *aip)
 		    if (pip->fl.caf) {
 		        int	i ;
 			bclose(pip->efp) ;
-			pip->efp = NULL ;
+			pip->efp = nullptr ;
 			for (i = 0 ; i < 3 ; i += 1)
 			    u_close(i) ;
 		    }
@@ -438,7 +414,7 @@ ret0:
 /* end subroutine (procaa) */
 
 
-static int loadserial(pip)
+local int loadserial(pip)
 PROGINFO	*pip ;
 {
 	int		rs = SR_OK ;
@@ -493,7 +469,7 @@ PROGINFO	*pip ;
 /* end subroutine (loadserial) */
 
 
-static int loadpath(pip,plp,varname,prdirs,defpath)
+local int loadpath(pip,plp,varname,prdirs,defpath)
 PROGINFO	*pip ;
 vecstr		*plp ;
 cchar	*varname ;
@@ -517,7 +493,7 @@ cchar	*defpath ;
 	if ((rs = vecstr_search(elp,varname,vstrkeycmp,&pp)) >= 0) {
 	    cchar	*tp ;
 
-	    if ((tp = strchr(pp,'=')) != NULL) {
+	    if ((tp = strchr(pp,'=')) != nullptr) {
 	        rs = loadpathcomp(pip,plp,(tp + 1)) ;
 	        c += rs ;
 	    }
@@ -531,14 +507,14 @@ cchar	*defpath ;
 
 /* system-default path */
 
-	    if ((rs >= 0) && (defpath != NULL)) {
+	    if ((rs >= 0) && (defpath != nullptr)) {
 	        rs = loadpathcomp(pip,plp,defpath) ;
 	        c += rs ;
 	    }
 
 /* process environment */
 
-	    if ((rs >= 0) && ((tp = getenv(varname)) != NULL)) {
+	    if ((rs >= 0) && ((tp = getenv(varname)) != nullptr)) {
 	        rs = loadpathcomp(pip,plp,tp) ;
 	        c += rs ;
 	    }
@@ -562,7 +538,7 @@ cchar	*defpath ;
 /* end subroutine (loadpath) */
 
 
-static int loadpathpr(pip,plp,prdirs)
+local int loadpathpr(pip,plp,prdirs)
 PROGINFO	*pip ;
 vecstr		*plp ;
 cchar	**prdirs ;
@@ -571,7 +547,7 @@ cchar	**prdirs ;
 	int		i ;
 	int		c = 0 ;
 
-	for (i = 0 ; prdirs[i] != NULL ; i += 1) {
+	for (i = 0 ; prdirs[i] != nullptr ; i += 1) {
 	    rs = loadpathprdir(pip,plp,prdirs[i]) ;
 	    c += rs ;
 	    if (rs < 0) break ;
@@ -582,7 +558,7 @@ cchar	**prdirs ;
 /* end subroutine (loadpathpr) */
 
 
-static int loadpathprdir(pip,plp,bname)
+local int loadpathprdir(pip,plp,bname)
 PROGINFO	*pip ;
 vecstr		*plp ;
 cchar	bname[] ;
@@ -601,7 +577,7 @@ cchar	bname[] ;
 /* end subroutine (loadpathprdir) */
 
 
-static int loadpathcomp(pip,plp,pp)
+local int loadpathcomp(pip,plp,pp)
 PROGINFO	*pip ;
 vecstr		*plp ;
 cchar	*pp ;
@@ -610,7 +586,7 @@ cchar	*pp ;
 	int		c = 0 ;
 	cchar	*tp ;
 
-	while ((tp = strbrk(pp,":;")) != NULL) {
+	while ((tp = strbrk(pp,":;")) != nullptr) {
 	    rs = loadpather(pip,plp,pp,(tp - pp)) ;
 	    pp = (tp + 1) ;
 	    if (rs < 0) break ;
@@ -625,7 +601,7 @@ cchar	*pp ;
 /* end subroutine (loadpathcomp) */
 
 
-static int loadpather(pip,plp,pbuf,plen)
+local int loadpather(pip,plp,pbuf,plen)
 PROGINFO	*pip ;
 vecstr		*plp ;
 cchar	pbuf[] ;
@@ -635,7 +611,7 @@ int		plen ;
 	int		c = 0 ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 	if ((rs = pathclean(tbuf,pbuf,plen)) > 0) {
 	    int	pl = rs ;
