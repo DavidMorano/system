@@ -169,7 +169,7 @@ const char	**envv ;
 int		to ;
 {
 	SUBINFO	si, *sip = &si ;
-	BITS		pargs ;
+	bits		pargs ;
 	VECSTR		names ;
 	int		rs = SR_OK ;
 	int		rs1 ;
