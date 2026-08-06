@@ -471,7 +471,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
-	                            pip->final.ssfile = TRUE ;
+	                            pip->finval.ssfile = TRUE ;
 	                            pip->have.ssfile = TRUE ;
 	                            pip->ssfname = avp ;
 	                        }
@@ -481,7 +481,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                pip->final.ssfile = TRUE ;
+	                                pip->finval.ssfile = TRUE ;
 	                                pip->have.ssfile = TRUE ;
 	                                pip->ssfname = argp ;
 	                            }
@@ -494,7 +494,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
-	                            pip->final.sxfile = TRUE ;
+	                            pip->finval.sxfile = TRUE ;
 	                            pip->have.sxfile = TRUE ;
 	                            pip->sxfname = avp ;
 	                        }
@@ -504,7 +504,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                pip->final.sxfile = TRUE ;
+	                                pip->finval.sxfile = TRUE ;
 	                                pip->have.sxfile = TRUE ;
 	                                pip->sxfname = argp ;
 	                            }
@@ -542,7 +542,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    break ;
 
 	                case argopt_wait:
-	                    pip->final.wait= TRUE ;
+	                    pip->finval.wait= TRUE ;
 	                    pip->have.wait = TRUE ;
 	                    pip->fl.wait = TRUE ;
 	                    if (f_optequal) {
@@ -555,7 +555,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    break ;
 
 	                case argopt_fold:
-	                    pip->final.fold = TRUE ;
+	                    pip->finval.fold = TRUE ;
 	                    pip->have.fold = TRUE ;
 	                    pip->fl.fold = TRUE ;
 	                    if (f_optequal) {
@@ -684,7 +684,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                pip->have.linelen = TRUE ;
-	                                pip->final.linelen = TRUE ;
+	                                pip->finval.linelen = TRUE ;
 	                                rs = optval(argp,argl) ;
 	                                pip->linelen = rs ;
 	                            }
@@ -793,7 +793,7 @@ int main(int argc,mainv argv,mainv envv) {
 	rs1 = (DEFPRECISION + 2) ;
 	if ((pip->linelen < rs1) && (argvalue >= rs1)) {
 	    pip->have.linelen = TRUE ;
-	    pip->final.linelen = TRUE ;
+	    pip->finval.linelen = TRUE ;
 	    pip->linelen = argvalue ;
 	}
 
@@ -826,7 +826,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    if (cp != NULL) {
 	        if ((cfdeci(cp,-1,&n) >= 0) && (n >= rs1)) {
 	            pip->have.linelen = TRUE ;
-	            pip->final.linelen = TRUE ;
+	            pip->finval.linelen = TRUE ;
 	            pip->linelen = n ;
 	        }
 	    }
@@ -1340,7 +1340,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 
 	            switch (oi) {
 	            case progopt_wait:
-	                if (! pip->final.wait) {
+	                if (! pip->finval.wait) {
 	                    n += 1 ;
 	                    pip->have.wait = TRUE ;
 	                    pip->fl.wait = TRUE ;
@@ -1351,7 +1351,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                }
 	                break ;
 	            case progopt_stdin:
-	                if (! pip->final.usestdin) {
+	                if (! pip->finval.usestdin) {
 	                    n += 1 ;
 	                    pip->have.usestdin = TRUE ;
 	                    pip->fl.usestdin = TRUE ;
@@ -1362,7 +1362,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                }
 	                break ;
 	            case progopt_own:
-	                if (! pip->final.useown) {
+	                if (! pip->finval.useown) {
 	                    n += 1 ;
 	                    pip->have.useown = TRUE ;
 	                    pip->fl.useown = TRUE ;
@@ -1373,7 +1373,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                }
 	                break ;
 	            case progopt_fold:
-	                if (! pip->final.fold) {
+	                if (! pip->finval.fold) {
 	                    n += 1 ;
 	                    pip->have.fold = TRUE ;
 	                    pip->fl.fold = TRUE ;
@@ -1384,7 +1384,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                }
 	                break ;
 	            case progopt_clean:
-	                if (! pip->final.clean) {
+	                if (! pip->finval.clean) {
 	                    n += 1 ;
 	                    pip->have.clean = TRUE ;
 	                    pip->fl.clean = TRUE ;
@@ -1395,7 +1395,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                }
 	                break ;
 	            case progopt_ssf:
-	                if (! pip->final.ssfile) {
+	                if (! pip->finval.ssfile) {
 	                    n += 1 ;
 	                    pip->have.ssfile = TRUE ;
 	                    if (vl > 0) {
@@ -1405,7 +1405,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                }
 	                break ;
 	            case progopt_sxf:
-	                if (! pip->final.sxfile) {
+	                if (! pip->finval.sxfile) {
 	                    n += 1 ;
 	                    pip->have.sxfile = TRUE ;
 	                    if (vl > 0) {
@@ -1415,10 +1415,10 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                }
 	                break ;
 	            case progopt_linelen:
-	                if (! pip->final.linelen) {
+	                if (! pip->finval.linelen) {
 	                    n += 1 ;
 	                    pip->have.linelen = TRUE ;
-	                    pip->final.linelen = TRUE ;
+	                    pip->finval.linelen = TRUE ;
 	                    pip->fl.linelen = TRUE ;
 	                    if (vl > 0) {
 	                        rs = cfdecui(vp,vl,&uv) ;
@@ -1427,10 +1427,10 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	                }
 	                break ;
 	            case progopt_indent:
-	                if (! pip->final.indent) {
+	                if (! pip->finval.indent) {
 	                    n += 1 ;
 	                    pip->have.indent = TRUE ;
-	                    pip->final.indent = TRUE ;
+	                    pip->finval.indent = TRUE ;
 	                    pip->fl.indent = TRUE ;
 	                    pip->indent = 8 ;
 	                    if (vl > 0) {
