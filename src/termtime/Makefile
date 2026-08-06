@@ -100,11 +100,11 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).x:			$(OBJ_MAIN)
-	$(CXX) -o $@ $(LDFLAGS) $(RUNINFO) $(OBJ_MAIN) $(LIBINFO)
+	$(CXX) -o $@ $(LDFLAGS) $(RUNINFO) $^ $(LIBINFO)
 
 $(T).nm:		$(T).x
 	$(NM) $(NMFLAGS) $(T).x > $(T).nm
@@ -168,8 +168,8 @@ filerec.dir:
 	makesubdir $@
 
 # DEBUG		(libu)
-debug.o:		debug.dir
-debug.dir:
+deb.o:		deb.dir
+deb.dir:
 	makesubdir $@
 
 # STRFILER	(libuc)
