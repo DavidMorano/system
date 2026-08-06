@@ -1,5 +1,5 @@
 /* opensvc_hotd */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* LOCAL facility open-service (hotd) */
 /* version %I% last-modified %G% */
