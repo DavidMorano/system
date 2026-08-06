@@ -37,7 +37,8 @@
 #include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<logfile.h>
 #include	<svcfile.h>
@@ -65,26 +66,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	sfshrink(cchar *,int,char **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	getfname(cchar *,cchar *,int,char *) ;
-
-extern int	securefile(cchar *,uid_t,gid_t) ;
-
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
 
@@ -92,9 +73,6 @@ extern int	proglog_flush(PROGINFO *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -115,8 +93,7 @@ static int	proclist(PROGINFO *,cchar *) ;
 
 /* local variables */
 
-/* 'conf' for most regular programs */
-static cchar	*sched_system[] = {
+constexpr cpcchar	sched_system[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -124,7 +101,7 @@ static cchar	*sched_system[] = {
 	NULL
 } ;
 
-static cchar	*sched_user[] = {
+constexpr cpcchar	sched_user[] = {
 	"%h/%e/%n/%n.%f",
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
@@ -133,12 +110,12 @@ static cchar	*sched_user[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progsvcopen(pip)
-PROGINFO	*pip ;
-{
+int progsvcopen(proginfo *pip) noex {
 	cint	tlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
