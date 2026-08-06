@@ -33,7 +33,7 @@
 #include	<sys/stat.h>
 #include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
