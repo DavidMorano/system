@@ -1,8 +1,8 @@
 TEXTCLEAN
 
-This program cleans up crap left over from (mostly) Micro$oft type programs.
-Apparently, many M$ program leave wierdo and other weirdo DOS-like character
-all over plain text files!  What is with that?
+This program cleans up crap left over from (mostly) Micro$oft type
+programs.  Apparently, many M$ program leave wierdo and other weirdo
+DOS-like character all over plain text files!  What is with that?
 
 Synopsis:
 $ textclean [<file(s)> ...] [-af <afile>] [-o <opt(s)>] [-mf <mfile>] [-V]
