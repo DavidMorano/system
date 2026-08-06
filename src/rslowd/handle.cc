@@ -742,77 +742,40 @@ struct jobentry	**jepp ;
 }
 /* end subroutine (handle_add) */
 
-
-/* delete a job */
-int handle_del(jlp,i,jep)
-JOBDB		*jlp ;
-int		i ;
-struct jobentry	*jep ;
-{
+int handle_del(jobdb *jlp,int i,jobdb_ent *jep) noex {
 	int		rs ;
-
-
 	if (jep == NULL) {
-
 		if ((rs = jobdb_get(jlp,i,&jep)) < 0) return rs ;
-
 	} else if (i < 0) {
-
-		if ((i = jobdb_getp(jlp,jep)) < 0) return i ;
-
+		if ((i = jobdb_getent(jlp,jep)) < 0) return i ;
 	}
-
 	(void) handlejob_del(jep) ;
-
 	return jobdb_del(jlp,i) ;
-}
-/* end subroutine (handle_del) */
-
+} /* end subroutine (handle_del) */
 
 /* extract an ID type header value */
-int ext_id(articleid,s)
-char	s[], articleid[] ;
-{
-	struct ema		aid ;
-
-	struct ema_ent	*ep ;
-
-	int	i, rs ;
-
-
+int ext_id(char *articleid,cchar *s) noex {
+	ema		aid ;
+	ema_ent		*ep ;
+	int		rs ;
 	articleid[0] = '\0' ;
 	ema_start(&aid) ;
-
 	if (ema_parse(&aid,s) > 0) {
-
-	    for (i = 0 ; (rs = ema_get(&aid,i,&ep)) >= 0 ; i += 1) {
-
+	    for (int i = 0 ; (rs = ema_get(&aid,i,&ep)) >= 0 ; i += 1) {
 	        if (ep == NULL) continue ;
-
 	        if (ep->fl.error) continue ;
-
 	        if (ep->rlen > 0) {
-
 	            strcpy(articleid,ep->route) ;
-
 	            break ;
-
 	        } else if (ep->alen > 0) {
-
 	            strcpy(articleid,ep->address) ;
-
 	            break ;
 	        }
-
 	    } /* end for */
-
 	} /* end if */
-
 	ema_finish(&aid) ;
-
 	return (articleid[0] == '\0') ? BAD : OK ;
-}
-/* end subroutine (ext_id) */
+} /* end subroutine (ext_id) */
 
 
 /* insert a job into the time wait list */
