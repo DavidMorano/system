@@ -1,6 +1,6 @@
 /* termchar_main (termchar) */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* part of TERMCHAR program */
 /* version %I% last-modified %G% */
@@ -36,15 +36,17 @@
 *****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstdlib>
-#include	<cstdio>
-#include	<usystem.h>
-#include	<storebuf.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<termcharsets.h>	/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
-#include	"termcharsets.h"
+#include	"termchar_config.h"
 
 
 /* local defines */
@@ -56,7 +58,15 @@
 
 /* external subroutines */
 
-extern int	termcharset(char *,int,int,int,cchar *) noex ;
+extern "C" {
+    extern int	termcharset(char *,int,int,int,cchar *) noex ;
+}
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -64,29 +74,36 @@ extern int	termcharset(char *,int,int,int,cchar *) noex ;
 
 /* local variables */
 
-static cchar	*ss2 = "\033N" ;
-static cchar	*ss3 = "\033O" ;
+[[maybe_unused]] local cchar	*ss2 = "\033N" ;
+[[maybe_unused]] local cchar	*ss3 = "\033O" ;
 
-static cchar	*ls0 = "\017" ;		/* also SI */
-static cchar	*ls1 = "\016" ;		/* also SO */
-static cchar	*ls2 = "\033n" ;
-static cchar	*ls3 = "\033o" ;
+[[maybe_unused]] local cchar	*ls0 = "\017" ;		/* also SI */
+[[maybe_unused]] local cchar	*ls1 = "\016" ;		/* also SO */
+[[maybe_unused]] local cchar	*ls2 = "\033n" ;
+[[maybe_unused]] local cchar	*ls3 = "\033o" ;
 
-static cchar	*ls1r = "\033~" ;
-static cchar	*ls2r = "\033}" ;
-static cchar	*ls3r = "\033|" ;
+[[maybe_unused]] local cchar	*ls1r = "\033~" ;
+[[maybe_unused]] local cchar	*ls2r = "\033}" ;
+[[maybe_unused]] local cchar	*ls3r = "\033|" ;
+
+cint		nrows = 16 ;
+cint		ncols = 32 ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int main(int argc,cchar **argv,cchar **envv) noex {
+int main(int argc,con mainv argv,con mainv) noex {
 	FILE		*fp = stdout ;
+	int		ex = EXIT_SUCCESS ;
 	int		rs = SR_OK ;
 	int		et = 2 ;
 
 /* argument processing */
 
-	if ((argc > 1) && (argv[1] != NULL)) {
+	if ((argc > 1) && (argv[1] != nullptr)) {
 	    et = atoi(argv[1]) ;
 	}
 
@@ -124,9 +141,9 @@ int main(int argc,cchar **argv,cchar **envv) noex {
 
 /* print out the characters */
 
-	for (int i = 0 ; i < 16 ; i += 1) { /* rows */
+	for (int i = 0 ; i < nrows ; i += 1) { /* rows */
 	    fprintf(fp,"\r") ;
-	    for (int j = 0 ; j < 32 ; j += 1) { /* columns */
+	    for (int j = 0 ; j < ncols ; j += 1) { /* columns */
 		int	pcol, ch ;
 	        if (j < 16) {
 	            pcol = j & 7 ;
@@ -180,7 +197,10 @@ int main(int argc,cchar **argv,cchar **envv) noex {
 /* done */
 
 	fclose(fp) ;
-	return 0 ;
+	if ((ex == EXIT_SUCCESS) && (rs < 0)) {
+	    ex = EXIT_FAILURE ;
+	} /* end if */
+	return ex ;
 }
 /* end subroutine (main) */
 
