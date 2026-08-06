@@ -38,7 +38,6 @@
 #include	<cstdarg>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<getbufsize.h>
 #include	<vecstr.h>
 #include	<logfile.h>
 #include	<logsys.h>
