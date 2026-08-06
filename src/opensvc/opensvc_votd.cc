@@ -240,7 +240,7 @@ struct subinfo {
 	cchar		*pdbname ;	/* paragraph-db name */
 	cchar		*vdbname ;	/* verse-db name */
 	cchar		*sdbname ;	/* structure-db name */
-	SUBINFO_FL	have, f, changed, final ;
+	SUBINFO_FL	have, f, changed, finval ;
 	SUBINFO_FL	open ;
 	time_t		dt ;
 	time_t		ti_tmtime ;
@@ -302,8 +302,8 @@ static int	subinfo_ndays(SUBINFO *,bibleverse_q *,int) noex ;
 #endif
 
 static int	procopts(SUBINFO *,keyopt *) noex ;
-static int	process(SUBINFO *,ARGINFO *,BITS *,cchar *,int) noex ;
-static int	procsome(SUBINFO *,ARGINFO *,BITS *,cchar *,int) noex ;
+static int	process(SUBINFO *,ARGINFO *,bits *,cchar *,int) noex ;
+static int	procsome(SUBINFO *,ARGINFO *,bits *,cchar *,int) noex ;
 static int	procspecs(SUBINFO *,cchar *,int) noex ;
 static int	procspec(SUBINFO *,cchar *,int) noex ;
 static int	procallcache(SUBINFO *) noex ;
@@ -453,7 +453,7 @@ int		to ;
 {
 	SUBINFO		si, *sip = &si ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	keyopt		akopts ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
@@ -669,7 +669,7 @@ int		to ;
 
 	                case argopt_bookname:
 	                    sip->have.bookname = true ;
-	                    sip->final.bookname = true ;
+	                    sip->finval.bookname = true ;
 	                    sip->fl.bookname = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
@@ -682,7 +682,7 @@ int		to ;
 
 	                case argopt_lang:
 	                    sip->have.lang = true ;
-	                    sip->final.bookname = true ;
+	                    sip->finval.bookname = true ;
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
@@ -745,7 +745,7 @@ int		to ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                sip->have.nitems = true ;
-	                                sip->final.nitems = true ;
+	                                sip->finval.nitems = true ;
 	                                rs = optvalue(argp,argl) ;
 	                                sip->nitems = rs ;
 	                            }
@@ -775,7 +775,7 @@ int		to ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                sip->have.linelen = true ;
-	                                sip->final.linelen = true ;
+	                                sip->finval.linelen = true ;
 	                                rs = optvalue(argp,argl) ;
 	                                sip->linelen = rs ;
 	                            }
@@ -799,7 +799,7 @@ int		to ;
 
 /* use GMT */
 	                    case 'z':
-	                        sip->final.gmt = true ;
+	                        sip->finval.gmt = true ;
 	                        sip->fl.gmt = true ;
 	                        if (f_optequal) {
 	                            f_optequal = false ;
@@ -843,7 +843,7 @@ int		to ;
 	    rs = optvalue(argval,-1) ;
 	    sip->nitems = rs ;
 	    sip->have.nitems = true ;
-	    sip->final.nitems = true ;
+	    sip->finval.nitems = true ;
 	}
 
 /* load up the environment options */
@@ -914,7 +914,7 @@ int		to ;
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (v >= rs1) {
 	                sip->have.linelen = true ;
-	                sip->final.linelen = true ;
+	                sip->finval.linelen = true ;
 	                sip->linelen = rs ;
 		    }
 	        }
@@ -994,9 +994,9 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 
 	                switch (oi) {
 	                case akoname_audit:
-	                    if (! sip->final.audit) {
+	                    if (! sip->finval.audit) {
 	                        sip->have.audit = true ;
-	                        sip->final.audit = true ;
+	                        sip->finval.audit = true ;
 	                        sip->fl.audit = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1005,9 +1005,9 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_linelen:
-	                    if (! sip->final.linelen) {
+	                    if (! sip->finval.linelen) {
 	                        sip->have.linelen = true ;
-	                        sip->final.linelen = true ;
+	                        sip->finval.linelen = true ;
 	                        sip->fl.linelen = true ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1016,9 +1016,9 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_indent:
-	                    if (! sip->final.indent) {
+	                    if (! sip->finval.indent) {
 	                        sip->have.indent = true ;
-	                        sip->final.indent = true ;
+	                        sip->finval.indent = true ;
 	                        sip->fl.indent = true ;
 	                        sip->indent = 1 ;
 	                        if (vl > 0) {
@@ -1028,9 +1028,9 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_bookname:
-	                    if (! sip->final.bookname) {
+	                    if (! sip->finval.bookname) {
 	                        sip->have.bookname = true ;
-	                        sip->final.bookname = true ;
+	                        sip->finval.bookname = true ;
 	                        sip->fl.bookname = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1039,9 +1039,9 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_interactive:
-	                    if (! sip->final.interactive) {
+	                    if (! sip->finval.interactive) {
 	                        sip->have.interactive = true ;
-	                        sip->final.interactive = true ;
+	                        sip->finval.interactive = true ;
 	                        sip->fl.interactive = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1050,9 +1050,9 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_separate:
-	                    if (! sip->final.separate) {
+	                    if (! sip->finval.separate) {
 	                        sip->have.separate = true ;
-	                        sip->final.separate = true ;
+	                        sip->finval.separate = true ;
 	                        sip->fl.separate = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1062,9 +1062,9 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    break ;
 	                case akoname_default:
 	                case akoname_defnull:
-	                    if (! sip->final.defnull) {
+	                    if (! sip->finval.defnull) {
 	                        sip->have.defnull = true ;
-	                        sip->final.defnull = true ;
+	                        sip->finval.defnull = true ;
 	                        sip->fl.defnull = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1073,9 +1073,9 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_para:
-	                    if (! sip->final.para) {
+	                    if (! sip->finval.para) {
 	                        sip->have.para = true ;
-	                        sip->final.para = true ;
+	                        sip->finval.para = true ;
 	                        sip->fl.para = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1084,9 +1084,9 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_gmt:
-	                    if (! sip->final.gmt) {
+	                    if (! sip->finval.gmt) {
 	                        sip->have.gmt = true ;
-	                        sip->final.gmt = true ;
+	                        sip->finval.gmt = true ;
 	                        sip->fl.gmt = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1095,9 +1095,9 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	                    }
 	                    break ;
 	                case akoname_allcache:
-	                    if (! sip->final.allcache) {
+	                    if (! sip->finval.allcache) {
 	                        sip->have.allcache = true ;
-	                        sip->final.allcache = true ;
+	                        sip->finval.allcache = true ;
 	                        sip->fl.allcache = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1128,7 +1128,7 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 }
 /* end subroutine (procopts) */
 
-static int process(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
+static int process(SUBINFO *sip,ARGINFO *aip,bits *bop,cchar *afn,
 		int f_apm) noex {
 	cint		fd = sip->wfd ;
 	int		rs ;
@@ -1157,7 +1157,7 @@ static int process(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 }
 /* end subroutine (process) */
 
-static int procsome(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
+static int procsome(SUBINFO *sip,ARGINFO *aip,bits *bop,cchar *afn,
 		int f_apm) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
