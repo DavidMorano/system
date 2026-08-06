@@ -39,7 +39,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<pcsconf.h>
 #include	<localmisc.h>
@@ -62,31 +63,8 @@
 #define	ARCHBUFLEN	80
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 
 /* external subroutines */
-
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -103,21 +81,23 @@ static int	matme(cchar *,cchar *,cchar **,cchar **) ;
 
 /* local variables */
 
-static cchar	*pcskeys[] = {
-	"timestamp",
-	"pollint",
-	NULL
-} ;
-
 enum pcskeys {
 	pcskey_timestamp,
 	pcskey_pollint,
 	pcskey_overlast
 } ;
 
+constexpr cpcchar	pcskeys[] = {
+	"timestamp",
+	"pollint",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
-
 
 #if	CF_PCSCONF
 
@@ -132,7 +112,7 @@ int progpcsconf(PROGINFO *pip)
 	    const int	plen = PCSCONF_LEN ;
 	    char	pbuf[PCSCONF_LEN + 1] ;
 	    cchar	*pr = pip->pr ;
-	    if ((rs1 = pcsconf(cp,NULL,&pc,&sets,NULL,pbuf,plen)) >= 0) {
+	    if ((rs1 = pcsconf(cp,nullptr,&pc,&sets,nullptr,pbuf,plen)) >= 0) {
 	       rs = procsets(pip,&sets) ;
 	    }
 	    vecstr_finish(&sets) ;
@@ -146,7 +126,7 @@ int progpcsconf(PROGINFO *pip)
 
 int progpcsconf(PROGINFO *pip)
 {
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 	return SR_OK ;
 } 
 /* end subroutine (progpcsconf) */
@@ -167,10 +147,10 @@ static int procsets(PROGINFO *pip,vecstr *slp)
 	cchar	*kp, *vp ;
 	cchar	*sp, *cp ;
 
-	if (slp == NULL) return SR_FAULT ;
+	if (slp == nullptr) return SR_FAULT ;
 
 	for (i = 0 ; vecstr_get(slp,i,&sp) >= 0 ; i += 1) {
-	    if (sp == NULL) continue ;
+	    if (sp == nullptr) continue ;
 
 	    if ((kl = matme(pip->searchname,sp,&kp,&vp)) < 0)
 	        continue ;
@@ -182,7 +162,7 @@ static int procsets(PROGINFO *pip,vecstr *slp)
 	        switch (i) {
 
 	        case pcskey_timestamp:
-		    if (pip->final.stampfname) {
+		    if (pip->finval.stampfname) {
 			pip->have.stampfname = TRUE ;
 	                cl = sfshrink(vp,-1,&cp) ;
 	                if (cl > 0)
@@ -191,7 +171,7 @@ static int procsets(PROGINFO *pip,vecstr *slp)
 	            break ;
 
 	        case pcskey_pollint:
-		    if (pip->final.intpoll) {
+		    if (pip->finval.intpoll) {
 			pip->have.intpoll = TRUE ;
 	                cl = sfshrink(vp,-1,&cp) ;
 	                if (cl)
@@ -219,19 +199,19 @@ cchar	**kpp, **vpp ;
 {
 	char		*cp2, *cp3 ;
 
-	if ((cp2 = strchr(ts,'=')) == NULL)
+	if ((cp2 = strchr(ts,'=')) == nullptr)
 	    return -1 ;
 
-	if (vpp != NULL)
+	if (vpp != nullptr)
 	    *vpp = cp2 + 1 ;
 
-	if ((cp3 = strchr(ts,':')) == NULL)
+	if ((cp3 = strchr(ts,':')) == nullptr)
 	    return -1 ;
 
 	if (cp3 > cp2)
 	    return -1 ;
 
-	if (kpp != NULL)
+	if (kpp != nullptr)
 	    *kpp = cp3 + 1 ;
 
 	if (strncmp(ts,key,(cp3 - ts)) != 0)
