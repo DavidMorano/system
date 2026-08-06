@@ -245,7 +245,7 @@ int		fd ;
 SOCKADDRESS	*sap ;
 int		sal ;
 {
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 	int		rs ;
 	int		c = 0 ;
 	cchar		*pn = pip->progname ;
