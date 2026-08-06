@@ -165,8 +165,8 @@ const char	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	const int	flen = MAILADDRLEN ;
 	const int	llen = LINEBUFLEN ;
 	const int	ulen = USERNAMELEN ;
