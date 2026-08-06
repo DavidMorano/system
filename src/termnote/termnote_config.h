@@ -1,4 +1,9 @@
-/* config */
+/* termnote_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* send a note (text) to a terminal */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,9 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	TERMNOTECONFIG_INCLUDE
+#define	TERMNOTECONFIG_INCLUDE
 
 
 #define	VERSION		"0"
@@ -75,5 +83,8 @@
 #define	LOCKFNAME	"spool/locks/termnote"
 
 #define	LOGSIZE		(80*1024)
+
+
+#endif /* TERMNOTECONFIG_INCLUDE */
 
 
