@@ -125,7 +125,7 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	SUBINFO_FL	f, final ;
+	SUBINFO_FL	f, finval ;
 	SUBINFO_FL	open ;
 	vecstr		stores ;
 	cchar		*pr ;
@@ -177,8 +177,8 @@ int opensvc_qotd(cchar *pr,cchar *prn,int of,mode_t om,
 		cchar **av,cchar **ev,int to)
 {
 	SUBINFO		si, *sip = &si ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -367,7 +367,7 @@ int opensvc_qotd(cchar *pr,cchar *prn,int of,mode_t om,
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-				    KEYOPT	*kop = &akopts ;
+				    keyopt	*kop = &akopts ;
 	                            rs = keyopt_loads(kop,argp,argl) ;
 				}
 			    } else
@@ -404,7 +404,7 @@ int opensvc_qotd(cchar *pr,cchar *prn,int of,mode_t om,
 
 /* use GMT */
 	                    case 'z':
-	                        sip->final.gmt = TRUE ;
+	                        sip->finval.gmt = TRUE ;
 	                        sip->fl.gmt = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
