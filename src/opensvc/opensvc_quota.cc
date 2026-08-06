@@ -67,7 +67,7 @@
 #include	<cstring>
 
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<char.h>
 #include	<getax.h>
 #include	<getpwx.h>
@@ -201,7 +201,7 @@ static int procuser(char *lbuf,int llen,cchar *un)
 #else
 	{
 	    struct passwd	pw ;
-	    const int		pwlen = getbufsize(bufsize_pw) ;
+	    const int		pwlen = bufsizeget(bufsize_pw) ;
 	    char		*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
