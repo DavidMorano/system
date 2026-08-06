@@ -66,7 +66,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<getusername.h>
@@ -106,7 +106,7 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	SUBINFO_FL	have, f, changed, final ;
+	SUBINFO_FL	have, f, changed, finval ;
 	SUBINFO_FL	open ;
 	vecstr		stores ;
 	const char	*pr ;
@@ -121,8 +121,8 @@ struct subinfo {
 
 /* forward references */
 
-static int	npargs(ARGINFO *,BITS *) ;
-static int	loadadmins(ARGINFO *,BITS *,const char **) ;
+static int	npargs(ARGINFO *,bits *) ;
+static int	loadadmins(ARGINFO *,bits *,const char **) ;
 
 static int	subinfo_start(SUBINFO *,const char *) ;
 static int	subinfo_finish(SUBINFO *) ;
@@ -164,8 +164,8 @@ int		to ;
 {
 	SUBINFO		si, *sip = &si ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -414,7 +414,7 @@ badsubstart:
 /* local subroutines */
 
 
-static int npargs(ARGINFO *aip,BITS *bop)
+static int npargs(ARGINFO *aip,bits *bop)
 {
 	int		rs = SR_OK ;
 	int		ai ;
@@ -434,7 +434,7 @@ static int npargs(ARGINFO *aip,BITS *bop)
 /* end subroutine (npargs) */
 
 
-static int loadadmins(ARGINFO *aip,BITS *bop,const char **admins)
+static int loadadmins(ARGINFO *aip,bits *bop,const char **admins)
 {
 	int		rs = SR_OK ;
 	int		ai ;
@@ -530,7 +530,7 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
 static int subinfo_getuser(SUBINFO *sip,const char *un)
 {
 	struct passwd	pw ;
-	const int	pwlen = getbufsize(bufsize_pw) ;
+	const int	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs ;
 	char		*pwbuf ;
 
