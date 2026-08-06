@@ -1,13 +1,13 @@
-/* progconfig */
+/* progconfig SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program configuration */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_LISTEN	1		/* try to listen */
-
 
 /* revision history:
 
@@ -20,37 +20,39 @@
 
 /*******************************************************************************
 
-	This module contains the subroutines that manage program configuration.
-
+  	Description:
+	This module contains the subroutines that manage program
+	configuration.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-
-#include	<usystem.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ascii.h>
 #include	<paramfile.h>
 #include	<vecstr.h>
 #include	<expcook.h>
 #include	<listenspec.h>
+#include	<prmkfname.h>		/* LIBPR */
 #include	<localmisc.h>
 
-#include	"prmkfname.h"
 #include	"config.h"
 #include	"defs.h"
 
 
 /* local defines */
+
+#define	PI		proginfo
 
 #ifndef	PBUFLEN
 #define	PBUFLEN		(4 * MAXPATHLEN)
@@ -67,82 +69,34 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	cfdecmfu(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	strwcmp(const char *,const char *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-
-extern int	securefile(const char *,uid_t,gid_t) ;
-
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* forward references */
 
-int		progconfigread(PROGINFO *) ;
+int		progconfigread(PI *) ;
 
-static int	progconfigreader(PROGINFO *,vecobj *,char *,int) ;
+local int	progconfigreader(PI *,vecobj *,char *,int) ;
 
-static int	proclistenadd(PROGINFO *,vecobj *,const char *,int) ;
-static int	proclistenmerge(PROGINFO *,vecobj *) ;
-static int	proclistenpresent(PROGINFO *,vecobj *,LISTENSPEC *) ;
-static int	proclistentmpdel(PROGINFO *,vecobj *,int) ;
-static int	proclistenfins(PROGINFO *,vecobj *) ;
+local int	proclistenadd(PI *,vecobj *,cchar *,int) ;
+local int	proclistenmerge(PI *,vecobj *) ;
+local int	proclistenpresent(PI *,vecobj *,LISTENSPEC *) ;
+local int	proclistentmpdel(PI *,vecobj *,int) ;
+local int	proclistenfins(PI *,vecobj *) ;
 
 
 /* local variables */
 
-static const char	*schedpconf[] = {
+constexpr cpcchar	schedpconf[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	"%p/%n.%f",
-	NULL
-} ;
-
-static const char	*params[] = {
-	"stampdir",
-	"logsize",
-	"reqfile",
-	"pidfile",
-	"logfile",
-	"svcfile",
-	"accfile",
-	"passfile",
-	"usersrv",
-	"listen",
-	"runint",
-	"pollint",
-	"markint",
-	"lockint",
-	"cmd",
-	"orgcode",
-	"defsvc",
-	"torecvfd",
-	"tosendfd",
-	"useracct",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 enum params {
 	param_stampdir,
@@ -166,43 +120,66 @@ enum params {
 	param_tosendfd,
 	param_useracct,
 	param_overlast
-} ;
+} ; /* end enum */
+
+/* exported variables */
+constexpr cpcchar	params[] = {
+	"stampdir",
+	"logsize",
+	"reqfile",
+	"pidfile",
+	"logfile",
+	"svcfile",
+	"accfile",
+	"passfile",
+	"usersrv",
+	"listen",
+	"runint",
+	"pollint",
+	"markint",
+	"lockint",
+	"cmd",
+	"orgcode",
+	"defsvc",
+	"torecvfd",
+	"tosendfd",
+	"useracct",
+	nullptr
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int progconfigstart(pip,sched,cfname)
-PROGINFO	*pip ;
-const char	*sched[] ;
-const char	cfname[] ;
-{
+int progconfigstart(PI *pip,mainv sched,cchar *cfname) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f_secreq ;
-	const char	**schedp ;
+	cchar	**schedp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
-	if (cfname == NULL)
+	if (cfname == nullptr)
 	    return SR_FAULT ;
 
 /* look for configuration file */
 
 	f_secreq = (! pip->fl.proglocal) ;
-	schedp = (sched != NULL) ? sched : schedpconf ;
+	schedp = (sched != nullptr) ? sched : schedpconf ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    int	i ;
 	    debugprintf("progconfigstart: search-schedule:\n") ;
-	    for (i = 0 ; schedp[i] != NULL ; i += 1)
+	    for (i = 0 ; schedp[i] != nullptr ; i += 1)
 	        debugprintf("progconfigstart: sched%u=%s\n",i,schedp[i]) ;
 	}
 #endif /* CF_DEBUG */
 
 	rs1 = SR_NOENT ;
 	tmpfname[0] = '\0' ;
-	if (strchr(cfname,'/') == NULL) {
+	if (strchr(cfname,'/') == nullptr) {
 
 	    f_secreq = FALSE ;
 	    rs1 = permsched(schedp,&pip->svars,
@@ -241,7 +218,7 @@ const char	cfname[] ;
 #endif
 
 	if ((rs1 >= 0) && (tmpfname[0] != '\0')) {
-	    const char	**vpp = &pip->cfname ;
+	    cchar	**vpp = &pip->cfname ;
 	    if ((rs = proginfo_setentry(pip,vpp,tmpfname,-1)) >= 0) {
 
 #if	CF_DEBUG
@@ -307,7 +284,7 @@ bad1:
 /* end subroutine (progconfigstart) */
 
 
-int progconfigfinish(PROGINFO *pip)
+int progconfigfinish(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -322,7 +299,7 @@ int progconfigfinish(PROGINFO *pip)
 	    vecobj	*llp = &pip->listens ;
 	    int		i ;
 	    for (i = 0 ; vecobj_get(llp,i,&lsp) >= 0 ; i += 1) {
-		if (lsp != NULL) {
+		if (lsp != nullptr) {
 		    rs1 = listenspec_finish(lsp) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
@@ -344,7 +321,7 @@ int progconfigfinish(PROGINFO *pip)
 /* end subroutine (progconfigfinish) */
 
 
-int progconfigcheck(PROGINFO *pip)
+int progconfigcheck(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
@@ -362,7 +339,7 @@ int progconfigcheck(PROGINFO *pip)
 /* end subroutine (progconfigcheck) */
 
 
-int progconfigread(PROGINFO *pip)
+int progconfigread(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -392,11 +369,11 @@ int progconfigread(PROGINFO *pip)
 /* end subroutine (progconfigread) */
 
 
-static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
+local int progconfigreader(PI *pip,vecobj *tlp,char *pbuf,int plen)
 {
-	PARAMFILE	*pfp = &pip->params ;
-	PARAMFILE_CUR	cur ;
-	PARAMFILE_ENT	pe ;
+	paramfile	*pfp = &pip->params ;
+	paramfile_cur	cur ;
+	paramfile_ent	pe ;
 	EXPCOOK		*ckp ;
 	const int	elen = EBUFLEN ;
 	int		rs = SR_OK ;
@@ -406,12 +383,12 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	int		el, tl ;
 	int		v ;
 	int		f ;
-	const char	*pr = pip->pr ;
-	const char	*kp, *vp, *ep ;
+	cchar	*pr = pip->pr ;
+	cchar	*kp, *vp, *ep ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		ebuf[EBUFLEN + 1] ;
 
-	if (pip == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -462,7 +439,7 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 
 	            switch (pi) {
 	            case param_logsize:
-	                if ((elen > 0) && (! pip->final.logsize)) {
+	                if ((elen > 0) && (! pip->finval.logsize)) {
 	                    rs1 = cfdecmfi(ebuf,el,&v) ;
 	                    if ((rs1 >= 0) && (v >= 0)) {
 	                        pip->have.logsize = TRUE ;
@@ -484,42 +461,42 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	                if ((rs1 >= 0) && (v >= 0)) {
 	                    switch (pi) {
 	                    case param_pollint:
-	                        if (! pip->final.intpoll) {
+	                        if (! pip->finval.intpoll) {
 	                            pip->have.intpoll = TRUE ;
 	                            pip->changed.intpoll = TRUE ;
 	                            pip->intpoll = v ;
 	                        }
 	                        break ;
 	                    case param_lockint:
-	                        if (! pip->final.intlock) {
+	                        if (! pip->finval.intlock) {
 	                            pip->have.intlock = TRUE ;
 	                            pip->changed.intlock = TRUE ;
 	                            pip->intlock = v ;
 	                        }
 	                        break ;
 	                    case param_markint:
-	                        if (! pip->final.intmark) {
+	                        if (! pip->finval.intmark) {
 	                            pip->have.intmark = TRUE ;
 	                            pip->changed.intmark = TRUE ;
 	                            pip->intmark = v ;
 	                        }
 	                        break ;
 	                    case param_runint:
-	                        if (! pip->final.intrun) {
+	                        if (! pip->finval.intrun) {
 	                            pip->have.intrun = TRUE ;
 	                            pip->changed.intrun = TRUE ;
 	                            pip->intrun = v ;
 	                        }
 	                        break ;
 	                    case param_torecvfd:
-	                        if (! pip->final.torecvfd) {
+	                        if (! pip->finval.torecvfd) {
 	                            pip->have.torecvfd = TRUE ;
 	                            pip->changed.torecvfd = TRUE ;
 	                            pip->to_recvfd = v ;
 	                        }
 	                        break ;
 	                    case param_tosendfd:
-	                        if (! pip->final.tosendfd) {
+	                        if (! pip->finval.tosendfd) {
 	                            pip->have.tosendfd = TRUE ;
 	                            pip->changed.tosendfd = TRUE ;
 	                            pip->to_sendfd = v ;
@@ -529,13 +506,13 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	                } /* end if (valid number) */
 	                break ;
 	            case param_reqfile:
-	                if (! pip->final.reqfname) {
+	                if (! pip->finval.reqfname) {
 	                    char	dname[MAXPATHLEN + 1] ;
 	                    pip->have.reqfname = TRUE ;
 	                    mkpath2(dname,VARDNAME,pip->searchname) ;
-	                    tl = prsetfname(pr,tmpfname,ebuf,el,TRUE,
+	                    tl = prmkfname(pr,tmpfname,ebuf,el,TRUE,
 	                        dname,pip->nodename,REQFEXT) ;
-	                    f = (pip->reqfname == NULL) ;
+	                    f = (pip->reqfname == nullptr) ;
 	                    f = f || (strcmp(pip->reqfname,tmpfname) != 0) ;
 	                    if (f) {
 				cchar	**vpp = &pip->reqfname ;
@@ -545,11 +522,11 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	                }
 	                break ;
 	            case param_pidfile:
-	                if (! pip->final.pidfname) {
+	                if (! pip->finval.pidfname) {
 	                    pip->have.pidfname = TRUE ;
-	                    tl = prsetfname(pr,tmpfname,ebuf,el,TRUE,
+	                    tl = prmkfname(pr,tmpfname,ebuf,el,TRUE,
 	                        RUNDNAME,pip->nodename,pip->searchname) ;
-	                    f = (pip->pidfname == NULL) ;
+	                    f = (pip->pidfname == nullptr) ;
 	                    f = f || (strcmp(pip->pidfname,tmpfname) != 0) ;
 	                    if (f) {
 				cchar	**vpp = &pip->pidfname ;
@@ -559,11 +536,11 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	                }
 	                break ;
 	            case param_logfile:
-	                if (! pip->final.lfname) {
+	                if (! pip->finval.lfname) {
 	                    pip->have.lfname = TRUE ;
-	                    tl = prsetfname(pr,tmpfname,ebuf,el,TRUE,
+	                    tl = prmkfname(pr,tmpfname,ebuf,el,TRUE,
 	                        LOGDNAME,pip->searchname,"") ;
-	                    f = (pip->lfname == NULL) ;
+	                    f = (pip->lfname == nullptr) ;
 	                    f = f || (strcmp(pip->lfname,tmpfname) != 0) ;
 	                    if (f) {
 				cchar	**vpp = &pip->lfname ;
@@ -574,11 +551,11 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	                }
 	                break ;
 	            case param_svcfile:
-	                if (! pip->final.svcfname) {
+	                if (! pip->finval.svcfname) {
 	                    pip->have.svcfname = TRUE ;
-	                    tl = prsetfname(pr,tmpfname,ebuf,el,TRUE,
+	                    tl = prmkfname(pr,tmpfname,ebuf,el,TRUE,
 	                        ETCDNAME,pip->searchname,SVCFEXT) ;
-	                    f = (pip->svcfname == NULL) ;
+	                    f = (pip->svcfname == nullptr) ;
 	                    f = f || (strcmp(pip->svcfname,tmpfname) != 0) ;
 	                    if (f) {
 				cchar	**vpp = &pip->svcfname ;
@@ -589,11 +566,11 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	                }
 	                break ;
 	            case param_accfile:
-	                if (! pip->final.accfname) {
+	                if (! pip->finval.accfname) {
 	                    pip->have.accfname = TRUE ;
-	                    tl = prsetfname(pr,tmpfname,ebuf,el,TRUE,
+	                    tl = prmkfname(pr,tmpfname,ebuf,el,TRUE,
 	                        ETCDNAME,pip->searchname,"") ;
-	                    f = (pip->accfname == NULL) ;
+	                    f = (pip->accfname == nullptr) ;
 	                    f = f || (strcmp(pip->accfname,tmpfname) != 0) ;
 	                    if (f) {
 				cchar	**vpp = &pip->accfname ;
@@ -604,11 +581,11 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	                }
 	                break ;
 	            case param_passfile:
-	                if (! pip->final.passfname) {
+	                if (! pip->finval.passfname) {
 	                    pip->have.passfname = TRUE ;
-	                    tl = prsetfname(pr,tmpfname,ebuf,el,TRUE,
+	                    tl = prmkfname(pr,tmpfname,ebuf,el,TRUE,
 	                        ETCDNAME,pip->searchname,"") ;
-	                    f = (pip->passfname == NULL) ;
+	                    f = (pip->passfname == nullptr) ;
 	                    f = f || (strcmp(pip->passfname,tmpfname) != 0) ;
 	                    if (f) {
 				cchar	**vpp = &pip->passfname ;
@@ -619,9 +596,9 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	                }
 	                break ;
 	            case param_usersrv:
-	                if (! pip->final.usersrv) {
+	                if (! pip->finval.usersrv) {
 	                    pip->have.usersrv = TRUE ;
-	                    f = (pip->usersrv == NULL) ;
+	                    f = (pip->usersrv == nullptr) ;
 	                    f = f || (strwcmp(pip->usersrv,ep,el) != 0) ;
 	                    if (f) {
 				cchar	**vpp = &pip->usersrv ;
@@ -632,11 +609,11 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 	                }
 	                break ;
 	            case param_stampdir:
-	                if (! pip->final.stampdname) {
+	                if (! pip->finval.stampdname) {
 	                    pip->have.stampdname = TRUE ;
-	                    tl = prsetfname(pr,tmpfname,ebuf,el,TRUE,
+	                    tl = prmkfname(pr,tmpfname,ebuf,el,TRUE,
 	                        VARDNAME,STAMPDNAME,"") ;
-	                    f = (pip->stampdname == NULL) ;
+	                    f = (pip->stampdname == nullptr) ;
 	                    f = f || (strcmp(pip->stampdname,tmpfname) != 0) ;
 	                    if (f) {
 				cchar	**vpp = &pip->stampdname ;
@@ -704,7 +681,7 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 
 
 /* add a listener-specification to a temporary listen list */
-static int proclistenadd(PROGINFO *pip,vecobj *tlp,cchar *ebuf,int elen)
+local int proclistenadd(PI *pip,vecobj *tlp,cchar *ebuf,int elen)
 {
 	LISTENSPEC	ls ;
 	VECSTR		al, *alp = &al ;
@@ -719,12 +696,12 @@ static int proclistenadd(PROGINFO *pip,vecobj *tlp,cchar *ebuf,int elen)
 #endif
 
 	if ((rs = vecstr_start(alp,5,0)) >= 0) {
-	    const char	*sp = ebuf ;
-	    const char	*tp ;
+	    cchar	*sp = ebuf ;
+	    cchar	*tp ;
 	    int		sl = elen ;
 	    int		c = 0 ;
 
-	    while ((tp = strnchr(sp,sl,CH_FS)) != NULL) {
+	    while ((tp = strnchr(sp,sl,CH_FS)) != nullptr) {
 	        c += 1 ;
 	        rs = vecstr_add(alp,sp,(tp-sp)) ;
 	        if (rs < 0) break ;
@@ -737,7 +714,7 @@ static int proclistenadd(PROGINFO *pip,vecobj *tlp,cchar *ebuf,int elen)
 	    }
 
 	    if (rs >= 0) {
-	        const char	**av ;
+	        cchar	**av ;
 	        if ((rs = vecstr_getvec(alp,&av)) >= 0) {
 	            if ((rs = listenspec_start(&ls,c,av)) >= 0) {
 	                n = rs ;
@@ -771,7 +748,7 @@ static int proclistenadd(PROGINFO *pip,vecobj *tlp,cchar *ebuf,int elen)
 /* end subroutine (proclistenadd) */
 
 
-static int proclistenmerge(PROGINFO *pip,vecobj *tlp)
+local int proclistenmerge(PI *pip,vecobj *tlp)
 {
 	LISTENSPEC	*lsp ;
 	LISTENSPEC	*tlsp ;
@@ -787,7 +764,7 @@ static int proclistenmerge(PROGINFO *pip,vecobj *tlp)
 /* phase-1 */
 
 	for (i = 0 ; vecobj_get(&pip->listens,i,&lsp) >= 0 ; i += 1) {
-	    if (lsp != NULL) {
+	    if (lsp != nullptr) {
 	        if ((rs1 = proclistenpresent(pip,tlp,lsp)) >= 0) {
 	            proclistentmpdel(pip,tlp,rs1) ;
 	        } else {
@@ -800,7 +777,7 @@ static int proclistenmerge(PROGINFO *pip,vecobj *tlp)
 
 	if (rs >= 0) {
 	for (i = 0 ; vecobj_get(tlp,i,&tlsp) >= 0 ; i += 1) {
-	    if (tlsp != NULL) {
+	    if (tlsp != nullptr) {
 
 	    rs1 = listenspec_delmarked(tlsp) ; /* cannot happen! */
 
@@ -825,7 +802,7 @@ static int proclistenmerge(PROGINFO *pip,vecobj *tlp)
 /* end subroutine (proclistenmerge) */
 
 
-static int proclistenpresent(PROGINFO *pip,vecobj *tlp,LISTENSPEC *lsp)
+local int proclistenpresent(PI *pip,vecobj *tlp,LISTENSPEC *lsp)
 {
 	LISTENSPEC	*tlsp ;
 	int		rs ;
@@ -833,7 +810,7 @@ static int proclistenpresent(PROGINFO *pip,vecobj *tlp,LISTENSPEC *lsp)
 	int		i = 0 ;
 
 	for (i = 0 ; (rs = vecobj_get(tlp,i,&tlsp)) >= 0 ; i += 1) {
-	    if (tlsp != NULL) {
+	    if (tlsp != nullptr) {
 	       rs1 = listenspec_issame(lsp,tlsp) ;
 	       if (rs1 > 0) break ;
 	    }
@@ -844,14 +821,14 @@ static int proclistenpresent(PROGINFO *pip,vecobj *tlp,LISTENSPEC *lsp)
 /* end subroutine (proclistenpresent) */
 
 
-static int proclistentmpdel(PROGINFO *pip,vecobj *tlp,int ei)
+local int proclistentmpdel(PI *pip,vecobj *tlp,int ei)
 {
-	LISTENSPEC	*tlsp = NULL ;
+	LISTENSPEC	*tlsp = nullptr ;
 	int		rs ;
 	int		rs1 ;
 
 	if ((rs = vecobj_get(tlp,ei,&tlsp)) >= 0) {
-	    if (tlsp != NULL) {
+	    if (tlsp != nullptr) {
 	        rs1 = listenspec_finish(tlsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        rs1 = vecobj_del(tlp,ei) ;
@@ -863,21 +840,16 @@ static int proclistentmpdel(PROGINFO *pip,vecobj *tlp,int ei)
 }
 /* end subroutine (proclistentmpdel) */
 
-
-static int proclistenfins(PROGINFO *pip,vecobj *tlp)
-{
+local int proclistenfins(PI *pip,vecobj *tlp) noex {
 	LISTENSPEC	*lsp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-
-	for (i = 0 ; vecobj_get(tlp,i,&lsp) >= 0 ; i += 1) {
-	    if (lsp != NULL) {
+	for (int i = 0 ; vecobj_get(tlp,i,&lsp) >= 0 ; i += 1) {
+	    if (lsp != nullptr) {
 	        rs1 = listenspec_finish(lsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (proclistenfins) */
