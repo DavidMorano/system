@@ -64,10 +64,11 @@
 #include	<keyopt.h>
 #include	<nulstr.h>
 #include	<nistinfo.h>
+#include	<timestr.h>
 #include	<filereadln.h>
 #include	<localmisc.h>
 
-#include	"opensvc_dayctime"
+#include	"opensvc_daytime"
 #include	"defs.h"
 
 
@@ -164,7 +165,7 @@ int		to ;
 	        strwcpy(ni.org,orgcode,NISTINFO_ORGLEN) ;
 	    }
 	    bp = ntbuf ;
-	    sp = timestr_nist(daytime,&ni,ntbuf) ;
+	    sp = timestr_nist(daytime,ntbuf,&ni) ;
 
 	    sl = strlen(sp) ;
 
