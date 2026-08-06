@@ -61,7 +61,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
