@@ -31,11 +31,12 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -115,26 +116,26 @@ struct state {
 
 /* forward references */
 
-static int	usage(proginfo *) noex ;
+local int	usage(proginfo *) noex ;
 
-static int	procopts(proginfo *,keyopt *) noex ;
+local int	procopts(proginfo *,keyopt *) noex ;
 
-static int	procextras(proginfo *) noex ;
-static int	procmsmap(proginfo *,OPTIONS *,cchar *) noex ;
-static int	procmsmaper(proginfo *,OPTIONS *,cchar *) noex ;
-static int	procmsmapline(proginfo *,char *,cchar *,int) noex ;
-static int	procloadsched(proginfo *,vecstr *) noex ;
+local int	procextras(proginfo *) noex ;
+local int	procmsmap(proginfo *,OPTIONS *,cchar *) noex ;
+local int	procmsmaper(proginfo *,OPTIONS *,cchar *) noex ;
+local int	procmsmapline(proginfo *,char *,cchar *,int) noex ;
+local int	procloadsched(proginfo *,vecstr *) noex ;
 
-static int	procout_begin(proginfo *,OPTIONS *,void *,cchar *) noex ;
-static int	procout_end(proginfo *,OPTIONS *,void *) noex ;
-static int	procout_post(proginfo *,OPTIONS *,bfile *,bfile *) noex ;
+local int	procout_begin(proginfo *,OPTIONS *,void *,cchar *) noex ;
+local int	procout_end(proginfo *,OPTIONS *,void *) noex ;
+local int	procout_post(proginfo *,OPTIONS *,bfile *,bfile *) noex ;
 
-static int process(proginfo *,ARGINFO *,bits *,OPTIONS *,void *,cchar *) noex ;
-static int procfile(proginfo *,OPTIONS *,bfile *,cchar *,int) noex ;
-static int procfiler(proginfo *,bfile *,bfile *) noex ;
-static int procline(proginfo *,bfile *,STATE *, cchar *,int) noex ;
+local int process(proginfo *,ARGINFO *,bits *,OPTIONS *,void *,cchar *) noex ;
+local int procfile(proginfo *,OPTIONS *,bfile *,cchar *,int) noex ;
+local int procfiler(proginfo *,bfile *,bfile *) noex ;
+local int procline(proginfo *,bfile *,STATE *, cchar *,int) noex ;
 
-static int msmapdef(char *) noex ;
+local int msmapdef(char *) noex ;
 
 
 /* local variables */
@@ -151,9 +152,9 @@ enum argopts {
 	argopt_of,
 	argopt_mf,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static cpcchar		argopts[] = {
+constexpr cpcchar	argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -165,17 +166,17 @@ static cpcchar		argopts[] = {
 	"of",
 	"mf",
 	nullptr
-} ;
+} ; /* end array */
 
-static const pivars	initvars = {
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRLOCAL
-} ;
+} ; /* end array */
 
-static const struct mapex	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -202,9 +203,9 @@ enum akonames {
 	akoname_compact,
 	akoname_subnbsp,
 	akoname_overlast
-} ;
+} ; /* end enum */
 
-static cpcchar		akonames[] = {
+constexpr cpcchar	akonames[] = {
 	"inplace",
 	"lower",
 	"doublespace",
@@ -219,23 +220,23 @@ static cpcchar		akonames[] = {
 	"compact",
 	"subnbsp",
 	nullptr
-} ;
+} ; /* end enum */
 
-static cpcchar		msmaps[] = {
+constexpr cpcchar	msmaps[] = {
 	"%p/etc/%n/%n.%f",
 	"%p/etc/%n/%f",
 	"%p/etc/%n.%f",
 	nullptr
-} ;
+} ; /* end array */
 
-static cint	selfchars[] = {
+constexpr cint		selfchars[] = {
 	CH_TAB,
 	CH_CR,
 	CH_NL,
 	CH_FF,
 	CH_VT,
 	0
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -774,9 +775,7 @@ badarg:
 
 /* local subroutines */
 
-
-static int usage(proginfo *pip)
-{
+local int usage(proginfo *pip) noex {
 	int     	rs = SR_OK ;
 	int     	wlen = 0 ;
 	cchar	*pn = pip->progname ;
@@ -857,10 +856,9 @@ static int usage(proginfo *pip)
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
-static int procopts(proginfo *pip,keyopt *kop) noex {
+local int procopts(proginfo *pip,keyopt *kop) noex {
 	options		*opp = pip->config ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -939,14 +937,11 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	} /* end if (ok) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procopts) */
+} /* end subroutine (procopts) */
 
-
-static int procextras(proginfo *pip)
-{
-	struct passwd	pw ;
-	cint	pwlen = getbufsize(bufsize_pw) ;
+local int procextras(proginfo *pip) noex {
+	PASSWD	pw ;
+	cint	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs ;
 	char		*pwbuf ;
 	if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
@@ -960,12 +955,9 @@ static int procextras(proginfo *pip)
 	    uc_free(pwbuf) ;
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (procextras) */
+} /* end subroutine (procextras) */
 
-
-static int procmsmap(proginfo *pip,OPTIONS *opp,cchar *mfn)
-{
+local int procmsmap(proginfo *pip,OPTIONS *opp,cchar *mfn) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((opp != nullptr) && opp->fl.mscrap) {
@@ -991,12 +983,9 @@ static int procmsmap(proginfo *pip,OPTIONS *opp,cchar *mfn)
 	    } /* end if (msmap-file) */
 	} /* end if (mscrap) */
 	return rs ;
-}
-/* end subroutine (procmsmap) */
+} /* end subroutine (procmsmap) */
 
-
-static int procmsmaper(proginfo *pip,OPTIONS *opp,cchar *mfn)
-{
+local int procmsmaper(proginfo *pip,OPTIONS *opp,cchar *mfn) noex {
 	bfile		mfile, *mfp = &mfile ;
 	int		rs ;
 	int		rs1 ;
@@ -1031,22 +1020,18 @@ static int procmsmaper(proginfo *pip,OPTIONS *opp,cchar *mfn)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (MS-file) */
 	return rs ;
-}
-/* end subroutine (procmsmaper) */
+} /* end subroutine (procmsmaper) */
 
-
-static int procmsmapline(proginfo *pip,char *mp,cchar *sp,int sl)
-{
+local int procmsmapline(proginfo *pip,char *mp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	cchar		*tp ;
 	if (pip == nullptr) return SR_FAULT ;
 	if ((tp = strnchr(sp,sl,'#')) != nullptr) {
-	    sl = (tp-sp) ;
+	    sl = intconv(tp-sp) ;
 	}
 	if (sl > 0) {
-	    int		cl ;
 	    cchar	*cp ;
-	    if ((cl = sfnext(sp,sl,&cp)) > 0) {
+	    if (int cl ; (cl = sfnext(sp,sl,&cp)) > 0) {
 		int	kch ;
 		if ((rs = cfnumi(cp,cl,&kch)) >= 0) {
 		    sl -= (cp+cl+1-sp) ;
@@ -1063,20 +1048,16 @@ static int procmsmapline(proginfo *pip,char *mp,cchar *sp,int sl)
 	    }
 	} /* end if (strnchr) */
 	return rs ;
-}
-/* end subroutine (procmsmapline) */
+} /* end subroutine (procmsmapline) */
 
-
-static int procloadsched(proginfo *pip,vecstr *svp)
-{
+local int procloadsched(proginfo *pip,vecstr *svp) noex {
 	int		rs = SR_OK ;
-	int		i ;
 	int		c = 0 ;
 	    cchar	*keys = "phen" ;
-	    for (i = 0 ; keys[i] != '\0' ; i += 1) {
+	    for (int i = 0 ; keys[i] != '\0' ; i += 1) {
 		cint	kc = MKCHAR(keys[i]) ;
 		cchar	*vp = nullptr ;
-		int		vl = -1 ;
+		int	vl = -1 ;
 	 	switch (kc) {
 		case 'p':
 		    vp = pip->pr ;
@@ -1100,12 +1081,9 @@ static int procloadsched(proginfo *pip,vecstr *svp)
 		if (rs < 0) break ;
 	    } /* end for */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procloadsched) */
+} /* end subroutine (procloadsched) */
 
-
-static int procout_begin(proginfo *pip,OPTIONS *optp,void *ofp,cchar *ofn)
-{
+local int procout_begin(proginfo *pip,OPTIONS *optp,void *ofp,cchar *ofn) noex {
 	int		rs = SR_OK ;
 	if (pip == nullptr) return SR_FAULT ;
 	if (optp->fl.inplace) {
@@ -1117,24 +1095,18 @@ static int procout_begin(proginfo *pip,OPTIONS *optp,void *ofp,cchar *ofn)
 	    rs = bopen(ofp,ofn,"wct",0666) ;
 	} /* end if (opening the output file) */
 	return rs ;
-}
-/* end subroutine (procout_begin) */
+} /* end subroutine (procout_begin) */
 
-
-static int procout_end(proginfo *pip,OPTIONS *optp,void *ofp)
-{
+local int procout_end(proginfo *pip,OPTIONS *optp,void *ofp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pip == nullptr) return SR_FAULT ;
 	rs1 = bclose(ofp) ;
 	if (rs >= 0) rs = rs1 ;
 	return rs ;
-}
-/* end subroutine (procout_end) */
+} /* end subroutine (procout_end) */
 
-
-static int procout_post(proginfo *pip,OPTIONS *optp,bfile *ofp,bfile *ifp)
-{
+local int procout_post(proginfo *pip,OPTIONS *optp,bfile *ofp,bfile *ifp) noex {
 	int		rs = SR_OK ;
 	int		clen = 0 ;
 	if (optp->fl.inplace) {
@@ -1151,11 +1123,9 @@ static int procout_post(proginfo *pip,OPTIONS *optp,bfile *ofp,bfile *ifp)
 	    }
 	} /* end if (in-place) */
 	return (rs >= 0) ? clen : rs ;
-}
-/* end subroutine (procout_post) */
+} /* end subroutine (procout_post) */
 
-
-static int process(proginfo *pip,arginfo *aip,bits *bop,options *optp,
+local int process(proginfo *pip,arginfo *aip,bits *bop,options *optp,
 		void *ofp,cchar *afn) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1236,10 +1206,9 @@ static int process(proginfo *pip,arginfo *aip,bits *bop,options *optp,
 	} /* end if (program invocation arguments) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (process) */
+} /* end subroutine (process) */
 
-static int procfile(proginfo *pip,OPTIONS *opp,bfile *ofp,cc *fp,int fl) noex {
+local int procfile(proginfo *pip,OPTIONS *opp,bfile *ofp,cc *fp,int fl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1266,10 +1235,9 @@ static int procfile(proginfo *pip,OPTIONS *opp,bfile *ofp,cc *fp,int fl) noex {
 	} /* end if (nulstr) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procfile) */
+} /* end subroutine (procfile) */
 
-static int procfiler(proginfo *pip,bfile *ifp,bfile *ofp) noex {
+local int procfiler(proginfo *pip,bfile *ifp,bfile *ofp) noex {
 	options		*opp = pip->config ;
 	STATE		fs{} ;
 	cint		llen = LINEBUFLEN ;
@@ -1298,10 +1266,9 @@ static int procfiler(proginfo *pip,bfile *ifp,bfile *ofp) noex {
 	} /* end while */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procfiler) */
+} /* end subroutine (procfiler) */
 
-static int procline(proginfo *pip,bfile *ofp,STATE *fsp,cc *lbuf,int ll) noex {
+local int procline(proginfo *pip,bfile *ofp,STATE *fsp,cc *lbuf,int ll) noex {
 	options		*opp = pip->config ;
 	cint		olen = LINEBUFLEN ;
 	int		rs = SR_OK ;
@@ -1391,10 +1358,9 @@ static int procline(proginfo *pip,bfile *ofp,STATE *fsp,cc *lbuf,int ll) noex {
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procline) */
+} /* end subroutine (procline) */
 
-static int msmapdef(char *bp) noex {
+local int msmapdef(char *bp) noex {
 	int		i ;
 	for (i = 0 ; i < 32 ; i += 1) {
 	    bp[i] = '¿' ;
@@ -1410,7 +1376,6 @@ static int msmapdef(char *bp) noex {
 	}
 	bp[CH_DEL] = '¿' ;
 	return SR_OK ;
-}
-/* end subroutine (msmapdef) */
+} /* end subroutine (msmapdef) */
 
 
