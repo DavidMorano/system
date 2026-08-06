@@ -1,5 +1,6 @@
 /* opensvc_imail SUPPORT */
-/* lang=C20 */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* LOCAL facility open-service (imail) */
 /* version %I% last-modified %G% */
@@ -32,6 +33,7 @@
 	environment is set up without the possibility of inheriting
 	stale held locks from the parent address space.
 
+	Notes:
 	Do not hold your breathe that other UNIXi® besides Solaris®
 	will be cleaning up their lib-C implementations to make
 	them fork-safe any time soon.  It is just not going to
@@ -54,12 +56,12 @@
 
 	Synopsis:
 	int opensvc_imail(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -119,9 +121,14 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucopen.h>
+#include	<ucdesc.h>
+#include	<ucfileop.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<sigblocker.h>
@@ -130,7 +137,8 @@
 #include	<spawnproc.h>
 #include	<mkfdfname.h>
 #include	<opentmp.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"opensvc_imail.h"
 #include	"defs.h"
@@ -138,8 +146,8 @@
 
 /* local defines */
 
-#ifndef	STDFNNULL
-#define	STDFNNULL	"*STDNULL*"
+#ifndef	STDFNnullptr
+#define	STDFNnullptr	"*STDNULL*"
 #endif
 
 #ifndef	VARIMAILPR
@@ -179,48 +187,40 @@
 
 /* external subroutines */
 
-#if	CF_DEBUGS || CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	writeargs(int,BITS *,int,int,const char **) ;
+local int	writeargs(int,bits *,int,int,cchar **) ;
 
 
 /* local variables */
-
-static const char *argopts[] = {
-	"ROOT",
-	"sn",
-	"svc",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
 	argopt_sn,
 	argopt_svc,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static const char	*envbads[] = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"sn",
+	"svc",
+	nullptr
+} ; /* end array */
+
+constexpr cpcchar	envbads[] = {
 	VARIMAILPR,
 	VARIMAILSN,
 	VARIMAILOPTS,
 	VARIMAILAF,
 	VARIMAILEF,
 	"PROGRAMROOT",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 
 /* external variables */
@@ -228,21 +228,13 @@ static const char	*envbads[] = {
 
 /* exported subroutines */
 
-
-int opensvc_imail(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
-int		of ;
-mode_t		om ;
-const char	**argv ;
-const char	**envv ;
-int		to ;
-{
-	SIGBLOCK	b ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	ENVHELP		eh ;
-	const int	am = (of & O_ACCMODE) ;
+int opensvc_imail(cc *pr,cc *prn,int of,mode_t om,
+		cmv argv,cmv envv,int to) noex {
+    	cnullptr	np{} ;
+	bits		pargs ;
+	keyopt		akopts ;
+	envhelp		eh ;
+	cint		am = (of & O_ACCMODE) ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -250,21 +242,21 @@ int		to ;
 	int		argc = 0 ;
 	int		fd = -1 ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_akopts = FALSE ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*sn = NULL ;
-	const char	*svc = NULL ;
-	const char	*cmdname = CMDNAME ;
-	const char	*execfname ;
-	const char	**ev ;
+	int		f_akopts = false ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*svc = nullptr ;
+	cchar	*cmdname = CMDNAME ;
+	cchar	*execfname ;
+	cchar	**ev ;
 	char		progfname[MAXPATHLEN+1] ;
 
-	if (argv != NULL) {
-	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	if (argv != nullptr) {
+	    for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 	}
 
-/* start parsing the arguments */
+	/* start parsing the arguments */
 
 	if (rs >= 0) rs = bits_start(&pargs,1) ;
 	if (rs < 0) goto badpargs ;
@@ -275,7 +267,7 @@ int		to ;
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -286,7 +278,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -302,15 +294,15 @@ int		to ;
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -334,7 +326,7 @@ int		to ;
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -352,7 +344,7 @@ int		to ;
 /* program service-name */
 	                case argopt_svc:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            svc = avp ;
 	                    } else {
@@ -377,10 +369,8 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
-
+	                    cint	kc = MKCHAR(*akp) ;
 	                    switch (kc) {
-
 /* program-root */
 	                    case 'R':
 	                        if (argr > 0) {
@@ -437,9 +427,9 @@ int		to ;
 
 #if	CF_DEBUGS 
 	{
-	    const char	*cp ;
+	    cchar	*cp ;
 	    cp = getourenv(envv,VARDEBUGFNAME) ;
-	    if (cp != NULL) {
+	    if (cp != nullptr) {
 	        int dfd = debugopen(cp) ;
 	        debugprintf("opensvc_imail: starting DFD=%u\n",dfd) ;
 	    }
@@ -454,7 +444,7 @@ int		to ;
 	{
 	    int	i ;
 	    debugprintf("opensvc_imail: entered argc=%u\n",argc) ;
-	    for (i = 0 ; argv[i] != NULL ; i += 1)
+	    for (i = 0 ; argv[i] != nullptr ; i += 1)
 	        debugprintf("opensvc_imail: argv[%u]=>%s<\n",i,argv[i]) ;
 	}
 #endif
@@ -464,12 +454,12 @@ int		to ;
 	    goto badacc ;
 	}
 
-	if (sn == NULL) sn = SEARCHNAME ;
+	if (sn == nullptr) sn = SEARCHNAME ;
 
-	if (svc == NULL) {
+	if (svc == nullptr) {
 	    if (argc > 0) svc = argv[0] ;
 	}
-	if (svc == NULL) svc = SVCNAME ;
+	if (svc == nullptr) svc = SVCNAME ;
 
 	execfname = progfname ;
 	rs = prgetprogpath(pr,progfname,svc,-1) ;
@@ -481,35 +471,35 @@ int		to ;
 #endif
 
 	if (rs >= 0) {
-	    if ((rs = sigblocker_start(&b,NULL)) >= 0) {
-	        const char	*template = "/tmp/opensvcXXXXXXX" ;
-	        char		afname[MAXPATHLEN+1] ;
+	    if (sigblocker b ; (rs = b.start(nullptr)) >= 0) {
+	        cchar	*tfpat = "/tmp/opensvcXXXXXXX" ;
+	        char	afname[MAXPATHLEN+1] ;
 
-	        if ((rs = opentmpfile(template,O_RDWR,0666,afname)) >= 0) {
-	            const char	**eb = envbads ;
+	        if ((rs = opentmpfile(tfpat,O_RDWR,0666,afname)) >= 0) {
+	            cchar	**eb = envbads ;
 	            int		afd = rs ;
 
 	            if ((rs = writeargs(afd,&pargs,ai_pos,argc,argv)) >= 0) {
 	                if ((rs = envhelp_start(&eh,eb,envv)) >= 0) {
 
 	                    if (rs >= 0) {
-	                        const char	*kp = VARIMAILPR ;
+	                        cchar	*kp = VARIMAILPR ;
 	                        rs = envhelp_envset(&eh,kp,pr,-1) ;
 	                    }
 	                    if (rs >= 0) {
-	                        const char	*kp = VARIMAILSN ;
+	                        cchar	*kp = VARIMAILSN ;
 	                        rs = envhelp_envset(&eh,kp,svc,-1) ;
 	                    }
 	                    if (rs >= 0) {
-	                        const char	*kp = VARIMAILOPTS ;
+	                        cchar	*kp = VARIMAILOPTS ;
 	                        rs = envhelp_envset(&eh,kp,"ignore",-1) ;
 	                    }
 	                    if (rs >= 0) {
-	                        const char	*kp = VARIMAILEF ;
+	                        cchar	*kp = VARIMAILEF ;
 #if	CF_DEBUGS
-	                        const char	*vp = DSTDFNERR ;
+	                        cchar	*vp = DSTDFNERR ;
 #else
-	                        const char	*vp = STDFNNULL ;
+	                        cchar	*vp = STDFNnullptr ;
 #endif
 	                        rs = envhelp_envset(&eh,kp,vp,-1) ;
 	                    }
@@ -524,15 +514,15 @@ int		to ;
 
 	                    if (rs >= 0) {
 	                        if ((rs = envhelp_getvec(&eh,&ev)) >= 0) {
-	                            SPAWNPROC	ps ;
+	                            spawnproc	ps{} ;
 	                            int		ac = 0 ;
-	                            const char	*av[4] ;
+	                            cchar	*av[4] ;
 
 	                            av[ac++] = cmdname ;
 #if	CF_DEBUGS
 	                            av[ac++] = "-D=5" ;
 #endif
-	                            av[ac] = NULL ;
+	                            av[ac] = nullptr ;
 
 	                            memset(&ps,0,sizeof(SPAWNPROC)) ;
 	                            ps.opts |= SPAWNPROC_OIGNINTR ;
@@ -561,7 +551,7 @@ int		to ;
 	            uc_unlink(afname) ;
 	        } /* end if (opentmpfile) */
 
-	        rs1 = sigblocker_finish(&b) ;
+	        rs1 = b.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */
 	} /* end if (ok) */
@@ -569,7 +559,7 @@ int		to ;
 badacc:
 badarg:
 	if (f_akopts) {
-	    f_akopts = FALSE ;
+	    f_akopts = false ;
 	    rs1 = keyopt_finish(&akopts) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -593,19 +583,16 @@ badpargs:
 
 /* local subroutines */
 
-static int writeargs(int afd,BITS *blp,int ai_pos,int argc,mainv argv) noex {
+local int writeargs(int afd,bits *blp,int ai_pos,int argc,mainv argv) noex {
 	int		rs ;
 	int		rs1 ;
-	int		n = 0 ;
-
+	int		n = 0 ; /* return-value */
 	if (filer b ; (rs = filer_start(&b,afd,0z,512,0)) >= 0) {
-	    int		ai ;
-	    int		f ;
+	    bool	f ;
 	    cchar	*ap ;
-
-	    for (ai = 1 ; ai < argc ; ai += 1) {
+	    for (int ai = 1 ; ai < argc ; ai += 1) {
 	        f = (bits_test(blp,ai) > 0) ;
-	        f = f || ((ai > ai_pos) && (argv[ai] != NULL)) ;
+	        f = f || ((ai > ai_pos) && (argv[ai] != nullptr)) ;
 	        if (f) {
 	            ap = argv[ai] ;
 	            if (ap[0] != '-') {
@@ -614,15 +601,11 @@ static int writeargs(int afd,BITS *blp,int ai_pos,int argc,mainv argv) noex {
 	            }
 	        }
 	    } /* end for */
-
 	    rs1 = filer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
-
 	if (rs >= 0) u_rewind(afd) ;
-
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (writeargs) */
+} /* end subroutine (writeargs) */
 
 
