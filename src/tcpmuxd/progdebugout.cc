@@ -1,10 +1,11 @@
-/* progdebugout */
+/* progdebugout SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* write out the output files from the executed program */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,19 +18,20 @@
 
 /*******************************************************************************
 
+  	Description:
 	Some sort of output procecessing.
-
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getx.h>
 #include	<linefold.h>
 #include	<bfile.h>
 #include	<localmisc.h>
@@ -51,10 +53,6 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
 
 /* forward references */
 
@@ -67,11 +65,12 @@ static int	procline(struct proginfo *,int,const char *,int) ;
 static cchar	blanks[] = "        " ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progdebugout(PROGINFO *pip,cchar *s,cchar *fname)
-{
+int progdebugout(PROGINFO *pip,cchar *s,cchar *fname) noex {
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	int		cols = -1 ;
