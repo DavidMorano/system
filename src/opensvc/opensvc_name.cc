@@ -123,7 +123,7 @@ static int subinfo_finish(SUBINFO *) ;
 static int subinfo_af(SUBINFO *,FILER *,cchar *) ;
 static int subinfo_def(SUBINFO *,FILER *) ;
 static int subinfo_all(SUBINFO *,FILER *) ;
-static int subinfo_args(SUBINFO *,FILER *,ARGINFO *,BITS *,cchar *) ;
+static int subinfo_args(SUBINFO *,FILER *,ARGINFO *,bits *,cchar *) ;
 static int subinfo_users(SUBINFO *,FILER *,cchar *,int) ;
 static int subinfo_user(SUBINFO *,FILER *,cchar *,int) ;
 
@@ -172,8 +172,8 @@ const char	**envv ;
 int		to ;
 {
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
@@ -365,7 +365,7 @@ int		to ;
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -503,7 +503,7 @@ static int subinfo_all(SUBINFO *sip,FILER *ofp)
 
 
 /* ARGSUSED */
-static int subinfo_args(SUBINFO *sip,FILER *ofp,ARGINFO *aip,BITS *bop,
+static int subinfo_args(SUBINFO *sip,FILER *ofp,ARGINFO *aip,bits *bop,
 		cchar *afn)
 {
 	const int	argc = aip->argc ;
