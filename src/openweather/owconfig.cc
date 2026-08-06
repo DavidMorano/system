@@ -339,9 +339,9 @@ OWCONFIG	*cfp ;
 int owconfig_read(cfp)
 OWCONFIG	*cfp ;
 {
-	PARAMFILE		*pfp = &cfp->p ;
-	PARAMFILE_CUR		cur ;
-	PARAMFILE_ENT		pe ;
+	paramfile		*pfp = &cfp->p ;
+	paramfile_cur		cur ;
+	paramfile_ent		pe ;
 
 	OW		*lip = cfp->lip ;
 	EXPCOOK		*ckp = &cfp->cooks ;
