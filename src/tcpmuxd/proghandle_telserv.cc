@@ -1,11 +1,12 @@
 /* proghandle_telserv SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle this service request */
 /* version %I% last-modified %G% */
 
-#define	P_TELSERV	1		/* which basic function */
+
+#define	CF_TELSERV	1		/* which basic function */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -97,8 +98,8 @@
 #include <syslog.h>
 #include <netdb.h>
 #include <csignal>
-#include <cstddef>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include <cstring>
 
 #ifndef SYSV
@@ -117,10 +118,8 @@
 #include <cerrno>
 #include <cstdio>
 
-#include	<clanguage.h>
-#include	<usysbase.h>
 #include	<vecstr.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -137,7 +136,7 @@
 #define	PROGNAME	"telnetd"
 #endif
 
-#if	P_TELSERV
+#if	CF_TELSERV
 #define	PROGNAME	"telserv"
 #endif
 
@@ -209,11 +208,14 @@
 
 extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,vecstr *,
-			const char *,const char **) ;
+			cchar *,cchar **) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
+
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdomain(char *) ;
 
 
 /* external variables */
@@ -242,37 +244,37 @@ struct envlist {
 
 /* forward references */
 
-local int	procsvcspec(struct proginfo *,vecstr *,char *,int) ;
+static int	procsvcspec(struct proginfo *,vecstr *,char *,int) ;
 
-local int	doit(struct proginfo *,STANDING *,BUILTIN *,
+static int	doit(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,int,struct sockaddr_storage *) ;
-local int	telnet(struct proginfo *,struct clientinfo *,pid_t,int,int) ;
-local int	mkpam(struct proginfo *,const char *,const char *) ;
+static int	telnet(struct proginfo *,struct clientinfo *,pid_t,int,int) ;
+static int	mkpam(struct proginfo *,cchar *,cchar *) ;
 
-local int	tcsetdefault(int) ;
-local int	tcspeednonzero(int) ;
-local int	tcnoecho(int) ;
-local int	readstream();
-local int	telrcv() ;
-local int	send_oob(int fd, char *ptr, int count);
-local int	setenv(const char *name, const char *value, int rdebugwrite);
-local int	removemod(int f, char *modname);
-local int	fatal(int,const char *) ;
+static int	tcsetdefault(int) ;
+static int	tcspeednonzero(int) ;
+static int	tcnoecho(int) ;
+static int	readstream();
+static int	telrcv() ;
+static int	send_oob(int fd, char *ptr, int count);
+static int	setenv(cchar *name, cchar *value, int rdebugwrite);
+static int	removemod(int f, char *modname);
+static int	fatal(int,cchar *) ;
 
-local int	termsecure(const char *,char *) ;
-local int	telserv_service(const char *,const char *) ;
+static int	termsecure(cchar *,char *) ;
+static int	telserv_service(cchar *,cchar *) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-local int	debugfstat(const char *,int) ;
+static int	debugfstat(cchar *,int) ;
 #endif
 
-local void	drainstream();
-local void	unsetenv(const char *name);
-local void	suboption();
-local void	showbanner() ;
-local void	cleanup();
+static void	drainstream();
+static void	unsetenv(cchar *name);
+static void	suboption();
+static void	showbanner() ;
+static void	cleanup();
 
-local int	fd_allzero(fd_set *) ;
+static int	fd_allzero(fd_set *) ;
 
 
 /* local (?) variables */
@@ -299,7 +301,7 @@ char	ptyobuf[BUFSIZ], *pfrontp = ptyobuf, *pbackp = ptyobuf;
 
 char	*netibuf, *netip;
 
-local int	netibufsize;
+static int	netibufsize;
 
 #define	NIACCUM(c)	{   *netip++ = c; \
 			    ncc++; \
@@ -410,7 +412,7 @@ char	*envinit[2];
 
 #if	CF_LOCALSVC
 
-static const char *termtypes[] = {
+static cchar *termtypes[] = {
 	"screen",
 	"vt100",
 	"vt101",
@@ -428,7 +430,7 @@ static const char *termtypes[] = {
 	NULL
 } ;
 
-static const char *services[] = {
+static cchar *services[] = {
 	"talker",			/* historical */
 	"talk",
 	"weather",
@@ -445,8 +447,8 @@ static const char *services[] = {
  * linked list structure.
  */
 
-local int
-new_env(const char *name, const char *value)
+static int
+new_env(cchar *name, cchar *value)
 {
 	struct envlist *env, *index;
 
@@ -476,8 +478,8 @@ new_env(const char *name, const char *value)
  * anyway before we exec login.
  */
 
-local int
-del_env(const char *name)
+static int
+del_env(cchar *name)
 {
 	struct envlist *env;
 
@@ -490,7 +492,7 @@ del_env(const char *name)
 	return (0);
 }
 
-local int
+static int
 issock(int fd)
 {
 	ustat stats;
@@ -560,7 +562,7 @@ struct clientinfo	*cip ;
 		exit(1);
 	}
 
-	if (setsockopt(0, SOL_SOCKET, SO_KEEPALIVE, (const char *)&on,
+	if (setsockopt(0, SOL_SOCKET, SO_KEEPALIVE, (cchar *)&on,
 						sizeof (on)) < 0) {
 		syslog(LOG_WARNING, "setsockopt (SO_KEEPALIVE): %m");
 	}
@@ -586,7 +588,7 @@ struct clientinfo	*cip ;
 /* local subroutines */
 
 
-local int procsvcspec(pip,nelp,svcspec,svcspeclen)
+static int procsvcspec(pip,nelp,svcspec,svcspeclen)
 struct proginfo		*pip ;
 vecstr			*nelp ;
 char			svcspec[] ;
@@ -598,8 +600,8 @@ int			svcspeclen ;
 	int	sl ;
 	int	len = 0 ;
 
-	const char	*tp, *cp ;
-	const char	*sp ;
+	cchar	*tp, *cp ;
+	cchar	*sp ;
 
 
 	if (nelp == NULL)
@@ -633,7 +635,7 @@ int			svcspeclen ;
 ret0:
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutines (procsvcspec) */
+/* end subroutine (procsvcspec) */
 
 
 /*
@@ -771,7 +773,7 @@ getterminaltype()
 /*
  * Get a pty, scan input lines.
  */
-local int doit(pip,sop,bop,cip,f, who)
+static int doit(pip,sop,bop,cip,f, who)
 struct proginfo		*pip ;
 STANDING		*sop ;
 BUILTIN			*bop ;
@@ -1236,7 +1238,7 @@ gotpty:
 	opts = VECSTR_OCOMPACT ;
 	if ((rs = vecstr_start(&envs,10,opts)) >= 0) {
 
-		const char	*sav[1] ;
+		cchar	*sav[1] ;
 
 
 		rs = vecstr_envadd(&envs,VARTERM,(terminaltype + 5),-1) ;
@@ -1299,9 +1301,9 @@ gotpty:
 /* end subroutine (doit) */
 
 
-local int fatal(f, msg)
+static int fatal(f, msg)
 int 		f ;
-const char	*msg;
+cchar	*msg;
 {
 	char buf[BUFSIZ];
 
@@ -1360,7 +1362,7 @@ int	s;		/* socket number */
  * flow between pty and network takes place through
  * in-kernel telnet streams module (telmod).
  */
-local int telnet(pip,cip,pid,net, master)
+static int telnet(pip,cip,pid,net, master)
 struct proginfo		*pip ;
 struct clientinfo	*cip ;
 pid_t			pid ;
@@ -1717,7 +1719,7 @@ int			master ;
 /* end subroutine (telnet) */
 
 
-local int telrcv()
+static int telrcv()
 {
 	register int c;
 
@@ -2143,7 +2145,7 @@ int option;
  *	Terminal type is
  */
 
-local void
+static void
 suboption()
 {
 	int subchar;
@@ -2222,10 +2224,11 @@ suboption()
 			return;
 		c = SB_GET();
 		if (c == TELQUAL_IS) {
-			if (subchar == TELOPT_OLD_ENVIRON)
+			if (subchar == TELOPT_OLD_ENVIRON) {
 				settimer(oenvironsubopt);
-			else
+			} else {
 				settimer(environsubopt);
+			}
 		} else if (c != TELQUAL_INFO) {
 			return;
 		}
@@ -2642,7 +2645,7 @@ netflush()
 	}
 }
 
-local void cleanup()
+static void cleanup()
 {
 
 	/*
@@ -2704,7 +2707,7 @@ rmut()
 			strncpy(rhost, up->ut_host, sizeof (up->ut_host));
 			rhost[sizeof (up->ut_host)] = '\0';
 
-#if	P_TELSERV
+#if	CF_TELSERV
 	cp = "telserv" ;
 #else
 	cp = "telnet" ;
@@ -2804,7 +2807,7 @@ rmut()
 #endif /* SYSV */
 
 
-local int
+static int
 readstream(fd, buf, offset)
 	int	fd;
 	char	*buf;
@@ -2862,7 +2865,8 @@ readstream(fd, buf, offset)
 	/*NOTREACHED*/
 }
 
-local void drainstream(size)
+static void
+drainstream(size)
 	int	size;
 {
 	int	nbytes;
@@ -2889,7 +2893,7 @@ local void drainstream(size)
  * TPI style replacement for socket send() primitive, so we do not require
  * sockmod to be on the stream.
  */
-local int send_oob(int fd, char *ptr, int count)
+static int send_oob(int fd, char *ptr, int count)
 {
 	struct T_exdata_req exd_req;
 	struct strbuf hdr, dat;
@@ -2923,7 +2927,7 @@ local int send_oob(int fd, char *ptr, int count)
 #define	__P(x)	()
 #endif
 
-static char *__findenv __P((const char *, int *));
+static char *__findenv __P((cchar *, int *));
 
 /*
  * setenv --
@@ -2931,12 +2935,12 @@ static char *__findenv __P((const char *, int *));
  *	"value".  If rdebugwrite is set, replace any current value.
  */
 setenv(name, value, rdebugwrite)
-	const char *name;
-	const char *value;
+	cchar *name;
+	cchar *value;
 	int rdebugwrite;
 {
 	extern char **environ;
-	local int alloced;			/* if allocated space before */
+	static int alloced;			/* if allocated space before */
 	register char *c;
 	int l_value, offset;
 
@@ -3008,7 +3012,7 @@ setenv(name, value, rdebugwrite)
  */
 void
 unsetenv(name)
-	const char *name;
+	cchar *name;
 {
 	extern char **environ;
 	register char **p;
@@ -3026,7 +3030,7 @@ unsetenv(name)
  */
 char *
 getenv(name)
-	const char *name;
+	cchar *name;
 {
 	int offset;
 
@@ -3042,12 +3046,12 @@ getenv(name)
  */
 static char *
 __findenv(name, offset)
-	register const char *name;
+	register cchar *name;
 	int *offset;
 {
 	extern char **environ;
 	register int len;
-	register const char *np;
+	register cchar *np;
 	register char **p, *c;
 
 	if (name == NULL || environ == NULL)
@@ -3199,7 +3203,7 @@ defbanner()
  * Verify that the named module is at the top of the stream
  * and then pop it off.
  */
-local int removemod(int f, char *modname)
+static int removemod(int f, char *modname)
 {
 	char topmodname[BUFSIZ];
 
@@ -3220,8 +3224,8 @@ local int removemod(int f, char *modname)
 #if	CF_LOCALSVC
 
 /* check if a terminal/service specification is allowed */
-local int termsecure(terminaltype,svc)
-const char	terminaltype[] ;
+static int termsecure(terminaltype,svc)
+cchar	terminaltype[] ;
 char		svc[] ;
 {
 	int	svcoff, i, j ;
@@ -3277,9 +3281,9 @@ char		svc[] ;
 
 
 /* see if this service is allowed from the "services" file */
-local int telserv_service(fname,service)
-const char	fname[] ;
-const char	service[] ;
+static int telserv_service(fname,service)
+cchar	fname[] ;
+cchar	service[] ;
 {
 	FILE	*fp ;
 
@@ -3336,7 +3340,7 @@ ret0:
 #endif /* CF_LOCALSVC */
 
 
-local int tcsetdefault(fd)
+static int tcsetdefault(fd)
 int	fd ;
 {
 	struct termios	ts ;
@@ -3384,7 +3388,7 @@ ret0:
 /* end subroutine (tcsetdefault) */
 
 
-local int tcspeednonzero(fd)
+static int tcspeednonzero(fd)
 int	fd ;
 {
 		struct termios	ts ;
@@ -3430,7 +3434,7 @@ int	fd ;
 /* end subroutine (tcspeednonzero) */
 
 
-local int tcnoecho(fd)
+static int tcnoecho(fd)
 int	fd ;
 {
 	struct termios	ts ;
@@ -3454,19 +3458,19 @@ int	fd ;
 /* end subroutine (tcnoecho) */
 
 
-local int mkpam(pip,rhost,slavename)
+static int mkpam(pip,rhost,slavename)
 struct proginfo	*pip ;
-const char	rhost[] ;
-const char	slavename[] ;
+cchar	rhost[] ;
+cchar	slavename[] ;
 {
 	pam_handle_t    *pamh;
 
 	int	rs1 ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
-#if	P_TELSERV
+#if	CF_TELSERV
 	cp = "telserv" ;
 #else
 	cp = "telnet" ;
@@ -3485,7 +3489,7 @@ const char	slavename[] ;
 /* end subroutine (mkpam) */
 
 
-local int fd_allzero(sp)
+static int fd_allzero(sp)
 fd_set	*sp ;
 {
 	int	i ;
@@ -3503,8 +3507,8 @@ fd_set	*sp ;
 
 #if	CF_DEBUG || CF_DEBUGS
 
-local int	debugfstat(s,fd)
-const char	s[] ;
+static int	debugfstat(s,fd)
+cchar	s[] ;
 int		fd ;
 {
 	ustat	sb ;
