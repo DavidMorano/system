@@ -1,6 +1,6 @@
 /* termtime_main (termtime) */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* display a time-stamp on the terminal */
 /* version %I% last-modified %G% */
@@ -38,16 +38,12 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdio>
 #include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<usysbase.h>
 #include	<usyscalls.h>
 #include	<usysutility.hh>	/* |libu::snprintf(3u)| */
 #include	<uclibmem.h>
-#include	<uctimeconvx.h>		/* |uc_localtime(3uc)| */
+#include	<uctimeconvx.h>		/* |uc_timelocal(3uc)| */
 #include	<ucstrftime.h>		/* |uc_strftime(3uc)| */
-#include	<getfdfile.h>		/* |FD_STDERR| */
 #include	<strmgr.h>
 #include	<libf.h>		/* |fwrite(3f)| */
 #include	<ascii.h>
@@ -62,7 +58,7 @@
 import libutil ;			/* |getlenstr(3u)| */
 import uconstants ;			/* |sysword(3u)| + |varname(3u)| */
 import ulibvals ;			/* |ulibval(3u)| */
-import debug ;
+import deb ;
 
 /* local defines */
 
@@ -231,11 +227,11 @@ local int mktimestr(char *tbuf,int tlen) noex {
     	custime		dt = time(nullptr) ;
     	int		rs ;
 	int		tl = 0 ; /* return-value */
-	if (TM ts ; (rs = uc_localtime(&dt,&ts)) >= 0) {
+	if (TM ts ; (rs = uc_timelocal(&dt,&ts)) >= 0) {
 	    cchar *fmt = " %a %e %H:%M" ;
 	    rs = uc_strftime(tbuf,tlen,fmt,&ts) ;
 	    tl = rs ;
-	} /* end if (uc_localtime) */
+	} /* end if (uc_timelocal) */
 	if_constexpr (f_debug) {
 	    debprintf(__func__,"ret rs=%d\n",rs) ;
 	}
