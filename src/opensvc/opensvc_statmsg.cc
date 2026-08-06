@@ -183,8 +183,8 @@ cchar	**argv ;
 cchar	**envv ;
 int		to ;
 {
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	VECHAND		adms ;
 	STATMSG_ID	mid ;
 	gid_t		gid = -1 ;
