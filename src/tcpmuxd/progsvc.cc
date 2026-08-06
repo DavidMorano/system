@@ -1,6 +1,6 @@
 /* progsvc SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C++20 (conformance reviewed) */
+/* lang=C++20 */
 
 /* handle some service processing */
 /* version %I% last-modified %G% */
@@ -37,7 +37,8 @@
 #include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<logfile.h>
 #include	<svcfile.h>
@@ -65,26 +66,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,ccharg *,uint) ;
-extern int	snsds(char *,int,ccharg *,const char *) ;
-extern int	sncpy1(char *,int,ccharg *) ;
-extern int	sncpy2(char *,int,ccharg *,const char *) ;
-extern int	mkpath1(char *,ccharg *) ;
-extern int	mkpath2(char *,ccharg *,const char *) ;
-extern int	mkpath3(char *,ccharg *,const char *,const char *) ;
-extern int	mkpath1w(char *,ccharg *,int) ;
-extern int	matstr(ccharg **,const char *,int) ;
-extern int	matpstr(ccharg **,int,const char *,int) ;
-extern int	sfshrink(ccharg *,int,char **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(ccharg *,int,int *) ;
-extern int	cfdecti(ccharg *,int,int *) ;
-extern int	perm(ccharg *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(ccharg **,vecstr *,char *,int,const char *,int) ;
-extern int	getfname(ccharg *,const char *,int,char *) ;
-
-extern int	securefile(ccharg *,uid_t,gid_t) ;
-
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
 
@@ -92,9 +73,6 @@ extern int	proglog_flush(PROGINFO *) ;
 extern int	debugprintf(ccharg *,...) ;
 extern int	nprintf(ccharg *,const char *,...) ;
 #endif
-
-extern char	*strwcpy(char *,ccharg *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -116,29 +94,29 @@ static int	proclist(PROGINFO *,ccharg *) ;
 /* local variables */
 
 /* 'conf' for most regular programs */
-static ccharg	*sched_system[] = {
+constexpr cpcchar	sched_system[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	"%p/%n.%f",
-	NULL
+	nullptr
 } ;
 
-static ccharg	*sched_user[] = {
+constexpr cpcchar	sched_user[] = {
 	"%h/%e/%n/%n.%f",
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
 	"%h/%n.%f",
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int progsvcopen(pip)
-PROGINFO	*pip ;
-{
+int progsvcopen(proginfo *pip) noex {
 	cint	tlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -166,7 +144,7 @@ PROGINFO	*pip ;
 	    debugprintf("progsvcopen: 0 svcfname=%r\n",cp,cl) ;
 #endif
 
-	if ((cp == NULL) || (cp[0] == '+')) {
+	if ((cp == nullptr) || (cp[0] == '+')) {
 	    cp = SVCFNAME ;
 	    cl = -1 ;
 	}
@@ -176,7 +154,7 @@ PROGINFO	*pip ;
 	    debugprintf("progsvcopen: 1 svcfname=%r\n",cp,cl) ;
 #endif
 
-	if (strchr(cp,'/') == NULL) {
+	if (strchr(cp,'/') == nullptr) {
 	    VECSTR	*plp = &pip->svars ;
 	    cchar	**sched ;
 
@@ -231,7 +209,7 @@ PROGINFO	*pip ;
 	}
 #endif
 
-	if ((rs >= 0) && (rs1 >= 0) && (cp != NULL)) {
+	if ((rs >= 0) && (rs1 >= 0) && (cp != nullptr)) {
 	    cchar	**vpp = &pip->svcfname ;
 	    rs = proginfo_setentry(pip,vpp,cp,cl) ;
 #if	CF_DEBUG
@@ -252,7 +230,7 @@ PROGINFO	*pip ;
 	if (pip->open.logprog)
 	    proglog_printf(pip,"svc=%s\n",pip->svcfname) ;
 
-	if ((rs = perm(pip->svcfname,-1,-1,NULL,R_OK)) >= 0) {
+	if ((rs = perm(pip->svcfname,-1,-1,nullptr,R_OK)) >= 0) {
 	    if (pip->fromconf.svcfname) {
 	        pip->fl.secure_svcfile = 
 	            pip->fl.secure_root && pip->fl.secure_conf ;
@@ -415,11 +393,11 @@ PROGINFO	*pip ;
 	    int		i ;
 	    ccharg	*sn = "helloworld" ;
 	    char	svbuf[SVBUFLEN + 1] ;
-	    rs1 = svcfile_fetch(&pip->stab,sn,NULL,&sv,svbuf,svlen) ;
+	    rs1 = svcfile_fetch(&pip->stab,sn,nullptr,&sv,svbuf,svlen) ;
 	    nprintf(DEBFNAME,"progsvccheck: svcfile_fetch() rs=%d\n",rs1) ;
 	    if (rs1 >= 0) {
 	        nprintf(DEBFNAME,"progsvccheck: svc=%s\n",sv.svc) ;
-	        for (i = 0 ; sv.keyvals[i][0] != NULL ; i += 1) {
+	        for (i = 0 ; sv.keyvals[i][0] != nullptr ; i += 1) {
 	            nprintf(DEBFNAME,"progsvccheck: k=%s v=>%s<\n",
 	                sv.keyvals[i][0],sv.keyvals[i][1]) ;
 		}
@@ -455,7 +433,7 @@ ccharg	*s ;
 	if (! pip->open.svcfname)
 	    goto ret0 ;
 
-	if (s == NULL) s = "" ;
+	if (s == nullptr) s = "" ;
 
 	if ((rs = svcfile_curbegin(svcp,&cur)) >= 0) {
 
