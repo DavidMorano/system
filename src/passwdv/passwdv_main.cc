@@ -100,8 +100,8 @@ struct locinfo {
 
 static int	usage(PROGINFO *) ;
 
-static int	procgather(PROGINFO *,PARAMOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
+static int	procgather(PROGINFO *,paramopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
 static int	procone(PROGINFO *,cchar *) ;
 
 static int	procout_begin(PROGINFO *,bfile *,cchar *) ;
@@ -194,8 +194,8 @@ int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo{} ;
-	BITS		pargs ;
-	PARAMOPT	aparams ;
+	bits		pargs ;
+	paramopt	aparams ;
 	bfile		errfile ;
 
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -374,7 +374,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            rs = SR_INVALID ;
 	                    }
 	                    if ((rs >= 0) && (cp != NULL)) {
-	                        PARAMOPT	*pop = &aparams ;
+	                        paramopt	*pop = &aparams ;
 	                        cchar		*po = po_option ;
 	                        rs = paramopt_loads(pop,po,cp,cl) ;
 	                    }
@@ -666,7 +666,7 @@ int main(int argc,mainv argv,mainv envv) {
 		    if ((rs = procout_begin(pip,&ofile,ofn)) >= 0) {
 		        {
 			    ARGINFO	*aip = &ainfo ;
-			    BITS	*bop = &pargs ;
+			    bits	*bop = &pargs ;
 			    rs = procargs(pip,aip,bop,afname) ;
 		        }
 		        rs1 = procout_end(pip,&ofile) ;
@@ -769,8 +769,8 @@ static int usage(PROGINFO *pip) noex {
 }
 /* end subroutine (usage) */
 
-static int procgather(PROGINFO *pip,PARAMOPT *pop) noex {
-	PARAMOPT_CUR	cur ;
+static int procgather(PROGINFO *pip,paramopt *pop) noex {
+	paramopt_cur	cur ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
@@ -795,7 +795,7 @@ static int procgather(PROGINFO *pip,PARAMOPT *pop) noex {
 } 
 /* end subroutine (procgather) */
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn) noex {
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cl ;
