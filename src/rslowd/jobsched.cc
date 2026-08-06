@@ -16,44 +16,62 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Description:
+	This subroutine is responsible for handling certain job
+	conditions.  This subroutine is called with the folowing
+	arguments:
+
+	Arguments:
+	wsp	watcher state (pointer)
+	jep	job entry pointer
+	sbp	job's file status block pointer
+	slp	daemon's service list pointer 
+
+	Returns:
+	OK	does not really matter in the current implementation
+
+*******************************************************************************/
+
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/wait.h>		/* POSIX */
+#include	<sys/time.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<poll.h>		/* POSIX */
+#include	<dirent.h>		/* POSIX */
+#include	<ftw.h>			/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bfile.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<vecelem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<baops.h>		/* LIBUC */
+#include	<msg.h>			/* LIBUC */
+#include	<msgheaders.h>		/* LIBUC */
+#include	<ema.h>			/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<jobdb.h>		/* LIBUC */
+#include	<srvfile.h>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/wait.h>
-#include	<sys/time.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<dirent.h>
-#include	<ftw.h>
-#include	<csignal>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<logfile.h>
-#include	<vecelem.h>
-#include	<vecstr.h>
-#include	<baops.h>
-#include	<msg.h>
-#include	<msgheaders.h>
-#include	<ema.h>
-#include	<strx.h>
-#include	<char.h>
-#include	<localmisc.h>
-
-#include	"jobdb.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"configfile.h"
-#include	"srvfile.h"
 
 
 /* local defines */
@@ -63,18 +81,14 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	getpwd(char *,int) ;
 extern int	matfromenv(cchar *,int) ;
 extern int	matmsghead(cchar *,int,char *,int *) ;
-extern int	jobdb_search(), jobdb_findpid() ;
-extern int	handlejob_start(), handlejob_end() ;
+extern int	jobdb_search() ;
+extern int	jobdb_findpid() ;
+extern int	handlejob_start() ;
+extern int	handlejob_end() ;
 
 extern int	path_init(), path_parse() ;
-
-extern char	*strshrink(char *) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* externals variables */
@@ -84,8 +98,8 @@ extern struct global	g ;
 
 /* forwards */
 
-static int	ext_id() ;
-static int	handle_enter() ;
+local int	ext_id(char *,cchar *) noex ;
+local int	handle_enter() noex ;
 
 
 /* external variables */
@@ -94,72 +108,53 @@ static int	handle_enter() ;
 /* local structures */
 
 
-/* local data */
-
-/* built-in function table */
-
-#define	FUN_REPORT	0
-#define	FUN_EXIT	1
+/* forward references */
 
 
-static cchar	*funtab[] = {
+/* local variables */
+
+enum funs {
+    	fun_report,
+	fun_exit,
+	fun_overlast
+} ; /* end enum (funs) */
+
+#define	FUN_REPORT	fun_export
+#define	FUN_EXIT	fun_exit
+
+constexpr cpcchar	funtab[] = {
 	"REPORT",
 	"EXIT",
-	NULL
-} ;
+	nullptr
+} ; /* end array (funtab)*/
 
 
-/*******************************************************************************
-
-	This subroutine is responsible for handling certain job conditions.
-
-	This subroutine is called with the folowing arguments:
-
-	Arguments:
-	wsp	watcher state (pointer)
-	jep	job entry pointer
-	sbp	job's file status block pointer
-	slp	daemon's service list pointer 
-
-	Returns:
-	OK	doesn't really matter in the current implementation
-
-
-*******************************************************************************/
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int handle_new(wsp,jlp,jep,sbp,slp)
-struct watchstate	*wsp ;
-JOBDB		*jlp ;
-struct jobentry	*jep ;
-ustat	*sbp ;
-struct vecelem	*slp ;
-{
-	struct sigaction	sigs ;
+int handle_new(watchstate *wsp,jobdb *jlp,hobdb_ent *jep,ustat *sbp,
+		vecele *slp) noex {
+	SIGACTION	sigs ;
 	MSGMATENV	me ;
 	bfile		infile, *ifp = &infile ;
 	sigset_t	signalmask ;
 	time_t		daytime ;
-	off_t	offset ;
+	off_t		offset ;
 	int		rs ;
 	int		i ;
-	int		len, l ;
+	int		len ;
+	int		l ;
 	char	tmpfname[MAXPATHLEN + 1] ;
 	char	linebuf[LINELEN + 1] ;
 	char	headname[LINELEN + 1] ;
 	char	*cp, *cp1 ;
-
-
 #if	CF_DEBUG
 	if (g.debuglevel > 1)
 	    debugprintf("handle_new: entered\n") ;
 #endif
-
 	wsp->c[JOBSTATE_WATCH] -= 1 ;
-
 /* can we open and read this file */
 
 #if	CF_DEBUG
@@ -176,44 +171,30 @@ struct vecelem	*slp ;
 
 	len = 0 ;
 	rs = bopen(ifp,tmpfname,"r",0666) ;
-
-	if (rs < 0)
-		goto ret0 ;
+	if (rs < 0) goto ret0 ;
 
 	offset = 0L ;
 
 /* analyze this job */
 top:
-	while (TRUE) {
-
+	while (true) {
 	    handle_enter(wsp,jep,sbp,slp,ifp,offset,linebuf,len) ;
-
-/* are we done? */
-
+	    /* are we done? */
 	    offset = jep->offset + jep->clen ;
 	    if (sbp->st_size <= offset) 
 		break ;
 
 	while ((rs = breadln(ifp,linebuf,LINELEN)) > 0) {
-
 	    len = rs ;
-	    if (! matfromenv(linebuf,len))
-		continue ;
-
-	    if (matmsghead(linebuf,len,headname,NULL) > 0)
-		continue ;
-
+	    if (! matfromenv(linebuf,len)) continue ;
+	    if (matmsghead(linebuf,len,headname,nullptr) > 0) continue ;
 	    offset += len ;
-
 	} /* end while */
-
-	if (rs < 0)
-		break ;
+	if (rs < 0) break ;
 
 /* we have another job hidden back here, allocate a new job entry */
 
 	    handle_add(wsp,jlp,jep->filename,sbp,&jep) ;
-
 	} /* end while */
 
 done:
@@ -226,7 +207,7 @@ ret0:
 /* end subroutine (handle_new) */
 
 
-static int handle_enter(wsp,jep,sbp,slp,ifp,offset,linebuf,linelen)
+local int handle_enter(wsp,jep,sbp,slp,ifp,offset,linebuf,linelen)
 struct watchstate	*wsp ;
 struct jobentry	*jep ;
 ustat	*sbp ;
@@ -236,20 +217,13 @@ off_t		offset ;
 char	linebuf[] ;
 int	linelen ;
 {
-	struct sigaction	sigs ;
-
-	struct srventry		*sep ;
-
+	SIGACTION	sigs ;
+	srventry	*sep ;
 	MSG		jh, *jhp = &jh ;
-
 	MSGMATENV	*mep ;
-
 	MSGHEADERS	*mhp ;
-
 	sigset_t	signalmask ;
-
 	time_t		daytime ;
-
 	int	rs, i ;
 	int	len, l ;
 
@@ -293,7 +267,7 @@ int	linelen ;
 
 		for (i = 0 ; msg_headget(jhp,i,&mhp) >= 0 ; i += 1) {
 
-			if (mhp == NULL) continue ;
+			if (mhp == nullptr) continue ;
 
 		debugprintf("handle_enter: H> %s: %s\n",
 			mhp->name,mhp->value) ;
@@ -305,7 +279,7 @@ int	linelen ;
 
 /* get some initial stuff */
 
-	if (msghvalues[HI_XJOBID] != NULL)
+	if (msghvalues[HI_XJOBID] != nullptr)
 	    strwcpy(jep->jobid,msghvalues[HI_XJOBID],JOBIDLEN) ;
 
 	else
@@ -319,7 +293,7 @@ int	linelen ;
 	debugprintf("handle_enter: x-queuespec=%s\n",msghvalues[HI_XQUEUESPEC]) ;
 #endif
 
-	if (msghvalues[HI_XQUEUESPEC] != NULL)
+	if (msghvalues[HI_XQUEUESPEC] != nullptr)
 	    ext_id(queuespec,msghvalues[HI_XQUEUESPEC]) ;
 
 #if	CF_DEBUG
@@ -327,7 +301,7 @@ int	linelen ;
 	debugprintf("handle_enter: queuespec=%s\n",queuespec) ;
 #endif
 
-	if ((cp = strbrk(queuespec,"!:")) != NULL) {
+	if ((cp = strbrk(queuespec,"!:")) != nullptr) {
 
 	    *cp++ = '\0' ;
 	    queue_machine = strshrink(queuespec) ;
@@ -341,7 +315,7 @@ int	linelen ;
 	        queue_path = strshrink(cp) ;
 
 	    else
-	        queue_path = NULL ;
+	        queue_path = nullptr ;
 
 #if	CF_DEBUG
 	if (g.debuglevel > 1)
@@ -350,7 +324,7 @@ int	linelen ;
 
 	} else {
 
-	    queue_path = NULL ;
+	    queue_path = nullptr ;
 	    queue_machine = strshrink(queuespec) ;
 
 	}
@@ -360,7 +334,7 @@ int	linelen ;
 	debugprintf("handle_enter: qm=%s qp=%s\n",queue_machine,queue_path) ;
 #endif
 
-	if (queue_path != NULL)
+	if (queue_path != nullptr)
 	    bufprintf(jep->queuespec,QUEUESPECLEN,"%s!%s",
 	        queue_machine,queue_path) ;
 
@@ -386,7 +360,7 @@ int	linelen ;
 
 /* get the service code */
 
-	if (msghvalues[HI_XSERVICE] == NULL)
+	if (msghvalues[HI_XSERVICE] == nullptr)
 	    goto handle_nosrv ;
 
 	l = sfshrink(msghvalues[HI_XSERVICE],-1,&cp1) ;
@@ -396,7 +370,7 @@ int	linelen ;
 	cp1[l] = '\0' ;
 	vecstrinit(&jep->srvargs,5,VSP_SORTED) ;
 
-	while ((cp = strbrk(cp1," \t\n\r\v")) != NULL) {
+	while ((cp = strbrk(cp1," \t\n\r\v")) != nullptr) {
 
 	    vecstradd(&jep->srvargs,cp1,cp - cp1) ;
 
@@ -411,9 +385,9 @@ int	linelen ;
 	    vecstradd(&jep->srvargs,cp1,-1) ;
 
 	for (i = 0 ; vecstrget(&jep->srvargs,i,&cp) >= 0 ; i += 1)
-	    if (cp != NULL) break ;
+	    if (cp != nullptr) break ;
 
-	if (cp == NULL) {
+	if (cp == nullptr) {
 
 	    vecstrfree(&jep->srvargs) ;
 
@@ -426,17 +400,17 @@ int	linelen ;
 
 
 	jep->orig_machine[0] = '\0' ;
-	if (msghvalues[HI_XORIGHOST] != NULL)
+	if (msghvalues[HI_XORIGHOST] != nullptr)
 	    strwcpy(jep->orig_machine,msghvalues[HI_XORIGHOST],
 	        MAXHOSTNAMELEN) ;
 
 	jep->orig_user[0] = '\0' ;
-	if (msghvalues[HI_XORIGUSER] != NULL)
+	if (msghvalues[HI_XORIGUSER] != nullptr)
 	    strwcpy(jep->orig_user,msghvalues[HI_XORIGUSER],
 	        MAXUSERNAMELEN) ;
 
 	jep->clen = -1 ;
-	if (msghvalues[HI_CLEN] != NULL) {
+	if (msghvalues[HI_CLEN] != nullptr) {
 
 	    if (cfdeci(msghvalues[HI_CLEN],-1,&jep->clen) < 0)
 	        jep->clen = -1 ;
@@ -447,12 +421,12 @@ int	linelen ;
 	    jep->clen = sbp->st_size - offset ;
 
 	jep->date = (time_t) -1 ;
-	if (msghvalues[HI_DATE] != NULL) {
+	if (msghvalues[HI_DATE] != nullptr) {
 
-	    if ((jep->date = getindate(msghvalues[HI_CLEN],NULL)) ==
+	    if ((jep->date = getindate(msghvalues[HI_CLEN],nullptr)) ==
 	        ((time_t) -1)) {
 
-	        jep->date = getabsdate(msghvalues[HI_CLEN],NULL) ;
+	        jep->date = getabsdate(msghvalues[HI_CLEN],nullptr) ;
 
 	    }
 	}
@@ -460,23 +434,23 @@ int	linelen ;
 
 	path_init(&jep->path) ;
 
-	if (msghvalues[HI_PATH] != NULL)
+	if (msghvalues[HI_PATH] != nullptr)
 	    path_parse(&jep->path,msghvalues[HI_PATH]) ;
 
 
 	ema_start(&jep->from) ;
 
-	if (msghvalues[HI_FROM] != NULL)
+	if (msghvalues[HI_FROM] != nullptr)
 	    ema_parse(&jep->from,msghvalues[HI_FROM],-1) ;
 
 	ema_start(&jep->sender) ;
 
-	if (msghvalues[HI_SENDER] != NULL)
+	if (msghvalues[HI_SENDER] != nullptr)
 	    ema_parse(&jep->sender,msghvalues[HI_SENDER],-1) ;
 
 	ema_start(&jep->error_to) ;
 
-	if (msghvalues[HI_ERRORTO] != NULL)
+	if (msghvalues[HI_ERRORTO] != nullptr)
 	    ema_parse(&jep->error_to,msghvalues[HI_ERRORTO],-1) ;
 
 
@@ -647,11 +621,8 @@ struct jobentry	**jepp ;
 	    debugprintf("handle_add: made log entry\n") ;
 #endif
 
-	logfile_printf(&g.lh,
-	    "f=%s\n",je.filename) ;
-
+	logfile_printf(&g.lh, "f=%s\n",je.filename) ;
 	je.state = JOBSTATE_WATCH ;
-
 	i = jobdb_add(jlp,&je,sizeof(struct jobentry)) ;
 
 #if	CF_DEBUG
@@ -664,80 +635,41 @@ struct jobentry	**jepp ;
 	jobdb_get(jlp,i,jepp) ;
 
 	return i ;
-}
-/* end subroutine (handle_add) */
+} /* end subroutine (handle_add) */
 
-
-/* delete a job */
-int handle_del(jlp,i,jep)
-JOBDB		*jlp ;
-int		i ;
-struct jobentry	*jep ;
-{
+int handle_del(jobdb *jlp,int i,jobdb_ent *jep) noex {
 	int		rs ;
-
-
-	if (jep == NULL) {
-
+	if (jep == nullptr) {
 		if ((rs = jobdb_get(jlp,i,&jep)) < 0) return rs ;
-
 	} else if (i < 0) {
-
-		if ((i = jobdb_getp(jlp,jep)) < 0) return i ;
-
+		if ((i = jobdb_getent(jlp,jep)) < 0) return i ;
 	}
-
 	(void) handlejob_del(jep) ;
-
 	return jobdb_del(jlp,i) ;
-}
-/* end subroutine (handle_del) */
-
+} /* end subroutine (handle_del) */
 
 /* extract an ID type header value */
-static int ext_id(articleid,s)
-char	s[], articleid[] ;
-{
-	struct ema		aid ;
-
-	struct ema_ent	*ep ;
-
-	int	i, rs ;
-
-
+local int ext_id(char *articleid,cchar *s) noex {
+	ema	aid ;
+	ema_ent	*ep ;
+	int	rs ;
 	articleid[0] = '\0' ;
 	ema_start(&aid) ;
-
 	if (ema_parse(&aid,s) > 0) {
-
-	    for (i = 0 ; (rs = ema_get(&aid,i,&ep)) >= 0 ; i += 1) {
-
-	        if (ep == NULL) continue ;
-
+	    for (int i = 0 ; (rs = ema_get(&aid,i,&ep)) >= 0 ; i += 1) {
+	        if (ep == nullptr) continue ;
 	        if (ep->fl.error) continue ;
-
 	        if (ep->rlen > 0) {
-
 	            strcpy(articleid,ep->route) ;
-
 	            break ;
-
 	        } else if (ep->alen > 0) {
-
 	            strcpy(articleid,ep->address) ;
-
 	            break ;
 	        }
-
 	    } /* end for */
-
 	} /* end if */
-
 	ema_finish(&aid) ;
-
 	return (articleid[0] == '\0') ? BAD : OK ;
-}
-/* end subroutine (ext_id) */
-
+} /* end subroutine (ext_id) */
 
 
