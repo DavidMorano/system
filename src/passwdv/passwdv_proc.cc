@@ -1,4 +1,5 @@
 /* passwdv_proc SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process a name */
@@ -18,6 +19,9 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************
+
+  	Name:
+	passwdv_proc
 
 	Description:
 	This module processes a single password verification request.
@@ -42,13 +46,14 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<pwd.h>
+#include	<ctime>
 #include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<ucmem.h>
 #include	<bfile.h>
 #include	<passwdent.h>
 #include	<pwfile.h>
@@ -62,15 +67,20 @@
 
 /* local defines */
 
+#ifndef	PI
+#define	PI	proginfo
+#endif
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-
-extern int	getpassword(const char *,char *,int) ;
-extern int	checkpass(PROGINFO *,const char *,const char *,int) ;
-extern int	passwdok(const char *,const char *) ;
 
 
 /* external variables */
@@ -81,7 +91,7 @@ extern int	passwdok(const char *,const char *) ;
 
 /* forward references */
 
-static int	userexists(PROGINFO *,PWFILE *,const char *) ;
+local int	userexists(PI *,PWFILE *,cchar *) ;
 
 
 /* local variables */
@@ -89,22 +99,20 @@ static int	userexists(PROGINFO *,PWFILE *,const char *) ;
 
 /* exported subroutines */
 
-
-int process(PROGINFO *pip,PWFILE *pfp,bfile *ofp,cchar *name)
-{
+int process(PI *pip,PWFILE *pfp,bfile *ofp,cchar *name) noex {
 	int		rs = SR_OK ;
-	int		f_valid = FALSE ;
+	int		f_valid = false ;
 	char		ubuf[USERNAMELEN + 1] ;
 	char		prompt[PROMPTLEN + 1] ;
 	char		password[PASSWDLEN + 1] ;
 	char		*p ;
 
-	if (name == NULL) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
 
 	if (name[0] == '\0') return SR_INVALID ;
 
 	if (name[0] == '-') {
-	    if (pip->username == NULL) {
+	    if (pip->username == nullptr) {
 		rs = getusername(ubuf,USERNAMELEN,-1) ;
 		if (rs >= 0)
 		    rs = proginfo_setentry(pip,&pip->username,ubuf,rs) ;
@@ -171,7 +179,7 @@ int process(PROGINFO *pip,PWFILE *pfp,bfile *ofp,cchar *name)
 	if (rs < 0)
 	    goto ret0 ;
 
-	if (pfp != NULL) {
+	if (pfp != nullptr) {
 	    PWFILE_ENT	pw ;
 	    PWFILE_CUR	cur ;
 	    cint	pwlen = PWFILE_ENTLEN ;
@@ -192,7 +200,7 @@ int process(PROGINFO *pip,PWFILE *pfp,bfile *ofp,cchar *name)
 #endif
 
 	        if (passwdok(password,pw.password)) {
-	            f_valid = TRUE ;
+	            f_valid = true ;
 	            break ;
 	        }
 
@@ -212,7 +220,7 @@ int process(PROGINFO *pip,PWFILE *pfp,bfile *ofp,cchar *name)
 	        debugprintf("process: using system 'checkpass()'\n") ;
 #endif
 
-	    rs = checkpass(pip,name,password,TRUE) ;
+	    rs = checkpass(pip,name,password,true) ;
 	    f_valid = (rs > 0) ;
 
 	} /* end if */
@@ -231,35 +239,35 @@ ret0:
 
 /* local subroutines */
 
-
 /* is the username present in the password database? */
-static int userexists(PROGINFO *pip,PWFILE *pfp,cchar *name)
-{
-	int		rs ;
+local int userexists(PI *pip,PWFILE *pfp,cchar *name) noex {
+    	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		f = FALSE ;
-
-	if (pip == NULL) return SR_FAULT ;
-
-	if ((rs = pwentrybufsize()) >= 0) {
-	    cint	pwlen = rs ;
-	    char	*pwbuf ;
-	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-	        if (pfp != NULL) {
-	            PWFILE_ENT	pfe ;
-	            rs = pwfile_fetchuser(pfp,name,NULL,&pfe,pwbuf,pwlen) ;
-	        } else {
-	            PASSWDENT	spw ;
-	            rs = getpw_name(&spw,pwbuf,pwlen,name) ;
-	        }
-	        f = (rs >= 0) ;
-	        rs1 = uc_free(pwbuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory-allocation-free) */
-	} /* end if (getbufsize) */
-
+	int		f = false ;
+	if (pip && name) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+	        if ((rs = pwentrybufsize()) >= 0) {
+	            cint	pwlen = rs ;
+	            if (char *pwbuf ; (rs = mem.mall((pwlen+1),&pwbuf)) >= 0) {
+	                if (pfp) {
+			    cauto pw_fu = pwfile_fetchuser ;
+	                    PWFILE_ENT	pfe ;
+	                    rs = pw_fu(pfp,name,np,&pfe,pwbuf,pwlen) ;
+	                    f = (rs > 0) ;
+	                } else {
+	                    PASSWDENT	spw ;
+	                    rs = getpw_name(&spw,pwbuf,pwlen,name) ;
+	                    f = (rs > 0) ;
+	                }
+	                rs1 = mem.free(pwbuf) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (memory-allocation-free) */
+	        } /* end if (valid) */
+	    } /* end if (pwentrybufsize) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (userexists) */
+} /* end subroutine (userexists) */
 
 
