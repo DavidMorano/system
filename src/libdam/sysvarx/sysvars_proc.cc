@@ -49,6 +49,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
 #include	<linebuffer.h>		/* LIBUC */
 #include	<filer.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
@@ -56,6 +57,7 @@
 #include	<field.h>		/* LIBUC */
 #include	<varmk.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
@@ -66,19 +68,7 @@
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-#ifndef	VBUFLEN
-#define	VBUFLEN		(10 * MAXPATHLEN)
-#endif
-
-#define	BUFLEN		MAX((4 * MAXPATHLEN),LINEBUFLEN)
+#define	BUFMULT		5		/* buffer size multiplier */
 
 #define	WORDEXPORT	"export"
 
@@ -96,6 +86,19 @@
 #if	defined(BSD) && (! defined(EXTERN_STRNCASECMP))
 extern int	strncasecmp(cchar *,cchar *,int) noex ;
 #endif
+
+
+/* external subroutines */
+
+
+/* local structures */
+
+namespace {
+    struct varer {
+	int	buflen ;
+	operator int () noex ;
+    } ; /* end struct (varer) */
+} /* end namespace */
 
 
 /* forward references */
@@ -136,6 +139,8 @@ constexpr cpcchar	pstrs[] = {
 	nullptr
 } ; /* end array */
 
+static varer		vdata ;
+
 
 /* exported variables */
 
@@ -148,28 +153,32 @@ int sysvars_procget(hdbstr *vlp,cchar *fn) noex {
 	if (vlp && fn) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0]) ylikely {
-	        cint	vn = 10 ;
-	        cint	vo = 0 ;
-	        if (vecstr lvars ; (rs = lvars.start(vn,vo)) >= 0) {
-	            if ((rs = lvars.envfile(fn)) >= 0) {
-	                bool	f ;
-	                cchar	*tp ;
-			cchar	*cp{} ;
-	                for (int i = 0 ; lvars.get(i,&cp) >= 0 ; i += 1) {
-	                    if (cp == nullptr) continue ;
-	                    if ((tp = strchr(cp,'=')) == nullptr) continue ;
-			    cint tl = intconv(tp - cp) ;
-	                    f = (matstr(wstrs,cp,tl) >= 0) ;
-	                    f = f || (matpstr(pstrs,10,cp,tl) >= 0) ;
-	                    if (f) {
-	                        rs = procaddvar(vlp,cp,-1) ;
-	                    } /* end if */
-	                    if (rs < 0) break ;
-	                } /* end for */
-	            } /* end if (vecstr_envfile) */
-	            rs1 = lvars.finish ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (lvars) */
+		if (static varer rsv = vdata ; (rs = rsv) >= 0) ylikely {
+	            cint	vn = 10 ;
+	            cint	vo = 0 ;
+		    (void) vdata.buflen ; /* <- currently unused */
+	            if (vecstr lvars ; (rs = lvars.start(vn,vo)) >= 0) ylikely {
+	                if ((rs = lvars.envfile(fn)) >= 0) {
+	                    bool	f ;
+			    cchar	*cp{} ;
+	                    for (int i = 0 ; lvars.get(i,&cp) >= 0 ; i += 1) {
+	                        if (cp) {
+	                            if (cc *tp = strchr(cp,'=') ; tp) {
+			               cint tl = intconv(tp - cp) ;
+	                               f = (matstr(wstrs,cp,tl) >= 0) ;
+	                               f = f || (matpstr(pstrs,10,cp,tl) >= 0) ;
+	                               if (f) {
+	                                   rs = procaddvar(vlp,cp,-1) ;
+	                               } /* end if */
+			            } /* end if (had equal sign) */
+			        } /* end if (non-null) */
+	                        if (rs < 0) break ;
+	                    } /* end for */
+	                } /* end if (vecstr_envfile) */
+	                rs1 = lvars.finish ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (lvars) */
+		} /* end if (varer) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -181,24 +190,24 @@ int sysvars_procset(hdbstr *vlp,cchar *dbn,mode_t om) noex {
 	int		rs1 ;
 	int		rs2 ;
 	int		c = 0 ;
-	if (vlp && dbn) {
+	if (vlp && dbn) ylikely {
 	    rs = SR_INVALID ;
-	    if (dbn[0]) {
+	    if (dbn[0]) ylikely {
 	        cint		of = O_CREAT ;
 	        cint		vn = DEFNVARS ;
 	        if (varmk svars ; (rs = varmk_open(&svars,dbn,of,om,vn)) >= 0) {
-	            int		vl ;
+		    cauto hcb = hdbstr_curbegin ;
+	            if (hdbstr_cur cur ; (rs2 = hcb(vlp,&cur)) >= 0) ylikely {
+	            int		val ;
 	            cchar	*kp ;
-	            cchar	*vp ;
-		    auto hcb = hdbstr_curbegin ;
-	            if (hdbstr_cur cur ; (rs2 = hcb(vlp,&cur)) >= 0) {
+	            cchar	*vap ;
 	                while (rs >= 0) {
-	                    rs1 = hdbstr_curenum(vlp,&cur,&kp,&vp,&vl) ;
+	                    rs1 = hdbstr_curenum(vlp,&cur,&kp,&vap,&val) ;
 	                    if (rs1 == SR_NOTFOUND) break ;
 	                    rs = rs1 ;
 	                    if (rs >= 0) {
 	                        c += 1 ;
-	                        rs = varmk_addvar(&svars,kp,vp,vl) ;
+	                        rs = varmk_addvar(&svars,kp,vap,val) ;
 	                    }
 	                } /* end while */
 	                rs1 = hdbstr_curend(vlp,&cur) ;
@@ -218,89 +227,67 @@ int sysvars_procset(hdbstr *vlp,cchar *dbn,mode_t om) noex {
 
 #if	CF_PROCVARFILE
 
+local int procvarln(hdbstr *vlp,cchar *cp,int cl) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if (field fsb ; (rs = fsb.start(cp,cl)) >= 0) ylikely {
+	    int kl = field_get(&fsb,fterms,&kp) ;
+            if (kl == 6) {
+                if (strncasecmp(WORDEXPORT,kp,kl) == 0) {
+                    kl = field_get(&fsb,fterms,&kp) ;
+                }
+            } /* end if (elimination of 'export') */
+            if ((kl > 0) && (! hasweird(kp,kl))) {
+                cvoid       *n = nullptr ;
+                if ((rs = hdbstr_fetch(vlp,kp,kl,n,n)) == rsn) {
+                    cchar *vap = vbuf ;
+                    int val = 0 ;
+                    if (fsb.term != '#') {
+                        val = field_sharg(&fsb,fterms,vbuf,vlen) ;
+                    }
+                    if (val >= 0) {
+                        c += 1 ;
+                        rs = hdbstr_add(vlp,kp,kl,vap,val) ;
+                    }
+                } /* end if (didn't have it already) */
+            } /* end if (have a variable keyname) */
+            rs1 = field_finish(&fsb) ;
+            if (rs >= 0) rs = rs1 ;
+	} /* end if (fields) */
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (procvarln) */
+
 local int procvarfile(hdbstr *vlp,cchar *fname) noex {
+	cint		rsn = SR_NOTFOUND ;
 	cint		to = TO_READ ;
 	int		rs ;
-	int		cl ;
-	int		kl ;
-	int		c = 0 ;
-	cchar	*tp, *kp ;
-	cchar	*cp ;
-
-	if (fname == nullptr) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	    filer	dfile, *dfp = &dfile ;
-	    cint	fd = rs ;
-	    if ((rs = filer_start(dfp,fd,0z,BUFLEN,0)) >= 0) {
-		field		fsb ;
-	        cint		llen = LINEBUFLEN ;
-		cint		vlen = VBUFLEN ;
-	        int		len ;
-		int		vl ;
-		cchar		*vp ;
-	        char		lbuf[LINEBUFLEN + 1] ;
-		char		vbuf[VBUFLEN + 1] ;
-
-	        while ((rs = filer_readln(dfp,lbuf,llen,to)) > 0) {
-	            len = rs ;
-
-	            if (lbuf[len - 1] == '\n') len -= 1 ;
-	            lbuf[len] = '\0' ;
-
-	            cp = lbuf ;
-	            cl = len ;
-	            while ((cl > 0) && CHAR_ISWHITE(*cp)) {
-	                cp += 1 ;
-	                cl -= 1 ;
-	            }
-
-	            if ((cp[0] == '\0') || (cp[0] == '#'))
-	                continue ;
-
-	            if ((rs = field_start(&fsb,cp,cl)) >= 0) {
-
-	                kl = field_get(&fsb,fterms,&kp) ;
-
-	                if (kl == 6) {
-	                    if (strncasecmp(WORDEXPORT,kp,kl) == 0) {
-	                        kl = field_get(&fsb,fterms,&kp) ;
-			    }
-	                } /* end if (elimination of 'export') */
-
-	                if ((kl > 0) && (! hasweird(kp,kl))) {
-	                    cint	nrs = SR_NOTFOUND ;
-	                    cvoid	*n = nullptr ;
-
-	                    if ((rs = hdbstr_fetch(vlp,kp,kl,n,n)) == nrs) {
-
-	                        vp = vbuf ;
-	                        vl = 0 ;
-	                        if (fsb.term != '#')
-	                            vl = field_sharg(&fsb,fterms,vbuf,vlen) ;
-
-	                        if (vl >= 0) {
-	                            c += 1 ;
-	                            rs = hdbstr_add(vlp,kp,kl,vp,vl) ;
-	                        }
-
-	                    } /* end if (didn't have it already) */
-
-	                } /* end if (have a variable keyname) */
-	                rs1 = field_finish(&fsb) ;
-	    		if (rs >= 0) rs = rs1 ;
-	            } /* end if (fields) */
-	            if (rs < 0) break ;
-	        } /* end while (reading lines) */
-	        rs1 = filer_finish(dfp) ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
+	if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) ylikely {
+	    cint of = O_RDONLY ;
+	    cint llen = rs ;
+	    if ((rs = u_open(fname,of,0)) >= 0) ylikely {
+	        cint	bsz = (llen * 2) ;
+	        cint	fd = rs ;
+	        if (filer fb ; (rs = fb.start(fd,0z,bsz,0)) >= 0) ylikely {
+	            while ((rs = fb.readln(lbuf,llen,to)) > 0) {
+		        cchar *cp ;
+		        if (int cl = (sl = sfcontent(lbuf,rs,&cp)) > 0) {
+			    rs = procvarln(blp,cp,cl) ;
+			    c += rs 
+		        } /* end if (sfcontent) */
+	                if (rs < 0) break ;
+	            } /* end while (reading lines) */
+	            rs1 = fb.finish ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (filer) */
+	        rs1 = u_close(fd) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (filer) */
-	    rs1 = u_close(fd) ;
+	    } /* end if (file) */
+	    rs1 = mem.free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (file) */
-
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (procvarfile) */
 
@@ -321,20 +308,28 @@ local int procaddvar(hdbstr *vlp,cchar *sp,int sl) noex {
     	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		kl = sl ;
-	int		vl = 0 ;
+	int		val = 0 ;
 	int		c = 0 ;
 	cchar		*kp = sp ;
-	cchar		*vp = nullptr ;
-	if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != np) {
-	    vp = (tp + 1) ;
-	    vl = -1 ;
+	cchar		*vap = nullptr ;
+	if (cchar *tp = strnchr(sp,sl,'=') ; tp) {
+	    vap = (tp + 1) ;
+	    val = -1 ;
 	    kl = intconv(tp - sp) ;
-	}
+	} /* end if (had equal sign) */
 	if ((rs = hdbstr_fetch(vlp,kp,kl,np,np)) == rsn) {
 	    c += 1 ;
-	    rs = hdbstr_add(vlp,kp,kl,vp,vl) ;
-	}
+	    rs = hdbstr_add(vlp,kp,kl,vap,val) ;
+	} /* end if */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (procaddvar) */
+
+varer::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
+	    buflen = (BUFMULT * rs) ;
+	} /* end if */
+    	return rs ;
+} /* end method (varer::operator) */
 
 
