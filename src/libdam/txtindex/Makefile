@@ -42,7 +42,7 @@ LIBS +=
 
 OBJ0= txtindex_prime.o txtindexmk.o
 OBJ1= txtindexes.o txtindexmks.o
-OBJ2= 
+OBJ2= txtindexhdr.o
 OBJ3= 
 
 OBJ4= 
@@ -50,7 +50,7 @@ OBJ5=
 PBJ6=
 OBJ7=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 OBJB=
 
 OBJ= obja.o
@@ -152,8 +152,9 @@ objb.o:			$(OBJB)
 
 
 txtindex_prime.o:	txtindex_prime.cc			$(INCS)
-txtindexes.o:		txtindexes.cc txtindexes.h		$(INCS)
-txtindexmk.o:		txtindexmk.cc txtindexmk.h		$(INCS)
-txtindexmks.o:		txtindexmks.cc txtindexmks.h		$(INCS)
+txtindexes.o:		txtindexes.cc	txtindexes.h		$(INCS)
+txtindexmk.o:		txtindexmk.cc	txtindexmk.h		$(INCS)
+txtindexmks.o:		txtindexmks.cc	txtindexmks.h		$(INCS)
+txtindexhdr.o:		txtindexhdr.cc	txtindexhdr.h		$(INCS)
 
 
