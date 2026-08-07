@@ -48,6 +48,7 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<strlibval.hh>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<spawnproc.h>		/* LIBUC */
@@ -156,10 +157,6 @@ import libutil ;			/* |lenstr(3u)| */
 #define	TMPDNAME	"/tmp"
 #endif
 
-#ifndef	TMPVARDNAME
-#define	TMPVARDNAME	"/var/tmp"
-#endif
-
 #ifndef	VCNAME
 #define	VCNAME		"var"
 #endif
@@ -189,10 +186,14 @@ import libutil ;			/* |lenstr(3u)| */
 #define	DEFNVARS	20
 #endif
 
+#ifndef	CF_MKSYSVARS
+#define	CF_MKSYSVARS	1		/* call 'sysvar' program */
+#endif
+
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -221,6 +222,13 @@ struct subinfo {
 	time_t		daytime ;
 } ; /* end struct */
 
+namespace {
+    struct varer {
+	int		maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (varer) */
+} /* end namespace */
+
 
 /* local structures */
 
@@ -231,11 +239,12 @@ template<typename ... Args>
 local int sysvars_ctor(sysvars *op,Args ... args) noex {
     	SYSVARS		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->vindp = new(nothrow) var) != np) ylikely {
+	    if ((op->vindp = new(nt) var) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-var) */
 	} /* end if (non-null) */
@@ -339,6 +348,7 @@ constexpr cpcchar	dbdirs[] = {
 	nullptr
 } ; /* end array (dbdirs) */
 
+static varer		vdata ;
 static strlibval	tmpdname(strlibval_tmpdir) ;
 cbool			f_mksysvars = CF_MKSYSVARS ;
 
@@ -357,22 +367,26 @@ const sysvars_obj		sysvars_modinfo = {
 int sysvars_open(SVS *op,cchar *pr,cchar *dbname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if ((dbname == nullptr) || (dbname[0] == '\0')) dbname = INDNAME ;
+	if ((dbname == nullptr) || (dbname[0] == '\0')) {
+	    dbname = INDNAME ;
+	}
 	if ((rs = sysvars_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (pr[0]) ylikely {
-	        if (SI si ; (rs = subinfo_start(&si)) >= 0) ylikely {
-	            if ((rs = sysvars_infoloadbegin(op,pr,dbname)) >= 0) {
-	                if ((rs = sysvars_indopen(op,&si)) >= 0) {
-	            	    op->magval = SYSVARS_MAGIC ;
-			}
-	                if (rs < 0) {
-	                    sysvars_infoloadend(op) ;
-			} /* end if (error) */
-	            } /* end if (infoload) */
-	            rs1 = subinfo_finish(&si) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (subinfo) */
+		if (static cint rsv = vdata ; (rs = rsv) >= 0) {
+	            if (SI si ; (rs = subinfo_start(&si)) >= 0) ylikely {
+	                if ((rs = sysvars_infoloadbegin(op,pr,dbname)) >= 0) {
+	                    if ((rs = sysvars_indopen(op,&si)) >= 0) {
+	            	        op->magval = SYSVARS_MAGIC ;
+			    }
+	                    if (rs < 0) {
+	                        sysvars_infoloadend(op) ;
+			    } /* end if (error) */
+	                } /* end if (infoload) */
+	                rs1 = subinfo_finish(&si) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (subinfo) */
+		} /* end if (varer) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		sysvars_dtor(op) ;
@@ -456,7 +470,7 @@ int sysvars_fetch(SVS *op,cc *kp,int kl,SVS_C *curp,char *vbuf,int vlen) noex {
 } /* end subroutine (sysvars_fetch) */
 
 int sysvars_curenum(SVS *op,SVS_C *curp,char *kp,int kl,char *vp,int vl) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	if ((rs = sysvars_magic(op,curp,kp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (curp->vcurp) ylikely {
@@ -492,7 +506,7 @@ local int sysvars_infoloadbegin(SVS *op,cchar *pr,cchar *dbname) noex {
 	    bp = (strwcpy(bp,pr,-1)+1) ;
 	    op->dbname = bp ;
 	    bp = (strwcpy(bp,dbname,-1)+1) ;
-	} /* emd if (memory-allocation) */
+	} /* emd if (memory-acquire) */
 	return rs ;
 } /* end subroutine (sysvars_infoloadbegin) */
 
@@ -503,7 +517,7 @@ local int sysvars_infoloadend(SVS *op) noex {
 	    rs1 = lm_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->a = nullptr ;
-	}
+	} /* end if (memory-release) */
 	op->pr = nullptr ;
 	op->dbname = nullptr ;
 	return rs ;
@@ -522,7 +536,7 @@ local int sysvars_indopenseq(SVS *op,SI *sip) noex {
 	    cint	vo = vecstrm.compact ;
 	    if (vecstr sdirs ; (rs = vecstr_start(&sdirs,vn,vo)) >= 0) {
 	        if ((rs = expcook_start(&cooks)) >= 0) {
-		    if ((rs = sysvars_loadcooks(op,&cooks)) >= 0) {
+		    if ((rs = sysvars_loadcooks(op,&cooks)) >= 0) ylikely {
 			rs = sysvars_indopenseqer(op,sip,&ds,&sdirs,&cooks) ;
 		    }
 		    rs1 = expcook_finish(&cooks) ;
@@ -539,72 +553,65 @@ local int sysvars_indopenseq(SVS *op,SI *sip) noex {
 
 local int sysvars_indopenseqer(SVS *op,SI *sip,dirseen *dsp,
 		vecstr *sdp,expcook *ecp) noex {
-	cint	elen = MAXPATHLEN ;
-	int		rs = SR_OK ;
+	cint		maxpath = vdata.maxpathlen ;
+	cint		sz = (2 * (vdata.maxpathlen + 1)) ;
+	int		rs ;
 	int		rs1 ;
-	int		i ;
-	int		el, pl ;
-	char		ebuf[MAXPATHLEN + 1] ;
-	char		pbuf[MAXPATHLEN + 1] ;
-
-/* first phase: expand possible directory paths */
-
-	for (i = 0 ; (rs >= 0) && (dbdirs[i] != nullptr) ; i += 1) {
-	    if ((rs = expcook_exp(ecp,0,ebuf,elen,dbdirs[i],-1)) > 0) {
-	        el = rs ;
-	        if ((rs = pathclean(pbuf,ebuf,el)) > 0) {
-	            pl = rs ;
+	int		ai = 2 ; /* double allocation */
+	if (char *a ; (rs = libmem.mall(sz,&a)) >= 0) {
+	    cint	elen = maxpath ;
+	    char	*ebuf = (a + (--ai * (maxpath + 1))) ;
+	    char	*pbuf = (a + (--ai * (maxpath + 1))) ;
+	    /* first phase: expand possible directory paths */
+	    for (int i = 0 ; (rs >= 0) && dbdirs[i] ; i += 1) {
+	        if ((rs = expcook_exp(ecp,0,ebuf,elen,dbdirs[i],-1)) > 0) {
+	            cint	el = rs ;
+	            if ((rs = pathclean(pbuf,ebuf,el)) > 0) {
+	                cint pl = rs ;
 	                rs1 = dirseen_havename(dsp,pbuf,pl) ;
 	                if (rs1 == SR_NOTFOUND) {
 	                    rs = dirseen_add(dsp,pbuf,pl,nullptr) ;
 		        }
-	        } /* end if (pathclean) */
-	    } /* end if (expcook_exp) */
-	} /* end for */
-
-/* next phase: create DB file-paths from directories */
-
-	if (rs >= 0) {
-	    if (op->dbname[0] != '/') {
-		dirseen_cur	cur ;
-
-	    if ((rs = dirseen_curbegin(dsp,&cur)) >= 0) {
-
-	        while (rs >= 0) {
-	            el = dirseen_curenum(dsp,&cur,ebuf,elen) ;
-	            if (el == SR_NOTFOUND) break ;
-	            rs = el ;
-	            if (rs >= 0) {
-	                if ((rs = mkpath2(pbuf,ebuf,op->dbname)) >= 0) {
-	                    pl = rs ;
-	                    rs = vecstr_add(sdp,pbuf,pl) ;
-			}
-	            }
-
-	        } /* end while */
-
-	        dirseen_curend(dsp,&cur) ;
-	    } /* end if (cursor) */
-
-	    } else {
-		rs = vecstr_add(sdp,op->dbname,-1) ;
-	    } /* end if */
-
-	} /* end if (ok) */
-
-/* final phase: try to open all of them in-sequence */
-
-	if (rs >= 0) {
-	    if (mainv dv ; (rs = vecstr_getvec(sdp,&dv)) >= 0) {
-	        if ((rs = var_opena(op->vindp,dv)) >= 0) {
-	            op->fl.var = true ;
-		}
-	        if ((rs < 0) && isNotPresent(rs)) {
-	            rs = sysvars_indopenalt(op,sip,dsp) ;
-		} /* end if (error) */
-	    }
-	} /* end if (ok) */
-
+	            } /* end if (pathclean) */
+	        } /* end if (expcook_exp) */
+	    } /* end for */
+	    /* next phase: create DB file-paths from directories */
+	    if (rs >= 0) {
+	        if (op->dbname[0] != '/') {
+		    dirseen_cur	cur ;
+	            if ((rs = dirseen_curbegin(dsp,&cur)) >= 0) {
+	        	while (rs >= 0) {
+	                    cint el = dirseen_curenum(dsp,&cur,ebuf,elen) ;
+	                    if (el == SR_NOTFOUND) break ;
+	                    rs = el ;
+	                    if (rs >= 0) {
+	                        if ((rs = mkpath2(pbuf,ebuf,op->dbname)) >= 0) {
+	                            cint pl = rs ;
+	                            rs = vecstr_add(sdp,pbuf,pl) ;
+			        }
+	                    }
+	                } /* end while */
+	                rs1 = dirseen_curend(dsp,&cur) ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (cursor) */
+	        } else {
+		    rs = vecstr_add(sdp,op->dbname,-1) ;
+	        } /* end if */
+	    } /* end if (ok) */
+	    /* final phase: try to open all of them in-sequence */
+	    if (rs >= 0) {
+	        if (mainv dv ; (rs = vecstr_getvec(sdp,&dv)) >= 0) {
+	            if ((rs = var_opena(op->vindp,dv)) >= 0) {
+	                op->fl.var = true ;
+		    }
+	            if ((rs < 0) && isNotPresent(rs)) {
+	                rs = sysvars_indopenalt(op,sip,dsp) ;
+		    } /* end if (error) */
+	        }
+	    } /* end if (ok) */
+	    rs1 = libmem.free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 } /* end subroutine (sysvars_indopenseqer) */
 
@@ -614,22 +621,22 @@ local int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 	char		kbuf[2] = {} ;
 	for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
 	    cint	kch = mkchar(ks[i]) ;
-	    int		vl = -1 ;
-	    cchar	*vp = nullptr ;
+	    int		val = -1 ;
+	    cchar	*vap = nullptr ;
 	    switch (kch) {
 	    case 'R':
-		vp = op->pr ;
+		vap = op->pr ;
 		break ;
 	    case 'S':
-		vp = INDDNAME ;
+		vap = INDDNAME ;
 		break ;
 	    case 'T':
-		vp = tmpdname ;
+		vap = tmpdname ;
 		break ;
 	    } /* end switch */
-	    if ((rs >= 0) && vp) {
+	    if ((rs >= 0) && vap) {
 		kbuf[0] = charconv(kch) ;
-		rs = expcook_add(ecp,kbuf,vp,vl) ;
+		rs = expcook_add(ecp,kbuf,vap,val) ;
 	    }
 	} /* end for */
 	if (rs >= 0) {
@@ -638,54 +645,50 @@ local int sysvars_loadcooks(SVS *op,expcook *ecp) noex {
 	        if (prname) {
 	            rs = expcook_add(ecp,"PRN",prname,-1) ;
 		}
-	    }
+	    } /* end if (sfbasename) */
 	} /* end if (ok) */
 	return rs ;
 } /* end subroutine (sysvars_loadcooks) */
 
 local int sysvars_indopenalt(SVS *op,SI *sip,dirseen *dsp) noex {
+    	cint		maxpath = vdata.maxpathlen ;
+	cint		sz = (2 * (vdata.maxpathlen + 1)) ;
 	int		rs ;
 	int		rs1 ;
-	if (dirseen_cur cur ; (rs = dirseen_curbegin(dsp,&cur)) >= 0) {
-	    cint	elen = MAXPATHLEN ;
-	    int		el ;
-	    char	ebuf[MAXPATHLEN + 1] ;
-	    char	indname[MAXPATHLEN + 1] ;
-
-	    while (rs >= 0) {
-
-	        el = dirseen_curenum(dsp,&cur,ebuf,elen) ;
-	        if (el == SR_NOTFOUND) break ;
-	        rs = el ;
-
-	        if (rs >= 0) {
-
-#if	CF_MKSYSVARS
-	            rs = sysvars_mksysvarsi(op,sip,ebuf) ;
-#else /* CF_MKSYSVARS */
-		    rs = SR_NOENT ;
-#endif /* CF_MKSYSVARS */
-
-	            if ((rs < 0) && isNotPresent(rs)) {
-	                rs = sysvars_indmk(op,ebuf) ;
-		    } /* end if (error) */
-
+	int		ai = 2 ; /* double memory allocation */
+	if (char *a ; (rs = libmem.mall(sz,&a)) >= 0) {
+	    cint	elen = maxpath ;
+	    if (dirseen_cur cur ; (rs = dirseen_curbegin(dsp,&cur)) >= 0) {
+	        char	*ebuf		= (a + (--ai * (maxpath + 1))) ;
+	        char	*indname	= (a + (--ai * (maxpath + 1))) ;
+	        while (rs >= 0) {
+	            int el = dirseen_curenum(dsp,&cur,ebuf,elen) ;
+	            if (el == SR_NOTFOUND) break ;
+	            rs = el ;
 	            if (rs >= 0) {
-	                if ((rs = mkpath2(indname,ebuf,op->dbname)) >= 0) {
-	                    rs = var_open(op->vindp,indname) ;
-	                    op->fl.var = (rs >= 0) ;
-	                }
-	            }
-
-	        } /* end if */
-
-	        if ((rs >= 0) || (! isNotPresent(rs))) break ;
-	    } /* end while */
-
-	    rs1 = dirseen_curend(dsp,&cur) ;
+		        if_constexpr (f_mksysvars) {
+	                    rs = sysvars_mksysvarsi(op,sip,ebuf) ;
+		        } else {
+		            rs = SR_NOENT ;
+		        } /* end if_constexpr (f_mksysvars) */
+	                if ((rs < 0) && isNotPresent(rs)) {
+	                    rs = sysvars_indmk(op,ebuf) ;
+		        } /* end if (error) */
+	                if (rs >= 0) {
+	                    if ((rs = mkpath2(indname,ebuf,op->dbname)) >= 0) {
+	                        rs = var_open(op->vindp,indname) ;
+	                        op->fl.var = (rs >= 0) ;
+	                    }
+	                } /* end if (ok) */
+	            } /* end if */
+	            if ((rs >= 0) || (! isNotPresent(rs))) break ;
+	        } /* end while */
+	        rs1 = dirseen_curend(dsp,&cur) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (cursor) */
+	    rs1 = libmem.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (cursor) */
-
+	} /* end if (m-a-f) */
 	return rs ;
 } /* end subroutine (sysvars_indopenalt) */
 
@@ -752,117 +755,112 @@ local int sysvars_indclose(SVS *op) noex {
 } /* end subroutine (sysvars_indclose) */
 
 /* make the index */
-#if	CF_MKSYSVARS
 local int sysvars_mksysvarsi(SVS *op,SI *sip,cchar *dname) noex {
     	cnullptr	np{} ;
+	cint		maxpath = vdata.maxpathlen ;
+	cint		sz = (2 * (vdata.maxpathlen + 1)) ;
 	int		rs ;
 	int		rs1 ;
+	int		ai = 2 ; /* double memory allocation */
 	cchar		*prog = PROG_MKSYSVARSI ;
-	char		dbname[MAXPATHLEN + 1] ;
-
-	if (dname == nullptr) return SR_FAULT ;
-
-	if (dname[0] == '\0') return SR_INVALID ;
-
-	if ((rs = mkpath2(dbname,dname,op->dbname)) >= 0) {
-	    if ((rs = subinfo_ids(sip)) >= 0) {
-	        USTAT	sb ;
-	        int		rs_last = SR_NOTFOUND ;
-	        int		pl = 0 ;
-		cchar		*pr = op->pr ;
-	        char		pbuf[MAXPATHLEN + 1] ;
-
-	        for (int i = 0 ; prbins[i] != nullptr ; i += 1) {
-	            if ((rs = mkpath3(pbuf,pr,prbins[i],prog)) >= 0) {
-	                pl = rs ;
-	                if ((rs = u_stat(pbuf,&sb)) >= 0) {
-	                    if ((rs = permid(&sip->id,&sb,X_OK)) >= 0) {
-				rs = 0 ;
-			    } else if (isNotPresent(rs)) {
+	if (char *a ; (rs = libmem.mall(sz,&a)) >= 0) {
+	    char	*dbname	= (a + (--ai * (maxpath + 1))) ;
+	    if ((rs = mkpath2(dbname,dname,op->dbname)) >= 0) {
+	        if ((rs = subinfo_ids(sip)) >= 0) {
+	            int		rs_last = SR_NOTFOUND ;
+	            int		pl = 0 ;
+		    cchar	*pr = op->pr ;
+	            char	*pbuf = (a + (--ai * (maxpath + 1))) ;
+	            for (int i = 0 ; prbins[i] ; i += 1) {
+	                if ((rs = mkpath3(pbuf,pr,prbins[i],prog)) >= 0) {
+	                    pl = rs ;
+	        	    if (ustat sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
+	                        if ((rs = permid(&sip->id,&sb,X_OK)) >= 0) {
+				    rs = 0 ;
+			        } else if (isNotPresent(rs)) {
+	                            rs_last = rs ;
+	                            pl = 0 ;
+	                            rs = SR_OK ;
+	                        }
+	                    } else if (isNotPresent(rs)) {
 	                        rs_last = rs ;
 	                        pl = 0 ;
 	                        rs = SR_OK ;
 	                    }
-	                } else if (isNotPresent(rs)) {
-	                    rs_last = rs ;
-	                    pl = 0 ;
-	                    rs = SR_OK ;
-	                }
-	            } /* end if (mkpath) */
-	            if (pl > 0) break ;
-	            if (rs >= 0) break ;
-	        } /* end for */
-	        if ((rs >= 0) && (pl == 0)) {
-		    rs = rs_last ;
-		}
-
-	        if (rs >= 0) {
-	            vecstr	envs ;
-		    cint	vn = 20 ;
-	            cint	vo = vecstrm.compact ;
-	            if ((rs = vecstr_start(&envs,vn,vo)) >= 0) {
-	                cchar	*cp ;
-
-/* setup environment */
-
-	                if (rs >= 0) {
-	                    rs = vecstr_envadd(&envs,VARSVPR,op->pr,-1) ;
-	                }
-	                if (rs >= 0) {
-	                    rs = vecstr_envadd(&envs,VARSVDBNAME,dbname,-1) ;
-	                }
-			if (rs >= 0) {
-	                    for (int i = 0 ; envdefs[i] ; i += 1) {
-				cchar	*evn = envdefs[i] ;
-	                        if ((cp = getenv(evn)) != np) {
-	                            rs = vecstr_envadd(&envs,evn,cp,-1) ;
-	                        }
-	                        if (rs < 0) break ;
-	                    } /* end for */
-			} /* end if (ok) */
-			/* go */
-	                if (rs >= 0) {
-	                    if (mainv ev ; (rs = envs.getvec(&ev)) >= 0) {
-	                        SPAWNPROC_CON	ps{} ;
-	                        int		i = 0 ;
-	                        cchar		*av[10] ;
-	                        av[i++] = prog ;
-	                        av[i++] = "-s" ;
-	                        av[i++] = nullptr ;
-	                        ps.opts |= SPAWNPROC_OIGNINTR ;
-	                        ps.opts |= SPAWNPROC_OSETPGRP ;
-	                        for (int j = 0 ; j < 3 ; j += 1) {
-	                            if (j != 2) {
-	                                ps.disp[j] = SPAWNPROC_DCLOSE ;
-	                            } else {
-	                                ps.disp[j] = SPAWNPROC_DINHERIT ;
-	                            }
-	                        } /* end for */
-	                        if ((rs = spawnproc(&ps,pbuf,av,ev)) >= 0) {
-	                            pid_t	cpid = rs ;
-	                            int		cs = 0 ;
-	                            if ((rs = u_waitpid(cpid,&cs,0)) >= 0) {
-	                                int	cex = 0 ;
-	                                if (WIFSIGNALED(cs)) {
-	                                    rs = SR_UNATCH ;
+	                } /* end if (mkpath) */
+	                if (pl > 0) break ;
+	                if (rs >= 0) break ;
+	            } /* end for */
+	            if ((rs >= 0) && (pl == 0)) {
+		        rs = rs_last ;
+		    }
+	            if (rs >= 0) ylikely {
+	               vecstr	envs ;
+		       cint	vn = 20 ;
+	               cint	vo = vecstrm.compact ;
+	               if ((rs = vecstr_start(&envs,vn,vo)) >= 0) {
+	                   cchar	*cp ;
+			   /* setup environment */
+	                   if (rs >= 0) ylikely {
+	                       rs = envs.envadd(VARSVPR,op->pr,-1) ;
+	                   }
+	                   if (rs >= 0) ylikely {
+	                       rs = envs.envadd(VARSVDBNAME,dbname,-1) ;
+	                   }
+			   if (rs >= 0) ylikely {
+	                       for (int i = 0 ; envdefs[i] ; i += 1) {
+				   cchar	*evn = envdefs[i] ;
+	                           if ((cp = getenv(evn)) != np) {
+	                               rs = envs.envadd(evn,cp,-1) ;
+	                           }
+	                           if (rs < 0) break ;
+	                       } /* end for */
+			   } /* end if (ok) */
+			   /* go */
+	                   if (rs >= 0) ylikely {
+	                       if (mainv ev ; (rs = envs.getvec(&ev)) >= 0) {
+	                            SPAWNPROC_CON	ps{} ;
+				    int		i = 0 ;
+	                            cchar	*av[10] ;
+	                            av[i++] = prog ;
+	                            av[i++] = "-s" ;
+	                            av[i++] = nullptr ;
+	                            ps.opts |= SPAWNPROC_OIGNINTR ;
+	                            ps.opts |= SPAWNPROC_OSETPGRP ;
+	                            for (int j = 0 ; j < 3 ; j += 1) {
+	                                if (j != 2) {
+	                                    ps.disp[j] = SPAWNPROC_DCLOSE ;
+	                                } else {
+	                                    ps.disp[j] = SPAWNPROC_DINHERIT ;
 	                                }
-	                                if ((rs >= 0) && WIFEXITED(cs)) {
-	                                    cex = WEXITSTATUS(cs) ;
-	                                    if (cex != 0) rs = SR_LIBBAD ;
-	                                } /* end if */
-	                            } /* end if (process finished) */
-	                        } /* end if (spawnproc) */
-	                    } /* end if (vecstr_getvec) */
-	                } /* end if (ok) */
-	                rs1 = vecstr_finish(&envs) ;
-			if (rs >= 0) rs = rs1 ;
-	            } /* end if (vecstr) */
-	        } /* end if (ok) */
-	    } /* end if (subinfo_ids) */
-	} /* end if (mkpath) */
+	                            } /* end for */
+	                            if ((rs = spawnproc(&ps,pbuf,av,ev)) >= 0) {
+	                                pid_t	cpid = rs ;
+	                                int	cs = 0 ;
+	                                if ((rs = u_waitpid(cpid,&cs,0)) >= 0) {
+	                                    int	cex = 0 ;
+	                                    if (WIFSIGNALED(cs)) {
+	                                        rs = SR_UNATCH ;
+	                                    }
+	                                    if ((rs >= 0) && WIFEXITED(cs)) {
+	                                        cex = WEXITSTATUS(cs) ;
+	                                        if (cex != 0) rs = SR_LIBBAD ;
+	                                    } /* end if */
+	                                } /* end if (process finished) */
+	                            } /* end if (spawnproc) */
+	                        } /* end if (vecstr_getvec) */
+	                    } /* end if (ok) */
+	                    rs1 = vecstr_finish(&envs) ;
+			    if (rs >= 0) rs = rs1 ;
+	                } /* end if (vecstr) */
+	            } /* end if (ok) */
+	        } /* end if (subinfo_ids) */
+	    } /* end if (mkpath) */
+	    rs1 = libmem.free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 } /* end subroutine (sysvars_mksysvarsi) */
-#endif /* CF_MKSYSVARS */
 
 local int subinfo_start(SI *sip) noex {
 	int		rs = SR_FAULT ;
@@ -901,15 +899,23 @@ local int subinfo_finish(SI *sip) noex {
 
 local int checkdname(cchar *dname) noex {
 	int		rs = SR_INVALID ;
-	if (dname[0] != '/') {
-	    if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
+	if (dname[0] != '/') ylikely {
+	    if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) ylikely {
 		rs = SR_NOTDIR ;
-	        if (S_ISDIR(sb.st_mode)) {
+	        if (S_ISDIR(sb.st_mode)) ylikely {
 	            rs = perm(dname,-1,-1,nullptr,W_OK) ;
 	        } /* end if (directory) */
 	    } /* end if (u_stat) */
 	} /* end if */
 	return rs ;
 } /* end subroutine (checkdname) */
+
+varer::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
+	    maxpathlen = rs ;
+	} /* end if (bufsizeget) */
+	return rs ;
+} /* end method (varer::operator) */
 
 
