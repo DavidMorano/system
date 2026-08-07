@@ -124,11 +124,11 @@ local int txtindex_ctor(txtindex *op,Args ... args) noex {
 	        if ((callp = new(nothrow) txtindex_calls) != np) ylikely {
 		    op->callp = callp ;
 		    rs = SR_OK ;
-		}
+		} /* end if (new-txtindex_calls) */
 		if (rs < 0) {
 		    delete op->mlp ;
 		    op->mlp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end new (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
@@ -217,7 +217,7 @@ int txtindex_open(txtindex *op,cchar *pr,cchar *dbname) noex {
 		txtindex_calls	*callp = callsp(op->callp) ;
 	        cchar	*objn = TXTINDEX_OBJNAME ;
 	        if ((rs = txtindex_objloadbegin(op,pr,objn)) >= 0) ylikely {
-		    auto	co = callp->open ;
+		    cauto	co = callp->open ;
 	            if ((rs = co(op->obj,dbname)) >= 0) ylikely {
 		        op->magval = TXTINDEX_MAGIC ;
 	            }
@@ -239,7 +239,7 @@ int txtindex_close(txtindex *op) noex {
 	if ((rs = txtindex_magic(op)) >= 0) ylikely {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    if (callp->close) ylikely {
-		auto	co = callp->close ;
+		cauto	co = callp->close ;
 	        rs1 = co(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -262,7 +262,7 @@ int txtindex_audit(txtindex *op) noex {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->audit) {
-		auto	co = callp->audit ;
+		cauto	co = callp->audit ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
@@ -275,7 +275,7 @@ int txtindex_count(txtindex *op) noex {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->count) {
-		auto	co = callp->count ;
+		cauto	co = callp->count ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
@@ -288,7 +288,7 @@ int txtindex_neigen(txtindex *op) noex {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->neigen) {
-		auto	co = callp->neigen ;
+		cauto	co = callp->neigen ;
 	        rs = co(op->obj) ;
 	    }
 	} /* end if (magic) */
@@ -337,11 +337,11 @@ int txtindex_curbegin(txtindex *op,TI_CUR *curp) noex {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    memclear(curp) ;
 	    if (callp->curbegin) {
-	        if (void *vp ; (rs = lm_mall(op->cursize,&vp)) >= 0) {
+	        if (void *vp ; (rs = lm_mall(op->cursz,&vp)) >= 0) ylikely {
 		    curp->scp = vp ;
 		    rs = SR_BUGCHECK ;
 		    if (callp->curbegin) {
-		        auto	co = callp->curbegin ;
+		        cauto	co = callp->curbegin ;
 		        if ((rs = co(op->obj,curp->scp)) >= 0) {
 	    	            curp->magval = TXTINDEX_MAGIC ;
 		        }
@@ -349,7 +349,7 @@ int txtindex_curbegin(txtindex *op,TI_CUR *curp) noex {
 	            if (rs < 0) {
 	    	        lm_free(curp->scp) ;
 	    	        curp->scp = nullptr ;
-		    } /* end if (erro) */
+		    } /* end if (error) */
 	        } /* end if (m-a) */
 	    } else {
 	        rs = SR_NOSYS ;
@@ -364,11 +364,11 @@ int txtindex_curend(txtindex *op,TI_CUR *curp) noex {
 	if ((rs = txtindex_magic(op,curp)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magval == TXTINDEX_MAGIC) {
+	    if (curp->magval == TXTINDEX_MAGIC) ylikely {
 	        rs = SR_BUGCHECK ;
 	        if (curp->scp) {
 	            if (callp->curend) {
-		        auto	co = callp->curend ;
+		        cauto	co = callp->curend ;
 	                rs1 = co(op->obj,curp->scp) ;
 	                if (rs >= 0) rs = rs1 ;
 	            }
@@ -389,7 +389,7 @@ int txtindex_curlook(txtindex *op,TI_CUR *curp,mainv klp) noex {
 	if ((rs = txtindex_magic(op,curp,klp)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magval == TXTINDEX_MAGIC) {
+	    if (curp->magval == TXTINDEX_MAGIC) ylikely {
 		rs = SR_BUGCHECK ;
 		if (cauto co = callp->curlook ; co) {
 		    rs = co(op->obj,curp->scp,klp) ;
@@ -406,7 +406,7 @@ int txtindex_curenum(txtindex *op,TI_CUR *curp,TI_TAG *tagp,
 	if ((rs = txtindex_magic(op,curp,tagp)) >= 0) {
 	    txtindex_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if (curp->magval == TXTINDEX_MAGIC) {
+	    if (curp->magval == TXTINDEX_MAGIC) ylikely {
 		rs = SR_NOSYS ;
 	        if (cauto co = callp->curenum ; co) {
 	            rs = co(op->obj,curp->scp,tagp,rb,rl) ;
@@ -426,9 +426,9 @@ local int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
-		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) ylikely {
+		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) ylikely {
 	            cchar	*modbname = TXTINDEX_MODBNAME ;
 	            int		mo = 0 ;
 	            mo |= modloadm.libvar ;
@@ -437,9 +437,9 @@ local int txtindex_objloadbegin(txtindex *op,cchar *pr,cchar *objn) noex {
 	            if ((rs = modload_open(lp,pr,modbname,objn,mo,sv)) >= 0) {
 		        op->fl.modload = true ;
 	                if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
-		            cint	sz = op->objsize ;
-		            op->objsize = mv[0] ;
-		            op->cursize = mv[1] ;
+		            cint	sz = op->objsz ;
+		            op->objsz = mv[0] ;
+		            op->cursz = mv[1] ;
 		            if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 		                op->obj = vp ;
 		                rs = txtindex_loadcalls(op,&syms) ;
