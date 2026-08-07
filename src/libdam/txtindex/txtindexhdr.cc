@@ -97,8 +97,8 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize	= hi_overlast * szof(uint) ;
-constexpr int		magicsize	= TXTINDEXHDR_MAGICSIZE ;
+constexpr int		headsz		= hi_overlast * szof(uint) ;
+constexpr int		magicsz		= TXTINDEXHDR_MAGICSIZE ;
 constexpr char		magicstr[]	= TXTINDEXHDR_MAGICSTR ;
 
 
@@ -110,19 +110,19 @@ constexpr char		magicstr[]	= TXTINDEXHDR_MAGICSTR ;
 int txtindexhdr_rd(txtindexhdr *ep,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (ep && hbuf) {
+	if (ep && hbuf) ylikely {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + 4)) {
-	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
-	            bp += magicsize ;
-	            bl -= magicsize ;
+	    if (bl >= (magicsz + 4)) ylikely {
+	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) ylikely {
+	            bp += magicsz ;
+	            bl -= magicsz ;
 	    	    memcpy(bp,ep->vetu,4) ;
 	    	    bp[0] = char(TXTINDEXHDR_VERSION) ;
 	    	    bp[1] = char(ENDIAN) ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
-	    	    if (bl >= headsize) {
+	    	    if (bl >= headsz) ylikely {
 	        	uint	*header = uintp(bp) ;
 	        	header[hi_hfsize]	= ep->hfsize ;
 	        	header[hi_tfsize]	= ep->tfsize ;
@@ -145,8 +145,8 @@ int txtindexhdr_rd(txtindexhdr *ep,char *hbuf,int hlen) noex {
 	        	header[hi_maxtags]	= ep->maxtags ;
 	        	header[hi_minwlen]	= ep->minwlen ;
 	        	header[hi_maxwlen]	= ep->maxwlen ;
-	        	bp += headsize ;
-	        	bl -= headsize ;
+	        	bp += headsz ;
+	        	bl -= headsz ;
 			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
@@ -162,15 +162,15 @@ int txtindexhdr_rd(txtindexhdr *ep,char *hbuf,int hlen) noex {
 int txtindexhdr_wr(txtindexhdr *ep,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (ep && hbuf) {
+	if (ep && hbuf) ylikely {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) ylikely {
 		rs = SR_OK ;
-	        bp += magicsize ;
-	        bl -= magicsize ;
+	        bp += magicsz ;
+	        bl -= magicsz ;
 		/* read out the VETU information */
-	        if (bl >= 4) {
+	        if (bl >= 4) ylikely {
 	            memcpy(ep->vetu,bp,4) ;
 	            if (ep->vetu[0] != TXTINDEXHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
@@ -183,8 +183,8 @@ int txtindexhdr_wr(txtindexhdr *ep,cchar *hbuf,int hlen) noex {
 		} else {
 		    rs = SR_ILSEQ ;
 		}
-	        if (rs >= 0) {
-	            if (bl >= headsize) {
+	        if (rs >= 0) ylikely {
+	            if (bl >= headsz) ylikely {
 	        	uint	*header = uintp(bp) ;
 	        	ep->hfsize	= header[hi_hfsize] ;
 	        	ep->tfsize	= header[hi_tfsize] ;
@@ -207,8 +207,8 @@ int txtindexhdr_wr(txtindexhdr *ep,cchar *hbuf,int hlen) noex {
 	        	ep->maxtags	= header[hi_maxtags] ;
 	        	ep->minwlen	= header[hi_minwlen] ;
 	        	ep->maxwlen	= header[hi_maxwlen] ;
-	        	bp += headsize ;
-	        	bl -= headsize ;
+	        	bp += headsz ;
+	        	bl -= headsz ;
 			len = intconv(bp - hbuf) ;
 		    } else {
 		        rs = SR_ILSEQ ;
