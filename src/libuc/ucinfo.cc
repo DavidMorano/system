@@ -59,8 +59,8 @@
 #include	<sys/utsname.h>		/* POSIX */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* C++STD plavement-new(c++) */
-#include	<memory>		/* C++STD |destroy_a(3c++)| */
+#include	<new>			/* C++STD placement-new(c++) */
+#include	<memory>		/* C++STD |destroy_at(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
