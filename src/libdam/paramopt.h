@@ -88,13 +88,13 @@ struct paramopt : paramopt_head {
 	paramopt_co	incr ;
 	paramopt_co	finish ;
 	paramopt() noex {
-	    start(this,paramoptmem_start) ;
-	    count(this,paramoptmem_count) ;
-	    incr(this,paramoptmem_incr) ;
-	    finish(this,paramoptmem_finish) ;
-	    head = nullptr ;
-	    tail = nullptr ;
-	    magval = 0 ;
+	    start	(this,paramoptmem_start) ;
+	    count	(this,paramoptmem_count) ;
+	    incr	(this,paramoptmem_incr) ;
+	    finish	(this,paramoptmem_finish) ;
+	    head	= nullptr ;
+	    tail	= nullptr ;
+	    magval	= 0 ;
 	} ; /* end ctor */
 	paramopt(const paramopt &) = delete ;
 	paramopt &operator = (const paramopt &) = delete ;
