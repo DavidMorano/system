@@ -48,13 +48,13 @@
 
 #if	F_DARWIN
 
-#include	<sys/dirent.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
+#include	<sys/dirent.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<new>			/* C++STD placement-new */
 #include	<memory>		/* C++STD |destroy_at(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
