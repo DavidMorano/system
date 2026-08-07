@@ -499,7 +499,7 @@ char		**cbp ;
 
 	        if (fbp->len > 0) {
 
-	            rs = u_pread(fd,copybuf,fbp->len,fbp->start) ;
+	            rs = u_readp(fd,copybuf,fbp->len,fbp->start) ;
 
 	            if (rs >= 0)
 	                rs = bwrite(ofp,copybuf,fbp->len) ;
