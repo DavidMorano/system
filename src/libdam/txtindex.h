@@ -49,8 +49,8 @@ struct txtindex_head {
 	void		*obj ;		/* object pointer */
 	TXTINDEX_FL	fl ;
 	uint		magval ;
-	int		objsize ;	/* object size */
-	int		cursize ;	/* cursor size */
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
 } ; /* end struct */
 
 typedef	TXTINDEX	txtindex ;
