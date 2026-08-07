@@ -136,7 +136,7 @@ int paramopt_finish(PO *op) noex {
 			void *p = voidp(vp->value) ;
 	                rs1 = lm_free(p) ;
 		        if (rs >= 0) rs = rs1 ;
-		    }
+		    } /* end if (memory-release) */
 	            nvp = vp->next ;
 	            rs1 = lm_free(vp) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -145,7 +145,7 @@ int paramopt_finish(PO *op) noex {
 		    void *p = voidp(ap->name) ;
 	            rs1 = lm_free(p) ;
 		    if (rs >= 0) rs = rs1 ;
-	        }
+	        } /* end if (memory-release) */
 	        nnp = ap->next ;
 	        rs1 = lm_free(ap) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -174,7 +174,7 @@ int paramopt_loadu(PO *op,cchar *sp,int sl) noex {
 	int		c = 0 ;
 	if ((rs = paramopt_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (int si ; (si = sibrk(sp,sl,"=\t")) >= 0) {
+	    if (int si ; (si = sibrk(sp,sl,"=\t")) >= 0) ylikely {
 	        cchar	*cp{} ;
 	        if (int cl ; (cl = sfshrink((sp + si),(sl- si),&cp)) > 0) {
 		    if (char *name ; (rs = lm_mall((cl+1),&name)) >= 0) {
@@ -208,7 +208,7 @@ given that a keyname is specified explicitly.
 int paramopt_loads(PO *op,cchar *name,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(op,name,sp)) >= 0) {
+	if ((rs = paramopt_magic(op,name,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    for (int si ; (si = sibrk(sp,sl," :,\t\r\n\v\f")) >= 0 ; ) {
 	        cchar	*cp = (sp+si) ;
@@ -232,13 +232,13 @@ int paramopt_loads(PO *op,cchar *name,cchar *sp,int sl) noex {
 int paramopt_load(PO *op,cchar *name,cchar *vbuf,int vlen) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = paramopt_magic(op,name,vbuf)) >= 0) {
+	if ((rs = paramopt_magic(op,name,vbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 	        cchar	*vp{} ;
 		rs = SR_OK ;
 	        if (vlen < 0) vlen = lenstr(vbuf) ;
-	        if (int vl ; (vl = sfshrink(vbuf,vlen,&vp)) > 0) {
+	        if (int vl ; (vl = sfshrink(vbuf,vlen,&vp)) > 0) ylikely {
 	            PO_VAL	*ovp ;
 	            PO_VAL	*nvp ;
 	            PO_NAME	*pp ;
@@ -311,9 +311,9 @@ int paramopt_loaduniq(PO *op,cchar *name,cchar *vp,int vl) noex {
 int paramopt_havekey(PO *op,cchar *name) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(op,name)) >= 0) {
+	if ((rs = paramopt_magic(op,name)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
+	    if (name[0]) ylikely {
 	        if (PO_NAME *pp ; (rs = paramopt_findkey(op,name,&pp)) >= 0) {
 	            c = pp->c ;
 	        } else if (rs == SR_NOTFOUND) {
@@ -328,9 +328,9 @@ int paramopt_haveval(PO *op,cchar *key,cchar *vp,int vl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(op,key,vp)) >= 0) {
+	if ((rs = paramopt_magic(op,key,vp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (key[0]) {
+	    if (key[0]) ylikely {
 	        if (PO_CUR cur ; (rs = paramopt_curbegin(op,&cur)) >= 0) {
 		    auto	pe = paramopt_curenumval ;
 	            int		f = 0 ;
@@ -353,7 +353,7 @@ int paramopt_haveval(PO *op,cchar *key,cchar *vp,int vl) noex {
 /* increment the parameters */
 int paramopt_incr(PO *op) noex {
 	int		rs ;
-	if ((rs = paramopt_magic(op)) >= 0) {
+	if ((rs = paramopt_magic(op)) >= 0) ylikely {
 	    PO_NAME	*pp = op->head ;
 	    PO_VAL	*vp ;
 	    rs = SR_NOTFOUND ;
@@ -378,7 +378,7 @@ int paramopt_incr(PO *op) noex {
 /* initialize a cursor */
 int paramopt_curbegin(PO *op,PO_CUR *curp) noex {
 	int		rs ;
-	if ((rs = paramopt_magic(op,curp)) >= 0) {
+	if ((rs = paramopt_magic(op,curp)) >= 0) ylikely {
 	    curp->keyp = nullptr ;
 	    curp->valp = nullptr ;
 	} /* end if (magic) */
@@ -400,7 +400,7 @@ int paramopt_curend(PO *op,PO_CUR *curp) noex {
 int paramopt_curenumkey(PO *op,PO_CUR *curp,cchar **rpp) noex {
 	int		rs ;
 	int		kl = 0 ;
-	if ((rs = paramopt_magic(op,curp)) >= 0) {
+	if ((rs = paramopt_magic(op,curp)) >= 0) ylikely {
 	    PO_NAME	*kp ;
 	    if (rpp) {
 	        *rpp = nullptr ;
@@ -430,9 +430,9 @@ int paramopt_curenumval(PO *op,cchar *key,PO_CUR *curp,cchar **rpp) noex {
 int paramopt_curfetch(PO *op,cchar *key,PO_CUR *curp,cchar **rpp) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if ((rs = paramopt_magic(op,key)) >= 0) {
+	if ((rs = paramopt_magic(op,key)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (key[0]) {
+	    if (key[0]) ylikely {
 	        PO_NAME	*kp = nullptr ;
 	        PO_VAL	*vp = nullptr ;
 	        PO_CUR	ncur ;
@@ -468,9 +468,9 @@ int paramopt_curfetch(PO *op,cchar *key,PO_CUR *curp,cchar **rpp) noex {
 int paramopt_countvals(PO *op,cchar *key) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(op,key)) >= 0) {
+	if ((rs = paramopt_magic(op,key)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (key[0]) {
+	    if (key[0]) ylikely {
 	        PO_NAME	*kp{} ;
 	        if ((rs = paramopt_findkey(op,key,&kp)) >= 0) {
 	            c = kp->c ;
@@ -489,7 +489,7 @@ int paramopt_countvals(PO *op,cchar *key) noex {
 local int paramopt_findkey(PO *op,cc *name,PO_NAME **rpp) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = paramopt_magic(op,name)) >= 0) {
+	if ((rs = paramopt_magic(op,name)) >= 0) ylikely {
 	    PO_NAME	*pp ;
 	    for (pp = op->head ; pp != nullptr ; pp = pp->next) {
 	        if (strcmp(pp->name,name) == 0) break ;
@@ -507,10 +507,10 @@ local int paramopt_findkey(PO *op,cc *name,PO_NAME **rpp) noex {
 local int paramopt_findvalue(PO *op,cc *key,cc *val,int vlen,
 		PO_VAL **rpp) noex {
 	int		rs ;
-	if ((rs = paramopt_magic(op)) >= 0) {
+	if ((rs = paramopt_magic(op)) >= 0) ylikely {
 	    PO_NAME	*kp{} ;
 	    if (vlen < 0) vlen = lenstr(val) ;
-	    if ((rs = paramopt_findkey(op,key,&kp)) >= 0) {
+	    if ((rs = paramopt_findkey(op,key,&kp)) >= 0) ylikely {
 	        rs = name_vfind(kp,val,vlen,rpp) ;
 	    }
 	} /* end if (magic) */
