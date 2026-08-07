@@ -51,8 +51,7 @@ OBJ= $(OBJA)
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -150,6 +149,6 @@ obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ipasswd.o:		ipasswd_prime.cc	$(INCS)
+ipasswd_prime.o:		ipasswd_prime.cc	$(INCS)
 
 
