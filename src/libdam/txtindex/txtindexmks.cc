@@ -258,10 +258,10 @@ local inline int txtindexmks_magic(txtindexmks *op,Args ... args) noex {
 local int	txtindexmks_checkparams(TIM *) noex ;
 local int	txtindexmks_idxdirbegin(TIM *) noex ;
 local int	txtindexmks_idxdirend(TIM *) noex ;
-local int	txtindexmks_filesbegin(TIM *) noex ;
-local int	txtindexmks_filesbeginc(TIM *) noex ;
-local int	txtindexmks_filesbeginwait(TIM *) noex ;
-local int	txtindexmks_filesbeginopen(TIM *,cchar *) noex ;
+local int	txtindexmks_filesbeg(TIM *) noex ;
+local int	txtindexmks_filesbegc(TIM *) noex ;
+local int	txtindexmks_filesbegwait(TIM *) noex ;
+local int	txtindexmks_filesbegopen(TIM *,cchar *) noex ;
 local int	txtindexmks_filesend(TIM *) noex ;
 local int	txtindexmks_listbegin(TIM *) noex ;
 local int	txtindexmks_listend(TIM *) noex ;
@@ -309,11 +309,10 @@ const txtindexmks_obj	txtindexmks_modinfo = {
 int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = txtindexmks_ctor(op,pp,db)) >= 0) {
+	if ((rs = txtindexmks_ctor(op,pp,db)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (db[0]) {
-		static cint	rsv = mkvars() ;
-		if ((rs = rsv) >= 0) {
+	    if (db[0]) ylikely {
+		if (static cint rsv = mkvars() ; (rs = rsv) >= 0) ylikely {
 	            op->om = (om | 0600) ;
 	            op->nfd = -1 ;
 	            op->pi = *pp ; /* copy the given parameters */
@@ -323,7 +322,7 @@ int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	                op->dbname = cp ;
 	                if ((rs = txtindexmks_checkparams(op)) >= 0) {
 	                    if ((rs = txtindexmks_idxdirbegin(op)) >= 0) {
-	                        if ((rs = txtindexmks_filesbegin(op)) >= 0) {
+	                        if ((rs = txtindexmks_filesbeg(op)) >= 0) {
 	                            f = rs ;
 	                            if ((rs = txtindexmks_listbegin(op)) >= 0) {
 	                                op->ti.maxtags = 0 ;
@@ -343,7 +342,7 @@ int txtindexmks_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 				void *vp = voidp(op->dbname) ;
 	                        libmem.free(vp) ;
 	                        op->dbname = nullptr ;
-	                    }
+	                    } /* end if (memory-release) */
 	                } /* end if (error) */
 	            } /* end if (memory-allocation) */
 		} /* end if (mkvars) */
@@ -359,7 +358,7 @@ int txtindexmks_close(TIM *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		clists = 0 ;
-	if ((rs = txtindexmks_magic(op)) >= 0) {
+	if ((rs = txtindexmks_magic(op)) >= 0) ylikely {
 	    bool	f_go  = (! op->fl.abort) ;
 	    {
 	        rs1 = txtindexmks_ntagclose(op) ;
@@ -406,7 +405,7 @@ int txtindexmks_close(TIM *op) noex {
 
 int txtindexmks_noop(TIM *op) noex {
 	int		rs ;
-	if ((rs = txtindexmks_magic(op)) >= 0) {
+	if ((rs = txtindexmks_magic(op)) >= 0) ylikely {
 	    rs = SR_OK ;
 	} /* end if (magic) */
 	return rs ;
@@ -414,7 +413,7 @@ int txtindexmks_noop(TIM *op) noex {
 
 int txtindexmks_abort(TIM *op) noex {
 	int		rs ;
-	if ((rs = txtindexmks_magic(op)) >= 0) {
+	if ((rs = txtindexmks_magic(op)) >= 0) ylikely {
 	    op->fl.abort = true ;
 	} /* end if (magic) */
 	return rs ;
@@ -422,9 +421,9 @@ int txtindexmks_abort(TIM *op) noex {
 
 int txtindexmks_addeigens(TIM *op,TIM_KEY *eigens,int n) noex {
 	int		rs ;
-	if ((rs = txtindexmks_magic(op,eigens)) >= 0) {
+	if ((rs = txtindexmks_magic(op,eigens)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (n >= 0) {
+	    if (n >= 0) ylikely {
 	        int	keylen = KEYBUFLEN ;
 	        char	keybuf[KEYBUFLEN + 1] ;
 		rs = SR_OK ;
@@ -450,7 +449,7 @@ int txtindexmks_addeigens(TIM *op,TIM_KEY *eigens,int n) noex {
 int txtindexmks_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = txtindexmks_magic(op,tags)) >= 0) {
+	if ((rs = txtindexmks_magic(op,tags)) >= 0) ylikely {
 	    for (int i = 0 ; i < ntags ; i += 1) {
 	        rs = txtindexmks_addtag(op,(tags + i)) ;
 	        c += rs ;
@@ -484,19 +483,19 @@ local int txtindexmks_checkparams(TIM *op) noex {
 	return rs ;
 } /* end subroutine (txtindexmks_checkparams) */
 
-local int txtindexmks_filesbegin(TIM *op) noex {
+local int txtindexmks_filesbeg(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (op->fl.ofcreat) {
-	    rs = txtindexmks_filesbeginc(op) ;
+	    rs = txtindexmks_filesbegc(op) ;
 	} else {
-	    rs = txtindexmks_filesbeginwait(op) ;
+	    rs = txtindexmks_filesbegwait(op) ;
 	    c = rs ;
 	}
 	return (rs >= 0) ? c : rs ;
-} /* end subroutine (txtindexmks_filesbegin) */
+} /* end subroutine (txtindexmks_filesbeg) */
 
-local int txtindexmks_filesbeginc(TIM *op) noex {
+local int txtindexmks_filesbegc(TIM *op) noex {
 	cint		type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	cint		szinc = (var.maxpathlen + 1) ;
 	int		rs ;
@@ -527,30 +526,31 @@ local int txtindexmks_filesbeginc(TIM *op) noex {
 	                }
 	                if (rs < 0) {
 	                    bclose(tfp) ;
-		        }
+		        } /* end if (error) */
 	            } /* end if (bopen) */
 		    if ((rs < 0) && type) {
 		        uc_unlink(rbuf) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ok) */
 	    } /* end if (mknewfname) */
 	    rs1 = libmem.free(ap) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-} /* end subroutine (txtindexmks_filesbeginc) */
+} /* end subroutine (txtindexmks_filesbegc) */
 
-local int txtindexmks_filesbeginwait(TIM *op) noex {
+local int txtindexmks_filesbegwait(TIM *op) noex {
 	int		rs ;
-	int		c = 0 ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_TAG	 ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) ylikely {
+	if (char *tbuf ; (rs = libmem.mp(&tbuf)) >= 0) ylikely {
+	    if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) ylikely {
 		cint	to_stale = TXTINDEXMKS_INTSTALE ;
 		cint	nrs = SR_EXISTS ;
 		int	to = TXTINDEXMKS_INTOPEN ;
-		while ((rs = txtindexmks_filesbeginopen(op,tbuf)) == nrs) {
+		while ((rs = txtindexmks_filesbegopen(op,tbuf)) == nrs) {
 		    c = 1 ;
 		    sleep(1) ;
 		    unlinkstale(tbuf,to_stale) ;
@@ -559,13 +559,16 @@ local int txtindexmks_filesbeginwait(TIM *op) noex {
 		if (rs == nrs) {
 		    op->fl.ofcreat = false ;
 		    c = 0 ;
-		    rs = txtindexmks_filesbeginc(op) ;
+		    rs = txtindexmks_filesbegc(op) ;
 		}
-	} /* end if (mknewfname) */
+	    } /* end if (mknewfname) */
+	    rs1 = libmem.free(&tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-} /* end subroutine (txtindexmks_filesbeginwait) */
+} /* end subroutine (txtindexmks_filesbegwait) */
 
-local int txtindexmks_filesbeginopen(TIM *op,cchar *tfn) noex {
+local int txtindexmks_filesbegopen(TIM *op,cchar *tfn) noex {
 	cmode		om = op->om ;
 	int		rs ;
 	char		ostr[8] = "wce" ;
@@ -574,13 +577,13 @@ local int txtindexmks_filesbeginopen(TIM *op,cchar *tfn) noex {
 	    op->fl.created = true ;
 	    if (cchar *cp ; (rs = libmem.strw(tfn,-1,&cp)) >= 0) ylikely {
 		op->ntagfname = (char *) cp ;
-	    }
+	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 		bclose(tfp) ;
 	    } /* end if (error) */
 	} /* end if (bopen) */
 	return rs ;
-} /* end subroutine (txtindexmks_filesbeginopen) */
+} /* end subroutine (txtindexmks_filesbegopen) */
 
 local int txtindexmks_filesend(TIM *op) noex {
 	int		rs = SR_OK ;
@@ -613,24 +616,28 @@ local int txtindexmks_filesend(TIM *op) noex {
 
 local int txtindexmks_idxdirbegin(TIM *op) noex {
 	int		rs = SR_INVALID ;
-	int		dnl ;
+	int		rs1 ;
 	cchar		*dnp ;
-	if ((dnl = sfdirname(op->dbname,-1,&dnp)) >= 0) {
-	    char	tbuf[MAXPATHLEN + 1] ;
-	    if (dnl == 0) {
-	        rs = getpwd(tbuf,MAXPATHLEN) ;
-	        dnl = rs ;
-	    } else {
-	        rs = mkpath1w(tbuf,dnp,dnl) ;
-	    }
-	    if (rs >= 0) {
-	        cint	am = (X_OK | W_OK) ;
-	        if ((rs = perm(tbuf,-1,-1,nullptr,am)) >= 0) {
-	            if (cchar *cp ; (rs = libmem.strw(tbuf,dnl,&cp)) >= 0) {
-	                op->idname = cp ;
-	            }
+	if (int dnl ; (dnl = sfdirname(op->dbname,-1,&dnp)) >= 0) ylikely {
+	    if (char *tbuf ; (rs = libmem.mp(&tbuf)) >= 0) ylikely {
+		cint tlen = rs ;
+	        if (dnl == 0) {
+	            rs = getpwd(tbuf,tlen) ;
+	            dnl = rs ;
+	        } else {
+	            rs = mkpath1w(tbuf,dnp,dnl) ;
 	        }
-	    } /* end if (ok) */
+	        if (rs >= 0) ylikely {
+	            cint	am = (X_OK | W_OK) ;
+	            if ((rs = perm(tbuf,-1,-1,nullptr,am)) >= 0) {
+	                if (cchar *cp ; (rs = libmem.strw(tbuf,dnl,&cp)) >= 0) {
+	                    op->idname = cp ;
+	                } /* end if (memory-acquire) */
+	            } /* end if (perm) */
+	        } /* end if (ok) */
+	        rs1 = libmem.free(tbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (sfdirname) */
 	return rs ;
 } /* end subroutine (txtindexmks_idxdirbegin) */
@@ -638,7 +645,7 @@ local int txtindexmks_idxdirbegin(TIM *op) noex {
 local int txtindexmks_idxdirend(TIM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->idname) {
+	if (op->idname) ylikely {
 	    void *vp = voidp(op->idname) ;
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -673,7 +680,7 @@ local int txtindexmks_listbegin(TIM *op) noex {
 	    if (rs < 0) {
 	        for (int j = 0 ; j <= idx ; j += 1) {
 	            LISTOBJ_FINISH(lop+j) ;
-	        }
+	        } /* end for */
 	    } /* end if (error) */
 	    if (rs < 0) {
 	        libmem.free(op->lists) ;
@@ -696,8 +703,8 @@ local int txtindexmks_listend(TIM *op) noex {
 	    for (int i = 0 ; i < tablen ; i += 1) {
 	        rs1 = LISTOBJ_FINISH(lop+i) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
-	}
+	    } /* end for */
+	} /* end block */
 	if (op->lists) {
 	    rs1 = libmem.free(op->lists) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -779,16 +786,16 @@ local int txtindexmks_mkhash(TIM *op) noex {
 	    hdr.minwlen = op->pi.minwlen ;
 	    hdr.maxwlen = op->pi.maxwlen ;
 	    hdr.tablen = op->pi.tablen ;
-	    if ((rs = txtindexmks_mkhashwrmain(op,&hdr)) >= 0) {
+	    if ((rs = txtindexmks_mkhashwrmain(op,&hdr)) >= 0) ylikely {
 	        cint	hlen = HDRBUFLEN ;
 	        char	hbuf[HDRBUFLEN+1] ;
 	        hdr.hfsize = rs ;
-	        if ((rs = txtindexhdr_rd(&hdr,hbuf,hlen)) >= 0) {
+	        if ((rs = txtindexhdr_rd(&hdr,hbuf,hlen)) >= 0) ylikely {
 	            cint	bl = rs ;
-	            if ((rs = u_writep(op->nfd,hbuf,bl,0L)) >= 0) {
+	            if ((rs = u_writep(op->nfd,hbuf,bl,0L)) >= 0) ylikely {
 	                cmode	om = op->om ;
 	                rs = uc_fminmod(op->nfd,om) ;
-	            }
+	            } /* end if (u_writep) */
 	        }
 	    } /* end if (txtindexmks_mkhashwrmain) */
 	    rs1 = txtindexmks_nhashclose(op) ;
@@ -890,26 +897,26 @@ local int txtindexmks_mkhashwrtabone(TIM *op,HDR *hdrp,
 	lop += i ;
 	if ((rs = LISTOBJ_COUNT(lop)) > 0) ylikely {
 	    cint	c = rs ;
-	    cint	asize = ((c+1)*szof(int)) ;
-	    if (int *va ; (rs = libmem.mall(asize,&va)) >= 0) {
-	        if ((rs = LISTOBJ_MKVEC(lop,va)) >= 0) {
+	    cint	asz = ((c+1)*szof(int)) ;
+	    if (int *va ; (rs = libmem.mall(asz,&va)) >= 0) ylikely {
+	        if ((rs = LISTOBJ_MKVEC(lop,va)) >= 0) ylikely {
 		    cint	maxtags = int(op->ti.maxtags) ;
 	            if (c > maxtags) {
 			op->ti.maxtags = c ;
 		    }
 	            if (c > 0) {
-	                cint	csize = szof(int) ;
+	                cint	csz = szof(int) ;
 	                op->clists += 1 ;
 	                tab[i] = off ;
-	                if ((rs = filer_write(hfp,&c,csize)) >= 0) {
+	                if ((rs = filer_write(hfp,&c,csz)) >= 0) {
 	                    off += rs ;
 	                    wlen += rs ;
 	                    if (c > 0) {
-	                        cint	vsize = (c*szof(uint)) ;
-	                        rs = filer_write(hfp,va,vsize) ;
+	                        cint	vsz = (c * szof(uint)) ;
+	                        rs = filer_write(hfp,va,vsz) ;
 	                        off += rs ;
 	                        wlen += rs ;
-	                    }
+	                    } /* end if (non-zero positive) */
 	                } /* end if (filer_write) */
 	            } /* end if (positive) */
 	        } /* end if (LISTINT_MKVEC) */
@@ -925,12 +932,12 @@ local int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 		filer *hfp,int off) noex {
 	strtab		*elp = op->eigenp ;
 	int		rs ;
-	int		wlen = 0 ;
+	int		wlen = 0 ; /* return-value */
 	if ((rs = strtab_strsize(elp)) >= 0) ylikely {
 	    cint	nskip = TXTINDEXMKS_NSKIP ;
 	    int		essize = rs ;
 	    hdrp->eiskip = nskip ;
-	    if (essize > 0) {
+	    if (essize > 0) ylikely {
 	        if (char *estab ; (rs = libmem.mall(essize,&estab)) >= 0) {
 	            hdrp->esoff = off ;
 	            hdrp->essize = essize ;
@@ -941,17 +948,14 @@ local int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 	            }
 	            libmem.free(estab) ;
 	        } /* end if (eigen-string table) */
-
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            int		ersz = 0 ;
 	            int		n ;
 	            int		erlen ;
 	            int		*ertab = nullptr ;
-
 	            n = strtab_count(op->eigenp) ;
 	            erlen = (n+1) ;
-
-	            if ((rs = strtab_recsize(op->eigenp)) >= 0) {
+	            if ((rs = strtab_recsize(op->eigenp)) >= 0) ylikely {
 	                ersz = rs ;
 	                if (void *vp ; (rs = libmem.mall(ersz,&vp)) >= 0) {
 	                    ertab = rectab_t(vp) ;
@@ -966,15 +970,13 @@ local int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 	                    libmem.free(ertab) ;
 	                } /* end if (memory-allocation) */
 	            } /* end if (recsize) */
-
 	        } /* end if (eigen-record table) */
-
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            int		eisz = 0 ;
 	            int		eilen ;
 	            int		(*eitab)[3] = nullptr ;
 	            eilen = strtab_indlen(elp) ;
-	            if ((rs = strtab_indsize(elp)) >= 0) {
+	            if ((rs = strtab_indsize(elp)) >= 0) ylikely {
 	                eisz = rs ;
 	                if (void *vp ; (rs = libmem.mall(eisz,&vp)) >= 0) {
 	                    eitab = idxtab_t(vp) ;
@@ -998,30 +1000,38 @@ local int txtindexmks_mkhashwreigen(TIM *op,HDR *hdrp,
 
 local int txtindexmks_nhashopen(TIM *op) noex {
 	cint		type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
+	cint		maxpath = var.maxpathlen ;
 	int		rs ;
+	int		rs1 ;
+	int		ai = 2 ; /* double (two) memory allocations */
+	cint		sz = (2 * (var.maxpathlen + 1)) ;
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IND ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
-	    cmode	om = op->om ;
-	    int		of = (O_CREAT|O_WRONLY) ; /* <- writable */
-	    cchar	*tfn = tbuf ;
-	    char	rbuf[MAXPATHLEN+1] ;
-	    if (type) {
-	        rs = opentmpfile(tbuf,of,om,rbuf) ;
-	        op->nfd = rs ;
-	        tfn = rbuf ;
-	    } else {
-	        if (op->fl.ofexcl) of |= O_EXCL ;
-	        rs = uc_open(tbuf,of,om) ;
-	        op->nfd = rs ;
-	    }
-	    if (rs >= 0) {
-	        if (cchar *cp ; (rs = libmem.strw(tfn,-1,&cp)) >= 0) {
-	            op->nidxfname = (char *) cp ;
+	if (char *a ; (rs = libmem.mall(sz,&a)) >= 0) ylikely {
+	    char *tbuf = (a + (--ai * (maxpath + 1))) ;
+	    if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) ylikely {
+	        cmode	om = op->om ;
+	        int	of = (O_CREAT|O_WRONLY) ; /* <- writable */
+	        cchar	*tfn = tbuf ;
+	        char	*rbuf = (a + (--ai * (maxpath + 1))) ;
+	        if (type) {
+	            rs = opentmpfile(tbuf,of,om,rbuf) ;
+	            op->nfd = rs ;
+	            tfn = rbuf ;
+	        } else {
+	            if (op->fl.ofexcl) of |= O_EXCL ;
+	            rs = uc_open(tbuf,of,om) ;
+	            op->nfd = rs ;
 	        }
-	    } /* end if (ok) */
-	} /* end if (mknewfname) */
+	        if (rs >= 0) {
+	            if (cchar *cp ; (rs = libmem.strw(tfn,-1,&cp)) >= 0) {
+	                op->nidxfname = charp(cp) ;
+	            } /* end if (memory-acquire) */
+	        } /* end if (ok) */
+	    } /* end if (mknewfname) */
+	    rs1 = libmem.free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 } /* end subroutine (txtindexmks_nhashopen) */
 
@@ -1037,32 +1047,38 @@ local int txtindexmks_nhashclose(TIM *op) noex {
 } /* end subroutine (txtindexmks_nhashclose) */
 
 local int txtindexmks_renamefiles(TIM *op) noex {
+    	cint		maxpath = var.maxpathlen ;
+    	cint		sz = (2 * (var.maxpathlen + 1)) ;
+	int		ai = 2 ; /* double (two) memory-allocation) */
 	int		rs ;
+	int		rs1 ;
 	cchar		*ends = ENDIANSTR ;
-	char		hashfname[MAXPATHLEN + 1] ;
-	if ((rs = mkfnamesuf2(hashfname,op->dbname,FSUF_IND,ends)) >= 0) {
-	    char	tagfname[MAXPATHLEN + 1] ;
-	    if ((rs = mkfnamesuf1(tagfname,op->dbname,FSUF_TAG)) >= 0) {
-
-	        if ((rs = u_rename(op->ntagfname,tagfname)) >= 0) {
-	            op->ntagfname[0] = '\0' ;
-	            if ((rs = u_rename(op->nidxfname,hashfname)) >= 0) {
-	                op->nidxfname[0] = '\0' ;
-		    }
-		}
-		if (rs < 0) {
-	            if (op->ntagfname[0] != '\0') {
-	                u_unlink(op->ntagfname) ;
+	if (char *a ; (rs = libmem.mall(sz,&a)) >= 0) ylikely {
+	    char	*hashfname	= (a + (--ai * (maxpath + 1))) ;
+	    if ((rs = mkfnamesuf2(hashfname,op->dbname,FSUF_IND,ends)) >= 0) {
+	        char	*tagfname	= (a + (--ai * (maxpath + 1))) ;
+	        if ((rs = mkfnamesuf1(tagfname,op->dbname,FSUF_TAG)) >= 0) {
+	            if ((rs = u_rename(op->ntagfname,tagfname)) >= 0) {
 	                op->ntagfname[0] = '\0' ;
-	            }
-	            if (op->nidxfname[0] != '\0') {
-	                u_unlink(op->nidxfname) ;
-	                op->nidxfname[0] = '\0' ;
-	            }
-		}
-
+	                if ((rs = u_rename(op->nidxfname,hashfname)) >= 0) {
+	                    op->nidxfname[0] = '\0' ;
+		        }
+		    } /* end if (u_rename) */
+		    if (rs < 0) {
+	                if (op->ntagfname[0] != '\0') {
+	                    u_unlink(op->ntagfname) ;
+	                    op->ntagfname[0] = '\0' ;
+	                }
+	                if (op->nidxfname[0] != '\0') {
+	                    u_unlink(op->nidxfname) ;
+	                    op->nidxfname[0] = '\0' ;
+	                }
+		    } /* end if (error) */
+	        } /* end if (ok) */
 	    } /* end if (ok) */
-	} /* end if (ok) */
+	    rs1 = libmem.free(a) ;
+	    if (rs >= 0) rs1 = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 } /* end subroutine (txtindexmks_renamefiles) */
 
@@ -1089,13 +1105,13 @@ int txtindexmks_ntagclose(TIM *op) noex {
 local int txtindexmks_printeigen(TIM *op) noex {
 	strtab		*edp = op->eigenp ;
 	int		rs ;
-	if ((rs = strtab_count(edp)) >= 0) {
+	if ((rs = strtab_count(edp)) >= 0) ylikely {
 	    int		erlen = (rs+1) ;
-	    if ((rs = strtab_strsize(edp)) >= 0) {
+	    if ((rs = strtab_strsize(edp)) >= 0) ylikely {
 		int	essize = rs ;
 		if (char *estab ; (rs = libmem.mall(essize,&estab)) >= 0) {
 		    if ((rs = strtab_strmk(edp,estab,essize)) >= 0) {
-			if ((rs = strtab_recsize(edp)) >= 0) {
+			if ((rs = strtab_recsize(edp)) >= 0) ylikely {
 			    int	ersz = rs ;
 			    int *ertab ; 
 			    if ((rs = libmem.mall(ersz,&ertab)) >= 0) {
@@ -1106,7 +1122,7 @@ local int txtindexmks_printeigen(TIM *op) noex {
 				a.erlen = erlen ;
 				rs = txtindexmks_printeigener(op,&a) ;
 				libmem.free(ertab) ;
-			    } /* end if (m-a) */
+			    } /* end if (memory-allocation) */
 			}
 		    }
 		    libmem.free(estab) ;
