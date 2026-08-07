@@ -22,7 +22,7 @@
 #include	<sys/types.h>		/* POSIX® |caddr_t| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<realname.h>
+#include	<realname.h>		/* LIBUC */
 
 
 #define	IPASSWD			struct ipasswd_head
@@ -31,11 +31,9 @@
 #define	IPASSWD_ENT		struct ipasswd_entry
 #define	IPASSWD_OBJ		struct ipasswd_object
 #define	IPASSWD_FL		struct ipasswd_flags
-
 #define	IPASSWD_SUF		"pwi"
 #define	IPASSWD_MAGIC		0x23456787
 #define	IPASSWD_CURMAGIC	0x23456788
-
 #define	IPASSWD_USERNAMELEN	32
 #define	IPASSWD_NINDICES	5	/* number of indices */
 
@@ -104,9 +102,9 @@ struct ipasswd_head {
 	int		pagesz ;
 	int		filesz ;
 	int		stcount ;
-	int		stsize ;
+	int		stsz ;
 	int		rtlen ;
-	int		rtsize ;
+	int		rtsz ;
 	int		rilen ;
 	int		collisions ;
 	int		fd ;
