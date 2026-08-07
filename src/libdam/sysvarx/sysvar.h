@@ -39,14 +39,14 @@ struct sysvar_flags {
 } ; /* end struct */
 
 struct sysvar_head {
-	modload		*mlp ;			/* mod-load-pointer */
-	void		*callp ;		/* call-struct pointer */
-	void		*obj ;			/* object pointer */
-	vecstr		*dlp ;			/* default-list-pointer */
+	modload		*mlp ;		/* mod-load-pointer */
+	void		*callp ;	/* call-struct pointer */
+	void		*obj ;		/* object pointer */
+	vecstr		*dlp ;		/* default-list-pointer */
 	SYSVAR_FL	fl ;
 	uint		magval ;
-	int		objsize ;		/* object size */
-	int		cursize ;		/* cursor size */
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
 } ; /* end struct */
 
 typedef SYSVAR		sysvar ;
