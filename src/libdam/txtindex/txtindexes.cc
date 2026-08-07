@@ -227,25 +227,14 @@ local int	txtindexes_oureigen(TIS *,cchar *,int) noex ;
 local int	txtindexes_hdrverify(TIS *,time_t) noex ;
 local int	txtindexes_audithash(TIS *,offindex *) noex ;
 local int	txtindexes_auditeigen(TIS *) noex ;
-
 local int	offindex_tags(offindex *,cchar *,int) noex ;
 
 local int	tag_parse(TIS_TAG *,char *,int,cchar *,int) noex ;
-
-#if	CF_DYNACOMPACT
-#else
 local int	taglist_compact(uint *,int) noex ;
-#endif
 
-local int	vcmpuint(cvoid *,cvoid *) noex ;
-
-#if	CF_SORTLISTS
 local int	cmplistdesc(const listdesc *,const listdesc *) noex ;
-#endif /* CF_SORTLISTS */
-
-#if	CF_SORTKEYS
+local int	vcmpuint(cvoid *,cvoid *) noex ;
 local int	vcmpkey(cchar **,cchar **) noex ;
-#endif
 
 
 /* local variables */
@@ -343,7 +332,7 @@ int txtindexes_audit(TIS *op) noex {
 	    } /* end if (offindex) */
 	    if (rs >= 0) {
 	        rs = txtindexes_auditeigen(op) ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (txtindexes_audit) */
@@ -351,7 +340,7 @@ int txtindexes_audit(TIS *op) noex {
 int txtindexes_count(TIS *op) noex {
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = txtindexes_magic(op)) >= 0) {
+	if ((rs = txtindexes_magic(op)) >= 0) ylikely {
 	    n = op->ifi.taglen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
@@ -360,7 +349,7 @@ int txtindexes_count(TIS *op) noex {
 int txtindexes_neigen(TIS *op) noex {
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = txtindexes_magic(op)) >= 0) {
+	if ((rs = txtindexes_magic(op)) >= 0) ylikely {
 	    n = (op->ifi.erlen - 1) ;
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
@@ -369,10 +358,10 @@ int txtindexes_neigen(TIS *op) noex {
 int txtindexes_getinfo(TIS *op,TIS_INFO *ip) noex {
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = txtindexes_magic(op)) >= 0) {
+	if ((rs = txtindexes_magic(op)) >= 0) ylikely {
 	    n = op->ifi.taglen ;
 	    memclear(ip) ;
-	    if (ip != nullptr) {
+	    if (ip != nullptr) ylikely {
 	        TIS_FI	*fip = &op->hf ;
 	        ip->ticreat = time_t(op->ifi.wtime) ;
 	        ip->timod = fip->ti_mod ;
@@ -388,7 +377,7 @@ int txtindexes_getinfo(TIS *op,TIS_INFO *ip) noex {
 int txtindexes_getsdn(TIS *op,char *rb,int rl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = txtindexes_magic(op,rb)) >= 0) {
+	if ((rs = txtindexes_magic(op,rb)) >= 0) ylikely {
 	    TIS_FI	*fip = &op->hf ;
 	    if (cc *sp = (fip->mapdata + op->ifi.sdnoff) ; sp[0] != '\0') {
 	        rs = sncpy(rb,rl,sp) ;
@@ -401,7 +390,7 @@ int txtindexes_getsdn(TIS *op,char *rb,int rl) noex {
 int txtindexes_getsfn(TIS *op,char *rb,int rl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = txtindexes_magic(op,rb)) >= 0) {
+	if ((rs = txtindexes_magic(op,rb)) >= 0) ylikely {
 	    TIS_FI	*fip = &op->hf ;
 	    if (cc *sp = (fip->mapdata + op->ifi.sfnoff) ; sp[0] != '\0') {
 	        rs = sncpy(rb,rl,sp) ;
@@ -413,7 +402,7 @@ int txtindexes_getsfn(TIS *op,char *rb,int rl) noex {
 
 int txtindexes_iseigen(TIS *op,cchar *kp,int kl) noex {
 	int		rs ;
-	if ((rs = txtindexes_magic(op,kp)) >= 0) {
+	if ((rs = txtindexes_magic(op,kp)) >= 0) ylikely {
 	    int		klen = KEYBUFLEN ;
 	    char	kbuf[KEYBUFLEN + 1] ;
 	    if (kl < 0) kl = lenstr(kp) ;
@@ -430,10 +419,10 @@ int txtindexes_iseigen(TIS *op,cchar *kp,int kl) noex {
 int txtindexes_curbegin(TIS *op,TIS_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = txtindexes_magic(op,curp)) >= 0) {
+	if ((rs = txtindexes_magic(op,curp)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
 	    memclear(curp) ;
-	    if ((rs = mxp->lockbegin) >= 0) {
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        op->ncursors += 1 ;
 	        rs1 = mxp->lockend ;
 		if (rs >= 0) rs = rs1 ;
@@ -445,7 +434,7 @@ int txtindexes_curbegin(TIS *op,TIS_CUR *curp) noex {
 int txtindexes_curend(TIS *op,TIS_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = txtindexes_magic(op,curp)) >= 0) {
+	if ((rs = txtindexes_magic(op,curp)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
 	    if (curp->taglist) {
 	        rs1 = lm_free(curp->taglist) ;
@@ -453,7 +442,7 @@ int txtindexes_curend(TIS *op,TIS_CUR *curp) noex {
 	        curp->taglist = nullptr ;
 	    } /* end if (memory-release) */
 	    curp->taglen = 0 ;
-	    if ((rs1 = mxp->lockbegin) >= 0) {
+	    if ((rs1 = mxp->lockbegin) >= 0) ylikely {
 	        if (op->ncursors > 0) {
 	            op->ncursors -= 1 ;
 	        }
@@ -469,7 +458,7 @@ int txtindexes_curlook(TIS *op,TIS_CUR *curp,mainv klp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ; /* return-value */
-	if ((rs = txtindexes_magic(op,curp,klp)) >= 0) {
+	if ((rs = txtindexes_magic(op,curp,klp)) >= 0) ylikely {
 	    cint	vn = 10 ;
 	    cint	vo = 0 ;
 	    curp->taglen = 0 ;
@@ -478,7 +467,7 @@ int txtindexes_curlook(TIS *op,TIS_CUR *curp,mainv klp) noex {
 	        curp->taglist = nullptr ;
 	    } /* end if (memory-release) */
 	    /* condition the keys for the lookup */
-	    if (vecstr hkeys ; (rs = hkeys.start(vn,vo)) >= 0) {
+	    if (vecstr hkeys ; (rs = hkeys.start(vn,vo)) >= 0) ylikely {
 	        if ((rs = txtindexes_mkhashkeys(op,&hkeys,klp)) >= 0) {
 	    	    uint *tlist = nullptr ;
 	            if ((rs = txtindexes_mktaglist(op,&tlist,&hkeys)) >= 0) {
@@ -502,7 +491,7 @@ int txtindexes_curenum(TIS *op,TIS_CUR *curp,TIS_TAG *tagp,
 		char *rbuf,int rlen) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = txtindexes_magic(op,curp,tagp,rbuf)) >= 0) {
+	if ((rs = txtindexes_magic(op,curp,tagp,rbuf)) >= 0) ylikely {
 	    TIS_FI	*fip = &op->tf ;
 	    cchar	*tagbuf ;
 	    uint	tagoff ;
@@ -517,7 +506,7 @@ int txtindexes_curenum(TIS *op,TIS_CUR *curp,TIS_TAG *tagp,
 	        if ((idx >= op->ifi.taglen) || (idx >= curp->taglen)) {
 	            rs = SR_NOTFOUND ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    const uint	umx = UINT_MAX ;
 		    const uint	tl = curp->taglen ;
 	            while ((idx < tl) && (curp->taglist[idx] == umx)) {
@@ -538,7 +527,7 @@ int txtindexes_curenum(TIS *op,TIS_CUR *curp,TIS_TAG *tagp,
 	        } /* end if */
 	        if (rs >= 0) {
 	            curp->i = (idx + 1) ;
-	        }
+	        } /* end if (ok) */
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
@@ -549,11 +538,11 @@ int txtindexes_curenum(TIS *op,TIS_CUR *curp,TIS_TAG *tagp,
 
 local int txtindexes_dbloadcreate(TIS *op,time_t dt) noex {
 	int		rs ;
-	if ((rs = txtindexes_dbmapcreate(op,dt)) >= 0) {
+	if ((rs = txtindexes_dbmapcreate(op,dt)) >= 0) ylikely {
 	    rs = txtindexes_dbproc(op,dt) ;
 	    if (rs < 0) {
 	        txtindexes_dbmapdestroy(op) ;
-	    }
+	    } /* end if (error) */
 	}
 	return rs ;
 } /* end subroutine (txtindexes_dbloadcreate) */
@@ -577,7 +566,7 @@ local int txtindexes_dbmapcreate(TIS *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	char		*tbuf{} ;
-	if ((rs = lm_mp(&tbuf)) >= 0) {
+	if ((rs = lm_mp(&tbuf)) >= 0) ylikely {
 	    if ((rs = mkfnamesuf2(tbuf,op->dbname,FE_HASH,ENDIANSTR)) >= 0) {
 	        if ((rs = txtindexes_fimapcreate(op,0,tbuf,dt)) >= 0) {
 	            if ((rs = mkfnamesuf1(tbuf,op->dbname,FE_TAG)) >= 0) {
@@ -585,7 +574,7 @@ local int txtindexes_dbmapcreate(TIS *op,time_t dt) noex {
 	            }
 	            if (rs < 0) {
 	                txtindexes_fimapdestroy(op,0) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (txtindexes_fimapcreate) */
 	    } /* end if (mkfnamesuf) */
 	    rs1 = lm_free(tbuf) ;
@@ -618,20 +607,20 @@ local int txtindexes_fimapcreate(TIS *op,int w,cc *fn,time_t dt) noex {
 	    fip->ti_mod = 0 ;
 	    fip->ti_map = 0 ;
 	}
-	if ((rs = u_open(fn,O_RDONLY,0666)) >= 0) {
+	if ((rs = u_open(fn,O_RDONLY,0666)) >= 0) ylikely {
 	    cnullptr	np{} ;
 	    cint	fd = rs ;
-	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
 	        size_t	ms = int(sb.st_size & UINT_MAX) ;
 	        int	mp = PROT_READ ;
 	        int	mf = MAP_SHARED ;
 	        void	*md ;
-	        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) ylikely {
 	            fip->mapdata = charp(md) ;
 	            fip->mapsize = ms ;
 	            fip->ti_mod = sb.st_mtime ;
 	            fip->ti_map = dt ;
-	        }
+	        } /* end if */
 	    } /* end if (fstat) */
 	    rs1 = u_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -642,7 +631,7 @@ local int txtindexes_fimapcreate(TIS *op,int w,cc *fn,time_t dt) noex {
 local int txtindexes_fimapdestroy(TIS *op,int w) noex {
 	TIS_FI		*fip = (w) ? &op->tf : &op->hf ;
 	int		rs = SR_OK ;
-	if (fip->mapdata != nullptr) {
+	if (fip->mapdata != nullptr) ylikely {
 	    rs = u_mmapend(fip->mapdata,fip->mapsize) ;
 	    fip->mapdata = nullptr ;
 	    fip->mapsize = 0 ;
@@ -657,8 +646,8 @@ local int txtindexes_dbproc(TIS *op,time_t dt) noex {
 	int		rs ;
 	int		c = 0 ; /* return-value */
 	cint	fsz = intsat(fip->mapsize) ;
-	if ((rs = txtindexhdr_rd(hip,fip->mapdata,fsz)) >= 0) {
-	    if ((rs = txtindexes_hdrverify(op,dt)) >= 0) {
+	if ((rs = txtindexhdr_rd(hip,fip->mapdata,fsz)) >= 0) ylikely {
+	    if ((rs = txtindexes_hdrverify(op,dt)) >= 0) ylikely {
 		TIS_MI		*mip = &op->mi ;
 	        mip->sdn = (char *) (fip->mapdata + hip->sdnoff) ;
 	        mip->sfn = (char *) (fip->mapdata + hip->sfnoff) ;
@@ -684,21 +673,16 @@ local int txtindexes_mkhashkeys(TIS *op,vecstr *clp,mainv klp) noex {
 	int		c = 0 ;
 	cchar		*kp ;
 	char		keybuf[KEYBUFLEN + 1] ;
-
 	minwlen = op->ifi.minwlen ;
 	maxwlen = op->ifi.maxwlen ;
-
 	for (i = 0 ; (kp = klp[i]) != nullptr ; i += 1) {
-	    if (kp != nullptr) {
-
+	    if (kp) {
 	        kl = lenstr(kp,klen) ;	/* also prevents overflow */
 	        if (kl >= minwlen) {
-
 	            if (hasuc(kp,kl)) {
 	                strwcpylc(keybuf,kp,kl) ;	/* cannot overflow */
 	                kp = keybuf ;
 	            }
-
 	    	    if ((rs = txtindexes_oureigen(op,kp,kl)) == 0) {
 			if (kl > maxwlen) kl = maxwlen ;
 	                if ((rs = vecstr_findn(clp,kp,kl)) == rsn) {
@@ -706,18 +690,15 @@ local int txtindexes_mkhashkeys(TIS *op,vecstr *clp,mainv klp) noex {
 	                    rs = vecstr_add(clp,kp,kl) ;
 	                }
 	            } /* end if */
-
 		} /* end if (go) */
-
 	    }
 	    if (rs < 0) break ;
 	} /* end for */
-
-#if	CF_SORTKEYS
-	if ((rs >= 0) && (c > 1))
-	    vecstr_sort(clp,vcmpkey) ;
-#endif
-
+	if_constexpr (f_sortkeys) {
+	    if ((rs >= 0) && (c > 1)) {
+	        vecstr_sort(clp,vcmpkey) ;
+	    }
+	} /* end if_constexpr (f_sortkeys) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (txtindexes_mkhashkeys) */
 
@@ -726,13 +707,12 @@ local int txtindexes_mktaglist(TIS *op,uint **tlpp,vecstr *hlp) noex {
 	int		rs ;
 	int		tagcount = 0 ;
 	/* allocate an array to hold tag-list results */
-	if ((rs = vecstr_count(hlp)) > 0) {
+	if ((rs = vecstr_count(hlp)) > 0) ylikely {
 	    listdesc	*lists = nullptr ;
 	    int		n = rs ;
 	    int		sz ;
-
 	    sz = n * szof(listdesc) ;
-	    if ((rs = lm_mall(sz,&lists)) >= 0) {
+	    if ((rs = lm_mall(sz,&lists)) >= 0) ylikely {
 	        uint	hv ;
 	        uint	*table = op->mi.table ;
 	        uint	*taglist = nullptr ;
@@ -746,163 +726,117 @@ local int txtindexes_mktaglist(TIS *op,uint **tlpp,vecstr *hlp) noex {
 	        int	k ;
 		int	c = 0 ;
 	        cchar	*kp ;
-
-/* fill in the tag-list array with results */
-
+		/* fill in the tag-list array with results */
 	        for (int i = 0 ; vecstr_get(hlp,i,&kp) >= 0 ; i += 1) {
 	            if (kp != nullptr) {
-
 	                hv = hash_elf(kp,-1) ;
-
 	                hi = (hv % tablen) ;
 	                listoff = table[hi] ;
-
 	                if (listoff != 0) {
-
-/* sanity checks */
-
+			    /* sanity checks */
 	                    if ((listoff & 3) != 0) {
 	                        rs = SR_BADFMT ;
 	                        break ;
 	                    }
-
 	                    if ((listoff < hip->listoff) || 
 				(listoff >= op->hf.mapsize)) {
 	                        rs = SR_BADFMT ;
 	                        break ;
 	                    }
-
-/* continue */
-
+			    /* continue */
 	                    uip = (uint *) (op->hf.mapdata + listoff) ;
 	                    ntags = *uip++ ;
-
 	                    if (ntags > 0) {
-
-/* sanity check (optionally requested by index creator!) */
-
+			        /* sanity check */
 	                        if ((maxtags > 0) && (ntags > maxtags)) {
 	                            rs = SR_BADFMT ;
 	                            break ;
 	                        }
-
 	                        lists[c].listp = uip ;
 	                        lists[c].ntags = ntags ;
 	                        c += 1 ;
-
 	                    } else {
 	                        c = 0 ;
 	                        break ;
 	                    } /* end if (non-zero number of tags) */
-
 	                } else {
 	                    c = 0 ;
 	                    break ;
 	                }
-
-	            }
+	            } /* end if (non-zero lastoff) */
 	            if (rs < 0) break ;
 	        } /* end for */
 	        n = c ;
-
-/* sort the list-descriptors by number of tag entries */
-
-#if	CF_SORTLISTS /* optional but strongly recommended, for performance */
-	        if ((rs >= 0) && (n > 1)) {
-	            int	(*cfn)(cvoid *,cvoid *) ;
-	            cfn = (int (*)(cvoid *,cvoid *)) cmplistdesc ;
-	            qsort(lists,n,sizeof(listdesc),cfn) ;
-	        }
-#endif /* CF_SORTLISTS */
-
-/* perform the join operation on the tag lists (not the easiest thing to do) */
-
+		/* sort the list-descriptors by number of tag entries */
+		if_constexpr (f_sortlists) { /* recommended for performance */
+	            if ((rs >= 0) && (n > 1)) {
+	                int	(*cfn)(cvoid *,cvoid *) ;
+	                cfn = (int (*)(cvoid *,cvoid *)) cmplistdesc ;
+	                qsort(lists,n,sizeof(listdesc),cfn) ;
+	            }
+		} /* end if_constexpr (f_sortlists) */
+		/* perform the join operation on the tag lists */
 	        taglen = 0 ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-
 	            uip = lists[i].listp ;
 	            ntags = lists[i].ntags ;
-
 	            if (i == 0) {
-
 	                tagcount = ntags ;
 	                taglen = ntags ;
 	                sz = (taglen + 1) * szof(uint) ;
 	                if ((rs = lm_mall(sz,&taglist)) >= 0) {
 	                    memcpy(taglist,uip,sz) ;
 	                }
-
 	            } else {
 			int	j ;
-
-#if	CF_DYNACOMPACT /* try dynamic compaction? (nerves of steel!) */
-
-	                j = 0 ;
-	                while (j < taglen) {
-
-	                    for (k = 0 ; k < ntags ; k += 1) {
-	                        if (taglist[j] == uip[k]) break ;
-	                    } /* end for */
-
-	                    if (k >= ntags) {
-	                        taglen -= 1 ;
-	                        if (taglen == 0) break ;
-	                        if (j < taglen) {
-				    taglist[j] = taglist[taglen] ;
-				}
-	                    } else {
-	                        j += 1 ;
-	                    }
-
-	                } /* end while */
-	                tagcount = taglen ;
-
-#else /* CF_DYNACOMPACT */
-
-	                for (j = 0 ; j < taglen ; j += 1) {
-	                    if (taglist[j] != UINT_MAX) {
-
+			if_constexpr (f_dynacompact) {
+	                    j = 0 ;
+	                    while (j < taglen) {
 	                        for (k = 0 ; k < ntags ; k += 1) {
 	                            if (taglist[j] == uip[k]) break ;
 	                        } /* end for */
-
 	                        if (k >= ntags) {
-	                            taglist[j] = UINT_MAX ;
-	                            tagcount -= 1 ;
-	                            if (tagcount == 0) break ;
+	                            taglen -= 1 ;
+	                            if (taglen == 0) break ;
+	                            if (j < taglen) {
+				        taglist[j] = taglist[taglen] ;
+				    }
+	                        } else {
+	                            j += 1 ;
 	                        }
-
-	                    } /* end if */
-	                } /* end for */
-
-#endif /* CF_DYNACOMPACT */
-
+	                    } /* end while */
+	                    tagcount = taglen ;
+			} else {
+	                    for (j = 0 ; j < taglen ; j += 1) {
+	                        if (taglist[j] != UINT_MAX) {
+	                            for (k = 0 ; k < ntags ; k += 1) {
+	                                if (taglist[j] == uip[k]) break ;
+	                            } /* end for */
+	                            if (k >= ntags) {
+	                                taglist[j] = UINT_MAX ;
+	                                tagcount -= 1 ;
+	                                if (tagcount == 0) break ;
+	                            }
+	                        } /* end if */
+	                    } /* end for */
+			} /* end if_constexpr (f_dynacompact) */
 	                if (tagcount == 0) break ;
 	            } /* end if */
-
 	        } /* end for (looping through hash keys) */
-
-/* finishing */
-
+		/* finishing */
 	        if ((rs >= 0) && (taglist != nullptr)) {
-
-#if	CF_DYNACOMPACT
-#else
-	            if ((tagcount > 0) && (taglen != tagcount)) {
-	                rs = taglist_compact(taglist,taglen) ;
-	            }
-#endif /* CF_DYNACOMPACT */
-
+		    if_constexpr (! f_dynacompact) {
+	                if ((tagcount > 0) && (taglen != tagcount)) {
+	                    rs = taglist_compact(taglist,taglen) ;
+	                }
+		    } /* end if_constexpr (! f_dynacompact) */
 	            taglist[tagcount] = UINT_MAX ;
-
-/* sort the tags in this resulting tag-list */
-
-#if	CF_SORT
-	            if ((rs >= 0) && (tagcount > 1)) {
-	                qsort(taglist,tagcount,sizeof(uint),vcmpuint) ;
-	            }
-#endif
-
+		    /* sort the tags in this resulting tag-list */
+		    if_constexpr (f_sort) {
+	                if ((rs >= 0) && (tagcount > 1)) {
+	                    qsort(taglist,tagcount,sizeof(uint),vcmpuint) ;
+	                }
+		    } /* end if_constexpr (f_sort) */
 	        } /* end if (finishing) */
 		/* done */
 	        if ((rs < 0) || (tlpp == nullptr)) {
@@ -969,11 +903,11 @@ local int txtindexes_hdrverify(TIS *op,time_t dt) noex {
 	    uint	essize = hip->essize ;
 	    uint	erlen = hip->erlen ;
 	    uint	eilen = hip->eilen ;
-		/* alignment restrictions */
+	    /* alignment restrictions */
 	    f = f && ((hip->esoff & (szof(int)-1)) == 0) ;
 	    f = f && ((hip->eroff & (szof(int)-1)) == 0) ;
 	    f = f && ((hip->eioff & (szof(int)-1)) == 0) ;
-		/* size restrictions */
+	    /* size restrictions */
 	    f = f && ((hip->esoff + essize) <= hfsize) ;
 	    f = f && ((hip->eroff + (erlen * szof(int))) <= hfsize) ;
 	    f = f && ((hip->eioff + (eilen * 3 * szof(int))) <= hfsize) ;
@@ -1144,8 +1078,7 @@ local int offindex_tags(offindex *oip,cchar *fp,int fl) noex {
 	int		rs = SR_OK ;
 	int		ll ;
 	int		n = 0 ;
-	cchar		*tp ;
-	while ((tp = strnchr(fp,fl,'\n')) != nullptr) {
+	for (cchar *tp ; (tp = strnchr(fp,fl,'\n')) != nullptr ; ) {
 	    cint	len = intconv((tp + 1) - fp) ;
 	    ll = (len - 1) ;
 	    if (ll > 0) {
@@ -1156,7 +1089,7 @@ local int offindex_tags(offindex *oip,cchar *fp,int fl) noex {
 	    lineoff += len ;
 	    fp += len ;
 	    fl -= len ;
-	} /* end while */
+	} /* end for */
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (offindex_tags) */
 
@@ -1209,8 +1142,6 @@ local int tag_parse(TIS_TAG *tagp,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (tag_parse) */
 
-#if	CF_DYNACOMPACT
-#else
 local int taglist_compact(uint *taglist,int taglen) noex {
 	while (taglist[taglen - 1] == UINT_MAX) {
 	    taglen -= 1 ;
@@ -1230,7 +1161,6 @@ local int taglist_compact(uint *taglist,int taglen) noex {
 	taglist[taglen] = UINT_MAX ;
 	return taglen ;
 } /* end subroutine (taglist_compact) */
-#endif /* CF_DYNACOMPACT */
 
 local int vcmpuint(cvoid *v1p,cvoid *v2p) noex {
 	const uint	*i1p = (const uint *) v1p ;
@@ -1249,8 +1179,6 @@ local int vcmpuint(cvoid *v1p,cvoid *v2p) noex {
 	} /* end if (one or the other) */
 	return rc ;
 } /* end subroutine (vcmpuint) */
-
-#if	CF_SORTKEYS
 
 /* reverse sort strings by 1. string length and 2. string value */
 local int vcmpkey(cchar **s1pp,cchar **s2pp) noex {
@@ -1275,12 +1203,8 @@ local int vcmpkey(cchar **s1pp,cchar **s2pp) noex {
 	return rc ;
 } /* end subroutine (vcmpkey) */
 
-#endif /* CF_SORTKEYS */
-
-#if	CF_SORTLISTS
 local int cmplistdesc(con listdesc *l1p,con listdesc *l2p) noex {
 	return (l1p->ntags - l2p->ntags) ;
 } /* end subroutine (cmplistdesc) */
-#endif /* CF_SORTLISTS */
 
 
