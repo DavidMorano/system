@@ -60,7 +60,7 @@ module ;
 #include	<ucfileop.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBUC */
-#include	<libdebug.h>		/* LIBU LIBDEBUG */
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -161,7 +161,7 @@ pair<int,int> argsz(cchar *sp,int chx) noex {
 	    sz += (lenstr(sp) + 1) ;
 	} /* end if */
 	rv.first = na ;
-	rv.second = ((na + 1) * szof(cchar **)) ;
+	rv.second = sz + ((na + 1) * szof(cchar **)) ;
 	return rv ;
 } /* end subroutine (argsz) */
 
