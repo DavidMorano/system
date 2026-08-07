@@ -70,25 +70,25 @@ int paramopt_loadone(paramopt *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		idx = 0 ;
-	if ((rs = paramopt_magic(op,sp)) >= 0) {
+	if ((rs = paramopt_magic(op,sp)) >= 0) ylikely {
 	    if (sl <= 0) sl = lenstr(sp) ;
 	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
-	    if (int si ; (si = sibrk(sp,sl," \t=,:")) >= 0) {
+	    } /* end while */
+	    if (int si ; (si = sibrk(sp,sl," \t=,:")) >= 0) ylikely {
 	        cchar	*keyname ;
-	        if (nulstr kn ; (rs = kn.start(sp,si,&keyname)) >= 0) {
+	        if (nulstr kn ; (rs = kn.start(sp,si,&keyname)) >= 0) ylikely {
 	            sp += si ;
 	            sl -= si ;
 	            while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	                sp += 1 ;
 	                sl -= 1 ;
-	            }
+	            } /* end while */
 	            if ((sl > 0) && ((*sp == '=') || (*sp == ':'))) {
 	                sp += 1 ;
 	                sl -= 1 ;
-	            }
+	            } /* end if */
 		    {
 	                rs = paramopt_load(op,keyname,sp,sl) ;
 		        idx = rs ;
