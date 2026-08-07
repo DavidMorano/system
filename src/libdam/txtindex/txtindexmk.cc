@@ -121,7 +121,7 @@ namespace {
 		db = adb ;
 		of = aof ;
 		om = aom ;
-	} ;
+	} ; /* end ctor */
 	int operator () (char *ap) noex ;
     } ; /* end struct (opener) */
 } /* end namespace */
@@ -223,7 +223,7 @@ int txtindexmk_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	if ((rs = txtindexmk_ctor(op,pp,db)) >= 0) ylikely {
 	    static cint		rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) ylikely {
-		cint	sz = (var.maxhostlen + 1 + var.maxpathlen + 1) ;
+		cint	sz = ((var.maxhostlen + 1) + (var.maxpathlen + 1)) ;
 		if (char *ap ; (rs = lm_mall(sz,&ap)) >= 0) ylikely {
 		    opener	oo(op,pp,db,of,om) ;
 		    {
@@ -236,7 +236,7 @@ int txtindexmk_open(TIM *op,TIM_PA *pp,cchar *db,int of,mode_t om) noex {
 	    } /* end if (mkvars) */
 	    if (rs < 0) {
 		txtindexmk_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (txtindexmk_ctor) */
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (txtindexmk_open) */
@@ -252,7 +252,7 @@ int opener::operator () (char *ap) noex {
 	    if ((rs = mkpr(pbuf,plen,pn,dbuf)) >= 0) ylikely {
 	        cchar	*objn = TIM_OBJNAME ;
 		cchar	*pr = pbuf ;
-		if ((rs = txtindexmk_objloadbegin(op,pr,objn)) >= 0) {
+		if ((rs = txtindexmk_objloadbegin(op,pr,objn)) >= 0) ylikely {
 	    	    txtindexmk_calls	*callp = callsp(op->callp) ;
 	    	    if ((rs = (*callp->open)(op->obj,pp,db,of,om)) >= 0) {
 			rv = rs ;
@@ -260,7 +260,7 @@ int opener::operator () (char *ap) noex {
 	    	    }
 	    	    if (rs < 0) {
 			txtindexmk_objloadend(op) ;
-		    }
+		    } /* end if (error) */
 		} /* end if (txtindexmk_objloadbegin) */
 	    } /* end if (mkpr) */
 	} /* end if (getnodedomain) */
@@ -291,7 +291,7 @@ int txtindexmk_close(TIM *op) noex {
 
 int txtindexmk_addeigens(TIM *op,TIM_KEY *keys,int nkeys) noex {
 	int		rs ;
-	if ((rs = txtindexmk_magic(op,keys)) >= 0) {
+	if ((rs = txtindexmk_magic(op,keys)) >= 0) ylikely {
 	    txtindexmk_calls	*callp = callsp(op->callp) ;
 	    rs = (*callp->addeigens)(op->obj,keys,nkeys) ;
 	} /* end if (magic) */
@@ -300,7 +300,7 @@ int txtindexmk_addeigens(TIM *op,TIM_KEY *keys,int nkeys) noex {
 
 int txtindexmk_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
 	int		rs ;
-	if ((rs = txtindexmk_magic(op,tags)) >= 0) {
+	if ((rs = txtindexmk_magic(op,tags)) >= 0) ylikely {
 	    txtindexmk_calls	*callp = callsp(op->callp) ;
 	    rs = (*callp->addtags)(op->obj,tags,ntags) ;
 	} /* end if (magic) */
@@ -309,7 +309,7 @@ int txtindexmk_addtags(TIM *op,TIM_TAG *tags,int ntags) noex {
 
 int txtindexmk_noop(TIM *op) noex {
 	int		rs ;
-	if ((rs = txtindexmk_magic(op)) >= 0) {
+	if ((rs = txtindexmk_magic(op)) >= 0) ylikely {
 	    txtindexmk_calls	*callp = callsp(op->callp) ;
 	    if (callp->noop) {
 	        rs = (*callp->noop)(op->obj) ;
@@ -327,9 +327,9 @@ local int txtindexmk_objloadbegin(TIM *op,cchar *pr,cchar *objn) noex {
 	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
-		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) ylikely {
+		if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) ylikely {
 	            cchar	*mn = TIM_MODBNAME ;
 		    int		mo = 0 ;
 	            mo |= modloadm.libvar ;
