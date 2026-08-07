@@ -52,9 +52,9 @@ typedef int (*uctim_f)(void *objp,int timid,int arg) noex ;
 EXTERNC_end
 
 struct uctim_entry {
+	uctim_f		notf ;		/* notify function (C-linkage) */
 	void		*objp ;		/* fcuntion argument (object pointer) */
 	psem		*psemp ;	/* POSIX® Semaphore pointer */
-	uctim_f		notf ;		/* notify function (C-linkage) */
 	ITIMERVAL	it ;		/* i-timer-value */
 	int		id ;		/* timer-ID */
 	int		arg ;		/* function argument */
