@@ -74,7 +74,7 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>
