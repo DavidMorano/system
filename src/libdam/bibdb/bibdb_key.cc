@@ -67,7 +67,8 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
-#include	<memory>                /* C++STD |destroy_at(3c++)| */
+#include	<new>			/* C++STD placement-new */
+#include	<memory>		/* C++STD |destroy_at(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
