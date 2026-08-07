@@ -252,8 +252,8 @@ int sysvar_open(SV *op,cchar *pr,cchar *dbname) noex {
 	        cchar	*objn = SYSVAR_OBJNAME ;
 	        if ((rs = sysvar_objloadbegin(op,pr,objn)) >= 0) ylikely {
 	            sysvar_calls	*callp = callsp(op->callp) ;
-		    if (op->callp) {
-			if (callp->open) {
+		    if (op->callp) ylikely {
+			if (callp->open) ylikely {
 			    cauto co = callp->open ;
 	                    if ((rs = co(op->obj,pr,dbname)) >= 0) {
 	    	                op->magval = SYSVAR_MAGIC ;
@@ -325,7 +325,7 @@ int sysvar_audit(SV *op) noex {
 
 int sysvar_count(SV *op) noex {
 	int		rs ;
-	if ((rs = sysvar_magic(op)) >= 0) {
+	if ((rs = sysvar_magic(op)) >= 0) ylikely {
 	    sysvar_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (op->fl.defaults) {
@@ -356,9 +356,9 @@ int sysvar_curbegin(SV *op,sysvar_cur *curp) noex {
 
 int sysvar_curend(SV *op,sysvar_cur *curp) noex {
 	int		rs ;
-	if ((rs = sysvar_magic(op,curp)) >= 0) {
+	if ((rs = sysvar_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magval == SYSVAR_MAGIC) {
+	    if (curp->magval == SYSVAR_MAGIC) ylikely {
 	        if (op->fl.defaults) {
 	            rs = sysvar_defcurend(op,curp) ;
 	        } else {
@@ -373,9 +373,9 @@ int sysvar_curend(SV *op,sysvar_cur *curp) noex {
 int sysvar_fetch(SV *op,cchar *kp,int kl,SV_CUR *curp,
 		char *vbuf,int vlen) noex {
 	int		rs ;
-	if ((rs = sysvar_magic(op,kp,curp)) >= 0) {
+	if ((rs = sysvar_magic(op,kp,curp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magval == SYSVAR_MAGIC) {
+	    if (curp->magval == SYSVAR_MAGIC) ylikely {
 		sysvar_calls	*callp = callsp(op->callp) ;
 		rs = SR_NOSYS ;
 	        if (op->fl.defaults) {
@@ -419,9 +419,9 @@ local int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
 	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
-	        if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) ylikely {
+	        if (mainv sv{} ; (rs = syms.getvec(&sv)) >= 0) ylikely {
 	            cchar	*mn = SYSVAR_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
@@ -429,11 +429,11 @@ local int sysvar_objloadbegin(SV *op,cchar *pr,cchar *objn) noex {
 	            mo |= modloadm.libprs ;
 	            mo |= modloadm.libsdirs ;
 	            mo |= modloadm.avail ;
-	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) {
+	            if ((rs = modload_open(lp,pr,mn,on,mo,sv)) >= 0) ylikely {
 		        op->fl.modload = true ;
 	                if (int mv[2] ; (rs = modload_getmva(lp,mv,1)) >= 0) {
-			    cint	osz = op->objsize ;
-	                    op->objsize = mv[0] ;
+			    cint	osz = op->objsz ;
+	                    op->objsz = mv[0] ;
 			    if (void *vp ; (rs = lm_mall(osz,&vp)) >= 0) {
 	                        op->obj = vp ;
 	                        rs = sysvar_loadcalls(op,&syms) ;
@@ -483,7 +483,7 @@ local int sysvar_loadcalls(SV *op,vecstr *slp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	cchar		*sname{} ;
-	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
+	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) ylikely {
 	    if (cvoid *snp{} ; (rs = modload_getsym(lp,sname,&snp)) >= 0) {
                 sysvar_calls        *callp = callsp(op->callp) ;
                 c += 1 ;
@@ -525,12 +525,12 @@ local int sysvar_loadcalls(SV *op,vecstr *slp) noex {
 local int sysvar_socurbegin(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op->callp) {
-	    cint	sz = op->cursize ;
-	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
+	    cint	sz = op->cursz ;
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 		sysvar_calls	*callp = callsp(op->callp) ;
 		curp->scp = vp ;
 		rs = SR_NOSYS ;
-		if (callp->curbegin) {
+		if (callp->curbegin) ylikely {
 		    cauto co = callp->curbegin ;
 		    rs = co(op->obj,curp->scp) ;
 		}
@@ -546,10 +546,10 @@ local int sysvar_socurbegin(SV *op,SV_CUR *curp) noex {
 local int sysvar_socurend(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (curp->scp) {
-	    if (op->callp) {
+	if (curp->scp) ylikely {
+	    if (op->callp) ylikely {
 		sysvar_calls	*callp = callsp(op->callp) ;
-		if (callp->curend) {
+		if (callp->curend) ylikely {
 		    auto	co = callp->curend ;
 	            rs1 = co(op->obj,curp->scp) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -558,7 +558,7 @@ local int sysvar_socurend(SV *op,SV_CUR *curp) noex {
 	            rs1 = lm_free(curp->scp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            curp->scp = nullptr ;
-		}
+		} /* end if (memory-release) */
 	    } else {
 	        rs = SR_NOSYS ;
 	    }
@@ -568,7 +568,7 @@ local int sysvar_socurend(SV *op,SV_CUR *curp) noex {
 
 local int sysvar_defaults(SV *op) noex {
 	int		rs ;
-	if ((rs = vecstr_start(op->dlp,NDEFAULTS,0)) >= 0) {
+	if ((rs = vecstr_start(op->dlp,NDEFAULTS,0)) >= 0) ylikely {
 	    op->fl.defaults = true ;
 	    for (int i = 0 ; sysfnames[i] != nullptr ; i += 1) {
 	        bool	f = false ;
@@ -577,7 +577,7 @@ local int sysvar_defaults(SV *op) noex {
 	        f = f || (rs == SR_ACCESS) ;
 	        if ((rs < 0) && (! f)) break ;
 	    } /* end for */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        vecstr_sort(op->dlp,vstrkeycmp) ;
 	    }
 	    if (rs < 0) {
@@ -596,8 +596,8 @@ local int sysvar_procsysdef(SV *op,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rs2 ;
-	if (vecstr lvars ; (rs = lvars.start(vn,vo)) >= 0) {
-	    if ((rs = lvars.envfile(fname)) >= 0) {
+	if (vecstr lvars ; (rs = lvars.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = lvars.envfile(fname)) >= 0) ylikely {
 		cchar	*cp{} ;
 	        for (int i = 0 ; (rs2 = lvars.get(i,&cp)) >= 0 ; i += 1) {
 	            if (cp) {
@@ -624,9 +624,9 @@ local int sysvar_procsysdef(SV *op,cchar *fname) noex {
 
 local int sysvar_defcurbegin(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op && curp) {
+	if (op && curp) ylikely {
 	    cint	sz = szof(SV_DC) ;
-	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 	        SV_DC	*dcp = (SV_DC *) vp ;
 	        curp->scp = vp ;
 	        dcp->i = -1 ;
@@ -638,14 +638,14 @@ local int sysvar_defcurbegin(SV *op,SV_CUR *curp) noex {
 local int sysvar_defcurend(SV *op,SV_CUR *curp) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (op && curp) {
-	    if (curp->scp) {
+	if (op && curp) ylikely {
+	    if (curp->scp) ylikely {
 	    	rs = SR_OK ;
 		{
 	            rs1 = lm_free(curp->scp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            curp->scp = nullptr ;
-		}
+		} /* end if (memory-release) */
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -665,11 +665,11 @@ local int sysvar_deffetch(SV *op,cc *kp,int kl,SV_DC *dcp,
 	        if (strkeycmp(key,cp) == 0) break ;
 	        i += 1 ;
 	    } /* end while */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        cchar	*valp = nullptr ;
 	        if (cchar *tp{} ; (tp = strchr(cp,'=')) != nullptr) {
 		    valp = (tp + 1) ;
-		}
+		} /* end if */
 	        if (valp) {
 	            if (vbuf) {
 		        rs = sncpy1(vbuf,vlen,valp) ;
@@ -680,8 +680,8 @@ local int sysvar_deffetch(SV *op,cc *kp,int kl,SV_DC *dcp,
 	        }
 	        if (rs >= 0) {
 	            dcp->i = i ;
-		}
-	    } /* end if */
+		} /* end if (ok) */
+	    } /* end if (ok) */
 	    rs1 = ns.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nul-string) */
@@ -699,7 +699,7 @@ local int sysvar_defenum(SV *op,SV_DC *dcp,char *kbuf,int klen,
 	    if (cp != nullptr) break ;
 	    i += 1 ;
 	} /* end while */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    int		kl = -1 ;
 	    cchar	*valp = nullptr ;
 	    if (cchar *tp ; (tp = strchr(cp,'=')) != nullptr) {
@@ -709,7 +709,7 @@ local int sysvar_defenum(SV *op,SV_DC *dcp,char *kbuf,int klen,
 	    if (kbuf) {
 		rs = snwcpy(kbuf,klen,cp,kl) ;
 	    }
-	    if ((rs >= 0) && valp) {
+	    if ((rs >= 0) && valp) ylikely {
 	        if (vbuf) {
 		    rs = sncpy1(vbuf,vlen,valp) ;
 		    vl = rs ;
@@ -717,7 +717,7 @@ local int sysvar_defenum(SV *op,SV_DC *dcp,char *kbuf,int klen,
 		    vl = lenstr(valp) ;
 		}
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        dcp->i = i ;
 	    }
 	} else if (vbuf) {
