@@ -106,7 +106,7 @@ import libutil ;			/* |lenstr(3u)| */
 /* local defines */
 
 #define	IPASSWD_IDLEN	(16 + 4)
-#define	IPASSWD_HEADLEN	(pwihdr_overlast * sizeif(uint))
+#define	IPASSWD_HEADLEN	(pwihdr_overlast * szof(uint))
 #define	IPASSWD_TOPLEN	(IPASSWD_IDLEN + IPASSWD_HEADLEN)
 
 #define	IPASSWD_IDOFF	0
@@ -876,10 +876,10 @@ local int ipasswd_hdrloader(ipasswd *op) noex {
 	/* extract the header table values */
 	op->rectab = (IPASSWD_ENT *) (op->mapdata + table[pwihdr_rectab]) ;
 	op->rtlen = table[pwihdr_reclen] ;
-	op->rtsize = table[pwihdr_recsize] ;
+	op->rtsz = table[pwihdr_recsize] ;
 	op->stab = ccharp(op->mapdata + table[pwihdr_strtab]) ;
 	op->stcount = table[pwihdr_lenstr] ;
-	op->stsize = table[pwihdr_strsize] ;
+	op->stsz = table[pwihdr_strsize] ;
 	op->rilen = table[pwihdr_idxlen] ;
 	op->recind[0] = (uint (*)[2]) (op->mapdata + table[pwihdr_idxl1]) ;
 	op->recind[1] = (uint (*)[2]) (op->mapdata + table[pwihdr_idxl3]) ;
