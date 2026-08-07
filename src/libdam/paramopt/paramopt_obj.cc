@@ -126,7 +126,7 @@ int paramopt_count(paramopt *op) noex {
 	    rs = 0 ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
 int paramopt::countvals(cchar *key) noex {
 	return paramopt_countvals(this,key) ;
@@ -140,7 +140,7 @@ void paramopt::dtor() noex {
 
 paramopt::operator int () noex {
     	int		rs = SR_NOTOPEN ;
-	if (head) {
+	if (head) ylikely {
 	    rs = paramopt_count(this) ;
 	}
 	return rs ;
@@ -148,7 +148,7 @@ paramopt::operator int () noex {
 
 paramopt_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case paramoptmem_start:
 	        rs = paramopt_start(op) ;
