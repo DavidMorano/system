@@ -56,7 +56,7 @@
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<field.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
 
 #include	"config.h"
