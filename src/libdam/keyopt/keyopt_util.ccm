@@ -1,0 +1,116 @@
+/* keyopt_util MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* utilities for the VARSUB object implementation */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-12-01, David A­D­ Morano
+	This code was originally written.
+
+	= 1999-07-12, David A­D­ Morano
+	Believe it or not I did not like the treatment that zero
+	length values were getting!  I modified the |keyopt_add|
+	subroutine to allow zero-length values in the default case.
+
+*/
+
+/* Copyright © 1998,1999 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Object:
+	keyopt
+
+	Description:
+	This module performs substitutions on strings that have
+	variable substitution escapes of some sort in them. The
+	variable substitution escapes look like environment variable
+	use within (for example) the Bourne and Korn shells.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strnxchr.h>		/* LIBUC */
+#include	<strnxcmp.h>		/* LIBUC |strnncmp(3uc)| */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"keyopt.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+export module keyopt_util ;
+
+import libutil ;			/* |memclear(3u)| */
+
+/* local defines */
+
+#define	KO	keyopt
+#define	KO_NA	keyopt_na
+#define	KO_VAL	keyopt_val
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+export {
+    template<typename ... Args>
+    inline int keyopt_magic(keyopt *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == KEYOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (keyopt_magic) */
+    namespace keyopt_keyname {
+	extern "C++" int keyname_incri(KO_NA *) noex ;
+	extern "C++" int keyname_findv(KO_NA *,cc*,int,keyopt_val **) noex ;
+    } /* end namespace (keyopt_keyname) */
+} /* end export */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+
