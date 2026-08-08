@@ -33,19 +33,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<intfloor.h>
-#include	<strwcpy.h>
-#include	<sfx.h>
-#include	<base64.h>
-#include	<bufslide.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
+#include	<memory>		/* C++STD |destroy_at(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<intfloor.h>		/* LIBU */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<base64.h>		/* LIBUC */
+#include	<bufslide.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"b64decoder.h"
 
@@ -60,7 +61,6 @@ import libutil ;			/* |getlenstr(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -123,26 +123,26 @@ cint		nstage = B64DECODER_NSTAGE ;
 /* exported subroutines */
 
 int b64decoder_start(b64decoder *op) noex {
+    	cnothrow	nt{} ;
 	int		rs ;
 	if ((rs = b64decoder_ctor(op)) >= 0) ylikely {
-	    if (bufslide *obp = new(nothrow) bufslide ; obp) ylikely {
+	    if (bufslide *obp = new(nt) bufslide ; obp) ylikely {
 		if ((rs = obp->start) >= 0) ylikely {
 	            op->outbuf = obp ;
 	            op->magval = B64DECODER_MAGIC ;
 		}
 		if (rs < 0) {
 	            delete obp ;
-		}
+		} /* end if (error) */
 	    } else {
 	        rs = SR_NOMEM ;
 	    } /* end if (new-bufslide) */
 	    if (rs < 0) {
 		b64decoder_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (b64decoder_ctor) */
 	return rs ;
-}
-/* end subroutine (b64decoder_start) */
+} /* end subroutine (b64decoder_start) */
 
 int b64decoder_finish(b64decoder *op) noex {
 	int		rs ;
@@ -165,8 +165,7 @@ int b64decoder_finish(b64decoder *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (b64decoder_finish) */
+} /* end subroutine (b64decoder_finish) */
 
 int b64decoder_load(b64decoder *op,cchar *sp,int µsl) noex {
 	int		rs ;
@@ -212,8 +211,7 @@ int b64decoder_load(b64decoder *op,cchar *sp,int µsl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (b64decoder_load) */
+} /* end subroutine (b64decoder_load) */
 
 int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -223,6 +221,7 @@ int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
             if (rlen >= 0) ylikely {
                 rs = SR_OK ;
                 if (rlen > 0) ylikely {
+		    rs = SR_BUGCHECK ;
                     if (bufslide *obp = bufslidep(op->outbuf) ; obp) ylikely {
                         if (cint len = obp->len ; len > 0) ylikely {
 			    cint ml = min(len,rlen) ;
@@ -232,39 +231,37 @@ int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
                             } /* end for */
                             rs = obp->adv(i) ;
 			} /* end if (non-zero positive) */
-		    } else {
-                        rs = SR_BUGCHECK ;
-                    } /* end if */
+                    } /* end if (non-null) */
                 } /* end if (non-zero positive) */
             } /* end if (valid) */
             rbuf[i] = '\0' ;
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (b64decoder_read) */
+} /* end subroutine (b64decoder_read) */
 
 int b64decoder_count(b64decoder *op) noex {
 	int		rs ;
 	int		c = 0 ; /* return-value */
 	if ((rs = b64decoder_magic(op)) >= 0) ylikely {
+	    rs = SR_BUGCHECK ;
 	    if (bufslide *obp = bufslidep(op->outbuf) ; obp) ylikely {
 	        rs = obp->len ;
 		c = rs ;
-	    }
+	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (b64decoder_count) */
+} /* end subroutine (b64decoder_count) */
 
 
 /* private subroutines */
 
 local int b64decoder_cvt(b64decoder *op,cchar *cp,int cl) noex {
+    	cnothrow	nt{} ;
 	int		rs = SR_BUGCHECK ;
 	int		c = 0 ;
 	if (bufslide *obp = bufslidep(op->outbuf) ; obp) ylikely {
 	    rs = SR_NOMEM ;
-	    if (char *rbuf = new(nothrow) char [cl + 1] ; rbuf) ylikely {
+	    if (char *rbuf = new(nt) char [cl + 1] ; rbuf) ylikely {
 	        if ((c = base64_d(cp,cl,rbuf)) > 0) ylikely {
 	            rbuf[c] = '\0' ;
 	            rs = obp->add(rbuf,c) ;
@@ -275,9 +272,7 @@ local int b64decoder_cvt(b64decoder *op,cchar *cp,int cl) noex {
 	    } /* end if (new-char) */
 	} /* end if (outbuf) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (b64decoder_cvt) */
-
+} /* end subroutine (b64decoder_cvt) */
 
 int b64decoder::load(cchar *sp,int sl) noex {
 	return b64decoder_load(this,sp,sl) ;
