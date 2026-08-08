@@ -38,7 +38,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
