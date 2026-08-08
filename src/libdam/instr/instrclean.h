@@ -26,7 +26,7 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
-
+#include	<instropts.h>		/* LIBDAM */
 
 EXTERNC_begin
 
