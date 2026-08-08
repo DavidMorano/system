@@ -48,8 +48,8 @@
 #include	<matstr.h>		/* LIBUC */
 #include	<stdfiles.h>		/* LIBUC */
 #include	<strstdfname.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<ismmclass.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 #include	<contypevals.h>		/* LIBMAILMSG */
