@@ -96,12 +96,13 @@ typedef vector<item> *	ivecp ;
 template<typename ... Args>
 local int linehist_ctor(linehist *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
 	    op->lvp = nullptr ;
-	    if ((op->lsp = new(nothrow) langstate) != np) ylikely {
+	    if ((op->lsp = new(nt) langstate) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-langstate) */
 	} /* end if (non-null) */
@@ -139,13 +140,13 @@ local inline int linehist_magic(linehist *op,Args ... args) noex {
 /* exported subroutines */
 
 int linehist_start(linehist *op,cchar *ss) noex {
-	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs ;
 	if ((rs = linehist_ctor(op,ss)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (ss[0]) ylikely {
 		rs = SR_NOMEM ;
-	        if (ivec *lvp ; (lvp = new(nothrow) ivec) != np) ylikely {
+	        if (ivec *lvp = new(nt) ivec ; lvp) ylikely {
 	            op->lvp = lvp ;
 	            if ((rs = langstate_start(op->lsp)) >= 0) ylikely {
 	                strncpy(op->ss,ss,2) ;
@@ -187,11 +188,10 @@ int linehist_finish(linehist *op) noex {
 } /* end subroutine (linehist_finish) */
 
 int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
-	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ; /* return-value */
 	if ((rs = linehist_magic(op,sp)) >= 0) ylikely {
-	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) ylikely {
+	    if (ivec *lvp = ivecp(op->lvp) ; lvp) ylikely {
 	        cint	sch0 = mkchar(op->ss[0]) ;
 	        cint	sch1 = mkchar(op->ss[1]) ;
 	        while ((rs >= 0) && sl && *sp) {
@@ -231,38 +231,35 @@ int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
 } /* end subroutine (linehist_proc) */
 
 int linehist_count(linehist *op) noex {
-	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ; /* return-value */
 	if ((rs = linehist_magic(op)) >= 0) ylikely {
-	    if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) ylikely {
+	    rs = SR_BUGCHECK ;
+	    if (ivec *lvp = ivecp(op->lvp) ; lvp) ylikely {
+		rs = SR_OK ;
 	        c = intconv(lvp->size()) ;
-	    } else {
-	        rs = SR_BUGCHECK ;
-	    }
+	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (linehist_count) */
 
 int linehist_get(linehist *op,int i,int *lnp) noex {
-	cnullptr	np{} ;
 	int		rs ;
 	int		type = 0 ; /* return-value */
 	if ((rs = linehist_magic(op,lnp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (i >= 0) ylikely {
-	        if (ivec *lvp ; (lvp = ivecp(op->lvp)) != np) ylikely {
+		rs = SR_BUGCHECK ;
+	        if (ivec *lvp = ivecp(op->lvp) ; lvp) ylikely {
 	            cint	len = intconv(lvp->size()) ;
 	            if (i < len) {
 	                item	vi = lvp->at(i) ;
 		        type = (vi.type() + 1) ;
-		        if (lnp != nullptr) {
+		        if (lnp) {
 		            *lnp = vi.line() ;
 		        }
 	            }
-	        } else {
-	            rs = SR_BUGCHECK ;
-	        }
+	        } /* end if (non-null) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? type : rs ;
