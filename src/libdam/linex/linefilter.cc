@@ -79,18 +79,19 @@ template<typename ... Args>
 local int linefilter_ctor(linefilter *op,Args ... args) noex {
     	LINEFILTER	*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->sslp = new(nothrow) vecstr) != np) ylikely {
-	        if ((op->sxlp = new(nothrow) vecstr) != np) ylikely {
+	    if ((op->sslp = new(nt) vecstr) != np) ylikely {
+	        if ((op->sxlp = new(nt) vecstr) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-vector) */
 		if (rs < 0) {
 		    delete op->sslp ;
 		    op->sslp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
@@ -128,7 +129,7 @@ int linefilter_start(linefilter *op,cchar *ssfname,cchar *sxfname) noex {
 	    cint	vo = 0 ;
 	    if ((ssfname != nullptr) && (ssfname[0] != '\0')) {
 	        op->fl.sslist = true ;
-	        if ((rs = vecstr_start(op->sslp,vn,vo)) >= 0) {
+	        if ((rs = vecstr_start(op->sslp,vn,vo)) >= 0) ylikely {
 	            rs = vecstr_loadfile(op->sslp,true,ssfname) ;
 	            if (rs < 0) {
 	                vecstr_finish(op->sslp) ;
@@ -232,7 +233,7 @@ void linefilter::dtor() noex {
 
 linefilter_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case linefiltermem_finish:
 	        rs = linefilter_finish(op) ;
