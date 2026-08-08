@@ -60,7 +60,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>		/* |FSCALE| + |FSHIFT| */
+#include	<sys/param.h>		/* POSIX® |FSCALE| + |FSHIFT| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
