@@ -51,18 +51,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"varsub.h"
 
@@ -92,24 +92,23 @@
 
 int varsub_addvec(varsub *op,vecstr *vsp) noex {
 	int		rs = SR_OK ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	cchar		*sp ;
 	for (int i = 0 ; vecstr_get(vsp,i,&sp) >= 0 ; i += 1) {
 	    if (sp) {
-		cchar	*vp ;
 	        cchar	*kp = sp ;
 		bool	f ;
 	        if (cchar *tp ; (tp = strchr(sp,'=')) != nullptr) {
 		    int		ch = mkchar(kp[0]) ;
+	            cchar *vap = (tp + 1) ;
 		    f = isprintlatin(ch) ;
-	            vp = (tp + 1) ;
 	            if (f) {
-		        ch = mkchar(vp[0]) ;
+		        ch = mkchar(vap[0]) ;
 		        f = ((ch == '\0') || isprintlatin(ch)) ;
 	            }
 	            if (f) {
 			cint	tl = intconv(tp - kp) ;
-	                rs = varsub_add(op,kp,tl,vp,-1) ;
+	                rs = varsub_add(op,kp,tl,vap,-1) ;
 		        if (rs < INT_MAX) c += 1 ;
 	            } /* end if */
 	        } /* end if */
@@ -117,7 +116,6 @@ int varsub_addvec(varsub *op,vecstr *vsp) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (varsub_addvec) */
+} /* end subroutine (varsub_addvec) */
 
 
