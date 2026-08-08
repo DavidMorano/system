@@ -37,7 +37,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<six.h>			/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"codebal.h"
