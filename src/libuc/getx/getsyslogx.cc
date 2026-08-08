@@ -49,8 +49,8 @@
 #include	<nleadstr.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"getsyslogx.h"
