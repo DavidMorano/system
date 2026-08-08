@@ -145,10 +145,9 @@ static vars		var ;
 int logfile_userinfo(logfile *op,userinfo *uip,time_t dt,cc *pn,cc *vn) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = logfile_magic(op,uip)) >= 0) {
-	    static cint		rsv = mkvars() ;
-	    if ((rs = rsv) >= 0) {
-		loguser		lo(op,uip,dt,pn,vn) ;
+	if ((rs = logfile_magic(op,uip)) >= 0) ylikely {
+	    if (static cint rsv = mkvars() ; (rs = rsv) >= 0) ylikely {
+		loguser	lo(op,uip,dt,pn,vn) ;
 		rs = lo ;
 		wlen += rs ;
 	    } /* end if (mkvars) */
@@ -161,7 +160,7 @@ int logfile_userinfo(logfile *op,userinfo *uip,time_t dt,cc *pn,cc *vn) noex {
 
 loguser::operator int () noex {
 	int		rs = SR_OK ;
-	int		wlen = 0 ;
+	int		wlen = 0 ; /* return-value */
 	for (auto m : mems) {
 	    rs = (this->*m)() ;
 	    wlen += rs ;
@@ -172,7 +171,7 @@ loguser::operator int () noex {
 
 int loguser::first() noex {
 	int		rs ;
-	int		wlen = 0 ;
+	int		wlen = 0 ; /* return-value */
 	char		tbuf[TIMEBUFLEN + 1] ;
 	{
 	    cchar	*ts = timestr_logz(dt,tbuf) ;
@@ -199,7 +198,7 @@ int loguser::second() noex {
 	cchar		*sn = uip->sysname ;
 	cchar		*rn = uip->release ;
 	cchar		*dn = uip->domainname ;
-	int		wlen = 0 ;
+	int		wlen = 0 ; /* return-value */
 	cchar		fmt[] = "a=%s os=%s(%s) d=%s" ;
 	if (a) {
 	    rs = logfile_printf(op,fmt,a,sn,rn,dn) ;
@@ -215,9 +214,9 @@ int loguser::third() noex {
 	cint		nlen = var.bangnamelen ;
 	int		rs ;
 	int		rs1 ;
-	int		wlen = 0 ;
-	if (char *nbuf ; (rs = lm_mall((nlen+1),&nbuf)) >= 0) {
-	    if ((rs = mkuibang(nbuf,nlen,uip)) >= 0) {
+	int		wlen = 0 ; /* return-value */
+	if (char *nbuf ; (rs = lm_mall((nlen+1),&nbuf)) >= 0) ylikely {
+	    if ((rs = mkuibang(nbuf,nlen,uip)) >= 0) ylikely {
 	        rs = logfile_print(op,nbuf,rs) ;
 	        wlen += rs ;
 	    } else if (isNotPresent(rs)) {
