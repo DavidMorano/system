@@ -36,10 +36,9 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
-
-#include	"strnul.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
