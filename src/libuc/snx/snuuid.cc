@@ -62,7 +62,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<sbuf.h>		/* LIBUC */
 #include	<mkuuid.h>		/* LIBUC |uuid_dat| below */
-#include	<localmisc.h>		/* LIBNU |DIGBUFLEN| */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"snx.h"
 
