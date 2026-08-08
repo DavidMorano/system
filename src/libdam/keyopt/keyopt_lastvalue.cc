@@ -35,6 +35,7 @@
 
 #include	"keyopt.h"
 
+import keyopt_util ;
 
 /* local defines */
 
@@ -63,7 +64,7 @@ int keyopt_lastvalue(keyopt *op,cchar *kp,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		vl = 0 ; /*return-value */
-	if ((rs = keyopt_magic(op,kp)) >= 0) {
+	if ((rs = keyopt_magic(op,kp)) >= 0) ylikely {
 	    cchar	*vp ;
 	    vp = nullptr ;
 	    vl = 0 ;
