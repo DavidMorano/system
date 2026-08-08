@@ -23,7 +23,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<varsub.h>		/* LIBUC */
-#include	<bfile.h>		/* LIBUC */
+#include	<bfile.h>		/* LIBB */
 
 
 EXTERNC_begin
