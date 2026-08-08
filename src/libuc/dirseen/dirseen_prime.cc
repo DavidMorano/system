@@ -40,7 +40,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<nulstr.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"dirseen.h"
