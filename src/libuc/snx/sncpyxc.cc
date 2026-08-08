@@ -61,13 +61,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<toxc.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<toxc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sncpyxc.h"
 
@@ -87,7 +87,7 @@
 /* forward references (local subroutine-templates) */
 
 template<int (*toxc)(int)>
-int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
+local int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
     	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	if (dbuf && sp) ylikely {
