@@ -99,6 +99,12 @@ export {
     } /* end subroutine (varsin_magic) */
 } /* end export */
 
+export {
+    namespace varsub_ns {
+        extern "C++" int	varsub_sort	(VS *) noex ;
+    } /* end namespace (varsub_ns) */
+} /* end export */
+
 
 /* local variables */
 
