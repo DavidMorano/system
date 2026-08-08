@@ -79,10 +79,10 @@
 #include	<vecstr.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<ismatstar.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 
