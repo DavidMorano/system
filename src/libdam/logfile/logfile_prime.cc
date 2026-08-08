@@ -206,11 +206,11 @@ int logfile_open(logfile *op,cc *lfname,int of,mode_t operm,cc *logid) noex {
 	        op->oflags = of ;
 	        op->operm = (operm & S_IAMB) ;
 	        op->lfd = -1 ;
-	        if (cchar *cp{} ; (rs = lm_strw(lfname,-1,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(lfname,-1,&cp)) >= 0) {
 	            op->fname = cp ;
-	            op->bufsize = LOGFILE_BUFSIZE ;
+	            op->bufsz = LOGFILE_BUFSIZE ;
 	            op->len = 0 ;
-	            if (void *vp{} ; (rs = lm_mall(op->bufsize,&vp)) >= 0) {
+	            if (void *vp ; (rs = lm_mall(op->bufsz,&vp)) >= 0) {
 	                op->buf = charp(vp) ;
 	                if ((rs = logfile_fileopen(op)) >= 0) {
 		            if_constexpr (f_chmod) {
@@ -227,7 +227,7 @@ int logfile_open(logfile *op,cc *lfname,int of,mode_t operm,cc *logid) noex {
 		            } /* end if (ok) */
 	                    if (rs >= 0) {
 	                        op->percent = LOGFILE_PERCENT ;
-		                op->magic = LOGFILE_MAGIC ;
+		                op->magval = LOGFILE_MAGIC ;
 	                    } /* end if (ok) */
 	                    if (rs < 0) {
 		                logfile_fileclose(op) ;
@@ -268,7 +268,7 @@ int logfile_close(logfile *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
 	    } /* end if (memory-release) */
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (logfile_close) */
@@ -575,7 +575,7 @@ local int logfile_iflush(logfile *op) noex {
 
 local int logfile_mkentry(logfile *op,time_t dt,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		rlen = (op->bufsize - op->len) ;
+	int		rlen = (op->bufsz - op->len) ;
 	int		ll = 0 ; /* return-value */
 	if (sl < 0) sl = lenstr(sp) ;
 	ll = (LOGFILE_LOGIDLEN + 1 + sl) ;
