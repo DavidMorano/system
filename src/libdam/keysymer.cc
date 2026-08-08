@@ -48,8 +48,8 @@
 #include	<sfx.h>			/* |sfnext(3uc)| */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<rmx.h>			/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 #include	<bfliner.h>		/* LIBUC */
