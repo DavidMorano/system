@@ -42,14 +42,14 @@ module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/stat.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<new>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
-#include	<strnul.hh>
-#include	<localmisc.h>
+#include	<strnul.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 module filerec ;
 
