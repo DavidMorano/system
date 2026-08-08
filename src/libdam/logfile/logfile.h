@@ -47,11 +47,11 @@ struct logfile_head {
 	time_t		ti_open ;
 	time_t		ti_data ;
 	time_t		ti_write ;
-	uint		magic ;
+	uint		magval ;
 	int		oflags ;
 	int		lfd ;
 	int		logidlen ;
-	int		bufsize ;
+	int		bufsz ;
 	int		len ;		/* length of buffer filled so far */
 	int		percent ;
 	mode_t		operm ;
