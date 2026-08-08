@@ -126,16 +126,16 @@
 #include	<cstdlib>
 #include	<string>
 #include	<string_view>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<funcodes.h>
-#include	<filetypes.h>
-#include	<timeval.hh>
-#include	<strnul.hh>
-#include	<ascii.h>
-#include	<localmisc.h>
-#include	<dprint.hh>		/* debugging */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<funcodes.h>		/* LIBU */
+#include	<filetypes.h>		/* LIBU */
+#include	<timeval.hh>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU debugging */
 
 #include	"ureade.h"
 
