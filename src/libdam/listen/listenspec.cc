@@ -59,8 +59,8 @@
 #include	<matstr.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<cfnum.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	<listenconn.h>
