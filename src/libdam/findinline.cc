@@ -63,8 +63,8 @@
 #include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
 #include	<strwcpy.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC |isalphalatin(3uc)| */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"findinline.h"
