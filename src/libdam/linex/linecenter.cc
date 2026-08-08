@@ -86,11 +86,12 @@ template<typename ... Args>
 local int linecenter_ctor(linecenter *op,Args ... args) noex {
     	LINECENTER	*hop = op  ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->sqp = new(nothrow) fifostr) != np) ylikely {
+	    if ((op->sqp = new(nt) fifostr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-fifostr) */
 	} /* end if (non-null) */
@@ -127,9 +128,9 @@ local int	lenpercent(int,double) noex ;
 
 /* local variables */
 
-constexpr int		fnlen = LINECENTER_FNLEN ;
-constexpr double	defpercent = LINECENTER_DEFPERCENT ;
-cbool			f_comment = false ;
+constexpr int		fnlen		= LINECENTER_FNLEN ;
+constexpr double	defpercent	= LINECENTER_DEFPERCENT ;
+cbool			f_comment	= false ;
 
 
 /* exported variables */
@@ -342,13 +343,13 @@ local int linecenter_storeline(LC *op,cc *lbuf,int llen) noex {
 	        int	ne = (op->le + 5) ;
 	        void	**nlines = nullptr ;
 	        sz = (ne + 1) * szof(char **) ;
-	        if ((rs = lm_rall(op->lines,sz,&nlines)) >= 0) {
+	        if ((rs = lm_rall(op->lines,sz,&nlines)) >= 0) ylikely {
 	            op->le = ne ;
 	            op->lines = ccharpp(nlines) ;
 	        }
 	    } /* end if */
 	    if (rs >= 0) {
-	        if (cchar *cp ; (rs = lm_strw(lbuf,llen,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(lbuf,llen,&cp)) >= 0) ylikely {
 	            op->lines[op->li] = cp ;
 	            op->li += 1 ;
 	        }
