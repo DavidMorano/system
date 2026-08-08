@@ -51,6 +51,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import keyopt_util ;
 
 /* local defines */
 
@@ -119,7 +120,7 @@ int keyopt_start(keyopt *op) noex {
 int keyopt_finish(keyopt *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = keyopt_magic(op)) >= 0) {
+	if ((rs = keyopt_magic(op)) >= 0) ylikely {
 	    for (NAM *nnp, *sp = op->head ; sp ; sp = nnp) {
 	        for (VAL *nvp, *vp = sp->head ; vp ; vp = nvp) {
 	            if (vp->value) {
@@ -154,7 +155,7 @@ int keyopt_loads(keyopt *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	if ((rs = keyopt_magic(op,sp)) >= 0) {
+	if ((rs = keyopt_magic(op,sp)) >= 0) ylikely {
 	    if (sl <= 0) sl = lenstr(sp) ;
 	    for (cchar *tp ; (tp = strnbrk(sp,sl,",\t\n\r ")) != np ; ) {
 	        cchar	*cp = sp ;
@@ -176,7 +177,7 @@ int keyopt_loads(keyopt *op,cchar *sp,int sl) noex {
 
 int keyopt_load(keyopt *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = keyopt_magic(op)) >= 0) {
+	if ((rs = keyopt_magic(op)) >= 0) ylikely {
 	    rs = keyopt_loadpair(op,sp,sl) ;
 	} /* end if (magic) */
 	return rs ;
@@ -184,7 +185,7 @@ int keyopt_load(keyopt *op,cchar *sp,int sl) noex {
 
 int keyopt_loadvalue(keyopt *op,cchar *key,cchar *vbuf,int vlen) noex {
 	int		rs ;
-	if ((rs = keyopt_magic(op,key)) >= 0) {
+	if ((rs = keyopt_magic(op,key)) >= 0) ylikely {
 	    NAM		*pp = nullptr ; /* used-afterwards */
 	    cchar	*cp ;
 	    int		klen = -1 ;
@@ -219,10 +220,10 @@ int keyopt_loadvalue(keyopt *op,cchar *key,cchar *vbuf,int vlen) noex {
 	            }
 	        } /* end if (memory allocation) */
 	    } /* end if (adding a new parameter block on the list) */
-    /* OK, now we have the parameter block that we are looking for in 'pp' */
+    	    /* OK, we have parameter block 'pp' */
 	    if ((rs >= 0) && pp) {
 	        cint	vsz = szof(VAL) ;
-	        if (VAL *nvp ; (rs = lm_mall(vsz,&nvp)) >= 0) {
+	        if (VAL *nvp ; (rs = lm_mall(vsz,&nvp)) >= 0) ylikely {
 	            nvp->next = nullptr ;
 	            nvp->value = nullptr ;
 	            if (vbuf) {
@@ -232,7 +233,7 @@ int keyopt_loadvalue(keyopt *op,cchar *key,cchar *vbuf,int vlen) noex {
 	                    lm_free(nvp) ;
 		        }
 	            } /* end if (new value) */
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                if (pp->head) {
 	    		    VAL *vp = pp->tail ;
 	                    vp->next = nvp ;
@@ -252,7 +253,7 @@ int keyopt_loadvalue(keyopt *op,cchar *key,cchar *vbuf,int vlen) noex {
 
 int keyopt_count(keyopt *op) noex {
 	int		rs ;
-	if ((rs = keyopt_magic(op)) >= 0) {
+	if ((rs = keyopt_magic(op)) >= 0) ylikely {
 	    rs = op->cnt ;
 	} /* end if (magic) */
 	return rs ;
@@ -260,7 +261,7 @@ int keyopt_count(keyopt *op) noex {
 
 int keyopt_enumkeys(keyopt *op,CUR *curp,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = keyopt_magic(op,curp)) >= 0) {
+	if ((rs = keyopt_magic(op,curp)) >= 0) ylikely {
 	    NAM	*kp ; /* used-afterwards */
 	    rs = SR_NOTFOUND ;
 	    if (rpp) *rpp = nullptr ;
@@ -282,7 +283,7 @@ int keyopt_enumkeys(keyopt *op,CUR *curp,cchar **rpp) noex {
 
 int keyopt_fetch(keyopt *op,cchar *kname,CUR *curp,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = keyopt_magic(op,kname)) >= 0) {
+	if ((rs = keyopt_magic(op,kname)) >= 0) ylikely {
 	    NAM		*kp = nullptr ;
 	    VAL		*vp = nullptr ;
 	    CUR		dcur ;
@@ -328,7 +329,7 @@ int keyopt_fetch(keyopt *op,cchar *kname,CUR *curp,cchar **rpp) noex {
 
 int keyopt_enumvalues(keyopt *op,cchar *key,CUR *curp,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = keyopt_magic(op,key,curp)) >= 0) {
+	if ((rs = keyopt_magic(op,key,curp)) >= 0) ylikely {
 	    rs = keyopt_fetch(op,key,curp,rpp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -336,7 +337,7 @@ int keyopt_enumvalues(keyopt *op,cchar *key,CUR *curp,cchar **rpp) noex {
 
 int keyopt_incr(keyopt *op) noex {
 	int		rs ;
-	if ((rs = keyopt_magic(op)) >= 0) {
+	if ((rs = keyopt_magic(op)) >= 0) ylikely {
 	    NAM		*pp = op->head ;
 	    rs = SR_NOTFOUND ;
 	    if (pp->next) {
@@ -359,7 +360,7 @@ int keyopt_incr(keyopt *op) noex {
 
 int keyopt_curbegin(keyopt *op,CUR *curp) noex {
 	int		rs ;
-	if ((rs = keyopt_magic(op,curp)) >= 0) {
+	if ((rs = keyopt_magic(op,curp)) >= 0) ylikely {
 	    curp->keyp = nullptr ;
 	    curp->valuep = nullptr ;
 	} /* end if (magic) */
@@ -377,8 +378,8 @@ int keyopt_curend(keyopt *op,CUR *curp) noex {
 
 int keyopt_findvalue(keyopt *op,cc *key,cc *valp,int µvall,VAL **rpp) noex {
 	int		rs ;
-	if ((rs = keyopt_magic(op,key,valp)) >= 0) {
-	    if (int vall ; (vall = getlenstr(valp,µvall)) >= 0) {
+	if ((rs = keyopt_magic(op,key,valp)) >= 0) ylikely {
+	    if (int vall ; (vall = getlenstr(valp,µvall)) >= 0) ylikely {
 	        int	klen = -1 ;
 	        /* do we have this key? */
 	        if (cchar *tp ; (tp = strchr(key,'=')) != nullptr) {
@@ -419,7 +420,7 @@ local int keyopt_loadpair(keyopt *op,cchar *sp,int sl) noex {
 	if (sp) ylikely {
 	    cchar	*keyp{} ;
 	    rs = SR_OK ;
-	    if (int klen ; (klen = sfshrink(sp,sl,&keyp)) > 0) {
+	    if (int klen ; (klen = sfshrink(sp,sl,&keyp)) > 0) ylikely {
 	        int	vlen = 0 ; /* used-afterwards */
 	        cchar	*valuep = nullptr ;
 	        char	keybuf[keybuflen + 1] ;
