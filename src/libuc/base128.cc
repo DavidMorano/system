@@ -63,7 +63,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<strn.h>		/* LIBUC |strnset(3uc)| */
-#include	<mkchar.h>		/* LIBUC |mkchar(3uc)| */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"base128.h"
