@@ -44,10 +44,15 @@ OBJ0= instrclean.o
 OBJ1= instrcompact.o
 OBJ2= instrrev.o
 OBJ3= instrcase.o
+OBJ4= instropts.o
+OBJ5=
+OBJ6=
+OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o
 
-OBJ= obja.o
+OBJ= obja.o objb.o
 
 
 INCDIRS +=
@@ -125,6 +130,18 @@ obj2.o:			$(OBJ2)
 obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
@@ -137,5 +154,7 @@ instrcase.o:		instrcase.cc		instrcase.h	$(INCS)
 instrclean.o:		instrclean.cc		instrclean.h	$(INCS)
 instrcompact.o:		instrcompact.cc		instrcompact.h	$(INCS)
 instrrev.o:		instrrev.cc		instrrev.h	$(INCS)
+
+instropts.o:		instropts.cc		instropts.h	$(INCS)
 
 
