@@ -45,7 +45,7 @@ export {
     inline int logfile_magic(logfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == LOGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LOGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
     } /* end subroutine (logfile_magic) */
