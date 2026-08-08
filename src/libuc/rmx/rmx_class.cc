@@ -164,7 +164,7 @@ int rmtrailer::operator () (cchar *sp,int sl) noex {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    while (sl && iscond(sp[sl - 1])) {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	} else {
 	    sl = -1 ;
 	}
