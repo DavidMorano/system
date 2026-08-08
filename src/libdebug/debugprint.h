@@ -1,6 +1,6 @@
 /* debugprint HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 (conformance reviewed) */
+/* lang=C20 (conformance reviewed) */
 
 /* debug utilities */
 /* version %I% last-modified %G% */
