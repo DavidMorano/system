@@ -34,15 +34,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<vector>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
+#include	<memory>		/* C++STD |destroy_at(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<vector>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"utf8decoder.h"
 
@@ -177,7 +178,6 @@ local inline int utf8decoder_magic(utf8decoder *op,Args ... args) noex {
 
 int utf8decoder_start(utf8decoder *op) noex {
     	cnothrow	nt{} ;
-    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
@@ -185,19 +185,18 @@ int utf8decoder_start(utf8decoder *op) noex {
 	    op->magval = 0 ;
 	    op->code = 0 ;
 	    op->rem = 0 ;
-	    if (widebuf *wbp ; (wbp = new(nt) widebuf) != np) {
+	    if (widebuf *wbp = new(nt) widebuf ; wbp) ylikely {
 	        op->outbuf = wbp ;
 	        op->magval = UTF8DECODER_MAGIC ;
 	        rs = SR_OK ;
 	    } /* end if (new-widebuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (utf8decoder_start) */
+} /* end subroutine (utf8decoder_start) */
 
 int utf8decoder_finish(utf8decoder *op) noex {
 	int		rs ;
-	if ((rs = utf8decoder_magic(op)) >= 0) {
+	if ((rs = utf8decoder_magic(op)) >= 0) ylikely {
 	    if (op->outbuf) {
 	        widebuf *wbp = widebufp(op->outbuf) ;
 		{
@@ -208,16 +207,14 @@ int utf8decoder_finish(utf8decoder *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (utf8decoder_finish) */
+} /* end subroutine (utf8decoder_finish) */
 
 int utf8decoder_load(utf8decoder *op,cchar *sp,int 탎l) noex {
-	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = utf8decoder_magic(op,sp)) >= 0) {
-	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
-	        if (widebuf *wbp ; (wbp = widebufp(op->outbuf)) != np) {
+	if ((rs = utf8decoder_magic(op,sp)) >= 0) ylikely {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
+	        if (widebuf *wbp = widebufp(op->outbuf) ; wbp) ylikely {
 	            while ((rs >= 0) && (sl-- > 0)) {
 		        const wchar_t	uch = mkchar(*sp++) ;
 		        if ((uch & 0x80) == 0) {
@@ -252,32 +249,28 @@ int utf8decoder_load(utf8decoder *op,cchar *sp,int 탎l) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (utf8decoder_load) */
+} /* end subroutine (utf8decoder_load) */
 
 int utf8decoder_read(utf8decoder *op,wchar_t *rbuf,int rlen) noex {
-	cnullptr	np{} ;
 	int		rs ;
-	int		i = 0 ;
-	if ((rs = utf8decoder_magic(op,rbuf)) >= 0) {
+	int		i = 0 ; /* return-value */
+	if ((rs = utf8decoder_magic(op,rbuf)) >= 0) ylikely {
 	    if (rlen > 0) {
 		int	ml ;
-	        if (widebuf *wbp ; (wbp = widebufp(op->outbuf)) != np) {
+		rs = SR_BUGCHECK ;
+	        if (widebuf *wbp = widebufp(op->outbuf) ; wbp) ylikely {
 	            cint	len = wbp->len() ; /* <- read-coerce */
 	            ml = min(len,rlen) ;
 	            for (i = 0 ; i < ml ; i += 1) {
 		        rbuf[i] = wbp->at(i) ;
-	            }
+	            } /* end for */
 	            rs = wbp->adv(i) ;
-	        } else {
-	            rs = SR_BUGCHECK ;
-	        }
+	        } /* end if (non-null) */
 	    } /* end if (positive) */
 	    rbuf[i] = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (utf8decoder_read) */
+} /* end subroutine (utf8decoder_read) */
 
 
 /* private subroutines */
@@ -309,7 +302,6 @@ int widebuf::adv(int al) noex {
 	    }
 	} /* end if */
 	return rl ;
-}
-/* end subroutine (widebuf::adv) */
+} /* end subroutine (widebuf::adv) */
 
 
