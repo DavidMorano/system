@@ -60,10 +60,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snxxx.h"
 
@@ -114,7 +114,7 @@ int snsdd(char *dbuf,int dlen,cchar *s1,uint d2) noex {
 	sxo.mch = '.' ;
 	sxo.d2 = d2 ;
 	return sxo(dbuf,dlen) ;
-}
+} /* end subroutine */
 
 int snddd(char *dbuf,int dlen,uint d1,uint d2) noex {
 	snxxx		sxo ;
@@ -122,7 +122,7 @@ int snddd(char *dbuf,int dlen,uint d1,uint d2) noex {
 	sxo.mch = '.' ;
 	sxo.d2 = d2 ;
 	return sxo(dbuf,dlen) ;
-}
+} /* end subroutine */
 
 int snses(char *dbuf,int dlen,cchar *s1,cchar *s2) noex {
 	snxxx		sxo ;
@@ -130,7 +130,7 @@ int snses(char *dbuf,int dlen,cchar *s1,cchar *s2) noex {
 	sxo.mch = '=' ;
 	sxo.s2 = s2 ;
 	return sxo(dbuf,dlen) ;
-}
+} /* end subroutine */
 
 int snscs(char *dbuf,int dlen,cchar *s1,cchar *s2) noex {
 	snxxx		sxo ;
@@ -138,7 +138,7 @@ int snscs(char *dbuf,int dlen,cchar *s1,cchar *s2) noex {
 	sxo.mch = ':' ;
 	sxo.s2 = s2 ;
 	return sxo(dbuf,dlen) ;
-}
+} /* end subroutine */
 
 int snsds(char *dbuf,int dlen,cchar *s1,cchar *s2) noex {
 	snxxx		sxo ;
@@ -146,7 +146,7 @@ int snsds(char *dbuf,int dlen,cchar *s1,cchar *s2) noex {
 	sxo.mch = '.' ;
 	sxo.s2 = s2 ;
 	return sxo(dbuf,dlen) ;
-}
+} /* end subroutine */
 
 int snsd(char *dbuf,int dlen,cchar *s1,uint d2) noex {
 	snxxx		sxo ;
@@ -154,7 +154,7 @@ int snsd(char *dbuf,int dlen,cchar *s1,uint d2) noex {
 	sxo.mch = 0 ;
 	sxo.d2 = d2 ;
 	return sxo(dbuf,dlen) ;
-}
+} /* end subroutine */
 
 int snchrs(char *dp,int dl,int ch,int n) noex {
     	int		rs = SR_FAULT ;
@@ -185,7 +185,7 @@ int snxxx::operator () (char *dbuf,int dlen) noex {
 	        } else {
 	            rs = sb.dec(d1) ;
 	        }
-	    }
+	    } /* end if (ok) */
 	    if ((rs >= 0) && mch) ylikely {
 	        rs = sb.chr(mch) ;
 	    }
@@ -195,7 +195,7 @@ int snxxx::operator () (char *dbuf,int dlen) noex {
 	        } else {
 	            rs = sb.dec(d2) ;
 	        }
-	    }
+	    } /* end if (ok) */
 	    rl = sb.idx ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
