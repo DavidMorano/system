@@ -97,7 +97,7 @@ int sntid(char *dp,int dl,pthread_t tid) noex {
 	if (dp) ylikely {
 	    uint	uv = cast_static<uint>(up & UINT_MAX) ;
 	    rs = ctdecui(dp,dl,uv) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (sntid) */
 
