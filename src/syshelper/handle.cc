@@ -41,7 +41,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -53,7 +53,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<time.h>
+#include	<ctime>
 #include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
@@ -220,7 +220,7 @@ struct clientinfo	*cip ;
 
 /* pop off the service name */
 
-	if ((len = uc_readlinetimed(ifd,srvspec,BUFLEN,TO_SVC)) <= 1) {
+	if ((len = uc_readlnto(ifd,srvspec,BUFLEN,TO_SVC)) <= 1) {
 
 #if	CF_DEBUG
 	if (gp->debuglevel > 1)
