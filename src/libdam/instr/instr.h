@@ -31,6 +31,7 @@
 #include	<instrclean.h>
 #include	<instrcompact.h>
 #include	<instrrev.h>
+#include	<instropts.h>
 
 
 #endif /* INSTR_INCLUDE */
