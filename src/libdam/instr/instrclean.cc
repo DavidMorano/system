@@ -60,10 +60,12 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU |CH_{xx}| */
-#include	<mkchar.h>		/* LIBU */
+#include	<rmx.h>			/* LIBUC |rmeol(3uc)| */
 #include	<ischarx.h>		/* LIBUC |isprintlatin(3uc)| */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"instropts.h"		/* substitution options */
 #include	"instrclean.h"
 
 #pragma		GCC dependency	"mod/libutil.ccm"
@@ -85,10 +87,16 @@ import libutil ;
 
 /* local structures */
 
-struct mflags {
+namespace {
+    struct mflags {
 	uint	subnul:1 ;
 	uint	subbad:1 ;
-} ; /* end struct */
+	mflags(int m) noex {
+	    subnul = !!(m & instroptm.subnul) ;
+	    subbad = !!(m & instroptm.subbad) ;
+	} ; /* end ctor */
+    } ; /* end struct */
+} /* end namespace */
 
 
 /* forward references */
@@ -96,9 +104,8 @@ struct mflags {
 local int	clean1(mflags *,char *,int) noex ;
 local int	clean2(mflags *,char *,int) noex ;
 
-local bool	isshift	(int) noex ;
-local bool	ischarok(int) noex ;
-local bool	isend	(int) noex ;
+local bool	isshift		(int) noex ;
+local bool	ischarok	(int) noex ;
 
 
 /* local variables */
@@ -111,24 +118,18 @@ cbool		f_clean1 = CF_CLEAN1 ;	/* use CLEAN-1 */
 
 /* exported subroutines */
 
-int instrclean(char *lp,int ll,int m) noex {
+int instrclean(char *lp,int µll,con int m) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (lp) ylikely {
-	    mflags	mf{} ;
+	int		len = 0 ; /* return-value */
+	if (cint ll = rmeol(lp,µll) ; ll >= 0) ylikely {
+	    mflags	mf(m) ;
 	    rs = SR_OK ;
-	    if (ll < 0) ll = lenstr(lp) ;
-	    while ((ll > 0) && isend(lp[ll - 1])) {
-	        ll -= 1 ;
-	    }
-	    mf.subnul = !!(m & 0x01) ;
-	    mf.subbad = !!(m & 0x02) ;
 	    if_constexpr (f_clean1) {
 	        len = clean1(&mf,lp,ll) ;
 	    } else {
 	        len = clean2(&mf,lp,ll) ;
 	    } /* end if_constexpr (f_clean1) */
-	} /* end if (non-null) */
+	} /* end if (rmeol) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (instrclean) */
 
@@ -203,9 +204,5 @@ local bool isshift(int ch) noex {
 local bool ischarok(int ch) noex {
 	return (ch == '\t') || (ch == '\n') ;
 } /* end subroutine (ischarok) */
-
-local bool isend(int ch) noex {
-	return (ch == '\n') || (ch == '\r') ;
-} /* end subroutine (isend) */
 
 
