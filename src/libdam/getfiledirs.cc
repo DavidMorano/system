@@ -80,7 +80,7 @@
 #include	<sfx.h>			/* LIBUC */
 #include	<mkx.h>			/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"getfiledirs.h"
