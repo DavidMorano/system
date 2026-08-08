@@ -65,9 +65,9 @@
 #include	<rmx.h>			/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<permx.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 
