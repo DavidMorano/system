@@ -25,45 +25,46 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<dirent.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<pwd.h>
-#include	<grp.h>
-#include	<ftw.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<logfile.h>
-#include	<vecstr.h>
-#include	<userinfo.h>
-#include	<baops.h>
-#include	<varsub.h>
-#include	<hdb.h>
-#include	<field.h>
-#include	<mallocstuff.h>
-#include	<eigendb.h>
-#include	<varsub.h>
-#include	<cfdec.h>
-#include	<timestr.h>
-#include	<prognamevar.hh>
-#include	<ischarx.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/stat.h>		/* POSIX */
+#include	<sys/socket.h>		/* POSIX */
+#include	<netinet/in.h>		/* POSIX */
+#include	<arpa/inet.h>		/* POSIX */
+#include	<dirent.h>		/* POSIX */
+#include	<unistd.h>		/* POSIX */
+#include	<fcntl.h>		/* POSIX */
+#include	<netdb.h>		/* POSIX */
+#include	<pwd.h>			/* POSIX */
+#include	<grp.h>			/* POSIX */
+#include	<ftw.h>			/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<baops.h>		/* LIBUC */
+#include	<varsub.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<mallocstuff.h>		/* LIBUC */
+#include	<eigendb.h>		/* LIBUC */
+#include	<varsub.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<prognamevar.hh>	/* LIBDAM */
+#include	<bibdb.h>		/* LIBDAM */
+#include	<mapex.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
-#include	"bdb.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"configfile.h"
@@ -143,8 +144,8 @@ int main(int argc,mainv argv,mainv envv) {
 	proginfo	g, *pip = &g ;
 	userinfo	u ;
 	CONFIGFILE	cf ;
-	BDB		bdbl ;
-	BDB_CUR		cur ;
+	bibdb		bdbl ;
+	bibdb_cur	cur ;
 	eigendb		eigendb ;
 	varsub		vsh_e, vsh_d ;
 	bfile		errfile, *efp = &errfile ;
@@ -1319,21 +1320,13 @@ int main(int argc,mainv argv,mainv envv) {
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1) {
-
-	    debugprintf("main: BDB enumerated keys\n") ;
-
+	    debugprintf("main: BIBDB enumerated keys\n") ;
 	    bdbcurbegin(&bdbl,&cur) ;
-
 	    while (bdbgetname(&bdbl,&cur,&cp) >= 0) {
-
 	        if (cp == nullptr) continue ;
-
 	        debugprintf("main: db=%s\n",cp) ;
-
 	    } /* end for */
-
 	    bdbcurend(&bdbl,&cur) ;
-
 	}
 #endif /* CF_DEBUG */
 
