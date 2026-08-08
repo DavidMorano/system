@@ -40,16 +40,18 @@ MODS +=
 LIBS +=
 
 
+DEPS= keyopt_util.o
+
 OBJ0= keyopt_prime.o keyopt_lastvalue.o
 OBJ1= keyopt_keyname.o
-OBJ2=
+OBJ2= $(DEPS)
 OBJ3=
 OBJ4=
 OBJ5=
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o
@@ -150,8 +152,9 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-keyopt_prime.o:		keyopt_prime.cc		keyopt.h	$(INCS)
-keyopt_lastvalue.o:	keyopt_lastvalue.cc	keyopt.h	$(INCS)
-keyopt_eyname.o:	keyopt_keyname.cc	keyopt.h	$(INCS)
+keyopt_prime.o:		keyopt_prime.cc		keyopt.h	$(DEPS)	$(INCS)
+keyopt_lastvalue.o:	keyopt_lastvalue.cc	keyopt.h	$(DEPS) $(INCS)
+keyopt_eyname.o:	keyopt_keyname.cc	keyopt.h	$(DEPS) $(INCS)
+keyopt_util.o:		keyopt_util.ccm		keyopt.h		$(INCS)
 
 
