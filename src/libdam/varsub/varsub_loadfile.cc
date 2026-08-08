@@ -122,11 +122,11 @@ int varsub_loadfile(varsub *op,cchar *fn) noex {
 	if ((fn == nullptr) || (fn[0] == '\0') || (fn[0] == '-')) {
 	    fn = STDFNIN ; /* standard-input */
 	}
-	if ((rs = varsub_magic(op)) >= 0) {
-	     if (static cint rsv = var ; (rs = rsv) >= 0) {
-	        if (char *lbuf ; (rs = lm_mp(&lbuf)) >= 0) {
+	if ((rs = varsub_magic(op)) >= 0) ylikely {
+	     if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+	        if (char *lbuf ; (rs = lm_mp(&lbuf)) >= 0) ylikely {
 	            cint	llen = rs ;
-	            if (char *abuf{} ; (rs = lm_mp(&abuf)) >= 0) {
+	            if (char *abuf ; (rs = lm_mp(&abuf)) >= 0) ylikely {
 		        sub_loadfile	lo(op,lbuf,llen,abuf,rs) ;
 		        {
 		            rs = lo(fn) ;
@@ -148,12 +148,13 @@ int varsub_loadfile(varsub *op,cchar *fn) noex {
 /* local subroutines */
 
 int sub_loadfile::operator () (cchar *fn) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (ucstream fi ; (rs = fi.open(fn,"r",0666)) >= 0) {
+	if (ucstream fi ; (rs = fi.open(fn,"r",0666)) >= 0) ylikely {
 	    cint	to = -1 ;
-	    while ((rs = fi.readlns(lbuf,llen,to,nullptr)) > 0) {
+	    while ((rs = fi.readlns(lbuf,llen,to,np)) > 0) {
 		if (int len ; (len = rmcomment(lbuf,llen)) > 0) {
 		    rs = procln(lbuf,len) ;
 		    c = rs ;
@@ -170,9 +171,9 @@ int sub_loadfile::procln(cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
-        if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) {
+        if (field fsb ; (rs = fsb.start(sp,sl)) >= 0) ylikely {
             cchar   *kp{} ;
-            if (int kl ; (kl = fsb.get(fterms,&kp)) > 0) {
+            if (int kl ; (kl = fsb.get(fterms,&kp)) > 0) ylikely {
                 int         al = alen ;
                 char        *ap = abuf ;
                 if ((kl == 6) && hasexport(kp,kl)) {
