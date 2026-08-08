@@ -61,8 +61,8 @@
 #include	<sbuf.h>		/* LIBUC */
 #include	<sigign.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"uterm.h"
