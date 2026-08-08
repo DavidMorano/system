@@ -68,10 +68,11 @@ import varsub_util ;
 #define	VS_SUB		varsub_sub
 #define	VS_MAGIC	VARSUB_MAGIC
 #define	VS_DEFENT	10
-#define	VS_NLINES	10
 
 
 /* imported namespaces */
+
+using varsub_ns::varsub_sort ;		/* subroutine */
 
 
 /* local typedefs */
@@ -123,7 +124,6 @@ local int varsub_dtor(VS *op) noex {
 local int	varsub_setopts	(VS *,int) noex ;
 local int	varsub_iadd	(VS *,cchar *,int,cchar *,int) noex ;
 local int	varsub_iaddq	(VS *,cchar *,int,cchar *,int) noex ;
-local int	varsub_sort	(VS *) noex ;
 local int	varsub_procvalue(VS *,buffer *,cchar *,int) noex ;
 local int	varsub_procsub	(VS *,buffer *,cchar *,int) noex ;
 local int	varsub_getval	(VS *,cchar *,int,cchar **) noex ;
@@ -206,12 +206,13 @@ int varsub_add(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 } /* end subroutine (varsub_add) */
 
 int varsub_addva(VS *op,mainv envv) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = varsub_magic(op,envv)) >= 0) ylikely {
 	    for (int i = 0 ; envv[i] ; i += 1) {
 	        cchar	*esp = envv[i] ;
-	        if (cchar *tp ; (tp = strchr(esp,'=')) != nullptr) {
+	        if (cchar *tp ; (tp = strchr(esp,'=')) != np) {
 	            cint	kch = mkchar(esp[0]) ;
 	            cchar	*vp = (tp + 1) ;
 	            if (isprintlatin(kch)) {
@@ -233,7 +234,7 @@ int varsub_addquick(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,k)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (k[0]) {
+	    if (k[0]) ylikely {
 		rs = varsub_iaddq(op,k,klen,v,vlen) ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -246,7 +247,7 @@ int varsub_addvaquick(VS *op,cchar **envv) noex {
 	if ((rs = varsub_magic(op,envv)) >= 0) ylikely {
 	    for (int i = 0 ; envv[i] != nullptr ; i += 1) {
 	        cchar	*esp = envv[i] ;
-	        if (cchar *tp ; (tp = strchr(esp,'=')) != nullptr) {
+	        if (cchar *tp = strchr(esp,'=') ; tp) ylikely {
 	            cint	kch = mkchar(esp[0]) ;
 	            cchar	*vp = (tp + 1) ;
 	            if (isprintlatin(kch)) {
@@ -270,7 +271,7 @@ int varsub_del(VS *op,cchar *k,int klen) noex {
 	if ((rs = varsub_magic(op,k)) >= 0) ylikely {
 	    vechand	*elp = op->slp ;
 	    if (klen < 0) klen = lenstr(k) ;
-	    if (klen > 0) {
+	    if (klen > 0) ylikely {
 	        ent	te ;
 	        void	*vp{} ;
 	        te.kp = k ;
@@ -311,9 +312,9 @@ int varsub_find(VS *op,cchar *k,int klen,cchar **vpp,int *vlenp) noex {
 
 int varsub_fetch(VS *op,cchar *k,int klen,cchar **vpp) noex {
 	int		rs ;
-	if ((rs = varsub_magic(op,k)) >= 0) {
+	if ((rs = varsub_magic(op,k)) >= 0) ylikely {
 	    if (klen < 0) klen = lenstr(k) ;
-	    if ((rs = varsub_sort(op)) >= 0) {
+	    if ((rs = varsub_sort(op)) >= 0) ylikely {
 	        rs = varsub_getval(op,k,klen,vpp) ;
 	    }
 	} /* end if (magic) */
@@ -330,7 +331,7 @@ int varsub_curbegin(VS *op,varsub_cur *curp) noex {
 
 int varsub_curend(VS *op,varsub_cur *curp) noex {
 	int		rs ;
-	if ((rs = varsub_magic(op,curp)) >= 0) {
+	if ((rs = varsub_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -375,9 +376,9 @@ int varsub_exp(VS *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 	        if (dlen < 0) dlen = mll ;
 	        op->badline = -1 ;
 	        if (dlen >= slen) {
-	            if ((rs = varsub_sort(op)) >= 0) {
+	            if ((rs = varsub_sort(op)) >= 0) ylikely {
 		        auto	vsp = varsub_procvalue ;
-	                if (buffer b ; (rs = b.start(mll)) >= 0) {
+	                if (buffer b ; (rs = b.start(mll)) >= 0) ylikely {
 	                    if ((rs = vsp(op,&b,sbuf,slen)) >= 0) {
 	                        if (cchar *bp{} ; (rs = b.get(&bp)) >= 0) {
 	                            bl = rs ;
@@ -423,7 +424,7 @@ local int varsub_setopts(VS *op,int vo) noex {
 	if (op) ylikely {
 	    rs = SR_INVALID ;
 	    op->fl = {} ;
-	    if ((vo & optmask) == 0) {
+	    if ((vo & optmask) == 0) ylikely {
 	        rs = SR_OK ;
 	        if (vo & varsubm.noblank) op->fl.noblank = true ;
 	        if (vo & varsubm.badnokey) op->fl.badnokey = true ;
@@ -439,6 +440,7 @@ local int varsub_setopts(VS *op,int vo) noex {
 } /* end subroutine (varsub_setopts) */
 
 local int varsub_procvalue(VS *op,buffer *bufp,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		sses[3][2] ;
 	int		kl ;
@@ -459,8 +461,7 @@ local int varsub_procvalue(VS *op,buffer *bufp,cchar *sp,int sl) noex {
 	}
 	sses[i][0] = 0 ;
 	sses[i][1] = 0 ;
-	cchar		*tp ;
-	while ((tp = strnchr(sp,sl,'$')) != nullptr) {
+	for (cchar *tp ; (tp = strnchr(sp,sl,'$')) != np ; ) {
 	    cchar	*cp = sp ;
 	    int		cl = intconv(tp - sp) ;
 	    if (cl > 0) {
@@ -487,7 +488,7 @@ local int varsub_procvalue(VS *op,buffer *bufp,cchar *sp,int sl) noex {
 	        } /* end if (ok) */
 	    } /* end if (ok) */
 	    if (rs < 0) break ;
-	} /* end while */
+	} /* end for */
 	if ((rs >= 0) && (sl > 0)) {
 	    rs = bufp->strw(sp,sl) ;
 	    len += rs ;
@@ -498,7 +499,7 @@ local int varsub_procvalue(VS *op,buffer *bufp,cchar *sp,int sl) noex {
 local int varsub_procsub(VS *op,buffer *bufp,cchar *kp,int kl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (kl > 0) {
+	if (kl > 0) ylikely {
 	    int		al = 0 ;
 	    cchar	*ap = nullptr ;
 	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
@@ -598,7 +599,8 @@ local int varsub_iaddq(VS *op,cchar *k,int klen,cchar *v,int vlen) noex {
 	return rs ;
 } /* end subroutine (varsub_iaddq) */
 
-local int varsub_sort(VS *op) noex {
+namespace varsub_ns {
+    int varsub_sort(VS *op) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (! op->fl.sorted) {
@@ -607,20 +609,21 @@ local int varsub_sort(VS *op) noex {
 	    rs = vechand_sort(op->slp,vcmpent) ;
 	}
 	return (rs >= 0) ? f : rs ;
-} /* end subroutine (varsub_sort) */
+    } /* end subroutine (varsub_sort) */
+} /* end namespace (varsub_ns) */
 
 local int varsub_getval(VS *op,cchar *kp,int kl,cchar **vpp) noex {
 	ent		*ep{} ;
 	int		rs = SR_DOM ;
 	int		vl = 0 ;
 	if (kl < 0) kl = lenstr(kp) ;
-	if (kl > 0) {
+	if (kl > 0) ylikely {
 	    vechand	*slp = op->slp ;
 	    ent		te{} ;
 	    void	*vp{} ;
 	    te.kp = kp ;
 	    te.kl = kl ;
-	    if ((rs = vechand_search(slp,&te,vcmpent,&vp)) >= 0) {
+	    if ((rs = slp->search(&te,vcmpent,&vp)) >= 0) {
 		ep = entp(vp) ;
 	        vl = ep->vl ;
 	    }
@@ -752,12 +755,12 @@ local int vcmpent(cvoid **ve1pp,cvoid **ve2pp) noex {
 	ent		**e1pp = (ent **) ve1pp ;
 	ent		**e2pp = (ent **) ve2pp ;
 	int		rc = 0 ;
-	{
+	if (e1pp && e2pp) ylikely {
 	    ent		*e1p = *e1pp ;
 	    ent		*e2p = *e2pp ;
 	    if (e1p || e2p) {
 		rc = +1 ;
-	        if (e1p) {
+	        if (e1p) ylikely {
 		    rc = -1 ;
 	            if (e2p) {
 		        rc = entry_keycmp(e1p,e2p) ;
