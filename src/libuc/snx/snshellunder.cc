@@ -60,13 +60,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |pid_t| */
+#include	<sys/types.h>		/* POSIX® |pid_t| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snshellunder.h"
 
@@ -116,7 +116,7 @@ int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *execfname) noex {
 	    if (rs >= 0) ylikely {
 	        rs = b.str(execfname) ;
 	        idx = b.idx ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? idx : rs ;
 } /* end subroutine (snshellunder) */
