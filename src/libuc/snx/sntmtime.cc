@@ -108,19 +108,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>
-#include	<cstdlib>		/* for |abs(3c)| */
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<calstrs.h>
-#include	<sbuf.h>
-#include	<zoffparts.h>
-#include	<ctdec.h>
-#include	<ctdecp.h>
-#include	<tmtime.hh>
-#include	<mkchar.h>
-#include	<localmisc.h>		/* |NYEARS_CENTURY| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |abs(3c)| */
+#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<calstrs.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<zoffparts.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<ctdecp.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |NYEARS_CENTURY| */
 
 #include	"sntmtime.h"
 
