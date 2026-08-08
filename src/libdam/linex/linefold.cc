@@ -302,8 +302,8 @@ local int params_nextline(params *pp,cchar *sp,int sl,cchar **rpp) noex {
 	    while (sl && CHAR_ISWHITE(sp[0])) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
-	}
+	    } /* end while */
+	} /* end if */
 	*rpp = sp ;
 	ncol = (pp->nline > 0) ? pp->ind : 0 ;
 	while ((pl = nextpiece(ncol,sp,sl,&ncs)) > 0) {
@@ -330,7 +330,7 @@ local int argcols(int cols) noex {
 	cchar		*vncols = varname.columns ;
 	int		rs = SR_OK ;
 	if (cols <= 0) {
-	    static cchar	*vcols = getenv(vncols) ;
+	    static cchar	*vcols = getenver(vncols) ;
 	    if (int v ; vcols && (cfdeci(vcols,-1,&v) >= 0)) {
 	        cols = v ;
 	    }
