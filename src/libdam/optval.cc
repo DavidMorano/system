@@ -44,8 +44,8 @@
 #include	<usupport.h>		/* LIBU */
 #include	<matostr.h>		/* LIBUC */
 #include	<cfnum.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC |isnumlatin(3uc) */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"optval.h"
