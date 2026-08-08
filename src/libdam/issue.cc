@@ -45,8 +45,8 @@
 #include	<fcntl.h>
 #include	<ctime>
 #include	<climits>		/* |UINT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* |strchr(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
@@ -82,11 +82,11 @@
 #include	<matstr.h>
 #include	<permx.h>
 #include	<nleadx.h>
-#include	<strnul.hh>
 #include	<mkchar.h>
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<isnot.h>
+#include	<strnul.hh>		/* LIBU */
 #include	<localmisc.h>
 
 #include	"issue.h"
