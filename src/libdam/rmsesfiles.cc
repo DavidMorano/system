@@ -77,11 +77,11 @@
 #include	<pathadd.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
-#include	<strnul.hh>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
 #include	<isoneof.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
+#include	<strnul.hh>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"rmsesfiles.h"
