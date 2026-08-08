@@ -156,8 +156,8 @@ namespace logfile_util {
 copier::operator int () noex {
 	int		rs ;
 	int		rs1 ;
-	if (sigblocker b ; (rs = b.start(sigblockers)) >= 0) {
-	    if ((rs = lockfile(op->lfd,F_WLOCK,0z,0z,TO_LOCK)) >= 0) {
+	if (sigblocker b ; (rs = b.start(sigblockers)) >= 0) ylikely {
+	    if ((rs = lockfile(op->lfd,F_WLOCK,0z,0z,TO_LOCK)) >= 0) ylikely {
 		{
 		    rs = tmpfile() ;
 		}	
@@ -174,10 +174,10 @@ int copier::tmpfile() noex {
     	cint		clen = colbuflen ;
     	int		rs ;
 	int		rs1 ;
-	if (char *cbuf ; (rs = lm_mall((clen + 1),&cbuf)) >= 0) {
-            if ((rs = opentmp(nullptr,0,0644)) >= 0) {
+	if (char *cbuf ; (rs = lm_mall((clen + 1),&cbuf)) >= 0) ylikely {
+            if ((rs = opentmp(nullptr,0,0644)) >= 0) ylikely {
                 cint	fd = rs ;
-		if ((rs = lineup(cbuf,clen)) >= 0) {
+		if ((rs = lineup(cbuf,clen)) >= 0) ylikely {
                     rs = copy(fd) ;
                 } /* end if (ok) */
                 rs1 = uc_close(fd) ;
@@ -192,7 +192,7 @@ int copier::tmpfile() noex {
 int copier::lineup(char *cbuf,int clen) noex {
 	coff		uoff = off_t(- logsz) ;
     	int		rs ;
-	if ((rs = uc_seek(op->lfd,uoff,SEEK_END)) >= 0) {
+	if ((rs = uc_seek(op->lfd,uoff,SEEK_END)) >= 0) ylikely {
 	    while ((rs = uc_readln(op->lfd,cbuf,clen)) > 0) {
 		if (cbuf[rs - 1] == '\n') break ;
 	    } /* end while */
@@ -202,14 +202,14 @@ int copier::lineup(char *cbuf,int clen) noex {
 
 int copier::copy(int fd) noex {
     	int		rs ;
-	if ((rs = uc_writedesc(fd,op->lfd,-1)) >= 0) {
+	if ((rs = uc_writedesc(fd,op->lfd,-1)) >= 0) ylikely {
 	    uc_rewind(op->lfd) ;
 	    uc_rewind(fd) ;
 	    /* shut off any APPEND mode if there is any */
-	    if ((rs = uc_setappend(op->lfd,false)) >= 0) {
+	    if ((rs = uc_setappend(op->lfd,false)) >= 0) ylikely {
 		bool	f_append = (rs > 0) ;
 		/* copy the temporary data back to the original file */
-		if ((rs = uc_writedesc(op->lfd,fd,-1)) > 0) {
+		if ((rs = uc_writedesc(op->lfd,fd,-1)) > 0) ylikely {
 		    coff foff = off_t(rs) ;
 	            rs = uc_ftruncate(op->lfd,foff) ;
 		} /* end if (uc_writedesc) */
