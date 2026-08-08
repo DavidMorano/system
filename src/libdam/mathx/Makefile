@@ -45,7 +45,7 @@ OBJ1= factorial.o
 OBJ2= fibonacci.o
 OBJ3= combinations.o permutations.o
 OBJ4= fft.o
-OBJ5= 
+OBJ5=
 OBJ6= 
 OBJ7= 
 
@@ -153,15 +153,6 @@ objb.o:			$(OBJB)
 binexp.o:		binexp.cc	binexp.h		$(INCS)
 factorial.o:		factorial.cc	factorial.h		$(INCS)
 fibonacci.o:		fibonacci.cc	fibonacci.h		$(INCS)
-
-complex.o:		complex0.o complex1.o
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-complex0.o:		complex.ccm				$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-complex1.o:		complex1.cc complex0.o			$(INCS)
-	$(COMPILE.cc) $<
 
 fft.o:			fft.ccm					$(INCS)
 combinations.o:		combinations.cc	combinations.h		$(INCS)
