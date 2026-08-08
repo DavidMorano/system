@@ -35,16 +35,16 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<uclibmem.h>		/* LIBUC*/
+#include	<uclibmem.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strwcmp.h>		/* LIBUC */
 #include	<cfhex.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
-#include	<char.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"querystr.h"
@@ -173,18 +173,18 @@ int querystr_start(querystr *op,cchar *sp,int sl) noex {
 	    if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 	        if ((rs = strpack_start(op->spp,rs)) >= 0) ylikely {
 	            op->open.packer = true ;
-	            if (subinfo si(op) ; (rs = si.split(sp,sl)) >= 0) {
+	            if (subinfo si(op) ; (rs = si.split(sp,sl)) >= 0) ylikely {
 		        rs = si.load() ;
 	            } /* end if (subinfo) */
 	            if (rs < 0) {
 	                op->open.packer = false ;
 		        strpack_finish(op->spp) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (strpack_start) */
 	    } /* end if (bufsizeget) */
 	    if (rs < 0) {
 		querystr_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (querystr_ctor) */
 	return rs ;
 } /* end subroutine (querystr_start) */
@@ -230,7 +230,7 @@ int querystr_already(querystr *op,cchar *kstr,int klen) noex {
 	    for (int i = 0 ; i < n ; i += 1) {
 	        f = (strwcmp(op->kv[i][0],kstr,klen) == 0) ;
 	        if (f) break ;
-	    }
+	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 } /* end if (querystr_already) */
@@ -321,8 +321,9 @@ int querystr_curenum(querystr *op,cur *curp,cc **kpp,cc **vpp) noex {
 /* private subroutines */
 
 int subinfo::split(cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	for (cchar *tp ; (tp = strnchr(sp,sl,'&')) != nullptr ; ) {
+	for (cchar *tp ; (tp = strnchr(sp,sl,'&')) != np ; ) {
 	    cint	cl = intconv(tp - sp) ;
 	    cchar	*cp = sp ;
 	    if (cl > 0) {
@@ -342,12 +343,12 @@ int subinfo::procpair(cchar *sbuf,int slen) noex {
 	int		rs = SR_OK ;
 	cchar		*sp ;
 	if (slen < 0) slen = lenstr(sbuf) ;
-	if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
+	if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) ylikely {
 	    int		kl = sl ;
 	    int		vl = 0 ;
 	    cchar	*kp = sp ;
 	    cchar	*vp = nullptr ;
-	    if (cchar *tp ; (tp = strnchr(sp,sl,'=')) != nullptr) {
+	    if (cchar *tp = strnchr(sp,sl,'=') ; tp) {
 	        kl = intconv(tp - sp) ;
 	        while (kl && CHAR_ISWHITE(*kp)) kl -= 1 ;
 	        vp = (tp + 1) ;
@@ -357,7 +358,7 @@ int subinfo::procpair(cchar *sbuf,int slen) noex {
 	        while ((vl > 0) && CHAR_ISWHITE(*vp)) {
 	            vp += 1 ;
 	            vl -= 1 ;
-	        }
+	        } /* end while */
 	        if ((vl > 0) && ((strnbrk(vp,vl,"%+\t")) != nullptr)) {
 	            if ((rs = tsize(vl)) >= 0) {
 	                rs = fixval(tbuf,tlen,vp,vl) ;
@@ -367,19 +368,20 @@ int subinfo::procpair(cchar *sbuf,int slen) noex {
 	        } /* end if (value) */
 	        if (rs >= 0) {
 	            rs = store(kp,kl,vp,vl) ;
-	        }
+	        } /* end if (ok) */
 	    } /* end if (key) */
 	} /* end if (sfshrink) */
 	return rs ;
 } /* end subroutine (subinfo::procpair) */
 
 int subinfo::fixval(char *rbuf,int rlen,cchar *vp,int vl) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if (vl > 0) {
 	    char	*rp = rbuf ;
 	    if (vl > rlen) vl = rlen ;
-	    for (cchar *tp ; (tp = strnbrk(vp,vl,"%+\t")) != nullptr ; ) {
+	    for (cchar *tp ; (tp = strnbrk(vp,vl,"%+\t")) != np ; ) ylikely {
 	        cint	sch = mkchar(*tp) ;
 	        if (cint tl = intconv(tp - vp) ; tl > 0) {
 	            rp = strwcpy(rp,vp,tl) ;
@@ -421,14 +423,14 @@ int subinfo::fixval(char *rbuf,int rlen,cchar *vp,int vl) noex {
 int subinfo::store(cchar *kp,int kl,cchar *vp,int vl) noex {
 	strpack		*spp = op->spp ;
 	int		rs ;
-	if (cchar *sp ; (rs = strpack_store(spp,kp,kl,&sp)) >= 0) {
+	if (cchar *sp ; (rs = strpack_store(spp,kp,kl,&sp)) >= 0) ylikely {
 	    kp = sp ;
 	    kl = rs ;
 	    if (vl > 0) {
 	        if ((rs = strpack_store(spp,vp,vl,&sp)) >= 0) {
 		    vp = sp ;
 		    vl = rs ;
-		}
+		} /* end if */
 	    } else {
 		vp = (kp+kl) ;
 	    }
@@ -450,7 +452,7 @@ int subinfo::load() noex {
 	int		rs ;
 	int		sz ;
 	sz = ((n + 1) * esz) ;
-	if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
+	if (void *p ; (rs = lm_mall(sz,&p)) >= 0) ylikely {
 	    op->kv = (cchar *(*)[2]) p ;
 	    op->n = n ;
 	    for (int i = 0 ; i < n ; i += 1) {
