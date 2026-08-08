@@ -55,14 +55,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>			/* |sfnext(3uc)| */
-#include	<toxc.h>		/* |chtouc(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC |sfnext(3uc)| */
+#include	<toxc.h>		/* LIBUC |chtouc(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"snabbr.h"
 
