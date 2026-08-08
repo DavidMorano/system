@@ -139,24 +139,6 @@ extern int keyopt_lastvalue	(keyopt *,cchar *,cchar **) noex ;
 
 EXTERNC_end
 
-#ifdef	__cplusplus
-
-template<typename ... Args>
-local inline int keyopt_magic(keyopt *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magval == KEYOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (keyopt_magic) */
-
-namespace keyopt_keyname {
-	extern int keyname_incri(keyopt_na *) noex ;
-	extern int keyname_findv(keyopt_na *,cchar *,int,keyopt_val **) noex ;
-} /* end namespace (keyopt_keyname) */
-
-#endif /* __cplusplus */
-
 
 #endif /* KEYOPT_INCLUDE */
 
