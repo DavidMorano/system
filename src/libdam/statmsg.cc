@@ -79,9 +79,9 @@
 #include	<writeto.h>		/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
 #include	<ctdec.h>		/* LIBUC */
-#include	<mkchar.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |DECBUFLEN| */
 #include	<bfile.h>		/* LIBB */
 
