@@ -1664,7 +1664,7 @@ local int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 	            char	kbuf[KBUFLEN+1] ;
 	            char	vbuf[VBUFLEN+1] ;
 	            while (rs >= 0) {
-	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
+	                vl = pcsconf_curenum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
 	                debugprintf("b_rest/procpcsconf: pair> %s=%r\n",
 	                    kbuf,vbuf,vl) ;
