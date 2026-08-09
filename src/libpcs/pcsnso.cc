@@ -164,14 +164,14 @@ const pcsno_obj		pcsnso_mod = {
 	"pcsnso",
 	szof(pcsnso),
 	szof(pcsnos_cur)
-} ;
+} ; /* end initialization */
 
 
 /* local structures */
 
 struct subinfo_flags {
 	uint		setcache:1 ;
-} ;
+} ; /* end struct */
 
 struct subinfo {
 	PCSNSO		*op ;
@@ -188,7 +188,7 @@ struct subinfo {
 struct pcsnametype {
 	cchar	*var ;
 	cchar	*fname ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -223,16 +223,16 @@ local int	getprojinfo_sysdb(SI *) ;
 
 /* local variables */
 
-static const struct pcsnametype	pcsnametypes[] = {
-	{ NULL, NULL },
+constexpr pcsnametype	pcsnametypes[] = {
+	{ nullptr, nullptr },
 	{ VARNAME, NAMEFNAME },
 	{ VARFULLNAME, FULLNAMEFNAME },
 	{ VARPROJINFO, PROJECTFNAME },
 	{ VARORG, ORGFNAME },
-	{ NULL, NULL }
-} ;
+	{ nullptr, nullptr }
+} ; /* end array */
 
-local int	(*getnames[])(SI *) = {
+constexpr int		(*getnames[])(SI *) = {
 	getname_var,
 	getname_nsmgr,
 	getname_daemon,
@@ -240,8 +240,8 @@ local int	(*getnames[])(SI *) = {
 	getname_again,
 	getname_sysdb,
 	getname_pcsdef,
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 
 /* exported variables */
@@ -252,37 +252,34 @@ local int	(*getnames[])(SI *) = {
 int pcsnso_open(PCSNSO *op,cchar *pr) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso_open: pr=%s\n",pr) ;
+	DEBUGPRINTF("pcsnso_open: pr=%s\n",pr) ;
 #endif
 
 	memclear(op) ;
 	if ((rs = pcsnso_infoloadbegin(op,pr)) >= 0) {
-	    op->magic = PCSNSO_MAGIC ;
+	    op->magval = PCSNSO_MAGIC ;
 	} /* end if (pcsnso_infoloadbegin) */
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso_open: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsnso_open: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (pcsnso_open) */
+} /* end subroutine (pcsnso_open) */
 
-
-int pcsnso_close(PCSNSO *op)
-{
+int pcsnso_close(PCSNSO *op) {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSO_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSO_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = pcsnso_clientend(op) ;
 	if (rs >= 0) rs = rs1 ;
@@ -291,36 +288,31 @@ int pcsnso_close(PCSNSO *op)
 	if (rs >= 0) rs = rs1 ;
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso_close: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsnso_close: ret rs=%d\n",rs) ;
 #endif
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (pcsnso_close) */
-
+} /* end subroutine (pcsnso_close) */
 
 int pcsnso_setopts(PCSNSO *op,int opts)
 {
 	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != PCSNSO_MAGIC) return SR_NOTOPEN ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magval != PCSNSO_MAGIC) return SR_NOTOPEN ;
 	op->opts = opts ;
 	return rs ;
-}
-/* end subroutine (pcsnso_setopts) */
+} /* end subroutine (pcsnso_setopts) */
 
-
-int pcsnso_get(PCSNSO *op,char *rbuf,int rlen,cchar *un,int w)
-{
+int pcsnso_get(PCSNSO *op,char *rbuf,int rlen,cchar *un,int w) {
 	SI		si, *sip = &si ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSO_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSO_MAGIC) return SR_NOTOPEN ;
 
 	if ((rs = subinfo_start(sip,op,rbuf,rlen,un,w)) >= 0) {
 	    switch (w) {
@@ -353,98 +345,82 @@ int pcsnso_get(PCSNSO *op,char *rbuf,int rlen,cchar *un,int w)
 	} /* end if (subinfo) */
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso_get: ret rs=%d len=%u\n",rs,len) ;
+	DEBUGPRINTF("pcsnso_get: ret rs=%d len=%u\n",rs,len) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pcsnso_get) */
+} /* end subroutine (pcsnso_get) */
 
-
-int pcsnso_audit(PCSNSO *op)
-{
+int pcsnso_audit(PCSNSO *op) {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSO_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSO_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso_audit: txtindex_audit() rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsnso_audit: txtindex_audit() rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (pcsnso_audit) */
+} /* end subroutine (pcsnso_audit) */
 
-
-int pcsnso_curbegin(PCSNSO *op,PCSNSO_CUR *curp)
-{
+int pcsnso_curbegin(PCSNSO *op,PCSNSO_CUR *curp) {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSO_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSO_MAGIC) return SR_NOTOPEN ;
 
 	memclear(curp) ;
 	op->ncursors += 1 ;
 
 	return rs ;
-}
-/* end subroutine (pcsnso_curbegin) */
+} /* end subroutine (pcsnso_curbegin) */
 
-
-int pcsnso_curend(PCSNSO *op,PCSNSO_CUR *curp)
-{
+int pcsnso_curend(PCSNSO *op,PCSNSO_CUR *curp) {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSO_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSO_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->verses != NULL) {
+	if (curp->verses != nullptr) {
 	    rs1 = lm_free(curp->verses) ;
 	    if (rs >= 0) rs = rs1 ;
-	    curp->verses = NULL ;
+	    curp->verses = nullptr ;
 	}
 
 	curp->nverses = 0 ;
 	if (op->ncursors > 0) op->ncursors -= 1 ;
 
 	return rs ;
-}
-/* end subroutine (pcsnso_curend) */
+} /* end subroutine (pcsnso_curend) */
 
-
-/* ARGSUSED */
-int pcsnso_enum(PCSNSO *op,PCSNSO_CUR *curp,char *vbuf,int vlen,int w)
-{
+int pcsnso_curenum(PCSNSO *op,PCSNSO_CUR *curp,char *vbuf,int vlen,int w) {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (vbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (vbuf == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSO_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSO_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso_read: ret rs=%d len=%u\n",rs,len) ;
+	DEBUGPRINTF("pcsnso_curenum: ret rs=%d len=%u\n",rs,len) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pcsnso_enum) */
+} /* end subroutine (pcsnso_curenum) */
 
 
 /* private subroutines */
 
-
-local int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr)
-{
+local int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr) {
 	int		rs ;
 
 	if ((rs = bufsizeget(bufsize_pw)) >= 0) {
@@ -464,12 +440,9 @@ local int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr)
 	} /* end if (bufsizeget) */
 
 	return rs ;
-}
-/* end subroutine (pcsnso_infoloadbegin) */
+} /* end subroutine (pcsnso_infoloadbegin) */
 
-
-local int pcsnso_infoloadend(PCSNSO *op)
-{
+local int pcsnso_infoloadend(PCSNSO *op) {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -479,32 +452,29 @@ local int pcsnso_infoloadend(PCSNSO *op)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (op->a != NULL) {
+	if (op->a != nullptr) {
 	    rs1 = lm_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->a = NULL ;
-	    op->pr = NULL ;
-	    pdp->pwbuf = NULL ;
+	    op->a = nullptr ;
+	    op->pr = nullptr ;
+	    pdp->pwbuf = nullptr ;
 	    pdp->pwlen = 0 ;
 	}
 
 	return rs ;
-}
-/* end subroutine (pcsnso_infoloadend) */
+} /* end subroutine (pcsnso_infoloadend) */
 
-
-local int pcsnso_getpw(PCSNSO *op,cchar *un)
-{
+local int pcsnso_getpw(PCSNSO *op,cchar *un) {
 	PCSNSO_PWD	*pdp = &op->pwd ;
 	int		rs = SR_OK ;
 	cchar		*pun ;
 
 	pun = pdp->pw.pw_name ;
-	if ((pun == NULL) || (strcmp(pun,un) != 0)) {
+	if ((pun == nullptr) || (strcmp(pun,un) != 0)) {
 	    struct passwd	*pwp = &pdp->pw ;
 	    cint		pwlen = pdp->pwlen ;
 	    char		*pwbuf = pdp->pwbuf ;
-	    if ((un != NULL) && (un[0] != '\0') && (un[0] != '-')) {
+	    if ((un != nullptr) && (un[0] != '\0') && (un[0] != '-')) {
 	        if (hasalldig(un,-1)) {
 	            uint	uv ;
 	            if ((rs = cfdecui(un,-1,&uv)) >= 0) {
@@ -520,98 +490,76 @@ local int pcsnso_getpw(PCSNSO *op,cchar *un)
 	} /* end if (was not already initialized) */
 
 #if	CF_DEBUGS
-	debugprintf("pcsnames/subinfo_getpw: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsnames/subinfo_getpw: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subrouine (pcsnso_getpw) */
+} /* end subrouine (pcsnso_getpw) */
 
-
-/* ARGSUSED */
-local int pcsnso_getrealname(PCSNSO *op,SI *sip)
-{
+local int pcsnso_getrealname(PCSNSO *op,SI *sip) {
 	int		rs ;
 
 	rs = getname(sip) ;
 
 	return rs ;
-}
-/* end subrouine (pcsnso_getrealname) */
+} /* end subrouine (pcsnso_getrealname) */
 
-
-/* ARGSUSED */
-local int pcsnso_getpcsname(PCSNSO *op,SI *sip)
-{
+local int pcsnso_getpcsname(PCSNSO *op,SI *sip) {
 	int		rs ;
 
 	rs = getname(sip) ;
 
 	return rs ;
-}
-/* end subrouine (pcsnso_getpcsname) */
+} /* end subrouine (pcsnso_getpcsname) */
 
-
-/* ARGSUSED */
-local int pcsnso_getfullname(PCSNSO *op,SI *sip)
-{
+local int pcsnso_getfullname(PCSNSO *op,SI *sip) {
 	int		rs ;
 
 	rs = getname(sip) ;
 
 	return rs ;
-}
-/* end subrouine (pcsnso_getfullname) */
+} /* end subrouine (pcsnso_getfullname) */
 
-
-/* ARGSUSED */
-local int pcsnso_getprojinfo(PCSNSO *op,SI *sip)
-{
+local int pcsnso_getprojinfo(PCSNSO *op,SI *sip) {
 	int		rs ;
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso/getprojinfo: ent\n") ;
+	DEBUGPRINTF("pcsnso/getprojinfo: ent\n") ;
 #endif
 
 	rs = getname(sip) ;
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso/getprojinfo: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsnso/getprojinfo: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subrouine (pcsnso_getprojinfo) */
+} /* end subrouine (pcsnso_getprojinfo) */
 
-
-local int pcsnso_client(PCSNSO *op)
-{
+local int pcsnso_client(PCSNSO *op) {
 	int		rs = MKBOOL(op->open.client) ;
 	if (! op->fl.client) {
 	    op->fl.client = TRUE ;
 	    rs = pcsnso_clientbegin(op,0) ;
 	} else if (! op->open.client) {
-	    const time_t	dt = time(NULL) ;
+	    const time_t	dt = time(nullptr) ;
 	    if ((dt - op->ti_lastcheck) >= TO_LASTCHECK) {
 		rs = pcsno_clientbegin(op,dt) ;
 	    }
 	}
 #if	CF_DEBUGS
-	debugprintf("pcsnso_client: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsnso_client: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroiutine (pcsnso_client) */
+} /* end subroiutine (pcsnso_client) */
 
-
-local int pcsnso_clientbegin(PCSNSO *op,time_t dt)
-{
+local int pcsnso_clientbegin(PCSNSO *op,time_t dt) {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 	if (! op->open.client) {
 	    PCSNSC	*pcp = &op->client ;
 	    cint	to = PCSNSO_TO ;
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 	    op->ti_lastcheck = dt ;
 	    if ((rs = pcsnsc_open(pcp,op->pr,to)) >= 0) {
 		op->open.client = TRUE ;
@@ -622,15 +570,12 @@ local int pcsnso_clientbegin(PCSNSO *op,time_t dt)
 	    }
 	} /* end if (client was not open) */
 #if	CF_DEBUGS
-	debugprintf("pcsnso_clientbegin: ret rs=%d f=%u\n",rs,f) ;
+	DEBUGPRINTF("pcsnso_clientbegin: ret rs=%d f=%u\n",rs,f) ;
 #endif
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroiutine (pcsnso_clientbegin) */
+} /* end subroutine (pcsnso_clientbegin) */
 
-
-local int pcsnso_clientend(PCSNSO *op)
-{
+local int pcsnso_clientend(PCSNSO *op) {
 	int		rs = SR_OK ;
 	if (op->open.client) {
 	    PCSNSC	*pcp = &op->client ;
@@ -662,7 +607,7 @@ local int subinfo_start(SI *sip,PCSNSO *op,char *rbuf,int rlen,
 local int subinfo_finish(SI *sip)
 {
 	int		rs = SR_OK ;
-	if (sip == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
@@ -694,7 +639,7 @@ local int getname(SI *sip)
 	int		len = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso/getname: ent u=%s w=%u\n",sip->un,sip->w) ;
+	DEBUGPRINTF("pcsnso/getname: ent u=%s w=%u\n",sip->un,sip->w) ;
 #endif
 
 	switch (w) {
@@ -705,7 +650,7 @@ local int getname(SI *sip)
 	case pcsnsreq_pcsorg:
 	    {
 	        int		i ;
-	        for (i = 0 ; getnames[i] != NULL ; i += 1) {
+	        for (i = 0 ; getnames[i] != nullptr ; i += 1) {
 	            rs = (*getnames[i])(sip) ;
 	            len = rs ;
 	            if (rs != 0) break ;
@@ -713,7 +658,7 @@ local int getname(SI *sip)
 	        if ((rs > 0) && sip->fl.setcache) {
 	            rs = pcsnsmgr_set(sip->rbuf,len,sip->un,sip->w,0) ;
 #if	CF_DEBUGS
-	            debugprintf("pcsnso/getname: pcsnsmgr_set() rs=%d\n",rs) ;
+	            DEBUGPRINTF("pcsnso/getname: pcsnsmgr_set() rs=%d\n",rs) ;
 #endif
 	        }
 	    } /* end block */
@@ -721,7 +666,7 @@ local int getname(SI *sip)
 	} /* end switch */
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso/getname: ret rs=%d len=%u\n",rs,len) ;
+	DEBUGPRINTF("pcsnso/getname: ret rs=%d len=%u\n",rs,len) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;
@@ -744,15 +689,15 @@ local int getname_var(SI *sip)
 	        int	f = (un[0] == '-') ;
 	        if (! f) {
 	            cchar	*vun = getenv(VARUSERNAME) ;
-	            if ((vun != NULL) && (vun[0] != '\0')) {
+	            if ((vun != nullptr) && (vun[0] != '\0')) {
 	                f = (strcmp(vun,un) == 0) ;
 	            }
 	        }
 	        if (f) {
 	            cchar	*var = pcsnametypes[w].var ;
-	            if (var != NULL) {
+	            if (var != nullptr) {
 	                cchar	*cp = getenv(var) ;
-	                if ((cp != NULL) && (cp[0] != '\0')) {
+	                if ((cp != nullptr) && (cp[0] != '\0')) {
 	                    rs = sncpy1(sip->rbuf,sip->rlen,cp) ;
 	                    len = rs ;
 	                }
@@ -773,12 +718,12 @@ local int getname_daemon(SI *sip)
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 #if	CF_DEBUGS
-	debugprintf("pcsnso/getname_daemon: ent\n") ;
+	DEBUGPRINTF("pcsnso/getname_daemon: ent\n") ;
 #endif
 #if	CF_PCSNSC
 	if ((op->opts & PCSNSO_ONOSERV) == 0) {
 #if	CF_DEBUGS
-	    debugprintf("pcsnso/getname_daemon: ent serv\n") ;
+	    DEBUGPRINTF("pcsnso/getname_daemon: ent serv\n") ;
 #endif
 	    if ((rs = pcsnso_client(op)) > 0) {
 	        PCSNSC		*pcp = &op->client ;
@@ -789,24 +734,24 @@ local int getname_daemon(SI *sip)
 	        if ((rs = pcsnsc_getval(pcp,rbuf,rlen,un,w)) > 0) {
 		    rl = rs ;
 #if	CF_DEBUGS
-		    debugprintf("pcsnso/getname_daemon: "
+		    DEBUGPRINTF("pcsnso/getname_daemon: "
 			"pcsnsc_getval() rs=%d\n", rs) ;
 #endif
 		} else if (isBadSend(rs)) {
 		    rs = SR_OK ;
 		}
 #if	CF_DEBUGS
-		debugprintf("pcsnso/getname_daemon: pcsnsc_open-out rs=%d\n",
+		DEBUGPRINTF("pcsnso/getname_daemon: pcsnsc_open-out rs=%d\n",
 			rs) ;
 #endif
 	    } /* end if (pcsnso_client) */
 #if	CF_DEBUGS
-	    debugprintf("pcsnso/getname_daemon: leaving rs=%d\n",rs) ;
+	    DEBUGPRINTF("pcsnso/getname_daemon: leaving rs=%d\n",rs) ;
 #endif
 	} /* end if (ok to call server) */
 #endif /* CF_PCSNSC */
 #if	CF_DEBUGS
-	debugprintf("pcsnso/getname_daemon: ret rs=%d rl=%u\n",rs,rl) ;
+	DEBUGPRINTF("pcsnso/getname_daemon: ret rs=%d rl=%u\n",rs,rl) ;
 #endif
 	return (rs >= 0) ? rl : rs ;
 }
@@ -821,24 +766,24 @@ local int getname_nsmgr(SI *sip)
 	cchar	*un = sip->un ;
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso/getname_nsmgr: ent\n") ;
+	DEBUGPRINTF("pcsnso/getname_nsmgr: ent\n") ;
 #endif
 
 	if ((rs = pcsnsmgr_get(sip->rbuf,sip->rlen,un,w)) == rsn) {
 #if	CF_DEBUGS
-	    debugprintf("pcsnso/getname_nsmgr: pcsnsmgr_get() rs=%d\n",rs) ;
+	    DEBUGPRINTF("pcsnso/getname_nsmgr: pcsnsmgr_get() rs=%d\n",rs) ;
 #endif
 	    rs = SR_OK ;
 	    sip->fl.setcache = TRUE ;
 	} else if (rs == 0) {
 #if	CF_DEBUGS
-	    debugprintf("pcsnso/getname_nsmgr: pcsnsmgr_get() rs=%d\n",rs) ;
+	    DEBUGPRINTF("pcsnso/getname_nsmgr: pcsnsmgr_get() rs=%d\n",rs) ;
 #endif
 	    sip->fl.setcache = TRUE ;
 	}
 
 #if	CF_DEBUGS
-	debugprintf("pcsnso/getname_nsmgr: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsnso/getname_nsmgr: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -854,24 +799,24 @@ local int getname_userhome(SI *sip)
 	cchar		*fn ;
 
 #if	CF_DEBUGS
-	debugprintf("pcsgetnames/getname_userhome: ent un=%s w=%u\n",un,w) ;
+	DEBUGPRINTF("pcsgetnames/getname_userhome: ent un=%s w=%u\n",un,w) ;
 #endif
 
 	fn = pcsnametypes[w].fname ;
 #if	CF_DEBUGS
-	debugprintf("pcsgetnames/getname_userhome: fn=%s\n",fn) ;
+	DEBUGPRINTF("pcsgetnames/getname_userhome: fn=%s\n",fn) ;
 #endif
-	if (fn != NULL) {
+	if (fn != nullptr) {
 	    cint	hlen = MAXPATHLEN ;
 	    char	hbuf[MAXPATHLEN + 1] ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
 	        char	tbuf[MAXPATHLEN + 1] ;
 #if	CF_DEBUGS
-	        debugprintf("pcsgetnames/getname_userhome: h=%s\n",hbuf) ;
+	        DEBUGPRINTF("pcsgetnames/getname_userhome: h=%s\n",hbuf) ;
 #endif
 	        if ((rs = mkpath2(tbuf,hbuf,fn)) >= 0) {
 #if	CF_DEBUGS
-	            debugprintf("pcsgetnames/getname_userhome: tbuf=%s\n",
+	            DEBUGPRINTF("pcsgetnames/getname_userhome: tbuf=%s\n",
 	                tbuf) ;
 #endif
 	            rs = filereadln(tbuf,sip->rbuf,sip->rlen) ;
@@ -881,7 +826,7 @@ local int getname_userhome(SI *sip)
 	} /* end if (non-null) */
 
 #if	CF_DEBUGS
-	debugprintf("pcsgetnames/getname_userhome: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsgetnames/getname_userhome: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -954,8 +899,8 @@ local int getname_sysdb(SI *sip)
 	} /* end if */
 
 #if	CF_DEBUGS
-	debugprintf("pcsnames/getname_sysdb: rn=>%r<\n",sip->rbuf,sip->rlen) ;
-	debugprintf("pcsnames/getname_sysdb: ret rs=%d len=%u\n",rs,len) ;
+	DEBUGPRINTF("pcsnames/getname_sysdb: rn=>%r<\n",sip->rbuf,sip->rlen) ;
+	DEBUGPRINTF("pcsnames/getname_sysdb: ret rs=%d len=%u\n",rs,len) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;
@@ -969,7 +914,7 @@ local int getname_pcsdef(SI *sip)
 	cint	w = sip->w ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	cchar		*fn = NULL ;
+	cchar		*fn = nullptr ;
 
 	switch (w) {
 	case pcsnsreq_projinfo:
@@ -980,7 +925,7 @@ local int getname_pcsdef(SI *sip)
 	    break ;
 	} /* end switch */
 
-	if ((rs >= 0) && (fn != NULL)) {
+	if ((rs >= 0) && (fn != nullptr)) {
 	    switch (w) {
 	    case pcsnsreq_projinfo:
 	        {
@@ -1015,7 +960,7 @@ local int getprojinfo_sysdb(SI *sip) noex {
 	int		len = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("pcsgetnames/getprojinfo_sysdb: un=%d\n",sip->un) ;
+	DEBUGPRINTF("pcsgetnames/getprojinfo_sysdb: un=%d\n",sip->un) ;
 #endif
 
 	if ((rs = bufsizeget(bufsize_pj)) >= 0) {
@@ -1046,12 +991,8 @@ local int getprojinfo_sysdb(SI *sip) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (bufsizeget) */
 
-#if	CF_DEBUGS
-	debugprintf("pcsgetnames/getprojinfo_sysdb: rs=%d len=%u\n",rs,len) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d len=%u\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getprojinfo_sysdb) */
+} /* end subroutine (getprojinfo_sysdb) */
 
 
