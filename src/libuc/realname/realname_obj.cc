@@ -111,7 +111,7 @@ int realname_esther::operator () () noex {
 	    } /* end switch */
 	}
 	return rs ;
-}
+} /* end method */
     
 int realname_esther::operator () (cchar *sp,int sl) noex {
 	int		rs = SR_BUGCHECK ;
@@ -123,7 +123,7 @@ int realname_esther::operator () (cchar *sp,int sl) noex {
 	    } /* end switch */
 	}
 	return rs ;
-}
+} /* end method */
 
 int realname_esther::operator () (cchar **sa,int sn) noex {
 	int		rs = SR_BUGCHECK ;
@@ -146,7 +146,7 @@ int realname_esther::operator () (cchar **sa,int sn) noex {
 	    } /* end switch */
 	}
 	return rs ;
-}
+} /* end method */
 
 int realname_esther::operator () (dstr *dsp) noex {
 	int		rs = SR_BUGCHECK ;
@@ -166,7 +166,7 @@ int realname_esther::operator () (dstr *dsp) noex {
 	    } /* end switch */
 	}
 	return rs ;
-}
+} /* end method */
 
 realname_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
