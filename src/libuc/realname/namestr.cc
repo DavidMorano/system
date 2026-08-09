@@ -146,7 +146,7 @@ int namestr_next(namestr *op,cchar **npp,int *fap,int *flp) noex {
 	            f = f && (op->strl > 0) ;
 	            f = f && ((op->strp[0] == ',') || isAbbr(op->strp[0])) ;
 	            if (f) {
-	                    if (isAbbr(op->strp[0])) {
+	                if (isAbbr(op->strp[0])) {
 	                    *fap = true ;
 	                } else {
 	                    *flp = true ;
