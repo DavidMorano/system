@@ -317,7 +317,7 @@ int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-} /* end subroutine (dirdb_enum) */
+} /* end subroutine (dirdb_curenum) */
 
 
 /* private subroutines */
