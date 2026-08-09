@@ -66,27 +66,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<endian.h>
-#include	<estrings.h>
-#include	<vecobj.h>
-#include	<strtab.h>
-#include	<filer.h>
-#include	<opentmp.h>
-#include	<hash.h>
-#include	<hashindex.h>
-#include	<nextpowtwo.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<strtab.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC */
+#include	<hashindex.h>		/* LIBUC */
+#include	<nextpowtwo.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"varmks.h"
 #include	"varhdr.h"
@@ -102,7 +103,7 @@ import libutil ;			/* |memclear(3u)| */
 #define	VARMKS_INDPERMS	0664
 
 #undef	RECTAB
-#define	RECTAB		struct varmks_rectab
+#define	RECTAB		varmks_rectab
 
 #ifndef	KEYBUFLEN
 #define	KEYBUFLEN	120
@@ -197,7 +198,7 @@ int varmks_open(VARMKS *op,cchar *dbname,int of,mode_t om,int n) noex {
 	if (dbname[0] == '\0') return SR_INVALID ;
 
 #if	CF_DEBUGS
-	debugprintf("varmks_open: ent dbname=%s\n",dbname) ;
+	DEBUGPRINTF("varmks_open: ent dbname=%s\n",dbname) ;
 #endif /* CF_DEBUGS */
 
 
@@ -221,16 +222,16 @@ int varmks_open(VARMKS *op,cchar *dbname,int of,mode_t om,int n) noex {
 	        }
 	        if (rs < 0) {
 	            varmks_filesend(op) ;
-		}
+		} /* end if (error) */
 	    } /* end if */
 	    if (rs < 0) {
 	        uc_free(op->dbname) ;
 	        op->dbname = nullptr ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-allocation) */
 
 #if	CF_DEBUGS
-	debugprintf("varmks_open: ret rs=%d c=%u\n",rs,c) ;
+	DEBUGPRINTF("varmks_open: ret rs=%d c=%u\n",rs,c) ;
 #endif
 
 	return (rs >= 0) ? c : rs ;
@@ -248,7 +249,7 @@ int varmks_close(VARMKS *op) noex {
 	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("varmks_close: nvars=%u\n",op->nvars) ;
+	DEBUGPRINTF("varmks_close: nvars=%u\n",op->nvars) ;
 #endif
 
 	f_go = (! op->fl.abort) ;
@@ -260,7 +261,7 @@ int varmks_close(VARMKS *op) noex {
 	}
 
 #if	CF_DEBUGS
-	debugprintf("varmks_close: varmks_mkvarfile() rs=%d\n",rs) ;
+	DEBUGPRINTF("varmks_close: varmks_mkvarfile() rs=%d\n",rs) ;
 #endif
 
 	if (op->nfd >= 0) {
@@ -279,7 +280,7 @@ int varmks_close(VARMKS *op) noex {
 	}
 
 #if	CF_DEBUGS
-	debugprintf("varmks_close: varmks_renamefiles() rs=%d\n",rs) ;
+	DEBUGPRINTF("varmks_close: varmks_renamefiles() rs=%d\n",rs) ;
 #endif
 
 	rs1 = varmks_filesend(op) ;
@@ -292,7 +293,7 @@ int varmks_close(VARMKS *op) noex {
 	}
 
 #if	CF_DEBUGS
-	debugprintf("varmks_close: ret=%d\n",rs) ;
+	DEBUGPRINTF("varmks_close: ret=%d\n",rs) ;
 #endif /* CF_DEBUGS */
 
 	op->magval = 0 ;
@@ -310,7 +311,7 @@ int varmks_addvar(VARMKS *op,cchar *k,cchar *vp,int vl) noex {
 	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
-	debugprintf("varmks_addvar: k=%s v=>%r<\n",k,vp,vl) ;
+	DEBUGPRINTF("varmks_addvar: k=%s v=>%r<\n",k,vp,vl) ;
 #endif
 
 	if ((rs = strtab_add(&op->keys,k,-1)) >= 0) {
@@ -324,7 +325,7 @@ int varmks_addvar(VARMKS *op,cchar *k,cchar *vp,int vl) noex {
 	}
 
 #if	CF_DEBUGS
-	debugprintf("varmks_addvar: ret=%d\n",rs) ;
+	DEBUGPRINTF("varmks_addvar: ret=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -360,7 +361,7 @@ local int varmks_filesbegin(VARMKS *op) noex {
 	    c = rs ;
 	}
 #if	CF_DEBUGS
-	debugprintf("varmks_filesbegin: ret rs=%d c=%u\n",rs,c) ;
+	DEBUGPRINTF("varmks_filesbegin: ret rs=%d c=%u\n",rs,c) ;
 #endif
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (varmks_filesbegin) */
@@ -388,7 +389,7 @@ local int varmks_filesbeginc(VARMKS *op) noex {
 	        rs = varmks_filesbegincreate(op,tfn,of,om) ;
 		if ((rs < 0) && type) {
 		    uc_unlink(rbuf) ;
-		}
+		} /* end if (error) */
 	    } /* end if (ok) */
 	} /* end if (mknewfname) */
 	return rs ;
@@ -408,7 +409,7 @@ local int varmks_filesbeginwait(VARMKS *op) noex {
 	    int			to = VARMKS_INTOPEN ;
 	    while ((rs = varmks_filesbegincreate(op,tbuf,of,om)) == nrs) {
 #if	CF_DEBUGS
-	        debugprintf("varmks_filesbeginwait: loop ret rs=%d\n",rs) ;
+	        DEBUGPRINTF("varmks_filesbeginwait: loop ret rs=%d\n",rs) ;
 #endif
 	        c = 1 ;
 	        sleep(1) ;
@@ -422,7 +423,7 @@ local int varmks_filesbeginwait(VARMKS *op) noex {
 	    }
 	} /* end if (mknewfname) */
 #if	CF_DEBUGS
-	debugprintf("varmks_filesbeginwait: ret ret rs=%d\n",rs) ;
+	DEBUGPRINTF("varmks_filesbeginwait: ret ret rs=%d\n",rs) ;
 #endif
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (varmks_filesbeginwait) */
@@ -433,8 +434,8 @@ local int varmks_filesbegincreate(VARMKS *op,cc *tfn,int of,mode_t om) noex {
 	{
 	    char	obuf[100+1] ;
 	    snflagsopen(obuf,100,of) ;
-	    debugprintf("varmks_filesbegincreate: ent of=%s\n",obuf) ;
-	    debugprintf("varmks_filesbegincreate: om=%05o\n",om) ;
+	    DEBUGPRINTF("varmks_filesbegincreate: ent of=%s\n",obuf) ;
+	    DEBUGPRINTF("varmks_filesbegincreate: om=%05o\n",om) ;
 	}
 #endif
 	if ((rs = uc_open(tfn,of,om)) >= 0) {
@@ -448,7 +449,7 @@ local int varmks_filesbegincreate(VARMKS *op,cc *tfn,int of,mode_t om) noex {
 	} /* end if (create) */
 
 #if	CF_DEBUGS
-	debugprintf("varmks_filesbegincreate: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("varmks_filesbegincreate: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -471,7 +472,7 @@ local int varmks_filesend(VARMKS *op) noex {
 	    op->idname = nullptr ;
 	}
 #if	CF_DEBUGS
-	debugprintf("varmks_filesend: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("varmks_filesend: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
 }
@@ -485,11 +486,11 @@ local int varmks_listbegin(VARMKS *op,int n) noex {
 	        rs = rectab_start(&op->rectab,n) ;
 	        if (rs < 0) {
 	            strtab_finish(&op->vals) ;
-		}
+		} /* end if (error) */
 	    } /* end if (strtab-vals) */
 	    if (rs < 0) {
 	        strtab_finish(&op->keys) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (strtab-keys) */
 	return rs ;
 } /* end subroutine (varmks_listbegin) */
@@ -531,7 +532,7 @@ local int varmks_mkvarfiler(VARMKS *op) noex {
 	int		wlen = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("varmks_mkidx: ent\n") ;
+	DEBUGPRINTF("varmks_mkidx: ent\n") ;
 #endif
 
 	if ((rs = varmks_nidxopen(op)) >= 0) {
@@ -565,7 +566,7 @@ local int varmks_mkvarfiler(VARMKS *op) noex {
 	} /* end if (varmks_nidx) */
 
 #if	CF_DEBUGS
-	debugprintf("varmks_mkidx: ret rs=%d wlen=%u\n",rs,wlen) ;
+	DEBUGPRINTF("varmks_mkidx: ret rs=%d wlen=%u\n",rs,wlen) ;
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
@@ -672,7 +673,7 @@ int varmks_mkind(varmks *op,cc *kst,int (*it)[3],int il) noex {
 	rtl = rectab_getvec(&op->rectab,&rt) ;
 
 #if	CF_DEBUGS
-	debugprintf("varmks_mkind: rtl=%u\n",rtl) ;
+	DEBUGPRINTF("varmks_mkind: rtl=%u\n",rtl) ;
 #endif
 
 #if	CF_FIRSTHASH
@@ -731,7 +732,7 @@ int varmks_mkind(varmks *op,cc *kst,int (*it)[3],int il) noex {
 	        kp = kst + ki ;
 
 #if	CF_DEBUGS
-	        debugprintf("varmks_mkind: ri=%u k=%s\n",ri,
+	        DEBUGPRINTF("varmks_mkind: ri=%u k=%s\n",ri,
 	            kp,strnlen(kp,20)) ;
 #endif
 
@@ -757,7 +758,7 @@ int varmks_mkind(varmks *op,cc *kst,int (*it)[3],int il) noex {
 	    sc = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("varmks_mkind: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("varmks_mkind: ret rs=%d\n",rs) ;
 #endif
 
 	return (rs >= 0) ? sc : rs ;
@@ -789,7 +790,7 @@ local int varmks_nidxopen(VARMKS *op) noex {
 	int		rs ;
 	int		fd = -1 ;
 #if	CF_DEBUGS
-	debugprintf("varmks_nidxopen: ent nidxfname=%s\n",op->nidxfname) ;
+	DEBUGPRINTF("varmks_nidxopen: ent nidxfname=%s\n",op->nidxfname) ;
 #endif
 	if (op->nidxfname == nullptr) {
 	    cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
@@ -824,7 +825,7 @@ local int varmks_nidxopen(VARMKS *op) noex {
 	    fd = rs ;
 	}
 #if	CF_DEBUGS
-	debugprintf("varmks_nidxopen: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("varmks_nidxopen: ret rs=%d\n",rs) ;
 #endif
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (varmks_nidxopen) */
@@ -963,16 +964,16 @@ local int indinsert(uint (*rt)[2],uint (*it)[3],int il,varentry *vep) noex {
 	chash = (nhash & INT_MAX) ;
 
 #if	CF_DEBUGS
-	debugprintf("indinsert: ve ri=%u ki=%u khash=%08X hi=%u\n",
+	DEBUGPRINTF("indinsert: ve ri=%u ki=%u khash=%08X hi=%u\n",
 	    vep->ri,vep->ki,vep->khash,vep->hi) ;
-	debugprintf("indinsert: il=%u loop 1\n",il) ;
+	DEBUGPRINTF("indinsert: il=%u loop 1\n",il) ;
 #endif
 
 /* CONSTCOND */
 	while (true) {
 
 #if	CF_DEBUGS
-	    debugprintf("indinsert: it%u ri=%u nhi=%u\n",
+	    DEBUGPRINTF("indinsert: it%u ri=%u nhi=%u\n",
 	        hi,it[hi][0],it[hi][2]) ;
 #endif
 
@@ -990,7 +991,7 @@ local int indinsert(uint (*rt)[2],uint (*it)[3],int il,varentry *vep) noex {
 	    hi = hashindex(nhash,il) ;
 
 #if	CF_DEBUGS
-	    debugprintf("indinsert: nhash=%08X nhi=%u\n",nhash,hi) ;
+	    DEBUGPRINTF("indinsert: nhash=%08X nhi=%u\n",nhash,hi) ;
 #endif
 
 	} /* end while */
@@ -998,7 +999,7 @@ local int indinsert(uint (*rt)[2],uint (*it)[3],int il,varentry *vep) noex {
 	if (it[hi][0] > 0) {
 
 #if	CF_DEBUGS
-	    debugprintf("indinsert: loop 2\n") ;
+	    DEBUGPRINTF("indinsert: loop 2\n") ;
 #endif
 
 	    lhi = hi ;
@@ -1008,7 +1009,7 @@ local int indinsert(uint (*rt)[2],uint (*it)[3],int il,varentry *vep) noex {
 	    hi = hashindex((lhi + 1),il) ;
 
 #if	CF_DEBUGS
-	    debugprintf("indinsert: loop 3 lhi=%u\n",lhi) ;
+	    DEBUGPRINTF("indinsert: loop 3 lhi=%u\n",lhi) ;
 #endif
 
 	    while (it[hi][0] > 0)
@@ -1017,7 +1018,7 @@ local int indinsert(uint (*rt)[2],uint (*it)[3],int il,varentry *vep) noex {
 	    it[lhi][2] = hi ;
 
 #if	CF_DEBUGS
-	    debugprintf("indinsert: loop 3 it%u ki=%u nhi=%u\n",lhi,
+	    DEBUGPRINTF("indinsert: loop 3 it%u ki=%u nhi=%u\n",lhi,
 	        it[lhi][0],hi) ;
 #endif
 
@@ -1028,7 +1029,7 @@ local int indinsert(uint (*rt)[2],uint (*it)[3],int il,varentry *vep) noex {
 	it[hi][2] = 0 ;
 
 #if	CF_DEBUGS
-	debugprintf("indinsert: ret hi=%u c=%u\n",hi,c) ;
+	DEBUGPRINTF("indinsert: ret hi=%u c=%u\n",hi,c) ;
 #endif
 
 	return c ;
