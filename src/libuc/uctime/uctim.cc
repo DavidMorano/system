@@ -82,12 +82,12 @@
 #include	<ptm.h>			/* LIBU */
 #include	<ptc.h>			/* LIBU */
 #include	<pta.h>			/* LIBU */
-#include	<upt.h>			/* LIBUC */
-#include	<vechand.h>		/* vector-handles */
-#include	<vecsorthand.h>		/* LIBUC vector-sorted-handles */
-#include	<ciq.h>			/* LIBUC container-interlocked-queue */
+#include	<upt.h>			/* LIBU */
 #include	<timespec.h>		/* LIBU */
 #include	<itimerspec.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC vector-handles */
+#include	<vecsorthand.h>		/* LIBUC vector-sorted-handles */
+#include	<ciq.h>			/* LIBUC container-interlocked-queue */
 #include	<sigevent.h>		/* LIBUC */
 #include	<psem.h>		/* LIBUC POSIX® semaphore */
 #include	<localmisc.h>		/* LIBU */
