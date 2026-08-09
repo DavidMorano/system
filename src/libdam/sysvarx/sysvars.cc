@@ -67,9 +67,9 @@
 #include	<isnot.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<var.h>			/* LIBDAM */
 
 #include	"sysvars.h"
-#include	"var.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -475,7 +475,7 @@ int sysvars_curenum(SVS *op,SVS_C *curp,char *kp,int kl,char *vp,int vl) noex {
 	    rs = SR_BUGCHECK ;
 	    if (curp->vcurp) ylikely {
 	        var_cur		*vcp = (var_cur *) curp->vcurp ;
-		rs = var_enum(op->vindp,vcp,kp,kl,vp,vl) ;
+		rs = var_curenum(op->vindp,vcp,kp,kl,vp,vl) ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	if ((rs < 0) && vp) {
@@ -534,7 +534,7 @@ local int sysvars_indopenseq(SVS *op,SI *sip) noex {
 	    expcook	cooks ;
 	    cint	vn = 6 ;
 	    cint	vo = vecstrm.compact ;
-	    if (vecstr sdirs ; (rs = vecstr_start(&sdirs,vn,vo)) >= 0) {
+	    if (vecstr sdirs ; (rs = sdirs.start(vn,vo)) >= 0) {
 	        if ((rs = expcook_start(&cooks)) >= 0) {
 		    if ((rs = sysvars_loadcooks(op,&cooks)) >= 0) ylikely {
 			rs = sysvars_indopenseqer(op,sip,&ds,&sdirs,&cooks) ;
@@ -542,7 +542,7 @@ local int sysvars_indopenseq(SVS *op,SI *sip) noex {
 		    rs1 = expcook_finish(&cooks) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (expcooks_loadcooks) */
-		rs1 = vecstr_finish(&sdirs) ;
+		rs1 = sdirs.finish ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (vecstr) */
 	    rs1 = dirseen_finish(&ds) ;
