@@ -15,7 +15,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<svcfile.h>		/* for type |svcfile_ent| */
+#include	<svcfile.h>		/* LIBDAM for type |svcfile_ent| */
 
 
 #define	SVCKEY		struct svckey_head
