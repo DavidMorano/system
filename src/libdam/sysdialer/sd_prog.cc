@@ -1343,7 +1343,7 @@ local int subinfo_procopts(SI *sip,keyopt *kop)
 	    int		kl, vl ;
 	    cchar	*kp, *vp ;
     
-	    while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	    while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	    if ((oi = matostr(procopts,2,kp,kl)) >= 0) {
 
@@ -2458,7 +2458,7 @@ cchar		sysvardb[] ;
 	    if ((sysvar_curbegin(&sv,&cur)) >= 0) {
 
 	        while (rs >= 0) {
-	            vl = sysvar_enum(&sv,&cur,kbuf,KBUFLEN,vbuf,vlen) ;
+	            vl = sysvar_curenum(&sv,&cur,kbuf,KBUFLEN,vbuf,vlen) ;
 	            if (vl == SR_NOTFOUND) break ;
  		    rs = vl ;
 
