@@ -93,12 +93,12 @@ struct clusterdb_file {
 	cchar		*fname ;
 	time_t		mtime ;
 	uint		fsize ;
-} ;
+} ; /* end struct */
 
 struct clusterdb_keyname {
 	cchar		*kname ;
 	int		count ;
-} ;
+} ; /* end struct */
 
 struct clusterdb_ie {
 	cchar		*(*keys)[2] ;
@@ -108,21 +108,21 @@ struct clusterdb_ie {
 	int		nkeys ;			/* number of keys */
 	int		fsize ;			/* total size */
 	int		fi ;			/* file index */
-} ;
+} ; /* end struct */
 
 struct svcentry {
 	vecobj		keys ;
 	cchar		*svc ;
 	cchar		*clu ;
 	cchar		*sys ;
-} ;
+} ; /* end struct */
 
 struct svcentry_key {
 	cchar		*kname ;
 	cchar		*args ;
 	int		kl ;
 	int		al ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -193,8 +193,7 @@ int clusterdb_open(clusterdb *op,cchar *fname) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (clusterdb_open) */
+} /* end subroutine (clusterdb_open) */
 
 int clusterdb_close(clusterdb *op) noex {
 	int		rs ;
@@ -211,8 +210,7 @@ int clusterdb_close(clusterdb *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (clusterdb_close) */
+} /* end subroutine (clusterdb_close) */
 
 int clusterdb_fileadd(clusterdb *op,cchar *fname) noex {
 	int		rs ;
@@ -223,8 +221,7 @@ int clusterdb_fileadd(clusterdb *op,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (clusterdb_fileadd) */
+} /* end subroutine (clusterdb_fileadd) */
 
 int clusterdb_curbegin(CD *op,CD_CUR *curp) noex {
 	int		rs ;
@@ -245,8 +242,7 @@ int clusterdb_curbegin(CD *op,CD_CUR *curp) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rsc : rs ;
-}
-/* end subroutine (clusterdb_curbegin) */
+} /* end subroutine (clusterdb_curbegin) */
 
 int clusterdb_curend(CD *op,CD_CUR *curp) noex {
 	int		rs ;
@@ -263,8 +259,7 @@ int clusterdb_curend(CD *op,CD_CUR *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (clusterdb_curend) */
+} /* end subroutine (clusterdb_curend) */
 
 int clusterdb_curenumcluster(CD *op,CD_CUR *curp,char *kbuf,int klen) noex {
 	int		rs ;
@@ -273,8 +268,7 @@ int clusterdb_curenumcluster(CD *op,CD_CUR *curp,char *kbuf,int klen) noex {
 	    rs = kvsfile_curenumkey(op->ctp,kcp,kbuf,klen) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (clusterdb_curenumcluster) */
+} /* end subroutine (clusterdb_curenumcluster) */
 
 int clusterdb_curenum(CD *op,CD_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
@@ -284,8 +278,7 @@ int clusterdb_curenum(CD *op,CD_CUR *curp,char *kbuf,int klen,
 	    rs = kvsfile_curenum(op->ctp,kcp,kbuf,klen,vbuf,vlen) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (clusterdb_curenum) */
+} /* end subroutine (clusterdb_curenum) */
 
 int clusterdb_curfetch(CD *op,cc *cn,CD_CUR *curp,char *vbuf,int vlen) noex {
 	int		rs ;
@@ -394,8 +387,7 @@ fetcher::operator int () noex {
 	    } /* end if (kvsfile-cursor) */
 	} /* end if */
 	return rs ;
-}
-/* end method (fetcher::operator) */
+} /* end method (fetcher::operator) */
 
 int clusterdb_check(CD *op,time_t daytime) noex {
 	int		rs ;
