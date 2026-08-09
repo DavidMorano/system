@@ -1612,7 +1612,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
@@ -1622,7 +1622,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	            if ((oi = matostr(progopts,2,kp,kl)) >= 0) {
 	                int	v = 0 ;
 
-	                vl = keyopt_enumvalues(kop,kp,NULL,&vp) ;
+	                vl = keyopt_curenumvals(kop,kp,NULL,&vp) ;
 
 	                switch (oi) {
 	                case progopt_quiet:
