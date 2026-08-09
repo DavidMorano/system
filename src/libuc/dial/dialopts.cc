@@ -98,7 +98,7 @@ namespace {
 
 /* forward references */
 
-static inline bool	btst(int w,int n) noex {
+local inline bool btst(int w,int n) noex {
 	return ((w >> n) & 1) ;
 } /* end subroutine */
 
@@ -109,6 +109,8 @@ constexpr bool		f_linger = CF_LINGER ;
 
 
 /* exported variables */
+
+const dialoptms 	dialoptm ;
 
 
 /* exported subroutines */
