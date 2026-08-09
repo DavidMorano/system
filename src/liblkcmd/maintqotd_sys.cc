@@ -210,7 +210,7 @@ static int procsystems(PROGINFO *pip,void *ofp,cchar *sfname) noex {
 	            SYSTEMS_ENT	*sep ;
 	            debugprintf("b_rfinger: sysnames: \n") ;
 	            systems_curbegin(&sysdb,&cur) ;
-	            while (systems_enum(&sysdb,&cur,&sep) >= 0) {
+	            while (systems_curenum(&sysdb,&cur,&sep) >= 0) {
 	                debugprintf("b_rfinger: sysname=%s\n",sep->sysname) ;
 	            }
 	            systems_curend(&sysdb,&cur) ;
