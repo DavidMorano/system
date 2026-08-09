@@ -246,7 +246,7 @@ int keysymer_curend(keysymer *op,keysymer_cur *curp) noex {
 	return rs ;
 } /* end subroutine (keysymer_curend) */
 
-int keysymer_enum(keysymer *op,keysymer_cur *curp,keysymer_ke *rp) noex {
+int keysymer_curenum(keysymer *op,keysymer_cur *curp,keysymer_ke *rp) noex {
 	int		rs ;
 	int		sl = 0 ;
 	if ((rs = keysymer_magic(op,curp,rp)) >= 0) {
@@ -263,7 +263,7 @@ int keysymer_enum(keysymer *op,keysymer_cur *curp,keysymer_ke *rp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
-} /* end subroutine (keysymer_enum) */
+} /* end subroutine (keysymer_curenum) */
 
 
 /* private subroutines */
