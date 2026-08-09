@@ -48,7 +48,7 @@ struct svcfile_head {
 	vecobj		*slp ;		/* service-list-pointer */
 	hdb		*elp ;		/* entry-list-pointer */
 	time_t		checktime ;
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 } ; /* end struct */
 
