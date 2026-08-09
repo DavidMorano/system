@@ -27,17 +27,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<estrings.h>
-#include	<nleadstr.h>
-#include	<matstr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSYD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"svckv.h"
 
@@ -65,7 +65,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-static bool	ourmat(cchar *,cchar *,int) noex ;
+local bool	ourmat(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -105,8 +105,7 @@ int svckv_val(cchar *(*kv)[2],int n,cchar *sp,cchar **vpp) noex {
 	    }
 	} /* end for */
 	return vl ;
-}
-/* end subroutine (svckv_val) */
+} /* end subroutine (svckv_val) */
 
 int svckv_dequote(cchar *(*kv)[2],int n,cchar *sp,cchar **vpp) noex {
 	int		cl = 0 ;
@@ -117,33 +116,35 @@ int svckv_dequote(cchar *(*kv)[2],int n,cchar *sp,cchar **vpp) noex {
 	}
 	if (vpp) *vpp = cp ;
 	return cl ;
-}
-/* end subroutine (svckv_dequote) */
+} /* end subroutine (svckv_dequote) */
 
 int svckv_isfile(cchar *(*kv)[2],int n,cchar **vpp) noex {
 	int		vl ;
 	cchar		*sp = "file" ;
+	{
 	vl = svckv_val(kv,n,sp,vpp) ;
+	}
 	return vl ;
-}
-/* end subroutine (svckv_isfile) */
+} /* end subroutine (svckv_isfile) */
 
 int svckv_ispass(cchar *(*kv)[2],int n,cchar **vpp) noex {
 	int		vl ;
 	cchar		*sp = "passfile" ;
+	{
 	vl = svckv_val(kv,n,sp,vpp) ;
+	}
 	return vl ;
-}
-/* end subroutine (svckv_ispass) */
+} /* end subroutine (svckv_ispass) */
 
 #ifdef	COMMENT
 int svckv_islib(cchar *(*kv)[2],int n,cchar **vpp) noex {
 	int		vl ;
 	cchar		*sp = "so" ;
+	{
 	vl = svckv_val(kv,n,sp,vpp) ;
+	}
 	return vl ;
-}
-/* end subroutine (svckv_islib) */
+} /* end subroutine (svckv_islib) */
 #endif /* COMMENT */
 
 int svckv_isprog(cchar *(*kv)[2],int n,cchar **vpp) noex {
@@ -151,10 +152,9 @@ int svckv_isprog(cchar *(*kv)[2],int n,cchar **vpp) noex {
 	for (int i = 0 ; isexecs[i] != nullptr ; i += 1) {
 	    vl = svckv_val(kv,n,isexecs[i],vpp) ;
 	    if (vl > 0) break ;
-	}
+	} /* end for */
 	return vl ;
-}
-/* end subroutine (svckv_isprog) */
+} /* end subroutine (svckv_isprog) */
 
 /* return (as the integer return value) a bit-set of options from the SVCENT */
 int svckv_svcopts(cchar *(*kv)[2],int n) noex {
@@ -180,22 +180,20 @@ int svckv_svcopts(cchar *(*kv)[2],int n) noex {
 	                ow |= (1 << ii) ;
 	            }
 	        }
-	    }
+	    } /* end if (non-zero positive) */
 	} /* end if (svckv) */
 	return ow ;
-}
-/* end subroutine (svckv_svcopts) */
+} /* end subroutine (svckv_svcopts) */
 
 
 /* local subrouties */
 
-static bool ourmat(cchar *sk,cchar *sp,int nl) noex {
+local bool ourmat(cchar *sk,cchar *sp,int nl) noex {
 	bool		f = false ;
 	if (int m ; (m = nleadstr(sk,sp,nl)) >= 1) {
 	    f = (m == nl) ;
 	}
 	return f ;
-}
-/* end subroutine (ourmat) */
+} /* end subroutine (ourmat) */
 
 
