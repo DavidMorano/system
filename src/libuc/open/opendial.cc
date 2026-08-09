@@ -43,10 +43,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -87,6 +87,8 @@ typedef const mainv	cmv ;
 
 
 /* exported variables */
+
+const opendialoptms	optdialoptm ;
 
 
 /* exported subroutines */
