@@ -50,7 +50,7 @@
 #include	<strwcmp.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strnxchr.h>		/* LIBUC */
-#include	<strnxcmp.h>		/* LINUC |strnncmp(3uc)| */
+#include	<strnxcmp.h>		/* LIBUC |strnncmp(3uc)| */
 #include	<ischarx.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
