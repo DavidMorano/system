@@ -155,7 +155,7 @@ int progopts(PROGINFO *pip,keyopt *kop)
 		cchar	*kp, *vp ;
 
 	        while (rs >= 0) {
-	            kl = keyopt_enumkeys(kop,&kcur,&kp) ;
+	            kl = keyopt_curenumkeys(kop,&kcur,&kp) ;
 	            if (kl == SR_NOTFOUND) break ;
 	            rs = kl ;
 	            if (rs < 0) break ;
