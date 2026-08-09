@@ -75,7 +75,6 @@ import libutil ;			/* |memclear(3u)| */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::mem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -96,12 +95,13 @@ template<typename ... Args>
 local int recipient_ctor(recipient *op,Args ... args) noex {
     	RECIPIENT	*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->hlp = new(nothrow) hdb) != np) ylikely {
-	        if ((op->nlp = new(nothrow) vecstr) != np) ylikely {
+	    if ((op->hlp = new(nt) hdb) != np) ylikely {
+	        if ((op->nlp = new(nt) vecstr) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-vecstr) */
 		if (rs < 0) {
@@ -353,7 +353,7 @@ int recipient_sort(RC *vhp) noex {
 
 #endif /* COMMENT */
 
-int recipient_enumhost(RC *op,RC_HCUR *hcp,cchar **hnpp) noex {
+int recipient_hcurenum(RC *op,RC_HCUR *hcp,cchar **hnpp) noex {
 	int		rs ;
 	if ((rs = recipient_magic(op,hcp)) >= 0) {
 	    cchar	*dump{} ;
@@ -366,7 +366,7 @@ int recipient_enumhost(RC *op,RC_HCUR *hcp,cchar **hnpp) noex {
 	*hcp = (rs >= 0) ? i : -1 ;
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (recipient_enumhost) */
+} /* end subroutine (recipient_hcurenum) */
 
 /* fetch the next entry value that matches the given host name */
 int recipient_fetchvalue(RC *op,cc *host,RC_VCUR *vcp,RC_VAL **vepp) noex {
