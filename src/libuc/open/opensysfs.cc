@@ -47,9 +47,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
@@ -61,6 +61,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<vecpstr.h>		/* LIBUC */
@@ -103,10 +104,6 @@ import unixfnames ;
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_closeonexec(int,int) noex ;
-    extern int uc_unlink(cchar *) noex ;
-} /* end extern */
 
 /* external variables */
 
@@ -177,11 +174,11 @@ constexpr cpcchar	envbads[] = {
 namespace libuc {
     int opensysfs(opensysdbs w,int of,int ttl) noex {
 	int		rs = SR_INVALID ;
-	if ((w >= 0) && (w < opensysdb_overlast)) {
+	if ((w >= 0) && (w < opensysdb_overlast)) ylikely {
 	    rs = SR_BADF ;
 	    if (ttl < 0) ttl = OPENSYSFS_DEFTTL ;
-	    if ((of & O_ACCMODE) == O_RDONLY) {
-		if (static cint rsv = var ; (rs = rsv) >= 0) {
+	    if ((of & O_ACCMODE) == O_RDONLY) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	            switch (w) {
 	            case opensysdb_userhomes:
 	            case opensysdb_usernames:
@@ -229,13 +226,13 @@ local int opencfile(int w,int of,int ttl) noex {
 	int		rs1 ;
 	int		fd = -1 ; /* return-value */
 	int		ai = 0 ;
-	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 	    cchar	*sdname = OPENSYSFS_SYSDNAME ;
 	    cchar	*gcname = opensysdb[w] ;
 	    char	*gfname = (a + ((maxpath + 1) * ai++)) ;
-	    if ((rs = mkrealpath(gfname,w,sdname,gcname)) > 0) {
+	    if ((rs = mkrealpath(gfname,w,sdname,gcname)) > 0) ylikely {
 	        time_t	dt = 0 ;
-	        if (ustat sb ; (rs = u_stat(gfname,&sb)) >= 0) {
+	        if (ustat sb ; (rs = u_stat(gfname,&sb)) >= 0) ylikely {
 		    mode_t	mm = MINPERMS ;
 	            time_t	mt = sb.st_mtime ;
 		    cchar	*ufn = nullptr ;
@@ -266,7 +263,7 @@ local int opencfile(int w,int of,int ttl) noex {
 	                } /* end switch */
 	            } /* end if (ttl) */
 		    (void) ufn ;
-	            if ((rs >= 0) && (ttl >= 0)) {
+	            if ((rs >= 0) && (ttl >= 0)) ylikely {
 	                switch (w) {
 	                case opensysdb_userhomes:
 	                    {
@@ -287,7 +284,7 @@ local int opencfile(int w,int of,int ttl) noex {
 	                } /* end switch */
 	            } /* end if (alternate test) */
 #ifdef	COMMENT
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                if (strcmp(dbfnames[w],STDFNNULL) != 0) {
 	                    if ((rs = u_stat(dbfnames[w],&sb)) >= 0) {
 	                        if (dt == 0) dt = time(nullptr) ;
@@ -311,7 +308,7 @@ local int opencfile(int w,int of,int ttl) noex {
 	            } /* end switch */
 	        } /* end (not-found or stale) */
 	        if (rs >= 0) {
-	            if ((rs = u_open(gfname,of,0666)) >= 0) {
+	            if ((rs = u_open(gfname,of,0666)) >= 0) ylikely {
 	                fd = rs ;
 	                if (of & O_CLOEXEC) {
 	                    rs = uc_closeonexec(fd,true) ;
@@ -331,7 +328,7 @@ local int opencfile(int w,int of,int ttl) noex {
 local int mkrealpath(char *gfname,int w,cchar *sdname,cchar *gcname) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *cbuf ; (rs = lm_mp(&cbuf)) >= 0) {
+	if (char *cbuf ; (rs = lm_mp(&cbuf)) >= 0) ylikely {
 	    cint	slen = szof(REALNAMESUF) + 10 ;
 	    cint	clen = rs ;
 	    cchar	*suf = REALNAMESUF ;
@@ -377,15 +374,15 @@ local int runmkpwi(int w,cchar *dbp,int dbl) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pn = OPENSYSFS_PROGMKPWI ;
-	if (ids id ; (rs = ids_load(&id)) >= 0) {
+	if (ids id ; (rs = ids_load(&id)) >= 0) ylikely {
 	    cint	sz = ((var.maxpathlen + 1) + (var.maxnamelen + 1)) ;
 	    cint	maxpath = var.maxpathlen ;
 	    int		ai = 0 ;
-	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 		cint	zlen = maxpath ;
-	        char	*pfname = (a + ((maxpath + 1) * ai++)) ;
-	        char	*zbuf = (a + ((maxpath + 1) * ai++)) ;
-	        if ((rs = findprog(&id,pfname,pn)) > 0) {
+	        char	*pfname	= (a + ((maxpath + 1) * ai++)) ;
+	        char	*zbuf	= (a + ((maxpath + 1) * ai++)) ;
+	        if ((rs = findprog(&id,pfname,pn)) > 0) ylikely {
 	            int		cs = 0 ;
 	            cchar	*av[3] ;
 	            if ((rs = sncpyuc(zbuf,zlen,pn)) >= 0) {
@@ -394,7 +391,7 @@ local int runmkpwi(int w,cchar *dbp,int dbl) noex {
 	                    mainv	ev = nullptr ;
 	                    if (rs >= 0) {
 	                        cchar	*cp ;
-	                        int		cl ;
+	                        int	cl ;
 	                        cchar	*evar = "MKPWI_PROGRAMROOT" ;
 	                        if ((cl = sfprogroot(pfname,-1,&cp)) > 0) {
 	                            rs = envhelp_envset(&env,evar,cp,cl) ;
@@ -444,7 +441,7 @@ local int runsysfs(int w) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pn = OPENSYSFS_PROGSYSFS ;
-	if (ids id ; (rs = ids_load(&id)) >= 0) {
+	if (ids id ; (rs = ids_load(&id)) >= 0) ylikely {
 	    cint	maxpath = var.maxpathlen ;
 	    cint	maxname = var.maxnamelen ;
 	    int		ai = 0 ;
@@ -452,16 +449,16 @@ local int runsysfs(int w) noex {
 	    sz += (var.maxpathlen + 1) ;
 	    sz += (var.maxnamelen + 1) ;
 	    sz += (var.usernamelen + 1) ;
-	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 		cint	zlen = maxpath ;
 		cint	alen = maxname ;
-	        char	*pfname = (a + ((maxpath + 1) * ai++)) ;
-	        char	*zbuf = (a + ((maxpath + 1) * ai++)) ;
-	        char	*abuf = (a + ((maxname + 1) * ai++)) ;
-	        if ((rs = findprog(&id,pfname,pn)) > 0) {
+	        char	*pfname	= (a + ((maxpath + 1) * ai++)) ;
+	        char	*zbuf	= (a + ((maxpath + 1) * ai++)) ;
+	        char	*abuf	= (a + ((maxname + 1) * ai++)) ;
+	        if ((rs = findprog(&id,pfname,pn)) > 0) ylikely {
 	            int		cs = 0 ;
 	            cchar	*av[3] ;
-	            if ((rs = sncpyuc(zbuf,zlen,pn)) >= 0) {
+	            if ((rs = sncpyuc(zbuf,zlen,pn)) >= 0) ylikely {
 	                spawnproc_con	ps{} ;
 	                mainv		ev = nullptr ;
 	                if ((rs = ctdeci(abuf,alen,w)) >= 0) {
@@ -495,8 +492,8 @@ local int findprog(ids *idp,char *pfname,cchar *pn) noex {
 	int		rs1 ;
 	int		pl = 0 ;
 	pfname[0] = '\0' ;
-	if (dirseen dirs ; (rs = dirs.start) >= 0) {
-	    if (vecpstr dhist ; (rs = dhist.start(4,0,0)) >= 0) {
+	if (dirseen dirs ; (rs = dirs.start) >= 0) ylikely {
+	    if (vecpstr dhist ; (rs = dhist.start(4,0,0)) >= 0) ylikely {
 	        bool	f = false ;
 	        cchar	*pr ; /* used-multiple */
 	        for (int i = 0 ; (rs >= 0) && prvars[i] ; i += 1) {
@@ -544,9 +541,9 @@ local int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 	int		rs ;
 	int		pl = 0 ; /* return-value */
 	bool		f = false ;
-	if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) {
-	    if (S_ISDIR(sb.st_mode)) {
-		if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) ylikely {
+	    if (S_ISDIR(sb.st_mode)) ylikely {
+		if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 	            for (int i = 0 ; (rs >= 0) && prbins[i] ; i += 1) {
 	                if ((rs = mkpath2(tbuf,pr,prbins[i])) >= 0) {
 	                    cint	dl = rs ;
@@ -579,11 +576,11 @@ local int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 	    maxnamelen = rs ;
-	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	        maxpathlen = rs ;
-	        if ((rs = bufsizeget(bufsize_un)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 		    usernamelen = rs ;
 	        }
 	    }
