@@ -28,28 +28,28 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<vecitem.h>
-#include	<ascii.h>
-#include	<mallocstuff.h>
-#include	<getpwd.h>
-#include	<mkpathx.h>
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<matstr.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<getpwd.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<vecitem.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"srvtab.h"
 
@@ -112,7 +112,7 @@ constexpr cchar		key_terms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
-} ;
+} ; /* end array */
 
 /* argument field terminators (pound '#' and comma ',') */
 constexpr cchar		saterms[32] = {
@@ -124,7 +124,7 @@ constexpr cchar		saterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 enum srvkeys {
 	srvkey_program,
@@ -141,9 +141,9 @@ enum srvkeys {
 	srvkey_passfile,
 	srvkey_project,
 	srvkey_overlast
-} ;
+} ; /* end enum */
 
-constexpr cpcchar	srvkeys[] = {
+constexpr cpcchar	srvkeynames[] = {
 	"program",
 	"arguments",
 	"args",
@@ -157,8 +157,8 @@ constexpr cpcchar	srvkeys[] = {
 	"addr",
 	"passfile",
 	"project",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 
 /* exported variables */
@@ -167,17 +167,17 @@ constexpr cpcchar	srvkeys[] = {
 /* exported subroutines */
 
 int srvtab_open(srvtab *op,cchar *fname,vecitem *eep) noex {
-	time_t		dt = time(NULL) ;
+	time_t		dt = time(nullptr) ;
 	int		rs = SR_OK ;
 	int		fnl = -1 ;
 	cchar		*fnp ;
 	cchar		*cp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	op->fd = -1 ;
 
 /* initialize */
@@ -213,7 +213,7 @@ int srvtab_open(srvtab *op,cchar *fname,vecitem *eep) noex {
 	if (rs < 0)
 	    goto bad3 ;
 
-	op->magic = SRVTAB_MAGIC ;
+	op->magval = SRVTAB_MAGIC ;
 
 ret0:
 	return rs ;
@@ -225,7 +225,7 @@ bad2:
 
 bad1:
 	uc_free(op->fname) ;
-	op->fname = NULL ;
+	op->fname = nullptr ;
 
 bad0:
 	goto ret0 ;
@@ -233,9 +233,9 @@ bad0:
 /* end subroutine (srvtab_open) */
 
 int srvtab_close(srvtab *op) noex {
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != SRVTAB_MAGIC)
+	if (op->magval != SRVTAB_MAGIC)
 	    return SR_NOTOPEN ;
 
 	if (op->fd >= 0) {
@@ -247,12 +247,12 @@ int srvtab_close(srvtab *op) noex {
 
 	vecitem_finish(&op->e) ;
 
-	if (op->fname != NULL) {
+	if (op->fname != nullptr) {
 	    uc_free(op->fname) ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return SR_OK ;
 }
 /* end subroutine (srvtab_close) */
@@ -265,23 +265,23 @@ int srvtab_match(srvtab *op,cchar *service,srvtab_ent **sepp) noex {
 	cchar	*sp, *cp ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SRVTAB_MAGIC)
+	if (op->magval != SRVTAB_MAGIC)
 	    return SR_NOTOPEN ;
 
-	if (service == NULL)
+	if (service == nullptr)
 	    return SR_FAULT ;
 
 	slp = &op->e ;
 	for (i = 0 ; vecitem_get(slp,i,sepp) >= 0 ; i += 1) {
-	    if (*sepp == NULL) continue ;
+	    if (*sepp == nullptr) continue ;
 
 	    sp = (*sepp)->service ;
 
-	    if (((cp = strchr(sp,'*')) != NULL) &&
-	        (strchr(sp,'\\') == NULL)) {
+	    if (((cp = strchr(sp,'*')) != nullptr) &&
+	        (strchr(sp,'\\') == nullptr)) {
 
 	        if (strncmp(service,sp,cp - sp) == 0) {
 
@@ -314,21 +314,21 @@ int srvtab_find(srvtab *op,cchar *service,srvtab_ent **sepp) noex {
 	cchar	*sp ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SRVTAB_MAGIC)
+	if (op->magval != SRVTAB_MAGIC)
 	    return SR_NOTOPEN ;
 
-	if (service == NULL)
+	if (service == nullptr)
 	    return SR_FAULT ;
 
-	if (sepp == NULL)
+	if (sepp == nullptr)
 	    sepp = &ep ;
 
 	slp = &op->e ;
 	for (i = 0 ; vecitem_get(slp,i,sepp) >= 0 ; i += 1) {
-	    if (*sepp == NULL) continue ;
+	    if (*sepp == nullptr) continue ;
 
 	    sp = (*sepp)->service ;
 
@@ -347,10 +347,10 @@ int srvtab_get(srvtab *op,int i,srvtab_ent **sepp) noex {
 	vecitem		*slp ;
 	int		rs ;
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SRVTAB_MAGIC)
+	if (op->magval != SRVTAB_MAGIC)
 	    return SR_NOTOPEN ;
 
 	slp = &op->e ;
@@ -364,14 +364,14 @@ int srvtab_check(srvtab *op,time_t dt,vecitem *eep) noex {
 	USTAT		sb ;
 	int		rs = SR_OK ;
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != SRVTAB_MAGIC)
+	if (op->magval != SRVTAB_MAGIC)
 	    return SR_NOTOPEN ;
 
 	if (dt <= 0)
-	    dt = time(NULL) ;
+	    dt = time(nullptr) ;
 
 /* should we even check? */
 
@@ -458,7 +458,7 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 /* what about caching the file descriptor? */
 
 	if (op->fd >= 0) {
-	    if (dt <= 0) dt = time(NULL) ;
+	    if (dt <= 0) dt = time(nullptr) ;
 	    if ((dt - op->opentime) > MAXOPENTIME) {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
@@ -529,7 +529,7 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 
 	            se.service = mallocstrw(fp,fl) ;
 
-	            if (se.service == NULL)
+	            if (se.service == nullptr)
 	                rs = SR_NOMEM ;
 
 #ifdef	MALLOCLOG
@@ -552,7 +552,7 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 	                cp = compile(se.service,se.matchcode,
 	                    (se.matchcode + SRVTAB_RGXLEN)) ;
 
-	                if (cp != NULL) {
+	                if (cp != nullptr) {
 	                    se.matchcode = cp ;
 	                    se.matchlen = SRVTAB_RGXLEN ;
 	                } else {
@@ -561,7 +561,7 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 	                } /* end if (compiling RE) */
 
 	            } else {
-	                se.matchcode = NULL ;
+	                se.matchcode = nullptr ;
 		    }
 #endif /* SRVTAB_REGEX */
 
@@ -577,7 +577,7 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 /* loop while we have additional fields on this line */
 
 	        while ((rs >= 0) && (fl >= 0)) {
-		    int	ki = matstr(srvkeys,fp,fl) ;
+		    int	ki = matstr(srvkeynames,fp,fl) ;
 
 	            if (fsb.term != ',') {
 
@@ -585,12 +585,12 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 	                fl = field_srvarg(&fsb,saterms,linebuf2,LINEBUFLEN) ;
 
 	            } else
-	                fp = NULL ;
+	                fp = nullptr ;
 
 	            switch (ki) {
 
 	            case srvkey_program:
-	                if (fp != NULL) {
+	                if (fp != nullptr) {
 			    cl = sfshrink(fp,fl,&cp) ;
 			    if (cl > 0) {
 	                        freeit(&se.program) ;
@@ -601,21 +601,21 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 
 	            case srvkey_arguments:
 	            case srvkey_args:
-	                if (fp != NULL) {
+	                if (fp != nullptr) {
 	                    freeit(&se.args) ;
 	                    se.args = mallocstrw(fp,fl) ;
 	                }
 	                break ;
 
 	            case srvkey_username:
-	                if ((fp != NULL) && (fl > 0)) {
+	                if ((fp != nullptr) && (fl > 0)) {
 	                    freeit(&se.username) ;
 	                    se.username = mallocstrw(fp,fl) ;
 	                }
 	                break ;
 
 	            case srvkey_groupname:
-	                if ((fp != NULL) && (fl > 0)) {
+	                if ((fp != nullptr) && (fl > 0)) {
 	                    freeit(&se.groupname) ;
 	                    se.groupname = mallocstrw(fp,fl) ;
 	                }
@@ -623,7 +623,7 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 
 	            case srvkey_options:
 	            case srvkey_opts:
-	                if (fp != NULL) {
+	                if (fp != nullptr) {
 	                    freeit(&se.options) ;
 	                    se.options = mallocstrw(fp,fl) ;
 	                }
@@ -634,7 +634,7 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 	                if (se.ngroups < 0)
 	                    se.ngroups = 0 ;
 
-	                if ((fl >= 0) && (fp != NULL))
+	                if ((fl >= 0) && (fp != nullptr))
 	                    entry_groupsload(&se,fp,fl) ;
 
 	                while ((fsb.ll > 0) && (fsb.term != ',')) {
@@ -651,34 +651,34 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 	                break ;
 
 	            case srvkey_access:
-	                if (fp != NULL) {
+	                if (fp != nullptr) {
 	                    freeit(&se.access) ;
 	                    se.access = mallocstrw(fp,fl) ;
 	                }
 	                break ;
 
 	            case srvkey_interval:
-	                if (fp != NULL) {
+	                if (fp != nullptr) {
 	                    freeit(&se.interval) ;
 	                    se.interval = mallocstrw(fp,fl) ;
 	                }
 	                break ;
 
 	            case srvkey_addr:
-	                if (fp != NULL) {
+	                if (fp != nullptr) {
 	                    stradd(&se.addr,fp,fl) ;
 	                } /* end if (getting address) */
 	                break ;
 
 	            case srvkey_passfile:
-	                if (fp != NULL) {
+	                if (fp != nullptr) {
 	                    freeit(&se.pass) ;
 	                    se.pass = mallocstrw(fp,fl) ;
 	                }
 	                break ;
 
 	            case srvkey_project:
-	                if (fp != NULL) {
+	                if (fp != nullptr) {
 	                    freeit(&se.project) ;
 	                    se.project = mallocstrw(fp,fl) ;
 	                }
@@ -731,7 +731,7 @@ static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 	    if (bcontrol(sfp,BC_FD,&fd) >= 0) {
 
 	        if (dt <= 0)
-	            dt = time(NULL) ;
+	            dt = time(nullptr) ;
 
 	        op->opentime = dt ;
 	        op->fd = u_dup(fd) ;
@@ -773,7 +773,7 @@ static int srvtab_filedump(SRVTAB *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	for (int i = 0 ; vecitem_get(&op->e,i,&ep) >= 0 ; i += 1) {
-	    if (ep == NULL) continue ;
+	    if (ep == nullptr) continue ;
 	    {
 	        rs1 = entry_finish(ep) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -800,7 +800,7 @@ static int entry_start(SRVTAB_ENT *sep) noex {
 static int entry_finish(SRVTAB_ENT *sep) noex {
 	int	i ;
 
-	if (sep->service == NULL)
+	if (sep->service == nullptr)
 	    return SR_OK ;
 
 	freeit(&sep->service) ;
@@ -817,7 +817,7 @@ static int entry_finish(SRVTAB_ENT *sep) noex {
 
 	freeit(&sep->groupname) ;
 
-	for (i = 0 ; sep->groupnames[i] != NULL ; i += 1) {
+	for (i = 0 ; sep->groupnames[i] != nullptr ; i += 1) {
 	    freeit(sep->groupnames + i) ;
 	}
 	freeit(&sep->access) ;
@@ -834,13 +834,13 @@ static int entry_finish(SRVTAB_ENT *sep) noex {
 /* end subroutine (entry_finish) */
 
 static int entry_enough(srvtab_ent *sep) noex {
-	if ((sep->service == NULL) || (sep->service[0] == '\0'))
+	if ((sep->service == nullptr) || (sep->service[0] == '\0'))
 	    return FALSE ;
 
-	if ((sep->program != NULL) && (sep->program[0] != '\0'))
+	if ((sep->program != nullptr) && (sep->program[0] != '\0'))
 	    return TRUE ;
 
-	if ((sep->args != NULL) && (sep->args[0] != '\0'))
+	if ((sep->args != nullptr) && (sep->args[0] != '\0'))
 	    return TRUE ;
 
 	return FALSE ;
@@ -877,7 +877,7 @@ static int entry_groupadd(SEVTAB_ENT *sep,cchar *name) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	/* enter the raw group name into a group slot */
-	while ((i < NGROUPS_MAX) && (sep->groupnames[i] != NULL)) {
+	while ((i < NGROUPS_MAX) && (sep->groupnames[i] != nullptr)) {
 	    i += 1 ;
 	}
 	rs = i ;
@@ -887,7 +887,7 @@ static int entry_groupadd(SEVTAB_ENT *sep,cchar *name) noex {
 
 	    if (rs >= 0) {
 	        sep->groupnames[i++] = sp ;
-	        sep->groupnames[i] = NULL ;
+	        sep->groupnames[i] = nullptr ;
 	    }
 
 	} else
@@ -908,7 +908,7 @@ static int stradd(cchar **spp,cchar *s,int slen) noex {
 	cchar	*sp = *spp ;
 
 	len = (slen + 1) ;
-	if (sp != NULL) {
+	if (sp != nullptr) {
 	    char	*cp ;
 	    char	*osp = (char *) sp ;
 
@@ -921,7 +921,7 @@ static int stradd(cchar **spp,cchar *s,int slen) noex {
 		*cp++ = CH_US ;
 	        strwcpy(cp,s,slen) ;
 	    } else {
-	        *spp = NULL ;
+	        *spp = nullptr ;
 	    }
 
 	} else {
@@ -937,7 +937,7 @@ static int stradd(cchar **spp,cchar *s,int slen) noex {
 static void freeit(cchar **pp) noex {
 	if (*pp) {
 	    uc_free(*pp) ;
-	    *pp = NULL ;
+	    *pp = nullptr ;
 	}
 }
 /* end subroutine (freeit) */
