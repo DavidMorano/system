@@ -25,7 +25,7 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
-#include	<varhdr.h>		/* <- the money shot */
+#include	<varhdr.h>		/* LIBDAM <- the money shot */
 
 
 #define	VARS		struct vars_head
@@ -99,9 +99,9 @@ EXTERNC_begin
 extern int	vars_open(vars *,cchar *) noex ;
 extern int	vars_count(vars *) noex ;
 extern int	vars_curbegin(vars *,vars_cur *) noex ;
-extern int	vars_fetch(vars *,cchar *,int,vars_cur *,char *,int) noex ;
-extern int	vars_enum(vars *,vars_cur *,char *,int,char *,int) noex ;
+extern int	vars_curenum(vars *,vars_cur *,char *,int,char *,int) noex ;
 extern int	vars_curend(vars *,vars_cur *) noex ;
+extern int	vars_fetch(vars *,cchar *,int,vars_cur *,char *,int) noex ;
 extern int	vars_getinfo(vars *,vars_info *) noex ;
 extern int	vars_audit(vars *) noex ;
 extern int	vars_close(vars *) noex ;
