@@ -31,16 +31,33 @@ enum dialopts {
 	dialopt_pwd,
 	dialopt_nolinger,
 	dialopt_nolight,
+	dialopt_nocheck,
 	dialopt_errchan,
 	dialopt_reuse,
 	dialopt_wait,
 	dialopt_wtimed,
 	dialopt_empty,
-	dialopt_nocheck,
 	dialopt_cloexec,
 	dialopt_overlast
 } ; /* end enum (dialopts) */
 
+#ifdef	__cplusplus
+struct dialoptms {
+    static constexpr int	mkeepalive	= (1 << dialopt_keepalive) ;
+    static constexpr int	mlinger		= (1 << dialopt_linger) ;
+    static constexpr int	mlong		= (1 << dialopt_long) ;
+    static constexpr int	mpwd		= (1 << dialopt_pwd) ;
+    static constexpr int	mnolinger	= (1 << dialopt_nolinger) ;
+    static constexpr int	mnolight	= (1 << dialopt_nolight) ;
+    static constexpr int	mnocheck	= (1 << dialopt_nocheck) ;
+    static constexpr int	merrchan	= (1 << dialopt_errchan) ;
+    static constexpr int	mreusæ		= (1 << dialopt_reuse) ;
+    static constexpr int	mwait		= (1 << dialopt_wait) ;
+    static constexpr int	mwtimed		= (1 << dialopt_wtimed) ;
+    static constexpr int	mempty		= (1 << dialopt_empty) ;
+    static constexpr int	mcloexec	= (1 << dialopt_cloexec) ;
+} ; /* end struct (dialoptms) */
+#endif /* __cplusplus */
 
 #define	DIALOPT_NONE		0
 /* keep connection alive */
@@ -76,6 +93,10 @@ EXTERNC_begin
 extern int	dialopts(int,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const dialoptms 		dialoptm ;
+#endif /* _cplusplus */
 
 
 #endif /* DIALOPTS_INCLUDE */
