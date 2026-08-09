@@ -28,21 +28,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<modload.h>
-#include	<vecstr.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<modload.h>		/* LIBDAM */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uuname.h"
 #include	"uunames.h"
@@ -62,7 +62,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -108,19 +108,20 @@ template<typename ... Args>
 local int uuname_ctor(uuname *op,Args ... args) noex {
     	UUNAME		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->mlp = new(nothrow) modload) != np) ylikely {
-		if (calls *p ; (p = new(nothrow) calls) != np) ylikely {
+	    if ((op->mlp = new(nt) modload) != np) ylikely {
+		if (calls *p ; (p = new(nt) calls) != np) ylikely {
 		    op->callp = p ;
 		    rs = memclear(p) ;
 		}
 		if (rs < 0) {
 		    delete op->mlp ;
 		    op->mlp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
@@ -207,16 +208,15 @@ int uuname_open(uuname *op,cchar *pr,cchar *dbname) noex {
 	            }
 	            if (rs < 0) {
 		        uuname_objloadend(op) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if )uuname_objloadbegin) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		uuname_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (uuname_ctor) */
 	return rs ;
-}
-/* end subroutine (uuname_open) */
+} /* end subroutine (uuname_open) */
 
 int uuname_close(uuname *op) noex {
 	int		rs ;
@@ -238,8 +238,7 @@ int uuname_close(uuname *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uuname_close) */
+} /* end subroutine (uuname_close) */
 
 int uuname_audit(uuname *op) noex {
 	int		rs ;
@@ -250,8 +249,7 @@ int uuname_audit(uuname *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uuname_audit) */
+} /* end subroutine (uuname_audit) */
 
 int uuname_count(uuname *op) noex {
 	int		rs ;
@@ -262,8 +260,7 @@ int uuname_count(uuname *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uuname_count) */
+} /* end subroutine (uuname_count) */
 
 int uuname_curbegin(uuname *op,UUNAME_CUR *curp) noex {
 	int		rs ;
@@ -271,21 +268,20 @@ int uuname_curbegin(uuname *op,UUNAME_CUR *curp) noex {
 	    calls *callp = (calls *) op->callp ;
 	    memclear(curp) ;
 	    if (callp->curbegin) {
-	        if (void *p ; (rs = uc_malloc(op->cursz,&p)) >= 0) {
+	        if (void *p ; (rs = mem.mall(op->cursz,&p)) >= 0) {
 	            curp->scp = p ;
 	            if ((rs = callp->curbegin(op->obj,curp->scp)) >= 0) {
 	                curp->magval = UUNAME_MAGIC ;
 	            }
 	            if (rs < 0) {
-		        uc_free(curp->scp) ;
+		        mem.free(curp->scp) ;
 		        curp->scp = nullptr ;
-	            }
-	        } /* end if (m-a) */
+	            } /* end if (error) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (have SO method) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uuname_curbegin) */
+} /* end subroutine (uuname_curbegin) */
 
 int uuname_curend(uuname *op,UUNAME_CUR *curp) noex {
 	int		rs ;
@@ -302,7 +298,7 @@ int uuname_curend(uuname *op,UUNAME_CUR *curp) noex {
 	                if (rs >= 0) rs = rs1 ;
 	            }
 	            {
-	                rs1 = uc_free(curp->scp) ;
+	                rs1 = mem.free(curp->scp) ;
 	                if (rs >= 0) rs = rs1 ;
 	                curp->scp = nullptr ;
 	            }
@@ -311,8 +307,7 @@ int uuname_curend(uuname *op,UUNAME_CUR *curp) noex {
 	    } /* end if (cursor-magic) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uuname_curend) */
+} /* end subroutine (uuname_curend) */
 
 int uuname_exists(uuname *op,cchar *sp,int sl) noex {
 	int		rs ;
@@ -323,10 +318,9 @@ int uuname_exists(uuname *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uuname_exists) */
+} /* end subroutine (uuname_exists) */
 
-int uuname_enum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
+int uuname_curenum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = uuname_magic(op,curp,rbuf)) >= 0) {
 	    rs = SR_NOTOPEN ;
@@ -339,8 +333,7 @@ int uuname_enum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
 	    } /* end if (cursor-magic) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uuname_enum) */
+} /* end subroutine (uuname_curenum) */
 
 
 /* private subroutines */
@@ -367,19 +360,19 @@ local int uuname_objloadbegin(UN *op,cchar *pr,cchar *objn) noex {
 			    cint	osz = mv[0] ;
 	                    op->objsz = mv[0] ;
 	                    op->cursz = mv[1] ;
-			    if (void *vp ; (rs = uc_malloc(osz,&vp)) >= 0) {
+			    if (void *vp ; (rs = mem.mall(osz,&vp)) >= 0) {
 	                        op->obj = vp ;
 	                        rs = uuname_loadcalls(op,&syms) ;
 	                        if (rs < 0) {
-	                            uc_free(op->obj) ;
+	                            mem.free(op->obj) ;
 	                            op->obj = nullptr ;
-	                        }
+	                        } /* end if (error) */
 	                    } /* end if (memory-allocation) */
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
 		            op->fl.modload = false ;
 	                    modload_close(mlp) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
 	    } /* end if (vecstr_addsyms) */
@@ -388,7 +381,7 @@ local int uuname_objloadbegin(UN *op,cchar *pr,cchar *objn) noex {
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
 		modload_close(mlp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (vecstr-syms) */
 	return rs ;
 } /* end subroutine (uuname_objloadbegin) */
@@ -397,7 +390,7 @@ local int uuname_objloadend(UN *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
-	    rs1 = uc_free(op->obj) ;
+	    rs1 = mem.free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
