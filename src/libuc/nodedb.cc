@@ -39,30 +39,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>		/* |u_stat(3u)| */
-#include	<ctime>
-#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<vecobj.h>
-#include	<hdb.h>
-#include	<mkchar.h>
-#include	<strwcpy.h>
-#include	<mkpathx.h>
-#include	<sfx.h>			/* |sfcontent(3uc)| */
-#include	<mkpathrooted.h>
-#include	<char.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC |sfcontent(3uc)| */
+#include	<mkpathrooted.h>	/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nodedb.h"
 
@@ -121,12 +121,12 @@ struct nodedb_file {
 	size_t		fsize ;
 	ino_t		ino ;
 	dev_t		dev ;
-} ;
+} ; /* end struct */
 
 struct nodedb_keyname {
 	cchar		*kname ;
 	int		count ;
-} ;
+} ; /* end struct */
 
 struct nodedb_ie {
 	cchar		*(*keys)[2] ;
@@ -142,11 +142,11 @@ struct nodedb_ie {
 struct lineinfo_field {
 	cchar		*fp ;
 	int		fl ;
-} ;
+} ; /* end struct */
 
 struct lineinfo {
 	lineinfo_field	f[3] ;
-} ;
+} ; /* end struct */
 
 struct svcentry {
 	vecobj		keys ;
@@ -154,7 +154,7 @@ struct svcentry {
 	cchar		*clu ;
 	cchar		*sys ;
 	char		*a ;
-} ;
+} ; /* end struct */
 
 struct svcentry_key {
 	cchar		*kname ;
@@ -194,7 +194,7 @@ local inline int nodedb_ctor(nodedb *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->filep ;
 		    op->filep = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
@@ -280,8 +280,8 @@ int nodedb_open(ND *op,cchar *fname) noex {
 		    cint	vn = NODEDB_NFILES ;
 	            cint	vo = VECOBJ_OREUSE ;
 	            if ((rs = flp->start(vsz,vn,vo)) >= 0) ylikely {
-		        hdb		*elp = op->entsp ;
-			cint		hn = NODEDB_DEFENTS ;
+		        hdb	*elp = op->entsp ;
+			cint	hn = NODEDB_DEFENTS ;
 	                if ((rs = hdb_start(elp,hn,0,np,np)) >= 0) {
 		    	    op->entbuflen = var.entbuflen ;
 	                    op->checktime = getustime ;
@@ -290,25 +290,24 @@ int nodedb_open(ND *op,cchar *fname) noex {
 	                        rs = nodedb_fileadd(op,fname) ;
 	                        if (rs < 0) {
 	                            op->magval = 0 ;
-	                        }
+	                        } /* end if (error) */
 	                    } /* end if (had an optional file) */
 	                    if (rs < 0) {
 	                        hdb_finish(op->entsp) ;
-			    }
+			    } /* end if (error) */
 	                } /* end if (entries) */
 	                if (rs < 0) {
 	                    vecobj_finish(op->filep) ;
-			}
+			} /* end if (error) */
 	            } /* end if (files) */
 		} /* end if (mkinit) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		nodedb_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (nodedb_ctor) */
 	return rs ;
-}
-/* end subroutine (nodedb_open) */
+} /* end subroutine (nodedb_open) */
 
 int nodedb_close(ND *op) noex {
 	int		rs ;
@@ -337,8 +336,7 @@ int nodedb_close(ND *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodedb_close) */
+} /* end subroutine (nodedb_close) */
 
 int nodedb_fileadd(ND *op,cchar *fname) noex {
 	int		rs ;
@@ -361,8 +359,7 @@ int nodedb_fileadd(ND *op,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (nodedb_fileadd) */
+} /* end subroutine (nodedb_fileadd) */
 
 int nodedb_curbegin(ND *op,nodedb_cur *curp) noex {
 	int		rs ;
@@ -376,12 +373,11 @@ int nodedb_curbegin(ND *op,nodedb_cur *curp) noex {
 		if (rs < 0) {
 		    delete curp->ecp ;
 		    curp->ecp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-hdb_cur) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodedb_curbegin) */
+} /* end subroutine (nodedb_curbegin) */
 
 int nodedb_curend(ND *op,nodedb_cur *curp) noex {
 	int		rs ;
@@ -394,10 +390,9 @@ int nodedb_curend(ND *op,nodedb_cur *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodedb_curend) */
+} /* end subroutine (nodedb_curend) */
 
-int nodedb_enum(ND *op,ND_C *curp,ND_E *ep,char *ebuf,int elen) noex {
+int nodedb_curenum(ND *op,ND_C *curp,ND_E *ep,char *ebuf,int elen) noex {
 	int		rs ;
 	int		svclen = 0 ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) ylikely {
@@ -415,8 +410,7 @@ int nodedb_enum(ND *op,ND_C *curp,ND_E *ep,char *ebuf,int elen) noex {
 	    } /* end if (had an entry) */
 	} /* end if (magic) */
 	return (rs >= 0) ? svclen : rs ;
-}
-/* end subroutine (nodedb_enum) */
+} /* end subroutine (nodedb_curenum) */
 
 int nodedb_fetch(ND *op,cc *svcbuf,ND_C *curp,
 		ND_E *ep,char *ebuf,int elen) noex {
@@ -439,8 +433,7 @@ int nodedb_fetch(ND *op,cc *svcbuf,ND_C *curp,
 	    } /* end if (hdb_fetch) */
 	} /* end if (magic) */
 	return (rs >= 0) ? svclen : rs ;
-}
-/* end subroutine (ND_Fetch) */
+} /* end subroutine (ND_Fetch) */
 
 int nodedb_check(ND *op) noex {
 	int		rs ;
@@ -453,8 +446,7 @@ int nodedb_check(ND *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (nodedb_check) */
+} /* end subroutine (nodedb_check) */
 
 
 /* private subroutines */
@@ -471,12 +463,12 @@ local int nodedb_fileadder(NODEDB *op,cchar *fname) noex {
 	            rs = nodedb_fileparse(op,fi) ;
 	            if (rs < 0) {
 	                nodedb_filedel(op,fi) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (vecobj_add) */
 	    } /* end if (vecobj_search) */
 	    if (rs < 0) {
 	        file_finish(&fe) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (file-start) */
 	return rs ;
 } /* end subroutine (nodedb_fileadder) */
@@ -532,7 +524,7 @@ local int nodedb_fileparse(ND *op,int fi) noex {
 		c = rs ;
 	        if (rs < 0) {
 	            nodedb_filedump(op,fi) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (non-null) */
 	} /* end if (vector_get) */
 	return (rs >= 0) ? c : rs ;
@@ -656,11 +648,11 @@ local int nodedb_addentry(ND *op,int fi,SE *sep) noex {
 	            rs = hdb_store(op->entsp,key,val) ;
 	            if (rs < 0) {
 	                ientry_finish(iep) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ientry-start) */
 	        if (rs < 0) {
 	            lm_free(iep) ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
