@@ -167,8 +167,7 @@ int vars_open(VARS *op,cchar *dbname) noex {
 	} /* end block */
 
 	return rs ;
-}
-/* end subroutine (vars_open) */
+} /* end subroutine (vars_open) */
 
 int vars_close(VARS *op) noex {
 	int		rs = SR_OK ;
@@ -189,8 +188,7 @@ int vars_close(VARS *op) noex {
 
 	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (vars_close) */
+} /* end subroutine (vars_close) */
 
 int vars_getinfo(VARS *op,VARS_INFO *vip) noex {
 	VARS_FM		*fip ;
@@ -214,8 +212,7 @@ int vars_getinfo(VARS *op,VARS_INFO *vip) noex {
 	vip->nskip = hip->nskip ;
 
 	return rs ;
-}
-/* end subroutine (vars_info) */
+} /* end subroutine (vars_info) */
 
 int vars_audit(VARS *op) noex {
 	int		rs ;
@@ -229,8 +226,7 @@ int vars_audit(VARS *op) noex {
 	rs = vars_ouraudit(op) ;
 
 	return rs ;
-}
-/* end subroutine (vars_audit) */
+} /* end subroutine (vars_audit) */
 
 int vars_count(VARS *op) noex {
 	VARHDR		*hip ;
@@ -243,8 +239,7 @@ int vars_count(VARS *op) noex {
 	hip = &op->ifi ;
 
 	return (rs >= 0) ? hip->nvars : rs ;
-}
-/* end subroutine (vars_count) */
+} /* end subroutine (vars_count) */
 
 int vars_curbegin(VARS *op,VARS_CUR *curp) noex {
 
@@ -258,8 +253,7 @@ int vars_curbegin(VARS *op,VARS_CUR *curp) noex {
 	op->ncursors += 1 ;
 
 	return SR_OK ;
-}
-/* end subroutine (vars_curbegin) */
+} /* end subroutine (vars_curbegin) */
 
 int vars_curend(VARS *op,VARS_CUR *curp) noex {
 
@@ -274,8 +268,7 @@ int vars_curend(VARS *op,VARS_CUR *curp) noex {
 	}
 
 	return SR_OK ;
-}
-/* end subroutine (vars_curend) */
+} /* end subroutine (vars_curend) */
 
 int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,
 		char *vbuf,int vlen) noex {
@@ -415,10 +408,9 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,
 	} /* end if (got one) */
 
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (vars_fetch) */
+} /* end subroutine (vars_fetch) */
 
-int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,
+int vars_curenum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	VARS_MI		*mip ;
 	VARHDR		*hip ;
@@ -467,8 +459,7 @@ int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,
 	}
 
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (vars_enum) */
+} /* end subroutine (vars_curenum) */
 
 
 /* private subroutines */
@@ -589,35 +580,36 @@ local int vars_viverify(VARS *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		size ;
 	int		f = true ;
-
-
+	{
 	f = f && (hip->fsize == fip->msize) ;
-
 	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
-
+	}
+	{
 	f = f && (hip->ksoff <= fip->msize) ;
 	f = f && ((hip->ksoff + hip->kslen) <= fip->msize) ;
-
+	}
+	{
 	f = f && (hip->vsoff <= fip->msize) ;
 	f = f && ((hip->vsoff + hip->vslen) <= fip->msize) ;
-
+	}
+	{
 	f = f && (hip->rtoff <= fip->msize) ;
 	size = (hip->rtlen + 1) * 2 * szof(int) ;
 	f = f && ((hip->rtoff + size) <= fip->msize) ;
-
+	}
+	{
 	f = f && (hip->itoff <= fip->msize) ;
 	size = (hip->itlen + 1) * 3 * szof(int) ;
 	f = f && ((hip->itoff + size) <= fip->msize) ;
-
-/* an extra (redundant) value */
-
+	}
+	/* an extra (redundant) value */
+	{
 	f = f && (hip->nvars == (hip->rtlen - 1)) ;
-
-/* get out */
-
-	if (! f)
+	}
+	/* get out */
+	if (! f) {
 	    rs = SR_BADFMT ;
-
+	}
 	return rs ;
 } /* end subroutine (vars_viverify) */
 
