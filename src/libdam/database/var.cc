@@ -29,30 +29,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<dlfcn.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getnodename.h>
-#include	<vecstr.h>
-#include	<nulstr.h>
-#include	<endian.h>
-#include	<sncpyx.h>
-#include	<mkpr.h>
-#include	<mkpathx.h>
-#include	<mkfname.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<endian.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkfname.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"var.h"
 #include	"vars.h"
@@ -153,8 +153,9 @@ int var_open(VAR *op,cchar *dbname) noex {
 	    if ((rs = (*op->call.open)(op->obj,dbname)) >= 0) {
 		op->magval = VAR_MAGIC ;
 	    }
-	    if (rs < 0)
+	    if (rs < 0) {
 		var_objloadend(op) ;
+	    }
 	} /* end if (objloadbegin) */
 
 	return rs ;
