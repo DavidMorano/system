@@ -1992,7 +1992,7 @@ local int mfswatch_loadsvcs(PROGINFO *pip,SREQ *jep)
 	        SVCFILE_CUR	cur ;
 	        if ((rs = svcfile_curbegin(sfp,&cur)) >= 0) {
 	            SVCFILE_ENT 	e ;
-	            while ((rs1 = svcfile_enum(sfp,&cur,&e,ebuf,elen)) >= 0) {
+	            while ((rs1 = svcfile_curenum(sfp,&cur,&e,ebuf,elen)) >= 0) {
 #if	CF_DEBUG
 		if (DEBUGLEVEL(5))
 		debugprintf("mfswatch_loadsvcs: svc=%s\n",e.svc) ;
@@ -2014,7 +2014,7 @@ local int mfswatch_loadsvcs(PROGINFO *pip,SREQ *jep)
 		MFSBUILT	*blp = &wip->built ;
 		MFSBUILT_CUR	cur ;
 		if ((rs = mfsbuilt_curbegin(blp,&cur)) >= 0) {
-		    while ((rs = mfsbuilt_enum(blp,&cur,ebuf,elen)) > 0) {
+		    while ((rs = mfsbuilt_curenum(blp,&cur,ebuf,elen)) > 0) {
 #if	CF_DEBUG
 		if (DEBUGLEVEL(5))
 		debugprintf("mfswatch_loadsvcs: el=%u ebuf=%s\n",rs,ebuf) ;
