@@ -31,7 +31,8 @@
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<new>			/* C++STD placement-new */
+#include	<memory>		/* C++STD |destroy_at(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -208,11 +209,11 @@ constexpr subnamer	subname ;
 
 int commandment_open(CMD *op,cchar *pr,cchar *dbn) noex {
 	int		rs ;
-	if ((rs = commandment_ctor(op,pr)) >= 0) {
+	if ((rs = commandment_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (pr[0]) {
 	        cchar	*objn = CMD_OBJNAME ;
-	        if ((rs = commandment_objloadbegin(op,pr,objn)) >= 0) {
+	        if ((rs = commandment_objloadbegin(op,pr,objn)) >= 0) ylikely {
 		    commandment_calls	*callp = callsp(op->callp) ;
 		    rs = SR_NOSYS ;
 		    if (cauto co = callp->open ; co) {
@@ -235,7 +236,7 @@ int commandment_open(CMD *op,cchar *pr,cchar *dbn) noex {
 int commandment_close(CMD *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = commandment_magic(op)) >= 0) {
+	if ((rs = commandment_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (commandment_calls *callp = callsp(op->callp) ; callp) ylikely {
 		rs = SR_OK ;
@@ -261,7 +262,7 @@ int commandment_close(CMD *op) noex {
 
 int commandment_audit(CMD *op) noex {
 	int		rs ;
-	if ((rs = commandment_magic(op)) >= 0) {
+	if ((rs = commandment_magic(op)) >= 0) ylikely {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (cauto co = callp->audit ; co) {
@@ -273,7 +274,7 @@ int commandment_audit(CMD *op) noex {
 
 int commandment_count(CMD *op) noex {
 	int		rs ;
-	if ((rs = commandment_magic(op)) >= 0) {
+	if ((rs = commandment_magic(op)) >= 0) ylikely {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (cauto co = callp->count ; co) {
@@ -285,7 +286,7 @@ int commandment_count(CMD *op) noex {
 
 int commandment_nummax(CMD *op) noex {
 	int		rs ;
-	if ((rs = commandment_magic(op)) >= 0) {
+	if ((rs = commandment_magic(op)) >= 0) ylikely {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (cauto co = callp->nummax ; co) {
@@ -297,7 +298,7 @@ int commandment_nummax(CMD *op) noex {
 
 int commandment_read(CMD *op,char *rbuf,int rlen,uint cn) noex {
 	int		rs ;
-	if ((rs = commandment_magic(op,rbuf)) >= 0) {
+	if ((rs = commandment_magic(op,rbuf)) >= 0) ylikely {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (cauto co = callp->read ; co) {
@@ -309,9 +310,9 @@ int commandment_read(CMD *op,char *rbuf,int rlen,uint cn) noex {
 
 int commandment_get(CMD *op,int i,char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = commandment_magic(op,rbuf)) >= 0) {
+	if ((rs = commandment_magic(op,rbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (i >= 0) {
+	    if (i >= 0) ylikely {
 	        uint	cn = uint(i) ;
 	        rs = commandment_read(op,rbuf,rlen,cn) ;
 	    }
@@ -321,12 +322,12 @@ int commandment_get(CMD *op,int i,char *rbuf,int rlen) noex {
 
 int commandment_curbegin(CMD *op,CMD_CUR *curp) noex {
 	int		rs ;
-	if ((rs = commandment_magic(op,curp)) >= 0) {
+	if ((rs = commandment_magic(op,curp)) >= 0) ylikely {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    memclear(curp) ;
-	    if (cauto co = callp->curbegin ; co) {
+	    if (cauto co = callp->curbegin ; co) ylikely {
 		cint	csz = op->cursz ;
-	        if (void *vp ; (rs = mem.mall(csz,&vp)) >= 0) {
+	        if (void *vp ; (rs = mem.mall(csz,&vp)) >= 0) ylikely {
 		    curp->scp = vp ;
 		    if ((rs = co(op->obj,curp->scp)) >= 0) {
 		         curp->magval = COMMANDMENT_MAGIC ;
@@ -349,11 +350,11 @@ int commandment_curbegin(CMD *op,CMD_CUR *curp) noex {
 int commandment_curend(CMD *op,CMD_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = commandment_magic(op,curp)) >= 0) {
+	if ((rs = commandment_magic(op,curp)) >= 0) ylikely {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOTOPEN ;
-	    if ((curp->magval == COMMANDMENT_MAGIC) && curp->scp) {
-	        if (cauto co = callp->curend ; co) {
+	    if ((curp->magval == COMMANDMENT_MAGIC) && curp->scp) ylikely {
+	        if (cauto co = callp->curend ; co) ylikely {
 	            rs1 = co(op->obj,curp->scp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        }
@@ -371,10 +372,10 @@ int commandment_curend(CMD *op,CMD_CUR *curp) noex {
 int commandment_curenum(CMD *op,CMD_CUR *curp,uint *cnp,
 		char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = commandment_magic(op,curp,rbuf)) >= 0) {
+	if ((rs = commandment_magic(op,curp,rbuf)) >= 0) ylikely {
 	    commandment_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
-	    if (cauto co = callp->curenum ; co) {
+	    if (cauto co = callp->curenum ; co) ylikely {
 	        COMMANDMENTS_ENT	cse{} ;
 	        rs = co(op->obj,curp->scp,&cse,rbuf,rlen) ;
 	        if (cnp) *cnp = cse.cn ;
@@ -389,7 +390,7 @@ int commandment_search(CMD *op,cc *s,cmpfunc,cchar **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
 	if (cmpfunc == nullptr) cmpfunc = defaultcmp ;
-	if ((rs = commandment_magic(op,s,rpp)) >= 0) {
+	if ((rs = commandment_magic(op,s,rpp)) >= 0) ylikely {
 	    char	**rpp2 ;
 	    if (op->fl.osorted && (! op->fl.issorted)) {
 	        op->fl.issorted = true ;
