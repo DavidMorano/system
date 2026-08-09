@@ -58,13 +58,13 @@ struct namestr : namestr_head {
 	    skipwhite	(this,namestrmem_skipwhite) ;
 	    finish	(this,namestrmem_finish) ;
 	    strp = nullptr ;
-	} ;
+	} ; /* end ctor */
 	namestr(const namestr &) = delete ;
 	namestr &operator = (const namestr &) = delete ;
-	int start(cchar *,int) noex ;
-	int next(cchar **,int *,int *) noex ;
-	int brk(cchar *,cchar **) noex ;
-	void dtor() noex ;
+	int start	(cchar *,int) noex ;
+	int next	(cchar **,int *,int *) noex ;
+	int brk		(cchar *,cchar **) noex ;
+	void dtor	() noex ;
 	destruct namestr() {
 	    if (strp) dtor() ;
 	} ;
