@@ -259,7 +259,7 @@ int keyopt_count(keyopt *op) noex {
 	return rs ;
 } /* end subroutine (keyopt_count) */
 
-int keyopt_enumkeys(keyopt *op,CUR *curp,cchar **rpp) noex {
+int keyopt_curenumkeys(keyopt *op,CUR *curp,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = keyopt_magic(op,curp)) >= 0) ylikely {
 	    NAM	*kp ; /* used-afterwards */
@@ -279,7 +279,7 @@ int keyopt_enumkeys(keyopt *op,CUR *curp,cchar **rpp) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (keyopt_enumkeys) */
+} /* end subroutine (keyopt_curenumkeys) */
 
 int keyopt_fetch(keyopt *op,cchar *kname,CUR *curp,cchar **rpp) noex {
 	int		rs ;
@@ -327,13 +327,13 @@ int keyopt_fetch(keyopt *op,cchar *kname,CUR *curp,cchar **rpp) noex {
 	return rs ;
 } /* end subroutine (keyopt_fetch) */
 
-int keyopt_enumvalues(keyopt *op,cchar *key,CUR *curp,cchar **rpp) noex {
+int keyopt_curenumvals(keyopt *op,cchar *key,CUR *curp,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = keyopt_magic(op,key,curp)) >= 0) ylikely {
 	    rs = keyopt_fetch(op,key,curp,rpp) ;
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (keyopt_enumvalues) */
+} /* end subroutine (keyopt_curenumvals) */
 
 int keyopt_incr(keyopt *op) noex {
 	int		rs ;
@@ -456,24 +456,24 @@ int keyopt::loadvalue(cchar *key,cchar *vbuf,int vlen) noex {
 	return keyopt_loadvalue(this,key,vbuf,vlen) ;
 }
 
-int keyopt::enumkeys(CUR *curp,cchar **rpp) noex {
-	return keyopt_enumkeys(this,curp,rpp) ;
-}
-
-int keyopt::fetch(cchar *kname,CUR *curp,cchar **rpp) noex {
-	return keyopt_fetch(this,kname,curp,rpp) ;
-}
-
-int keyopt::enumvalues(cchar *key,CUR *curp,cchar **rpp) noex {
-	return keyopt_enumvalues(this,key,curp,rpp) ;
-}
-
 int keyopt::curbegin(CUR *curp) noex {
 	return keyopt_curbegin(this,curp) ;
 }
 
 int keyopt::curend(CUR *curp) noex {
 	return keyopt_curend(this,curp) ;
+}
+
+int keyopt::curenumkeys(CUR *curp,cchar **rpp) noex {
+	return keyopt_curenumkeys(this,curp,rpp) ;
+}
+
+int keyopt::fetch(cchar *kname,CUR *curp,cchar **rpp) noex {
+	return keyopt_fetch(this,kname,curp,rpp) ;
+}
+
+int keyopt::curenumvals(cchar *key,CUR *curp,cchar **rpp) noex {
+	return keyopt_curenumvals(this,key,curp,rpp) ;
 }
 
 int keyopt::findvalue(cc *key,cc *valp,int vall,VAL **rpp) noex {
