@@ -77,7 +77,7 @@ extern int pcsconfs_start(pcsconfs *,cchar *,mainv,cchar *) noex ;
 extern int pcsconfs_curbegin(pcsconfs *,pcsconfs_cur *) noex ;
 extern int pcsconfs_fetch(pcsconfs *, cchar *,int,pcsconfs_cur *,
 				char *,int) noex ;
-extern int pcsconfs_enum(pcsconfs *,pcsconfs_cur *,char *,int,char *,int) noex ;
+extern int pcsconfs_curenum(pcsconfs *,pcsconfs_cur *,char *,int,char *,int) noex ;
 extern int pcsconfs_curend(pcsconfs *,pcsconfs_cur *) noex ;
 extern int pcsconfs_audit(pcsconfs *) noex ;
 extern int pcsconfs_finish(pcsconfs *) noex ;
