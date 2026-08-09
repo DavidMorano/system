@@ -301,7 +301,7 @@ int poller_curend(poller *op,poller_cur *curp) noex {
 	return rs ;
 } /* end subroutine (poller_curend) */
 
-int poller_enum(poller *op,poller_cur *curp,poller_spec *rp) noex {
+int poller_curenum(poller *op,poller_cur *curp,poller_spec *rp) noex {
 	int		rs ;
 	if ((rs = poller_magic(op,curp,rp)) >= 0) {
 	    int		i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
@@ -318,7 +318,7 @@ int poller_enum(poller *op,poller_cur *curp,poller_spec *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (poller_enum) */
+} /* end subroutine (poller_curenum) */
 
 
 /* private subroutines */
