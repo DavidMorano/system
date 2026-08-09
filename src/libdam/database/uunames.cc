@@ -520,7 +520,7 @@ int uunames_exists(UU *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (uunames_exists) */
 
-int uunames_enum(UU *op,cur *curp,char *ubuf,int ulen) noex {
+int uunames_curenum(UU *op,cur *curp,char *ubuf,int ulen) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = uunames_magic(op,curp,ubuf)) >= 0) {
@@ -536,7 +536,7 @@ int uunames_enum(UU *op,cur *curp,char *ubuf,int ulen) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (uunames_enum) */
+/* end subroutine (uunames_curenum) */
 
 int uunames_count(UU *op) noex {
 	int		rs ;
