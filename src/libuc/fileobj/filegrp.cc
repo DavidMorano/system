@@ -94,7 +94,7 @@ local inline int filegrp_ctor(filegrp *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->ti_check = 0 ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->ttl = 0 ;
 	    op->nmax = 0 ;
 	    op->s = {} ;
@@ -105,7 +105,7 @@ local inline int filegrp_ctor(filegrp *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->flp ;
 		    op->flp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-cq) */
 	} /* end if (non-null) */
 	return rs ;
@@ -131,25 +131,25 @@ template<typename ... Args>
 local inline int filegrp_magic(filegrp *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == FILEGRP_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == FILEGRP_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (filegrp_magic) */
 
-local int filegrp_searchgid(FG *,FG_REC **,gid_t) noex ;
-local int filegrp_newrec(FG *,time_t,FG_REC **,gid_t,cc *) noex ;
-local int filegrp_recaccess(FG *,FG_REC *,time_t) noex ;
-local int filegrp_allocrec(FG *,FG_REC **) noex ;
-local int filegrp_recfree(FG *,FG_REC *) noex ;
-local int filegrp_maintenance(FG *,time_t) noex ;
-local int filegrp_record(FG *,int,int) noex ;
+local int filegrp_searchgid	(FG *,FG_REC **,gid_t) noex ;
+local int filegrp_newrec	(FG *,time_t,FG_REC **,gid_t,cc *) noex ;
+local int filegrp_recaccess	(FG *,FG_REC *,time_t) noex ;
+local int filegrp_allocrec	(FG *,FG_REC **) noex ;
+local int filegrp_recfree	(FG *,FG_REC *) noex ;
+local int filegrp_maintenance	(FG *,time_t) noex ;
+local int filegrp_record	(FG *,int,int) noex ;
 
-local int record_start(FG_REC *,time_t,gid_t,cc *) noex ;
-local int record_old(FG_REC *,time_t,int) noex ;
-local int record_refresh(FG_REC *,time_t) noex ;
-local int record_update(FG_REC *,time_t,cc *) noex ;
-local int record_access(FG_REC *,time_t) noex ;
-local int record_finish(FG_REC *) noex ;
+local int record_start		(FG_REC *,time_t,gid_t,cc *) noex ;
+local int record_old		(FG_REC *,time_t,int) noex ;
+local int record_refresh	(FG_REC *,time_t) noex ;
+local int record_update		(FG_REC *,time_t,cc *) noex ;
+local int record_access		(FG_REC *,time_t) noex ;
+local int record_finish		(FG_REC *) noex ;
 
 
 /* local variables */
@@ -176,16 +176,16 @@ int filegrp_start(FG *op,int nmax,int ttl) noex {
 		        op->nmax = nmax ;
 		        op->ttl = ttl ;
 		        op->ti_check = time(nullptr) ;
-		        op->magic = FILEGRP_MAGIC ;
+		        op->magval = FILEGRP_MAGIC ;
 	            } /* end if (vechand-start) */
 	            if (rs < 0) {
 		        cq_finish(op->flp) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (cq_start) */
 	    } /* end if (gnl) */
 	    if (rs < 0) {
 		filegrp_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (filegrp_start) */
@@ -207,11 +207,11 @@ int filegrp_finish(FG *op) noex {
                         {
                             rs1 = lm_free(rp) ;
                             if (rs >= 0) rs = rs1 ;
-                        }
+                        } /* end if (memory-release) */
                     }
-                } /* end while */
+                } /* end for */
                 if (rs >= 0) rs = rs1 ;
-            }
+            } /* end if */
             if (op->alp) {
                 rs1 = vechand_finish(op->alp) ;
                 if (rs >= 0) rs = rs1 ;     /* <- compiler bug here */
@@ -221,7 +221,7 @@ int filegrp_finish(FG *op) noex {
                 while (cq_rem(op->flp,&vp) >= 0) {
                     rs1 = lm_free(vp) ;
                     if (rs >= 0) rs = rs1 ;
-                }
+                } /* end while (memory-release) */
             }
 	    if (op->flp) {
 	        rs1 = cq_finish(op->flp) ;
@@ -231,7 +231,7 @@ int filegrp_finish(FG *op) noex {
 	        rs1 = filegrp_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (filegrp_finish) */
@@ -328,11 +328,11 @@ local int filegrp_newrec(FG *op,time_t dt,FG_REC **rpp,gid_t gid,cc *gn) noex {
 	        rs = vechand_add(op->alp,rp) ;
 		if (rs < 0) {
 		    record_finish(rp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (record-start) */
 	    if (rs < 0) {
 		lm_free(rp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if */
 	if (rpp) *rpp = (rs >= 0) ? rp : nullptr ;
 	return (rs >= 0) ? gl : rs ;
@@ -415,7 +415,7 @@ local int filegrp_allocrec(FG *op,FG_REC **rpp) noex {
 	if ((rs = cq_rem(op->flp,rpp)) == SR_NOTFOUND) {
 	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 	        *rpp = (FG_REC *) vp ;
-	    }
+	    } /* end if (memory-acquire) */
 	}
 	return rs ;
 } /* end subroutine (filegrp_allocrec) */
@@ -431,7 +431,7 @@ local int filegrp_recfree(FG *op,FG_REC *rp) noex {
 	            rs = cq_ins(fqp,rp) ;
 	            if (rs < 0) {
 		        lm_free(rp) ;
-		    }
+		    } /* end if (error) */
 	        } else {
 	            lm_free(rp) ;
 	        }
