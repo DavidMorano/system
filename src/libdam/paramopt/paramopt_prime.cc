@@ -332,7 +332,7 @@ int paramopt_haveval(PO *op,cchar *key,cchar *vp,int vl) noex {
 	    rs = SR_INVALID ;
 	    if (key[0]) ylikely {
 	        if (PO_CUR cur ; (rs = paramopt_curbegin(op,&cur)) >= 0) {
-		    auto	pe = paramopt_curenumval ;
+		    cauto	pe = paramopt_curenumval ;
 	            int		f = 0 ;
 	            cchar	*pvp{} ;
 	            while ((rs1 = pe(op,key,&cur,&pvp)) >= 0) {
