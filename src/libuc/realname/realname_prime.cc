@@ -127,7 +127,7 @@ template<typename ... Args>
 local inline int realname_magic(realname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == REALNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == REALNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (realname_magic) */
@@ -157,7 +157,7 @@ int realname_start(realname *op,cchar *sp,int sl) noex {
 	        rs = realname_parse(op,sp,sl) ;
 	    }
 	    if (rs >= 0) ylikely {
-		op->magic = REALNAME_MAGIC ;
+		op->magval = REALNAME_MAGIC ;
 	    }
 	    if (rs < 0) {
 		realname_dtor(op) ;
@@ -174,7 +174,7 @@ int realname_finish(realname *op) noex {
 		rs1 = realname_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (realname_finish) */
