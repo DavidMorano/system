@@ -43,36 +43,38 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/mman.h>
-#include	<grp.h>
-#include	<ctime>			/* |time_t| */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucsysmisc.h>		/* |ucpagesize(3u)| */
-#include	<bufsizeget.h>
-#include	<getax.h>
-#include	<recarr.h>
-#include	<vecobj.h>
-#include	<ascii.h>
-#include	<strn.h>
-#include	<sncpyx.h>
-#include	<strwcpy.h>
-#include	<strdcpy.h>
-#include	<cfdec.h>
-#include	<strwcmp.h>
-#include	<sysdbfn.h>		/* |sysdbfn_get(3uc)| */
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<grp.h>			/* POSIX® */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<new>			/* C++STD plaement-new */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC |ucpagesize(3u)| */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<sysdbfn.h>		/* LIBUC |sysdbfn_get(3uc)| */
+#include	<recarr.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strdcpy.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"grmems.h"
 
@@ -90,7 +92,6 @@ import libutil ;			/* memclear(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -104,11 +105,6 @@ extern "C" {
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_fsize(int) noex ;
-}
 
 
 /* external variables */
@@ -133,7 +129,7 @@ enum cts {
 } ; /* end enu (cts) */
 
 struct grmems_rec : pq_ent {
-	cchar		**mems ;
+	cchar		**entspp ;
 	char		*gn ;
 	time_t		ti_create ;
 	time_t		ti_access ;
@@ -159,11 +155,12 @@ template<typename ... Args>
 local int grmems_ctor(grmems *op,Args ... args) noex {
 	grmems_head	*hop = cast_static<grmems_head *>(op) ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->lrup = new(nothrow) pq) != np) ylikely {
+	    if ((op->lrup = new(nt) pq) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-pq) */
 	} /* end if (non-null) */
@@ -265,8 +262,7 @@ int grmems_start(grmems *op,int nmax,int ttl) noex {
 	    } /* end if (error) */
 	} /* end if (grmems_ctor) */
 	return rs ;
-}
-/* end subroutine (grmems_start) */
+} /* end subroutine (grmems_start) */
 
 int grmems_finish(grmems *op) noex {
 	int		rs ;
@@ -281,7 +277,7 @@ int grmems_finish(grmems *op) noex {
 	            rs1 = lm_free(op->usergids) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->usergids = nullptr ;
-		}
+		} /* end if (memory-release) */
 	    } /* end if (usergids) */
 	    {
 	        rs1 = grmems_recfins(op) ;
@@ -296,7 +292,7 @@ int grmems_finish(grmems *op) noex {
 	            rs1 = lm_free(op->recs) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->recs = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	    }
 	    if (op->lrup) ylikely {
 	        rs1 = pq_finish(op->lrup) ;
@@ -309,8 +305,7 @@ int grmems_finish(grmems *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (grmems_finish) */
+} /* end subroutine (grmems_finish) */
 
 int grmems_curbegin(grmems *op,grmems_cur *curp) noex {
 	int		rs ;
@@ -322,8 +317,7 @@ int grmems_curbegin(grmems *op,grmems_cur *curp) noex {
 	    curp->magval = GRMEMS_CURMAGIC ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (grmems_curbegin) */
+} /* end subroutine (grmems_curbegin) */
 
 int grmems_curend(grmems *op,grmems_cur *curp) noex {
 	int		rs ;
@@ -338,8 +332,7 @@ int grmems_curend(grmems *op,grmems_cur *curp) noex {
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (grmems_curend) */
+} /* end subroutine (grmems_curend) */
 
 int grmems_lookup(grmems *op,grmems_cur *curp,cchar *gnp,int gnl) noex {
 	int		rs ;
@@ -348,7 +341,7 @@ int grmems_lookup(grmems *op,grmems_cur *curp,cchar *gnp,int gnl) noex {
 	    rs = SR_NOTOPEN ;
 	    if (curp->magval == GRMEMS_CURMAGIC) ylikely {
 		rs = SR_INVALID ;
-	        if (gnp[0]) {
+	        if (gnp[0]) ylikely {
 		    rs = SR_OK ;
 	            if (op->recs == nullptr) {
 	                rs = grmems_starter(op) ;
@@ -377,8 +370,7 @@ int grmems_lookup(grmems *op,grmems_cur *curp,cchar *gnp,int gnl) noex {
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ri : rs ;
-}
-/* end subroutine (grmems_lookup) */
+} /* end subroutine (grmems_lookup) */
 
 int grmems_lookread(grmems *op,grmems_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -397,8 +389,8 @@ int grmems_lookread(grmems *op,grmems_cur *curp,char *rbuf,int rlen) noex {
 	                int		i = (curp->i >= 0) ? (curp->i+1) : 0 ;
 	                if ((rs = recarr_get(rlp,ri,&ep)) >= 0) {
 	                    if (i < ep->nmems) {
-				cchar	*mem = ep->mems[i] ;
-	                        if ((rs = sncpy1(rbuf,rlen,mem)) >= 0) {
+				cchar	*entp = ep->entspp[i] ;
+	                        if ((rs = sncpy1(rbuf,rlen,entp)) >= 0) {
 	                            curp->i = i ;
 	                        }
 	                    } else {
@@ -412,8 +404,7 @@ int grmems_lookread(grmems *op,grmems_cur *curp,char *rbuf,int rlen) noex {
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (grmems_lookread) */
+} /* end subroutine (grmems_lookread) */
 
 int grmems_invalidate(grmems *op,cchar *gnp,int gnl) noex {
 	int		rs ;
@@ -447,7 +438,7 @@ int grmems_invalidate(grmems *op,cchar *gnp,int gnl) noex {
 		        {
 	                    rs1 = lm_free(ep) ;
 	                    if (rs >= 0) rs = rs1 ;
-		        }
+		        } /* end if (memory-release) */
 	            } else if (rs == SR_NOTFOUND) {
 	                rs = SR_OK ;
 	            }
@@ -455,8 +446,7 @@ int grmems_invalidate(grmems *op,cchar *gnp,int gnl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_found : rs ;
-}
-/* end subroutine (grmems_invalidate) */
+} /* end subroutine (grmems_invalidate) */
 
 int grmems_check(grmems *op,time_t dt) noex {
 	int		rs ;
@@ -474,7 +464,7 @@ int grmems_check(grmems *op,time_t dt) noex {
 	                        pq_ent	*pep = (pq_ent *) ep ;
 	                        rs = pq_unlink(op->lrup,pep) ;
 	                        lm_free(ep) ;
-	                    }
+	                    } /* end if (memory-release) */
 	                } /* end if (entry-old) */
 		    } /* end if (non-null) */
 	            if (rs < 0) break ;
@@ -482,14 +472,13 @@ int grmems_check(grmems *op,time_t dt) noex {
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (grmems_check) */
+} /* end subroutine (grmems_check) */
 
 int grmems_stats(grmems *op,grmems_st *sp) noex {
 	int		rs ;
 	if ((rs = grmems_magic(op,sp)) >= 0) ylikely {
 	    if (op->recs) {
-	        if ((rs = recarr_count(op->recs)) >= 0) {
+	        if ((rs = recarr_count(op->recs)) >= 0) ylikely {
 	            *sp = op->s ;
 	            sp->nentries = rs ;
 	        }
@@ -498,8 +487,7 @@ int grmems_stats(grmems *op,grmems_st *sp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (grmems_stats) */
+} /* end subroutine (grmems_stats) */
 
 
 /* private subroutines */
@@ -520,12 +508,11 @@ local int grmems_starter(grmems *op) noex {
 	        if (rs < 0) {
 	            lm_free(op->recs) ;
 	            op->recs = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (memory-acquire) */
 	} /* end if (needed initialization) */
 	return rs ;
-}
-/* end subroutine (grmems_starter) */
+} /* end subroutine (grmems_starter) */
 
 local int grmems_fetch(grmems *op,grmems_rec **epp,cchar *gnp,int gnl) noex {
 	recarr		*rlp = op->recs ;
@@ -543,8 +530,7 @@ local int grmems_fetch(grmems *op,grmems_rec **epp,cchar *gnp,int gnl) noex {
 	    *epp = (rs >= 0) ? ep : nullptr ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (grmems_fetch) */
+} /* end subroutine (grmems_fetch) */
 
 local int grmems_mkrec(grmems *op,time_t dt,grmems_rec **epp,
 		cchar *gnp,int gnl) noex {
@@ -579,8 +565,7 @@ local int grmems_mkrec(grmems *op,time_t dt,grmems_rec **epp,
 	    } /* end if (at max entries or not) */
 	} /* end if (recarr_count) */
 	return (rs >= 0) ? ri : rs ;
-}
-/* end subroutine (grmems_mkrec) */
+} /* end subroutine (grmems_mkrec) */
 
 local int grmems_newrec(grmems *op,time_t dt,grmems_rec **epp,
 		cchar *gnp,int gnl) noex {
@@ -592,13 +577,12 @@ local int grmems_newrec(grmems *op,time_t dt,grmems_rec **epp,
 	        rs = grmems_recstart(op,dt,ep,gnp,gnl) ;
 	        if (rs < 0) {
 		    lm_free(ep) ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-acquire) */
 	    *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (grmems_newrec) */
+} /* end subroutine (grmems_newrec) */
 
 local int grmems_recstart(grmems *op,time_t dt,grmems_rec *ep,
 		cchar *gnp,int gnl) noex {
@@ -626,7 +610,7 @@ local int grmems_recstart(grmems *op,time_t dt,grmems_rec *ep,
 	                        }
 	                        if (rs < 0) {
 	                            record_finish(ep) ;
-			        }
+			        } /* end if (error) */
 	                    } /* end if (entry-start) */
 	                } /* end if (grmems-recusers) */
 	                rs1 = u.finish ;
@@ -638,8 +622,7 @@ local int grmems_recstart(grmems *op,time_t dt,grmems_rec *ep,
 	    } /* end if (m-a-f) */
 	} /* end block */
 	return (rs >= 0) ? ri : rs ;
-}
-/* end subroutine (grmems_recstart) */
+} /* end subroutine (grmems_recstart) */
 
 local int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 	cint		wc = op->wcount++ ;
@@ -669,8 +652,7 @@ local int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 	    } /* end if (lm_gr) */
 	} /* end if (record_getgnp) */
 	return (rs >= 0) ? wc : rs ;
-}
-/* end subroutine (grmems_recrefresh) */
+} /* end subroutine (grmems_recrefresh) */
 
 /* get all users w/ this specified GID */
 local int grmems_recusers(grmems *op,time_t dt,vecobj *ulp,gid_t gid) noex {
@@ -704,8 +686,7 @@ local int grmems_recusers(grmems *op,time_t dt,vecobj *ulp,gid_t gid) noex {
 	    } /* end if (had some hits) */
 	} /* end if (grmems-mkug) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (grmems_recusers) */
+} /* end subroutine (grmems_recusers) */
 
 local int grmems_mkug(grmems *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -728,8 +709,7 @@ local int grmems_mkug(grmems *op,time_t dt) noex {
 	    } /* end if (vecobj) */
 	} /* end if (usergids) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (grmems_mkug) */
+} /* end subroutine (grmems_mkug) */
 
 local int grmems_mkugload(grmems *op,time_t dt,vecobj *ulp) noex {
 	cnullptr	np{} ;
@@ -758,7 +738,7 @@ local int grmems_mkugload(grmems *op,time_t dt,vecobj *ulp) noex {
 			    }
 			    if (rs < 0) {
 				usergid_finish(&ug) ;
-			    }
+			    } /* end if (error) */
 	                } /* end if (usergid_start) */
 	            } /* end if (pwentparse) */
 	            ml -= intconv((tp + 1) - mp) ;
@@ -770,8 +750,7 @@ local int grmems_mkugload(grmems *op,time_t dt,vecobj *ulp) noex {
 	    } /* end if (grmems-pwmap) */
 	} /* end if (sysdbfn_get) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (grmems_mkugload) */
+} /* end subroutine (grmems_mkugload) */
 
 local int grmems_mkugstore(grmems *op,time_t dt,vecobj *ulp) noex {
 	cint		esz = sizeof(grmems_ug) ;
@@ -794,8 +773,7 @@ local int grmems_mkugstore(grmems *op,time_t dt,vecobj *ulp) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (vecobj-count) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (grmems_mkugstore) */
+} /* end subroutine (grmems_mkugstore) */
 
 local int grmems_mkugdeplete(grmems *op) noex {
 	int		rs = SR_OK ;
@@ -809,8 +787,7 @@ local int grmems_mkugdeplete(grmems *op) noex {
 	    } /* end for */
 	} /* end if (needed) */
 	return rs ;
-}
-/* end subroutine (grmems_mkugdeplete) */
+} /* end subroutine (grmems_mkugdeplete) */
 
 local int grmems_recaccess(grmems *op,time_t dt,grmems_rec *ep) noex {
 	int		rs ;
@@ -822,8 +799,7 @@ local int grmems_recaccess(grmems *op,time_t dt,grmems_rec *ep) noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (grmems_recaccess) */
+} /* end subroutine (grmems_recaccess) */
 
 local int grmems_recrear(grmems *op,grmems_rec *ep) noex {
 	int		rs ;
@@ -842,8 +818,7 @@ local int grmems_recrear(grmems *op,grmems_rec *ep) noex {
 	    }
 	} /* end if (pq_gettail) */
 	return rs ;
-}
-/* end subroutine (grmems_recrear) */
+} /* end subroutine (grmems_recrear) */
 
 local int grmems_recdel(grmems *op,grmems_rec *ep) noex {
 	int		rs = SR_OK ;
@@ -857,8 +832,7 @@ local int grmems_recdel(grmems *op,grmems_rec *ep) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (grmems_recdel) */
+} /* end subroutine (grmems_recdel) */
 
 local int grmems_recfins(grmems *op) noex {
 	int		rs = SR_OK ;
@@ -875,13 +849,12 @@ local int grmems_recfins(grmems *op) noex {
 		    {
 	                rs1 = lm_free(ep) ;
 	                if (rs >= 0) rs = rs1 ;
-		    }
+		    } /* end if (memory-release) */
 		}
 	    } /* end for */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (grmems_recfins) */
+} /* end subroutine (grmems_recfins) */
 
 local int grmems_upstats(grmems *op,int ct,int rs) noex {
 	int		f_got = (rs > 0) ;
@@ -896,8 +869,7 @@ local int grmems_upstats(grmems *op,int ct,int rs) noex {
 	    break ;
 	} /* end switch */
 	return SR_OK ;
-}
-/* end subroutine (grmems_upstats) */
+} /* end subroutine (grmems_upstats) */
 
 local int grmems_pwmapbegin(grmems *op,time_t dt,cchar *fn) noex {
 	cnullptr	np{} ;
@@ -925,7 +897,7 @@ local int grmems_pwmapbegin(grmems *op,time_t dt,cchar *fn) noex {
 	                } /* end if (advise) */
 	                if (rs < 0) {
 	                    u_mmapend(md,ms) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (mmap) */
 	        } /* end if (file-size) */
 	        rs1 = u_close(op->fd) ;
@@ -934,8 +906,7 @@ local int grmems_pwmapbegin(grmems *op,time_t dt,cchar *fn) noex {
 	    } /* end if (file-open) */
 	} /* end if (need mapping) */
 	return rs ;
-}
-/* end subroutine (grmems_pwmapbegin) */
+} /* end subroutine (grmems_pwmapbegin) */
 
 local int grmems_pwmapend(grmems *op) noex {
 	int		rs = SR_OK ;
@@ -950,8 +921,7 @@ local int grmems_pwmapend(grmems *op) noex {
 	    op->ti_open = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (grmems_pwmapend) */
+} /* end subroutine (grmems_pwmapend) */
 
 local int record_start(grmems_rec *ep,time_t dt,int wc,
 		vecobj *ulp,ucentgr *grp) noex {
@@ -971,33 +941,31 @@ local int record_start(grmems_rec *ep,time_t dt,int wc,
 		    ep->gn[0] = '\0' ;
 		    lm_free(ep->gn) ;
 		    ep->gn = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-acquire) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (record_start) */
+} /* end subroutine (record_start) */
 
 local int record_finish(grmems_rec *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (ep) ylikely {
 	    rs = SR_OK ;
-	    if (ep->mems) {
-	        rs1 = lm_free(ep->mems) ;
+	    if (ep->entspp) {
+	        rs1 = lm_free(ep->entspp) ;
 	        if (rs >= 0) rs = rs1 ;
-	        ep->mems = nullptr ;
-	    }
+	        ep->entspp = nullptr ;
+	    } /* end if (memory-release) */
 	    if (ep->gn) {
 	        ep->gn[0] = '\0' ;
 		rs1 = lm_free(ep->gn) ;
 	        if (rs >= 0) rs = rs1 ;
 		ep->gn = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (record_finish) */
+} /* end subroutine (record_finish) */
 
 local int record_refresh(grmems_rec *ep,time_t dt,int wc,
 		vecobj *ulp,ucentgr *grp) noex {
@@ -1006,20 +974,19 @@ local int record_refresh(grmems_rec *ep,time_t dt,int wc,
 	int		n = 0 ;
 	if (ep) ylikely {
 	    rs = SR_OK ;
-	    if (ep->mems != nullptr) {
-	        rs1 = lm_free(ep->mems) ;	/* checked! */
+	    if (ep->entspp) {
+	        rs1 = lm_free(ep->entspp) ;	/* checked! */
 		if (rs >= 0) rs = rs1 ;
-	        ep->mems = nullptr ;
+	        ep->entspp = nullptr ;
 	        ep->nmems = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	    if (rs >= 0) {
 	        rs = record_mems(ep,dt,wc,ulp,grp) ;
 	        n = rs ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (record_refresh) */
+} /* end subroutine (record_refresh) */
 
 local int record_mems(grmems_rec *ep,time_t dt,int wc,
 		vecobj *ulp,ucentgr *grp) noex {
@@ -1047,28 +1014,27 @@ local int record_mems(grmems_rec *ep,time_t dt,int wc,
 		    } /* end if (non-null) */
 	        } /* end for */
 	        if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) ylikely {
-	            cchar	**mems = ccharpp(bp) ;
+	            cchar	**entspp = ccharpp(bp) ;
 	            int		c = 0 ;
 	            bp += masz ;
-	            for (int i = 0 ; vecobj_get(ulp,i,&vp) >= 0 ; i += 1) {
+	            for (int i = 0 ; ulp->get(i,&vp) >= 0 ; i += 1) {
 	                if (vp) {
 	        	    grmems_u	*up = (grmems_u *) vp ;
-	                    mems[c++] = bp ;
+	                    entspp[c++] = bp ;
 	                    bp = (strwcpy(bp,up->up,up->ul) + 1) ;
 			}
 	            } /* end for */
-	            mems[c] = nullptr ;
+	            entspp[c] = nullptr ;
 	            ep->ti_create = dt ;
 	            ep->ti_access = dt ;
 	            ep->wcount = wc ;
-	            ep->mems = mems ;
+	            ep->entspp = entspp ;
 	            ep->nmems = c ;
 	        } /* end if (memory-acquire) */
 	    } /* end if (vecobj-count) */
 	} /* end if (load user members) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (record_mems) */
+} /* end subroutine (record_mems) */
 
 local int record_loadgruns(grmems_rec *op,vecobj *ulp,ucentgr *grp) noex {
 	int		rs = SR_FAULT ;
@@ -1076,10 +1042,10 @@ local int record_loadgruns(grmems_rec *op,vecobj *ulp,ucentgr *grp) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (grp->gr_mem != nullptr) {
-	        cchar	**mems = ccharpp(grp->gr_mem) ;
-	        for (int i = 0 ; mems[i] != nullptr ; i += 1) {
+	        cchar	**entspp = ccharpp(grp->gr_mem) ;
+	        for (int i = 0 ; entspp[i] != nullptr ; i += 1) {
 	            grmems_u	u ;
-	            u.up = mems[i] ;
+	            u.up = entspp[i] ;
 	            u.ul = -1 ;
 	            rs = vecobj_addouruniq(ulp,&u) ;
 	            if (rs < INT_MAX) c += 1 ;
@@ -1088,8 +1054,7 @@ local int record_loadgruns(grmems_rec *op,vecobj *ulp,ucentgr *grp) noex {
 	    } /* end if (had members) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (record_loadgruns) */
+} /* end subroutine (record_loadgruns) */
 
 local int record_access(grmems_rec *ep,time_t dt) noex {
 	int		rs = SR_FAULT ;
@@ -1100,8 +1065,7 @@ local int record_access(grmems_rec *ep,time_t dt) noex {
 	    wc = ep->wcount ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? wc : rs ;
-}
-/* end subroutine (record_access) */
+} /* end subroutine (record_access) */
 
 local int record_isold(grmems_rec *ep,time_t dt,int ttl) noex {
 	int		rs = SR_FAULT ;
@@ -1111,8 +1075,7 @@ local int record_isold(grmems_rec *ep,time_t dt,int ttl) noex {
 	    f_old = ((dt - ep->ti_create) >= ttl) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_old : rs ;
-}
-/* end subroutine (record_isold) */
+} /* end subroutine (record_isold) */
 
 local int record_getgnp(grmems_rec *ep,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -1127,8 +1090,7 @@ local int record_getgnp(grmems_rec *ep,cchar **rpp) noex {
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (record_getgnp) */
+} /* end subroutine (record_getgnp) */
 
 local int usergid_start(grmems_ug *ugp,cchar *unp,int unl,gid_t gid) noex {
 	int		rs ;
@@ -1140,8 +1102,7 @@ local int usergid_start(grmems_ug *ugp,cchar *unp,int unl,gid_t gid) noex {
 	    ugp->gid = gid ;
 	} /* end if (memory-acquire) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (usergid_start) */
+} /* end subroutine (usergid_start) */
 
 local int usergid_finish(grmems_ug *ugp) noex {
 	int		rs = SR_FAULT ;
@@ -1153,11 +1114,10 @@ local int usergid_finish(grmems_ug *ugp) noex {
 		rs1 = lm_free(ugp->un) ;
 		if (rs >= 0) rs = rs1 ;
 		ugp->un = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (usergid_finish) */
+} /* end subroutine (usergid_finish) */
 
 /* PASSWD entry parsing */
 local int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
@@ -1191,8 +1151,7 @@ local int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
 	} /* end for (looping through fields) */
 	if (! fgid) ul = 0 ;
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (pwentparse) */
+} /* end subroutine (pwentparse) */
 
 local int vecobj_addouruniq(vecobj *ulp,grmems_u *unp) noex {
 	cint		ulen = var.usernamelen ;
@@ -1213,15 +1172,13 @@ local int vecobj_addouruniq(vecobj *ulp,grmems_u *unp) noex {
 	    rs = INT_MAX ;
 	}
 	return rs ;
-}
-/* end subroutine (vecobj_addouruniq) */
+} /* end subroutine (vecobj_addouruniq) */
 
 local int cmpug(cvoid *v1p,cvoid *v2p) noex {
 	grmems_ug	*g1p = (grmems_ug *) v1p ;
 	grmems_ug	*g2p = (grmems_ug *) v2p ;
 	return (g1p->gid - g2p->gid) ;
-}
-/* end subroutine (cmpug) */
+} /* end subroutine (cmpug) */
 
 local int vcmpug(cvoid **v1pp,cvoid **v2pp) noex {
 	grmems_ug	**g1pp = (grmems_ug **) v1pp ;
@@ -1241,8 +1198,7 @@ local int vcmpug(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (vcmpug) */
+} /* end subroutine (vcmpug) */
 
 vars::operator int () noex {
 	int		rs ;
@@ -1259,7 +1215,6 @@ vars::operator int () noex {
 	    }
 	} /* end if (ucpagesize) */
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
