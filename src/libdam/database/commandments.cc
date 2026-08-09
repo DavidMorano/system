@@ -438,7 +438,7 @@ int commandments_curenum(CMS *op,CMS_CUR *curp,CMS_ENT *ep,
 	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-} /* end subroutine (commandments_enum) */
+} /* end subroutine (commandments_curenum) */
 
 int commandments_get(CMS *op,int cn,char *rbuf,int rlen) noex {
 	return commandments_read(op,rbuf,rlen,cn) ;
