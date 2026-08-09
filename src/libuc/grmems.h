@@ -59,7 +59,7 @@ struct grmems_head {
 	time_t		ti_access ;
 	time_t		ti_usergids ;
 	GRMEMS_ST	s ;
-	uint		magic ;
+	uint		magval ;
 	uint		wcount ;	/* write-count */
 	int		pagesize ;
 	int		ttl ;		/* time-to-live */
@@ -76,15 +76,15 @@ typedef GRMEMS_ST	grmems_st ;
 
 EXTERNC_begin
 
-extern int grmems_start(grmems *,int,int) noex ;
-extern int grmems_curbegin(grmems *,grmems_cur *) noex ;
-extern int grmems_lookup(grmems *,grmems_cur *,cchar *,int) noex ;
-extern int grmems_lookread(grmems *,grmems_cur *,char *,int) noex ;
-extern int grmems_curend(grmems *,grmems_cur *) noex ;
-extern int grmems_invalidate(grmems *,cchar *,int) noex ;
-extern int grmems_check(grmems *,time_t) noex ;
-extern int grmems_stats(grmems *,grmems_st *) noex ;
-extern int grmems_finish(grmems *) noex ;
+extern int grmems_start		(grmems *,int,int) noex ;
+extern int grmems_curbegin	(grmems *,grmems_cur *) noex ;
+extern int grmems_lookup	(grmems *,grmems_cur *,cchar *,int) noex ;
+extern int grmems_lookread	(grmems *,grmems_cur *,char *,int) noex ;
+extern int grmems_curend	(grmems *,grmems_cur *) noex ;
+extern int grmems_invalidate	(grmems *,cchar *,int) noex ;
+extern int grmems_check		(grmems *,time_t) noex ;
+extern int grmems_stats		(grmems *,grmems_st *) noex ;
+extern int grmems_finish	(grmems *) noex ;
 
 EXTERNC_end
 
