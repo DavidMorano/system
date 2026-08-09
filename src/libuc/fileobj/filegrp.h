@@ -49,7 +49,7 @@ struct filegrp_head {
 	vechand		*alp ;
 	time_t		ti_check ;
 	FILEGRP_ST	s ;
-	uint		magic ;
+	uint		magval ;
 	int		ttl ;		/* time-to-live in seconds */
 	int		nmax ;		/* maximum entries */
 } ; /* end struct (filegrp_head) */
