@@ -240,7 +240,7 @@ static int mfscmder(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 	    cchar	*fmt ;
 
 	    while (rs >= 0) {
-	        kl = keyopt_enumkeys(kop,&kcur,&kp) ;
+	        kl = keyopt_curenumkeys(kop,&kcur,&kp) ;
 	        if (kl == SR_NOTFOUND) break ;
 	        rs = kl ;
 
