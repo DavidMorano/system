@@ -45,7 +45,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<new>			/* C++STD placement-new */
 #include	<vector>		/* C++STD */
 #include	<string>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
@@ -80,7 +80,6 @@ import deb ;
 /* imported namespaces */
 
 using std::string ;			/* type */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -104,7 +103,7 @@ local int langproc_ctor(langproc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->lvp = nullptr ;
 	    if (langstate *lsp ; (lsp = new(nt) langstate) != np) ylikely {
 		op->lsp = lsp ;
@@ -142,7 +141,7 @@ template<typename ... Args>
 local inline int langproc_magic(langproc *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LANGPROC_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LANGPROC_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (langproc_magic) */
@@ -164,15 +163,15 @@ int langproc_start(langproc *op) noex {
 	    if ((rs = langstate_start(op->lsp)) >= 0) ylikely {
 		vecstr *lvp = resumelife<vecstr>(op->lvp) ;
 		if ((rs = lvp->start) >= 0) ylikely {
-		    op->magic = LANGPROC_MAGIC ;
+		    op->magval = LANGPROC_MAGIC ;
 		}
 		if (rs < 0) {
 		    langstate_finish(op->lsp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (langstate_start) */
 	    if (rs < 0) {
 		langproc_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (langproc_ctor) */
 	return rs ;
 } /* end subroutine (langproc_start) */
@@ -194,7 +193,7 @@ int langproc_finish(langproc *op) noex {
 		rs1 = langproc_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (langproc_finish) */
