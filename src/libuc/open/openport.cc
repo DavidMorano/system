@@ -45,9 +45,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/socket.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/socket.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
@@ -125,7 +125,7 @@ namespace {
 	    pt = t ;
 	    proto = r ;
 	    sap = s ;
-	} ;
+	} ; /* end ctor */
 	operator int () noex ;
 	int start	() noex ;
 	int finish	() noex ;
