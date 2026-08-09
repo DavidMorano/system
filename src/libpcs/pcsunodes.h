@@ -46,7 +46,7 @@ extern int pcsunodes_start(PCSUNODES *,cchar *) noex ;
 extern int pcsunodes_get(PCSUNODES *,int,cchar **) noex ;
 extern int pcsunodes_mat(PCSUNODES *,cchar *,int) noex ;
 extern int pcsunodes_curbegin(PCSUNODES *,pcsunodes_cur *) noex ;
-extern int pcsunodes_enum(PCSUNODES *,pcsunodes_cur *,char *,int) noex ;
+extern int pcsunodes_curenum(PCSUNODES *,pcsunodes_cur *,char *,int) noex ;
 extern int pcsunodes_curend(PCSUNODES *,pcsunodes_cur *) noex ;
 extern int pcsunodes_audit(PCSUNODES *) noex ;
 extern int pcsunodes_finish(PCSUNODES *) noex ;
