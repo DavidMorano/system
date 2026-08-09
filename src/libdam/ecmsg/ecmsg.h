@@ -32,7 +32,44 @@ struct ecmsg_head {
 	int		elen ;
 } ; /* end struct */
 
-typedef	ECMSG		ecmsg ;
+#ifdef	__cplusplus
+enum ecmsgmems {
+    	ecmsgmem_start,
+	ecmsgmem_already,
+	ecmsgmem_finish,
+	ecmsgmem_overlast
+} ; /* end enum (ecmsgmems) */
+struct ecmsg ;
+struct ecmsg_co {
+	ecmsg		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (ecmsg *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (ecmsg_co) */
+struct ecmsg : ecmsg_head {
+	ecmsg_co	start ;
+	ecmsg_co	already ;
+	ecmsg_co	finish ;
+	ecmsg() noex {
+	    start	(this,ecmsgmem_start) ;
+	    already	(this,ecmsgmem_already) ;
+	    finish	(this,ecmsgmem_finish) ;
+	} ; /* end ctor */
+	ecmsg(const ecmsg &) = delete ;
+	ecmsg &operator = (const ecmsg &) = delete ;
+	int loadbuf	(cchar *,int = -1) noex ;
+	void dtor	() noex ;
+	operator int () noex ;
+} ; /* end struct (ecmsg) */
+#else	/* __cplusplus */
+typedef EXMSG		ecmsg ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
