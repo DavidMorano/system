@@ -13,13 +13,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-#include	<varmks.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
+#include	<varmks.h>		/* LIBUC */
 
 
 #define	VARMK		struct varmk_head
@@ -42,7 +39,7 @@ struct varmk_head {
 	VARMK_CALLS	call ;
 	void		*sop ;		/* shared-object (SO) pointer */
 	void		*obj ;		/* object pointer */
-	uint		magic ;
+	uint		magval ;
 	int		objsz ;		/* object size */
 } ; /* end struct */
 
@@ -51,11 +48,11 @@ typedef VARMK_CALLS	varmk_calls ;
 
 EXTERNC_begin
 
-extern int	varmk_open(varmk *,cchar *,int,mode_t,int) noex ;
-extern int	varmk_chgrp(varmk *,gid_t) noex ;
-extern int	varmk_addvar(varmk *,cchar *,cchar *,int) noex ;
-extern int	varmk_abort(varmk *) noex ;
-extern int	varmk_close(varmk *) noex ;
+extern int	varmk_open	(varmk *,cchar *,int,mode_t,int) noex ;
+extern int	varmk_chgrp	(varmk *,gid_t) noex ;
+extern int	varmk_addvar	(varmk *,cchar *,cchar *,int) noex ;
+extern int	varmk_abort	(varmk *) noex ;
+extern int	varmk_close	(varmk *) noex ;
 
 EXTERNC_end
 
