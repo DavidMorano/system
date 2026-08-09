@@ -1,5 +1,8 @@
-/* mfsns */
+/* mfsns HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
+/* version %I% last-modified %G% */
 /* version %I% last-modified %G% */
 
 
@@ -15,34 +18,29 @@
 
 /* Copyright © 2008,2017 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	MFSNS_INCLUDE
-#define	MFSNS_INCLUDE	1
+#define	MFSNS_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-#include	<sys/types.h>
-
-#include	<modload.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBDAM */
 
 
-#define	MFSNS_MAGIC	0x99447244
 #define	MFSNS		struct mfsns_head
-#define	MFSNS_CUR	struct mfsns_c
-#define	MFSNS_CALLS	struct mfsns_calls
-
+#define	MFSNS_CUR	struct mfsns_cursor
+#define	MFSNS_CA	struct mfsns_calls
+#define	MFSNS_MAGIC	0x99447244
 /* query options */
-
 #define	MFSNS_ONOSERV	(1<<0)		/* do not call the server */
 #define	MFSNS_OPREFIX	(1<<1)		/* prefix match */
 
 
-struct mfsns_c {
-	uint	magic ;
+struct mfsns_cursor {
 	void	*scp ;		/* SO-cursor pointer */
-} ;
+	uint	magval ;
+} ; /* end struct */
 
 struct mfsns_calls {
 	int	(*open)(void *,cchar *) ;
@@ -53,38 +51,34 @@ struct mfsns_calls {
 	int	(*curend)(void *,void *) ;
 	int	(*audit)(void *) ;
 	int	(*close)(void *) ;
-} ;
+} ; /* end struct */
 
 struct mfsns_head {
-	uint		magic ;
 	MODLOAD		loader ;
 	MFSNS_CALLS	call ;
 	void		*obj ;		/* object pointer */
-	int		objsize ;	/* object size */
-	int		cursize ;	/* cursor size */
-} ;
+	uint		magval ;
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
+} ; /* end struct */
 
+typedef	MFSNS		mfsns ;
+typedef	MFSNS_CUR	mfsns_cur ;
+typedef	MFSNS_CA	mfsns_ca ;
 
-#if	(! defined(MFSNS_MASTER)) || (MFSNS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int mfsns_open(mfsns *,cchar *) noex ;
+extern int mfsns_setopts(mfsns *,int) noex ;
+extern int mfsns_get(mfsns *,char *,int,cchar *,int) noex ;
+extern int mfsns_curbegin(mfsns *,mfsns_cur *) noex ;
+extern int mfsns_curenum(mfsns *,mfsns_cur *,char *,int,int) noex ;
+extern int mfsns_curend(mfsns *,mfsns_cur *) noex ;
+extern int mfsns_audit(mfsns *) noex ;
+extern int mfsns_close(mfsns *) noex ;
 
-extern int mfsns_open(MFSNS *,cchar *) ;
-extern int mfsns_setopts(MFSNS *,int) ;
-extern int mfsns_get(MFSNS *,char *,int,cchar *,int) ;
-extern int mfsns_curbegin(MFSNS *,MFSNS_CUR *) ;
-extern int mfsns_enum(MFSNS *,MFSNS_CUR *,char *,int,int) ;
-extern int mfsns_curend(MFSNS *,MFSNS_CUR *) ;
-extern int mfsns_audit(MFSNS *) ;
-extern int mfsns_close(MFSNS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MFSNS_MASTER */
 
 #endif /* MFSNS_INCLUDE */
 
