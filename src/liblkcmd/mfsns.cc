@@ -31,18 +31,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<estrings.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mfsns.h"
 
@@ -65,11 +65,11 @@
 
 /* forward references */
 
-static int	mfsns_objloadbegin(MFSNS *,cchar *,cchar *) ;
-static int	mfsns_objloadend(MFSNS *) ;
-static int	mfsns_loadcalls(MFSNS *,cchar *) ;
+local int	mfsns_objloadbegin(MFSNS *,cchar *,cchar *) noex ;
+local int	mfsns_objloadend(MFSNS *) noex ;
+local int	mfsns_loadcalls(MFSNS *,cchar *) noex ;
 
-static int	isrequired(int) ;
+local bool	isrequired(int) noex ;
 
 
 /* external variables */
@@ -77,7 +77,19 @@ static int	isrequired(int) ;
 
 /* local variables */
 
-static cchar	*subs[] = {
+enum subs {
+	sub_open,
+	sub_setopts,
+	sub_get,
+	sub_curbegin,
+	sub_curenum,
+	sub_curend,
+	sub_audit,
+	sub_close,
+	sub_overlast
+} ; /* end enum */
+
+constexpr cpcchar	subs[] = {
 	"open",
 	"setopts",
 	"get",
@@ -86,32 +98,21 @@ static cchar	*subs[] = {
 	"curend",
 	"audit",
 	"close",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
-enum subs {
-	sub_open,
-	sub_setopts,
-	sub_get,
-	sub_curbegin,
-	sub_enum,
-	sub_curend,
-	sub_audit,
-	sub_close,
-	sub_overlast
-} ;
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int mfsns_open(MFSNS *op,cchar *pr)
-{
+int mfsns_open(MFSNS *op,cchar *pr) noex {
 	int		rs ;
 	cchar	*objname = MFSNS_OBJNAME ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
@@ -139,7 +140,7 @@ int mfsns_close( MFSNS *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MFSNS_MAGIC) return SR_NOTOPEN ;
 
@@ -159,11 +160,11 @@ int mfsns_setopts(MFSNS *op,int opts)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MFSNS_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.setopts != NULL) {
+	if (op->call.setopts != nullptr) {
 	    rs = (*op->call.setopts)(op->obj,opts) ;
 	}
 
@@ -176,11 +177,11 @@ int mfsns_audit(MFSNS *op)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MFSNS_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.audit != NULL) {
+	if (op->call.audit != nullptr) {
 	    rs = (*op->call.audit)(op->obj) ;
 	}
 
@@ -193,7 +194,7 @@ int mfsns_get(MFSNS *op,char *rbuf,int rlen,cchar *un,int w)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MFSNS_MAGIC) return SR_NOTOPEN ;
 
@@ -201,7 +202,7 @@ int mfsns_get(MFSNS *op,char *rbuf,int rlen,cchar *un,int w)
 	debugprintf("mfsns_get ent un=%s w=%u\n",un,w) ;
 #endif
 
-	if (op->call.get != NULL) {
+	if (op->call.get != nullptr) {
 	    rs = (*op->call.get)(op->obj,rbuf,rlen,un,w) ;
 	}
 
@@ -214,14 +215,14 @@ int mfsns_curbegin(MFSNS *op,MFSNS_CUR *curp)
 {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != MFSNS_MAGIC) return SR_NOTOPEN ;
 
 	memset(curp,0,sizeof(MFSNS_CUR)) ;
 
-	if (op->call.curbegin != NULL) {
+	if (op->call.curbegin != nullptr) {
 	    void	*p ;
 	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
 		curp->scp = p ;
@@ -230,7 +231,7 @@ int mfsns_curbegin(MFSNS *op,MFSNS_CUR *curp)
 		}
 		if (rs < 0) {
 	    	    uc_free(curp->scp) ;
-	    	    curp->scp = NULL ;
+	    	    curp->scp = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
 	} else
@@ -246,55 +247,50 @@ int mfsns_curend(MFSNS *op,MFSNS_CUR *curp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != MFSNS_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != MFSNS_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->scp != NULL) {
-	    if (op->call.curend != NULL) {
+	if (curp->scp != nullptr) {
+	    if (op->call.curend != nullptr) {
 	        rs1 = (*op->call.curend)(op->obj,curp->scp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    rs1 = uc_free(curp->scp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    curp->scp = NULL ;
+	    curp->scp = nullptr ;
 	} else
 	    rs = SR_NOTSUP ;
 
 	curp->magic = 0 ;
 	return rs ;
-}
-/* end subroutine (mfsns_curend) */
+} /* end subroutine (mfsns_curend) */
 
-
-/* enumerate entries */
-int mfsns_enum(MFSNS *op,MFSNS_CUR *curp,char *vbuf,int vlen,int w)
-{
+int mfsns_curenum(MFSNS *op,MFSNS_CUR *curp,char *vbuf,int vlen,int w) noex {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (vbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (vbuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != MFSNS_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != MFSNS_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.enumerate != NULL) {
+	if (op->call.enumerate != nullptr) {
 	    rs = (*op->call.enumerate)(op->obj,curp->scp,vbuf,vlen,w) ;
 	}
 
 	return rs ;
-}
-/* end subroutine (mfsns_enumerate) */
+} /* end subroutine (mfsns_curenum) */
 
 
 /* private subroutines */
 
 
 /* find and load the DB-access object */
-static int mfsns_objloadbegin(MFSNS *op,cchar *pr,cchar *objname)
+local int mfsns_objloadbegin(MFSNS *op,cchar *pr,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
@@ -311,10 +307,10 @@ static int mfsns_objloadbegin(MFSNS *op,cchar *pr,cchar *objname)
 	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
 	    const int	nlen = SYMNAMELEN ;
 	    int		i ;
-	    int		f_modload = FALSE ;
+	    int		f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;
@@ -359,7 +355,7 @@ static int mfsns_objloadbegin(MFSNS *op,cchar *pr,cchar *objname)
 		    rs = mfsns_loadcalls(op,objname) ;
 		    if (rs < 0) {
 			uc_free(op->obj) ;
-			op->obj = NULL ;
+			op->obj = nullptr ;
 		    }
 		} /* end if (memory-allocation) */
 	    } /* end if (getmva) */
@@ -372,15 +368,15 @@ static int mfsns_objloadbegin(MFSNS *op,cchar *pr,cchar *objname)
 /* end subroutine (mfsns_objloadbegin) */
 
 
-static int mfsns_objloadend(MFSNS *op)
+local int mfsns_objloadend(MFSNS *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj != nullptr) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
 	rs1 = modload_close(&op->loader) ;
@@ -391,7 +387,7 @@ static int mfsns_objloadend(MFSNS *op)
 /* end subroutine (mfsns_objloadend) */
 
 
-static int mfsns_loadcalls(MFSNS *op,cchar *objname)
+local int mfsns_loadcalls(MFSNS *op,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
 	const int	nlen = SYMNAMELEN ;
@@ -401,11 +397,11 @@ static int mfsns_loadcalls(MFSNS *op,cchar *objname)
 	char		nbuf[SYMNAMELEN + 1] ;
 	const void	*snp ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = NULL ;
+		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
 		}
 	    }
@@ -415,10 +411,10 @@ static int mfsns_loadcalls(MFSNS *op,cchar *objname)
 #if	CF_DEBUGS
 	    debugprintf("mfsns_loadcalls: call=%s %c\n",
 		subs[i],
-		((snp != NULL) ? 'Y' : 'N')) ;
+		((snp != nullptr) ? 'Y' : 'N')) ;
 #endif
 
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 
 	        c += 1 ;
 		switch (i) {
@@ -443,7 +439,7 @@ static int mfsns_loadcalls(MFSNS *op,cchar *objname)
 			(int (*)(void *,void *)) snp ;
 		    break ;
 
-		case sub_enum:
+		case sub_curenum:
 		    op->call.enumerate = 
 			(int (*)(void *,void *,char *,int,int)) snp ;
 		    break ;
@@ -471,20 +467,17 @@ static int mfsns_loadcalls(MFSNS *op,cchar *objname)
 }
 /* end subroutine (mfsns_loadcalls) */
 
-
-static int isrequired(int i)
-{
-	int		f = FALSE ;
+local bool isrequired(int i) noex {
+	bool		f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_setopts:
 	case sub_get:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
