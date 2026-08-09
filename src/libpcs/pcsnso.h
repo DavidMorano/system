@@ -37,8 +37,8 @@
 
 struct pcsnso_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct pcsnso_cursor {
@@ -67,7 +67,7 @@ struct pcsnso_head {
 	ids		id ;
 	PCSNSC		client ;		/* the PCS-client object */
 	time_t		ti_lastcheck ;		/* server-open check */
-	uint		magic ;
+	uint		magval ;
 	int		ncursors ;
 	int		opts ;
 } ; /* end struct (pcsnso_head) */
