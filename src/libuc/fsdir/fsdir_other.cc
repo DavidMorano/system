@@ -41,7 +41,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysflag.h>		/* LINU */
+#include	<usysflag.h>		/* LIBU */
 
 #if	F_SUNOS || F_LINUX || (defined(CF_TEST) && (CF_TEST > 0))
 
