@@ -27,21 +27,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |getustime(3u)| */
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<fsdir.h>
-#include	<strn.h>		/* |strnrchr(3uc)| */
-#include	<strx.h>
-#include	<matstr.h>		/* |matstr(3uc)| */
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |getustime(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnrchr(3uc)| */
+#include	<strx.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC |matstr(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysdialer.h"
 
