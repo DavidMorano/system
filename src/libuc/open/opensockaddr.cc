@@ -47,8 +47,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/socket.h>
-#include	<unistd.h>
+#include	<sys/socket.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -71,12 +71,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_socket(int,int,int) noex ;
-    extern int uc_connect(int,cvoid *,int) noex ;
-    extern int uc_connecte(int,cvoid *,int,int) noex ;
-} /* end extern */
 
 
 /* external variables */
