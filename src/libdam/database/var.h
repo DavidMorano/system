@@ -20,16 +20,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<stddef.h>		/* language types */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-
-#include	<vars.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
+#include	<vars.h>		/* LIBDAM */
 
 
 #define	VAR		struct var_head
@@ -50,7 +47,7 @@ struct var_information {
 
 struct var_cursor {
 	void		*scp ;		/* SO-cursor pointer */
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 EXTERNC_begin
@@ -72,7 +69,7 @@ struct var_head {
 	modload		loader ;
 	VAR_CALLS	call ;
 	void		*obj ;		/* object pointer */
-	uint		magic ;
+	uint		magval ;
 	int		objsz ;		/* object size */
 	int		cursz ;		/* cursor size */
 } ; /* end struct */
@@ -96,7 +93,7 @@ extern int	var_opena(var *,mainv) noex ;
 extern int	var_count(var *) noex ;
 extern int	var_curbegin(var *,var_cur *) noex ;
 extern int	var_fetch(var *,cchar *,int,var_cur *,char *,int) noex ;
-extern int	var_enum(var *,var_cur *,char *,int,char *,int) noex ;
+extern int	var_curenum(var *,var_cur *,char *,int,char *,int) noex ;
 extern int	var_curend(var *,var_cur *) noex ;
 extern int	var_getinfo(var *,var_info *) noex ;
 extern int	var_audit(var *) noex ;
