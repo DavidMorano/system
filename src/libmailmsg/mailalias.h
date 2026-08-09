@@ -127,7 +127,7 @@ EXTERNC_begin
 extern int	mailalias_open(mailalias *,cc *,cc *,int,mode_t,int) noex ;
 extern int	mailalias_getinfo(mailalias *,mailalias_info *) noex ;
 extern int	mailalias_curbegin(mailalias *,mailalias_cur *) noex ;
-extern int	mailalias_enum(mailalias *,mailalias_cur *,
+extern int	mailalias_curenum(mailalias *,mailalias_cur *,
 			char *,int,char *,int) noex ;
 extern int	mailalias_fetch(mailalias *,int,cchar *,
 			mailalias_cur *,char *,int) noex ;
