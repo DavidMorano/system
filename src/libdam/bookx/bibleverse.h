@@ -2,6 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
+/* BibleVerse object-load management */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
