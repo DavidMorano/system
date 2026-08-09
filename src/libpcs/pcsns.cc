@@ -244,7 +244,7 @@ int pcsns_curend(pcsns *op,PCSNS_CUR *curp) noex {
 }
 /* end subroutine (pcsns_curend) */
 
-int pcsns_enum(pcsns *op,PCSNS_CUR *curp,char *vbuf,int vlen,int w) noex {
+int pcsns_curenum(pcsns *op,PCSNS_CUR *curp,char *vbuf,int vlen,int w) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -260,7 +260,7 @@ int pcsns_enum(pcsns *op,PCSNS_CUR *curp,char *vbuf,int vlen,int w) noex {
 
 	return rs ;
 }
-/* end subroutine (pcsns_enumerate) */
+/* end subroutine (pcsns_curenumerate) */
 
 
 /* private subroutines */
