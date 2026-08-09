@@ -185,12 +185,11 @@ int setstr_del(setstr *op,cchar *sp,int µsl) noex {
 
 int setstr_delall(setstr *op) noex {
     	return hdb_delall(op) ;
-}
+} /* end subroutine */
 
 int setstr_count(setstr *op) noex {
 	return hdb_count(op) ;
-}
-/* end subroutine (setstr_count) */
+} /* end subroutine (setstr_count) */
 
 int setstr_curbegin(setstr *op,setstr_cur *curp) noex {
 	return hdb_curbegin(op,curp) ;
