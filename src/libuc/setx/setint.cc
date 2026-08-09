@@ -27,18 +27,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<initializer_list>
-#include	<utility>
-#include	<functional>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<unordered_set>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
+#include	<initializer_list>	/* C++STD */
+#include	<utility>		/* C++STD */
+#include	<functional>		/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<unordered_set>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"setint.h"
 
@@ -50,7 +50,6 @@
 
 using std::unordered_set ;		/* type-template */
 using std::pair ;			/* type-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -192,6 +191,7 @@ int setint_mkvec(setint *op,int *va) noex {
 
 int setint_curbegin(setint *op,setint_cur *curp) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && curp) ylikely {
 	    rs = SR_NOTOPEN ;
@@ -199,7 +199,7 @@ int setint_curbegin(setint *op,setint_cur *curp) noex {
 	        usetint		*setp = usetintp(op->setp) ;
 	        usetintit	*interp ;
 		rs = SR_NOMEM ;
-	        if ((interp = new(nothrow) usetintit) != np) ylikely {
+	        if ((interp = new(nt) usetintit) != np) ylikely {
 	            *interp = setp->begin() ;
 	            curp->interp = voidp(interp) ;
 		    rs = SR_OK ;
