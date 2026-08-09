@@ -57,17 +57,15 @@ enum sysdialeros {
 } ; /* end enum (sysdialeros) */
 
 #ifdef	__cplusplus
-
 struct sysdialerms {
-	inline static cint	full	= (1 << sysdialero_full) ;
-	inline static cint	halfout	= (1 << sysdialero_halfout) ;
-	inline static cint	halfin	= (1 << sysdialero_halfin) ;
-	inline static cint	cor	= (1 << sysdialero_cor) ;
-	inline static cint	co	= (1 << sysdialero_co) ;
-	inline static cint	cl	= (1 << sysdialero_cl) ;
-	inline static cint	nargs	= (1 << sysdialero_nargs) ;
+	static constexpr int	full	= (1 << sysdialero_full) ;
+	static constexpr int	halfout	= (1 << sysdialero_halfout) ;
+	static constexpr int	halfin	= (1 << sysdialero_halfin) ;
+	static constexpr int	cor	= (1 << sysdialero_cor) ;
+	static constexpr int	co	= (1 << sysdialero_co) ;
+	static constexpr int	cl	= (1 << sysdialero_cl) ;
+	static constexpr int	nargs	= (1 << sysdialero_nargs) ;
 } ; /* end struct (sysdialerms) */
-
 #endif /* __cplusplus */
 
 #define	SYSDIALER_MFULL		(1 << sysdialero_full)
@@ -229,6 +227,10 @@ namespace sysdialer_util {
     extern int entry_hasname	(SYSDIALER_ENT *,void *,cchar *) noex ;
     extern int entry_finish	(SYSDIALER_ENT *) noex ;
 } /* end namespace (sysdialer_util) */
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+extern const sysdialerms	sysdialerm ;
 #endif /* __cplusplus */
 
 
