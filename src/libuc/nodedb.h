@@ -21,17 +21,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecobj.h>
-#include	<hdb.h>
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
 
 
-#define	NODEDB_MAGIC		0x31415926
 #define	NODEDB			struct nodedb_head
 #define	NODEDB_CUR		struct nodedb_cursor
 #define	NODEDB_ENT		struct nodedb_entry
+#define	NODEDB_MAGIC		0x31415926
 #define	NODEDB_NFILES		3
 #define	NODEDB_DEFENTS		10
 #define	NODEDB_ENTLENMULT	4	/* entry-length multiplier */
@@ -71,9 +71,9 @@ extern int nodedb_open(nodedb *,cchar *) noex ;
 extern int nodedb_fileadd(nodedb *,cchar *) noex ;
 extern int nodedb_curbegin(nodedb *,nodedb_cur *) noex ;
 extern int nodedb_curend(nodedb *,nodedb_cur *) noex ;
+extern int nodedb_curenum(nodedb *,nodedb_cur *,nodedb_ent *,char *,int) noex ;
 extern int nodedb_fetch(nodedb *,cchar *,nodedb_cur *,
 		nodedb_ent *,char *,int) noex ;
-extern int nodedb_enum(nodedb *,nodedb_cur *,nodedb_ent *,char *,int) noex ;
 extern int nodedb_check(nodedb *,time_t) noex ;
 extern int nodedb_close(nodedb *) noex ;
 
