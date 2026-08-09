@@ -27,8 +27,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<unistd.h>
-#include	<climits>
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
@@ -96,9 +96,9 @@ local bool	isreadable(int) noex ;
 
 /* local variables */
 
-constexpr cchar		sysbanner[] = SYSBANNER ;
-
-constexpr bool		f_filemap = CF_FILEMAP ;
+constexpr int		cols		 = COLUMNS ;
+constexpr cchar		sysbanner[]	= SYSBANNER ;
+constexpr bool		f_filemap	= CF_FILEMAP ;
 
 
 /* exported variables */
@@ -135,7 +135,7 @@ int opensys_banner(cchar *fname,int of,mode_t om) noex {
 local int process(cchar *ds,int f_top) noex {
 	int		rs ;
 	int		rs1 ;
-	int		fd = -1 ;
+	int		fd = -1 ; /* return-value */
 	if (int pipes[2] ; (rs = uc_pipe(pipes)) >= 0) {
 	    cint	wfd = pipes[1] ;
 	    fd = pipes[0] ;
@@ -168,7 +168,7 @@ local int procfiler(filer *wfp,cchar *ds,int f_top) noex {
 
 local int procfile_map(filer *wfp,cchar *ds,int f_top) noex {
 	filemap		sysban, *sfp = &sysban ;
-	cint		maxsize = (5*1024) ;
+	cint		maxsize = (5 * 1024) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -184,7 +184,7 @@ local int procfile_map(filer *wfp,cchar *ds,int f_top) noex {
 	            rs = printsub(wfp,ds,lbuf,len) ;
 	            wlen += rs ;
 	        } else {
-	            rs = filer_println(wfp,lbuf,len) ;
+	            rs = wfp->println(lbuf,len) ;
 	            wlen += rs ;
 	        }
 	        line += 1 ;
@@ -206,11 +206,10 @@ local int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 	    cint	to = -1 ;
 	    cmode	om = 0666 ;
 	    if ((rs = uc_open(sysbanner,of,om)) >= 0) {
-	        filer	sysban, *sfp = &sysban ;
 	        cint	fd = rs ;
-	        if ((rs = filer_start(sfp,fd,0z,0,0)) >= 0) {
+	        if (filer sysban ; (rs = sysban.start(fd,0z,0,0)) >= 0) {
 	            int		line = 0 ;
-	            while ((rs = filer_readln(sfp,lbuf,llen,to)) > 0) {
+	            while ((rs = sysban.readln(lbuf,llen,to)) > 0) {
 	                cint	len = rmeol(lbuf,rs) ;
 	                if (f_top && (line == 0)) {
 	                    rs = printend(wfp,ds,lbuf,len) ;
@@ -219,13 +218,13 @@ local int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 	                    rs = printsub(wfp,ds,lbuf,len) ;
 	                    wlen += rs ;
 	                } else {
-	                    rs = filer_println(wfp,lbuf,len) ;
+	                    rs = wfp->println(lbuf,len) ;
 	                    wlen += rs ;
 	                }
 	                line += 1 ;
 	                if (rs < 0) break ;
 	            } /* end while (reading lines) */
-	            rs1 = filer_finish(sfp) ;
+	            rs1 = sysban.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (filer) */
 	        rs1 = uc_close(fd) ;
@@ -238,28 +237,27 @@ local int procfile_reg(filer *wfp,cchar *ds,int f_top) noex {
 } /* end subroutine (procfile_reg) */
 
 local int printend(filer *wfp,cchar *ds,cchar *lbuf,int len) noex {
-	cint		cols = COLUMNS ;
 	cint		dl = lenstr(ds) ;
 	int		rs = SR_OK ;
-	int		breaklen ;
+	int		brklen ;
 	int		ml ;
 	int		i = 0 ;
-	int		wlen = 0 ;
-	breaklen = (cols - dl) ;
-	if ((rs >= 0) && (i < breaklen)) {
-	    ml = min(len,breaklen) ;
-	    rs = filer_write(wfp,(lbuf+i),ml) ;
+	int		wlen = 0 ; /* return-value */
+	brklen = (cols - dl) ;
+	if ((rs >= 0) && (i < brklen)) {
+	    ml = min(len,brklen) ;
+	    rs = wfp->write((lbuf + i),ml) ;
 	    wlen += rs ;
 	    i += rs ;
 	}
-	if ((rs >= 0) && (i < breaklen)) {
-	    ml = (breaklen-i) ;
-	    rs = filer_writeblanks(wfp,ml) ;
+	if ((rs >= 0) && (i < brklen)) {
+	    ml = (brklen-i) ;
+	    rs = wfp->writeblanks(ml) ;
 	    wlen += rs ;
 	    i += rs ;
 	}
 	if (rs >= 0) {
-	    rs = filer_write(wfp,ds,dl) ;
+	    rs = wfp->write(ds,dl) ;
 	    wlen += rs ;
 	}
 	if (rs >= 0) {
@@ -293,7 +291,7 @@ local int filer_char(filer *wfp,int ch) noex {
 	char		wbuf[2] ;
 	wbuf[0] = charconv(ch) ;
 	wbuf[1] = '\0' ;
-	return filer_write(wfp,wbuf,1) ;
+	return wfp->write(wbuf,1) ;
 } /* end subroutine (filer_char) */
 
 local bool isreadable(int of) noex {
