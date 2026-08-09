@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* BV object-load management */
+/* BibleVerse object-load management */
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* non-switchable debug print-outs */
