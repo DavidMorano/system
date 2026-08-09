@@ -58,9 +58,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>		/* |O_{xx}| */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® |O_{xx}| */
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
@@ -196,9 +196,9 @@ int suber::fileclose() noex {
 int suber::loadfd() noex {
 	int		rs ;
 	int		c = 0 ;
-	if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
+	if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) ylikely {
 	    csize fsize = size_t(sb.st_size) ;
-	    if (! S_ISDIR(sb.st_mode)) {
+	    if (! S_ISDIR(sb.st_mode)) ylikely {
 		int	to = -1 ;
 	        int	cs ;
 		int	fbsz = 1024 ;
