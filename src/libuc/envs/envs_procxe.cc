@@ -157,7 +157,7 @@ template<typename ... Args>
 local inline int envs_magic(envs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == ENVS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == ENVS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (envs_magic) */
@@ -400,7 +400,7 @@ int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 	                if (cl > 0) {
 			    cchar	*dn{} ;
 			    if (nulstr ns ; (rs = ns.start(cp,cl,&dn)) >= 0) {
-	                        if (USTAT sb ; (rs = u_stat(dn,&sb)) >= 0) {
+	                        if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
 	                            if (! S_ISDIR(sb.st_mode)) {
 	                                f_store = false ;
 				    }
@@ -427,7 +427,7 @@ int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 	                    }
 	                } /* end if (sep) */
 	                if (rs >= 0) {
-	                    bool	f_append = atp->add ;
+	                    cbool	f_append = atp->add ;
 	                    rs = envs_store(nlp,enp,f_append,cp,cl) ;
 	                } /* end if */
 	            } /* end if (store) */
