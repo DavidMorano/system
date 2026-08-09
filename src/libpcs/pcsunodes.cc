@@ -189,7 +189,7 @@ int pcsunodes_curend(PN *op,PN_CUR *curp) noex {
 }
 /* end subroutine (pcsunodes_curend) */
 
-int pcsunodes_enum(PN *op,PN_CUR *curp,char *rbuf,int rlen) noex {
+int pcsunodes_curenum(PN *op,PN_CUR *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rl = 0 ; /* return-value */
 	if ((rs = pcsunodes_magic(op,curp,rbuf)) >= 0) {
@@ -206,7 +206,7 @@ int pcsunodes_enum(PN *op,PN_CUR *curp,char *rbuf,int rlen) noex {
 	} /* end if (pcsunodes_magic) */
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (pcsunodes_enum) */
+/* end subroutine (pcsunodes_curenum) */
 
 int pcsunodes_audit(PN *op) noex {
     	int		rs ;
