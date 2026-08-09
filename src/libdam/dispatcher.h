@@ -31,11 +31,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ciq.h>
-#include	<psem.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ciq.h>			/* LIBUC */
+#include	<psem.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	DISPATCHER	struct dispatcher_head
@@ -47,7 +47,7 @@ struct dispatcher_head {
 	vecobj		tids ;
 	void		*callsub ;	/* called subroutine entry-address */
 	void		*callarg ;	/* called subroutine argument */
-	uint		magic ;
+	uint		magval ;
 	volatile int	f_exit ;	/* CMD to exit immediately */
 	volatile int	f_done ;	/* CMD to exit after work completed */
 	int		nthr ;		/* concurrency */
