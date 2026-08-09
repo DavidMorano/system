@@ -40,14 +40,14 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<matxstr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"svckey.h"
 
@@ -145,7 +145,6 @@ int svckey_load(svckey *skp,svcfile_ent *sep) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (svckey_load) */
+} /* end subroutine (svckey_load) */
 
 
