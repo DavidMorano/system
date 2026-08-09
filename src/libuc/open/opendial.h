@@ -31,6 +31,12 @@ enum opendialopts {
 	opendialopt_overlast
 } ; /* end enum (opendialopts) */
 
+#ifdef	__cplusplus
+struct opendialoptms {
+    	static constexpr int	mlong		= (1 << opendialopt_long) ;
+} ; /* end struct (opendialoptms) */
+#endif /* __cplusplus */
+
 /* options */
 #define	OPENDIAL_OLONG		(1 << opendialopt_long)	/* FINGER "long" */
 
@@ -39,6 +45,10 @@ EXTERNC_begin
 extern int opendial(int,int,cc *,cc *,cc *,con mainv,con mainv,int,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const opendialoptms	optdialoptm ;
+#endif /* __cplusplus */
 
 
 #endif /* OPENDIAL_INCLUDE */
