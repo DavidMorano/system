@@ -32,30 +32,35 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<bfile.h>
-#include	<absfn.h>
-#include	<field.h>
-#include	<fieldterminit.hh>
-#include	<sncpyx.h>
-#include	<sfx.h>
-#include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<char.h>
-#include	<timestr.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |lenstr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<absfn.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"svcfile.h"
 
@@ -65,14 +70,19 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	SVCFILE_INTCHECK	2	/* file-change check interval */
-#define	SVCFILE_INTWAIT		2	/* file-change wait interval */
-
-#define	SVCFILE_FILE		xsvcfile_file
-#define	SVCFILE_KEYNAME		svcfile_keyname
-#define	SVCFILE_SF_IE		svcfile_ie
-#define	SVCFILE_SVCNAME		svcfile_svcname
-#define	SF_IE			svcfile_ie
+#define	SVF			svcfile
+#define	SVF_CUR			svcfile_cur
+#define	SVF_ENT			svcfile_ent
+#define	SVF_FILE		svcfile_file
+#define	SVF_KEYNAME		svcfile_keyname
+#define	SVF_SVCNAME		svcfile_svcname
+#define	SVF_IE			svcfile_ie
+#define	SVF_INTCHECK		2	/* file-change check interval */
+#define	SVF_INTWAIT		2	/* file-change wait interval */
+#define	SVF_KA			szof(char *(*)[2])
+#define	SVF_BO(v)		\
+	((SVF_KA - ((v) % SVF_KA)) % SVF_KA)
+#define	SVF_MAG			SVCFILE_MAGIC
 
 #define	SVCENTRY		svcentry
 #define	SVCENTRY_KEY		svcentry_key
@@ -83,24 +93,15 @@ import libutil ;			/* |lenstr(3u)| */
 #define	DEFNFILES		10
 #define	DEFNENTRIES		10
 
-#define	SVCFILE_KA		szof(char *(*)[2])
-#define	SVCFILE_BO(v)		\
-	((SVCFILE_KA - ((v) % SVCFILE_KA)) % SVCFILE_KA)
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
 
 
 /* external variables */
@@ -113,12 +114,12 @@ struct svcfile_svcname {
 	int		count ;
 } ; /* end struct */
 
-struct xsvcfile_file {
+struct svcfile_file {
 	cchar		*fname ;
 	time_t		timod ;
 	ino_t		ino ;
 	dev_t		dev ;
-	int		fsize ;
+	int		fsz ;
 } ; /* end struct */
 
 struct svcfile_keyname {
@@ -161,24 +162,25 @@ template<typename ... Args>
 local int svcfile_ctor(svcfile *op,Args ... args) noex {
 	SVCFILE		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->flp = new(nothrow) vecobj) != np) ylikely {
-	        if ((op->slp = new(nothrow) vecobj) != np) ylikely {
-	            if ((op->elp = new(nothrow) hdb) != np) ylikely {
+	    if ((op->flp = new(nt) vecobj) != np) ylikely {
+	        if ((op->slp = new(nt) vecobj) != np) ylikely {
+	            if ((op->elp = new(nt) hdb) != np) ylikely {
 	 		rs = SR_OK ;
 	            } /* end if (new-hdb) */
 		    if (rs < 0) {
 		        delete op->slp ;
 		        op->slp = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (new-vecobj) */
 		if (rs < 0) {
 		    delete op->flp ;
 		    op->flp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
@@ -208,7 +210,7 @@ template<typename ... Args>
 local inline int svcfile_magic(svcfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SVCFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SVF_MAG) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (svcfile_magic) */
@@ -243,21 +245,21 @@ local int	svcentry_nkeys(SVCENTRY *) noex ;
 local int	svcentry_size(SVCENTRY *) noex ;
 local int	svcentry_finish(SVCENTRY *) noex ;
 
-local int	file_start(SVCFILE_FILE *,cchar *) noex ;
-local int	file_finish(SVCFILE_FILE *) noex ;
+local int	file_start(SVF_FILE *,cchar *) noex ;
+local int	file_finish(SVF_FILE *) noex ;
 
-local int	svcname_start(SVCFILE_SVCNAME *,cchar *) noex ;
-local int	svcname_incr(SVCFILE_SVCNAME *) noex ;
-local int	svcname_decr(SVCFILE_SVCNAME *) noex ;
-local int	svcname_finish(SVCFILE_SVCNAME *) noex ;
+local int	svcname_start(SVF_SVCNAME *,cchar *) noex ;
+local int	svcname_incr(SVF_SVCNAME *) noex ;
+local int	svcname_decr(SVF_SVCNAME *) noex ;
+local int	svcname_finish(SVF_SVCNAME *) noex ;
 
-local int	ientry_loadstr(SF_IE *,char *,SVCENTRY *) noex ;
-local int	ientry_finish(SF_IE *) noex ;
+local int	ientry_loadstr(SVF_IE *,char *,SVCENTRY *) noex ;
+local int	ientry_finish(SVF_IE *) noex ;
 #if	CF_MOREKEYS
-local int	ientry_morekeys(SF_IE *,int,int) noex ;
+local int	ientry_morekeys(SVF_IE *,int,int) noex ;
 #endif
 
-local int	entry_load(svcfile_ent *,char *,int,SF_IE *) noex ;
+local int	entry_load(svcfile_ent *,char *,int,SVF_IE *) noex ;
 
 local int	mkvars() noex ;
 
@@ -310,18 +312,17 @@ int svcfile_open(svcfile *op,cchar *fname) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = svcfile_ctor(op)) >= 0) ylikely {
-	    static cint		rsv = mkvars() ;
-	    if ((rs = rsv) >= 0) ylikely {
-	        int		sz = szof(SVCFILE_FILE) ;
-	        int		vn = DEFNFILES ;
-	        int		vo = (vecobjm.stationary | vecobjm.reuse) ;
+	    if (static cint rsv = mkvars() ; (rs = rsv) >= 0) ylikely {
+	        int	sz = szof(SVF_FILE) ;
+	        int	vn = DEFNFILES ;
+	        int	vo = (vecobjm.stationary | vecobjm.reuse) ;
 	        if ((rs = vecobj_start(op->flp,sz,vn,vo)) >= 0) ylikely {
-	            sz = szof(SVCFILE_SVCNAME) ;
+	            sz = szof(SVF_SVCNAME) ;
 	            vo = vecobjm.compact ;
 	            if ((rs = vecobj_start(op->slp,sz,10,vo)) >= 0) ylikely {
 	                vn = DEFNENTRIES ;
 	                if ((rs = hdb_start(op->elp,vn,0,np,np)) >= 0) {
-	                    op->magic = SVCFILE_MAGIC ;
+	                    op->magval = SVF_MAG ;
 	                    op->checktime = getustime ;
 	                    if (fname) {
 	                        rs = svcfile_fileadd(op,fname) ;
@@ -329,7 +330,7 @@ int svcfile_open(svcfile *op,cchar *fname) noex {
 	                    }
 	                    if (rs < 0) {
 	                        hdb_finish(op->elp) ;
-	                        op->magic = 0 ;
+	                        op->magval = 0 ;
 	                    } /* end if (error) */
 	                } /* end if (hdb-start) */
 	                if (rs < 0) {
@@ -382,7 +383,7 @@ int svcfile_close(svcfile *op) noex {
 	        rs1 = svcfile_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (svcfile_close) */
@@ -395,7 +396,7 @@ int svcfile_fileadd(svcfile *op,cchar *fname) noex {
 	    absfn	af ;
 	    int		fi = 0 ;
 	    if (cchar *fn{} ; (rs = af.start(fname,-1,&fn)) >= 0) ylikely {
-	        SVCFILE_FILE	fe ;
+	        SVF_FILE	fe ;
 	        vecobj		*flp = op->flp ;
 	        if ((rs = file_start(&fe,fn)) >= 0) ylikely {
 	            cint	rsn = SR_NOTFOUND ;
@@ -408,7 +409,7 @@ int svcfile_fileadd(svcfile *op,cchar *fname) noex {
 	                    if (rs < 0) {
 	                        f_fin = true ;
 	                        vecobj_del(flp,fi) ;
-	                    }
+	                    } /* end if (error) */
 	                } /* end if (vecobj_add) */
 	            } else {
 	                f_fin = true ;
@@ -439,11 +440,11 @@ int svcfile_curbegin(svcfile *op,svcfile_cur *curp) noex {
 	            if ((rs = hdb_curbegin(elp,ecp)) >= 0) {
 			curp->ecp = ecp ;
 	                op->ncursors += 1 ;
-	                op->magic = SVCFILE_MAGIC ;
+	                op->magval = SVF_MAG ;
 	            }
 		    if (rs < 0) {
 			lm_free(vp) ;
-		    }
+		    } /* end if (error) */
 		} /* end if (memory-allocation) */
 	    } /* end if (ok) */
 	} /* end if (magic) */
@@ -472,11 +473,11 @@ int svcfile_curenumsvc(svcfile *op,svcfile_cur *curp,char *ebuf,int elen) noex {
 	int		rs ;
 	int		kl = 0 ;
 	if ((rs = svcfile_magic(op,curp,ebuf)) >= 0) {
-	    SVCFILE_SVCNAME	*snp = nullptr ;
+	    SVF_SVCNAME	*snp = nullptr ;
 	    int		i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	    void	*vp{} ;
 	    while ((rs = vecobj_get(op->slp,i,&vp)) >= 0) {
-	        snp = (SVCFILE_SVCNAME *) vp ;
+	        snp = (SVF_SVCNAME *) vp ;
 	        if (snp) break ;
 	        i += 1 ;
 	    } /* end while */
@@ -503,7 +504,7 @@ int svcfile_curenum(svcfile *op,svcfile_cur *curp,svcfile_ent *ep,
 	            hdb_dat	val ;
 	            hdb_cur	*ecp = curp->ecp ;
 	            if ((rs = hdb_curenum(op->elp,ecp,&key,&val)) >= 0) {
-	                SF_IE	*iep = (SF_IE *) val.buf ;
+	                SVF_IE	*iep = (SVF_IE *) val.buf ;
 	                if ((ep != nullptr) && (ebuf != nullptr)) {
 	                    rs = entry_load(ep,ebuf,elen,iep) ;
 	                    svclen = rs ;
@@ -515,7 +516,7 @@ int svcfile_curenum(svcfile *op,svcfile_cur *curp,svcfile_ent *ep,
 	    } /* end if (non-null) */
 	} /* end if (magic) */
 	return (rs >= 0) ? svclen : rs ;
-} /* end subroutine (svcfile_enum) */
+} /* end subroutine (svcfile_curenum) */
 
 int svcfile_curfetch(svcfile *op,cc *svcname,svcfile_cur *curp,svcfile_ent *ep,
 		char *ebuf,int elen) noex {
@@ -546,7 +547,7 @@ int svcfile_curfetch(svcfile *op,cc *svcname,svcfile_cur *curp,svcfile_ent *ep,
 	            key.buf = svcname ;
 	            key.len = lenstr(svcname) ;
 	            if ((rs = hdb_fetch(op->elp,key,ecp,&val)) >= 0) {
-	                SF_IE	*iep = (SF_IE *) val.buf ;
+	                SVF_IE	*iep = (SVF_IE *) val.buf ;
 	                if ((ep != nullptr) && (ebuf != nullptr)) {
 	                    rs = entry_load(ep,ebuf,elen,iep) ;
 	                    svclen = rs ;
@@ -567,7 +568,7 @@ int svcfile_check(svcfile *op,time_t dt) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = svcfile_magic(op)) >= 0) {
-	    cint	to = SVCFILE_INTCHECK ;
+	    cint	to = SVF_INTCHECK ;
 	    if (dt == 0) dt = getustime ;
             /* should we even check? */
 	    if ((op->ncursors == 0) && ((dt - op->checktime) >= to)) {
@@ -595,7 +596,7 @@ local int svcfile_filefins(svcfile *op) noex {
 	int		rs1 ;
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
-	    SVCFILE_FILE	*fep = (SVCFILE_FILE *) vp ;
+	    SVF_FILE	*fep = (SVF_FILE *) vp ;
 	    if (vp) {
 		{
 	            rs1 = file_finish(fep) ;
@@ -610,7 +611,7 @@ local int svcfile_filefins(svcfile *op) noex {
 /* ARGSUSED */
 local int svcfile_checkfiles(svcfile *op,time_t dt) noex {
 	ustat		sb ;
-	cint		wt = SVCFILE_INTWAIT ;
+	cint		wt = SVF_INTWAIT ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c_changed = 0 ;
@@ -618,7 +619,7 @@ local int svcfile_checkfiles(svcfile *op,time_t dt) noex {
 	/* check the files */
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
-	    SVCFILE_FILE	*fep = (SVCFILE_FILE *) vp ;
+	    SVF_FILE	*fep = (SVF_FILE *) vp ;
 	    if (vp) {
 	        rs1 = uc_stat(fep->fname,&sb) ;
 	        if ((rs1 >= 0) && ((sb.st_mtime - fep->timod) >= wt)) {
@@ -636,15 +637,16 @@ local int svcfile_fileparse(svcfile *op,int fi) noex {
 	int		rs ;
 	int		c = 0 ;
 	if (void *vp ; (rs = vecobj_get(op->flp,fi,&vp)) >= 0) {
-	    SVCFILE_FILE	*fep = (SVCFILE_FILE *) vp ;
+	    SVF_FILE	*fep = (SVF_FILE *) vp ;
 	    if (vp) {
 	        cchar	*fname = fep->fname ;
 	        if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) {
+		    csize fsize = size_t(sb.st_size) ;
 	            if (sb.st_mtime > fep->timod) {
 	                fep->dev = sb.st_dev ;
 	                fep->ino = sb.st_ino ;
 	                fep->timod = sb.st_mtime ;
-	                fep->fsize = intsat(sb.st_size) ;
+	                fep->fsz = intsat(fsize) ;
 	                rs = svcfile_fileparser(op,fi,fname) ;
 	                c = rs ;
 	            } /* end if (need new parsing) */
@@ -773,7 +775,7 @@ int fileparser::parsef(cchar *fn) noex {
 	} /* end if (bfile) */
 	if (rs < 0) {
 	    svcfile_filedump(op,fi) ;
-	}
+	} /* end if (error) */
 	return (rs >= 0) ? c : rs ;
 } /* end method (fileparser::parsef) */
 
@@ -834,7 +836,7 @@ local int svcfile_filealready(svcfile *op,dev_t dev,ino_t ino) noex {
 	int		f = false ;
 	void		*vp{} ;
 	for (int i = 0 ; (rs1 = vecobj_get(op->flp,i,&vp)) >= 0 ; i += 1) {
-	    SVCFILE_FILE	*fep = (SVCFILE_FILE *) vp ;
+	    SVF_FILE	*fep = (SVF_FILE *) vp ;
 	    if (vp) {
 	        f = ((fep->dev == dev) && (fep->ino == ino)) ;
 	    }
@@ -847,7 +849,7 @@ local int svcfile_filealready(svcfile *op,dev_t dev,ino_t ino) noex {
 
 /* add an entry to the access entry list */
 local int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
-	int		sz = szof(SF_IE) ;
+	int		sz = szof(SVF_IE) ;
 	int		rs ;
 	int		f_added = false ;
 
@@ -857,7 +859,7 @@ local int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
 
 	    f_added = true ;
 	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
-		SF_IE	*iep = (SF_IE *) vp ;
+		SVF_IE	*iep = (SVF_IE *) vp ;
 	        cint	n = svcentry_nkeys(nep) ;
 	        iep->fi = fi ;
 	        sz = (n+1) * 2 * szof(char *) ;
@@ -874,27 +876,27 @@ local int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
 	                    key.buf = iep->svc ;
 	                    key.len = sl ;
 	                    val.buf = iep ;
-	                    val.len = szof(SF_IE) ;
+	                    val.len = szof(SVF_IE) ;
 	                    if ((rs = hdb_store(op->elp,key,val)) >= 0) {
 	                        rs = svcfile_svcadd(op,iep->svc) ;
 	                        if (rs < 0) {
 	                            hdb_delkey(op->elp,key) ;
-				}
+				} /* end if (error) */
 	                    } /* end if (hdb_store) */
 	                } /* end if (ientry_loadstr) */
 	                if (rs < 0) {
 	                    iep->svc = nullptr ;
 	                    lm_free(bp) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (memory-allocation) */
 	            if (rs < 0) {
 	                lm_free(iep->keyvals) ;
 	                iep->keyvals = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (memory-allocation) */
 	        if (rs < 0) {
 	            lm_free(iep) ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-allocation) */
 
 #if	CF_ALREADY
@@ -928,9 +930,9 @@ local int svcfile_filedump(svcfile *op,int fi) noex {
 	int		rs2 ;
 	int		c = 0 ;
 	if ((rs = hdb_curbegin(op->elp,&cur)) >= 0) {
-	    SF_IE	*ep ;
+	    SVF_IE	*ep ;
 	    while ((rs2 = hdb_curenum(op->elp,&cur,&key,&val)) >= 0) {
-	        ep = (SF_IE *) val.buf ;
+	        ep = (SVF_IE *) val.buf ;
 	        if ((ep->fi == fi) || (fi < 0)) {
 	            c += 1 ;
 		    {
@@ -964,7 +966,7 @@ local int svcfile_filedel(svcfile *op,int fi) noex {
 	int		rs1 ;
 	void		*vp{} ;
 	if ((rs = vecobj_get(op->flp,fi,&vp)) >= 0) {
-	    SVCFILE_FILE	*fep = (SVCFILE_FILE *) vp ;
+	    SVF_FILE	*fep = (SVF_FILE *) vp ;
 	    if (vp) {
 		{
 	            rs1 = file_finish(fep) ;
@@ -981,7 +983,7 @@ local int svcfile_filedel(svcfile *op,int fi) noex {
 #endif /* CF_FILEDEL */
 
 local int svcfile_svcadd(svcfile *op,cchar *svc) noex {
-	SVCFILE_SVCNAME	sn{} ;
+	SVF_SVCNAME	sn{} ;
 	vecobj		*lp = op->slp ;
 	int		rs ;
 	int		f_added = false ;
@@ -989,7 +991,7 @@ local int svcfile_svcadd(svcfile *op,cchar *svc) noex {
 	sn.svcname = svc ;
 	sn.count = 1 ;
 	if ((rs = vecobj_search(lp,&sn,vcmpsvcname,&vp)) >= 0) {
-	    SVCFILE_SVCNAME	*snp = (SVCFILE_SVCNAME *) vp ;
+	    SVF_SVCNAME	*snp = (SVF_SVCNAME *) vp ;
 	    rs = svcname_incr(snp) ;
 	} else if (rs == SR_NOTFOUND) {
 	    f_added = true ;
@@ -997,14 +999,14 @@ local int svcfile_svcadd(svcfile *op,cchar *svc) noex {
 	        rs = vecobj_add(lp,&sn) ;
 	        if (rs < 0) {
 	            svcname_finish(&sn) ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end if */
 	return (rs >= 0) ? f_added : rs ;
 } /* end subroutine (svcfile_svcadd) */
 
 local int svcfile_svcdel(svcfile *op,cchar *svc) noex {
-	SVCFILE_SVCNAME	sn{} ;
+	SVF_SVCNAME	sn{} ;
 	vecobj		*lp = op->slp ;
 	int		rs ;
 	int		rs1 ;
@@ -1013,7 +1015,7 @@ local int svcfile_svcdel(svcfile *op,cchar *svc) noex {
 	sn.svcname = svc ;
 	sn.count = 0 ;
 	if ((rs = vecobj_search(lp,&sn,vcmpsvcname,&vp)) >= 0) {
-	    SVCFILE_SVCNAME	*snp = (SVCFILE_SVCNAME *) vp ;
+	    SVF_SVCNAME	*snp = (SVF_SVCNAME *) vp ;
 	    si = rs ;
 	    {
 	        rs1 = svcname_decr(snp) ;
@@ -1041,7 +1043,7 @@ local int svcfile_svcfins(svcfile *op) noex {
 	int		c = 0 ;
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(op->slp,i,&vp) >= 0 ; i += 1) {
-	    SVCFILE_SVCNAME	*snp = (SVCFILE_SVCNAME *) vp ;
+	    SVF_SVCNAME	*snp = (SVF_SVCNAME *) vp ;
 	    if (vp) {
 	        c += 1 ;
 	        rs1 = svcname_finish(snp) ;
@@ -1051,7 +1053,7 @@ local int svcfile_svcfins(svcfile *op) noex {
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (svcfile_svcfins) */
 
-local int file_start(SVCFILE_FILE *fep,cchar *fname) noex {
+local int file_start(SVF_FILE *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (fep && fname) ylikely {
 	    memclear(fep) ;
@@ -1062,7 +1064,7 @@ local int file_start(SVCFILE_FILE *fep,cchar *fname) noex {
 	return rs ;
 } /* end subroutine (file_start) */
 
-local int file_finish(SVCFILE_FILE *fep) noex {
+local int file_finish(SVF_FILE *fep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (fep) ylikely {
@@ -1077,7 +1079,7 @@ local int file_finish(SVCFILE_FILE *fep) noex {
 	return rs ;
 } /* end subroutine (file_finish) */
 
-local int svcname_start(SVCFILE_SVCNAME *snp,cchar *svc) noex {
+local int svcname_start(SVF_SVCNAME *snp,cchar *svc) noex {
 	int		rs ;
 	snp->count = 0 ;
 	if (cchar *cp ; (rs = lm_strw(svc,-1,&cp)) >= 0) ylikely {
@@ -1087,7 +1089,7 @@ local int svcname_start(SVCFILE_SVCNAME *snp,cchar *svc) noex {
 	return rs ;
 } /* end subroutine (svcname_start) */
 
-local int svcname_finish(SVCFILE_SVCNAME *snp) noex {
+local int svcname_finish(SVF_SVCNAME *snp) noex {
 	cint		c = snp->count ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1101,13 +1103,13 @@ local int svcname_finish(SVCFILE_SVCNAME *snp) noex {
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (svcname_finish) */
 
-local int svcname_incr(SVCFILE_SVCNAME *snp) noex {
+local int svcname_incr(SVF_SVCNAME *snp) noex {
 	cint	c = snp->count ;
 	snp->count += 1 ;
 	return c ;
 } /* end subroutine (svcname_incr) */
 
-local int svcname_decr(SVCFILE_SVCNAME *snp) noex {
+local int svcname_decr(SVF_SVCNAME *snp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (snp->count > 0) snp->count -= 1 ;
@@ -1136,7 +1138,7 @@ local int svcentry_start(SVCENTRY *sep,cchar *sp,int sl) noex {
 		    void *vp = voidp(cp) ;
 	            lm_free(vp) ;
 	            sep->svc = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
@@ -1190,7 +1192,7 @@ local int svcentry_addkey(SVCENTRY *sep,cc *kp,int kl,cc *ap,int al) noex {
 	    rs = vecobj_add(&sep->keys,&key) ;
 	    if (rs < 0) {
 	        const_free(key.kname) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-allocation) */
 	return rs ;
 } /* end subroutine (svcentry_addkey) */
@@ -1213,7 +1215,7 @@ local int svcentry_size(SVCENTRY *sep) noex {
 	return sz ;
 } /* end subroutine (svcentry_size) */
 
-local int ientry_loadstr(SF_IE *iep,char *bp,SVCENTRY *nep) noex {
+local int ientry_loadstr(SVF_IE *iep,char *bp,SVCENTRY *nep) noex {
 	int		rs = SR_FAULT ;
 	int		sl = 0 ;
 	if (iep && bp && nep) {
@@ -1244,7 +1246,7 @@ local int ientry_loadstr(SF_IE *iep,char *bp,SVCENTRY *nep) noex {
 	return (rs >= 0) ? sl : rs ;
 } /* end subroutine (ientry_loadstr) */
 
-local int ientry_finish(SF_IE *iep) noex {
+local int ientry_finish(SVF_IE *iep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (iep) {
@@ -1264,7 +1266,7 @@ local int ientry_finish(SF_IE *iep) noex {
 } /* end subroutine (ientry_finish) */
 
 #if	CF_MOREKEYS
-local int ientry_morekeys(SF_IE *iep,int c,int i) noex {
+local int ientry_morekeys(SVF_IE *iep,int c,int i) noex {
 	int		rs = SR_FAULT ;
 	int		f_more = true ;
 	if (iep) {
@@ -1278,13 +1280,13 @@ local int ientry_morekeys(SF_IE *iep,int c,int i) noex {
 #endif /* CF_MOREKEYS */
 
 /* load up the user-interface entry from the internal structure */
-local int entry_load(svcfile_ent *ep,char *ebuf,int elen,SF_IE *iep) noex {
+local int entry_load(svcfile_ent *ep,char *ebuf,int elen,SVF_IE *iep) noex {
 	int		rs = SR_FAULT ;
 	int		rlen = 0 ;
 	if (iep && ebuf && iep) {
 	    rs = SR_OVERFLOW ;
 	    if (elen > 0) {
-		cint	bo = SVCFILE_BO((ulong) ebuf) ;
+		cint	bo = SVF_BO((ulong) ebuf) ;
 		char	*bp ;
 		if (iep->sz <= (elen - bo)) {
 		    cint	kal = (iep->nkeys + 1) * 2 * szof(char *) ;
@@ -1337,8 +1339,8 @@ local int mkvars() noex {
 } /* end subroutine (mkvars) */
 
 local int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
-	SVCFILE_FILE	*e1p = (SVCFILE_FILE *) *v1pp ;
-	SVCFILE_FILE	*e2p = (SVCFILE_FILE *) *v2pp ;
+	SVF_FILE	*e1p = (SVF_FILE *) *v1pp ;
+	SVF_FILE	*e2p = (SVF_FILE *) *v2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    rc = +1 ;
@@ -1353,10 +1355,10 @@ local int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
 } /* end subroutine (vcmpfname) */
 
 local int vcmpsvcname(cvoid **v1pp, cvoid **v2pp) noex {
-	SVCFILE_SVCNAME	*e1p = (SVCFILE_SVCNAME *) *v1pp ;
-	SVCFILE_SVCNAME	*e2p = (SVCFILE_SVCNAME *) *v2pp ;
+	SVF_SVCNAME	*e1p = (SVF_SVCNAME *) *v1pp ;
+	SVF_SVCNAME	*e2p = (SVF_SVCNAME *) *v2pp ;
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
