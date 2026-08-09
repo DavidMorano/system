@@ -521,7 +521,7 @@ int sreq_snenum(sreq *op,SREQ_SNCUR *scp,cchar **rpp) noex {
 	if (op->open.namesvcs) {
 	    setostr	*ssp = &op->namesvcs ;
 	    setostr_cur	*curp = &scp->cur ;
-	    rs = setostr_enum(ssp,curp,rpp) ;
+	    rs = setostr_curenum(ssp,curp,rpp) ;
 	}
 	return rs ;
 }
