@@ -32,6 +32,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -125,5 +126,42 @@ int ecmsg_already(ecmsg *op) noex {
 	}
 	return rs ;
 } /* end subroutine (ecmsg_already) */
+
+int ecmsg::loadbuf(cchar *sp,int sl) noex {
+    	return ecmsg_loadbuf(this,sp,sl) ;
+} /* end method */
+
+void ecmsg::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("ecmsg",rs,"fini-finish") ;
+	}
+} /* end method (ecmsg::dtor) */
+
+ecmsg::operator int () noex {
+    	int		rs = SR_NOTOPEN ;
+	if (ebuf) {
+	    rs = elen ;
+	}
+	return rs ;
+} /* end method (ecmsg::operator) */
+
+ecmsg_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case ecmsgmem_start:
+	        rs = ecmsg_start(op) ;
+	        break ;
+	    case ecmsgmem_already:
+	        rs = ecmsg_already(op) ;
+	        break ;
+	    case ecmsgmem_finish:
+	        rs = ecmsg_finish(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (ecmsg_co::operator) */
+
 
 
