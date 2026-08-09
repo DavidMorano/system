@@ -33,7 +33,7 @@
 struct langproc_head {
 	langstate	*lsp ;		/* LANGSTATE pointer */
 	void		*lvp ;		/* line-value-pointer */
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct (langproc_head) */
 
 struct langproc_cursor {
@@ -70,18 +70,18 @@ struct langproc : langproc_head {
 	    start	(this,langprocmem_start) ;
 	    finish	(this,langprocmem_finish) ;
 	    count	(this,langprocmem_count) ;
-	    magic = 0 ;
+	    magval	= 0 ;
 	} ; /* end ctor */
 	langproc(const langproc &) = delete ;
 	langproc &operator = (const langproc &) = delete ;
-	int proc(int,cchar *,int = -1) noex ;
-	int curbegin(langproc_cur *) noex ;
-	int curend(langproc_cur *) noex ;
-	int curenum(langproc_cur *,cchar **) noex ;
-	void dtor() noex ;
+	int proc	(int,cchar *,int = -1) noex ;
+	int curbegin	(langproc_cur *) noex ;
+	int curend	(langproc_cur *) noex ;
+	int curenum	(langproc_cur *,cchar **) noex ;
+	void dtor	() noex ;
 	operator int () noex ;
 	destruct langproc() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (langproc) */
 #else	/* __cplusplus */
