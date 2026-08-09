@@ -57,7 +57,7 @@ extern int keysymer_count(keysymer *) noex ;
 extern int keysymer_lookup(keysymer *,cchar *,int) noex ;
 extern int keysymer_curbegin(keysymer *,keysymer_cur *) noex ;
 extern int keysymer_curend(keysymer *,keysymer_cur *) noex ;
-extern int keysymer_enum(keysymer *,keysymer_cur *,keysymer_ke *) noex ;
+extern int keysymer_curenum(keysymer *,keysymer_cur *,keysymer_ke *) noex ;
 extern int keysymer_close(keysymer *) noex ;
 
 EXTERNC_end
