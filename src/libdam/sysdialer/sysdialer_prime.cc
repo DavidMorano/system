@@ -28,37 +28,38 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<dlfcn.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |getustime(3u)| */
-#include	<uclibmem.h>
-#include	<getnodedomain.h>
-#include	<vecobj.h>
-#include	<vecstr.h>
-#include	<fsdir.h>
-#include	<ids.h>
-#include	<dirseen.h>
-#include	<strn.h>		/* |strnrchr(3uc)| */
-#include	<strx.h>
-#include	<sncpyx.h>
-#include	<strwcpy.h>
-#include	<mkpathx.h>
-#include	<mkfname.h>
-#include	<pathclean.h>
-#include	<isoneof.h>
-#include	<ischarx.h>
-#include	<isnot.h>		/* |isNotPresent(3uc)| */
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<new>			/* C++STD placement-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |getustime(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<dirseen.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnrchr(3uc)| */
+#include	<strx.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkfname.h>		/* LIBUC */
+#include	<pathclean.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC |isNotPresent(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysdialer.h"
 
@@ -258,9 +259,8 @@ int sysdialer_start(SD *op,cchar *pr,mainv prs,mainv dirs) noex {
 	if ((rs = sysdialer_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (pr[0]) ylikely {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) ylikely {
-	            if (cchar *cp ; (rs = lm_strw(pr,-1,&cp)) >= 0) {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+	            if (cchar *cp ; (rs = lm_strw(pr,-1,&cp)) >= 0) ylikely {
 	                op->pr = cp ;
 		        rs = sysdialer_starter(op,prs,dirs) ;
 			if ((rs < 0) && op->pr) {
@@ -273,7 +273,7 @@ int sysdialer_start(SD *op,cchar *pr,mainv prs,mainv dirs) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		sysdialer_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (sysdialer_ctor) */
 	return rs ;
 } /* end subroutine (sysdialer_start) */
@@ -290,7 +290,7 @@ local int sysdialer_starter(SD *op,mainv prs,mainv dirs) noex {
 	    }
             if (rs < 0) {
                 sysdialer_finish(op) ;
-            }
+            } /* end if (error) */
 	}
 	return rs ;
 } /* end subroutine (sysdialer_starter) */
@@ -298,7 +298,7 @@ local int sysdialer_starter(SD *op,mainv prs,mainv dirs) noex {
 local int sysdialer_startprs(SD *op,mainv prs) noex {
     	int		rs = SR_OK ;
         if (prs) {
-            if (vecstr *plp = op->plp ; (rs = plp->start(5,0)) >= 0) {
+            if (vecstr *plp = op->plp ; (rs = plp->start(5,0)) >= 0) ylikely {
                 op->fl.vsprs = true ;
                 for (int i = 0 ; prs[i] != nullptr ; i += 1) {
 		    cchar *pr = prs[i] ;
@@ -320,16 +320,16 @@ local int sysdialer_startprs(SD *op,mainv prs) noex {
 
 local int sysdialer_startdirs(SD *op,mainv dirs) noex {
     	int		rs = SR_OK ;
-        if (dirs) {
+        if (dirs) ylikely {
 	    cint	vn = 10 ;
 	    cint	vo = 0 ;
-            if (vecstr *dlp = op->dlp ; (rs = dlp->start(vn,vo)) >= 0) {
+            if (vecstr *dlp = op->dlp ; (rs = dlp->start(vn,vo)) >= 0) ylikely {
                 op->fl.vsdirs = true ;
                 for (int i = 0 ; (rs >= 0) && dirs[i] ; i += 1) {
                     rs = dlp->add(dirs[i]) ;
                     if (rs < 0) break ;
                 } /* end for */
-                if (rs >= 0) {
+                if (rs >= 0) ylikely {
                     if (mainv dp ; (rs = dlp->getvec(&dp)) >= 0) {
                         op->dirs = dp ;
                     }
@@ -339,7 +339,7 @@ local int sysdialer_startdirs(SD *op,mainv dirs) noex {
                         dlp->finish() ;
                         op->fl.vsdirs = false ;
                     }
-                } /* end if (errors) */
+                } /* end if (error) */
             } /* end if (vecstr_start) */
         } else {
             op->dirs = prdirs ;
@@ -353,9 +353,9 @@ local int sysdialer_startents(SD *op) noex {
         cint    	vn = 5 ;
         cint    	vo = vecobjm.sorted ;
     	int		rs ;
-        if ((rs = elp->start(vsz,vn,vo)) >= 0) {
+        if ((rs = elp->start(vsz,vn,vo)) >= 0) ylikely {
             op->fl.voents = true ;
-            if ((rs = prcache_start(&op->pc)) >= 0){
+            if ((rs = prcache_start(&op->pc)) >= 0) ylikely {
                 op->fl.prcache = true ;
                 op->magic = SD_MAGIC ;
             }
@@ -370,7 +370,7 @@ local int sysdialer_startents(SD *op) noex {
 int sysdialer_finish(SD *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sysdialer_magic(op)) >= 0) {
+	if ((rs = sysdialer_magic(op)) >= 0) ylikely {
 	    if (op->fl.prcache) {
 	        rs1 = prcache_finish(&op->pc) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -422,7 +422,7 @@ int sysdialer_loadin(SD *op,cchar *name,ent **depp) noex {
     	cnullptr	np{} ;
     	cint		rsn = SR_NOENT ;
 	int		rs ;
-	if ((rs = sysdialer_magic(op,name,depp)) >= 0) {
+	if ((rs = sysdialer_magic(op,name,depp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
 		vecobj	*elp = op->elp ;
@@ -447,12 +447,12 @@ int sysdialer_loadin(SD *op,cchar *name,ent **depp) noex {
 			} /* end if (sysdialer_sofind) */
 			if (rs < 0) {
 			    entry_finish(&e) ;
-			}
+			} /* end if (error) */
 		    } /* end if (entry_start) */
 	        } else if (rs >= 0) {
 		    *depp = entp(vp) ;
 	            (*depp)->count += 1 ;
-		}
+		} /* end if (ok) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
@@ -460,7 +460,7 @@ int sysdialer_loadin(SD *op,cchar *name,ent **depp) noex {
 
 int sysdialer_loadout(SD *op,cchar *name) noex {
 	int		rs ;
-	if ((rs = sysdialer_magic(op,name)) >= 0) {
+	if ((rs = sysdialer_magic(op,name)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (name[0]) {
 		vecobj	*elp = op->elp ;
@@ -485,13 +485,12 @@ int sysdialer_loadout(SD *op,cchar *name) noex {
 
 int sysdialer_check(SD *op,time_t dt) noex {
 	int		rs ;
-	if ((rs = sysdialer_magic(op)) >= 0) {
+	if ((rs = sysdialer_magic(op)) >= 0) ylikely {
 	    if (dt == 0) dt = getustime ;
 	    op->ti_lastcheck = dt ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (sysdialer_check) */
+} /* end subroutine (sysdialer_check) */
 
 
 /* private subroutines */
@@ -523,13 +522,13 @@ int sofind::operator () (SD *op,cchar *pr) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if ((rs = ids_load(&id)) >= 0) {
+	if ((rs = ids_load(&id)) >= 0) ylikely {
 	    if ((rs = ds.start) >= 0) {
     		cint	maxpath = var.maxpathlen ;
 		cint	asz = ((var.maxpathlen + 1) * 2) ;
 		int	ai = 0 ;
 		llen = var.maxpathlen ;
-	        if (char *a ; (rs = lm_mall(asz,&a)) >= 0) {
+	        if (char *a ; (rs = lm_mall(asz,&a)) >= 0) ylikely {
 	            lbuf = (a + ((maxpath + 1) * ai++)) ;
 	            pbuf = (a + ((maxpath + 1) * ai++)) ;
 		    {
@@ -555,10 +554,10 @@ int sofind::operator () (SD *op,cchar *pr) noex {
 int sofind::sofindpr(SD *op,cc *pr) noex {
 	int		rs ;
 	int		len = 0 ; /* return-value */
-	if ((rs = mkpath(lbuf,pr,LIBCNAME)) >= 0) {
+	if ((rs = mkpath(lbuf,pr,LIBCNAME)) >= 0) ylikely {
 	    len = rs ;
-	    if ((rs = ds.havename(lbuf,len)) >= 0) {
-		if (ustat sb ; (rs = u_stat(lbuf,&sb)) >= 0) {
+	    if ((rs = ds.havename(lbuf,len)) >= 0) ylikely {
+		if (ustat sb ; (rs = u_stat(lbuf,&sb)) >= 0) ylikely {
 		    if (S_ISDIR(sb.st_mode)) {
 			if ((rs = ds.havedevino(&sb)) >= 0) {
 			    rs = socheck(op,&sb) ;
@@ -602,7 +601,7 @@ int sofind::sofindvar(SD *op) noex {
 	static cchar	*sp = getenver(varname.libpath) ;
 	cnullptr	np{} ;
 	int		rs = SR_NOENT ;
-	if (sp) {
+	if (sp) ylikely {
 	    cauto sd_socheck = sysdialer_socheckvarc ;
 	    for (cchar *tp ; (tp = strbrk(sp,":;")) != np ; ) {
 		if (cint tl = intconv(tp - sp) ; tl > 0) {
@@ -640,8 +639,8 @@ local int sysdialer_socheckvarc(SD *op,ids *idp,DS *dsp,cc *ldnp,
     	cint		rsn = SR_NOENT ;
 	int		rs ;
 	int		rs1 ;
-	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
-	    if ((rs = pathclean(pbuf,ldnp,ldnl)) >= 0) {
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
+	    if ((rs = pathclean(pbuf,ldnp,ldnl)) >= 0) ylikely {
 		cchar	*pp = pbuf ;
 		cint	pl = rs ;
 		if ((rs = dsp->havename(pp,pl)) == rsn) {
@@ -674,7 +673,7 @@ local int sysdialer_sochecklib(SD *op,ids *idp,DS *dsp,cc *libdname,
 	int		len = 0 ; /* return-value */
 	(void) op ;
 	(void) idp ;
-	if (char *subdname ; (rs = lm_mp(&subdname)) >= 0) {
+	if (char *subdname ; (rs = lm_mp(&subdname)) >= 0) ylikely {
 	    cpcchar	*dirs = (asz == 8) ? de64 : de32 ;
 	    for (int i = 0 ; (rs >= 0) && (len == 0) && dirs[i] ; i += 1) {
 	        cchar *ldnp = libdname ;
@@ -682,7 +681,7 @@ local int sysdialer_sochecklib(SD *op,ids *idp,DS *dsp,cc *libdname,
 		    ldnp = subdname ;
 	            rs = mkpath(subdname,libdname,dirs[i]) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    if (ustat sb ; (rs = u_stat(ldnp,&sb)) >= 0) {
 		        if (S_ISDIR(sb.st_mode)) {
 		    	    if ((rs = dsp->add(ldnp,-1,&sb)) >= 0) {
@@ -709,7 +708,7 @@ local int sysdialer_sotest(SD *op,cc *soname) noex {
 	SD_INFO	*mip ;
 	cnullptr	np{} ;
 	int		rs = SR_NOTFOUND ;
-	if ((mip = (SD_INFO *) dlsym(op->sop,soname)) != np) {
+	if ((mip = (SD_INFO *) dlsym(op->sop,soname)) != np) ylikely {
 	    if (strcmp(mip->name,soname) == 0) {
 	        ep->osz = dip->osz ;
 	        ep->flags = dip->flags ;
@@ -726,15 +725,19 @@ local int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	ent		**e1pp = (ent **) v1pp ;
 	ent		**e2pp = (ent **) v2pp ;
 	int		rc = 0 ;
-	{
+	if (e1pp && e2pp) ylikely {
 	    ent		*e1p = *e1pp ;
 	    ent		*e2p = *e2pp ;
-	    if (e1p || e2p) {
+	    if (e1p || e2p) ylikely {
 	        rc = +1 ;
 	        if (e1p) {
 		    rc = -1 ;
 	            if (e2p) {
-		        rc = strcmp(e1p->name,e2p->name) ;
+			cint ch1 = mkchar(e1p->name[0]) ;
+			cint ch2 = mkchar(e2p->name[0]) ;
+			if ((rc = (ch1 - ch2)) == 0) {
+		            rc = strcmp(e1p->name,e2p->name) ;
+			}
 		    }
 	        }
 	    }
