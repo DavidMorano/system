@@ -20,14 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-
-#include	<uunames.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBDAM */
+#include	<uunames.h>		/* LIBDAM */
 
 
 #define	UUNAME		struct uuname_head
@@ -66,7 +62,7 @@ extern int uuname_open(uuname *,cchar *,cchar *) noex ;
 extern int uuname_count(uuname *) noex  ;
 extern int uuname_exists(uuname *,cchar *,int) noex ;
 extern int uuname_curbegin(uuname *,uuname_cur *) noex ;
-extern int uuname_enum(uuname *,uuname_cur *,char *,int) noex ;
+extern int uuname_curenum(uuname *,uuname_cur *,char *,int) noex ;
 extern int uuname_curend(uuname *,uuname_cur *) noex ;
 extern int uuname_audit(uuname *) noex ;
 extern int uuname_close(uuname *) noex ;
