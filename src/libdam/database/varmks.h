@@ -10,12 +10,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<strtab.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strtab.h>		/* LIBUC */
 
 
 #define	VARMKS		struct varmks_head
@@ -30,7 +27,8 @@
 
 struct varmks_object {
 	char		*name ;
-	uint		objsize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct varmks_flags {
@@ -57,7 +55,7 @@ struct varmks_head {
 	VARMKS_REC	rectab ;
 	gid_t		gid ;
 	VARMKS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		nvars ;
 	int		nfd ;
 	mode_t		om ;
