@@ -34,7 +34,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
-#include	<uclibmem.h>		/* LINUC */
+#include	<uclibmem.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"fifoelem.h"
