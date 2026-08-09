@@ -43,8 +43,8 @@
 
 /* file buffer state */
 struct srvreg_buffer {
-	char		*buf ;		/* fixed buffer */
-	uint		size ;		/* fixed buffer size */
+	char		*bufp ;		/* fixed buffer pointer */
+	uint		bufl ;		/* fixed buffer length */
 	uint		len ;		/* length of valid area */
 	uint		off ;		/* file offset of valid area */
 } ; /* end struct */
@@ -80,11 +80,11 @@ struct srvreg_head {
 	SRVREG_FILE	h ;
 	SVCREG_BUF	b ;	/* file buffer */
 	SRVREG_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		oflags ;
 	int		operm ;
-	int		pagesize ;
-	int		filesize ;
+	int		pagesz ;
+	int		filesz ;
 	int		fd ;
 	int		cursors ;
 } ; /* end struct */
@@ -93,12 +93,12 @@ struct srvreg_cursor {
 	int		i ;
 } ; /* end struct */
 
-typedef	SRVREG			srvreg ;
-typedef	SRVREG_FL		srvreg_fl ;
-typedef	SRVREG_FILE		srvreg_file ;
-typedef	SRVREG_BUF		srvreg_buf ;
-typedef	SRVREG_CUR		srvreg_cur ;
-typedef	SRVREG_ENT		srvreg_ent ;
+typedef	SRVREG		srvreg ;
+typedef	SRVREG_FL	srvreg_fl ;
+typedef	SRVREG_FILE	srvreg_file ;
+typedef	SRVREG_BUF	srvreg_buf ;
+typedef	SRVREG_CUR	srvreg_cur ;
+typedef	SRVREG_ENT	srvreg_ent ;
 
 EXTERNC_begin
 
@@ -107,7 +107,7 @@ extern int srvreg_check(srvreg *,time_t) noex ;
 extern int srvreg_close(srvreg *) noex ;
 extern int srvreg_curbegin(srvreg *,srvreg_cur *) noex ;
 extern int srvreg_curend(srvreg *,srvreg_cur *) noex ;
-extern int srvreg_enum(srvreg *,srvreg_cur *,srvreg_ent *) noex ;
+extern int srvreg_curenum(srvreg *,srvreg_cur *,srvreg_ent *) noex ;
 extern int srvreg_fetchsvc(srvreg *,cchar *,srvreg_cur *,srvreg_ent *) noex ;
 extern int srvreg_write(srvreg *,int,srvreg_ent *) noex ;
 
