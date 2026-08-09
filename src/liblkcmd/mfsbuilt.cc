@@ -355,7 +355,7 @@ int mfsbuilt_curend(MFSBUILT *op,MFSBUILT_CUR *curp) noex {
 }
 /* end subroutine (mfsbuilt_curend) */
 
-int mfsbuilt_enum(MFSBUILT *op,MFSBUILT_CUR *curp,char *rbuf,int rlen) noex {
+int mfsbuilt_curenum(MFSBUILT *op,MFSBUILT_CUR *curp,char *rbuf,int rlen) noex {
 	hdb		*dbp ;
 	hdb_cur		*hcp ;
 	hdb_datum	k, v ;
@@ -374,11 +374,11 @@ int mfsbuilt_enum(MFSBUILT *op,MFSBUILT_CUR *curp,char *rbuf,int rlen) noex {
 	    rs = SR_OK ;
 	}
 #if	CF_DEBUGS
-	debugprintf("mfsbuilt_enum: ret rs=%d\n",rs) ;
+	debugprintf("mfsbuilt_curenum: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
 }
-/* end subroutine (mfsbuilt_enum) */
+/* end subroutine (mfsbuilt_curenum) */
 
 int mfsbuilt_strsize(MFSBUILT *op) noex {
 	hdb		*dbp ;
