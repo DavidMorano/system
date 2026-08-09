@@ -23,7 +23,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<hdb.h>			/* LIBUC */
-#include	<vecstr.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
 
 
 #define	RECIPIENT		struct recipient_head
@@ -61,7 +61,7 @@ extern int recipient_counthosts(recipient *) noex ;
 extern int recipient_count(recipient *) noex ;
 extern int recipient_hcurbegin(recipient *,recipient_hcur *) noex ;
 extern int recipient_hcurend(recipient *,recipient_hcur *) noex ;
-extern int recipient_enumhost(recipient *,recipient_hcur *,
+extern int recipient_hcurenum(recipient *,recipient_hcur *,
 			cchar **) noex ;
 extern int recipient_vcurbegin(recipient *,recipient_vcur *) noex ;
 extern int recipient_vcurend(recipient *,recipient_vcur *) noex ;
