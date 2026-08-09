@@ -38,13 +38,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |ADDRINFO| */
-#include	<sys/socket.h>		/* |ADDRINFO| */
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>		/* |ADDRINFO| */
+#include	<sys/types.h>		/* POSIX® |ADDRINFO| */
+#include	<sys/socket.h>		/* POSIX® |ADDRINFO| */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® |ADDRINFO| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -111,7 +111,6 @@ int openaddrinfo(ADDRINFO *aip,int to) noex {
 	    }
 	} /* end if (u_socket) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (openaddrinfo) */
+} /* end subroutine (openaddrinfo) */
 
 
