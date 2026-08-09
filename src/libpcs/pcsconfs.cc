@@ -396,7 +396,7 @@ int pcsconfs_fetch(PC *op,cchar *kp,int kl,PC_CUR *curp,
 /* end subroutine (pcsconfs_fetch) */
 
 
-int pcsconfs_enum(PC *op,PC_CUR *curp,char *kbuf,int klen,
+int pcsconfs_curenum(PC *op,PC_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs = SR_NOTFOUND ;
 
@@ -408,7 +408,7 @@ int pcsconfs_enum(PC *op,PC_CUR *curp,char *kbuf,int klen,
 	if (curp->magval != PC_CURMAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.db) {
-	    rs = var_enum(&op->db,&curp->vcur,kbuf,klen,vbuf,vlen) ;
+	    rs = var_curenum(&op->db,&curp->vcur,kbuf,klen,vbuf,vlen) ;
 	}
 
 	if ((rs < 0) && (vbuf != nullptr)) {
@@ -417,7 +417,7 @@ int pcsconfs_enum(PC *op,PC_CUR *curp,char *kbuf,int klen,
 
 	return rs ;
 }
-/* end subroutine (pcsconfs_enum) */
+/* end subroutine (pcsconfs_curenum) */
 
 int pcsconfs_count(PC *op) noex {
 	int		rs = SR_OK ;
