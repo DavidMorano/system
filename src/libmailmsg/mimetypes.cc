@@ -317,7 +317,7 @@ int mimetypes_curend(mt *op,mt_cur *curp) noex {
 /* end subroutine (mimetypes_curend) */
 
 /* enumerate all of the key-val pairs */
-int mimetypes_enum(mt *op,mt_cur *curp,char *ext,char *ts) noex {
+int mimetypes_curenum(mt *op,mt_cur *curp,char *ext,char *ts) noex {
 	int		rs ;
 	if ((rs = mimetypes_magic(op,curp,ext)) >= 0) ylikely {
 	    mt_dat	key{} ;
@@ -337,7 +337,7 @@ int mimetypes_enum(mt *op,mt_cur *curp,char *ext,char *ts) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (mimetypes_enum) */
+/* end subroutine (mimetypes_curenum) */
 
 /* fetch the next val by extension and a possible cursor */
 int mimetypes_fetch(mt *op,mt_cur *curp,char *ext,char *ts) noex {
