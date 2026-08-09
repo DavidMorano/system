@@ -452,7 +452,7 @@ int mailalias_curend(MA *op,MA_CUR *curp) noex {
 }
 /* end subroutine (mailalias_curend) */
 
-int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
+int mailalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	int		rs1 ;
@@ -505,7 +505,7 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
-/* end subroutine (mailalias_enum) */
+/* end subroutine (mailalias_curenum) */
 
 int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 		char *vbuf,int vlen) noex {
