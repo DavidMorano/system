@@ -27,15 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t(3c++)| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<estrings.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"svcent.h"
 #include	"svckv.h"
@@ -74,15 +74,13 @@ int svcent_getval(svcent *sep,cchar *k,cchar **rpp) noex {
 	cint		n = sep->nkeys ;
 	cchar		*(*kv)[2] = sep->keyvals ;
 	return svckv_val(kv,n,k,rpp) ;
-}
-/* end subroutine (svcent_getval) */
+} /* end subroutine (svcent_getval) */
 
 int svcent_getdeval(svcent *sep,cchar *k,cchar **rpp) noex {
 	cint		n = sep->nkeys ;
 	cchar		*(*kv)[2] = sep->keyvals ;
 	return svckv_dequote(kv,n,k,rpp) ;
-}
-/* end subroutine (svcent_getdeval) */
+} /* end subroutine (svcent_getdeval) */
 
 int svcent_islib(svcent *sep,cchar **rpp) noex {
 	constexpr char	ko[] = "so" ;
@@ -98,8 +96,7 @@ int svcent_islib(svcent *sep,cchar **rpp) noex {
 	    }
 	}
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (svcent_islib) */
+} /* end subroutine (svcent_islib) */
 
 int svcent::geval(cchar *sp,cchar **rpp) noex {
 	return svcent_getval(this,sp,rpp) ;
