@@ -52,36 +52,37 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<ctime>			/* |time_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<strlibval.hh>
-#include	<vecstr.h>
-#include	<varsub.h>
-#include	<field.h>
-#include	<fieldterminit.hh>
-#include	<sbuf.h>
-#include	<svcfile.h>
-#include	<strn.h>
-#include	<snx.h>
-#include	<snwcpy.h>
-#include	<sfx.h>
-#include	<mktmp.h>
-#include	<strwcpy.h>
-#include	<cfdec.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® |pid_t| */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<strlibval.hh>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<varsub.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<svcfile.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mktmp.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"svcentry.h"
 #include	"svckey.h"
@@ -102,17 +103,12 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_unlink(cchar *) noex ;
-}
 
 
 /* external variables */
@@ -133,11 +129,12 @@ template<typename ... Args>
 local int svcentry_ctor(svcentry *op,Args ... args) noex {
 	SVCENTRY	*hop = (SVCENTRY *) op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->sap = new(nothrow) vecstr) != np) ylikely {
+	    if ((op->sap = new(nt) vecstr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
@@ -160,7 +157,7 @@ template<typename ... Args>
 local inline int svcentry_magic(svcentry *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SVCENTRY_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SVCENTRY_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (svcentry_magic) */
@@ -185,11 +182,8 @@ local void	freeit(cchar **) noex ;
 /* local variables */
 
 constexpr fieldterminit		pt(" \t") ;
-
 constexpr int			tmplen = TMPLEN ;
-
 static vars			var ;
-
 static strlibval		deftmpdname(strlibval_tmpdir) ;
 
 
@@ -201,8 +195,7 @@ static strlibval		deftmpdname(strlibval_tmpdir) ;
 int svcentry_start(SE *op,varsub *ssp,ENT *sep,ARGS * esap) noex {
 	int		rs ;
 	if ((rs = svcentry_ctor(op,sep)) >= 0) ylikely {
-	    static cint		rsv = mkvars() ;
-	    if ((rs = rsv) >= 0) ylikely {
+	    if (static cint rsv = mkvars() ; (rs = rsv) >= 0) ylikely {
 	        if (char *bp ; (rs = lm_mn(&bp)) >= 0) ylikely {
 		    cint	namelen = rs ;
 		    op->name = bp ;
@@ -222,8 +215,7 @@ int svcentry_start(SE *op,varsub *ssp,ENT *sep,ARGS * esap) noex {
 	    }
 	} /* end if (svcentry_ctor) */
 	return rs ;
-}
-/* end subroutine (svcentry_start) */
+} /* end subroutine (svcentry_start) */
 
 int svcentry_finish(SE *op) noex {
 	int		rs ;
@@ -239,7 +231,7 @@ int svcentry_finish(SE *op) noex {
 	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->ofname = nullptr ;
-		}
+		} /* end if (memort-release) */
 	    }
 	    if (op->efname) ylikely {
 	        if (op->efname[0] != '\0') {
@@ -250,7 +242,7 @@ int svcentry_finish(SE *op) noex {
 	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->efname = nullptr ;
-		}
+		} /* end if (memort-release) */
 	    }
 	    if (op->fl.srvargs) ylikely {
 	        op->fl.srvargs = false ;
@@ -262,47 +254,46 @@ int svcentry_finish(SE *op) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->program = nullptr ;
-	    }
+	    } /* end if (memort-release) */
 	    if (op->username) ylikely {
 		vp = voidp(op->username) ;
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->username = nullptr ;
-	    }
+	    } /* end if (memort-release) */
 	    if (op->groupname) ylikely {
 		vp = voidp(op->groupname) ;
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->groupname = nullptr ;
-	    }
+	    } /* end if (memort-release) */
 	    if (op->options) {
 		vp = voidp(op->options) ;
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->options = nullptr ;
-	    }
+	    } /* end if (memort-release) */
 	    if (op->access) {
 		vp = voidp(op->access) ;
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->access = nullptr ;
-	    }
+	    } /* end if (memort-release) */
 	    if (op->name) {
 		vp = voidp(op->name) ;
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->name = nullptr ;
-	    }
+	    } /* end if (memort-release) */
 	    {
 		rs1 = svcentry_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->program = nullptr ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcentry_finish) */
+} /* end subroutine (svcentry_finish) */
 
 int svcentry_getaccess(SE *op,cchar **rpp) noex {
 	int		rs ;
@@ -311,8 +302,7 @@ int svcentry_getaccess(SE *op,cchar **rpp) noex {
 	    rs = (op->access) ? SR_OK : SR_EMPTY ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcentry_getaccess) */
+} /* end subroutine (svcentry_getaccess) */
 
 /* retrieve for caller the execution interval for this entry */
 int svcentry_getinterval(SE *op,int *rp) noex {
@@ -323,8 +313,7 @@ int svcentry_getinterval(SE *op,int *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcentry_getinterval) */
+} /* end subroutine (svcentry_getinterval) */
 
 int svcentry_getargs(SE *op,mainv avp) noex {
 	int		rs ;
@@ -332,8 +321,7 @@ int svcentry_getargs(SE *op,mainv avp) noex {
 	    rs = vecstr_getvec(op->sap,&avp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcentry_getargs) */
+} /* end subroutine (svcentry_getargs) */
 
 namespace {
     struct expander {
@@ -378,8 +366,7 @@ int svcentry_expand(SE *op,ENT *sep,ARGS *esap) noex {
 	    rs = eo ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcentry_expand) */
+} /* end subroutine (svcentry_expand) */
 
 expander::operator int () noex {
 	int		rs ;
@@ -402,8 +389,7 @@ expander::operator int () noex {
 	    esap->service = oldservice ;
 	} /* end if (svckey_load) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (svcentry_expand) */
+} /* end subroutine (svcentry_expand) */
 
 int expander::mkfiles() noex {
 	int		rs = SR_OK ;
@@ -431,8 +417,7 @@ int expander::mkfiles() noex {
 	    } /* end if (error) */
 	} /* end if (svcentry_mkfile) */
 	return rs ;
-}
-/* end method (expander::mkfiles) */
+} /* end method (expander::mkfiles) */
 
 int expander::mkcomps() noex {
 	int		rs = SR_OK ;
@@ -441,8 +426,7 @@ int expander::mkcomps() noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end method (expander::mkcomps) */
+} /* end method (expander::mkcomps) */
 
 int expander::comp_p() noex {
 	int		rs = SR_OK ;
@@ -459,8 +443,7 @@ int expander::comp_p() noex {
 	    } /* end if */
 	} /* end if (program path) */
 	return rs ;
-}
-/* end method (expander::comp_p) */
+} /* end method (expander::comp_p) */
 
 int expander::comp_a() noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -484,8 +467,7 @@ int expander::comp_a() noex {
 	    } /* end if (svcentry_proc) */
 	} /* end if (program arguments) */
 	return rs ;
-}
-/* end method (expander::comp_a) */
+} /* end method (expander::comp_a) */
 
 int expander::comp_u() noex {
 	int		rs = SR_OK ;
@@ -497,8 +479,7 @@ int expander::comp_u() noex {
 	    } /* end if (svcentry_proc) */
 	} /* end if (username field) */
 	return rs ;
-}
-/* end method (expander::comp_u) */
+} /* end method (expander::comp_u) */
 
 int expander::comp_g() noex {
 	int		rs = SR_OK ;
@@ -510,8 +491,7 @@ int expander::comp_g() noex {
 	    } /* end if (svcentry_proc) */
 	}
 	return rs ;
-}
-/* end method (expander::comp_g) */
+} /* end method (expander::comp_g) */
 
 int expander::comp_o() noex {
 	int		rs = SR_OK ;
@@ -523,8 +503,7 @@ int expander::comp_o() noex {
 	    } /* end if (svcentry_proc) */
 	}
 	return rs ;
-}
-/* end method (expander::comp_o) */
+} /* end method (expander::comp_o) */
 
 int expander::comp_prog() noex {
 	int		rs = SR_OK ;
@@ -537,8 +516,7 @@ int expander::comp_prog() noex {
 	    } /* end if (non-zero) */
 	}
 	return rs ;
-}
-/* end method (expander::comp_prog) */
+} /* end method (expander::comp_prog) */
 
 int expander::comp_def() noex {
 	int		rs = SR_OK ;
@@ -562,8 +540,7 @@ int expander::comp_def() noex {
 	    } /* end if (non-zero) */
 	} /* end if (setting 'argv[0]') */
 	return (rs >= 0) ? c : rs ;
-}
-/* end method (expander::comp_def) */
+} /* end method (expander::comp_def) */
 
 void expander::compfrees() noex {
 	freeit(&op->options) ;
@@ -574,8 +551,7 @@ void expander::compfrees() noex {
 	    vecstr_finish(op->sap) ;
 	}
 	freeit(&op->program) ;
-}
-/* end method (expander::compfrees) */
+} /* end method (expander::compfrees) */
 
 int svcentry_arrival(SE *op,time_t *tp) noex {
 	int		rs ;
@@ -583,8 +559,7 @@ int svcentry_arrival(SE *op,time_t *tp) noex {
 	    if (tp) *tp = op->atime ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcentry_arrival) */
+} /* end subroutine (svcentry_arrival) */
 
 int svcentry_stime(SE *op,time_t daytime) noex {
 	int		rs ;
@@ -592,8 +567,7 @@ int svcentry_stime(SE *op,time_t daytime) noex {
 	    op->stime = daytime ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (svcentry_stime) */
+} /* end subroutine (svcentry_stime) */
 
 
 /* private subroutines */
@@ -627,7 +601,7 @@ local int svcentry_starter(SE *op,svckey *skp,ARGS *esap) noex {
 	                op->interval = -1 ;
 	            }
 	            if (rs >= 0) {
-	                op->magic = SVCENTRY_MAGIC ;
+	                op->magval = SVCENTRY_MAGIC ;
 	            } else {
 	                if (op->access) {
 			    void *vp = voidp(op->access) ;
@@ -641,8 +615,7 @@ local int svcentry_starter(SE *op,svckey *skp,ARGS *esap) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (bufsizeget) */
 	return rs ;
-}
-/* end subroutie (svcentry_starter) */
+} /* end subroutie (svcentry_starter) */
 
 local int svcentry_proc(SE *op,cc *inbuf,ARGS *esap,char *obuf,int olen) noex {
 	int		rs = SR_FAULT ;
@@ -671,8 +644,7 @@ local int svcentry_proc(SE *op,cc *inbuf,ARGS *esap,char *obuf,int olen) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? elen : rs ;
-}
-/* end subroutine (svcentry_proc) */
+} /* end subroutine (svcentry_proc) */
 
 local int svcentry_mkfile(SE *op,cchar *tmpdname,int type) noex {
 	int		rs ;
@@ -695,8 +667,7 @@ local int svcentry_mkfile(SE *op,cchar *tmpdname,int type) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (svcentry_mkfile) */
+} /* end subroutine (svcentry_mkfile) */
 
 /* expand out a program argument with the substitution parameters */
 
@@ -822,8 +793,7 @@ local int args_expand(ARGS *esap,char *rbuf,int rlen,cc *sp,int sl) noex {
 	    } /* end if (non-empty source c-string) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (args_expand) */
+} /* end subroutine (args_expand) */
 
 /* process an argument list */
 local int vecstr_procargs(vecstr *alp,char *abuf) noex {
@@ -852,8 +822,7 @@ local int vecstr_procargs(vecstr *alp,char *abuf) noex {
 	    } /* end if (non-empty arguments) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c: rs ;
-}
-/* end subroutine (processargs) */
+} /* end subroutine (processargs) */
 
 /* make our little files for input and output of the server programs */
 local int mkfile(char *obuf,cc *tmpdname,int type) noex {
@@ -869,8 +838,7 @@ local int mkfile(char *obuf,cc *tmpdname,int type) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkfile) */
+} /* end subroutine (mkfile) */
 
 local int mkpat(char *pbuf,int plen,cc *tmpdname,int type) noex {
 	int		rs ;
@@ -888,8 +856,7 @@ local int mkpat(char *pbuf,int plen,cc *tmpdname,int type) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sbuf) */
 	return rs ;
-}
-/* end subroutine (mkpat) */
+} /* end subroutine (mkpat) */
 
 local int mkvars() noex {
 	int		rs ;
@@ -897,26 +864,23 @@ local int mkvars() noex {
 	    var.olen = (rs * BUFMULT) ;
 	}
 	return rs ;
-}
-/* end subroutine (mkvars) */
+} /* end subroutine (mkvars) */
 
 local void delfreeit(cchar *&fn) noex {
-	if (fn) {
+	if (fn) ylikely {
 	    if (fn[0]) {
 		uc_unlink(fn) ;
 	    }
 	    freeit(&fn) ;
-	}
-}
-/* end subroutine (delfreeit) */
+	} /* end if (non-null) */
+} /* end subroutine (delfreeit) */
 
 local void freeit(cchar **pp) noex {
 	if (*pp != nullptr) {
 	    void *vp = voidp(*pp) ;
 	    lm_free(vp) ;
 	    *pp = nullptr ;
-	}
-}
-/* end subroutine (freeit) */
+	} /* end if (non-null) */
+} /* end subroutine (freeit) */
 
 
