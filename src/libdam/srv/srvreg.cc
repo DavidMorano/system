@@ -5,7 +5,7 @@
 /* manage reading or writing of a server registry file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		1
 #define	CF_CREAT	0		/* always create the file? */
 
@@ -33,29 +33,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<inttypes.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<climits>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<serialbuf.h>
-#include	<strwcpy.h>
-#include	<lockfile.h>
-#include	<intceil.h>
-#include	<timestr.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<inttypes.h>		/* CSTD */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<lockfile.h>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"srvreg.h"
 #include	"srvrege.h"
@@ -95,6 +96,10 @@ import libutil ;			/* |memclear(3u)| */
 #define	NENTRIES	100
 #define	FBUFLEN		(SRVREG_FLTOP + 9)
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0
+#endif
+
 
 /* external subroutines */
 
@@ -109,21 +114,21 @@ import libutil ;			/* |memclear(3u)| */
 
 int		srvreg_close(SRVREG *) ;
 
-static int	srvreg_fileopen(SRVREG *,time_t) ;
-static int	srvreg_fileclose(SRVREG *) ;
-static int	srvreg_lockget(SRVREG *,time_t,int) ;
-static int	srvreg_lockrelease(SRVREG *) ;
-static int	srvreg_fileinit(SRVREG *,time_t) ;
-static int	srvreg_filechanged(SRVREG *) ;
-static int	srvreg_filecheck(SRVREG *,time_t,int) ;
-static int	srvreg_buf(SRVREG *,uint,uint,char **) ;
-static int	srvreg_bufupdate(SRVREG *,uint,int,cchar *) ;
-static int	srvreg_bufinit(SRVREG *) ;
-static int	srvreg_buffree(SRVREG *) ;
-static int	srvreg_writehead(SRVREG *) ;
+local int	srvreg_fileopen(SRVREG *,time_t) noex ;
+local int	srvreg_fileclose(SRVREG *) noex ;
+local int	srvreg_lockget(SRVREG *,time_t,int) noex ;
+local int	srvreg_lockrelease(SRVREG *) noex ;
+local int	srvreg_fileinit(SRVREG *,time_t) noex ;
+local int	srvreg_filechanged(SRVREG *) noex ;
+local int	srvreg_filecheck(SRVREG *,time_t,int) noex ;
+local int	srvreg_buf(SRVREG *,uint,uint,char **) noex ;
+local int	srvreg_bufupdate(SRVREG *,uint,int,cchar *) noex ;
+local int	srvreg_bufinit(SRVREG *) noex ;
+local int	srvreg_buffree(SRVREG *) noex ;
+local int	srvreg_writehead(SRVREG *) noex ;
 
-static int	filemagic(char *,int,struct srvreg_filemagic *) ;
-static int	filehead(char *,int,struct srvreg_filehead *) ;
+local int	filemagic(char *,int,struct srvreg_filemagic *) noex ;
+local int	filehead(char *,int,struct srvreg_filehead *) noex ;
 
 
 /* local variables */
@@ -142,10 +147,12 @@ static cchar	*aitypes[] = {
 	"sockstream",
 	"sockdgram",
 	"pmq",
-	NULL
+	nullptr
 } ;
 
 #endif /* COMMENT */
+
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -161,36 +168,36 @@ int		operm ;
 {
 	USTAT		sb ;
 
-	time_t	daytime = time(NULL) ;
+	time_t	daytime = time(nullptr) ;
 
 	int	rs ;
 	int	amode ;
-	int	f_create = FALSE ;
+	int	f_create = false ;
 
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_open: ent fname=%s\n",fname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_open: ent fname=%s\n",fname) ;
 #endif
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 #endif /* CF_SAFE */
 
-	if ((fname == NULL) || (fname[0] == '\0'))
+	if ((fname == nullptr) || (fname[0] == '\0'))
 	    return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_open: oflags=%4o fname=%s\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_open: oflags=%4o fname=%s\n",
 	    oflags,fname) ;
 	if (oflags & O_CREAT)
-	    debugprintf("srvreg_open: creating as needed\n") ;
+	    DEBUGPRINTF("srvreg_open: creating as needed\n") ;
 #endif
 
 	memclear(op) ;
 
 	op->magic = 0 ;
-	op->fname = NULL ;
+	op->fname = nullptr ;
 
 #if	CF_CREAT
 	oflags |= O_CREAT ;
@@ -220,19 +227,19 @@ int		operm ;
 	rs = u_open(op->fname,oflags,operm) ;
 	op->fd = rs ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_open: u_open() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_open: u_open() rs=%d\n",rs) ;
 #endif
 
 	if ((rs < 0) && (op->oflags & O_CREAT)) {
 
-	    f_create = TRUE ;
+	    f_create = true ;
 	    oflags = op->oflags ;
 	    rs = u_open(op->fname,oflags,operm) ;
 	    op->fd = rs ;
 
-#if	CF_DEBUGS
-	    debugprintf("srvreg_open: u_open() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	    DEBUGPRINTF("srvreg_open: u_open() rs=%d\n",rs) ;
 #endif
 
 	} /* end if (creating file) */
@@ -243,26 +250,26 @@ int		operm ;
 	amode = (oflags & O_ACCMODE) ;
 	op->fl.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_open: f_writable=%d\n",op->fl.writable) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_open: f_writable=%d\n",op->fl.writable) ;
 #endif
 
 	op->opentime = daytime ;
 	op->accesstime = daytime ;
 	rs = u_fstat(op->fd,&sb) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_open: u_fstat() rs=%d\n",rs) ;
-	debugprintf("srvreg_open: f_size=%08x\n",sb.st_size) ;
-	debugprintf("srvreg_open: f_mtime=%08x\n",sb.st_mtime) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_open: u_fstat() rs=%d\n",rs) ;
+	DEBUGPRINTF("srvreg_open: f_size=%08lx\n",sb.st_size) ;
+	DEBUGPRINTF("srvreg_open: f_mtime=%08lx\n",sb.st_mtime) ;
 #endif
 
 	if (rs < 0)
 	    goto bad3 ;
 
 	op->mtime = sb.st_mtime ;
-	op->filesize = sb.st_size ;
-	op->pagesize = getpagesize() ;
+	op->filesz = sb.st_size ;
+	op->pagesz = getpagesize() ;
 
 /* local or remote */
 
@@ -275,8 +282,8 @@ int		operm ;
 
 	rs = srvreg_fileinit(op,daytime) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_open: srvreg_fileinit() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_open: srvreg_fileinit() rs=%d\n",rs) ;
 #endif
 
 	if (rs < 0)
@@ -284,8 +291,8 @@ int		operm ;
 
 /* out of here */
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_open: ret rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_open: ret rs=%d\n",rs) ;
 #endif
 
 	op->magic = SRVREG_MAGIC ;
@@ -305,9 +312,9 @@ bad2:
 	srvreg_buffree(op) ;
 
 bad1:
-	if (op->fname != NULL) {
+	if (op->fname != nullptr) {
 	    uc_free(op->fname) ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
 
 bad0:
@@ -322,7 +329,7 @@ SRVREG		*op ;
 
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != SRVREG_MAGIC)
@@ -336,9 +343,9 @@ SRVREG		*op ;
 	    op->fd = -1 ;
 	}
 
-	if (op->fname != NULL) {
+	if (op->fname != nullptr) {
 	    uc_free(op->fname) ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
 
 	op->magic = 0 ;
@@ -356,14 +363,14 @@ SRVREG		*op ;
 
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != SRVREG_MAGIC)
 	    return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-	c = (op->filesize - SRVREG_FOTAB) / SRVREG_ENTSIZE ;
+	c = (op->filesz - SRVREG_FOTAB) / SRVREG_ENTSIZE ;
 
 	return (rs >= 0) ? c : rs ;
 }
@@ -378,20 +385,20 @@ SRVREG_CUR	*cp ;
 
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != SRVREG_MAGIC)
 	    return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-	if (cp == NULL)
+	if (cp == nullptr)
 	    return SR_FAULT ;
 
 	op->cursors += 1 ;
 
-	op->fl.cursorlockbroken = FALSE ;
-	op->fl.cursoracc = FALSE ;
+	op->fl.cursorlockbroken = false ;
+	op->fl.cursoracc = false ;
 	cp->i = -1 ;
 	return SR_OK ;
 }
@@ -407,19 +414,19 @@ SRVREG_CUR	*cp ;
 
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != SRVREG_MAGIC)
 	    return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-	if (cp == NULL)
+	if (cp == nullptr)
 	    return SR_FAULT ;
 
 	if (op->fl.cursoracc) {
 
-	    daytime = time(NULL) ;
+	    daytime = time(nullptr) ;
 
 	    op->accesstime = daytime ;
 
@@ -438,7 +445,7 @@ SRVREG_CUR	*cp ;
 
 
 /* enumerate the entries */
-int srvreg_enum(op,cup,ep)
+int srvreg_curenum(op,cup,ep)
 SRVREG		*op ;
 SRVREG_CUR	*cup ;
 SRVREG_ENT	*ep ;
@@ -455,21 +462,21 @@ SRVREG_ENT	*ep ;
 
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != SRVREG_MAGIC)
 	    return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_enum: ent fileinit=%u\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_curenum: ent fileinit=%u\n",
 		op->fl.fileinit) ;
-	debugprintf("srvreg_enum: cursorlockbroken=%u\n",
+	DEBUGPRINTF("srvreg_curenum: cursorlockbroken=%u\n",
 		op->fl.cursorlockbroken) ;
 #endif
 
-	if (cup == NULL)
+	if (cup == nullptr)
 	    return SR_FAULT ;
 
 /* is the file even initialized? */
@@ -485,12 +492,12 @@ SRVREG_ENT	*ep ;
 /* do we have proper file access? */
 
 	if (daytime == 0)
-	    daytime = time(NULL) ;
+	    daytime = time(nullptr) ;
 
 	rs = srvreg_filecheck(op,daytime,1) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_enum: srvreg_filecheck() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_curenum: srvreg_filecheck() rs=%d\n",rs) ;
 #endif
 
 	if ((rs < 0) || (! op->fl.fileinit))
@@ -501,13 +508,13 @@ SRVREG_ENT	*ep ;
 	ei = (cup->i < 0) ? 0 : cup->i + 1 ;
 	eoff = SRVREG_FOTAB + (ei * ebs) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_enum: ei=%d eoff=%u\n",ei,eoff) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_curenum: ei=%d eoff=%u\n",ei,eoff) ;
 #endif
 
 /* form result to caller */
 
-	rs = ((eoff + ebs) <= op->filesize) ? SR_OK : SR_NOTFOUND ;
+	rs = ((eoff + ebs) <= op->filesz) ? SR_OK : SR_NOTFOUND ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -515,8 +522,8 @@ SRVREG_ENT	*ep ;
 
 	rs = srvreg_buf(op,eoff,ebs,&bp) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_enum: srvreg_buf() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_curenum: srvreg_buf() rs=%d\n",rs) ;
 #endif
 
 	if ((rs >= 0) && (rs < ebs))
@@ -527,7 +534,7 @@ SRVREG_ENT	*ep ;
 
 /* copy entry to caller buffer */
 
-	if (ep != NULL) {
+	if (ep != nullptr) {
 
 	    srvrege_all(bp,SRVREGE_SIZE,1,ep) ;
 
@@ -538,12 +545,12 @@ SRVREG_ENT	*ep ;
 	if (rs >= 0)
 	    cup->i = ei ;
 
-	op->fl.cursoracc = TRUE ;
+	op->fl.cursoracc = true ;
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_enum: ret rs=%d ei=%u\n",rs,ei) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_curenum: ret rs=%d ei=%u\n",rs,ei) ;
 #endif
 
 	return (rs >= 0) ? ei : rs ;
@@ -551,8 +558,8 @@ ret0:
 /* bad stuff */
 bad1:
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_enum: BAD1 rs=%d fileinit=%u\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_curenum: BAD1 rs=%d fileinit=%u\n",
 		rs,op->fl.fileinit) ;
 #endif
 
@@ -562,7 +569,7 @@ bad1:
 bad0:
 	goto ret0 ;
 }
-/* end subroutine (srvreg_enum) */
+/* end subroutine (srvreg_curenum) */
 
 
 /* fetch by service name */
@@ -587,18 +594,18 @@ SRVREG_ENT	*ep ;
 
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != SRVREG_MAGIC)
 	    return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-	if (svc == NULL)
+	if (svc == nullptr)
 	    return SR_FAULT ;
 
 #ifdef	OPTIONAL
-	if (ep == NULL)
+	if (ep == nullptr)
 	    return SR_FAULT ;
 #endif
 
@@ -610,7 +617,7 @@ SRVREG_ENT	*ep ;
 /* do we have proper file access? */
 
 	if (daytime == 0)
-	    daytime = time(NULL) ;
+	    daytime = time(nullptr) ;
 
 	rs = srvreg_filecheck(op,daytime,1) ;
 	if ((rs < 0) || (! op->fl.fileinit))
@@ -618,20 +625,20 @@ SRVREG_ENT	*ep ;
 
 /* deal with the cursor */
 
-	if (cp == NULL) {
+	if (cp == nullptr) {
 	    ei = 0 ;
 	} else
 	    ei = (cp->i < 0) ? 0 : (cp->i + 1) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_fetchsvc: svc=%s ei=%d\n",svc,ei) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_fetchsvc: svc=%s ei=%d\n",svc,ei) ;
 #endif
 
 /* continue with the search */
 
 	ne = 20 ;
 
-	f = FALSE ;
+	f = false ;
 	while (! f) {
 
 	    eoff = SRVREG_FOTAB + (ei * ebs) ;
@@ -658,7 +665,7 @@ SRVREG_ENT	*ep ;
 
 	} /* end while */
 
-	if ((rs >= 0) && f && (ep != NULL)) {
+	if ((rs >= 0) && f && (ep != nullptr)) {
 
 	    srvrege_all(bep,SRVREGE_SIZE,1,ep) ;
 
@@ -667,7 +674,7 @@ SRVREG_ENT	*ep ;
 	if ((rs == 0) || (! f))
 	    rs = SR_NOTFOUND ;
 
-	if ((rs >= 0) && (cp != NULL))
+	if ((rs >= 0) && (cp != nullptr))
 	    cp->i = ei ;
 
 /* optionally release our lock if we didn't have a cursor outstanding */
@@ -680,18 +687,18 @@ SRVREG_ENT	*ep ;
 	if (op->cursors == 0) {
 
 	    if (daytime == 0)
-	        daytime = time(NULL) ;
+	        daytime = time(nullptr) ;
 
 	    op->accesstime = daytime ;
 
 	} else
-	    op->fl.cursoracc = TRUE ;
+	    op->fl.cursoracc = true ;
 
 /* done */
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_fetchsvc: ret rs=%d ei=%u\n",rs,ei) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_fetchsvc: ret rs=%d ei=%u\n",rs,ei) ;
 #endif
 
 	return (rs >= 0) ? ei : rs ;
@@ -730,17 +737,17 @@ SRVREG_ENT	*ep ;
 	char	*bp, *bep, *fp ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != SRVREG_MAGIC)
 	    return SR_NOTOPEN ;
 
-	if (ep == NULL)
+	if (ep == nullptr)
 	    return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_write: ent ei=%d fileinit=%u\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_write: ent ei=%d fileinit=%u\n",
 		ei,op->fl.fileinit) ;
 #endif
 
@@ -750,7 +757,7 @@ SRVREG_ENT	*ep ;
 /* do we have proper file access? */
 
 	if (daytime == 0)
-	    daytime = time(NULL) ;
+	    daytime = time(nullptr) ;
 
 	rs = srvreg_filecheck(op,daytime,0) ;
 	if (rs < 0)
@@ -758,14 +765,14 @@ SRVREG_ENT	*ep ;
 
 /* is the file initialized? */
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_write: fileinit=%u\n",op->fl.fileinit) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_write: fileinit=%u\n",op->fl.fileinit) ;
 #endif
 
 	if (! op->fl.fileinit) {
 
 	    if (daytime == 0)
-	        daytime = time(NULL) ;
+	        daytime = time(nullptr) ;
 
 	    rs = srvreg_fileinit(op,daytime) ;
 	    if (rs < 0)
@@ -775,7 +782,7 @@ SRVREG_ENT	*ep ;
 
 /* figure where we need to write this */
 
-	ne = (op->filesize - SRVREG_FOTAB) / ebs ;
+	ne = (op->filesz - SRVREG_FOTAB) / ebs ;
 	if (ei > ne) {
 	    rs = SR_INVALID ;
 	    goto ret0 ;
@@ -787,11 +794,11 @@ SRVREG_ENT	*ep ;
 
 /* do we need to find an empty slot? */
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_write: find empty ne=%d \n",ne) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_write: find empty ne=%d \n",ne) ;
 #endif
 
-	f = FALSE ;
+	f = false ;
 	if (ei < 0) {
 
 	    memset(zbuf,0,4) ;
@@ -802,21 +809,21 @@ SRVREG_ENT	*ep ;
 	    while (! f) {
 
 #ifdef	OPTIONAL
-	        if (nr > ((op->filesize - eoff) / ebs))
-	            nr = (op->filesize - eoff) / ebs ;
+	        if (nr > ((op->filesz - eoff) / ebs))
+	            nr = (op->filesz - eoff) / ebs ;
 #endif
 
 	        len = nr * ebs ;
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_write: srvreg_buf() eoff=%u len=%d\n",
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_write: srvreg_buf() eoff=%u len=%d\n",
 			eoff,len) ;
 #endif
 
 	        rs = srvreg_buf(op,eoff,len,&bp) ;
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_write: srvreg_buf() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_write: srvreg_buf() rs=%d\n",rs) ;
 #endif
 
 	        if (rs < ebs)
@@ -827,7 +834,7 @@ SRVREG_ENT	*ep ;
 
 	            bep = bp + (i * ebs) ;
 	            fp = bep + SRVREGE_OITYPE ;
-	            f = (memcmp(zbuf,fp,sizeof(uint)) == 0) ;
+	            f = (memcmp(zbuf,fp,szof(uint)) == 0) ;
 
 	            if (f)
 	                break ;
@@ -845,26 +852,26 @@ SRVREG_ENT	*ep ;
 
 	} /* end if (needed an empty slot) */
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_write: writing at slot ei=%u\n",ei) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_write: writing at slot ei=%u\n",ei) ;
 #endif
 
 	eoff = SRVREG_FOTAB + (ei * ebs) ;
 	uoff = eoff ;
 	rs = u_writep(op->fd,ebuf,ebs,uoff) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_write: u_writep() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_write: u_writep() rs=%d\n",rs) ;
 #endif
 
 	if (rs >= 0) {
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_write: f_found=%u\n",f) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_write: f_found=%u\n",f) ;
 #endif
 
 	    if (daytime == 0)
-	        daytime = time(NULL) ;
+	        daytime = time(nullptr) ;
 
 		op->h.wcount += 1 ;
 		op->h.wtime = daytime ;
@@ -873,18 +880,18 @@ SRVREG_ENT	*ep ;
 		if (! f) {
 
 	    op->h.nentries += 1 ;
-	    op->filesize += ebs ;
+	    op->filesz += ebs ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_write: filesize=%u\n",op->filesize) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_write: filesz=%u\n",op->filesz) ;
 #endif
 
 		}
 
 		rs = srvreg_writehead(op) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_write: srvreg_writehead() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_write: srvreg_writehead() rs=%d\n",rs) ;
 #endif
 
 		if ((rs >= 0) && op->fl.remote)
@@ -894,8 +901,8 @@ SRVREG_ENT	*ep ;
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_write: ret rs=%u filesize=%u\n",rs,op->filesize) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_write: ret rs=%u filesz=%u\n",rs,op->filesz) ;
 #endif
 
 	return (rs >= 0) ? ei : rs ;
@@ -910,13 +917,13 @@ time_t		daytime ;
 {
 	int	rs = SR_OK ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	char	timebuf[TIMEBUFLEN + 1] ;
 #endif
 
 
 #if	CF_SAFE
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != SRVREG_MAGIC)
@@ -926,8 +933,8 @@ time_t		daytime ;
 	if (op->fd < 0)
 	    return SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_check: %s\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_check: %s\n",
 	    timestr_log(daytime,timebuf)) ;
 #endif
 
@@ -956,13 +963,13 @@ closeit:
 
 
 /* check the file for coherency */
-static int srvreg_filecheck(op,daytime,f_read)
+local int srvreg_filecheck(op,daytime,f_read)
 SRVREG		*op ;
 time_t		daytime ;
 int		f_read ;
 {
 	int	rs = SR_OK ;
-	int	f_changed = FALSE ;
+	int	f_changed = false ;
 
 
 /* is the file open */
@@ -970,7 +977,7 @@ int		f_read ;
 	if (op->fd < 0) {
 
 	    if (daytime == 0)
-	        daytime = time(NULL) ;
+	        daytime = time(nullptr) ;
 
 	    rs = srvreg_fileopen(op,daytime) ;
 	    if (rs < 0)
@@ -983,7 +990,7 @@ int		f_read ;
 	if ((! op->fl.readlocked) && (! op->fl.writelocked)) {
 
 	    if (daytime == 0)
-	        daytime = time(NULL) ;
+	        daytime = time(nullptr) ;
 
 	    rs = srvreg_lockget(op,daytime,f_read) ;
 	    if (rs < 0)
@@ -1011,7 +1018,7 @@ bad0:
 
 
 /* initialize the file header (either read it only or write it) */
-static int srvreg_fileinit(op,daytime)
+local int srvreg_fileinit(op,daytime)
 SRVREG		*op ;
 time_t		daytime ;
 {
@@ -1019,24 +1026,24 @@ time_t		daytime ;
 
 	int	rs = SR_OK ;
 	int	bl ;
-	int	f_locked = FALSE ;
+	int	f_locked = false ;
 
 	char	fbuf[FBUFLEN + 1] ;
 
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_fileinit: ent filesize=%u\n",op->filesize) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_fileinit: ent filesz=%u\n",op->filesz) ;
 #endif
 
-	if (op->filesize == 0) {
+	if (op->filesz == 0) {
 
 	    u_seek(op->fd,0L,SEEK_SET) ;
 
-	    op->fl.fileinit = FALSE ;
+	    op->fl.fileinit = false ;
 	    if (op->fl.writable) {
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_fileinit: writing header\n") ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_fileinit: writing header\n") ;
 #endif
 
 	        if (! op->fl.writelocked) {
@@ -1045,7 +1052,7 @@ time_t		daytime ;
 	            if (rs < 0)
 	                goto ret0 ;
 
-	            f_locked = TRUE ;
+	            f_locked = true ;
 	        }
 
 /* write the file header stuff */
@@ -1065,7 +1072,7 @@ time_t		daytime ;
 
 	        rs = u_writep(op->fd,fbuf,bl,0L) ;
 	        if (rs > 0) {
-	            op->filesize = rs ;
+	            op->filesz = rs ;
 		    op->mtime = daytime ;
 		    if (op->fl.remote) {
 			u_fsync(op->fd) ;
@@ -1076,7 +1083,7 @@ time_t		daytime ;
 
 	    } /* end if (writing) */
 
-	} else if (op->filesize >= SRVREG_FOTAB) {
+	} else if (op->filesz >= SRVREG_FOTAB) {
 
 	    int	f ;
 
@@ -1089,13 +1096,13 @@ time_t		daytime ;
 	        if (rs < 0)
 	            goto ret0 ;
 
-	        f_locked = TRUE ;
+	        f_locked = true ;
 	    }
 
 	    rs = u_readp(op->fd,fbuf,FBUFLEN,0L) ;
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_fileinit: u_readp() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_fileinit: u_readp() rs=%d\n",rs) ;
 #endif
 
 	    if (rs >= SRVREG_FLTOP) {
@@ -1105,34 +1112,34 @@ time_t		daytime ;
 
 	        filehead((fbuf + bl),1,&op->h) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_fileinit: f_wtime=%08x\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_fileinit: f_wtime=%08x\n",
 		op->h.wtime) ;
-	debugprintf("srvreg_fileinit: f_wcount=%08x\n",
+	DEBUGPRINTF("srvreg_fileinit: f_wcount=%08x\n",
 		op->h.wcount) ;
-	debugprintf("srvreg_fileinit: f_nentries=%08x\n",
+	DEBUGPRINTF("srvreg_fileinit: f_nentries=%08x\n",
 		op->h.nentries) ;
 #endif
 
 	        f = (strcmp(fm.magic,SRVREG_FILEMAGIC) == 0) ;
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_fileinit: fm.magic=%s\n",fm.magic) ;
-	        debugprintf("srvreg_fileinit: magic cmp f=%d\n",f) ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_fileinit: fm.magic=%s\n",fm.magic) ;
+	        DEBUGPRINTF("srvreg_fileinit: magic cmp f=%d\n",f) ;
 #endif
 
 #if	(SRVREG_FILEVERSION > 0)
 	        f = f && (fm.vetu[0] <= SRVREG_FILEVERSION) ;
 #endif
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_fileinit: version cmp f=%d\n",f) ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_fileinit: version cmp f=%d\n",f) ;
 #endif
 
 	        f = f && (fm.vetu[1] == SRVREG_ENDIAN) ;
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_fileinit: cmp f=%d\n",f) ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_fileinit: cmp f=%d\n",f) ;
 #endif
 
 	        if (! f)
@@ -1152,8 +1159,8 @@ time_t		daytime ;
 /* we're out of here */
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_fileinit: ret rs=%d fileinit=%u\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_fileinit: ret rs=%d fileinit=%u\n",
 		rs,op->fl.fileinit) ;
 #endif
 
@@ -1163,21 +1170,21 @@ ret0:
 
 
 /* has the file changed at all? */
-static int srvreg_filechanged(op)
+local int srvreg_filechanged(op)
 SRVREG		*op ;
 {
 	USTAT		sb ;
 
 	int	rs ;
-	int	f_changed = FALSE ;
+	int	f_changed = false ;
 
 
 /* has the file changed at all? */
 
 	rs = u_fstat(op->fd,&sb) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_filechanged: u_fstat() rs=%d filesize=%u\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_filechanged: u_fstat() rs=%d fsize=%z\n",
 		rs,sb.st_size) ;
 #endif
 
@@ -1190,19 +1197,19 @@ SRVREG		*op ;
 	    goto bad2 ;
 
 	if (sb.st_size < SRVREG_FOTAB)
-	    op->fl.fileinit = FALSE ;
+	    op->fl.fileinit = false ;
 
 	f_changed = (! op->fl.fileinit) ||
-	    (sb.st_size != op->filesize) ||
+	    (sb.st_size != op->filesz) ||
 	    (sb.st_mtime != op->mtime) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_filechanged: fileinit=%u\n",op->fl.fileinit) ;
-	debugprintf("srvreg_filechanged: f_size=%08x o_size=%08x\n",
-		sb.st_size,op->filesize) ;
-	debugprintf("srvreg_filechanged: f_mtime=%08x o_mtime=%08x\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_filechanged: fileinit=%u\n",op->fl.fileinit) ;
+	DEBUGPRINTF("srvreg_filechanged: fsize=%08lx o_size=%08x\n",
+		sb.st_size,op->filesz) ;
+	DEBUGPRINTF("srvreg_filechanged: f_mtime=%08x o_mtime=%08x\n",
 		sb.st_mtime,op->mtime) ;
-	debugprintf("srvreg_filechanged: fstat f_changed=%u\n",f_changed) ;
+	DEBUGPRINTF("srvreg_filechanged: fstat f_changed=%u\n",f_changed) ;
 #endif
 
 /* if it has NOT changed, read the file header for write indications */
@@ -1216,18 +1223,18 @@ SRVREG		*op ;
 
 	    rs = u_readp(op->fd,hbuf,SRVREG_FLTOP,0) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_filechanged: u_readp() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_filechanged: u_readp() rs=%d\n",rs) ;
 #endif
 
 	    if (rs < 0)
 	        goto bad2 ;
 
 	    if (rs < SRVREG_FLTOP)
-	        op->fl.fileinit = FALSE ;
+	        op->fl.fileinit = false ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_filechanged: fileinit=%u\n",op->fl.fileinit) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_filechanged: fileinit=%u\n",op->fl.fileinit) ;
 #endif
 
 	    if (rs > 0) {
@@ -1238,14 +1245,14 @@ SRVREG		*op ;
 	            (op->h.wcount != h.wcount) ||
 	            (op->h.nentries != h.nentries) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_filechanged: o_wtime=%08x f_wtime=%08x\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_filechanged: o_wtime=%08x f_wtime=%08x\n",
 		op->h.wtime,h.wtime) ;
-	debugprintf("srvreg_filechanged: o_wcount=%08x f_wcount=%08x\n",
+	DEBUGPRINTF("srvreg_filechanged: o_wcount=%08x f_wcount=%08x\n",
 		op->h.wcount,h.wcount) ;
-	debugprintf("srvreg_filechanged: o_nentries=%08x f_nentries=%08x\n",
+	DEBUGPRINTF("srvreg_filechanged: o_nentries=%08x f_nentries=%08x\n",
 		op->h.nentries,h.nentries) ;
-	debugprintf("srvreg_filechanged: header f_changed=%u\n",f_changed) ;
+	DEBUGPRINTF("srvreg_filechanged: header f_changed=%u\n",f_changed) ;
 #endif
 
 	        if (f_changed)
@@ -1258,16 +1265,16 @@ SRVREG		*op ;
 /* OK, we're done */
 
 	if (f_changed) {
+	    csize fsize = size(sb.st_size) ;
 	    op->b.len = 0 ;
-	    op->filesize = sb.st_size ;
+	    op->filesz = intsat(fsize) ;
 	    op->mtime = sb.st_mtime ;
-	}
-
+	} /* end if */
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_filechanged: ret rs=%d f_changed=%u\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_filechanged: ret rs=%d f_changed=%u\n",
 		rs,f_changed) ;
 #endif
 
@@ -1283,26 +1290,26 @@ bad0:
 
 
 /* acquire access to the file */
-static int srvreg_lockget(op,daytime,f_read)
+local int srvreg_lockget(op,daytime,f_read)
 SRVREG		*op ;
 int		f_read ;
 time_t		daytime ;
 {
 	int	rs = SR_OK ;
 	int	lockcmd ;
-	int	f_already = FALSE ;
+	int	f_already = false ;
 
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_lockget: ent f_read=%d\n",f_read) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_lockget: ent f_read=%d\n",f_read) ;
 #endif
 
 	if (op->fd < 0) {
 
 	    rs = srvreg_fileopen(op,daytime) ;
 
-#if	CF_DEBUGS
-	    debugprintf("srvreg_lockget: srvreg_fileopen() rs=%d fd=%d\n",
+#if	CF_DEBUG
+	    DEBUGPRINTF("srvreg_lockget: srvreg_fileopen() rs=%d fd=%d\n",
 	        rs,op->fd) ;
 #endif
 
@@ -1315,23 +1322,23 @@ time_t		daytime ;
 
 	if (f_read || (! op->fl.writable)) {
 
-#if	CF_DEBUGS
-	    debugprintf("srvreg_lockget: need READ lock\n") ;
+#if	CF_DEBUG
+	    DEBUGPRINTF("srvreg_lockget: need READ lock\n") ;
 #endif
 	    f_already = op->fl.readlocked ;
-	    op->fl.readlocked = TRUE ;
-	    op->fl.writelocked = FALSE ;
+	    op->fl.readlocked = true ;
+	    op->fl.writelocked = false ;
 	    lockcmd = F_RLOCK ;
 
 	} else {
 
-#if	CF_DEBUGS
-	    debugprintf("srvreg_lockget: need WRITE lock\n") ;
+#if	CF_DEBUG
+	    DEBUGPRINTF("srvreg_lockget: need WRITE lock\n") ;
 #endif
 
 	    f_already = op->fl.writelocked ;
-	    op->fl.readlocked = FALSE ;
-	    op->fl.writelocked = TRUE ;
+	    op->fl.readlocked = false ;
+	    op->fl.writelocked = true ;
 	    lockcmd = F_WLOCK ;
 
 	} /* end if */
@@ -1345,8 +1352,8 @@ time_t		daytime ;
 
 	rs = lockfile(op->fd,lockcmd,0L,0L,TO_LOCK) ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_lockget: lockfile() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_lockget: lockfile() rs=%d\n",rs) ;
 #endif
 
 	if (rs < 0)
@@ -1354,8 +1361,8 @@ time_t		daytime ;
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_lockget: ret rs=%d fileinit=%u\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_lockget: ret rs=%d fileinit=%u\n",
 		rs,op->fl.fileinit) ;
 #endif
 
@@ -1364,17 +1371,17 @@ ret0:
 /* bad stuff */
 bad2:
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_lockget: BAD rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_lockget: BAD rs=%d\n",rs) ;
 #endif
 
-	op->fl.fileinit = FALSE ;
+	op->fl.fileinit = false ;
 
 	lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
 
 bad1:
-	op->fl.readlocked = FALSE ;
-	op->fl.writelocked = FALSE ;
+	op->fl.readlocked = false ;
+	op->fl.writelocked = false ;
 
 bad0:
 	goto ret0 ;
@@ -1382,25 +1389,25 @@ bad0:
 /* end subroutine (srvreg_lockget) */
 
 
-static int srvreg_lockrelease(op)
+local int srvreg_lockrelease(op)
 SRVREG		*op ;
 {
 	int	rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_lockrelease: ent\n") ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_lockrelease: ent\n") ;
 #endif
 
 	if ((op->fl.readlocked || op->fl.writelocked)) {
 	    if (op->fd >= 0) {
 	        rs = lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
 	    }
-	    op->fl.readlocked = FALSE ;
-	    op->fl.writelocked = FALSE ;
+	    op->fl.readlocked = false ;
+	    op->fl.writelocked = false ;
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_lockrelease: ret rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_lockrelease: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -1408,27 +1415,27 @@ SRVREG		*op ;
 /* end subroutine (srvreg_lockrelease) */
 
 
-static int srvreg_fileopen(op,daytime)
+local int srvreg_fileopen(op,daytime)
 SRVREG		*op ;
 time_t		daytime ;
 {
 	int	rs ;
 
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_fileopen: fname=%s\n",op->fname) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_fileopen: fname=%s\n",op->fname) ;
 #endif
 
 	if (op->fd >= 0)
 	    return op->fd ;
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_fileopen: need open\n") ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_fileopen: need open\n") ;
 #endif
 
 	if ((rs = u_open(op->fname,op->oflags,op->operm)) >= 0) {
 	    op->fd = rs ;
-	    uc_closeonexec(op->fd,TRUE) ;
+	    uc_closeonexec(op->fd,true) ;
 	    op->opentime = daytime ;
 	}
 
@@ -1452,7 +1459,7 @@ SRVREG		*op ;
 /* end subroutine (srvreg_fileclose) */
 
 
-static int srvreg_bufinit(op)
+local int srvreg_bufinit(op)
 SRVREG		*op ;
 {
 	int	rs ;
@@ -1462,10 +1469,10 @@ SRVREG		*op ;
 
 	op->b.off = 0 ;
 	op->b.len = 0 ;
-	op->b.size = 0 ;
+	op->b.bufl = 0 ;
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
-	    op->b.buf = bp ;
-	    op->b.size = size ;
+	    op->b.bufp = bp ;
+	    op->b.bufl = size ;
 	}
 
 	return rs ;
@@ -1473,19 +1480,19 @@ SRVREG		*op ;
 /* end subroutine (srvreg_bufinit) */
 
 
-static int srvreg_buffree(op)
+local int srvreg_buffree(op)
 SRVREG		*op ;
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
 
-	if (op->b.buf != NULL) {
-	    rs1 = uc_free(op->b.buf) ;
+	if (op->b.bufp != nullptr) {
+	    rs1 = uc_free(op->b.bufp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->b.buf = NULL ;
+	    op->b.bufp = nullptr ;
 	}
 
-	op->b.size = 0 ;
+	op->b.bufl = 0 ;
 	op->b.len = 0 ;
 	return rs ;
 }
@@ -1493,7 +1500,7 @@ SRVREG		*op ;
 
 
 /* try to buffer up some of the file */
-static int srvreg_buf(op,roff,rlen,rpp)
+local int srvreg_buf(op,roff,rlen,rpp)
 SRVREG		*op ;
 uint		roff, rlen ;
 char		**rpp ;
@@ -1509,10 +1516,10 @@ char		**rpp ;
 	char	*rbuf ;
 
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_buf: ent roff=%u rlen=%u\n",roff,rlen) ;
-	debugprintf("srvreg_buf: b.size=%u b.off=%u b.len=%u \n",
-	    op->b.size,op->b.off,op->b.len) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_buf: ent roff=%u rlen=%u\n",roff,rlen) ;
+	DEBUGPRINTF("srvreg_buf: b.bufl=%u b.off=%u b.len=%u \n",
+	    op->b.bufl,op->b.off,op->b.len) ;
 #endif
 
 /* do we need to read in more data? */
@@ -1521,40 +1528,40 @@ char		**rpp ;
 	fext = op->b.off + op->b.len ;
 	if ((roff < op->b.off) || (rext > fext)) {
 
-#if	CF_DEBUGS
-	    debugprintf("srvreg_buf: need more data\n") ;
+#if	CF_DEBUG
+	    DEBUGPRINTF("srvreg_buf: need more data\n") ;
 #endif
 
 /* can we do an "add-on" type read operation? */
 
-	    bend = op->b.off + op->b.size ;
+	    bend = op->b.off + op->b.bufl ;
 	    if ((roff >= op->b.off) &&
 	        (rext <= bend)) {
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_buf: add-on read\n") ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_buf: add-on read\n") ;
 #endif
 
 	        foff = op->b.off + op->b.len ;
-	        rbuf = op->b.buf + op->b.len ;
+	        rbuf = op->b.bufp + op->b.len ;
 
 	        ext = roff + MAX(rlen,SRVREG_READSIZE) ;
-	        fext = uceil(ext,op->pagesize) ;
+	        fext = uceil(ext,op->pagesz) ;
 
 	        if (fext > bend)
 	            fext = bend ;
 
 	        len = fext - foff ;
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_buf: u_readp() foff=%llu len=%u\n",
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_buf: u_readp() foff=%llu len=%u\n",
 	            foff,len) ;
 #endif
 
 	        rs = u_readp(op->fd,rbuf,len, foff) ;
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_buf: u_readp() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_buf: u_readp() rs=%d\n",rs) ;
 #endif
 
 	        if (rs >= 0) {
@@ -1562,34 +1569,34 @@ char		**rpp ;
 	            op->b.len += rs ;
 	            len = MIN(((op->b.off + op->b.len) - roff),rlen) ;
 
-#if	CF_DEBUGS
-	            debugprintf("srvreg_buf: len=%d\n",len) ;
+#if	CF_DEBUG
+	            DEBUGPRINTF("srvreg_buf: len=%d\n",len) ;
 #endif
 
 	        }
 
 	    } else {
 
-#if	CF_DEBUGS
-	        debugprintf("srvreg_buf: fresh read\n") ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("srvreg_buf: fresh read\n") ;
 #endif
 
 	        op->b.off = roff ;
 	        op->b.len = 0 ;
 
-	        bend = roff + op->b.size ;
+	        bend = (int(roff + op->b.bufl)) ;
 
 	        foff = roff ;
-	        rbuf = op->b.buf ;
+	        rbuf = op->b.bufp ;
 
 	        ext = roff + MAX(rlen,SRVREG_READSIZE) ;
-	        fext = uceil(ext,op->pagesize) ;
+	        fext = uceil(ext,op->pagesz) ;
 
 	        if (fext > bend)
 	            fext = bend ;
 
 	        len = fext - foff ;
-	        if ((rs = u_readp(op->fd,op->b.buf,len, foff)) >= 0) {
+	        if ((rs = u_readp(op->fd,op->b.bufp,len, foff)) >= 0) {
 	            op->b.len = rs ;
 	            len = MIN(rs,rlen) ;
 	        }
@@ -1598,11 +1605,12 @@ char		**rpp ;
 
 	} /* end if (needed to read more data) */
 
-	if (rpp != NULL)
-	    *rpp = op->b.buf + (roff - op->b.off) ;
+	if (rpp) {
+	    *rpp = op->b.bufp + (roff - op->b.off) ;
+	}
 
-#if	CF_DEBUGS
-	debugprintf("srvreg_buf: ret rs=%d len=%u\n",rs,len) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("srvreg_buf: ret rs=%d len=%u\n",rs,len) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;
@@ -1611,7 +1619,7 @@ char		**rpp ;
 
 
 /* update the file buffer from a user supplied source */
-static int srvreg_bufupdate(op,roff,rbuflen,rbuf)
+local int srvreg_bufupdate(op,roff,rbuflen,rbuf)
 SRVREG		*op ;
 uint		roff ;
 int		rbuflen ;
@@ -1619,9 +1627,7 @@ cchar	rbuf[] ;
 {
 	uint	boff, bext ;
 	uint	rext = roff + rbuflen ;
-
 	int	buflen, bdiff ;
-
 
 	buflen = op->b.len ;
 	boff = op->b.off ;
@@ -1650,7 +1656,7 @@ cchar	rbuf[] ;
 
 	if (rbuflen > 0) {
 	    bdiff = roff - boff ;
-	    memcpy((op->b.buf + bdiff),rbuf,rbuflen) ;
+	    memcpy((op->b.bufp + bdiff),rbuf,rbuflen) ;
 	}
 
 	return rbuflen ;
@@ -1659,7 +1665,7 @@ cchar	rbuf[] ;
 
 
 /* write out the file header */
-static int srvreg_writehead(op)
+local int srvreg_writehead(op)
 SRVREG		*op ;
 {
 	off_t	uoff ;
@@ -1680,7 +1686,7 @@ SRVREG		*op ;
 /* end subroutine (srvreg_writehead) */
 
 
-static int filemagic(buf,f_read,mp)
+local int filemagic(buf,f_read,mp)
 char			*buf ;
 int			f_read ;
 struct srvreg_filemagic	*mp ;
@@ -1691,7 +1697,7 @@ struct srvreg_filemagic	*mp ;
 	char	*cp ;
 
 
-	if (buf == NULL)
+	if (buf == nullptr)
 	    return SR_BADFMT ;
 
 	if (f_read) {
@@ -1699,7 +1705,7 @@ struct srvreg_filemagic	*mp ;
 	    bp[15] = '\0' ;
 	    strncpy(mp->magic,bp,15) ;
 
-	    if ((cp = strchr(mp->magic,'\n')) != NULL)
+	    if ((cp = strchr(mp->magic,'\n')) != nullptr)
 	        *cp = '\0' ;
 
 	    bp += 16 ;
@@ -1723,7 +1729,7 @@ struct srvreg_filemagic	*mp ;
 
 
 /* encode or decode the file header */
-static int filehead(buf,f_read,hp)
+local int filehead(buf,f_read,hp)
 char			*buf ;
 int			f_read ;
 struct srvreg_filehead	*hp ;
@@ -1733,7 +1739,7 @@ struct srvreg_filehead	*hp ;
 	int		rs ;
 	int		rs1 ;
 
-	if (buf == NULL)
+	if (buf == nullptr)
 	    return SR_BADFMT ;
 
 	if ((rs = serialbuf_start(&msgbuf,buf,buflen)) >= 0) {
