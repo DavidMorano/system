@@ -32,7 +32,7 @@ struct srvtab_head {
 	time_t		opentime ;	/* time FD was cached */
 	time_t		checktime ;	/* time last checked */
 	time_t		mtime ;		/* last file modification */
-	uint		magic ;
+	uint		magval ;
 	int		fd ;		/* cached server file descriptor */
 } ; /* end struct */
 
