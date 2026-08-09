@@ -73,7 +73,7 @@ extern int uunames_open(uunames *,cchar *,cchar *) noex ;
 extern int uunames_count(uunames *) noex ;
 extern int uunames_exists(uunames *,cchar *,int) noex ;
 extern int uunames_curbegin(uunames *,uunames_cur *) noex ;
-extern int uunames_enum(uunames *,uunames_cur *,char *,int) noex ;
+extern int uunames_curenum(uunames *,uunames_cur *,char *,int) noex ;
 extern int uunames_curend(uunames *,uunames_cur *) noex ;
 extern int uunames_audit(uunames *) noex ;
 extern int uunames_close(uunames *) noex ;
