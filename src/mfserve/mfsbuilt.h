@@ -63,7 +63,7 @@ extern int mfsbuilt_loadend(MFSBUILT *,cchar *,int) ;
 extern int mfsbuilt_count(MFSBUILT *) ;
 extern int mfsbuilt_curbegin(MFSBUILT *,MFSBUILT_CUR *) ;
 extern int mfsbuilt_curend(MFSBUILT *,MFSBUILT_CUR *) ;
-extern int mfsbuilt_enum(MFSBUILT *,MFSBUILT_CUR *,char *,int) ;
+extern int mfsbuilt_curenum(MFSBUILT *,MFSBUILT_CUR *,char *,int) ;
 extern int mfsbuilt_strsize(MFSBUILT *) ;
 extern int mfsbuilt_strvec(MFSBUILT *,cchar **,char *,int) ;
 extern int mfsbuilt_check(MFSBUILT *,time_t) ;
