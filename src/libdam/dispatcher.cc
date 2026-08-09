@@ -39,8 +39,10 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<upt.h>			/* LIBUC */
+#include	<upt.h>			/* LIBU */
+#include	<ucsysmisc.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"dispatcher.h"
 
@@ -60,10 +62,6 @@ extern "C" {
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) noex ;
-#endif
 
 extern "C" {
     extern int uc_nprocessors(int) noex ;
