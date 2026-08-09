@@ -666,7 +666,7 @@ keyopt		*kop ;
 	    int		kl, vl ;
 	    cchar	*kp, *vp ;
 
-	while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 /* get the first value for this key */
 
