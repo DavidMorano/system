@@ -37,7 +37,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>
+#include	<sys/socket.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -92,7 +92,7 @@ int openusd(cchar *sfn,int of,mode_t om) noex {
 	            sockaddress	sa ;
 	            cint	af = AF_UNIX ;
 	            fd = rs ;
-	            if ((rs = sa.start(af,sfn,0,0)) >= 0) {
+	            if ((rs = sa.start(af,sfn,0,0)) >= 0) ylikely {
 		        SOCKADDR	*sap = (SOCKADDR *) &sa ;
 		        cint		sal = rs ;
 		        {
