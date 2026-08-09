@@ -70,26 +70,26 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
-#include	<algorithm>		/* C++SRD |min(3c++)| + |max(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 #include	<ucsysmisc.h>		/* LIBU |ucpagesize(3u)| */
+#include	<upt.h>			/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
+#include	<intfloor.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
-#include	<upt.h>			/* LIBUC */
 #include	<baops.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
-#include	<ascii.h>		/* LIBU */
 #include	<fieldterms.h>		/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<bfile.h>		/* LIBUC */
 #include	<psem.h>		/* LIBUC */
-#include	<ptm.h>			/* LIBU */
-#include	<ptc.h>			/* LIBU */
-#include	<intfloor.h>		/* LIBU */
-#include	<intceil.h>		/* LIBU */
 #include	<ciq.h>			/* LIBUC */
 #include	<naturalwords.h>	/* LIBUC */
 #include	<txtindexmk.h>		/* LIBUC */
