@@ -106,15 +106,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strnxchr.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strnxchr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkutmpid.h"
 
@@ -208,8 +208,7 @@ constexpr cchar		dpre[] = "/dev/" ;	/* device prefix */
 int mkutmpid(char *idbuf,int idlen,cchar *devbuf,int devlen) noex {
 	tmper	to(idbuf,idlen,devbuf,devlen) ;
 	return to ;
-}
-/* end subroutine (mkutmpid) */
+} /* end subroutine (mkutmpid) */
 
 
 /* local subroutines */
