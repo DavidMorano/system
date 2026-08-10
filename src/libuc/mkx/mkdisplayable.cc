@@ -42,16 +42,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sbuf.h>
-#include	<ascii.h>		/* |CH_{xx}| */
-#include	<mkchar.h>
-#include	<ischarx.h>		/* |isprintlatin(3uc)| */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU |CH_{xx}| */
+#include	<sbuf.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC |isprintlatin(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkdisplayable.h"
 
@@ -118,7 +118,6 @@ int mkdisplayable(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkdisplayable) */
+} /* end subroutine (mkdisplayable) */
 
 
