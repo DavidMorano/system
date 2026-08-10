@@ -35,11 +35,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkpathxw.h"
 
@@ -79,32 +79,26 @@ extern "C" {
 
 int mkpath1w(char *pp,cc *s1,int sl) noex {
 	return mknpathxw(pp,-1,1,s1,sl) ;
-}
-/* end subroutine (mknpath1w) */
+} /* end subroutine (mknpath1w) */
 
 int mkpath2w(char *pp,cc *s1,cc *s2,int sl) noex {
 	return mknpathxw(pp,-1,2,s1,s2,sl) ;
-}
-/* end subroutine (mknpath2w) */
+} /* end subroutine (mknpath2w) */
 
 int mkpath3w(char *pp,cc *s1,cc *s2,cc *s3,int sl) noex {
 	return mknpathxw(pp,-1,3,s1,s2,s3,sl) ;
-}
-/* end subroutine (mknpath3w) */
+} /* end subroutine (mknpath3w) */
 
 int mkpath4w(char *pp,cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
 	return mknpathxw(pp,-1,4,s1,s2,s3,s4,sl) ;
-}
-/* end subroutine (mknpath4w) */
+} /* end subroutine (mknpath4w) */
 
 int mkpath5w(char *pp,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl) noex {
 	return mknpathxw(pp,-1,5,s1,s2,s3,s4,s5,sl) ;
-}
-/* end subroutine (mknpath5w) */
+} /* end subroutine (mknpath5w) */
 
 int mkpath6w(char *pp,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,int sl) noex {
 	return mknpathxw(pp,-1,6,s1,s2,s3,s4,s5,s6,sl) ;
-}
-/* end subroutine (mknpath6w) */
+} /* end subroutine (mknpath6w) */
 
 
