@@ -1,12 +1,11 @@
-/* procfilepaths */
-/* lang=C20 */
+/* procfilepaths SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* process a paths file */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -19,28 +18,35 @@
 
 /*******************************************************************************
 
-	This subroutine will read (process) a file that has directory
-	paths in it.
+  	Name:
+	procfilepaths
 
-	This reads the directory paths in the file and creates a
-	new single environment variable named 'PATH'. That environment
-	variable is then added to the specified list.
+	Description:
+	This subroutine will read (process) a file that has directory
+	paths in it.  This reads the directory paths in the file
+	and creates a new single environment variable named 'PATH'.
+	That environment variable is then added to the specified
+	list.
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
+#include	<pathclean.h>
 #include	<strnxcmp.h>
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -63,8 +69,6 @@
 
 /* external subroutines */
 
-extern int	pathclean(char *,const char *,int) ;
-
 
 /* externals variables */
 
@@ -72,7 +76,7 @@ extern int	pathclean(char *,const char *,int) ;
 /* forward references */
 
 #if	CF_DEBUGS
-static int pathdump(const char *,int) ;
+local int pathdump(cchar *,int) noex ;
 #endif
 
 
@@ -81,7 +85,7 @@ static int pathdump(const char *,int) ;
 
 /* local variables */
 
-static const uchar	fterms[32] = {
+constexpr char		fterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -90,14 +94,15 @@ static const uchar	fterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array (fterms) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
 int procfilepaths(cchar *programroot,cchar *fname,vecdtr *lp) noex {
-	FIELD	fsb ;
 	bfile	pfile, *pfp = &pfile ;
 	int	rs, rs1 ;
 	int	c, len ;
@@ -177,6 +182,7 @@ int procfilepaths(cchar *programroot,cchar *fname,vecdtr *lp) noex {
 	    if ((cp[0] == '\0') || (cp[0] == '#'))
 	        continue ;
 
+	    field fsb ;
 	    if ((rs = field_start(&fsb,cp,cl)) >= 0) {
 
 		fp = buf ;
@@ -186,12 +192,12 @@ int procfilepaths(cchar *programroot,cchar *fname,vecdtr *lp) noex {
 	    debugprintf("procfilepaths: 1 field> %r\n",fp,fl) ;
 #endif
 
-	    while ((fl > 1) && (fp[fl - 1] == '/'))
+	    while ((fl > 1) && (fp[fl - 1] == '/')) {
 	        fl -= 1 ;
+	    }
 
 	    fp[fl] = '\0' ;
 	    if (pbi > 0) {
-
 	        if (strnvalcmp(pathbuf,fp,fl) != 0) {
 
 	            c += 1 ;
@@ -218,7 +224,7 @@ int procfilepaths(cchar *programroot,cchar *fname,vecdtr *lp) noex {
 
 		pbi += rs ;
 
-	    }
+	    } /* end if */
 
 	    } /* end if (non-zero field) */
 
@@ -279,11 +285,11 @@ ret0:
 /* local subroutines */
 
 #if	CF_DEBUGS
-static int pathdump(cchar *pathbuf,int pbi) noex {
+local int pathdump(cchar *pathbuf,int pbi) noex {
 	int	rs = SR_OK ;
 	int	mlen, rlen = pbi ;
 	int	wlen = 0 ;
-		const char	*pp = pathbuf ;
+		cchar	*pp = pathbuf ;
 		while (rlen > 0) {
 			mlen = MIN(rlen,40) ;
 			rs = debugprintf("procfilepaths: path| %r\n",
