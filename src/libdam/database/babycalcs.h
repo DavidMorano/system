@@ -13,14 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |time_t| */
-#include	<ptm.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<babieshdr.h>
+#include	<sys/types.h>		/* POSIX® |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<babieshdr.h>		/* LIBDAM */
 
 
 #define	BABYCALCS		struct babycalcs_head
@@ -32,9 +29,17 @@
 #define	BABYCALCS_MAGIC		0x43628199
 
 
+struct babycalcs_flags {
+	uint		shm:1 ;
+	uint		txt:1 ;
+	uint		sorted:1 ;
+	uint		needinit:1 ;
+} ; /* end struct */
+
 struct babycalcs_object {
 	cchar		*name ;
-	uint		objsize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct babycalcs_information {
@@ -46,13 +51,6 @@ struct babycalcs_information {
 struct babycalcs_entry {
 	time_t		date ;
 	uint		count ;
-} ; /* end struct */
-
-struct babycalcs_flags {
-	uint		shm:1 ;
-	uint		txt:1 ;
-	uint		sorted:1 ;
-	uint		needinit:1 ;
 } ; /* end struct */
 
 struct babycalcs_head {
@@ -69,9 +67,9 @@ struct babycalcs_head {
 	size_t		mapsize ;	/* SHM map-size */
 	BABYCALCS_FL	fl ;
 	uint		magval ;
-	int		pagesize ;
-	int		dbsize ;
-	int		shmsize ;
+	int		pagesz ;
+	int		dbsz ;
+	int		shmsz ;
 	int		nentries ;	
 } ; /* end struct */
 
@@ -90,6 +88,10 @@ extern int	babycalcs_getinfo(babycalcs *,babycalcs_info *) noex ;
 extern int	babycalcs_close(babycalcs *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const babycalcs_obj	babycalcs_modinfo ;
+#endif /* __cplusplus */
 
 
 #endif /* BABYCALCS_INCLUDE */
