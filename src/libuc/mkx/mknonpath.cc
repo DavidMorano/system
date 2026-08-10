@@ -40,14 +40,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<getpwd.h>
-#include	<mkpath.h>
-#include	<nonpath.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<getpwd.h>		/* LIBUC */
+#include	<mkpath.h>		/* LIBUC */
+#include	<nonpath.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 #include	"mknonpath.h"
@@ -87,7 +87,6 @@ int mknonpath(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end if (mknonpath) */
+} /* end if (mknonpath) */
 
 
