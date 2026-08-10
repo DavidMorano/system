@@ -41,15 +41,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<field.h>
-#include	<sbuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 
@@ -68,7 +68,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -133,7 +132,6 @@ int mkaddrdisp(char *abuf,int alen,cchar *sp,int sl) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkaddrdisp) */
+} /* end subroutine (mkaddrdisp) */
 
 
