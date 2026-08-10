@@ -169,8 +169,7 @@ int mkpathmulti(char *rbuf,cchar *fp,int fl) noex {
             } /* end if (go) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (mkpathmulti) */
+} /* end subroutine (mkpathmulti) */
 
 
 /* local subroutines */
