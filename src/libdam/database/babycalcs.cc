@@ -43,45 +43,47 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstdarg>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucsysmisc.h>
-#include	<ucsigset.h>
-#include	<bufsizeget.h>
-#include	<endian.h>
-#include	<sigblocker.h>
-#include	<bfile.h>
-#include	<estrings.h>
-#include	<vecobj.h>
-#include	<tmz.hh>
-#include	<tmtime.hh>
-#include	<filer.h>
-#include	<storebuf.h>
-#include	<ptma.h>
-#include	<ptm.h>
-#include	<cvtdater.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<snx.h>
-#include	<mkx.h>
-#include	<sncpyx.h>
-#include	<cfdec.h>
-#include	<isoneof.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<ucsigset.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<sigblocker.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<tmz.hh>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<ptma.h>		/* LIBUC */
+#include	<cvtdater.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"babycalcs.h"
 #include	"babieshdr.h"
@@ -150,11 +152,6 @@ typedef BABYCALCS_ENT *	entp ;
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_openshm(cchar *,int,mode_t) noex ;
-    extern int uc_msync(void *,size_t,int) noex ;
-} /* end extern (C) */
-
 
 /* external variables */
 
@@ -163,10 +160,10 @@ extern "C" {
 
 namespace {
     struct vars {
-	int		pagesize ;
+	int		pagesz ;
 	int		maxpathlen ;
 	operator int () noex ;
-    } ;
+    } ; /* end struct (vars) */
 } /* end namespace */
 
 
@@ -237,28 +234,29 @@ extern "C" {
 
 /* local variables */
 
-constexpr static BC_ENT	defs[] = {
+constexpr BC_ENT	defs[] = {
 	{ 96526800, 0 },
 	{ 1167627600, 47198810 },	/* from Guntmacker Institute */
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
-constexpr static cint		loadrs[] = {
+constexpr cint		loadrs[] = {
 	SR_NOENT,
 	SR_NOTSUP,
 	SR_NOSYS,
 	0
-} ;
+} ; /* end array */
 
-static vars			var ;
+static vars		var ;
 
 
 /* exported variables */
 
-extern const babycalcs_obj	babycalcs_modinfo = {
+const babycalcs_obj	babycalcs_modinfo = {
 	BABYCALCS_OBJNAME,
-	szof(BABYCALCS)
-} ;
+	szof(BABYCALCS),
+	0
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -275,7 +273,7 @@ int babycalcs_open(BC *op,cchar *pr,cchar *dbname) noex {
 	    if (pr[0]) {
 		static cint	rsv = var ;
 		if ((rs = rsv) >= 0) {
-		    op->pagesize = var.pagesize ;
+		    op->pagesz = var.pagesz ;
 	            if (cchar *cp ; (rs = lm_strw(pr,-1,&cp)) >= 0) {
 	                op->pr = cp ;
 			rs = babycalcs_opens(op,dbname) ;
@@ -294,8 +292,7 @@ int babycalcs_open(BC *op,cchar *pr,cchar *dbname) noex {
 	    }
 	} /* end if (babycalcs_ctor) */
 	return rs ;
-}
-/* end subroutine (babycalcs_open) */
+} /* end subroutine (babycalcs_open) */
 
 local int babycalcs_opens(BC *op,cchar *dbname) noex {
     	cint		sz = ((var.maxpathlen + 1) * 2) ;
@@ -341,8 +338,7 @@ local int babycalcs_opens(BC *op,cchar *dbname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (babycalcs_opens) */
+} /* end subroutine (babycalcs_opens) */
 
 int babycalcs_close(BC *op) noex {
 	int		rs ;
@@ -383,8 +379,7 @@ int babycalcs_close(BC *op) noex {
 	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (babycalcs_close) */
+} /* end subroutine (babycalcs_close) */
 
 int babycalcs_check(BC *op,time_t dt) noex {
 	int		rs ;
@@ -392,8 +387,7 @@ int babycalcs_check(BC *op,time_t dt) noex {
 	    rs = babycalcs_dbcheck(op,dt) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (babycalcs_check) */
+} /* end subroutine (babycalcs_check) */
 
 int babycalcs_lookup(BC *op,time_t datereq,uint *rp) noex {
 	int		rs ;
@@ -411,8 +405,7 @@ int babycalcs_lookup(BC *op,time_t datereq,uint *rp) noex {
 	    } /* end if (db-check) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (babycalcs_lookup) */
+} /* end subroutine (babycalcs_lookup) */
 
 int babycalcs_getinfo(BC *op,BC_INFO *bip) noex {
 	int		rs ;
@@ -426,8 +419,7 @@ int babycalcs_getinfo(BC *op,BC_INFO *bip) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (babycalcs_getinfo) */
+} /* end subroutine (babycalcs_getinfo) */
 
 
 /* private subroutines */
@@ -496,8 +488,7 @@ local int babycalcs_shmload(BC *op,mode_t om) noex {
 	    }
 	} /* end if (error handling) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (babycalcs_shmload) */
+} /* end subroutine (babycalcs_shmload) */
 
 local int babycalcs_shmopen(BC *op,time_t dt,cchar *shmname,mode_t om) noex {
 	cint	rsn = SR_NOENT ;
@@ -535,8 +526,7 @@ local int babycalcs_shmopen(BC *op,time_t dt,cchar *shmname,mode_t om) noex {
 	}
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (babycalcs_shmopen) */
+} /* end subroutine (babycalcs_shmopen) */
 
 local int babycalcs_mapbegin(BC *op,time_t dt,int fd) noex {
     	cnullptr	np{} ;
@@ -569,9 +559,7 @@ local int babycalcs_mapbegin(BC *op,time_t dt,int fd) noex {
 	    } /* end if (map) */
 	} /* end if (valid) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (babycalcs_mapbegin) */
-
+} /* end subroutine (babycalcs_mapbegin) */
 
 local int babycalcs_mapend(BC *op) noex {
 	int		rs = SR_OK ;
@@ -593,8 +581,7 @@ local int babycalcs_mapend(BC *op) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (babycalcs_mapend) */
+} /* end subroutine (babycalcs_mapend) */
 
 local int babycalcs_procmap(BC *op,time_t dt) noex {
 	HDR		*hfp = &op->hf ;
@@ -611,8 +598,7 @@ local int babycalcs_procmap(BC *op,time_t dt) noex {
 	    }
 	} /* end if (babieshdr_wr) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (babycalcs_procmap) */
+} /* end subroutine (babycalcs_procmap) */
 
 local int babycalcs_loadtxt(BC *op) noex {
 	cint		vsz = szof(BC_ENT) ;
@@ -656,8 +642,7 @@ local int babycalcs_loadtxt(BC *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecobj-entries) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (babycalcs_loadtxt) */
+} /* end subroutine (babycalcs_loadtxt) */
 
 local int babycalcs_proctxt(BC *op,vecobj *tlp) noex {
 	int		rs ;
@@ -697,8 +682,7 @@ local int babycalcs_proctxt(BC *op,vecobj *tlp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cvtdater) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (babycalcs_proctxt) */
+} /* end subroutine (babycalcs_proctxt) */
 
 local int babycalcs_proctxtln(BC *op,vecobj *tlp,cvtdater *cdp,
 		cchar *lbuf,int llen) noex {
@@ -735,8 +719,7 @@ local int babycalcs_proctxtln(BC *op,vecobj *tlp,cvtdater *cdp,
 	    } /* end if (cvtdater_load) */
 	} /* end if (sfnext) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (babycalcs_proctxtln) */
+} /* end subroutine (babycalcs_proctxtln) */
 
 local int babycalcs_shmwr(BC *op,time_t dt,int fd,mode_t om) noex {
 	HDR		hf{} ;
@@ -767,11 +750,10 @@ local int babycalcs_shmwr(BC *op,time_t dt,int fd,mode_t om) noex {
 	    } /* end if (u_rewind) */
 	} /* end if (babycalcs_shmwrer) */
 	return (rs >= 0) ? foff : rs ;
-}
-/* end subroutine (babycalcs_shmwr) */
+} /* end subroutine (babycalcs_shmwr) */
 
 local int babycalcs_shmwrer(BC *op,time_t dt,int fd,mode_t om,HDR *hfp) noex {
-	cint		bsz = op->pagesize ;
+	cint		bsz = op->pagesz ;
 	int		rs ;
 	int		rs1 ;
 	int		foff = 0 ;
@@ -826,8 +808,7 @@ local int babycalcs_shmwrer(BC *op,time_t dt,int fd,mode_t om,HDR *hfp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
 	return (rs >= 0) ? foff : rs ;
-}
-/* end subroutine (babycalcs_shmwrer) */
+} /* end subroutine (babycalcs_shmwrer) */
 
 local int babycalcs_mutexinit(BC *op) noex {
 	HDR		*hfp = &op->hf ;
@@ -844,8 +825,7 @@ local int babycalcs_mutexinit(BC *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (mutex-lock attribute) */
 	return rs ;
-}
-/* end subroutine (babycalcs_mutexinit) */
+} /* end subroutine (babycalcs_mutexinit) */
 
 local int babycalcs_openshmwait(BC *op,cchar *shmname) noex {
 	int		rs = SR_FAULT ;
@@ -867,8 +847,7 @@ local int babycalcs_openshmwait(BC *op,cchar *shmname) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (babycalcs_openshmwait) */
+} /* end subroutine (babycalcs_openshmwait) */
 
 local int babycalcs_verify(BC *op,time_t dt) noex {
 	HDR		*hfp = &op->hf ;
@@ -902,8 +881,7 @@ local int babycalcs_verify(BC *op,time_t dt) noex {
 	    rs = SR_BADFMT ;
 
 	return rs ;
-}
-/* end subroutine (babycalcs_verify) */
+} /* end subroutine (babycalcs_verify) */
 
 local int babycalcs_lookshm(BC *op,time_t dt,time_t datereq,
 		uint *rp) noex {
@@ -932,8 +910,7 @@ local int babycalcs_lookshm(BC *op,time_t dt,time_t datereq,
 	} /* end if (u_sigprocmask) */
 
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (babycalcs_lookshm) */
+} /* end subroutine (babycalcs_lookshm) */
 
 local int babycalcs_lookproc(BC *op,time_t datereq,uint *rp) noex {
 	int		rs = SR_OK ;
@@ -952,8 +929,7 @@ local int babycalcs_lookproc(BC *op,time_t datereq,uint *rp) noex {
 	babycalcs_calc(op,i,datereq,rp) ;
 
 	return rs ;
-}
-/* end subroutine (babycalcs_lookproc) */
+} /* end subroutine (babycalcs_lookproc) */
 
 local int babycalcs_calc(BC *op,int i,time_t rd,uint *rp) noex {
 	time_t		bd = (i > 0) ? op->table[i-1].date : 0L ;
@@ -979,8 +955,7 @@ local int babycalcs_calc(BC *op,int i,time_t rd,uint *rp) noex {
 	}
 	*rp = int(yr) ;
 	return rs ;
-}
-/* end subroutine (babycalcs_calc) */
+} /* end subroutine (babycalcs_calc) */
 
 local int babycalcs_dbcheck(BC *op,time_t dt) noex {
     	cint		to = TO_LASTCHECK ;
@@ -1012,8 +987,7 @@ local int babycalcs_dbcheck(BC *op,time_t dt) noex {
 	    } /* end if (stat) */
 	} /* end if (time-out) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (babycalcs_dbcheck) */
+} /* end subroutine (babycalcs_dbcheck) */
 
 local int babycalcs_shminfo(BC *op,BC_INFO *bip) noex {
 	sigset_t	oldsigmask, newsigmask ;
@@ -1041,8 +1015,7 @@ local int babycalcs_shminfo(BC *op,BC_INFO *bip) noex {
 	} /* end if (procmask) */
 
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (babycalcs_shminfo) */
+} /* end subroutine (babycalcs_shminfo) */
 
 local int babycalcs_lookinfo(BC *op,BC_INFO *bip) noex {
 	uint		*hwp ;
@@ -1053,8 +1026,7 @@ local int babycalcs_lookinfo(BC *op,BC_INFO *bip) noex {
 	bip->atime = hwp[babieshdrh_atime] ;
 	bip->acount = hwp[babieshdrh_acount] ;
 	return rs ;
-}
-/* end subroutine (babycalcs_lookinfo) */
+} /* end subroutine (babycalcs_lookinfo) */
 
 local int babycalcs_dbwait(BC *op,time_t dt,ustat *sbp) noex {
 	int		rs = SR_OK ;
@@ -1075,8 +1047,7 @@ local int babycalcs_dbwait(BC *op,time_t dt,ustat *sbp) noex {
 	} /* end if (needed) */
 
 	return rs ;
-}
-/* end subroutine (babycalcs_dbwait) */
+} /* end subroutine (babycalcs_dbwait) */
 
 local int babycalcs_reloadshm(BC *op,time_t dt,ustat *sbp) noex {
 	cint		of = O_RDWR ;
@@ -1111,7 +1082,7 @@ local int babycalcs_reloadshm(BC *op,time_t dt,ustat *sbp) noex {
 	    }
 	    c = op->nentries ;
 	    if ((rs >= 0) && f && (c != neo)) {
-	        mapextent = uceil(mapsz,op->pagesize) ;
+	        mapextent = uceil(mapsz,op->pagesz) ;
 	        if (op->shmsize > mapextent) {
 	            babycalcs_mapend(op) ;
 	            rs = babycalcs_mapbegin(op,dt,fd) ;
@@ -1124,8 +1095,7 @@ local int babycalcs_reloadshm(BC *op,time_t dt,ustat *sbp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (open) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (babycalcs_reloadshm) */
+} /* end subroutine (babycalcs_reloadshm) */
 
 local int babycalcs_shmupdate(BC *op,time_t dt,ustat *sbp,int fd) noex {
 	BC_ENT		*tblp = op->table ;
@@ -1171,8 +1141,7 @@ local int babycalcs_shmupdate(BC *op,time_t dt,ustat *sbp,int fd) noex {
 	} /* end if (babycalcs_loadtxt) */
 	op->table = tblp ;
 	return rs ;
-}
-/* end subroutine (babycalcs_shmupdate) */
+} /* end subroutine (babycalcs_shmupdate) */
 
 local int babycalcs_shmaddwrite(BC *op,int fd) noex {
 	off_t		tbloff ;
@@ -1196,8 +1165,7 @@ local int babycalcs_shmaddwrite(BC *op,int fd) noex {
 	    }
 	} /* end if (u_seek) */
 	return (rs >= 0) ? shmsz : rs ;
-}
-/* end subroutine (babycalcs_shmaddwrite) */
+} /* end subroutine (babycalcs_shmaddwrite) */
 
 local int babycalcs_reloadtxt(BC *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -1213,8 +1181,7 @@ local int babycalcs_reloadtxt(BC *op,time_t dt) noex {
 	    rs = babycalcs_loadtxt(op) ;
 	}
 	return rs ;
-}
-/* end subroutine (babycalcs_reloadtxt) */
+} /* end subroutine (babycalcs_reloadtxt) */
 
 local int babycalcs_shmcheck(BC *op,ustat *sbp) noex {
 	uint		*hwp = (uint *) (op->mapdata + BABIESHDR_IDLEN) ;
@@ -1227,8 +1194,7 @@ local int babycalcs_shmcheck(BC *op,ustat *sbp) noex {
 	f = f || (dbsz != hwp[babieshdrh_dbsize]) ;
 	f = f || (shmsz != hwp[babieshdrh_shmsize]) ;
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (babycalcs_shmcheck) */
+} /* end subroutine (babycalcs_shmcheck) */
 
 local int babycalcs_shmaccess(BC *op,time_t dt) noex {
 	int		rs = SR_BUGCHECK ;
@@ -1244,8 +1210,8 @@ local int babycalcs_shmaccess(BC *op,time_t dt) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = ucpagesize) >= 0) {
-	    pagesize = rs ;
+	if ((rs = ucpagesz) >= 0) {
+	    pagesz = rs ;
 	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 		maxpathlen = rs ;
 	    }
@@ -1255,7 +1221,7 @@ vars::operator int () noex {
 
 local int entcmp(BC_ENT *e1p,BC_ENT *e2p) noex {
     	return intconv(e1p->date - e2p->date) ;
-}
+} /* end subroutine */
 
 local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 	BC_ENT		*e1p = (BC_ENT *) *v1pp ;
@@ -1273,7 +1239,6 @@ local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpentry) */
+} /* end subroutine (vcmpentry) */
 
 
