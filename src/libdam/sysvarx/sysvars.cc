@@ -15,9 +15,9 @@
 	sysvars
 
 	Description:
-	This little object provides access to the SVS database and
-	index (if any).  The "in-sequence" procedure for finding
-	indices is:
+	This little object provides access to the SYS-variible
+	database and index (if any).  The "in-sequence" procedure
+	for finding indices is:
 
 	%R/var/%D
 	/var/tmp/%{PRN}/%D
@@ -298,6 +298,8 @@ local int	checkdname(cchar *) noex ;
 #ifdef	COMMENT
 local int	mkindfname(char *,cchar *,cchar *,cchar *,cchar *) noex ;
 #endif
+
+local int havefile(cchar *) noex ;
 
 
 /* local variables */
@@ -585,11 +587,11 @@ local int sysvars_indopenseqer(SVS *op,SI *sip,dirseen *dsp,
 	                    if (el == SR_NOTFOUND) break ;
 	                    rs = el ;
 	                    if (rs >= 0) {
-	                        if ((rs = mkpath2(pbuf,ebuf,op->dbname)) >= 0) {
+	                        if ((rs = mkpath(pbuf,ebuf,op->dbname)) >= 0) {
 	                            cint pl = rs ;
 	                            rs = vecstr_add(sdp,pbuf,pl) ;
 			        }
-	                    }
+	                    } /* end if (ok) */
 	                } /* end while */
 	                rs1 = dirseen_curend(dsp,&cur) ;
 		        if (rs >= 0) rs = rs1 ;
@@ -601,10 +603,16 @@ local int sysvars_indopenseqer(SVS *op,SI *sip,dirseen *dsp,
 	    /* final phase: try to open all of them in-sequence */
 	    if (rs >= 0) {
 	        if (mainv dv ; (rs = vecstr_getvec(sdp,&dv)) >= 0) {
-	            if ((rs = var_opena(op->vindp,dv)) >= 0) {
-	                op->fl.var = true ;
-		    }
-	            if ((rs < 0) && isNotPresent(rs)) {
+		    for (int i = 0 ; i < rs ; i += 1) {
+			if (cchar *fn = dv[i] ; (rs = havefile(fn)) > 0) {
+	                    if ((rs = var_open(op->vindp,fn)) >= 0) {
+	                        op->fl.var = true ;
+		            }
+			} /* end if (havefile) */
+	                if (op->fl.var) break ;
+			if (rs < 0) break ;
+		    } /* end for */
+	            if (((rs < 0) && isNotPresent(rs)) || (! op->fl.var)) {
 	                rs = sysvars_indopenalt(op,sip,dsp) ;
 		    } /* end if (error) */
 	        }
@@ -917,5 +925,18 @@ varer::operator int () noex {
 	} /* end if (bufsizeget) */
 	return rs ;
 } /* end method (varer::operator) */
+
+local int havefile(cchar *fn) noex {
+    	int		rs ;
+	int		f = false ; /* return-value */
+	if (fn[0]) {
+	    if (ustat sb ; (rs = u_stat(fn,&sb)) >= 0) {
+		f = true ;
+	    } else if (isNotPresent(rs)) {
+		rs = SR_OK ;
+	    } /* end if */
+	} /* end if (valid) */
+	return (rs >= 0) ? f : rs ;
+} /* end subroutine (havefile) */
 
 
