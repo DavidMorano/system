@@ -144,8 +144,7 @@ int varmk_open(VARMK *op,cchar *dbname,int of,mode_t om,int n) noex {
 	} /* end if (getnodedomain) */
 
 	return rs ;
-}
-/* end subroutine (varmk_open) */
+} /* end subroutine (varmk_open) */
 
 /* free up the entire vector string data structure object */
 int varmk_close(VARMK *op) noex {
@@ -165,8 +164,7 @@ int varmk_close(VARMK *op) noex {
 	}
 	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (varmk_close) */
+} /* end subroutine (varmk_close) */
 
 int varmk_addvar(VARMK *op,cchar *k,cchar *vp,int vl) noex {
 	int		rs ;
@@ -178,8 +176,7 @@ int varmk_addvar(VARMK *op,cchar *k,cchar *vp,int vl) noex {
 	rs = (*op->call.addvar)(op->obj,k,vp,vl) ;
 
 	return rs ;
-}
-/* end subroutine (varmk_addvar) */
+} /* end subroutine (varmk_addvar) */
 
 int varmk_abort(VARMK *op) noex {
 	int		rs = SR_NOSYS ;
@@ -193,8 +190,7 @@ int varmk_abort(VARMK *op) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (varmk_abort) */
+} /* end subroutine (varmk_abort) */
 
 int varmk_chgrp(VARMK *op,gid_t gid) noex {
 	int		rs = SR_NOSYS ;
@@ -208,8 +204,7 @@ int varmk_chgrp(VARMK *op,gid_t gid) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (varmk_chgrp) */
+} /* end subroutine (varmk_chgrp) */
 
 
 /* private subroutines */
