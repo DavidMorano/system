@@ -42,32 +42,32 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<endian.h>
-#include	<ids.h>
-#include	<storebuf.h>
-#include	<mkpathx.h>
-#include	<snx.h>
-#include	<sncpyx.h>
-#include	<strwcpy.h>
-#include	<permx.h>
-#include	<char.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cyi.h"
 #include	"cyihdr.h"
@@ -189,11 +189,11 @@ constexpr bool		f_search = CF_SEARCH ;
 
 /* exported variables */
 
-extern const cyi_obj	cyi_modinfo = {
+const cyi_obj	cyi_modinfo = {
 	"cyi",
 	szof(cyi),
 	szof(cyi_cur)
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -218,8 +218,7 @@ int cyi_open(cyi *op,int year,cchar *dname,cchar *cname) noex {
 	    }
 	} /* end if (cyi_ctor) */
 	return rs ;
-}
-/* end subroutine (cyi_open) */
+} /* end subroutine (cyi_open) */
 
 int cyi_close(cyi *op) noex {
 	int		rs ;
@@ -236,8 +235,7 @@ int cyi_close(cyi *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cyi_close) */
+} /* end subroutine (cyi_close) */
 
 int cyi_audit(cyi *op) noex {
 	int		rs ;
@@ -245,8 +243,7 @@ int cyi_audit(cyi *op) noex {
 	    rs = cyi_auditvt(op) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cyi_audit) */
+} /* end subroutine (cyi_audit) */
 
 int cyi_count(cyi *op) noex {
 	int		rs = SR_OK ;
@@ -256,8 +253,7 @@ int cyi_count(cyi *op) noex {
 	    nent = hip->nentries ;
 	} /* end if (magic) */
 	return (rs >= 0) ? nent : rs ;
-}
-/* end subroutine (cyi_count) */
+} /* end subroutine (cyi_count) */
 
 int cyi_getinfo(cyi *op,cyi_info *ip) noex {
 	int		rs ;
@@ -274,8 +270,7 @@ int cyi_getinfo(cyi *op,cyi_info *ip) noex {
 	    nent = hip->nentries ;
 	} /* end if (magic) */
 	return (rs >= 0) ? nent : rs ;
-}
-/* end subroutine (cyi_info) */
+} /* end subroutine (cyi_info) */
 
 int cyi_curbegin(cyi *op,cyi_cur *curp) noex {
     	int		rs ;
@@ -287,8 +282,7 @@ int cyi_curbegin(cyi *op,cyi_cur *curp) noex {
 	    op->ncursors += 1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cyi_curbegin) */
+} /* end subroutine (cyi_curbegin) */
 
 int cyi_curend(cyi *op,cyi_cur *curp) noex {
     	int		rs ;
@@ -302,8 +296,7 @@ int cyi_curend(cyi *op,cyi_cur *curp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (cyi_curend) */
+} /* end subroutine (cyi_curend) */
 
 int cyi_curcite(cyi *op,cyi_cur *curp,cyi_q *qp) noex {
 	int		rs ;
@@ -341,8 +334,7 @@ int cyi_curcite(cyi *op,cyi_cur *curp,cyi_q *qp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vi : rs ;
-}
-/* end subroutine (cyi_lookcite) */
+} /* end subroutine (cyi_lookcite) */
 
 int cyi_curread(cyi *op,cyi_cur *curp,cyi_ent *ep,char *ebuf,int elen) noex {
 	int		rs ;
@@ -381,13 +373,11 @@ int cyi_curread(cyi *op,cyi_cur *curp,cyi_ent *ep,char *ebuf,int elen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (cyi_curread) */
+} /* end subroutine (cyi_curread) */
 
 int cyi_curenum(cyi *op,cyi_cur *curp,cyi_ent *bvep,char *ebuf,int elen) noex {
 	return cyi_curread(op,curp,bvep,ebuf,elen) ;
-}
-/* end subroutine (cyi_curenum) */
+} /* end subroutine (cyi_curenum) */
 
 
 /* private subroutines */
