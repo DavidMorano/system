@@ -197,6 +197,10 @@ import libutil ;			/* |memclear(3u)| */
 #define	TO_LOCK		30		/* seconds */
 #endif /* CF_DEBUGTEST */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0
+#endif
+
 
 /* imported namespaces */
 
@@ -274,6 +278,8 @@ local int	namematch(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
+
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -381,8 +387,8 @@ int msfile_curbegin(MSF *op,MSF_CUR *curp) noex {
     	int		rs ;
 	if ((rs = msfile_magic(op,curp)) >= 0) {
 	    op->ncursors += 1 ;
-	    opop->fl.cursorlockbroken = false ;
-	    opop->fl.cursoracc = false ;
+	    op->fl.cursorlockbroken = false ;
+	    op->fl.cursoracc = false ;
 	    curp->i = -1 ;
 	} /* end if (msfile_magic) */
 	return rs ;
@@ -392,14 +398,14 @@ int msfile_curend(MSF *op,MSF_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = msfile_magic(op,curp)) >= 0) {
-	    if (opop->fl.cursoracc) {
+	    if (op->fl.cursoracc) {
 	        op->ti_access = time(nullptr) ;
 	    } /* end if */
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
 	    }
 	    bool	f = (op->ncursors == 0) ;
-	    f = f && (opop->fl.lockedread || opop->fl.lockedwrite) ;
+	    f = f && (op->fl.lockedread || op->fl.lockedwrite) ;
 	    if (f) {
 	        rs1 = msfile_lockrelease(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -425,7 +431,7 @@ int msfile_curenum(MSF *op,MSF_CUR *curp,MSF_ENT *ep) noex {
 	            }
 	            if (rs >= 0) {
 	                curp->i = ei ;
-	                opop->fl.cursoracc = true ;
+	                op->fl.cursoracc = true ;
 	            } /* end if (ok) */
 	        } /* end if (msfile_readent) */
 	    } /* end if (msfile_acquire) */
@@ -476,7 +482,7 @@ int msfile_match(MSF *op,time_t dt,cchar *nnp,int nnl,MSF_ENT *ep) noex {
 
 /* if we are a writer (open for write), update the access time also */
 
-	    if ((rs >= 0) && opop->fl.writable) {
+	    if ((rs >= 0) && op->fl.writable) {
 	        MSFILEE a ;
 	        if (dt == 0) dt = time(nullptr) ;
 	        a.atime = dt ;
@@ -493,7 +499,7 @@ int msfile_match(MSF *op,time_t dt,cchar *nnp,int nnl,MSF_ENT *ep) noex {
 	        if (dt == 0) dt = time(nullptr) ;
 	        op->ti_access = dt ;
 	    } else {
-	        opop->fl.cursoracc = true ;
+	        op->fl.cursoracc = true ;
 	    }
 
 	} /* end if (msfile_acquire) */
@@ -598,7 +604,7 @@ int msfile_write(MSF *op,time_t dt,cchar *nnp,int nnl,MSF_ENT *ep) noex {
 
 /* update the file header-table (for a write) */
 
-	        if ((rs >= 0) && opop->fl.writable) {
+	        if ((rs >= 0) && op->fl.writable) {
 	            if (dt == 0) dt = time(nullptr) ;
 	            op->h.wcount += 1 ;
 	            op->h.wtime = dt ;
@@ -619,7 +625,7 @@ int msfile_write(MSF *op,time_t dt,cchar *nnp,int nnl,MSF_ENT *ep) noex {
 	            if (dt == 0) dt = time(nullptr) ;
 	            op->ti_access = dt ;
 	        } else {
-	            opop->fl.cursoracc = true ;
+	            op->fl.cursoracc = true ;
 	        }
 
 	    } /* end if (msfile_findname) */
@@ -641,7 +647,7 @@ int msfile_update(MSF *op,time_t dt,MSF_ENT *ep) noex {
 
 	if (ep == nullptr) return SR_FAULT ;
 
-	DEBUGPRINTF("writable=%u\n",opop->fl.writable) ;
+	DEBUGPRINTF("writable=%u\n",op->fl.writable) ;
 
 	if ((rs = msfile_acquire(op,dt,1)) >= 0) {
 	    int		nnl ;
@@ -798,7 +804,7 @@ int msfile_update(MSF *op,time_t dt,MSF_ENT *ep) noex {
 	                        if (dt == 0) dt = time(nullptr) ;
 	                        op->ti_access = dt ;
 	                    } else {
-	                        opop->fl.cursoracc = true ;
+	                        op->fl.cursoracc = true ;
 	                    }
 	                }
 	            } /* end if (ok) */
@@ -823,7 +829,7 @@ int msfile_check(MSF *op,time_t dt) noex {
 #endif /* CF_SAFE */
 
 	if (op->fd >= 0) {
-	    if ((! opop->fl.lockedread) && (! opop->fl.lockedwrite)) {
+	    if ((! op->fl.lockedread) && (! op->fl.lockedwrite)) {
 	        if (dt == 0) dt = time(nullptr) ;
 	        f = ((dt - op->ti_access) >= TO_ACCESS) ;
 	        f = f || ((dt - op->ti_open) >= TO_OPEN) ;
@@ -972,13 +978,13 @@ local int msfile_acquire(MSF *op,time_t dt,int f_read) noex {
 	    rs = msfile_fileopen(op,dt) ;
 	}
 
-	if ((rs >= 0) && (! f_read) && opop->fl.lockedread) {
+	if ((rs >= 0) && (! f_read) && op->fl.lockedread) {
 	    rs = msfile_lockrelease(op) ;
 	}
 
 /* capture the lock if we do not already have it */
 
-	f = (opop->fl.lockedread || opop->fl.lockedwrite) ;
+	f = (op->fl.lockedread || op->fl.lockedwrite) ;
 	if ((rs >= 0) && (! f)) {
 	    if ((rs = msfile_lockget(op,dt,f_read)) >= 0) {
 	        f_changed = (rs > 0) ;
@@ -1003,14 +1009,14 @@ local int msfile_filebegin(MSF *op,time_t dt) noex {
 
 	if (op->filesize == 0) {
 
-	    opop->fl.fileinit = false ;
-	    if (opop->fl.writable) {
+	    op->fl.fileinit = false ;
+	    if (op->fl.writable) {
 
-	        if (opop->fl.lockedread) {
+	        if (op->fl.lockedread) {
 	            rs = msfile_lockrelease(op) ;
 		}
 
-	        if ((rs >= 0) && (! opop->fl.lockedwrite)) {
+	        if ((rs >= 0) && (! op->fl.lockedwrite)) {
 	            f_locked = true ;
 	            rs = msfile_lockget(op,dt,0) ;
 	        }
@@ -1025,7 +1031,7 @@ local int msfile_filebegin(MSF *op,time_t dt) noex {
 	} else if (op->filesize >= MSF_TABOFF) {
 	    bool f ;
 	    /* read the file header */
-	    f = (opop->fl.lockedread || opop->fl.lockedwrite) ;
+	    f = (op->fl.lockedread || op->fl.lockedwrite) ;
 	    if (! f) {
 	        rs = msfile_lockget(op,dt,1) ;
 	        f_locked = (rs >= 0) ;
@@ -1037,7 +1043,7 @@ local int msfile_filebegin(MSF *op,time_t dt) noex {
 	        if ((rs = msfile_filetopread(op)) >= 0) {
 	            if ((rs = msfile_fileverify(op)) >= 0) {
 	        	rs = msfile_headtab(op,1) ;
-	        	opop->fl.fileinit = (rs >= 0) ;
+	        	op->fl.fileinit = (rs >= 0) ;
 		    }
 		}
 	    }
@@ -1060,7 +1066,7 @@ local int msfile_filecheck(MSF *op) noex {
 
 	if (op->filesize < MSF_TABOFF) {
 	    f_changed = true ;
-	    if (opop->fl.writable) {
+	    if (op->fl.writable) {
 	        rs = msfile_filetopwrite(op) ;
 	    }
 	} else {
@@ -1068,7 +1074,7 @@ local int msfile_filecheck(MSF *op) noex {
 	        if ((rs = msfile_fileverify(op)) >= 0) {
 	            rs = msfile_headtab(op,1) ;
 	            f_changed = (rs > 0) ;
-	            opop->fl.fileinit = (rs >= 0) ;
+	            op->fl.fileinit = (rs >= 0) ;
 		}
 	    }
 	} /* end if */
@@ -1103,7 +1109,7 @@ local int msfile_filetopwrite(MSF *op) noex {
 	if ((rs = u_writep(op->fd,op->topbuf,bl,poff)) >= 0) {
 	    op->filesize = rs ;
 	    op->topsize = rs ;
-	    opop->fl.fileinit = true ;
+	    op->fl.fileinit = true ;
 	}
 
 	return rs ;
@@ -1211,15 +1217,15 @@ local int msfile_lockget(MSF *op,time_t dt,int f_read) noex {
 
 	if (rs >= 0) {
 
-	    if (f_read || (! opop->fl.writable)) {
-	        f_already = opop->fl.lockedread ;
-	        opop->fl.lockedread = true ;
-	        opop->fl.lockedwrite = false ;
+	    if (f_read || (! op->fl.writable)) {
+	        f_already = op->fl.lockedread ;
+	        op->fl.lockedread = true ;
+	        op->fl.lockedwrite = false ;
 	        lockcmd = F_RLOCK ;
 	    } else {
-	        f_already = opop->fl.lockedwrite ;
-	        opop->fl.lockedread = false ;
-	        opop->fl.lockedwrite = true ;
+	        f_already = op->fl.lockedwrite ;
+	        op->fl.lockedread = false ;
+	        op->fl.lockedwrite = true ;
 	        lockcmd = F_WLOCK ;
 	    } /* end if */
 
@@ -1254,13 +1260,13 @@ local int msfile_lockget(MSF *op,time_t dt,int f_read) noex {
 	                    (sb.st_mtime != op->ti_mod) ;
 
 	                if (f_changed) {
-	                    if (opop->fl.bufvalid) opop->fl.bufvalid = false ;
+	                    if (op->fl.bufvalid) op->fl.bufvalid = false ;
 	                    op->filesize = sb.st_size ;
 	                    op->ti_mod = sb.st_mtime ;
 	                } /* end if */
 
 	                if (op->filesize < MSF_TABOFF) {
-	                    opop->fl.fileinit = false ;
+	                    op->fl.fileinit = false ;
 	                }
 
 	            } else {
@@ -1289,7 +1295,7 @@ local int msfile_lockrelease(MSF *op) noex {
 	DEBUGPRINTF("ent\n") ;
 #endif
 
-	if ((opop->fl.lockedread || opop->fl.lockedwrite)) {
+	if ((op->fl.lockedread || op->fl.lockedwrite)) {
 
 	    if (op->fd >= 0) {
 
@@ -1317,8 +1323,8 @@ local int msfile_lockrelease(MSF *op) noex {
 
 	    } /* end if (file was open) */
 
-	    opop->fl.lockedread = false ;
-	    opop->fl.lockedwrite = false ;
+	    op->fl.lockedread = false ;
+	    op->fl.lockedwrite = false ;
 
 	} /* end if (there was a possible lock set) */
 
@@ -1339,9 +1345,9 @@ local int msfile_fileopen(MSF *op,time_t dt) noex {
 
 	if (op->fd < 0) {
 	    int		oflags = (op->oflags & (~ O_CREAT)) ;
-	    opop->fl.fileinit = false ;
-	    opop->fl.lockedread = false ;
-	    opop->fl.lockedwrite = false ;
+	    op->fl.fileinit = false ;
+	    op->fl.lockedread = false ;
+	    op->fl.lockedwrite = false ;
 	    rs = u_open(op->fname,oflags,op->operm) ;
 	    op->fd = rs ;
 	    if (isNotPresent(rs) && (op->oflags & O_CREAT)) {
@@ -1378,14 +1384,14 @@ int msfile_fileclose(MSF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (opop->fl.entbuf) {
+	if (op->fl.entbuf) {
 	    rs1 = msfile_entbuffinish(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (op->fd >= 0) {
-	    opop->fl.lockedread = false ;
-	    opop->fl.lockedwrite = false ;
+	    op->fl.lockedread = false ;
+	    op->fl.lockedwrite = false ;
 	    rs1 = u_close(op->fd) ;
 	    op->fd = -1 ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1399,12 +1405,12 @@ local int msfile_filesetinfo(MSF *op) noex {
 	int		rs ;
 	int		amode ;
 	amode = (op->oflags & O_ACCMODE) ;
-	opop->fl.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
+	op->fl.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
 	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
 	    op->ti_mod = sb.st_mtime ;
 	    op->filesize = sb.st_size ;
 	    if ((rs = isfsremote(op->fd)) > 0) {
-	        opop->fl.remote = true ;
+	        op->fl.remote = true ;
 	    }
 	} /* end if (stat) */
 	return rs ;
@@ -1413,14 +1419,14 @@ local int msfile_filesetinfo(MSF *op) noex {
 local int msfile_entbufstart(MSF *op) noex {
 	int		rs = SR_OK ;
 
-	if (! opop->fl.entbuf) {
+	if (! op->fl.entbuf) {
 	    if (op->fd >= 0) {
 	        uint	soff = MSF_TABOFF ;
 	        int	esize = MSF_ENTSZ ;
 	        int	nways = MSF_NWAYS ;
 	        int	n = MSF_NEPW ;
 	        rs = entbuf_start(&op->ebm,op->fd,soff,esize,nways,n) ;
-	        opop->fl.entbuf = (rs >= 0) ;
+	        op->fl.entbuf = (rs >= 0) ;
 	    } else {
 	        rs = SR_NOANODE ;
 	    }
@@ -1433,8 +1439,8 @@ local int msfile_entbuffinish(MSF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (opop->fl.entbuf) {
-	    opop->fl.entbuf = false ;
+	if (op->fl.entbuf) {
+	    op->fl.entbuf = false ;
 	    rs1 = entbuf_finish(&op->ebm) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
