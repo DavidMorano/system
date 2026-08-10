@@ -1427,7 +1427,7 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1665,7 +1665,7 @@ local int procpcsconf_begin(PI *pip) noex {
 	            char	kbuf[KBUFLEN+1] ;
 	            char	vbuf[VBUFLEN+1] ;
 	            while (rs >= 0) {
-	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
+	                vl = pcsconf_curenum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
 	                debugprintf("main/procpcsconf: pair> %s=%r\n",
 	                    kbuf,vbuf,vl) ;
@@ -2094,7 +2094,7 @@ local int procatts(PI *pip,MAILMSGATT *attp,cchar *atfname) noex {
 	    int	rs1 = mailmsgatt_count(attp) ;
 	    int	i ;
 	    debugprintf("main: attachments n=%d\n",rs1) ;
-	    for (i = 0 ; mailmsgatt_enum(attp,i,&aep) >= 0 ; i += 1) {
+	    for (i = 0 ; mailmsgatt_curenum(attp,i,&aep) >= 0 ; i += 1) {
 	        debugprintf("main: att file=%s\n",aep->attfname) ;
 	        debugprintf("main: att type=%s subtype=%s\n",
 	            aep->type,aep->subtype) ;
@@ -2105,7 +2105,7 @@ local int procatts(PI *pip,MAILMSGATT *attp,cchar *atfname) noex {
 /* are all of the attachment files present? */
 
 	if (rs >= 0) {
-	    for (i = 0 ; (mailmsgatt_enum(attp,i,&aep) >= 0) ; i += 1) {
+	    for (i = 0 ; (mailmsgatt_curenum(attp,i,&aep) >= 0) ; i += 1) {
 	        if (aep != nullptr) {
 		    cchar	*atfname = aep->attfname ;
 
@@ -2226,7 +2226,7 @@ local int procmime_begin(PI *pip,MIMETYPES *mtp) noex {
 	    char	typespec[MIMETYPES_TYPELEN + 1] ;
 	    debugprintf("main: mimetypes enumed\n") ;
 	    mimetypes_curbegin(mtp,&cur) ;
-	    while (mimetypes_enum(mtp,&cur,ext,typespec) >= 0) {
+	    while (mimetypes_curenum(mtp,&cur,ext,typespec) >= 0) {
 	        debugprintf("main: ext=%s typespec=%s\n",
 	            ext,typespec) ;
 	    } /* end while */
