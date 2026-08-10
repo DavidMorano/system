@@ -39,17 +39,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ascii.h>
-#include	<sbuf.h>
-#include	<strn.h>
-#include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<snwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 
@@ -127,7 +127,6 @@ int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl) noex {
 	    } /* end if (sfshrink) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
-}
-/* end subroutine (mkfmtphone) */
+} /* end subroutine (mkfmtphone) */
 
 
