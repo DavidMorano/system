@@ -40,15 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strrchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<bufsizevar.hh>
-#include	<sbuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strrchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 
@@ -105,7 +105,6 @@ int mkaltext(char *dbuf,cchar *name,cchar *ext) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkaltext) */
+} /* end subroutine (mkaltext) */
 
 
