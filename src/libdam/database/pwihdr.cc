@@ -82,7 +82,7 @@ import libutil ;			/* |lenstr(3u)| */
 /* local variables */
 
 constexpr int		tabsize		= (pwihdr_overlast * szof(uint)) ;
-constexpr int		magicsize	= PWIHDR_MAGICSIZE ;
+constexpr int		magicsz		= PWIHDR_MAGICSIZE ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= PWIHDR_MAGICSTR ;
 
@@ -98,10 +98,10 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 	if (op && hbuf) {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + vsz)) {
-	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
-	            bp += magicsize ;
-	            bl -= magicsize ;
+	    if (bl >= (magicsz + vsz)) {
+	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) {
+	            bp += magicsz ;
+	            bl -= magicsz ;
 	    	    memcopy(bp,op->vetu,vsz) ;
 	    	    bp[0] = uchar(PWIHDR_VERSION) ;
 	    	    bp[1] = uchar(ENDIAN) ;
@@ -137,8 +137,7 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pwihdr_rd) */
+} /* end subroutine (pwihdr_rd) */
 
 int pwihdr_wr(pwihdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
@@ -146,10 +145,10 @@ int pwihdr_wr(pwihdr *op,cchar *hbuf,int hlen) noex {
 	if (op && hbuf) {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) {
 		rs = SR_OK ;
-	        bp += magicsize ;
-	        bl -= magicsize ;
+	        bp += magicsz ;
+	        bl -= magicsz ;
 	        /* read out the VETU information */
 	        if (bl >= vsz) {
 	            memcopy(op->vetu,bp,vsz) ;
@@ -193,8 +192,7 @@ int pwihdr_wr(pwihdr *op,cchar *hbuf,int hlen) noex {
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pwihdr_wr) */
+} /* end subroutine (pwihdr_wr) */
 
 
 /* local subroutines */
