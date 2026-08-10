@@ -50,35 +50,35 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<pwd.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getpwx.h>
-#include	<getuserhome.h>
-#include	<bufsizevar.hh>
-#include	<ids.h>
-#include	<fsdir.h>
-#include	<sncpyx.h>
-#include	<sncpyxc.h>
-#include	<snwcpyxc.h>
-#include	<nleadstr.h>
-#include	<mkpathx.h>
-#include	<mkpathxw.h>
-#include	<permx.h>
-#include	<hasx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<pwd.h>			/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<getuserhome.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<sncpyxc.h>		/* LIBUC */
+#include	<snwcpyxc.h>		/* LIBUC */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkpathxw.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkpr.h"
 
