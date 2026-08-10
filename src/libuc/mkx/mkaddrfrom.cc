@@ -54,15 +54,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<snwcpy.h>
-#include	<ema.h>
-#include	<isoneof.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<ema.h>			/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 
@@ -96,7 +96,7 @@ enum atypes {
 	atype_address,
 	atype_route,
 	atype_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward references */
@@ -138,8 +138,7 @@ int mkaddrfrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkaddrfrom) */
+} /* end subroutine (mkaddrfrom) */
 
 
 /* local subroutines */
