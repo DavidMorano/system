@@ -69,7 +69,7 @@ local int	pcsns_objloadbegin(pcsns *,cchar *,cchar *) noex ;
 local int	pcsns_objloadend(pcsns *) noex ;
 local int	pcsns_loadcalls(pcsns *,cchar *) noex ;
 
-static bool	isrequired(int) noex ;
+local bool	isrequired(int) noex ;
 
 
 /* local variables */
@@ -79,24 +79,24 @@ enum subs {
 	sub_setopts,
 	sub_get,
 	sub_curbegin,
-	sub_enum,
+	sub_curenum,
 	sub_curend,
 	sub_audit,
 	sub_close,
 	sub_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	subs[] = {
 	"open",
 	"setopts",
 	"get",
 	"curbegin",
-	"enum",
+	"curenum",
 	"curend",
 	"audit",
 	"close",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -119,13 +119,13 @@ int pcsns_open(pcsns *op,cchar *pr) noex {
 	    if ((rs = (*op->call.open)(op->obj,pr)) >= 0) {
 		op->magic = PCSNS_MAGIC ;
 	    }
-	    if (rs < 0)
+	    if (rs < 0) {
 		pcsns_objloadend(op) ;
+	    } /* end if (error) */
 	} /* end if (objload-begin) */
 
 	return rs ;
-}
-/* end subroutine (pcsns_open) */
+} /* end subroutine (pcsns_open) */
 
 int pcsns_close(pcsns *op) noex {
 	int		rs = SR_OK ;
@@ -134,17 +134,17 @@ int pcsns_close(pcsns *op) noex {
 	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PCSNS_MAGIC) return SR_NOTOPEN ;
-
+	{
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = pcsns_objloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	op->magic = 0 ;
 	return rs ;
-}
-/* end subroutine (pcsns_close) */
+} /* end subroutine (pcsns_close) */
 
 int pcsns_setopts(pcsns *op,int opts) noex {
 	int		rs = SR_NOSYS ;
@@ -158,8 +158,7 @@ int pcsns_setopts(pcsns *op,int opts) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (pcsns_setopts) */
+} /* end subroutine (pcsns_setopts) */
 
 int pcsns_audit(pcsns *op) noex {
 	int		rs = SR_NOSYS ;
@@ -173,8 +172,7 @@ int pcsns_audit(pcsns *op) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (pcsns_audit) */
+} /* end subroutine (pcsns_audit) */
 
 int pcsns_get(pcsns *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	int		rs = SR_NOSYS ;
@@ -188,8 +186,7 @@ int pcsns_get(pcsns *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (pcsns_count) */
+} /* end subroutine (pcsns_count) */
 
 int pcsns_curbegin(pcsns *op,PCSNS_CUR *curp) noex {
 	int		rs = SR_NOTSUP ;
@@ -214,10 +211,8 @@ int pcsns_curbegin(pcsns *op,PCSNS_CUR *curp) noex {
 		}
 	    } /* end if (memory-allocation) */
 	}
-
 	return rs ;
-}
-/* end subroutine (pcsns_curbegin) */
+} /* end subroutine (pcsns_curbegin) */
 
 int pcsns_curend(pcsns *op,PCSNS_CUR *curp) noex {
 	int		rs = SR_NOTSUP ;
@@ -241,8 +236,7 @@ int pcsns_curend(pcsns *op,PCSNS_CUR *curp) noex {
 
 	curp->magic = 0 ;
 	return rs ;
-}
-/* end subroutine (pcsns_curend) */
+} /* end subroutine (pcsns_curend) */
 
 int pcsns_curenum(pcsns *op,PCSNS_CUR *curp,char *vbuf,int vlen,int w) noex {
 	int		rs = SR_NOSYS ;
@@ -259,8 +253,7 @@ int pcsns_curenum(pcsns *op,PCSNS_CUR *curp,char *vbuf,int vlen,int w) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (pcsns_curenumerate) */
+} /* end subroutine (pcsns_curenumerate) */
 
 
 /* private subroutines */
@@ -276,7 +269,7 @@ local int pcsns_objloadbegin(pcsns *op,cchar *pr,cchar *objname) noex {
 	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
 	    cint	nlen = SYMNAMELEN ;
 	    int		i ;
-	    int		f_modload = FALSE ;
+	    int		f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
 
 	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
@@ -329,25 +322,22 @@ local int pcsns_objloadbegin(pcsns *op,cchar *pr,cchar *objname) noex {
 	} /* end if (ok) */
 
 	return rs ;
-}
-/* end subroutine (pcsns_objloadbegin) */
+} /* end subroutine (pcsns_objloadbegin) */
 
 local int pcsns_objloadend(pcsns *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op->obj != nullptr) {
+	if (op->obj) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-
+	{
 	rs1 = modload_close(&op->loader) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	return rs ;
-}
-/* end subroutine (pcsns_objloadend) */
+} /* end subroutine (pcsns_objloadend) */
 
 local int pcsns_loadcalls(pcsns *op,cchar *objname) noex {
 	modload		*lp = &op->loader ;
@@ -394,7 +384,7 @@ local int pcsns_loadcalls(pcsns *op,cchar *objname) noex {
 			(int (*)(void *,void *)) snp ;
 		    break ;
 
-		case sub_enum:
+		case sub_curenum:
 		    op->call.enumerate = 
 			(int (*)(void *,void *,char *,int,int)) snp ;
 		    break ;
@@ -419,21 +409,19 @@ local int pcsns_loadcalls(pcsns *op,cchar *objname) noex {
 	} /* end for (subs) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (pcsns_loadcalls) */
+} /* end subroutine (pcsns_loadcalls) */
 
-static bool isrequired(int i) noex {
-	bool		f = FALSE ;
+local bool isrequired(int i) noex {
+	bool		f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_setopts:
 	case sub_get:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
