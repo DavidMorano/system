@@ -1,4 +1,4 @@
-/* cm SUPPORT */
+/* cm SUPPORT (Communications-Connection Manager) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -28,28 +28,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getusername.h>
-#include	<expcook.h>
-#include	<vecstr.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<sbuf.h>
-#include	<buffer.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 #include	"cm.h"
 
@@ -126,7 +126,7 @@ template<typename ... Args>
 local inline int cmsb_magic(cmsb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == CM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (cmsb_magic) */
@@ -160,9 +160,7 @@ int cm_open(cm *op,cm_args *ap,cc *hostname,cc *svcname,mainv av) noex {
 	if (hostname == nullptr) return SR_FAULT ;
 	if (svcname == nullptr) return SR_FAULT ;
 	if (ap == nullptr) return SR_FAULT ;
-
-/* do we have the necessary helper objects */
-
+	/* do we have the necessary helper objects */
 	if ((ap->dp == nullptr) || (ap->sp == nullptr)) return SR_INVALID ;
 
 	memclear(op) ;
@@ -200,7 +198,7 @@ int cm_open(cm *op,cm_args *ap,cc *hostname,cc *svcname,mainv av) noex {
 	    cint	sl = sep->dialernamelen ;
 	    cchar	*sp = sep->dialername ;
 	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) {
-		op->magic = CM_MAGIC ;
+		op->magval = CM_MAGIC ;
 	        op->dname = cp ;
 	    }
 	}
@@ -221,12 +219,11 @@ int cm_open(cm *op,cm_args *ap,cc *hostname,cc *svcname,mainv av) noex {
 #ifdef	COMMENT
 	    sysdialer_loadout(ap->dp,sep->dialername) ;
 #endif
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	}
 
 	return rs ;
-}
-/* end subroutine (cm_open) */
+} /* end subroutine (cm_open) */
 
 int cm_close(CM *op) noex {
 	int		rs = SR_OK ;
@@ -234,108 +231,97 @@ int cm_close(CM *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CM_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CM_MAGIC) return SR_NOTOPEN ;
 
-	if (op->dname != nullptr) {
+	if (op->dname) {
 	    rs1 = lm_free(op->dname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dname = nullptr ;
 	}
-
-/* close the connection */
-
+	/* close the connection */
 	if (op->c.close != nullptr) {
 	    rs1 = (*op->c.close)(op->dobj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->c.close = nullptr ;
 	}
-
-	if (op->dobj != nullptr) {
+	if (op->dobj) {
 	    rs1 = lm_free(op->dobj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->dobj = nullptr ;
 	}
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (cm_close) */
+} /* end subroutine (cm_close) */
 
 int cm_getinfo(CM *op,char *nbuf,int nlen,CM_INFO *ip) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (ip == nullptr) return SR_FAULT ;
 
-	if (op->magic != CM_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CM_MAGIC) return SR_NOTOPEN ;
 
 	ip->itype = op->itype ;
 	ip->dflags = op->dflags ;
 	strwcpy(ip->dname,op->dname,MAXNAMELEN) ;
 
 	return SR_OK ;
-}
-/* end subroutine (cm_info) */
+} /* end subroutine (cm_info) */
 
 int cm_reade(CM *op,char *buf,int buflen,int timeout,int opts) noex {
 	int		rs = SR_NOTSUP ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CM_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CM_MAGIC) return SR_NOTOPEN ;
 
 	if (op->c.reade != nullptr) {
 	    rs = (*op->c.reade)(op->dobj,buf,buflen,timeout,opts) ;
 	}
 
 	return rs ;
-}
-/* end subroutine (cm_reade) */
+} /* end subroutine (cm_reade) */
 
 int cm_recve(CM *op,char *buf,int buflen,int flags,int timeout,int opts) noex {
 	int		rs = SR_NOTSUP ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CM_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CM_MAGIC) return SR_NOTOPEN ;
 
 	if (op->c.recve != nullptr) {
 	    rs = (*op->c.recve)(op->dobj,buf,buflen,flags,timeout,opts) ;
 	}
 
 	return rs ;
-}
-/* end subroutine (cm_recve) */
+} /* end subroutine (cm_recve) */
 
 int cm_write(CM *op,cchar *buf,int buflen) noex {
 	int		rs = SR_NOTSUP ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CM_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CM_MAGIC) return SR_NOTOPEN ;
 
 	if (op->c.write != nullptr) {
 	    rs = (*op->c.write)(op->dobj,buf,buflen) ;
 	}
 
 	return rs ;
-}
-/* end subroutine (cm_write) */
+} /* end subroutine (cm_write) */
 
 int cm_shutdown(CM *op,int cmd) noex {
 	int		rs = SR_NOTSUP ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != CM_MAGIC) return SR_NOTOPEN ;
-
-/* do the shutdown if the module supports it */
-
+	if (op->magval != CM_MAGIC) return SR_NOTOPEN ;
+	/* do the shutdown if the module supports it */
 	if (op->c.shutdown != nullptr) {
 	    rs = (*op->c.shutdown)(op->dobj,cmd) ;
 	}
 
 	return rs ;
-}
-/* end subroutine (cm_shutdown) */
+} /* end subroutine (cm_shutdown) */
 
 
 /* private subroutines */
@@ -449,8 +435,7 @@ local int cm_loadcooks(cm *op,SI *sip,EC *cookp,cm_args *ap,
 	} /* end if (memory_allocation) */
 
 	return rs ;
-}
-/* end subroutine (cm_loadcooks) */
+} /* end subroutine (cm_loadcooks) */
 
 local int cm_trysys(cm *op,SI *sip,SD *dp,SD_ARGS *dap,
 	    EC *cookp,SY_ENT *sep,cc *sysname,cc *svcname,mainv av) noex {
@@ -543,8 +528,7 @@ local int cm_trysys(cm *op,SI *sip,SD *dp,SD_ARGS *dap,
 	} /* end if */
 
 	return rs ;
-}
-/* end subroutine (cm_trysys) */
+} /* end subroutine (cm_trysys) */
 
 local int cm_trysysargs(cm *op,SI *sip,vecstr *alp,
 		char *abuf,int alen) noex {
@@ -567,8 +551,7 @@ local int cm_trysysargs(cm *op,SI *sip,vecstr *alp,
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cm_trysysargs) */
+} /* end subroutine (cm_trysysargs) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -592,7 +575,6 @@ vars::operator int () noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
