@@ -52,7 +52,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -140,8 +140,7 @@ int mklineclean(char *rbuf,int rlen,int m,cchar *lp,int ll) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mklineclean) */
+} /* end subroutine (mklineclean) */
 
 
 /* local subroutines */
