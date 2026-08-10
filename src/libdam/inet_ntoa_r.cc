@@ -48,22 +48,23 @@
 	strategy below to convert a |struct in_addr| to a string
 	representation.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
-#include	<usystem.h>
-#include	<uinet.h>
-#include	<sbuf.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
+#include	"inet_ntoa_r.h"
 
 /* local defines */
 
@@ -88,9 +89,8 @@
 char *inet_ntoa_r(INADDR in,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (rbuf) {
-	    sbuf	b ;
-	    if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	if (rbuf) ylikely {
+	    if (sbuf b ; (rs = sbuf_start(&b,rbuf,rlen)) >= 0) ylikely {
 	        cint	n = INET4ADDRLEN ;
 	        cchar	*ap = charp(&in) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
@@ -103,7 +103,6 @@ char *inet_ntoa_r(INADDR in,char *rbuf,int rlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rbuf : nullptr ;
-}
-/* end subroutine (inet_ntoa_r) */
+} /* end subroutine (inet_ntoa_r) */
 
 
