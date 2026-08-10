@@ -276,7 +276,7 @@ int cachetime_curenum(CT *op,CT_CUR *curp,char *pbuf,int plen,
 	    }
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (cachetime_enum) */
+} /* end subroutine (cachetime_curenum) */
 
 int cachetime_stats(CT *op,st *statp) noex {
 	int		rs ;
