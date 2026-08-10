@@ -43,32 +43,33 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<dlfcn.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usysflag.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getnodedomain.h>	/* |getnodedomain(3uc)| */
-#include	<ids.h>
-#include	<dirseen.h>
-#include	<snx.h>
-#include	<pathclean.h>
-#include	<mkpathx.h>
-#include	<mkx.h>			/* |mksofname(3uc)| */
-#include	<mkpr.h>
-#include	<permx.h>
-#include	<strx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<new>			/* C++STD placement-new */
+#include	<memory>		/* C++STD |destroy_at(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC |getnodedomain(3uc)| */
+#include	<ids.h>			/* LIBUC */
+#include	<dirseen.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<pathclean.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC |mksofname(3uc)| */
+#include	<mkpr.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"modload.h"
 
@@ -230,9 +231,8 @@ constexpr cpcchar	exts[] = {
 
 static vars		var ;
 
-constexpr cchar		symsuf[] = MODLOAD_SYMSUF ;
-
-constexpr bool		f_darwin = F_DARWIN ;
+constexpr cchar		symsuf[]	= MODLOAD_SYMSUF ;
+constexpr bool		f_darwin	= F_DARWIN ;
 
 
 /* exported variables */
@@ -287,7 +287,7 @@ int modload_close(ML *op) noex {
 int modload_getsym(ML *op,cchar *symname,cvoid **vpp) noex {
 	int		rs ;
 	cvoid		*rp = nullptr ;
-	if ((rs = modload_magic(op,symname)) >= 0) {
+	if ((rs = modload_magic(op,symname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (symname[0]) ylikely {
 		rs = SR_NOTFOUND ;
@@ -329,7 +329,7 @@ int modload_getmva(ML *op,int *mva,int mvn) noex {
 	        v = mip->mv[0] ;
 	        for (int i = 0 ; i < mvn ; i += 1) {
 	            mva[i] = mip->mv[i] ;
-	        }
+	        } /* end for */
 	    } else {
 	        rs = SR_NOTFOUND ;
 	    }
@@ -448,7 +448,7 @@ int subinfo::sofind() noex {
 			    len = rs ;
 			}
 		    }
-		}
+		} /* end if */
 	    } /* end if (ok) */
 	    rs1 = dirseen_finish(&ds) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -457,6 +457,7 @@ int subinfo::sofind() noex {
 } /* end subroutine (subinfo::sofind) */
 
 int subinfo::sofindroot(dirseen *dsp,int dlm,cchar *apr) noex {
+	cint		rsn = SR_NOTFOUND ;
 	cint		maxpath = var.maxpathlen ;
 	cint		sz = ((var.maxpathlen + 1) * 2) ;
 	int		rs ;
@@ -466,7 +467,6 @@ int subinfo::sofindroot(dirseen *dsp,int dlm,cchar *apr) noex {
 	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 	    char	*lbuf = (a + ((maxpath + 1) * ai++)) ;
 	    if ((rs = mkpath(lbuf,apr,LIBCNAME)) >= 0) ylikely {
-	        cint	rsn = SR_NOTFOUND ;
 		len = rs ;
 	        if ((rs = dirseen_havename(dsp,lbuf,-1)) == rsn) {
 	            if (ustat sb ; (rs = u_stat(lbuf,&sb)) >= 0) {
@@ -496,7 +496,7 @@ int subinfo::sofindroot(dirseen *dsp,int dlm,cchar *apr) noex {
 	        } else if (rs >= 0) {
 	            rs = SR_OK ;
 		    len = 0 ;
-	        }
+	        } /* end if */
 	    } /* end if (mkpath) */
 	    rs1 = lm_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -505,6 +505,7 @@ int subinfo::sofindroot(dirseen *dsp,int dlm,cchar *apr) noex {
 } /* end subroutine (subinfo::sofindpr) */
 
 int subinfo::sofindvar(dirseen *dsp,int dlm) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		len = 0 ; /* return-value */
 	cchar		*vn{} ;
@@ -517,7 +518,7 @@ int subinfo::sofindvar(dirseen *dsp,int dlm) noex {
 	    static cchar	*sp = getenv(vn) ;
 	    if (sp) {
 	        int	sl{} ;
-	        for (cchar *tp ; (tp = strbrk(sp,":;")) != nullptr ; ) {
+	        for (cchar *tp ; (tp = strbrk(sp,":;")) != np ; ) {
 	            sl = intconv(tp - sp) ;
 	            if (sl > 0) {
 	                if ((rs = socheckvarc(dsp,sp,sl,dlm)) > 0) {
@@ -533,7 +534,7 @@ int subinfo::sofindvar(dirseen *dsp,int dlm) noex {
 			    len = rs ;
 			}
 		    }
-	        }
+	        } /* end if (ok) */
 	    } /* end if (getenv) */
 	} /* end if (selected && valid) */
 	return (rs >= 0) ? len : rs ;
@@ -547,10 +548,10 @@ int subinfo::sofindprs(dirseen *dsp,int dlm) noex {
 	    cint	maxhost = var.maxhostlen ;
 	    cint	sz = ((var.maxhostlen + 1) + (var.maxpathlen + 1)) ;
 	    int		ai = 0 ;
-	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 		cint	dl = var.maxhostlen ;
 	        char	*dn = (a + (ai++ * (maxhost + 1))) ;
-	        if ((rs = getinetdomain(dn,dl)) >= 0) {
+	        if ((rs = getinetdomain(dn,dl)) >= 0) ylikely {
 	            cint	prlen = var.maxpathlen ;
 	            char	*prbuf = (a + (ai++ * (maxhost + 1))) ;
 	            for (int i = 0 ; prnames[i] ; i += 1) {
@@ -619,7 +620,7 @@ int subinfo::socheckvarc(dirseen *dsp,cc *ldnp,int ldnl,int dlm) noex {
 	        } else if (rs >= 0) {
 	            rs = SR_OK ;
 		    len = 0 ;
-	        }
+	        } /* end if (ok) */
 	    } /* end if (pathclean) */
 	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -641,7 +642,7 @@ int subinfo::sochecklib(dirseen *dsp,cchar *ldname,int dlm) noex {
 	                ldnp = tbuf ;
 	                rs = mkpath(tbuf,ldname,extdirs[i]) ;
 	            }
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                if (ustat sb ; (rs = u_stat(ldnp,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
 			        ids	*idp = &id ;
