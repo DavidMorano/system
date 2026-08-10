@@ -41,13 +41,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>			/* |sfbasename(3uc)| */
-#include	<snwcpy.h>		/* |snwcpy(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC |sfbasename(3uc)| */
+#include	<snwcpy.h>		/* LIBUC |snwcpy(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 
@@ -82,7 +82,6 @@ int mkbasename(char *rbuf,int rlen,cchar *pnp,int pnl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkbasename) */
+} /* end subroutine (mkbasename) */
 
 
