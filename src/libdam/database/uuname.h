@@ -34,13 +34,13 @@
 #define	UUNAME_OBJNAME	"uunames"
 
 
+struct uuname_flags {
+    	uint		modload:1 ;
+} ; /* end struct */
+
 struct uuname_cursor {
 	void		*scp ;		/* SO-cursor pointer */
 	uint		magval ;
-} ; /* end struct */
-
-struct uuname_flags {
-    	uint		modload:1 ;
 } ; /* end struct */
 
 struct uuname_head {
