@@ -135,8 +135,7 @@ int ttihdr_rd(ttihdr *op,char *hbuf,int hlen) noex {
             }
         } /* end if (non-null) */
         return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ttihdr_rd) */
+} /* end subroutine (ttihdr_rd) */
 
 int ttihdr_wr(ttihdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
@@ -183,8 +182,7 @@ int ttihdr_wr(ttihdr *op,cchar *hbuf,int hlen) noex {
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ttihdr_wr) */
+} /* end subroutine (ttihdr_wr) */
 
 
 /* local subroutines */
