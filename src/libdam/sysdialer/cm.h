@@ -1,4 +1,4 @@
-/* cm HEADER */
+/* cm HEADER (Communications-Connection Manager) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -20,21 +20,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<unistd.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sysdialer.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sysdialer.h>		/* LIBDAM */
+#include	<systems.h>		/* LIBDAM */
 
 
 #define	CM		struct cm_head
 #define	CM_ARGS		struct cm_arguments
 #define	CM_INFO		struct cm_information
-#define	CM_MAGIC	31815926
+#define	CM_MAGIC	0x78565444
 
 
 struct cm_arguments {
@@ -62,7 +63,7 @@ struct cm_head {
 	cchar		*dname ;	/* sysdialer name */
 	CM_ARGS		*ap ;
 	void		*callp ;
-	uint		magic ;
+	uint		magval ;
 	int		dsize ;		/* individual sysdialer object size */
 	int		dflags ;	/* sysdialer flags */
 	int		itype ;
