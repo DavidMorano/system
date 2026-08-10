@@ -184,16 +184,16 @@ int progeigen_curend(PROGINFO *pip,PROGEIGEN_CUR *curp)
 /* end subroutine (progeigen_curend) */
 
 
-int progeigen_enum(PROGINFO *pip,PROGEIGEN_CUR *curp,cchar **rpp)
+int progeigen_curenum(PROGINFO *pip,PROGEIGEN_CUR *curp,cchar **rpp)
 {
 	int		rs = SR_OK ;
 	if (pip == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 	if (rpp == NULL) return SR_FAULT ;
-	rs = eigendb_enum(&pip->eigendb,&curp->cur,rpp) ;
+	rs = eigendb_curenum(&pip->eigendb,&curp->cur,rpp) ;
 	return rs ;
 }
-/* end subroutine (progeigen_enum) */
+/* end subroutine (progeigen_curenum) */
 
 
 /* local subroutines */
