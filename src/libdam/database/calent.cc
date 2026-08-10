@@ -28,18 +28,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sbuf.h>
-#include	<sfx.h>
-#include	<hash.h>		/* |hash_elf(3dam)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<hash.h>		/* LIBUC |hash_elf(3dam)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"calent.h"
 
@@ -54,7 +54,6 @@ import libutil ;			/* |memclear(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -72,34 +71,31 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int calent_ctor(calent *op,Args ... args) noex {
+local int calent_ctor(calent *op,Args ... args) noex {
     	CALENT		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = memclear(hop) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (calent_ctor) */
+} /* end subroutine (calent_ctor) */
 
-static int calent_dtor(calent *op) noex {
+local int calent_dtor(calent *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (calent_dtor) */
+} /* end subroutine (calent_dtor) */
 
 template<typename ... Args>
-static inline int calent_magic(calent *op,Args ... args) noex {
+local inline int calent_magic(calent *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == CALENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (calent_magic) */
+} /* end subroutine (calent_magic) */
 
 
 /* local variables */
@@ -132,8 +128,7 @@ int calent_start(calent *op,calent_q *qp,uint loff,int llen) noex {
 	    }
 	} /* end if (calent_ctor) */
 	return rs ;
-}
-/* end subroutine (calent_start) */
+} /* end subroutine (calent_start) */
 
 int calent_finish(calent *op) noex {
 	int		rs ;
@@ -160,8 +155,7 @@ int calent_finish(calent *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (calent_finish) */
+} /* end subroutine (calent_finish) */
 
 int calent_setidx(calent *op,int cidx) noex {
 	int		rs ;
@@ -173,8 +167,7 @@ int calent_setidx(calent *op,int cidx) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (calent_setidx) */
+} /* end subroutine (calent_setidx) */
 
 int calent_add(calent *op,uint loff,int llen) noex {
 	int		rs ;
@@ -205,8 +198,7 @@ int calent_add(calent *op,uint loff,int llen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (calent_add) */
+} /* end subroutine (calent_add) */
 
 int calent_samecite(calent *op,CALENT *oop) noex {
 	int		rs ;
@@ -217,8 +209,7 @@ int calent_samecite(calent *op,CALENT *oop) noex {
 	    f = f && (op->q.d == oop->q.d) ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (calent_samecite) */
+} /* end subroutine (calent_samecite) */
 
 int calent_mkhash(calent *op,cchar *md) noex {
 	int		rs ;
@@ -249,8 +240,7 @@ int calent_mkhash(calent *op,cchar *md) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (calent_mkhash) */
+} /* end subroutine (calent_mkhash) */
 
 int calent_sethash(calent *op,uint hash) noex {
 	int		rs ;
@@ -260,8 +250,7 @@ int calent_sethash(calent *op,uint hash) noex {
 	    op->fl.hash = true ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (calent_sethash) */
+} /* end subroutine (calent_sethash) */
 
 int calent_gethash(calent *op,uint *rp) noex {
 	int		rs ;
@@ -274,8 +263,7 @@ int calent_gethash(calent *op,uint *rp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (calent_gethash) */
+} /* end subroutine (calent_gethash) */
 
 int calent_loadbuf(calent *op,char *rbuf,int rlen,cchar *mp) noex {
 	int		rs ;
@@ -298,8 +286,7 @@ int calent_loadbuf(calent *op,char *rbuf,int rlen,cchar *mp) noex {
 	    } /* end if (sbuf) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (calent_loadbuf) */
+} /* end subroutine (calent_loadbuf) */
 
 int calent_getci(calent *op) noex {
 	int		rs ;
@@ -307,7 +294,6 @@ int calent_getci(calent *op) noex {
 	    rs = op->cidx ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (calent_getci) */
+} /* end subroutine (calent_getci) */
 
 
