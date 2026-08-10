@@ -91,7 +91,7 @@ enum his {
 /* local variables */
 
 constexpr int		headsize	= hi_overlast * szof(uint) ;
-constexpr int		magicsize	= VARHDR_MAGICSIZE ;
+constexpr int		magicsz		= VARHDR_MAGICSIZE ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= VARHDR_MAGICSTR ;
 
@@ -107,10 +107,10 @@ int varhdr_rd(varhdr *ep,char *hbuf,int hlen) noex {
 	if (ep && hbuf) {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + vsz)) {
-	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
-	            bp += magicsize ;
-	            bl -= magicsize ;
+	    if (bl >= (magicsz + vsz)) {
+	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) {
+	            bp += magicsz ;
+	            bl -= magicsz ;
 	    	    memcopy(bp,ep->vetu,vsz) ;
 	    	    bp[0] = uchar(VARHDR_VERSION) ;
 	    	    bp[1] = uchar(ENDIAN) ;
@@ -142,8 +142,7 @@ int varhdr_rd(varhdr *ep,char *hbuf,int hlen) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (varhdr_rd) */
+} /* end subroutine (varhdr_rd) */
 
 int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
@@ -151,10 +150,10 @@ int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex {
 	if (ep && hbuf) {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) {
 		rs = SR_OK ;
-	        bp += magicsize ;
-	        bl -= magicsize ;
+	        bp += magicsz ;
+	        bl -= magicsz ;
 		/* read out the VETU information */
 	        if (bl >= vsz) {
 	            memcopy(ep->vetu,bp,vsz) ;
@@ -196,8 +195,7 @@ int varhdr_wr(varhdr *ep,cchar *hbuf,int hlen) noex {
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (varhdr_wr) */
+} /* end subroutine (varhdr_wr) */
 
 
 /* local subroutines */
