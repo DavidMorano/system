@@ -1,4 +1,4 @@
-/* b_look SUPPORT */
+/* b_look SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -53,13 +53,14 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<climits>
 #include	<fcntl.h>
+#include	<climits>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bits.h>
 #include	<vecobj.h>
 #include	<naturalwords.h>
@@ -139,7 +140,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, final, changed ;
+	LOCINFO_FL	have, f, finval, changed ;
 	PROGINFO	*pip ;
 } ;
 
@@ -269,7 +270,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
-	BITS		pargs ;
+	bits		pargs ;
 	SHIO		errfile ;
 	SHIO		ofile, *ofp = &ofile ;
 
@@ -548,7 +549,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* dictionary order */
 	                    case 'd':
-	                        lip->final.d = TRUE ;
+	                        lip->finval.d = TRUE ;
 	                        lip->fl.d = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -561,7 +562,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* fold-case */
 	                    case 'f':
-	                        lip->final.f = TRUE ;
+	                        lip->finval.f = TRUE ;
 	                        lip->fl.f = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -726,8 +727,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        cp = argv[ai] ;
 		switch (pan) {
 	        case 0:
-	            if (! lip->final.d) lip->fl.d = TRUE ;
-	            if (! lip->final.f) lip->fl.f = TRUE ;
+	            if (! lip->finval.d) lip->fl.d = TRUE ;
+	            if (! lip->finval.f) lip->fl.f = TRUE ;
 	            strwcpy(string,cp,MAXSTRLEN) ;
 	            break ;
 	        case 1:
