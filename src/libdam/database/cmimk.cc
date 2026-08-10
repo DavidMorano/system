@@ -64,31 +64,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |UINT_MAX| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<endian.h>
-#include	<estrings.h>
-#include	<vecobj.h>
-#include	<filer.h>
-#include	<opentmp.h>
-#include	<mktmp.h>
-#include	<mkfnamesuf.h>
-#include	<char.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* |UINT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++SYD plaement-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<mktmp.h>		/* LIBUC */
+#include	<mkfnamesuf.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"cmimk.h"
 #include	"cmihdr.h"
@@ -116,8 +116,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* local typedefs */
-
-using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
@@ -148,18 +146,19 @@ template<typename ... Args>
 local int cmimk_ctor(cmimk *op,Args ... args) noex {
     	CMIMK		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->elp = new(nothrow) vecobj) != np) ylikely {
-	        if ((op->llp = new(nothrow) vecobj) != np) ylikely {
+	    if ((op->elp = new(nt) vecobj) != np) ylikely {
+	        if ((op->llp = new(nt) vecobj) != np) ylikely {
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
 		    delete op->elp ;
 		    op->elp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
@@ -248,17 +247,17 @@ int cmimk_open(cmimk *op,cchar *dbname,int of,mode_t om) noex {
 	                }
 	                if (rs < 0) {
 	                    cmimk_filesend(op) ;
-		        }
+		        } /* end if (error) */
 	            } /* end if (nvimk) */
 	            if (rs < 0) {
 	                uc_free(op->dbname) ;
 	                op->dbname = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		cmimk_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (cmimk_ctor) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (cmimk_open) */
@@ -414,7 +413,7 @@ local int cmimk_filesbeginc(cmimk *op) noex {
 	        rs = cmimk_filesbegincreate(op,tfn,of,om) ;
 		if ((rs < 0) && type) {
 		    uc_unlink(rbuf) ;
-		}
+		} /* end if (error) */
 	    } /* end if (ok) */
 	} /* end if (mknewfname) */
 	return rs ;
