@@ -41,11 +41,11 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 #include	"mknpathxx.h"
@@ -86,7 +86,7 @@ import libutil ;			/* |lensr(3u)| + |getlenstr(3u)| */
 int mknpathexp(char *rbuf,int rlen,cchar *pp,int µpl) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;
+	int		rl = 0 ; /* return-value */
 	if (rbuf && pp) ylikely {
 	    rbuf[0] = '\0' ;
 	    if (int pl ; (pl = getlenstr(pp,µpl)) > 0) ylikely {
@@ -97,7 +97,6 @@ int mknpathexp(char *rbuf,int rlen,cchar *pp,int µpl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mknpathexp) */
+} /* end subroutine (mknpathexp) */
 
 
