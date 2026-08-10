@@ -48,14 +48,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bufsizevar.hh>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkfname.h"
 
@@ -90,33 +90,27 @@ static bufsizevar	maxpathlen(bufsize_mp) ;
 
 int mkfname1(char *rbuf,cchar *p1) noex {
 	return mkfnamex(rbuf,1,p1) ;
-}
-/* end subroutine (mkfname1) */
+} /* end subroutine (mkfname1) */
 
 int mkfname2(char *rbuf,cchar *p1,cchar *p2) noex {
 	return mkfnamex(rbuf,2,p1,p2) ;
-}
-/* end subroutine (mkfname2) */
+} /* end subroutine (mkfname2) */
 
 int mkfname3(char *rbuf,cchar *p1,cchar *p2,cchar *p3) noex {
 	return mkfnamex(rbuf,3,p1,p2,p3) ;
-}
-/* end subroutine (mkfname3) */
+} /* end subroutine (mkfname3) */
 
 int mkfname4(char *rbuf,cchar *p1,cchar *p2,cchar *p3,cchar *p4) noex {
 	return mkfnamex(rbuf,4,p1,p2,p3,p4) ;
-}
-/* end subroutine (mkfname4) */
+} /* end subroutine (mkfname4) */
 
 int mkfname5(char *rbuf,cc *p1,cc *p2,cc *p3,cc *p4,cc *p5) noex {
 	return mkfnamex(rbuf,5,p1,p2,p3,p4,p5) ;
-}
-/* end subroutine (mkfname5) */
+} /* end subroutine (mkfname5) */
 
 int mkfname6(char *rbuf,cc *p1,cc *p2,cc *p3,cc *p4,cc *p5,cc *p6) noex {
 	return mkfnamex(rbuf,6,p1,p2,p3,p4,p5,p6) ;
-}
-/* end subroutine (mkfname6) */
+} /* end subroutine (mkfname6) */
 
 int mkfnamex(char *rbuf,int na,...) noex {
 	va_list		ap ;
@@ -137,7 +131,6 @@ int mkfnamex(char *rbuf,int na,...) noex {
 	    } /* end if (maxpathlen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mkfnamex) */
+} /* end subroutine (mkfnamex) */
 
 
