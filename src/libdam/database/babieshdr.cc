@@ -129,8 +129,7 @@ int babieshdr_rd(babieshdr *ep,char *hbuf,int hlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (babieshdr_rd) */
+} /* end subroutine (babieshdr_rd) */
 
 /* write to the (header) object from the contents of the buffer */
 int babieshdr_wr(babieshdr *ep,cchar *hbuf,int hlen) noex {
@@ -183,8 +182,7 @@ int babieshdr_wr(babieshdr *ep,cchar *hbuf,int hlen) noex {
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (babieshdr_wr) */
+} /* end subroutine (babieshdr_wr) */
 
 
 /* local subroutines */
