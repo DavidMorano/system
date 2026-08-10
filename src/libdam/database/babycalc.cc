@@ -28,19 +28,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<dlfcn.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
+#include	<dlfcn.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"babycalc.h"
 #include	"babycalcs.h"
@@ -66,11 +66,11 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 extern "C" {
-    typedef int (*soopen_f)(void *,cchar *,cchar *) noex ;
-    typedef int (*socheck_f)(void *,time_t) noex ;
-    typedef int (*solookup_f)(void *,time_t,uint *) noex ;
-    typedef int (*soinfo_f)(void *,babycalcs_info *) noex ;
-    typedef int (*soclose_f)(void *) noex ;
+    typedef int (*soopen_f)	(void *,cchar *,cchar *) noex ;
+    typedef int (*socheck_f)	(void *,time_t) noex ;
+    typedef int (*solookup_f)	(void *,time_t,uint *) noex ;
+    typedef int (*sogetinfo_f)	(void *,babycalcs_info *) noex ;
+    typedef int (*soclose_f)	(void *) noex ;
 } /* end extern (C) */
 
 
@@ -86,7 +86,7 @@ struct babycalc_calls {
 	soopen_f	open ;
 	socheck_f	check ;
 	solookup_f	lookup ;
-	soinfo_f	info ;
+	sogetinfo_f	getinfo ;
 	soclose_f	close ;
 } ; /* end struct */
 
@@ -112,7 +112,7 @@ local int babycalc_ctor(babycalc *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->mlp ;
 		    op->mlp = np ;
-		}
+		} /* end if (error) */
 	    } /* end new (modload) */
 	} /* end if (non-null) */
 	return rs ;
@@ -160,18 +160,18 @@ enum subs {
 	sub_open,
 	sub_check,
 	sub_lookup,
-	sub_info,
+	sub_getinfo,
 	sub_close,
 	sub_overlast
 } ; /* end enum (subs) */
 
-constexpr cpcchar	subs[] = {
+constexpr cpcchar	subnames[] = {
 	"open",
 	"check",
 	"lookup",
-	"info",
+	"getinfo",
 	"close",
-	NULL
+	nullptr
 } ; /* end array (subs) */
 
 
@@ -193,16 +193,15 @@ int babycalc_open(BC *op,cchar *pr,cchar *dbname) noex {
 	            }
 	            if (rs < 0) {
 		        babycalc_objloadend(op) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (obj-load-begin) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		babycalc_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (babycalc_ctor) */
 	return rs ;
-}
-/* end subroutine (babycalc_open) */
+} /* end subroutine (babycalc_open) */
 
 int babycalc_close(BC *op) noex {
 	int		rs ;
@@ -224,8 +223,7 @@ int babycalc_close(BC *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (babycalc_close) */
+} /* end subroutine (babycalc_close) */
 
 int babycalc_check(BC *op,time_t daytime) noex {
 	int		rs ;
@@ -237,8 +235,7 @@ int babycalc_check(BC *op,time_t daytime) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (babycalc_check) */
+} /* end subroutine (babycalc_check) */
 
 int babycalc_lookup(BC *op,time_t datereq,uint *rp) noex {
 	int		rs ;
@@ -250,8 +247,7 @@ int babycalc_lookup(BC *op,time_t datereq,uint *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (babycalc_lookup) */
+} /* end subroutine (babycalc_lookup) */
 
 int babycalc_getinfo(BC *op,BC_INFO *ip) noex {
 	int		rs ;
@@ -259,8 +255,8 @@ int babycalc_getinfo(BC *op,BC_INFO *ip) noex {
 	if ((rs = babycalc_magic(op)) >= 0) {
 	    callsp p = callsp(op->callp) ;
 	    BABYCALCS_INFO	bi{} ;
-	    if (p->info) {
-	        rs = p->info(op->obj,&bi) ;
+	    if (p->getinfo) {
+	        rs = p->getinfo(op->obj,&bi) ;
 	        n = rs ;
 	    }
 	    if (ip) {
@@ -269,12 +265,11 @@ int babycalc_getinfo(BC *op,BC_INFO *ip) noex {
 		    ip->wtime = bi.wtime ;
 		    ip->atime = bi.atime ;
 		    ip->acount = bi.acount ;
-	        }
+	        } /* end if (ok) */
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (babycalc_getinfo) */
+} /* end subroutine (babycalc_getinfo) */
 
 
 /* private subroutines */
@@ -286,7 +281,7 @@ local int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
 	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = BC_MODBNAME ;
 	            cchar	*on = objn ;
@@ -307,13 +302,13 @@ local int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
 	                        if (rs < 0) {
 	                            lm_free(op->obj) ;
 	                            op->obj = nullptr ;
-	                        }
+	                        } /* end if (error) */
 	                    } /* end if (memory-allocation) */
 	                } /* end if (modload_getmva) */
 	                if (rs < 0) {
 		            op->fl.modload = false ;
 	                    modload_close(mlp) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (modload_open) */
 		} /* end if (vecstr_getvec) */
 	    } /* end if (vecstr_addsyms) */
@@ -322,11 +317,10 @@ local int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
 	    if ((rs < 0) && op->fl.modload) {
 		op->fl.modload = false ;
 		modload_close(mlp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (vecstr-syms) */
 	return rs ;
-}
-/* end subroutine (babycalc_objloadbegin) */
+} /* end subroutine (babycalc_objloadbegin) */
 
 local int babycalc_objloadend(BC *op) noex {
 	int		rs = SR_OK ;
@@ -342,8 +336,7 @@ local int babycalc_objloadend(BC *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (babycalc_objloadend) */
+} /* end subroutine (babycalc_objloadend) */
 
 local int babycalc_loadcalls(BC *op,vecstr *slp) noex {
 	modload		*mlp = op->mlp ;
@@ -366,8 +359,8 @@ local int babycalc_loadcalls(BC *op,vecstr *slp) noex {
                 case sub_lookup:
                     callp->lookup = solookup_f(snp) ;
                     break ;
-                case sub_info:
-                    callp->info = soinfo_f(snp) ;
+                case sub_getinfo:
+                    callp->getinfo = sogetinfo_f(snp) ;
                     break ;
                 case sub_close:
                     callp->close = soclose_f(snp) ;
@@ -380,8 +373,7 @@ local int babycalc_loadcalls(BC *op,vecstr *slp) noex {
 	} /* end for (vecstr_get) */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (babycalc_loadcalls) */
+} /* end subroutine (babycalc_loadcalls) */
 
 local bool isrequired(int i) noex {
 	bool		f = false ;
@@ -389,13 +381,12 @@ local bool isrequired(int i) noex {
 	case sub_open:
 	case sub_check:
 	case sub_lookup:
-	case sub_info:
+	case sub_getinfo:
 	case sub_close:
 	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
