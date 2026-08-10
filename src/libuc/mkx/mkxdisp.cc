@@ -43,14 +43,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkxdisp.h"
 
@@ -107,7 +107,7 @@ namespace {
 
 local bool havevar(cchar *v) noex {
     	return (v && v[0]) ;
-}
+} /* end subroutine */
 
 
 /* local variables */
@@ -137,8 +137,7 @@ int mkxsdisp(char *rbuf,int rlen,cc *disp,cc *node,cc *domain) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkxdisp) */
+} /* end subroutine (mkxdisp) */
 
 
 /* private subroutines */
