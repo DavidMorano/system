@@ -65,20 +65,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<new>			/* |nothrow(3c++) */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<storebuf.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<sfx.h>
-#include	<pathadd.h>
-#include	<strwcpy.h>
-#include	<mkchar.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<sfx.h>			/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 #include	"mknpathxx.h"
@@ -186,8 +186,7 @@ int mknpathvar(char *rbuf,int rlen,cchar *fp,int µfl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? el : rs ;
-}
-/* end subroutine (mknpathvar) */
+} /* end subroutine (mknpathvar) */
 
 
 /* local srubroutines */
