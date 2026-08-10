@@ -45,16 +45,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |getustime(3u)| */
-#include	<bufsizevar.hh>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |getustime(3u)| */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkshlibname.h"
 
@@ -97,18 +97,18 @@ static bufsizevar		maxnamelen(bufsize_mn) ;
 int mkshlibname(char *rbuf,cchar *pre,cchar *base,cchar *ext) noex {
     	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (rbuf && base) {
+	if (rbuf && base) ylikely {
 	    rs = SR_INVALID ;
-	    if (base[0]) {
-	        if ((rs = maxnamelen) >= 0) {
+	    if (base[0]) ylikely {
+	        if ((rs = maxnamelen) >= 0) ylikely {
     	            storebuf sb(rbuf,rs) ;
 	            if (pre && pre[0]) {
 		        if ((rs = sb.str(pre)) >= 0) {
 			    rs = sb.str("_") ;
 			}
 	            } /* end if (prefix) */
-	            if (rs >= 0) {
-			if ((rs = sb.str(base)) >= 0) {
+	            if (rs >= 0) ylikely {
+			if ((rs = sb.str(base)) >= 0) ylikely {
 			    if (ext && ext[0]) {
 				if ((rs = sb.chr('.')) >= 0) {
 				    rs = sb.str(ext) ;
@@ -121,7 +121,6 @@ int mkshlibname(char *rbuf,cchar *pre,cchar *base,cchar *ext) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mkshlibname) */
+} /* end subroutine (mkshlibname) */
 
 
