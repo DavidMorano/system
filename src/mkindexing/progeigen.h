@@ -50,7 +50,7 @@ extern int progeigen_begin(PROGINFO *) ;
 extern int progeigen_end(PROGINFO *) ;
 extern int progeigen_count(PROGINFO *) ;
 extern int progeigen_curbegin(PROGINFO *,PROGEIGEN_CUR *) ;
-extern int progeigen_enum(PROGINFO *,PROGEIGEN_CUR *,cchar **) ;
+extern int progeigen_curenum(PROGINFO *,PROGEIGEN_CUR *,cchar **) ;
 extern int progeigen_curend(PROGINFO *,PROGEIGEN_CUR *) ;
  
 #ifdef	__cplusplus
