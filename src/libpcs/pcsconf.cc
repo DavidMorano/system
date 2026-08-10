@@ -35,37 +35,37 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<dlfcn.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucinfo.h>
-#include	<bufsizeget.h>
-#include	<getnodedomain.h>
-#include	<getusername.h>
-#include	<getpwx.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<vecstr.h>
-#include	<modload.h>
-#include	<nulstr.h>
-#include	<expcook.h>
-#include	<snx.h>
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<snwcpy.h>
-#include	<matstr.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucinfo.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<modload.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsconf.h"
 #include	"pcsconfs.h"
@@ -222,9 +222,9 @@ local bool	isrequired(int) noex ;
 enum subs {
 	sub_start,
 	sub_curbegin,
-	sub_fetch,
-	sub_enum,
+	sub_curenum,
 	sub_curend,
+	sub_fetch,
 	sub_audit,
 	sub_finish,
 	sub_overlast
@@ -233,9 +233,9 @@ enum subs {
 constexpr cpcchar	subs[] = {
 	"start",
 	"curbegin",
-	"fetch",
-	"enum",
+	"curenum",
 	"curend",
+	"fetch",
 	"audit",
 	"finish",
 	nullptr
@@ -311,11 +311,11 @@ int pcsconf_start(PC *op,cchar *pr,mainv envv,cchar *cfname) noex {
 	                    }
 	                    if (rs < 0) {
 		                mxp->destroy() ;
-		            }
+		            } /* end if (error) */
 	                } /* end if (ptm) */
 	                if (rs < 0) {
 		            pcsconf_objloadend(op) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (obj-mod loading) */
 		} /* end if (vars) */
 	    } /* end if (valid) */
@@ -324,8 +324,7 @@ int pcsconf_start(PC *op,cchar *pr,mainv envv,cchar *cfname) noex {
 	    } /* end if (error) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pcsconf_start) */
+} /* end subroutine (pcsconf_start) */
 
 int pcsconf_finish(PC *op) noex {
 	int		rs ;
@@ -347,7 +346,7 @@ int pcsconf_finish(PC *op) noex {
 	            rs1 = lm_free(cmp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->cookmgr = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	    }
 	    {
 	        rs1 = (*op->call.finish)(op->obj) ;
@@ -369,8 +368,7 @@ int pcsconf_finish(PC *op) noex {
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pcsconf_finish) */
+} /* end subroutine (pcsconf_finish) */
 
 int pcsconf_audit(PC *op) noex {
 	int		rs ;
@@ -390,8 +388,7 @@ int pcsconf_audit(PC *op) noex {
 	    } /* end if (have method) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (pcsconf_audit) */
+} /* end subroutine (pcsconf_audit) */
 
 int pcsconf_getpcsuid(PC *op) noex {
 	int		rs ;
@@ -408,8 +405,7 @@ int pcsconf_getpcsuid(PC *op) noex {
 	    } /* end if (mutex) */
 	} /* end if (magic) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (pcsconf_getpcsuid) */
+} /* end subroutine (pcsconf_getpcsuid) */
 
 int pcsconf_getpcsgid(PC *op) noex {
 	int		rs ;
@@ -426,8 +422,7 @@ int pcsconf_getpcsgid(PC *op) noex {
 	    } /* end if (mutex) */
 	} /* end if (magic) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (pcsconf_getpcsgid) */
+} /* end subroutine (pcsconf_getpcsgid) */
 
 int pcsconf_getpcsusername(PC *op,char *ubuf,int ulen) noex {
 	int		rs ;
@@ -452,8 +447,7 @@ int pcsconf_getpcsusername(PC *op,char *ubuf,int ulen) noex {
 	    } /* end if (mutex) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (pcsconf_getpcsusername) */
+} /* end subroutine (pcsconf_getpcsusername) */
 
 int pcsconf_getpr(PC *op,cchar **prp) noex {
 	int		rs ;
@@ -464,8 +458,7 @@ int pcsconf_getpr(PC *op,cchar **prp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pcsconf_getpr) */
+} /* end subroutine (pcsconf_getpr) */
 
 int pcsconf_getenvv(PC *op,mainv *envvp) noex {
 	int		rs ;
@@ -475,8 +468,7 @@ int pcsconf_getenvv(PC *op,mainv *envvp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pcsconf_getenvv) */
+} /* end subroutine (pcsconf_getenvv) */
 
 int pcsconf_curbegin(PC *op,pcsconf_cur *curp) noex {
 	int		rs ;
@@ -498,7 +490,7 @@ int pcsconf_curbegin(PC *op,pcsconf_cur *curp) noex {
 	                    if (rs < 0) {
 	                        lm_free(curp->scp) ;
 	                        curp->scp = nullptr ;
-		            }
+		            } /* end if (memory-release) */
 	                } /* end if (memory-allocation) */
 		        rs1 = mxp->lockend ;
 	                if (rs >= 0) rs = rs1 ;
@@ -507,8 +499,7 @@ int pcsconf_curbegin(PC *op,pcsconf_cur *curp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pcsconf_curbegin) */
+} /* end subroutine (pcsconf_curbegin) */
 
 int pcsconf_curend(PC *op,pcsconf_cur *curp) noex {
 	int		rs ;
@@ -537,8 +528,7 @@ int pcsconf_curend(PC *op,pcsconf_cur *curp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pcsconf_curend) */
+} /* end subroutine (pcsconf_curend) */
 
 /* lookup tags by strings */
 int pcsconf_curfetch(PC *op,cchar *kp,int kl,PC_CUR *curp,
@@ -565,8 +555,7 @@ int pcsconf_curfetch(PC *op,cchar *kp,int kl,PC_CUR *curp,
 	    } /* end if (valid) */
 	} /* end if (pcsconf_magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (pcsconf_curfetch) */
+} /* end subroutine (pcsconf_curfetch) */
 
 int pcsconf_curenum(PC *op,PC_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
@@ -593,8 +582,7 @@ int pcsconf_curenum(PC *op,PC_CUR *curp,char *kbuf,int klen,
 	    } /* end if (valid) */
 	} /* end if (pcsconf_magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (pcsconf_curenum) */
+} /* end subroutine (pcsconf_curenum) */
 
 int pcsconf_fetchone(PC *op,cchar *kp,int kl,char *vbuf,int vlen) noex {
 	int		rs ;
@@ -611,8 +599,7 @@ int pcsconf_fetchone(PC *op,cchar *kp,int kl,char *vbuf,int vlen) noex {
 	    } /* end if (cursor) */
 	} /* end if (pcsconf_magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (pcsconf_fetchone) */
+} /* end subroutine (pcsconf_fetchone) */
 
 
 /* private subroutines */
@@ -642,8 +629,7 @@ local int pcsconf_objloadbegin(PC *op,cchar *pr,cchar *objname) noex {
 	    }
 	} /* end if (modloadopen) */
 	return rs ;
-}
-/* end subroutine (pcsconf_objloadbegin) */
+} /* end subroutine (pcsconf_objloadbegin) */
 
 local int pcsconf_objloadend(PC *op) noex {
 	int		rs = SR_OK ;
@@ -658,8 +644,7 @@ local int pcsconf_objloadend(PC *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (pcsconf_objloadend) */
+} /* end subroutine (pcsconf_objloadend) */
 
 local int pcsconf_modloadopen(PC *op,cchar *pr,cchar *objname) noex {
 	int		rs ;
@@ -702,8 +687,7 @@ local int pcsconf_modloadopen(PC *op,cchar *pr,cchar *objname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (pcsconf_modloadopen) */
+} /* end subroutine (pcsconf_modloadopen) */
 
 local int pcsconf_loadcalls(PC *op,cchar *objname) noex {
 	modload		*lp = op->mlp ;
@@ -750,7 +734,7 @@ local int pcsconf_loadcalls(PC *op,cchar *objname) noex {
 	                snp ;
 	            break ;
 
-	        case sub_enum:
+	        case sub_curenum:
 	            op->call.enumerate = 
 	                (int (*)(void *,void *,char *,int,char *,int)) snp ;
 	            break ;
@@ -775,8 +759,7 @@ local int pcsconf_loadcalls(PC *op,cchar *objname) noex {
 	} /* end for (subs) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (pcsconf_loadcalls) */
+} /* end subroutine (pcsconf_loadcalls) */
 
 local int pcsconf_getpcsids(PC *op) noex {
 	int		rs = SR_OK ;
@@ -787,8 +770,7 @@ local int pcsconf_getpcsids(PC *op) noex {
 	    } /* end if (stat) */
 	} /* end if (needed) */
 	return rs ;
-}
-/* end subroutine (pcsconf_getpcsids) */
+} /* end subroutine (pcsconf_getpcsids) */
 
 local int pcsconf_getpcspw(PC *op) noex {
 	int		rs = SR_OK ;
@@ -824,8 +806,7 @@ local int pcsconf_getpcspw(PC *op) noex {
 	    rs = lenstr(op->pcsusername) ;
 	}
 	return rs ;
-}
-/* end subroutine (pcsconf_getpcspw) */
+} /* end subroutine (pcsconf_getpcspw) */
 
 local int pcsconf_expand(PC *op,char *vbuf,int vlen,int vl) noex {
 	int		rs = SR_OK ;
@@ -861,8 +842,7 @@ local int pcsconf_expand(PC *op,char *vbuf,int vlen,int vl) noex {
 	    } /* end if (memory_allocation) */
 	} /* end if (had keys) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (pcsconf_expand) */
+} /* end subroutine (pcsconf_expand) */
 
 local int pcsconf_cookmgr(PC *op) noex {
 	int		rs = SR_OK ;
@@ -879,8 +859,7 @@ local int pcsconf_cookmgr(PC *op) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (needed to initialize CM) */
 	return rs ;
-}
-/* end subroutine (pcsconf_cookmgr) */
+} /* end subroutine (pcsconf_cookmgr) */
 
 local int pcsconf_cookload(PC *op,cchar *kp,int kl) noex {
 	int		rs ;
@@ -889,8 +868,7 @@ local int pcsconf_cookload(PC *op,cchar *kp,int kl) noex {
 	    rs = cookmgr_load(cmp,kp,kl) ;
 	} /* end if (cook-manager started) */
 	return rs ;
-}
-/* end subroutine (pcsconf_cookload) */
+} /* end subroutine (pcsconf_cookload) */
 
 local int cookmgr_start(CM *cmp,cchar *pr) noex {
 	int		rs ;
@@ -903,8 +881,7 @@ local int cookmgr_start(CM *cmp,cchar *pr) noex {
 	    cmp->fl.cooks = (rs >= 0) ;
 	}
 	return rs ;
-}
-/* end subroutine (cookmgr_start) */
+} /* end subroutine (cookmgr_start) */
 
 local int cookmgr_load(CM *cmp,cchar *kp,int kl) noex {
     	cnullptr	np{} ;
@@ -1027,8 +1004,7 @@ local int cookmgr_load(CM *cmp,cchar *kp,int kl) noex {
 	    } /* end if (nulstr) */
 	} /* end if (key not already found) */
 	return rs ;
-}
-/* end subroutine (cookmgr_load) */
+} /* end subroutine (cookmgr_load) */
 
 local int cookmgr_expand(CM *cmp,char *ebuf,int elen,cc *vbuf,int vl) noex {
 	expcook		*ecp = (expcook *) &cmp->cooks ;
@@ -1038,8 +1014,7 @@ local int cookmgr_expand(CM *cmp,char *ebuf,int elen,cc *vbuf,int vl) noex {
 	    rs = expcook_exp(ecp,wch,ebuf,elen,vbuf,vl) ;
 	}
 	return rs ;
-}
-/* end subroutine (cookmgr_expand) */
+} /* end subroutine (cookmgr_expand) */
 
 local int cookmgr_uname(CM *cmp) noex {
 	int		rs = SR_OK ;
@@ -1048,8 +1023,7 @@ local int cookmgr_uname(CM *cmp) noex {
 	    rs = ucinfo_name(&cmp->uname) ;
 	}
 	return rs ;
-}
-/* end subroutine (cookmgr_uname) */
+} /* end subroutine (cookmgr_uname) */
 
 local int cookmgr_uaux(CM *cmp) noex {
 	int		rs = SR_OK ;
@@ -1058,8 +1032,7 @@ local int cookmgr_uaux(CM *cmp) noex {
 	    rs = ucinfo_aux(&cmp->uaux) ;
 	}
 	return rs ;
-}
-/* end subroutine (cookmgr_uaux) */
+} /* end subroutine (cookmgr_uaux) */
 
 local int cookmgr_nodedomain(CM *cmp) noex {
     	cint		nlen = sysvar.nodenamelen ;
@@ -1087,8 +1060,7 @@ local int cookmgr_nodedomain(CM *cmp) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (i-null) */
 	return rs ;
-}
-/* end subroutine (cookmgr_nodedomain) */
+} /* end subroutine (cookmgr_nodedomain) */
 
 local int cookmgr_finish(CM *cmp) noex {
 	int		rs = SR_OK ;
@@ -1106,8 +1078,7 @@ local int cookmgr_finish(CM *cmp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (cookmgr_finish) */
+} /* end subroutine (cookmgr_finish) */
 
 variables::operator int () noex {
     	int		rs ;
@@ -1131,16 +1102,15 @@ local bool isrequired(int i) noex {
 	switch (i) {
 	case sub_start:
 	case sub_curbegin:
-	case sub_fetch:
-	case sub_enum:
+	case sub_curenum:
 	case sub_curend:
+	case sub_fetch:
 	case sub_audit:
 	case sub_finish:
 	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
