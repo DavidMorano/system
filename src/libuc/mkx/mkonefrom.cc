@@ -54,14 +54,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>			/* |sfshrink(3uc)| */
-#include	<snwcpy.h>
-#include	<ema.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<ema.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 
@@ -139,8 +139,7 @@ int mkonefrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkonefrom) */
+} /* end subroutine (mkonefrom) */
 
 
 /* local subroutines */
