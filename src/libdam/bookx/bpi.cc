@@ -199,14 +199,13 @@ int bpi_open(bpi *op,cchar *dbn) noex {
 	    rs = SR_INVALID ;
 	    if (dbn[0]) {
 	        custime		dt = time(nullptr) ;
-	        int		tl ;
 	        if (cchar *cp ; (rs = mem.strw(dbn,-1,&cp)) >= 0) {
 	            cchar	*suf = BPI_SUF ;
 	            cchar	*end = ENDIANSTR ;
 		    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
 	    	        op->dbname = cp ;
 	    		if ((rs = mkfnamesuf2(tbuf,cp,suf,end)) >= 0) {
-	                    tl = rs ;
+	                    cint tl = rs ;
 	                    if ((rs = mem.strw(tbuf,tl,&cp)) >= 0) {
 	            		op->fname = cp ;
 	            		if ((rs = bpi_loadbegin(op,dt)) >= 0) {
@@ -240,23 +239,23 @@ int bpi_open(bpi *op,cchar *dbn) noex {
 int bpi_close(bpi *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = bpi_magic(op)) >= 0) {
+	if ((rs = bpi_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = bpi_loadend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->fname) {
 	        voidp vp = voidp(op->fname) ;
-	        rs1 = uc_free(vp) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->dbname) {
 	        voidp vp = voidp(op->dbname) ;
-	        rs1 = uc_free(vp) ;
+	        rs1 = mem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 	        rs1 = bpi_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -268,7 +267,7 @@ int bpi_close(bpi *op) noex {
 
 int bpi_audit(bpi *op) noex {
 	int		rs ;
-	if ((rs = bpi_magic(op)) >= 0) {
+	if ((rs = bpi_magic(op)) >= 0) ylikely {
 	    /* verify that all list pointers and list entries are valid */
 	    rs = bpi_auditvt(op) ;
 	} /* end if (bpi_magic) */
@@ -278,7 +277,7 @@ int bpi_audit(bpi *op) noex {
 int bpi_count(bpi *op) noex {
 	int		rs ;
 	int		nv = 0 ; /* return-value */
-	if ((rs = bpi_magic(op)) >= 0) {
+	if ((rs = bpi_magic(op)) >= 0) ylikely {
 	    bpihdr	*hip = op->fhip ;
 	    nv = hip->nverses ;
 	} /* end if (bpi_magic) */
@@ -288,7 +287,7 @@ int bpi_count(bpi *op) noex {
 int bpi_getinfo(bpi *op,bpi_info *ip) noex {
 	int		rs ;
 	int		nv = 0 ; /* return-value */
-	if ((rs = bpi_magic(op)) >= 0) {
+	if ((rs = bpi_magic(op)) >= 0) ylikely {
 	    bpihdr	*hip = op->fhip ;
 	    if (ip) {
 		bpi_fmi *fip = op->fmip ;
@@ -308,7 +307,7 @@ int bpi_getinfo(bpi *op,bpi_info *ip) noex {
 int bpi_get(bpi *op,bpi_q *qp) noex {
 	int		rs ;
 	int		vi = 0 ; /* return-value */
-	if ((rs = bpi_magic(op,qp)) >= 0) {
+	if ((rs = bpi_magic(op,qp)) >= 0) ylikely {
 	    /* check for update */
 	    if (op->ncursors == 0) {
 	        rs = bpi_checkupdate(op,0) ;
@@ -323,7 +322,7 @@ int bpi_get(bpi *op,bpi_q *qp) noex {
 
 int bpi_curbegin(bpi *op,bpi_cur *curp) noex {
     	int		rs ;
-	if ((rs = bpi_magic(op,curp)) >= 0) {
+	if ((rs = bpi_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	    op->ncursors += 1 ;
 	} /* end if (bpi_magic) */
@@ -332,7 +331,7 @@ int bpi_curbegin(bpi *op,bpi_cur *curp) noex {
 
 int bpi_curend(bpi *op,bpi_cur *curp) noex {
     	int		rs ;
-	if ((rs = bpi_magic(op,curp)) >= 0) {
+	if ((rs = bpi_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
@@ -343,8 +342,8 @@ int bpi_curend(bpi *op,bpi_cur *curp) noex {
 
 int bpi_curenum(bpi *op,bpi_cur *curp,bpi_v *bvep) noex {
 	int		rs ;
-	if ((rs = bpi_magic(op,curp,bvep)) >= 0) {
-	   bpihdr	*hip = op->fhip ;
+	if ((rs = bpi_magic(op,curp,bvep)) >= 0) ylikely {
+	    bpihdr	*hip = op->fhip ;
 	    rs = SR_INVALID ;
 	    if (op->ncursors > 0) {
 		int	vi = (curp->i < 0) ? 0 : (curp->i + 1) ;
@@ -366,7 +365,7 @@ int bpi_curenum(bpi *op,bpi_cur *curp,bpi_v *bvep) noex {
 local int bpi_loadbegin(bpi *op,time_t daytime) noex {
 	int		rs ;
 	int		nv = 0 ; /* return-value */
-	if ((rs = bpi_mapcreate(op,daytime)) >= 0) {
+	if ((rs = bpi_mapcreate(op,daytime)) >= 0) ylikely {
 	    rs = bpi_proc(op,daytime) ;
 	    nv = rs ;
 	    if (rs < 0) {
@@ -394,9 +393,9 @@ local int bpi_mapcreate(bpi *op,time_t daytime) noex {
     	cnullptr	np{} ;
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (op->fname) {
+	if (op->fname) ylikely {
 	    bpi_fmi	*mip = op->fmip ;
-	    if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) {
+	    if ((rs = u_open(op->fname,O_RDONLY,0666)) >= 0) ylikely {
 	        cint	fd = rs ;
 	        if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	            csize	fsize = size_t(sb.st_size) ;
@@ -462,9 +461,9 @@ local int bpi_checkupdate(bpi *op,time_t dt) noex {
 local int bpi_proc(bpi *op,time_t dt) noex {
 	int		rs = SR_BUGCHECK ;
 	int		nv = 0 ; /* return-value */
-	if (bpi_fmi *mip = op->fmip ; mip) {
+	if (bpi_fmi *mip = op->fmip ; mip) ylikely {
 	    cint msz = intconv(mip->mapsize) ;
-	    if (bpihdr *hip = op->fhip ; hip) {
+	    if (bpihdr *hip = op->fhip ; hip) ylikely {
 	        if ((rs = hip->wr(mip->mapdata,msz)) >= 0) {
 	            if ((rs = bpi_verify(op,dt)) >= 0) {
 	                nv = hip->nverses ;
@@ -478,8 +477,8 @@ local int bpi_proc(bpi *op,time_t dt) noex {
 
 local int bpi_verify(bpi *op,time_t dt) noex {
 	int		rs = SR_BUGCHECK ;
-	if (bpi_fmi *mip = op->fmip ; mip) {
-	    if (bpihdr *hip = op->fhip ; hip) {
+	if (bpi_fmi *mip = op->fmip ; mip) ylikely {
+	    if (bpihdr *hip = op->fhip ; hip) ylikely {
 		cuint	utime = uint(dt) ;
 		cuint	msz = uintconv(mip->mapsize) ;
 		cint	si = SHIFTINT ;
@@ -507,8 +506,8 @@ local int bpi_verify(bpi *op,time_t dt) noex {
 
 local int bpi_auditvt(bpi *op) noex {
 	int		rs = SR_BUGCHECK ;
-	if (bpi_fmi *mip = op->fmip ; mip) {
-	    if (bpihdr *hip = op->fhip ; hip) {
+	if (bpi_fmi *mip = op->fmip ; mip) ylikely {
+	    if (bpihdr *hip = op->fhip ; hip) ylikely {
 	        uint	(*vt)[1] = mip->vt ;
 	        uint	pcitcmpval = 0 ;
 		int	vilen = int(hip->vilen) ;
@@ -586,7 +585,7 @@ local uint mkciteload(uint ci,uchar item) noex {
 
 local int mkcitekey(uint *cip,bpi_q *bvp) noex {
     	int		rs = SR_BUGCHECK ;
-	if (cip && bvp) {
+	if (cip && bvp) ylikely {
 	    uint	ci = 0 ;
 	    rs = SR_OK ;
 	    ci = mkciteload(ci,bvp->b) ;
