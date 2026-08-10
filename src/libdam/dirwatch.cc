@@ -373,7 +373,7 @@ int dirwatch_curenum(DW *op,DW_CUR *curp,DW_ENT *dep,char *rbuf,int rlen) noex {
 } /* end subroutine (dirwatch_curenum) */
 
 /* enumerate those entries that are "checkable" */
-int dirwatch_curenumcheck(DW *op,DW_CUR *curp,DW_ENT *dep,
+int dirwatch_curenumck(DW *op,DW_CUR *curp,DW_ENT *dep,
 		char *rbuf,int rlen) noex {
 	int		rs ;
 	int		i = 0 ; /* return-value */
@@ -406,7 +406,7 @@ int dirwatch_curenumcheck(DW *op,DW_CUR *curp,DW_ENT *dep,
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
-} /* end subroutine (dirwatch_enumcheckable) */
+} /* end subroutine (dirwatch_curenumck) */
 
 int dirwatch_del(DW *op,DW_CUR *curp) noex {
 	int		rs ;
