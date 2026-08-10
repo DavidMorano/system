@@ -308,21 +308,6 @@ int sysvar_close(SV *op) noex {
 	return rs ;
 } /* end subroutine (sysvar_close) */
 
-int sysvar_audit(SV *op) noex {
-	int		rs ;
-	if ((rs = sysvar_magic(op)) >= 0) ylikely {
-	    sysvar_calls	*callp = callsp(op->callp) ;
-	    rs = SR_NOSYS ;
-	    if (op->fl.defaults) {
-	        rs = vecstr_audit(op->dlp) ;
-	    } else if (callp->audit) {
-		cauto co = callp->audit ;
-	        rs = co(op->obj) ;
-	    }
-	} /* end if (magic) */
-	return rs ;
-} /* end subroutine (sysvar_audit) */
-
 int sysvar_count(SV *op) noex {
 	int		rs ;
 	if ((rs = sysvar_magic(op)) >= 0) ylikely {
@@ -370,6 +355,26 @@ int sysvar_curend(SV *op,sysvar_cur *curp) noex {
 	return rs ;
 } /* end subroutine (sysvar_curend) */
 
+int sysvar_curenum(SV *op,SV_CUR *curp,char *kbuf,int klen,
+		char *vbuf,int vlen) noex {
+	int		rs ;
+	if ((rs = sysvar_magic(op,curp,kbuf)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magval == SYSVAR_MAGIC) {
+		sysvar_calls	*callp = callsp(op->callp) ;
+		rs = SR_NOSYS ;
+	        if (op->fl.defaults) {
+		    SV_DC	*dcurp = (SV_DC *) curp->scp ;
+	            rs = sysvar_defenum(op,dcurp,kbuf,klen,vbuf,vlen) ;
+	        } else if (callp->curenum) {
+		    cauto co = callp->curenum ;
+	            rs = co(op->obj,curp->scp,kbuf,klen,vbuf,vlen) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
+	return rs ;
+} /* end subroutine (sysvar_curenum) */
+
 int sysvar_fetch(SV *op,cchar *kp,int kl,SV_CUR *curp,
 		char *vbuf,int vlen) noex {
 	int		rs ;
@@ -390,25 +395,20 @@ int sysvar_fetch(SV *op,cchar *kp,int kl,SV_CUR *curp,
 	return rs ;
 } /* end subroutine (sysvar_fetch) */
 
-int sysvar_curenum(SV *op,SV_CUR *curp,char *kbuf,int klen,
-		char *vbuf,int vlen) noex {
+int sysvar_audit(SV *op) noex {
 	int		rs ;
-	if ((rs = sysvar_magic(op,curp,kbuf)) >= 0) {
-	    rs = SR_NOTOPEN ;
-	    if (curp->magval == SYSVAR_MAGIC) {
-		sysvar_calls	*callp = callsp(op->callp) ;
-		rs = SR_NOSYS ;
-	        if (op->fl.defaults) {
-		    SV_DC	*dcurp = (SV_DC *) curp->scp ;
-	            rs = sysvar_defenum(op,dcurp,kbuf,klen,vbuf,vlen) ;
-	        } else if (callp->curenum) {
-		    cauto co = callp->curenum ;
-	            rs = co(op->obj,curp->scp,kbuf,klen,vbuf,vlen) ;
-	        }
-	    } /* end if (valid) */
+	if ((rs = sysvar_magic(op)) >= 0) ylikely {
+	    sysvar_calls	*callp = callsp(op->callp) ;
+	    rs = SR_NOSYS ;
+	    if (op->fl.defaults) {
+	        rs = vecstr_audit(op->dlp) ;
+	    } else if (callp->audit) {
+		cauto co = callp->audit ;
+	        rs = co(op->obj) ;
+	    }
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (sysvar_curenum) */
+} /* end subroutine (sysvar_audit) */
 
 
 /* private subroutines */
