@@ -30,34 +30,34 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getusername.h>
-#include	<estrings.h>
-#include	<vecobj.h>
-#include	<sbuf.h>
-#include	<ids.h>
-#include	<vecstr.h>
-#include	<tmtime.hh>
-#include	<fsdir.h>
-#include	<mkdirs.h>
-#include	<mkpathx.h>
-#include	<snx.h>
-#include	<strn.h>
-#include	<strwcpy.h>
-#include	<char.h>
-#include	<isx.h>
-#include	<localmisc.h>		/* |COLUMNS| */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<mkdirs.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
 
 #include	"calmgr.h"
 #include	"calent.h"
@@ -82,7 +82,6 @@ import libutil ;			/* |memclear(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -114,13 +113,14 @@ namespace {
 
 template<typename ... Args>
 local int calmgr_ctor(calmgr *op,Args ... args) noex {
-	cnullptr	np{} ;
     	CALMGR		*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->idxp = new(nothrow) vechand) != np) ylikely {
+	    if ((op->idxp = new(nt) vechand) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
@@ -140,7 +140,7 @@ local int calmgr_dtor(calmgr *op) noex {
 } /* end subroutine (calmgr_dtor) */
 
 template<typename ... Args>
-static inline int calmgr_magic(calmgr *op,Args ... args) noex {
+local inline int calmgr_magic(calmgr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == CALMGR_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -201,8 +201,7 @@ int calmgr_start(calmgr *op,calyears *cyp,int cidx,cchar *dn,cchar *cn) noex {
 	custime		dt = getustime ;
 	int		rs ;
 	if ((rs = calmgr_ctor(op,cyp,dn,cn)) >= 0) {
-	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) {
 	        op->cyp = cyp ; /* parent object */
 	        op->cidx = cidx ; /* parent index */
 	        if ((rs = calmgr_argbegin(op,dn,cn)) >= 0) {
@@ -419,10 +418,10 @@ local int calmgr_dbmaper(calmgr *op,cc *dbuf,time_t dt) noex {
             cint        fd = rs ;
             if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
                 if (S_ISREG(sb.st_mode)) {
-                    csize       szm = size_t(INT_MAX) ;
+                    csize       msize = size_t(INT_MAX) ;
                     op->fsize = size_t(sb.st_size) ;
                     op->ti_db = sb.st_mtime ;
-                    if (op->fsize <= szm) {
+                    if (op->fsize <= msize) {
                         csize   ms = op->fsize ;
                         cint    mp = PROT_READ ;
                         cint    mf = MAP_SHARED ;
@@ -455,7 +454,7 @@ local int calmgr_dbmapdestroy(calmgr *op) noex {
 	    rs = u_mmapend(md,ms) ;
 	    op->mapdata = nullptr ;
 	    op->mapsize = 0 ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (calmgr_dbmapdestroy) */
 
@@ -498,7 +497,7 @@ local int calmgr_lookyear(calmgr *op,calmgr_q *qp,cyi **cypp) noex {
 	        }
 	    }
 	}
-	if (cypp != nullptr) {
+	if (cypp) {
 	    *cypp = (rs >= 0) ? yip : nullptr ;
 	}
 	return (rs >= 0) ? i : rs ;
@@ -656,8 +655,6 @@ local int calmgr_cyiclose(calmgr *op,calmgr_idx *cip) noex {
 } /* end subroutine (calmgr_cyiclose) */
 
 local int calmgr_mkcyi(calmgr *op,int y) noex {
-	cyimk		cyind ;
-	cyimk_ent	bve ;
 	int		rs ;
 	int		rs1 ;
 	int		of = 0 ;
@@ -666,7 +663,9 @@ local int calmgr_mkcyi(calmgr *op,int y) noex {
 	cmode		om = 0664 ;
 	cchar	*dn = op->idxdname ;
 	cchar	*cn = op->cn ;
+	cyimk		cyind ;
 	if ((rs = cyimk_open(&cyind,y,dn,cn,of,om)) >= 0) ylikely {
+	    cyimk_ent	bve ;
 	    calent	e ;
 	    calcite	q ;
 	    uint	foff = 0 ;
@@ -760,7 +759,6 @@ local int calmgr_mkcyi(calmgr *op,int y) noex {
 	    rs1 = cyimk_close(&cyind) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cyimk) */
-
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (calmgr_mkcyi) */
 
