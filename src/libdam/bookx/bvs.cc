@@ -228,7 +228,7 @@ int bvs_open(bvs *op,cchar *pr,cchar *dbn) noex {
 int bvs_close(bvs *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = bvs_magic(op)) >= 0) {
+	if ((rs = bvs_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (bvs_calls *callp = callsp(op->callp) ; callp) {
 		rs = SR_OK ;
@@ -255,7 +255,7 @@ int bvs_close(bvs *op) noex {
 
 int bvs_count(bvs *op) noex {
 	int		rs ;
-	if ((rs = bvs_magic(op)) >= 0) {
+	if ((rs = bvs_magic(op)) >= 0) ylikely {
 	    bvs_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->count) {
@@ -269,7 +269,7 @@ int bvs_count(bvs *op) noex {
 int bvs_getinfo(bvs *op,bvs_info *ip) noex {
 	int		rs ;
 	int		n = 0 ; /* return-value */
-	if ((rs = bvs_magic(op)) >= 0) {
+	if ((rs = bvs_magic(op)) >= 0) ylikely {
 	    bvses_info	bvsi{} ;
 	    bvs_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
@@ -296,7 +296,7 @@ int bvs_getinfo(bvs *op,bvs_info *ip) noex {
 int bvs_mkmodq(bvs *op,bvs_v *bvep,int mjd) noex {
 	int		rs ;
 	int		n = 0 ; /* return-value */
-	if ((rs = bvs_magic(op)) >= 0) {
+	if ((rs = bvs_magic(op)) >= 0) ylikely {
 	    bvses_v	bv{} ;
 	    bvs_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
@@ -318,7 +318,7 @@ int bvs_mkmodq(bvs *op,bvs_v *bvep,int mjd) noex {
 
 int bvs_audit(bvs *op) noex {
 	int		rs ;
-	if ((rs = bvs_magic(op)) >= 0) {
+	if ((rs = bvs_magic(op)) >= 0) ylikely {
 	    bvs_calls	*callp = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (callp->audit) {
