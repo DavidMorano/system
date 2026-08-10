@@ -42,7 +42,7 @@ extern int mailmsgatt_start(mailmsgatt *) noex ;
 extern int mailmsgatt_finish(mailmsgatt *) noex ;
 extern int mailmsgatt_add(mailmsgatt *,cchar *,cchar *,cchar *,int) noex ;
 extern int mailmsgatt_count(mailmsgatt *) noex ;
-extern int mailmsgatt_enum(mailmsgatt *,int,mailmsgattent **) noex ;
+extern int mailmsgatt_curenum(mailmsgatt *,int,mailmsgattent **) noex ;
 extern int mailmsgatt_typeatts(mailmsgatt *,mimetypes *) noex ;
 
 EXTERNC_end
