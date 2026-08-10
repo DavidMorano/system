@@ -94,7 +94,7 @@ extern int dirwatch_curbegin	(dirwatch *,dirwatch_cur *) noex ;
 extern int dirwatch_curend	(dirwatch *,dirwatch_cur *) noex ;
 extern int dirwatch_curenum	(dirwatch *,dirwatch_cur *,dirwatch_ent *,
 					char *,int) noex ;
-extern int dirwatch_curenumcheck(dirwatch *,dirwatch_cur *,dirwatch_ent *,
+extern int dirwatch_curenumck	(dirwatch *,dirwatch_cur *,dirwatch_ent *,
 					char *,int) noex ;
 extern int dirwatch_state	(dirwatch *,int,int) noex ;
 
