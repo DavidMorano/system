@@ -43,13 +43,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sbuf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 
@@ -85,7 +85,7 @@
 
 int mkfingerquery(char *qbuf,int qlen,int f_long,cchar *up,mainv av) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (qbuf && up) ylikely {
 	    rs = SR_INVALID ;
 	    if (qlen > 0) ylikely {
@@ -110,7 +110,6 @@ int mkfingerquery(char *qbuf,int qlen,int f_long,cchar *up,mainv av) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkfingerquery) */
+} /* end subroutine (mkfingerquery) */
 
 
