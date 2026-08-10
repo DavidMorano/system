@@ -30,13 +30,15 @@
 
 
 #define	VAR		struct var_head
+#define	VAR_FL		struct var_flags
 #define	VAR_CUR		struct var_cursor
 #define	VAR_INFO	struct var_information
-#define	VAR_CALLS	struct var_callsubs
 #define	VAR_MAGIC	0x99447246
 
-#define	VARINFO_DAT	struct varinfo_data
 
+struct var_flags {
+    	uint		modload:1 ;
+} ; /* end struct (var_flags) */
 
 struct var_information {
 	time_t		wtime ;
@@ -50,46 +52,24 @@ struct var_cursor {
 	uint		magval ;
 } ; /* end struct */
 
-EXTERNC_begin
-    struct var_callsubs {
-	int	(*open)(void *,cchar *) noex ;
-	int	(*opena)(void *,cchar **) noex ;
-	int	(*count)(void *) noex ;
-	int	(*curbegin)(void *,void *) noex ;
-	int	(*fetch)(void *,cchar *,int,void *,char *,int) noex ;
-	int	(*enumerate)(void *,void *,char *,int,char *,int) noex ;
-	int	(*curend)(void *,void *) noex ;
-	int	(*info)(void *,VARS_INFO *) noex ;
-	int	(*audit)(void *) noex ;
-	int	(*close)(void *) noex ;
-    } ; /* end struct (var_callsubs) */
-EXTERNC_end
-
 struct var_head {
-	modload		loader ;
-	VAR_CALLS	call ;
+	modload		*mlp ;		/* module-load-pointer */
+	void		*callp ;	/* */
 	void		*obj ;		/* object pointer */
+	VAR_FL		fl ;
 	uint		magval ;
 	int		objsz ;		/* object size */
 	int		cursz ;		/* cursor size */
 } ; /* end struct */
 
-struct varinfo_data {
-	size_t		sz ;
-	time_t		mtime ;
-} ; /* end struct */
-
 typedef	VAR		var ;
+typedef VAR_FL		var_fl ;
 typedef VAR_CUR		var_cur ;
 typedef VAR_INFO	var_info ;
-typedef VAR_CALLS	var_calls ;
-
-typedef VARINFO_DAT	varinfo_dat ;
 
 EXTERNC_begin
 
 extern int	var_open(var *,cchar *) noex ;
-extern int	var_opena(var *,mainv) noex ;
 extern int	var_count(var *) noex ;
 extern int	var_curbegin(var *,var_cur *) noex ;
 extern int	var_fetch(var *,cchar *,int,var_cur *,char *,int) noex ;
@@ -99,8 +79,10 @@ extern int	var_getinfo(var *,var_info *) noex ;
 extern int	var_audit(var *) noex ;
 extern int	var_close(var *) noex ;
 
+#ifdef	COMMENT
 extern int	varinfo_get(varinfo_dat *,cchar *,int) noex ;
 extern int	varunlink(cchar *,int) noex ;
+#endif
 
 EXTERNC_end
 
