@@ -30,14 +30,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<cstring>		/* |strlcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bufsizevar.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<cstring>		/* CSTD |strlcpy(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mknpathx.h"
 
@@ -89,33 +89,27 @@ static maxpather	getrlen ;
 
 int mknpath1(char *pp,int pl,cc *s1) noex {
 	return mknpathx(pp,pl,1,s1) ;
-}
-/* end subroutine (mknpath1) */
+} /* end subroutine (mknpath1) */
 
 int mknpath2(char *pp,int pl,cc *s1,cc *s2) noex {
 	return mknpathx(pp,pl,2,s1,s2) ;
-}
-/* end subroutine (mknpath2) */
+} /* end subroutine (mknpath2) */
 
 int mknpath3(char *pp,int pl,cc *s1,cc *s2,cc *s3) noex {
 	return mknpathx(pp,pl,3,s1,s2,s3) ;
-}
-/* end subroutine (mknpath3) */
+} /* end subroutine (mknpath3) */
 
 int mknpath4(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4) noex {
 	return mknpathx(pp,pl,4,s1,s2,s3,s4) ;
-}
-/* end subroutine (mknpath4) */
+} /* end subroutine (mknpath4) */
 
 int mknpath5(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
 	return mknpathx(pp,pl,5,s1,s2,s3,s4,s5) ;
-}
-/* end subroutine (mknpath5) */
+} /* end subroutine (mknpath5) */
 
 int mknpath6(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 	return mknpathx(pp,pl,6,s1,s2,s3,s4,s5,s6) ;
-}
-/* end subroutine (mknpath5) */
+} /* end subroutine (mknpath5) */
 
 int mknpathx(char *pbuf,int plen,int n,...) noex {
 	va_list		ap ;
@@ -154,8 +148,7 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	    pl = intconv(bp - pbuf) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (mknpathx) */
+} /* end subroutine (mknpathx) */
 
 
 /* local subroutines */
