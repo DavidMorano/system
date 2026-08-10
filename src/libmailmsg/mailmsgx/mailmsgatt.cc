@@ -153,14 +153,14 @@ int mailmsgatt_count(mailmsgatt *op) noex {
 /* end subroutine (mailmsgatt_count) */
 
 /* enumerate */
-int mailmsgatt_enum(mailmsgatt *op,int i,mailmsgattent **epp) noex {
+int mailmsgatt_curenum(mailmsgatt *op,int i,mailmsgattent **epp) noex {
 	int		rs = SR_FAULT ;
 	if (op && epp) {
 	    rs = vecitem_get(op,i,epp) ;
 	}
 	return rs ;
 }
-/* end subroutine (mailmsgatt_enum) */
+/* end subroutine (mailmsgatt_curenum) */
 
 /* find content types for all of the mailmsgattments using a MIME-types DB */
 int mailmsgatt_typeatts(mailmsgatt *op,MIMETYPES *mtp) noex {
@@ -168,7 +168,7 @@ int mailmsgatt_typeatts(mailmsgatt *op,MIMETYPES *mtp) noex {
 	if (op && mtp) {
 	    mailmsgattent	*ep ;
 	    rs = SR_OK ;
-	    for (int i = 0 ; mailmsgatt_enum(op,i,&ep) >= 0 ; i += 1) {
+	    for (int i = 0 ; mailmsgatt_curenum(op,i,&ep) >= 0 ; i += 1) {
 	        if (ep) {
 	            rs = mailmsgattent_type(ep,mtp) ;
 	            if (rs < 0) break ;
