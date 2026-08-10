@@ -47,13 +47,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bufsizevar.hh>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mksofname.h"
 
@@ -117,7 +117,6 @@ int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mksofname) */
+} /* end subroutine (mksofname) */
 
 
