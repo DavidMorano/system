@@ -1,10 +1,8 @@
-/* txtindex */
+/* txtindex SUPPORT */
 
 /* interface to the TXTINDEXES loadable object */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -17,28 +15,25 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that provides
-	access to the TXTINDEX object (which is dynamically loaded).
-
+	This module implements an interface (a trivial one) that
+	provides access to the TXTINDEX object (which is dynamically
+	loaded).
 
 *******************************************************************************/
 
-
-#define	TXTINDEX_MASTER		1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"txtindex.h"
 #include	"txtindexes.h"
@@ -63,54 +58,23 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	txtindex_objloadbegin(TXTINDEX *,const char *,const char *) ;
-static int	txtindex_objloadend(TXTINDEX *) ;
-static int	txtindex_loadcalls(TXTINDEX *,const char *) ;
+local int	txtindex_objloadbegin(TXTINDEX *,cchar *,cchar *) ;
+local int	txtindex_objloadend(TXTINDEX *) ;
+local int	txtindex_loadcalls(TXTINDEX *,cchar *) ;
 
-static int	isrequired(int) ;
+local bool	isrequired(int) noex ;
 
 
 /* external variables */
 
 
 /* local variables */
-
-static const char	*subs[] = {
-	"open",
-	"count",
-	"neigen",
-	"info",
-	"iseigen",
-	"curbegin",
-	"lookup",
-	"read",
-	"curend",
-	"audit",
-	"close",
-	NULL
-} ;
 
 enum subs {
 	sub_open,
@@ -119,12 +83,29 @@ enum subs {
 	sub_info,
 	sub_iseigen,
 	sub_curbegin,
-	sub_lookup,
-	sub_enum,
+	sub_curenum,
 	sub_curend,
+	sub_lookup,
+	sub_read,
 	sub_audit,
 	sub_close,
 	sub_overlast
+} ; /* end enum */
+
+constexpr cpcchar	subs[] = {
+	"open",
+	"count",
+	"neigen",
+	"info",
+	"iseigen",
+	"curbegin",
+	"curenum",
+	"curend",
+	"lookup",
+	"read",
+	"audit",
+	"close",
+	nullptr
 } ;
 
 
@@ -134,15 +115,15 @@ enum subs {
 int txtindex_open(TXTINDEX *op,cchar pr[],cchar dbname[])
 {
 	int		rs ;
-	const char	*objname = TXTINDEX_OBJNAME ;
+	cchar	*objname = TXTINDEX_OBJNAME ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("txtindex_open: ent dbname=%s\n",dbname) ;
 #endif
 
@@ -156,7 +137,7 @@ int txtindex_open(TXTINDEX *op,cchar pr[],cchar dbname[])
 		txtindex_objloadend(op) ;
 	} /* end if (txtindex_objloadbegin) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("txtindex_open: ret rs=%d\n",rs) ;
 #endif
 
@@ -171,7 +152,7 @@ int txtindex_close(TXTINDEX *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 
@@ -191,11 +172,11 @@ int txtindex_audit(TXTINDEX *op)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.audit != NULL) {
+	if (op->call.audit != nullptr) {
 	    rs = (*op->call.audit)(op->obj) ;
 	}
 
@@ -208,11 +189,11 @@ int txtindex_count(TXTINDEX *op)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.count != NULL) {
+	if (op->call.count != nullptr) {
 	    rs = (*op->call.count)(op->obj) ;
 	}
 
@@ -225,11 +206,11 @@ int txtindex_neigen(TXTINDEX *op)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.neigen != NULL) {
+	if (op->call.neigen != nullptr) {
 	    rs = (*op->call.neigen)(op->obj) ;
 	}
 
@@ -242,11 +223,11 @@ int txtindex_info(TXTINDEX *op,TXTINDEX_INFO *ip)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.info != NULL) {
+	if (op->call.info != nullptr) {
 	    rs = (*op->call.info)(op->obj,ip) ;
 	}
 
@@ -259,14 +240,14 @@ int txtindex_curbegin(TXTINDEX *op,TXTINDEX_CUR *curp)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 
 	memset(curp,0,sizeof(TXTINDEX_CUR)) ;
 
-	if (op->call.curbegin != NULL) {
+	if (op->call.curbegin != nullptr) {
 	    void	*p ;
 	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
 		curp->scp = p ;
@@ -275,7 +256,7 @@ int txtindex_curbegin(TXTINDEX *op,TXTINDEX_CUR *curp)
 		}
 	        if (rs < 0) {
 	    	    uc_free(curp->scp) ;
-	    	    curp->scp = NULL ;
+	    	    curp->scp = nullptr ;
 		}
 	    } /* end if (m-a) */
 	} else
@@ -291,22 +272,22 @@ int txtindex_curend(TXTINDEX *op,TXTINDEX_CUR *curp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->scp == NULL) return SR_NOTSOCK ;
+	if (curp->scp == nullptr) return SR_NOTSOCK ;
 
-	if (op->call.curend != NULL) {
+	if (op->call.curend != nullptr) {
 	    rs1 = (*op->call.curend)(op->obj,curp->scp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	rs1 = uc_free(curp->scp) ;
 	if (rs >= 0) rs = rs1 ;
-	curp->scp = NULL ;
+	curp->scp = nullptr ;
 
 	curp->magic = 0 ;
 	return rs ;
@@ -319,9 +300,9 @@ int txtindex_lookup(TXTINDEX *op,TXTINDEX_CUR *curp,cchar **klp)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (klp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (klp == nullptr) return SR_FAULT ;
 
 	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
@@ -338,13 +319,13 @@ int txtindex_read(TXTINDEX *op,TXTINDEX_CUR *curp,TXTINDEX_TAG *tagp)
 {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != TXTINDEX_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.read != NULL) {
+	if (op->call.read != nullptr) {
 	    rs = (*op->call.read)(op->obj,curp->scp,tagp) ;
 	}
 
@@ -357,7 +338,7 @@ int txtindex_read(TXTINDEX *op,TXTINDEX_CUR *curp,TXTINDEX_TAG *tagp)
 
 
 /* find and load the DB-access object */
-static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
+local int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
@@ -366,7 +347,7 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 	int		rs ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("txtindex_objloadbegin: pr=%s\n",pr) ;
 	debugprintf("txtindex_objloadbegin: objname=%s\n",objname) ;
 #endif
@@ -377,7 +358,7 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 	    int		f_modload = FALSE ;
 	    char	nbuf[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;
@@ -387,9 +368,9 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 	    } /* end for */
 
 	    if (rs >= 0) {
-		const char	**sv ;
+		cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const char	*modbname = TXTINDEX_MODBNAME ;
+	            cchar	*modbname = TXTINDEX_MODBNAME ;
 	            int	mo = (MODLOAD_OLIBVAR | MODLOAD_OPRS | MODLOAD_OSDIRS) ;
 	            rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
 		    f_modload = (rs >= 0) ;
@@ -402,7 +383,7 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 		modload_close(lp) ;
 	} /* end if (vecstr) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("txtindex_objloadbegin: modload_open() rs=%d\n",rs) ;
 #endif
 
@@ -411,7 +392,7 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 	    if ((rs = modload_getmva(lp,mv,2)) >= 0) {
 		void	*p ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 		debugprintf("txtindex_objloadbegin: getmv rs=%d\n",rs) ;
 #endif
 
@@ -420,12 +401,12 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 		if ((rs = uc_malloc(op->objsize,&p)) >= 0) {
 		    op->obj = p ;
 		    rs = txtindex_loadcalls(op,objname) ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 		debugprintf("txtindex_objloadbegin: calls rs=%d\n",rs) ;
 #endif
 		    if (rs < 0) {
 			uc_free(op->obj) ;
-			op->obj = NULL ;
+			op->obj = nullptr ;
 		    }
 		} /* end if (memory-allocation) */
 	    } /* end if (modload_getmva) */
@@ -433,7 +414,7 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 		modload_close(lp) ;
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("txtindex_objloadbegin: ret rs=%d\n",rs) ;
 #endif
 
@@ -442,15 +423,15 @@ static int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 /* end subroutine (txtindex_objloadbegin) */
 
 
-static int txtindex_objloadend(TXTINDEX *op)
+local int txtindex_objloadend(TXTINDEX *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj != nullptr) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
 	rs1 = modload_close(&op->loader) ;
@@ -461,7 +442,7 @@ static int txtindex_objloadend(TXTINDEX *op)
 /* end subroutine (txtindex_objloadend) */
 
 
-static int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
+local int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
 {
 	MODLOAD		*lp = &op->loader ;
 	const int	nlen = SYMNAMELEN ;
@@ -471,31 +452,31 @@ static int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
 	char		nbuf[SYMNAMELEN + 1] ;
 	const void	*snp ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = NULL ;
+		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
 		}
 	    }
 
 	    if (rs < 0) break ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("txtindex_loadcalls: call=%s %c\n",
 		subs[i],
-		((snp != NULL) ? 'Y' : 'N')) ;
+		((snp != nullptr) ? 'Y' : 'N')) ;
 #endif
 
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 
 	        c += 1 ;
 		switch (i) {
 
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *)) snp ;
+			(int (*)(void *,cchar *)) snp ;
 		    break ;
 
 		case sub_count:
@@ -511,7 +492,7 @@ static int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
 		    break ;
 
 		case sub_iseigen:
-		    op->call.iseigen = (int (*)(void *,const char *,int)) snp ;
+		    op->call.iseigen = (int (*)(void *,cchar *,int)) snp ;
 		    break ;
 
 		case sub_curbegin:
@@ -521,10 +502,10 @@ static int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
 
 		case sub_lookup:
 		    op->call.lookup = 
-			(int (*)(void *,void *,const char **)) snp ;
+			(int (*)(void *,void *,cchar **)) snp ;
 		    break ;
 
-		case sub_enum:
+		case sub_curenum:
 		    op->call.read = 
 			(int (*)(void *,void *,TIS_TAG *)) snp ;
 		    break ;
@@ -552,26 +533,21 @@ static int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
 }
 /* end subroutine (txtindex_loadcalls) */
 
-
-static int isrequired(int i)
-{
+local bool isrequired(int i) noex {
 	int		f = FALSE ;
-
 	switch (i) {
 	case sub_open:
 	case sub_neigen:
 	case sub_iseigen:
 	case sub_curbegin:
-	case sub_lookup:
-	case sub_enum:
+	case sub_curenum:
 	case sub_curend:
+	case sub_lookup:
 	case sub_close:
 	    f = TRUE ;
 	    break ;
 	} /* end switch */
-
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
