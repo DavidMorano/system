@@ -119,6 +119,10 @@ extern int	cyi_close(cyi *) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+extern const cyi_obj	cyi_modinfo = {
+#endif /* __cplusplus */
+
 
 #endif /* CYI_INCLUDE */
 
