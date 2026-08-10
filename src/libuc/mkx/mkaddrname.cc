@@ -54,15 +54,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sfx.h>			/* |shshrink(3uc)| */
-#include	<snwcpy.h>
-#include	<ema.h>
-#include	<isoneof.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC |shshrink(3uc)| */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<ema.h>			/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 
@@ -100,7 +100,7 @@ enum atypes {
 	atype_address,
 	atype_route,
 	atype_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward references */
@@ -116,7 +116,7 @@ static constexpr int	rsbadaddr[] = {
 	SR_INVALID,
 	SR_DOM,
 	0
-} ;
+} ; /* end array */
 
 constexpr bool		f_massage = CF_MASSAGE ;
 
@@ -138,8 +138,8 @@ int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
 	    if (sl > 0)  ylikely {
 	        if (ema a ; (rs = a.start) >= 0) ylikely {
 	            if ((rs = a.parse(sp,sl)) >= 0) ylikely {
-	        	ema_ent		*ep{} ;
-			cauto		eg = ema_get ;
+	        	ema_ent	*ep{} ;
+			cauto	eg = ema_get ;
 		        for (int i = 0 ; (rs1 = eg(&a,i,&ep)) >= 0 ; i += 1) {
 		            rs = emaentry_addrname(ep,fbuf,flen) ;
 	                    len = rs ;
@@ -155,8 +155,7 @@ int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
 	    } /* end if (non-zero source) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkaddrname) */
+} /* end subroutine (mkaddrname) */
 
 
 /* local subroutines */
