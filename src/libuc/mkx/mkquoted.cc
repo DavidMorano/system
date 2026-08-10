@@ -56,19 +56,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<sbuf.h>
-#include	<snwcpy.h>
-#include	<ascii.h>
-#include	<six.h>			/* |siterm(3uc)| */
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC |siterm(3uc)| */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkquoted.h"
 
@@ -119,10 +119,8 @@ namespace {
 
 /* local variables */
 
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
-constexpr cchar		qchars[] = "\"\\$`" ;
-
+constexpr int		termsize	= ((UCHAR_MAX+1)/CHAR_BIT) ;
+constexpr cchar		qchars[]	= "\"\\$`" ;
 static char		qterms[termsize] ;
 
 
@@ -141,8 +139,7 @@ int mkquoted(char *qbuf,int qlen,cchar *abuf,int alen) noex {
 	    } /* end if (fieldterms) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkquoted) */
+} /* end subroutine (mkquoted) */
 
 
 /* local subroutines */
