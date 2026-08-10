@@ -42,7 +42,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<uclibmem.h>		/* LIBUC */
+#include	<ucmem.h>		/* LIBUC */
 #include	<getnodename.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<nulstr.h>		/* LIBUC */
@@ -83,6 +83,26 @@ import libutil ;			/* |memclear(3u)| */
 #endif
 
 
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
+extern "C" {
+    typedef int	(*soopen_f)	(void *,cchar *) noex ;
+    typedef int	(*socount_f)	(void *) noex ;
+    typedef int	(*socurbegin_f)	(void *,void *) noex ;
+    typedef int	(*socurenum_f)	(void *,void *,char *,int,char *,int) noex ;
+    typedef int	(*socurend_f)	(void *,void *) noex ;
+    typedef int	(*sofetch_f)	(void *,cchar *,int,void *,char *,int) noex ;
+    typedef int	(*sogetinfo_f)	(void *,VARS_INFO *) noex ;
+    typedef int	(*soaudit_f)	(void *) noex ;
+    typedef int	(*soclose_f)	(void *) noex ;
+} /* end extern (C) */
+
+
 /* external subroutines */
 
 
@@ -91,12 +111,76 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local structures */
 
+struct var_calls {
+    soopen_f		open ;
+    socount_f		count ;
+    socurbegin_f	curbegin ;
+    socurend_f		curend ;
+    socurenum_f		curenum ;
+    sofetch_f		fetch ;
+    sogetinfo_f		getinfo ;
+    soaudit_f		audit ;
+    soclose_f		close ;
+} ; /* end struct (var) */
+
+typedef var_calls *	callsp ;
+
 
 /* forward references */
 
-local int	var_objloadbegin(VAR *,cchar *) noex ;
+template<typename ... Args>
+local int var_ctor(var *op,Args ... args) noex {
+	VAR		*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->mlp = new(nt) modload) != np) ylikely {
+		var_calls    *callp ;
+                if ((callp = new(nt) var_calls) != np) ylikely {
+                    op->callp = callp ;
+                    rs = SR_OK ;
+                } /* end if (new-var_calls) */
+                if (rs < 0) {
+                    delete op->mlp ;
+                    op->mlp = nullptr ;
+                } /* end if (error) */
+	    } /* end if (new-modload) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (var_ctor) */
+
+local int var_dtor(var *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+            if (op->callp) ylikely {
+                var_calls    *callp = callsp(op->callp) ;
+                delete callp ;
+                op->callp = nullptr ;
+            }
+	    if (op->mlp) ylikely {
+		delete op->mlp ;
+		op->mlp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (var_dtor) */
+
+template<typename ... Args>
+local inline int var_magic(var *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == VAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (var_magic) */
+
+local int	var_objloadbegin(VAR *,cchar *,cchar *) noex ;
 local int	var_objloadend(VAR *) noex ;
-local int	var_loadcalls(VAR *,cchar *) noex ;
+local int	var_loadcalls(VAR *,vecstr *) noex ;
 
 local bool	isrequired(int) noex ;
 
@@ -113,13 +197,13 @@ enum subs {
 	sub_curenum,
 	sub_curend,
 	sub_fetch,
-	sub_info,
+	sub_getinfo,
 	sub_audit,
 	sub_close,
 	sub_overlast
 } ; /* end enum (subs) */
 
-constexpr cpcchar	subs[] = {
+constexpr cpcchar	subnames[] = {
 	"open",
 	"count",
 	"curbegin",
@@ -139,423 +223,293 @@ constexpr cpcchar	subs[] = {
 /* exported subroutines */
 
 int var_open(VAR *op,cchar *dbname) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	cchar		*objname = VAR_OBJNAME ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (dbname == nullptr) return SR_FAULT ;
-
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
-	if ((rs = var_objloadbegin(op,objname)) >= 0) {
-	    if ((rs = (*op->call.open)(op->obj,dbname)) >= 0) {
-		op->magval = VAR_MAGIC ;
-	    }
+	if ((rs = var_ctor(op,dbname)) >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if (dbname[0]) {
+	        if ((rs = var_objloadbegin(op,np,objname)) >= 0) {
+                    var_calls *callp = resumelife<var_calls>(op->callp) ;
+                    if ((rs = callp->open(op->obj,dbname)) >= 0) {
+                        op->magval = VAR_MAGIC ;
+                    }
+	            if (rs < 0) {
+		        var_objloadend(op) ;
+	            }
+	        } /* end if (var_objloadbegin) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-		var_objloadend(op) ;
-	    }
-	} /* end if (objloadbegin) */
-
+		var_dtor(op) ;
+	    } /* end if (error) */
+	} /* end if (var_ctor) */
 	return rs ;
-}
-/* end subroutine (var_open) */
-
-int var_opena(VAR *op,cchar **narr) noex {
-	int		rs ;
-	cchar	*objname = VAR_OBJNAME ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (narr == nullptr) return SR_FAULT ;
-
-	if (narr[0] == nullptr) return SR_INVALID ;
-	if (narr[0][0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
-	if ((rs = var_objloadbegin(op,objname)) >= 0) {
-	    int	i ;
-	    for (i = 0 ; narr[i] != nullptr ; i += 1) {
-	        rs = (*op->call.open)(op->obj,narr[i]) ;
-	        if ((rs >= 0) || (! isNotPresent(rs))) break ;
-	    } /* end for */
-	    if (rs >= 0) {
-		op->magval = VAR_MAGIC ;
-	    }
-	    if (rs < 0)
-		var_objloadend(op) ;
-	} /* end if (objloadbegin) */
-
-	return rs ;
-}
-/* end subroutine (var_opena) */
+} /* end subroutine (var_open) */
 
 int var_close(VAR *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = (*op->call.close)(op->obj) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = var_objloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magval = 0 ;
-	return rs ;
-}
-/* end subroutine (var_close) */
-
-int var_getinfo(VAR *op,VAR_INFO *vip) noex {
-	VARS_INFO	vsi ;
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (vip == nullptr) return SR_FAULT ;
-
-	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
-
-	memclear(vip) ;
-
-	if (op->call.info != nullptr) {
-	    if ((rs = (*op->call.info)(op->obj,&vsi)) >= 0) {
-		vip->wtime = vsi.wtime ;
-		vip->mtime = vsi.mtime ;
-		vip->nvars = vsi.nvars ;
-		vip->nskip = vsi.nskip ;
-	    }
-	} /* end if */
-
-	return rs ;
-}
-/* end subroutine (var_info) */
-
-int var_audit(VAR *op) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.audit != nullptr) {
-	    rs = (*op->call.audit)(op->obj) ;
-	}
-
-	return rs ;
-}
-/* end subroutine (var_audit) */
-
-int var_count(VAR *op) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.count != nullptr) {
-	    rs = (*op->call.count)(op->obj) ;
-	}
-
-	return rs ;
-}
-/* end subroutine (var_count) */
-
-int var_curbegin(VAR *op,VAR_CUR *curp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
-
-	memclear(curp) ;
-
-	if (op->call.curbegin != nullptr) {
-	    if (void *vp ; (rs = uc_malloc(op->cursz,&vp)) >= 0) {
-		curp->scp = vp ;
-	        if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
-	            curp->magval = VAR_MAGIC ;
-		}
-	        if (rs < 0) {
-	            uc_free(curp->scp) ;
-	            curp->scp = nullptr ;
-	        }
-	    } /* end if (memory-allocation) */
-	} else {
-	    rs = SR_NOSYS ;
-	}
-	return rs ;
-}
-/* end subroutine (var_curbegin) */
-
-int var_curend(VAR *op,VAR_CUR *curp) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
-	if (curp->magval != VAR_MAGIC) return SR_NOTOPEN ;
-
-	if (curp->scp != nullptr) {
-	    if (op->call.curend != nullptr) {
-	        rs1 = (*op->call.curend)(op->obj,curp->scp) ;
+	if ((rs = var_magic(op)) >= 0) ylikely {
+	    {
+                var_calls *callp = resumelife<var_calls>(op->callp) ;
+	        rs1 = callp->close(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } else {
-	        rs = SR_NOSYS ;
 	    }
 	    {
-	        rs1 = uc_free(curp->scp) ;
+	        rs1 = var_objloadend(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	        curp->scp = nullptr ;
 	    }
-	} else {
-	    rs = SR_NOANODE ;
-	}
-
-	curp->magval = 0 ;
+	    {
+		rs1 = var_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
+	} /* end if (var_magic) */
 	return rs ;
-}
-/* end subroutine (var_curend) */
+} /* end subroutine (var_close) */
 
-int var_fetch(VAR *op,cc *kp,int kl,VAR_CUR *curp,char *vbuf,int vlen) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (kp == nullptr) return SR_FAULT ;
-
-	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
-	if (curp->magval != VAR_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.fetch != nullptr) {
-	    rs = (*op->call.fetch)(op->obj,kp,kl,curp->scp,vbuf,vlen) ;
-	}
-
+int var_getinfo(VAR *op,VAR_INFO *vip) noex {
+	int		rs ;
+	if ((rs = var_magic(op,vip)) >= 0) ylikely {
+	    memclear(vip) ;
+            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
+	        VARS_INFO	vsi{} ;
+	        if ((rs = callp->getinfo(op->obj,&vsi)) >= 0) {
+		    vip->wtime = vsi.wtime ;
+		    vip->mtime = vsi.mtime ;
+		    vip->nvars = vsi.nvars ;
+		    vip->nskip = vsi.nskip ;
+	        }
+	    } /* end if */
+	} /* end if (var_magic) */
 	return rs ;
-}
-/* end subroutine (var_fetch) */
+} /* end subroutine (var_getinfo) */
+
+int var_count(VAR *op) noex {
+	int		rs ;
+	if ((rs = var_magic(op)) >= 0) ylikely {
+            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
+	        rs = callp->count(op->obj) ;
+	    }
+	} /* end if (var_magic) */
+	return rs ;
+} /* end subroutine (var_count) */
+
+int var_curbegin(VAR *op,VAR_CUR *curp) noex {
+	int		rs ;
+	if ((rs = var_magic(op,curp)) >= 0) {
+	    memclear(curp) ;
+	    rs = SR_BUGCHECK ;
+            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
+		rs = SR_NOSYS ;
+	        if (callp->curbegin) {
+	            if (void *vp ; (rs = mem.mall(op->cursz,&vp)) >= 0) {
+		        curp->scp = vp ;
+	                if ((rs = callp->curbegin(op->obj,curp->scp)) >= 0) {
+	                    curp->magval = VAR_MAGIC ;
+			} /* end if (ok) */
+	        	if (rs < 0) {
+	            	    mem.free(curp->scp) ;
+	            	    curp->scp = nullptr ;
+	        	} /* end if (error) */
+	    	    } /* end if (memory-acquire) */
+		} /* end if (non-null) */
+	    } /* end if (bug-check) */
+	} /* end if (var_magic) */
+	return rs ;
+} /* end subroutine (var_curbegin) */
+
+int var_curend(VAR *op,VAR_CUR *curp) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = var_magic(op,curp)) >= 0) {
+	    rs = SR_BUGCHECK ;
+            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
+	        rs = SR_NOTOPEN ;
+	        if (curp->magval == VAR_MAGIC) {
+		    rs = SR_BUGCHECK ;
+		    if (curp->scp) {
+			rs = SR_NOSYS ;
+	    	        if (callp->curend) {
+	        	    rs1 = callp->curend(op->obj,curp->scp) ;
+	        	    if (rs >= 0) rs = rs1 ;
+			}
+	                {
+	                    rs1 = mem.free(curp->scp) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                    curp->scp = nullptr ;
+		        } /* end if (memory-release) */
+	            } /* end if (non-null) */
+		} /* end if (cursor-magic) */
+		curp->magval = 0 ;
+	    } /* end if (bug-check) */
+	} /* end if (var_magic) */
+	return rs ;
+} /* end subroutine (var_curend) */
 
 int var_curenum(VAR *op,VAR_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (kbuf == nullptr) return SR_FAULT ;
-
-	if (op->magval != VAR_MAGIC) return SR_NOTOPEN ;
-	if (curp->magval != VAR_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.enumerate != nullptr) {
-	    rs = (*op->call.enumerate)(op->obj,curp->scp,
-		kbuf,klen,vbuf,vlen) ;
-	}
-
-	return rs ;
-}
-/* end subroutine (var_curenum) */
-
-int varinfo(VARINFO *vip,cchar *dbnp,int dbnl) noex {
 	int		rs ;
-	int		rs1 ;
-
-	if (vip == nullptr) return SR_FAULT ;
-	if (dbnp == nullptr) return SR_FAULT ;
-
-	if (dbnp[0] == '\0') return SR_INVALID ;
-
-	cchar		*namp ;
-	if (nulstr ns ; (rs = ns.start(dbnp,dbnl,&namp)) >= 0) {
-	    cchar	*end = ENDIANSTR ;
-	    char	tmpfname[MAXPATHLEN + 1] ;
-
-	    memclear(vip) ;
-
-	    if ((rs = mkfnamesuf2(tmpfname,namp,INDSUF,end)) >= 0) {
-	        if (ustat sb ; (rs = u_stat(tmpfname,&sb)) >= 0) {
-		    vip->size = sb.st_size ;
-		    vip->mtime = sb.st_mtime ;
-		}
-	    }
-
-	    rs1 = ns.finish ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (nulstr) */
-
+	if ((rs = var_magic(op,curp,kbuf)) >= 0) {
+	    rs = SR_BUGCHECK ;
+            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
+	        rs = SR_NOTOPEN ;
+	        if (curp->magval == VAR_MAGIC) {
+		    rs = SR_BUGCHECK ;
+		    if (curp->scp) {
+			rs = SR_NOSYS ;
+		        if (callp->curenum) {
+	    		    rs = callp->curenum(op->obj,curp->scp,
+				kbuf,klen,vbuf,vlen) ;
+			} /* end if (ok) */
+		    } /* end if (non-null) */
+		} /* end if (cursor-magic) */
+	    } /* end if (bug-check) */
+	} /* end if (var_magic) */
 	return rs ;
-}
-/* end subroutine (varinfo) */
+} /* end subroutine (var_curenum) */
 
-int varunlink(cchar *dbnp,int dbnl) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-
-	if (dbnp == nullptr) return SR_FAULT ;
-	if (dbnp[0] == '\0') return SR_INVALID ;
-
-	cchar	*namp ;
-	if (nulstr ns ; (rs = ns.start(dbnp,dbnl,&namp)) >= 0) {
-	    cchar	*end = ENDIANSTR ;
-	    char	tmpfname[MAXPATHLEN + 1] ;
-
-	    if ((rs = mkfnamesuf2(tmpfname,namp,INDSUF,end)) >= 0) {
-		rs = uc_unlink(tmpfname) ;
-	    }
-
-	    rs1 = ns.finish ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (nulstr) */
-
+int var_fetch(VAR *op,cc *kp,int kl,VAR_CUR *curp,char *vbuf,int vlen) noex {
+	int		rs = SR_NOSYS ;
+	if ((rs = var_magic(op,curp,kp)) >= 0) {
+	    rs = SR_BUGCHECK ;
+            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
+	        rs = SR_NOTOPEN ;
+	        if (curp->magval == VAR_MAGIC) {
+		    rs = SR_NOSYS ;
+		    if (callp->fetch) {
+	    		rs = callp->fetch(op->obj,kp,kl,curp->scp,vbuf,vlen) ;
+		    } /* end if (ok) */
+		} /* end if (cursor-magic) */
+	    } /* end if (bug-check) */
+	} /* end if (var_magic) */
 	return rs ;
-}
-/* end subroutine (varunlink) */
+} /* end subroutine (var_fetch) */
+
+int var_audit(VAR *op) noex {
+	int		rs ;
+	if ((rs = var_magic(op)) >= 0) {
+	    rs = SR_NOSYS ;
+            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
+	        rs = callp->audit(op->obj) ;
+	    }
+	} /* end if (var_magic) */
+	return rs ;
+} /* end subroutine (var_audit) */
 
 
 /* private subroutines */
 
-local int var_objloadbegin(VAR *op,cchar *objname) noex {
-	modload		*lp = &op->loader ;
+local int var_objloadbegin(VAR *op,cchar *pr,cchar *objn) noex {
+	modload		*mlp = op->mlp ;
+	cint		vn = sub_overlast ;
+	cint		vo = vecstrm.compact ;
 	int		rs ;
-	char		dn[MAXHOSTNAMELEN+1] ;
-	if ((rs = getnodedomain(nullptr,dn)) >= 0) {
-	    cchar	*prname = VARPRLOCAL ;
-	    char	pr[MAXPATHLEN+1] ;
-	    if ((rs = mkpr(pr,MAXPATHLEN,prname,dn)) >= 0) {
-		vecstr	syms ;
-	        cint	vn = nelem(subs) ;
-		cint	vo = vecstrm.compact ;
-
-	        if ((rs = vecstr_start(&syms,vn,vo)) >= 0) {
-		    cint	snl = SYMNAMELEN ;
-		    cchar	*on = objname ;
-		    char	snb[SYMNAMELEN + 1] ;
-
-	            for (int i = 0 ; (i < vn) && subs[i] ; i += 1) {
-	                if (isrequired(i)) {
-	                    if ((rs = sncpy3(snb,snl,on,"_",subs[i])) >= 0) {
-			        rs = vecstr_add(&syms,snb,rs) ;
-			    }
-		        }
-		        if (rs < 0) break ;
-	            } /* end for */
-        
-	            if (rs >= 0) {
-		        if (mainv sv{} ; (rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	                    cchar	*modbname = VAR_MODBNAME ;
-			    int		mo = 0 ;
-	                    mo |= modloadm.libvar ;
-			    mo |= modloadm.libprs ;
-			    mo |= modloadm.libsdirs ;
-	                    rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
-			} /* end if (getvec) */
-	            } /* end if (ok) */
-
-	            vecstr_finish(&syms) ;
-	        } /* end if (allocation) */
-
-		if (rs >= 0) {
-		    if (int mv[2] ; (rs = modload_getmva(lp,mv,2)) >= 0) {
-			op->objsz = mv[0] ;
-			op->cursz = mv[1] ;
-			if (void *p ; (rs = uc_malloc(op->objsz,&p)) >= 0) {
-			    op->obj = p ;
-			    rs = var_loadcalls(op,objname) ;
-			    if (rs < 0) {
-	    			uc_free(op->obj) ;
-	    			op->obj = nullptr ;
-			    }
-			} /* end if (memory-allocation) */
-		    } /* end if (modload_getmva) */
-		    if (rs < 0) {
-			modload_close(lp) ;
-		    }
-		} /* end if (modload_open) */
-
-	    } /* end if (mkpr) */
-	} /* end if (getnodedomain) */
-
+	int		rs1 ;
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
+	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
+	            cchar	*mn = VAR_MODBNAME ;
+	            cchar	*on = objn ;
+	            int		mo = 0 ;
+	            mo |= modloadm.libvar ;
+	            mo |= modloadm.libprs ;
+	            mo |= modloadm.libsdirs ;
+	            mo |= modloadm.avail ;
+	            if ((rs = modload_open(mlp,pr,mn,on,mo,sv)) >= 0) {
+		        op->fl.modload = true ;
+	                if (int mv[2] ; (rs = modload_getmva(mlp,mv,2)) >= 0) {
+			    cint	osz = mv[0] ;
+	                    op->objsz = mv[0] ;
+	                    op->cursz = mv[1] ;
+			    if (void *vp ; (rs = mem.mall(osz,&vp)) >= 0) {
+	                        op->obj = vp ;
+	                        rs = var_loadcalls(op,&syms) ;
+	                        if (rs < 0) {
+	                            mem.free(op->obj) ;
+	                            op->obj = nullptr ;
+	                        } /* end if (error) */
+	                    } /* end if (memory-allocation) */
+	                } /* end if (modload_getmva) */
+	                if (rs < 0) {
+		            op->fl.modload = false ;
+	                    modload_close(mlp) ;
+	                } /* end if (error) */
+	            } /* end if (modload_open) */
+		} /* end if (vecstr_getvec) */
+	    } /* end if (vecstr_addsyms) */
+	    rs1 = syms.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	    if ((rs < 0) && op->fl.modload) {
+		op->fl.modload = false ;
+		modload_close(mlp) ;
+	    } /* end if (error) */
+	} /* end if (vecstr-syms) */
 	return rs ;
 } /* end subroutine (var_objloadbegin) */
 
 local int var_objloadend(VAR *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op->obj != nullptr) {
-	    rs1 = uc_free(op->obj) ;
+	if (op->obj) {
+	    rs1 = mem.free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
+	} /* end if (memory-release) */
+	if (op->mlp && op->fl.modload) {
+	    op->fl.modload = false ;
+	    rs1 = modload_close(op->mlp) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
-
-	rs1 = modload_close(&op->loader) ;
-	if (rs >= 0) rs = rs1 ;
-
 	return rs ;
 } /* end subroutine (var_objloadend) */
 
-local int var_loadcalls(VAR *op,cchar *objname) noex {
-	modload		*lp = &op->loader ;
+local int var_loadcalls(VAR *op,vecstr *slp) noex {
+	modload		*mlp = op->mlp ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
-	char		symname[SYMNAMELEN + 1] ;
-	cvoid	*snp ;
-
-	for (int i = 0 ; subs[i] != nullptr ; i += 1) {
-
-	    if ((rs = sncpy3(symname,SYMNAMELEN,objname,"_",subs[i])) >= 0) {
-	         if ((rs = modload_getsym(lp,symname,&snp)) == SR_NOTFOUND) {
-		     snp = nullptr ;
-		     if (! isrequired(i)) rs = SR_OK ;
-		}
-	    }
-
-	    if (rs < 0) break ;
-
-	    if (snp != nullptr) {
-	        c += 1 ;
-		switch (i) {
-		case sub_open:
-		    op->call.open = 
-			(int (*)(void *,cchar *)) snp ;
-		    break ;
+	cchar		*sname{} ;
+	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
+	    if (cvoid *snp{} ; (rs = modload_getsym(mlp,sname,&snp)) >= 0) {
+                var_calls   *callp = callsp(op->callp) ;
+                c += 1 ;
+                switch (i) {
+                case sub_open:
+                    callp->open		= soopen_f(snp) ;
+                    break ;
 		case sub_count:
-		    op->call.count = (int (*)(void *)) snp ;
+		    callp->count	= socount_f(snp) ;
 		    break ;
 		case sub_curbegin:
-		    op->call.curbegin = 
-			(int (*)(void *,void *)) snp ;
-		    break ;
-		case sub_fetch:
-		    op->call.fetch = 
-			(int (*)(void *,cchar *,int,void *,char *,int)) 
-				snp ;
+		    callp->curbegin	= socurbegin_f(snp) ;
 		    break ;
 		case sub_curenum:
-		    op->call.enumerate = 
-			(int (*)(void *,void *,char *,int,char *,int)) snp ;
+		    callp->curenum	= socurenum_f(snp) ;
 		    break ;
 		case sub_curend:
-		    op->call.curend = (int (*)(void *,void *)) snp ;
+		    callp->curend	= socurend_f(snp) ;
 		    break ;
-		case sub_info:
-		    op->call.info = (int (*)(void *,VARS_INFO *)) snp ;
+		case sub_fetch:
+		    callp->fetch	= sofetch_f(snp) ;
+		    break ;
+		case sub_getinfo:
+		    callp->getinfo	= sogetinfo_f(snp) ;
 		    break ;
 		case sub_audit:
-		    op->call.audit = (int (*)(void *)) snp ;
+		    callp->audit	= soaudit_f(snp) ;
 		    break ;
 		case sub_close:
-		    op->call.close = (int (*)(void *)) snp ;
+		    callp->close	= soclose_f(snp) ;
 		    break ;
 		} /* end switch */
-	    } /* end if (it had the call) */
-	} /* end for (subs) */
-
+            } else if (rs == rsn) {
+                if (! isrequired(i)) rs = SR_OK ;
+            } /* end if (it had the call) */
+	    if (rs < 0) break ;
+	} /* end for (vecstr_get) */
+	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (var_loadcalls) */
 
