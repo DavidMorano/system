@@ -29,11 +29,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkpathx.h"
 
@@ -73,32 +73,26 @@ extern "C" {
 
 int mkpath1(char *pp,cc *s1) noex {
 	return mknpathx(pp,-1,1,s1) ;
-}
-/* end subroutine (mkpath1) */
+} /* end subroutine (mkpath1) */
 
 int mkpath2(char *pp,cc *s1,cc *s2) noex {
 	return mknpathx(pp,-1,2,s1,s2) ;
-}
-/* end subroutine (mkpath2) */
+} /* end subroutine (mkpath2) */
 
 int mkpath3(char *pp,cc *s1,cc *s2,cc *s3) noex {
 	return mknpathx(pp,-1,3,s1,s2,s3) ;
-}
-/* end subroutine (mkpath3) */
+} /* end subroutine (mkpath3) */
 
 int mkpath4(char *pp,cc *s1,cc *s2,cc *s3,cc *s4) noex {
 	return mknpathx(pp,-1,4,s1,s2,s3,s4) ;
-}
-/* end subroutine (mkpath4) */
+} /* end subroutine (mkpath4) */
 
 int mkpath5(char *pp,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
 	return mknpathx(pp,-1,5,s1,s2,s3,s4,s5) ;
-}
-/* end subroutine (mkpath5) */
+} /* end subroutine (mkpath5) */
 
 int mkpath6(char *pp,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 	return mknpathx(pp,-1,6,s1,s2,s3,s4,s5,s6) ;
-}
-/* end subroutine (mkpath6) */
+} /* end subroutine (mkpath6) */
 
 
