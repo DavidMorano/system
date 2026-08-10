@@ -68,14 +68,14 @@ using libuc::mem ;			/* variable */
 /* local typedefs */
 
 extern "C" {
-    typedef int (*soopen_f)(void *,cchar *,cchar *) noex ;
-    typedef int (*socount_f)(void *) noex ;
-    typedef int (*soexists_f)(void *,cchar *,int) noex ;
-    typedef int (*socurbegin_f)(void *,void *) noex ;
-    typedef int (*socurenum_f)(void *,void *,char *,int) noex ;
-    typedef int (*socurend_f)(void *,void *) noex ;
-    typedef int (*soaudit_f)(void *) noex ;
-    typedef int (*soclose_f)(void *) noex ;
+    typedef int (*soopen_f)	(void *,cchar *,cchar *) noex ;
+    typedef int (*socount_f)	(void *) noex ;
+    typedef int (*soexists_f)	(void *,cchar *,int) noex ;
+    typedef int (*socurbegin_f)	(void *,void *) noex ;
+    typedef int (*socurenum_f)	(void *,void *,char *,int) noex ;
+    typedef int (*socurend_f)	(void *,void *) noex ;
+    typedef int (*soaudit_f)	(void *) noex ;
+    typedef int (*soclose_f)	(void *) noex ;
 } /* end extern (C) */
 
 
@@ -177,7 +177,7 @@ enum subs {
 	sub_overlast
 } ; /* end enum */
 
-constexpr cpcchar	subs[] = {
+constexpr cpcchar	subnames[] = {
 	"open",
 	"count",
 	"exists",
@@ -202,7 +202,7 @@ int uuname_open(uuname *op,cchar *pr,cchar *dbname) noex {
 	    rs = SR_INVALID ;
 	    if (dbname[0]) {
 	        if ((rs = uuname_objloadbegin(op,pr,objname)) >= 0) {
-		    calls *callp = (calls *) op->callp ;
+		    calls *callp = resumelife<calls>(op->callp) ;
 	            if ((rs = callp->open(op->obj,pr,dbname)) >= 0) {
 	                op->magval = UUNAME_MAGIC ;
 	            }
@@ -223,7 +223,7 @@ int uuname_close(uuname *op) noex {
 	int		rs1 ;
 	if ((rs = uuname_magic(op)) >= 0) {
 	    if (op->obj) {
-		calls *callp = (calls *) op->callp ;
+		calls *callp = resumelife<calls>(op->callp) ;
 	        rs1 = callp->close(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -243,7 +243,7 @@ int uuname_close(uuname *op) noex {
 int uuname_audit(uuname *op) noex {
 	int		rs ;
 	if ((rs = uuname_magic(op)) >= 0) {
-	    calls *callp = (calls *) op->callp ;
+	    calls *callp = resumelife<calls>(op->callp) ;
 	    if (callp->audit) {
 	        rs = callp->audit(op->obj) ;
 	    }
@@ -254,7 +254,7 @@ int uuname_audit(uuname *op) noex {
 int uuname_count(uuname *op) noex {
 	int		rs ;
 	if ((rs = uuname_magic(op)) >= 0) {
-	    calls *callp = (calls *) op->callp ;
+	    calls *callp = resumelife<calls>(op->callp) ;
 	    if (callp->count) {
 	        rs = callp->count(op->obj) ;
 	    }
@@ -265,7 +265,7 @@ int uuname_count(uuname *op) noex {
 int uuname_curbegin(uuname *op,UUNAME_CUR *curp) noex {
 	int		rs ;
 	if ((rs = uuname_magic(op,curp)) >= 0) {
-	    calls *callp = (calls *) op->callp ;
+	    calls *callp = resumelife<calls>(op->callp) ;
 	    memclear(curp) ;
 	    if (callp->curbegin) {
 	        if (void *p ; (rs = mem.mall(op->cursz,&p)) >= 0) {
@@ -291,7 +291,7 @@ int uuname_curend(uuname *op,UUNAME_CUR *curp) noex {
 	    if (curp->magval == UUNAME_MAGIC) {
 		rs = SR_BUGCHECK ;
 	        if (curp->scp) {
-		    calls *callp = (calls *) op->callp ;
+		    calls *callp = resumelife<calls>(op->callp) ;
 		    rs = SR_OK ;
 	            if (callp->curend) {
 	                rs1 = callp->curend(op->obj,curp->scp) ;
@@ -301,7 +301,7 @@ int uuname_curend(uuname *op,UUNAME_CUR *curp) noex {
 	                rs1 = mem.free(curp->scp) ;
 	                if (rs >= 0) rs = rs1 ;
 	                curp->scp = nullptr ;
-	            }
+	            } /* end if (memory-release) */
 		} /* end if (cursor) */
 	        curp->magval = 0 ;
 	    } /* end if (cursor-magic) */
@@ -325,7 +325,7 @@ int uuname_curenum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
 	if ((rs = uuname_magic(op,curp,rbuf)) >= 0) {
 	    rs = SR_NOTOPEN ;
 	    if (curp->magval) {
-		calls *callp = (calls *) op->callp ;
+		calls *callp = resumelife<calls>(op->callp) ;
 		rs = SR_NOSYS ;
 	        if (callp->curenum) {
 	            rs = callp->curenum(op->obj,curp->scp,rbuf,rlen) ;
@@ -345,7 +345,7 @@ local int uuname_objloadbegin(UN *op,cchar *pr,cchar *objn) noex {
 	int		rs ;
 	int		rs1 ;
 	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subs)) >= 0) {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
 	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
 	            cchar	*mn = UN_MODBNAME ;
 	            cchar	*on = objn ;
@@ -393,7 +393,7 @@ local int uuname_objloadend(UN *op) noex {
 	    rs1 = mem.free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
-	}
+	} /* end if (memory-release) */
 	if (op->mlp && op->fl.modload) {
 	    op->fl.modload = false ;
 	    rs1 = modload_close(op->mlp) ;
@@ -415,28 +415,28 @@ local int uuname_loadcalls(UN *op,vecstr *slp) noex {
                 c += 1 ;
                 switch (i) {
                 case sub_open:
-                    callp->open = soopen_f(snp) ;
+                    callp->open		= soopen_f(snp) ;
                     break ;
 		case sub_count:
-		    callp->count = socount_f(snp) ;
+		    callp->count	= socount_f(snp) ;
 		    break ;
 		case sub_exists:
-		    callp->exists = soexists_f(snp) ;
+		    callp->exists	= soexists_f(snp) ;
 		    break ;
 		case sub_curbegin:
-		    callp->curbegin = socurbegin_f(snp) ;
+		    callp->curbegin	= socurbegin_f(snp) ;
 		    break ;
 		case sub_curenum:
-		    callp->curenum = socurenum_f(snp) ;
+		    callp->curenum	= socurenum_f(snp) ;
 		    break ;
 		case sub_curend:
-		    callp->curend = socurend_f(snp) ;
+		    callp->curend	= socurend_f(snp) ;
 		    break ;
 		case sub_audit:
-		    callp->audit = soaudit_f(snp) ;
+		    callp->audit	= soaudit_f(snp) ;
 		    break ;
 		case sub_close:
-		    callp->close = soclose_f(snp) ;
+		    callp->close	= soclose_f(snp) ;
 		    break ;
 		} /* end switch */
             } else if (rs == rsn) {
