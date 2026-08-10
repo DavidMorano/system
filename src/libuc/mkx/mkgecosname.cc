@@ -128,14 +128,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<snwcpy.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<ascii.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkgecosname.h"
 
@@ -193,8 +193,7 @@ int mkgecosname(char *rbuf,int rlen,cchar *gf) noex {
 	    } /* end if (getgecosname) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mkgecosname) */
+} /* end subroutine (mkgecosname) */
 
 int getgecosname(cchar *gbuf,int µglen,cchar **rpp) noex {
 	cnullptr	np{} ;
@@ -229,7 +228,6 @@ int getgecosname(cchar *gbuf,int µglen,cchar **rpp) noex {
 	} /* end if (non-null) */
 	if (rpp) *rpp = cp ;
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (getgecosname) */
+} /* end subroutine (getgecosname) */
 
 
