@@ -69,21 +69,29 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local variables */
 
-constexpr cpcchar	svckeys[] = {
-	"file",
-	"passfile",
-	"so",
-	"program",
-	"args",
-	"username",
-	"groupname",
-	"interval",
-	"access",
-	"opts",
-	"failcont",
-	"include",
-	nullptr
-} ; /* end array (svckeys) */
+namespace {
+    struct namer {
+	ccharp		n[svckey_overlast + 1] ;
+        consteval namer() noex {
+	    n[svckey_file]	= "file" ;
+	    n[svckey_pass]	= "passfile" ;
+	    n[svckey_so]	= "so" ;
+	    n[svckey_p]		= "program" ;
+	    n[svckey_a]		= "args" ;
+	    n[svckey_u]		= "username" ;
+	    n[svckey_g]		= "groupname" ;
+	    n[svckey_interval]	= "interval" ;
+	    n[svckey_acc]	= "access" ;
+	    n[svckey_opts]	= "opts" ;
+	    n[svckey_failcont]	= "failcont" ;
+	    n[svckey_include]	= "include" ;
+	    n[svckey_svc]	= "service" ;
+	    n[svckey_overlast]	= nullptr ;
+	} ; /* end ctor */
+    } ; /* end ctor (namer) */
+} /* end namespace */
+
+constexpr namer		svcname ;
 
 
 /* exported variables */
@@ -101,7 +109,7 @@ int svckey_load(svckey *skp,svcfile_ent *sep) noex {
 	    for (int i = 0 ; sep->keyvals[i][0] != nullptr ; i += 1) {
 	        cchar	*kp = sep->keyvals[i][0] ;
 	        cchar	*vp = sep->keyvals[i][1] ;
-	        if (int ki ; (ki = matostr(svckeys,1,kp,-1)) >= 0) {
+	        if (int ki ; (ki = matostr(svcname.n,1,kp,-1)) >= 0) {
 	            switch (ki) {
 	            case svckey_file:
 	                skp->file = vp ;
