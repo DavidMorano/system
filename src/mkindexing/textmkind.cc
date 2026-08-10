@@ -445,7 +445,7 @@ bfile		*ofp ;
 
 	    while (rs >= 0) {
 
-	        wl = eigendb_enum(edbp,&ecur,&wp) ;
+	        wl = eigendb_curenum(edbp,&ecur,&wp) ;
 	        if (wl < 0)
 	            break ;
 
