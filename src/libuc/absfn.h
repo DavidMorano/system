@@ -54,13 +54,13 @@ struct absfn_co {
 struct absfn : absfn_head {
 	absfn_co	finish ;
 	absfn() noex {
-	    finish(this,absfnmem_finish) ;
+	    finish	(this,absfnmem_finish) ;
 	    as = nullptr ;
-	} ;
+	} ; /* end ctor */
 	absfn(const absfn &) = delete ;
 	absfn &operator = (const absfn &) = delete ;
-	int start(cchar *sp,int sl,cchar **) noex ;
-	void dtor() noex ;
+	int start	(cchar *sp,int sl,cchar **) noex ;
+	void dtor	() noex ;
 	destruct absfn() {
 	    if (as) dtor() ;
 	} ;
