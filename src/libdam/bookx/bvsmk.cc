@@ -228,12 +228,12 @@ const bvsmk_obj		bvsmk_modinfo = {
 int bvsmk_open(bvsmk *op,cchar *pr,cchar *db,int of,mode_t µom) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = bvsmk_ctor(op,pr,db)) >= 0) {
+	if ((rs = bvsmk_ctor(op,pr,db)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (pr[0] && db[0]) {
 	        DEBUGPRINTF("ent pr=%s\n",pr) ;
 	        DEBUGPRINTF("db=%s\n",db) ;
-		if (static cint rsv = var ; (rs = rsv) >= 0) {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	            cint	n = BVSMK_NENTRIES ;
 	            int		sz = 0 ;
 	            op->omode = µom ;
@@ -242,15 +242,15 @@ int bvsmk_open(bvsmk *op,cchar *pr,cchar *db,int of,mode_t µom) noex {
 	            op->fl.ofexcl	= MKBOOL(of & O_EXCL) ;
 	            sz += (lenstr(pr) + 1) ;
 	            sz += (lenstr(db) + 1) ;
-	            if (char *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
+	            if (char *bp ; (rs = mem.mall(sz,&bp)) >= 0) ylikely {
 	                op->a = bp ;
 	                op->pr = bp ;
 	                bp = (strwcpy(bp,pr,-1)+1) ;
 	                op->db = bp ;
 	                bp = (strwcpy(bp,db,-1)+1) ;
-	                if ((rs = bvsmk_filesbegin(op)) >= 0) {
+	                if ((rs = bvsmk_filesbegin(op)) >= 0) ylikely {
 		            c = rs ;
-		            if ((rs = bvsmk_listbegin(op,n)) >= 0) {
+		            if ((rs = bvsmk_listbegin(op,n)) >= 0) ylikely {
 			        op->magval = BVSMK_MAGIC ;
 		            }
 		            if (rs < 0) {
@@ -276,7 +276,7 @@ int bvsmk_close(bvsmk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		nv = 0 ; /* return-value */
-	if ((rs = bvsmk_magic(op)) >= 0) {
+	if ((rs = bvsmk_magic(op)) >= 0) ylikely {
 	    DEBUGPRINTF("ent nverses=%u\n",op->nverses) ;
 	    DEBUGPRINTF("nzverses=%u\n",op->nzverses) ;
 	    bool	f_go = (! op->fl.abort) ;
@@ -321,11 +321,11 @@ int bvsmk_close(bvsmk *op) noex {
 
 int bvsmk_add(bvsmk *op,int book,uchar *ap,int al) noex {
 	int		rs ;
-	if ((rs = bvsmk_magic(op,ap)) >= 0) {
+	if ((rs = bvsmk_magic(op,ap)) >= 0) ylikely {
 	    if ((book >= 0) && (al >= 0)) {
 	        if (al > 0) {
 		    cint	sz = (al * szof(uchar)) ;
-		    if (uchar *bp ; (rs = mem.mall(sz,&bp)) >= 0) {
+		    if (uchar *bp ; (rs = mem.mall(sz,&bp)) >= 0) ylikely {
 		        vecobj	*blp = op->blp ;
 		        bvsbook	be{} ;
 	                uint	nzverses ;
@@ -359,7 +359,7 @@ int bvsmk_add(bvsmk *op,int book,uchar *ap,int al) noex {
 
 int bvsmk_abort(bvsmk *op,int f) noex {
     	int		rs ;
-	if ((rs = bvsmk_magic(op)) >= 0) {
+	if ((rs = bvsmk_magic(op)) >= 0) ylikely {
 	    op->fl.abort = !!f ;
 	} /* end if (bvsmk_magic) */
 	return rs ;
@@ -372,14 +372,14 @@ local int bvsmk_filesbegin(bvsmk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) ylikely {
 	    cchar	*idname = BVSMK_IDNAME ;
 	    cchar	*dnp = tbuf ;
-	    if ((rs = mkpath2(tbuf,op->pr,idname)) >= 0) {
+	    if ((rs = mkpath2(tbuf,op->pr,idname)) >= 0) ylikely {
 	        cint	dnl = rs ;
 	        cmode	dm = 0777 ;
-	        if ((rs = mkdname(tbuf,dm)) >= 0) {
-	            if (cchar *cp ; (rs = mem.strw(dnp,dnl,&cp)) >= 0) {
+	        if ((rs = mkdname(tbuf,dm)) >= 0) ylikely {
+	            if (cchar *cp ; (rs = mem.strw(dnp,dnl,&cp)) >= 0) ylikely {
 	                op->idname = cp ;
 	                if (op->fl.ofcreat) {
 	                    rs = bvsmk_filesbeginc(op) ;
@@ -413,9 +413,9 @@ local int bvsmk_filesbeginc(bvsmk *op) noex {
 	    cchar	*db = op->db ;
 	    cchar	*suf = FSUF_IDX	;
 	    cint sz = (ai * (var.maxpathlen + 1)) ;
-	    if (char *a ; (rs = mem.mall(sz,&a)) >= 0) {
+	    if (char *a ; (rs = mem.mall(sz,&a)) >= 0) ylikely {
 		char *tbuf = (a + (--ai * (maxpath + 1))) ;
-	        if ((rs = mknifname(tbuf,type,id,db,suf)) >= 0) {
+	        if ((rs = mknifname(tbuf,type,id,db,suf)) >= 0) ylikely {
 	            cmode	om = op->omode ;
 	            cchar	*tfn = tbuf ;
 	            char	*rbuf = (a + (--ai * (maxpath + 1))) ;
@@ -446,11 +446,11 @@ local int bvsmk_filesbeginwait(bvsmk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) ylikely {
 	    cchar	*id = op->idname ;
 	    cchar	*db = op->db ;
 	    cchar	*suf = FSUF_IDX	 ;
-	    if ((rs = mknifname(tbuf,false,id,db,suf)) >= 0) {
+	    if ((rs = mknifname(tbuf,false,id,db,suf)) >= 0) ylikely {
 	        cint	to_stale = BVSMK_INTSTALE ;
 	        cint	of = (O_CREAT|O_WRONLY|O_EXCL) ;
 	        int	to = BVSMK_INTOPEN ;
@@ -485,10 +485,10 @@ local int bvsmk_filesbegincreate(bvsmk *op,cchar *tfn,int of,mode_t om) noex {
 	    DEBUGPRINTF("om=%05o\n",om) ;
 	}
 #endif
-	if ((rs = uc_open(tfn,of,om)) >= 0) {
+	if ((rs = uc_open(tfn,of,om)) >= 0) ylikely {
 	    cint	fd = rs ;
 	    op->fl.created = true ;
-	    if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) ylikely {
 	        op->nidxfname = (char *) cp ;
 	    } /* end if (memory-acquire) */
 	    rs1 = u_close(fd) ;
@@ -564,7 +564,7 @@ local int bvsmk_mkidx(bvsmk *op) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	DEBUGPRINTF("ent\n") ;
-	if ((rs = bvsmk_nidxopen(op)) >= 0) {
+	if ((rs = bvsmk_nidxopen(op)) >= 0) ylikely {
 	    bvshdr	hdr{} ;
 	    hdr.vetu[0]		= uchar(BVSHDR_VERSION) ;
 	    hdr.vetu[1]		= uchar(ENDIAN) ;
@@ -573,7 +573,7 @@ local int bvsmk_mkidx(bvsmk *op) noex {
 	    hdr.wtime		= (uint) time(nullptr) ;
 	    hdr.nverses		= op->nverses ;
 	    hdr.nzverses	= op->nverses ;
-	    if ((rs = bvsmk_mkidxwrmain(op,&hdr)) >= 0) {
+	    if ((rs = bvsmk_mkidxwrmain(op,&hdr)) >= 0) ylikely {
 	        cint	hlen = HDRBUFLEN ;
 	        char	hbuf[HDRBUFLEN+1] ;
 	        hdr.fsz = rs ;
@@ -596,11 +596,11 @@ local int bvsmk_mkidxwrmain(bvsmk *op,bvshdr *hdrp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		foff = 0 ; /* return-value */
-	if ((rs = ucpagesize) >= 0) {
+	if ((rs = ucpagesize) >= 0) ylikely {
 	    cint bsz = (rs * PAGEBUFMULT) ;
 	    cint nfd = op->nfd ;
-	    if (filer hf ; (rs = hf.start(nfd,0,bsz,0)) >= 0) {
-	        if ((rs = bvsmk_mkidxwrhdr(op,hdrp,&hf)) >= 0) {
+	    if (filer hf ; (rs = hf.start(nfd,0,bsz,0)) >= 0) ylikely {
+	        if ((rs = bvsmk_mkidxwrhdr(op,hdrp,&hf)) >= 0) ylikely {
 	            foff += rs ;
 		    op->maxbook = 0 ;
 	            if (rs >= 0) {
@@ -622,10 +622,10 @@ local int bvsmk_mkidxwrmain(bvsmk *op,bvshdr *hdrp) noex {
 local int bvsmk_mkidxwrhdr(bvsmk *op,bvshdr *hdrp,filer *hfp) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	if (op) {
+	if (op) ylikely {
 	    cint	hlen = HDRBUFLEN ;
 	    char	hbuf[HDRBUFLEN+1] ;
-	    if ((rs = hdrp->rd(hbuf,hlen)) >= 0) {
+	    if ((rs = hdrp->rd(hbuf,hlen)) >= 0) ylikely {
 	        rs = hfp->writefill(hbuf,rs) ;
 	        wlen += rs ;
 	    } /* end if (bvshdr_rd) */
@@ -669,12 +669,12 @@ local int bvsmk_mkidxbooktab(bvsmk *op,bvshdr *hdrp,filer *hfp,int foff) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ; /* return-value */
-	if ((rs = hfp->writealign(hsz)) >= 0) {
+	if ((rs = hfp->writealign(hsz)) >= 0) ylikely {
 	    cint	sz = (n * narrval) * szof(ushort) ;
 	    ushort	(*arrp)[narrval] = nullptr ;
 	    wlen += rs ;
 	    foff += rs ;
-	    if ((rs = mem.call(1,sz,&arrp)) >= 0) {
+	    if ((rs = mem.call(1,sz,&arrp)) >= 0) ylikely {
 		void *vp ;
 	        for (int i = 0 ; blp->get(i,&vp) >= 0 ; i += 1) {
 	            bvsbook	*bep = resumelife<bvsbook>(vp) ;
@@ -711,9 +711,9 @@ local int bvsmk_nidxopen(bvsmk *op) noex {
 	    cchar	*id = op->idname ;
 	    cchar	*db = op->db ;
 	    cchar	*suf = FSUF_IDX ;
-	    if (char *a ; (rs = mem.mall(sz,&a)) >= 0) {
+	    if (char *a ; (rs = mem.mall(sz,&a)) >= 0) ylikely {
 	        char	*tbuf = (a + (--ai * (maxpath + 1))) ;
-	        if ((rs = mknifname(tbuf,type,id,db,suf)) >= 0) {
+	        if ((rs = mknifname(tbuf,type,id,db,suf)) >= 0) ylikely {
 	            cchar	*tfn = tbuf ;
 	            char	*rbuf = (a + (--ai * (maxpath + 1))) ;
 	            if (type) {
@@ -812,8 +812,8 @@ local int mknifname(char *rbuf,int type,cchar *id,cchar *db,cchar *suf) noex {
 	int		rs1 ;
 	cchar		*end = ENDIANSTR ;
 	cchar		*fin = (type) ? "xXXXX" : "n" ;
-	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
-	    if ((rs = mkpath2(tbuf,id,db)) >= 0) {
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) ylikely {
+	    if ((rs = mkpath2(tbuf,id,db)) >= 0) ylikely {
 	        rs = mkfnamesuf3(rbuf,tbuf,suf,end,fin) ;
 	    }
 	    rs1 = mem.free(tbuf) ;
@@ -840,7 +840,7 @@ local int unlinkstale(cchar *fn,int to) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	} /* end if (bufsizeget) */
     	return rs ;
