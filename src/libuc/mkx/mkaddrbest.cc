@@ -125,7 +125,6 @@ int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	    } /* end if (ema) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkaddrbest) */
+} /* end subroutine (mkaddrbest) */
 
 
