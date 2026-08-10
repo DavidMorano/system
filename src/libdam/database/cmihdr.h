@@ -25,8 +25,8 @@
 
 struct cmihdr_head {
 	uint		dbsz ;		/* DB-file size */
+	uint		idxsz ;		/* IDX-file size */
 	uint		dbtime ;	/* DB modification-time */
-	uint		idxsize ;	/* IDX-file size */
 	uint		idxtime ;	/* IDX creation-time */
 	uint		vioff ;
 	uint		vilen ;
