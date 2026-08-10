@@ -44,21 +44,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<getusername.h>
-#include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<strn.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<ascii.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 #include	"mkpathxx.h"
@@ -115,7 +115,7 @@ int mkpathuser(char *rbuf,cchar *un,cchar *pp,int µpl) noex {
 	    while ((pl > 0) && (pp[0] == '/')) {
 	        pp += 1 ;
 	        pl -= 1 ;
-	    }
+	    } /* end while */
 	    if (pl > 0) ylikely {
 	        if (pp[0] == CH_TILDE) {
 	            pp += 1 ;
@@ -127,8 +127,7 @@ int mkpathuser(char *rbuf,cchar *un,cchar *pp,int µpl) noex {
 	    } /* end if */
 	} /* end if (getlenstr) */
 	return rs ;
-}
-/* end subroutine (mkpathuser) */
+} /* end subroutine (mkpathuser) */
 
 
 /* local subroutines */
