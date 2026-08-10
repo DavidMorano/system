@@ -72,12 +72,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE|[ */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
 #include	<ctime>			/* CSTD */
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD |nullptr_t| */
