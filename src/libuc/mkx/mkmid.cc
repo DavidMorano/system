@@ -86,9 +86,9 @@ int mkmid(char *rbuf,int rlen,cchar *dn,cchar *nn,pid_t pid,int serial) noex {
 	    rs = SR_INVALID ;
 	    if (dn[0] && nn[0] && (pid >= 0)) ylikely {
 	        if (sbuf mb ; (rs = mb.start(rbuf,rlen)) >= 0) ylikely {
+	            custime	dt = getustime ;
+	            uint	uv = uint(pid) ;
 		    {
-	                custime		dt = getustime ;
-	                uint		uv = uint(pid) ;
 	                mb.strw(nn) ;
 	                mb.dec(uv) ;
 	                mb.chr('.') ;
@@ -107,7 +107,6 @@ int mkmid(char *rbuf,int rlen,cchar *dn,cchar *nn,pid_t pid,int serial) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkmid) */
+} /* end subroutine (mkmid) */
 
 
