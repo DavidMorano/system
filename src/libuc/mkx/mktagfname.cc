@@ -40,12 +40,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mkpathxw.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkpathxw.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 
@@ -75,7 +75,6 @@
 
 int mktagfname(char *rbuf,cchar *basedname,cchar *sp,int sl) noex {
 	return mkpath2w(rbuf,basedname,sp,sl) ;
-}
-/* end subroutine (mktagfname) */
+} /* end subroutine (mktagfname) */
 
 
