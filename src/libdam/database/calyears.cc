@@ -355,31 +355,33 @@ int calyears_close(CALYEARS *op) noex {
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
 	if (op->magval != CALYEARS_MAGIC) return SR_NOTOPEN ;
 #endif
-
 	if (op->open.hols) {
 	    op->open.hols = false ;
 	    rs1 = holidayer_close(&op->hols) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
+	{
 	rs1 = calyears_domerfins(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = vechand_finish(&op->doms) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = calyears_calsdestroy(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = vechand_finish(&op->cals) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
+	{
 	rs1 = calyears_argend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	op->nentries = 0 ;
 	op->magval = 0 ;
 	return rs ;
