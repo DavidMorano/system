@@ -920,7 +920,7 @@ static int subinfo_eigendefs(SUBINFO *sip)
 	        if ((rs = progeigen_curbegin(pip,&ecur)) >= 0) {
 		    int		wl ;
 		    cchar	*wp ;
-		    while ((wl = progeigen_enum(pip,&ecur,&wp)) >= 0) {
+		    while ((wl = progeigen_curenum(pip,&ecur,&wp)) >= 0) {
 			if (wl > 0) {
 			    rs = vecpstr_add(esp,wp,wl) ;
 			}
