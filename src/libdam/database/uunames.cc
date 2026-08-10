@@ -414,20 +414,19 @@ int uunames_open(UU *op,cchar *pr,cchar *dbname) noex {
 			}
 			if (rs < 0) {
 			    vecobj_finish(op->nlp) ;
-			}
+			} /* end if (error) */
 		    } /* end if (vecobj_start) */
 		    if (rs < 0) {
 			uunames_infoloadend(op) ;
-		    }
+		    } /* end if (error) */
 		} /* end if (infoload) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		uunames_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (uunames_ctor) */
 	return rs ;
-}
-/* end subroutine (uunames_open) */
+} /* end subroutine (uunames_open) */
 
 int uunames_close(UU *op) noex {
 	int		rs ;
@@ -452,8 +451,7 @@ int uunames_close(UU *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uunames_close) */
+} /* end subroutine (uunames_close) */
 
 int uunames_audit(UU *op) noex {
 	int		rs ;
@@ -461,8 +459,7 @@ int uunames_audit(UU *op) noex {
 	    rs = uunames_indcheck(op,0) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uunames_audit) */
+} /* end subroutine (uunames_audit) */
 
 int uunames_curbegin(UU *op,cur *curp) noex {
 	int		rs ;
@@ -473,8 +470,7 @@ int uunames_curbegin(UU *op,cur *curp) noex {
 	    rs = uunames_indcheck(op,0) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uunames_curbegin) */
+} /* end subroutine (uunames_curbegin) */
 
 int uunames_curend(UU *op,cur *curp) noex {
 	int		rs ;
@@ -485,8 +481,7 @@ int uunames_curend(UU *op,cur *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (uunames_curend) */
+} /* end subroutine (uunames_curend) */
 
 /* returns 0=not-found, (>0)=found-with-this-length */
 int uunames_exists(UU *op,cchar *sp,int sl) noex {
@@ -517,8 +512,7 @@ int uunames_exists(UU *op,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (uunames_exists) */
+} /* end subroutine (uunames_exists) */
 
 int uunames_curenum(UU *op,cur *curp,char *ubuf,int ulen) noex {
 	int		rs ;
@@ -535,8 +529,7 @@ int uunames_curenum(UU *op,cur *curp,char *ubuf,int ulen) noex {
 	    } /* end if (vecobj_get) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (uunames_curenum) */
+} /* end subroutine (uunames_curenum) */
 
 int uunames_count(UU *op) noex {
 	int		rs ;
@@ -548,8 +541,7 @@ int uunames_count(UU *op) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (uunames_count) */
+} /* end subroutine (uunames_count) */
 
 
 /* private subroutines */
