@@ -44,14 +44,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<bufsizevar.hh>		/* |maxnamelen(3uc)| */
-#include	<storebuf.h>
-#include	<strn.h>		/* |strnnlen(3uc)| */
-#include	<localmisc.h>
+#include	<storebuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnnlen(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkx.h"
 
@@ -119,7 +119,6 @@ int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl) noex {
 	    } /* end if (storebuf) */
 	} /* end if (maxnamelen) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkshmname) */
+} /* end subroutine (mkshmname) */
 
 
