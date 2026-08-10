@@ -26,12 +26,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSYD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"calcite.h"
 
@@ -71,7 +71,6 @@ int calcite_load(calcite *ep,int y,int m, int d) noex {
 	    ep->d = uchar(d) ;
 	}
 	return rs ;
-}
-/* end subroutine (calcite_load) */
+} /* end subroutine (calcite_load) */
 
 
