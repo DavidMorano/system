@@ -82,7 +82,7 @@ struct cmi_head {
 	cchar 		*dbname ;
 	cchar		*fname ;
 	CMI_FMI		fmi ;		/* file-map information */
-	CMIHDR		fhi ;		/* file-header information */
+	cmihdr		fhi ;		/* file-header information */
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magval ;
 	int		ncursors ;
@@ -109,6 +109,10 @@ extern int	cmi_audit	(cmi *) noex ;
 extern int	cmi_close	(cmi *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const cmi_obj		cmi_modinfo ;
+#endif /* __cplusplus */
 
 
 #endif /* CMI_INCLUDE */
