@@ -38,14 +38,14 @@
 #define	BABYCALC_MAGIC		0x97147229
 
 
+struct babycalc_flags {
+    	uint		modload:1 ;
+} ; /* end struct */
+
 struct babycalc_information {
 	time_t		wtime ;
 	time_t		atime ;
 	uint		acount ;
-} ; /* end struct */
-
-struct babycalc_flags {
-    	uint		modload:1 ;
 } ; /* end struct */
 
 struct babycalc_head {
