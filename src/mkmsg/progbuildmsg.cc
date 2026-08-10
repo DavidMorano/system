@@ -234,7 +234,7 @@ MAILMSGATT	*alp ;
 	        debugprintf("progbuildmsg: type=%s subtype=%s\n",
 	            iep->type,iep->subtype) ;
 	    }
-	    for (i = 0 ; mailmsgatt_enum(alp,i,&ep) >= 0 ; i += 1) {
+	    for (i = 0 ; mailmsgatt_curenum(alp,i,&ep) >= 0 ; i += 1) {
 	        if (ep == NULL) continue ;
 	        debugprintf("progbuildmsg: type=%s subtype=%s\n",
 	            ep->type,ep->subtype) ;
@@ -274,7 +274,7 @@ MAILMSGATT	*alp ;
 #endif
 
 	if (rs >= 0) {
-	    for (i = 0 ; (rs1 = mailmsgatt_enum(alp,i,&ep)) >= 0 ; i += 1) {
+	    for (i = 0 ; (rs1 = mailmsgatt_curenum(alp,i,&ep)) >= 0 ; i += 1) {
 	        if (ep != NULL) {
 	            rs = mailmsgattent_code(ep,pip->jobdname) ;
 	            code = rs ;
@@ -364,7 +364,7 @@ MAILMSGATT	*alp ;
 /* do the attachments */
 
 	if (rs >= 0) {
-	    for (i = 0 ; mailmsgatt_enum(alp,i,&ep) >= 0 ; i += 1) {
+	    for (i = 0 ; mailmsgatt_curenum(alp,i,&ep) >= 0 ; i += 1) {
 	        if (ep != NULL) {
 	            rs = progoutpart(pip,pip->ofp,f_multipart,msgbound,ep) ;
 	            wlen += rs ;
