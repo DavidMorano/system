@@ -38,12 +38,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkcexsync.h"
 
@@ -88,15 +88,14 @@ int mkcexsync(char *rbuf,int rlen) noex {
 	        for (j = (leaderlen-1) ; j >= 0 ; j -= 1) {
 	            rbuf[i] = (i & 1) ;
 	            i += 1 ;
-	        }
+	        } /* end for */
 	        for (j = 0 ; j < finlen ; j += 1) {
 	            rbuf[i++] = CH_SYNC ;
-	        }
+	        } /* end for */
 	        rs = SR_OK ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mkcexsync) */
+} /* end subroutine (mkcexsync) */
 
 
