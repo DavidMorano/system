@@ -97,7 +97,6 @@ int mkufname(char *rbuf,cchar *hn,cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkufname) */
+} /* end subroutine (mkufname) */
 
 
