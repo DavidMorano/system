@@ -43,13 +43,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bufsizevar.hh>
-#include	<ctdec.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mkfdfname.h"
 
@@ -100,8 +100,7 @@ int mkfdfname(char *dbuf,int dlen,int fd) noex {
 	    } /* end if (valid FD) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mkfdfname) */
+} /* end subroutine (mkfdfname) */
 
 
 /* local subroutines */
