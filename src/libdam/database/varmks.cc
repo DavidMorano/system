@@ -235,8 +235,7 @@ int varmks_open(VARMKS *op,cchar *dbname,int of,mode_t om,int n) noex {
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (varmks_open) */
+} /* end subroutine (varmks_open) */
 
 int varmks_close(VARMKS *op) noex {
 	int		rs = SR_OK ;
@@ -298,8 +297,7 @@ int varmks_close(VARMKS *op) noex {
 
 	op->magval = 0 ;
 	return (rs >= 0) ? nvars : rs ;
-}
-/* end subroutine (varmks_close) */
+} /* end subroutine (varmks_close) */
 
 int varmks_addvar(VARMKS *op,cchar *k,cchar *vp,int vl) noex {
 	int		rs ;
@@ -329,24 +327,21 @@ int varmks_addvar(VARMKS *op,cchar *k,cchar *vp,int vl) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (varmks_addvar) */
+} /* end subroutine (varmks_addvar) */
 
 int varmks_abort(VARMKS *op) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
 	op->fl.abort = true ;
 	return SR_OK ;
-}
-/* end subroutine (varmks_abort) */
+} /* end subroutine (varmks_abort) */
 
 int varmks_chgrp(VARMKS *op,gid_t gid) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
 	op->gid = gid ;
 	return SR_OK ;
-}
-/* end subroutine (varmks_chgrp) */
+} /* end subroutine (varmks_chgrp) */
 
 
 /* private subroutines */
