@@ -94,8 +94,8 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize	= hi_overlast * szof(uint) ;
-constexpr int		magicsize	= CMIHDR_MAGICSIZE ;
+constexpr int		headsz		= hi_overlast * szof(uint) ;
+constexpr int		magicsz		= CMIHDR_MAGICSIZE ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= CMIHDR_MAGICSTR ;
 
@@ -109,20 +109,20 @@ constexpr char		magicstr[]	= CMIHDR_MAGICSTR ;
 int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && hbuf) {
+	if (op && hbuf) ylikely {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
 	    rs = SR_INVALID ;
-	    if (bl >= (magicsize + vsz)) {
-	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
-	            bp += magicsize ;
-	            bl -= magicsize ;
+	    if (bl >= (magicsz + vsz)) ylikely {
+	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) ylikely {
+	            bp += magicsz ;
+	            bl -= magicsz ;
 	    	    memcopy(bp,op->vetu,vsz) ;
 	    	    bp[0] = uchar(CMIHDR_VERSION) ;
 	    	    bp[1] = uchar(ENDIAN) ;
 	    	    bp += vsz ;
 	    	    bl -= vsz ;
-	    	    if (bl >= headsize) {
+	    	    if (bl >= headsz) ylikely {
 	        	uint			*header = uintp(bp) ;
 	        	header[hi_dbsz]		= op->dbsz ;
 	        	header[hi_dbtime]	= op->dbtime ;
@@ -134,8 +134,8 @@ int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	        	header[hi_vllen]	= op->vllen ;
 	        	header[hi_nents]	= op->nents ;
 	        	header[hi_maxent]	= op->maxent ;
-	        	bp += headsize ;
-	        	bl -= headsize ;
+	        	bp += headsz ;
+	        	bl -= headsz ;
 			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
@@ -146,20 +146,19 @@ int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (cmihdr_rd) */
+} /* end subroutine (cmihdr_rd) */
 
 /* write to (header) object (from buffer) */
 int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && hbuf) {
+	if (op && hbuf) ylikely {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) {
 		rs = SR_OK ;
-	        bp += magicsize ;
-	        bl -= magicsize ;
+	        bp += magicsz ;
+	        bl -= magicsz ;
 		/* read out the VETU information */
 	        if (bl >= 4) {
 		    uchar	ech = uchar(ENDIAN) ;
@@ -175,8 +174,8 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	        } else {
 	            rs = SR_ILSEQ ;
 		}
-	        if (rs >= 0) {
-	            if (bl >= headsize) {
+	        if (rs >= 0) ylikely {
+	            if (bl >= headsz) ylikely {
 	                const uint	*header = uintp(bp) ;
 	                op->dbsz	= header[hi_dbsz] ;
 	                op->dbtime	= header[hi_dbtime] ;
@@ -188,8 +187,8 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	                op->vllen	= header[hi_vllen] ;
 	                op->nents	= header[hi_nents] ;
 	                op->maxent	= header[hi_maxent] ;
-	                bp += headsize ;
-	                bl -= headsize ;
+	                bp += headsz ;
+	                bl -= headsz ;
 			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
@@ -200,8 +199,7 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	    } /* end if (hasValidMagic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (cmihdr_wr) */
+} /* end subroutine (cmihdr_wr) */
 
 
 /* local subroutines */
