@@ -231,18 +231,18 @@ const bpimk_obj		bpimk_modinfo = {
 int bpimk_open(bpimk *op,ccharp dbn,int of,mode_t om) noex {
 	cint		n = BPIMK_NENTRIES ;
 	int		rs ;
-	if ((rs = bpimk_ctor(op,dbn)) >= 0) {
+	if ((rs = bpimk_ctor(op,dbn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (dbn[0]) {
-		if (static cint rsv = var ; (rs = rsv) >= 0) {
+	    if (dbn[0]) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	            op->om = (om | 0600) ;
 	            op->nfd = -1 ;
 	            op->fl.ofcreat	= MKBOOL(of & O_CREAT) ;
 	            op->fl.ofexcl	= MKBOOL(of & O_EXCL) ;
-	            if (cchar *cp ; (rs = mem.strw(dbn,-1,&cp)) >= 0) {
+	            if (cchar *cp ; (rs = mem.strw(dbn,-1,&cp)) >= 0) ylikely {
 	                op->dbname = cp ;
-	                if ((rs = bpimk_filesbegin(op)) >= 0) {
-	                    if ((rs = bpimk_listbegin(op,n)) >= 0) {
+	                if ((rs = bpimk_filesbegin(op)) >= 0) ylikely {
+	                    if ((rs = bpimk_listbegin(op,n)) >= 0) ylikely {
 	                        op->magval = BPIMK_MAGIC ;
 	                    } /* end if */
 	                    if (rs < 0) {
@@ -271,7 +271,7 @@ int bpimk_close(bpimk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		nv = 0 ; /* return-value */
-	if ((rs = bpimk_magic(op)) >= 0) {
+	if ((rs = bpimk_magic(op)) >= 0) ylikely {
 	    int		f_go{} ;
 	    DEBUGPRINTF("nverses=%u\n",op->nverses) ;
 	    f_go = (! op->fl.abort) ;
@@ -324,7 +324,7 @@ int bpimk_close(bpimk *op) noex {
 
 int bpimk_add(bpimk *op,bpimk_v *bvp) noex {
 	int		rs ;
-	if ((rs = bpimk_magic(op,bvp)) >= 0) {
+	if ((rs = bpimk_magic(op,bvp)) >= 0) ylikely {
 	    DEBUGPRINTF("q=%u:%u:%u\n", bvp->b,bvp->c,bvp->v) ;
 	    if (bventry bve ; (rs = mkcitation(&bve.citation,bvp)) >= 0) {
 	        uint	citcmpval = (bve.citation & bvcitemask) ;
@@ -352,8 +352,8 @@ int bpimk_add(bpimk *op,bpimk_v *bvp) noex {
 } /* end subroutine (bpimk_add) */
 
 int bpimk_abort(bpimk *op,int f) noex {
-    	int		rs = SR_FAULT ;
-	if ((rs = bpimk_magic(op)) >= 0) {
+    	int		rs ;
+	if ((rs = bpimk_magic(op)) >= 0) ylikely {
 	    op->fl.abort = !!f ;
 	} /* end if (non-null) */
 	return rs ;
@@ -362,7 +362,7 @@ int bpimk_abort(bpimk *op,int f) noex {
 int bpimk_getinfo(bpimk *op,bpimk_info *bip) noex {
 	int		rs ;
 	int		nv = 0 ; /* return-value*/
-	if ((rs = bpimk_magic(op,bip)) >= 0) {
+	if ((rs = bpimk_magic(op,bip)) >= 0) ylikely {
 	    nv = op->nverses ;
 	    if (bip) {
 		memclear(bip) ;
@@ -396,15 +396,15 @@ local int bpimk_filesbeginc(bpimk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ai = 2 ; /* two path buffers */
-	if ((rs = maxpathlen) >= 0) {
+	if ((rs = maxpathlen) >= 0) ylikely {
 	    cint	sz = (ai * (rs + 1)) ;
 	    cint	maxpath = rs ;
 	    cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	    cchar	*dbn = op->dbname ;
 	    cchar	*suf = FSUF_IDX	 ;
-	    if (char *a ; (rs = mem.mall(sz,&a)) >= 0) {
+	    if (char *a ; (rs = mem.mall(sz,&a)) >= 0) ylikely {
 		char	*tbuf = (a + (--ai * (maxpath + 1))) ;
-	        if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
+	        if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) ylikely {
 	            cchar	*tfn = tbuf ;
 	            char	*rbuf = (a + (--ai * (maxpath + 1))) ;
 	            cmode	om = op->om ;
@@ -435,10 +435,10 @@ local int bpimk_filesbeginwait(bpimk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
-	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) ylikely {
 	    cchar	*dbn = op->dbname ;
 	    cchar	*suf = FSUF_IDX	 ;
-	    if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) {
+	    if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) ylikely {
 	        cint	to_stale = BPIMK_INTSTALE ;
 	        cint	of = (O_CREAT|O_WRONLY|O_EXCL) ;
 	        int	to = BPIMK_INTOPEN ;
@@ -472,10 +472,10 @@ local int bpimk_filesbegincreate(bpimk *op,cchar *tfn,int of,mode_t om) noex {
 	    DEBUGPRINTF("om=%05o\n",om) ;
 	}
 #endif
-	if ((rs = uc_open(tfn,of,om)) >= 0) {
+	if ((rs = uc_open(tfn,of,om)) >= 0) ylikely {
 	    cint	fd = rs ;
 	    op->fl.created = true ;
-	    if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) ylikely {
 	        op->nidxfname = charp(cp) ;
 	    } /* end if (memory-acquire) */
 	    rs1 = u_close(fd) ;
@@ -537,7 +537,7 @@ local int bpimk_mkidx(bpimk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = bpimk_nidxopen(op)) >= 0) {
+	if ((rs = bpimk_nidxopen(op)) >= 0) ylikely {
 	    bpihdr	hdr{} ;
 	    hdr.vetu[0] = uchar(BPIHDR_VERSION) ;
 	    hdr.vetu[1] = uchar(ENDIAN) ;
@@ -572,13 +572,13 @@ local int bpimk_mkidxwrmain(bpimk *op,bpihdr *hdrp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		off = 0 ; /* return-value */
-	if ((rs = ucpagesize) >= 0) {
+	if ((rs = ucpagesize) >= 0) ylikely {
 	    cint bsz = (rs * 4) ;
 	    cint nfd = op->nfd ;
-	    if (filer hf ; (rs = hf.start(nfd,0,bsz,0)) >= 0) {
-	        if ((rs = bpimk_mkidxwrhdr(op,hdrp,&hf,off)) >= 0) {
+	    if (filer hf ; (rs = hf.start(nfd,0,bsz,0)) >= 0) ylikely {
+	        if ((rs = bpimk_mkidxwrhdr(op,hdrp,&hf,off)) >= 0) ylikely {
 	            off += rs ;
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                rs = bpimk_mkidxwrtab(op,hdrp,&hf,off) ;
 	                off += rs ;
 	            } /* end if (ok) */
@@ -595,7 +595,7 @@ local int bpimk_mkidxwrhdr(bpimk *op,bpihdr *hdrp,filer *hfp,int off) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	(void) off ;
-	if (op) {
+	if (op) ylikely {
 	    cint	hlen = HDRBUFLEN ;
 	    char	hbuf[HDRBUFLEN+1] ;
 	    if ((rs = hdrp->rd(hbuf,hlen)) >= 0) {
@@ -640,7 +640,7 @@ local int bpimk_nidxopen(bpimk *op) noex {
 	if (op->nidxfname == nullptr) {
 	    cint psz = (ai * (var.maxpathlen + 1)) ;
 	    cint maxpath = var.maxpathlen ;
-	    if (char *a ; (rs = mem.mall(psz,&a)) >= 0) {
+	    if (char *a ; (rs = mem.mall(psz,&a)) >= 0) ylikely {
 	        cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
 	        cchar	*dbn = op->dbname ;
 	        cchar	*suf = FSUF_IDX ;
@@ -691,10 +691,10 @@ local int bpimk_nidxclose(bpimk *op) noex {
 local int bpimk_renamefiles(bpimk *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *idxfname ; (rs = mem.mp(&idxfname)) >= 0) {
+	if (char *idxfname ; (rs = mem.mp(&idxfname)) >= 0) ylikely {
 	    cchar	*suf = FSUF_IDX ;
 	    cchar	*end = ENDIANSTR ;
-	    if ((rs = mkfnamesuf2(idxfname,op->dbname,suf,end)) >= 0) {
+	    if ((rs = mkfnamesuf2(idxfname,op->dbname,suf,end)) >= 0) ylikely {
 	        if ((rs = u_rename(op->nidxfname,idxfname)) >= 0) {
 	            op->nidxfname[0] = '\0' ;
 	        } else {
@@ -716,7 +716,7 @@ local uint mkciteload(uint ci,uchar item) noex {
 
 local int mkcitation(uint *cip,bpimk_v *bvp) noex {
     	int		rs = SR_FAULT ;
-	if (cip && bvp) {
+	if (cip && bvp) ylikely {
 	    uint	ci = 0 ;
 	    rs = SR_OK ;
 	    ci = mkciteload(ci,0) ;
@@ -752,7 +752,7 @@ local int unlinkstale(cchar *fn,int to) noex {
 
 local int entcmp(BVENT *e1p,BVENT *e2p) noex {
     	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    if (e1p) {
 	        if (e2p) {
 	    	    cint vc1 = intconv(e1p->citation & bvcitemask) ;
@@ -772,7 +772,7 @@ local int vvecmp(cvoid **v1pp,cvoid **v2pp) noex {
 	bventry		**e1pp = (bventry **) v1pp ;
 	bventry		**e2pp = (bventry **) v2pp ;
 	int		rc = 0 ;
-	if (e1pp && e2pp) {
+	if (e1pp && e2pp) ylikely {
 	    bventry	*e1p = *e1pp ;
 	    bventry	*e2p = *e2pp ;
 	    rc = entcmp(e1p,e2p) ;
@@ -782,7 +782,7 @@ local int vvecmp(cvoid **v1pp,cvoid **v2pp) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	} /* end if (bufsizeget) */
     	return rs ;
