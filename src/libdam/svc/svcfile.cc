@@ -84,8 +84,8 @@ import libutil ;			/* |lenstr(3u)| */
 	((SVF_KA - ((v) % SVF_KA)) % SVF_KA)
 #define	SVF_MAG			SVCFILE_MAGIC
 
-#define	SVCENTRY		svcentry
-#define	SVCENTRY_KEY		svcentry_key
+#define	SVI			svcitem
+#define	SVI_KEY			svcitem_key
 
 #undef	DEFCHUNKSIZE
 #define	DEFCHUNKSIZE		512
@@ -135,12 +135,12 @@ struct svcfile_ie {
 	int		fi ;			/* file index */
 } ; /* end struct */
 
-struct svcentry {
+struct svcitem {
 	vecobj		keys ;
 	cchar		*svc ;
 } ; /* end struct */
 
-struct svcentry_key {
+struct svcitem_key {
 	cchar		*kname ;
 	cchar		*args ;
 	int		kl, al ;
@@ -152,7 +152,7 @@ struct vars {
 	int		maxhostlen ;
 } ; /* end struct */
 
-typedef svcentry_key *	keyp ;
+typedef svcitem_key *	keyp ;
 typedef cchar		*(*keyvals_t)[2] ;
 
 
@@ -224,7 +224,7 @@ local int	svcfile_filedump(svcfile *,int) noex ;
 local int	svcfile_filedel(svcfile *,int) noex ;
 #endif /* CF_FILEDEL */
 
-local int	svcfile_addentry(svcfile *,int,SVCENTRY *) noex ;
+local int	svcfile_addentry(svcfile *,int,SVI *) noex ;
 local int	svcfile_checkfiles(svcfile *,time_t) noex ;
 
 local int	svcfile_svcadd(svcfile *,cchar *) noex ;
@@ -239,11 +239,11 @@ local int	svcfile_already(svcfile *,cchar *) noex ;
 local int	svcfile_filealready(svcfile *,dev_t,ino_t) noex ;
 #endif
 
-local int	svcentry_start(SVCENTRY *,cchar *,int = -1) noex ;
-local int	svcentry_addkey(SVCENTRY *,cchar *,int,cchar *,int) noex ;
-local int	svcentry_nkeys(SVCENTRY *) noex ;
-local int	svcentry_size(SVCENTRY *) noex ;
-local int	svcentry_finish(SVCENTRY *) noex ;
+local int	svcitem_start(SVI *,cchar *,int = -1) noex ;
+local int	svcitem_addkey(SVI *,cchar *,int,cchar *,int) noex ;
+local int	svcitem_nkeys(SVI *) noex ;
+local int	svcitem_size(SVI *) noex ;
+local int	svcitem_finish(SVI *) noex ;
 
 local int	file_start(SVF_FILE *,cchar *) noex ;
 local int	file_finish(SVF_FILE *) noex ;
@@ -253,7 +253,7 @@ local int	svcname_incr(SVF_SVCNAME *) noex ;
 local int	svcname_decr(SVF_SVCNAME *) noex ;
 local int	svcname_finish(SVF_SVCNAME *) noex ;
 
-local int	ientry_loadstr(SVF_IE *,char *,SVCENTRY *) noex ;
+local int	ientry_loadstr(SVF_IE *,char *,SVI *) noex ;
 local int	ientry_finish(SVF_IE *) noex ;
 #if	CF_MOREKEYS
 local int	ientry_morekeys(SVF_IE *,int,int) noex ;
@@ -676,10 +676,10 @@ namespace {
 	bool		f_ent = false ;
 	fileparser(svcfile *p,int idx) noex : op(p), fi(idx) { } ;
         int operator () (cchar *) noex ;
-	int allocbegin() noex ;
-	int allocend() noex ;
-	int parsef(cchar *) noex ;
-	int parseln(svcentry *,cchar *,int) noex ;
+	int allocbegin	() noex ;
+	int allocend	() noex ;
+	int parsef	(cchar *) noex ;
+	int parseln	(svcitem *,cchar *,int) noex ;
     } ; /* end struct (fileparser) */
 } /* end namespace */
 
@@ -752,7 +752,7 @@ int fileparser::parsef(cchar *fn) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (bfile sf ; (rs = sf.open(fn,"r",0)) >= 0) {
-	    svcentry	se{} ;
+	    svcitem	se{} ;
 	    while ((rs = sf.readln(lbuf,llen)) > 0) {
 	 	cchar	*cp{} ;
 		if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
@@ -767,7 +767,7 @@ int fileparser::parsef(cchar *fn) noex {
 	            rs = svcfile_addentry(op,fi,&se) ;
 	        }
 	        f_ent = false ;
-	        rs1 = svcentry_finish(&se) ;
+	        rs1 = svcitem_finish(&se) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (extra entry) */
 	    rs1 = sf.close ;
@@ -779,7 +779,7 @@ int fileparser::parsef(cchar *fn) noex {
 	return (rs >= 0) ? c : rs ;
 } /* end method (fileparser::parsef) */
 
-int fileparser::parseln(svcentry *sep,cchar *cp,int cl) noex {
+int fileparser::parseln(svcitem *sep,cchar *cp,int cl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ce = 0 ;	/* count-entries */
@@ -797,7 +797,7 @@ int fileparser::parseln(svcentry *sep,cchar *cp,int cl) noex {
 		} else if ((fl > 0) && (svcl > 0)) {
 		    int		kl = fl ;
 		    cchar	*kp = fp ;
-		    /* create a SVCENTRY if found a first key */
+		    /* create a SVI if found a first key */
 	            if (ck++ == 0) {
 	            	if (f_ent) {
 			    if (rs >= 0) {
@@ -805,19 +805,19 @@ int fileparser::parseln(svcentry *sep,cchar *cp,int cl) noex {
 				rs = svcfile_addentry(op,fi,sep) ;
 			    }
 			    f_ent = false ;
-			    svcentry_finish(sep) ;
+			    svcitem_finish(sep) ;
 			} /* end if */
 			if (rs >= 0) {
-			    rs = svcentry_start(sep,svcp,svcl) ;
+			    rs = svcitem_start(sep,svcp,svcl) ;
 			    f_ent = (rs >= 0) ;
 			}
-		    } /* end if (created SVCENTRY) */
+		    } /* end if (created SVI) */
 	            if ((rs >= 0) && (fsb.term != ',')) {
 	                rs = fsb.srvarg(saterms,abuf,alen) ;
 			al = rs ;
 	            }
 	            if ((rs >= 0) && f_ent) { /* zero-value is allowed! */
-	                rs = svcentry_addkey(sep,kp,kl,abuf,al) ;
+	                rs = svcitem_addkey(sep,kp,kl,abuf,al) ;
 	            }
 		} /* end if (handling record) */
 		if (fsb.term == '#') break ;
@@ -848,7 +848,7 @@ local int svcfile_filealready(svcfile *op,dev_t dev,ino_t ino) noex {
 #endif /* CF_DEVINO */
 
 /* add an entry to the access entry list */
-local int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
+local int svcfile_addentry(svcfile *op,int fi,SVI *nep) noex {
 	int		sz = szof(SVF_IE) ;
 	int		rs ;
 	int		f_added = false ;
@@ -860,13 +860,13 @@ local int svcfile_addentry(svcfile *op,int fi,SVCENTRY *nep) noex {
 	    f_added = true ;
 	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 		SVF_IE	*iep = (SVF_IE *) vp ;
-	        cint	n = svcentry_nkeys(nep) ;
+	        cint	n = svcitem_nkeys(nep) ;
 	        iep->fi = fi ;
 	        sz = (n+1) * 2 * szof(char *) ;
 	        if ((rs = lm_mall(sz,&vp)) >= 0) {
 	            iep->nkeys = n ;
 	            iep->keyvals = keyvals_t(vp) ;
-	            sz = svcentry_size(nep) ;
+	            sz = svcitem_size(nep) ;
 	            if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
 	                iep->sz = sz ;
 	                if ((rs = ientry_loadstr(iep,bp,nep)) >= 0) {
@@ -1124,12 +1124,12 @@ local int svcname_decr(SVF_SVCNAME *snp) noex {
 	return (rs >= 0) ? snp->count : rs ;
 } /* end subroutine (svcname_decr) */
 
-local int svcentry_start(SVCENTRY *sep,cchar *sp,int sl) noex {
+local int svcitem_start(SVI *sep,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
 	    rs = memclear(sep) ;
 	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) {
-	        cint	sz = szof(SVCENTRY_KEY) ;
+	        cint	sz = szof(SVI_KEY) ;
 		cint	vn = 5 ;
 		cint	vo = vecobjm.ordered ;
 	        sep->svc = cp ;
@@ -1142,14 +1142,14 @@ local int svcentry_start(SVCENTRY *sep,cchar *sp,int sl) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
-} /* end subroutine (svcentry_start) */
+} /* end subroutine (svcitem_start) */
 
-local int svcentry_finish(SVCENTRY *sep) noex {
+local int svcitem_finish(SVI *sep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(&sep->keys,i,&vp) >= 0 ; i += 1) {
-	    SVCENTRY_KEY	*kep = (SVCENTRY_KEY *) vp ;
+	    SVI_KEY	*kep = (SVI_KEY *) vp ;
 	    if (vp) {
 	        if (kep->kname) {
 	            rs1 = const_free(kep->kname) ;
@@ -1168,9 +1168,9 @@ local int svcentry_finish(SVCENTRY *sep) noex {
 	    sep->svc = nullptr ;
 	}
 	return rs ;
-} /* end subroutine (svcentry_finish) */
+} /* end subroutine (svcitem_finish) */
 
-local int svcentry_addkey(SVCENTRY *sep,cc *kp,int kl,cc *ap,int al) noex {
+local int svcitem_addkey(SVI *sep,cc *kp,int kl,cc *ap,int al) noex {
 	int		rs ;
 	int		sz = 0 ;
 	if (kl < 0) kl = lenstr(kp) ;
@@ -1178,7 +1178,7 @@ local int svcentry_addkey(SVCENTRY *sep,cc *kp,int kl,cc *ap,int al) noex {
 	sz += (kl+1) ;
 	sz += (al+1) ;
 	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
-	    SVCENTRY_KEY	key ;
+	    SVI_KEY	key ;
 	    key.kl = kl ;
 	    key.kname = bp ;
 	    key.al = 0 ;
@@ -1195,27 +1195,27 @@ local int svcentry_addkey(SVCENTRY *sep,cc *kp,int kl,cc *ap,int al) noex {
 	    } /* end if (error) */
 	} /* end if (memory-allocation) */
 	return rs ;
-} /* end subroutine (svcentry_addkey) */
+} /* end subroutine (svcitem_addkey) */
 
-local int svcentry_nkeys(SVCENTRY *sep) noex {
+local int svcitem_nkeys(SVI *sep) noex {
 	return vecobj_count(&sep->keys) ;
-} /* end subroutine (svcentry_nkeys) */
+} /* end subroutine (svcitem_nkeys) */
 
-local int svcentry_size(SVCENTRY *sep) noex {
+local int svcitem_size(SVI *sep) noex {
 	int		sz = 0 ;
 	sz += (lenstr(sep->svc) + 1) ;
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(&sep->keys,i,&vp) >= 0 ; i += 1) {
-	    SVCENTRY_KEY	*kep = (SVCENTRY_KEY *) vp ;
+	    SVI_KEY	*kep = (SVI_KEY *) vp ;
 	    if (vp) {
 	        sz += (kep->kl+1) ;
 	        sz += (kep->al+1) ;
 	    }
 	} /* end for */
 	return sz ;
-} /* end subroutine (svcentry_size) */
+} /* end subroutine (svcitem_size) */
 
-local int ientry_loadstr(SVF_IE *iep,char *bp,SVCENTRY *nep) noex {
+local int ientry_loadstr(SVF_IE *iep,char *bp,SVI *nep) noex {
 	int		rs = SR_FAULT ;
 	int		sl = 0 ;
 	if (iep && bp && nep) {
@@ -1225,7 +1225,7 @@ local int ientry_loadstr(SVF_IE *iep,char *bp,SVCENTRY *nep) noex {
 	    bp = (strwcpy(bp,nep->svc,sl)+1) ;
 	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(&nep->keys,i,&vp) >= 0 ; i += 1) {
-	        SVCENTRY_KEY	*kep = (SVCENTRY_KEY *) vp ;
+	        SVI_KEY	*kep = (SVI_KEY *) vp ;
 	        if (vp) {
 	            iep->keyvals[j][0] = nullptr ;
 	            iep->keyvals[j][1] = nullptr ;
@@ -1342,7 +1342,7 @@ local int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
 	SVF_FILE	*e1p = (SVF_FILE *) *v1pp ;
 	SVF_FILE	*e2p = (SVF_FILE *) *v2pp ;
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
