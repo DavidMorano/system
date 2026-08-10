@@ -96,7 +96,7 @@ enum his {
 /* local variables */
 
 constexpr int		headsize	= hi_overlast * szof(uint) ;
-constexpr int		magicsize	= CYIHDR_MAGICSIZE ;
+constexpr int		magicsz		= CYIHDR_MAGICSIZE ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= CYIHDR_MAGICSTR ;
 
@@ -112,10 +112,10 @@ int cyihdr_rd(cyihdr *op,char *hbuf,int hlen) noex {
 	if (op && hbuf) {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + vsz)) {
-	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
-	            bp += magicsize ;
-	            bl -= magicsize ;
+	    if (bl >= (magicsz + vsz)) {
+	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) {
+	            bp += magicsz ;
+	            bl -= magicsz ;
 	    	    memcopy(bp,op->vetu,vsz) ;
 	    	    bp[0] = uchar(CYIHDR_VERSION) ;
 	    	    bp[1] = uchar(ENDIAN) ;
@@ -146,8 +146,7 @@ int cyihdr_rd(cyihdr *op,char *hbuf,int hlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (cyihdr_rd) */
+} /* end subroutine (cyihdr_rd) */
 
 int cyihdr_wr(cyihdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
@@ -155,10 +154,10 @@ int cyihdr_wr(cyihdr *op,cchar *hbuf,int hlen) noex {
 	if (op && hbuf) {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) {
 		rs = SR_OK ;
-	        bp += magicsize ;
-	        bl -= magicsize ;
+	        bp += magicsz ;
+	        bl -= magicsz ;
 		/* read out the VETU information */
 		if (bl >= vsz) {
 	            memcopy(op->vetu,bp,vsz) ;
@@ -199,8 +198,7 @@ int cyihdr_wr(cyihdr *op,cchar *hbuf,int hlen) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (cyihdr_wr) */
+} /* end subroutine (cyihdr_wr) */
 
 
 /* local subroutines */
