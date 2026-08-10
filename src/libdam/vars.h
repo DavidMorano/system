@@ -96,15 +96,15 @@ typedef	VARS_MI		vars_mi ;
 
 EXTERNC_begin
 
-extern int	vars_open(vars *,cchar *) noex ;
-extern int	vars_count(vars *) noex ;
-extern int	vars_curbegin(vars *,vars_cur *) noex ;
-extern int	vars_curenum(vars *,vars_cur *,char *,int,char *,int) noex ;
-extern int	vars_curend(vars *,vars_cur *) noex ;
-extern int	vars_fetch(vars *,cchar *,int,vars_cur *,char *,int) noex ;
-extern int	vars_getinfo(vars *,vars_info *) noex ;
-extern int	vars_audit(vars *) noex ;
-extern int	vars_close(vars *) noex ;
+extern int vars_open		(vars *,cchar *) noex ;
+extern int vars_count		(vars *) noex ;
+extern int vars_curbegin	(vars *,vars_cur *) noex ;
+extern int vars_curenum		(vars *,vars_cur *,char *,int,char *,int) noex ;
+extern int vars_curend		(vars *,vars_cur *) noex ;
+extern int vars_fetch		(vars *,cc *,int,vars_cur *,char *,int) noex ;
+extern int vars_getinfo		(vars *,vars_info *) noex ;
+extern int vars_audit		(vars *) noex ;
+extern int vars_close		(vars *) noex ;
 
 EXTERNC_end
 
