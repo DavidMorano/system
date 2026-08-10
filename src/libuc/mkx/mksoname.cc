@@ -45,14 +45,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bufsizevar.hh>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizevar.hh>		/* LLIBUC */
+#include	<storebuf.h>		/* LLIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mksoname.h"
 
@@ -84,10 +84,8 @@ import libutil ;			/* |lenstr(3u)| */
 /* local variables */
 
 static bufsizevar	maxnamelen(bufsize_mn) ;
-
-cchar			liba[] = "lib" ;
-
-cint			libl = clenstr(liba) ;
+cchar			liba[]	= "lib" ;
+cint			libl	= clenstr(liba) ;
 
 
 /* exported variables */
@@ -124,7 +122,6 @@ int mksoname(char *shlibname,cchar *pnp,int µpnl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (mksoname) */
+} /* end subroutine (mksoname) */
 
 
