@@ -170,7 +170,7 @@ local int absfn_loadnul(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		nl = 0 ; /* return-value */
 	if (sl > ABSFN_SHORTLEN) {
-	    if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) ylikely {
 		nl = rs ;
 		*rpp = cp ;
 		op->as = cp ;
