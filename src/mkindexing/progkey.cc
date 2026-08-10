@@ -379,7 +379,7 @@ local int subinfo_sendparamseigens(SUBINFO *sip,bfile *ofp)
 	            if ((rs = progeigen_curbegin(pip,&ecur)) >= 0) {
 
 	                while (rs >= 0) {
-	                    wl = progeigen_enum(pip,&ecur,&wp) ;
+	                    wl = progeigen_curenum(pip,&ecur,&wp) ;
 	                    if (wl == SR_NOTFOUND) break ;
 	                    rs = wl ;
 
