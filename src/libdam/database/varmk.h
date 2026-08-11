@@ -20,31 +20,26 @@
 
 
 #define	VARMK		struct varmk_head
-#define	VARMK_CALLS	struct varmk_callsubs
+#define	VARMK_FL	struct varmk_flags
 #define	VARMK_MAGIC	0x99447246
 
 
-EXTERNC_begin
-    struct varmk_callsubs {
-	int	(*open)(void *,cchar *,int,mode_t,int) ;
-	int	(*chgrp)(void *,gid_t) ;
-	int	(*addvar)(void *,cchar *,cchar *,int) ;
-	int	(*abort)(void *) ;
-	int	(*close)(void *) ;
-    } ; /* end struct (varmk_callsubs) */
-EXTERNC_end
+struct varmk_flags {
+    	uint		modload:1 ;
+} ; /* end struct */
 
 struct varmk_head {
-	modload		loader ;
-	VARMK_CALLS	call ;
-	void		*sop ;		/* shared-object (SO) pointer */
+	modload		*mlp ;
+	void		*callp ;
 	void		*obj ;		/* object pointer */
+	VARMK_FL	fl ;
 	uint		magval ;
 	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
 } ; /* end struct */
 
 typedef VARMK		varmk ;
-typedef VARMK_CALLS	varmk_calls ;
+typedef VARMK_FL	varmk_fl ;
 
 EXTERNC_begin
 
