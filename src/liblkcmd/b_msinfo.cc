@@ -1,4 +1,4 @@
-/* b_msinfo SUPPORT */
+/* b_msinfo SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -21,29 +21,33 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_msinfo
+
+	Description:
 	This is a built-in command to the KSH shell.  It should
 	also be able to be made into a stand-alone program without
 	much (if almost any) difficulty, but I have not done that
-	yet (we already have a MSINFO program out there).
+	yet (we already have a MSINFO program out there).  Note
+	that special care needed to be taken with the child processes
+	because we cannot let them ever return normally!  They
+	cannot return since they would be returning to a KSH program
+	that thinks it is alive (!) and that geneally causes some
+	sort of problem or another.  That is just some weird thing
+	asking for trouble.  So we have to take care to force child
+	procnodees to exit explicitly.  Child procnodees are only
+	created when run in "daemon" mode.
 
-	Note that special care needed to be taken with the child
-	processes because we cannot let them ever return normally!
-	They cannot return since they would be returning to a KSH
-	program that thinks it is alive (!) and that geneally causes
-	some sort of problem or another.  That is just some weird
-	thing asking for trouble.  So we have to take care to force
-	child procnodees to exit explicitly.  Child procnodees are
-	only created when run in "daemon" mode.
-
-	Implemtation note: We do not print out the data on a node
-	whence we first get it.  First we collect all of the data
-	on all nodes, and then we print out all nodes that we have
-	data for.  We do this because, there is optimized locking
-	within the MSFILE object and the look can be held from one
-	enumeration of a node to another (that is the optimization)
-	and if we printed stuff out between getting a node's
-	information, we cannot guarantee that we will not be blocked
-	on output while we might be holding the MSFILE lock.
+	Implemtation note: 
+	We do not print out the data on a node whence we first get
+	it.  First we collect all of the data on all nodes, and
+	then we print out all nodes that we have data for.  We do
+	this because, there is optimized locking within the MSFILE
+	object and the look can be held from one enumeration of a
+	node to another (that is the optimization) and if we printed
+	stuff out between getting a node's information, we cannot
+	guarantee that we will not be blocked on output while we
+	might be holding the MSFILE lock.
 
 	Synopsis:
 	$ msinfo [-msfile <file>]
@@ -67,7 +71,7 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
@@ -104,21 +108,6 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	msfile_best(MSFILE *,time_t,uint,MSFILE_ENT *) ;
@@ -129,13 +118,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -160,7 +142,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	PROGINFO	*pip ;
 	cchar		*speedname ;
@@ -184,8 +166,8 @@ static int	locinfo_start(LOCINFO *,PROGINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
 static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,VECSTR *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,VECSTR *,cchar *) ;
 static int	procloads(PROGINFO *,vecstr *,cchar *,int) ;
 static int	procload(PROGINFO *,vecstr *,cchar *,int) ;
 
@@ -402,8 +384,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -701,7 +683,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_speedname:
 	                    lip->have.speedname = TRUE ;
-	                    lip->final.speedname = TRUE ;
+	                    lip->finval.speedname = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl)
@@ -825,7 +807,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -1222,7 +1204,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1234,13 +1216,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(progopts,2,kp,kl)) >= 0) {
 	                int	v ;
@@ -1249,9 +1231,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case progopt_quiet:
-	                    if (! pip->final.quiet) {
+	                    if (! pip->finval.quiet) {
 	                        pip->have.quiet = TRUE ;
-	                        pip->final.quiet = TRUE ;
+	                        pip->finval.quiet = TRUE ;
 	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1260,9 +1242,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case progopt_speedname:
-	                    if (! lip->final.speedname) {
+	                    if (! lip->finval.speedname) {
 	                        lip->have.speedname = TRUE ;
-	                        lip->final.speedname = TRUE ;
+	                        lip->finval.speedname = TRUE ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &lip->speedname ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -1270,9 +1252,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case progopt_speedint:
-	                    if (! lip->final.speedint) {
+	                    if (! lip->finval.speedint) {
 	                        lip->have.speedint = TRUE ;
-	                        lip->final.speedint = TRUE ;
+	                        lip->finval.speedint = TRUE ;
 	                        if (vl > 0) {
 	                            rs = cfdecti(vp,vl,&v) ;
 	                            lip->speedint = v ;
@@ -1280,9 +1262,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case progopt_age:
-	                    if (! lip->final.age) {
+	                    if (! lip->finval.age) {
 	                        lip->have.age = TRUE ;
-	                        lip->final.age = TRUE ;
+	                        lip->finval.age = TRUE ;
 	                        lip->fl.age = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1291,9 +1273,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    } /* end if */
 	                    break ;
 	                case progopt_all:
-	                    if (! lip->final.all) {
+	                    if (! lip->finval.all) {
 	                        lip->have.all = TRUE ;
-	                        lip->final.all = TRUE ;
+	                        lip->finval.all = TRUE ;
 	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1302,9 +1284,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    } /* end if */
 	                    break ;
 	                case progopt_geekout:
-	                    if (! lip->final.geekout) {
+	                    if (! lip->finval.geekout) {
 	                        lip->have.geekout = TRUE ;
-	                        lip->final.geekout = TRUE ;
+	                        lip->finval.geekout = TRUE ;
 	                        lip->fl.geekout = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1330,7 +1312,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,VECSTR *nnp,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,VECSTR *nnp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1565,11 +1547,11 @@ int		oflags ;
 	            i = 0 ;
 	            while ((rs >= 0) && (i < 4)) {
 
-	                rs1 = msfile_enum(&ms,&cur,&e) ;
+	                rs1 = msfile_curenum(&ms,&cur,&e) ;
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4)) {
-	                    debugprintf("b_msinfo: msfile_enum() rs=%d\n",rs) ;
+	                    debugprintf("msfile_curenum() rs=%d\n",rs) ;
 	                    if (rs1 >= 0)
 	                        debugmse(&e) ;
 	                }
