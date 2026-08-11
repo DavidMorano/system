@@ -1,4 +1,5 @@
-/* b_sysdb SUPPORT */
+/* b_sysdb SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to query system databases */
@@ -19,12 +20,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_sysdb
+
 	Synopsis:
 	$ sysdb <db> [<queries>]
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -47,7 +51,7 @@
 
 #include	<usystem.h>
 #include	<exitcodes.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -107,7 +111,7 @@ struct locinfo {
 	cchar		*dbfname ;
 	cchar		*fname ;
 	cchar		*proto ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	vecstr		stores ;
 	uint		ndb ;
@@ -138,10 +142,10 @@ static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 static int	locinfo_defaults(LOCINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
 
-static int	procopts(PI *,KEYOPT *) ;
-static int	process(PI *,ARGINFO *,BITS *,cchar *,cchar *,int) ;
+static int	procopts(PI *,keyopt *) ;
+static int	process(PI *,ARGINFO *,bits *,cchar *,cchar *,int) ;
 static int	procall(PI *,int,void *) ;
-static int	procsome(PI *,int,void *,ARGINFO *,BITS *,cchar *) ;
+static int	procsome(PI *,int,void *,ARGINFO *,bits *,cchar *) ;
 static int	procspecs(PI *,void *,int,cchar *,int) ;
 static int	procspec(PI *,void *,int,cchar *,int) ;
 
@@ -310,8 +314,8 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PI		pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -651,7 +655,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -993,7 +997,7 @@ static int usage(PI *pip)
 
 
 /* process the program ako-options */
-static int procopts(PI *pip,KEYOPT *kop)
+static int procopts(PI *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1005,13 +1009,13 @@ static int procopts(PI *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1020,9 +1024,9 @@ static int procopts(PI *pip,KEYOPT *kop)
 	                switch (oi) {
 	                case akoname_utf:
 	                case akoname_db:
-	                    if (! lip->final.dbfname) {
+	                    if (! lip->finval.dbfname) {
 	                        lip->have.dbfname = TRUE ;
-	                        lip->final.dbfname = TRUE ;
+	                        lip->finval.dbfname = TRUE ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &lip->dbfname ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -1048,7 +1052,7 @@ static int procopts(PI *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PI *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn,
+static int process(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
 		int w)
 {
 	SHIO		ofile, *ofp = &ofile ;
@@ -1214,7 +1218,7 @@ static int procall(PI *pip,int w,void *ofp)
 /* end subroutine (procall) */
 
 
-static int procsome(PI *pip,int w,void *ofp,ARGINFO *aip,BITS *bop,
+static int procsome(PI *pip,int w,void *ofp,ARGINFO *aip,bits *bop,
 		cchar *afn)
 {
 	int		rs = SR_OK ;
@@ -1404,7 +1408,7 @@ static int procprotos_end(PI *pip,int w) noex {
 /* ARGSUSED */
 static int procprotos_all(PI *pip,int w,void *ofp) noex {
 	struct protoent	pe ;
-	const int	pelen = getbufsize(getbufsize_pe) ;
+	const int	pelen = bufsizeget(bufsize_pr) ;
 	int		rs ;
 	int		rs1 ;
 	char		*pebuf ;
@@ -1444,7 +1448,7 @@ static int procprotos_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	cchar		*name ;
 	if ((rs = nulstr_start(&s,sp,sl,&name)) >= 0) {
 	    struct protoent	pe ;
-	    const int		pelen = getbufsize(getbufsize_pe) ;
+	    const int		pelen = bufsizeget(bufsize_pr) ;
 	    char		*pebuf ;
 	    if ((rs = uc_malloc((pelen+1),&pebuf)) >= 0) {
 	        if ((rs = getpe_name(&pe,pebuf,pelen,name)) > 0) {
@@ -1471,7 +1475,7 @@ static int procnets_end(PI *pip,int w) noex {
 /* ARGSUSED */
 static int procnets_all(PI *pip,int w,void *ofp) noex {
 	struct netent	ne ;
-	const int	nelen = getbufsize(getbufsize_ne) ;
+	const int	nelen = bufsizeget(bufsize_nw) ;
 	int		rs ;
 	int		rs1 ;
 	char		*nebuf ;
@@ -1503,7 +1507,7 @@ static int procnets_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	cchar		*name ;
 	if ((rs = nulstr_start(&s,sp,sl,&name)) >= 0) {
 	    struct netent	ne ;
-	    const int		nelen = getbufsize(getbufsize_ne) ;
+	    const int		nelen = bufsizeget(bufsize_nw) ;
 	    char		*nebuf ;
 	    if ((rs = uc_malloc((nelen+1),&nebuf)) >= 0) {
 	        if ((rs = getne_name(&ne,nebuf,nelen,name)) > 0) {
@@ -1530,7 +1534,7 @@ static int prochosts_end(PI *pip,int w) noex {
 /* ARGSUSED */
 static int prochosts_all(PI *pip,int w,void *ofp) noex {
 	struct hostent	he ;
-	const int	helen = getbufsize(getbufsize_he) ;
+	const int	helen = bufsizeget(bufsize_ho) ;
 	int		rs ;
 	int		rs1 ;
 	char		*hebuf ;
@@ -1562,7 +1566,7 @@ static int prochosts_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	cchar		*name ;
 	if ((rs = nulstr_start(&s,sp,sl,&name)) >= 0) {
 	    struct hostent	he ;
-	    const int		helen = getbufsize(getbufsize_he) ;
+	    const int		helen = bufsizeget(bufsize_ho) ;
 	    char		*hebuf ;
 	    if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
 	        if ((rs = gethe_name(&he,hebuf,helen,name)) > 0) {
@@ -1589,7 +1593,7 @@ static int procsvcs_end(PI *pip,int w) noex {
 /* ARGSUSED */
 static int procsvcs_all(PI *pip,int w,void *ofp) noex {
 	struct servent	se ;
-	const int	selen = getbufsize(getbufsize_se) ;
+	const int	selen = bufsizeget(bufsize_sv) ;
 	int		rs ;
 	int		rs1 ;
 	char		*sebuf ;
@@ -1622,7 +1626,7 @@ static int procsvcs_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	cchar		*name ;
 	if ((rs = nulstr_start(&s,sp,sl,&name)) >= 0) {
 	    struct servent	se ;
-	    const int		selen = getbufsize(getbufsize_se) ;
+	    const int		selen = bufsizeget(bufsize_sv) ;
 	    cchar		*proto = lip->proto ;
 	    char		*sebuf ;
 	    if ((rs = uc_malloc((selen+1),&sebuf)) >= 0) {
@@ -1650,7 +1654,7 @@ static int procuas_end(PI *pip,int w) noex {
 /* ARGSUSED */
 static int procuas_all(PI *pip,int w,void *ofp) noex {
 	userattr_t	ua ;
-	const int	ualen = getbufsize(getbufsize_ua) ;
+	const int	ualen = bufsizeget(bufsize_ua) ;
 	int		rs ;
 	int		rs1 ;
 	char		*uabuf ;
@@ -1685,7 +1689,7 @@ static int procuas_query(PI *pip,int w,void *ofp,cchar *sp,int sl) noex {
 	cchar		*name ;
 	if ((rs = nulstr_start(&s,sp,sl,&name)) >= 0) {
 	    userattr_t	ua ;
-	    const int	ualen = getbufsize(getbufsize_ua) ;
+	    const int	ualen = bufsizeget(bufsize_ua) ;
 	    char	*uabuf ;
 	    if ((rs = uc_malloc((ualen+1),&uabuf)) >= 0) {
 	        if ((rs = getua_name(&ua,uabuf,ualen,name)) > 0) {
@@ -1771,7 +1775,7 @@ static int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
 
 	if (dbfname != nullptr) {
 	    lip->have.dbfname = TRUE ;
-	    lip->final.dbfname = TRUE ;
+	    lip->finval.dbfname = TRUE ;
 	    lip->dbfname = dbfname ;
 	}
 
@@ -1794,7 +1798,7 @@ static int locinfo_defaults(LOCINFO *lip) noex {
 	if (lip == nullptr)
 	    return SR_FAULT ;
 
-	if ((lip->dbfname == nullptr) && (! lip->final.dbfname)) {
+	if ((lip->dbfname == nullptr) && (! lip->finval.dbfname)) {
 	    cchar	*cp = getourenv(pip->envv,VARDBFNAME) ;
 	    if (cp != nullptr) {
 	        cchar	**vpp = &lip->dbfname ;
