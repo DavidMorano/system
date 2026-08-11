@@ -100,7 +100,7 @@ local int	liner(int,size_t) noex ;
 int filelines(cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		lines = 0 ;
+	int		lines = 0 ; /* return-value */
 	if (fn) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0]) ylikely {
@@ -112,7 +112,7 @@ int filelines(cchar *fn) noex {
 			rs = SR_NOTSUP ;
 		        if (S_ISREG(sb.st_mode)) ylikely {
 			    rs = SR_OK ;
-			    if (fsize > 0) {
+			    if (fsize > 0) ylikely {
 			        rs = liner(fd,fsize) ;
 			        lines = rs ;
 			    } /* end if (non-zero positive) */
