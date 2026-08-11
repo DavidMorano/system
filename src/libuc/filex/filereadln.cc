@@ -70,10 +70,12 @@
 
 /* forward references */
 
-local int reader(char *,int,char *,int,cchar *) noex ;
+local int	reader(char *,int,char *,int,cchar *) noex ;
 
 
 /* local variables */
+
+cint		bsz		= 512 ; /* buffer size */
 
 
 /* exported variables */
@@ -114,7 +116,7 @@ local int reader(char *lbuf,int llen,char *rbuf,int rlen,cchar *fname) noex {
 	cmode		om = 0666 ;
         if ((rs = uc_open(fname,of,om)) >= 0) ylikely {
             cint    fd = rs ;
-            if (filer b ; (rs = b.start(fd,0z,512,0)) >= 0) ylikely {
+            if (filer b ; (rs = b.start(fd,0z,bsz)) >= 0) ylikely {
                 while ((rs = b.readln(lbuf,llen)) > 0) {
                     cchar   *cp{} ;
                     if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
