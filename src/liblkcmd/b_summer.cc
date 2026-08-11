@@ -1,12 +1,13 @@
-/* b_summer (KSH built-in) */
+/* b_summer SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* main subroutine for SUMMER */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchables */
 #define	CF_DEBUG	0		/* debug print-outs */
 #define	CF_LOCSETENT	0		/* |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -22,11 +23,13 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_summer
+
+	Description:
 	This is a fairly generic front-end subroutine for a program.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -43,15 +46,15 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
 #include	<usystem.h>
 #include	<keyopt.h>
 #include	<bits.h>
 #include	<vecobj.h>
 #include	<field.h>
+#include	<cfdec.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -75,19 +78,6 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecf(const char *,int, double *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -97,15 +87,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-
-extern double	fsum(double *,int) ;
-extern double	fam(double *,int) ;
-extern double	fhm(double *,int) ;
 
 
 /* external variables */
@@ -130,7 +111,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
@@ -143,8 +124,8 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
 static int	procout(PROGINFO *,void *,PROCESSOR *,int) ;
 
 static int	processor_start(PROCESSOR *,int) ;
@@ -364,8 +345,8 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -574,7 +555,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-				    KEYOPT	*kop = &akopts ;
+				    keyopt	*kop = &akopts ;
 	                            rs = keyopt_loads(kop,argp,argl) ;
 				}
 	                    } else
@@ -693,7 +674,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -933,7 +914,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 	if (rs >= 0) {
 	    ARGINFO	*aip = &ainfo ;
-	    BITS	*bop = &pargs ;
+	    bits	*bop = &pargs ;
 	    rs = process(pip,aip,bop,ofname,afname,ifname) ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
@@ -1041,7 +1022,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1055,10 +1036,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    KEYOPT_CUR	cur ;
+	    keyopt_cur	cur ;
 	    debugprintf("main: progopts specified:\n") ;
 	    keyopt_curbegin(kop,&cur) ;
-	    while ((rs = keyopt_enumkeys(kop,&cur,&cp)) >= 0) {
+	    while ((rs = keyopt_curenumkeys(kop,&cur,&cp)) >= 0) {
 	        if (cp == NULL) continue ;
 	        debugprintf("main: | optkey=%s\n",cp) ;
 	    }
@@ -1070,11 +1051,11 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	    int		ki ;
 	    int		wi ;
 	    for (ki = 0 ; progopts[ki] != NULL ; ki += 1) {
-	        KEYOPT_CUR	cur ;
+	        keyopt_cur	cur ;
 	        if ((rs = keyopt_curbegin(kop,&cur)) >= 0) {
 
 	            while (rs >= 0) {
-	                cl = keyopt_enumvalues(kop,progopts[ki],&cur,&cp) ;
+	                cl = keyopt_curenumvals(kop,progopts[ki],&cur,&cp) ;
 	                if (cl == SR_NOTFOUND) break ;
 		        rs = cl ;
 		        if (rs >= 0) {
@@ -1125,7 +1106,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn,
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
 			cchar *ifn)
 {
 	SHIO		ofile, *ofp = &ofile ;
@@ -1409,7 +1390,7 @@ static int processor_add(PROCESSOR *op,cchar *sp,int sl)
 
 	while ((cl = nextfield(sp,sl,&cp)) > 0) {
 
-	    if ((rs = cfdecf(cp,cl,&fnum)) >= 0) {
+	    if ((rs = cfdecd(cp,cl,&fnum)) >= 0) {
 	        rs = vecobj_add(&op->numbers,&fnum) ;
 	    }
 
