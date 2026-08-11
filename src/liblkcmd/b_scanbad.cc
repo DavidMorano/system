@@ -77,42 +77,8 @@
 
 /* external subroutines */
 
-extern uint	uceil(uint,int) ;
-
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	cfdecmfll(cchar *,int,LONG *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	msleep(int) ;
-extern int	hasnonwhite(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isStrEmpty(cchar *,int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -132,7 +98,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
@@ -156,24 +122,24 @@ struct procdata {
 
 /* forward references */
 
-static int	mainsub(int,cchar *[],cchar *[],void *) ;
+local int	mainsub(int,cchar *[],cchar *[],void *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_allocbegin(LOCINFO *,int) ;
-static int	locinfo_allocend(LOCINFO *) ;
-static int	locinfo_scanspec(LOCINFO *,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_allocbegin(LOCINFO *,int) ;
+local int	locinfo_allocend(LOCINFO *) ;
+local int	locinfo_scanspec(LOCINFO *,cchar *,int) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif /* CF_LOCSETENT */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,PROCDATA *,
+local int	procargs(PROGINFO *,ARGINFO *,bits *,PROCDATA *,
 			cchar *,cchar *) ;
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procfile(PROGINFO *,PROCDATA *,void *,cchar *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procfile(PROGINFO *,PROCDATA *,void *,cchar *) ;
 
 
 /* local variables */
@@ -281,14 +247,14 @@ int p_scanbad(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
 	PROCDATA	pd ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -540,7 +506,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_nice:
-	                    lip->final.nice = TRUE ;
+	                    lip->finval.nice = TRUE ;
 	                    lip->have.nice = TRUE ;
 	                    if (argr > 0) {
 	                        argp = argv[++ai] ;
@@ -561,7 +527,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        argl = strlen(argp) ;
 	                        if (argl) {
 	                            int		v ;
-	                            lip->final.gap = TRUE ;
+	                            lip->finval.gap = TRUE ;
 	                            lip->have.gap = TRUE ;
 	                            rs = cfdecti(argp,argl,&v) ;
 	                            lip->gap = v ;
@@ -638,7 +604,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -827,7 +793,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    if ((rs = locinfo_allocbegin(lip,pd.blocklen)) >= 0) {
 	        {
 		    ARGINFO	*aip = &ainfo ;
-		    BITS	*bop = &pargs ;
+		    bits	*bop = &pargs ;
 	            cchar	*ofn = ofname ;
 	            cchar	*afn = afname ;
 	            rs = procargs(pip,aip,bop,&pd,ofn,afn) ;
@@ -927,7 +893,7 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -947,7 +913,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PROCDATA *pdp,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,PROCDATA *pdp,
 		cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
@@ -1043,7 +1009,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PROCDATA *pdp,
 /* end subroutine (procargs) */
 
 
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1055,13 +1021,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(progopts,3,kp,kl)) >= 0) {
 
@@ -1070,9 +1036,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 
 	                case progopt_nice:
-	                    if (! lip->final.nice) {
+	                    if (! lip->finval.nice) {
 	                        if (vl > 0) {
-	                            lip->final.nice = TRUE ;
+	                            lip->finval.nice = TRUE ;
 	                            lip->have.nice = TRUE ;
 	                            rs = optvalue(vp,vl) ;
 	                            lip->nice = rs ;
@@ -1081,10 +1047,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case progopt_scanoff:
-	                    if ( ! lip->final.scanoff) {
+	                    if ( ! lip->finval.scanoff) {
 	                        if (vl > 0) {
 	                            LONG	lv ;
-	                            lip->final.scanoff = TRUE ;
+	                            lip->finval.scanoff = TRUE ;
 	                            lip->have.scanoff = TRUE ;
 	                            rs = cfdecmfll(vp,vl,&lv) ;
 	                            lip->scanoff = lv ;
@@ -1093,10 +1059,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case progopt_scanlen:
-	                    if ( ! lip->final.scanlen) {
+	                    if ( ! lip->finval.scanlen) {
 	                        if (vl > 0) {
 	                            LONG	lv ;
-	                            lip->final.scanlen = TRUE ;
+	                            lip->finval.scanlen = TRUE ;
 	                            lip->have.scanlen = TRUE ;
 	                            rs = cfdecmfll(vp,vl,&lv) ;
 	                            lip->scanlen = lv ;
@@ -1105,10 +1071,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case progopt_gap:
-	                    if (! lip->final.gap) {
+	                    if (! lip->finval.gap) {
 	                        if (vl > 0) {
 	                            int		v ;
-	                            lip->final.gap = TRUE ;
+	                            lip->finval.gap = TRUE ;
 	                            lip->have.gap = TRUE ;
 	                            rs = cfdecti(vp,vl,&v) ;
 	                            lip->gap = v ;
@@ -1135,7 +1101,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 
 /* process a file */
-static int procfile(PROGINFO *pip,PROCDATA *pdp,void *ofp,cchar *ifname)
+local int procfile(PROGINFO *pip,PROCDATA *pdp,void *ofp,cchar *ifname)
 {
 	LOCINFO		*lip = pip->lip ;
 	off_t	scanoff, scanlen ;
@@ -1271,7 +1237,7 @@ static int procfile(PROGINFO *pip,PROCDATA *pdp,void *ofp,cchar *ifname)
 /* end subroutine (procfile) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1286,7 +1252,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1305,7 +1271,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1342,7 +1308,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int locinfo_allocbegin(LOCINFO *lip,int blocklen)
+local int locinfo_allocbegin(LOCINFO *lip,int blocklen)
 {
 	int		rs = SR_OK ;
 
@@ -1372,7 +1338,7 @@ static int locinfo_allocbegin(LOCINFO *lip,int blocklen)
 /* end subroutine (locinfo_allocbegin) */
 
 
-static int locinfo_allocend(LOCINFO *lip)
+local int locinfo_allocend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1396,7 +1362,7 @@ static int locinfo_allocend(LOCINFO *lip)
 /* end subroutine (locinfo_allocend) */
 
 
-static int locinfo_scanspec(LOCINFO *lip,cchar *sp,int sl)
+local int locinfo_scanspec(LOCINFO *lip,cchar *sp,int sl)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
