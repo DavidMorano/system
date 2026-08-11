@@ -1,5 +1,6 @@
-/* b_numcvt */
-/* lang=C++11 */
+/* b_numcvt SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* convert numbers from one base to another */
 /* version %I% last-modified %G% */
@@ -25,6 +26,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_numcvt
+
+	Desription:
 	We converts numbers (given as arguments or on STDIN) from
 	one numberic base to another.  This subroutine is fairly
 	standard as front-ends go.  It calls |procspec()| to do the
@@ -101,19 +106,6 @@ using namespace	std ;
 extern "C" int	b_numcvt(int,cchar **,void *) ;
 extern "C" int	p_numcvt(int,cchar **,cchar **,void *) ;
 
-extern "C" int	matstr(const char **,const char *,int) ;
-extern "C" int	matostr(const char **,int,const char *,int) ;
-extern "C" int	sfshrink(const char *,int,const char **) ;
-extern "C" int	cfromani(cchar *,int,int *) ;
-extern "C" int	optbool(const char *,int) ;
-extern "C" int	optvalue(const char *,int) ;
-extern "C" int	bufprintf(char *,int,const char *,...) ;
-extern "C" int	hasalldig(cchar *,int) ;
-extern "C" int	isdigitlatin(int) ;
-extern "C" int	isFailOpen(int) ;
-extern "C" int	isNotPresent(int) ;
-extern "C" int	isNotValid(int) ;
-
 extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -123,11 +115,6 @@ extern "C" int	debugprintf(const char *,...) ;
 extern "C" int	debugclose() ;
 extern "C" int	strlinelen(const char *,int,int) ;
 #endif
-
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
-
-extern "C" char	*strwcpy(char *,const char *,int) ;
-extern "C" char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -166,7 +153,7 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 static int	usage(PROGINFO *) ;
 
 static int	findbase(PROGINFO *,const BASERECORD *,cchar *,int) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
 static int	procspecs(PROGINFO *,SHIO *,cchar *,int) ;
 static int	procspec(PROGINFO *,SHIO *,cchar *,int) ;
 
@@ -299,8 +286,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -674,7 +661,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -1014,7 +1001,7 @@ static int findbase(PROGINFO *pip,const BASERECORD *basemap,
 /* end subroutine (findbase) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *ifn,
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *ifn,
 		cchar *afn)
 {
 	SHIO		*efp = (SHIO *) pip->efp ;
