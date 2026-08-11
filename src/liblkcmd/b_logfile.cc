@@ -1,13 +1,13 @@
-/* b_logfile */
+/* b_logfile SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* utility to log messages to a file */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
-
 
 /* revision history:
 
@@ -20,17 +20,19 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  This little program looks
-	up a number in a database and returns the corresponding string.
+  	Name:
+	b_username
+
+	Description:
+	This is a built-in command to the KSH shell.  This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
-
 	$ logfile <logfile> [-c[=<b>]] [-n <name>[:<version>]] 
 		[-s <logsize>] [-if <infile>] [-V]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -49,7 +51,7 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
@@ -61,7 +63,7 @@
 #include	<logfile.h>
 #include	<linefold.h>
 #include	<expcook.h>
-#include	<tmtime.hh>
+#include	<tmctimeh>
 #include	<strn.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -116,38 +118,6 @@
 
 /* external subroutines */
 
-extern int	sntmtime(char *,int,TMTIME *,cchar *) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	nleadcasestr(const char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	matpcasestr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	getnodename(char *,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getuid_user(cchar *,int) ;
-extern int	mklogid(char *,int,cchar *,int,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	isalphalatin(int) ;
-extern int	isdigitlatin(int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -157,10 +127,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -178,7 +144,7 @@ struct locinfo_flags {
 
 struct locinfo {
 	PROGINFO	*pip ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	const char	*facname ;
 	const char	*facversion ;
@@ -194,7 +160,7 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
 static int	process(PROGINFO *,EXPCOOK *,const char *) ;
 static int	procline(PROGINFO *,const char *,int) ;
 static int	procsubs(PROGINFO *,EXPCOOK *,char *,int,cchar *,int) ;
@@ -314,8 +280,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	PARAMOPT	aparams ;
 	SHIO		errfile ;
 
@@ -594,7 +560,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* create-logfile */
 	                    case 'c':
 	                        lip->have.create = TRUE ;
-	                        lip->final.create = TRUE ;
+	                        lip->finval.create = TRUE ;
 	                        lip->fl.create = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -613,7 +579,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                lip->have.name = TRUE ;
-	                                lip->final.name = TRUE ;
+	                                lip->finval.name = TRUE ;
 	                                namespec = argp ;
 	                            }
 	                        } else
@@ -627,7 +593,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 					}
 	                        } else
@@ -646,7 +612,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                pip->have.logsize = TRUE ;
-	                                pip->final.logsize = TRUE ;
+	                                pip->finval.logsize = TRUE ;
 	                                rs = cfdecmfi(argp,argl,&v) ;
 	                                pip->logsize = v ;
 	                            }
@@ -782,7 +748,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if ((rs >= 0) && (pip->logsize == 0) && (argval != NULL)) {
 	    pip->have.logsize = TRUE ;
-	    pip->final.logsize = TRUE ;
+	    pip->finval.logsize = TRUE ;
 	    rs = cfdecmfi(argval,-1,&v) ;
 	    pip->logsize = v ;
 	}
@@ -996,7 +962,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1009,14 +975,14 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	v ;
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1024,9 +990,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case akoname_audit:
-	                    if (! lip->final.audit) {
+	                    if (! lip->finval.audit) {
 	                        lip->have.audit = TRUE ;
-	                        lip->final.audit = TRUE ;
+	                        lip->finval.audit = TRUE ;
 	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1035,9 +1001,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_create:
-	                    if (! lip->final.create) {
+	                    if (! lip->finval.create) {
 	                        lip->have.create= TRUE ;
-	                        lip->final.create = TRUE ;
+	                        lip->finval.create = TRUE ;
 	                        lip->fl.create = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1046,9 +1012,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_logsize:
-	                    if (! pip->final.logsize) {
+	                    if (! pip->finval.logsize) {
 	                        pip->have.logsize = TRUE ;
-	                        pip->final.logsize = TRUE ;
+	                        pip->finval.logsize = TRUE ;
 	                        if (vl > 0) {
 	                            rs = cfdecmfi(vp,vl,&v) ;
 	                            pip->logsize = v ;
@@ -1387,7 +1353,7 @@ static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
 	const time_t	dt = pip->daytime ;
 	int		rs ;
 
-	if ((rs = tmtime_localtime(&mt,dt)) >= 0) {
+	if ((rs = tmtime_timelocal(&mt,dt)) >= 0) {
 	    const int	tlen = TIMEBUFLEN ;
 	    cchar	*fmt = "r%y%m%d%H%M%S" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
