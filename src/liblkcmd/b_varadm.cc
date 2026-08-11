@@ -1,4 +1,5 @@
-/* b_varadm SUPPORT */
+/* b_varadm SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to return load averages */
@@ -22,11 +23,13 @@
 
 /**************************************************************************
 
+  	Name:
+	b_varadm
+
 	Synopsis:
 	$ varadm <spec(s)>
 
 	Special note:
-
 	Just so an observer (like myself later on) will not go too
 	crazy trying to understand what is going on with the 'struct
 	percache' local data, it is a persistent data structure.
@@ -40,26 +43,22 @@
 	that we have already been executed in the past.  This data
 	is allocated in the BSS section of our process memory map
 	so it is initialized to all-zero on program-load (a UNIX
-	standard now for ? over twenty years!).
-
-	Hopefully, everything else now makes sense upon inspection
-	with this understanding.
-
-	Why do this?  Because it speeds things up.  Everything in
-	this program is already quite fast, but we have the chance
-	of reducing some file-access work with the introduction of
-	a persistent data cache.  It is hard to get faster than a
-	single file-access (like a shared-memory cache), so anything
-	worth doing has to be a good bit faster than that.  Hence,
-	pretty much only TSR behavior can beat a single file access.
-
-	Parallelism?  There isn't any, so we do not have to worry about
-	using mutexes or semaphores.  Maybe someday we will have to
-	think about parallelism, but probably not any time soon!
+	standard now for ? over twenty years!).  With this
+	understanding.  Why do this?  Because it speeds things up.
+	Everything in this program is already quite fast, but we
+	have the chance of reducing some file-access work with the
+	introduction of a persistent data cache.  It is hard to get
+	faster than a single file-access (like a shared-memory
+	cache), so anything worth doing has to be a good bit faster
+	than that.  Hence, pretty much only TSR behavior can beat
+	a single file access.  Parallelism?  There is not any, so
+	we do not have to worry about using mutexes or semaphores.
+	Maybe someday we will have to think about parallelism, but
+	probably not any time soon!
 
 *****************************************************************************/
 
-#include	<envstandards.h>	/* must be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -76,24 +75,25 @@
 #include	<sys/loadavg.h>
 #include	<sys/statvfs.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<climits>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctype.h>
 #include	<utmpx.h>
 #include	<netdb.h>
-
-#include	<usystem.h>
+#include	<climits>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<getsysmisc.h>
+#include	<estrings.h>
 #include	<sigman.h>
 #include	<baops.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<tmpx.h>
 #include	<kinfo.h>
-#include	<getsysmisc.h>
 #include	<field.h>
 #include	<ctdec.h>
 #include	<exitcodes.h>
@@ -119,7 +119,6 @@
 
 /* external subroutines */
 
-extern int	snfsflags(char *,int,ulong) ;
 extern int	snwcpy(char *,int,const char *,int) ;
 extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
@@ -203,7 +202,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	struct locinfo_flags	have, f, changed, final ;
+	struct locinfo_flags	have, f, changed, finval ;
 	struct locinfo_flags	init, open ;
 	vecstr		stores ;
 	struct proginfo	*pip ;
@@ -231,7 +230,7 @@ struct locinfo {
 
 static int	usage(struct proginfo *) ;
 
-static int	procopts(struct proginfo *,KEYOPT *) ;
+static int	procopts(struct proginfo *,keyopt *) ;
 static int	procspec(struct proginfo *,void *, const char *) ;
 static int	procla(struct proginfo *,SHIO *,char *,int) ;
 static int	procout(struct proginfo *,SHIO *,const char *) ;
@@ -464,7 +463,7 @@ void	*contextp ;
 	SHIO		errfile ;
 	SHIO		outfile, *ofp = &outfile ;
 
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 
 	uint	mo_start = 0 ;
 
@@ -1227,11 +1226,11 @@ struct proginfo	*pip ;
 /* process the program ako-options */
 static int procopts(pip,kop)
 struct proginfo	*pip ;
-KEYOPT		*kop ;
+keyopt		*kop ;
 {
 	struct locinfo	*lip = pip->lip ;
 
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 
 	int	rs = SR_OK ;
 	int	oi ;
@@ -1252,7 +1251,7 @@ KEYOPT		*kop ;
 
 	if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 
-	    while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	    while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 /* get the first value for this key */
 
@@ -1266,9 +1265,9 @@ KEYOPT		*kop ;
 
 	            case akoname_utf:
 	            case akoname_db:
-	                if (! lip->final.utfname) {
+	                if (! lip->finval.utfname) {
 	                    lip->have.utfname = TRUE ;
-	                    lip->final.utfname = TRUE ;
+	                    lip->finval.utfname = TRUE ;
 	                    if (vl > 0)
 				rs = locinfo_setentry(lip,&lip->utfname,vp,vl) ;
 	                }
@@ -1524,11 +1523,12 @@ const char	req[] ;
 			rs = ctdecul(cvtbuf,CVTBUFLEN,fi.f_fsid) ;
 			break ;
 		    case qopt_fsflags:
-			rs = snfsflags(cvtbuf,CVTBUFLEN,fi.f_flag) ;
+			rs = snflagsfs(cvtbuf,CVTBUFLEN,fi.f_flag) ;
 			break ;
 		    } /* end switch */
-		    if (v >= 0)
+		    if (v >= 0) {
 	                rs = bufprintf(cvtbuf,CVTBUFLEN,"%llu",v) ;
+		    }
 		}
 	    }
 	    break ;
@@ -1687,7 +1687,7 @@ const char	*utfname ;
 
 	if (utfname != NULL) {
 	    lip->have.utfname = TRUE ;
-	    lip->final.utfname = TRUE ;
+	    lip->finval.utfname = TRUE ;
 	    lip->utfname = utfname ;
 	}
 
@@ -1737,7 +1737,7 @@ struct locinfo	*lip ;
 	    return SR_FAULT ;
 
 
-	if ((lip->utfname == NULL) && (! lip->final.utfname)) {
+	if ((lip->utfname == NULL) && (! lip->finval.utfname)) {
 	    const char	*cp = getenv(VARUTFNAME) ;
 	    if (cp != NULL)
 		rs = locinfo_setentry(lip,&lip->utfname,cp,-1);
