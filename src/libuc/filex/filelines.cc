@@ -102,7 +102,7 @@ int filelines(cchar *fn) noex {
 			rs = SR_NOTSUP ;
 		        if (S_ISREG(sb.st_mode)) ylikely {
 			    rs = SR_OK ;
-			    if (fsize > 0) {
+			    if (fsize > 0) ylikely {
 			        rs = liner(fd,fsize) ;
 			        lines = rs ;
 			    }
