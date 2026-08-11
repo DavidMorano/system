@@ -1,4 +1,4 @@
-/* b_la SUPPORT */
+/* b_la SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -22,7 +22,6 @@
 	$ la <spec(s)>
 
 	Special note:
-
 	Just so an observer (like myself later on) won't go too
 	crazy trying to understand what is going on with the PERCAHE
 	local data, it is a persistent data structure.  This program
@@ -83,14 +82,18 @@
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<ugetpid.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucgetpid.h>
+#include	<ucinfo.h>
 #include	<getnodedomain.h>	/* |getnetdomain(3uc)| */
+#include	<estrings.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -99,7 +102,6 @@
 #include	<ctdecf.h>
 #include	<cthex.h>
 #include	<field.h>
-#include	<uinfo.h>
 #include	<nulstr.h>
 #include	<sysmemutil.h>
 #include	<exitcodes.h>
@@ -158,7 +160,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
@@ -197,8 +199,8 @@ static int	mainsub(int,cchar **,cchar **,void *) noex ;
 
 static int	usage(PROGINFO *) noex ;
 
-static int	procopts(PROGINFO *,KEYOPT *) noex ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) noex ;
+static int	procopts(PROGINFO *,keyopt *) noex ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) noex ;
 static int	procspecs(PROGINFO *,void *,cchar *,int) noex ;
 static int	procspec(PROGINFO *,void *, cchar *,int) noex ;
 static int	procfs(PROGINFO *,char *,int,int,cchar *,int) noex ;
@@ -450,8 +452,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -762,7 +764,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -1061,7 +1063,7 @@ static int usage(PROGINFO *pip) noex {
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1073,13 +1075,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1089,9 +1091,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                case akoname_utf:
 	                case akoname_db:
-	                    if (! lip->final.utfname) {
+	                    if (! lip->finval.utfname) {
 	                        lip->have.utfname = true ;
-	                        lip->final.utfname = true ;
+	                        lip->finval.utfname = true ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &lip->utfname ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -1117,7 +1119,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1566,7 +1568,7 @@ static int procfs(PROGINFO *pip,char vbuf[],int vlen,int ri,cchar *sp,int sl)
 	                cbl = rs ;
 	                break ;
 	            case qopt_fsflags:
-	                rs = snfsflags(vbuf,vlen,fi.f_flag) ;
+	                rs = snflagsfs(vbuf,vlen,fi.f_flag) ;
 	                cbl = rs ;
 	                break ;
 	            } /* end switch */
@@ -1737,7 +1739,7 @@ static int locinfo_utfname(LOCINFO *lip,cchar *utfname)
 
 	if (utfname != nullptr) {
 	    lip->have.utfname = true ;
-	    lip->final.utfname = true ;
+	    lip->finval.utfname = true ;
 	    lip->utfname = utfname ;
 	}
 
@@ -1779,7 +1781,7 @@ static int locinfo_defaults(LOCINFO *lip)
 
 	if (lip == nullptr) return SR_FAULT ;
 
-	if ((rs >= 0) && (lip->utfname == nullptr) && (! lip->final.utfname)) {
+	if ((rs >= 0) && (lip->utfname == nullptr) && (! lip->finval.utfname)) {
 	    cchar	*cp = getourenv(pip->envv,VARUTFNAME) ;
 	    if (cp != nullptr) {
 	        cchar	**vpp = &lip->utfname ;
@@ -1798,7 +1800,7 @@ static int locinfo_uname(LOCINFO *lip)
 
 	if (! lip->fl.uname) {
 	    lip->fl.uname = true ;
-	    rs = uinfo_name(&lip->uname) ;
+	    rs = ucinfo_name(&lip->uname) ;
 	}
 
 	return rs ;
@@ -1812,7 +1814,7 @@ static int locinfo_uaux(LOCINFO *lip)
 
 	if (! lip->fl.uaux) {
 	    lip->fl.uaux = true ;
-	    rs = uinfo_aux(&lip->uaux) ;
+	    rs = ucinfo_aux(&lip->uaux) ;
 	}
 
 	return rs ;
