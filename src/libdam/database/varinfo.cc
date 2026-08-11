@@ -19,7 +19,7 @@
 /*******************************************************************************
 
   	Object:
-	var
+	varinfo_dat
 
 	Description:
 	This module implements an interface (a trivial one) that
