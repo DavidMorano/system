@@ -15,7 +15,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<ipasswd.h>		/* LIBU */
+#include	<ipasswd.h>		/* LIBDAM */
 
 
 #define	PWI		struct pwi_head
