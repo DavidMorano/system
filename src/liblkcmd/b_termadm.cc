@@ -1,4 +1,5 @@
-/* b_termadm SUPPORT */
+/* b_termadm SUPPORT (SKH builtin) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in to enquire about terminal device values */
@@ -19,6 +20,9 @@
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_termadm
 
 	Synopsis:
 	$ termadm [-s|-l] [-dev <device>|-line <line>]
@@ -78,51 +82,8 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2w(char *,cchar *,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matocasestr(cchar **,int,cchar *,int) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	mklogidpre(char *,int,cchar *,int) ;
-extern int	mklogidsub(char *,int,cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	getutmpterm(char *,int,pid_t) ;
-extern int	termdevice(char *,int,int) ;
-extern int	tcgetws(int,struct winsize *) ;
-extern int	tcgetlines(int) ;
-extern int	tcsetlines(int,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -149,7 +110,7 @@ struct locinfo {
 	PROGINFO	*pip ;
 	cchar		*termfname ;		/* terminal file-name */
 	cchar		*db ;
-	struct winsize	ws ;
+	WINSIZE		ws ;
 	int		tfd ;
 	int		intpoll ;
 	int		to_open ;
@@ -162,10 +123,10 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procspecs(PROGINFO *,void *,cchar *,int) ;
 static int	procspec(PROGINFO *,void *, cchar *,int) ;
 static int	procget(PROGINFO *,void *,int) ;
@@ -331,8 +292,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -695,7 +656,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 				} else
@@ -842,7 +803,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #endif
 
 	if ((rs = locinfo_setline(lip,termline,-1)) >= 0) {
-	     KEYOPT	*kop = &akopts ;
+	     keyopt	*kop = &akopts ;
 	     rs = procopts(pip,kop) ;
 	}
 
@@ -867,7 +828,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 			if ((rs = locinfo_termbegin(lip)) >= 0) {
 			    {
 			        ARGINFO	*aip = &ainfo ;
-			        BITS	*bop = &pargs ;
+			        bits	*bop = &pargs ;
 	         	        cchar	*afn = afname ;
 	     		        cchar	*ofn = ofname ;
 	 		        rs = process(pip,aip,bop,ofn,afn) ;
@@ -1010,7 +971,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1023,13 +984,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(progopts,3,kp,kl)) >= 0) {
 
@@ -1052,9 +1013,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case progopt_logprog:
-	                    if (! pip->final.logprog) {
+	                    if (! pip->finval.logprog) {
 	                        pip->have.logprog = TRUE ;
-	                        pip->final.logprog = TRUE ;
+	                        pip->finval.logprog = TRUE ;
 	                        pip->fl.logprog = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1080,7 +1041,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	int		rs ;
 
@@ -1091,7 +1052,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
