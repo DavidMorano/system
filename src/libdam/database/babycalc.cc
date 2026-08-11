@@ -144,9 +144,9 @@ local inline int babycalc_magic(babycalc *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (babycalc_magic) */
 
-local int	babycalc_objloadbegin(BC *,cchar *,cchar *) noex ;
-local int	babycalc_objloadend(BC *) noex ;
-local int	babycalc_loadcalls(BC *,vecstr *) noex ;
+local int	babycalc_objloadbegin	(BC *,cchar *,cchar *) noex ;
+local int	babycalc_objloadend	(BC *) noex ;
+local int	babycalc_loadcalls	(BC *,vecstr *) noex ;
 
 local bool	isrequired(int) noex ;
 
@@ -206,7 +206,7 @@ int babycalc_open(BC *op,cchar *pr,cchar *dbname) noex {
 int babycalc_close(BC *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = babycalc_magic(op)) >= 0) {
+	if ((rs = babycalc_magic(op)) >= 0) ylikely {
 	    if (op->callp && op->obj) {
 		callsp	p = callsp(op->callp) ;
 	        rs1 = (*p->close)(op->obj) ;
@@ -227,7 +227,7 @@ int babycalc_close(BC *op) noex {
 
 int babycalc_check(BC *op,time_t daytime) noex {
 	int		rs ;
-	if ((rs = babycalc_magic(op)) >= 0) {
+	if ((rs = babycalc_magic(op)) >= 0) ylikely {
 	    callsp p = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (p->check) {
@@ -239,7 +239,7 @@ int babycalc_check(BC *op,time_t daytime) noex {
 
 int babycalc_lookup(BC *op,time_t datereq,uint *rp) noex {
 	int		rs ;
-	if ((rs = babycalc_magic(op)) >= 0) {
+	if ((rs = babycalc_magic(op)) >= 0) ylikely {
 	    callsp p = callsp(op->callp) ;
 	    rs = SR_NOSYS ;
 	    if (p->lookup) {
@@ -252,7 +252,7 @@ int babycalc_lookup(BC *op,time_t datereq,uint *rp) noex {
 int babycalc_getinfo(BC *op,BC_INFO *ip) noex {
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = babycalc_magic(op)) >= 0) {
+	if ((rs = babycalc_magic(op)) >= 0) ylikely {
 	    callsp p = callsp(op->callp) ;
 	    BABYCALCS_INFO	bi{} ;
 	    if (p->getinfo) {
@@ -280,9 +280,9 @@ local int babycalc_objloadbegin(BC *op,cchar *pr,cchar *objn) noex {
 	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
-	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) ylikely {
+	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) ylikely {
 	            cchar	*mn = BC_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
