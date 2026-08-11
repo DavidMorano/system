@@ -2130,7 +2130,7 @@ local int procopts(PI *pip,keyopt *kop)
 	        cchar	*kp, *vp ;
 
 	        while (rs >= 0) {
-	            kl = keyopt_enumkeys(kop,&kcur,&kp) ;
+	            kl = keyopt_curenumkeys(kop,&kcur,&kp) ;
 	            if (kl == SR_NOTFOUND) break ;
 	            rs = kl ;
 	            if (rs < 0) break ;
@@ -3444,7 +3444,7 @@ vechand		*tlp ;
 	        setostr		*rlp = &lip->recips ;
 
 	        if ((rs = setostr_curbegin(rlp,&rcur)) >= 0) {
-	            while ((rs1 = setostr_enum(rlp,&rcur,&ap)) >= 0) {
+	            while ((rs1 = setostr_curenum(rlp,&rcur,&ap)) >= 0) {
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(5))
@@ -6050,7 +6050,7 @@ local int procprinthdr_bcc(PI *pip,filer *fbp,vechand *tlp)
 	    if ((rs = setostr_curbegin(rlp,&rcur)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
 	        cchar		*ap ;
-	        while ((rs1 = setostr_enum(rlp,&rcur,&ap)) >= 0) {
+	        while ((rs1 = setostr_curenum(rlp,&rcur,&ap)) >= 0) {
 	            if ((rs = vechand_search(tlp,ap,vrecipsch,nullptr)) == rsn) {
 	                rs = SR_OK ;
 	                if (! f_hdr) {
@@ -6601,7 +6601,7 @@ local int proclogmsg_bcc(PI *pip,int mi)
 	            if ((rs = setostr_curbegin(rlp,&rcur)) >= 0) {
 	                cint	rsn = SR_NOTFOUND ;
 	                cchar		*ap ;
-	                while ((rs1 = setostr_enum(rlp,&rcur,&ap)) >= 0) {
+	                while ((rs1 = setostr_curenum(rlp,&rcur,&ap)) >= 0) {
 	                    vrecipsch_t	vs = vrecipsch ;
 	                    if ((rs = vechand_search(&aa,ap,vs,nullptr)) == rsn) {
 	                        cchar	*fmt = "  %s=%s" ;
