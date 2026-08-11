@@ -1252,7 +1252,7 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1675,7 +1675,7 @@ local int procall(PI *pip) noex {
 	    char	bvbuf[BVBUFLEN + 1] ;
 
 	    while (rs >= 0) {
-	        bvl = bibleverse_enum(vdbp,&cur,&q,bvbuf,bvlen) ;
+	        bvl = bibleverse_curenum(vdbp,&cur,&q,bvbuf,bvlen) ;
 	        if ((bvl == SR_NOTFOUND) || (bvl == 0)) break ;
 	        rs = bvl ;
 
