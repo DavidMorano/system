@@ -1,25 +1,26 @@
-/* b_projectinfo */
+/* b_projectinfo SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in: return various group information */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LOCSETENT	1		/* |locinfo_setentry()| */
 
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
 	This code was originally written.  It was inspired by many
-	programs that performs various subset functions of this program.  This
-	can be either a KSH builtin or a stand-alone program.
+	programs that performs various subset functions of this
+	program.  This can be either a KSH builtin or a stand-alone
+	program.
 
 	= 2010-02-03, David A­D­ Morano
-	This subroutine was changed to acess information from the system-group
-	database.
+	This subroutine was changed to acess information from the
+	system-group database.
 
 */
 
@@ -27,15 +28,17 @@
 
 /*******************************************************************************
 
-	We query and present information from the system PROJECT database.
+  	Name:
+	b_projectinfo
+
+	Descrption:
+	We query and present information from the system PROJECT
+	database.
 
 	Synopsis:
-
 	$ projectinfo [[<groupname>|-] <qkey(s)>] [-af <afile>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -62,7 +65,7 @@
 #include	<netdb.h>
 
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<estrings.h>
@@ -135,34 +138,6 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	sncpylc(char *,int,cchar *) ;
-extern int	sncpyuc(char *,int,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	vecpstr_loadgrusers(VECPSTR *,gid_t) ;
-extern int	vecpstr_loadpjusers(VECPSTR *,cchar *) ;
-extern int	isdigitlatin(int) ;
-extern int	isalphalatin(int) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isInvalid(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -172,13 +147,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -194,7 +162,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	PROJECTENT	pj ;
@@ -211,8 +179,8 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,void *,cchar *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,void *,cchar *) ;
 static int	proclist(PROGINFO *,void *) ;
 static int	proclistfind(PROGINFO *,vecpstr *) ;
 static int	proclistusers(PROGINFO *,vecpstr *) ;
@@ -356,8 +324,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -645,7 +613,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'a':
-	                        pip->final.all = TRUE ;
+	                        pip->finval.all = TRUE ;
 	                        pip->have.all = TRUE ;
 	                        pip->fl.all = TRUE ;
 	                        if (f_optequal) {
@@ -658,7 +626,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'l':
-	                        pip->final.list = TRUE ;
+	                        pip->finval.list = TRUE ;
 	                        pip->have.list = TRUE ;
 	                        pip->pf.lister = TRUE ;
 	                        if (f_optequal) {
@@ -677,7 +645,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -971,7 +939,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1013,7 +981,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1302,7 +1270,7 @@ static int proclistgroups(PROGINFO *pip,vecpstr *plp)
 	cchar		**groups ;
 	groups = (cchar **) lip->pj.pj_groups ;
 	if (groups != NULL) {
-	    const int	grlen = getbufsize(getbufsize_gr) ;
+	    const int	grlen = bufsizeget(bufsize_gr) ;
 	    char	*grbuf ;
 	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
 	        int	i ;
@@ -1345,7 +1313,7 @@ static int proclistgroup(PROGINFO *pip,vecpstr *plp,
 
 static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
-	const int	pjlen = getbufsize(getbufsize_pj) ;
+	const int	pjlen = bufsizeget(bufsize_pj) ;
 	int		rs ;
 	char		*bp ;
 
