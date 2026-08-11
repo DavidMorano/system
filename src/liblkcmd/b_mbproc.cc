@@ -1,4 +1,4 @@
-/* b_mbproc SUPPORT */
+/* b_mbproc SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -24,6 +24,9 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_mbproc
 
   	Description:
 	This is a built-in command to the KSH shell.  It should
@@ -61,16 +64,17 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<utime.h>
+#include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<ctime>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<netdb.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -91,8 +95,9 @@
 #include	<strw.h>		/* |strwset(3uc)| */
 #include	<strn.h>
 #include	<char.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<mapex.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -145,56 +150,11 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	mklogidpre(char *,int,cchar *,int) ;
-extern int	mklogidsub(char *,int,cchar *,int) ;
-extern int	mkmid(char *,int,cchar *,cchar *,pid_t,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int prsetfname(cchar *,char *,cchar *,int,int,cchar *,cchar *,cchar *) ;
-extern int	tolc(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PI *,cchar *,const pivars *) ;
 
 extern int	proguserlist_begin(PI *) ;
 extern int	proguserlist_end(PI *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -218,7 +178,7 @@ struct locinfo_flags {
 
 struct locinfo {
 	proginfo	*pip ;
-	LOCINFO_FL	have, f, final, changed ;
+	LOCINFO_FL	have, f, finval, changed ;
 	LOCINFO_FL	open ;
 	VECSTR		stores ;
 	VECPSTR		mbfnames ;
@@ -241,7 +201,7 @@ struct locinfo {
 struct config {
 	proginfo	*pip ;
 	paramopt	*app ;
-	PF	p ;
+	PF		p ;
 	expcook		cooks ;
 	uint		magic ;
 	uint		f_p:1 ;
@@ -251,56 +211,56 @@ struct config {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PI *) ;
+local int	usage(PI *) ;
 
-static int	procopts(PI *,KEYOPT *,paramopt *) ;
-static int	procargs(PI *,ARGINFO *,BITS *,cchar *,cchar *) ;
+local int	procopts(PI *,keyopt *,paramopt *) ;
+local int	procargs(PI *,ARGINFO *,bits *,cchar *,cchar *) ;
 
-static int	procuserinfo_begin(PI *,USERINFO *) ;
-static int	procuserinfo_end(PI *) ;
-static int	procuserinfo_logid(PI *) ;
+local int	procuserinfo_begin(PI *,USERINFO *) ;
+local int	procuserinfo_end(PI *) ;
+local int	procuserinfo_logid(PI *) ;
 
-static int	procourconf_begin(PI *,paramopt *,cchar *) ;
-static int	procourconf_end(PI *) ;
+local int	procourconf_begin(PI *,paramopt *,cchar *) ;
+local int	procourconf_end(PI *) ;
 
-static int	procmailbox(PI *,SHIO *,cchar *,int) ;
-static int	procmailmsg(PI *,SHIO *,MBCACHE *,int,int,char *) ;
+local int	procmailbox(PI *,SHIO *,cchar *,int) ;
+local int	procmailmsg(PI *,SHIO *,MBCACHE *,int,int,char *) ;
 
-static int	procout(PI *,SHIO *,int,char *,
+local int	procout(PI *,SHIO *,int,char *,
 			MBCACHE_SCAN *,off_t,int) ;
-static int	procouter(PI *,int,SHIO *,char *,off_t,int) ;
-static int	procouthdrs(PI *,SHIO *,MBCACHE_SCAN *) ;
-static int	procouthdrstatus(PI *,SHIO *,MBCACHE_SCAN *) ;
-static int	procouthdrmid(PI *,SHIO *,MBCACHE_SCAN *) ;
+local int	procouter(PI *,int,SHIO *,char *,off_t,int) ;
+local int	procouthdrs(PI *,SHIO *,MBCACHE_SCAN *) ;
+local int	procouthdrstatus(PI *,SHIO *,MBCACHE_SCAN *) ;
+local int	procouthdrmid(PI *,SHIO *,MBCACHE_SCAN *) ;
 
-static int	procbase(PI *,int,char *,MBCACHE_SCAN *,off_t,int) ;
-static int	procbaser(PI *,int,bfile *,char *,off_t,int) ;
-static int	procbasehdrs(PI *,bfile *,MBCACHE_SCAN *) ;
-static int	procbasehdrstatus(PI *,bfile *,MBCACHE_SCAN *) ;
-static int	procbasehdrmid(PI *,bfile *,MBCACHE_SCAN *) ;
+local int	procbase(PI *,int,char *,MBCACHE_SCAN *,off_t,int) ;
+local int	procbaser(PI *,int,bfile *,char *,off_t,int) ;
+local int	procbasehdrs(PI *,bfile *,MBCACHE_SCAN *) ;
+local int	procbasehdrstatus(PI *,bfile *,MBCACHE_SCAN *) ;
+local int	procbasehdrmid(PI *,bfile *,MBCACHE_SCAN *) ;
 
-static int	locinfo_start(LOCINFO *,PI *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_midseen(LOCINFO *,cchar *,int) ;
-static int	locinfo_yearbase(LOCINFO *,cchar *,int) ;
-static int	locinfo_yearfins(LOCINFO *) ;
-static int	locinfo_yfile(LOCINFO *,time_t) ;
-static int	locinfo_yclose(LOCINFO *,int) ;
-static int	locinfo_nshow(LOCINFO *,cchar *) ;
+local int	locinfo_start(LOCINFO *,PI *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_midseen(LOCINFO *,cchar *,int) ;
+local int	locinfo_yearbase(LOCINFO *,cchar *,int) ;
+local int	locinfo_yearfins(LOCINFO *) ;
+local int	locinfo_yfile(LOCINFO *,time_t) ;
+local int	locinfo_yclose(LOCINFO *,int) ;
+local int	locinfo_nshow(LOCINFO *,cchar *) ;
 
-static int	config_start(CONFIG *,PI *,paramopt *,cchar *) ;
-static int	config_findfile(CONFIG *,char *,cchar *) ;
-static int	config_cookbegin(CONFIG *) ;
-static int	config_cookend(CONFIG *) ;
-static int	config_read(CONFIG *) ;
-static int	config_reader(CONFIG *) ;
-static int	config_finish(CONFIG *) ;
+local int	config_start(CONFIG *,PI *,paramopt *,cchar *) ;
+local int	config_findfile(CONFIG *,char *,cchar *) ;
+local int	config_cookbegin(CONFIG *) ;
+local int	config_cookend(CONFIG *) ;
+local int	config_read(CONFIG *) ;
+local int	config_reader(CONFIG *) ;
+local int	config_finish(CONFIG *) ;
 
 #ifdef	COMMENT
-static int	config_check(CONFIG *) ;
+local int	config_check(CONFIG *) ;
 #endif /* COMMENT */
 
 
@@ -321,7 +281,7 @@ enum argopts {
 	argopt_lf,
 	argopt_year,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	argopts[] = {
 	"VERSION",
@@ -338,7 +298,7 @@ constexpr cpcchar	argopts[] = {
 	"lf",
 	"year",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	csched[] = {
 	"%p/%e/%n/%n.%f",
@@ -346,21 +306,21 @@ constexpr cpcchar	csched[] = {
 	"%p/%e/%n.%f",
 	"%p/%n.%f",
 	nullptr
-} ;
+} ; /* end array */
 
 enum cparams {
 	cparam_maildir,
 	cparam_logsize,
 	cparam_logfile,
 	cparam_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	cparams[] = {
 	"maildir",
 	"logsize",
 	"logfile",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
@@ -368,7 +328,7 @@ constexpr PIVARS	initvars = {
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
 constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
@@ -390,7 +350,7 @@ enum akonames {
 	akoname_nshow,
 	akoname_clen,
 	akoname_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	akonames[] = {
 	"md",
@@ -398,10 +358,10 @@ constexpr cpcchar	akonames[] = {
 	"nshow",
 	"clen",
 	nullptr
-} ;
+} ; /* end array */
 
 #ifdef	COMMENT
-static cchar	*varmaildirs[] = {
+constexpr cpcchar	varmaildirs[] = {
 	VARMAILDNAMESP,
 	VARMAILDNAMES,
 	VARMAILDNAME,
@@ -410,11 +370,11 @@ static cchar	*varmaildirs[] = {
 #endif /* COMMENT */
 
 #ifdef	COMMENT
-static cchar	*varmailusers[] = {
+constexpr cpcchar	varmailusers[] = {
 	VARMAILUSERSP,
 	VARMAILUSERS,
 	nullptr
-} ;
+} ; /* end array */
 #endif /* COMMENT */
 
 
@@ -423,7 +383,7 @@ static cchar	*varmailusers[] = {
 
 /* exported subroutines */
 
-int b_mbproc(int argc,mainv argv,void *contextp) noex {
+int b_mbproc(int argc,con mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
@@ -441,7 +401,7 @@ int b_mbproc(int argc,mainv argv,void *contextp) noex {
 }
 /* end subroutine (b_mbproc) */
 
-int p_mbproc(int argc,mainv argv,mainv envv,void *contextp) noex {
+int p_mbproc(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_mbproc) */
@@ -450,12 +410,12 @@ int p_mbproc(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* local subroutines */
 
 /* ARGSUSED */
-static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
+local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	proginfo	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	paramopt	aparams ;
 	SHIO		errfile ;
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -617,7 +577,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
-	                            pip->final.logprog = true ;
+	                            pip->finval.logprog = true ;
 	                            pip->lfname = avp ;
 	                        }
 	                    }
@@ -747,7 +707,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                    }
 	                    if ((rs >= 0) && (cp != nullptr)) {
 	                        pip->have.cfname = true ;
-	                        pip->final.cfname = true ;
+	                        pip->finval.cfname = true ;
 	                        cfname = argp ;
 	                    }
 	                    break ;
@@ -808,7 +768,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                pip->have.cfname = true ;
-	                                pip->final.cfname = true ;
+	                                pip->finval.cfname = true ;
 	                                cfname = argp ;
 	                            }
 	                        } else
@@ -848,7 +808,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -1003,7 +963,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 	if (cfname == nullptr) cfname = getourenv(pip->envv,VARCFNAME) ;
 	if (cfname == nullptr) cfname = CONFIGFNAME ;
-	if (cfname != nullptr) pip->final.cfname = true ;
+	if (cfname != nullptr) pip->finval.cfname = true ;
 
 	if (pip->lfname == nullptr) pip->lfname = getourenv(pip->envv,VARLFNAME) ;
 
@@ -1036,7 +996,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                    if ((rs = proguserlist_begin(pip)) >= 0) {
 			        {
 				    ARGINFO	*aip = &ainfo ;
-				    BITS	*bop = &pargs ;
+				    bits	*bop = &pargs ;
 	                            cchar	*afn = afname ;
 	                            cchar	*ofn = ofname ;
 	                            rs = procargs(pip,aip,bop,ofn,afn) ;
@@ -1195,7 +1155,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PI *pip)
+local int usage(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1216,7 +1176,7 @@ static int usage(PI *pip)
 
 
 /* process the program ako-options */
-static int procopts(PI *pip,KEYOPT *kop,paramopt *app)
+local int procopts(PI *pip,keyopt *kop,paramopt *app)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1228,13 +1188,13 @@ static int procopts(PI *pip,KEYOPT *kop,paramopt *app)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1251,8 +1211,8 @@ static int procopts(PI *pip,KEYOPT *kop,paramopt *app)
 	                    break ;
 
 	                case akoname_sort:
-	                    if (! lip->final.sort) {
-	                        lip->final.sort = true ;
+	                    if (! lip->finval.sort) {
+	                        lip->finval.sort = true ;
 	                        lip->have.sort = true ;
 	                        lip->fl.sort = true ;
 	                        if (vl > 0) {
@@ -1271,9 +1231,9 @@ static int procopts(PI *pip,KEYOPT *kop,paramopt *app)
 	                    break ;
 
 	                case akoname_nshow:
-	                    if (! lip->final.nshow) {
+	                    if (! lip->finval.nshow) {
 	                        if (vl) {
-	                            lip->final.nshow = true ;
+	                            lip->finval.nshow = true ;
 	                            lip->have.nshow = true ;
 	                            rs = optvalue(vp,vl) ;
 	                            lip->nshow = rs ;
@@ -1282,9 +1242,9 @@ static int procopts(PI *pip,KEYOPT *kop,paramopt *app)
 	                    break ;
 
 	                case akoname_clen:
-	                    if (! lip->final.clen) {
+	                    if (! lip->finval.clen) {
 	                        if (vl) {
-	                            lip->final.clen = true ;
+	                            lip->finval.clen = true ;
 	                            lip->have.clen = true ;
 	                            rs = optvalue(vp,vl) ;
 	                            lip->fl.clen = (rs > 0) ;
@@ -1310,7 +1270,7 @@ static int procopts(PI *pip,KEYOPT *kop,paramopt *app)
 /* end subroutine (procopts) */
 
 
-static int procuserinfo_begin(PI *pip,USERINFO *uip)
+local int procuserinfo_begin(PI *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1352,7 +1312,7 @@ static int procuserinfo_begin(PI *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PI *pip)
+local int procuserinfo_end(PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1363,7 +1323,7 @@ static int procuserinfo_end(PI *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procuserinfo_logid(PI *pip)
+local int procuserinfo_logid(PI *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -1390,7 +1350,7 @@ static int procuserinfo_logid(PI *pip)
 /* end subroutine (procuserinfo_logid) */
 
 
-static int procourconf_begin(PI *pip,paramopt *app,cchar cfname[])
+local int procourconf_begin(PI *pip,paramopt *app,cchar cfname[])
 {
 	cint	csize = sizeof(CONFIG) ;
 	int		rs = SR_OK ;
@@ -1431,7 +1391,7 @@ static int procourconf_begin(PI *pip,paramopt *app,cchar cfname[])
 /* end subroutine (procourconf_begin) */
 
 
-static int procourconf_end(PI *pip)
+local int procourconf_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1456,7 +1416,7 @@ static int procourconf_end(PI *pip)
 /* end subroutine (procourconf_end) */
 
 
-static int procargs(PI *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *ofn)
+local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1568,7 +1528,7 @@ static int procargs(PI *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *ofn)
 /* end subroutine (procargs) */
 
 
-static int procmailbox(PI *pip,SHIO *ofp,cchar *mbp,int mbl)
+local int procmailbox(PI *pip,SHIO *ofp,cchar *mbp,int mbl)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILBOX		mb ;
@@ -1641,7 +1601,7 @@ static int procmailbox(PI *pip,SHIO *ofp,cchar *mbp,int mbl)
 /* end subroutine (procmailbox) */
 
 
-static int procmailmsg(pip,ofp,mcp,mi,mfd,mbuf)
+local int procmailmsg(pip,ofp,mcp,mi,mfd,mbuf)
 proginfo	*pip ;
 SHIO		*ofp ;
 MBCACHE		*mcp ;
@@ -1696,7 +1656,7 @@ char		*mbuf ;
 /* end subroutine (procmailmsg) */
 
 
-static int procout(pip,ofp,mfd,mbuf,msp,mo,ml)
+local int procout(pip,ofp,mfd,mbuf,msp,mo,ml)
 proginfo	*pip ;
 SHIO		*ofp ;
 int		mfd ;
@@ -1760,7 +1720,7 @@ int		ml ;
 /* end subroutine (procout) */
 
 
-static int procouter(pip,mfd,ofp,mbuf,mo,ml)
+local int procouter(pip,mfd,ofp,mbuf,mo,ml)
 proginfo	*pip ;
 int		mfd ;
 SHIO		*ofp ;
@@ -1777,7 +1737,7 @@ int		ml ;
 	ps = lip->pagesize ;
 	while ((rs >= 0) && (ml > 0)) {
 	    minlen = MIN(ml,ps) ;
-	    rs = u_pread(mfd,mbuf,minlen,mo) ;
+	    rs = u_readp(mfd,mbuf,minlen,mo) ;
 	    if (rs <= 0) break ;
 	    mo += rs ;
 	    ml -= rs ;
@@ -1795,7 +1755,7 @@ int		ml ;
 /* end subroutine (procouter) */
 
 
-static int procouthdrs(pip,ofp,msp)
+local int procouthdrs(pip,ofp,msp)
 proginfo	*pip ;
 SHIO		*ofp ;
 MBCACHE_SCAN	*msp ;
@@ -1825,7 +1785,7 @@ MBCACHE_SCAN	*msp ;
 /* end subroutine (procouthdrs) */
 
 
-static int procouthdrstatus(pip,ofp,msp)
+local int procouthdrstatus(pip,ofp,msp)
 proginfo	*pip ;
 SHIO		*ofp ;
 MBCACHE_SCAN	*msp ;
@@ -1845,7 +1805,7 @@ MBCACHE_SCAN	*msp ;
 /* end subroutine (procouthdrstatus) */
 
 
-static int procouthdrmid(pip,ofp,msp)
+local int procouthdrmid(pip,ofp,msp)
 proginfo	*pip ;
 SHIO		*ofp ;
 MBCACHE_SCAN	*msp ;
@@ -1872,7 +1832,7 @@ MBCACHE_SCAN	*msp ;
 /* end subroutine (procouthdrmid) */
 
 
-static int procbase(pip,mfd,mbuf,msp,mo,ml)
+local int procbase(pip,mfd,mbuf,msp,mo,ml)
 proginfo	*pip ;
 int		mfd ;
 char		mbuf[] ;
@@ -1943,7 +1903,7 @@ int		ml ;
 /* end subroutine (procbase) */
 
 
-static int procbaser(pip,mfd,yfp,mbuf,mo,ml)
+local int procbaser(pip,mfd,yfp,mbuf,mo,ml)
 proginfo	*pip ;
 int		mfd ;
 bfile		*yfp ;
@@ -1960,7 +1920,7 @@ int		ml ;
 	ps = lip->pagesize ;
 	while ((rs >= 0) && (ml > 0)) {
 	    minlen = MIN(ml,ps) ;
-	    rs = u_pread(mfd,mbuf,minlen,mo) ;
+	    rs = u_readp(mfd,mbuf,minlen,mo) ;
 	    if (rs <= 0) break ;
 	    mo += rs ;
 	    ml -= rs ;
@@ -1978,7 +1938,7 @@ int		ml ;
 /* end subroutine (procbaser) */
 
 
-static int procbasehdrs(pip,yfp,msp)
+local int procbasehdrs(pip,yfp,msp)
 proginfo	*pip ;
 bfile		*yfp ;
 MBCACHE_SCAN	*msp ;
@@ -2008,7 +1968,7 @@ MBCACHE_SCAN	*msp ;
 /* end subroutine (procbasehdrs) */
 
 
-static int procbasehdrstatus(pip,yfp,msp)
+local int procbasehdrstatus(pip,yfp,msp)
 proginfo	*pip ;
 bfile		*yfp ;
 MBCACHE_SCAN	*msp ;
@@ -2028,7 +1988,7 @@ MBCACHE_SCAN	*msp ;
 /* end subroutine (procbasehdrstatus) */
 
 
-static int procbasehdrmid(pip,yfp,msp)
+local int procbasehdrmid(pip,yfp,msp)
 proginfo	*pip ;
 bfile		*yfp ;
 MBCACHE_SCAN	*msp ;
@@ -2055,7 +2015,7 @@ MBCACHE_SCAN	*msp ;
 /* end subroutine (procbasehdrmid) */
 
 
-static int locinfo_start(LOCINFO *lip,PI *pip)
+local int locinfo_start(LOCINFO *lip,PI *pip)
 {
 	cint	n = 1000 ;
 	int		rs ;
@@ -2098,7 +2058,7 @@ static int locinfo_start(LOCINFO *lip,PI *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	proginfo	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2167,7 +2127,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_yearfins(LOCINFO *lip)
+local int locinfo_yearfins(LOCINFO *lip)
 {
 	proginfo	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2209,7 +2169,7 @@ static int locinfo_yearfins(LOCINFO *lip)
 /* end subroutine (locinfo_yearfins) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -2245,7 +2205,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_midseen(LOCINFO *lip,cchar mp[],int ml)
+local int locinfo_midseen(LOCINFO *lip,cchar mp[],int ml)
 {
 	HDB_DATUM	hk, hv ;
 	int		rs = SR_OK ;
@@ -2276,7 +2236,7 @@ static int locinfo_midseen(LOCINFO *lip,cchar mp[],int ml)
 /* end subroutine (locinfo_midseen) */
 
 
-static int locinfo_yearbase(LOCINFO *lip,cchar *sp,int sl)
+local int locinfo_yearbase(LOCINFO *lip,cchar *sp,int sl)
 {
 	proginfo	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2295,7 +2255,7 @@ static int locinfo_yearbase(LOCINFO *lip,cchar *sp,int sl)
 	        if ((rs = locinfo_setentry(lip,vpp,sp,sl)) >= 0) {
 	            TMTIME	ts ;
 	            cint	yrbegin = YEARTIMEBASE ;
-	            if ((rs = tmtime_localtime(&ts,pip->daytime)) >= 0) {
+	            if ((rs = tmtime_timelocal(&ts,pip->daytime)) >= 0) {
 	                cint	yrend = (TM_YEAR_BASE+ts.year+1) ;
 	                int		nyrs ;
 	                int		ysize ;
@@ -2367,7 +2327,7 @@ static int locinfo_yearbase(LOCINFO *lip,cchar *sp,int sl)
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
 	                debugprintf("locinfo_yearbase: "
-	                    "tmtime_localtime-out rs=%d\n",rs) ;
+	                    "tmtime_timelocal-out rs=%d\n",rs) ;
 #endif
 	        } /* end if (locinfo_setentry) */
 	    } else
@@ -2388,7 +2348,7 @@ static int locinfo_yearbase(LOCINFO *lip,cchar *sp,int sl)
 /* end subroutine (locinfo_yearbase) */
 
 
-static int locinfo_yfile(LOCINFO *lip,time_t t)
+local int locinfo_yfile(LOCINFO *lip,time_t t)
 {
 	proginfo	*pip = lip->pip ;
 	cint	nyrs = lip->nyrs ;
@@ -2497,7 +2457,7 @@ static int locinfo_yfile(LOCINFO *lip,time_t t)
 /* end subroutine (locinfo_yfile) */
 
 
-static int locinfo_yclose(LOCINFO *lip,int i)
+local int locinfo_yclose(LOCINFO *lip,int i)
 {
 	proginfo	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2559,14 +2519,14 @@ static int locinfo_yclose(LOCINFO *lip,int i)
 /* end subroutine (locinfo_yclose) */
 
 
-static int locinfo_nshow(LOCINFO *lip,cchar *sp)
+local int locinfo_nshow(LOCINFO *lip,cchar *sp)
 {
 	int		rs = SR_OK ;
 
-	if (! lip->final.nshow) {
+	if (! lip->finval.nshow) {
 	    if (sp != nullptr) {
 	        int	v ;
-	        lip->final.nshow = true ;
+	        lip->finval.nshow = true ;
 	        lip->have.nshow = true ;
 	        rs = cfdeci(sp,-1,&v) ;
 	        lip->nshow = v ;
@@ -2579,7 +2539,7 @@ static int locinfo_nshow(LOCINFO *lip,cchar *sp)
 
 
 /* configuration maintenance */
-static int config_start(CONFIG *csp,PI *pip,paramopt *app,cchar *cfn)
+local int config_start(CONFIG *csp,PI *pip,paramopt *app,cchar *cfn)
 {
 	int		rs = SR_OK ;
 	char		tmpfname[MAXPATHLEN+1] = { 0 } ;
@@ -2631,7 +2591,7 @@ static int config_start(CONFIG *csp,PI *pip,paramopt *app,cchar *cfn)
 /* end subroutine (config_start) */
 
 
-static int config_finish(CONFIG *csp)
+local int config_finish(CONFIG *csp)
 {
 	proginfo	*pip ;
 	int		rs = SR_OK ;
@@ -2668,7 +2628,7 @@ static int config_finish(CONFIG *csp)
 /* end subroutine (config_finish) */
 
 
-static int config_findfile(CONFIG *csp,char tbuf[],cchar cfname[])
+local int config_findfile(CONFIG *csp,char tbuf[],cchar cfname[])
 {
 	proginfo	*pip = csp->pip ;
 	VECSTR		sv ;
@@ -2696,7 +2656,7 @@ static int config_findfile(CONFIG *csp,char tbuf[],cchar cfname[])
 /* end subroutine (config_findfile) */
 
 
-static int config_cookbegin(CONFIG *csp)
+local int config_cookbegin(CONFIG *csp)
 {
 	proginfo	*pip = csp->pip ;
 	int		rs ;
@@ -2762,7 +2722,7 @@ static int config_cookbegin(CONFIG *csp)
 /* end subroutine (config_cookbegin) */
 
 
-static int config_cookend(CONFIG *csp)
+local int config_cookend(CONFIG *csp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2779,7 +2739,7 @@ static int config_cookend(CONFIG *csp)
 
 
 #ifdef	COMMENT
-static int config_check(CONFIG *csp)
+local int config_check(CONFIG *csp)
 {
 	proginfo	*pip = csp->pip ;
 	int		rs = SR_OK ;
@@ -2799,7 +2759,7 @@ static int config_check(CONFIG *csp)
 #endif /* COMMENT */
 
 
-static int config_read(CONFIG *csp)
+local int config_read(CONFIG *csp)
 {
 	proginfo	*pip = csp->pip ;
 	LOCINFO		*lip ;
@@ -2824,9 +2784,7 @@ static int config_read(CONFIG *csp)
 }
 /* end subroutine (config_read) */
 
-
-static int config_reader(CONFIG *csp)
-{
+local int config_reader(CONFIG *csp) noex {
 	proginfo	*pip = csp->pip ;
 	LOCINFO		*lip ;
 	PF	*pfp = &csp->p ;
@@ -2898,7 +2856,7 @@ static int config_reader(CONFIG *csp)
 	                case cparam_maildir:
 	                    {
 	                        int	ml ;
-	                        ml = prsetfname(pr,tbuf,ebuf,el,true,
+	                        ml = prmkfname(pr,tbuf,ebuf,el,true,
 	                            nullptr,MAILDNAME,"") ;
 	                        if (ml > 0)
 	                            rs = procmaildir(pip,tbuf,ml) ;
@@ -2907,12 +2865,12 @@ static int config_reader(CONFIG *csp)
 #endif /* COMMENT */
 
 	                case cparam_logfile:
-	                    if (! pip->final.lfname) {
+	                    if (! pip->finval.lfname) {
 	                        cchar	*lfn = pip->lfname ;
 	                        cchar	*tfn = tbuf ;
-	                        pip->final.lfname = true ;
+	                        pip->finval.lfname = true ;
 	                        pip->have.lfname = true ;
-	                        ml = prsetfname(pr,tbuf,ebuf,el,true,
+	                        ml = prmkfname(pr,tbuf,ebuf,el,true,
 	                            LOGCNAME,sn,"") ;
 	                        if ((lfn == nullptr) || 
 	                            (strcmp(lfn,tfn) != 0)) {
