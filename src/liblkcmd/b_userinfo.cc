@@ -34,7 +34,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -50,30 +50,30 @@
 #include	<sys/param.h>
 #include	<sys/task.h>
 #include	<sys/statvfs.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<project.h>
 #include	<netdb.h>
-
-#if	SYSHAS_AUDIT
-#include	<bsm/audit.h>
-#endif
-
-#include	<usystem.h>
-#include	<uinfo.h>
-#include	<ugetpw.h>
-#include	<ugetpid.h>
-#include	<userattr.h>
-#include	<getbufsize.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<ucgetx.h>
+#include	<ucgetnetname.h>
+#include	<ucgetpw.h>
+#include	<ucgetpid.h>
+#include	<bufsizeget.h>
 #include	<getxname.h>
 #include	<getax.h>
 #include	<getusername.h>
+#include	<getpwentry.h>
+#include	<getutmpent.h>
+#include	<estrings.h>
+#include	<ucinfo.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
@@ -82,8 +82,6 @@
 #include	<realname.h>
 #include	<pwentry.h>
 #include	<pwfile.h>
-#include	<getpwentry.h>
-#include	<getutmpent.h>
 #include	<pcsns.h>
 #include	<lastlogfile.h>
 #include	<sncpy.h>
@@ -91,7 +89,6 @@
 #include	<sysgroup.h>
 #include	<sysproject.h>
 #include	<tmpx.h>
-#include	<estrings.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -100,6 +97,9 @@
 #include	"b_userinfo.h"
 #include	"defs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -139,6 +139,8 @@
 #define	DEVDNAME	"/dev"
 #endif
 
+#define	PI		proginfo
+
 #define	LOCINFO		struct locinfo
 #define	LOCINFO_FL	struct locinfo_flags
 
@@ -162,21 +164,28 @@ extern char	**environ ;		/* definition required by AT&T AST */
 
 /* local structures */
 
+namespace {
+    struct vars {
+    	int	netnamelen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 struct locinfo_flags {
 	uint		stores:1 ;
 	uint		ns:1 ;
 	uint		phone:1 ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	PROGINFO	*pip ;
 	vecstr		stores ;
 	PCSNS		ns ;
 	cchar		*pr_pcs ;
 	int		phone ;
-} ;
+} ; /* end struct */
 
 struct datauser_flags {
 	uint		pent:1 ;
@@ -199,7 +208,7 @@ struct datauser_flags {
 	uint		statvfs:1 ;
 	uint		lastlog:1 ;
 	uint		utmpent:1 ;
-} ;
+} ; /* end struct */
 
 struct datauser {
 	PROGINFO	*pip ;
@@ -214,8 +223,8 @@ struct datauser {
 	DATAUSER_FL	init ;
 	DATAUSER_FL	have ;
 	STATVFS	fss ;
-	struct group	gr ;
-	struct project	pj ;
+	GROUP	gr ;
+	PROJECT	pj ;
 	PWENTRY		pent ;
 	GETUTMPENT	ue ;
 	vecstr		groups ;
@@ -238,7 +247,7 @@ struct datauser {
 	char		lastseen[LASTLOGFILE_LLINE + 1] ;
 	char		orgcode[ORGCODELEN+1] ;
 	char		orgloc[ORGLOCLEN+1] ;
-} ;
+} ; /* end struct */
 
 struct datasys_flags {
 	uint		stores:1 ;
@@ -249,12 +258,12 @@ struct datasys_flags {
 	uint		nisdomain:1 ;
 	uint		uname:1 ;
 	uint		uaux:1 ;
-} ;
+} ; /* end struct */
 
 struct datasys {
 	PROGINFO	*pip ;
 	vecstr		stores ;
-	DATASYS_FL	f ;
+	DATASYS_FL	fl ;
 	UINFO_NAME	uname ;
 	UINFO_AUX	uaux ;
 	cchar		*nodename ;
@@ -262,7 +271,7 @@ struct datasys {
 	cchar		*clustername ;
 	cchar		*domainname ;
 	cchar		*nisdomainname ;
-} ;
+} ; /* end struct */
 
 struct progdata_flags {
 	uint		self:1 ;
@@ -270,7 +279,7 @@ struct progdata_flags {
 	uint		domain:1 ;
 	uint		host:1 ;
 	uint		prpcs:1 ;
-} ;
+} ; /* end struct */
 
 struct progdata {
 	PROGINFO	*pip ;
@@ -278,104 +287,104 @@ struct progdata {
 	cchar		*un ;		/* specified user-name */
 	cchar		*domainname ;
 	cchar		*pwfname ;
-	PROGDATA_FL	f ;
+	PROGDATA_FL	fl ;
 	DATAUSER	du ;
 	struct datasys	ds ;
 	char		hostname[MAXHOSTNAMELEN + 1] ;
 	char		prpcs[MAXPATHLEN + 1] ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PI *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,PROGDATA *,
+local int	procopts(PI *,keyopt *) ;
+local int	procargs(PI *,ARGINFO *,bits *,PROGDATA *,
 			cchar *,cchar *) ;
-static int	procqueries(PROGINFO *,PROGDATA *,void *,cchar *,int) ;
-static int	procquery(PROGINFO *,PROGDATA *,void *,cchar *,int) ;
-static int	procquery_name(PROGINFO *,PROGDATA *,char *,int) ;
-static int	procquery_fullname(PROGINFO *,PROGDATA *,char *,int) ;
-static int	procquery_netname(PROGINFO *,PROGDATA *,char *,int) ;
-static int	procquery_projinfo(PROGINFO *,PROGDATA *,char *,int) ;
-static int	procquery_projects(PROGINFO *,PROGDATA *,char *,int) ;
-static int	procout(PROGINFO *,void *,cchar *,int) ;
-static int	procgetns(PROGINFO *,char *,int,cchar *,int) ;
+local int	procqueries(PI *,PROGDATA *,void *,cchar *,int) ;
+local int	procquery(PI *,PROGDATA *,void *,cchar *,int) ;
+local int	procquery_name(PI *,PROGDATA *,char *,int) ;
+local int	procquery_fullname(PI *,PROGDATA *,char *,int) ;
+local int	procquery_netname(PI *,PROGDATA *,char *,int) ;
+local int	procquery_projinfo(PI *,PROGDATA *,char *,int) ;
+local int	procquery_projects(PI *,PROGDATA *,char *,int) ;
+local int	procout(PI *,void *,cchar *,int) ;
+local int	procgetns(PI *,char *,int,cchar *,int) ;
 
-static int	progdata_start(PROGDATA *,PROGINFO *,cchar *,int, cchar *) ;
-static int	progdata_host(PROGDATA *) ;
-static int	progdata_domain(PROGDATA *) ;
-static int	progdata_haveuser(PROGDATA *) ;
-static int	progdata_finish(PROGDATA *) ;
+local int	progdata_start(PROGDATA *,PI *,cchar *,int, cchar *) ;
+local int	progdata_host(PROGDATA *) ;
+local int	progdata_domain(PROGDATA *) ;
+local int	progdata_haveuser(PROGDATA *) ;
+local int	progdata_finish(PROGDATA *) ;
 
-static int	datasys_start(struct datasys *,PROGINFO *) ;
-static int	datasys_finish(struct datasys *) ;
-static int	datasys_setentry(DATASYS *,cchar **,cchar *,int) ;
-static int	datasys_uname(struct datasys *) ;
-static int	datasys_uaux(struct datasys *) ;
-static int	datasys_node(struct datasys *) ;
-static int	datasys_system(struct datasys *) ;
-static int	datasys_cluster(struct datasys *) ;
-static int	datasys_nodeinfo(struct datasys *) ;
-static int	datasys_domain(struct datasys *) ;
-static int	datasys_nisdomain(struct datasys *) ;
+local int	datasys_start(struct datasys *,PI *) ;
+local int	datasys_finish(struct datasys *) ;
+local int	datasys_setentry(DATASYS *,cchar **,cchar *,int) ;
+local int	datasys_uname(struct datasys *) ;
+local int	datasys_uaux(struct datasys *) ;
+local int	datasys_node(struct datasys *) ;
+local int	datasys_system(struct datasys *) ;
+local int	datasys_cluster(struct datasys *) ;
+local int	datasys_nodeinfo(struct datasys *) ;
+local int	datasys_domain(struct datasys *) ;
+local int	datasys_nisdomain(struct datasys *) ;
 
-static int	datauser_start(DATAUSER *,PROGINFO *,cchar *,cchar *) ;
-static int	datauser_ua(DATAUSER *) ;
-static int	datauser_domain(DATAUSER *) ;
-static int	datauser_pw(DATAUSER *) ;
-static int	datauser_gr(DATAUSER *) ;
-static int	datauser_pj(DATAUSER *) ;
-static int	datauser_groups(DATAUSER *) ;
+local int	datauser_start(DATAUSER *,PI *,cchar *,cchar *) ;
+local int	datauser_ua(DATAUSER *) ;
+local int	datauser_domain(DATAUSER *) ;
+local int	datauser_pw(DATAUSER *) ;
+local int	datauser_gr(DATAUSER *) ;
+local int	datauser_pj(DATAUSER *) ;
+local int	datauser_groups(DATAUSER *) ;
 #if	CF_DEFGROUP
-static int	datauser_groupdef(DATAUSER *) ;
+local int	datauser_groupdef(DATAUSER *) ;
 #endif /* CF_DEFGROUP */
-static int	datauser_groupsfind(DATAUSER *) ;
-static int	datauser_groupsfinder(DATAUSER *,char *,int) ;
-static int	datauser_projects(DATAUSER *) ;
-static int	datauser_projectsfind(DATAUSER *) ;
-static int	datauser_projectsfinder(DATAUSER *,char *,int) ;
-static int	datauser_tz(DATAUSER *) ;
-static int	datauser_lastlog(DATAUSER *) ;
-static int	datauser_statvfs(DATAUSER *) ;
-static int	datauser_utmpent(DATAUSER *) ;
-static int	datauser_orgcode(DATAUSER *) ;
-static int	datauser_orgloc(DATAUSER *) ;
-static int	datauser_lastseen(DATAUSER *) ;
-static int	datauser_lastseener(DATAUSER *,char *,int,vecstr *) ;
-static int	datauser_username(DATAUSER *,char *,int) ;
-static int	datauser_realname(DATAUSER *,char *,int) ;
-static int	datauser_netname(DATAUSER *,cchar *) ;
-static int	datauser_finish(DATAUSER *) ;
-static int	datauser_mkgids(DATAUSER *,char *,int) ;
+local int	datauser_groupsfind(DATAUSER *) ;
+local int	datauser_groupsfinder(DATAUSER *,char *,int) ;
+local int	datauser_projects(DATAUSER *) ;
+local int	datauser_projectsfind(DATAUSER *) ;
+local int	datauser_projectsfinder(DATAUSER *,char *,int) ;
+local int	datauser_tz(DATAUSER *) ;
+local int	datauser_lastlog(DATAUSER *) ;
+local int	datauser_statvfs(DATAUSER *) ;
+local int	datauser_utmpent(DATAUSER *) ;
+local int	datauser_orgcode(DATAUSER *) ;
+local int	datauser_orgloc(DATAUSER *) ;
+local int	datauser_lastseen(DATAUSER *) ;
+local int	datauser_lastseener(DATAUSER *,char *,int,vecstr *) ;
+local int	datauser_username(DATAUSER *,char *,int) ;
+local int	datauser_realname(DATAUSER *,char *,int) ;
+local int	datauser_netname(DATAUSER *,cchar *) ;
+local int	datauser_finish(DATAUSER *) ;
+local int	datauser_mkgids(DATAUSER *,char *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_prpcs(LOCINFO *) ;
-static int	locinfo_pcsns(LOCINFO *) ;
-static int	locinfo_pcsnsget(LOCINFO *,char *,int,cchar *,int) ;
-static int	locinfo_setphone(LOCINFO *,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PI *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_prpcs(LOCINFO *) ;
+local int	locinfo_pcsns(LOCINFO *) ;
+local int	locinfo_pcsnsget(LOCINFO *,char *,int,cchar *,int) ;
+local int	locinfo_setphone(LOCINFO *,cchar *,int) ;
 
-static int	mkstrlist(char *,int,vecstr *) ;
-static int	mkgid(char *,int,cchar *) ;
-static int	getuser(char *,int,uid_t) ;
+local int	mkstrlist(char *,int,vecstr *) ;
+local int	mkgid(char *,int,cchar *) ;
+local int	getuser(char *,int,uid_t) ;
 
 
 /* local variables */
 
-static constexpr PIVARS	initvars = {
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
-static constexpr MAPEX	mapexs[] = {
+constexpr MAPEX	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -388,7 +397,7 @@ static constexpr MAPEX	mapexs[] = {
 	{ SR_EXIT, EX_TERM },
 	{ SR_NOTUNIQ, EX_TEMPFAIL },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
 enum argopts {
 	argopt_root,
@@ -403,9 +412,9 @@ enum argopts {
 	argopt_pwfile,
 	argopt_pwidb,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static constexpr cpcchar	argopts[] = {
+constexpr cpcchar	argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -418,17 +427,17 @@ static constexpr cpcchar	argopts[] = {
 	"pwfile",
 	"pwidb",
 	nullptr
-} ;
+} ; /* end array */
 
 enum progopts {
 	progopt_phone,
 	progopt_overlast
-} ;
+} ; /* end enum */
 
-static constexpr cpcchar	progopts[] = {
+constexpr cpcchar	progopts[] = {
 	"phone",
 	nullptr
-} ;
+} ; /* end array */
 
 enum qopts {
 	qopt_sysname,
@@ -524,9 +533,9 @@ enum qopts {
 	qopt_lastseen,
 	qopt_execname,
 	qopt_overlast
-} ;
+} ; /* end enum */
 
-static constexpr cpcchar	qopts[] = {
+constexpr cpcchar	qopts[] = {
 	"sysname",
 	"nodename",
 	"release",
@@ -620,33 +629,33 @@ static constexpr cpcchar	qopts[] = {
 	"lastseen",
 	"execname",
 	nullptr
-} ;
+} ; /* end array */
 
 enum uakeys {
 	uakey_tz,
 	uakey_dn,
 	uakey_overlast
-} ;
+} ; /* end enum */
 
-static constexpr cpcchar	uakeys[] = {
+constexpr cpcchar	uakeys[] = {
 	"tz",
 	"dn",
 	nullptr
-} ;
+} ; /* end array */
 
 enum phonetypes {
 	phonetype_fancy,
 	phonetype_plain,
 	phonetype_overlast
-} ;
+} ; /* end enum */
 
-static constexpr cpcchar	phonetypes[] = {
+constexpr cpcchar	phonetypes[] = {
 	"fancy",
 	"plain",
 	nullptr
-} ;
+} ; /* end array */
 
-static constexpr cchar	aterms[] = {
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -655,7 +664,9 @@ static constexpr cchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
+
+static vars		var ;
 
 
 /* exported variables */
@@ -681,9 +692,7 @@ int b_userinfo(int argc,cchar *argv[],void *contextp) noex {
 }
 /* end subroutine (b_userinfo) */
 
-
-int p_userinfo(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_userinfo(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_userinfo) */
@@ -691,15 +700,13 @@ int p_userinfo(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
+    	static cint	rsv = var ;
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 	uid_t		uid = getuid() ;
 
@@ -714,11 +721,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		v ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_version = FALSE ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
-	int		f_name = FALSE ;
-	int		f_self = FALSE ;
+	int		f_version = false ;
+	int		f_usage = false ;
+	int		f_help = false ;
+	int		f_name = false ;
+	int		f_self = false ;
 	int		f ;
 
 	cchar		*argp, *aop, *akp, *avp ;
@@ -745,6 +752,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
+
+	if (rsv < 0) goto badprogstart ;
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
 	if (rs < 0) {
@@ -805,9 +814,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != nullptr) {
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
@@ -836,7 +845,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -845,7 +854,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -854,13 +863,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -878,7 +887,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* argument file */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -896,7 +905,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -914,7 +923,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* output file name */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -931,7 +940,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_if:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            cp = avp ;
 	                    } else {
@@ -949,7 +958,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* password file */
 	                case argopt_pwfile:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pwfname = avp ;
 	                    } else {
@@ -967,7 +976,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* inverse password ('ipasswd') file */
 	                case argopt_pwidb:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pwidb = avp ;
 	                    } else {
@@ -1000,7 +1009,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -1010,7 +1019,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->fl.quiet = TRUE ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -1027,7 +1036,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 /* options */
@@ -1037,7 +1046,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -1045,7 +1054,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'n':
-	                        f_name = TRUE ;
+	                        f_name = true ;
 	                        break ;
 
 	                    case 'q':
@@ -1056,7 +1065,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -1065,7 +1074,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -1097,8 +1106,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    shio_control(&errfile,SHIO_CSETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    shio_control(&errfile,SHIO_CSETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1222,12 +1231,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            uid_t	tuid = v ;
 	            un = unbuf ;
 	            rs = getusername(unbuf,USERNAMELEN,tuid) ;
-	            if ((rs >= 0) && (tuid == uid)) f_self = TRUE ;
+	            if ((rs >= 0) && (tuid == uid)) f_self = true ;
 	        } /* end if (cfdec) */
 	    } /* end if */
 
 	} else {
-	    f_self = TRUE ;
+	    f_self = true ;
 	    un = unbuf ;
 	    rs = getusername(unbuf,USERNAMELEN,uid) ;
 	}
@@ -1261,7 +1270,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        cchar		*pfn = pwfname ;
 	        if ((rs = progdata_start(pdp,pip,un,f_self,pfn)) >= 0) {
 	            ARGINFO	*aip = &ainfo ;
-	            BITS	*bop = &pargs ;
+	            bits	*bop = &pargs ;
 	            cchar	*afn = afname ;
 	            cchar	*ofn = ofname ;
 
@@ -1333,13 +1342,13 @@ retearly:
 #endif
 
 	if (pip->efp != nullptr) {
-	    pip->open.errfile = FALSE ;
+	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
 	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -1380,7 +1389,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -1435,7 +1444,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+local int procopts(PI *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1447,13 +1456,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(progopts,3,kp,kl)) >= 0) {
 
@@ -1461,9 +1470,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case progopt_phone:
-	                    if (! lip->final.phone) {
-	                        lip->have.phone = TRUE ;
-	                        lip->final.phone = TRUE ;
+	                    if (! lip->finval.phone) {
+	                        lip->have.phone = true ;
+	                        lip->finval.phone = true ;
 	                        if (vl > 0) {
 	                            rs = locinfo_setphone(lip,vp,vl) ;
 	                        }
@@ -1487,10 +1496,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(pip,aip,bop,pdp,ofn,afn)
+local int procargs(pip,aip,bop,pdp,ofn,afn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-BITS		*bop ;
+bits		*bop ;
 PROGDATA	*pdp ;
 cchar		*ofn ;
 cchar		*afn ;
@@ -1601,7 +1610,7 @@ cchar		*afn ;
 /* end subroutine (procargs) */
 
 
-static int procqueries(pip,pdp,ofp,lbuf,len)
+local int procqueries(pip,pdp,ofp,lbuf,len)
 PROGINFO	*pip ;
 PROGDATA	*pdp ;
 void		*ofp ;
@@ -1630,7 +1639,7 @@ int		len ;
 
 
 /* process a query specification */
-static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
+local int procquery(PI *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 {
 	DATAUSER	*dup = &pdp->du ;
 	LOCINFO		*lip = pip->lip ;
@@ -2012,7 +2021,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    break ;
 	case qopt_egids:
 	    if (pdp->fl.self) {
-	        SBUF	b ;
+	        sbuf	b ;
 	        sp = cbuf ;
 	        if ((rs = sbuf_start(&b,cbuf,clen)) >= 0) {
 	            gid_t	egids[NGROUPS_MAX + 1] ;
@@ -2288,7 +2297,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	    break ;
 	case qopt_egroups:
 	    if (pdp->fl.self) {
-	        SBUF	b ;
+	        sbuf	b ;
 	        gid_t	egids[NGROUPS_MAX + 1] ;
 	        gid_t	v ;
 	        int	n, i ;
@@ -2380,7 +2389,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	            rs = ctdecul(cbuf,clen,fssp->f_fsid) ;
 	            break ;
 	        case qopt_fsflags:
-	            rs = snfsflags(cbuf,clen,fssp->f_flag) ;
+	            rs = snflagsfs(cbuf,clen,fssp->f_flag) ;
 	            break ;
 	        } /* end switch */
 	        if ((rs >= 0) && (v >= 0)) {
@@ -2445,7 +2454,7 @@ static int procquery(PROGINFO *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 }
 /* end subroutine (procquery) */
 
-static int procquery_name(PROGINFO *pip,PROGDATA *pdp,
+local int procquery_name(PI *pip,PROGDATA *pdp,
 		char *cbuf,int clen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2520,7 +2529,7 @@ static int procquery_name(PROGINFO *pip,PROGDATA *pdp,
 /* end subroutine (procquery_name) */
 
 
-static int procquery_fullname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
+local int procquery_fullname(PI *pip,PROGDATA *pdp,char *cbuf,int clen)
 {
 	int		rs = SR_OK ;
 	int		sl = -1 ;
@@ -2586,14 +2595,13 @@ static int procquery_fullname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 }
 /* end subroutine (procquery_fullname) */
 
-
-static int procquery_netname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
-{
+local int procquery_netname(PI *pip,PROGDATA *pdp,char *cbuf,int clen) noex {
+	cint		netlen = var.netnamelen ;
 	int		rs = SR_OK ;
 	int		cl = 0 ;
 	if (pdp->fl.self) {
-	    char	nbuf[MAXNETNAMELEN+1] ;
-	    if ((rs = uc_getnetname(nbuf)) >= 0) {
+	    char	nbuf[netlen+1] ;
+	    if ((rs = uc_getnetname(nbuf,netlen)) >= 0) {
 	        cl = (strdcpy1w(cbuf,clen,nbuf,rs) - cbuf) ;
 	    } else if ((rs == SR_NOTFOUND) || (rs == SR_UNAVAIL)) {
 	        rs = SR_OK ;
@@ -2616,7 +2624,7 @@ static int procquery_netname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 /* end subroutine (procquery_netname) */
 
 
-static int procquery_projects(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
+local int procquery_projects(PI *pip,PROGDATA *pdp,char *cbuf,int clen)
 {
 	DATAUSER	*dup = &pdp->du ;
 	int		rs ;
@@ -2630,7 +2638,7 @@ static int procquery_projects(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 /* end subroutine (procquery_projects) */
 
 
-static int procquery_projinfo(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
+local int procquery_projinfo(PI *pip,PROGDATA *pdp,char *cbuf,int clen)
 {
 	DATAUSER	*dup = &pdp->du ;
 	int		rs ;
@@ -2650,7 +2658,7 @@ static int procquery_projinfo(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 /* end subroutine (procquery_projinfo) */
 
 
-static int procout(PROGINFO *pip,void *ofp,cchar *sp,int sl)
+local int procout(PI *pip,void *ofp,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -2667,7 +2675,7 @@ static int procout(PROGINFO *pip,void *ofp,cchar *sp,int sl)
 /* end subroutine (procout) */
 
 
-static int procgetns(PROGINFO *pip,char *nbuf,int nlen,cchar *un,int w)
+local int procgetns(PI *pip,char *nbuf,int nlen,cchar *un,int w)
 {
 	LOCINFO		*lip = pip->lip ;
 	return locinfo_pcsnsget(lip,nbuf,nlen,un,w) ;
@@ -2675,7 +2683,7 @@ static int procgetns(PROGINFO *pip,char *nbuf,int nlen,cchar *un,int w)
 /* end subroutine (procgetns) */
 
 
-static int progdata_start(PROGDATA *pdp,PROGINFO *pip,cchar *un,int f_self,
+local int progdata_start(PROGDATA *pdp,PI *pip,cchar *un,int f_self,
 		cchar *pwfname)
 {
 	int		rs ;
@@ -2716,7 +2724,7 @@ static int progdata_start(PROGDATA *pdp,PROGINFO *pip,cchar *un,int f_self,
 /* end subroutine (progdata_start) */
 
 
-static int progdata_finish(PROGDATA *pdp)
+local int progdata_finish(PROGDATA *pdp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2736,7 +2744,7 @@ static int progdata_finish(PROGDATA *pdp)
 /* end subroutine (progdata_finish) */
 
 
-static int progdata_domain(PROGDATA *pdp)
+local int progdata_domain(PROGDATA *pdp)
 {
 	int		rs = SR_OK ;
 
@@ -2750,13 +2758,13 @@ static int progdata_domain(PROGDATA *pdp)
 	    }
 
 	    if (sp == nullptr) {
-	        if (! pdp->ds.f.domain) rs = datasys_domain(&pdp->ds) ;
+	        if (! pdp->ds.fl.domain) rs = datasys_domain(&pdp->ds) ;
 	        if ((rs >= 0) && (pdp->ds.domainname[0] != '\0')) {
 	            sp = pdp->ds.domainname ;
 		}
 	    } /* end if */
 
-	    pdp->fl.domain = TRUE ;
+	    pdp->fl.domain = true ;
 	    if ((rs >= 0) && (sp != nullptr)) {
 	        pdp->domainname = sp ;
 		rs = strlen(sp) ;
@@ -2771,14 +2779,14 @@ static int progdata_domain(PROGDATA *pdp)
 /* end subroutine (progdata_domain) */
 
 
-static int progdata_host(PROGDATA *pdp)
+local int progdata_host(PROGDATA *pdp)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
 	if ((! pdp->fl.host) && (pdp->hostname[0] == '\0')) {
-	    pdp->fl.host = TRUE ;
-	    if (! pdp->ds.f.node) {
+	    pdp->fl.host = true ;
+	    if (! pdp->ds.fl.node) {
 	        rs = datasys_node(&pdp->ds) ;
 	    }
 	    if ((rs >= 0) && (! pdp->fl.domain)) {
@@ -2799,7 +2807,7 @@ static int progdata_host(PROGDATA *pdp)
 /* end subroutine (progdata_host) */
 
 
-static int progdata_haveuser(PROGDATA *pdp)
+local int progdata_haveuser(PROGDATA *pdp)
 {
 	int		rs = SR_OK ;
 
@@ -2812,7 +2820,7 @@ static int progdata_haveuser(PROGDATA *pdp)
 /* end subroutine (progdata_haveuser) */
 
 
-static int datasys_start(DATASYS *dsp,PROGINFO *pip)
+local int datasys_start(DATASYS *dsp,PI *pip)
 {
 	int		rs ;
 
@@ -2826,7 +2834,7 @@ static int datasys_start(DATASYS *dsp,PROGINFO *pip)
 /* end subroutine (datasys_start) */
 
 
-static int datasys_finish(DATASYS *dsp)
+local int datasys_finish(DATASYS *dsp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2868,35 +2876,31 @@ int datasys_setentry(DATASYS *dsp,cchar **epp,cchar *vp,int vl)
 /* end subroutine (datasys_setentry) */
 
 
-static int datasys_uname(DATASYS *dsp)
+local int datasys_uname(DATASYS *dsp)
 {
 	int		rs = SR_OK ;
 
 	if (! dsp->fl.uname) {
-	    dsp->fl.uname = TRUE ;
-	    rs = uinfo_name(&dsp->uname) ;
+	    dsp->fl.uname = true ;
+	    rs = ucinfo_name(&dsp->uname) ;
 	} /* end if (uname) */
 
 	return rs ;
 }
 /* end subroutine (datasys_uname) */
 
-
-static int datasys_uaux(DATASYS *dsp)
-{
+local int datasys_uaux(DATASYS *dsp) noex {
 	int		rs = SR_OK ;
-
 	if (! dsp->fl.uaux) {
-	    dsp->fl.uaux = TRUE ;
-	    rs = uinfo_aux(&dsp->uaux) ;
+	    dsp->fl.uaux = true ;
+	    rs = ucinfo_aux(&dsp->uaux) ;
 	} /* end if (uaux) */
-
 	return rs ;
 }
 /* end subroutine (datasys_uaux) */
 
 
-static int datasys_node(DATASYS *dsp)
+local int datasys_node(DATASYS *dsp)
 {
 	PROGINFO	*pip = dsp->pip ;
 	int		rs = SR_OK ;
@@ -2904,7 +2908,7 @@ static int datasys_node(DATASYS *dsp)
 	if (pip == nullptr) return SR_FAULT ;
 
 	if (! dsp->fl.node) {
-	    dsp->fl.node = TRUE ;
+	    dsp->fl.node = true ;
 	    if (dsp->nodename == nullptr) {
 	        cchar	*cp = getourenv(pip->envv,VARNODE) ;
 	        if ((cp != nullptr) && (cp[0] != '\0')) {
@@ -2916,13 +2920,13 @@ static int datasys_node(DATASYS *dsp)
 	        if (! dsp->fl.uname) rs = datasys_uname(dsp) ;
 	        if (rs >= 0) {
 	            int		nl = -1 ;
-	            cchar	*np = dsp->uname.nodename ;
+	            cchar	*valp = dsp->uname.nodename ;
 	            cchar	**vpp = &dsp->nodename ;
 	            char	*tp ;
-	            if ((tp = strchr(np,'.')) != nullptr) {
-	                nl = (tp-np) ;
+	            if ((tp = strchr(valp,'.')) != nullptr) {
+	                nl = intconv(tp-valp) ;
 	            }
-	            rs = datasys_setentry(dsp,vpp,np,nl) ;
+	            rs = datasys_setentry(dsp,vpp,valp,nl) ;
 	        }
 	    }
 	} else if (dsp->nodename != nullptr) {
@@ -2933,16 +2937,14 @@ static int datasys_node(DATASYS *dsp)
 }
 /* end subroutine (datasys_node) */
 
-
-static int datasys_cluster(DATASYS *dsp)
-{
+local int datasys_cluster(DATASYS *dsp) noex {
 	PROGINFO	*pip = dsp->pip ;
 	int		rs = SR_OK ;
 
 	if (pip == nullptr) return SR_FAULT ;
 
 	if (! dsp->fl.cluster) {
-	    dsp->fl.cluster = TRUE ;
+	    dsp->fl.cluster = true ;
 	    if (dsp->clustername == nullptr) {
 	        cchar	*cp = getourenv(pip->envv,VARCLUSTER) ;
 	        if ((cp != nullptr) && (cp[0] != '\0')) {
@@ -2964,7 +2966,7 @@ static int datasys_cluster(DATASYS *dsp)
 /* end subroutine (datasys_cluster) */
 
 
-static int datasys_system(DATASYS *dsp)
+local int datasys_system(DATASYS *dsp)
 {
 	PROGINFO	*pip = dsp->pip ;
 	int		rs = SR_OK ;
@@ -2972,7 +2974,7 @@ static int datasys_system(DATASYS *dsp)
 	if (pip == nullptr) return SR_FAULT ;
 
 	if (! dsp->fl.system) {
-	    dsp->fl.system = TRUE ;
+	    dsp->fl.system = true ;
 	    if (dsp->systemname == nullptr) {
 	        cchar	*cp = getourenv(pip->envv,VARSYSTEM) ;
 	        if ((cp != nullptr) && (cp[0] != '\0')) {
@@ -2994,7 +2996,7 @@ static int datasys_system(DATASYS *dsp)
 /* end subroutine (datasys_system) */
 
 
-static int datasys_nodeinfo(DATASYS *dsp)
+local int datasys_nodeinfo(DATASYS *dsp)
 {
 	PROGINFO	*pip = dsp->pip ;
 	int		rs = SR_OK ;
@@ -3024,7 +3026,7 @@ static int datasys_nodeinfo(DATASYS *dsp)
 
 
 /* this is a "user" domain-name (not a "system" domain-name) */
-static int datasys_domain(DATASYS *dsp)
+local int datasys_domain(DATASYS *dsp)
 {
 	PROGINFO	*pip = dsp->pip ;
 	int		rs = SR_OK ;
@@ -3032,7 +3034,7 @@ static int datasys_domain(DATASYS *dsp)
 	if (pip == nullptr) return SR_FAULT ;
 
 	if (! dsp->fl.domain) {
-	    dsp->fl.domain = TRUE ;
+	    dsp->fl.domain = true ;
 	    if (dsp->domainname == nullptr) {
 	        cchar	*cp = getourenv(pip->envv,VARDOMAIN) ;
 	        if ((cp != nullptr) && (cp[0] != '\0'))
@@ -3062,7 +3064,7 @@ static int datasys_domain(DATASYS *dsp)
 /* end subroutine (datasys_domain) */
 
 
-static int datasys_nisdomain(DATASYS *dsp)
+local int datasys_nisdomain(DATASYS *dsp)
 {
 	PROGINFO	*pip = dsp->pip ;
 	int		rs = SR_OK ;
@@ -3071,7 +3073,7 @@ static int datasys_nisdomain(DATASYS *dsp)
 
 	if (! dsp->fl.nisdomain) {
 	    cchar	*ndp ;
-	    dsp->fl.nisdomain = TRUE ;
+	    dsp->fl.nisdomain = true ;
 	    if (dsp->nisdomainname == nullptr) {
 	        cchar	*cp = getourenv(pip->envv,VARNISDOMAIN) ;
 	        if ((cp != nullptr) && (cp[0] != '\0')) {
@@ -3099,7 +3101,7 @@ static int datasys_nisdomain(DATASYS *dsp)
 /* end subroutine (datasys_nisdomain) */
 
 
-static int datauser_start(DATAUSER *dup,PROGINFO *pip,cchar *un,cchar *pwfname)
+local int datauser_start(DATAUSER *dup,PI *pip,cchar *un,cchar *pwfname)
 {
 	cint	pentlen ;
 	cint	grlen ;
@@ -3123,9 +3125,9 @@ static int datauser_start(DATAUSER *dup,PROGINFO *pip,cchar *un,cchar *pwfname)
 
 	if ((rs = pwentrybufsize()) >= 0) {
 	    pentlen = rs ;
-	    if ((rs = getbufsize(getbufsize_gr)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_gr)) >= 0) {
 		grlen = rs ;
-		if ((rs = getbufsize(getbufsize_pj)) >= 0) {
+		if ((rs = bufsizeget(bufsize_pj)) >= 0) {
 		    int		sz = 0 ;
 		    char	*bp ;
 		    pjlen = rs ;
@@ -3155,9 +3157,9 @@ static int datauser_start(DATAUSER *dup,PROGINFO *pip,cchar *un,cchar *pwfname)
 	        	    dup->pjbuf = nullptr ;
 	        	    dup->pjlen = 0 ;
 	    		}
-		    } /* end if (getbufsize) */
-		} /* end if (getbufsize) */
-	    } /* end if (getbufsize) */
+		    } /* end if (bufsizeget) */
+		} /* end if (bufsizeget) */
+	    } /* end if (bufsizeget) */
 	} /* end if (memory-allocation) */
 
 #if	CF_DEBUGS
@@ -3169,7 +3171,7 @@ static int datauser_start(DATAUSER *dup,PROGINFO *pip,cchar *un,cchar *pwfname)
 /* end subroutine (datauser_start) */
 
 
-static int datauser_finish(DATAUSER *dup)
+local int datauser_finish(DATAUSER *dup)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -3184,13 +3186,13 @@ static int datauser_finish(DATAUSER *dup)
 	}
 
 	if (dup->have.groups) {
-	    dup->have.groups = FALSE ;
+	    dup->have.groups = false ;
 	    rs1 = vecstr_finish(&dup->groups) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (dup->have.projects) {
-	    dup->have.projects = FALSE ;
+	    dup->have.projects = false ;
 	    rs1 = vecstr_finish(&dup->projects) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -3212,7 +3214,7 @@ static int datauser_finish(DATAUSER *dup)
 /* end subroutine (datauser_finish) */
 
 
-static int datauser_ua(DATAUSER *dup)
+local int datauser_ua(DATAUSER *dup)
 {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
@@ -3225,7 +3227,7 @@ static int datauser_ua(DATAUSER *dup)
 
 	if (! dup->init.ua) {
 	    USERATTR	ua ;
-	    dup->init.ua = TRUE ;
+	    dup->init.ua = true ;
 	    dup->tz[0] = '\0' ;
 	    dup->dn[0] = '\0' ;
 	    if ((rs = userattrdb_open(&ua,dup->un)) >= 0) {
@@ -3263,7 +3265,7 @@ static int datauser_ua(DATAUSER *dup)
 /* end subroutine (datauser_ua) */
 
 
-static int datauser_domain(DATAUSER *dup)
+local int datauser_domain(DATAUSER *dup)
 {
 	int		rs = SR_OK ;
 
@@ -3274,7 +3276,7 @@ static int datauser_domain(DATAUSER *dup)
 #endif
 
 	if (! dup->init.domain) {
-	    dup->init.domain = TRUE ;
+	    dup->init.domain = true ;
 
 	    if (! dup->init.ua) {
 	        rs = datauser_ua(dup) ;
@@ -3310,12 +3312,12 @@ static int datauser_domain(DATAUSER *dup)
 /* end subroutine (datauser_domain) */
 
 
-static int datauser_pw(DATAUSER *dup)
+local int datauser_pw(DATAUSER *dup)
 {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f_ent = FALSE ;
+	int		f_ent = false ;
 
 	if (dup == nullptr) return SR_FAULT ;
 	pip = dup->pip ;
@@ -3333,19 +3335,19 @@ static int datauser_pw(DATAUSER *dup)
 	    cint	rsn = SR_NOTFOUND ;
 	    cchar	*un = dup->un ;
 	    char	*pbuf = dup->pentbuf ;
-	    dup->init.pent = TRUE ;
+	    dup->init.pent = true ;
 	    if (dup->pwfname == nullptr) {
 	        if ((rs = getpwentry_name(pp,pbuf,plen,un)) >= 0) {
-	            dup->have.pent = TRUE ;
-	            f_ent = TRUE ;
+	            dup->have.pent = true ;
+	            f_ent = true ;
 	        } else if ((rs == rsn) && hasalldig(un,-1)) {
 	            if ((rs = cfdecui(un,-1,&uiw)) >= 0) {
 	                const uid_t	tuid = uiw ;
 	                if ((rs = getpwentry_uid(pp,pbuf,plen,tuid)) >= 0) {
 	                    cint	unlen = USERNAMELEN ;
 	                    char	*unbuf = dup->unbuf ;
-	                    dup->have.pent = TRUE ;
-	                    f_ent = TRUE ;
+	                    dup->have.pent = true ;
+	                    f_ent = true ;
 	                    dup->un = dup->unbuf ;
 	                    strdcpy1(unbuf,unlen,pp->username) ;
 	                } /* end if (getpwentry_uid) */
@@ -3362,8 +3364,8 @@ static int datauser_pw(DATAUSER *dup)
 
 	        if ((rs = pwfile_open(&pf,dup->pwfname)) >= 0) {
 	            if ((rs = pwfile_fetchuser(&pf,un,n,pp,pbuf,plen)) >= 0) {
-	                dup->have.pent = TRUE ;
-	                f_ent = TRUE ;
+	                dup->have.pent = true ;
+	                f_ent = true ;
 	            } else if ((rs == rsn) && hasalldig(un,-1)) {
 	                cint	ulen = USERNAMELEN ;
 	                if ((rs = cfdecui(un,-1,&uiw)) >= 0) {
@@ -3374,8 +3376,8 @@ static int datauser_pw(DATAUSER *dup)
 	                        un = dup->un ;
 	                        rs = pwfile_fetchuser(&pf,un,n,pp,pbuf,plen) ;
 	                        if (rs >= 0) {
-	                            dup->have.pent = TRUE ;
-	                            f_ent = TRUE ;
+	                            dup->have.pent = true ;
+	                            f_ent = true ;
 	                        }
 	                    } /* end if (getusername) */
 	                } /* end if (cfdec) */
@@ -3402,27 +3404,27 @@ static int datauser_pw(DATAUSER *dup)
 
 
 /* find group entry for given username */
-static int datauser_gr(DATAUSER *dup)
+local int datauser_gr(DATAUSER *dup)
 {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if (dup == nullptr) return SR_FAULT ;
 	pip = dup->pip ;
 	if (pip == nullptr) return SR_FAULT ;
 
 	if (! dup->init.gr) {
-	    dup->init.gr = TRUE ;
+	    dup->init.gr = true ;
 	    if (! dup->init.pent) rs = datauser_pw(dup) ;
 	    if ((rs >= 0) && dup->have.pent) {
-	        struct group	*grp = &dup->gr ;
+	        GROUP	*grp = &dup->gr ;
 	        const gid_t	gid = dup->pent.gid ;
 	        cint	grlen = dup->grlen ;
 	        char		*grbuf = dup->grbuf ;
 	        if ((rs = getgr_gid(grp,grbuf,grlen,gid)) >= 0) {
-	            dup->have.gr = TRUE ;
-	            f = TRUE ;
+	            dup->have.gr = true ;
+	            f = true ;
 	        } else if (isNotPresent(rs)) {
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(5))
@@ -3446,11 +3448,11 @@ static int datauser_gr(DATAUSER *dup)
 /* end subroutine (datauser_gr) */
 
 
-static int datauser_pj(DATAUSER *dup)
+local int datauser_pj(DATAUSER *dup)
 {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if (dup == nullptr) return SR_FAULT ;
 	pip = dup->pip ;
@@ -3463,14 +3465,14 @@ static int datauser_pj(DATAUSER *dup)
 #endif
 
 	if (! dup->init.pj) {
-	    struct project	*pjp = &dup->pj ;
+	    PROJECT	*pjp = &dup->pj ;
 	    cint		pjlen = dup->pjlen ;
 	    cchar		*un = dup->un ;
 	    char		*pjbuf = dup->pjbuf ;
-	    dup->init.pj = TRUE ;
-	    if ((rs = uc_getdefaultproj(un,pjp,pjbuf,pjlen)) >= 0) {
-	        dup->have.pj = TRUE ;
-	        f = TRUE ;
+	    dup->init.pj = true ;
+	    if ((rs = uc_getprojdef(un,pjp,pjbuf,pjlen)) >= 0) {
+	        dup->have.pj = true ;
+	        f = true ;
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;
 	    }
@@ -3490,20 +3492,18 @@ static int datauser_pj(DATAUSER *dup)
 }
 /* end subroutine (datauser_pj) */
 
-
 /* find supplemental group names for a given username */
-static int datauser_groups(DATAUSER *dup)
-{
+local int datauser_groups(DATAUSER *dup) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
 	if (dup == nullptr) return SR_FAULT ;
 
 	if (! dup->init.groups) {
-	    dup->init.groups = TRUE ;
+	    dup->init.groups = true ;
 	    if ((rs = datauser_pw(dup)) >= 0) {
 	        if ((rs = vecstr_start(&dup->groups,10,0)) >= 0) {
-	            dup->have.groups = TRUE ;
+	            dup->have.groups = true ;
 
 #if	CF_DEFGROUP
 	            rs = datauser_groupdef(dup) ;
@@ -3530,7 +3530,7 @@ static int datauser_groups(DATAUSER *dup)
 
 
 #if	CF_DEFGROUP
-static int datauser_groupdef(DAYAUSER *dup)
+local int datauser_groupdef(DAYAUSER *dup)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -3549,13 +3549,13 @@ static int datauser_groupdef(DAYAUSER *dup)
 #endif /* CF_DEFGROUP */
 
 
-static int datauser_groupsfind(DATAUSER *dup)
+local int datauser_groupsfind(DATAUSER *dup)
 {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	
-	if ((rs = getbufsize(getbufsize_gr)) >= 0) {
+	if ((rs = bufsizeget(bufsize_gr)) >= 0) {
 	    cint	grlen = rs ;
 	    char	*grbuf ;
 	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
@@ -3564,13 +3564,13 @@ static int datauser_groupsfind(DATAUSER *dup)
 	        rs1 = uc_free(grbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (datauser_groupsfind) */
 
-static int datauser_groupsfinder(DATAUSER *dup,char *grbuf,int grlen) noex {
+local int datauser_groupsfinder(DATAUSER *dup,char *grbuf,int grlen) noex {
 	sysgroup	sgr ;
 	int		rs ;
 	int		rs1 ;
@@ -3599,7 +3599,7 @@ static int datauser_groupsfinder(DATAUSER *dup,char *grbuf,int grlen) noex {
 /* end subroutine (datauser_groupsfinder) */
 
 /* find supplemental project names for a given username */
-static int datauser_projects(DATAUSER *dup) noex {
+local int datauser_projects(DATAUSER *dup) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -3616,13 +3616,13 @@ static int datauser_projects(DATAUSER *dup) noex {
 #endif
 
 	if (! dup->init.projects) {
-	    dup->init.projects = TRUE ;
+	    dup->init.projects = true ;
 	    if ((rs = datauser_pw(dup)) >= 0) {
 	        if ((rs = datauser_gr(dup)) >= 0) {
 	            if ((rs = datauser_groups(dup)) >= 0) {
 	                vecstr	*pjp = &dup->projects ;
 	                if ((rs = vecstr_start(pjp,10,0)) >= 0) {
-	                    dup->have.projects = TRUE ;
+	                    dup->have.projects = true ;
 	                    if ((rs = datauser_pj(dup)) >= 0) {
 	                        cchar	*pn = dup->pj.pj_name ;
 	                        if (dup->have.pj && (pn[0] != '\0')) {
@@ -3635,7 +3635,7 @@ static int datauser_projects(DATAUSER *dup) noex {
 	                        }
 	                    } /* end if (datauser_pj) */
 	                    if (rs < 0) {
-	                        dup->have.projects = FALSE ;
+	                        dup->have.projects = false ;
 	                        vecstr_finish(pjp) ;
 	                    }
 	                } /* end if (vecstr_start) */
@@ -3663,13 +3663,13 @@ static int datauser_projects(DATAUSER *dup) noex {
 /* end subroutine (datauser_projects) */
 
 
-static int datauser_projectsfind(DATAUSER *dup)
+local int datauser_projectsfind(DATAUSER *dup)
 {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 
-	if ((rs = getbufsize(getbufsize_pj)) >= 0) {
+	if ((rs = bufsizeget(bufsize_pj)) >= 0) {
 	    cint	pjlen = rs ;
 	    char	*pjbuf ;
 	    if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
@@ -3678,22 +3678,19 @@ static int datauser_projectsfind(DATAUSER *dup)
 	        rs1 = uc_free(pjbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (datauser_projectsfind) */
 
-
-static int datauser_projectsfinder(DATAUSER *dup,char *pjbuf,int pjlen)
-{
+local int datauser_projectsfinder(DATAUSER *dup,char *pjbuf,int pjlen) noex {
 	SYSPROJECT	spj ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
 	    if ((rs = sysproject_open(&spj,nullptr)) >= 0) {
-		struct project	pj ;
+		PROJECT		pj ;
 	        vecstr		*glp = &dup->groups ;
 	        vecstr		*plp = &dup->projects ;
 		cint	rsn = SR_NOTFOUND ;
@@ -3701,7 +3698,7 @@ static int datauser_projectsfinder(DATAUSER *dup,char *pjbuf,int pjlen)
 	        cchar		*un = dup->un ;
 	        cchar		*gn = dup->gr.gr_name ;
 	        while ((rs = sysproject_readent(&spj,&pj,pjbuf,pjlen)) > 0) {
-	            f = FALSE ;
+	            f = false ;
 	            if ((! f) && (pj.pj_users != nullptr)) {
 	                cchar	**users = (cchar **) pj.pj_users ;
 	                f = (matstr(users,un,-1) >= 0) ;
@@ -3743,7 +3740,7 @@ static int datauser_projectsfinder(DATAUSER *dup,char *pjbuf,int pjlen)
 
 
 /* timezone */
-static int datauser_tz(DATAUSER *dup)
+local int datauser_tz(DATAUSER *dup)
 {
 	int		rs = SR_OK ;
 
@@ -3754,12 +3751,12 @@ static int datauser_tz(DATAUSER *dup)
 #endif
 
 	if (! dup->init.tz) {
-	    dup->init.tz = TRUE ;
+	    dup->init.tz = true ;
 	    if (! dup->init.ua) rs = datauser_ua(dup) ;
 	    if (rs >= 0) {
 		if (! dup->have.tz) {
 	            if ((rs = inittimezone(dup->tz,TZLEN,DEFINITFNAME)) >= 0) {
-	               dup->have.tz = TRUE ;
+	               dup->have.tz = true ;
 	           }
 		} else {
 		    rs = strlen(dup->tz) ;
@@ -3774,14 +3771,14 @@ static int datauser_tz(DATAUSER *dup)
 /* end subroutine (datauser_tz) */
 
 
-static int datauser_lastlog(DATAUSER *dup)
+local int datauser_lastlog(DATAUSER *dup)
 {
 	int		rs = SR_OK ;
 
 	if (dup == nullptr) return SR_FAULT ;
 
 	if (! dup->init.lastlog) {
-	    dup->init.lastlog = TRUE ;
+	    dup->init.lastlog = true ;
 	    if ((rs >= 0) && (! dup->have.lastlog)) {
 	        if (! dup->init.pent) rs = datauser_pw(dup) ;
 	        if ((rs >= 0) && (dup->have.pent)) {
@@ -3799,14 +3796,14 @@ static int datauser_lastlog(DATAUSER *dup)
 /* end subroutine (datauser_lastlog) */
 
 
-static int datauser_statvfs(DATAUSER *dup)
+local int datauser_statvfs(DATAUSER *dup)
 {
 	int		rs = SR_OK ;
 
 	if (dup == nullptr) return SR_FAULT ;
 
 	if (! dup->init.statvfs) {
-	    dup->init.statvfs = TRUE ;
+	    dup->init.statvfs = true ;
 	    if ((rs >= 0) && (! dup->have.statvfs)) {
 	        if (! dup->init.pent) {
 	            rs = datauser_pw(dup) ;
@@ -3823,7 +3820,7 @@ static int datauser_statvfs(DATAUSER *dup)
 /* end subroutine (datauser_statvfs) */
 
 
-static int datauser_utmpent(DATAUSER *dup)
+local int datauser_utmpent(DATAUSER *dup)
 {
 	PROGINFO	*pip = dup->pip ;
 	int		rs = SR_OK ;
@@ -3837,7 +3834,7 @@ static int datauser_utmpent(DATAUSER *dup)
 	        dup->init.utmpent) ;
 #endif
 	if (! dup->init.utmpent) {
-	    dup->init.utmpent = TRUE ;
+	    dup->init.utmpent = true ;
 	    if (! dup->have.utmpent) {
 	        int	rs1 = getutmpent(&dup->ue,0) ;
 #if	CF_DEBUG
@@ -3862,7 +3859,7 @@ static int datauser_utmpent(DATAUSER *dup)
 /* end subroutine (datauser_utmpent) */
 
 
-static int datauser_orgcode(DATAUSER *dup)
+local int datauser_orgcode(DATAUSER *dup)
 {
 	PROGINFO	*pip = dup->pip ;
 	cint	bl = ORGCODELEN ;
@@ -3882,7 +3879,7 @@ static int datauser_orgcode(DATAUSER *dup)
 /* end subroutine (datauser_orgcode) */
 
 
-static int datauser_orgloc(DATAUSER *dup)
+local int datauser_orgloc(DATAUSER *dup)
 {
 	PROGINFO	*pip = dup->pip ;
 	cint	bl = ORGLOCLEN ;
@@ -3912,7 +3909,7 @@ static int datauser_orgloc(DATAUSER *dup)
 /* end subroutine (datauser_orgloc) */
 
 
-static int datauser_lastseen(DATAUSER *dup)
+local int datauser_lastseen(DATAUSER *dup)
 {
 	cint	bl = LASTLOGFILE_LLINE ;
 	int		rs = SR_OK ;
@@ -3939,7 +3936,7 @@ static int datauser_lastseen(DATAUSER *dup)
 /* end subroutine (datauser_lastseen) */
 
 
-static int datauser_lastseener(DATAUSER *dup,char *bp,int bl,vecstr *tlp)
+local int datauser_lastseener(DATAUSER *dup,char *bp,int bl,vecstr *tlp)
 {
 	TMPX		ut ;
 	int		rs ;
@@ -3980,7 +3977,7 @@ static int datauser_lastseener(DATAUSER *dup,char *bp,int bl,vecstr *tlp)
 /* end subroutine (datauser_lastseener) */
 
 
-static int datauser_username(DATAUSER *dup,char *cbuf,int clen)
+local int datauser_username(DATAUSER *dup,char *cbuf,int clen)
 {
 	int		rs ;
 	int		len = 0 ;
@@ -3996,7 +3993,7 @@ static int datauser_username(DATAUSER *dup,char *cbuf,int clen)
 /* end subroutine (datauser_username) */
 
 
-static int datauser_realname(DATAUSER *dup,char *cbuf,int clen)
+local int datauser_realname(DATAUSER *dup,char *cbuf,int clen)
 {
 	int		rs ;
 	int		len = 0 ;
@@ -4011,9 +4008,8 @@ static int datauser_realname(DATAUSER *dup,char *cbuf,int clen)
 }
 /* end subroutine (datauser_realname) */
 
-
-static int datauser_netname(DATAUSER *dup,cchar *nis)
-{
+local int datauser_netname(DATAUSER *dup,cchar *nis) noex {
+	cint		netlen = var.netnamelen ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (dup->netname == nullptr) {
@@ -4023,15 +4019,15 @@ static int datauser_netname(DATAUSER *dup,cchar *nis)
 	            cint	v = dup->pent.uid ;
 	            char	dbuf[DIGBUFLEN+1] ;
 	            if ((rs = ctdeci(dbuf,dlen,v)) >= 0) {
-	                cint	nlen = MAXNETNAMELEN ;
-	                char		nbuf[MAXNETNAMELEN+1] ;
-	                cchar		*u = "unix" ;
-			cchar		*d = "." ;
+	                cint	nlen = netlen ;
+	                char	nbuf[netlen+1] ;
+	                cchar	*u = "unix" ;
+			cchar	*d = "." ;
 	                if ((rs = sncpy5(nbuf,nlen,u,d,dbuf,"@",nis)) >= 0) {
-	                    cchar	*np ;
+	                    cchar	*valp ;
 			    len = rs ;
-	                    if ((rs = uc_mallocstrw(nbuf,rs,&np)) >= 0) {
-	                        dup->netname = np ;
+	                    if ((rs = uc_mallocstrw(nbuf,rs,&valp)) >= 0) {
+	                        dup->netname = valp ;
 	                    }
 	                }
 	            }
@@ -4045,13 +4041,13 @@ static int datauser_netname(DATAUSER *dup,cchar *nis)
 /* end subroutine (datauser_netname) */
 
 
-static int datauser_mkgids(DATAUSER *dup,char *rbuf,int rlen)
+local int datauser_mkgids(DATAUSER *dup,char *rbuf,int rlen)
 {
-	SBUF		b ;
+	sbuf		b ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	    cint	grlen = getbufsize(getbufsize_gr) ;
+	    cint	grlen = bufsizeget(bufsize_gr) ;
 	    char	*grbuf ;
 	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
 	        vecstr	*glp = &dup->groups ;
@@ -4078,33 +4074,27 @@ static int datauser_mkgids(DATAUSER *dup,char *rbuf,int rlen)
 }
 /* end subroutine (datauser_mkgids) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
-
+local int locinfo_start(LOCINFO *lip,PI *pip) noex {
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
-
 	return SR_OK ;
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+local int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (lip == nullptr) return SR_FAULT ;
 
 	if (lip->open.ns) {
-	    lip->open.ns = FALSE ;
+	    lip->open.ns = false ;
 	    rs1 = pcsns_close(&lip->ns) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (lip->open.stores) {
-	    lip->open.stores = FALSE ;
+	    lip->open.stores = false ;
 	    rs1 = vecstr_finish(&lip->stores) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -4113,10 +4103,8 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
-{
-	VECSTR		*slp ;
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -4150,7 +4138,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_prpcs(LOCINFO *lip)
+local int locinfo_prpcs(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -4172,14 +4160,14 @@ static int locinfo_prpcs(LOCINFO *lip)
 /* end subroutine (locinfo_prpcs) */
 
 
-static int locinfo_pcsns(LOCINFO *lip)
+local int locinfo_pcsns(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (! lip->open.ns) {
 	    if ((rs = locinfo_prpcs(lip)) >= 0) {
 	        cchar	*pr_pcs = lip->pr_pcs ;
 	        if ((rs = pcsns_open(&lip->ns,pr_pcs)) >= 0) {
-	            lip->open.ns = TRUE ;
+	            lip->open.ns = true ;
 	        }
 	    }
 	} /* end if (needed initialization) */
@@ -4188,7 +4176,7 @@ static int locinfo_pcsns(LOCINFO *lip)
 /* end subroutine (locinfo_pcsns) */
 
 
-static int locinfo_pcsnsget(LOCINFO *lip,char *rbuf,int rlen,cchar *un,int w)
+local int locinfo_pcsnsget(LOCINFO *lip,char *rbuf,int rlen,cchar *un,int w)
 {
 	int		rs ;
 	if ((rs = locinfo_pcsns(lip)) >= 0) {
@@ -4199,7 +4187,7 @@ static int locinfo_pcsnsget(LOCINFO *lip,char *rbuf,int rlen,cchar *un,int w)
 /* end subroutine (locinfo_pcsnsget) */
 
 
-static int locinfo_setphone(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_setphone(LOCINFO *lip,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		oi ;
@@ -4210,17 +4198,13 @@ static int locinfo_setphone(LOCINFO *lip,cchar *vp,int vl)
 }
 /* end subroutine (locinfo_setphone) */
 
-
-static int mkstrlist(char *cbuf,int clen,vecstr *lp)
-{
-	SBUF		b ;
+local int mkstrlist(char *cbuf,int clen,vecstr *lp) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = sbuf_start(&b,cbuf,clen)) >= 0) {
-	    int		i ;
+	if (sbuf b ; (rs = sbuf_start(&b,cbuf,clen)) >= 0) {
 	    int		c = 0 ;
 	    cchar	*cp ;
-	    for (i = 0 ; vecstr_get(lp,i,&cp) >= 0 ; i += 1) {
+	    for (int i = 0 ; vecstr_get(lp,i,&cp) >= 0 ; i += 1) {
 	        if (cp != nullptr) {
 	            if (c++ > 0) sbuf_chr(&b,' ') ;
 	            rs = sbuf_strw(&b,cp,-1) ;
@@ -4234,10 +4218,8 @@ static int mkstrlist(char *cbuf,int clen,vecstr *lp)
 }
 /* end subroutine (mkstrlist) */
 
-
-static int mkgid(char *grbuf,int grlen,cchar *gname)
-{
-	struct group	gr ;
+local int mkgid(char *grbuf,int grlen,cchar *gname) noex {
+	GROUP		gr ;
 	int		rs ;
 	if ((rs = getgr_name(&gr,grbuf,grlen,gname)) >= 0) {
 	    rs = gr.gr_gid ;
@@ -4246,10 +4228,8 @@ static int mkgid(char *grbuf,int grlen,cchar *gname)
 }
 /* end subroutine (mkgid) */
 
-
 /* yes, this subroutine degenerates into an existing interface */
-static int getuser(char *ubuf,int ulen,uid_t uid)
-{
+local int getuser(char *ubuf,int ulen,uid_t uid) noex {
 	return getusername(ubuf,ulen,uid) ;
 }
 /* end subroutine (getuser) */
