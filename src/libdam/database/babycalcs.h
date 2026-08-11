@@ -81,11 +81,11 @@ typedef	BABYCALCS_ENT		babycalcs_ent ;
 
 EXTERNC_begin
 
-extern int	babycalcs_open(babycalcs *,cchar *,cchar *) noex ;
-extern int	babycalcs_check(babycalcs *,time_t) noex ;
-extern int	babycalcs_lookup(babycalcs *,time_t,uint *) noex ;
-extern int	babycalcs_getinfo(babycalcs *,babycalcs_info *) noex ;
-extern int	babycalcs_close(babycalcs *) noex ;
+extern int	babycalcs_open		(babycalcs *,cchar *,cchar *) noex ;
+extern int	babycalcs_check		(babycalcs *,time_t) noex ;
+extern int	babycalcs_lookup	(babycalcs *,time_t,uint *) noex ;
+extern int	babycalcs_getinfo	(babycalcs *,babycalcs_info *) noex ;
+extern int	babycalcs_close		(babycalcs *) noex ;
 
 EXTERNC_end
 
