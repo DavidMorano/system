@@ -1,15 +1,15 @@
-/* b_logadm */
+/* b_logadm SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in for user login-administration */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_PERCACHE	1		/* use persistent cache */
 #define	CF_LOCUTMPENT	0		/* using |locinfo_utmpent()| */
-
 
 /* revision history:
 
@@ -22,13 +22,13 @@
 
 /*******************************************************************************
 
-	Synopsis:
+  	Name:
+	b_logadm
 
+	Synopsis:
 	$ logadm [-u <username>] [-y|-n] [-h <host>] [<spec(s)>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -49,7 +49,7 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<utmpx.h>
@@ -85,28 +85,6 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	logout(pid_t) ;
-extern int	mkutmpid(char *,int,cchar *,int) ;
-extern int	termdevice(char *,int,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -116,12 +94,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -142,7 +114,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init ;
 	PROGINFO	*pip ;
 	cchar		*utfname ;
@@ -172,7 +144,7 @@ static int	locinfo_finish(LOCINFO *) ;
 static int	locinfo_utmpent(LOCINFO *) ;
 #endif
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procspecs(PROGINFO *,void *,cchar *,int) ;
 static int	procspec(PROGINFO *,void *, cchar *,int) ;
 static int	procout(PROGINFO *,SHIO *,cchar *,int) ;
@@ -321,8 +293,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -583,7 +555,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* session */
 			case argopt_ses:
 	                        lip->have.session = TRUE ;
-	                        lip->final.session = TRUE ;
+	                        lip->finval.session = TRUE ;
 	                        if (argr > 0) {
 	                        argp = argv[++ai] ;
 	                        argr -= 1 ;
@@ -705,7 +677,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 				} else
@@ -1194,7 +1166,7 @@ static int locinfo_username(LOCINFO *lip)
 /* end subroutine (locinfo_username) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
