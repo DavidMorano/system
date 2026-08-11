@@ -170,18 +170,18 @@ int vars_open(vars *op,cchar *dbname) noex {
 	time_t		dt = time(nullptr) ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = vars_ctor(op,dbname)) >= 0) {
+	if ((rs = vars_ctor(op,dbname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (dbname[0]) {
+	    if (dbname[0]) ylikely {
 		cchar *ndbn ;
 		if (absfn nfn ; (rs = nfn.start(dbname,-1,&ndbn)) >= 0) {
 		    cint pl = rs ;
 	    	    if (cchar *cp ; (rs = mem.strw(dbname,pl,&cp)) >= 0) {
 	                op->dbname = cp ;
-		        if ((rs = vars_dbloadbegin(op,dt)) >= 0) {
+		        if ((rs = vars_dbloadbegin(op,dt)) >= 0) ylikely {
 			    op->ti_lastcheck = dt ;
 			    op->magval = VARS_MAGIC ;
-		        }
+		        } /* end if */
 		        if (rs < 0) {
 	    		    voidp vp = voidp(op->dbname) ;
 	    		    mem.free(vp) ;
@@ -202,7 +202,7 @@ int vars_open(vars *op,cchar *dbname) noex {
 int vars_close(vars *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = vars_magic(op)) >= 0) {
+	if ((rs = vars_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = vars_dbloadend(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -224,7 +224,7 @@ int vars_close(vars *op) noex {
 
 int vars_getinfo(vars *op,vars_info *vip) noex {
 	int		rs = SR_OK ;
-	if ((rs = vars_magic(op,vip)) >= 0) {
+	if ((rs = vars_magic(op,vip)) >= 0) ylikely {
 	    memclear(vip) ;
 	    vars_fm	*fip = &op->vf ;
 	    varhdr	*hip = &op->ifi ;
@@ -242,7 +242,7 @@ int vars_getinfo(vars *op,vars_info *vip) noex {
 
 int vars_audit(vars *op) noex {
 	int		rs ;
-	if ((rs = vars_magic(op)) >= 0) {
+	if ((rs = vars_magic(op)) >= 0) ylikely {
 	    rs = vars_ouraudit(op) ;
 	} /* end if (vars_magic) */
 	return rs ;
@@ -251,7 +251,7 @@ int vars_audit(vars *op) noex {
 int vars_count(vars *op) noex {
 	int		rs ;
 	int		n = 0 ; /* return-value */
-	if ((rs = vars_magic(op)) >= 0) {
+	if ((rs = vars_magic(op)) >= 0) ylikely {
 	    varhdr	*hip = &op->ifi ;
 	    n = hip->nvars ;
 	} /* end if (vars_magic) */
@@ -260,7 +260,7 @@ int vars_count(vars *op) noex {
 
 int vars_curbegin(vars *op,vars_cur *curp) noex {
     	int		rs ;
-	if ((rs = vars_magic(op,curp)) >= 0) {
+	if ((rs = vars_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	    curp->chash = 0 ;
 	    op->ncursors += 1 ;
@@ -270,7 +270,7 @@ int vars_curbegin(vars *op,vars_cur *curp) noex {
 
 int vars_curend(vars *op,vars_cur *curp) noex {
     	int		rs ;
-	if ((rs = vars_magic(op,curp)) >= 0) {
+	if ((rs = vars_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
@@ -283,7 +283,7 @@ int vars_curenum(vars *op,vars_cur *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	int		vl = 0 ; /* return-value */
-	if ((rs = vars_magic(op,curp,kbuf)) >= 0) {
+	if ((rs = vars_magic(op,curp,kbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (op->ncursors > 0) {
 	        vars_mi		*mip ;
@@ -329,7 +329,7 @@ int vars_fetch(vars *op,cchar *kp,int kl,vars_cur *curp,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if ((rs = vars_magic(op,kp)) >= 0) {
+	if ((rs = vars_magic(op,kp)) >= 0) ylikely {
 	   vars_cur	dcur ;
 	   vars_mi	*mip = &op->mi ;
 	   varhdr	*hip = &op->ifi ;
