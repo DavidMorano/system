@@ -109,13 +109,13 @@ local inline int calent_magic(calent *op,Args ... args) noex {
 int calent_start(calent *op,calent_q *qp,uint loff,int llen) noex {
 	cint		ne = CALENT_NLE ;
 	int		rs ;
-	if ((rs = calent_ctor(op,qp)) >= 0) {
+	if ((rs = calent_ctor(op,qp)) >= 0) ylikely {
 	    cint	sz = ne * szof(calent_ln) ;
 	    op->cidx = -1 ;
 	    op->q = *qp ;
 	    op->voff = loff ;
 	    op->vlen = llen ;
-	    if (calent_ln *elp ; (rs = lm_mall(sz,&elp)) >= 0) {
+	    if (calent_ln *elp ; (rs = lm_mall(sz,&elp)) >= 0) ylikely {
 	        op->lines = elp ;
 	        op->e = ne ;
 	        op->i += 1 ;
@@ -125,7 +125,7 @@ int calent_start(calent *op,calent_q *qp,uint loff,int llen) noex {
 	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 		calent_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (calent_ctor) */
 	return rs ;
 } /* end subroutine (calent_start) */
@@ -133,17 +133,17 @@ int calent_start(calent *op,calent_q *qp,uint loff,int llen) noex {
 int calent_finish(calent *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = calent_magic(op)) >= 0) {
+	if ((rs = calent_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->e > 0) {
+	    if (op->e > 0) ylikely {
 		rs = SR_BADFMT ;
-	        if ((op->i >= 0) && (op->i <= op->e)) {
+	        if ((op->i >= 0) && (op->i <= op->e)) ylikely {
 		    rs = SR_OK ;
 	            if (op->lines) {
 	                rs1 = lm_free(op->lines) ;
 	                if (rs >= 0) rs = rs1 ;
 	                op->lines = nullptr ;
-	            }
+	            } /* end if (memory-release) */
 	            op->i = 0 ;
 	            op->e = 0 ;
 	        } /* end if (good) */
@@ -159,7 +159,7 @@ int calent_finish(calent *op) noex {
 
 int calent_setidx(calent *op,int cidx) noex {
 	int		rs ;
-	if ((rs = calent_magic(op)) >= 0) {
+	if ((rs = calent_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (cidx >= 0) {
 	        rs = cidx ;
@@ -171,11 +171,11 @@ int calent_setidx(calent *op,int cidx) noex {
 
 int calent_add(calent *op,uint loff,int llen) noex {
 	int		rs ;
-	if ((rs = calent_magic(op)) >= 0) {
+	if ((rs = calent_magic(op)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->e > 0) {
+	    if (op->e > 0) ylikely {
 		rs = SR_BADFMT ;
-	        if ((op->i >= 0) && (op->i <= op->e)) {
+	        if ((op->i >= 0) && (op->i <= op->e)) ylikely {
 	            calent_ln	*elp ;
 	            int		sz ;
 		    rs = SR_OK ;
@@ -187,7 +187,7 @@ int calent_add(calent *op,uint loff,int llen) noex {
 	                    op->lines = elp ;
 	                }
 	            }
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                op->vlen = ((loff + llen) - op->voff) ;
 	                elp = (op->lines + op->i) ;
 	                elp->loff = loff ;
@@ -203,7 +203,7 @@ int calent_add(calent *op,uint loff,int llen) noex {
 int calent_samecite(calent *op,CALENT *oop) noex {
 	int		rs ;
 	int		f = true ;
-	if ((rs = calent_magic(op,oop)) >= 0) {
+	if ((rs = calent_magic(op,oop)) >= 0) ylikely {
 	    f = f && (op->q.y == oop->q.y) ;
 	    f = f && (op->q.m == oop->q.m) ;
 	    f = f && (op->q.d == oop->q.d) ;
@@ -213,11 +213,11 @@ int calent_samecite(calent *op,CALENT *oop) noex {
 
 int calent_mkhash(calent *op,cchar *md) noex {
 	int		rs ;
-	if ((rs = calent_magic(op,md)) >= 0) {
+	if ((rs = calent_magic(op,md)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (op->e > 0) {
+	    if (op->e > 0) ylikely {
 		rs = SR_NOTOPEN ;
-	        if (op->lines) {
+	        if (op->lines) ylikely {
 	            calent_ln	*elp = op->lines ;
 	            rs = SR_OK ;
 	            if (! op->fl.hash) {
@@ -244,7 +244,7 @@ int calent_mkhash(calent *op,cchar *md) noex {
 
 int calent_sethash(calent *op,uint hash) noex {
 	int		rs ;
-	if ((rs = calent_magic(op)) >= 0) {
+	if ((rs = calent_magic(op)) >= 0) ylikely {
 	    rs = SR_OK ;
 	    op->hash = hash ;
 	    op->fl.hash = true ;
@@ -255,7 +255,7 @@ int calent_sethash(calent *op,uint hash) noex {
 int calent_gethash(calent *op,uint *rp) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = calent_magic(op)) >= 0) {
+	if ((rs = calent_magic(op)) >= 0) ylikely {
 	    rs = SR_OK ;
 	    f = op->fl.hash ;
 	    if (rp) {
@@ -268,8 +268,8 @@ int calent_gethash(calent *op,uint *rp) noex {
 int calent_loadbuf(calent *op,char *rbuf,int rlen,cchar *mp) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = calent_magic(op,rbuf,mp)) >= 0) {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) {
+	if ((rs = calent_magic(op,rbuf,mp)) >= 0) ylikely {
+	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        calent_ln	*lines = op->lines ;
 	        int		nlines = op->i ; /* number of line elements */
 	        int		ll ;
@@ -290,7 +290,7 @@ int calent_loadbuf(calent *op,char *rbuf,int rlen,cchar *mp) noex {
 
 int calent_getci(calent *op) noex {
 	int		rs ;
-	if ((rs = calent_magic(op)) >= 0) {
+	if ((rs = calent_magic(op)) >= 0) ylikely {
 	    rs = op->cidx ;
 	} /* end if (magic) */
 	return rs ;
