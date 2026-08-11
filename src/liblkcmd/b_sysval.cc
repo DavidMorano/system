@@ -1,4 +1,4 @@
-/* b_sysval SUPPORT */
+/* b_sysval SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -92,21 +92,24 @@
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<utmpx.h>
+#include	<tzfile.h>		/* for TM_YEAR_BASE */
+#include	<netdb.h>
 #include	<ctime>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<utmpx.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<ugetpid.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<utmpacc.h>
-#include	<uinfo.h>
-#include	<getbufsize.h>
+#include	<uclibmem.h>
+#include	<ucgetpid.h>
+#include	<ucinfo.h>
+#include	<bufsizeget.h>
 #include	<gethz.h>
 #include	<getnodedomain.h>	/* |getnetdomain(3uc) */
+#include	<estrings.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<ctdec.h>
@@ -128,6 +131,9 @@
 #include	"defs.h"
 #include	"percache.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -182,7 +188,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	vecstr		stores ;
 	TMTIME		gmtime ;
@@ -234,8 +240,8 @@ static int	mainsub(int,const char **,const char **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procqueries(PROGINFO *,void *,cchar *,int) ;
 static int	procquery(PROGINFO *,void *, cchar *,int) ;
 static int	procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *,int) ;
@@ -632,8 +638,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo{} ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -980,7 +986,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -1324,7 +1330,7 @@ static int usage(PROGINFO *pip) noex {
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1336,13 +1342,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1351,9 +1357,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 	                case akoname_utf:
 	                case akoname_db:
-	                    if (! lip->final.utfname) {
+	                    if (! lip->finval.utfname) {
 	                        lip->have.utfname = true ;
-	                        lip->final.utfname = true ;
+	                        lip->finval.utfname = true ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &lip->utfname ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -1361,9 +1367,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_ttl:
-	                    if (! lip->final.ttl) {
+	                    if (! lip->finval.ttl) {
 	                        lip->have.ttl = true ;
-	                        lip->final.ttl = true ;
+	                        lip->finval.ttl = true ;
 	                        if (vl > 0) {
 	                            int	v ;
 	                            rs = cfdecti(vp,vl,&v) ;
@@ -1372,9 +1378,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_hextime:
-	                    if (! lip->final.hextime) {
+	                    if (! lip->finval.hextime) {
 	                        lip->have.hextime = true ;
-	                        lip->final.hextime = true ;
+	                        lip->finval.hextime = true ;
 	                        lip->fl.hextime = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1384,9 +1390,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 	                case akoname_time:
 	                case akoname_date:
-	                    if (! lip->final.timeform) {
+	                    if (! lip->finval.timeform) {
 	                        if (vl > 0) {
-	                            lip->final.timeform = true ;
+	                            lip->finval.timeform = true ;
 	                            rs = locinfo_timeform(lip,vp,vl) ;
 	                        }
 			    }
@@ -1409,7 +1415,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1969,70 +1975,70 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	    }
 	    break ;
 	case qopt_argmax:
-	    if ((rs = getbufsize(getbufsize_args)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_ma)) >= 0) {
 	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	        cbp = cvtbuf ;
 	        cbl = rs ;
 	    }
 	    break ;
 	case qopt_pwbufsize:
-	    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_pw)) >= 0) {
 	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	        cbp = cvtbuf ;
 	        cbl = rs ;
 	    }
 	    break ;
 	case qopt_spbufsize:
-	    if ((rs = getbufsize(getbufsize_sp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_sp)) >= 0) {
 	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	        cbp = cvtbuf ;
 	        cbl = rs ;
 	    }
 	    break ;
 	case qopt_uabufsize:
-	    if ((rs = getbufsize(getbufsize_ua)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_ua)) >= 0) {
 	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	        cbp = cvtbuf ;
 	        cbl = rs ;
 	    }
 	    break ;
 	case qopt_grbufsize:
-	    if ((rs = getbufsize(getbufsize_gr)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_gr)) >= 0) {
 	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	        cbp = cvtbuf ;
 	        cbl = rs ;
 	    }
 	    break ;
 	case qopt_pjbufsize:
-	    if ((rs = getbufsize(getbufsize_pj)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_pj)) >= 0) {
 	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	        cbp = cvtbuf ;
 	        cbl = rs ;
 	    }
 	    break ;
 	case qopt_pebufsize:
-	    if ((rs = getbufsize(getbufsize_pe)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_pr)) >= 0) {
 	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	        cbp = cvtbuf ;
 	        cbl = rs ;
 	    }
 	    break ;
 	case qopt_sebufsize:
-	    if ((rs = getbufsize(getbufsize_se)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_sv)) >= 0) {
 	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	        cbp = cvtbuf ;
 	        cbl = rs ;
 	    }
 	    break ;
 	case qopt_nebufsize:
-	    if ((rs = getbufsize(getbufsize_ne)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_nw)) >= 0) {
 	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	        cbp = cvtbuf ;
 	        cbl = rs ;
 	    }
 	    break ;
 	case qopt_hebufsize:
-	    if ((rs = getbufsize(getbufsize_he)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_ho)) >= 0) {
 	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	        cbp = cvtbuf ;
 	        cbl = rs ;
@@ -2206,7 +2212,7 @@ static int procfs(PROGINFO *pip,char *cbuf,int clen,int ri,cchar *vp,int vl)
 	if (DEBUGLEVEL(4))
 	debugprintf("b_sysval/procfs: f=\\x%08x\n",fi.f_flag) ;
 #endif
-	                rs = snfsflags(cbuf,clen,fi.f_flag) ;
+	                rs = snflagsfs(cbuf,clen,fi.f_flag) ;
 	                cbl = rs ;
 	                break ;
 	            } /* end switch */
@@ -2456,7 +2462,7 @@ static int locinfo_utfname(LOCINFO *lip,cchar *utfname)
 
 	if (utfname != nullptr) {
 	    lip->have.utfname = true ;
-	    lip->final.utfname = true ;
+	    lip->finval.utfname = true ;
 	    lip->utfname = utfname ;
 	}
 
@@ -2505,7 +2511,7 @@ static int locinfo_defaults(LOCINFO *lip)
 
 	if (lip == nullptr) return SR_FAULT ;
 
-	if ((lip->utfname == nullptr) && (! lip->final.utfname)) {
+	if ((lip->utfname == nullptr) && (! lip->finval.utfname)) {
 	    cchar	*cp = getourenv(pip->envv,VARUTFNAME) ;
 	    if (cp != nullptr) {
 	        rs = locinfo_setentry(lip,&lip->utfname,cp,-1) ;
@@ -2522,7 +2528,7 @@ static int locinfo_gmtime(LOCINFO *lip)
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
 
-	rs = tmtime_gmtime(&lip->gmtime,pip->daytime) ;
+	rs = tmtime_timegm(&lip->gmtime,pip->daytime) ;
 
 	return rs ;
 }
@@ -2654,7 +2660,7 @@ static int locinfo_uname(LOCINFO *lip)
 
 	if (! lip->fl.uname) {
 	    lip->fl.uname = true ;
-	    rs = uinfo_name(&lip->uname) ;
+	    rs = ucinfo_name(&lip->uname) ;
 	}
 
 	return rs ;
@@ -2668,7 +2674,7 @@ static int locinfo_uaux(LOCINFO *lip)
 
 	if (! lip->fl.uaux) {
 	    lip->fl.uaux = true ;
-	    rs = uinfo_aux(&lip->uaux) ;
+	    rs = ucinfo_aux(&lip->uaux) ;
 	}
 
 	return rs ;
