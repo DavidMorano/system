@@ -1,4 +1,4 @@
-/* b_mjd SUPPORT */
+/* b_mjd SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -23,6 +23,9 @@
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_mjd
 
 	Synopsis:
 	$ mjd [<day(s)>] [-af <afile>] [-V]
@@ -107,23 +110,6 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	getmjd(int,int,int) ;
-extern int	hasalldig(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -134,10 +120,6 @@ extern int	debugprinthex(const char *,int,const char *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -167,7 +149,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	TMTIME		curdate ;
 	DAYSPEC		curspec ;
@@ -188,8 +170,8 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procquery(PROGINFO *,void *,const char *,int) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
@@ -331,8 +313,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -528,7 +510,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* data-gram mode */
 	                case argopt_dgram:
-	                    lip->final.dgram = TRUE ;
+	                    lip->finval.dgram = TRUE ;
 	                    lip->fl.dgram = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
@@ -734,7 +716,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -766,7 +748,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'u':
 	                        pip->have.bufnone = TRUE ;
 	                        pip->fl.bufnone = TRUE ;
-	                        pip->final.bufnone = TRUE ;
+	                        pip->finval.bufnone = TRUE ;
 	                        break ;
 
 /* verbose mode */
@@ -796,7 +778,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'z':
-	                        lip->final.gmt = TRUE ;
+	                        lip->finval.gmt = TRUE ;
 	                        lip->have.gmt = TRUE ;
 	                        lip->fl.gmt = TRUE ;
 	                        if (f_optequal) {
@@ -1085,7 +1067,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1097,13 +1079,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1112,9 +1094,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 	                case akoname_bufwhole:
 	                case akoname_whole:
-	                    if (! pip->final.bufwhole) {
+	                    if (! pip->finval.bufwhole) {
 	                        pip->have.bufwhole = TRUE ;
-	                        pip->final.bufwhole = TRUE ;
+	                        pip->finval.bufwhole = TRUE ;
 	                        pip->fl.bufwhole = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1124,9 +1106,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 	                case akoname_bufline:
 	                case akoname_line:
-	                    if (! pip->final.bufline) {
+	                    if (! pip->finval.bufline) {
 	                        pip->have.bufline = TRUE ;
-	                        pip->final.bufline = TRUE ;
+	                        pip->finval.bufline = TRUE ;
 	                        pip->fl.bufline = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1137,9 +1119,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_bufnone:
 	                case akoname_none:
 	                case akoname_un:
-	                    if (! pip->final.bufnone) {
+	                    if (! pip->finval.bufnone) {
 	                        pip->have.bufnone = TRUE ;
-	                        pip->final.bufnone = TRUE ;
+	                        pip->finval.bufnone = TRUE ;
 	                        pip->fl.bufnone = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1148,9 +1130,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_termout:
-	                    if (! lip->final.termout) {
+	                    if (! lip->finval.termout) {
 	                        lip->have.termout = TRUE ;
-	                        lip->final.termout = TRUE ;
+	                        lip->finval.termout = TRUE ;
 	                        lip->fl.termout = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1159,9 +1141,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_gmt:
-	                    if (! lip->final.gmt) {
+	                    if (! lip->finval.gmt) {
 	                        lip->have.gmt = TRUE ;
-	                        lip->final.gmt = TRUE ;
+	                        lip->finval.gmt = TRUE ;
 	                        lip->fl.gmt = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1209,7 +1191,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *ofn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	const int	to_open = pip->to_open ;
@@ -1549,9 +1531,9 @@ static int locinfo_curdate(LOCINFO *lip)
 	    TMTIME	*ctp = &lip->curdate ;
 	    lip->fl.curdate = TRUE ;
 	    if (lip->fl.gmt) {
-	        rs = tmtime_gmtime(ctp,pip->daytime) ;
+	        rs = tmtime_timegm(ctp,pip->daytime) ;
 	    } else {
-	        rs = tmtime_localtime(ctp,pip->daytime) ;
+	        rs = tmtime_timelocal(ctp,pip->daytime) ;
 	    }
 	} /* end if */
 	return rs ;
