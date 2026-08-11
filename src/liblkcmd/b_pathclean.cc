@@ -1,4 +1,4 @@
-/* b_pathclean SUPPORT */
+/* b_pathclean SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -21,6 +21,9 @@
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_pathclean
 
 	Synopsis:
 	$ pathclean path(s) [-j]
@@ -49,10 +52,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
+#include	<cstddef>
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -83,13 +87,6 @@ import libutil ;
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 
 /* external variables */
 
@@ -115,26 +112,26 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procname(PROGINFO *,SHIO *,cchar *,int) ;
-static int	procpath(PROGINFO *,cchar *,int) ;
-static int	procjoin(PROGINFO *,SHIO *) ;
-static int	printit(PROGINFO *,SHIO *,cchar *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procname(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procpath(PROGINFO *,cchar *,int) ;
+local int	procjoin(PROGINFO *,SHIO *) ;
+local int	printit(PROGINFO *,SHIO *,cchar *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_nmax(LOCINFO *,int) ;
-static int	locinfo_loadpath(LOCINFO *,cchar *,int) ;
-static int	locinfo_mkjoin(LOCINFO *,char *,int) ;
-static int	locinfo_finishpaths(LOCINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_nmax(LOCINFO *,int) ;
+local int	locinfo_loadpath(LOCINFO *,cchar *,int) ;
+local int	locinfo_mkjoin(LOCINFO *,char *,int) ;
+local int	locinfo_finishpaths(LOCINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_LOCLOADPATHS
-static int	locinfo_loadpaths(LOCINFO *,cchar *,int) ;
+local int	locinfo_loadpaths(LOCINFO *,cchar *,int) ;
 #endif /* CF_LOCLOADPATHS */
 
 
@@ -234,11 +231,11 @@ int p_pathclean(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 /* local subroutines */
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	keyopt		akopts ;
 	SHIO		errfile ;
 
@@ -751,7 +748,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 /* print out (standard error) some short usage */
-static int usage(PROGINFO *pip) noex {
+local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar	*pn = pip->progname ;
@@ -777,7 +774,7 @@ static int usage(PROGINFO *pip) noex {
 }
 /* end subroutine (usage) */
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	cint		ne = 10 ;
 	cint		vo = (VECSTR_OORDERED | VECSTR_OREUSE) ;
 	int		rs ;
@@ -791,7 +788,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 }
 /* end subroutine (locinfo_start) */
 
-static int locinfo_finish(LOCINFO *lip) noex {
+local int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (lip) {
@@ -806,14 +803,14 @@ static int locinfo_finish(LOCINFO *lip) noex {
 }
 /* end subroutine (locinfo_finish) */
 
-static int locinfo_nmax(LOCINFO *lip,int nmax) noex {
+local int locinfo_nmax(LOCINFO *lip,int nmax) noex {
 	lip->nmax = nmax ;
 	return SR_OK ;
 }
 /* end subroutine (locinfo_nmax) */
 
 #if	CF_LOCLOADPATHS
-static int locinfo_loadpaths(LOCINFO *lip,cchar *sp,int sl) noex {
+local int locinfo_loadpaths(LOCINFO *lip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar		*tp, *cp ;
@@ -839,7 +836,7 @@ static int locinfo_loadpaths(LOCINFO *lip,cchar *sp,int sl) noex {
 /* end subroutine (locinfo_loadpaths) */
 #endif /* CF_LOCLOADPATHS */
 
-static int locinfo_loadpath(LOCINFO *lip,cchar *sp,int sl) noex {
+local int locinfo_loadpath(LOCINFO *lip,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	{
@@ -850,7 +847,7 @@ static int locinfo_loadpath(LOCINFO *lip,cchar *sp,int sl) noex {
 }
 /* end subroutine (locinfo_loadpath) */
 
-static int locinfo_mkjoin(LOCINFO *lip,char *pbuf,int plen) noex {
+local int locinfo_mkjoin(LOCINFO *lip,char *pbuf,int plen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -902,7 +899,7 @@ static int locinfo_mkjoin(LOCINFO *lip,char *pbuf,int plen) noex {
 }
 /* end subroutine (locinfo_mkjoin) */
 
-static int locinfo_finishpaths(LOCINFO *lip) noex {
+local int locinfo_finishpaths(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c ;
@@ -933,7 +930,7 @@ static int locinfo_finishpaths(LOCINFO *lip) noex {
 }
 /* end subroutine (locinfo_finishpaths) */
 
-static int procopts(PROGINFO *pip,keyopt *kop) noex {
+local int procopts(PROGINFO *pip,keyopt *kop) noex {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -951,7 +948,7 @@ static int procopts(PROGINFO *pip,keyopt *kop) noex {
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-		while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+		while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(progopts,2,kp,kl)) >= 0) {
 
@@ -996,7 +993,7 @@ static int procopts(PROGINFO *pip,keyopt *kop) noex {
 }
 /* end subroutine (procopts) */
 
-static int procargs(PI *pip,AI *aip,bits *bop,cc *ofname,cc *afname) noex {
+local int procargs(PI *pip,AI *aip,bits *bop,cc *ofname,cc *afname) noex {
 	shio		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
@@ -1105,7 +1102,7 @@ static int procargs(PI *pip,AI *aip,bits *bop,cc *ofname,cc *afname) noex {
 /* end subroutine (procargs) */
 
 /* process a name */
-static int procname(PROGINFO *pip,SHIO *ofp,cchar sp[],int sl) noex {
+local int procname(PROGINFO *pip,SHIO *ofp,cchar sp[],int sl) noex {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	int		cl ;
@@ -1160,7 +1157,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar sp[],int sl) noex {
 }
 /* end subroutine (procname) */
 
-static int procpath(PROGINFO *pip,cchar *sp,int sl) noex {
+local int procpath(PROGINFO *pip,cchar *sp,int sl) noex {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	int		plen = 0 ;
@@ -1202,7 +1199,7 @@ static int procpath(PROGINFO *pip,cchar *sp,int sl) noex {
 }
 /* end subroutine (procpath) */
 
-static int procjoin(PROGINFO *pip,SHIO *ofp) noex {
+local int procjoin(PROGINFO *pip,SHIO *ofp) noex {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs ;
 	int		rs1 ;
@@ -1237,7 +1234,7 @@ static int procjoin(PROGINFO *pip,SHIO *ofp) noex {
 /* end subroutine (procjoin) */
 
 /* print it out */
-static int printit(PROGINFO *pip,SHIO *ofp,cchar *fname) noex {
+local int printit(PROGINFO *pip,SHIO *ofp,cchar *fname) noex {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
