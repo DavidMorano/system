@@ -42,8 +42,8 @@
 #include	<sncpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"commandment.h"
 #include	"commandments.h"
+#include	"commandment.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
