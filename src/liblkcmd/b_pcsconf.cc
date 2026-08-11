@@ -1,4 +1,4 @@
-/* b_pcsconf SUPPORT (PCSCONF) */
+/* b_pcsconf SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -22,6 +22,7 @@
 /*******************************************************************************
 
   	Name:
+	b_pcsconf
 
 	Description:
 	This program is used either by programs or a user to retrieve
@@ -153,7 +154,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	PCSNS		ns ;
 	vecstr		stores ;
@@ -184,11 +185,11 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
 static int	procpcsdump(PROGINFO *,cchar *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	proclist(PROGINFO *,SHIO *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,SHIO *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,SHIO *,cchar *) ;
 static int	procqueries(PROGINFO *,void *,cchar *,int) ;
 static int	procquery(PROGINFO *,void *,cchar *,int) ;
 
@@ -399,8 +400,8 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -770,7 +771,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                    case 'l':
 	                        lip->fl.list = TRUE ;
 	                        lip->have.list = TRUE ;
-	                        lip->final.list = TRUE ;
+	                        lip->finval.list = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -787,7 +788,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -801,7 +802,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* only special-queries */
 	                    case 's':
 	                        lip->fl.squery = TRUE ;
-	                        lip->final.squery = TRUE ;
+	                        lip->finval.squery = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
@@ -1046,7 +1047,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 	                                if (rs >= 0) {
 	                                    ARGINFO	*aip = &ainfo ;
-	                                    BITS	*bop = &pargs ;
+	                                    bits	*bop = &pargs ;
 	                                    rs = process(pip,aip,bop,ofn,afn) ;
 	                                }
 
@@ -1234,10 +1235,10 @@ static int usage(PROGINFO *pip) noex {
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutines (usage) */
+/* end subroutine (usage) */
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
+static int procopts(PROGINFO *pip,keyopt *kop) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1248,13 +1249,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1262,9 +1263,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 
 	                switch (oi) {
 	                case akoname_squery:
-	                    if (! lip->final.squery) {
+	                    if (! lip->finval.squery) {
 	                        lip->have.squery = TRUE ;
-	                        lip->final.squery = TRUE ;
+	                        lip->finval.squery = TRUE ;
 	                        lip->fl.squery = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1293,7 +1294,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
@@ -1350,7 +1351,7 @@ static int proclist(PROGINFO *pip,SHIO *ofp) noex {
 	    char	kbuf[KBUFLEN+1] ;
 	    char	vbuf[VBUFLEN+1] ;
 	    while (rs >= 0) {
-	        vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
+	        vl = pcsconf_curenum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	        if (vl == SR_NOTFOUND) break ;
 	        if ((nfs = nchr(vbuf,vl,CH_FS)) > 0) {
 	            rs = mkpresent(vbuf,vlen,vl,CH_FS,nfs) ;
@@ -1370,7 +1371,7 @@ static int proclist(PROGINFO *pip,SHIO *ofp) noex {
 /* end subroutine (proclist) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,SHIO *ofp,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1687,7 +1688,7 @@ static int procpcsdump(PROGINFO *pip,cchar *dfname)
 	            char	kbuf[KBUFLEN+1] ;
 	            char	vbuf[VBUFLEN+1] ;
 	            while (rs >= 0) {
-	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
+	                vl = pcsconf_curenum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
 	                if ((nfs = nchr(vbuf,vl,CH_FS)) > 0) {
 	                    rs = mkpresent(vbuf,vlen,vl,CH_FS,nfs) ;
@@ -1818,7 +1819,7 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 	            char	kbuf[KBUFLEN+1] ;
 	            char	vbuf[VBUFLEN+1] ;
 	            while (rs >= 0) {
-	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
+	                vl = pcsconf_curenum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
 	                debugprintf("main/procpcsconf: pair> %s=%r\n",
 	                    kbuf,vbuf,vl) ;
