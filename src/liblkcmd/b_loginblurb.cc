@@ -1,15 +1,15 @@
-/* b_loginblurb */
+/* b_loginblurb SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in which provides a blurb for use at pehaps login-time */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_LOCCHECK	0		/* using |locinfo_check()| */
-
 
 /* revision history:
 
@@ -22,13 +22,13 @@
 
 /*******************************************************************************
 
-	Synopsis:
+	Name:
+	b_loginblurb
 
+	Synopsis:
 	$ loginblurb [-s <string>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -48,7 +48,7 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
@@ -67,6 +67,9 @@
 #include	"b_loginblurb.h"
 #include	"defs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -81,35 +84,8 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	snfsflags(cchar *,int,ulong) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matpcasestr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	ctdecull(char *,int,ULONG *) ;
-extern int	ctdecll(char *,int,LONG *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	sbuf_termconseq(SBUF *,int,int,int,int,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-extern int	ndig(double *,int) ;
-extern int	ndigmax(double *,int,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(cchar *) ;
@@ -118,16 +94,6 @@ extern int	debugclose() ;
 extern int	nprintf(cchar *,cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpyuc(char *,cchar *,int) ;
-extern char	*strdcpy1(char *,int,cchar *) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -155,7 +121,7 @@ struct locinfo_flags {
 
 struct locinfo {
 	PROGINFO	*pip ;
-	LOCINFO_FL	have, init, f, final ;
+	LOCINFO_FL	have, init, f, finval ;
 	TMPX		ut ;
 	time_t		ti_check ;
 	time_t		ti_tmpx ;
@@ -174,7 +140,7 @@ static int	mainsub(int,cchar **,cchar **,void *) noex ;
 
 static int	usage(PROGINFO *) noex ;
 
-static int	procopts(PROGINFO *,KEYOPT *) noex ;
+static int	procopts(PROGINFO *,keyopt *) noex ;
 static int	process(PROGINFO *,cchar *) noex ;
 static int	procprint(PROGINFO *,SHIO *) noex ;
 static int	procbuf(PROGINFO *,char *,int) noex ;
@@ -340,8 +306,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -633,7 +599,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -651,7 +617,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                lip->final.o_string = TRUE ;
+	                                lip->finval.o_string = TRUE ;
 	                                lip->fl.o_string = TRUE ;
 	                                lip->string = argp ;
 	                            }
@@ -947,7 +913,7 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
+static int procopts(PROGINFO *pip,keyopt *kop) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -958,14 +924,14 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	cur ;
+	    keyopt_cur	cur ;
 	    if ((rs = keyopt_curbegin(kop,&cur)) >= 0) {
 	        int	v ;
 	        int	ki ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&cur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&cur,&kp)) >= 0) {
 
 	            if ((ki = matostr(progopts,2,kp,kl)) >= 0) {
 
@@ -973,7 +939,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 
 	                switch (ki) {
 	            case progopt_str:
-	                if (! lip->final.o_string) {
+	                if (! lip->finval.o_string) {
 	                    lip->fl.o_string = TRUE ;
 	                    if (vl > 0) {
 	                        strdcpy1w(lip->strbuf,STRBUFLEN,vp,vl) ;
@@ -1034,8 +1000,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	                }
 	                break ;
 	            case progopt_term:
-	                if (! lip->final.term) {
-	                    lip->final.term = TRUE ;
+	                if (! lip->finval.term) {
+	                    lip->finval.term = TRUE ;
 	                    lip->have.term = TRUE ;
 	                    lip->fl.term = TRUE ;
 	                    if (vl > 0) {
