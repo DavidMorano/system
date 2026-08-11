@@ -1,12 +1,13 @@
-/* b_lspell */
+/* b_lspell SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a generic front-end for the LSPELL command */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	1		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -19,11 +20,13 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_lspell
+
+	Description:
 	This is a simple program (of some sort!).
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -43,9 +46,9 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
 
 #include	<usystem.h>
 #include	<sigman.h>
@@ -89,15 +92,6 @@
 
 /* external subroutines */
 
-extern int	sfword(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	field_word(FIELD *,const uchar *,const char **) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
 
@@ -108,10 +102,6 @@ extern int	debugprinthex(const char *,int,const char *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -133,7 +123,7 @@ struct xlocinfo {
 	vecstr		stores ;
 	STRPACK		wstore ;
 	HDB		wdb ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 } ;
 
@@ -154,8 +144,8 @@ static int	locinfo_finish(LOCINFO *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,PARAMOPT *,
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,PARAMOPT *,
 			void *,uchar *,const char *,const char *) ;
 static int	procfile(PROGINFO *,void *,uchar *,const char *) ;
 static int	procword(PROGINFO *,const char *,int) ;
@@ -300,8 +290,8 @@ void		*contextp ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
 	SIGMAN		sm ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	PARAMOPT	aparams ;
 	SHIO		errfile ;
 	SHIO		outfile, *ofp = &outfile ;
@@ -614,7 +604,7 @@ void		*contextp ;
 	                        break ;
 
 	                    case 'c':
-	                        lip->final.counts = TRUE ;
+	                        lip->finval.counts = TRUE ;
 	                        lip->have.counts = TRUE ;
 	                        lip->fl.counts = TRUE ;
 	                        if (f_optequal) {
@@ -1134,7 +1124,7 @@ PROGINFO	*pip ;
 /* process the program ako-options */
 static int procopts(pip,kop)
 PROGINFO	*pip ;
-KEYOPT		*kop ;
+keyopt		*kop ;
 {
 	LOCINFO	*lip = pip->lip ;
 
@@ -1148,13 +1138,13 @@ KEYOPT		*kop ;
 	    rs = keyopt_loads(kop,cp,-1) ;
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int		oi ;
 	        int		kl, vl ;
 		const char	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            vl = keyopt_fetch(kop,kp,NULL,&vp) ;
 
@@ -1163,9 +1153,9 @@ KEYOPT		*kop ;
 	                switch (oi) {
 
 	                case akoname_foldcase:
-	                    if (! lip->final.foldcase) {
+	                    if (! lip->finval.foldcase) {
 	                        lip->have.foldcase = TRUE ;
-	                        lip->final.foldcase = TRUE ;
+	                        lip->finval.foldcase = TRUE ;
 	                        lip->fl.foldcase = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1175,9 +1165,9 @@ KEYOPT		*kop ;
 	                    break ;
 
 	                case akoname_uniq:
-	                    if (! lip->final.uniq) {
+	                    if (! lip->finval.uniq) {
 	                        lip->have.uniq = TRUE ;
-	                        lip->final.uniq = TRUE ;
+	                        lip->finval.uniq = TRUE ;
 	                        lip->fl.uniq = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1187,9 +1177,9 @@ KEYOPT		*kop ;
 	                    break ;
 
 	                case akoname_counts:
-	                    if (! lip->final.counts) {
+	                    if (! lip->finval.counts) {
 	                        lip->have.counts = TRUE ;
-	                        lip->final.counts = TRUE ;
+	                        lip->finval.counts = TRUE ;
 	                        lip->fl.counts = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1222,7 +1212,7 @@ KEYOPT		*kop ;
 static int procargs(pip,aip,bop,app,ofp,wterms,ifname,afname)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-BITS		*bop ;
+bits		*bop ;
 PARAMOPT	*app ;
 void		*ofp ;
 uchar		wterms[] ;
