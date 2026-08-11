@@ -1,13 +1,14 @@
-/* b_mkwords */
+/* b_mkwords SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a generic front-end for the MKWORDS command */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LOCSETENT	0		/* using |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -20,11 +21,13 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_mkwords
+
+	Description:
 	This is a simple program (of some sort!).
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -90,16 +93,6 @@
 
 /* external subroutines */
 
-extern int	sfword(cchar *,int,cchar **) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	field_word(FIELD *,const uchar *,cchar **) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -110,10 +103,6 @@ extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -135,7 +124,7 @@ struct locinfo {
 	vecstr		stores ;
 	STRPACK		wstore ;
 	HDB		wdb ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	unsigned char	wterms[32] ;
 } ;
@@ -152,9 +141,9 @@ static int	mainsub(int,cchar *[],cchar *[],void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,void *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,void *,cchar *) ;
 static int	procfile(PROGINFO *,void *,cchar *) ;
 static int	procline(PROGINFO *,void *,cchar *,int) ;
 static int	procword(PROGINFO *,cchar *,int) ;
@@ -277,8 +266,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	PARAMOPT	aparams ;
 	SHIO		errfile ;
 
@@ -557,7 +546,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'c':
-	                        lip->final.counts = TRUE ;
+	                        lip->finval.counts = TRUE ;
 	                        lip->have.counts = TRUE ;
 	                        lip->fl.counts = TRUE ;
 	                        if (f_optequal) {
@@ -576,7 +565,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -729,7 +718,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (rs >= 0) {
 	    if ((rs = procopts(pip,&akopts)) >= 0) {
 	        ARGINFO	*aip = &ainfo ;
-	        BITS	*bop = &pargs ;
+	        bits	*bop = &pargs ;
 	        cchar	*ofn = ofname ;
 	        cchar	*afn = afname ;
 	        rs = process(pip,aip,bop,ofn,afn) ;
@@ -850,7 +839,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -862,13 +851,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -876,9 +865,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case akoname_foldcase:
-	                    if (! lip->final.foldcase) {
+	                    if (! lip->finval.foldcase) {
 	                        lip->have.foldcase = TRUE ;
-	                        lip->final.foldcase = TRUE ;
+	                        lip->finval.foldcase = TRUE ;
 	                        lip->fl.foldcase = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -887,9 +876,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_uniq:
-	                    if (! lip->final.uniq) {
+	                    if (! lip->finval.uniq) {
 	                        lip->have.uniq = TRUE ;
-	                        lip->final.uniq = TRUE ;
+	                        lip->finval.uniq = TRUE ;
 	                        lip->fl.uniq = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -898,9 +887,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_counts:
-	                    if (! lip->final.counts) {
+	                    if (! lip->finval.counts) {
 	                        lip->have.counts = TRUE ;
-	                        lip->final.counts = TRUE ;
+	                        lip->finval.counts = TRUE ;
 	                        lip->fl.counts = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -929,7 +918,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -962,7 +951,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
