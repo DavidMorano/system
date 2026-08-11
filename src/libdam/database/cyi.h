@@ -20,14 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<cyihdr.h>		/* this is the hash-file-header */
-#include	<calcite.h>
+#include	<sys/types.h>		/* POSIX® |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<cyihdr.h>		/* LIBDAM hash-file-header */
+#include	<calcite.h>		/* LIBDAM */
 
 
 #define	CYI		struct cyi_head
@@ -44,8 +41,8 @@
 
 struct cyi_object {
 	cchar		*name ;
-	uint		objsize ;
-	uint		cursize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct cyi_information {
@@ -120,7 +117,7 @@ extern int	cyi_close(cyi *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-extern const cyi_obj	cyi_modinfo = {
+extern const cyi_obj	cyi_modinfo ;
 #endif /* __cplusplus */
 
 
