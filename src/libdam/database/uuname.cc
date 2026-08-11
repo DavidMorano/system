@@ -153,9 +153,9 @@ local inline int uuname_magic(uuname *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (uuname_magic) */
 
-local int	uuname_objloadbegin(UN *,cchar *,cchar *) noex ;
-local int	uuname_objloadend(UN *) noex ;
-local int	uuname_loadcalls(UN *,vecstr *) noex ;
+local int	uuname_objloadbegin	(UN *,cchar *,cchar *) noex ;
+local int	uuname_objloadend	(UN *) noex ;
+local int	uuname_loadcalls	(UN *,vecstr *) noex ;
 
 local bool	isrequired(int) noex ;
 
@@ -344,9 +344,9 @@ local int uuname_objloadbegin(UN *op,cchar *pr,cchar *objn) noex {
 	cint		vo = vecstrm.compact ;
 	int		rs ;
 	int		rs1 ;
-	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) {
-	    if ((rs = syms.addsyms(objn,subnames)) >= 0) {
-	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) {
+	if (vecstr syms ; (rs = syms.start(vn,vo)) >= 0) ylikely {
+	    if ((rs = syms.addsyms(objn,subnames)) >= 0) ylikely {
+	        if (mainv sv ; (rs = syms.getvec(&sv)) >= 0) ylikely {
 	            cchar	*mn = UN_MODBNAME ;
 	            cchar	*on = objn ;
 	            int		mo = 0 ;
