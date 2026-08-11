@@ -1,4 +1,4 @@
-/* b_temp SUPPORT */
+/* b_temp SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -20,6 +20,9 @@
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_temp
 
 	Synopsis:
 	$ temp[<temp(s)>] [-af <afile>] [-V]
@@ -45,15 +48,15 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
+#include	<cfdec.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -95,39 +98,8 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdecf(cchar *,int,double *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isalphalatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -145,7 +117,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
@@ -162,18 +134,18 @@ enum units {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procquery(PROGINFO *,void *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procquery(PROGINFO *,void *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif /* CF_LOCSETENT */
 
 static double	getkelvin(int,double) ;
@@ -290,13 +262,13 @@ int p_temp(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -611,7 +583,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -850,7 +822,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -871,7 +843,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -882,13 +854,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -923,7 +895,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *ofn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	const int	to_open = pip->to_open ;
@@ -1016,7 +988,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *ofn)
 /* end subroutine (procargs) */
 
 
-static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
+local int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 {
 	int		rs = SR_OK ;
 	int		cl ;
@@ -1053,7 +1025,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 	        } /* end switch */
 	        cl -= 1 ;
 	    } /* end if (is-alpha-latin) */
-	    if ((rs >= 0) && ((rs = cfdecf(cp,cl,&v)) >= 0)) {
+	    if ((rs >= 0) && ((rs = cfdecd(cp,cl,&v)) >= 0)) {
 	        double	vk = getkelvin(w,v) ;
 	        double	vf, vc ;
 	        vf = cvt_fahrenheit(vk) ;
@@ -1068,7 +1040,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 /* end subroutine (procquery) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	cchar		*varterm = VARTERM ;
@@ -1085,7 +1057,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1105,7 +1077,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
