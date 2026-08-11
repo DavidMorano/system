@@ -78,8 +78,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local variables */
 
-constexpr int		headsize	= babieshdrh_overlast * szof(uint) ;
-constexpr int		magicsize	= BABIESHDR_MAGICSIZE ;
+constexpr int		headsz		= babieshdrh_overlast * szof(uint) ;
+constexpr int		magicsz		= BABIESHDR_MAGICSIZE ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= BABIESHDR_MAGICSTR ;
 
@@ -93,32 +93,32 @@ constexpr char		magicstr[]	= BABIESHDR_MAGICSTR ;
 int babieshdr_rd(babieshdr *ep,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (ep && hbuf) {
+	if (ep && hbuf) ylikely {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsize + vsz)) {
-	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
-	            bp += magicsize ;
-	            bl -= magicsize ;
+	    if (bl >= (magicsz + vsz)) ylikely {
+	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) ylikely {
+	            bp += magicsz ;
+	            bl -= magicsz ;
 	    	    memcopy(bp,ep->vetu,vsz) ;
 	    	    bp[0] = uchar(BABIESHDR_VERSION) ;
 	    	    bp[1] = uchar(ENDIAN) ;
 	    	    bp += vsz ;
 	    	    bl -= vsz ;
-	    	    if (bl >= headsize) {
+	    	    if (bl >= headsz) ylikely {
 	        	uint				*header = uintp(bp) ;
-	        	header[babieshdrh_shmsize]	= ep->shmsize ;
-	        	header[babieshdrh_dbsize]	= ep->dbsize ;
+	        	header[babieshdrh_shmsz]	= ep->shmsz ;
+	        	header[babieshdrh_dbsz]		= ep->dbsz ;
 	        	header[babieshdrh_dbtime]	= ep->dbtime ;
 	        	header[babieshdrh_wtime]	= ep->wtime ;
 	        	header[babieshdrh_atime]	= ep->atime ;
 	        	header[babieshdrh_acount]	= ep->acount ;
 	        	header[babieshdrh_muoff]	= ep->muoff ;
-	        	header[babieshdrh_musize]	= ep->musize ;
+	        	header[babieshdrh_musz]		= ep->musz ;
 	        	header[babieshdrh_btoff]	= ep->btoff ;
 	        	header[babieshdrh_btlen]	= ep->btlen ;
-	        	bp += headsize ;
-	        	bl -= headsize ;
+	        	bp += headsz ;
+	        	bl -= headsz ;
 			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
@@ -135,15 +135,15 @@ int babieshdr_rd(babieshdr *ep,char *hbuf,int hlen) noex {
 int babieshdr_wr(babieshdr *ep,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (ep && hbuf) {
+	if (ep && hbuf) ylikely {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) ylikely {
 		rs = SR_OK ;
-	        bp += magicsize ;
-	        bl -= magicsize ;
+	        bp += magicsz ;
+	        bl -= magicsz ;
 		/* read out the VETU information */
-	        if (bl >= vsz) {
+	        if (bl >= vsz) ylikely {
 		    uchar	ech = uchar(ENDIAN) ;
 	            memcopy(ep->vetu,bp,vsz) ;
 	            if (ep->vetu[0] != BABIESHDR_VERSION) {
@@ -157,21 +157,21 @@ int babieshdr_wr(babieshdr *ep,cchar *hbuf,int hlen) noex {
 	        } else {
 	            rs = SR_ILSEQ ;
 		}
-	        if (rs >= 0) {
-	            if (bl >= headsize) {
+	        if (rs >= 0) ylikely {
+	            if (bl >= headsz) ylikely {
 	                const uint	*header = uintp(bp) ;
-	                ep->shmsize	= header[babieshdrh_shmsize] ;
-	                ep->dbsize	= header[babieshdrh_dbsize] ;
+	                ep->shmsz	= header[babieshdrh_shmsz] ;
+	                ep->dbsz	= header[babieshdrh_dbsz] ;
 	                ep->dbtime	= header[babieshdrh_dbtime] ;
 	                ep->wtime	= header[babieshdrh_wtime] ;
 	                ep->atime	= header[babieshdrh_atime] ;
 	                ep->acount	= header[babieshdrh_acount] ;
 	                ep->muoff	= header[babieshdrh_muoff] ;
-	                ep->musize	= header[babieshdrh_musize] ;
+	                ep->musz	= header[babieshdrh_musz] ;
 	                ep->btoff	= header[babieshdrh_btoff] ;
 	                ep->btlen	= header[babieshdrh_btlen] ;
-	                bp += headsize ;
-	                bl -= headsize ;
+	                bp += headsz ;
+	                bl -= headsz ;
 			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
