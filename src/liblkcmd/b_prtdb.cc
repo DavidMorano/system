@@ -1,4 +1,4 @@
-/* b_prtdb */
+/* b_prtdb SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -22,11 +22,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_prtdb
+
+	Description:
 	This subroutine is the front-end for a program that accesses
 	several possible databases in order to find the value for
-	specified keys.  We use the PRINTER environment variable to
-	find the default printer to lookup keys for when an explicit
-	printer is not specified.
+	specified keys.  We use the PRINTER environment variable
+	to find the default printer to lookup keys for when an
+	explicit printer is not specified.
 
 *******************************************************************************/
 
@@ -46,15 +50,16 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<time.h>
+#include	<pwd.h>
+#include	<ctime>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<pwd.h>
-
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
+#include	<bufsizeget.h>
 #include	<getusername.h>
-#include	<getourenv.h>
 #include	<getax.h>
 #include	<keyopt.h>
 #include	<bits.h>
@@ -96,40 +101,8 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	snwcpyuc(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	getprogpath(IDS *,vecstr *,char *,cchar *,int) ;
-extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-extern int	isFailOpen(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -145,7 +118,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, fin ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	PDB		db ;
@@ -162,22 +135,22 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,void *,cchar *,int) ;
-static int	procspec(PROGINFO *,void *,cchar *,int) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procspecs(PROGINFO *,void *,cchar *,int) ;
+local int	procspec(PROGINFO *,void *,cchar *,int) ;
 
-static int	lpgetout(PROGINFO *,char *,int,cchar *,cchar *) ;
+local int	lpgetout(PROGINFO *,char *,int,cchar *,cchar *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_userinfo(LOCINFO *) ;
-static int	locinfo_findlpget(LOCINFO *) ;
-static int	locinfo_getprinter(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_userinfo(LOCINFO *) ;
+local int	locinfo_findlpget(LOCINFO *) ;
+local int	locinfo_getprinter(LOCINFO *) ;
 
 
 /* local variables */
@@ -294,13 +267,13 @@ int p_prtdb(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
+local int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
 	PARAMOPT	aparams ;
-	BITS		pargs ;
+	bits		pargs ;
 	SHIO		errfile ;
 
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -881,7 +854,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	        lip->open.db = TRUE ;
 	        {
 	            ARGINFO	*aip = &ainfo ;
-	            BITS	*bop = &pargs ;
+	            bits	*bop = &pargs ;
 	            cchar	*ofn = ofname ;
 	            cchar	*afn = afname ;
 	            rs = process(pip,aip,bop,ofn,afn) ;
@@ -958,7 +931,7 @@ badarg:
 /* end subroutine (main) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs ;
 	int		wlen = 0 ;
@@ -986,7 +959,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1087,7 +1060,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
+local int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1110,7 +1083,7 @@ static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 /* end subroutine (procspecs) */
 
 
-static int procspec(PROGINFO *pip,void *ofp,cchar *kp,int kl)
+local int procspec(PROGINFO *pip,void *ofp,cchar *kp,int kl)
 {
 	LOCINFO		*lip = pip->lip ;
 	cint	klen = KBUFLEN ;
@@ -1185,7 +1158,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *kp,int kl)
 /* end subroutine (procspec) */
 
 
-static int lpgetout(PROGINFO *pip,char *vbuf,int vlen,cchar *pt,cchar *key)
+local int lpgetout(PROGINFO *pip,char *vbuf,int vlen,cchar *pt,cchar *key)
 {
 	LOCINFO		*lip = pip->lip ;
 	bfile		ofile, *ofp = &ofile ;
@@ -1317,7 +1290,7 @@ static int lpgetout(PROGINFO *pip,char *vbuf,int vlen,cchar *pt,cchar *key)
 /* end subroutine (lpgetout) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1329,7 +1302,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1347,7 +1320,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1383,7 +1356,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_userinfo(LOCINFO *lip)
+local int locinfo_userinfo(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		hl = 0 ;
@@ -1397,7 +1370,7 @@ static int locinfo_userinfo(LOCINFO *lip)
 	    }
 	} else {
 	    struct passwd	pw ;
-	    cint		pwlen = getbufsize(getbufsize_pw) ;
+	    cint		pwlen = bufsizeget(bufsize_pw) ;
 	    char		*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
@@ -1417,7 +1390,7 @@ static int locinfo_userinfo(LOCINFO *lip)
 
 
 /* get the path to the LPGET program */
-static int locinfo_findlpget(LOCINFO *lip)
+local int locinfo_findlpget(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1441,7 +1414,7 @@ static int locinfo_findlpget(LOCINFO *lip)
 /* end subroutine (locinfo_findlpget) */
 
 
-static int locinfo_getprinter(LOCINFO *lip)
+local int locinfo_getprinter(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
