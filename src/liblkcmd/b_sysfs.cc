@@ -1,4 +1,4 @@
-/* b_sysfs SUPPORT */
+/* b_sysfs SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -17,12 +17,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_sysfs
+
 	Synopsis:
 	$ sysfs [<w>]
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -43,7 +46,7 @@
 #include	<cstring>
 
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -65,7 +68,7 @@
 #include	"kshlib.h"
 #include	"b_sysfs.h"
 #include	"defs.h"
-#include	"opensysfs.h"
+#include	"opensysfs.hh"
 
 
 /* local defines */
@@ -83,38 +86,8 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mknpath2(char *,int,cchar *,cchar *) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	pathadd(char *,int,cchar *) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -135,7 +108,7 @@ struct locinfo {
 	PROGINFO	*pip ;
 	cchar		*dbfname ;
 	cchar		*fname ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	vecstr		stores ;
 	uint		wargs ;
@@ -195,7 +168,7 @@ static int	procshells(PROGINFO *,int) noex ;
 static int	procshadow(PROGINFO *,int) noex ;
 static int	procuserattr(PROGINFO *,int) noex ;
 
-static int	procopts(PROGINFO *,KEYOPT *) noex ;
+static int	procopts(PROGINFO *,keyopt *) noex ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
 static int	locinfo_warg(LOCINFO *,int) noex ;
@@ -331,8 +304,8 @@ int p_sysfs(int argc,mainv argv,mainv envv,void *contextp) noex {
 static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
@@ -625,7 +598,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -895,7 +868,7 @@ static int usage(PROGINFO *pip) noex {
 /* end subroutine (usage) */
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
+static int procopts(PROGINFO *pip,keyopt *kop) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -906,13 +879,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -921,9 +894,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop) noex {
 	                switch (oi) {
 	                case akoname_utf:
 	                case akoname_db:
-	                    if (! lip->final.dbfname) {
+	                    if (! lip->finval.dbfname) {
 	                        lip->have.dbfname = true ;
-	                        lip->final.dbfname = true ;
+	                        lip->finval.dbfname = true ;
 	                        if (vl > 0) {
 	                            cchar	**vpp = &lip->dbfname ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -1139,10 +1112,10 @@ static int procusers_begin(PROGINFO *pip,PU *pup) noex {
 
 	return rs ;
 }
-/* end subroutines (procusers_begin) */
+/* end subroutine (procusers_begin) */
 
 static int procusers_allocbegin(PROGINFO *pip,PU *pup) noex {
-	cint		pwlen = getbufsize(getbufsize_pw) ;
+	cint		pwlen = bufsizeget(bufsize_pw) ;
 	cint		plen = MAXPATHLEN ;
 	int		rs ;
 	int		llen ;
@@ -1165,7 +1138,7 @@ static int procusers_allocbegin(PROGINFO *pip,PU *pup) noex {
 	} /* end if (memory-ållocation) */
 	return rs ;
 }
-/* end subroutines (procusers_allocbegin) */
+/* end subroutine (procusers_allocbegin) */
 
 static int procusers_allocend(PROGINFO *pip,PU *pup) noex {
 	int		rs = SR_FAULT ;
@@ -1183,7 +1156,7 @@ static int procusers_allocend(PROGINFO *pip,PU *pup) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutines (procusers_allocend) */
+/* end subroutine (procusers_allocend) */
 
 static int procusers_beginer(PROGINFO *pip,PU *pup,cc *sd,mode_t om) noex {
 	cint		n = 50 ;
@@ -1366,7 +1339,7 @@ static int procgroups_load(PROGINFO *pip,bfile *gsfp,bfile *grfp) noex {
 	GROUP		gr ;
 	setstr		groups, *gsp = &groups ;
 	cint		n = 40 ;
-	cint		grlen = getbufsize(getbufsize_gr) ;
+	cint		grlen = bufsizeget(bufsize_gr) ;
 	int		rs ;
 	int		rs1 ;
 	int		llen ;
@@ -1472,7 +1445,7 @@ static int procprojects(PROGINFO *pip,int w) noex {
 
 static int procprojects_load(PROGINFO *pip,bfile *pnfp,bfile *pjfp) noex {
 	PROJECT		pj ;
-	cint	pjlen = getbufsize(getbufsize_pj) ;
+	cint	pjlen = bufsizeget(bufsize_pj) ;
 	int		rs ;
 	int		c = 0 ;
 	int		llen ;
@@ -1561,7 +1534,7 @@ static int procshadow(PROGINFO *pip,int w) noex {
 	    bfile	sfile, *sfp = &sfile ;
 	    if ((rs = bopenmod(sfp,tmpfname,"wct",om)) >= 0) {
 	        struct spwd	sp ;
-	        cint	splen = getbufsize(getbufsize_sp) ;
+	        cint	splen = bufsizeget(bufsize_sp) ;
 	        char		*spbuf ;
 		if ((rs = uc_malloc((splen+1),&spbuf)) >= 0) {
 	            if ((rs = getsp_begin()) >= 0) {
@@ -1613,7 +1586,7 @@ static int procuserattr(PROGINFO *pip,int w) noex {
 	    bfile	sfile, *sfp = &sfile ;
 	    if ((rs = bopenmod(sfp,tmpfname,"wct",om)) >= 0) {
 	        userattr_t	ua ;
-	        cint	ualen = getbufsize(getbufsize_ua) ;
+	        cint	ualen = bufsizeget(bufsize_ua) ;
 	        char		*uabuf ;
 		if ((rs = uc_malloc((ualen+1),&uabuf)) >= 0) {
 	            if ((rs = getua_begin()) >= 0) {
@@ -1780,7 +1753,7 @@ static int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
 
 	if (dbfname != nullptr) {
 	    lip->have.dbfname = true ;
-	    lip->final.dbfname = true ;
+	    lip->finval.dbfname = true ;
 	    lip->dbfname = dbfname ;
 	}
 
@@ -1803,7 +1776,7 @@ static int locinfo_defaults(LOCINFO *lip) noex {
 	if (lip == nullptr)
 	    return SR_FAULT ;
 
-	if ((lip->dbfname == nullptr) && (! lip->final.dbfname)) {
+	if ((lip->dbfname == nullptr) && (! lip->finval.dbfname)) {
 	    cchar	*cp = getourenv(pip->envv,VARDBFNAME) ;
 	    if (cp != nullptr) {
 	        cchar	**vpp = &lip->dbfname ;
