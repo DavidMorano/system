@@ -1,4 +1,4 @@
-/* b_pathenum */
+/* b_pathenum UPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -21,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_pathenum
+
+	Description:
 	This is the front-end for retrieving environment variables
 	and outputting them in a packaged-up format for SHELL
 	interpretation.
@@ -46,11 +50,12 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<nulstr.h>
@@ -66,37 +71,15 @@
 
 /* local defines */
 
-#define	LOCINFO_MAGIC	0x99224571
 #define	LOCINFO		struct locinfo
 #define	LOCINFO_FL	struct locinfo_flags
+#define	LOCINFO_MAGIC	0x99224571
 
 
 /* external subroutines */
 
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	getev(cchar **,cchar *,int,cchar **) ;
-extern int	isalnumlatin(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -115,24 +98,24 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procname(PROGINFO *,SHIO *,cchar *,int) ;
-static int	printit(PROGINFO *,SHIO *,cchar *,int) ;
-static int	isenvnameok(cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procname(PROGINFO *,SHIO *,cchar *,int) ;
+local int	printit(PROGINFO *,SHIO *,cchar *,int) ;
+local int	isenvnameok(cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_setes(LOCINFO *,cchar *) ;
-static int	locinfo_getes(LOCINFO *,cchar **) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_setes(LOCINFO *,cchar *) ;
+local int	locinfo_getes(LOCINFO *,cchar **) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-static int	locinfo_debug(LOCINFO *,cchar *) ;
-static int	strdeblen(cchar *) ;
+local int	locinfo_debug(LOCINFO *,cchar *) ;
+local int	strdeblen(cchar *) ;
 #endif
 
 
@@ -232,13 +215,13 @@ int p_pathenum(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -538,7 +521,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 				} else
@@ -758,7 +741,7 @@ badprogstart:
 
 
 /* print out (standard error) some short usage */
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -782,7 +765,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		size ;
 
@@ -802,7 +785,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -829,7 +812,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setes(LOCINFO *lip,cchar *es)
+local int locinfo_setes(LOCINFO *lip,cchar *es)
 {
 	int		rs = SR_OK ;
 	cchar	*cp ;
@@ -869,7 +852,7 @@ static int locinfo_setes(LOCINFO *lip,cchar *es)
 /* end subroutine (locinfo_setes) */
 
 
-static int locinfo_getes(LOCINFO *lip,cchar **rpp)
+local int locinfo_getes(LOCINFO *lip,cchar **rpp)
 {
 	int		rs = SR_OK ;
 
@@ -899,7 +882,7 @@ static int locinfo_getes(LOCINFO *lip,cchar **rpp)
 /* end subroutine (locinfo_getes) */
 
 
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -912,13 +895,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(progopts,2,kp,kl)) >= 0) {
 
@@ -951,7 +934,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1062,7 +1045,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 
 
 /* process a name */
-static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
+local int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1146,7 +1129,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 
 
 /* print it out */
-static int printit(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
+local int printit(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -1178,7 +1161,7 @@ static int printit(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 
 #if	CF_DEBUG || CF_DEBUGS
 
-static int locinfo_debug(LOCINFO *lip,cchar s[])
+local int locinfo_debug(LOCINFO *lip,cchar s[])
 {
 	if (lip == NULL) return SR_FAULT ;
 	debugprintf("locinfo_debug: magic=%s\n",
@@ -1191,7 +1174,7 @@ static int locinfo_debug(LOCINFO *lip,cchar s[])
 /* end subroutine (locinfo_debug) */
 
 
-static int strdeblen(cchar *s)
+local int strdeblen(cchar *s)
 {
 	if (s == NULL) return -1 ;
 	return (strlen(s)) ;
@@ -1201,7 +1184,7 @@ static int strdeblen(cchar *s)
 
 
 /* is the given environment varialbe OK? */
-static int isenvnameok(cchar *kp,int kl)
+local int isenvnameok(cchar *kp,int kl)
 {
 	int		ch ;
 	int		f_ok = TRUE ;
