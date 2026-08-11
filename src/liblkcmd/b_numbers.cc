@@ -1,4 +1,4 @@
-/* b_numbers SUPPORT */
+/* b_numbers SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++11 */
 
@@ -20,6 +20,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_numbers
+
 	Synopsis:
 	$ numbers <num-n>[,<num-k>] ...
 
@@ -38,13 +41,15 @@
 #endif
 
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
@@ -73,29 +78,8 @@
 extern "C" int b_numbers(int,cchar **,void *) ;
 extern "C" int p_numbers(int,cchar **,cchar **,void *) ;
 
-extern "C" long	factorial(int) ;
-extern "C" long	permutations(int,int) ;
-extern "C" long	combinations(int,int) ;
-extern "C" long	multicombinations(int,int) ;
-
-extern "C" int	matostr(cchar **,int,cchar *,int) ;
-extern "C" int	matstr(cchar **,cchar *,int) ;
-extern "C" int	matcasestr(cchar **,cchar *,int) ;
-extern "C" int	optbool(cchar *,int) ;
-extern "C" int	optvalue(cchar *,int) ;
-
 extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern "C" int	debugopen(cchar *) ;
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	debugclose() ;
-extern "C" int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern "C" char	*timestr_log(time_t,char *) ;
-extern "C" char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -151,7 +135,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	f, have, changed, final ;
+	LOCINFO_FL	f, have, changed, finval ;
 	PROGINFO	*pip ;
 	int		numtype ;
 	int		otype ;
@@ -240,8 +224,8 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procspecs(PROGINFO *,SHIO *,cchar *,int) ;
 static int	procspec(PROGINFO *,SHIO *,cchar *,int) ;
 
@@ -376,8 +360,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -681,7 +665,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -955,7 +939,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -967,13 +951,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -982,9 +966,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 	                case akoname_output:
 	                case akoname_otype:
-	                    if (! lip->final.otype) {
+	                    if (! lip->finval.otype) {
 	                        lip->have.otype = TRUE ;
-	                        lip->final.otype = TRUE ;
+	                        lip->finval.otype = TRUE ;
 	                        lip->fl.otype = TRUE ;
 	                        if (vl > 0) {
 	                            rs = locinfo_setotype(lip,vp,vl) ;
@@ -992,9 +976,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_hex:
-	                    if (! lip->final.hex) {
+	                    if (! lip->finval.hex) {
 	                        lip->have.hex = TRUE ;
-	                        lip->final.hex = TRUE ;
+	                        lip->finval.hex = TRUE ;
 	                        lip->fl.hex = TRUE ;
 				lip->otype = otype_hex ;
 	                    }
@@ -1020,7 +1004,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
