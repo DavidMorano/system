@@ -1,4 +1,4 @@
-/* b_mailforward */
+/* b_mailforward SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_mailforward
+
+	Description:
 	This is a built-in command to the KSH shell.  It should
 	also be able to be made into a stand-alone program without
 	much (if almost any) difficulty, but I have not done that
@@ -68,12 +72,13 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecint.h>
@@ -122,45 +127,8 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	mklogid(char *,int,cchar *,int,int) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_loga(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -184,7 +152,7 @@ struct progstate {
 
 struct config {
 	PROGINFO	*pip ;
-	PARAMFILE	p ;
+	paramfile	p ;
 	EXPCOOK		cooks ;
 	uint		f_p ;
 } ;
@@ -192,21 +160,21 @@ struct config {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	progstate_start(PROGSTATE *,PROGINFO *) ;
-static int	progstate_nums(PROGSTATE *,cchar *,int) ;
-static int	progstate_ema(PROGSTATE *,cchar *,int) ;
-static int	progstate_finish(PROGSTATE *) ;
+local int	progstate_start(PROGSTATE *,PROGINFO *) ;
+local int	progstate_nums(PROGSTATE *,cchar *,int) ;
+local int	progstate_ema(PROGSTATE *,cchar *,int) ;
+local int	progstate_finish(PROGSTATE *) ;
 
-static int	procmailbox(PROGINFO *,PROGSTATE *) ;
+local int	procmailbox(PROGINFO *,PROGSTATE *) ;
 
-static int	config_start(CONFIG *,PROGINFO *,cchar *) ;
-static int	config_check(CONFIG *) ;
-static int	config_read(CONFIG *) ;
-static int	config_finish(CONFIG *) ;
+local int	config_start(CONFIG *,PROGINFO *,cchar *) ;
+local int	config_check(CONFIG *) ;
+local int	config_read(CONFIG *) ;
+local int	config_finish(CONFIG *) ;
 
 
 /* local variables */
@@ -324,15 +292,15 @@ int p_mailforward(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	PROGSTATE	ps, *psp = &ps ;
 	ustat	sb ;
 	ustat	*sbp = (ustat *) &sb ;
 	CONFIG	co ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 	USERINFO	u ;
 
@@ -513,7 +481,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
-				    pip->final.logprog = TRUE ;
+				    pip->finval.logprog = TRUE ;
 	                            strwcpy(pip->lfname,avp,
 	                                MIN(avl,MAXNAMELEN)) ;
 				}
@@ -635,7 +603,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        argl = strlen(argp) ;
 	                        if (argl) {
 				    pip->have.cfname = TRUE ;
-				    pip->final.cfname = TRUE ;
+				    pip->finval.cfname = TRUE ;
 	                            cfname = argp ;
 				}
 				} else
@@ -675,7 +643,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            if (avl) {
 					const int	ch = MKCHAR(avp[0]) ;
 	                		if (isdigitlatin(ach)) {
-					    pip->final.intrun = TRUE ;
+					    pip->finval.intrun = TRUE ;
 	                                    rs = cfdecti(avp,avl,&v) ;
 	                                    pip->intrun = v ;
 	                                } else if (tolower(*avp) == 'i') {
@@ -714,7 +682,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 				} else
@@ -868,13 +836,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* set finals */
 
 	if (maildname != NULL)
-		pip->final.mailforward_maildir = TRUE ;
+		pip->finval.mailforward_maildir = TRUE ;
 
 	if (cfname != NULL)
-		pip->final.cfname = TRUE ;
+		pip->finval.cfname = TRUE ;
 
 	if (pip->intpoll >= 0)
-	    pip->final.mailforward_pollint = TRUE ;
+	    pip->finval.mailforward_pollint = TRUE ;
 
 /* find and open a configuration file (if there is one) */
 
@@ -1120,7 +1088,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1141,7 +1109,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the mailbox */
-static int procmailbox(PROGSTATE *psp,PROGINFO *pip)
+local int procmailbox(PROGSTATE *psp,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1153,7 +1121,7 @@ static int procmailbox(PROGSTATE *psp,PROGINFO *pip)
 
 
 /* program state */
-static int progstate_start(PROGSTATE *psp,PROGINFO *pip)
+local int progstate_start(PROGSTATE *psp,PROGINFO *pip)
 {
 	int		rs ;
 	int		opts ;
@@ -1182,7 +1150,7 @@ bad0:
 /* end subroutine (progstate_start) */
 
 
-static int progstate_finish(PROGSTATE *psp)
+local int progstate_finish(PROGSTATE *psp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1205,7 +1173,7 @@ static int progstate_finish(PROGSTATE *psp)
 
 
 /* get numbers */
-static int progstate_nums(psp,ap,al)
+local int progstate_nums(psp,ap,al)
 PROGSTATE	*psp ;
 cchar	*ap ;
 int		al ;
@@ -1252,7 +1220,7 @@ int		al ;
 
 
 /* store EMAs */
-static int progstate_ema(PROGSTATE *psp,cchar *ap,int al)
+local int progstate_ema(PROGSTATE *psp,cchar *ap,int al)
 {
 	int		rs ;
 
@@ -1266,7 +1234,7 @@ static int progstate_ema(PROGSTATE *psp,cchar *ap,int al)
 
 
 /* configuration maintenance */
-static int config_start(CONFIG *op,PROGINFO *pip,cchar *cfname)
+local int config_start(CONFIG *op,PROGINFO *pip,cchar *cfname)
 {
 	VECSTR		sv ;
 	int		rs = SR_OK ;
@@ -1390,7 +1358,7 @@ bad0:
 /* end subroutine (config_start) */
 
 
-static int config_check(op)
+local int config_check(op)
 CONFIG	*op ;
 {
 	PROGINFO	*pip = op->pip ;
@@ -1406,7 +1374,7 @@ CONFIG	*op ;
 /* end subroutine (config_check) */
 
 
-static int config_finish(op)
+local int config_finish(op)
 CONFIG	*op ;
 {
 	PROGINFO	*pip = op->pip ;
@@ -1421,13 +1389,12 @@ CONFIG	*op ;
 }
 /* end subroutine (config_finish) */
 
-
-static int config_read(op)
+local int config_read(op)
 CONFIG	*op ;
 {
 	PROGINFO	*pip = op->pip ;
 	struc locinfo	*lip ;
-	PARAMFILE_CUR	cur ;
+	paramfile_cur	cur ;
 	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
 	int		i ;
@@ -1517,12 +1484,12 @@ CONFIG	*op ;
 	                            break ;
 
 	                        case param_pollint:
-				    if (! pip->final.pollint)
+				    if (! pip->finval.pollint)
 	                                pip->intpoll = v ;
 	                            break ;
 
 	                        case param_intlock:
-				    if (! pip->final.intlock)
+				    if (! pip->finval.intlock)
 	                                pip->intlock = v ;
 	                            break ;
 
@@ -1532,9 +1499,9 @@ CONFIG	*op ;
 	                    break ;
 
 	                case param_maildir:
-			    if (! pip->final.mailforward_maildir) {
+			    if (! pip->finval.mailforward_maildir) {
 				pip->have.mailforward_maildir = TRUE ;
-	                        prsetfname(pr,tmpfname,ebuf,el,TRUE,
+	                        prmkfname(pr,tmpfname,ebuf,el,TRUE,
 	                            NULL,MAILDNAME,"") ;
 				if ((pip->maildname == NULL) ||
 				    (strcmp(pip->maildname,tmpfname) != 0)) {
@@ -1546,7 +1513,7 @@ CONFIG	*op ;
 	                    break ;
 
 	                case param_logfile:
-			    if (! pip->final.logfname) {
+			    if (! pip->finval.logfname) {
 				pip->have.logfname = TRUE ;
 	                        setfname(pip,tmpfname,ebuf,el,TRUE,
 	                            LOGDNAME,pip->searchname,"") ;
