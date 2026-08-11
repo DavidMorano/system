@@ -25,9 +25,11 @@
 	has.  An optional comment character can be specified.  When
 	a comment character is specified, only lines with some
 	content located before the comment character will count as
-	a line.  Note that a comment characters is indeed just a
-	single characters, so things like specifying C-language
-	comments are not possible.
+	a line.  Note that a comment character is indeed just a
+	single character, so things like specifying C-language
+	comments are not possible with this subroutine.  Look
+	elsewhere if you need to calculate "non-commented-source-lines"
+	in files containing source code.
 
 	Synopsis:
 	int fileliner(cchar *fname,int cc) noex
@@ -37,8 +39,8 @@
 	cc		optional comment character (when non-zero)
 
 	Returns:
-	<0		error
 	>=0		number of lines in the file
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -73,7 +75,7 @@ import ucstream ;
 
 /* forward references */
 
-local int reader(char *,int,cc *,int) noex ;
+local int	reader(char *,int,cc *,int) noex ;
 
 
 /* local variables */
@@ -87,7 +89,7 @@ local int reader(char *,int,cc *,int) noex ;
 int fileliner(cchar *fname,int cn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 	if (fname) ylikely {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
@@ -111,7 +113,7 @@ int fileliner(cchar *fname,int cn) noex {
 local int reader(char *lbuf,int llen,cc *fn,int cn) noex {
 	int		rs ;
 	int		rs1 ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 	if (ucstream sf ; (rs = sf.open(fn,"r")) >= 0) ylikely {
 	    while ((rs = sf.readln(lbuf,llen)) > 0) {
 		if (cn > 0) {
@@ -130,7 +132,7 @@ local int reader(char *lbuf,int llen,cc *fn,int cn) noex {
 	    rs1 = sf.close ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ucstream) */
-	return (rs >= 0) ? rs : n ;
+	return (rs >= 0) ? n : rs ;
 } /* end subroutine (reader) */
 
 
