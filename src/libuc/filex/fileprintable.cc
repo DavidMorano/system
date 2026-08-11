@@ -11,7 +11,6 @@
 	= 1998-07-01, David A­D­ Morano
 	This code was originally written.
 
-
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -39,7 +38,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -72,6 +71,8 @@
 
 /* local variables */
 
+cint		bsz		= 512 ; /* buffer size */
+
 
 /* exported variables */
 
@@ -91,7 +92,7 @@ int fileprintable(cchar *fname) noex {
 		    cmode	om = 0 ;
 	            if ((rs = uc_open(fname,of,om)) >= 0) ylikely {
 	                cint	fd = rs ;
-	                if (filer b ; (rs = b.start(fd,0z,512)) >= 0) ylikely {
+	                if (filer b ; (rs = b.start(fd,0z,bsz)) >= 0) ylikely {
 	                    while ((rs = b.readln(lbuf,llen)) > 0) {
 	                        cint	ll = rmeol(lbuf,rs) ;
 		    		f = hasprintbad(lbuf,ll) ;
