@@ -1,4 +1,5 @@
-/* b_sysvar SUPPORT */
+/* b_sysvar SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* set the "system" variables at boot-up time */
@@ -20,6 +21,9 @@
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_sysvar
 
 	Description:
 	This subroutine is the front-end for the program that sets
@@ -127,50 +131,12 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	sichr(cchar *,int,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	vecstr_envfile(vecstr *,cchar *) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	isalnumlatin(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	debugprinthexblock(const char *,int,const void *,int) ;
-extern int	nprintf(cchar *,cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 #if	(CF_DEBUG || CF_DEBUGS) && CF_DEBUGFORK
 extern int	debugfork(cchar *) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -192,7 +158,7 @@ struct locinfo_flags {
 
 struct locinfo {
 	PROGINFO	*pip ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	cchar		*dumpfname ;
 	HDBSTR		vars ;
@@ -202,36 +168,36 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_qkey(LOCINFO *,cchar *,int) ;
-static int	locinfo_addvar(LOCINFO *,cchar *,int) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_qkey(LOCINFO *,cchar *,int) ;
+local int	locinfo_addvar(LOCINFO *,cchar *,int) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #ifdef	COMMENT
-static int	locinfo_varcount(LOCINFO *) ;
+local int	locinfo_varcount(LOCINFO *) ;
 #endif
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,
 			cchar *,cchar *,cchar *,cchar *) ;
-static int	procfiles(PROGINFO *,PARAMOPT *) ;
-static int	procfile(PROGINFO *,cchar *,int) ;
-static int	procsysdefs(PROGINFO *) ;
-static int	procsysdef(PROGINFO *,cchar *) ;
-static int	procvarfile(PROGINFO *,cchar *,int) ;
-static int	procset(PROGINFO *,cchar *) ;
-static int	procseter(PROGINFO *,cchar *,gid_t) ;
-static int	process(PROGINFO *,cchar *,void *,cchar *) ;
-static int	procgetfile(PROGINFO *,void *,VAR *,cchar *) ;
-static int	procqkey(PROGINFO *,void *,VAR *,cchar *,int) ;
-static int	procdumpfile(PROGINFO *,VAR *,cchar *) ;
-static int	procoutall(PROGINFO *,VAR *,void *) ;
+local int	procfiles(PROGINFO *,paramopt *) ;
+local int	procfile(PROGINFO *,cchar *,int) ;
+local int	procsysdefs(PROGINFO *) ;
+local int	procsysdef(PROGINFO *,cchar *) ;
+local int	procvarfile(PROGINFO *,cchar *,int) ;
+local int	procset(PROGINFO *,cchar *) ;
+local int	procseter(PROGINFO *,cchar *,gid_t) ;
+local int	process(PROGINFO *,cchar *,void *,cchar *) ;
+local int	procgetfile(PROGINFO *,void *,VAR *,cchar *) ;
+local int	procqkey(PROGINFO *,void *,VAR *,cchar *,int) ;
+local int	procdumpfile(PROGINFO *,VAR *,cchar *) ;
+local int	procoutall(PROGINFO *,VAR *,void *) ;
 
-static int	hasweird(cchar *,int) ;
+local int	hasweird(cchar *,int) ;
 
 
 /* local variables */
@@ -382,14 +348,14 @@ int p_sysvar(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	bits		pargs ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -682,7 +648,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_df:
 	                case argopt_dump:
 	                    lip->have.dump = TRUE ;
-	                    lip->final.dump = TRUE ;
+	                    lip->finval.dump = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl)
@@ -754,7 +720,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                PARAMOPT	*pop = &aparams ;
+	                                paramopt	*pop = &aparams ;
 	                                cchar		*po = PO_FILENAME ;
 	                                rs = paramopt_loads(pop,po,argp,argl) ;
 	                            }
@@ -780,7 +746,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'l':
 	                    case 'a':
 	                        lip->have.list = TRUE ;
-	                        lip->final.list = TRUE ;
+	                        lip->finval.list = TRUE ;
 	                        lip->fl.list = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -798,7 +764,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -813,7 +779,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* set mode */
 	                    case 's':
 	                        lip->have.set = TRUE ;
-	                        lip->final.set = TRUE ;
+	                        lip->finval.set = TRUE ;
 	                        lip->fl.set = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -827,7 +793,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* unique mode */
 	                    case 'u':
 	                        lip->have.uniq = TRUE ;
-	                        lip->final.uniq = TRUE ;
+	                        lip->finval.uniq = TRUE ;
 	                        lip->fl.uniq = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -969,7 +935,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	    debugprintf("b_sysvar: f_flist=%u f_list=%u f_set=%u f_query=%u\n",
-	        lip->final.list,lip->fl.list,lip->fl.set,lip->fl.query) ;
+	        lip->finval.list,lip->fl.list,lip->fl.set,lip->fl.query) ;
 #endif
 
 /* continue */
@@ -1139,7 +1105,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1160,7 +1126,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1172,13 +1138,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1187,9 +1153,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 
 	                case akoname_set:
-	                    if (! lip->final.set) {
+	                    if (! lip->finval.set) {
 	                        lip->have.set = TRUE ;
-	                        lip->final.set = TRUE ;
+	                        lip->finval.set = TRUE ;
 	                        lip->fl.set = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1199,9 +1165,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_list:
-	                    if (! lip->final.list) {
+	                    if (! lip->finval.list) {
 	                        lip->have.list = TRUE ;
-	                        lip->final.list = TRUE ;
+	                        lip->finval.list = TRUE ;
 	                        lip->fl.list = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1211,18 +1177,18 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_dump:
-	                    if (! lip->final.dump) {
+	                    if (! lip->finval.dump) {
 	                        lip->have.dump = TRUE ;
-	                        lip->final.dump = TRUE ;
+	                        lip->finval.dump = TRUE ;
 	                        if (vl > 0)
 	                            lip->dumpfname = vp ;
 	                    }
 	                    break ;
 
 	                case akoname_audit:
-	                    if (! lip->final.audit) {
+	                    if (! lip->finval.audit) {
 	                        lip->have.audit = TRUE ;
-	                        lip->final.audit = TRUE ;
+	                        lip->finval.audit = TRUE ;
 	                        lip->fl.audit = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1232,9 +1198,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_star:
-	                    if (! lip->final.star) {
+	                    if (! lip->finval.star) {
 	                        lip->have.star = TRUE ;
-	                        lip->final.star = TRUE ;
+	                        lip->finval.star = TRUE ;
 	                        lip->fl.star = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1261,10 +1227,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(pip,aip,bop,ofn,dbn,afn,gfn)
+local int procargs(pip,aip,bop,ofn,dbn,afn,gfn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-BITS		*bop ;
+bits		*bop ;
 cchar		*ofn ;
 cchar		*dbn ;
 cchar		*afn ;
@@ -1364,9 +1330,9 @@ cchar		*gfn ;
 /* end subroutine (procargs) */
 
 
-static int procfiles(PROGINFO *pip,PARAMOPT *app)
+local int procfiles(PROGINFO *pip,paramopt *app)
 {
-	PARAMOPT_CUR	cur ;
+	paramopt_cur	cur ;
 	int		rs ;
 	int		c = 0 ;
 	cchar		*po_name = PO_FILENAME ;
@@ -1398,7 +1364,7 @@ static int procfiles(PROGINFO *pip,PARAMOPT *app)
 /* end subroutine (procfiles) */
 
 
-static int procfile(PROGINFO *pip,cchar fnp[],int fnl)
+local int procfile(PROGINFO *pip,cchar fnp[],int fnl)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -1413,7 +1379,7 @@ static int procfile(PROGINFO *pip,cchar fnp[],int fnl)
 /* end subroutine (procfile) */
 
 
-static int procsysdefs(PROGINFO *pip)
+local int procsysdefs(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1438,7 +1404,7 @@ static int procsysdefs(PROGINFO *pip)
 /* end subroutine (procsysdefs) */
 
 
-static int procsysdef(PROGINFO *pip,cchar fname[])
+local int procsysdef(PROGINFO *pip,cchar fname[])
 {
 	LOCINFO	*lip = pip->lip ;
 	ustat	usb ;
@@ -1512,7 +1478,7 @@ static int procsysdef(PROGINFO *pip,cchar fname[])
 /* end subroutine (procsysdef) */
 
 
-static int process(PROGINFO *pip,cchar dbname[],void *ofp,cchar gfname[])
+local int process(PROGINFO *pip,cchar dbname[],void *ofp,cchar gfname[])
 {
 	LOCINFO		*lip = pip->lip ;
 	VAR		sv ;
@@ -1583,7 +1549,7 @@ static int process(PROGINFO *pip,cchar dbname[],void *ofp,cchar gfname[])
 /* end subroutine (process) */
 
 
-static int procdumpfile(PROGINFO *pip,VAR *svp,cchar *dumpfname)
+local int procdumpfile(PROGINFO *pip,VAR *svp,cchar *dumpfname)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1608,7 +1574,7 @@ static int procdumpfile(PROGINFO *pip,VAR *svp,cchar *dumpfname)
 
 
 /* output all variables (sorted by key-name) */
-static int procoutall(PROGINFO *pip,VAR *svp,void *ofp)
+local int procoutall(PROGINFO *pip,VAR *svp,void *ofp)
 {
 	vecstr		keys, *klp = &keys ;
 	int		rs ;
@@ -1627,7 +1593,7 @@ static int procoutall(PROGINFO *pip,VAR *svp,void *ofp)
 	    if ((rs = var_curbegin(svp,&cur)) >= 0) {
 
 	        while (rs >= 0) {
-	            vl = var_enum(svp,&cur,kbuf,klen,NULL,vlen) ;
+	            vl = var_curenum(svp,&cur,kbuf,klen,NULL,vlen) ;
 	            if (vl == SR_NOTFOUND) break ;
 	            rs = vl ;
 
@@ -1689,7 +1655,7 @@ static int procoutall(PROGINFO *pip,VAR *svp,void *ofp)
 /* end subroutine (procoutall) */
 
 
-static int procgetfile(PROGINFO *pip,void *ofp,VAR *vfp,cchar gfname[])
+local int procgetfile(PROGINFO *pip,void *ofp,VAR *vfp,cchar gfname[])
 {
 	FIELD		fsb ;
 	SHIO		getfile, *gfp = &getfile ;
@@ -1752,7 +1718,7 @@ ret0:
 /* end subroutine (procgetfile) */
 
 
-static int procqkey(PROGINFO *pip,void *ofp,VAR *vfp,cchar *kp,int kl)
+local int procqkey(PROGINFO *pip,void *ofp,VAR *vfp,cchar *kp,int kl)
 {
 	LOCINFO		*lip = pip->lip ;
 	VAR_CUR		cur ;
@@ -1817,7 +1783,7 @@ static int procqkey(PROGINFO *pip,void *ofp,VAR *vfp,cchar *kp,int kl)
 /* end subroutine (procqkey) */
 
 
-static int procset(PROGINFO *pip,cchar dbname[])
+local int procset(PROGINFO *pip,cchar dbname[])
 {
 	ustat	sb ;
 	int		rs ;
@@ -1831,7 +1797,7 @@ static int procset(PROGINFO *pip,cchar dbname[])
 /* end subroutine (procset) */
 
 
-static int procseter(PROGINFO *pip,cchar dbname[],gid_t gid)
+local int procseter(PROGINFO *pip,cchar dbname[],gid_t gid)
 {
 	LOCINFO		*lip = pip->lip ;
 	HDBSTR_CUR	cur ;
@@ -1904,7 +1870,7 @@ static int procseter(PROGINFO *pip,cchar dbname[],gid_t gid)
 }
 /* end subroutine (procseter) */
 
-static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl) noex {
+local int procvarfile(PROGINFO *pip,cchar *fnp,int fnl) noex {
 	LOCINFO		*lip = pip->lip ;
 	dhbstr		*varp ;
 	field		fsb ;
@@ -2023,7 +1989,7 @@ static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl) noex {
 /* end subroutine (procvarfile) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs ;
 
@@ -2043,7 +2009,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2060,7 +2026,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #ifdef	COMMENT
-static int locinfo_varcount(LOCINFO *lip)
+local int locinfo_varcount(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2074,7 +2040,7 @@ static int locinfo_varcount(LOCINFO *lip)
 #endif /* COMMENT */
 
 
-static int locinfo_qkey(LOCINFO *lip,cchar *qp,int ql)
+local int locinfo_qkey(LOCINFO *lip,cchar *qp,int ql)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -2099,7 +2065,7 @@ static int locinfo_qkey(LOCINFO *lip,cchar *qp,int ql)
 /* end subroutine (locinfo_qkey) */
 
 
-static int locinfo_addvar(LOCINFO *lip,cchar *cp,int cl)
+local int locinfo_addvar(LOCINFO *lip,cchar *cp,int cl)
 {
 	HDBSTR		*varp = &lip->vars ;
 	int		rs = SR_OK ;
@@ -2133,7 +2099,7 @@ static int locinfo_addvar(LOCINFO *lip,cchar *cp,int cl)
 /* end subroutine (locinfo_addvar) */
 
 
-static int hasweird(cchar *sp,int sl)
+local int hasweird(cchar *sp,int sl)
 {
 	int		i ;
 	int		f = FALSE ;
