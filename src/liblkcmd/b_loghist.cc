@@ -1,15 +1,15 @@
-/* b_loghist */
+/* b_loghist SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in similar to 'who(1)' */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_FULLNAME	0		/* use fullname? */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
 
 /* revision history:
 
@@ -22,32 +22,33 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  It should also be able to
-	be made into a stand-alone program without much (if almost any)
-	difficulty, but I have not done that yet.
+  	Name:
+	b_loghist
 
-	This built-in is pretty straight forward.  We used the supplied UNIX®
-	System subroutines for accessing UTMPX because it is more portable and
-	speed is not paramount, like it would be if we were continuously
-	scanning the UTMPX DB for changed events.  In short, the system UTMPX
-	subroutines are fast enough for a one-shot scan through the UTMPX DB
-	like we are doing here.
-
-	One interesting thing to note is that we do maintain a cache of the
-	username-to-realname translations.  Even though we are only scanning
-	the UTMPX DB once, there may be several repeat logins by the same
-	username.  Using the cache, we bypass asking the system for every
-	username for those usernames that we've seen before.  I think that the
-	cost of maintaining the cache is not as bad as asking the system for
-	every username.  Your mileage may vary!
+	Description:
+	This is a built-in command to the KSH shell.  It should
+	also be able to be made into a stand-alone program without
+	much (if almost any) difficulty, but I have not done that
+	yet.  This built-in is pretty straight forward.  We used
+	the supplied UNIX® System subroutines for accessing UTMPX
+	because it is more portable and speed is not paramount,
+	like it would be if we were continuously scanning the UTMPX
+	DB for changed events.  In short, the system UTMPX subroutines
+	are fast enough for a one-shot scan through the UTMPX DB
+	like we are doing here.  One interesting thing to note is
+	that we do maintain a cache of the username-to-realname
+	translations.  Even though we are only scanning the UTMPX
+	DB once, there may be several repeat logins by the same
+	username.  Using the cache, we bypass asking the system for
+	every username for those usernames that we've seen before.
+	I think that the cost of maintaining the cache is not as
+	bad as asking the system for every username.  Your mileage
+	may vary!
 
 	Synopsis:
-
 	$ loghost [-l]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -71,7 +72,7 @@
 #include	<netdb.h>
 
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -80,7 +81,7 @@
 #include	<tmpx.h>
 #include	<realname.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<getusername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -123,26 +124,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	mkgecosname(char *,int,const char *) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	isdigitlatin(int) ;
-extern int	hasMeAlone(cchar *,int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -151,13 +132,6 @@ extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -175,7 +149,7 @@ struct locinfo_flags {
 
 struct locinfo {
 	const char	*wtmpfname ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	int		records ;
 	char		username[USERNAMELEN + 1] ;
 } ;
@@ -197,8 +171,8 @@ static int	mainsub(int,const char **,const char **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,vecstr *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,vecstr *,cchar *) ;
 static int	procloadnames(PROGINFO *,VECSTR *,const char *,int) ;
 static int	procloadname(PROGINFO *,vecstr *,const char *,int) ;
 static int	procout(PROGINFO *,const char *,vecstr *) ;
@@ -337,8 +311,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -486,7 +460,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_nh:
 	                    lip->fl.hdr = FALSE ;
-	                    lip->final.hdr = TRUE ;
+	                    lip->finval.hdr = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl) {
@@ -658,7 +632,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* print header */
 	                    case 'h':
-	                        lip->final.hdr = TRUE ;
+	                        lip->finval.hdr = TRUE ;
 	                        lip->fl.hdr = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -676,7 +650,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -947,7 +921,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -959,13 +933,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int		oi ;
 	        int		kl, vl ;
 	        const char	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -984,8 +958,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                case akoname_header:
 	                case akoname_hdr:
-	                    if (! lip->final.hdr) {
-	                        lip->final.hdr = TRUE ;
+	                    if (! lip->finval.hdr) {
+	                        lip->finval.hdr = TRUE ;
 	                        lip->fl.hdr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1012,7 +986,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,vecstr *nlp,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1403,7 +1377,7 @@ static int procthemout(PROGINFO *pip,void *ofp,vecobj *ulp)
 {
 	struct passwd	pw ;
 	LOCINFO		*lip = pip->lip ;
-	const int	pwlen = getbufsize(getbufsize_pw) ;
+	const int	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
