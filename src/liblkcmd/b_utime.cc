@@ -1,29 +1,30 @@
-/* b_utime */
+/* b_utime SPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to return load averages */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
 	= 1989-03-01, David A­D­ Morano
-        This code was originally written. This whole program, LOGDIR, is
-        needed for use on the Sun CAD machines because Sun doesn't support
-        LOGDIR or LOGNAME at this time. There was a previous program but it is
-        lost and not as good as this one anyway. This one handles NIS+ also.
-        (The previous one didn't.)
+	This code was originally written. This whole program, LOGDIR,
+	is needed for use on the Sun CAD machines because Sun doesn't
+	support LOGDIR or LOGNAME at this time. There was a previous
+	program but it is lost and not as good as this one anyway.
+	This one handles NIS+ also.  (The previous one didn't.)
 
 	= 1998-06-01, David A­D­ Morano
-        I enhanced the program a little to print out some other user information
-        besides the user's name and login home directory.
+	I enhanced the program a little to print out some other
+	user information besides the user's name and login home
+	directory.
 
 	= 1999-03-01, David A­D­ Morano
-        I enhanced the program to also print out effective UID and effective
-        GID.
+	I enhanced the program to also print out effective UID and
+	effective GID.
 
 	= 2003-10-01, David A­D­ Morano
 	This is now a built-in command for the KSH shell.
@@ -34,15 +35,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_utime
+
 	Synopsis:
-
 	$ utime spec(s)
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>	/* must be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -63,7 +64,7 @@
 #include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctype.h>
@@ -82,7 +83,7 @@
 
 #include	"shio.h"
 #include	"kshlib.h"
-#include	"b_utime.h"
+#include	"b_uctime"
 #include	"defs.h"
 
 
