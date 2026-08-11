@@ -1,4 +1,4 @@
-/* b_tabsvt SUPPORT */
+/* b_tabsvt SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -39,6 +39,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_tabsvt
+
 	Synopsis:
 	$ tabsvt
 
@@ -63,7 +66,7 @@
 #include	<termios.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
@@ -136,40 +139,8 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfshrink(cchar *,int,char **) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	tcgetlines(int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	pcsmailcheck(cchar *,char *,int,cchar *) ;
-extern int	nusers(cchar *) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_std(time_t,char *) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -194,7 +165,7 @@ struct locinfo_flags {
 struct locinfo {
 	char		*prpcs ;
 	char		*utfname ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 } ;
 
 struct termtype {
@@ -205,19 +176,19 @@ struct termtype {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,SHIO *,int,cchar *) ;
-static int	gettermflags(PROGINFO *,cchar *,int *) ;
-static int	terminit(PROGINFO *,cchar *,int,int,char *,int) ;
-static int	termclear(PROGINFO *,cchar *,int,int,char *,int) ;
-static int	termdate(PROGINFO *,cchar *,int,int,char *,int,time_t) ;
-static int	bufsd(PROGINFO *,int,SBUF *,int,cchar *,int) ;
-static int	bufdiv(PROGINFO *,int,SBUF *,int,int,cchar *,int) ;
-static int	loadstrs(SBUF *,cchar **) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,SHIO *,int,cchar *) ;
+local int	gettermflags(PROGINFO *,cchar *,int *) ;
+local int	terminit(PROGINFO *,cchar *,int,int,char *,int) ;
+local int	termclear(PROGINFO *,cchar *,int,int,char *,int) ;
+local int	termdate(PROGINFO *,cchar *,int,int,char *,int,time_t) ;
+local int	bufsd(PROGINFO *,int,SBUF *,int,cchar *,int) ;
+local int	bufdiv(PROGINFO *,int,SBUF *,int,int,cchar *,int) ;
+local int	loadstrs(SBUF *,cchar **) ;
 
 
 /* local variables */
@@ -420,12 +391,12 @@ int p_tabsvt(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO	li, *lip = &li ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 	SHIO		outfile, *ofp = &outfile ;
 
@@ -761,13 +732,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                    case 'a':
 	                        lip->have.all = TRUE ;
-	                        lip->final.all = TRUE ;
+	                        lip->finval.all = TRUE ;
 	                        lip->fl.all = TRUE ;
 	                        break ;
 
 	                    case 'd':
 	                        lip->have.date = TRUE ;
-	                        lip->final.date = TRUE ;
+	                        lip->finval.date = TRUE ;
 	                        lip->fl.date = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -780,7 +751,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                    case 'i':
 	                        lip->have.init = TRUE ;
-	                        lip->final.init = TRUE ;
+	                        lip->finval.init = TRUE ;
 	                        lip->fl.init = TRUE ;
 	                        break ;
 
@@ -791,7 +762,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 				} else
@@ -1067,7 +1038,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1088,7 +1059,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1100,13 +1071,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-		while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+		while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	    	    if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1115,9 +1086,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 
 	        case akoname_all:
-	            if (! lip->final.all) {
+	            if (! lip->finval.all) {
 	                lip->have.all = TRUE ;
-	                lip->final.all = TRUE ;
+	                lip->finval.all = TRUE ;
 	                lip->fl.all = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1127,9 +1098,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            break ;
 
 	        case akoname_init:
-	            if (! lip->final.init) {
+	            if (! lip->finval.init) {
 	                lip->have.init = TRUE ;
-	                lip->final.init = TRUE ;
+	                lip->finval.init = TRUE ;
 	                lip->fl.init = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1139,9 +1110,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            break ;
 
 	        case akoname_sd:
-	            if (! lip->final.sd) {
+	            if (! lip->finval.sd) {
 	                lip->have.sd = TRUE ;
-	                lip->final.sd = TRUE ;
+	                lip->finval.sd = TRUE ;
 	                lip->fl.sd = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1151,9 +1122,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            break ;
 
 	        case akoname_clear:
-	            if (! lip->final.clear) {
+	            if (! lip->finval.clear) {
 	                lip->have.clear = TRUE ;
-	                lip->final.date = TRUE ;
+	                lip->finval.date = TRUE ;
 	                lip->fl.clear = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1163,9 +1134,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            break ;
 
 	        case akoname_date:
-	            if (! lip->final.date) {
+	            if (! lip->finval.date) {
 	                lip->have.date = TRUE ;
-	                lip->final.date = TRUE ;
+	                lip->finval.date = TRUE ;
 	                lip->fl.date = TRUE ;
 	                if (vl > 0) {
 			    rs = (vp,vl) ;
@@ -1175,9 +1146,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            break ;
 
 	        case akoname_scroll:
-	            if (! lip->final.scroll) {
+	            if (! lip->finval.scroll) {
 	                lip->have.scroll = TRUE ;
-	                lip->final.scroll = TRUE ;
+	                lip->finval.scroll = TRUE ;
 	                lip->fl.scroll = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1187,9 +1158,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            break ;
 
 	        case akoname_la:
-	            if (! lip->final.la) {
+	            if (! lip->finval.la) {
 	                lip->have.la = TRUE ;
-	                lip->final.la = TRUE ;
+	                lip->finval.la = TRUE ;
 	                lip->fl.la = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1199,9 +1170,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            break ;
 
 	        case akoname_mailcheck:
-	            if (! lip->final.mailcheck) {
+	            if (! lip->finval.mailcheck) {
 	                lip->have.mailcheck = TRUE ;
-	                lip->final.mailcheck = TRUE ;
+	                lip->finval.mailcheck = TRUE ;
 	                lip->fl.mailcheck = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1211,9 +1182,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	            break ;
 
 	        case akoname_nusers:
-	            if (! lip->final.nusers) {
+	            if (! lip->finval.nusers) {
 	                lip->have.nusers = TRUE ;
-	                lip->final.nusers = TRUE ;
+	                lip->finval.nusers = TRUE ;
 	                lip->fl.nusers = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1240,7 +1211,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(pip,ofp,fd,termspec)
+local int process(pip,ofp,fd,termspec)
 PROGINFO	*pip ;
 SHIO		*ofp ;
 int		fd ;
@@ -1374,7 +1345,7 @@ ret0:
 /* end subroutine (process) */
 
 
-static int gettermflags(pip,termspec,rp)
+local int gettermflags(pip,termspec,rp)
 PROGINFO	*pip ;
 cchar	termspec[] ;
 int		*rp ;
@@ -1409,7 +1380,7 @@ int		*rp ;
 
 
 /* create the data to set (reset-fix) the terminal state */
-static int terminit(pip,termspec,termflags,lines,buf,buflen)
+local int terminit(pip,termspec,termflags,lines,buf,buflen)
 PROGINFO	*pip ;
 cchar	termspec[] ;
 int		termflags ;
@@ -1582,7 +1553,7 @@ ret0:
 
 
 /* clear the terminal */
-static int termclear(pip,termspec,termflags,lines,buf,buflen)
+local int termclear(pip,termspec,termflags,lines,buf,buflen)
 PROGINFO	*pip ;
 cchar	termspec[] ;
 int		termflags ;
@@ -1633,7 +1604,7 @@ ret0:
 
 #ifdef	COMMENT
 
-static int termlines(pip,termflags,lines,buf,buflen,daytime)
+local int termlines(pip,termflags,lines,buf,buflen,daytime)
 PROGINFO	*pip ;
 int		termflags ;
 int		lines ;
@@ -1713,7 +1684,7 @@ ret0:
 #endif /* COMMENT */
 
 
-static int termdate(pip,termspec,termflags,lines,buf,buflen,daytime)
+local int termdate(pip,termspec,termflags,lines,buf,buflen,daytime)
 PROGINFO	*pip ;
 cchar	termspec[] ;
 int		termflags ;
@@ -1964,7 +1935,7 @@ ret0:
 /* end subroutine (termdate) */
 
 
-static int bufsd(pip,termflags,bufp,x,buf,buflen)
+local int bufsd(pip,termflags,bufp,x,buf,buflen)
 PROGINFO	*pip ;
 int		termflags ;
 SBUF		*bufp ;
@@ -2053,7 +2024,7 @@ ret0:
 /* end subroutine (bufsd) */
 
 
-static int bufdiv(pip,termflags,bufp,y,x,buf,buflen)
+local int bufdiv(pip,termflags,bufp,y,x,buf,buflen)
 PROGINFO	*pip ;
 int		termflags ;
 SBUF		*bufp ;
@@ -2136,7 +2107,7 @@ ret0:
 
 
 /* load a set of strings into the buffer */
-static int loadstrs(sbp,spp)
+local int loadstrs(sbp,spp)
 SBUF		*sbp ;
 cchar	**spp ;
 {
