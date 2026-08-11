@@ -25,28 +25,28 @@
 
 
 enum babieshdrhs {
-	babieshdrh_shmsize,
-	babieshdrh_dbsize,
+	babieshdrh_shmsz,
+	babieshdrh_dbsz,
 	babieshdrh_dbtime,
 	babieshdrh_wtime,
 	babieshdrh_atime,
 	babieshdrh_acount,		/* access count */
 	babieshdrh_muoff,
-	babieshdrh_musize,
+	babieshdrh_musz,
 	babieshdrh_btoff,
 	babieshdrh_btlen,
 	babieshdrh_overlast
 } ; /* end enum */
 
 struct babieshdr_head {
-	uint		shmsize ;
-	uint		dbsize ;
+	uint		shmsz ;
+	uint		dbsz ;
 	uint		dbtime ;
 	uint		wtime ;
 	uint		atime ;		/* access time */
 	uint		acount ;	/* access count */
 	uint		muoff ;
-	uint		musize ;
+	uint		musz ;
 	uint		btoff ;
 	uint		btlen ;
 	uchar		vetu[4] ;
