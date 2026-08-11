@@ -15,7 +15,6 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	LCONFIG_INCLUDE
 #define	LCONFIG_INCLUDE
 
