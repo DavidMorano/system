@@ -5,7 +5,7 @@
 /* uunames-query database manager */
 /* version %I% last-modified %G% */
 
-#define	CF_GETPROGROOT	1		/* use 'getprogroot(3dam)' */
+#define	CF_GETPROGROOT	1		/* use |getprogroot(3dam)| */
 
 /* revision history:
 
@@ -28,45 +28,46 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<ctime>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<bufsizeget.h>
-#include	<endian.h>
-#include	<vecstr.h>
-#include	<vecobj.h>
-#include	<spawnproc.h>
-#include	<getprogroot.h>
-#include	<storebuf.h>
-#include	<sbuf.h>
-#include	<ids.h>
-#include	<mkdirs.h>
-#include	<permx.h>
-#include	<ascii.h>
-#include	<baops.h>
-#include	<sbuf.h>
-#include	<strn.h>
-#include	<sfx.h>			/* |sfbasename(3uc)| */
-#include	<snx.h>
-#include	<snwcpy.h>
-#include	<mkx.h>
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<pathclean.h>
-#include	<strwcpy.h>
-#include	<char.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<getprogroot.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<mkdirs.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<ascii.h>		/* LIBUC */
+#include	<baops.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC |sfbasename(3uc)| */
+#include	<mkx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<pathclean.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uunames.h"
 
@@ -181,7 +182,7 @@ import sif ;
 
 #define	UU		uunames
 #define	CUR		uunames_cur
-#define	ENVPOP		struct envpop
+#define	ENVPOP		envpop
 
 #define	VARDNAME	"var"
 #define	INDDNAME	"uunames"
@@ -202,25 +203,24 @@ import sif ;
 
 #define	PROG_MKUU	"mkuunames"
 
+#ifndef	CF_GETPROGROOT
+#define	CF_GETPROGROOT	1		/* use 'getprogroot(3dam)' */
+#endif
+
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
-typedef int (*uunames_f)(uunames *,time_t) noex ;
+extern "C" {
+    typedef int (*uunames_f)(uunames *,time_t) noex ;
+}
 
 typedef uunames_cur	cur ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-}
 
 
 /* external variables */
@@ -234,12 +234,12 @@ namespace {
 	int		ll ;
 	liner() noex : lp(nullptr), ll(0) { } ;
 	liner(cchar *p,int l) noex : lp(p), ll(l) { } ;
-    } ;
+    } ; /* end struct */
     struct envpop {
 	cchar		*name ;
 	cchar		*sub1dname ;
 	cchar		*sub2dname ;
-    } ;
+    } ; /* end struct */
 } /* end namespace */
 
 typedef liner *		linerp ;
@@ -251,11 +251,12 @@ template<typename ... Args>
 local int uunames_ctor(uunames *op,Args ... args) noex {
     	UUNAMES		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->nlp = new(nothrow) vecobj) != np) ylikely {
+	    if ((op->nlp = new(nt) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
@@ -367,10 +368,10 @@ constexpr cpcchar	envdefs[] = {
 } ; /* end array */
 
 constexpr envpop	envpops[] = {
-	{ VARPATH, "bin", "sbin" },
-	{ VARLIBPATH, "lib", nullptr },
-	{ VARMANPATH, "man", nullptr },
-	{ nullptr, nullptr, nullptr }
+	{ VARPATH,	"bin",		"sbin" },
+	{ VARLIBPATH,	"lib",		nullptr },
+	{ VARMANPATH,	"man",		nullptr },
+	{ nullptr,	nullptr,	nullptr }
 } ; /* end array */
 
 constexpr uunames_f	indopens[] = {
@@ -379,12 +380,13 @@ constexpr uunames_f	indopens[] = {
 	nullptr
 } ; /* end array */
 
-constexpr char		filemagic[] = UUNAMES_DBMAGICSTR ;
+constexpr char		filemagic[]	= UUNAMES_DBMAGICSTR ;
+cbool			f_getprogroot	= CF_GETPROGROOT ;
 
 
 /* exported variables */
 
-extern const uunames_obj	uunames_modinfo = {
+const uunames_obj	uunames_modinfo = {
     	"uunames",
 	szof(uunames),
 	szof(uunames_cur)
@@ -399,17 +401,17 @@ extern const uunames_obj	uunames_modinfo = {
 int uunames_open(UU *op,cchar *pr,cchar *dbname) noex {
 	time_t		dt = getustime ;
 	int		rs ;
-	if ((rs = uunames_ctor(op,pr)) >= 0) {
+	if ((rs = uunames_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (pr[0]) {
 	        if ((dbname == nullptr) || (dbname[0] == '\0')) {
 	            dbname = DBNAME ;
 	        }
-		if ((rs = uunames_infoloadbegin(op,pr,dbname)) >= 0) {
+		if ((rs = uunames_infoloadbegin(op,pr,dbname)) >= 0) ylikely {
 	            cint	sz = szof(liner) ;
 	            cint	ne = DEFNAMES ;
-	            if ((rs = vecobj_start(op->nlp,sz,ne,0)) >= 0) {
-			if ((rs = uunames_indopen(op,dt)) >= 0) {
+	            if ((rs = vecobj_start(op->nlp,sz,ne,0)) >= 0) ylikely {
+			if ((rs = uunames_indopen(op,dt)) >= 0) ylikely {
 			    op->magval = UUNAMES_MAGIC ;
 			}
 			if (rs < 0) {
@@ -431,7 +433,7 @@ int uunames_open(UU *op,cchar *pr,cchar *dbname) noex {
 int uunames_close(UU *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = uunames_magic(op)) >= 0) {
+	if ((rs = uunames_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = uunames_indclose(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -455,7 +457,7 @@ int uunames_close(UU *op) noex {
 
 int uunames_audit(UU *op) noex {
 	int		rs ;
-	if ((rs = uunames_magic(op)) >= 0) {
+	if ((rs = uunames_magic(op)) >= 0) ylikely {
 	    rs = uunames_indcheck(op,0) ;
 	} /* end if (magic) */
 	return rs ;
@@ -463,7 +465,7 @@ int uunames_audit(UU *op) noex {
 
 int uunames_curbegin(UU *op,cur *curp) noex {
 	int		rs ;
-	if ((rs = uunames_magic(op,curp)) >= 0) {
+	if ((rs = uunames_magic(op,curp)) >= 0) ylikely {
 	    memclear(curp) ;
 	    curp->i = -1 ;
 	    op->ncursors += 1 ;
@@ -474,7 +476,7 @@ int uunames_curbegin(UU *op,cur *curp) noex {
 
 int uunames_curend(UU *op,cur *curp) noex {
 	int		rs ;
-	if ((rs = uunames_magic(op,curp)) >= 0) {
+	if ((rs = uunames_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
@@ -485,16 +487,16 @@ int uunames_curend(UU *op,cur *curp) noex {
 
 /* returns 0=not-found, (>0)=found-with-this-length */
 int uunames_exists(UU *op,cchar *sp,int sl) noex {
+	cnullptr	np{} ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
 	int		kl = 0 ;
-	if ((rs = uunames_magic(op,sp)) >= 0) {
+	if ((rs = uunames_magic(op,sp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (sp[0]) {
-	        if ((rs = uunames_indcheck(op,0)) >= 0) {
-		    if (cchar *kp ; (rs = lm_strw(sp,sl,&kp)) >= 0) {
-			cnullptr	np{} ;
+	    if (sp[0]) ylikely {
+	        if ((rs = uunames_indcheck(op,0)) >= 0) ylikely {
+		    if (cchar *kp ; (rs = lm_strw(sp,sl,&kp)) >= 0) ylikely {
 	                kl = rs ;
 			{
 			    vecobj	*nlp = op->nlp ;
@@ -517,10 +519,10 @@ int uunames_exists(UU *op,cchar *sp,int sl) noex {
 int uunames_curenum(UU *op,cur *curp,char *ubuf,int ulen) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = uunames_magic(op,curp,ubuf)) >= 0) {
+	if ((rs = uunames_magic(op,curp,ubuf)) >= 0) ylikely {
 	    cint	i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	    void	*vp{} ;
-	    if ((rs = vecobj_get(op->nlp,i,&vp)) >= 0) {
+	    if ((rs = vecobj_get(op->nlp,i,&vp)) >= 0) ylikely {
 	        liner	*lep = linerp(vp) ;
 	        if ((rs = snwcpy(ubuf,ulen,lep->lp,lep->ll)) >= 0) {
 	            len = rs ;
@@ -534,8 +536,8 @@ int uunames_curenum(UU *op,cur *curp,char *ubuf,int ulen) noex {
 int uunames_count(UU *op) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = uunames_magic(op)) >= 0) {
-	    if ((rs = uunames_indcheck(op,0)) >= 0) {
+	if ((rs = uunames_magic(op)) >= 0) ylikely {
+	    if ((rs = uunames_indcheck(op,0)) >= 0) ylikely {
 	        rs = vecobj_count(op->nlp) ;
 		c = rs ;
 	    }
@@ -547,16 +549,23 @@ int uunames_count(UU *op) noex {
 /* private subroutines */
 
 local int uunames_infoloadbegin(UU *op,cc *pr,cc *dbname) noex {
-	int		rs = SR_OK ;
-	op->pr = pr ;
-	op->dbname = dbname ;
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+	    op->pr = pr ;
+	    op->dbname = dbname ;
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (uunames_infoloadbegin) */
 
 local int uunames_infoloadend(UU *op) noex {
-	op->pr = nullptr ;
-	op->dbname = nullptr ;
-	return SR_OK ;
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+	    op->pr = nullptr ;
+	    op->dbname = nullptr ;
+	} /* end if (non-null) */
+	return rs ;
 } /* end subroutine (uunames_infoloadend) */
 
 local int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
@@ -564,14 +573,14 @@ local int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 	int		rs1 ;
 	int		rv = 0 ;
 	op->indfname = nullptr ;
-	if (char *indfname ; (rs = lm_mp(&indfname)) >= 0) {
+	if (char *indfname ; (rs = lm_mp(&indfname)) >= 0) ylikely {
 	    cchar	*suf = INDSUF ;
 	    cchar	*ends = ENDIANSTR ;
-	    if ((rs = mkfnamesuf2(indfname,indname,suf,ends)) >= 0) {
+	    if ((rs = mkfnamesuf2(indfname,indname,suf,ends)) >= 0) ylikely {
 		cint	fl = rs ;
-	        if (cchar *cp ; (rs = lm_strw(indfname,fl,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = lm_strw(indfname,fl,&cp)) >= 0) ylikely {
 		    op->indfname = cp ;
-		    if ((rs = uunames_filemapcreate(op,dt)) >= 0) {
+		    if ((rs = uunames_filemapcreate(op,dt)) >= 0) ylikely {
 			rs = uunames_indlist(op) ;
 			rv = rs ;
 		    } /* end if */
@@ -580,7 +589,7 @@ local int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 	                rs1 = lm_free(vp) ;
 	                if (rs >= 0) rs = rs1 ;
 	                op->dbname = nullptr ;
-	            }
+	            } /* end if (error) */
 		} /* end if (memory-allocation) */
 	    } /* end if (mkfnamesuf) */
 	    rs1 = lm_free(indfname) ;
@@ -647,12 +656,14 @@ local int uunames_filemapcreate(UU *op,time_t dt) noex {
 local int uunames_filemapdestroy(UU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->mapdata != nullptr) {
-	    rs1 = u_mmapend(op->mapdata,op->mapsize) ;
+	if (op->mapdata) {
+	    caddr_t	md = op->mapdata ;
+	    csize	ms = op->mapsize ;
+	    rs1 = u_mmapend(md,ms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->mapdata = nullptr ;
 	    op->mapsize = 0 ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (uunames_filemapdestroy) */
 
@@ -893,7 +904,7 @@ local int uunames_mkuunamesi(UU *op,cchar *dname) noex {
 	ps.opts |= SPAWNPROC_OSETPGRP ;
 	for (i = 0 ; i < 3 ; i += 1) {
 	    ps.disp[i] = (i != 2) ? SPAWNPROC_DCLOSE : SPAWNPROC_DINHERIT ;
-	}
+	} /* end for */
 	rs = spawnproc(&ps,progfname,av,ev) ;
 	cpid = rs ;
 
@@ -924,8 +935,8 @@ local int uunames_envpaths(UU *op,vecstr *elp) noex {
 	cint		ne = 40 ;
 	int		rs ;
 	int		rs1 ;
-	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
-	    if (vecstr pc ; (rs = pc.start(ne,vo)) >= 0) {
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
+	    if (vecstr pc ; (rs = pc.start(ne,vo)) >= 0) ylikely {
 	        int	bl ;
 	        int	pl ;
 	        char	*bp = nullptr ;
@@ -1030,9 +1041,9 @@ local int mkindfname(char *rbuf,cc *dname,cc *name,cc *suf,cc *end) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    int		dnl = 0 ;
-	    if (sbuf sb ; (rs = sb.start(rbuf,rs)) >= 0) {
+	    if (sbuf sb ; (rs = sb.start(rbuf,rs)) >= 0) ylikely {
 		{
 	            if ((rs = sb.strw(dname,-1)) >= 0) {
 	                dnl = rs ;
@@ -1073,12 +1084,12 @@ local int vecstr_loadpath(vecstr *clp,cchar *pp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 	    sif		of(pp,-1,":;") ;
 	    int		cl ;
 	    cchar	*cp ;
 	    while ((cl = of(&cp)) > 0) {
-	        if ((rs = pathclean(tbuf,cp,cl)) >= 0) {
+	        if ((rs = pathclean(tbuf,cp,cl)) >= 0) ylikely {
 	            if ((rs = clp->findn(tbuf,cl)) == rsn) {
 	                c += 1 ;
 		        rs = clp->add(tbuf,cl) ;
@@ -1130,29 +1141,38 @@ local int mkpathval(vecstr *clp,char *vbuf,int vbuflen) noex {
 	return (rs >= 0) ? rlen : rs ;
 } /* end subroutine (mkpathval) */
 
-local int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
-	liner		**e1pp = (liner **) v1pp ;
-	liner		**e2pp = (liner **) v2pp ;
-	liner		*l1p ;
-	liner		*l2p ;
+local int esrch(con liner *l1p,con liner *l2p) noex {
 	int		rc = 0 ;
-	l1p = *e1pp ;
-	l2p = *e2pp ;
-	if (l1p || l2p) {
-	    if (l1p) {
-	        if (l2p) {
-		    if ((rc = (l1p->lp[0] - l2p->lp[0])) == 0) {
-	    	        if ((rc = strncmp(l1p->lp,l2p->lp,l1p->ll)) == 0) {
-	    		    rc = (l1p->ll - l2p->ll) ;
-		        }
-		    }
-	        } else {
-	            rc = -1 ;
-	        }
-	    } else {
-	        rc = +1 ;
-	    }
-	} /* end if (at least one is non-null) */
+        if (l1p || l2p) ylikely {
+            if (l1p) {
+                if (l2p) {
+                    cint cl = l1p->ll ;
+                    cc *c1p = l1p->lp ;
+                    cc *c2p = l2p->lp ;
+                    if ((rc = (c1p[0] - c2p[0])) == 0) {
+                        if ((rc = strncmp(c1p,c2p,cl)) == 0) {
+                            rc = (l1p->ll - l2p->ll) ;
+                        }
+                    }
+                } else {
+                    rc = -1 ;
+                }
+            } else {
+                rc = +1 ;
+            }
+        } /* end if (at least one is non-null) */
+	return rc ;
+} /* end subroutine (esrch) */
+
+local int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
+	con liner	**e1pp = cast_reinterpret<con liner **>(v1pp) ;
+	con liner	**e2pp = cast_reinterpret<con liner **>(v2pp) ;
+	int		rc = 0 ;
+	if (e1pp && e2pp) ylikely {
+	    con liner	*l1p = *e1pp ;
+	    con liner	*l2p = *e2pp ;
+	    rc = esrch(l1p,l2p) ;
+	} /* end if (non-null) */
 	return rc ;
 } /* end subroutine (vesrch) */
 
