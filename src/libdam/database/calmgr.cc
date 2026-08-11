@@ -58,11 +58,11 @@
 #include	<char.h>		/* LIBUC */
 #include	<isx.h>			/* LIBUC */
 #include	<localmisc.h>		/* LIBU |COLUMNS| */
+#include	<calent.h>		/* LIBDAM */
+#include	<cyi.h>			/* LIBDAM */
+#include	<cyimk.h>		/* LIBDAM */
 
 #include	"calmgr.h"
-#include	"calent.h"
-#include	"cyi.h"
-#include	"cyimk.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -207,7 +207,7 @@ int calmgr_start(calmgr *op,calyears *cyp,int cidx,cchar *dn,cchar *cn) noex {
 	        if ((rs = calmgr_argbegin(op,dn,cn)) >= 0) {
 	            if ((rs = calmgr_dbloadbegin(op,dt)) >= 0) {
 	                if ((rs = calmgr_idxdir(op)) >= 0) {
-	                    cint	vo = vechand.m.stationary ;
+	                    cint	vo = vechandm.stationary ;
 	                    if ((rs = vechand_start(op->idxp,1,vo)) >= 0) {
 	                        op->fl.idxes = true ;
 				op->magval = CALMGR_MAGIC ;
@@ -232,7 +232,7 @@ int calmgr_start(calmgr *op,calyears *cyp,int cidx,cchar *dn,cchar *cn) noex {
 int calmgr_finish(calmgr *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = calmgr_magic(op)) >= 0) {
+	if ((rs = calmgr_magic(op)) >= 0) ylikely {
 	    if (op->fl.idxes) {
 	        {
 	            rs1 = calmgr_idxends(op) ;
@@ -280,7 +280,7 @@ int calmgr_lookup(calmgr *op,vecobj *rlp,calmgr_q *qp) noex {
 
 int calmgr_getci(calmgr *op) noex {
     	int		rs ;
-	if ((rs = calmgr_magic(op)) >= 0) {
+	if ((rs = calmgr_magic(op)) >= 0) ylikely {
 	    rs = op->cidx ;
 	} /* end if (magic) */
 	return rs ;
@@ -288,7 +288,7 @@ int calmgr_getci(calmgr *op) noex {
 
 int calmgr_getbase(calmgr *op,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = calmgr_magic(op,rpp)) >= 0) {
+	if ((rs = calmgr_magic(op,rpp)) >= 0) ylikely {
 	    cchar	*md{} ;
 	    rs = SR_INVALID ;
 	    if (op->mapdata) {
@@ -302,10 +302,10 @@ int calmgr_getbase(calmgr *op,cchar **rpp) noex {
 
 int calmgr_gethash(calmgr *op,calent *ep,uint *rp) noex {
 	int		rs ;
-	if ((rs = calmgr_magic(op,ep,rp)) >= 0) {
-	    if ((rs = calent_gethash(ep,rp)) == 0) {
+	if ((rs = calmgr_magic(op,ep,rp)) >= 0) ylikely {
+	    if ((rs = calent_gethash(ep,rp)) == 0) ylikely {
 	        cchar	*md = op->mapdata ;
-	        if ((rs = calent_mkhash(ep,md)) >= 0) {
+	        if ((rs = calent_mkhash(ep,md)) >= 0) ylikely {
 		    rs = calent_gethash(ep,rp) ;
 	        }
 	    }
@@ -315,8 +315,8 @@ int calmgr_gethash(calmgr *op,calent *ep,uint *rp) noex {
 
 int calmgr_loadbuf(calmgr *op,char *rbuf,int rlen,calent *ep) noex {
 	int		rs ;
-	if ((rs = calmgr_magic(op,rbuf,ep)) >= 0) {
-	    if (cchar *md ; (rs = calmgr_mapdata(op,&md)) >= 0) {
+	if ((rs = calmgr_magic(op,rbuf,ep)) >= 0) ylikely {
+	    if (cchar *md ; (rs = calmgr_mapdata(op,&md)) >= 0) ylikely {
 	        rs = calent_loadbuf(ep,rbuf,rlen,md) ;
 	    }
 	} /* end if (magic) */
@@ -325,7 +325,7 @@ int calmgr_loadbuf(calmgr *op,char *rbuf,int rlen,calent *ep) noex {
 
 int calmgr_audit(calmgr *op) noex {
 	int		rs ;
-	if ((rs = calmgr_magic(op)) >= 0) {
+	if ((rs = calmgr_magic(op)) >= 0) ylikely {
 	    vechand	*ilp = op->idxp ;
 	    void	*vp{} ;
 	    for (int i = 0 ; ilp->get(i,&vp) >= 0 ; i += 1) {
@@ -347,7 +347,7 @@ local int calmgr_argbegin(calmgr *op,cchar *dn,cchar *cn) noex {
 	int		sz = 0 ;
 	sz += (lenstr(dn)+1) ;
 	sz += (lenstr(cn)+1) ;
-	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
+	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) ylikely {
 	    op->a = bp ;
 	    op->dn = bp ;
 	    bp = (strwcpy(bp,dn,-1)+1) ;
@@ -360,11 +360,11 @@ local int calmgr_argbegin(calmgr *op,cchar *dn,cchar *cn) noex {
 local int calmgr_argend(calmgr *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->a != nullptr) {
+	if (op->a) {
 	    rs1 = lm_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->a = nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (calmgr_argend) */
 
@@ -392,13 +392,13 @@ local int calmgr_dbmapcreate(calmgr *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ai = 0 ;
-	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 	    cint	nlen = maxpath ;
 	    cchar	*suf = CALMGR_DBSUF ;
 	    char	*nbuf = (a + ((maxpath + 1) * ai++)) ;
-	    if ((rs = snsds(nbuf,nlen,op->cn,suf)) >= 0) {
+	    if ((rs = snsds(nbuf,nlen,op->cn,suf)) >= 0) ylikely {
 	        char	*dbuf = (a + ((maxpath + 1) * ai++)) ;
-	        if ((rs = mkpath2(dbuf,op->dn,nbuf)) >= 0) {
+	        if ((rs = mkpath2(dbuf,op->dn,nbuf)) >= 0) ylikely {
 		    rs = calmgr_dbmaper(op,dbuf,dt) ;
 	        } /* end if (mkpath) */
 	    } /* end if (snsds) */
@@ -414,9 +414,9 @@ local int calmgr_dbmaper(calmgr *op,cc *dbuf,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	cmode		om = 0666 ;
-        if ((rs = u_open(dbuf,of,om)) >= 0) {
+        if ((rs = u_open(dbuf,of,om)) >= 0) ylikely {
             cint        fd = rs ;
-            if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+            if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
                 if (S_ISREG(sb.st_mode)) {
                     csize       msize = size_t(INT_MAX) ;
                     op->fsize = size_t(sb.st_size) ;
@@ -508,8 +508,8 @@ local int calmgr_lookone(calmgr *op,vecobj *rlp,cyi *cip,calmgr_q *qp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (cyi_cur ccur ; (rs = cyi_curbegin(cip,&ccur)) >= 0) {
-	    if ((rs = cyi_curcite(cip,&ccur,qp)) >= 0) {
+	if (cyi_cur ccur ; (rs = cyi_curbegin(cip,&ccur)) >= 0) ylikely {
+	    if ((rs = cyi_curcite(cip,&ccur,qp)) >= 0) ylikely {
 	        cint		celen = CEBUFLEN ;
 		if (char *cebuf ; (rs = lm_mall((celen+1),&cebuf)) >= 0) {
 		cyi_ent		ce ;
@@ -576,9 +576,9 @@ local int calmgr_lookone(calmgr *op,vecobj *rlp,cyi *cip,calmgr_q *qp) noex {
 local int calmgr_mkidx(calmgr *op,int y) noex {
 	cint		csz = szof(calmgr_idx) ;
 	int		rs ;
-	if (void *vp ; (rs = lm_mall(csz,&vp)) >= 0) {
+	if (void *vp ; (rs = lm_mall(csz,&vp)) >= 0) ylikely {
 	    calmgr_idx *cip = (calmgr_idx *) vp ;
-	    if ((rs = calmgr_idxbegin(op,cip,y)) >= 0) {
+	    if ((rs = calmgr_idxbegin(op,cip,y)) >= 0) ylikely {
 	        vechand		*ilp = op->idxp ;
 	        rs = vechand_add(ilp,cip) ;
 	        if (rs < 0) {
@@ -766,7 +766,7 @@ local int calmgr_mkcyi(calmgr *op,int y) noex {
 local int calmgr_mkdirs(calmgr *op,cchar *dname,mode_t dm) noex {
 	int		rs ;
 	dm &= S_IAMB ;
-	if ((rs = mkdirs(dname,dm)) >= 0) {
+	if ((rs = mkdirs(dname,dm)) >= 0) ylikely {
 	    if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
 	        if (((sb.st_mode & dm) != dm)) {
 	            rs = uc_minmod(dname,dm) ;
