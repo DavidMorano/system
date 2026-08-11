@@ -1,4 +1,4 @@
-/* b_smesg SUPPORT */
+/* b_smesg SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -26,6 +26,9 @@
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_smesg
 
 	Synopsis:
 	$ smesg [-y|-n] [<fromuser(s)>]
@@ -203,14 +206,14 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procmesg(PROGINFO *,SHIO *) ;
 static int	procmesgout(PROGINFO *,SHIO *,cchar *,ustat *) ;
-static int	procnotes(PROGINFO *,ARGINFO *,BITS *,SHIO *,cchar *) ;
+static int	procnotes(PROGINFO *,ARGINFO *,bits *,SHIO *,cchar *) ;
 static int	procnotesout(PROGINFO *,SHIO *) ;
 static int	procnoteouter(PROGINFO *,SHIO *,LOCNOTE *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
 static int	procargers(PROGINFO *,OSETSTR *) ;
 static int	procloadnames(PROGINFO *,OSETSTR *,cchar *,int) ;
 static int	procloadname(PROGINFO *,OSETSTR *,cchar *,int) ;
@@ -479,8 +482,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -910,7 +913,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 				} else
@@ -1153,7 +1156,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 			    if ((rs = proguserlist_begin(pip)) >= 0) {
 			        if ((rs = locinfo_noteadm(lip)) >= 0) {
 				    ARGINFO	*aip = &ainfo ;
-				    BITS	*bop = &pargs ;
+				    bits	*bop = &pargs ;
 				    cchar	*ofn = ofname ;
 				    cchar	*afn = afname ;
 		    	            rs = process(pip,aip,bop,ofn,afn) ;
@@ -1304,7 +1307,7 @@ static int usage(PROGINFO *pip) noex {
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1316,13 +1319,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1400,7 +1403,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1580,7 +1583,7 @@ static int procmesgout(PROGINFO *pip,SHIO *ofp,cchar *td,ustat *usbp)
 /* end subroutine (procmesgout) */
 
 
-static int procnotes(PROGINFO *pip,ARGINFO *aip,BITS *bop,SHIO *ofp,cchar *afn)
+static int procnotes(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	cint	cmd = kshlibcmd_notecount ;
@@ -1662,7 +1665,7 @@ static int procnoteouter(PROGINFO *pip,SHIO *ofp,LOCNOTE *onp)
 		onp->type,onp->user) ;
 #endif
 
-	if ((rs = tmtime_localtime(&tm,onp->stime)) >= 0) {
+	if ((rs = tmtime_timelocal(&tm,onp->stime)) >= 0) {
 	    cint	tlen = TIMEBUFLEN ;
 	    cchar	*fmt = "%c %s %s « %r\n" ;
 	    cchar	*tf = "%R" ;
@@ -1681,7 +1684,7 @@ static int procnoteouter(PROGINFO *pip,SHIO *ofp,LOCNOTE *onp)
 		wlen += rs ;
 
 	    } /* end if (sntmtime) */
-	} /* end if (tmtime_localtime) */
+	} /* end if (tmtime_timelocal) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1693,7 +1696,7 @@ static int procnoteouter(PROGINFO *pip,SHIO *ofp,LOCNOTE *onp)
 /* end subroutine (procnoteouter) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	OSETSTR		ss ;
 	cint	n = 20 ;
@@ -1883,7 +1886,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 
 	if (nl < 0) nl = strlen(np) ;
 
-	if ((np[0] == '\0') || hasMeAlone(np,nl)) {
+	if ((np[0] == '\0') || hasonlyme(np,nl)) {
 	    if ((rs = locinfo_username(lip)) >= 0) {
 	        np = lip->unbuf ;
 	        nl = rs ;
