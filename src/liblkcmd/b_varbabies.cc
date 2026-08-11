@@ -1,19 +1,17 @@
-/* b_varbabies */
+/* b_varbabies SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to for specialized DB management */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-
 	This code was originally written.  
-
 
 */
 
@@ -21,15 +19,15 @@
 
 /**************************************************************************
 
+  	Name:
+	b_varbabies
+
 	Synopsis:
-
 	$ varbabies <date(s)>
-
 
 *****************************************************************************/
 
-
-#include	<envstandards.h>	/* must be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -50,7 +48,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctype.h>
-#include	<time.h>
+#include	<ctime>
 
 #include	<usystem.h>
 #include	<sigman.h>
@@ -82,30 +80,9 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-
-extern int	proginfo_setpiv(struct proginfo *,const char *,
+extern int	proginfo_setpiv(struct proginfo *,cchar *,
 			const struct pivars *) ;
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 
 
 /* external variables */
@@ -125,8 +102,8 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	const char	*dbname ;
-	struct locinfo_flags	have, f, changed, final, open ;
+	cchar	*dbname ;
+	struct locinfo_flags	have, f, changed, finval, open ;
 	struct proginfo	*pip ;
 	CVTDATER	cvt ;
 	BABYCALC	bc ;
@@ -138,18 +115,18 @@ struct locinfo {
 
 static void	sighand_int(int) ;
 
-static int	usage(struct proginfo *) ;
+local int	usage(struct proginfo *) ;
 
-static int	procopts(struct proginfo *,KEYOPT *) ;
-static int	procinfo(struct proginfo *,void *) ;
-static int	procspec(struct proginfo *,void *, const char *) ;
+local int	procopts(struct proginfo *,keyopt *) ;
+local int	procinfo(struct proginfo *,void *) ;
+local int	procspec(struct proginfo *,void *, cchar *) ;
 
-static int	locinfo_start(struct locinfo *,struct proginfo *) ;
-static int	locinfo_dbname(struct locinfo *,const char *) ;
-static int	locinfo_flags(struct locinfo *,int,int) ;
-static int	locinfo_lookinfo(struct locinfo *,BABYCALC_INFO *) ;
-static int	locinfo_lookup(struct locinfo *,const char *,int,uint *) ;
-static int	locinfo_finish(struct locinfo *) ;
+local int	locinfo_start(struct locinfo *,struct proginfo *) ;
+local int	locinfo_dbname(struct locinfo *,cchar *) ;
+local int	locinfo_flags(struct locinfo *,int,int) ;
+local int	locinfo_lookinfo(struct locinfo *,BABYCALC_INFO *) ;
+local int	locinfo_lookup(struct locinfo *,cchar *,int,uint *) ;
+local int	locinfo_finish(struct locinfo *) ;
 
 
 /* local variables */
@@ -178,7 +155,7 @@ static const int	sigints[] = {
 	0
 } ;
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -226,7 +203,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char *akonames[] = {
+static cchar *akonames[] = {
 	"quiet",
 	"refint",
 	NULL
@@ -269,7 +246,7 @@ void	*contextp ;
 	SHIO	errfile ;
 	SHIO	outfile, *ofp = &outfile ;
 
-	KEYOPT	akopts ;
+	keyopt	akopts ;
 
 	int	argr, argl, aol, akl, avl, kwi ;
 	int	ai, ai_max, ai_pos ;
@@ -288,14 +265,14 @@ void	*contextp ;
 	int	f_info = FALSE ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
 	char	argpresent[MAXARGGROUPS] ;
-	const char	*pr = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*dbname = NULL ;
-	const char	*cp ;
+	cchar	*pr = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*dbname = NULL ;
+	cchar	*cp ;
 
 
 	if (contextp != NULL) lib_initenviron() ;
@@ -815,7 +792,7 @@ void	*contextp ;
 	        int	ml ;
 	        int	fl ;
 
-	        const char	*fp ;
+	        cchar	*fp ;
 
 	        char	linebuf[LINEBUFLEN + 1] ;
 	        char	name[MAXNAMELEN + 1] ;
@@ -972,7 +949,7 @@ int	sn ;
 /* end subroutine (sighand_int) */
 
 
-static int usage(pip)
+local int usage(pip)
 struct proginfo	*pip ;
 {
 	int	rs ;
@@ -995,21 +972,21 @@ struct proginfo	*pip ;
 
 
 /* process the program ako-options */
-static int procopts(pip,kop)
+local int procopts(pip,kop)
 struct proginfo	*pip ;
-KEYOPT		*kop ;
+keyopt		*kop ;
 {
 	struct locinfo	*lip = pip->lip ;
 
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 
 	int	rs = SR_OK ;
 	int	oi ;
 	int	kl, vl ;
 	int	c = 0 ;
 
-	const char	*kp, *vp ;
-	const char	*cp ;
+	cchar	*kp, *vp ;
+	cchar	*cp ;
 
 
 	if ((cp = getenv(VAROPTS)) != NULL)
@@ -1022,7 +999,7 @@ KEYOPT		*kop ;
 
 	if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 
-	while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 /* get the first value for this key */
 
@@ -1036,9 +1013,9 @@ KEYOPT		*kop ;
 	        switch (oi) {
 
 	        case akoname_quiet:
-	            if (! pip->final.quiet) {
+	            if (! pip->finval.quiet) {
 	                pip->have.quiet = TRUE ;
-	                pip->final.quiet = TRUE ;
+	                pip->finval.quiet = TRUE ;
 	                pip->fl.quiet = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
 	                    pip->fl.quiet = (uv > 0) ? 1 : 0 ;
@@ -1046,9 +1023,9 @@ KEYOPT		*kop ;
 	            break ;
 
 	        case akoname_intref:
-	            if (! lip->final.intref) {
+	            if (! lip->finval.intref) {
 	                lip->have.intref = TRUE ;
-	                lip->final.intref = TRUE ;
+	                lip->finval.intref = TRUE ;
 	                lip->fl.intref = TRUE ;
 	                if (vl > 0) {
 			    rs = cfdecui(vp,vl,&uv) ;
@@ -1077,7 +1054,7 @@ ret0:
 
 
 /* process an information request */
-static int procinfo(pip,ofp)
+local int procinfo(pip,ofp)
 struct proginfo	*pip ;
 void		*ofp ;
 {
@@ -1125,10 +1102,10 @@ ret0:
 
 
 /* process a specification name */
-static int procspec(pip,ofp,name)
+local int procspec(pip,ofp,name)
 struct proginfo	*pip ;
 void		*ofp ;
-const char	name[] ;
+cchar	name[] ;
 {
 	struct locinfo	*lip = pip->lip ;
 
@@ -1178,7 +1155,7 @@ ret0:
 /* end subroutine (procspec) */
 
 
-static int locinfo_start(lip,pip)
+local int locinfo_start(lip,pip)
 struct locinfo	*lip ;
 struct proginfo	*pip ;
 {
@@ -1195,9 +1172,9 @@ struct proginfo	*pip ;
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_dbname(lip,dbname)
+local int locinfo_dbname(lip,dbname)
 struct locinfo	*lip ;
-const char	*dbname ;
+cchar	*dbname ;
 {
 
 
@@ -1210,7 +1187,7 @@ const char	*dbname ;
 /* end subroutine (locinfo_dbname) */
 
 
-static int locinfo_flags(lip,f_init,f_nocache)
+local int locinfo_flags(lip,f_init,f_nocache)
 struct locinfo	*lip ;
 int		f_init ;
 int		f_nocache ;
@@ -1227,7 +1204,7 @@ int		f_nocache ;
 /* end subroutine (locinfo_flags) */
 
 
-static int locinfo_lookinfo(lip,bip)
+local int locinfo_lookinfo(lip,bip)
 struct locinfo	*lip ;
 BABYCALC_INFO	*bip ;
 {
@@ -1260,9 +1237,9 @@ BABYCALC_INFO	*bip ;
 /* end subroutine (locinfo_info) */
 
 
-static int locinfo_lookup(lip,dbuf,dlen,rp)
+local int locinfo_lookup(lip,dbuf,dlen,rp)
 struct locinfo	*lip ;
-const char	dbuf[] ;
+cchar	dbuf[] ;
 int		dlen ;
 uint		*rp ;
 {
@@ -1351,7 +1328,7 @@ ret0:
 /* end subroutine (locinfo_lookup) */
 
 
-static int locinfo_finish(lip)
+local int locinfo_finish(lip)
 struct locinfo	*lip ;
 {
 	int		rs = SR_OK ;
