@@ -215,7 +215,7 @@ int cyi_open(cyi *op,int year,cchar *dname,cchar *cname) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		cyi_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (cyi_ctor) */
 	return rs ;
 } /* end subroutine (cyi_open) */
@@ -223,7 +223,7 @@ int cyi_open(cyi *op,int year,cchar *dname,cchar *cname) noex {
 int cyi_close(cyi *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = cyi_magic(op)) >= 0) {
+	if ((rs = cyi_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = cyi_dblose(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -239,7 +239,7 @@ int cyi_close(cyi *op) noex {
 
 int cyi_audit(cyi *op) noex {
 	int		rs ;
-	if ((rs = cyi_magic(op)) >= 0) {
+	if ((rs = cyi_magic(op)) >= 0) ylikely {
 	    rs = cyi_auditvt(op) ;
 	} /* end if (magic) */
 	return rs ;
@@ -248,7 +248,7 @@ int cyi_audit(cyi *op) noex {
 int cyi_count(cyi *op) noex {
 	int		rs = SR_OK ;
 	int		nent = 0 ;
-	if ((rs = cyi_magic(op)) >= 0) {
+	if ((rs = cyi_magic(op)) >= 0) ylikely {
 	    cyihdr	*hip = &op->fhi ;
 	    nent = hip->nentries ;
 	} /* end if (magic) */
@@ -258,7 +258,7 @@ int cyi_count(cyi *op) noex {
 int cyi_getinfo(cyi *op,cyi_info *ip) noex {
 	int		rs ;
 	int		nent = 0 ;
-	if ((rs = cyi_magic(op)) >= 0) {
+	if ((rs = cyi_magic(op)) >= 0) ylikely {
 	    cyihdr	*hip = &op->fhi ;
 	    if (ip) {
 	        memclear(ip) ;
@@ -274,7 +274,7 @@ int cyi_getinfo(cyi *op,cyi_info *ip) noex {
 
 int cyi_curbegin(cyi *op,cyi_cur *curp) noex {
     	int		rs ;
-	if ((rs = cyi_magic(op,curp)) >= 0) {
+	if ((rs = cyi_magic(op,curp)) >= 0) ylikely {
 	    memclear(curp) ;
 	    curp->citekey = UINT_MAX ;
 	    curp->i = -1 ;
@@ -286,7 +286,7 @@ int cyi_curbegin(cyi *op,cyi_cur *curp) noex {
 
 int cyi_curend(cyi *op,cyi_cur *curp) noex {
     	int		rs ;
-	if ((rs = cyi_magic(op,curp)) >= 0) {
+	if ((rs = cyi_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (curp->magval == CYI_MAGIC) {
 	        if (op->ncursors > 0) {
@@ -301,7 +301,7 @@ int cyi_curend(cyi *op,cyi_cur *curp) noex {
 int cyi_curcite(cyi *op,cyi_cur *curp,cyi_q *qp) noex {
 	int		rs ;
 	int		vi = 0 ;
-	if ((rs = cyi_magic(op,curp,qp)) >= 0) {
+	if ((rs = cyi_magic(op,curp,qp)) >= 0) ylikely {
 	    cyi_fmi	*mip = &op->fmi ;
 	    cyihdr	*hip = &op->fhi ;
 	    rs = SR_NOTOPEN ;
@@ -339,7 +339,7 @@ int cyi_curcite(cyi *op,cyi_cur *curp,cyi_q *qp) noex {
 int cyi_curread(cyi *op,cyi_cur *curp,cyi_ent *ep,char *ebuf,int elen) noex {
 	int		rs ;
 	int		rl = 0 ;
-	if ((rs = cyi_magic(op,curp,ep,ebuf)) >= 0) {
+	if ((rs = cyi_magic(op,curp,ep,ebuf)) >= 0) ylikely {
 	    cyi_fmi	*mip = &op->fmi ;
 	    cyihdr	*hip = &op->fhi ;
 	    rs = SR_NOTOPEN ;
@@ -448,7 +448,7 @@ local int cyi_dbfindone(cyi *op,time_t dt,cchar *cal,cchar *tmpfname) noex {
 	    if (strncmp(cp,cal,mnl) != 0) rs = SR_NOMSG ;
 	    if (rs < 0) {
 		cyi_loadend(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if */
 	return rs ;
 } /* end subroutine (cyi_dbfindone) */
@@ -470,15 +470,15 @@ local int cyi_dblose(cyi *op) noex {
 
 local int cyi_loadbegin(cyi *op,time_t dt,cchar *fname) noex {
 	int		rs ;
-	int		fsize = 0 ;
+	int		fsz = 0 ;
 	if ((rs = cyi_mapcreate(op,dt,fname)) >= 0) {
 	    fsize = rs ;
 	    rs = cyi_proc(op,dt) ;
 	    if (rs < 0) {
 		cyi_mapdestroy(op) ;
-	    }
+	    } /* end if (error) */
 	}
-	return (rs >= 0) ? fsize : rs ;
+	return (rs >= 0) ? fsz : rs ;
 } /* end subroutine (cyi_loadbegin) */
 
 local int cyi_loadend(cyi *op) noex {
@@ -501,14 +501,13 @@ local int cyi_mapcreate(cyi *op,time_t dt,cchar *fname) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
-	int		fsize = 0 ;	/* subroutine return value */
+	int		fsz = 0 ;	/* subroutine return value */
 	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	    USTAT	sb ;
 	    cint	fd = rs ;
-	    if ((rs = u_fstat(fd,&sb)) >= 0) {
-		fsize = (sb.st_size & INT_MAX) ;
+	    if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
+		csize fsize = size_t(sb.st_size) ;
 	        if (fsize > 0) {
-	    	    csize	ms = size_t(sb.st_size) ;
+	    	    csize	ms = fsize ;
 	    	    cint	mp = PROT_READ ;
 	    	    cint	mf = MAP_SHARED ;
 	    	    void	*md{} ;
@@ -518,6 +517,7 @@ local int cyi_mapcreate(cyi *op,time_t dt,cchar *fname) noex {
 	        	mip->mapsize = ms ;
 	        	mip->ti_mod = sb.st_mtime ;
 	        	mip->ti_map = dt ;
+			fsz = intsat(fsize) ;
 	    	    } /* end if (u_mmapbegin) */
 		} else {
 	    	    rs = SR_NOCSI ;
@@ -526,7 +526,7 @@ local int cyi_mapcreate(cyi *op,time_t dt,cchar *fname) noex {
 	    rs1 = u_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file) */
-	return (rs >= 0) ? fsize : rs ;
+	return (rs >= 0) ? fsz : rs ;
 } /* end subroutine (cyi_mapcreate) */
 
 local int cyi_mapdestroy(cyi *op) noex {
@@ -589,7 +589,7 @@ local int cyi_verify(cyi *op,time_t dt) noex {
 	cyihdr		*hip = &op->fhi ;
 	uint		utime = (uint) dt ;
 	int		rs = SR_OK ;
-	int		size ;
+	int		sz ;
 	int		f = true ;
 	{
 	    f = f && (hip->fsize == mip->mapsize) ;
@@ -597,13 +597,13 @@ local int cyi_verify(cyi *op,time_t dt) noex {
 	}
 	{
 	    f = f && (hip->vioff <= mip->mapsize) ;
-	    size = hip->vilen * 5 * szof(uint) ;
-	    f = f && ((hip->vioff + size) <= mip->mapsize) ;
+	    sz = hip->vilen * 5 * szof(uint) ;
+	    f = f && ((hip->vioff + sz) <= mip->mapsize) ;
 	}
 	{
 	    f = f && (hip->vloff <= mip->mapsize) ;
-	    size = hip->vllen * 2 * szof(uint) ;
-	    f = f && ((hip->vloff + size) <= mip->mapsize) ;
+	    sz = hip->vllen * 2 * szof(uint) ;
+	    f = f && ((hip->vloff + sz) <= mip->mapsize) ;
 	}
 	{
 	    f = f && (hip->vilen == hip->nentries) ;
@@ -650,8 +650,8 @@ local int cyi_bsearch(cyi *op,uint (*vt)[5],int vtlen,uint vte[5]) noex {
 	if (op) ylikely {
 	    uint	citekey = (vte[3] & 0xffff) ;
 	    uint	(*vtep)[5] ;
-	    int		vtesize = (5 * szof(uint)) ;
-	    vtep = (uint (*)[5]) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
+	    int		vtesz = (5 * szof(uint)) ;
+	    vtep = (uint (*)[5]) bsearch(vte,vt,vtlen,size_t(vtesz),vtecmp) ;
 	    rs = (vtep) ? (vtep - vt) : SR_NOTFOUND ;
 	    vi = rs ;
 	    if (rs >= 0) {
@@ -697,8 +697,8 @@ local int cyi_loadbve(cyi *op,cyi_ent *bvep,char *ebuf,int ebuflen,
 	    if (li < hip->vllen) {
 	        cyi_fmi		*mip = &op->fmi ;
 	        cint		bo = CYI_BO((ulong) ebuf) ;
-	        cint		linesize = ((nlines + 1) * szof(cyi_line)) ;
-	        if (linesize <= (ebuflen - bo)) {
+	        cint		linesz = ((nlines + 1) * szof(cyi_line)) ;
+	        if (linesz <= (ebuflen - bo)) {
 	            cyi_line	*lines ;
 	            caddr_t	ma = caddr_t(mip->mapdata) ;
 	            uint	(*lt)[2] ;
@@ -713,7 +713,7 @@ local int cyi_loadbve(cyi *op,cyi_ent *bvep,char *ebuf,int ebuflen,
 	            if (rs >= 0) {
 	                lines[i].loff = 0 ;
 	                lines[i].llen = 0 ;
-	                rlen = (linesize + bo) ;
+	                rlen = (linesz + bo) ;
 	            }
 	        } else {
 	            rs = SR_OVERFLOW ;
@@ -779,7 +779,7 @@ local bool isNotOurFile(int rs) noex {
 
 int vars::mkvars() noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	}
     	return rs ;
