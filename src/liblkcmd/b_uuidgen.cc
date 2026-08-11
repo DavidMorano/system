@@ -1,4 +1,4 @@
-/* b_uuidgen SUPPORT */
+/* b_uuidgen SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -20,12 +20,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_uuidgen
+
 	Synopsis:
 	$ babies <date(s)>
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -86,12 +89,6 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
-
 
 /* external variables */
 
@@ -108,7 +105,7 @@ struct locinfo_flags {
 struct locinfo {
 	PROGINFO	*pip ;
 	const char	*dbname ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 } ;
 
@@ -119,7 +116,7 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
@@ -210,8 +207,8 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -491,7 +488,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 				} else
@@ -635,7 +632,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	if (rs >= 0) {
 	    if ((rs = locinfo_dbname(lip,dbname)) >= 0) {
 		ARGINFO	*aip = &ainfo ;
-		BITS	*bop = &pargs ;
+		bits	*bop = &pargs ;
 		cchar	*ofn = ofname ;
 		cchar	*afn = afname ;
 		rs = process(pip,aip,bop,ofn,afn) ;
@@ -757,7 +754,7 @@ static int usage(PROGINFO *pip)
 
 
 /* ARGSUSED */
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
