@@ -1,6 +1,9 @@
-/* varmks HEADER */
+/* varmks HEADER (Variable-Makes) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
+
+/* make a VAR database */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -26,7 +29,7 @@
 
 
 struct varmks_object {
-	char		*name ;
+	cchar		*name ;
 	uint		objsz ;
 	uint		cursz ;
 } ; /* end struct */
@@ -68,13 +71,17 @@ typedef	VARMKS_REC	varmks_rec ;
 
 EXTERNC_begin
 
-extern int	varmks_open(varmks *,cchar *,int,mode_t,int) noex ;
-extern int	varmks_addvar(varmks *,cchar *,cchar *,int) noex ;
-extern int	varmks_abort(varmks *) noex ;
-extern int	varmks_chgrp(varmks *,gid_t) noex ;
-extern int	varmks_close(varmks *) noex ;
+extern int	varmks_open	(varmks *,cchar *,int,mode_t,int) noex ;
+extern int	varmks_add	(varmks *,cchar *,cchar *,int) noex ;
+extern int	varmks_abort	(varmks *) noex ;
+extern int	varmks_chgrp	(varmks *,gid_t) noex ;
+extern int	varmks_close	(varmks *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const varmks_obj		varmks_modinfo ;
+#endif /* __cplusplus */
 
 
 #endif /* VARMKS_INCLUDE */
