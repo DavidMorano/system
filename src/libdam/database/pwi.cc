@@ -260,15 +260,14 @@ int pwi_open(pwi *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = pwi_ctor(op,pr)) >= 0) {
+	if ((rs = pwi_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0]) {
-	        static cint	rsv = var.mkvars() ;
-	        if ((rs = rsv) >= 0) {
+	    if (pr[0]) ylikely {
+	        if (static cint	rsv = var.mkvars() ; (rs = rsv) >= 0) ylikely {
 		    opener	so(pr,dbname) ;
-		    if ((rs = so.start()) >= 0) {
-	    	        if ((rs = so.mkidxdname()) >= 0) {
-			    if ((rs = so.decide()) >= 0) {
+		    if ((rs = so.start()) >= 0) ylikely {
+	    	        if ((rs = so.mkidxdname()) >= 0) ylikely {
+			    if ((rs = so.decide()) >= 0) ylikely {
 				cc *sfn = so.idxdname ;
 				if ((rs = ipasswd_open(op->dbp,sfn)) >= 0) {
 				    rv = rs ;
@@ -292,7 +291,7 @@ int opener::decide() noex {
 	cint		to = TO_FILEMOD ;
 	int		rs ;
 	int		rs1 ;
-	if (char *fbuf ; (rs = libmem.mp(&fbuf)) >= 0) {
+	if (char *fbuf ; (rs = libmem.mp(&fbuf)) >= 0) ylikely {
 	    cchar	*suf = IPASSWD_SUF ;
 	    cchar	*endstr = ENDIANSTR ;
 	    if ((rs = mkfnamesuf(fbuf,idxdname,suf,endstr)) >= 0) {
@@ -320,7 +319,7 @@ int opener::decide() noex {
 int pwi_close(pwi *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pwi_magic(op)) >= 0) {
+	if ((rs = pwi_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = ipasswd_close(op->dbp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -354,7 +353,7 @@ int pwi_lookup(pwi *op,char *rbuf,int rlen,cchar *name) noex {
     	int		rs ;
 	int		rs1 ;
 	int		ul = 0 ;
-	if ((rs = pwi_magic(op,rbuf,name)) >= 0) {
+	if ((rs = pwi_magic(op,rbuf,name)) >= 0) ylikely {
 	    cint	nl = lenstr(name) ;
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
@@ -396,14 +395,14 @@ int lookuper::proc(cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		ul = 0 ;
 	int		c = 0 ;
-	if (char *pwbuf ; (rs = libmem.pw(&pwbuf)) >= 0) {
+	if (char *pwbuf ; (rs = libmem.pw(&pwbuf)) >= 0) ylikely {
 	    ucentpw	pw ;
 	    cint	pwlen = rs ;
-	    if (realname rn ; (rs = rn.start(sp,sl)) >= 0) {
+	    if (realname rn ; (rs = rn.start(sp,sl)) >= 0) ylikely {
 		ipasswd		*iop = op->dbp ;
 		auto		ip_cb = ipasswd_curbegin ;
-		if (ipasswd_cur	cur ; (rs = ip_cb(iop,&cur)) >= 0) {
-		    if (char *un ; (rs = libmem.un(&un)) >= 0) {
+		if (ipasswd_cur	cur ; (rs = ip_cb(iop,&cur)) >= 0) ylikely {
+		    if (char *un ; (rs = libmem.un(&un)) >= 0) ylikely {
 			pwdesc	pd(&pw,pwbuf,pwlen) ;
 		        cint	fopts = 0 ;
 	                while (rs >= 0) {
@@ -480,7 +479,7 @@ int opener::mkidxdname() noex {
 	        cint	clen = nodelen ;
 	        char	*nbuf = (a + (ai++ * (nodelen + 1))) ;
 	        char	*cbuf = (a + (ai++ * (nodelen + 1))) ;
-	        if ((rs = getnodename(nbuf,nlen)) >= 0) {
+	        if ((rs = getnodename(nbuf,nlen)) >= 0) ylikely {
 	            cint	rsn = SR_NOTFOUND ;
 	            cchar	*nn ;
 	            if ((rs = prgetclustername(pr,cbuf,clen,nbuf)) >= 0) {
@@ -520,9 +519,9 @@ int opener::mk() noex {
         int		rs ;
         int		rs1 ;
         int		rv = 0 ;
-	if (char *pbuf ; (rs = libmem.mp(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = libmem.mp(&pbuf)) >= 0) ylikely {
 	    pbuf[0] = '\0' ;
-            if ((rs = mkbegin(pbuf)) >= 0) {
+            if ((rs = mkbegin(pbuf)) >= 0) ylikely {
     		{
 		    rs = mkproc(pbuf) ;
 		    rv = rs ;
@@ -540,9 +539,9 @@ int opener::mkbegin(char *pbuf) noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (ids id ; (rs = id.load) >= 0) {
+	if (ids id ; (rs = id.load) >= 0) ylikely {
 	    for (int i = 0 ; prbins[i] != nullptr ; i += 1) {
-	        if ((rs = mkpath(pbuf,pr,prbins[i],progmkpwi)) >= 0) {
+	        if ((rs = mkpath(pbuf,pr,prbins[i],progmkpwi)) >= 0) ylikely {
 		    const uid_t		u = id.uid ;
 		    const gid_t		g = id.gid ;
 		    const gid_t		*gids = id.gids ;
@@ -571,8 +570,8 @@ int opener::mkproc(cchar *pbuf) noex {
 	int		rs ;
 	int		rs1 ;
 	int		cpid = 0 ; /* return-value */
-	if (vecstr envs ; (rs = vecstr_start(&envs,vn,vo)) >= 0) {
-	    if (char *abuf ; (rs = libmem.mn(&abuf)) >= 0) {
+	if (vecstr envs ; (rs = vecstr_start(&envs,vn,vo)) >= 0) ylikely {
+	    if (char *abuf ; (rs = libmem.mn(&abuf)) >= 0) ylikely {
 		cint	alen = rs ;
 	        int	ai = 0 ;
 	        cchar	*av[10] ;
@@ -604,7 +603,7 @@ int opener::mkproc(cchar *pbuf) noex {
 int opener::mkspawn(cchar *pbuf,mainv av,vecstr *elp) noex {
     	int		rs ;
 	int		cpid = 0 ;
-	if (mainv ev{} ; (rs = elp->getvec(&ev)) >= 0) {
+	if (mainv ev{} ; (rs = elp->getvec(&ev)) >= 0) ylikely {
 	    spawnproc_con	ps{} ;
 	    ps.opts |= SPAWNPROC_OIGNINTR ;
 	    ps.opts |= SPAWNPROC_OSETPGRP ;
@@ -652,20 +651,20 @@ int opener::mkenv(vecstr *elp) noex {
 	            rs = elp->envadd(exports[i],valp) ;
 		}
 	    } /* end for */
-	}
+	} /* end if */
 	return rs ;
 } /* end method (opener:mkenv) */
 
 local int realname_isextra(realname *op,pwdesc *pdp,cchar *un) noex {
 	int		rs ;
 	int		f = false ;
-	if (cchar *lp{} ; (rs = realname_getlast(op,&lp)) >= 0) {
+	if (cchar *lp{} ; (rs = realname_getlast(op,&lp)) >= 0) ylikely {
 	    cint	ll = rs ;
 	    if (strnbrk(lp,ll,extras) == nullptr) {
 		ucentpw		*pwp = pdp->pwp ;
 		cint		pwlen = pdp->pwlen ;
 		char		*pwbuf = pdp->pwbuf ;
-		if ((rs = getpwx_name(pwp,pwbuf,pwlen,un)) > 0) {
+		if ((rs = getpwx_name(pwp,pwbuf,pwlen,un)) > 0) ylikely {
 		    cchar	*gecos = pwp->pw_gecos ;
 		    if (cchar *sp{} ; (rs = getgecosname(gecos,-1,&sp)) > 0) {
 			f = (strnbrk(sp,rs,extras) != nullptr) ;
@@ -680,13 +679,13 @@ local int realname_isextra(realname *op,pwdesc *pdp,cchar *un) noex {
 
 int vars::mkvars() noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
-	    if ((rs = bufsizeget(bufsize_mn)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 	        maxnamelen = rs ;
-	        if ((rs = bufsizeget(bufsize_nn)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_nn)) >= 0) ylikely {
 		    nodenamelen = rs ;
-	            if ((rs = bufsizeget(bufsize_un)) >= 0) {
+	            if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 			usernamelen = rs ;
 			realnamelen = REALNAMELEN ;
 		    }
