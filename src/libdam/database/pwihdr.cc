@@ -95,11 +95,11 @@ constexpr char		magicstr[]	= PWIHDR_MAGICSTR ;
 int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && hbuf) {
+	if (op && hbuf) ylikely {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsz + vsz)) {
-	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) {
+	    if (bl >= (magicsz + vsz)) ylikely {
+	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) ylikely {
 	            bp += magicsz ;
 	            bl -= magicsz ;
 	    	    memcopy(bp,op->vetu,vsz) ;
@@ -107,7 +107,7 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 	    	    bp[1] = uchar(ENDIAN) ;
 	    	    bp += vsz ;
 	    	    bl -= vsz ;
-	    	    if (bl >= tabsize) {
+	    	    if (bl >= tabsize) ylikely {
 	        	uint			*header = uintp(bp) ;
 			header[pwihdr_fsz]	= op->fsz ;
 			header[pwihdr_wrtime]	= op->wrtime ;
@@ -142,15 +142,15 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 int pwihdr_wr(pwihdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && hbuf) {
+	if (op && hbuf) ylikely {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) ylikely {
 		rs = SR_OK ;
 	        bp += magicsz ;
 	        bl -= magicsz ;
 	        /* read out the VETU information */
-	        if (bl >= vsz) {
+	        if (bl >= vsz) ylikely {
 	            memcopy(op->vetu,bp,vsz) ;
 	            if (op->vetu[0] != PWIHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
