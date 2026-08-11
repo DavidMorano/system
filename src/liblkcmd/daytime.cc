@@ -47,10 +47,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<estrings.h>
 #include	<modload.h>
-#include	<nistinfo.h>
+#include	<nistinfo.h>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC */
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"mfserve.h"
@@ -95,7 +97,7 @@ typedef mainv	mv ;
 /* forward references */
 
 template<typename ... Args>
-static int daytime_ctor(lfm *op,Args ... args) noex {
+local int daytime_ctor(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = memclear(op) ;
@@ -104,7 +106,7 @@ static int daytime_ctor(lfm *op,Args ... args) noex {
 }
 /* end subroutine (daytime_ctor) */
 
-static int daytime_dtor(lfm *op) noex {
+local int daytime_dtor(lfm *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -114,7 +116,7 @@ static int daytime_dtor(lfm *op) noex {
 /* end subroutine (daytime_dtor) */
 
 template<typename ... Args>
-static inline int daytime_magic(lfm *op,Args ... args) noex {
+local inline int daytime_magic(lfm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == DAYTIME_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -123,9 +125,9 @@ static inline int daytime_magic(lfm *op,Args ... args) noex {
 }
 /* end subroutine (daytime_magic) */
 
-static int daytime_argsbegin(DT *,cchar **) noex ;
-static int daytime_argsend(DT *) noex ;
-static int daytime_worker(DT *) noex ;
+local int daytime_argsbegin(DT *,cchar **) noex ;
+local int daytime_argsend(DT *) noex ;
+local int daytime_worker(DT *) noex ;
 
 
 /* local variables */
@@ -240,7 +242,7 @@ int daytime_abort(DT *op) noex {
 
 /* provate subroutines */
 
-static int daytime_argsbegin(DT *op,cchar **argv) noex {
+local int daytime_argsbegin(DT *op,cchar **argv) noex {
 	vecpstr		*alp = &op->args ;
 	cint		ss = DAYTIME_CSIZE ;
 	int		rs ;
@@ -255,10 +257,9 @@ static int daytime_argsbegin(DT *op,cchar **argv) noex {
 	    }
 	} /* end if (m-a) */
 	return rs ;
-}
-/* end subroutine (daytime_argsbegin) */
+} /* end subroutine (daytime_argsbegin) */
 
-static int daytime_argsend(DT *op) noex {
+local int daytime_argsend(DT *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fl.args) ylikely {
@@ -267,10 +268,9 @@ static int daytime_argsend(DT *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (daytime_argsend) */
+} /* end subroutine (daytime_argsend) */
 
-static int daytime_worker(DT *op) noex {
+local int daytime_worker(DT *op) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	if (! op->f_abort) {
@@ -286,7 +286,7 @@ static int daytime_worker(DT *op) noex {
 	                custime		dt = getustime ;
 	                char		ntbuf[NISTINFO_BUFLEN+1+1] ;
 	                strdcpy1(ni.org,NISTINFO_ORGLEN,obuf) ;
-	                timestr_nist(dt,&ni,ntbuf) ;
+	                timestr_nist(dt,ntbuf,&ni) ;
 	                {
 	                    int		tl = strlen(ntbuf) ;
 			    ntbuf[tl++] = '\n' ;
@@ -302,7 +302,6 @@ static int daytime_worker(DT *op) noex {
 	} /* end if (not aborting) */
 	op->f_exiting = true ;
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (daytime_worker) */
+} /* end subroutine (daytime_worker) */
 
 
