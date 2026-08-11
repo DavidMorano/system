@@ -1,13 +1,13 @@
-/* b_isfile */
+/* b_isfile SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in: determine if a file has certain attributes */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -20,18 +20,19 @@
 
 /*******************************************************************************
 
-	This is sort of a replacement for the 'test(1)' program (or the various
-	SHELL built-in versions).  Except that this version does not
-	discriminate against a file if it is a symbolic link and the link is
-	dangling.
+  	Name:
+	b_isfile
+
+	Description:
+	This is sort of a replacement for the 'test(1)' program (or
+	the various SHELL built-in versions).  Except that this
+	version does not discriminate against a file if it is a
+	symbolic link and the link is dangling.
 
 	Synopsis:
-
 	$ isfile [<file(s)>] [-<intage>] [<opt(s)>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -51,7 +52,7 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
@@ -83,26 +84,6 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	getgid_group(cchar *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	fileobject(const char *) ;
-extern int	filebinary(const char *) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -112,12 +93,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -159,13 +134,13 @@ struct locinfo {
 	LOCINFO_FTS	ft ;
 	PROGINFO	*pip ;
 	cchar		*group_tar ;
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	dev_t		same_d ;
 	ino_t		same_i ;
 	ids		id ;
 	gid_t		gid_tar ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	int		nsame ;
 	int		intage ;
@@ -185,7 +160,7 @@ static int	locinfo_ids(LOCINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
 static int	locinfo_getgroup(LOCINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procfile(PROGINFO *,const char *) ;
 
 static int	isNeedStat(PROGINFO *) ;
@@ -341,7 +316,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -585,7 +560,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_same:
-	                    lip->final.same = TRUE ;
+	                    lip->finval.same = TRUE ;
 	                    lip->have.same = TRUE ;
 	                    lip->fl.same = TRUE ;
 	                    if (f_optequal) {
@@ -732,7 +707,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &lip->akopts ;
+					keyopt	*kop = &lip->akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -746,7 +721,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                PARAMOPT	*pop = &lip->aparams ;
+	                                paramopt	*pop = &lip->aparams ;
 	                                const char	*po = PO_TYPE ;
 	                                rs = paramopt_loads(pop,po,argp,argl) ;
 	                            }
@@ -768,7 +743,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* allow zero arguments */
 	                    case 'z':
-	                        lip->final.zero = TRUE ;
+	                        lip->finval.zero = TRUE ;
 	                        lip->have.zero = TRUE ;
 	                        lip->fl.zero = TRUE ;
 	                        if (f_optequal) {
@@ -1045,7 +1020,7 @@ static int usage(PROGINFO *pip)
 
 
 /* ARGSUSED */
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1364,8 +1339,8 @@ static int locinfo_finish(LOCINFO *lip)
 static int locinfo_procopts(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
-	KEYOPT		*kop = &lip->akopts ;
-	KEYOPT_CUR	kcur ;
+	keyopt		*kop = &lip->akopts ;
+	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	const char	*cp ;
@@ -1380,7 +1355,7 @@ static int locinfo_procopts(LOCINFO *lip)
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 	                int	v ;
@@ -1390,9 +1365,9 @@ static int locinfo_procopts(LOCINFO *lip)
 	                switch (oi) {
 
 	                case akoname_quiet:
-	                    if (! pip->final.quiet) {
+	                    if (! pip->finval.quiet) {
 	                        pip->have.quiet = TRUE ;
-	                        pip->final.quiet = TRUE ;
+	                        pip->finval.quiet = TRUE ;
 	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1402,9 +1377,9 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    break ;
 
 	                case akoname_intage:
-	                    if (! lip->final.intage) {
+	                    if (! lip->finval.intage) {
 	                        lip->have.intage = TRUE ;
-	                        lip->final.intage = TRUE ;
+	                        lip->finval.intage = TRUE ;
 	                        lip->fl.intage = TRUE ;
 	                        if (vl > 0) {
 	                            rs = cfdecti(vp,vl,&v) ;
@@ -1414,9 +1389,9 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    break ;
 
 	                case akoname_same:
-	                    if (! lip->final.same) {
+	                    if (! lip->finval.same) {
 	                        lip->have.same = TRUE ;
-	                        lip->final.same = TRUE ;
+	                        lip->finval.same = TRUE ;
 	                        lip->fl.same = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1426,9 +1401,9 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    break ;
 
 	                case akoname_zero:
-	                    if (! lip->final.zero) {
+	                    if (! lip->finval.zero) {
 	                        lip->have.zero = TRUE ;
-	                        lip->final.zero = TRUE ;
+	                        lip->finval.zero = TRUE ;
 	                        lip->fl.zero = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1457,7 +1432,7 @@ static int locinfo_procopts(LOCINFO *lip)
 
 static int locinfo_ftypes(LOCINFO *lip)
 {
-	PARAMOPT_CUR	cur ;
+	paramopt_cur	cur ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
