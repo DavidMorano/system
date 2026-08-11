@@ -13,12 +13,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIDAM */
 
 
 #define	CYIMK		struct cyimk_head
@@ -33,7 +30,8 @@
 
 struct cyimk_object {
 	cchar		*name ;
-	uint		objsize ;
+	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
 struct cyimk_liner {
@@ -84,12 +82,16 @@ typedef	CYIMK_ENT	cyimk_ent ;
 
 EXTERNC_begin
 
-extern int	cyimk_open(cyimk *,int,cchar *,cchar *,int,mode_t) noex ;
-extern int	cyimk_add(cyimk *,cyimk_ent *) noex ;
-extern int	cyimk_abort(cyimk *,int) noex ;
-extern int	cyimk_close(cyimk *) noex ;
+extern int	cyimk_open	(cyimk *,int,cchar *,cchar *,int,mode_t) noex ;
+extern int	cyimk_add	(cyimk *,cyimk_ent *) noex ;
+extern int	cyimk_abort	(cyimk *,int) noex ;
+extern int	cyimk_close	(cyimk *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const cyimk_obj		cyimk_modinfo ;
+#endif /* __cplusplus */
 
 
 #endif /* CYIMK_INCLUDE */
