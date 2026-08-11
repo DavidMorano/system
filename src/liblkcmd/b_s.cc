@@ -1,4 +1,4 @@
-/* b_s SUPPORT (s) */
+/* b_s SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* language=C89 */
 
@@ -40,6 +40,9 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_s
+
 	Synopsis:
 	$ s [arguments]
 
@@ -68,11 +71,13 @@
 #include	<termios.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getusername.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -223,7 +228,7 @@ struct locinfo {
 	cchar		*prpcs ;
 	cchar		*utfname ;
 	cchar		*termspec ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	int		termflags ;
 	int		lines ;
@@ -245,7 +250,7 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
 static int	process(PROGINFO *,cchar *) ;
 static int	processer(PROGINFO *,SHIO *) ;
 static int	procmailusers(PROGINFO *) ;
@@ -522,8 +527,8 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -861,13 +866,13 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 	                    case 'a':
 	                        lip->have.all = TRUE ;
-	                        lip->final.all = TRUE ;
+	                        lip->finval.all = TRUE ;
 	                        lip->fl.all = TRUE ;
 	                        break ;
 
 	                    case 'd':
 	                        lip->have.date = TRUE ;
-	                        lip->final.date = TRUE ;
+	                        lip->finval.date = TRUE ;
 	                        lip->fl.date = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -880,7 +885,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 	                    case 'i':
 	                        lip->have.init = TRUE ;
-	                        lip->final.init = TRUE ;
+	                        lip->finval.init = TRUE ;
 	                        lip->fl.init = TRUE ;
 	                        break ;
 
@@ -891,7 +896,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -1036,14 +1041,14 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 
 	if (lip->have.home && lip->fl.home) {
 	    if (! lip->have.clear) {
-	        lip->final.clear = TRUE ;
+	        lip->finval.clear = TRUE ;
 	        lip->fl.clear = FALSE ;
 	    }
 	} /* end if */
 
 	if (lip->have.clear && (! lip->fl.clear)) {
 	    if (! lip->have.home) {
-	        lip->final.home = TRUE ;
+	        lip->finval.home = TRUE ;
 	        lip->fl.home = FALSE ;
 	    }
 	} /* end if */
@@ -1255,7 +1260,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1267,13 +1272,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1281,9 +1286,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case akoname_all:
-	                    if (! lip->final.all) {
+	                    if (! lip->finval.all) {
 	                        lip->have.all = TRUE ;
-	                        lip->final.all = TRUE ;
+	                        lip->finval.all = TRUE ;
 	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1292,9 +1297,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_init:
-	                    if (! lip->final.init) {
+	                    if (! lip->finval.init) {
 	                        lip->have.init = TRUE ;
-	                        lip->final.init = TRUE ;
+	                        lip->finval.init = TRUE ;
 	                        lip->fl.init = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1303,9 +1308,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_sd:
-	                    if (! lip->final.sd) {
+	                    if (! lip->finval.sd) {
 	                        lip->have.sd = TRUE ;
-	                        lip->final.sd = TRUE ;
+	                        lip->finval.sd = TRUE ;
 	                        lip->fl.sd = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1314,9 +1319,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_home:
-	                    if (! lip->final.home) {
+	                    if (! lip->finval.home) {
 	                        lip->have.home = TRUE ;
-	                        lip->final.home = TRUE ;
+	                        lip->finval.home = TRUE ;
 	                        lip->fl.home = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1325,9 +1330,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_clear:
-	                    if (! lip->final.clear) {
+	                    if (! lip->finval.clear) {
 	                        lip->have.clear = TRUE ;
-	                        lip->final.clear = TRUE ;
+	                        lip->finval.clear = TRUE ;
 	                        lip->fl.clear = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1336,9 +1341,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_date:
-	                    if (! lip->final.date) {
+	                    if (! lip->finval.date) {
 	                        lip->have.date = TRUE ;
-	                        lip->final.date = TRUE ;
+	                        lip->finval.date = TRUE ;
 	                        lip->fl.date = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1347,9 +1352,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_scroll:
-	                    if (! lip->final.scroll) {
+	                    if (! lip->finval.scroll) {
 	                        lip->have.scroll = TRUE ;
-	                        lip->final.scroll = TRUE ;
+	                        lip->finval.scroll = TRUE ;
 	                        lip->fl.scroll = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1358,9 +1363,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_la:
-	                    if (! lip->final.la) {
+	                    if (! lip->finval.la) {
 	                        lip->have.la = TRUE ;
-	                        lip->final.la = TRUE ;
+	                        lip->finval.la = TRUE ;
 	                        lip->fl.la = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1369,9 +1374,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_mailcheck:
-	                    if (! lip->final.mailcheck) {
+	                    if (! lip->finval.mailcheck) {
 	                        lip->have.mailcheck = TRUE ;
-	                        lip->final.mailcheck = TRUE ;
+	                        lip->finval.mailcheck = TRUE ;
 	                        lip->fl.mailcheck = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1380,9 +1385,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_mailfrom:
-	                    if (! lip->final.mailfrom) {
+	                    if (! lip->finval.mailfrom) {
 	                        lip->have.mailfrom = TRUE ;
-	                        lip->final.mailfrom = TRUE ;
+	                        lip->finval.mailfrom = TRUE ;
 	                        lip->fl.mailfrom = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1391,9 +1396,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_mailsubj:
-	                    if (! lip->final.mailsubj) {
+	                    if (! lip->finval.mailsubj) {
 	                        lip->have.mailsubj = TRUE ;
-	                        lip->final.mailsubj = TRUE ;
+	                        lip->finval.mailsubj = TRUE ;
 	                        lip->fl.mailsubj = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1402,9 +1407,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_nusers:
-	                    if (! lip->final.nusers) {
+	                    if (! lip->finval.nusers) {
 	                        lip->have.nusers = TRUE ;
-	                        lip->final.nusers = TRUE ;
+	                        lip->finval.nusers = TRUE ;
 	                        lip->fl.nusers = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1413,9 +1418,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_lines:
-	                    if (! lip->final.lines) {
+	                    if (! lip->finval.lines) {
 	                        lip->have.lines = TRUE ;
-	                        lip->final.lines = TRUE ;
+	                        lip->finval.lines = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            lip->lines = rs ;
@@ -1565,7 +1570,7 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 	        debugprintf("b_s/process: f_sd=%u\n",lip->fl.sd) ;
 #endif
 
-	    if ((rs = tmtime_localtime(&tm,pip->daytime)) >= 0) {
+	    if ((rs = tmtime_timelocal(&tm,pip->daytime)) >= 0) {
 	        const int	tlen = TIMEBUFLEN ;
 	        cchar		*ts = "%a %e %b %R" ;
 	        char		tbuf[TIMEBUFLEN + 1] ;
@@ -1580,7 +1585,7 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 		    }
 		} /* end if (sntmtime) */
 
-	    } /* end if (tmtime_localtime) */
+	    } /* end if (tmtime_timelocal) */
 
 	} /* end if (date) */
 
