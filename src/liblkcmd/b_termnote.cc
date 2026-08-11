@@ -1,14 +1,14 @@
-/* b_termnote */
+/* b_termnote SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a SHELL built-in command */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_LOCSETENT	0		/* |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -21,15 +21,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_termnote
+
 	Synopsis:
-
 	$ termnote [<recip(s)> ...] [<options>]
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -43,13 +43,14 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
@@ -85,38 +86,8 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	hasalluc(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnrchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -134,7 +105,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, fin ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	vecstr		recips ;
@@ -150,8 +121,8 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
 static int	procarger(PROGINFO *,cchar *,int) ;
 static int	procisexit(PROGINFO *) ;
 static int	process(PROGINFO *,const char *) ;
@@ -302,8 +273,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -637,7 +608,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -650,7 +621,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'r':
-	                        lip->final.bell = TRUE ;
+	                        lip->fin.bell = TRUE ;
 	                        lip->have.bell = TRUE ;
 	                        lip->fl.bell = TRUE ;
 	                        if (f_optequal) {
@@ -679,7 +650,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'u':
 	                        pip->have.bufnone = TRUE ;
 	                        pip->fl.bufnone = TRUE ;
-	                        pip->final.bufnone = TRUE ;
+	                        pip->fin.bufnone = TRUE ;
 	                        break ;
 
 /* verbose mode */
@@ -787,7 +758,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	rs = procopts(pip,&akopts) ;
 
-	if ((! pip->final.ignore) && hasalluc(pip->progname,-1))
+	if ((! pip->fin.ignore) && hasalluc(pip->progname,-1))
 	    pip->fl.ignore = TRUE ;
 
 #ifdef	COMMENT
@@ -927,7 +898,7 @@ badprogstart:
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
-	    debugprintf("b_termnote: final mallout=%u\n",(mo-mo_start)) ;
+	    debugprintf("b_termnote: fin mallout=%u\n",(mo-mo_start)) ;
 	    uc_mallset(0) ;
 	}
 #endif
@@ -984,7 +955,7 @@ static int procisexit(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -996,13 +967,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1011,9 +982,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 
 	                case akoname_ignore:
-	                    if (! pip->final.ignore) {
+	                    if (! pip->fin.ignore) {
 	                        pip->have.ignore = TRUE ;
-	                        pip->final.ignore = TRUE ;
+	                        pip->fin.ignore = TRUE ;
 	                        pip->fl.ignore = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1024,9 +995,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                case akoname_bufwhole:
 	                case akoname_whole:
-	                    if (! pip->final.bufwhole) {
+	                    if (! pip->fin.bufwhole) {
 	                        pip->have.bufwhole = TRUE ;
-	                        pip->final.bufwhole = TRUE ;
+	                        pip->fin.bufwhole = TRUE ;
 	                        pip->fl.bufwhole = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1037,9 +1008,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                case akoname_bufline:
 	                case akoname_line:
-	                    if (! pip->final.bufline) {
+	                    if (! pip->fin.bufline) {
 	                        pip->have.bufline = TRUE ;
-	                        pip->final.bufline = TRUE ;
+	                        pip->fin.bufline = TRUE ;
 	                        pip->fl.bufline = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1051,9 +1022,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akoname_bufnone:
 	                case akoname_none:
 	                case akoname_un:
-	                    if (! pip->final.bufnone) {
+	                    if (! pip->fin.bufnone) {
 	                        pip->have.bufnone = TRUE ;
-	                        pip->final.bufnone = TRUE ;
+	                        pip->fin.bufnone = TRUE ;
 	                        pip->fl.bufnone = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1063,9 +1034,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_bell:
-	                    if (! lip->final.bell) {
+	                    if (! lip->fin.bell) {
 	                        lip->have.bell = TRUE ;
-	                        lip->final.bell = TRUE ;
+	                        lip->fin.bell = TRUE ;
 	                        lip->fl.bell = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1075,9 +1046,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_biff:
-	                    if (! lip->final.biff) {
+	                    if (! lip->fin.biff) {
 	                        lip->have.biff = TRUE ;
-	                        lip->final.biff = TRUE ;
+	                        lip->fin.biff = TRUE ;
 	                        lip->fl.biff = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1087,9 +1058,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 
 	                case akoname_all:
-	                    if (! lip->final.all) {
+	                    if (! lip->fin.all) {
 	                        lip->have.all = TRUE ;
-	                        lip->final.all = TRUE ;
+	                        lip->fin.all = TRUE ;
 	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1123,7 +1094,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
