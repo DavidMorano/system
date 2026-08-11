@@ -20,15 +20,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
 
-#include	<calyears.h>
-#include	<calent.h>
-#include	<cyi.h>
-#include	<calcite.h>
+#include	<calyears.h>		/* LIBDAM */
+#include	<calent.h>		/* LIBDAM */
+#include	<cyi.h>			/* LIBDAM */
+#include	<calcite.h>		/* LIBDAM */
 
 
 #define	CALMGR		struct calmgr_head
@@ -75,14 +75,14 @@ typedef CALMGR_CUR	calmgr_cur ;
 
 EXTERNC_begin
 
-extern int calmgr_start(calmgr *,calyears *,int,cchar *,cchar *) noex ;
-extern int calmgr_finish(calmgr *) noex ;
-extern int calmgr_lookup(calmgr *,vecobj *,calcite *) noex ;
-extern int calmgr_gethash(calmgr *,calent *,uint *) noex ;
-extern int calmgr_getci(calmgr *) noex ;
-extern int calmgr_getbase(calmgr *,cchar **) noex ;
-extern int calmgr_loadbuf(calmgr *,char *,int,calent *) noex ;
-extern int calmgr_audit(calmgr *) noex ;
+extern int calmgr_start		(calmgr *,calyears *,int,cchar *,cchar *) noex ;
+extern int calmgr_finish	(calmgr *) noex ;
+extern int calmgr_lookup	(calmgr *,vecobj *,calcite *) noex ;
+extern int calmgr_gethash	(calmgr *,calent *,uint *) noex ;
+extern int calmgr_getci		(calmgr *) noex ;
+extern int calmgr_getbase	(calmgr *,cchar **) noex ;
+extern int calmgr_loadbuf	(calmgr *,char *,int,calent *) noex ;
+extern int calmgr_audit		(calmgr *) noex ;
 
 EXTERNC_end
 
