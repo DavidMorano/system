@@ -77,6 +77,8 @@ local int	reader(cchar *,char *,int) noex ;
 
 /* local variables */
 
+cint		bsz		= 512 ; /* buffer size */
+
 
 /* exported variables */
 
@@ -86,10 +88,10 @@ local int	reader(cchar *,char *,int) noex ;
 int filereadstrs(cchar *fname,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (fname && rbuf) {
+	if (fname && rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (fname[0] && (rlen > 0)) {
+	    if (fname[0] && (rlen > 0)) ylikely {
 		rs = reader(fname,rbuf,rlen) ;
 		rl = rs ;
 	    } /* end if (valid) */
@@ -104,13 +106,13 @@ local int reader(cchar *fname,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-        if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
+        if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 	    cint	llen = rs ;
             cint        of = O_RDONLY ;
             cmode       om = 0 ;
-            if ((rs = uc_open(fname,of,om)) >= 0) {
+            if ((rs = uc_open(fname,of,om)) >= 0) ylikely {
                 cint    fd = rs ;
-                if (filer b ; (rs = b.start(fd,0z,512,0)) >= 0) {
+                if (filer b ; (rs = b.start(fd,0z,bsz)) >= 0) ylikely {
                     int         c = 0 ;
                     while ((rs = b.readln(lbuf,llen)) > 0) {
 			cchar   *sp{} ;
