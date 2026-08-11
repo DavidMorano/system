@@ -1043,7 +1043,7 @@ static int procall(PROGINFO *pip,vecstr *sp)
 	        const int	nlen = NODENAMELEN ;
 
 	        while (rs >= 0) {
-	            rs1 = clusterdb_enumcluster(&cluster,&cur,cname,nlen) ;
+	            rs1 = clusterdb_curenum(&cluster,&cur,cname,nlen) ;
 	            if (rs1 == nrs) break ;
 	            rs = rs1 ;
 
