@@ -1,21 +1,21 @@
-/* b_touch */
+/* b_touch SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a SHELL built-in version of 'touch(1)' */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_TMTIME	0		/* use |tmtime(3dam)| */
 
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This was written when we discovered that the SHELL (KSH) can be
-	enhanced with plugin built-in functions.  Many thanks are due to David
-	Korn for his shell!
+	This was written when we discovered that the SHELL (KSH)
+	can be enhanced with plugin built-in functions.  Many thanks
+	are due to David Korn for his shell!
 
 */
 
@@ -23,15 +23,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_touch
+
 	Synopsis:
-
 	$ touch [-acm] [{-t datespec}|datespec] files(s) [-af <afile>]
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -106,18 +106,6 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -127,12 +115,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strshrink(char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -151,7 +133,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	PROGINFO	*pip ;
 } ;
 
@@ -169,7 +151,7 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 static int	usage(PROGINFO *) ;
 
 static int	gettimes(PROGINFO *,TOUCH_INFO *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,TOUCH_INFO *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,TOUCH_INFO *,cchar *) ;
 static int	procfile(PROGINFO *,TOUCH_INFO *,cchar *) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
@@ -267,8 +249,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
 	TOUCH_INFO	spi ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -583,7 +565,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -640,7 +622,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* use GMT */
 	                    case 'z':
-	                        lip->final.gmt = TRUE ;
+	                        lip->finval.gmt = TRUE ;
 	                        lip->fl.gmt = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -815,7 +797,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	        if ((rs >= 0) && (tmz.hhasyear(&stz) == 0)) {
 	            t = time(NULL) ;
-	            rs = tmtime_localtime(&tmt,t) ;
+	            rs = tmtime_timelocal(&tmt,t) ;
 	            tmz_setyear(&stz,tmt.year) ;
 	        } /* end if (getting the current year) */
 
@@ -1030,7 +1012,7 @@ static int gettimes(PROGINFO *pip,TOUCH_INFO *spip,cchar reffname[])
 /* end subroutine (gettimes) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,TOUCH_INFO *spip,
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,TOUCH_INFO *spip,
 		cchar *afn)
 {
 	int		rs = SR_OK ;
@@ -1148,9 +1130,9 @@ static int procfile(PROGINFO *pip,TOUCH_INFO *spip,cchar fname[])
 	        ut.modtime = spip->mtime ;
 	    }
 	    if (spip->f_current) {
-	        rs = uc_utime(fname,NULL) ;
+	        rs = uc_filetime(fname,NULL) ;
 	    } else {
-	        rs = uc_utime(fname,&ut) ;
+	        rs = uc_filetime(fname,&ut) ;
 	    }
 	} /* end if (ok) */
 
