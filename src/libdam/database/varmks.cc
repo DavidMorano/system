@@ -1,11 +1,11 @@
-/* varmks SUPPORT */
+/* varmks SUPPORT (Variable-Makes) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* make a VAR database */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 #define	CF_FIRSTHASH	0		/* arrange for first-attempt hashing */
 
 /* revision history:
@@ -76,9 +76,16 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<endian.h>		/* LIBU */
-#include	<uclibmem.h>		/* LIBUC */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<estrings.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<mktmp.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<strtab.h>		/* LIBUC */
 #include	<filer.h>		/* LIBUC */
@@ -86,11 +93,12 @@
 #include	<hash.h>		/* LIBUC */
 #include	<hashindex.h>		/* LIBUC */
 #include	<nextpowtwo.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	"varmks.h"
 #include	"varhdr.h"
+#include	"varmks.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -98,25 +106,42 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	VARMKS_SIZEMULT	4
-#define	VARMKS_NSKIP	5
-#define	VARMKS_INDPERMS	0664
+#define	VMKS		varmks
+#define	VMKS_REC	varmks_rectab
+#define	VMKS_SIZEMULT	4
+#define	VMKS_NSKIP	5
+#define	VMKS_INDPERMS	0664
+#define	VMKS_MAG	VARMKS_MAGIC
+#define	VMKS_NENTS	VARMKS_NENTRIES
+#define	VMKS_INTOPEN	VARMKS_INTOPEN
+#define	VMKS_INTSTALE	VARMKS_INTSTALE
+
+#define	VE		varentry
 
 #undef	RECTAB
 #define	RECTAB		varmks_rectab
 
-#ifndef	KEYBUFLEN
-#define	KEYBUFLEN	120
-#endif
-
-#define	HDRBUFLEN	(szof(VARHDR) + 128)
-#define	BUFLEN		(szof(VARHDR) + 128)
+#define	HDRBUFLEN	(szof(varhdr) + 128)
+#define	BUFLEN		(szof(varhdr) + 128)
 
 #define	FSUF_IDX	VARHDR_FSUF
 
-#define	TO_OLDFILE	(5 * 60)
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+#ifndef	CF_FIRSTHASH
+#define	CF_FIRSTHASH	0		/* arrange for first-attempt hashing */
+#endif
 
-#define	NDF		"varmks.deb"
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
+typedef uint (*rectab_t)[2] ;
 
 
 /* external subroutines */
@@ -127,357 +152,363 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local structures */
 
-struct varentry {
+namespace {
+    struct varentry {
 	uint	khash ;
 	uint	ri ;
 	uint	ki ;
 	uint	hi ;
-} ; /* end struct */
+    } ; /* end struct (varentry) */
+    struct vars {
+	int	maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
 
-local int	varmks_filesbegin(VARMKS *) ;
-local int	varmks_filesbeginc(VARMKS *) ;
-local int	varmks_filesbeginwait(VARMKS *) ;
-local int	varmks_filesbegincreate(VARMKS *,cchar *,int,mode_t) ;
-local int	varmks_filesend(VARMKS *) ;
+template<typename ... Args>
+local inline int varmks_ctor(varmks *op,Args ... args) noex {
+    	VARMKS		*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (varmks_ctor) */
 
-local int	varmks_listbegin(VARMKS *,int) ;
-local int	varmks_listend(VARMKS *) ;
+local int varmks_dtor(varmks *op) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (varmks_dtor) */
 
-local int	varmks_mkvarfile(VARMKS *) ;
-local int	varmks_mkvarfiler(VARMKS *) ;
-local int	varmks_mkidxwrmain(VARMKS *,VARHDR *) ;
-local int	varmks_mkidxwrhdr(VARMKS *,VARHDR *,filer *) ;
-local int	varmks_mkrectab(VARMKS *,VARHDR *,filer *,int) ;
-local int	varmks_mkind(VARMKS *,cchar *,uint (*)[3],int) ;
-local int	varmks_mkstrtab(VARMKS *,VARHDR *,filer *,int) ;
-local int	varmks_nidxopen(VARMKS *) ;
-local int	varmks_nidxclose(VARMKS *) ;
-local int	varmks_renamefiles(VARMKS *) ;
+template<typename ... Args>
+local inline int varmks_magic(varmks *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == VMKS_MAG) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (varmks_magic) */
 
-local int	rectab_start(RECTAB *,int) ;
-local int	rectab_add(RECTAB *,uint,uint) ;
-local int	rectab_done(RECTAB *) ;
-local int	rectab_getvec(RECTAB *,uint (**)[2]) ;
-local int	rectab_extend(RECTAB *) ;
-local int	rectab_finish(RECTAB *) ;
+local int	varmks_filebeg(VMKS *) noex ;
+local int	varmks_filebegcr(VMKS *) noex ;
+local int	varmks_filebegwait(VMKS *) noex ;
+local int	varmks_filebegcr(VMKS *,cchar *,int,mode_t) noex ;
+local int	varmks_fileend(VMKS *) noex ;
+
+local int	varmks_listbegin(VMKS *,int) noex ;
+local int	varmks_listend(VMKS *) noex ;
+
+local int	varmks_mkvarfile(VMKS *) noex ;
+local int	varmks_mkvarfiler(VMKS *) noex ;
+local int	varmks_mkidxwrmain(VMKS *,varhdr *) noex ;
+local int	varmks_mkidxwrhdr(VMKS *,varhdr *,filer *) noex ;
+local int	varmks_mkrectab(VMKS *,varhdr *,filer *,int) noex ;
+local int	varmks_mkind(VMKS *,cchar *,uint (*)[3],int) noex ;
+local int	varmks_mkstrtab(VMKS *,varhdr *,filer *,int) noex ;
+local int	varmks_nidxopen(VMKS *) noex ;
+local int	varmks_nidxclose(VMKS *) noex ;
+local int	varmks_renamefiles(VMKS *) noex ;
+
+local int	rectab_start(RECTAB *,int) noex ;
+local int	rectab_add(RECTAB *,uint,uint) noex ;
+local int	rectab_done(RECTAB *) noex ;
+local int	rectab_getvec(RECTAB *,uint (**)[2]) noex ;
+local int	rectab_extend(RECTAB *) noex ;
+local int	rectab_finish(RECTAB *) noex ;
 
 #ifdef	COMMENT
-local int	rectab_count(RECTAB *) ;
+local int	rectab_count(RECTAB *) noex ;
 #endif
 
-local int	mknewfname(char *,int,cchar *,cchar *) ;
-local int	unlinkstale(cchar *,int) ;
+local int	mknewfname(char *,int,cchar *,cchar *) noex ;
+local int	unlinkstale(cchar *,int) noex ;
 
-local int	indinsert(uint (*rt)[2],uint (*it)[3],int,varentry *) noex ;
+local int	indinsert(uint (*rt)[2],uint (*it)[3],int,VE *) noex ;
 
 
 /* local variables */
 
+static sysval	pagesz(sysval_ps) ;
+static vars	var ;
+cbool		f_debug		= CF_DEBUG ;
+cbool		f_firsthash	= CF_FIRSTHASH ;
+
 
 /* exported variables */
 
-extern const varmks_obj		varmks_modinfo = {
+const varmks_obj	varmks_modinfo = {
 	"varmks",
-	szof(varmks)
+	szof(varmks),
+	0
 } ; /* end initialization */
 
 
 /* exported subroutines */
 
-int varmks_open(VARMKS *op,cchar *dbname,int of,mode_t om,int n) noex {
+int varmks_open(VMKS *op,cchar *dbn,int of,mode_t om,int n) noex {
 	int		rs ;
-	int		c = 0 ;
-	cchar	*cp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (dbname == nullptr) return SR_FAULT ;
-
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_open: ent dbname=%s\n",dbname) ;
-#endif /* CF_DEBUGS */
-
-
-	if (n < VARMKS_NENTRIES)
-	    n = VARMKS_NENTRIES ;
-
-	memclear(op) ;
-	op->om = om ;
-	op->nfd = -1 ;
-	op->gid = -1 ;
-
-	op->fl.ofcreat = MKBOOL(of & O_CREAT) ;
-	op->fl.ofexcl = MKBOOL(of & O_EXCL) ;
-
-	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
-	    op->dbname = cp ;
-	    if ((rs = varmks_filesbegin(op)) >= 0) {
-		c = rs ;
-	        if ((rs = varmks_listbegin(op,n)) >= 0) {
-	            op->magval = VARMKS_MAGIC ;
-	        }
-	        if (rs < 0) {
-	            varmks_filesend(op) ;
-		} /* end if (error) */
-	    } /* end if */
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("ent dbn=%s\n",dbn) ;
+	if (n < VMKS_NENTS) {
+	    n = VMKS_NENTS ;
+	}
+	if ((rs = varmks_ctor(op,dbn)) >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if (dbn[0]) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+	            op->om		= om ;
+	            op->nfd		= -1 ;
+	            op->gid		= -1 ;
+	            op->fl.ofcreat	= !!(of & O_CREAT) ;
+	            op->fl.ofexcl	= !!(of & O_EXCL) ;
+	            if (cchar *cp ; (rs = mem.strw(dbn,-1,&cp)) >= 0) ylikely {
+	                op->dbname = cp ;
+	                if ((rs = varmks_filebeg(op)) >= 0) ylikely {
+		            c = rs ;
+	                    if ((rs = varmks_listbegin(op,n)) >= 0) {
+	                        op->magval = VMKS_MAG ;
+	                    } /* end if */
+	                    if (rs < 0) {
+	                        varmks_fileend(op) ;
+		            } /* end if (error) */
+	                } /* end if */
+	                if (rs < 0) {
+	                    voidp vp = voidp(op->dbname) ;
+	                    mem.free(vp) ;
+	                    op->dbname = nullptr ;
+	                } /* end if (error) */
+	            } /* end if (memory-allocation) */
+		} /* end if (vars) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-	        uc_free(op->dbname) ;
-	        op->dbname = nullptr ;
+		varmks_dtor(op) ;
 	    } /* end if (error) */
-	} /* end if (memory-allocation) */
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_open: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	} /* end if (varmks_ctor) */
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (varmks_open) */
 
-int varmks_close(VARMKS *op) noex {
-	int		rs = SR_OK ;
+int varmks_close(VMKS *op) noex {
+	int		rs ;
 	int		rs1 ;
 	int		nvars = 0 ;
-	int		f_go = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_close: nvars=%u\n",op->nvars) ;
-#endif
-
-	f_go = (! op->fl.abort) ;
-	nvars = op->nvars ;
-	if (! op->fl.abort) {
-	    rs1 = varmks_mkvarfile(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	    f_go = f_go && (rs1 >= 0) ;
-	}
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_close: varmks_mkvarfile() rs=%d\n",rs) ;
-#endif
-
-	if (op->nfd >= 0) {
-	    rs1 = u_close(op->nfd) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->nfd = -1 ;
-	}
-
-	rs1 = varmks_listend(op) ;
-	if (rs >= 0) rs = rs1 ;
-	f_go = f_go && (rs1 >= 0) ;
-
-	if ((rs >= 0) && (nvars > 0) && f_go) {
-	    rs1 = varmks_renamefiles(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_close: varmks_renamefiles() rs=%d\n",rs) ;
-#endif
-
-	rs1 = varmks_filesend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->dbname != nullptr) {
-	    rs1 = uc_free(op->dbname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = nullptr ;
-	}
-
-#if	CF_DEBUGS
+	DEBUGPRINTF("ent nvars=%u\n",op->nvars) ;
+	if ((rs = varmks_magic(op)) >= 0) ylikely {
+	    bool	f_go = (! op->fl.abort) ;
+	    nvars = op->nvars ;
+	    if (! op->fl.abort) {
+	        rs1 = varmks_mkvarfile(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	        f_go = f_go && (rs1 >= 0) ;
+	    }
+	    DEBUGPRINTF("varmks_mkvarfile() rs=%d\n",rs) ;
+	    if (op->nfd >= 0) {
+	        rs1 = u_close(op->nfd) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->nfd = -1 ;
+	    }
+	    {
+	        rs1 = varmks_listend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	        f_go = f_go && (rs1 >= 0) ;
+	    }
+	    if ((rs >= 0) && (nvars > 0) && f_go) {
+	        rs1 = varmks_renamefiles(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    DEBUGPRINTF("varmks_renamefiles() rs=%d\n",rs) ;
+	    {
+	        rs1 = varmks_fileend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->dbname) {
+	        voidp vp = voidp(op->dbname) ;
+	        rs1 = mem.free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->dbname = nullptr ;
+	    } /* end if (memory-release) */
+	    op->magval = 0 ;
+	} /* end if (varmks_magic) */
 	DEBUGPRINTF("varmks_close: ret=%d\n",rs) ;
-#endif /* CF_DEBUGS */
-
-	op->magval = 0 ;
 	return (rs >= 0) ? nvars : rs ;
 } /* end subroutine (varmks_close) */
 
-int varmks_addvar(VARMKS *op,cchar *k,cchar *vp,int vl) noex {
+int varmks_add(VMKS *op,cchar *k,cchar *vap,int val) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (k == nullptr) return SR_FAULT ;
-	if (vp == nullptr) return SR_FAULT ;
-
-	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_addvar: k=%s v=>%r<\n",k,vp,vl) ;
-#endif
-
-	if ((rs = strtab_add(&op->keys,k,-1)) >= 0) {
-	    uint	ki = rs ;
-	    if ((rs = strtab_add(&op->vals,vp,vl)) >= 0) {
-	        uint	vi = rs ;
-	        if ((rs = rectab_add(&op->rectab,ki,vi)) >= 0) {
-	            op->nvars += 1 ;
+	DEBUGPRINTF("ent k=%s v=>%r<\n",k,vap,val) ;
+	if ((rs = varmks_magic(op,k,vap)) >= 0) ylikely {
+	    if ((rs = strtab_add(&op->keys,k,-1)) >= 0) ylikely {
+	        con uint	ki = rs ;
+	        if ((rs = strtab_add(&op->vals,vap,val)) >= 0) ylikely {
+	            con uint	vi = rs ;
+	            if ((rs = rectab_add(&op->rectab,ki,vi)) >= 0) ylikely {
+	                op->nvars += 1 ;
+	            }
 	        }
-	    }
-	}
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_addvar: ret=%d\n",rs) ;
-#endif
-
+	    } /* end if (strtab_add) */
+	} /* end if (varmks_magic) */
+	DEBUGPRINTF("ret=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (varmks_addvar) */
+} /* end subroutine (varmks_add) */
 
-int varmks_abort(VARMKS *op) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
-	op->fl.abort = true ;
-	return SR_OK ;
+int varmks_abort(VMKS *op) noex {
+    	int		rs ;
+	if ((rs = varmks_magic(op)) >= 0) ylikely {
+	    op->fl.abort = true ;
+	} /* end if (non-null) */
+	return rs ;
 } /* end subroutine (varmks_abort) */
 
-int varmks_chgrp(VARMKS *op,gid_t gid) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magval != VARMKS_MAGIC) return SR_NOTOPEN ;
-	op->gid = gid ;
-	return SR_OK ;
+int varmks_chgrp(VMKS *op,gid_t gid) noex {
+    	int		rs ;
+	if ((rs = varmks_magic(op)) >= 0) ylikely {
+	    op->gid = gid ;
+	} /* end if (varmks_magic) */
+	return rs ;
 } /* end subroutine (varmks_chgrp) */
 
 
 /* private subroutines */
 
-local int varmks_filesbegin(VARMKS *op) noex {
+local int varmks_filebeg(VMKS *op) noex {
 	int		rs = SR_OK ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if (op->fl.ofcreat) {
-	    rs = varmks_filesbeginc(op) ;
+	    rs = varmks_filebegcr(op) ;
 	} else {
-	    rs = varmks_filesbeginwait(op) ;
+	    rs = varmks_filebegwait(op) ;
 	    c = rs ;
 	}
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_filesbegin: ret rs=%d c=%u\n",rs,c) ;
-#endif
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
-} /* end subroutine (varmks_filesbegin) */
+} /* end subroutine (varmks_filebeg) */
 
-local int varmks_filesbeginc(VARMKS *op) noex {
+local int varmks_filebegcr(VMKS *op) noex {
 	cint		type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
+	cint		maxpath = var.maxpathlen ;
+	cint		sz = ((var.maxpathlen + 1) * 2) ;
 	int		rs ;
+	int		rs1 ;
+	int		ai = 2 ; /* double allocation */
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IDX	 ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
-	    cmode	om = op->om ;
-	    cchar		*tfn = tbuf ;
-	    char		rbuf[MAXPATHLEN+1] ;
-	    if (type) {
-	        if ((rs = mktmpfile(rbuf,om,tbuf)) >= 0) {
-	            op->fl.created = true ;
-	            tfn = rbuf ;
-	        }
-	    }
-	    if (rs >= 0) {
-	        mode_t	om = op->om ;
-	        int	of = O_CREAT ;
-	        if (op->fl.ofexcl) of |= O_EXCL ;
-	        rs = varmks_filesbegincreate(op,tfn,of,om) ;
-		if ((rs < 0) && type) {
-		    uc_unlink(rbuf) ;
-		} /* end if (error) */
-	    } /* end if (ok) */
-	} /* end if (mknewfname) */
+	if (char *a ; (rs = mem.mall(sz,&a)) >= 0) ylikely {
+	    con mode_t	om = op->om ;
+	    char	*tbuf = (a + (--ai * (maxpath + 1))) ;
+	    if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) ylikely {
+	        cchar	*tfn = tbuf ;
+	        char	*rbuf = (a + (--ai * (maxpath + 1))) ;
+	        if (type) {
+	            if ((rs = mktmpfile(rbuf,tbuf,om)) >= 0) ylikely {
+	                op->fl.created = true ;
+	                tfn = rbuf ;
+	            }
+	        } /* end if (type) */
+	        if (rs >= 0) ylikely {
+	            int	of = O_CREAT ;
+	            if (op->fl.ofexcl) of |= O_EXCL ;
+	            rs = varmks_filebegcr(op,tfn,of,om) ;
+		    if ((rs < 0) && type) {
+		        uc_unlink(rbuf) ;
+		    } /* end if (error) */
+	        } /* end if (ok) */
+	    } /* end if (mknewfname) */
+	    rs1 = mem.free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
-} /* end subroutine (varmks_filesbeginc) */
+} /* end subroutine (varmks_filebegcr) */
 
-local int varmks_filesbeginwait(VARMKS *op) noex {
+local int varmks_filebegwait(VMKS *op) noex {
+	cint		nrs = SR_EXISTS ;
 	int		rs ;
-	int		c = 0 ;
+	int		rs1 ;
+	int		c = 0 ; /* return-value */
 	cchar		*dbn = op->dbname ;
 	cchar		*suf = FSUF_IDX	 ;
-	char		tbuf[MAXPATHLEN+1] ;
-	if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) {
-	    cmode	om = op->om ;
-	    cint		to_stale = VARMKS_INTSTALE ;
-	    cint		nrs = SR_EXISTS ;
-	    cint		of = (O_CREAT|O_WRONLY|O_EXCL) ;
-	    int			to = VARMKS_INTOPEN ;
-	    while ((rs = varmks_filesbegincreate(op,tbuf,of,om)) == nrs) {
-#if	CF_DEBUGS
-	        DEBUGPRINTF("varmks_filesbeginwait: loop ret rs=%d\n",rs) ;
-#endif
-	        c = 1 ;
-	        sleep(1) ;
-	        unlinkstale(tbuf,to_stale) ;
-	        if (to-- == 0) break ;
-	    } /* end while (db exists) */
-	    if (rs == nrs) {
-	        op->fl.ofcreat = false ;
-	        c = 0 ;
-	        rs = varmks_filesbeginc(op) ;
-	    }
-	} /* end if (mknewfname) */
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_filesbeginwait: ret ret rs=%d\n",rs) ;
-#endif
+	if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) ylikely {
+	    if ((rs = mknewfname(tbuf,false,dbn,suf)) >= 0) ylikely {
+	        cmode	om = op->om ;
+	        cint	to_stale = VMKS_INTSTALE ;
+	        cint	of = (O_CREAT|O_WRONLY|O_EXCL) ;
+	        int		to = VMKS_INTOPEN ;
+	        while ((rs = varmks_filebegcr(op,tbuf,of,om)) == nrs) {
+	            DEBUGPRINTF("loop ret rs=%d\n",rs) ;
+	            c = 1 ;
+	            sleep(1) ;
+	            unlinkstale(tbuf,to_stale) ;
+	            if (to-- == 0) break ;
+	        } /* end while (db exists) */
+	        if (rs == nrs) {
+	            op->fl.ofcreat = false ;
+	            c = 0 ;
+	            rs = varmks_filebegcr(op) ;
+	        }
+	    } /* end if (mknewfname) */
+	    rs1 = mem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? c : rs ;
-} /* end subroutine (varmks_filesbeginwait) */
+} /* end subroutine (varmks_filebegwait) */
 
-local int varmks_filesbegincreate(VARMKS *op,cc *tfn,int of,mode_t om) noex {
+local int varmks_filebegcr(VMKS *op,cc *tfn,int of,mode_t om) noex {
 	int		rs ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	obuf[100+1] ;
 	    snflagsopen(obuf,100,of) ;
-	    DEBUGPRINTF("varmks_filesbegincreate: ent of=%s\n",obuf) ;
-	    DEBUGPRINTF("varmks_filesbegincreate: om=%05o\n",om) ;
+	    DEBUGPRINTF("varmks_filebegcr: ent of=%s\n",obuf) ;
+	    DEBUGPRINTF("varmks_filebegcr: om=%05o\n",om) ;
 	}
 #endif
-	if ((rs = uc_open(tfn,of,om)) >= 0) {
+	if ((rs = uc_open(tfn,of,om)) >= 0) ylikely {
 	    cint	fd = rs ;
 	    cchar	*cp ;
 	    op->fl.created = true ;
-	    if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
+	    if ((rs = mem.strw(tfn,-1,&cp)) >= 0) {
 	        op->nidxfname = (char *) cp ;
-	    }
+	    } /* end if (memory-acquire) */
 	    u_close(fd) ;
 	} /* end if (create) */
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_filesbegincreate: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (varmks_filesbegincreate) */
+} /* end subroutine (varmks_filebegcr) */
 
-local int varmks_filesend(VARMKS *op) noex {
+local int varmks_fileend(VMKS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->nidxfname) {
 	    if (op->fl.created && (op->nidxfname[0] != '\0')) {
 	        u_unlink(op->nidxfname) ;
 	    }
-	    rs1 = uc_free(op->nidxfname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->nidxfname = nullptr ;
+	    {
+	        rs1 = mem.free(op->nidxfname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->nidxfname = nullptr ;
+	    } /* end if (memory-release) */
 	}
 	if (op->idname) {
-	    rs1 = uc_free(op->idname) ;
+	    voidp vp = voidp(op->idname) ;
+	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->idname = nullptr ;
-	}
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_filesend: ret rs=%d\n",rs) ;
-#endif
+	} /* end if (memory-release) */
+	DEBUGPRINTF("varmks_fileend: ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (varmks_filesend) */
+} /* end subroutine (varmks_fileend) */
 
-local int varmks_listbegin(VARMKS *op,int n) noex {
-	cint	size = (n * VARMKS_SIZEMULT) ;
+local int varmks_listbegin(VMKS *op,int n) noex {
+	cint		sz = (n * VMKS_SIZEMULT) ;
 	int		rs ;
-	if ((rs = strtab_start(&op->keys,size)) >= 0) {
-	    if ((rs = strtab_start(&op->vals,size)) >= 0) {
+	if ((rs = strtab_start(&op->keys,sz)) >= 0) ylikely {
+	    if ((rs = strtab_start(&op->vals,sz)) >= 0) ylikely {
 	        rs = rectab_start(&op->rectab,n) ;
 	        if (rs < 0) {
 	            strtab_finish(&op->vals) ;
@@ -490,342 +521,307 @@ local int varmks_listbegin(VARMKS *op,int n) noex {
 	return rs ;
 } /* end subroutine (varmks_listbegin) */
 
-local int varmks_listend(VARMKS *op) noex {
+local int varmks_listend(VMKS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
-	rs1 = rectab_finish(&op->rectab) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = rectab_finish(&op->rectab) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	{
-	rs1 = strtab_finish(&op->vals) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = strtab_finish(&op->vals) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	{
-	rs1 = strtab_finish(&op->keys) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = strtab_finish(&op->keys) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
 } /* end subroutine (varmks_listend) */
 
-local int varmks_mkvarfile(VARMKS *op) noex {
-	int		rs = SR_OK ;
-	int		rtl ;
-	if ((rtl = rectab_done(&op->rectab)) >= 0) {
+local int varmks_mkvarfile(VMKS *op) noex {
+	int		rs ;
+	int		nv = 0 ; /* return-value */
+	if ((rs = rectab_done(&op->rectab)) >= 0) ylikely {
+	    cint rtl = rs ;
 	    if (rtl == (op->nvars + 1)) {
 	        rs = varmks_mkvarfiler(op) ;
+		nv = op->nvars ;
 	    } else {
 	        rs = SR_BUGCHECK ;
 	    }
-	}
-	return (rs >= 0) ? op->nvars : rs ;
+	} /* end if (rectab_done) */
+	return (rs >= 0) ? nv : rs ;
 } /* end subroutine (varmks_mkvarfile) */
 
-local int varmks_mkvarfiler(VARMKS *op) noex {
+local int varmks_mkvarfiler(VMKS *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_mkidx: ent\n") ;
-#endif
-
-	if ((rs = varmks_nidxopen(op)) >= 0) {
+	DEBUGPRINTF("ent\n") ;
+	if ((rs = varmks_nidxopen(op)) >= 0) ylikely {
 	    varhdr	hdr{} ;
 	    hdr.vetu[0] = VARHDR_VERSION ;
-	    hdr.vetu[1] = ENDIAN ;
+	    hdr.vetu[1] = uchar(ENDIAN) ;
 	    hdr.vetu[2] = 0 ;
 	    hdr.vetu[3] = 0 ;
-	    hdr.wtime = (uint) time(nullptr) ;
+	    hdr.wtime = (uint) getustime ;
 	    hdr.nvars = op->nvars ;
-	    hdr.nskip = VARMKS_NSKIP ;
-
-	    if ((rs = varmks_mkidxwrmain(op,&hdr)) >= 0) {
+	    hdr.nskip = VMKS_NSKIP ;
+	    if ((rs = varmks_mkidxwrmain(op,&hdr)) >= 0) ylikely {
 	        cint	hlen = HDRBUFLEN ;
-	        char		hbuf[HDRBUFLEN+1] ;
-	        hdr.fsize = rs ;
+	        char	hbuf[HDRBUFLEN+1] ;
+	        hdr.fsz = rs ;
 	        wlen = rs ;
-
-	        if ((rs = varhdr(&hdr,0,hbuf,hlen)) >= 0) {
+	        if ((rs = hdr.rd(hbuf,hlen)) >= 0) ylikely {
 	            cint	bl = rs ;
-	            if ((rs = u_writep(op->nfd,hbuf,bl,0L)) >= 0) {
+	            if ((rs = u_writep(op->nfd,hbuf,bl,0z)) >= 0) ylikely {
 	                cmode	om = op->om ;
 	                rs = uc_fminmod(op->nfd,om) ;
-	            }
-	        }
-
+	            } /* end if (u_writep) */
+	        } /* end if (header-read) */
 	    } /* end if (varmks_mkidxwrmain) */
-
 	    rs1 = varmks_nidxclose(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (varmks_nidx) */
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_mkidx: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d wlen=%u\n",rs,wlen) ;
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (varmks_mkvarfiler) */
 
-local int varmks_mkidxwrmain(VARMKS *op,VARHDR *hdrp) noex {
-	filer		hf, *hfp = &hf ;
-	cint	nfd = op->nfd ;
-	cint	ps = getpagesize() ;
-	int		bsize ;
+local int varmks_mkidxwrmain(VMKS *op,varhdr *hdrp) noex {
 	int		rs ;
 	int		rs1 ;
-	int		off = 0 ;
-	bsize = (ps * 4) ;
-	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
-	    if ((rs = varmks_mkidxwrhdr(op,hdrp,hfp)) >= 0) {
-	        off += rs ;
-	        if (rs >= 0) {
-	            rs = varmks_mkrectab(op,hdrp,hfp,off) ;
+	int		off = 0 ; /* return-value */
+	if ((rs = pagesz) >= 0) ylikely {
+	    cint	nfd = op->nfd ;
+	    int		bsz = (rs * 4) ;
+	    if (filer hf ; (rs = hf.start(nfd,0,bsz,0)) >= 0) ylikely {
+	        if ((rs = varmks_mkidxwrhdr(op,hdrp,&hf)) >= 0) ylikely {
 	            off += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = varmks_mkstrtab(op,hdrp,hfp,off) ;
-	            off += rs ;
-	        }
-	    } /* end if (varmks_mkidxwrhdr) */
-	    rs1 = filer_finish(hfp) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filer) */
+	            if (rs >= 0) ylikely {
+	                rs = varmks_mkrectab(op,hdrp,&hf,off) ;
+	                off += rs ;
+	            }
+	            if (rs >= 0) ylikely {
+	                rs = varmks_mkstrtab(op,hdrp,&hf,off) ;
+	                off += rs ;
+	            }
+	        } /* end if (varmks_mkidxwrhdr) */
+	        rs1 = hf.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (filer) */
+	} /* end if (pagesz) */
 	return (rs >= 0) ? off : rs ;
 } /* end subroutine (varmks_mkidxwrmain) */
 
-/* ARGSUSED */
-local int varmks_mkidxwrhdr(VARMKS *op,VARHDR *hdrp,filer *hfp) noex {
-	cint		hlen = HDRBUFLEN ;
-	int		rs ;
-	int		wlen = 0 ;
-	char		hbuf[HDRBUFLEN+1] ;
-	if (op == nullptr) return SR_FAULT ; /* LINT */
-	if ((rs = varhdr(hdrp,0,hbuf,hlen)) >= 0) {
-	    rs = filer_writefill(hfp,hbuf,rs) ;
-	    wlen += rs ;
-	}
+local int varmks_mkidxwrhdr(VMKS *op,varhdr *hdrp,filer *hfp) noex {
+	int		rs = SR_BUGCHECK ;
+	int		wlen = 0 ; /* return-value */
+	if (op && hdrp) ylikely {
+	    cint	hlen = HDRBUFLEN ;
+	    char	hbuf[HDRBUFLEN+1] ;
+	    if ((rs = hdrp->rd(hbuf,hlen)) >= 0) ylikely {
+	        rs = filer_writefill(hfp,hbuf,rs) ;
+	        wlen += rs ;
+	    } /* end if (header-read) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (varmks_mkidxwrhdr) */
 
-local int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,filer *hfp,int off) noex {
+local int varmks_mkrectab(VMKS *op,varhdr *hdrp,filer *hfp,int off) noex {
+	int		sz ;
 	int		rs ;
-	int		rtl ;
-	int		size ;
-	int		wlen = 0 ;
+	int		rs1 ;
+	int		wlen = 0 ; /* return-value */
 	uint		(*rt)[2] ;
-	rtl = rectab_getvec(&op->rectab,&rt) ;
-	hdrp->rtoff = off ;
-	hdrp->rtlen = rtl ;
-	size = ((rtl + 1) * 2 * szof(uint)) ;
-	if ((rs = filer_write(hfp,rt,size)) >= 0) {
-	    strtab	*ksp = &op->keys ;
-	    char	*kstab = nullptr ;
-	    off += rs ;
-	    wlen += rs ;
-	    size = strtab_strsize(ksp) ;
-	    hdrp->ksoff = off ;
-	    hdrp->kslen = size ;
-	    if ((rs = uc_malloc(size,&kstab)) >= 0) {
-	        if ((rs = strtab_strmk(ksp,kstab,size)) >= 0) {
-	            rs = filer_write(hfp,kstab,size) ;
-	            off += rs ;
-	    	    wlen += rs ;
-	        }
-	        if (rs >= 0) {
-	            uint	(*indtab)[3] = nullptr ;
-		    int		itl = nextpowtwo(rtl) ;
-	            hdrp->itoff = off ;
-	            hdrp->itlen = itl ;
-	            size = (itl + 1) * 3 * szof(int) ;
-	            if ((rs = uc_malloc(size,&indtab)) >= 0) {
-	                memset(indtab,0,size) ;
-	                if ((rs = varmks_mkind(op,kstab,indtab,itl)) >= 0) {
-	                    rs = filer_write(hfp,indtab,size) ;
-	                    off += rs ;
-	    		    wlen += rs ;
-	                }
-	                uc_free(indtab) ;
-	            } /* end if (memory allocation) */
-	        } /* end if (record-index table) */
-	        uc_free(kstab) ;
-	    } /* end if (memory allocation) */
-	} /* end if (key-string table) */
+	if ((rs = rectab_getvec(&op->rectab,&rt)) >= 0) ylikely {
+	    cint rtl = rs ;
+	    hdrp->rtoff = off ;
+	    hdrp->rtlen = rtl ;
+	    sz = ((rtl + 1) * 2 * szof(uint)) ;
+	    if ((rs = filer_write(hfp,rt,sz)) >= 0) {
+	        strtab	*ksp = &op->keys ;
+	        char	*kstab = nullptr ;
+	        off += rs ;
+	        wlen += rs ;
+	        sz = strtab_strsize(ksp) ;
+	        hdrp->ksoff = off ;
+	        hdrp->kslen = sz ;
+	        if ((rs = mem.mall(sz,&kstab)) >= 0) ylikely {
+	            if ((rs = strtab_strmk(ksp,kstab,sz)) >= 0) ylikely {
+	                rs = filer_write(hfp,kstab,sz) ;
+	                off += rs ;
+	    	        wlen += rs ;
+	            }
+	            if (rs >= 0) ylikely {
+	                uint	(*indtab)[3] = nullptr ;
+		        int	itl = nextpowtwo(rtl) ;
+	                hdrp->itoff = off ;
+	                hdrp->itlen = itl ;
+	                sz = (itl + 1) * 3 * szof(int) ;
+	                if ((rs = mem.mall(sz,&indtab)) >= 0) {
+	                    memclear(indtab,sz) ;
+	                    if ((rs = varmks_mkind(op,kstab,indtab,itl)) >= 0) {
+	                        rs = filer_write(hfp,indtab,sz) ;
+	                        off += rs ;
+	    		        wlen += rs ;
+	                    }
+	                    mem.free(indtab) ;
+	                } /* end if (memory allocation) */
+	            } /* end if (record-index table) */
+	            rs1 = mem.free(kstab) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (memory allocation) */
+	    } /* end if (key-string table) */
+	} /* end if (rectab_getvec) */
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (varmks_mkrectab) */
 
 /* make an index table of the record table */
-int varmks_mkind(varmks *op,cc *kst,int (*it)[3],int il) noex {
-	struct varentry	ve ;
-	uint		ri, ki, hi ;
-	uint		khash ;
+local int varmks_mkind(varmks *op,cc *kst,uint (*it)[3],int il) noex {
 	uint		(*rt)[2] ;
-	int		rs = SR_OK ;
-	int		rtl ;
-	int		sc = 0 ;
-	cchar	*kp ;
-
-	rtl = rectab_getvec(&op->rectab,&rt) ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_mkind: rtl=%u\n",rtl) ;
-#endif
-
-#if	CF_FIRSTHASH
-	{
-	    varentry	*vep ;
-	    vecobj	ves ;
-	    int		sz = szof(varentry) ;
-	    int		opts ;
-	    opts = vecobjm.compact ;
-	    if ((rs = vecobj_start(&ves,sz,rtl,opts)) >= 0) {
-
-	        for (ri = 1 ; ri < rtl ; ri += 1) {
-
+	int		rs ;
+	int		rs1 ;
+	int		sc = 0 ; /* return-value */
+	if ((rs = rectab_getvec(&op->rectab,&rt)) >= 0) ylikely {
+	    varentry	ve{} ;
+	    uint	ri, ki, hi ;
+	    uint	khash ;
+	    cint	rtl = rs ;
+	    cchar	*kp ;
+	    DEBUGPRINTF("varmks_mkind: rtl=%u\n",rtl) ;
+	    if_constexpr (f_firsthash) {
+	        cint	sz = szof(varentry) ;
+	        cint	vo = vecobjm.compact ;
+	        if (vecobj ves ; (rs = ves.start(sz,rtl,vo)) >= 0) {
+	            for (ri = 1 ; ri < rtl ; ri += 1) {
+	                ki = rt[ri][0] ;
+	                kp = kst + ki ;
+	                khash = hash_elf(kp,-1) ;
+	                hi = hashindex(khash,il) ;
+	                if (it[hi][0] == 0) {
+	                    it[hi][0] = ri ;
+	                    it[hi][1] = (khash & INT_MAX) ;
+	                    it[hi][2] = 0 ;
+	                    sc += 1 ;
+	                } else {
+	                    ve.ri = ri ;
+	                    ve.ki = ki ;
+	                    ve.khash = khash ;
+	                    ve.hi = hi ;
+	                    rs = vecobj_add(&ves,&ve) ;
+	                } /* end if */
+	                if (rs < 0) break ;
+	            } /* end for */
+	            if (rs >= 0) {
+			void *vp ;
+	                for (int i = 0 ; ves.get(i,&vp) >= 0 ; i += 1) {
+	        	    if (VE *vep = resumelife<VE>(vp) ; vp) {
+	                        sc += indinsert(rt,it,il,vep) ;
+			    }
+	                } /* end for */
+	            } /* end if (ok) */
+	            rs1 = ves.finish ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (ves) */
+	    } else { /* (f_firsthash) */
+	        uint rilim = uint(rtl) ;
+	        for (ri = 1 ; ri < rilim ; ri += 1) {
 	            ki = rt[ri][0] ;
 	            kp = kst + ki ;
+	            DEBUGPRINTF("ri=%u k=%s\n",ri, kp,lenstr(kp,20)) ;
 	            khash = hash_elf(kp,-1) ;
-
 	            hi = hashindex(khash,il) ;
-
-	            if (it[hi][0] == 0) {
-
-	                it[hi][0] = ri ;
-	                it[hi][1] = (khash & INT_MAX) ;
-	                it[hi][2] = 0 ;
-	                sc += 1 ;
-
-	            } else {
-
-	                ve.ri = ri ;
-	                ve.ki = ki ;
-	                ve.khash = chash ;
-	                ve.hi = hi ;
-	                rs = vecobj_add(&ves,&ve) ;
-
-	            }
-
-	            if (rs < 0) break ;
+	            ve.ri = ri ;
+	            ve.ki = ki ;
+	            ve.khash = khash ;
+	            ve.hi = hi ;
+	            sc += indinsert(rt,it,il,&ve) ;
 	        } /* end for */
-
-	        if (rs >= 0) {
-	            int	i ;
-	            for (i = 0 ; vecobj_get(&ves,i,&vep) >= 0 ; i += 1) {
-	                sc += indinsert(rt,it,il,vep) ;
-	            } /* end for */
-	        }
-
-	        vecobj_finish(&ves) ;
-	    } /* end if (ves) */
-
-	} /* end block */
-#else /* CF_FIRSTHASH */
-	{
-	    for (ri = 1 ; ri < rtl ; ri += 1) {
-
-	        ki = rt[ri][0] ;
-	        kp = kst + ki ;
-
-#if	CF_DEBUGS
-	        DEBUGPRINTF("varmks_mkind: ri=%u k=%s\n",ri,
-	            kp,strnlen(kp,20)) ;
-#endif
-
-	        khash = hash_elf(kp,-1) ;
-
-	        hi = hashindex(khash,il) ;
-
-	        ve.ri = ri ;
-	        ve.ki = ki ;
-	        ve.khash = khash ;
-	        ve.hi = hi ;
-	        sc += indinsert(rt,it,il,&ve) ;
-
-	    } /* end for */
-	}
-#endif /* CF_FIRSTHASH */
-
-	it[il][0] = UINT_MAX ;
-	it[il][1] = 0 ;
-	it[il][2] = 0 ;
-
-	if (sc < 0)
-	    sc = 0 ;
-
-#if	CF_DEBUGS
+	    } /* end if_constexpr (f_firsthash) */
+	    it[il][0] = UINT_MAX ;
+	    it[il][1] = 0 ;
+	    it[il][2] = 0 ;
+	    if (sc < 0) {
+	        sc = 0 ;
+	    }
+	} /* end if (rectab_getvec) */
 	DEBUGPRINTF("varmks_mkind: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? sc : rs ;
 } /* end subroutine (varmks_mkind) */
 
-local int varmks_mkstrtab(VARMKS *op,VARHDR *hdrp,filer *hfp,int off) noex {
+local int varmks_mkstrtab(VMKS *op,varhdr *hdrp,filer *hfp,int off) noex {
 	strtab		*vsp = &op->vals ;
 	int		rs ;
-	int		sz ;
+	int		rs1 ;
 	int		wlen = 0 ; /* return-value */
-	char		*vstab ;
-	    sz = strtab_strsize(vsp) ;
+	if ((rs = vsp->strsize) >= 0) ylikely {
+	    cint sz = rs ;
 	    hdrp->vsoff = off ;
 	    hdrp->vslen = sz ;
-	    if ((rs = uc_malloc(sz,&vstab)) >= 0) {
-	        if ((rs = strtab_strmk(vsp,vstab,sz)) >= 0) {
+	    if (char *vstab ; (rs = mem.mall(sz,&vstab)) >= 0) ylikely {
+	        if ((rs = strtab_strmk(vsp,vstab,sz)) >= 0) ylikely {
 	            rs = filer_write(hfp,vstab,sz) ;
 	            off += rs ;
 		    wlen += rs ;
 	        }
-	        uc_free(vstab) ;
+	        rs1 = mem.free(vstab) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory allocation) */
+	} /* end if (strtab_strssize) */
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (varmks_mkstrtab) */
 
-local int varmks_nidxopen(VARMKS *op) noex {
-	cmode	om = op->om ;
+local int varmks_nidxopen(VMKS *op) noex {
 	int		of = (O_CREAT|O_WRONLY) ;
 	int		rs ;
+	int		rs1 ;
 	int		fd = -1 ;
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_nidxopen: ent nidxfname=%s\n",op->nidxfname) ;
-#endif
+	cmode		om = op->om ;
+	DEBUGPRINTF("ent nidxfname=%s\n",op->nidxfname) ;
 	if (op->nidxfname == nullptr) {
+	    cint	maxpath = var.maxpathlen ;
+	    cint	sz = ((var.maxpathlen + 1) * 2) ;
 	    cint	type = (op->fl.ofcreat && (! op->fl.ofexcl)) ;
+	    int		ai = 2 ; /* double allocation */
 	    cchar	*dbn = op->dbname ;
-	    cchar	*suf = FSUF_IDX ;
-	    char	tbuf[MAXPATHLEN+1] ;
-	    if ((rs = mknewfname(tbuf,type,dbn,suf)) >= 0) {
-	        cchar	*tfn = tbuf ;
-	        char	rbuf[MAXPATHLEN+1] ;
-	        if (type) {
-	            rs = opentmpfile(tbuf,of,om,rbuf) ;
-	            op->nfd = rs ;
-		    fd = rs ;
-	            tfn = rbuf ;
-	        } else {
-	            if (op->fl.ofexcl) of |= O_EXCL ;
-	            rs = uc_open(tbuf,of,om) ;
-	            op->nfd = rs ;
-		    fd = rs ;
-	        }
-	        if (rs >= 0) {
-	            cchar	*cp ;
-	            if ((rs = uc_mallocstrw(tfn,-1,&cp)) >= 0) {
-	                op->nidxfname = (char *) cp ;
-	            }
-	        } /* end if (ok) */
-	    } /* end if (mknewfname) */
+	    cchar	*strsuf = FSUF_IDX ;
+	    if (char *a ; (rs = mem.mall(sz,&a)) >= 0) ylikely {
+	        char	*tbuf = (a + (--ai * (maxpath + 1))) ;
+	        if ((rs = mknewfname(tbuf,type,dbn,strsuf)) >= 0) ylikely {
+	            cchar	*tfn = tbuf ;
+	            char	*rbuf = (a + (--ai * (maxpath + 1))) ;
+	            if (type) {
+	                rs = opentmpfile(tbuf,of,om,rbuf) ;
+	                op->nfd = rs ;
+		        fd = rs ;
+	                tfn = rbuf ;
+	            } else {
+	                if (op->fl.ofexcl) of |= O_EXCL ;
+	                rs = uc_open(tbuf,of,om) ;
+	                op->nfd = rs ;
+		        fd = rs ;
+	            } /* end if */
+	            if (rs >= 0) ylikely {
+	                if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
+	                    op->nidxfname = charp(cp) ;
+	                } /* end if (memory-acquire) */
+	            } /* end if (ok) */
+	        } /* end if (mknewfname) */
+	        rs1 = mem.free(a) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} else {
 	    if (op->fl.ofexcl) of |= O_EXCL ;
 	    rs = uc_open(op->nidxfname,of,om) ;
 	    op->nfd = rs ;
 	    fd = rs ;
-	}
-#if	CF_DEBUGS
-	DEBUGPRINTF("varmks_nidxopen: ret rs=%d\n",rs) ;
-#endif
+	} /* end if */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (varmks_nidxopen) */
 
-local int varmks_nidxclose(VARMKS *op) noex {
+local int varmks_nidxclose(VMKS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->nfd >= 0) {
@@ -836,40 +832,39 @@ local int varmks_nidxclose(VARMKS *op) noex {
 	return rs ;
 } /* end subroutine (varmks_nidxclose) */
 
-local int varmks_renamefiles(VARMKS *op) noex {
+local int varmks_renamefiles(VMKS *op) noex {
 	int		rs ;
-	cchar	*suf = FSUF_IDX ;
-	cchar	*end = ENDIANSTR ;
-	char		idxfname[MAXPATHLEN + 1] ;
-	if ((rs = mkfnamesuf2(idxfname,op->dbname,suf,end)) >= 0) {
-	    if ((rs = u_rename(op->nidxfname,idxfname)) >= 0) {
-	        op->nidxfname[0] = '\0' ;
-	    } else {
-	        u_unlink(op->nidxfname) ;
-	        op->nidxfname[0] = '\0' ;
-	    }
-	} /* end if (mkfnamesuf) */
+	int		rs1 ;
+	cchar		*strsuf = FSUF_IDX ;
+	cchar		*strend = ENDIANSTR ;
+	if (char *ibuf ; (rs = mem.mp(&ibuf)) >= 0) ylikely {
+	    if ((rs = mkfnamesuf(ibuf,op->dbname,strsuf,strend)) >= 0) {
+	        if ((rs = u_rename(op->nidxfname,ibuf)) >= 0) {
+	            op->nidxfname[0] = '\0' ;
+	        } else {
+	            u_unlink(op->nidxfname) ;
+	            op->nidxfname[0] = '\0' ;
+	        }
+	    } /* end if (mkfnamesuf) */
+	    rs1 = mem.free(ibuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 } /* end subroutine (varmks_renamefiles) */
 
 local int rectab_start(RECTAB *rtp,int n) noex {
 	int		rs = SR_OK ;
-	int		size ;
-	void		*p ;
-
-	if (n < 10)
-	    n = 10 ;
-
+	int		sz ;
+	if (n < 10) n = 10 ;
 	rtp->i = 0 ;
 	rtp->n = n ;
-	size = (n + 1) * 2 * szof(int) ;
-	if ((rs = uc_malloc(size,&p)) >= 0) {
-	    rtp->rectab = p ;
+	sz = ((n + 1) * 2 * szof(int)) ;
+	if (void *p ; (rs = mem.mall(sz,&p)) >= 0) ylikely {
+	    rtp->rectab = rectab_t(p) ;
 	    rtp->rectab[0][0] = 0 ;
 	    rtp->rectab[0][1] = 0 ;
 	    rtp->i = 1 ;
-	}
-
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (rectab_start) */
 
@@ -877,25 +872,24 @@ local int rectab_finish(RECTAB *rtp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (rtp->rectab) {
-	    rs1 = uc_free(rtp->rectab) ;
+	    rs1 = mem.free(rtp->rectab) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rtp->rectab = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (rectab_finish) */
 
 local int rectab_add(RECTAB *rtp,uint ki,uint vi) noex {
 	int		rs = SR_OK ;
-	int		i ;
-	i = rtp->i ;
+	int		i = rtp->i ; /* return-value */
 	if ((i + 1) > rtp->n) {
 	    rs = rectab_extend(rtp) ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rtp->rectab[i][0] = ki ;
 	    rtp->rectab[i][1] = vi ;
 	    rtp->i += 1 ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (rectab_add) */
 
@@ -903,37 +897,42 @@ local int rectab_extend(RECTAB *rtp) noex {
 	int		rs = SR_OK ;
 	if ((rtp->i + 1) > rtp->n) {
 	    uint	(*va)[2] ;
-	    int		nn, size ;
+	    int		nn, sz ;
 	    nn = (rtp->n + 1) * 2 ;
-	    size = (nn + 1) * 2 * szof(int) ;
-	    if ((rs = uc_realloc(rtp->rectab,size,&va)) >= 0) {
+	    sz = (nn + 1) * 2 * szof(int) ;
+	    if ((rs = mem.rall(rtp->rectab,sz,&va)) >= 0) ylikely {
 	        rtp->rectab = va ;
 	        rtp->n = nn ;
-	    }
+	    } /* end if (memory-realloc) */
 	} /* end if */
 	return rs ;
 } /* end subroutine (rectab_extend) */
 
 local int rectab_done(RECTAB *rtp) noex {
-	int		i = rtp->i ;
+	int		i = rtp->i ; /* return-value */
 	rtp->rectab[i][0] = UINT_MAX ;
 	rtp->rectab[i][1] = 0 ;
 	return i ;
 } /* end subroutine (rectab_done) */
 
 local int rectab_getvec(RECTAB *rtp,uint (**rpp)[2]) noex {
-	*rpp = rtp->rectab ;
-	return rtp->i ;
+    	int		rs = SR_BUGCHECK ;
+	int		idx = 0 ; /* return-value */
+	if (rtp && rpp) ylikely {
+	    *rpp = rtp->rectab ;
+	    idx = rtp->i ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? idx : rs ;
 } /* end subroutine (rectab_getvec) */
 
 local int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf) noex {
-	cchar		*end = ENDIANSTR ;
-	cchar		*fin = (type) ? "xXXXX" : "n" ;
-	return mkfnamesuf3(tbuf,dbn,suf,end,fin) ;
+	cchar		*strend = ENDIANSTR ;
+	cchar		*strfin = (type) ? "xXXXX" : "n" ;
+	return mkfnamesuf(tbuf,dbn,suf,strend,strfin) ;
 } /* end subroutine (mknewfname) */
 
 local int unlinkstale(cchar *fn,int to) noex {
-	const time_t	dt = time(nullptr) ;
+	custime		dt = getustime ;
 	int		rs ;
 	if (ustat sb ; (rs = uc_stat(fn,&sb)) >= 0) {
 	    if ((dt-sb.st_mtime) >= to) {
@@ -949,85 +948,54 @@ local int unlinkstale(cchar *fn,int to) noex {
 } /* end subroutine (unlinkstale) */
 
 local int indinsert(uint (*rt)[2],uint (*it)[3],int il,varentry *vep) noex {
-	uint		nhash, chash ;
+	uint		chash ;
 	uint		ri, ki ;
-	uint		lhi, nhi, hi ;
-	int		c = 0 ;
-
-	hi = vep->hi ;
-	nhash = vep->khash ;
+	uint		lhi, nhi ;
+	uint		nhash = vep->khash ;
+	uint		hi = vep->hi ;
+	int		c = 0 ; /* return-value */
 	chash = (nhash & INT_MAX) ;
-
-#if	CF_DEBUGS
 	DEBUGPRINTF("indinsert: ve ri=%u ki=%u khash=%08X hi=%u\n",
-	    vep->ri,vep->ki,vep->khash,vep->hi) ;
+	vep->ri,vep->ki,vep->khash,vep->hi) ;
 	DEBUGPRINTF("indinsert: il=%u loop 1\n",il) ;
-#endif
-
-/* CONSTCOND */
-	while (true) {
-
-#if	CF_DEBUGS
-	    DEBUGPRINTF("indinsert: it%u ri=%u nhi=%u\n",
-	        hi,it[hi][0],it[hi][2]) ;
-#endif
-
-	    if (it[hi][0] == 0)
-	        break ;
-
+	forever {
+	    DEBUGPRINTF("it%u ri=%u nhi=%u\n",hi,it[hi][0],it[hi][2]) ;
+	    if (it[hi][0] == 0) break ;
 	    ri = it[hi][0] ;
 	    ki = rt[ri][0] ;
-	    if (ki == vep->ki)
-	        break ;
-
-	    it[hi][1] |= (~ INT_MAX) ;
-	    nhash = hashagain(nhash,c++,VARMKS_NSKIP) ;
-
+	    if (ki == vep->ki) break ;
+	    it[hi][1] |= (compl INT_MAX) ;
+	    nhash = hash_again(nhash,c++,VMKS_NSKIP) ;
 	    hi = hashindex(nhash,il) ;
-
-#if	CF_DEBUGS
-	    DEBUGPRINTF("indinsert: nhash=%08X nhi=%u\n",nhash,hi) ;
-#endif
-
+	    DEBUGPRINTF("nhash=%08X nhi=%u\n",nhash,hi) ;
 	} /* end while */
-
 	if (it[hi][0] > 0) {
-
-#if	CF_DEBUGS
-	    DEBUGPRINTF("indinsert: loop 2\n") ;
-#endif
-
+	    DEBUGPRINTF("loop 2\n") ;
 	    lhi = hi ;
-	    while ((nhi = it[lhi][2]) > 0)
+	    while ((nhi = it[lhi][2]) > 0) {
 	        lhi = nhi ;
-
+	    } /* end while */
 	    hi = hashindex((lhi + 1),il) ;
-
-#if	CF_DEBUGS
-	    DEBUGPRINTF("indinsert: loop 3 lhi=%u\n",lhi) ;
-#endif
-
-	    while (it[hi][0] > 0)
+	    DEBUGPRINTF("loop 3 lhi=%u\n",lhi) ;
+	    while (it[hi][0] > 0) {
 	        hi = hashindex((hi + 1),il) ;
-
+	    } /* end while */
 	    it[lhi][2] = hi ;
-
-#if	CF_DEBUGS
-	    DEBUGPRINTF("indinsert: loop 3 it%u ki=%u nhi=%u\n",lhi,
-	        it[lhi][0],hi) ;
-#endif
-
+	    DEBUGPRINTF("loop 3 it%u ki=%u nhi=%u\n",lhi, it[lhi][0],hi) ;
 	} /* end if (same-key continuation) */
-
 	it[hi][0] = vep->ri ;
 	it[hi][1] = chash ;
 	it[hi][2] = 0 ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("indinsert: ret hi=%u c=%u\n",hi,c) ;
-#endif
-
+	DEBUGPRINTF("ret hi=%u c=%u\n",hi,c) ;
 	return c ;
 } /* end subroutine (indinsert) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
+	    maxpathlen = rs ;
+	} /* end if (bufsizeget) */
+	return rs ;
+} /* end if (vars::operator) */
 
 
