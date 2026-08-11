@@ -77,7 +77,7 @@ import libutil ;			/* |lenstr(3u)| */
 enum his {
 	hi_dbsz,			/* DB file size */
 	hi_dbtime,			/* DB modification-time */
-	hi_idxsize,			/* IDX file size */
+	hi_idxsz,			/* IDX file size */
 	hi_idxtime,			/* IDX modification-time */
 	hi_vioff,			/* key-string table */
 	hi_vilen,
@@ -126,7 +126,7 @@ int cmihdr_rd(cmihdr *op,char *hbuf,int hlen) noex {
 	        	uint			*header = uintp(bp) ;
 	        	header[hi_dbsz]		= op->dbsz ;
 	        	header[hi_dbtime]	= op->dbtime ;
-	        	header[hi_idxsize]	= op->idxsize ;
+	        	header[hi_idxsz]	= op->idxsz ;
 	        	header[hi_idxtime]	= op->idxtime ;
 	        	header[hi_vioff]	= op->vioff ;
 	        	header[hi_vilen]	= op->vilen ;
@@ -155,12 +155,12 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	if (op && hbuf) ylikely {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) ylikely {
 		rs = SR_OK ;
 	        bp += magicsz ;
 	        bl -= magicsz ;
 		/* read out the VETU information */
-	        if (bl >= 4) {
+	        if (bl >= 4) ylikely {
 		    uchar	ech = uchar(ENDIAN) ;
 	            memcopy(op->vetu,bp,vsz) ;
 	            if (op->vetu[0] != CMIHDR_VERSION) {
@@ -179,7 +179,7 @@ int cmihdr_wr(cmihdr *op,cchar *hbuf,int hlen) noex {
 	                const uint	*header = uintp(bp) ;
 	                op->dbsz	= header[hi_dbsz] ;
 	                op->dbtime	= header[hi_dbtime] ;
-	                op->idxsize	= header[hi_idxsize] ;
+	                op->idxsz	= header[hi_idxsz] ;
 	                op->idxtime	= header[hi_idxtime] ;
 	                op->vioff	= header[hi_vioff] ;
 	                op->vilen	= header[hi_vilen] ;
