@@ -178,9 +178,9 @@ local inline int var_magic(var *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (var_magic) */
 
-local int	var_objloadbegin(VAR *,cchar *,cchar *) noex ;
-local int	var_objloadend(VAR *) noex ;
-local int	var_loadcalls(VAR *,vecstr *) noex ;
+local int	var_objloadbegin	(var *,cchar *,cchar *) noex ;
+local int	var_objloadend		(var *) noex ;
+local int	var_loadcalls		(var *,vecstr *) noex ;
 
 local bool	isrequired(int) noex ;
 
@@ -222,7 +222,7 @@ constexpr cpcchar	subnames[] = {
 
 /* exported subroutines */
 
-int var_open(VAR *op,cchar *dbname) noex {
+int var_open(var *op,cchar *dbname) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	cchar		*objname = VAR_OBJNAME ;
@@ -246,7 +246,7 @@ int var_open(VAR *op,cchar *dbname) noex {
 	return rs ;
 } /* end subroutine (var_open) */
 
-int var_close(VAR *op) noex {
+int var_close(var *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = var_magic(op)) >= 0) ylikely {
@@ -268,7 +268,7 @@ int var_close(VAR *op) noex {
 	return rs ;
 } /* end subroutine (var_close) */
 
-int var_getinfo(VAR *op,VAR_INFO *vip) noex {
+int var_getinfo(var *op,VAR_INFO *vip) noex {
 	int		rs ;
 	if ((rs = var_magic(op,vip)) >= 0) ylikely {
 	    memclear(vip) ;
@@ -285,7 +285,7 @@ int var_getinfo(VAR *op,VAR_INFO *vip) noex {
 	return rs ;
 } /* end subroutine (var_getinfo) */
 
-int var_count(VAR *op) noex {
+int var_count(var *op) noex {
 	int		rs ;
 	if ((rs = var_magic(op)) >= 0) ylikely {
             if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
@@ -295,9 +295,9 @@ int var_count(VAR *op) noex {
 	return rs ;
 } /* end subroutine (var_count) */
 
-int var_curbegin(VAR *op,VAR_CUR *curp) noex {
+int var_curbegin(var *op,var_cur *curp) noex {
 	int		rs ;
-	if ((rs = var_magic(op,curp)) >= 0) {
+	if ((rs = var_magic(op,curp)) >= 0) ylikely {
 	    memclear(curp) ;
 	    rs = SR_BUGCHECK ;
             if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
@@ -319,10 +319,10 @@ int var_curbegin(VAR *op,VAR_CUR *curp) noex {
 	return rs ;
 } /* end subroutine (var_curbegin) */
 
-int var_curend(VAR *op,VAR_CUR *curp) noex {
+int var_curend(var *op,var_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = var_magic(op,curp)) >= 0) {
+	if ((rs = var_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
             if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
 	        rs = SR_NOTOPEN ;
@@ -347,10 +347,10 @@ int var_curend(VAR *op,VAR_CUR *curp) noex {
 	return rs ;
 } /* end subroutine (var_curend) */
 
-int var_curenum(VAR *op,VAR_CUR *curp,char *kbuf,int klen,
+int var_curenum(var *op,var_cur *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
-	if ((rs = var_magic(op,curp,kbuf)) >= 0) {
+	if ((rs = var_magic(op,curp,kbuf)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
             if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
 	        rs = SR_NOTOPEN ;
@@ -369,9 +369,9 @@ int var_curenum(VAR *op,VAR_CUR *curp,char *kbuf,int klen,
 	return rs ;
 } /* end subroutine (var_curenum) */
 
-int var_fetch(VAR *op,cc *kp,int kl,VAR_CUR *curp,char *vbuf,int vlen) noex {
+int var_fetch(var *op,cc *kp,int kl,var_cur *curp,char *vbuf,int vlen) noex {
 	int		rs = SR_NOSYS ;
-	if ((rs = var_magic(op,curp,kp)) >= 0) {
+	if ((rs = var_magic(op,curp,kp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
             if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
 	        rs = SR_NOTOPEN ;
@@ -386,9 +386,9 @@ int var_fetch(VAR *op,cc *kp,int kl,VAR_CUR *curp,char *vbuf,int vlen) noex {
 	return rs ;
 } /* end subroutine (var_fetch) */
 
-int var_audit(VAR *op) noex {
+int var_audit(var *op) noex {
 	int		rs ;
-	if ((rs = var_magic(op)) >= 0) {
+	if ((rs = var_magic(op)) >= 0) ylikely {
 	    rs = SR_NOSYS ;
             if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
 	        rs = callp->audit(op->obj) ;
@@ -400,7 +400,7 @@ int var_audit(VAR *op) noex {
 
 /* private subroutines */
 
-local int var_objloadbegin(VAR *op,cchar *pr,cchar *objn) noex {
+local int var_objloadbegin(var *op,cchar *pr,cchar *objn) noex {
 	modload		*mlp = op->mlp ;
 	cint		vn = sub_overlast ;
 	cint		vo = vecstrm.compact ;
@@ -448,7 +448,7 @@ local int var_objloadbegin(VAR *op,cchar *pr,cchar *objn) noex {
 	return rs ;
 } /* end subroutine (var_objloadbegin) */
 
-local int var_objloadend(VAR *op) noex {
+local int var_objloadend(var *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->obj) {
@@ -464,7 +464,7 @@ local int var_objloadend(VAR *op) noex {
 	return rs ;
 } /* end subroutine (var_objloadend) */
 
-local int var_loadcalls(VAR *op,vecstr *slp) noex {
+local int var_loadcalls(var *op,vecstr *slp) noex {
 	modload		*mlp = op->mlp ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
