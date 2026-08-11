@@ -1,4 +1,4 @@
-/* b_quote SUPPORT */
+/* b_quote SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -21,6 +21,9 @@
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_quote
 
   	Description:
 	This is a built-in command to the KSH shell.  This little
@@ -55,8 +58,9 @@
 #include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -190,10 +194,10 @@ static int	config_finish(CF *) ;
 static int	config_files(CF *,vecstr *) ;
 static int	config_loadcooks(CF *) ;
 
-static int	procopts(PI *,KEYOPT *) ;
+static int	procopts(PI *,keyopt *) ;
 static int	procspecs(PI *,cchar *,int) ;
 static int	procspec(PI *,vecstr *) ;
-static int	procnames(PI *,PARAMOPT *) ;
+static int	procnames(PI *,paramopt *) ;
 
 static int	procout(PI *,cchar *,int) ;
 static int	procoutline(PI *,int,cchar *,int) ;
@@ -351,9 +355,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO	li, *lip = &li ;
 	CF	co ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	bits		pargs ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	USERINFO	u ;
 	SHIO		errfile ;
 	SHIO		outfile, *ofp = &outfile ;
@@ -679,7 +683,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        argl = strlen(argp) ;
 	                        if (argl) {
 				    lip->have.quotenames = TRUE ;
-				    lip->final.quotenames = TRUE ;
+				    lip->finval.quotenames = TRUE ;
 	                            rs = paramopt_loads(&aparams,
 	                                PO_NAME,argp,argl) ;
 				}
@@ -694,7 +698,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 				} else
@@ -729,7 +733,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        argl = strlen(argp) ;
 	                        if (argl) {
 	                            lip->have.linelen = TRUE ;
-	                            lip->final.linelen = TRUE ;
+	                            lip->finval.linelen = TRUE ;
 	                            rs = optvalue(argp,argl) ;
 	                            lip->linelen = rs ;
 	                        }
@@ -835,7 +839,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if ((lip->nverses <= 0) && (argvalue >= 0)) {
 	    lip->have.nverses = TRUE ;
-	    lip->final.nverses = TRUE ;
+	    lip->finval.nverses = TRUE ;
 	    lip->nverses = argvalue ;
 	}
 
@@ -901,9 +905,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* calendar directories */
 
-	if ((rs >= 0) && (! lip->final.quotedirs)) {
+	if ((rs >= 0) && (! lip->finval.quotedirs)) {
 	if ((cp = getourenv(envv,VARCALDNAMES)) != NULL) {
-	    lip->final.quotedirs = TRUE ;
+	    lip->finval.quotedirs = TRUE ;
 	    lip->have.quotedirs = TRUE ;
 	    rs = locinfo_loaddirs(lip,cp,-1) ;
 	} /* end if */
@@ -915,9 +919,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    rs = procnames(pip,&aparams) ;
 	}
 
-	if ((rs >= 0) && (! lip->final.quotenames)) {
+	if ((rs >= 0) && (! lip->finval.quotenames)) {
 	    if ((cp = getourenv(envv,VARQUOTENAMES)) != NULL) {
-	        lip->final.quotenames = TRUE ;
+	        lip->finval.quotenames = TRUE ;
 	        lip->have.quotenames = TRUE ;
 	        rs = locinfo_loadnames(lip,cp,-1) ;
 	    } /* end if */
@@ -1254,7 +1258,7 @@ static int locinfo_deflinelen(LOCINFO *lip)
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (rs >= def) {
 	                lip->have.linelen = TRUE ;
-	                lip->final.linelen = TRUE ;
+	                lip->finval.linelen = TRUE ;
 	                lip->linelen = rs ;
 		    }
 	        }
@@ -1340,7 +1344,7 @@ PROGINFO	*pip ;
 cchar	*configfname ;
 {
 	EXPCOOK		*ckp ;
-	PARAMFILE	*pp ;
+	paramfile	*pp ;
 	vecstr		files ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1630,9 +1634,9 @@ CF	*cfp ;
 static int config_read(CF *cfp) noex {
 	proginfo	*pip = cfp->pip ;
 	LOCINFO		*lip ;
-	PARAMFILE	*pfp ;
-	PARAMFILE_CUR	cur ;
-	PARAMFILE_ENT	pe ;
+	paramfile	*pfp ;
+	paramfile_cur	cur ;
+	paramfile_ent	pe ;
 	EXPCOOK		*ckp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1699,7 +1703,7 @@ static int config_read(CF *cfp) noex {
 
 	    switch (i) {
 	            case param_logsize:
-	                if ((! pip->final.logsize) && (el > 0)) {
+	                if ((! pip->finval.logsize) && (el > 0)) {
 	                    pip->have.logsize = TRUE ;
 	                    rs1 = cfdecmfi(ebuf,el,&v) ;
 	                    if (rs1 >= 0)
@@ -1707,9 +1711,9 @@ static int config_read(CF *cfp) noex {
 	                }
 	                break ;
 	            case param_logfile:
-	                if (! pip->final.logfname) {
+	                if (! pip->finval.logfname) {
 	                    pip->have.logfname = TRUE ;
-	                    rs1 = prsetfname(pr,tmpfname,ebuf,el,TRUE,
+	                    rs1 = prmkfname(pr,tmpfname,ebuf,el,TRUE,
 	                        LOGDNAME,pip->searchname,"") ;
 	                    ccp = pip->lfname ;
 	                    if ((ccp == NULL) ||
@@ -1721,7 +1725,7 @@ static int config_read(CF *cfp) noex {
 	                }
 	                break ;
 	            case param_quotedirs:
-	                if ((! lip->final.quotedirs) && (el > 0)) {
+	                if ((! lip->finval.quotedirs) && (el > 0)) {
 #if	CF_DEBUG
 			if (DEBUGLEVEL(4))
 	    		    debugprintf("config_read: caldir=%r\n",
@@ -1731,7 +1735,7 @@ static int config_read(CF *cfp) noex {
 			}
 	                break ;
 	            case param_quotenames:
-	                if ((! lip->final.quotenames) && (el > 0)) {
+	                if ((! lip->finval.quotenames) && (el > 0)) {
 	                    rs = locinfo_loadnames(lip,ebuf,el) ;
 			}
 	                break ;
@@ -1757,10 +1761,10 @@ ret0:
 
 static int procnames(pip,app)
 PROGINFO	*pip ;
-PARAMOPT	*app ;
+paramopt	*app ;
 {
 	LOCINFO	*lip = pip->lip ;
-	PARAMOPT_CUR	cur ;
+	paramopt_cur	cur ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		nl ;
@@ -1795,7 +1799,7 @@ ret0:
 
 
 /* process the program ako-names */
-static int procopts(PI *pip,KEYOPT *kop)
+static int procopts(PI *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1807,13 +1811,13 @@ static int procopts(PI *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-		while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+		while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 		    if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1821,9 +1825,9 @@ static int procopts(PI *pip,KEYOPT *kop)
 
 	        	switch (oi) {
 	        case akoname_audit:
-	            if (! lip->final.audit) {
+	            if (! lip->finval.audit) {
 	                lip->have.audit = TRUE ;
-	                lip->final.audit = TRUE ;
+	                lip->finval.audit = TRUE ;
 	                lip->fl.audit = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1832,9 +1836,9 @@ static int procopts(PI *pip,KEYOPT *kop)
 	            }
 	            break ;
 	        case akoname_linelen:
-	            if (! lip->final.linelen) {
+	            if (! lip->finval.linelen) {
 	                lip->have.linelen = TRUE ;
-	                lip->final.linelen = TRUE ;
+	                lip->finval.linelen = TRUE ;
 	                lip->fl.linelen = TRUE ;
 	                if (vl > 0) {
 			    rs = optvalue(vp,vl) ;
@@ -1843,9 +1847,9 @@ static int procopts(PI *pip,KEYOPT *kop)
 	            }
 	            break ;
 	        case akoname_indent:
-	            if (! lip->final.indent) {
+	            if (! lip->finval.indent) {
 	                lip->have.indent = TRUE ;
-	                lip->final.indent = TRUE ;
+	                lip->finval.indent = TRUE ;
 	                lip->fl.indent = TRUE ;
 			lip->indent = 1 ;
 	                if (vl > 0) {
@@ -1855,9 +1859,9 @@ static int procopts(PI *pip,KEYOPT *kop)
 	            }
 	            break ;
 		case akoname_interactive:
-	            if (! lip->final.interactive) {
+	            if (! lip->finval.interactive) {
 	                lip->have.interactive = TRUE ;
-	                lip->final.interactive = TRUE ;
+	                lip->finval.interactive = TRUE ;
 	                lip->fl.interactive = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1866,9 +1870,9 @@ static int procopts(PI *pip,KEYOPT *kop)
 		    }
 		    break ;
 		case akoname_prefix:
-	            if (! lip->final.prefix) {
+	            if (! lip->finval.prefix) {
 	                lip->have.prefix = TRUE ;
-	                lip->final.prefix = TRUE ;
+	                lip->finval.prefix = TRUE ;
 	                lip->fl.prefix = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
@@ -1877,9 +1881,9 @@ static int procopts(PI *pip,KEYOPT *kop)
 		    }
 		    break ;
 	        case akoname_separate:
-	            if (! lip->final.separate) {
+	            if (! lip->finval.separate) {
 	                lip->have.separate = TRUE ;
-	                lip->final.separate = TRUE ;
+	                lip->finval.separate = TRUE ;
 	                lip->fl.separate = TRUE ;
 	                if (vl > 0) {
 			    rs = optbool(vp,vl) ;
