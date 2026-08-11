@@ -1,14 +1,14 @@
-/* b_mkboottime */
+/* b_mkboottime SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to create a "boottime" file */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LOCINFOUTF	1		/* locinfo-utf */
-
 
 /* revision history:
 
@@ -21,13 +21,13 @@
 
 /*******************************************************************************
 
-	Synopsis:
+  	Name:
+	b_mkboottime
 
+	Synopsis:
 	$ mkboottime <file>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -74,22 +74,6 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -99,12 +83,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -121,7 +99,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
@@ -137,8 +115,8 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procline(PROGINFO *,void *,cchar *,int) ;
 static int	procspec(PROGINFO *,void *,cchar *,int) ;
 
@@ -268,8 +246,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -568,7 +546,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -724,7 +702,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (rs >= 0) {
 	    ARGINFO	*aip = &ainfo ;
-	    BITS	*bop = &pargs ;
+	    bits	*bop = &pargs ;
 	    cchar	*ofn = ofname ;
 	    cchar	*afn = afname ;
 	    rs = process(pip,aip,bop,ofn,afn) ;
@@ -844,7 +822,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -856,13 +834,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -871,9 +849,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (oi) {
 	                case akoname_utf:
 	                case akoname_db:
-	                    if (! lip->final.utfname) {
+	                    if (! lip->finval.utfname) {
 	                        lip->have.utfname = TRUE ;
-	                        lip->final.utfname = TRUE ;
+	                        lip->finval.utfname = TRUE ;
 	                        if (vl > 0) {
 	                            const char	**vpp = &lip->utfname ;
 	                            rs = locinfo_setentry(lip,vpp,vp,vl) ;
@@ -898,7 +876,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1043,8 +1021,8 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *fp,int fl)
 	            struct utimbuf	ut ;
 	            ut.actime = pip->daytime ;
 	            ut.modtime = lip->btime ;
-	            rs = u_utime(fname,&ut) ;
-	        }
+	            rs = uc_filetime(fname,&ut) ;
+	        } /* end if (ok) */
 
 	        if (pip->debuglevel > 0) {
 	            fmt = "%s: file=%s (%d)\n" ;
@@ -1148,7 +1126,7 @@ static int locinfo_utfname(LOCINFO *lip,cchar *utfname)
 
 	if (utfname != NULL) {
 	    lip->have.utfname = TRUE ;
-	    lip->final.utfname = TRUE ;
+	    lip->finval.utfname = TRUE ;
 	    lip->utfname = utfname ;
 	}
 
@@ -1165,7 +1143,7 @@ static int locinfo_defaults(LOCINFO *lip)
 
 	if (lip == NULL) return SR_FAULT ;
 
-	if ((lip->utfname == NULL) && (! lip->final.utfname)) {
+	if ((lip->utfname == NULL) && (! lip->finval.utfname)) {
 	    cchar	*cp = getourenv(pip->envv,VARUTFNAME) ;
 	    if (cp != NULL) {
 	        cchar	**vpp = &lip->utfname ;
