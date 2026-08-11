@@ -50,8 +50,8 @@ struct babycalc_information {
 
 struct babycalc_head {
 	modload		*mlp ;		/* module-load-pointer */
-	void		*obj ;		/* object pointer */
 	void		*callp ;	/* calls-structure pointer */
+	void		*obj ;		/* object pointer */
 	BABYCALC_FL	fl ;
 	uint		magval ;
 	int		objsz ;
