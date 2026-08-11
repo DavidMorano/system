@@ -1,5 +1,6 @@
-/* b_rename SUPPORT */
-/* lang=C++20 */
+/* b_rename SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to rename a file */
 /* version %I% last-modified %G% */
@@ -18,6 +19,9 @@
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+  	Name:
+	b_rename
 
 	Description:
 	This is a built-in command to the KSH shell.  It should
@@ -87,44 +91,8 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	ctdecpi(char *,int,int,int) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	hasuc(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -150,10 +118,10 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	const char	*suffix ;
-	const char	*startnum ;
+	cchar	*suffix ;
+	cchar	*startnum ;
 	PROGINFO	*pip ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	NUMINCR		incr ;
 	enum sufs	suftype ;
 	int		sortkey ;
@@ -161,9 +129,9 @@ struct locinfo {
 
 /* argument values */
 struct argvals {
-	const char	*basename ;
-	const char	*suffix ;
-	const char	*countstr ;
+	cchar	*basename ;
+	cchar	*suffix ;
+	cchar	*countstr ;
 	int		countlen ;
 	int		prec ;
 	int		incr ;
@@ -178,39 +146,39 @@ struct zombiename {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,vecstr *,cchar *) ;
-static int	entername(PROGINFO *,vecstr *,const char *) ;
-static int	procnewnames(PROGINFO *,ARGVALS *,vecstr *) ;
-static int	procrename(PROGINFO *,char *,vecstr *,vecstr *) ;
-static int	parsesort(PROGINFO *,const char *,int) ;
-static int	makefname(PROGINFO *,ARGVALS *,cchar *,char *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,vecstr *,cchar *) ;
+local int	entername(PROGINFO *,vecstr *,cchar *) ;
+local int	procnewnames(PROGINFO *,ARGVALS *,vecstr *) ;
+local int	procrename(PROGINFO *,char *,vecstr *,vecstr *) ;
+local int	parsesort(PROGINFO *,cchar *,int) ;
+local int	makefname(PROGINFO *,ARGVALS *,cchar *,char *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_setsuf(LOCINFO *,cchar *) ;
-static int	locinfo_findsuf(LOCINFO *,cchar *,int) ;
-static int	locinfo_setcount(LOCINFO *,cchar *,int) ;
-static int	locinfo_setprec(LOCINFO *,int) ;
-static int	locinfo_setsort(LOCINFO *,cchar *,int) ;
-static int	locinfo_incr(LOCINFO *,int) ;
-static int	locinfo_cvtstr(LOCINFO *,char *,int,int) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_setsuf(LOCINFO *,cchar *) ;
+local int	locinfo_findsuf(LOCINFO *,cchar *,int) ;
+local int	locinfo_setcount(LOCINFO *,cchar *,int) ;
+local int	locinfo_setprec(LOCINFO *,int) ;
+local int	locinfo_setsort(LOCINFO *,cchar *,int) ;
+local int	locinfo_incr(LOCINFO *,int) ;
+local int	locinfo_cvtstr(LOCINFO *,char *,int,int) ;
+local int	locinfo_finish(LOCINFO *) ;
 
-static int	zombiename_start(ZOMBIENAME *,VECSTR *) ;
-static int	zombiename_rename(ZOMBIENAME *,const char *,char *) ;
-static int	zombiename_finish(ZOMBIENAME *) ;
+local int	zombiename_start(ZOMBIENAME *,VECSTR *) ;
+local int	zombiename_rename(ZOMBIENAME *,cchar *,char *) ;
+local int	zombiename_finish(ZOMBIENAME *) ;
 
-static int	mkfnamenum(char *,const char *,int,int) ;
-static int	argvals_check(ARGVALS *) ;
+local int	mkfnamenum(char *,cchar *,int,int) ;
+local int	argvals_check(ARGVALS *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"HELP",
@@ -253,7 +221,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"sort",
 	NULL
 } ;
@@ -263,7 +231,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*sortkeys[] = {
+static cchar	*sortkeys[] = {
 	"default",
 	"name",
 	"mtime",
@@ -292,7 +260,7 @@ int b_rename(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    cchar	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -316,14 +284,14 @@ int p_rename(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	ARGVALS		avs ;		/* argument values */
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -339,13 +307,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -616,7 +584,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 				} else
@@ -882,12 +850,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-b <base>] [-s <suffix>] [<files(s)> ...]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -907,25 +875,25 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-		while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+		while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	    	    if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -933,9 +901,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	        	switch (oi) {
 	        	case akoname_sort:
-		    	    if (! lip->final.sortkey) {
+		    	    if (! lip->finval.sortkey) {
 	                	lip->have.sortkey = TRUE ;
-	                	lip->final.sortkey = TRUE ;
+	                	lip->finval.sortkey = TRUE ;
 	                	lip->fl.sortkey = FALSE ;
 	                	if (vl > 0) {
 			    	    rs = parsesort(pip,vp,vl) ;
@@ -961,12 +929,12 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,vecstr *nlp,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pan = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (rs >= 0) {
 	    int	ai ;
@@ -1030,13 +998,13 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,vecstr *nlp,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int entername(PROGINFO *pip,vecstr *nlp,cchar *name)
+local int entername(PROGINFO *pip,vecstr *nlp,cchar *name)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		cl = strlen(name) ;
 	int		c = 0 ;
-	const char	*cp = name ;
+	cchar	*cp = name ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -1063,7 +1031,7 @@ static int entername(PROGINFO *pip,vecstr *nlp,cchar *name)
 /* end subroutine (entername) */
 
 
-static int procnewnames(PROGINFO *pip,ARGVALS *avsp,vecstr *nlp)
+local int procnewnames(PROGINFO *pip,ARGVALS *avsp,vecstr *nlp)
 {
 	LOCINFO		*lip = pip->lip ;
 	vecstr		newnames ;
@@ -1081,7 +1049,7 @@ static int procnewnames(PROGINFO *pip,ARGVALS *avsp,vecstr *nlp)
 	    int		len ;
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
-	    const char	*np ;
+	    cchar	*np ;
 	    char	tbuf[MAXPATHLEN+1] ;
 	    for (i = 0 ; vecstr_get(nlp,i,&np) >= 0 ; i += 1) {
 #if	CF_DEBUG
@@ -1119,7 +1087,7 @@ static int procnewnames(PROGINFO *pip,ARGVALS *avsp,vecstr *nlp)
 /* end subroutine (procnewnames) */
 
 
-static int procrename(PROGINFO *pip,char *tbuf,vecstr *nlp,vecstr *nnlp)
+local int procrename(PROGINFO *pip,char *tbuf,vecstr *nlp,vecstr *nnlp)
 {
 	ZOMBIENAME	zn ;
 	int		rs ;
@@ -1160,7 +1128,7 @@ static int procrename(PROGINFO *pip,char *tbuf,vecstr *nlp,vecstr *nnlp)
 /* end subroutine (procrename) */
 
 
-static int parsesort(PROGINFO *pip,cchar *vp,int vl)
+local int parsesort(PROGINFO *pip,cchar *vp,int vl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1172,7 +1140,7 @@ static int parsesort(PROGINFO *pip,cchar *vp,int vl)
 /* end subroutine (parsesort) */
 
 
-static int makefname(PROGINFO *pip,ARGVALS *sip,cchar *np,char *tbuf)
+local int makefname(PROGINFO *pip,ARGVALS *sip,cchar *np,char *tbuf)
 {
 	LOCINFO		*lip = pip->lip ;
 	const int	dlen = DBUFLEN ;
@@ -1259,7 +1227,7 @@ static int makefname(PROGINFO *pip,ARGVALS *sip,cchar *np,char *tbuf)
 /* end subroutine (makefname) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs ;
 
@@ -1273,7 +1241,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1293,7 +1261,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setsuf(LOCINFO *lip,cchar *suf)
+local int locinfo_setsuf(LOCINFO *lip,cchar *suf)
 {
 	int		rs = SR_OK ;
 
@@ -1342,7 +1310,7 @@ static int locinfo_setsuf(LOCINFO *lip,cchar *suf)
 /* end subroutine (locinfo_setsuf) */
 
 
-static int locinfo_findsuf(LOCINFO *lip,cchar *sp,int sl)
+local int locinfo_findsuf(LOCINFO *lip,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 
@@ -1354,7 +1322,7 @@ static int locinfo_findsuf(LOCINFO *lip,cchar *sp,int sl)
 	        cp = (tp+1) ;
 	        cl = (sp + sl) - cp ;
 	        if (cl > 0) {
-	            const char	*ccp ;
+	            cchar	*ccp ;
 		    if (hasuc(cp,cl)) {
 		        cl = strwcpylc(sufbuf,cp,SUFLEN) - sufbuf ;
 		        cp = sufbuf ;
@@ -1376,7 +1344,7 @@ static int locinfo_findsuf(LOCINFO *lip,cchar *sp,int sl)
 /* end subroutine (locinfo_findsuf) */
 
 
-static int locinfo_setcount(LOCINFO *lip,cchar *sp,int sl)
+local int locinfo_setcount(LOCINFO *lip,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 
@@ -1389,7 +1357,7 @@ static int locinfo_setcount(LOCINFO *lip,cchar *sp,int sl)
 /* end subroutine (locinfo_setcount) */
 
 
-static int locinfo_setprec(LOCINFO *lip,int prec)
+local int locinfo_setprec(LOCINFO *lip,int prec)
 {
 	int		rs ;
 
@@ -1400,7 +1368,7 @@ static int locinfo_setprec(LOCINFO *lip,int prec)
 /* end subroutine (locinfo_setprec) */
 
 
-static int locinfo_setsort(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_setsort(LOCINFO *lip,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		si ;
@@ -1421,14 +1389,14 @@ static int locinfo_setsort(LOCINFO *lip,cchar *vp,int vl)
 /* end subroutine (locinfo_setsort) */
 
 
-static int locinfo_incr(LOCINFO *lip,int incr)
+local int locinfo_incr(LOCINFO *lip,int incr)
 {
 	return numincr_incr(&lip->incr,incr) ;
 }
 /* end subroutine (locinfo_incr) */
 
 
-static int locinfo_cvtstr(LOCINFO *lip,char *dbuf,int dlen,int prec)
+local int locinfo_cvtstr(LOCINFO *lip,char *dbuf,int dlen,int prec)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -1447,7 +1415,7 @@ static int locinfo_cvtstr(LOCINFO *lip,char *dbuf,int dlen,int prec)
 /* end subroutine (locinfo_cvtstr) */
 
 
-static int zombiename_start(ZOMBIENAME *op,VECSTR *nnp)
+local int zombiename_start(ZOMBIENAME *op,VECSTR *nnp)
 {
 
 	memset(op,0,sizeof(ZOMBIENAME)) ;
@@ -1458,7 +1426,7 @@ static int zombiename_start(ZOMBIENAME *op,VECSTR *nnp)
 /* end subroutine (zombiename_start) */
 
 
-static int zombiename_rename(ZOMBIENAME *op,cchar *fname,char *tmpfname)
+local int zombiename_rename(ZOMBIENAME *op,cchar *fname,char *tmpfname)
 {
 	USTAT		usb ;
 	USTAT		*sbp = &usb ;
@@ -1503,7 +1471,7 @@ static int zombiename_rename(ZOMBIENAME *op,cchar *fname,char *tmpfname)
 /* end subroutine (zombiename_rename) */
 
 
-static int zombiename_finish(ZOMBIENAME *op)
+local int zombiename_finish(ZOMBIENAME *op)
 {
 
 	op->prefix[0] = '\0' ;
@@ -1514,7 +1482,7 @@ static int zombiename_finish(ZOMBIENAME *op)
 /* end subroutine (zombiename_finish) */
 
 
-static int mkfnamenum(char *tmpfname,cchar *prefix,int prec,int fn)
+local int mkfnamenum(char *tmpfname,cchar *prefix,int prec,int fn)
 {
 	const int	dlen = DBUFLEN ;
 	int		rs ;
@@ -1537,7 +1505,7 @@ static int mkfnamenum(char *tmpfname,cchar *prefix,int prec,int fn)
 
 
 /* argument values */
-static int argvals_check(ARGVALS *ap)
+local int argvals_check(ARGVALS *ap)
 {
 
 	if (ap->prec < 0)
