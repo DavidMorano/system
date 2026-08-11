@@ -1,4 +1,4 @@
-/* b_webcounter SUPPORT */
+/* b_webcounter SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -28,11 +28,16 @@
 
 /*******************************************************************************
 
-	This is a fairly generic front-end subroutine for small programs.
+  	Name:
+	b_webcounter
+
+	Description:
+	This is a fairly generic front-end subroutine for small
+	programs.
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -49,12 +54,13 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<estrings.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -151,7 +157,7 @@ struct locinfo_flags {
 
 struct locinfo {
 	VECSTR		stores ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	PROGINFO	*pip ;
 	vecstr		sufmaps ;
@@ -165,7 +171,7 @@ struct config {
 	uint		magic ;
 	PROGINFO	*pip ;
 	PARAMOPT	*app ;
-	PARAMFILE	p ;
+	paramfile	p ;
 	EXPCOOK		cooks ;
 	uint		f_p:1 ;
 	uint		f_cooks:1 ;
@@ -204,8 +210,8 @@ static int	procourconf_end(PROGINFO *) ;
 static int	procout_begin(PROGINFO *,void *,cchar *) ;
 static int	procout_end(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
@@ -379,8 +385,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	PARAMOPT	aparams ;
 	SHIO		errfile ;
 
@@ -675,7 +681,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            rs = SR_INVALID ;
 	                    }
 	                    if ((rs >= 0) && (cp != NULL)) {
-	                        lip->final.dbname = TRUE ;
+	                        lip->finval.dbname = TRUE ;
 	                        lip->dbname = cp ;
 	                    }
 	                    break ;
@@ -756,7 +762,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* add a counter to the DB if not already present */
 	                    case 'a':
-	                        lip->final.add = TRUE ;
+	                        lip->finval.add = TRUE ;
 	                        lip->have.add = TRUE ;
 	                        lip->fl.add = TRUE ;
 	                        if (f_optequal) {
@@ -774,7 +780,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                lip->final.basedname = TRUE ;
+	                                lip->finval.basedname = TRUE ;
 	                                lip->basedname = argp ;
 	                            }
 	                        } else
@@ -783,7 +789,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* increment a counter */
 	                    case 'i':
-	                        lip->final.inc = TRUE ;
+	                        lip->finval.inc = TRUE ;
 	                        lip->have.inc = TRUE ;
 	                        lip->fl.inc = TRUE ;
 	                        if (f_optequal) {
@@ -812,7 +818,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -821,7 +827,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* print out counter values */
 	                    case 'p':
-	                        lip->final.print = TRUE ;
+	                        lip->finval.print = TRUE ;
 	                        lip->have.print = TRUE ;
 	                        lip->fl.print = TRUE ;
 	                        if (f_optequal) {
@@ -1041,7 +1047,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if ((rs = procout_begin(pip,&ofile,ofn)) >= 0) {
 	                            {
 	                                ARGINFO	*aip = &ainfo ;
-	                                BITS	*bop = &pargs ;
+	                                bits	*bop = &pargs ;
 	                                rs = procargs(pip,aip,bop,afn,qs) ;
 	                            }
 	                            rs1 = procout_end(pip) ;
@@ -1193,7 +1199,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1205,13 +1211,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1219,9 +1225,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case akoname_print:
-	                    if (! lip->final.print) {
+	                    if (! lip->finval.print) {
 	                        lip->have.print = TRUE ;
-	                        lip->final.print = TRUE ;
+	                        lip->finval.print = TRUE ;
 	                        lip->fl.print = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1230,9 +1236,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_add:
-	                    if (! lip->final.add) {
+	                    if (! lip->finval.add) {
 	                        lip->have.add = TRUE ;
-	                        lip->final.add = TRUE ;
+	                        lip->finval.add = TRUE ;
 	                        lip->fl.add = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1241,9 +1247,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_inc:
-	                    if (! lip->final.inc) {
+	                    if (! lip->finval.inc) {
 	                        lip->have.inc = TRUE ;
-	                        lip->final.inc = TRUE ;
+	                        lip->finval.inc = TRUE ;
 	                        lip->fl.inc = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1252,17 +1258,17 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_base:
-	                    if (! lip->final.basedname) {
+	                    if (! lip->finval.basedname) {
 	                        if (vl > 0) {
-	                            lip->final.basedname = TRUE ;
+	                            lip->finval.basedname = TRUE ;
 	                            rs = locinfo_basedir(lip,vp,vl) ;
 	                        }
 	                    }
 	                    break ;
 	                case akoname_log:
-	                    if (! pip->final.logprog) {
+	                    if (! pip->finval.logprog) {
 	                        if (vl > 0) {
-	                            pip->final.logprog = TRUE ;
+	                            pip->finval.logprog = TRUE ;
 	                            rs = optbool(vp,vl) ;
 	                            pip->fl.logprog = (rs > 0) ;
 	                        }
@@ -1476,7 +1482,7 @@ static int procout_end(PROGINFO *pip)
 /* end subroutine (procout_end) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn,cchar *qs)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *qs)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAPSTRINT	names ;
@@ -1970,7 +1976,7 @@ static int procqsget(PROGINFO *pip,querystr *qsp,COUNTINFO *cip)
 	if (pip == NULL) return SR_FAULT ;
 	if ((rs = querystr_curbegin(qsp,&cur)) >= 0) {
 	    cchar	*kp, *vp ;
-	    while ((rs1 = querystr_enum(qsp,&cur,&kp,&vp)) >= 0) {
+	    while ((rs1 = querystr_curenum(qsp,&cur,&kp,&vp)) >= 0) {
 	        int		ki ;
 	        int		vl = rs1 ;
 #if	CF_DEBUG
@@ -2362,8 +2368,8 @@ static int config_read(CONFIG *csp)
 {
 	PROGINFO	*pip = csp->pip ;
 	LOCINFO		*lip ;
-	PARAMFILE	*pfp = &csp->p ;
-	PARAMFILE_CUR	cur ;
+	paramfile	*pfp = &csp->p ;
+	paramfile_cur	cur ;
 	const int	vlen = VBUFLEN ;
 	const int	elen = EBUFLEN ;
 	int		rs = SR_OK ;
@@ -2431,20 +2437,20 @@ static int config_read(CONFIG *csp)
 	                        break ;
 	                    case cparam_basedir:
 	                    case cparam_basedb:
-	                        if (! lip->final.basedname) {
+	                        if (! lip->finval.basedname) {
 	                            if (vl > 0) {
-	                                lip->final.basedname = TRUE ;
+	                                lip->finval.basedname = TRUE ;
 	                                rs = locinfo_basedir(lip,ebuf,el) ;
 	                            }
 	                        }
 	                        break ;
 	                    case cparam_logfile:
-	                        if (! pip->final.lfname) {
+	                        if (! pip->finval.lfname) {
 	                            cchar *lfn = pip->lfname ;
 	                            cchar	*tfn = tbuf ;
-	                            pip->final.lfname = TRUE ;
+	                            pip->finval.lfname = TRUE ;
 	                            pip->have.lfname = TRUE ;
-	                            ml = prsetfname(pr,tbuf,ebuf,el,TRUE,
+	                            ml = prmkfname(pr,tbuf,ebuf,el,TRUE,
 	                                LOGCNAME,sn,"") ;
 	                            if ((lfn == NULL) || 
 	                                (strcmp(lfn,tfn) != 0)) {
