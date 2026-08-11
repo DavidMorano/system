@@ -186,7 +186,7 @@ local int	vvecmp(cvoid *,cvoid *) ;
 
 /* exported variables */
 
-extern const cyimk_obj	cyimk_modinfo = {
+const cyimk_obj		cyimk_modinfo = {
 	"cyimk",
 	szof(cyimk)
 } ; /* end initialization */
