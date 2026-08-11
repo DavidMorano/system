@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecobj.h>
+#include	<time.h>		/* POSIX® |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	UUNAMES		struct uunames_head
@@ -69,16 +69,20 @@ typedef	UUNAMES_CUR	uunames_cur ;
 
 EXTERNC_begin
 
-extern int uunames_open(uunames *,cchar *,cchar *) noex ;
-extern int uunames_count(uunames *) noex ;
-extern int uunames_exists(uunames *,cchar *,int) noex ;
-extern int uunames_curbegin(uunames *,uunames_cur *) noex ;
-extern int uunames_curenum(uunames *,uunames_cur *,char *,int) noex ;
-extern int uunames_curend(uunames *,uunames_cur *) noex ;
-extern int uunames_audit(uunames *) noex ;
-extern int uunames_close(uunames *) noex ;
+extern int uunames_open		(uunames *,cchar *,cchar *) noex ;
+extern int uunames_count	(uunames *) noex ;
+extern int uunames_exists	(uunames *,cchar *,int) noex ;
+extern int uunames_curbegin	(uunames *,uunames_cur *) noex ;
+extern int uunames_curenum	(uunames *,uunames_cur *,char *,int) noex ;
+extern int uunames_curend	(uunames *,uunames_cur *) noex ;
+extern int uunames_audit	(uunames *) noex ;
+extern int uunames_close	(uunames *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const uunames_obj	uunames_modinfo ;
+#endif /* __cplusplus */
 
 
 #endif /* UUNAMES_INCLUDE */
