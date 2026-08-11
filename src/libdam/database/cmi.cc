@@ -162,7 +162,7 @@ int cmi_open(cmi *op,cchar *dbname) noex {
 	int		nents = 0 ;
 	if ((rs = cmi_ctor(op,dbname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (dbname[0]) {
+	    if (dbname[0]) ylikely {
 		rs = cmi_opener(op,dbname) ;
 		nents = rs ;
 	    } /* end if (valid) */
@@ -240,7 +240,7 @@ int cmi_close(cmi *op) noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magval = 0 ;
-	} /* end if (magic) */
+	} /* end if (cmi_magic) */
 	return rs ;
 } /* end subroutine (cmi_close) */
 
@@ -248,17 +248,17 @@ int cmi_audit(cmi *op) noex {
 	int		rs ;
 	if ((rs = cmi_magic(op)) >= 0) ylikely {
 	    rs = cmi_auditvt(op) ;
-	} /* end if (magic) */
+	} /* end if (cmi_magic) */
 	return rs ;
 } /* end subroutine (cmi_audit) */
 
 int cmi_count(cmi *op) noex {
 	int		rs ;
 	int		ne = 0 ;
-	if ((rs = cmi_magic(op)) >= 0) {
+	if ((rs = cmi_magic(op)) >= 0) ylikely {
 	    cmihdr	*hip = &op->fhi ;
 	    ne = hip->nents ;
-	} /* end if (magic) */
+	} /* end if (cmi_magic) */
 	return (rs >= 0) ? ne : rs ;
 } /* end subroutine (cmi_count) */
 
@@ -272,13 +272,13 @@ int cmi_getinfo(cmi *op,cmi_info *ip) noex {
 	        ip->idxmtime = op->fmi.ti_mod ;
 	        ip->idxctime = (time_t) hip->idxtime ;
 	        ip->dbtime = (time_t) hip->dbtime ;
-	        ip->dbsize = (size_t) hip->dbsize ;
-	        ip->idxsize = (size_t) hip->idxsize ;
+	        ip->dbsz = (size_t) hip->dbsz ;
+	        ip->idxsz = (size_t) hip->idxsz ;
 	        ip->nents = hip->nents ;
 	        ip->maxent = hip->maxent ;
 		ne = hip->nents ;
 	    } /* end if (non-null) */
-	} /* end if (magic) */
+	} /* end if (cmi_magic) */
 	return (rs >= 0) ? ne : rs ;
 } /* end subroutine (cmi_getinfo) */
 
@@ -295,16 +295,16 @@ int cmi_read(cmi *op,cmi_ent *bvep,char *vbuf,int vlen,uint cn) noex {
 	            rs = cmi_loadcmi(op,bvep,vbuf,vlen,vi) ;
 	        }
 	    } /* end if (ok) */
-	} /* end if (magic) */
+	} /* end if (cmi_magic) */
 	return (rs >= 0) ? vi : rs ;
 } /* end subroutine (cmi_read) */
 
 int cmi_curbegin(cmi *op,cmi_cur *curp) noex {
 	int		rs ;
-	if ((rs = cmi_magic(op,curp)) >= 0) {
+	if ((rs = cmi_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	    op->ncursors += 1 ;
-	} /* end if (magic) */
+	} /* end if (cmi_magic) */
 	return rs ;
 } /* end subroutine (cmi_curbegin) */
 
@@ -315,7 +315,7 @@ int cmi_curend(cmi *op,cmi_cur *curp) noex {
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
 	    }
-	} /* end if (magic) */
+	} /* end if (cmi_magic) */
 	return rs ;
 } /* end subroutine (cmi_curend) */
 
@@ -463,7 +463,7 @@ local int cmi_verify(cmi *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		sz ;
 	int		f = true ;
-	f = f && (hip->idxsize == mip->mapsize) ;
+	f = f && (hip->idxsz == mip->mapsize) ;
 	f = f && (hip->idxtime > 0) ;
 	if (f) {
 	    time_t	tt = (time_t) hip->idxtime ;
