@@ -1,13 +1,13 @@
-/* b_terminit */
+/* b_terminit SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in to return file-system information */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -20,15 +20,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_terminit
+
 	Synopsis:
-
 	$ terminit <file> <spec(s)>
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(CF_SFIO) && (CF_SFIO > 0)
 #define	CF_SFIO	1
@@ -44,14 +44,16 @@
 #include	<sys/param.h>
 #include	<sys/loadavg.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
+#include	<estrings.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
@@ -75,22 +77,6 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -99,12 +85,6 @@ extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -274,8 +254,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 	SHIO		outfile, *ofp = &outfile ;
 
@@ -571,7 +551,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 				} else
@@ -1027,7 +1007,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar req[])
 			rs = ctdecul(cvtbuf,CVTBUFLEN,fssp->f_fsid) ;
 			break ;
 		    case qopt_fsflags:
-			rs = snfsflags(cvtbuf,CVTBUFLEN,fssp->f_flag) ;
+			rs = snflagsfs(cvtbuf,CVTBUFLEN,fssp->f_flag) ;
 			break ;
 
 	default:
