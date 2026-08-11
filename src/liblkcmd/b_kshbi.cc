@@ -1,14 +1,14 @@
-/* b_kshbi */
+/* b_kshbi SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* this is a SHELL built-in */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LINEBUFOUT	1		/* line buffering for STDERR */
-
 
 /* revision history:
 
@@ -21,13 +21,13 @@
 
 /*******************************************************************************
 
-	Synopsis:
+  	Name:
+	b_kshbi
 
+	Synopsis:
 	$ kshbi [-Q] [-f <lib>] [<name>] [-af <afile>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -113,42 +113,8 @@
 
 /* external subroutines */
 
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	pathclean(char *,cchar *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	rmdirfiles(cchar *,cchar *,int) ;
-extern int	vecstr_addpath(VECSTR *,cchar *,int) ;
-extern int	vecstr_addpathclean(VECSTR *,cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnrchr(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -177,7 +143,7 @@ struct locinfo {
 	void		*dhp ;
 	vecstr		stores ;
 	vecstr		libdirs ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, fin ;
 	LOCINFO_FL	open ;
 	uid_t		uid_pr ;
 	gid_t		gid_pr ;
@@ -187,57 +153,57 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procuserconf_begin(PROGINFO *) ;
-static int	procuserconf_end(PROGINFO *) ;
+local int	procuserconf_begin(PROGINFO *) ;
+local int	procuserconf_end(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *,cchar *) ;
-static int	procprint(PROGINFO *,void *) ;
-static int	procall(PROGINFO *,void *) ;
-static int	procsfn(PROGINFO *,char *) ;
-static int	procsfner(PROGINFO *,char *,cchar *) ;
-static int	procsfnmk(PROGINFO *,cchar *,cchar *) ;
-static int	procsfnmkline(PROGINFO *,SHIO *,cchar *,int) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,void *,cchar *,cchar *) ;
-static int	procnames(PROGINFO *,SHIO *,cchar *,int) ;
-static int	procname(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+local int	procprint(PROGINFO *,void *) ;
+local int	procall(PROGINFO *,void *) ;
+local int	procsfn(PROGINFO *,char *) ;
+local int	procsfner(PROGINFO *,char *,cchar *) ;
+local int	procsfnmk(PROGINFO *,cchar *,cchar *) ;
+local int	procsfnmkline(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,void *,cchar *,cchar *) ;
+local int	procnames(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procname(PROGINFO *,SHIO *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_libenv(LOCINFO *,cchar *) ;
-static int	locinfo_libdef(LOCINFO *) ;
-static int	locinfo_libset(LOCINFO *,cchar *,int) ;
-static int	locinfo_libopen(LOCINFO *) ;
-static int	locinfo_libopenfind(LOCINFO *,int) ;
-static int	locinfo_libclose(LOCINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_storedir(LOCINFO *) ;
-static int	locinfo_dircheck(LOCINFO *,cchar *) ;
-static int	locinfo_minmod(LOCINFO *,cchar *,mode_t) ;
-static int	locinfo_storedirtmp(LOCINFO *,char *) ;
-static int	locinfo_tmpcheck(LOCINFO *) ;
-static int	locinfo_tmpmaint(LOCINFO *) ;
-static int	locinfo_chown(LOCINFO *,cchar *) ;
-static int	locinfo_fchmodown(LOCINFO *,int,ustat *,mode_t) ;
-static int	locinfo_loadprids(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_libenv(LOCINFO *,cchar *) ;
+local int	locinfo_libdef(LOCINFO *) ;
+local int	locinfo_libset(LOCINFO *,cchar *,int) ;
+local int	locinfo_libopen(LOCINFO *) ;
+local int	locinfo_libopenfind(LOCINFO *,int) ;
+local int	locinfo_libclose(LOCINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_storedir(LOCINFO *) ;
+local int	locinfo_dircheck(LOCINFO *,cchar *) ;
+local int	locinfo_minmod(LOCINFO *,cchar *,mode_t) ;
+local int	locinfo_storedirtmp(LOCINFO *,char *) ;
+local int	locinfo_tmpcheck(LOCINFO *) ;
+local int	locinfo_tmpmaint(LOCINFO *) ;
+local int	locinfo_chown(LOCINFO *,cchar *) ;
+local int	locinfo_fchmodown(LOCINFO *,int,ustat *,mode_t) ;
+local int	locinfo_loadprids(LOCINFO *) ;
 
-static int	locinfo_libdirfind(LOCINFO *,char *) ;
-static int	locinfo_libdirsearch(LOCINFO *,char *,cchar *) ;
-static int	locinfo_libdirsearching(LOCINFO *,char *,cchar *) ;
-static int	locinfo_libdirsearcher(LOCINFO *,char *,cchar *,vecstr *) ;
-static int	locinfo_libdirtest(LOCINFO *,char *) ;
-static int	locinfo_libdirs(LOCINFO *) ;
-static int	locinfo_libdirpath(LOCINFO *) ;
-static int	locinfo_libdirinit(LOCINFO *) ;
-static int	locinfo_libdirpr(LOCINFO *) ;
-static int	locinfo_libdiradd(LOCINFO *,cchar *) ;
+local int	locinfo_libdirfind(LOCINFO *,char *) ;
+local int	locinfo_libdirsearch(LOCINFO *,char *,cchar *) ;
+local int	locinfo_libdirsearching(LOCINFO *,char *,cchar *) ;
+local int	locinfo_libdirsearcher(LOCINFO *,char *,cchar *,vecstr *) ;
+local int	locinfo_libdirtest(LOCINFO *,char *) ;
+local int	locinfo_libdirs(LOCINFO *) ;
+local int	locinfo_libdirpath(LOCINFO *) ;
+local int	locinfo_libdirinit(LOCINFO *) ;
+local int	locinfo_libdirpr(LOCINFO *) ;
+local int	locinfo_libdiradd(LOCINFO *,cchar *) ;
 
-static int	vecstr_loadnames(vecstr *,cchar *) ;
-static int	vecstr_loadnamers(vecstr *,cchar *) ;
+local int	vecstr_loadnames(vecstr *,cchar *) ;
+local int	vecstr_loadnamers(vecstr *,cchar *) ;
 
 
 /* local variables */
@@ -359,13 +325,13 @@ int p_kshbi(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
@@ -669,7 +635,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	    			        lip->have.lib = TRUE ;
-	    			        lip->final.lib = TRUE ;
+	    			        lip->fin.lib = TRUE ;
 	                                lip->libfname = argp ;
 				    }
 	                        } else
@@ -683,7 +649,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -711,7 +677,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 			    case 'p':
-	                        lip->final.print = TRUE ;
+	                        lip->fin.print = TRUE ;
 	                        lip->have.print = TRUE ;
 	                        lip->fl.print = TRUE ;
 	                        if (f_optequal) {
@@ -939,7 +905,7 @@ badprogstart:
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
-	    debugprintf("b_kshbi: final mallout=%u\n",(mo-mo_start)) ;
+	    debugprintf("b_kshbi: fin mallout=%u\n",(mo-mo_start)) ;
 	    uc_mallset(0) ;
 	}
 #endif /* CF_DEBUGMALL */
@@ -962,7 +928,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -986,7 +952,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procuserconf_begin(PROGINFO *pip)
+local int procuserconf_begin(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if (pip == NULL) return SR_FAULT ;
@@ -996,7 +962,7 @@ static int procuserconf_begin(PROGINFO *pip)
 /* end subroutine (procuserconf_begin) */
 
 
-static int procuserconf_end(PROGINFO *pip)
+local int procuserconf_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if (pip == NULL) return SR_FAULT ;
@@ -1006,7 +972,7 @@ static int procuserconf_end(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1018,13 +984,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1032,18 +998,18 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case akoname_lib:
-	                    if (! lip->final.lib) {
+	                    if (! lip->fin.lib) {
 	                        lip->have.lib = TRUE ;
-	                        lip->final.lib = TRUE ;
+	                        lip->fin.lib = TRUE ;
 	                        if (vl > 0) {
 	                            rs = locinfo_libset(lip,vp,vl) ;
 	                        }
 	                    }
 	                    break ;
 	                case akoname_maint:
-	                    if (! lip->final.maint) {
+	                    if (! lip->fin.maint) {
 	                        lip->have.maint = TRUE ;
-	                        lip->final.maint = TRUE ;
+	                        lip->fin.maint = TRUE ;
 	                        lip->fl.maint = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1052,9 +1018,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_pr:
-	                    if (! lip->final.pr) {
+	                    if (! lip->fin.pr) {
 	                        lip->have.pr = TRUE ;
-	                        lip->final.pr = TRUE ;
+	                        lip->fin.pr = TRUE ;
 	                        lip->fl.pr = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1063,9 +1029,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_print:
-	                    if (! lip->final.print) {
+	                    if (! lip->fin.print) {
 	                        lip->have.print = TRUE ;
-	                        lip->final.print = TRUE ;
+	                        lip->fin.print = TRUE ;
 	                        lip->fl.print = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1094,7 +1060,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,
 		cchar *ofn,cchar *afn,cchar *ifn)
 {
 	SHIO		ofile, *ofp = &ofile ;
@@ -1148,7 +1114,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 /* end subroutine (process) */
 
 
-static int procprint(PROGINFO *pip,void *ofp)
+local int procprint(PROGINFO *pip,void *ofp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1178,7 +1144,7 @@ static int procprint(PROGINFO *pip,void *ofp)
 /* end subroutine (procprint) */
 
 
-static int procall(PROGINFO *pip,void *ofp)
+local int procall(PROGINFO *pip,void *ofp)
 {
 	int		rs ;
 	int		rs1 ;
@@ -1212,7 +1178,7 @@ static int procall(PROGINFO *pip,void *ofp)
 /* end subroutine (procall) */
 
 
-static int procsfn(PROGINFO *pip,char *sfname)
+local int procsfn(PROGINFO *pip,char *sfname)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1238,7 +1204,7 @@ static int procsfn(PROGINFO *pip,char *sfname)
 /* end subroutine (procsfn) */
 
 
-static int procsfner(PROGINFO *pip,char *sfname,cchar *rbuf)
+local int procsfner(PROGINFO *pip,char *sfname,cchar *rbuf)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1274,7 +1240,7 @@ static int procsfner(PROGINFO *pip,char *sfname,cchar *rbuf)
 /* end subroutine (procsfner) */
 
 
-static int procsfnmk(PROGINFO *pip,cchar *sfname,cchar *rbuf)
+local int procsfnmk(PROGINFO *pip,cchar *sfname,cchar *rbuf)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1349,7 +1315,7 @@ static int procsfnmk(PROGINFO *pip,cchar *sfname,cchar *rbuf)
 /* end subroutine (procsfnmk) */
 
 
-static int procsfnmkline(PROGINFO *pip,SHIO *sfp,cchar *sp,int sl)
+local int procsfnmkline(PROGINFO *pip,SHIO *sfp,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		cl ;
@@ -1373,7 +1339,7 @@ static int procsfnmkline(PROGINFO *pip,SHIO *sfp,cchar *sp,int sl)
 /* end subroutine (procsfnmkline) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp,
 		cchar *afn,cchar *ifn)
 {
 	int		rs = SR_OK ;
@@ -1500,7 +1466,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,
 /* end subroutine (procargs) */
 
 
-static int procnames(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
+local int procnames(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1525,7 +1491,7 @@ static int procnames(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 /* end subroutine (procnames) */
 
 
-static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
+local int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 {
 	LOCINFO		*lip = pip->lip ;
 	const int	nlen = MAXNAMELEN ;
@@ -1583,7 +1549,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 /* end subroutine (procname) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1597,7 +1563,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1629,7 +1595,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1665,7 +1631,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_libdirfind(LOCINFO *lip,char *rbuf)
+local int locinfo_libdirfind(LOCINFO *lip,char *rbuf)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -1714,7 +1680,7 @@ static int locinfo_libdirfind(LOCINFO *lip,char *rbuf)
 /* end subroutine (locinfo_libdirfind) */
 
 
-static int locinfo_libdirsearch(LOCINFO *lip,char *rbuf,cchar *name)
+local int locinfo_libdirsearch(LOCINFO *lip,char *rbuf,cchar *name)
 {
 	vecstr		*ldp = &lip->libdirs ;
 	int		rs = SR_OK ;
@@ -1739,7 +1705,7 @@ static int locinfo_libdirsearch(LOCINFO *lip,char *rbuf,cchar *name)
 /* end subroutine (locinfo_libdirsearch) */
 
 
-static int locinfo_libdirsearching(LOCINFO *lip,char *rbuf,cchar *name)
+local int locinfo_libdirsearching(LOCINFO *lip,char *rbuf,cchar *name)
 {
 	vecstr		*ldp = &lip->libdirs ;
 	vecstr		ns ;
@@ -1768,7 +1734,7 @@ static int locinfo_libdirsearching(LOCINFO *lip,char *rbuf,cchar *name)
 /* end subroutine (locinfo_libdirsearching) */
 
 
-static int locinfo_libdirsearcher(LOCINFO *lip,char *rbuf,cchar *dp,vecstr *nlp)
+local int locinfo_libdirsearcher(LOCINFO *lip,char *rbuf,cchar *dp,vecstr *nlp)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -1791,7 +1757,7 @@ static int locinfo_libdirsearcher(LOCINFO *lip,char *rbuf,cchar *dp,vecstr *nlp)
 /* end subroutine (locinfo_libdirsearcher) */
 
 
-static int locinfo_libdirtest(LOCINFO *lip,char *rbuf)
+local int locinfo_libdirtest(LOCINFO *lip,char *rbuf)
 {
 	ustat	sb ;
 	int		rs ;
@@ -1811,7 +1777,7 @@ static int locinfo_libdirtest(LOCINFO *lip,char *rbuf)
 /* end subroutine (locinfo_libdirtest) */
 
 
-static int locinfo_libdirs(LOCINFO *lip)
+local int locinfo_libdirs(LOCINFO *lip)
 {
 	int		rs ;
 	if ((rs = locinfo_libdirpath(lip)) >= 0) {
@@ -1827,7 +1793,7 @@ static int locinfo_libdirs(LOCINFO *lip)
 /* end subroutine (locinfo_libdirs) */
 
 
-static int locinfo_libdirpath(LOCINFO *lip)
+local int locinfo_libdirpath(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1849,7 +1815,7 @@ static int locinfo_libdirpath(LOCINFO *lip)
 /* end subroutine (locinfo_libdirpath) */
 
 
-static int locinfo_libdirpr(LOCINFO *lip)
+local int locinfo_libdirpr(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -1867,7 +1833,7 @@ static int locinfo_libdirpr(LOCINFO *lip)
 /* end subroutine (locinfo_libdirpr) */
 
 
-static int locinfo_libdiradd(LOCINFO *lip,cchar *libdir)
+local int locinfo_libdiradd(LOCINFO *lip,cchar *libdir)
 {
 	int		rs ;
 	if ((rs = locinfo_libdirinit(lip)) >= 0) {
@@ -1886,7 +1852,7 @@ static int locinfo_libdiradd(LOCINFO *lip,cchar *libdir)
 /* end subroutine (locinfo_libdiradd) */
 
 
-static int locinfo_libdirinit(LOCINFO *lip)
+local int locinfo_libdirinit(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	vecstr		*ldp = &lip->libdirs ;
@@ -1910,7 +1876,7 @@ static int locinfo_libdirinit(LOCINFO *lip)
 /* end subroutine (locinfo_libdirinit) */
 
 
-static int locinfo_libenv(LOCINFO *lip,cchar *varname)
+local int locinfo_libenv(LOCINFO *lip,cchar *varname)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1929,7 +1895,7 @@ static int locinfo_libenv(LOCINFO *lip,cchar *varname)
 /* end subroutine (locinfo_libenv) */
 
 
-static int locinfo_libdef(LOCINFO *lip)
+local int locinfo_libdef(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (lip->libfname == NULL) {
@@ -1940,7 +1906,7 @@ static int locinfo_libdef(LOCINFO *lip)
 /* end subroutine (locinfo_libdef) */
 
 
-static int locinfo_libset(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_libset(LOCINFO *lip,cchar *vp,int vl)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1962,7 +1928,7 @@ static int locinfo_libset(LOCINFO *lip,cchar *vp,int vl)
 /* end subroutine (locinfo_libset) */
 
 
-static int locinfo_libopen(LOCINFO *lip)
+local int locinfo_libopen(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	const int	dlflags = (RTLD_LAZY|RTLD_LOCAL) ;
@@ -2014,7 +1980,7 @@ static int locinfo_libopen(LOCINFO *lip)
 /* end subroutine (locinfo_libopen) */
 
 
-static int locinfo_libclose(LOCINFO *lip)
+local int locinfo_libclose(LOCINFO *lip)
 {
 	if (lip->dhp != NULL) {
 	    dlclose(lip->dhp) ;
@@ -2025,7 +1991,7 @@ static int locinfo_libclose(LOCINFO *lip)
 /* end subroutine (locinfo_libclose) */
 
 
-static int locinfo_libopenfind(LOCINFO *lip,int dlflags)
+local int locinfo_libopenfind(LOCINFO *lip,int dlflags)
 {
 	PROGINFO	*pip = lip->pip ;
 	VECSTR		ns ;
@@ -2089,7 +2055,7 @@ static int locinfo_libopenfind(LOCINFO *lip,int dlflags)
 /* end subroutine (locinfo_libopenfind) */
 
 
-static int locinfo_storedir(LOCINFO *lip)
+local int locinfo_storedir(LOCINFO *lip)
 {
 	int		rs ;
 	if ((rs = locinfo_loadprids(lip)) >= 0) {
@@ -2114,7 +2080,7 @@ static int locinfo_storedir(LOCINFO *lip)
 /* end subroutine (locinfo_storedir) */
 
 
-static int locinfo_dircheck(LOCINFO *lip,cchar *dname)
+local int locinfo_dircheck(LOCINFO *lip,cchar *dname)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -2150,7 +2116,7 @@ static int locinfo_dircheck(LOCINFO *lip,cchar *dname)
 /* end subroutine (locinfo_dircheck) */
 
 
-static int locinfo_minmod(LOCINFO *lip,cchar *dname,mode_t dm)
+local int locinfo_minmod(LOCINFO *lip,cchar *dname,mode_t dm)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -2165,7 +2131,7 @@ static int locinfo_minmod(LOCINFO *lip,cchar *dname,mode_t dm)
 /* end subroutine (locinfo_minmod) */
 
 
-static int locinfo_storedirtmp(LOCINFO *lip,char *tbuf)
+local int locinfo_storedirtmp(LOCINFO *lip,char *tbuf)
 {
 	int		rs ;
 	cchar		*tt = "tmpXXXXXXXXXXX" ;
@@ -2179,14 +2145,14 @@ static int locinfo_storedirtmp(LOCINFO *lip,char *tbuf)
 /* end subroutine (locinfo_storedirtmp) */
 
 
-static int locinfo_tmpcheck(LOCINFO *lip)
+local int locinfo_tmpcheck(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
 	if (lip->storedname != NULL) {
 	    TMTIME	t ;
-	    if ((rs = tmtime_localtime(&t,pip->daytime)) >= 0) {
+	    if ((rs = tmtime_timelocal(&t,pip->daytime)) >= 0) {
 	        if ((t.hour >= HOUR_MAINT) && lip->fl.maint) {
 		    uptsub_t	thr = (uptsub_t) locinfo_tmpmaint ;
 	            pthread_t	tid ;
@@ -2196,7 +2162,7 @@ static int locinfo_tmpcheck(LOCINFO *lip)
 	                lip->fl.tmpmaint = TRUE ;
 	            } /* end if (uptcreate) */
 	        } /* end if (after hours) */
-	    } /* end if (tmtime_localtime) */
+	    } /* end if (tmtime_timelocal) */
 	} /* end if (store-dname) */
 
 	return rs ;
@@ -2205,7 +2171,7 @@ static int locinfo_tmpcheck(LOCINFO *lip)
 
 
 /* this runs as an independent thread */
-static int locinfo_tmpmaint(LOCINFO *lip)
+local int locinfo_tmpmaint(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	const int	to = TO_TMPFILES ;
@@ -2251,7 +2217,7 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 /* end subroutine (locinfo_tmpmaint) */
 
 
-static int locinfo_chown(LOCINFO *lip,cchar *fname)
+local int locinfo_chown(LOCINFO *lip,cchar *fname)
 {
 	int		rs ;
 	int		f = FALSE ;
@@ -2271,7 +2237,7 @@ static int locinfo_chown(LOCINFO *lip,cchar *fname)
 /* end subroutine (locinfo_chown) */
 
 
-static int locinfo_fchmodown(LOCINFO *lip,int fd,ustat *sbp,mode_t mm)
+local int locinfo_fchmodown(LOCINFO *lip,int fd,ustat *sbp,mode_t mm)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2298,7 +2264,7 @@ static int locinfo_fchmodown(LOCINFO *lip,int fd,ustat *sbp,mode_t mm)
 /* end subroutine (locinfo_fchmodown) */
 
 
-static int locinfo_loadprids(LOCINFO *lip)
+local int locinfo_loadprids(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2314,7 +2280,7 @@ static int locinfo_loadprids(LOCINFO *lip)
 /* end subroutine (locinfo_loadprids) */
 
 
-static int vecstr_loadnames(vecstr *nlp,cchar *name)
+local int vecstr_loadnames(vecstr *nlp,cchar *name)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -2334,7 +2300,7 @@ static int vecstr_loadnames(vecstr *nlp,cchar *name)
 /* end subroutine (locinfo_loadnames) */
 
 
-static int vecstr_loadnamers(vecstr *nlp,cchar *name)
+local int vecstr_loadnamers(vecstr *nlp,cchar *name)
 {
 	const int	nlen = MAXNAMELEN ;
 	int		rs = SR_OK ;
