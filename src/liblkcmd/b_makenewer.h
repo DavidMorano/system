@@ -1,19 +1,31 @@
-/* b_makenewer HEADER */
+/* b_makeneer HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 (conformance reviewed) */
+/* lang=C++20 */
 
-/* SHELL built-in to return load averages */
-/* generic short program front-end */
+/* generic front-end for SHELL built-ins */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2004-03-01, David A­D­ Morano
-	Originally written for Rightcore Network Services.
+	= 2001-11-01, David A­D­ Morano
+	This subroutine was written for use as a front-end for Korn
+	Shell (KSH) commands that are compiled as stand-alone
+	programs.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	MAKENEWERCONFIG_INCLUDE
+#define	MAKENEWERCONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #define	VERSION		"0a"
@@ -80,5 +92,8 @@
 #define	LOGFNAME	"log/makenewer"
 
 #define	SUFLEN		40		/* maximum suffix length scanned */
+
+
+#endif /* MAKENEWERCONFIG_INCLUDE */
 
 
