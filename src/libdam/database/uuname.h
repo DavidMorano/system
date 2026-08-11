@@ -45,8 +45,8 @@ struct uuname_cursor {
 
 struct uuname_head {
 	modload		*mlp ;
-	void		*obj ;		/* object pointer */
 	void		*callp ;
+	void		*obj ;		/* object pointer */
 	UUNAME_FL	fl ;
 	uint		magval ;
 	int		objsz ;		/* object size */
