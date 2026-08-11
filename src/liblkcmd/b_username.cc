@@ -1,15 +1,15 @@
-/* b_username */
+/* b_username SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SHELL built-in: return various user information */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 #define	CF_LOCSETENT	1		/* |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -22,15 +22,15 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_username
+
 	Synopsis:
-
 	$ username [<username>|-] 
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>	/* must be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -52,13 +52,13 @@
 #include	<pwd.h>
 
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<setostr.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<getpwx.h>
 #include	<getusername.h>
 #include	<field.h>
 #include	<pcsns.h>
@@ -122,33 +122,6 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfskipwhite(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	getgecosname(cchar *,int,cchar **) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	mkrealname(char *,int,cchar *,int) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	hasMeAlone(cchar *,int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -158,12 +131,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -200,7 +167,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	PROGINFO	*pip ;
 	vecstr		stores ;
@@ -239,10 +206,10 @@ static int	locinfo_pcsnsget(LOCINFO *,char *,int,cchar *,int) ;
 static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procall(PROGINFO *,ARGINFO *,BITS *,void *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,void *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+static int	procall(PROGINFO *,ARGINFO *,bits *,void *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,void *,cchar *) ;
 static int	procloadnames(PROGINFO *,OSETSTR *,cchar *,int) ;
 static int	procloadname(PROGINFO *,OSETSTR *,cchar *,int) ;
 static int	procquery(PROGINFO *,SHIO *,cchar *) ;
@@ -494,8 +461,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -769,7 +736,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'a':
-	                        lip->final.all = TRUE ;
+	                        lip->finval.all = TRUE ;
 	                        lip->fl.all = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -798,7 +765,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -1090,7 +1057,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1102,13 +1069,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1116,9 +1083,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case akoname_linebuf:
-	                    if (! lip->final.linebuf) {
+	                    if (! lip->finval.linebuf) {
 	                        lip->have.linebuf = TRUE ;
-	                        lip->final.linebuf = TRUE ;
+	                        lip->finval.linebuf = TRUE ;
 	                        lip->fl.linebuf = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1127,9 +1094,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_all:
-	                    if (! lip->final.all) {
+	                    if (! lip->finval.all) {
 	                        lip->have.all = TRUE ;
-	                        lip->final.all = TRUE ;
+	                        lip->finval.all = TRUE ;
 	                        lip->fl.all = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1138,9 +1105,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_realname:
-	                    if (! lip->final.realname) {
+	                    if (! lip->finval.realname) {
 	                        lip->have.realname = TRUE ;
-	                        lip->final.realname = TRUE ;
+	                        lip->finval.realname = TRUE ;
 	                        lip->fl.realname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1150,9 +1117,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 	                case akoname_pcsname:
 	                case akoname_name:
-	                    if (! lip->final.name) {
+	                    if (! lip->finval.name) {
 	                        lip->have.name = TRUE ;
-	                        lip->final.name = TRUE ;
+	                        lip->finval.name = TRUE ;
 	                        lip->fl.name = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1161,9 +1128,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_fullname:
-	                    if (! lip->final.fullname) {
+	                    if (! lip->finval.fullname) {
 	                        lip->have.fullname = TRUE ;
-	                        lip->final.fullname = TRUE ;
+	                        lip->finval.fullname = TRUE ;
 	                        lip->fl.fullname = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1172,9 +1139,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_org:
-	                    if (! lip->final.org) {
+	                    if (! lip->finval.org) {
 	                        lip->have.org = TRUE ;
-	                        lip->final.org = TRUE ;
+	                        lip->finval.org = TRUE ;
 	                        lip->fl.org = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1183,9 +1150,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_projinfo:
-	                    if (! lip->final.projinfo) {
+	                    if (! lip->finval.projinfo) {
 	                        lip->have.projinfo = TRUE ;
-	                        lip->final.projinfo = TRUE ;
+	                        lip->finval.projinfo = TRUE ;
 	                        lip->fl.projinfo = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1194,9 +1161,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_sysuser:
-	                    if (! lip->final.sysuser) {
+	                    if (! lip->finval.sysuser) {
 	                        lip->have.sysuser = TRUE ;
-	                        lip->final.sysuser = TRUE ;
+	                        lip->finval.sysuser = TRUE ;
 	                        lip->fl.sysuser = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1205,9 +1172,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_reguser:
-	                    if (! lip->final.reguser) {
+	                    if (! lip->finval.reguser) {
 	                        lip->have.reguser = TRUE ;
-	                        lip->final.reguser = TRUE ;
+	                        lip->finval.reguser = TRUE ;
 	                        lip->fl.reguser = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1216,9 +1183,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_speuser:
-	                    if (! lip->final.speuser) {
+	                    if (! lip->finval.speuser) {
 	                        lip->have.speuser = TRUE ;
-	                        lip->final.speuser = TRUE ;
+	                        lip->finval.speuser = TRUE ;
 	                        lip->fl.speuser = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1244,7 +1211,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
@@ -1281,7 +1248,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
 {
 	OSETSTR		ss ;
 	const int	n = 20 ;
@@ -1365,7 +1332,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp,cchar *afn)
 	    if (rs >= 0) {
 	        OSETSTR_CUR	cur ;
 	        if ((rs = setostr_curbegin(&ss,&cur)) >= 0) {
-	            while ((rs1 = setostr_enum(&ss,&cur,&cp)) >= 0) {
+	            while ((rs1 = setostr_curenum(&ss,&cur,&cp)) >= 0) {
 	                if (strcmp(cp,"--") != 0) {
 	                    rs = procquery(pip,ofp,cp) ;
 	                    wlen += rs ;
@@ -1434,7 +1401,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 
 	if (nl < 0) nl = strlen(np) ;
 
-	if ((np[0] == '\0') || hasMeAlone(np,nl)) {
+	if ((np[0] == '\0') || hasonlyme(np,nl)) {
 	    if ((rs = locinfo_username(lip)) >= 0) {
 	        np = lip->unbuf ;
 	        nl = rs ;
@@ -1514,7 +1481,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 /* end subroutine (procloadname) */
 
 
-static int procall(PROGINFO *pip,ARGINFO *aip,BITS *bop,void *ofp)
+static int procall(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp)
 {
 	SYSUSERNAMES	su ;
 	int		rs ;
@@ -1558,7 +1525,7 @@ static int procquery(PROGINFO *pip,SHIO *ofp,cchar name[])
 	    debugprintf("b_userxxx/procquery: q=>%s<\n",name) ;
 #endif
 
-	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
+	if ((rs = bufsizeget(bufsize_pw)) >= 0) {
 	    struct passwd	pw ;
 	    const int		pwlen = rs ;
 	    char		*pwbuf ;
@@ -1586,7 +1553,7 @@ static int procquery(PROGINFO *pip,SHIO *ofp,cchar name[])
 	        rs1 = uc_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a) */
-	} /* end if (getbufsize) */
+	} /* end if (bufsizeget) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
