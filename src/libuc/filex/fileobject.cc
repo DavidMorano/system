@@ -69,13 +69,13 @@ import libutil ;			/* |lenstr(3u)| */
 
 namespace {
     struct matcher {
-	cchar	*mbuf ;
-	int	mlen ;
-	matcher(cchar *b,int l) noex : mbuf(b), mlen(l) { } ;
+	cchar		*mbuf ;
+	int		mlen ;
+	matcher		(cchar *b,int l) noex : mbuf(b), mlen(l) { } ;
 	operator int () noex ;
-	int mat_elf() noex ;
-	int mat_coff() noex ;
-	int mat_fat() noex ;
+	int mat_elf	() noex ;
+	int mat_coff	() noex ;
+	int mat_fat	() noex ;
     } ; /* end struct (matcher) */
     typedef int (matcher::*matcher_m)() noex ;
 } /* end namespace */
@@ -147,7 +147,7 @@ matcher::operator int () noex {
     	int		rs = SR_OK ;
 	for (cauto &m : mems) {
 	    rs = (this->*m)() ;
-	    if (! rs) break ;
+	    if (rs) break ;
 	} /* end for */
 	return rs ;
 } /* end method (matcher::operator) */
