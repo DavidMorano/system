@@ -88,9 +88,9 @@ constexpr cpcchar	hits[] = {
 int optval(cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	int		v = 0 ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 	    rs = SR_OK ;
-	    if (sl > 0) {
+	    if (sl > 0) ylikely {
 		if (int hi ; (hi = matocasestr(hits,1,sp,sl)) >= 0) {
 	            v = (hi & 1) ;
 	        } else {
