@@ -95,7 +95,7 @@ local bool	isc1(int) noex ;
 
 /* local variables */
 
-constexpr cchar	allowed[] = "\a\b\f\n\r\t\v" ;
+constexpr cchar		allowed[] = "\a\b\f\n\r\t\v" ;
 
 
 /* exported variables */
@@ -110,7 +110,7 @@ int filebinary(cchar *fname) noex {
 	if (fname) ylikely {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
-		if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
+		if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
 		    cint llen = rs ;
 		    {
 			rs = reader(lbuf,llen,fname) ;
