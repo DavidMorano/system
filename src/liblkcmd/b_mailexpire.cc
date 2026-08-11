@@ -1,4 +1,4 @@
-/* b_mailexpire */
+/* b_mailexpire SUPPORT (KSH builtin) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -22,6 +22,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_mailexpire
+
+	Description:
 	We expire old mail messages.
 
 	Synopsis:
@@ -46,13 +50,14 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
+#include	<ctime>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-#include	<netdb.h>
-#include	<time.h>
-
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<userinfo.h>
@@ -172,7 +177,7 @@ struct locinfo_flags {
 struct locinfo {
 	PROGINFO	*pip ;
 	cchar		*ofname ;
-	LOCINFO_FL	have, f, final, changed ;
+	LOCINFO_FL	have, f, finval, changed ;
 	LOCINFO_FL	open ;
 	SHIO		ofile ;
 	VECSTR		stores ;
@@ -184,8 +189,8 @@ struct locinfo {
 
 struct config {
 	PROGINFO	*pip ;
-	PARAMOPT	*app ;
-	PARAMFILE	p ;
+	paramopt	*app ;
+	paramfile	p ;
 	EXPCOOK		cooks ;
 	uint		f_p:1 ;
 	uint		f_cooks:1 ;
@@ -200,22 +205,22 @@ static int	usage(PROGINFO *) ;
 
 static int	procuser_begin(PROGINFO *) ;
 static int	procuser_end(PROGINFO *) ;
-static int	procourconf_begin(PROGINFO *,PARAMOPT *,cchar *) ;
+static int	procourconf_begin(PROGINFO *,paramopt *,cchar *) ;
 static int	procourconf_end(PROGINFO *) ;
 static int	procout_begin(PROGINFO *,cchar *) ;
 static int	procout_end(PROGINFO *) ;
 static int	procout_beginer(PROGINFO *) ;
 static int	procout_printf(PROGINFO *,cchar *,...) ;
 
-static int	procopts(PROGINFO *,KEYOPT *,PARAMOPT *) ;
-static int	procmailusers(PROGINFO *,PARAMOPT *) ;
+static int	procopts(PROGINFO *,keyopt *,paramopt *) ;
+static int	procmailusers(PROGINFO *,paramopt *) ;
 static int	procmailusers_all(PROGINFO *) ;
 static int	procmailusers_env(PROGINFO *,cchar *) ;
-static int	procmailusers_arg(PROGINFO *,PARAMOPT *) ;
+static int	procmailusers_arg(PROGINFO *,paramopt *) ;
 static int	procmailusers_def(PROGINFO *) ;
 static int	procmailusers_add(PROGINFO *,cchar *,int) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procmailbox(PROGINFO *,cchar *,int) ;
 static int	procmailboxes(PROGINFO *,cchar *,int) ;
 static int	procmailboxone(PROGINFO *,cchar *,cchar *,int) ;
@@ -228,7 +233,7 @@ static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 static int	locinfo_eprintf(LOCINFO *,cchar *,...) ;
 #endif
 
-static int	config_start(CONFIG *,PROGINFO *,PARAMOPT *,cchar *) ;
+static int	config_start(CONFIG *,PROGINFO *,paramopt *,cchar *) ;
 static int	config_findfile(CONFIG *,char *,cchar *) ;
 static int	config_cookbegin(CONFIG *) ;
 static int	config_cookend(CONFIG *) ;
@@ -395,9 +400,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	bits		pargs ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -653,7 +658,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    }
 	                    if (cp != NULL) {
 	                        pip->have.cfname = TRUE ;
-	                        pip->final.cfname = TRUE ;
+	                        pip->finval.cfname = TRUE ;
 	                        cfname = cp ;
 	                    }
 	                    break ;
@@ -680,7 +685,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            rs = SR_INVALID ;
 	                    }
 	                    if ((rs >= 0) && (cp != NULL)) {
-	                        lip->final.msgto = TRUE ;
+	                        lip->finval.msgto = TRUE ;
 	                        rs = cfdecti(cp,cl,&v) ;
 	                        lip->msgto = v ;
 	                    }
@@ -710,7 +715,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    }
 	                    if ((rs >= 0) && (cp != NULL)) {
 	                        cchar	*po = PO_MAILDIRS ;
-	                        lip->final.maildirs = TRUE ;
+	                        lip->finval.maildirs = TRUE ;
 	                        lip->have.maildirs = TRUE ;
 	                        rs = paramopt_loads(&aparams,po,cp,cl) ;
 	                    }
@@ -737,7 +742,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                pip->have.cfname = TRUE ;
-	                                pip->final.cfname = TRUE ;
+	                                pip->finval.cfname = TRUE ;
 	                                cfname = argp ;
 	                            }
 	                        } else
@@ -795,7 +800,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else
@@ -812,7 +817,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                lip->final.msgto = TRUE ;
+	                                lip->finval.msgto = TRUE ;
 	                                rs = cfdecti(argp,argl,&v) ;
 	                                lip->msgto = v ;
 	                            }
@@ -843,7 +848,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                                rs = SR_INVALID ;
 	                        }
 	                        if ((rs >= 0) && (cp != NULL)) {
-				    PARAMOPT	*pop = &aparams ;
+				    paramopt	*pop = &aparams ;
 	                            cchar	*po = PO_MAILUSERS ;
 	                            rs = paramopt_loads(pop,po,cp,cl) ;
 	                        }
@@ -964,7 +969,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
 
 	if ((rs >= 0) && (lip->msgto <= 0) && (argval != NULL)) {
-	    lip->final.msgto = TRUE ;
+	    lip->finval.msgto = TRUE ;
 	    rs = cfdecti(argval,-1,&v) ;
 	    lip->msgto = v ;
 	}
@@ -1138,7 +1143,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
+static int procopts(PROGINFO *pip,keyopt *kop,paramopt *app)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1150,13 +1155,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 	                int	v ;
@@ -1166,10 +1171,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                switch (oi) {
 
 	                case akoname_md:
-	                    if (! lip->final.maildirs) {
+	                    if (! lip->finval.maildirs) {
 	                        if (vl > 0) {
 	                            cchar	*po = PO_MAILDIRS ;
-	                            lip->final.maildirs = TRUE ;
+	                            lip->finval.maildirs = TRUE ;
 	                            lip->have.maildirs = TRUE ;
 	                            rs = paramopt_loads(app,po,vp,vl) ;
 	                        }
@@ -1177,8 +1182,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                    break ;
 
 	                case akoname_sort:
-	                    if (! lip->final.sort) {
-	                        lip->final.sort = TRUE ;
+	                    if (! lip->finval.sort) {
+	                        lip->finval.sort = TRUE ;
 	                        lip->have.sort = TRUE ;
 	                        lip->fl.sort = TRUE ;
 	                        if (vl > 0) {
@@ -1197,9 +1202,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                    break ;
 
 	                case akoname_nshow:
-	                    if (! lip->final.nshow) {
+	                    if (! lip->finval.nshow) {
 	                        if (vl) {
-	                            lip->final.nshow = TRUE ;
+	                            lip->finval.nshow = TRUE ;
 	                            lip->have.nshow = TRUE ;
 	                            rs = optvalue(vp,vl) ;
 	                            lip->nshow = rs ;
@@ -1208,9 +1213,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                    break ;
 
 	                case akoname_msgto:
-	                    if (! lip->final.msgto) {
+	                    if (! lip->finval.msgto) {
 	                        if (vl) {
-	                            lip->final.msgto = TRUE ;
+	                            lip->finval.msgto = TRUE ;
 	                            lip->have.msgto = TRUE ;
 	                            rs = cfdecti(vp,vl,&v) ;
 	                            lip->msgto = v ;
@@ -1219,8 +1224,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                    break ;
 
 	                case akoname_allusers:
-	                    if (! lip->final.allusers) {
-	                        lip->final.allusers = TRUE ;
+	                    if (! lip->finval.allusers) {
+	                        lip->finval.allusers = TRUE ;
 	                        lip->have.allusers = TRUE ;
 	                        lip->fl.allusers = TRUE ;
 	                        if (vl) {
@@ -1231,8 +1236,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *app)
 	                    break ;
 
 	                case akoname_nodel:
-	                    if (! lip->final.nodel) {
-	                        lip->final.nodel = TRUE ;
+	                    if (! lip->finval.nodel) {
+	                        lip->finval.nodel = TRUE ;
 	                        lip->have.nodel = TRUE ;
 	                        lip->fl.nodel = TRUE ;
 	                        if (vl) {
@@ -1329,7 +1334,7 @@ static int procuser_end(PROGINFO *pip)
 /* end subroutine (procuser_end) */
 
 
-static int procourconf_begin(PROGINFO *pip,PARAMOPT *app,cchar cfname[])
+static int procourconf_begin(PROGINFO *pip,paramopt *app,cchar cfname[])
 {
 	const int	csize = sizeof(CONFIG) ;
 	int		rs = SR_OK ;
@@ -1469,7 +1474,7 @@ static int procout_printf(PROGINFO *pip,cchar *fmt,...)
 /* end subroutine (procout_printf) */
 
 
-static int procmailusers(PROGINFO *pip,PARAMOPT *app)
+static int procmailusers(PROGINFO *pip,paramopt *app)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1606,14 +1611,14 @@ static int procmailusers_env(PROGINFO *pip,cchar *var)
 /* end subroutine (procmailusers_env) */
 
 
-static int procmailusers_arg(PROGINFO *pip,PARAMOPT *app)
+static int procmailusers_arg(PROGINFO *pip,paramopt *app)
 {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*po = PO_MAILUSERS ;
 
 	if ((rs = paramopt_havekey(app,po)) > 0) {
-	    PARAMOPT_CUR	cur ;
+	    paramopt_cur	cur ;
 	    int			cl ;
 	    cchar		*cp ;
 
@@ -1722,7 +1727,7 @@ static int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
 /* end subroutine (procmailusers_add) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	int		rs ;
 	int		rs1 ;
@@ -2121,7 +2126,7 @@ static int locinfo_eprintf(LOCINFO *lip,cchar *fmt,...)
 
 
 /* configuration maintenance */
-static int config_start(CONFIG *csp,PROGINFO *pip,PARAMOPT *app,cchar *cfn)
+static int config_start(CONFIG *csp,PROGINFO *pip,paramopt *app,cchar *cfn)
 {
 	int		rs = SR_OK ;
 	char		tmpfname[MAXPATHLEN+1] = { 0 } ;
@@ -2370,9 +2375,9 @@ static int config_reader(CONFIG *op)
 {
 	PROGINFO	*pip = op->pip ;
 	LOCINFO		*lip ;
-	PARAMFILE	*pfp ;
-	PARAMFILE_CUR	cur ;
-	PARAMOPT	*pop = op->app ;
+	paramfile	*pfp ;
+	paramfile_cur	cur ;
+	paramopt	*pop = op->app ;
 	const int	vlen = VBUFLEN ;
 	const int	elen = EBUFLEN ;
 	int		rs = SR_OK ;
@@ -2413,10 +2418,10 @@ static int config_reader(CONFIG *op)
 	            switch (i) {
 
 	            case cparam_maildir:
-	                if (! lip->final.maildirs) {
+	                if (! lip->finval.maildirs) {
 	                    if (el > 0) {
 	                        cchar	*po = PO_MAILDIRS ;
-	                        lip->final.maildirs = TRUE ;
+	                        lip->finval.maildirs = TRUE ;
 	                        lip->have.maildirs = TRUE ;
 	                        rs = paramopt_loads(pop,po,ebuf,el) ;
 	                    }
@@ -2437,8 +2442,8 @@ static int config_reader(CONFIG *op)
 
 	            case cparam_logfile:
 	                if (el > 0) {
-	                    if (! pip->final.lfname) {
-	                        pip->final.lfname = TRUE ;
+	                    if (! pip->finval.lfname) {
+	                        pip->finval.lfname = TRUE ;
 	                        pip->have.lfname = TRUE ;
 	                        rs = config_setlfname(op,ebuf,el) ;
 	                    }
@@ -2472,7 +2477,7 @@ static int config_setlfname(CONFIG *cfp,cchar *vp,int vl)
 	pr = pip->pr ;
 	sn = pip->searchname ;
 	lfn = pip->lfname ;
-	tl = prsetfname(pr,tbuf,vp,vl,TRUE,LOGCNAME,sn,"") ;
+	tl = prmkfname(pr,tbuf,vp,vl,TRUE,LOGCNAME,sn,"") ;
 
 	if ((lfn == NULL) || (strcmp(lfn,tbuf) != 0)) {
 	    cchar	**vpp = &pip->lfname ;
