@@ -1651,7 +1651,7 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	        cchar	*sn = pip->searchname ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 	                int	v = 0 ;
@@ -4940,7 +4940,7 @@ local int locinfo_gatherbeginall(LI *lip) noex {
 	    char	sbuf[SVCLEN+1] ;
 	    char	eb[SVCENTLEN+1] ;
 	    void	*n = nullptr ;
-	    while ((rs1 = svcfile_enumsvc(sfp,&c,sbuf,slen)) > 0) {
+	    while ((rs1 = svcfile_curenumsvc(sfp,&c,sbuf,slen)) > 0) {
 	        if ((rs = locinfo_svclistadd(lip,sbuf,rs1)) >= 0) {
 	            if ((rs = svcfile_fetch(sfp,sbuf,n,&se,eb,el)) > 0) {
 	                rs = locinfo_gatherbeginer(lip,&se) ;
@@ -5460,7 +5460,7 @@ local int locinfo_qs(LI *lip,cchar *qs) noex {
 	    if ((rs = querystr_start(&ps,qs,-1)) >= 0) {
 	        if ((rs = querystr_curbegin(&ps,&cur)) >= 0) {
 	            cchar	*kp, *vp ;
-	            while ((rs1 = querystr_enum(&ps,&cur,&kp,&vp)) >= 0) {
+	            while ((rs1 = querystr_curenum(&ps,&cur,&kp,&vp)) >= 0) {
 	                if (vp == nullptr) break ; /* lint */
 	                rs = locinfo_svclistadd(lip,kp,-1) ;
 	                c += rs ;
