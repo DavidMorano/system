@@ -1,4 +1,5 @@
-/* b_isproc SUPPORT */
+/* b_isproc SUPPORT (KSH builtin) */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* SHELL built-in: determine if a file has certain attributes */
@@ -19,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	b_isproc
+
+	Description:
 	This is sort of a replacement for the |test(1)| program (or
 	the various SHELL built-in versions).  Except that this
 	version does not discriminate against a file if it is a
@@ -47,7 +52,7 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -79,39 +84,8 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -131,42 +105,42 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	PROGINFO	*pip ;
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	int		intage ;
 } ;
 
 struct locinfo_pcur {
-	PARAMOPT_CUR	cur ;
+	paramopt_cur	cur ;
 } ;
 
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_pidfile(LOCINFO *,cchar *,int) ;
-static int	locinfo_query(LOCINFO *,cchar *,int) ;
-static int	locinfo_procopts(LOCINFO *) ;
-static int	locinfo_intage(LOCINFO *,cchar *,cchar *) ;
-static int	locinfo_queries(LOCINFO *) ;
-static int	locinfo_procage(LOCINFO *,ustat *) ;
-static int	locinfo_pcurbegin(LOCINFO *,LOCINFO_PCUR *) ;
-static int	locinfo_pcurend(LOCINFO *,LOCINFO_PCUR *) ;
-static int	locinfo_pget(LOCINFO *,LOCINFO_PCUR *,cchar **) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_pidfile(LOCINFO *,cchar *,int) ;
+local int	locinfo_query(LOCINFO *,cchar *,int) ;
+local int	locinfo_procopts(LOCINFO *) ;
+local int	locinfo_intage(LOCINFO *,cchar *,cchar *) ;
+local int	locinfo_queries(LOCINFO *) ;
+local int	locinfo_procage(LOCINFO *,ustat *) ;
+local int	locinfo_pcurbegin(LOCINFO *,LOCINFO_PCUR *) ;
+local int	locinfo_pcurend(LOCINFO *,LOCINFO_PCUR *) ;
+local int	locinfo_pget(LOCINFO *,LOCINFO_PCUR *,cchar **) ;
+local int	locinfo_finish(LOCINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procfiles(PROGINFO *) ;
-static int	procarg(PROGINFO *,cchar *) ;
-static int	procpid(PROGINFO *,cchar *) ;
-static int	procfile(PROGINFO *,cchar *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procfiles(PROGINFO *) ;
+local int	procarg(PROGINFO *,cchar *) ;
+local int	procpid(PROGINFO *,cchar *) ;
+local int	procfile(PROGINFO *,cchar *) ;
 
 
 /* local variables */
@@ -308,11 +282,11 @@ int p_isNotRunning(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 
 /* local subroutines */
 
-static int mainsub(int argc,mainv argv,mainv envv,void *) noex {
+local int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	SHIO		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -632,7 +606,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &lip->akopts ;
+					keyopt	*kop = &lip->akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 				} else
@@ -931,7 +905,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -956,7 +930,7 @@ static int usage(PROGINFO *pip)
 
 
 /* ARGSUSED */
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1046,7 +1020,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procarg(PROGINFO *pip,cchar *spec)
+local int procarg(PROGINFO *pip,cchar *spec)
 {
 	int		rs ;
 	switch (pip->progmode) {
@@ -1063,7 +1037,7 @@ static int procarg(PROGINFO *pip,cchar *spec)
 /* end subroutine (procarg) */
 
 
-static int procpid(PROGINFO *pip,cchar *pidspec)
+local int procpid(PROGINFO *pip,cchar *pidspec)
 {
 	int		rs ;
 	int		f_ok = FALSE ;
@@ -1100,7 +1074,7 @@ static int procpid(PROGINFO *pip,cchar *pidspec)
 /* end subroutine (procpid) */
 
 
-static int procfiles(PROGINFO *pip)
+local int procfiles(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	LOCINFO_PCUR	pcur ;
@@ -1129,7 +1103,7 @@ static int procfiles(PROGINFO *pip)
 /* end subroutine (procfiles) */
 
 
-static int procfile(PROGINFO *pip,cchar *fname)
+local int procfile(PROGINFO *pip,cchar *fname)
 {
 	ustat	usb ;
 	LOCINFO		*lip = pip->lip ;
@@ -1170,7 +1144,7 @@ static int procfile(PROGINFO *pip,cchar *fname)
 /* end subroutine (procfile) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs ;
 
@@ -1193,7 +1167,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1216,9 +1190,9 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_pidfile(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_pidfile(LOCINFO *lip,cchar *vp,int vl)
 {
-	PARAMOPT	*pop = &lip->aparams ;
+	paramopt	*pop = &lip->aparams ;
 	int		rs ;
 	const char	*po = PO_PIDFILE ;
 	if ((rs = paramopt_loads(pop,po,vp,vl)) >= 0) {
@@ -1229,9 +1203,9 @@ static int locinfo_pidfile(LOCINFO *lip,cchar *vp,int vl)
 /* end subroutine (locinfo_pidfile) */
 
 
-static int locinfo_query(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_query(LOCINFO *lip,cchar *vp,int vl)
 {
-	PARAMOPT	*pop = &lip->aparams ;
+	paramopt	*pop = &lip->aparams ;
 	int		rs ;
 	const char	*po = PO_QUERY ;
 	if ((rs = paramopt_loads(pop,po,vp,vl)) >= 0) {
@@ -1243,11 +1217,11 @@ static int locinfo_query(LOCINFO *lip,cchar *vp,int vl)
 
 
 /* process the program options */
-static int locinfo_procopts(LOCINFO *lip)
+local int locinfo_procopts(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
-	KEYOPT		*kop = &lip->akopts ;
-	KEYOPT_CUR	kcur ;
+	keyopt		*kop = &lip->akopts ;
+	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	const char	*cp ;
@@ -1262,7 +1236,7 @@ static int locinfo_procopts(LOCINFO *lip)
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 	                int	v ;
@@ -1271,9 +1245,9 @@ static int locinfo_procopts(LOCINFO *lip)
 
 	                switch (oi) {
 	                case akoname_quiet:
-	                    if (! pip->final.quiet) {
+	                    if (! pip->finval.quiet) {
 	                        pip->have.quiet = TRUE ;
-	                        pip->final.quiet = TRUE ;
+	                        pip->finval.quiet = TRUE ;
 	                        pip->fl.quiet = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1282,9 +1256,9 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    }
 	                    break ;
 	                case akoname_intage:
-	                    if (! lip->final.intage) {
+	                    if (! lip->finval.intage) {
 	                        lip->have.intage = TRUE ;
-	                        lip->final.intage = TRUE ;
+	                        lip->finval.intage = TRUE ;
 	                        if (vl > 0) {
 	                            rs = cfdecti(vp,vl,&v) ;
 	                            lip->intage = v ;
@@ -1309,7 +1283,7 @@ static int locinfo_procopts(LOCINFO *lip)
 /* end subroutine (locinfo_procopts) */
 
 
-static int locinfo_intage(LOCINFO *lip,cchar *argval,cchar *intagespec)
+local int locinfo_intage(LOCINFO *lip,cchar *argval,cchar *intagespec)
 {
 	int		rs = SR_OK ;
 	int		maxage = 0 ;
@@ -1325,15 +1299,15 @@ static int locinfo_intage(LOCINFO *lip,cchar *argval,cchar *intagespec)
 /* end subroutine (locinfo_intage) */
 
 
-static int locinfo_queries(LOCINFO *lip)
+local int locinfo_queries(LOCINFO *lip)
 {
-	PARAMOPT	*pop = &lip->aparams ;
+	paramopt	*pop = &lip->aparams ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	cchar		*po = PO_QUERY ;
 	if ((rs = paramopt_countvals(pop,po)) > 0) {
-	    PARAMOPT_CUR	cur ;
+	    paramopt_cur	cur ;
 	    if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
 		int	vl ;
 		cchar	*vp ;
@@ -1367,7 +1341,7 @@ static int locinfo_queries(LOCINFO *lip)
 /* end subroutine (locinfo_queries) */
 
 
-static int locinfo_procage(LOCINFO *lip,ustat *sbp)
+local int locinfo_procage(LOCINFO *lip,ustat *sbp)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1383,34 +1357,34 @@ static int locinfo_procage(LOCINFO *lip,ustat *sbp)
 /* end subroutine (locinfo_procage) */
 
 
-static int locinfo_pcurbegin(LOCINFO *lip,LOCINFO_PCUR *lpcurp)
+local int locinfo_pcurbegin(LOCINFO *lip,LOCINFO_PCUR *lpcurp)
 {
-	PARAMOPT	*pop = &lip->aparams ;
-	PARAMOPT_CUR	*pcurp = &lpcurp->cur ;
+	paramopt	*pop = &lip->aparams ;
+	paramopt_cur	*pcurp = &lpcurp->cur ;
 	int		rs ;
-	memset(lpcurp,0,sizeof(PARAMOPT_CUR)) ;
+	memset(lpcurp,0,sizeof(paramopt_cur)) ;
 	rs = paramopt_curbegin(pop,pcurp) ;
 	return rs ;
 }
 /* end subroutine (locinfo_pcurbegin) */
 
 
-static int locinfo_pcurend(LOCINFO *lip,LOCINFO_PCUR *lpcurp)
+local int locinfo_pcurend(LOCINFO *lip,LOCINFO_PCUR *lpcurp)
 {
-	PARAMOPT	*pop = &lip->aparams ;
-	PARAMOPT_CUR	*pcurp = &lpcurp->cur ;
+	paramopt	*pop = &lip->aparams ;
+	paramopt_cur	*pcurp = &lpcurp->cur ;
 	int		rs ;
 	rs = paramopt_curend(pop,pcurp) ;
-	memset(lpcurp,0,sizeof(PARAMOPT_CUR)) ;
+	memset(lpcurp,0,sizeof(paramopt_cur)) ;
 	return rs ;
 }
 /* end subroutine (locinfo_procurend) */
 
 
-static int locinfo_pget(LOCINFO *lip,LOCINFO_PCUR *lpcurp,cchar **rpp)
+local int locinfo_pget(LOCINFO *lip,LOCINFO_PCUR *lpcurp,cchar **rpp)
 {
-	PARAMOPT	*pop = &lip->aparams ;
-	PARAMOPT_CUR	*pcurp = &lpcurp->cur ;
+	paramopt	*pop = &lip->aparams ;
+	paramopt_cur	*pcurp = &lpcurp->cur ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 	int		vl ;
