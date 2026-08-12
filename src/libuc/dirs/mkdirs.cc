@@ -51,6 +51,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<permx.h>		/* LIBUC */
@@ -63,11 +64,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-    extern int uc_mkdir(cchar *,mode_t) noex ;
-}
 
 
 /* external variables */
