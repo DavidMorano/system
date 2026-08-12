@@ -1,4 +1,4 @@
-/* ttihdr HEADER */
+/* ttihdr HEADER (Term-Trans) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
