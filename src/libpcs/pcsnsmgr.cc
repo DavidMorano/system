@@ -50,19 +50,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ptm.h>
-#include	<ptc.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsnsmgr.h"
 #include	"pcsnsrecs.h"
@@ -105,7 +105,7 @@ struct pcsnsmgr_head {
 	volatile int	f_capture ;	/* capture flag */
 	volatile int	f_init ;	/* race-condition, blah, blah */
 	volatile int	f_initdone ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -116,9 +116,9 @@ local int	pcsnsmgr_capbegin(PCSNSMGR *,int) noex ;
 local int	pcsnsmgr_capend(PCSNSMGR *) noex ;
 
 extern "C" {
-    static void	pcsnsmgr_atforkbefore() noex ;
-    static void	pcsnsmgr_atforkafter() noex ;
-    static void	pcsnsmgr_exit() noex ;
+    local void	pcsnsmgr_atforkbefore() noex ;
+    local void	pcsnsmgr_atforkafter() noex ;
+    local void	pcsnsmgr_exit() noex ;
 }
 
 
@@ -172,8 +172,7 @@ int pcsnsmgr_init() noex {
 	    if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKFAIL ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (pcsnsmgr_init) */
+} /* end subroutine (pcsnsmgr_init) */
 
 int pcsnsmgr_fini() noex {
 	PCSNSMGR	*uip = &pcsnsmgr_data ;
@@ -236,8 +235,7 @@ int pcsnsmgr_set(cchar *vbuf,int vlen,cchar *un,int w,int ttl) noex {
 	} /* end if (init) */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pcsnsmgr_set) */
+} /* end subroutine (pcsnsmgr_set) */
 
 int pcsnsmgr_get(char *rbuf,int rlen,cchar *un,int w) noex {
 	int		rs ;
@@ -267,8 +265,7 @@ int pcsnsmgr_get(char *rbuf,int rlen,cchar *un,int w) noex {
 	} /* end if (init) */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pcsnsmgr_get) */
+} /* end subroutine (pcsnsmgr_get) */
 
 int pcsnsmgr_invalidate(cchar *un,int w) noex {
 	int		rs ;
@@ -296,8 +293,7 @@ int pcsnsmgr_invalidate(cchar *un,int w) noex {
 	} /* end if (init) */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pcsnsmgr_invalidate) */
+} /* end subroutine (pcsnsmgr_invalidate) */
 
 int pcsnsmgr_stats(PCSNSMGR_STATS *usp) noex {
 	int		rs ;
@@ -334,8 +330,7 @@ int pcsnsmgr_stats(PCSNSMGR_STATS *usp) noex {
 	} /* end if (init) */
 
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (pcsnsmgr_stats) */
+} /* end subroutine (pcsnsmgr_stats) */
 
 
 /* local subroutines (or "private"?) */
@@ -360,8 +355,7 @@ local int pcsnsmgr_capbegin(PCSNSMGR *uip,int to) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end subroutine (pcsnsmgr_capbegin) */
+} /* end subroutine (pcsnsmgr_capbegin) */
 
 local int pcsnsmgr_capend(PCSNSMGR *uip) noex {
 	ptm *mxp = &uip->mx ;
@@ -379,34 +373,30 @@ local int pcsnsmgr_capend(PCSNSMGR *uip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end subroutine (pcsnsmgr_capend) */
+} /* end subroutine (pcsnsmgr_capend) */
 
-static void pcsnsmgr_atforkbefore() noex {
+local void pcsnsmgr_atforkbefore() noex {
 	PCSNSMGR		*uip = &pcsnsmgr_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockbegin() ;
 	}
-}
-/* end subroutine (pcsnsmgr_atforkbefore) */
+} /* end subroutine (pcsnsmgr_atforkbefore) */
 
-static void pcsnsmgr_atforkafter() noex {
+local void pcsnsmgr_atforkafter() noex {
 	PCSNSMGR		*uip = &pcsnsmgr_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockend() ;
 	}
-}
-/* end subroutine (pcsnsmgr_atforkafter) */
+} /* end subroutine (pcsnsmgr_atforkafter) */
 
-static void pcsnsmgr_exit() noex {
+local void pcsnsmgr_exit() noex {
 	cint		rs = pcsnsmgr_fini() ;
 	if (rs < 0) {
 	    ulogerror("pcsnsmgr",rs,"exit-fini") ;
 	}
-}
-/* end subroutine (pcsnsmgr_exit) */
+} /* end subroutine (pcsnsmgr_exit) */
 
 local int pcsnsmgr_begin(PCSNSMGR *uip) noex {
 	int		rs = SR_OK ;
@@ -429,22 +419,20 @@ local int pcsnsmgr_begin(PCSNSMGR *uip) noex {
 	} /* end if (needed initialization) */
 
 	return rs ;
-}
-/* end subroutine (pcsnsmgr_begin) */
+} /* end subroutine (pcsnsmgr_begin) */
 
 local int pcsnsmgr_end(PCSNSMGR *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (uip->recs != nullptr) {
+	if (uip->recs) {
 	    PCSNSRECS	*recsp = (PCSNSRECS *) uip->recs ;
 	    rs1 = pcsnsrecs_finish(recsp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = lm_free(uip->recs) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->recs = nullptr ;
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pcsnsmgr_end) */
+} /* end subroutine (pcsnsmgr_end) */
 
 
