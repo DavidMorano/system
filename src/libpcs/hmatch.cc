@@ -56,12 +56,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hmatch.h"
 
@@ -133,7 +133,6 @@ int hmatch(cchar *header,cchar *str) noex {
 	    } /* end if (isbasic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (hmatch) */
+} /* end subroutine (hmatch) */
 
 
