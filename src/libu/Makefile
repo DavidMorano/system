@@ -88,12 +88,17 @@ OBJ31= ccfile.o readln.o dprint.o
 OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33= intext.o cmporders.o localmisc.o
 OBJ34= exitcodes.o stacktypes.o sysconfcmds.o
-OBJ35= utmptypes.o utmpsizes.o ascii.o 
+OBJ35= utmptypes.o utmpsizes.o
 
 OBJ36= mapex.o deb.o
 OBJ37= syspredefined.o
 OBJ38= typecodes.o charnames.o
 OBJ39= strtox.o atox.o
+
+OBJ40= ascii.o ubufdefs.o vardefs.o
+OBJ41=
+OBJ42=
+OBJ43=
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -105,6 +110,7 @@ OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJH= obj28.o obj29.o obj30.o obj31.o
 OBJI= obj32.o obj33.o obj34.o obj35.o
 OBJJ= obj36.o obj37.o obj38.o obj39.o
+OBJK= obj40.o
 
 OBJ += obja.o objb.o objc.o objd.o 
 OBJ += obje.o objf.o objg.o objh.o
@@ -362,6 +368,15 @@ objj.o:			$(OBJJ)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 objk.o:			$(OBJK)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+objl.o:			$(OBJL)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+objm.o:			$(OBJM)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+objn.o:			$(OBJN)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
@@ -637,8 +652,11 @@ cmporders.o:		cmporders.cc		cmporders.h		$(INCS)
 localmisc.o:		localmisc.cc		localmisc.h		$(INCS)
 mapex.o:		mapex.cc		mapex.h			$(INCS)
 sysconfcmds.o:		sysconfcmds.cc		sysconfcmds.h		$(INCS)
-ascii.o:		ascii.cc		ascii.h			$(INCS)
 charnames.o:		charnames.cc		charnames.h		$(INCS)
 syspredefined.o:	syspredefined.cc	syspredefined.h		$(INCS)
+
+ascii.o:		ascii.cc		ascii.h			$(INCS)
+ubufdefs.o:		ubufdefs.cc		ubufdefs.h		$(INCS)
+vardefs.o:		vardefs.cc		vardefs.h		$(INCS)
 
 
