@@ -137,7 +137,7 @@ OBJ37= sfcookkey.o sfsubstance.o sfthing.o sfcenter.o sfrootname.o sfnamecomp.o
 OBJ38=
 OBJ39=
 
-OBJ40= getenv3.o
+OBJ40= get.o
 OBJ41= permsched.o
 OBJ42=
 OBJ43=
@@ -146,7 +146,7 @@ OBJ45=
 OBJ46= opentermnote.o openport.o
 OBJ47= openusd.o
 
-OBJ48= wdt.o base64.o netorder.o stdorder.o getserial.o log2.o logbase.o
+OBJ48= wdt.o base64.o netorder.o stdorder.o log2.o logbase.o
 OBJ49=
 OBJ50= readn.o writen.o writeto.o acceptpass.o passfd.o
 OBJ51=
@@ -206,7 +206,7 @@ OBJ95=
 OBJ96= memfile.o langx.o sigman.o sighand.o
 OBJ97= comparse.o mhcom.o zos.o tmz.o zdb.o zoffparts.o snflags.o
 OBJ98= openportmsg.o varsub.o userattr.o 
-OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
+OBJ99= tmpx.o tmpx_tmpx_getuserlines.o tmpx_getsessions.o
 OBJ100= rijndael.o expcook.o
 OBJ101= egs.o librandom.o
 OBJ102= loadave.o modload.o userinfo.o
@@ -266,8 +266,8 @@ OBJ149= msgsub.o
 OBJ150= wsnwcpynarrow.o
 OBJ151= wsfnext.o wsinul.o wsichr.o wsirchr.o
 
-OBJ152= getuserorg.o getdefzinfo.o getrealname.o getprojname.o
-OBJ153= getaflen.o getprotofamily.o getlogfac.o getlogpri.o getmjd.o 
+OBJ152=
+OBJ153=
 OBJ154= msghdr.o cmsghdr.o
 OBJ155= mailboxappend.o
 OBJ156= hdrextid.o hdrextnum.o 
@@ -277,18 +277,18 @@ OBJ159= inetpton.o inetntop.o inet_ntoa_r.o inet4int.o
 
 OBJ160= tabcols.o nextfield.o nextfieldterm.o nextqtoken.o 
 OBJ161= nusers.o mesg.o initnow.o 
-OBJ162= getfiledirs.o findfilepath.o findfile.o
+OBJ162= findfilepath.o findfile.o
 OBJ163= cvttemperature.o bufprintf.o xfile.o
 OBJ164= strsigabbr.o strerrabbr.o strlocktype.o
 OBJ165=
 OBJ166=
 OBJ167=
 
-OBJ168= getgid_def.o
+OBJ168=
 OBJ169=
 OBJ170=
-OBJ171= getprovider.o getproviderid.o
-OBJ172= gettid.o
+OBJ171=
+OBJ172=
 OBJ173=
 OBJ174=
 OBJ175= argutils.o cmdutils.o
@@ -888,13 +888,17 @@ term.o:			term.dir
 term.dir:
 	makesubdir $@
 
+# GET
+get.o:			get.dir
+get.dir:
+	makesubdir $@
+
 ba.o:			ba.cc ba.h
 
 # SINGLES
 printhelp.o:		printhelp.cc printhelp.hh
 removename.o:		removename.cc removename.h
 wdt.o:			wdt.cc wdt.h
-getclusters.o:		getclusters.cc		getclusters.h
 sockpeername.o:		sockpeername.cc		sockpeername.h
 nlspeername.o:		nlspeername.cc		nlspeername.h
 ismatstar.o:		ismatstar.cc		ismatstar.h		$(INCS)
