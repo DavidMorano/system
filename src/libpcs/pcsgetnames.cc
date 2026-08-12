@@ -64,16 +64,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>
 #include	<ucentpw.h>
 #include	<ucentpj.h>
@@ -84,7 +84,6 @@
 #include	<getusername.h>
 #include	<getuserhome.h>
 #include	<bufsizevar.hh>
-#include	<bfile.h>
 #include	<filereadln.h>
 #include	<cfdec.h>
 #include	<mkx.h>
@@ -95,7 +94,9 @@
 #include	<char.h>
 #include	<hasx.h>
 #include	<isnot.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"pcsgetnames.h"
 
@@ -243,31 +244,26 @@ static bufsizevar		maxpathlen(bufsize_mp) ;
 int pcsgetname(cchar *pr,char *rbuf,int rlen,cchar *username) noex {
 	cint	ntype = pcsnametype_name ;
 	return pcsgetnames(pr,rbuf,rlen,username,ntype) ;
-}
-/* end subroutine (pcsgetname) */
+} /* end subroutine (pcsgetname) */
 
 int pcsgetfullname(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	cint	ntype = pcsnametype_fullname ;
 	return pcsgetnames(pr,rbuf,rlen,username,ntype) ;
-}
-/* end subroutine (pcsgetfullname) */
+} /* end subroutine (pcsgetfullname) */
 
 int pcsname(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	cint	ntype = pcsnametype_name ;
 	return pcsgetnames(pr,rbuf,rlen,username,ntype) ;
-}
-/* end subroutine (pcsname) */
+} /* end subroutine (pcsname) */
 
 int pcsfullname(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	cint	ntype = pcsnametype_fullname ;
 	return pcsgetnames(pr,rbuf,rlen,username,ntype) ;
-}
-/* end subroutine (pcsfullname) */
+} /* end subroutine (pcsfullname) */
 
 int pcsnames(cc *pr,char *rbuf,int rlen,cc *un,int ntype) noex {
 	return pcsgetnames(pr,rbuf,rlen,un,ntype) ;
-}
-/* end subroutine (pcsnames) */
+} /* end subroutine (pcsnames) */
 
 int pcsgetnames(cc *pr,char *rbuf,int rlen,cc *un,int ntype) noex {
 	int		rs = SR_FAULT ;
@@ -289,13 +285,11 @@ int pcsgetnames(cc *pr,char *rbuf,int rlen,cc *un,int ntype) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (pcsgetnames) */
+} /* end subroutine (pcsgetnames) */
 
 int pcsgetprojinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	return pcsprojectinfo(pr,rbuf,rlen,username) ;
-}
-/* end subroutine (pcsgetprojinfo) */
+} /* end subroutine (pcsgetprojinfo) */
 
 int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	int		rs = SR_FAULT ;
@@ -319,8 +313,7 @@ int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (pcsprojectinfo) */
+} /* end subroutine (pcsprojectinfo) */
 
 
 /* local subroutines */
@@ -339,8 +332,7 @@ local int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *un) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (maxpathlen) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
 local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -352,8 +344,7 @@ local int subinfo_finish(SI *sip) noex {
 	}
 	sip->pr = nullptr ;
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 local int subinfo_getuid(SI *sip,uid_t *uidp) noex {
 	int		rs = SR_OK ;
@@ -380,8 +371,7 @@ local int subinfo_getuid(SI *sip,uid_t *uidp) noex {
 	    rs = SR_NOTFOUND ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_getuid) */
+} /* end subroutine (subinfo_getuid) */
 
 local int subinfo_getpw(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -408,8 +398,7 @@ local int subinfo_getpw(SI *sip) noex {
 	    }
 	} /* end if (was not already initialized) */
 	return rs ;
-}
-/* end subroutine (subinfo_getpw) */
+} /* end subroutine (subinfo_getpw) */
 
 local int getname(SI *sip,int ntype) noex {
 	int		rs = SR_BUGCHECK ;
@@ -424,8 +413,7 @@ local int getname(SI *sip,int ntype) noex {
 	    } /* end for */
 	} /* end if (ok) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (getname) */
+} /* end subroutine (getname) */
 
 local int getname_var(SI *sip,int ntype) noex {
 	int		rs = SR_OK ;
@@ -447,8 +435,7 @@ local int getname_var(SI *sip,int ntype) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getname_var) */
+} /* end subroutine (getname_var) */
 
 local int getname_userhome(SI *sip ,int ntype) noex {
         cint            sz = (2 * (maxpathlen + 1)) ;
@@ -475,8 +462,7 @@ local int getname_userhome(SI *sip ,int ntype) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getname_userhome) */
+} /* end subroutine (getname_userhome) */
 
 local int getname_again(SI *sip,int ntype) noex {
 	int		rs = SR_OK ;
@@ -485,8 +471,7 @@ local int getname_again(SI *sip,int ntype) noex {
 	    rs = getname(sip,ntype) ;
 	}
 	return rs ;
-}
-/* end subroutine (getname_again) */
+} /* end subroutine (getname_again) */
 
 local int getname_sysdb(SI *sip,int) noex {
 	int		rs = SR_OK ;
@@ -508,8 +493,7 @@ local int getname_sysdb(SI *sip,int) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getname_sysdb) */
+} /* end subroutine (getname_sysdb) */
 
 local int getprojinfo_userhome(SI *sip) noex {
 	cint		sz = (2 * (maxpathlen + 1)) ;
@@ -538,8 +522,7 @@ local int getprojinfo_userhome(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getprojinfo_userhome) */
+} /* end subroutine (getprojinfo_userhome) */
 
 local int getprojinfo_sysdb(SI *sip) noex {
 	int		rs ;
@@ -566,8 +549,7 @@ local int getprojinfo_sysdb(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getprojinfo_sysdb) */
+} /* end subroutine (getprojinfo_sysdb) */
 
 local int getprojinfo_pcsdef(SI *sip) noex {
 	int		rs ;
@@ -592,7 +574,6 @@ local int getprojinfo_pcsdef(SI *sip) noex {
 	    } /* end if (system UID) */
 	} /* end if )subinfo_getuid) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getprojinfo_pcsdef) */
+} /* end subroutine (getprojinfo_pcsdef) */
 
 
