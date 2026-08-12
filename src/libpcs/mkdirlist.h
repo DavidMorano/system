@@ -23,24 +23,24 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |mode_t| */
-#include	<sys/stat.h>		/* |dev_t| + |ino_t| */
-#include	<time.h>		/* |time_t| */
-#include	<monthname.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
+#include	<sys/types.h>		/* POSIX® |mode_t| */
+#include	<sys/stat.h>		/* POSIX® |dev_t| + |ino_t| */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<monthname.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
 
 
-#define	MKDIRLIST_MAGIC		0x8987372A
 #define	MKDIRLIST		struct mkdirlist_head
 #define	MKDIRLIST_EFL		struct mkdirlist_eflags
 #define	MKDIRLIST_ENT		struct mkdirlist_entry
+#define	MKDIRLIST_MAGIC		0x8987372A
 
 
 struct mkdirlist_head {
 	vechand		*dlp ;		/* Directory-List-Pointer */
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct mkdirlist_eflags {
