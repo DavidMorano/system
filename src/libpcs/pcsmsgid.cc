@@ -39,17 +39,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |getustime(3u)| */
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<getnodedomain.h>
-#include	<sbuf.h>
-#include	<localmisc.h>
-#include	<pcsgetserial.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* |getustime(3u)| */
+#include	<usupport.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<pcsgetserial.h>	/* LIBPCS */
 
 #include	"pcsmsgid.h"
 
@@ -97,20 +98,19 @@ int pcsmsgid(cchar *pr,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if (pr && rbuf) {
+	if (pr && rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0]) {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+	    if (pr[0]) ylikely {
+		if (static cint	rsv = var ; (rs = rsv) >= 0) ylikely {
 		   cint nlen = var.nodenamelen ;
 		   cint hlen = var.hostnamelen ;
-	           if ((rs = pcsgetserial(pr)) >= 0) {
+	           if ((rs = pcsgetserial(pr)) >= 0) ylikely {
 		       cint	sz = ((nlen + 1) + (hlen + 1)) ;
 	               cint	sn = rs ;
-		       if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+		       if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 	                   char	*nn = (a + 0) ;
 	                   char	*dn = (a + (nlen + 1)) ;
-	                   if ((rs = getnodedomain(nn,dn)) >= 0) {
+	                   if ((rs = getnodedomain(nn,dn)) >= 0) ylikely {
 	                       rs = mkstr(rbuf,rlen,dn,nn,sn) ;
 			       rv = rs;
 	                   } /* end if (getnodedomain) */
@@ -122,16 +122,16 @@ int pcsmsgid(cchar *pr,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (pcsmsgid) */
+} /* end subroutine (pcsmsgid) */
 
 
 /* local subroutines */
 
 local int mkstr(char *rp,int rl,cchar *dn,cchar *nn,int sn) noex {
+    	custime		dt = getustime ;
 	int		rs ;
-	if (sbuf sb ; (rs = sb.start(rp,rl)) >= 0) {
-	    cuint	tv = (uint) getustime ;
+	if (sbuf sb ; (rs = sb.start(rp,rl)) >= 0) ylikely {
+	    cuint	tv = conv<uint>(dt) ;
 	    cint	pid = getpid() ;
 	    cint	nl = lenstr(nn) ;
 	    int		len ;
@@ -156,16 +156,15 @@ local int mkstr(char *rp,int rl,cchar *dn,cchar *nn,int sn) noex {
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsgid_join) */
+} /* end subroutine (pcsmsgid_join) */
 
 variables::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) ylikely {
 	    nodenamelen = rs ;
-	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 	        hostnamelen = rs ;
-	        if ((rs = bufsizeget(bufsize_un)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 		    usernamelen = rs ;
 		}
 	    }
