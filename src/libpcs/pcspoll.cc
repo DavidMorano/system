@@ -5,7 +5,7 @@
 /* load management and interface for the PCSPOLLS object */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -33,27 +33,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<dlfcn.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<modload.h>
-#include	<pcsconf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<modload.h>		/* LIBUC */
+#include	<pcsconf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"pcspoll.h"
 #include	"pcspolls.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -130,7 +134,7 @@ int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspoll_start: pcp={%p} sn=%s\n",pcp,sn) ;
 #endif
 
@@ -165,13 +169,12 @@ int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn) noex {
 	    } /* end if (pollsdname) */
 	} /* end block */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspoll_start: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (pcspoll_start) */
+} /* end subroutine (pcspoll_start) */
 
 /* free up the entire vector string data structure object */
 int pcspoll_finish(PCSPOLL *op) noex {
@@ -191,8 +194,7 @@ int pcspoll_finish(PCSPOLL *op) noex {
 
 	op->magic = 0 ;
 	return rs ;
-}
-/* end subroutine (pcspoll_finish) */
+} /* end subroutine (pcspoll_finish) */
 
 int pcspoll_info(PCSPOLL *op,PCSPOLL_INFO *ip) noex {
 	int		rs = SR_NOSYS ;
@@ -217,12 +219,9 @@ int pcspoll_info(PCSPOLL *op,PCSPOLL_INFO *ip) noex {
 	    rs = SR_OK ;
 
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (pcspoll_info) */
+} /* end subroutine (pcspoll_info) */
 
-
-int pcspoll_cmd(PCSPOLL *op,int cmd)
-{
+int pcspoll_cmd(PCSPOLL *op,int cmd) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -237,18 +236,16 @@ int pcspoll_cmd(PCSPOLL *op,int cmd)
 	    rs = SR_OK ;
 
 	return rs ;
-}
-/* end subroutine (pcspoll_cmd) */
+} /* end subroutine (pcspoll_cmd) */
 
 
 /* private subroutines */
 
 /* find and load the DB-access object */
-local int pcspoll_objloadbegin(PCSPOLL *op,cchar *pr,cchar *objname)
-{
+local int pcspoll_objloadbegin(PCSPOLL *op,cchar *pr,cchar *objname) noex {
 	int		rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspoll_objloadbegin: pr=%s\n",pr) ;
 	debugprintf("pcspoll_objloadbegin: objname=%s\n",objname) ;
 #endif
@@ -272,9 +269,7 @@ local int pcspoll_objloadbegin(PCSPOLL *op,cchar *pr,cchar *objname)
 	} /* end if (modload-ed) */
 
 	return rs ;
-}
-/* end subroutine (pcspoll_objloadbegin) */
-
+} /* end subroutine (pcspoll_objloadbegin) */
 
 local int pcspoll_objloadend(PCSPOLL *op) noex {
 	int		rs = SR_OK ;
@@ -290,8 +285,7 @@ local int pcspoll_objloadend(PCSPOLL *op) noex {
 	if (rs >= 0) rs = rs1 ;
 
 	return rs ;
-}
-/* end subroutine (pcspoll_objloadend) */
+} /* end subroutine (pcspoll_objloadend) */
 
 local int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname) noex {
 	cint	vn = nelem(subs) ;
@@ -328,8 +322,7 @@ local int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname) noex {
 	} /* end if (allocation) */
 
 	return rs ;
-}
-/* end subroutine (pcspoll_modloadopen) */
+} /* end subroutine (pcspoll_modloadopen) */
 
 local int pcspoll_loadcalls(PCSPOLL *op,cchar *objname) noex {
 	modload		*lp = &op->loader ;
@@ -384,8 +377,7 @@ local int pcspoll_loadcalls(PCSPOLL *op,cchar *objname) noex {
 	} /* end for (subs) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (pcspoll_loadcalls) */
+} /* end subroutine (pcspoll_loadcalls) */
 
 local bool isrequired(int i) noex {
 	bool	f = false ;
@@ -396,7 +388,6 @@ local bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
