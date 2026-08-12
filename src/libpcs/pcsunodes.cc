@@ -27,21 +27,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecpstr.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<matstr.h>		/* |matcasestr(3uc)| */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecpstr.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC |matcasestr(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsunodes.h"
 
@@ -75,11 +75,9 @@ local inline int pcsunodes_magic(pcsunodes *op,Args ... args) noex {
 	    rs = (op->magic == PN_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (pcsunodes_magic) */
+} /* end subroutine (pcsunodes_magic) */
 
 local int	pcsunodes_mktab(PN *,vecpstr *) noex ;
-
 local int	vecpstr_loadnodes(vecpstr *,cchar **,char *) noex ;
 
 
@@ -125,8 +123,7 @@ int pcsunodes_start(PN *op,cchar *pr) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pcsunodes_start) */
+} /* end subroutine (pcsunodes_start) */
 
 int pcsunodes_finish(PN *op) noex {
 	int		rs ;
@@ -140,8 +137,7 @@ int pcsunodes_finish(PN *op) noex {
 	    op->magic = 0 ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
-/* end subroutine (pcsunodes_finish) */
+} /* end subroutine (pcsunodes_finish) */
 
 int pcsunodes_get(PN *op,int i,cchar **rpp) noex {
 	int		rs ;
@@ -157,8 +153,7 @@ int pcsunodes_get(PN *op,int i,cchar **rpp) noex {
 	    }
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
-/* end subroutine (pcsunodes_get) */
+} /* end subroutine (pcsunodes_get) */
 
 int pcsunodes_mat(PN *op,cchar *mp,int ml) noex {
 	int		rs ;
@@ -168,8 +163,7 @@ int pcsunodes_mat(PN *op,cchar *mp,int ml) noex {
 	    }
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
-/* end subroutine (pcsunodes_mat) */
+} /* end subroutine (pcsunodes_mat) */
 
 int pcsunodes_curbegin(PN *op,PN_CUR *curp) noex {
     	int		rs ;
@@ -177,8 +171,7 @@ int pcsunodes_curbegin(PN *op,PN_CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
-/* end subroutine (pcsunodes_curbegin) */
+} /* end subroutine (pcsunodes_curbegin) */
 
 int pcsunodes_curend(PN *op,PN_CUR *curp) noex {
     	int		rs ;
@@ -186,8 +179,7 @@ int pcsunodes_curend(PN *op,PN_CUR *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
-/* end subroutine (pcsunodes_curend) */
+} /* end subroutine (pcsunodes_curend) */
 
 int pcsunodes_curenum(PN *op,PN_CUR *curp,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -205,8 +197,7 @@ int pcsunodes_curenum(PN *op,PN_CUR *curp,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (pcsunodes_magic) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (pcsunodes_curenum) */
+} /* end subroutine (pcsunodes_curenum) */
 
 int pcsunodes_audit(PN *op) noex {
     	int		rs ;
@@ -214,8 +205,7 @@ int pcsunodes_audit(PN *op) noex {
 	    rs = SR_OK ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
-/* end subroutine (pcsunodes_mat) */
+} /* end subroutine (pcsunodes_mat) */
 
 
 /* local subroutines */
@@ -249,8 +239,7 @@ local int pcsunodes_mktab(PN *op,vecpstr *ulp) noex {
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (pcsunodes_mktab) */
+} /* end subroutine (pcsunodes_mktab) */
 
 local int vecpstr_loadnodes(vecpstr *ulp,cchar **va,char *st) noex {
 	int		rs ;
@@ -280,7 +269,6 @@ local int vecpstr_loadnodes(vecpstr *ulp,cchar **va,char *st) noex {
 	debugprintf("vecpstr_loadnodes: ret rs=%d c=%u\n",rs,c) ;
 #endif
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (vecpstr_loadnodes) */
+} /* end subroutine (vecpstr_loadnodes) */
 
 
