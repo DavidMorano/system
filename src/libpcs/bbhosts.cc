@@ -27,16 +27,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<uclibmem.h>
-#include	<vecpstr.h>
-#include	<mkpathx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecpstr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"bbhosts.hh"
 
@@ -96,8 +96,7 @@ int bbhosts_start(bbhosts *op,cchar *pr,cchar *bbhostfn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (bbhosts_start) */
+} /* end subroutine (bbhosts_start) */
 
 int bbhosts_finish(bbhosts *op) noex {
     	int		rs ;
@@ -106,8 +105,7 @@ int bbhosts_finish(bbhosts *op) noex {
 	    op->magic = 0 ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
-/* end subroutine (bbhosts_finish) */
+} /* end subroutine (bbhosts_finish) */
 
 int bbhosts_get(bbhosts *op,int µi,cchar **rpp) noex {
     	int		rs ;
@@ -115,8 +113,7 @@ int bbhosts_get(bbhosts *op,int µi,cchar **rpp) noex {
 	    rs = op->vecpstr::get(µi,rpp) ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
-/* end subroutine (bbhosts_get) */
+} /* end subroutine (bbhosts_get) */
 
 int bbhosts_find(bbhosts *op,cchar *s) noex {
     	int		rs ;
@@ -124,8 +121,7 @@ int bbhosts_find(bbhosts *op,cchar *s) noex {
 	    rs = op->vecpstr::find(s) ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
-/* end subroutine (bbhosts_find) */
+} /* end subroutine (bbhosts_find) */
 
 int bbhosts_count(bbhosts *op) noex {
     	int		rs ;
@@ -133,7 +129,7 @@ int bbhosts_count(bbhosts *op) noex {
     	    rs = op->vecpstr::count ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
+} /* end subroutine */
 
 int bbhosts_audit(bbhosts *op) noex {
     	int		rs ;
@@ -141,7 +137,7 @@ int bbhosts_audit(bbhosts *op) noex {
     	    rs = op->vecpstr::audit ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
-}
+} /* end subroutine */
 
 
 /* private subroutines */
