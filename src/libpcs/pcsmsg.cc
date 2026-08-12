@@ -1,4 +1,5 @@
 /* pcs-msg SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* messages for PCS requests-responses */
@@ -16,20 +17,25 @@
 
 /*******************************************************************************
 
+  	Name:
+	pcs-msg
+
+	Description:
 	This module contains the subroutines to make and parse the
 	PCSMSG family of messages.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
-#include	<usystem.h>
-#include	<stdorder.h>
-#include	<serialbuf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdorder.h>		/* LIBUC */
+#include	<serialbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsmsg.h"
 
@@ -82,8 +88,7 @@ int pcsmsg_getstatus(pcsmsg_getstatus *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_getstatus) */
+} /* end subroutine (pcsmsg_getstatus) */
 
 int pcsmsg_status(pcsmsg_status *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -116,8 +121,7 @@ int pcsmsg_status(pcsmsg_status *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_status) */
+} /* end subroutine (pcsmsg_status) */
 
 int pcsmsg_getval(pcsmsg_getval *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -148,8 +152,7 @@ int pcsmsg_getval(pcsmsg_getval *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_getval) */
+} /* end subroutine (pcsmsg_getval) */
 
 int pcsmsg_val(pcsmsg_val *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -184,8 +187,7 @@ int pcsmsg_val(pcsmsg_val *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_val) */
+} /* end subroutine (pcsmsg_val) */
 
 int pcsmsg_gethelp(pcsmsg_gethelp *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -214,8 +216,7 @@ int pcsmsg_gethelp(pcsmsg_gethelp *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_gethelp) */
+} /* end subroutine (pcsmsg_gethelp) */
 
 int pcsmsg_help(pcsmsg_help *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -250,8 +251,7 @@ int pcsmsg_help(pcsmsg_help *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_help) */
+} /* end subroutine (pcsmsg_help) */
 
 int pcsmsg_getname(pcsmsg_getname *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -280,8 +280,7 @@ int pcsmsg_getname(pcsmsg_getname *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_getname) */
+} /* end subroutine (pcsmsg_getname) */
 
 int pcsmsg_name(pcsmsg_name *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -312,8 +311,7 @@ int pcsmsg_name(pcsmsg_name *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_name) */
+} /* end subroutine (pcsmsg_name) */
 
 int pcsmsg_getuser(pcsmsg_getuser *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -342,8 +340,7 @@ int pcsmsg_getuser(pcsmsg_getuser *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_getuser) */
+} /* end subroutine (pcsmsg_getuser) */
 
 int pcsmsg_user(pcsmsg_user *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -374,8 +371,7 @@ int pcsmsg_user(pcsmsg_user *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_user) */
+} /* end subroutine (pcsmsg_user) */
 
 int pcsmsg_exit(pcsmsg_exit *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -404,8 +400,7 @@ int pcsmsg_exit(pcsmsg_exit *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_exit) */
+} /* end subroutine (pcsmsg_exit) */
 
 int pcsmsg_mark(pcsmsg_mark *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -432,8 +427,7 @@ int pcsmsg_mark(pcsmsg_mark *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_mark) */
+} /* end subroutine (pcsmsg_mark) */
 
 int pcsmsg_ack(pcsmsg_ack *sp,int f,char *mbuf,int mlen) noex {
 	serialbuf	m ;
@@ -462,7 +456,6 @@ int pcsmsg_ack(pcsmsg_ack *sp,int f,char *mbuf,int mlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (serialbuf) */
 	return rs ;
-}
-/* end subroutine (pcsmsg_ack) */
+} /* end subroutine (pcsmsg_ack) */
 
 
