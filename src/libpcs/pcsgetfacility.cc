@@ -51,20 +51,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<strdcpy.h>
-#include	<strwcpy.h>		/* |strwcpylc(3uc)| */
-#include	<pcsns.h>
-#include	<isoneof.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strdcpy.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC |strwcpylc(3uc)| */
+#include	<pcsns.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsgetfacility.h"
 
@@ -142,7 +142,6 @@ int pcsgetfacility(cchar *pr,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (pcsgetfacility) */
+} /* end subroutine (pcsgetfacility) */
 
 
