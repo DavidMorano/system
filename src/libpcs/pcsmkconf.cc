@@ -26,22 +26,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<mktmp.h>
-#include	<ids.h>
-#include	<vecstr.h>
-#include	<paramfile.h>
-#include	<varmk.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<mktmp.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<varmk.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -50,7 +50,7 @@ import libutil ;			/* |memclear(3u)| */
 /* local defines */
 
 #define	SI		subinfo
-#define	SI_FL	subinfo_flags
+#define	SI_FL		subinfo_flags
 
 #define	PRCONF		"conf"
 
@@ -142,8 +142,7 @@ int pcsmkconf(cchar *pr,mainv envv,cc *cfname) noex {
 	    /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pcsmkconf) */
+} /* end subroutine (pcsmkconf) */
 
 
 /* local subroutines */
@@ -162,9 +161,7 @@ local int subinfo_start(SI *sip,cc *pr,mainv envv,cc *cfname) noex {
 	sip->prconf = PRCONF ;
 	sip->pr = pr ;
 	sip->cfname = cfname ;
-
-/* open the PCS-configuration file (if it exists) */
-
+	/* open the PCS-configuration file (if it exists) */
 	vecstr		subs ;
 	if ((rs = vecstr_start(&subs,4,0)) >= 0) {
 	    char	tmpfname[MAXPATHLEN+1] ;
@@ -191,8 +188,7 @@ local int subinfo_start(SI *sip,cc *pr,mainv envv,cc *cfname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (subs) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
 local int subinfo_finish(SI *sip) noex )
 	int		rs = SR_OK ;
@@ -202,8 +198,7 @@ local int subinfo_finish(SI *sip) noex )
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 local int subinfo_startsubs(SI *sip,vecstr *slp) noex {
 	int		rs = SR_OK ;
@@ -220,8 +215,7 @@ local int subinfo_startsubs(SI *sip,vecstr *slp) noex {
 	    rs = vecstr_envadd(slp,"n",cp,cl) ;
 
 	return rs ;
-}
-/* end subroutine (subinfo_startsubs) */
+} /* end subroutine (subinfo_startsubs) */
 
 local int subinfo_confglobal(SI *sip,char *dbname) noex {
 	int		rs ;
@@ -232,22 +226,18 @@ local int subinfo_confglobal(SI *sip,char *dbname) noex {
 	    rs = mkpath2(dbname,tmpdname,sip->prconf) ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_confglobal) */
+} /* end subroutine (subinfo_confglobal) */
 
 local int subinfo_conflocal(SI *sip,char *dbname) noex {
 	int		rs ;
 	cmode		dm = 0775 ;
 	cchar		*cdname = "pcsconf" ;
 	char		tmpdname[MAXPATHLEN+1] ;
-
 	if ((rs = mktmpuserdir(tmpdname,"-",cdname,dm)) >= 0) {
 	    rs = mkpath2(dbname,tmpdname,sip->prconf) ;
 	}
-
 	return rs ;
-}
-/* end subroutine (subinfo_conflocal) */
+} /* end subroutine (subinfo_conflocal) */
 
 local int subinfo_proc(SI *sip) noex {
 	paramfile	*pfp = &sip->pf ;
@@ -275,8 +265,7 @@ local int subinfo_proc(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (paramfile) */
 	return rs ;
-}
-/* end subroutine (subinfo_proc) */
+} /* end subroutine (subinfo_proc) */
 
 vars::operator int () noex {
 	return u_getenviron(&envv) ;
