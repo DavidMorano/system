@@ -28,37 +28,38 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<netdb.h>
-#include	<pwd.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getpx.h>
-#include	<getpwx.h>
-#include	<bufsizeget.h>
-#include	<getusername.h>
-#include	<getax.h>
-#include	<estrings.h>
-#include	<vecstr.h>
-#include	<spawnproc.h>
-#include	<expcook.h>
-#include	<ascii.h>
-#include	<field.h>
-#include	<sbuf.h>
-#include	<gecos.h>
-#include	<filereadln.h>
-#include	<strwcpy.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<pwd.h>			/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getpx.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<gecos.h>		/* LIBUC */
+#include	<filereadln.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<vardefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"pcsnso.h"
@@ -72,34 +73,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 #ifndef	NSYSPIDS
 #define	NSYSPIDS	100
-#endif
-
-#ifndef	VARPRPCS
-#define	VARPRPCS	"PCS"
-#endif
-
-#ifndef	VARHOME
-#define	VARHOME		"HOME"
-#endif
-
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
-#endif
-
-#ifndef	VARNAME
-#define	VARNAME		"NAME"
-#endif
-
-#ifndef	VARFULLNAME
-#define	VARFULLNAME	"FULLNAME"
-#endif
-
-#ifndef	VARPROJINFO
-#define	VARPROJINFO	"PROJINFO"
-#endif
-
-#ifndef	VARORG
-#define	VARORG		"ORGANIZATION"
 #endif
 
 #ifndef	DEFPROJNAME
@@ -128,10 +101,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 #ifndef	PRORGFNAME
 #define	PRORGFNAME	"etc/organization"
-#endif
-
-#ifndef	VARPRLOCAL
-#define	VARPRLOCAL	"LOCAL"
 #endif
 
 #ifndef	TMPDNAME
@@ -183,7 +152,7 @@ struct subinfo {
 	uid_t		uid ;
 	int		rlen ;		/* passed argument */
 	int		w ;		/* passed argument */
-} ;
+} ; /* end struct (subinfo) */
 
 struct pcsnametype {
 	cchar	*var ;
