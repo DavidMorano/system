@@ -28,35 +28,35 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<mktmp.h>
-#include	<vecstr.h>
-#include	<spawnproc.h>
-#include	<ids.h>
-#include	<fsdir.h>
-#include	<varmk.h>
-#include	<paramfile.h>
-#include	<pathadd.h>
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<permx.h>
-#include	<var.h>
-#include	<varmk.h>
-#include	<hasx.h>
-#include	<isoneof.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBU */
+#include	<mktmp.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBU */
+#include	<spawnproc.h>		/* LIBU */
+#include	<ids.h>			/* LIBU */
+#include	<fsdir.h>		/* LIBU */
+#include	<varmk.h>		/* LIBU */
+#include	<paramfile.h>		/* LIBU */
+#include	<pathadd.h>		/* LIBU */
+#include	<sfx.h>			/* LIBU */
+#include	<strwcpy.h>		/* LIBU */
+#include	<permx.h>		/* LIBU */
+#include	<var.h>			/* LIBU */
+#include	<varmk.h>		/* LIBU */
+#include	<hasx.h>		/* LIBU */
+#include	<isoneof.h>		/* LIBU */
+#include	<isnot.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 #include	<libpr.h>		/* LIBPR */
 
 #include	"pcsconfs.h"
@@ -153,6 +153,7 @@ import libutil ;			/* |lenstr(3u)| */
 #define	PC_CUR		pcsconfs_cur
 #define	PC_MAGIC	PCSCONFS_MAGIC
 #define	PC_CURMAGIC	PCSCONFS_CURMAGIC
+
 #define	CV		confvars
 #define	CV_FL		confvars_flags
 
@@ -163,9 +164,7 @@ import libutil ;			/* |lenstr(3u)| */
 #ifndef	VCNAME
 #define	VCNAME		"var"
 #endif
-
 #define	INDDNAME	"pcsconfs"
-
 #define	INDNAME		"pcsconfs"
 #define	INDSUF		"vi"
 
@@ -269,7 +268,7 @@ constexpr int		stales[] = {
 
 /* exported variables */
 
-pcsconfs_obj		pcsconfs_mod = {
+const pcsconfs_obj	pcsconfs_mod = {
 	"pcsconfs",
 	szof(pcsconfs),
 	szof(pcsconfs_cur)
@@ -298,8 +297,7 @@ int pcsconfs_start(PC *op,cchar *pr,mainv ev,cchar *cfname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pcsconfs_start) */
+} /* end subroutine (pcsconfs_start) */
 
 int pcsconfs_finish(PC *op) noex {
 	int		rs = SR_FAULT ;
@@ -313,8 +311,7 @@ int pcsconfs_finish(PC *op) noex {
 	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pcsconfs_finish) */
+} /* end subroutine (pcsconfs_finish) */
 
 int pcsconfs_audit(PC *op) noex {
 	int		rs = SR_FAULT ;
@@ -327,8 +324,7 @@ int pcsconfs_audit(PC *op) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pcsconfs_audit) */
+} /* end subroutine (pcsconfs_audit) */
 
 int pcsconfs_curbegin(PC *op,PC_CUR *curp) noex {
 	int		rs = SR_OK ;
@@ -348,8 +344,7 @@ int pcsconfs_curbegin(PC *op,PC_CUR *curp) noex {
 	if (rs >= 0) curp->magval = PC_CURMAGIC ;
 
 	return rs ;
-}
-/* end subroutine (pcsconfs_curbegin) */
+} /* end subroutine (pcsconfs_curbegin) */
 
 int pcsconfs_curend(PC *op,PC_CUR *curp) noex {
 	int		rs = SR_OK ;
@@ -369,8 +364,7 @@ int pcsconfs_curend(PC *op,PC_CUR *curp) noex {
 
 	curp->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (pcsconfs_curend) */
+} /* end subroutine (pcsconfs_curend) */
 
 int pcsconfs_fetch(PC *op,cchar *kp,int kl,PC_CUR *curp,
 		char *vbuf,int vlen) noex {
@@ -392,9 +386,7 @@ int pcsconfs_fetch(PC *op,cchar *kp,int kl,PC_CUR *curp,
 	}
 
 	return rs ;
-}
-/* end subroutine (pcsconfs_fetch) */
-
+} /* end subroutine (pcsconfs_fetch) */
 
 int pcsconfs_curenum(PC *op,PC_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
@@ -416,8 +408,7 @@ int pcsconfs_curenum(PC *op,PC_CUR *curp,char *kbuf,int klen,
 	}
 
 	return rs ;
-}
-/* end subroutine (pcsconfs_curenum) */
+} /* end subroutine (pcsconfs_curenum) */
 
 int pcsconfs_count(PC *op) noex {
 	int		rs = SR_OK ;
@@ -431,8 +422,7 @@ int pcsconfs_count(PC *op) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (pcsconfs_count) */
+} /* end subroutine (pcsconfs_count) */
 
 
 /* private subroutines */
@@ -454,8 +444,7 @@ local int pcsconfs_valsbegin(PC *op,cchar *pr,cchar *cfname) noex {
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (pcsconfs_valsbegin) */
+} /* end subroutine (pcsconfs_valsbegin) */
 
 local int pcsconfs_valsend(PC *op) noex {
 	int		rs = SR_OK ;
@@ -466,8 +455,7 @@ local int pcsconfs_valsend(PC *op) noex {
 	    op->a = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (pcsconfs_valsend) */
+} /* end subroutine (pcsconfs_valsend) */
 
 local int pcsconfs_dbcheck(PC *op) noex {
 	CV	si, *sip = &si ;
@@ -487,8 +475,7 @@ local int pcsconfs_dbcheck(PC *op) noex {
 	} /* end if (confvars) */
 
 	return (rs >= 0) ? f_conf : rs ;
-}
-/* end subroutine (pcsconfs_dbcheck) */
+} /* end subroutine (pcsconfs_dbcheck) */
 
 local int pcsconfs_dbclose(PC *op) noex {
 	int		rs = SR_OK ;
@@ -499,8 +486,7 @@ local int pcsconfs_dbclose(PC *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (pcsconfs_dbclose) */
+} /* end subroutine (pcsconfs_dbclose) */
 
 local int pcsconfs_finout(PC *op) noex {
 	int		rs = SR_OK ;
@@ -514,8 +500,7 @@ local int pcsconfs_finout(PC *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (pcsconfs_finout) */
+} /* end subroutine (pcsconfs_finout) */
 
 local int pcsconfs_envv(PC *op,mainv ev) noex {
     	int	rs = SR_OK ;
@@ -541,9 +526,7 @@ local int confvars_start(CV *sip,PC *op) noex {
 	sip->cfname = op->cfname ;
 	sip->uid_pcs = -1 ;
 	sip->gid_pcs = -1 ;
-
-/* find the PCS-configuration file if necessary */
-
+	/* find the PCS-configuration file if necessary */
 	cfname = op->cfname ;
 
 	if (op->fl.prdb) {
@@ -565,11 +548,9 @@ local int confvars_start(CV *sip,PC *op) noex {
 			}
 		    }
 	        } /* end if (subs loaded) */
-
 	        vecstr_finish(&subs) ;
 	    } /* end if (subs) */
 	} /* end if */
-
 	if (rs >= 0) {
 	    if (rs1 >= 0) {
 	        ustat	sb ;
@@ -580,10 +561,8 @@ local int confvars_start(CV *sip,PC *op) noex {
 	        }
 	    }
 	} /* end if */
-
 	return rs ;
-}
-/* end subroutine (confvars_start) */
+} /* end subroutine (confvars_start) */
 
 local int confvars_finish(CV *sip) noex {
 	int		rs = SR_OK ;
@@ -601,8 +580,7 @@ local int confvars_finish(CV *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (confvars_finish) */
+} /* end subroutine (confvars_finish) */
 
 local int confvars_loadsubs(CV *sip,vecstr *slp) noex {
 	int		rs = SR_OK ;
@@ -612,15 +590,14 @@ local int confvars_loadsubs(CV *sip,vecstr *slp) noex {
 	bl = sfbasename(sip->pr,-1,&bp) ;
 	if (bl <= 0) rs = SR_INVALID ;
 
-	if (rs >= 0)
+	if (rs >= 0) {
 	    rs = vecstr_envadd(slp,"p",sip->pr,-1) ;
-
-	if (rs >= 0)
+	}
+	if (rs >= 0) {
 	    rs = vecstr_envadd(slp,"n",bp,bl) ;
-
+	}
 	return rs ;
-}
-/* end subroutine (confvars_loadsubs) */
+} /* end subroutine (confvars_loadsubs) */
 
 local int confvars_dbstart(CV *sip) noex {
 	pcsconfs	*op = sip->op ;
@@ -666,10 +643,8 @@ local int confvars_dbstart(CV *sip) noex {
 #if	CF_DEBUGS
 	debugprintf("confvars_dbstart: ret rs=%d\n",rs) ;
 #endif
-
 	return rs ;
-}
-/* end subroutine (confvars_dbstart) */
+} /* end subroutine (confvars_dbstart) */
 
 local int confvars_confglobal(CV *sip,char *dname) noex {
 	int		rs ;
@@ -689,8 +664,7 @@ local int confvars_confglobal(CV *sip,char *dname) noex {
 	rs = prmktmpdir(sip->pr,dname,tmpdname,cdname,dm) ;
 
 	return rs ;
-}
-/* end subroutine (confvars_confglobal) */
+} /* end subroutine (confvars_confglobal) */
 
 local int confvars_conflocal(CV *sip,char *dname) noex {
 	int		rs ;
@@ -702,8 +676,7 @@ local int confvars_conflocal(CV *sip,char *dname) noex {
 	rs = mktmpuserdir(dname,"-",cdname,dm) ;
 
 	return rs ;
-}
-/* end subroutine (confvars_conflocal) */
+} /* end subroutine (confvars_conflocal) */
 
 local int confvars_dbopen(CV *sip,cchar *dbname) noex {
 	pcsconfs	*op = sip->op ;
@@ -744,25 +717,20 @@ local int confvars_dbopen(CV *sip,cchar *dbname) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (confvars_dbopen) */
+} /* end subroutine (confvars_dbopen) */
 
 local int confvars_dbclose(CV *sip) noex {
 	pcsconfs	*op = sip->op ;
-	var		*vdp ;
+	var		*vdp = &op->db ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	vdp = &op->db ;
 	if (op->fl.db) {
 	    op->fl.db = false ;
 	    rs1 = var_close(vdp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
-}
-/* end subroutine (confvars_dbclose) */
+} /* end subroutine (confvars_dbclose) */
 
 local int confvars_dbmake(CV *sip,cchar *dbname) noex {
 	varmk		*vmp = &sip->v ;
@@ -781,16 +749,13 @@ local int confvars_dbmake(CV *sip,cchar *dbname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (varmk) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (confvars_dbmake) */
+} /* end subroutine (confvars_dbmake) */
 
 local int confvars_proc(CV *sip) noex {
-	ustat		sb ;
 	int		rs ;
 	int		rs1 ;
-
-	if ((rs = u_stat(sip->cfname,&sb)) >= 0) {
-	    paramfile		*pfp = &sip->pf ;
+	if (ustat sb ; (rs = u_stat(sip->cfname,&sb)) >= 0) {
+	    paramfile	*pfp = &sip->pf ;
 	    if ((rs = paramfile_open(pfp,sip->envv,sip->cfname)) >= 0) {
 	        paramfile_cur	cur ;
 	        paramfile_ent	pe ;
