@@ -24,18 +24,12 @@
 	This module creates a CYI database file.
 
 	Synopsis:
-	int cyimk_open(op,year,dname,cname,of,om)
-	CYIMK		*op ;
-	int		year ;
-	const char	dname[] ;
-	const char	cname[] ;
-	int		of ;
-	mode_t		om ;
+	int cyimk_open(CTUMK *op,int year,cc *dn,cc *cn,int of,mode_t om)
 
 	Arguments:
 	op		object pointer
-	dname		directory path
-	cname		name of calendar
+	dn		directory path
+	cn		name of calendar
 	of		open-flags
 	om		open (create) file permissions 
 	year		year
@@ -188,7 +182,8 @@ local int	vvecmp(cvoid *,cvoid *) ;
 
 const cyimk_obj		cyimk_modinfo = {
 	"cyimk",
-	szof(cyimk)
+	szof(cyimk),
+	0
 } ; /* end initialization */
 
 
@@ -217,19 +212,17 @@ int cyimk_open(CYIMK *op,int year,cc *dname,cc *cname,int of,mode_t om) noex {
 	op->om = (om|0600) ;
 	op->nfd = -1 ;
 	op->year = year ;
-
-	op->fl.ofcreat = MKBOOL(of & O_CREAT) ;
-	op->fl.ofexcl = MKBOOL(of & O_EXCL) ;
+	op->fl.ofcreat	= MKBOOL(of & O_CREAT) ;
+	op->fl.ofexcl	= MKBOOL(of & O_EXCL) ;
 	op->fl.none = (! op->fl.ofcreat) && (! op->fl.ofexcl) ;
-
-	if (rs >= 0) {
-	    if ((rs = cyimk_idbegin(op,dname,year)) >= 0) {
+	if (rs >= 0) ylikely {
+	    if ((rs = cyimk_idbegin(op,dname,year)) >= 0) ylikely {
 	        cchar	*cp ;
-	        if ((rs = uc_mallocstrw(cname,-1,&cp)) >= 0) {
+	        if ((rs = uc_mallocstrw(cname,-1,&cp)) >= 0) ylikely {
 	            op->cname = cp ;
-	            if ((rs = cyimk_filesbegin(op)) >= 0) {
+	            if ((rs = cyimk_filesbegin(op)) >= 0) ylikely {
 	                c = rs ;
-	                if ((rs = cyimk_listbegin(op,n)) >= 0) {
+	                if ((rs = cyimk_listbegin(op,n)) >= 0) ylikely {
 	                    op->magval = CYIMK_MAGIC ;
 	                }
 	                if (rs < 0)
@@ -242,11 +235,11 @@ int cyimk_open(CYIMK *op,int year,cc *dname,cc *cname,int of,mode_t om) noex {
 	                }
 	            }
 	        } /* end if (memory-allocation) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            cyimk_idend(op) ;
+		} /* end if (error) */
 	    } /* end if (cyim_idbegin) */
 	} /* end if (ok) */
-
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (cyimk_open) */
 
