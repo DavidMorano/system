@@ -22,12 +22,12 @@
 
 	Description:
 	This subroutine is used to get a unique serial number from
-	a specified file. These numbes are used for sequencing and
+	a specified file.  These numbes are used for sequencing and
 	other purposes in general code. An attempt is made to lock
 	the SERIAL file and if the lock fails, the subroutine returns
 	an error (negative number).  Locking may indeed fail due
 	to the very poorly written file locking code on the old
-	SunOS 4.xxx version of the UNIX system. Remote file locking
+	SunOS 4.xxx version of the UNIX system.  Remote file locking
 	over NFS on the old SunOS 4.xxx systems **never** worked
 	correctly!  Other errors, like "couldn't create the file"
 	are reported as such.
