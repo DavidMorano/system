@@ -5,7 +5,7 @@
 /* send a FD over to another host using UUCP */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -42,26 +42,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<sys/wait.h>
-#include	<netinet/in.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<bfile.h>
-#include	<sbuf.h>
-#include	<vecstr.h>
-#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<sys/wait.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vstrcmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"pcsdialuucp.h"
 
@@ -93,7 +93,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* external subroutines */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 #endif
 
@@ -157,7 +157,7 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 	char		pfname[MAXPATHLEN + 2] ;
 	char		dst[DSTLEN + 2] ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uucp: ent\n") ;
 #endif
 
@@ -196,7 +196,7 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 	        goto bad0 ;
 	    }
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uucp: got in\n") ;
 #endif
 
@@ -206,7 +206,7 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 	if (rs < 0)
 	    goto bad0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uucp: continuing\n") ;
 #endif
 
@@ -218,7 +218,7 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 	    goto bad0 ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uucp: about to make pipe file\n") ;
 #endif
 
@@ -230,13 +230,13 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 	    goto bad0 ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uucp: got pipe\n") ;
 #endif
 
 /* we spawn the program */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uucp: about to fork\n") ;
 #endif
 
@@ -245,7 +245,7 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 	    int		fd ;
 	    char	*arg0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("uucp: inside fork\n") ;
 #endif
 
@@ -301,13 +301,13 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 	    pid = rs ;
 	} /* end if (fork) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uucp: main line continue\n") ;
 #endif
 
 /* open the pipe file */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uucp: about to open the pipe\n") ;
 #endif
 
@@ -330,7 +330,7 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 
 ret0:
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uucp: ret rs=%d fd=%d\n",
 	    rs,pfd) ;
 #endif
@@ -371,14 +371,14 @@ local int testuucp(cchar *pr,cchar *uunode) noex {
 	char	*cp ;
 
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testuucp: ent\n") ;
 #endif
 
 	if ((uunode == nullptr) || (uunode[0] == '\0'))
 	    return SR_HOSTUNREACH ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testuucp: got in\n") ;
 #endif
 
@@ -389,14 +389,14 @@ local int testuucp(cchar *pr,cchar *uunode) noex {
 	fpa[1] = pfp ;		/* capture the standard output! */
 	fpa[2] = &file2 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testuucp: about to open command - FPA[1]=%08X\n",fpa[1]) ;
 	debugprintf("testuucp: FPA[0]=%08X\n",fpa[0]) ;
 #endif
 
 	if ((rs = bopencmd(fpa,progfname)) >= 0) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("testuucp: opened command OK\n") ;
 #endif
 
@@ -412,7 +412,7 @@ local int testuucp(cchar *pr,cchar *uunode) noex {
 	    rs = SR_HOSTUNREACH ;
 	    while ((len = breadln(pfp,buf,NODENAMELEN)) > 0) {
 
-#if	CF_DEBUGS && 0
+#if	CF_DEBUG && 0
 	        debugprintf("testuucp: got a line\n") ;
 #endif
 
@@ -423,7 +423,7 @@ local int testuucp(cchar *pr,cchar *uunode) noex {
 
 	        if ((i == sl) && (strncasecmp(cp,uunode,i) == 0)) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            debugprintf("testuucp: got a machine match\n") ;
 #endif
 
@@ -443,7 +443,7 @@ local int testuucp(cchar *pr,cchar *uunode) noex {
 
 ret0:
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testuucp: ret rs=%d\n",rs) ;
 #endif
 
