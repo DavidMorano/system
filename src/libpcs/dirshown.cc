@@ -32,21 +32,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<intsat.h>
-#include	<vechand.h>
-#include	<mkdirlist.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<mkdirlist.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dirshown.h"
 
@@ -54,7 +54,7 @@
 /* local defines */
 
 #define	DS		dirshown
-#define	DS_ENT		mkdirlist_ent
+#define	DS_ENT		dirshown_ent
 
 
 /* local typedefs */
@@ -92,8 +92,7 @@ int dirshown_start(DS *op) noex {
 	   rs = op->start(vn,vo) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dirshown_start) */
+} /* end subroutine (dirshown_start) */
 
 int dirshown_finish(DS *op) noex {
     	int		rs = SR_FAULT ;
@@ -101,8 +100,7 @@ int dirshown_finish(DS *op) noex {
 	    rs = op->finish ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dirshown_finish) */
+} /* end subroutine (dirshown_finish) */
 
 /* add a directory to the list of those which have been shown already */
 int dirshown_set(DS *op,DS_ENT *dsp) noex {
@@ -111,8 +109,7 @@ int dirshown_set(DS *op,DS_ENT *dsp) noex {
 	    rs = op->add(dsp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dirshown_set) */
+} /* end subroutine (dirshown_set) */
 
 int dirshown_already(DS *op,DS_ENT *dsp,DS_ENT **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -132,8 +129,7 @@ int dirshown_already(DS *op,DS_ENT *dsp,DS_ENT **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dirshown_already) */
+} /* end subroutine (dirshown_already) */
 
 
 /* local subroutines */
@@ -146,7 +142,6 @@ local int cmpdir(DS_ENT *dsp1,DS_ENT *dsp2) noex {
 	    rc = (dsp1->ino > dsp2->ino) ? +1 : -1 ;
 	}
 	return rc ;
-}
-/* end subroutine (cmpdir) */
+} /* end subroutine (cmpdir) */
 
 
