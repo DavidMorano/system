@@ -230,7 +230,7 @@ enum subs {
 	sub_overlast
 } ; /* end enum */
 
-constexpr cpcchar	subs[] = {
+constexpr cpcchar	subnames[] = {
 	"start",
 	"curbegin",
 	"curenum",
@@ -261,7 +261,7 @@ enum cooks {
 	cook_overlast
 } ; /* end enum */
 
-constexpr cpcchar	cooks[] = {
+constexpr cpcchar	cooknames[] = {
 	"sysname",
 	"nodename",
 	"release",
@@ -651,15 +651,15 @@ local int pcsconf_modloadopen(PC *op,cchar *pr,cchar *objname) noex {
 	int		rs1 ;
 	if (char *sbuf ; (rs = lm_sn(&sbuf)) >= 0) {
 	    cint	slen = rs ;
-	    cint	vn = nelem(subs) ;
+	    cint	vn = nelem(subnames) ;
 	    cint	vo = vecstrm.compact ;
 	    if (vecstr syms ; (rs = vecstr_start(&syms,vn,vo)) >= 0) {
 	        modload	*lp = op->mlp ;
 	        int		f_modload = false ;
 	        cchar		*modbname ;
-	        for (int i = 0 ; (i < vn) && subs[i] ; i += 1) {
+	        for (int i = 0 ; (i < vn) && subnames[i] ; i += 1) {
 	            if (isrequired(i)) {
-	                rs = sncpy3(sbuf,slen,objname,"_",subs[i]) ;
+	                rs = sncpy3(sbuf,slen,objname,"_",subnames[i]) ;
 	                if (rs >= 0)
 	                    rs = vecstr_add(&syms,sbuf,rs) ;
 	            }
@@ -697,9 +697,9 @@ local int pcsconf_loadcalls(PC *op,cchar *objname) noex {
 	char		symname[SYMNAMELEN + 1] ;
 	cvoid		*snp ;
 
-	for (int i = 0 ; subs[i] != nullptr ; i += 1) {
+	for (int i = 0 ; subnames[i] ; i += 1) {
 
-	    rs = sncpy3(symname,SYMNAMELEN,objname,"_",subs[i]) ;
+	    rs = sncpy3(symname,SYMNAMELEN,objname,"_",subnames[i]) ;
 	    if (rs < 0) break ;
 
 	    rs1 = modload_getsym(lp,symname,&snp) ;
@@ -893,7 +893,7 @@ local int cookmgr_load(CM *cmp,cchar *kp,int kl) noex {
 	    if (nulstr ns ; (rs = ns.start(kp,kl,&kname)) >= 0) {
 		if (char *ubuf ; (rs = lm_un(&ubuf)) >= 0) {
 		    cint	ulen = rs ;
-	            cint	ci = matstr(cooks,kp,kl) ;
+	            cint	ci = matstr(cooknames,kp,kl) ;
 	            int	vl = -1 ;
 	            cchar	*vp = nullptr ;
 	            char	*tbuf = nullptr ;
