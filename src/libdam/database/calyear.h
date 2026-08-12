@@ -2,6 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* CALYEAR object loader */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
@@ -10,65 +13,60 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<modload.h>
-#include	<calyears.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBDAM */
+#include	<calyears.h>		/* LIBDAM */
 
 
 #define	CALYEAR		struct calyear_head
-#define	CALYEAR_Q	struct calyear_q
-#define	CALYEAR_QUERY	struct calyear_q
-#define	CALYEAR_CITE	struct calyear_q
-#define	CALYEAR_CUR	struct calyear_c
-#define	CALYEAR_CALLS	struct calyear_calls
+#define	CALYEAR_FL	struct calyear_flags
+#define	CALYÆAR_Q	struct calyear_query
+#define	CALYEAR_QUERY	struct calyear_query
+#define	CALYEAR_CITE	struct calyear_query
+#define	CALYEAR_CUR	struct calyear_cursor
 #define	CALYEAR_MAGIC	0x99447246
 
 
-struct calyear_q {
+struct calyear_flags {
+    	uint		modload:1 ;
+} ; /* end struct */
+
+struct calyear_query {
 	ushort		y ;
 	uchar		m, d ;
 } ; /* end struct */
 
-struct calyear_c {
+struct calyear_cursor {
 	void		*scp ;
 	uint		magval ;
 } ; /* end struct */
 
-struct calyear_calls {
-	int	(*open)(void *,cchar *,cchar **,cchar **) ;
-	int	(*count)(void *) ;
-	int	(*curbegin)(void *,CALYEARS_CUR *) ;
-	int	(*lookcite)(void *,CALYEARS_CUR *,CALYEARS_Q *) ;
-	int	(*read)(void *,CALYEARS_CUR *,CALYEARS_Q *,char *,int) ;
-	int	(*curend)(void *,CALYEARS_CUR *) ;
-	int	(*check)(void *,time_t) ;
-	int	(*audit)(void *) ;
-	int	(*close)(void *) ;
-} ; /* end struct */
-
 struct calyear_head {
-	modload		loader ;
+	modload		*mlp ;
+	void		*callp ;
 	void		*obj ;		/* object pointer */
-	CALYEAR_CALLS	call ;
 	uint		magval ;
 	int		objsz ;		/* object size */
 	int		cursz ;		/* cursor size */
 } ; /* end struct */
 
+typedef	CALYEAR		calyear ;
+typedef	CALYEAR_FL	calyear_fl ;
+typedef	CALYEAR_Q	calyear_q ;
+typedef	CALYEAR_CUR	calyear_cur ;
+
 EXTERNC_begin
 
-extern int calyear_open(CALYEAR *,cchar *,cchar **,cchar **) noex ;
-extern int calyear_count(CALYEAR *) noex ;
-extern int calyear_curbegin(CALYEAR *,CALYEAR_CUR *) noex ;
-extern int calyear_lookcite(CALYEAR *,CALYEAR_CUR *,CALYEAR_Q *) noex ;
-extern int calyear_read(CALYEAR *,CALYEAR_CUR *,CALYEAR_Q *,char *,int) noex ;
-extern int calyear_curend(CALYEAR *,CALYEAR_CUR *) noex ;
-extern int calyear_check(CALYEAR *,time_t) noex ;
-extern int calyear_audit(CALYEAR *) noex ;
-extern int calyear_close(CALYEAR *) noex ;
+extern int calyear_open(calyear *,cchar *,cchar **,cchar **) noex ;
+extern int calyear_count(calyear *) noex ;
+extern int calyear_curbegin(calyear *,calyear_cur *) noex ;
+extern int calyear_lookcite(calyear *,calyear_cur *,calyear_q *) noex ;
+extern int calyear_read(calyear *,calyear_cur *,calyear_q *,char *,int) noex ;
+extern int calyear_curend(calyear *,calyear_cur *) noex ;
+extern int calyear_check(calyear *,time_t) noex ;
+extern int calyear_audit(calyear *) noex ;
+extern int calyear_close(calyear *) noex ;
 
 EXTERNC_end
 
