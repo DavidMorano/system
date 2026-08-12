@@ -1,4 +1,5 @@
 /* pcsgetuserorg SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* get the organization name (string) for a specified user-name */
@@ -40,11 +41,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
-#include	<getusername.h>
-#include	<getuserorg.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<getusername.h>		/* LIBUC */
+#include	<getuserorg.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsgetorg.h"
 #include	"pcsgetuserorg.h"
@@ -86,7 +90,6 @@ int pcsgetuserorg(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pcsgetuserorg) */
+} /* end subroutine (pcsgetuserorg) */
 
 
