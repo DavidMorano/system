@@ -1,4 +1,5 @@
 /* pcsngdname SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* create a directory name when given a newsgroup name */
@@ -43,20 +44,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<bwops.h>
-#include	<strn.h>
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<pow.h>
-#include	<mkchar.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bwops.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<pow.h>			/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsngdname.h"
 
@@ -87,7 +90,7 @@
 local int	mknewsdname(cchar *,char *,cchar *) noex ;
 local int	mkdname(char *,int,cchar *,int) noex ;
 local int	ndots(cchar *) noex ;
-static bool	isNotOurs(int) noex ;
+local bool	isNotOurs(int) noex ;
 
 
 /* local variables */
@@ -132,8 +135,7 @@ int pcsngdname(cchar *pcs,char *rbuf,cchar *newsdname,cchar *ngname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pcsngdname) */
+} /* end subroutine (pcsngdname) */
 
 
 /* local subroutines */
@@ -146,8 +148,7 @@ local int mknewsdname(cchar *pr,char *rbuf,cchar *newsdname) noex {
 	    rs = mkpath1(rbuf,newsdname) ;
 	}
 	return rs ;
-}
-/* end subroutine (mknewsdname) */
+} /* end subroutine (mknewsdname) */
 
 local int mkdname(char *rbuf,int rlen,cchar *ngname,int mask) noex {
 	int		rs ;
@@ -170,8 +171,7 @@ local int mkdname(char *rbuf,int rlen,cchar *ngname,int mask) noex {
 	    } /* end if */
 	} /* end if (pathadd) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkdname) */
+} /* end subroutine (mkdname) */
 
 local int ndots(cchar *ngname) noex {
 	int		n = 0 ;
@@ -179,16 +179,14 @@ local int ndots(cchar *ngname) noex {
 	    if (ngname[i] == '.') n += 1 ;
 	}
 	return n ;
-}
-/* end subroutine (ndots) */
+} /* end subroutine (ndots) */
 
-static bool isNotOurs(int rs) noex {
+local bool isNotOurs(int rs) noex {
 	bool		f = true ;
 	if (isNotPresent(rs) || (rs == SR_NOTDIR)) {
 	    f = false ;
 	}
 	return f ;
-}
-/* end subroutine (isNotOurs) */
+} /* end subroutine (isNotOurs) */
 
 
