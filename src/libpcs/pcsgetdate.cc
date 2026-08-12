@@ -44,15 +44,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<tmtime.hh>
-#include	<tmz.hh>
-#include	<localmisc.h>
+#include	<ctime>			/* CSYD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<tmz.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsgetdate.h"
 
@@ -121,8 +121,7 @@ int pcsgetdate(cchar *pr,tmtime *tmp,cc *sp,int µsl,pcsdatetypes dt) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (pcsgetdate) */
+} /* end subroutine (pcsgetdate) */
 
 
 /* local subroutines */
