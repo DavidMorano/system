@@ -29,17 +29,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<estrings.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsns.h"
 
@@ -86,7 +87,7 @@ enum subs {
 	sub_overlast
 } ; /* end enum */
 
-constexpr cpcchar	subs[] = {
+constexpr cpcchar	subnames[] = {
 	"open",
 	"setopts",
 	"get",
@@ -272,9 +273,9 @@ local int pcsns_objloadbegin(pcsns *op,cchar *pr,cchar *objname) noex {
 	    int		f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != nullptr) ; i += 1) {
+	    for (i = 0 ; (i < n) && (subnames[i] ; i += 1) {
 	        if (isrequired(i)) {
-	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
+	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subnames[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;
 		    }
 		}
@@ -348,9 +349,9 @@ local int pcsns_loadcalls(pcsns *op,cchar *objname) noex {
 	char		nbuf[SYMNAMELEN + 1] ;
 	cvoid	*snp ;
 
-	for (i = 0 ; subs[i] != nullptr ; i += 1) {
+	for (i = 0 ; subnames[i] != nullptr ; i += 1) {
 
-	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
+	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subnames[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
 		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
