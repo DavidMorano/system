@@ -33,12 +33,12 @@
 	from a composite c-string of fields.
 
 	Synopsis:
-	int operator (cchar *rpp) noex
-	int next(cchar *rpp) noex
-	int nextchr(cchar *rpp) noex
-	int nextbrk(cchar *rpp) noex
-	int chr(cchar *rpp) noex
-	int brk(cchar *rpp) noex
+	int operator() 	(cchar *rpp) noex
+	int next	(cchar *rpp) noex
+	int nextchr	(cchar *rpp) noex
+	int nextbrk	(cchar *rpp) noex
+	int chr		(cchar *rpp) noex
+	int brk		(cchar *rpp) noex
 
 	Arguments:
 	rpp		result pointer pointer
