@@ -1,10 +1,11 @@
-/* pcsgetprogpath */
+/* pcsgetprogpath SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* get the path to a program that is used within the PCS system */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -49,49 +50,29 @@
 
 	programpath	returned file path if it was not in the PWD
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<vecstr.h>
-#include	<ids.h>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<vardefs.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
 
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
-
 
 /* external subroutines */
-
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	prgetprogpath(const char *,char *,const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	strnnlen(const char *,int,int) ;
-#endif
-
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -108,11 +89,8 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* exported subroutines */
 
-
-int pcsgetprogpath(cchar *pr,char *rbuf,cchar *np)
-{
-	return prgetprogpath(pr,rbuf,np,-1) ;
-}
-/* end subroutine (pcsgetprogpath) */
+int pcsgetprogpath(cchar *pr,char *rbuf,cchar *nap) noex {
+	return prgetprogpath(pr,rbuf,nap,-1) ;
+} /* end subroutine (pcsgetprogpath) */
 
 
