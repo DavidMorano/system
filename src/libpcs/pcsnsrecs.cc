@@ -1,4 +1,5 @@
 /* pcsnsrecs SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* PCS Name-Server Records */
@@ -16,22 +17,27 @@
 
 /*******************************************************************************
 
+  	Name:
+	pcsnsrecs
+
+	Description:
 	This object provides storage for PCS Name-Server records.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<cstdlib>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
-#include	<usystem.h>
-#include	<recarr.h>
-#include	<snwcpy.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<recarr.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsnsrecs.h"
 
@@ -42,13 +48,13 @@ import libutil ;			/* |memclear(3u)| */
 /* local defines */
 
 #ifndef	PCSNSRECS_REC
-#define	PCSNSRECS_REC	struct pcsnsrecs_r
+#define	PCSNSRECS_REC	pcsnsrecs_r
 #endif
 
 #define	RECS		PCSNSRECS
 #define	REC		PCSNSRECS_REC
 
-#define	RECINFO		struct recinfo
+#define	RECINFO		recinfo
 
 
 /* external subroutines */
@@ -65,14 +71,14 @@ struct recinfo {
 	int		vlen ;
 	int		w ;
 	int		ttl ;		/* time-to-live */
-} ;
+} ; /* end struct */
 
 enum cts {
 	ct_null,
 	ct_miss,
 	ct_hit,
 	ct_overlast
-} ;
+} ; /* end struct */
 
 struct pcsnsrecs_r {
 	pq_ent		linkage ;
@@ -86,7 +92,7 @@ struct pcsnsrecs_r {
 	int		w ;		/* "which" number */
 	int		ttl ;
 	char		un[USERNAMELEN+1] ; /* key */
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -158,8 +164,7 @@ int pcsnsrecs_start(RECS *op,int nmax,int ttl) noex {
 	} /* end block */
 
 	return rs ;
-}
-/* end subroutine (pcsnsrecs_start) */
+} /* end subroutine (pcsnsrecs_start) */
 
 int pcsnsrecs_finish(RECS *op) noex {
 	int		rs = SR_OK ;
@@ -192,8 +197,7 @@ int pcsnsrecs_finish(RECS *op) noex {
 
 	op->magic = 0 ;
 	return rs ;
-}
-/* end subroutine (pcsnsrecs_finish) */
+} /* end subroutine (pcsnsrecs_finish) */
 
 int pcsnsrecs_store(RECS *op,cchar *vbuf,int vlen,cchar *un,
 		int w,int ttl) noex {
@@ -218,8 +222,7 @@ int pcsnsrecs_store(RECS *op,cchar *vbuf,int vlen,cchar *un,
 	rs = pcsnsrecs_mkrec(op,dt,&ri) ;
 
 	return rs ;
-}
-/* end subroutine (pcsnsrecs_store) */
+} /* end subroutine (pcsnsrecs_store) */
 
 int pcsnsrecs_lookup(RECS *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	PCSNSRECS_REC	*ep = NULL ;
@@ -266,8 +269,7 @@ int pcsnsrecs_lookup(RECS *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	if (rs <= 0) rbuf[0] = '\0' ;
 
 	return rs ;
-}
-/* end subroutine (pcsnsrecs_lookup) */
+} /* end subroutine (pcsnsrecs_lookup) */
 
 int pcsnsrecs_invalidate(RECS *op,cchar *un,int w) noex {
 	PCSNSRECS_REC	*ep ;
@@ -305,8 +307,7 @@ int pcsnsrecs_invalidate(RECS *op,cchar *un,int w) noex {
 	}
 
 	return (rs >= 0) ? f_found : rs ;
-}
-/* end subroutine (pcsnsrecs_invalidate) */
+} /* end subroutine (pcsnsrecs_invalidate) */
 
 int pcsnsrecs_check(RECS *op,time_t dt) noex {
 	PCSNSRECS_REC	*ep ;
@@ -318,9 +319,7 @@ int pcsnsrecs_check(RECS *op,time_t dt) noex {
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
-
-/* loop checking all cache entries */
-
+	/* loop checking all cache entries */
 	for (i = 0 ; recarr_get(rlp,i,&ep) >= 0 ; i += 1) {
 	    if (ep != NULL) {
 	        if (dt == 0) dt = time(NULL) ;
@@ -337,8 +336,7 @@ int pcsnsrecs_check(RECS *op,time_t dt) noex {
 	} /* end for */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (pcsnsrecs_check) */
+} /* end subroutine (pcsnsrecs_check) */
 
 int pcsnsrecs_stats(RECS *op,PCSNSRECS_ST *sp) noex {
 	int		rs ;
@@ -354,8 +352,7 @@ int pcsnsrecs_stats(RECS *op,PCSNSRECS_ST *sp) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (pcsnsrecs_stats) */
+} /* end subroutine (pcsnsrecs_stats) */
 
 
 /* private subroutines */
@@ -376,8 +373,7 @@ local int pcsnsrecs_fetch(RECS *op,PCSNSRECS_REC **epp,cchar *un,int w) noex {
 	    *epp = (rs >= 0) ? ep : NULL ;
 	}
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (pcsnsrecs_fetch) */
+} /* end subroutine (pcsnsrecs_fetch) */
 
 local int pcsnsrecs_mkrec(RECS *op,time_t dt,RECINFO *rip) noex {
 	int		rs ;
@@ -408,8 +404,7 @@ local int pcsnsrecs_mkrec(RECS *op,time_t dt,RECINFO *rip) noex {
 	    } /* end if */
 	} /* end if (recarr_count) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (pcsnsrecs_mkrec) */
+} /* end subroutine (pcsnsrecs_mkrec) */
 
 local int pcsnsrecs_newrec(RECS *op,time_t dt,
 		PCSNSRECS_REC **epp,RECINFO *rip) noex {
@@ -425,9 +420,7 @@ local int pcsnsrecs_newrec(RECS *op,time_t dt,
 
 	*epp = (rs >= 0) ? ep : NULL ;
 	return rs ;
-}
-/* end subroutine (pcsnsrecs_newrec) */
-
+} /* end subroutine (pcsnsrecs_newrec) */
 
 local int pcsnsrecs_recstart(RECS *op,time_t dt,PCSNSRECS_REC *ep,
 		RECINFO *rip) noex {
@@ -442,8 +435,7 @@ local int pcsnsrecs_recstart(RECS *op,time_t dt,PCSNSRECS_REC *ep,
 	        record_finish(ep) ;
 	} /* end if (entry-start) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (pcsnsrecs_recstart) */
+} /* end subroutine (pcsnsrecs_recstart) */
 
 local int pcsnsrecs_recaccess(RECS *op,time_t dt,PCSNSRECS_REC *ep) noex {
 	int		rs ;
@@ -451,8 +443,7 @@ local int pcsnsrecs_recaccess(RECS *op,time_t dt,PCSNSRECS_REC *ep) noex {
 	    rs = record_access(ep,dt) ;
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (pcsnsrecs_recaccess) */
+} /* end subroutine (pcsnsrecs_recaccess) */
 
 local int pcsnsrecs_recrear(RECS *op,PCSNSRECS_REC *ep) noex {
 	pq_ent		*pcp = (pq_ent *) ep ;
@@ -474,8 +465,7 @@ local int pcsnsrecs_recrear(RECS *op,PCSNSRECS_REC *ep) noex {
 	} /* end if (pq-gettail) */
 
 	return rs ;
-}
-/* end subroutine (pcsnsrecs_recrear) */
+} /* end subroutine (pcsnsrecs_recrear) */
 
 local int pcsnsrecs_recdel(RECS *op,PCSNSRECS_REC *ep) noex {
 	int		rs = SR_OK ;
@@ -490,8 +480,7 @@ local int pcsnsrecs_recdel(RECS *op,PCSNSRECS_REC *ep) noex {
 	if (rs >= 0) rs = rs1 ;
 
 	return rs ;
-}
-/* end subroutine (pcsnsrecs_recdel) */
+} /* end subroutine (pcsnsrecs_recdel) */
 
 local int pcsnsrecs_recfins(RECS *op) noex {
 	RECARR		*rlp = op->recs ;
@@ -510,8 +499,7 @@ local int pcsnsrecs_recfins(RECS *op) noex {
 	} /* end for */
 
 	return rs ;
-}
-/* end subroutine (pcsnsrecs_recfins) */
+} /* end subroutine (pcsnsrecs_recfins) */
 
 local int pcsnsrecs_upstats(RECS *op,int ct,int rs) noex {
 	int		f_got = (rs > 0) ;
@@ -526,8 +514,7 @@ local int pcsnsrecs_upstats(RECS *op,int ct,int rs) noex {
 	    break ;
 	} /* end switch */
 	return SR_OK ;
-}
-/* end subroutine (pcsnsrecs_upstats) */
+} /* end subroutine (pcsnsrecs_upstats) */
 
 local int record_start(PCSNSRECS_REC *ep,time_t dt,int wc,RECINFO *rip) noex {
 	int		rs ;
@@ -561,8 +548,7 @@ local int record_start(PCSNSRECS_REC *ep,time_t dt,int wc,RECINFO *rip) noex {
 	}
 
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (record_start) */
+} /* end subroutine (record_start) */
 
 local int record_finish(PCSNSRECS_REC *ep) noex {
 	int		rs = SR_OK ;
@@ -579,8 +565,7 @@ local int record_finish(PCSNSRECS_REC *ep) noex {
 
 	ep->un[0] = '\0' ;
 	return rs ;
-}
-/* end subroutine (record_finish) */
+} /* end subroutine (record_finish) */
 
 local int record_access(PCSNSRECS_REC *ep,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -591,8 +576,7 @@ local int record_access(PCSNSRECS_REC *ep,time_t dt) noex {
 	ep->ti_access = dt ;
 	vl = ep->vl ;
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (record_access) */
+} /* end subroutine (record_access) */
 
 local int record_old(PCSNSRECS_REC *ep,time_t dt,int ttl) noex {
 	int		f_old = false ;
@@ -600,14 +584,12 @@ local int record_old(PCSNSRECS_REC *ep,time_t dt,int ttl) noex {
 	if ((ep->ttl > 0) && (ep->ttl < ttl)) ttl = ep->ttl ;
 	f_old = ((dt - ep->ti_create) >= ttl) ;
 	return f_old ;
-}
-/* end subroutine (record_old) */
+} /* end subroutine (record_old) */
 
 local int record_get(PCSNSRECS_REC *ep,char *rbuf,int rlen) noex {
 	int		rs ;
 	rs = snwcpy(rbuf,rlen,ep->vbuf,ep->vl) ;
 	return rs ;
-}
-/* end subroutine (record_get) */
+} /* end subroutine (record_get) */
 
 
