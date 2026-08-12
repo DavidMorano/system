@@ -31,18 +31,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usysutility.hh>	/* |snvprintf(3u)| */
-#include	<uclibmem.h>
-#include	<fmtstr.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysutility.hh>	/* LIBUC |snvprintf(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"errfile.h"
 
@@ -107,8 +107,7 @@ int erropen(cchar *errfname,cchar *logid) noex {
 	    } /* end if (u_open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? efd : rs ;
-}
-/* end subroutine (erropen) */
+} /* end subroutine (erropen) */
 
 int errclose() noex {
     	int		rs = SR_NOTOPEN ;
@@ -117,8 +116,7 @@ int errclose() noex {
 	    efd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (errclose) */
+} /* end subroutine (errclose) */
 
 int errprintf(cchar *fmt,...) noex {
 	va_list		ap ;
@@ -144,7 +142,6 @@ int errprintf(cchar *fmt,...) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (errprintf) */
+} /* end subroutine (errprintf) */
 
 
