@@ -108,16 +108,16 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T):			$(T).ee
 	cp -p $(T).ee $(T)
 
-$(T).x:			$(OBJ) Makefile
+$(T).x:			$(OBJ)
 #	makedate -m $(T) > makedate.c
 	$(CC) -c $(CFLAGS) makedate.c
-	$(LD) -o $@ $(LDFLAGS) $(OBJS) $(LIBINFO) > $(T).lm
+	$(LD) -o $@ $(LDFLAGS) $^ $(LIBINFO) > $(T).lm
 
 $(T).prof:		$(OBJ) Makefile
 	makedate -m $(T) > makedate.c
