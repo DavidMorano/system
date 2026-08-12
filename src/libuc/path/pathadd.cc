@@ -59,6 +59,7 @@
 
 	Extra:
 	The |pathaddw| subroutine is almost equivalent to:
+	{{
 	    int pathaddw(char *rbuf,int rl,cc *sp,int sl) noex {
 	        int	rs ;
 	        if ((rs = bufsizeget(bufsize_mp)) >= 0) {
@@ -71,11 +72,12 @@
 	        }
 	        return (rs >= 0) ? rl : rs ;
 	    }
+	}}
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -140,7 +142,7 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 	int		rs = SR_FAULT ;
 	if (pbuf) {
 	    rs = SR_INVALID ;
-	    if ((plen >= 0) && (pl >= 0)) {
+	    if ((plen >= 0) && (pl >= 0)) ylikely {
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
 		    cchar	*sp = (char *) va_arg(ap,char *) ;
@@ -155,10 +157,10 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 
 int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (pbuf && sp) {
+	if (pbuf && sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (pl >= 0) {
-	        if ((rs = maxpathlen) >= 0) {
+	    if (pl >= 0) ylikely {
+	        if ((rs = maxpathlen) >= 0) ylikely {
 		    cint	plen = rs ;
 		    rs = local_pathadd(pbuf,plen,pl,sp,sl) ;
 		    pl = rs ;
@@ -171,10 +173,10 @@ int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 int pathaddx(char *pbuf,int pl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
-	if (pbuf) {
+	if (pbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (pl >= 0) {
-	        if ((rs = maxpathlen) >= 0) {
+	    if (pl >= 0) ylikely {
+	        if ((rs = maxpathlen) >= 0) ylikely {
 		    cint	plen = rs ;
 	            va_begin(ap,n) ;
 	            for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
@@ -198,7 +200,7 @@ local int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	    rs = storebuf_chr(pbuf,plen,pl,'/') ;
 	    pl += rs ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = storebuf_strw(pbuf,plen,pl,sp,sl) ;
 	    pl += rs ;
 	}
