@@ -53,25 +53,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucentpw.h>
-#include	<ucentgr.h>
-#include	<getusername.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<vecstr.h>
-#include	<matstr.h>
-#include	<permx.h>
-#include	<isnot.h>		/* |isNotPresent(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucentpw.h>		/* LIBUC */
+#include	<ucentgr.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC |isNotPresent(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcstrustuser.h"
 
