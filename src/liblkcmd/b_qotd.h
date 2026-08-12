@@ -1,4 +1,5 @@
 /* b_qotd HEADER */
+/* charset=ISO8859-1 */
 /* lang=C20 */
 
 /* this is a SHELL built-in version of |qotd(1ksh)| */
@@ -13,6 +14,10 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	QOTDCONFIG_INCLUDE
+#define	QOTDCONFIG_INCLUDE
+
 
 #define	VERSION		"1"
 #define	WHATINFO	"@(#)qotd "
@@ -87,5 +92,8 @@
 #define	TO_RECVMSG	(5*60)
 
 #define	OPT_LOGPROG	TRUE
+
+
+#endif /* QOTDCONFIG_INCLUDE */
 
 
