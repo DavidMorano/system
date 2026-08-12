@@ -43,7 +43,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<uclibmem.h>		/* LIBUC */
+#include	<ucmem.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<modload.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -58,16 +58,43 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	CALYEAR_DEFENTS		(44 * 1000)
-#define	CALYEAR_MODBNAME	"calyears"
-#define	CALYEAR_OBJNAME 	"calyears"
+#define	CY		calyear
+#define	CY_Q		calyear_q
+#define	CY_FL		calyear_fl
+#define	CY_CUR		calyear_cur
+#define	CY_MAG		CALYEAR_MAGIC
+#define	CY_DEFENTS	(44 * 1000)
+#define	CY_MODBNAME	"calyears"
+#define	CY_OBJNAME 	"calyears"
+
+#define	CYS_Q		calyears_cite
+#define	CYS_CUR		calyears_cur
 
 #ifndef	SYMNAMELEN
-#define	SYMNAMELEN		60
+#define	SYMNAMELEN	60
 #endif
 
-#define	CLS_Q			CALYEARS_CITE
-#define	CLS_C			CALYEARS_CUR
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+extern "C" {
+    typedef int	(*soopen_f)	(void *,cchar *,cchar **,cchar **) noex ;
+    typedef int	(*socount)	(void *) noex ;
+    typedef int	(*socurbegin_f)	(void *,CYS_CUR *) noex ;
+    typedef int	(*solookcite_f)	(void *,CYS_CUR *,CYS_Q *) noex ;
+    typedef int	(*soread_f)	(void *,CYS_CUR *,CYS_Q *,char *,int) noex ;
+    typedef int	(*socurend_f)	(void *,CYS_CUR *) noex ;
+    typedef int	(*socheck_f)	(void *,time_t) noex ;
+    typedef int	(*soaudit_f)	(void *) noex ;
+    typedef int	(*soclose_f)	(void *) noex ;
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -81,9 +108,9 @@ import libutil ;			/* |memclear(3u)| */
 
 /* forward references */
 
-local int	calyear_objloadbegin(CALYEAR *,cchar *,cchar *) noex ;
-local int	calyear_objloadend(CALYEAR *) noex ;
-local int	calyear_loadcalls(CALYEAR *,cchar *) noex ;
+local int	calyear_objloadbegin(CY *,cchar *,cchar *) noex ;
+local int	calyear_objloadend(CY *) noex ;
+local int	calyear_loadcalls(CY *,cchar *) noex ;
 
 local bool	isrequired(int) noex ;
 
@@ -116,6 +143,8 @@ constexpr cpcchar	subnames[] = {
 	nullptr
 } ; /* end array */
 
+cbool			f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -124,7 +153,7 @@ constexpr cpcchar	subnames[] = {
 
 int calyear_open(calyear *op,cc *pr,cc *dirnames,cc *calnames) noex {
 	int		rs ;
-	cchar	*objname = CALYEAR_OBJNAME ;
+	cchar	*objname = CY_OBJNAME ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (pr == nullptr) return SR_FAULT ;
@@ -134,7 +163,7 @@ int calyear_open(calyear *op,cc *pr,cc *dirnames,cc *calnames) noex {
 	memclear(op) ;
 	if ((rs = calyear_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dirnames,calnames)) >= 0) {
-		op->magval = CALYEAR_MAGIC ;
+		op->magval = CT_MAG ;
 	    }
 	    if (rs < 0) {
 		calyear_objloadend(op) ;
@@ -148,13 +177,13 @@ int calyear_open(calyear *op,cc *pr,cc *dirnames,cc *calnames) noex {
 	return rs ;
 } /* end subroutine (calyear_open) */
 
-int calyear_close(CALYEAR *op) noex {
+int calyear_close(CY *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CT_MAG) return SR_NOTOPEN ;
 
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
@@ -166,12 +195,12 @@ int calyear_close(CALYEAR *op) noex {
 	return rs ;
 } /* end subroutine (calyear_close) */
 
-int calyear_count(CALYEAR *op) noex {
+int calyear_count(CY *op) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CT_MAG) return SR_NOTOPEN ;
 
 	if (op->call.count != nullptr) {
 	    rs = (*op->call.count)(op->obj) ;
@@ -180,12 +209,12 @@ int calyear_count(CALYEAR *op) noex {
 	return rs ;
 } /* end subroutine (calyear_count) */
 
-int calyear_audit(CALYEAR *op) noex {
+int calyear_audit(CY *op) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CT_MAG) return SR_NOTOPEN ;
 
 	if (op->call.audit != nullptr) {
 	    rs = (*op->call.audit)(op->obj) ;
@@ -194,12 +223,12 @@ int calyear_audit(CALYEAR *op) noex {
 	return rs ;
 } /* end subroutine (calyear_audit) */
 
-int calyear_check(CALYEAR *op,time_t dt) noex {
+int calyear_check(CY *op,time_t dt) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CT_MAG) return SR_NOTOPEN ;
 
 	if (op->call.check != nullptr) {
 	    rs = (*op->call.check)(op->obj,dt) ;
@@ -208,13 +237,13 @@ int calyear_check(CALYEAR *op,time_t dt) noex {
 	return rs ;
 } /* end subroutine (calyear_check) */
 
-int calyear_curbegin(CALYEAR *op,CALYEAR_CUR *curp) noex {
+int calyear_curbegin(CY *op,CY_CUR *curp) noex {
 	int		rs = SR_OK ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CT_MAG) return SR_NOTOPEN ;
 
 	if (op->call.curbegin != nullptr)  {
 	    void	*p ;
@@ -233,14 +262,14 @@ int calyear_curbegin(CALYEAR *op,CALYEAR_CUR *curp) noex {
 	return rs ;
 } /* end subroutine (calyear_curbegin) */
 
-int calyear_curend(CALYEAR *op,CALYEAR_CUR *curp) noex {
+int calyear_curend(CY *op,CY_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CT_MAG) return SR_NOTOPEN ;
 
 	if (curp->scp != nullptr)  {
 	    if (op->call.curend != nullptr) {
@@ -256,7 +285,7 @@ int calyear_curend(CALYEAR *op,CALYEAR_CUR *curp) noex {
 	return rs ;
 } /* end subroutine (calyear_curend) */
 
-int calyear_lookcite(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp) noex {
+int calyear_lookcite(CY *op,CY_CUR *curp,CALCITE *qp) noex {
 	CALYEARS_CUR	*ocurp ;
 	int		rs = SR_NOSYS ;
 
@@ -264,7 +293,7 @@ int calyear_lookcite(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp) noex {
 	if (curp == nullptr) return SR_FAULT ;
 	if (qp == nullptr) return SR_FAULT ;
 
-	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CT_MAG) return SR_NOTOPEN ;
 
 	if (curp->scp != nullptr) {
 	    if (op->call.lookcite != nullptr) {
@@ -286,7 +315,7 @@ int calyear_lookcite(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp) noex {
 	return rs ;
 } /* end subroutine (calyear_lookcite) */
 
-int calyear_read(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp,
+int calyear_read(CY *op,CY_CUR *curp,CALCITE *qp,
 		char *rbuf,int rlen) noex {
 	CALYEARS_CUR	*ocurp ;
 	int		rs = SR_NOSYS ;
@@ -295,7 +324,7 @@ int calyear_read(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp,
 	if (curp == nullptr) return SR_FAULT ;
 	if (qp == nullptr) return SR_FAULT ;
 
-	if (op->magval != CALYEAR_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != CT_MAG) return SR_NOTOPEN ;
 
 	if (curp->scp != nullptr) {
 	    if (op->call.read != nullptr) {
@@ -312,7 +341,7 @@ int calyear_read(CALYEAR *op,CALYEAR_CUR *curp,CALCITE *qp,
 
 /* private subroutines */
 
-local int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname) noex {
+local int calyear_objloadbegin(CY *op,cchar *pr,cchar *objname) noex {
 	modload		*lp = &op->loader ;
 	vecstr		syms ;
 	cint		n = nelem(subs) ;
@@ -343,7 +372,7 @@ local int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname) noex {
 	    if (rs >= 0) {
 		cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            cchar	*modbname = CALYEAR_MODBNAME ;
+	            cchar	*modbname = CY_MODBNAME ;
 		    int		mo = 0 ;
 		    mo |= moadloadm.libvar ;
 		    mo |= moadloadm.libsdirs ;
@@ -381,7 +410,7 @@ local int calyear_objloadbegin(CALYEAR *op,cchar *pr,cchar *objname) noex {
 	return rs ;
 } /* end subroutine (calyear_objloadbegin) */
 
-local int calyear_objloadend(CALYEAR *op) noex {
+local int calyear_objloadend(CY *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -397,7 +426,7 @@ local int calyear_objloadend(CALYEAR *op) noex {
 	return rs ;
 } /* end subroutine (calyear_objloadend) */
 
-local int calyear_loadcalls(CALYEAR *op,cchar *objname) noex {
+local int calyear_loadcalls(CY *op,cchar *objname) noex {
 	modload		*lp = &op->loader ;
 	cint		nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
@@ -435,18 +464,18 @@ local int calyear_loadcalls(CALYEAR *op,cchar *objname) noex {
 		    break ;
 		case sub_curbegin:
 		    op->call.curbegin = 
-			(int (*)(void *,CLS_C *)) snp ;
+			(int (*)(void *,CYS_C *)) snp ;
 		    break ;
 		case sub_lookcite:
-		    op->call.lookcite = (int (*)(void *,CLS_C *,CLS_Q *)) snp ;
+		    op->call.lookcite = (int (*)(void *,CYS_C *,CYS_Q *)) snp ;
 		    break ;
 		case sub_read:
 		    op->call.read = 
-			(int (*)(void *,CLS_C *,CLS_Q *,char *,int)) snp ;
+			(int (*)(void *,CYS_C *,CYS_Q *,char *,int)) snp ;
 		    break ;
 		case sub_curend:
 		    op->call.curend= 
-			(int (*)(void *,CLS_C *)) snp ;
+			(int (*)(void *,CYS_C *)) snp ;
 		    break ;
 		case sub_check:
 		    op->call.check = (int (*)(void *,time_t)) snp ;
