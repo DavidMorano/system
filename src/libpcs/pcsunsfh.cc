@@ -1,10 +1,11 @@
-/* pcsunsfh */
+/* pcsunsfh SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* management for PCSUNS shared-memory segment */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG 	0		/* run-time debugging */
-
 
 /* revision history:
 
@@ -17,10 +18,13 @@
 
 /*******************************************************************************
 
+  	Name:
+	pcsunsfh
+
+	Description:
 	This subroutine reads and writes the BABIES shared-memory segment.
 
 	Synopsis:
-
 	int pcsunsfh(ep,f,hbuf,hlen)
 	PCSUNSFH	*ep ;
 	int		f ;
@@ -28,33 +32,28 @@
 	int		hlen ;
 
 	Arguments:
-
 	- ep		object pointer
 	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<endian.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* LIBUC */
+#include	<sys/param.h>		/* LIBUC */
+#include	<unistd.h>		/* LIBUC */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsunsfh.h"
 
@@ -63,17 +62,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	mkmagic(char *,int,cchar *) ;
-extern int	cfhexi(const char *,int,uint *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -90,16 +78,14 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* exported subroutines */
 
-
-int pcsunsfh(PCSUNSFH *ep,int f,char *hbuf,int hlen)
-{
+int pcsunsfh(PCSUNSFH *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	const int	magicsize = PCSUNSFH_MAGICSIZE ;
+	cint	magicsize = PCSUNSFH_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		headsize ;
 	int		bl, cl ;
-	const char	*magicstr = PCSUNSFH_MAGICSTR ;
-	const char	*tp, *cp ;
+	cchar	*magicstr = PCSUNSFH_MAGICSTR ;
+	cchar	*tp, *cp ;
 	char		*bp ;
 
 	if (ep == NULL) return SR_FAULT ;
@@ -216,7 +202,6 @@ int pcsunsfh(PCSUNSFH *ep,int f,char *hbuf,int hlen)
 	} /* end if */
 
 	return (rs >= 0) ? (bp - hbuf) : rs ;
-}
-/* end subroutine (pcsunsfh) */
+} /* end subroutine (pcsunsfh) */
 
 
