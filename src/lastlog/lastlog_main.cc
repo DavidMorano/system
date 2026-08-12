@@ -193,8 +193,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    ex = mapex(mapexs,rs) ;
 	}
 	return ex ;
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
@@ -222,8 +221,7 @@ local void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	    main_sigdump(sip) ;
 	}
 	u_exit(EX_TERM) ;
-}
-/* end subroutine (main_sighand) */
+} /* end subroutine (main_sighand) */
 
 local int main_sigdump(siginfo_t *sip) noex {
 	cint	wlen = LINEBUFLEN ;
@@ -262,8 +260,7 @@ local int main_sigdump(siginfo_t *sip) noex {
 	wl = bufprintf(wbuf,wlen,fmt,sn,si_code,scs,as) ;
 	write(2,wbuf,wl) ;
 	return 0 ;
-}
-/* end subroutine (main_sigdump) */
+} /* end subroutine (main_sigdump) */
 
 local cchar *strsigcode(const SIGCODE *scp,int code) noex {
 	int		i ; /* used-afterwards */
@@ -275,7 +272,6 @@ local cchar *strsigcode(const SIGCODE *scp,int code) noex {
 	}
 	if (f) sn = scp[i].name ;
 	return sn ;
-}
-/* end subroutine (strsigcode) */
+} /* end subroutine (strsigcode) */
 
 
