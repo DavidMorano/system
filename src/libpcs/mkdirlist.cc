@@ -50,28 +50,29 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<bufsizeget.h>
-#include	<bfile.h>
-#include	<filer.h>
-#include	<fsdirtree.h>
-#include	<mktmp.h>		/* |mktmpfile(3uc)| */
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<strwcmp.h>
-#include	<isnot.h>		/* |isNotPresent(3uc)| */
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new.h>			/* C++STD placement-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<fsdirtree.h>		/* LIBUC */
+#include	<mktmp.h>		/* LIBUC |mktmpfile(3uc)| */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC |isNotPresent(3uc)| */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"mkdirlist.h"
 
@@ -94,8 +95,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -130,17 +129,18 @@ namespace {
 template<typename ... Args>
 local int mkdirlist_ctor(mkdirlist *op,Args ... args) noex {
 	MKDIRLIST	*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->dlp = new(nothrow) vechand) != nullptr) ylikely {
+	    if ((op->dlp = new(nt) vechand) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mkdirlist_ctor) */
+} /* end subroutine (mkdirlist_ctor) */
 
 local int mkdirlist_dtor(mkdirlist *op) noex {
 	int		rs = SR_FAULT ;
@@ -149,21 +149,19 @@ local int mkdirlist_dtor(mkdirlist *op) noex {
 	    if (op->dlp) ylikely {
 		delete op->dlp ;
 		op->dlp = nullptr ;
-	    }
+	    } /* end if (delete-vechand) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (clusterdb_dtor) */
+} /* end subroutine (clusterdb_dtor) */
 
 template<typename ... Args>
 local int mkdirlist_magic(mkdirlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MKDIRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MKDIRLIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mkdirlist_magic) */
+} /* end subroutine (mkdirlist_magic) */
 
 local int mkdirlist_pdc(mkdirlist *,cchar *,int) noex ; /* proc-dir-cache */
 local int mkdirlist_pdn(mkdirlist *,cchar *) noex ;	/* proc-dir-news */
@@ -218,7 +216,7 @@ int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex {
 	                    c = rs ;
 	                }
 	                if (rs >= 0) {
-			    op->magic = MKDIRLIST_MAGIC ;
+			    op->magval = MKDIRLIST_MAGIC ;
 		        }
 	                if (rs < 0) {
 	                    mkdirlist_finents(op) ;
@@ -232,8 +230,7 @@ int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex {
 	    }
 	} /* end if (mkdirlist_ctor) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkdirlist_start) */
+} /* end subroutine (mkdirlist_start) */
 
 int mkdirlist_finish(mkdirlist *op) noex {
 	int		rs ;
@@ -252,11 +249,10 @@ int mkdirlist_finish(mkdirlist *op) noex {
 		rs1 = mkdirlist_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mkdirlist_finish) */
+} /* end subroutine (mkdirlist_finish) */
 
 int mkdirlist_get(mkdirlist *op,int i,ENT **epp) noex {
 	int		rs ;
@@ -267,8 +263,7 @@ int mkdirlist_get(mkdirlist *op,int i,ENT **epp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mkdirlist_get) */
+} /* end subroutine (mkdirlist_get) */
 
 int mkdirlist_link(mkdirlist *op) noex {
 	int		rs ;
@@ -297,8 +292,7 @@ int mkdirlist_link(mkdirlist *op) noex {
 	    } /* end for (linking like entries) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mkdirlist_link) */
+} /* end subroutine (mkdirlist_link) */
 
 int mkdirlist_showdef(mkdirlist *op) noex {
 	int		rs ;
@@ -316,8 +310,7 @@ int mkdirlist_showdef(mkdirlist *op) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkdirlist_showdef) */
+} /* end subroutine (mkdirlist_showdef) */
 
 int mkdirlist_show(mkdirlist *op,cchar *ng,int order) noex {
 	int		rs ;
@@ -339,8 +332,7 @@ int mkdirlist_show(mkdirlist *op,cchar *ng,int order) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkdirlist_show) */
+} /* end subroutine (mkdirlist_show) */
 
 int mkdirlist_ung(mkdirlist *op,cc *ung,time_t utime,int f_sub,int order) noex {
 	int		rs ;
@@ -362,8 +354,7 @@ int mkdirlist_ung(mkdirlist *op,cc *ung,time_t utime,int f_sub,int order) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkdirlist_ung) */
+} /* end subroutine (mkdirlist_ung) */
 
 int mkdirlist_sort(mkdirlist *op) noex {
 	int		rs ;
@@ -372,8 +363,7 @@ int mkdirlist_sort(mkdirlist *op) noex {
 	    rs = vechand_sort(op->dlp,vcf) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mkdirlist_sort) */
+} /* end subroutine (mkdirlist_sort) */
 
 int mkdirlist_audit(mkdirlist *op) noex {
 	int		rs ;
@@ -382,8 +372,7 @@ int mkdirlist_audit(mkdirlist *op) noex {
 	    rs = vechand_audit(dlp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mkdirlist_audit) */
+} /* end subroutine (mkdirlist_audit) */
 
 
 /* private subroutines */
@@ -438,8 +427,7 @@ local int mkdirlist_pdc(mkdirlist *op,cchar *ndn,int fd) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkdirlist_pdc) */
+} /* end subroutine (mkdirlist_pdc) */
 
 local int mkdirlist_pdn(MKDIRLIST *op,cchar *ndn) noex {
 	cint		fdm = (fsdirtreem.follow | fsdirtreem.dir) ;
@@ -464,8 +452,7 @@ local int mkdirlist_pdn(MKDIRLIST *op,cchar *ndn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkdirlist_pdn) */
+} /* end subroutine (mkdirlist_pdn) */
 
 local int mkdirlist_newent(mkdirlist *op,ustat *sbp,cc *nbuf,int nlen) noex {
 	cint		esz = szof(mkdirlist_ent) ;
@@ -485,8 +472,7 @@ local int mkdirlist_newent(mkdirlist *op,ustat *sbp,cc *nbuf,int nlen) noex {
 	    }
 	} /* end if (memory-allocation) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkdirlist_newent) */
+} /* end subroutine (mkdirlist_newent) */
 
 local int mkdirlist_finents(mkdirlist *op) noex {
 	vechand		*dlp = op->dlp ;
@@ -510,8 +496,7 @@ local int mkdirlist_finents(mkdirlist *op) noex {
 	} /* end for */
 	if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
 	return rs ;
-}
-/* end subroutine (mkdirlist_finents) */
+} /* end subroutine (mkdirlist_finents) */
 
 local int entry_start(ENT *ep,ustat *sbp,cchar *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
@@ -530,8 +515,7 @@ local int entry_start(ENT *ep,ustat *sbp,cchar *dbuf,int dlen) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 local int entry_finish(ENT *ep) noex {
 	int		rs = SR_OK ;
@@ -543,8 +527,7 @@ local int entry_finish(ENT *ep) noex {
 	    ep->name = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 local int entry_matung(ENT *ep,cc *ung,time_t ut,int f_sub,int order) noex {
 	int		rs = SR_OK ;
@@ -558,8 +541,7 @@ local int entry_matung(ENT *ep,cc *ung,time_t ut,int f_sub,int order) noex {
 	    } /* end if (name match) */
 	} /* end if (not a linked entry) */
 	return rs ;
-}
-/* end subroutine (entry_matung) */
+} /* end subroutine (entry_matung) */
 
 local int entry_showdef(ENT *ep) noex {
 	int		rs = SR_OK ;
@@ -568,8 +550,7 @@ local int entry_showdef(ENT *ep) noex {
 	    if (ep->fl.show) rs = 1 ;
 	}
 	return rs ;
-}
-/* end subroutine (entry_showdef) */
+} /* end subroutine (entry_showdef) */
 
 local int entry_show(ENT *ep,cchar *ng,int order) noex {
 	int		rs = SR_OK ;
@@ -581,14 +562,13 @@ local int entry_show(ENT *ep,cchar *ng,int order) noex {
 	    } /* end if (name match) */
 	} /* end if (not a linked entry) */
 	return rs ;
-}
-/* end subroutine (entry_show) */
+} /* end subroutine (entry_show) */
 
 local int vcmporder(cvoid **v1pp,cvoid **v2pp) noex {
 	mkdirlist_ent	*e1p = entp(*v1pp) ;
 	mkdirlist_ent	*e2p = entp(*v2pp) ;
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
@@ -598,8 +578,7 @@ local int vcmporder(cvoid **v1pp,cvoid **v2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmporder) */
+} /* end subroutine (vcmporder) */
 
 vars::operator int () noex {
 	int		rs ;
@@ -607,7 +586,6 @@ vars::operator int () noex {
 	    maxpathlen = rs ;
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
