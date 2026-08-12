@@ -55,15 +55,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* |strncasecmp(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strncasecmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<six.h>			/* |sichr(3uc)| */
-#include	<rmx.h>			/* |rmblk(3uc)| */
-#include	<localmisc.h>
+#include	<strings.h>		/* BSD |strncasecmp(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncasecmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<six.h>			/* LIBUC |sichr(3uc)| */
+#include	<rmx.h>			/* LIBUC |rmblk(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mheader.h"
 
@@ -120,7 +120,6 @@ int mheader(cchar *hkeyp,cchar *hbuf) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (getlenstr) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (mheader) */
+} /* end subroutine (mheader) */
 
 
