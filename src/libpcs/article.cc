@@ -76,13 +76,13 @@ local inline int article_ctor(article *op,Args ... args) noex {
 	cnullptr	np{} ;
 	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->pathp = new(nt) retpath) != np) {
-	        if ((op->ngp = new(nt) ng) != np) {
-	            if ((op->envp = new(nt) vechand) != np) {
-	                if ((op->msgp = new(nt) dater) != np) {
+	    if ((op->pathp = new(nt) retpath) != np) ylikely {
+	        if ((op->ngp = new(nt) ng) != np) ylikely {
+	            if ((op->envp = new(nt) vechand) != np) ylikely {
+	                if ((op->msgp = new(nt) dater) != np) ylikely {
 			    rs = SR_OK ;
 		        } /* end if (new-dater) */
 		        if (rs < 0) {
@@ -106,7 +106,7 @@ local inline int article_ctor(article *op,Args ... args) noex {
 
 local inline int article_dtor(article *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->pathp) {
 		delete op->pathp ;
@@ -131,7 +131,7 @@ local inline int article_dtor(article *op) noex {
 template<typename ... Args>
 local inline int article_magic(article *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == ARTICLE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
@@ -148,14 +148,14 @@ local inline int article_magic(article *op,Args ... args) noex {
 
 int article_start(AR *op) noex {
 	int		rs ;
-	if ((rs = article_ctor(op)) >= 0) {
+	if ((rs = article_ctor(op)) >= 0) ylikely {
 	    op->clen = -1 ;
 	    op->clines = -1 ;
-	    if ((rs = ng_start(op->ngp)) >= 0) {
+	    if ((rs = ng_start(op->ngp)) >= 0) ylikely {
 	        op->fl.ngs = true ;
-	        if ((rs = retpath_start(op->pathp)) >= 0) {
+	        if ((rs = retpath_start(op->pathp)) >= 0) ylikely {
 	            op->fl.path = true ;
-		    if ((rs = vechand_start(op->envp,1,0)) >= 0) {
+		    if ((rs = vechand_start(op->envp,1,0)) >= 0) ylikely {
 	                op->fl.envdates = true ;
 		    } /* end if */
 		    if (rs < 0) {
@@ -178,7 +178,7 @@ int article_start(AR *op) noex {
 int article_finish(AR *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = article_magic(op)) >= 0) {
+	if ((rs = article_magic(op)) >= 0) ylikely {
 	    if (op->fl.msgdate) {
 	        op->fl.msgdate = false ;
 	        rs1 = dater_finish(op->msgp) ;
@@ -237,7 +237,7 @@ int article_finish(AR *op) noex {
 
 int article_addpath(AR *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = article_magic(op,sp)) >= 0) {
+	if ((rs = article_magic(op,sp)) >= 0) ylikely {
 	    if (! op->fl.path) {
 	        op->fl.path = true ;
 	        rs = retpath_start(op->pathp) ;
@@ -251,7 +251,7 @@ int article_addpath(AR *op,cchar *sp,int sl) noex {
 
 int article_addng(AR *op,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = article_magic(op,sp)) >= 0) {
+	if ((rs = article_magic(op,sp)) >= 0) ylikely {
 	    if (! op->fl.ngs) {
 	        op->fl.ngs = true ;
 	        rs = ng_start(op->ngp) ;
@@ -265,10 +265,10 @@ int article_addng(AR *op,cchar *sp,int sl) noex {
 
 int article_addenvdate(AR *op,dater *d2p) noex {
 	int		rs ;
-	if ((rs = article_magic(op,d2p)) >= 0) {
+	if ((rs = article_magic(op,d2p)) >= 0) ylikely {
 	    cint	msz = szof(dater) ;
-	    if (dater *dp ; (rs = mem.mall(msz,&dp)) >= 0) {
-	        if ((rs = dater_startcopy(dp,d2p)) >= 0) {
+	    if (dater *dp ; (rs = mem.mall(msz,&dp)) >= 0) ylikely {
+	        if ((rs = dater_startcopy(dp,d2p)) >= 0) ylikely {
 		    rs = vechand_add(op->envp,dp) ;
 		    if (rs < 0) {
 		        dater_finish(dp) ;
@@ -284,12 +284,12 @@ int article_addenvdate(AR *op,dater *d2p) noex {
 
 int article_addmsgdate(AR *op,dater *dp) noex {
 	int		rs ;
-	if ((rs = article_magic(op,dp)) >= 0) {
+	if ((rs = article_magic(op,dp)) >= 0) ylikely {
 	    if (! op->fl.msgdate) {
 	        op->fl.msgdate = true ;
 	        rs = dater_start(op->msgp,nullptr,nullptr,0) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = dater_setcopy(op->msgp,dp) ;
 	    }
 	} /* end if (magic) */
@@ -298,16 +298,16 @@ int article_addmsgdate(AR *op,dater *dp) noex {
 
 int article_addaddr(AR *op,int type,cchar *sp,int sl) noex {
 	int		rs ;
-	if ((rs = article_magic(op,sp)) >= 0) {
+	if ((rs = article_magic(op,sp)) >= 0) ylikely {
 	    cint	n = articleaddr_overlast ;
 	    rs = SR_INVALID ;
-	    if ((type >= 0) && (type < n)) {
+	    if ((type >= 0) && (type < n)) ylikely {
 		rs = SR_OK ;
 	        if (! op->af[type]) {
 	            op->af[type] = true ;
 	            rs = ema_start(&op->addr[type]) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = ema_parse(&op->addr[type],sp,sl) ;
 	        }
 	    } /* end if (valid) */
@@ -318,7 +318,7 @@ int article_addaddr(AR *op,int type,cchar *sp,int sl) noex {
 int article_addstr(AR *op,int type,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = article_magic(op,sp)) >= 0) {
+	if ((rs = article_magic(op,sp)) >= 0) ylikely {
 	    cint	n = articlestr_overlast ;
 	    rs = SR_INVALID ;
 	    if ((type >= 0) &&  (type < n)) {
@@ -344,10 +344,10 @@ int article_addparse(AR *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ; /* return-value */
-	if ((rs = article_magic(op,sp)) >= 0) {
+	if ((rs = article_magic(op,sp)) >= 0) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (ema aid ; (rs = ema_start(&aid)) >= 0) {
-	        if ((rs = ema_parse(&aid,sp,sl)) > 0) {
+	    if (ema aid ; (rs = ema_start(&aid)) >= 0) ylikely {
+	        if ((rs = ema_parse(&aid,sp,sl)) > 0) ylikely {
 		    int	cl ;
 		    cchar	*cp ;
 		    ema_ent *ep ;
@@ -371,7 +371,7 @@ int article_addparse(AR *op,cchar *sp,int sl) noex {
 
 int article_ao(AR *op,uint aoff,uint alen) noex {
     	int		rs ;
-	if ((rs = article_magic(op)) >= 0) {
+	if ((rs = article_magic(op)) >= 0) ylikely {
 	    op->aoff = aoff ;
 	    op->alen = alen ;
 	} /* end if (magic) */
@@ -380,7 +380,7 @@ int article_ao(AR *op,uint aoff,uint alen) noex {
 
 int article_countenvdate(AR *op) noex {
 	int		rs ;
-	if ((rs = article_magic(op)) >= 0) {
+	if ((rs = article_magic(op)) >= 0) ylikely {
 	    rs = vechand_count(op->envp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -400,7 +400,7 @@ int article_getenvdate(AR *op,int i,dater **epp) noex {
 
 int article_getstr(AR *op,int type,cchar **rpp) noex {
 	int		rs = SR_OK ;
-	if ((rs = article_magic(op)) >= 0) {
+	if ((rs = article_magic(op)) >= 0) ylikely {
 	    cint	n = articlestr_overlast ;
 	    cchar	*sp = nullptr ;
 	    rs = SR_INVALID ;
@@ -419,7 +419,7 @@ int article_getstr(AR *op,int type,cchar **rpp) noex {
 
 int article_getaddrema(AR *op,int type,ema **rpp) noex {
 	int		rs = SR_OK ;
-	if ((rs = article_magic(op)) >= 0) {
+	if ((rs = article_magic(op)) >= 0) ylikely {
 	    cint	n = articleaddr_overlast ;
 	    rs = SR_INVALID ;
 	    if ((type >= 0) && (type < n)) {
