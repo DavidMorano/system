@@ -21,9 +21,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecobj.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	DIRLIST		struct dirlist_head
@@ -74,27 +74,27 @@ struct dirlist : dirlist_head {
 	dirlist_co	join ;
 	dirlist_co	finish ;
 	dirlist() noex {
-	    start(this,dirlistmem_start) ;
-	    semi(this,dirlistmem_semi) ;
-	    count(this,dirlistmem_count) ;
-	    strsize(this,dirlistmem_strsize) ;
-	    join(this,dirlistmem_join) ;
-	    finish(this,dirlistmem_finish) ;
-	    magic = 0 ;
+	    start	(this,dirlistmem_start) ;
+	    semi	(this,dirlistmem_semi) ;
+	    count	(this,dirlistmem_count) ;
+	    strsize	(this,dirlistmem_strsize) ;
+	    join	(this,dirlistmem_join) ;
+	    finish	(this,dirlistmem_finish) ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	dirlist(const dirlist &) = delete ;
 	dirlist &operator = (const dirlist &) = delete ;
-	int adds(cchar *,int) noex ;
-	int add(cchar *,int) noex ;
-	int curbegin(dirlist_cur *) noex ;
-	int curend(dirlist_cur *) noex ;
-	int curenum(dirlist_cur *,char *,int) noex ;
-	int curget(dirlist_cur *,cchar **) noex ;
-	int joinmk(char *,int) noex ;
-	void dtor() noex ;
+	int adds	(cchar *,int) noex ;
+	int add		(cchar *,int) noex ;
+	int curbegin	(dirlist_cur *) noex ;
+	int curenum	(dirlist_cur *,char *,int) noex ;
+	int curget	(dirlist_cur *,cchar **) noex ;
+	int curend	(dirlist_cur *) noex ;
+	int joinmk	(char *,int) noex ;
+	void dtor	() noex ;
 	operator int () noex ;
 	destruct dirlist() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (dirlist) */
 #else	/* __cplusplus */
@@ -104,20 +104,20 @@ typedef DIRLIST		dirlist ;
 
 EXTERNC_begin
 
-extern int dirlist_start(dirlist *) noex ;
-extern int dirlist_semi(dirlist *) noex ;
-extern int dirlist_add(dirlist *,cchar *,int) noex ;
-extern int dirlist_adds(dirlist *,cchar *,int) noex ;
-extern int dirlist_count(dirlist *) noex ;
-extern int dirlist_strsize(dirlist *) noex ;
-extern int dirlist_curbegin(dirlist *,dirlist_cur *) noex ;
-extern int dirlist_curend(dirlist *,dirlist_cur *) noex ;
-extern int dirlist_curenum(dirlist *,dirlist_cur *,char *,int) noex ;
-extern int dirlist_curget(dirlist *,dirlist_cur *,cchar **) noex ;
-extern int dirlist_join(dirlist *) noex ;
-extern int dirlist_joinsize(dirlist *) noex ;
-extern int dirlist_joinmk(dirlist *,char *,int) noex ;
-extern int dirlist_finish(dirlist *) noex ;
+extern int dirlist_start	(dirlist *) noex ;
+extern int dirlist_semi		(dirlist *) noex ;
+extern int dirlist_add		(dirlist *,cchar *,int) noex ;
+extern int dirlist_adds		(dirlist *,cchar *,int) noex ;
+extern int dirlist_count	(dirlist *) noex ;
+extern int dirlist_strsize	(dirlist *) noex ;
+extern int dirlist_curbegin	(dirlist *,dirlist_cur *) noex ;
+extern int dirlist_curend	(dirlist *,dirlist_cur *) noex ;
+extern int dirlist_curenum	(dirlist *,dirlist_cur *,char *,int) noex ;
+extern int dirlist_curget	(dirlist *,dirlist_cur *,cchar **) noex ;
+extern int dirlist_join		(dirlist *) noex ;
+extern int dirlist_joinsize	(dirlist *) noex ;
+extern int dirlist_joinmk	(dirlist *,char *,int) noex ;
+extern int dirlist_finish	(dirlist *) noex ;
 
 EXTERNC_end
 
