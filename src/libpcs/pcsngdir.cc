@@ -1,4 +1,5 @@
 /* pcsngdir SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* return a directory name when given a newsgroup name */
@@ -43,18 +44,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsngdir.h"
 
@@ -117,17 +119,14 @@ int pcsngdir(cc *pcs,char *ngdir,cc *bbnewsdir,cc *newsgroup) noex {
 	                *bp = '/' ;
 	                cp2 = (bp + 1) ;
 	            } /* end while */
-
-/* OK, start looking for the closest directory that matches */
-
-	            f_first = TRUE ;
+		    /* looking for closest directory that matches */
+	            f_first = true ;
 	            rs = SR_ACCESS ;
 	            while (f_first || ((bp = strrchr(ngdir,'/')) != NULL)) {
-
-	                if (! f_first)
+	                if (! f_first) {
 	                    *bp = '.' ;
-
-	                f_first = FALSE ;
+			}
+	                f_first = false ;
 	                if ((rs = mkpath1(ndp,ngdir)) >= 0) {
 
 	                    if ((u_stat(bbnewsdir2,&sb) >= 0) && 
@@ -142,13 +141,9 @@ int pcsngdir(cc *pcs,char *ngdir,cc *bbnewsdir,cc *newsgroup) noex {
 
 	                if (rs < 0) break ;
 	            } /* end while */
-
-/* if we do not have a directory yet, try the last name we are left with */
-
+		    /* try the last name we are left with */
 	            if (rs < 0) {
-
 	                strcpy(ndp,ngdir) ;
-
 	                if ((u_stat(bbnewsdir2,&sb) >= 0) && 
 	                    S_ISDIR(sb.st_mode) &&
 	                    (u_access(bbnewsdir2,W_OK) >= 0))
@@ -163,7 +158,6 @@ int pcsngdir(cc *pcs,char *ngdir,cc *bbnewsdir,cc *newsgroup) noex {
 	} /* end if (u_stat) */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pcsngdir) */
+} /* end subroutine (pcsngdir) */
 
 
