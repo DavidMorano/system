@@ -71,18 +71,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<useraccdb.h>
-#include	<nulstr.h>
-#include	<strn.h>
-#include	<snx.h>
-#include	<sfx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<useraccdb.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcsuserfile.h"
 
@@ -156,7 +156,6 @@ int pcsuserfile(cc *pr,cc *ufn,cc *nn,cc *un,cc *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_created : rs ;
-}
-/* end subroutine (pcsuserfile) */
+} /* end subroutine (pcsuserfile) */
 
 
