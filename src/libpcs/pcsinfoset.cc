@@ -5,7 +5,7 @@
 /* PCS set-information */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -53,17 +53,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -92,7 +92,7 @@ constexpr cpcchar	nfnames[] = {
 	".project",
 	".organization",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -128,21 +128,18 @@ int pcsinfoset(cchar *pr,cchar *nbuf,int nlen,cchar *un,int nt) noex {
 	} /* end if (name-file-name) */
 
 	return rs ;
-}
-/* end subroutine (pcsinfoset) */
+} /* end subroutine (pcsinfoset) */
 
 
 /* local subroutines */
 
-
-local int rmnames(cchar *pr,cchar *nfname)
-{
-	ustat	sb ;
+local int rmnames(cchar *pr,cchar *nfname) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (pr == nullptr) return SR_FAULT ;
 
+	ustat	sb ;
 	rs1 = u_stat(nfname,&sb) ;
 
 #ifdef	COMMENT
@@ -154,8 +151,7 @@ local int rmnames(cchar *pr,cchar *nfname)
 #endif /* COMMENT */
 
 	return rs ;
-}
-/* end subroutine (rmnames) */
+} /* end subroutine (rmnames) */
 
 local int setnames(cchar *pr,cchar *nfname,cchar *nbuf,int nlen) noex {
 	cmode	om = 0664 ;
@@ -189,7 +185,6 @@ local int setnames(cchar *pr,cchar *nfname,cchar *nbuf,int nlen) noex {
 	} /* end if (memory-allocations) */
 
 	return rs ;
-}
-/* end subroutine (setnames) */
+} /* end subroutine (setnames) */
 
 
