@@ -1,10 +1,11 @@
-/* uunames SUPPORT */
+/* uunames SUPPORT (UU-Names) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* uunames-query database manager */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_GETPROGROOT	1		/* use |getprogroot(3dam)| */
 
 /* revision history:
@@ -43,11 +44,11 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
+#include	<getprogroot.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<spawnproc.h>		/* LIBUC */
-#include	<getprogroot.h>		/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
@@ -67,100 +68,20 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
+#include	<vardefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"uunames.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/uconstants.ccm"
+#pragma		GCC dependency		"mod/sif.ccm"
 
 import libutil ;			/* |memclear(3u)| */
+import uconstants ;			/* |sysword(3c)| */
 import sif ;
 
 /* local defines */
-
-#ifndef	VARSYSNAME
-#define	VARSYSNAME	"SYSNAME"
-#endif
-
-#ifndef	VARRELEASE
-#define	VARRELEASE	"RELEASE"
-#endif
-
-#ifndef	VARVERSION
-#define	VARVERSION	"VERSION"
-#endif
-
-#ifndef	VARMACHINE
-#define	VARMACHINE	"MACHINE"
-#endif
-
-#ifndef	VARARCHITECTURE
-#define	VARARCHITECTURE	"ARCHITECTURE"
-#endif
-
-#ifndef	VARHZ
-#define	VARHZ		"HZ"
-#endif
-
-#ifndef	VARDOMAIN
-#define	VARDOMAIN	"DOMAIN"
-#endif
-
-#ifndef	VARNODE
-#define	VARNODE		"NODE"
-#endif
-
-#ifndef	VARHOMEDNAME
-#define	VARHOMEDNAME	"HOME"
-#endif
-
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
-#endif
-
-#ifndef	VARLOGNAME
-#define	VARLOGNAME	"LOGNAME"
-#endif
-
-#ifndef	VARTZ
-#define	VARTZ		"TZ"
-#endif
-
-#ifndef	VARPWD
-#define	VARPWD		"PWD"
-#endif
-
-#ifndef	VARTMPDNAME
-#define	VARTMPDNAME	"TMPDIR"
-#endif
-
-#ifndef	VARMAIL
-#define	VARMAIL		"MAIL"
-#endif
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
-
-#ifndef	VARLIBPATH
-#define	VARLIBPATH	"LD_LIBRARY_PATH"
-#endif
-
-#ifndef	VARMANPATH
-#define	VARMANPATH	"MANPATH"
-#endif
-
-#ifndef	VARVPATH
-#define	VARVPATH	"VPATH"
-#endif
-
-#ifndef	VARPRLOCAL
-#define	VARPRLOCAL	"LOCAL"
-#endif
-
-#ifndef	VARPRNCMP
-#define	VARPRNCMP	"NCMP"
-#endif
 
 #ifndef	VARPRMKUU
 #define	VARPRMKUU	"MKUUNAMES_PROGRAMROOT"
@@ -169,30 +90,15 @@ import sif ;
 #undef	VARDBNAME
 #define	VARDBNAME	"MKUUNAMES_DBNAME"
 
-#ifndef	TMPDNAME
-#define	TMPDNAME	"/tmp"
-#endif
-
-#ifndef	TMPVARDNAME
-#define	TMPVARDNAME	"/var/tmp"
-#endif
-
-#define	UUNAMES_DBMAGICSTR	"UUNAMES"
-#define	UUNAMES_PRNAME	VARPRNCMP
-
 #define	UU		uunames
-#define	CUR		uunames_cur
-#define	ENVPOP		envpop
+#define	UU_CUR		uunames_cur
+#define	UU_OBJ		uunames_obj
+#define	UU_MAGSTR	"UUNAMES"
 
 #define	VARDNAME	"var"
 #define	INDDNAME	"uunames"
-
 #define	DBNAME		"uunames"
 #define	INDSUF		"sl"
-
-#ifndef	KEYBUFLEN
-#define	KEYBUFLEN	NATURALWORDLEN
-#endif
 
 #define	TO_FILEMOD	(60 * 24 * 3600)
 #define	TO_MKWAIT	(5 * 50)
@@ -203,8 +109,11 @@ import sif ;
 
 #define	PROG_MKUU	"mkuunames"
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 #ifndef	CF_GETPROGROOT
-#define	CF_GETPROGROOT	1		/* use 'getprogroot(3dam)' */
+#define	CF_GETPROGROOT	1		/* use |getprogroot(3dam)| */
 #endif
 
 
@@ -214,7 +123,7 @@ import sif ;
 /* local typedefs */
 
 extern "C" {
-    typedef int (*uunames_f)(uunames *,time_t) noex ;
+    typedef int (*indopen_f)(uunames *,time_t) noex ;
 }
 
 typedef uunames_cur	cur ;
@@ -240,6 +149,10 @@ namespace {
 	cchar		*sub1dname ;
 	cchar		*sub2dname ;
     } ; /* end struct */
+    struct vars {
+	int		maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
 } /* end namespace */
 
 typedef liner *		linerp ;
@@ -270,7 +183,7 @@ local int uunames_dtor(uunames *op) noex {
 	    if (op->nlp) ylikely {
 		delete op->nlp ;
 		op->nlp = nullptr ;
-	    }
+	    } /* end if (delete-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (uunames_dtor) */
@@ -293,23 +206,23 @@ local int	uunames_indopendname(UU *,cchar *,time_t) noex ;
 local int	uunames_indclose(UU *) noex ;
 local int	uunames_mkuunamesi(UU *,cchar *) noex ;
 local int	uunames_envpaths(UU *,vecstr *) noex ;
-local int	uunames_indtest(UU *,cchar *,time_t) noex ;
+local int	uunames_indreq(UU *,cchar *,time_t) noex ;
 local int	uunames_indmapcreate(UU *,cchar *,time_t) noex ;
 local int	uunames_indmapdestroy(UU *) noex ;
 local int	uunames_filemapcreate(UU *,time_t) noex ;
 local int	uunames_filemapdestroy(UU *) noex ;
-local int	uunames_indfn(UU *,cchar *,time_t) noex ;
 local int	uunames_indlist(UU *) noex ;
 local int	uunames_indcheck(UU *,time_t) noex ;
 
-local int	checkdname(cchar *) noex ;
+local int	vecstr_envdefs	(vecstr *,con mainv) noex ;
+local int	vecstr_loadpath	(vecstr *,cchar *) noex ;
+local int	vecstr_pathval	(vecstr *,char *,int) noex ;
 
-local int	vecstr_defenvs(vecstr *,mainv) noex ;
-local int	vecstr_loadpath(vecstr *,cchar *) noex ;
-local int	mkpathval(vecstr *,char *,int) noex ;
+local int	ckdirs(cchar *dn,mode_t dm) noex ;
+local int	mkpathbn(char *,cc *,cc *,int,cc *) noex ;
 
 #ifdef	COMMENT
-local int	mkindfname(char *,cchar *,cchar *,cchar *,cchar *) noex ;
+local int	mkindfn(char *,cchar *,cchar *,cchar *,cchar *) noex ;
 #endif
 
 extern "C" {
@@ -364,6 +277,7 @@ constexpr cpcchar	envdefs[] = {
 	"LC_TIME",
 	"PATH",
 	"LD_LIBRARY_PATH",
+	"DYLD_LIBRARY_PATH",
 	nullptr
 } ; /* end array */
 
@@ -374,13 +288,14 @@ constexpr envpop	envpops[] = {
 	{ nullptr,	nullptr,	nullptr }
 } ; /* end array */
 
-constexpr uunames_f	indopens[] = {
+constexpr indopen_f	indopens[] = {
 	uunames_indopenpr,
-	uunames_indopentmp,
-	nullptr
+	uunames_indopentmp
 } ; /* end array */
 
-constexpr char		filemagic[]	= UUNAMES_DBMAGICSTR ;
+static vars		var ;
+constexpr char		fmagstr[]	= UU_MAGSTR ;
+cbool			f_debug		= CF_DEBUG ;
 cbool			f_getprogroot	= CF_GETPROGROOT ;
 
 
@@ -398,30 +313,19 @@ const uunames_obj	uunames_modinfo = {
 
 /* exported subroutines */
 
+local int uunames_opens(UU *op,cchar *pr,cchar *dbname) noex ;
+
 int uunames_open(UU *op,cchar *pr,cchar *dbname) noex {
-	time_t		dt = getustime ;
 	int		rs ;
+	if ((dbname == nullptr) || (dbname[0] == '\0')) {
+	    dbname = DBNAME ;
+	}
 	if ((rs = uunames_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0]) {
-	        if ((dbname == nullptr) || (dbname[0] == '\0')) {
-	            dbname = DBNAME ;
-	        }
-		if ((rs = uunames_infoloadbegin(op,pr,dbname)) >= 0) ylikely {
-	            cint	sz = szof(liner) ;
-	            cint	ne = DEFNAMES ;
-	            if ((rs = vecobj_start(op->nlp,sz,ne,0)) >= 0) ylikely {
-			if ((rs = uunames_indopen(op,dt)) >= 0) ylikely {
-			    op->magval = UUNAMES_MAGIC ;
-			}
-			if (rs < 0) {
-			    vecobj_finish(op->nlp) ;
-			} /* end if (error) */
-		    } /* end if (vecobj_start) */
-		    if (rs < 0) {
-			uunames_infoloadend(op) ;
-		    } /* end if (error) */
-		} /* end if (infoload) */
+	    if (pr[0]) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+		    rs = uunames_opens(op,pr,dbname) ;
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		uunames_dtor(op) ;
@@ -429,6 +333,27 @@ int uunames_open(UU *op,cchar *pr,cchar *dbname) noex {
 	} /* end if (uunames_ctor) */
 	return rs ;
 } /* end subroutine (uunames_open) */
+
+local int uunames_opens(UU *op,cchar *pr,cchar *dbname) noex {
+	time_t		dt = getustime ;
+    	int		rs ;
+        if ((rs = uunames_infoloadbegin(op,pr,dbname)) >= 0) ylikely {
+            cint        sz = szof(liner) ;
+            cint        ne = DEFNAMES ;
+            if ((rs = vecobj_start(op->nlp,sz,ne,0)) >= 0) ylikely {
+                if ((rs = uunames_indopen(op,dt)) >= 0) ylikely {
+                    op->magval = UUNAMES_MAGIC ;
+                }
+                if (rs < 0) {
+                    vecobj_finish(op->nlp) ;
+                } /* end if (error) */
+            } /* end if (vecobj_start) */
+            if (rs < 0) {
+                uunames_infoloadend(op) ;
+            } /* end if (error) */
+        } /* end if (infoload) */
+	return rs ;
+} /* end subroutine (uunames_opens) */
 
 int uunames_close(UU *op) noex {
 	int		rs ;
@@ -501,15 +426,15 @@ int uunames_exists(UU *op,cchar *sp,int sl) noex {
 			{
 			    vecobj	*nlp = op->nlp ;
 			    liner	le(kp,kl) ;
-			    auto	vcf = vesrch ;
-	                    if ((rs = vecobj_search(nlp,&le,vcf,np)) == rsn) {
+			    cauto	vcf = vesrch ;
+	                    if ((rs = nlp->search(&le,vcf,np)) == rsn) {
 				kl = 0 ;
 			    }
 			} /* end block */
 			void *vp = voidp(kp) ;
 	                rs1 = lm_free(vp) ;
 			if (rs >= 0) rs = rs1 ;
-	            } /* end if (allocation) */
+	            } /* end if (m-a-f) */
 	        } /* end if (uunames_indcheck) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
@@ -572,13 +497,12 @@ local int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	op->indfname = nullptr ;
-	if (char *indfname ; (rs = lm_mp(&indfname)) >= 0) ylikely {
-	    cchar	*suf = INDSUF ;
-	    cchar	*ends = ENDIANSTR ;
-	    if ((rs = mkfnamesuf2(indfname,indname,suf,ends)) >= 0) ylikely {
+	if (char *ibuf ; (rs = lm_mp(&ibuf)) >= 0) ylikely {
+	    cchar	*s_suf = INDSUF ;
+	    cchar	*s_end = ENDIANSTR ;
+	    if ((rs = mkfnamesuf(ibuf,indname,s_suf,s_end)) >= 0) {
 		cint	fl = rs ;
-	        if (cchar *cp ; (rs = lm_strw(indfname,fl,&cp)) >= 0) ylikely {
+	        if (cchar *cp ; (rs = lm_strw(ibuf,fl,&cp)) >= 0) ylikely {
 		    op->indfname = cp ;
 		    if ((rs = uunames_filemapcreate(op,dt)) >= 0) ylikely {
 			rs = uunames_indlist(op) ;
@@ -588,11 +512,11 @@ local int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 	                void *vp = voidp(op->indfname) ;
 	                rs1 = lm_free(vp) ;
 	                if (rs >= 0) rs = rs1 ;
-	                op->dbname = nullptr ;
+	                op->indfname = nullptr ;
 	            } /* end if (error) */
-		} /* end if (memory-allocation) */
+		} /* end if (memory-acquire) */
 	    } /* end if (mkfnamesuf) */
-	    rs1 = lm_free(indfname) ;
+	    rs1 = lm_free(ibuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
@@ -601,7 +525,7 @@ local int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 local int uunames_indmapdestroy(UU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	for (int i = 0 ; vecobj_del(op->nlp,i) >= 0 ; i += 1) {
 	    c += 1 ;
 	} /* end for */
@@ -614,11 +538,12 @@ local int uunames_indmapdestroy(UU *op) noex {
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->indfname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (uunames_indmapdestroy) */
 
 local int uunames_filemapcreate(UU *op,time_t dt) noex {
+	cnullptr	np{} ;
 	cint		of = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
@@ -629,9 +554,8 @@ local int uunames_filemapcreate(UU *op,time_t dt) noex {
 	    if (ustat sb ; (rs = uc_fstat(fd,&sb)) >= 0) {
 		rs = SR_NOTSUP ;
 	        if (S_ISREG(sb.st_mode)) {
-		    cnullptr	np{} ;
 		    rs = SR_TOOBIG ;
-	            if (sb.st_size <= INT_MAX) {
+	            if (sb.st_size <= INT_MAX) ylikely {
 			csize	ms = size_t(sb.st_size) ;
 			cint	mp = PROT_READ ;
 			cint	mf = MAP_SHARED ;
@@ -656,7 +580,7 @@ local int uunames_filemapcreate(UU *op,time_t dt) noex {
 local int uunames_filemapdestroy(UU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->mapdata) {
+	if (op->mapdata) ylikely {
 	    caddr_t	md = op->mapdata ;
 	    csize	ms = op->mapsize ;
 	    rs1 = u_mmapend(md,ms) ;
@@ -670,8 +594,8 @@ local int uunames_filemapdestroy(UU *op) noex {
 local int uunames_indopen(UU *op,time_t dt) noex {
 	int		rs = SR_NOENT ;
 	int		f = false ;
-	for (int i = 0 ; indopens[i] != nullptr ; i += 1) {
-	    if ((rs = (*indopens[i])(op,dt)) >= 0) {
+	for (cauto &fun : indopens) {
+	    if ((rs = fun(op,dt)) >= 0) {
 		f = true ;
 	    } else if (isNotPresent(rs)) {
 		rs = SR_OK ;
@@ -684,11 +608,11 @@ local int uunames_indopen(UU *op,time_t dt) noex {
 local int uunames_indopenpr(UU *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *idname ; (rs = lm_mp(&idname)) >= 0) {
-	    if ((rs = mkpath(idname,op->pr,VARDNAME,INDDNAME)) >= 0) {
-	        rs = uunames_indopendname(op,idname,dt) ;
+	if (char *ibuf ; (rs = lm_mp(&ibuf)) >= 0) ylikely {
+	    if ((rs = mkpath(ibuf,op->pr,VARDNAME,INDDNAME)) >= 0) ylikely {
+	        rs = uunames_indopendname(op,ibuf,dt) ;
 	    }
-	    rs1 = lm_free(idname) ;
+	    rs1 = lm_free(ibuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -697,17 +621,17 @@ local int uunames_indopenpr(UU *op,time_t dt) noex {
 local int uunames_indopentmp(UU *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
-	cchar		*tmpdname = TMPVARDNAME ;
+	cchar		*tmpdname = sysword.w_vartmpdir ;
 	cchar		*inddname = INDDNAME ;
-	if (char *idname ; (rs = lm_mp(&idname)) >= 0) {
-	    if (cchar *prname ; (rs = sfbasename(op->pr,-1,&prname)) > 0) {
-	        if ((rs = mkpath(idname,tmpdname,prname,inddname)) >= 0) {
-	            rs = uunames_indopendname(op,idname,dt) ;
+	if (char *ibuf ; (rs = lm_mp(&ibuf)) >= 0) ylikely {
+	    if (cchar *bn ; (rs = sfbasename(op->pr,-1,&bn)) > 0) {
+	        if ((rs = mkpathbn(ibuf,tmpdname,bn,rs,inddname)) >= 0) {
+	            rs = uunames_indopendname(op,ibuf,dt) ;
 	        }
-	    } else {
+	    } else if (rs == 0) {
 	        rs = SR_INVALID ;
 	    }
-	    rs1 = lm_free(idname) ;
+	    rs1 = lm_free(ibuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
@@ -716,91 +640,56 @@ local int uunames_indopentmp(UU *op,time_t dt) noex {
 local int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *indname ; (rs = lm_mp(&indname)) >= 0) {
-	bool	f_mk = false ;
-	if ((rs = mkpath2(indname,dname,op->dbname)) >= 0) {
-	    if ((rs = uunames_indtest(op,indname,dt)) >= 0) {
-	        bool	f_ok = (rs > 0) ;
-
-	if (((rs < 0) && (rs != SR_NOMEM)) || (! f_ok)) {
-	    if ((rs = uunames_mkuunamesi(op,dname)) >= 0) {
-		f_mk = true ;
-	        rs = uunames_indtest(op,indname,dt) ;
-	        f_ok = (rs > 0) ;
-	    }
-	}
-
-	if (((rs < 0) && (rs != SR_NOMEM)) || (! f_ok)) {
-	    f_mk = true ;
-	    rs = uunames_indfn(op,dname,dt) ;
-	}
-
-	if (rs >= 0) {
-	    rs = uunames_indmapcreate(op,indname,dt) ;
-	    op->fl.varind = (rs >= 0) ;
-	}
-
-	if ((rs < 0) && (rs != SR_BADFMT) && (! f_mk)) {
-	    if ((rs = uunames_indfn(op,dname,dt)) >= 0) {
-		rs = uunames_indmapcreate(op,indname,dt) ;
-	        op->fl.varind = (rs >= 0) ;
-	    }
-	}
-
-		} /* end if (indtest) */
-	    } /* end if (mkpath) */
-	    rs1 = lm_free(indname) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
-	return rs ;
+	int		rv = 0 ; /* return-value */
+	cmode		dm = 0777 ;
+	if ((rs = ckdirs(dname,dm)) > 0) {
+	    if (char *ibuf ; (rs = lm_mp(&ibuf)) >= 0) ylikely {
+	        if ((rs = mkpath(ibuf,dname,op->dbname)) >= 0) ylikely {
+	            if ((rs = uunames_indreq(op,ibuf,dt)) > 0) {
+	                if ((rs = uunames_mkuunamesi(op,dname)) >= 0) {
+		            rs = uunames_indmapcreate(op,ibuf,dt) ;
+			    rv = rs ;
+		        }
+		    } else if (rs == SR_OK) {
+		        rs = uunames_indmapcreate(op,ibuf,dt) ;
+		        rv = rs ;
+		    } /* end if (ok) */
+	        } /* end if (mkpath) */
+	        rs1 = lm_free(ibuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (ckdirs) */
+	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (uunames_indopendname) */
 
-local int uunames_indtest(UU *op,cchar *indname,time_t dt) noex {
+/* new-index-required - ret: 0=NO, 1=YES */
+local int uunames_indreq(UU *op,cchar *indname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
-	int		f = false ;
-	if (char *indfname ; (rs = lm_mp(&indfname)) >= 0) {
-	    cchar	*suf = INDSUF ;
-	    cchar	*ends = ENDIANSTR ;
-	    if ((rs = mkfnamesuf2(indfname,indname,suf,ends)) >= 0) {
-	         ustat		sb ;
-	         time_t		ti_ind ;
-	         rs1 = u_stat(indfname,&sb) ;
-	         ti_ind = sb.st_mtime ;
-	         if ((rs1 >= 0) && ((sb.st_size == 0) || (ti_ind == 0))) {
-	             rs1 = SR_NOTFOUND ;
-	         }
-	         if ((rs1 >= 0) && (op->ti_mod > ti_ind)) {
-	             rs1 = SR_NOTFOUND ;
-	         }
-	         if ((rs1 >= 0) && ((dt - ti_ind) >= TO_FILEMOD)) {
-	             rs1 = SR_TIMEDOUT ;
-	         }
-	         f = (rs1 >= 0) ;
+	int		freq = false ; /* return-value */
+	if (char *ibuf ; (rs = lm_mp(&ibuf)) >= 0) ylikely {
+	    cchar	*s_suf = INDSUF ;
+	    cchar	*s_end = ENDIANSTR ;
+	    if ((rs = mkfnamesuf(ibuf,indname,s_suf,s_end)) >= 0) ylikely {
+	         if (ustat sb ; (rs = u_stat(ibuf,&sb)) >= 0) {
+	             custime ti_ind = sb.st_mtime ;
+		     if (dt == 0) dt = getustime ;
+		     if (sb.st_size == 0) {
+			 freq = true ;
+		     } else if (ti_ind > op->ti_mod) {
+			 freq = true ;
+		     } else if ((dt - ti_ind) >= TO_FILEMOD) {
+			 freq = true ;
+		     }
+		 } else if (isNotPresent(rs)) {
+		     freq = true ;
+	         } /* end if (u_stat) */
 	    } /* end if (mkfnamesuf) */
-	    rs1 = lm_free(indfname) ;
+	    rs1 = lm_free(ibuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
-	return (rs >= 0) ? f : rs ;
-} /* end subroutine (uunames_indtest) */
-
-local int uunames_indfn(UU *op,cchar *dname,time_t) noex {
-	int		rs ;
-	int		rs1 ;
-	int		len = 0 ;
-	if (char *indname ; (rs = lm_mp(&indname)) >= 0) {
-	    if ((rs = checkdname(dname)) == SR_NOENT) {
-	        rs = mkdirs(dname,TMPDMODE) ;
-	    }
-	    if (rs >= 0) {
-	        rs = mkpath2(indname,dname,op->dbname) ;
-		len = rs ;
-	    }
-	    rs1 = lm_free(indname) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
-	return (rs >= 0) ? len : rs ;
-} /* end subroutine (uunames_indfn) */
+	return (rs >= 0) ? freq : rs ;
+} /* end subroutine (uunames_indreq) */
 
 local int uunames_indclose(UU *op) noex {
 	int		rs = SR_OK ;
@@ -813,7 +702,33 @@ local int uunames_indclose(UU *op) noex {
 	return rs ;
 } /* end subroutine (uunames_indclose) */
 
+#ifdef	COMMENT
+namespace {
+    struct spawer {
+	UU		*op ;
+	cchar		*dname ;
+	spawner(UU *o,cchar *d) noex : op(o), dname(d) { } ;
+	operator int () noex ;
+    } ; /* end struct (spanwer) */
+} /* end namespace */
+#endif /* COMMENT */
+
 /* make the index */
+local int uunames_mkuunamesi(UU *op,cchar *dname) noex {
+    	int		rs = SR_BUGCHECK ;
+	if (op && dname) ylikely {
+	    spawner so(op,dname) ;
+	    rs = so ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (uunames_mkuunamesi) */
+
+spawner::operator int () noex {
+    	int		rs = SR_OK ;
+    	return rs ;
+} /* end method (spawner::operator) */
+
+#ifdef	COMMENT
 local int uunames_mkuunamesi(UU *op,cchar *dname) noex {
 	SPAWNPROC_CON	ps{} ;
 	vecstr		envs ;
@@ -835,7 +750,7 @@ local int uunames_mkuunamesi(UU *op,cchar *dname) noex {
 	if (dname[0] == '\0')
 	    return SR_INVALID ;
 
-	rs = mkpath2(dbname,dname,op->dbname) ;
+	rs = mkpath(dbname,dname,op->dbname) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -880,13 +795,13 @@ local int uunames_mkuunamesi(UU *op,cchar *dname) noex {
 	    rs = vecstr_envadd(&envs,VARDBNAME,dbname,-1) ;
 
 	if (rs >= 0)
-	    rs = vecstr_defenvs(&envs,envsys) ;
+	    rs = vecstr_envdefs(&envs,envsys) ;
 
 	if (rs >= 0)
-	    rs = vecstr_defenvs(&envs,prnames) ;
+	    rs = vecstr_envdefs(&envs,prnames) ;
 
 	if (rs >= 0)
-	    rs = vecstr_defenvs(&envs,envdefs) ;
+	    rs = vecstr_envdefs(&envs,envdefs) ;
 
 	if (rs < 0)
 	    goto ret2 ;
@@ -928,6 +843,7 @@ ret2:
 ret0:
 	return rs ;
 } /* end subroutine (uunames_mkuunamesi) */
+#endif /* COMMENT */
 
 local int uunames_envpaths(UU *op,vecstr *elp) noex {
 	cnullptr	np{} ;
@@ -952,12 +868,12 @@ local int uunames_envpaths(UU *op,vecstr *elp) noex {
 	            } /* end if */
 	            subdname = envpops[i].sub2dname ;
 	            if ((rs >= 0) && (subdname != nullptr)) {
-	                if ((rs = mkpath2(pbuf,op->pr,subdname)) >= 0) {
+	                if ((rs = mkpath(pbuf,op->pr,subdname)) >= 0) {
 	                    pl = rs ;
 	                    rs = pc.add(pbuf,pl) ;
 		        }
 	            } /* end if */
-	            if (cchar *vp ; (rs >= 0) && ((vp = getenv(enp)) != np)) {
+	            if (cchar *vp ; (rs >= 0) && ((vp = getenver(enp)) != np)) {
 	                rs = vecstr_loadpath(&pc,vp) ;
 	            }
 	            if (rs >= 0) {
@@ -965,7 +881,7 @@ local int uunames_envpaths(UU *op,vecstr *elp) noex {
 		        sz = rs ;
 	            }
 	            if ((rs >= 0) && ((rs = lm_mall((sz+1),&bp)) >= 0)) {
-	                if ((rs = mkpathval(&pc,bp,sz)) >= 0) {
+	                if ((rs = vecstr_pathval(&pc,bp,sz)) >= 0) {
 	                    bl = rs ;
 	                    rs = elp->envadd(enp,bp,bl) ;
 		        }
@@ -985,23 +901,25 @@ local int uunames_envpaths(UU *op,vecstr *elp) noex {
 } /* end subroutine (uunames_envpaths) */
 
 local int uunames_indlist(UU *op) noex {
+    	vecobj		*nlp = op->nlp ;
+	cnullptr	np{} ;
 	uint		lineoff = 0 ;
 	int		rs = SR_OK ;
 	int		ml = intsat(op->mapsize) ;
 	int		n = 0 ; /* return-value */
 	cchar		*mp = charp(op->mapdata) ;
-	for (cchar *tp ; (tp = strnchr(mp,ml,'\n')) != nullptr ; ) {
+	for (cchar *tp ; (tp = strnchr(mp,ml,'\n')) != np ; ) {
 	    liner	le ;
 	    cint	len = intconv((tp + 1) - mp) ;
 	    le.lp = mp ;
-	    le.ll = (len - 1) ; /* subtrace off NL */
+	    le.ll = (len - 1) ; /* subtract off NL */
 	    if (lineoff > 0) {
 		if (cchar *cp ; sfcontent(le.lp,le.ll,&cp) > 0) {
 		    n += 1 ;
-		    rs = vecobj_add(op->nlp,&le) ;
+		    rs = nlp->add(&le) ;
 		}
 	    } else {
-		if ((le.ll == 0) || (strncmp(le.lp,filemagic,le.ll) != 0)) {
+		if ((le.ll == 0) || (strncmp(le.lp,fmagstr,le.ll) != 0)) {
 		    rs = SR_LIBBAD ;
 		}
 	    } /* end if */
@@ -1022,68 +940,24 @@ local int uunames_indcheck(UU *op,time_t) noex {
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (uunames_indcheck) */
 
-local int checkdname(cchar *dname) noex {
-	int		rs = SR_INVALID ;
-	if (dname[0] == '/') {
-	    if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
-		rs = SR_NOTDIR ;
-		if (S_ISDIR(sb.st_mode)) {
-	    	    rs = perm(dname,-1,-1,nullptr,W_OK) ;
-		} /* end if (directory) */
-	    } /* end if (u_stat) */
-	} /* end if */
-	return rs ;
-} /* end subroutine (checkdname) */
-
-#ifdef	COMMENT
-
-local int mkindfname(char *rbuf,cc *dname,cc *name,cc *suf,cc *end) noex {
-	int		rs ;
-	int		rs1 ;
-	int		len = 0 ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
-	    int		dnl = 0 ;
-	    if (sbuf sb ; (rs = sb.start(rbuf,rs)) >= 0) ylikely {
-		{
-	            if ((rs = sb.strw(dname,-1)) >= 0) {
-	                dnl = rs ;
-		    }
-	            if ((rs >= 0) && (dname[dnl - 1] != '/')) {
-	                rs = sb.chr('/') ;
-	            }
-	            if (rs >= 0) rs = sb.strw(name) ;
-	            if (rs >= 0) rs = sb.chr('.') ;
-	            if (rs >= 0) rs = sb.strw(suf) ;
-	            if (rs >= 0) rs = sb.strw(end) ;
-		} /* end block */
-		rs1 = sb.finish ;
-		if (rs >= 0) rs = rs1 ;
-		len = rs1 ;
-	    } /* end if (sbuf) */
-	} /* end if (bufsizeget) */
-	return (rs >= 0) ? len : rs ;
-} /* end subroutine (mkindfname) */
-
-#endif /* COMMENT */
-
-local int vecstr_defenvs(vecstr *elp,mainv ea) noex {
+local int vecstr_envdefs(vecstr *elp,con mainv ea) noex {
 	int		rs = SR_OK ;
-	int		c = 0 ;
-	for (int i = 0 ; ea[i] != nullptr ; i += 1) {
-	    if (cchar *cp ; (cp = getenv(ea[i])) != nullptr) {
+	int		c = 0 ; /* return-value */
+	for (int i = 0 ; ea[i] ; i += 1) {
+	    if (cchar *cp = getenver(ea[i]) ; cp) {
 		rs = vecstr_envadd(elp,ea[i],cp,-1) ;
 		c += !!(rs < INT_MAX) ;
-	    }
+	    } /* end if (getenver) */
 	    if (rs < 0) break ;
 	} /* end for */
 	return (rs >= 0) ? c : rs ;
-} /* end subroutine (vecstr_defenvs) */
+} /* end subroutine (vecstr_envdefs) */
 
 local int vecstr_loadpath(vecstr *clp,cchar *pp) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 	    sif		of(pp,-1,":;") ;
 	    int		cl ;
@@ -1103,10 +977,10 @@ local int vecstr_loadpath(vecstr *clp,cchar *pp) noex {
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (vecstr_loadpath) */
 
-local int mkpathval(vecstr *clp,char *vbuf,int vbuflen) noex {
+local int vecstr_pathval(vecstr *clp,char *vbuf,int vlen) noex {
 	int		rs = SR_OK ;
-	int		rlen = 0 ;
-	if (vbuflen >= 0) {
+	int		rl = 0 ; /* return-value */
+	if (vlen >= 0) {
 	    int		sch{} ;
 	    int		c = 0 ;
 	    cchar	*cp ;
@@ -1122,12 +996,12 @@ local int mkpathval(vecstr *clp,char *vbuf,int vbuflen) noex {
 	                    } else {
 	                        sch = ':' ;
 		            }
-	                    rs = storebuf_chr(vbuf,vbuflen,rlen,sch) ;
-	                    rlen += rs ;
+	                    rs = storebuf_chr(vbuf,vlen,rl,sch) ;
+	                    rl += rs ;
 	                } /* end if */
 	                if (rs >= 0) {
-	                    rs = storebuf_strw(vbuf,vbuflen,rlen,cp,-1) ;
-	                    rlen += rs ;
+	                    rs = storebuf_strw(vbuf,vlen,rl,cp,-1) ;
+	                    rl += rs ;
 	                }
 	            } else {
 	                f_semi = true ;
@@ -1138,8 +1012,86 @@ local int mkpathval(vecstr *clp,char *vbuf,int vbuflen) noex {
 	} else {
 	    rs = SR_NOANODE ;
 	}
-	return (rs >= 0) ? rlen : rs ;
-} /* end subroutine (mkpathval) */
+	return (rs >= 0) ? rl : rs ;
+} /* end subroutine (vecstr_pathval) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	    maxpathlen = rs ;
+	} /* end if */
+    	return rs ;
+} /* end method (vars::operator) */
+
+local int ckdirs(cchar *dn,mode_t dm) noex {
+    	cnullptr	np{} ;
+    	int		rs = SR_FAULT ;
+	int		fok = false ;
+	if (dn) ylikely {
+	    if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
+		rs = SR_NOTDIR ;
+		if (S_ISDIR(sb.st_mode)) {
+	    	    if ((rs = perm(dn,-1,-1,np,W_OK)) >= 0) {
+			fok = true ;
+		    }
+		} /* end if (is-dir) */
+	    } else if (isNotPresent(rs)) {
+		if ((rs = mkdirs(dn,dm)) >= 0) {
+		    fok = true ;
+		} else if (isNotPresent(rs)) {
+		    rs = SR_OK ;
+		} /* end if (mkdirs) */
+	    } /* end if */
+	} /* end if (non-null) */
+    	return (rs >= 0) ? fok : rs ;
+} /* end subroutine (ckdirs) */
+
+#ifdef	COMMENT
+local int mkindfn(char *rbuf,cc *dn,cc *nn,cc *s_suf,cc *s_end) noex {
+    	cint		rlen = var.maxpathlen ;
+	int		rs ;
+	int		rs1 ;
+        if (sbuf sb ; (rs = sb.start(rbuf,rlen)) >= 0) ylikely {
+            {
+                if ((rs = sb.strw(dn)) >= 0) ylikely {
+                    cint dnl = rs ;
+                    if (dn[dnl - 1] != '/') {
+                        rs = sb.chr('/') ;
+                    }
+                } /* end if */
+                if (rs >= 0) rs = sb.strw(nn) ;
+                if (rs >= 0) rs = sb.chr('.') ;
+                if (rs >= 0) rs = sb.strw(s_suf) ;
+                if (rs >= 0) rs = sb.strw(s_end) ;
+            } /* end block */
+            rs1 = sb.finish ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (sbuf) */
+	return rs ;
+} /* end subroutine (mkindfn) */
+#endif /* COMMENT */
+
+local int mkpathbn(char *rbuf,cc *dn,cc *bp,int bl,cc *nn) noex {
+    	cint		rlen = var.maxpathlen ;
+	int		rs ;
+	int		rs1 ;
+        if (sbuf sb ; (rs = sb.start(rbuf,rlen)) >= 0) ylikely {
+            {
+                if ((rs = sb.strw(dn)) >= 0) ylikely {
+                    cint dnl = rs ;
+                    if (dn[dnl - 1] != '/') {
+                        rs = sb.chr('/') ;
+                    }
+                } /* end if */
+                if (rs >= 0) rs = sb.strw(bp,bl) ;
+                if (rs >= 0) rs = sb.chr('/') ;
+                if (rs >= 0) rs = sb.strw(nn) ;
+            } /* end block */
+            rs1 = sb.finish ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (sbuf) */
+	return rs ;
+} /* end subroutine (mkpathbn) */
 
 local int esrch(con liner *l1p,con liner *l2p) noex {
 	int		rc = 0 ;
