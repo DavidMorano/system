@@ -1,4 +1,4 @@
-/* ttihdr SUPPORT */
+/* ttihdr SUPPORT (Term-Trans) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -90,7 +90,7 @@ enum his {
 /* local variables */
 
 constexpr int		headsize	= hi_overlast * szof(uint) ;
-constexpr int		magicsize	= TTIHDR_MAGICSIZE ;
+constexpr int		magicsz		= TTIHDR_MAGICSIZE ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= TTIHDR_MAGICSTR ;
 
@@ -103,19 +103,19 @@ constexpr char		magicstr[]	= TTIHDR_MAGICSTR ;
 int ttihdr_rd(ttihdr *op,char *hbuf,int hlen) noex {
         int             rs = SR_FAULT ;
         int             len = 0 ;
-        if (op && hbuf) {
+        if (op && hbuf) ylikely {
             int         bl = hlen ;
             char        *bp = hbuf ;
-            if (bl >= (magicsize + vsz)) {
-                if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
-                    bp += magicsize ;
-                    bl -= magicsize ;
+            if (bl >= (magicsz + vsz)) ylikely {
+                if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) ylikely {
+                    bp += magicsz ;
+                    bl -= magicsz ;
                     memcopy(bp,op->vetu,vsz) ;
                     bp[0] = uchar(TTIHDR_VERSION) ;
                     bp[1] = uchar(ENDIAN) ;
                     bp += vsz ;
                     bl -= vsz ;
-                    if (bl >= headsize) {
+                    if (bl >= headsize) ylikely {
                         uint    		*header = uintp(bp) ;
 	        	header[hi_fsz]		= op->fsz ;
 	        	header[hi_ctime]	= op->ctime ;
@@ -140,15 +140,15 @@ int ttihdr_rd(ttihdr *op,char *hbuf,int hlen) noex {
 int ttihdr_wr(ttihdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && hbuf) {
+	if (op && hbuf) ylikely {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) ylikely {
                 rs = SR_OK ;
-                bp += magicsize ;
-                bl -= magicsize ;
+                bp += magicsz ;
+                bl -= magicsz ;
                 /* read out the VETU information */
-                if (bl >= vsz) {
+                if (bl >= vsz) ylikely {
                     memcopy(op->vetu,bp,vsz) ;
                     if (op->vetu[0] != TTIHDR_VERSION) {
                         rs = SR_PROTONOSUPPORT ;
@@ -161,8 +161,8 @@ int ttihdr_wr(ttihdr *op,cchar *hbuf,int hlen) noex {
                 } else {
                     rs = SR_ILSEQ ;
                 }
-	        if (rs >= 0) {
-	            if (bl >= headsize) {
+	        if (rs >= 0) ylikely {
+	            if (bl >= headsize) ylikely {
 	                const uint	*header = uintp(bp) ;
 	                op->fsz		= header[hi_fsz] ;
 	                op->ctime	= header[hi_ctime] ;
