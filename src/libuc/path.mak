@@ -139,7 +139,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-pathadd.o:		pathadd.cc pathadd.h		$(INCS)
-pathclean.o:		pathclean.cc pathclean.h	$(INCS)
+pathadd.o:		pathadd.cc	pathadd.h		$(INCS)
+pathclean.o:		pathclean.cc	pathclean.h		$(INCS)
 
 
