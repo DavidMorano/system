@@ -1,4 +1,5 @@
 /* pcsopendircache SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* open a channel (file-descriptor) to the directory-cache of a directory */
@@ -46,31 +47,33 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<varnames.hh>
-#include	<bufsizevar.hh>
-#include	<mallocxx.h>
-#include	<vecpstr.h>
-#include	<bfile.h>
-#include	<fsdirtree.h>
-#include	<storebuf.h>
-#include	<mktmp.h>
-#include	<mkpathx.h>
-#include	<strwcmp.h>
-#include	<intsat.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* LIBU */
+#include	<usystem.h>		/* LIBU */
+#include	<ucmem.hh>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<vecpstr.h>		/* LIBUC */
+#include	<fsdirtree.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<mktmp.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<intsat.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"pcsopendircache.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -111,7 +114,7 @@ namespace {
 	int finish() noex ;
 	int proc() noex ;
     } ; /* end struct (dirhelp) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -150,8 +153,7 @@ int pcsopendircache(cchar *pr,cchar *ndname,int of,mode_t om,int ttl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (pcsopendircache) */
+} /* end subroutine (pcsopendircache) */
 
 
 /* local subroutines */
@@ -170,8 +172,7 @@ dirhelp::operator int () noex {
 	} /* end if (start-finish) */
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
-}
-/* end method (dirhelp::operator) */
+} /* end method (dirhelp::operator) */
 
 int dirhelp::start() noex {
 	int		rs = SR_OK ;
@@ -186,8 +187,7 @@ int dirhelp::start() noex {
 	    } /* end if (memory-allocation) */
 	}
 	return rs ;
-}
-/* end method (dirhelp::finish) */
+} /* end method (dirhelp::finish) */
 
 int dirhelp::finish() noex {
 	int		rs = SR_OK ;
@@ -198,8 +198,7 @@ int dirhelp::finish() noex {
 	    nbuf = nullptr ;
 	}
 	return rs ;
-}
-/* end method (dirhelp::start) */
+} /* end method (dirhelp::start) */
 
 int dirhelp::proc() noex {
 	int		rs ;
@@ -209,9 +208,9 @@ int dirhelp::proc() noex {
 	        int	fsz = 1 ;
 	        cchar	*dc = DIRCACHE_CFNAME ;
 	        char	*fbuf{} ;
-	        fsz += (strlen(ndname) + 1) ;
+	        fsz += (lenstr(ndname) + 1) ;
 	        fsz += 1 ;
-	        fsz += (strlen(dc) + 1) ;
+	        fsz += (lenstr(dc) + 1) ;
 	        if ((rs = uc_malloc(fsz,&fbuf)) >= 0) {
 		    if ((rs = mkpath(fbuf,ndname,dc)) >= 0) {
 	    	        if ((rs = u_open(fbuf,of,om)) >= 0) {
@@ -230,8 +229,7 @@ int dirhelp::proc() noex {
 		if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (procdname) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end method (dirhelp::proc) */
+} /* end method (dirhelp::proc) */
 
 local int procdname(cchar *newsdname,int ttl) noex {
 	int		rs ;
@@ -257,8 +255,7 @@ local int procdname(cchar *newsdname,int ttl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procdname) */
+} /* end subroutine (procdname) */
 
 local int procdnamer(cchar *newsdname) noex {
 	vecpstr		dirs ;
@@ -276,11 +273,10 @@ local int procdnamer(cchar *newsdname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecpstr-dirs) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procdnamer) */
+} /* end subroutine (procdnamer) */
 
 local int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
-	cint		ml = strlen(DIRCACHE_MAGICSTR) ;
+	cint		ml = lenstr(DIRCACHE_MAGICSTR) ;
 	int		rs ;
 	int		rs1 ;
 	int		f = true ;
@@ -306,8 +302,7 @@ local int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (vecpstr-getsize) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (procdiffer) */
+} /* end subroutine (procdiffer) */
 
 local int procdiffers(vecpstr *dlp,cchar *dcfname) noex {
 	int		rs ;
@@ -340,8 +335,7 @@ local int procdiffers(vecpstr *dlp,cchar *dcfname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? fmis : rs ;
-}
-/* end subroutine (procdiffers) */
+} /* end subroutine (procdiffers) */
 
 local int procdircache(vecpstr *dlp,cchar *newsdname) noex {
 	int		rs ;
@@ -371,8 +365,7 @@ local int procdircache(vecpstr *dlp,cchar *newsdname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procdircache) */
+} /* end subroutine (procdircache) */
 
 local int procdircacher(vecpstr *dlp,cchar *fn) noex {
 	bfile		dcfile, *dcfp = &dcfile ;
@@ -385,7 +378,7 @@ local int procdircacher(vecpstr *dlp,cchar *fn) noex {
 	        cchar	*dp{} ;
 	        for (int i = 0 ; vecpstr_get(dlp,i,&dp) >= 0 ; i += 1) {
 	            if (dp) {
-	                cint	dl = strlen(dp) ;
+	                cint	dl = lenstr(dp) ;
 	                c += 1 ;
 	                rs = bprintln(dcfp,dp,dl) ;
 	            }
@@ -396,7 +389,6 @@ local int procdircacher(vecpstr *dlp,cchar *fn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (opened replacement file) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procdircacher) */
+} /* end subroutine (procdircacher) */
 
 
