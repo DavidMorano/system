@@ -96,6 +96,10 @@ import uconstants ;			/* |varname(3u)| */
 #define	SUB		subinfo
 #define	CF		config
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+
 
 /* imported namespaces */
 
@@ -199,6 +203,8 @@ constexpr cpcchar	defprogs[] = {
 	"/usr/games/fortune",
 	nullptr
 } ; /* end array */
+
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
