@@ -62,10 +62,10 @@ import ureserve ;			/* |ischarx(3u)| */
 
 /* local defines */
 
-#define	TOBC(ch)	char_tobc(ch)
-#define	TOLC(ch)	char_tolc(ch)
-#define	TOUC(ch)	char_touc(ch)
-#define	TOFC(ch)	char_tofc(ch)
+#define	TOBC(ch)	char_tobc(ch)	/* |ureserve| */
+#define	TOLC(ch)	char_tolc(ch)	/* |ureserve| */
+#define	TOUC(ch)	char_touc(ch)	/* |ureserve| */
+#define	TOFC(ch)	char_tofc(ch)	/* |ureserve| */
 
 
 /* imported namespaces */
@@ -93,7 +93,7 @@ extern "C" {
 
 local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
     	int		rc = 0 ;
-	if (s1 || s2) {
+	if (s1 || s2) ylikely {
 	    rc = +1 ;
 	    if (s1) {
 		rc = -1 ;
@@ -121,14 +121,14 @@ local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
 namespace libu {
     int strbasecmp(cchar *s1,cchar *s2) noex {
     	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    rc = strcmp(s1,s2) ;
 	}
 	return rc ;
     } /* end subroutine (strbasecmp) */
     int strcasecmp(cchar *s1,cchar *s2) noex {
 	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    while (rc == 0) {
 	        cint ch1 = TOUC(*s1++) ;
 	        cint ch2 = TOUC(*s2++) ;
@@ -140,7 +140,7 @@ namespace libu {
     } /* end subroutine (strcasecmp) */
     int strfoldcmp(cchar *s1,cchar *s2) noex {
 	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    while (rc == 0) {
 	        cint ch1 = TOFC(*s1++) ;
 	        cint ch2 = TOFC(*s2++) ;
@@ -158,7 +158,7 @@ namespace libu {
     }
     int strbasecmpr(cchar *s1,cchar *s2) noex {
 	return (- strbasecmp(s1,s2)) ;
-}
+    }
 } /* end namespace (libu) */
 
 namespace libu {
