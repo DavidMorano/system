@@ -145,7 +145,7 @@ char		name[] ;
 		lineindex_curbegin(&li,&cur) ;
 
 		line = 0 ;
-		while (lineindex_enum(&li,&cur,&off) >= 0) {
+		while (lineindex_curenum(&li,&cur,&off) >= 0) {
 
 			debugprintf("process: line=%u off=%lu\n",
 				line,off) ;
