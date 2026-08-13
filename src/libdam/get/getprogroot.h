@@ -1,4 +1,4 @@
-/* getprogroot HEADER */
+/* getprogroot HEADER (Get-Program-Root) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -26,7 +26,7 @@
 
 EXTERNC_begin
 
-extern int	getprogroot(cchar *,con mainv,int *,char *,cchar *) noex ;
+extern int	getprogroot(char *,cchar *,con mainv,cchar *) noex ;
 
 EXTERNC_end
 
