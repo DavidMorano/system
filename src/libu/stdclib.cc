@@ -77,14 +77,14 @@
 namespace stdclib {
     int std_strbasecmp(cchar *s1,cchar *s2) noex {
 	int rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    rc = strcmp(s1,s2) ;
 	} /* end if (non-null) */
 	return rc ;
     } /* end subroutine */
     int std_strcasecmp(cchar *s1,cchar *s2) noex {
 	int rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    rc = strcasecmp(s1,s2) ;
 	} /* end if (non-null) */
 	return rc ;
@@ -94,15 +94,17 @@ namespace stdclib {
 namespace stdclib {
     int std_strnbasecmp(cchar *s1,cchar *s2,int n) noex {
 	int rc = 0 ;
-	if (s1 && s2) {
-	    rc = strncmp(s1,s2,n) ;
+	if (s1 && s2) ylikely {
+	    csize nsize = size_t(n) ;
+	    rc = strncmp(s1,s2,nsize) ;
 	} /* end if (non-null) */
 	return rc ;
     } /* end subroutine */
     int std_strncasecmp(cchar *s1,cchar *s2,int n) noex {
 	int rc = 0 ;
-	if (s1 && s2) {
-	    rc = strncasecmp(s1,s2,n) ;
+	if (s1 && s2) ylikely {
+	    csize nsize = size_t(n) ;
+	    rc = strncasecmp(s1,s2,nsize) ;
 	} /* end if (non-null) */
 	return rc ;
     } /* end subroutine */
