@@ -1,12 +1,13 @@
-/* progout */
+/* progout SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* support building a message without output related subroutines */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_OUTVALUE	1		/* use 'outvalue()' */
-
 
 /* revision history:
 
@@ -20,6 +21,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	Output a header.
 
 	int outhead(pip,ofp,name,v,vlen)
@@ -60,19 +62,16 @@
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<ema.h>
