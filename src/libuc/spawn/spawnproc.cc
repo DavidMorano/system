@@ -81,6 +81,7 @@
 #include	<ucsysconf.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<getpwd.h>		/* LIBUC */
+#include	<getprogpath.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<sigignores.h>		/* LIBUC */
 #include	<sigign.h>		/* LIBUC */
@@ -137,7 +138,6 @@ extern "C" {
 }
 
 extern "C" {
-    extern int	getprogpath(ids *,vecstr *,char *,cchar *,int) noex ;
     extern int	dupup(int,int) noex ;
     extern int	sigdefaults(cint *) noex ;
 }
