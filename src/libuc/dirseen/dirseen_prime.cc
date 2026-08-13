@@ -5,6 +5,7 @@
 /* unique directory manager */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -37,11 +38,13 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<nulstr.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"dirseen.h"
 
@@ -50,6 +53,10 @@
 import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	1		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -80,7 +87,7 @@ namespace {
 	dirseen_ent(cchar *sp,int sl = -1) noex : namep(sp) {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    namel = sl ;
-	} ;
+	} ; /* end ctor */
 	dirseen_ent(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
     } ; /* end struct (dirseen_ent) */
 } /* end namespace */
@@ -103,6 +110,8 @@ extern "C" {
 
 /* local variables */
 
+cbool			f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -113,6 +122,7 @@ int dirseen_start(dirseen *op) noex {
     	cnullptr	np{} ;
 	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
+	DPRINTF("ent\n") ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
@@ -122,14 +132,16 @@ int dirseen_start(dirseen *op) noex {
 		cint	vn = DIRSEEN_NDEF ;
 	        cint	vo = 0 ;
 	        if ((rs = vecobj_start(op->dlistp,esz,vn,vo)) >= 0) ylikely {
+		    DPRINTF("dlistp=%16p\n",op->dlistp) ;
 	            op->magval = DIRSEEN_MAGIC ;
 	        } /* end if  */
 		if (rs < 0) {
 		    delete op->dlistp ;
 		    op->dlistp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (dirseen_start) */
 
@@ -138,12 +150,11 @@ int dirseen_finish(dirseen *op) noex {
 	int		rs1 ;
 	if ((rs = dirseen_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (op->dlistp) ylikely {
-		vecobj	*dlp = op->dlistp ;
+	    if (vecobj *dlp = op->dlistp ; op->dlistp) ylikely {
 	        void	*vp{} ;
+		rs = SR_OK ;
 	        for (int i = 0 ; dlp->get(i,&vp) >= 0 ; i += 1) {
-	            dirseen_ent		*ep = entp(vp) ;
-	            if (vp) {
+	            if (dirseen_ent *ep = entp(vp) ; ep) {
 	                rs1 = entry_finish(ep) ;
 	                if (rs >= 0) rs = rs1 ;
 	            }
@@ -155,7 +166,7 @@ int dirseen_finish(dirseen *op) noex {
 	        {
 		    delete op->dlistp ;
 		    op->dlistp = nullptr ;
-	        }
+	        } /* end if (delete-vecobj) */
 	    } /* end if (bugcheck) */
 	    op->magval = 0 ;
 	} /* end if (magic) */
@@ -185,7 +196,7 @@ int dirseen_add(dirseen *op,cchar *sp,int sl,ustat *sbp) noex {
 	            rs = vecobj_add(op->dlistp,&e) ;
 	            if (rs < 0) {
 		        entry_finish(&e) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (entry_start) */
 	    } /* end if (vecobj_search) */
 	} /* end if (magic) */
@@ -194,10 +205,18 @@ int dirseen_add(dirseen *op,cchar *sp,int sl,ustat *sbp) noex {
 
 int dirseen_havename(dirseen *op,cchar *sp,int sl) noex {
 	int		rs ;
+	DPRINTF("ent\n") ;
+	if_constexpr (f_debug) {
+	    strnul ss(sp,sl) ;
+	   DPRINTF("ss=%s\n",ccp(ss)) ;
+	}
 	if ((rs = dirseen_magic(op,sp)) >= 0) ylikely {
-	    dirseen_ent		e(sp,sl) ;
+	    dirseen_ent e(sp,sl) ;
+	    DPRINTF("->search\n") ;
+	    DPRINTF("dlistp=%16p\n",op->dlistp) ;
 	    rs = vecobj_search(op->dlistp,&e,vcmpname,nullptr) ;
 	} /* end if (magic) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (dirseen_havename) */
 
@@ -343,7 +362,7 @@ local int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	dirseen_ent	**e1pp = entpp(v1pp) ;
 	dirseen_ent	**e2pp = entpp(v2pp) ;
 	int		rc = 0 ;
-	{
+	if (e1pp && e2pp) ylikely {
 	    dirseen_ent	*e1p = *e1pp ;
 	    dirseen_ent	*e2p = *e2pp ;
 	    if (e1p || e2p) ylikely {
