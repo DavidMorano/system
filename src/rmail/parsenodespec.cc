@@ -1,4 +1,4 @@
-/* rmail_parsenodespec SUPPORT */
+/* parsenodespec SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -19,7 +19,10 @@
 
 /******************************************************************************
 
-  	Description:
+  	Name:
+	parrsenodespec
+
+	Description:
 	This little subroutine just parses out a node specification.
 	A node specification looks like:
 
@@ -31,11 +34,7 @@
 	port that was passed by the caller is returned instead.
 
 	Synopsis:
-	int parsenodespec(PROGINFO *pip,char rbuf[],cchar *nsp,int nsl)
-	PROGINFO	*pip ;
-	char		rbuf[] ;
-	char		*nsp ;
-	int		nsl ;
+	int parsenodespec(PROGINFO *pip,char *rbuf,cchar *nsp,int nsl) noex
 
 	Arguments:
 	pip		pointer to program information
@@ -49,21 +48,20 @@
 
 ******************************************************************************/
 
-#include	<envstandards.h>	/* MUST be first to configure */
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<netinet/in.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getportnum.h>
 #include	<strn.h>
 #include	<localmisc.h>
 
@@ -86,7 +84,6 @@ extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
-extern int	getportnum(cchar *,cchar *) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 
@@ -125,7 +122,7 @@ typedef unsigned int	in_addr_t ;
 
 /* external subroutines */
 
-int parsenodespec(PROGINFO *pip,char rbuf[],cchar *nsp,int nsl) noex {
+int parsenodespec(PROGINFO *pip,char *rbuf,cchar *nsp,int nsl) noex {
 	int		rs = SR_OK ;
 	int		nl, pl ;
 	int		port = 0 ;
