@@ -63,6 +63,10 @@ import ureserve ;			/* |sf{x}(3u)| */
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
 
 /* imported namespaces */
 
@@ -177,10 +181,10 @@ template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 	        mf = oneday * 1 ;
 	        break ;
 	    case 'h':
-	        mf = 60 * 60 ;
-	        break ;
+	        mf *= 60 ;
+	        falldown ;
 	    case 'm':
-	        mf = 60 ;
+	        mf *= 60 ;
 	        break ;
 	    case 's':
 	    case 0:			/* <- indicates no multiply character */
@@ -190,8 +194,8 @@ template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 		rs = SR_NOMSG ;
 		break ;
 	    } /* end switch */
-	    if (rs >= 0) {
-	        if (T v{} ; (rs = cfdec(cp,cl,&v)) >= 0) {
+	    if (rs >= 0) ylikely {
+	        if (T v{} ; (rs = cfdec(cp,cl,&v)) >= 0) ylikely {
 		    if (T res{} ; (! ckd_mul(&res,v,mf))) ylikely {
 		        *rp = res ;
 		        rs = intsat(res) ;
