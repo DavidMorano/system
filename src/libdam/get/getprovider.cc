@@ -167,7 +167,7 @@ libdam::provider		providerid ;
 int getproviderid(cchar *sp,int 탎l) noex {
     	int		rs = SR_FAULT ;
 	int		id = 0 ;
-	if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
+	if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
 	    rs = SR_OK ;
 	    for (int m, i = 0 ; providers[i].codename ; i += 1) {
 	        cchar	*bs = providers[i].codename ;
@@ -183,9 +183,9 @@ int getproviderid(cchar *sp,int 탎l) noex {
 
 int getprovider(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen >= 0) {
+	    if (rlen >= 0) ylikely {
 	        trier	to(rbuf,rlen) ;
 	        rs = to ;
 	    }
@@ -197,12 +197,12 @@ int getvendor(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
-	    if (rlen >= 0) {
-	        if (char *pbuf ; (rs = lm_mn(&pbuf)) >= 0) {
-	            if ((rs = getprovider(pbuf,rs)) >= 0) {
+	    if (rlen >= 0) ylikely {
+	        if (char *pbuf ; (rs = lm_mn(&pbuf)) >= 0) ylikely {
+	            if ((rs = getprovider(pbuf,rs)) >= 0) ylikely {
 	                cint	pl = rs ;
 	                int	i ; /* used-afterwards */
 	                int	m ;
@@ -278,8 +278,8 @@ namespace libdam {
 	int		rs ;
 	int		rs1 ;
 	int		id = 0 ;
-	if (char *pbuf ; (rs = lm_mn(&pbuf)) >= 0) {
-	    if ((rs = getprovider(pbuf,rs)) >= 0) {
+	if (char *pbuf ; (rs = lm_mn(&pbuf)) >= 0) ylikely {
+	    if ((rs = getprovider(pbuf,rs)) >= 0) ylikely {
 		rs = getproviderid(pbuf,rs) ;
 		id = rs ;
 	    }
