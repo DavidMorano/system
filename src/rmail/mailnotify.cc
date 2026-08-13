@@ -45,7 +45,7 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<bufsizeget.h>
 #include	<getportnum.h>
 #include	<bfile.h>
 #include	<vecobj.h>
@@ -138,7 +138,7 @@ typedef unsigned int	in_addr_t ;
 /* forward references */
 
 static int	prognotifyrecip(PROGINFO *,vecobj *,
-			REPORTINFO *,PARAMFILE *,RECIP *) ;
+			REPORTINFO *,paramfile *,RECIP *) ;
 static int	prognotifyrecipnode(PROGINFO *,vecobj *,
 			REPORTINFO *,RECIP *,const char *,int) ;
 static int	report(PROGINFO *,REPORTINFO *) ;
@@ -155,7 +155,7 @@ static int	searchfunc() ;
 int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp)
 {
 	REPORTINFO	ri ;
-	PARAMFILE	mbtab ;
+	paramfile	mbtab ;
 	int		rs, rs1 ;
 	int		defport ;
 	int		cl ;
@@ -260,10 +260,10 @@ static int prognotifyrecip(pip,mip,rip,mbp,rp)
 PROGINFO	*pip ;
 vecobj		*mip ;
 REPORTINFO	*rip ;
-PARAMFILE	*mbp ;
+paramfile	*mbp ;
 RECIP		*rp ;
 {
-	PARAMFILE_CUR	cur ;
+	paramfile_cur	cur ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ul ;
@@ -335,7 +335,7 @@ int		port ;
 	struct hostent	he, *hep = &he ;
 	struct msginfo	mi, *iep = &mi ;
 	int		moff ;
-	cint	helen = getbufsize(getbufsize_he) ;
+	cint	helen = bufsizeget(bufsize_ho) ;
 	cint	af = AF_INET4 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
