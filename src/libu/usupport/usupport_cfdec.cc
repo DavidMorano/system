@@ -80,14 +80,14 @@ namespace libu {
 	[[maybe_unused]] char	*endp{} ; /* <- unused */
 	cint		b = CFBASE ;	/* conversion number base */
 	int		rs = SR_FAULT ;
-	if (sp) {
+	if (sp) ylikely {
 	    T		v{} ;
 	    strnul	str(sp,sl) ;
 	    errno = 0 ;
 	    v = cfx(str,&endp,b) ;
 	    if (rp) *rp = v ;
 	    if (errno) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    } else {
 		rs = intsat(v) ;
 	    }
