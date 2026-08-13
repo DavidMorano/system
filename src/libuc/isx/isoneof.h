@@ -28,7 +28,8 @@
 
 EXTERNC_begin
 
-extern bool isoneof(cint *,int) noex ;
+extern bool isoneof	(cint *,int) noex ;
+extern bool isonebad	(cint *,int) noex ;
 
 local inline bool isOneOf(cint *rsa,int rs) noex {
 	return isoneof(rsa,rs) ;
