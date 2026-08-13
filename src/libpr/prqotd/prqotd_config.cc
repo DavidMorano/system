@@ -216,7 +216,7 @@ constexpr cpcchar	cparams[] = {
 	nullptr
 } ; /* end array (cparams) */
 
-cbool		f_debug = CF_DEBUG ;
+cbool			f_debug = CF_DEBUG ;
 
 
 /* exported variables */
