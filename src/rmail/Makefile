@@ -342,8 +342,6 @@ densitydb.o:		densitydb.c densitydb.h densitydbe.h
 
 densitydbe.o:		densitydbe.c densitydbe.h
 
-keyopt.o:		keyopt.c keyopt.h
-
 tmtime.o:		tmtime.c tmtime.h
 
 
