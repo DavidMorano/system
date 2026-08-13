@@ -1462,12 +1462,12 @@ local int mkmonth(cchar *cp,int cl) noex {
 
 /* for use with 'vecobj_sort(3dam)' or similar */
 local int vrcmp(cvoid *v1p,cvoid *v2p) noex {
-	CALENT		*e1p, **e1pp = (CALENT **) v1p ;
-	CALENT		*e2p, **e2pp = (CALENT **) v2p ;
+	con CALENT	**e1pp = (cont CALENT **) v1p ;
+	con CALENT	**e2pp = (con CALENT **) v2p ;
 	int		rc = 0 ;
-	{
-	    e1p = *e1pp ;
-	    e2p = *e2pp ;
+	if (r1pp && e2pp) ylikely {{
+	    con CALENT	*e1p = *e1pp ;
+	    con CALENT	*e2p = *e2pp ;
 	    if (e1p || e2p) {
 	        rs = +1 ;
 	        if (e1p) {
@@ -1479,7 +1479,7 @@ local int vrcmp(cvoid *v1p,cvoid *v2p) noex {
 	            }
 	        }
 	    }
-	} /* end block */
+	} /* end if (non-null) */
 	return rc ;
 } /* end subroutine (vrcmp) */
 
