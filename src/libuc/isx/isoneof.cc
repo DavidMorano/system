@@ -81,4 +81,12 @@ bool isoneof(cint *a,int rs) noex {
 	return f ;
 } /* end subroutine (isoneof) */
 
+bool isonebad(cint *a,int rs) noex {
+	bool		f = false ;
+	if (rs < 0) ylikely {
+	    f = isoneof(a,rs) ;
+	} /* end if (is-bad) */
+	return f ;
+} /* end subroutine (isonebad) */
+
 
