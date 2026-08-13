@@ -280,8 +280,7 @@ int openqotd_init() noex {
 	    } /* end while */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (openqotd_init) */
+} /* end subroutine (openqotd_init) */
 
 int openqotd_fini() noex {
 	OPENQOTD	*uip = &openqotd_data ;
@@ -309,8 +308,7 @@ int openqotd_fini() noex {
 	    memclear(uip) ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end subroutine (openqotd_fini) */
+} /* end subroutine (openqotd_fini) */
 
 local int prqotd_opens(cc *,int,int,int,time_t) noex ;
 
@@ -333,8 +331,7 @@ int prqotd_open(cchar *pr,int mjd,int of,int to) noex {
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (prqotd_open) */
+} /* end subroutine (prqotd_open) */
 
 
 /* local subroutines */
@@ -564,9 +561,9 @@ local int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	int		lof = of ;
 	int		fd = -1 ;
 	cmode		om = 0664 ;
-	lof &= (~ O_ACCMODE) ;
-	lof &= (~ O_TRUNC) ;
-	lof &= (~ O_EXCL) ;
+	lof &= (compl O_ACCMODE) ;
+	lof &= (compl O_TRUNC) ;
+	lof &= (compl O_EXCL) ;
 	lof |= (O_CREAT | O_RDWR) ;
 	if ((rs = uc_open(qfname,lof,om)) >= 0) ylikely {
 	    fd = rs ;
