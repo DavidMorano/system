@@ -51,32 +51,32 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<bufsizevar.hh>
-#include	<vecstr.h>
-#include	<ids.h>
-#include	<mkpathx.h>
-#include	<mkpathxw.h>
-#include	<pathadd.h>
-#include	<storebuf.h>
-#include	<strn.h>
-#include	<strx.h>
-#include	<rmx.h>
-#include	<permx.h>
-#include	<isoneof.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkpathxw.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"prgetprogpath.h"
 
@@ -199,8 +199,7 @@ int prgetprogpath(cchar *pr,char *rbuf,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (prgetprogpath) */
+} /* end subroutine (prgetprogpath) */
 
 
 /* local subroutines */
@@ -213,8 +212,7 @@ local int subinfo_start(SI *sip,cchar *pr) noex {
 	    rs = ids_load(&sip->id) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
 local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
@@ -232,8 +230,7 @@ local int subinfo_finish(SI *sip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 local int subinfo_tryfull(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -250,8 +247,7 @@ local int subinfo_tryfull(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 	    } /* end if */
 	} /* end if (full-path) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (subinbfo_tryfull) */
+} /* end subroutine (subinbfo_tryfull) */
 
 local int subinfo_tryroot(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -279,8 +275,7 @@ local int subinfo_tryroot(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 	    sip->f_changed = true ;
 	}
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (subinfo_tryroot) */
+} /* end subroutine (subinfo_tryroot) */
 
 local int subinfo_tryother(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 	static cchar	*path = getenv(varname.path) ;
@@ -308,8 +303,7 @@ local int subinfo_tryother(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 	    }
 	} /* end if (getenv-path) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (subinfo_other) */
+} /* end subroutine (subinfo_other) */
 
 local int subinfo_tryothercheck(SI *sip,cchar *dp,int dl,
 		char *rbuf,cchar *sp,int sl) noex {
@@ -329,8 +323,7 @@ local int subinfo_tryothercheck(SI *sip,cchar *dp,int dl,
 	    } /* end if */
 	} /* end if (no-entry) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (subinfo_tryothercheck) */
+} /* end subroutine (subinfo_tryothercheck) */
 
 local int subinfo_xfile(SI *sip,cchar *name) noex {
 	int		rs ;
@@ -341,8 +334,7 @@ local int subinfo_xfile(SI *sip,cchar *name) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_xfile) */
+} /* end subroutine (subinfo_xfile) */
 
 local int subinfo_record(SI *sip,cchar *dp,int dl) noex {
 	int		rs = SR_OK ;
@@ -354,13 +346,12 @@ local int subinfo_record(SI *sip,cchar *dp,int dl) noex {
 	    rs = vecstr_add(&sip->dirs,dp,dl) ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_record) */
+} /* end subroutine (subinfo_record) */
 
 local int mkdfname(char *rbuf,cchar *dp,int dl,cchar *sp,int sl) noex {
 	int		rs ;
 	int		i = 0 ; /* return-vakue */
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    cint	rlen = rs ;
 	    if (rs >= 0) ylikely {
 	        rs = storebuf_strw(rbuf,rlen,i,dp,dl) ;
@@ -376,12 +367,10 @@ local int mkdfname(char *rbuf,cchar *dp,int dl,cchar *sp,int sl) noex {
 	    }
 	} /* end if (bufsizeget) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mkdfname) */
+} /* end subroutine (mkdfname) */
 
 local bool isOverNoEntAcc(int rs) noex {
 	return isOneOf(rsentacc,rs) ;
-}
-/* end subroutine (isOverNoEntAcc) */
+} /* end subroutine (isOverNoEntAcc) */
 
 
