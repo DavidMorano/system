@@ -529,7 +529,7 @@ int vecobj_curfetch(vecobj *op,cvoid *ep,cur *curp,c_f vcf,void **rpp) noex {
 int vecobj_search(vecobj *op,cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && ep && rpp) ylikely {
+	if (op && ep && vcf) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
 		if ((rs = vecobj_sorted(op,vcf)) > 0) {
