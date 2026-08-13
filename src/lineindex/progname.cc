@@ -138,7 +138,7 @@ const char	name[] ;
 			debugprintf("progname: fname=%s\n",fname) ;
 		lineindex_curbegin(&li,&cur) ;
 		line = 0 ;
-		while (lineindex_enum(&li,&cur,&off) >= 0) {
+		while (lineindex_curenum(&li,&cur,&off) >= 0) {
 			debugprintf("progname: line=%u off=%lu\n",
 				line,off) ;
 			line += 1 ;
