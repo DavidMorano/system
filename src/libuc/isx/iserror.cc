@@ -33,12 +33,12 @@
 	"return-status") is a part of a certain category of errors.
 
 	Synopsis:
-	extern int isFailOpen(int rs) noex
-	extern int isFailConn( rs) noex 
-	extern int isBadSend(int rs) noex 
-	extern int isBadRecv(int rs) noex 
-	extern int isBadMsg(int rs) noex 
-	extern int isIOError(int rs) noex
+	extern int isFailOpen	(int rs) noex
+	extern int isFailConn	(int rs) noex 
+	extern int isBadSend	(int rs) noex 
+	extern int isBadRecv	(int rs) noex 
+	extern int isBadMsg	(int rs) noex 
+	extern int isIOError	(int rs) noex
 
 	Arguments:
 	rs		value to check
@@ -156,33 +156,32 @@ bool isFailOpen(int rs) noex {
 	int		f = false ;
 	if (rs < 0) {
 	    f = f || isNotPresent(rs) ;
-	    f = f || isOneOf(rfailopen,rs) ;
+	    f = f || isonebad(rfailopen,rs) ;
 	}
 	return f ;
 } /* end subroutine (isFailOpen) */
 
 bool isFailConn(int rs) noex {
-	int		f = false ;
-	if (rs < 0) {
-	    f = isOneOf(rfailconn,rs) ;
-	}
-	return f ;
+	return isonebad(rfailconn,rs) ;
 } /* end subroutine (isFailConn) */
 
 bool isBadSend(int rs) noex {
-	return isOneOf(rbadsend,rs) ;
+	return isonebad(rbadsend,rs) ;
 } /* end subroutine (isBadSend) */
 
 bool isBadRecv(int rs) noex {
-	return isOneOf(rbadrecv,rs) ;
+	return isonebad(rbadrecv,rs) ;
 } /* end subroutine (isBadRecv) */
 
 bool isBadMsg(int rs) noex {
-	return isOneOf(rbadmsg,rs) ;
+	return isonebad(rbadmsg,rs) ;
 } /* end subroutine (isBadMsg) */
 
 bool isIOError(int rs) noex {
-	return isOneOf(rioerror,rs) ;
+	return isonebad(rioerror,rs) ;
 } /* end subroutine (isIOError) */
+
+
+/* local subroutines */
 
 
