@@ -176,14 +176,14 @@ int vecstr_start(vecstr *op,int vn,int vo) noex {
 	if (vn <= 1) vn = defents ;
 	assert(op) ;
 	if ((rs = vecstr_ctor(op)) >= 0) ylikely {
-	    op->n = vn ;
+	    op->vext = vn ;
 	    if ((rs = vecstr_setopts(op,vo)) >= 0) ylikely {
 	        cint	sz = (vn + 1) * szof(cchar **) ;
 	        if (void *va ; (rs = libmem.mall(sz,&va)) >= 0) ylikely {
 	            op->va = ccharpp(va) ;
 	            op->va[0] = nullptr ;
-	            op->stsz = 1 ;
-		    op->fl.stsz = true ;	/* starts off true */
+	            op->vstsz = 1 ;
+		    op->vfl.stsz = true ;	/* starts off true */
 	        } /* end if (memory-acquire) */
 	    } /* end if */
 	    if (rs < 0) {
@@ -200,7 +200,7 @@ int vecstr_finish(vecstr *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
-	        for (int i = 0 ; i < op->i ; i += 1) {
+	        for (int i = 0 ; i < op->vidx ; i += 1) {
 		    cchar	*ep = op->va[i] ;
 	            if (ep) {
 			char *bp = cast_const<charp>(ep) ;
@@ -214,9 +214,9 @@ int vecstr_finish(vecstr *op) noex {
 	            op->va = nullptr ;
 		} /* end if (memory-release) */
 	    } /* end if (populated) */
-	    op->c = 0 ;
-	    op->i = 0 ;
-	    op->n = 0 ;
+	    op->vcnt = 0 ;
+	    op->vidx = 0 ;
+	    op->vext = 0 ;
 	    {
 		rs1 = vecstr_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -232,7 +232,7 @@ int vecstr_audit(vecstr *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
-	        for (int i = 0 ; i < op->i ; i += 1) {
+	        for (int i = 0 ; i < op->vidx ; i += 1) {
 		    cchar	*ep = op->va[i] ;
 	            if (ep) {
 	                cchar	*cp = (cchar *) ep ;
@@ -240,7 +240,7 @@ int vecstr_audit(vecstr *op) noex {
 		        c += 1 ;
 	            }
 	        } /* end for */
-	        rs = (c == op->c) ? SR_OK : SR_BADFMT ;
+	        rs = (c == op->vcnt) ? SR_OK : SR_BADFMT ;
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -276,7 +276,7 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	    if ((vl < 0) || ((vp == nullptr) && (vl != 0))) {
 	        vl = (vp) ? lenstr(vp) : 0 ;
 	    }
-	    if ((op->i + 1) > op->n) {
+	    if ((op->vidx + 1) > op->vext) {
 	        rs = vecstr_extvec(op) ;
 	    }
 	    if (rs >= 0) {
@@ -287,7 +287,7 @@ int vecstr_addkeyval(vecstr *op,cchar *kp,int kl,cchar *vp,int vl) noex {
 	            *bp++ = '=' ;
 	            if (vp) bp = strwcpy(bp,vp,vl) ;
 	            *bp = '\0' ;
-	            op->stsz += sz ;
+	            op->vstsz += sz ;
 	            i = vecstr_addsp(op,ap) ;
 	        } /* end if (memory-acquire) */
 	    } /* end if (ok) */
@@ -302,14 +302,14 @@ int vecstr_insert(vecstr *op,int ii,cchar *sp,int 탎l) noex {
 	if (op) ylikely {
 	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 	        if ((rs = vecstr_validx(op,ii)) >= 0) ylikely {
-	             if ((op->i + 1) > op->n) {
+	             if ((op->vidx + 1) > op->vext) {
 	                 rs = vecstr_extvec(op) ;
 	             }
 	             if (rs >= 0) {
 	                 cint	sz = (sl + 1) ;
 	                 if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	                     strwcpy(bp,sp,sl) ;
-	                     op->stsz += sz ;
+	                     op->vstsz += sz ;
 	                     i = vecstr_insertsp(op,ii,bp) ;
 	                 } /* end if (memory-acquire) */
 	             } /* end if (OK) */
@@ -326,14 +326,14 @@ int vecstr_store(vecstr *op,cchar *sp,int 탎l,cchar **rpp) noex {
 	if (op) ylikely {
 	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
 		rs = SR_OK ;
-	        if ((op->i + 1) > op->n) {
+	        if ((op->vidx + 1) > op->vext) {
 	            rs = vecstr_extvec(op) ;
 	        }
 	        if (rs >= 0) {
 	            cint	sz = (sl + 1) ;
 	            if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
 	                char *ep = strwcpy(bp,sp,sl) ;
-	                op->stsz += intconv(ep - bp) ;
+	                op->vstsz += intconv(ep - bp) ;
 	                i = vecstr_addsp(op,bp) ;
 		        if (rpp) *rpp = bp ;
 	            } /* end if (m-a) */
@@ -370,8 +370,8 @@ int vecstr_getlast(vecstr *op,cchar **spp) noex {
 	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
-	    if (op->va && (op->c > 0)) {
-	        i = (op->i-1) ;
+	    if (op->va && (op->vcnt > 0)) {
+	        i = (op->vidx-1) ;
 	        while ((i >= 0) && (op->va[i] == nullptr)) {
 		    i -= 1 ;
 	        } /* end while */
@@ -394,55 +394,55 @@ int vecstr_del(vecstr *op,int i) noex {
 		if ((rs = vecstr_validx(op,i)) >= 0) ylikely {
 		    bool	f_fi = false ;
 	            if (op->va[i] != nullptr) {
-	                op->c -= 1 ;		/* decrement list count */
-	                if (op->fl.stsz) {
-	                    op->stsz -= (lenstr(op->va[i]) + 1) ;
+	                op->vcnt -= 1 ;		/* decrement list count */
+	                if (op->vfl.stsz) {
+	                    op->vstsz -= (lenstr(op->va[i]) + 1) ;
 	                }
 			char *bp = cast_const<charp>(op->va[i]) ;
 	    		libmem.free(bp) ;
 		    } /* end if (freeing the actual string data) */
-		    if (op->fl.ostationary) {
+		    if (op->vfl.ostationary) {
 	    	        op->va[i] = nullptr ;
-	    	        if (i == (op->i - 1)) op->i -= 1 ;
+	    	        if (i == (op->vidx - 1)) op->vidx -= 1 ;
 	    	        f_fi = true ;
-		    } else if (op->fl.issorted || op->fl.oordered) {
-	                if (op->fl.ocompact) {
-	                    op->i -= 1 ;
-	                    for (int j = i ; j < op->i ; j += 1) {
+		    } else if (op->vfl.issorted || op->vfl.oordered) {
+	                if (op->vfl.ocompact) {
+	                    op->vidx -= 1 ;
+	                    for (int j = i ; j < op->vidx ; j += 1) {
 	                        op->va[j] = op->va[j + 1] ;
 		            }
-	                    op->va[op->i] = nullptr ;
+	                    op->va[op->vidx] = nullptr ;
 	                } else {
 	                    op->va[i] = nullptr ;
-	                    if (i == (op->i - 1)) op->i -= 1 ;
+	                    if (i == (op->vidx - 1)) op->vidx -= 1 ;
 	                    f_fi = true ;
 	                } /* end if */
 	            } else {
-			bool	f = (op->fl.oswap || op->fl.ocompact) ;
-			f = f && (i < (op->i - 1)) ;
+			bool	f = (op->vfl.oswap || op->vfl.ocompact) ;
+			f = f && (i < (op->vidx - 1)) ;
 			if (f) {
-	                    op->va[i] = op->va[op->i - 1] ;
-	                    op->va[--op->i] = nullptr ;
-	                    op->fl.issorted = false ;
+	                    op->va[i] = op->va[op->vidx - 1] ;
+	                    op->va[--op->vidx] = nullptr ;
+	                    op->vfl.issorted = false ;
 	                } else {
 	                    op->va[i] = nullptr ;
-	                    if (i == (op->i - 1)) op->i -= 1 ;
+	                    if (i == (op->vidx - 1)) op->vidx -= 1 ;
 	                    f_fi = true ;
 	                } /* end if */
 	            } /* end if */
-	            if (op->fl.oconserve) {
-	                while (op->i > i) {
-	                    if (op->va[op->i - 1] != nullptr) break ;
-	                    op->i -= 1 ;
+	            if (op->vfl.oconserve) {
+	                while (op->vidx > i) {
+	                    if (op->va[op->vidx - 1] != nullptr) break ;
+	                    op->vidx -= 1 ;
 	                } /* end while */
 	            } /* end if */
-	            if (f_fi && (i < op->fi)) op->fi = i ;
+	            if (f_fi && (i < op->vfidx)) op->vfidx = i ;
 		} else if (rs == SR_NOTFOUND) {
 		    rs = vecstr_delall(op) ;
 	        } /* end if (valid index) */
-		op->fl.stsz = false ;
-		op->stsz = 0 ;
-		c = op->c ;
+		op->vfl.stsz = false ;
+		op->vstsz = 0 ;
+		c = op->vcnt ;
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -455,18 +455,18 @@ int vecstr_delall(vecstr *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
-	        for (int i = 0 ; i < op->i ; i += 1) {
+	        for (int i = 0 ; i < op->vidx ; i += 1) {
 	            if (op->va[i] != nullptr) {
 			char *bp = cast_const<charp>(op->va[i]) ;
 		        rs1 = libmem.free(bp) ;
 		        if (rs >= 0) rs = rs1 ;
 	            }
 	        } /* end for */
-	        op->i = 0 ;
-	        op->fi = 0 ;
+	        op->vidx = 0 ;
+	        op->vfidx = 0 ;
 	        op->va[0] = nullptr ;
-	        op->c = 0 ;
-	        op->stsz = 1 ;
+	        op->vcnt = 0 ;
+	        op->vstsz = 1 ;
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
@@ -476,7 +476,7 @@ int vecstr_count(vecstr *op) noex {
 	int	rs = SR_FAULT ;
 	assert(op) ;
 	if (op) ylikely {
-	    rs = op->c ;
+	    rs = op->vcnt ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (vecstr_count) */
@@ -489,11 +489,11 @@ int vecstr_sort(vecstr *op,vecstr_vcmp vcf) noex {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
 	        if (vcf == nullptr) vcf = vstrcmp ;
-	        if ((! op->fl.issorted) && (op->c > 1)) {
-		    c = op->c ;
+	        if ((! op->vfl.issorted) && (op->vcnt > 1)) {
+		    c = op->vcnt ;
 		    vecstr_arrsort(op,vcf) ;
 	        } /* end if (sorting) */
-	        op->fl.issorted = true ;
+	        op->vfl.issorted = true ;
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -508,14 +508,14 @@ int vecstr_search(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 		int	i = 0 ;
 	        cchar	**spp{} ;
 	        if (vcf == nullptr) vcf = vstrcmp ;
-	        if (op->fl.osorted && (! op->fl.issorted)) {
-	            op->fl.issorted = true ;
-	            if (op->c > 1) {
+	        if (op->vfl.osorted && (! op->vfl.issorted)) {
+	            op->vfl.issorted = true ;
+	            if (op->vcnt > 1) {
 		        vecstr_arrsort(op,vcf) ;
 	            }
 	        } /* end if (sorting) */
-	        if (op->fl.issorted) {
-		    csize	alen = size_t(op->i) ;
+	        if (op->vfl.issorted) {
+		    csize	alen = size_t(op->vidx) ;
 	            csize	esize = sizeof(char *) ;
 	            qsort_f	scf = qsort_f(vcf) ;
 	            spp = (cchar **) bsearch(&sp,op->va,alen,esize,scf) ;
@@ -525,13 +525,13 @@ int vecstr_search(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	                rs = i ;
 	            }
 	        } else {
-	            for (i = 0 ; i < op->i ; i += 1) {
+	            for (i = 0 ; i < op->vidx ; i += 1) {
 	                spp = (op->va + i) ;
 	                if (*spp) {
 	                    if ((*vcf)(&sp,spp) == 0) break ;
 		        }
 	            } /* end for */
-		    if (i < op->i) rs = i ;
+		    if (i < op->vidx) rs = i ;
 	        } /* end if (sorted or not) */
 	        if (rpp) {
 	            *rpp = (rs >= 0) ? op->va[i] : nullptr ;
@@ -572,12 +572,12 @@ int vecstr_finder(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	    if (vcf == nullptr) vcf = vstrcmp ;
 	    if (op->va) ylikely {
 		int	i ; /* used-afterwards */
-	        for (i = 0 ; i < op->i ; i += 1) {
+	        for (i = 0 ; i < op->vidx ; i += 1) {
 	            if (op->va[i]) {
 	                if ((*vcf)(&sp,(op->va + i)) == 0) break ;
 	            }
 	        } /* end for */
-	        if (i < op->i) rs = i ;
+	        if (i < op->vidx) rs = i ;
 	        if (rpp) {
 	            *rpp = (rs >= 0) ? op->va[i] : nullptr ;
 	        }
@@ -594,13 +594,13 @@ int vecstr_find(vecstr *op,cchar *sp) noex {
 	    if (op->va) ylikely {
 		cint	sch = sp[0] ; /* ok: since all get promoted similarly */
 		int	i ; /* used-afterwards */
-	        for (i = 0 ; i < op->i ; i += 1) {
+	        for (i = 0 ; i < op->vidx ; i += 1) {
 	            cchar	*ep = op->va[i] ;
 	            if (ep) {
 	                if ((sch == ep[0]) && (strcmp(sp,ep) == 0)) break ;
 		    }
 	        } /* end for */
-	        if (i < op->i) rs = i ;
+	        if (i < op->vidx) rs = i ;
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return rs ;
@@ -615,14 +615,14 @@ int vecstr_findn(vecstr *op,cchar *sp,int 탎l) noex {
 	        if (op->va) ylikely {
 	            cint	sch = sp[0] ; /* ok: all promoted similarly */
 	    	    int	i{} ;		/* <- used-afterwards */
-	            for (i = 0 ; i < op->i ; i += 1) {
+	            for (i = 0 ; i < op->vidx ; i += 1) {
 	                cchar	*ep = op->va[i] ;
 	                if (ep && (sch == ep[0])) {
 		            cint	m = nleadstr(ep,sp,sl) ;
 		            if ((m == sl) && (ep[m] == '\0')) break ;
 		        }
 	            } /* end for */
-	            if (i < op->i) rs = i ;
+	            if (i < op->vidx) rs = i ;
 	        } /* end if (populated) */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
@@ -635,7 +635,7 @@ int vecstr_findaddr(vecstr *op,cchar *addr) noex {
 	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
 	    if (op->va) ylikely {
-	        for (int i = 0 ; i < op->i ; i += 1) {
+	        for (int i = 0 ; i < op->vidx ; i += 1) {
 	            cchar	*ep = op->va[i] ;
 	            if (ep && (addr == ep)) {
 		        rs = i ;
@@ -653,7 +653,7 @@ int vecstr_getvec(vecstr *op,mainv *rppp) noex {
 	if (op && rppp) ylikely {
 	    if ((rs = vecstr_extvec(op)) >= 0) ylikely {
 	        if (op->va) ylikely {
-		    rs = op->c ;
+		    rs = op->vcnt ;
 		    *rppp = mainv(op->va) ;
 		}
 	    }
@@ -668,17 +668,17 @@ int vecstr_strsize(vecstr *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
-	        if (! op->fl.stsz) {
-	            for (int i = 0 ; i < op->i ; i += 1) {
+	        if (! op->vfl.stsz) {
+	            for (int i = 0 ; i < op->vidx ; i += 1) {
 			cchar	*ep = op->va[i] ;
 	                if (ep) {
 	                    stsz += (lenstr(ep) + 1) ;
 		        }
 	            } /* end for */
-	            op->stsz = stsz ;
-	            op->fl.stsz = true ;
+	            op->vstsz = stsz ;
+	            op->vfl.stsz = true ;
 	        } /* end if (calculating size) */
-	        stsz = iceil(op->stsz,szof(int)) ;
+	        stsz = iceil(op->vstsz,szof(int)) ;
 	    } /* end if (populated) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? stsz : rs ;
@@ -689,7 +689,7 @@ int vecstr_strmk(vecstr *op,char *tab,int tabs) noex {
 	int		c = 0 ;
 	assert(op) ;
 	if (op && tab) ylikely {
-	    cint 	stsz = iceil(op->stsz,resz) ;
+	    cint 	stsz = iceil(op->vstsz,resz) ;
 	    rs = SR_OVERFLOW ;
 	    if (tabs >= stsz) {
 	        char	*bp = tab ;
@@ -697,7 +697,7 @@ int vecstr_strmk(vecstr *op,char *tab,int tabs) noex {
 	        *bp++ = '\0' ;	/* <- no chunks: do it ourselves */
 		c += 1 ;	/* and count it */
 	    	if (op->va) {
-	            for (int i = 0 ; i < op->i ; i += 1) {
+	            for (int i = 0 ; i < op->vidx ; i += 1) {
 			cchar	*ep = op->va[i] ;
 	                if (ep) {
 	    	            c += 1 ;
@@ -720,7 +720,7 @@ int vecstr_recsize(vecstr *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
-	        rsz += (op->c * resz) ;
+	        rsz += (op->vcnt * resz) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rsz : rs ;
@@ -730,7 +730,7 @@ int vecstr_cksize(vecstr *op) noex {
 	int		rs = SR_FAULT ;
 	assert(op) ;
 	if (op) ylikely {
-	    if ((rs = op->stsz) == 0) {
+	    if ((rs = op->vstsz) == 0) {
 	        rs = vecstr_strsize(op) ;
 	    }
 	} /* end if (non-null) */
@@ -742,7 +742,7 @@ int vecstr_recmk(vecstr *op,int *rec,int recs) noex {
 	int		c = 0 ;
 	assert(op) ;
 	if (op && rec) ylikely {
-	    cint	rsz = ((op->c + 2) * resz) ;
+	    cint	rsz = ((op->vcnt + 2) * resz) ;
 	    rs = SR_OVERFLOW ;
 	    if (recs >= rsz) ylikely {
 	        int	si = 0 ;
@@ -750,7 +750,7 @@ int vecstr_recmk(vecstr *op,int *rec,int recs) noex {
 	        rec[c++] = si ;		/* <- zeroth entry is zero */
 	        si += 1 ;
 		if (op->va) {
-	            for (int i = 0 ; i < op->i ; i += 1) {
+	            for (int i = 0 ; i < op->vidx ; i += 1) {
 			cchar	*ep = op->va[i] ;
 	                if (ep) {
 	                    rec[c++] = si ;
@@ -770,19 +770,19 @@ int vecstr_recmkstr(vecstr *op,int *rec,int recs,char *tab,int tabs) noex {
 	assert(op) ;
 	if (op && rec && tab) ylikely {
 	    rs = SR_OK ;
-	    if (op->stsz == 0) {
+	    if (op->vstsz == 0) {
 		rs = vecstr_strsize(op) ;
 	    }
 	    if (rs >= 0) ylikely {
-		cint 	stsz = iceil(op->stsz,resz) ;
+		cint 	stsz = iceil(op->vstsz,resz) ;
 		rs = SR_OVERFLOW ;
 	        if (tabs >= stsz) ylikely {
-	            cint	rsz = ((op->c + 2) * resz) ;
+	            cint	rsz = ((op->vcnt + 2) * resz) ;
 	            if (recs >= rsz) {
 	    		char	*bp = tab ;
 	    		rec[c++] = 0 ;		/* <- zeroth entry is zero */
 	    		*bp++ = '\0' ;
-	                    for (int i = 0 ; i < op->i ; i += 1) {
+	                    for (int i = 0 ; i < op->vidx ; i += 1) {
 				cchar	*ep = op->va[i] ;
 	                        if (ep) {
 	                            rec[c++] = intconv(bp - tab) ;
@@ -803,15 +803,15 @@ int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	assert(op) ;
 	if (op && av && tab) ylikely {
 	    if ((rs = op->cksize) >= 0) ylikely {
-		int	sz = iceil(op->stsz,szof(int)) ;
+		int	sz = iceil(op->vstsz,szof(int)) ;
 		rs = SR_OVERFLOW ;
 	        if (tabs >= sz) ylikely {
-	            sz = (op->c + 1) * szof(int) ;
+	            sz = (op->vcnt + 1) * szof(int) ;
 	            if (avs >= sz) {
 		        char	*bp = tab ;
 		        rs = SR_OK ;
 	                *bp++ = '\0' ;
-	                for (int i = 0 ; i < op->i ; i += 1) {
+	                for (int i = 0 ; i < op->vidx ; i += 1) {
 		            cchar	*ep = op->va[i] ;
 	                    if (ep) {
 	                        av[c++] = bp ;
@@ -845,11 +845,11 @@ local int vecstr_ctor(vecstr *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->va = nullptr ;
-	    op->c = 0 ;
-	    op->i = 0 ;
-	    op->n = 0 ;
-	    op->fi = 0 ;
-	    op->stsz = 0 ;
+	    op->vcnt = 0 ;
+	    op->vidx = 0 ;
+	    op->vext = 0 ;
+	    op->vfidx = 0 ;
+	    op->vstsz = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (vecstr_ctor) */
@@ -879,21 +879,21 @@ local int vecstr_setopts(vecstr *op,int vo) noex {
 	int		rs = SR_INVALID ;
 	if ((vo & (compl optmask)) == 0) ylikely {
 	    rs = SR_OK ;
-	    op->fl = {} ;
-	    if (vo & vecstrm.reuse)		op->fl.oreuse		= true ;
-	    if (vo & vecstrm.swap)		op->fl.oswap		= true ;
-	    if (vo & vecstrm.stationary)	op->fl.ostationary	= true ;
-	    if (vo & vecstrm.compact)		op->fl.ocompact		= true ;
-	    if (vo & vecstrm.sorted)		op->fl.osorted		= true ;
-	    if (vo & vecstrm.ordered)		op->fl.oordered		= true ;
-	    if (vo & vecstrm.conserve)		op->fl.oconserve	= true ;
+	    op->vfl = {} ;
+	    if (vo & vecstrm.reuse)		op->vfl.oreuse		= true ;
+	    if (vo & vecstrm.swap)		op->vfl.oswap		= true ;
+	    if (vo & vecstrm.stationary)	op->vfl.ostationary	= true ;
+	    if (vo & vecstrm.compact)		op->vfl.ocompact		= true ;
+	    if (vo & vecstrm.sorted)		op->vfl.osorted		= true ;
+	    if (vo & vecstrm.ordered)		op->vfl.oordered		= true ;
+	    if (vo & vecstrm.conserve)		op->vfl.oconserve	= true ;
 	} /* end if (valid options) */
 	return rs ;
 } /* end subroutine (vecstr_setopts) */
 
 local int vecstr_extvec(vecstr *op,int n) noex {
 	int		rs = SR_OK ;
-	if ((op->i + 1) > op->n) {
+	if ((op->vidx + 1) > op->vext) {
 	    int		nn ;
 	    int		sz ;
 	    void	*na{} ;
@@ -902,14 +902,14 @@ local int vecstr_extvec(vecstr *op,int n) noex {
 	        sz = (nn + 1) * szof(char **) ;
 	        rs = libmem.mall(sz,&na) ;
 	    } else {
-	        nn = (op->n + 1) * 2 ;
+	        nn = (op->vext + 1) * 2 ;
 	        sz = (nn + 1) * szof(char **) ;
 	        rs = libmem.rall(op->va,sz,&na) ;
 	    } /* end if */
 	    if (rs >= 0) {
 	        op->va = (cchar **) na ;
-		op->va[op->i] = nullptr ;
-	        op->n = nn ;
+		op->va[op->vidx] = nullptr ;
+	        op->vext = nn ;
 	    } /* end if (ok) */
 	} /* end if (extension needed) */
 	return rs ;
@@ -917,59 +917,59 @@ local int vecstr_extvec(vecstr *op,int n) noex {
 
 local int vecstr_addsp(vecstr *op,cchar *sp) noex {
 	int		i = 0 ;
-	cbool		f = op->fl.oreuse || op->fl.oconserve ;
+	cbool		f = op->vfl.oreuse || op->vfl.oconserve ;
 	bool		f_done = false ;
-	if (f && (op->c < op->i)) {
-	    i = op->fi ;
-	    while ((i < op->i) && (op->va[i] != nullptr)) {
+	if (f && (op->vcnt < op->vidx)) {
+	    i = op->vfidx ;
+	    while ((i < op->vidx) && (op->va[i] != nullptr)) {
 	        i += 1 ;
 	    }
-	    op->fi = i + 1 ;
-	    if (i < op->i) {
+	    op->vfidx = i + 1 ;
+	    if (i < op->vidx) {
 	        op->va[i] = (char *) sp ;
 	        f_done = true ;
 	    }
 	} /* end if (reuse or conserve) */
 	if (! f_done) {
-	    i = op->i ;
-	    op->va[op->i++] = sp ;
-	    op->va[op->i] = nullptr ;
+	    i = op->vidx ;
+	    op->va[op->vidx++] = sp ;
+	    op->va[op->vidx] = nullptr ;
 	} /* end if */
-	op->c += 1 ;
-	op->fl.issorted = false ;
+	op->vcnt += 1 ;
+	op->vfl.issorted = false ;
 	return i ;
 } /* end subroutine (vecstr_addsp) */
 
 local int vecstr_insertsp(vecstr *op,int ii,cchar *sp) noex {
-	if (ii == op->i) {
-	    op->i += 1 ;
-	    op->va[op->i] = nullptr ;
+	if (ii == op->vidx) {
+	    op->vidx += 1 ;
+	    op->va[op->vidx] = nullptr ;
 	} else if (op->va[ii] != nullptr) {
 	    int		i ;
-	    for (i = (ii + 1) ; i < op->i ; i += 1) {
+	    for (i = (ii + 1) ; i < op->vidx ; i += 1) {
 		if (op->va[i] == nullptr) break ;
 	    }
-	    if (i == op->i) {
-	        op->i += 1 ;
-	        op->va[op->i] = nullptr ;
+	    if (i == op->vidx) {
+	        op->vidx += 1 ;
+	        op->va[op->vidx] = nullptr ;
 	    }
 	    for (int j = i ; j > ii ; j -= 1) {
 		op->va[j] = op->va[j-1] ;
 	    }
 	} /* end if */
 	op->va[ii] = sp ;
-	op->c += 1 ;
-	op->fl.issorted = false ;
+	op->vcnt += 1 ;
+	op->vfl.issorted = false ;
 	return ii ;
 } /* end subroutine (vecstr_insertsp) */
 
 local int vecstr_validx(vecstr *op,int i) noex {
-	return ((i >= 0) && (i < op->i)) ? SR_OK : SR_NOTFOUND ;
+	return ((i >= 0) && (i < op->vidx)) ? SR_OK : SR_NOTFOUND ;
 } /* end subroutine (vecstr_validx) */
 
 local void vecstr_arrsort(vecstr *op,vecstr_vcmp vcf) noex {
 	cchar	**va = op->va ;
-	csize	alen = size_t(op->i) ;
+	csize	alen = size_t(op->vidx) ;
 	csize	esize = sizeof(char *) ;
 	qsort_f	scf = qsort_f(vcf) ;
 	qsort(va,alen,esize,scf) ;
@@ -1072,8 +1072,8 @@ void vecstr::dtor() noex {
 
 vecstr::operator int () noex {
     	int		rs = SR_NOTOPEN ;
-	if (n >= 0) {
-	    rs = c ;
+	if (vext >= 0) {
+	    rs = vcnt ;
 	}
 	return rs ;
 } /* end method (vecstr::operator) */
