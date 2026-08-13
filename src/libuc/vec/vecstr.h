@@ -98,18 +98,18 @@ struct vecstr_flags {
 
 struct vecstr_head {
 	cchar		**va ;
-	VECSTR_FL	fl ;
-	int		c ;		/* count of items in list */
-	int		i ;		/* overlast index */
-	int		n ;		/* current extent of array */
-	int		fi ;		/* free index */
-	int		stsz ;		/* total string-table length */
+	VECSTR_FL	vfl ;
+	int		vcnt ;		/* count of items in list */
+	int		vidx ;		/* overlast index */
+	int		vext ;		/* current extent of array */
+	int		vfidx ;		/* free index */
+	int		vstsz ;		/* total string-table length */
 } ; /* end struct (vecstr_head) */
 
 EXTERNC_begin
 
-typedef int (*vecstr_vcmp)(cchar **,cchar **) noex ;
-typedef int (*vecstr_f)(cchar **,cchar **) noex ;
+typedef int (*vecstr_vcmp)	(cchar **,cchar **) noex ;
+typedef int (*vecstr_f)		(cchar **,cchar **) noex ;
 
 EXTERNC_end
 
@@ -246,11 +246,11 @@ struct vecstr : vecstr_head {
 	int addpathclean	(cchar *,int) noex ;
 	operator int () noex ;
 	vecstr_iter begin() noex {
-	    vecstr_iter		it(va,0,i) ;
+	    vecstr_iter		it(va,0,vidx) ;
 	    return it ;
 	} ;
 	vecstr_iter end() noex {
-	    vecstr_iter		it(va,i,i) ;
+	    vecstr_iter		it(va,vidx,vidx) ;
 	    return it ;
 	} ;
 	void dtor() noex ;
