@@ -136,30 +136,30 @@ constexpr int	rnosupport[] = {
 /* exported subroutines */
 
 bool isNotPresent(int rs) noex {
-	return isOneOf(npresent,rs) ;
+	return isonebad(npresent,rs) ;
 } /* end subroutine (isNotPresent) */
 
 bool isNotAccess(int rs) noex {
 	int		f = false ;
-	f = f || isOneOf(naccess,rs) ;
-	f = f || isOneOf(npresent,rs) ;
+	f = f || isonebad(naccess,rs) ;
+	f = f || isonebad(npresent,rs) ;
 	return f ;
 } /* end subroutine (isNotAccess) */
 
 bool isNotValid(int rs) noex {
-	return isOneOf(nvalid,rs) ;
+	return isonebad(nvalid,rs) ;
 } /* end subroutine (isNotValid) */
 
 bool isNotLib(int rs) noex {
-	return isOneOf(nlib,rs) ;
+	return isonebad(nlib,rs) ;
 } /* end subroutine (isNotLib) */
 
 bool isNotTerm(int rs) noex {
-	return isOneOf(rnoterm,rs) ;
+	return isonebad(rnoterm,rs) ;
 }
 
 bool isNotSupport(int rs) noex {
-	return isOneOf(rnosupport,rs) ;
+	return isonebad(rnosupport,rs) ;
 }
 
 
