@@ -5,6 +5,7 @@
 /* environment variables definitions */
 /* version %I% last-modified %G% */
 
+
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
@@ -111,6 +112,10 @@
 #define	VARVPATH	"VPATH"
 #endif
 
+#ifndef	VARPREXTRA
+#define	VARPREXTRA	"EXTRA"
+#endif
+
 #ifndef	VARPRUSRLOCAL
 #define	VARPRUSRLOCAL	"USRLOCAL"
 #endif
@@ -119,12 +124,32 @@
 #define	VARPRLOCAL	"LOCAL"
 #endif
 
+#ifndef	VARPRGNU
+#define	VARPRGNU	"GNU"
+#endif
+
 #ifndef	VARPRNCMP
 #define	VARPRNCMP	"NCMP"
 #endif
 
 #ifndef	VARPRPCS
 #define	VARPRPCS	"PCS"
+#endif
+
+#ifndef	VARPRAST
+#define	VARPRAST	"AST"
+#endif
+
+#ifndef	VARPRTOOLS
+#define	VARPRTOOLS	"TOOLS"
+#endif
+
+#ifndef	VARPRXDIR
+#define	VARPRXDIR	"XDIR"
+#endif
+
+#ifndef	VARPRDWB
+#define	VARPRDWB	"DWB"
 #endif
 
 #ifndef	VARDISPLAY
