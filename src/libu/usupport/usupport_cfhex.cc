@@ -87,7 +87,7 @@ namespace libu {
 	    v = cfx(str,&endp,b) ;
 	    if (rp) *rp = v ;
 	    if (errno) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    } else {
 		rs = intsat(v) ;
 	    }
