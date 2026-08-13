@@ -111,8 +111,8 @@ namespace {
 	int		elen ;
 	geter(cc *p,vecstr *s,cc *n) noex : pr(p), nn(n), slp(s) { } ;
 	operator int () noex ;
-	int ndb() noex ;
-	int cdb() noex ;
+	int ndb		() noex ;
+	int cdb		() noex ;
     } ; /* end struct (geter) */
 } /* end namespace */
 
@@ -133,10 +133,10 @@ static vars		var ;
 int getclusters(cchar *pr,vecstr *slp,cchar *nn) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (pr && slp && nn) {
+	if (pr && slp && nn) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0] && nn[0]) {
-		if (static cint rsv = var ; (rs = rsv) >= 0) {
+	    if (pr[0] && nn[0]) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		    geter go(pr,slp,nn) ;
 		    rs = go ;
 		    c = rs ;
@@ -154,14 +154,14 @@ geter::operator int () noex {
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (caddr_t p ; (rs = lm_mall(sz,&p)) >= 0) {
+	if (caddr_t p ; (rs = lm_mall(sz,&p)) >= 0) ylikely {
 	    tlen = var.maxpathlen ;
 	    tbuf = p ;
 	    elen = var.elen ;
 	    ebuf = (p + (var.maxpathlen + 1)) ;
-	    if ((rs = ndb()) >= 0) {
+	    if ((rs = ndb()) >= 0) ylikely {
 		c += rs ;
-		if ((rs = cdb()) >= 0) {
+		if ((rs = cdb()) >= 0) ylikely {
 		    c += rs ;
 		}
 	    }
@@ -175,8 +175,8 @@ int geter::ndb() noex {
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = mkpath(tbuf,pr,NODEFNAME)) >= 0) {
-	    if (nodedb st ; (rs = nodedb_open(&st,tbuf)) >= 0) {
+	if ((rs = mkpath(tbuf,pr,NODEFNAME)) >= 0) ylikely {
+	    if (nodedb st ; (rs = nodedb_open(&st,tbuf)) >= 0) ylikely {
 	        if (nodedb_cur cur ; (rs = nodedb_curbegin(&st,&cur)) >= 0) {
 	    	    nodedb_ent	ste ;
 		    cint	rsn = SR_NOTFOUND ;
@@ -209,7 +209,7 @@ int geter::cdb() noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = mkpath(tbuf,pr,CLUSTERFNAME)) >= 0) {
+	if ((rs = mkpath(tbuf,pr,CLUSTERFNAME)) >= 0) ylikely {
 	    if (clusterdb clu ; (rs = clusterdb_open(&clu,tbuf)) >= 0) {
 	        if (cdb_cur cur{} ; (rs = clusterdb_curbegin(&clu,&cur)) >= 0) {
 		    cint	rsn = SR_NOTFOUND ;
@@ -217,7 +217,7 @@ int geter::cdb() noex {
 	                rs1 = clusterdb_curfetchrev(&clu,nn,&cur,ebuf,elen) ;
 	                if (rs1 == rsn) break ;
 			rs = rs1 ;
-			if (rs >= 0) {
+			if (rs >= 0) ylikely {
 	            	    if ((rs = slp->find(ebuf)) == rsn) {
 	                	c += 1 ;
 	                	rs = slp->add(ebuf) ;
@@ -238,9 +238,9 @@ int geter::cdb() noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
-	    if ((rs = bufsizeget(bufsize_nn)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_nn)) >= 0) ylikely {
 		nodenamelen = rs ;
 		elen = (rs * EBUFMULT) ;
 	    }
