@@ -117,6 +117,8 @@ local int prqotd_maints(cchar *,int,int,int,time_t) noex ;
 
 /* local variables */
 
+cbool		f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -142,8 +144,7 @@ int prqotd_maint(cchar *pr,int mjd,int of,int to) noex {
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (prqotd_maint) */
+} /* end subroutine (prqotd_maint) */
 
 
 /* local subroutines */
