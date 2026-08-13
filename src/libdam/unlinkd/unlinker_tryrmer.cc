@@ -59,6 +59,7 @@
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
 #include	<getnodename.h>		/* LIBUC */
+#include	<getprogpath.h>		/* LIBUC */
 #include	<spawnproc.h>		/* LIBUC */
 #include	<mkpath.h>		/* LIBUC */
 #include	<mkpr.h>		/* LIBUC */
@@ -102,10 +103,6 @@ using libuc::mem ;		/* variable */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	pcsgetprogpath(cchar *,char *,cchar *,int) noex ;
-}
 
 
 /* external variables */
