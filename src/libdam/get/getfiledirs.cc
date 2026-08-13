@@ -68,6 +68,9 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<getpwd.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<permx.h>		/* LIBUC */
@@ -93,10 +96,6 @@ import sif ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
 
 
 /* external variables */
@@ -128,8 +127,8 @@ namespace {
 	operator int () noex ;
 	int tryabs	() noex ;
 	int tryrel	() noex ;
-	int checkfile	(int) noex ;
 	int trypath	() noex ;
+	int checkfile	(int) noex ;
 	int checks	(cc *,int) noex ;
 	int checker	(cc *,int) noex ;
 	int checkname	(bool,int) noex ;
@@ -161,10 +160,10 @@ static strlibval	defpath(strlibval_path) ;
 int getfiledirs(cc *path,cc *fname,cc *modestr,vecstr *dlp) noex {
     	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (fname && dlp) {
+	if (fname && dlp) ylikely {
 	    cint	am = getmode(modestr) ;
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 		if (getter go(path,fname,am,dlp) ; (rs = go) >= 0) {
 		    c = rs ;
 		}
@@ -241,7 +240,7 @@ int getter::checkfile(int pl) noex {
 		rs = dlp->adduniq(cp,cl) ;
 		c += (rs < INT_MAX) ;
 	    }
-	}
+	} /* end if (checkname) */
 	return (rs >= 0) ? c : rs ;
 } /* end method (getter::checkfile) */
 
@@ -283,8 +282,8 @@ int getter::checker(cc *dp,int dl) noex {
 		        rs = checkname(ty,am) ;
 			c = rs ;
 		    }
-		}
-	    }
+		} /* end if (checkname) */
+	    } /* end if (mkpath) */
 	} else if (! fpwd) {
 	    dlen = 0 ;
 	    if ((rs = mknpath(pbuf,plen,fname)) >= 0) ylikely {
@@ -294,19 +293,19 @@ int getter::checker(cc *dp,int dl) noex {
 	    	    fpwd = true ;
 		    rs = getpwd(pbuf,plen) ;
 		    dlen = rs ;
-		}
-	    }
-	}
+		} /* end if (checkname) */
+	    } /* end if (mkpath) */
+	} /* end if */
 	return (rs >= 0) ? c : rs ;
 } /* end method (getter::checker) */
 
-int getter::checkname(bool fdir,int um) noex {
+int getter::checkname(bool fdir,int fam) noex {
     	int		rs ;
 	int		c = 0 ;
 	if (ustat sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
 	    cmode	pm = sb.st_mode ;
 	    if ((fdir && S_ISDIR(pm)) || ((!fdir) && S_ISREG(pm))) {
-	        if ((rs = permid(&id,&sb,um)) >= 0) {
+	        if ((rs = permid(&id,&sb,fam)) >= 0) {
 	            c = 1 ;
 	        } else if (isNotAccess(rs)) {
 		    rs = SR_OK ;
