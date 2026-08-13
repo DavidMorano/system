@@ -244,7 +244,7 @@ int		fd ;
 SOCKADDRESS	*sap ;
 int		sal ;
 {
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 	int		rs ;
 	int		c = 0 ;
 	cchar		*pn = pip->progname ;
@@ -256,7 +256,7 @@ int		sal ;
 	    cchar	*kp ;
 
 	    while (rs >= 0) {
-	        kl = keyopt_enumkeys(&pip->cmds,&kcur,&kp) ;
+	        kl = keyopt_curenumkeys(&pip->cmds,&kcur,&kp) ;
 	        if (kl == SR_NOTFOUND) break ;
 	        if (kl == 0) continue ;
 
