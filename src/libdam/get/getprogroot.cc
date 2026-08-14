@@ -63,16 +63,17 @@
 #include	<getpwd.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
 #include	<dirseen.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<strx.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<mkpathxw.h>		/* LIBUC */
 #include	<mkpr.h>		/* LIBUC */
 #include	<permx.h>		/* LIBUC */
-#include	<sfx.h>			/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
@@ -120,7 +121,7 @@ namespace {
 	    namp = nullptr ;
 	    naml = 0 ;
 	    f_dirs = false ;
-	} ;
+	} ; /* end ctor */
 	int operator () (cchar *nap,int nal) noex ;
 	int start	() noex ;
 	int trypr	(cchar *,int) noex ;
@@ -165,13 +166,9 @@ int getprogroot(char *rbuf,cc *pr,con mainv prns,cc *namep) noex {
 	int		rl = 0 ; /* return-value */
 	DPRINTF("ent pn=%s\n",namep) ;
 	if (rbuf && namep) ylikely {
+	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
-	    if (namep[0]) ylikely {
-	        int	namel = lenstr(namep) ;
-	        rbuf[0] = '\0' ;
-	        while ((namel > 0) && (namep[namel - 1] == '/')) {
-	            namel -= 1 ;
-	        } /* end while */
+	    if (int namel = rmslashes(namep) ; namel > 0) ylikely {
 		if (subinfo so(rbuf,pr,prns) ; (rs = so(namep,namel)) >= 0) {
 		    rl = rs ;
 		} /* end if (subinfo) */
@@ -426,7 +423,7 @@ int subinfo::dirstat(ustat *sbp,cc *dirp,int dirl) noex {
 	    if ((rs = u_stat(dnp,sbp)) >= 0) {
 		DPRINTF("stat 1 rs=%d\n",rs) ;
 	        if (S_ISDIR(sbp->st_mode)) {
-	            if ((rs = permid(&id,sbp,X_OK)) >= 0) {
+	            if ((rs = permids(&id,sbp,X_OK)) >= 0) {
 		        rl = dl ;
 		    } else if (isNotAccess(rs)) {
 		        rs = SR_OK ;
@@ -449,7 +446,7 @@ int subinfo::xfile(cc *name) noex {
 	int		fok = false ; /* return-value */
 	if (ustat sb ; (rs = u_stat(name,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
-	        if ((rs = permid(&id,&sb,X_OK)) >= 0) {
+	        if ((rs = permids(&id,&sb,X_OK)) >= 0) {
 		    fok = true ;
 		} else if (isNotAccess(rs)) {
 		    rs = SR_OK ;
