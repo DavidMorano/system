@@ -21,13 +21,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<var.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<var.h>			/* LIBUC */
 
 
 #define	PCSCONFS		struct pcsconfs_head
@@ -76,8 +73,9 @@ EXTERNC_begin
 extern int pcsconfs_start(pcsconfs *,cchar *,mainv,cchar *) noex ;
 extern int pcsconfs_curbegin(pcsconfs *,pcsconfs_cur *) noex ;
 extern int pcsconfs_fetch(pcsconfs *, cchar *,int,pcsconfs_cur *,
-				char *,int) noex ;
-extern int pcsconfs_curenum(pcsconfs *,pcsconfs_cur *,char *,int,char *,int) noex ;
+			char *,int) noex ;
+extern int pcsconfs_curenum(pcsconfs *,pcsconfs_cur *,char *,int,
+			char *,int) noex ;
 extern int pcsconfs_curend(pcsconfs *,pcsconfs_cur *) noex ;
 extern int pcsconfs_audit(pcsconfs *) noex ;
 extern int pcsconfs_finish(pcsconfs *) noex ;
