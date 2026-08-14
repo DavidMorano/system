@@ -673,7 +673,7 @@ int disuser::loadtermsx(vecstr *llp,int o) noex {
                             }
                         }
                         if ((rs1 >= 0) && f_go) {
-                            rs1 = permid(op->idp,&sb,W_OK) ;
+                            rs1 = permids(op->idp,&sb,W_OK) ;
                             if (rs1 >= 0) {
                                 ut.atime = sb.st_atime ;
                                 rs = vecobj_add(tlp,&ut) ;
