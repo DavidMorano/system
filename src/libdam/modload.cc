@@ -646,7 +646,7 @@ int subinfo::sochecklib(dirseen *dsp,cchar *ldname,int dlm) noex {
 	                if (ustat sb ; (rs = u_stat(ldnp,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
 			        ids	*idp = &id ;
-			        if ((rs = permid(idp,&sb,am)) >= 0) {
+			        if ((rs = permids(idp,&sb,am)) >= 0) {
 		   	            rs = sockliber(dsp,ldnp,dlm) ;
 			        } else if (isNotPresent(rs)) {
 	    		            rs = dirseen_add(dsp,ldnp,-1,&sb) ;
@@ -683,7 +683,7 @@ int subinfo::sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex {
 	        if ((rs = mksofname(tbuf,ldnp,mfn,exts[j])) >= 0) {
 	            if (ustat sb ; (rs = u_stat(tbuf,&sb)) >= 0) {
 		        if (S_ISREG(sb.st_mode)) {
-			    if ((rs = permid(idp,&sb,am)) >= 0) {
+			    if ((rs = permids(idp,&sb,am)) >= 0) {
 				void		*sop ;
 			        if ((sop = dlopen(tbuf,dlm)) != np) {
 				    mlp->sop = sop ;
@@ -698,7 +698,7 @@ int subinfo::sockliber(dirseen *dsp,cchar *ldnp,int dlm) noex {
 			        } /* end if (dlopen) */
 			    } else if (isNotPresent(rs)) {
 			        rs = SR_OK ;
-			    } /* end if (permid) */
+			    } /* end if (permids) */
 		        } /* end if (regular file) */
 		    } else if (isNotPresent(rs)) {
 		        rs = SR_OK ;
