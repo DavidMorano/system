@@ -37,14 +37,14 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctype.h>
-#include	<time.h>
+#include	<ctime>
 #include	<tzfile.h>
 
 #include	<usystem.h>
 #include	<paramopt.h>
 #include	<bfile.h>
-#include	<tmtime.hh>
-#include	<sntmtime.h>
+#include	<tmctimeh>
+#include	<sntmctime>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -121,7 +121,7 @@ PARAMOPT	*pp ;
 	    debugprintf("progfile: about to get time\n") ;
 #endif
 
-	if ((rs = tmtime_localtime(&ts,sb.st_mtime)) >= 0) {
+	if ((rs = tmtime_timelocal(&ts,sb.st_mtime)) >= 0) {
 	    switch (otype) {
 
 	    case OTYPE_DEC:
