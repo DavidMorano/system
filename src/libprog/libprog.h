@@ -30,6 +30,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 #include	<progexpand.h>
+#include	<progfindprog.h>
 #include	<proginfo.hh>
 #include	<proglog.hh>
 #include	<proguserlist.hh>
