@@ -157,8 +157,7 @@ int prmktmpdir(cchar *pr,char *rbuf,cc *tmpdname,cc *dname,mode_t m) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (prmktmpdir) */
+} /* end subroutine (prmktmpdir) */
 
 
 /* local subroutines */
