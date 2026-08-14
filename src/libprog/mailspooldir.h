@@ -2,6 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
+/* check for a valid mail spool directory */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -10,13 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-
-#include	"proginfo.hh"
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<proginfo.hh>		/* LIBPROG */
 
 
 EXTERNC_begin
