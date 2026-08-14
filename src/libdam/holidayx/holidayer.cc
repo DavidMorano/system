@@ -650,7 +650,7 @@ local int holidayer_yearfile(HO *op,char *hfname,uint y) noex {
 	            if (ustat sb ; (rs = uc_stat(hfname,&sb)) >= 0) {
 	                if (isOurMode(sb.st_mode)) {
 	                    cint	am = (R_OK) ;
-	                    if ((rs = permid(op->idp,&sb,am)) >= 0) {
+	                    if ((rs = permids(op->idp,&sb,am)) >= 0) {
 	                        len = pl ;
 	                    } else if (isNotAccess(rs)) {
 	                        rs = SR_OK ;
@@ -685,7 +685,7 @@ local int holidayer_dirok(HO *op,cchar *dn) noex {
 	        if (ustat sb ; (rs = uc_stat(dbuf,&sb)) >= 0) ylikely {
 	            if (S_ISDIR(sb.st_mode)) {
 	                cint	am = (R_OK|X_OK) ;
-	                if ((rs = permid(op->idp,&sb,am)) >= 0) {
+	                if ((rs = permids(op->idp,&sb,am)) >= 0) {
 	                    f = true ;
 	                }
 	            } /* end if (is-dir) */
