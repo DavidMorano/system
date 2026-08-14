@@ -78,20 +78,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<estrings.h>
-#include	<mkpathx.h>
-#include	<mkfnamesuf.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkfnamesuf.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"prmkfname.h"
 
@@ -127,8 +127,8 @@ int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (pr && fname) {
-	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	if (pr && fname) ylikely {
+	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 		cint	tlen = rs ;
 	        cchar	*sp ; /* used-multiple */
 	        if ((f_def && (ebuf[0] == '\0')) || (strcmp(ebuf,"+") == 0)) {
@@ -181,7 +181,6 @@ int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (prmkfname) */
+} /* end subroutine (prmkfname) */
 
 
