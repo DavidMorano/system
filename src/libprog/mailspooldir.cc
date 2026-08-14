@@ -50,25 +50,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<sys/param.h>
-#include	<sys/utsname.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<sfx.h>
-#include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<permx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/utsname.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"proginfo.hh"
+#include	"mailspooldir.hh"
 
 
 /* local defines */
@@ -164,14 +167,13 @@ int mailspooldir(proginfo *pip,char *spooldname,int fl) noex {
 	if ((cl == 4) && (strncmp(cp,MAILGNAME,glen) == 0) )
 		srs +=1 ;
 
-/* is there a spool file there that the REAL user can read ? */
+/* is there a spool file there that the REAL user can read? */
 
-	if (u_access(tmpdname,W_OK) >= 0) 
+	if (u_access(tmpdname,W_OK) >= 0)  {
 		srs += 1 ;
+	}
 
 	return srs ;
-}
-/* end subroutine (mailspooldir) */
-
+} /* end subroutine (mailspooldir) */
 
 
