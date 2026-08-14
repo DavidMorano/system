@@ -536,7 +536,7 @@ int dialcprog(cchar *pr,cchar *node,cchar *fname,mainv av,mainv ev,
 	                rs1 = SR_ISDIR ;
 
 	            if (rs1 >= 0)
-	                rs1 = permid(&id,&sb,R_OK) ;
+	                rs1 = permids(&id,&sb,R_OK) ;
 
 #endif /* COMMENT */
 
