@@ -24,7 +24,7 @@
 
 	Description:
 	This is a cheap combination of the IDS (libuc) object and
-	the |permid(3uc)| subroutine.  Only the process user-id and
+	the |permids(3uc)| subroutine.  Only the process user-id and
 	group-id are considered in permission evaluations.  So use
 	of the permssions element of this object is not conclusive.
 	On permission failures, other methods needs to be emplyed
