@@ -15,15 +15,15 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	PCSPCSCONFIG_INCLUDE
-#define	PCSPCSCONFIG_INCLUDE
+#ifndef	PCSCONFIG_INCLUDE
+#define	PCSCONFIG_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<msfile.h>
-#include	<paramfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<msfile.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
 #include	<expcook.h>
 
 #include	"proginfo.h"
@@ -36,7 +36,7 @@
 struct pcsconfig_flags {
 	uint		p:1 ;
 	uint		lockinfo:1 ;
-} ;
+} ; /* end struct */
 
 struct pcsconfig_head {
 	proginfo	*pip ;
@@ -45,7 +45,7 @@ struct pcsconfig_head {
 	time_t		ti_lastcheck ;
 	PCSCONFIG_FL	fl ;
 	int		intcheck ;
-} ;
+} ; /* end struct */
 
 typedef	PCSCONFIG	pcsconfig ;
 typedef	PCSCONFIG_FL	pcsconfig_fl ;
@@ -60,6 +60,6 @@ extern int	pcsconfig_finish(pcsconfig *) noex ;
 EXTERNC_end
 
 
-#endif /* PCSPCSCONFIG_INCLUDE */
+#endif /* PCSCONFIG_INCLUDE */
 
 
