@@ -21,17 +21,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<vechand.h>
-#include	<retpath.h>
-#include	<dater.h>
-#include	<ema.h>
-#include	<ng.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<retpath.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
+#include	<ema.h>			/* LIBUC */
+#include	<ng.h>			/* LIBUC */
 
 
 #define	ARTICLE		struct article_head
@@ -80,7 +78,7 @@ struct article_head {
 	ARTICLE_FL	fl ;
 	uint		aoff ;
 	uint		alen ;
-	uint		magic ;
+	uint		magval ;
 	int		clen ;
 	int		clines ;
 	char		af[articleaddr_overlast] ;
