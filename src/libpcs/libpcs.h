@@ -40,9 +40,11 @@
 #include	<pcspoll.h>
 
 #include	<pcsuserfile.h>
-#include	<pcsgetserial.h>
-#include	<pcsgetnames.h>
 #include	<pcsgetdate.h>
+#include	<pcsgetnames.h>
+#include	<pcsgetprog.h>
+#include	<pcsgetprogpath.h>
+#include	<pcsgetserial.h>
 #include	<pcsmsgid.h>
 #include	<pcsmailhost.h>
 #include	<pcstrustuser.h>
