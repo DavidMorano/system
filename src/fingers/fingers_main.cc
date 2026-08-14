@@ -2170,7 +2170,7 @@ local int procopts(proginfo *pip,keyopt *kop) noex {
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 	            if ((oi = matostr(akonames,3,kp,kl)) >= 0) {
 
 	                vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
@@ -2500,14 +2500,14 @@ local int procenvsysvar(proginfo *pip,cchar sysvardb[])
 	    if ((rs = sysvar_curbegin(&sv,&cur)) >= 0) {
 
 	        while (rs >= 0) {
-	            vl = sysvar_enum(&sv,&cur,kbuf,KBUFLEN,vbuf,vlen) ;
+	            vl = sysvar_curenum(&sv,&cur,kbuf,KBUFLEN,vbuf,vlen) ;
 	            if (vl == SR_NOTFOUND) break ;
 	            rs = vl ;
 	            if (rs < 0) break ;
 
 #if	CF_DEBUG && CF_DEBUGENV
 	            if (DEBUGLEVEL(3)) {
-	                debugprintf("procenvsysvar: sysvar_enum() rs=%d\n",rs) ;
+	                debugprintf("procenvsysvar: sysvar_curenum() rs=%d\n",rs) ;
 	                debugprintf("procenvsysvar: k=%s v=>%r<\n",kbuf,
 	                    vbuf,strnnlen(vbuf,vl,40)) ;
 	            }
@@ -2988,7 +2988,7 @@ local int loaddefsfile(proginfo *pip,cchar *dfname)
 
 	if ((rs = u_stat(dfname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
-	        if ((rs = permid(&pip->id,&sb,R_OK)) >= 0) {
+	        if ((rs = permids(&pip->id,&sb,R_OK)) >= 0) {
 		    VECSTR	*defp = &pip->defs ;
 		    expcook	*ecp = &pip->cooks ;
 		    cchar	**envv = pip->envv ;
@@ -3063,7 +3063,7 @@ local int loadxfile(proginfo *pip,cchar *xfname)
 
 	if ((rs = u_stat(xfname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
-	        if ((rs = permid(&pip->id,&sb,R_OK)) >= 0) {
+	        if ((rs = permids(&pip->id,&sb,R_OK)) >= 0) {
 		    if ((rs = securefile(xfname,pip->euid,pip->egid)) >= 0) {
 	    		pip->fl.secure_path = TRUE ;
 		    } else if (isNotPresent(rs)) {
