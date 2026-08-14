@@ -1032,7 +1032,7 @@ local int mailalias_dbmake(MA *op,time_t dt) noex {
 	        if ((rs = mkpath1w(dbuf,cp,cl)) >= 0) {
 	            if (ustat sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
 			if (S_ISDIR(sb.st_mode)) {
-	                    rs = permid(op->idp,&sb,W_OK) ;
+	                    rs = permids(op->idp,&sb,W_OK) ;
 			} else {
 			    rs = SR_NOTDIR ;
 	                }
@@ -1243,7 +1243,7 @@ local int mailalias_aprofile(MA *op,time_t dt) noex {
 	                rs1 = SR_ISDIR ;
 	            }
 	            if (rs1 >= 0) {
-	                rs1 = permid(op->idp,&sb,R_OK) ;
+	                rs1 = permids(op->idp,&sb,R_OK) ;
 	            }
 	            if (rs1 >= 0) break ;
 	        } /* end for */
