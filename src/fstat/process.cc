@@ -32,7 +32,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<csignal>
 #include	<tzfile.h>
 #include	<cstdlib>
