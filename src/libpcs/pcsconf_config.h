@@ -1,5 +1,8 @@
-/* config */
+/* pcsconf_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
+/* version %I% last-modified %G% */
 /* version %I% last-modified %G% */
 
 
@@ -11,6 +14,9 @@
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	PCSCONFCONFIG_INCLUDE
+#define	PCSCONFCONFIG_INCLUDE
 
 
 #define	VERSION		"0d"
@@ -89,5 +95,8 @@
 #define	USAGECOLS	4
 
 #define	LOGSIZE		(80*1024)
+
+
+#endif /* PCSCONFCONFIG_INCLUDE */
 
 
