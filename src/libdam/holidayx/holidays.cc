@@ -686,7 +686,7 @@ local int holidays_dbfinder(HOS *op,ids *idp,char *tmpfname,
 	    if (rs >= 0) {
 		ustat	sb ;
 	        if ((rs1 = u_stat(tmpfname,&sb)) >= 0) {
-	            rs1 = permid(idp,&sb,R_OK) ;
+	            rs1 = permids(idp,&sb,R_OK) ;
 		}
 	    } /* end if (error) */
 	    if (rs1 >= 0) break ;
