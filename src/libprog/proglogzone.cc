@@ -27,19 +27,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>
-#include	<usystem.h>
-#include	<estrings.h>
-#include	<logzones.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<logzones.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"proginfo.hh"
+#include	"proglogzone.hh"
 
 
 /* local defines */
@@ -100,8 +102,7 @@ int proglogzone_begin(proginfo *pip) noex {
 	    }
 	} /* end if (log-zones) */
 	return rs ;
-}
-/* end subroutine (proglogzone_begin) */
+} /* end subroutine (proglogzone_begin) */
 
 int proglogzone_end(proginfo *pip) noex {
 	int		rs = SR_OK ;
@@ -112,8 +113,7 @@ int proglogzone_end(proginfo *pip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (proglogzone_end) */
+} /* end subroutine (proglogzone_end) */
 
 int proglogzone_update(proginfo *pip,cchar *zn,int zl,int zoff,cchar *zs) noex {
 	int		rs = SR_OK ;
@@ -121,7 +121,6 @@ int proglogzone_update(proginfo *pip,cchar *zn,int zl,int zoff,cchar *zs) noex {
 	    logzones_update(&pip->lz,zn,zl,zoff,zs) ;
 	}
 	return rs ;
-}
-/* end subroutine (proglogzone_update) */
+} /* end subroutine (proglogzone_update) */
 
 
