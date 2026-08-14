@@ -117,14 +117,14 @@ int pcsgetfacility(cchar *pr,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ; /* return-value */
-	if (pr && rbuf) {
+	if (pr && rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (pr[0]) {
-	        if (char *ubuf ; (rs = lm_un(&ubuf)) >= 0) {
+	    if (pr[0]) ylikely {
+	        if (char *ubuf ; (rs = lm_un(&ubuf)) >= 0) ylikely {
 	            cint ulen = rs ;
 	            strwcpylc(ubuf,prname,ulen) ; /* get lower-case */
-	            if (PCSNS ns ; (rs = pcsns_open(&ns,pr)) >= 0) {
+	            if (PCSNS ns ; (rs = pcsns_open(&ns,pr)) >= 0) ylikely {
 	                cint	w = pcsnsreq_fullname ;
 	                if ((rs = pcsns_get(&ns,rbuf,rlen,ubuf,w)) >= 0) {
 		            rl = rs ;
