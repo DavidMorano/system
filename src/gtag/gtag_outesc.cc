@@ -123,7 +123,7 @@ int progoutesc(PROGINFO *pip,TAGTRACK *ttp,cchar *ofname)
 	    if ((rs = tagtrack_curbegin(ttp,&cur)) >= 0) {
 
 	        while (rs >= 0) {
-		    rs1 = tagtrack_enum(ttp,&cur,&te) ;
+		    rs1 = tagtrack_curenum(ttp,&cur,&te) ;
 		    if (rs1 == SR_NOTFOUND) break ;
 		    rs = rs1 ;
 
