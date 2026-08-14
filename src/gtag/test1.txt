@@ -1,4 +1,0 @@
-.BIB test.rbd
-where \cite{morano96differential, morano97challenges} there 
-is a citation and more
-
