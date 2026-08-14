@@ -1404,7 +1404,7 @@ local int subinfo_checkdname(SI *sip,cchar *dname) noex {
 		rs = SR_NOTDIR ;
 	        if (S_ISDIR(sb.st_mode)) {
 	            if ((rs = subinfo_ids(sip)) >= 0) {
-	                rs = permid(&sip->id,&sb,W_OK) ;
+	                rs = permids(&sip->id,&sb,W_OK) ;
 		    }
 	        } /* end if (directory) */
 	    } /* end if (uc_stat) */
@@ -1419,7 +1419,7 @@ local int subinfo_regacc(SI *sip,cchar *fn,int am) noex {
 	if (ustat sb ; (rs = u_stat(fn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
 	        if ((rs = subinfo_ids(sip)) >= 0) {
-	            if ((rs = permid(&sip->id,&sb,am)) >= 0) {
+	            if ((rs = permids(&sip->id,&sb,am)) >= 0) {
 		        f = true ;
 	            } else if (isNotAccess(rs)) {
 		        rs = SR_OK ;
