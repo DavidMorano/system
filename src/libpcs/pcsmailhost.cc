@@ -49,7 +49,7 @@ import uconstants ;			/* |varname(3u)| */
 /* local defines */
 
 #ifndef	MAILHOSTFNAME
-#define	MAILHOSTFNAME		"etc/mailhost"
+#define	MAILHOSTFNAME	"etc/mailhost"
 #endif
 
 
