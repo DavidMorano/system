@@ -40,6 +40,10 @@
 #define	VARSYSNAME	"SYSNAME"
 #endif
 
+#ifndef	VARSYSTYPE
+#define	VARSYSTYPE	"SYSTYPE"
+#endif
+
 #ifndef	VARRELEASE
 #define	VARRELEASE	"RELEASE"
 #endif
@@ -56,16 +60,32 @@
 #define	VARARCHITECTURE	"ARCHITECTURE"
 #endif
 
+#ifndef	VARTMODIR
+#define	VARTMPDIR	"TMPDIR"
+#endif
+
+#ifndef	VARLIBDIR
+#define	VARLIBDIR	"LIBDIR"
+#endif
+
 #ifndef	VARHZ
 #define	VARHZ		"HZ"
 #endif
 
-#ifndef	VARDOMAIN
-#define	VARDOMAIN	"DOMAIN"
+#ifndef	VARTZ
+#define	VARTZ		"TZ"
+#endif
+
+#ifndef	VARNCPU
+#define	VARNCPU		"NCPU"
 #endif
 
 #ifndef	VARNODE
 #define	VARNODE		"NODE"
+#endif
+
+#ifndef	VARDOMAIN
+#define	VARDOMAIN	"DOMAIN"
 #endif
 
 #ifndef	VARHOMEDNAME
@@ -76,12 +96,12 @@
 #define	VARUSERNAME	"USERNAME"
 #endif
 
-#ifndef	VARLOGNAME
-#define	VARLOGNAME	"LOGNAME"
+#ifndef	VARGORUPNAME
+#define	VARGROUPNAME	"GROUPNAME"
 #endif
 
-#ifndef	VARTZ
-#define	VARTZ		"TZ"
+#ifndef	VARLOGNAME
+#define	VARLOGNAME	"LOGNAME"
 #endif
 
 #ifndef	VARPWD
@@ -100,12 +120,20 @@
 #define	VARPATH		"PATH"
 #endif
 
+#ifndef	VARLIBPATH
+#define	VARLIBPATH	"LIBPATH"
+#endif
+
 #ifndef	VARFPATH
 #define	VARFPATH	"FPATH"
 #endif
 
 #ifndef	VARMANPATH
 #define	VARMANPATH	"MANPATH"
+#endif
+
+#ifndef	VARINFOPATH
+#define	VARINFOPATH	"INFOPATH"
 #endif
 
 #ifndef	VARVPATH
@@ -150,6 +178,18 @@
 
 #ifndef	VARPRDWB
 #define	VARPRDWB	"DWB"
+#endif
+
+#ifndef	VARMAILDIR
+#define	VARMAILDIR	"MAILDIR"
+#endif
+
+#ifndef	VARMAILDIRS
+#define	VARMAILDIRS	"MAILDIRS"
+#endif
+
+#ifndef	VARMAILHOST
+#define	VARMAILHOST	"MAILHOST"
 #endif
 
 #ifndef	VARDISPLAY
