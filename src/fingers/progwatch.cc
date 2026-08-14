@@ -825,7 +825,7 @@ static int procwatchpoll(PROGINFO *pip,SUBINFO *wip)
 	    POLLER_CUR	cur ;
 	    debugprintf("procwatchpoll: mintpoll=%u\n",wip->mintpoll) ;
 		poller_curbegin(&wip->pm,&cur) ;
-		while (poller_enum(&wip->pm,&cur,&ps) >= 0) {
+		while (poller_curenum(&wip->pm,&cur,&ps) >= 0) {
 	        debugprintf("procwatchpoll: fd=%d e=%08b\n",
 			ps.fd,ps.events) ;
 		}
