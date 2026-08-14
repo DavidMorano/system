@@ -22,8 +22,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<sysbase.h>		/* LIBU */
-
-#include	"proginfo.hh"
+#include	<proginfo.hh>		/* LIBPROG */
 
 
 EXTERNC_begin
