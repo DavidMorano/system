@@ -870,7 +870,7 @@ local int subinfo_addprbin(SUB *sip,vecstr *plp,cc *pr,cc *prbin) noex {
 	        if (ustat sb ; (rs = u_stat(tbuf,&sb)) >= 0) ylikely {
 		    if (S_ISDIR(sb.st_mode)) {
 		        cint	am = (R_OK|X_OK) ;
-		        if ((rs = permid(&sip->id,&sb,am)) >= 0) {
+		        if ((rs = permids(&sip->id,&sb,am)) >= 0) {
 			    rs = vecstr_adduniq(plp,tbuf,tl) ;
 			    if (rs < INT_MAX) c += 1 ;
 		        } else if (isNotPresent(rs)) {
