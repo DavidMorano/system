@@ -61,6 +61,7 @@
 #include	<vstrcmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 #include	<bfile.h>		/* LIBB */
 
 #include	"pcsdialuucp.h"
@@ -88,14 +89,15 @@ import libutil ;			/* |lenstr(3u)| */
 
 #define	DSTLEN		(2 * MAXPATHLEN)
 #define	BUFLEN		(20 * MAXPATHLEN)
+
 #define	TO_WAITPID	5
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
 
 
 /* external subroutines */
-
-#if	CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-#endif
 
 
 /* external variables */
@@ -136,6 +138,8 @@ constexpr cpcchar	goodenvs[] = {
 	"PCS",
 	nullptr
 } ; /* end array (goodenvs) */
+
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -182,7 +186,6 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 	    pr = PCS ;
 
 	if (perm(pr,-1,-1,nullptr,X_OK | R_OK) < 0) {
-
 	    rs = SR_PROTO ;
 	    goto bad0 ;
 	}
@@ -190,7 +193,6 @@ int pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex {
 /* make the program filepath */
 
 	rs = findprogname(pr,progfname,proguucp) ;
-
 	if (rs < 0) {
 	        rs = SR_PROTO ;
 	        goto bad0 ;
