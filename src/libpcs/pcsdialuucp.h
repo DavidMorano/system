@@ -21,13 +21,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	pcsdialuucp(cchar *pr,cchar *uuhost,cchar *filename) noex ;
+extern int	pcsdialuucp(cchar *,cchar *,cchar *) noex ;
 
 EXTERNC_end
 
