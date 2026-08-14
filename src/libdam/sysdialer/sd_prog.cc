@@ -1875,7 +1875,7 @@ local int subinfo_dirok(SI *sip,cchar d[],int dlen)
 
 	        if ((rs1 = u_stat(dnp,&sb)) >= 0) {
 	            if (S_ISDIR(sb.st_mode)) {
-	                rs1 = permid(&sip->id,&sb,(R_OK | X_OK)) ;
+	                rs1 = permids(&sip->id,&sb,(R_OK | X_OK)) ;
 	                f = (rs1 >= 0) ;
 	            } /* end if */
 	        } /* end if (stat) */
@@ -2208,7 +2208,7 @@ local int loaddefsfile(SI *sip,cchar *dfname)
 	}
 
 	if (rs1 >= 0)
-	    rs1 = permid(&sip->id,&sb,R_OK) ;
+	    rs1 = permids(&sip->id,&sb,R_OK) ;
 
 	if (rs1 >= 0)
 	    rs = defproc(&sip->defs,envv,&sip->cooks,dfname) ;
@@ -2251,7 +2251,7 @@ local int loadxfile(SI *sip,cchar *xfname)
 	    rs1 = SR_NOENT ;
 
 	if (rs1 >= 0)
-	    rs1 = permid(&sip->id,&sb,R_OK) ;
+	    rs1 = permids(&sip->id,&sb,R_OK) ;
 
 	f = (rs1 >= 0) ;
 	if (rs1 >= 0) {
@@ -2717,7 +2717,7 @@ local int xfile(IDS *idp,cchar *fname) noex {
 	if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode)) {
-	        rs = permid(idp,&sb,X_OK) ;
+	        rs = permids(idp,&sb,X_OK) ;
 	    }
 	}
 	return rs ;
