@@ -864,7 +864,7 @@ local int bibleqs_dirok(BQS *op,DS *dsp,ids *idp,cchar *dp,int dl) noex {
 	    if (ustat sb ; (rs = uc_stat(dp,&sb)) >= 0) {
 		if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
 		    cint	am = (W_OK|R_OK|X_OK) ;
-		    if ((rs = permid(idp,&sb,am)) >= 0) {
+		    if ((rs = permids(idp,&sb,am)) >= 0) {
 			f_ok = true ;
 		    } else if (isNotPresent(rs)) {
 			rs = dirseen_add(dsp,dp,dl,&sb) ;
@@ -1724,7 +1724,7 @@ local int eigenfinds(EDB *edbp,cc *pr,ids *idp,EC *ecp) noex {
 		        if (ustat sb ; (rs = u_stat(ebuf,&sb)) >= 0) {
 			    rs = SR_ISDIR ;
 			    if (! S_ISDIR(sb.st_mode)) {
-	        	        rs = permid(idp,&sb,R_OK) ;
+	        	        rs = permids(idp,&sb,R_OK) ;
 			    }
 		        } /* end if (u_stat) */
 		    } /* end if (expcook_exp) */
