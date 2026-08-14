@@ -281,9 +281,8 @@ constexpr cpcchar	cooknames[] = {
 	nullptr
 } ; /* end array */
 
-constexpr uid_t		uidend = uid_t(-1) ;
-
 static variables	sysvar ;
+constexpr uid_t		uidend = uid_t(-1) ;
 
 
 /* exported variables */
@@ -296,8 +295,7 @@ int pcsconf_start(PC *op,cchar *pr,mainv envv,cchar *cfname) noex {
 	if ((rs = pcsconf_ctor(op,pr,envv,cfname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && cfname[0]) {
-	        static cint	rsv = sysvar ;
-		if ((rs = rsv) >= 0) {
+	        if (static cint	rsv = sysvar ; (rs = rsv) >= 0) {
 	            cchar	*objname = PC_OBJNAME ;
 	            op->pr = pr ;
 	            op->envv = envv ;
