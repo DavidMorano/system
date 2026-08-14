@@ -20,23 +20,24 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	PCSCLIENT		struct pcsclient_head
 #define	PCSCLIENT_FL		struct pcsclient_flags
 #define	PCSCLIENT_OBJ		struct pcsclient_object
-#define	PCSCLIENT_DATA		struct pcsclient_d
+#define	PCSCLIENT_DA		struct pcsclient_data
 #define	PCSCLIENT_MAGIC		0x58261227
 
 
 struct pcsclient_object {
 	char		*name ;
 	uint		objsz ;
+	uint		cursz ;
 } ; /* end struct */
 
-struct pcsclient_d {
+struct pcsclient_data {
 	uint		intstale ;
 	uint		utime ;
 	uint		btime ;
@@ -54,27 +55,27 @@ struct pcsclient_head {
 	cchar		*shmname ;
 	char		*mapdata ;
 	uint		*shmtable ;
+	csize		mapsize ;
 	time_t		dt ;
 	time_t		ti_shm ;		/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* last check of file */
 	PCSCLIENT_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		nodenamelen ;
-	int		pagesize ;
-	int		mapsize ;
-	int		shmsize ;
+	int		pagesz ;
+	int		shmsz ;
 } ; /* end struct */
 
 typedef PCSCLIENT	pcsclient ;
 typedef PCSCLIENT_FL	pcsclient_fl ;
 typedef PCSCLIENT_OBJ	pcsclient_obj ;
-typedef PCSCLIENT_DATA	pcsclient_data ;
+typedef PCSCLIENT_DA	pcsclient_da ;
 
 EXTERNC_begin
 
 extern int	pcsclient_open(pcsclient *,cchar *) noex ;
-extern int	pcsclient_get(pcsclient *,time_t,int,pcsclient_data *) noex ;
+extern int	pcsclient_get(pcsclient *,time_t,int,pcsclient_da *) noex ;
 extern int	pcsclient_close(pcsclient *) noex ;
 
 EXTERNC_end
