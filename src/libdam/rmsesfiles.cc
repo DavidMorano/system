@@ -151,11 +151,11 @@ int rmsesfiles(cchar *dname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (dname) {
+	if (dname) ylikely {
 	    rs = SR_INVALID ;
-	    if (dname[0]) {
-	        if (ids id ; (rs = ids_load(&id)) >= 0) {
-		    if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
+	    if (dname[0]) ylikely {
+	        if (ids id ; (rs = ids_load(&id)) >= 0) ylikely {
+		    if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
 		        {
 		            rs = rmsesfiler(&id,pbuf,dname) ;
 			    c = rs ;
@@ -178,14 +178,14 @@ local int rmsesfiler(ids *idp,char *pbuf,cchar *dname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = mkpath(pbuf,dname)) >= 0) {
+	if ((rs = mkpath(pbuf,dname)) >= 0) ylikely {
 	    cint	pl = rs ;
-	    if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
+	    if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) ylikely {
 		cint	nlen = rs ;
-	        if (sigblocker s ; (rs = s.start) >= 0) {
-	            if ((rs = lockbegin(pbuf,pl)) >= 0) {
+	        if (sigblocker s ; (rs = s.start) >= 0) ylikely {
+	            if ((rs = lockbegin(pbuf,pl)) >= 0) ylikely {
 	                cint	lfd = rs ;
-	                if (fsdir d ; (rs = d.open(pbuf)) >= 0) {
+	                if (fsdir d ; (rs = d.open(pbuf)) >= 0) ylikely {
 	                    fsdir_ent	de ;
 	                    while ((rs = d.read(&de,nbuf,nlen)) > 0) {
 	                        cchar	*sp = de.name ;
@@ -222,7 +222,7 @@ local int lockbegin(char *pbuf,int plen) noex {
 	int		rs ;
 	int		lfd = -1 ;
 	cchar		*lfn = RMSESFILES_LOCKFILE ;
-	if ((rs = pathadd(pbuf,plen,lfn)) >= 0) {
+	if ((rs = pathadd(pbuf,plen,lfn)) >= 0) ylikely {
 	    cint	of = (O_CREAT|O_RDWR|O_TRUNC) ;
 	    cmode	om = 0666 ;
 	    if (openstate ols ; (rs = openstate_open(&ols,pbuf,of,om)) >= 0) {
@@ -230,7 +230,7 @@ local int lockbegin(char *pbuf,int plen) noex {
 	        if (ols.f_created) {
 	            rs = u_fchmod(lfd,om) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = uc_lockf(lfd,F_TWLOCK,0) ;
 	        }
 	        if (rs < 0) {
@@ -248,7 +248,7 @@ local int lockbegin(char *pbuf,int plen) noex {
 local int lockend(char *pbuf,int plen,int lfd) noex {
 	int		rs ;
 	cchar		*lfn = RMSESFILES_LOCKFILE ;
-	if ((rs = pathadd(pbuf,plen,lfn)) >= 0) {
+	if ((rs = pathadd(pbuf,plen,lfn)) >= 0) ylikely {
 	    u_unlink(pbuf) ;
 	    u_close(lfd) ;
 	}
@@ -258,11 +258,11 @@ local int lockend(char *pbuf,int plen,int lfd) noex {
 local int rmsesdir(ids *idp,char *pbuf,int plen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if (ustat sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(pbuf,&sb)) >= 0) ylikely {
 	    if (S_ISDIR(sb.st_mode)) {
 	        cint	am = (R_OK|W_OK|X_OK) ;
-	        if ((rs = permid(idp,&sb,am)) >= 0) {
-	            if ((rs = rmdirfiles(pbuf,plen)) > 0) {
+	        if ((rs = permids(idp,&sb,am)) >= 0) ylikely {
+	            if ((rs = rmdirfiles(pbuf,plen)) > 0) ylikely {
 	                cchar	*cp{} ;
 	                c += rs ;
 	                if (int cl ; (cl = sfbasename(pbuf,plen,&cp)) > 0) {
@@ -285,14 +285,14 @@ local int rmdirfiles(char *pbuf,int plen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (pbuf) {
+	if (pbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (pbuf[0]) {
+	    if (pbuf[0]) ylikely {
 	        cint	vn = RMSESFILES_NENT ;
 		cint	vo = 0 ;
-	        if (vecpstr files ; (rs = files.start(0,vn,vo)) >= 0) {
+	        if (vecpstr files ; (rs = files.start(0,vn,vo)) >= 0) ylikely {
 	            int		c = 0 ;
-	            if ((rs = vecpstr_dirload(&files,pbuf,plen)) > 0) {
+	            if ((rs = vecpstr_dirload(&files,pbuf,plen)) > 0) ylikely {
 	                c = rs ;
 	                if ((rs = vecpstr_dirdel(&files,pbuf,plen)) >= 0) {
 	                    if (c == rs) rc = (rs+1) ;
@@ -309,14 +309,14 @@ local int rmdirfiles(char *pbuf,int plen) noex {
 } /* end subroutine (rmdirfiles) */
 
 local int vecpstr_dirload(vecpstr *flp,char *pbuf,int plen) noex {
+	strnul		dname(pbuf,plen) ;
 	int		rs = SR_NOMEM ;
 	int		rs1 ;
 	int		c = 0 ;
-	strnul		dname(pbuf,plen) ;
-	if (cchar *dn = dname ; dn != nullptr) {
-	    if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
+	if (cchar *dn = dname ; dn) ylikely {
+	    if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) ylikely {
 		cint	nlen = rs ;
-	        if (fsdir dir ; (rs = dir.open(dn)) >= 0) {
+	        if (fsdir dir ; (rs = dir.open(dn)) >= 0) ylikely {
 	            fsdir_ent	de ;
 	            while ((rs = dir.read(&de,nbuf,nlen)) > 0) {
 	                cint	sl = rs ;
@@ -339,11 +339,11 @@ local int vecpstr_dirload(vecpstr *flp,char *pbuf,int plen) noex {
 
 local int vecpstr_dirdel(vecpstr *flp,char *pbuf,int plen) noex {
 	int		rs = SR_OK ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
 	cchar		*sp ;
-	for (int i = 0 ; vecpstr_get(flp,i,&sp) >= 0 ; i += 1) {
+	for (int i = 0 ; flp->get(i,&sp) >= 0 ; i += 1) {
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
-	        if ((rs = pathadd(pbuf,plen,sp)) >= 0) {
+	        if ((rs = pathadd(pbuf,plen,sp)) >= 0) ylikely {
 	            if (sp[0] == 'p') {
 	                if ((rs = NotRunning(sp,-1)) > 0) {
 	                    rs = rmfile(pbuf) ;
@@ -363,10 +363,10 @@ local int vecpstr_dirdel(vecpstr *flp,char *pbuf,int plen) noex {
 
 local int openstate_open(openstate *lsp,cchar *fn,int of,mode_t om) noex {
 	int		rs = SR_FAULT ;
-	if (lsp && fn) {
+	if (lsp && fn) ylikely {
 	    rs = SR_INVALID ;
 	    memclear(lsp) ;
-	    if (fn[0]) {
+	    if (fn[0]) ylikely {
 	        if ((rs = u_open(fn,(of|O_EXCL),om)) >= 0) {
 	            lsp->f_created = true ;
 	        } else if ((!(of&O_EXCL)) && (rs == SR_EXISTS)) {
@@ -390,7 +390,7 @@ local int rmfile(cchar *fn) noex {
 local int NotRunning(cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
+	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    cint	sch = mkchar(sp[0]) ;
 	    rs = SR_OK ;
 	    if ((sl > 1) && ((sch == 'p') || (sch == 's'))) {
