@@ -1241,7 +1241,7 @@ int		dlen ;
 	rs1 = u_stat(dnp,&sb) ;
 
 	if ((rs1 >= 0) && S_ISDIR(sb.st_mode)) {
-	    rs1 = permid(&sip->id,&sb,(R_OK | X_OK)) ;
+	    rs1 = permids(&sip->id,&sb,(R_OK | X_OK)) ;
 	    f = (rs1 >= 0) ;
 	} /* end if */
 
