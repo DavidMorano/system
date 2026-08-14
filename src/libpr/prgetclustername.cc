@@ -86,23 +86,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getclustername.h>
-#include	<nodedb.h>
-#include	<clusterdb.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<ids.h>
-#include	<permx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getclustername.h>	/* LIBUC */
+#include	<nodedb.h>		/* LIBUC */
+#include	<clusterdb.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"prgetclustername.h"
 
@@ -116,9 +115,6 @@ import uconstants ;			/* |varname(3u)| */
 
 
 /* imported namespaces */
-
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -146,14 +142,13 @@ using std::max ;			/* subroutine-template */
 
 int prgetclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
     	int		rs = SR_FAULT ;
-	if (pr && rbuf) {
+	if (pr && rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen > 0) {
+	    if (rlen > 0) ylikely {
 	        rs = libuc::prgetclustername(pr,rbuf,rlen,nn) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (prgetclustername) */
+} /* end subroutine (prgetclustername) */
 
 
