@@ -305,7 +305,7 @@ int getter::checkname(bool fdir,int fam) noex {
 	if (ustat sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
 	    cmode	pm = sb.st_mode ;
 	    if ((fdir && S_ISDIR(pm)) || ((!fdir) && S_ISREG(pm))) {
-	        if ((rs = permid(&id,&sb,fam)) >= 0) {
+	        if ((rs = permids(&id,&sb,fam)) >= 0) {
 	            c = 1 ;
 	        } else if (isNotAccess(rs)) {
 		    rs = SR_OK ;
