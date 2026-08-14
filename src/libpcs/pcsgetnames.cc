@@ -74,26 +74,26 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<uclibmem.h>
-#include	<ucentpw.h>
-#include	<ucentpj.h>
-#include	<ucgetpj.h>
-#include	<ucpwcache.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<getusername.h>
-#include	<getuserhome.h>
-#include	<bufsizevar.hh>
-#include	<filereadln.h>
-#include	<cfdec.h>
-#include	<mkx.h>
-#include	<mkpathx.h>
-#include	<sncpyx.h>
-#include	<snwcpyx.h>
-#include	<strwcpy.h>
-#include	<char.h>
-#include	<hasx.h>
-#include	<isnot.h>
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucentpw.h>		/* LIBUC */
+#include	<ucentpj.h>		/* LIBUC */
+#include	<ucgetpj.h>		/* LIBUC */
+#include	<ucpwcache.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getuserhome.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<filereadln.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 #include	<bfile.h>		/* LIBB */
