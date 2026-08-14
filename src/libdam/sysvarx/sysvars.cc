@@ -783,7 +783,7 @@ local int sysvars_mksysvarsi(SVS *op,SI *sip,cchar *dname) noex {
 	                if ((rs = mkpath3(pbuf,pr,prbins[i],prog)) >= 0) {
 	                    pl = rs ;
 	        	    if (ustat sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
-	                        if ((rs = permid(&sip->id,&sb,X_OK)) >= 0) {
+	                        if ((rs = permids(&sip->id,&sb,X_OK)) >= 0) {
 				    rs = 0 ;
 			        } else if (isNotPresent(rs)) {
 	                            rs_last = rs ;
