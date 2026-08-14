@@ -18,37 +18,34 @@
 
 /*******************************************************************************
 
-        This subroutine is used to find a PCS related program and to verify that
-        it is executable.
+  	Name:
+	pcsgetprogpath
+
+	Description:
+	This subroutine is used to find a PCS related program and
+	to verify that it is executable.
 
 	Important:
-
-        This subroutine is different from 'pcsgetprog(3pcs)' in that this will
-        return a full path of the found program whenever it is different than
-        what was supplied. In contrast, the 'pcsgetprog(3pcs)' subroutine only
-        returns the full path of the found program when it is not absolute and
-        it is found in the PCS distribution.
+	This subroutine is different from |pcsgetprog(3pcs)| in
+	that this will return a full path of the found program
+	whenever it is different than what was supplied. In contrast,
+	the 'pcsgetprog(3pcs)' subroutine only returns the full
+	path of the found program when it is not absolute and it
+	is found in the PCS distribution.
 
 	Synopsis:
 
-	int pcsgetprogpath(pcsroot,programpath,name)
-	const char	pcsroot[] ;
-	char		programpath[] ;
-	const char	name[] ;
+	int pcsgetprogpath(cc *pcsroot,char *rbuf,cc *name) noex
 
 	Arguments:
-
 	pcsroot		PCS program root path
-	programpath	returned file path if not the same as input
+	rbuf		result buffer pointer (MAXPATHLEN)
 	name		program to find
 
 	Returns:
-
 	>0		found the program path and this is the length
 	==0		program was found w/o any path prefix
 	<0		program was not found
-
-	programpath	returned file path if it was not in the PWD
 
 *******************************************************************************/
 
@@ -65,9 +62,15 @@
 #include	<vecstr.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
-#include	<vardefs.h>		/* LIBUC */
+#include	<vardefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<libpr.h>		/* LIBPR |prgetprogpath(3pr)| */
 
+#include	"pcsgetprogpath.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
