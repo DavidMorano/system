@@ -5,7 +5,7 @@
 /* track tags in DWB documents */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -21,6 +21,9 @@
 
 /******************************************************************************
 
+  	Object:
+	tagtrack
+
   	Description:
 	This code module (object) maintains a citation database.
 	It stores the citation keys, and a count for each, that are
@@ -30,38 +33,54 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<findinline.h>		/* LIBDAM */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"tagtrack.h"
-#include	"findinline.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	TAGTRACK_MAGIC		0x31887239
-#define	TAGTRACK_DEFENTRIES	20
+#define	TT		tagtrack
+#define	TT_TAG		tagtrack_tag
+#define	TT_ESC		tagtrack_esc
+#define	TT_ENT		tagtrack_ent
+#define	TT_CUR		tagtrack_cur
+#define	TT_MAG		TAGTRACK_MAGIC
+#define	TT_DEFENTS	TAGTRACK_DEFENTS
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
+#endif
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfnext(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
 
 
 /* external variables */
@@ -72,24 +91,70 @@ extern int	matstr(cchar **,cchar *,int) ;
 
 /* forward references */
 
-local int	tagtrack_addmac(TAGTRACK *,cchar *,int) ;
-local int	tagtrack_scanescapes(TAGTRACK *,int,uint,cchar *,int) ;
-local int	tagtrack_search(TAGTRACK *,TAGTRACK_TAG **,cchar *,int) ;
-local int	tagtrack_addesc(TAGTRACK *,TAGTRACK_TAG *,int,uint,int) ;
+template<typename ... Args>
+local inline int tagtrack_ctor(tagtrack *op,Args ... args) noex {
+    	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = SR_NOMEM ;
+	    op->tlp	= nullptr ;
+	    op->elp	= nullptr ;
+	    op->magval	= 0 ;
+	    op->lc	= 0 ;	/* last count */
+	    for (int i = 0 ; i < tagtype_overlast ; i += 1) {
+	        op->c[i] = 0 ;
+	    } /* end for */
+	    if (op->tlp = new(nt) vechand ; op->tlp) {
+	        if (op->elp = new(nt) vecobj ; op->elp) {
+		    rs = SR_OK ;
+	        } /* end if (new-vecobj) */
+		if (rs < 0) {
+		    delete op->tlp ;
+		    op->tlp = nullptr ;
+		} /* end if (error) */
+	    } /* end if (new-vecobj) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (tagtrack_ctor) */
 
-int		tagtrack_add(TAGTRACK *,int,uint,int,cchar *,int) ;
+local int tagtrack_dtor(tagtrack *op) noex {
+	int		rs = SR_OK ;
+	if (op->elp) ylikely {
+	    delete op->elp ;
+	    op->elp = nullptr ;
+	}
+	if (op->tlp) ylikely {
+	    delete op->tlp ;
+	    op->tlp = nullptr ;
+	}
+	return rs ;
+} /* end subroutine (tagtrack_dtor) */
 
-local int	tag_start(TAGTRACK_TAG *,cchar *,int) ;
-local int	tag_addnum(TAGTRACK_TAG *,int,int) ;
-local int	tag_finish(TAGTRACK_TAG *) ;
+template<typename ... Args>
+local inline int tagtrack_magic(tagtrack *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == TT_MAG) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (tagtrack_magic) */
 
-local int	entry_load(TAGTRACK_ENT *,TAGTRACK_ESC *) ;
+local int	tagtrack_addmac(TT *,cchar *,int) noex ;
+local int	tagtrack_scanescapes(TT *,int,uint,cchar *,int) noex ;
+local int	tagtrack_search(TT *,TT_TAG **,cchar *,int) noex ;
+local int	tagtrack_addesc(TT *,TT_TAG *,int,uint,int) noex ;
+
+local int	tag_start	(TT_TAG *,cchar *,int) noex ;
+local int	tag_addnum	(TT_TAG *,int,int) noex ;
+local int	tag_finish	(TT_TAG *) noex ;
+
+local int	entry_load	(TT_ENT *,TT_ESC *) noex ;
 
 #ifdef	COMMENT
-local int	mkcitestr(char *,int) ;
+local int	mkcitestr(char *,int) noex ;
 #endif /* COMMENT */
 
-local int	vcmpfor(cvoid **,cvoid **) ;
+local int	vcmpfor(cvoid **,cvoid **) noex ;
 
 
 /* local variables */
@@ -101,139 +166,128 @@ enum ourmacs {
 	ourmac_equation,
 	ourmac_tag,
 	ourmac_overlast
-} ;
+} ; /* end enum */
 
-static cchar	*ourmacs[] = {
+constexpr cpcchar	ourmacs[] = {
 	"TE",
 	"EE",
 	"FG",
 	"EN",
 	"TAG",
 	nullptr
-} ;
+} ; /* end array */
 
 enum ourescapes {
 	ourescape_tag,
 	ourescape_under,
 	ourescape_overlast
-} ;
+} ; /* end enum */
 
-static cchar	*ourescapes[] = {
+constexpr cpcchar	ourescapes[] = {
 	"tag",
 	"_",
 	nullptr
-} ;
+} ; /* end array */
+
+cbool			f_debug		= CF_DEBUG ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int tagtrack_start(TAGTRACK *op)
-{
-	const int	n = TAGTRACK_DEFENTRIES ;
+int tagtrack_start(TT *op) noex {
+	cint		n = TT_DEFENTS ;
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_start: ent\n") ;
-#endif
-
-	memset(op,0,sizeof(TAGTRACK)) ;
-
-	if ((rs = vechand_start(&op->tags,n,0)) >= 0) {
-	    const int	size = sizeof(TAGTRACK_ESC) ;
-	    if ((rs = vecobj_start(&op->list,size,n,0)) >= 0) {
-		op->magic = TAGTRACK_MAGIC ;
-	    }
-	    if (rs < 0)
-		vechand_finish(&op->tags) ;
-	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_start: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ent\n") ;
+	if ((rs = tagtrack_ctor(op)) >= 0) ylikely {
+	    if ((rs = vechand_start(op->tlp,n,0)) >= 0) ylikely {
+	        cint	sz = szof(TT_ESC) ;
+	        if ((rs = vecobj_start(op->elp,sz,n,0)) >= 0) ylikely {
+		    op->magval = TT_MAG ;
+	        }
+	        if (rs < 0) {
+		    vechand_finish(op->tlp) ;
+	        } /* end if (error) */
+	    } /* end if */
+	    if (rs < 0) {
+	        tagtrack_dtor(op) ;
+	    } /* end if (error) */
+	} /* end if (tagtrack_ctor) */
+	DEBUGPRINTF("rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (tagtrack_start) */
+} /* end subroutine (tagtrack_start) */
 
-
-int tagtrack_finish(TAGTRACK *op)
-{
-	TAGTRACK_TAG	*tagp ;
-	int		rs = SR_OK ;
+int tagtrack_finish(TT *op) noex {
+	int		rs ;
 	int		rs1 ;
-	int		i ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = vecobj_finish(&op->list) ;
-	if (rs >= 0) rs = rs1 ;
-
-	for (i = 0 ; vechand_get(&op->tags,i,&tagp) >= 0 ; i += 1) {
-	    if (tagp != nullptr) {
-	        rs1 = tag_finish(tagp) ;
-	        if (rs >= 0) rs = rs1 ;
-	        rs1 = uc_free(tagp) ;
+	if ((rs = tagtrack_magic(op)) >= 0) ylikely {
+	    {
+	        rs1 = vecobj_finish(op->elp) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    void *vp ;
+	    for (int i = 0 ; vechand_get(op->tlp,i,&vp) >= 0 ; i += 1) {
+	        if (TT_TAG *tagp = resumelife<TT_TAG>(vp) ; tagp) {
+		    {
+	                rs1 = tag_finish(tagp) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
+		    {
+	                rs1 = mem.free(tagp) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
+	        }
+	    } /* end if (cursor) */
+	    {
+	        rs1 = vechand_finish(op->tlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	} /* end if (cursor) */
-
-	rs1 = vechand_finish(&op->tags) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	    {
+		rs1 = tagtrack_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magval = 0 ;
+	} /* end if (tagtrack_magic) */
 	return rs ;
-}
-/* end subroutine (tagtrack_finish) */
+} /* end subroutine (tagtrack_finish) */
 
-
-int tagtrack_scanline(op,fi,loff,lp,ll)
-TAGTRACK	*op ;
-int		fi ;
-uint		loff ;
-cchar	*lp ;
-int		ll ;
-{
-	const int	ch = MKCHAR(lp[0]) ;
-	int		rs = SR_OK ;
-	int		f_macro = FALSE ;
-
+int tagtrack_scanline(TT *op,int fi,uint loff,cchar *lp,int ll) noex {
+    	cnullptr	np{} ;
+	int		rs ;
+	int		f_macro = false ; /* return-value */
+	if ((rs = tagtrack_magic(op,lp)) >= 0) ylikely {
+	cint	ch = MKCHAR(lp[0]) ;
 	if (ch == '.') {
-	    int		ml ;
 	    cchar	*mp ;
 	    lp += 1 ;
 	    ll -= 1 ;
-	    if ((ml = sfnext(lp,ll,&mp)) > 0) {
-		int	nl ;
-		int	oi ;
-		cchar	*np ;
-		ll -= ((mp+ml)-lp) ;
-		lp = (mp+ml) ;
-	        if ((oi = matstr(ourmacs,mp,ml)) >= 0) {
-#if	CF_DEBUGS
-	debugprintf("tagtrack_scanline: ours=%s\n",ourmacs[oi]) ;
-#endif
+	    if (int ml ; (ml = sfnext(lp,ll,&mp)) > 0) {
+		int	nal ;
+		cchar	*nap ;
+		ll -= conv<int>((mp + ml) - lp) ;
+		lp = (mp + ml) ;
+	        if (int oi ; (oi = matstr(ourmacs,mp,ml)) >= 0) {
+		    DEBUGPRINTF("ours=%s\n",ourmacs[oi]) ;
 		    switch (oi) {
 		    case ourmac_tag:
-		        f_macro = TRUE ;
+		        f_macro = true ;
 			{
 			    cchar	*tp ;
-			    while ((tp = strnbrk(lp,ll," ,\t")) != nullptr) {
-				if ((nl = sfnext(lp,(tp-lp),&np)) > 0) {
-			    	    rs = tagtrack_addmac(op,np,nl) ;
+			    while ((tp = strnbrk(lp,ll," ,\t")) != np) {
+				cint tl = conv<int>(tp - lp) ;
+				if ((nal = sfnext(lp,tl,&nap)) > 0) {
+			    	    rs = tagtrack_addmac(op,nap,nal) ;
 				}
-				ll -= ((tp+1)-lp) ;
-				lp = (tp+1) ;
+				ll -= conv<int>((tp + 1) - lp) ;
+				lp = (tp + 1) ;
 			    } /* end while */
 			    if ((rs >= 0) && (ll > 0)) {
-				if ((nl = sfnext(lp,ll,&np)) > 0) {
-			    	    rs = tagtrack_addmac(op,np,nl) ;
+				if ((nal = sfnext(lp,ll,&nap)) > 0) {
+			    	    rs = tagtrack_addmac(op,nap,nal) ;
 				}
-			    }
+			    } /* end if */
 			} /* end block */
 			break ;
 		    case ourmac_table:
@@ -251,393 +305,250 @@ int		ll ;
 	    rs = tagtrack_scanescapes(op,fi,loff,lp,ll) ;
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("tagtrack_scanline: ret rs=%d f_macro=%u\n",rs,f_macro) ;
-#endif
-
+	} /* end if (tagtrack_magic) */
+	DEBUGPRINTF("ret rs=%d f_macro=%u\n",rs,f_macro) ;
 	return (rs >= 0) ? f_macro : rs ;
-}
-/* end subroutine (tagtrack_scanline) */
+} /* end subroutine (tagtrack_scanline) */
 
-
-int tagtrack_adds(op,fi,eoff,elen,kp,kl)
-TAGTRACK	*op ;
-int		fi ;
-uint		eoff ;
-int		elen ;
-cchar	kp[] ;
-int		kl ;
-{
-	int		rs = SR_OK ;
-	int		cl ;
-	int		c = 0 ;
-	cchar	*cp ;
-	cchar	*tp ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_adds: fi=%u eoff=%u elen=%d k=>%r<\n",
-		fi,eoff,elen,kp,kl) ;
-#endif
-
-
-	if (kl < 0)
-	    kl = strlen(kp) ;
-
-	while ((tp = strnchr(kp,kl,',')) != nullptr) {
-	    if ((cl = sfshrink(kp,(tp - kp),&cp)) > 0) {
-		c += 1 ;
-	        rs = tagtrack_add(op,fi,eoff,elen,cp,cl) ;
-	    }
-	    kl -= ((tp + 1) - kp) ;
-	    kp = (tp + 1) ;
-	    if (rs < 0) break ;
-	} /* end while */
-
-	if ((rs >= 0) && (kl > 0)) {
-	    if ((cl = sfshrink(kp,kl,&cp)) > 0) {
-		c += 1 ;
-	        rs = tagtrack_add(op,fi,eoff,elen,cp,cl) ;
-	    }
-	}
-
+int tagtrack_adds(TT *op,int fi,uint eoff,int elen,cchar *kp,int kl) noex {
+    	cnullptr	np{} ;
+	int		rs ;
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("fi=%u eoff=%u elen=%d k=>%r<\n",fi,eoff,elen,kp,kl) ;
+	if ((rs = tagtrack_magic(op,kp)) >= 0) ylikely {
+	    int		cl ;
+	    cchar	*cp ;
+	    if (kl < 0) kl = lenstr(kp) ;
+	    for (cchar *tp ; (tp = strnchr(kp,kl,',')) != np ; ) {
+		cint tl = conv<int>(tp - kp) ;
+	        if ((cl = sfshrink(kp,tl,&cp)) > 0) {
+		    c += 1 ;
+	            rs = tagtrack_add(op,fi,eoff,elen,cp,cl) ;
+	        }
+	        kl -= conv<int>((tp + 1) - kp) ;
+	        kp = (tp + 1) ;
+	        if (rs < 0) break ;
+	    } /* end for */
+	    if ((rs >= 0) && (kl > 0)) {
+	        if ((cl = sfshrink(kp,kl,&cp)) > 0) {
+		    c += 1 ;
+	            rs = tagtrack_add(op,fi,eoff,elen,cp,cl) ;
+	        }
+	    } /* end if */
+	} /* end if (tagtrack_magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (tagtrack_adds) */
-
+} /* end subroutine (tagtrack_adds) */
 
 /* load a string parameter into the DB */
-int tagtrack_add(op,fi,eoff,elen,np,nl)
-TAGTRACK	*op ;
-int		fi ;
-uint		eoff ;
-int		elen ;
-cchar	np[] ;
-int		nl ;
-{
-	TAGTRACK_TAG	*tagp ;
+int tagtrack_add(TT *op,int fi,uint eoff,int elen,cchar *nap,int nal) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (np == nullptr) return SR_FAULT ;
-
-	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
-
-	if (fi < 0) return SR_INVALID ;
-	if (np[0] == '\0') return SR_INVALID ;
-
-	if (nl < 0)
-	    nl = strlen(np) ;
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_add: eoff=%u elen=%d\n",eoff,elen) ;
-	debugprintf("tagtrack_add: n=%r\n",np,nl) ;
-#endif
-
-	if ((rs = tagtrack_search(op,&tagp,np,nl)) >= 0) {
-	    rs = tagtrack_addesc(op,tagp,fi,eoff,elen) ;
-	} else if (rs == SR_NOTFOUND) {
-	    const int	size = sizeof(TAGTRACK_TAG) ;
-	    void	*p ;
-	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        tagp = p ;
-	        if ((rs = tag_start(tagp,np,nl)) >= 0) {
-	    	    if ((rs = tagtrack_addesc(op,tagp,fi,eoff,elen)) >= 0) {
-		        rs = vechand_add(&op->tags,tagp) ;
-		    }
-		    if (rs < 0)
-			tag_finish(tagp) ;
-		} /* end if (tag-start) */
-		if (rs < 0)
-		    uc_free(tagp) ;
-	    } /* end if (memory-allocated) */
-
-	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_add: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("eoff=%u elen=%d\n",eoff,elen) ;
+	DEBUGPRINTF("n=%r\n",nap,nal) ;
+	if ((rs = tagtrack_magic(op,nap)) >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if ((fi >= 0) && nap[0]) {
+		if (nal < 0) nal = lenstr(nap) ;
+	        TT_TAG	*tagp ;
+	        if ((rs = tagtrack_search(op,&tagp,nap,nal)) >= 0) {
+	            rs = tagtrack_addesc(op,tagp,fi,eoff,elen) ;
+	        } else if (rs == SR_NOTFOUND) {
+	            cint	sz = szof(TT_TAG) ;
+	            if (void *p ; (rs = mem.mall(sz,&p)) >= 0) {
+	                tagp = resumelife<TT_TAG>(p) ;
+	                if ((rs = tag_start(tagp,nap,nal)) >= 0) {
+	    	            cauto tt_ad = tagtrack_addesc ;
+	    	            if ((rs = tt_ad(op,tagp,fi,eoff,elen)) >= 0) {
+		                rs = vechand_add(op->tlp,tagp) ;
+		            }
+		            if (rs < 0) {
+			        tag_finish(tagp) ;
+		            } /* end if (error) */
+		        } /* end if (tag-start) */
+		        if (rs < 0) {
+		            mem.free(tagp) ;
+		        } /* end if (error) */
+	            } /* end if (memory-allocated) */
+	        } /* end if (alternatives) */
+	    } /* end if (valid) */
+	} /* end if (tagtrack_magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (tagtrack_add) */
+} /* end subroutine (tagtrack_add) */
 
+int tagtrack_curbegin(TT *op,TT_CUR *curp) noex {
+    	int		rs ;
+	DEBUGPRINTF("ent\n") ;
+	if ((rs = tagtrack_magic(op,curp)) >= 0) ylikely {
+	    curp->i = -1 ;
+	} /* end if (tagtrack_magic) */
+	return rs ;
+} /* end subroutine (tagtrack_curbegin) */
 
-int tagtrack_curbegin(TAGTRACK *op,TAGTRACK_CUR *curp)
-{
+int tagtrack_curend(TT *op,TT_CUR *curp) noex {
+    	int		rs ;
+	DEBUGPRINTF("ent \n") ;
+	if ((rs = tagtrack_magic(op,curp)) >= 0) ylikely {
+	    curp->i = -1 ;
+	} /* end if (tagtrack_magic) */
+	return rs ;
+} /* end subroutine (tagtrack_curend) */
 
-#if	CF_DEBUGS
-	debugprintf("tagtrack_curbegin: ent\n") ;
-#endif
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = -1 ;
-	return SR_OK ;
-}
-/* end subroutine (tagtrack_curbegin) */
-
-
-int tagtrack_curend(TAGTRACK *op,TAGTRACK_CUR *curp)
-{
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_curend: ent \n") ;
-#endif
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = -1 ;
-	return SR_OK ;
-}
-/* end subroutine (tagtrack_curend) */
-
-
-int tagtrack_enum(TAGTRACK *op,TAGTRACK_CUR *curp,TAGTRACK_ENT *ep)
-{
-	TAGTRACK_ESC	*offp ;
+int tagtrack_curenum(TT *op,TT_CUR *curp,TAGTRACK_ENT *ep) noex {
 	int		rs ;
-	int		i ;
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_enum: ent\n") ;
-#endif
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (ep == nullptr) return SR_FAULT ;
-
-	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
-
-	i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-
-/* do the lookup */
-
-	while ((rs = vecobj_get(&op->list,i,&offp)) >= 0) {
-	    if (offp != nullptr) break ;
-	    i += 1 ;
-	} /* end while */
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_enum: vecobj_get() rs=%d\n",rs) ;
-#endif
-
-	if ((rs >= 0) && (offp != nullptr)) {
-	    if (ep != nullptr) {
-	        rs = entry_load(ep,offp) ;
-	    }
-	    curp->i = i ;
-	}
-
+	int		i ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
+	if ((rs = tagtrack_magic(op,curp,ep)) >= 0) ylikely {
+	    TT_ESC	*fop = nullptr ;
+	    i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+	    /* do the lookup */
+	    void *vp ;
+	    while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
+	        if (fop = resumelife<TT_ESC>(vp) ; fop) break ;
+	        i += 1 ;
+	    } /* end while */
+	    DEBUGPRINTF("vecobj_get() rs=%d\n",rs) ;
+	    if ((rs >= 0) && fop) {
+	        if (ep) {
+	            rs = entry_load(ep,fop) ;
+	        }
+	        curp->i = i ;
+	    } /* end if */
+	} /* end if (tagtrack_magic) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (tagtrack_enum) */
+} /* end subroutine (tagtrack_curenum) */
 
-
-int tagtrack_audit(TAGTRACK *op)
-{
+int tagtrack_audit(TT *op) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TAGTRACK_MAGIC) return SR_NOTOPEN ;
-
-	rs = vechand_audit(&op->tags) ;
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_audit: ret rs=%d\n",rs) ;
-#endif
-
+	if ((rs = tagtrack_magic(op)) >= 0) ylikely {
+	    rs = vechand_audit(op->tlp) ;
+	} /* end if (tagtrack_magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (tagtrack_audit) */
+} /* end subroutine (tagtrack_audit) */
 
 
 /* private subroutines */
 
-
-local int tagtrack_addmac(TAGTRACK *op,cchar *np,int nl)
-{
-	TAGTRACK_TAG	*tagp ;
+local int tagtrack_addmac(TT *op,cchar *nap,int nal) noex {
+	TT_TAG	*tagp ;
 	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_addmac: n=%r\n",np,nl) ;
-	debugprintf("tagtrack_addmac: ltt=%d lc=%d\n",op->ltt,op->lc) ;
-#endif
-
-	if ((rs = tagtrack_search(op,&tagp,np,nl)) >= 0) {
-#if	CF_DEBUGS
-	debugprintf("tagtrack_addmac: found already\n") ;
-#endif
+	DEBUGPRINTF("n=%r\n",nap,nal) ;
+	DEBUGPRINTF("ltt=%d lc=%d\n",op->ltt,op->lc) ;
+	if ((rs = tagtrack_search(op,&tagp,nap,nal)) >= 0) {
+	DEBUGPRINTF("found already\n") ;
 	    rs = tag_addnum(tagp,op->ltt,op->lc) ;
 	} else if (rs == SR_NOTFOUND) {
-	    const int	size = sizeof(TAGTRACK_TAG) ;
-	    void	*p ;
-#if	CF_DEBUGS
-	debugprintf("tagtrack_addmac: new tag\n") ;
-#endif
-	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        tagp = p ;
-	        if ((rs = tag_start(tagp,np,nl)) >= 0) {
+	    cint	sz = szof(TT_TAG) ;
+	    DEBUGPRINTF("new tag\n") ;
+	    if (void *p ; (rs = mem.mall(sz,&p)) >= 0) {
+	        tagp = resumelife<TT_TAG>(p) ;
+	        if ((rs = tag_start(tagp,nap,nal)) >= 0) {
 		    if ((rs = tag_addnum(tagp,op->ltt,op->lc)) >= 0) {
-		        rs = vechand_add(&op->tags,tagp) ;
-#if	CF_DEBUGS
-	debugprintf("tagtrack_addmac: vechand_add() rs=%d\n",rs) ;
-#endif
+		        rs = vechand_add(op->tlp,tagp) ;
+			DEBUGPRINTF("vechand_add() rs=%d\n",rs) ;
 		    }
-		    if (rs < 0)
+		    if (rs < 0) {
 			tag_finish(tagp) ;
+		    } /* end if (error) */
 		} /* end if (tag-start) */
-		if (rs < 0)
-		    uc_free(tagp) ;
+		if (rs < 0) {
+		    mem.free(tagp) ;
+		} /* end if (error) */
 	    } /* end if (memory-allocated) */
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_addmac: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-}
-/* end subroutine (tagtrack_addmac) */
+} /* end subroutine (tagtrack_addmac) */
 
-
-local int tagtrack_scanescapes(TAGTRACK *op,int fi,uint loff,cchar *lp,int ll)
-{
-	FINDINLINE	esc ;
-	uint		eoff ;
+local int tagtrack_scanescapes(TT *op,int fi,uint loff,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		sl ;
-	int		ei ;
-	int		c = 0 ;
-	cchar	*linestart = lp ;
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_scanescapes: fi=%u loff=%u\n",fi,loff) ;
-	debugprintf("tagtrack_scanescapes: l=>%r<\n",lp,ll) ;
-#endif
-
-	if (ll < 0) ll = strlen(lp) ;
-
-	while ((sl = findinline(&esc,lp,ll)) > 0) {
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_scanescapes: found sl=%d\n",sl) ;
-#endif
-
-	    if ((ei = matstr(ourescapes,esc.kp,esc.kl)) >= 0) {
+	int		c = 0 ; /* return-value */
+	cchar		*linestart = lp ;
+	DEBUGPRINTF("fi=%u loff=%u\n",fi,loff) ;
+	DEBUGPRINTF("l=>%r<\n",lp,ll) ;
+	if (ll < 0) ll = lenstr(lp) ;
+	for (findinline esc{} ; (sl = findinline_esc(&esc,lp,ll)) > 0 ; ) {
+	    uint	eoff ;
+	    DEBUGPRINTF("found sl=%d\n",sl) ;
+	    if (int ei ; (ei = matstr(ourescapes,esc.kp,esc.kl)) >= 0) {
 		c += 1 ;
 		switch (ei) {
 		case ourescape_tag:
 		case ourescape_under:
-		    eoff = (loff + (esc.sp-linestart)) ;
+		    eoff = (loff + conv<uint>(esc.sp - linestart)) ;
 		    rs = tagtrack_adds(op,fi,eoff,sl,esc.vp,esc.vl) ;
 		    break ;
 		} /* end switch */
 	    } /* end if (matstr) */
-	    ll -= ((esc.sp+sl)-lp) ;
-	    lp = (esc.sp+sl) ;
+	    ll -= conv<int>((esc.sp + sl) - lp) ;
+	    lp = (esc.sp + sl) ;
 	    if (rs < 0) break ;
-	} /* end while */
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_scanescapes: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	} /* end for */
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (tagtrack_scanescapes) */
+} /* end subroutine (tagtrack_scanescapes) */
 
-
-local int tagtrack_search(TAGTRACK *op,TAGTRACK_TAG **tagpp,cchar *np,int nl)
-{
-	NULSTR		tn ;
+local int tagtrack_search(TT *op,TT_TAG **tagpp,cchar *nap,int nal) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*name = nullptr ;
-
-	if ((rs = nulstr_start(&tn,np,nl,&name)) >= 0) {
+	if (nulstr tn ; (rs = tn.start(nap,nal,&name)) >= 0) {
 	    {
-	        TAGTRACK_TAG	te ;
+	        TT_TAG	te{} ;
 	        te.name = name ;
-	        rs = vechand_search(&op->tags,&te,vcmpfor,tagpp) ;
+		voidpp vpp = voidpp(tagpp) ;
+	        rs = vechand_search(op->tlp,&te,vcmpfor,vpp) ;
 	    }
-	    rs1 = nulstr_finish(&tn) ;
+	    rs1 = tn.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
-
 	return rs ;
 } /* end subroutine (tagtrack_search) */
 
-local int tagtrack_addesc(op,tagp,fi,eoff,elen)
-TAGTRACK	*op ;
-TAGTRACK_TAG	*tagp ;
-int		fi ;
-uint		eoff ;
-int		elen ;
-{
-	TAGTRACK_ESC	esc ;
+local int tagtrack_addesc(TT *op,TT_TAG *tagp,int fi,uint eoff,int elen) noex {
+	TT_ESC		esc{} ;
 	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_addesc: store eoff=%u\n",eoff) ;
-#endif
-
-	    memset(&esc,0,sizeof(TAGTRACK_ESC)) ;
+	DEBUGPRINTF("store eoff=%u\n",eoff) ;
+	{
 	    esc.tagp = tagp ;
 	    esc.fi = fi ;
 	    esc.eoff = eoff ;
 	    esc.elen = elen ;
-
-	    rs = vecobj_add(&op->list,&esc) ;
-
-#if	CF_DEBUGS
-	debugprintf("tagtrack_addesc: vecobj_add() rs=%d\n",rs) ;
-#endif
-
+	    rs = vecobj_add(op->elp,&esc) ;
+	} /* end block */
+	DEBUGPRINTF("vecobj_add() rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (tagtrack_addesc) */
 
-local int tag_start(TAGTRACK_TAG *tagp,cchar *kp,int kl) noex {
-	int		rs ;
-
-	if (tagp == nullptr) return SR_FAULT ;
-	if (kp == nullptr) return SR_FAULT ;
-
-	memset(tagp,0,sizeof(TAGTRACK_TAG)) ;
-	tagp->tagtype = -1 ;
-
-	cchar	*cp ;
-	if ((rs = uc_mallocstrw(kp,kl,&cp)) >= 0) {
-	    tagp->name = cp ;
-	}
-
+local int tag_start(TT_TAG *tagp,cchar *kp,int kl) noex {
+	int		rs = SR_BUGCHECK ;
+	if (tagp && kp) {
+	    memclear(tagp) ;
+	    tagp->tagtype = -1 ;
+	    if (cchar *cp ; (rs = mem.strw(kp,kl,&cp)) >= 0) {
+	        tagp->name = cp ;
+	    } /* end if (memory-acquire) */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (tag_start) */
 
-local int tag_finish(TAGTRACK_TAG *sp) noex {
-	int		rs = SR_OK ;
+local int tag_finish(TT_TAG *sp) noex {
+	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (sp == nullptr) return SR_FAULT ;
-	if (sp->name) {
-	    rs1 = uc_free(sp->name) ;
-	    if (rs >= 0) rs = rs1 ;
-	    sp->name = nullptr ;
-	}
+	if (sp) {
+	    rs = SR_OK ;
+	    if (sp->name) {
+	        voidp vp = voidp(sp->name) ;
+	        rs1 = mem.free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        sp->name = nullptr ;
+	    } /* end if (memory-release) */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (tag_finish) */
 
-local int tag_addnum(TAGTRACK_TAG *tagp,int ltt,int lc) noex {
+local int tag_addnum(TT_TAG *tagp,int ltt,int lc) noex {
 	int	rs = SR_OK ;
 	if (tagp->c <= 0) {
 	    tagp->tagtype = ltt ;
@@ -648,33 +559,40 @@ local int tag_addnum(TAGTRACK_TAG *tagp,int ltt,int lc) noex {
 	return rs ;
 } /* end subroutine (tag_addnum) */
 
-local int entry_load(TAGTRACK_ENT *ep,TAGTRACK_ESC *offp) noex {
-	TAGTRACK_TAG	*tagp = offp->tagp ;
-	int		rs = SR_OK ;
-	ep->fi = offp->fi ;
-	ep->eoff = offp->eoff ;
-	ep->elen = offp->elen ;
-	ep->v = tagp->c ;
+local int entry_load(TT_ENT *ep,TT_ESC *fop) noex {
+	TT_TAG		*tagp = fop->tagp ;
+	int		rs = SR_BUGCHECK ;
+	if (ep && fop) {
+	    rs = SR_OK ;
+	    ep->fi	= fop->fi ;
+	    ep->eoff	= fop->eoff ;
+	    ep->elen	= fop->elen ;
+	    ep->v	= tagp->c ;
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (entry_load) */
 
 local int vcmpfor(cvoid **v1pp,cvoid **v2pp) noex {
-	TAGTRACK_TAG	**e1pp = (TAGTRACK_TAG **) v1pp ;
-	TAGTRACK_TAG	**e2pp = (TAGTRACK_TAG **) v2pp ;
+	TT_TAG	**e1pp = (TT_TAG **) v1pp ;
+	TT_TAG	**e2pp = (TT_TAG **) v2pp ;
 	int		rc = 0 ;
-	if ((*e1pp != nullptr) || (*e2pp != nullptr)) {
-	    if (*e1pp != nullptr) {
-		if (*e2pp != nullptr) {
-		    if ((rc = ((*e1pp)->name[0] - (*e2pp)->name[0])) == 0) {
-	    		rc = strcmp((*e1pp)->name,(*e2pp)->name) ;
+	if (v1pp && v2pp) ylikely {
+	    TT_TAG	*e1p = *e1pp ;
+	    TT_TAG	*e2p = *e2pp ;
+	    if (e1p || e2p) ylikely {
+	        if (e1p) {
+		    if (e2p) {
+		        if ((rc = (e1p->name[0] - e2p->name[0])) == 0) {
+	    		    rc = strcmp(e1p->name,e2p->name) ;
+		        }
+		    } else {
+		        rc = -1 ;
 		    }
-		} else {
-		    rc = -1 ;
-		}
-	    } else {
-		rc = 1 ;
-	    }
-	}
+	        } else {
+		    rc  = +1 ;
+	        }
+	    } /* end if (or) */
+	} /* end if (and) */
 	return rc ;
 } /* end subroutine (vcmpfor) */
 
