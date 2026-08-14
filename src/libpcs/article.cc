@@ -132,7 +132,7 @@ template<typename ... Args>
 local inline int article_magic(article *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == ARTICLE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == ARTICLE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (article_magic) */
