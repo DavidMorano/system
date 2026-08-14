@@ -82,17 +82,19 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<endian.h>		/* LIBU */
-#include	<uclibmem.h>		/* LIBUC */
-#include	<bufsizeget.h>		/* LIBUC */
+#include	<ucmem.h>		/* LIBUC */
 #include	<getusername.h>		/* LIBUC */
 #include	<getax.h>		/* LIBUC */
 #include	<getpwx.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
 #include	<estrings.h>		/* LIBUC */
 #include	<nulstr.h>		/* LIBUC */
 #include	<filer.h>		/* LIBUC */
 #include	<expcook.h>		/* LIBUC */
 #include	<ascii.h>		/* LIBUC */
 #include	<getsysmisc.h>		/* LIBUC */
+#include	<vardefs.h>		/* LIBU */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -107,11 +109,12 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	PCSCLIENT_SHMDBNAME	"sm"
 
-#define	LOADINFO		loadinfo
-#define	LOADINFO_FL		loadinfo_flags
+#define	LOADINFO	loadinfo
+#define	LOADINFO_FL	loadinfo_flags
 
-#define	PC			pcsclient
-#define	PC_OBJ			pcsclient_obj
+#define	PC		pcsclient
+#define	PC_OBJ		pcsclient_obj
+#define	PC_DA		pcsclient_da
 
 #ifndef	SHMNAMELEN
 #define	SHMNAMELEN	14		/* shared-memory name length */
@@ -134,11 +137,7 @@ import libutil ;			/* |memclear(3u)| */
 #endif
 
 #ifndef	VARPR
-#define	VARPR		"LOCAL"
-#endif
-
-#ifndef	VARNCPU
-#define	VARNCPU		"NCPU"
+#define	VARPR		VARPRLOCAL
 #endif
 
 #define	MODBNAME	"sysmiscs"	/* base-name (part of filename) */
@@ -151,6 +150,18 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	TO_UPDATE	60
 #define	TO_SHMWAIT	10
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+
+
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -179,6 +190,33 @@ struct loadinfo {
 
 
 /* forward references */
+
+template<typename ... Args>
+local inline int pcsclient_ctor(pcsclient *op,Args ... args) noex {
+    	PCSCLIENT	*hop = op ;
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = memclear(hop) ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (pcsclient_ctor) */
+
+local int pcsclient_dtor(pcsclient *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) ylikely {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (pcsclient_dtor) */
+
+template<typename ... Args>
+local inline int pcsclient_magic(pcsclient *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == PCSCLIENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+} /* end subroutine (pcsclient_magic) */
 
 local int	pcsclient_setbegin(PC *,cchar *) noex ;
 local int	pcsclient_setend(PC *) noex ;
@@ -241,7 +279,8 @@ constexpr cpcchar	cookies[] = {
 	nullptr
 } ; /* end array (cookies) */
 
-static cint		pagesz = getpagesize() ;
+static sysval		pagesz		(sysval_ps) ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -257,74 +296,58 @@ const PCSCLIENT_OBJ	pcsclient = {
 
 int pcsclient_open(PC *op,cchar *pr) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-
-#if	CF_DEBUG
-	debugprintf("pcsclient_open: pr=%s\n",pr) ;
-#endif
-
-	memclear(op) ;
-
-	if ((rs = pcsclient_setbegin(op,pr)) >= 0) {
-	    cmode	om = SHMPERMS ;
-	    cchar	*dbname = PCSCLIENT_SHMDBNAME ;
-	    if ((rs = pcsclient_shmcreate(op,dbname,om)) >= 0) {
-		op->magic = PCSCLIENT_MAGIC ;
-	    }
-	    if (rs < 0)
-		pcsclient_setend(op) ;
-	} /* end if (pcsclient_setbegin) */
-
-#if	CF_DEBUG
-	debugprintf("pcsclient_open: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ent pr=%s\n",pr) ;
+	if ((rs = pcsclient_ctor(op,pr)) >= 0) ylikely {
+	    if ((rs = pagesz) >= 0) {
+	        if ((rs = pcsclient_setbegin(op,pr)) >= 0) {
+	            cmode	om = SHMPERMS ;
+	            cchar	*dbname = PCSCLIENT_SHMDBNAME ;
+	            if ((rs = pcsclient_shmcreate(op,dbname,om)) >= 0) {
+		        op->magval = PCSCLIENT_MAGIC ;
+	            }
+	            if (rs < 0) {
+		        pcsclient_setend(op) ;
+	            } /* end if (error) */
+	        } /* end if (pcsclient_setbegin) */
+	    } /* end if (pagesz) */
+	    if (rs < 0) {
+	        pcsclient_dtor(op) ;
+	    } /* end if (error) */
+	} /* end if (pcsclient_ctor) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (pcsclient_open) */
 
 int pcsclient_close(PC *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != PCSCLIENT_MAGIC) return SR_NOTOPEN ;
-	{
-	rs1 = pcsclient_shmdestroy(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-	{
-	rs1 = pcsclient_setend(op) ;
-	if (rs >= 0) rs = rs1 ;
-	}
-#if	CF_DEBUG
-	debugprintf("pcsclient_close: ret rs=%d\n",rs) ;
-#endif
-
+	if ((rs = pcsclient_magic(op)) >= 0) {
+	    {
+	        rs1 = pcsclient_shmdestroy(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = pcsclient_setend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = pcscient_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (pcsclient_magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (pcsclient_close) */
 
-int pcsclient_get(PC *op,time_t dt,int to,PCSCLIENT_DATA *dp) noex {
+int pcsclient_get(PC *op,time_t dt,int to,PC_DA *dp) noex {
+	int		rs = SR_OK ;
+	int		n = 0 ; /* return-value */
+	DEBUGPRINTF("ent \n") ;
+	if ((rs = pcsclient_magic(op)) >= 0) {
 	uint		*shmtable ;
 	time_t		ti_update ;
-	int		rs = SR_OK ;
-	int		i ;
-	int		n = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != PCSCLIENT_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUG
-	debugprintf("pcsclient_get: ent \n") ;
-#endif
-
 	if (to <= 0) to = 1 ;
-
 	if (dt > op->dt) op->dt = dt ;
-
 	shmtable = (uint *) (op->mapdata + SYSMISCFH_IDLEN) ;
 	ti_update = shmtable[sysmiscfv_utime] ;
 
@@ -334,24 +357,21 @@ int pcsclient_get(PC *op,time_t dt,int to,PCSCLIENT_DATA *dp) noex {
 	}
 
 	n = shmtable[sysmiscfv_ncpu] ;
-	if (dp != nullptr) {
+	if (dp) {
 	    if (rs >= 0) {
 	        dp->utime = shmtable[sysmiscfv_utime] ;
 	        dp->btime = shmtable[sysmiscfv_btime] ;
 	        dp->ncpu = shmtable[sysmiscfv_ncpu] ;
 	        dp->nproc = shmtable[sysmiscfv_nproc] ;
-		for (i = 0 ; i < 3 ; i += 1) {
+		for (int i = 0 ; i < 3 ; i += 1) {
 	            dp->la[i] = shmtable[sysmiscfv_la + i] ;
-	        }
+	        } /* end for */
 	    } else {
-	        memclear(dp,szof(PCSCLIENT_DATA)) ;
+	        memclear(dp) ;
 	    }
 	} /* end if */
-
-#if	CF_DEBUG
-	debugprintf("pcsclient_get: ret rs=%d n=%u\n",rs,n) ;
-#endif
-
+	} /* end if (pcsclient_magic) */
+	DEBUGPRINTF("ret rs=%d n=%u\n",rs,n) ;
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (pcsclient_get) */
 
@@ -361,19 +381,17 @@ int pcsclient_get(PC *op,time_t dt,int to,PCSCLIENT_DATA *dp) noex {
 local int pcsclient_setbegin(PC *op,cchar *pr) noex {
 	op->pr = pr ;
 	return SR_OK ;
-}
-/* end subroutine (pcsclient_setbegin) */
+} /* end subroutine (pcsclient_setbegin) */
 
 local int pcsclient_setend(PC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op->shmname != nullptr) {
-	    rs1 = uc_free(op->shmname) ;
+	if (op->shmname) {
+	    voidp = vp = voidp(op->shmname) ;
+	    rs1 = mem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->shmname = nullptr ;
 	}
-
 	op->pr = nullptr ;
 	return rs ;
 } /* end subroutine (pcsclient_setend) */
@@ -388,20 +406,20 @@ local int pcsclient_shmcreate(PC *op,cchar *dbname,mode_t om) noex {
 	    char	shmname[SHMNAMELEN + 1] ;
 
 #if	CF_DEBUG
-	debugprintf("pcsclient_shmcreate: loadinfo_start() rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsclient_shmcreate: loadinfo_start() rs=%d\n",rs) ;
 #endif
 
 	for (i = 0 ; shmnames[i] != nullptr ; i += 1) {
 
 #if	CF_DEBUG
-	debugprintf("pcsclient_shmcreate: expand%i=>%s<\n",
+	DEBUGPRINTF("pcsclient_shmcreate: expand%i=>%s<\n",
 		i,shmnames[i]) ;
 #endif
 
 	    rs1 = loadinfo_expand(&li,shmname,shmnames[i]) ;
 
 #if	CF_DEBUG
-	debugprintf("pcsclient_shmcreate: loadinfo_expand() rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsclient_shmcreate: loadinfo_expand() rs=%d\n",rs) ;
 #endif
 
 	    if (rs1 >= 0) {
@@ -409,7 +427,7 @@ local int pcsclient_shmcreate(PC *op,cchar *dbname,mode_t om) noex {
 	        rs = pcsclient_shmcreater(op,&li,i,shmname) ;
 
 #if	CF_DEBUG
-	debugprintf("pcsclient_shmcreate: _shmcreater() rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsclient_shmcreate: _shmcreater() rs=%d\n",rs) ;
 #endif
 
 	        if ((rs >= 0) || (! isNotPresent(rs))) break ;
@@ -422,11 +440,7 @@ local int pcsclient_shmcreate(PC *op,cchar *dbname,mode_t om) noex {
 
 	loadinfo_finish(&li) ;
 	} /* end if (loadinfo) */
-
-#if	CF_DEBUG
-	debugprintf("pcsclient_shmcreate: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (pcsclient_shmcreate) */
 
@@ -443,10 +457,10 @@ local int pcsclient_shmcreater(PC *op,LOADINFO *lip,int shmi,
 	cchar		*cp ;
 
 #if	CF_DEBUG
-	debugprintf("pcsclient_shmcreate: shmname=%s\n",shmname) ;
+	DEBUGPRINTF("pcsclient_shmcreate: shmname=%s\n",shmname) ;
 #endif
 
-	op->shmsize = 0 ;
+	op->shmsz = 0 ;
 	op->shmtable = nullptr ;
 
 	if (op->shmname != nullptr) {
@@ -463,15 +477,15 @@ local int pcsclient_shmcreater(PC *op,LOADINFO *lip,int shmi,
 	fd = rs ;
 
 #if	CF_DEBUG
-	debugprintf("pcsclient_shmcreate: 1 uc_openshm() rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsclient_shmcreate: 1 uc_openshm() rs=%d\n",rs) ;
 #endif
 
 	if (rs >= 0) {
 	    ustat	sb ;
 	    rs = u_fstat(fd,&sb) ;
-	    op->shmsize = sb.st_size ;
+	    op->shmsz = sb.st_size ;
 	    op->ti_shm = sb.st_mtime ;
-	    f_needwr = (op->shmsize < SYSMISCFH_IDLEN) ;
+	    f_needwr = (op->shmsz < SYSMISCFH_IDLEN) ;
 	}
 
 	if (rs == SR_NOENT) {
@@ -483,7 +497,7 @@ local int pcsclient_shmcreater(PC *op,LOADINFO *lip,int shmi,
 	    fd = rs ;
 
 #if	CF_DEBUG
-	    debugprintf("pcsclient_shmcreate: 2 uc_openshm() rs=%d\n",
+	    DEBUGPRINTF("pcsclient_shmcreate: 2 uc_openshm() rs=%d\n",
 	        rs) ;
 #endif
 
@@ -499,7 +513,7 @@ local int pcsclient_shmcreater(PC *op,LOADINFO *lip,int shmi,
 	} /* end if */
 
 	if ((rs == SR_ACCESS) || (rs == SR_EXIST)) {
-	    op->shmsize = 0 ;
+	    op->shmsz = 0 ;
 	    rs = pcsclient_shmopenwait(op,shmname,om) ;
 	    fd = rs ;
 	}
@@ -509,11 +523,11 @@ local int pcsclient_shmcreater(PC *op,LOADINFO *lip,int shmi,
 
 /* map it */
 
-	if ((rs >= 0) && (op->shmsize == 0)) {
+	if ((rs >= 0) && (op->shmsz == 0)) {
 	    ustat	sb ;
 	    rs = u_fstat(fd,&sb) ;
-	    op->shmsize = sb.st_size ;
-	    f_needupdate = f_needupdate || (op->shmsize == 0) ;
+	    op->shmsz = sb.st_size ;
+	    f_needupdate = f_needupdate || (op->shmsz == 0) ;
 	}
 
 	if (rs >= 0) {
@@ -523,7 +537,7 @@ local int pcsclient_shmcreater(PC *op,LOADINFO *lip,int shmi,
 	        f_needupdate = f_needupdate || (rs > 0) ;
 
 #if	CF_DEBUG
-	        debugprintf("pcsclient_shmcreate: _shmproc() rs=%d\n",rs) ;
+	        DEBUGPRINTF("pcsclient_shmcreate: _shmproc() rs=%d\n",rs) ;
 #endif
 
 	        if (rs == SR_STALE) {
@@ -538,7 +552,7 @@ local int pcsclient_shmcreater(PC *op,LOADINFO *lip,int shmi,
 	    rs = pcsclient_shmupdate(op) ;
 
 #if	CF_DEBUG
-	    debugprintf("pcsclient_shmcreate: _shmupdate() rs=%d\n",rs) ;
+	    DEBUGPRINTF("pcsclient_shmcreate: _shmupdate() rs=%d\n",rs) ;
 #endif
 
 	} /* end if */
@@ -560,15 +574,13 @@ local int pcsclient_shmcreater(PC *op,LOADINFO *lip,int shmi,
 
 /* close it (it stays mapped) */
 ret1:
-	if (fd >= 0)
+	if (fd >= 0) {
 	    u_close(fd) ;
+	}
 
 ret0:
 
-#if	CF_DEBUG
-	debugprintf("pcsclient_shmcreate: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (pcsclient_shmcreater) */
 
@@ -581,31 +593,32 @@ local int pcsclient_shmdestroy(PC *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    op->shmtable = nullptr ;
 	}
-
 	if (op->shmname) {
-	    rs1 = uc_free(op->shmname) ;
+	    voidp = vp = voidp(op->shmname) ;
+	    rs1 = uc_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->shmname = nullptr ;
-	}
+	} /* end if (memory-release) */
 
 	return rs ;
 } /* end subroutine (pcsclient_shmdestroy) */
 
 local int pcsclient_shmwr(PC *op,int fd,mode_t om) noex {
 	SYSMISCFH	hdr{} ;
-	filer		babyfile ;
 	uint		fileoff = 0 ;
 	int		rs = SR_OK ;
-	int		size ;
+	int		rs1 ;
+	int		sz ;
 	int		bl ;
 	char		hdrbuf[HDRBUFLEN + 1] ;
 
-	op->shmsize = 0 ;
+	op->shmsz = 0 ;
 	if (op->dt == 0)
 	    op->dt = time(nullptr) ;
 
-	if (op->pagesize == 0)
-	    op->pagesize = getpagesize() ;
+	if (op->pagesz == 0) {
+	    op->pagesz = pagesz ;
+	}
 
 /* prepare the file-header */
 
@@ -617,8 +630,9 @@ local int pcsclient_shmwr(PC *op,int fd,mode_t om) noex {
 
 /* create the file-header */
 
-	size = (op->pagesize * 4) ;
-	if ((rs = filer_start(&babyfile,fd,0,size,0)) >= 0) {
+	sz = (op->pagesz * 4) ;
+	filer		babyfile ;
+	if ((rs = filer_start(&babyfile,fd,0,sz,0)) >= 0) {
 
 	if ((rs = sysmiscfh(&hdr,0,hdrbuf,HDRBUFLEN)) >= 0) {
 	    bl = rs ;
@@ -626,16 +640,17 @@ local int pcsclient_shmwr(PC *op,int fd,mode_t om) noex {
 	    fileoff += rs ;
 	}
 
-	filer_finish(&babyfile) ;
+	rs1 = filer_finish(&babyfile) ;
+	if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
 
 	if (rs >= 0) {
-	    hdr.shmsize = fileoff ;
+	    hdr.shmsz = fileoff ;
 	    if ((rs = u_seek(fd,0L,SEEK_SET)) >= 0) {
 	        if ((rs = sysmiscfh(&hdr,0,hdrbuf,HDRBUFLEN)) >= 0) {
 	            bl = rs ;
 	            if ((rs = u_write(fd,hdrbuf,bl)) >= 0) {
-	    		op->shmsize = fileoff ;
+	    		op->shmsz = fileoff ;
 	    		rs = u_fchmod(fd,om) ;
 		    }
 	        }
@@ -687,7 +702,7 @@ local int pcsclient_shmloadbegin(PC *op,int fd) noex {
 	if (op->dt == 0)
 	    op->dt = time(nullptr) ;
 
-	msize = op->shmsize ;
+	msize = op->shmsz ;
 	mprot = PROT_READ | PROT_WRITE ;
 	mflags = MAP_SHARED ;
 	if ((rs = u_mmap(np,msize,mprot,mflags,fd,0z,&mp)) >= 0) {
@@ -723,7 +738,7 @@ local int pcsclient_shmproc(PC *op) noex {
 	int		f_stale = false ;
 
 #if	CF_DEBUG
-	debugprintf("pcsclient_shmproc: ent\n") ;
+	DEBUGPRINTF("pcsclient_shmproc: ent\n") ;
 #endif
 
 	if ((rs = sysmiscfh(&hdr,1,op->mapdata,op->mapsize)) >= 0) {
@@ -731,26 +746,26 @@ local int pcsclient_shmproc(PC *op) noex {
 	    uint	utime ;
 	    uint	intstale ;
 	    uint	*shmtable ;
-	    int		shmsize ;
+	    int		shmsz ;
 
 #if	CF_DEBUG
-	debugprintf("pcsclient_shmproc: sysmiscfh() rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsclient_shmproc: sysmiscfh() rs=%d\n",rs) ;
 #endif
 
 	if ((rs = pcsclient_shmverify(op,&hdr)) >= 0) {
 	    f_stale = (rs > 0) ;
 
 #if	CF_DEBUG
-	debugprintf("pcsclient_shmproc: _shmverify() rs=%d\n",rs) ;
+	DEBUGPRINTF("pcsclient_shmproc: _shmverify() rs=%d\n",rs) ;
 #endif
 
 	    shmtable = (uint *) (op->mapdata + SYSMISCFH_IDLEN) ;
 	    op->shmtable = shmtable ;
 
 	    utime = shmtable[sysmiscfv_utime] ;
-	    shmsize = shmtable[sysmiscfv_shmsize] ;
+	    shmsz = shmtable[sysmiscfv_shmsz] ;
 	    intstale = shmtable[sysmiscfv_intstale] ;
-	    if (shmsize == op->shmsize) {
+	    if (shmsz == op->shmsz) {
 	        if ((! f_stale) && (intstale > 0)) {
 	            f_stale = ((dtime - utime) >= intstale) ;
 	        }
@@ -769,12 +784,8 @@ local int pcsclient_shmproc(PC *op) noex {
 
 local int pcsclient_shmverify(PC *op,SYSMISCFH *hp) noex {
 	int		rs = SR_OK ;
-	int		f_stale = (hp->shmsize != op->shmsize) ;
-
-#if	CF_DEBUG
-	debugprintf("pcsclient_shmverify: ret rs=%d\n",rs) ;
-#endif
-
+	int		f_stale = (hp->shmsz != op->shmsz) ;
+	DEBUGPRINTF("pcsclient_shmverify: ret rs=%d\n",rs) ;
 	return (rs >= 0) ? f_stale : rs ;
 } /* end subroutine (pcsclient_shmverify) */
 
@@ -814,7 +825,7 @@ local int pcsclient_shmchild(PC *op) noex {
 	    GETSYSMISC	kd ;
 	    if ((rs = getsysmisc(&kd,op->dt)) >= 0) {
 		uint	*shmtable = op->shmtable ;
-	        shmtable[sysmiscfv_shmsize] = op->shmsize ;
+	        shmtable[sysmiscfv_shmsz] = op->shmsz ;
 	        shmtable[sysmiscfv_utime] = op->dt ; /* this should be last */
 	        shmtable[sysmiscfv_btime] = kd.btime ;
 	        shmtable[sysmiscfv_ncpu] = kd.ncpu ;
@@ -950,16 +961,15 @@ local int loadinfo_rn(LOADINFO *lip) noex {
 	if (lip->rn == nullptr) {
 	    cchar	*bp ;
 	    if ((bl = sfbasename(lip->pr,-1,&bp)) > 0) {
-	        cchar	*cp ;
 	        if (bl > SHMPREFIXLEN) bl = SHMPREFIXLEN ;
-	    	if ((rs = uc_mallocstrw(bp,bl,&cp)) >= 0) {
+	        if (cchar *cp ; (rs = mem.strw(bp,bl,&cp)) >= 0) {
 	            lip->rn = cp ;
-	        }
+	        } /* end if (memory-acquire) */
 	    } else {
 	        rs = SR_ISDIR ;
 	    }
 	} else {
-	    bl = strlen(lip->rn) ;
+	    bl = lenstr(lip->rn) ;
 	}
 
 	return (rs >= 0) ? bl : rs ;
@@ -967,19 +977,23 @@ local int loadinfo_rn(LOADINFO *lip) noex {
 
 local int loadinfo_username(LOADINFO *lip) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		unl = 0 ;
-	char		userbuf[USERNAMELEN + 1] ;
 	if (lip->username == nullptr) {
-	    if ((rs = getusername(userbuf,USERNAMELEN,-1)) >= 0) {
-		cchar	*cp{} ;
-	        unl = rs ;
-	        if (unl > SHMPREFIXLEN) unl = SHMPREFIXLEN ;
-	        if ((rs = uc_mallocstrw(userbuf,unl,&cp)) >= 0) {
-	            lip->username = cp ;
-		}
-	    }
+	    if (char *ubuf (rs = mem.un(&ubuf)) >= 0) {
+		cint ulen = rs ;
+	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
+	            unl = rs ;
+	            if (unl > SHMPREFIXLEN) unl = SHMPREFIXLEN ;
+		    if (cchar *cp ; (rs = mem.strw(userbuf,unl,&cp)) >= 0) {
+	                lip->username = cp ;
+		    } /* end if (memory-acquire) */
+	        } /* end if (getusername) */
+	        rs1 = mem.free(ubuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} else {
-	    unl = strlen(lip->username) ;
+	    unl = lenstr(lip->username) ;
 	}
 	return (rs >= 0) ? unl : rs ;
 } /* end subroutine (loadinfo_username) */
@@ -988,11 +1002,10 @@ local int loadinfo_chown(LOADINFO *lip,int fd,int shmi) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (lip) {
-	    ucentpw	pw ;
-	    cint	pwlen = bufsizeget(bufsize_pw) ;
-	    cchar	*sysuser = "sys" ;
-	    char	*pwbuf{} ;
-	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
+	    if (char *pwbuf ; (rs = mem.pw(&pwbuf)) >= 0) {
+	        ucentpw	pw ;
+	        cint	pwlen = rs ;
+	        cchar	*sysuser = "sys" ;
 	        switch (shmi) {
 	        case shmname_sys:
 	            if ((rs = getpw_name(&pw,pwbuf,pwlen,sysuser)) >= 0) {
@@ -1002,7 +1015,7 @@ local int loadinfo_chown(LOADINFO *lip,int fd,int shmi) noex {
 		    }
 	            break ;
 	        } /* end switch */
-	        rs1 = uc_free(pwbuf) ;
+	        rs1 = mem.free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
@@ -1011,24 +1024,20 @@ local int loadinfo_chown(LOADINFO *lip,int fd,int shmi) noex {
 
 local int getcookname(cchar *sp,cchar **rpp) noex {
 	int		cnl = 1 ;
-	cchar	*cnp ;
-	cchar	*tp ;
-
+	cchar		*cnp = nullptr ;
 	if (sp[0] == CH_LBRACK) {
 	    cnp = (sp + 1) ;
-	    if ((tp = strchr(cnp,CH_RBRACK)) != nullptr) {
+	    if (cchar *tp = strchr(cnp,CH_RBRACK) ; tp) {
 	        cnl = (tp - cnp) ;
 	    } else {
-	        cnl = strlen(cnp) ;
+	        cnl = lenstr(cnp) ;
 	    }
 	} else {
 	    cnp = sp ;
 	}
-
 	if (rpp) {
 	    *rpp = cnp ;
 	}
-
 	return cnl ;
 } /* end subroutine (getcookname) */
 
