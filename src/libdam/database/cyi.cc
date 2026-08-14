@@ -422,7 +422,7 @@ local int cyi_dbfindname(cyi *op,ids *idp,time_t dt,char *tbuf,
 		        if ((rs = mkpath2(tbuf,ydname,cbuf)) >= 0) {
 			    if (USTAT sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 			        cint	am = (R_OK) ;
-			        if ((rs = permid(idp,&sb,am)) >= 0) {
+			        if ((rs = permids(idp,&sb,am)) >= 0) {
 	                            tl = rs ;
 	                            rs = cyi_dbfindone(op,dt,cal,tbuf) ;
 			        }
