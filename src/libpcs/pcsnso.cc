@@ -193,12 +193,11 @@ local int	getprojinfo_sysdb(SI *) ;
 /* local variables */
 
 constexpr pcsnametype	pcsnametypes[] = {
-	{ nullptr, nullptr },
-	{ VARNAME, NAMEFNAME },
-	{ VARFULLNAME, FULLNAMEFNAME },
-	{ VARPROJINFO, PROJECTFNAME },
-	{ VARORG, ORGFNAME },
-	{ nullptr, nullptr }
+	{ VARNAME,	NAMEFNAME },
+	{ VARFULLNAME,	FULLNAMEFNAME },
+	{ VARPROJINFO,	PROJECTFNAME },
+	{ VARORG,	ORGFNAME },
+	{ nullptr,	nullptr }
 } ; /* end array */
 
 constexpr int		(*getnames[])(SI *) = {
@@ -242,7 +241,7 @@ int pcsnso_open(PCSNSO *op,cchar *pr) noex {
 	return rs ;
 } /* end subroutine (pcsnso_open) */
 
-int pcsnso_close(PCSNSO *op) {
+int pcsnso_close(PCSNSO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -264,8 +263,7 @@ int pcsnso_close(PCSNSO *op) {
 	return rs ;
 } /* end subroutine (pcsnso_close) */
 
-int pcsnso_setopts(PCSNSO *op,int opts)
-{
+int pcsnso_setopts(PCSNSO *op,int opts) noex {
 	int		rs = SR_OK ;
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magval != PCSNSO_MAGIC) return SR_NOTOPEN ;
@@ -273,7 +271,7 @@ int pcsnso_setopts(PCSNSO *op,int opts)
 	return rs ;
 } /* end subroutine (pcsnso_setopts) */
 
-int pcsnso_get(PCSNSO *op,char *rbuf,int rlen,cchar *un,int w) {
+int pcsnso_get(PCSNSO *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	SI		si, *sip = &si ;
 	int		rs ;
 	int		rs1 ;
@@ -320,7 +318,7 @@ int pcsnso_get(PCSNSO *op,char *rbuf,int rlen,cchar *un,int w) {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (pcsnso_get) */
 
-int pcsnso_audit(PCSNSO *op) {
+int pcsnso_audit(PCSNSO *op) noex {
 	int		rs = SR_OK ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -334,7 +332,7 @@ int pcsnso_audit(PCSNSO *op) {
 	return rs ;
 } /* end subroutine (pcsnso_audit) */
 
-int pcsnso_curbegin(PCSNSO *op,PCSNSO_CUR *curp) {
+int pcsnso_curbegin(PCSNSO *op,PCSNSO_CUR *curp) noex {
 	int		rs = SR_OK ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -389,7 +387,7 @@ int pcsnso_curenum(PCSNSO *op,PCSNSO_CUR *curp,char *vbuf,int vlen,int w) {
 
 /* private subroutines */
 
-local int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr) {
+local int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr) noex {
 	int		rs ;
 
 	if ((rs = bufsizeget(bufsize_pw)) >= 0) {
@@ -411,17 +409,15 @@ local int pcsnso_infoloadbegin(PCSNSO *op,cchar *pr) {
 	return rs ;
 } /* end subroutine (pcsnso_infoloadbegin) */
 
-local int pcsnso_infoloadend(PCSNSO *op) {
+local int pcsnso_infoloadend(PCSNSO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->fl.id) {
 	    op->fl.id = FALSE ;
 	    rs1 = ids_release(&op->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-	if (op->a != nullptr) {
+	if (op->a) {
 	    rs1 = lm_free(op->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->a = nullptr ;
@@ -429,11 +425,10 @@ local int pcsnso_infoloadend(PCSNSO *op) {
 	    pdp->pwbuf = nullptr ;
 	    pdp->pwlen = 0 ;
 	}
-
 	return rs ;
 } /* end subroutine (pcsnso_infoloadend) */
 
-local int pcsnso_getpw(PCSNSO *op,cchar *un) {
+local int pcsnso_getpw(PCSNSO *op,cchar *un) noex {
 	PCSNSO_PWD	*pdp = &op->pwd ;
 	int		rs = SR_OK ;
 	cchar		*pun ;
@@ -457,15 +452,11 @@ local int pcsnso_getpw(PCSNSO *op,cchar *un) {
 	        rs = getpwusername(pwp,pwbuf,pwlen,-1) ;
 	    }
 	} /* end if (was not already initialized) */
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnames/subinfo_getpw: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subrouine (pcsnso_getpw) */
 
-local int pcsnso_getrealname(PCSNSO *op,SI *sip) {
+local int pcsnso_getrealname(PCSNSO *op,SI *sip) noex {
 	int		rs ;
 
 	rs = getname(sip) ;
@@ -473,23 +464,23 @@ local int pcsnso_getrealname(PCSNSO *op,SI *sip) {
 	return rs ;
 } /* end subrouine (pcsnso_getrealname) */
 
-local int pcsnso_getpcsname(PCSNSO *op,SI *sip) {
+local int pcsnso_getpcsname(PCSNSO *op,SI *sip) noex {
 	int		rs ;
-
+	{
 	rs = getname(sip) ;
-
+	}
 	return rs ;
 } /* end subrouine (pcsnso_getpcsname) */
 
-local int pcsnso_getfullname(PCSNSO *op,SI *sip) {
+local int pcsnso_getfullname(PCSNSO *op,SI *sip) noex {
 	int		rs ;
-
+	{
 	rs = getname(sip) ;
-
+	}
 	return rs ;
 } /* end subrouine (pcsnso_getfullname) */
 
-local int pcsnso_getprojinfo(PCSNSO *op,SI *sip) {
+local int pcsnso_getprojinfo(PCSNSO *op,SI *sip) noex {
 	int		rs ;
 
 #if	CF_DEBUGS
@@ -505,7 +496,7 @@ local int pcsnso_getprojinfo(PCSNSO *op,SI *sip) {
 	return rs ;
 } /* end subrouine (pcsnso_getprojinfo) */
 
-local int pcsnso_client(PCSNSO *op) {
+local int pcsnso_client(PCSNSO *op) noex {
 	int		rs = MKBOOL(op->open.client) ;
 	if (! op->fl.client) {
 	    op->fl.client = TRUE ;
@@ -522,7 +513,7 @@ local int pcsnso_client(PCSNSO *op) {
 	return rs ;
 } /* end subroiutine (pcsnso_client) */
 
-local int pcsnso_clientbegin(PCSNSO *op,time_t dt) {
+local int pcsnso_clientbegin(PCSNSO *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 	if (! op->open.client) {
@@ -544,7 +535,7 @@ local int pcsnso_clientbegin(PCSNSO *op,time_t dt) {
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (pcsnso_clientbegin) */
 
-local int pcsnso_clientend(PCSNSO *op) {
+local int pcsnso_clientend(PCSNSO *op) noex {
 	int		rs = SR_OK ;
 	if (op->open.client) {
 	    PCSNSC	*pcp = &op->client ;
@@ -552,9 +543,7 @@ local int pcsnso_clientend(PCSNSO *op) {
 	    rs = pcsnsc_close(pcp) ;
 	}
 	return rs ;
-}
-/* end subroiutine (pcsnso_clientend) */
-
+} /* end subroiutine (pcsnso_clientend) */
 
 local int subinfo_start(SI *sip,PCSNSO *op,char *rbuf,int rlen,
 			cchar *un,int w) noex {
@@ -569,21 +558,15 @@ local int subinfo_start(SI *sip,PCSNSO *op,char *rbuf,int rlen,
 	sip->w = w ;
 	sip->varusername = VARUSERNAME ;
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-
-local int subinfo_finish(SI *sip)
-{
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	if (sip == nullptr) return SR_FAULT ;
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
-
-local int subinfo_prfile(SI *sip,cchar *fn)
-{
+local int subinfo_prfile(SI *sip,cchar *fn) noex {
 	int		rs ;
 	int		len = 0 ;
 	char		tbuf[MAXPATHLEN + 1] ;
@@ -597,20 +580,13 @@ local int subinfo_prfile(SI *sip,cchar *fn)
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo_prfile) */
+} /* end subroutine (subinfo_prfile) */
 
-
-local int getname(SI *sip)
-{
+local int getname(SI *sip) noex {
 	cint	w = sip->w ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnso/getname: ent u=%s w=%u\n",sip->un,sip->w) ;
-#endif
-
+	DEBUGPRINTF("ent u=%s w=%u\n",sip->un,sip->w) ;
 	switch (w) {
 	case pcsnsreq_realname:
 	case pcsnsreq_pcsname:
@@ -633,18 +609,11 @@ local int getname(SI *sip)
 	    } /* end block */
 	    break ;
 	} /* end switch */
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnso/getname: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d len=%u\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getname) */
+} /* end subroutine (getname) */
 
-
-local int getname_var(SI *sip)
-{
+local int getname_var(SI *sip) noex {
 	cint	w = sip->w ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -675,25 +644,17 @@ local int getname_var(SI *sip)
 	    } /* end block */
 	    break ;
 	} /* end switch */
-
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getname_var) */
+} /* end subroutine (getname_var) */
 
-
-local int getname_daemon(SI *sip)
-{
+local int getname_daemon(SI *sip) noex {
 	PCSNSO		*op = sip->op ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnso/getname_daemon: ent\n") ;
-#endif
+	DEBUGPRINTFent\n") ;
 #if	CF_PCSNSC
 	if ((op->opts & PCSNSO_ONOSERV) == 0) {
-#if	CF_DEBUGS
-	    DEBUGPRINTF("pcsnso/getname_daemon: ent serv\n") ;
-#endif
+	    DEBUGPRINTF("serv\n") ;
 	    if ((rs = pcsnso_client(op)) > 0) {
 	        PCSNSC		*pcp = &op->client ;
 	        cint	rlen = sip->rlen ;
@@ -702,33 +663,20 @@ local int getname_daemon(SI *sip)
 		char		*rbuf = sip->rbuf ;
 	        if ((rs = pcsnsc_getval(pcp,rbuf,rlen,un,w)) > 0) {
 		    rl = rs ;
-#if	CF_DEBUGS
-		    DEBUGPRINTF("pcsnso/getname_daemon: "
-			"pcsnsc_getval() rs=%d\n", rs) ;
-#endif
+		    DEBUGPRINTF("pcsnsc_getval() rs=%d\n", rs) ;
 		} else if (isBadSend(rs)) {
 		    rs = SR_OK ;
 		}
-#if	CF_DEBUGS
-		DEBUGPRINTF("pcsnso/getname_daemon: pcsnsc_open-out rs=%d\n",
-			rs) ;
-#endif
+		DEBUGPRINTF("-out rs=%d\n", rs) ;
 	    } /* end if (pcsnso_client) */
-#if	CF_DEBUGS
-	    DEBUGPRINTF("pcsnso/getname_daemon: leaving rs=%d\n",rs) ;
-#endif
+	    DEBUGPRINTF("leaving rs=%d\n",rs) ;
 	} /* end if (ok to call server) */
 #endif /* CF_PCSNSC */
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnso/getname_daemon: ret rs=%d rl=%u\n",rs,rl) ;
-#endif
+	DEBUGPRINTF("ret rs=%d rl=%u\n",rs,rl) ;
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (getname_daemon) */
+} /* end subroutine (getname_daemon) */
 
-
-local int getname_nsmgr(SI *sip)
-{
+local int getname_nsmgr(SI *sip) noex {
 	cint	rsn = SR_NOTFOUND ;
 	cint	w = sip->w ;
 	int		rs ;
@@ -756,12 +704,9 @@ local int getname_nsmgr(SI *sip)
 #endif
 
 	return rs ;
-}
-/* end subroutine (getname_nsmgr) */
+} /* end subroutine (getname_nsmgr) */
 
-
-local int getname_userhome(SI *sip)
-{
+local int getname_userhome(SI *sip) noex {
 	cint	w = sip->w ;
 	int		rs = SR_OK ;
 	cchar		*un = sip->un ;
@@ -799,26 +744,18 @@ local int getname_userhome(SI *sip)
 #endif
 
 	return rs ;
-}
-/* end subroutine (getname_userhome) */
+} /* end subroutine (getname_userhome) */
 
-
-local int getname_again(SI *sip)
-{
+local int getname_again(SI *sip) noex {
 	int		rs = SR_OK ;
-
 	if (sip->w == pcsnsreq_fullname) {
 	    sip->w = pcsnsreq_pcsname ;
 	    rs = getname(sip) ;
 	}
-
 	return rs ;
-}
-/* end subroutine (getname_again) */
+} /* end subroutine (getname_again) */
 
-
-local int getname_sysdb(SI *sip)
-{
+local int getname_sysdb(SI *sip) noex {
 	PCSNSO		*op = sip->op ;
 	cint	w = sip->w ;
 	int		rs ;
@@ -866,19 +803,12 @@ local int getname_sysdb(SI *sip)
 	        break ;
 	    } /* end switch */
 	} /* end if */
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnames/getname_sysdb: rn=>%r<\n",sip->rbuf,sip->rlen) ;
-	DEBUGPRINTF("pcsnames/getname_sysdb: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
+	DEBUGPRINTF("rn=>%r<\n",sip->rbuf,sip->rlen) ;
+	DEBUGPRINTF("ret rs=%d len=%u\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getname_sysdb) */
+} /* end subroutine (getname_sysdb) */
 
-
-local int getname_pcsdef(SI *sip)
-{
+local int getname_pcsdef(SI *sip) noex {
 	PCSNSO		*op = sip->op ;
 	cint	w = sip->w ;
 	int		rs = SR_OK ;
@@ -919,8 +849,7 @@ local int getname_pcsdef(SI *sip)
 	} /* end if (appropriate) */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (getname_pcsdef) */
+} /* end subroutine (getname_pcsdef) */
 
 local int getprojinfo_sysdb(SI *sip) noex {
 	PCSNSO		*op = sip->op ;
