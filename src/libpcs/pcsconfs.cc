@@ -56,6 +56,7 @@
 #include	<hasx.h>		/* LIBU */
 #include	<isoneof.h>		/* LIBU */
 #include	<isnot.h>		/* LIBU */
+#include	<vardefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libpr.h>		/* LIBPR */
 
@@ -67,86 +68,22 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#ifndef	varSYSNAME
-#define	varSYSNAME	"SYSNAME"
+#ifndef	TMPDNAME
+#define	TMPDNAME	"/tmp"
 #endif
 
-#ifndef	varRELEASE
-#define	varRELEASE	"RELEASE"
-#endif
+#undef	VARSVDBNAME
+#define	VARrSVDBNAME	"PCSCONFS_DBNAME"
 
-#ifndef	varVERSION
-#define	varVERSION	"VERSION"
-#endif
-
-#ifndef	varMACHINE
-#define	varMACHINE	"MACHINE"
-#endif
-
-#ifndef	varARCHITECTURE
-#define	varARCHITECTURE	"ARCHITECTURE"
-#endif
-
-#ifndef	varHZ
-#define	varHZ		"HZ"
-#endif
-
-#ifndef	varDOMAIN
-#define	varDOMAIN	"DOMAIN"
-#endif
-
-#ifndef	varNODE
-#define	varNODE		"NODE"
-#endif
-
-#ifndef	varHOMEDNAME
-#define	varHOMEDNAME	"HOME"
-#endif
-
-#ifndef	varUSERNAME
-#define	varUSERNAME	"USERNAME"
-#endif
-
-#ifndef	varLOGNAME
-#define	varLOGNAME	"LOGNAME"
-#endif
-
-#ifndef	varTZ
-#define	varTZ		"TZ"
-#endif
-
-#ifndef	varWSTATION
-#define	varWSTATION	"ESTATION"
-#endif
-
-#ifndef	varPWD
-#define	varPWD		"PWD"
-#endif
-
-#ifndef	varTMPDNAME
-#define	varTMPDNAME	"TMPDIR"
-#endif
-
-#ifndef	varPRLOCAL
-#define	varPRLOCAL	"LOCAL"
-#endif
+#undef	VARSVPR
+#define	VARSVPR		"PCSCONFS_PROGRAMROOT"
 
 #ifndef	TMPDNAME
 #define	TMPDNAME	"/tmp"
 #endif
 
-#undef	varSVDBNAME
-#define	varSVDBNAME	"PCSCONFS_DBNAME"
-
-#undef	varSVPR
-#define	varSVPR		"PCSCONFS_PROGRAMROOT"
-
-#ifndef	TMPDNAME
-#define	TMPDNAME	"/tmp"
-#endif
-
-#ifndef	TMPvarDNAME
-#define	TMPvarDNAME	"/var/tmp"
+#ifndef	TMPVARDNAME
+#define	TMPVARDNAME	"/var/tmp"
 #endif
 
 #define	PC		pcsconfs
