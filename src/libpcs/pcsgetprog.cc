@@ -5,6 +5,7 @@
 /* get the path to a program that is used within the PCS system */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -33,14 +34,11 @@
 	different than that supplied.
 
 	Synopsis:
-	int pcsgetprog(pcsroot,programpath,program)
-	const char	pcsroot[] ;
-	char		programpath[] ;
-	const char	program[] ;
+	int pcsgetprog(cc *pcsroot,char *rbuf,cc *program) noex
 
 	Arguments:
 	pcsroot		PCS program-root
-	programpath	resulting path to program if it is not absolute
+	rbuf		resulting path to program if it is not absolute
 			and it is found in the PCS distribution
 	program		program to find
 
@@ -68,9 +66,19 @@
 #include	<getfiledirs.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DDEBUGPRINTF(3debug)| */
 
+#include	"pcsgetprog.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* external subroutines */
@@ -87,6 +95,8 @@
 
 /* local variables */
 
+cbool		f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -101,17 +111,13 @@ int pcsgetprog(cchar *pcsroot,char *output,cchar *name) noex {
 	int		f_output = FALSE ;
 	char		outbuf[MAXPATHLEN + 2] ;
 
-	if (name == NULL) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
 
 	if (name[0] == '\0') return SR_NOTFOUND ;
 
-#if	CF_DEBUGS
-	debugprintf("pcsgetprog: pcsroot=%s name=%s\n",pcsroot,name) ;
-#endif
-
-/* was output specified? */
-
-	if (output != NULL) {
+	DEBUGPRINTF("pcsroot=%s name=%s\n",pcsroot,name) ;
+	/* was output specified? */
+	if (output != nullptr) {
 	    f_output = TRUE ;
 	    output[0] = '\0' ;
 	} else {
@@ -120,7 +126,7 @@ int pcsgetprog(cchar *pcsroot,char *output,cchar *name) noex {
 
 /* check input */
 
-	namelen = strlen(name) ;
+	namelen = lenstr(name) ;
 
 	while ((namelen > 0) && (name[namelen - 1] == '/')) {
 	    namelen -= 1 ;
@@ -128,19 +134,15 @@ int pcsgetprog(cchar *pcsroot,char *output,cchar *name) noex {
 
 /* start the checks */
 
-	if (strnchr(name,namelen,'/') != NULL) {
-
-#if	CF_DEBUGS
-	debugprintf("pcsgetprog: slashed\n") ;
-#endif
-
+	if (strnchr(name,namelen,'/') != nullptr) {
+	DEBUGPRINTF("slashed\n") ;
 	    if ((rs = mkpath1w(output,name,namelen)) >= 0)
 	        rs = u_stat(output,&sb) ;
 
 	    if (rs >= 0) {
 	        rs = SR_NOTFOUND ;
 	        if (S_ISREG(sb.st_mode))
-	            rs = perm(output,-1,-1,NULL,X_OK) ;
+	            rs = perm(output,-1,-1,nullptr,X_OK) ;
 	    }
 
 	    if (rs >= 0)
@@ -151,18 +153,16 @@ int pcsgetprog(cchar *pcsroot,char *output,cchar *name) noex {
 /* check if the PCS root directory exists */
 
 	if ((rs == SR_NOENT) || (rs == SR_ACCESS) &&
-	    (pcsroot != NULL)) {
+	    (pcsroot != nullptr)) {
 
-#if	CF_DEBUGS
-	debugprintf("pcsgetprog: rooted\n") ;
-#endif
+	DEBUGPRINTF("rooted\n") ;
 
 	    if ((rs = mkpath3w(output,pcsroot,"bin",name,namelen)) >= 0) {
 	    outlen = rs ;
 	    if ((rs = u_stat(output,&sb)) >= 0) {
 	        rs = SR_NOTFOUND ;
 	        if (S_ISREG(sb.st_mode))
-	            rs = perm(output,-1,-1,NULL,X_OK) ;
+	            rs = perm(output,-1,-1,nullptr,X_OK) ;
 	    } /* end if */
 	    } /* end if */
 
@@ -173,7 +173,7 @@ int pcsgetprog(cchar *pcsroot,char *output,cchar *name) noex {
 	        if ((rs = u_stat(output,&sb)) >= 0) {
 	            rs = SR_NOTFOUND ;
 	            if (S_ISREG(sb.st_mode)) {
-	                rs = perm(output,-1,-1,NULL,X_OK) ;
+	                rs = perm(output,-1,-1,nullptr,X_OK) ;
 		    }
 	        }
 
@@ -187,25 +187,18 @@ int pcsgetprog(cchar *pcsroot,char *output,cchar *name) noex {
 /* search the execution path */
 
 	if ((rs == SR_NOENT) || (rs == SR_ACCESS)) {
-
-#if	CF_DEBUGS
-	debugprintf("pcsgetprog: pathed\n") ;
-#endif
+	DEBUGPRINTF("pathed\n") ;
 
 	    if (f_output)
 	        output[0] = '\0' ;
 
-	    if (getfiledirs(NULL,name,"x",NULL) > 0)
+	    if (getfiledirs(nullptr,name,"x",nullptr) > 0)
 	        rs = 0 ;
 
 	} /* end if */
 
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("pcsgetprog: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (pcsgetprog) */
 
