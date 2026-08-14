@@ -66,6 +66,7 @@
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<mkpathxw.h>		/* LIBUC */
 #include	<pathadd.h>		/* LIBUC */
@@ -73,7 +74,7 @@
 #include	<strn.h>		/* LIBUC */
 #include	<strx.h>		/* LIBUC */
 #include	<rmx.h>			/* LIBUC */
-#include	<permx.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
 #include	<isoneof.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -140,8 +141,7 @@ typedef int (*subinfo_f)(SI *,char *,cchar *,int) noex ;
 constexpr subinfo_f	tries[] = {
 	subinfo_tryfull,
 	subinfo_tryroot,
-	subinfo_tryother,
-	nullptr
+	subinfo_tryother
 } ; /* end array (tries) */
 
 constexpr cpcchar	prbins[] = {
@@ -165,23 +165,17 @@ constexpr int		rsentacc[] = {
 
 /* exported subroutines */
 
-int prgetprogpath(cchar *pr,char *rbuf,cchar *sp,int sl) noex {
+int prgetprogpath(cchar *pr,char *rbuf,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		rl = 0 ;
+	int		rl = 0 ; /* return-value */
 	if (pr && rbuf && sp) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (sp[0]) ylikely {
-		bool fchanged = false ;
-	        if (sl < 0) sl = lenstr(sp) ;
-	        while ((sl > 0) && (sp[sl - 1] == '/')) {
-	            fchanged = true ;
-	            sl -= 1 ;
-	        } /* end while */
+	    if (int sl = rmslashes(sp,µsl) ; sl > 0) ylikely {
+		bool fchanged = (sl != µsl) ;
 	        if (subinfo si ; (rs = subinfo_start(&si,pr)) >= 0) ylikely {
-	            for (int i = 0 ; tries[i] ; i += 1) {
-			subinfo_f fun = tries[i] ;
+	            for (cauto &fun : tries) {
 		        rs = fun(&si,rbuf,sp,sl) ;
 		        if ((rs != 0) || si.f_done) break ;
 	            } /* end for */
@@ -196,7 +190,7 @@ int prgetprogpath(cchar *pr,char *rbuf,cchar *sp,int sl) noex {
 	            rs1 = subinfo_finish(&si) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (subinfo) */
-	    } /* end if (valid) */
+	    } /* end if (rmslashes) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (prgetprogpath) */
@@ -237,11 +231,11 @@ local int subinfo_tryfull(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 	int		rl = 0 ; /* return-value */
 	if (strnchr(sp,sl,'/') != nullptr) {
 	    if ((rs = mkpath1w(rbuf,sp,sl)) >= 0) ylikely {
-		rl = rs ;
-		rs = subinfo_xfile(sip,rbuf) ;
-	        if (isNotPresent(rs)) {
+		cint pl = rs ;
+		if ((rs = subinfo_xfile(sip,rbuf)) > 0) {
+		    rl = pl ;
+		} else if (rs == SR_OK) {
 		    rs = SR_OK ;
-		    rl = 0 ;
 		    sip->f_done = true ;
 		}
 	    } /* end if */
@@ -254,21 +248,20 @@ local int subinfo_tryroot(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 	int		rl = 0 ; /* return-value */
 	cchar		*pr = sip->pr ;
 	for (int i = 0 ; prbins[i] ; i += 1) {
-	    rl = 0 ;
 	    if ((rs = mkpath2(rbuf,pr,prbins[i])) >= 0) {
 	        cint	plen = rs ;
 		if ((rs = pathaddw(rbuf,plen,sp,sl)) >= 0) {
-		    rl = rs ;
-	            if ((rs = subinfo_xfile(sip,rbuf)) >= 0) {
-			break ;
-		    } else if (isOverNoEntAcc(rs)) {
+		    cint pl = rs ;
+	            if ((rs = subinfo_xfile(sip,rbuf)) > 0) {
+			rl = pl ; /* <- break out */
+		    } else if (rs == SR_OK) {
 	                rs = subinfo_record(sip,rbuf,rl) ;
-			rl = 0 ;
 		    }
 		} /* end if (pathaddw) */
 	    } else if (isOverNoEntAcc(rs)) {
 	        rs = SR_OK ;
 	    }
+	    if (rl > 0) break ;
 	    if (rs < 0) break ;
 	} /* end for */
 	if ((rs >= 0) && (rl > 0)) {
@@ -278,7 +271,7 @@ local int subinfo_tryroot(SI *sip,char *rbuf,cchar *sp,int sl) noex {
 } /* end subroutine (subinfo_tryroot) */
 
 local int subinfo_tryother(SI *sip,char *rbuf,cchar *sp,int sl) noex {
-	static cchar	*path = getenv(varname.path) ;
+	static cchar	*path = getenver(varname.path) ;
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		rl = 0 ; /* return-value */
@@ -327,13 +320,19 @@ local int subinfo_tryothercheck(SI *sip,cchar *dp,int dl,
 
 local int subinfo_xfile(SI *sip,cchar *name) noex {
 	int		rs ;
+	int		fok = false ; /* return-value */
 	if (ustat sb ; (rs = u_stat(name,&sb)) >= 0) {
-	    rs = SR_NOENT ;
 	    if (S_ISREG(sb.st_mode)) {
-	        rs = permid(&sip->id,&sb,X_OK) ;
-	    }
-	}
-	return rs ;
+	        if ((rs = permids(&sip->id,&sb,X_OK)) >= 0) {
+		    fok = true ;
+	        } else if (isOverNoEntAcc(rs)) {
+		    rs = SR_OK ;
+		}
+	    } /* end if (is-reg) */
+	} else if (isNotPresent(rs)) {
+	    rs = SR_OK ;
+	} /* end if (u_stat) */
+	return (rs >= 0) ? fok : rs ;
 } /* end subroutine (subinfo_xfile) */
 
 local int subinfo_record(SI *sip,cchar *dp,int dl) noex {
@@ -344,7 +343,7 @@ local int subinfo_record(SI *sip,cchar *dp,int dl) noex {
 	}
 	if (rs >= 0) ylikely {
 	    rs = vecstr_add(&sip->dirs,dp,dl) ;
-	}
+	} /* end if (ok) */
 	return rs ;
 } /* end subroutine (subinfo_record) */
 
@@ -357,7 +356,7 @@ local int mkdfname(char *rbuf,cchar *dp,int dl,cchar *sp,int sl) noex {
 	        rs = storebuf_strw(rbuf,rlen,i,dp,dl) ;
 	        i += rs ;
 	    }
-	    if ((rs >= 0) && (i > 0) && (rbuf[i - 1] != '/')) {
+	    if ((rs >= 0) && (i > 0) && hasneedslash(rbuf,i)) {
 	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	        i += rs ;
 	    }
