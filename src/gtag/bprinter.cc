@@ -1,11 +1,11 @@
-/* bprinter */
+/* bprinter SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* print a line without trailing white-space */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -13,8 +13,8 @@
 	This code was originally written.
 
 	= 1998-09-01, David A­D­ Morano
-        This subroutine was modified to remove white-space in front of trailing
-        white-space also.
+	This subroutine was modified to remove white-space in front
+	of trailing white-space also.
 
 */
 
@@ -34,56 +34,42 @@
         TROFF macro is present.
 
 	Synopsis:
-
 	int bprinter(bfile *tfp,int f_bol,cchar *lp,int ll)
 
 	Arguments:
-
 	tfp		pointer to BFILE object
 	f_bol		flag indicating Beginning-Of-Line or not
 	lp		character buffer to print
 	ll		length of buffer to print
 
 	Returns:
-
 	-		number of characters (bytes) printed 
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<ascii.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	"bprinter.h"
 
 
 /* local defines */
-
-#ifndef	MKCHAR
-#define	MKCHAR(c)	((c) & 0xff)
-#endif
 
 #undef	NSPUNCTS
 #define	NSPUNCTS	10		/* max number of puncts to store */
 
 
 /* external subroutines */
-
-extern int	matstr(const char **,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfsub(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -97,38 +83,40 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* local variables */
 
-static const char	puncts[] = ".,;!?:" ;
+constexpr char		puncts[] = ".,;!?:" ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int bprinter(bfile *tfp,int f_bol,cchar *lp,int ll)
-{
-	int		rs = SR_OK ;
-	int		wlen = 0 ;
-
+int bprinter(bfile *tfp,int f_bol,cchar *lp,int ll) noex {
+	int		rs = SR_FAULT ;
+	int		wlen = 0 ; /* return-value */
+	if (tfp && lp) {
+	    rs = SR_OK ;
 	if (ll > 0) {
-	    const int	splen = NSPUNCTS ;
-	    const int	sch = MKCHAR(lp[0]) ;
+	    cint	splen = NSPUNCTS ;
+	    cint	sch = MKCHAR(lp[0]) ;
 	    int		spl = 0 ;
-	    int		f_preserve ;
-	    int		f = FALSE ;
+	    bool	f_preserve ;
+	    int		f = false ;
 	    char	spuncts[NSPUNCTS+1] ;
-	    f_preserve = ((strchr(puncts,sch)) != NULL) && f_bol ;
+	    f_preserve = ((strchr(puncts,sch)) != nullptr) && f_bol ;
 	    if (lp[ll-1] == '\n') ll -= 1 ;
 	    while (ll && CHAR_ISWHITE(lp[ll-1])) ll -= 1 ;
 	    while (ll && lp[0]) {
 		int	ch = MKCHAR(lp[ll-1]) ;
-		if (strchr(puncts,ch) != NULL) {
+		if (strchr(puncts,ch) != nullptr) {
 		    if (spl < splen) {
 			int	i = (splen-1-spl++) ;
-			spuncts[i] = ch ;
+			spuncts[i] = char(ch) ;
 		    } else {
-			f = TRUE ;
+			f = true ;
 		    }
 		} else if (! CHAR_ISWHITE(ch)) {
-		    f = TRUE ;
+		    f = true ;
 		}
 		if (f) break ;
 		ll -= 1 ;
@@ -149,14 +137,12 @@ int bprinter(bfile *tfp,int f_bol,cchar *lp,int ll)
 		}
 	    }
 	} /* end if (non-zero-length line) */
-
 	if (rs >= 0) {
 	    rs = bputc(tfp,CH_LF) ;
 	    wlen += rs ;
 	}
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (bprinter) */
+} /* end subroutine (bprinter) */
 
 
