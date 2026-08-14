@@ -1057,10 +1057,11 @@ local int ckdirs(cchar *dn,mode_t dm) noex {
 	int		fok = false ;
 	if (dn) ylikely {
 	    if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
-		rs = SR_NOTDIR ;
 		if (S_ISDIR(sb.st_mode)) {
 	    	    if ((rs = perm(dn,-1,-1,np,W_OK)) >= 0) {
 			fok = true ;
+		    } else if (isNotAccess(rs)) {
+			rs = SR_OK ;
 		    }
 		} /* end if (is-dir) */
 	    } else if (isNotPresent(rs)) {
