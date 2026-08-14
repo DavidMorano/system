@@ -1,6 +1,6 @@
 /* tagtrack HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* track tagtypes in DWB documents */
 /* version %I% last-modified %G% */
@@ -36,18 +36,20 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* POSIX® */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<vechand.h>
-#include	<vecobj.h>
+#include	<vechand.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	TAGTRACK		struct tagtrack_head
-#define	TAGTRACK_TAG		struct tagtrack_tag
-#define	TAGTRACK_ESC		struct tagtrack_esc
-#define	TAGTRACK_ENT		struct tagtrack_e
-#define	TAGTRACK_CUR		struct tagtrack_cur
+#define	TAGTRACK_TAG		struct tagtrack_tager
+#define	TAGTRACK_ESC		struct tagtrack_escape
+#define	TAGTRACK_ENT		struct tagtrack_entry
+#define	TAGTRACK_CUR		struct tagtrack_cursor
+#define	TAGTRACK_MAGIC		0x31887239
+#define	TAGTRACK_DEFENTS	20
 
 
 enum tagtypes {
@@ -59,20 +61,20 @@ enum tagtypes {
 } ; /* end enum */
 
 /* store tags here */
-struct tagtrack_tag {
+struct tagtrack_tager {
 	cchar		*name ;		/* tag name */
 	int		c ;		/* tag-type count */
 	int		tagtype ;	/* tag-type */
 } ; /* end struct */
 
-struct tagtrack_esc {
-	TRACKTAG_TAG	*tagp ;
+struct tagtrack_escape {
+	TAGTRACK_TAG	*tagp ;
 	uint		eoff ;
 	int		elen ;
 	int		fi ;
 } ; /* end struct */
 
-struct tagtrack_e {
+struct tagtrack_entry {
 	uint		eoff ;
 	int		elen ;
 	int		fi ;
@@ -80,28 +82,36 @@ struct tagtrack_e {
 } ; /* end struct */
 
 struct tagtrack_head {
-	uint		magic ;
+	vechand		*tlp ;		/* tag-list-pointer */
+	vecobj		*elp ;		/* ESC-list-pointer */
+	uint		magval ;
 	int		c[tagtype_overlast] ;
 	int		lc ;		/* last count */
 	int		ltt ;		/* last tag-type */
-	vechand		tags ;
-	vecobj		list ;		/* list of escapes */
 } ; /* end struct */
 
-struct tagtrack_cur {
+struct tagtrack_cursor {
 	int		i ;
 } ; /* end struct */
 
+typedef	TAGTRACK	tagtrack ;
+typedef	TAGTRACK_TAG	tagtrack_tag ;
+typedef	TAGTRACK_ESC	tagtrack_esc ;
+typedef	TAGTRACK_ENT	tagtrack_ent ;
+typedef	TAGTRACK_CUR	tagtrack_cur ;
+
 EXTERNC_begin
 
-extern int	tagtrack_start(TAGTRACK *) noex ;
-extern int	tagtrack_finish(TAGTRACK *) noex ;
-extern int	tagtrack_scanline(TAGTRACK *,int,uint,cchar *,int) noex ;
-extern int	tagtrack_adds(TAGTRACK *,int,uint,int,cchar *,int) noex ;
-extern int	tagtrack_curbegin(TAGTRACK *,TAGTRACK_CUR *) noex ;
-extern int	tagtrack_curend(TAGTRACK *,TAGTRACK_CUR *) noex ;
-extern int	tagtrack_enum(TAGTRACK *,TAGTRACK_CUR *,TAGTRACK_ENT *) noex ;
-extern int	tagtrack_audit(TAGTRACK *) noex ;
+extern int tagtrack_start	(tagtrack *) noex ;
+extern int tagtrack_finish	(tagtrack *) noex ;
+extern int tagtrack_scanline	(tagtrack *,int,uint,cchar *,int) noex ;
+extern int tagtrack_add		(tagtrack *,int,uint,int,cchar *,int) noex ;
+extern int tagtrack_adds	(tagtrack *,int,uint,int,cchar *,int) noex ;
+extern int tagtrack_curbegin	(tagtrack *,tagtrack_cur *) noex ;
+extern int tagtrack_curend	(tagtrack *,tagtrack_cur *) noex ;
+extern int tagtrack_curenum	(tagtrack *,tagtrack_cur *,
+		tagtrack_ent *) noex ;
+extern int tagtrack_audit	(tagtrack *) noex ;
 
 EXTERNC_end
 
