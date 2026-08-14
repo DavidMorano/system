@@ -1444,7 +1444,7 @@ static int subinfo_dirok(SUBINFO *sip,cchar *d,int dlen)
 	    if ((rs = nulstr_start(&ss,d,dlen,&dnp)) >= 0) {
 	        if ((rs1 = u_stat(dnp,&sb)) >= 0) {
 	            if (S_ISDIR(sb.st_mode)) {
-	                rs1 = permid(&sip->id,&sb,(R_OK | X_OK)) ;
+	                rs1 = permids(&sip->id,&sb,(R_OK | X_OK)) ;
 	                f = (rs1 >= 0) ;
 	            }
 	        }
