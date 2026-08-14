@@ -781,7 +781,7 @@ local int bibleverses_dirok(BVSS *op,DS *dsp,ids *idp,cc *dp,int dl) noex {
 	    if (ustat sb ; (rs = uc_stat(dp,&sb)) >= 0) {
 		if ((rs = dirseen_havedevino(dsp,&sb)) == rsn) {
 		    cint	am = (W_OK|R_OK|X_OK) ;
-		    if ((rs = permid(idp,&sb,am)) >= 0) {
+		    if ((rs = permids(idp,&sb,am)) >= 0) {
 			f_ok = true ;
 		    } else if (isNotPresent(rs)) {
 			rs = dirseen_add(dsp,dp,dl,&sb) ;
