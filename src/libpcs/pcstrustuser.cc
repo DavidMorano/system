@@ -183,8 +183,7 @@ int pcstrustuser(cchar *pr,cchar *un) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (pcstrustuser) */
+} /* end subroutine (pcstrustuser) */
 
 
 /* local subroutines */
@@ -203,8 +202,7 @@ local int subinfo_start(SI *sip,cchar *pr,cchar *un) noex {
 	    sip->unlen = rs ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
 local int subinfo_finish(SI *sip) noex {
     	int		rs = SR_FAULT ;
@@ -218,8 +216,7 @@ local int subinfo_finish(SI *sip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 local int subinfo_listdb(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -233,8 +230,7 @@ local int subinfo_listdb(SI *sip) noex {
 	    f = (matstr(trustedusers,un,-1) >= 0) ;
 	} /* end if (ok) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (subinfo_listdb) */
+} /* end subroutine (subinfo_listdb) */
 
 local int subinfo_filedb(SI *sip) noex {
 	int		rs ;
@@ -253,8 +249,7 @@ local int subinfo_filedb(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (svs) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (subinfo_filedb) */
+} /* end subroutine (subinfo_filedb) */
 
 local int subinfo_filedbx(SI *sip,vecstr *svp,char *tbuf,int tlen) noex {
     	cint		rsn = SR_NOTFOUND ;
@@ -282,8 +277,7 @@ local int subinfo_filedbx(SI *sip,vecstr *svp,char *tbuf,int tlen) noex {
 	    rs = SR_OK ;
 	} /* end if (permsched) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (subinfo_filedbx) */
+} /* end subroutine (subinfo_filedbx) */
 
 local int subinfo_idpr(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -296,8 +290,7 @@ local int subinfo_idpr(SI *sip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_idpr) */
+} /* end subroutine (subinfo_idpr) */
 
 local int subinfo_idun(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -332,8 +325,7 @@ local int subinfo_idun(SI *sip) noex {
 	    len = lenstr(sip->un) ;
 	} /* end if (needed) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (subinfo_idun) */
+} /* end subroutine (subinfo_idun) */
 
 local int subinfo_prgroup(SI *sip) noex {
     	cint		rsn = SR_NOTFOUND ;
@@ -367,7 +359,6 @@ local int subinfo_prgroup(SI *sip) noex {
 	    } /* end if (m-a) */
 	} /* end if */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (pcstrustuser) */
+} /* end subroutine (pcstrustuser) */
 
 
