@@ -43,7 +43,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<usyscalls.h>		/* |getustime(3u)| */
+#include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
