@@ -56,7 +56,7 @@
 #include	<snx.h>
 #include	<mkpathx.h>
 #include	<mkpr.h>		/* |getrootdname(3uc)| */
-#include	<permx.h>		/* |permid(3uc)| */
+#include	<permx.h>		/* |permids(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -313,7 +313,7 @@ local int dircheck(ids *idp,cchar *dname) noex {
 	if (ustat sb ; (rs = u_stat(dname,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        cint	am = (R_OK|X_OK) ;
-	        rs = permid(idp,&sb,am) ;
+	        rs = permids(idp,&sb,am) ;
 	    } else {
 	        rs = SR_NOTDIR ;
 	    }
