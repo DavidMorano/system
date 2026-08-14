@@ -27,10 +27,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<modload.h>
-#include	<ptm.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<modload.h>		/* LIBUC */
 
 #include	"pcsconfs.h"
 
