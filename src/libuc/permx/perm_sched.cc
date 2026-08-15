@@ -85,7 +85,7 @@
 #include	<sbuf.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
-#include	<permx.h>		/* LIBUC |permid(3uc)| */
+#include	<permx.h>		/* LIBUC |permids(3uc)| */
 #include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
@@ -140,7 +140,7 @@ int permsched(mv sched,vecstr *nsp,char *rbuf,int rlen,cc *fn,pm am) noex {
 	                if ((rs = schedexpand(sch,nsp,rbuf,rlen,fn)) >= 0) {
 	                    sl = rs ;
 	                    if (ustat sb ; (rs = uc_stat(rbuf,&sb)) >= 0) {
-	                        rs = permid(&id,&sb,am) ;
+	                        rs = permids(&id,&sb,am) ;
 	                    }
 	                } /* end if (schedexpand) */
 	                if (rs >= 0) break ;
