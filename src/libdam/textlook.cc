@@ -81,14 +81,13 @@
 #include	<ptc.h>			/* LIBU */
 #include	<intfloor.h>		/* LIBU */
 #include	<intceil.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
-#include	<baops.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<fieldterms.h>		/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
-#include	<bfile.h>		/* LIBUC */
 #include	<psem.h>		/* LIBUC */
 #include	<ciq.h>			/* LIBUC */
 #include	<naturalwords.h>	/* LIBUC */
@@ -108,6 +107,7 @@
 #include	<isnot.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"textlook.h"
 
