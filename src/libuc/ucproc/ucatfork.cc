@@ -168,17 +168,17 @@ namespace {
 /* forward references */
 
 extern "C" {
-    static void ucatfork_atforkbefore() noex ;
-    static void ucatfork_atforkparent() noex ;
-    static void ucatfork_atforkchild() noex ;
-    static void ucatfork_exit() noex ;
+    local void ucatfork_atforkbefore() noex ;
+    local void ucatfork_atforkparent() noex ;
+    local void ucatfork_atforkchild() noex ;
+    local void ucatfork_exit() noex ;
 }
 
-static int	list_add(UCAF_LIST *,UCAF_ENT *) noex ;
-static int	list_rem(UCAF_LIST *,UCAF_ENT *) noex ;
+local int	list_add(UCAF_LIST *,UCAF_ENT *) noex ;
+local int	list_rem(UCAF_LIST *,UCAF_ENT *) noex ;
 
-static int	entry_load(UCAF_ENT *,void_f,void_f,void_f) noex ;
-static int	entry_match(UCAF_ENT *,void_f,void_f,void_f) noex ;
+local int	entry_load(UCAF_ENT *,void_f,void_f,void_f) noex ;
+local int	entry_match(UCAF_ENT *,void_f,void_f,void_f) noex ;
 
 
 /* local variables */
@@ -256,8 +256,7 @@ int ucatfork_head::init() noex {
 	    } /* end if (initialization) */
 	} /* end if (no-void) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ucatfork_head::init) */
+} /* end subroutine (ucatfork_head::init) */
 
 int ucatfork_head::fini() noex {
 	int		rs = SR_OK ;	
@@ -276,8 +275,7 @@ int ucatfork_head::fini() noex {
 	    finitdone = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end subroutine (ucatfork_head::fini) */
+} /* end subroutine (ucatfork_head::fini) */
 
 int ucatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 	int		rs ;
@@ -306,8 +304,7 @@ int ucatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
 	return rs ;
-}
-/* end subroutine (ucatfork_head::record) */
+} /* end subroutine (ucatfork_head::record) */
 
 int ucatfork_head::expunge(void_f sb,void_f sp,void_f sc) noex {
 	int		rs ;
@@ -342,14 +339,12 @@ int ucatfork_head::expunge(void_f sb,void_f sp,void_f sc) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (ucatfork_head::expunge) */
+} /* end subroutine (ucatfork_head::expunge) */
 
 int ucatfork_head::trackbegin() noex {
 	ftrack = true ;
 	return SR_OK ;
-}
-/* end subroutine (ucatfork_head::trackbegin) */
+} /* end subroutine (ucatfork_head::trackbegin) */
 
 int ucatfork_head::trackend() noex {
 	int		rs = SR_OK ;
@@ -368,8 +363,7 @@ int ucatfork_head::trackend() noex {
 	    hlist.tail = nullptr ;
 	} /* end if (tracking was started) */
 	return rs ;
-}
-/* end subroutine (ucatfork_head::trackend) */
+} /* end subroutine (ucatfork_head::trackend) */
 
 /* traverse the list backwards (tail to head) */
 void ucatfork_head::atforkbefore() noex {
@@ -388,8 +382,7 @@ void ucatfork_head::atforkbefore() noex {
 	    } /* end if (locked) */
 	}
 	(void) rs ;
-}
-/* end subroutine (ucatfork_head::atforkbefore) */
+} /* end subroutine (ucatfork_head::atforkbefore) */
 
 /* traverse the list forwards (head to tail) */
 void ucatfork_head::atforkparent() noex {
@@ -411,8 +404,7 @@ void ucatfork_head::atforkparent() noex {
 	    }
 	}
 	(void) rs ;
-}
-/* end subroutine (ucatfork_head::atforkparent) */
+} /* end subroutine (ucatfork_head::atforkparent) */
 
 /* traverse the list forwards (head to tail) */
 void ucatfork_head::atforkchild() noex {
@@ -434,27 +426,26 @@ void ucatfork_head::atforkchild() noex {
 	    }
 	}
 	(void) rs ;
-}
-/* end subroutine (ucatfork_head::atforkchild) */
+} /* end subroutine (ucatfork_head::atforkchild) */
 
-static void ucatfork_atforkbefore() noex {
+local void ucatfork_atforkbefore() noex {
 	ucatfork_data.atforkbefore() ;
 }
 
-static void ucatfork_atforkparent() noex {
+local void ucatfork_atforkparent() noex {
 	ucatfork_data.atforkparent() ;
 }
 
-static void ucatfork_atforkchild() noex {
+local void ucatfork_atforkchild() noex {
 	ucatfork_data.atforkchild() ;
 }
 
-static void ucatfork_exit() noex {
+local void ucatfork_exit() noex {
 	ucatfork_data.fvoid = true ;
 }
 
 /* add at the tail */
-static int list_add(ucatfork_list *lp,ucatfork_ent *ep) noex {
+local int list_add(ucatfork_list *lp,ucatfork_ent *ep) noex {
 	ucatfork_ent	*lep = lp->tail ;
 	if (lep) {
 	    lep->next = ep ;
@@ -467,11 +458,10 @@ static int list_add(ucatfork_list *lp,ucatfork_ent *ep) noex {
 	    lp->head = ep ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (list_add) */
+} /* end subroutine (list_add) */
 
 /* this is an entry-unlink operation (remove from middle) */
-static int list_rem(ucatfork_list *lp,ucatfork_ent *ep) noex {
+local int list_rem(ucatfork_list *lp,ucatfork_ent *ep) noex {
 	ucatfork_ent	*pep = ep->prev ;
 	ucatfork_ent	*nep = ep->next ;
 	if (nep) {
@@ -485,25 +475,22 @@ static int list_rem(ucatfork_list *lp,ucatfork_ent *ep) noex {
 	    lp->head = nep ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (list_rem) */
+} /* end subroutine (list_rem) */
 
-static int entry_load(ucatfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
+local int entry_load(ucatfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
 	ep->sub_before = sb ;
 	ep->sub_parent = sp ;
 	ep->sub_child = sc ;
 	ep->next = nullptr ;
 	return SR_OK ;
-}
-/* end subroutine (entry_load) */
+} /* end subroutine (entry_load) */
 
-static int entry_match(ucatfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
+local int entry_match(ucatfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
 	int		f = true ;
 	f = f && (ep->sub_before == sb) ;
 	f = f && (ep->sub_parent == sp) ;
 	f = f && (ep->sub_child == sc) ;
 	return f ;
-}
-/* end subroutine (entry_match) */
+} /* end subroutine (entry_match) */
 
 
