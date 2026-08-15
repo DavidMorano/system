@@ -20,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/timeb.h>		/* |TIMEB| */
+#include	<sys/timeb.h>		/* POSIX® |TIMEB| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
