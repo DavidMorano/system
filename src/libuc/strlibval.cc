@@ -30,25 +30,35 @@
 			* do something w/ string-value pointer 'strpath' *
 		}
 
+	Synopsis:
+	val = strlibval(strlibvals w) noex
+
+	Arguements:
+	w		which value to retrieve
+
+	Returns:
+	val		return value (either substantive or NULL)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucsysconf.h>
-#include	<ucfork.h>
-#include	<ucatfork.h>
-#include	<ucatexit.h>
-#include	<timewatch.hh>
-#include	<bufsizevar.hh>
-#include	<ptm.h>
-#include	<mkpathx.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |getenver(3u)| */
+#include	<ptm.h>			/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsysconf.h>		/* LIBUC */
+#include	<ucfork.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strlibval.hh"
 
@@ -187,9 +197,9 @@ constexpr strvarenv::strvarenv() noex {
 /* forward references */
 
 extern "C" {
-    static void	valstore_atforkbefore() noex ;
-    static void	valstore_atforkafter() noex ;
-    static void	valstore_exit() noex ;
+    local void	valstore_atforkbefore() noex ;
+    local void	valstore_atforkafter() noex ;
+    local void	valstore_exit() noex ;
 }
 
 
@@ -229,8 +239,7 @@ strlibval::operator ccharp () noex {
 	    }
 	} /* end if (needed) */
 	return rp ;
-}
-/* end method (valstore::operator) */
+} /* end method (valstore::operator) */
 
 int valstore::iinit() noex {
 	int		rs = SR_NXIO ;
@@ -273,8 +282,7 @@ int valstore::iinit() noex {
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
 	return (rs >= 0) ? fr : rs ;
-}
-/* end method (valstore::iinit) */
+} /* end method (valstore::iinit) */
 
 int valstore::ifini() noex {
 	int		rs = SR_OK ;
@@ -303,8 +311,7 @@ int valstore::ifini() noex {
 	    finit = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end method (valstore::ifini) */
+} /* end method (valstore::ifini) */
 
 int valstore::valget(strlibvals aw,cchar **rpp) noex {
 	int		rs = SR_INVALID ;
@@ -333,8 +340,7 @@ int valstore::valget(strlibvals aw,cchar **rpp) noex {
 	    } /* end if (mon) */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end method (valstore::valget) */
+} /* end method (valstore::valget) */
 
 int valstore::valtmpdir(int aw) noex {
 	int		rs = SR_OK ;
@@ -347,13 +353,12 @@ int valstore::valtmpdir(int aw) noex {
 	} /* end if (env-variable name) */
 	facc[aw] = true ;
 	return rs ;
-}
-/* end method (valstore::valtmpdir) */
+} /* end method (valstore::valtmpdir) */
 
 int valstore::valmaildir(int aw) noex {
 	int		rs = SR_OK ;
 	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
-	    cchar	*rp ;
+	    cchar	*rp ; /* used-afterwards */
 	    if ((rp = getenver(vn)) == nullptr) {
 		rp = sysword.w_maildir ;
 	    } /* end if (env-variable access) */
@@ -361,8 +366,7 @@ int valstore::valmaildir(int aw) noex {
 	} /* end if (env-variable name) */
 	facc[aw] = true ;
 	return rs ;
-}
-/* end method (valstore::valmaildir) */
+} /* end method (valstore::valmaildir) */
 
 int valstore::valpath(int aw) noex {
 	int		rs = SR_OK ;
@@ -399,8 +403,7 @@ int valstore::valpath(int aw) noex {
 	} /* end if (env-variable name) */
 	facc[aw] = true ;
 	return rs ;
-}
-/* end method (valstore::valpath) */
+} /* end method (valstore::valpath) */
 
 int valstore::valenv(int aw) noex {
 	int		rs = SR_OK ;
@@ -409,15 +412,13 @@ int valstore::valenv(int aw) noex {
 	}
 	facc[aw] = true ;
 	return rs ;
-}
-/* end method (valstore::valenv) */
+} /* end method (valstore::valenv) */
 
 void valstore::dtor() noex {
 	if (cint rs = fini() ; rs < 0) {
 	    ulogerror("strlibval",rs,"dtor-fini") ;
 	}
-}
-/* end method (valstore::dtor) */
+} /* end method (valstore::dtor) */
 
 valstore_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -438,22 +439,18 @@ valstore_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (valstore_co) */
+} /* end method (valstore_co) */
 
-static void valstore_atforkbefore() noex {
+local void valstore_atforkbefore() noex {
 	data.atforkbefore() ;
-}
-/* end subroutine (valstore_atforkbefore) */
+} /* end subroutine (valstore_atforkbefore) */
 
-static void valstore_atforkafter() noex {
+local void valstore_atforkafter() noex {
 	data.atforkafter() ;
-}
-/* end subroutine (valstore_atforkafter) */
+} /* end subroutine (valstore_atforkafter) */
 
-static void valstore_exit() noex {
+local void valstore_exit() noex {
 	data.fini() ;
-}
-/* end subroutine (valstore_exit) */
+} /* end subroutine (valstore_exit) */
 
 
