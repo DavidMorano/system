@@ -45,10 +45,9 @@ EXTERNC_end
 
 template<concharp ... Args>
 inline int sncpy(char *dp,int dl,Args ... args) noex {
-	cint		na = npack(Args) ;
+	cint	na = npack(Args) ;
 	return sncpyx(dp,dl,na,args ...) ;
 } /* end subroutine-template (sncpy) */
-
 
 #endif /* __cplusplus */
 
