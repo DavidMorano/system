@@ -67,7 +67,7 @@ namespace libuc {
 	    return operator int () ;
 	} ;
     } ; /* end struct (maxpider) */
-}
+} /* end namespace */
 
 extern libuc::maxpider		maxpid ;
 
