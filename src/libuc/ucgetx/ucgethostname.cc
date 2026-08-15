@@ -27,14 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |u_gethostid(3u)| */
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |u_gethostid(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetx.h"
 
@@ -73,8 +73,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 int uc_gethostid(ulong *lp) noex {
 	return u_gethostid(lp) ;
-}
-/* end subroutine (uc_gethostid) */
+} /* end subroutine (uc_gethostid) */
 
 int uc_gethostname(char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
@@ -87,12 +86,11 @@ int uc_gethostname(char *hbuf,int hlen) noex {
 	            hbuf[hlen] = '\0' ;
 	            rs = lenstr(hbuf) ;
 	        } else {
-	            rs = (- errno) ;
+	            rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_gethostname) */
+} /* end subroutine (uc_gethostname) */
 
 
