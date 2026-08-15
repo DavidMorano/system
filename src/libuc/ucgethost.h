@@ -35,9 +35,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<netdb.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
