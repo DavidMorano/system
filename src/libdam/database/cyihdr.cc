@@ -95,8 +95,8 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize	= hi_overlast * szof(uint) ;
-constexpr int		magicsz		= CYIHDR_MAGICSIZE ;
+constexpr int		headsz		= hi_overlast * szof(uint) ;
+constexpr int		magicsz		= CYIHDR_MAGICSZ ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= CYIHDR_MAGICSTR ;
 
@@ -109,11 +109,11 @@ constexpr char		magicstr[]	= CYIHDR_MAGICSTR ;
 int cyihdr_rd(cyihdr *op,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && hbuf) {
+	if (op && hbuf) ylikely {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magicsz + vsz)) {
-	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) {
+	    if (bl >= (magicsz + vsz)) ylikely {
+	        if ((rs = mkmagic(bp,magicsz,magicstr)) >= 0) ylikely {
 	            bp += magicsz ;
 	            bl -= magicsz ;
 	    	    memcopy(bp,op->vetu,vsz) ;
@@ -121,7 +121,7 @@ int cyihdr_rd(cyihdr *op,char *hbuf,int hlen) noex {
 	    	    bp[1] = uchar(ENDIAN) ;
 	    	    bp += vsz ;
 	    	    bl -= vsz ;
-	    	    if (bl >= headsize) {
+	    	    if (bl >= headsz) ylikely {
 	        	uint			*header = uintp(bp) ;
 	        	header[hi_fsz]		= op->fsz ;
 	        	header[hi_wtime]	= op->wtime ;
@@ -134,8 +134,8 @@ int cyihdr_rd(cyihdr *op,char *hbuf,int hlen) noex {
 	        	header[hi_nentries]	= op->nentries ;
 	        	header[hi_nskip]	= op->nskip ;
 	        	header[hi_year]		= op->year ;
-	        	bp += headsize ;
-	        	bl -= headsize ;
+	        	bp += headsz ;
+	        	bl -= headsz ;
 			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
@@ -151,15 +151,15 @@ int cyihdr_rd(cyihdr *op,char *hbuf,int hlen) noex {
 int cyihdr_wr(cyihdr *op,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (op && hbuf) {
+	if (op && hbuf) ylikely {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) {
+	    if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) ylikely {
 		rs = SR_OK ;
 	        bp += magicsz ;
 	        bl -= magicsz ;
 		/* read out the VETU information */
-		if (bl >= vsz) {
+		if (bl >= vsz) ylikely {
 	            memcopy(op->vetu,bp,vsz) ;
 	            if (op->vetu[0] != CYIHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
@@ -172,8 +172,8 @@ int cyihdr_wr(cyihdr *op,cchar *hbuf,int hlen) noex {
 		} else {
 		    rs = SR_ILSEQ ;
 		}
-	        if (rs >= 0) {
-		    if (bl >= headsize) {
+	        if (rs >= 0) ylikely {
+		    if (bl >= headsz) ylikely {
 	                const uint	*header = uintp(bp) ;
 	                op->fsz		= header[hi_fsz] ;
 	                op->wtime	= header[hi_wtime] ;
@@ -186,8 +186,8 @@ int cyihdr_wr(cyihdr *op,cchar *hbuf,int hlen) noex {
 	                op->nentries	= header[hi_nentries] ;
 	                op->nskip	= header[hi_nskip] ;
 	                op->year	= header[hi_year] ;
-	                bp += headsize ;
-	        	bl -= headsize ;
+	                bp += headsz ;
+	        	bl -= headsz ;
 			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
