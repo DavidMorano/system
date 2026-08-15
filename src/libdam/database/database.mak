@@ -48,13 +48,15 @@ OBJ4= msfile.o msfile_best.o msfilee.o
 OBJ5= cyihdr.o pwi.o pwihdr.o
 OBJ6= uuname.o uunames.o
 OBJ7= var.o varhdr.o varmk.o varmks.o vars.o
+
 OBJ8= votdchdr.o votdshdr.o
 OBJ9= ttihdr.o
+OBJ10= calyear.o
 
 
 OBJA= obj0.o obj1.o obj2.o obj3.o 
 OBJB= obj4.o obj5.o obj6.o obj7.o
-OBJC= obj8.o obj9.o
+OBJC= obj8.o obj9.o obj10.o
 
 OBJ= $(OBJA) $(OBJB) $(OBJC)
 
@@ -148,10 +150,17 @@ obj6.o:			$(OBJ6)
 obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+
 obj8.o:			$(OBJ8)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj9.o:			$(OBJ9)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj10.o:		$(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj11.o:		$(OBJ11)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -172,7 +181,6 @@ bvcitekey.o:		bvcitekey.cc bvcitekey.h	$(INCS)
 bpihdr.o:		bpihdr.cc bpihdr.h		$(INCS)
 bvihdr.o:		bvihdr.cc bvihdr.h		$(INCS)
 bvshdr.o:		bvshdr.cc bvshdr.h		$(INCS)
-cmi.o:			cmi.cc cmi.h			$(INCS)
 commandment.o:		commandment.cc commandment.h	$(INCS)
 commandments.o:		commandments.cc commandments.h	$(INCS)
 cyihdr.o:		cyihdr.cc cyihdr.h		$(INCS)
@@ -192,7 +200,13 @@ votdchdr.o:		votdchdr.cc votdchdr.h		$(INCS)
 votdshdr.o:		votdshdr.cc votdshdr.h		$(INCS)
 ttihdr.o:		ttihdr.cc ttihdr.h		$(INCS)
 
-cmihdr.o:		cmihdr.cc cmihdr.h		$(INCS)
-cmimk.o:		cmimk.cc cmimk.h		$(INCS)
+cmi.o:			cmi.cc		cmi.h cmihdr.h			$(INCS)
+cmimk.o:		cmimk.cc	cmimk.h cmihdr.h		$(INCS)
+cmihdr.o:		cmihdr.cc	cmihdr.h			$(INCS)
+
+calmgr.o:		calmgr.cc	calmgr.h			$(INCS)
+
+calyear.o:		calyear.cc	calyear.h calyears.h		$(INCS)
+calyears.o:		calyears.cc	calyears.h			$(INCS)
 
 
