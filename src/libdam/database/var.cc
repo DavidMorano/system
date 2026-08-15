@@ -42,16 +42,17 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<getnodename.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<nulstr.h>		/* LIBUC */
-#include	<endian.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<mkpr.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<mkfname.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
+#include	<vardefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"var.h"
@@ -62,10 +63,6 @@
 import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
-
-#ifndef	VARPRLOCAL
-#define	VARPRLOCAL	"LOCAL"
-#endif
 
 #define	VAR_MODBNAME	"vars"
 #define	VAR_OBJNAME	"vars"
@@ -111,7 +108,7 @@ extern "C" {
 
 /* local structures */
 
-struct var_calls {
+struct calls {
     soopen_f		open ;
     socount_f		count ;
     socurbegin_f	curbegin ;
@@ -123,7 +120,7 @@ struct var_calls {
     soclose_f		close ;
 } ; /* end struct (var) */
 
-typedef var_calls *	callsp ;
+typedef calls *	callsp ;
 
 
 /* forward references */
@@ -138,11 +135,11 @@ local int var_ctor(var *op,Args ... args) noex {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
 	    if ((op->mlp = new(nt) modload) != np) ylikely {
-		var_calls    *callp ;
-                if ((callp = new(nt) var_calls) != np) ylikely {
+		calls    *callp ;
+                if ((callp = new(nt) calls) != np) ylikely {
                     op->callp = callp ;
                     rs = SR_OK ;
-                } /* end if (new-var_calls) */
+                } /* end if (new-calls) */
                 if (rs < 0) {
                     delete op->mlp ;
                     op->mlp = nullptr ;
@@ -157,7 +154,7 @@ local int var_dtor(var *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
             if (op->callp) ylikely {
-                var_calls    *callp = callsp(op->callp) ;
+                calls    *callp = callsp(op->callp) ;
                 delete callp ;
                 op->callp = nullptr ;
             }
@@ -230,7 +227,7 @@ int var_open(var *op,cchar *dbname) noex {
 	    rs = SR_INVALID ;
 	    if (dbname[0]) {
 	        if ((rs = var_objloadbegin(op,np,objname)) >= 0) {
-                    var_calls *callp = resumelife<var_calls>(op->callp) ;
+                    calls *callp = resumelife<calls>(op->callp) ;
                     if ((rs = callp->open(op->obj,dbname)) >= 0) {
                         op->magval = VAR_MAGIC ;
                     }
@@ -251,7 +248,7 @@ int var_close(var *op) noex {
 	int		rs1 ;
 	if ((rs = var_magic(op)) >= 0) ylikely {
 	    {
-                var_calls *callp = resumelife<var_calls>(op->callp) ;
+                calls *callp = resumelife<calls>(op->callp) ;
 	        rs1 = callp->close(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -272,7 +269,7 @@ int var_getinfo(var *op,VAR_INFO *vip) noex {
 	int		rs ;
 	if ((rs = var_magic(op,vip)) >= 0) ylikely {
 	    memclear(vip) ;
-            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
+            if (calls *callp = resumelife<calls>(op->callp) ; callp) {
 	        VARS_INFO	vsi{} ;
 	        if ((rs = callp->getinfo(op->obj,&vsi)) >= 0) {
 		    vip->wtime = vsi.wtime ;
@@ -288,7 +285,7 @@ int var_getinfo(var *op,VAR_INFO *vip) noex {
 int var_count(var *op) noex {
 	int		rs ;
 	if ((rs = var_magic(op)) >= 0) ylikely {
-            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
+            if (calls *callp = resumelife<calls>(op->callp) ; callp) {
 	        rs = callp->count(op->obj) ;
 	    }
 	} /* end if (var_magic) */
@@ -300,7 +297,7 @@ int var_curbegin(var *op,var_cur *curp) noex {
 	if ((rs = var_magic(op,curp)) >= 0) ylikely {
 	    memclear(curp) ;
 	    rs = SR_BUGCHECK ;
-            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
+            if (calls *callp = resumelife<calls>(op->callp) ; callp) {
 		rs = SR_NOSYS ;
 	        if (callp->curbegin) {
 	            if (void *vp ; (rs = mem.mall(op->cursz,&vp)) >= 0) {
@@ -323,26 +320,25 @@ int var_curend(var *op,var_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = var_magic(op,curp)) >= 0) ylikely {
-	    rs = SR_BUGCHECK ;
-            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
-	        rs = SR_NOTOPEN ;
-	        if (curp->magval == VAR_MAGIC) {
-		    rs = SR_BUGCHECK ;
-		    if (curp->scp) {
+	    rs = SR_NOTOPEN ;
+	    if ((curp->magval == VAR_MAGIC) && curp->scp) ylikely {
+	        rs = SR_BUGCHECK ;
+                if (calls *co = resumelife<calls>(op->callp) ; co) {
+		    rs = SR_OK ;
+		    if (co->curend) {
+	        	rs1 = co->curend(op->obj,curp->scp) ;
+	        	if (rs >= 0) rs = rs1 ;
+		    } else {
 			rs = SR_NOSYS ;
-	    	        if (callp->curend) {
-	        	    rs1 = callp->curend(op->obj,curp->scp) ;
-	        	    if (rs >= 0) rs = rs1 ;
-			}
-	                {
-	                    rs1 = mem.free(curp->scp) ;
-	                    if (rs >= 0) rs = rs1 ;
-	                    curp->scp = nullptr ;
-		        } /* end if (memory-release) */
-	            } /* end if (non-null) */
-		} /* end if (cursor-magic) */
+		    }
+	            {
+	                rs1 = mem.free(curp->scp) ;
+	                if (rs >= 0) rs = rs1 ;
+	                curp->scp = nullptr ;
+		    } /* end if (memory-release) */
+	        } /* end if (non-null) */
 		curp->magval = 0 ;
-	    } /* end if (bug-check) */
+	    } /* end if (cursor-magic) */
 	} /* end if (var_magic) */
 	return rs ;
 } /* end subroutine (var_curend) */
@@ -351,20 +347,17 @@ int var_curenum(var *op,var_cur *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	if ((rs = var_magic(op,curp,kbuf)) >= 0) ylikely {
-	    rs = SR_BUGCHECK ;
-            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
-	        rs = SR_NOTOPEN ;
-	        if (curp->magval == VAR_MAGIC) {
-		    rs = SR_BUGCHECK ;
-		    if (curp->scp) {
+	    rs = SR_NOTOPEN ;
+	    if ((curp->magval == VAR_MAGIC) && curp->scp) ylikely {
+	        rs = SR_BUGCHECK ;
+                if (calls *co = resumelife<calls>(op->callp) ; co) {
 			rs = SR_NOSYS ;
-		        if (callp->curenum) {
-	    		    rs = callp->curenum(op->obj,curp->scp,
+		        if (co->curenum) {
+	    		    rs = co->curenum(op->obj,curp->scp,
 				kbuf,klen,vbuf,vlen) ;
 			} /* end if (ok) */
-		    } /* end if (non-null) */
-		} /* end if (cursor-magic) */
-	    } /* end if (bug-check) */
+	        } /* end if (bug-check) */
+	    } /* end if (cursor-magic) */
 	} /* end if (var_magic) */
 	return rs ;
 } /* end subroutine (var_curenum) */
@@ -372,16 +365,16 @@ int var_curenum(var *op,var_cur *curp,char *kbuf,int klen,
 int var_fetch(var *op,cc *kp,int kl,var_cur *curp,char *vbuf,int vlen) noex {
 	int		rs = SR_NOSYS ;
 	if ((rs = var_magic(op,curp,kp)) >= 0) ylikely {
-	    rs = SR_BUGCHECK ;
-            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
-	        rs = SR_NOTOPEN ;
-	        if (curp->magval == VAR_MAGIC) {
+	    rs = SR_NOTOPEN ;
+	    if ((curp->magval == VAR_MAGIC) && curp->scp) ylikely {
+	        rs = SR_BUGCHECK ;
+                if (calls *co = resumelife<calls>(op->callp) ; co) {
 		    rs = SR_NOSYS ;
-		    if (callp->fetch) {
-	    		rs = callp->fetch(op->obj,kp,kl,curp->scp,vbuf,vlen) ;
+		    if (co->fetch) {
+	    		rs = co->fetch(op->obj,kp,kl,curp->scp,vbuf,vlen) ;
 		    } /* end if (ok) */
-		} /* end if (cursor-magic) */
-	    } /* end if (bug-check) */
+	        } /* end if (bug-check) */
+	    } /* end if (cursor-magic) */
 	} /* end if (var_magic) */
 	return rs ;
 } /* end subroutine (var_fetch) */
@@ -390,8 +383,8 @@ int var_audit(var *op) noex {
 	int		rs ;
 	if ((rs = var_magic(op)) >= 0) ylikely {
 	    rs = SR_NOSYS ;
-            if (var_calls *callp = resumelife<var_calls>(op->callp) ; callp) {
-	        rs = callp->audit(op->obj) ;
+            if (calls *co = resumelife<calls>(op->callp) ; co) {
+	        rs = co->audit(op->obj) ;
 	    }
 	} /* end if (var_magic) */
 	return rs ;
@@ -473,7 +466,7 @@ local int var_loadcalls(var *op,vecstr *slp) noex {
 	cchar		*sname{} ;
 	for (int i = 0 ; (rs1 = slp->get(i,&sname)) >= 0 ; i += 1) {
 	    if (cvoid *snp{} ; (rs = modload_getsym(mlp,sname,&snp)) >= 0) {
-                var_calls   *callp = callsp(op->callp) ;
+                calls   *callp = callsp(op->callp) ;
                 c += 1 ;
                 switch (i) {
                 case sub_open:
