@@ -1,42 +1,40 @@
-/* process */
+/* process SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a file (I really have no idea what this was supposed to do!) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
 	The program was written from scratch to do what the previous
 	program by the same name did.
 
-
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1996 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine processes a file for SpamAssassin bugs.
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
 #include	<usystem.h>
-#include	<char.h>
 #include	<bfile.h>
+#include	<char.h>
+#include	<headkeymat.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -56,8 +54,6 @@
 
 /* external subroutines */
 
-extern int	headkeymat(const char *,const char *,int) ;
-
 
 /* external variables */
 
@@ -67,28 +63,30 @@ extern int	headkeymat(const char *,const char *,int) ;
 
 /* forward references */
 
-static int	headkey(const char *,int) ;
+static int	headkey(cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*spamkeys[] = {
+constexpr cpcchar	spamkeys[] = {
 	"x-spam-level",
 	"x-spam-status",
 	"x-spam-flag",
 	"x-spam-report",
 	"x-spam-checker-version",
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
 int process(pip,ofp,fname)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	bfile	ifile, *ifp = &ifile ;
 
@@ -100,7 +98,7 @@ const char	fname[] ;
 	int	f ;
 
 
-	if (fname == NULL)
+	if (fname == nullptr)
 	    return SR_FAULT ;
 
 	if ((fname[0] == '\0') || (fname[0] == '-')) fname = BFILE_STDIN ;
@@ -130,7 +128,7 @@ const char	fname[] ;
 
 		if (f_bol) {
 
-		    for (i = 0 ; spamkeys[i] != NULL ; i += 1) {
+		    for (i = 0 ; spamkeys[i] != nullptr ; i += 1) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -174,7 +172,7 @@ const char	fname[] ;
 #ifdef	COMMENT
 
 static int headkey(sp,sl)
-const char	sp[] ;
+cchar	sp[] ;
 int		sl ;
 {
 	int	hi = 0 ;
