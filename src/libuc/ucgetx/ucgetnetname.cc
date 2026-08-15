@@ -45,16 +45,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetnetname.h"
 
@@ -117,13 +117,13 @@ int uc_getnetname(char *nbuf,int nlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (nbuf) {
+	if (nbuf) ylikely {
 	    nbuf[0] = '\0' ;
-	    if (static cint rsv = var ; (rs = rsv) >= 0) {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		cint rlen = rs ;
 		if (char *rbuf ; (rs = libmem.mall((rlen+1),&rbuf)) >= 0) {
 	            const uid_t	uid = 0 ; /* root user */
-	            if ((rs = uc_procpid(PROCNAME,uid)) > 0) {
+	            if ((rs = uc_procpid(PROCNAME,uid)) > 0) ylikely {
 	                if (getnetname(rbuf) > 0) {
 			    rs = sncpy(nbuf,nlen,rbuf) ;
 	                    len = rs ;
@@ -143,7 +143,7 @@ int uc_getnetname(char *nbuf,int nlen) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = usys::getnetnamelen()) >= 0) {
+	if ((rs = usys::getnetnamelen()) >= 0) ylikely {
 	    netnamelen = rs ;
 	}
     	return rs ;
