@@ -52,18 +52,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |pid_t| */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |memset(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |msleep(3u)| */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® |pid_t| */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memset(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |msleep(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetx.h"
 
@@ -135,8 +135,7 @@ int uc_getprojdef(PROJECT *pjp,char *rbuf,int rlen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getprojdef) */
+} /* end subroutine (uc_getprojdef) */
 
 
 /******************************************************************************/
@@ -155,8 +154,7 @@ int uc_getprojdef(PROJECT *pjp,char *rbuf,int rlen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getprojdef) */
+} /* end subroutine (uc_getprojdef) */
 
 
 /******************************************************************************/
