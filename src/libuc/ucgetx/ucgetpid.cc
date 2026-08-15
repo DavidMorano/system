@@ -43,18 +43,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucatexit.h>
-#include	<ucatfork.h>
-#include	<timewatch.hh>
-#include	<ptm.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<timewatch.hh>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetpid.h"
 
@@ -92,14 +92,14 @@ namespace {
 	int fini() noex ;
         void atforkbefore() noex {
 	    mx.lockbegin() ;
-        }
+        } ;
         void atforkparent() noex {
 	    mx.lockend() ;
-        }
+        } ;
         void atforkchild() noex {
 	    pid = 0 ;
 	    mx.lockend() ;
-        }
+        } ;
 	destruct ucgetpid() noex {
 	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("ucgetpid",rs,"dtor-fini") ;
@@ -139,14 +139,13 @@ int uc_getpid(void) noex {
 	    rs = ucgetpid_data.pid ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
 int uc_setpid(pid_t pid) noex {
 	if (pid < 0) pid = getpid() ;
 	ucgetpid_data.pid = pid ;
 	return SR_OK ;
-}
-/* end subroutine (uc_setpid) */
+} /* end subroutine (uc_setpid) */
 
 int ucgetpid_init() noex {
 	return ucgetpid_data.init() ;
@@ -178,15 +177,15 @@ int ucgetpid::init() noex {
 	                }
 	                if (rs < 0) {
 	                    uc_atforkexp(b,ap,ac) ;
-			}
+			} /* end if (error) */
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
 	        cauto lamb = [this] () -> int {
