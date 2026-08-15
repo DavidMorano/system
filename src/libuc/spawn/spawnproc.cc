@@ -167,7 +167,7 @@ local void	spawnproc_child(scon *,cchar *,mainv,mainv,
 local int	envhelp_load(envhelp *,char *,cchar *,mainv) noex ;
 
 local int	findprog(char *,char *,cchar *) noex ;
-local int	findxfile(ids *,char *,cchar *) noex ;
+local int	findfilex(ids *,char *,cchar *) noex ;
 local int	ourfork() noex ;
 local int	opendevnull(int *,int) noex ;
 
@@ -575,12 +575,12 @@ local int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 	                pl = rs ;
 	                if (ustat sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
 	                    cint	am = X_OK ;
-	                    rs = permid(&id,&sb,am) ;
+	                    rs = permids(&id,&sb,am) ;
 	                }
 	            } /* end if (mkpath) */
 	        } /* end if (ok) */
 	    } else {
-	        rs = findxfile(&id,pbuf,fname) ;
+	        rs = findfilex(&id,pbuf,fname) ;
 	        pl = rs ;
 	    } /* end if */
 	    rs1 = id.release ;
@@ -589,7 +589,7 @@ local int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 	return (rs >= 0) ? pl : rs ;
 } /* end subroutine (findprog) */
 
-local int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
+local int findfilex(ids *idp,char *rbuf,cchar *pn) noex {
     	static cchar	*path = getenv(varname.path) ;
 	int		rs ;
 	int		rs1 ;
@@ -609,7 +609,7 @@ local int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
 	return (rs >= 0) ? pl : rs ;
-} /* end subroutine (findxfile) */
+} /* end subroutine (findfilex) */
 
 local int ourfork() noex {
 	return uc_fork() ;
