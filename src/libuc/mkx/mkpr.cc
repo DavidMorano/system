@@ -333,7 +333,7 @@ local int si_dirok(SI *sip,cchar *dname,mode_t dm) noex {
 	    if ((rs = si_checkid(sip)) >= 0) ylikely {
 	        rs = SR_NOTDIR ;
 	        if (S_ISDIR(sb.st_mode) && sip->open.ids) {
-	            rs = permid(&sip->id,&sb,dm) ;
+	            rs = permids(&sip->id,&sb,dm) ;
 		}
 	    }
 	} /* end if (uc_stat) */
