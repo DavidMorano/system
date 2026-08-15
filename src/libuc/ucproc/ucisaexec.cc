@@ -91,7 +91,6 @@ int uc_isaexecve(cchar *pfn,con mainv argv,con mainv envv) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_isaexecve) */
+} /* end subroutine (uc_isaexecve) */
 
 
