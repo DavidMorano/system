@@ -72,7 +72,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>		/* CSTD */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -119,9 +119,8 @@ local sysret_t	std_getloadavg(double *,int) noex ;
 
 /* local variables */
 
-constexpr int		maxloadavgs = LOADAVG_NSTATS ;
-
-constexpr bool		f_kloadavg = F_KLOADAVG ;
+constexpr int	maxloadavgs	= LOADAVG_NSTATS ;
+constexpr bool	f_kloadavg	= F_KLOADAVG ;
 
 
 /* exported variables */
@@ -138,7 +137,7 @@ sysret_t u_getloadavg(uint *la,int n) noex {
 		if_constexpr (f_kloadavg) {
 		    int		*ila = intp(la) ;
 	            if ((rs = kloadavg(ila,n)) < 0) {
-	                rs = (- errno) ;
+	                rs = (neg errno) ;
 	            }
 		} else {
 		    rs = make_ugetloadavg(la,n) ;
@@ -146,8 +145,7 @@ sysret_t u_getloadavg(uint *la,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_getloadavg) */
+} /* end subroutine (u_getloadavg) */
 
 sysret_t u_loadavgd(double *dla,int n) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
@@ -198,16 +196,14 @@ local sysret_t make_ugetloadavg(uint *la,int n) noex {
 	    } /* end if (greater-than) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rn : rs ;
-}
-/* end subroutine (make_ugetloadavg) */
+} /* end subroutine (make_ugetloadavg) */
 
 local sysret_t std_getloadavg(double *dla,int n) noex {
 	int		rs ;
 	if ((rs = getloadavg(dla,n)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (std_getloadavg) */
+} /* end subroutine (std_getloadavg) */
 
 
