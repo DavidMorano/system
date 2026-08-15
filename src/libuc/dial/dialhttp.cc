@@ -259,7 +259,7 @@ static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
 	                                rl = rs ;
 	                                if ((rs = u_stat(rbuf,&sb)) >= 0) {
 	                                    if (S_ISREG(sb.st_mode)) {
-	                                        rs = permid(idp,&sb,perms) ;
+	                                        rs = permids(idp,&sb,perms) ;
 	                                        if (isNotAccess(rs)) {
 	                                            rl = 0 ;
 	                                        }
