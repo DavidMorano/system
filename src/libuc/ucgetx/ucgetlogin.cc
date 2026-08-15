@@ -24,17 +24,16 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>		/* |getlogin(3c)| */
-#include	<cerrno>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strlen(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<bufsizeget.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetx.h"
 
@@ -74,24 +73,27 @@ constexpr bool		f_getloginr = SYSHAS_GETLOGINR ;
 
 int uc_getlogin(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
-	    if ((rs = bufsizeget(bufsize_un)) >= 0) {
+	if (rbuf) ylikely {
+	    if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 		cint	ulen = rs ;
 		rs = SR_OVERFLOW ;
-	        if ((rlen >= 0) && (rlen < ulen)) {
+	        if ((rlen >= 0) && (rlen < ulen)) ylikely {
 	            if_constexpr (f_getloginr) {
-	                if ((rs = getlogin_r(rbuf,rlen)) != 0) rs = (- errno) ;
-	                if (rs >= 0) rs = strlen(rbuf) ;
+	                if ((rs = getlogin_r(rbuf,rlen)) != 0) {
+			    rs = (neg errno) ;
+			} /* end if (error) */
+	                if (rs >= 0) {
+			    rs = lenstr(rbuf) ;
+			}
 	            } else {
 	                cchar	*rp = getlogin() ;
-	                rs = (rp != nullptr) ? 0 : (- errno) ;
+	                rs = (rp != nullptr) ? 0 : (neg errno) ;
 	                if (rs >= 0) rs = sncpy1(rbuf,rlen,rp) ;
 	            } /* end if_constexpr (f_getloginr) */
 	        } /* end if (valid) */
 	    } /* end if (bufsizeget) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getlogin) */
+} /* end subroutine (uc_getlogin) */
 
 
