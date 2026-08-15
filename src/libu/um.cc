@@ -362,6 +362,20 @@ int u_munmap(void *ma,size_t ms) noex {
 	return u_mmapend(ma,ms) ;
 } /* end subroutine */
 
+/* alias names */
+
+int u_mmapbeg(void *ma,size_t ms,int pr,int fl,int fd,
+			off_t off,void *vp) noex {
+	return u_mmapbegin(ma,ms,pr,fl,fd,off,vp) ;
+}
+int u_mlockbeg(void *ma,size_t ms) noex {
+	return u_mlockbegin(ma,ms) ;
+}
+int u_mlockallbeg(int fl) noex {
+	return u_mlockallbegin(fl) ;
+}
+
+
 
 /* local subroutines */
 
