@@ -1,6 +1,6 @@
 /* mmpost_main SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* post a mail-like message to the PCS bulletin board system */
 /* version %I% last-modified %G% */
