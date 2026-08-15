@@ -18,7 +18,7 @@
 
 
 #define	CYIHDR			struct cyihdr_head
-#define	CYIHDR_MAGICSIZE	16
+#define	CYIHDR_MAGICSZ		16
 #define	CYIHDR_MAGICSTR		"CALENDARINDEX"
 #define	CYIHDR_VERSION		0
 
