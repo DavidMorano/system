@@ -44,11 +44,11 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucsysmisc.h>		/* LIBUC */
 #include	<ucinfo.h>		/* LIBUC */
 #include	<ucnprocs.h>		/* LIBUC */
-#include	<baops.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strdcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
