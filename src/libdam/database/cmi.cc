@@ -5,6 +5,7 @@
 /* read or audit a ComMandment Index (CMI) database */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_SEARCH	1		/* use |bsearch(3c)| */
 
 /* revision history:
@@ -53,6 +54,7 @@
 #include	<ucmem.h>		/* LIBUC */
 #include	<mkfname.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<bvcitekey.h>		/* LIBDAM */
 
@@ -72,6 +74,9 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	TO_CHECK	4
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 #ifndef	CF_SEARCH
 #define	CF_SEARCH	1		/* use |bsearch(3c)| */
 #endif
@@ -97,20 +102,37 @@ using libuc::mem ;			/* variable */
 /* forward references */
 
 template<typename ... Args>
-local int cmi_ctor(cmi *op,Args ... args) noex {
-	CMI		*hop = op ;
+local inline int cmi_ctor(cmi *op,Args ... args) noex {
+    	CMI		*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = memclear(hop) ;
+	    memclear(hop) ;
+	    rs = SR_NOMEM ;
+	    if ((op->fmp = new(nt) CMI_FMI) != np) {
+	        if ((op->fhp = new(nt) cmihdr) != np) {
+		    rs = SR_OK ;
+		} /* end if (new-cmihdr) */
+		if (rs < 0) {
+		    delete op->fmp ;
+		    op->fmp = nullptr ;
+		} /* end if (error) */
+	    } /* end if (new-CMI_FMI) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (cmi_ctor) */
 
 local int cmi_dtor(cmi *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) ylikely {
-	    rs = SR_OK ;
-	} /* end if (non-null) */
+	int		rs = SR_OK ;
+	if (op->fmp) ylikely {
+	    delete op->fhp ;
+	    op->fhp = nullptr ;
+	} /* end if (delete-cmihdr) */
+	if (op->fmp) ylikely {
+	    delete op->fmp ;
+	    op->fmp = nullptr ;
+	} /* end if (delete-CMI_FMI) */
 	return rs ;
 } /* end subroutine (cmi_dtor) */
 
@@ -123,7 +145,7 @@ local inline int cmi_magic(cmi *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (cmi_magic) */
 
-local int	cmi_loadbegin	(cmi *,time_t) noex ;
+local int	cmi_loadbeg	(cmi *,time_t) noex ;
 local int	cmi_loadend	(cmi *) noex ;
 local int	cmi_mapcreate	(cmi *,time_t) noex ;
 local int	cmi_mapdestroy	(cmi *) noex ;
@@ -141,7 +163,8 @@ extern "C" {
 
 /* local variables */
 
-constexpr bool		f_search = CF_SEARCH ;
+constexpr bool		f_debug		= CF_DEBUG ;
+constexpr bool		f_search	= CF_SEARCH ;
 
 
 /* exported variables */
@@ -159,7 +182,7 @@ local int	cmi_opener(cmi *,cchar *) noex ;
 
 int cmi_open(cmi *op,cchar *dbname) noex {
 	int		rs ;
-	int		nents = 0 ;
+	int		nents = 0 ; /* return-value */
 	if ((rs = cmi_ctor(op,dbname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (dbname[0]) ylikely {
@@ -187,11 +210,11 @@ local int cmi_opener(cmi *op,cchar *dbn) noex {
 	            cint	tl = rs ;
 	            if ((rs = mem.strw(tbuf,tl,&cp)) >= 0) ylikely {
 	                op->fname = cp ;
-	                if ((rs = cmi_loadbegin(op,dt)) >= 0) ylikely {
+	                if ((rs = cmi_loadbeg(op,dt)) >= 0) ylikely {
 	                    nents = rs ;
 	                    op->ti_lastcheck = dt ;
 	                    op->magval = CMI_MAGIC ;
-	                } /* end if (loadbegin) */
+	                } /* end if (loadbeg) */
 	                if (rs < 0) {
 	                    if (op->fname) {
 	                        voidp vp = voidp(op->fname) ;
@@ -256,7 +279,7 @@ int cmi_count(cmi *op) noex {
 	int		rs ;
 	int		ne = 0 ;
 	if ((rs = cmi_magic(op)) >= 0) ylikely {
-	    cmihdr	*hip = &op->fhi ;
+	    cmihdr	*hip = op->fhp ;
 	    ne = hip->nents ;
 	} /* end if (cmi_magic) */
 	return (rs >= 0) ? ne : rs ;
@@ -267,15 +290,16 @@ int cmi_getinfo(cmi *op,cmi_info *ip) noex {
 	int		ne = 0 ;
 	if ((rs = cmi_magic(op)) >= 0) ylikely {
 	    if (ip) {
-	        cmihdr	*hip = &op->fhi ;
+		CMI_FMI	*fmp = op->fmp ;
+	        cmihdr	*hip = op->fhp ;
 	        rs = memclear(ip) ;
-	        ip->idxmtime = op->fmi.ti_mod ;
-	        ip->idxctime = (time_t) hip->idxtime ;
-	        ip->dbtime = (time_t) hip->dbtime ;
-	        ip->dbsz = (size_t) hip->dbsz ;
-	        ip->idxsz = (size_t) hip->idxsz ;
-	        ip->nents = hip->nents ;
-	        ip->maxent = hip->maxent ;
+	        ip->idxmtime	= conv<uint>(fmp->ti_mod) ;
+	        ip->idxctime	= conv<uint>(hip->idxtime) ;
+	        ip->dbtime	= hip->dbtime ;
+	        ip->dbsz	= hip->dbsz ;
+	        ip->idxsz	= hip->idxsz ;
+	        ip->nents	= hip->nents ;
+	        ip->maxent	= hip->maxent ;
 		ne = hip->nents ;
 	    } /* end if (non-null) */
 	} /* end if (cmi_magic) */
@@ -285,7 +309,7 @@ int cmi_getinfo(cmi *op,cmi_info *ip) noex {
 int cmi_read(cmi *op,cmi_ent *bvep,char *vbuf,int vlen,uint cn) noex {
 	int		rs ;
 	int		vi = 0 ;
-	if ((rs = cmi_magic(op,bvep,vnif)) >= 0) ylikely {
+	if ((rs = cmi_magic(op,bvep,vbuf)) >= 0) ylikely {
 	    if ((rs >= 0) && (op->ncursors == 0)) {
 	        rs = cmi_checkupdate(op,0) ;
 	    }
@@ -325,9 +349,9 @@ int cmi_curenum(cmi *op,cmi_cur *curp,cmi_ent *bvep,char *vbuf,int vlen) noex {
 	if ((rs = cmi_magic(op,curp,bvep,vbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (op->ncursors > 0) {
-	        cmihdr	*hip = &op->fhi ;
+	        cmihdr	*hip = op->fhp ;
 	        int	vi = (curp->i < 0) ? 0 : (curp->i + 1) ;
-	        if (vi < hip->vilen) {
+	        if (uint uvi = uint(vi) ; uvi < hip->vilen) {
 	            if ((rs = cmi_loadcmi(op,bvep,vbuf,vlen,vi)) >= 0) {
 		        nlines = rs ;
 	                curp->i = vi ;
@@ -343,7 +367,7 @@ int cmi_curenum(cmi *op,cmi_cur *curp,cmi_ent *bvep,char *vbuf,int vlen) noex {
 
 /* private subroutines */
 
-local int cmi_loadbegin(cmi *op,time_t dt) noex {
+local int cmi_loadbeg(cmi *op,time_t dt) noex {
 	int		rs ;
 	int		nents = 0 ;
 	if ((rs = cmi_mapcreate(op,dt)) >= 0) ylikely {
@@ -354,7 +378,7 @@ local int cmi_loadbegin(cmi *op,time_t dt) noex {
 	    } /* end if (error) */
 	} /* end if */
 	return (rs >= 0) ? nents : rs ;
-} /* end subroutine (cmi_loadbegin) */
+} /* end subroutine (cmi_loadbeg) */
 
 local int cmi_loadend(cmi *op) noex {
 	int		rs = SR_OK ;
@@ -364,7 +388,7 @@ local int cmi_loadend(cmi *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	{
-	    cmi_fmi	*mip = &op->fmi ;
+	    cmi_fmi	*mip = op->fmp ;
 	    mip->vt = nullptr ;
 	    mip->lt = nullptr ;
 	}
@@ -372,7 +396,7 @@ local int cmi_loadend(cmi *op) noex {
 } /* end subroutine (cmi_loadend) */
 
 local int cmi_mapcreate(cmi *op,time_t dt) noex {
-	cmi_fmi		*mip = &op->fmi ;
+	cmi_fmi		*mip = op->fmp ;
 	cnullptr	np{} ;
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
@@ -382,14 +406,13 @@ local int cmi_mapcreate(cmi *op,time_t dt) noex {
 	    if ((rs = u_open(op->fname,of,om)) >= 0) ylikely {
 	        cint	fd = rs ;
 	        if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
-	            csize	fsize = size_t(sb.st_size) {
-	            if (fsize > 0) {
+	            if (csize fsize = size_t(sb.st_size) ; fsize > 0) {
 	                csize	ms = fsize ;
 	                cint	mp = PROT_READ ;
 	                cint	mf = MAP_SHARED ;
 	                void	*md ;
-	                if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
-	                    mip->mapdata = md ;
+	                if ((rs = u_mmapbeg(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	                    mip->mapdata = charp(md) ;
 	                    mip->mapsize = ms ;
 	                    mip->ti_mod = sb.st_mtime ;
 	                    mip->ti_map = dt ;
@@ -407,7 +430,7 @@ local int cmi_mapcreate(cmi *op,time_t dt) noex {
 } /* end subroutine (cmi_mapcreate) */
 
 local int cmi_mapdestroy(cmi *op) noex {
-	cmi_fmi		*mip = &op->fmi ;
+	cmi_fmi		*mip = op->fmp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (mip->mapdata) {
@@ -426,14 +449,14 @@ local int cmi_checkupdate(cmi *op,time_t dt) noex {
 	if (op->ncursors == 0) {
 	    if (dt <= 0) dt = getustime ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
-	        cmi_fmi		*mip = &op->fmi ;
+	        cmi_fmi		*mip = op->fmp ;
 	        op->ti_lastcheck = dt ;
 	        if (ustat sb ; (rs = u_stat(op->fname,&sb)) >= 0) {
 	            f = f || (sb.st_mtime > mip->ti_mod) ;
 	            f = f || (sb.st_mtime > mip->ti_map) ;
 	            if (f) {
 	                cmi_loadend(op) ;
-	                rs = cmi_loadbegin(op,dt) ;
+	                rs = cmi_loadbeg(op,dt) ;
 	            } /* end if (update) */
 	        } else if (isNotPresent(rs)) {
 	            rs = SR_OK ;
@@ -444,22 +467,25 @@ local int cmi_checkupdate(cmi *op,time_t dt) noex {
 } /* end subroutine (cmi_checkupdate) */
 
 local int cmi_proc(cmi *op,time_t dt) noex {
-	cmi_fmi		*mip = &op->fmi ;
-	cmihdr		*hip = &op->fhi ;
+	cmi_fmi		*mip = op->fmp ;
+	cmihdr		*hip = op->fhp ;
 	int		rs ;
-	int		nents = 0 ;
-	if ((rs = cmihdr(hip,1,mip->mapdata,mip->mapsize)) >= 0) {
-	    if ((rs = cmi_verify(op,dt)) >= 0) {
-	        mip->vt = (uint (*)[4]) (mip->mapdata + hip->vioff) ;
-	        mip->lt = (uint (*)[2]) (mip->mapdata + hip->vloff) ;
-	    }
-	}
+	int		nents = 0 ; /* return-value */
+	{
+	    cint msz = conv<int>(mip->mapsize) ;
+	    if ((rs = hip->wr(mip->mapdata,msz)) >= 0) {
+	        if ((rs = cmi_verify(op,dt)) >= 0) {
+	            mip->vt = (uint (*)[4]) (mip->mapdata + hip->vioff) ;
+	            mip->lt = (uint (*)[2]) (mip->mapdata + hip->vloff) ;
+	        } /* end if (cmihdr_wr) */
+	    } /* end if (cmihdr_wr) */
+	} /* end block */
 	return (rs >= 0) ? nents : rs ;
 } /* end subroutine (cmi_proc) */
 
 local int cmi_verify(cmi *op,time_t dt) noex {
-	cmi_fmi		*mip = &op->fmi ;
-	cmihdr		*hip = &op->fhi ;
+	cmi_fmi		*mip = op->fmp ;
+	cmihdr		*hip = op->fhp ;
 	int		rs = SR_OK ;
 	int		sz ;
 	int		f = true ;
@@ -477,27 +503,27 @@ local int cmi_verify(cmi *op,time_t dt) noex {
 #endif
 	/* alignment restriction */
 	{
-	f = f && ((hip->vioff & (szof(int) - 1)) == 0) ;
+	    f = f && ((hip->vioff & (szof(int) - 1)) == 0) ;
 	}
 	/* size restrictions */
 	{
-	f = f && (hip->vioff <= mip->mapsize) ;
-	sz = hip->vilen * 4 * szof(uint) ;
-	f = f && ((hip->vioff + sz) <= mip->mapsize) ;
+	    f = f && (hip->vioff <= mip->mapsize) ;
+	    sz = hip->vilen * 4 * szof(uint) ;
+	    f = f && ((hip->vioff + sz) <= mip->mapsize) ;
 	}
 	/* alignment restriction */
 	{
-	f = f && ((hip->vloff & (szof(int) - 1)) == 0) ;
+	    f = f && ((hip->vloff & (szof(int) - 1)) == 0) ;
 	}
 	/* size restrictions */
 	{
-	f = f && (hip->vloff <= mip->mapsize) ;
-	size = (hip->vllen * 2 * szof(uint)) ;
-	f = f && ((hip->vloff + sz) <= mip->mapsize) ;
+	    f = f && (hip->vloff <= mip->mapsize) ;
+	    sz = (hip->vllen * 2 * szof(uint)) ;
+	    f = f && ((hip->vloff + sz) <= mip->mapsize) ;
 	}
 	/* size restrictions */
 	{
-	f = f && (hip->vilen == hip->nents) ;
+	    f = f && (hip->vilen == hip->nents) ;
 	}
 	/* get out */
 	if (! f) {
@@ -507,19 +533,18 @@ local int cmi_verify(cmi *op,time_t dt) noex {
 } /* end subroutine (cmi_verify) */
 
 local int cmi_auditvt(cmi *op) noex {
-	cmi_fmi		*mip = &op->fmi ;
-	cmihdr		*hip = &op->fhi ;
+	cmi_fmi		*mip = op->fmp ;
+	cmihdr		*hip = op->fhp ;
 	uint		(*vt)[4] ;
 	uint		pcitcmpval = 0 ;
 	uint		citcmpval ;
 	int		rs = SR_OK ;
-	int		li ;
 	vt = mip->vt ;
 	/* "verses" table */
-	for (int i = 1 ; (rs >= 0) && (i < hip->vilen) ; i += 1) {
-	    /* verify no line-index is longer than the "lines" table itself */
-	    li = vt[i][2] ;
-	    if (li >= hip->vllen) {
+	cint n = conv<int>(hip->vilen) ;
+	for (int i = 1 ; (rs >= 0) && (i < n) ; i += 1) {
+	    /* verify no line-index is longer than the "lines" table */
+	    if (uint uli = vt[i][2] ; uli >= hip->vllen) {
 	        rs = SR_BADFMT ;
 	        break ;
 	    }
@@ -535,14 +560,16 @@ local int cmi_auditvt(cmi *op) noex {
 } /* end subroutine (cmi_auditvt) */
 
 local int cmi_search(cmi *op,uint cn) noex {
-	cmi_fmi		*mip = &op->fmi ;
-	cmihdr		*hip = &op->fhi ;
+	cmi_fmi		*mip = op->fmp ;
+	cmihdr		*hip = op->fhp ;
+	cuint		usm = USHORT_MAX ;
 	uint		(*vt)[4] ;
-	uint		vte[4] ;
-	uint		citekey = (uint) (cn & USHORT_MAX) ;
+	uint		vte[4] = {} ;
+	uint		citekey = uint(cn & USHORT_MAX) ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		vtlen ;
-	int		vi = 0 ;
+	int		vi = 0 ; /* return-value */
 	vt = mip->vt ;
 	vtlen = hip->vilen ;
 	/* search for entry */
@@ -551,11 +578,11 @@ local int cmi_search(cmi *op,uint cn) noex {
 	    uint	*vtep ;
 	    csize	vtesize = (4 * szof(uint)) ;
 	    vtep = (uint *) bsearch(vte,vt,vtlen,vtesize,vtecmp) ;
-	    rs = (vtep != nullptr) ? ((vtep - vt[0]) >> 2) : SR_NOTFOUND ;
+	    rs = (vtep) ? conv<int>(((vtep - vt[0]) >> 2) & usm) : rsn ;
 	    vi = rs ;
 	} else {
 	    for (vi = 0 ; vi < vtlen ; vi += 1) {
-	        const ushort	vkey = ((vt[vi][3] >> 16) & USHORT_MAX) ;
+	        cuint vkey = ((vt[vi][3] >> 16) & usm) ;
 	        if (vkey == citekey) break ;
 	    } /* end for */
 	    rs = (vi < vtlen) ? vi : SR_NOTFOUND ;
@@ -579,8 +606,8 @@ local int cmi_loadcmi(cmi *op,cmi_ent *bvep,char *ebuf,int elen,int vi) noex {
 	        int		bo ;
 	        int		linesz ;
 	        rs = SR_OK ;
-	        mip = &op->fmi ;
-	        hip = &op->fhi ;
+	        mip = op->fmp ;
+	        hip = op->fhp ;
 	        vte = mip->vt[vi] ;
 	        /* load the basic stuff */
 	        memclear(bvep) ;
@@ -619,8 +646,8 @@ local int cmi_loadcmi(cmi *op,cmi_ent *bvep,char *ebuf,int elen,int vi) noex {
 } /* end subroutine (cmi_loadcmi) */
 
 local int vtecmp(cvoid *v1p,cvoid *v2p) noex {
-	uint		*vte1 = (uint *) v1p ;
-	uint		*vte2 = (uint *) v2p ;
+	uint		*vte1 = uintp(v1p) ;
+	uint		*vte2 = uintp(v2p) ;
 	int		rc = 0 ;
 	{
 	    int cn1 = ((vte1[3] >> 0) & USHORT_MAX) ;
