@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* does the c-string contain a leading given character (after skipping WS) */
+/* does the c-string have a trailing EOL character */
 /* version %I% last-modified %G% */
 
 
@@ -24,19 +24,17 @@
 	haslead
 
 	Description:
-	Determine if the given c-string contains a leading character
-	(caller supplied) after skipping all leading white-space.
+	Determine if the given c-string has a trailing EOL character.
 
 	Synopsis:
-	bool haslead(cchar *sp,int µsl,int chx) noex
+	bool haseol(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		c-string pointer
 	sl		c-string length
-	chx		character to match to
 
 	Returns:
-	true		the given c-string has a leading given character
+	true		the given c-string has a trailing EOL character
 	false		the given c-string did not match
 
 *******************************************************************************/
@@ -93,6 +91,6 @@ bool haseol(cchar *sp,int µsl) noex {
 	    f = (ch == CH_NL) || (ch == CH_CR) ;
 	} /* end if (getlenstr) */
 	return f ;
-} /* end subroutine (haslead) */
+} /* end subroutine (haseol) */
 
 
