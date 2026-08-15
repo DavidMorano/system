@@ -116,7 +116,7 @@ local int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
 	int		rs ;
 	if (ustat sb ; (rs = uc_stat(dirbuf,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
-	        rs = permid(idp,&sb,X_OK) ;
+	        rs = permids(idp,&sb,X_OK) ;
 	        if (rs > 0) rs = 0 ;
 	    } else {
 	        rs = SR_NOTDIR ;
