@@ -18,9 +18,10 @@
 /*******************************************************************************
 
 	Names:
+	permids
+	permidf
 	perm
 	permf
-	permid
 
 	Description:
 	This module is sort of the "effective_user" version of
@@ -28,7 +29,8 @@
 	interfaces:
  	+ perm(3uc)
 	+ permf(3uc)
-	+ permid(3uc)
+	+ permids(3uc)
+	+ permidf(3uc)
 
 	Synopsis:
 	int perm(cchar *fname,uid_t uid,gid_t gid,cgid_t *groups,int am) noex
@@ -103,9 +105,9 @@ constexpr local int	mkperms(int) noex ;
 
 namespace {
     constexpr int	tablen = (1 << pbits) ;
-    struct permtab {
+    struct permtaber {
 	uchar	tab[tablen] = {} ;
-	constexpr permtab() noex {
+	constexpr permtaber() noex {
 	    for (int i = 0 ; i < tablen ; i += 1) {
 		if (i & R_OK) tab[i] |= S_IROTH ;
 		if (i & W_OK) tab[i] |= S_IWOTH ;
@@ -114,8 +116,8 @@ namespace {
 	} ; /* end ctor */
 	constexpr int operator [] (int a) const noex {
 	    return tab[a] ;
-	} ;
-    } ; /* end struct (permtab) */
+	} ; /* end method */
+    } ; /* end struct (permtaber) */
 } /* end namespace */
 
 namespace {
@@ -157,7 +159,7 @@ constexpr tryer_m	tries[] = {
 constexpr uid_t		uidend = (-1) ;
 constexpr gid_t		gidend = (-1) ;
 
-constexpr permtab	perms ;
+constexpr permtaber	perms ;
 
 
 /* exported variables */
@@ -188,7 +190,7 @@ int permf(int fd,uid_t euid,gid_t egid,const gid_t *gids,int am) noex {
 	return rs ;
 } /* end subroutine (permf) */
 
-int permid(ids *idp,ustat *sbp,int am) noex {
+int permids(ids *idp,ustat *sbp,int am) noex {
 	int		rs = SR_FAULT ;
 	if (idp && sbp) ylikely {
 	    const uid_t		euid = idp->euid ;
@@ -197,7 +199,17 @@ int permid(ids *idp,ustat *sbp,int am) noex {
 	    rs = permer(sbp,euid,egid,gids,am) ;
 	} /* end if (non-null) */
 	return rs ;
-} /* end subroutine (permid) */
+} /* end subroutine (permids) */
+
+extern int permidf(ids *idp,cchar *fname,int am) noex {
+	int		rs ;
+	if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
+	    if (S_ISREG(sb.st_mode)) {
+	        rs = permids(idp,&sb,am) ;
+	    }
+	} /* end if (u_stat) */
+	return rs ;
+} /* end subroutine (peridf) */
 
 
 /* local subroutines */
