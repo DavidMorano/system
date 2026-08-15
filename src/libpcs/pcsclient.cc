@@ -82,6 +82,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<endian.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<getusername.h>		/* LIBUC */
 #include	<getax.h>		/* LIBUC */
@@ -92,7 +93,6 @@
 #include	<nulstr.h>		/* LIBUC */
 #include	<filer.h>		/* LIBUC */
 #include	<expcook.h>		/* LIBUC */
-#include	<ascii.h>		/* LIBUC */
 #include	<getsysmisc.h>		/* LIBUC */
 #include	<vardefs.h>		/* LIBU */
 #include	<exitcodes.h>		/* LIBU */
