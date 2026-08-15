@@ -87,8 +87,7 @@ int uc_atexit(void_f func) noex {
 	    rs = aeo() ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_atexit) */
+} /* end subroutine (uc_atexit) */
 
 
 /* local subroutines */
@@ -116,8 +115,7 @@ int ucatexit::operator () () noex {
             } /* end if (error) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end subroutine (ucatexit::operator) */
+} /* end subroutine (ucatexit::operator) */
 
 int ucatexit::stdatexit() noex {
 	int		rs ;
@@ -125,7 +123,6 @@ int ucatexit::stdatexit() noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (ucatexit::stdatexit) */
+} /* end method (ucatexit::stdatexit) */
 
 
