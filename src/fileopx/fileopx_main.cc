@@ -1981,7 +1981,7 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	        int	v ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(progopts,1,kp,kl)) >= 0) {
 
