@@ -61,19 +61,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
+#include	<sys/types.h>		/* POSIX® system types */
 #include	<sys/stat.h>		/* POSIX® */
 #include	<unistd.h>		/* POSIX® */
 #include	<fcntl.h>		/* POSIX */
-#include	<cstddef>		/* POSIX® |nullptr_t| */
-#include	<cstdlib>		/* LIBU */
-#include	<cstring>		/* LIBU |strcmp(3c)| */
-#include	<pwd.h>			/* LIBU */
+#include	<pwd.h>			/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<uclibmem.h>		/* LIBU */
-#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<aflag.hh>		/* LIBUC */
+#include	<aflag.hh>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<ucpwcache.h>		/* LIBUC |ucpwcache_name(3uc)| */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<getax.h>		/* LIBUC */
 #include	<getpwx.h>		/* LIBUC */
@@ -96,8 +98,8 @@ import libutil ;			/* |emclear(3u)| */
 
 /* local defines */
 
-#define	SUBINFO		subinfo
-#define	SUBINFO_FL	subinfo_flags
+#define	SI		subinfo
+#define	SI_FL		subinfo_flags
 
 
 /* imported namespaces */
@@ -109,11 +111,7 @@ import libutil ;			/* |emclear(3u)| */
 /* external subroutines */
 
 extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
-
-extern "C" {
-    int		getuserhome(char *,int,cchar *) noex ;
+    extern int	getuserhome(char *,int,cchar *) noex ;
 }
 
 
@@ -131,7 +129,7 @@ struct subinfo {
 	char		*pwbuf ;
 	ucentpw		pw ;
 	uid_t		uid ;
-	SUBINFO_FL	init ;
+	SI_FL		init ;
 	int		pwlen ;
 } ; /* end struct */
 
