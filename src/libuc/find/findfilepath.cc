@@ -120,7 +120,7 @@ int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
 	        if (ids id ; (rs = id.load) >= 0) ylikely {
 	            if (fn[0] == '/') {
 	                if ((rs = fileperm(&id,fn,am)) > 0) {
-			    rs = mkpath1(rbuf,fn) ;
+			    rs = mkpath(rbuf,fn) ;
 	                    len = rs ;
 	                }
 	            } else {
