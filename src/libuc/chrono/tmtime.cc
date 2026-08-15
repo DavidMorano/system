@@ -164,7 +164,7 @@ int tmtime_timegm(tmtime *op,time_t t) noex {
 	    } /* end if */
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmtime_zinit) */
 	return rs ;
 } /* end subroutine (tmtime_timegm) */
@@ -178,7 +178,7 @@ int tmtime_timelocal(tmtime *op,time_t t) noex {
 	    }
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmtime_zinit) */
 	return rs ;
 } /* end subroutine (tmtime_timelocal) */
