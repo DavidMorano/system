@@ -63,17 +63,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netdb.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |msleep(3u)| */
-#include        <errtimer.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |msleep(3u)| */
+#include        <errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetx.h"
 #include	"ucgetipnodeby.h"
