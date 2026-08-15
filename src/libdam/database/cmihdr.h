@@ -18,7 +18,7 @@
 
 
 #define	CMIHDR			struct cmihdr_head
-#define	CMIHDR_MAGICSIZE	16
+#define	CMIHDR_MAGICSZ		16
 #define	CMIHDR_MAGICSTR		"CMDINDEX"
 #define	CMIHDR_VERSION		0
 
