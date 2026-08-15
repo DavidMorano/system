@@ -96,7 +96,7 @@ namespace {
 /* forward references */
 
 extern "C" {
-    static void	ucfork_exit() noex ;
+    local void	ucfork_exit() noex ;
 }
 
 
@@ -167,8 +167,7 @@ int ucfork::init() noex {
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (ucfork::init) */
+} /* end method (ucfork::init) */
 
 int ucfork::fini() noex {
 	int		rs = SR_OK ;
@@ -184,8 +183,7 @@ int ucfork::fini() noex {
 	    finitdone.clear() ;
 	} /* end if (atexit registered) */
 	return rs ;
-}
-/* end method (ucfork::fini) */
+} /* end method (ucfork::fini) */
 
 int ucfork::stdfork() noex {
 	int		rs ;
@@ -210,8 +208,7 @@ int ucfork::stdfork() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
 	return (rs >= 0) ? pid : rs ;
-}
-/* end mrthod (ucfork::stdfork) */
+} /* end mrthod (ucfork::stdfork) */
 
 int ucfork::lockbegin(int to) noex {
 	int		rs ;
@@ -226,8 +223,7 @@ int ucfork::lockbegin(int to) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (ucfork::lockbegin) */
+} /* end subroutine (ucfork::lockbegin) */
 
 int ucfork::lockend() noex {
 	int		rs ;
@@ -244,10 +240,9 @@ int ucfork::lockend() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (ucfork::lockend) */
+} /* end subroutine (ucfork::lockend) */
 
-static void ucfork_exit() noex {
+local void ucfork_exit() noex {
 	ucfork_data.fvoid = true ;
 }
 
