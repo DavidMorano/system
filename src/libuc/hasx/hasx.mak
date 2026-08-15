@@ -41,14 +41,14 @@ LIBS +=
 
 
 OBJ0= hasmisc.o hasclass.o hasall.o
-OBJ1= hasnot.o
+OBJ1= hasnot.o hasend.o haseol.o
 OBJ2= hasprint.o hasonly.o
 OBJ3= hasuniq.o haslead.o hasnon.o
 
 OBJ4= hasbasename.o hasmodname.o
 OBJ5= hasinet.o
 OBJ6= hasallof.o hasourmjd.o
-OBJ7= haspath.o
+OBJ7= haspath.o hasneed.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o 
 OBJB= obj4.o obj5.o obj6.o obj7.o
@@ -168,6 +168,8 @@ haslead.o:		haslead.cc	haslead.h		$(INCS)
 hasprintbad.o:		hasprint.cc	hasprint.h		$(INCS)
 hasourmjd.o:		hasourmjd.cc	hasourmjd.h		$(INCS)
 haseol.o:		haseol.cc	haseol.h		$(INCS)
+hasend.o:		hasend.cc	hasend.h		$(INCS)
+hasneed.o:		hasneed.cc	hasneed.h		$(INCS)
 haspath.o:		haspath.cc	haspath.h		$(INCS)
 
 hasallof.o:		hasallof.cc	hasallof.h		$(INCS)
