@@ -43,8 +43,8 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<endian.h>		/* LIBUC */
-#include	<intceil.h>		/* LIBUC */
+#include	<endian.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
 #include	<intsat.h>		/* LIBUC */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucmem.h>		/* LIBUC */
@@ -73,8 +73,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -97,11 +95,12 @@ template<typename ... Args>
 local int lineindex_ctor(lineindex *op,Args ... args) noex {
     	LINEINDEX	*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->sbp = new(nothrow) ustat) != np) ylikely {
+	    if ((op->sbp = new(nt) ustat) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-ustat) */
 	} /* end if (non-null) */
@@ -115,7 +114,7 @@ local int lineindex_dtor(lineindex *op) noex {
 	    if (op->sbp) ylikely {
 		delete op->sbp ;
 		op->sbp = nullptr ;
-	    }
+	    } /* end if (delete-ustat) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (lineindex_dtor) */
