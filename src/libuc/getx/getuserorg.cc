@@ -85,6 +85,10 @@ import uconstants ;			/* |varname(3u)| */
 #undef	ORGCNAME
 #define	ORGCNAME	"organization"
 
+#ifndef	CF_ORGSYS
+#define	CF_ORGSYS	1
+#endif
+
 
 /* external subroutines */
 
@@ -95,11 +99,13 @@ import uconstants ;			/* |varname(3u)| */
 /* local structures */
 
 struct subinfo {
-	cchar		*ofp ;
-	cchar		*un ;
-	char		*rbuf ;		/* user-supplied buffer */
-	int		rlen ;
+	cchar		*ofp ;		/* organization-filename-pointer */
+	cchar		*un ;		/* username */
+	char		*rbuf ;		/* result buffer pointer */
+	int		rlen ;		/* result buffer length */
 } ; /* end sruct (subinfo) */
+
+typedef int (*subinfo_f)(subinfo *) noex ;
 
 
 /* forward references */
@@ -109,19 +115,24 @@ local int	subinfo_finish		(SI *) noex ;
 
 local int	getuserorg_var		(SI *) noex ;
 local int	getuserorg_home		(SI *) noex ;
-local int	getuserorg_passwd	(SI *) noex ;
-#if	CF_ORGSYS
+local int	getuserorg_gecos	(SI *) noex ;
 local int	getuserorg_sys		(SI *) noex ;
-#endif
 
 
 /* local variables */
 
-constexpr cchar		orgname[] = ORGCNAME ;
+constexpr cchar		orgcname[]	= ORGCNAME ;
+static cchar		*etcdir		= sysword.w_etcdir ;
+static cchar		*vusername	= varname.username ;
+static cchar		*vorganization	= varname.organization ;
+cbool			f_orgsys	= CF_ORGSYS ;
 
-#if	CF_ORGSYS
-static cchar		*etcdir = sysword.w_etcdir ;
-#endif
+constexpr subinfo_f	tries[] = {
+	&getuserorg_var,
+	&getuserorg_home,
+	&getuserorg_gecos,
+	&getuserorg_sys
+} ; /* end array */
 
 
 /* exported variables */
@@ -138,20 +149,10 @@ int getuserorg(char *rbuf,int rlen,cchar *un) noex {
 	    rbuf[0] = '\0' ;
 	    if (un[0]) ylikely {
 	        subinfo		si, *sip = &si ;
-		cchar		*on = orgname ;
+		cchar		*on = orgcname ;
 	        if ((rs = subinfo_start(&si,on,rbuf,rlen,un)) >= 0) ylikely {
-	            for (int i = 0 ; i < 3 ; i += 1) {
-	                switch (i) {
-	                case 0:
-	                    rs = getuserorg_var(sip) ;
-	                    break ;
-	                case 1:
-	                    rs = getuserorg_home(sip) ;
-	                    break ;
-	                case 2:
-	                    rs = getuserorg_passwd(sip) ;
-	                    break ;
-	                } /* end switch */
+		    for (cauto &fun : tries) {
+			rs = fun(sip) ;
 	                len = rs ;
 	                if (rs != 0) break ;
 	            } /* end for */
@@ -173,7 +174,7 @@ int gethomeorg(char *rbuf,int rlen,cchar *hd) noex {
 	    if (hd[0]) ylikely {
 	        if (char *cbuf ; (rs = lm_mn(&cbuf)) >= 0) ylikely {
 		    cint	clen = rs ;
-	            if ((rs = sncpy2(cbuf,clen,".",orgname)) >= 0) ylikely {
+	            if ((rs = sncpy(cbuf,clen,".",orgcname)) >= 0) ylikely {
 	                if (char *obuf ; (rs = lm_mp(&obuf)) >= 0) {
 	                    if ((rs = mkpath(obuf,hd,cbuf)) >= 0) {
 	                        if ((rs = filereadln(obuf,rbuf,rlen)) >= 0) {
@@ -213,15 +214,13 @@ local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) ylikely {
 	    rs = SR_OK ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (subinfo_finish) */
 
 local int getuserorg_var(SI *sip) noex {
-	cchar		*vusername = varname.username ;
-	cchar		*vorganization = varname.organization ;
 	int		rs = SR_OK ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	cchar		*un = sip->un ;
 	bool		f = (un[0] == '-') ;
 	if (! f) {
@@ -233,7 +232,7 @@ local int getuserorg_var(SI *sip) noex {
 	if (f) {
 	    static cchar	*vorg = getenver(vorganization) ;
 	    if (vorg && vorg[0]) {
-	        rs = sncpy1(sip->rbuf,sip->rlen,vorg) ;
+	        rs = sncpy(sip->rbuf,sip->rlen,vorg) ;
 	        len = rs ;
 	    }
 	} /* end if */
@@ -243,11 +242,11 @@ local int getuserorg_var(SI *sip) noex {
 local int getuserorg_home(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) ylikely { 
 	    cint	hlen = rs ;
 	    if ((rs = getuserhome(hbuf,hlen,sip->un)) >= 0) ylikely {
-	        if ((rs = gethomeorg(sip->rbuf,sip->rlen,hbuf)) >= 0) {
+	        if ((rs = gethomeorg(sip->rbuf,sip->rlen,hbuf)) > 0) {
 		    len = rs ;
 	        }
 	    } /* end if (getuserhome) */
@@ -257,11 +256,11 @@ local int getuserorg_home(SI *sip) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (getuserorg_home) */
 
-/* this tries to retrieve from the PASSWD gecos field */
-local int getuserorg_passwd(SI *sip) noex {
+/* this tries to retrieve from the PASSWD GECOS field */
+local int getuserorg_gecos(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
 	    ucentpw	pw ;
 	    cint	pwlen = rs ;
@@ -286,25 +285,26 @@ local int getuserorg_passwd(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-} /* end subroutine (getuserorg_passwd) */
-
-#if	CF_ORGSYS
+} /* end subroutine (getuserorg_gecos) */
 
 local int getuserorg_sys(SI *sip) noex {
-	int		rs ;
+	int		rs = SR_OK ;
 	int		rs1 ;
-	int		len = 0 ;
-	if (char *ofname ; (rs = lm_mp(&ofname)) >= 0) ylikely {
-	    if ((rs = mkpath(ofname,etcdir,sip->ofp)) >= 0) ylikely {
-	        rs = filereadln(ofname,sip->rbuf,sip->rlen) ;
-	        len = rs ;
-	    }
-	    rs1 = lm_free(ofname) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
+	int		len = 0 ; /* return-value */
+	if_constexpr (f_orgsys) {
+	    if (char *ofname ; (rs = lm_mp(&ofname)) >= 0) ylikely {
+	        if ((rs = mkpath(ofname,etcdir,sip->ofp)) >= 0) ylikely {
+	            if ((rs = filereadln(ofname,sip->rbuf,sip->rlen)) >= 0) {
+	                len = rs ;
+		    } else if (isNotPresent(rs)) {
+		        rs = SR_OK ;
+		    }
+	        } /* end if (mkpath) */
+	        rs1 = lm_free(ofname) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if_constexpr (f_orgsys) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (getuserorg_sys) */
-
-#endif /* CF_ORGSYS */
 
 
