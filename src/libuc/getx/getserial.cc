@@ -110,9 +110,9 @@
 
 /* forward references */
 
-local int	getserial_open(cchar *) noex ;
-local int	getserial_read(int,char *,int) noex ;
-local int	getserial_write(int,char *,int,int) noex ;
+local int	getserial_open	(cchar *) noex ;
+local int	getserial_read	(int,char *,int) noex ;
+local int	getserial_write	(int,char *,int,int) noex ;
 
 
 /* local variables */
@@ -126,7 +126,7 @@ local int	getserial_write(int,char *,int,int) noex ;
 int getserial(cchar *sfname) noex {
 	int		rs ;
 	int		rs1 ;
-	int		serial = 0 ;
+	int		serial = 0 ; /* return-value */
 	if ((sfname == nullptr) || (sfname[0] == '\0')) {
 	    sfname = DEFSERIAL ;
 	}
@@ -137,7 +137,7 @@ int getserial(cchar *sfname) noex {
 	    if ((rs = lockfile(fd,cmd,0z,0z,to)) >= 0) ylikely {
 		cint	dlen = DIGBUFLEN ;
 		char	dbuf[DIGBUFLEN+1] ;
-	        if ((rs = getserial_read(fd,dbuf,dlen)) >= 0) {
+	        if ((rs = getserial_read(fd,dbuf,dlen)) >= 0) ylikely {
 	            serial = rs ; /* result for return */
 	            rs = getserial_write(fd,dbuf,dlen,serial) ;
 	        }
@@ -151,9 +151,10 @@ int getserial(cchar *sfname) noex {
 
 /* local subroutines */
 
+local int getserial_openc(cchar *) noex ;
+
 local int getserial_open(cchar *sfname) noex {
 	int		rs ;
-	int		rs1 ;
 	int		fd = -1 ;
 	cmode		m = FILEMODE ;
 	rs = uc_open(sfname,O_RDWR,m) ;
@@ -164,37 +165,47 @@ local int getserial_open(cchar *sfname) noex {
 	    }
 	}
 	if (rs == SR_NOENT) {
-	    cint	of = (O_RDWR|O_CREAT) ;
-	    if ((rs = uc_open(sfname,of,m)) >= 0) ylikely {
-	        fd = rs ;
-	        if ((rs = uc_fminmod(fd,m)) >= 0) ylikely {
-	            cint	cmd = _PC_CHOWN_RESTRICTED ;
-	            if ((rs = uc_fpathconf(fd,cmd,nullptr)) == 0) {
-	                cchar	*cp{} ;
-	                if (int cl ; (cl = sfdirname(sfname,-1,&cp)) > 0) {
-	                    if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
-	                        if ((rs = mkpath1w(pbuf,cp,cl)) >= 0) {
-	                	    ustat	sb ;
-	                            if ((rs = uc_stat(pbuf,&sb)) >= 0) {
-					const uid_t	u = sb.st_uid ;
-					const gid_t	g = sb.st_gid ;
-	                                rs = uc_fchown(fd,u,g) ;
-	                            }
-	                        } /* end if (mkpath) */
-				rs1 = lm_free(pbuf) ;
-				if (rs >= 0) rs = rs1 ;
-			    } /* end if (m-a-f) */
-	                } /* end if (sfdirname) */
-	            } /* end if (u_pathconf) */
-	        } /* end if (uc_fminmod) */
-	    } /* end if (uc_open) */
-	} /* end if (NOTENT) */
+	    rs = getserial_openc(sfname) ;
+	    fd = rs ;
+	} /* end if */
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (getserial_open) */
 
+local int getserial_openc(cchar *sfname) noex {
+	cint		of = (O_RDWR|O_CREAT) ;
+	int		rs ;
+	int		rs1 ;
+	int		fd = -1 ; /* return-value */
+	cmode		om = 0666 ;
+        if ((rs = uc_open(sfname,of,om)) >= 0) ylikely {
+            fd = rs ;
+            if ((rs = uc_fminmod(fd,om)) >= 0) ylikely {
+                cint        cmd = _PC_CHOWN_RESTRICTED ;
+                if ((rs = uc_fpathconf(fd,cmd,nullptr)) == 0) {
+                    cchar   *cp{} ;
+                    if (int cl ; (cl = sfdirname(sfname,-1,&cp)) > 0) {
+                        if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
+                            if ((rs = mkpath1w(pbuf,cp,cl)) >= 0) {
+                                ustat sb ;
+                                if ((rs = uc_stat(pbuf,&sb)) >= 0) {
+                                    const uid_t     u = sb.st_uid ;
+                                    const gid_t     g = sb.st_gid ;
+                                    rs = uc_fchown(fd,u,g) ;
+                                }
+                            } /* end if (mkpath) */
+                            rs1 = lm_free(pbuf) ;
+                            if (rs >= 0) rs = rs1 ;
+                        } /* end if (m-a-f) */
+                    } /* end if (sfdirname) */
+                } /* end if (u_pathconf) */
+            } /* end if (uc_fminmod) */
+        } /* end if (uc_open) */
+	return (rs >= 0) ? fd : rs ;
+} /* end subroutine (getserial_copenc) */
+
 local int getserial_read(int fd,char *dbuf,int dlen) noex {
 	int		rs ;
-	int		serial = 0 ;
+	int		serial = 0 ; /* return-value */
 	if ((rs = u_read(fd,dbuf,dlen)) > 0) ylikely {
 	    cint	dl = rs ;
 	    cchar	*cp{} ;
