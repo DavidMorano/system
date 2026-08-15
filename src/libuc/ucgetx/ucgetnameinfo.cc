@@ -44,19 +44,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include        <errtimer.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include        <errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetx.h"
 
@@ -101,9 +101,9 @@ int uc_getnameinfo(const SA *sap,int sal,char *hbuf,int hlen,
 		char *sbuf,int slen,int fl) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (sap && hbuf) {
+	if (sap && hbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if ((sal > 0) && (hlen > 0) && (fl >= 0)) {
+	    if ((sal > 0) && (hlen > 0) && (fl >= 0)) ylikely {
                 errtimer	to_mfile	= utimeout[uto_mfile] ;
                 errtimer        to_nfile	= utimeout[uto_nfile] ;
                 errtimer        to_nomem	= utimeout[uto_nomem] ;
@@ -147,8 +147,7 @@ int uc_getnameinfo(const SA *sap,int sal,char *hbuf,int hlen,
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (uc_getnameinfo) */
+} /* end subroutine (uc_getnameinfo) */
 
 
 /* local subroutines */
@@ -192,7 +191,7 @@ local int std_getnameinfo(con SA *sap,int sal,char *hbuf,int hlen,
                 rs = SR_SOCKTNOSUPPORT ;
                 break ;
             case EAI_SYSTEM:
-                rs = (- errno) ;
+                rs = (neg errno) ;
                 break ;
             case EAI_BADHINTS:
                 rs = SR_INVALID ;
