@@ -33,12 +33,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |uloadavgd(3u)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |uloadavgd(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetloadavg.h"
 
@@ -76,7 +76,6 @@ using libu::uloadavgd ;			/* internal library subroutine */
 
 int uc_getloadavg(double *dla,int n) noex {
 	return uloadavgd(dla,n) ;
-}
-/* end subroutine (uc_getloadavg) */
+} /* end subroutine (uc_getloadavg) */
 
 
