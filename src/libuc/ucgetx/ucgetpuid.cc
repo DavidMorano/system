@@ -43,18 +43,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<unistd.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<unistd.h>		/* POSIX® */
 #include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizevar.hh>
-#include	<storebuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetx.h"
 
@@ -127,8 +127,7 @@ int uc_getpuid(pid_t pid) noex {
 	    r = intsat(uid) ;
 	} /* end if (valid PID) */
 	return (rs >= 0) ? r : rs ;
-}
-/* end subroutine (uc_getpuid) */
+} /* end subroutine (uc_getpuid) */
 
 
 /* local subroutines */
