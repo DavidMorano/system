@@ -36,7 +36,6 @@
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -79,9 +78,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* imported namespaces */
-
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -345,8 +341,8 @@ int calmgr_audit(calmgr *op) noex {
 local int calmgr_argbegin(calmgr *op,cchar *dn,cchar *cn) noex {
 	int		rs ;
 	int		sz = 0 ;
-	sz += (lenstr(dn)+1) ;
-	sz += (lenstr(cn)+1) ;
+	sz += (lenstr(dn) + 1) ;
+	sz += (lenstr(cn) + 1) ;
 	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) ylikely {
 	    op->a = bp ;
 	    op->dn = bp ;
