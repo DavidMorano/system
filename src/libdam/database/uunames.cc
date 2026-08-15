@@ -41,21 +41,22 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<endian.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<getprogroot.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
+#include	<mkdirs.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
-#include	<spawnproc.h>		/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
-#include	<mkdirs.h>		/* LIBUC */
 #include	<permx.h>		/* LIBUC */
-#include	<ascii.h>		/* LIBUC */
-#include	<baops.h>		/* LIBUC */
+#include	<findfilepath.h>	/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC |sfbasename(3uc)| */
@@ -205,24 +206,24 @@ local inline int uunames_magic(uunames *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (uunames_magic) */
 
-local int	uunames_infoloadbegin(UU *,cchar *,cchar *) noex ;
-local int	uunames_infoloadend(UU *) noex ;
-local int	uunames_indopen(UU *,time_t) noex ;
-local int	uunames_indopenpr(UU *,time_t) noex ;
-local int	uunames_indopentmp(UU *,time_t) noex ;
-local int	uunames_indopendname(UU *,cchar *,time_t) noex ;
-local int	uunames_indclose(UU *) noex ;
-local int	uunames_mkuunamesi(UU *,cchar *) noex ;
-local int	uunames_envpaths(UU *,vecenv *) noex ;
-local int	uunames_indreq(UU *,cchar *,time_t) noex ;
-local int	uunames_indmapcreate(UU *,cchar *,time_t) noex ;
-local int	uunames_indmapdestroy(UU *) noex ;
-local int	uunames_filemapcreate(UU *,time_t) noex ;
-local int	uunames_filemapdestroy(UU *) noex ;
-local int	uunames_indlist(UU *) noex ;
-local int	uunames_indcheck(UU *,time_t) noex ;
+local int	uunames_infoloadbegin	(UU *,cchar *,cchar *) noex ;
+local int	uunames_infoloadend	(UU *) noex ;
+local int	uunames_indopen		(UU *,time_t) noex ;
+local int	uunames_indopenpr	(UU *,time_t) noex ;
+local int	uunames_indopentmp	(UU *,time_t) noex ;
+local int	uunames_indopendname	(UU *,cchar *,time_t) noex ;
+local int	uunames_indclose	(UU *) noex ;
+local int	uunames_mkuunamesi	(UU *,cchar *) noex ;
+local int	uunames_envpaths	(UU *,vecenv *) noex ;
+local int	uunames_indreq		(UU *,cchar *,time_t) noex ;
+local int	uunames_indmapcreate	(UU *,cchar *,time_t) noex ;
+local int	uunames_indmapdestroy	(UU *) noex ;
+local int	uunames_filemapcreate	(UU *,time_t) noex ;
+local int	uunames_filemapdestroy	(UU *) noex ;
+local int	uunames_indlist		(UU *) noex ;
+local int	uunames_indcheck	(UU *,time_t) noex ;
 
-local int	ckdirs(cchar *dn,mode_t dm) noex ;
+local int	ckdir(cchar *dn,mode_t dm) noex ;
 local int	mkpathbn(char *,cc *,cc *,int,cc *) noex ;
 
 #ifdef	COMMENT
@@ -647,7 +648,7 @@ local int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
 	cmode		dm = 0777 ;
-	if ((rs = ckdirs(dname,dm)) > 0) {
+	if ((rs = ckdir(dname,dm)) > 0) {
 	    if (char *ibuf ; (rs = mem.mp(&ibuf)) >= 0) ylikely {
 	        if ((rs = mkpath(ibuf,dname,op->dbname)) >= 0) ylikely {
 	            if ((rs = uunames_indreq(op,ibuf,dt)) > 0) {
@@ -663,7 +664,7 @@ local int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 	        rs1 = mem.free(ibuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
-	} /* end if (ckdirs) */
+	} /* end if (ckdir) */
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (uunames_indopendname) */
 
@@ -714,12 +715,16 @@ namespace {
 	char		*pbuf ;
 	char		*dbuf ;
 	vecenv		envs ;
+	int		pl ;
 	spawner(UU *o,cchar *d) noex : op(o), dname(d) { 
 	    pbuf = nullptr ;
 	    dbuf = nullptr ;
+	    pl = 0 ;
 	} ; /* end ctor */
 	operator int () noex ;
-	int loadenvs() noex ;
+	int findprog	() noex ;
+	int loadenvs	() noex ;
+	int proc	() noex ;
     } ; /* end struct (spanwer) */
 } /* end namespace */
 
@@ -741,9 +746,11 @@ spawner::operator int () noex {
 		cint vn = 10 ;
 		cint vo = vecstrm.compact ;
 		if ((rs = envs.start(vn,vo)) >= 0) {
-		    if ((rs = loadenvs()) >= 0) {
-			rs = SR_OK ;
-		    }
+		    if ((rs = findprog()) >= 0) { ylikely 
+		        if ((rs = loadenvs()) >= 0) ylikely {
+			    rs = proc() ;
+		        }
+		    } /* end if (findprog) */
 		    rs1 = envs.finish ;
 	            if (rs >= 0) rs = rs1 ;
 		} /* end if (vecenv) */
@@ -756,6 +763,19 @@ spawner::operator int () noex {
     	return rs ;
 } /* end method (spawner::operator) */
 
+int spawner::findprog() noex {
+    	cnullptr	np{} ;
+	cint		am = (R_OK | X_OK) ;
+    	int		rs ;
+	ccharp		pn = PROG_MKUU ;
+	{{
+	    if ((rs = findfilepath(pbuf,np,pn,am)) >= 0) {
+	        pl = rs ;
+	    } /* end if (findfilepath) */
+	}}
+	return rs ;
+} /* end method (spawner::findprog) */
+
 int spawner::loadenvs() noex {
     	int		rs = SR_OK ;
 	if (rs >= 0) rs = uunames_envpaths(op,&envs) ;
@@ -767,111 +787,37 @@ int spawner::loadenvs() noex {
 	return rs ;
 } /* end method (spawner::loadenvs) */
 
-#ifdef	COMMENT
-local int uunames_mkuunamesi(UU *op,cchar *dname) noex {
-	SPAWNPROC_CON	ps{} ;
-	vecstr		envs ;
-	pid_t	cpid ;
-	int	rs ;
-	int	i, cstat, cex ;
-	int	prlen = 0 ;
-
-	cchar		*varprmkuu = VARPRMKUU ;
-	cchar		*pn = PROG_MKUU ;
-	cchar		*av[10] ;
-	mainv		ev ;
-
-	char	progfname[MAXPATHLEN + 1] ;
-	char	dbname[MAXPATHLEN + 1] ;
-	if (dname == nullptr)
-	    return SR_FAULT ;
-
-	if (dname[0] == '\0')
-	    return SR_INVALID ;
-
-	rs = mkpath(dbname,dname,op->dbname) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	rs = vecstr_start(&envs,10,vecstrm.compact) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-#if	CF_GETPROGROOT
-
-	rs = getprogroot(progfname,op->pr,prnames,pn) ;
-
-	if (rs == 0)
-	    rs = mkpath1(progfname,pn) ;
-
-#ifdef	COMMENT
-	if ((rs >= 0) && (prlen > 0)) {
-	    rs = vecstr_envadd(&envs,varprmkuu,progfname,prlen) ;
-	} else if (rs >= 0)
-	    rs = vecstr_envadd(&envs,varprmkuu,op->pr,-1) ;
-#endif /* COMMENT */
-
-#else /* CF_GETPROGROOT */
-
-	rs = prgetprogpath(op->pr,progfname,pn,-1) ;
-	if (rs == 0)
-	    rs = mkpath1(progfname,progmkuunamesi) ;
-
-#endif /* CF_GETPROGROOT */
-
-	if (rs < 0)
-	    goto ret2 ;
-
-/* setup environment for child process */
-
-	if (rs >= 0) rs = uunames_envpaths(op,&envs) ;
-	if (rs >= 0) rs = vecstr_envadd(&envs,varprmkuu,op->pr,-1) ;
-	if (rs >= 0) rs = vecstr_envadd(&envs,VARDBNAME,dbname,-1) ;
-	if (rs >= 0) rs = vecstr_envdefs(&envs,envsys) ;
-	if (rs >= 0) rs = vecstr_envdefs(&envs,prnames) ;
-	if (rs >= 0) rs = vecstr_envdefs(&envs,envdefs) ;
-
-	if (rs < 0)
-	    goto ret2 ;
-
-/* setup arguments */
-
-	i = 0 ;
-	av[i++] = pn ;
-	av[i++] = nullptr ;
-
-/* go */
-
-	vecstr_getvec(&envs,&ev) ;
-	ps.opts |= SPAWNPROC_OIGNINTR ;
-	ps.opts |= SPAWNPROC_OSETPGRP ;
-	for (i = 0 ; i < 3 ; i += 1) {
-	    ps.disp[i] = (i != 2) ? SPAWNPROC_DCLOSE : SPAWNPROC_DINHERIT ;
-	} /* end for */
-	rs = spawnproc(&ps,progfname,av,ev) ;
-	cpid = rs ;
-
-ret2:
-	vecstr_finish(&envs) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	cstat = 0 ;
-	if ((rs = u_waitpid(cpid,&cstat,0)) >= 0) {
-	    cex = 0 ;
-	    if (WIFSIGNALED(cstat)) {
-	        rs = SR_UNATCH ;	/* protocol not attached */
-	    }
-	    if ((rs >= 0) && WIFEXITED(cstat)) {
-	        cex = WEXITSTATUS(cstat) ;
-	        if (cex != 0) rs = SR_LIBBAD ;
-	    }
-	} /* end if (process finished) */
-
-ret0:
+int spawner::proc() noex {
+    	cint		nargs = 3 ;
+    	int		rs ;
+	int		ai = 0 ;
+	ccharp		av[nargs + 1] ;
+	mainv		ev{} ;
+	if (ai <= nargs) av[ai++] = pbuf ;
+	if (ai <= nargs) av[ai++] = nullptr ;
+	if ((rs = envs.getvec(&ev)) >= 0) {
+	    SPAWNPROC_CON	ps{} ;
+	    ps.opts |= SPAWNPROC_OIGNINTR ;
+	    ps.opts |= SPAWNPROC_OSETPGRP ;
+	    for (int i = 0 ; i < 3 ; i += 1) {
+	        ps.disp[i] = (i != 2) ? SPAWNPROC_DCLOSE : SPAWNPROC_DINHERIT ;
+	    } /* end for */
+	    if ((rs = spawnproc(&ps,pbuf,av,ev)) >= 0) {
+	        cint cpid = rs ;
+	        int cstat = 0 ;
+	        if ((rs = u_waitpid(cpid,&cstat,0)) >= 0) {
+	            if (WIFSIGNALED(cstat)) {
+	                rs = SR_UNATCH ;	/* protocol not attached */
+	            }
+	            if ((rs >= 0) && WIFEXITED(cstat)) {
+	                cint cex = WEXITSTATUS(cstat) ;
+	                if (cex != 0) rs = SR_LIBBAD ;
+	            }
+	        } /* end if (process finished) */
+	    } /* end if (spawnproc) */
+	} /* end if (vecstr_getvec) */
 	return rs ;
-} /* end subroutine (uunames_mkuunamesi) */
-#endif /* COMMENT */
+} /* end method (spawner::proc) */
 
 local int uunames_envpaths(UU *op,vecenv *elp) noex {
 	cnullptr	np{} ;
@@ -1051,7 +997,7 @@ vars::operator int () noex {
     	return rs ;
 } /* end method (vars::operator) */
 
-local int ckdirs(cchar *dn,mode_t dm) noex {
+local int ckdir(cchar *dn,mode_t dm) noex {
     	cnullptr	np{} ;
     	int		rs = SR_FAULT ;
 	int		fok = false ;
@@ -1073,7 +1019,7 @@ local int ckdirs(cchar *dn,mode_t dm) noex {
 	    } /* end if */
 	} /* end if (non-null) */
     	return (rs >= 0) ? fok : rs ;
-} /* end subroutine (ckdirs) */
+} /* end subroutine (ckdir) */
 
 #ifdef	COMMENT
 local int mkindfn(char *rbuf,cc *dn,cc *nn,cc *s_suf,cc *s_end) noex {
