@@ -88,7 +88,6 @@ int uc_forkdet() noex {
 	    } /* end if (sigaction) */
 	} /* end if (uc_sigsetempty) */
 	return (rs >= 0) ? pid : rs ;
-}
-/* end subroutine (uc_forkdet) */
+} /* end subroutine (uc_forkdet) */
 
 
