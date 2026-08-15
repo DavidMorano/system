@@ -47,8 +47,8 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
 #include	<char.h>		/* LIBUC */
-#include	<endian.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"bvchapters.hh"
