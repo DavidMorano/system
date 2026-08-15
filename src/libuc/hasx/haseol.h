@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* does the c-string contain a leading given character (after skipping WS) */
+/* does the c-string have a trailing EOL character */
 /* version %I% last-modified %G% */
 
 
@@ -31,6 +31,12 @@ EXTERNC_begin
 extern bool	haseol(cchar *,int) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+inline bool haseol(cchar *sp) noex {
+    	return haseol(sp,-1) ;
+} /* end subroutine */
+#endif /* __cplusplus */
 
 
 #endif /* HASEOL_INCLUDE */
