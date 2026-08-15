@@ -13,13 +13,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecobj.h>
+#include	<sys/types.h>		/* POSIX® |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	CMIMK		struct cmimk_head
@@ -54,7 +51,8 @@ struct cmimk_entry {
 	CMIMK_LINE	*lines ;
 	uint		eoff ;
 	uint		elen ;
-	ushort		nlines, cn ;
+	ushort		nlines ;
+	ushort		cn ;
 } ; /* end struct */
 
 struct cmimk_flags {
