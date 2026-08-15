@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/random.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/random.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 /* options for |uc_getrandom(3uc)| */
