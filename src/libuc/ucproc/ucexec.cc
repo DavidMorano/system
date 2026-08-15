@@ -84,7 +84,6 @@ int uc_execve(cchar *fname,con mainv av,con mainv ev) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (uc_execve) */
+} /* end subroutine (uc_execve) */
 
 
