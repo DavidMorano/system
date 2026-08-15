@@ -281,7 +281,7 @@ int commandment_count(CMD *op) noex {
 	    if (cauto co = callp->count ; co) {
 	        rs = co(op->obj) ;
 	    }
-	} /* end if (magic) */
+	} /* end if (commandment_magic) */
 	return rs ;
 } /* end subroutine (commandment_count) */
 
@@ -293,7 +293,7 @@ int commandment_nummax(CMD *op) noex {
 	    if (cauto co = callp->nummax ; co) {
 	        rs = co(op->obj) ;
 	    }
-	} /* end if (magic) */
+	} /* end if (commandment_magic) */
 	return rs ;
 } /* end subroutine (commandment_nummax) */
 
@@ -305,7 +305,7 @@ int commandment_read(CMD *op,char *rbuf,int rlen,uint cn) noex {
 	    if (cauto co = callp->read ; co) {
     		rs = co(op->obj,rbuf,rlen,cn) ;
 	    }
-	} /* end if (magic) */
+	} /* end if (commandment_magic) */
 	return rs ;
 } /* end subroutine (commandment_read) */
 
@@ -317,7 +317,7 @@ int commandment_get(CMD *op,int i,char *rbuf,int rlen) noex {
 	        uint	cn = uint(i) ;
 	        rs = commandment_read(op,rbuf,rlen,cn) ;
 	    }
-	} /* end if (magic) */
+	} /* end if (commandment_magic) */
 	return rs ;
 } /* end subroutine (commandment_get) */
 
@@ -344,7 +344,7 @@ int commandment_curbegin(CMD *op,CMD_CUR *curp) noex {
 	    if (rs < 0) {
 	        memclear(curp) ;
 	    } /* end if (error) */
-	} /* end if (magic) */
+	} /* end if (commandment_magic) */
 	return rs ;
 } /* end subroutine (commandment_curbegin) */
 
@@ -366,7 +366,7 @@ int commandment_curend(CMD *op,CMD_CUR *curp) noex {
 		} /* end if (memory-release) */
 	        curp->magval = 0 ;
 	    } /* end if (valid) */
-	} /* end if (magic) */
+	} /* end if (commandment_magic) */
 	return rs ;
 } /* end subroutine (commandment_curend) */
 
@@ -374,14 +374,17 @@ int commandment_curenum(CMD *op,CMD_CUR *curp,uint *cnp,
 		char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = commandment_magic(op,curp,rbuf)) >= 0) ylikely {
-	    CMD_CA	*callp = callsp(op->callp) ;
-	    rs = SR_NOSYS ;
-	    if (cauto co = callp->curenum ; co) ylikely {
-	        COMMANDMENTS_ENT	cse{} ;
-	        rs = co(op->obj,curp->scp,&cse,rbuf,rlen) ;
-	        if (cnp) *cnp = cse.cn ;
-	    }
-	} /* end if (magic) */
+	    rs = SR_NOTOPEN ;
+	    if ((curp->magval == COMMANDMENT_MAGIC) && curp->scp) ylikely {
+	        CMD_CA	*callp = callsp(op->callp) ;
+	        rs = SR_NOSYS ;
+	        if (cauto co = callp->curenum ; co) ylikely {
+	            commandments_ent cse{} ;
+	            rs = co(op->obj,curp->scp,&cse,rbuf,rlen) ;
+	            if (cnp) *cnp = cse.cn ;
+	        }
+	    } /* end if (cursor-magic) */
+	} /* end if (commandment_magic) */
 	return rs ;
 } /* end subroutine (commandment_curenum) */
 
