@@ -552,7 +552,7 @@ local int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 	                            ustat psb ;
 	                            pl = rs ;
 	                            if ((rs = u_stat(pfname,&psb)) >= 0) {
-	                                if ((rs = permid(idp,&psb,X_OK)) >= 0) {
+	                                if ((rs = permids(idp,&psb,X_OK)) >= 0) {
 	                                    f = S_ISREG(psb.st_mode) ;
 	                                } else if (isNotPresent(rs)) {
 					    rs = SR_OK ;
