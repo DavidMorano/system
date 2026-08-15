@@ -84,19 +84,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<netdb.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<ucgetho.h>
-#include	<storeitem.h>
-#include	<hostent.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<ucgetho.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgethost.h"
 
@@ -128,30 +128,25 @@
 
 int uc_gethostbegin(int stayopen) noex {
     	return uc_gethobegin(stayopen) ;
-}
-/* end subrouttine (uc_gethostbegin) */
+} /* end subrouttine (uc_gethostbegin) */
 
 int uc_gethostend() noex {
     	return uc_gethoend() ;
-}
-/* end subrouttine (uc_gethostend) */
+} /* end subrouttine (uc_gethostend) */
 
 int uc_gethostent(HE *hep,char *hebuf,int helen) noex {
     	ucentho		*up = cast_static<ucentho *>(hep) ;
 	return uc_gethoent(up,hebuf,helen) ;
-}
-/* end subroutine (uc_gethostent) */
+} /* end subroutine (uc_gethostent) */
 
 int uc_gethostbyname(HE *hep,char *hebuf,int helen,cc *name) noex {
     	ucentho		*up = cast_static<ucentho *>(hep) ;
 	return uc_gethonam(up,hebuf,helen,name) ;
-}
-/* end subroutine (uc_gethostbyname) */
+} /* end subroutine (uc_gethostbyname) */
 
 int uc_gethostbyaddr(HE *hep,char *hebuf,int helen,int af,cc *ap,int al) noex {
     	ucentho		*up = cast_static<ucentho *>(hep) ;
 	return uc_gethoadd(up,hebuf,helen,af,ap,al) ;
-}
-/* end subroutine (uc_gethostbyaddr) */
+} /* end subroutine (uc_gethostbyaddr) */
 
 
