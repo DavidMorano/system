@@ -260,10 +260,10 @@ int searcher::getprs() noex {
                 for (cauto &pr : prs) {
                     if ((rs = mkpath(pbuf,nodefname)) >= 0) ylikely {
                         if (ustat sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
-                            if ((rs = permid(&id,&sb,am)) >= 0) {
+                            if ((rs = permids(&id,&sb,am)) >= 0) {
                                 rs = prgetclustername(pr,rbuf,rlen,nn) ;
                                 len = rs ;
-                            } /* end if (permid) */
+                            } /* end if (permids) */
                         } /* end if (stat) */
                     } /* end if (mkpath) */
                     if (rs != 0) break ;
