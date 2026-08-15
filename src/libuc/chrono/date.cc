@@ -92,7 +92,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local variables */
 
-static bufsizevar		znlen(bufsize_zn) ;
+static bufsizevar	znlen(bufsize_zn) ;
 
 
 /* exported variables */
