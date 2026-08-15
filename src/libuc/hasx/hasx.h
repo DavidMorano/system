@@ -28,10 +28,12 @@
 #include	<hasall.h>
 #include	<hasbasename.h>
 #include	<hasclass.h>
+#include	<hasend.h>
 #include	<haseol.h>
 #include	<hasinet.h>
 #include	<haslead.h>
 #include	<hasmodname.h>
+#include	<hasneed.h>
 #include	<hasnon.h>
 #include	<hasnot.h>
 #include	<hasonly.h>
