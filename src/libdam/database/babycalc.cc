@@ -60,8 +60,6 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -108,12 +106,12 @@ local int babycalc_ctor(babycalc *op,Args ... args) noex {
 	        if (callsp p ; (p = new(nt) babycalc_calls) != np) ylikely {
 		    op->callp = callsp(p) ;
 		    rs = SR_OK ;
-		}
+		} /* end if (new-calls) */
 		if (rs < 0) {
 		    delete op->mlp ;
 		    op->mlp = np ;
 		} /* end if (error) */
-	    } /* end new (modload) */
+	    } /* end new (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (babycalc_ctor) */
@@ -126,11 +124,11 @@ local int babycalc_dtor(babycalc *op) noex {
 		callsp p = callsp(op->callp) ;
 		delete p ;
 		op->callp = nullptr ;
-	    }
+	    } /* end if (delete-calls) */
 	    if (op->mlp) ylikely {
 		delete op->mlp ;
 		op->mlp = nullptr ;
-	    }
+	    } /* end if (delete-modload) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (babycalc_dtor) */
@@ -148,7 +146,7 @@ local int	babycalc_objloadbegin	(BC *,cchar *,cchar *) noex ;
 local int	babycalc_objloadend	(BC *) noex ;
 local int	babycalc_loadcalls	(BC *,vecstr *) noex ;
 
-local bool	isrequired(int) noex ;
+local bool	isnotrequired(int) noex ;
 
 
 /* external variables */
@@ -209,7 +207,7 @@ int babycalc_close(BC *op) noex {
 	if ((rs = babycalc_magic(op)) >= 0) ylikely {
 	    if (op->callp && op->obj) {
 		callsp	p = callsp(op->callp) ;
-	        rs1 = (*p->close)(op->obj) ;
+	        rs1 = p->close(op->obj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -351,23 +349,23 @@ local int babycalc_loadcalls(BC *op,vecstr *slp) noex {
                 c += 1 ;
                 switch (i) {
                 case sub_open:
-                    callp->open = soopen_f(snp) ;
+                    callp->open		= soopen_f(snp) ;
                     break ;
                 case sub_check:
-                    callp->check = socheck_f(snp) ;
+                    callp->check	= socheck_f(snp) ;
                     break ;
                 case sub_lookup:
-                    callp->lookup = solookup_f(snp) ;
+                    callp->lookup	= solookup_f(snp) ;
                     break ;
                 case sub_getinfo:
-                    callp->getinfo = sogetinfo_f(snp) ;
+                    callp->getinfo	= sogetinfo_f(snp) ;
                     break ;
                 case sub_close:
-                    callp->close = soclose_f(snp) ;
+                    callp->close	= soclose_f(snp) ;
                     break ;
                 } /* end switch */
             } else if (rs == rsn) {
-                if (! isrequired(i)) rs = SR_OK ;
+                if (isnotrequired(i)) rs = SR_OK ;
             } /* end if (it had the call) */
 	    if (rs < 0) break ;
 	} /* end for (vecstr_get) */
@@ -375,18 +373,18 @@ local int babycalc_loadcalls(BC *op,vecstr *slp) noex {
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (babycalc_loadcalls) */
 
-local bool isrequired(int i) noex {
-	bool		f = false ;
+local bool isnotrequired(int i) noex {
+	bool	f = true ;
 	switch (i) {
 	case sub_open:
 	case sub_check:
 	case sub_lookup:
 	case sub_getinfo:
 	case sub_close:
-	    f = true ;
+	    f = false ;
 	    break ;
 	} /* end switch */
 	return f ;
-} /* end subroutine (isrequired) */
+} /* end subroutine (isnotrequired) */
 
 
