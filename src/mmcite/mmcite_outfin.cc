@@ -117,7 +117,7 @@ int progoutfin(PROGINFO *pip,BDB *bdbp,CITEDB *cdbp,cchar *ofname) noex {
 		const int	biblen = BIBBUFLEN ;
 		char		bibbuf[BIBBUFLEN + 1] ;
 
-	        while ((rs1 = citedb_enum(cdbp,&cur,&ce)) >= 0) {
+	        while ((rs1 = citedb_curenum(cdbp,&cur,&ce)) >= 0) {
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3)) {
