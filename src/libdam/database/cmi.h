@@ -43,11 +43,11 @@ struct cmi_object {
 } ; /* end struct */
 
 struct cmi_information {
-	time_t		idxctime ;	/* IDX creation-time */
-	time_t		idxmtime ;	/* IDX modification-time */
-	time_t		dbtime ;	/* DB-file time */
-	size_t		dbsize ;	/* DB-file size */
-	size_t		idxsize ;	/* IDX-file size */
+	uint		idxctime ;	/* IDX creation-time */
+	uint		idxmtime ;	/* IDX modification-time */
+	uint		dbtime ;	/* DB-file time */
+	uint		dbsz ;		/* DB-file size */
+	uint		idxsz ;		/* IDX-file size */
 	uint		nents ;
 	uint		maxent ;
 } ; /* end struct */
@@ -70,7 +70,7 @@ struct cmi_cursor {
 } ; /* end struct */
 
 struct cmi_fmidx {
-	char		*mapdata ;	/* file map */
+	charp		mapdata ;	/* file map */
 	uint		(*vt)[4] ;	/* mapped verses table */
 	uint		(*lt)[2] ;	/* mapped lines table */
 	time_t		ti_mod ;	/* time file modication */
@@ -81,8 +81,8 @@ struct cmi_fmidx {
 struct cmi_head {
 	cchar 		*dbname ;
 	cchar		*fname ;
-	CMI_FMI		fmi ;		/* file-map information */
-	cmihdr		fhi ;		/* file-header information */
+	CMI_FMI		*fmp ;		/* pointer file-map */
+	cmihdr		*fhp ;		/* pointer file-header */
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magval ;
 	int		ncursors ;
