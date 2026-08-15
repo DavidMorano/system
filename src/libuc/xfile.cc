@@ -45,6 +45,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<permx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -63,9 +64,14 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
 
 
 /* local variables */
@@ -83,7 +89,7 @@ int xfile(ids *idp,cchar *fname) noex {
 	    if (fname[0]) ylikely {
 	        if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) ylikely {
 	            if (S_ISREG(sb.st_mode)) {
-		        rs = permid(idp,&sb,X_OK) ;
+		        rs = permids(idp,&sb,X_OK) ;
 	            } else {
 	                rs = SR_NOTFOUND ;
 	            }
