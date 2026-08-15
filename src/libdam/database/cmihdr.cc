@@ -95,7 +95,7 @@ enum his {
 /* local variables */
 
 constexpr int		headsz		= hi_overlast * szof(uint) ;
-constexpr int		magicsz		= CMIHDR_MAGICSIZE ;
+constexpr int		magicsz		= CMIHDR_MAGICSZ ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= CMIHDR_MAGICSTR ;
 
