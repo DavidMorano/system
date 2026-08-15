@@ -27,18 +27,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<ucsysconf.h>
-#include	<ucsysauxinfo.h>
-#include	<sncpyx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<ucsysconf.h>		/* LIBUC */
+#include	<ucsysauxinfo.h>	/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetx.h"
 
