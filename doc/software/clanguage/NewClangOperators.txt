@@ -101,28 +101,30 @@ y = (x**4 + x³ + 2*x² + x¹ + 17*x°)²
 
 bitand		&
 bitor		|
-bitxor		^
+bitxor		^		(also exists as 'xor')
 
 bitand_eq	&=
 bitor_eq	|=
 bitxor_eq	^=
 
-logand		&&
-logor		||
+logand		&&		(also exists as 'and')
+logor		||		(also exists as 'or')
 logxor		^^
 
 logand_eq	&&=
 logor_eq	||=
 logxor_eq	^^=
 
-bitnot		~
-lognot		!
+bitnot		~		(also exists as 'compl')
+lognot		!		(also exists as 'not')
 
 
 = new keywords
 
 repeat
 until
+forever
+falldown			(or 'fallthrough')
 
 
 = modifications to existing keywords
@@ -130,5 +132,26 @@ until
 Make the while' keyword essentially identical to the 'for' keyword,
 except that any trailing statement and its colon character (';')
 that introduces it is optional.
+
+
+= example usages
+
+{{
+    bool f = true ;
+    f &&= (condition1) ;
+    f &&= (condition2) ;
+}}
+
+{{
+    bool f1 = true ;
+    bool f2 = true ;
+    vool f3 ;
+    vool f ;
+    f = f1 ^^ f2 ;
+    f ^^= (condition1) ;
+    f ^^= (condition2) ;
+    f3 = !(f1 ^^ f2) ;
+}}
+
 
 
