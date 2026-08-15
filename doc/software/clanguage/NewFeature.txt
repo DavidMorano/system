@@ -12,7 +12,7 @@ struct example {
     int calltwo(int) noex ;
 } ;
 
-{
+{{
     example	ex ;
     int		rs ;
     ex.m = &example::callone ;
@@ -21,11 +21,10 @@ struct example {
     example	*exp = &ex ;
     rs = (exp->*(exp->m))(42) ;
     rs = exp->m(42) ;
+ }}
 
-}
 
-
-{
+{{
     typedef int (*caller_f)(int) ;
     int rs ;
     int cal1(int v) ;
@@ -39,6 +38,6 @@ struct example {
 
     clang	*clp = &cc ;
     rs = clp->m(42) ;
+}}
 
-}
 
