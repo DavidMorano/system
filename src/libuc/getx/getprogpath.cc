@@ -36,7 +36,7 @@
 	Returns:
 	>0		found the program path and this is the length
 	==0		program was found w/o a path prefix
-	<0		program was not found (system-return)
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -47,10 +47,14 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<getpwd.h>		/* LIBUC */
-#include	<mkpathxw.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
-#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
 #include	<vecstr.h>		/* LIBUC */
+#include	<mkpathxw.h>		/* LIBUC */
+#include	<path.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<rmx.h>			/* LIBUC |rmshlashes(3uc)| */
 #include	<xfile.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -65,6 +69,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* imported namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* local typedefs */
@@ -83,10 +89,14 @@ typedef vecstr		vs ;
 
 /* forward references */
 
-local int getprogpathrel(ids *,vs *,char *,cc *,int) noex ;
+local int getprogpathabs	(ids *,vs *,char *,cc *,int) noex ;
+local int getprogpathrel	(ids *,vs *,char *,cc *,int) noex ;
+local int getprogpathpwd	(ids *,vs *,char *,cc *,int) noex ;
 
 
 /* local variables */
+
+static bufsizevar		maxpathlen(bufsize_mp) ;
 
 
 /* exported variables */
@@ -94,34 +104,43 @@ local int getprogpathrel(ids *,vs *,char *,cc *,int) noex ;
 
 /* exported subroutines */
 
-int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pnp,int pnl) noex {
+int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pnp,int µpnl) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	if (idp && plp && rbuf && pnp) ylikely {
 	     rs = SR_INVALID ;
 	     rbuf[0] = '\0' ;
-	     if (pnp[0]) ylikely {
-	         if (pnl < 0) pnl = lenstr(pnp) ;
-	         while ((pnl > 0) && (pnp[pnl-1] == '/')) {
-	             pnl -= 1 ;
-	         }
-	         if (strnchr(pnp,pnl,'/') == nullptr) {
+	     if (int pnl = rmslashes(pnp,µpnl) ; pnl > 0) ylikely {
+		 if (pnp[0] == '/') {
+		     rs = getprogpathabs(idp,plp,rbuf,pnp,pnl) ;
+		     rl = rs ;
+		 } else if (strnchr(pnp,pnl,'/') == nullptr) {
 	             rs = getprogpathrel(idp,plp,rbuf,pnp,pnl) ;
 	             rl = rs ;
 	         } else {
-	             if ((rs = mkpath1w(rbuf,pnp,pnl)) >= 0) {
-	                 rl = rs ;
-	                 rs = xfile(idp,rbuf) ;
-	             }
+	             rs = getprogpathpwd(idp,plp,rbuf,pnp,pnl) ;
+	             rl = rs ;
 	         } /* end if */
-	         if (rs < 0) rbuf[0] = '\0' ;
-	    } /* end if (valid) */
+	         if ((rs < 0) || (rl == 0)) {
+		     rbuf[0] = '\0' ;
+		 }
+	    } /* end if (rmslashes) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (getprogpath) */
 
 
 /* local subroutines */
+
+local int getprogpathabs(ids *idp,vs *,char *rbuf,cc *pnp,int pnl) noex {
+    	int		rs ;
+	int		rl = 0 ; /* return-value */
+	if ((rs = mkpath1w(rbuf,pnp,pnl)) >= 0) {
+	    rs = xfile(idp,rbuf) ;
+	    rl = rs ;
+	} /* end if (mkpath) */
+	return (rs >= 0) ? rl : rs ;
+} /* end subroutine (getprogpathabs) */
 
 local int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
 	int		rs ;
@@ -139,13 +158,13 @@ local int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
 			    rs = getpwd(pwdp,pwdl) ;
 			}
 	                if (rs >= 0) {
-	                    rs1 = mkpath2w(rbuf,pwdp,pnp,pnl) ;
-	                    rl = rs1 ;
-	                }
+	                    rs = mkpath2w(rbuf,pwdp,pnp,pnl) ;
+	                    rl = rs ;
+	                } /* end if (ok) */
 	            } else {
-	                rs1 = mkpath2w(rbuf,pp,pnp,pnl) ;
-	                rl = rs1 ;
-	            }
+	                rs = mkpath2w(rbuf,pp,pnp,pnl) ;
+	                rl = rs ;
+	            } /* end if */
 	            if ((rs >= 0) && (rl > 0)) {
 	                if ((rs = xfile(idp,rbuf)) >= 0) {
 	                    f = true ;
@@ -158,11 +177,29 @@ local int getprogpathrel(ids *idp,vs *plp,char *rbuf,cc *pnp,int pnl) noex {
 	        if (f) break ;
 	        if (rs < 0) break ;
 	    } /* end for */
-	    if ((rs >= 0) && (!f)) rs = SR_NOENT ;
+	    if ((rs >= 0) && (!f)) {
+		rs = SR_NOENT ;
+	    }
 	    rs1 = lm_free(pwdp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (getprogpathrel) */
+
+local int getprogpathpwd(ids *idp,vs *,char *rbuf,cc *pnp,int pnl) noex {
+	int		rs ;
+	int		rl = 0 ; /* return-value */
+	if ((rs = maxpathlen) >= 0) {
+	    cint rlen = rs ;
+	    if ((rs = getpwd(rbuf,rlen)) >= 0) {
+		cint pl = rs ;
+	        if ((rs = pathadd(rbuf,pl,pnp,pnl)) >= 0) {
+	            rl = rs ;
+	            rs = xfile(idp,rbuf) ;
+	        } /* end if (mkpath) */
+	    } /* end if (getpwd) */
+	} /* end if (maxpathlen) */
+	return (rs >= 0) ? rl : rs ;
+} /* end subroutine (getprogpathpwd) */
 
 
