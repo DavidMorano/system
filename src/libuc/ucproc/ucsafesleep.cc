@@ -1,4 +1,4 @@
-/* ucsafesleep */
+/* ucsafesleep SUPPORT **/
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -42,16 +42,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<getusmtime.hh>		/* LIBU |getusmtime(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsafesleep.h"
 
@@ -100,7 +101,6 @@ int uc_safesleep(int n) noex {
 	    } /* end while */
 	} /* end if (positive) */
 	return rs ;
-}
-/* end subroutine (uc_safesleep) */
+} /* end subroutine (uc_safesleep) */
 
 
