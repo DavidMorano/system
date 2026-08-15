@@ -71,7 +71,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
-#include	<baops.h>		/* LIBUC */
+#include	<baops.h>		/* LIBU */
 #include	<fieldterms.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
