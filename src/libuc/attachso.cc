@@ -238,7 +238,7 @@ local int subinfo_sofind(SI *sip) noex {
 		    } else {
 		        if (USTAT sb ; (rs = u_stat(dname,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
-	                	rs = permid(&id,&sb,soperm) ;
+	                	rs = permids(&id,&sb,soperm) ;
 			    } else {
 			        rs = SR_NOTDIR ;
 			    }
@@ -275,7 +275,7 @@ local int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	                rs1 = SR_ISDIR ;
 		    }
 	            if (rs1 >= 0) {
-	                rs1 = permid(idp,&sb,soperm) ;
+	                rs1 = permids(idp,&sb,soperm) ;
 		    }
 	            if (rs1 >= 0) {
 	                sip->sop = dlopen(sofname,sip->dlmode) ;
