@@ -28,18 +28,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |caddr_t| */
-#include	<sys/random.h>		/* |getentropy(2)| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysbase.h>
-#include	<usysutility.hh>	/* |ugetrandom(3u)| */
-#include	<usysflag.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® |caddr_t| */
+#include	<sys/random.h>		/* POSIX® |getentropy(2)| */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysutility.hh>	/* LIBU |ugetrandom(3u)| */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetrandom.h"
 
@@ -93,8 +93,7 @@ int uc_getrandom(void *rbuf,int rlen,uint fl) noex {
 	    }
 	} /* end while */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (uc_getrandom) */
+} /* end subroutine (uc_getrandom) */
 
 int uc_getentropy(void *vbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -117,8 +116,7 @@ int uc_getentropy(void *vbuf,int rlen) noex {
 	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rlen : rs ;
-}
-/* end subroutine (uc_getentropy) */
+} /* end subroutine (uc_getentropy) */
 
 
 /* local subroutines */
