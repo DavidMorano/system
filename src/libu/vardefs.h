@@ -64,6 +64,14 @@
 #define	VARTMPDIR	"TMPDIR"
 #endif
 
+#ifndef	VARTMPDNAME
+#define	VARTMPDNAME	"TMPDIR"
+#endif
+
+#ifndef	VARINCDIR
+#define	VARINCDIR	"INCBDIR"
+#endif
+
 #ifndef	VARLIBDIR
 #define	VARLIBDIR	"LIBDIR"
 #endif
