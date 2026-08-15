@@ -37,13 +37,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/socket.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/socket.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetx.h"
 
@@ -87,7 +87,6 @@ int uc_getsocktype(int fd) noex {
 	    if (tlen != szof(int)) rs = SR_NOMSG ;
 	}
 	return (rs >= 0) ? tval : rs ;
-}
-/* end subroutine (uc_getsocktype) */
+} /* end subroutine (uc_getsocktype) */
 
 
