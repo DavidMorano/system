@@ -25,16 +25,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/resource.h>	/* 'getpriority(2)' */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/resource.h>	/* |getpriority(2)| */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetx.h"
 
@@ -62,7 +62,6 @@ int uc_getpriority(int which,id_t who,int *rp) noex {
 	    }
 	} /* end if (valid) */
 	return (rs >= 0) ? prio : rs ;
-}
-/* end subroutine (uc_getpriority) */
+} /* end subroutine (uc_getpriority) */
 
 
