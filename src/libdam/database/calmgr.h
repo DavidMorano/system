@@ -24,7 +24,6 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<vechand.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
-
 #include	<calyears.h>		/* LIBDAM */
 #include	<calent.h>		/* LIBDAM */
 #include	<cyi.h>			/* LIBDAM */
@@ -32,7 +31,7 @@
 
 
 #define	CALMGR		struct calmgr_head
-#define	CALMGR_Q	CALCITE
+#define	CALMGR_Q	calcite
 #define	CALMGR_FL	struct calmgr_flags
 #define	CALMGR_CUR	struct calmgr_cursor
 #define	CALMGR_MAGIC	0x15712543
