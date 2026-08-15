@@ -117,7 +117,6 @@ using std::max ;			/* subroutine-template */
 /* forward references */
 
 local int	dayspec_parse(dayspec *,cchar *,int) noex ;
-
 local int	siourbrk(cchar *,int,int) noex ;
 local int	parsemonth(cchar *,int) noex ;
 
