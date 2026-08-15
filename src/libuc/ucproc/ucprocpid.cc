@@ -135,7 +135,6 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pid : rs ;
-}
-/* end subroutine (uc_procpid) */
+} /* end subroutine (uc_procpid) */
 
 
