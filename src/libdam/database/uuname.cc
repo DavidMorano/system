@@ -70,10 +70,10 @@ using libuc::mem ;			/* variable */
 extern "C" {
     typedef int (*soopen_f)	(void *,cchar *,cchar *) noex ;
     typedef int (*socount_f)	(void *) noex ;
-    typedef int (*soexists_f)	(void *,cchar *,int) noex ;
     typedef int (*socurbegin_f)	(void *,void *) noex ;
     typedef int (*socurenum_f)	(void *,void *,char *,int) noex ;
     typedef int (*socurend_f)	(void *,void *) noex ;
+    typedef int (*soexists_f)	(void *,cchar *,int) noex ;
     typedef int (*soaudit_f)	(void *) noex ;
     typedef int (*soclose_f)	(void *) noex ;
 } /* end extern (C) */
@@ -90,10 +90,10 @@ extern "C" {
 struct uuname_calls {
     soopen_f		open ;
     socount_f		count ;
-    soexists_f		exists ;
     socurbegin_f	curbegin ;
     socurenum_f		curenum ;
     socurend_f		curend ;
+    soexists_f		exists ;
     soaudit_f		audit ;
     soclose_f		close ;
 } ; /* end struct (uuname_calls) */
@@ -168,10 +168,10 @@ local bool	isrequired(int) noex ;
 enum subs {
 	sub_open,
 	sub_count,
-	sub_exists,
 	sub_curbegin,
 	sub_curenum,
 	sub_curend,
+	sub_exists,
 	sub_audit,
 	sub_close,
 	sub_overlast
@@ -180,10 +180,10 @@ enum subs {
 constexpr cpcchar	subnames[] = {
 	"open",
 	"count",
-	"exists",
 	"curbegin",
 	"curenum",
 	"curend",
+	"exists",
 	"audit",
 	"close",
 	nullptr
@@ -236,20 +236,9 @@ int uuname_close(uuname *op) noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magval = 0 ;
-	} /* end if (magic) */
+	} /* end if (uuname_magic) */
 	return rs ;
 } /* end subroutine (uuname_close) */
-
-int uuname_audit(uuname *op) noex {
-	int		rs ;
-	if ((rs = uuname_magic(op)) >= 0) {
-	    calls *callp = resumelife<calls>(op->callp) ;
-	    if (callp->audit) {
-	        rs = callp->audit(op->obj) ;
-	    }
-	} /* end if (magic) */
-	return rs ;
-} /* end subroutine (uuname_audit) */
 
 int uuname_count(uuname *op) noex {
 	int		rs ;
@@ -258,7 +247,7 @@ int uuname_count(uuname *op) noex {
 	    if (callp->count) {
 	        rs = callp->count(op->obj) ;
 	    }
-	} /* end if (magic) */
+	} /* end if (uuname_magic) */
 	return rs ;
 } /* end subroutine (uuname_count) */
 
@@ -279,7 +268,7 @@ int uuname_curbegin(uuname *op,UUNAME_CUR *curp) noex {
 	            } /* end if (error) */
 	        } /* end if (memory-acquire) */
 	    } /* end if (have SO method) */
-	} /* end if (magic) */
+	} /* end if (uuname_magic) */
 	return rs ;
 } /* end subroutine (uuname_curbegin) */
 
@@ -305,35 +294,50 @@ int uuname_curend(uuname *op,UUNAME_CUR *curp) noex {
 		} /* end if (cursor) */
 	        curp->magval = 0 ;
 	    } /* end if (cursor-magic) */
-	} /* end if (magic) */
+	} /* end if (uuname_magic) */
 	return rs ;
 } /* end subroutine (uuname_curend) */
-
-int uuname_exists(uuname *op,cchar *sp,int sl) noex {
-	int		rs ;
-	if ((rs = uuname_magic(op)) >= 0) {
-	    calls *callp = (calls *) op->callp ;
-	    if (callp->exists) {
-	        rs = callp->exists(op->obj,sp,sl) ;
-	    }
-	} /* end if (magic) */
-	return rs ;
-} /* end subroutine (uuname_exists) */
 
 int uuname_curenum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = uuname_magic(op,curp,rbuf)) >= 0) {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magval) {
-		calls *callp = resumelife<calls>(op->callp) ;
-		rs = SR_NOSYS ;
-	        if (callp->curenum) {
-	            rs = callp->curenum(op->obj,curp->scp,rbuf,rlen) ;
-	        }
+	    if (curp->magval == UUNAME_MAGIC) {
+		rs = SR_BUGCHECK ;
+		if (curp->scp) {
+		    calls *callp = resumelife<calls>(op->callp) ;
+		    rs = SR_NOSYS ;
+	            if (callp->curenum) {
+	                rs = callp->curenum(op->obj,curp->scp,rbuf,rlen) ;
+	            }
+	        } /* end if (sub-cursor) */
 	    } /* end if (cursor-magic) */
-	} /* end if (magic) */
+	} /* end if (uuname_magic) */
 	return rs ;
 } /* end subroutine (uuname_curenum) */
+
+int uuname_exists(uuname *op,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = uuname_magic(op)) >= 0) {
+	    calls *callp = resumelife<calls>(op->callp) ;
+	    rs = SR_BUGCHECK ;
+	    if (callp->exists) {
+	        rs = callp->exists(op->obj,sp,sl) ;
+	    }
+	} /* end if (uuname_magic) */
+	return rs ;
+} /* end subroutine (uuname_exists) */
+
+int uuname_audit(uuname *op) noex {
+	int		rs ;
+	if ((rs = uuname_magic(op)) >= 0) {
+	    calls *callp = resumelife<calls>(op->callp) ;
+	    if (callp->audit) {
+	        rs = callp->audit(op->obj) ;
+	    }
+	} /* end if (uuname_magic) */
+	return rs ;
+} /* end subroutine (uuname_audit) */
 
 
 /* private subroutines */
@@ -452,10 +456,10 @@ local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
-	case sub_exists:
 	case sub_curbegin:
 	case sub_curenum:
 	case sub_curend:
+	case sub_exists:
 	case sub_close:
 	    f = true ;
 	    break ;
