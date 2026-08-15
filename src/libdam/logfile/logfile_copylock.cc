@@ -56,12 +56,12 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
 #include	<sigblocker.h>		/* LIBUC */
-#include	<ascii.h>		/* LIBUC */
 #include	<lockfile.h>		/* LIBUC */
 #include	<opentmp.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
