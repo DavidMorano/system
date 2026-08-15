@@ -86,7 +86,7 @@
 #include	<sigign.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<permx.h>		/* LIBUC */
-#include	<findxfile.h>		/* LIBUC */
+#include	<findfilex.h>		/* LIBUC */
 #include	<xfile.h>		/* LIBUC */
 #include	<getpwd.h>		/* LIBUC */
 #include	<snx.h>			/* LIBUC */
@@ -948,12 +948,12 @@ local int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 	                pl = rs ;
 			if (ustat sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
 			    cint	am = X_OK ;
-			    rs = permid(&id,&sb,am) ;
+			    rs = permids(&id,&sb,am) ;
 		        }
 	            } /* end if (mkpath) */
 	        } /* end if (ok) */
 	    } else {
-	        rs = findxfile(&id,pbuf,fname) ;
+	        rs = findfilex(&id,pbuf,fname) ;
 	        pl = rs ;
 	    } /* end if */
 	    rs1 = id.release ;
