@@ -1,4 +1,4 @@
-/* ucexit */
+/* ucexit SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -51,7 +51,6 @@ int uc_exit(int ex) noex {
 	    exit(ex) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_exit) */
+} /* end subroutine (uc_exit) */
 
 
