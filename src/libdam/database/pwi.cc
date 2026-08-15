@@ -54,7 +54,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<endian.h>		/* LIBUC */
+#include	<endian.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucpwcache.h>		/* LIBUC */
 #include	<getpwx.h>		/* LIBUC */
