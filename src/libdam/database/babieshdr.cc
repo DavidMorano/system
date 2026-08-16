@@ -79,7 +79,7 @@ import libutil ;			/* |lenstr(3u)| */
 /* local variables */
 
 constexpr int		headsz		= babieshdrh_overlast * szof(uint) ;
-constexpr int		magicsz		= BABIESHDR_MAGICSIZE ;
+constexpr int		magicsz		= BABIESHDR_MAGICSZ ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= BABIESHDR_MAGICSTR ;
 
