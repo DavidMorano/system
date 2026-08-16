@@ -1,4 +1,5 @@
 /* opensvc_votd SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* LOCAL facility open-service (votd) */
@@ -76,15 +77,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<usystem.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<estrings.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -103,8 +104,8 @@
 #include	<bvsmk.h>
 #include	<votdc.h>
 #include	<ourmjd.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"opensvc_votd.h"
 #include	"defs.h"
@@ -153,8 +154,8 @@
 #define	TO_MKWAIT	(1 * 50)
 #endif
 
-#ifndef	TO_TMTIME
-#define	TO_TMTIME	5		/* time-out for TMTIME */
+#ifndef	TO_TIME
+#define	TO_TIME		5		/* time-out */
 #endif
 
 #define	TO_MJD		5		/* time-out for MJD */
@@ -223,7 +224,7 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	TMTIME		tm ;		/* holds today's date, when set */
+	tmtime		tm ;		/* holds today's date, when set */
 	BIBLEBOOK	ndb ;		/* bible-book-name DB */
 	bibleverse	vdb ;
 	BVS		sdb ;
@@ -986,7 +987,7 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -2023,10 +2024,10 @@ static int subinfo_today(SUBINFO *sip) noex {
 
 	if ((rs = subinfo_tmtime(sip)) >= 0) {
 	    if ((! sip->fl.mjd) || ((sip->dt - sip->ti_mjd) >= to)) {
-	        TMTIME	*tmp = &sip->tm ;
+	        tmtime	*tmp = &sip->tm ;
 	        int	yr ;
 	        sip->ti_mjd = sip->dt ;
-	        yr = (tmp->year + TM_YEAR_BASE) ;
+	        yr = (tmp->year + TMTIME_YEARBASE) ;
 	        rs = getmjd(yr,tmp->mon,tmp->mday) ;
 	        mjd = rs ;
 	        sip->fl.mjd = true ;
@@ -2057,7 +2058,7 @@ static int subinfo_year(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (sip->year <= 0) {
 	    if ((rs = subinfo_tmtime(sip)) >= 0) {
-	        sip->year = (sip->tm.year + TM_YEAR_BASE) ;
+	        sip->year = (sip->tm.year + TMTIME_YEARBASE) ;
 	    }
 	}
 	return rs ;
@@ -2066,7 +2067,7 @@ static int subinfo_year(SUBINFO *sip) noex {
 
 static int subinfo_tmtime(SUBINFO *sip) noex {
 	cint	tc = TIMECOUNT ;
-	cint	to = TO_TMTIME ;
+	cint	to = TO_TIME ;
 	int		rs = SR_OK ;
 
 	if ((! sip->fl.tmtime) || (sip->timecount++ >= tc)) {
