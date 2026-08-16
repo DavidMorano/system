@@ -31,7 +31,6 @@
 #include	<sys/param.h>		/* POSIX */
 #include	<sys/stat.h>		/* POSIX */
 #include	<unistd.h>		/* POSIX */
-#include	<tzfile.h>		/* POSIX TM_YEAR_BASE */
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
@@ -1035,7 +1034,7 @@ local int getyear(time_t dt) noex {
 	int		rs ;
 	int		year = 0 ; /* return-value */
 	if (tmtime tm ; (rs = tmtime_timegm(&tm,dt)) >= 0) {
-	    year = (tm.year + TM_YEAR_BASE) ;
+	    year = (tm.year + TMTIME_YEARBASE) ;
 	}
 	return (rs >= 0) ? year : rs ;
 } /* end subroutine (getyear) */
