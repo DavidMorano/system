@@ -133,7 +133,7 @@ constexpr bool		f_linux		= F_LINUX ;
 /* exported variables */
 
 cint	tmtime::znlen	= getznlen() ;
-cint	baseyear	= TMTIME_BASEYEAR ;
+cint	baseyear	= TMTIME_YEARBASE ;
 
 
 /* exported subroutines */
