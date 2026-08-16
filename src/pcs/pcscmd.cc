@@ -194,8 +194,8 @@ int pcscmd_svcname(PROGINFO *pip,int idx,cchar **rpp)
 static int pcscmder(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 {
 	LOCINFO		*lip = pip->lip ;
-	KEYOPT		*kop ;
-	KEYOPT_CUR	kcur ;
+	keyopt		*kop ;
+	keyopt_cur	kcur ;
 	int		rs ;
 	int		c = 0 ;
 
@@ -208,7 +208,7 @@ static int pcscmder(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 	    cchar	*fmt ;
 
 	    while (rs >= 0) {
-	        kl = keyopt_enumkeys(kop,&kcur,&kp) ;
+	        kl = keyopt_curenumkeys(kop,&kcur,&kp) ;
 	        if (kl == SR_NOTFOUND) break ;
 	        rs = kl ;
 
