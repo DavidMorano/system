@@ -1,13 +1,14 @@
-/* opensvc_cotd */
+/* opensvc_cotd SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* LOCAL facility open-service (cotd) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_GETUSERHOME	1		/* use 'getuserhome(3dam)' */
 #define	CF_LOCSETENT	0		/* need 'subinfo_setentry()' */
-
 
 /* revision history:
 
@@ -19,10 +20,10 @@
 /* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+  	Description:
 
 	This is an open-facility-service module.
 
-	Synopsis:
 
 	int opensvc_cotd(pr,prn,of,om,argv,envv,to)
 	cchar	*pr ;
@@ -34,7 +35,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	of		open-flags
@@ -44,26 +44,22 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
 	<0		error
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<char.h>
@@ -139,20 +135,20 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar *) ;
-static int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_start(SUBINFO *,cchar *) ;
+local int	subinfo_finish(SUBINFO *) ;
 #if	CF_LOCSETENT
-static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
+local int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	subinfo_cotd(SUBINFO *,int,cchar *,cchar *) ;
-static int	subinfo_procout(SUBINFO *,int,int,int,cchar *,int) ;
-static int	subinfo_procoutline(SUBINFO *,FILER *,
+local int	subinfo_cotd(SUBINFO *,int,cchar *,cchar *) ;
+local int	subinfo_procout(SUBINFO *,int,int,int,cchar *,int) ;
+local int	subinfo_procoutline(SUBINFO *,FILER *,
 			int,int,int,cchar *,int) ;
-static int	subinfo_tmtime(SUBINFO *) ;
+local int	subinfo_tmtime(SUBINFO *) ;
 
 #ifdef	COMMENT
-static int	subinfo_procuser(SUBINFO *,char *,int,cchar *) ;
+local int	subinfo_procuser(SUBINFO *,char *,int,cchar *) ;
 #endif
 
 
@@ -487,7 +483,7 @@ badsubstart:
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *sip,cchar *pr)
+local int subinfo_start(SUBINFO *sip,cchar *pr)
 {
 	int		rs = SR_OK ;
 
@@ -502,7 +498,7 @@ static int subinfo_start(SUBINFO *sip,cchar *pr)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -521,7 +517,7 @@ static int subinfo_finish(SUBINFO *sip)
 
 
 #if	CF_LOCSETENT
-static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
+local int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -557,7 +553,7 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int subinfo_cotd(SUBINFO *sip,int wfd,cchar *dbname,cchar *dayspec)
+local int subinfo_cotd(SUBINFO *sip,int wfd,cchar *dbname,cchar *dayspec)
 {
 	COMMANDMENT	cmd, *cmp = &cmd ;
 	int		rs ;
@@ -629,7 +625,7 @@ static int subinfo_cotd(SUBINFO *sip,int wfd,cchar *dbname,cchar *dayspec)
 }
 /* end subroutine (subinfo_cotd) */
 
-static int subinfo_procout(SUBINFO *sip,int wfd,int prec,int n,
+local int subinfo_procout(SUBINFO *sip,int wfd,int prec,int n,
 		cchar *cbuf,int clen) noex {
 	int		rs ;
 	int		wlen = 0 ;
@@ -672,7 +668,7 @@ static int subinfo_procout(SUBINFO *sip,int wfd,int prec,int n,
 /* end subroutine (subinfo_procout) */
 
 
-static int subinfo_procoutline(SUBINFO *sip,FILER *fbp,int prec,int ln,int n,
+local int subinfo_procoutline(SUBINFO *sip,FILER *fbp,int prec,int ln,int n,
 		cchar *lp,int ll)
 {
 	int		rs ;
@@ -689,20 +685,17 @@ static int subinfo_procoutline(SUBINFO *sip,FILER *fbp,int prec,int ln,int n,
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (subinfo_procoutline) */
+} /* end subroutine (subinfo_procoutline) */
 
-
-static int subinfo_tmtime(SUBINFO *sip)
-{
+local int subinfo_tmtime(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		mday = sip->mday ;
 
 	if (sip->mday <= 0) {
-	    TMTIME	t ;
+	    tmtime	t ;
 	    time_t	daytime = time(NULL) ;
 	    rs = tmtime_timelocal(&t,daytime) ;
-	    sip->year = (t.year + TM_YEAR_BASE) ;
+	    sip->year = (t.year + TMTIME_YEARBASE) ;
 	    sip->mon = t.mon ;
 	    sip->mday = t.mday ;
 	    sip->yday = t.yday ;
@@ -712,7 +705,6 @@ static int subinfo_tmtime(SUBINFO *sip)
 	}
 
 	return (rs >= 0) ? mday : rs ;
-}
-/* end subroutine (subinfo_tmtime) */
+} /* end subroutine (subinfo_tmtime) */
 
 
