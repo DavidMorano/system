@@ -1026,7 +1026,7 @@ local int tmz_yearadj(tmz *op,int sc) noex {
 	if (stp->tm_year >= 0) ylikely {
 	    op->fl.year = true ;
 	    if (sc >= 0) {
-	        cint	yy = ((sc*nyears)-TM_YEAR_BASE) ;
+	        cint	yy = ((sc * nyears) - TM_YEAR_BASE) ;
 	        stp->tm_year += yy ;
 	    } else {
 	        if ((stp->tm_year >= 0) && (stp->tm_year <= 38)) {
