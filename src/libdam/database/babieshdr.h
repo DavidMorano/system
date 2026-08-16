@@ -18,7 +18,7 @@
 
 
 #define	BABIESHDR		struct babieshdr_head
-#define	BABIESHDR_MAGICSIZE	16
+#define	BABIESHDR_MAGICSZ	16
 #define	BABIESHDR_MAGICSTR	"BABIES"
 #define	BABIESHDR_VERSION	0
 #define	BABIESHDR_IDLEN		20
