@@ -13,7 +13,7 @@
 #ifndef	PCSCMD_INCLUDE
 #define	PCSCMD_INCLUDE	1
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	"pcsmain.h"
 #include	"defs.h"		/* for PROGINFO */
