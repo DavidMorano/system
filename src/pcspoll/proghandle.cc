@@ -30,8 +30,9 @@
 	3) check if it is a local username
 	4) check if there is a "default" service table entry
 
-        Note: Note (carefully) that zero-length service strings *are*
-        acceptable. They cause a default service to be invoked.
+	Note: Note (carefully) that zero-length service strings
+	*are* acceptable.  They cause a default service to be
+	invoked.
 
 
 *******************************************************************************/
@@ -62,6 +63,7 @@
 
 #include	"config.h"
 #include	"defs.h"
+#include	"clientinfo.h"
 #include	"builtin.h"
 #include	"standing.h"
 
@@ -107,9 +109,11 @@ extern int	sisub(const char *,int,const char *) ;
 extern int	field_svcargs(FIELD *,VECSTR *) ;
 extern int	isasocket(int) ;
 
-extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
-			struct clientinfo *,vecstr *,
-			const char *,const char **) ;
+extern int	progserve(PROGINFO *,STANDING *,BUILTIN *,
+			CLIENTINFO *,vecstr *,cchar *,cchar **) ;
+
+extern int	proglog_printf(PROGINFO *,cchar *,...) ;
+extern int	proglog_flush(PROGINFO *) ;
 
 #if	CF_DEBUG || CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
@@ -127,8 +131,8 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	procsvcspec(struct proginfo *,struct clientinfo *,
-			char *,int,vecstr *,const char *,int) ;
+static int	procsvcspec(PROGINFO *,CLIENTINFO *,
+			char *,int,vecstr *,cchar *,int) ;
 
 
 /* local variables */
@@ -150,102 +154,90 @@ static const uchar	sterms[] = {
 
 
 int proghandle(pip,sop,bop,cip)
-struct proginfo		*pip ;
-STANDING		*sop ;
-BUILTIN			*bop ;
-struct clientinfo	*cip ;
+PROGINFO	*pip ;
+STANDING	*sop ;
+BUILTIN		*bop ;
+CLIENTINFO	*cip ;
 {
-	vecstr		svcargs ;
-
+	vecstr		sargs ;
 	const int	svclen = SVCBUFLEN ;
-
-	int	rs = SR_OK ;
-	int	ifd = cip->fd_input ;
-	int	ofd = cip->fd_output ;
-	int	len ;
-	int	opts ;
-	int	to ;
-	int	f_socket = FALSE ;
-
-	const char	**sav ;
-	const char	*cp ;
-
-	char	svcspec[SVCSPECLEN + 1] ;
-	char	svcbuf[SVCBUFLEN + 1] ;
-
-
-	to = TO_READSVC ;
-	f_socket = isasocket(ifd) ;
-
-/* pop off the service name */
-
-	rs = uc_readlinetimed(ifd,svcbuf,svclen,to) ;
-	len = rs ;
-	if (rs < 0)
-	    goto bad0 ;
-
-	if ((len > 0) && ISEOL(svcbuf[len - 1])) len -= 1 ;
-	svcbuf[len] = '\0' ;
+	const int	to = TO_READSVC ;
+	int		rs ;
+	int		ifd = cip->fd_input ;
+	int		ofd = cip->fd_output ;
+	int		len ;
+	int		opts ;
+	const int	f_socket = isasocket(ifd) ;
+	char		svcspec[SVCSPECLEN + 1] ;
+	char		svcbuf[SVCBUFLEN + 1] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("proghandle: svcbuf=>%r<\n",svcbuf,len) ;
+	    debugprintf("proghandle: ent f_sock=%u\n",f_socket) ;
+#endif
+
+	if (ofd < 0) return SR_INVALID ;
+
+	if ((rs = uc_readlnto(ifd,svcbuf,svclen,to)) >= 0) {
+	    len = rs ;
+
+	    if ((len > 0) && ISEOL(svcbuf[len - 1])) len -= 1 ;
+	    svcbuf[len] = '\0' ;
+
+#if	CF_DEBUG
+	    if (DEBUGLEVEL(4))
+	        debugprintf("proghandle: svcbuf=>%r<\n",svcbuf,len) ;
 #endif
 
 /* we have our input data => make sure we do not get any more! :-) */
 
 #if	defined(P_FINGERS)
-	if (f_socket)
-	    u_shutdown(ifd,SHUT_RD) ;
+	    if (f_socket)
+	        u_shutdown(ifd,SHUT_RD) ;
 #endif
 
 /* OK, parse the stuff to get 1) service 2) the '/W' thing */
 
-	cip->f_long = FALSE ;
-	opts = (VECSTR_OCOMPACT) ;
-	if ((rs = vecstr_start(&svcargs,6,opts)) >= 0) {
+	    cip->f_long = FALSE ;
+	    opts = (VECSTR_OCOMPACT) ;
+	    if ((rs = vecstr_start(&sargs,6,opts)) >= 0) {
 
-	    rs = procsvcspec(pip,cip,svcspec,SVCSPECLEN,&svcargs,svcbuf,len) ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4)) {
-	        int i ;
-	        debugprintf("proghandle: svcspec=>%s<\n",svcspec) ;
-	        for (i = 0 ; vecstr_get(&svcargs,i,&cp) >= 0 ; i += 1) {
-	            if (cp == NULL) continue ;
-	            debugprintf("proghandle: svcarg%u=>%s<\n",i,cp) ;
-	        }
-	    }
-#endif /* CF_DEBUG */
-
-	    if (rs >= 0) {
-	        vecstr_getvec(&svcargs,&sav) ;
+	        rs = procsvcspec(pip,cip,svcspec,SVCSPECLEN,&sargs,
+	            svcbuf,len) ;
 
 #if	CF_DEBUG
-	        if (DEBUGLEVEL(5)) {
-	            int	i ;
-	            debugprintf("proghandle: sav\n") ;
-	            for (i = 0 ; sav[i] != NULL ; i += 1)
-	                debugprintf("proghandle: sav[%u]=>%s<\n",i,sav[i]) ;
+	        if (DEBUGLEVEL(4)) {
+	            int 	i ;
+	            cchar	*cp ;
+	            debugprintf("proghandle: svcspec=>%s<\n",svcspec) ;
+	            for (i = 0 ; vecstr_get(&sargs,i,&cp) >= 0 ; i += 1) {
+	                if (cp == NULL) continue ;
+	                debugprintf("proghandle: svcarg%u=>%s<\n",i,cp) ;
+	            }
 	        }
 #endif /* CF_DEBUG */
 
-	        rs = progserve(pip,sop,bop,cip,NULL,svcspec,sav) ;
+	        if (rs >= 0) {
+	            cchar	**sav ;
+	            if ((rs = vecstr_getvec(&sargs,&sav)) >= 0) {
+	                rs = progserve(pip,sop,bop,cip,NULL,svcspec,sav) ;
+	            }
+	        } /* end if (ok) */
 
-	    } /* end if */
+	        vecstr_finish(&sargs) ;
+	    } /* end if (sargs) */
 
-	    vecstr_finish(&svcargs) ;
-	} /* end if (svcargs) */
+	    if (pip->open.logprog)
+	        proglog_flush(pip) ;
 
-	if (pip->open.log)
-	    logfile_flush(&pip->lh) ;
+	} /* end if (uc_readlnto) */
 
-ret0:
+#if	CF_DEBUG
+	if (DEBUGLEVEL(4))
+	    debugprintf("proghandle: ret rs=%d\n",rs) ;
+#endif
+
 	return rs ;
-
-/* bad stuff */
-bad0:
-	goto ret0 ;
 }
 /* end subroutine (proghandle) */
 
@@ -254,39 +246,35 @@ bad0:
 
 
 static int procsvcspec(pip,cip,snbuf,snlen,sap,svcbuf,svclen)
-struct proginfo		*pip ;
-struct clientinfo	*cip ;
-char			snbuf[] ;
-int			snlen ;
-vecstr			*sap ;
-const char		svcbuf[] ;
-int			svclen ;
+PROGINFO	*pip ;
+CLIENTINFO	*cip ;
+char		snbuf[] ;
+int		snlen ;
+vecstr		*sap ;
+const char	svcbuf[] ;
+int		svclen ;
 {
-	FIELD	fsb ;
-
-	int	rs = SR_OK ;
-	int	si ;
-	int	fl ;
-	int	len = 0 ;
-
-	const char	*ols = "/w" ;
-	const char	*fp ;
-
-	char	fbuf[SVCSPECLEN + 1] ;
-
+	FIELD		fsb ;
+	int		rs ;
+	int		len = 0 ;
 
 	if (pip == NULL) return SR_FAULT ;
 
 	snbuf[0] = '\0' ;
 	if ((rs = field_start(&fsb,svcbuf,svclen)) >= 0) {
-
+	    int		fl ;
+	    cchar	*fp ;
+	    char	fbuf[SVCSPECLEN + 1] ;
 	    if ((fl = field_get(&fsb,sterms,&fp)) > 0) {
+	        int	si ;
+	        cchar	*ols = "/w" ;
 
 	        if ((fl == 2) && (strncasecmp(fp,ols,2) == 0)) {
 
 	            cip->f_long = TRUE ;
-	            if ((fl = field_get(&fsb,sterms,&fp)) > 0)
+	            if ((fl = field_get(&fsb,sterms,&fp)) > 0) {
 	                len = strdcpy1w(snbuf,snlen,fp,fl) - snbuf ;
+	            }
 
 	        } else {
 
@@ -302,27 +290,25 @@ int			svclen ;
 	            fl = field_sharg(&fsb,sterms,fbuf,SVCSPECLEN) ;
 
 	            if ((fl == 2) && (strncasecmp(fp,ols,2) == 0)) {
-
 	                cip->f_long = TRUE ;
-
-	            } else if (fl > 0)
+	            } else if (fl > 0) {
 	                rs = vecstr_add(sap,fp,fl) ;
+	            }
 
 	        } /* end if */
 
 /* put the rest of the arguments into a string list */
 
-	        if ((rs >= 0) && (len > 0))
+	        if ((rs >= 0) && (len > 0)) {
 	            rs = field_svcargs(&fsb,sap) ;
+	        }
 
-	    } /* end if */
-
+	    } /* end if (field_get) */
 	    field_finish(&fsb) ;
 	} /* end if (field) */
 
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (procsvcspec) */
-
 
 
