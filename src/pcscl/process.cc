@@ -1,18 +1,16 @@
-/* process */
+/* process SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* add content length and content lines to a mail header */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1
-
 
 /* revision history:
 
 	= 1998/07-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -20,38 +18,44 @@
 
 /*******************************************************************************
 
-        This subroutine processes the input so that it conforms MORE properly to
-        a mail message format with a content length header.
+  	Name:
+	process
 
-        The whole way in which this subroutine worls is very much flawed. RFC822
-        headers are NOT handled any where near correctly! This is really garbage
-        but who wants to write this stuff from scratch?
-
+	Description:
+	This subroutine processes the input so that it conforms
+	MORE properly to a mail message format with a content length
+	header.  The whole way in which this subroutine worls is
+	very much flawed. RFC822 headers are NOT handled any where
+	near correctly! This is really garbage but who wants to
+	write this stuff from scratch?
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/utsname.h>
 #include	<sys/param.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
+#include	<netdb.h>
 #include	<pwd.h>
 #include	<grp.h>
-
-#include	<usystem.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
-#include	<char.h>
 #include	<userinfo.h>
+#include	<mkpathx.h>
+#include	<strwcpy.h>
+#include	<timestr.h>
+#include	<char.h>
 #include	<mailmsgmatenv.h>
+#include	<mheader.h>		/* PCS */
 #include	<localmisc.h>
 
 #include	"headerkeys.h"
@@ -66,14 +70,6 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	cfdecl(const char *,int,long *) ;
-extern int	mheader() ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_edate(time_t,char *) ;
-extern char	*timestr_hdate(time_t,char *) ;
-
 
 /* external variables */
 
@@ -84,20 +80,14 @@ extern char	*timestr_hdate(time_t,char *) ;
 /* local variables */
 
 
+/* exported variables */
 
 
+/* exported subroutine */
 
-
-
-int process(pip,ofp,filename)
-struct proginfo	*pip ;
-bfile		*ofp ;
-char		filename[] ;
-{
-	ustat	stat_i ;
-
+int process(PI *pip,bfile *ofp,cchar *filename) noex {
+	ustat		stat_i ;
 	MSGMATENV	me ;
-
 	bfile	infile, *ifp = &infile ;
 	bfile	tmpfile, *tfp = &tmpfile ;
 
