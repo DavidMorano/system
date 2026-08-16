@@ -108,9 +108,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<tzfile.h>		/* POSIX® |TMTIME_YEARBASE| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD |abs(3c)| */
-#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<calstrs.h>		/* LIBUC */
@@ -203,7 +203,7 @@ local int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'C':
 	                {
-	                    cint y = ((tmp->year+TM_YEAR_BASE)/nyears) ;
+	                    cint y = ((tmp->year + TMTIME_YEARBASE) / nyears) ;
 	                    rs = sbuf_twodig(ssp,y) ;
 	                }
 	                break ;
@@ -293,7 +293,7 @@ local int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'y':
 	                {
-	                    cint y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
+	                    cint y = ((tmp->year + TMTIME_YEARBASE) % nyears) ;
 	                    rs = sbuf_twodig(ssp,y) ;
 	                }
 	                break ;
@@ -379,7 +379,7 @@ local int sbuf_digs(sbuf *ssp,int v,int n,int f_space) noex {
 } /* end subroutine (sbuf_digs) */
 
 local int sbuf_year(sbuf *ssp,tmtime *tmp) noex {
-	cint		y = ((tmp->year + TM_YEAR_BASE)%10000) ;
+	cint		y = ((tmp->year + TMTIME_YEARBASE) % 10000) ;
 	cint		dlen = 4 ;
 	cint		prec = 4 ;
 	int		rs ;
@@ -427,7 +427,7 @@ local int sbuf_dated(sbuf *ssp,tmtime *tmp) noex {
 	    if ((rs = sbuf_chr(ssp,'/')) >= 0) ylikely {
 	        if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) ylikely {
 	    	    if ((rs = sbuf_chr(ssp,'/')) >= 0) ylikely {
-	        	cint y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
+	        	cint y = ((tmp->year + TMTIME_YEARBASE) % nyears) ;
 	        	rs = sbuf_twodig(ssp,y) ;
 		    }
 		}
