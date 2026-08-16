@@ -1,10 +1,11 @@
 /* opensvc_qotd SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* LOCAL facility open-service (qotd) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_GETUSERHOME	1		/* use 'getuserhome(3dam)' */
 #define	CF_LOCSETENT	0		/* need 'subinfo_setentry()' */
@@ -57,23 +58,24 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-
-#include	<usystem.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<getusername.h>
+#include	<getax.h>
+#include	<getpwx.h>
 #include	<keyopt.h>
 #include	<bits.h>
 #include	<char.h>
 #include	<vecstr.h>
-#include	<getusername.h>
-#include	<getax.h>
-#include	<getpwx.h>
 #include	<dayspec.h>
 #include	<tmtime.hh>
 #include	<wordfill.h>
 #include	<ourmjd.h>
-#include	<localmisc.h>
+#include	<mapex.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"opensvc_qotd.h"
 #include	"openqotd.h"
@@ -107,14 +109,6 @@
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
-
 
 /* local structures */
 
@@ -140,13 +134,13 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_mjd(SUBINFO *,cchar *) ;
-static int	subinfo_tmtime(SUBINFO *) ;
+local int	subinfo_start(SUBINFO *,cchar *) ;
+local int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_mjd(SUBINFO *,cchar *) ;
+local int	subinfo_tmtime(SUBINFO *) ;
 
 #if	CF_LOCSETENT
-static int	subinfo_setentry(SUBINFO *,cchar **,
+local int	subinfo_setentry(SUBINFO *,cchar **,
 			cchar *,int) ;
 #endif
 
@@ -527,7 +521,7 @@ badsubstart:
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *sip,cchar *pr)
+local int subinfo_start(SUBINFO *sip,cchar *pr)
 {
 	int		rs = SR_OK ;
 
@@ -542,7 +536,7 @@ static int subinfo_start(SUBINFO *sip,cchar *pr)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -601,7 +595,7 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar vp[],int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int subinfo_mjd(SUBINFO *sip,cchar *dayspec)
+local int subinfo_mjd(SUBINFO *sip,cchar *dayspec)
 {
 	int		rs ;
 	int		dl = strlen(dayspec) ;
@@ -632,29 +626,26 @@ static int subinfo_mjd(SUBINFO *sip,cchar *dayspec)
 	} /* end if (dayspec handling) */
 
 	return rs ;
-}
-/* end subroutine (subinfo_mjd) */
+} /* end subroutine (subinfo_mjd) */
 
-
-static int subinfo_tmtime(SUBINFO *sip)
-{
+local int subinfo_tmtime(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		mday = sip->mday ;
 
 	if (sip->mday <= 0) {
-	    TMTIME	t ;
+	    tmtime	t ;
 	    time_t	daytime = time(NULL) ;
 	    rs = tmtime_timelocal(&t,daytime) ;
-	    sip->year = (t.year + TM_YEAR_BASE) ;
+	    sip->year = (t.year + TMTIME_YEARBASE) ;
 	    sip->mon = t.mon ;
 	    sip->mday = t.mday ;
 	    sip->yday = t.yday ;
 	    mday = t.mday ;
-	} else
+	} else {
 	    mday = sip->mday ;
+	}
 
 	return (rs >= 0) ? mday : rs ;
-}
-/* end subroutine (subinfo_tmtime) */
+} /* end subroutine (subinfo_tmtime) */
 
 
