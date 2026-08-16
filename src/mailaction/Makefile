@@ -256,8 +256,6 @@ msfileentry.o:		msfileentry.c msfileentry.h
 
 mapstrint.o:		mapstrint.c mapstrint.h
 
-keyopt.o:		keyopt.c keyopt.h
-
 srvtab.o:		srvtab.c srvtab.h
 
 acctab.o:		acctab.c acctab.h
