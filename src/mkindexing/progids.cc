@@ -23,8 +23,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ids.h>
+#include	<permx.h>
 #include	<localmisc.h>
 
 #include	"defs.h"
@@ -58,8 +63,7 @@ int progids_begin(PROGINFO *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (progids_begin) */
+} /* end subroutine (progids_begin) */
 
 int progids_end(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
@@ -70,18 +74,16 @@ int progids_end(PROGINFO *pip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (progids_end) */
+} /* end subroutine (progids_end) */
 
-extern int progids_permid(PROGINFO *pip,USTAT *sbp,int am) noex {
+extern int progids_permids(PROGINFO *pip,ustat *sbp,int am) noex {
 	int		rs ;
 	if (pip->open.ids) {
-	   rs = permid(&pip->id,sbp,am) ;
+	   rs = permids(&pip->id,sbp,am) ;
 	} else {
 	    rs = SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (progids_permid) */
+} /* end subroutine (progids_permids) */
 
 
