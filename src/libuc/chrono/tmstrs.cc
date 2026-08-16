@@ -26,9 +26,9 @@
 	date strings to their TM-structure equivalents.
 
 	Notes:
-	Note on year calculations for MSG-type year strings:
+	1.Note on year calculations for MSG-type year strings:
 
-	RFC2822 says that all three digit years should be interpreted
+	2. RFC2822 says that all three digit years should be interpreted
 	as being added to 2000 to get the actual year.  This would
 	seem to be an unfortunate choice since the only way that
 	three digit years were ever used was due to buggy software
@@ -39,7 +39,7 @@
 	software designers that make the world work! See the
 	compile-time switch CF_THREEYEAR for our options on this.
 
-	Also, RFC2822 says that two digit years less than (whatever)
+	3.Also, RFC2822 says that two digit years less than (whatever)
 	about 50 should be interpreted as being added to 2000 to
 	get the actual year, while two digit years greater than
 	about that should be added to 1900 to get the actual year.
@@ -50,11 +50,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<tmtime.hh>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -202,7 +202,7 @@ int tmstrsyear(cchar *sp,int sl) noex {
 	            break ;
 	        case 4:
 	        case 5:
-	            year -= TM_YEAR_BASE ;
+	            year -= TMTIME_YEARBASE ;
 	            break ;
 	        } /* end switch */
 	    } /* end if (cfdec) */
