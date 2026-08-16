@@ -39,34 +39,32 @@
 	Returns:
 
 	>=0		OK
-	<0		error code
-
+	<0		error code (syhstem-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<climits>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>
 #include	<ids.h>
+#include	<permx.h>
 #include	<baops.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<vecobj.h>
 #include	<hdb.h>
-#include	<ptm.h>
 #include	<psem.h>
 #include	<eigendb.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"fsi.h"
 #include	"upt.h"
@@ -85,22 +83,21 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	getnprocessors(const char **,int) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	getnprocessors(cchar **,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthexblock(const char *,int,const void *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern int	progkeyer(PROGINFO *,bfile *,PTM *,
 cuchar *,cchar *,cchar *,char *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -112,8 +109,8 @@ struct subinfo {
 	PROGINFO	*pip ;
 	ARGINFO		*aip ;
 	const uchar	*terms ;
-	const char	*delimiter ;
-	const char	*ignchrs ;
+	cchar	*delimiter ;
+	cchar	*ignchrs ;
 	IDS		id ;
 	int		pan ;
 } ;
@@ -136,8 +133,8 @@ struct wargs {
 	PTM		*omp ;
 	bfile		*ofp ;
 	const uchar	*terms ;
-	const char	*delimiter ;
-	const char	*ignchrs ;
+	cchar	*delimiter ;
+	cchar	*ignchrs ;
 } ;
 
 
@@ -154,14 +151,14 @@ static int	subinfo_sendparamsstr(SUBINFO *,bfile *,cchar *,cchar *) ;
 static int	subinfo_args(SUBINFO *,DISP *) ;
 static int	subinfo_argfile(SUBINFO *,DISP *) ;
 static int	subinfo_stdin(SUBINFO *,DISP *) ;
-static int	subinfo_procfile(SUBINFO *,DISP *,const char *) ;
+static int	subinfo_procfile(SUBINFO *,DISP *,cchar *) ;
 
 static int	worker(void *) ;
 
-static int	ereport(PROGINFO *,const char *,int) ;
+static int	ereport(PROGINFO *,cchar *,int) ;
 
 static int	disp_start(DISP *,WARGS *) ;
-static int	disp_addwork(DISP *,const char *,int) ;
+static int	disp_addwork(DISP *,cchar *,int) ;
 static int	disp_finish(DISP *,int) ;
 
 
@@ -175,9 +172,9 @@ int progkey(pip,aip,terms,delimiter,ignchrs,ofname)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 const uchar	terms[] ;
-const char	delimiter[] ;
-const char	ignchrs[] ;
-const char	ofname[] ;
+cchar	delimiter[] ;
+cchar	ignchrs[] ;
+cchar	ofname[] ;
 {
 	SUBINFO		si, *sip = &si ;
 	WARGS		wa ;
@@ -266,8 +263,8 @@ SUBINFO		*sip ;
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 const uchar	terms[] ;
-const char	delimiter[] ;
-const char	ignchrs[] ;
+cchar	delimiter[] ;
+cchar	ignchrs[] ;
 {
 	int		rs = SR_OK ;
 
@@ -430,7 +427,7 @@ static int subinfo_sendparamseigens(SUBINFO *sip,bfile *ofp)
 static int subinfo_sendparamsval(sip,ofp,cmd,v)
 SUBINFO		*sip ;
 bfile		*ofp ;
-const char	cmd[] ;
+cchar	cmd[] ;
 int		v ;
 {
 	int		rs = SR_OK ;
@@ -451,8 +448,8 @@ int		v ;
 static int subinfo_sendparamsstr(sip,ofp,cmd,s)
 SUBINFO		*sip ;
 bfile		*ofp ;
-const char	cmd[] ;
-const char	s[] ;
+cchar	cmd[] ;
+cchar	s[] ;
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -478,7 +475,7 @@ DISP		*dop ;
 	int		rs = SR_OK ;
 	int		ai ;
 	int		f ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (pip == NULL) return SR_FAULT ;
 
@@ -506,7 +503,7 @@ DISP		*dop ;
 	ARGINFO		*aip = sip->aip ;
 	bfile		argfile ;
 	int		rs = SR_OK ;
-	const char	*afname ;
+	cchar	*afname ;
 
 	afname = aip->afname ;
 	if ((aip->afname == NULL) || (aip->afname[0] == '\0'))
@@ -554,7 +551,7 @@ DISP		*dop ;
 	int		rs = SR_OK ;
 
 	if (sip->pan == 0) {
-	    const char	*cp = "-" ;
+	    cchar	*cp = "-" ;
 	    sip->pan += 1 ;
 	    rs = subinfo_procfile(sip,dop,cp) ;
 	}
@@ -567,7 +564,7 @@ DISP		*dop ;
 static int subinfo_procfile(sip,dop,fname)
 SUBINFO		*sip ;
 DISP		*dop ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	PROGINFO	*pip = sip->pip ;
 	ustat	sb ;
@@ -590,7 +587,7 @@ const char	fname[] ;
 
 	    rs1 = u_stat(fname,&sb) ;
 	    if (rs1 >= 0)
-	        rs1 = permid(&sip->id,&sb,R_OK) ;
+	        rs1 = permids(&sip->id,&sb,R_OK) ;
 
 	    if (rs1 < 0)
 	        ereport(pip,fname,rs1) ;
@@ -750,7 +747,7 @@ int		f_abort ;
 
 static int disp_addwork(dop,tagbuf,taglen)
 DISP		*dop ;
-const char	tagbuf[] ;
+cchar	tagbuf[] ;
 int		taglen ;
 {
 	PROGINFO	*pip = dop->pip ;
@@ -859,7 +856,7 @@ void		*ptvp ;
 
 static int ereport(pip,fname,frs)
 PROGINFO	*pip ;
-const char	fname[] ;
+cchar	fname[] ;
 int		frs ;
 {
 	int		rs = SR_OK ;
