@@ -81,8 +81,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local variables */
 
-constexpr int		tabsize		= (pwihdr_overlast * szof(uint)) ;
-constexpr int		magicsz		= PWIHDR_MAGICSIZE ;
+constexpr int		tabsz		= (pwihdr_overlast * szof(uint)) ;
+constexpr int		magicsz		= PWIHDR_MAGICSZ ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= PWIHDR_MAGICSTR ;
 
@@ -107,26 +107,26 @@ int pwihdr_rd(pwihdr *op,char *hbuf,int hlen) noex {
 	    	    bp[1] = uchar(ENDIAN) ;
 	    	    bp += vsz ;
 	    	    bl -= vsz ;
-	    	    if (bl >= tabsize) ylikely {
+	    	    if (bl >= tabsz) ylikely {
 	        	uint			*header = uintp(bp) ;
 			header[pwihdr_fsz]	= op->fsz ;
 			header[pwihdr_wrtime]	= op->wrtime ;
 			header[pwihdr_wrcount]	= op->wrcount ;
 			header[pwihdr_rectab]	= op->rectab ;
 			header[pwihdr_reclen]	= op->reclen ;
-			header[pwihdr_recsize]	= op->recsize ;
+			header[pwihdr_recsz]	= op->recsz ;
 			header[pwihdr_strtab]	= op->strtab ;
 			header[pwihdr_lenstr]	= op->lenstr ;
-			header[pwihdr_strsize]	= op->strsize ;
+			header[pwihdr_strsz]	= op->strsz ;
 			header[pwihdr_idxlen]	= op->idxlen ;
-			header[pwihdr_idxsize]	= op->idxsize ;
+			header[pwihdr_idxsz]	= op->idxsz ;
 			header[pwihdr_idxl1]	= op->idxl1 ;
 			header[pwihdr_idxl3]	= op->idxl3 ;
 			header[pwihdr_idxf]	= op->idxf ;
 			header[pwihdr_idxfl3]	= op->idxfl3 ;
 			header[pwihdr_idxun]	= op->idxun ;
-	        	bp += tabsize ;
-	        	bl -= tabsize ;
+	        	bp += tabsz ;
+	        	bl -= tabsz ;
 			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_OVERFLOW ;
@@ -160,26 +160,26 @@ int pwihdr_wr(pwihdr *op,cchar *hbuf,int hlen) noex {
 		    }
 	            bp += vsz ;
 	            bl -= vsz ;
-	            if ((rs >= 0) && (bl >= tabsize)) {
+	            if ((rs >= 0) && (bl >= tabsz)) {
 			const uint	*header = uintp(bp) ;
 	                op->fsz		= header[pwihdr_fsz] ;
 	                op->wrtime	= header[pwihdr_wrtime] ;
 	                op->wrcount	= header[pwihdr_wrcount] ;
 	                op->rectab	= header[pwihdr_rectab] ;
 	                op->reclen	= header[pwihdr_reclen] ;
-	                op->recsize	= header[pwihdr_recsize] ;
+	                op->recsz	= header[pwihdr_recsz] ;
 	                op->strtab	= header[pwihdr_strtab] ;
 	                op->lenstr	= header[pwihdr_lenstr] ;
-	                op->strsize	= header[pwihdr_strsize] ;
+	                op->strsz	= header[pwihdr_strsz] ;
 	                op->idxlen	= header[pwihdr_idxlen] ;
-	                op->idxsize	= header[pwihdr_idxsize] ;
+	                op->idxsz	= header[pwihdr_idxsz] ;
 	                op->idxl1	= header[pwihdr_idxl1] ;
 	                op->idxl3	= header[pwihdr_idxl3] ;
 	                op->idxf	= header[pwihdr_idxf] ;
 	                op->idxfl3	= header[pwihdr_idxfl3] ;
 	                op->idxun	= header[pwihdr_idxun] ;
-	                bp += tabsize ;
-	                bl -= tabsize ;
+	                bp += tabsz ;
+	                bl -= tabsz ;
 			len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
