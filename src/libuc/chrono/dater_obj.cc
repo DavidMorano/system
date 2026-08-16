@@ -61,7 +61,6 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/timeb.h>		/* POSIX® |TIMEB| */
-#include	<tzfile.h>		/* POSIC® TM_YEAR_BASE */
 #include	<ctime>			/* CSTD |time_t| */
 #include	<climits>		/* CSTD |SHORT_MIN| */
 #include	<cstddef>		/* CSTD */
