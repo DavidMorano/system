@@ -30,7 +30,7 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
