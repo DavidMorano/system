@@ -32,7 +32,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>		/* POSIX® */
 #include	<sys/mman.h>		/* POSIX® */
-#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
