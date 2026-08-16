@@ -676,7 +676,7 @@ cchar	fname[] ;
 
 	    rs1 = u_stat(fname,&sb) ;
 	    if (rs1 >= 0)
-	        rs1 = permid(&sip->id,&sb,R_OK) ;
+	        rs1 = permids(&sip->id,&sb,R_OK) ;
 
 	} /* end if (flie check) */
 
