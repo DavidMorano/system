@@ -1,32 +1,28 @@
-/* progfile */
+/* mkhtmartiles_proc SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a file */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_FOOTER	1		/* include a footer? */
-
 
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
 	The program was written from scratch to do what the previous
 	program by the same name did.
 
-
 	= 2004-02-09, David A­D­ Morano
-
-	No it wasn't (referring to the above).	I snarfed this from
-	another program with that previous change note! :-)  Almost every
-	subroutine starts from a previous one.	Why do we keep the old
-	change notes?
+	No it was not referring to the above).  I snarfed this from
+	another program with that previous change note! :-)  Almost
+	every subroutine starts from a previous one.  Why do we
+	keep the old change notes?
 
 	Also, what was the previous program by the same name?
 	Never mind, it doesn't really matter since I have gutted
 	this subroutine almost to the bone! :-)
-
 
 */
 
@@ -34,32 +30,31 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine processes one file at a time.  
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<cstdlib>
-#include	<cstring>
-#include	<tzfile.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<char.h>
+#include	<tzfile.h>		/* |TM_YEAR_BASE| */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<sbuf.h>
 #include	<realname.h>
-#include	<localmisc.h>
+#include	<char.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -416,9 +411,8 @@ const char	fname[] ;
 	            pfp->date = 0 ;
 
 	        if (f_write && (pfp->date != 0)) {
-	            struct tm	ts ;
+	            TM		ts ;
 	            uint	year ;
-
 	            rs1 = uc_timelocal(&pfp->date,&ts) ;
 
 #if	CF_DEBUG
@@ -430,15 +424,12 @@ const char	fname[] ;
 #endif
 
 	            if (rs1 >= 0) {
-
 	                bprintf(&ofile,"<br>\n") ;
-
 	                year = TM_YEAR_BASE + ts.tm_year ;
 	                bprintf(&ofile,"%s %s %u, %u\n",
 	                    fulldays[ts.tm_wday],
 	                    fullmonths[ts.tm_mon],
 	                    ts.tm_mday,year) ;
-
 	            }
 	        }
 
@@ -666,7 +657,7 @@ time_t		*rtp ;
 	const char	*tp, *cp ;
 
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("artdate: s=>%r<\n",s,slen) ;
 #endif
 
@@ -709,7 +700,7 @@ time_t		*rtp ;
 	        }
 	    }
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("artdate: mon=%d\n",mon) ;
 #endif
 
@@ -730,7 +721,7 @@ time_t		*rtp ;
 	        if (cfdeci(s,(tp - s),&day) < 0)
 	            day = -1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("artdate: mday=%d\n",day) ;
 #endif
 
@@ -751,7 +742,7 @@ time_t		*rtp ;
 
 /* get the year */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("artdate: rstr=%r\n",s,slen) ;
 #endif
 
@@ -764,7 +755,7 @@ time_t		*rtp ;
 		cl = (tp - s) ;
 		slen -= cl ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("artdate: new rstr=%r\n",cp,cl) ;
 #endif
 
@@ -775,7 +766,7 @@ time_t		*rtp ;
 
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("artdate: year=%d\n",year) ;
 #endif
 
@@ -787,13 +778,13 @@ time_t		*rtp ;
 
 	    if (year >= 2000) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("artdate: year GT 2000\n") ;
 #endif
 
 	        year -= TM_YEAR_BASE ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("artdate: GT-200 year=%d\n",year) ;
 #endif
 
@@ -803,7 +794,7 @@ time_t		*rtp ;
 	} else
 	    year = cy ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("artdate: adjusted year=%d\n",year) ;
 #endif
 
@@ -814,7 +805,7 @@ time_t		*rtp ;
 
 	rs = uc_mktime(&ts,rtp) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    debugprintf("artdate: uc_mktime() rs=%d\n",rs) ;
@@ -822,7 +813,7 @@ time_t		*rtp ;
 	        timestr_log(*rtp,timebuf)) ;
 	}
 	    debugprintf("artdate: ret rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	return rs ;
 }
@@ -840,7 +831,7 @@ int		sl ;
 	int	rs ;
 
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mkrealname: name=>%r<\n",sp,sl) ;
 #endif
 
@@ -851,7 +842,7 @@ int		sl ;
 	    realname_finish(&rn) ;
 	} /* end if (realname) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mkrealname: ret rs=%d name=>%r<\n",
 		rs,namebuf,rs) ;
 #endif
