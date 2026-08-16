@@ -30,12 +30,13 @@
 
 
 #define	CALYEARS	struct calyears_head
+#define	CALYEARS_FL	struct calyears_flags
 #define	CALYEARS_OBJ	struct calyears_object
 #define	CALYEARS_Q	calcite
 #define	CALYEARS_QUERY	calcite
 #define	CALYEARS_CITE	calcite
 #define	CALYEARS_CUR	struct calyears_cursor
-#define	CALYEARS_FL	struct calyears_flags
+#define	CALYEARS_ENT	calent
 #define	CALYEARS_MAGIC	0x99447245
 
 
@@ -79,6 +80,7 @@ typedef	CALYEARS	calyears ;
 typedef	CALYEARS_FL	calyears_fl ;
 typedef	CALYEARS_OBJ	calyears_obj ;
 typedef	CALYEARS_CUR	calyears_cur ;
+typedef	CALYEARS_ENT	calyears_ent ;
 typedef	CALYEARS_Q	calyears_q ;
 
 EXTERNC_begin
@@ -93,7 +95,7 @@ extern int calyears_curend(calyears *,calyears_cur *) noex ;
 extern int calyears_check(calyears *,time_t) noex ;
 extern int calyears_audit(calyears *) noex ;
 extern int calyears_close(calyears *) noex ;
-extern int calyears_already(calyears *,vecobj *,calent *) noex ;
+extern int calyears_already(calyears *,vecobj *,calyears_ent *) noex ;
 extern int calyears_havestart(calyears *,calyears_q *,int,cchar *,int) noex ;
 
 EXTERNC_end
