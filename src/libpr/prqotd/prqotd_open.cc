@@ -116,9 +116,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<csignal>		/* |sig_atomic_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -634,7 +634,7 @@ local int getdefmjd(time_t dt) noex {
 	int		rs ;
 	if (dt == 0) dt = time(nullptr) ;
 	if (tmtime ct ; (rs = tmtime_timelocal(&ct,dt)) >= 0) ylikely {
-	    cint	y = (ct.year + TM_YEAR_BASE) ;
+	    cint	y = (ct.year + TMTIME_YEARBASE) ;
 	    cint	m = ct.mon ;
 	    cint	d = ct.mday ;
 	    rs = getmjd(y,m,d) ;
