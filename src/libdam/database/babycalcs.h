@@ -60,7 +60,7 @@ struct babycalcs_head {
 	cchar		*shmname ;
 	caddr_t		mapdata ;	/* SHM data */
 	ptm		*mxp ;		/* pointer to SHM mutex */
-	BABIESHDR	hf ;
+	babieshdr	hf ;
 	time_t		ti_mdb ;	/* db-mtime */
 	time_t		ti_map ;	/* map-time */
 	time_t		ti_lastcheck ;
