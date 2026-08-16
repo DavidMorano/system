@@ -26,7 +26,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdint>		/* CSTD */
@@ -178,7 +177,11 @@ int dayofmonth_start(dayofmonth *op,int year) noex {
 	        if (tmtime ts{} ; (rs = tmtime_timelocal(&ts,dt)) >= 0) {
 	            op->isdst = ts.isdst ;
 	            op->gmtoff = ts.gmtoff ;
-	            op->year = (year >= 0) ? year : (ts.year + TM_YEAR_BASE) ;
+	            if (year >= 0) {
+			op->year = year  ;
+		    } else {
+	                op->year = (ts.year + TMTIME_YEARBASE) ;
+		    }
 	            op->magval = DAYOFMONTH_MAGIC ;
 	        } /* end if (tmtime_timelocal) */
 	    } /* end if (ok) */
@@ -306,7 +309,7 @@ local int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
 	            daymax = (isleapyear(op->year)) ? 29 : 28 ;
 	        } /* end if */
 	        tmo.tm_isdst = -1 ;
-	        tmo.tm_year = (op->year - TM_YEAR_BASE) ;
+	        tmo.tm_year = (op->year - TMTIME_YEARBASE) ;
 	        tmo.tm_mon = m ;
 	        tmo.tm_mday = 1 ;
 	        if ((rs = uc_mktime(&tmo,nullptr)) >= 0) {
