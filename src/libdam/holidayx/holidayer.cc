@@ -38,7 +38,6 @@
 #include	<sys/param.h>		/* POSIX */
 #include	<sys/stat.h>		/* POSIX */
 #include	<unistd.h>		/* POSIX */
-#include	<tzfile.h>		/* POIX® TM_YEAR_BASE */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
@@ -812,7 +811,7 @@ local int holidayer_yearmk(HO *op) noex {
 	if (op->year == 0) {
 	    custime	dt = time(nullptr) ;
 	    if (tmtime m ; (rs = tmtime_timelocal(&m,dt)) >= 0) {
-	        y = (m.year + TM_YEAR_BASE) ;
+	        y = (m.year + TMTIME_YEARBASE) ;
 	        op->year = y ;
 	    }
 	} /* end if (zero) */
