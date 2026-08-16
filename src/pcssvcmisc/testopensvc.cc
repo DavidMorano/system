@@ -17,7 +17,7 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<cstdarg>
 #include	<cstdio>
