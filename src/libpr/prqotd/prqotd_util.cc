@@ -30,9 +30,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -122,7 +121,7 @@ namespace prqotd {
 	int		rs ;
 	if (dt == 0) dt = getustime ;
 	if (tmtime ct ; (rs = tmtime_timelocal(&ct,dt)) >= 0) {
-	    cint	y = (ct.year + TM_YEAR_BASE) ;
+	    cint	y = (ct.year + TMTIME_YEARBASE) ;
 	    cint	m = ct.mon ;
 	    cint	d = ct.mday ;
 	    rs = getmjd(y,m,d) ;
