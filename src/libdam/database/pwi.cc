@@ -208,7 +208,7 @@ local int pwi_dtor(pwi *op) noex {
 	    if (op->dbp) ylikely {
 		delete op->dbp ;
 		op->dbp = nullptr ;
-	    }
+	    } /* end if (delete-ipasswd) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pwi_dtor) */
@@ -282,7 +282,7 @@ int pwi_open(pwi *op,cchar *pr,cchar *dbname) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		pwi_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (pwi_ctor) */
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (pwi_open) */
@@ -383,7 +383,7 @@ int lookuper::operator () (char *nbuf,int nlen) noex {
 	    rs = sncpylc(nbuf,nlen,name) ;
 	    sl = rs ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = proc(sp,sl) ;
 	    ul = rs ;
 	} /* end if (ok) */
@@ -538,13 +538,13 @@ int opener::mk() noex {
 int opener::mkbegin(char *pbuf) noex {
     	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (ids id ; (rs = id.load) >= 0) ylikely {
-	    for (int i = 0 ; prbins[i] != nullptr ; i += 1) {
+	    for (int i = 0 ; prbins[i] ; i += 1) {
 	        if ((rs = mkpath(pbuf,pr,prbins[i],progmkpwi)) >= 0) ylikely {
-		    const uid_t		u = id.uid ;
-		    const gid_t		g = id.gid ;
-		    const gid_t		*gids = id.gids ;
+		    const uid_t	u = id.uid ;
+		    const gid_t	g = id.gid ;
+		    const gid_t	*gids = id.gids ;
 		    len = rs ;		/* save length for return */
 	            if ((rs = perm(pbuf,u,g,gids,X_OK)) >= 0) {
 			rs = int(true) ; /* <- signal exit from loop */
@@ -570,7 +570,7 @@ int opener::mkproc(cchar *pbuf) noex {
 	int		rs ;
 	int		rs1 ;
 	int		cpid = 0 ; /* return-value */
-	if (vecstr envs ; (rs = vecstr_start(&envs,vn,vo)) >= 0) ylikely {
+	if (vecstr envs ; (rs = envs.start(vn,vo)) >= 0) ylikely {
 	    if (char *abuf ; (rs = libmem.mn(&abuf)) >= 0) ylikely {
 		cint	alen = rs ;
 	        int	ai = 0 ;
