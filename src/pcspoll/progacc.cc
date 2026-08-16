@@ -1,4 +1,5 @@
 /* progacc SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* handle some service processing */
@@ -19,6 +20,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	Prepare to do some servicing.
 
 *******************************************************************************/
@@ -33,7 +35,8 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
 #include	<acctab.h>
 #include	<localmisc.h>
@@ -48,10 +51,6 @@
 #define	VARPATH		"PATH"
 #endif
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
-
 #ifndef	DEBUGLEVEL
 #define	DEBUGLEVEL(n)	(pip->debuglevel >= (n))
 #endif
@@ -59,36 +58,11 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	getfname(const char *,const char *,int,char *) ;
-
-extern int	securefile(const char *,uid_t,gid_t) ;
-
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -105,7 +79,7 @@ extern char	*timestr_logz(time_t,char *) ;
 #ifdef	COMMENT
 
 /* 'conf' for most regular programs */
-static const char	*sched1[] = {
+constexpr cpcchar	sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -116,7 +90,7 @@ static const char	*sched1[] = {
 #endif /* COMMENT */
 
 /* non-'conf' ETC stuff for all regular programs */
-static const char	*sched2[] = {
+constexpr cpcchar	sched2[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -127,7 +101,7 @@ static const char	*sched2[] = {
 
 #ifdef	COMMENT
 /* non-'conf' ETC stuff for local searching */
-static const char	*sched3[] = {
+constexpr cpcchar	sched3[] = {
 	"%e/%n/%n.%f",
 	"%e/%n/%f",
 	"%e/%n.%f",
@@ -139,11 +113,12 @@ static const char	*sched3[] = {
 #endif /* COMMENT */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progaccopen(PROGINFO *pip)
-{
+int progaccopen(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 = 0 ;
 	int		cl ;
