@@ -82,34 +82,36 @@
 #include	<fcntl.h>
 #include	<netdb.h>
 #include	<poll.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ugetpid.h>
-#include	<getpwx.h>
-#include	<ucinfo.h>
-#include	<userinfo.h>
-#include	<getax.h>
-#include	<getusername.h>
-#include	<gethz.h>
-#include	<estrings.h>
-#include	<cfdec.h>
-#include	<bits.h>
-#include	<keyopt.h>
-#include	<vecstr.h>
-#include	<ascii.h>
-#include	<snx.h>
-#include	<strn.h>
-#include	<spawner.h>
-#include	<timestr.h>
-#include	<toxc.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<ugetpid.h>		/* LIBUC */
+#include	<ucinfo.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<gethz.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<getprogpath.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<bits.h>		/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<spawner.h>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -163,48 +165,9 @@
 
 /* external subroutines */
 
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	getnprocessors(cchar **,int) ;
-extern int	getarch(char *,int) ;
-extern int	getnprocessors(const char **,int) ;
-extern int	getproviderid(const char *,int) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	getserial(const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	securefile(cchar *,uid_t,gid_t) ;
-extern int	mklogidpre(char *,int,cchar *,int) ;
-extern int	mklogidsub(char *,int,cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	hasnonwhite(cchar *,int) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-extern int	isStrEmpty(cchar *,int) ;
-
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	proginfo_rootname(PROGINFO *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	mfsdebug_lockprint(PROGINFO *,cchar *) ;
-#endif
 
 #if	CF_DEBUGZ
 extern int	zprintf(cchar *,cchar *,...) ;
@@ -2671,7 +2634,7 @@ static int procmntcheck(PROGINFO *pip)
 	    cchar		*fmt ;
 	    if ((rs = u_stat(lip->mntfname,&usb)) >= 0) {
 	        if (S_ISREG(usb.st_mode)) {
-	            rs = permid(&pip->id,&usb,W_OK) ;
+	            rs = permids(&pip->id,&usb,W_OK) ;
 	        } else
 	            rs = SR_BUSY ;
 	        if (rs < 0) {
@@ -2723,7 +2686,7 @@ static int procbacks(PROGINFO *pip)
 	        debugprintf("main/procbacks: prog=%r\n",ebuf,el) ;
 #endif
 
-	    if ((rs = prgetprogpath(pip->pr,pbuf,ebuf,el)) > 0) {
+	    if ((rs = prgetprogpath(pip->pr,pbuf,nullptr,ebuf,el)) > 0) {
 	        pf = pbuf ;
 	    }
 
