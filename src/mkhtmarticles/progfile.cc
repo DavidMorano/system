@@ -5,7 +5,6 @@
 /* process a file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_FOOTER	1		/* include a footer? */
 
@@ -35,28 +34,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<tzfile.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<tzfile.h>		/* |TM_YEAR_BASE| */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<sbuf.h>
 #include	<realname.h>
 #include	<strn.h>
 #include	<strwcpy.h>
 #include	<char.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -427,7 +425,6 @@ cchar	fname[] ;
 	            if (rs1 >= 0) {
 
 	                bprintf(&ofile,"<br>\n") ;
-
 	                year = TM_YEAR_BASE + ts.tm_year ;
 	                bprintf(&ofile,"%s %s %u, %u\n",
 	                    fulldays[ts.tm_wday],
@@ -661,7 +658,7 @@ time_t		*rtp ;
 	cchar	*tp, *cp ;
 
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("artdate: s=>%r<\n",s,slen) ;
 #endif
 
@@ -704,7 +701,7 @@ time_t		*rtp ;
 	        }
 	    }
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("artdate: mon=%d\n",mon) ;
 #endif
 
@@ -725,7 +722,7 @@ time_t		*rtp ;
 	        if (cfdeci(s,(tp - s),&day) < 0)
 	            day = -1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("artdate: mday=%d\n",day) ;
 #endif
 
@@ -746,7 +743,7 @@ time_t		*rtp ;
 
 /* get the year */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("artdate: rstr=%r\n",s,slen) ;
 #endif
 
@@ -759,7 +756,7 @@ time_t		*rtp ;
 		cl = (tp - s) ;
 		slen -= cl ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("artdate: new rstr=%r\n",cp,cl) ;
 #endif
 
@@ -770,7 +767,7 @@ time_t		*rtp ;
 
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("artdate: year=%d\n",year) ;
 #endif
 
@@ -779,26 +776,16 @@ time_t		*rtp ;
 	memset(&ts,0,sizeof(struct tm)) ;
 
 	if (year >= 0) {
-
 	    if (year >= 2000) {
-
-#if	CF_DEBUGS
-	        debugprintf("artdate: year GT 2000\n") ;
-#endif
-
 	        year -= TM_YEAR_BASE ;
-
-#if	CF_DEBUGS
-	        debugprintf("artdate: GT-200 year=%d\n",year) ;
-#endif
-
-	    } else if (year < 70)
+	    } else if (year < 70) {
 	        year += 100 ;
-
-	} else
+	    }
+	} else {
 	    year = cy ;
+	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("artdate: adjusted year=%d\n",year) ;
 #endif
 
@@ -809,7 +796,7 @@ time_t		*rtp ;
 
 	rs = uc_mktime(&ts,rtp) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    debugprintf("artdate: uc_mktime() rs=%d\n",rs) ;
@@ -817,7 +804,7 @@ time_t		*rtp ;
 	        timestr_log(*rtp,timebuf)) ;
 	}
 	    debugprintf("artdate: ret rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	return rs ;
 }
@@ -835,7 +822,7 @@ int		sl ;
 	int	rs ;
 
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mkrealname: name=>%r<\n",sp,sl) ;
 #endif
 
@@ -846,7 +833,7 @@ int		sl ;
 	    realname_finish(&rn) ;
 	} /* end if (realname) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mkrealname: ret rs=%d name=>%r<\n",
 		rs,namebuf,rs) ;
 #endif
