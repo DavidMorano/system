@@ -69,12 +69,11 @@
 #include	<sys/types.h>		/* POSIX® */
 #include	<sys/param.h>		/* POSIX® */
 #include	<sys/stat.h>		/* POSIX® */
-#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE|[ */
 #include	<unistd.h>		/* POSIX® */
 #include	<fcntl.h>		/* POSIX® */
 #include	<ctime>			/* CSTD */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
@@ -202,10 +201,10 @@ int cyimk_open(CYIMK *op,int year,cc *dname,cc *cname,int of,mode_t om) noex {
 	if (cname[0] == '\0') return SR_INVALID ;
 
 	if (year <= 0) {
-	    TMTIME	tm ;
+	    TMTIME	tmval ;
 	    time_t	dt = time(nullptr) ;
-	    rs = tmtime_timelocal(&tm,dt) ;
-	    year = (tm.year + TM_YEAR_BASE) ;
+	    rs = tmtime_timelocal(&tmval,dt) ;
+	    year = (tm.year + TMTIME_YEARBASE) ;
 	} /* end if */
 
 	memclear(op) ;
