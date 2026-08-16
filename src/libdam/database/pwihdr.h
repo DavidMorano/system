@@ -18,7 +18,7 @@
 
 
 #define	PWIHDR			struct pwihdr_head
-#define	PWIHDR_MAGICSIZE	16
+#define	PWIHDR_MAGICSZ		16
 #define	PWIHDR_MAGICSTR		"IPASSWD"
 #define	PWIHDR_VERSION		0
 #define	PWIHDR_TYPE		0
@@ -30,12 +30,12 @@ enum pwihdrs {
 	pwihdr_wrcount,
 	pwihdr_rectab,
 	pwihdr_reclen,
-	pwihdr_recsize,
+	pwihdr_recsz,
 	pwihdr_strtab,
 	pwihdr_lenstr,
-	pwihdr_strsize,
+	pwihdr_strsz,
 	pwihdr_idxlen,
-	pwihdr_idxsize,
+	pwihdr_idxsz,
 	pwihdr_idxl1,
 	pwihdr_idxl3,
 	pwihdr_idxf,
@@ -49,13 +49,13 @@ struct pwihdr_head {
 	uint		wrtime ;
 	uint		wrcount ;
 	uint		rectab ;
-	uint		recsize ;
+	uint		recsz ;
 	uint		reclen ;
 	uint		strtab ;
 	uint		lenstr ;
-	uint		strsize ;
+	uint		strsz ;
 	uint		idxlen ;
-	uint		idxsize ;
+	uint		idxsz ;
 	uint		idxl1 ;
 	uint		idxl3 ;
 	uint		idxf ;
