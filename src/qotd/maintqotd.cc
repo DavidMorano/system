@@ -5,7 +5,7 @@
 /* open a channel (file-descriptor) to the quote-of-the-day (QOTD) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 #define	CF_OPENDEF	0		/* ? */
 #define	CF_SOURCES	1		/* use sources */
 #define	CF_CONFIGCHECK	0		/* |config_check()| */
@@ -53,38 +53,43 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<csignal>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<estrings.h>
-#include	<mkfnamesuf.h>
-#include	<ids.h>
-#include	<sigman.h>
-#include	<tmtime.hh>
-#include	<storebuf.h>
-#include	<vecstr.h>
-#include	<vecpstr.h>
-#include	<ascii.h>
-#include	<paramfile.h>
-#include	<expcook.h>
-#include	<logfile.h>
-#include	<iserror.h>
-#include	<isnot.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getmjd.h>		/* LIBUC */
+#include	<getprogpath.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<mkfnamesuf.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<sigman.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecpstr.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<iserror.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"maintqotd.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -138,44 +143,7 @@
 
 /* external subroutines */
 
-extern int	snfilemode(char *,int,mode_t) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	ctdecpi(char *,int,int,int) ;
-extern int	getaf(cchar *,int) ;
-extern int	getmjd(int,int,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getprogpath(IDS *,vecstr *,char *,cchar *,int) ;
-extern int	getprogexec(char *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	mklogid(char *,int,cchar *,int,int) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	vecstr_addpathclean(vecstr *,cchar *,int) ;
-extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
-extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
-
-extern int	maintqotd_prog(MAINTQOTD *,cchar *,cchar *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif /* CF_DEBUGS */
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strwcpyuc(char *,cchar *,int) ;
-extern char	*strcpylc(char *,cchar *) ;
-extern char	*strcpyuc(char *,cchar *) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern int	maintqotd_prog(MAINTQOTD *,cchar *,cchar *) noex ;
 
 
 /* external variables */
@@ -186,77 +154,77 @@ extern cchar	**environ ;
 /* local structures */
 
 struct config {
-	uint		magic ;
 	MAINTQOTD	*sip ;
 	paramfile	p ;
-	EXPCOOK		cooks ;
+	expcool		cooks ;
+	uint		magval ;
 	uint		f_p:1 ;
 	uint		f_cooks:1 ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	subinfo_start(MAINTQOTD *,time_t,cchar *,int,int,int) ;
-static int	subinfo_finish(MAINTQOTD *) ;
-static int	subinfo_confbegin(MAINTQOTD *) ;
-static int	subinfo_confend(MAINTQOTD *) ;
-static int	subinfo_setentry(MAINTQOTD *,cchar **,cchar *,int) ;
-static int	subinfo_envbegin(MAINTQOTD *) ;
-static int	subinfo_envend(MAINTQOTD *) ;
-static int	subinfo_logfile(MAINTQOTD *,cchar *,int) ;
-static int	subinfo_hostname(MAINTQOTD *,cchar *,int) ;
-static int	subinfo_source(MAINTQOTD *,cchar *,int) ;
-static int	subinfo_logbegin(MAINTQOTD *) ;
-static int	subinfo_logend(MAINTQOTD *) ;
-static int	subinfo_logenv(MAINTQOTD *) ;
-static int	subinfo_defaults(MAINTQOTD *) ;
-static int	subinfo_spooldir(MAINTQOTD *,cchar *,int) ;
-static int	subinfo_spoolcheck(MAINTQOTD *) ;
-static int	subinfo_qdirname(MAINTQOTD *,int) ;
-static int	subinfo_gather(MAINTQOTD *,cchar *,mode_t) ;
-static int	subinfo_opensource(MAINTQOTD *,cchar *,cchar *) ;
-static int	subinfo_opensourceprog(MAINTQOTD *,cchar *,cchar *) ;
+local int	subinfo_start(MAINTQOTD *,time_t,cchar *,int,int,int) ;
+local int	subinfo_finish(MAINTQOTD *) ;
+local int	subinfo_confbegin(MAINTQOTD *) ;
+local int	subinfo_confend(MAINTQOTD *) ;
+local int	subinfo_setentry(MAINTQOTD *,cchar **,cchar *,int) ;
+local int	subinfo_envbegin(MAINTQOTD *) ;
+local int	subinfo_envend(MAINTQOTD *) ;
+local int	subinfo_logfile(MAINTQOTD *,cchar *,int) ;
+local int	subinfo_hostname(MAINTQOTD *,cchar *,int) ;
+local int	subinfo_source(MAINTQOTD *,cchar *,int) ;
+local int	subinfo_logbegin(MAINTQOTD *) ;
+local int	subinfo_logend(MAINTQOTD *) ;
+local int	subinfo_logenv(MAINTQOTD *) ;
+local int	subinfo_defaults(MAINTQOTD *) ;
+local int	subinfo_spooldir(MAINTQOTD *,cchar *,int) ;
+local int	subinfo_spoolcheck(MAINTQOTD *) ;
+local int	subinfo_qdirname(MAINTQOTD *,int) ;
+local int	subinfo_gather(MAINTQOTD *,cchar *,mode_t) ;
+local int	subinfo_opensource(MAINTQOTD *,cchar *,cchar *) ;
+local int	subinfo_opensourceprog(MAINTQOTD *,cchar *,cchar *) ;
 
-static int subinfo_defprog(MAINTQOTD *,cchar *) ;
-static int subinfo_defproger(MAINTQOTD *,vecstr *,cchar *,cchar *) ;
-static int subinfo_addourpath(MAINTQOTD *,vecstr *) ;
-static int subinfo_addprbins(MAINTQOTD *,vecstr *) ;
-static int subinfo_addprbin(MAINTQOTD *,vecstr *,cchar *,cchar *) ;
-static int subinfo_id(MAINTQOTD *) ;
-static int subinfo_dircheck(MAINTQOTD *,cchar *) ;
-static int subinfo_dirminmode(MAINTQOTD *,cchar *,mode_t) ;
+local int subinfo_defprog(MAINTQOTD *,cchar *) ;
+local int subinfo_defproger(MAINTQOTD *,vecstr *,cchar *,cchar *) ;
+local int subinfo_addourpath(MAINTQOTD *,vecstr *) ;
+local int subinfo_addprbins(MAINTQOTD *,vecstr *) ;
+local int subinfo_addprbin(MAINTQOTD *,vecstr *,cchar *,cchar *) ;
+local int subinfo_id(MAINTQOTD *) ;
+local int subinfo_dircheck(MAINTQOTD *,cchar *) ;
+local int subinfo_dirminmode(MAINTQOTD *,cchar *,mode_t) ;
 
-static int	config_start(struct config *,MAINTQOTD *,cchar *) ;
-static int	config_findfile(struct config *,char *,cchar *) ;
-static int	config_cookbegin(struct config *) ;
-static int	config_cookend(struct config *) ;
-static int	config_read(struct config *) ;
-static int	config_reader(struct config *,char *,int) ;
-static int	config_finish(struct config *) ;
+local int	config_start(struct config *,MAINTQOTD *,cchar *) ;
+local int	config_findfile(struct config *,char *,cchar *) ;
+local int	config_cookbegin(struct config *) ;
+local int	config_cookend(struct config *) ;
+local int	config_read(struct config *) ;
+local int	config_reader(struct config *,char *,int) ;
+local int	config_finish(struct config *) ;
 
 #if	CF_CONFIGCHECK
-static int	config_check(struct config *) ;
+local int	config_check(struct config *) ;
 #endif
 
-static int	getdefmjd(time_t) ;
-static int	mkqfname(char *,cchar *,int) ;
+local int	getdefmjd(time_t) ;
+local int	mkqfname(char *,cchar *,int) ;
 
-static int	setfname(MAINTQOTD *,char *,cchar *,int,
+local int	setfname(MAINTQOTD *,char *,cchar *,int,
 			int,cchar *,cchar *,cchar *) ;
 
-static int	mkourname(char *,cchar *,cchar *,cchar *,int) ;
+local int	mkourname(char *,cchar *,cchar *,cchar *,int) ;
 
-#if	CF_DEBUGS && CF_OPENDEF
-static int opendef(MAINTQOTD *) ;
+#if	CF_DEBUG && CF_OPENDEF
+local int opendef(MAINTQOTD *) ;
 #endif
 
-#if	CF_DEBUGS
-static int debugmode(cchar *,cchar *,cchar *) ;
+#if	CF_DEBUG
+local int debugmode(cchar *,cchar *,cchar *) ;
 #endif
 
-#if	CF_DEBUGS
-static int debugfmode(cchar *,cchar *,int) ;
+#if	CF_DEBUG
+local int debugfmode(cchar *,cchar *,int) ;
 #endif
 
 
@@ -267,7 +235,7 @@ static cchar	*csched[] = {
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	"%p/%n.%f",
-	NULL
+	nullptr
 } ;
 
 static cchar	*cparams[] = {
@@ -278,7 +246,7 @@ static cchar	*cparams[] = {
 	"svcname",
 	"to",
 	"source",
-	NULL
+	nullptr
 } ;
 
 enum cparams {
@@ -296,7 +264,7 @@ static cchar	*sources[] = {
 	"prog",
 	"systems",
 	"uqotd",
-	NULL
+	nullptr
 } ;
 
 enum sources {
@@ -309,7 +277,7 @@ enum sources {
 static cchar	*prbins[] = {
 	"bin",
 	"sbin",
-	NULL
+	nullptr
 } ;
 
 static cchar	*defprogs[] = {
@@ -318,7 +286,7 @@ static cchar	*defprogs[] = {
 	"/swd/local/bin/fortune",
 	"/usr/extra/bin/fortune",
 	"/usr/games/fortune",
-	NULL
+	nullptr
 } ;
 
 
@@ -333,14 +301,14 @@ int maintqotd(cchar *pr,int mjd,int of,int to)
 	int		rs1 ;
 	int		fd = -1 ;
 
-	if (pr == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd: ent mjd=%d\n",mjd) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	if (mjd <= 0) {
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 	    rs = getdefmjd(dt) ;
 	    mjd = rs ;
 	}
@@ -356,25 +324,25 @@ int maintqotd(cchar *pr,int mjd,int of,int to)
 	                        if ((rs = mkqfname(qfname,qd,mjd)) >= 0) {
 	                            const mode_t	om = 0664 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 				    debugprintf("maintqotd: qf=%s\n",qfname) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	                            of &= (~ OM_SPECIAL) ;
     
-#if	CF_DEBUGS
+#if	CF_DEBUG
 				    {
 				        char	obuf[TIMEBUFLEN+1] ;
 				        snflagsopen(obuf,TIMEBUFLEN,of) ;
 				        debugprintf("maintqotd: of=%s\n",obuf) ;
 				    }
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 	                            rs = u_open(qfname,of,om) ;
 	                            fd = rs ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 				    debugprintf("maintqotd: u_open() rs=%d\n",
 					rs) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 	                            if (rs == SR_NOENT) {
 	                                rs = subinfo_gather(sip,qfname,om) ;
 	                                fd = rs ;
@@ -396,9 +364,9 @@ int maintqotd(cchar *pr,int mjd,int of,int to)
 	    } /* end if (subinfo) */
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd: ret rs=%d fd=%u\n",rs,fd) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	return (rs >= 0) ? fd : rs ;
 }
@@ -408,15 +376,15 @@ int maintqotd(cchar *pr,int mjd,int of,int to)
 /* local subroutines */
 
 
-static int subinfo_start(MAINTQOTD *sip,time_t dt,cchar *pr,
+local int subinfo_start(MAINTQOTD *sip,time_t dt,cchar *pr,
 		int of,int to,int mjd)
 {
 	ustat	sb ;
 	int		rs ;
 
-	if (dt == 0) dt = time(NULL) ;
+	if (dt == 0) dt = time(nullptr) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_start: ent pr=%s\n",pr) ;
 #endif
 
@@ -438,8 +406,8 @@ static int subinfo_start(MAINTQOTD *sip,time_t dt,cchar *pr,
 
 	    if ((rs = subinfo_envbegin(sip)) >= 0) {
 	        if ((rs = subinfo_confbegin(sip)) >= 0) {
-		    const int	llen = LOGIDLEN ;
-		    const int	v = (int) ugetpid() ;
+		    cint	llen = LOGIDLEN ;
+		    cint	v = (int) ugetpid() ;
 		    cchar	*nn = sip->nn ;
 		    char	lbuf[LOGIDLEN+1] ;
 		    if ((rs = mklogid(lbuf,llen,nn,5,v)) >= 0) {
@@ -467,7 +435,7 @@ static int subinfo_start(MAINTQOTD *sip,time_t dt,cchar *pr,
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(MAINTQOTD *sip)
+local int subinfo_finish(MAINTQOTD *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -509,8 +477,8 @@ int subinfo_setentry(MAINTQOTD *lip,cchar **epp,cchar vp[],int vl)
 	int		rs = SR_OK ;
 	int		vnlen = 0 ;
 
-	if (lip == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
+	if (epp == nullptr) return SR_FAULT ;
 
 	if (! lip->open.stores) {
 	    rs = vecstr_start(&lip->stores,4,0) ;
@@ -520,14 +488,14 @@ int subinfo_setentry(MAINTQOTD *lip,cchar **epp,cchar vp[],int vl)
 	if (rs >= 0) {
 	    int	oi = -1 ;
 
-	    if (*epp != NULL)
+	    if (*epp != nullptr)
 	        oi = vecstr_findaddr(&lip->stores,*epp) ;
 
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        vnlen = strnlen(vp,vl) ;
 	        rs = vecstr_store(&lip->stores,vp,vnlen,epp) ;
 	    } else
-		*epp = NULL ;
+		*epp = nullptr ;
 
 	    if ((rs >= 0) && (oi >= 0))
 	        vecstr_del(&lip->stores,oi) ;
@@ -539,18 +507,18 @@ int subinfo_setentry(MAINTQOTD *lip,cchar **epp,cchar vp[],int vl)
 /* end subroutine (subinfo_setentry) */
 
 
-static int subinfo_envbegin(MAINTQOTD *sip)
+local int subinfo_envbegin(MAINTQOTD *sip)
 {
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar		*cp ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_envbegin: ent\n") ;
 #endif
 
 	{
-	    const int	elen = MAXPATHLEN ;
+	    cint	elen = MAXPATHLEN ;
 	    int		el = -1 ;
 	    cchar	*en ;
 	    char	ebuf[MAXPATHLEN+1] ;
@@ -564,7 +532,7 @@ static int subinfo_envbegin(MAINTQOTD *sip)
 	        cchar	**vpp = &sip->pn ;
 	        if ((cl = sfbasename(en,el,&cp)) > 0) {
 		    cchar	*tp ;
-		    if ((tp = strnchr(cp,cl,'.')) != NULL) cl = (tp-cp) ;
+		    if ((tp = strnchr(cp,cl,'.')) != nullptr) cl = (tp-cp) ;
 	            rs = subinfo_setentry(sip,vpp,cp,cl) ;
 	        }
 	    }
@@ -575,7 +543,7 @@ static int subinfo_envbegin(MAINTQOTD *sip)
 	    char	dn[MAXHOSTNAMELEN+1] ;
 	    if ((rs = getnodedomain(nn,dn)) >= 0) {
 	        cchar	**vpp = &sip->nn ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("maintqotd/subinfo_envbegin: nn=%s\n",nn) ;
 	        debugprintf("maintqotd/subinfo_envbegin: dn=%s\n",dn) ;
 #endif
@@ -587,7 +555,7 @@ static int subinfo_envbegin(MAINTQOTD *sip)
 	}
 
 	if (rs >= 0) {
-	    const int	ulen = USERNAMELEN ;
+	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
 	        cchar	**vpp = &sip->un ;
@@ -600,25 +568,25 @@ static int subinfo_envbegin(MAINTQOTD *sip)
 /* end subroutine (subinfo_envbegin) */
 
 
-static int subinfo_envend(MAINTQOTD *sip)
+local int subinfo_envend(MAINTQOTD *sip)
 {
 	int		rs = SR_OK ;
 
-	if (sip == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
 
 	return rs ;
 }
 /* end subroutine (subinfo_envend) */
 
 
-static int subinfo_confbegin(MAINTQOTD *sip)
+local int subinfo_confbegin(MAINTQOTD *sip)
 {
-	const int	csize = sizeof(struct config)  ;
+	cint	csize = sizeof(struct config)  ;
 	int		rs = SR_OK ;
 	cchar		*cfname = CONFIGFNAME ;
 	void		*p ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("maintqotd/subinfo_confbegin: ent\n") ;
 #endif
 
@@ -634,11 +602,11 @@ static int subinfo_confbegin(MAINTQOTD *sip)
 	    } /* end if (config) */
 	    if (rs < 0) {
 	        uc_free(p) ;
-	        sip->config = NULL ;
+	        sip->config = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("maintqotd/subinfo_confbegin: ret rs=%d\n",rs) ;
 #endif
 
@@ -647,23 +615,23 @@ static int subinfo_confbegin(MAINTQOTD *sip)
 /* end subroutine (subinfo_confbegin) */
 
 
-static int subinfo_confend(MAINTQOTD *sip)
+local int subinfo_confend(MAINTQOTD *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("maintqotd/subinfo_confend: config=%u\n",
-	        (sip->config != NULL)) ;
+	        (sip->config != nullptr)) ;
 #endif
 
-	if (sip->config != NULL) {
+	if (sip->config != nullptr) {
 	    CONFIG	*csp = sip->config ;
 	    rs1 = config_finish(csp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(sip->config) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->config = NULL ;
+	    sip->config = nullptr ;
 	}
 
 	return rs ;
@@ -671,26 +639,26 @@ static int subinfo_confend(MAINTQOTD *sip)
 /* end subroutine (subinfo_confend) */
 
 
-static int subinfo_defaults(MAINTQOTD *sip)
+local int subinfo_defaults(MAINTQOTD *sip)
 {
 	int		rs = SR_OK ;
 
-	if (sip->spooldname == NULL) {
+	if (sip->spooldname == nullptr) {
 	    cchar	*vp = sip->sn ;
-	    const int	vl = -1 ;
+	    cint	vl = -1 ;
 	    rs = subinfo_spooldir(sip,vp,vl) ;
 	}
 
 	{
 	    cchar	*lf = sip->lfname ;
-	    if (((lf == NULL) || (lf[0] == '+')) && sip->fl.logsub) {
+	    if (((lf == nullptr) || (lf[0] == '+')) && sip->fl.logsub) {
 	        cchar	*vp = sip->sn ;
-	        const int	vl = -1 ;
+	        cint	vl = -1 ;
 	        rs = subinfo_logfile(sip,vp,vl) ;
 	    }
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("subinfo_defaults: lfname=%s\n",sip->lfname) ;
 #endif
 
@@ -699,7 +667,7 @@ static int subinfo_defaults(MAINTQOTD *sip)
 /* end subroutine (subinfo_defaults) */
 
 
-static int subinfo_spooldir(MAINTQOTD *sip,cchar *vp,int vl)
+local int subinfo_spooldir(MAINTQOTD *sip,cchar *vp,int vl)
 {
 	int		rs ;
 	cchar		*pr = sip->pr ;
@@ -716,7 +684,7 @@ static int subinfo_spooldir(MAINTQOTD *sip,cchar *vp,int vl)
 /* end subroutine (subinfo_spooldir) */
 
 
-static int subinfo_logfile(MAINTQOTD *sip,cchar *vp,int vl)
+local int subinfo_logfile(MAINTQOTD *sip,cchar *vp,int vl)
 {
 	int		rs ;
 	cchar		*pr = sip->pr ;
@@ -733,7 +701,7 @@ static int subinfo_logfile(MAINTQOTD *sip,cchar *vp,int vl)
 /* end subroutine (subinfo_logfile) */
 
 
-static int subinfo_hostname(MAINTQOTD *sip,cchar *vp,int vl)
+local int subinfo_hostname(MAINTQOTD *sip,cchar *vp,int vl)
 {
 	int	rs = SR_OK ;
 
@@ -742,7 +710,7 @@ static int subinfo_hostname(MAINTQOTD *sip,cchar *vp,int vl)
 	    sip->open.hosts = (rs >= 0) ;
 	}
 
-	if ((rs >= 0) && (vp != NULL)) {
+	if ((rs >= 0) && (vp != nullptr)) {
 	    rs = vecpstr_adduniq(&sip->hosts,vp,vl) ;
 	}
 
@@ -751,11 +719,11 @@ static int subinfo_hostname(MAINTQOTD *sip,cchar *vp,int vl)
 /* end subroutine (subinfo_hostname) */
 
 
-static int subinfo_source(MAINTQOTD *sip,cchar *vp,int vl)
+local int subinfo_source(MAINTQOTD *sip,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_source: ent v=>%r<\n",vp,vl) ;
 #endif
 
@@ -764,7 +732,7 @@ static int subinfo_source(MAINTQOTD *sip,cchar *vp,int vl)
 	    sip->open.sources = (rs >= 0) ;
 	}
 
-	if ((rs >= 0) && (vp != NULL)) {
+	if ((rs >= 0) && (vp != nullptr)) {
 	    rs = vecpstr_adduniq(&sip->sources,vp,vl) ;
 	}
 
@@ -773,22 +741,22 @@ static int subinfo_source(MAINTQOTD *sip,cchar *vp,int vl)
 /* end subroutine (subinfo_source) */
 
 
-static int subinfo_logbegin(MAINTQOTD *sip)
+local int subinfo_logbegin(MAINTQOTD *sip)
 {
 	int		rs = SR_OK ;
 	cchar		*lf = sip->lfname ;
 
-	if ((lf != NULL) && (lf[0] != '-')) {
-	    const int	size = sizeof(LOGFILE) ;
+	if ((lf != nullptr) && (lf[0] != '-')) {
+	    cint	size = sizeof(LOGFILE) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 		LOGFILE	*lhp = p ;
 	        cchar	*logid = sip->logid ;
 	        sip->logsub = p ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/_logbegin: lf=%s\n",lf) ;
 	debugprintf("maintqotd/_logbegin: logid=%s\n",logid) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 	        if ((rs = logfile_open(lhp,lf,0,0666,logid)) >= 0) {
 		    sip->open.logsub = TRUE ;
 		    rs = subinfo_logenv(sip) ;
@@ -799,37 +767,37 @@ static int subinfo_logbegin(MAINTQOTD *sip)
 		} else if (isNotPresent(rs)) {
 		    rs = SR_OK ;
 		}
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/_logbegin: logfile_open-out rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 		if (rs < 0) {
 		    uc_free(sip->logsub) ;
-		    sip->logsub = NULL ;
+		    sip->logsub = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
 	} /* end if (log-file) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/_logbegin: ret rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	return rs ;
 }
 /* end subroutine (subinfo_logbegin) */
 
 
-static int subinfo_logend(MAINTQOTD *sip)
+local int subinfo_logend(MAINTQOTD *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip->logsub != NULL) {
+	if (sip->logsub != nullptr) {
 	    LOGFILE	*lhp = sip->logsub ;
 	    rs1 = logfile_close(lhp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(sip->logsub) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->logsub = NULL ;
+	    sip->logsub = nullptr ;
 	}
 
 	return rs ;
@@ -837,7 +805,7 @@ static int subinfo_logend(MAINTQOTD *sip)
 /* end subroutine (subinfo_logend) */
 
 
-static int subinfo_logenv(MAINTQOTD *sip)
+local int subinfo_logenv(MAINTQOTD *sip)
 {
 	int		rs = SR_OK ;
 	char		tbuf[TIMEBUFLEN+1] ;
@@ -858,7 +826,7 @@ static int subinfo_logenv(MAINTQOTD *sip)
 /* end subroutine (subinfo_logenv) */
 
 
-static int subinfo_spoolcheck(MAINTQOTD *sip)
+local int subinfo_spoolcheck(MAINTQOTD *sip)
 {
 	int		rs ;
 	cchar		*sdname = sip->spooldname ;
@@ -868,16 +836,16 @@ static int subinfo_spoolcheck(MAINTQOTD *sip)
 /* end subroutine (subinfo_spoolcheck) */
 
 
-static int subinfo_qdirname(MAINTQOTD *sip,int mjd)
+local int subinfo_qdirname(MAINTQOTD *sip,int mjd)
 {
-	const int	dlen = DIGBUFLEN ;
-	const int	prec = 3 ; /* digit precision for another 100 years */
+	cint	dlen = DIGBUFLEN ;
+	cint	prec = 3 ; /* digit precision for another 100 years */
 	int		rs ;
 	int		len = 0 ;
 	cchar		*sdname = sip->spooldname ;
 	char		dbuf[DIGBUFLEN+1] ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_qdirname: ent mjd=%u\n",mjd) ;
 #endif
 
@@ -893,7 +861,7 @@ static int subinfo_qdirname(MAINTQOTD *sip,int mjd)
 	    } /* end if (mkpath) */
 	} /* end if (ctdeci) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_qdirname: ret rs=%d len=%u\n",rs,len) ;
 #endif
 
@@ -903,12 +871,12 @@ static int subinfo_qdirname(MAINTQOTD *sip,int mjd)
 
 
 #if	CF_SOURCES
-static int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om)
+local int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om)
 {
 	int		rs = SR_OK ;
 	int		fd = -1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_gather: ent\n") ;
 	debugprintf("maintqotd/subinfo_gather: qf=%s\n",qfname) ;
 #endif
@@ -917,11 +885,11 @@ static int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om)
 	    VECPSTR	*slp = &sip->sources ;
 	    int		i ;
 	    cchar	*sep ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_gather: n=%d\n",vecpstr_count(slp)) ;
 #endif
 	    for (i = 0 ; (rs = vecpstr_get(slp,i,&sep)) >= 0 ; i += 1) {
-	        if (sep != NULL) {
+	        if (sep != nullptr) {
 	            rs = subinfo_opensource(sip,qfname,sep) ;
 	            fd = rs ;
 	        }
@@ -936,7 +904,7 @@ static int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om)
 	    rs = subinfo_defprog(sip,qfname) ;
 	    fd = rs ;
 	}
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_gather: mid rs=%d fd=%u\n",rs,fd) ;
 #endif
 	if (rs >= 0) {
@@ -949,17 +917,17 @@ static int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om)
 	    } /* end if (rewind) */
 	    if (rs < 0) u_close(fd) ;
 	} /* end if (got a source) */
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_gather: ret rs=%d\n",rs) ;
 #endif
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (subinfo_gather) */
 #else /* CF_SOURCES */
-static int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om)
+local int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om)
 {
 	const mode_t	om = 0664 ;
-	const int	of = (O_RDWR|O_CREAT|O_TRUNC) ;
+	cint	of = (O_RDWR|O_CREAT|O_TRUNC) ;
 	int		rs ;
 	int		fd = -1 ;
 	if ((rs = u_open(qfname,of,om)) >= 0) {
@@ -977,7 +945,7 @@ static int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om)
 #endif /* CF_SOURCES */
 
 
-static int subinfo_opensource(MAINTQOTD *sip,cchar *qf,cchar *sep)
+local int subinfo_opensource(MAINTQOTD *sip,cchar *qf,cchar *sep)
 {
 	int		rs = SR_OK ;
 	int		fd = -1 ;
@@ -986,13 +954,13 @@ static int subinfo_opensource(MAINTQOTD *sip,cchar *qf,cchar *sep)
 	cchar		*sp = sep ;
 	cchar		*ap ;
 	cchar		*tp ;
-	if ((tp = strchr(sp,CH_FS)) != NULL) {
+	if ((tp = strchr(sp,CH_FS)) != nullptr) {
 	    sl = (tp-sp) ;
 	    ap = (tp+1) ;
 	} else {
 	    ap = (sp + strlen(sp)) ;
 	}
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_opensource: svc=%r\n",sp,sl) ;
 	debugprintf("maintqotd/subinfo_opensource: a=%s\n",ap) ;
 #endif
@@ -1010,14 +978,14 @@ static int subinfo_opensource(MAINTQOTD *sip,cchar *qf,cchar *sep)
 	} else
 	    rs = SR_NOENT ;
 
-#if	CF_DEBUGS && CF_OPENDEF
+#if	CF_DEBUG && CF_OPENDEF
 	if (rs == SR_NOENT) {
 	    rs = opendef(sip) ;
 	    fd = rs ;
 	}
 #endif
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_opensource: ret rs=%d fd=%u\n",rs,fd) ;
 #endif
 
@@ -1026,12 +994,12 @@ static int subinfo_opensource(MAINTQOTD *sip,cchar *qf,cchar *sep)
 /* end subroutine (subinfo_opensource) */
 
 
-static int subinfo_opensourceprog(MAINTQOTD *sip,cchar *qf,cchar *ap)
+local int subinfo_opensourceprog(MAINTQOTD *sip,cchar *qf,cchar *ap)
 {
 	int		rs ;
 	int		fd = -1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/subinfo_opensourceprog: ent\n") ;
 	debugprintf("maintqotd/subinfo_opensourceprog: a=%s\n",ap) ;
 #endif
@@ -1039,7 +1007,7 @@ static int subinfo_opensourceprog(MAINTQOTD *sip,cchar *qf,cchar *ap)
 	rs = maintqotd_prog(sip,qf,ap) ;
 	fd = rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	if (rs >= 0)
 	debugfmode("maintqotd/subinfo_opensourceprog","_prog()",fd) ;
 	debugprintf("maintqotd/subinfo_opensourceprog: _prog() rs=%d\n",rs) ;
@@ -1050,7 +1018,7 @@ static int subinfo_opensourceprog(MAINTQOTD *sip,cchar *qf,cchar *ap)
 /* end subroutine (subinfo_opensourceprog) */
 
 
-static int subinfo_defprog(MAINTQOTD *sip,cchar *qfn)
+local int subinfo_defprog(MAINTQOTD *sip,cchar *qfn)
 {
 	int		rs ;
 	int		rs1 ;
@@ -1060,7 +1028,7 @@ static int subinfo_defprog(MAINTQOTD *sip,cchar *qfn)
 	    if ((rs = vecstr_start(plp,5,0)) >= 0) {
 	        if ((rs = subinfo_addourpath(sip,plp)) >= 0) {
 	            int		i ;
-	            for (i = 0 ; defprogs[i] != NULL ; i += 1) {
+	            for (i = 0 ; defprogs[i] != nullptr ; i += 1) {
 	                cchar	*prog = defprogs[i] ;
 	                if ((rs = subinfo_defproger(sip,plp,prog,qfn)) >= 0) {
 			    fd = rs ;
@@ -1082,15 +1050,15 @@ static int subinfo_defprog(MAINTQOTD *sip,cchar *qfn)
 /* end subroutine (subinfo_defprog) */
 
 
-static int subinfo_defproger(MAINTQOTD *sip,vecstr *plp,cchar *prog,cchar *qfn)
+local int subinfo_defproger(MAINTQOTD *sip,vecstr *plp,cchar *prog,cchar *qfn)
 {
 	IDS		*idp = &sip->id ;
 	int		rs ;
 	int		fd = -1 ;
 	char		rbuf[MAXPATHLEN+1] ;
 	if ((rs = getprogpath(idp,plp,rbuf,prog,-1)) >= 0) {
-	    const int	alen = MAXNAMELEN ;
-	    const int	rl = rs ;
+	    cint	alen = MAXNAMELEN ;
+	    cint	rl = rs ;
 	    char	abuf[MAXNAMELEN+1] ;
 	    if (rl == 0) rs = mkpath1(rbuf,prog) ;
 	    if (rs >= 0) {
@@ -1098,15 +1066,15 @@ static int subinfo_defproger(MAINTQOTD *sip,vecstr *plp,cchar *prog,cchar *qfn)
 		cchar	*cp ;
 	        if ((cl = sfbasename(prog,-1,&cp)) > 0) {
 		    if ((rs = sncpy1w(abuf,alen,cp,cl)) >= 0) {
-			const int	of = O_RDONLY ;
+			cint	of = O_RDONLY ;
 		        cchar		*av[2] ;
-		        cchar		**ev = NULL ;
+		        cchar		**ev = nullptr ;
 	                av[0] = abuf ;
-		        av[1] = NULL ;
+		        av[1] = nullptr ;
 	                if ((rs = uc_openprog(rbuf,of,av,ev)) >= 0) {
 			    const mode_t	om = 0664 ;
-			    const int		qof = (O_CREAT|O_TRUNC|O_RDWR) ;
-		            const int		pfd = rs ;
+			    cint		qof = (O_CREAT|O_TRUNC|O_RDWR) ;
+		            cint		pfd = rs ;
 			    if ((rs = uc_open(qfn,qof,om)) >= 0) {
 				fd = rs ;
 				rs = uc_copy(pfd,fd,-1) ;
@@ -1127,12 +1095,12 @@ static int subinfo_defproger(MAINTQOTD *sip,vecstr *plp,cchar *prog,cchar *qfn)
 /* end subroutine (subinfo_defproger) */
 
 
-static int subinfo_addourpath(MAINTQOTD *sip,vecstr *plp)
+local int subinfo_addourpath(MAINTQOTD *sip,vecstr *plp)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*path = getenv(VARPATH) ;
-	if (path != NULL) {
+	if (path != nullptr) {
 	    rs = vecstr_addpathclean(plp,path,-1) ;
 	    c += rs ;
 	}
@@ -1145,13 +1113,13 @@ static int subinfo_addourpath(MAINTQOTD *sip,vecstr *plp)
 /* end subroutine (subinfo_addourpath) */
 
 
-static int subinfo_addprbins(MAINTQOTD *sip,vecstr *plp)
+local int subinfo_addprbins(MAINTQOTD *sip,vecstr *plp)
 {
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	cchar		*pr = sip->pr ;
-	for (i = 0 ; (rs >= 0) && (prbins[i] != NULL) ; i += 1) {
+	for (i = 0 ; (rs >= 0) && (prbins[i] != nullptr) ; i += 1) {
 	    cchar	*prbin = prbins[i] ;
 	    rs = subinfo_addprbin(sip,plp,pr,prbin) ;
 	    c += rs ;
@@ -1161,18 +1129,18 @@ static int subinfo_addprbins(MAINTQOTD *sip,vecstr *plp)
 /* end subroutine (subinfo_addprbins) */
 
 
-static int subinfo_addprbin(MAINTQOTD *sip,vecstr *plp,cchar *pr,cchar *prbin)
+local int subinfo_addprbin(MAINTQOTD *sip,vecstr *plp,cchar *pr,cchar *prbin)
 {
 	int		rs ;
 	int		c = 0 ;
 	char		tbuf[MAXPATHLEN+1] ;
 	if ((rs = mkpath2(tbuf,pr,prbin)) >= 0) {
 	    ustat	sb ;
-	    const int		tl = rs ;
+	    cint		tl = rs ;
 	    if ((rs = u_stat(tbuf,&sb)) >= 0) {
 		if (S_ISDIR(sb.st_mode)) {
-		    const int	am = (R_OK|X_OK) ;
-		    if ((rs = permid(&sip->id,&sb,am)) >= 0) {
+		    cint	am = (R_OK|X_OK) ;
+		    if ((rs = permids(&sip->id,&sb,am)) >= 0) {
 			rs = vecstr_adduniq(plp,tbuf,tl) ;
 			if (rs < INT_MAX) c += 1 ;
 		    } else if (isNotPresent(rs)) {
@@ -1188,7 +1156,7 @@ static int subinfo_addprbin(MAINTQOTD *sip,vecstr *plp,cchar *pr,cchar *prbin)
 /* end subroutine (subinfo_addprbin) */
 
 
-static int subinfo_id(MAINTQOTD *sip)
+local int subinfo_id(MAINTQOTD *sip)
 {
 	int		rs = SR_OK ;
 	if (! sip->open.id) {
@@ -1200,12 +1168,12 @@ static int subinfo_id(MAINTQOTD *sip)
 /* end subroutine (subinfo_id) */
 
 
-static int subinfo_dircheck(MAINTQOTD *sip,cchar *dname)
+local int subinfo_dircheck(MAINTQOTD *sip,cchar *dname)
 {
 	ustat	sb ;
 	const mode_t	dm = (0777 | S_ISGID) ;
 	const uid_t	euid = sip->euid ;
-	const int	nrs = SR_NOENT ;
+	cint	nrs = SR_NOENT ;
 	int		rs ;
 
 	if ((rs = u_stat(dname,&sb)) >= 0) {
@@ -1223,7 +1191,7 @@ static int subinfo_dircheck(MAINTQOTD *sip,cchar *dname)
 /* end subroutine (subinfo_dircheck) */
 
 
-static int subinfo_dirminmode(MAINTQOTD *sip,cchar *dname,mode_t dm)
+local int subinfo_dirminmode(MAINTQOTD *sip,cchar *dname,mode_t dm)
 {
 	const uid_t	euid = sip->euid ;
 	int		rs ;
@@ -1237,12 +1205,12 @@ static int subinfo_dirminmode(MAINTQOTD *sip,cchar *dname,mode_t dm)
 /* end subroutine (subinfo_dirminmode) */
 
 
-static int config_start(CONFIG *csp,MAINTQOTD *sip,cchar *cfname)
+local int config_start(CONFIG *csp,MAINTQOTD *sip,cchar *cfname)
 {
 	int		rs ;
 	char		tmpfname[MAXPATHLEN+1] = { 0 } ;
 
-	if (cfname == NULL) return SR_FAULT ;
+	if (cfname == nullptr) return SR_FAULT ;
 
 	memset(csp,0,sizeof(struct config)) ;
 	csp->sip = sip ;
@@ -1251,7 +1219,7 @@ static int config_start(CONFIG *csp,MAINTQOTD *sip,cchar *cfname)
 	    cchar	**envv = (cchar **) environ ;
 	    if (rs > 0) cfname = tmpfname ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("maintqotd/config_start: mid rs=%d cfname=%s\n",
 		rs,cfname) ;
 #endif
@@ -1267,9 +1235,9 @@ static int config_start(CONFIG *csp,MAINTQOTD *sip,cchar *cfname)
 	} else if (isNotPresent(rs))
 	    rs = SR_OK ;
 
-	if (rs >= 0) csp->magic = MAINTQOTD_CONFMAGIC ;
+	if (rs >= 0) csp->magval = MAINTQOTD_CONFMAGIC ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/config_start: ret rs=%d f=%u\n",rs,csp->f_p) ;
 #endif
 
@@ -1278,7 +1246,7 @@ static int config_start(CONFIG *csp,MAINTQOTD *sip,cchar *cfname)
 /* end subroutine (config_start) */
 
 
-static int config_findfile(CONFIG *csp,char tbuf[],cchar *cfname)
+local int config_findfile(CONFIG *csp,char tbuf[],cchar *cfname)
 {
 	MAINTQOTD	*sip = csp->sip ;
 	VECSTR		sv ;
@@ -1287,7 +1255,7 @@ static int config_findfile(CONFIG *csp,char tbuf[],cchar *cfname)
 
 	tbuf[0] = '\0' ;
 	if ((rs = vecstr_start(&sv,6,0)) >= 0) {
-	    const int	tlen = MAXPATHLEN ;
+	    cint	tlen = MAXPATHLEN ;
 
 	    vecstr_envset(&sv,"p",sip->pr,-1) ;
 	    vecstr_envset(&sv,"e","etc",-1) ;
@@ -1304,10 +1272,10 @@ static int config_findfile(CONFIG *csp,char tbuf[],cchar *cfname)
 /* end subroutine (config_findfile) */
 
 
-static int config_cookbegin(CONFIG *csp)
+local int config_cookbegin(CONFIG *csp)
 {
 	MAINTQOTD	*sip = csp->sip ;
-	const int	hlen = MAXHOSTNAMELEN ;
+	cint	hlen = MAXHOSTNAMELEN ;
 	int		rs ;
 	char		hbuf[MAXHOSTNAMELEN+1] ;
 
@@ -1322,7 +1290,7 @@ static int config_cookbegin(CONFIG *csp)
 	    kbuf[1] = '\0' ;
 	    for (i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
 	        kch = MKCHAR(ks[i]) ;
-	        vp = NULL ;
+	        vp = nullptr ;
 	        vl = -1 ;
 	        switch (kch) {
 	        case 'P':
@@ -1353,7 +1321,7 @@ static int config_cookbegin(CONFIG *csp)
 	            vp = sip->un ;
 	            break ;
 	        } /* end switch */
-	        if ((rs >= 0) && (vp != NULL)) {
+	        if ((rs >= 0) && (vp != nullptr)) {
 	            kbuf[0] = kch ;
 	            rs = expcook_add(&csp->cooks,kbuf,vp,vl) ;
 	        }
@@ -1382,7 +1350,7 @@ static int config_cookbegin(CONFIG *csp)
 /* end subroutine (config_cookbegin) */
 
 
-static int config_cookend(CONFIG *csp)
+local int config_cookend(CONFIG *csp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1398,13 +1366,13 @@ static int config_cookend(CONFIG *csp)
 /* end subroutine (config_cookend) */
 
 
-static int config_finish(CONFIG *csp)
+local int config_finish(CONFIG *csp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (csp == NULL) return SR_FAULT ;
-	if (csp->magic != MAINTQOTD_CONFMAGIC) return SR_NOTOPEN ;
+	if (csp == nullptr) return SR_FAULT ;
+	if (csp->magval != MAINTQOTD_CONFMAGIC) return SR_NOTOPEN ;
 
 	if (csp->f_p) {
 
@@ -1425,13 +1393,13 @@ static int config_finish(CONFIG *csp)
 
 
 #if	CF_CONFIGCHECK
-static int config_check(CONFIG *csp)
+local int config_check(CONFIG *csp)
 {
 	MAINTQOTD	*sip = csp->sip ;
 	int		rs = SR_OK ;
 
-	if (csp == NULL) return SR_FAULT ;
-	if (csp->magic != MAINTQOTD_CONFMAGIC) return SR_NOTOPEN ;
+	if (csp == nullptr) return SR_FAULT ;
+	if (csp->magval != MAINTQOTD_CONFMAGIC) return SR_NOTOPEN ;
 
 	if (csp->f_p) {
 	    time_t	dt = sip->dt ;
@@ -1445,23 +1413,23 @@ static int config_check(CONFIG *csp)
 #endif /* CF_CONFIGCHECK */
 
 
-static int config_read(CONFIG *csp)
+local int config_read(CONFIG *csp)
 {
 	MAINTQOTD	*sip = csp->sip ;
 	int		rs = SR_OK ;
 
-	if (csp == NULL) return SR_FAULT ;
-	if (csp->magic != MAINTQOTD_CONFMAGIC) return SR_NOTOPEN ;
+	if (csp == nullptr) return SR_FAULT ;
+	if (csp->magval != MAINTQOTD_CONFMAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/config_read: ent f_p=%u\n",csp->f_p) ;
 #endif
 
 	sip = csp->sip ;
-	if (sip == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
 
 	if (csp->f_p) {
-	    const int	elen = EBUFLEN ;
+	    cint	elen = EBUFLEN ;
 	    char	*ebuf ;
 	    if ((rs = uc_malloc((elen+1),&ebuf)) >= 0) {
 		rs = config_reader(csp,ebuf,elen) ;
@@ -1469,7 +1437,7 @@ static int config_read(CONFIG *csp)
 	    } /* end if (memory-allocation) */
 	} /* end if (avtive) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/config_read: ret rs=%d\n",rs) ;
 #endif
 
@@ -1478,12 +1446,12 @@ static int config_read(CONFIG *csp)
 /* end subroutine (config_read) */
 
 
-static int config_reader(CONFIG *csp,char *ebuf,int elen)
+local int config_reader(CONFIG *csp,char *ebuf,int elen)
 {
 	MAINTQOTD	*sip = csp->sip ;
 	paramfile	*pfp = &csp->p ;
 	paramfile_cur	cur ;
-	const int	vlen = VBUFLEN ;
+	cint	vlen = VBUFLEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		vl, el ;
@@ -1492,17 +1460,17 @@ static int config_reader(CONFIG *csp,char *ebuf,int elen)
 	int		c = 0 ;
 	char		vbuf[VBUFLEN + 1] ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/config_reader: ent f_active=%u\n",
 		csp->f_p) ;
 #endif
-	if (sip == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
 
 	if (csp->f_p) {
-	    for (i = 0 ; cparams[i] != NULL ; i += 1) {
+	    for (i = 0 ; cparams[i] != nullptr ; i += 1) {
 		cchar	*cparam = cparams[i] ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("mqintqotd/config_read: cparam=%s\n",cparam) ;
 #endif
 
@@ -1510,7 +1478,7 @@ static int config_reader(CONFIG *csp,char *ebuf,int elen)
 
 	            while (rs >= 0) {
 	                vl = paramfile_fetch(pfp,cparam,&cur,vbuf,vlen) ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                debugprintf("mqintqotd/config_read: "
 			"paramfile_fetch() rs=%d\n",vl) ;
 #endif
@@ -1518,7 +1486,7 @@ static int config_reader(CONFIG *csp,char *ebuf,int elen)
 	                rs = vl ;
 	                if (rs < 0) break ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                    debugprintf("mqintqotd/config_read: "
 				"vbuf=>%r<\n",vbuf,vl) ;
 #endif
@@ -1530,7 +1498,7 @@ static int config_reader(CONFIG *csp,char *ebuf,int elen)
 	                    if (el >= 0) ebuf[el] = '\0' ;
 	                }
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                debugprintf("maintqotd/config_read: "
 				"ebuf=>%r<\n",ebuf,el) ;
 #endif
@@ -1570,7 +1538,7 @@ static int config_reader(CONFIG *csp,char *ebuf,int elen)
 	                            sip->have.lfname = TRUE ;
 	                            ml = setfname(sip,tbuf,ebuf,el,TRUE,
 	                                LOGCNAME,sn,"") ;
-	                            if ((lfn == NULL) || 
+	                            if ((lfn == nullptr) || 
 	                                (strcmp(lfn,tfn) != 0)) {
 	                                cchar	**vpp = &sip->lfname ;
 	                                sip->changed.lfname = TRUE ;
@@ -1580,13 +1548,13 @@ static int config_reader(CONFIG *csp,char *ebuf,int elen)
 	                        break ;
 
 	                    case cparam_spooldir:
-	                        if (sip->spooldname == NULL) {
+	                        if (sip->spooldname == nullptr) {
 	                            rs = subinfo_spooldir(sip,ebuf,el) ;
 	                        }
 	                        break ;
 
 	                    case cparam_hostname:
-	                        if (sip->hostname == NULL) {
+	                        if (sip->hostname == nullptr) {
 	                            rs = subinfo_hostname(sip,ebuf,el) ;
 	                        }
 	                        break ;
@@ -1608,64 +1576,50 @@ static int config_reader(CONFIG *csp,char *ebuf,int elen)
 	    } /* end for (parameters) */
 	} /* end if (active) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("maintqotd/config_reader: ret rs=%d c=%u\n",rs,c) ;
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (config_reader) */
+} /* end subroutine (config_reader) */
 
-
-static int getdefmjd(time_t dt)
-{
-	TMTIME		ct ;
+local int getdefmjd(time_t dt) noex {
 	int		rs ;
-	if (dt == 0) dt = time(NULL) ;
-	if ((rs = tmtime_timelocal(&ct,dt)) >= 0) {
-	    int	y = (ct.year + TM_YEAR_BASE) ;
+	if (dt == 0) dt = time(nullptr) ;
+	if (tmtime ct ; (rs = tmtime_timelocal(&ct,dt)) >= 0) {
+	    int	y = (ct.year + TMTIME_YEARBASE) ;
 	    int	m = ct.mon ;
 	    int	d = ct.mday ;
 	    rs = getmjd(y,m,d) ;
 	}
 	return rs ;
-}
-/* end subroutine (getdefmjd) */
+} /* end subroutine (getdefmjd) */
 
-
-static int mkqfname(char *rbuf,cchar *qdname,int mjd)
-{
-	const int	rlen = MAXPATHLEN ;
+local int mkqfname(char *rbuf,cchar *qdname,int mjd) noex {
+	cint	rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
-
 	if (rs >= 0) {
 	    rs = storebuf_strw(rbuf,rlen,i,qdname,-1) ;
 	    i += rs ;
 	}
-
 	if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
 	    rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	    i += rs ;
 	}
-
 	if (rs >= 0) {
 	    rs = storebuf_chr(rbuf,rlen,i,'q') ;
 	    i += rs ;
 	}
-
 	if (rs >= 0) {
 	    rs = storebuf_deci(rbuf,rlen,i,mjd) ;
 	    i += rs ;
 	}
-
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mkqfname) */
-
+} /* end subroutine (mkqfname) */
 
 /* calculate a file name */
-static int setfname(sip,fname,ebuf,el,f_def,dname,name,suf)
+local int setfname(sip,fname,ebuf,el,f_def,dname,name,suf)
 MAINTQOTD	*sip ;
 char		fname[] ;
 cchar		ebuf[] ;
@@ -1682,13 +1636,13 @@ int		f_def ;
 	    (strcmp(ebuf,"+") == 0)) {
 
 	    np = name ;
-	    if ((suf != NULL) && (suf[0] != '\0')) {
+	    if ((suf != nullptr) && (suf[0] != '\0')) {
 	        np = tmpname ;
 	        mkfnamesuf1(tmpname,name,suf) ;
 	    }
 
 	    if (np[0] != '/') {
-	        if ((dname != NULL) && (dname[0] != '\0')) {
+	        if ((dname != nullptr) && (dname[0] != '\0')) {
 	            rs = mkpath3(fname,sip->pr,dname,np) ;
 	        } else
 	            rs = mkpath2(fname,sip->pr,np) ;
@@ -1709,10 +1663,10 @@ int		f_def ;
 	    }
 
 	    if (ebuf[0] != '/') {
-	        if (strchr(np,'/') != NULL) {
+	        if (strchr(np,'/') != nullptr) {
 	            rs = mkpath2(fname,sip->pr,np) ;
 	        } else {
-	            if ((dname != NULL) && (dname[0] != '\0')) {
+	            if ((dname != nullptr) && (dname[0] != '\0')) {
 	                rs = mkpath3(fname,sip->pr,dname,np) ;
 	            } else
 	                rs = mkpath2(fname,sip->pr,np) ;
@@ -1726,12 +1680,9 @@ int		f_def ;
 }
 /* end subroutine (setfname) */
 
-
-static int mkourname(char *rbuf,cchar *pr,cchar *inter,cchar *sp,int sl)
-{
+local int mkourname(char *rbuf,cchar *pr,cchar *inter,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-
-	if (strnchr(sp,sl,'/') != NULL) {
+	if (strnchr(sp,sl,'/') != nullptr) {
 	    if (sp[0] != '/') {
 	        rs = mkpath2w(rbuf,pr,sp,sl) ;
 	    } else {
@@ -1740,16 +1691,11 @@ static int mkourname(char *rbuf,cchar *pr,cchar *inter,cchar *sp,int sl)
 	} else {
 	    rs = mkpath3w(rbuf,pr,inter,sp,sl) ;
 	}
-
 	return rs ;
-}
-/* end subroutine (mkourname) */
+} /* end subroutine (mkourname) */
 
-
-#if	CF_DEBUGS && CF_OPENDEF
-/* ARGSUSED */
-static int opendef(MAINTQOTD *sip)
-{
+#if	CF_DEBUG && CF_OPENDEF
+local int opendef(MAINTQOTD *sip) noex {
 	int		rs ;
 	int		pipes[2] ;
 	int		fd = -1 ;
@@ -1763,40 +1709,22 @@ static int opendef(MAINTQOTD *sip)
 	    u_close(wfd) ;
 	}
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opendef) */
-#endif /* CF_DEBUGS */
+} /* end subroutine (opendef) */
+#endif /* CF_DEBUG */
 
-#if	CF_DEBUGS
-static int debugmode(cchar *ids,cchar *s,cchar *fname)
-{
-	ustat	sb ;
+#if	CF_DEBUG
+local int debugmode(cchar *ids,cchar *s,cchar *fname) noex {
+	cint		mlen = SYMNAMELEN ;
 	int		rs ;
-	if ((rs = u_stat(fname,&sb)) >= 0) {
-	    char	mstr[100+1] ;
-	    snfilemode(mstr,100,sb.st_mode) ;
+	if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
+	    char	mstr[mlen +1] ;
+	    snfilemode(mstr,mlen,sb.st_mode) ;
 	    debugprintf("%s: %s %s\n",ids,s,mstr) ;
 	} else {
 	    debugprintf("%s: %s rs=%d\n",ids,s,rs) ;
 	}
 	return rs ;
-}
-/* end subroutine (debugmode) */
-#endif /* CF_DEBUGS */
-
-
-#if	CF_DEBUGS
-static int debugfmode(cchar *id,cchar *s,int fd)
-{
-	ustat	sb ;
-	int		rs ;
-		char	mstr[100+1] ;
-		u_fstat(fd,&sb) ;
-		snfilemode(mstr,100,sb.st_mode) ;
-	rs = debugprintf("%s: %s m=%s\n",id,s,mstr) ;
-	return rs ;
-}
-/* end subroutine (debugfmode) */
-#endif /* CF_DEBUGS */
+} /* end subroutine (debugmode) */
+#endif /* CF_DEBUG */
 
 
