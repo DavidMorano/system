@@ -27,7 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<tzfile.h>		/* POSIX® |TM_YEAR_BASE| */
 #include	<climits>		/* CSTD |SHORT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
