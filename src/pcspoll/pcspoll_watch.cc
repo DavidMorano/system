@@ -18,7 +18,7 @@
 #define	CF_ACCTABFREE	0		/* free up ACCTAB occassionally? */
 #define	CF_LOGONLY	0		/* log exit only w/ daemon? */
 #define	CF_POLL		1		/* use 'poll(2)'? */
-#define	CF_SPERM	1		/* use 'permid(3dam)' */
+#define	CF_SPERM	1		/* use 'permids(3dam)' */
 #define	CF_SLOWGROW	1		/* slowly grow polling interval */
 #define	CF_ENVLOCAL	0		/* use only local environment */
 #define	CF_MKSUBLOGID	1		/* use 'mklogidsub(3dam)' */
@@ -46,45 +46,48 @@
 
 	Returns:
 	OK	may not really matter in the current implementation!
-	<0	error (syhstem-error)
+	<0	error (system-return)
 
 *****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/wait.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cerrno>
-#include	<csignal>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<mktmp.h>
-#include	<bfile.h>
-#include	<logfile.h>
-#include	<vechand.h>
-#include	<vecstr.h>
-#include	<varsub.h>
-#include	<field.h>
-#include	<ids.h>
-#include	<svcfile.h>
-#include	<acctab.h>
-#include	<cq.h>
-#include	<spawner.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/wait.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cerrno>		/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<getprogpath.h>		/* LIBUC */
+#include	<mktmp.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<varsub.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<svcfile.h>		/* LIBUC */
+#include	<acctab.h>		/* LIBUC */
+#include	<cq.h>			/* LIBUC */
+#include	<spawner.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
+#include	<svcentry.h>		/* LIBDAM */
+#include	<svckey.h>		/* LIBDAM */
 
 #include	"config.h"
 #include	"defs.h"
-#include	"svcentry.h"
-#include	"svckey.h"
 
 
 /* local defines */
@@ -109,28 +112,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsdd(char *,int,cchar *,uint) ;
-extern int	snddd(char *,int,uint,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mklogidsub(char *,int,cchar *,int) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	cfdeci(char *,int,int *) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
-extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
-extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,
-			mode_t) ;
-extern int	getpwd(char *,int) ;
-extern int	varsub_addvec(VARSUB *,VECSTR *) ;
-extern int	isNotPresent(int) ;
-
 extern int	progpidbegin(struct proginfo *,int) ;
 extern int	progpidcheck(struct proginfo *) ;
 extern int	progpidend(struct proginfo *) ;
@@ -138,14 +119,6 @@ extern int	progexec(struct proginfo *,cchar *,vecstr *,vecstr *) ;
 extern int	proglogout(struct proginfo *,cchar *,cchar *) ;
 extern int	progsvccheck(struct proginfo *) ;
 extern int	progacccheck(struct proginfo *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* externals variables */
@@ -170,7 +143,7 @@ struct subinfo {
 	int		to_minjob ;	/* interval */
 	int		to_logjobs ;
 	uint		f_error:1 ;	/* early exit on error */
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -808,7 +781,7 @@ vecstr		*snp ;
 
 	    if ((rs = svcfile_curbegin(sfp,&cur)) >= 0) {
 
-	    while (svcfile_enum(sfp,&cur,&ste,vbuf,VBUFLEN) >= 0) {
+	    while (svcfile_curenum(sfp,&cur,&ste,vbuf,VBUFLEN) >= 0) {
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -1415,7 +1388,7 @@ struct proginfo	*pip ;
 	            debugprintf("progwatch/procmorecheck: while-before\n") ;
 #endif
 
-	    while (svcfile_enum(sfp,&cur,&ste,vbuf,VBUFLEN) >= 0) {
+	    while (svcfile_curenum(sfp,&cur,&ste,vbuf,VBUFLEN) >= 0) {
 
 	        svckey_load(&sk,&ste) ;
 
@@ -2337,7 +2310,7 @@ cchar	fname[] ;
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode)) {
 #if	CF_SPERM
-	        rs = permid(&pip->id,&sb,X_OK) ;
+	        rs = permids(&pip->id,&sb,X_OK) ;
 #else
 	        rs = perm(fname,-1,-1,NULL,X_OK) ;
 #endif
