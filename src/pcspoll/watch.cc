@@ -1,4 +1,4 @@
-/* watch SUPPORT */
+/* pcspoll_watch SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -16,7 +16,7 @@
 #define	CF_LOGONLY	0		/* log exit only w/ daemon? */
 #define	CF_POLL		1		/* use 'poll(2)'? */
 #define	CF_LOGFILECHECK	1		/* logfile check */
-#define	CF_SPERM	1		/* use 'permid(3dam)' */
+#define	CF_SPERM	1		/* use 'permids(3dam)' */
 
 /* revision history:
 
@@ -54,7 +54,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-#include	<time.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<logfile.h>
@@ -67,6 +67,8 @@
 #include	<acctab.h>
 #include	<cq.h>
 #include	<sfx.h>
+#include	<timestr.h>
+#include	<prognamevar.hh>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 #include	<debug.h>
@@ -97,24 +99,6 @@
 
 
 /* external subroutines */
-
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsdd(char *,int,cchar *,uint) ;
-extern int	snddd(char *,int,uint,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	cfdeci(char *,int,int *) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
-extern int	pcsgetprog(cchar *,char *,cchar *) ;
-extern int	pcsgetprogpath(cchar *,char *,cchar *) ;
-extern int	getpwd(char *,int) ;
-
-extern char	*strbasename(char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* externals variables */
@@ -1153,8 +1137,8 @@ ret0:
 
 /* spawn a job */
 static int process_startjob(pip,pcp,pep)
-struct proginfo	*pip ;
-struct procinfo	*pcp ;
+proginfo	*pip ;
+procinfo	*pcp ;
 PROGENTRY	*pep ;
 {
 	pid_t	pid ;
@@ -1278,11 +1262,10 @@ PROGENTRY	*pep ;
 #ifdef	COMMENT
 	if (rs > 0) {
 
-	    if ((pep->program[0] != '/') && (programpath[0] != '/'))
+	    if ((pep->program[0] != '/') && (programpath[0] != '/')) {
 	        mkpath2(programpath, pip->pwd,pep->program) ;
-
+	    }
 	    program = programpath ;
-
 	}
 #endif /* COMMENT */
 
@@ -1320,35 +1303,25 @@ PROGENTRY	*pep ;
 
 	pid = rs ;
 	if (pid == 0) {
-
-/* we are now the CHILD!! */
-
+	    /* we are now the CHILD!! */
 	    u_close(0) ;
-
 	    u_close(1) ;
-
 	    u_close(2) ;
-
 	    u_open("/dev/null",O_RDONLY,0666) ;
-
 	    u_open(pep->ofname,O_WRONLY,0666) ;
-
 	    u_open(pep->efname,O_WRONLY,0666) ;
-
-	    if ((! f_secure) && (pip->uid != pip->euid))
+	    if ((! f_secure) && (pip->uid != pip->euid)) {
 		u_seteuid(pip->uid) ;
-
-/* do it */
-
+	    }
+	    /* do it */
 	    rs = execute(pip,program,pep->srvargs,pcp->elp) ;
-
-
 	    if (rs < 0) {
 
 #if	CF_DEBUG
 	        if (pip->debuglevel > 2)
-	            debugprintf("process_startjob: could not exec prog=%s rs=%d\n",
-	                program,rs) ;
+		    cc *fmt ;
+		    fmt = "process_startjob: could not exec prog=%s rs=%d\n" ;
+	            debugprintf(fmt,program,rs) ;
 #endif
 
 	        (void) u_unlink(pep->efname) ;
@@ -1369,26 +1342,24 @@ PROGENTRY	*pep ;
 
 	{
 	    char	timebuf[TIMEBUFLEN + 1] ;
-	    char	*arg0 = strbasename(program) ;
-
-
+	    char	*arg0 = program ;
 	    if (pip->fl.log) {
 
 	        logfile_printf(&pip->lh,"%s server=%s\n",
-	            timestr_logz(pcp->daytime,timebuf),
-	            arg0) ;
+	            timestr_logz(pcp->daytime,timebuf), arg0) ;
 
-		if (! f_secure)
-	    	logfile_printf(&pip->lh,"security reset uid=%d\n",
+		if (! f_secure) {
+	    	    logfile_printf(&pip->lh,"security reset uid=%d\n",
 			pip->uid) ;
+		}
 
 	    } /* end if (log entry) */
 
-	    if (pip->debuglevel > 0)
+	    if (pip->debuglevel > 0) {
 	        bprintf(pip->efp,"%s: %s server=%s\n",
 	            pip->progname,
-	            timestr_logz(pcp->daytime,timebuf),
-	            arg0) ;
+	            timestr_logz(pcp->daytime,timebuf),arg0) ;
+	    }
 
 	} /* end block */
 
@@ -2300,7 +2271,7 @@ static int xfile(proginfo *pip,cchar *fname) noex {
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode)) {
 #if	CF_SPERM
-		rs = permid(&pip->ids,&sb,X_OK) ;
+		rs = permids(&pip->ids,&sb,X_OK) ;
 #else
 	        rs = perm(fname,-1,-1,nullptr,X_OK) ;
 #endif
