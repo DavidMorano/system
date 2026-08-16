@@ -566,7 +566,7 @@ local int subinfo_procfile(SUBINFO *sip,DISP *dop,cchar *fname)
 	if (fname[0] != '-') {
 	    USTAT	sb ;
 	    if ((rs = u_stat(fname,&sb)) >= 0) {
-	        if ((rs = permid(&sip->id,&sb,R_OK)) >= 0) {
+	        if ((rs = permids(&sip->id,&sb,R_OK)) >= 0) {
 	            rs = disp_addwork(dop,fname,-1) ;
 	        } else if (isNotAccess(rs)) {
 		    if (pip->fl.iacc) {
