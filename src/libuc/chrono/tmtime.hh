@@ -29,7 +29,7 @@
 
 
 #define	TMTIME			tmtime
-#define	TMTIME_BASEYEAR		1900
+#define	TMTIME_YEARBASE		1900
 
 
 struct tmtime {
