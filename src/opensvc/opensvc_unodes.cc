@@ -154,7 +154,7 @@ static int pcsunodes_trans(PCSUNODES *unp,int wfd,char *nbuf,int nlen) noex {
 	if (filer fb ; (rs = filer_start(&fb,wfd,0z,0,0)) >= 0) {
 	    PCSUNODES_CUR	cur ;
 	    if ((rs = pcsunodes_curbegin(unp,&cur)) >= 0) {
-		while ((rs = pcsunodes_enum(unp,&cur,nbuf,nlen)) >= 0) {
+		while ((rs = pcsunodes_curenum(unp,&cur,nbuf,nlen)) >= 0) {
 		    rs = filer_println(&fb,nbuf,rs) ;
 		    if (rs < 0) break ;
 		} /* end while */
