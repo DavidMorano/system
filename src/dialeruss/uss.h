@@ -1,62 +1,66 @@
-/* uss */
+/* uss HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* SYSDIALER "uss" dialer */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2003-11-04, David A­D­ Morano
+	This was created as one of the first dialer modules for the
+	SYSDIALER object.
+
+*/
+
+/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	USS_INCLUDE
-#define	USS_INCLUDE	1
+#define	USS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<logfile.h>
-#include	<localmisc.h>
-
-#include	"sysdialer.h"
+#include	<sysdialer.h>
 
 
-#define	USS_MAGIC	31415926
 #define	USS		struct uss_head
 #define	USS_FL		struct uss_flags
+#define	USS_MAGIC	31415926
 
 
 struct uss_flags {
 	uint		log:1 ;
-} ;
+} ; /* end struct */
 
 struct uss_head {
-	uint		magic ;
-	LOGFILE		lh ;
+	logfile		lh ;
 	USS_FL		open ;
+	uint		magic ;
 	int		tlen ;
 	int		fd ;
-} ;
+} ; /* end struct */
 
-
-#if	(! defined(USS_MASTER)) || (USS_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int uss_open(USS *,SYSDIALER_ARGS *,
-		const char *,const char *,const char **) ;
-extern int uss_reade(USS *,char *,int,int,int) ;
-extern int uss_recve(USS *,char *,int,int,int,int) ;
-extern int uss_recvfrome(USS *,char *,int,int,void *,int *,int,int) ;
-extern int uss_recvmsge(USS *,struct msghdr *,int,int,int) ;
-extern int uss_write(USS *,const char *,int) ;
-extern int uss_send(USS *,const char *,int,int) ;
-extern int uss_sendto(USS *,const char *,int,int,void *,int) ;
-extern int uss_sendmsg(USS *,struct msghdr *,int) ;
-extern int uss_shutdown(USS *,int) ;
-extern int uss_close(USS *) ;
+		cchar *,cchar *,cchar **) const ;
+extern int uss_reade(USS *,char *,int,int,int) const ;
+extern int uss_recve(USS *,char *,int,int,int,int) const ;
+extern int uss_recvfrome(USS *,char *,int,int,void *,int *,int,int) const ;
+extern int uss_recvmsge(USS *,MSGHDR *,int,int,int) const ;
+extern int uss_write(USS *,cchar *,int) const ;
+extern int uss_send(USS *,cchar *,int,int) const ;
+extern int uss_sendto(USS *,cchar *,int,int,void *,int) const ;
+extern int uss_sendmsg(USS *,MSGHDR *,int) const ;
+extern int uss_shutdown(USS *,int) const ;
+extern int uss_close(USS *) const ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* USS_MASTER */
 
 #endif /* USS_INCLUDE */
 
