@@ -1,6 +1,9 @@
-/* bbcmp */
+/* bbcmp SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* compare two bulleting board names for equality */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,29 +21,31 @@
 
 /*******************************************************************************
 
-        This subroutine only has to compare for equality (as opposed to an
-        actual comparison of greater-than or less-than) so we only return
-        'TRUE=OK' or 'FALSE=BAD'.
+  	Name:
+	bbcmp
 
+	Description:
+	This subroutine only has to compare for equality (as opposed
+	to an actual comparison of greater-than or less-than) so
+	we only return 'TRUE=OK' or 'FALSE=BAD'.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
-#include	<localmisc.h>
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int bbcmp(s1,s2)
-const char	*s1, *s2 ;
-{
-
-
+int bbcmp(cchar *s1,cchar *s2) noex {
 	while (*s1) {
-
 	    if (*s1 != *s2) {
 
 		if (*s1 == '*') 
@@ -53,15 +58,11 @@ const char	*s1, *s2 ;
 	            return BAD ;
 
 	    }
-
 	    s1 += 1 ;
 	    s2 += 1 ;
-
 	} /* end while */
-
 	return ((*s2 == '\0') ? OK : BAD) ;
-}
-/* end subroutine (bbcmp) */
+} /* end subroutine (bbcmp) */
 
 
 
