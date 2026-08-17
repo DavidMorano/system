@@ -32,7 +32,7 @@
 #include	<sys/stat.h>
 #include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
@@ -56,15 +56,7 @@
 
 /* external subroutines */
 
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-
-extern int	procfile(struct proginfo *,PARAMOPT *,const char *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strshrink(char *) ;
+extern int	procfile(struct proginfo *,paramopt *,const char *) ;
 
 
 /* external variables */
@@ -125,7 +117,7 @@ char	*envv[] ;
 {
 	struct proginfo	pi, *pip = &pi ;
 
-	PARAMOPT	aparams ;
+	paramopt	aparams ;
 
 	bfile	errfile, *efp = &errfile ;
 	bfile	outfile, *ofp = &outfile ;
@@ -570,7 +562,7 @@ char	*envv[] ;
 	} /* end if */
 
 	if ((rs = paramopt_havekey(&aparams,PO_OPTION)) > 0) {
-	    PARAMOPT_CUR	cur ;
+	    paramopt_cur	cur ;
 
 	    paramopt_curbegin(&aparams,&cur) ;
 
