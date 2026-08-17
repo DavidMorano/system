@@ -1,13 +1,14 @@
-/* daytimer */
+/* daytimer SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* day timer subroutine */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_POLL		1
 #define	CF_ISPROC	0		/* use |uc_prochave(3uc)| */
-
 
 /* revision history:
 
@@ -30,6 +31,9 @@
 
 /*******************************************************************************
 
+  	Name:
+
+	Description:
 	This is the subroutine which performs the active work for
 	the 'daytime' program.
 
@@ -57,13 +61,17 @@
 #include	<sys/wait.h>
 #include	<csignal>
 #include	<poll.h>
-#include	<time.h>
+#include	<ctime>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibsubs.h>
 #include	<userinfo.h>
 #include	<bfile.h>
 #include	<lfm.h>
+#include	<timestr.h>
 #include	<localmisc.h>
 
 #include	"mailfiles.h"
@@ -77,9 +85,6 @@
 
 /* external subroutines */
 
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
-
 
 /* external variables */
 
@@ -91,12 +96,14 @@ static void	int_all(int) ;
 
 /* local file-scope variables */
 
-static int	if_all = FALSE ;	/* interrupt-flag for "all" */
-static int	signal_num = 0 ;
+local int	if_all = FALSE ;	/* interrupt-flag for "all" */
+local int	signal_num = 0 ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int process(pip,up,fd_display,ti_offset,ti_refresh,f_statdisplay,mfp)
 struct proginfo	*pip ;
@@ -371,7 +378,7 @@ MAILFILES	*mfp ;
 
 	                rs = lfm_check(&pip->lk,&ci,daytime) ;
 
-	                if (rs == SR_LOCKLOST) {
+	                if (rs == SR_LOCKFAIL) {
 
 	                    bprintf(pip->efp,
 	                        "%s: detected a lock conflict PID=%u\n",
@@ -391,7 +398,7 @@ MAILFILES	*mfp ;
 
 	                rs = lfm_check(&pip->pidlock,&ci,daytime) ;
 
-	                if (rs == SR_LOCKLOST) {
+	                if (rs == SR_LOCKFAIL) {
 
 	                    bprintf(pip->efp,
 	                        "%s: detected a PID lock conflict PID=%u\n",
