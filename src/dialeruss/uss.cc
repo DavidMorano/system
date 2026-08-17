@@ -1,16 +1,17 @@
-/* uss */
+/* sd_uss SUPPORT (Sys-Dialer) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* SYSDIALER "uss" dialer */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-        This was created as one of the first dialer modules for the SYSDIALER
-        object.
+	This was created as one of the first dialer modules for the
+	SYSDIALER object.
 
 */
 
@@ -18,47 +19,50 @@
 
 /*******************************************************************************
 
+  	Name:
+	uss
+
+	Description:
 	This is a SYSDIALER module.
 
 	Synopsis:
-
 	uss <path>
 
 	Arguments:
-
 	<path>		path to socket file
-
 
 *******************************************************************************/
 
-
-#define	USS_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<keyopt.h>
 #include	<ids.h>
 #include	<userinfo.h>
 #include	<vecstr.h>
 #include	<nulstr.h>
 #include	<expcook.h>
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
+#include	<libdebug.h>
 
+#include	"sysdialer.h"
+#include	"sd_uss.h"
 #include	"envs.h"
 #include	"inetaddrparse.h"
-#include	"sysdialer.h"
-#include	"uss.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
@@ -80,47 +84,14 @@
 #define	SVCNAMELEN	32
 #endif
 
-#define	ARGBUFLEN	(MAXPATHLEN + 35)
-
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_ALLOCS	struct subinfo_allocs
 #define	SUBINFO_FL	struct subinfo_flags
 
+#define	SI		subinfo
+
 
 /* external subroutines */
-
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	getgroupname(char *,int,gid_t) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	getaf(const char *,int) ;
-extern int	dialuss(const char *,int,int) ;
-extern int	dialussnls(const char *,const char *,int,int) ;
-extern int	dialussmux(const char *,const char *,const char **,int,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;
-extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_loadfile(vecstr *,int,const char *) ;
-extern int	vecstr_envadd(VECSTR *,const char *,const char *,int) ;
-extern int	vecstr_envadds(VECSTR *,const char *,int) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
-extern int	hasleadcolon(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -137,60 +108,60 @@ struct subinfo_flags {
 	uint		ignore:1 ;
 	uint		progdash:1 ;
 	uint		log:1 ;
-} ;
+} ; /* end struct */
 
 struct subinfo_allocs {
-	const char	*node ;
-	const char	*svc ;
-	const char	*pr ;
-	const char	*portspec ;
-} ;
+	cchar	*node ;
+	cchar	*svc ;
+	cchar	*pr ;
+	cchar	*portspec ;
+} ; /* end struct */
 
 struct subinfo {
-	const char	**argv ;
-	const char	**envv ;
-	const char	*pr ;
-	const char	*prn ;
-	const char	*searchname ;
-	const char	*afspec ;
-	const char	*hostname ;
-	const char	*portspec ;
-	const char	*svcname ;
-	const char	*pvfname ;
-	const char	*dfname ;
-	const char	*xfname ;
-	const char	*efname ;
-	const char	*architecture ;		/* machine architecture */
-	const char	*umachine ;		/* UNAME machine name */
-	const char	*usysname ;		/* UNAME OS system-name */
-	const char	*urelease ;		/* UNAME OS release */
-	const char	*uversion ;		/* UNAME OS version */
-	const char	*hz ;			/* OS HZ */
-	const char	*nodename ;		/* USERINFO */
-	const char	*domainname ;		/* USERINFO */
-	const char	*username ;		/* USERINFO */
-	const char	*homedname ;		/* USERINFO */
-	const char	*shell ;		/* USERINFO */
-	const char	*organization ;		/* USERINFO */
-	const char	*gecosname ; 		/* USERINFO */
-	const char	*realname ;		/* USERINFO */
-	const char	*name ;			/* USERINFO */
-	const char	*tz ;			/* USERINFO */
-	const char	*groupname ;
-	const char	*tmpdname ;
-	const char	*maildname ;
-	const char	*hfname ;
-	const char	*lfname ;
-	const char	*paramfname ;
-	const char	*version ;		/* object version */
-	const char	*logid ;
-	const char	*defprog ;
+	cchar	**argv ;
+	cchar	**envv ;
+	cchar	*pr ;
+	cchar	*prn ;
+	cchar	*searchname ;
+	cchar	*afspec ;
+	cchar	*hostname ;
+	cchar	*portspec ;
+	cchar	*svcname ;
+	cchar	*pvfname ;
+	cchar	*dfname ;
+	cchar	*xfname ;
+	cchar	*efname ;
+	cchar	*architecture ;		/* machine architecture */
+	cchar	*umachine ;		/* UNAME machine name */
+	cchar	*usysname ;		/* UNAME OS system-name */
+	cchar	*urelease ;		/* UNAME OS release */
+	cchar	*uversion ;		/* UNAME OS version */
+	cchar	*hz ;			/* OS HZ */
+	cchar	*nodename ;		/* userinfo */
+	cchar	*domainname ;		/* userinfo */
+	cchar	*username ;		/* userinfo */
+	cchar	*homedname ;		/* userinfo */
+	cchar	*shell ;		/* userinfo */
+	cchar	*organization ;		/* userinfo */
+	cchar	*gecosname ; 		/* userinfo */
+	cchar	*realname ;		/* userinfo */
+	cchar	*name ;			/* userinfo */
+	cchar	*tz ;			/* userinfo */
+	cchar	*groupname ;
+	cchar	*tmpdname ;
+	cchar	*maildname ;
+	cchar	*hfname ;
+	cchar	*lfname ;
+	cchar	*paramfname ;
+	cchar	*version ;		/* object version */
+	cchar	*logid ;
+	cchar	*defprog ;
 	USS		*op ;
 	SYSDIALER_ARGS	*ap ;
 	IDS		id ;
-	VECSTR		aenvs ;
-	VECSTR		stores ;
-	USERINFO	u ;
+	vecstr		aenvs ;
+	vecstr		stores ;
+	userinfo	u ;
 	SUBINFO_ALLOCS	a ;
 	SUBINFO_FL	f, init, open ;
 	uid_t		uid ;
@@ -200,22 +171,22 @@ struct subinfo {
 	int		ncpu ;
 	int		af ;
 	int		to ;
-} ;
+} ; /* end struct */
 
 struct intprog {
 	char		fname[MAXPATHLEN + 1] ;
 	char		arg[MAXPATHLEN + 1] ;
-} ;
+} ; /* end struct */
 
 struct afamily {
-	const char	*name ;
+	cchar		*name ;
 	int		af ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	uss_logbegin(USS *op,const char *,const char *) ;
+static int	uss_logbegin(USS *op,cchar *,cchar *) ;
 static int	uss_logend(USS *) ;
 static int	uss_logstuff(USS *,SUBINFO *) ;
 
@@ -224,44 +195,19 @@ static int	subinfo_start(SUBINFO *,USS *,
 			SYSDIALER_ARGS *,
 			cchar *,cchar *) ;
 static int	subinfo_procargs(SUBINFO *) ;
-static int	subinfo_procopts(SUBINFO *,KEYOPT *) ;
+static int	subinfo_procopts(SUBINFO *,keyopt *) ;
 static int	subinfo_defaults(SUBINFO *) ;
 static int	subinfo_userinfo(SUBINFO *) ;
 static int	subinfo_logfile(SUBINFO *) ;
 static int	subinfo_addrparse(SUBINFO *) ;
 static int	subinfo_addrparseunix(SUBINFO *,int) ;
 static int	subinfo_addrparseinet(SUBINFO *) ;
-static int	subinfo_dirok(SUBINFO *,const char *,int) ;
+static int	subinfo_dirok(SUBINFO *,cchar *,int) ;
 static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 static int	subinfo_finish(SUBINFO *) ;
 
 
-/* external variables (module information) */
-
-SYSDIALER_INFO	uss = {
-	USS_MNAME,
-	USS_VERSION,
-	USS_INAME,
-	sizeof(USS),
-	USS_MF
-} ;
-
-
 /* local variables */
-
-static cchar	*argopts[] = {
-	"ROOT",
-	"RN",
-	"sn",
-	"af",
-	"lf",
-	"pvf",
-	"pf",
-	"df",
-	"xf",
-	"ef",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -275,49 +221,73 @@ enum argopts {
 	argopt_xf,
 	argopt_ef,
 	argopt_overlast
-} ;
+} ; /* end enum (argopts) */
 
-static cchar	*procopts[] = {
-	"log",
-	NULL
-} ;
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"RN",
+	"sn",
+	"af",
+	"lf",
+	"pvf",
+	"pf",
+	"df",
+	"xf",
+	"ef",
+	nullptr
+} ; /* end array (argopts) */
 
 enum procopts {
 	procopt_log,
 	procopt_overlast
-} ;
+} ; /* end enum (procopts) */
+
+constexpr cpcchar	procopts[] = {
+	"log",
+	nullptr
+} ; /* end array (procopts) */
+
+
+/* external variables (module information) */
+
+SYSDIALER_INFO	sd_uss = {
+	USS_MNAME,
+	USS_VERSION,
+	USS_INAME,
+	szof(USS),
+	USS_MF
+} ; /* end object */
 
 
 /* exported subroutines */
-
 
 /* ARGSUSED */
 int uss_open(op,ap,hostname,svcname,av)
 USS		*op ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
-const char	*av[] ;
+cchar	hostname[] ;
+cchar	svcname[] ;
+cchar	*av[] ;
 {
 	SUBINFO		si, *sip = &si ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		opts = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (hostname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (hostname == nullptr) return SR_FAULT ;
 
 	if (hostname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(USS)) ;
+	memclear(op) ; /* dangerous */
 
 #if	CF_DEBUGS
 	{
 	    int	i ;
 	    debugprintf("uss_open: ent hostname=%s svcname=%s\n",
 	        hostname,svcname) ;
-	    if (ap->argv != NULL) {
-	        for (i = 0 ; ap->argv[i] != NULL ; i += 1) {
+	    if (ap->argv != nullptr) {
+	        for (i = 0 ; ap->argv[i] != nullptr ; i += 1) {
 	            debugprintf("uss_open: a%u=>%s<\n",i,ap->argv[i]) ;
 	        }
 	    }
@@ -354,7 +324,7 @@ const char	*av[] ;
 	        switch (sip->af) {
 	        case AF_UNSPEC:
 	        case AF_UNIX:
-	            if (sip->portspec != NULL) {
+	            if (sip->portspec != nullptr) {
 	                rs = dialuss(sip->portspec,sip->to,opts) ;
 	            } else
 	                rs = SR_NOENT ;
@@ -365,7 +335,7 @@ const char	*av[] ;
 
 	    if (rs >= 0) {
 	        op->magic = USS_MAGIC ;
-	        uc_closeonexec(op->fd,TRUE) ;
+	        uc_closeonexec(op->fd,true) ;
 	    }
 
 	    rs1 = subinfo_finish(sip) ;
@@ -396,7 +366,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != USS_MAGIC)
@@ -422,7 +392,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != USS_MAGIC)
@@ -450,7 +420,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != USS_MAGIC)
@@ -475,7 +445,7 @@ int		to, opts ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != USS_MAGIC)
@@ -493,13 +463,13 @@ int		to, opts ;
 
 int uss_write(op,buf,buflen)
 USS		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != USS_MAGIC)
@@ -517,14 +487,14 @@ int		buflen ;
 
 int uss_send(op,buf,buflen,flags)
 USS		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 int		flags ;
 {
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != USS_MAGIC)
@@ -542,7 +512,7 @@ int		flags ;
 
 int uss_sendto(op,buf,buflen,flags,sap,salen)
 USS		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 int		flags ;
 void		*sap ;
@@ -551,7 +521,7 @@ int		salen ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != USS_MAGIC)
@@ -575,7 +545,7 @@ int		flags ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != USS_MAGIC)
@@ -599,7 +569,7 @@ int		cmd ;
 	int	rs ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != USS_MAGIC)
@@ -623,7 +593,7 @@ USS		*op ;
 	int	rs1 ;
 
 
-	if (op == NULL)
+	if (op == nullptr)
 	    return SR_FAULT ;
 
 	if (op->magic != USS_MAGIC)
@@ -647,15 +617,15 @@ USS		*op ;
 /* private subroutines */
 
 
-static int uss_logbegin(USS *op,const char *lfname,const char *logid)
+static int uss_logbegin(USS *op,cchar *lfname,cchar *logid)
 {
 	int	rs = SR_OK ;
 	int	f = op->open.log ;
 
 	if (! op->open.log) {
 	    if ((rs = logfile_open(&op->lh,lfname,0,0666,logid)) >= 0) {
-	        op->open.log = TRUE ;
-	        f = TRUE ;
+	        op->open.log = true ;
+	        f = true ;
 	    } else if (isNotPresent(rs))
 	        rs = SR_OK ;
 	} /* end if (needed opening) */
@@ -671,7 +641,7 @@ static int uss_logend(USS *op)
 	int	rs1 ;
 
 	if (op->open.log) {
-	    op->open.log = FALSE ;
+	    op->open.log = false ;
 	    rs1 = logfile_close(&op->lh) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -684,14 +654,14 @@ static int uss_logend(USS *op)
 static int uss_logstuff(USS *op,SUBINFO *sip)
 {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if ((rs = subinfo_logfile(sip)) > 0) {
-	    const char	*lfname = sip->lfname ;
-	    const char	*logid = sip->logid ;
+	    cchar	*lfname = sip->lfname ;
+	    cchar	*logid = sip->logid ;
 	    if ((rs = uss_logbegin(op,lfname,logid)) > 0) {
-	        USERINFO	*uip = &sip->u ;
-	        f = TRUE ;
+	        userinfo	*uip = &sip->u ;
+	        f = true ;
 
 	        logfile_userinfo(&op->lh,uip,0L,
 	            sip->searchname,sip->version) ;
@@ -717,14 +687,14 @@ SUBINFO		*sip ;
 USS		*op ;
 SYSDIALER_INFO	*dip ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
+cchar	hostname[] ;
+cchar	svcname[] ;
 {
 	int		rs = SR_OK ;
 
 	memset(sip,0,sizeof(SUBINFO)) ;
 
-	sip->envv = (const char **) environ ;
+	sip->envv = (cchar **) environ ;
 	sip->op = op ;
 	sip->ap = ap ;
 	sip->pr = ap->pr ;
@@ -735,9 +705,9 @@ const char	svcname[] ;
 	sip->af = -1 ;
 
 	if ((rs = vecstr_start(&sip->stores,3,0)) >= 0) {
-	    sip->open.stores = TRUE ;
+	    sip->open.stores = true ;
 	    if ((rs = vecstr_start(&sip->aenvs,3,0)) >= 0) {
-	        if (ap != NULL) {
+	        if (ap != nullptr) {
 	            rs = subinfo_procargs(sip) ;
 	        }
 	        if (rs < 0)
@@ -762,36 +732,36 @@ static int subinfo_finish(SUBINFO *sip)
 	int		rs1 ;
 
 	if (sip->open.userinfo) {
-	    sip->open.userinfo = FALSE ;
+	    sip->open.userinfo = false ;
 	    rs1 = userinfo_finish(&sip->u) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (sip->open.ids) {
-	    sip->open.ids = FALSE ;
+	    sip->open.ids = false ;
 	    rs1 = ids_load(&sip->id) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (sip->a.node != NULL) {
+	if (sip->a.node != nullptr) {
 	    rs1 = uc_free(sip->a.node) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->a.node = NULL ;
+	    sip->a.node = nullptr ;
 	}
 
-	if (sip->a.svc != NULL) {
+	if (sip->a.svc != nullptr) {
 	    rs1 = uc_free(sip->a.svc) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->a.svc = NULL ;
+	    sip->a.svc = nullptr ;
 	}
 
-	if (sip->a.pr != NULL) {
+	if (sip->a.pr != nullptr) {
 	    rs1 = uc_free(sip->a.pr) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->a.pr = NULL ;
+	    sip->a.pr = nullptr ;
 	}
 
-	if (sip->a.portspec != NULL) {
+	if (sip->a.portspec != nullptr) {
 	    rs1 = uc_free(sip->a.portspec) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -800,7 +770,7 @@ static int subinfo_finish(SUBINFO *sip)
 	if (rs >= 0) rs = rs1 ;
 
 	if (sip->open.stores) {
-	    sip->open.stores = FALSE ;
+	    sip->open.stores = false ;
 	    rs1 = vecstr_finish(&sip->stores) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -812,7 +782,7 @@ static int subinfo_finish(SUBINFO *sip)
 
 static int subinfo_procargs(SUBINFO *sip)
 {
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	SYSDIALER_ARGS	*ap = sip->ap ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -821,23 +791,23 @@ static int subinfo_procargs(SUBINFO *sip)
 	int		ai, ai_max, ai_pos ;
 	int		pan = 0 ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_dash = FALSE ;
-	const char	**argv ;
-	const char	*argval = NULL ;
-	const char	*argp, *aop, *akp, *avp ;
+	int		f_dash = false ;
+	cchar	**argv ;
+	cchar	*argval = nullptr ;
+	cchar	*argp, *aop, *akp, *avp ;
 
 #if	CF_DEBUGS
 	debugprintf("uss/subinfo_procargs: ent arguments\n") ;
 #endif
 
-	argv = (const char **) ap->argv ;
+	argv = (cchar **) ap->argv ;
 
-	for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 
 #if	CF_DEBUGS
 	{
 	    debugprintf("uss/subinfo_procargs: argc=%u\n",argc) ;
-	    for (ai = 0 ; argv[ai] != NULL ; ai += 1)
+	    for (ai = 0 ; argv[ai] != nullptr ; ai += 1)
 	        debugprintf("uss/subinfo_procargs: argv[%u]=%s\n",
 	            ai,argv[ai]) ;
 	}
@@ -853,7 +823,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -872,7 +842,7 @@ static int subinfo_procargs(SUBINFO *sip)
 
 	        } else if ((argl == 2) && (ach == '-')) {
 
-	            f_dash = TRUE ;
+	            f_dash = true ;
 	            ai += 1 ;
 	            argr -= 1 ;
 
@@ -887,15 +857,15 @@ static int subinfo_procargs(SUBINFO *sip)
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -911,7 +881,7 @@ static int subinfo_procargs(SUBINFO *sip)
 /* program-root */
 	                case argopt_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->pr = avp ;
 	                    } else {
@@ -929,7 +899,7 @@ static int subinfo_procargs(SUBINFO *sip)
 /* program-root-name */
 	                case argopt_rn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->prn = avp ;
 	                    } else {
@@ -947,7 +917,7 @@ static int subinfo_procargs(SUBINFO *sip)
 /* search-name root */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->searchname = avp ;
 	                    } else {
@@ -964,9 +934,9 @@ static int subinfo_procargs(SUBINFO *sip)
 
 /* logfile */
 	                case argopt_lf:
-	                    sip->fl.log = TRUE ;
+	                    sip->fl.log = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->lfname = avp ;
 	                    } else {
@@ -985,7 +955,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                case argopt_pvf:
 	                case argopt_pf:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->pvfname = avp ;
 	                    } else {
@@ -1002,7 +972,7 @@ static int subinfo_procargs(SUBINFO *sip)
 
 	                case argopt_df:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->dfname = avp ;
 	                    } else {
@@ -1019,7 +989,7 @@ static int subinfo_procargs(SUBINFO *sip)
 
 	                case argopt_xf:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->xfname = avp ;
 	                    } else {
@@ -1036,7 +1006,7 @@ static int subinfo_procargs(SUBINFO *sip)
 
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sip->efname = avp ;
 	                    } else {
@@ -1073,7 +1043,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                        break ;
 
 	                    case 'i':
-	                        sip->fl.ignore = TRUE ;
+	                        sip->fl.ignore = true ;
 	                        break ;
 
 /* options */
@@ -1083,7 +1053,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -1147,10 +1117,10 @@ static int subinfo_procargs(SUBINFO *sip)
 
 	        switch (pan) {
 	        case 0:
-	            sip->portspec = (const char *) argp ;
+	            sip->portspec = (cchar *) argp ;
 	            break ;
 	        case 1:
-	            sip->svcname = (const char *) argp ;
+	            sip->svcname = (cchar *) argp ;
 	            break ;
 	        } /* end switch */
 	        pan += 1 ;
@@ -1170,7 +1140,7 @@ static int subinfo_procargs(SUBINFO *sip)
 
 	if ((rs >= 0) && ((ai_max < 0) || (ai_pos < 0))) rs = SR_BUGCHECK ;
 
-	if ((rs >= 0) && (argval != NULL)) {
+	if ((rs >= 0) && (argval != nullptr)) {
 	    rs = 1 ;
 	}
 
@@ -1190,7 +1160,7 @@ static int subinfo_procargs(SUBINFO *sip)
 #endif
 
 	if ((rs >= 0) && (sip->af < 0) && 
-	    (sip->afspec != NULL) && (sip->afspec[0] != '\0')) {
+	    (sip->afspec != nullptr) && (sip->afspec[0] != '\0')) {
 
 #if	CF_DEBUGS
 	    debugprintf("uss/subinfo_procargs: afspec=%s\n",sip->afspec) ;
@@ -1220,9 +1190,9 @@ badkopts:
 /* end subroutine (subinfo_procargs) */
 
 
-static int subinfo_procopts(SUBINFO *sip,KEYOPT *kop)
+static int subinfo_procopts(SUBINFO *sip,keyopt *kop)
 {
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
@@ -1231,15 +1201,15 @@ static int subinfo_procopts(SUBINFO *sip,KEYOPT *kop)
 	    int		kl, vl ;
 	    cchar	*kp, *vp ;
 
-	    while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	    while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	        if ((oi = matostr(procopts,2,kp,kl)) >= 0) {
 
-	            vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+	            vl = keyopt_fetch(kop,kp,nullptr,&vp) ;
 
 	            switch (oi) {
 	            case procopt_log:
-	                sip->fl.log = TRUE ;
+	                sip->fl.log = true ;
 	                if ((vl > 0) && ((rs = optbool(vp,vl)) >= 0))
 	                    sip->fl.log = (rs > 0) ;
 	                break ;
@@ -1264,8 +1234,8 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *sp,int sl)
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if (sip == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_FAULT ;
+	if (sip == nullptr) return SR_FAULT ;
+	if (epp == nullptr) return SR_FAULT ;
 
 	if (! sip->open.stores) {
 	    rs = vecstr_start(&sip->stores,4,0) ;
@@ -1275,15 +1245,15 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *sp,int sl)
 	if (rs >= 0) {
 	    int	oi = -1 ;
 
-	    if (*epp != NULL) oi = vecstr_findaddr(&sip->stores,*epp) ;
+	    if (*epp != nullptr) oi = vecstr_findaddr(&sip->stores,*epp) ;
 
-	    if (sp != NULL) {
+	    if (sp != nullptr) {
 	        len = strnlen(sp,sl) ;
 	        if ((rs = vecstr_add(&sip->stores,sp,len)) >= 0) {
 	            rs = vecstr_get(&sip->stores,rs,epp) ;
 	        } /* end if (added new entry) */
 	    } else {
-	        *epp = NULL ;
+	        *epp = nullptr ;
 	    }
 	    if ((rs >= 0) && (oi >= 0)) {
 	        vecstr_del(&sip->stores,oi) ;
@@ -1301,7 +1271,7 @@ static int subinfo_defaults(SUBINFO *sip)
 	SYSDIALER_ARGS	*ap = sip->ap ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	const char	*vp ;
+	cchar	*vp ;
 
 #if	CF_DEBUGS
 	debugprintf("uss/subinfo_defaults: ent af=%d\n",sip->af) ;
@@ -1309,11 +1279,11 @@ static int subinfo_defaults(SUBINFO *sip)
 
 /* program-root */
 
-	if ((sip->pr == NULL) && (sip->prn != NULL) && (sip->prn[0] != '\0')) {
+	if ((sip->pr == nullptr) && (sip->prn != nullptr) && (sip->prn[0] != '\0')) {
 	    char	domainname[MAXHOSTNAMELEN + 1] ;
 	    char	pr[MAXPATHLEN + 1] ;
 
-	    rs1 = getnodedomain(NULL,domainname) ;
+	    rs1 = getnodedomain(nullptr,domainname) ;
 
 	    if (rs1 >= 0)
 	        rs1 = mkpr(pr,MAXPATHLEN,sip->prn,domainname) ;
@@ -1332,9 +1302,9 @@ static int subinfo_defaults(SUBINFO *sip)
 
 	} /* end if */
 
-	if ((rs >= 0) && (sip->pr == NULL)) {
+	if ((rs >= 0) && (sip->pr == nullptr)) {
 
-	    if ((vp = getenv(USS_VARPR)) != NULL) {
+	    if ((vp = getenv(USS_VARPR)) != nullptr) {
 
 	        rs1 = subinfo_dirok(sip,vp,-1) ;
 	        if (rs1 > 0)
@@ -1344,7 +1314,7 @@ static int subinfo_defaults(SUBINFO *sip)
 
 	} /* end if */
 
-	if ((rs >= 0) && (sip->pr == NULL)) {
+	if ((rs >= 0) && (sip->pr == nullptr)) {
 
 	    vp = USS_PR ;
 	    rs1 = subinfo_dirok(sip,vp,-1) ;
@@ -1353,17 +1323,17 @@ static int subinfo_defaults(SUBINFO *sip)
 
 	} /* end if */
 
-	if (sip->pr == NULL)
+	if (sip->pr == nullptr)
 	    sip->pr = ap->pr ;
 
 /* search-name */
 
-	if (sip->searchname == NULL)
+	if (sip->searchname == nullptr)
 	    sip->searchname = USS_SEARCHNAME ;
 
 /* log-file */
 
-	if ((rs >= 0) && (sip->lfname == NULL))
+	if ((rs >= 0) && (sip->lfname == nullptr))
 	    sip->lfname = USS_LOGFNAME ;
 
 #if	CF_DEBUGS
@@ -1394,9 +1364,9 @@ static int subinfo_userinfo(SUBINFO *sip)
 	int		rs = SR_OK ;
 
 	if (! sip->open.userinfo) {
-	    USERINFO	*uip = &sip->u ;
-	    if ((rs = userinfo_start(uip,NULL)) >= 0) {
-	        sip->open.userinfo = TRUE ;
+	    userinfo	*uip = &sip->u ;
+	    if ((rs = userinfo_start(uip,nullptr)) >= 0) {
+	        sip->open.userinfo = true ;
 	        sip->umachine = uip->machine ;
 	        sip->usysname = uip->sysname ;
 	        sip->urelease = uip->release ;
@@ -1429,8 +1399,8 @@ static int subinfo_logfile(SUBINFO *sip)
 
 	if (sip->fl.log && (! sip->init.log)) {
 	    cchar	*lfname = sip->lfname ;
-	    sip->init.log = TRUE ;
-	    f = TRUE ;
+	    sip->init.log = true ;
+	    f = true ;
 
 	    if (lfname[0] != '/') {
 	        cchar	*logdname = USS_LOGDNAME ;
@@ -1462,11 +1432,11 @@ static int subinfo_dirok(SUBINFO *sip,cchar *d,int dlen)
 	NULSTR		ss ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
-	const char	*dnp ;
+	int		f = false ;
+	cchar	*dnp ;
 
 	if (! sip->open.ids) {
-	    sip->open.ids = TRUE ;
+	    sip->open.ids = true ;
 	    rs = ids_load(&sip->id) ;
 	}
 
@@ -1474,7 +1444,7 @@ static int subinfo_dirok(SUBINFO *sip,cchar *d,int dlen)
 	    if ((rs = nulstr_start(&ss,d,dlen,&dnp)) >= 0) {
 	        if ((rs1 = u_stat(dnp,&sb)) >= 0) {
 	            if (S_ISDIR(sb.st_mode)) {
-	                rs1 = permid(&sip->id,&sb,(R_OK | X_OK)) ;
+	                rs1 = permids(&sip->id,&sb,(R_OK | X_OK)) ;
 	                f = (rs1 >= 0) ;
 	            }
 	        }
@@ -1486,12 +1456,10 @@ static int subinfo_dirok(SUBINFO *sip,cchar *d,int dlen)
 }
 /* end subroutine (subinfo_dirok) */
 
-
-static int subinfo_addrparse(SUBINFO *sip)
-{
+static int subinfo_addrparse(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 
-	if ((sip->portspec != NULL) && (sip->portspec[0] != '\0')) {
+	if ((sip->portspec != nullptr) && (sip->portspec[0] != '\0')) {
 
 	    if (hasleadcolon(sip->portspec,-1)) {
 	        if (strncasecmp("unix:",sip->portspec,5) == 0) {
@@ -1499,7 +1467,7 @@ static int subinfo_addrparse(SUBINFO *sip)
 	        } else {
 	            rs = subinfo_addrparseinet(sip) ;
 	        }
-	    } else if (strchr(sip->portspec,'/') != NULL) {
+	    } else if (strchr(sip->portspec,'/') != nullptr) {
 	        rs = subinfo_addrparseunix(sip,0) ;
 	    } else {
 	        if ((sip->af == 0) || 
@@ -1521,14 +1489,14 @@ static int subinfo_addrparseunix(SUBINFO *sip,int f)
 {
 	int		rs = SR_OK ;
 	int		pslen = -1 ;
-	const char	*ps = sip->portspec ;
+	cchar	*ps = sip->portspec ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	if (f)
 	    ps += 5 ;
 
 	if (ps[0] != '/') {
-	    f = TRUE ;
+	    f = true ;
 	    pslen = mkpath2(tmpfname,sip->pr,ps) ;
 	    ps = tmpfname ;
 	}
@@ -1556,7 +1524,7 @@ static int subinfo_addrparseinet(SUBINFO *sip)
 
 	if ((rs = inetaddrparse_load(&a,sip->portspec,-1)) >= 0) {
 
-	    if ((rs >= 0) && (a.af.sp != NULL) && a.af.sl) {
+	    if ((rs >= 0) && (a.af.sp != nullptr) && a.af.sl) {
 	        cchar	**vpp = &sip->afspec ;
 
 	        if ((rs = subinfo_setentry(sip,vpp,a.af.sp,a.af.sl)) >= 0) {
@@ -1571,12 +1539,12 @@ static int subinfo_addrparseinet(SUBINFO *sip)
 
 	    } /* end if */
 
-	    if ((rs >= 0) && (a.host.sp != NULL) && a.host.sl) {
+	    if ((rs >= 0) && (a.host.sp != nullptr) && a.host.sl) {
 	        cchar	**vpp = &sip->hostname ;
 	        rs = subinfo_setentry(sip,vpp,a.host.sp,a.host.sl) ;
 	    }
 
-	    if ((rs >= 0) && (a.port.sp != NULL) && a.port.sl) {
+	    if ((rs >= 0) && (a.port.sp != nullptr) && a.port.sl) {
 	        cchar	**vpp = &sip->portspec ;
 	        rs = subinfo_setentry(sip,vpp,a.port.sp,a.port.sl) ;
 	    }
