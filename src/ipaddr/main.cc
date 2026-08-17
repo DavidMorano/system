@@ -1,41 +1,46 @@
-/* main (IPADDR) */
+/* main SUPPORT (IPADDR) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* create an IP address suitable for use by the TLI API */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
 
-#include	<envstandards.h>
+  	Description:
 
-#include	<sys/utsname.h>
+*******************************************************************************/
+
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#include	<sys/param.h>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<time.h>
 #include	<pwd.h>
 #include	<grp.h>
+#include	<ctime>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<uclibmem.h>
 #include	<bfile.h>
 #include	<baops.h>
+#include	<cfdec.h>
+#include	<sfx.h>			/* |sfbasename(3uc)| */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -54,11 +59,6 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
-
-extern char	*strdirname(), *strbasename() ;
-extern char	*strshrink() ;
-
 extern void	int_alarm() ;
 
 
@@ -76,38 +76,37 @@ struct parts {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
 	bfile		errfile, *efp = &errfile ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		infile, *ifp = &infile ;
-
 	struct parts	p[4] ;
-
-	unsigned long	a ;
-
+	long	a ;
 	int	argl, aol ;
 	int	pan, i, l ;
 	int	rs ;
-	int	f_usage = FALSE ;
-	int	f_ddash = FALSE ;
-	int	f_version = FALSE ;
+	int	ex = EXIT_SUCCESS ;
+	int	f_usage = false ;
+	int	f_ddash = false ;
+	int	f_version = false ;
 	int	len ;
 	int	a_net, a_host ;
-	int	nparts, class ;
+	int	nparts ;
+	int	classnum ;
 
 	char	*argp, *aop ;
 	char	*progname ;
-	char	linebuf[LINELEN + 1], *cp, *cp2 ;
+	char	linebuf[LINELEN + 1], *cp2 ;
+	cchar	*cp ;
 
-
-	progname = strbasename(argv[0]) ;
+	if (int cl ; (cl = sfbasename(argv[0],-1,&cp)) >= 0) {
+	    rs = lm_strw(cp,cl,&progname) ;
+	}
 
 	if (bopen(efp,BFILE_STDERR,"dwca",0666) >= 0)
 		bcontrol(efp,BC_LINEBUF,0) ;
@@ -123,26 +122,25 @@ char	*envv[] ;
 	if ((len = breadln(ifp,linebuf,LINELEN)) < 1) 
 		goto badinopen ;
 
-	if (linebuf[len - 1] == '\n') 
+	if (linebuf[len - 1] == '\n') {
 		len -= 1 ;
-
+	}
 	linebuf[len] = '\0' ;
-
 
 /* parse into pieces */
 
 	cp = linebuf ;
-	while (ISWHITE(*cp)) 
+	while (ISWHITE(*cp)) {
 		cp += 1 ;
+	}
 
-	for (i = 0 ; i < 4 ; i += 1) 
-		p[i].valid = FALSE ;
+	for (i = 0 ; i < 4 ; i += 1) {
+		p[i].valid = false ;
+	}
 
 	nparts = 0 ;
 	for (i = 0 ; i < 3 ; i += 1) {
-
 	    if ((cp2 = strchr(cp,'.')) == NULL) break ;
-
 	    *cp2 = '\0' ;
 
 #if	CF_DEBUG
@@ -157,7 +155,7 @@ char	*envv[] ;
 #endif
 
 	    nparts += 1 ;
-	    p[i].valid = TRUE ;
+	    p[i].valid = true ;
 	    cp = cp2 + 1 ;
 
 	} /* end for */
@@ -169,7 +167,7 @@ char	*envv[] ;
 	if ((rs = cfdeci(cp,strlen(cp),&p[nparts].v)) < 0)
 	    goto badin_b ;
 
-	p[nparts].valid = TRUE ;
+	p[nparts].valid = true ;
 	nparts += 1 ;
 
 	switch (nparts) {
@@ -206,38 +204,32 @@ char	*envv[] ;
 
 	} /* end switch */
 
-
-	if (a >= (192 << 24))
-	    class = CLASS_C ;
-
-	else if (a >= (135 << 24))
-	    class = CLASS_B ;
-
-	else 
-	    class = CLASS_A ;
+	if (a >= (192 << 24)) {
+	    classnum = CLASS_C ;
+	} else if (a >= (135 << 24)) {
+	    classnum = CLASS_B ;
+	} else {
+	    classnum = CLASS_A ;
+	}
 
 	p[0].v = (a >> 24) ;
 	p[1].v = (a >> 16) & 255 ;
 	p[2].v = (a >> 8) & 255 ;
 	p[3].v = a & 255 ;
 
-	switch (class) {
-
+	switch (classnum) {
 	case CLASS_A:
 	    a_net = a >> 24 ;
 	    a_host = a & 0xFFFFFF ;
 	    break ;
-
 	case CLASS_B:
 	    a_net = a >> 16 ;
 	    a_host = a & 0xFFFF ;
 	    break ;
-
 	case CLASS_C:
 	    a_net = a >> 8 ;
 	    a_host = a & 255 ;
 	    break ;
-
 	} /* end switch */
 
 	bprintf(ofp,"dot=%d.%d.%d.%d hex=\\x%08X\n",
@@ -246,21 +238,23 @@ char	*envv[] ;
 	bprintf(ofp,"net=%d host=%d\n",
 	    a_net,a_host) ;
 
-
-	bclose(ofp) ;
-
-	bclose(efp) ;
-
-	return OK ;
+ret0:
+	if (ofp) {
+	    bclose(ofp) ;
+	    ofp = nullptr ;
+	}
+	if (efp) {
+	    bclose(efp) ;
+	    efp = nullptr ;
+	}
+	return ex ;
 
 badinopen:
 	bprintf(efp,"%s: bad input\n",progname) ;
-
 	goto badret ;
 
 badin_a:
 	bprintf(efp,"%s: bad input A\n",progname) ;
-
 	goto badret ;
 
 badin_b:
@@ -268,8 +262,8 @@ badin_b:
 
 badret:
 	bclose(efp) ;
-
-	return BAD ;
+	ex = EXIT_FAILURE ;
+	goto ret0 ;
 }
 /* end subroutine (main) */
 
