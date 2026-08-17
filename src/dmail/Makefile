@@ -334,8 +334,6 @@ densitydb.o:		densitydb.c densitydb.h densitydbe.h
 
 densitydbe.o:		densitydbe.c densitydbe.h
 
-keyopt.o:		keyopt.c keyopt.h
-
 pcsconf.o:		pcsconf.c pcsconf.h
 
 pcspoll.o:		pcspoll.c pcspoll.h
