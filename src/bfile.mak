@@ -58,12 +58,12 @@ OBJ11=
 OBJ12= bread.o breadln.o breadlns.o bgetc.o 
 OBJ13= bwasteln.o
 OBJ14= bfliner.o
-OBJ15=
+OBJ15= varsub_expfile.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o
-OBJD= obj12.o obj13.o obj14.o
+OBJD= obj12.o obj13.o obj14.o obj15.o
 
 OBJ= obja.o objb.o objc.o objd.o
 
@@ -239,5 +239,7 @@ bsupport.o:		bsupport.cc		$(INCS)
 bobj.o:			bobj.cc			$(INCS)
 
 bfliner.o:		bfliner.cc	bfliner.h	$(INCS)
+
+varsub_expfile.o:	varsub_expfile.cc varsub_expfile.h	$(DEPS) $(INCS)
 
 
