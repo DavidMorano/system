@@ -1,21 +1,19 @@
-/* main (DWD) */
+/* main SUPPORT (DWD) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Directory Watcher Daemon (DWD) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_FINALROOT	1
 #define	CF_NPRINTF	0
 
-
 /* revision history:
 
 	= 1998-09-10, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -23,6 +21,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This program will watch a directory for new entries and will
 	wait until a new entry stops increasing in size.  After a new
 	entry stops increasing in size, this program will look it up in
@@ -34,37 +33,36 @@
 		PROGRAMROOT	root of program files
 
 	Synopsis:
-
 	$ dwd [-C conf] [-polltime] [directory_path] [srvtab] [-V?]
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mkdev.h>
+#include	<dirent.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
 #include	<csignal>
-#include	<dirent.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<ctype.h>
-#include	<time.h>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<field.h>
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<userinfo.h>
-#include	<char.h>
 #include	<lfm.h>
 #include	<mallocstuff.h>
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<srvtab.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -72,7 +70,6 @@
 #include	"defs.h"
 #include	"configfile.h"
 #include	"job.h"
-#include	"srvtab.h"
 
 
 /* local defines */
@@ -87,26 +84,10 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	getpwd(char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	isdigitlatin(int) ;
-
-extern int	proginfo_setpiv(PROGINFO *,const char *,
+extern int	proginfo_setpiv(PROGINFO *,cchar *,
 			const struct pivars *) ;
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	expander() ;
-
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*delenv(const char *) ;
 
 
 /* externals variables */
@@ -122,7 +103,7 @@ static int usage(PROGINFO *) ;
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -170,8 +151,8 @@ static const struct mapex	mapexs[] = {
 
 int main(argc,argv,envv)
 int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
+cchar	*argv[] ;
+cchar	*envv[] ;
 {
 	ustat	sb ;
 	PROGINFO	pi, *pip = &pi ;
@@ -205,18 +186,18 @@ const char	*envv[] ;
 	int	f_exports = FALSE ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	buf[BUFLEN + 1], *bp ;
 	char	userbuf[USERINFO_LEN + 1] ;
 	char	tmpfname[MAXPATHLEN + 1] ;
 	char	timebuf[TIMEBUFLEN + 1] ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*configfname = NULL ;
-	const char	*logfname = NULL ;
-	const char	*sp, *cp ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*configfname = NULL ;
+	cchar	*logfname = NULL ;
+	cchar	*sp, *cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -985,7 +966,7 @@ const char	*envv[] ;
 		pip->pidfname,LFM_TRECORD,TO_PIDFILE,NULL,
 	        pip->nodename,pip->username,BANNER) ;
 
-	    if ((rs < 0) && (rs != SR_LOCKLOST) && (rs != SR_AGAIN))
+	    if ((rs < 0) && (rs != SR_LOCKFAIL) && (rs != SR_AGAIN))
 	        goto badpidopen ;
 
 	    if (rs < 0)
