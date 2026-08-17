@@ -68,7 +68,7 @@
 #include	<fcntl.h>
 #include	<poll.h>
 #include	<csignal>
-#include	<time.h>
+#include	<ctime>
 #include	<dirent.h>
 #include	<climits>
 #include	<cstdlib>
