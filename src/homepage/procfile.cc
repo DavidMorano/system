@@ -35,20 +35,20 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<tzfile.h>		/* |TM_YEAR_BASE| */
 #include	<ctime>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
 #include	<tzfile.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<baops.h>
 #include	<field.h>
 #include	<sbuf.h>
@@ -57,6 +57,7 @@
 #include	<strwcpy.h>
 #include	<char.h>
 #include	<localmisc.h>
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -415,12 +416,8 @@ const char	fname[] ;
 	            pfp->date = 0 ;
 
 	        if (f_write && (pfp->date != 0)) {
-
-	            struct tm	ts ;
-
 	            uint	year ;
-
-
+	            TM ts ;
 	            rs1 = uc_timelocal(&pfp->date,&ts) ;
 
 #if	CF_DEBUG
@@ -432,9 +429,7 @@ const char	fname[] ;
 #endif
 
 	            if (rs1 >= 0) {
-
 	                bprintf(&ofile,"<br>\n") ;
-
 	                year = TM_YEAR_BASE + ts.tm_year ;
 	                bprintf(&ofile,"%s %s %u, %u\n",
 	                    fulldays[ts.tm_wday],
