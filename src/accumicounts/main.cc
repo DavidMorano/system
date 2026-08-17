@@ -107,7 +107,7 @@ char	*envv[] ;
 {
 	struct proginfo	pi, *pip = &pi ;
 
-	PARAMOPT	aparams ;
+	paramopt	aparams ;
 
 	bfile	errfile ;
 	bfile	outfile, *ofp = &outfile ;
@@ -593,7 +593,7 @@ char	*envv[] ;
 	} /* end if */
 
 	if ((rs = paramopt_havekey(&aparams,PO_OPTION)) > 0) {
-	    PARAMOPT_CUR	cur ;
+	    paramopt_cur	cur ;
 
 	    paramopt_curbegin(&aparams,&cur) ;
 
