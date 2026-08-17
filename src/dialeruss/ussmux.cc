@@ -88,28 +88,27 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	getgroupname(char *,int,gid_t) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	dialuss(const char *,int,int) ;
-extern int	dialussnls(const char *,const char *,int,int) ;
-extern int	dialussmux(const char *,const char *,const char **,int,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;
-extern int	dialtcpmux(const char *,const char *,int,const char *,
-			const char **,int,int) ;
+extern int	mkpr(char *,int,cchar *,cchar *) ;
+extern int	dialuss(cchar *,int,int) ;
+extern int	dialussnls(cchar *,cchar *,int,int) ;
+extern int	dialussmux(cchar *,cchar *,cchar **,int,int) ;
+extern int	dialtcp(cchar *,cchar *,int,int,int) ;
+extern int	dialtcpnls(cchar *,cchar *,int,cchar *,int,int) ;
+extern int	dialtcpmux(cchar *,cchar *,int,cchar *,
+			cchar **,int,int) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
-			const char *,const char *) ;
+			cchar *,cchar *) ;
 extern int	isNotPresent(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -122,7 +121,7 @@ extern char	**environ ;
 
 /* forward references */
 
-static int ussmux_logbegin(USSMUX *,const char *,const char *) ;
+static int ussmux_logbegin(USSMUX *,cchar *,cchar *) ;
 static int ussmux_logend(USSMUX *) ;
 static int ussmux_logstuff(USSMUX *,USSINFO *) ;
 
@@ -147,9 +146,9 @@ SYSDIALER_INFO	ussmux = {
 int ussmux_open(op,ap,hostname,svcname,av)
 USSMUX		*op ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
-const char	*av[] ;
+cchar	hostname[] ;
+cchar	svcname[] ;
+cchar	*av[] ;
 {
 	USSINFO		si, *sip = &si ;
 
@@ -359,7 +358,7 @@ int		to, opts ;
 
 int ussmux_write(op,buf,buflen)
 USSMUX		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int	rs ;
@@ -383,7 +382,7 @@ int		buflen ;
 
 int ussmux_send(op,buf,buflen,flags)
 USSMUX		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 int		flags ;
 {
@@ -408,7 +407,7 @@ int		flags ;
 
 int ussmux_sendto(op,buf,buflen,flags,sap,salen)
 USSMUX		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 int		flags ;
 void		*sap ;
@@ -513,7 +512,7 @@ USSMUX		*op ;
 /* private subroutines */
 
 
-static int ussmux_logbegin(USSMUX *op,const char *lfname,const char *logid)
+static int ussmux_logbegin(USSMUX *op,cchar *lfname,cchar *logid)
 {
 	int	rs = SR_OK ;
 	int	f = op->open.log ;
@@ -553,8 +552,8 @@ int ussmux_logstuff(USSMUX *op,USSINFO *sip)
 	int	f = FALSE ;
 
 	if ((rs = ussinfo_logfile(sip)) > 0) {
-	    const char	*lfname = sip->lfname ;
-	    const char	*logid = sip->logid ;
+	    cchar	*lfname = sip->lfname ;
+	    cchar	*logid = sip->logid ;
 	    if ((rs = ussmux_logbegin(op,lfname,logid)) > 0) {
 		USERINFO	*uip = &sip->u ;
 		f = TRUE ;
