@@ -52,20 +52,19 @@
 #include	<ctime>
 #include	<csignal>
 #include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibsubs.h>
 #include	<getportnum.h>
+#include	<getprogpath.h>		/* LIBUC */
 #include	<mallocxx.h>
 #include	<sighand.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
-#include	<bfile.h>
 #include	<dater.h>
 #include	<userinfo.h>
 #include	<paramfile.h>
@@ -89,6 +88,7 @@
 #include	<mapex.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -1172,7 +1172,7 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 	            int	oi ;
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
