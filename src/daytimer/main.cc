@@ -1,27 +1,24 @@
-/* main */
+/* main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* main subroutine for the day timer program */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* time-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory allocations */
 #define	CF_EXPERIMENT	1		/* ? */
 
-
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-
 	This code was originally written.
 
-
 	= 1990-02-10, David A­D­ Morano
-
 	This subroutine was modified to not write out anything
 	to standard output if the access time of the associated
 	terminal has not been changed in 10 minutes.
-
 
 */
 
@@ -30,30 +27,26 @@
 /************************************************************************
 
 	Synopsis:
-
 	$ daytimer [[mailfile] offint] [-o options] [-sV] [-t timeout]
-
 
 *************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mkdev.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<cstdlib>
+#include	<netdb.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getx.h>
 #include	<keyopt.h>
-#include	<char.h>
 #include	<ascii.h>
 #include	<bfile.h>
 #include	<baops.h>
@@ -61,6 +54,7 @@
 #include	<logfile.h>
 #include	<lfm.h>
 #include	<mallocstuff.h>
+#include	<char.h>
 #include	<userinfo.h>
 #include	<localmisc.h>
 
@@ -95,44 +89,23 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	termdevice(char *,int,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	isdigitlatin(int) ;
-
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
-extern int	proginfo_setpiv(struct proginfo *,const char *,
+extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
+extern int	proginfo_setpiv(struct proginfo *,cchar *,
 			const struct pivars *) ;
 extern int	process(struct proginfo *,struct userinfo *,int,
 			time_t,time_t,int,MAILFILES *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
 
-extern const char	daytimer_makedate[] ;
+extern cchar	daytimer_makedate[] ;
 
 
 /* local structures */
@@ -141,13 +114,13 @@ extern const char	daytimer_makedate[] ;
 /* forward references */
 
 static int	usage(struct proginfo *) ;
-static int	mklinename(char *,const char *) ;
-static int	procopts(struct proginfo *,KEYOPT *) ;
+static int	mklinename(char *,cchar *) ;
+static int	procopts(struct proginfo *,keyopt *) ;
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"DEBUG",
 	"VERSION",
@@ -195,7 +168,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char *progopts[] = {
+static cchar *progopts[] = {
 	"offint",
 	"logextra",
 	NULL
@@ -213,13 +186,13 @@ enum progopts {
 
 int main(argc,argv,envv)
 int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
+cchar	*argv[] ;
+cchar	*envv[] ;
 {
 	struct proginfo	pi, *pip = &pi ;
 	USERINFO	u ;
 	MAILFILES	mfs ;
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	bfile		errfile ;
 	time_t		daytime = time(NULL) ;
 
@@ -241,8 +214,8 @@ const char	*envv[] ;
 	int	f_statdisplay ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
 	char	argpresent[NARGPRESENT] ;
 	char	buf[BUFLEN + 1] ;
 	char	userinfobuf[USERINFO_LEN + 1] ;
@@ -252,19 +225,19 @@ const char	*envv[] ;
 	char	lockfname[MAXPATHLEN + 1] ;
 	char	pidfname[MAXPATHLEN + 1] ;
 	char	timebuf[TIMEBUFLEN + 1] ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*piddname = PIDDNAME ;
-	const char	*lockdname = LOCKDNAME ;
-	const char	*afname = NULL;
-	const char	*efname = NULL;
-	const char	*hfname = HELPFNAME ;
-	const char	*lfname = NULL ;
-	const char	*termarg = NULL ;
-	const char	*maildname = NULL ;
-	const char	*mailfname = NULL ;
-	const char	*mailpath = NULL ;
-	const char	*cp ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*piddname = PIDDNAME ;
+	cchar	*lockdname = LOCKDNAME ;
+	cchar	*afname = NULL;
+	cchar	*efname = NULL;
+	cchar	*hfname = HELPFNAME ;
+	cchar	*lfname = NULL ;
+	cchar	*termarg = NULL ;
+	cchar	*maildname = NULL ;
+	cchar	*mailfname = NULL ;
+	cchar	*mailpath = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -722,7 +695,7 @@ const char	*envv[] ;
 	            case 1:
 	                if (argv[ai][0] != '\0') {
 
-				pip->final.offint = TRUE ;
+				pip->finval.offint = TRUE ;
 	                    rs = cfdeci(argv[ai],-1,&pip->offint) ;
 
 	                }
@@ -1321,8 +1294,8 @@ struct proginfo	*pip ;
 {
 	int		rs ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [mailfile [<toff>]] [-sV] [-t <to>] [-<toff>]\n",
 	rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -1333,15 +1306,15 @@ struct proginfo	*pip ;
 
 	return rs ;
 }
-/* end subroutines (usage) */
+/* end subroutine (usage) */
 
 
 static int mklinename(linename,termdevfname)
 char		linename[] ;
-const char	termdevfname[] ;
+cchar	termdevfname[] ;
 {
 	int		i ;
-	const char	*sp, *tp ;
+	cchar	*sp, *tp ;
 
 	sp = termdevfname ;
 	while (*sp && (*sp == '/'))
@@ -1366,23 +1339,23 @@ const char	termdevfname[] ;
 /* process program options */
 static int procopts(pip,kop)
 struct proginfo	*pip ;
-KEYOPT		*kop ;
+keyopt		*kop ;
 {
 	int		rs = SR_OK ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL)
 	    rs = keyopt_loads(kop,cp,-1) ;
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 		int		val ;
 	        int		oi ;
 	        int		kl, vl ;
-	        const char	*kp, *vp ;
+	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            vl = keyopt_fetch(kop,kp,NULL,&vp) ;
 
