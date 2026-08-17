@@ -1,67 +1,61 @@
-/* watch */
+/* watch SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* watch the specified directory */
 /* version %I% last-modified %G% */
 
-
 #define	F_DEBUG		1
 #define	F_STALE		0
 
-
-/* revision history :
+/* revision history:
 
 	= Dave Morano, September 1991
 	This program was originally written.
 
-
 */
-
-
 
 /*****************************************************************************
 
+  	Description:
 	This subroutine is responsible for watching the specified
-	directory.
-
-	This subroutine is called with the folowing arguments :
-
+	directory.  This subroutine is called with the folowing
+	arguments:
 	- slp	service table list pointer
 	- jlp	job table list pointer
 
-
-	Returns :
-	OK	doesn't really matter in the current implementation
-
-
+	Returns:
+	OK	does not really matter in the current implementation
 
 *****************************************************************************/
 
-
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<sys/time.h>
 #include	<unistd.h>
-#include	<cstdlib>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<time.h>
-#include	<ftw.h>
-#include	<cerrno>
-#include	<climits>
-#include	<cstring>
 #include	<poll.h>
+#include	<ftw.h>
+#include	<ctime>
+#include	<cerrno>
+#include	<csignal>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
 #include	<dirent.h>
-
-#include	<bio.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<bfile.h>
 #include	<logfile.h>
 #include	<vecelem.h>
 #include	<vecstr.h>
 #include	<bitops.h>
-#include	<system.h>
 #include	<directory.h>
+#include	<localmisc.h>
 
 #include	"misc.h"
 #include	"config.h"
@@ -76,18 +70,11 @@
 #define	W_OPTIONS	(WUNTRACED | WNOHANG)
 
 
-
 /* external subroutines */
 
-extern int	cfdec() ;
 extern int	substring() ;
-extern int	getpwd() ;
 extern int	job_search(), job_start(), job_findpid(), job_end() ;
 extern int	checklockfile() ;
-
-extern char	*strbasename() ;
-extern char	*timestr_log(), *timestr_ulog() ;
-extern char	*strwcpy() ;
 
 
 /* external variables */
