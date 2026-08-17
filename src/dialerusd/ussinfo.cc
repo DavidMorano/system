@@ -666,7 +666,7 @@ keyopt		*kop ;
 	    int		kl, vl ;
 	    cchar	*kp, *vp ;
 
-	while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 /* get the first value for this key */
 
@@ -964,7 +964,7 @@ int		dlen ;
 
 	if ((rs1 >= 0) && S_ISDIR(sb.st_mode)) {
 
-	    rs1 = permid(&sip->id,&sb,(R_OK | X_OK)) ;
+	    rs1 = permids(&sip->id,&sb,(R_OK | X_OK)) ;
 	    f = (rs1 >= 0) ;
 
 	} /* end if */
