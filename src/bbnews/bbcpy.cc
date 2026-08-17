@@ -1,4 +1,4 @@
-/* bbcpy */
+/* bbcpy SUPPORT */
 
 /* copy a string substituting periods for where ever we find slashes */
 
@@ -23,37 +23,35 @@
         there was a slash character in the newsgroup directory path.
 
 	Synopsis:
-
-	int bbcpy(s2,s1)
-	char	*s1, *s2 ;
+	int bbcpy(cchar *s2,cchar *s1) noex
 
 	Arguments:
-
 	s1	string that contains the newsgroup directory path
 	s2	resulting strings with periods instead of slashes
 
 	Returns:
-
 	>=0	length of string copied
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
-#include	<localmisc.h>
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int bbcpy(s2,s1)
-char		*s2 ;
-const char	*s1 ;
-{
-	const char	*cp = s1 ;
-
+int bbcpy(cchar *s2,cchar *s1) noex {
+	cchar	*cp = s1 ;
 	while (*s1) {
 	    if (*s1 == '/') {
 	        *s2++ = '.' ;
@@ -61,11 +59,8 @@ const char	*s1 ;
 	    } else
 	        *s2++ = *s1++ ;
 	} /* end while */
-
 	*s2++ = '\0' ;
-	return (s2 - cp) ;
-}
-/* end subroutine (bbcpy) */
-
+	return conv_int>(s2 - cp) ;
+} /* end subroutine (bbcpy) */
 
 
