@@ -1578,7 +1578,7 @@ local int procopts(PI *pip,keyopt *kop) noex {
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1740,7 +1740,7 @@ local int procpcsconf_begin(PI *pip,PCSCONF *pcp) noex {
 	            char	kbuf[KBUFLEN+1] ;
 	            char	vbuf[VBUFLEN+1] ;
 	            while (rs >= 0) {
-	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
+	                vl = pcsconf_curenum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
 	                c += 1 ;
 	                debugprintf("main/procpcsconf: pair> %s=%r\n",
