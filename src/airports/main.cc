@@ -81,7 +81,7 @@
 *****************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) || defined(KSHBUILTIN)
 #undef	CF_SFIO
@@ -934,7 +934,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    slfname = argv[ai] ;
 	    BACLR(argpresent,ai) ;
-		pip->final.slfile = TRUE ;
+		pip->finval.slfile = TRUE ;
 	    break ;
 
 	} /* end for */
@@ -942,7 +942,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if (slfname == NULL) {
 
 	    if ((cp = getenv(VARSLFNAME)) != NULL) {
-		pip->final.slfile = TRUE ;
+		pip->finval.slfile = TRUE ;
 	        slfname = cp ;
 	    }
 
@@ -960,7 +960,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if (ddname == NULL) {
 
 	    if ((cp = getenv(VARDDNAME)) != NULL) {
-		pip->final.ddir = TRUE ;
+		pip->finval.ddir = TRUE ;
 	        ddname = cp ;
 	    }
 
