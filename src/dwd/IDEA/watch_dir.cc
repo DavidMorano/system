@@ -1,62 +1,59 @@
-/* watch_dir */
+/* watch_dir SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* watch the specified directory */
 /* version %I% last-modified %G% */
 
-
 #define	F_DEBUG		1
 #define	F_STALE		0
 
-
-/* revision history :
+/* revision history:
 
 	= 1991-09-10, Dave Morano
-
 	This program was originally written.
-
 
 */
 
-
 /*****************************************************************************
 
+	Description:
 	This subroutine is responsible for watching the specified
 	directory.
 
 	Arguments:
-
 	- slp	service table list pointer
 	- jlp	job table list pointer
 
 	Returns:
-
-	OK	doesn't really matter in the current implementation
-
+	OK	does not really matter in the current implementation
 
 *****************************************************************************/
 
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<sys/time.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<fcntl.h>
-#include	<csignal>
-#include	<time.h>
-#include	<climits>
-#include	<cstring>
-#include	<poll.h>
 #include	<dirent.h>
-
-#include	<bio.h>
+#include	<unistd.h>
+#include	<fcntl.h>
+#include	<poll.h>
+#include	<ctime>
+#include	<csignal>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<bfile.h>
 #include	<logfile.h>
 #include	<vecelem.h>
 #include	<vecstr.h>
 #include	<bitops.h>
-#include	<system.h>
+#include	<localmisc.h>
 
 #include	"misc.h"
 #include	"config.h"
