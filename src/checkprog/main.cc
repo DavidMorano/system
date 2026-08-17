@@ -67,18 +67,12 @@
 
 /* external subroutines */
 
-extern int	sfbasename(const char *,int,const char **) ;
-
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -262,7 +256,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	for (i = 0 ; i < ufi ; i += 1) {
 
-static int procfile(PROGINFO *pip,ARGINFO *aip,BITS *bop,ofn
+static int procfile(PROGINFO *pip,ARGINFO *aip,bits *bop,ofn
 
 static int procfile(PROGINFO *pip,cchar *fn)
 {
