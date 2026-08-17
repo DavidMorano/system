@@ -41,11 +41,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
 #include	<ctime>			/* CSTD */
 #include	<csignal>		/* CSTD */
 #include	<cstddef>		/* CSTD */
@@ -57,7 +57,6 @@
 #include	<ascii.h>		/* LIBU */
 #include	<uterm.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
-#include	<bfile.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<spawnproc.h>		/* LIBUC */
 #include	<keysym.h>		/* LIBUC */
@@ -67,13 +66,14 @@
 #include	<toxc.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
+#include	<termdisp.h>
 #include	<instr.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 #include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"defs.h"
-#include	"display.h"
 #include	"bbinter.h"
 #include	"mailmsgfile.h"
 #include	"mailmsgviewer.h"
@@ -533,7 +533,7 @@ int bbinter_start(BBINTER *iap,proginfo *pip) noex {
 	    }
 
 	    if ((rs >= 0) && (rs1 >= 0))
-		rs1 = permid(&pip->id,&sb,R_OK) ;
+		rs1 = permids(&pip->id,&sb,R_OK) ;
 
 #if	CF_KBDINFO
 	    if ((rs >= 0) && (rs1 >= 0)) {
@@ -2331,9 +2331,9 @@ int		mblen ;
 
 	f_access = ((rs1 >= 0) && S_ISREG(sb.st_mode)) ;
 	if (f_access) {
-	    rs1 = permid(&pip->id,&sb,(R_OK | W_OK)) ;
+	    rs1 = permids(&pip->id,&sb,(R_OK | W_OK)) ;
 	    if (rs1 == SR_ACCES) {
-	        rs1 = permid(&pip->id,&sb,(R_OK)) ;
+	        rs1 = permids(&pip->id,&sb,(R_OK)) ;
 	        f_readonly = (rs1 >= 0) ;
 	    }
 	    f_access = (rs1 >= 0) ;
