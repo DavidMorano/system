@@ -1,7 +1,19 @@
 #!/usr/extra/bin/ksh
 # RMDB
 
-PRS="/root[01]/usr/extra ${LOCAL}"
+: ${EXTRA:=/usr/extra}
+: ${USRLOCAL:=/usr/local}
+: ${LOCAL:=/opt/local}
+: ${GNU:=/opt/gnu}
+: ${NCMP:=/opt/ncmp}
+: ${PCS:=/opt/pcs}
+: ${AST:=/opt/ast}
+
+: ${LANG:="en_US.ISO8859-1"}
+: ${HOME:=$( ${LOCAL}/bin/userhome )}
+
+
+PRS="${EXTRA} ${LOCAL}"
 
 for PR in ${PRS} ; do
   VDIR=${PR}/var/bvses
