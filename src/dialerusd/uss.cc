@@ -1201,7 +1201,7 @@ static int subinfo_procopts(SUBINFO *sip,keyopt *kop)
 	    int		kl, vl ;
 	    cchar	*kp, *vp ;
 
-	    while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	    while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	        if ((oi = matostr(procopts,2,kp,kl)) >= 0) {
 
@@ -1444,7 +1444,7 @@ static int subinfo_dirok(SUBINFO *sip,cchar *d,int dlen)
 	    if ((rs = nulstr_start(&ss,d,dlen,&dnp)) >= 0) {
 	        if ((rs1 = u_stat(dnp,&sb)) >= 0) {
 	            if (S_ISDIR(sb.st_mode)) {
-	                rs1 = permid(&sip->id,&sb,(R_OK | X_OK)) ;
+	                rs1 = permids(&sip->id,&sb,(R_OK | X_OK)) ;
 	                f = (rs1 >= 0) ;
 	            }
 	        }
