@@ -33,7 +33,7 @@
 #include	<poll.h>
 #include	<termios.h>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 
 #include	<usystem.h>
