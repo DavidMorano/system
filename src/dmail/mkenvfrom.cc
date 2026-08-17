@@ -1,5 +1,5 @@
 /* mkenvfrom SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* create an environment FROM address */
 /* version %I% last-modified %G% */
@@ -38,7 +38,7 @@
 
 ******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
