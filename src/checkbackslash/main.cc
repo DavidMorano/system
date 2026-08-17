@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -53,11 +53,7 @@
 
 /* external subroutines */
 
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	progfile(PROGINFO *,PARAMOPT *,const char *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
+extern int	progfile(PROGINFO *,paramopt *,const char *) ;
 
 
 /* external variables */
@@ -113,7 +109,7 @@ enum options {
 int main(int argc,cchar *argv[],cchar *envv[])
 {
 	PROGINFO	pi, *pip = &pi ;
-	PARAMOPT	aparams ;
+	paramopt	aparams ;
 	bfile		errfile, *efp = &errfile ;
 	bfile		outfile, *ofp = &outfile ;
 
@@ -509,7 +505,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	} /* end if */
 
 	if ((rs = paramopt_havekey(&aparams,PO_OPTION)) > 0) {
-	    PARAMOPT_CUR	cur ;
+	    paramopt_cur	cur ;
 
 	    paramopt_curbegin(&aparams,&cur) ;
 
