@@ -1,61 +1,66 @@
-/* ussnls */
+/* ussnls HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* SYSDIALER "ussnls" dialer */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-11-04, David A­D­ Morano
+	This was created as one of the first dialer modules for the
+	SYSDIALER object.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	USSNLS_INCLUDE
-#define	USSNLS_INCLUDE	1
+#define	USSNLS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<logfile.h>
-#include	<localmisc.h>
-
-#include	"sysdialer.h"
+#include	<sysdialer.h>
 
 
-#define	USSNLS_MAGIC		31415926
 #define	USSNLS			struct ussnls_head
 #define	USSNLS_FL		struct ussnls_flags
+#define	USSNLS_MAGIC		31415926
 
 
 struct ussnls_flags {
 	uint		log:1 ;
-
-} ;
+} ; /* end struct */
 
 struct ussnls_head {
+	logfile		lh ;
+	USSNLS_FL	fl, open ;
 	uint		magic ;
-	LOGFILE		lh ;
-	USSNLS_FL	f, open ;
 	int		tlen ;
 	int		fd ;
-} ;
+} ; /* end struct */
 
-
-#if	(! defined(USSNLS_MASTER)) || (USSNLS_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
 extern int ussnls_open(USSNLS *,SYSDIALER_ARGS *,
-		const char *,const char *,const char **) ;
-extern int ussnls_reade(USSNLS *,char *,int,int,int) ;
-extern int ussnls_recve(USSNLS *,char *,int,int,int,int) ;
-extern int ussnls_recvfrome(USSNLS *,char *,int,int,void *,int *,int,int) ;
-extern int ussnls_recvmsge(USSNLS *,struct msghdr *,int,int,int) ;
-extern int ussnls_write(USSNLS *,const char *,int) ;
-extern int ussnls_send(USSNLS *,const char *,int,int) ;
-extern int ussnls_sendto(USSNLS *,const char *,int,int,void *,int) ;
-extern int ussnls_sendmsg(USSNLS *,struct msghdr *,int) ;
-extern int ussnls_shutdown(USSNLS *,int) ;
-extern int ussnls_close(USSNLS *) ;
+		cchar *,cchar *,cchar **) noex ;
+extern int ussnls_reade(USSNLS *,char *,int,int,int) noex ;
+extern int ussnls_recve(USSNLS *,char *,int,int,int,int) noex ;
+extern int ussnls_recvfrome(USSNLS *,char *,int,int,void *,int *,int,int) noex ;
+extern int ussnls_recvmsge(USSNLS *,MSGHDR *,int,int,int) noex ;
+extern int ussnls_write(USSNLS *,cchar *,int) noex ;
+extern int ussnls_send(USSNLS *,cchar *,int,int) noex ;
+extern int ussnls_sendto(USSNLS *,cchar *,int,int,void *,int) noex ;
+extern int ussnls_sendmsg(USSNLS *,MSGHDR *,int) noex ;
+extern int ussnls_shutdown(USSNLS *,int) noex ;
+extern int ussnls_close(USSNLS *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* USSNLS_MASTER */
 
 #endif /* USSNLS_INCLUDE */
 
