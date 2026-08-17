@@ -2,6 +2,18 @@
 /* charset=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
+/* USSINFO helper object */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2003-11-04, David A­D­ Morano
+	This is a helper object for the various USS-type SYSDIALERs.
+
+*/
+
+/* Copyright © 2003 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	USSINFO_INCLUDE
 #define	USSINFO_INCLUDE
@@ -9,13 +21,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<expcook.h>
 #include	<userinfo.h>
 #include	<keyopt.h>
-
-#include	"sysdialer.h"
+#include	<sysdialer.h>
 
 
 #define	USSINFO		struct ussinfo_head
@@ -30,18 +43,18 @@ struct ussinfo_flags {
 	uint		userinfo:1 ;
 	uint		ignore:1 ;
 	uint		log:1 ;
-} ;
+} ; /* end struct */
 
 struct ussinfo_allocs {
 	cchar		*node ;
 	cchar		*svc ;
 	cchar		*pr ;
 	cchar		*portspec ;
-} ;
+} ; /* end struct */
 
 struct ussinfo_head {
-	cchar		**argv ;
-	cchar		**envv ;
+	mainv		argv ;
+	mainv		envv ;
 	cchar		*pr ;
 	cchar		*prn ;
 	cchar		*searchname ;
@@ -85,7 +98,7 @@ struct ussinfo_head {
 	vecstr		stores ;
 	userinfo	u ;
 	USSINFO_A	a ;
-	USSINFO_FL	f, init, open ;
+	USSINFO_FL	fl, init, open ;
 	uid_t		uid ;
 	gid_t		gid ;
 	int		argc ;
@@ -93,9 +106,9 @@ struct ussinfo_head {
 	int		ncpu ;
 	int		af ;
 	int		to ;
-} ;
+} ; /* end struct */
 
-typedef	USSIFO		ussifo ;
+typedef	USSINFO		ussinfo ;
 
 EXTERNC_begin
 
