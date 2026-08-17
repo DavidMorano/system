@@ -35,26 +35,28 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<getfiledirs.h>
-#include	<ctdec.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<logfile.h>
-#include	<vecitem.h>
-#include	<vecstr.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<getfiledirs.h>		/* LIBUC */
+#include	<getprogpath.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<vecitem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
+#include	<srvtab.h>		/* LIBDAM */
 
 #include	"config.h"
 #include	"defs.h"
-#include	"srvtab.h"
 #include	"job.h"
 
 
@@ -75,27 +77,14 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	prgetprogpath(const char *,char *,const char *,int) ;
-extern int	findfilepath(const char *,char *,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strbasename(char *) ;
-
 
 /* externals variables */
 
 
 /* forward references */
 
-static int	processargs() ;
-static int	expand() ;
+local int	processargs() ;
+local int	expand() ;
 
 
 /* local structures */
@@ -893,7 +882,7 @@ struct jobentry	**jepp ;
 
 
 /* process an argument list */
-static int processargs(pip,alp,command,sp)
+local int processargs(pip,alp,command,sp)
 struct proginfo	*pip ;
 vecstr		*alp ;
 const char		command[] ;
@@ -973,7 +962,7 @@ done:
 #
 */
 
-static int expand(pip,buf,len,sep,rbuf,rlen)
+local int expand(pip,buf,len,sep,rbuf,rlen)
 struct proginfo		*pip ;
 char			rbuf[], buf[] ;
 int			rlen, len ;
