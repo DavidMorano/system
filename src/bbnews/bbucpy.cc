@@ -1,6 +1,9 @@
-/* bbucpy */
+/* bbucpy SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* copy a string substituting slashes for where ever we find periods */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,17 +21,20 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
-#include	<localmisc.h>
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int bbucpy(char *d,cchar *s)
-{
+int bbucpy(char *d,cchar *s) noex {
 	char		*dp = d ;
-
 	while (*s) {
 	    if (*s == '.') {
 	        *dp++ = '/' ;
@@ -37,10 +43,8 @@ int bbucpy(char *d,cchar *s)
 	        *dp++ = *s++ ;
 	    }
 	} /* end while */
-
 	*dp++ = '\0' ;
 	return (dp - s) ;
-}
-/* end subroutine (bbcpy) */
+} /* end subroutine (bbcpy) */
 
 
