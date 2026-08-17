@@ -38,7 +38,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctype.h>
-#include	<time.h>
+#include	<ctime>
 #include	<netdb.h>
 
 #include	<usystem.h>
@@ -358,9 +358,9 @@ ret0:
 int progconfigread(pip)
 struct proginfo	*pip ;
 {
-	PARAMFILE_CUR	cur ;
+	paramfile_cur	cur ;
 
-	PARAMFILE_ENT		pe ;
+	paramfile_ent		pe ;
 
 	vecobj	tmplistens ;
 
@@ -451,7 +451,7 @@ struct proginfo	*pip ;
 	    switch (pi) {
 
 	    case param_logsize:
-	        if ((elen > 0) && (! pip->final.logsize)) {
+	        if ((elen > 0) && (! pip->finval.logsize)) {
 	            rs1 = cfdecmfi(ebuf,el,&v) ;
 	            if ((rs1 >= 0) && (v >= 0)) {
 	                pip->have.logsize = TRUE ;
@@ -476,7 +476,7 @@ struct proginfo	*pip ;
 	            switch (pi) {
 
 	            case param_pollint:
-	                if (! pip->final.intpoll) {
+	                if (! pip->finval.intpoll) {
 	                    pip->have.intpoll = TRUE ;
 	                    pip->changed.intpoll = TRUE ;
 	                    pip->intpoll = v ;
@@ -484,7 +484,7 @@ struct proginfo	*pip ;
 	                break ;
 
 	            case param_lockint:
-	                if (! pip->final.intlock) {
+	                if (! pip->finval.intlock) {
 	                    pip->have.intlock = TRUE ;
 	                    pip->changed.intlock = TRUE ;
 	                    pip->intlock = v ;
@@ -492,7 +492,7 @@ struct proginfo	*pip ;
 	                break ;
 
 	            case param_markint:
-	                if (! pip->final.intmark) {
+	                if (! pip->finval.intmark) {
 	                    pip->have.intmark = TRUE ;
 	                    pip->changed.intmark = TRUE ;
 	                    pip->intmark = v ;
@@ -500,7 +500,7 @@ struct proginfo	*pip ;
 	                break ;
 
 	            case param_runint:
-	                if (! pip->final.intrun) {
+	                if (! pip->finval.intrun) {
 	                    pip->have.intrun = TRUE ;
 	                    pip->changed.intrun = TRUE ;
 	                    pip->intrun = v ;
@@ -508,7 +508,7 @@ struct proginfo	*pip ;
 	                break ;
 
 	            case param_torecvfd:
-	                if (! pip->final.torecvfd) {
+	                if (! pip->finval.torecvfd) {
 	                    pip->have.torecvfd = TRUE ;
 	                    pip->changed.torecvfd = TRUE ;
 	                    pip->to_recvfd = v ;
@@ -516,7 +516,7 @@ struct proginfo	*pip ;
 	                break ;
 
 	            case param_tosendfd:
-	                if (! pip->final.tosendfd) {
+	                if (! pip->finval.tosendfd) {
 	                    pip->have.tosendfd = TRUE ;
 	                    pip->changed.tosendfd = TRUE ;
 	                    pip->to_sendfd = v ;
@@ -530,7 +530,7 @@ struct proginfo	*pip ;
 	        break ;
 
 	    case param_reqfile:
-	        if (! pip->final.reqfile) {
+	        if (! pip->finval.reqfile) {
 	            char	dname[MAXPATHLEN + 1] ;
 	            pip->have.reqfile = TRUE ;
 	            mkpath2(dname,VARDNAME,pip->searchname) ;
@@ -547,7 +547,7 @@ struct proginfo	*pip ;
 	        break ;
 
 	    case param_pidfile:
-	        if (! pip->final.pidfile) {
+	        if (! pip->finval.pidfile) {
 	            pip->have.pidfile = TRUE ;
 	            tl = setfname(pip,tmpfname,ebuf,el,TRUE,
 	                RUNDNAME,pip->nodename,pip->searchname) ;
@@ -562,7 +562,7 @@ struct proginfo	*pip ;
 	        break ;
 
 	    case param_logfile:
-	        if (! pip->final.logfile) {
+	        if (! pip->finval.logfile) {
 	            pip->have.logfile = TRUE ;
 	            tl = setfname(pip,tmpfname,ebuf,el,TRUE,
 	                LOGDNAME,pip->searchname,"") ;
@@ -578,7 +578,7 @@ struct proginfo	*pip ;
 	        break ;
 
 	    case param_svcfile:
-	        if (! pip->final.svcfile) {
+	        if (! pip->finval.svcfile) {
 	            pip->have.svcfile = TRUE ;
 	            tl = setfname(pip,tmpfname,ebuf,el,TRUE,
 	                ETCDNAME,pip->searchname,SVCFEXT) ;
@@ -594,7 +594,7 @@ struct proginfo	*pip ;
 	        break ;
 
 	    case param_accfile:
-	        if (! pip->final.accfile) {
+	        if (! pip->finval.accfile) {
 	            pip->have.accfile = TRUE ;
 	            tl = setfname(pip,tmpfname,ebuf,el,TRUE,
 	                ETCDNAME,pip->searchname,"") ;
@@ -610,7 +610,7 @@ struct proginfo	*pip ;
 		break ;
 
 	    case param_passfile:
-	        if (! pip->final.passfile) {
+	        if (! pip->finval.passfile) {
 	            pip->have.passfile = TRUE ;
 	            tl = setfname(pip,tmpfname,ebuf,el,TRUE,
 	                ETCDNAME,pip->searchname,"") ;
@@ -626,7 +626,7 @@ struct proginfo	*pip ;
 	        break ;
 
 	    case param_usersrv:
-	        if (! pip->final.usersrv) {
+	        if (! pip->finval.usersrv) {
 	            pip->have.usersrv = TRUE ;
 	            f = (pip->usersrv == NULL) ;
 	            f = f || (strwcmp(pip->usersrv,ep,el) != 0) ;
@@ -640,7 +640,7 @@ struct proginfo	*pip ;
 	        break ;
 
 	    case param_stampdir:
-	        if (! pip->final.stampdir) {
+	        if (! pip->finval.stampdir) {
 	            pip->have.stampdir = TRUE ;
 	            tl = setfname(pip,tmpfname,ebuf,el,TRUE,
 	                VARDNAME,STAMPDNAME,"") ;
