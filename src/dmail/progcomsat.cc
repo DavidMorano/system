@@ -447,7 +447,7 @@ static int rmtabnodes(PROGINFO *pip,vecstr *nlp)
 
 	        while (rs >= 0) {
 
-	            hl = kvsfile_enumkey(&info,&cur,hbuf,hlen) ;
+	            hl = kvsfile_curenumkey(&info,&cur,hbuf,hlen) ;
 	            if (hl == SR_NOTFOUND) break ;
 	            rs = hl ;
 
