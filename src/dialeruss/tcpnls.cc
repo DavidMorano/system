@@ -1,17 +1,18 @@
-/* tcpnls */
+/* tcpnls SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* SYSDIALER "tcpnls" dialer */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SOLARISBUG	1		/* bad bug in Solaris TLI */
 
-
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-        This was created as one of the first dialer modules for the SYSDIALER
-        object.
+	This was created as one of the first dialer modules for the
+	SYSDIALER object.
 
 */
 
@@ -19,37 +20,33 @@
 
 /*******************************************************************************
 
+  	Name:
+
+	Descrption:
 	This is a SYSDIALER module.
 
 	Synopsis:
-
 	tcpnls [[<host>:]<port>] [-f <af>]
 
 	Arguments:
-
-	host		override hostname
+	host		hostname
 	port		service port
 	af		address family
 
-
 *******************************************************************************/
 
-
-#define	TCPNLS_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<localmisc.h>
 
@@ -82,17 +79,6 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	getpwd(char *,int) ;
-extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;
-extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-extern int	isdigitlatin(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-
 
 /* external variables */
 
@@ -100,7 +86,7 @@ extern char	*strwcpy(char *,cchar *,int) ;
 /* local structures */
 
 struct afamily {
-	const char	*name ;
+	cchar	*name ;
 	int		af ;
 } ;
 
@@ -121,7 +107,7 @@ SYSDIALER_INFO	tcpnls = {
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"af",
 	NULL
@@ -149,17 +135,17 @@ static const struct afamily	afs[] = {
 int tcpnls_open(op,ap,hostname,svcname,av)
 TCPNLS		*op ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
-const char	*av[] ;
+cchar	hostname[] ;
+cchar	svcname[] ;
+cchar	*av[] ;
 {
 	int		rs = SR_OK ;
 	int		to = -1 ;
 	int		af = 0 ;
 	int		opts = 0 ;
-	const char	*portname = TCPNLS_PORTNAME ;
-	const char	*pr = NULL ;
-	const char	*tp ;
+	cchar	*portname = TCPNLS_PORTNAME ;
+	cchar	*pr = NULL ;
+	cchar	*tp ;
 	char		hostnamebuf[MAXHOSTNAMELEN + 1] ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -178,11 +164,11 @@ const char	*av[] ;
 	    int	f_optminus, f_optplus, f_optequal ;
 	    int	f_bad = FALSE ;
 
-	    const char	**argv, *argp, *aop, *avp ;
-	    const char	*argval = NULL ;
+	    cchar	**argv, *argp, *aop, *avp ;
+	    cchar	*argval = NULL ;
 	    char	argpresent[NARGPRESENT] ;
-	    const char	*afspec = NULL ;
-	    const char	*hostspec = NULL ;
+	    cchar	*afspec = NULL ;
+	    cchar	*hostspec = NULL ;
 
 #if	CF_DEBUGS
 	    debugprintf("tcpnls_open: arguments\n") ;
@@ -594,7 +580,7 @@ int		to, opts ;
 
 int tcpnls_recvmsge(op,msgp,flags,to,opts)
 TCPNLS		*op ;
-struct msghdr	*msgp ;
+MSGHDR	*msgp ;
 int		flags ;
 int		to, opts ;
 {
@@ -615,7 +601,7 @@ int		to, opts ;
 
 int tcpnls_write(op,buf,buflen)
 TCPNLS		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int	rs ;
@@ -635,7 +621,7 @@ int		buflen ;
 
 int tcpnls_send(op,buf,buflen,flags)
 TCPNLS		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 int		flags ;
 {
@@ -653,10 +639,9 @@ int		flags ;
 	return rs ;
 }
 
-
 int tcpnls_sendto(op,buf,buflen,flags,sap,salen)
 TCPNLS		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 int		flags ;
 void		*sap ;
@@ -679,7 +664,7 @@ int		salen ;
 
 int tcpnls_sendmsg(op,msgp,flags)
 TCPNLS		*op ;
-struct msghdr	*msgp ;
+MSGHDR	*msgp ;
 int		flags ;
 {
 	int	rs ;
