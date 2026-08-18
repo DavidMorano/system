@@ -19,23 +19,20 @@
 
 /*****************************************************************************
 
-        This is the 'main' module for the MKTAGPRINT program. This program reads
-        tags and prints out the associated original text with possibly some
-        minor formatting.
-
+	This is the 'main' module for the MKTAGPRINT program. This
+	program reads tags and prints out the associated original
+	text with possibly some minor formatting.
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -60,20 +57,6 @@
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int,int *) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
-			const char *,const char *) ;
-
 extern int	expander() ;
 
 extern int	printhelp(void *,const char *,const char *,const char *) ;
@@ -81,10 +64,6 @@ extern int	proginfo_setpiv(struct proginfo *,const char *,
 			const struct pivars *) ;
 extern int	mktagprint(struct proginfo *,struct arginfo *,
 			const char *,const char *,const char *) ;
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* externals variables */
