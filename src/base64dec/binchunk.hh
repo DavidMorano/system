@@ -39,10 +39,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	BINCHUNK_NENTS		64	/* starting number entries */
@@ -78,11 +78,11 @@ class binchunk {
 	int8_t		*binbuf ;
 	int		ql ;		/* queue length */
 	int		qe ;		/* queue extent */
-	int istart() noex ;
-	int ifinish() noex ;
-	int ireset() noex ;
-	int iextend(int) noex ;
-	void dtor() noex ;
+	int istart	() noex ;
+	int ifinish	() noex ;
+	int ireset	() noex ;
+	int iextend	(int) noex ;
+	void dtor	() noex ;
     public:
 	binchunk() noex ;
 	binchunk(const binchunk &) = delete ;
