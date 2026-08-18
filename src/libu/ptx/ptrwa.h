@@ -49,19 +49,19 @@ struct ptrwa : pthread_rwlockattr_t {
 	ptrwa_co	create ;
 	ptrwa_co	destroy ;
 	ptrwa_co	setpshared ;
-	uint		magic ;
+	uint		magval ;
 	constexpr ptrwa() noex {
 	    create	(this,ptrwamem_create) ;
 	    destroy	(this,ptrwamem_destroy) ;
 	    setpshared	(this,ptrwamem_setpshared) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	ptrwa(const ptrwa &) = delete ;
 	ptrwa &operator = (const ptrwa &) = delete ;
 	int getpshared(int *) noex ;
 	void dtor() noex ;
 	destruct ptrwa() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ; /* end dtor (ptrwa) */
 } ; /* end class (ptrwa) */
 #else
