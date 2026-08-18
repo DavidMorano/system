@@ -10,10 +10,10 @@
 */
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 
 #include	<bfile.h>
 #include	<localmisc.h>
