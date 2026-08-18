@@ -32,6 +32,7 @@
 #include	<intfloor.h>
 #include	<intrem.h>
 #include	<intsat.h>
+#include	<intcmp.h>
 
 
 #endif /* INTX_INCLUDE */
