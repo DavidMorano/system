@@ -97,7 +97,7 @@ local bool	isnotempry(int) noex ;
 
 bool hasnotdots(cchar *sp,int µsl) noex {
 	bool		f = true ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
+	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    if (sp[0] == '.') {
 		switch (sl) {
 		case 1:
