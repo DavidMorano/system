@@ -45,21 +45,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"lockrw.h"
 
@@ -68,8 +65,6 @@
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -83,17 +78,18 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 local inline int lockrw_ctor(lockrw *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->readers = 0 ;
 	    op->writers = 0 ;
 	    op->waitwriters = 0 ;
 	    op->waitreaders = 0 ;
 	    op->cvp = nullptr ;
-	    if ((op->mxp = new(nothrow) ptm) != np) ylikely {
-	        if ((op->cvp = new(nothrow) ptc) != np) ylikely {
+	    if ((op->mxp = new(nt) ptm) != np) ylikely {
+	        if ((op->cvp = new(nt) ptc) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-ptc) */
 	 	if (rs < 0) {
@@ -110,11 +106,11 @@ local int lockrw_dtor(lockrw *op) noex {
 	if (op->cvp) ylikely {
 	    delete op->cvp ;
 	    op->cvp = nullptr ;
-	}
+	} /* end if (delete-ptc) */
 	if (op->mxp) ylikely {
 	    delete op->mxp ;
 	    op->mxp = nullptr ;
-	}
+	} /* end if (delete-ptm) */
 	return rs ;
 } /* end subroutine (lockrw_dtor) */
 
@@ -122,7 +118,7 @@ template<typename ... Args>
 local inline int lockrw_magic(lockrw *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LOCKRW_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LOCKRW_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (lockrw_magic) */
@@ -145,7 +141,7 @@ int lockrw_create(lockrw *op,int f_shared) noex {
 	if ((rs = lockrw_ctor(op)) >= 0) ylikely {
 	    if ((rs = lockrw_ptminit(op,f_shared)) >= 0) ylikely {
 	        if ((rs = lockrw_ptcinit(op,f_shared)) >= 0) ylikely {
-		    op->magic = LOCKRW_MAGIC ;
+		    op->magval = LOCKRW_MAGIC ;
 		}
 	        if (rs < 0) {
 		    ptm *mxp = op->mxp ;
@@ -154,7 +150,7 @@ int lockrw_create(lockrw *op,int f_shared) noex {
 	    } /* end if (PTM created) */
 	    if (rs < 0) {
 		lockrw_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (lockrw_ctor) */
 	return rs ;
 } /* end subroutine (lockrw_create) */
@@ -167,17 +163,17 @@ int lockrw_destroy(lockrw *op) noex {
 		ptc *cvp = op->cvp ;
 	        rs1 = cvp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if */
 	    if (op->mxp) ylikely {
 		ptm *mxp = op->mxp ;
 	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if */
 	    {
 		rs1 = lockrw_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (lockrw_destroy) */
@@ -239,7 +235,7 @@ int lockrw_wrlock(lockrw *op,int to) noex {
 	        } /* end while */
 	        if (rs >= 0) {
 		    op->writers += 1 ;
-		}
+		} /* end if (ok) */
 	        op->waitwriters -= 1 ;
 	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
@@ -297,7 +293,7 @@ local int lockrw_ptminit(lockrw *op,int f_shared) noex {
 		cint	v = PTHREAD_PROCESS_SHARED ;
 		rs = ptma_setpshared(&a,v) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = mxp->create(&a) ;
 		f_ptm = (rs >= 0) ;
 	    }
@@ -305,7 +301,7 @@ local int lockrw_ptminit(lockrw *op,int f_shared) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_ptm) {
 		mxp->destroy() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ptma) */
 	return rs ;
 } /* end subroutine (lockrw_ptminit) */
@@ -323,12 +319,12 @@ local int lockrw_ptcinit(lockrw *op,int f_shared) noex {
 	    if (rs >= 0) ylikely {
 	        rs = cvp->create(&a) ;
 		f_ptc = (rs >= 0) ;
-	    }
+	    } /* end if (ok) */
 	    rs1 = ptca_destroy(&a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_ptc) {
 		cvp->destroy() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ptca) */
 	return rs ;
 } /* end subroutine (lockrw_ptcinit) */
