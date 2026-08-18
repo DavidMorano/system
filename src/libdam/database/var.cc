@@ -363,7 +363,7 @@ int var_curenum(var *op,var_cur *curp,char *kbuf,int klen,
 } /* end subroutine (var_curenum) */
 
 int var_fetch(var *op,cc *kp,int kl,var_cur *curp,char *vbuf,int vlen) noex {
-	int		rs = SR_NOSYS ;
+	int		rs ;
 	if ((rs = var_magic(op,curp,kp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if ((curp->magval == VAR_MAGIC) && curp->scp) ylikely {
