@@ -26,20 +26,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<pthread.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<numeric>		/* |mul_sat(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>		/* |POLL_INTMULT| */
-#include	<usyscalls.h>		/* |um(3u)| */
-#include	<usupport.h>		/* |msleep(3u)| */
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<pthread.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<numeric>		/* C++STD |mul_sat(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU |POLL_INTMULT| */
+#include	<usyscalls.h>		/* LIBU |um(3u)| */
+#include	<usupport.h>		/* LIBU |msleep(3u)| */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
-#include	"ptm.h"
 #include	"ptma.h"
+#include	"ptm.h"
 
 
 /* local defines */
@@ -212,8 +212,7 @@ int ptm_lockend(ptm *op) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptm_lockend) */
+} /* end subroutine (ptm_lockend) */
 
 
 /* local subroutines */
@@ -257,7 +256,7 @@ int ucptm::operator () (ptm *op) noex {
 
 int ucptm::create(ptm *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    if ((rs = pthread_mutex_init(op,ap)) > 0) {
 	        rs = (- rs) ;
 	    } else if (rs < 0) {
