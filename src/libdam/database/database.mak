@@ -40,31 +40,34 @@ MODS +=
 LIBS +=
 
 
-OBJ0= babieshdr.o babycalc.o babycalcs.o
-OBJ1= bpihdr.o bvihdr.o bvshdr.o
-OBJ2= cmi.o cmihdr.o 
-OBJ3= commandment.o commandments.o
-OBJ4= msfile.o msfile_best.o msfilee.o
-OBJ5= cyihdr.o pwi.o pwihdr.o
-OBJ6= uuname.o uunames.o
-OBJ7= var.o varhdr.o varmk.o varmks.o vars.o
+OBJ00= babieshdr.o babycalc.o babycalcs.o
+OBJ01= calmgr.o
+OBJ02= cmi.o cmihdr.o 
+OBJ03= commandment.o commandments.o
+OBJ04= ttihdr.o
+OBJ05= pwi.o pwihdr.o
+OBJ06= uuname.o uunames.o
+OBJ07= var.o varhdr.o varmk.o varmks.o vars.o
 
-OBJ8= votdchdr.o votdshdr.o
-OBJ9= ttihdr.o
-OBJ10= calyear.o
+OBJ08= calent.o calcite.o
+OBJ09= calyear.o calyears.o
+OBJ10= cyihdr.o cyimk.o
+OBJ11=
+OBJ12=
+OBJ13=
+OBJ14=
+OBJ15=
 
-
-OBJA= obj0.o obj1.o obj2.o obj3.o 
-OBJB= obj4.o obj5.o obj6.o obj7.o
-OBJC= obj8.o obj9.o obj10.o
+OBJA= obj00.o obj01.o obj02.o obj03.o 
+OBJB= obj04.o obj05.o obj06.o obj07.o
+OBJC= obj08.o obj09.o obj10.o
+OBJD= obj12.o obj13.o obj14.o obj15.o
 
 OBJ= $(OBJA) $(OBJB) $(OBJC)
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -126,35 +129,35 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:			$(OBJ0)
+obj00.o:		$(OBJ00)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1.o:			$(OBJ1)
+obj01.o:		$(OBJ01)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2.o:			$(OBJ2)
+obj02.o:		$(OBJ02)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3.o:			$(OBJ3)
+obj03.o:		$(OBJ03)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj4.o:			$(OBJ4)
+obj04.o:		$(OBJ04)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj5.o:			$(OBJ5)
+obj05.o:		$(OBJ05)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj6.o:			$(OBJ6)
+obj06.o:		$(OBJ06)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj7.o:			$(OBJ7)
+obj07.o:		$(OBJ07)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obj8.o:			$(OBJ8)
+obj08.o:		$(OBJ08)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj9.o:			$(OBJ9)
+obj09.o:		$(OBJ09)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj10.o:		$(OBJ10)
@@ -173,24 +176,23 @@ objb.o:		$(OBJB)
 objc.o:		$(OBJC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objd.o:		$(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 babieshdr.o:		babieshdr.cc babieshdr.h	$(INCS)
 babycalc.o:		babycalc.cc babycalc.h		$(INCS)
 babycalcs.o:		babycalcs.cc babycalcs.h	$(INCS)
-bvcitekey.o:		bvcitekey.cc bvcitekey.h	$(INCS)
-bpihdr.o:		bpihdr.cc bpihdr.h		$(INCS)
-bvihdr.o:		bvihdr.cc bvihdr.h		$(INCS)
-bvshdr.o:		bvshdr.cc bvshdr.h		$(INCS)
+
 commandment.o:		commandment.cc commandment.h	$(INCS)
 commandments.o:		commandments.cc commandments.h	$(INCS)
-cyihdr.o:		cyihdr.cc cyihdr.h		$(INCS)
-msfile.o:		msfile.cc msfile.h		$(INCS)
-msfile_best.o:		msfile_best.cc msfile.h		$(INCS)
-msfilee.o:		msfilee.cc msfilee.h		$(INCS)
+
 pwi.o:			pwi.cc pwi.h			$(INCS)
 pwihdr.o:		pwihdr.cc pwihdr.h		$(INCS)
+
 uuname.o:		uuname.cc uuname.h		$(INCS)
 uunames.o:		uunames.cc uunames.h		$(INCS)
+
 var.o:			var.cc var.h			$(INCS)
 varhdr.o:		varhdr.cc varhdr.h		$(INCS)
 varmk.o:		varmk.cc varmk.h		$(INCS)
@@ -200,11 +202,17 @@ votdchdr.o:		votdchdr.cc votdchdr.h		$(INCS)
 votdshdr.o:		votdshdr.cc votdshdr.h		$(INCS)
 ttihdr.o:		ttihdr.cc ttihdr.h		$(INCS)
 
+cyi.o:			cyi.cc		cyi.h				$(INCS)
+cyimk.o:		cyimk.cc	cyimk.h				$(INCS)
+cyihdr.o:		cyihdr.cc	cyihdr.h			$(INCS)
+
 cmi.o:			cmi.cc		cmi.h cmihdr.h			$(INCS)
 cmimk.o:		cmimk.cc	cmimk.h cmihdr.h		$(INCS)
 cmihdr.o:		cmihdr.cc	cmihdr.h			$(INCS)
 
 calmgr.o:		calmgr.cc	calmgr.h			$(INCS)
+calent.o:		calent.cc	calent.h			$(INCS)
+calcite.o:		calcite.cc	calcite.h			$(INCS)
 
 calyear.o:		calyear.cc	calyear.h calyears.h		$(INCS)
 calyears.o:		calyears.cc	calyears.h			$(INCS)
