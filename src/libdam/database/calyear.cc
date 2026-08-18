@@ -161,7 +161,7 @@ local int calyear_dtor(calyear *op) noex {
 } /* end subroutine (calyear_dtor) */
 
 template<typename ... Args>
-local inline int calyear_magic(calyear *op,Args ... args) noex {
+local inline int calyear_magic(con calyear *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magval == CALYEAR_MAGIC) ? SR_OK : SR_NOTOPEN ;
