@@ -71,9 +71,9 @@ struct calyears_head {
 	uint		magval ;
 	int		nentries ;
 	int		ncursors ;
-	int		year ;			/* current year */
 	int		isdst ;			/* current is-dst */
 	int		gmtoff ;		/* current offset from GMT */
+	ushort		year ;			/* current year */
 } ; /* end struct */
 
 typedef	CALYEARS	calyears ;
