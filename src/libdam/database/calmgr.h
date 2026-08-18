@@ -34,6 +34,7 @@
 #define	CALMGR_Q	calcite
 #define	CALMGR_FL	struct calmgr_flags
 #define	CALMGR_CUR	struct calmgr_cursor
+#define	CALMGR_ENT	calent
 #define	CALMGR_MAGIC	0x15712543
 
 
@@ -71,16 +72,18 @@ typedef CALMGR		calmgr ;
 typedef	CALMGR_FL	calmgr_fl ;
 typedef	CALMGR_Q	calmgr_q ;
 typedef CALMGR_CUR	calmgr_cur ;
+typedef CALMGR_ENT	calmgr_ent ;
 
 EXTERNC_begin
 
 extern int calmgr_start		(calmgr *,calyears *,int,cchar *,cchar *) noex ;
 extern int calmgr_finish	(calmgr *) noex ;
-extern int calmgr_lookup	(calmgr *,vecobj *,calcite *) noex ;
+extern int calmgr_lookup	(calmgr *,vecobj *,con calmgr_q *) noex ;
 extern int calmgr_gethash	(calmgr *,calent *,uint *) noex ;
 extern int calmgr_getci		(calmgr *) noex ;
 extern int calmgr_getbase	(calmgr *,cchar **) noex ;
-extern int calmgr_loadbuf	(calmgr *,char *,int,calent *) noex ;
+extern int calmgr_loadbuf	(calmgr *,char *,int,
+					calmgr_ent *) noex ;
 extern int calmgr_audit		(calmgr *) noex ;
 
 EXTERNC_end
