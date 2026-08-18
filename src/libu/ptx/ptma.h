@@ -45,6 +45,9 @@ struct ptma_co {
             w = m ;
         } ;
         int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () (0) ;
+	} ;
 } ; /* end struct (ptma_co) */
 struct ptma : pthread_mutexattr_t {
 	ptma_co		create ;
@@ -54,7 +57,7 @@ struct ptma : pthread_mutexattr_t {
 	ptma_co		setpshared ;
 	ptma_co		setrobustnp ;
 	ptma_co		settype ;
-	uint		magic ;
+	uint		magval ;
 	constexpr ptma() noex {
 	    create	(this,ptmamem_create) ;
 	    destroy	(this,ptmamem_destroy) ;
@@ -63,7 +66,7 @@ struct ptma : pthread_mutexattr_t {
 	    setpshared	(this,ptmamem_setpshared) ;
 	    setrobustnp	(this,ptmamem_setrobustnp) ;
 	    settype	(this,ptmamem_settype) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	ptma(const ptma &) = delete ;
 	ptma &operator = (const ptma &) = delete ;
@@ -74,7 +77,7 @@ struct ptma : pthread_mutexattr_t {
 	int gettype	(int *) noex ;
 	void dtor() noex ;
 	destruct ptma() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ; /* end dtor (ptma) */
 } ; /* end class (ptma) */
 #else
