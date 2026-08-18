@@ -33,14 +33,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<pthread.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<pthread.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ptrwa.h"
 
@@ -99,8 +99,7 @@ int ptrwa_create(ptrwa *op) noex {
 	    } until ((rs >= 0) || r.fexit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptrwa_create) */
+} /* end subroutine (ptrwa_create) */
 
 int ptrwa_destroy(ptrwa *op) noex {
 	int		rs = SR_FAULT ;
@@ -112,8 +111,7 @@ int ptrwa_destroy(ptrwa *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (ptrwa_destroy) */
+} /* end subroutine (ptrwa_destroy) */
 
 int ptrwa_getpshared(ptrwa *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
@@ -125,8 +123,7 @@ int ptrwa_getpshared(ptrwa *op,int *oldp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (ptrwa_getpshared) */
+} /* end subroutine (ptrwa_getpshared) */
 
 int ptrwa_setpshared(ptrwa *op,int fl) noex {
 	int		rs = SR_FAULT ;
@@ -139,8 +136,7 @@ int ptrwa_setpshared(ptrwa *op,int fl) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (ptrwa_setpshared) */
+} /* end subroutine (ptrwa_setpshared) */
 
 int ptrwa::getpshared(int *rp) noex {
     	return ptrwa_getpshared(this,rp) ;
@@ -158,12 +154,12 @@ int ptrwa_co::operator () (int a) noex {
 	    switch (w) {
 	    case ptrwamem_create:
 	        if ((rs = ptrwa_create(op)) >= 0) ylikely {
-		    op->magic = PTRWA_MAGIC ;
+		    op->magval = PTRWA_MAGIC ;
 		}
 	        break ;
 	    case ptrwamem_destroy:
 	        rs = ptrwa_destroy(op) ;
-		op->magic = 0 ;
+		op->magval = 0 ;
 	        break ;
 	    case ptrwamem_setpshared:
 	        rs = ptrwa_setpshared(op,a) ;
