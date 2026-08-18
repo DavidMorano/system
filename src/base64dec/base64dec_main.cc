@@ -44,11 +44,11 @@
 #include	<ccfile.hh>
 #include	<bufos.hh>
 #include	<rmx.h>			/* |rmeol(3uc)| */
-#include	<strnul.hh>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<strnul.hh>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU debugging */
 #include	<libdebug.h>		/* LIBDEBUG */
-#include	<dprint.hh>		/* debugging */
 
 #include	"base64dec.h"		/* program-private */
 
