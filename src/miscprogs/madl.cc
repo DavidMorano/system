@@ -14,7 +14,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdio>
 #include	<usystem.h>
 #include	<cfdec.h>
