@@ -78,24 +78,9 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	bprintlns(bfile *,int,const char *,int) ;
-extern int	isdigitlatin(int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(struct proginfo *,const char *,
 			const struct pivars *) ;
-
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -112,7 +97,7 @@ struct locinfo {
 	const char	*hostname ;
 	const char	*portspec ;
 	vecstr		stores ;
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	int		af ;
 	int		timeout ;
@@ -124,7 +109,7 @@ struct locinfo {
 
 static int	usage(struct proginfo *) ;
 
-static int	procargs(struct proginfo *,struct arginfo *,BITS *,
+static int	procargs(struct proginfo *,struct arginfo *,bits *,
 			const char *,const char *) ;
 static int	procspecs(PROGINFO *,void *,const char *,int) ;
 static int	procspec(PROGINFO *,void *,cchar *,int) ;
@@ -205,7 +190,7 @@ const char	*envv[] ;
 	struct proginfo	pi, *pip = &pi ;
 	struct locinfo	li, *lip = &li ;
 	struct arginfo	ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	bfile		errfile ;
 	bfile		outfile, *ofp = &outfile ;
 
@@ -470,7 +455,7 @@ const char	*envv[] ;
 	                    case 'Q':
 	                        pip->have.quiet = TRUE ;
 	                        pip->fl.quiet = TRUE ;
-	                        pip->final.quiet = TRUE ;
+	                        pip->finval.quiet = TRUE ;
 	                        break ;
 
 /* version */
@@ -756,7 +741,7 @@ struct proginfo	*pip ;
 static int procargs(pip,aip,bop,ofname,afname)
 struct proginfo	*pip ;
 struct arginfo	*aip ;
-BITS		*bop ;
+bits		*bop ;
 const char	*ofname ;
 const char	*afname ;
 {
