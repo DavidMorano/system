@@ -46,19 +46,19 @@ struct ptca : pthread_condattr_t {
 	ptca_co		create ;
 	ptca_co		destroy ;
 	ptca_co		setpshared ;
-	uint		magic ;
+	uint		magval ;
 	constexpr ptca() noex {
 	    create	(this,ptcamem_create) ;
 	    destroy	(this,ptcamem_destroy) ;
 	    setpshared	(this,ptcamem_setpshared) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end struct */
 	ptca(const ptca &) = delete ;
 	ptca &operator = (const ptca &) = delete ;
 	int	getpshared(int *) noex ;
 	void dtor() noex ;
 	destruct ptca() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ; /* end dtor (ptca) */
 } ; /* end class (ptca) */
 #else
