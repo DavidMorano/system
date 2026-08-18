@@ -61,12 +61,12 @@ struct cyimk_head {
 	cchar		*idname ;
 	cchar		*cname ;
 	char		*nidxfname ;
-	vecobj		verses ;
-	vecobj		lines ;
+	vecobj		*vlp ;		/* list-pointer verse */
+	vecobj		*llp ;		/* list-pointer lines */
 	gid_t		gid ;
 	uid_t		uid ;
 	CYIMK_FL	fl ;
-	uint		mafval ;
+	uint		magval ;
 	uint		pcitation ;
 	int		nentries ;
 	int		nfd ;
