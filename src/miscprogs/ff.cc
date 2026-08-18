@@ -20,7 +20,7 @@
 
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 
 #include	<bfile.h>
 
