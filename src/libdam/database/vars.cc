@@ -223,7 +223,7 @@ int vars_close(vars *op) noex {
 } /* end subroutine (vars_close) */
 
 int vars_getinfo(vars *op,vars_info *vip) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	if ((rs = vars_magic(op,vip)) >= 0) ylikely {
 	    memclear(vip) ;
 	    vars_fm	*fip = &op->vf ;
