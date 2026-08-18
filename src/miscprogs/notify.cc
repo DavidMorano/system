@@ -9,7 +9,7 @@
 
 #include	<sys/types.h>
 #include	<cstdio>
-#include	<time.h>
+#include	<ctime>
 
 #include	<termstr.h>
 
