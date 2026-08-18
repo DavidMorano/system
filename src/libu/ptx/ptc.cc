@@ -27,16 +27,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<pthread.h>
-#include	<ctime>			/* for |TIMESPEC| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<pthread.h>		/* POSIX® */
+#include	<ctime>			/* CSTD |TIMESPEC| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ptca.h"
 #include	"ptc.h"
@@ -53,7 +53,7 @@
 
 /* forward references */
 
-template<typename ... Args> local int ptc_ma::operator () (Args ... args) noex {
+template<typename ... Args> int ptc_ma::operator () (Args ... args) noex {
         int             rs = SR_FAULT ;
         if ((... && args)) {
             rs = (op->magval == ptc_magicval) ? SR_OK : SR_NOTOPEN ;
@@ -68,7 +68,7 @@ inline ptc_ma::operator int () noex {
 local sysret_t std_ptcinit(ptc *op,ptca *ap) noex {
     	int		rs ;
 	if ((rs = pthread_cond_init(op,ap)) > 0) {
-	    rs = (- rs) ;
+	    rs = (neg rs) ;
 	} else if (rs < 0) {
 	    rs = SR_NOANODE ;
 	}
@@ -128,7 +128,7 @@ int ptc_destroy(ptc *op) noex {
 	if (op) ylikely {
 	    repeat {
 	        if ((rs = pthread_cond_destroy(op)) > 0) {
-	            rs = (- rs) ;
+	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 	            rs = SR_NOANODE ;
 	        }
@@ -142,7 +142,7 @@ int ptc_broadcast(ptc *op) noex {
 	if (op) ylikely {
 	    repeat {
 	        if ((rs = pthread_cond_broadcast(op)) > 0) {
-	            rs = (- rs) ;
+	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 	            rs = SR_NOANODE ;
 	        }
@@ -156,7 +156,7 @@ int ptc_signal(ptc *op) noex {
 	if (op) ylikely {
 	    repeat {
 	        if ((rs = pthread_cond_signal(op)) > 0) {
-	            rs = (- rs) ;
+	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 	            rs = SR_NOANODE ;
 	        }
@@ -170,7 +170,7 @@ int ptc_wait(ptc *op,ptm *mp) noex {
 	if (op && mp) ylikely {
 	    repeat {
 	        if ((rs = pthread_cond_wait(op,mp)) > 0) {
-	            rs = (- rs) ;
+	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 	            rs = SR_NOANODE ;
 	        }
@@ -201,7 +201,7 @@ int ptc_waiter(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	    if (tp) {
 		repeat {
 	            if ((rs = pthread_cond_timedwait(op,mp,tp)) > 0) {
-	                rs = (- rs) ;
+	                rs = (neg rs) ;
 	            } else if (rs < 0) {
 	                rs = SR_NOANODE ;
 	            }
@@ -221,7 +221,7 @@ int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	            repeat {
 		        cauto pthread_waiter = pthread_cond_reltimedwait_np ;
 	                if ((rs = pthread_waiter(op,mp,tp)) > 0) {
-	                    rs = (- rs) ;
+	                    rs = (neg rs) ;
 		        } else if (rs < 0) {
 			    rs = SR_NOANODE ;
 	                }
@@ -234,8 +234,7 @@ int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptc_reltimedwaitnp) */
+} /* end subroutine (ptc_reltimedwaitnp) */
 
 
 /* local subroutines */
@@ -281,7 +280,7 @@ int ptc_creater::operator () (ptca *ap) noex {
 int ptc_co::operator () (int) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
-	    if ((rs = op->magic) >= 0) ylikely {
+	    if ((rs = op->magval) >= 0) ylikely {
 	        switch (w) {
 	        case ptcmem_destroy:
 	            rs = ptc_destroy(op) ;
