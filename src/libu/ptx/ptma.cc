@@ -27,14 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<pthread.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<pthread.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ptma.h"
 
@@ -107,8 +107,7 @@ int ptma_create(ptma *op) noex {
 	    } until ((rs >= 0) || r.fexit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_create) */
+} /* end subroutine (ptma_create) */
 
 int ptma_destroy(ptma *op) noex {
 	int		rs = SR_FAULT ;
@@ -120,8 +119,7 @@ int ptma_destroy(ptma *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_destroy) */
+} /* end subroutine (ptma_destroy) */
 
 int ptma_getprioceiling(ptma *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
@@ -133,8 +131,7 @@ int ptma_getprioceiling(ptma *op,int *oldp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_getprioceiling) */
+} /* end subroutine (ptma_getprioceiling) */
 
 int ptma_setprioceiling(ptma *op,int fn) noex {
 	int		rs = SR_FAULT ;
@@ -146,8 +143,7 @@ int ptma_setprioceiling(ptma *op,int fn) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_setprioceiling) */
+} /* end subroutine (ptma_setprioceiling) */
 
 int ptma_getprotocol(ptma *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
@@ -159,8 +155,7 @@ int ptma_getprotocol(ptma *op,int *oldp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_getprotocol) */
+} /* end subroutine (ptma_getprotocol) */
 
 int ptma_setprotocol(ptma *op,int fn) noex {
 	int		rs = SR_FAULT ;
@@ -172,8 +167,7 @@ int ptma_setprotocol(ptma *op,int fn) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_setprotocol) */
+} /* end subroutine (ptma_setprotocol) */
 
 int ptma_getpshared(ptma *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
@@ -185,8 +179,7 @@ int ptma_getpshared(ptma *op,int *oldp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_getpshared) */
+} /* end subroutine (ptma_getpshared) */
 
 int ptma_setpshared(ptma *op,int fn) noex {
 	int		rs = SR_FAULT ;
@@ -198,8 +191,7 @@ int ptma_setpshared(ptma *op,int fn) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_setpshared) */
+} /* end subroutine (ptma_setpshared) */
 
 int ptma_getrobustnp(ptma *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
@@ -234,8 +226,7 @@ int ptma_setrobustnp(ptma *op,int fn) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_setrobustnp) */
+} /* end subroutine (ptma_setrobustnp) */
 
 int ptma_gettype(ptma *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
@@ -247,8 +238,7 @@ int ptma_gettype(ptma *op,int *oldp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_gettype) */
+} /* end subroutine (ptma_gettype) */
 
 int ptma_settype(ptma *op,int nf) noex {
 	int		rs = SR_FAULT ;
@@ -260,8 +250,7 @@ int ptma_settype(ptma *op,int nf) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_settype) */
+} /* end subroutine (ptma_settype) */
 
 
 /* local subroutines */
@@ -298,12 +287,12 @@ int ptma_co::operator () (int a) noex {
 	    switch (w) {
 	    case ptmamem_create:
 	        if ((rs = ptma_create(op)) >= 0) ylikely {
-	            op->magic = PTMA_MAGIC ;
+	            op->magval = PTMA_MAGIC ;
 		}
 	        break ;
 	    case ptmamem_destroy:
 	        rs = ptma_destroy(op) ;
-	        op->magic = 0 ;
+	        op->magval = 0 ;
 	        break ;
 	    case ptmamem_setprioceiling:
 	        rs = ptma_setprioceiling(op,a) ;
