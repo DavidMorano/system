@@ -70,7 +70,7 @@ struct ptrwlock : pthread_rwlock_t {
 	ptrwlock_co	lockwrtry ;
 	ptrwlock_co	lockend ;
 	ptrwlock_co	destroy ;
-	uint		magic ;
+	uint		magval ;
 	constexpr ptrwlock() noex {
 	    create	(this,ptrwlockmem_create) ;
 	    lockrd	(this,ptrwlockmem_lockrd) ;
@@ -79,7 +79,7 @@ struct ptrwlock : pthread_rwlock_t {
 	    lockwrtry	(this,ptrwlockmem_lockwrtry) ;
 	    lockend	(this,ptrwlockmem_lockend) ;
 	    destroy	(this,ptrwlockmem_destroy) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	ptrwlock(const ptrwlock &) = delete ;
 	ptrwlock &operator = (const ptrwlock &) = delete ;
@@ -87,7 +87,7 @@ struct ptrwlock : pthread_rwlock_t {
 	int lockwrto	(int) noex ;
 	void dtor() noex ;
 	destruct ptrwlock() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ; /* end dtor (ptrwlock) */
 } ; /* end class (prwlock) */
 #else
