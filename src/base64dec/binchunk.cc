@@ -34,14 +34,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ulogerror.h>
-#include	<umem.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<umem.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"binchunk.hh"
 
@@ -107,7 +107,7 @@ int binchunk::ifinish() noex {
 	    binbuf = nullptr ;
 	    qe = 0 ;
 	    ql = 0 ;
-	} /* end if (non-null) */
+	} /* end if (memory-release) */
     	return rs ;
 } /* end method (binchunk:ifinish) */
 
@@ -125,13 +125,13 @@ int binchunk::iextend(int amount) noex {
 		if ((rs = umem.rall(binbuf,(ne + 1),&na)) >= 0) {
 		    binbuf = na ;
 		    qe = ne ;
-		}
+		} /* end if (memory-acquire) */
 	    } else {
 	        cint	ne = max((ql + amount),nents) ;
 		if ((rs = umem.mall((ne + 1),&na)) >= 0) {
 		    binbuf = na ;
 		    qe = ne ;
-		}
+		} /* end if (memory-acquire) */
 	    } /* end if */
 	} /* end if (extension required) */
 	return rs ;
