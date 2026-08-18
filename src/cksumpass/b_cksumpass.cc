@@ -939,7 +939,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	    keyopt_cur	cur ;
 	    debugprintf("main: progopts specified:\n") ;
 	    keyopt_curbegin(kop,&cur) ;
-	    while ((rs = keyopt_enumkeys(kop,&cur,&cp)) >= 0) {
+	    while ((rs = keyopt_curenumkeys(kop,&cur,&cp)) >= 0) {
 	        if (cp == NULL) continue ;
 	        debugprintf("main: | optkey=%s\n",cp) ;
 	    }
@@ -954,7 +954,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	        if ((rs = keyopt_curbegin(kop,&cur)) >= 0) {
 
 	            while (rs >= 0) {
-	                cl = keyopt_enumvalues(kop,progopts[ki],&cur,&cp) ;
+	                cl = keyopt_curenumvals(kop,progopts[ki],&cur,&cp) ;
 	                if (cl == SR_NOTFOUND) break ;
 	                rs = cl ;
 	                if (rs >= 0) {
