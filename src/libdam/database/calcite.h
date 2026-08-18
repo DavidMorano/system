@@ -31,6 +31,8 @@ EXTERNC_begin
 
 extern int	calcite_load(calcite *,int,int,int) noex ;
 
+extern int	cmpcalcite(con calcite *,con calcite *) noex ;
+
 EXTERNC_end
 
 
