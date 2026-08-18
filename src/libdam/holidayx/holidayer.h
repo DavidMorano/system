@@ -26,7 +26,8 @@
 #define	HOLIDAYER_FL	struct holidayer_flags
 #define	HOLIDAYER_OBJ	struct holidayer_object
 #define	HOLIDAYER_CUR	struct holidayer_cursor
-#define	HOLIDAYER_CITE	HOLIDAYS_CITE
+#define	HOLIDAYER_CITE	holidays_cite
+#define	HOLIDAYER_Q	holidays_cite
 #define	HOLIDAYER_MAGIC	0x63328184
 
 
@@ -62,6 +63,7 @@ typedef	HOLIDAYER_FL	holidayer_fl ;
 typedef	HOLIDAYER_OBJ	holidayer_obj ;
 typedef	HOLIDAYER_CUR	holidayer_cur ;
 typedef	HOLIDAYER_CITE	holidayer_cite ;
+typedef	HOLIDAYER_Q	holidayer_q ;
 
 EXTERNC_begin
 
