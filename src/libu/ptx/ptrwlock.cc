@@ -56,18 +56,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<pthread.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include        <errtimer.hh>
-#include	<localmisc.h>
+#include	<pthread.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include        <errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
-#include	"ptrwlock.h"
-#include	"ptrwa.h"
+#include	"ptrwlock.h"		/* LIBU */
+#include	"ptrwa.h"		/* LIBU */
 
 
 /* local defines */
@@ -116,8 +116,7 @@ int ptrwlock_create(ptrwlock *psp,ptrwa *atp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptrwlock_create) */
+} /* end subroutine (ptrwlock_create) */
 
 int ptrwlock_destroy(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
@@ -131,8 +130,7 @@ int ptrwlock_destroy(ptrwlock *psp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptrwlock_destroy) */
+} /* end subroutine (ptrwlock_destroy) */
 
 int ptrwlock_lockrd(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
@@ -146,8 +144,7 @@ int ptrwlock_lockrd(ptrwlock *psp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptrwlock_lockrd) */
+} /* end subroutine (ptrwlock_lockrd) */
 
 int ptrwlock_lockrdtry(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
@@ -161,8 +158,7 @@ int ptrwlock_lockrdtry(ptrwlock *psp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptrwlock_lockrdtry) */
+} /* end subroutine (ptrwlock_lockrdtry) */
 
 int ptrwlock_lockrdto(ptrwlock *psp,int to) noex {
 	int		rs = SR_FAULT ;
@@ -195,8 +191,7 @@ int ptrwlock_lockrdto(ptrwlock *psp,int to) noex {
 	    } until ((rs >= 0) || f_exit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptrwlock_lockrdto) */
+} /* end subroutine (ptrwlock_lockrdto) */
 
 int ptrwlock_lockwr(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
@@ -210,8 +205,7 @@ int ptrwlock_lockwr(ptrwlock *psp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptrwlock_lockwr) */
+} /* end subroutine (ptrwlock_lockwr) */
 
 int ptrwlock_lockwrtry(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
@@ -225,8 +219,7 @@ int ptrwlock_lockwrtry(ptrwlock *psp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptrwlock_lockwrtry) */
+} /* end subroutine (ptrwlock_lockwrtry) */
 
 int ptrwlock_lockwrto(ptrwlock *psp,int to) noex {
 	int		rs = SR_FAULT ;
@@ -257,8 +250,7 @@ int ptrwlock_lockwrto(ptrwlock *psp,int to) noex {
 	    } until ((rs >= 0) || f_exit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptrwlock_lockwrto) */
+} /* end subroutine (ptrwlock_lockwrto) */
 
 int ptrwlock_lockend(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
@@ -272,8 +264,7 @@ int ptrwlock_lockend(ptrwlock *psp) noex {
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptrwlock_lockend) */
+} /* end subroutine (ptrwlock_lockend) */
 
 int ptrwlock::lockrdto(int a) noex {
     	return ptrwlock_lockrdto(this,a) ;
@@ -292,7 +283,7 @@ void ptrwlock::dtor() noex {
 int ptrwlock_cr::operator () (ptrwa *ap) noex {
     	int		rs ;
 	if ((rs = ptrwlock_create(op,ap)) >= 0) {
-	    op->magic = PTRWLOCK_MAGIC ;
+	    op->magval = PTRWLOCK_MAGIC ;
 	}
 	return rs ;
 } /* end method (ptrwlock_cr::operator) */
@@ -303,7 +294,7 @@ ptrwlock_co::operator int () noex {
 	    switch (w) {
 	    case ptrwlockmem_destroy:
 	        rs = ptrwlock_destroy(op) ;
-	        op->magic = PTRWLOCK_MAGIC ;
+	        op->magval = PTRWLOCK_MAGIC ;
 	        break ;
 	    case ptrwlockmem_lockrd:
 	        rs = ptrwlock_lockrd(op) ;
