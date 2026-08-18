@@ -42,7 +42,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<netdb.h>
-#include	<time.h>
+#include	<ctime>
 
 #include	<usystem.h>
 #include	<ascii.h>
@@ -79,20 +79,6 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdeci(const char *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	authfile(const char *,char *,char *) ;
-extern int	inetping(char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isFailOpen(int) ;
-
 extern int	proguserlist_begin(PROGINFO *) ;
 extern int	proguserlist_end(PROGINFO *) ;
 
@@ -108,12 +94,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -140,7 +120,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	PROGINFO	*pip ;
 	ustat	isb ;
