@@ -300,7 +300,7 @@ local int commandments_opens(CMS *op,cchar *pr,cchar *dbn) noex {
 } /* end subroutine (commandments_opens) */
 
 int commandments_close(CMS *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
 	if ((rs = commandments_magic(op)) >= 0) ylikely {
 	    {
@@ -364,7 +364,7 @@ int commandments_max(CMS *op) noex {
 } /* end subroutine (commandments_max) */
 
 int commandments_read(CMS *op,char *vbuf,int vlen,uint cn) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		len = 0 ; /* return-value */
 	if ((rs = commandments_magic(op,vbuf)) >= 0) ylikely {
 	    cmi_line	lines[CMS_NLINES+1] ;
@@ -727,12 +727,12 @@ local int commandments_idxopencheck(CMS *op,cchar *dbname) noex {
 	int		nents = 0 ;
 	DEBUGPRINTF("ent dbname=%s\n",dbname) ;
 	if ((rs = cmi_open(cip,dbname)) >= 0) ylikely {
-	    cmi_info	cinfo ;
 	    DEBUGPRINTF("cmi_open() rs=%d\n",rs) ;
-	    if ((rs = cmi_getinfo(cip,&cinfo)) >= 0) ylikely {
+	    if (cmi_info cinfo ; (rs = cmi_getinfo(cip,&cinfo)) >= 0) ylikely {
+		cuint	dbsz = conv<uint>(op->db_size) ;
 		bool	f = true ;
 	        f = f && (cinfo.idxctime >= op->ti_db) ;
-	        f = f && (cinfo.dbsize == op->db_size) ;
+	        f = f && (cinfo.dbsz == dbsz) ;
 		if (f) {
 	            op->fl.idx = true ;
 		    op->nents = cinfo.nents ;
@@ -752,13 +752,12 @@ local int commandments_idxopencheck(CMS *op,cchar *dbname) noex {
 } /* end subroutine (commandments_idxopencheck) */
 
 local int commandments_idxmk(CMS *op,cchar *tbuf) noex {
-	cmimk		mk ;
-	cmode		om = 0664 ;
 	cint		of = 0 ;
 	int		rs ;
 	int		rs1 ;
+	cmode		om = 0664 ;
 	DEBUGPRINTF("ent tbuf=%s\n",tbuf) ;
-	if ((rs = cmimk_open(&mk,tbuf,of,om)) >= 0) ylikely {
+	if (cmimk mk ; (rs = cmimk_open(&mk,tbuf,of,om)) >= 0) ylikely {
 	    if ((rs = cmimk_setdb(&mk,op->db_size,op->ti_db)) >= 0) ylikely {
 		rs = commandments_dbproc(op,&mk) ;
 	    }
@@ -825,9 +824,10 @@ local int commandments_usridname(CMS *op,char *tbuf) noex {
 
 local int commandments_sysidname(CMS *op,char *tbuf) noex {
     	cnullptr	np{} ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		rl = 0 ;
+	int		rl = 0 ; /* return-value */
 	DEBUGPRINTF("ent pr=%s\n",op->pr) ;
 	if (tbuf[0] == '\0') {
 	    int		prnl ;
@@ -840,7 +840,6 @@ local int commandments_sysidname(CMS *op,char *tbuf) noex {
 	            cchar	*tmpdname = CMS_TMPDNAME ;
 	            cchar	*sn = CMS_SN ;
 	            if ((rs = mkpath(tbuf,tmpdname,prn,sn)) >= 0) ylikely {
-		        cint	rsn = SR_NOTFOUND ;
 	                rl = rs ;
 		        if (ustat sb ; (rs = uc_stat(tbuf,&sb)) == rsn) {
 	                    cmode	dm = 0777 ;
@@ -1004,7 +1003,7 @@ local int commandments_dbproc(CMS *op,cmimk *cmp) noex {
 
 local int commandments_checkupdate(CMS *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if (op->ncursors == 0) {
 	    if (dt == 0) dt = getustime ;
 	    if ((dt - op->ti_lastcheck) >= TO_CHECK) {
@@ -1028,7 +1027,7 @@ local int commandments_checkupdate(CMS *op,time_t dt) noex {
 local int commandments_loadbuf(CMS *op,cmi_ent *vivp,
 		char *rbuf,int rlen) noex {
 	int		rs ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	DEBUGPRINTF("ent eoff=%u elen=%u\n",vivp->eoff,vivp->elen) ;
 	if (sbuf b ; (rs = sbuf_start(&b,rbuf,rlen)) >= 0) ylikely {
 	    cmi_line	*lines = vivp->lines ;
@@ -1121,7 +1120,7 @@ local int mkent_start(mkent *ep,int cn,uint eoff,uint elen) noex {
 } /* end subroutine (mkent_start) */
 
 local int mkent_finish(mkent *ep) noex {
-	int		rs = SR_FAULT ;
+	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	if (ep) ylikely {
 	    DEBUGPRINTF("ent e=%u i=%u\n",ep->e,ep->i) ;
@@ -1136,7 +1135,7 @@ local int mkent_finish(mkent *ep) noex {
 } /* end subroutine (mkent_finish) */
 
 local int mkent_add(mkent *ep,uint eoff,uint elen) noex {
-	int		rs = SR_FAULT ;
+	int		rs = SR_BUGCHECK ;
 	if (ep) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (ep->e > 0) ylikely {
@@ -1245,7 +1244,7 @@ local bool isstart(cchar *lp,int ll,int *namp,int *sip) noex {
 } /* end subroutine (isstart) */
 
 local bool hasourdig(cchar *sp,int sl) noex {
-	bool		f = false ;
+	bool		f = false ; /* return-value */
 	cchar	*cp ;
 	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
 	    f = true ;
@@ -1259,7 +1258,7 @@ local bool hasourdig(cchar *sp,int sl) noex {
 
 #if	CF_DEBUG && CF_DEBUGLINE
 local int linenlen(cchar *lp,int ll,int ml) noex {
-	int		len = INT_MAX ;
+	int		len = INT_MAX ; /* return-value */
 	if (lp) {
 	    if (ll > 0) len = MIN(len,ll) ;
 	    if (ml > 0) len = MIN(len,ml) ;
@@ -1281,7 +1280,7 @@ local bool isNotOurAccess(int rs) noex {
 } /* end subroutine (isNotOurAccess) */
 
 local bool isStale(int rs) noex {
-	bool		f = false ;
+	bool		f = false ; /* return-value */
 	if (rs < 0) {
 	    f = f || isNotPresent(rs) ;
 	    f = f || isOneOf(rsold,rs) ;
@@ -1291,7 +1290,7 @@ local bool isStale(int rs) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
 	}
     	return rs ;
