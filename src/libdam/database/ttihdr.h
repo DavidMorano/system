@@ -1,4 +1,4 @@
-/* ttihdr HEADER (Term-Trans) */
+/* ttihdr HEADER (Term-Translate-Index) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -25,7 +25,7 @@
 
 
 #define	TTIHDR			struct ttihdr_head
-#define	TTIHDR_MAGICSIZE	16
+#define	TTIHDR_MAGICSZ		16
 #define	TTIHDR_MAGICSTR		"TERMTRANSINDEX"
 #define	TTIHDR_VERSION		0
 
