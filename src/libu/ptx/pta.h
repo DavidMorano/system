@@ -55,12 +55,12 @@ struct pta : pthread_attr_t {
 	pta_co		create ;
 	pta_co		destroy ;
 	pta_co		setscope ;
-	uint		magic ;
+	uint		magval ;
 	constexpr pta() noex {
 	    create(this,ptamem_create) ;
 	    destroy(this,ptamem_destroy) ;
 	    setscope(this,ptamem_setscope) ;
-	    magic = 0 ;
+	    magval = 0 ;
 	} ; /* end ctor */
 	pta(const pta &) = delete ;
 	pta &operator = (const pta &) = delete ;
@@ -69,7 +69,7 @@ struct pta : pthread_attr_t {
 	int setstacksize(size_t) noex ;
 	void dtor() noex ;
 	destruct pta() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ; /* end dtor (pta) */
 } ; /* end class (pta) */
 #else
