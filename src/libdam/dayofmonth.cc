@@ -164,7 +164,7 @@ constexpr bool		f_braindamaged = false ; /* old ILP32 environments */
 
 int dayofmonth_start(dayofmonth *op,int year) noex {
 	int		rs ;
-	if ((rs = dayofmonth_ctor(op)) >= 0) {
+	if ((rs = dayofmonth_ctor(op)) >= 0) ylikely {
 	    if_constexpr (f_braindamaged) {
 	        if (year >= 0) {
 	            if ((year < 1970) || (year > 2038)) {
@@ -172,7 +172,7 @@ int dayofmonth_start(dayofmonth *op,int year) noex {
 	            }
 	        }
 	    } /* end if_constexpr (f_braindamaged) */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        custime		dt = getustime ;
 	        if (tmtime ts{} ; (rs = tmtime_timelocal(&ts,dt)) >= 0) {
 	            op->isdst = ts.isdst ;
@@ -197,7 +197,7 @@ int dayofmonth_finish(dayofmonth *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
-	if ((rs = dayofmonth_magic(op)) >= 0) {
+	if ((rs = dayofmonth_magic(op)) >= 0) ylikely {
 	    for (int i = 0 ; i < n ; i += 1) {
 	        if (op->months[i] != nullptr) {
 	            c += 1 ;
@@ -219,18 +219,18 @@ int dayofmonth_lookup(dayofmonth *op,int m,int wday,int oday) noex {
 	cint		n = DAYOFMONTH_NMONS ;
 	int		rs ;
 	int		mday = 0 ; /* return-value */
-	if ((rs = dayofmonth_magic(op)) >= 0) {
+	if ((rs = dayofmonth_magic(op)) >= 0) ylikely {
 	    bool	fval = true ;
 	    rs = SR_INVALID ;
 	    fval = fval && ((m >= 0) && (m < n)) ;
 	    fval = fval && ((wday >= wday_sunday) && (wday < wday_overlast)) ;
 	    fval = fval && ((oday >= oday_first) && (oday < oday_overlast)) ;
-	    if (fval) {
+	    if (fval) ylikely {
 		rs = SR_OK ;
 	        if (op->months[m] == nullptr) {
 	            rs = dayofmonth_mkmonth(op,m) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            dayofmonth_mon	*mp = op->months[m] ;
 	            int			w{} ; /* used-afterwards */
 	            if (oday != oday_last) { /* a numbered week */
@@ -258,7 +258,7 @@ int dayofmonth_lookup(dayofmonth *op,int m,int wday,int oday) noex {
 int dayofmonth_mkday(dayofmonth *op,int m,cchar *cp,int cl) noex {
 	int		rs ;
 	int		mday = 0 ; /* return-value */
-	if ((rs = dayofmonth_magic(op,cp)) >= 0) {
+	if ((rs = dayofmonth_magic(op,cp)) >= 0) ylikely {
 	    if ((cl > 0) && (cp[cl-1] == '*')) {
 	        cl -= 1 ;
 	    }
@@ -301,7 +301,7 @@ local int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
 	int		rs = SR_OK ;
 	if (op->months[m] == nullptr) {
 	    cint	osz = szof(dayofmonth_mon) ;
-	    if (dayofmonth_mon *mp ; (rs = lm_mall(osz,&mp)) >= 0) {
+	    if (dayofmonth_mon *mp ; (rs = lm_mall(osz,&mp)) >= 0) ylikely {
 	       	TM	tmo{} ;
 	        int	daymax = daysmonth[m] ;
 	        op->months[m] = mp ;
@@ -312,7 +312,7 @@ local int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
 	        tmo.tm_year = (op->year - TMTIME_YEARBASE) ;
 	        tmo.tm_mon = m ;
 	        tmo.tm_mday = 1 ;
-	        if ((rs = uc_mktime(&tmo,nullptr)) >= 0) {
+	        if ((rs = uc_mktime(&tmo,nullptr)) >= 0) ylikely {
 	            schar	day = 1 ;
 	            bool	f = false ;
 	            for (int w = 0 ; w < 6 ; w += 1) {
@@ -359,7 +359,7 @@ void dayofmonth::dtor() noex {
 
 dayofmonth_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case dayofmonthmem_finish:
 	        rs = dayofmonth_finish(op) ;
