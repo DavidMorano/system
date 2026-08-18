@@ -40,26 +40,29 @@ MODS +=
 LIBS +=
 
 
-OBJ0_SFX= sfbaselib.o sfbasename.o sfbracketval.o
-OBJ1_SFX= sfcenter.o sfcookkey.o sfdequote.o sfdirname.o
-OBJ2_SFX= sfkey.o sflast.o sfnamecomp.o sfprogroot.o 
-OBJ3_SFX= sfrootname.o sfshrink.o sfskipwhite.o 
-OBJ4_SFX= sfcasesub.o sfsubstance.o sfthing.o 
-OBJ5_SFX= sfword.o sfprogname.o sfsign.o sfkeyval.o 
-OBJ6_SFX= sfnext.o sfnextqtok.o 
-OBJ7_SFX= sfxchr.o sfxbrk.o sfxsub.o sfext.o
+OBJ00= sfbaselib.o sfbasename.o sfbracketval.o
+OBJ01= sfcenter.o sfcookkey.o sfdequote.o sfdirname.o
+OBJ02= sflast.o sfnamecomp.o sfprogroot.o 
+OBJ03= sfrootname.o sfshrink.o sfskipwhite.o 
+OBJ04= sfcasesub.o sfsubstance.o sfthing.o 
+OBJ05= sfword.o sfprogname.o sfsign.o 
+OBJ06= sfnext.o sfnextqtok.o xfcontent.o
+OBJ07= sfxchr.o sfxbrk.o sfxsub.o sfext.o
 
-OBJ8_SFX= sfweirdo.o
+OBJ08= sfweirdo.o cfcontent.o
+OBJ09= sfkey.o sfkeyval.o
+OBJ10=
+OBJ11=
 
-OBJA_SFX= obj0_sfx.o obj1_sfx.o
-OBJB_SFX= obj2_sfx.o obj3_sfx.o
-OBJC_SFX= obj4_sfx.o obj5_sfx.o
-OBJD_SFX= obj6_sfx.o obj7_sfx.o obj8_sfx.o
+OBJA= obj00.o obj01.o
+OBJB= obj02.o obj03.o
+OBJC= obj04.o obj05.o
+OBJD= obj06.o obj07.o obj08.o obj09.o
 
-OBJG0_SFX= obja_sfx.o objb_sfx.o
-OBJG1_SFX= objc_sfx.o objd_sfx.o
+OBJG0= obja.o objb.o
+OBJG1= objc.o objd.o
 
-OBJ_SFX= $(OBJG0_SFX) $(OBJG1_SFX)
+OBJ= $(OBJG0) $(OBJG1_SFX)
 
 
 INCDIRS=
@@ -109,10 +112,10 @@ all:			$(ALL)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).o:			$(OBJ_SFX)
+$(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-$(T).a:			$(OBJ_SFX)
+$(T).a:			$(OBJ)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).o
@@ -128,54 +131,60 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_sfx.o:		$(OBJ0_SFX)
+obj00.o:		$(OBJ00)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_sfx.o:		$(OBJ1_SFX)
+obj01.o:		$(OBJ01)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_sfx.o:		$(OBJ2_SFX)
+obj02.o:		$(OBJ02)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_sfx.o:		$(OBJ3_SFX)
+obj03.o:		$(OBJ03)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj4_sfx.o:		$(OBJ4_SFX)
+obj04.o:		$(OBJ04)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj5_sfx.o:		$(OBJ5_SFX)
+obj05.o:		$(OBJ05)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj6_sfx.o:		$(OBJ6_SFX)
+obj06.o:		$(OBJ06)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj7_sfx.o:		$(OBJ7_SFX)
+obj07.o:		$(OBJ07)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj8_sfx.o:		$(OBJ8_SFX)
+obj08.o:		$(OBJ08)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj9_sfx.o:		$(OBJ9_SFX)
+obj09.o:		$(OBJ09)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-
-obja_sfx.o:		$(OBJA_SFX)
+obj10.o:		$(OBJ10)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb_sfx.o:		$(OBJB_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-objc_sfx.o:		$(OBJC_SFX)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-objd_sfx.o:		$(OBJD_SFX)
+obj11.o:		$(OBJ11)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-objg0_sfx.o:		$(OBJG0_SFX)
+obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objg1_sfx.o:		$(OBJG1_SFX)
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objc.o:			$(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+objg0.o:		$(OBJG0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objg1.o:		$(OBJG1)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -192,5 +201,10 @@ sfbasename.o:		sfbasename.cc	sfxname.h		$(INCS)
 sfdirname.o:		sfdirname.cc	sfxname.h		$(INCS)
 sfprogname.o:		sfprogname.cc	sfxname.h		$(INCS)
 sfrootname.o:		sfrootname.cc	sfxname.h		$(INCS)
+
+sfcontent.o:		sfcontent.cc	sfcontent.h		$(INCS)
+
+sfkey.o:		sfkey.cc	sfkey.h			$(INCS)
+sfkeyval.o:		sfkeyval.cc	sfkeyval.h		$(INCS)
 
 
