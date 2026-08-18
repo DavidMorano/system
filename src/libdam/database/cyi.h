@@ -29,8 +29,8 @@
 
 #define	CYI		struct cyi_head
 #define	CYI_OBJ		struct cyi_object
-#define	CYI_Q		CALCITE
-#define	CYI_QUERY	CALCITE
+#define	CYI_Q		calcite
+#define	CYI_QUERY	calcite
 #define	CYI_CUR		struct cyi_cursor
 #define	CYI_ENT		struct cyi_entry
 #define	CYI_LINE	struct cyi_liner
@@ -83,8 +83,8 @@ struct cyi_fmier {
 
 struct cyi_head {
 	cchar		*fname ;
-	CYI_FMI		fmi ;		/* file-map information */
-	cyihdr		fhi ;		/* file-header information */
+	CYI_FMI		*fmp ;		/* pointer file-map */
+	cyihdr		*fhp ;		/* pointer file-header */
 	time_t		ti_lastcheck ;	/* time last check of file */
 	uint		magval ;
 	int		ncursors ;
