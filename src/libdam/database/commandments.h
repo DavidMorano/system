@@ -71,7 +71,7 @@ struct commandments_head {
 	cchar		*dbname ;
 	cchar		*uhome ;		/* user home dir */
 	cchar 		*fname ;
-	voidp		db_data ;
+	voidp		db_data ;		/* source DB */
 	size_t		db_size ;		/* srouce DB size */
 	time_t		ti_db ;			/* source DB m-time */
 	time_t		ti_idx ;		/* index modification */
