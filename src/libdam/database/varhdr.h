@@ -18,7 +18,7 @@
 
 
 #define	VARHDR			struct varhdr_head
-#define	VARHDR_MAGICSIZE	16
+#define	VARHDR_MAGICSZ		16
 #define	VARHDR_MAGICSTR		"VARIND"
 #define	VARHDR_VERSION		0
 #define	VARHDR_FSUF		"vi"
