@@ -27,15 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<pthread.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIXkRO */
+#include	<pthread.h>		/* POSIXkRO */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ptca.h"
 
@@ -100,8 +100,7 @@ int ptca_create(ptca *op) noex {
 	    } until ((rs >= 0) || r.fexit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptca_create) */
+} /* end subroutine (ptca_create) */
 
 int ptca_destroy(ptca *op) noex {
 	int		rs = SR_FAULT ;
@@ -113,8 +112,7 @@ int ptca_destroy(ptca *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptca_destroy) */
+} /* end subroutine (ptca_destroy) */
 
 int ptca_getpshared(ptca *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
@@ -126,8 +124,7 @@ int ptca_getpshared(ptca *op,int *oldp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptca_getpshared) */
+} /* end subroutine (ptca_getpshared) */
 
 int ptca_setpshared(ptca *op,int fl) noex {
 	int		rs = SR_FAULT ;
@@ -139,8 +136,7 @@ int ptca_setpshared(ptca *op,int fl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptca_setpshared) */
+} /* end subroutine (ptca_setpshared) */
 
 
 /* local subroutines */
@@ -161,12 +157,12 @@ int ptca_co::operator () (int a) noex {
 	    switch (w) {
 	    case ptcamem_create:
 	        if ((rs = ptca_create(op)) >= 0) ylikely {
-		    op->magic = PTCA_MAGIC ;
+		    op->magval = PTCA_MAGIC ;
 		}
 	        break ;
 	    case ptcamem_destroy:
 	        rs = ptca_destroy(op) ;
-		op->magic = 0 ;
+		op->magval = 0 ;
 	        break ;
 	    case ptcamem_setpshared:
 	        rs = ptca_setpshared(op,a) ;
