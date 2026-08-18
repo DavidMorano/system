@@ -131,7 +131,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
@@ -155,8 +155,8 @@ struct locinfo {
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 static int	procnewsdirs(PROGINFO *,void *,cchar *,int) ;
 static int	procnewsdname(PROGINFO *pip) ;
 
@@ -264,8 +264,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -665,7 +665,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-					KEYOPT	*kop = &akopts ;
+					keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 				    }
 	                        } else {
@@ -839,7 +839,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            if ((rs = proguserlist_begin(pip)) >= 0) {
 					{
 				            ARGINFO	*aip = &ainfo ;
-				            BITS	*bop = &pargs ;
+				            bits	*bop = &pargs ;
 	                                    cchar	*af = afname ;
 	                                    cchar	*of = ofname ;
 	                                    rs = procargs(pip,aip,bop,of,af) ;
@@ -1038,7 +1038,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1050,13 +1050,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1064,9 +1064,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                switch (oi) {
 	                case akoname_squery:
-	                    if (! lip->final.squery) {
+	                    if (! lip->finval.squery) {
 	                        lip->have.squery = TRUE ;
-	                        lip->final.squery = TRUE ;
+	                        lip->finval.squery = TRUE ;
 	                        lip->fl.squery = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1167,7 +1167,7 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 	            char	kbuf[KBUFLEN+1] ;
 	            char	vbuf[VBUFLEN+1] ;
 	            while (rs >= 0) {
-	                vl = pcsconf_enum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
+	                vl = pcsconf_curenum(pcp,&cur,kbuf,klen,vbuf,vlen) ;
 	                if (vl == SR_NOTFOUND) break ;
 	                c += 1 ;
 	                debugprintf("main/procpcsconf: pair> %s=%r\n",
@@ -1197,7 +1197,7 @@ static int procpcsconf_end(PROGINFO *pip)
 /* end subroutine (procpcsconf_end) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *app,cchar *afn,cchar *ofn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *app,cchar *afn,cchar *ofn)
 {
 	bfile		ofile, *ofp = &ofile ;
 	int		rs ;
