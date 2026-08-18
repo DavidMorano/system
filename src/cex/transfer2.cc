@@ -1,7 +1,9 @@
-/* transfer */
+/* transfer SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* transfer data */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	1		/* switchable debug print-outs */
@@ -20,14 +22,12 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine transfer data among several file descriptors.
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -35,12 +35,14 @@
 #include	<sys/time.h>
 #include	<netinet/in.h>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
+#include	<fcntl.h>
 #include	<netdb.h>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<logfile.h>
 #include	<localmisc.h>
 
