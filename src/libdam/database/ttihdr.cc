@@ -1,4 +1,4 @@
-/* ttihdr SUPPORT (Term-Trans) */
+/* ttihdr SUPPORT (Term-Translate-Index) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -89,8 +89,8 @@ enum his {
 
 /* local variables */
 
-constexpr int		headsize	= hi_overlast * szof(uint) ;
-constexpr int		magicsz		= TTIHDR_MAGICSIZE ;
+constexpr int		headsz		= hi_overlast * szof(uint) ;
+constexpr int		magicsz		= TTIHDR_MAGICSZ ;
 constexpr int		vsz		= szof(uint) ;	/* VETU */
 constexpr char		magicstr[]	= TTIHDR_MAGICSTR ;
 
@@ -115,7 +115,7 @@ int ttihdr_rd(ttihdr *op,char *hbuf,int hlen) noex {
                     bp[1] = uchar(ENDIAN) ;
                     bp += vsz ;
                     bl -= vsz ;
-                    if (bl >= headsize) ylikely {
+                    if (bl >= headsz) ylikely {
                         uint    		*header = uintp(bp) ;
 	        	header[hi_fsz]		= op->fsz ;
 	        	header[hi_ctime]	= op->ctime ;
@@ -123,8 +123,8 @@ int ttihdr_rd(ttihdr *op,char *hbuf,int hlen) noex {
 	        	header[hi_reclen]	= op->reclen ;
 	        	header[hi_ostrtab]	= op->ostrlen ;
 	        	header[hi_ostrlen]	= op->ostrlen ;
-                        bp += headsize ;
-                        bl -= headsize ;
+                        bp += headsz ;
+                        bl -= headsz ;
                         len = intconv(bp - hbuf) ;
                     } else {
                         rs = SR_OVERFLOW ;
@@ -162,7 +162,7 @@ int ttihdr_wr(ttihdr *op,cchar *hbuf,int hlen) noex {
                     rs = SR_ILSEQ ;
                 }
 	        if (rs >= 0) ylikely {
-	            if (bl >= headsize) ylikely {
+	            if (bl >= headsz) ylikely {
 	                const uint	*header = uintp(bp) ;
 	                op->fsz		= header[hi_fsz] ;
 	                op->ctime	= header[hi_ctime] ;
@@ -170,8 +170,8 @@ int ttihdr_wr(ttihdr *op,cchar *hbuf,int hlen) noex {
 	                op->reclen	= header[hi_reclen] ;
 	                op->ostrtab	= header[hi_ostrtab] ;
 	                op->ostrlen	= header[hi_ostrlen] ;
-	                bp += headsize ;
-	                bl -= headsize ;
+	                bp += headsz ;
+	                bl -= headsz ;
 		        len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
