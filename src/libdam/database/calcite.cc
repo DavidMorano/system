@@ -30,6 +30,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<intcmp.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"calcite.h"
@@ -71,5 +72,23 @@ int calcite_load(calcite *ep,int y,int m, int d) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (calcite_load) */
+
+int cmpcalcite(con calcite *e1p,con calcite *e2p) noex {
+    	int		rc = 0 ;
+	if (e1p || e2p) ylikely {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+		if (e2p) {
+		    if ((rc = intcmp(e1p->y,e2p->y)) == 0) {
+		        if ((rc = intcmp(e1p->m,e2p->m)) == 0) {
+		            rc = intcmp(e1p->d,e2p->d) ;
+		        }
+		    }
+		}
+	    }
+	} /* end if */
+    	return rc ;
+} /* end subroutine (cmpcalcite) */
 
 
