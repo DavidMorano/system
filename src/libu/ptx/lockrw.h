@@ -13,13 +13,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ptm.h>
-#include	<ptc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
 
 
 #define	LOCKRW		struct lockrw_head
@@ -29,7 +26,7 @@
 struct lockrw_head {
 	ptm		*mxp ;
 	ptc		*cvp ;
-	uint		magic ;
+	uint		magval ;
 	int		readers ;
 	int		writers ;
 	int		waitwriters ;
