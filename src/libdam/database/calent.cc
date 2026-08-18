@@ -39,6 +39,7 @@
 #include	<sfx.h>			/* LIBUC */
 #include	<hash.h>		/* LIBUC |hash_elf(3dam)| */
 #include	<localmisc.h>		/* LIBU */
+#include	<calcite.h>		/* LIBDAM */
 
 #include	"calent.h"
 
@@ -47,6 +48,13 @@
 import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
+
+#define	CE		calent
+#define	CE_FL		calent_fl
+#define	CE_LN		calent_ln
+#define	CE_Q		calent_q
+#define	CE_MAG		CALENT_MAGIC
+#define	CE_NLE		CALENT_NLE
 
 
 /* imported namespaces */
@@ -85,10 +93,10 @@ local int calent_dtor(calent *op) noex {
 } /* end subroutine (calent_dtor) */
 
 template<typename ... Args>
-local inline int calent_magic(calent *op,Args ... args) noex {
+local inline int calent_magic(con calent *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magval == CALENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CE_MAG) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (calent_magic) */
@@ -102,22 +110,25 @@ local inline int calent_magic(calent *op,Args ... args) noex {
 
 /* exported subroutines */
 
-int calent_start(calent *op,calent_q *qp,uint loff,int llen) noex {
-	cint		ne = CALENT_NLE ;
+int calent_start(calent *op,con calent_q *qp,uint loff,int llen) noex {
+	cint		ne = CE_NLE ;
 	int		rs ;
 	if ((rs = calent_ctor(op,qp)) >= 0) ylikely {
 	    cint	sz = ne * szof(calent_ln) ;
 	    op->cidx = -1 ;
-	    op->q = *qp ;
+	    op->cite = *qp ; /* copy */
 	    op->voff = loff ;
 	    op->vlen = llen ;
-	    if (calent_ln *elp ; (rs = lm_mall(sz,&elp)) >= 0) ylikely {
-	        op->lines = elp ;
-	        op->e = ne ;
-	        op->i += 1 ;
-	        op->magval = CALENT_MAGIC ;
-	        elp->loff = loff ;
-	        elp->llen = llen ;
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
+		calent_ln *elp = resumelife<CE_LN>(vp) ;
+		{
+	            op->lines = elp ;
+	            op->e = ne ;
+	            op->i += 1 ;
+	            op->magval = CE_MAG ;
+	            elp->loff = loff ;
+	            elp->llen = llen ;
+		}
 	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 		calent_dtor(op) ;
@@ -172,22 +183,24 @@ int calent_add(calent *op,uint loff,int llen) noex {
 	    if (op->e > 0) ylikely {
 		rs = SR_BADFMT ;
 	        if ((op->i >= 0) && (op->i <= op->e)) ylikely {
-	            calent_ln	*elp ;
 	            int		sz ;
 		    rs = SR_OK ;
 	            if (op->i == op->e) {
-	                cint	ne = (op->e * 2) + CALENT_NLE ;
-	                sz = ne * szof(calent_ln) ;
-	                if ((rs = lm_rall(op->lines,sz,&elp)) >= 0) {
+	                cint	ne = ((op->e * 2) + CE_NLE) ;
+	                sz = (ne * szof(CE_LN)) ;
+	                if (void *vp ; (rs = lm_rall(op->lines,sz,&vp)) >= 0) {
+	                    op->lines = resumelife<CE_LN>(vp) ;
 	                    op->e = ne ;
-	                    op->lines = elp ;
-	                }
-	            }
+	                } /* end if (memory-reallocate) */
+	            } /* end if */
 	            if (rs >= 0) ylikely {
+	                CE_LN *elp = op->lines ;
 	                op->vlen = ((loff + llen) - op->voff) ;
-	                elp = (op->lines + op->i) ;
-	                elp->loff = loff ;
-	                elp->llen = llen ;
+			{
+	                    elp = (op->lines + op->i) ;
+	                    elp->loff = loff ;
+	                    elp->llen = llen ;
+			}
 	                op->i += 1 ;
 	            } /* end if (ok) */
 	        } /* end if (good) */
@@ -196,13 +209,11 @@ int calent_add(calent *op,uint loff,int llen) noex {
 	return rs ;
 } /* end subroutine (calent_add) */
 
-int calent_samecite(calent *op,CALENT *oop) noex {
+int calent_samecite(calent *op,calent *oop) noex {
 	int		rs ;
-	int		f = true ;
+	int		f = true ; /* return-value */
 	if ((rs = calent_magic(op,oop)) >= 0) ylikely {
-	    f = f && (op->q.y == oop->q.y) ;
-	    f = f && (op->q.m == oop->q.m) ;
-	    f = f && (op->q.d == oop->q.d) ;
+	    f = (cmpcalcite(&op->cite,&oop->cite) == 0) ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (calent_samecite) */
@@ -214,7 +225,7 @@ int calent_mkhash(calent *op,cchar *md) noex {
 	    if (op->e > 0) ylikely {
 		rs = SR_NOTOPEN ;
 	        if (op->lines) ylikely {
-	            calent_ln	*elp = op->lines ;
+	            CE_LN *elp = op->lines ;
 	            rs = SR_OK ;
 	            if (! op->fl.hash) {
 	                uint	hash = 0 ;
@@ -223,7 +234,7 @@ int calent_mkhash(calent *op,cchar *md) noex {
 	                for (int i = 0 ; i < op->i ; i += 1) {
 	                    sp = (md + elp[i].loff) ;
 	                    sl = elp[i].llen ;
-	                    while ((cl = nextfield(sp,sl,&cp)) > 0) {
+	                    while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	                        hash += hash_elf(cp,cl) ;
 	                        sl -= intconv((cp + cl) - sp) ;
 	                        sp = (cp + cl) ;
@@ -266,10 +277,10 @@ int calent_loadbuf(calent *op,char *rbuf,int rlen,cchar *mp) noex {
 	int		len = 0 ;
 	if ((rs = calent_magic(op,rbuf,mp)) >= 0) ylikely {
 	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
-	        calent_ln	*lines = op->lines ;
-	        int		nlines = op->i ; /* number of line elements */
-	        int		ll ;
-	        cchar		*lp ;
+	        CE_LN	*lines = op->lines ;
+	        int	nlines = op->i ; /* number of line elements */
+	        int	ll ;
+	        cchar	*lp ;
 	        for (int i = 0 ; i < nlines ; i += 1) {
 	            if (i > 0) b.chr(' ') ;
 	            lp = (mp + lines[i].loff) ;
@@ -291,5 +302,27 @@ int calent_getci(calent *op) noex {
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (calent_getci) */
+
+int calent_getq(calent *op,mut calent_q *rp) noex {
+    	int		rs ;
+	if ((rs = calent_magic(op,rp)) >= 0) ylikely {
+	    *rp = op->cite ; /* copy */
+	} /* end if (magic) */
+	return rs ;
+} /* end subroutine (calent_getq) */
+
+int cmpcalent(con calent *e1p,con calent *e2p) noex {
+    	int		rc = 0 ;
+	if (e1p || e2p) {
+	    rc = +1 ;
+	    if (e1p) {
+		rc = -1 ;
+		if (e2p) {
+		    rc = cmpcalcite(&e1p->cite,&e2p->cite) ;
+		}
+	    }
+	} /* end if */
+    	return rc ;
+} /* end subroutine (cmpcalent) */
 
 
