@@ -194,7 +194,7 @@ local int pwi_ctor(pwi *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->dbp = new(nt) ipasswd) != np) {
+	    if ((op->dbp = new(nt) ipasswd) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-ipasswd) */
 	} /* end if (non-null) */
@@ -294,7 +294,7 @@ int opener::decide() noex {
 	if (char *fbuf ; (rs = libmem.mp(&fbuf)) >= 0) ylikely {
 	    cchar	*suf = IPASSWD_SUF ;
 	    cchar	*endstr = ENDIANSTR ;
-	    if ((rs = mkfnamesuf(fbuf,idxdname,suf,endstr)) >= 0) {
+	    if ((rs = mkfnamesuf(fbuf,idxdname,suf,endstr)) >= 0) ylikely {
 		if (ustat sb ; (rs = u_stat(fbuf,&sb)) >= 0) {
 		    custime	dt = getustime ;
 		    time_t	ti_pwi = sb.st_mtime ;
@@ -488,7 +488,7 @@ int opener::mkidxdname() noex {
 		        rs = SR_OK ;
 		        nn = nbuf ;
 		    }
-		    if (rs >= 0) {
+		    if (rs >= 0) ylikely {
 		        if (char *tbuf ; (rs = libmem.mp(&tbuf)) >= 0) {
 	                    if ((rs = mkpath(tbuf,pr,DBDNAME,nn)) >= 0) {
 	    		        rs = idxload(tbuf,rs) ;
@@ -509,7 +509,7 @@ int opener::mkidxdname() noex {
 
 int opener::idxload(cc *dp,int dl) noex {
 	int		rs ;
-	if (cchar *cp ; (rs = libmem.strw(dp,dl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = libmem.strw(dp,dl,&cp)) >= 0) ylikely {
 	    idxdname = cp ;
 	} /* end if (memory-acquire) */
 	return rs ;
@@ -642,7 +642,7 @@ int opener::mkwait(int cpid) noex {
 int opener::mkenv(vecstr *elp) noex {
         int		rs ;
         cchar		*vn = VARPRPWI ;
-        if ((rs = elp->envadd(vn,pr)) >= 0) {
+        if ((rs = elp->envadd(vn,pr)) >= 0) ylikely {
 	    if (idxdname) {
 	        rs = elp->envadd(VARDBNAME,idxdname) ;
 	    }
