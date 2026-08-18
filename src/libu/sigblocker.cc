@@ -28,7 +28,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<csignal>		/* CSTD */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -76,8 +76,7 @@ int sigblocker_start(sigblocker *op,cint *sigs) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sigblocker_start) */
+} /* end subroutine (sigblocker_start) */
 
 int sigblocker_finish(sigblocker *op) noex {
 	int		rs = SR_FAULT ;
@@ -86,8 +85,7 @@ int sigblocker_finish(sigblocker *op) noex {
 	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sigblocker_finish) */
+} /* end subroutine (sigblocker_finish) */
 
 
 /* local subroutines */
