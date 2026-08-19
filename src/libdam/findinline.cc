@@ -60,8 +60,8 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
-#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC |isalphalatin(3uc)| */
 #include	<mkchar.h>		/* LIBU */
@@ -74,6 +74,10 @@
 import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	CHX_BS		CH_BSLASH
+#define	CHX_LB		CH_LBRACE
+#define	CHX_RB		CH_RBRACE
 
 
 /* external subroutines */
@@ -102,12 +106,12 @@ local int	getpair(findinline *,cchar *,int) noex ;
 int findinline_esc(findinline *fip,cchar *lp,int ll) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	int		skiplen = 0 ;
+	int		skiplen = 0 ; /* return-value */
 	if (fip && lp) ylikely {
 	    rs = SR_OK ;
 	    if (ll < 0) ll = lenstr(lp) ;
 	    if (ll >= 3) ylikely {
-	        for (cc *tp ; (tp = strnchr(lp,ll,CH_BSLASH)) != np ; ) {
+	        for (cc *tp ; (tp = strnchr(lp,ll,CHX_BS)) != np ; ) {
 		    cchar	*cp = (tp + 1) ;
 		    fip->sp = tp ;
 		    if (int cl = intconv((lp + ll) - (tp + 1)) ; cl > 0) {
@@ -161,14 +165,14 @@ local int getpair(findinline *fip,cchar *sp,int sl) noex {
 	int		skiplen = 0 ; /* return-value */
 	cchar		*start = (sp - 1) ;
 	fip->kp = sp ;
-	if (cchar *tp ; (tp = strnchr(sp,sl,CH_LBRACE)) != np) {
+	if (cchar *tp = strnchr(sp,sl,CHX_LB) ; tp) ylikely {
 	    cint tl = intconv(tp - sp) ;
-	    if (int kl ; (kl = sfshrink(sp,tl,nullptr)) > 0) {
+	    if (int kl ; (kl = sfshrink(sp,tl,np)) > 0) {
 		fip->kl = kl ;
 		sl -= intconv((tp + 1) - sp) ;
 		sp = (tp + 1) ;
 		fip->vp = sp ;
-	        if ((tp = strnchr(sp,sl,CH_RBRACE)) != nullptr) {
+	        if ((tp = strnchr(sp,sl,CHX_RB)) != np) {
 		    if ((tp-sp) > 0) {
 			fip->vl = intconv(tp - sp) ;
 			skiplen = intconv((tp + 1) - start) ;
