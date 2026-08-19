@@ -25,7 +25,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<modload.h>		/* LIBUC */
+#include	<modload.h>		/* LIBDAM */
 #include	<vars.h>		/* LIBDAM */
 
 
