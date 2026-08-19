@@ -109,11 +109,11 @@ int htm_start(htm *op,shio *ofp,cchar *lang) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = htm_ctor(op,ofp)) >= 0) {
+	if ((rs = htm_ctor(op,ofp)) >= 0) ylikely {
 	    op->ofp = ofp ;
 	    if ((rs = shio_print(op->ofp,"<!doctype html>",-1)) >= 0) {
 	        wlen += rs ;
-	        if (char *lp{} ; (rs = lm_ml(&lp)) >= 0) {
+	        if (char *lp ; (rs = lm_ml(&lp)) >= 0) ylikely {
 		    cint	ll = rs ;
 		    cchar	*fmt ;
 		    op->lbuf = lp ;
@@ -125,7 +125,7 @@ int htm_start(htm *op,shio *ofp,cchar *lang) noex {
 			fmt = "<html>" ;
 	                rs = bufprintf(op->lbuf,op->llen,fmt) ;
 	            }
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                if ((rs = shio_print(op->ofp,op->lbuf,rs)) >= 0) {
 	                    wlen += rs ;
 	    		    op->magval = HTM_MAGIC ;
@@ -151,7 +151,7 @@ int htm_finish(htm *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op)) >= 0) {
+	if ((rs = htm_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = htm_printline(op,"</html>",-1) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -176,9 +176,9 @@ int htm_finish(htm *op) noex {
 int htm_headbegin(htm *op,cchar *cfname) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op)) >= 0) {
+	if ((rs = htm_magic(op)) >= 0) ylikely {
 	    cchar	*sp = "<head>" ;
-	    if ((rs = shio_print(op->ofp,sp,-1)) >= 0) {
+	    if ((rs = shio_print(op->ofp,sp,-1)) >= 0) ylikely {
 	        wlen += rs ;
 	        if ((cfname != nullptr) && (cfname[0] != '\0')) {
 		    rs = htm_wrfile(op,cfname) ;
@@ -193,7 +193,7 @@ int htm_headbegin(htm *op,cchar *cfname) noex {
 int htm_headend(htm *op) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op)) >= 0) {
+	if ((rs = htm_magic(op)) >= 0) ylikely {
 	    cchar	*sp = "</head>" ;
 	    rs = shio_print(op->ofp,sp,-1) ;
 	    wlen += rs ;
@@ -205,9 +205,9 @@ int htm_headend(htm *op) noex {
 int htm_bodybegin(htm *op,cchar *cfname) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op)) >= 0) {
+	if ((rs = htm_magic(op)) >= 0) ylikely {
 	    cchar	*sp = "<body>" ;
-	    if ((rs = shio_print(op->ofp,sp,-1)) >= 0) {
+	    if ((rs = shio_print(op->ofp,sp,-1)) >= 0) ylikely {
 	        wlen += rs ;
 	        if ((cfname != nullptr) && (cfname[0] != '\0')) {
 		    rs = htm_wrfile(op,cfname) ;
@@ -235,9 +235,9 @@ int htm_tagbegin(htm *op,cc *tag,cc *eclass,cc *id,cc *(*kv)[2]) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op,tag)) >= 0) {
+	if ((rs = htm_magic(op,tag)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (tag[0]) {
+	    if (tag[0]) ylikely {
 	        cint	c = COLUMNS ;
 	        if (buffer b ; (rs = b.start(c)) >= 0) {
 	            cchar	*k ;
@@ -296,9 +296,9 @@ int htm_tagbegin(htm *op,cc *tag,cc *eclass,cc *id,cc *(*kv)[2]) noex {
 int htm_tagend(htm *op,cchar *tag) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op,tag)) >= 0) {
+	if ((rs = htm_magic(op,tag)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (tag[0]) {
+	    if (tag[0]) ylikely {
 		cchar	*fmt = "</%s>" ;
 	        if ((rs = bufprintf(op->lbuf,op->llen,fmt,tag)) >= 0) {
 	            rs = shio_print(op->ofp,op->lbuf,rs) ;
@@ -314,7 +314,7 @@ int htm_textbegin(htm *op,cc *eclass,cc *id,cc *title,
 		int r,int c,cchar *(*tkv)[2]) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = htm_magic(op)) >= 0) {
+	if ((rs = htm_magic(op)) >= 0) ylikely {
 	    cint	dlen = DIGBUFLEN ;
 	    int		bsz = 0 ;
 	    int		kvsize = 0 ;
@@ -327,7 +327,7 @@ int htm_textbegin(htm *op,cc *eclass,cc *id,cc *title,
 	    kvsize += (6*(2*szof(cchar *))) ;
 	    bsz += kvsize ;
 	    bsz += ((dlen+1)*2) ;
-	    if (void *vp ; (rs = lm_mall(bsz,&vp)) >= 0) {
+	    if (void *vp ; (rs = lm_mall(bsz,&vp)) >= 0) ylikely {
 	        cchar	*(*kv)[2] ;
 	        char	*bp = charp(vp) ;
 	        char	*d0, *d1 ;
@@ -379,9 +379,9 @@ int htm_abegin(htm *op,cc *eclass,cc *id,cc *href,cc *title) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op,href)) >= 0) {
+	if ((rs = htm_magic(op,href)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (href[0]) {
+	    if (href[0]) ylikely {
 	        if (sbuf b ; (rs = b.start(op->lbuf,op->llen)) >= 0) {
 	            cchar	*tag = "a" ;
 	            b.chr(CH_LANGLE) ;
@@ -430,7 +430,7 @@ int htm_abegin(htm *op,cc *eclass,cc *id,cc *href,cc *title) noex {
 int htm_aend(htm *op) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op)) >= 0) {
+	if ((rs = htm_magic(op)) >= 0) ylikely {
 	    cchar	*tag = "a" ;
 	    if ((rs = bufprintf(op->lbuf,op->llen,"</%s>",tag)) >= 0) {
 	        rs = shio_print(op->ofp,op->lbuf,rs) ;
@@ -454,9 +454,9 @@ int htm_img(htm *op,cc *eclass,cc *id,cc *src,cc *title,cc *alt,
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op,src)) >= 0) {
+	if ((rs = htm_magic(op,src)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (src[0]) {
+	    if (src[0]) ylikely {
 	        if (sbuf b ; (rs = b.start(op->lbuf,op->llen)) >= 0) {
 	            cchar	*tag = "img" ;
 	            b.chr(CH_LANGLE) ;
@@ -517,7 +517,7 @@ int htm_img(htm *op,cc *eclass,cc *id,cc *src,cc *title,cc *alt,
 int htm_write(htm *op,cvoid *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op,lbuf)) >= 0) {
+	if ((rs = htm_magic(op,lbuf)) >= 0) ylikely {
 	    rs = shio_write(op->ofp,lbuf,llen) ;
 	    wlen += rs ;
 	    op->wlen += wlen ;
@@ -528,7 +528,7 @@ int htm_write(htm *op,cvoid *lbuf,int llen) noex {
 int htm_printline(htm *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op,lbuf)) >= 0) {
+	if ((rs = htm_magic(op,lbuf)) >= 0) ylikely {
 	    rs = shio_print(op->ofp,lbuf,llen) ;
 	    wlen += rs ;
 	    op->wlen += wlen ;
@@ -539,7 +539,7 @@ int htm_printline(htm *op,cchar *lbuf,int llen) noex {
 int htm_printf(htm *op,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
-	if ((rs = htm_magic(op)) >= 0) {
+	if ((rs = htm_magic(op)) >= 0) ylikely {
 	    va_begin(ap,fmt) ;
 	    rs = htm_vprintf(op,fmt,ap) ;
 	    va_end(ap) ;
@@ -550,7 +550,7 @@ int htm_printf(htm *op,cchar *fmt,...) noex {
 int htm_vprintf(htm *op,cchar *fmt,va_list ap) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op)) >= 0) {
+	if ((rs = htm_magic(op)) >= 0) ylikely {
 	    rs = shio_vprintf(op->ofp,fmt,ap) ;
 	    wlen += rs ;
 	    op->wlen += wlen ;
@@ -561,7 +561,7 @@ int htm_vprintf(htm *op,cchar *fmt,va_list ap) noex {
 int htm_putc(htm *op,int ch) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op)) >= 0) {
+	if ((rs = htm_magic(op)) >= 0) ylikely {
 	    rs = shio_putc(op->ofp,ch) ;
 	    wlen += rs ;
 	    op->wlen += wlen ;
@@ -576,9 +576,9 @@ local int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = htm_magic(op,tag)) >= 0) {
+	if ((rs = htm_magic(op,tag)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (tag[0]) {
+	    if (tag[0]) ylikely {
                 if (sbuf b ; (rs = b.start(op->lbuf,op->llen)) >= 0) {
                     b.chr(CH_LANGLE) ;
                     b.strw(tag,-1) ;
@@ -602,7 +602,7 @@ local int htm_tagalone(htm *op,cchar *tag,cchar *eclass,cchar *id) noex {
                     } /* end for */
                     b.strw(" /",2) ;
                     b.chr(CH_RANGLE) ;
-                    if (rs >= 0) {
+                    if (rs >= 0) ylikely {
                         if ((rs = b.getlen) >= 0) {
                             rs = shio_print(op->ofp,op->lbuf,rs) ;
                             wlen += rs ;
@@ -620,7 +620,7 @@ local int htm_printout(htm *op,int c,cchar *bp,int bl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (linefold f ; (rs = linefold_start(&f,c,1,bp,bl)) >= 0) {
+	if (linefold f ; (rs = linefold_start(&f,c,1,bp,bl)) >= 0) ylikely {
 	    int		ll ;
 	    cchar	*lp ;
 	    for (int i = 0 ; (ll = linefold_get(&f,i,&lp)) >= 0 ; i += 1) {
@@ -644,7 +644,7 @@ local int htm_wrfile(htm *op,cchar *cfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-        if (shio cf ; (rs = shio_open(&cf,cfname,"r",0)) >= 0) {
+        if (shio cf ; (rs = shio_open(&cf,cfname,"r",0)) >= 0) ylikely {
             while ((rs = shio_read(&cf,op->lbuf,op->llen)) > 0) {
                 rs = shio_write(op->ofp,op->lbuf,rs) ;
                 wlen += rs ;
