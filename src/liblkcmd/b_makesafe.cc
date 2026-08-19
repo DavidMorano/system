@@ -1624,7 +1624,7 @@ local int procfile(proginfo *pip,DISP *dop,cchar *fname)
 	if (fname[0] != '-') {
 	    ustat	sb ;
 	    if ((rs = u_stat(fname,&sb)) >= 0) {
-	        if ((rs = permid(&lip->id,&sb,R_OK)) >= 0) {
+	        if ((rs = permids(&lip->id,&sb,R_OK)) >= 0) {
 	            rs = disp_addwork(dop,fname,-1) ;
 	        } else if (isNotAccess(rs)) {
 	            rs = SR_OK ;
