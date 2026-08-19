@@ -15,7 +15,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<vecobj.h>		/* LIDAM */
+#include	<vecobj.h>		/* LIDUC */
 
 
 #define	CYIMK		struct cyimk_head
