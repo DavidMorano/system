@@ -1370,7 +1370,7 @@ local int procpathtry_cd(PI *pip,SHIO *ofp,pathtry *ptp) noex {
 	    if (ustat sb ; (rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 		    cint	am = (X_OK | R_OK) ;
-	            if ((rs = permid(&lip->id,&sb,am)) >= 0) {
+	            if ((rs = permids(&lip->id,&sb,am)) >= 0) {
 	    		rs = printit(pip,ofp,ptp->fname) ;
 	    		c += 1 ;
 		    } else if (isNotAccess(rs)) {
@@ -1395,7 +1395,7 @@ local int procpathtry_exec(PI *pip,SHIO *ofp,pathtry *ptp) noex {
 	    if (ustat sb ; (rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
 		    cint	am = X_OK ;
-		    if ((rs = permid(&lip->id,&sb,am)) >= 0) {
+		    if ((rs = permids(&lip->id,&sb,am)) >= 0) {
 	                rs = printit(pip,ofp,ptp->fname) ;
 	                c += 1 ;
 		    } else if (isNotAccess(rs)) {
@@ -1425,7 +1425,7 @@ local int procpathtry_func(PI *pip,SHIO *ofp,pathtry *ptp) noex {
 	    if (ustat sb ; (rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
 		    cint	am = R_OK ;
-	            if ((rs = permid(&lip->id,&sb,am)) >= 0) {
+	            if ((rs = permids(&lip->id,&sb,am)) >= 0) {
 	                rs = printit(pip,ofp,ptp->fname) ;
 	                c += 1 ;
 		    } else if (isNotAccess(rs)) {
@@ -1503,7 +1503,7 @@ local int procpathtry_liber(PI *pip,SHIO *ofp,pathtry *ptp) noex {
 	if (ustat sb ; (rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
 		cint	am = R_OK ;
-	        if ((rs = permid(&lip->id,&sb,am)) >= 0) {
+	        if ((rs = permids(&lip->id,&sb,am)) >= 0) {
 	            rs = printit(pip,ofp,ptp->fname) ;
 	            c += 1 ;
 		} else if (isNotAccess(rs)) {
@@ -1553,7 +1553,7 @@ local int procpathtry_man(PI *pip,SHIO *ofp,pathtry *ptp) noex {
 			if (ustat sb ; (rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	                    if (S_ISREG(sb.st_mode)) {
 				cint	am = R_OK ;
-	                        if ((rs = permid(&lip->id,&sb,am)) >= 0) {
+	                        if ((rs = permids(&lip->id,&sb,am)) >= 0) {
 	                	    rs = printit(pip,ofp,ptp->fname) ;
 	                	    c += 1 ;
 				} else if (isNotAccess(rs)) {
@@ -1652,7 +1652,7 @@ local int procpathtry_maner(PI *pip,SHIO *ofp,pathtry *ptp,
 			if ((rs = uc_stat(ptp->fname,&sb)) >= 0) {
 			    if (S_ISREG(sb.st_mode)) {
 				cint	am = R_OK ;
-				if ((rs = permid(&lip->id,&sb,am)) >= 0) {
+				if ((rs = permids(&lip->id,&sb,am)) >= 0) {
 	            		    rs = printit(pip,ofp,ptp->fname) ;
 	            		    c += 1 ;
 				} else if (isNotAccess(rs)) {
@@ -1681,7 +1681,7 @@ local int procpathtry_inc(PI *pip,SHIO *ofp,pathtry *ptp) noex {
 	    if (ustat sb ; (rs = uc_stat(ptp->fname,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
 		    cint	am = R_OK ;
-	            if ((rs = permid(&lip->id,&sb,am)) >= 0) {
+	            if ((rs = permids(&lip->id,&sb,am)) >= 0) {
 	                rs = printit(pip,ofp,ptp->fname) ;
 	                c += 1 ;
 		    } else if (isNotAccess(rs)) {
@@ -1730,7 +1730,7 @@ local int procqualname(PI *pip,SHIO *ofp,cchar *fname) noex {
 	    if ((rs >= 0) && lip->pt.e) {
 	        if (S_ISREG(sb.st_mode)) {
 		    cint	am = X_OK ;
-	            if ((rs = permid(&lip->id,&sb,am)) >= 0) {
+	            if ((rs = permids(&lip->id,&sb,am)) >= 0) {
 	                rs = printit(pip,ofp,fname) ;
 	                c += 1 ;
 		    } else if (isNotAccess(rs)) {
