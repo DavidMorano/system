@@ -110,7 +110,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
 extern int	haswhite(const char *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isalphalatin(int) ;
