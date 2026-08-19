@@ -1,19 +1,17 @@
-/* progexec */
+/* progexec SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* execute a server daemon program */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	0		/* debug print-outs */
 #define	CF_ISAEXEC	1		/* try 'isaexec(3c)' */
-
 
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -21,30 +19,29 @@
 
 /**************************************************************************
 
-	This subroutine just 'exec(2)'s a daemon server program.
-
+	Description:
+	This subroutine just |exec(2)|s a daemon server program.
 
 ***************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
 #include	<csignal>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
-
 
 
 /* local defines */
@@ -57,13 +54,7 @@
 #define	VARUNDER	"_"
 
 
-
 /* external subroutines */
-
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
 
 
 /* external variables */
@@ -71,25 +62,27 @@ extern int	vstrkeycmp(const char **,const char **) ;
 
 /* forward references */
 
-static int	vecstr_loadenames(vecstr *,const char **,const char *) ;
-static int	vecstr_loadename(vecstr *,const char *,const char *) ;
+static int	vecstr_loadenames(vecstr *,cchar **,cchar *) ;
+static int	vecstr_loadename(vecstr *,cchar *,cchar *) ;
 
 
 /* local variables */
 
-static const char	*enames[] = {
+constexpr cpcchar	enames[] = {
 	VARUNDER,
 	"_EF",
 	NULL
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int progexec(pip,progfname,alp,elp)
 struct proginfo	*pip ;
-const char	progfname[] ;
+cchar	progfname[] ;
 VECSTR		*alp ;
 VECSTR		*elp ;
 {
@@ -117,8 +110,8 @@ VECSTR		*elp ;
 	}
 
 	if (rs >= 0) {
-	    const char	**av = (const char **) alp->va ;
-	    const char	**ev = (const char **) elp->va ;
+	    cchar	**av = (cchar **) alp->va ;
+	    cchar	**ev = (cchar **) elp->va ;
 
 #if	CF_ISAEXEC && defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 	    uc_isaexecve(progfname,av,ev);
@@ -145,8 +138,8 @@ ret0:
 
 static int vecstr_loadenames(elp,names,fname)
 vecstr		*elp ;
-const char	*names[] ;
-const char	fname[] ;
+cchar	*names[] ;
+cchar	fname[] ;
 {
 	int	rs = SR_OK ;
 	int	i ;
@@ -162,13 +155,13 @@ const char	fname[] ;
 
 	return rs ;
 }
-/* end subroutines (vecstr_loadenames) */
+/* end subroutine (vecstr_loadenames) */
 
 
 static int vecstr_loadename(elp,name,fname)
 vecstr		*elp ;
-const char	name[] ;
-const char	fname[] ;
+cchar	name[] ;
+cchar	fname[] ;
 {
 	int	rs = SR_OK ;
 	int	i ;
@@ -182,7 +175,7 @@ const char	fname[] ;
 
 	return rs ;
 }
-/* end subroutines (vecstr_loadename) */
+/* end subroutine (vecstr_loadename) */
 
 
 
