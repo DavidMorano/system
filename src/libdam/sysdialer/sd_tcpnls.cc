@@ -151,7 +151,7 @@ cchar	*av[] ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic == TCPNLS_MAGIC) return SR_INUSE ;
+	if (op->magval == TCPNLS_MAGIC) return SR_INUSE ;
 
 #if	CF_DEBUGS
 	debugprintf("tcpnls_open: ent hostname=%s svcname=%s\n",
@@ -485,7 +485,7 @@ cchar	*av[] ;
 
 	    uc_closeonexec(op->fd,true) ;
 
-	    op->magic = TCPNLS_MAGIC ;
+	    op->magval = TCPNLS_MAGIC ;
 	    op->opentime = time(nullptr) ;
 
 	}
@@ -524,7 +524,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != TCPNLS_MAGIC)
+	if (op->magval != TCPNLS_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_reade(op->fd,buf,buflen,to,opts) ;
@@ -546,7 +546,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != TCPNLS_MAGIC)
+	if (op->magval != TCPNLS_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_recve(op->fd,buf,buflen,flags,to,opts) ;
@@ -570,7 +570,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != TCPNLS_MAGIC)
+	if (op->magval != TCPNLS_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_recvfrome(op->fd,buf,buflen,flags,sap,salenp,to,opts) ;
@@ -591,7 +591,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != TCPNLS_MAGIC)
+	if (op->magval != TCPNLS_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_recvmsge(op->fd,msgp,flags,to,opts) ;
@@ -611,7 +611,7 @@ int		buflen ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != TCPNLS_MAGIC)
+	if (op->magval != TCPNLS_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_writen(op->fd,buf,buflen) ;
@@ -632,7 +632,7 @@ int		flags ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != TCPNLS_MAGIC)
+	if (op->magval != TCPNLS_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_send(op->fd,buf,buflen,flags) ;
@@ -655,7 +655,7 @@ int		salen ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != TCPNLS_MAGIC)
+	if (op->magval != TCPNLS_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_sendto(op->fd,buf,buflen,flags,sap,salen) ;
@@ -675,7 +675,7 @@ int		flags ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != TCPNLS_MAGIC)
+	if (op->magval != TCPNLS_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_sendmsg(op->fd,msgp,flags) ;
@@ -697,7 +697,7 @@ int		cmd ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != TCPNLS_MAGIC)
+	if (op->magval != TCPNLS_MAGIC)
 	    return SR_NOTOPEN ;
 
 /* a bad bug in the Solaris TLI module hoses on this if comes too fast */
@@ -732,12 +732,12 @@ TCPNLS		*op ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != TCPNLS_MAGIC)
+	if (op->magval != TCPNLS_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_close(op->fd) ;
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (tcpnls_close) */
