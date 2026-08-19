@@ -1,8 +1,9 @@
-/* main */
+/* main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* generic (pretty much) front end program subroutine */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
@@ -13,12 +14,11 @@
 #define	CF_SETRUID	1		/* set real UID to EUID */
 #define	CF_CHECKONC	1		/* check ONC */
 
-
 /* revision history:
 
 	= 1994-09-01, David A­D­ Morano
-	This subroutine was borrowed and modified from previous generic
-	front-end 'main' subroutines !
+	This subroutine was borrowed and modified from previous
+	generic front-end 'main' subroutines !
 
 */
 
@@ -26,22 +26,20 @@
 
 /*******************************************************************************
 
-        This subroutine forms the front-end part of a generic PCS type of
-        program. This front-end is used in a variety of PCS programs.
-
-        This code was originally part of the Personal Communications
-        Services (PCS) package but can also be used independently from it.
-        Historically, this was developed as part of an effort to maintain high
-        function (and reliable) email communications in the face of increasingly
-        draconian security restrictions imposed on the computers in the DEFINITY
-        development organization.
-
+  	Description:
+	This subroutine forms the front-end part of a generic PCS
+	type of program. This front-end is used in a variety of PCS
+	programs.  This code was originally part of the Personal
+	Communications Services (PCS) package but can also be used
+	independently from it.  Historically, this was developed
+	as part of an effort to maintain high function (and reliable)
+	email communications in the face of increasingly draconian
+	security restrictions imposed on the computers in the
+	DEFINITY development organization.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -49,16 +47,16 @@
 #include	<sys/mkdev.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<climits>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<netdb.h>
+#include	<grp.h>
+#include	<ctime>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<grp.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<logfile.h>
 #include	<vecstr.h>
@@ -70,12 +68,12 @@
 #include	<getax.h>
 #include	<getusername.h>
 #include	<userinfo.h>
+#include	<srvtab.h>
+#include	<acctab.h>
+#include	<paramfile.h>
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
-
-#include	"srvtab.h"
-#include	"acctab.h"
-#include	"paramfile.h"
 
 #include	"config.h"
 #include	"defs.h"
@@ -111,33 +109,11 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	vstrkeycmp(char **,char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	getserial(const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	getfname(const char *,const char *,int,char *) ;
-extern int	bopenroot(bfile *,char *,char *,char *,char *,int) ;
-
-extern int	varsub_addva(), varsub_subbuf(), varsub_merge() ;
 extern int	expander(struct proginfo *,char *,int,char *,int) ;
 extern int	procfileenv(char *,char *,vecstr *) ;
 extern int	procfilepath(char *,char *,vecstr *) ;
 
 extern int	process(struct proginfo *,vecstr *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strbasename(char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 #if	CF_DEBUG
 extern void	d_whoopen(char *) ;
@@ -165,17 +141,6 @@ static int	checkstamp(struct proginfo *,char *,int) ;
 
 /* local variables */
 
-static const char *argopts[] = {
-	"TMPDIR",
-	"VERSION",
-	"VERBOSE",
-	"ROOT",
-	"LOGFILE",
-	"CONFIG",
-	"HELP",
-	NULL
-} ;
-
 enum argopts {
 	argopt_tmpdir,
 	argopt_version,
@@ -187,11 +152,14 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*configkeys[] = {
-	"timestamp",
-	"mincheck",
-	"mbtab",
-	"maildir",
+constexpr cpcchar	argopts[] = {
+	"TMPDIR",
+	"VERSION",
+	"VERBOSE",
+	"ROOT",
+	"LOGFILE",
+	"CONFIG",
+	"HELP",
 	NULL
 } ;
 
@@ -203,8 +171,16 @@ enum configkeys {
 	configkey_overlast
 } ;
 
+constexpr cpcchar	configkeys[] = {
+	"timestamp",
+	"mincheck",
+	"mbtab",
+	"maildir",
+	NULL
+} ;
+
 /* 'conf' for most regular programs */
-static const char	*sched1[] = {
+constexpr cpcchar	sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -213,7 +189,7 @@ static const char	*sched1[] = {
 } ;
 
 /* non-'conf' ETC stuff for all regular programs */
-static const char	*sched2[] = {
+constexpr cpcchar	sched2[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -223,7 +199,7 @@ static const char	*sched2[] = {
 } ;
 
 /* non-'conf' ETC stuff for local searching */
-static const char	*sched3[] = {
+constexpr cpcchar	sched3[] = {
 	"%e/%n/%n.%f",
 	"%e/%n/%f",
 	"%e/%n.%f",
@@ -234,17 +210,16 @@ static const char	*sched3[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[], *envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
 	ustat		sb ;
 	struct proginfo		pi, *pip = &pi ;
 	struct configfile	cf ;
-	struct group	ge ;
+	GROUP		ge ;
 	PCSCONF		pc ;
 	USERINFO	u ;
 	bfile		errfile ;
