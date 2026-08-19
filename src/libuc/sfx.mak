@@ -46,10 +46,10 @@ OBJ02= sflast.o sfnamecomp.o sfprogroot.o
 OBJ03= sfrootname.o sfshrink.o sfskipwhite.o 
 OBJ04= sfcasesub.o sfsubstance.o sfthing.o 
 OBJ05= sfword.o sfprogname.o sfsign.o 
-OBJ06= sfnext.o sfnextqtok.o xfcontent.o
+OBJ06= sfnext.o sfnextqtok.o
 OBJ07= sfxchr.o sfxbrk.o sfxsub.o sfext.o
 
-OBJ08= sfweirdo.o cfcontent.o
+OBJ08= sfweirdo.o sfcontent.o
 OBJ09= sfkey.o sfkeyval.o
 OBJ10=
 OBJ11=
@@ -62,7 +62,7 @@ OBJD= obj06.o obj07.o obj08.o obj09.o
 OBJG0= obja.o objb.o
 OBJG1= objc.o objd.o
 
-OBJ= $(OBJG0) $(OBJG1_SFX)
+OBJ= $(OBJG0) $(OBJG1)
 
 
 INCDIRS=
