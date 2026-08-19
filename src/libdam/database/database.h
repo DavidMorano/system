@@ -30,20 +30,14 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ptm.h>
-#include	<fifoitem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<fifoitem.h>		/* LINUC */
 
 #include	<babieshdr.h>
 #include	<babycalc.h>
 #include	<babycalcs.h>
-#include	<bpihdr.h>
-#include	<bvihdr.h>
-#include	<bvshdr.h>
 #include	<cmi.h>
 #include	<cmihdr.h>
 #include	<cmimk.h>
@@ -59,7 +53,6 @@
 #include	<varmk.h>
 #include	<varmks.h>
 #include	<vars.h>
-#include	<votdchdr.h>
 
 
 #endif /* DATABASE_INCLUDE */
