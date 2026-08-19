@@ -144,7 +144,7 @@ namespace {
 
 /* forward references */
 
-local int permer(ustat *,uid_t,gid_t,const gid_t *,int) noex ;
+local int permer(custat *,uid_t,gid_t,const gid_t *,int) noex ;
 
 
 /* local variables */
@@ -190,7 +190,7 @@ int permf(int fd,uid_t euid,gid_t egid,const gid_t *gids,int am) noex {
 	return rs ;
 } /* end subroutine (permf) */
 
-int permids(ids *idp,ustat *sbp,int am) noex {
+int permids(ids *idp,custat *sbp,int am) noex {
 	int		rs = SR_FAULT ;
 	if (idp && sbp) ylikely {
 	    const uid_t		euid = idp->euid ;
@@ -214,7 +214,7 @@ extern int permidf(ids *idp,cchar *fname,int am) noex {
 
 /* local subroutines */
 
-local int permer(ustat *sbp,uid_t euid,gid_t egid,cgid *gids,int am) noex {
+local int permer(custat *sbp,uid_t euid,gid_t egid,cgid *gids,int am) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (sbp) ylikely {
