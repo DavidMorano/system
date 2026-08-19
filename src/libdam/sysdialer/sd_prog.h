@@ -41,7 +41,7 @@ struct sdprog_head {
 	logfile		*lhp ;
 	pid_t		pid ;
 	SDPROG_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
 	int		tlen ;
 	char		efname[MAXPATHLEN + 1] ;
