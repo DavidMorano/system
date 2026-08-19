@@ -20,12 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<pthread.h>		/* |pthread_mutex_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<pthread.h>		/* POSIX® |pthread_mutex_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	"ptma.h"
 
