@@ -23,7 +23,7 @@
 
 
 struct tcpmux_head {
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
 } ; /* end struct */
 
