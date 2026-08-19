@@ -96,7 +96,7 @@ extern int	citedb_finish(CITEDB *) ;
 extern int	citedb_adds(CITEDB *,int,uint,const char *,int) ;
 extern int	citedb_curbegin(CITEDB *,CITEDB_CUR *) ;
 extern int	citedb_curend(CITEDB *,CITEDB_CUR *) ;
-extern int	citedb_enum(CITEDB *,CITEDB_CUR *,CITEDB_ENT *) ;
+extern int	citedb_curenum(CITEDB *,CITEDB_CUR *,CITEDB_ENT *) ;
 extern int	citedb_fetch(CITEDB *,const char *,
 			CITEDB_CUR *,CITEDB_ENT *) ;
 extern int	citedb_audit(CITEDB *) ;
