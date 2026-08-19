@@ -1186,12 +1186,12 @@ static int procfile(PROGINFO *pip,cchar fname[])
 	                if (lip->ft.r) am |= R_OK ;
 	                if (lip->ft.w) am |= W_OK ;
 	                if (lip->ft.x) am |= X_OK ;
-	                rs1 = permid(&lip->id,&usb,am) ;
+	                rs1 = permids(&lip->id,&usb,am) ;
 	                if (rs1 >= 0) f_ok = TRUE ;
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(3))
-	                    debugprintf("b_isfile/procfile: permid() rs=%d\n",
+	                    debugprintf("b_isfile/procfile: permids() rs=%d\n",
 	                        rs1) ;
 #endif
 
