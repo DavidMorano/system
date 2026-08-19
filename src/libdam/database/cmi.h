@@ -22,7 +22,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<cmihdr.h>		/* this is the hash-file-header */
+#include	<cmihdr.h>		/* LIBDAM hash-file-header */
 
 
 #define	CMI		struct cmi_head
