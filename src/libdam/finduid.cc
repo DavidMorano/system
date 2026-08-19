@@ -127,15 +127,15 @@ local int finduid_dtor(finduid *op) noex {
 	    if (op->ucp) ylikely {
 		delete op->ucp ;
 		op->ucp = nullptr ;
-	    }
+	    } /* end if (delete-pwcache) */
 	    if (op->utp) ylikely {
 		delete op->utp ;
 		op->utp = nullptr ;
-	    }
+	    } /* end if (delete-tmpx) */
 	    if (op->mxp) ylikely {
 		delete op->mxp ;
 		op->mxp = nullptr ;
-	    }
+	    } /* end if (delete-ptm) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (finduid_dtor) */
