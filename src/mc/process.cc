@@ -1,60 +1,54 @@
-/* process */
+/* process SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process the service names given us */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	1		/* switchable debug print-outs */
-#define	CF_ALWAYSDEFAULT	0		/* always want the default access ? */
-#define	CF_FASTQ		0		/* fast Q allocation of PROEGENTRYs */
+#define	CF_ALWAYSDEFAULT	0	/* always want the default access ? */
+#define	CF_FASTQ		0	/* fast Q allocation of PROEGENTRYs */
 #define	CF_SRVTABCHECK	1		/* check SRVTAB for changes */
 #define	CF_ACCTABCHECK	1		/* check ACCTAB for changes */
 #define	CF_SRVTABFREE	0		/* free up SRVTAB occassionally ? */
 #define	CF_ACCTABFREE	0		/* free up ACCTAB occassionally ? */
 
-
 /* revision history:
 
 	= 91/09/01, David A­D­ Morano
-
 	This subroutine was adopted from the DWD program.
-
 
 */
 
-
 /*****************************************************************************
 
+  	Description:
 	This subroutine is responsible for processing the jobs that
 	have been handed to us from the initialization code.
 
-
 	Returns:
-
 	OK	may not really matter in the current implementation !
-
-
 
 *****************************************************************************/
 
-
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<sys/time.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
+#include	<ctime>
 #include	<csignal>
-#include	<time.h>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<logfile.h>
 #include	<varsub.h>
@@ -571,7 +565,7 @@ struct proginfo		*pip ;
 struct procinfo		*sip ;
 struct pollentry	*pep ;
 {
-	PARAMFILE_CUR	cur ;
+	paramfile_cur	cur ;
 
 	SOCKADDRESS		to ;
 
