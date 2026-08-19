@@ -1232,7 +1232,7 @@ local bool isstart(cchar *lp,int ll,int *namp,int *sip) noex {
 	bool		f = false ;
 	*namp = -1 ;
 	*sip = 0 ;
-	if (cchar *tp = strnchr(lp,ll,'.') ; tp) {
+	if (cchar *tp = strnchr(lp,ll,'.') ; tp) ylikely {
 	    cc	*cp = lp ;
 	    int	cl = intconv(tp - lp) ;
 	    f = hasourdig(cp,cl) && (cfdeci(cp,cl,namp) >= 0) ;
@@ -1246,7 +1246,7 @@ local bool isstart(cchar *lp,int ll,int *namp,int *sip) noex {
 local bool hasourdig(cchar *sp,int sl) noex {
 	bool		f = false ; /* return-value */
 	cchar	*cp ;
-	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	    f = true ;
 	    for ( ; cl-- && *cp ; cp += 1) {
 	        f = isdigitlatin(*cp) ;
