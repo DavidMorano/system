@@ -108,7 +108,7 @@ struct sysdialer_head {
 	SYSDIALER_PRC	pc ;
 	SYSDIALER_FL	fl ;
 	time_t		ti_lastcheck ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct sysdialer_module {
