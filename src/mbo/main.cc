@@ -1,7 +1,9 @@
-/* main */
+/* main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* fairly generic (PCS) front-end */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* run-time */
@@ -9,12 +11,11 @@
 #define	CF_PCSPOLL	0		/* call 'pcspoll(3pcs)' */
 #define	CF_ISSAMEHOST	1		/* use 'issamehostname(3dam)' */
 
-
 /* revision history:
 
 	= 1999-05-01, David A­D­ Morano
-        This code module was completely rewritten to replace any original
-        garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 */
 
@@ -22,32 +23,31 @@
 
 /******************************************************************************
 
-        This program just locks a mailbox file and copies it out. After a
-        successful copy, the mailbox file is truncated.
-
+  	Description:
+	This program just locks a mailbox file and copies it out.
+	After a successful copy, the mailbox file is truncated.
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<termios.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<grp.h>
 #include	<syslog.h>
-
-#include	<usystem.h>
+#include	<grp.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getax.h>
-#include	<getourenv.h>
 #include	<baops.h>
 #include	<keyopt.h>
 #include	<bfile.h>
@@ -63,6 +63,7 @@
 #include	<mailmsgid.h>
 #include	<ctdec.h>
 #include	<strwcpy.h>
+#include	<headkeymat.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -92,38 +93,15 @@
 
 /* external subroutines */
 
-extern int	snscs(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	headkeymat(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getfname(const char *,const char *,int,char *) ;
-extern int	getserial(const char *) ;
-extern int	pcsuserfile(const char *,const char *,
-			const char *,const char *, char *) ;
-extern int	lockfile(int,int,off_t,off_t,int) ;
-extern int	initnow(struct timeb *,char *,int) ;
-extern int	isdigitlatin(int) ;
-
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
-extern int	proginfo_setpiv(struct proginfo *,const char *,
+extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
+extern int	proginfo_setpiv(struct proginfo *,cchar *,
 			const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 #endif
-
-extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
-extern char	*strbasename(char *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -142,22 +120,10 @@ extern char	*timestr_logz(time_t,char *) ;
 
 static int	usage(struct proginfo *) ;
 static int	errormap(int) ;
-static int	getprogopts(struct proginfo *,KEYOPT *,vecstr *) ;
+static int	getprogopts(struct proginfo *,keyopt *,vecstr *) ;
 
 
 /* local variables */
-
-static const char *argopts[] = {
-	"VERSION",
-	"VERBOSE",
-	"ROOT",
-	"TMPDIR",
-	"HELP",
-	"if",
-	"af",
-	"of",
-	NULL
-} ;
 
 enum argopts {
 	argopt_version,
@@ -171,7 +137,19 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const struct pivars	initvars = {
+constexpr cpcchar	argopts[] = {
+	"VERSION",
+	"VERBOSE",
+	"ROOT",
+	"TMPDIR",
+	"HELP",
+	"if",
+	"af",
+	"of",
+	nullptr
+} ;
+
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -179,7 +157,7 @@ static const struct pivars	initvars = {
 	VARPRLOCAL
 } ;
 
-static const struct mapex	mapexs[] = {
+constexpr mapex		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -189,21 +167,6 @@ static const struct mapex	mapexs[] = {
 	{ SR_REMOTE, EX_PROTOCOL },
 	{ SR_NOSPC, EX_TEMPFAIL },
 	{ 0, 0 }
-} ;
-
-static const char *progopts[] = {
-	"maildir",
-	"deadmaildir",
-	"comsat",
-	"spam",
-	"loglen",
-	"logzones",
-	"logenv",
-	"divert",
-	"logmsgid",
-	"nospam",
-	"norepeat",
-	NULL
 } ;
 
 enum progopts {
@@ -221,9 +184,26 @@ enum progopts {
 	progopt_overlast
 } ;
 
+constexpr cpcchar	progopts[] = {
+	"maildir",
+	"deadmaildir",
+	"comsat",
+	"spam",
+	"loglen",
+	"logzones",
+	"logenv",
+	"divert",
+	"logmsgid",
+	"nospam",
+	"norepeat",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
-
 
 int main(argc,argv,envv)
 int	argc ;
@@ -235,7 +215,7 @@ char	*envv[] ;
 	struct group	ge ;
 	PCSCONF		p ;
 	USERINFO	u ;
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	bfile		errfile ;
 	bfile		infile, *ifp = &infile ;
 	bfile		outfile, *ofp = &outfile ;
@@ -261,16 +241,16 @@ char	*envv[] ;
 	int	f_version = FALSE ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*pr = NULL ;
-	const char	*ifname = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*fromaddr = NULL ;
-	const char	*uu_machine = NULL ;
-	const char	*uu_user = NULL ;
-	const char	*protospec = NULL ;
-	const char	*up, *sp, *cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*pr = nullptr ;
+	cchar	*ifname = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*fromaddr = nullptr ;
+	cchar	*uu_machine = nullptr ;
+	cchar	*uu_user = nullptr ;
+	cchar	*protospec = nullptr ;
+	cchar	*up, *sp, *cp ;
 	char	argpresent[MAXARGGROUPS + 1] ;
 	char	userbuf[USERINFO_LEN + 1] ;
 	char	pcsconfbuf[PCSCONF_LEN + 1] ;
@@ -280,7 +260,7 @@ char	*envv[] ;
 	char	timebuf[TIMEBUFLEN + 1] ;
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -288,10 +268,10 @@ char	*envv[] ;
 
 	proginfo_start(pip,envv,argv[0],VERSION) ;
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
-	if ((cp = getenv(VARERRORFNAME)) != NULL) {
+	if ((cp = getenv(VARERRORFNAME)) != nullptr) {
 	    rs = bopen(&errfile,cp,"wca",0666) ;
 	} else
 	    rs = bopen(&errfile,BFILE_STDERR,"dwca",0666) ;
@@ -376,14 +356,14 @@ char	*envv[] ;
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-			avp = NULL ;
+			avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -780,7 +760,7 @@ char	*envv[] ;
 /* get help if requested */
 
 	if (f_help)
-	    rs = printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    rs = printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	if (f_version || f_help || f_usage)
 	    goto retearly ;
@@ -790,10 +770,10 @@ char	*envv[] ;
 
 /* initialization */
 
-	if (pip->tmpdname == NULL)
+	if (pip->tmpdname == nullptr)
 	    pip->tmpdname = getenv(VARTMPDNAME) ;
 
-	if (pip->tmpdname == NULL)
+	if (pip->tmpdname == nullptr)
 	    pip->tmpdname = TMPDNAME ;
 
 
@@ -829,7 +809,7 @@ char	*envv[] ;
 	    debugprintf("main: userinfo()\n",rs) ;
 #endif
 
-	rs = userinfo(&u,userbuf,USERINFO_LEN,NULL) ;
+	rs = userinfo(&u,userbuf,USERINFO_LEN,nullptr) ;
 	if (rs < 0) {
 	    ex = EX_NOUSER ;
 	    goto retearly ;
@@ -867,7 +847,7 @@ char	*envv[] ;
 	if (rs < 0)
 	    goto badinit1 ;
 
-	rs1 = pcsconf(pip->pr,NULL,&p,&sets,NULL,
+	rs1 = pcsconf(pip->pr,nullptr,&p,&sets,nullptr,
 	    pcsconfbuf,PCSCONF_LEN) ;
 
 #if	CF_DEBUG
@@ -897,9 +877,9 @@ char	*envv[] ;
 
 /* the "from" (envelope) address */
 
-	if (fromaddr == NULL) {
+	if (fromaddr == nullptr) {
 
-	    if (pip->fl.trusted && (uu_user != NULL))
+	    if (pip->fl.trusted && (uu_user != nullptr))
 	        fromaddr = uu_user ;
 
 	    else
@@ -911,9 +891,9 @@ char	*envv[] ;
 
 /* the protocol specification */
 
-	if (protospec == NULL) {
+	if (protospec == nullptr) {
 
-	    if (uu_machine != NULL) {
+	    if (uu_machine != nullptr) {
 
 	        protospec = buf ;
 	        snscs(buf,BUFLEN,"uucp",uu_machine) ;
@@ -985,16 +965,16 @@ char	*envv[] ;
 	        u.sysname,u.release) ;
 
 	    buf[0] = '\0' ;
-	    if ((u.fullname != NULL) && (u.fullname[0] != '\0'))
+	    if ((u.fullname != nullptr) && (u.fullname[0] != '\0'))
 	        strcpy(buf,u.fullname) ;
 
-	    else if ((u.name != NULL) && (u.name[0] != '\0'))
+	    else if ((u.name != nullptr) && (u.name[0] != '\0'))
 	        strcpy(buf,u.name) ;
 
-	    else if ((u.gecosname != NULL) && (u.gecosname[0] != '\0'))
+	    else if ((u.gecosname != nullptr) && (u.gecosname[0] != '\0'))
 	        strcpy(buf,u.gecosname) ;
 
-	    else if (u.mailname != NULL)
+	    else if (u.mailname != nullptr)
 	        strcpy(buf,u.mailname) ;
 
 	    if (buf[0] != '\0')
@@ -1005,13 +985,13 @@ char	*envv[] ;
 	        logfile_printf(&pip->lh,"%s!%s",
 	            u.nodename,u.username) ;
 
-	    if (protospec != NULL)
+	    if (protospec != nullptr)
 	        logfile_printf(&pip->lh,"proto=%s\n",protospec) ;
 
-	    if (uu_machine != NULL)
+	    if (uu_machine != nullptr)
 	        logfile_printf(&pip->lh,"uu_machine=%s\n",uu_machine) ;
 
-	    if (uu_user != NULL)
+	    if (uu_user != nullptr)
 	        logfile_printf(&pip->lh,"uu_user=%s\n",uu_user) ;
 
 	} /* end if */
@@ -1109,7 +1089,7 @@ char	*envv[] ;
 /* process the input message */
 
 	ifd = FD_STDIN ;
-	if ((ifname != NULL) && (ifname[0] != '-')) {
+	if ((ifname != nullptr) && (ifname[0] != '-')) {
 
 	    rs = uc_open(ifname,O_FLAGS,0666) ;
 	    ifd = rs ;
@@ -1129,7 +1109,7 @@ char	*envv[] ;
 /* output */
 
 	tfd = FD_STDOUT ;
-	if ((ofname != NULL) && (ofname[0] != '-')) {
+	if ((ofname != nullptr) && (ofname[0] != '-')) {
 
 	    rs = uc_open(ofname,O_WRONLY,0666) ;
 	    tfd = rs ;
@@ -1252,7 +1232,7 @@ ret3:
 	dater_finish(&pip->tmpdate) ;
 
 ret2:
-	if (pip->efp != NULL)
+	if (pip->efp != nullptr)
 	    bclose(pip->efp) ;
 
 ret1:
@@ -1296,16 +1276,16 @@ struct proginfo	*pip ;
 	wlen += rs ;
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutines (usage) */
+/* end subroutine (usage) */
 
 
 /* process program options */
 static int getprogopts(pip,kop,setsp)
 struct proginfo	*pip ;
-KEYOPT		*kop ;
+keyopt		*kop ;
 vecstr		*setsp ;
 {
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 
 	int	rs ;
 	int	i, oi, val, cl ;
@@ -1319,7 +1299,7 @@ vecstr		*setsp ;
 
 /* load up the environment options */
 
-	if ((cp = getenv(VAROPTS)) != NULL)
+	if ((cp = getenv(VAROPTS)) != nullptr)
 	    keyopt_loads(kop,cp,-1) ;
 
 /* system-wide options? */
@@ -1330,12 +1310,8 @@ vecstr		*setsp ;
 #endif
 
 	for (i = 0 ; vecstr_get(setsp,i,&cp) >= 0 ; i += 1) {
-
 	    char	*cp2 ;
-
-
-	    if (cp == NULL)
-	        continue ;
+	    if (cp == nullptr) continue ;
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
@@ -1358,9 +1334,9 @@ vecstr		*setsp ;
 	    keyopt_loads(kop,cp,-1) ;
 #else
 	    kp = cp ;
-	    vp = NULL ;
+	    vp = nullptr ;
 	    vlen = 0 ;
-	    if ((cp = strchr(cp,'=')) != NULL) {
+	    if ((cp = strchr(cp,'=')) != nullptr) {
 
 	        vp = cp + 1 ;
 	        vlen = -1 ;
@@ -1377,9 +1353,9 @@ vecstr		*setsp ;
 
 	keyopt_curbegin(kop,&kcur) ;
 
-	while ((rs = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	while ((rs = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
-	    KEYOPT_CUR	vcur ;
+	    keyopt_cur	vcur ;
 
 	    int	f_value = FALSE ;
 
@@ -1393,7 +1369,7 @@ vecstr		*setsp ;
 
 /* use only the first of any option with the same key */
 
-	    while ((rs = keyopt_enumvalues(kop,kp,&vcur,&vp)) >= 0) {
+	    while ((rs = keyopt_curenumvals(kop,kp,&vcur,&vp)) >= 0) {
 
 	        f_value = TRUE ;
 	        vlen = rs ;
@@ -1411,13 +1387,13 @@ vecstr		*setsp ;
 	        switch (oi) {
 
 	        case progopt_maildir:
-	            if ((vlen > 0) && (pip->maildname == NULL))
+	            if ((vlen > 0) && (pip->maildname == nullptr))
 	                pip->maildname = mallocstrw(vp,vlen) ;
 
 	            break ;
 
 	        case progopt_deadmaildir:
-	            if ((vlen > 0) && (pip->deadmaildname == NULL))
+	            if ((vlen > 0) && (pip->deadmaildname == nullptr))
 	                pip->deadmaildname = mallocstrw(vp,vlen) ;
 
 	            break ;
@@ -1436,13 +1412,13 @@ vecstr		*setsp ;
 	                }
 	            }
 
-	            if (pip->comsatfname == NULL)
+	            if (pip->comsatfname == nullptr)
 	                pip->comsatfname = mallocstrw(cp,cl) ;
 
 	            break ;
 
 	        case progopt_spam:
-	            if ((vlen > 0) && (pip->comsatfname == NULL))
+	            if ((vlen > 0) && (pip->comsatfname == nullptr))
 	                pip->spamfname = mallocstrw(vp,vlen) ;
 
 	            break ;
