@@ -91,7 +91,7 @@ local inline int bufstr_xxxx(bufstr *op,ctxxx_f<T> ctxxx,T v) noex {
 	        rs = ctxxx(bp,dlen,v) ;
 	        op->len += rs ;
 		len = rs ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine-template (bufstr_xxxx) */
@@ -147,7 +147,7 @@ int bufstr_finish(bufstr *op) noex {
 	        rs1 = lm_free(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    len = op->len ;
 	    op->dlen = 0 ;
 	    op->len = 0 ;
@@ -298,7 +298,7 @@ local int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 	int		rs = SR_OK ;
 	char		*dp{} ;
 	if (op->dbuf) {
-	    cint	rlen = (slen-op->len) ;
+	    cint	rlen = (slen - op->len) ;
 	    if (nlen > rlen) {
 	    	cint	dlen = max((slen + nlen),(slen * 2)) ;
 		if ((rs = lm_mall((dlen+1),&dp)) >= 0) {
