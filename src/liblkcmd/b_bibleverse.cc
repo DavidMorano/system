@@ -5,7 +5,6 @@
 /* retrieve bible verses by citation */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_DEBUGN	0		/* special */
@@ -53,7 +52,6 @@
 #include	<climits>		/* POSIX */
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
-#include	<tzfile.h>		/* POSIX |TM_YEAR_BASE| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
@@ -101,19 +99,16 @@ import libutil ;			/* |lenstr(3u)| */
 #endif
 
 #define	COLBUFLEN	(COLUMNS + 10)
-
 #define	NDAYS		256		/* maximum verses per chapter */
-
 #define	NBLANKS		20
-
 #define	TIMECOUNT	5
 
 #ifndef	TO_MKWAIT
 #define	TO_MKWAIT	(1 * 50)
 #endif
 
-#ifndef	TO_TMTIME
-#define	TO_TMTIME	5		/* time-out for TMTIME */
+#ifndef	TO_TIME
+#define	TO_TIME		5		/* time-out */
 #endif
 
 #define	TO_MJD		5		/* time-out for MJD */
@@ -159,7 +154,7 @@ struct locinfo_fl {
 } ; /* end struct */
 
 struct locinfo {
-	TMTIME		tm ;		/* holds today's date, when set */
+	tmtime		tm ;		/* holds today's date, when set */
 	BIBLEBOOK	ndb ;		/* bible-book-name DB */
 	BIBLEVERSE	vdb ;
 	BVS		sdb ;
@@ -392,7 +387,7 @@ local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	keyopt		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -421,14 +416,14 @@ local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	cchar	*cp ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_bibleverse: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -1185,7 +1180,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
@@ -1194,7 +1189,7 @@ badprogstart:
 	}
 #endif
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -2192,9 +2187,9 @@ local int locinfo_today(LI *lip) noex {
 
 	if ((rs = locinfo_tmtime(lip)) >= 0) {
 	    if ((! lip->fl.mjd) || ((pip->daytime - lip->ti_mjd) >= to)) {
-	        TMTIME	*tmp = &lip->tm ;
+	        tmtime	*tmp = &lip->tm ;
 	        lip->ti_mjd = pip->daytime ;
-	        yr = (tmp->year + TM_YEAR_BASE) ;
+	        yr = (tmp->year + TMTIME_YEARBASE) ;
 	        rs = getmjd(yr,tmp->mon,tmp->mday) ;
 	        mjd = rs ;
 	        lip->fl.mjd = true ;
@@ -2224,7 +2219,7 @@ local int locinfo_year(LI *lip) noex {
 
 	if (lip->year == 0) {
 	    if ((rs = locinfo_tmtime(lip)) >= 0) {
-	        lip->year = (lip->tm.year + TM_YEAR_BASE) ;
+	        lip->year = (lip->tm.year + TMTIME_YEARBASE) ;
 	    }
 	}
 
@@ -2235,7 +2230,7 @@ local int locinfo_tmtime(LI *lip) noex {
 	PI	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		tc = TIMECOUNT ;
-	int		to = TO_TMTIME ;
+	int		to = TO_TIME ;
 
 	if ((! lip->fl.tmtime) || (lip->timecount++ >= tc)) {
 	    if ((pip->daytime == 0) || (lip->timecount == tc)) {
