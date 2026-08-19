@@ -5,7 +5,6 @@
 /* generic (more of less) front-end subroutine */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 
@@ -53,15 +52,16 @@
 #include	<shell.h>
 #endif
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<cstdlib>
-#include	<cstring>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-
-#include	<usystem.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<calstrs.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -69,8 +69,8 @@
 #include	<linefold.h>
 #include	<filer.h>
 #include	<strx.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -88,7 +88,7 @@
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
@@ -239,7 +239,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	keyopt		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -271,14 +271,14 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	cchar		*cp ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_cal: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -812,7 +812,7 @@ badpargs:
 
 badprogstart:
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	debugclose() ;
 #endif
 
