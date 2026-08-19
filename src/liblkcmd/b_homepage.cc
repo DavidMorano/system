@@ -5,8 +5,7 @@
 /* program to create a "home" webpage in corporate environment */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0		/* run-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEBUGMOUT	0		/* debug memory-allocations */
 #define	CF_PROCARGS	0		/* |procargs()| */
@@ -61,51 +60,49 @@
 #include	<sys/param.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<climits>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<getpwx.h>
-#include	<bufsizeget.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<estrings.h>
-#include	<intceil.h>
-#include	<bits.h>
-#include	<keyopt.h>
-#include	<paramopt.h>
-#include	<userinfo.h>
-#include	<vecobj.h>
-#include	<vecstr.h>
-#include	<vecpstr.h>
-#include	<filer.h>
-#include	<paramfile.h>
-#include	<expcook.h>
-#include	<svcfile.h>
-#include	<ascii.h>
-#include	<nulstr.h>
-#include	<vechand.h>
-#include	<pta.h>
-#include	<ptm.h>
-#include	<ptc.h>
-#include	<upt.h>
-#include	<bwops.h>
-#include	<termout.h>
-#include	<spawner.h>
-#include	<lfm.h>
-#include	<tmtime.hh>
-#include	<querystr.h>
-#include	<strn.h>		/* |strnrbrk(3uc)| */
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<rmdirfiles.h>
-#include	<findbit.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<pta.h>			/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<findbit.h>		/* LIBU */
+#include	<getpwx.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<bits.h>		/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<paramopt.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecpstr.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<svcfile.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<bwops.h>		/* LIBUC */
+#include	<termout.h>		/* LIBUC */
+#include	<spawner.h>		/* LIBUC */
+#include	<lfm.h>			/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<querystr.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnrbrk(3uc)| */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<rmdirfiles.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -700,7 +697,7 @@ local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	paramopt	aparams ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -729,14 +726,14 @@ local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	cchar		*cp ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_homepage: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -1550,7 +1547,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mi[12] ;
 	    uint	mo ;
@@ -1593,7 +1590,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -1944,7 +1941,7 @@ local int procuserinfo_begin(PI *pip,userinfo *uip) noex {
 	    LI	*lip = pip->lip ;
 	    TMTIME	t ;
 	    if ((rs = tmtime_timegm(&t,pip->daytime)) >= 0) {
-	        lip->year = (t.year + TM_YEAR_BASE) ;
+	        lip->year = (t.year + TMTIME_YEARBASE) ;
 	        rs = locinfo_cookbegin(lip) ;
 	    }
 	}
@@ -2133,7 +2130,7 @@ local int procdaemondefs(PI *pip) noex {
 	    debugprintf("msumain: daemon=%u logging=%u\n",
 	        pip->fl.daemon,pip->have.logprog) ;
 #endif
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msumain: daemon=%u logging=%u\n",
 	    pip->fl.daemon,pip->have.logprog) ;
 #endif
@@ -2476,7 +2473,7 @@ local int procmntcheck(PI *pip) noex {
 	    cchar	*fmt ;
 	    if ((rs = u_stat(lip->mntfname,&usb)) >= 0) {
 	        if (S_ISREG(usb.st_mode)) {
-	            rs = permid(&pip->id,&usb,W_OK) ;
+	            rs = permids(&pip->id,&usb,W_OK) ;
 	        } else {
 	            rs = SR_BUSY ;
 	        }
@@ -3065,7 +3062,7 @@ local int procpage_begin(PI *pip,char *dbuf) noex {
 	                            "u_rename() rs=%d\n",rs) ;
 #endif
 	                }
-	            } else if ((rs = permid(&pip->id,&sb,am)) == SR_ACCESS) {
+	            } else if ((rs = permids(&pip->id,&sb,am)) == SR_ACCESS) {
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
 	                    debugprintf("procpage_begin: ACCESS\n") ;
@@ -3892,7 +3889,7 @@ local int gather_file(GATHER *glp,cchar *svc,int f_to,cchar *fp,int fl) noex {
 	int		rs ;
 	void		*p ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/gather_file: ent\n") ;
 	debugprintf("b_homepage/gather_file: svc=%s\n",svc) ;
 	debugprintf("b_homepage/gather_file: fn=%r\n",fp,fl) ;
@@ -3921,7 +3918,7 @@ local int gather_file(GATHER *glp,cchar *svc,int f_to,cchar *fp,int fl) noex {
 	    }
 	} /* end if (m-a) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/gather_file: ret rs=%d\n",rs) ;
 #endif
 
@@ -3948,7 +3945,7 @@ local int gather_entfins(GATHER *glp) noex {
 	    }
 	} /* end for */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/gather_entfins: ret rs=%d u=%d\n",rs,used) ;
 #endif
 
@@ -3960,7 +3957,7 @@ local int gather_getlines(GATHER *glp,cchar *svc) noex {
 	int		rs = SR_OK ;
 	int		lines = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/gather_getlines: ent svc=%s\n",svc) ;
 #endif
 
@@ -3985,7 +3982,7 @@ local int gather_getlines(GATHER *glp,cchar *svc) noex {
 	    lines = rs ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/gather_getlines: ret rs=%d lns=%u\n",
 	    rs,lines) ;
 #endif
@@ -4027,7 +4024,7 @@ local int filedat_start(FILEDAT *fep,PI *pip,cchar *tt,int cols,
 	int		size = 0 ;
 	char		*bp ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/filedat_start: ent svc=%s\n",svc) ;
 	debugprintf("b_homepage/filedat_start: fn=%r\n",fp,fl) ;
 #endif
@@ -4088,7 +4085,7 @@ local int filedat_start(FILEDAT *fep,PI *pip,cchar *tt,int cols,
 	    }
 	} /* end if (m-a) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/filedat_start: ret rs=%d\n",rs) ;
 #endif
 
@@ -4183,7 +4180,7 @@ local int filedat_finish(FILEDAT *fep) noex {
 	int		rs1 ;
 	int		used = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/filedat_finish: ent svc=%s\n",fep->svc) ;
 #endif
 
@@ -4194,7 +4191,7 @@ local int filedat_finish(FILEDAT *fep) noex {
 	if (rs >= 0) rs = rs1 ;
 	if (rs >= 0) used = rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/filedat_finish: svc=%s stack used=%u\n",
 	    fep->svc,used) ;
 #endif
@@ -4214,7 +4211,7 @@ local int filedat_finish(FILEDAT *fep) noex {
 	fep->fname = nullptr ;
 	fep->svc = nullptr ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/filedat_finish: ret rs=%d\n",rs) ;
 #endif
 
@@ -4226,7 +4223,7 @@ local int filedat_worker(FILEDAT *fep) noex {
 	int		rs ;
 	int		rl = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("filedat_worker: ent svc=%s\n",fep->svc) ;
 	debugprintf("filedat_worker: fn=%s\n",fep->fname) ;
 	debugprintf("filedat_worker: uc_open() svc=%s\n",fep->svc) ;
@@ -4250,7 +4247,7 @@ local int filedat_worker(FILEDAT *fep) noex {
 	    u_close(fd) ;
 	} /* end if (file) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("filedat_worker: ret rs=%d svc=%s rl=%u lines=%u\n",
 	    rs,fep->svc,rl,fep->lines) ;
 #endif
@@ -4260,7 +4257,7 @@ local int filedat_worker(FILEDAT *fep) noex {
 
 local int filedat_workread(FILEDAT *fep,int fd) noex {
 	int		rs ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("filedat_workread: ent svc=%s tt=%s\n",
 	    fep->svc,fep->termtype) ;
 #endif
@@ -4269,7 +4266,7 @@ local int filedat_workread(FILEDAT *fep,int fd) noex {
 	} else {
 	    rs = filedat_workreadreg(fep,fd) ;
 	}
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("filedat_workread: ret rs=%d svc=%s\n",rs,fep->svc) ;
 #endif
 	return rs ;
@@ -4283,12 +4280,12 @@ local int filedat_workreadreg(FILEDAT *fep,int fd) noex {
 	int		len ;
 	int		rl = 0 ;
 	char		*rp = fep->dbuf ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("filedat_workreadreg: ent svc=%s\n",fep->svc) ;
 #endif
 	while ((rs >= 0) && (rl < rlen)) {
 	    ml = (rlen-rl) ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("filedat_workreadreg: svc=%s uc_reade() ml=%d\n",
 	        fep->svc,ml) ;
 #endif
@@ -4297,7 +4294,7 @@ local int filedat_workreadreg(FILEDAT *fep,int fd) noex {
 #else
 	    rs = u_read(fd,rp,ml) ;
 #endif
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("filedat_workreadreg: svc=%s uc_reade() rs=%d\n",
 	        fep->svc,rs) ;
 #endif
@@ -4306,7 +4303,7 @@ local int filedat_workreadreg(FILEDAT *fep,int fd) noex {
 	    rp += len ;
 	    rl += len ;
 	} /* end while */
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("filedat_workreadreg: ret rs=%d svc=%s rl=%u\n",
 	    rs,fep->svc,rl) ;
 #endif
@@ -4354,7 +4351,7 @@ local int filedat_workreadtermline(FILEDAT *fep,TERMOUT *top,char *rp,
 	int		rlen = (fep->dsize-1) ;
 	int		rs ;
 	int		rl = 0 ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("filedat_workreadtermline: ent l=>%r<\n",
 	    lbuf,strlinelen(lbuf,len,40)) ;
 #endif
@@ -4368,13 +4365,13 @@ local int filedat_workreadtermline(FILEDAT *fep,TERMOUT *top,char *rp,
 	    for (i = 0 ; i < ln ; i += 1) {
 	        ll = termout_getline(top,i,&lp) ;
 	        if (ll < 0) break ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("filedat_workreadtermline: l=>%r<\n",
 	            lp,strlinelen(lp,ll,30)) ;
 #endif
 	        if (lenrem > 0) {
 	            ml = MIN(ll,(lenrem-1)) ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            debugprintf("filedat_workreadtermline: ml=%u\n",ml) ;
 #endif
 	            rp = strwcpy(rp,lp,ml) ;
@@ -4385,7 +4382,7 @@ local int filedat_workreadtermline(FILEDAT *fep,TERMOUT *top,char *rp,
 	        if (lenrem == 0) break ;
 	    } /* end for */
 	} /* end if (termout_load) */
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("filedat_workreadtermline: ret rs=%d rl=%u\n",rs,rl) ;
 #endif
 	return (rs >= 0) ? rl : rs ;
@@ -4394,7 +4391,7 @@ local int filedat_workreadtermline(FILEDAT *fep,TERMOUT *top,char *rp,
 local int filedat_getlines(FILEDAT *fep) noex {
 	proginfo	*pip = fep->pip ;
 	int		rs ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/filedat_getlines: ent svc=%s f_run=%u\n",
 	    fep->svc,fep->f_running) ;
 #endif
@@ -4404,7 +4401,7 @@ local int filedat_getlines(FILEDAT *fep) noex {
 	    int		trs ;
 	    fep->f_running = false ;
 	    if ((rs = uptjoin(fep->tid,&trs)) >= 0) {
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("b_homepage/filedat_getlines: uptjoin() trs=%d\n",
 	            trs) ;
 #endif
@@ -4420,13 +4417,13 @@ local int filedat_getlines(FILEDAT *fep) noex {
 	        fmt = "%s: join failure svc=%s (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,fep->svc,rs) ;
 	    } /* end if (pthead-join) */
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("b_homepage/filedat_getlines: uptjoin-out rs=%d\n",rs) ;
 #endif
 	} else {
 	    rs = fep->lines ;
 	}
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_homepage/filedat_getlines: ret rs=%d svc=%s lns=%u\n",
 	    rs,fep->svc,fep->lines) ;
 #endif
