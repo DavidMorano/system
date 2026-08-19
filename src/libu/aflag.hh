@@ -21,9 +21,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<atomic>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<atomic>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 enum aflagmems {
