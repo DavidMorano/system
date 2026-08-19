@@ -49,7 +49,7 @@ export module findutil ;
 
 
 export {
-    extern int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex ;
+    int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex ;
 } /* end export */
 
 
