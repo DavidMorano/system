@@ -136,7 +136,7 @@ local int ecmpe(OI_E *,OI_E *) noex ;
 int offindex_start(offindex *op,int vn) noex {
 	int		rs ;
 	if (vn < NDEF) vn = NDEF ;
-	if ((rs = offindex_ctor(op)) >= 0) {
+	if ((rs = offindex_ctor(op)) >= 0) ylikely {
 	    cint	vsz = szof(OI_E) ;
 	    cint	vo = 0 ;
 	    if ((rs = vecobj_start(op->oip,vsz,vn,vo)) >= 0) {
@@ -152,7 +152,7 @@ int offindex_start(offindex *op,int vn) noex {
 int offindex_finish(offindex *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = offindex_magic(op)) >= 0) {
+	if ((rs = offindex_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = vecobj_finish(op->oip) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -168,7 +168,7 @@ int offindex_finish(offindex *op) noex {
 
 int offindex_add(offindex *op,off_t off,int len) noex {
 	int		rs ;
-	if ((rs = offindex_magic(op)) >= 0) {
+	if ((rs = offindex_magic(op)) >= 0) ylikely {
 	    OI_E	e ;
 	    e.lineoff = off ;
 	    e.linelen = len ;
@@ -180,7 +180,7 @@ int offindex_add(offindex *op,off_t off,int len) noex {
 int offindex_lookup(offindex *op,off_t off) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = offindex_magic(op)) >= 0) {
+	if ((rs = offindex_magic(op)) >= 0) ylikely {
 	    OI_E	key ;
 	    rs = SR_NOSYS ;
 	    if (! op->fl.setsorted) {
@@ -213,7 +213,7 @@ local int vecmp(cvoid **v1pp,cvoid **v2pp) noex {
 
 local int ecmpe(OI_E *e1p,OI_E *e2p) noex {
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
@@ -222,7 +222,7 @@ local int ecmpe(OI_E *e1p,OI_E *e2p) noex {
 	            rc = intconv(lo) ;
 	        }
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (ecmpe) */
 
