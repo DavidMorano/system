@@ -147,60 +147,49 @@ inline int storebuf_hex(char *bp,int bl,int i,ulonglong uv)	noex {
 }
 
 struct storebuf {
-	char		*bufp ;
+	charp		bufp ;
 	int		bufl ;
 	int		idx ;
-	storebuf() noex : bufp(nullptr), bufl(0), idx (0) { } ;
+	storebuf() noex : bufp(nullptr), bufl(0), idx(0) { } ;
 	storebuf(char *p,int l,int i = 0) noex : bufp(p), bufl(l), idx(i) { } ;
-	int chrs(int ch,int n) noex {
-	    cint rs = storebuf_chrs(bufp,bufl,idx,ch,n) ;
-	    idx += rs ;
-	    return rs ;
-	} ;
-	int chr(int ch) noex {
-	    cint rs = storebuf_chr(bufp,bufl,idx,ch) ;
-	    idx += rs ;
-	    return rs ;
-	} ;
-	int strw(cchar *sp,int sl = -1) noex {
-	    cint rs = storebuf_strw(bufp,bufl,idx,sp,sl) ;
-	    idx += rs ;
-	    return rs ;
-	} ;
-	int str(cchar *sp) noex {
-	    cint rs = storebuf_str(bufp,bufl,idx,sp) ;
-	    idx += rs ;
-	    return rs ;
-	} ;
-	int buf(cchar *sp,int sl = -1) noex {
-	    cint rs = storebuf_buf(bufp,bufl,idx,sp,sl) ;
-	    idx += rs ;
-	    return rs ;
-	} ;
-	int blanks(int n = 1) noex {
-	    cint rs = storebuf_blanks(bufp,bufl,idx,n) ;
-	    idx += rs ;
-	    return rs ;
-	} ;
+	int chrs	(int ch,int n) noex ;
+	int chr		(int ch) noex ;
+	int strw	(cchar *sp,int sl = -1) noex ;
+	int str		(cchar *sp) noex ;
+	int buf		(cchar *sp,int sl = -1) noex ;
+	int blanks	(int n = 1) noex ;
 	int bin(auto v) noex {
 	    cint rs = storebuf_bin(bufp,bufl,idx,v) ;
-	    idx += rs ;
+	    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
 	    return rs ;
 	} ;
 	int oct(auto v) noex {
 	    cint rs = storebuf_oct(bufp,bufl,idx,v) ;
-	    idx += rs ;
+	    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
 	    return rs ;
 	} ;
 	int dec(auto v) noex {
 	    cint rs = storebuf_dec(bufp,bufl,idx,v) ;
-	    idx += rs ;
+	    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
 	    return rs ;
 	} ;
 	int hexn(int i,auto v) noex {
 	    cint rs = storebuf_hex(bufp,bufl,idx,v) ;
-	    idx += rs ;
+	    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
 	    return rs ;
+	} ;
+	storebuf &operator << (cchar *sp) noex {
+	    strw(sp) ;
+	    return *this ;
+	} ;
+	storebuf &operator << (char ch) noex {
+	    chr(ch) ;
+	    return *this ;
+	} ;
+	storebuf &operator << (int v) noex {
+	    cint rs = storebuf_dec(bufp,bufl,idx,v) ;
+	    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+	    return *this ;
 	} ;
 	operator int () noex {
 	    return idx ;
