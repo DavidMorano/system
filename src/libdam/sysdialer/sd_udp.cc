@@ -149,7 +149,7 @@ cchar	*av[] ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic == UDP_MAGIC) return SR_INUSE ;
+	if (op->magval == UDP_MAGIC) return SR_INUSE ;
 
 #if	CF_DEBUGS
 	debugprintf("udp_open: entered hostname=%s svcname=%s\n",
@@ -473,7 +473,7 @@ cchar	*av[] ;
 	op->fd = rs ;
 	if (rs >= 0) {
 
-	    op->magic = UDP_MAGIC ;
+	    op->magval = UDP_MAGIC ;
 		uc_closeonexec(op->fd,true) ;
 
 	}
@@ -508,7 +508,7 @@ int		to, opts ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != UDP_MAGIC) return SR_NOTOPEN ;
 
 	rs = uc_reade(op->fd,buf,blen,to,opts) ;
 
@@ -527,7 +527,7 @@ int		to, opts ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != UDP_MAGIC) return SR_NOTOPEN ;
 
 	rs = uc_recve(op->fd,buf,blen,flags,to,opts) ;
 
@@ -548,7 +548,7 @@ int		to, opts ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != UDP_MAGIC) return SR_NOTOPEN ;
 
 	rs = uc_recvfrome(op->fd,buf,blen,flags,sap,salenp,to,opts) ;
 
@@ -566,7 +566,7 @@ int		to, opts ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != UDP_MAGIC) return SR_NOTOPEN ;
 
 	rs = uc_recvmsge(op->fd,msgp,flags,to,opts) ;
 
@@ -583,7 +583,7 @@ int		blen ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != UDP_MAGIC) return SR_NOTOPEN ;
 
 	rs = uc_writen(op->fd,((void *) buf),blen) ;
 
@@ -601,7 +601,7 @@ int		flags ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != UDP_MAGIC) return SR_NOTOPEN ;
 
 	rs = u_send(op->fd,buf,blen,flags) ;
 
@@ -621,7 +621,7 @@ int		salen ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != UDP_MAGIC) return SR_NOTOPEN ;
 
 	rs = u_sendto(op->fd,buf,blen,flags,sap,salen) ;
 
@@ -638,7 +638,7 @@ int		flags ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != UDP_MAGIC) return SR_NOTOPEN ;
 
 	rs = u_sendmsg(op->fd,msgp,flags) ;
 
@@ -655,7 +655,7 @@ int		cmd ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != UDP_MAGIC) return SR_NOTOPEN ;
 
 	rs = u_shutdown(op->fd,cmd) ;
 
@@ -673,12 +673,12 @@ UDP		*op ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != UDP_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != UDP_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = u_close(op->fd) ;
 	if (rs >= 0) rs = rs1 ;
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (udp_close) */
