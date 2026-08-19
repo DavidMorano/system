@@ -83,12 +83,12 @@ int timeout_load(timeout *top,time_t v,void *o,t_f m,uint tag,int arg) noex {
 	int		rs = SR_FAULT ;
 	if (top) {
 	    rs = SR_OK ;
-	    top->id = -1 ;
-	    top->val = v ;
-	    top->objp = o ;
-	    top->metf = m ;
-	    top->tag = tag ;
-	    top->arg = arg ;
+	    top->id	= -1 ;
+	    top->val	= v ;
+	    top->objp	= o ;
+	    top->metf	= m ;
+	    top->tag	= tag ;
+	    top->arg	= arg ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (timeout_load) */
