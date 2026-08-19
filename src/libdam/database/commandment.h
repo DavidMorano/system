@@ -22,8 +22,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<modload.h>		/* LIBUC */
-#include	<commandments.h>	/* LIBUC */
+#include	<modload.h>		/* LIBDAM */
+#include	<commandments.h>	/* LIBDAM */
 
 
 #define	COMMANDMENT		struct commandment_head
