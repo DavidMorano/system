@@ -1,11 +1,12 @@
-/* main */
+/* main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* almost a generic front-end */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history:
 
@@ -18,22 +19,25 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine forms a program that sends data to a remote
 	INET host to its 'echo' service.
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<sys/time.h>
 #include	<netinet/in.h>
-#include	<time.h>
-#include	<csignal>
 #include	<netdb.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<sockaddress.h>
