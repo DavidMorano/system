@@ -34,15 +34,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* IPOSIX system types */
+#include	<sys/types.h>		/* POSIX system types */
 #include	<sys/time.h>		/* POSIX <- interval timers are here */
 #include	<time.h>		/* CSTD i-timer types */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<psen.h>		/* POSIX® semaphore */
+#include	<psem.h>		/* LIBUC POSIX® semaphore */
 
 
-#define	UCTIM_ENT	struct uctim_entry
+#define	UCTIMNOTE	struct uctimnote_head
 
 
 EXTERNC_begin
@@ -51,22 +51,26 @@ typedef int (*uctim_f)(void *objp,int timid,int arg) noex ;
 
 EXTERNC_end
 
-struct uctim_entry {
+struct uctimnote_head {
 	uctim_f		notf ;		/* notify function (C-linkage) */
-	void		*objp ;		/* fcuntion argument (object pointer) */
+	void		*objp ;		/* object pointer (function argument) */
 	psem		*psemp ;	/* POSIX® Semaphore pointer */
-	ITIMERVAL	it ;		/* i-timer-value */
-	int		id ;		/* timer-ID */
 	int		arg ;		/* function argument */
-} ; /* end struct (uctim) */
+} ; /* end struct (uctim_note) */
 
-typedef	UCTIM_ENT		uctim_ent ;
+#ifdef	__cplusplus
+struct uctimeote : uctimenote_head {
+    	int load	(void *,psem *,uctim_f,int) noex ;
+} ; /* end struct (uctimnote) */
+#endif /* __cplusplus */
+typedef	UCTIMNOTE	uctimnote ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
-extern int uctim_load		(uctim_ent *,void *,psem *,uctim_f,int) noex ;
+extern int uctimnote_load	(uctimnote *,void *,psem *,uctim_f,int) noex ;
 
-extern int uc_timcreate		(uctim_ent *) noex ;
+extern int uc_timcreate		(con uctimnote *) noex ;
 extern int uc_timdestroy	(int) noex ;
 extern int uc_timset		(int,CITIMERVAL *,ITIMERVAL *) noex ;
 extern int uc_timget		(int,ITIMERVAL *) noex ;
