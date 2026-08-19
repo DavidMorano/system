@@ -15,8 +15,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<modload.h>		/* LIBUC */
-#include	<varmks.h>		/* LIBUC */
+#include	<modload.h>		/* LIBDAM */
+#include	<varmks.h>		/* LIBDAM */
 
 
 #define	VARMK		struct varmk_head
