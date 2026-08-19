@@ -6,6 +6,7 @@
 /* virtual per-process timer management */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_CHILDTHRS	0		/* start threads in child process */
 
 /* revision history:
@@ -41,14 +42,14 @@
 	Synopsis:
 	typedef ITIMEVAL	itim
 	typedef CITIMEVAL	citim
-	int uc_timcreate	(uctim *entp) noex
+	int uc_timcreate	(uctim *notep) noex
 	int uc_timdestroy	(int id) noex
 	int uc_timset		(int id,int,citim *ntvp,itim *otvp) noex
 	int uc_timget		(int id,itim *otvp) noex
 	int uc_timover		(int id) noex
 
 	Arguments:
-	entp		UCTIM object pointer
+	notep		UCTIM object pointer
 	id		timer identification
 	ntvp		new timer-value-pointer
 	otvp		old timer-value-pointer
@@ -97,6 +98,9 @@
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 #ifndef	CF_CHILDTHRS
 #define	CF_CHILDTHRS	0
 #endif
@@ -134,6 +138,17 @@ typedef uctim *		uctimp ;
 
 /* local structures */
 
+#ifdef	COMMENT
+struct uctim_entry {
+	uctim_f		notf ;		/* notify function (C-linkage) */
+	void		*objp ;		/* object pointer (function argument) */
+	psem		*psemp ;	/* POSIX® Semaphore pointer */
+	ITIMERVAL	it ;		/* i-timer-value */
+	int		id ;		/* timer-ID */
+	int		arg ;		/* function argument */
+} ; /* end struct (uctim) */
+#endif /* COMMENT */
+
 enum dispcmds {
 	dispcmd_exit,
 	dispcmd_timeout,
@@ -158,10 +173,10 @@ namespace {
     } /* end enum (timemgrmems) */
     struct timemgr ;
     struct timemgr_arg {
-	uctim		*entp ;
+	uctimnote	*notep ;
 	CITIMERVAL	*ntcp ;
 	ITIMERVAL	*otcp ;
-	timemgr_arg(uctim *c) noex : entp(c) { } ;
+	timemgr_arg(uctim *c) noex : notep(c) { } ;
 	timemgr_arg(ITIMERVAL *o,CITIMERVAL *n) noex : ntvp(n), otvp(o) { } ;
 	int operator () (cmdsubs,int) noex ;
     } ; /* end struct (timemgr_arg) */
@@ -287,8 +302,8 @@ cbool			f_childthrs = CF_CHILDTHRS ;
 
 /* exported subroutines */
 
-int uc_timcreate(uctim_ent *entp) noex {
-	timemgr_arg	ao(entp) ;
+int uc_timcreate(uctim_ent *notep) noex {
+	timemgr_arg	ao(notep) ;
 	return ao(cmdsub_create,0) ;
 } /* end subroutine */
 
@@ -442,10 +457,10 @@ int uctim::pfini() noex {
 int uctim::cmd_create(int id,timemgr_arg *argp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (argp->entp) ylikely {
+	if (argp->notep) ylikely {
 	    cint	esz = szof(uctim_ent) ;
 	    if (uctim *ep ; (rs = lm_mall(esz,&ep)) >= 0) ylikely {
-		*ep = *argp->entp ;
+		*ep = *argp->notep ;
 	        if ((rs = ents.add(ep)) >= 0) ylikely {
 	            ep->id = rs ;
 	        } /* end if (vechand_add) */
@@ -1144,6 +1159,13 @@ local void timemgr_atforkchild() noex {
 local void timemgr_exit() noex {
 	timemgr_data.fvoid = true ;
 } /* end subroutine (timemgr_atforkparent) */
+
+int uctimnote::load (void *op,psem *psp,uctim_f fp,int arg) noex {
+	notf	= fp ;		/* notify function (C-linkage) */
+	objp	= op ;		/* object pointer (function argument) */
+	psemp	= psp ;		/* POSIX® Semaphore pointer */
+	arg	= a ;		/* function argument */
+} /* end method (uctimnote::load) */
 
 local int ourcmp(const TIMEOUT *e1p,const TIMEOUT *e2p) noex {
 	int		rc = 0 ;
