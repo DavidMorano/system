@@ -1,11 +1,12 @@
-/* main (mkhosts) */
+/* main SUPPORT (mkhosts) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* convert a DNS database (in ASCII) into a 'hosts' table format */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history:
 
@@ -18,31 +19,31 @@
 
 /*******************************************************************************
 
-        This program will read a DNS database (in ASCII) and convert it into a
-        'hosts' type of file.
+  	Description:
+	This program will read a DNS database (in ASCII) and convert
+	it into a 'hosts' type of file.
 
 	Synopsis:
-
 	$ mkhosts [input_file] [-DV] 
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<cstdlib>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<baops.h>
-#include	<exitcodes.h>
 #include	<mallocstuff.h>
+#include	<prognamevar.hh>
+#include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -62,39 +63,21 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	isdigitlatin(int) ;
-
 extern int	procfile() ;
-
-extern char	*strbasename(char *) ;
 
 
 /* forward references */
 
-static void	helpfile(const char *,bfile *) ;
+static void	helpfile(cchar *,bfile *) ;
 
 
 /* local structures */
 
 
-/* global data */
-
-struct global		g ;
+/* forward references */
 
 
 /* local variables */
-
-static const char *argopts[] = {
-	"ROOT",
-	"DEBUG",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	NULL,
-} ;
 
 enum argopts {
 	argopt_root,
@@ -105,20 +88,28 @@ enum argopts {
 	argopt_overlast
 } ;
 
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"DEBUG",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	nullptr
+} ;
 
 
+/* exported variables */
+
+struct global		g ;
 
 
+/* exported subroutines */
 
-int main(argc,argv)
-int	argc ;
-char	*argv[] ;
-{
-	struct global	*gp = &g ;
-
+int main(int argc,mainv argv,mainv envv) {
+    	prognamevar	progname(argc,argv,envv) ;
+	global		*gp = &g ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		errfile, *efp = &errfile ;
-
 	int	argr, argl, aol, avl ;
 	int	maxai, pan, npa, kwi, i ;
 	int	f_optminus, f_optplus, f_optequal ;
@@ -126,34 +117,32 @@ char	*argv[] ;
 	int	ex = EX_INFO ;
 	int	argnum ;
 	int	nhosts ;
-	int	f_extra = FALSE ;
-	int	f_version = FALSE ;
-	int	f_usage = FALSE ;
-	int	f_help = FALSE ;
+	int	f_extra = false ;
+	int	f_version = false ;
+	int	f_usage = false ;
+	int	f_help = false ;
 
-	const char	*argp, *aop, *avp ;
+	cchar	*argp, *aop, *avp ;
 	char	argpresent[NARGGROUPS] ;
 	char	buf[BUFLEN + 1] ;
-	const char	*ifname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*ifname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*cp ;
 
 
-	g.progname = strbasename(argv[0]) ;
-
-	if (bopen(efp,BFILE_STDERR,"wca",0666) < 0)
+	g.progname = progname ;
+	if (bopen(efp,BFILE_STDERR,"wca",0666) < 0) {
 	    bcontrol(efp,BC_LINEBUF,0) ;
+	}
 
 	g.efp = efp ;
 	g.ofp = ofp ;
 	g.debuglevel = 0 ;
-	g.programroot = NULL ;
-	g.helpfile = NULL ;
+	g.programroot = nullptr ;
+	g.helpfile = nullptr ;
 
-	g.f.verbose = FALSE ;
-
-	f_help = FALSE ;
-
+	g.f.verbose = false ;
+	f_help = false ;
 
 /* process program arguments */
 
@@ -186,13 +175,13 @@ char	*argv[] ;
 
 	                aop = argp + 1 ;
 	                aol = argl - 1 ;
-	                f_optequal = FALSE ;
-	                if ((avp = strchr(aop,'=')) != NULL) {
+	                f_optequal = false ;
+	                if ((avp = strchr(aop,'=')) != nullptr) {
 
 	                    aol = avp - aop ;
 	                    avp += 1 ;
 	                    avl = aop + argl - 1 - avp ;
-	                    f_optequal = TRUE ;
+	                    f_optequal = true ;
 
 	                } else
 	                    avl = 0 ;
@@ -207,7 +196,7 @@ char	*argv[] ;
 	                    case argopt_root:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) g.programroot = avp ;
 
 	                        } else {
@@ -235,7 +224,7 @@ char	*argv[] ;
 	                                avp,avl) ;
 #endif
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if ((avl > 0) &&
 	                                (cfdeci(avp,avl,
 	                                &g.debuglevel) < 0))
@@ -246,23 +235,23 @@ char	*argv[] ;
 	                        break ;
 
 	                    case argopt_version:
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 	                    case argopt_verbose:
-	                        g.f.verbose = TRUE ;
+	                        g.f.verbose = true ;
 	                        break ;
 
 /* help file */
 	                    case argopt_help:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) g.helpfile = avp ;
 
 	                        }
 
-	                        f_help  = TRUE ;
+	                        f_help  = true ;
 	                        break ;
 
 	                    } /* end switch (key words) */
@@ -277,26 +266,24 @@ char	*argv[] ;
 	                            g.debuglevel = 1 ;
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                rs = cfdeci(avp,avl, &g.debuglevel) ;
-
-					if (rs < 0)
-	                                    goto badargvalue ;
+					if (rs < 0) goto badargvalue ;
 
 	                            }
 
 	                            break ;
 
 	                        case 'V':
-	                            f_version = TRUE ;
+	                            f_version = true ;
 	                            break ;
 
 	                        case 'v':
-					g.f.verbose = TRUE ;
+					g.f.verbose = true ;
 	                            break ;
 
 	                        case '?':
-	                            f_usage = TRUE ;
+	                            f_usage = true ;
 				    break ;
 
 	                        default:
@@ -334,19 +321,14 @@ char	*argv[] ;
 	    } else {
 
 	        if (i < MAXARGINDEX) {
-
 	            BASET(argpresent,i) ;
 	            maxai = i ;
 	            npa += 1 ;
-
 	        } else {
-
 	            if (! f_extra) {
-
-	                f_extra = TRUE ;
+	                f_extra = true ;
 	                bprintf(efp,"%s: extra arguments ignored\n",
 	                    g.progname) ;
-
 	            }
 	        }
 
@@ -363,15 +345,15 @@ char	*argv[] ;
 
 /* get our program root (if we have one) */
 
-	if (g.programroot == NULL) {
+	if (g.programroot == nullptr) {
 
-	    if (g.programroot == NULL)
+	    if (g.programroot == nullptr)
 	        g.programroot = getenv(VARPROGRAMROOT1) ;
 
-	    if (g.programroot == NULL)
+	    if (g.programroot == nullptr)
 	        g.programroot = getenv(VARPROGRAMROOT2) ;
 
-	    if (g.programroot == NULL)
+	    if (g.programroot == nullptr)
 	        g.programroot = PROGRAMROOT ;
 
 	} /* end if */
@@ -393,7 +375,7 @@ char	*argv[] ;
 
 	if (f_help) {
 
-	    if (g.helpfile == NULL) {
+	    if (g.helpfile == nullptr) {
 
 	        bl = mkpath2(buf,
 	            g.programroot,HELPFILE) ;
@@ -416,7 +398,7 @@ char	*argv[] ;
 
 /* open output file */
 
-	if ((ofname == NULL) || (ofname[0] == '-'))
+	if ((ofname == nullptr) || (ofname[0] == '-'))
 		rs = bopen(ofp,BFILE_STDOUT,"dwct",0666) ;
 
 	else
@@ -554,32 +536,16 @@ badret:
 /* end subroutine (main) */
 
 
+/* local subroutines */
 
-/* LOCAL SUBROUTINES */
-
-
-
-/* print out some help ! */
-void helpfile(f,ofp)
-const char	f[] ;
-bfile		*ofp ;
-{
+void helpfile(cchar *f,bfile *ofp) noex {
 	bfile	file, *ifp = &file ;
-
-
-	if ((f == NULL) || (f[0] == '\0')) 
-	    return ;
-
+	if ((f == nullptr) || (f[0] == '\0')) return ;
 	if (bopen(ifp,f,"r",0666) >= 0) {
-
 	    bcopyblock(ifp,ofp,-1) ;
-
 	    bclose(ifp) ;
-
 	}
-
 }
 /* end subroutine (helpfile) */
-
 
 
