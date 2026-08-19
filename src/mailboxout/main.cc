@@ -42,16 +42,16 @@
 #include	<netinet/in.h>
 #include	<termios.h>
 #include	<unistd.h>
-#include	<csignal>
+#include	<syslog.h>
+#include	<grp.h>
 #include	<ctime>
+#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<grp.h>
-#include	<syslog.h>
-#include	<usystem.h>
-#include	<getbufsize.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<getax.h>
 #include	<getx.h>
 #include	<getxname.h>
@@ -74,6 +74,7 @@
 #include	<mktmp.h>
 #include	<cfdec.h>
 #include	<strwcpy.h>
+#include	<headkeymat.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -99,20 +100,9 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	headkeymat(const char *,const char *,int) ;
-extern int	getfname(const char *,const char *,int,char *) ;
-extern int	getserial(const char *) ;
-extern int	pcsuserfile() ;
-
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	process(struct proginfo *,bfile *,bfile *,vecobj *) ;
 extern int	deliver(struct proginfo *,int,struct recip *) ;
-
-extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -130,29 +120,22 @@ struct errormap {
 
 /* local typedefs */
 
-#if	defined(IRIX) && (! defined(TYPEDEF_INADDRT))
-#define	TYPEDEF_INADDRT	1
-
-typedef unsigned int	in_addr_t ;
-
-#endif
-
 
 /* forward references */
 
 static int	errormap(int) ;
-static int	getprogopts(struct proginfo *,KEYOPT *,vecstr *) ;
+static int	getprogopts(struct proginfo *,keyopt *,vecstr *) ;
 
 static int	comsat(struct proginfo *,vecobj *,vecobj *) ;
 
-static int	mkcsmsg(char *,int,const char *,int,uint) ;
+static int	mkcsmsg(char *,int,cchar *,int,uint) ;
 static int	parsenodespec(struct proginfo *,int,char *,int,
-			char *,const char *) ;
+			char *,cchar *) ;
 
-static int	vecobj_addrecip(vecobj *,const char *) ;
+static int	vecobj_addrecip(vecobj *,cchar *) ;
 static int	vecobj_finishrecips(vecobj *) ;
 
-static int	recip_init(struct recip *,const char *) ;
+static int	recip_init(struct recip *,cchar *) ;
 static int	recip_mo(struct recip *,uint,uint) ;
 static int	recip_free(struct recip *) ;
 
@@ -180,7 +163,7 @@ constexpr cpcchar	argopts[] = {
 	"if",
 	"af",
 	"of",
-	NULL
+	nullptr
 } ;
 
 constexpr cpcchar	maildirs[] = {
@@ -188,7 +171,7 @@ constexpr cpcchar	maildirs[] = {
 	"/var/spool/mail",
 	"/usr/mail",
 	"/usr/spool/mail",
-	NULL
+	nullptr
 } ;
 
 constexpr cpcchar	trustedusers[] = {
@@ -204,7 +187,7 @@ constexpr cpcchar	trustedusers[] = {
 	"smtp",
 	"dam",
 	"morano",
-	NULL
+	nullptr
 } ;
 
 enum progopts {
@@ -234,7 +217,7 @@ constexpr cpcchar	progopts[] = {
 	"logmsgid",
 	"nospam",
 	"norepeat",
-	NULL
+	nullptr
 } ;
 
 constexpr errormap	errormaps[] = {
@@ -253,7 +236,7 @@ constexpr cpcchar	entries[] = {
 	"uucp",
 	"staff",
 	"pcs",
-	NULL
+	nullptr
 } ;
 
 
@@ -266,9 +249,9 @@ int main(int argc,mainv argv,mainv envv) {
 	USTAT		sb ;
 	struct pcsconf	p ;
 	struct proginfo	pi, *pip = &pi ;
-	struct group	ge ;
+	GROUP	ge ;
 	USERINFO	u ;
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 
 	bfile		errfile ;
 	bfile		infile, *ifp = &infile ;
@@ -299,16 +282,16 @@ int main(int argc,mainv argv,mainv envv) {
 	int	f_bad ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*pr = NULL ;
-	const char	*ifname = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*fromaddr = NULL ;
-	const char	*uu_machine = NULL ;
-	const char	*uu_user = NULL ;
-	const char	*protospec = NULL ;
-	const char	*up, *sp, *cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*pr = nullptr ;
+	cchar	*ifname = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*fromaddr = nullptr ;
+	cchar	*uu_machine = nullptr ;
+	cchar	*uu_user = nullptr ;
+	cchar	*protospec = nullptr ;
+	cchar	*up, *sp, *cp ;
 	char	argpresent[MAXARGGROUPS + 1] ;
 	char	userbuf[USERINFO_LEN + 1] ;
 	char	pcsconfbuf[PCSCONF_LEN + 1] ;
@@ -318,7 +301,7 @@ int main(int argc,mainv argv,mainv envv) {
 	char	timebuf[TIMEBUFLEN + 1] ;
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -326,10 +309,10 @@ int main(int argc,mainv argv,mainv envv) {
 
 	proginfo_start(pip,envv,argv[0],VERSION) ;
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
-	if ((cp = getenv(VARERRORFNAME)) != NULL) {
+	if ((cp = getenv(VARERRORFNAME)) != nullptr) {
 	    rs = bopen(&errfile,cp,"wca",0666) ;
 	} else
 	    rs = bopen(&errfile,BFILE_STDERR,"dwca",0666) ;
@@ -401,14 +384,14 @@ int main(int argc,mainv argv,mainv envv) {
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-			avp = NULL ;
+			avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -787,32 +770,32 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* get some program information */
 
-	if (pr == NULL) {
+	if (pr == nullptr) {
 
 	    pr = getenv(VARPROGRAMROOT1) ;
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = getenv(VARPROGRAMROOT2) ;
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = getenv(VARPROGRAMROOT3) ;
 
 /* try to see if a path was given at invocation */
 
-	    if ((pr == NULL) && (pip->progdname != NULL))
+	    if ((pr == nullptr) && (pip->progdname != nullptr))
 	        proginfo_rootprogdname(pip) ;
 
 /* do the special thing */
 
 #if	CF_GETEXECNAME && defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-	    if ((pr == NULL) && (pip->pr == NULL)) {
+	    if ((pr == nullptr) && (pip->pr == nullptr)) {
 
-	        const char	*pp ;
+	        cchar	*pp ;
 
 
 	        pp = getexecname() ;
 
-	        if (pp != NULL)
+	        if (pp != nullptr)
 	            proginfo_execname(pip,pp) ;
 
 	    }
@@ -820,9 +803,9 @@ int main(int argc,mainv argv,mainv envv) {
 
 	} /* end if (getting a program root) */
 
-	if (pip->pr == NULL) {
+	if (pip->pr == nullptr) {
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = PROGRAMROOT ;
 
 	    proginfo_setprogroot(pip,pr,-1) ;
@@ -851,7 +834,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        debugprintf("main: printhelp() helpfname=%s\n",HELPFNAME) ;
 #endif
 
-	    rs = printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    rs = printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
@@ -864,10 +847,10 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* initialization */
 
-	if (pip->tmpdname == NULL)
+	if (pip->tmpdname == nullptr)
 	    pip->tmpdname = getenv("TMPDIR") ;
 
-	if (pip->tmpdname == NULL)
+	if (pip->tmpdname == nullptr)
 	    pip->tmpdname = TMPDNAME ;
 
 
@@ -905,7 +888,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    debugprintf("main: userinfo()\n",rs) ;
 #endif
 
-	rs = userinfo(&u,userbuf,USERINFO_LEN,NULL) ;
+	rs = userinfo(&u,userbuf,USERINFO_LEN,nullptr) ;
 
 	if (rs < 0)
 	    goto baduser ;
@@ -944,7 +927,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if (rs < 0)
 	    goto badinit1 ;
 
-	rs = pcsconf(pip->pr,NULL,&p,&sets,NULL,
+	rs = pcsconf(pip->pr,nullptr,&p,&sets,nullptr,
 	    pcsconfbuf,PCSCONF_LEN) ;
 
 #if	CF_DEBUG
@@ -974,9 +957,9 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* the "from" (envelope) address */
 
-	if (fromaddr == NULL) {
+	if (fromaddr == nullptr) {
 
-	    if (pip->fl.trusted && (uu_user != NULL))
+	    if (pip->fl.trusted && (uu_user != nullptr))
 	        fromaddr = uu_user ;
 
 	    else
@@ -988,9 +971,9 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* the protocol specification */
 
-	if (protospec == NULL) {
+	if (protospec == nullptr) {
 
-	    if (uu_machine != NULL) {
+	    if (uu_machine != nullptr) {
 
 	        protospec = buf ;
 	        snscs(buf,BUFLEN,"uucp",uu_machine) ;
@@ -1086,16 +1069,16 @@ int main(int argc,mainv argv,mainv envv) {
 	        un.sysname,un.release) ;
 
 	    buf[0] = '\0' ;
-	    if ((u.fullname != NULL) && (u.fullname[0] != '\0'))
+	    if ((u.fullname != nullptr) && (u.fullname[0] != '\0'))
 	        strcpy(buf,u.fullname) ;
 
-	    else if ((u.name != NULL) && (u.name[0] != '\0'))
+	    else if ((u.name != nullptr) && (u.name[0] != '\0'))
 	        strcpy(buf,u.name) ;
 
-	    else if ((u.gecosname != NULL) && (u.gecosname[0] != '\0'))
+	    else if ((u.gecosname != nullptr) && (u.gecosname[0] != '\0'))
 	        strcpy(buf,u.gecosname) ;
 
-	    else if (u.mailname != NULL)
+	    else if (u.mailname != nullptr)
 	        strcpy(buf,u.mailname) ;
 
 	    if (buf[0] != '\0')
@@ -1106,13 +1089,13 @@ int main(int argc,mainv argv,mainv envv) {
 	        logfile_printf(&pip->lh,"%s!%s",
 	            u.nodename,u.username) ;
 
-	    if (protospec != NULL)
+	    if (protospec != nullptr)
 	        logfile_printf(&pip->lh,"proto=%s\n",protospec) ;
 
-	    if (uu_machine != NULL)
+	    if (uu_machine != nullptr)
 	        logfile_printf(&pip->lh,"uu_machine=%s\n",uu_machine) ;
 
-	    if (uu_user != NULL)
+	    if (uu_user != nullptr)
 	        logfile_printf(&pip->lh,"uu_user=%s\n",uu_user) ;
 
 	} /* end if */
@@ -1236,7 +1219,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 #if	CF_MAILDIRS
 
-	if ((pip->maildname == NULL) || (pip->maildname[0] == '\0')) {
+	if ((pip->maildname == nullptr) || (pip->maildname[0] == '\0')) {
 
 	    vecstr	dirs ;
 
@@ -1248,8 +1231,8 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    vecstr_start(&dirs,10,0) ;
 
-	    if ((pip->maildname == NULL) &&
-	        ((sp = getenv("MAIL")) != NULL)) {
+	    if ((pip->maildname == nullptr) &&
+	        ((sp = getenv("MAIL")) != nullptr)) {
 
 	        cl = sfdirname(sp,-1,&cp) ;
 
@@ -1266,7 +1249,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        debugprintf("main: 1 maildname=%s\n",pip->maildname) ;
 #endif
 
-	    if (pip->maildname == NULL) {
+	    if (pip->maildname == nullptr) {
 
 	        cp = SPOOLDNAME ;
 	        cl = -1 ;
@@ -1287,9 +1270,9 @@ int main(int argc,mainv argv,mainv envv) {
 	        debugprintf("main: 2 maildname=%s\n",pip->maildname) ;
 #endif
 
-	    if (pip->maildname == NULL) {
+	    if (pip->maildname == nullptr) {
 
-	        for (i = 0 ; maildirs[i] != NULL ; i += 1) {
+	        for (i = 0 ; maildirs[i] != nullptr ; i += 1) {
 
 	            cp = (char *) maildirs[i] ;
 	            cl = -1 ;
@@ -1323,11 +1306,11 @@ int main(int argc,mainv argv,mainv envv) {
 
 
 	rs = SR_NOTFOUND ;
-	if (pip->maildname != NULL) {
+	if (pip->maildname != nullptr) {
 
 /* pop something inside the directory because of automounting */
 
-	    for (i = 0 ; entries[i] != NULL ; i += 1) {
+	    for (i = 0 ; entries[i] != nullptr ; i += 1) {
 
 	        mkpath2(tmpfname,pip->maildname,entries[i]) ;
 
@@ -1338,7 +1321,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    } /* end for */
 
-	    rs = perm(pip->maildname,-1,-1,NULL,W_OK) ;
+	    rs = perm(pip->maildname,-1,-1,nullptr,W_OK) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
@@ -1367,11 +1350,11 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    } /* end if (logging the problem) */
 
-	    pip->maildname = NULL ;
-	    f = pip->fl.optdivert && (pip->deadmaildname != NULL) ;
+	    pip->maildname = nullptr ;
+	    f = pip->fl.optdivert && (pip->deadmaildname != nullptr) ;
 
 	    if (f)
-	        rs = perm(pip->deadmaildname,-1,-1,NULL,W_OK) ;
+	        rs = perm(pip->deadmaildname,-1,-1,nullptr,W_OK) ;
 
 	    if (f && (rs >= 0)) {
 		cchar	*un = DIVERTUSER ;
@@ -1395,7 +1378,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* get and save some information on the mail spool directory */
 
-	if ((pip->maildname != NULL) && (rs >= 0))
+	if ((pip->maildname != nullptr) && (rs >= 0))
 	    rs = u_stat(pip->maildname,&sb) ;
 
 	if (rs < 0)
@@ -1469,7 +1452,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 #endif
 
-	if ((afname != NULL) && (afname[0] != '\0')) {
+	if ((afname != nullptr) && (afname[0] != '\0')) {
 	    bfile	afile ;
 	    char	linebuf[LINEBUFLEN + 1] ;
 
@@ -1520,7 +1503,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* do we have a COMSAT file ? */
 
-	if ((pip->comsatfname == NULL) || (pip->comsatfname[0] == '+')) {
+	if ((pip->comsatfname == nullptr) || (pip->comsatfname[0] == '+')) {
 	    char	csfname[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
@@ -1540,7 +1523,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    }
 
 	    if (rs1 >= 0)
-	        rs1 = perm(csfname,-1,-1,NULL,R_OK) ;
+	        rs1 = perm(csfname,-1,-1,nullptr,R_OK) ;
 
 	    if (rs1 >= 0)
 	        pip->comsatfname = mallocstrw(csfname,cl) ;
@@ -1560,7 +1543,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    }
 
 	    if (rs1 >= 0)
-	        rs1 = perm(csfname,-1,-1,NULL,R_OK) ;
+	        rs1 = perm(csfname,-1,-1,nullptr,R_OK) ;
 
 	    if (rs1 >= 0) {
 
@@ -1572,11 +1555,11 @@ int main(int argc,mainv argv,mainv envv) {
 	}
 
 	pip->fl.comsat = 
-	    (pip->comsatfname != NULL) && (pip->comsatfname[0] != '-') ;
+	    (pip->comsatfname != nullptr) && (pip->comsatfname[0] != '-') ;
 
 /* do we have a spam filter file ? */
 
-	if ((pip->spamfname == NULL) && pip->fl.comsat) {
+	if ((pip->spamfname == nullptr) && pip->fl.comsat) {
 	    char	spamfname[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
@@ -1595,7 +1578,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    }
 
-	    rs1 = perm(spamfname,-1,-1,NULL,R_OK) ;
+	    rs1 = perm(spamfname,-1,-1,nullptr,R_OK) ;
 
 	    if (rs1 >= 0)
 	        pip->spamfname = mallocstrw(spamfname,cl) ;
@@ -1603,12 +1586,12 @@ int main(int argc,mainv argv,mainv envv) {
 	} /* end if (default spam file) */
 
 	pip->fl.spam = pip->fl.comsat &&
-	    (pip->spamfname != NULL) && (pip->spamfname[0] != '-') ;
+	    (pip->spamfname != nullptr) && (pip->spamfname[0] != '-') ;
 
 
 /* process the input message */
 
-	if ((ifname != NULL) && (ifname[0] != '-')) {
+	if ((ifname != nullptr) && (ifname[0] != '-')) {
 	    rs = bopen(ifp,ifname,"r",0666) ;
 	} else
 	    rs = bopen(ifp,BFILE_STDIN,"dr",0666) ;
@@ -1702,7 +1685,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if (DEBUGLEVEL(4)) {
 	    struct msgoff	*mop ;
 	    for (i = 0 ; vecobj_get(&info,i,&mop) >= 0 ; i += 1) {
-	        if (mop == NULL) continue ;
+	        if (mop == nullptr) continue ;
 	        debugprintf("main: msg=%u off=%u mlen=%u\n",
 	            i,mop->offset,mop->mlen) ;
 	    } /* end for */
@@ -1751,7 +1734,7 @@ int main(int argc,mainv argv,mainv envv) {
 		c = 0 ;
 	    for (i = 0 ; vecobj_get(&recips,i,&rp) >= 0 ; i += 1) {
 
-	        if (rp == NULL) continue ;
+	        if (rp == nullptr) continue ;
 
 	        if (pip->debuglevel > 0)
 	            bprintf(pip->efp, "%s: recipient=%s\n",
@@ -1765,7 +1748,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        if (pip->open.logfile)
 	            logfile_printf(&pip->lh,"recip=%s\n",rp->recipient) ;
 
-	        pip->daytime = time(NULL) ;
+	        pip->daytime = time(nullptr) ;
 
 		memset(&midkey,0,sizeof(MSGID_KEY)) ;
 
@@ -1775,7 +1758,7 @@ int main(int argc,mainv argv,mainv envv) {
 	            int	f_repeat = FALSE ;
 	            int	f_deliver ;
 
-	            if (mop == NULL) continue ;
+	            if (mop == nullptr) continue ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
@@ -1784,11 +1767,11 @@ int main(int argc,mainv argv,mainv envv) {
 #endif
 
 	            mid.count = 0 ;
-	            if (f_mid && (mop->messageid != NULL) && 
+	            if (f_mid && (mop->messageid != nullptr) && 
 	                (mop->messageid[0] != '\0')) {
 
 			if ((c & 255) == 255)
-				pip->daytime = time(NULL) ;
+				pip->daytime = time(nullptr) ;
 
 			midkey.mtime = mop->mtime ;
 	                midkey.from = mop->from ;
@@ -1937,7 +1920,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if (pip->open.logfile)
 	    logfile_flush(&pip->lh) ;
 
-	if ((pip->comsatfname != NULL) && (pip->comsatfname[0] != '-') &&
+	if ((pip->comsatfname != nullptr) && (pip->comsatfname[0] != '-') &&
 	    (c_delivered > 0) &&
 	    (uc_fork() == 0)) {
 
@@ -1980,7 +1963,7 @@ int main(int argc,mainv argv,mainv envv) {
 	if (pip->fl.multirecip) {
 
 	    rs1 = SR_NOENT ;
-	    if ((ofname != NULL) && (ofname[0] != '-')) {
+	    if ((ofname != nullptr) && (ofname[0] != '-')) {
 	        rs1 = bopen(ofp,ofname,"wct",0644) ;
 	    } else  {
 	        rs1 = bopen(ofp,BFILE_STDOUT,"dwct",0644) ;
@@ -2116,7 +2099,7 @@ ret2:
 
 	dater_finish(&pip->tmpdate) ;
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    bclose(pip->efp) ;
 	}
 
@@ -2142,7 +2125,7 @@ usage:
 /* help */
 help:
 	ex = EX_INFO ;
-	printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	goto retearly ;
 
@@ -2246,10 +2229,10 @@ static int errormap(int val)
 /* process program options */
 static int getprogopts(pip,kop,setsp)
 struct proginfo	*pip ;
-KEYOPT		*kop ;
+keyopt		*kop ;
 vecstr		*setsp ;
 {
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 
 	int	rs, i, oi, val, cl ;
 	int	nlen, klen, vlen ;
@@ -2262,7 +2245,7 @@ vecstr		*setsp ;
 
 /* load up the environment options */
 
-	if ((cp = getenv(VAROPTS)) != NULL) {
+	if ((cp = getenv(VAROPTS)) != nullptr) {
 	    keyopt_loads(kop,cp,-1) ;
 	}
 
@@ -2271,7 +2254,7 @@ vecstr		*setsp ;
 	for (i = 0 ; vecstr_get(setsp,i,&cp) >= 0 ; i += 1) {
 	    char	*cp2 ;
 
-	    if (cp == NULL)
+	    if (cp == nullptr)
 	        continue ;
 
 #if	CF_DEBUG
@@ -2295,9 +2278,9 @@ vecstr		*setsp ;
 	    keyopt_loads(kop,cp,-1) ;
 #else
 	    kp = cp ;
-	    vp = NULL ;
+	    vp = nullptr ;
 	    vlen = 0 ;
-	    if ((cp = strchr(cp,'=')) != NULL) {
+	    if ((cp = strchr(cp,'=')) != nullptr) {
 	        vp = cp + 1 ;
 	        vlen = -1 ;
 	    }
@@ -2313,8 +2296,8 @@ vecstr		*setsp ;
 
 	keyopt_curbegin(kop,&kcur) ;
 
-	while ((rs = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
-	    KEYOPT_CUR	vcur ;
+	while ((rs = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
+	    keyopt_cur	vcur ;
 	    int	f_value = FALSE ;
 
 	    klen = rs ;
@@ -2326,7 +2309,7 @@ vecstr		*setsp ;
 
 /* use only the first of any option with the same key */
 
-	    while ((rs = keyopt_enumvalues(kop,kp,&vcur,&vp)) >= 0) {
+	    while ((rs = keyopt_curenumvals(kop,kp,&vcur,&vp)) >= 0) {
 	        f_value = TRUE ;
 	        vlen = rs ;
 	        if (vlen > 0) break ;
@@ -2341,13 +2324,13 @@ vecstr		*setsp ;
 	        switch (oi) {
 
 	        case progopt_maildir:
-	            if ((vlen > 0) && (pip->maildname == NULL))
+	            if ((vlen > 0) && (pip->maildname == nullptr))
 	                pip->maildname = mallocstrw(vp,vlen) ;
 
 	            break ;
 
 	        case progopt_deadmaildir:
-	            if ((vlen > 0) && (pip->deadmaildname == NULL))
+	            if ((vlen > 0) && (pip->deadmaildname == nullptr))
 	                pip->deadmaildname = mallocstrw(vp,vlen) ;
 
 	            break ;
@@ -2375,13 +2358,13 @@ vecstr		*setsp ;
 	                }
 	            }
 
-	            if (pip->comsatfname == NULL)
+	            if (pip->comsatfname == nullptr)
 	                pip->comsatfname = mallocstrw(cp,cl) ;
 
 	            break ;
 
 	        case progopt_spam:
-	            if ((vlen > 0) && (pip->comsatfname == NULL))
+	            if ((vlen > 0) && (pip->comsatfname == nullptr))
 	                pip->spamfname = mallocstrw(vp,vlen) ;
 
 	            break ;
@@ -2444,7 +2427,7 @@ vecstr		*setsp ;
 /* add a recipient to the recipient list */
 static int vecobj_addrecip(op,name)
 vecobj		*op ;
-const char	name[] ;
+cchar	name[] ;
 {
 	struct recip	*rp, entry ;
 	int		rs, i ;
@@ -2457,7 +2440,7 @@ const char	name[] ;
 	    return 0 ;
 
 	for (i = 0 ; (rs = vecobj_get(op,i,&rp)) >= 0 ; i += 1) {
-	    if (rp == NULL) continue ;
+	    if (rp == nullptr) continue ;
 	    if (strcmp(rp->recipient,name) == 0) break ;
 	} /* end for */
 
@@ -2493,7 +2476,7 @@ vecobj		*op ;
 	int		i ;
 
 	for (i = 0 ; vecobj_get(op,i,&rp) >= 0 ; i += 1) {
-	    if (rp != NULL) {
+	    if (rp != nullptr) {
 	        rs1 = vecitem_finish(&rp->mds) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -2510,7 +2493,7 @@ vecobj		*op ;
 
 static int recip_init(rp,name)
 struct recip	*rp ;
-const char	name[] ;
+cchar	name[] ;
 {
 	int		rs ;
 
@@ -2638,7 +2621,7 @@ vecobj		*mip ;
 
 	n = 0 ;
 	for (i = 0 ; vecstr_get(&h,i,&nsp) >= 0 ; i += 1) {
-	    if (nsp == NULL) continue ;
+	    if (nsp == nullptr) continue ;
 
 /* separate the node-spec into node and port */
 
@@ -2663,7 +2646,7 @@ vecobj		*mip ;
 #endif
 
 	        hep = &he ;
-	        rs = getheour(np,NULL,hep,hostbuf,HOSTBUFLEN) ;
+	        rs = getheour(np,nullptr,hep,hostbuf,HOSTBUFLEN) ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -2692,7 +2675,7 @@ vecobj		*mip ;
 #endif
 
 	            for (j = 0 ; vecobj_get(rsp,j,&rp) >= 0 ; j += 1) {
-	                if (rp == NULL) continue ;
+	                if (rp == nullptr) continue ;
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4))
@@ -2709,7 +2692,7 @@ vecobj		*mip ;
 	                for (k = 0 ; vecitem_get(&rp->mds,k,&mdp) >= 0 ; 
 				k += 1) {
 
-	                    if (mdp == NULL) continue ;
+	                    if (mdp == nullptr) continue ;
 
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(4))
@@ -2772,7 +2755,7 @@ int		defport ;
 char		buf[] ;
 int		buflen ;
 char		nodename[] ;
-const char	*nsp ;
+cchar	*nsp ;
 {
 	struct servent	se ;
 	int	rs = SR_OK ;
@@ -2782,22 +2765,22 @@ const char	*nsp ;
 	char	*np, *pp ;
 	char	*cp ;
 
-	pp = NULL ;
-	if ((cp = strchr(nsp,':')) != NULL) {
+	pp = nullptr ;
+	if ((cp = strchr(nsp,':')) != nullptr) {
 
 	    nl = sfshrink(nsp,(cp - nsp),&np) ;
 
 	    pl = sfshrink((cp + 1),-1,&pp) ;
 
 	    if (pl == 0)
-	        pp = NULL ;
+	        pp = nullptr ;
 
 	} else
 	    nl = sfshrink(nsp,-1,&np) ;
 
 	strwcpy(nodename,np,MIN(nl,NODENAMELEN)) ;
 
-	if (pp != NULL) {
+	if (pp != nullptr) {
 	    const int	ch = MKCHAR(pp[0]) ;
 
 	    if (isdigitlatin(ch)) {
@@ -2835,7 +2818,7 @@ const char	*nsp ;
 static int mkcsmsg(buf,buflen,up,ul,val)
 char		buf[] ;
 int		buflen ;
-const char	*up ;
+cchar	*up ;
 int		ul ;
 uint		val ;
 {
