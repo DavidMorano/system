@@ -39,7 +39,7 @@ struct ussnls_flags {
 struct ussnls_head {
 	logfile		lh ;
 	USSNLS_FL	fl, open ;
-	uint		magic ;
+	uint		magval ;
 	int		tlen ;
 	int		fd ;
 } ; /* end struct */
