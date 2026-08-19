@@ -43,6 +43,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |getustime(3u)| */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
@@ -123,8 +124,8 @@ local inline int holidayer_ctor(holidayer *op,Args ... args) noex {
 	    op->idp = nullptr ;
 	    op->hlp = nullptr ;
 	    op->fl = {} ;
-	    if (op->idp = new(nt) ids ; op->idp) {
-		if (op->hlp = new(nt) vechand ; op->hlp) {
+	    if (op->idp = new(nt) ids ; op->idp) ylikely {
+		if (op->hlp = new(nt) vechand ; op->hlp) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-vechand) */
 		if (rs < 0) {
@@ -141,11 +142,11 @@ local int holidayer_dtor(holidayer *op) noex {
 	if (op->hlp) ylikely {
 	    delete op->hlp ;
 	    op->hlp = nullptr ;
-	}
+	} /* end if (delete-vechand) */
 	if (op->idp) ylikely {
 	    delete op->idp ;
 	    op->idp = nullptr ;
-	}
+	} /* end if (delete-ids) */
 	return rs ;
 } /* end subroutine (holidayer_dtor) */
 
@@ -507,8 +508,8 @@ int holidayer_curenum(HO *op,HO_CUR *curp,HO_CITE *qp,
 int holidayer_check(HO *op,time_t dt) noex {
 	int		rs ;
 	int		f_changed = false ; /* return-value */
-	if ((rs = holidayer_magic(op)) >= 0) {
-	    if (dt == 0) dt = time(nullptr) ;
+	if ((rs = holidayer_magic(op)) >= 0) ylikely {
+	    if (dt == 0) dt = getustime ;
 	    if (dt == 1) f_changed = true ;
 	} /* end if (holidayer_magic) */
 	return (rs >= 0) ? f_changed : rs ;
@@ -670,7 +671,7 @@ local int holidayer_yearadd(HO *op,HO_H *hep) noex {
 	int		rs ;
 	if ((rs = holidayer_liststart(op)) >= 0) ylikely {
 	    vechand	*hlp = op->hlp ;
-	    rs = vechand_add(hlp,hep) ;
+	    rs = hlp->add(hep) ;
 	}
 	return rs ;
 } /* end subroutine (holidayer_yearadd) */
@@ -809,7 +810,7 @@ local int holidayer_yearmk(HO *op) noex {
 	int		rs = SR_OK ;
 	int		y = 0 ; /* return-value */
 	if (op->year == 0) {
-	    custime	dt = time(nullptr) ;
+	    custime	dt = getustime ;
 	    if (tmtime m ; (rs = tmtime_timelocal(&m,dt)) >= 0) {
 	        y = (m.year + TMTIME_YEARBASE) ;
 	        op->year = y ;
