@@ -23,10 +23,10 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<vechand.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
 #include	<calent.h>		/* LIBDAM */
 #include	<calcite.h>		/* LIBDAM */
 #include	<holidayer.h>		/* LIBDAM */
-#include	<vecobj.h>		/* LIBDAM */
 
 
 #define	CALYEARS	struct calyears_head
