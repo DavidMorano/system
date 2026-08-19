@@ -37,7 +37,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<usyscalls.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |getustime(3u)| */
 #include	<intcmp.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<estrings.h>		/* LIBUC */
@@ -229,13 +229,13 @@ local int holidays_opens(HOS *op,cchar *pr,int year,cchar *fname) noex {
 	int		c = 0 ; /* return-value */
 	(void) pr ;
 	(void) year ;
-        if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) {
+        if (cchar *cp ; (rs = mem.strw(fname,-1,&cp)) >= 0) ylikely {
             op->fname = cp ;
-            if (SI si ; (rs = subinfo_start(&si,op)) >= 0) {
-                if ((rs = subinfo_procfile(&si)) >= 0) {
+            if (SI si ; (rs = subinfo_start(&si,op)) >= 0) ylikely {
+                if ((rs = subinfo_procfile(&si)) >= 0) ylikely {
                     c = rs ;
-                    if ((rs = subinfo_mkdata(&si)) >= 0) {
-                        op->ti_check = time(nullptr) ;
+                    if ((rs = subinfo_mkdata(&si)) >= 0) ylikely {
+                        op->ti_check = getustime ;
                         op->magval = HOS_MAGIC ;
                     }
                 }
@@ -255,17 +255,17 @@ int holidays_open(HOS *op,cchar *pr,int year,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
-	if ((rs = holidays_ctor(op,pr)) >= 0) {
+	if ((rs = holidays_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0]) {
-		custime	dt = time(nullptr) ;
+	    if (pr[0]) ylikely {
+		custime	dt = getustime ;
 		rs = SR_INVALID ;
 	        if (year <= 0) year = getyear(dt) ;
-	        if (year >= 1970) {
+	        if (year >= 1970) ylikely {
 		    int		fl = -1 ;
 		    op->year	= year ;
 		    op->pr	= pr ;
-		    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+		    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) ylikely {
 		        if ((fname == nullptr) || (fname[0] == '\0')) {
 	    	            if (ids id ; (rs = id.load) >= 0) {
 	        	        rs = holidays_dbfind(op,&id,tbuf) ;
@@ -296,7 +296,7 @@ int holidays_open(HOS *op,cchar *pr,int year,cchar *fname) noex {
 int holidays_close(HOS *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = holidays_magic(op)) >= 0) {
+	if ((rs = holidays_magic(op)) >= 0) ylikely {
 	    if (op->vst) {
 	        rs1 = mem.free(op->vst) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -335,7 +335,7 @@ int holidays_close(HOS *op) noex {
 int holidays_count(HOS *op) noex {
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	if ((rs = holidays_magic(op)) >= 0) {
+	if ((rs = holidays_magic(op)) >= 0) ylikely {
 	    c = (op->rtlen - 1) ;
 	} /* end if (holidays_magic) */
 	return (rs >= 0) ? c : rs ;
@@ -343,7 +343,7 @@ int holidays_count(HOS *op) noex {
 
 int holidays_audit(HOS *op) noex {
 	int		rs ;
-	if ((rs = holidays_magic(op)) >= 0) {
+	if ((rs = holidays_magic(op)) >= 0) ylikely {
 	    rs = 1 ;
 	} /* end if (holidays_magic) */
 	return rs ;
@@ -351,7 +351,7 @@ int holidays_audit(HOS *op) noex {
 
 int holidays_curbegin(HOS *op,holidays_cur *curp) noex {
     	int		rs ;
-	if ((rs = holidays_magic(op,curp)) >= 0) {
+	if ((rs = holidays_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	    curp->chash = 0 ;
 	    op->ncursors += 1 ;
@@ -361,7 +361,7 @@ int holidays_curbegin(HOS *op,holidays_cur *curp) noex {
 
 int holidays_curend(HOS *op,holidays_cur *curp) noex {
     	int		rs ;
-	if ((rs = holidays_magic(op,curp)) >= 0) {
+	if ((rs = holidays_magic(op,curp)) >= 0) ylikely {
 	    curp->i = 0 ;
 	    if (op->ncursors > 0) {
 	        op->ncursors -= 1 ;
@@ -374,7 +374,7 @@ int holidays_fetchcite(HOS *op,HOS_CITE *qp,HOS_CUR *curp,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	int		vl = 0 ; /* return-value */
-	if ((rs = holidays_magic(op,qp)) >= 0) {
+	if ((rs = holidays_magic(op,qp)) >= 0) ylikely {
 	    HOS_CUR	dcur ;
 	    uint	(*rt)[3] ;
 	    uint	(*rpp)[3] ;
@@ -455,7 +455,7 @@ int holidays_fetchname(HOS *op,cc *kp,int kl,HOS_CUR *curp,HOS_CITE *qp,
 		char *vbuf,int vlen) noex {
 	int		rs = SR_OK ;
 	int		vl = 0 ; /* return-value */
-	if ((rs = holidays_magic(op,kp)) >= 0) {
+	if ((rs = holidays_magic(op,kp)) >= 0) ylikely {
 	    HOS_CUR	dcur ;
 	    uint	khash, nhash ;
 	    uint	chash ;
@@ -591,7 +591,7 @@ int holidays_curenum(HOS *op,HOS_CUR *curp,HOS_CITE *qp,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	int		vl = 0 ; /* return-value */
-	if ((rs = holidays_magic(op,curp)) >= 0) {
+	if ((rs = holidays_magic(op,curp)) >= 0) ylikely {
 	    uint	(*rt)[3] ;
 	    int		ri = (curp->i < 1) ? 1 : (curp->i + 1) ;
 	    int		vi ; /* used-below */
@@ -632,8 +632,8 @@ int holidays_curenum(HOS *op,HOS_CUR *curp,HOS_CITE *qp,
 int holidays_check(HOS *op,time_t dt) noex {
 	int		rs ;
 	int		f_changed = false ; /* return-value */
-	if ((rs = holidays_magic(op)) >= 0) {
-	    if (dt == 0) dt = time(nullptr) ;
+	if ((rs = holidays_magic(op)) >= 0) ylikely {
+	    if (dt == 0) dt = getustime ;
 	    if (dt == 1) f_changed = true ; /* dummy check (never happens) */
 	} /* end if (holidays_magic) */
 	return (rs >= 0) ? f_changed : rs ;
