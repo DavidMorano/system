@@ -1679,7 +1679,7 @@ local int procmntcheck(PROGINFO *pip)
 	cchar		*fmt ;
 	if ((rs = u_stat(lip->mntfname,&usb)) >= 0) {
 	    if (S_ISREG(usb.st_mode)) {
-	        rs = permid(&pip->id,&usb,W_OK) ;
+	        rs = permids(&pip->id,&usb,W_OK) ;
 	    } else
 	        rs = SR_BUSY ;
 	    if (rs < 0) {
