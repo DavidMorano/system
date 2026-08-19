@@ -1,11 +1,12 @@
-/* main */
+/* listener_main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* for LISTENER */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history:
 
@@ -18,6 +19,8 @@
 
 /*******************************************************************************
 
+  	Description:
+
 	Synopsis:
 
 	$ LISTNER_ADDR=<tliadda>
@@ -25,12 +28,9 @@
 	$ export LISTENER_ADDR LISTENER_PROGRAM
 	$ listener
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -40,21 +40,22 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
 #include	<netdb.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<userinfo.h>
 #include	<logfile.h>
 #include	<lfm.h>
 #include	<sockaddress.h>
-#include	<exitcodes.h>
+#include	<prognamevar.hh>
 #include	<mallocstuff.h>
+#include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"connection.h"
@@ -98,24 +99,6 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
-extern int	listenusd(const char *,int) ;
-extern int	isdigitlatin(int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strbasename(char *) ;
-extern char	*timestr_log(time_t,char *) ;
-
 
 /* external variables */
 
@@ -127,24 +110,13 @@ extern char	makedate[] ;
 
 /* forward references */
 
-static int	helpfile(const char *,bfile *) ;
+static int	helpfile(cchar *,bfile *) ;
 
 
 /* global data */
 
 
 /* local variables */
-
-static char *const argopts[] = {
-	"ROOT",
-	"DEBUG",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"LOG",
-	"MAKEDATE",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -157,25 +129,37 @@ enum argopts {
 	argopt_overlast
 } ;
 
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"DEBUG",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"LOG",
+	"MAKEDATE",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int main(int argc,cchar *argv[],cchar *envv[])
-{
-	struct msghdr	mh ;
-	struct pollfd	fds[3] ;
-	struct iovec	vecs[NIOVECS] ;
-	ustat	sb ;
+int main(int argc,mainv argv,mainv envv) {
+    	prognamevar	progname(argc,argv,envv) ;
+	MSGHDR		mh ;
+	POLLFD		fds[3] ;
+	IOVEC		vecs[NIOVECS] ;
+	ustat		sb ;
 	PROGINFO	pi, *pip = &pi ;
-	USERINFO	u ;
+	userinfo	u ;
 	LFM		lk ;
 	bfile		errfile, *efp = &errfile ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		infile, *ifp = &infile ;
 	bfile		pidfile ;
-
-	time_t		daytime = time(NULL) ;
+	time_t		daytime = time(nullptr) ;
 
 	int	argr, argl, aol, avl ;
 	int	maxai, pan, npa, kwi, i ;
@@ -205,28 +189,26 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	cchar	peername[SOCKADDRESS_NAMELEN + 1] ;
 	cchar	jobidbuf[JOBIDLEN + 1] ;
 	cchar	timebuf[TIMEBUFLEN] ;
-	cchar	*jobid = NULL ;
-	cchar	*pidfname = NULL ;
-	cchar	*logfname = NULL ;
-	cchar	*addrspec = NULL ;
-	cchar	*hostname = NULL ;
-	cchar	*portspec = NULL ;
-	cchar	*progpath = NULL ;
-	cchar	*username = NULL ;
+	cchar	*jobid = nullptr ;
+	cchar	*pidfname = nullptr ;
+	cchar	*logfname = nullptr ;
+	cchar	*addrspec = nullptr ;
+	cchar	*hostname = nullptr ;
+	cchar	*portspec = nullptr ;
+	cchar	*progpath = nullptr ;
+	cchar	*username = nullptr ;
 	cchar	*cp, *cp1, *cp2 ;
 
-
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
 #endif /* CF_DEBUGS */
 
-	memset(pip,0,sizeof(struct proginfo)) ;
-
+	memclear(pip) ;
 	pip->banner = BANNER ;
-	pip->progname = strbasename(argv[0]) ;
+	pip->progname = progname ;
 
 	if (bopen(efp,BFILE_STDERR,"dwca",0666) >= 0) {
 	    u_close(2) ;
@@ -234,9 +216,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    bcontrol(efp,BC_LINEBUF,0) ;
 	}
 
-	pip->programroot = NULL ;
-	pip->helpfname = NULL ;
-
+	pip->programroot = nullptr ;
+	pip->helpfname = nullptr ;
 	pip->debuglevel = 0 ;
 	pip->verboselevel = 1 ;
 
@@ -276,7 +257,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                aop = argp + 1 ;
 	                aol = argl - 1 ;
 	                f_optequal = FALSE ;
-	                if ((avp = strchr(aop,'=')) != NULL) {
+	                if ((avp = strchr(aop,'=')) != nullptr) {
 
 	                    aol = avp - aop ;
 	                    avp += 1 ;
@@ -533,16 +514,16 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* get our program root */
 
-	if (pip->programroot == NULL)
+	if (pip->programroot == nullptr)
 	    pip->programroot = getenv(VARPROGRAMROOT1) ;
 
-	if (pip->programroot == NULL)
+	if (pip->programroot == nullptr)
 	    pip->programroot = getenv(VARPROGRAMROOT2) ;
 
-	if (pip->programroot == NULL)
+	if (pip->programroot == nullptr)
 	    pip->programroot = getenv(VARPROGRAMROOT3) ;
 
-	if (pip->programroot == NULL)
+	if (pip->programroot == nullptr)
 	    pip->programroot = PROGRAMROOT ;
 
 #if	CF_DEBUG
@@ -555,16 +536,16 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	        pip->progname,pip->programroot) ;
 
 
-	if (pip->searchname == NULL)
+	if (pip->searchname == nullptr)
 	    pip->searchname = getenv(VARSEARCHNAME) ;
 
-	if (pip->searchname == NULL)
+	if (pip->searchname == nullptr)
 	    pip->searchname = SEARCHNAME ;
 
 
 	if (f_help) {
 
-	    if (pip->helpfname == NULL) {
+	    if (pip->helpfname == nullptr) {
 
 	        blen = bufprintf(buf,BUFLEN,"%s/%s",
 	            pip->programroot,HELPFNAME) ;
@@ -582,7 +563,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* who are we ? */
 
-	if ((rs = userinfo(&u,userinfobuf,USERINFO_LEN,NULL)) < 0)
+	if ((rs = userinfo(&u,userinfobuf,USERINFO_LEN,nullptr)) < 0)
 	    goto baduser ;
 
 	pip->up = &u ;
@@ -642,7 +623,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* possibly clean up the user specified JOB ID */
 
-	if (jobid != NULL) {
+	if (jobid != nullptr) {
 
 	    cp = jobid ;
 	    i = 0 ;
@@ -669,10 +650,10 @@ int main(int argc,cchar *argv[],cchar *envv[])
 #endif
 
 	rs = BAD ;
-	if ((logfname == NULL) || (logfname[0] == '\0'))
+	if ((logfname == nullptr) || (logfname[0] == '\0'))
 	    logfname = getenv(LOGVAR) ;
 
-	if ((logfname == NULL) || (logfname[0] == '\0'))
+	if ((logfname == nullptr) || (logfname[0] == '\0'))
 	    logfname = LOGFNAME ;
 
 	if ((logfname[0] == '/') || (u_access(logfname,W_OK) >= 0))
@@ -733,13 +714,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 
 	    buf[0] = '\0' ;
-	    if ((u.name != NULL) && (u.name[0] != '\0'))
+	    if ((u.name != nullptr) && (u.name[0] != '\0'))
 	        sprintf(buf,"(%s)",u.name) ;
 
-	    else if ((u.gecosname != NULL) && (u.gecosname[0] != '\0'))
+	    else if ((u.gecosname != nullptr) && (u.gecosname[0] != '\0'))
 	        sprintf(buf,"(%s)",u.gecosname) ;
 
-	    else if ((u.fullname != NULL) && (u.fullname[0] != '\0'))
+	    else if ((u.fullname != nullptr) && (u.fullname[0] != '\0'))
 	        sprintf(buf,"(%s)",u.fullname) ;
 
 	    (void) u_uname(&un) ;
@@ -756,19 +737,19 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* other initialization */
 
-	if (pidfname == NULL)
+	if (pidfname == nullptr)
 		pidfname = getenv(PIDVAR) ;
 
-	if (pidfname == NULL)
+	if (pidfname == nullptr)
 		pidfname = "/var/run/listener.pid" ;
 
 
-	if (addrspec == NULL)
+	if (addrspec == nullptr)
 		addrspec = getenv(ADDRVAR) ;
 
-	if ((addrspec != NULL) && (addrspec[0] != '\0')) {
+	if ((addrspec != nullptr) && (addrspec[0] != '\0')) {
 
-	if ((cp = strchr(addrspec,':')) != NULL) {
+	if ((cp = strchr(addrspec,':')) != nullptr) {
 
 		strwcpy(addrbuf,addrspec,ADDRBUFLEN) ;
 
@@ -782,14 +763,14 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	}
 
-	if ((hostname == NULL) || (hostname[0] == '\0'))
+	if ((hostname == nullptr) || (hostname[0] == '\0'))
 	    hostname = "rca" ;
 
-	if ((portspec == NULL) || (portspec[0] == '\0'))
+	if ((portspec == nullptr) || (portspec[0] == '\0'))
 	    portspec = "printer" ;
 
 
-	if (progpath == NULL)
+	if (progpath == nullptr)
 		progpath = getenv(PROGVAR) ;
 
 #if	CF_DEBUG
@@ -797,7 +778,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	debugprintf("main: 1 progpath=%s\n",progpath) ;
 #endif
 
-	if (progpath == NULL)
+	if (progpath == nullptr)
 	    progpath = PROG_ECHOD ;
 
 #if	CF_DEBUG
@@ -806,10 +787,10 @@ int main(int argc,cchar *argv[],cchar *envv[])
 #endif
 
 
-	if (username == NULL)
+	if (username == nullptr)
 		username = getenv(USERNAMEVAR) ;
 
-	if (username == NULL)
+	if (username == nullptr)
 		username = "daemon" ;
 
 
@@ -858,7 +839,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	u_close(fd_listen) ;
 
 
-	if (pidfname != NULL)
+	if (pidfname != nullptr)
 		u_unlink(pidfname) ;
 
 
@@ -941,7 +922,6 @@ badlisten:
 
 /* local subroutines */
 
-
 static int helpfile(f,ofp)
 char	f[] ;
 bfile	*ofp ;
@@ -949,15 +929,12 @@ bfile	*ofp ;
 	bfile		file, *ifp = &file ;
 	int		rs ;
 
-	if ((f == NULL) || (f[0] == '\0'))
+	if ((f == nullptr) || (f[0] == '\0'))
 	    return SR_NOENT ;
 
 	if ((rs = bopen(ifp,f,"r",0666)) >= 0) {
-
 	    rs = bcopyblock(ifp,ofp,-1) ;
-
 	    bclose(ifp) ;
-
 	}
 
 	return rs ;
