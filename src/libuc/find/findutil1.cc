@@ -51,6 +51,7 @@ module ;
 #include	<usyscalls.h>		/* LIBU */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"findfilepath.h"
@@ -93,24 +94,24 @@ static bufsizevar	maxpathlen(bufsize_mp) ;
 /* exported subroutines */
 
 int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex {
-	int		rs ;
-	int		i = 0 ; /* return-value */
-	if ((rs = maxpathlen) >= 0) ylikely {
-	    cint	plen = rs ;
-	    if (rs >= 0) {
-	        rs = storebuf_strw(pbuf,plen,i,dnp,dnl) ;
-	        i += rs ;
-	    }
-	    if ((rs >= 0) && (i > 0) && hasneedslash(dnp,dnl)) {
-	        rs = storebuf_chr(pbuf,plen,i,'/') ;
-	        i += rs ;
-	    }
-	    if (rs >= 0) {
-	        rs = storebuf_strw(pbuf,plen,i,fn,-1) ;
-	        i += rs ;
-	    }
-	} /* end if (maxpathlen) */
-	return (rs >= 0) ? i : rs ;
+	int		rs = SR_FAULT ;
+	int		len = 0 ; /* return-value */
+	if (pbuf && dnp && fn) ylikely {
+	    if ((rs = maxpathlen) >= 0) ylikely {
+		storebuf sb(pbuf,rs) ;
+	        if (rs >= 0) {
+		    rs = sb.strw(dnp,dnl) ;
+		}
+	        if ((rs >= 0) && (sb.idx > 0) && hasneedslash(dnp,dnl)) {
+	            rs = sb.chr('/') ;
+	        }
+	        if (rs >= 0) {
+		    rs = sb.str(fn) ;
+		}
+		len = sb.idx ;
+	    } /* end if (maxpathlen) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 } /* end subroutine (mkourpath) */
 
 
