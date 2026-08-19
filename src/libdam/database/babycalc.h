@@ -20,14 +20,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<modload.h>
-#include	<babycalcs.h>
+#include	<time.h>		/* POSIX® |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBDAM */
+#include	<babycalcs.h>		/* LIBDAM */
 
 
 #define	BABYCALC		struct babycalc_head
