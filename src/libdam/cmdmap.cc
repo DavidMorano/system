@@ -152,7 +152,7 @@ int cmdmap_start(cmdmap *op,const cmdmap_ent *defmap) noex {
 int cmdmap_finish(cmdmap *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = cmdmap_magic(op)) >= 0) {
+	if ((rs = cmdmap_magic(op)) >= 0) ylikely {
 	    {
 		rs1 = vecobj_finish(op->mlp) ;
 		if (rs < 0) rs = rs1 ;
@@ -169,7 +169,7 @@ int cmdmap_finish(cmdmap *op) noex {
 int cmdmap_load(cmdmap *op,int key,int cmd) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	if ((rs = cmdmap_magic(op)) >= 0) {
+	if ((rs = cmdmap_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (key >= 0) {
 	        cmdmap_ent	e{} ;
@@ -201,7 +201,7 @@ int cmdmap_load(cmdmap *op,int key,int cmd) noex {
 int cmdmap_lookup(cmdmap *op,int key) noex {
 	int		rs ;
 	int		cmd = 0 ;
-	if ((rs = cmdmap_magic(op)) >= 0) {
+	if ((rs = cmdmap_magic(op)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (key >= 0) {
 		rs = SR_OK ;
@@ -209,7 +209,7 @@ int cmdmap_lookup(cmdmap *op,int key) noex {
 	            op->fl.sorted = true ;
 	            rs = vecobj_sort(op->mlp,vcmpfind) ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            cmdmap_ent	te{} ;
 	            te.key = key ;
 		    cauto	vos = vecobj_search ;
@@ -250,7 +250,7 @@ local int vcmpfind(cvoid **v1pp,cvoid **v2pp) noex {
 	cmdmap_ent	*e1p = (cmdmap_ent *) *v1pp ;
 	cmdmap_ent	*e2p = (cmdmap_ent *) *v2pp ;
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
@@ -258,7 +258,7 @@ local int vcmpfind(cvoid **v1pp,cvoid **v2pp) noex {
 	            rc = e1p->key - e2p->key ;
 	        }
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (vcmpfind) */
 
