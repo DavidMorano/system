@@ -30,12 +30,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<atomic>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<timewatch.hh>		/* |timewatch(3u)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<atomic>		/* C++SYD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU |timewatch(3u)| */
 
 #include	"aflag.hh"
 
@@ -153,14 +153,12 @@ int aflag::ilockbegin(int to) noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (aflag::ilockbegin) */
+} /* end method (aflag::ilockbegin) */
 
 int aflag::ilockend() noex {
 	af.clear(memord_release) ;
 	af.notify_one() ;
 	return SR_OK ;
-}
-/* end method (aflag::ilockend) */
+} /* end method (aflag::ilockend) */
 
 
