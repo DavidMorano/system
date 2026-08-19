@@ -5,7 +5,6 @@
 /* translate a bible number to its corresponding name */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_DEBUGN	0		/* extra (special) debugging */
@@ -50,32 +49,33 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-
-#include	<usystem.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<calstrs.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
 #include	<estrings.h>
 #include	<field.h>
-#include	<char.h>
 #include	<wordfill.h>
 #include	<tmtime.hh>
 #include	<dayspec.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<char.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<holidayer.h>		/* LIBDAM */
 
 #include	"shio.h"
 #include	"kshlib.h"
 #include	"b_holiday.h"
 #include	"defs.h"
-#include	"holidayer.h"
 
 
 /* local defines */
@@ -114,14 +114,6 @@
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
 
 /* external variables */
 
@@ -154,7 +146,7 @@ struct locinfo {
 	PROGINFO	*pip ;
 	void		*ofp ;
 	HOLIDAYER	holdb ;
-	TMTIME		tm ;
+	tmtime		tm ;
 	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	int		linelen ;
@@ -168,38 +160,38 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	process(PROGINFO *,ARGINFO *,bits *,
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,
 			paramopt *,cchar *,cchar *) ;
-static int	procsome(PROGINFO *,ARGINFO *,bits *,paramopt *,cchar *) ;
-static int	procspecs(PROGINFO *,cchar *,int) ;
-static int	procspec(PROGINFO *,cchar *,int) ;
+local int	procsome(PROGINFO *,ARGINFO *,bits *,paramopt *,cchar *) ;
+local int	procspecs(PROGINFO *,cchar *,int) ;
+local int	procspec(PROGINFO *,cchar *,int) ;
 
-static int	procnow(PROGINFO *,int,int) ;
+local int	procnow(PROGINFO *,int,int) ;
 
-static int	procallents(PROGINFO *) ;
-static int	procnames(PROGINFO *,paramopt *) ;
-static int	procname(PROGINFO *,const char *,int) ;
-static int	procqueries(PROGINFO *,HOLIDAYER_CITE *,int) ;
-static int	procquery(PROGINFO *,HOLIDAYER_CITE *) ;
+local int	procallents(PROGINFO *) ;
+local int	procnames(PROGINFO *,paramopt *) ;
+local int	procname(PROGINFO *,cchar *,int) ;
+local int	procqueries(PROGINFO *,HOLIDAYER_CITE *,int) ;
+local int	procquery(PROGINFO *,HOLIDAYER_CITE *) ;
 
-static int	procoutents(PROGINFO *,HOLIDAYER_CITE *,cchar *,int) ;
-static int	procoutenters(PROGINFO *,HOLIDAYER_CITE *,cchar *,int) ;
-static int	procoutline(PROGINFO *,int,const char *,int) ;
+local int	procoutents(PROGINFO *,HOLIDAYER_CITE *,cchar *,int) ;
+local int	procoutenters(PROGINFO *,HOLIDAYER_CITE *,cchar *,int) ;
+local int	procoutline(PROGINFO *,int,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_deflinelen(LOCINFO *) ;
-static int	locinfo_tmtime(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_deflinelen(LOCINFO *) ;
+local int	locinfo_tmtime(LOCINFO *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"HELP",
@@ -247,7 +239,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"audit",
 	"linelen",
 	"indent",
@@ -277,7 +269,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	blanks[] = "                    " ;
+static cchar	blanks[] = "                    " ;
 
 static const uchar	aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
@@ -301,7 +293,7 @@ int b_holiday(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -325,7 +317,7 @@ int p_holiday(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -335,7 +327,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	paramopt	aparams ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -344,29 +336,29 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		rs, rs1 ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_version = FALSE ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
+	int		f_version = false ;
+	int		f_usage = false ;
+	int		f_help = false ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*dbfname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*dbfname = NULL ;
+	cchar	*cp ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_holiday: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -424,11 +416,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
-	            if (f_optplus) lip->fl.apm = TRUE ;
+	            if (f_optplus) lip->fl.apm = true ;
 	            argval = (argp+1) ;
 
 	        } else if (ach == '-') {
@@ -441,9 +433,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
@@ -460,7 +452,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -468,7 +460,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* program root */
 	                case argopt_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pr = avp ;
 	                    } else {
@@ -484,13 +476,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -508,7 +500,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* argument file */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -526,7 +518,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -544,7 +536,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* output file */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -562,7 +554,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* BibleBook-verse DB name */
 	                case argopt_db:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            dbfname = avp ;
 	                    } else {
@@ -578,11 +570,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_monthname:
-	                    lip->have.monthname = TRUE ;
-	                    lip->finval.monthname = TRUE ;
-	                    lip->fl.monthname = TRUE ;
+	                    lip->have.monthname = true ;
+	                    lip->finval.monthname = true ;
+	                    lip->fl.monthname = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            lip->fl.monthname = (rs > 0) ;
@@ -600,7 +592,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -608,7 +600,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -618,7 +610,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->fl.quiet = TRUE ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -635,19 +627,19 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 	                    case 'a':
-	                        lip->fl.allents = TRUE ;
+	                        lip->fl.allents = true ;
 	                        break ;
 
 	                    case 'i':
-	                        lip->have.interactive = TRUE ;
-	                        lip->finval.interactive = TRUE ;
-	                        lip->fl.interactive = TRUE ;
+	                        lip->have.interactive = true ;
+	                        lip->finval.interactive = true ;
+	                        lip->fl.interactive = true ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
 	                                lip->fl.interactive = (rs > 0) ;
@@ -656,7 +648,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'n':
-	                        lip->fl.names = TRUE ;
+	                        lip->fl.names = true ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
@@ -692,7 +684,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -707,8 +699,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                lip->have.linelen = TRUE ;
-	                                lip->finval.linelen = TRUE ;
+	                                lip->have.linelen = true ;
+	                                lip->finval.linelen = true ;
 	                                rs = optvalue(argp,argl) ;
 	                                lip->linelen = rs ;
 	                            }
@@ -724,8 +716,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                rs = optvalue(argp,argl) ;
-	                                lip->finval.year = TRUE ;
-	                                lip->have.year = TRUE ;
+	                                lip->finval.year = true ;
+	                                lip->have.year = true ;
 	                                lip->year = rs ;
 	                            }
 	                        } else
@@ -734,11 +726,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* use GMT */
 	                    case 'z':
-	                        lip->finval.gmt = TRUE ;
-	                        lip->have.gmt = TRUE ;
-	                        lip->fl.gmt = TRUE ;
+	                        lip->finval.gmt = true ;
+	                        lip->have.gmt = true ;
+	                        lip->fl.gmt = true ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
 	                                lip->fl.gmt = (rs > 0) ;
@@ -747,7 +739,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -783,8 +775,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (efname == NULL) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    shio_control(&errfile,SHIO_CSETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    shio_control(&errfile,SHIO_CSETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -841,8 +833,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* argument processing */
 
 	if ((lip->nitems <= 0) && (argval != NULL)) {
-	    lip->have.nitems = TRUE ;
-	    lip->finval.nitems = TRUE ;
+	    lip->have.nitems = true ;
+	    lip->finval.nitems = true ;
 	    rs = optvalue(argval,-1) ;
 	    lip->nitems = rs ;
 	}
@@ -900,9 +892,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (rs >= 0) {
 	    if ((rs = holidayer_open(&lip->holdb,pip->pr)) >= 0) {
-	        const int	nverses = rs ;
-	        const char	*pn = pip->progname ;
-	        lip->open.holiday = TRUE ;
+	        cint	nverses = rs ;
+	        cchar	*pn = pip->progname ;
+	        lip->open.holiday = true ;
 
 	        if (lip->fl.audit) {
 	            rs = holidayer_audit(&lip->holdb) ;
@@ -920,13 +912,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                paramopt	*pop = &aparams ;
 		        ARGINFO		*aip = &ainfo ;
 		        bits		*bop = &pargs ;
-	                const char	*ofn = ofname ;
-	                const char	*afn = afname ;
+	                cchar	*ofn = ofname ;
+	                cchar	*afn = afname ;
 	                rs = process(pip,aip,bop,pop,ofn,afn) ;
 	            } /* end if (locinfo_tmtime) */
 	        } /* end if (ok) */
 
-	        lip->open.holiday = FALSE ;
+	        lip->open.holiday = false ;
 	        rs1 = holidayer_close(&lip->holdb) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
@@ -946,8 +938,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* done */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    if (! pip->fl.quiet) {
-	        const char	*pn = pip->progname ;
-	        const char	*fmt = "%s: could not perform function (%d)\n" ;
+	        cchar	*pn = pip->progname ;
+	        cchar	*fmt = "%s: could not perform function (%d)\n" ;
 	        shio_printf(pip->efp,fmt,pn,rs) ;
 	    }
 	    ex = mapex(mapexs,rs) ;
@@ -971,18 +963,18 @@ retearly:
 #endif
 
 	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
 	    pip->efp = NULL ;
 	}
 
 	if (pip->open.aparams) {
-	    pip->open.aparams = FALSE ;
+	    pip->open.aparams = false ;
 	    paramopt_finish(&aparams) ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -996,7 +988,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mi[12] ;
 	    uint	mo ;
@@ -1007,8 +999,8 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
-	        const char	*ids = "main" ;
+	        cint	size = (10*sizeof(uint)) ;
+	        cchar	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
 	        debugprintf("main: MIoutnummax=%u\n",mi[ucmallreg_outnummax]) ;
@@ -1033,7 +1025,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -1051,12 +1043,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<mon><day> ...] [-af <afile>] [+[<days>]]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1076,12 +1068,12 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1103,9 +1095,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                switch (oi) {
 	                case akoname_audit:
 	                    if (! lip->finval.audit) {
-	                        lip->have.audit = TRUE ;
-	                        lip->finval.audit = TRUE ;
-	                        lip->fl.audit = TRUE ;
+	                        lip->have.audit = true ;
+	                        lip->finval.audit = true ;
+	                        lip->fl.audit = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.audit = (rs > 0) ;
@@ -1114,9 +1106,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_linelen:
 	                    if (! lip->finval.linelen) {
-	                        lip->have.linelen = TRUE ;
-	                        lip->finval.linelen = TRUE ;
-	                        lip->fl.linelen = TRUE ;
+	                        lip->have.linelen = true ;
+	                        lip->finval.linelen = true ;
+	                        lip->fl.linelen = true ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            lip->linelen = rs ;
@@ -1125,9 +1117,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_indent:
 	                    if (! lip->finval.indent) {
-	                        lip->have.indent = TRUE ;
-	                        lip->finval.indent = TRUE ;
-	                        lip->fl.indent = TRUE ;
+	                        lip->have.indent = true ;
+	                        lip->finval.indent = true ;
+	                        lip->fl.indent = true ;
 	                        lip->indent = 1 ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
@@ -1137,9 +1129,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_monthname:
 	                    if (! lip->finval.monthname) {
-	                        lip->have.monthname = TRUE ;
-	                        lip->finval.monthname = TRUE ;
-	                        lip->fl.monthname = TRUE ;
+	                        lip->have.monthname = true ;
+	                        lip->finval.monthname = true ;
+	                        lip->fl.monthname = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.monthname = (rs > 0) ;
@@ -1148,9 +1140,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_separate:
 	                    if (! lip->finval.separate) {
-	                        lip->have.separate = TRUE ;
-	                        lip->finval.separate = TRUE ;
-	                        lip->fl.separate = TRUE ;
+	                        lip->have.separate = true ;
+	                        lip->finval.separate = true ;
+	                        lip->fl.separate = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.separate = (rs > 0) ;
@@ -1159,9 +1151,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_interactive:
 	                    if (! lip->finval.interactive) {
-	                        lip->have.interactive = TRUE ;
-	                        lip->finval.interactive = TRUE ;
-	                        lip->fl.interactive = TRUE ;
+	                        lip->have.interactive = true ;
+	                        lip->finval.interactive = true ;
+	                        lip->fl.interactive = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.interactive = (rs > 0) ;
@@ -1170,9 +1162,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_citebreak:
 	                    if (! lip->finval.citebreak) {
-	                        lip->have.citebreak = TRUE ;
-	                        lip->finval.citebreak = TRUE ;
-	                        lip->fl.citebreak = TRUE ;
+	                        lip->have.citebreak = true ;
+	                        lip->finval.citebreak = true ;
+	                        lip->fl.citebreak = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.citebreak = (rs > 0) ;
@@ -1182,9 +1174,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                case akoname_default:
 	                case akoname_defnull:
 	                    if (! lip->finval.defnull) {
-	                        lip->finval.defnull = TRUE ;
-	                        lip->have.defnull = TRUE ;
-	                        lip->fl.defnull = TRUE ;
+	                        lip->finval.defnull = true ;
+	                        lip->have.defnull = true ;
+	                        lip->fl.defnull = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.defnull = (rs > 0) ;
@@ -1193,9 +1185,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_defall:
 	                    if (! lip->finval.defall) {
-	                        lip->finval.defall = TRUE ;
-	                        lip->have.defall = TRUE ;
-	                        lip->fl.defall = TRUE ;
+	                        lip->finval.defall = true ;
+	                        lip->have.defall = true ;
+	                        lip->fl.defall = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.defall = (rs > 0) ;
@@ -1204,9 +1196,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_gmt:
 	                    if (! lip->finval.gmt) {
-	                        lip->finval.gmt = TRUE ;
-	                        lip->have.gmt = TRUE ;
-	                        lip->fl.gmt = TRUE ;
+	                        lip->finval.gmt = true ;
+	                        lip->have.gmt = true ;
+	                        lip->fl.gmt = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.gmt = (rs > 0) ;
@@ -1231,13 +1223,13 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int process(pip,aip,bop,pop,ofn,afn)
+local int process(pip,aip,bop,pop,ofn,afn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bits		*bop ;
 paramopt	*pop ;
-const char	*ofn ;
-const char	*afn ;
+cchar	*ofn ;
+cchar	*afn ;
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
@@ -1275,12 +1267,12 @@ const char	*afn ;
 /* end subroutine (process) */
 
 
-static int procsome(pip,aip,bop,pop,afn)
+local int procsome(pip,aip,bop,pop,afn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bits		*bop ;
 paramopt	*pop ;
-const char	*afn ;
+cchar	*afn ;
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1319,7 +1311,7 @@ const char	*afn ;
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1367,7 +1359,7 @@ const char	*afn ;
 
 	    pan += 1 ;
 	    if (lip->nitems > 1) ndays = lip->nitems ;
-	    rs = procnow(pip,TRUE,ndays) ;
+	    rs = procnow(pip,true,ndays) ;
 	    wlen += rs ;
 
 	} /* end if */
@@ -1387,7 +1379,7 @@ const char	*afn ;
 /* end subroutine (procsome) */
 
 
-static int procspecs(PROGINFO *pip,cchar *sp,int sl)
+local int procspecs(PROGINFO *pip,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	FIELD		fsb ;
@@ -1399,7 +1391,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 	if (sl < 0) sl = strlen(sp) ;
 
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	    const int	flen = sl ;
+	    cint	flen = sl ;
 	    char	*fbuf ;
 	    if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	        int	fl ;
@@ -1421,7 +1413,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 /* end subroutine (procspecs) */
 
 
-static int procspec(PROGINFO *pip,cchar sp[],int sl)
+local int procspec(PROGINFO *pip,cchar sp[],int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1438,12 +1430,12 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 #endif
 
 	if ((sp[0] == '+') || (sp[0] == '-')) {
-	    const int	f_plus = (sp[0] == '+') ;
+	    cint	f_plus = (sp[0] == '+') ;
 	    int		v = (lip->nitems-1) ;
 
 	    if (sl > 1) {
-	        const int	cl = (sl - 1) ;
-	        const char	*cp = (sp + 1) ;
+	        cint	cl = (sl - 1) ;
+	        cchar	*cp = (sp + 1) ;
 	        rs = cfdeci(cp,cl,&v) ;
 	    }
 
@@ -1490,7 +1482,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 
 
 /* ARGSUSED */
-static int procnow(PROGINFO *pip,int f_plus,int ndays)
+local int procnow(PROGINFO *pip,int f_plus,int ndays)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1503,18 +1495,18 @@ static int procnow(PROGINFO *pip,int f_plus,int ndays)
 #endif
 
 	if ((rs = locinfo_tmtime(lip)) >= 0) {
-	    TMTIME		tm = lip->tm ;
+	    tmtime		tm = lip->tm ;
 	    HOLIDAYER_CITE	q ;
 
 	    if (pip->debuglevel > 0) {
-	        const int	y = (tm.year + TM_YEAR_BASE) ;
-	        const char	*pn = pip->progname ;
-	        const char	*fmt = "%s: year=%u\n" ;
+	        cint	y = (tm.year + TMTIME_YEARBASE) ;
+	        cchar	*pn = pip->progname ;
+	        cchar	*fmt = "%s: year=%u\n" ;
 	        shio_printf(pip->efp,fmt,pn,y) ;
 	    }
 
 	    memset(&q,0,sizeof(HOLIDAYER_CITE)) ;
-	    q.y = (lip->have.year) ? lip->year : (tm.year+TM_YEAR_BASE) ;
+	    q.y = (lip->have.year) ? lip->year : (tm.year+TMTIME_YEARBASE) ;
 	    q.m = tm.mon ;
 	    q.d = tm.mday ;
 	    rs = procqueries(pip,&q,ndays) ;
@@ -1527,7 +1519,7 @@ static int procnow(PROGINFO *pip,int f_plus,int ndays)
 /* end subroutine (procnow) */
 
 
-static int procallents(PROGINFO *pip)
+local int procallents(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	HOLIDAYER	*holp ;
@@ -1539,8 +1531,8 @@ static int procallents(PROGINFO *pip)
 
 	holp = &lip->holdb ;
 	if ((rs = holidayer_curbegin(holp,&cur)) >= 0) {
-	    const int	y = lip->year ;
-	    const int	clen = COMBUFLEN ;
+	    cint	y = lip->year ;
+	    cint	clen = COMBUFLEN ;
 	    int		cbl ;
 	    char	cbuf[COMBUFLEN + 1] ;
 
@@ -1582,7 +1574,7 @@ static int procallents(PROGINFO *pip)
 /* end subroutine (procallents) */
 
 
-static int procnames(PROGINFO *pip,paramopt *app)
+local int procnames(PROGINFO *pip,paramopt *app)
 {
 	paramopt_cur	cur ;
 	int		rs ;
@@ -1613,7 +1605,7 @@ static int procnames(PROGINFO *pip,paramopt *app)
 /* end subroutine (procnames) */
 
 
-static int procname(PROGINFO *pip,cchar *np,int nl)
+local int procname(PROGINFO *pip,cchar *np,int nl)
 {
 	LOCINFO		*lip = pip->lip ;
 	HOLIDAYER	*hop ;
@@ -1625,8 +1617,8 @@ static int procname(PROGINFO *pip,cchar *np,int nl)
 
 	hop = &lip->holdb ;
 	if ((rs = holidayer_curbegin(hop,&cur)) >= 0) {
-	    const int	vlen = VBUFLEN ;
-	    const int	y = lip->year ;
+	    cint	vlen = VBUFLEN ;
+	    cint	y = lip->year ;
 	    int		vl ;
 	    char	vbuf[VBUFLEN + 1] ;
 
@@ -1652,7 +1644,7 @@ static int procname(PROGINFO *pip,cchar *np,int nl)
 /* end subroutine (procname) */
 
 
-static int procqueries(PROGINFO *pip,HOLIDAYER_CITE *qp,int ndays)
+local int procqueries(PROGINFO *pip,HOLIDAYER_CITE *qp,int ndays)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1677,13 +1669,11 @@ static int procqueries(PROGINFO *pip,HOLIDAYER_CITE *qp,int ndays)
 
 	if ((rs >= 0) && (ndays > 1)) {
 	    if ((rs = locinfo_tmtime(lip)) >= 0) {
-	        TMTIME	tm = lip->tm ;
-	        int	i ;
-
-	        tm.year = (qp->y-TM_YEAR_BASE) ;
+	        tmtime	tm = lip->tm ;
+	        tm.year = (qp->y - TMTIME_YEARBASE) ;
 	        tm.mon = qp->m ;
 	        tm.mday = qp->d ;
-	        for (i = 1 ; i < ndays ; i += 1) {
+	        for (int i = 1 ; i < ndays ; i += 1) {
 	            qp->d += 1 ;
 	            if (qp->d > 27) {
 	                time_t	dummy ;
@@ -1693,7 +1683,7 @@ static int procqueries(PROGINFO *pip,HOLIDAYER_CITE *qp,int ndays)
 #endif
 	                tm.mday = qp->d ;
 	                if ((rs = tmtime_adjtime(&tm,&dummy)) >= 0) {
-	                    qp->y = (ushort) (tm.year+TM_YEAR_BASE) ;
+	                    qp->y = (ushort) (tm.year+TMTIME_YEARBASE) ;
 	                    qp->m = (uchar) tm.mon ;
 	                    qp->d = (uchar) tm.mday ;
 	                }
@@ -1718,7 +1708,7 @@ static int procqueries(PROGINFO *pip,HOLIDAYER_CITE *qp,int ndays)
 /* end subroutine (procqueries) */
 
 
-static int procquery(PROGINFO *pip,HOLIDAYER_CITE *qp)
+local int procquery(PROGINFO *pip,HOLIDAYER_CITE *qp)
 {
 	LOCINFO		*lip = pip->lip ;
 	HOLIDAYER_CUR	cur ;
@@ -1733,7 +1723,7 @@ static int procquery(PROGINFO *pip,HOLIDAYER_CITE *qp)
 #endif
 
 	if ((rs = holidayer_curbegin(&lip->holdb,&cur)) >= 0) {
-	    const int	vlen = VBUFLEN ;
+	    cint	vlen = VBUFLEN ;
 	    int		vl ;
 	    char	vbuf[VBUFLEN + 1] ;
 
@@ -1777,7 +1767,7 @@ static int procquery(PROGINFO *pip,HOLIDAYER_CITE *qp)
 /* end subroutine (procquery) */
 
 
-static int procoutents(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
+local int procoutents(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1790,7 +1780,7 @@ static int procoutents(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 #endif
 
 	if ((qp->m < 12) && (qp->d < 32)) {
-	    const char	*fmt ;
+	    cchar	*fmt ;
 
 /* print out any necessary separator */
 
@@ -1826,7 +1816,7 @@ static int procoutents(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 /* end subroutine (procoutents) */
 
 
-static int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
+local int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	WORDFILL	w ;
@@ -1834,7 +1824,7 @@ static int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = wordfill_start(&w,NULL,0)) >= 0) {
-	    const int	clen = COLBUFLEN ;
+	    cint	clen = COLBUFLEN ;
 	    int		cl ;
 	    int		line = 0 ;
 	    int		cbl ;
@@ -1844,11 +1834,11 @@ static int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 	    cbl = MIN((lip->linelen - lip->indent),clen) ;
 
 	    if (lip->fl.monthname) {
-	        const char	*mon = calstrs_months[qp->m] ;
+	        cchar	*mon = calstrs_months[qp->m] ;
 	        rs = bufprintf(citebuf,CITEBUFLEN,"%r-%02u",mon,3,qp->d) ;
 	        cl = rs ;
 	    } else {
-	        const int	m = (qp->m + 1) ;
+	        cint	m = (qp->m + 1) ;
 	        rs = bufprintf(citebuf,CITEBUFLEN,"%02u-%02u",m,qp->d) ;
 	        cl = rs ;
 	    }
@@ -1924,7 +1914,7 @@ static int procoutenters(PROGINFO *pip,HOLIDAYER_CITE *qp,cchar *sp,int sl)
 
 
 /* ARGSUSED */
-static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll)
+local int procoutline(PROGINFO *pip,int line,cchar *lp,int ll)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1940,7 +1930,7 @@ static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll)
 /* end subroutine (procoutline) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1948,15 +1938,15 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->pip = pip ;
 	lip->count = -1 ;
 	lip->max = -1 ;
-	lip->fl.separate = FALSE ;
-	lip->fl.monthname = TRUE ;
+	lip->fl.separate = false ;
+	lip->fl.monthname = true ;
 
 	return rs ;
 }
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
@@ -1967,9 +1957,9 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_deflinelen(LOCINFO *lip)
+local int locinfo_deflinelen(LOCINFO *lip)
 {
-	const int	def = (DEFPRECISION + 2) ;
+	cint	def = (DEFPRECISION + 2) ;
 	int		rs = SR_OK ;
 	if (lip->linelen < def) {
 	    PROGINFO	*pip = lip->pip ;
@@ -1983,8 +1973,8 @@ static int locinfo_deflinelen(LOCINFO *lip)
 	    if (hasnonwhite(cp,-1)) {
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (rs >= def) {
-	                lip->have.linelen = TRUE ;
-	                lip->finval.linelen = TRUE ;
+	                lip->have.linelen = true ;
+	                lip->finval.linelen = true ;
 	                lip->linelen = rs ;
 		    }
 	        }
@@ -1996,14 +1986,14 @@ static int locinfo_deflinelen(LOCINFO *lip)
 /* end subroutine (locinfo_deflinelen) */
 
 
-static int locinfo_tmtime(LOCINFO *lip)
+local int locinfo_tmtime(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		y = lip->year ;
 
 	if (! lip->fl.tmtime) {
-	    lip->fl.tmtime = TRUE ;
+	    lip->fl.tmtime = true ;
 	    if (pip->daytime == 0) pip->daytime = time(NULL) ;
 	    if (lip->fl.gmt) {
 	        rs = tmtime_timegm(&lip->tm,pip->daytime) ;
@@ -2011,7 +2001,7 @@ static int locinfo_tmtime(LOCINFO *lip)
 	        rs = tmtime_timelocal(&lip->tm,pip->daytime) ;
 	    }
 	    if (lip->year <= 0) {
-	        lip->year = (lip->tm.year+TM_YEAR_BASE) ;
+	        lip->year = (lip->tm.year+TMTIME_YEARBASE) ;
 	        y = lip->year ;
 	    }
 	} /* end if (needed) */
@@ -2020,14 +2010,11 @@ static int locinfo_tmtime(LOCINFO *lip)
 }
 /* end subroutine (locinfo_tmtime) */
 
-
-static int isNotGoodCite(int rs)
-{
-	int		f = FALSE ;
+local bool isNotGoodCite(int rs) noex {
+	bool	f = false ;
 	f = f || (rs == SR_NOTFOUND) ;
 	f = f || isNotValid(rs) ;
 	return f ;
-}
-/* end subroutine (isNotGoodCite) */
+} /* end subroutine (isNotGoodCite) */
 
 
