@@ -1,4 +1,4 @@
-/* main SUPPORT (mesg) */
+/* mesg_main SUPPORT (mesg) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -37,8 +37,11 @@
 #include	<csignal>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<userinfo.h>
 #include	<baops.h>
@@ -46,6 +49,7 @@
 #include	<getlogx.h>
 #include	<matstr.h>
 #include	<mkpathx.h>
+#include	<prognamevar.hh>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -97,14 +101,12 @@ constexpr cpcchar	argopts[] = {
 
 /* exported subroutines */
 
-int main(int argc,cchar **argv,cchar **envv) {
-	bfile	errfile, *efp = &errfile ;
-	bfile	outfile, *ofp = &outfile ;
-
-	struct proginfo		pi, *pip = &pi ;
-
+int main(int argc,mainv argv,mainv envv) {
+    	prognamevar	progname(argc,argv,envv) ;
+	bfile		errfile, *efp = &errfile ;
+	bfile		outfile, *ofp = &outfile ;
+	proginfo	pi, *pip = &pi ;
 	ustat	sb ;
-
 	int	argr, argl, aol, akl, avl, npa, maxai, kwi ;
 	int	pan ;
 	int	rs, i ;
@@ -126,30 +128,24 @@ int main(int argc,cchar **argv,cchar **envv) {
 	char	*newstate = nullptr ;
 	char	*cp ;
 
-
 	if (((cp = getenv("ERROR_FD")) != nullptr) &&
-	    (cfdeci(cp,-1,&err_fd) >= 0))
+	    (cfdeci(cp,-1,&err_fd) >= 0)) {
 	    esetfd(err_fd) ;
-
-	    else
+	} else {
 	    eclose() ;
+	}
 
-
-	pip->progname = strbasename(argv[0]) ;
-
-	if (bopen(efp,BIO_STDERR,"dwca",0666) >= 0)
+	pip->progname = progname ;
+	if (bopen(efp,BIO_STDERR,"dwca",0666) >= 0) {
 	    bcontrol(efp,BC_LINEBUF,0) ;
-
-
+	}
 /* early things to initialize */
-
 	pip->efp = efp ;
 	pip->debuglevel = 0 ;
 	pip->verboselevel = 1 ;
 	pip->tmpdir = nullptr ;
 
 	pip->fl.quiet = FALSE ;
-
 
 /* process program arguments */
 
