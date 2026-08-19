@@ -655,7 +655,7 @@ int prog_open(PROG *op,SD_ARGS *ap,cc *hostname,cc *svcname,mainv av) noex {
 	}
 
 	if (rs >= 0)
-	    op->magic = PROG_MAGIC ;
+	    op->magval = PROG_MAGIC ;
 
 badfindprog:
 badprocenvsys:
@@ -721,7 +721,7 @@ int		to, opts ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PROG_MAGIC) return SR_NOTOPEN ;
 
 	rs = uc_reade(op->fd,buf,buflen,to,opts) ;
 
@@ -744,7 +744,7 @@ int		to, opts ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PROG_MAGIC) return SR_NOTOPEN ;
 
 	rs = uc_recve(op->fd,buf,buflen,flags,to,opts) ;
 
@@ -769,7 +769,7 @@ int		to, opts ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PROG_MAGIC) return SR_NOTOPEN ;
 
 	rs = uc_recvfrome(op->fd,buf,buflen,flags,sap,salenp,to,opts) ;
 
@@ -791,7 +791,7 @@ int		to, opts ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PROG_MAGIC) return SR_NOTOPEN ;
 
 	rs = uc_recvmsge(op->fd,msgp,flags,to,opts) ;
 
@@ -812,7 +812,7 @@ int		buflen ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PROG_MAGIC) return SR_NOTOPEN ;
 
 	rs = uc_writen(op->fd,buf,buflen) ;
 
@@ -834,7 +834,7 @@ int		flags ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PROG_MAGIC) return SR_NOTOPEN ;
 
 	rs = u_send(op->fd,buf,buflen,flags) ;
 
@@ -858,7 +858,7 @@ int		salen ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PROG_MAGIC) return SR_NOTOPEN ;
 
 	rs = u_sendto(op->fd,buf,buflen,flags,sap,salen) ;
 
@@ -874,7 +874,7 @@ int prog_sendmsg(PROG *op,MSGHDR *msgp,int flags) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PROG_MAGIC) return SR_NOTOPEN ;
 
 	rs = u_sendmsg(op->fd,msgp,flags) ;
 
@@ -892,7 +892,7 @@ int prog_shutdown(PROG *op,int cmd)
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PROG_MAGIC) return SR_NOTOPEN ;
 
 	rs = u_shutdown(op->fd,cmd) ;
 
@@ -911,7 +911,7 @@ int prog_close(PROG *op)
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PROG_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fd >= 0) {
 	    rs1 = u_close(op->fd) ;
@@ -940,7 +940,7 @@ int prog_close(PROG *op)
 	    op->fl.log = false ;
 	} /* end if */
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (prog_close) */
