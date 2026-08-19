@@ -5,7 +5,6 @@
 /* process a MAILBOX (in certain ways) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEBUGMALLER	1		/* print out results */
@@ -66,15 +65,14 @@
 #include	<fcntl.h>
 #include	<netdb.h>
 #include	<utime.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -418,7 +416,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	keyopt		akopts ;
 	paramopt	aparams ;
 	SHIO		errfile ;
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 	int		argr, argl, aol, akl, avl, kwi ;
@@ -441,14 +439,14 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	cchar	*yrbase = nullptr ;
 	cchar	*cp ;
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_mbproc: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -1094,13 +1092,13 @@ badpargs:
 badlocstart:
 	rs1 = proginfo_finish(pip) ;
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugprintf("main/proginfo_finish: ret rs=%d\n",rs1) ;
 #endif
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mi[12] ;
 	    uint	mo ;
@@ -1137,7 +1135,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -2256,7 +2254,7 @@ local int locinfo_yearbase(LOCINFO *lip,cchar *sp,int sl)
 	            TMTIME	ts ;
 	            cint	yrbegin = YEARTIMEBASE ;
 	            if ((rs = tmtime_timelocal(&ts,pip->daytime)) >= 0) {
-	                cint	yrend = (TM_YEAR_BASE+ts.year+1) ;
+	                cint	yrend = (TMTIME_YEARBASE+ts.year+1) ;
 	                int		nyrs ;
 	                int		ysize ;
 	                void		*p ;
@@ -2274,7 +2272,7 @@ local int locinfo_yearbase(LOCINFO *lip,cchar *sp,int sl)
 	                    debugprintf("locinfo_yearbase: ysize=%u\n",ysize) ;
 #endif
 	                if ((rs = uc_malloc(ysize,&p)) >= 0) {
-	                    int		yr = (yrbegin - TM_YEAR_BASE) ;
+	                    int		yr = (yrbegin - TMTIME_YEARBASE) ;
 	                    int		i ;
 	                    lip->yeartimes = p ;
 	                    lip->maxtimes = (lip->yeartimes + (nyrs+1)) ;
