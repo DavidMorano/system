@@ -1,5 +1,6 @@
 /* main SUPPORT (liblkcmd) */
-/* lang=C20 */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* generic front-end for SHELL built-ins */
 /* version %I% last-modified %G% */
@@ -25,7 +26,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
@@ -39,6 +40,7 @@
 #include	<intceil.h>
 #include	<sighand.h>
 #include	<mapex.h>
+#include	<strx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -64,25 +66,10 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy2w(char *,int,const char *,const char *,int) ;
-extern int	sncpylc(char *,int,const char *) ;
-extern int	sncpyuc(char *,int,const char *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	ucontext_rtn(ucontext_t *,long *) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	msleep(int) ;
-extern int	haslc(cchar *,int) ;
-extern int	hasuc(cchar *,int) ;
-
 #if	CF_DEBUGN
 extern int	nprintf(cchar *,cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-extern cchar	*strsigabbr(int) ;
 
 
 /* external variables */
@@ -121,7 +108,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const int	sigcatches[] = {
+static cint	sigcatches[] = {
 	SIGILL, 
 	SIGSEGV,
 	SIGBUS,
@@ -159,8 +146,8 @@ static const SIGCODE	sigcode_bus[] = {
 /* exported subroutines */
 
 int main(int argc,mainv argv,mainv envv) {
-	const int	f_lockmemalloc = CF_LOCKMEMALLOC ;
-	const int	f_util = CF_UTIL ;
+	cint	f_lockmemalloc = CF_LOCKMEMALLOC ;
+	cint	f_util = CF_UTIL ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ex = EX_INFO ;
@@ -218,7 +205,7 @@ static void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	    long	ra ;
 	    ucontext_t	*ucp = (ucontext_t *) vcp ;
 	    void	*rtn ;
-	    const int	wlen = LINEBUFLEN ;
+	    cint	wlen = LINEBUFLEN ;
 	    int		wl ;
 	    cchar	*fmt ;
 	    char	wbuf[LINEBUFLEN+1] ;
@@ -241,14 +228,14 @@ static void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 
 static int main_sigdump(siginfo_t *sip) noex {
 {
-	const int	wlen = LINEBUFLEN ;
-	const int	si_signo = sip->si_signo ;
-	const int	si_code = sip->si_code ;
+	cint	wlen = LINEBUFLEN ;
+	cint	si_signo = sip->si_signo ;
+	cint	si_code = sip->si_code ;
 	int		wl ;
-	const char	*sn = strsigabbr(sip->si_signo) ;
-	const char	*as = "*na*" ;
-	const char	*scs = NULL ;
-	const char	*fmt ;
+	cchar	*sn = strabbrsig(sip->si_signo) ;
+	cchar	*as = "*na*" ;
+	cchar	*scs = NULL ;
+	cchar	*fmt ;
 	char		wbuf[LINEBUFLEN+1] ;
 	char		abuf[16+1] ;
 	switch (si_signo) {
