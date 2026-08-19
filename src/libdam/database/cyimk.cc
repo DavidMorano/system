@@ -804,7 +804,7 @@ local int cyimk_nidxopen(cyimk *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	int		of = (O_CREAT|O_WRONLY) ;
+	int		of = (O_CREAT | O_WRONLY) ;
 	int		ai = 2 ; /* double allocation */
 	cmode		om = op->om ;
 	if (op->nidxfname == nullptr) {
@@ -899,31 +899,19 @@ local int mkcitation(uint *cip,cyimk_ent *bvp) noex {
 
 local int mkydname(char *rbuf,cchar *dname,int year) noex {
 	cint		rlen = var.maxpathlen ;
-	int		rs = SR_OK ;
-	int		i = 0 ;
-	if (rs >= 0) {
-	    rs = storebuf_strw(rbuf,rlen,i,dname,-1) ;
-	    i += rs ;
-	}
-	if (rs >= 0) {
-	    rs = storebuf_chr(rbuf,rlen,i,'/') ;
-	    i += rs ;
-	}
-	if (rs >= 0) {
-	    rs = storebuf_chr(rbuf,rlen,i,'y') ;
-	    i += rs ;
-	}
-	if (rs >= 0) {
-	    rs = storebuf_deci(rbuf,rlen,i,year) ;
-	    i += rs ;
-	}
-	return (rs >= 0) ? i : rs ;
+	int		rs ;
+	if (storebuf sb(rbuf,rlen) ; (rs = sb.str(dname)) >= 0) {
+	    sb << "/y" ;
+	    sb << year ;
+	    rs = sb ;
+	} /* end if (storebuf) */
+	return rs ;
 } /* end subroutine (mkydname) */
 
 local int mknewfname(char *tbuf,int type,cchar *dbn,cchar *suf) noex {
 	cchar		*s_end = ENDIANSTR ;
 	cchar		*s_fin = (type) ? "xXXXX" : "n" ;
-	return mkfnamesuf3(tbuf,dbn,suf,s_end,s_fin) ;
+	return mkfnamesuf(tbuf,dbn,suf,s_end,s_fin) ;
 } /* end subroutine (mknewfname) */
 
 local int unlinkstale(cchar *fn,int to) noex {
