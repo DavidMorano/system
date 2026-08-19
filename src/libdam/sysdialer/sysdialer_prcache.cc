@@ -131,7 +131,7 @@ int prcache_start(prcache *pcp) noex {
 	cint		osz = (nprs + 1) * szof(char *) ;
 	int		rs ;
 	pcp->domainname = nullptr ;
-	if (void *vp ; (rs = lm_mall(osz,&vp)) >= 0) {
+	if (void *vp ; (rs = lm_mall(osz,&vp)) >= 0) ylikely {
 	    memclear(vp,osz) ;
 	    pcp->prs = ccharpp(vp) ;
 	} /* end if (memory-allocation) */
@@ -186,7 +186,7 @@ int prcache_lookup(prcache *pcp,int i,cchar **rpp) noex {
 	    cint	maxpath = var.maxpathlen ;
 	    cint	asz = ((var.maxpathlen + 1) * 2) ;
 	    int		ai = 0 ;
-	    if (char *a ; (rs = lm_mall(asz,&a)) >= 0) {
+	    if (char *a ; (rs = lm_mall(asz,&a)) >= 0) ylikely {
 	        char *prbuf = (a + ((maxpath + 1) * ai++)) ;
 	        char *dnbuf = (a + ((maxpath + 1) * ai++)) ;
 		if ((rs = prcache_domain(pcp,dnbuf,maxpath)) >= 0) {
