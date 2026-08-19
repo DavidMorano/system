@@ -5,7 +5,6 @@
 /* this is a SHELL built-in version of |mjd(1)| */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_BUFLINEIN	1		/* line-buffering for STDIN */
@@ -54,19 +53,19 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
-
-#include	<usystem.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<tmtime.hh>
 #include	<dayspec.h>
 #include	<ourmjd.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* CSTD */
+#include	<localmisc.h>		/* CSTD */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -113,7 +112,7 @@
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 extern int	debugopen(const char *) ;
 extern int	debugprintf(const char *,...) ;
 extern int	debugprinthex(const char *,int,const char *,int) ;
@@ -152,7 +151,7 @@ struct locinfo {
 	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	TMTIME		curdate ;
-	DAYSPEC		curspec ;
+	dayspec		curspec ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
 	const char	*termtype ;
@@ -166,23 +165,23 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procquery(PROGINFO *,void *,const char *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procquery(PROGINFO *,void *,const char *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_getdefyear(LOCINFO *) ;
-static int	locinfo_qfname(LOCINFO *,cchar *) ;
-static int	locinfo_defspec(LOCINFO *,DAYSPEC *) ;
-static int	locinfo_curspec(LOCINFO *) ;
-static int	locinfo_getcentury(LOCINFO *) ;
-static int	locinfo_curdate(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_getdefyear(LOCINFO *) ;
+local int	locinfo_qfname(LOCINFO *,cchar *) ;
+local int	locinfo_defspec(LOCINFO *,dayspec *) ;
+local int	locinfo_curspec(LOCINFO *) ;
+local int	locinfo_getcentury(LOCINFO *) ;
+local int	locinfo_curdate(LOCINFO *) ;
 
 
 /* local variables */
@@ -308,7 +307,7 @@ int p_mjd(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -317,7 +316,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	keyopt		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -328,9 +327,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		wlen = 0 ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_version = FALSE ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
+	int		f_version = false ;
+	int		f_usage = false ;
+	int		f_help = false ;
 
 	const char	*argp, *aop, *akp, *avp ;
 	const char	*argval = NULL ;
@@ -345,14 +344,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	const char	*cp ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_mjd: starting DFD=%u\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -418,9 +417,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
@@ -437,7 +436,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -446,7 +445,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -457,7 +456,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* program root */
 	                case argopt_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pr = avp ;
 	                    } else {
@@ -475,7 +474,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* open time-out */
 	                case argopt_to:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            tos_open = avp ;
 	                    } else {
@@ -493,7 +492,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* read time-out */
 	                case argopt_tr:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            tos_read = avp ;
 	                    } else {
@@ -510,10 +509,10 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* data-gram mode */
 	                case argopt_dgram:
-	                    lip->finval.dgram = TRUE ;
-	                    lip->fl.dgram = TRUE ;
+	                    lip->finval.dgram = true ;
+	                    lip->fl.dgram = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = cfdecti(avp,avl,&v) ;
 	                            lip->intrun = v ;
@@ -522,13 +521,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -546,7 +545,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* argument-list file */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -564,7 +563,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -582,7 +581,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* output file name */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -599,7 +598,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_if:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            cp = avp ;
 	                    } else {
@@ -632,7 +631,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -642,7 +641,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->fl.quiet = TRUE ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -671,14 +670,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 /* expiration maintenance */
 	                    case 'e':
-	                        lip->fl.expire = TRUE ;
+	                        lip->fl.expire = true ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = cfdecti(avp,avl,&v) ;
 	                                lip->ttl = v ;
@@ -699,9 +698,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* specify that queries are MJDs */
 	                    case 'm':
-	                        lip->fl.mjd = TRUE ;
+	                        lip->fl.mjd = true ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
 	                                lip->fl.mjd = (rs > 0) ;
@@ -728,7 +727,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'r':
-	                        lip->fl.del = TRUE ;
+	                        lip->fl.del = true ;
 	                        break ;
 
 	                    case 't':
@@ -746,16 +745,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* line-buffered */
 	                    case 'u':
-	                        pip->have.bufnone = TRUE ;
-	                        pip->fl.bufnone = TRUE ;
-	                        pip->finval.bufnone = TRUE ;
+	                        pip->have.bufnone = true ;
+	                        pip->fl.bufnone = true ;
+	                        pip->finval.bufnone = true ;
 	                        break ;
 
 /* verbose mode */
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -778,11 +777,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case 'z':
-	                        lip->finval.gmt = TRUE ;
-	                        lip->have.gmt = TRUE ;
-	                        lip->fl.gmt = TRUE ;
+	                        lip->finval.gmt = true ;
+	                        lip->have.gmt = true ;
+	                        lip->fl.gmt = true ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
 	                                lip->fl.gmt = (rs > 0) ;
@@ -791,7 +790,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -823,8 +822,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (efname == NULL) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    shio_control(&errfile,SHIO_CSETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    shio_control(&errfile,SHIO_CSETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -990,13 +989,13 @@ retearly:
 #endif
 
 	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
 	    pip->efp = NULL ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -1010,7 +1009,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
@@ -1019,7 +1018,7 @@ badprogstart:
 	}
 #endif
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -1038,7 +1037,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1067,7 +1066,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1095,9 +1094,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                case akoname_bufwhole:
 	                case akoname_whole:
 	                    if (! pip->finval.bufwhole) {
-	                        pip->have.bufwhole = TRUE ;
-	                        pip->finval.bufwhole = TRUE ;
-	                        pip->fl.bufwhole = TRUE ;
+	                        pip->have.bufwhole = true ;
+	                        pip->finval.bufwhole = true ;
+	                        pip->fl.bufwhole = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            pip->fl.bufwhole = (rs > 0) ;
@@ -1107,9 +1106,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                case akoname_bufline:
 	                case akoname_line:
 	                    if (! pip->finval.bufline) {
-	                        pip->have.bufline = TRUE ;
-	                        pip->finval.bufline = TRUE ;
-	                        pip->fl.bufline = TRUE ;
+	                        pip->have.bufline = true ;
+	                        pip->finval.bufline = true ;
+	                        pip->fl.bufline = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            pip->fl.bufline = (rs > 0) ;
@@ -1120,9 +1119,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                case akoname_none:
 	                case akoname_un:
 	                    if (! pip->finval.bufnone) {
-	                        pip->have.bufnone = TRUE ;
-	                        pip->finval.bufnone = TRUE ;
-	                        pip->fl.bufnone = TRUE ;
+	                        pip->have.bufnone = true ;
+	                        pip->finval.bufnone = true ;
+	                        pip->fl.bufnone = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            pip->fl.bufnone = (rs > 0) ;
@@ -1131,9 +1130,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_termout:
 	                    if (! lip->finval.termout) {
-	                        lip->have.termout = TRUE ;
-	                        lip->finval.termout = TRUE ;
-	                        lip->fl.termout = TRUE ;
+	                        lip->have.termout = true ;
+	                        lip->finval.termout = true ;
+	                        lip->fl.termout = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.termout = (rs > 0) ;
@@ -1142,9 +1141,9 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	                    break ;
 	                case akoname_gmt:
 	                    if (! lip->finval.gmt) {
-	                        lip->have.gmt = TRUE ;
-	                        lip->finval.gmt = TRUE ;
-	                        lip->fl.gmt = TRUE ;
+	                        lip->have.gmt = true ;
+	                        lip->finval.gmt = true ;
+	                        lip->fl.gmt = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->fl.gmt = (rs > 0) ;
@@ -1191,7 +1190,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	const int	to_open = pip->to_open ;
@@ -1210,7 +1209,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 	    const char	*cp ;
 
 	    if (pip->have.bufnone)
-	        shio_control(ofp,SHIO_CSETBUFNONE,TRUE) ;
+	        shio_control(ofp,SHIO_CSETBUFNONE,true) ;
 
 	    if (pip->have.bufline)
 	        shio_control(ofp,SHIO_CSETBUFLINE,pip->fl.bufline) ;
@@ -1302,7 +1301,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 /* end subroutine (procargs) */
 
 
-static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
+local int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1325,7 +1324,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 	} else if ((rs = ourmjd(qp,ql)) > 0) {
 	    mjd = rs ;
 	} else {
-	    DAYSPEC	ds ;
+	    dayspec	ds ;
 	    if ((qp[0] == '+') || (qp[0] == '-')) {
 	        rs = dayspec_def(&ds) ;
 	    } else {
@@ -1333,7 +1332,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 	    }
 	    if (rs >= 0) {
 	        if ((rs = locinfo_defspec(lip,&ds)) >= 0) {
-		    if (ds.y >= TM_YEAR_BASE) {
+		    if (ds.y >= TMTIME_YEARBASE) {
 	                rs = getmjd(ds.y,ds.m,ds.d) ;
 	                mjd = rs ;
 		    } else {
@@ -1358,7 +1357,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 /* end subroutine (procquery) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	const char	*varterm = VARTERM ;
@@ -1377,7 +1376,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1385,7 +1384,7 @@ static int locinfo_finish(LOCINFO *lip)
 	if (lip == NULL) return SR_FAULT ;
 
 	if (lip->open.stores) {
-	    lip->open.stores = FALSE ;
+	    lip->open.stores = false ;
 	    rs1 = vecstr_finish(&lip->stores) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1395,7 +1394,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1431,11 +1430,11 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_getdefyear(LOCINFO *lip)
+local int locinfo_getdefyear(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (lip->fl.year) {
-	    lip->fl.year = TRUE ;
+	    lip->fl.year = true ;
 	    if (lip->year > 0) {
 	        if (lip->year < NYEARS_CENTURY) {
 	            if ((rs = locinfo_getcentury(lip)) >= 0) {
@@ -1451,7 +1450,7 @@ static int locinfo_getdefyear(LOCINFO *lip)
 /* end subroutine (locinfo_getdefyear) */
 
 
-static int locinfo_qfname(LOCINFO *lip,const char *qfname)
+local int locinfo_qfname(LOCINFO *lip,const char *qfname)
 {
 	int		rs = SR_OK ;
 
@@ -1461,14 +1460,11 @@ static int locinfo_qfname(LOCINFO *lip,const char *qfname)
 	}
 
 	return rs ;
-}
-/* end subroutine (locinfo_qfname) */
+} /* end subroutine (locinfo_qfname) */
 
-
-static int locinfo_defspec(LOCINFO *lip,DAYSPEC *dsp)
-{
+local int locinfo_defspec(LOCINFO *lip,dayspec *dsp) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	f = f || (dsp->y < 0) || (dsp->y < NYEARS_CENTURY) ;
 	f = f || (dsp->m < 0) ;
@@ -1492,44 +1488,35 @@ static int locinfo_defspec(LOCINFO *lip,DAYSPEC *dsp)
 	} /* end if (needed) */
 
 	return rs ;
-}
-/* end subroutine (locinfo_defspec) */
+} /* end subroutine (locinfo_defspec) */
 
-
-static int locinfo_curspec(LOCINFO *lip)
-{
+local int locinfo_curspec(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	if (! lip->fl.curspec) {
-	    lip->fl.curspec = TRUE ;
+	    lip->fl.curspec = true ;
 	    if ((rs = locinfo_curdate(lip)) >= 0) {
-	        lip->curspec.y = (lip->curdate.year + TM_YEAR_BASE) ;
+	        lip->curspec.y = (lip->curdate.year + TMTIME_YEARBASE) ;
 	        lip->curspec.m = lip->curdate.mon ;
 	        lip->curspec.d = lip->curdate.mday ;
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (locinfo_curspec) */
+} /* end subroutine (locinfo_curspec) */
 
-
-static int locinfo_getcentury(LOCINFO *lip)
-{
+local int locinfo_getcentury(LOCINFO *lip) noex {
 	int		rs ;
 	if ((rs = locinfo_curdate(lip)) >= 0) {
-	    rs = ((lip->curdate.year + TM_YEAR_BASE) / NYEARS_CENTURY) ;
+	    rs = ((lip->curdate.year + TMTIME_YEARBASE) / NYEARS_CENTURY) ;
 	}
 	return rs ;
-}
-/* end subroutine (locinfo_getcentury) */
+} /* end subroutine (locinfo_getcentury) */
 
-
-static int locinfo_curdate(LOCINFO *lip)
-{
+local int locinfo_curdate(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	if (! lip->fl.curdate) {
 	    TMTIME	*ctp = &lip->curdate ;
-	    lip->fl.curdate = TRUE ;
+	    lip->fl.curdate = true ;
 	    if (lip->fl.gmt) {
 	        rs = tmtime_timegm(ctp,pip->daytime) ;
 	    } else {
