@@ -1429,7 +1429,7 @@ local int procsysdef(PROGINFO *pip,cchar fname[])
 	sbp = &usb ;
 	rs1 = u_stat(fname,sbp) ;
 	if (rs1 >= 0)
-	    rs1 = permid(&pip->id,sbp,R_OK) ;
+	    rs1 = permids(&pip->id,sbp,R_OK) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
