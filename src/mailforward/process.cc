@@ -1,20 +1,18 @@
-/* process */
+/* mailforward_process SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* delivers mail messages (data) to a mailbox spool file */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
-#define	F_TESTSLEEP	0		/* test sleep mode */
-
+#define	CF_TESTSLEEP	0		/* test sleep mode */
 
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -22,28 +20,27 @@
 
 /*******************************************************************************
 
-        This subroutine is used to deliver new mail to the mail spool file for a
-        given recipient.
-
+  	Description:
+	This subroutine is used to deliver new mail to the mail
+	spool file for a given recipient.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<csignal>
-#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
-
-#include	<usystem.h>
-#include	<getbufsize.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>
+#include	<cstdlib>
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<sbuf.h>
 #include	<bfile.h>
 #include	<ctdec.h>
@@ -73,17 +70,11 @@
 #define	S_ISLNK(mode)	((mode) & S_IFLNK)
 #endif
 
+#define	PI	proginfo
+#define	OPS	opens
+
 
 /* external subroutines */
-
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	getuid_name(cchar *,int) ;
-extern int	isNotPresent(int) ;
-
-extern int	copyparts(struct recip *,int,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -91,18 +82,18 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* local structures */
 
-struct opens {
+OPS {
 	uint	f_needsid : 1 ;		/* cache for need set-ID next time */
 } ;
 
 
 /* forward references */
 
-static int	openspoolfile(struct proginfo *,struct opens *,const char *) ;
-static int	createspoolfile(struct proginfo *,struct opens *,const char *,
+local int	openspoolfile(PI *,OPS *,cchar *) ;
+local int	createspoolfile(PI *,OPS *,cchar *,
 			int) ;
-static int	ourlock(int,int,int) ;
-static int	mklockinfo(struct proginfo *,time_t,char *,int) ;
+local int	ourlock(int,int,int) ;
+local int	mklockinfo(PI *,time_t,char *,int) ;
 
 
 /* local variables */
@@ -112,13 +103,13 @@ static int	mklockinfo(struct proginfo *,time_t,char *,int) ;
 
 
 int deliver(pip,tfd,rp)
-struct proginfo	*pip ;
+PI	*pip ;
 int		tfd ;
 struct recip	*rp ;
 {
 	ustat	mstat ;
 
-	struct opens	os ;
+	OPS	os ;
 
 	LKMAIL		ml ;
 
@@ -164,7 +155,7 @@ struct recip	*rp ;
 	    debugprintf("deliver: entered recip=%s\n",rp->recipient) ;
 #endif
 
-	memset(&os,0,sizeof(struct opens)) ;
+	memset(&os,0,sizeof(OPS)) ;
 
 /* verify that this recipient is valid and that we can write to her mailfile */
 
@@ -481,7 +472,7 @@ struct recip	*rp ;
 
 	                    if (rs >= 0) {
 
-#if	F_TESTSLEEP
+#if	CF_TESTSLEEP
 	                        sleep(20) ;
 #endif
 
@@ -623,7 +614,7 @@ ret0:
 
 
 /* this subroutine both locks and unlocks ! (depending on 'cmd') */
-static int ourlock(fd,cmd,timeout)
+local int ourlock(fd,cmd,timeout)
 int	fd, cmd, timeout ;
 {
 	int	rs, i ;
@@ -673,8 +664,8 @@ int	fd, cmd, timeout ;
 /* end subroutine (ourlock) */
 
 
-static int mklockinfo(pip,daytime,buf,buflen)
-struct proginfo	*pip ;
+local int mklockinfo(pip,daytime,buf,buflen)
+PI	*pip ;
 time_t		daytime ;
 char		buf[] ;
 int		buflen ;
@@ -726,10 +717,10 @@ int		buflen ;
 
 
 /* open the spool file (using SUID or SGID as necessary) */
-static int openspoolfile(pip,osp,mailfname)
-struct proginfo	*pip ;
-struct opens	*osp ;
-const char	mailfname[] ;
+local int openspoolfile(pip,osp,mailfname)
+PI	*pip ;
+OPS	*osp ;
+cchar	mailfname[] ;
 {
 	int	rs, rs1 ;
 	int	euid, egid ;
@@ -838,11 +829,10 @@ const char	mailfname[] ;
 }
 /* end subroutine (openspoolfile) */
 
-
-static int createspoolfile(pip,osp,mailfname,uid_recip)
-struct proginfo	*pip ;
-struct opens	*osp ;
-const char	mailfname[] ;
+local int createspoolfile(pip,osp,mailfname,uid_recip)
+proginfo	*pip ;
+opens	*osp ;
+cchar	mailfname[] ;
 int		uid_recip ;
 {
 	ustat	sb ;
