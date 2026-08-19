@@ -20,15 +20,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<pthread.h>		/* |pthread_cond_t| */
-#include	<time.h>		/* |CTIMESPEC| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ptm.h>			/* needed for interface */
-#include	<ptca.h>
+#include	<pthread.h>		/* POSIX® |pthread_cond_t| */
+#include	<time.h>		/* CSTD |CTIMESPEC| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU needed for interface */
+#include	<ptca.h>		/* LIBU */
 
 
 #define	PTC		pthread_cond_t
