@@ -552,8 +552,10 @@ local int babycalcs_mapbeg(BC *op,time_t dt,int fd) noex {
 	            mem.free(op->table) ;
 	            op->table = nullptr ;
 	        } /* end if (memory-release) */
-	        rs = babycalcs_procmap(op,dt) ;
-	        c = rs ;
+		{
+	            rs = babycalcs_procmap(op,dt) ;
+	            c = rs ;
+		}
 	        if (rs < 0) {
 	            op->table = nullptr ;
 	            op->fl.shm = false ;
@@ -656,7 +658,8 @@ local int babycalcs_proctxt(BC *op,vecobj *tlp) noex {
 	if (cvtdater cd ; (rs = cd.start(0)) >= 0) ylikely {
 	    if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) ylikely {
 		cint	llen = rs ;
-	        if (bfile tf ; (rs = tf.open(op->dbfname,"r",0666)) >= 0) {
+		cmode	om = 0666 ;
+	        if (bfile tf ; (rs = tf.open(op->dbfname,"r",om)) >= 0) {
 	            if (ustat sb ; (rs = tf.control(BC_STAT,&sb)) >= 0) {
 			csize	fsize = size_t(sb.st_size) ;
 	                op->ti_mdb = sb.st_mtime ;
@@ -733,13 +736,13 @@ local int babycalcs_shmwr(BC *op,time_t dt,int fd,mode_t om) noex {
 	op->shmsz = 0 ;
 	if (dt == 0) dt = getustime ;
 	/* prepare the file-header */
-	hf.vetu[0] = HDR_VERSION ;
-	hf.vetu[1] = uchar(ENDIAN) ;
-	hf.vetu[2] = 0 ;
-	hf.vetu[3] = 0 ;
-	hf.dbsz = (uint) op->dbsz ;
-	hf.dbtime = (uint) op->ti_mdb ;
-	hf.wtime = (uint) dt ;
+	hf.vetu[0]	= HDR_VERSION ;
+	hf.vetu[1]	= uchar(ENDIAN) ;
+	hf.vetu[2]	= 0 ;
+	hf.vetu[3]	= 0 ;
+	hf.dbsz		= conv<uint>(op->dbsz) ;
+	hf.dbtime	= conv<uint>(op->ti_mdb) ;
+	hf.wtime	= conv<uint>(dt) ;
 	/* process */
 	if ((rs = babycalcs_shmwrer(op,dt,fd,om,&hf)) >= 0) ylikely {
 	    foff = rs ;
@@ -833,7 +836,7 @@ local int babycalcs_mutexinit(BC *op) noex {
 local int babycalcs_openshmwait(BC *op,cchar *shmname) noex {
 	int		rs = SR_FAULT ;
 	int		fd = -1 ;
-	if (op) {
+	if (op && shmname) ylikely {
 	    cint	of = O_RDWR ;
 	    int		to = TO_WAITSHM ;
 	    cmode	om = BABYCALCS_PERMS ;
@@ -956,7 +959,7 @@ local int babycalcs_dbcheck(BC *op,time_t dt) noex {
 	if (dt == 0) dt = getustime ;
 	if (int tint = int(dt - op->ti_lastcheck) ; tint >= to) {
 	    op->ti_lastcheck = dt ;
-	    if (ustat sb ; (rs = u_stat(op->dbfname,&sb)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(op->dbfname,&sb)) >= 0) ylikely {
 	        if (op->fl.shm) {
 	            f = (sb.st_mtime > op->hf.dbtime) ;
 	            f = f || (sb.st_size != op->hf.dbsz) ;
@@ -1006,13 +1009,14 @@ local int babycalcs_shminfo(BC *op,BC_INFO *bip) noex {
 } /* end subroutine (babycalcs_shminfo) */
 
 local int babycalcs_lookinfo(BC *op,BC_INFO *bip) noex {
-	uint		*hwp ;
 	int		rs = SR_OK ;
-	memclear(bip) ;
-	hwp = uintp(op->mapdata + BABIESHDR_IDLEN) ;
-	bip->wtime	= hwp[babieshdrh_wtime] ;
-	bip->atime	= hwp[babieshdrh_atime] ;
-	bip->acount	= hwp[babieshdrh_acount] ;
+	if (bip) {
+	    uint	*hwp = uintp(op->mapdata + BABIESHDR_IDLEN) ;
+	    memclear(bip) ;
+	    bip->wtime	= hwp[babieshdrh_wtime] ;
+	    bip->atime	= hwp[babieshdrh_atime] ;
+	    bip->acount	= hwp[babieshdrh_acount] ;
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (babycalcs_lookinfo) */
 
@@ -1203,7 +1207,7 @@ vars::operator int () noex {
 	return rs ;
 } /* end method (vars::operator) */
 
-local int entcmp(con BC_ENT *e1p,con BC_ENT *e2p) noex {
+local int cmpent(con BC_ENT *e1p,con BC_ENT *e2p) noex {
 	int		rc = 0 ;
 	if (e1p || e2p) ylikely {
 	    if (e1p) {
@@ -1224,7 +1228,7 @@ local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 	if (v1pp && v2pp) ylikely {
 	    con BC_ENT	*e1p = (BC_ENT *) *v1pp ;
 	    con BC_ENT	*e2p = (BC_ENT *) *v2pp ;
-	    rc = entcmp(e1p,e2p) ;
+	    rc = cmpent(e1p,e2p) ;
 	} /* end if (non-null) */
 	return rc ;
 } /* end subroutine (vcmpentry) */
