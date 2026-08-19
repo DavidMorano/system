@@ -5,7 +5,6 @@
 /* SHELL built-in to return load averages */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEBUGN	0		/* special */
@@ -89,17 +88,16 @@
 #include	<sys/param.h>
 #include	<sys/loadavg.h>
 #include	<sys/statvfs.h>
-#include	<sys/time.h>		/* for 'gethrtime(3c)' */
+#include	<sys/time.h>		/* for |gethrtime(3c)| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<utmpx.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<netdb.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
+#include	<ctime>			/* CSYD */
+#include	<climits>		/* CSYD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSYD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<utmpacc.h>
@@ -122,8 +120,8 @@
 #include	<nulstr.h>
 #include	<sysmemutil.h>
 #include	<prgetclustername.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -191,7 +189,7 @@ struct locinfo {
 	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	vecstr		stores ;
-	TMTIME		gmtime ;
+	tmtime		gmtime ;
 	UINFO_NAME	uname ;		/* from UINFO */
 	UINFO_AUX	uaux ;		/* from UINFO */
 	PROGINFO	*pip ;
@@ -578,7 +576,7 @@ constexpr char		terms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_UTYPES
+#if	(CF_DEBUG || CF_DEBUG) && CF_UTYPES
 constexpr cpcchar	utypes[] = {
 	"empty",
 	"runlevel",
@@ -642,7 +640,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	keyopt		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -670,14 +668,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	cchar		*cp ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_sysval: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -1237,7 +1235,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
@@ -1246,7 +1244,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -1863,9 +1861,9 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	    break ;
 	case qopt_mjd:
 	    if ((rs = locinfo_gmtime(lip)) >= 0) {
-	        TMTIME	*tmp = &lip->gmtime ;
+	        tmtime	*tmp = &lip->gmtime ;
 	        int	yr ;
-	        yr = (tmp->year + TM_YEAR_BASE) ;
+	        yr = (tmp->year + TMTIME_YEARBASE) ;
 	        if ((rs = getmjd(yr,tmp->mon,tmp->mday)) >= 0) {
 	            rs = ctdeci(cvtbuf,cvtlen,rs) ;
 	            cbp = cvtbuf ;
