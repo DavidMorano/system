@@ -174,8 +174,7 @@ int storebuf_chrs(char *rbuf,int rlen,int idx,int ch,int n) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? 1 : rs ;
-}
-/* end subroutine (storebuf_chrs) */
+} /* end subroutine (storebuf_chrs) */
 
 int storebuf_chr(char *rbuf,int rlen,int i,int ch) noex {
 	int		rs = SR_FAULT ;
@@ -193,8 +192,7 @@ int storebuf_chr(char *rbuf,int rlen,int i,int ch) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? 1 : rs ;
-}
-/* end subroutine (storebuf_chr) */
+} /* end subroutine (storebuf_chr) */
 
 int storebuf_buf(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -235,8 +233,7 @@ int storebuf_buf(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (storebuf_buf) */
+} /* end subroutine (storebuf_buf) */
 
 int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -279,115 +276,150 @@ int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (storebuf_strw) */
+} /* end subroutine (storebuf_strw) */
 
 int storebuf_bini(char *rbuf,int rlen,int i,int v) noex {
 	uint		uv = uint(v) ;
 	return storebuf_binx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_binl(char *rbuf,int rlen,int i,long v) noex {
 	ulong		uv = ulong(v) ;
 	return storebuf_binx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_binll(char *rbuf,int rlen,int i,longlong v) noex {
 	ulonglong	uv = ulonglong(v) ;
 	return storebuf_binx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_binui(char *rbuf,int rlen,int i,uint uv) noex {
 	return storebuf_binx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_binul(char *rbuf,int rlen,int i,ulong uv) noex {
 	return storebuf_binx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_binull(char *rbuf,int rlen,int i,ulonglong uv) noex {
 	return storebuf_binx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_octi(char *rbuf,int rlen,int i,int v) noex {
 	uint		uv = uint(v) ;
 	return storebuf_octx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_octl(char *rbuf,int rlen,int i,long v) noex {
 	ulong		uv = ulong(v) ;
 	return storebuf_octx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_octll(char *rbuf,int rlen,int i,longlong v) noex {
 	ulonglong	uv = ulonglong(v) ;
 	return storebuf_octx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_octui(char *rbuf,int rlen,int i,uint uv) noex {
 	return storebuf_octx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_octul(char *rbuf,int rlen,int i,ulong uv) noex {
 	return storebuf_octx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_octull(char *rbuf,int rlen,int i,ulonglong uv) noex {
 	return storebuf_octx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_deci(char *rbuf,int rlen,int i,int v) noex {
 	uint		uv = uint(v) ;
 	return storebuf_decx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_decl(char *rbuf,int rlen,int i,long v) noex {
 	ulong		uv = ulong(v) ;
 	return storebuf_decx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_decll(char *rbuf,int rlen,int i,longlong v) noex {
 	ulonglong	uv = ulonglong(v) ;
 	return storebuf_decx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_decui(char *rbuf,int rlen,int i,uint uv) noex {
 	return storebuf_decx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_decul(char *rbuf,int rlen,int i,ulong uv) noex {
 	return storebuf_decx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_decull(char *rbuf,int rlen,int i,ulonglong uv) noex {
 	return storebuf_decx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_hexi(char *rbuf,int rlen,int i,int v) noex {
 	uint		uv = uint(v) ;
 	return storebuf_hexx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_hexl(char *rbuf,int rlen,int i,long v) noex {
 	ulong		uv = ulong(v) ;
 	return storebuf_hexx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_hexll(char *rbuf,int rlen,int i,longlong v) noex {
 	ulonglong	uv = ulonglong(v) ;
 	return storebuf_hexx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_hexui(char *rbuf,int rlen,int i,uint uv) noex {
 	return storebuf_hexx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_hexul(char *rbuf,int rlen,int i,ulong uv) noex {
 	return storebuf_hexx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
 
 int storebuf_hexull(char *rbuf,int rlen,int i,ulonglong uv) noex {
 	return storebuf_hexx(rbuf,rlen,i,uv) ;
-}
+} /* end subroutine */
+
+int storebuf::chrs(int ch,int n) noex {
+    cint rs = storebuf_chrs(bufp,bufl,idx,ch,n) ;
+    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    return rs ;
+} /* end method */
+
+int storebuf::chr(int ch) noex {
+    cint rs = storebuf_chr(bufp,bufl,idx,ch) ;
+    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    return rs ;
+} /* end method */
+
+int storebuf::strw(cchar *sp,int sl) noex {
+    cint rs = storebuf_strw(bufp,bufl,idx,sp,sl) ;
+    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    return rs ;
+} /* end method */
+
+int storebuf::str(cchar *sp) noex {
+    cint rs = storebuf_str(bufp,bufl,idx,sp) ;
+    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    return rs ;
+} /* end method */
+
+int storebuf::buf(cchar *sp,int sl) noex {
+    cint rs = storebuf_buf(bufp,bufl,idx,sp,sl) ;
+    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    return rs ;
+} /* end method */
+
+int storebuf::blanks(int n) noex {
+    cint rs = storebuf_blanks(bufp,bufl,idx,n) ;
+    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    return rs ;
+} /* end method */
 
 
