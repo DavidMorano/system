@@ -13,12 +13,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<pthread.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<pthread.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	PTCA		pthread_condattr_t
@@ -55,7 +52,7 @@ struct ptca : pthread_condattr_t {
 	} ; /* end struct */
 	ptca(const ptca &) = delete ;
 	ptca &operator = (const ptca &) = delete ;
-	int	getpshared(int *) noex ;
+	int		getpshared(int *) noex ;
 	void dtor() noex ;
 	destruct ptca() {
 	    if (magval) dtor() ;
