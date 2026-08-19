@@ -36,7 +36,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<csignal>
 #include	<netdb.h>
 #include	<cstdlib>
@@ -82,35 +82,11 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,
-			const char *,const char *) ;
-extern int	pcspoll(const char *,const char *,PCSCONF *,VECSTR *) ;
-extern int	pcstrustuser(const char *,const char *) ;
-extern int	headkeymat(const char *,const char *,int) ;
-extern int	isindomain(const char *,const char *) ;
-extern int	isdigitlatin(int) ;
-
 extern int	printhelp(bfile *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(struct proginfo *,const char *,
 			const struct pivars *) ;
 extern int	proginfo_rootname(struct proginfo *) ;
 extern int	procflow(struct proginfo *,CM *,bfile *,int *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -124,7 +100,7 @@ extern char	makedate[] ;
 /* forward references */
 
 static int	usage(struct proginfo *) ;
-static int	procopts(struct proginfo *,KEYOPT *,vecstr *) ;
+static int	procopts(struct proginfo *,keyopt *,vecstr *) ;
 
 static void	int_all() ;
 
@@ -237,7 +213,7 @@ char	*envv[] ;
 	SYSTEMS		sysdb ;
 	DIALER		d ;
 	CM		con ;
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	sigset_t	signalmask ;
 	bfile		errfile ;
 	vecstr		sets, addrs ;
@@ -1106,11 +1082,11 @@ char	*envv[] ;
 
 	    for (j = 0 ; j < 2 ; j += 1) {
 
-	        if (j == 0)
+	        if (j == 0) {
 	            schedvar_add(&sf,"f",SYSFNAME1,-1) ;
-
-	        else
+		} else {
 	            schedvar_add(&sf,"f",SYSFNAME2,-1) ;
+		}
 
 	        for (i = 0 ; sysfiles[i] != NULL ; i += 1) {
 
@@ -1125,7 +1101,7 @@ char	*envv[] ;
 
 	                rs1 = SR_NOENT ;
 	                if (! S_ISDIR(sb.st_mode))
-	                    rs1 = permid(&pip->id,&sb,R_OK) ;
+	                    rs1 = permids(&pip->id,&sb,R_OK) ;
 
 	            }
 
@@ -1153,7 +1129,6 @@ char	*envv[] ;
 	    } /* end for */
 
 	    schedvar_finish(&sf) ;
-
 	    } /* end if */
 
 	} /* end block (loading 'systems' files) */
@@ -1164,7 +1139,7 @@ char	*envv[] ;
 	    SYSTEMS_ENT	*sep ;
 	    debugprintf("main: sysnames: \n") ;
 	    systems_curbegin(&sysdb,&cur) ;
-	    while (systems_enum(&sysdb,&cur,&sep) >= 0)
+	    while (systems_curenum(&sysdb,&cur,&sep) >= 0)
 	        debugprintf("main: sysname=%s\n",sep->sysname) ;
 	    systems_curend(&sysdb,&cur) ;
 	}
@@ -1386,10 +1361,10 @@ int	signum ;
 /* process program options */
 static int procopts(pip,kop,setsp)
 struct proginfo	*pip ;
-KEYOPT		*kop ;
+keyopt		*kop ;
 vecstr		*setsp ;
 {
-	KEYOPT_CUR	kcur ;
+	keyopt_cur	kcur ;
 
 	int	rs = SR_OK ;
 	int	i, oi, val ;
@@ -1461,9 +1436,9 @@ vecstr		*setsp ;
 
 	keyopt_curbegin(kop,&kcur) ;
 
-	while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
-	    KEYOPT_CUR	vcur ;
+	    keyopt_cur	vcur ;
 
 
 /* get the first (non-zero length) value for this key */
@@ -1473,7 +1448,7 @@ vecstr		*setsp ;
 
 /* use only the first of any option with the same key */
 
-	    while ((vl = keyopt_enumvalues(kop,kp,&vcur,&vp)) >= 0) {
+	    while ((vl = keyopt_curenumvals(kop,kp,&vcur,&vp)) >= 0) {
 
 	        if (vl > 0)
 	            break ;
