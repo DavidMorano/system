@@ -1,11 +1,12 @@
-/* progfile */
+/* progfile SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a filename */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_DEFEXTS	0		/* define DEP-EXTS */
-
 
 /* revision history:
 
@@ -18,10 +19,10 @@
 
 /*******************************************************************************
 
+  	Description:
 	Check the corresponding C language file for newer dependencies.
 
 	Implementation notes:
-
 	Errors look like:
 
 	"main.c", line 42: Can't find include file usystem.h
@@ -34,10 +35,12 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdarg>
-#include	<usystem.h>
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
@@ -46,11 +49,11 @@
 #include	<sbuf.h>
 #include	<ascii.h>
 #include	<opentmp.h>
+#include	<dirlist.h>
 #include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
-#include	"dirlist.h"
 
 
 /* local defines */
@@ -63,23 +66,9 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkaltext(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfsub(const char *,int,const char *,const char **) ;
-extern int	sfdequote(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-
-extern int	progeprintf(PROGINFO *,const char *,...) ;
-extern int	progout_printf(PROGINFO *,const char *,...) ;
-extern int	progalready_lookup(PROGINFO *,cchar *,int,time_t *) ;
-
-extern char	*strnchr(const char *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
+extern int	progeprintf(PROGINFO *,cchar *,...) noex ;
+extern int	progout_printf(PROGINFO *,cchar *,...) noex ;
+extern int	progalready_lookup(PROGINFO *,cchar *,int,time_t *) noex ;
 
 
 /* external variables */
@@ -89,28 +78,28 @@ extern char	*timestr_log(time_t,char *) ;
 
 struct lstate {
 	int		f_continue ;
-} ;
+} ; /* end struct */
 
 struct cpperr {
-	const char	*fname ;
-	const char	*ifname ;
+	cchar		*fname ;
+	cchar		*ifname ;
 	int		line ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int depscheck(PROGINFO *,const char *,time_t,char *) ;
-static int depsget(PROGINFO *,VECSTR *,VECOBJ *,const char *) ;
-static int proclines(PROGINFO *,VECSTR *,int) ;
-static int procline(PROGINFO *,VECSTR *,struct lstate *,cchar *,int) ;
-static int procerr(PROGINFO *,VECOBJ *,int) ;
-static int procerrline(PROGINFO *,VECOBJ *,const char *,int) ;
-static int mkdepname(char *,const char *) ;
+local int depscheck(PROGINFO *,cchar *,time_t,char *) noex ;
+local int depsget(PROGINFO *,vecstr *,vecobj *,cchar *) noex ;
+local int proclines(PROGINFO *,vecstr *,int) noex ;
+local int procline(PROGINFO *,vecstr *,struct lstate *,cchar *,int) noex ;
+local int procerr(PROGINFO *,vecobj *,int) noex ;
+local int procerrline(PROGINFO *,vecobj *,cchar *,int) noex ;
+local int mkdepname(char *,cchar *) noex ;
 
-static int cpperr_start(CPPERR *,int,const char *,int) ;
-static int cpperr_ifname(CPPERR *,const char *,int) ;
-static int cpperr_finish(CPPERR *) ;
+local int cpperr_start(CPPERR *,int,cchar *,int) noex ;
+local int cpperr_ifname(CPPERR *,cchar *,int) noex ;
+local int cpperr_finish(CPPERR *) noex ;
 
 
 /* external variables */
@@ -118,38 +107,38 @@ static int cpperr_finish(CPPERR *) ;
 
 /* local variables */
 
-static const char	errsub1[] = ", line " ;
-static const char	errsub2[] = ": Can't find include file " ;
+constexpr cchar		errsub1[] = ", line " ;
+constexpr cchar		errsub2[] = ": Can't find include file " ;
 
 #if	CF_DEFEXTS
-static const char	*depexts[] = {
+constexpr cpcchar	depexts[] = {
 	"c",
 	"cc",
 	"cp",
 	"cpp",
 	"c++",
 	"C",
-	NULL
+	nullptr
 } ;
 #endif /* CF_DEFEXTS */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progfile(PROGINFO *pip,cchar *name)
-{
-	ustat	sb ;
+int progfile(PROGINFO *pip,cchar *name) noex {
 	time_t		mtime_o ;
 	time_t		mtime_c ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f_remove = FALSE ;
-	const char	*depout = NULL ;
+	cchar	*depout = nullptr ;
 	char		depfname[MAXPATHLEN + 1] ;
 	char		outfname[MAXPATHLEN + 1] ;
 
-	if (name == NULL) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
 
 	if ((name[0] == '\0') || (name[0] == '-')) return SR_INVALID ;
 
@@ -160,6 +149,7 @@ int progfile(PROGINFO *pip,cchar *name)
 
 /* is the file there at all? */
 
+	ustat	sb ;
 	rs1 = u_stat(name,&sb) ;
 
 	mtime_o = sb.st_mtime ;
@@ -235,14 +225,14 @@ int progfile(PROGINFO *pip,cchar *name)
 	    if (pip->debuglevel > 0)
 	        progeprintf(pip,"%s: removing=%s dep=%s\n",
 	            pip->progname,name, 
-	            ((depout != NULL) ? depout : "")) ;
+	            ((depout != nullptr) ? depout : "")) ;
 
 	    if (pip->verboselevel > 0) {
 	        if (pip->verboselevel == 2) {
 	            progout_printf(pip,"%s\n",name) ;
 	        } else if (pip->verboselevel > 2) {
 	            progout_printf(pip,"%s %s\n",name,
-	                ((depout != NULL) ? depout : "")) ;
+	                ((depout != nullptr) ? depout : "")) ;
 		}
 	    } /* end if */
 
@@ -266,29 +256,28 @@ ret0:
 
 
 /* check the dependencies agains the original (object) file */
-static int depscheck(pip,depfname,mtime_o,outfname)
+local int depscheck(pip,depfname,mtime_o,outfname)
 PROGINFO	*pip ;
-const char	depfname[] ;
+cchar	depfname[] ;
 time_t		mtime_o ;
 char		outfname[] ;
 {
 	ustat	sb ;
-	VECSTR		deps ;
-	VECOBJ		errs ;
+	vecstr		deps ;
+	vecobj		errs ;
 	time_t		mtime ;
 	int		rs, rs1 ;
 	int		size ;
 	int		i ;
-	int		opts ;
+	int		vo = 0 ;
 	int		f_remove = FALSE ;
-	const char	*cp ;
+	cchar	*cp ;
 
-	if (outfname != NULL) outfname[0] = '\0' ;
+	if (outfname != nullptr) outfname[0] = '\0' ;
 
 /* prepare to get the dependencies */
 
-	opts = 0 ;
-	rs = vecstr_start(&deps,NDEPS,opts) ;
+	rs = vecstr_start(&deps,NDEPS,vo) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -310,7 +299,7 @@ char		outfname[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	    for (i = 0 ; vecstr_get(&deps,i,&cp) >= 0 ; i += 1) {
-	        if (cp == NULL) continue ;
+	        if (cp == nullptr) continue ;
 	        debugprintf("progfile: depfname=%s\n",cp) ;
 	    }
 	}
@@ -319,7 +308,7 @@ char		outfname[] ;
 /* pop our file if any dependency is younger */
 
 	for (i = 0 ; vecstr_get(&deps,i,&cp) >= 0 ; i += 1) {
-	    if (cp == NULL) continue ;
+	    if (cp == nullptr) continue ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -348,7 +337,7 @@ char		outfname[] ;
 	            debugprintf("progfile: remove\n") ;
 #endif
 
-	        if (outfname != NULL)
+	        if (outfname != nullptr)
 	            mkpath1(outfname,cp) ;
 
 	        f_remove = TRUE ;
@@ -362,7 +351,7 @@ char		outfname[] ;
 	if (! pip->fl.quiet) {
 	    CPPERR	*ep ;
 	    for (i = 0 ; vecobj_get(&errs,i,&ep) >= 0 ; i += 1) {
-	        if (ep != NULL) {
+	        if (ep != nullptr) {
 	        progeprintf(pip,"%s: dep=%s:%u missing inc=%s\n",
 	            pip->progname,
 	            ep->fname,ep->line,
@@ -377,7 +366,7 @@ ret2:
 	{
 	    CPPERR	*ep ;
 	    for (i = 0 ; vecobj_get(&errs,i,&ep) >= 0 ; i += 1) {
-	        if (ep != NULL) {
+	        if (ep != nullptr) {
 	        cpperr_finish(ep) ;
 		}
 	    } /* end for */
@@ -400,26 +389,26 @@ ret0:
 
 
 /* get the dependencies for the given file */
-static int depsget(pip,dp,errp,fname)
+local int depsget(pip,dp,errp,fname)
 PROGINFO	*pip ;
-VECSTR		*dp ;
-VECOBJ		*errp ;
-const char	fname[] ;
+vecstr		*dp ;
+vecobj		*errp ;
+cchar	fname[] ;
 {
 	SPAWNPROC	psa ;
 	DIRLIST_CUR	cur ;
-	VECSTR		args ;
+	vecstr		args ;
 	const mode_t	operms = 0664 ;
 
 	int		rs ;
 	int		cl ;
-	int		opts ;
+	int		vo ;
 	int		oflags ;
 	int		fd_out ;
 	int		fd_err ;
 	int		cstat ;
-	const char	**av ;
-	const char	*cp ;
+	cchar	**av ;
+	cchar	*cp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		outfname[MAXPATHLEN + 1] ;
 	char		errfname[MAXPATHLEN + 1] ;
@@ -427,7 +416,7 @@ const char	fname[] ;
 
 	errfname[0] = '\0' ;
 	outfname[0] = '\0' ;
-	opts = VECSTR_OCOMPACT ;
+	vo = vecstrm.compact ;
 	rs = vecstr_start(&args,10,opts) ;
 	if (rs < 0)
 	    goto ret0 ;
@@ -447,10 +436,10 @@ const char	fname[] ;
 	strcpy(argbuf,"-I") ;
 
 	if ((rs = dirlist_curbegin(&pip->incs,&cur)) >= 0) {
-	    char	*ap = (argbuf+2) ;
+	    char	*ap = (argbuf + 2) ;
 	    int		al = MAXPATHLEN ;
 	    while (rs >= 0) {
-	        int	rs1 = dirlist_enum(&pip->incs,&cur,ap,al) ;
+	        int	rs1 = dirlist_curenum(&pip->incs,&cur,ap,al) ;
 	        if (rs1 == SR_NOTFOUND) break ;
 	        rs = rs1 ;
 
@@ -508,7 +497,7 @@ const char	fname[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	    int	i ;
-	    for (i = 0 ; av[i] != NULL ; i += 1)
+	    for (i = 0 ; av[i] != nullptr ; i += 1)
 	        debugprintf("depsget: arg%u=>%s<\n",i,av[i]) ;
 	}
 #endif
@@ -573,9 +562,9 @@ ret0:
 
 
 /* process the lines that contain dependency names */
-static int proclines(pip,dp,fd)
+local int proclines(pip,dp,fd)
 PROGINFO	*pip ;
-VECSTR		*dp ;
+vecstr		*dp ;
 int		fd ;
 {
 	cint		to = pip->to_read ;
@@ -634,18 +623,18 @@ int		fd ;
 
 
 /* process a dependecy line */
-static int procline(pip,dp,lsp,lbuf,len)
+local int procline(pip,dp,lsp,lbuf,len)
 PROGINFO	*pip ;
-VECSTR		*dp ;
+vecstr		*dp ;
 struct lstate	*lsp ;
-const char	lbuf[] ;
+cchar	lbuf[] ;
 int		len ;
 {
 	int		rs = SR_OK ;
 	int		sl, cl ;
 	int		f_continue = FALSE ;
 	int		c = 0 ;
-	const char	*tp, *sp, *cp ;
+	cchar	*tp, *sp, *cp ;
 
 	if ((len > 1) && (lbuf[len - 1] == CH_BSLASH)) {
 	    f_continue = TRUE ;
@@ -655,7 +644,7 @@ int		len ;
 	sp = lbuf ;
 	sl = len ;
 	if (! lsp->f_continue) {
-	    if ((tp = strnchr(sp,sl,':')) != NULL) {
+	    if ((tp = strnchr(sp,sl,':')) != nullptr) {
 	        sl -= ((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	    }
@@ -681,9 +670,9 @@ int		len ;
 
 
 /* process the error output */
-static int procerr(pip,errp,fd_err)
+local int procerr(pip,errp,fd_err)
 PROGINFO	*pip ;
-VECOBJ		*errp ;
+vecobj		*errp ;
 int		fd_err ;
 {
 	YSTAT		sb ;
@@ -735,7 +724,7 @@ int		fd_err ;
 	            CPPERR	*ep ;
 	            debugprintf("depget: errors\n") ;
 	            for (i = 0 ; vecobj_get(errp,i,&ep) >= 0 ; i += 1) {
-	                if (ep == NULL) continue ;
+	                if (ep == nullptr) continue ;
 	                debugprintf("depsget: fname=%s:%u inc=%s\n",
 	                    ep->fname,ep->line,ep->ifname) ;
 	            }
@@ -752,28 +741,28 @@ int		fd_err ;
 
 
 /* process an error line */
-static int procerrline(pip,errp,lbuf,len)
+local int procerrline(pip,errp,lbuf,len)
 PROGINFO	*pip ;
-VECOBJ		*errp ;
-const char	lbuf[] ;
+vecobj		*errp ;
+cchar	lbuf[] ;
 int		len ;
 {
 	int		rs = SR_OK ;
 	int		cl, cl1, cl2 ;
 	int		line ;
-	const char	*cp ;
-	const char	*cp1, *cp2 ;
+	cchar	*cp ;
+	cchar	*cp1, *cp2 ;
 
 	if ((cl2 = sfsub(lbuf,len,errsub2,&cp2)) >= 0) {
 	    if ((cl1 = sfsub(lbuf,MIN(len,(cp2-lbuf)),errsub1,&cp1)) > 0) {
 	        if ((cl = sfdequote(lbuf,(cp1-lbuf),&cp)) > 0) {
 	            const int	dl = (cp2 - (cp1 + cl1)) ;
-	            const char	*dp = (cp1 + cl1) ;
+	            cchar	*dp = (cp1 + cl1) ;
 	            if ((rs = cfdeci(dp,dl,&line)) >= 0) {
 			CPPERR	e ;
 	                if ((rs = cpperr_start(&e,line,cp,cl)) >= 0) {
 	                    int		sl = (len-((cp2+cl2)-lbuf)) ;
-	                    const char	*sp = (cp2 + cl2) ;
+	                    cchar	*sp = (cp2 + cl2) ;
 	                    if ((cl = sfshrink(sp,sl,&cp)) > 0) {
 	                        if ((rs = cpperr_ifname(&e,cp,cl)) >= 0) {
 	                            rs = vecobj_add(errp,&e) ;
@@ -793,14 +782,14 @@ int		len ;
 
 
 /* create the dependency name from the given name */
-static int mkdepname(char *rbuf,cchar *name)
+local int mkdepname(char *rbuf,cchar *name)
 {
 	SBUF		dep ;
 	int		rs = SR_INVALID ;
 	int		len = 0 ;
-	const char	*tp ;
+	cchar	*tp ;
 
-	if ((tp = strrchr(name,'.')) != NULL) {
+	if ((tp = strrchr(name,'.')) != nullptr) {
 	    if (tp[1] == 'o') {
 	        const int	rlen = MAXPATHLEN ;
 	        if ((rs = sbuf_start(&dep,rbuf,rlen)) >= 0) {
@@ -822,12 +811,12 @@ static int mkdepname(char *rbuf,cchar *name)
 /* end subroutine (mkdepname) */
 
 
-static int cpperr_start(CPPERR *ep,int line,cchar *fp,int fl)
+local int cpperr_start(CPPERR *ep,int line,cchar *fp,int fl)
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
-	if (fp == NULL) return SR_FAULT ;
+	if (fp == nullptr) return SR_FAULT ;
 
 	ep->line = line ;
 	if ((rs = uc_mallocstrw(fp,fl,&cp)) >= 0) {
@@ -839,14 +828,13 @@ static int cpperr_start(CPPERR *ep,int line,cchar *fp,int fl)
 /* end subroutine (cpperr_start) */
 
 
-static int cpperr_ifname(CPPERR *ep,cchar *fp,int fl)
+local int cpperr_ifname(CPPERR *ep,cchar *fp,int fl)
 {
 	int		rs ;
-	const char	*cp ;
 
-	if (fp == NULL) return SR_FAULT ;
+	if (fp == nullptr) return SR_FAULT ;
 
-	if ((rs = uc_mallocstrw(fp,fl,&cp)) >= 0) {
+	if (cchar *cp ; (rs = uc_mallocstrw(fp,fl,&cp)) >= 0) {
 	    ep->ifname = cp ;
 	}
 
@@ -855,21 +843,21 @@ static int cpperr_ifname(CPPERR *ep,cchar *fp,int fl)
 /* end subroutine (cpperr_ifname) */
 
 
-static int cpperr_finish(CPPERR *ep)
+local int cpperr_finish(CPPERR *ep)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (ep->fname != NULL) {
+	if (ep->fname != nullptr) {
 	    rs1 = uc_free(ep->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->fname = NULL ;
+	    ep->fname = nullptr ;
 	}
 
-	if (ep->ifname != NULL) {
+	if (ep->ifname != nullptr) {
 	    rs1 = uc_free(ep->ifname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->ifname = NULL ;
+	    ep->ifname = nullptr ;
 	}
 
 	ep->line = 0 ;
