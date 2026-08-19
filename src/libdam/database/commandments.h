@@ -22,7 +22,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<cmi.h>			/* LIBU */
+#include	<cmi.h>			/* LIBDAM */
 
 
 #define	COMMANDMENTS		struct commandments_head
