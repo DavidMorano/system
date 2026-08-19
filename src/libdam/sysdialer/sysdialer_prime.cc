@@ -183,7 +183,7 @@ template<typename ... Args>
 local inline int sysdialer_magic(SD *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == SYSDIALER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == SYSDIALER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (sysdialer_magic) */
@@ -357,7 +357,7 @@ local int sysdialer_startents(SD *op) noex {
             op->fl.voents = true ;
             if ((rs = prcache_start(&op->pc)) >= 0) ylikely {
                 op->fl.prcache = true ;
-                op->magic = SD_MAGIC ;
+                op->magval = SD_MAGIC ;
             }
             if (rs < 0) {
                 elp->finish() ;
@@ -412,7 +412,7 @@ int sysdialer_finish(SD *op) noex {
 		rs1 = sysdialer_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (sysdialer_finish) */
