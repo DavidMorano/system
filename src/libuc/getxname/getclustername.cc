@@ -116,7 +116,6 @@
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::prgetclustername ;		/* subroutine */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
