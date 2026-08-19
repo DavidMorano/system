@@ -449,7 +449,7 @@ local int varmks_filebegwait(VMKS *op) noex {
 	            op->fl.ofcreat = false ;
 	            c = 0 ;
 	            rs = varmks_filebegcr(op) ;
-	        }
+	        } /* end if (not-found) */
 	    } /* end if (mknewfname) */
 	    rs1 = mem.free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -460,6 +460,7 @@ local int varmks_filebegwait(VMKS *op) noex {
 
 local int varmks_filebegcr(VMKS *op,cc *tfn,int of,mode_t om) noex {
 	int		rs ;
+	int		rs1 ;
 #if	CF_DEBUG
 	{
 	    char	obuf[100+1] ;
@@ -470,12 +471,12 @@ local int varmks_filebegcr(VMKS *op,cc *tfn,int of,mode_t om) noex {
 #endif
 	if ((rs = uc_open(tfn,of,om)) >= 0) ylikely {
 	    cint	fd = rs ;
-	    cchar	*cp ;
 	    op->fl.created = true ;
-	    if ((rs = mem.strw(tfn,-1,&cp)) >= 0) {
-	        op->nidxfname = (char *) cp ;
+	    if (cchar *cp ; (rs = mem.strw(tfn,-1,&cp)) >= 0) {
+	        op->nidxfname = charp(cp) ;
 	    } /* end if (memory-acquire) */
-	    u_close(fd) ;
+	    rs1 = uc_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (create) */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
@@ -557,17 +558,17 @@ local int varmks_mkvarfile(VMKS *op) noex {
 local int varmks_mkvarfiler(VMKS *op) noex {
 	int		rs ;
 	int		rs1 ;
-	int		wlen = 0 ;
+	int		wlen = 0 ; /* return-value */
 	DEBUGPRINTF("ent\n") ;
 	if ((rs = varmks_nidxopen(op)) >= 0) ylikely {
 	    varhdr	hdr{} ;
-	    hdr.vetu[0] = VARHDR_VERSION ;
-	    hdr.vetu[1] = uchar(ENDIAN) ;
-	    hdr.vetu[2] = 0 ;
-	    hdr.vetu[3] = 0 ;
-	    hdr.wtime = (uint) getustime ;
-	    hdr.nvars = op->nvars ;
-	    hdr.nskip = VMKS_NSKIP ;
+	    hdr.vetu[0]		= VARHDR_VERSION ;
+	    hdr.vetu[1]		= uchar(ENDIAN) ;
+	    hdr.vetu[2]		= 0 ;
+	    hdr.vetu[3]		= 0 ;
+	    hdr.wtime		= (uint) getustime ;
+	    hdr.nvars		= op->nvars ;
+	    hdr.nskip		= VMKS_NSKIP ;
 	    if ((rs = varmks_mkidxwrmain(op,&hdr)) >= 0) ylikely {
 	        cint	hlen = HDRBUFLEN ;
 	        char	hbuf[HDRBUFLEN+1] ;
