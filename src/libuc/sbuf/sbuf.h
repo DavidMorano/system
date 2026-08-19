@@ -150,11 +150,11 @@ struct sbuf : sbuf_head {
 	    return *this ;
 	} ;
 	sbuf_iter begin() noex {
-	    sbuf_iter		it(rbuf) ;
+	    sbuf_iter	it(rbuf) ;
 	    return it ;
 	} ;
 	sbuf_iter end() noex {
-	    sbuf_iter		it(rbuf+index) ;
+	    sbuf_iter	it(rbuf + index) ;
 	    return it ;
 	} ;
 	void dtor() noex ;
