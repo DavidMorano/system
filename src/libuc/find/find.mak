@@ -165,7 +165,7 @@ findfilepath.o:		findfilepath.cc	findfilepath.h		$(MODS)	$(INCS)
 findfile.o:		findfile.cc	findfile.h		$(MODS)	$(INCS)
 findfilex.o:		findfilex.cc	findfilex.h		$(MODS)	$(INCS)
 
-finditil.o:		findutil0.o findutil1.o
+findutil.o:		findutil0.o findutil1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 findutil0.o:		findutil.ccm findutil.hh			$(INCS)
