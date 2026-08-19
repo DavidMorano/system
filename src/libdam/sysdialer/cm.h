@@ -58,13 +58,13 @@ struct cm_information {
 } ; /* end struct (cm_information) */
 
 struct cm_head {
+	cchar		*dname ;	/* sysdialer name */
 	void		*addr ;		/* remote address */
 	void		*dobj ;		/* individual sysdialer object */
-	cchar		*dname ;	/* sysdialer name */
-	CM_ARGS		*ap ;
 	void		*callp ;
+	CM_ARGS		*ap ;
 	uint		magval ;
-	int		dsize ;		/* individual sysdialer object size */
+	int		dsz ;		/* individual sysdialer object size */
 	int		dflags ;	/* sysdialer flags */
 	int		itype ;
 	int		fd ;
@@ -77,7 +77,7 @@ typedef	CM_INFO		cm_info ;
 
 EXTERNC_begin
 
-extern int cm_open(cm *,cmd_args *,cchar *,cchar *,mainv) noex ;
+extern int cm_open(cm *,cm_args *,cchar *,cchar *,mainv) noex ;
 extern int cm_getinfo(cm *,char *,int,cm_info *) noex ;
 extern int cm_reade(cm *,char *,int,int,int) noex ;
 extern int cm_recve(cm *,char *,int,int,int,int) noex ;
