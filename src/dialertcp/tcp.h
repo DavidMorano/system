@@ -32,7 +32,7 @@
 
 
 struct tcp_head {
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
 } ; /* end struct */
 
