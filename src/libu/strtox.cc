@@ -56,13 +56,13 @@
 	errno		set on error (UNIX® error number)
 
 	Description:
-	This code converts a c-string of decimal digits into the
-	integer types |slonglong| or |ulonglong|.  The API and
-	semantics of this code is intentionally modeled after the
-	API and semantics of the existing UNIX® standard C-language
-	library conversion subroutines |strtol(3c)| and |strtoul(3c)|.
-	See the notes below for more information on the necessity
-	for these.
+	This code converts a c-string of digit characters (of a
+	given numeric base) into the integer types |slonglong| or
+	|ulonglong|.  The API and semantics of this code is
+	intentionally modeled after the API and semantics of the
+	existing UNIX® standard C-language library conversion
+	subroutines |strtol(3c)| and |strtoul(3c)|.  See the notes
+	below for more information on the necessity for these.
 
 	Acknowledgements:
 	1. Thanks are due to P.J. Plauger for his origial creation
@@ -81,7 +81,9 @@
 	Notes:
 	1. This code is limited (for standards compliance) to a
 	maximum base of 36.  This is the standard for the standard
-	C-language library subroutines.
+	C-language library subroutines.  Digit character conversions
+	to integers for bases up to 128 are available elsewhere in
+	my code bases.
 	2. When the standard C library subroutine |strtol(3c)|
 	is given a NULL string, it seg-faults.  So I here below,
 	check for that (a NULL pointer).  But at least when the 
@@ -93,7 +95,7 @@
 	Q. Why are you using these old weirdo UNIX® standard
 	C-language library subroutine function signatures?
 
-	A. Because before the CTX subroutines (in the LIBUC) library
+	A. Because before the CFX subroutines (in the LIBUC) library
 	are available (in a code load sequence), I need some local
 	subroutines (here within the LIBU library) to perform some
 	of these conversions.  Although |strtol(3c)| and |strtoul(3c)|
@@ -102,13 +104,13 @@
 	interfaces), the standard C-language library does not supply
 	any of: |strtoi|, |strtoui|, |strtoll|, |strtoull|, |strtoim|
 	or |strtouim|.  I leverage the fact that |strtol| and
-	|strtoul| were already written to provide conversion for
-	types smaller than a |long| and |ulong|.  But for the
-	integers sized larger than that (128-bit and larger), I had
-	to write compatible (similar function signature and semantic)
-	subroutines from scratch, since there are no simple standard
-	lirbary calls that are avilable in regular C-language that
-	could be used.
+	|strtoul| were already written to provide conversions for
+	types equal in size or smaller than a |long| and |ulong|.
+	But for the integers sized larger than that (128-bit and
+	larger), I had to write compatible (similar function signature
+	and semantic) subroutines from scratch, since there are no
+	simple standard lirbary calls that are avilable in regular
+	C-language that could be used.
 
 	Q. Are subroutine converters availble now for 256-bit and
 	512-bit integers?
@@ -133,15 +135,14 @@
 	to mean conversion to a 128-bit integer.  Further, I want
 	the postfix 'im' or 'imax' to indicate a conversion to a
 	256-bit integer (not yet implemented).  I have implemented
-	the 'im' or 'imax' variations elsewhere, now hidden inside
-	a company that will not be named but does have the initials
-	"Hewlett Package Enterprise."
+	the 'im' or 'imax' variations elsewhere.
 
 	Q. What is the basic algorithm used below for conversions 
 	(signed and unsigned)?
 
 	A. I use the "cutoff-cutlim" algorithm; the same is used
-	in all (known) current UNIXi (or POSIXi) implementations.
+	in most (perhaps all) known current UNIXi (or POSIXi)
+	implementations.
 
 	Q. Do you optimize even-power-of-two bases for faster
 	conversions.
@@ -166,7 +167,7 @@
 	Q. Have you written enough of these "number conversion"
 	functions yet?
 
-	A. Apparently not.  But this may be my last one.
+	A. Apparently not.
 
 *******************************************************************************/
 
