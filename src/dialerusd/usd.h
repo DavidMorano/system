@@ -39,7 +39,7 @@ struct usd_flags {
 struct usd_head {
 	logfile		lh ;
 	USD_FL		fl ;
-	uint		magic ;
+	uint		magval ;
 	int		tlen ;
 	int		fd ;
 } ; /* end struct */
