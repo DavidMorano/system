@@ -98,6 +98,7 @@
 #include	<tmtime.hh>		/* LIBUC */
 #include	<opentmp.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasneedslash(3uc)| */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -901,7 +902,8 @@ local int mkydname(char *rbuf,cchar *dname,int year) noex {
 	cint		rlen = var.maxpathlen ;
 	int		rs ;
 	if (storebuf sb(rbuf,rlen) ; (rs = sb.str(dname)) >= 0) {
-	    sb << "/y" ;
+	    if ((sb.idx > 0) && hasneedslash(dname)) sb << '/' ;
+	    sb << 'y' ;
 	    sb << year ;
 	    rs = sb ;
 	} /* end if (storebuf) */
