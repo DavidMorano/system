@@ -1,31 +1,28 @@
-/* watch */
+/* watch SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* watch the specified directory */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUG	0
 #define	CF_STALE	0
 #define	CF_NODOTS	1
 
-
 /* revision history:
 
 	= 1991-09-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
-
 /*****************************************************************************
 
+  	Description:
 	This subroutine is responsible for watching the specified
 	directory.
 
 	Synopsis:
-
 	int watch(pip,slp,jlp,maxjobs,filetime)
 	struct proginfo	*pip ;
 	SRVTAB		*slp ;
@@ -33,36 +30,32 @@
 	int		maxjobs, filetime ;
 
 	Arguments:
-
 	- slp	service table list pointer
 	- jlp	job table list pointer
 
 	Returns:
-
 	OK	doesn't really matter in the current implementation
-
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<sys/time.h>
-#include	<climits>
+#include	<dirent.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
 #include	<poll.h>
-#include	<dirent.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<csignal>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<logfile.h>
 #include	<vecstr.h>
