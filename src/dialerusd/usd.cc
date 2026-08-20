@@ -357,7 +357,7 @@ cchar	*av[] ;
 	op->fd = rs ;
 
 	if (rs >= 0) {
-	    op->magic = USD_MAGIC ;
+	    op->magval = USD_MAGIC ;
 	    uc_closeonexec(op->fd,true) ;
 	}
 
@@ -394,7 +394,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != USD_MAGIC)
+	if (op->magval != USD_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_reade(op->fd,buf,buflen,to,opts) ;
@@ -419,7 +419,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != USD_MAGIC)
+	if (op->magval != USD_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_recve(op->fd,buf,buflen,flags,to,opts) ;
@@ -446,7 +446,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != USD_MAGIC)
+	if (op->magval != USD_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_recvfrome(op->fd,buf,buflen,flags,sap,salenp,to,opts) ;
@@ -470,7 +470,7 @@ int		to, opts ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != USD_MAGIC)
+	if (op->magval != USD_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_recvmsge(op->fd,msgp,flags,to,opts) ;
@@ -493,7 +493,7 @@ int		buflen ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != USD_MAGIC)
+	if (op->magval != USD_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = uc_writen(op->fd,((void *) buf),buflen) ;
@@ -517,7 +517,7 @@ int		flags ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != USD_MAGIC)
+	if (op->magval != USD_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_send(op->fd,buf,buflen,flags) ;
@@ -543,7 +543,7 @@ int		salen ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != USD_MAGIC)
+	if (op->magval != USD_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_sendto(op->fd,buf,buflen,flags,sap,salen) ;
@@ -566,7 +566,7 @@ int		flags ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != USD_MAGIC)
+	if (op->magval != USD_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_sendmsg(op->fd,msgp,flags) ;
@@ -589,7 +589,7 @@ int		cmd ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != USD_MAGIC)
+	if (op->magval != USD_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_shutdown(op->fd,cmd) ;
@@ -611,7 +611,7 @@ USD		*op ;
 	if (op == nullptr)
 	    return SR_FAULT ;
 
-	if (op->magic != USD_MAGIC)
+	if (op->magval != USD_MAGIC)
 	    return SR_NOTOPEN ;
 
 	rs = u_close(op->fd) ;
@@ -625,7 +625,7 @@ USD		*op ;
 
 	} /* end if */
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (usd_close) */
