@@ -1,95 +1,80 @@
-/* process */
+/* process SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* process a name */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0
 
-
 /* revision history:
 
-	= 96/03/01, David A­D­ Morano
+	= 1996-03-01, David A­D­ Morano
 	The subroutine was adapted from others programs that
 	did similar types of functions.
 
-
 */
 
+/* Copyright © 1996 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /******************************************************************************
 
+  	Description:
 	This module just provides optional expansion of directories.
 	The real work is done by the 'checkname' module.
 
-
-
 ******************************************************************************/
 
-
-
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<termios.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<time.h>
-
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<field.h>
+#include	<paramopt.h>
 #include	<wdt.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
-#include	"paramopt.h"
 #include	"config.h"
 #include	"defs.h"
-
 
 
 /* local defines */
 
 
-
 /* external subroutines */
 
-extern int	wdt() ;
-extern int	checkname() ;
-
-extern char	*strbasename() ;
-
-
-/* local forward references */
-
 
 /* external variables */
 
 
-/* external variables */
+/* forward references */
 
 
 /* local variables */
 
 
+/* exported variables */
 
 
-int process(pip,name,pp)
-struct proginfo	*pip ;
-char		name[] ;
-PARAMOPT	*pp ;
-{
-	ustat	sb ;
+/* exported subroutines */
 
-	struct checkparams	ck ;
-
-	int	rs ;
-
-
-	if (name == NULL) 
-		return BAD ;
+int process(proginfo *pip,cchar *name,paramopt *pp) noex {
+	ustat		sb ;
+	checkparams	ck ;
+	int		rs ;
+	if (name == NULL) return BAD ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1)
@@ -117,8 +102,9 @@ PARAMOPT	*pp ;
 
 		rs = wdt(name,WDTM_FOLLOW,checkname,&ck) ;
 
-	} else
+	} else {
 		rs = checkname(name,&sb,&ck) ;
+	}
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1)
@@ -128,6 +114,5 @@ PARAMOPT	*pp ;
 	return rs ;
 }
 /* end subroutine (process) */
-
 
 
