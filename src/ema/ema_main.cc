@@ -973,7 +973,7 @@ static int procopts(PROGINFO *pip,keyopt *akp)
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(akp,&cur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(akp,&cur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,1,kp,kl)) >= 0) {
 
