@@ -34,13 +34,15 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
+#include	<netdb.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<netdb.h>
-#include	<time.h>
-#include	<usystem.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<bits.h>
 #include	<ascii.h>
@@ -48,11 +50,12 @@
 #include	<stdorder.h>
 #include	<sockaddress.h>
 #include	<filer.h>
+#include	<dialopts.h>
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 #include	<debug.h>
 
-#include	"dialopts.h"
 #include	"dialcprogmsg.h"
 #include	"config.h"
 #include	"defs.h"
@@ -107,41 +110,16 @@ import libutil ;			/* |memclear(3u)| */
 
 /* external subroutines */
 
-extern int	snses(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	ctdecl(char *,int,long) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	getnodename(char *,int) ;
-extern int	findfilepath(const char *,char *,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isFailOpen(int) ;
-
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	nprintf(const char *,const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -157,7 +135,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	vecstr		args ;
@@ -172,11 +150,11 @@ struct targetinfo_flags {
 } ;
 
 struct targetinfo {
-	const char	*nodename ;
-	const char	*pwd ;
-	const char	*progfname ;
-	const char	**av ;
-	const char	**ev ;
+	cchar	*nodename ;
+	cchar	*pwd ;
+	cchar	*progfname ;
+	cchar	**av ;
+	cchar	**ev ;
 	SOCKADDRESS	saout, saerr ;
 	TARGETINFO_FL	f ;
 	int		opts ;
@@ -204,7 +182,7 @@ static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -232,7 +210,7 @@ static const struct pivars	initvars = {
 	VARPRLOCAL
 } ;
 
-static const char	*envbads[] = {
+static cchar	*envbads[] = {
 	"_",
 	"_A0",
 	"_EF",
@@ -252,7 +230,7 @@ static const char	*envbads[] = {
 	NULL
 } ;
 
-static const char	*envsys[] = {
+static cchar	*envsys[] = {
 	"SYSNAME",
 	"RELEASE",
 	"VERSION",
@@ -272,7 +250,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	TARGETINFO	ti, *tip = &ti ;
-	BITS		pargs ;
+	bits		pargs ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -295,16 +273,16 @@ int main(int argc,cchar **argv,cchar **envv)
 	int	f_usage = FALSE ;
 	int	f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*efname = NULL ;
-	const char	*progfname = NULL ;
-	const char	*xpath = NULL ;
-	const char	*varpath = VARPATH ;
-	const char	*varpwd = VARPWD ;
-	const char	*sp, *cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*progfname = NULL ;
+	cchar	*xpath = NULL ;
+	cchar	*varpath = VARPATH ;
+	cchar	*varpwd = VARPWD ;
+	cchar	*sp, *cp ;
 	char		buf[BUFLEN + 1] ;
 	char		nodename[NODENAMELEN + 1] ;
 	char		progfbuf[MAXPATHLEN + 1] ;
@@ -677,7 +655,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 #ifdef	COMMENT /* this is the *wrong* (source) nodename; we needed dst */
 	if (rs >= 0) {
-	    const char	*nn = tip->nodename ;
+	    cchar	*nn = tip->nodename ;
 	    if ((nn != NULL) && (nn[0] != '\0')) {
 		cchar	*varnode = VARNODE ;
 	        rs = vecstr_envadd(&lip->envs,varnode,nn,-1) ;
@@ -946,9 +924,9 @@ int main(int argc,cchar **argv,cchar **envv)
 /* do the 'exec(2)' */
 
 	if (rs >= 0) {
-	    const char	**cpp ;
-	    const char	**av ;
-	    const char	**ev ;
+	    cchar	**cpp ;
+	    cchar	**av ;
+	    cchar	**ev ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
@@ -960,12 +938,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	    if (rs >= 0) {
 	        rs = vecstr_getvec(&lip->args,&cpp) ;
-	        av = (const char **) cpp ;
+	        av = (cchar **) cpp ;
 	    }
 
 	    if (rs >= 0) {
 	        rs = vecstr_getvec(&lip->envs,&cpp) ;
-	        ev = (const char **) cpp ;
+	        ev = (cchar **) cpp ;
 	    }
 
 	    if (rs >= 0)
@@ -1043,8 +1021,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s\n",
 	rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -1067,8 +1045,8 @@ static int procenvsys(PROGINFO *pip)
 	int		rs1 ;
 	int		i ;
 	int		n = 0 ;
-	const char	**envs = envsys ;
-	const char	*tp ;
+	cchar	**envs = envsys ;
+	cchar	*tp ;
 	char		vbuf[VBUFLEN+1] = { 0 } ;
 
 	if ((rs = u_uname(&un)) >= 0) {
@@ -1292,7 +1270,7 @@ TARGETINFO	*tip ;
 	    len = usw & USHORT_MAX ;
 	    if (len <= (rlen-3)) {
 	        if ((rs = filer_read(fbp,envbuf,len,to)) >= 0) {
-	            const char	**vpp = NULL ;
+	            cchar	**vpp = NULL ;
 	            envlen = (len-1) ;
 	            switch (type) {
 	            case dialcprogmsgtype_nodename:
