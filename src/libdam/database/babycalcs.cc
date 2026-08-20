@@ -73,7 +73,6 @@
 #include	<tmz.hh>		/* LIBUC */
 #include	<tmtime.hh>		/* LIBUC */
 #include	<filer.h>		/* LIBUC */
-#include	<storebuf.h>		/* LIBUC */
 #include	<cvtdater.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
