@@ -1,48 +1,53 @@
-/* calworder */
+/* calworder HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* word management - CALWORDER */
+/* CALYEAR object loader */
+/* version %I% last-modified %G% */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 1999-05-19, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CALWORDER_INCLUDE
-#define	CALWORDER_INCLUDE	1
+#define	CALWORDER_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>
-
-#include	"calent.h"
-
-
-#define	CALWORDER		struct calworder
+#include	<sys/types.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<calent.h>		/* LIBDAM */
 
 
-struct calworder {
-	CALENT_LINE	*lines ;
+#define	CALWORDER	struct calworder_head
+
+
+struct calworder_head {
+	calent_line	*lines ;
 	cchar		*md ;
 	cchar		*sp ;
 	int		sl ;
 	int		i ;
 	int		nlines ;
-} ;
+} ; /* end struct (calworder_head) */
 
+typedef	CALWORDER	calworder ;
 
-#if	(! defined(CALWORDER_MASTER)) || (CALWORDER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	calworder_start(calworder *,cchar *,calent *) noex ;
+extern int	calworder_finish(calworder *) noex ;
+extern int	calworder_get(calworder *,cchar **) noex ;
 
-extern int	calworder_start(CALWORDER *,cchar *,CALENT *) ;
-extern int	calworder_finish(CALWORDER *) ;
-extern int	calworder_get(CALWORDER *,cchar **) ;
+EXTERNC_end
 
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* CALWORDER_MASTER */
 
 #endif /* CALWORDER_INCLUDE */
 
