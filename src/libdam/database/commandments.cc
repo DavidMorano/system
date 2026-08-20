@@ -49,7 +49,6 @@
 #include	<ucfileop.h>		/* LIBUC */
 #include	<nulstr.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
-#include	<storebuf.h>		/* LIBUC */
 #include	<opentmp.h>		/* LIBUC */
 #include	<getx.h>		/* LIBUC */
 #include	<getxname.h>		/* LIBUC */
