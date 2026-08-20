@@ -103,7 +103,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -204,10 +203,8 @@ extern "C" {
 /* local variables */
 
 static vars		var ;
-
-constexpr int		diglen = DIGBUFLEN ;
-
-constexpr char		total[] = "TOTAL" ;
+constexpr int		diglen		= DIGBUFLEN ;
+constexpr char		total[]		= "TOTAL" ;
 
 
 /* exported variables */
