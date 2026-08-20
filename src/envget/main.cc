@@ -3,13 +3,11 @@
 /* front-end subroutine */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
 #define	CF_UNDERSCORE	1		/* allow the underscore key */
 #define	CF_ALLOK	0		/* all variables are OK */
 #define	CF_ENVSORT	0		/* sort the environment */
-
 
 /* revision history:
 
@@ -26,24 +24,21 @@
         outputting them in a packaged-up format for SHELL interpretation.
 
 	Synopsis:
-
 	$ envget [-tee <teefile>]
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<baops.h>
 #include	<vecstr.h>
 #include	<bfile.h>
@@ -68,23 +63,8 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfkey(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecull(const char *,int,ULONG *) ;
-extern int	cfnumull(const char *,int,ULONG *) ;
-extern int	optbool(const char *,int) ;
-extern int	isdigitlatin(int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -167,7 +147,7 @@ char	*envv[] ;
 	PROGINFO	pi, *pip = &pi ;
 	ustat	sb ;
 	USERINFO	u ;
-	PARAMOPT	aparams ;
+	paramopt	aparams ;
 	bfile		errfile, teefile ;
 	bfile		outfile, *ofp = &outfile ;
 
@@ -557,7 +537,7 @@ char	*envv[] ;
 /* option parsing */
 
 	{
-	    PARAMOPT_CUR	c ;
+	    paramopt_cur	c ;
 
 	    int	spc = 0 ;
 
