@@ -1513,7 +1513,7 @@ local int procopts(PROGINFO *pip,keyopt *kop)
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,3,kp,kl)) >= 0) {
 
@@ -1724,7 +1724,7 @@ local int procenvsysvar(PROGINFO *pip,cchar *sysvardb)
 	        char		kbuf[KBUFLEN + 1] ;
 	        char		vbuf[VBUFLEN + 1] ;
 	        while (rs >= 0) {
-	            vl = sysvar_enum(&sv,&cur,kbuf,klen,vbuf,vlen) ;
+	            vl = sysvar_curenum(&sv,&cur,kbuf,klen,vbuf,vlen) ;
 	            if (vl == SR_NOTFOUND) break ;
 	            rs = vl ;
 
@@ -3008,7 +3008,7 @@ local int loaddefsfile(PROGINFO *pip,cchar *dfname)
 	}
 
 	if (rs1 >= 0) {
-	    if ((rs1 = permid(&pip->id,&sb,R_OK)) >= 0) {
+	    if ((rs1 = permids(&pip->id,&sb,R_OK)) >= 0) {
 	        if (pip->debuglevel > 0) {
 	            cchar	*pn = pip->progname ;
 	            bprintf(pip->efp,"%s: def=%s\n",pn,dfname) ;
@@ -3082,11 +3082,11 @@ local int loadxfile(PROGINFO *pip,cchar xfname[])
 	    rs1 = SR_NOENT ;
 
 	if (rs1 >= 0)
-	    rs1 = permid(&pip->id,&sb,R_OK) ;
+	    rs1 = permids(&pip->id,&sb,R_OK) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("envset/loadxfile: permid() rs=%d\n",rs1) ;
+	    debugprintf("envset/loadxfile: permids() rs=%d\n",rs1) ;
 #endif
 
 	f = (rs1 >= 0) ;
