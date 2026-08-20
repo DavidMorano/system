@@ -35,7 +35,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<csignal>
 #include	<netdb.h>
 #include	<cstdlib>
@@ -81,21 +81,6 @@
 
 /* external subroutines */
 
-extern int	snscs(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy4(char *,int,const char *,const char *,
-			const char *,const char *) ;
-extern int	sncpy5(char *,int,const char *,const char *,
-			const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	isdigitlatin(int) ;
-
 extern int	printhelp(bfile *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -103,12 +88,6 @@ extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	debugprintf(const char *,...) ;
 extern int	nprintf(const char *,const char *,...) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_hdate(time_t,char *) ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* external variables */
@@ -205,7 +184,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	PROGINFO	pi, *pip = &pi ;
 	ustat	sb ;
 	struct sigaction	sigs ;
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	USERINFO	u ;
 	SYSTEMS		sysdb ;
 	SYSDIALER	d ;
