@@ -1,18 +1,17 @@
-/* main */
+/* main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to send echo data to a remote host (and back) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -20,6 +19,7 @@
 
 /*******************************************************************************
 
+	Description:
 	This subroutine forms a program that sends data to a remote
 	INET host to its 'echo' service.
 
@@ -31,12 +31,15 @@
 #include	<sys/socket.h>
 #include	<sys/time.h>
 #include	<netinet/in.h>
-#include	<time.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getx.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<sockaddress.h>
@@ -68,35 +71,15 @@
 
 /* external subroutines */
 
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	dialuss(const char *,int,int) ;
-extern int	dialusd(const char *,int,int) ;
-extern int	dialudp(const char *,const char *,int,int,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;
-extern int	dialtcpmux(const char *,const char *,int,const char *,
-			const char **,int,int) ;
-extern int	dialticotsordnls(const char *,int,const char *,int,int) ;
-extern int	getaf(const char *,int) ;
-extern int	isdigitlatin(int) ;
-
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern const char	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -112,7 +95,7 @@ static int	usage(PROGINFO *) ;
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"HELP",
 	"proto",
@@ -158,7 +141,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*dialers[] = {
+static cchar	*dialers[] = {
 	"tcp",
 	"tcpmux",
 	"tcpnls",
@@ -186,8 +169,8 @@ enum dialers {
 
 int main(argc,argv,envv)
 int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
+cchar	*argv[] ;
+cchar	*envv[] ;
 {
 	PROGINFO	pi, *pip = &pi ;
 	bfile		errfile ;
@@ -212,25 +195,25 @@ const char	*envv[] ;
 	int		f_log = FALSE ;
 	int		f_shutdown = FALSE ;
 	int		f ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
 	char		argpresent[MAXARGGROUPS + 1] ;
 	char		buf[BUFLEN + 1] ;
 	char		srcpath[MAXPATHLEN + 1] ;
 	char		hostnamebuf[MAXHOSTNAMELEN + 1] ;
 	char		dialspecbuf[MAXHOSTNAMELEN + 1] ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*lfname = NULL ;
-	const char	*dialspec = NULL ;
-	const char	*addrspec = NULL ;
-	const char	*hostname = NULL ;
-	const char	*portspec = NULL ;
-	const char	*svcspec = NULL ;
-	const char	*cp ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*lfname = NULL ;
+	cchar	*dialspec = NULL ;
+	cchar	*addrspec = NULL ;
+	cchar	*hostname = NULL ;
+	cchar	*portspec = NULL ;
+	cchar	*svcspec = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -1089,8 +1072,8 @@ PROGINFO	*pip ;
 {
 	int		rs ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-d <dialer>] <host> <svc>\n" ;
 	rs = bprintf(pip->efp,fmt,pn,pn) ;
