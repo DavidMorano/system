@@ -39,7 +39,7 @@ struct ussmux_flags {
 struct ussmux_head {
 	logfile		lh ;
 	USSMUX_FL	fl, open ;
-	uint		magic ;
+	uint		magval ;
 	int		tlen ;
 	int		fd ;
 } ; /* end struct (ussmux_head) */
