@@ -1,12 +1,13 @@
-/* main */
+/* main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* program to send echo data to a remote host (and back) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -19,6 +20,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine forms a program that sends data to a remote
 	INET host to its 'echo' service.
 
@@ -31,12 +33,15 @@
 #include	<sys/time.h>
 #include	<netinet/in.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<csignal>
+#include	<fcntl.h>
 #include	<netdb.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bits.h>
 #include	<bfile.h>
 #include	<logfile.h>
@@ -73,29 +78,6 @@
 
 /* external subroutines */
 
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	getsrcname(char *,int,int) ;
-extern int	getaf(const char *,int) ;
-extern int	isasocket(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
-extern int	dialudp(const char *,const char *,int,int,int) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;
-extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-extern int	dialuss(const char *,int,int) ;
-extern int	dialussnls(const char *,const char *,int,int) ;
-extern int	dialussmux(const char *,const char *,const char **,int,int) ;
-extern int	dialusd(const char *,int,int) ;
-extern int	dialticotsord(const char *,int,int,int) ;
-extern int	dialticotsordnls(const char *,int,const char *,int,int) ;
-extern int	dialpass(const char *,int,int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	transfer(PROGINFO *,cchar *,int,int,int,int,int,int) ;
@@ -107,10 +89,6 @@ extern int	debugprinthex(const char *,int,const char *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif /* CF_DEBUG */
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -219,7 +197,7 @@ enum dialers {
 int main(int argc,cchar *argv[],cchar *envv[])
 {
 	PROGINFO	pi, *pip = &pi ;
-	BITS		pargs ;
+	bits		pargs ;
 	bfile		errfile ;
 	mode_t		operm ;
 
