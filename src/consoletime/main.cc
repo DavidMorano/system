@@ -1,13 +1,13 @@
-/* main (consletime) */
+/* main SUPPORT (consletime) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* generic front-end */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -30,45 +30,41 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ consoletime ...
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-#include	<time.h>
-
-#include	<usystem.h>
+#include	<ctime>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<ids.h>
+#include	<permx.h>
+#include	<opendefstds.h>
 #include	<sighand.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
 #include	<sbuf.h>
-#include	<ids.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
 
+#pragma		GCC dependency		"mod/uconstants.ccm"
+
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
-
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
-#endif
 
 #ifndef	LINEBUFLEN
 #define	LINEBUFLEN	MAX((MAXPATHLEN + 3),2048)
@@ -92,39 +88,38 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpcasestr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matcasestr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matpcasestr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
 extern int	getnprocessors(cchar **,int) ;
 extern int	termconseq(char *,int,int,int,int,int,int) ;
 extern int	acceptpass(int, struct strrecvfd *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	ndig(double *,int) ;
 extern int	ndigmax(double *,int,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;
@@ -140,11 +135,11 @@ extern char	*timestr_elapsed(time_t,char *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procdaemon(PROGINFO *,const char *) ;
-static int	procserve(PROGINFO *,const char *) ;
-static int	proconce(PROGINFO *,const char *) ;
-static int	procout(PROGINFO *,const char *,gid_t) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procdaemon(PROGINFO *,cchar *) ;
+static int	procserve(PROGINFO *,cchar *) ;
+static int	proconce(PROGINFO *,cchar *) ;
+static int	procout(PROGINFO *,cchar *,gid_t) ;
 static int	procprint(PROGINFO *,int,gid_t) ;
 
 static int	procinfo_begin(PROGINFO *) ;
@@ -153,7 +148,7 @@ static int	procinfo_nprocs(PROGINFO *) ;
 static int	procinfo_check(PROGINFO *) ;
 static int	procinfo_end(PROGINFO *) ;
 
-static int	msglogdev(IDS *,const char *) ;
+static int	msglogdev(IDS *,cchar *) ;
 
 static void	main_sighand(int,siginfo_t *,void *) ;
 
@@ -163,7 +158,7 @@ static void	main_sighand(int,siginfo_t *,void *) ;
 static volatile int	if_exit ;
 static volatile int	if_int ;
 
-static const int	sigblocks[] = {
+static cint	sigblocks[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGHUP,
@@ -171,20 +166,20 @@ static const int	sigblocks[] = {
 	0
 } ;
 
-static const int	sigignores[] = {
+static cint	sigignores[] = {
 	SIGPIPE,
 	SIGPOLL,
 	0
 } ;
 
-static const int	sigints[] = {
+static cint	sigints[] = {
 	SIGINT,
 	SIGTERM,
 	SIGQUIT,
 	0
 } ;
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -240,7 +235,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"consoletime",
 	"loginblurb",
 	NULL
@@ -317,16 +312,17 @@ static cchar	*msglogdevs[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,cchar **argv,cchar **envv) {
 	PROGINFO	pi, *pip = &pi ;
 	ustat	sb ;
 	SIGHAND		sm ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	IDS		id ;
 	bfile		errfile ;
 
@@ -343,18 +339,18 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*pmspec = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*termtype = NULL ;
-	const char	*mntfname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*pmspec = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*termtype = NULL ;
+	cchar	*mntfname = NULL ;
+	cchar	*cp ;
 
 
 	if_exit = 0 ;
@@ -377,14 +373,9 @@ int main(int argc,cchar **argv,cchar **envv)
 	}
 
 	if ((cp = getenv(VARBANNER)) == NULL) cp = BANNER ;
-	proginfo_setbanner(pip,cp) ;
+	if (rs >= 0) rs = proginfo_setbanner(pip,cp) ;
 
-	for (i = 0 ; i < 3 ; i += 1) {
-	    if (u_fstat(i,&sb) < 0) {
-	        int oflags = (i == 0) ? O_RDONLY : O_WRONLY ;
-	        u_open(NULLFNAME,oflags,0666) ;
-	    }
-	} /* end for */
+	if (rs >= 0) rs = opendefstds(3) ;
 
 /* initialize */
 
@@ -425,7 +416,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -665,7 +656,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -732,7 +723,7 @@ int main(int argc,cchar **argv,cchar **envv)
 /* observe MESG flag (group-writeable) on output devi
 							    ce */
 	                    case 'm':
-	                        pip->final.mesg = TRUE ;
+	                        pip->finval.mesg = TRUE ;
 	                        pip->fl.mesg = TRUE ;
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
@@ -768,7 +759,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-	                            pip->final.o_string = TRUE ;
+	                            pip->finval.o_string = TRUE ;
 	                            pip->fl.o_string = TRUE ;
 	                            pip->string = argp ;
 	                        }
@@ -776,7 +767,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* specify if output is a terminal or not */
 	                    case 't':
-	                        pip->final.term = TRUE ;
+	                        pip->finval.term = TRUE ;
 	                        pip->have.term = TRUE ;
 	                        pip->fl.term = TRUE ;
 	                        if (f_optequal) {
@@ -927,7 +918,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    if (ofname == NULL) ofname = "-" ;
 	    break ;
 	case progmode_consoletime:
-	    if ((! pip->final.o_time) && pip->fl.daemon)
+	    if ((! pip->finval.o_time) && pip->fl.daemon)
 	        pip->fl.o_time = FALSE ;
 	    break ;
 	} /* end switch */
@@ -951,7 +942,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    pip->fl.ansiterm = (n >= 0) ;
 	} /* end if */
 
-	if (pip->fl.daemon && (! pip->final.term)) {
+	if (pip->fl.daemon && (! pip->finval.term)) {
 	    pip->fl.term = FALSE ;
 	}
 
@@ -963,8 +954,8 @@ int main(int argc,cchar **argv,cchar **envv)
 	pip->daytime = time(NULL) ;
 
 	if ((ofname == NULL) && (! pip->fl.daemon)) {
-	    const char	*ccp ;
-	    const char	*backup = NULL ;
+	    cchar	*ccp ;
+	    cchar	*backup = NULL ;
 	    if ((rs = ids_load(&id)) >= 0) {
 	        for (i = 0 ; (msglogdevs[i] != NULL) ; i += 1) {
 	            ccp = msglogdevs[i] ;
@@ -986,7 +977,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	if ((ofname != NULL) &&
 	    ((ofname[0] == '\0') || (ofname[0] == '-'))) {
 	    ofname = OUTPUTDEV ;
-	    if (! pip->final.mesg)
+	    if (! pip->finval.mesg)
 	        pip->fl.mesg = FALSE ;
 	}
 
@@ -1113,8 +1104,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-of <consdev>] [-t[=<b>]] [-m[=<b>]]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -1141,25 +1132,25 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getenv(VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	cur ;
+	    keyopt_cur	cur ;
 	    if ((rs = keyopt_curbegin(kop,&cur)) >= 0) {
 	        int	ki ;
 	        int	kl, vl ;
 	        int	v ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&cur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&cur,&kp)) >= 0) {
 
 	            ki = matostr(progopts,2,kp,kl) ;
 
@@ -1170,7 +1161,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	            switch (ki) {
 	            case progopt_str:
-	                if (! pip->final.o_string) {
+	                if (! pip->finval.o_string) {
 	                    pip->fl.o_string = TRUE ;
 	                    if (vl > 0) {
 	                        strdcpy1w(pip->strbuf,STRBUFLEN,vp,vl) ;
@@ -1231,8 +1222,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                }
 	                break ;
 	            case progopt_term:
-	                if (! pip->final.term) {
-	                    pip->final.term = TRUE ;
+	                if (! pip->finval.term) {
+	                    pip->finval.term = TRUE ;
 	                    pip->have.term = TRUE ;
 	                    pip->fl.term = TRUE ;
 	                    if (vl > 0) {
@@ -1242,8 +1233,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                }
 	                break ;
 	            case progopt_mesg:
-	                if (! pip->final.mesg) {
-	                    pip->final.mesg = TRUE ;
+	                if (! pip->finval.mesg) {
+	                    pip->finval.mesg = TRUE ;
 	                    pip->fl.mesg = TRUE ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
@@ -1382,8 +1373,8 @@ static int procserve(PROGINFO *pip,cchar *mntfname)
 	    if ((rs >= 0) && (n > 0)) {
 
 	        for (i = 0 ; (rs >= 0) && (i < nfds) ; i += 1) {
-	            const int	fd = fds[i].fd ;
-	            const int	re = fds[i].revents ;
+	            cint	fd = fds[i].fd ;
+	            cint	re = fds[i].revents ;
 
 	            if (fd == sfd) {
 
@@ -1445,7 +1436,7 @@ static int procserve(PROGINFO *pip,cchar *mntfname)
 	} /* end while */
 
 ret4:
-	uc_fdetach(mntfname) ;
+	uc_detach(mntfname) ;
 
 ret3:
 ret2:
@@ -1511,7 +1502,7 @@ static int proconce(PROGINFO *pip,cchar ofname[])
 static int procout(PROGINFO *pip,cchar ofname[],gid_t gid)
 {
 	const mode_t	om = 0666 ;
-	const int	of = O_FLAGS ;
+	cint	of = O_FLAGS ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1521,9 +1512,9 @@ static int procout(PROGINFO *pip,cchar ofname[],gid_t gid)
 	if (ofname[0] == '\0') return SR_INVALID ;
 
 	if ((rs = procinfo_begin(pip)) >= 0) {
-	    const int	to = pip->to_open ;
+	    cint	to = pip->to_open ;
 	    if ((rs = uc_opene(ofname,of,om,to)) >= 0) {
-	        const int	fd = rs ;
+	        cint	fd = rs ;
 
 	        rs = procprint(pip,fd,gid) ;
 	        wlen += rs ;
@@ -1546,7 +1537,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 {
 	ustat	sb ;
 	SBUF		b ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -1656,7 +1647,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 
 	    if ((rs >= 0) && pip->fl.o_load) {
 	        double		dla[3] ;
-	        const char	*fmt ;
+	        cchar	*fmt ;
 	        if ((rs1 = uc_getloadavg(dla,3)) >= 0) {
 	            fmt = "la=(%4.1f %4.1f %4.1f)" ;
 	            if (ndig(dla,3) > 2) {
@@ -1671,7 +1662,7 @@ static int procprint(PROGINFO *pip,int fd,gid_t gid)
 /* done */
 
 	    if (f_terminal && pip->fl.ansiterm) {
-	        const int	clen = CODEBUFLEN ;
+	        cint	clen = CODEBUFLEN ;
 	        int		cl ;
 	        char	cbuf[CODEBUFLEN+1] ;
 	        cl = termconseq(cbuf,clen,'K',-1,-1,-1,-1) ;
@@ -1779,7 +1770,7 @@ static int msglogdev(IDS *idp,cchar *fname)
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	if ((rs = u_stat(fname,&sb)) >= 0) {
-	    if ((rs = permid(idp,&sb,W_OK)) >= 0) {
+	    if ((rs = permids(idp,&sb,W_OK)) >= 0) {
 	        f = f || S_ISCHR(sb.st_mode) ;
 	        f = f || S_ISFIFO(sb.st_mode) ;
 	        f = f || S_ISSOCK(sb.st_mode) ;
