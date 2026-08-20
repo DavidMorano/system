@@ -32,7 +32,7 @@
 
 struct tcpnls_head {
 	time_t		opentime ;
-	uint		magic ;
+	uint		magval ;
 	int		fd ;
 } ; /* end struct */
 
