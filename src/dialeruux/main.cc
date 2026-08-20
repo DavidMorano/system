@@ -34,7 +34,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<csignal>
 #include	<netdb.h>
 #include	<cstdlib>
@@ -208,7 +208,7 @@ const char	*envv[] ;
 
 	CM		con ;
 
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 
 	sigset_t	signalmask ;
 
