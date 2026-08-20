@@ -68,7 +68,7 @@
 #include	<varsub.h>
 #include	<hostent.h>
 #include	<storebuf.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
