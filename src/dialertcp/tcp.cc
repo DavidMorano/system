@@ -112,7 +112,7 @@ template<typename ... Args>
 local inline int tcp_magic(TCP *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == TCP_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == TCP_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (tcp_magic) */
@@ -434,7 +434,7 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar *hn,cchar *svc,mainv) noex {
 	}
 
 	if (rs >= 0) {
-	    op->magic = TCP_MAGIC ;
+	    op->magval = TCP_MAGIC ;
 	    uc_closeonexec(op->fd,true) ;
 	}
 
@@ -529,7 +529,7 @@ int tcp_close(TCP *op) noex {
 	int		rs ;
 	if ((rs = tcp_magic(op)) >= 0) {
 	    rs = u_close(op->fd) ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
