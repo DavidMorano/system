@@ -1421,7 +1421,7 @@ local int procopts(PI *pip,keyopt *kop,paramopt *aop) noex {
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(locopts,3,kp,kl)) >= 0) {
 
@@ -2061,7 +2061,7 @@ local int procmaildname_add(PI *pip,cchar *vp,int vl) noex {
 	    if (ustat sb ; (rs = uc_stat(dname,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 		    IDS		*idp = &pip->id ;
-	            if ((rs = permid(idp,&sb,W_OK)) >= 0) {
+	            if ((rs = permids(idp,&sb,W_OK)) >= 0) {
 	                rs = vecstr_adduniq(&pip->maildirs,vp,vl) ;
 	                if (rs < INT_MAX) c += 1 ;
 	                if (rs > 0) {
