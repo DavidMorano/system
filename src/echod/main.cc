@@ -176,7 +176,7 @@ struct locinfo_flags {
 
 struct locinfo {
 	vecstr		stores ;
-	struct locinfo_flags	have, f, changed, final ;
+	struct locinfo_flags	have, f, changed, finval ;
 	struct locinfo_flags	open ;
 	ustat		s ;
 	NAMECACHE		nc ;
@@ -190,7 +190,7 @@ struct locinfo {
 static int	usage(PROGINFO *) ;
 static int	loadname(PROGINFO *,vecstr *,const char *,int) ;
 static int	loadnames(PROGINFO *,VECSTR *,const char *,int) ;
-static int	procopts(PROGINFO *,KEYOPT *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
 static int	process(PROGINFO *,SHIO *,VECSTR *) ;
 static int	proccheck(PROGINFO *,vecstr *) ;
 static int	procgetdb(PROGINFO *,vecstr *,VECOBJ *) ;
@@ -317,7 +317,7 @@ const void	*contextp ;
 	struct locinfo	li, *lip = &li ;
 	SHIO		errfile ;
 	SHIO		outfile, *ofp = &outfile ;
-	KEYOPT		akopts ;
+	keyopt		akopts ;
 	VECSTR		names ;
 	sigset_t	oldsigmask, newsigmask ;
 
@@ -1167,7 +1167,7 @@ int		cl ;
 /* process the program ako-options */
 static int procopts(pip,kop)
 PROGINFO	*pip ;
-KEYOPT		*kop ;
+keyopt		*kop ;
 {
 	struct locinfo	*lip = pip->lip ;
 
@@ -1181,13 +1181,13 @@ KEYOPT		*kop ;
 	    rs = keyopt_loads(kop,cp,-1) ;
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int		oi ;
 	        int		kl, vl ;
 	        const char	*kp, *vp ;
 
-		while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+		while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	    	    vl = keyopt_fetch(kop,kp,NULL,&vp) ;
 
@@ -1197,9 +1197,9 @@ KEYOPT		*kop ;
 	        switch (oi) {
 
 	        case akoname_header:
-	            if (! lip->final.header) {
+	            if (! lip->finval.header) {
 	                lip->have.header = TRUE ;
-	                lip->final.header = TRUE ;
+	                lip->finval.header = TRUE ;
 	                lip->fl.header = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
 	                    lip->fl.header = (uv > 0) ? 1 : 0 ;
@@ -1208,9 +1208,9 @@ KEYOPT		*kop ;
 	            break ;
 
 	        case akoname_long:
-	            if (! lip->final.fmtlong) {
+	            if (! lip->finval.fmtlong) {
 	                lip->have.fmtlong = TRUE ;
-	                lip->final.fmtlong = TRUE ;
+	                lip->finval.fmtlong = TRUE ;
 	                lip->fl.fmtlong = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
 	                    lip->fl.fmtlong = (uv > 0) ? 1 : 0 ;
@@ -1218,10 +1218,10 @@ KEYOPT		*kop ;
 	            break ;
 
 	        case akoname_short:
-	            if (! lip->final.fmtshort) {
+	            if (! lip->finval.fmtshort) {
 
 	                lip->have.fmtshort = TRUE ;
-	                lip->final.fmtshort = TRUE ;
+	                lip->finval.fmtshort = TRUE ;
 	                lip->fl.fmtshort = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
 	                    lip->fl.fmtshort = (uv > 0) ? 1 : 0 ;
@@ -1231,10 +1231,10 @@ KEYOPT		*kop ;
 	            break ;
 
 	        case akoname_uniq:
-	            if (! lip->final.uniq) {
+	            if (! lip->finval.uniq) {
 
 	                lip->have.uniq = TRUE ;
-	                lip->final.uniq = TRUE ;
+	                lip->finval.uniq = TRUE ;
 	                lip->fl.uniq = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
 	                    lip->fl.uniq = (uv > 0) ? 1 : 0 ;
@@ -1244,10 +1244,10 @@ KEYOPT		*kop ;
 	            break ;
 
 	        case akoname_users:
-	            if (! lip->final.users) {
+	            if (! lip->finval.users) {
 
 	                lip->have.users = TRUE ;
-	                lip->final.users = TRUE ;
+	                lip->finval.users = TRUE ;
 	                lip->fl.users = TRUE ;
 	                if ((vl > 0) && (cfdecui(vp,vl,&uv) >= 0))
 	                    lip->fl.users = (uv > 0) ? 1 : 0 ;
