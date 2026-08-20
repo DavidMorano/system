@@ -1,14 +1,14 @@
-/* main */
+/* envwipe_main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* program to exec a program with the named arg0 */
 /* version %I% last-modified %G% */
 
-
 #define	F_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	F_DEBUG		1		/* debug print-outs switchable */
 
-
-/* revision history :
+/* revision history:
 
 	= 1990-11-01, David A­D­ Morano
 	This code was originally written.
@@ -23,27 +23,27 @@
 
 /**************************************************************************
 
-	Execute as :
+  	Description:
 
+	Execute:
 		envwipe [-e envfile] [-V] prog arg0 arg1 ...
-
 
 **************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstdio>
-
-#include	<usystem.h>
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<vecstr.h>
+#include	<prognamevar.hh>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -51,16 +51,11 @@
 #include	"misc.h"
 #include	"defs.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* external subroutines */
-
-extern int	cfdeci(const char *,int,int *) ;
-extern int	matstr(char * const *,char *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	findfilepath(const char *,char *,const char *,int) ;
-extern int	isdigitlatin(int) ;
-
-extern char	*strbasename(char *) ;
 
 
 /* external variables */
@@ -71,36 +66,30 @@ extern char	*strbasename(char *) ;
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
 
 /* local variables */
 
-static char *argopts[] = {
-	"VERSION",
-	NULL,
-} ;
-
 #define	ARGOPT_VERSION	0
 
+constexpr cpcchar	argopts[] = {
+	"VERSION",
+	nullptr
+} ;
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
+    	prognamevar	progname(argc,argv,ænvv) ;
+	proginfo	pi{}, *pip = &pi ;
 	vecstr		exports = obj_vecstr(20,0) ;
-
-	ustat	sb ;
-
-	FILE		*efp = NULL ;
-
-	PROGINFO	pi, *pip = &pi ;
-
+	FILE		*efp = nullptr ;
+	ustat		sb ;
 	int	argr, argl, aol, akl, avl ;
 	int	kwi, npa, ai = 0, i ;
 	int	f_optplus, f_optminus, f_optequal ;
@@ -116,17 +105,16 @@ char	*envv[] ;
 	int	fd_stderr ;
 
 	char	*argp, *aop, *akp, *avp ;
-	char	*programroot = NULL ;
+	char	*programroot = nullptr ;
 	char	progfnamebuf[MAXPATHLEN + 1] ;
-	char	*progfname = NULL ;
-	char	*envfname = NULL ;
-	char	*arg0 = NULL ;
+	char	*progfname = nullptr ;
+	char	*envfname = nullptr ;
+	char	*arg0 = nullptr ;
 	char	*progfile ;
 	char	*cp ;
 
-
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -137,16 +125,13 @@ char	*envv[] ;
 		efp = fdopen(fd_stderr,"a") ;
 	} /* end if */
 
-	(void) memset(pip,0,sizeof(PROGINFO)) ;
-
 	pip->efp = efp ;
-	pip->progname = strbasename(argv[0]) ;
+	pip->progname = progname ;
 
 /* early things to initialize */
 
 	pip->version = VERSION ;
-	pip->programroot = NULL ;
-
+	pip->programroot = nullptr ;
 	pip->debuglevel = 0 ;
 
 	pip->fl.verbose = FALSE ;
@@ -180,7 +165,7 @@ char	*envv[] ;
 	                aol = argl - 1 ;
 	                akp = aop ;
 	                f_optequal = FALSE ;
-	                if ((avp = strchr(aop,'=')) != NULL) {
+	                if ((avp = strchr(aop,'=')) != nullptr) {
 
 	                    akl = avp - aop ;
 	                    avp += 1 ;
@@ -305,7 +290,7 @@ char	*envv[] ;
 	        default:
 	            ex = EX_USAGE ;
 	            f_usage = TRUE ;
-	            if (efp != NULL)
+	            if (efp != nullptr)
 	                fprintf(efp,
 	                    "%s: extra positional arguments ignored\n",
 	                    pip->progname) ;
@@ -323,7 +308,7 @@ char	*envv[] ;
 #endif
 
 
-	if (f_version && (efp != NULL)) {
+	if (f_version && (efp != nullptr)) {
 	    fprintf(efp,"%s: version %s\n",pip->progname,VERSION) ;
 	}
 
@@ -346,7 +331,7 @@ char	*envv[] ;
 	if (npa < 2)
 	    goto badargnum ;
 
-	if ((progfname == NULL) || (arg0 == NULL))
+	if ((progfname == nullptr) || (arg0 == nullptr))
 	    goto badarg ;
 
 
@@ -357,17 +342,17 @@ char	*envv[] ;
 	eprintf("main: programroot\n") ;
 #endif
 
-	if (pip->programroot == NULL) {
+	if (pip->programroot == nullptr) {
 
 	    programroot = getenv(PROGRAMROOTVAR1) ;
 
-	    if (programroot == NULL)
+	    if (programroot == nullptr)
 	        programroot = getenv(PROGRAMROOTVAR2) ;
 
-	    if (programroot == NULL)
+	    if (programroot == nullptr)
 	        programroot = getenv(PROGRAMROOTVAR3) ;
 
-	    if (programroot == NULL)
+	    if (programroot == nullptr)
 	        programroot = PROGRAMROOT ;
 
 	    pip->programroot = programroot ;
@@ -398,7 +383,7 @@ char	*envv[] ;
 		envfname) ;
 #endif
 
-	if (envfname != NULL) {
+	if (envfname != nullptr) {
 
 		rs = procenv(pip->programroot,envfname,&exports) ;
 
@@ -406,7 +391,7 @@ char	*envv[] ;
 	if (pip->debuglevel > 1) {
 	eprintf("main: procenv() rs=%d\n",rs) ;
 		for (i = 0 ; rs = vecstr_get(&exports,i,&cp) >= 0 ; i += 1) {
-			if (cp == NULL) continue ;
+			if (cp == nullptr) continue ;
 			eprintf("main: e> %s\n",cp) ;
 		}
 	}
@@ -414,7 +399,7 @@ char	*envv[] ;
 
 	} /* end if (user specified environment) */
 
-	if (efp != NULL)
+	if (efp != nullptr)
 	    fclose(efp) ;
 
 /* find the file path if we need to */
@@ -428,7 +413,7 @@ char	*envv[] ;
 	progfile = progfname ;
 	if (progfile[0] != '/') {
 
-	    rs = findfilepath(NULL,progfnamebuf,progfile,X_OK) ;
+	    rs = findfilepath(nullptr,progfnamebuf,progfile,X_OK) ;
 
 #if	F_DEBUG
 	if (pip->debuglevel > 1)
@@ -477,7 +462,7 @@ char	*envv[] ;
 /* handle error condition */
 
 	ex = EX_NOEXEC ;
-	if (efp != NULL) {
+	if (efp != nullptr) {
 
 	    fprintf(stderr,
 	        "%s: program would not 'exec' correctly (rs %d)\n",
@@ -499,7 +484,7 @@ badargval:
 
 
 badargnum:
-	if (efp != NULL)
+	if (efp != nullptr)
 	    fprintf(stderr,
 	        "%s: not enough arguments given\n",
 	        pip->progname) ;
@@ -507,7 +492,7 @@ badargnum:
 	goto badarg ;
 
 badargextra:
-	if (efp != NULL)
+	if (efp != nullptr)
 	    fprintf(efp,
 	        "%s: no value associated with this option key\n",
 	        pip->progname) ;
@@ -516,9 +501,9 @@ badargextra:
 
 badarg:
 	ex = EX_USAGE ;
-	if (efp != NULL)
+	if (efp != nullptr)
 	    fprintf(stderr,
-	        "%s: a bad (NULL, whatever !) argument was given\n",
+	        "%s: a bad (nullptr, whatever !) argument was given\n",
 	        pip->progname) ;
 
 	goto done ;
@@ -533,7 +518,7 @@ badprog:
 	ex = EX_NOPROG ;
 
 done:
-	if (efp != NULL)
+	if (efp != nullptr)
 	    fclose(stderr) ;
 
 	return ex ;
@@ -543,19 +528,14 @@ done:
 
 /* local subroutines */
 
-
-/* print out (standard error) some short usage */
-static int usage(PROGINFO *pip)
-{
+local int usage(PROGINFO *pip) noex {
 	int		rs = SR_NOTOPEN ;
-
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    rs = SR_OK ;
 	    fprintf(pip->efp,
 	        "%s: USAGE> %s [-e envfile] program [arg0 [args ...]]\n",
 	        pip->progname,pip->progname) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (usage) */
