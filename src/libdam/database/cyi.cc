@@ -69,6 +69,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<permx.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasneedslash(3uc)| */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -776,12 +777,12 @@ local int cyi_loadbve(cyi *op,cyi_ent *bvep,char *ebuf,int elen,
 local int mkydname(char *rbuf,cchar *dname,int year) noex {
 	cint		rlen = var.maxpathlen ;
 	int		rs ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (storebuf sb(rbuf,rlen) ; (rs = sb.str(dname)) >= 0) ylikely {
-	    if (rs >= 0) rs = sb.chr('/') ;
+	    if ((sb.idx > 0) && hasneedslash(dname)) rs = sb.chr('/') ;
 	    if (rs >= 0) rs = sb.chr('y') ;
 	    if (rs >= 0) rs = sb.dec(year) ;
-	    len = sb.idx ;
+	    len = sb  ;
 	} /* end if (storebuf) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (mkydname) */
