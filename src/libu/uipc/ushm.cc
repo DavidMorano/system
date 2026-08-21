@@ -29,21 +29,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/ipc.h>
-#include	<sys/shm.h>
-#include	<unistd.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* |intptr_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/ipc.h>		/* POSIX® */
+#include	<sys/shm.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |intptr_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uipc.h"
 
@@ -79,8 +78,8 @@ int u_shmget(key_t key,size_t sz,int msgflag) noex {
 	int		to_nospc = utimeout[uto_nospc] ;
 	bool		f_exit = false ;
 	repeat {
-	    if ((rs = shmget(key,sz,msgflag)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
+	    if ((rs = shmget(key,sz,msgflag)) < 0) {
+		rs = (- errno) ;
 	        switch (rs) {
 	        case SR_NOMEM:
 	            if (to_nomem-- > 0) {
@@ -106,8 +105,7 @@ int u_shmget(key_t key,size_t sz,int msgflag) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (u_shmget) */
+} /* end subroutine (u_shmget) */
 
 int u_shmat(int shmid,void *shmaddr,int flags,void **app) noex {
 	int		rs = SR_FAULT ;
@@ -158,8 +156,7 @@ int u_shmat(int shmid,void *shmaddr,int flags,void **app) noex {
 	    } until ((rs >= 0) || f_exit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_shmat) */
+} /* end subroutine (u_shmat) */
 
 int u_shmctl(int shmid,int cmd,SHMIDDS *buf) noex {
 	int		rs ;
@@ -185,16 +182,16 @@ int u_shmctl(int shmid,int cmd,SHMIDDS *buf) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (u_shmctl) */
+} /* end subroutine (u_shmctl) */
 
 int u_shmdt(void *shmaddr) noex {
 	int		rs ;
 	repeat {
-	    if ((rs = shmdt(shmaddr)) < 0) rs = (- errno) ;
+	    if ((rs = shmdt(shmaddr)) < 0) {
+		rs = (- errno) ;
+	    }
 	} until (rs != SR_INTR) ;
 	return rs ;
-}
-/* end subroutine (u_shmdt) */
+} /* end subroutine (u_shmdt) */
 
 
