@@ -240,7 +240,7 @@ local int getpwentry_gecos(pwentry *uep,SI *sip,cchar *gecosdata) noex {
 	            case gecosval_account:
 	                vpp = &uep->account ;
 	                break ;
-	            case gecosval_bin:
+	            case gecosval_prbin:
 	                vpp = &uep->bin ;
 	                break ;
 	            case gecosval_office:
