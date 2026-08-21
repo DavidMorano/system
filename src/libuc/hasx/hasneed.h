@@ -31,17 +31,11 @@ EXTERNC_begin
 extern bool	hasneedchr	(cchar *,int,int) noex ;
 extern bool	hasneedslash	(cchar *,int) noex ;
 
-extern bool	hastrailchr	(cchar *,int,int) noex ;
-extern bool	hastrailslash	(cchar *,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
 inline bool hasneedslash(cchar *sp) noex {
     	return hasneedslash(sp,-1) ;
-} /* end subroutine */
-inline bool hastrailslash(cchar *sp) noex {
-    	return hastrailslash(sp,-1) ;
 } /* end subroutine */
 #endif /* __cplusplus */
 
