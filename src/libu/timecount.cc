@@ -26,9 +26,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 
 #include	"timecount.hh"
 
@@ -66,7 +68,6 @@ timecount::operator int () noex {
             }
         } /* end if (counting down) */
         return (rs >= 0) ? f : rs ;
-} 
-/* end method (timecount::operator) */
+} /* end method (timecount::operator) */
 
 
