@@ -81,7 +81,7 @@ import libutil ;			/* |memcopy(3u)| */
 
 /* local typedefs */
 
-template<typename T> using ctxxx_f = int (*)(char *,int,T) noex ;
+template<typename T> using ctx_f = int (*)(char *,int,T) noex ;
 
 
 /* external subroutines */
@@ -97,8 +97,7 @@ template<typename T> using ctxxx_f = int (*)(char *,int,T) noex ;
 
 template<typename T>
 local inline 
-int storebuf_xxxx(char *rp,int rl,int i,ctxxx_f<T> ctxxx,T v) noex {
-	cint		dlen = DIGBUFLEN ;
+int storebuf_xxxx(char *rp,int rl,int i,int dlen,ctx_f<T> ctx,T v) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rp) ylikely {
@@ -108,19 +107,18 @@ int storebuf_xxxx(char *rp,int rl,int i,ctxxx_f<T> ctxxx,T v) noex {
 		rs = SR_OK ;
 	        *bp = '\0' ;
 	        if ((rl < 0) || ((rl - i) >= dlen)) {
-	            if ((rs = ctxxx(bp,(rl - i),v)) >= 0) {
+	            if ((rs = ctx(bp,(rl - i),v)) >= 0) {
 		        len = rs ;
 	            }
 	        } else {
-	            char	dbuf[dlen+1] ;
-	            if ((rs = ctxxx(dbuf,dlen,v)) >= 0) {
+	            if (char dbuf[dlen+1] ; (rs = ctx(dbuf,dlen,v)) >= 0) {
 	                len = rs ;
 	                if ((rl < 0) || ((rl - i) >= len)) {
 	                    strwcpy(bp,dbuf,len) ;
 	                } else {
 		            rs = SR_OVERFLOW ;
 		        }
-	            } /* end if (ctxxx) */
+	            } /* end if (ctx) */
 	        } /* end if */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -129,22 +127,26 @@ int storebuf_xxxx(char *rp,int rl,int i,ctxxx_f<T> ctxxx,T v) noex {
 
 template<typename T>
 local inline int storebuf_binx(char *bp,int bl,int i,T v) noex {
-	return storebuf_xxxx(bp,bl,i,ctbin,v) ;
+    	cint dlen = BINBUFLEN ;
+	return storebuf_xxxx(bp,bl,i,dlen,ctbin,v) ;
 } /* end subroutine-template (storebuf_binx) */
 
 template<typename T>
 local inline int storebuf_octx(char *bp,int bl,int i,T v) noex {
-	return storebuf_xxxx(bp,bl,i,ctoct,v) ;
+    	cint dlen = OCTBUFLEN ;
+	return storebuf_xxxx(bp,bl,i,dlen,ctoct,v) ;
 } /* end subroutine-template (storebuf_octx) */
 
 template<typename T>
 local inline int storebuf_decx(char *bp,int bl,int i,T v) noex {
-	return storebuf_xxxx(bp,bl,i,ctdec,v) ;
+    	cint dlen = DECBUFLEN ;
+	return storebuf_xxxx(bp,bl,i,dlen,ctdec,v) ;
 } /* end subroutine-template (storebuf_decx) */
 
 template<typename T>
 local inline int storebuf_hexx(char *bp,int bl,int i,T v) noex {
-	return storebuf_xxxx(bp,bl,i,cthex,v) ;
+    	cint dlen = HEXBUFLEN ;
+	return storebuf_xxxx(bp,bl,i,dlen,cthex,v) ;
 } /* end subroutine-template (storebuf_hexx) */
 
 
@@ -387,39 +389,107 @@ int storebuf_hexull(char *rbuf,int rlen,int i,ulonglong uv) noex {
 } /* end subroutine */
 
 int storebuf::chrs(int ch,int n) noex {
-    cint rs = storebuf_chrs(bufp,bufl,idx,ch,n) ;
-    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    int		rs ;
+    if ((rs = idx) >= 0) {
+	if ((rs = storebuf_chrs(bufp,bufl,idx,ch,n)) >= 0) {
+            idx += rs ;
+	} else {
+	    idx = rs ;
+	}
+    } /* end if (ok) */
     return rs ;
 } /* end method */
 
 int storebuf::chr(int ch) noex {
-    cint rs = storebuf_chr(bufp,bufl,idx,ch) ;
-    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    int		rs ;
+    if ((rs = idx) >= 0) {
+        if ((rs = storebuf_chr(bufp,bufl,idx,ch)) >= 0) {
+            idx += rs ;
+	} else {
+	    idx = rs ;
+	}
+    } /* end if (ok) */
     return rs ;
 } /* end method */
 
 int storebuf::strw(cchar *sp,int sl) noex {
-    cint rs = storebuf_strw(bufp,bufl,idx,sp,sl) ;
-    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    int		rs ;
+    if ((rs = idx) >= 0) {
+        if ((rs = storebuf_strw(bufp,bufl,idx,sp,sl)) >= 0) {
+            idx += rs ;
+	} else {
+	    idx = rs ;
+	}
+    } /* end if (ok) */
     return rs ;
 } /* end method */
 
 int storebuf::str(cchar *sp) noex {
-    cint rs = storebuf_str(bufp,bufl,idx,sp) ;
-    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    int		rs ;
+    if ((rs = idx) >= 0) {
+        if ((rs = storebuf_str(bufp,bufl,idx,sp)) >= 0) {
+            idx += rs ;
+	} else {
+	    idx = rs ;
+	}
+    } /* end if (ok) */
     return rs ;
 } /* end method */
 
 int storebuf::buf(cchar *sp,int sl) noex {
-    cint rs = storebuf_buf(bufp,bufl,idx,sp,sl) ;
-    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    int		rs ;
+    if ((rs = idx) >= 0) {
+        if ((rs = storebuf_buf(bufp,bufl,idx,sp,sl)) >= 0) {
+            idx += rs ;
+	} else {
+	    idx = rs ;
+	}
+    } /* end if (ok) */
     return rs ;
 } /* end method */
 
 int storebuf::blanks(int n) noex {
-    cint rs = storebuf_blanks(bufp,bufl,idx,n) ;
-    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
+    int		rs ;
+    if ((rs = idx) >= 0) {
+        if ((rs = storebuf_blanks(bufp,bufl,idx,n)) >= 0) {
+            idx += rs ;
+	} else {
+	    idx = rs ;
+	}
+    } /* end if (ok) */
     return rs ;
 } /* end method */
+
+storebuf &storebuf::operator << (cchar *sp) noex {
+	strw(sp) ;
+	return *this ;
+}
+
+storebuf &storebuf::operator << (char ch) noex {
+	chr(ch) ;
+	return *this ;
+}
+
+template<typename T> local inline storebuf &opval(storebuf *op,T v) noex {
+	op->dec(v) ;
+	return *op ;
+} /* end subroutine-template (opval) */
+
+storebuf &storebuf::operator << (short		sv) noex {
+    	cint v = int(sv) ;
+	return opval(this,v) ;
+}
+
+storebuf &storebuf::operator << (int		v) noex {
+	return opval(this,v) ;
+}
+
+storebuf &storebuf::operator << (long		v) noex {
+	return opval(this,v) ;
+}
+
+storebuf &storebuf::operator << (longlong	v) noex {
+	return opval(this,v) ;
+}
 
 
