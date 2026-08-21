@@ -356,7 +356,7 @@ int vecstr::icount() const noex {
 /* special */
 int vecstr_add(vecstr *op,string *strp) noex {
     	return op->add(strp) ;
-}
+} /* end subroutine */
 
 void vecstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
