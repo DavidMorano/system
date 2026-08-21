@@ -82,7 +82,7 @@ extern "C" {
     typedef int (*toxc_f)(int) noex ;
     typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
     typedef int (*matxstr_f)(con mainv,cchar *,int) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
