@@ -12,20 +12,23 @@
 	This object module was originally written.
 
 	= 2016-11-06, David A­D­ Morano
-	I did some optimization for the method |sbuf_decX()| and
-	|sbuf_hexX()| to form the digits in the object buffer
-	directly rather than in a separate buffer and then copying
-	the data into the object buffer.
-
-	= 2017-11-06, David A­D­ Morano
-	I enhanced the |sbuf_hexXX()| methods using the property
-	that the length (in bytes) of the result is known ahead of
-	time.  We cannot do this (really quickly) with decimal
-	conversions.
+	I did some optimization for the methods:
+       		|sbuf_binX()|
+       		|sbuf_octX()|
+       		|sbuf_decX()|
+		|sbuf_hexX()| 
+	to form the digits in the object buffer directly rather
+	than in a separate buffer and then copying the data into
+	the object buffer.  If there is not enough space left
+	in the object buffer, a separate buffer is used and then
+	(attempted to be) copied into the objext buffer.  The code
+	for these methods above are actually in a template 
+	(|sbuf_xxxx()|) so the modification is only really in one
+	place.
 
 */
 
-/* Copyright © 1998,2016,2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2016 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -74,7 +77,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
-import uconstants ;
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -104,8 +107,8 @@ template<typename T> using ctxxx_f = int (*)(char *,int,T) noex ;
 
 namespace {
     struct blanker {
-	cint	l = clenstr(sysword.w_blanks) ;
-	cchar	*p = sysword.w_blanks ;
+	cchar	*p	= sysword.w_blanks ;
+	cint	l	= clenstr(sysword.w_blanks) ;
     } ; /* end struct (blanker) */
 } /* end namespace */
 
@@ -115,22 +118,19 @@ namespace {
 local int	sbuf_addstrw(sbuf *,cchar *,int) noex ;
 
 template<typename T>
-local inline int sbuf_xxxx(sbuf *op,ctxxx_f<T> ctxxx,T v) noex {
-	cint		dlen = DIGBUFLEN ;
+local inline int sbuf_xxxx(sbuf *op,int dlen,ctxxx_f<T> ctxxx,T v) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op) ylikely {
 	    if ((rs = SBUF_INDEX) >= 0) ylikely {
-	        cint		bl = (SBUF_RLEN - SBUF_INDEX) ;
-	        if (bl >= dlen) {
-	            char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
+	        if (cint  bl = (SBUF_RLEN - SBUF_INDEX) ; bl >= dlen) {
+	            charp bp = (SBUF_RBUF + SBUF_INDEX) ;
 	            if ((rs = ctxxx(bp,bl,v)) >= 0) {
 		        SBUF_INDEX += rs ;
 		        len = rs ;
 	            }
 	        } else {
-	            char	dbuf[dlen+1] ;
-	            if ((rs = ctxxx(dbuf,dlen,v)) >= 0) {
+	            if (char dbuf[dlen+1] ; (rs = ctxxx(dbuf,dlen,v)) >= 0) {
 	                len = rs ;
 	                rs = sbuf_addstrw(op,dbuf,len) ;
 	            }
@@ -142,22 +142,26 @@ local inline int sbuf_xxxx(sbuf *op,ctxxx_f<T> ctxxx,T v) noex {
 
 template<typename T>
 local inline int sbuf_binx(sbuf *op,T v) noex {
-	return sbuf_xxxx(op,ctbin,v) ;
+    	cint dlen = BINBUFLEN ;
+	return sbuf_xxxx(op,dlen,ctbin,v) ;
 } /* end subroutine-template (sbuf_binx) */
 
 template<typename T>
 local inline int sbuf_octx(sbuf *op,T v) noex {
-	return sbuf_xxxx(op,ctoct,v) ;
+    	cint dlen = OCTBUFLEN ;
+	return sbuf_xxxx(op,dlen,ctoct,v) ;
 } /* end subroutine-template (sbuf_octx) */
 
 template<typename T>
 local inline int sbuf_decx(sbuf *op,T v) noex {
-	return sbuf_xxxx(op,ctdec,v) ;
+    	cint dlen = DECBUFLEN ;
+	return sbuf_xxxx(op,dlen,ctdec,v) ;
 } /* end subroutine-template (sbuf_decx) */
 
 template<typename T>
 local inline int sbuf_hexx(sbuf *op,T v) noex {
-	return sbuf_xxxx(op,cthex,v) ;
+    	cint dlen = HEXBUFLEN ;
+	return sbuf_xxxx(op,dlen,cthex,v) ;
 } /* end subroutine-template (sbuf_hexx) */
 
 
@@ -382,9 +386,9 @@ int sbuf_hexuc(sbuf *op,uchar v) noex {
 	if (op) ylikely {
 	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 		cint	bl = (SBUF_RLEN - SBUF_INDEX) ;
+	        charp	bp = (SBUF_RBUF + SBUF_INDEX) ;
 		rs = SR_OVERFLOW ;
 	        if (bl >= hlen) ylikely {
-	            char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
 	            if ((rs = cthexuc(bp,bl,v)) >= 0) ylikely {
 		        SBUF_INDEX += rs ;
 		        len = rs ;
@@ -415,7 +419,7 @@ int sbuf_chr(sbuf *op,int ch) noex {
 	if (op) ylikely {
 	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 	        cint	bl = (SBUF_RLEN - SBUF_INDEX) ;
-	        char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
+	        charp	bp = (SBUF_RBUF + SBUF_INDEX) ;
 		rs = SR_OVERFLOW ;
 	        if (bl >= len) ylikely {
 	            *bp++ = charconv(ch) ;
@@ -431,20 +435,20 @@ int sbuf_chr(sbuf *op,int ch) noex {
 } /* end subroutine (sbuf_chr) */
 
 /* store a character (n-times) */
-int sbuf_chrs(sbuf *op,int ch,int len) noex {
+int sbuf_chrs(sbuf *op,int ch,int n) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 		rs = SR_INVALID ;
-		if (len >= 0) ylikely {
+		if (n >= 0) ylikely {
 		    cint	bl = (SBUF_RLEN - SBUF_INDEX) ;
-		    char	*bp = (SBUF_RBUF + SBUF_INDEX) ;
+		    charp	bp = (SBUF_RBUF + SBUF_INDEX) ;
 		    rs = SR_OVERFLOW ;
-	            if (bl >= len) ylikely {
-	                for (int i = 0 ; i < len ; i += 1) {
+	            if (bl >= n) ylikely {
+	                for (int i = 0 ; i < n ; i += 1) {
 		            *bp++ = charconv(ch) ;
-	                }
-	                SBUF_INDEX += len ;
+	                } /* end for */
+	                SBUF_INDEX += n ;
 	                rs = SR_OK ;
 	                *bp = '\0' ;
 	            } else {
@@ -453,7 +457,7 @@ int sbuf_chrs(sbuf *op,int ch,int len) noex {
 		} /* end if (valid) */
 	   } /* end if (not in error-mode) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
+	return (rs >= 0) ? n : rs ;
 } /* end subroutine (sbuf_chrs) */
 
 int sbuf_blanks(sbuf *op,int n) noex {
@@ -480,9 +484,9 @@ int sbuf_vprintf(sbuf *op,cchar *fmt,va_list ap) noex {
 	    rs = SR_INVALID ;
 	    if (fmt[0]) ylikely {
 	        if ((rs = SBUF_INDEX) >= 0) ylikely {
-	            cint	fm = 0x01 ; /* *will* error out on overflow! */
+	            cint	fm = 0 ; /* *will* error out on overflow! */
 	            cint	dl = (SBUF_RLEN - SBUF_INDEX) ;
-	            char	*dp = (SBUF_RBUF + SBUF_INDEX) ;
+	            charp	dp = (SBUF_RBUF + SBUF_INDEX) ;
 	            if ((rs = fmtstr(dp,dl,fm,fmt,ap)) >= 0) ylikely {
 	                len = rs ;
 		        SBUF_INDEX += len ;
@@ -513,7 +517,9 @@ int sbuf_adv(sbuf *op,int adv,char **dpp) noex {
 	    if (dpp) *dpp = nullptr ;
 	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 	        if ((SBUF_RLEN - SBUF_INDEX) >= adv) {
-		    if (dpp != nullptr) *dpp = (SBUF_RBUF + SBUF_INDEX) ;
+		    if (dpp) {
+			*dpp = (SBUF_RBUF + SBUF_INDEX) ;
+		    }
 		    SBUF_INDEX += adv ;
 	        } else {
 		    rs = SR_TOOBIG ;
@@ -528,7 +534,7 @@ int sbuf_rem(sbuf *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = SBUF_INDEX) >= 0) ylikely {
-	        rs = (SBUF_RLEN-SBUF_INDEX) ;
+	        rs = (SBUF_RLEN - SBUF_INDEX) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
