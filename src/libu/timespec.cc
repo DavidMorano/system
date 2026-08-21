@@ -38,12 +38,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>			/* |TIMESPEC| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD |TIMESPEC| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"timespec.h"
 
@@ -79,7 +79,7 @@ const int	onebillion = INTBILLION ;
 
 int timespec_load(TIMESPEC *tsp,time_t sec,long nsec) noex {
 	int		rs = SR_FAULT ;
-	if (tsp) {
+	if (tsp) ylikely {
 	    rs = SR_OK ;
 	    while (nsec >= onebillion) {
 	        sec += 1 ;
@@ -89,7 +89,6 @@ int timespec_load(TIMESPEC *tsp,time_t sec,long nsec) noex {
 	    tsp->tv_nsec = nsec ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (timespec_load) */
+} /* end subroutine (timespec_load) */
 
 
