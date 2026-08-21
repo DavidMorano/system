@@ -71,11 +71,9 @@
 #include	<expcook.h>
 #include	<fibonacci.h>
 #include	<field.h>
-#include	<filegrp.h>
-#include	<filemap.h>
+#include	<filex.h>
 #include	<filer.h>
-#include	<findfilepath.h>
-#include	<findxfile.h>
+#include	<find.h>
 #include	<format.h>
 #include	<fsdir.h>
 #include	<fsdirtree.h>
