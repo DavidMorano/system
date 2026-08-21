@@ -95,7 +95,7 @@ import ureserve ;			/* |ischarx(3u)| */
 
 extern "C" {
     typedef bool (*isclass_f)(int) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
