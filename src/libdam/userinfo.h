@@ -46,7 +46,7 @@ struct userinfo_head {
 	cchar		*organization ;	/* GECOS organization */
 	cchar		*gecosname ;	/* GECOS name */
 	cchar		*account ;	/* GECOS account */
-	cchar		*bin ;		/* GECOS printer-bin */
+	cchar		*prbin ;	/* GECOS printer-bin */
 	cchar		*office ;	/* GECOS office */
 	cchar		*wphone ;	/* GECOS work-phone */
 	cchar		*hphone ;	/* GECOS home-phone */
@@ -99,8 +99,8 @@ struct userinfo : userinfo_head {
 	userinfo_cos	start ;
 	userinfo_co	finish ;
 	userinfo() noex {
-	    start(this) ;
-	    finish(this,userinfomem_finish) ;
+	    start	(this) ;
+	    finish	(this,userinfomem_finish) ;
 	    magval = 0 ;
 	} ; /* end ctor */
 	userinfo(const userinfo &) = delete ;
