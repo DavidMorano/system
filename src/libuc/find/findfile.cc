@@ -56,12 +56,10 @@
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
 #include	<ids.h>			/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
-#include	<storebuf.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<path.h>		/* LIBUC */
 #include	<rmx.h>			/* LIBUC |rmslashes)3uc)| */
 #include	<permx.h>		/* LIBUC */
-#include	<hasx.h>		/* LIBUC |hasneedslash(3uc)| */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
