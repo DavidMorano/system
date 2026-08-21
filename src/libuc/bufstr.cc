@@ -81,8 +81,7 @@ template<typename T> using ctxxx_f = int (*)(char *,int,T) noex ;
 local int	bufstr_extend(bufstr *,int,char ** = nullptr) noex ;
 
 template<typename T>
-local inline int bufstr_xxxx(bufstr *op,ctxxx_f<T> ctxxx,T v) noex {
-	cint		dlen = DIGBUFLEN ;
+local inline int bufstr_xxxx(bufstr *op,int dlen,ctxxx_f<T> ctxxx,T v) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op) ylikely {
@@ -98,22 +97,26 @@ local inline int bufstr_xxxx(bufstr *op,ctxxx_f<T> ctxxx,T v) noex {
 
 template<typename T>
 local inline int bufstr_binx(bufstr *sbp,T v) noex {
-	return bufstr_xxxx(sbp,ctbin,v) ;
+    	cint dlen = BINBUFLEN ;
+	return bufstr_xxxx(sbp,dlen,ctbin,v) ;
 } /* end subroutine-template (bufstr_binx) */
 
 template<typename T>
 local inline int bufstr_octx(bufstr *sbp,T v) noex {
-	return bufstr_xxxx(sbp,ctoct,v) ;
+    	cint dlen = OCTBUFLEN ;
+	return bufstr_xxxx(sbp,dlen,ctoct,v) ;
 } /* end subroutine-template (bufstr_octx) */
 
 template<typename T>
 local inline int bufstr_decx(bufstr *sbp,T v) noex {
-	return bufstr_xxxx(sbp,ctdec,v) ;
+    	cint dlen = DECBUFLEN ;
+	return bufstr_xxxx(sbp,dlen,ctdec,v) ;
 } /* end subroutine-template (bufstr_decx) */
 
 template<typename T>
 local inline int bufstr_hexx(bufstr *sbp,T v) noex {
-	return bufstr_xxxx(sbp,cthex,v) ;
+    	cint dlen = HEXBUFLEN ;
+	return bufstr_xxxx(sbp,dlen,cthex,v) ;
 } /* end subroutine-template (bufstr_hexx) */
 
 
