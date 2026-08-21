@@ -59,11 +59,9 @@
 #include	<getpwd.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<strlibval.hh>		/* LIBUC */
-#include	<storebuf.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<permx.h>		/* LIBUC */
-#include	<hasx.h>		/* LIBUC |hasneedslash(3uc)| */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
