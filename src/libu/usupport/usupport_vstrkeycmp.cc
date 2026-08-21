@@ -80,7 +80,7 @@ typedef vstrorders	vo ;
 
 extern "C" {
     typedef int (*strxcmp_f)(cchar *,cchar *) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
