@@ -104,7 +104,7 @@ longlong llceil(longlong v,int m) noex {
 
 off_t ofceil(off_t v,int m) noex {
 	return xceil(v,m) ;
-}
+} /* end subroutine */
 
 intptr_t ipceil(intptr_t v,int m) noex {
 	return xceil(v,m) ;
@@ -125,7 +125,7 @@ ulonglong ullceil(ulonglong v,int m) noex {
 
 size_t szceil(size_t v,int m) noex {
 	return xceil(v,m) ;
-}
+} /* end subroutine */
 
 uintptr_t uipceil(uintptr_t v,int m) noex {
 	return xceil(v,m) ;
