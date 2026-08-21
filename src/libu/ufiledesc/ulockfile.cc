@@ -133,18 +133,18 @@ constexpr bool		f_oldunixbug = CF_OLDUNIXBUG ;
 
 #ifdef	COMMENT
 constexpr lockcmd	cmdlu[] = {
-	{ F_ULOCK, "unlock" },
-	{ F_LOCK, "lock" },
-	{ F_TLOCK, "tlock" },
-	{ F_TEST, "test" },
-	{ F_RLOCK, "rlock" },
-	{ F_WLOCK, "wlock" },
-	{ F_TRLOCK, "trlock" },
-	{ F_TWLOCK, "twlock" },
-	{ F_RTEST, "rtest" },
-	{ F_WTEST, "wtest" },
-	{ 0, NULL }
-} ;
+	{ F_ULOCK,	"unlock" },
+	{ F_LOCK,	"lock" },
+	{ F_TLOCK,	"tlock" },
+	{ F_TEST,	"test" },
+	{ F_RLOCK,	"rlock" },
+	{ F_WLOCK,	"wlock" },
+	{ F_TRLOCK,	"trlock" },
+	{ F_TWLOCK,	"twlock" },
+	{ F_RTEST,	"rtest" },
+	{ F_WTEST,	"wtest" },
+	{ 0,		nullptr }
+} ; /* end array */
 #endif /* COMMENT */
 
 
@@ -211,8 +211,7 @@ int u_lockfile(int fd,int cmd,off_t start,off_t sz,int to) noex {
 	    }
 	} /* end if_constexpr (f_oldunixbug) */
 	return rs ;
-}
-/* end subroutine (u_lockfile) */
+} /* end subroutine (u_lockfile) */
 
 
 /* local subroutines */
