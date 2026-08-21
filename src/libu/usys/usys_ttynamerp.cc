@@ -68,14 +68,14 @@ errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	    ec = errno ;
 	}
 	return ec ;
-}
+} /* end */
 
 #else /* all other operatring systems at this time */
 
 errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	csize		rsize = size_t(rlen) ;
 	return ttyname_r(fd,rbuf,rsize) ;
-}
+} /* end */
 
 #endif /* which OS */
 
@@ -108,7 +108,7 @@ errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	    ec = EBADF ;
 	}
 	return ec ;
-}
+} /* end */
 
 #endif /* defined(SYSHAS_TTYNAMER) && (SYSHAS_TTYNAMER > 0) */
 /* TTYNAMER end */
