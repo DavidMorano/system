@@ -71,7 +71,7 @@ using libu::chtofc ;			/* subroutine */
 
 extern "C" {
     typedef char (*chtoxc_f)(int) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
@@ -106,18 +106,18 @@ local char *strncpyxc(chtoxc_f chtoxc,char *dst,cchar *src,int n) noex {
 
 char *strncpybc(char *dst,cchar *src,int n) noex {
 	return strncpyxc(chtobc,dst,src,n) ;
-}
+} /* end */
 
 char *strncpylc(char *dst,cchar *src,int n) noex {
 	return strncpyxc(chtolc,dst,src,n) ;
-}
+} /* end */
 
 char *strncpyuc(char *dst,cchar *src,int n) noex {
 	return strncpyxc(chtouc,dst,src,n) ;
-}
+} /* end */
 
 char *strncpyfc(char *dst,cchar *src,int n) noex {
 	return strncpyxc(chtofc,dst,src,n) ;
-}
+} /* end */
 
 
