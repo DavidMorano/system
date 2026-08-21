@@ -93,7 +93,7 @@ using libu::ufiledescbase ;		/* type */
 
 extern "C" {
     extern int u_poll(POLLFD *,int,int) noex ;
-}
+} /* end extern */
 
 
 /* external variables */
@@ -150,8 +150,7 @@ int u_connect(int s,cvoid *vsap,int sal) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (connsub) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (u_connect) */
+} /* end subroutine (u_connect) */
 
 
 /* local subroutines */
@@ -165,8 +164,7 @@ local int connsub_start(CS *cip,int fd,SOCKADDR *sap,int sal) noex {
 	    cip->sal = sal ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (connsub_start) */
+} /* end subroutine (connsub_start) */
 
 local int connsub_finish(CS *cip) noex {
 	int		rs = SR_FAULT ;
@@ -174,8 +172,7 @@ local int connsub_finish(CS *cip) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (connsub_finish) */
+} /* end subroutine (connsub_finish) */
 
 local int connsub_checkblock(CS *cip) noex {
 	int		rs = SR_OK ;
@@ -184,25 +181,28 @@ local int connsub_checkblock(CS *cip) noex {
 	    if ((rs = u_fcntl(cip->fd,F_GETFL,0)) >= 0) {
 	        if (rs & O_NONBLOCK) cip->fl.nonblock = true ;
 	        if (rs & O_NDELAY) cip->fl.ndelay = true ;
-		cip->fl.blocking = ((! cip->fl.nonblock) && (! cip->fl.ndelay)) ;
-	    }
+		{
+		    bool f = true ;
+		    f = f && (! cip->fl.nonblock) ;
+		    f = f && (! cip->fl.ndelay) ;
+		    cip->fl.blocking = f ;
+		}
+	    } /* end if (u_fcntl) */
 	} /* end if (block check) */
 	return rs ;
-}
-/* end subroutine (connsub_checkblock) */
+} /* end subroutine (connsub_checkblock) */
 
 local int connsub_proc(CS *cip) noex {
+	CSOCKADDR	*sap = (SOCKADDR *) cip->sap ;
 	cint		sal = cip->sal ;
 	cint		s = cip->fd ;
 	int		rs ;
-	CSOCKADDR	*sap = (SOCKADDR *) cip->sap ;
 	int		to_nobufs = utimeout[uto_nobufs] ;
 	int		to_nosr = utimeout[uto_nosr] ;
 	bool		f_exit = false ;
-
 	repeat {
 	    if ((rs = connect(s,sap,sal)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	        switch (rs) {
 	        case SR_NOBUFS:
 	            if (to_nobufs-- > 0) {
@@ -264,12 +264,9 @@ local int connsub_proc(CS *cip) noex {
 	            break ;
 	        } /* end switch */
 	    } /* end if (error) */
-	} 
-	until ((rs >= 0) || f_exit) ;
-
+	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (connsub_proc) */
+} /* end subroutine (connsub_proc) */
 
 local int connsub_wait(CS *cip,int to) noex {
 	POLLFD		fds[2] = {} ;
@@ -279,21 +276,16 @@ local int connsub_wait(CS *cip,int to) noex {
 	int		rs = SR_OK ;
 	int		nfds ;
 	bool		f_done = false ;
-
 	ti_end = (ti_start + to) ;
-
 	nfds = 0 ;
 	fds[nfds].fd = cip->fd ;
 	fds[nfds].events = POLLOUT ;
 	fds[nfds].revents = 0 ;
 	nfds += 1 ;
 	fds[nfds].fd = -1 ;
-
 	while ((rs >= 0) && (ti_now < ti_end)) {
-
 	    if ((rs = u_poll(fds,nfds,POLLTIMEOUT)) > 0) {
 	        cint	re = fds[0].revents ;
-
 	        if (re & POLLOUT) {
 		    f_done = true ;
 	        } else if (re & POLLHUP) {
@@ -311,13 +303,10 @@ local int connsub_wait(CS *cip,int to) noex {
 	    ti_now = time(nullptr) ;
 	    if (rs < 0) break ;
 	} /* end while (loop timeout) */
-
 	if ((rs >= 0) && (ti_now >= ti_end)) {
 	    rs = SR_TIMEDOUT ;
 	}
-
 	return rs ;
-}
-/* end subroutine (connsub_wait) */
+} /* end subroutine (connsub_wait) */
 
 
