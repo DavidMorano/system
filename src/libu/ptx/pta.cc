@@ -307,15 +307,15 @@ int pta_setstack(pta *op,void *saddr,size_t ssize) noex {
 
 int pta::setguardsize(size_t sz) noex {
     	return pta_setguardsize(this,sz) ;
-}
+} /* end method */
 
 int pta::setstackaddr(void *sa) noex {
     	return pta_setstackaddr(this,sa) ;
-}
+} /* end method */
 
 int pta::setstacksize(size_t sz) noex {
     	return pta_setstacksize(this,sz) ;
-}
+} /* end method */
 
 void pta::dtor() noex {
 	if (cint rs = pta_destroy(this) ; rs < 0) {
