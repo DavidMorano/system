@@ -26,20 +26,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>		/* |intptr_t| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<utimeout.h>
-#include	<errtimer.hh>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |intptr_t| */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<utimeout.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
 
 #include	"usyscallbase.hh"
 
@@ -60,7 +58,7 @@ using namespace	libu ;			/* namespace */
 extern "C" {
     extern int	u_poll(POLLFD *,int,int) noex ;
     extern int	msleep(int) noex ;
-}
+} /* end extern */
 
 
 /* external variables */
@@ -95,66 +93,65 @@ int usyscallbase::handler() noex {
 	reterr		r ;
 	int		to_closewait	= utimeout[uto_closewait] ;
 	int		rs ;
-	    repeat {
-	        if ((rs = callstd()) < 0) {
-		    r(rs) ;			/* <- default causes exit */
-                    switch (rs) {
-                    case SR_AGAIN:
-                        r = to_again(rs) ;
-                        break ;
-                    case SR_BUSY:
-                        r = to_busy(rs) ;
-                        break ;
-                    case SR_NOMEM:
-                        r = to_nomem(rs) ;
-                        break ;
-                    case SR_NOSPC:
-                        r = to_nospc(rs) ;
-		        break ;
-	            case SR_NOSR:
-                        r = to_nosr(rs) ;
-		        break ;
-	            case SR_NOBUFS:
-	                r = to_nobufs(rs) ;
-	                break ;
-                    case SR_MFILE:
-                        r = to_mfile(rs) ;
-                        break ;
-                    case SR_NFILE:
-                        r = to_nfile(rs) ;
-                        break ;
-	            case SR_NOLCK:
-                        r = to_nolck(rs) ;
-		        break ;
-	            case SR_DQUOT:
-                        r = to_dquot(rs) ;
-		        break ;
-	            case SR_IO:
-                        r = to_io(rs) ;
-		        break ;
-		    case SR_INPROGRESS: /* who thought up this? */
-		        if (f.fclose) {
-		            rs = msleep(to_closewait * 1000) ;
-		        }
-		        break ;
-                    case SR_INTR:
-			if (f.fwrite) {
-			    if ((rs = uwrcheck()) >= 0) {
-				r(false) ;
-			    } else {
-				r(rs) ;
-			    }
-			} else if (! f.fintr) {
-			    r(false) ;
-		        }
-                        break ;
-                    } /* end switch */
-		    rs = r ;
-                } /* end if (callstd) */
-	    } until ((rs >= 0) || r.fexit) ;
+        repeat {
+            if ((rs = callstd()) < 0) {
+                r(rs) ;                     /* <- default causes exit */
+                switch (rs) {
+                case SR_AGAIN:
+                    r = to_again(rs) ;
+                    break ;
+                case SR_BUSY:
+                    r = to_busy(rs) ;
+                    break ;
+                case SR_NOMEM:
+                    r = to_nomem(rs) ;
+                    break ;
+                case SR_NOSPC:
+                    r = to_nospc(rs) ;
+                    break ;
+                case SR_NOSR:
+                    r = to_nosr(rs) ;
+                    break ;
+                case SR_NOBUFS:
+                    r = to_nobufs(rs) ;
+                    break ;
+                case SR_MFILE:
+                    r = to_mfile(rs) ;
+                    break ;
+                case SR_NFILE:
+                    r = to_nfile(rs) ;
+                    break ;
+                case SR_NOLCK:
+                    r = to_nolck(rs) ;
+                    break ;
+                case SR_DQUOT:
+                    r = to_dquot(rs) ;
+                    break ;
+                case SR_IO:
+                    r = to_io(rs) ;
+                    break ;
+                case SR_INPROGRESS: /* who thought up this? */
+                    if (f.fclose) {
+                        rs = msleep(to_closewait * 1000) ;
+                    }
+                    break ;
+                case SR_INTR:
+                    if (f.fwrite) {
+                        if ((rs = uwrcheck()) >= 0) {
+                            r(false) ;
+                        } else {
+                            r(rs) ;
+                        }
+                    } else if (! f.fintr) {
+                        r(false) ;
+                    }
+                    break ;
+                } /* end switch */
+                rs = r ;
+            } /* end if (callstd) */
+        } until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end method (usyscallbase::operator) */
+} /* end method (usyscallbase::operator) */
 
 int usyscallbase::uwrcheck() noex {
 	POLLFD		fds[1] = {} ;
@@ -172,7 +169,6 @@ int usyscallbase::uwrcheck() noex {
 	    }
 	} /* end if (we had some poll results) */
 	return rs ;
-}
-/* end method (usyscallbase::uwrcheck) */
+} /* end method (usyscallbase::uwrcheck) */
 
 
