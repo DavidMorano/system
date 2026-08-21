@@ -89,20 +89,20 @@ export {
     template<> const int	vsmax<int> 		= INT_MAX ;
     template<> const long	vsmax<long> 		= LONG_MAX ;
     template<> const longlong	vsmax<longlong> 	= LONGLONG_MAX ;
-}
+} /* end export */
 
 export {
     template<typename T> const T	vsmin = 0 ;
     template<> const int	vsmin<int> 		= INT_MIN ;
     template<> const long	vsmin<long> 		= LONG_MIN ;
     template<> const longlong	vsmin<longlong> 	= LONGLONG_MIN ;
-}
+} /* end export */
 
 export {
     template<typename T> const T	vumax = 0 ;
     template<> const uint	vumax<uint> 		= UINT_MAX ;
     template<> const ulong	vumax<ulong> 		= ULONG_MAX ;
     template<> const ulonglong	vumax<ulonglong>	= ULONGLONG_MAX ;
-}
+} /* end export */
 
 
