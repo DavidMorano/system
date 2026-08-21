@@ -34,7 +34,7 @@ module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<bitset>		/* C++STD <- the money shot! */
 #include	<clanguage.h>		/* LIBU */
@@ -178,8 +178,7 @@ bool isalphalatin(int ch) noex {
 	    f = ischarx_data.isalpha[ch] ;
 	}
 	return f ;
-}
-/* end subroutine (isalphalatin) */
+} /* end subroutine (isalphalatin) */
 
 bool isalnumlatin(int ch) noex {
 	bool		f = false ;
@@ -187,8 +186,7 @@ bool isalnumlatin(int ch) noex {
 	    f = ischarx_data.isalnum[ch] ;
 	}
 	return f ;
-}
-/* end subroutine (isalnumlatin) */
+} /* end subroutine (isalnumlatin) */
 
 bool isdigexlatin(int ch) noex {
 	bool		f = false ;
@@ -196,8 +194,7 @@ bool isdigexlatin(int ch) noex {
 	    f = ischarx_data.isdigex[ch] ;
 	}
 	return f ;
-}
-/* end subroutine (isdigexlatin) */
+} /* end subroutine (isdigexlatin) */
 
 bool iswhitelatin(int ch) noex {
 	bool		f = false ;
@@ -205,8 +202,7 @@ bool iswhitelatin(int ch) noex {
 	    f = char_iswhite(ch) ;
 	}
 	return f ;
-}
-/* end subroutine (iswhitelatin) */
+} /* end subroutine (iswhitelatin) */
 
 bool islowerlatin(int ch) noex {
 	bool		f = false ;
@@ -214,8 +210,7 @@ bool islowerlatin(int ch) noex {
 	    f = char_islc(ch) ;
 	}
 	return f ;
-}
-/* end subroutine (islowerlatin) */
+} /* end subroutine (islowerlatin) */
 
 bool isupperlatin(int ch) noex {
 	bool		f = false ;
@@ -223,8 +218,7 @@ bool isupperlatin(int ch) noex {
 	    f = char_isuc(ch) ;
 	}
 	return f ;
-}
-/* end subroutine (isupperlatin) */
+} /* end subroutine (isupperlatin) */
 
 bool isprintlatin(int ch) noex {
 	bool		f = false ;
@@ -232,8 +226,7 @@ bool isprintlatin(int ch) noex {
 	    f = ischarx_data.isprint[ch] ;
 	}
 	return f ;
-}
-/* end subroutine (isprintlatin) */
+} /* end subroutine (isprintlatin) */
 
 bool isprintterm(int ch) noex {
 	bool		f = false ;
@@ -241,13 +234,11 @@ bool isprintterm(int ch) noex {
 	    f = ischarx_data.isterm[ch] ;
 	}
 	return f ;
-}
-/* end subroutine (isprintterm) */
+} /* end subroutine (isprintterm) */
 
 bool isprintbad(int ch) noex {
 	return (! isprintlatin(ch)) ;
-}
-/* end subroutine (isprintbad) */
+} /* end subroutine (isprintbad) */
 
 bool isdict(int ch) noex {
 	bool		f = false ;
@@ -255,8 +246,7 @@ bool isdict(int ch) noex {
 	    f = ischarx_data.isalnum[ch] || (ch == CH_SP) ;
 	}
 	return f ;
-}
-/* end subroutine (isdict) */
+} /* end subroutine (isdict) */
 
 bool iscmdstart(int ch) noex {
 	bool		f = false ;
@@ -266,12 +256,10 @@ bool iscmdstart(int ch) noex {
 	f = f || (ch == CH_SS2) ;
 	f = f || (ch == CH_SS3) ;
 	return f ;
-}
-/* end subroutine (iscmdstart) */
+} /* end subroutine (iscmdstart) */
 
 bool ishdrkey(int ch) noex {
 	return (isalnumlatin(ch) || (ch == '-') || (ch == '_')) ;
-}
-/* end subroutine (ishdrkey) */
+} /* end subroutine (ishdrkey) */
 
 
