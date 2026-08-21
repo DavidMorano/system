@@ -68,6 +68,6 @@ constexpr bool		f_debug		= CF_DEBUG ;
 export {
     template<int bits,typename Digit> 
     constexpr int ndig = ((bits / szof(Digit)) / CHAR_BIT) ;
-}
+} /* end export */
 
 
