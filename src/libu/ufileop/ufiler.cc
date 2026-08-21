@@ -87,24 +87,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/param.h>		/* standard says this is necessary */
-#include	<sys/stat.h>		/* |S_IFMT| */
-#include	<sys/xattr.h>		/* is this now ubiquitous? */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdint>		/* |uint32_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usysflag.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<sys/param.h>		/* POSIX® standard says necessary */
+#include	<sys/stat.h>		/* POSIX® |S_IFMT| */
+#include	<sys/xattr.h>		/* POSIX® is this now ubiquitous? */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |uint32_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ufiler.h"
 
@@ -127,7 +125,7 @@ using libu::ufileopbase ;		/* type */
 
 extern "C" {
     extern unixret_t rename(cchar *,cchar *) noex ;
-}
+} /* end extern */
 
 
 /* external variables */
@@ -213,14 +211,13 @@ int u_access(cchar *fname,int am) noex {
 	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = access(fname,am)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_access) */
+} /* end subroutine (u_access) */
 
 int u_chdir(cchar *fname) noex {
 	int		rs = SR_FAULT ;
@@ -229,14 +226,13 @@ int u_chdir(cchar *fname) noex {
 	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = chdir(fname)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_chdir) */
+} /* end subroutine (u_chdir) */
 
 int u_chmod(cchar *fname,mode_t m) noex {
 	int		rs = SR_FAULT ;
@@ -246,14 +242,13 @@ int u_chmod(cchar *fname,mode_t m) noex {
 	        m &= (~ S_IFMT) ;
 	        repeat {
 	            if ((rs = chmod(fname,m)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_chmod) */
+} /* end subroutine (u_chmod) */
 
 int u_chmodmin(cchar *name,mode_t m) noex {
 	int		rs = SR_FAULT ;
@@ -272,13 +267,11 @@ int u_chmodmin(cchar *name,mode_t m) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fchanged : rs ;
-}
-/* end subroutine (u_chmodmin) */
+} /* end subroutine (u_chmodmin) */
 
 int u_minmod(cchar *name,mode_t m) noex {
     	return u_chmodmin(name,m) ;
-}
-/* end subroutine (u_minmod) */
+} /* end subroutine (u_minmod) */
 
 int u_chown(cchar *fname,uid_t uid,gid_t gid) noex {
 	int		rs = SR_FAULT ;
@@ -287,25 +280,23 @@ int u_chown(cchar *fname,uid_t uid,gid_t gid) noex {
 	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = chown(fname,uid,gid)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_chmod) */
+} /* end subroutine (u_chmod) */
 
 int u_lchown(cchar *fname,uid_t uid,gid_t gid) noex {
 	int		rs ;
 	repeat {
 	    if ((rs = lchown(fname,uid,gid)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;
 	return rs ;
-}
-/* end subroutine (u_lchown) */
+} /* end subroutine (u_lchown) */
 
 int u_link(cchar *fname,cchar *dst) noex {
 	int		rs = SR_FAULT ;
@@ -314,14 +305,13 @@ int u_link(cchar *fname,cchar *dst) noex {
 	    if (fname[0] && dst[0]) ylikely {
 	        repeat {
 	            if ((rs = link(fname,dst)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_link) */
+} /* end subroutine (u_link) */
 
 int u_lstat(cchar *fname,ustat *sbp) noex {
 	int		rs = SR_FAULT ;
@@ -330,28 +320,25 @@ int u_lstat(cchar *fname,ustat *sbp) noex {
 	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = lstat(fname,sbp)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_lstat) */
+} /* end subroutine (u_lstat) */
 
 int u_mkdir(cchar *fn,mode_t fm) noex {
 	ufiler		fo(fm) ;
 	fo.m = &ufiler::imkdir ;
 	return fo(fn) ;
-}
-/* end subroutine (u_mkdir) */
+} /* end subroutine (u_mkdir) */
 
 int u_mknod(cchar *fn,mode_t fm,dev_t dev) noex {
 	ufiler		fo(fm,dev) ;
 	fo.m = &ufiler::imknod ;
 	return fo(fn) ;
-}
-/* end subroutine (u_mknod) */
+} /* end subroutine (u_mknod) */
 
 int u_pathconf(cchar *fn,int name,long *rp) noex {
 	int		rs = SR_FAULT ;
@@ -367,7 +354,7 @@ int u_pathconf(cchar *fn,int name,long *rp) noex {
                             lw = 0 ;
                         }
                     } /* end if_constexpr (f_sunos) */
-                    if (errno != 0) rs = (- errno) ;
+                    if (errno != 0) rs = (neg errno) ;
                 } /* end if (pathconf) */
                 if ((rs >= 0) && (lw >= 0)) {
                     rs = intsat(lw) ;
@@ -378,8 +365,7 @@ int u_pathconf(cchar *fn,int name,long *rp) noex {
             *rp = (rs >= 0) ? lw : 0l ;
         }
         return rs ;
-}
-/* end subroutine (u_pathconf) */
+} /* end subroutine (u_pathconf) */
 
 int u_readlink(cchar *fname,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -390,7 +376,7 @@ int u_readlink(cchar *fname,char *rbuf,int rlen) noex {
 		    cauto rl = readlink ;
 	            repeat {
 	                if (ssize_t rsize ; (rsize = rl(fname,rbuf,rlen)) < 0) {
-		            rs = (- errno) ;
+		            rs = (neg errno) ;
 	                } else {
 		            rs = intsat(rsize) ;
 	                }
@@ -404,15 +390,13 @@ int u_readlink(cchar *fname,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_readlink) */
+} /* end subroutine (u_readlink) */
 
 int u_rename(cchar *fn,cchar *dfn) noex {
 	ufiler		fo(dfn) ;
 	fo.m = &ufiler::irename ;
 	return fo(fn) ;
-}
-/* end subroutine (u_rename) */
+} /* end subroutine (u_rename) */
 
 int u_resolvepath(cchar *fname,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -427,15 +411,13 @@ int u_resolvepath(cchar *fname,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_resolvepath) */
+} /* end subroutine (u_resolvepath) */
 
 int u_rmdir(cchar *fn) noex {
 	ufiler		fo ;
 	fo.m = &ufiler::irmdir ;
 	return fo(fn) ;
-}
-/* end subroutine (u_rmdir) */
+} /* end subroutine (u_rmdir) */
 
 int u_stat(cchar *fname,ustat *sbp) noex {
 	int		rs = SR_FAULT ;
@@ -444,14 +426,13 @@ int u_stat(cchar *fname,ustat *sbp) noex {
 	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = statfile(fname,sbp)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until (rs != SR_INTR) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_stat) */
+} /* end subroutine (u_stat) */
 
 int u_statfs(cchar *fname,ustatfs *sbp) noex {
 	int		rs = SR_FAULT ;
@@ -460,14 +441,13 @@ int u_statfs(cchar *fname,ustatfs *sbp) noex {
 	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = statfilefs(fname,sbp)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until (rs != SR_INTR) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_statfs) */
+} /* end subroutine (u_statfs) */
 
 int u_statvfs(cchar *fname,ustatvfs *sbp) noex {
 	int		rs = SR_FAULT ;
@@ -476,21 +456,19 @@ int u_statvfs(cchar *fname,ustatvfs *sbp) noex {
 	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = statfilevfs(fname,sbp)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until (rs != SR_INTR) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_statvfs) */
+} /* end subroutine (u_statvfs) */
 
 int u_symlink(cchar *fn,cchar *dfn) noex {
 	ufiler		fo(dfn) ;
 	fo.m = &ufiler::isymlink ;
 	return fo(fn) ;
-}
-/* end subroutine (u_symlink) */
+} /* end subroutine (u_symlink) */
 
 int u_truncate(cchar *fname,off_t fo) noex {
 	int		rs = SR_FAULT ;
@@ -499,14 +477,13 @@ int u_truncate(cchar *fname,off_t fo) noex {
 	    if (fname[0]) {
 	        repeat {
 	            if ((rs = truncate(fname,fo)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_truncate) */
+} /* end subroutine (u_truncate) */
 
 int u_unlink(cchar *fname) noex {
 	int		rs = SR_FAULT ;
@@ -515,14 +492,13 @@ int u_unlink(cchar *fname) noex {
 	    if (fname[0]) ylikely {
 	        repeat {
 	            if ((rs = unlink(fname)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until ((rs != SR_AGAIN) && (rs != SR_INTR)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_unlink) */
+} /* end subroutine (u_unlink) */
 
 int u_xattrget(cc *fn,cc *n,void *v,size_t sz,uint32_t foff,int o) noex {
 	ufiler		fo(n,v,sz,foff,o) ;
@@ -545,75 +521,67 @@ int ufiler::imkdir(cchar *fname) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
 	        if ((rs = mkdir(fname,fm)) < 0) {
-	            rs = (- errno) ;
+	            rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ufiler::imkdir) */
+} /* end method (ufiler::imkdir) */
 
 int ufiler::imknod(cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	if ((rs = mknod(fn,fm,dev)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ufiler::umknod) */
+} /* end method (ufiler::umknod) */
 
 int ufiler::irename(cchar *fn) noex {
 	int		rs ;
 	if ((rs = rename(fn,dfn)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ufiler::irename) */
+} /* end method (ufiler::irename) */
 
 int ufiler::iresolvepath(cchar *fn) noex {
     	return std_resolvepath(fn,rbuf,rlen) ;
-}
-/* end method (ufiler::iresolvepath) */
+} /* end method (ufiler::iresolvepath) */
 
 int ufiler::irmdir(cchar *fn) noex {
 	int		rs ;
 	if ((rs = rmdir(fn)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ufiler::irmdir) */
+} /* end method (ufiler::irmdir) */
 
 int ufiler::isymlink(cchar *fn) noex {
 	int		rs ;
 	if ((rs = symlink(fn,dfn)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ufiler::isymlink) */
+} /* end method (ufiler::isymlink) */
 
 int ufiler::ixattrget(cchar *fn) noex {
 	void		*val = const_cast<voidp>(xaval) ;
 	int		rs ;
 	if (ssize_t rsize ; (rsize = getxattr(fn,xaname,val,sz,foff,oo)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    rs = intsat(rsize) ;
 	}
 	return rs ;
-}
-/* end method (ufiler::ixattrget) */
+} /* end method (ufiler::ixattrget) */
 
 int ufiler::ixattrset(cchar *fn) noex {
 	int		rs ;
 	if ((rs = setxattr(fn,xaname,xaval,sz,foff,oo)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ufiler::ixattrset) */
+} /* end method (ufiler::ixattrset) */
 
 local sysret_t std_resolvepath(cchar *fn,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -631,13 +599,12 @@ local sysret_t std_resolvepath(cchar *fn,char *rbuf,int rlen) noex {
 			    rs = SR_OVERFLOW ;
 		        }
 		    } else if (rs < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } until (rs != SR_INTR) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (std_resolvepath) */
+} /* end subroutine (std_resolvepath) */
 
 
