@@ -35,18 +35,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<numeric>		/* |sat_add(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |u_sysconfval(3u)| */
-#include	<usupport.h>		/* |um(3u)| */
-#include	<intceil.h>		/* |ceil(3u)| */
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<numeric>		/* C++STD |sat_add(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |u_sysconfval(3u)| */
+#include	<usupport.h>		/* LIBU |umem(3u)| */
+#include	<intceil.h>		/* LIBU |ceil(3u)| */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ufiledescbase.hh"
 #include	"ureadext.h"
@@ -64,7 +64,7 @@ using libu::ufiledescbase ;		/* type */
 using std::min ;			/* subroutine */
 using std::max ;			/* subroutine */
 using std::sat_add ;			/* subroutine */
-using libu::um ;			/* variable */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -74,7 +74,7 @@ using libu::um ;			/* variable */
 
 extern "C" {
     extern int u_writedesc(int,int) noex ;
-}
+} /* end extern */
 
 
 /* external variables */
@@ -111,21 +111,20 @@ int u_readextdesc(int fd,int dfd) noex {
 	int		rs1 ;
 	int		tlen = 0 ; /* return-value */
 	if ((fd >= 0) && (dfd >= 0)) ylikely {
-    	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) ylikely {
+    	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	        if ((rs = getsize(fd)) >= 0) ylikely {
 		    cint fsz = rs ;
 	            cint csz = (var.pagesz * PAGEMULT) ;
 		    {
 			size_t	tsize = 0 ;
 		        cint	clen = min(fsz,csz) ;
-	                if (char *cbuf ; (rs = um.mall(clen,&cbuf)) >= 0) {
+	                if (char *cbuf ; (rs = umem.mall(clen,&cbuf)) >= 0) {
 			    while ((rs = u_read(fd,cbuf,clen)) > 0) {
 			        rs = u_write(dfd,cbuf,rs) ;
 				tsize += size_t(rs) ;
 			        if (rs < 0) break ;
 			    } /* end while */
-			    rs1 = um.free(cbuf) ;
+			    rs1 = umem.free(cbuf) ;
 			    if (rs >= 0) rs = rs1 ;
 		        } /* end if (m-a-f) */
 			tlen = intsat(tsize) ;
@@ -134,8 +133,7 @@ int u_readextdesc(int fd,int dfd) noex {
 	    } /* end if (vars) */
 	} /* end if (valid) */
     	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (u_readextdesc) */
+} /* end subroutine (u_readextdesc) */
 
 int u_readextfile(int fd,cchar *name) noex {
     	cint		of = (O_WRONLY | O_TRUNC) ;
@@ -153,8 +151,7 @@ int u_readextfile(int fd,cchar *name) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (open-close) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (u_readextfile) */
+} /* end subroutine (u_readextfile) */
 
 
 /* local subroutines */
