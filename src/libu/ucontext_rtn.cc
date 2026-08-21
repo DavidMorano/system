@@ -32,10 +32,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ucontext.h>
-#include	<usyscalls.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
+#include	<ucontext.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -77,8 +81,7 @@ int ucontext_rtn(ucontext_t *ucp,long *rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucontext_rtn) */
+} /* end subroutine (ucontext_rtn) */
 
 #else /* defined(F_SUNOS) && (F_SUNOS > 0) */
 
@@ -91,8 +94,7 @@ int ucontext_rtn(ucontext_t *ucp,long *rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucontext_rtn) */
+} /* end subroutine (ucontext_rtn) */
 
 #endif /* defined(F_SUNOS) && (F_SUNOS > 0) */
 
