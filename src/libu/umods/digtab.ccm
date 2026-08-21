@@ -51,13 +51,13 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>		/* |MAXBASE| */
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU |MAXBASE| */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module digtab ;
 
@@ -122,7 +122,7 @@ struct digtaber {
 
 export {
     extern const digtaber	digtab ;
-}
+} /* end extern */
 
 constexpr digtaber	digtab ;
 
