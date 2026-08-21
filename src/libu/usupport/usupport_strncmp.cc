@@ -79,7 +79,7 @@ typedef cmporders	co ;
 
 extern "C" {
     typedef int (*strncmp_f)(cchar *,cchar *,int) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
