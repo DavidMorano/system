@@ -257,7 +257,7 @@ extern "C" {
     local void	uopen_atforkbefore() noex ;
     local void	uopen_atforkafter() noex ;
     local void	uopen_exit() noex ;
-}
+} /* end extern */
 
 
 /* local variables */
@@ -275,13 +275,11 @@ constexpr bool		f_debug	= CF_DEBUG ;
 
 int uopen_init() noex {
 	return uopen_data.init() ;
-}
-/* end subroutine (uopen_init) */
+} /* end subroutine (uopen_init) */
 
 int uopen_fini() noex {
 	return uopen_data.fini() ;
-}
-/* end subroutine (uopen_fini) */
+} /* end subroutine (uopen_fini) */
 
 namespace libu {
     sysret_t uopen_lockbegin() noex {
@@ -313,41 +311,39 @@ int u_openat(int dfd,cchar *fname,int of,mode_t om) noex {
 int u_creat(cchar *fname,mode_t om) noex {
 	cint		of = (O_CREAT | O_TRUNC | O_WRONLY) ;
 	return u_open(fname,of,om) ;
-}
+} /* end subroutine */
 
 int u_socket(int pf,int st,int pr) noex {
 	stdcaller	oo(pf,st,pr) ;
 	oo.m = &stdcaller::isocket ;
 	oo.flavor = flavor_single ;
 	return oo ;
-}
+} /* end subroutine */
 
 int u_accept(int fd,SOCKADDR *fromp,int *fromlenp) noex {
 	stdcaller	oo(fd,fromp,fromlenp) ;
 	oo.m = &stdcaller::iaccept ;
 	oo.flavor = flavor_single ;
 	return oo ;
-}
+} /* end subroutine */
 
 int u_acceptpass(int fd,STRRECVFD *sp,int to) noex {
 	stdcaller	oo(fd,sp,to) ;
 	oo.flavor = flavor_single ;
 	return oo ;
-}
+} /* end subroutine */
 
 int u_dup(int sfd) noex {
 	stdcaller	oo(sfd) ;
 	oo.m = &stdcaller::idup1 ;
 	return oo ;
-}
-/* end subroutine (u_dup) */
+} /* end subroutine (u_dup) */
 
 int u_dupmin(int sfd,int mfd) noex {
 	stdcaller	oo(sfd,mfd) ;
 	oo.m = &stdcaller::idupmin ;
 	return oo ;
-}
-/* end subroutine (u_dupmin) */
+} /* end subroutine (u_dupmin) */
 
 int u_dupminer(int sfd,int mfd,int of) noex {
 	stdcaller	oo(sfd,mfd) ;
@@ -355,29 +351,27 @@ int u_dupminer(int sfd,int mfd,int of) noex {
 	oo.m = &stdcaller::idupminer ;
 	if (of & O_CLOEXEC) oo.fl.closeonexec = true ;
 	return oo(np,of,0) ;
-}
-/* end subroutine (u_dupminer) */
+} /* end subroutine (u_dupminer) */
 
 int u_dupover(int sfd,int tfd) noex {
 	stdcaller	oo(sfd,tfd) ;
 	oo.m = &stdcaller::idupover ;
 	return oo ;
-}
-/* end subroutine (u_dupover) */
+} /* end subroutine (u_dupover) */
 
 int u_socketpair(int pf,int st,int pr,int *pipes) noex {
 	stdcaller	oo(pf,st,pr,pipes) ;
 	oo.m = &stdcaller::isocketpair ;
 	oo.flavor = flavor_pipes ;
 	return oo ;
-}
+} /* end subroutine */
 
 int u_pipe(int *pipes) noex {
 	stdcaller	oo(pipes) ;
 	oo.m = &stdcaller::ipipe ;
 	oo.flavor = flavor_pipes ;
 	return oo ;
-}
+} /* end subroutine */
 
 int u_pipe2(int *pipes,int of) noex {
 	cnullptr	np{} ;
@@ -385,7 +379,7 @@ int u_pipe2(int *pipes,int of) noex {
 	oo.m = &stdcaller::ipipe2 ;
 	oo.flavor = flavor_pipes ;
 	return oo(np,of,0) ;
-}
+} /* end subroutine */
 
 int u_piper(int *pipes,int of,int mfd) noex {
 	cnullptr	np{} ;
@@ -393,14 +387,14 @@ int u_piper(int *pipes,int of,int mfd) noex {
 	oo.m = &stdcaller::ipiper ;
 	oo.flavor = flavor_pipes ;
 	return oo(np,of,0) ;
-}
+} /* end subroutine */
 
 int u_close(int fd) noex {
 	cnullptr	np{} ;
 	stdcaller	oo(fd) ;
 	oo.m = &stdcaller::iclose ;
 	return oo(np,0,0) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
