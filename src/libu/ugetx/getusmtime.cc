@@ -84,10 +84,11 @@ usys_mtime		getusmtime ;
 /* local subroutines */
 
 usys_mtime::operator mtime_t () noex {
-	    return umtime() ;
-}
+	return umtime() ;
+} /* end */
+
 mtime_t usys_mtime::operator () () noex {
-	    return umtime() ;
-}
+	return umtime() ;
+} /* end */
 
 
