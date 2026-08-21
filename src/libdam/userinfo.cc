@@ -122,10 +122,6 @@ import uconstants ;			/* |sysword(3u)| */
 #define	LOGIDLEN	15		/* log ID length */
 #endif
 
-#ifndef	PROJNAMELEN
-#define	PROJNAMELEN	100		/* is this enough? */
-#endif
-
 #ifndef	WSLEN
 #define	WSLEN		15		/* weather-station (abbr) length */
 #endif
@@ -171,8 +167,6 @@ import uconstants ;			/* |sysword(3u)| */
 
 #define	UI		userinfo
 
-#define	NDF		"/tmp/userinfo.nd"
-
 
 /* imported namespaces */
 
@@ -206,7 +200,7 @@ enum uits {
 	uit_organization,
 	uit_gecosname,
 	uit_account,
-	uit_bin,
+	uit_prbin,
 	uit_office,
 	uit_wphone,
 	uit_hphone,
@@ -323,7 +317,7 @@ local int	procinfo_ualookup(PCI *,char *,int,cchar *) noex ;
 local int	procinfo_homedname(PCI *) noex ;
 local int	procinfo_shell(PCI *) noex ;
 local int	procinfo_org(PCI *) noex ;
-local int	procinfo_bin(PCI *) noex ;
+local int	procinfo_prbin(PCI *) noex ;
 local int	procinfo_office(PCI *) noex ;
 local int	procinfo_printer(PCI *) noex ;
 local int	procinfo_gecos(PCI *) noex ;
@@ -349,7 +343,7 @@ constexpr int		(*components[])(PCI *) = {
 	procinfo_homedname,
 	procinfo_shell,
 	procinfo_org,
-	procinfo_bin,
+	procinfo_prbin,
 	procinfo_office,
 	procinfo_printer,
 	procinfo_gecos,
@@ -384,7 +378,7 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	int		len = 0 ;
 	if ((rs = userinfo_ctor(uip)) >= 0) ylikely {
 	    if (static cint rsv = var.mkvars() ; (rs = rsv) >= 0) ylikely {
-		static cchar	*nn = getenv(varname.node) ;
+		static cchar	*nn = getenver(varname.node) ;
 	        uip->nodename = nn ;
 	        if ((rs = userinfo_id(uip)) >= 0) ylikely {
 	            cint	sz = (uit_overlast * szof(cchar *)) ;
@@ -515,8 +509,8 @@ local int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	                case uit_account:
 	                    vpp = &uip->account ;
 	                    break ;
-	                case uit_bin:
-	                    vpp = &uip->bin ;
+	                case uit_prbin:
+	                    vpp = &uip->prbin ;
 	                    break ;
 	                case uit_office:
 	                    vpp = &uip->office ;
@@ -676,8 +670,8 @@ local int procinfo_uabegin(PCI *pip) noex {
 	            pip->uap = (userattrdb *) vp ;
 	            pip->fl.allocua = true ;
 	        }
-	    }
-	    if (rs >= 0) {
+	    } /* end if */
+	    if (rs >= 0) ylikely {
 	        cchar	*un = pip->pw.pw_name ;
 	        if ((rs = userattrdb_open(pip->uap,un)) >= 0) {
 	            pip->fl.ua = true ;
@@ -688,7 +682,7 @@ local int procinfo_uabegin(PCI *pip) noex {
 	                pip->fl.allocua = false ;
 		    } /* end if (memory-release) */
 		    if (isNotPresent(rs)) rs = SR_OK ;
-		}
+		} /* end if */
 	    } /* end if (ok) */
 	} /* end if (f.ua) */
 	return rs ;
@@ -829,11 +823,11 @@ local int procinfo_homedname(PCI *pip) noex {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            vp = getenv(varname.home) ;
+	            vp = getenver(varname.home) ;
 	        }
 	    }
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
-	        vp = getenv(varname.tmpdir) ;
+	        vp = getenver(varname.tmpdir) ;
 	    }
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
 	        vp = sysword.w_tmpdir ;
@@ -851,13 +845,13 @@ local int procinfo_shell(PCI *pip) noex {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            vp = getenv(varname.shell) ;
+	            vp = getenver(varname.shell) ;
 	        }
 	    }
 	    if (vp && (vp[0] != '\0')) {
 	        uip->shell = vp ;
 	    }
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (procinfo_shell) */
 
@@ -876,28 +870,28 @@ local int procinfo_org(PCI *pip) noex {
 	    if (char *orgfname ; (rs = lm_mp(&orgfname)) >= 0) ylikely {
 	        if ((vp == nullptr) || (vp[0] == '\0')) {
 	            if (! pip->fl.altuser) {
-	                vp = getenv(varname.organization) ;
+	                vp = getenver(varname.organization) ;
 	            }
 	        }
 	        if ((vp == nullptr) || (vp[0] == '\0')) {
 	            char	cname[orglen+1] ;
 	            rs = sncpy2(cname,orglen,".",orgcname) ;
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                cchar	*hd = uip->homedname ;
 	                if ((hd == nullptr) && pip->fl.pw) {
 	                    hd = pip->pw.pw_dir ;
 		        }
 	                if (hd == nullptr) hd = DEFHOMEDNAME ;
 	                rs = mkpath2(orgfname,hd,cname) ;
-	            }
-	            if (rs >= 0) {
+	            } /* end if (ok) */
+	            if (rs >= 0) ylikely {
 	                rs = filereadln(orgfname,rbuf,rlen) ;
 	                vl = rs ;
 	                if (rs > 0) vp = rbuf ;
 	                if (isNotPresent(rs)) rs = SR_OK ;
-	            }
+	            } /* end if (ok) */
 	        } /* end if */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            if ((vp != nullptr) && (vp[0] != '\0')) {
 	                rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
 		    }
@@ -909,23 +903,23 @@ local int procinfo_org(PCI *pip) noex {
 	return rs ;
 } /* end subroutine (procinfo_org) */
 
-local int procinfo_bin(PCI *pip) noex {
+local int procinfo_prbin(PCI *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
-	int		uit = uit_bin ;
-	if ((pip->sis[uit] == 0) && (uip->bin == nullptr)) {
+	int		uit = uit_prbin ;
+	if ((pip->sis[uit] == 0) && (uip->prbin == nullptr)) {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            vp = getenv(VARBIN) ;
+	            vp = getenver(VARBIN) ;
 	        }
 	    }
 	    if ((vp != nullptr) && (vp[0] != '\0')) {
-	        uip->bin = vp ;
+	        uip->prbin = vp ;
 	    }
 	}
 	return rs ;
-} /* end subroutine (procinfo_bin) */
+} /* end subroutine (procinfo_prbin) */
 
 local int procinfo_office(PCI *pip) noex {
 	userinfo	*uip = pip->uip ;
@@ -935,7 +929,7 @@ local int procinfo_office(PCI *pip) noex {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            vp = getenv(VAROFFICE) ;
+	            vp = getenver(VAROFFICE) ;
 	        }
 	    }
 	    if ((vp != nullptr) && (vp[0] != '\0')) {
@@ -953,7 +947,7 @@ local int procinfo_printer(PCI *pip) noex {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            vp = getenv(varname.printer) ;
+	            vp = getenver(varname.printer) ;
 	        }
 	    }
 	    if ((vp != nullptr) && (vp[0] != '\0')) {
@@ -965,12 +959,12 @@ local int procinfo_printer(PCI *pip) noex {
 
 /* parse out the GECOS field */
 local int procinfo_gecos(PCI *pip) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*gstr = pip->pw.pw_gecos ;
 	if (pip->fl.pw && (gstr != nullptr) && (gstr[0] != '\0')) {
-	    gecos	g ;
-	    if ((rs = gecos_start(&g,gstr,-1)) >= 0) {
+	    if (gecos g ; (rs = gecos_start(&g,gstr,-1)) >= 0) {
 	        userinfo	*uip = pip->uip ;
 	        bits		*bip = &pip->have ;
 	        for (int i = 0 ; i < gecosval_overlast ; i += 1) {
@@ -982,14 +976,14 @@ local int procinfo_gecos(PCI *pip) noex {
 	                case gecosval_organization:
 	                    uit = uit_organization ;
 	                    up = uip->organization ;
-	                    if ((bits_test(bip,uit) > 0) || (up != nullptr)) {
+	                    if ((bits_test(bip,uit) > 0) || (up != np)) {
 	                        vp = nullptr ;
 			    }
 	                    break ;
 	                case gecosval_realname:
 	                    uit = uit_gecosname ;
 	                    up = uip->gecosname ;
-	                    if ((bits_test(bip,uit) == 0) && (up == nullptr)) {
+	                    if ((bits_test(bip,uit) == 0) && (up == np)) {
 	                        char	*nbuf ;
 	                        if ((rs = lm_mall((vl+1),&nbuf)) >= 0) {
 	                            if (strnchr(vp,vl,'_') != nullptr) {
@@ -1016,42 +1010,42 @@ local int procinfo_gecos(PCI *pip) noex {
 	                case gecosval_account:
 	                    uit = uit_account ;
 	                    up = uip->account ;
-	                    if ((bits_test(bip,uit) > 0) || (up != nullptr)) {
+	                    if ((bits_test(bip,uit) > 0) || (up != np)) {
 	                        vp = nullptr ;
 			    }
 	                    break ;
-	                case gecosval_bin:
-	                    uit = uit_bin ;
-	                    up = uip->bin ;
-	                    if ((bits_test(bip,uit) > 0) || (up != nullptr)) {
+	                case gecosval_prbin:
+	                    uit = uit_prbin ;
+	                    up = uip->prbin ;
+	                    if ((bits_test(bip,uit) > 0) || (up != np)) {
 	                        vp = nullptr ;
 			    }
 	                    break ;
 	                case gecosval_office:
 	                    uit = uit_office ;
 	                    up = uip->office ;
-	                    if ((bits_test(bip,uit) > 0) || (up != nullptr)) {
+	                    if ((bits_test(bip,uit) > 0) || (up != np)) {
 	                        vp = nullptr ;
 			    }
 	                    break ;
 	                case gecosval_wphone:
 	                    uit = uit_wphone ;
 	                    up = uip->hphone ;
-	                    if ((bits_test(bip,uit) > 0) || (up != nullptr)) {
+	                    if ((bits_test(bip,uit) > 0) || (up != np)) {
 	                        vp = nullptr ;
 			    }
 	                    break ;
 	                case gecosval_hphone:
 	                    uit = uit_hphone ;
 	                    up = uip->hphone ;
-	                    if ((bits_test(bip,uit) > 0) || (up != nullptr)) {
+	                    if ((bits_test(bip,uit) > 0) || (up != np)) {
 	                        vp = nullptr ;
 			    }
 	                    break ;
 	                case gecosval_printer:
 	                    uit = uit_printer ;
 	                    up = uip->printer ;
-	                    if ((bits_test(bip,uit) > 0) || (up != nullptr)) {
+	                    if ((bits_test(bip,uit) > 0) || (up != np)) {
 	                        vp = nullptr ;
 			    }
 	                    break ;
@@ -1059,8 +1053,8 @@ local int procinfo_gecos(PCI *pip) noex {
 	                    vp = nullptr ;
 	                    break ;
 	                } /* end switch */
-	                if ((rs >= 0) && (vp != nullptr)) {
-	                    rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
+	                if ((rs >= 0) && (vp != np)) {
+	                    rs = procinfo_store(pip,uit,vp,vl,np) ;
 	                }
 	            } /* end if */
 	            if (rs < 0) break ;
@@ -1102,7 +1096,7 @@ local int procinfo_realname(PCI *pip) noex {
 	    char	nbuf[REALNAMELEN+1] ;
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            sp = getenv(varname.name) ;
+	            sp = getenver(varname.name) ;
 	        }
 	    }
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
@@ -1135,7 +1129,7 @@ local int procinfo_mailname(PCI *pip) noex {
 	    char	mbuf[REALNAMELEN+1] ;
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            sp = getenv(varname.mailname) ;
+	            sp = getenver(varname.mailname) ;
 	        }
 	    }
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
@@ -1150,7 +1144,7 @@ local int procinfo_mailname(PCI *pip) noex {
 	    }
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            sp = getenv(varname.name) ;
+	            sp = getenver(varname.name) ;
 		    sl = -1 ;
 	        }
 	    }
@@ -1183,7 +1177,7 @@ local int procinfo_name(PCI *pip) noex {
 	    char	rbuf[REALNAMELEN+1] ;
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            sp = getenv(varname.name) ;
+	            sp = getenver(varname.name) ;
 	        }
 	    }
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
@@ -1220,7 +1214,7 @@ local int procinfo_fullname(PCI *pip) noex {
 	if ((pip->sis[uit] == 0) && (uip->fullname == nullptr)) {
 	    cchar	*sp = nullptr ;
 	        if (! pip->fl.altuser) {
-	            sp = getenv(varname.fullname) ;
+	            sp = getenver(varname.fullname) ;
 	        }
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
 	        uip->fullname = sp ;
@@ -1258,8 +1252,8 @@ local int procinfo_domainname(PCI *pip) noex {
 	        if (! pip->fl.altuser) {
 		    cnullptr	np{} ;
 		    cchar	*valp ; 
-		    if ((valp = getenv(varname.localdomain)) != np) {
-			valp = getenv(varname.domain) ;
+		    if ((valp = getenver(varname.localdomain)) != np) {
+			valp = getenver(varname.domain) ;
 		    }
 	            uip->domainname = valp ;
 	        } /* end if (getting env-domain) */
@@ -1339,7 +1333,7 @@ local int procinfo_tz(PCI *pip) noex {
 	    uip->tz = nullptr ;
 	    if (uip->tz == nullptr) {
 	        if (! pip->fl.altuser) {
-	            uip->tz = getenv(varname.tz) ;
+	            uip->tz = getenver(varname.tz) ;
 	        }
 	    }
 	    if (uip->tz == nullptr) {
@@ -1374,7 +1368,7 @@ local int procinfo_md(PCI *pip) noex {
 	    uip->md = nullptr ;
 	    if (uip->md == nullptr) {
 	        if (! pip->fl.altuser) {
-	            uip->md = getenv(varname.maildir) ;
+	            uip->md = getenver(varname.maildir) ;
 	        }
 	    }
 	    if (uip->md == nullptr) {
@@ -1411,7 +1405,7 @@ local int procinfo_wstation(PCI *pip) noex {
 	    uip->wstation = nullptr ;
 	    if (uip->wstation == nullptr) {
 	        if (! pip->fl.altuser) {
-	            uip->wstation = getenv(VARWSTATION) ;
+	            uip->wstation = getenver(VARWSTATION) ;
 	        }
 	    }
 	    if (uip->wstation == nullptr) {
@@ -1580,8 +1574,8 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	                        rpp = &oup->account ;
 	                        sp = u.account ;
 	                        break ;
-	                    case uit_bin:
-	                        rpp = &oup->bin ;
+	                    case uit_prbin:
+	                        rpp = &oup->prbin ;
 	                        sp = u.bin ;
 	                        break ;
 	                    case uit_office:
