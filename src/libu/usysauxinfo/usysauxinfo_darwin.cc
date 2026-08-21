@@ -36,13 +36,15 @@
 #include	<sys/sysctl.h>		/* <- Darwin |sysctl(3c)| */
 #include	<unistd.h>		/* POSIX® */
 #include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<new>			/* C++STD */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usupport.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
 
 #include	"usysauxinfo_darwin.h"
 
@@ -52,7 +54,7 @@ using usys::darwin_usysctl ;
 
 namespace libu {
     extern sysret_t loadhwserial(char *,int) noex ;
-}
+} /* end namespace (libu) */
 
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
