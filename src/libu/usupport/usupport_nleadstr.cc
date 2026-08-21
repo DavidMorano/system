@@ -88,7 +88,7 @@ using libu::tofc ;			/* subroutine */
 
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
