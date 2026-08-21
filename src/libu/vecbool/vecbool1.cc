@@ -31,18 +31,15 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<vector>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ulogerror.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<vector>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 module vecbool ;
 
@@ -95,7 +92,7 @@ int vecbool::resize(int n) noex {
 int vecbool::icount() noex {
     	csize	cnt = size() ;
     	return intsat(cnt) ;
-}
+} /* end method */
 
 int vecbool::adj(int idx) noex {
 	int		rs = SR_OK ;
@@ -112,7 +109,7 @@ void vecbool::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecbool",rs,"fini-finish") ;
 	}
-}
+} /* end method */
 
 vecbool_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
