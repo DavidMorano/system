@@ -85,11 +85,11 @@
 
 int u_sockaddrloc(int s,void *ap,int *alp) noex {
 	return u_getsockname(s,ap,alp) ;
-}
+} /* end subroutine */
 
 int u_sockaddrrem(int s,void *ap,int *alp) noex {
 	return u_getpeername(s,ap,alp) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
