@@ -101,7 +101,7 @@ unixret_t isastream(int fd) noex {
 	    rc = -1 ;
 	}
 	return rc ;
-}
+} /* end */
 
 unixret_t fattach(int fd,cchar *fname) noex {
 	unixret_t	rc = -1 ;
@@ -124,7 +124,7 @@ unixret_t fattach(int fd,cchar *fname) noex {
 	    rc = -1 ;
 	}
 	return rc ;
-}
+} /* end */
 
 unixret_t fdetach(cchar *fname) noex {
 	unixret_t	rc = -1 ;
@@ -143,7 +143,7 @@ unixret_t fdetach(cchar *fname) noex {
 	    rc = -1 ;
 	}
 	return rc ;
-}
+} /* end */
 
 unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex {
 	unixret_t	rc = -1 ;
@@ -162,7 +162,7 @@ unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex {
 	    rc = -1 ;
 	}
 	return rc ;
-}
+} /* end */
 
 unixret_t getpmsg(int fd,SB *cmp,SB *dmp,int *bp,int *fp) noex {
 	unixret_t	rc = -1 ;
@@ -181,7 +181,7 @@ unixret_t getpmsg(int fd,SB *cmp,SB *dmp,int *bp,int *fp) noex {
 	    rc = -1 ;
 	}
 	return rc ;
-}
+} /* end */
 
 unixret_t putmsg(int fd,SB *cmp,SB *dmp,int fl) noex {
 	unixret_t	rc = -1 ;
@@ -201,7 +201,7 @@ unixret_t putmsg(int fd,SB *cmp,SB *dmp,int fl) noex {
 	    rc = -1 ;
 	}
 	return rc ;
-}
+} /* end */
 
 unixret_t putpmsg(int fd,SB *cmp,SB *dmp,int bd,int fl) noex {
 	unixret_t	rc = -1 ;
@@ -222,7 +222,7 @@ unixret_t putpmsg(int fd,SB *cmp,SB *dmp,int bd,int fl) noex {
 	    rc = -1 ;
 	}
 	return rc ;
-}
+} /* end */
 
 #endif /* (!defined(SYSHAS_STREAMS)) || (SYSHAS_STREAMS == 0) */
 /* STREAMS end */
