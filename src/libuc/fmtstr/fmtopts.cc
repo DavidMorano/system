@@ -35,10 +35,35 @@
 #include	"fmtopts.h"
 
 
-cint	fmtoptms::clean		= (1 << fmtopt_clean) ;
-cint	fmtoptms::nooverr	= (1 << fmtopt_nooverr) ;
-cint	fmtoptms::minfill	= (1 << fmtopt_minfill) ;
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 const fmtoptms		fmtoptm ;
+
+
+/* exported subroutines */
 
 
