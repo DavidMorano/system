@@ -28,14 +28,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<umem.hh>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<umem.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"nulstr.h"
 
@@ -102,8 +102,7 @@ int nulstr_start(nulstr *ssp,cchar *sp,int sl,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (nulstr_start) */
+} /* end subroutine (nulstr_start) */
 
 int nulstr_finish(nulstr *ssp) noex {
 	int		rs = SR_FAULT ;
@@ -119,15 +118,14 @@ int nulstr_finish(nulstr *ssp) noex {
 	    ssp->buf[0] = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (nulstr_finish) */
+} /* end subroutine (nulstr_finish) */
 
 
 /* local subroutines */
 
 int nulstr::start(cchar *sp,int sl,cchar **rpp) noex {
 	return nulstr_start(this,sp,sl,rpp) ;
-}
+} /* end method */
 
 nulstr::operator int () noex {
     	int		rs ;
