@@ -26,15 +26,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<ctime>			/* |TIMEVAL| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<compare>
-#include	<numeric>		/* |sat_mul(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD |TIMEVAL| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<compare>		/* C++STD */
+#include	<numeric>		/* C++STD |sat_mul(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"timeval.hh"
 
@@ -89,8 +89,7 @@ int timeval_load(TIMEVAL *dst,time_t sec,int usec) noex {
 	    dst->tv_usec = usec ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (timeval_load) */
+} /* end subroutine (timeval_load) */
 
 int timeval_add(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	int		rs = SR_FAULT ;
@@ -103,8 +102,7 @@ int timeval_add(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (timeval_add) */
+} /* end subroutine (timeval_add) */
 
 int timeval_sub(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	int		rs = SR_FAULT ;
@@ -117,8 +115,7 @@ int timeval_sub(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (timeval_sub) */
+} /* end subroutine (timeval_sub) */
 
 timeval_t &timeval_t::operator *= (int m) noex {
     	const time_t		vs = m ;
