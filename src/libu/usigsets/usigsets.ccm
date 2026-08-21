@@ -24,7 +24,7 @@ module ;
 #include	<pthread.h>		/* POSIX |pthread_setmask(3c)| */
 #include	<csignal>		/* CSTD */
 #include	<cerrno>		/* CSTD */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -71,7 +71,7 @@ export {
 
 export {
     extern usigsets	usigset ;
-}
+} /* end export */
 
 
 /* exported subroutines */
