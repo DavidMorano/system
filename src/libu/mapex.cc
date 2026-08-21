@@ -94,7 +94,6 @@ int mapex(const mapex_map *mapexs,int rs) noex {
 	    } /* end for */
 	} /* end if (had eror) */
 	return ex ;
-}
-/* end subroutine (mapex) */
+} /* end subroutine (mapex) */
 
 
