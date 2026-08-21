@@ -27,20 +27,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/msg.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/msg.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"umsg.h"
 
@@ -81,7 +78,7 @@ namespace {
 	int snd(int,void *,int,int) noex ;
 	int operator () (int,void *,int,int) noex ;
     } ; /* end struct (umsg) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -100,28 +97,26 @@ int u_msgget(key_t key,int msgflag) noex {
 	umsg		umo(key) ;
 	umo.m = &umsg::get ;
 	return umo(0,np,0,msgflag) ;
-}
+} /* end subroutine */
 
 int u_msgctl(int msqid,int cmd,MSQIDDS *buf) noex {
 	cnullptr	np{} ;
 	umsg		umo(cmd,buf) ;
 	umo.m = &umsg::ctl ;
 	return umo(msqid,np,0,0) ;
-}
+} /* end subroutine */
 
 int u_msgrcv(int msqid,void *msgp,int msgl,sysvmsgtype mt,int msgflag) noex {
 	umsg		umo(mt) ;
 	umo.m = &umsg::rcv ;
 	return umo(msqid,msgp,msgl,msgflag) ;
-}
-/* end method (u_msgrcv) */
+} /* end method (u_msgrcv) */
 
 int u_msgsnd(int msqid,void *msgp,int msgl,int msgflag) noex {
 	umsg		umo ;
 	umo.m = &umsg::snd ;
 	return umo(msqid,msgp,msgl,msgflag) ;
-}
-/* end method (u_msgsnd) */
+} /* end method (u_msgsnd) */
 
 
 /* local subroutines */
@@ -187,26 +182,23 @@ int umsg::operator () (int msqid,void *msgp,int msgl,int msgflag) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end subroutine (umsg::operator) */
+} /* end method (umsg::operator) */
 
 int umsg::get(int,void *,int,int msgflag) noex {
 	int		rs ;
 	if ((rs = msgget(key,msgflag)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (umsg::get) */
+} /* end method (umsg::get) */
 
 int umsg::ctl(int msqid,void *,int,int) noex {
 	int		rs ;
 	if ((rs = msgctl(msqid,cmd,buf)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (umsg::ctl) */
+} /* end method (umsg::ctl) */
 
 int umsg::rcv(int msqid,void *msgp,int msgl,int msgflag) noex {
 	int		rs = SR_FAULT ;
@@ -216,15 +208,14 @@ int umsg::rcv(int msqid,void *msgp,int msgl,int msgflag) noex {
 		csize	msize = size_t(msgl) ;
 		ssize_t	rsize ;
 	        if ((rsize = msgrcv(msqid,msgp,msize,msgtype,msgflag)) < 0) {
-	            rs = (- errno) ;
+	            rs = (neg errno) ;
 	        } else {
 		    rs = intsat(rsize) ;
 		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umsg::rcv) */
+} /* end method (umsg::rcv) */
 
 int umsg::snd(int msqid,void *msgp,int msgl,int msgflag) noex {
 	int		rs = SR_FAULT ;
@@ -233,12 +224,11 @@ int umsg::snd(int msqid,void *msgp,int msgl,int msgflag) noex {
 	    if (msgl > 0) {
 		csize	msize = size_t(msgl) ;
 	        if ((rs = msgsnd(msqid,msgp,msize,msgflag)) < 0) {
-	            rs = (- errno) ;
+	            rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (umsg::snd) */
+} /* end method (umsg::snd) */
 
 
