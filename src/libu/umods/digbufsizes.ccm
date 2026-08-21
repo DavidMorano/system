@@ -99,7 +99,7 @@ export {
     constexpr int digbufsizes_maxbase = MAXBASE ; /* current max-base */
     constexpr int digbufsizes_maxtype = MAXTYPE ; /* types in bytes */
     constexpr int digbufsizes_nbases = (digbufsizes_maxbase+1) ;
-}
+} /* end export */
 
 consteval int ndigits(int t,int b) noex {
     int             n = 0 ;
