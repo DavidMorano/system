@@ -45,7 +45,7 @@
 unixret_t waitid(idtype_t,id_t,siginfo_t *,int) noex {
 	errno = ENOSYS ;
 	return -1 ;
-}
+} /* end */
 
 #endif /* (!defined(SYSHAS_WAITID)) || (SYSHAS_WAITID == 0) */
 /* WAITID end */
