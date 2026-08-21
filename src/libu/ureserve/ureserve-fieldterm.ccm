@@ -41,7 +41,7 @@ module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -66,7 +66,7 @@ export {
 export {
     extern int	fieldterms	(char *,int,cchar *) noex ;
     extern int	fieldtermsx	(char *,int,int,...) noex ;
-}
+} /* end export */
 
 export {
     constexpr int	fieldterms_termsize = ((UCHAR_MAX + 1) / CHAR_BIT) ;
