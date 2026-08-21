@@ -46,7 +46,7 @@ module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
@@ -106,8 +106,7 @@ int fieldterms(char *terms,int f_retain,cchar *s) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (fieldterms) */
+} /* end subroutine (fieldterms) */
 
 int fieldtermsx(char *terms,int f,int na,...) noex {
 	va_list		ap ;
@@ -130,7 +129,6 @@ int fieldtermsx(char *terms,int f,int na,...) noex {
 	    } /* end if (non-zero-positive) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (fieldtermx) */
+} /* end subroutine (fieldtermx) */
 
 
