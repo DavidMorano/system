@@ -83,7 +83,7 @@ namespace libu {
 
 namespace libu {
     extern int siwhtbrk(cchar *,int,con chrset *) noex ;
-}
+} /* end namespace */
 
 
 /* external variables */
