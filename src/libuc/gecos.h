@@ -33,7 +33,7 @@ enum gecosvals {
 	gecosval_organization,
 	gecosval_realname,
 	gecosval_account,
-	gecosval_bin,
+	gecosval_prbin,
 	gecosval_office,
 	gecosval_wphone,
 	gecosval_hphone,
@@ -79,10 +79,10 @@ struct gecos : gecos_head {
 	} ; /* end ctor */
 	gecos(const gecos &) = delete ;
 	gecos &operator = (const gecos &) = delete ;
-	int start(cchar *,int = -1) noex ;
-	int compose(char *,int) noex ;
-	int getval(int,cchar **) noex ;
-	void dtor() noex ;
+	int start	(cchar *,int = -1) noex ;
+	int compose	(char *,int) noex ;
+	int getval	(int,cchar **) noex ;
+	void dtor	() noex ;
 	destruct gecos() {
 	    cchar *p = vals[gecosval_realname].vp ;
 	    if (p) dtor() ;
