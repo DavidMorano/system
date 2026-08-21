@@ -49,43 +49,53 @@ int t_errno = 0 ;
 
 voidp	xti_alloc	(int,int,int) noex {
     return nullptr ;
-}
+} /* end */
+
 int	xti_open	(cchar *,int,struct t_info *) noex {
     t_errno = TBADF ;
     return -1 ;
-}
+} /* end */
+
 int	xti_bind	(int,struct t_bind *,struct t_bind *) noex {
     t_errno = TBADF ;
     return -1 ;
-}
+} /* end */
+
 int	xti_listen	(int,struct t_call *) noex {
     t_errno = TBADF ;
     return -1 ;
-}
+} /* end */
+
 int	xti_connect	(int,struct t_call *,struct t_call *) noex {
     t_errno = TBADF ;
     return -1 ;
-}
+} /* end */
+
 int	xti_accept	(int,int,const struct t_call *) noex {
     t_errno = TBADF ;
     return -1 ;
-}
+} /* end */
+
 int	xti_look	(int) noex {
     t_errno = TBADF ;
     return -1 ;
-}
+} /* end */
+
 int	xti_sync	(int) noex {
     t_errno = TBADF ;
     return -1 ;
-}
+} /* end */
+
 int	xti_close	(int) noex  {
     t_errno = TBADF ;
     return -1 ;
-}
+} /* end */
+
 int	xti_free	(void *,int) noex  {
     t_errno = TBADF ;
     return -1 ;
-}
+} /* end */
+
 
 #endif /* defined(SYSHAS_XTI) && (SYSHAS_XTI > 0) */
 /* USYSXTI end */
