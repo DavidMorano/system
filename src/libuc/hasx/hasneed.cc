@@ -21,8 +21,8 @@
 	haslead
 
 	Description:
-	Determine if the given c-string has the specified 
-	trailing character.
+	Determine if the given c-string needs to have the specified 
+	character added at the end of the given c-string.
 
 	Synopsis:
 	bool hasneedchr		(cchar *sp,int sl,int chx) noex
@@ -95,13 +95,5 @@ bool hasneedchr(cchar *sp,int sl,int chx) noex {
 bool hasneedslash(cchar *sp,int sl) noex {
     	return hasneedchr(sp,sl,'/') ;
 } /* end subroutine (hasneedslash) */
-
-bool hastrailchr(cchar *sp,int sl,int chx) noex {
-    	return hasneedchr(sp,sl,chx) ;
-}
-
-bool hastrailslash(cchar *sp,int sl) noex {
-    	return hasneedslash(sp,sl) ;
-}
 
 
