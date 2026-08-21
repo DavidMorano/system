@@ -72,7 +72,6 @@ import usysconf ;			/* |usysconfval(3u)| */
 /* local defines */
 
 #define	LINEBUFMULT	5		/* line-buffer size multiplier */
-
 #define	WORDEXPORT	"export"	/* optional word to ignore */
 
 
@@ -87,7 +86,7 @@ using libu::umem ;			/* variable */
 
 extern "C" {
     typedef int (*vs_f)(cchar **,cchar **) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
