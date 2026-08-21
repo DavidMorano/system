@@ -34,7 +34,7 @@ module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<bitset>		/* C++STD <- the money shot! */
 #include	<clanguage.h>		/* LIBU */
@@ -149,23 +149,23 @@ bool isnotaccess(int rs) noex {
 
 bool isnotlib(int rs) noex {
 	return isoneof(nlib,rs) ;
-}
+} /* end subroutine */
 
 bool isnotpresent(int rs) noex {
 	return isoneof(npresent,rs) ;
-}
+} /* end subroutine */
 
 bool isnotsupport(int rs) noex {
 	return isoneof(rnosupport,rs) ;
-}
+} /* end subroutine */
 
 bool isnotterm(int rs) noex {
 	return isoneof(rnoterm,rs) ;
-}
+} /* end subroutine */
 
 bool isnotvalid(int rs) noex {
 	return isoneof(nvalid,rs) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
