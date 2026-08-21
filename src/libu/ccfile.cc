@@ -167,8 +167,7 @@ int ccfile::open(cchar *fn,cchar *ofs,mode_t) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ccfile::open) */
+} /* end method (ccfile::open) */
 
 int opener::operator () (cchar *ofs) noex {
 	int		rs ;
@@ -251,8 +250,7 @@ int ccfile::open(const strview &sv,cchar *ofs,mode_t om) noex {
 	    } /* end block */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ccfile::open) */
+} /* end method (ccfile::open) */
 
 int ccfile::open(const string &str,cchar *ofs,mode_t om) noex {
 	csize		ssz = str.length() ;
@@ -266,8 +264,7 @@ int ccfile::open(const string &str,cchar *ofs,mode_t om) noex {
 	    } /* end block */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ccfile::open) */
+} /* end method (ccfile::open) */
 
 int ccfile::readln(char *ibuf,int ilen,int dch) noex {
     	istream		*isp = this ;
@@ -283,8 +280,7 @@ int ccfile::readln(char *ibuf,int ilen,int dch) noex {
 	    } /* end if (not-fnulling) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (ccfile::readln) */
+} /* end method (ccfile::readln) */
 
 int ccfile::readln(string &s,int dch) noex {
     	cnothrow	nt{} ;
@@ -308,8 +304,7 @@ int ccfile::readln(string &s,int dch) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (not-fnulling) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (ccfile::readln) */
+} /* end method (ccfile::readln) */
 
 local inline bool iscont(cchar *lp,int li) noex {
     	bool	f = true ;
@@ -383,8 +378,7 @@ int ccfile::seek(off_t o,int w) noex {
 	    } /* end if (ok) */
 	} /* end if (not-fnulling) */
 	return rs ;
-}
-/* end method (ccfile::seek) */
+} /* end method (ccfile::seek) */
 
 
 /* private subroutines */
