@@ -159,7 +159,7 @@ int buffer_finish(buffer *op) noex {
 	        rs1 = libmem.free(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    len = op->clen ;
 	    op->dlen = 0 ;
 	    op->startlen = 0 ;
