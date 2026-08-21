@@ -122,11 +122,11 @@ local int loadave_dtor(loadave *op) noex {
 	    if (op->valp) {
 		delete op->valp ;
 		op->valp = nullptr ;
-	    }
+	    } /* end if (delete-loadave_val) */
 	    if (op->midp) {
 		delete op->midp ;
 		op->midp = nullptr ;
-	    }
+	    } /* end if (delete-loadave_mid) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (loadave_dtor) */
@@ -151,7 +151,8 @@ local int	rethostid() noex ;
 
 /* local variables */
 
-cint		idlen = LOADAVE_IDLEN ;
+cint		idlen		= LOADAVE_IDLEN ;
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -162,7 +163,7 @@ cint		idlen = LOADAVE_IDLEN ;
 int loadave_start(loadave *op) noex {
 	int		rs ;
 	DEBUGPRINTF("ent\n") ;
-	if ((rs = loadave_ctor(op)) >= 0) {
+	if ((rs = loadave_ctor(op)) >= 0) ylikely {
 	    custime dt = getustime ;
 	    {
 		op->magval = LA_MAGIC ;
@@ -172,13 +173,14 @@ int loadave_start(loadave *op) noex {
 		loadave_dtor(op) ;
 	    } /* end if (error) */
         } /* end if (loadave_ctor) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (loadave_start) */
 
 int loadave_finish(loadave *op) noex {
     	int		rs ;
 	int		rs1 ;
-	if ((rs = loadave_magic(op)) >= 0) {
+	if ((rs = loadave_magic(op)) >= 0) ylikely {
 	    {
 		rs1 = loadave_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
@@ -190,8 +192,8 @@ int loadave_finish(loadave *op) noex {
 int loadave_readmid(loadave *op,loadave_mid *mip) noex {
 	custime		dt = getustime ;
 	int		rs ;
-	if ((rs = loadave_magic(op,mip)) >= 0) {
-	    if ((rs = loadave_midup(op,dt)) >= 0) {
+	if ((rs = loadave_magic(op,mip)) >= 0) ylikely {
+	    if ((rs = loadave_midup(op,dt)) >= 0) ylikely {
 		memcopy(mip,op->midp) ;
 	    }
         } /* end if (loadave_magic) */
@@ -201,8 +203,8 @@ int loadave_readmid(loadave *op,loadave_mid *mip) noex {
 int loadave_readval(loadave *op,loadave_val *vap) noex {
 	custime		dt = getustime ;
 	int		rs ;
-	if ((rs = loadave_magic(op,vap)) >= 0) {
-	    if ((rs = loadave_valup(op,dt)) >= 0) {
+	if ((rs = loadave_magic(op,vap)) >= 0) ylikely {
+	    if ((rs = loadave_valup(op,dt)) >= 0) ylikely {
 		memcopy(vap,op->valp) ;
 	    }
         } /* end if (loadave_magic) */
@@ -211,7 +213,7 @@ int loadave_readval(loadave *op,loadave_val *vap) noex {
 
 int loadave_check(loadave *op,time_t dt) noex {
 	int		rs ;
-	if ((rs = loadave_magic(op)) >= 0) {
+	if ((rs = loadave_magic(op)) >= 0) ylikely {
 	    if (dt == 0) dt = getustime ;
 	    if ((rs = loadave_midup(op,dt)) >= 0) {
 		rs = loadave_valup(op,dt) ;
@@ -244,8 +246,8 @@ local int loadave_valup(LA *op,time_t dt) noex {
 	int		n = 0 ; /* return-value */
 	if (dt == 0) dt = getustime ;
 	if ((dt - valp->tim_la) >= TO_LA) {
-	    if ((rs = loadave_la(op,dt)) >= 0) {
-		if ((rs = loadave_nprocs(op,dt)) >= 0) {
+	    if ((rs = loadave_la(op,dt)) >= 0) ylikely {
+		if ((rs = loadave_nprocs(op,dt)) >= 0) ylikely {
 		    n = rs ;
 		    rs = loadave_ncpu(op,dt) ;
 		} /* end if */
@@ -257,7 +259,7 @@ local int loadave_valup(LA *op,time_t dt) noex {
 local int loadave_la(LA *op,time_t dt) noex {
 	loadave_val	*valp = op->valp ;
     	int		rs ;
-	if (uint la[NLA] ; (rs = u_getloadavg(la,NLA)) >= 0) {
+	if (uint la[NLA] ; (rs = u_getloadavg(la,NLA)) >= 0) ylikely {
 	    valp->la1min	= la[0] ;
 	    valp->la5min	= la[1] ;
 	    valp->la15min	= la[2] ;
