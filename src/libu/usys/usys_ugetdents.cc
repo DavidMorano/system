@@ -77,7 +77,7 @@ namespace usys {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (ugetdents) */
-}
+} /* end namespace */
 
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) 
 
@@ -96,7 +96,7 @@ namespace usys {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (ugetdents) */
-}
+} /* end namespace */
 
 #elif	defined(OSNAME_Linux) && (OSNAME_Liunx > 0) 
 
@@ -119,7 +119,7 @@ namespace usys {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (ugetdents) */
-}
+} /* end namespace */
 
 #else /* any other operating system */
 
@@ -138,7 +138,7 @@ namespace usys {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (ugetdents) */
-}
+} /* end namespace */
 
 #endif /* which OS */
 
