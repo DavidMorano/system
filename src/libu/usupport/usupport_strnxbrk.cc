@@ -75,7 +75,7 @@ using libu::strnrbrk ;			/* subroutine */
 namespace libu {
     extern char *strnobrk(cchar *,int,const chrset &) noex ;
     extern char *strnrbrk(cchar *,int,const chrset &) noex ;
-}
+} /* end extern */
 
 
 /* external variables */
