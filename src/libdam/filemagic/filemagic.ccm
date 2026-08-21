@@ -26,7 +26,7 @@
 
 	Description:
 	This module contains an object (FILEMAGIC) that helps manage
-	the magic information in (constant) data-base (DB) files.
+	the magic information in data-base (DB) files.
 
 	Synopsis:
 	int rd		(char *mbuf,int mlen = -1) noex
