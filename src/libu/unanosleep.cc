@@ -16,15 +16,13 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<cerrno>
-#include	<ctime>			/* |nanosleep(2)| */
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<ctime>			/* CSTD |nanosleep(2)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -48,11 +46,10 @@ int u_nanosleep(CTIMESPEC *tsp,TIMESPEC *rtsp) noex {
 	int		rs = SR_FAULT ;
 	if (tsp) {
 	    if ((rs = nanosleep(tsp,rtsp)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_nanosleep) */
+} /* end subroutine (u_nanosleep) */
 
 
