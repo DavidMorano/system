@@ -93,7 +93,7 @@ struct bufstr : bufstr_head {
 	} ;
 } ; /* end struct (bufstr) */
 #else	/* __cplusplus */
-typedef BUFFER		bufstr ;
+typedef BUFSTR		bufstr ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
