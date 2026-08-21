@@ -25,23 +25,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* POSIX® */
 #include	<sys/ipc.h>		/* UNIX® Sys-V IPC */
 #include	<sys/shm.h>		/* UNIX® Sys-V IPC - SHM */
 #include	<sys/msg.h>		/* UNIX® Sys-V IPC - MSG */
 #include	<sys/sem.h>		/* UNIX® Sys-V IPC - SEM */
-#include	<unistd.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* |intptr_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |intptr_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uipc.h"
 
@@ -110,5 +109,6 @@ namespace uipc {
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
     } /* end method (uipcbase::operator) */
-}
+} /* end namespace */
+
 
