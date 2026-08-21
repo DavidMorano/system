@@ -184,7 +184,7 @@ typedef string_view	strview ;
 
 extern "C" {
     extern int u_nonblock(int,int) noex ;
-}
+} /* end extern */
 
 
 /* external variables */
