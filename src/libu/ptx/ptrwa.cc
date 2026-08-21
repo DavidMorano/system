@@ -140,7 +140,7 @@ int ptrwa_setpshared(ptrwa *op,int fl) noex {
 
 int ptrwa::getpshared(int *rp) noex {
     	return ptrwa_getpshared(this,rp) ;
-}
+} /* end method */
 
 void ptrwa::dtor() noex {
 	if (cint rs = ptrwa_destroy(this) ; rs < 0) {
