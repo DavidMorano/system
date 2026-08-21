@@ -58,7 +58,8 @@ mqd_t mq_open(const char *n,int,mode_t,const MQATTR *) noex {
 	}
 	if (ec) errno = ec ;
 	return mqdbad ;
-}
+} /* end */
+
 unixret_t mq_close(mqd_t qd) noex {
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
@@ -66,7 +67,8 @@ unixret_t mq_close(mqd_t qd) noex {
 	}
 	if (ec) errno = ec ;
 	return -1 ;
-}
+} /* end */
+
 unixret_t mq_send(mqd_t qd,const char *sp,int,int) noex {
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
@@ -77,7 +79,8 @@ unixret_t mq_send(mqd_t qd,const char *sp,int,int) noex {
 	}
 	if (ec) errno = ec ;
 	return -1 ;
-}
+} /* end */
+
 unixret_t mq_receive(mqd_t qd,char *rp,int,uint *) noex {
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
@@ -88,7 +91,8 @@ unixret_t mq_receive(mqd_t qd,char *rp,int,uint *) noex {
 	}
 	if (ec) errno = ec ;
 	return -1 ;
-}
+} /* end */
+
 unixret_t mq_setattr(mqd_t qd,const MQATTR *ap,MQATTR *) noex {
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
@@ -99,7 +103,8 @@ unixret_t mq_setattr(mqd_t qd,const MQATTR *ap,MQATTR *) noex {
 	}
 	if (ec) errno = ec ;
 	return -1 ;
-}
+} /* end */
+
 unixret_t mq_getattr(mqd_t qd,MQATTR *ap) noex {
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
@@ -110,7 +115,8 @@ unixret_t mq_getattr(mqd_t qd,MQATTR *ap) noex {
 	}
 	if (ec) errno = ec ;
 	return -1 ;
-}
+} /* end */
+
 unixret_t mq_notify(mqd_t qd,struct sigevent *sep) noex {
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
@@ -121,8 +127,9 @@ unixret_t mq_notify(mqd_t qd,struct sigevent *sep) noex {
 	}
 	if (ec) errno = ec ;
 	return -1 ;
-}
-unixret_t mq_unlink(const char *n) noex {
+} /* end */
+
+unixret_t mq_unlink(const char *n) noex {/* end */
 	errno_t		ec = EFAULT ;
 	if (n) {
 	    ec = EINVAL ;
@@ -132,7 +139,7 @@ unixret_t mq_unlink(const char *n) noex {
 	}
 	if (ec) errno = ec ;
 	return -1 ;
-}
+} /* end */
 
 #endif /* (!defined(SYSHAS_PMQ)) || (SYSHAS_PMQ == 0) */
 /* SYSHAS_PMQ end */
