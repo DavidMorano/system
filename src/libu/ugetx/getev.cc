@@ -109,7 +109,6 @@ int getev(con mainv envv,cchar *kp,int kl,cchar **rpp) noex {
 	    *rpp = (rs >= 0) ? vp : nullptr ;
 	}
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (getev) */
+} /* end subroutine (getev) */
 
 
