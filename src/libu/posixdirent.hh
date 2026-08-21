@@ -32,10 +32,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |off_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<dirent.h>		/* |DIR(3c)| + |dirent_t(3c)| */
+#include	<sys/types.h>		/* POSIX® |off_t| */
+#include	<dirent.h>		/* POSIX® |DIR(3c)| + |dirent_t(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	POSIXDIRENT_MAGIC	0x97634525
