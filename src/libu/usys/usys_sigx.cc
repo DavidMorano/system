@@ -50,7 +50,7 @@ unixret_t sigqueue(pid_t pid,int sn,const SIGVAL) noex {
 	    rc = -1 ;
 	}
 	return rc ;
-}
+} /* end */
 
 #endif /* (!defined(SYSHAS_SIGQUEUE)) || (SYSHAS_SIGQUEUE == 0) */
 /* SIGQUEUE end */
@@ -97,7 +97,7 @@ unixret_t sigsend(idtype_t type,id_t id,int sn) noex {
 	    rc = -1 ;
 	}
 	return rc ;
-}
+} /* end */
 
 #endif /* (!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0) */
 /* SIGSEND end */
@@ -120,7 +120,7 @@ unixret_t sigsendset(procset_t *sp,int sn) noex {
 	    rc = -1 ;
 	}
 	return rc ;
-}
+} /* end */
 
 #endif /* (!defined(SYSHAS_SIGSENDSET)) || (SYSHAS_SIGSENDSET == 0) */
 /* SIGSENDSET end */
@@ -136,7 +136,7 @@ extern errno_t pthread_sigqueue(pthread_t tid,int sn,const SIGVAL) noex {
 	    ec = EINVAL ;
 	}
 	return ec ;
-}
+} /* end */
 
 #endif /* (!defined(SYSHAS_PTHREADSIGQUEUE)) || (SYSHAS_PTHREADSIGQUEUE == 0) */
 /* PTHREADSIGQUEUE end */
