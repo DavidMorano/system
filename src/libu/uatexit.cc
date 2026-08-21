@@ -28,15 +28,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* |atexit(3c)| */
-#include	<cerrno>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |atexit(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® |atexit(3c)| */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uatexit.h"
 
@@ -83,8 +83,7 @@ int u_atexit(atexit_f f) noex {
 	ucatexit	aeo(f) ;
 	aeo.m = &ucatexit::stdatexit ;
 	return aeo() ;
-}
-/* end subroutine (uc_atexit) */
+} /* end subroutine (uc_atexit) */
 
 
 /* local subroutines */
@@ -120,19 +119,17 @@ int ucatexit::operator () () noex {
             } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (ucatexit::operator) */
+} /* end subroutine (ucatexit::operator) */
 
 int ucatexit::stdatexit() noex {
 	int		rs = SR_FAULT ;
 	if (func) {
 	    rs = SR_OK ;
 	    if (atexit(func) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	}
 	return rs ;
-}
-/* end method (ucatexit::stdatexit) */
+} /* end method (ucatexit::stdatexit) */
 
 
