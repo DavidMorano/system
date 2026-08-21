@@ -77,11 +77,11 @@ using libu::strnrchr ;			/* subroutine */
 
 extern "C" {
     typedef char *(*strnx_f)(cchar *,int,int) noex ;
-}
+} /* end extern */
 
 extern "C" {
     typedef bool (*iscond_f)(int) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
