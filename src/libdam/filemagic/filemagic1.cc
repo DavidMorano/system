@@ -92,12 +92,12 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local variables */
 
-
-/* exported variables */
-
 cint	filemagic_magsz		= magsz ;
 cint	filemagic_infosz	= szof(uint) ;
 cint	filemagic_sz		= (magsz + szof(uint)) ;
+
+
+/* exported variables */
 
 cint	filemagic::bufsz	= (magsz + szof(uint)) ;
 
@@ -115,7 +115,7 @@ int filemagic::rd(char *rbuf,int rlen) noex {
 	        bp = caddr_t(memcopy(bp,magic,magsz)) ;
 	        bp = caddr_t(memcopy(bp,vetu,4)) ;
 	        len = intconv(bp - rbuf) ;
-	    }
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 } /* end method (filemagic:rd) */
@@ -177,7 +177,7 @@ int filemagic::verify(cc *msp,int msl) noex {
 	    rs = SR_INVALID ;
 	    if ((ml > 0) && (ml < magsz) && msp[0]) ylikely {
 		rs = SR_OK ;
-		fok = strwcmp(magic,msp,msl) ;
+		fok = (strwcmp(magic,msp,msl) == 0) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fok : rs ;
