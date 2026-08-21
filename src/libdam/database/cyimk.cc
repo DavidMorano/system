@@ -901,7 +901,7 @@ local int mkcitation(uint *cip,cyimk_ent *bvp) noex {
 local int mkydname(char *rbuf,cchar *dname,int year) noex {
 	cint		rlen = var.maxpathlen ;
 	int		rs ;
-	if (storebuf sb(rbuf,rlen) ; (rs = sb.str(dname)) >= 0) {
+	if (storebuf sb(rbuf,rlen) ; (rs = sb.str(dname)) >= 0) ylikely {
 	    if ((sb.idx > 0) && hasneedslash(dname)) sb << '/' ;
 	    sb << 'y' ;
 	    sb << year ;
