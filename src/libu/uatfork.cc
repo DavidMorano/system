@@ -60,15 +60,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>
-#include	<umem.hh>
-#include	<timewatch.hh>
-#include	<ptm.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<umem.hh>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uatfork.h"
 
@@ -138,17 +138,17 @@ namespace {
 /* forward references */
 
 extern "C" {
-    static void uatfork_atforkbefore() noex ;
-    static void uatfork_atforkparent() noex ;
-    static void uatfork_atforkchild() noex ;
-    static void uatfork_exit() noex ;
-}
+    local void uatfork_atforkbefore() noex ;
+    local void uatfork_atforkparent() noex ;
+    local void uatfork_atforkchild() noex ;
+    local void uatfork_exit() noex ;
+} /* end extern */
 
-static int	list_add(UAF_LIST *,UAF_ENT *) noex ;
-static int	list_rem(UAF_LIST *,UAF_ENT *) noex ;
+local int	list_add(UAF_LIST *,UAF_ENT *) noex ;
+local int	list_rem(UAF_LIST *,UAF_ENT *) noex ;
 
-static int	entry_load(UAF_ENT *,void_f,void_f,void_f) noex ;
-static int	entry_match(UAF_ENT *,void_f,void_f,void_f) noex ;
+local int	entry_load(UAF_ENT *,void_f,void_f,void_f) noex ;
+local int	entry_match(UAF_ENT *,void_f,void_f,void_f) noex ;
 
 
 /* local variables */
@@ -167,7 +167,7 @@ int u_atforkrec(void_f b,void_f p,void_f c) noex {
 	    rs = uatfork_data.record(b,p,c) ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
 int u_atforkexp(void_f b,void_f p,void_f c) noex {
 	int		rs = SR_INVALID ;
@@ -175,19 +175,19 @@ int u_atforkexp(void_f b,void_f p,void_f c) noex {
 	    rs = uatfork_data.expunge(b,p,c) ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
 int uatfork_init() noex {
 	return uatfork_data.init() ;
-}
+} /* end subroutine */
 
 int uatfork_fini() noex {
 	return uatfork_data.fini() ;
-}
+} /* end subroutine */
 
 int uatfork_trackbegin() noex {
 	return uatfork_data.trackbegin() ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -231,8 +231,7 @@ int uatfork_head::init() noex {
 	    } /* end if (initialization) */
 	} /* end if (no-void) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (uatfork_head::init) */
+} /* end subroutine (uatfork_head::init) */
 
 int uatfork_head::fini() noex {
 	int		rs = SR_OK ;	
@@ -251,8 +250,7 @@ int uatfork_head::fini() noex {
 	    finitdone = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end subroutine (uatfork_head::fini) */
+} /* end subroutine (uatfork_head::fini) */
 
 int uatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 	int		rs ;
@@ -277,8 +275,7 @@ int uatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (usigblock) */
 	return rs ;
-}
-/* end subroutine (uatfork_head::record) */
+} /* end subroutine (uatfork_head::record) */
 
 int uatfork_head::expunge(void_f sb,void_f sp,void_f sc) noex {
 	int		rs ;
@@ -309,14 +306,12 @@ int uatfork_head::expunge(void_f sb,void_f sp,void_f sc) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (usigblock) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (uatfork_head::expunge) */
+} /* end subroutine (uatfork_head::expunge) */
 
 int uatfork_head::trackbegin() noex {
 	ftrack = true ;
 	return SR_OK ;
-}
-/* end subroutine (uatfork_head::trackbegin) */
+} /* end subroutine (uatfork_head::trackbegin) */
 
 int uatfork_head::trackend() noex {
 	int		rs = SR_OK ;
@@ -335,8 +330,7 @@ int uatfork_head::trackend() noex {
 	    hlist.tail = nullptr ;
 	} /* end if (tracking was started) */
 	return rs ;
-}
-/* end subroutine (uatfork_head::trackend) */
+} /* end subroutine (uatfork_head::trackend) */
 
 /* traverse the list backwards (tail to head) */
 void uatfork_head::atforkbefore() noex {
@@ -355,8 +349,7 @@ void uatfork_head::atforkbefore() noex {
 	    } /* end if (locked) */
 	}
 	(void) rs ;
-}
-/* end subroutine (uatfork_head::atforkbefore) */
+} /* end subroutine (uatfork_head::atforkbefore) */
 
 /* traverse the list forwards (head to tail) */
 void uatfork_head::atforkparent() noex {
@@ -378,8 +371,7 @@ void uatfork_head::atforkparent() noex {
 	    }
 	}
 	(void) rs ;
-}
-/* end subroutine (uatfork_head::atforkparent) */
+} /* end subroutine (uatfork_head::atforkparent) */
 
 /* traverse the list forwards (head to tail) */
 void uatfork_head::atforkchild() noex {
@@ -401,27 +393,26 @@ void uatfork_head::atforkchild() noex {
 	    }
 	}
 	(void) rs ;
-}
-/* end subroutine (uatfork_head::atforkchild) */
+} /* end subroutine (uatfork_head::atforkchild) */
 
-static void uatfork_atforkbefore() noex {
+local void uatfork_atforkbefore() noex {
 	uatfork_data.atforkbefore() ;
-}
+} /* end */
 
-static void uatfork_atforkparent() noex {
+local void uatfork_atforkparent() noex {
 	uatfork_data.atforkparent() ;
-}
+} /* end */
 
-static void uatfork_atforkchild() noex {
+local void uatfork_atforkchild() noex {
 	uatfork_data.atforkchild() ;
-}
+} /* end */
 
-static void uatfork_exit() noex {
+local void uatfork_exit() noex {
 	uatfork_data.fvoid = true ;
-}
+} /* end */
 
 /* add at the tail */
-static int list_add(uatfork_list *lp,uatfork_ent *ep) noex {
+local int list_add(uatfork_list *lp,uatfork_ent *ep) noex {
 	uatfork_ent	*lep = lp->tail ;
 	if (lep) {
 	    lep->next = ep ;
@@ -434,11 +425,10 @@ static int list_add(uatfork_list *lp,uatfork_ent *ep) noex {
 	    lp->head = ep ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (list_add) */
+} /* end subroutine (list_add) */
 
 /* this is an entry-unlink operation (remove from middle) */
-static int list_rem(uatfork_list *lp,uatfork_ent *ep) noex {
+local int list_rem(uatfork_list *lp,uatfork_ent *ep) noex {
 	uatfork_ent	*pep = ep->prev ;
 	uatfork_ent	*nep = ep->next ;
 	if (nep) {
@@ -452,25 +442,22 @@ static int list_rem(uatfork_list *lp,uatfork_ent *ep) noex {
 	    lp->head = nep ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (list_rem) */
+} /* end subroutine (list_rem) */
 
-static int entry_load(uatfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
+local int entry_load(uatfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
 	ep->sub_before = sb ;
 	ep->sub_parent = sp ;
 	ep->sub_child = sc ;
 	ep->next = nullptr ;
 	return SR_OK ;
-}
-/* end subroutine (entry_load) */
+} /* end subroutine (entry_load) */
 
-static int entry_match(uatfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
+local int entry_match(uatfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
 	int		f = true ;
 	f = f && (ep->sub_before == sb) ;
 	f = f && (ep->sub_parent == sp) ;
 	f = f && (ep->sub_child == sc) ;
 	return f ;
-}
-/* end subroutine (entry_match) */
+} /* end subroutine (entry_match) */
 
 
