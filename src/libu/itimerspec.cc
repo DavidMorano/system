@@ -44,14 +44,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/time.h>		/* <- interval timers are here */
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/time.h>		/* POSIX® <- interval timers are here */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"itimerspec.h"
 
@@ -92,7 +92,6 @@ int itimerspec_load(ITIMERSPEC *tsp,CTIMESPEC *valp,CTIMESPEC *ivp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (itimerspec_load) */
+} /* end subroutine (itimerspec_load) */
 
 
