@@ -158,39 +158,37 @@ struct storebuf {
 	int str		(cchar *sp) noex ;
 	int buf		(cchar *sp,int sl = -1) noex ;
 	int blanks	(int n = 1) noex ;
+	template<typename T> using ctx_f = int (*)(char *,int,int,T) noex ;
+	template<typename T>
+	int xxx(ctx_f<T> ctx,T v) noex {
+    	    int		rs ;
+    	    if ((rs = idx) >= 0) {
+	        if ((rs = ctx(bufp,bufl,idx,v)) >= 0) {
+                    idx += rs ;
+	        } else {
+	            idx = rs ;
+	        }
+            } /* end if (ok) */
+	    return rs ;
+	} ; /* end method (xxx) */
 	int bin(auto v) noex {
-	    cint rs = storebuf_bin(bufp,bufl,idx,v) ;
-	    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
-	    return rs ;
-	} ;
+	    return xxx(storebuf_bin,v) ;
+	} ; /* end method (bin) */
 	int oct(auto v) noex {
-	    cint rs = storebuf_oct(bufp,bufl,idx,v) ;
-	    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
-	    return rs ;
-	} ;
+	    return xxx(storebuf_oct,v) ;
+	} ; /* end method (oct) */
 	int dec(auto v) noex {
-	    cint rs = storebuf_dec(bufp,bufl,idx,v) ;
-	    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
-	    return rs ;
-	} ;
-	int hexn(int i,auto v) noex {
-	    cint rs = storebuf_hex(bufp,bufl,idx,v) ;
-	    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
-	    return rs ;
-	} ;
-	storebuf &operator << (cchar *sp) noex {
-	    strw(sp) ;
-	    return *this ;
-	} ;
-	storebuf &operator << (char ch) noex {
-	    chr(ch) ;
-	    return *this ;
-	} ;
-	storebuf &operator << (int v) noex {
-	    cint rs = storebuf_dec(bufp,bufl,idx,v) ;
-	    idx = ((rs >= 0) && (idx >= 0)) ? (rs + idx) : rs ;
-	    return *this ;
-	} ;
+	    return xxx(storebuf_dec,v) ;
+	} ; /* end method (dec) */
+	int hex(auto v) noex {
+	    return xxx(storebuf_hex,v) ;
+	} ; /* end method (hex) */
+	storebuf &operator << (ccharp	sp)	noex ;
+	storebuf &operator << (char	ch)	noex ;
+	storebuf &operator << (short	v)	noex ;
+	storebuf &operator << (int	v)	noex ;
+	storebuf &operator << (long	v)	noex ;
+	storebuf &operator << (longlong	v)	noex ;
 	operator int () noex {
 	    return idx ;
 	} ;
