@@ -179,8 +179,7 @@ cchar *getenver(cchar *kp,int ªkl) noex {
 	    } /* end if (sub) */
 	} /* end if (getlenstr) */
 	return valp ;
-}
-/* end subroutine (getenver) */
+} /* end subroutine (getenver) */
 
 
 /* local subroutines */
