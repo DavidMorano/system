@@ -113,9 +113,9 @@ static charp strdcpyu(char *dp,int dl,cchar *sp) noex {
 
 /* local variables */
 
-static constexpr int		wlen = (ULOGERRMGR_MSGLEN*2) ;
-static constexpr char		var[] = ULOGERRMGR_VARNAME ;
-static constinit ulogerrmgr	ulogerrmgr_data ;
+constexpr int		wlen = (ULOGERRMGR_MSGLEN*2) ;
+constexpr char		var[] = ULOGERRMGR_VARNAME ;
+constinit ulogerrmgr	ulogerrmgr_data ;
 
 
 /* exported variables */
@@ -129,8 +129,7 @@ int ulogerror(cchar *id,int err,cchar *msg) noex {
 	    f = ulogerrmgr_data.record(id,err,msg) ;
 	}
 	return f ;
-}
-/* end subroutine (ulogerror) */
+} /* end subroutine (ulogerror) */
 
 
 /* local subroutines */
