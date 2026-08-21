@@ -64,7 +64,7 @@ using libu::sncpy1 ;			/* subroutine */
 
 namespace libu {
     extern char *strwcpy(char *dp,cchar *sp,int sl) noex ;
-}
+} /* end namespace */
 
 
 /* external variables */
