@@ -65,7 +65,7 @@ import ureserve ;			/* |is{x}latin(3u)| */
 
 extern "C" {
     typedef bool (*xchr_f)(int) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
