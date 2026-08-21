@@ -32,12 +32,12 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>		/* |va_list| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>		/* |eol| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |eol| */
 
 module umisc ;
 
@@ -89,23 +89,22 @@ local int	local_pathadd(char *,int,int,cchar *,int) noex ;
 
 int pathnaddw(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
-	if (pbuf && sp) {
+	if (pbuf && sp) ylikely {
 	    rs = SR_INVALID ;
-	    if ((plen >= 0) && (pl >= 0)) {
+	    if ((plen >= 0) && (pl >= 0)) ylikely {
 		rs = local_pathadd(pbuf,plen,pl,sp,sl) ;
 		pl = rs ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (pathnaddw) */
+} /* end subroutine (pathnaddw) */
 
 int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
-	if (pbuf) {
+	if (pbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if ((plen >= 0) && (pl >= 0)) {
+	    if ((plen >= 0) && (pl >= 0)) ylikely {
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
 		    cchar	*sp = (char *) va_arg(ap,char *) ;
@@ -116,8 +115,7 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (pathnaddx) */
+} /* end subroutine (pathnaddx) */
 
 
 /* local subroutines */
@@ -128,12 +126,11 @@ local int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	    rs = snaddslash(pbuf,plen,pl) ;
 	    pl += rs ;
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = snaddw(pbuf,plen,pl,sp,sl) ;
 	    pl += rs ;
 	}
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (local_pathadd) */
+} /* end subroutine (local_pathadd) */
 
 
