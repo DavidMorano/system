@@ -142,12 +142,12 @@ local int filesyner_dtor(filesyner *op) noex {
 		filerec *rlp = filerecp(op->recp) ;
 		delete rlp ;
 		op->recp = nullptr ;
-	    }
+	    } /* end if (delete-filerec) */
 	    if (op->dirp) {
 		tardir *dlp = tardirp(op->dirp) ;
 		delete dlp ;
 		op->dirp = nullptr ;
-	    }
+	    } /* end if (delete-tardir) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (filesyner_dtor) */
@@ -178,9 +178,7 @@ local bool isNotDir(int) noex ;
 /* local variables */
 
 static const int	maxpathlen = ulibval.maxpathlen ;
-
 static vars		var ;
-
 cbool			f_debug = CF_DEBUG ;
 
 constexpr int		rsnotdir[] = {
@@ -198,14 +196,14 @@ constexpr int		rsnotdir[] = {
 int filesyner::istart(mainv tlist) noex {
 	int		rs ;
 	int		c = 0 ; /* return-value */
-	if ((rs = filesyner_ctor(this)) >= 0) {
-	    if ((rs = maxpathlen) >= 0) {
-		if (static cint rsv = var ; (rs = rsv) >= 0) {
+	if ((rs = filesyner_ctor(this)) >= 0) ylikely {
+	    if ((rs = maxpathlen) >= 0) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		    cint sz = ((var.maxpath + 1) * 2) ;
 		    int ai = 0 ;
 		    plen = var.maxpath ;
 		    dlen = var.maxpath ;
-		    if ((rs = umem.mall(sz,&a)) >= 0) {
+		    if ((rs = umem.mall(sz,&a)) >= 0) ylikely {
 			pbuf = (a + ((var.maxpath + 1) * ai++)) ;
 			dbuf = (a + ((var.maxpath + 1) * ai++)) ;
 	                if ((rs = istarter()) >= 0) {
@@ -217,7 +215,7 @@ int filesyner::istart(mainv tlist) noex {
 		        if (rs < 0) {
 			    umem.free(pbuf) ;
 			    plen = 0 ;
-		        }
+		        } /* end if (error) */
 		    } /* end if (memory-acquire) */
 		} /* end if (vars) */
 	    } /* end if (maxpathlen) */
@@ -231,7 +229,7 @@ int filesyner::istart(mainv tlist) noex {
 int filesyner::istarter() noex {
 	tardir		*dlp = tardirp(dirp) ;
 	int		rs ;
-	if ((rs = dlp->start) >= 0) {
+	if ((rs = dlp->start) >= 0) ylikely {
 	    filerec *rlp = filerecp(recp) ;
 	    if ((rs = rlp->start) >= 0) {
 		magval = filesyner_magicval ;
@@ -361,7 +359,7 @@ int filesyner::ione(custat *tsb,cc *tdp,custat *sbp,cc *sp,int sl) noex {
     	int		rs ;
 	int		c = 0 ; /* return-value */
 	(void) tsb ;
-	if ((rs = mknpathw(pbuf,plen,tdp,sp,sl)) >= 0) {
+	if ((rs = mknpathw(pbuf,plen,tdp,sp,sl)) >= 0) ylikely {
 	    if (ustat fsb ; (rs = u_lstat(pbuf,&fsb)) >= 0) {
 		if (isnotsame(&fsb,sbp)) {
 		    if (S_ISDIR(sbp->st_mode)) {
@@ -437,8 +435,8 @@ int filesyner::mkpdirs(cchar *tarfname,mode_t dm) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*dp ;
-	if (int dl ; (dl = sfdirname(tarfname,-1,&dp)) > 0) {
-	    if ((rs = mknpath1w(dbuf,dlen,dp,dl)) >= 0) {
+	if (int dl ; (dl = sfdirname(tarfname,-1,&dp)) > 0) ylikely {
+	    if ((rs = mknpath1w(dbuf,dlen,dp,dl)) >= 0) ylikely {
 		if (ustat dsb ; (rs = u_stat(dbuf,&dsb)) >= 0) {
 		    rs = SR_OK ;
 		} else if (isNotPresent(rs)) {
@@ -485,7 +483,7 @@ filesyner_co::operator int () noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = maxpathlen) >= 0) {
+	if ((rs = maxpathlen) >= 0) ylikely {
 	    maxpath = rs ;
 	}
     	return rs ;
