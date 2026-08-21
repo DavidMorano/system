@@ -208,8 +208,7 @@ int ptma_getrobustnp(ptma *op,int *oldp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ptma_getrobustnp) */
+} /* end subroutine (ptma_getrobustnp) */
 
 int ptma_setrobustnp(ptma *op,int fn) noex {
 	int		rs = SR_FAULT ;
@@ -263,23 +262,23 @@ void ptma::dtor() noex {
 
 int ptma::getprioceiling(int *rp) noex {
 	return ptma_getprioceiling(this,rp) ;
-}
+} /* end method */
 
 int ptma::getprotocol(int *rp) noex {
 	return ptma_getprotocol(this,rp) ;
-}
+} /* end method */
 
 int ptma::getpshared(int *rp) noex {
 	return ptma_getpshared(this,rp) ;
-}
+} /* end method */
 
 int ptma::getrobustnp(int *rp) noex {
 	return ptma_getrobustnp(this,rp) ;
-}
+} /* end method */
 
 int ptma::gettype(int *rp) noex {
 	return ptma_gettype(this,rp) ;
-}
+} /* end method */
 
 int ptma_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
