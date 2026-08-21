@@ -29,7 +29,7 @@
 	in one of the following ways:
 
 	    name,office,workphone,homephone
-	    organization-name(account,bin)office,workphone,homephone,printer
+	    organization-name(account,prbin)office,workphone,homephone,printer
 	    name(account)office,workphone,homephone,printer
 	    name
 
@@ -40,7 +40,7 @@
 
 	The original AT&T GECOS field contained:
 
-	    department-name(account,bin)
+	    department-name(account,prbin)
 
 	and was further put into a 'struct comment' with fields:
 
@@ -60,14 +60,14 @@
 
 	Some alternatives for the GECOS field are:
 
-	    orgdept-name(account,bin)office,workphone,homephone
-	    orgdept-name(account,bin)office,workphone,homephone,printer
+	    orgdept-name(account,prbin)office,workphone,homephone
+	    orgdept-name(account,prbin)office,workphone,homephone,printer
 
 	Fields:
 		orgdept		organization-department
 		name		real-name
 		account		account number
-		bin		printer bin
+		prbin		printer bin
 		office		office address
 		workphone	work phone number
 		homephone	home phone number
@@ -141,17 +141,17 @@ namespace {
 	    bp = asp ;
 	    bl = asl ;
 	} ; /* end ctor */
-	int start() noex ;
-	int finish() noex ;
+	int start	() noex ;
+	int finish	() noex ;
 	void organization() noex ;
-	void realname() noex ;
-	void account() noex ;
-	void bin() noex ;
-	void office() noex ;
-	void wphone() noex ;
-	void hphone() noex ;
-	void printer() noex ;
-	void proc() noex ;
+	void realname	() noex ;
+	void account	() noex ;
+	void prbin	() noex ;
+	void office	() noex ;
+	void wphone	() noex ;
+	void hphone	() noex ;
+	void printer	() noex ;
+	void proc	() noex ;
     } ; /* end struct (gecoshelp) */
 } /* end namespace */
 
@@ -176,7 +176,7 @@ constexpr gecoshelp_m	gmems[] = {
 	&gecoshelp::organization,
 	&gecoshelp::realname,
 	&gecoshelp::account,
-	&gecoshelp::bin,
+	&gecoshelp::prbin,
 	&gecoshelp::office,
 	&gecoshelp::wphone,
 	&gecoshelp::hphone,
@@ -254,7 +254,7 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
 		{
 		    bool f = false ;
                     f = f || (op->vals[gecosval_account].vp != np) ;
-                    f = f || (op->vals[gecosval_bin].vp != np) ;
+                    f = f || (op->vals[gecosval_prbin].vp != np) ;
 		    if (f) {
                         fparen = true ;
                         b.chr(CH_LPAREN) ;
@@ -263,9 +263,9 @@ int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
                 if (op->vals[gecosval_account].vp != nullptr) {
                     gecos_storeit(op,&b,gecosval_account) ;
                 }
-                if (op->vals[gecosval_bin].vp != nullptr) {
+                if (op->vals[gecosval_prbin].vp != nullptr) {
                     b.strw(",",1) ;
-                    gecos_storeit(op,&b,gecosval_bin) ;
+                    gecos_storeit(op,&b,gecosval_prbin) ;
                 }
                 if (fparen) {
                     b.chr(CH_RPAREN) ;
@@ -393,31 +393,31 @@ void gecoshelp::account() noex {
 	    bl = intconv((sp + sl) - (tp + 1)) ;
 	} else {
 	    n += 1 ;
-	    op->vals[gecosval_bin].vp = bp ;
-	    op->vals[gecosval_bin].vl = bl ;
+	    op->vals[gecosval_prbin].vp = bp ;
+	    op->vals[gecosval_prbin].vl = bl ;
 	    bl = 0 ;
 	} /* end if */
 } /* end method (gecoshelp::account) */
 
-void gecoshelp::bin() noex {
+void gecoshelp::prbin() noex {
 	if (fparen) {
 	    if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
 	        if (tp[0] == CH_RPAREN) fparen = false ;
-	        if ((tp - bp) && (op->vals[gecosval_bin].vp == nullptr)) {
+	        if ((tp - bp) && (op->vals[gecosval_prbin].vp == nullptr)) {
 	            n += 1 ;
-	            op->vals[gecosval_bin].vp = bp ;
-	            op->vals[gecosval_bin].vl = intconv(tp - bp) ;
+	            op->vals[gecosval_prbin].vp = bp ;
+	            op->vals[gecosval_prbin].vl = intconv(tp - bp) ;
 	        }
 	        bp = (tp + 1) ;
 	        bl = intconv((sp + sl) - (tp + 1)) ;
-	    } else if (op->vals[gecosval_bin].vp == nullptr) {
+	    } else if (op->vals[gecosval_prbin].vp == nullptr) {
 	        n += 1 ;
-	        op->vals[gecosval_bin].vp = bp ;
-	        op->vals[gecosval_bin].vl = bl ;
+	        op->vals[gecosval_prbin].vp = bp ;
+	        op->vals[gecosval_prbin].vl = bl ;
 	        bl = 0 ;
 	    } /* end if */
 	} /* end if (possible printer-bin item) */
-} /* end method (gecoshelp::bin) */
+} /* end method (gecoshelp::prbin) */
 
 void gecoshelp::office() noex {
 	if (cchar *tp ; (tp = strnbrk(bp,bl,brkright)) != np) {
@@ -445,7 +445,7 @@ void gecoshelp::wphone() noex {
 	    }
 	    bp = (tp + 1) ;
 	    bl = intconv((sp + sl) - (tp + 1)) ;
-	} else if (op->vals[gecosval_office].vp == nullptr) {
+	} else if (op->vals[gecosval_office].vp == np) {
 	    n += 1 ;
 	    op->vals[gecosval_office].vp = bp ;
 	    op->vals[gecosval_office].vl = bl ;
