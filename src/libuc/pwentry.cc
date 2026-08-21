@@ -249,7 +249,7 @@ int pwentry_mkextras(pwentry *op) noex {
 	                        case gecosval_account:
 	                            rs = loaditem(&op->account,vp,vl) ;
 	                            break ;
-	                        case gecosval_bin:
+	                        case gecosval_prbin:
 	                            rs = loaditem(&op->bin,vp,vl) ;
 	                            break ;
 	                        case gecosval_office:
