@@ -96,7 +96,7 @@ local int filemap_dtor(filemap *op) noex {
 	    if (op->stbp) ylikely {
 		delete op->stbp ;
 		op->stbp = nullptr ;
-	    } /* end if (memory-release) */
+	    } /* end if (delete-ustat) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (filemap_dtor) */
@@ -330,7 +330,7 @@ local int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
 
 filemap_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case filemapmem_rewind:
 	        rs = filemap_rewind(op) ;
@@ -357,7 +357,7 @@ int filemap_teller::operator () (off_t *fop) noex {
 
 int filemap::open(cchar *fn,size_t fsz) noex {
     	return filemap_open(this,fn,fsz) ;
-}
+} /* end method (filemap::open) */
 
 int filemap::stat(ustat *p) noex {
     	return filemap_stat(this,p) ;
