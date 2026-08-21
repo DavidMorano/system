@@ -68,7 +68,7 @@ struct ecmsg : ecmsg_head {
 	operator int () noex ;
 } ; /* end struct (ecmsg) */
 #else	/* __cplusplus */
-typedef EXMSG		ecmsg ;
+typedef ECMSG		ecmsg ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
