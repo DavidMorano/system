@@ -181,22 +181,27 @@ constexpr charinfo	ischx_data ;
 
 bool ischalpha(int ch) noex attrpure {
 	return ischx_data.isalpha[ch & UCHAR_MAX] ;
-}
+} /* end */
+
 bool ischalnum(int ch) noex attrpure {
 	return ischx_data.isalnum[ch & UCHAR_MAX] ;
-}
+} /* end */
+
 bool ischwhite(int ch) noex attrpure {
 	return ischx_data.iswhite[ch & UCHAR_MAX] ;
-}
+} /* end */
+
 bool ischlower(int ch) noex attrpure {
 	return ischx_data.islc[ch & UCHAR_MAX] ;
-}
+} /* end */
+
 bool ischupper(int ch) noex attrpure {
 	return ischx_data.isuc[ch & UCHAR_MAX] ;
-}
+} /* end */
+
 bool ischfold(int ch) noex attrpure {
 	return ischx_data.isfc[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 
 /* local subroutines */
