@@ -80,7 +80,7 @@ typedef cmporders	co ;
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
     typedef int (*strcmp_f)(cchar *,cchar *) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
@@ -96,7 +96,7 @@ extern "C" {
 
 local inline bool isend(int ch) noex {
     	return (ch == '=') || (ch == '\0') ;
-}
+} /* end subroutine */
 
 local int strkeyxcmp(toxc_f tox,cchar *e1p,cchar *e2p) noex {
 	int		rc = 0 ;
