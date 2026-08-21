@@ -30,7 +30,7 @@
 
 
 struct sbuf_head {
-	char		*rbuf ;		/* result buffer base (constant) */
+	charp		rbuf ;		/* result buffer base (constant) */
 	int		rlen ;		/* result buffer length (constant) */
 	int		index ;		/* current buffer index (changes) */
 } ; /* end struct (sbuf_head) */
