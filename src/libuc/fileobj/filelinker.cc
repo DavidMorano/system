@@ -132,7 +132,7 @@ local int filelinker_dtor(filelinker *op) noex {
 		tardir *dlp = tardirp(op->dirp) ;
 		delete dlp ;
 		op->dirp = nullptr ;
-	    }
+	    } /* end if (delete-tardir) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (filelinker_dtor) */
