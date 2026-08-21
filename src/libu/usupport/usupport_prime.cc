@@ -108,8 +108,7 @@ mtime_t umtime(void) noex {
 	    m += (t * onethousand) ;
 	}
 	return m ;
-}
-/* end subroutine (umtime) */
+} /* end subroutine (umtime) */
 
 int msleep(int msec) noex {
 	int		rs = SR_INVALID ;
@@ -122,8 +121,7 @@ int msleep(int msec) noex {
 	    rs = SR_OK ;
 	} /* end if (valiid argument) */
 	return rs ;
-}
-/* end subroutine (msleep) */
+} /* end subroutine (msleep) */
 
 
 /* local subroutines */
