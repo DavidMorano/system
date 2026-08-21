@@ -34,9 +34,9 @@ enum fmtopts {
 #ifdef	__cplusplus
 
 struct fmtoptms {
-	static cint	clean ;
-	static cint	nooverr ;
-	static cint	minfill ;
+	static constexpr int	clean	= (1 << fmtopt_clean) ;
+	static constexpr int	nooverr	= (1 << fmtopt_nooverr) ;
+	static constexpr int	minfill	= (1 << fmtopt_minfill) ;
 } ; /* end struct (fmtoptms) */
 
 extern const fmtoptms	fmtoptm ;
