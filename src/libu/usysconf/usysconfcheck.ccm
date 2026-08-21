@@ -101,6 +101,6 @@ export {
 
 export {
     extern const getter	getci ;
-}
+} /* end export */
 
 
