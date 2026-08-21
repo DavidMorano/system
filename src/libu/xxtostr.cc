@@ -319,51 +319,51 @@ constexpr int		b10 = 10 ;
 
 char *itostr	(int v,         char *endp)     	noex {
     return stostr<uint>(v,endp,b10) ;
-}
+} /* end */
 char *ltostr	(long v,        char *endp)     	noex {
     return stostr<ulong>(v,endp,b10) ;
-}
+} /* end */
 char *lltostr	(longlong v,    char *endp)     	noex {
     return stostr<ulonglong>(v,endp,b10) ;
-}
+} /* end */
 char *uitostr	(uint uv,       char *endp)     	noex {
     return utostr(uv,endp,b10) ;
-}
+} /* end */
 char *ultostr	(ulong uv,      char *endp)     	noex {
     return utostr(uv,endp,b10) ;
-}
+} /* end */
 char *ulltostr	(ulonglong uv,  char *endp)     	noex {
     return utostr(uv,endp,b10) ;
-}
+} /* end */
 
 char *itostr	(int v,         char *endp,int b)	noex {
     return stostr<uint>(v,endp,b) ;
-}
+} /* end */
 char *ltostr	(long v,        char *endp,int b)	noex {
     return stostr<ulong>(v,endp,b) ;
-}
+} /* end */
 char *lltostr	(longlong v,    char *endp,int b)	noex {
     return stostr<ulonglong>(v,endp,b) ;
-}
+} /* end */
 char *uitostr	(uint uv,       char *endp,int b)	noex {
     return utostr(uv,endp,b) ;
-}
+} /* end */
 char *ultostr	(ulong uv,      char *endp,int b)	noex {
     return utostr(uv,endp,b) ;
-}
+} /* end */
 char *ulltostr	(ulonglong uv,  char *endp,int b)	noex {
     return utostr(uv,endp,b) ;
-}
+} /* end */
 
 
 /* local subroutines */
 
 local char getdig_lo(int r) noex {
         return digtab.dig100[r][0] ;
-}
+} /* end subroutine */
 
 local char getdig_hi(int r) noex {
         return digtab.dig100[r][1] ;
-}
+} /* end subroutine */
 
 
