@@ -88,7 +88,6 @@ int uc_ttyname(int fd,char *dbuf,int dlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (uc_ttyname) */
+} /* end subroutine (uc_ttyname) */
 
 
