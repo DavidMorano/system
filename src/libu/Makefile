@@ -96,7 +96,7 @@ OBJ38= typecodes.o charnames.o
 OBJ39= strtox.o atox.o
 
 OBJ40= ascii.o ubufdefs.o vardefs.o
-OBJ41=
+OBJ41= memord.o
 OBJ42=
 OBJ43=
 
@@ -658,5 +658,6 @@ syspredefined.o:	syspredefined.cc	syspredefined.h		$(INCS)
 ascii.o:		ascii.cc		ascii.h			$(INCS)
 ubufdefs.o:		ubufdefs.cc		ubufdefs.h		$(INCS)
 vardefs.o:		vardefs.cc		vardefs.h		$(INCS)
+memord.o:		memord.cc		memord.hh		$(INCS)
 
 
