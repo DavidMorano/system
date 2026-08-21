@@ -28,22 +28,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/ipc.h>
-#include	<sys/sem.h>
-#include	<unistd.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdint>		/* |intptr_t| */
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/ipc.h>		/* POSIX® */
+#include	<sys/sem.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD |intptr_t| */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uipc.h"
 
@@ -80,7 +79,7 @@ int u_semget(key_t key,int nsems,int semflag) noex {
 	bool		f_exit = false ;
 	repeat {
 	    if ((rs = semget(key,nsems,semflag)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	        switch (rs) {
 	        case SR_NOMEM:
 	            if (to_nomem-- > 0) {
@@ -106,8 +105,7 @@ int u_semget(key_t key,int nsems,int semflag) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (u_semget) */
+} /* end subroutine (u_semget) */
 
 int u_semop(int semid,SEMBUF *sops,size_t nsops) noex {
 	int		rs = SR_FAULT ;
@@ -118,7 +116,7 @@ int u_semop(int semid,SEMBUF *sops,size_t nsops) noex {
 	if (sops) {
 	    repeat {
 	        if ((rs = semop(semid,sops,nsops)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	            switch (rs) {
 	            case SR_NOMEM:
 	                if (to_nomem-- > 0) {
@@ -151,8 +149,7 @@ int u_semop(int semid,SEMBUF *sops,size_t nsops) noex {
 	    } until ((rs >= 0) || f_exit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_semop) */
+} /* end subroutine (u_semop) */
 
 int u_semctl(int semid,int semnum,int cmd,...) noex {
 	va_list		ap ;
@@ -164,7 +161,7 @@ int u_semctl(int semid,int semnum,int cmd,...) noex {
 	unp = (SEMUN *) va_arg(ap,SEMUN *) ;
 	repeat {
 	    if ((rs = semctl(semid,semnum,cmd,unp)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	        switch (rs) {
 	        case SR_NOMEM:
 	            if (to_nomem-- > 0) {
@@ -183,7 +180,6 @@ int u_semctl(int semid,int semnum,int cmd,...) noex {
 	} until ((rs >= 0) || f_exit) ;
 	va_end(ap) ;
 	return rs ;
-}
-/* end subroutine (u_semctl) */
+} /* end subroutine (u_semctl) */
 
 
