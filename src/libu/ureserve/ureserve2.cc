@@ -304,39 +304,39 @@ constexpr short	chardata_dictorder[] = {
 
 bool char_iswhite(int ch) noex {
 	return char_data.iswhite[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 bool char_islc(int ch) noex {
 	return char_data.islc[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 bool char_isuc(int ch) noex {
 	return char_data.isuc[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 bool char_isfc(int ch) noex {
 	return char_data.isfc[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 short char_dictorder(int ch) noex {
     	return chardata_dictorder[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 uchar char_tolc(int ch) noex {
     	return chardata_tolc[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 uchar char_touc(int ch) noex {
     	return chardata_touc[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 uchar char_tofc(int ch) noex {
     	return chardata_tofc[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 int char_toval(int ch) noex {
 	return char_data.toval[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 
 /* local subroutines */
