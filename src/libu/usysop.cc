@@ -37,20 +37,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/time.h>
-#include	<cerrno>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/time.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* CSTD */
+#include	<usysbase.h>		/* CSTD */
+#include	<usyscalls.h>		/* CSTD */
+#include	<usupport.h>		/* CSTD */
+#include	<intsat.h>		/* CSTD */
+#include	<localmisc.h>		/* CSTD */
 
 #include	"usysop.h"
 
@@ -89,33 +87,30 @@ int u_adjtime(CTIMEVAL *tvp,TIMEVAL *ovp) noex {
 	int		rs = SR_INVALID ;
 	if (tvp || ovp) {
 	    if ((rs = adjtime(tvp,ovp)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_adjtime) */
+} /* end subroutine (u_adjtime) */
 
 int u_stime(time_t *tp) noex {
 	int		rs = SR_FAULT ;
 	if (tp) {
 	    if ((rs = stime(tp)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_stime) */
+} /* end subroutine (u_stime) */
 
 int u_time(time_t *rp) noex {
 	int		rs ;
 	if (time_t ut ; (ut = time(rp)) < 0) {
-	    rs = (- errno) ;	/* really only can be |EFAULT| */
+	    rs = (neg errno) ;	/* really only can be |EFAULT| */
 	} else {
 	    rs = intsat(ut) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_time) */
+} /* end subroutine (u_time) */
 
 
