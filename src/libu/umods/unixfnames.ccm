@@ -57,6 +57,6 @@ export {
 
 export {
     extern const unixfnames	unixfname ;
-}
+} /* end export */
 
 
