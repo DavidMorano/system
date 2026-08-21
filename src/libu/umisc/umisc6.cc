@@ -32,12 +32,12 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 module umisc ;
 
@@ -73,9 +73,9 @@ module umisc ;
 int snaddslash(char *rbuf,int rlen,int rl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if ((rlen >= 0) && (rl >= 0)) {
+	    if ((rlen >= 0) && (rl >= 0)) ylikely {
 	        rs = SR_OK ;
 		if ((rl == 0) || (rbuf[rl - 1] != '/')) {
 		    rbuf[rl] = '/' ;
@@ -84,7 +84,6 @@ int snaddslash(char *rbuf,int rlen,int rl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (snaddslash) */
+} /* end subroutine (snaddslash) */
 
 
