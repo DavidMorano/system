@@ -85,31 +85,36 @@ int inproj(cchar *name,cc *projname,void *rbuf,size_t) noex {
 /* Solaris® implementation */
 void setprojent(void) noex {
     	errno = ENOSYS ;
-} ;
+} /* end */
+
 void endprojent(void) noex {
     	errno = ENOSYS ;
-}
+} /* end */
+
 CPROJECT *getprojent(PROJECT *,void *,size_t) noex {
     	PROJECT	 *rp = nullptr ;
 	errno_t	ec = 0 ;
 	ec = ENOSYS ;
 	if (ec) errno = ec ;
 	return rp ;
-}
+} /* end */
+
 CPROJECT *getprojbyname(cchar *,PROJECT *,void *,size_t) noex {
     	PROJECT *rp = nullptr ;
 	errno_t	ec = 0 ;
 	ec = ENOSYS ;
 	if (ec) errno = ec ;
 	return rp ;
-}
+} /* end */
+
 CPROJECT *getprojbyid(projid_t,PROJECT *,void *,size_t) noex {
     	PROJECT *rp = nullptr ;
 	errno_t	ec = 0 ;
 	ec = ENOSYS ;
 	if (ec) errno = ec ;
 	return rp ;
-}
+} /* end */
+
 CPROJECT *getdefaultproj(cchar *,PROJECT *,void *,size_t) noex {
     	PROJECT *rp = nullptr ;
 	errno_t	ec = 0 ;
