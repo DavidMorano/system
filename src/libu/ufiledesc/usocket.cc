@@ -238,29 +238,25 @@ int u_bind(int fd,cvoid *sap,int sal) noex {
 	usocket		so(sap,sal) ;
 	so.m = &usocket::ibind ;
 	return so(fd) ;
-}
-/* end subroutine (u_bind) */
+} /* end subroutine (u_bind) */
 
 int u_listen(int fd,int backlog) noex {
 	usocket		so(backlog) ;
 	so.m = &usocket::ilisten ;
 	return so(fd) ;
-}
-/* end subroutine (u_listen) */
+} /* end subroutine (u_listen) */
 
 int u_setsockopt(int fd,int level,int optname,cvoid *valp,int len) noex {
 	usocket		so(level,optname,valp,len) ;
 	so.m = &usocket::isetsockopt ;
 	return so(fd) ;
-}
-/* end subroutine (u_setsockopt) */
+} /* end subroutine (u_setsockopt) */
 
 int u_getsockopt(int fd,int level,int optname,void *valp,int *lenp) noex {
 	usocket		so(level,optname,valp,lenp) ;
 	so.m = &usocket::igetsockopt ;
 	return so(fd) ;
-}
-/* end subroutine (u_getsockopt) */
+} /* end subroutine (u_getsockopt) */
 
 int u_getpeername(int fd,void *sap,int *lenp) noex {
 	int		rs = SR_FAULT ;
@@ -270,8 +266,7 @@ int u_getpeername(int fd,void *sap,int *lenp) noex {
 	    rs = so(fd) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_getpeername) */
+} /* end subroutine (u_getpeername) */
 
 int u_getsockname(int fd,void *sap,int *lenp) noex {
 	int		rs = SR_FAULT ;
@@ -281,8 +276,7 @@ int u_getsockname(int fd,void *sap,int *lenp) noex {
 	    rs = so(fd) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_getsockname) */
+} /* end subroutine (u_getsockname) */
 
 int u_send(int fd,cvoid *wbuf,int wlen,int flags) noex {
 	int		rs = SR_FAULT ;
@@ -292,8 +286,7 @@ int u_send(int fd,cvoid *wbuf,int wlen,int flags) noex {
 	    rs = so(fd) ;
 	}
 	return rs ;
-} 
-/* end subroutine (u_send) */
+} /* end subroutine (u_send) */
 
 int u_sendmsg(int fd,CMSGHDR *msgp,int flags) noex {
 	int		rs = SR_FAULT ;
@@ -303,8 +296,7 @@ int u_sendmsg(int fd,CMSGHDR *msgp,int flags) noex {
 	    rs = so(fd) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_sendmsg) */
+} /* end subroutine (u_sendmsg) */
 
 int u_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
 	int		rs = SR_FAULT ;
@@ -314,8 +306,7 @@ int u_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
 	    rs = so(fd) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_sendto) */
+} /* end subroutine (u_sendto) */
 
 int u_sendfile(int s,int fd,off_t fo,size_t c) noex {
 	int		rs = SR_FAULT ;
@@ -325,8 +316,7 @@ int u_sendfile(int s,int fd,off_t fo,size_t c) noex {
 	    rs = so(fd) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_sendfile) */
+} /* end subroutine (u_sendfile) */
 
 int u_recv(int fd,void *rbuf,int rlen,int flags) noex {
 	int		rs = SR_FAULT ;
@@ -336,8 +326,7 @@ int u_recv(int fd,void *rbuf,int rlen,int flags) noex {
 	    rs = so(fd) ;
 	}
 	return rs ;
-}
-/* end subroutine (u_recv) */
+} /* end subroutine (u_recv) */
 
 int u_recvmsg(int fd,MSGHDR *msgp,int flags) noex {
 	int		rs = SR_FAULT ;
@@ -347,8 +336,7 @@ int u_recvmsg(int fd,MSGHDR *msgp,int flags) noex {
 	    rs = so(fd) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_recvmsg) */
+} /* end subroutine (u_recvmsg) */
 
 int u_recvfrom(int fd,void *rbuf,int rlen,int flags,void *vp,int *lenp) noex {
 	int		rs = SR_FAULT ;
@@ -358,15 +346,13 @@ int u_recvfrom(int fd,void *rbuf,int rlen,int flags,void *vp,int *lenp) noex {
 	    rs = so(fd) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_recvfrom) */
+} /* end subroutine (u_recvfrom) */
 
 int u_shutdown(int fd,int dir) noex {
 	usocket	so(dir) ;
 	so.m = &usocket::ishutdown ;
 	return so(fd) ;
-}
-/* end subroutine (u_shutdown) */
+} /* end subroutine (u_shutdown) */
 
 
 /* local subroutines */
@@ -375,31 +361,28 @@ int usocket::ibind(int fd) noex {
 	int		rs = SR_FAULT ;
 	if (sap) {
 	    if ((rs = bind(fd,sap,sal)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (usocket::bind) */
+} /* end method (usocket::bind) */
 
 int usocket::ilisten(int fd) noex {
 	int		rs ;
 	if ((rs = listen(fd,sal)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (usocket::listen) */
+} /* end method (usocket::listen) */
 
 int usocket::isetsockopt(int fd) noex {
 	int		rs ;
 	socklen_t	slen = socklen_t(len) ;
 	if ((rs = setsockopt(fd,level,name,valp,slen)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (usocket::isetsockopt) */
+} /* end method (usocket::isetsockopt) */
 
 int usocket::igetsockopt(int fd) noex {
 	int		rs = SR_FAULT ;
@@ -407,66 +390,61 @@ int usocket::igetsockopt(int fd) noex {
 	    void	*vp = cast_const<void *>(valp) ;
 	    socklen_t	slen = socklen_t(*lenp) ;
 	    if ((rs = getsockopt(fd,level,name,vp,&slen)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    } else {
 	        *lenp = intsat(slen) ;
 		rs = intsat(slen) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (usocket::igetsockopt) */
+} /* end method (usocket::igetsockopt) */
 
 int usocket::igetpeername(int fd) noex {
 	SOCKADDR	*fromp = cast_const<SOCKADDR *>(sap) ;
 	socklen_t	slen = socklen_t(*lenp) ;
 	int		rs ;
 	if ((rs = getpeername(fd,fromp,&slen)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    *lenp = intsat(slen) ;
 	    rs = intsat(slen) ;
 	}
 	return rs ;
-}
-/* end method (usocket::igetpeername) */
+} /* end method (usocket::igetpeername) */
 
 int usocket::igetsockname(int fd) noex {
 	SOCKADDR	*fromp = cast_const<SOCKADDR *>(sap) ;
 	socklen_t	slen = socklen_t(*lenp) ;
 	int		rs ;
 	if ((rs = getsockname(fd,fromp,&slen)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    *lenp = intsat(slen) ;
 	    rs = intsat(slen) ;
 	}
 	return rs ;
-}
-/* end method (usocket::igetsockname) */
+} /* end method (usocket::igetsockname) */
 
 int usocket::isend(int fd) noex {
 	int		rs ;
 	csize		wsize = size_t(wlen) ;
 	if (ssize_t rsize ; (rsize = send(fd,wbuf,wsize,flags)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    rs = intsat(rsize) ;
 	}
 	return rs ;
-}
-/* end method (usocket::isend) */
+} /* end method (usocket::isend) */
 
 int usocket::isendmsg(int fd) noex {
 	int		rs ;
 	if (ssize_t rsize ; (rsize = sendmsg(fd,msgp,flags)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    rs = intsat(rsize) ;
 	}
 	return rs ;
-}
-/* end method (usocket::isendmsg) */
+} /* end method (usocket::isendmsg) */
 
 int usocket::isendto(int fd) noex {
 	int		rs ;
@@ -474,36 +452,33 @@ int usocket::isendto(int fd) noex {
 	csocklen	slen = socklen_t(sal) ;
 	ssize_t		rsize ;
 	if ((rsize = sendto(fd,wbuf,wsize,flags,sap,slen)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    rs = intsat(rsize) ;
 	}
 	return rs ;
-}
-/* end method (usocket::isendmsg) */
+} /* end method (usocket::isendmsg) */
 
 int usocket::irecv(int fd) noex {
 	int		rs ;
 	if (ssize_t rsize ; (rsize = recv(fd,rbuf,rlen,flags)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    rs = intsat(rsize) ;
 	}
 	return rs ;
-}
-/* end method (usocket::irecv) */
+} /* end method (usocket::irecv) */
 
 int usocket::irecvmsg(int fd) noex {
 	int		rs ;
 	MSGHDR		*mp = cast_const<MSGHDR *>(msgp) ;
 	if (ssize_t rsize ; (rsize = recvmsg(fd,mp,flags)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    rs = intsat(rsize) ;
 	}
 	return rs ;
-}
-/* end method (usocket::irecvmsg) */
+} /* end method (usocket::irecvmsg) */
 
 int usocket::irecvfrom(int fd) noex {
 	int		rs ;
@@ -512,27 +487,24 @@ int usocket::irecvfrom(int fd) noex {
 	SOCKADDR	*sp = cast_const<SOCKADDR *>(sap) ;
 	ssize_t		rsize ;
 	if ((rsize = recvfrom(fd,rbuf,rsz,flags,sp,&slen)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    rs = intsat(rsize) ;
 	    *lenp = intsat(slen) ;
 	}
 	return rs ;
-}
-/* end method (usocket::irecvfrom) */
+} /* end method (usocket::irecvfrom) */
 
 int usocket::ishutdown(int fd) noex {
 	int		rs ;
 	if ((rs = shutdown(fd,sal)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (usocket::ishutdown) */
+} /* end method (usocket::ishutdown) */
 
 int usender::isendfile(int fd) noex {
 	return usys::usendfile(fd,s,fo,c) ;
-}
-/* end method (usender::isendfile) */
+} /* end method (usender::isendfile) */
 
 
