@@ -52,12 +52,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"utimeout.h"
 #include	"utimeoutdefs.h"
@@ -120,7 +120,6 @@ int u_timeout(int w,int val) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (u_timeout) */
+} /* end subroutine (u_timeout) */
 
 
