@@ -67,7 +67,7 @@ using libu::snwcpy ;
 extern "C" {
     extern int	u_fstatfs(int,USTATFS *) noex ;
     extern int	u_fstatvfs(int,USTATVFS *) noex ;
-}
+} /* end extern */
 
 /* exported subroutines */
 
@@ -85,7 +85,7 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ufstype) */
-}
+} /* end */
 
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
@@ -94,14 +94,14 @@ namespace libu {
 	int		rs = SR_FAULT ;
 	if (nbuf) {
 	    if (USTATFS sb ; (rs = u_fstatfs(fd,&sb)) >= 0) {
-	        cchar	*cp = sb.f_fstypename ;
+	        ccharp	cp = sb.f_fstypename ;
 	        cint	cl = cstrnlen(sb.f_fstypename,MFSNAMELEN) ;
 	        rs = snwcpy(nbuf,nlen,cp,cl) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ufstype) */
-}
+} /* end */
 
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
@@ -113,7 +113,7 @@ namespace libu {
     sysret_t ufstype(char *rbuf,int rlen,int) noex {
 	return sncpy(rbuf,rlen,"remote") ;
     }
-}
+} /* end namespace */
 
 #else /* all other operating systems */
 
@@ -121,7 +121,7 @@ namespace libu {
     sysret_t ufstype(char *rbuf,int rlen,int) noex {
 	return sncpy(rbuf,rlen,"remote") ;
     }
-}
+} /* end namespace */
 
 #endif /* which operating system */
 
