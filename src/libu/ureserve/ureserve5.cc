@@ -31,7 +31,7 @@ module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
@@ -78,22 +78,22 @@ using libu::siwhtbrk ;			/* subroutine */
 local bool iswhiteand(strop *sop,int tch) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return ISWHT(ch) && (ch != tch) ;
-}
+} /* end subroutine */
 
 local bool isnotchr(strop *sop,int tch) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return (ch != tch) ;
-}
+} /* end subroutine */
 
 local bool isnotterm(strop *sop,cchar *terms) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return (! batst(terms,ch)) ;
-}
+} /* end subroutine */
 
 local bool isterm(strop *sop,cchar *terms) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return  batst(terms,ch) ;
-}
+} /* end subroutine */
 
 
 /* local variables */
@@ -247,31 +247,39 @@ int strop_span(strop *sop,cchar *ss) noex {
 
 int strop::start(cchar *ap,int al) noex {
 	return strop_start(this,ap,al) ;
-}
+} /* end */
+
 int strop::fieldwht(cchar **rpp) noex {
 	return strop_fieldwht(this,rpp) ;
-}
+} /* end */
+
 int strop::fieldchr(int sch,cchar **rpp) noex {
 	return strop_fieldchr(this,sch,rpp) ;
-}
+} /* end */
+
 int strop::fieldbrk(cchar *ss,cchar **rpp) noex {
 	return strop_fieldbrk(this,ss,rpp) ;
-}
+} /* end */
+
 int strop::whitechr(int tch) noex {
 	return strop_whitechr(this,tch) ;
-}
+} /* end */
+
 int strop::findchr(int tch) noex {
 	return strop_findchr(this,tch) ;
-}
+} /* end */
+
 int strop::findterm(cchar *terms) noex {
 	return strop_findterm(this,terms) ;
-}
+} /* end */
+
 int strop::spanterm(cchar *terms) noex {
 	return strop_spanterm(this,terms) ;
-}
+} /* end */
+
 int strop::span(cchar *ss) noex {
 	return strop_span(this,ss) ;
-}
+} /* end */
 
 void strop::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
