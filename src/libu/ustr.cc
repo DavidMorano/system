@@ -60,15 +60,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<poll.h>
-#include	<cerrno>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ustr.h"
 
@@ -104,7 +104,7 @@ namespace {
 	int msgputp(int,STRBUF *,STRBUF *) noex ;
 	int operator () (int,STRBUF *,STRBUF *) noex ;
     } ; /* end struct (ustr) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -120,59 +120,53 @@ namespace {
 
 int u_fattach(int fd,cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        if ((rs = fattach(fd,fname)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (u_fattach) */
+} /* end subroutine (u_fattach) */
 
-int u_fdetach(cchar *fname) noex {
+int u_detach(cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        if ((rs = fdetach(fname)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (u_fdetach) */
+} /* end subroutine (u_fdetach) */
 
 int u_strmsgget(int fd,STRBUF *cmp,STRBUF *dmp,int *fp) noex {
 	ustr		uso(fp) ;
 	uso.m = &ustr::msgget ;
 	return uso(fd,cmp,dmp) ;
-}
-/* end subroutine (u_strmsgget) */
+} /* end subroutine (u_strmsgget) */
 
 int u_strmsggetp(int fd,STRBUF *cmp,STRBUF *dmp,int *bp,int *fp) noex {
 	ustr		uso(fp,bp) ;
 	uso.m = &ustr::msggetp ;
 	return uso(fd,cmp,dmp) ;
-}
-/* end subroutine (u_strmsggetp) */
+} /* end subroutine (u_strmsggetp) */
 
 int u_strmsgput(int fd,STRBUF *cmp,STRBUF *dmp,int flags) noex {
 	ustr		uso(flags) ;
 	uso.m = &ustr::msgput ;
 	return uso(fd,cmp,dmp) ;
-}
-/* end subroutine (u_strmsgput) */
+} /* end subroutine (u_strmsgput) */
 
 int u_strmsgputp(int fd,STRBUF *cmp,STRBUF *dmp,int band,int flags) noex {
 	ustr		uso(flags,band) ;
 	uso.m = &ustr::msgputp ;
 	return uso(fd,cmp,dmp) ;
-}
-/* end subroutine (u_strmsgput) */
+} /* end subroutine (u_strmsgput) */
 
 
 /* local subroutines */
@@ -251,44 +245,38 @@ int ustr::operator () (int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	    } /* end if (some kind of error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (ustr::operator) */
+} /* end subroutine (ustr::operator) */
 
 int ustr::msgget(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		rs ;
 	if ((rs = getmsg(fd,cmp,dmp,fp)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ustr::msgget) */
+} /* end method (ustr::msgget) */
 
 int ustr::msggetp(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		rs ;
 	if ((rs = getpmsg(fd,cmp,dmp,bp,fp)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ustr::msggetp) */
+} /* end method (ustr::msggetp) */
 
 int ustr::msgput(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		rs ;
 	if ((rs = putmsg(fd,cmp,dmp,flags)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ustr::msgput) */
+} /* end method (ustr::msgput) */
 
 int ustr::msgputp(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		rs ;
 	if ((rs = putpmsg(fd,cmp,dmp,band,flags)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ustr::msgputp) */
-
+} /* end method (ustr::msgputp) */
 
 
