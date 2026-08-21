@@ -78,11 +78,11 @@ bool isin4mapped(ushort *in6addr) noex {
 	int		i ; /* used afterwards */
 	for (i = 0 ; i < 5 ; i += 1) {
 	    if (in6addr[i] != 0) break ;
-	}
+	} /* end for */
 	if (i == 5) {
-	    const ushort	v = in6addr[5] ;
+	    const ushort v = in6addr[5] ;
 	    f = ((v == 0) || (v == 0xFFFF)) ;
-	}
+	} /* end if */
 	return f ;
 } /* end subroutine (isin4mapped) */
 
@@ -91,11 +91,11 @@ bool isin6loopback(ushort *in6addr) noex {
 	int		i ; /* used-afterwards */
 	for (i = 0 ; i < 7 ; i += 1) {
 	    if (in6addr[i] != 0) break ;
-	}
+	} /* end for */
 	if (i == 7) {
-	    const ushort	v = ntohs(in6addr[7]) ;
+	    const ushort v = ntohs(in6addr[7]) ;
 	    f = (v == 0x0001) ;
-	}
+	} /* end if */
 	return f ;
 } /* end subroutine (isin6loopback) */
 
