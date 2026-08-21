@@ -38,25 +38,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |dir| + |dirent| */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usysflag.h>
-#include	<usupport.h>
-#include	<ufileop.h>		/* |u_pathconf(3u)| */
-#include	<umem.hh>
-#include	<errtimer.hh>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® |dir| + |dirent| */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<ufileop.h>		/* LIBU |u_pathconf(3u)| */
+#include	<umem.hh>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"posixdirent.hh"
 
@@ -128,8 +125,7 @@ int posixdirent::open(cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (posixdirent::open) */
+} /* end method (posixdirent::open) */
 
 int posixdirent::iclose() noex {
 	int		rs ;
@@ -146,8 +142,7 @@ int posixdirent::iclose() noex {
 	    magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (posixdirent::iclose) */
+} /* end method (posixdirent::iclose) */
 
 int posixdirent::read(dirent *ep,char *dbuf,int dlen) noex {
 	int		rs ;
@@ -161,8 +156,7 @@ int posixdirent::read(dirent *ep,char *dbuf,int dlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (posixdirent::read) */
+} /* end method (posixdirent::read) */
 
 int posixdirent::itell(off_t *offp) noex {
     	int		rs ;
@@ -171,8 +165,7 @@ int posixdirent::itell(off_t *offp) noex {
 	    rs = callout(&posixdirent::dirtell) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (posixdirent::itell) */
+} /* end method (posixdirent::itell) */
 
 int posixdirent::seek(off_t o) noex {
     	int		rs ;
@@ -181,8 +174,7 @@ int posixdirent::seek(off_t o) noex {
 	    rs = callout(&posixdirent::dirseek) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (posixdirent::seek) */
+} /* end method (posixdirent::seek) */
 
 int posixdirent::irewind() noex {
     	int		rs ;
@@ -190,8 +182,7 @@ int posixdirent::irewind() noex {
 	    rs = callout(&posixdirent::dirrewind) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (posixdirent::irewind) */
+} /* end method (posixdirent::irewind) */
 
 
 /* local subroutines */
@@ -211,8 +202,7 @@ int posixdirent::bufbegin(cchar *fn) noex {
 	    rs = SR_OK ;
 	} /* end if_constexpr (f_readdirr) */
 	return rs ;
-}
-/* end subroutine (posixdirent::bufbegin) */
+} /* end method (posixdirent::bufbegin) */
 
 int posixdirent::bufend() noex {
     	int		rs = SR_OK ;
@@ -224,8 +214,7 @@ int posixdirent::bufend() noex {
 	    delen = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (posixdirent::bufend) */
+} /* end method (posixdirent::bufend) */
 
 int posixdirent::callout(posixdirent_m m) noex {
         errtimer    to_again	= utimeout[uto_again] ;
@@ -262,8 +251,7 @@ int posixdirent::callout(posixdirent_m m) noex {
             } /* end if (error) */
         } until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end subroutine (posixdirent::callout) */
+} /* end method (posixdirent::callout) */
 
 int posixdirent::diropen() noex {
 	int		rs = SR_OK ;
@@ -271,11 +259,10 @@ int posixdirent::diropen() noex {
 	if (DIR *p ; (p = opendir(fname)) != nullptr) ylikely {
 	    dirp = p ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (posixdirent::diropen) */
+} /* end method (posixdirent::diropen) */
 
 int posixdirent::dirclose() noex {
 	int		rs = SR_NOTOPEN ;
@@ -283,13 +270,12 @@ int posixdirent::dirclose() noex {
 	    errno = 0 ;
 	    rs = SR_OK ;
 	    if (int rc = closedir(dirp) ; rc < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	    dirp = nullptr ;
 	} /* end if (open) */
 	return rs ;
-}
-/* end subroutine (posixdirent::dirclose) */
+} /* end method (posixdirent::dirclose) */
 
 int posixdirent::dirread() noex {
     	cint		desz = szof(dirent) ;
@@ -304,7 +290,7 @@ int posixdirent::dirread() noex {
 		        memcopy(dep,p,desz) ;
 	                rs = snwcpy(nbuf,nlen,p->d_name,nl) ;
 		    } else {
-	                rs = (- errno) ;	/* <- EOF condition */
+	                rs = (neg errno) ;	/* <- EOF condition */
 		    }
 	        } else {
 	            rs = (- ec) ;
@@ -315,13 +301,12 @@ int posixdirent::dirread() noex {
 		    memcopy(dep,p,desz) ;
 	            rs = snwcpy(nbuf,nlen,p->d_name,nl) ;
 	        } else {
-	            rs = (- errno) ;		/* <- EOF condition */
+	            rs = (neg errno) ;		/* <- EOF condition */
 	        }
 	    } /* end if_constexpr (f_readdirr) */
 	} /* end if (open) */
 	return rs ;
-}
-/* end subroutine (posixdirent::dirread) */
+} /* end method (posixdirent::dirread) */
 
 int posixdirent::dirtell() noex {
 	int		rs = SR_NOTOPEN ;
@@ -329,7 +314,7 @@ int posixdirent::dirtell() noex {
 	    long	loff{} ;
 	    errno = 0 ;
   	    loff = telldir(dirp) ;
-	    if ((rs = (- errno)) >= 0) {
+	    if ((rs = (neg errno)) >= 0) {
 	        so = off_t(loff) ;
 	        if (sop) *sop = so ;
 	        rs = intsat(loff) ;	/* |off_t| is weird on Sarwin */
@@ -338,8 +323,7 @@ int posixdirent::dirtell() noex {
 	    }
 	} /* end if (open) */
 	return rs ;
-}
-/* end subroutine (posixdirent::dirtell) */
+} /* end method (posixdirent::dirtell) */
 
 int posixdirent::dirseek() noex {
     	int		rs = SR_NOTOPEN ;
@@ -347,28 +331,26 @@ int posixdirent::dirseek() noex {
 	    long	loff = long(so) ;
 	    errno = 0 ;
 	    seekdir(dirp,loff) ;
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} /* end if (open) */
 	return rs ;
-}
-/* end subroutine (posixdirent::dirseek) */
+} /* end method (posixdirent::dirseek) */
 
 int posixdirent::dirrewind() noex {
     	int		rs = SR_NOTOPEN ;
 	if (dirp) ylikely {
 	    errno = 0 ;
 	    rewinddir(dirp) ;
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} /* end if (open) */
 	return rs ;
-}
-/* end subroutine (posixdirent::dirrewind) */
+} /* end method (posixdirent::dirrewind) */
 
 void posixdirent::dtor() noex {
     	if (cint rs = close() ; rs < 0) {
 	    ulogerror("posixdirent",rs,"dtor-close") ;
 	}
-}
+} /* end method */
 
 int posixdirent_te::operator () (off_t *offp) noex {
 	int		rs = SR_BUGCHECK ;
@@ -380,8 +362,7 @@ int posixdirent_te::operator () (off_t *offp) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (posixdirent_te::operator) */
+} /* end method (posixdirent_te::operator) */
 
 posixdirent_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -396,7 +377,6 @@ posixdirent_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (posixdirent_co::operator) */
+} /* end method (posixdirent_co::operator) */
 
 
