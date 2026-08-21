@@ -94,19 +94,23 @@ local int intsatux(UT v) noex {
 
 int intsatl(long v) noex {
 	return intsatsx(v) ;
-}
+} /* end */
+
 int intsatll(longlong v) noex {
 	return intsatsx(v) ;
-}
+} /* end */
+
 
 int intsatui(uint v) noex {
     	return intsatux(v) ;
-}
+} /* end */
+
 int intsatul(ulong v) noex {
     	return intsatux(v) ;
-}
+} /* end */
+
 int intsatull(ulonglong v) noex {
     	return intsatux(v) ;
-}
+} /* end */
 
 
