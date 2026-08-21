@@ -119,14 +119,13 @@ int u_getdents(int fd,void *dbuf,int dlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (u_getdents) */
+} /* end subroutine (u_getdents) */
 
 
 /* local subroutines */
 
 sysret_t udirop::igetdents(int fd) noex {
 	return ugetdents(fd,dbuf,dlen) ;
-}
+} /* end method */
 
 
