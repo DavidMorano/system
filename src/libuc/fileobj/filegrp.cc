@@ -118,11 +118,11 @@ local inline int filegrp_dtor(filegrp *op) noex {
 	    if (op->alp) ylikely {
 		delete op->alp ;
 		op->alp = nullptr ;
-	    }
+	    } /* end if (delete-vechand) */
 	    if (op->flp) ylikely {
 		delete op->flp ;
 		op->flp = nullptr ;
-	    }
+	    } /* end if (delete-cq) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (filegrp_dtor) */
@@ -197,7 +197,7 @@ int filegrp_finish(FG *op) noex {
             if (op->alp) {
                 vechand     *rlp = op->alp ;
                 void        *vp{} ;
-                for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
+                for (int i = 0 ; rlp->get(i,&vp) >= 0 ; i += 1) {
                     if (vp) {
                         FG_REC *rp = (FG_REC *) vp ;
                         {
@@ -241,17 +241,17 @@ int filegrp_add(FG *op,gid_t gid,cc *gn) noex {
 	int		rs ;
 	int		gl = 0 ;
 	if ((rs = filegrp_magic(op,gn)) >= 0) ylikely {
-		rs = SR_INVALID ;
-	        if ((gid != gidend) && gn[0]) ylikely {
-	            FG_REC	*rp{} ;
-	            if ((rs = filegrp_searchgid(op,&rp,gid)) >= 0) {
-	                gl = rs ;
-	                rs = record_update(rp,dt,gn) ;
-	            } else if (rs == SR_NOTFOUND) {
-	                rs = filegrp_newrec(op,dt,nullptr,gid,gn) ;
-	                gl = rs ;
-	            }
-	        } /* end if (valid) */
+	    rs = SR_INVALID ;
+	    if ((gid != gidend) && gn[0]) ylikely {
+	        FG_REC	*rp{} ;
+	        if ((rs = filegrp_searchgid(op,&rp,gid)) >= 0) {
+	            gl = rs ;
+	            rs = record_update(rp,dt,gn) ;
+	        } else if (rs == SR_NOTFOUND) {
+	            rs = filegrp_newrec(op,dt,nullptr,gid,gn) ;
+	            gl = rs ;
+	        }
+	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? gl : rs ;
 } /* end subroutine (filegrp_add) */
@@ -358,7 +358,7 @@ local int filegrp_searchgid(FG *op,FG_REC **rpp,gid_t gid) noex {
 	int		gl = 0 ;
 	void		*vp{} ;
 	if (rpp) *rpp = nullptr ;
-	for (int i = 0 ; (rs = vechand_get(rlp,i,&vp)) >= 0 ; i += 1) {
+	for (int i = 0 ; (rs = rlp->get(i,&vp)) >= 0 ; i += 1) {
 	    if (vp) {
 		rp = (FG_REC *) vp ;
 	        if (rp->gid == gid) break ;
@@ -367,7 +367,7 @@ local int filegrp_searchgid(FG *op,FG_REC **rpp,gid_t gid) noex {
 	if ((rs >= 0) && rp) {
 	   *rpp = rp ;
 	    gl = lenstr(rp->gn) ;
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? gl : rs ;
 } /* end subroutine (filegrp_searchgid) */
 
@@ -379,7 +379,7 @@ local int filegrp_maintenance(FG *op,time_t dt) noex {
 	int		rs1 ;
 	int		iold = -1 ; /* the oldest one */
 	void		*vp{} ;
-	for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; rlp->get(i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
 	        if ((dt - rp->ti_create) >= op->ttl) {
 		    rp = (FG_REC *) vp ;
@@ -392,7 +392,7 @@ local int filegrp_maintenance(FG *op,time_t dt) noex {
 	                iold = i ;
 	            }
 	        }
-	    }
+	    } /* end if (non-null) */
 	} /* end for */
 	if ((rs >= 0) && (iold >= 0)) {
 	    cint	n = vechand_count(op->alp) ;
