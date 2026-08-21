@@ -82,18 +82,22 @@ template<typename T> local int intcmpx(T v1,T v2) noex {
 
 int intcmpc(uchar v1,uchar v2)			noex {
 	return intcmpx(v1,v2) ;
-}
+} /* end */
+
 int intcmps(ushort v1,ushort v2)		noex {
 	return intcmpx(v1,v2) ;
-}
+} /* end */
+
 int intcmpi(uint v1,uint v2)			noex {
 	return intcmpx(v1,v2) ;
-}
+} /* end */
+
 int intcmpl(ulong v1,ulong v2)			noex {
 	return intcmpx(v1,v2) ;
-}
+} /* end */
+
 int intcmpll(ulonglong v1,ulonglong v2)		noex {
 	return intcmpx(v1,v2) ;
-}
+} /* end */
 
 
