@@ -47,11 +47,11 @@ EXTERNC_begin
 
 void setuserattr() noex { 
 	errno = ENOSYS ;
-}
+} /* end */
 
 void enduserattr() noex { 
 	errno = ENOSYS ;
-}
+} /* end */
 
 void free_userattr(userattr *ep) noex { 
 	if (ep) {
@@ -59,22 +59,22 @@ void free_userattr(userattr *ep) noex {
 	} else {
 	    errno = EFAULT ;
 	}
-}
+} /* end */
 
 userattr *getuserattr() noex {
 	errno = ENOSYS ;
 	return nullptr ;
-}
+} /* end */
 
 userattr *getusernam(const char *) noex  {
 	errno = ENOSYS ;
 	return nullptr ;
-}
+} /* end */
 
 userattr *getuseruid(uid_t) noex {
 	errno = ENOSYS ;
 	return nullptr ;
-}
+} /* end */
 
 EXTERNC_end
 
