@@ -99,7 +99,7 @@ export {
     constexpr int numbasedigs_maxbase = MAXBASE ; /* current max-base */
     constexpr int numbasedigs_maxtype = MAXTYPE ; /* types in bytes */
     constexpr int numbasedigs_nbases = (numbasedigs_maxbase+1) ;
-}
+} /* end export */
 
 consteval int ndigits(int t,int b) noex {
     int             n = 0 ;
