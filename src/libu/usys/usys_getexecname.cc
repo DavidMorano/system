@@ -143,8 +143,7 @@ cchar *getexecname() noex {
 	    ulogerror("getexecname",rs,"namer::operator") ;
 	}
 	return rp ;
-}
-/* end subroutine (getexecname) */
+} /* end subroutine (getexecname) */
 
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
@@ -158,8 +157,7 @@ cchar *getexecname() noex {
 	    rp = charp(r) ;
 	} /* end if (have entry) */
 	return rp ;
-}
-/* end subroutine (getexecname) */
+} /* end subroutine (getexecname) */
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 #endif /* (! defined(SYSHAS_GETEXECNAME)) || (SYSHAS_GETEXECNAME == 0) */
