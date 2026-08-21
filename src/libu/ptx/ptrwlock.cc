@@ -268,11 +268,11 @@ int ptrwlock_lockend(ptrwlock *psp) noex {
 
 int ptrwlock::lockrdto(int a) noex {
     	return ptrwlock_lockrdto(this,a) ;
-}
+} /* end method */
 
 int ptrwlock::lockwrto(int a) noex {
     	return ptrwlock_lockwrto(this,a) ;
-}
+} /* end method */
 
 void ptrwlock::dtor() noex {
 	if (cint rs = ptrwlock_destroy(this) ; rs < 0) {
