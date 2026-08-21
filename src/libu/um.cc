@@ -367,13 +367,15 @@ int u_munmap(void *ma,size_t ms) noex {
 int u_mmapbeg(void *ma,size_t ms,int pr,int fl,int fd,
 			off_t off,void *vp) noex {
 	return u_mmapbegin(ma,ms,pr,fl,fd,off,vp) ;
-}
+} /* end subroutine */
+
 int u_mlockbeg(void *ma,size_t ms) noex {
 	return u_mlockbegin(ma,ms) ;
-}
+} /* end subroutine */
+
 int u_mlockallbeg(int fl) noex {
 	return u_mlockallbegin(fl) ;
-}
+} /* end subroutine */
 
 
 
@@ -381,7 +383,7 @@ int u_mlockallbeg(int fl) noex {
 
 int umemop::callstd(void *ma,size_t ms) noex {
     	return (this->*m)(ma,ms) ;
-}
+} /* end method */
 
 int umemop::operator () (void *ma,size_t ms) noex {
         errtimer        to_again        = utimeout[uto_again] ;
