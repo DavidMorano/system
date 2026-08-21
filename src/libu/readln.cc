@@ -165,12 +165,11 @@ int readln(istream *isp,char *ibuf,int ilen,int dch) noex {
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (readln) */
+} /* end subroutine (readln) */
 
 extern int istr_readln(istream *isp,char *ibuf,int ilen,int dch) noex {
 	return readln(isp,ibuf,ilen,dch) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
