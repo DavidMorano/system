@@ -149,7 +149,7 @@ void ptca::dtor() noex {
 
 int ptca::getpshared(int *rp) noex {
 	return ptca_getpshared(this,rp) ;
-}
+} /* end method */
 
 int ptca_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
