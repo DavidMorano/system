@@ -62,14 +62,12 @@ static sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (sunos_sysinfo) */
+} /* end subroutine (sunos_sysinfo) */
 
 sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 	cint	req = SI_SRPC_DOMAIN ;	/* <- whew! nothing is easy */
 	return sunos_sysinfo(rbuf,rlen,req) ;
-}
-/* end subroutine (sunos_ugetnisdom) */
+} /* end subroutine (sunos_ugetnisdom) */
 
 
 /*----------------------------------------------------------------------------*/
