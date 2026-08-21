@@ -48,8 +48,7 @@ size_t strnlen(cchar *s,size_t nsz) noex {
 	    }
 	} /* end if (non-null) */
 	return rsz ;
-}
-/* end subroutine (strnlen) */
+} /* end subroutine (strnlen) */
 
 #endif /* SUBROUTINE_STRNLEN */
 
@@ -74,8 +73,7 @@ size_t strlcpy(char *dst,cchar *src,size_t msz) noex {
 	    if (*src) rsz += strlen(src) ;
 	} /* end if (non-null) */
 	return rsz ;
-}
-/* end subroutine (strlcpy) */
+} /* end subroutine (strlcpy) */
 
 #endif /* SUBROUTINE_STRLCPY */
 
