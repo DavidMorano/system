@@ -51,7 +51,7 @@ module ;
 #include	<usyscalls.h>		/* LIBU */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
-#include	<hasx.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasneedslash(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"findfilepath.h"
@@ -98,17 +98,15 @@ int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex {
 	int		len = 0 ; /* return-value */
 	if (pbuf && dnp && fn) ylikely {
 	    if ((rs = maxpathlen) >= 0) ylikely {
-		storebuf sb(pbuf,rs) ;
-	        if (rs >= 0) {
-		    rs = sb.strw(dnp,dnl) ;
-		}
-	        if ((rs >= 0) && (sb.idx > 0) && hasneedslash(dnp,dnl)) {
-	            rs = sb.chr('/') ;
-	        }
-	        if (rs >= 0) {
-		    rs = sb.str(fn) ;
-		}
-		len = sb.idx ;
+		if (storebuf sb(pbuf,rs) ; (rs = sb.strw(dnp,dnl)) >= 0) {
+	            if ((sb.idx > 0) && hasneedslash(dnp,dnl)) {
+	                rs = sb.chr('/') ;
+	            }
+	            if (rs >= 0) {
+		        rs = sb.str(fn) ;
+		    }
+		    len = sb.idx ;
+		} /* end if (storebuf) */
 	    } /* end if (maxpathlen) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
