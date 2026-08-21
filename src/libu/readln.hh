@@ -21,9 +21,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<istream>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<istream>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 extern int readln(std::istream *,char *,int,int = 0) noex ;
