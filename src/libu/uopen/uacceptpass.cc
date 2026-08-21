@@ -38,16 +38,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/conf.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<ctime>			/* |time(2)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usyscalls.h>
-#include	<localmisc.h>		/* |POLL_INTMULT| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/conf.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<ctime>			/* CSTD |time(2)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |POLL_INTMULT| */
 
 
 /* local defines */
@@ -81,8 +83,8 @@
 
 /* forward references */
 
-static int acceptpass_stall(int,STRRECVFD *) noex ;
-static int acceptpass_poll(int,STRRECVFD *,int) noex ;
+local int acceptpass_stall(int,STRRECVFD *) noex ;
+local int acceptpass_poll(int,STRRECVFD *,int) noex ;
 
 
 /* local variables */
@@ -117,7 +119,7 @@ namespace libu {
 
 /* local subroutines */
 
-static int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
+local int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
 	POLLFD		pfds[2] = {} ;
 	time_t		ti_now = time(nullptr) ;
 	time_t		ti_start ;
@@ -158,10 +160,9 @@ static int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
 	    if (rs < 0) break ;
 	} /* end while (polling) */
 	return (rs >= 0) ? pfd : rs ;
-}
-/* end subroutine (acceptpass_poll) */
+} /* end subroutine (acceptpass_poll) */
 
-static int acceptpass_stall(int fd_pass,STRRECVFD *sp) noex {
+local int acceptpass_stall(int fd_pass,STRRECVFD *sp) noex {
 	int		rs = SR_OK ;
 	int		pfd = -1 ; /* return-value */
 	while (rs != SR_OK) {
@@ -172,7 +173,6 @@ static int acceptpass_stall(int fd_pass,STRRECVFD *sp) noex {
 	    }
 	} /* end while */
 	return (rs >= 0) ? pfd : rs ;
-}
-/* end subroutine (acceptpass_stall) */
+} /* end subroutine (acceptpass_stall) */
 
 
