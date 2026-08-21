@@ -226,7 +226,7 @@ namespace {
 	int isetsid() noex ;
 	int isetgroups() noex ;
     } ; /* end struct (uprocess) */
-}
+} /* end namespace */
 
 
 /* forward references */
