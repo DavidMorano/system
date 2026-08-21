@@ -96,7 +96,7 @@ debon_mgr	debon ;
 
 debon_mgr::operator int () noex {
 	return (dfd >= 0) ;
-}
+} /* end method */
 
 int debfd(int fd) noex {
     	dfd = fd ;
