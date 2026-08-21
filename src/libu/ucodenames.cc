@@ -75,7 +75,6 @@ using std::partition_point ;		/* subroutine-template */
 /* local typedefs */
 
 
-
 /* external subroutines */
 
 
