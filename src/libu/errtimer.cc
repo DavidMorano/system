@@ -27,10 +27,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"errtimer.hh"
 
@@ -74,13 +75,11 @@ const reterr errtimer::operator () (int ars) noex {
 	    }
 	}
 	return r ;
-}
-/* end method (errtimer::operator) */
+} /* end method (errtimer::operator) */
 
 errtimer::operator reterr () noex {
 	reterr		r(rs,(mto == 0)) ;
 	return r ;
-}
-/* end method (errtimer::operator) */
+} /* end method (errtimer::operator) */
 
 
