@@ -37,23 +37,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>		/* |mode_t| */
-#include	<csignal>		/* |sig_atomic_t| */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usupport.h>
-#include	<uregfork.hh>		/* |uregfork{x}(3u)| */
-#include	<aflag.hh>
-#include	<timewatch.hh>
-#include	<ptm.h>
-#include	<ulogerror.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® |mode_t| */
+#include	<csignal>		/* CSTD |sig_atomic_t| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<uregfork.hh>		/* LIBU |uregfork{x}(3u)| */
+#include	<aflag.hh>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uobjlock.hh"
 
@@ -137,8 +134,7 @@ int uobjlock::iinit() noex {
 	    } /* end if (valid) */
 	} /* end if (not-voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (uobjlock::iinit) */
+} /* end subroutine (uobjlock::iinit) */
 
 int uobjlock::ifini() noex {
 	int		rs = SR_OK ;
@@ -163,8 +159,7 @@ int uobjlock::ifini() noex {
 	    finitdone = false ;
 	} /* end if (atexit registered) */
 	return rs ;
-}
-/* end method (uobjlock::ifini) */
+} /* end method (uobjlock::ifini) */
 
 int uobjlock::icallbegin(int to) noex {
 	int		rs ;
@@ -188,8 +183,7 @@ int uobjlock::icallend() noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end method (uobjlock::icallend) */
+} /* end method (uobjlock::icallend) */
 
 int uobjlock::isetexit() noex {
     	int		rs = SR_OK ;
@@ -197,8 +191,7 @@ int uobjlock::isetexit() noex {
 	    rs = uatexit(aefunc_f) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (uobjlock::isetexit) */
+} /* end method (uobjlock::isetexit) */
 
 void uobjlock::dtor() noex {
 	if (cint rs = ifini() ; rs < 0) {
@@ -225,7 +218,6 @@ int uobjlock_co::operator () (int to) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (uobjlock_co::operator) */
+} /* end method (uobjlock_co::operator) */
 
 
