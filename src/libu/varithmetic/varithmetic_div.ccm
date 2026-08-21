@@ -32,18 +32,18 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<concepts>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
-#include	<localmisc.h>
-#include	<dprint.hh>		/* debugging */
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<concepts>		/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU debugging */
 
 export module varithmetic.div ;
 
@@ -84,7 +84,7 @@ typedef const ulonglong	cull ;
 
 export {
     conex ull vdivushort(int,mut ull *,con ull *,ull) noex ;
-}
+} /* end export */
 
 
 /* local variables */
