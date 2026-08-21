@@ -20,7 +20,6 @@
 	Name:
 	hasendchr
 	hasendslash
-	ead
 
 	Description:
 	Determine if the given c-string has the specified 
@@ -101,5 +100,13 @@ bool hasendchr(cchar *sp,int µsl,int chx) noex {
 bool hasendslash(cchar *sp,int sl) noex {
     	return hasendchr(sp,sl,'/') ;
 } /* end subroutine (hasendslash) */
+
+bool hastrailchr(cchar *sp,int sl,int chx) noex {
+    	return hasendchr(sp,sl,chx) ;
+} /* end subroutine */
+
+bool hastrailslash(cchar *sp,int sl) noex {
+    	return hasendslash(sp,sl) ;
+} /* end subroutine */
 
 
