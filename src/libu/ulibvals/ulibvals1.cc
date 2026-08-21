@@ -45,10 +45,10 @@ module ;
 #include	<usysdefs.h>		/* LIBU |MAXBASE| */
 #include	<ulogerror.h>		/* LIBU */
 #include	<usysflag.h>		/* LIBU */
-#include	<sysconfcmds.h>		/* |_SC_{xx}| */
-#include	<localmisc.h>		/* |{xxx}BUFLEN| */
+#include	<sysconfcmds.h>		/* LIBU |_SC_{xx}| */
+#include	<localmisc.h>		/* LIBU |{xxx}BUFLEN| */
 
-#pragma		GCC dependency	"mod/usysconf.ccm"
+#pragma		GCC dependency		"mod/usysconf.ccm"
 
 module ulibvals ;
 
@@ -118,7 +118,7 @@ const int	ulibvals::digbuflen	= DIGBUFLEN ;	/* for |int256_t| */
 
 ulibvals::operator int () noex {
 	return rscum ;
-}
+} /* end method */
 
 const ulibvals	ulibval ;
 
