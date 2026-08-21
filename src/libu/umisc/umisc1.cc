@@ -35,13 +35,13 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlcpy(3c)| */
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strlcpy(3c)| */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 module umisc ;
 
@@ -68,7 +68,7 @@ module umisc ;
 local int cstrlcpy(char *dp,cchar *sp,int sl) noex {
     	csize	ssize = size_t(sl) ;
 	return int(strlcpy(dp,sp,ssize)) ;
-}
+} /* end subroutine */
 
 local int getrlen(int plen) noex {
     	int		rs = SR_INVALID ;
@@ -89,22 +89,27 @@ local int getrlen(int plen) noex {
 
 int mknpath1(char *pp,int pl,cc *s1) noex {
 	return mknpathx(pp,pl,1,s1) ;
-}
+} /* end */
+
 int mknpath2(char *pp,int pl,cc *s1,cc *s2) noex {
 	return mknpathx(pp,pl,2,s1,s2) ;
-}
+} /* end */
+
 int mknpath3(char *pp,int pl,cc *s1,cc *s2,cc *s3) noex {
 	return mknpathx(pp,pl,3,s1,s2,s3) ;
-}
+} /* end */
+
 int mknpath4(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4) noex {
 	return mknpathx(pp,pl,4,s1,s2,s3,s4) ;
-}
+} /* end */
+
 int mknpath5(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
 	return mknpathx(pp,pl,5,s1,s2,s3,s4,s5) ;
-}
+} /* end */
+
 int mknpath6(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 	return mknpathx(pp,pl,6,s1,s2,s3,s4,s5,s6) ;
-}
+} /* end */
 
 int mknpathx(char *pbuf,int plen,int n,...) noex {
 	va_list		ap ;
@@ -143,7 +148,6 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	    pl = intconv(bp - pbuf) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (mknpathx) */
+} /* end subroutine (mknpathx) */
 
 
