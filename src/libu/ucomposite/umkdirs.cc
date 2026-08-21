@@ -117,8 +117,7 @@ int u_mkdirs(cchar *dname,mode_t dm) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (u_mkdirs) */
+} /* end subroutine (u_mkdirs) */
 
 
 /* local subroutines */
