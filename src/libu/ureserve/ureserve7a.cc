@@ -96,7 +96,7 @@ module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -158,15 +158,15 @@ local constexpr char	wterms[] = {
 
 local inline bool istermorquote(cchar *terms,int ch) noex {
 	return (batst(terms,ch) || batst(quotes.terms,ch)) ;
-}
+} /* end */
 
 local inline bool istermandnotquote(cchar *terms,int ch) noex {
 	return batst(terms,ch) && (! batst(quotes.terms,ch)) ;
-}
+} /* end */
 
 local inline bool isquoteanddouble(int sl,int ch) noex {
 	return ((ch == CH_SQUOTE) && (sl > 1) && batst(doubles.terms,ch)) ;
-}
+} /* end */
 
 
 /* exported variables */
@@ -191,8 +191,7 @@ int field_start(field *fsbp,cchar *lp,int ll) noex {
 	    fsbp->ll = ll ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (field_start) */
+} /* end subroutine (field_start) */
 
 int field_finish(field *fsbp) noex {
 	int		rs = SR_FAULT ;
@@ -205,8 +204,7 @@ int field_finish(field *fsbp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (field_finish) */
+} /* end subroutine (field_finish) */
 
 int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		rs = SR_FAULT ;
@@ -262,8 +260,7 @@ int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 	    } /* end if (strop) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (field_get) */
+} /* end subroutine (field_get) */
 
 int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		rs = SR_FAULT ;
@@ -303,8 +300,7 @@ int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 	    } /* end if (so) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (field_getterm) */
+} /* end subroutine (field_getterm) */
 
 int field_word(field *op,cchar *terms,cchar **fpp) noex {
 	int		rs = SR_FAULT ;
@@ -358,8 +354,7 @@ int field_word(field *op,cchar *terms,cchar **fpp) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (field_word) */
+} /* end subroutine (field_word) */
 
 int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 	int		rs = SR_FAULT ;
@@ -460,8 +455,7 @@ int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 	    } /* end if (so) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (field_sharg) */
+} /* end subroutine (field_sharg) */
 
 int field_remaining(field *fsbp,cchar **lpp) noex {
 	int		rs = SR_FAULT ;
@@ -477,35 +471,34 @@ int field_remaining(field *fsbp,cchar **lpp) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (field_remaining) */
+} /* end subroutine (field_remaining) */
 
 
 /* local subroutines */
 
 int field::start(cchar *sp,int sl) noex {
 	return field_start(this,sp,sl) ;
-}
+} /* end method */
 
 int field::get(cchar *tp,cchar **rpp) noex {
 	return field_get(this,tp,rpp) ;
-}
+} /* end method */
 
 int field::getterm(cchar *tp,cchar **rpp) noex {
 	return field_getterm(this,tp,rpp) ;
-}
+} /* end method */
 
 int field::word(cchar *terms,cchar **fpp) noex {
 	return field_word(this,terms,fpp) ;
-}
+} /* end method */
 
 int field::sharg(cchar *terms,char *fbuf,int flen) noex {
 	return field_sharg(this,terms,fbuf,flen) ;
-}
+} /* end method */
 
 int field::remaining(cchar **rpp) noex {
 	return field_remaining(this,rpp) ;
-}
+} /* end method */
 
 void field::dtor() noex {
 	if (cint rs = field_finish(this) ; rs < 0) {
@@ -527,6 +520,5 @@ field_co::operator int () noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (field_co::operator) */
-
 
 
