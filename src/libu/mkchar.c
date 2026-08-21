@@ -79,7 +79,7 @@
 #ifndef	MKCHAR_STATICINLINE
 inline int mkchar(int ch) noex {
 	return (ch & UCHAR_MAX) ;
-}
+} /* end subroutine */
 /* end subroutine (mkchar) */
 #endif /* MKCHAR_STATICINLINE */
 
