@@ -80,7 +80,7 @@ import ureserve ;			/* |is{x}(3u)| */
 
 extern "C" {
     typedef bool (*ischr_f)(int) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
