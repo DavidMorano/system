@@ -32,14 +32,13 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<vector>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<vector>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module ureserve:isnot ;
 
@@ -59,7 +58,7 @@ export {
     bool isnotsupport(int) noex ;
     bool isnotterm(int) noex ;
     bool isnotvalid(int) noex ;
-}
+} /* end export */
 
 export {
     inline bool isNotAccess(int rc) noex {
