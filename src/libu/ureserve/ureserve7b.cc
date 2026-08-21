@@ -53,13 +53,13 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<baops.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -247,8 +247,7 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (field_wordphrase) */
+} /* end subroutine (field_wordphrase) */
 
 
 /* local subroutines */
