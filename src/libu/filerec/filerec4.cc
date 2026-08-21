@@ -88,15 +88,15 @@ module filerec ;
 
 bool filerec_iter::operator != (const filerec_iter &oit) noex {
     	return (baseit != oit.baseit) ;
-}
+} /* end method */
 
 bool filerec_iter::operator == (const filerec_iter &oit) noex {
     	return (baseit == oit.baseit) ;
-}
+} /* end method */
 
 filerec_ent filerec_iter::operator * () noex {
     	return *baseit ;
-}
+} /* end method */
 
 filerec_iter filerec_iter::operator + (int n) const noex {
     	filerec_iter	it(*this) ;
@@ -104,21 +104,21 @@ filerec_iter filerec_iter::operator + (int n) const noex {
 	    ++it.baseit ;
 	}
 	return it ;
-}
+} /* end method */
 
 filerec_iter &filerec_iter::operator += (int) noex {
     	return *this ;
-}
+} /* end method */
 
 filerec_iter filerec_iter::operator ++ () noex /* pre */ {
     	++baseit ;
 	return *this ;
-}
+} /* end method */
 
 filerec_iter filerec_iter::operator ++ (int) noex /* post */ {
     	filerec_iter	it(*this) ;
     	++baseit ;
 	return it ;
-}
+} /* end method */
 
 
