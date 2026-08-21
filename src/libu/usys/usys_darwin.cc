@@ -97,27 +97,31 @@ errno_t timer_create(clockid_t,SIGEVENT *,timer_t *tmp) noex {
 	    ec = ENOSYS ;
 	}
 	return ec ;
-}
+} /* end */
+
 errno_t timer_delete(timer_t) noex {
     return ENOSYS ;
-}
+} /* end */
+
 errno_t timer_settime(timer_t,int,CITIMERSPEC *ntvp,ITIMERSPEC *) noex {
 	errno_t		ec = EFAULT ;
 	if (ntvp) {
 	    ec = ENOSYS ;
 	}
 	return ec ;
-}
+} /* end */
+
 errno_t timer_gettime(timer_t,ITIMERSPEC *otvp) noex {
 	errno_t		ec = EFAULT ;
 	if (otvp) {
 	    ec = ENOSYS ;
 	}
 	return ec ;
-}
+} /* end */
+
 errno_t timer_getoverrun(timer_t) noex {
     return ENOSYS ;
-}
+} /* end */
 
 EXTERNC_end
 
@@ -155,7 +159,7 @@ unixret_t sigtimedwait(const sigset_t *setp,siginfo_t *sip,ctsp *tsp) noex {
 
 unixret_t sigwaitinfoto(const sigset_t *setp,siginfo_t *sip,ctsp *tsp) noex {
     	return sigtimedwait(setp,sip,tsp) ;
-}
+} /* end */
 
 EXTERNC_end
 
@@ -173,7 +177,7 @@ errno_t pthread_cond_reltimedwait_np(PTC *op,PTM *mp,CTIMESPEC *) noex {
 	    ec = ENOSYS ;
 	}
 	return ec ;
-}
+} /* end */
 
 #endif /* (!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0) */
 /* RELTIMEDWAIT end */
@@ -191,7 +195,7 @@ unixret_t darwinsem_init(sem_t *semp,int,unsigned int) noex {
 	    rs = SR_NOSYS ;
 	}
 	return rs ;
-}
+} /* end */
 
 unixret_t darwinsem_destroy(sem_t *semp) noex {
     	int		rs = SR_FAULT ;
@@ -199,7 +203,7 @@ unixret_t darwinsem_destroy(sem_t *semp) noex {
 	    rs = SR_NOSYS ;
 	}
 	return rs ;
-}
+} /* end */
 
 EXTERNC_end
 
@@ -234,8 +238,7 @@ int syscaller::isysctl() noex {
             rs = (- errno) ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end method (syscaller:isysctl) */
+} /* end method (syscaller:isysctl) */
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYS_DARWIN finish */
