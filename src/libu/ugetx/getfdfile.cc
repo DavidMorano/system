@@ -128,8 +128,7 @@ int getfdfile(cchar *fp,int µfl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (getfdfile) */
+} /* end subroutine (getfdfile) */
 
 
 /* local subroutines */
