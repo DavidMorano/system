@@ -79,32 +79,26 @@ template<typename T> local T remx(T v,int m) noex {
 
 int irem(int v,int m) noex {
 	return remx(v,m) ;
-}
-/* end subroutine (irem) */
+} /* end subroutine (irem) */
 
 long lrem(long v,int m) noex {
 	return remx(v,m) ;
-}
-/* end subroutine (lrem) */
+} /* end subroutine (lrem) */
 
 longlong llrem(longlong v,int m) noex {
 	return remx(v,m) ;
-}
-/* end subroutine (llrem) */
+} /* end subroutine (llrem) */
 
 uint urem(uint v,int m) noex {
 	return remx(v,m) ;
-}
-/* end subroutine (uirem) */
+} /* end subroutine (uirem) */
 
 ulong ulrem(ulong v,int m) noex {
 	return remx(v,m) ;
-}
-/* end subroutine (ulrem) */
+} /* end subroutine (ulrem) */
 
 ulonglong ullrem(ulonglong v,int m) noex {
 	return remx(v,m) ;
-}
-/* end subroutine (ullrem) */
+} /* end subroutine (ullrem) */
 
 
