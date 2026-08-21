@@ -32,16 +32,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uexec.h"
 
@@ -78,7 +78,7 @@ namespace {
 	int iexecv(cchar *,mainv,mainv) noex ;
 	int iexecvp(cchar *,mainv,mainv) noex ;
     } ; /* end struct (uexecbase) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -96,66 +96,60 @@ int u_execve(cchar *fn,mainv argv,mainv envv) noex {
 	uexecbase	eo ;
 	eo.m = &uexecbase::iexecve ;
 	return eo(fn,argv,envv) ;
-}
-/* end subroutine (uexecve) */
+} /* end subroutine (uexecve) */
 
 int u_execv(cchar *fn,mainv argv) noex {
 	uexecbase	eo ;
 	eo.m = &uexecbase::iexecv ;
 	return eo(fn,argv) ;
-}
-/* end subroutine (u_execv) */
+} /* end subroutine (u_execv) */
 
 int u_execvp(cchar *fn,mainv argv) noex {
 	uexecbase	eo ;
 	eo.m = &uexecbase::iexecvp ;
 	return eo(fn,argv) ;
-}
-/* end subroutine (u_execvp) */
+} /* end subroutine (u_execvp) */
 
 
 /* local subroutines */
 
 int uexecbase::callstd(cchar *fn,mainv argv,mainv envv) noex {
 	return (this->*m)(fn,argv,envv) ;
-}
+} /* end method */
 
 int uexecbase::iexecve(cchar *fn,mainv argv,mainv envv) noex {
 	int		rs ;
 	char		*const *eav = (char *const *) argv ;
 	char		*const *eev = (char *const *) envv ;
 	if ((rs = execve(fn,eav,eev)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (uexecbase::iexecve) */
+} /* end method (uexecbase::iexecve) */
 
 int uexecbase::iexecv(cchar *fn,mainv argv,mainv) noex {
 	int		rs ;
 	char		*const	*eav = (char *const *) argv ;
 	if ((rs = execv(fn,eav)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (uexecbase::iexecv) */
+} /* end method (uexecbase::iexecv) */
 
 int uexecbase::iexecvp(cchar *fn,mainv argv,mainv) noex {
 	int		rs ;
 	char		*const	*eav = (char *const *) argv ;
 	if (fn[0] != '/') {
 	    if ((rs = execvp(fn,eav)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} else {
 	    if ((rs = execv(fn,eav)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	}
 	return rs ;
-}
-/* end method (uexecbase::iexecvp) */
+} /* end method (uexecbase::iexecvp) */
 
 int uexecbase::operator () (cchar *fn,mainv argv,mainv envv) noex {
 	int		rs = SR_FAULT ;
