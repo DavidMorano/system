@@ -82,6 +82,8 @@ using buffer_ns::buffer_ext ;		/* subroutine */
 
 /* local typedefs */
 
+template<typename T> using ctxxx_f = int (*)(char *,int,T) noex ;
+
 
 /* external subroutines */
 
@@ -95,8 +97,7 @@ using buffer_ns::buffer_ext ;		/* subroutine */
 /* forward references */
 
 template<typename T>
-int buffer_xxxx(buffer *op,int (*ctxxx)(char *,int,T),T v) noex {
-	cint		dlen = DIGBUFLEN ;
+int buffer_xxxx(buffer *op,int dlen,ctxxx_f<T> ctxxx,T v) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op) ylikely {
@@ -105,29 +106,33 @@ int buffer_xxxx(buffer *op,int (*ctxxx)(char *,int,T),T v) noex {
 	        rs = ctxxx(bp,dlen,v) ;
 	        op->clen += rs ;
 		len = rs ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine-template (buffer_xxxx) */
 
 template<typename T>
 int buffer_binx(buffer *op,T v) noex {
-	return buffer_xxxx(op,ctbin,v) ;
+    	cint dlen = BINBUFLEN ;
+	return buffer_xxxx(op,dlen,ctbin,v) ;
 } /* end subroutine-template (buffer_binx) */
 
 template<typename T>
 int buffer_octx(buffer *op,T v) noex {
-	return buffer_xxxx(op,ctoct,v) ;
+    	cint dlen = OCTBUFLEN ;
+	return buffer_xxxx(op,dlen,ctoct,v) ;
 } /* end subroutine-template (buffer_octx) */
 
 template<typename T>
 int buffer_decx(buffer *op,T v) noex {
-	return buffer_xxxx(op,ctdec,v) ;
+    	cint dlen = DECBUFLEN ;
+	return buffer_xxxx(op,dlen,ctdec,v) ;
 } /* end subroutine-template (buffer_decx) */
 
 template<typename T>
 int buffer_hexx(buffer *op,T v) noex {
-	return buffer_xxxx(op,cthex,v) ;
+    	cint dlen = HEXBUFLEN ;
+	return buffer_xxxx(op,dlen,cthex,v) ;
 } /* end subroutine-template (buffer_hexx) */
 
 
