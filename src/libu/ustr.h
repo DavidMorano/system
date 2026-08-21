@@ -34,11 +34,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	<usys.h>
 
@@ -51,7 +48,11 @@ extern int u_strmsggetp(int,STRBUF *,STRBUF *,int *,int *) noex ;
 extern int u_strmsgput(int,STRBUF *,STRBUF *,int) noex ;
 extern int u_strmsgputp(int,STRBUF *,STRBUF *,int,int) noex ;
 
-extern int u_fdetach(cchar *) noex ;
+extern int u_detach(cchar *) noex ;
+
+local int u_fdetach(cchar *fname) noex {
+    	return u_detach(fname) ;
+} /* end subroutine */
 
 EXTERNC_end
 
