@@ -46,7 +46,7 @@
 hrtime_t gethrtime() noex {
 	const clockid_t	cid = CLOCK_MONOTONIC_RAW ;
 	return clock_gettime_nsec_np(cid) ;
-}
+} /* end */
 
 #elif	defined(OSNAME_LINUX) && (OSNAME_LINUX > 0)
 
@@ -62,13 +62,13 @@ hrtime_t gethrtime() noex {
 	    r += (t * onebillion) ;
 	}
 	return r ;
-}
+} /* end */
 
 #else /* all other OSes */
 
 hrtime_t gethrtime() noex {
 	return 0 ;
-}
+} /* end */
 
 #endif /* which OS */
 
