@@ -33,18 +33,18 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<aflag.hh>
-#include	<sigblocke.h>
-#include	<timewatch.hh>
-#include	<ptm.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<aflag.hh>		/* LIBU */
+#include	<sigblocke.h>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/usigblock.ccm"
 
@@ -121,8 +121,7 @@ int kernlockget() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
 	return (rs >= 0) ? cmask : rs ;
-}
-/* end subroutine (kernlockget) */
+} /* end subroutine (kernlockget) */
 
 int kernlockset(mode_t cmask) noex {
 	int		rs ;
@@ -137,8 +136,7 @@ int kernlockset(mode_t cmask) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
 	return (rs >= 0) ? omask : rs ;
-}
-/* end subroutine (kernlockset) */
+} /* end subroutine (kernlockset) */
 
 
 /* local subroutines */
@@ -161,15 +159,15 @@ int kernlocker::init() noex {
 		        }
 		        if (rs < 0) {
 		            uc_atforkexp(b,a,a) ;
-			}
+			} /* end if (error) */
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
             } else if (! finitdone) { 
                 timewatch       tw(to) ;
                 auto lamb = [this] () -> int {
@@ -185,8 +183,7 @@ int kernlocker::init() noex {
 	    } /* end if */
 	} /* end if (not-voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (kernlock_init) */
+} /* end subroutine (kernlock_init) */
 
 int kernlocker::fini() noex {
 	int		rs = SR_OK ;
@@ -206,8 +203,7 @@ int kernlocker::fini() noex {
 	    finitdone = false ;
 	} /* end if (atexit registered) */
 	return rs ;
-}
-/* end method (kernlocker::fini) */
+} /* end method (kernlocker::fini) */
 
 int kernlocker::get() noex {
 	int		rs ;
@@ -229,8 +225,7 @@ int kernlocker::get() noex {
 	} /* end if (init) */
 	cmask &= INT_MAX ;
 	return (rs >= 0) ? cmask : rs ;
-}
-/* end method (kernlocker::get) */
+} /* end method (kernlocker::get) */
 
 int kernlocker::setmode(mode_t cmask) noex {
 	int		rs ;
@@ -251,7 +246,6 @@ int kernlocker::setmode(mode_t cmask) noex {
 	} /* end if (init) */
 	omask &= INT_MAX ;
 	return (rs >= 0) ? omask : rs ;
-}
-/* end subroutine (kernlocker::set) */
+} /* end subroutine (kernlocker::set) */
 
 
