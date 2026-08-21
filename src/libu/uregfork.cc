@@ -60,18 +60,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usupport.h>
-#include	<umem.hh>
-#include	<timewatch.hh>
-#include	<ptm.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<umem.hh>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uregfork.hh"
 
@@ -141,17 +138,17 @@ namespace {
 /* forward references */
 
 extern "C" {
-    static void uregfork_atforkbefore() noex ;
-    static void uregfork_atforkparent() noex ;
-    static void uregfork_atforkchild() noex ;
-    static void uregfork_exit() noex ;
-}
+    local void uregfork_atforkbefore() noex ;
+    local void uregfork_atforkparent() noex ;
+    local void uregfork_atforkchild() noex ;
+    local void uregfork_exit() noex ;
+} /* end extern */
 
-static int	list_add(URF_LIST *,URF_ENT *) noex ;
-static int	list_rem(URF_LIST *,URF_ENT *) noex ;
+local int	list_add(URF_LIST *,URF_ENT *) noex ;
+local int	list_rem(URF_LIST *,URF_ENT *) noex ;
 
-static int	entry_load(URF_ENT *,void_f,void_f,void_f) noex ;
-static int	entry_match(URF_ENT *,void_f,void_f,void_f) noex ;
+local int	entry_load(URF_ENT *,void_f,void_f,void_f) noex ;
+local int	entry_match(URF_ENT *,void_f,void_f,void_f) noex ;
 
 
 /* local variables */
@@ -229,8 +226,7 @@ int uregfork::init() noex {
 	    } /* end if (initialization) */
 	} /* end if (no-void) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (uregfork::init) */
+} /* end subroutine (uregfork::init) */
 
 int uregfork::fini() noex {
 	int		rs = SR_OK ;	
@@ -249,8 +245,7 @@ int uregfork::fini() noex {
 	    finitdone = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end subroutine (uregfork::fini) */
+} /* end subroutine (uregfork::fini) */
 
 int uregfork::record(void_f sb,void_f sp,void_f sc) noex {
 	int		rs ;
@@ -275,8 +270,7 @@ int uregfork::record(void_f sb,void_f sp,void_f sc) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (usigblock) */
 	return rs ;
-}
-/* end subroutine (uregfork::record) */
+} /* end subroutine (uregfork::record) */
 
 int uregfork::expunge(void_f sb,void_f sp,void_f sc) noex {
 	int		rs ;
@@ -307,14 +301,12 @@ int uregfork::expunge(void_f sb,void_f sp,void_f sc) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (uregfork::expunge) */
+} /* end subroutine (uregfork::expunge) */
 
 int uregfork::trackbegin() noex {
 	ftrack = true ;
 	return SR_OK ;
-}
-/* end subroutine (uregfork::trackbegin) */
+} /* end subroutine (uregfork::trackbegin) */
 
 int uregfork::trackend() noex {
 	int		rs = SR_OK ;
@@ -333,8 +325,7 @@ int uregfork::trackend() noex {
 	    hlist.tail = nullptr ;
 	} /* end if (tracking was started) */
 	return rs ;
-}
-/* end subroutine (uregfork::trackend) */
+} /* end subroutine (uregfork::trackend) */
 
 /* traverse the list backwards (tail to head) */
 void uregfork::atforkbefore() noex {
@@ -353,8 +344,7 @@ void uregfork::atforkbefore() noex {
 	    } /* end if (locked) */
 	}
 	(void) rs ;
-}
-/* end subroutine (uregfork::atforkbefore) */
+} /* end subroutine (uregfork::atforkbefore) */
 
 /* traverse the list forwards (head to tail) */
 void uregfork::atforkparent() noex {
@@ -376,8 +366,7 @@ void uregfork::atforkparent() noex {
 	    }
 	}
 	(void) rs ;
-}
-/* end subroutine (uregfork::atforkparent) */
+} /* end subroutine (uregfork::atforkparent) */
 
 /* traverse the list forwards (head to tail) */
 void uregfork::atforkchild() noex {
@@ -399,27 +388,26 @@ void uregfork::atforkchild() noex {
 	    }
 	}
 	(void) rs ;
-}
-/* end subroutine (uregfork::atforkchild) */
+} /* end subroutine (uregfork::atforkchild) */
 
-static void uregfork_atforkbefore() noex {
+local void uregfork_atforkbefore() noex {
 	uregfork_data.atforkbefore() ;
-}
+} /* end */
 
-static void uregfork_atforkparent() noex {
+local void uregfork_atforkparent() noex {
 	uregfork_data.atforkparent() ;
-}
+} /* end */
 
-static void uregfork_atforkchild() noex {
+local void uregfork_atforkchild() noex {
 	uregfork_data.atforkchild() ;
-}
+} /* end */
 
-static void uregfork_exit() noex {
+local void uregfork_exit() noex {
 	uregfork_data.fvoid = true ;
-}
+} /* end */
 
 /* add at the tail */
-static int list_add(uregfork_list *lp,uregfork_ent *ep) noex {
+local int list_add(uregfork_list *lp,uregfork_ent *ep) noex {
 	uregfork_ent	*lep = lp->tail ;
 	if (lep) {
 	    lep->next = ep ;
@@ -432,11 +420,10 @@ static int list_add(uregfork_list *lp,uregfork_ent *ep) noex {
 	    lp->head = ep ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (list_add) */
+} /* end subroutine (list_add) */
 
 /* this is an entry-unlink operation (remove from middle) */
-static int list_rem(uregfork_list *lp,uregfork_ent *ep) noex {
+local int list_rem(uregfork_list *lp,uregfork_ent *ep) noex {
 	uregfork_ent	*pep = ep->prev ;
 	uregfork_ent	*nep = ep->next ;
 	if (nep) {
@@ -450,25 +437,22 @@ static int list_rem(uregfork_list *lp,uregfork_ent *ep) noex {
 	    lp->head = nep ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (list_rem) */
+} /* end subroutine (list_rem) */
 
-static int entry_load(uregfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
+local int entry_load(uregfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
 	ep->sub_before = sb ;
 	ep->sub_parent = sp ;
 	ep->sub_child = sc ;
 	ep->next = nullptr ;
 	return SR_OK ;
-}
-/* end subroutine (entry_load) */
+} /* end subroutine (entry_load) */
 
-static int entry_match(uregfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
+local int entry_match(uregfork_ent *ep,void_f sb,void_f sp,void_f sc) noex {
 	int		f = true ;
 	f = f && (ep->sub_before == sb) ;
 	f = f && (ep->sub_parent == sp) ;
 	f = f && (ep->sub_child == sc) ;
 	return f ;
-}
-/* end subroutine (entry_match) */
+} /* end subroutine (entry_match) */
 
 
