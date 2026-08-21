@@ -104,7 +104,7 @@ using libu::tofc ;		/* subroutine */
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
     typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
