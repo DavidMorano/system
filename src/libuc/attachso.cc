@@ -89,7 +89,7 @@ typedef mainv		mv ;
 
 extern "C" {
     extern int	isSpecialObject(void *) noex ;
-}
+} /* end */
 
 
 /* external variables */
