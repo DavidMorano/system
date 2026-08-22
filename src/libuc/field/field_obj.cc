@@ -33,7 +33,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -74,41 +74,41 @@
 
 int field::start(cchar *sp,int sl) noex {
 	return field_start(this,sp,sl) ;
-}
+} /* end method */
 
 int field::get(cchar *tp,cchar **rpp) noex {
 	return field_get(this,tp,rpp) ;
-}
+} /* end method */
 
 int field::getterm(cchar *tp,cchar **rpp) noex {
 	return field_getterm(this,tp,rpp) ;
-}
+} /* end method */
 
 int field::word(cchar *tp,cchar **fpp) noex {
 	return field_word(this,tp,fpp) ;
-}
+} /* end method */
 
 int field::wordphrase(cchar *tp,char *rbuf,int rlen) noex {
 	return field_wordphrase(this,tp,rbuf,rlen) ;
-}
+} /* end method */
 
 int field::sharg(cchar *tp,char *rbuf,int rlen) noex {
 	return field_sharg(this,tp,rbuf,rlen) ;
-}
+} /* end method */
 
 int field::srvarg(cchar *tp,char *rbuf,int rlen) noex {
 	return field_srvarg(this,tp,rbuf,rlen) ;
-}
+} /* end method */
 
 int field::remaining(cchar **rpp) noex {
 	return field_remaining(this,rpp) ;
-}
+} /* end method */
 
 void field::dtor() noex {
 	if (cint rs = field_finish(this) ; rs < 0) {
 	    ulogerror("field",rs,"fini-finish") ;
 	}
-}
+} /* end method */
 
 field_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
