@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		length of result
-	<0		error code (- errno)
+	<0		error code (neg errno)
 
 	Notes:
 	1. Apple-Darwin has depracated their version of |msxmsglen(2)|.
