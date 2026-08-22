@@ -105,7 +105,7 @@ local int entry_finish	(dirseen_ent *) noex ;
 extern "C" {
     local int vcmpname		(cvoid **,cvoid **) noex ;
     local int vcmpdevino	(cvoid **,cvoid **) noex ;
-}
+} /* end */
 
 
 /* local variables */
@@ -276,27 +276,27 @@ int dirseen_curenum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 
 int dirseen::add(cchar *sp,int sl,ustat *sbp) noex {
 	return dirseen_add(this,sp,sl,sbp) ;
-}
+} /* end method */
 
 int dirseen::havename(cchar *sp,int sl) noex {
 	return dirseen_havename(this,sp,sl) ;
-}
+} /* end method */
 
 int dirseen::havedevino(ustat *sbp) noex {
 	return dirseen_havedevino(this,sbp) ;
-}
+} /* end method */
 
 int dirseen::curbegin(dirseen_cur *curp) noex {
 	return dirseen_curbegin(this,curp) ;
-}
+} /* end method */
 
 int dirseen::curend(dirseen_cur *curp) noex {
 	return dirseen_curend(this,curp) ;
-}
+} /* end method */
 
 int dirseen::curenum(dirseen_cur *curp,char *rbuf,int rlen) noex {
 	return dirseen_curenum(this,curp,rbuf,rlen) ;
-}
+} /* end method */
 
 void dirseen::dtor() noex {
 	if (int rs ; (rs = finish) < 0) {
