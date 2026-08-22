@@ -29,23 +29,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecobj.h>
-#include	<hdb.h>
-#include	<storeitem.h>
-#include	<kvsfile.h>
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<kvsfile.h>		/* LIBUC */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"clusterdb.h"
 
@@ -75,7 +75,6 @@
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -130,11 +129,12 @@ struct svcentry_key {
 template<typename ... Args>
 local int clusterdb_ctor(clusterdb *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
-	    if ((op->ctp = new(nothrow) kvsfile) != np) ylikely {
+	    if ((op->ctp = new(nt) kvsfile) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new_kvsfile) */
 	} /* end if (non-null) */
@@ -290,8 +290,7 @@ int clusterdb_curfetch(CD *op,cc *cn,CD_CUR *curp,char *vbuf,int vlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (clusterdb_curfetch) */
+} /* end subroutine (clusterdb_curfetch) */
 
 namespace {
     struct fetcher {
@@ -347,8 +346,7 @@ int clusterdb_curfetchrev(CD *op,cc *nn,CD_CUR *curp,char *kbuf,int klen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (clusterdb_curfetchrev) */
+} /* end subroutine (clusterdb_curfetchrev) */
 
 fetcher::operator int () noex {
 	kvsfile		*kop = op->ctp ;
@@ -395,7 +393,6 @@ int clusterdb_check(CD *op,time_t daytime) noex {
 	    rs = kvsfile_check(op->ctp,daytime) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (clusterdb_check) */
+} /* end subroutine (clusterdb_check) */
 
 
