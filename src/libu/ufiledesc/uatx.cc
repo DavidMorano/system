@@ -149,7 +149,7 @@ int u_atlink(int fd,cchar *fn,int dfd,cchar *dfn,int fl) noex {
 sysret_t uatxer::iataccess(int fd) noex {
     	int		rs ;
 	if ((rs = faccessat(fd,fn,am,fl)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uatxer::iataccess) */
@@ -157,7 +157,7 @@ sysret_t uatxer::iataccess(int fd) noex {
 sysret_t uatxer::iatlink(int fd) noex {
     	int		rs ;
 	if ((rs = linkat(fd,fn,dfd,dfn,fl)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uatxer::iatlink) */
