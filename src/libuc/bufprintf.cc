@@ -72,8 +72,7 @@ int bufprintf(char *dbuf,int dlen,cchar *fmt,...) noex {
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bufprintf) */
+} /* end subroutine (bufprintf) */
 
 int bufvprintf(char *dbuf,int dlen,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
@@ -81,7 +80,6 @@ int bufvprintf(char *dbuf,int dlen,cchar *fmt,va_list ap) noex {
 	    rs = fmtstr(dbuf,dlen,mo,fmt,ap) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (bufvprintf) */
+} /* end subroutine (bufvprintf) */
 
 
