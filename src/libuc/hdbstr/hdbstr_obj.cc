@@ -73,51 +73,51 @@
 
 int hdbstr::add(cchar *kstr,int klen,cchar *vstr,int vlen) noex {
 	return hdbstr_add(this,kstr,klen,vstr,vlen) ;
-}
+} /* end method */
 
 int hdbstr::curbegin(hdbstr_cur *curp) noex {
 	return hdbstr_curbegin(this,curp) ;
-}
+} /* end method */
 
 int hdbstr::curget(hdbstr_cur *curp,cc **kpp,cc **vpp,int *vlp) noex {
 	return hdbstr_curget(this,curp,kpp,vpp,vlp) ;
-}
+} /* end method */
 
 int hdbstr::curenum(hdbstr_cur *curp,cc **kpp,cc **vpp,int *vlenp) noex {
 	return hdbstr_curenum(this,curp,kpp,vpp,vlenp) ;
-}
+} /* end method */
 
 int hdbstr::curdel(hdbstr_cur *curp,int fadv) noex {
 	return hdbstr_curdel(this,curp,fadv) ;
-}
+} /* end method */
 
 int hdbstr::curnext(hdbstr_cur *curp) noex {
 	return hdbstr_curnext(this,curp) ;
-}
+} /* end method */
 
 int hdbstr::curdone(hdbstr_cur *curp) noex {
 	return hdbstr_curdone(this,curp) ;
-}
+} /* end method */
 
 int hdbstr::curend(hdbstr_cur *curp) noex {
 	return hdbstr_curend(this,curp) ;
-}
+} /* end method */
 
 int hdbstr::fetch(cchar *kstr,int klen,hdbstr_cur *curp,cchar **rpp) noex {
 	return hdbstr_fetch(this,kstr,klen,curp,rpp) ;
-}
+} /* end method */
 
 int hdbstr::delkey(cchar *kstr,int klen) noex {
 	return hdbstr_delkey(this,kstr,klen) ;
-}
+} /* end method */
 
 int hdbstr::loadkeys(cchar *fn) noex {
 	return hdbstr_loadkeys(this,fn) ;
-}
+} /* end method */
 
 int hdbstr::loadpairs(cchar *fn) noex {
 	return hdbstr_loadpairs(this,fn) ;
-}
+} /* end method */
 
 void hdbstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
