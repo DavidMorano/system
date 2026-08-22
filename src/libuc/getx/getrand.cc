@@ -91,19 +91,18 @@ template<typename T> local int getrandx(T *p) noex {
 
 int getrand(void *rbuf,int rlen)	noex {
 	return uc_rand(rbuf,rlen) ;
-}
-/* end subroutine (getrand) */
+} /* end subroutine (getrand) */
 
 int getrandi	(int *p)		noex {
     return getrandx(p) ;
-}
+} /* end */
 
 int getrandl	(long *p)		noex {
     return getrandx(p) ;
-}
+} /* end */
 
 int getrandll	(longlong *p)		noex {
     return getrandx(p) ;
-}
+} /* end */
 
 
