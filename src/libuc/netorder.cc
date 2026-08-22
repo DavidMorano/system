@@ -223,29 +223,29 @@ int netorder_wull(char *buf,ulonglong ullw) noex {
 int netorder_readl(char *buf,ulonglong *ulwp) noex {
 	longlong	*lwp = (longlong *) ulwp ;
 	return netorder_rlong(buf,lwp) ;
-}
+} /* end */
 
 int netorder_writel(char *buf,ulonglong ulw) noex {
 	return netorder_wlong(buf,ulw) ;
-}
+} /* end */
 
 int netorder_readi(char *buf,uint *uiwp) noex {
 	int	*iwp = (int *) uiwp ;
 	return netorder_rint(buf,iwp) ;
-}
+} /* end */
 
 int netorder_writei(char *buf,uint uiw) noex {
 	return netorder_wint(buf,uiw) ;
-}
+} /* end */
 
 int netorder_reads(char *buf,ushort *uswp) noex {
 	short	*swp = (short *) uswp ;
 	return netorder_rshort(buf,swp) ;
-}
+} /* end */
 
 int netorder_writes(char *buf,uint usw) noex {
 	return netorder_wshort(buf,usw) ;
-}
+} /* end */
 
 #endif /* COMMENT */
 
