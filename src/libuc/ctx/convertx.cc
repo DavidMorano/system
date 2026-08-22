@@ -85,7 +85,7 @@ int converte(double v,int prec,int *dpp,int *fsign,char *buf) noex {
 	(void) fsign ;
 	(void) buf ;
 	return 0 ;
-}
+} /* end subroutine */
 
 int convertf(double v,int prec,int *dpp,int *fsign,char *buf) noex {
 	(void) v ;
@@ -94,7 +94,7 @@ int convertf(double v,int prec,int *dpp,int *fsign,char *buf) noex {
 	(void) fsign ;
 	(void) buf ;
 	return 0 ;
-}
+} /* end subroutine */
 
 int convertg(double v,int prec,int trailing,char *buf) noex {
 	(void) v ;
@@ -102,6 +102,6 @@ int convertg(double v,int prec,int trailing,char *buf) noex {
 	(void) trailing ;
 	(void) buf ;
 	return 0 ;
-}
+} /* end subroutine */
 
 
