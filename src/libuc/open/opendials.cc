@@ -110,7 +110,7 @@ namespace libuc {
 
 namespace libuc {
     constexpr opendialer	opendial_data ;
-}
+} /* end namespace (libuc) */
 
 
 /* exported subroutines */
