@@ -55,7 +55,7 @@ export {
     constexpr cint	chx_binary = mkchar('b') ;
     constexpr cint	chx_expand = mkchar('ß') ;
     constexpr cint	chx_badsub = mkchar('¿') ;
-}
+} /* end */
 
 export {
     bool hasourbad(cchar *,int) noex ;
