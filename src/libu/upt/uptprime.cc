@@ -242,7 +242,7 @@ int uptgetconcurrency() noex {
 	repeat {
 	    errno = 0 ;
 	    rs = pthread_getconcurrency() ;
-	    if (errno != 0) rs = (- errno) ;
+	    if (errno != 0) rs = (neg errno) ;
 	} until (rs != SR_INTR) ;
 	return rs ;
 } /* end subroutine (uptgetconcurrency) */
