@@ -91,26 +91,26 @@ import cfcharsx ;
 
 int cfcharsi(cchar *sp,int sl,int b,int *rp) noex {
 	return cfcharsx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfcharsl(cchar *sp,int sl,int b,long *rp) noex {
 	return cfcharsx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfcharsll(cchar *sp,int sl,int b,longlong *rp) noex {
 	return cfcharsx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfcharsui(cchar *sp,int sl,int b,uint *rp) noex {
 	return cfcharsx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfcharsul(cchar *sp,int sl,int b,ulong *rp) noex {
 	return cfcharsx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfcharsull(cchar *sp,int sl,int b,ulonglong *rp) noex {
 	return cfcharsx(sp,sl,b,rp) ;
-}
+} /* end */
 
 
