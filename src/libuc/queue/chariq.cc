@@ -237,15 +237,15 @@ int chariq_count(chariq *op) noex {
 
 int chariq::start(int µsz) noex {
 	return chariq_start(this,µsz) ;
-}
+} /* end method */
 
 int chariq::ins(int ch) noex {
 	return chariq_ins(this,ch) ;
-}
+} /* end method */
 
 int chariq::rem(char *rp) noex {
 	return chariq_rem(this,rp) ;
-}
+} /* end method */
 
 void chariq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
