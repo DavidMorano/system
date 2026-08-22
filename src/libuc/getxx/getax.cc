@@ -100,23 +100,23 @@ int getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 
 int getua_begin() noex {
 	return uc_getuabegin() ;
-}
+} /* end */
 
 int getua_end() noex {
 	return uc_getuaend() ;
-}
+} /* end */
 
 int getua_ent(ucentua *ep,char *ebuf,int elen) noex {
 	return uc_getuaent(ep,ebuf,elen) ;
-}
+} /* end */
 
 int getua_entnam(ucentua *ep,char *ebuf,int elen,cchar *name) noex {
 	return uc_getuanam(ep,ebuf,elen,name) ;
-}
+} /* end */
 
 int getua_entuid(ucentua *ep,char *ebuf,int elen,uid_t uid) noex {
 	return uc_getuauid(ep,ebuf,elen,uid) ;
-}
+} /* end */
 
 
 int getsp_begin() noex {
