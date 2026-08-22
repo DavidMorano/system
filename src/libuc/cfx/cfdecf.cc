@@ -101,14 +101,14 @@ template<typename T> local int cfdecfx(cchar *snp,int snl,T *rp) noex {
 
 int cfdecf(cchar *snp,int snl,float *rp) noex {
     	return cfdecfx(snp,snl,rp) ;
-}
+} /* end */
 
 int cfdecd(cchar *snp,int snl,double *rp) noex {
     	return cfdecfx(snp,snl,rp) ;
-}
+} /* end */
 
 int cfdecld(cchar *snp,int snl,longdouble *rp) noex {
     	return cfdecfx(snp,snl,rp) ;
-}
+} /* end */
 
 
