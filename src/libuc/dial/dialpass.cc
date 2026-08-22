@@ -39,22 +39,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/poll.h>
-#include	<sys/socket.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/poll.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialpass.h"
 
@@ -76,13 +77,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_pipe(int *) noex ;
-    extern int uc_ioctl(int,int,...) noex ;
-}
-
 
 /* external variables */
 
@@ -92,7 +86,7 @@ extern "C" {
 
 /* forward references */
 
-static int	waitready(int,int) noex ;
+local int	waitready(int,int) noex ;
 
 
 /* local variables */
@@ -148,13 +142,12 @@ int dialpass(cchar *fname,int timeout,int) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialpass) */
+} /* end subroutine (dialpass) */
 
 
 /* local subroutines */
 
-static int waitready(int fd,int timeout) noex {
+local int waitready(int fd,int timeout) noex {
 	time_t		ti_timeout ;
 	time_t		dt = time(nullptr) ;
 	int		rs = SR_OK ;
@@ -190,7 +183,6 @@ static int waitready(int fd,int timeout) noex {
 	    } /* end while */
 	} /* end if (ok) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (waitready) */
+} /* end subroutine (waitready) */
 
 
