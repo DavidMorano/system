@@ -28,25 +28,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>		/* open-flags */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<pwd.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<hdb.h>
-#include	<storeitem.h>
-#include	<strn.h>
-#include	<snwcpy.h>
-#include	<rmx.h>
-#include	<cfdec.h>
-#include	<lockfile.h>
-#include	<pwentry.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® open-flags */
+#include	<pwd.h>			/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<lockfile.h>		/* LIBUC */
+#include	<pwentry.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pwfile.h"
 
@@ -81,7 +81,7 @@ using std::nothrow ;			/* constant */
 extern "C" {
     extern int uc_stat(cchar *,ustat *) noex ;
     extern int uc_fstat(int,ustat *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -179,8 +179,7 @@ int pwfile_open(PF *op,cchar *pwfname) noex {
 	    }
 	} /* end if (pwfile_ctor) */
 	return rs ;
-}
-/* end subroutine (pwfile_open) */
+} /* end subroutine (pwfile_open) */
 
 int pwfile_close(PF *op) noex {
 	int		rs ;
@@ -208,8 +207,7 @@ int pwfile_close(PF *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pwfile_close) */
+} /* end subroutine (pwfile_close) */
 
 int pwfile_curenum(PF *op,PF_CUR *curp,PWE *uep,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -229,8 +227,7 @@ int pwfile_curenum(PF *op,PF_CUR *curp,PWE *uep,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pwfile_curenum) */
+} /* end subroutine (pwfile_curenum) */
 
 /* fetch the next entry that matches the specified username */
 int pwfile_fetchuser(PF *op,cc *un,PF_CUR *curp,PWE *uep,char *rb,int rl) noex {
@@ -265,8 +262,7 @@ int pwfile_fetchuser(PF *op,cc *un,PF_CUR *curp,PWE *uep,char *rb,int rl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pwfile_fetchuser) */
+} /* end subroutine (pwfile_fetchuser) */
 
 int pwfile_curbegin(PF *op,PF_CUR *curp) noex {
 	int		rs ;
@@ -302,8 +298,7 @@ int pwfile_curbegin(PF *op,PF_CUR *curp) noex {
 	    } /* end if (pwfile_checkopen) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pwfile_curbegin) */
+} /* end subroutine (pwfile_curbegin) */
 
 int pwfile_curend(PF *op,PF_CUR *curp) noex {
 	int		rs ;
@@ -321,8 +316,7 @@ int pwfile_curend(PF *op,PF_CUR *curp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pwfile_curend) */
+} /* end subroutine (pwfile_curend) */
 
 int pwfile_lock(PF *op,int type,int to_lock) noex {
 	int		rs ;
@@ -374,8 +368,7 @@ int pwfile_lock(PF *op,int type,int to_lock) noex {
 	    } /* end if (pwfile_checkopen) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_opened : rs ;
-}
-/* end subroutine (pwfile_lock) */
+} /* end subroutine (pwfile_lock) */
 
 
 /* private subroutines */
@@ -411,8 +404,7 @@ local int pwfile_loadbegin(PF *op) noex {
 	    }
 	} /* end if (pwfile_filefront) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (pwfile_loadbegin) */
+} /* end subroutine (pwfile_loadbegin) */
 
 local int pwfile_loadend(PF *op) noex {
 	int		rs = SR_OK ;
@@ -426,8 +418,7 @@ local int pwfile_loadend(PF *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (pwfile_loadend) */
+} /* end subroutine (pwfile_loadend) */
 
 local int pwfile_filefront(PF *op) noex {
 	int		rs = SR_NOENTRY ;
@@ -447,8 +438,7 @@ local int pwfile_filefront(PF *op) noex {
 	    } /* end if (uc_stat) */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (pwfile_filefront) */
+} /* end subroutine (pwfile_filefront) */
 
 local int pwfile_filefronter(PF *op) noex {
 	int		rs ;
@@ -478,8 +468,7 @@ local int pwfile_filefronter(PF *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (pwfile_filefronter) */
+} /* end subroutine (pwfile_filefronter) */
 
 local int pwfile_fileln(PF *op,cchar *lbuf,int ll) noex {
     	cnullptr	np{} ;
@@ -515,8 +504,7 @@ local int pwfile_fileln(PF *op,cchar *lbuf,int ll) noex {
             }
         } /* end if (initialized new entry) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (pwfile_fileln) */
+} /* end subroutine (pwfile_fileln) */
 
 local int pwfile_fileback(PF *op) noex {
 	vecitem		*alp = op->alp ;
@@ -535,8 +523,7 @@ local int pwfile_fileback(PF *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (pwfile_fileback) */
+} /* end subroutine (pwfile_fileback) */
 
 local int pwfile_checkopen(PF *op) noex {
 	int		rs = SR_OK ;
@@ -549,7 +536,6 @@ local int pwfile_checkopen(PF *op) noex {
 	    f = true ;
 	} /* end if (it wasn not open) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (pwfile_checkopen) */
+} /* end subroutine (pwfile_checkopen) */
 
 
