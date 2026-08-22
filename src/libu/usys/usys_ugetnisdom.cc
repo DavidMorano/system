@@ -87,7 +87,7 @@ namespace libu {
 	        if ((rs = getdom(rbuf,rlen)) >= 0) {
 	            rbuf[rlen] = '\0' ; /* for safety */
 	        } else {
-	            rs = (- errno) ;
+	            rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
