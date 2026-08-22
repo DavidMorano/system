@@ -35,7 +35,7 @@
 
 	Returns:
 	>=0		length of result
-	<0		error code (- errno)
+	<0		error code (neg errno)
 
 *******************************************************************************/
 
@@ -65,7 +65,7 @@ namespace usys {
 		    rs = SR_OK ;
 	            len = intsat(lw) ;
 	        } else {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -86,7 +86,7 @@ namespace usys {
 		clong lw = res ;
 	        len = intsat(lw) ;
 	    } else {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -107,7 +107,7 @@ namespace usys {
 		    rs = SR_OK ;
 	            len = intsat(lw) ;
 	        } else {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
