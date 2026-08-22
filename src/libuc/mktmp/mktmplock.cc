@@ -52,6 +52,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<dirseen.h>		/* LIBUC */
@@ -71,10 +72,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_lockf(int,int,off_t) noex ;
-}
 
 
 /* external variables */
