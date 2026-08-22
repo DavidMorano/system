@@ -64,6 +64,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<getpwx.h>		/* LIBUC */
 #include	<getuserhome.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
@@ -115,10 +116,6 @@ using libuc::libmem ;			/* variable */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
 
 
 /* external variables */
@@ -236,11 +233,11 @@ static bufsizevar	maxpathlen(bufsize_mp) ;
 
 int getrootdname(char *rbuf,int rlen,cchar *prname,cchar *domain) noex {
     	return getpr(gettries,rbuf,rlen,prname,domain) ;
-}
+} /* end subroutine */
 
 int mkpr(char *rbuf,int rlen,cchar *prname,cchar *domain) noex {
     	return getpr(mktries,rbuf,rlen,prname,domain) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
