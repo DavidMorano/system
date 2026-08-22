@@ -40,16 +40,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<bit>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<bit>			/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pow.h"
 #include	"xpow.h"
@@ -82,7 +82,7 @@ constexpr int	b10tab[] = {
 
 local inline int ipow10(int n) noex {
 	return b10tab[n] ;
-}
+} /* end */
 
 template<typename T> local T xpowraw(T b,int n) noex {
     	T	r = 1 ;
