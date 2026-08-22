@@ -332,15 +332,15 @@ local int bufstr_extend(bufstr *op,int nlen,char **rpp) noex {
 
 int bufstr::strw(cchar *sp,int sl) noex {
 	return bufstr_strw(this,sp,sl) ;
-}
+} /* end method */
 
 int bufstr::chr(int ch) noex {
 	return bufstr_chr(this,ch) ;
-}
+} /* end method */
 
 int bufstr::get(cchar **rpp) noex {
 	return bufstr_get(this,rpp) ;
-}
+} /* end method */
 
 void bufstr::dtor() noex {
 	if (cint rs = bufstr_finish(this) ; rs < 0) {
