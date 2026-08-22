@@ -42,26 +42,27 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<netdb.h>
-#include	<fcntl.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uxti.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucsigset.h>
-#include	<sigign.h>
-#include	<buffer.h>
-#include	<sfx.h>
-#include	<mkx.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uxti.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucsigset.h>		/* LIBUC */
+#include	<sigign.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialticotsord.h"
 
@@ -160,8 +161,7 @@ int dialticotsordmux(cc *abuf,int alen,cc *svc,cmv sav,int to,int opts) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialticotsordmux) */
+} /* end subroutine (dialticotsordmux) */
 
 
 /* local subroutines */
