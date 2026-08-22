@@ -126,7 +126,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     extern int	opensockaddr(int,int,int,SOCKADDR *,int) noex ;
-}
+} /* end */
 
 
 /* external variables */
@@ -472,7 +472,9 @@ local int try_inet(SI *sip) noex {
 	            if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	            rs1 = hostaddr_curend(&ha,&cur) ;
 		    if (rs >= 0) rs = rs1 ;
-	            if ((rs >= 0) && (c == 0)) rs = SR_HOSTUNREACH ;
+	            if ((rs >= 0) && (c == 0)) {
+			rs = SR_HOSTUNREACH ;
+		    }
 	        } /* end if (cursor) */
 	        rs1 = hostaddr_finish(&ha) ;
 	        if (rs >= 0) rs = rs1 ;
