@@ -109,14 +109,14 @@ template<typename UT> local UT bitrotatex(UT v,int n) noex {
 
 uint		bitrotateui(uint v,int n) noex {
     	return bitrotatex(v,n) ;
-}
+} /* end */
 
 ulong		bitrotateul(ulong v,int n) noex {
     	return bitrotatex(v,n) ;
-}
+} /* end */
 
 ulonglong	bitrotateull(ulonglong v,int n) noex {
     	return bitrotatex(v,n) ;
-}
+} /* end */
 
 
