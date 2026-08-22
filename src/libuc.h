@@ -288,10 +288,10 @@
 #include	<ucuserattr.h>
 #include	<ucutility.h>
 #include	<ucinfo.h>
+#include	<ucnameo.h>
+
 #include	<udomain.h>
 #include	<umask.h>
-#include	<unameo.h>
-#include	<upt.h>
 #include	<usyscalls.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
