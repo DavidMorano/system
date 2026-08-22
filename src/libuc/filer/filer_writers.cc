@@ -167,7 +167,7 @@ namespace {
 extern "C" {
     int		filer_writealign(filer *,int) noex ;
     int		filer_writezero(filer *,int) noex ;
-}
+} /* end */
 
 
 /* local variables */
