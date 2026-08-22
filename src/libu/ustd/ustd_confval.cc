@@ -103,7 +103,7 @@ namespace libu {
 	    rs = intsat(res) ;
 	} else {
 	    if (errno) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    } else {
 		if (hasnolimit(req)) {
 		    rs = INT_MAX ;
