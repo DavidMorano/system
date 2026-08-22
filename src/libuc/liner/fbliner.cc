@@ -158,11 +158,11 @@ int fbliner_adv(fbliner *lsp,int inc) noex {
 
 int fbliner::start(filer *p,off_t off,int ato) noex {
 	return fbliner_start(this,p,off,ato) ;
-}
+} /* end method */
 
 int fbliner::getln(cchar **lpp) noex {
 	return fbliner_getln(this,lpp) ;
-}
+} /* end method */
 
 void fbliner::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
