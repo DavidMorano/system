@@ -74,31 +74,31 @@ using namespace		ema_ns ;	/* |ema_starter()| */
 
 int ema::parse(cchar *sp,int sl) noex {
 	return ema_parse(this,sp,sl) ;
-}
+} /* end method */
 
 int ema::addent(ema_ent *ep) noex {
     	return ema_addent(this,ep) ;
-}
+} /* end method */
 
 int ema::addents(ema *oop) noex {
     	return ema_addents(this,oop) ;
-}
+} /* end method */
 
 int ema::get(int i,ema_ent **epp) noex {
 	return ema_get(this,i,epp) ;
-}
+} /* end method */
 
 int ema::getbestaddr(int i,cchar **rpp) noex {
     	return ema_getbestaddr(this,i,rpp) ;
-}
+} /* end method */
 
 int ema::haveaddr(cchar *sp,int sl) noex {
     	return ema_haveaddr(this,sp,sl) ;
-}
+} /* end method */
 
 int ema::first(cchar **rpp) noex {
     	return ema_first(this,rpp) ;
-}
+} /* end method */
 
 void ema::dtor() noex {
     if (cint rs = finish ; rs < 0) {
