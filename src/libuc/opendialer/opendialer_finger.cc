@@ -5,7 +5,7 @@
 /* open-dialer (finger) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -59,31 +59,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<baops.h>
-#include	<ids.h>
-#include	<keyopt.h>
-#include	<vecstr.h>
-#include	<vechand.h>
-#include	<sbuf.h>
-#include	<nulstr.h>
-#include	<logfile.h>
-#include	<strn.h>
-#include	<strwcpy.h>
-#include	<strx.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"opendialer_finger.h"
 #include	"defs.h"
@@ -125,7 +125,7 @@ struct argparse {
 	int		af ;
 	int		to ;
 	int		f_long ;
-} ;
+} ; /* end struct */
 
 
 /* local variables */
@@ -135,20 +135,20 @@ enum ops {
 	op_af,
 	op_long,
 	op_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	ops[] = {
 	"to",
 	"af",
 	"long",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 
 /* forward references */
 
-static int argparse_start(struct argparse *,cchar *) noex ;
-static int argparse_finish(struct argparse *) noex ;
+local int argparse_start(struct argparse *,cchar *) noex ;
+local int argparse_finish(struct argparse *) noex ;
 
 
 /* exported variables */
@@ -172,30 +172,30 @@ int		to ;
 	int		af = AF_UNSPEC ;
 	int		opts = 0 ;
 	int		fd = -1 ;
-	cchar	*argz = NULL ;
-	cchar	*hostname = NULL ;
-	cchar	*portspec = NULL ;
+	cchar	*argz = nullptr ;
+	cchar	*hostname = nullptr ;
+	cchar	*portspec = nullptr ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    int	i ;
 	    debugprintf("opendialer_finger: svc=%s\n",svc) ;
-	    if (argv != NULL) {
-	        for (i = 0 ; argv[i] != NULL ; i += 1) {
+	    if (argv != nullptr) {
+	        for (i = 0 ; argv[i] != nullptr ; i += 1) {
 	            debugprintf("opendialer_finger: a[%u]=%s\n",i,argv[i]) ;
 	        }
 	    }
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	if (svc[0] == '\0') return SR_INVALID ;
 
-	if (argv != NULL) {
-	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
+	if (argv != nullptr) {
+	    for (argc = 0 ; argv[argc] != nullptr ; argc += 1) ;
 	    argz = argv[0] ;
 	}
 
-	if ((rs >= 0) && (argz == NULL)) rs = SR_NOENT ;
+	if ((rs >= 0) && (argz == nullptr)) rs = SR_NOENT ;
 	if ((rs >= 0) && (argz[0] == '\0')) rs = SR_NOENT ;
 	if (rs < 0) goto ret0 ;
 
@@ -205,13 +205,13 @@ int		to ;
 	finger¥<af>:<host>:<port>[,to=<to>][­<arg(s)>]
 */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("opendialer_finger: argz=%s\n",argz) ;
 #endif
 
 	if ((rs = argparse_start(&ai,argz)) >= 0) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("opendialer_finger: svc=%s\n",svc) ;
 	    debugprintf("opendialer_finger: ai.s1=%s\n",ai.s1) ;
 	    debugprintf("opendialer_finger: ai.s2=%s\n",ai.s2) ;
@@ -219,13 +219,13 @@ int		to ;
 	    debugprintf("opendialer_finger: ai.to=%d\n",ai.to) ;
 	    debugprintf("opendialer_finger: ai.af=%d\n",ai.af) ;
 	    debugprintf("opendialer_finger: ai.f_long=%u\n",ai.f_long) ;
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	    if (ai.to >= 0) to = ai.to ;
 	    if (ai.af >= 0) af = ai.af ;
-	    if ((ai.s1 != NULL) && (strcmp(svc,argz) != 0)) {
-	        if (ai.s2 != NULL) {
-	            if (ai.s3 != NULL) {
+	    if ((ai.s1 != nullptr) && (strcmp(svc,argz) != 0)) {
+	        if (ai.s2 != nullptr) {
+	            if (ai.s3 != nullptr) {
 			hostname = ai.s1 ;
 	                portspec = ai.s2 ;
 	                rs = getaf(svc,-1) ;
@@ -244,7 +244,7 @@ int		to ;
 		hostname = LOCALHOST ;
 	    }
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("opendialer_finger: args rs=%d \n",rs) ;
 	debugprintf("opendialer_finger: hn=%s ps=%s svc=%s\n",
 		hostname,portspec,svc) ;
@@ -259,28 +259,28 @@ int		to ;
 		    int		n = 0 ;
 		    cchar	**av = (cchar **) bp ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 		    debugprintf("opendialer_finger: svc=%s\n",
 			svc) ;
 #endif
 
 		    if (argc > 0) {
 			int	i ;
-		        for (i = 1 ; argv[i] != NULL ; i += 1) {
+		        for (i = 1 ; argv[i] != nullptr ; i += 1) {
 			    av[n++] = argv[i] ;
 			}
 		    }
-		    av[n] = NULL ;
+		    av[n] = nullptr ;
 
-#if	CF_DEBUGS
-	            for (n = 0 ; av[n] != NULL ; n += 1) {
+#if	CF_DEBUG
+	            for (n = 0 ; av[n] != nullptr ; n += 1) {
 	                debugprintf("opendialer_finger: a[%u]=%s\n",n,av[n]) ;
 		    }
 #endif
 
 /* continue */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 		    debugprintf("opendialer_finger: mid rs=%d f_long=%u\n",
 			rs,ai.f_long) ;
 		    debugprintf("opendialer_finger: hostname=%s\n",hostname) ;
@@ -304,24 +304,22 @@ int		to ;
 
 ret0:
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("opendialer_finger: ret rs=%d fd=%u\n",rs,fd) ;
 #endif
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opendialer_finger) */
+} /* end subroutine (opendialer_finger) */
 
 
 /* local subroutines */
-
 
 /*
 	finger¥[<af>]:<host>[:<port>]:<svc>[,to=<to>][,af=<af>][­<arg(s)>]
 	finger¥[<af>]:<host>:<svc>[,to=<to>][,af=<af>][­<arg(s)>]
 */
 
-static int argparse_start(struct argparse *app,cchar *args)
+local int argparse_start(struct argparse *app,cchar *args)
 {
 	int		rs = SR_OK ;
 	int		s1l = 0 ;
@@ -329,22 +327,22 @@ static int argparse_start(struct argparse *app,cchar *args)
 	int		s3l = 0 ;
 	int		opl = 0 ;
 	cchar	*tp, *sp ;
-	cchar	*s1p = NULL ;
-	cchar	*s2p = NULL ;
-	cchar	*s3p = NULL ;
-	cchar	*opp = NULL ;
+	cchar	*s1p = nullptr ;
+	cchar	*s2p = nullptr ;
+	cchar	*s3p = nullptr ;
+	cchar	*opp = nullptr ;
 
 	memclear(app) ;
 	app->to = -1 ;
 	app->af = -1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("opendialer_finger/argparse_start: args=%s\n",args) ;
 #endif
 
-	if ((args == NULL) || (args[0] == '\0')) goto ret0 ;
+	if ((args == nullptr) || (args[0] == '\0')) goto ret0 ;
 
-	if ((tp = strbrk(args,",:")) != NULL) {
+	if ((tp = strbrk(args,",:")) != nullptr) {
 	    int		oi ;
 	    int		v ;
 	    int		kl, vl ;
@@ -357,23 +355,23 @@ static int argparse_start(struct argparse *app,cchar *args)
 	    if (tp[0] == ':') {
 	        s2p = sp ;
 	        s2l = -1 ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("opendialer_finger/argparse_start: s=%s\n",sp) ;
 #endif
-	        if ((tp = strbrk(sp,":,")) != NULL) {
+	        if ((tp = strbrk(sp,":,")) != nullptr) {
 		    s2l = (tp-sp) ;
 	    	    sp = (tp+1) ;
 	    	    if (tp[0] == ':') {
 			s3p = sp ;
 			s3l = -1 ;
-	                if ((tp = strchr(sp,',')) != NULL) {
+	                if ((tp = strchr(sp,',')) != nullptr) {
 	                    s3l = (tp-sp) ;
 	                    sp = (tp+1) ;
 			}
 		    }
 		}
 	    }
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("opendialer_finger/argparse_start: s1=>%r<\n",
 		s1p,s1l) ;
 	    debugprintf("opendialer_finger/argparse_start: s2=>%r<\n",
@@ -386,28 +384,28 @@ static int argparse_start(struct argparse *app,cchar *args)
 	    while (ch) {
 	        opp = sp ;
 	        opl = -1 ;
-	        if ((tp = strchr(sp,',')) != NULL) {
+	        if ((tp = strchr(sp,',')) != nullptr) {
 	            opl = (tp-sp) ;
 		    nsp = (tp+1) ;
 	        } else {
 	            opl = lenstr(sp) ;
 		    nsp = (sp+opl) ;
 	        }
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("opendialer_finger/argparse_start: op=>%r<\n",opp,opl) ;
 #endif
 		kp = opp ;
 		kl = opl ;
-		vp = NULL ;
+		vp = nullptr ;
 		vl = 0 ;
-		if ((tp = strnchr(opp,opl,'=')) != NULL) {
+		if ((tp = strnchr(opp,opl,'=')) != nullptr) {
 		    kl = (tp-opp) ;
 		    vp = (tp+1) ;
 		    vl = (opp+opl) - (tp+1) ;
 		}
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("opendialer_finger/argparse_start: k=%r\n",kp,kl) ;
-		if (vp != NULL) 
+		if (vp != nullptr) 
 	            debugprintf("opendialer_finger/argparse_start: v=%r\n",
 			vp,vl) ;
 #endif
@@ -435,7 +433,7 @@ static int argparse_start(struct argparse *app,cchar *args)
 	            } /* end switch */
 		} /* end if */
 	        sp = nsp ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("opendialer_finger/argparse_start: "
 		    "while-bot rs=%d\n",rs) ;
 #endif
@@ -443,32 +441,32 @@ static int argparse_start(struct argparse *app,cchar *args)
 	        ch = (sp[0] & 0xff) ;
 	    } /* end while */
 	    if ((rs >= 0) && 
-		((s1p != NULL) || (s2p != NULL) || (s3p != NULL))) {
+		((s1p != nullptr) || (s2p != nullptr) || (s3p != nullptr))) {
 	        int	size = 0 ;
 	        char	*bp ;
-	        if (s1p != NULL) {
+	        if (s1p != nullptr) {
 	            if (s1l < 0) s1l = lenstr(s1p) ;
 	            size += (s1l + 1) ;
 	        }
-	        if (s2p != NULL) {
+	        if (s2p != nullptr) {
 	            if (s2l < 0) s2l = lenstr(s2p) ;
 	            size += (s2l + 1) ;
 	        }
-	        if (s3p != NULL) {
+	        if (s3p != nullptr) {
 	            if (s3l < 0) s3l = lenstr(s3p) ;
 	            size += (s3l + 1) ;
 	        }
 	        if ((rs = uc_malloc(size,&bp)) >= 0) {
 	            app->a = bp ;
-	            if (s1p != NULL) {
+	            if (s1p != nullptr) {
 	                app->s1 = bp ;
 	                bp = strwcpy(bp,s1p,s1l) + 1 ;
 	            }
-	            if (s2p != NULL) {
+	            if (s2p != nullptr) {
 	                app->s2 = bp ;
 	                bp = strwcpy(bp,s2p,s2l) + 1 ;
 	            }
-	            if (s3p != NULL) {
+	            if (s3p != nullptr) {
 	                app->s3 = bp ;
 	                bp = strwcpy(bp,s3p,s3l) + 1 ;
 	            }
@@ -479,26 +477,22 @@ static int argparse_start(struct argparse *app,cchar *args)
 
 ret0:
 	return rs ;
-}
-/* end subroutine (argparse_start) */
+} /* end subroutine (argparse_start) */
 
-
-static int argparse_finish(struct argparse *app)
-{
+local int argparse_finish(struct argparse *app) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (app->a != NULL) {
+	if (app->a) {
 	    rs1 = uc_free(app->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    app->a = NULL ;
+	    app->a = nullptr ;
 	}
-
-	app->s1 = NULL ;
-	app->s2 = NULL ;
-	app->s3 = NULL ;
+	{
+	app->s1 = nullptr ;
+	app->s2 = nullptr ;
+	app->s3 = nullptr ;
+	}
 	return rs ;
-}
-/* end subroutine (argparse_finish) */
+} /* end subroutine (argparse_finish) */
 
 
