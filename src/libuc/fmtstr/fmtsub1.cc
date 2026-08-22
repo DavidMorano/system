@@ -84,23 +84,23 @@ module fmtsub ;
 
 int fmtsub::start(char *ub,int ul,int fm) noex {
 	return fmtsub_start(this,ub,ul,fm) ;
-}
+} /* end method */
 
 int fmtsub::strclean(cchar *sp,int sl) noex {
 	return fmtsub_strclean(this,sp,sl) ;
-}
+} /* end method */
 
 int fmtsub::strw(cchar *sp,int sl) noex {
 	return fmtsub_strw(this,sp,sl) ;
-}
+} /* end method */
 
 int fmtsub::chr(int ch) noex {
 	return fmtsub_chr(this,ch) ;
-}
+} /* end method */
 
 int fmtsub::blanks(int n) noex {
 	return fmtsub_blanks(this,n) ;
-}
+} /* end method */
 
 int fmtsub::emitter(fmtspec *fsp,cchar *bp,int bl) noex {
     	int		rs = SR_OK ;
@@ -112,11 +112,11 @@ int fmtsub::emitter(fmtspec *fsp,cchar *bp,int bl) noex {
 
 int fmtsub::emit(fmtspec *fsp,cchar *sp,int sl) noex {
 	return fmtsub_emit(this,fsp,sp,sl) ;
-}
+} /* end method */
 
 int fmtsub::formstr(fmtspec *fsp,fmtstrdata *sdp) noex {
 	return fmtsub_formstr(this,fsp,sdp) ;
-}
+} /* end method */
 
 void fmtsub::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
