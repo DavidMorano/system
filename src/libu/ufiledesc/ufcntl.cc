@@ -164,7 +164,7 @@ local sysret_t try_fcntl(int fd,int cmd,uintptr_t anyarg) noex {
 int ufuncter::ifcntl(int fd) noex {
 	int		rs ;
 	if ((rs = fcntl(fd,cmd,anyarg)) == -1) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} /* end if */
 	if (rs == SR_ACCESS) {
 	    switch (cmd) {
