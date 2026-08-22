@@ -150,11 +150,11 @@ fsdir_co::operator int () noex {
 
 int fsdir::read(fsdir_ent *ep,char *ebuf,int elen) noex {
 	return fsdir_read(this,ep,ebuf,elen) ;
-}
+} /* end method */
 
 int fsdir::seek(off_t o) noex {
 	return fsdir_seek(this,o) ;
-}
+} /* end method */
 
 void fsdir::dtor() noex {
 	if (cint rs = close ; rs < 0) {
