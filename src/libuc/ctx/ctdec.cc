@@ -206,37 +206,37 @@ local int ctdecux(char *dp,int dl,const UT &uv) noex {
 
 int ctdeci(char *dp,int dl,int v)		noex {
 	return ctdecsx<uint>(dp,dl,v) ;
-}
+} /* end */
 
 int ctdecl(char *dp,int dl,long v)		noex {
 	return ctdecsx<ulong>(dp,dl,v) ;
-}
+} /* end */
 
 int ctdecll(char *dp,int dl,longlong v)		noex {
 	return ctdecsx<ulonglong>(dp,dl,v) ;
-}
+} /* end */
 
 int ctdecui(char *dp,int dl,uint uv)		noex {
 	return ctdecux(dp,dl,uv) ;
-}
+} /* end */
 
 int ctdecul(char *dp,int dl,ulong uv)		noex {
 	return ctdecux(dp,dl,uv) ;
-}
+} /* end */
 
 int ctdecull(char *dp,int dl,ulonglong uv)	noex {
 	return ctdecux(dp,dl,uv) ;
-}
+} /* end */
 
 
 /* local subroutines */
 
 local char getdig_lo(int r) noex {
         return digtab.dig100[r][0] ;
-}
+} /* end */
 
 local char getdig_hi(int r) noex {
         return digtab.dig100[r][1] ;
-}
+} /* end */
 
 
