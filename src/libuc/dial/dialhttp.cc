@@ -51,40 +51,40 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<csignal>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uinet.h>		/* |AF_{x}(3u)| */
-#include	<uclibmem.h>
-#include	<ucsig.h>
-#include	<getnodename.h>
-#include	<getnodedomain.h>	/* |getinetdomain(3uc)| */
-#include	<getprogpath.h>
-#include	<bufsizevar.hh>
-#include	<varnames.hh>
-#include	<estrings.h>
-#include	<ids.h>
-#include	<permx.h>
-#include	<vecstr.h>
-#include	<sbuf.h>
-#include	<pathclean.h>
-#include	<mkpr.h>
-#include	<mkpathx.h>
-#include	<ctdec.h>
-#include	<strx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU |AF_{x}(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsig.h>		/* LIBUC */
+#include	<getnodename.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC |getinetdomain(3uc)| */
+#include	<getprogpath.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<varnames.hh>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<pathclean.h>		/* LIBUC */
+#include	<mkpr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialtcp.h"
 #include	"dialprog.h"
@@ -96,11 +96,8 @@ import uconstants ;			/* |varname(3u)| */
 /* local defines */
 
 #define	PROG_WGET	"wget"
-
 #define	BINDNAME	"bin"
-
 #define	URLMULT		4		/* URL-buflen multiplier */
-
 #define	TOBUFLEN	20
 
 #define	VS		vecstr
@@ -125,14 +122,14 @@ typedef mainv		mv ;
 
 /* forward references */
 
-static int	dialhttper(cc *,cc *,int,cc *,mainv,int,int) noex ;
-static int	findprog(char *,cchar *) noex ;
-static int	loadpath(vecstr *) noex ;
-static int	findprprog(ids *,vecstr *,char *,cchar *) noex ;
-static int	runprog(cchar *,cchar *,cchar *,cchar *) noex ;
-static int	mkurl(char *,int,cchar *,cchar *,cchar *,mainv) noex ;
-static int	mkvars() noex ;
-static int	afvalid(int) noex ;
+local int	dialhttper(cc *,cc *,int,cc *,mainv,int,int) noex ;
+local int	findprog(char *,cchar *) noex ;
+local int	loadpath(vecstr *) noex ;
+local int	findprprog(ids *,vecstr *,char *,cchar *) noex ;
+local int	runprog(cchar *,cchar *,cchar *,cchar *) noex ;
+local int	mkurl(char *,int,cchar *,cchar *,cchar *,mainv) noex ;
+local int	mkvars() noex ;
+local int	afvalid(int) noex ;
 
 
 /* local variables */
@@ -146,7 +143,7 @@ static constexpr cpcchar	prnames[] = {
 } ;
 
 static bufsizevar		maxpathlen(bufsize_mp) ;
-static int			urlbuflen ;
+local int			urlbuflen ;
 
 
 /* exported variables */
@@ -157,12 +154,11 @@ static int			urlbuflen ;
 int dialhttp(cc *hn,cc *ps,int af,cc *svc,mainv sargv,int to,int) noex {
 	int		rs = SR_FAULT ;
 	int		fd = -1 ;
-	if (hn) {
+	if (hn) ylikely {
 	    rs = SR_INVALID ;
-	    if (hn[0]) {
-		if ((rs = afvalid(af)) >= 0) {
-		    static cint		rsv = mkvars() ;
-		    if ((rs = rsv) >= 0) {
+	    if (hn[0]) ylikely {
+		if ((rs = afvalid(af)) >= 0) ylikely {
+		    if (static cint rsv = mkvars() ; (rs = rsv) >= 0) {
 			rs = dialhttper(hn,ps,af,svc,sargv,to,0) ;
 			fd = rs ;
 		    } /* end if (mkvars) */
@@ -170,13 +166,12 @@ int dialhttp(cc *hn,cc *ps,int af,cc *svc,mainv sargv,int to,int) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialhttp) */
+} /* end subroutine (dialhttp) */
 
 
 /* local subroutines */
 
-static int dialhttper(cc *hn,cc *ps,int,cc *svc,mv sargv,int to,int) noex {
+local int dialhttper(cc *hn,cc *ps,int,cc *svc,mv sargv,int to,int) noex {
 	cint		ulen = urlbuflen ;
 	int		rs ;
 	int		rs1 ;
@@ -205,17 +200,16 @@ static int dialhttper(cc *hn,cc *ps,int,cc *svc,mv sargv,int to,int) noex {
 	} /* end if (m-a-f) */
 	if ((rs < 0) && (fd >= 0)) {
 	    u_close(fd) ;
-	}
+	} /* end if (error) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialhttper) */
+} /* end subroutine (dialhttper) */
 
-static int findprog(char *execfname,cchar *pn) noex {
+local int findprog(char *execfname,cchar *pn) noex {
 	int		rs  ;
 	int		rs1 ;
 	int		pl = 0 ;
 	execfname[0] = '\0' ;
-	if (ids id ; (rs = ids_load(&id)) >= 0) {
+	if (ids id ; (rs = ids_load(&id)) >= 0) ylikely {
 	    if (vecstr path ; (rs = vecstr_start(&path,20,0)) >= 0) {
 	        if ((rs = loadpath(&path)) >= 0) {
 	            rs = getprogpath(&id,&path,execfname,pn,-1) ;
@@ -232,18 +226,17 @@ static int findprog(char *execfname,cchar *pn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (findprog) */
+} /* end subroutine (findprog) */
 
-static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
+local int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
 	cint		rsn = SR_NOTFOUND ;
 	cint		perms = (R_OK | X_OK) ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
 	rbuf[0] = '\0' ;
-	if (char *dn ; (rs = lm_hostname(&dn)) >= 0) {
-	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
+	if (char *dn ; (rs = lm_hostname(&dn)) >= 0) ylikely {
+	    if ((rs = getnodedomain(nullptr,dn)) >= 0) ylikely {
 	        cint	sz = ((maxpathlen + 1) * 2) ;
 	        cchar	*bdname = BINDNAME ;
 	        if (char *prbuf ; (rs = lm_mall((sz+1),&prbuf)) >= 0) {
@@ -285,10 +278,9 @@ static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (findprprog) */
+} /* end subroutine (findprprog) */
 
-static int runprog(cchar *efname,cchar *ubuf,cchar *tobuf,cchar *pn) noex {
+local int runprog(cchar *efname,cchar *ubuf,cchar *tobuf,cchar *pn) noex {
 	SIGACTION	nsh{} ;
 	SIGACTION	osh ;
 	sigset_t	smask ;
@@ -318,15 +310,14 @@ static int runprog(cchar *efname,cchar *ubuf,cchar *tobuf,cchar *pn) noex {
 	    u_sigaction(sig,&osh,nullptr) ;
 	} /* end if (sigaction) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (runprog) */
+} /* end subroutine (runprog) */
 
-static int loadpath(vecstr *plp) noex {
+local int loadpath(vecstr *plp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
 	cchar		*vn = varname.path ;
-	if (cchar *pp ; (pp = getenv(vn)) != nullptr) {
+	if (cchar *pp ; (pp = getenver(vn)) != nullptr) {
 	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	        cchar	*tp ;
 	        while ((tp = strbrk(pp,":;")) != nullptr) {
@@ -347,12 +338,11 @@ static int loadpath(vecstr *plp) noex {
 		rs1 = lm_free(tbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
-	} /* end if (getenv) */
+	} /* end if (getenver) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (loadpath) */
+} /* end subroutine (loadpath) */
 
-static int mkurl(char *ubuf,int ulen,cc *hn,cc *ps,cc *svc,mainv sargv) noex {
+local int mkurl(char *ubuf,int ulen,cc *hn,cc *ps,cc *svc,mainv sargv) noex {
 	int		rs ;
 	int		rs1 ;
 	if (sbuf url ; (rs = sbuf_start(&url,ubuf,ulen)) >= 0) {
@@ -377,25 +367,22 @@ static int mkurl(char *ubuf,int ulen,cc *hn,cc *ps,cc *svc,mainv sargv) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sbuf) */
 	return rs ;
-}
-/* end subroutine (mkurl) */
+} /* end subroutine (mkurl) */
 
-static int mkvars() noex {
+local int mkvars() noex {
 	int		rs ;
 	if ((rs = maxpathlen) >= 0) {
 	    urlbuflen = (rs * URLMULT) ;
 	}
 	return rs ;
-}
-/* end subroutine (mkvars) */
+} /* end subroutine (mkvars) */
 
-static int afvalid(int af) noex {
+local int afvalid(int af) noex {
 	bool		f = false ;
 	f = f || (af == AF_UNSPEC) ;
 	f = f || (af == AF_INET4) ;
 	f = f || (af == AF_INET6) ;
 	return (f) ? SR_OK : SR_AFNOSUPPORT ;
-}
-/* end subroutine (afvalid) */
+} /* end subroutine (afvalid) */
 
 
