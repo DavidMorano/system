@@ -60,21 +60,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<strn.h>
-#include	<strwcpy.h>
-#include	<strx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"opendialer_tcpnls.h"
 #include	"defs.h"
@@ -126,8 +126,8 @@ constexpr cpcchar	ops[] = {
 
 /* forward references */
 
-static int argparse_start(struct argparse *,cchar *) noex ;
-static int argparse_finish(struct argparse *) noex ;
+local int argparse_start(struct argparse *,cchar *) noex ;
+local int argparse_finish(struct argparse *) noex ;
 
 
 /* exported variables */
@@ -244,19 +244,17 @@ ret0:
 #endif
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opendialer_tcpnls) */
+} /* end subroutine (opendialer_tcpnls) */
 
 
 /* local subroutines */
-
 
 /*
 	tcpnls¥[<af>]:<host>[:<port>]:<svc>[,to=<to>][,af=<af>][­<arg(s)>]
 	tcpnls¥[<af>]:<host>:<svc>[,to=<to>][,af=<af>][­<arg(s)>]
 */
 
-static int argparse_start(struct argparse *app,cchar *args)
+local int argparse_start(struct argparse *app,cchar *args)
 {
 	int	rs = SR_OK ;
 	int	hostl = 0 ;
@@ -418,27 +416,21 @@ static int argparse_start(struct argparse *app,cchar *args)
 
 ret0:
 	return rs ;
-}
-/* end subroutine (argparse_start) */
+} /* end subroutine (argparse_start) */
 
-
-static int argparse_finish(struct argparse *app)
-{
+local int argparse_finish(struct argparse *app) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
-
-	if (app->a != nullptr) {
+	if (app->a) {
 	    rs1 = uc_free(app->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    app->a = nullptr ;
 	}
-
+	{
 	app->hostname = nullptr ;
 	app->portspec = nullptr ;
+	}
 	return rs ;
-}
-/* end subroutine (argparse_finish) */
-
+} /* end subroutine (argparse_finish) */
 
 
