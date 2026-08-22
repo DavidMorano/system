@@ -396,23 +396,23 @@ local int pq_finishup(pq *qp) noex {
 
 int ciq::ins(void *ep) noex {
 	return ciq_ins(this,ep) ;
-}
+} /* end method */
 
 int ciq::rem(void *rpp) noex {
 	return ciq_rem(this,rpp) ;
-}
+} /* end method */
 
 int ciq::remtail(void *rpp) noex {
 	return ciq_remtail(this,rpp) ;
-}
+} /* end method */
 
 int ciq::rement(void *rpp) noex {
 	return ciq_rement(this,rpp) ;
-}
+} /* end method */
 
 int ciq::gettail(void *rpp) noex {
 	return ciq_gettail(this,rpp) ;
-}
+} /* end method */
 
 void ciq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
