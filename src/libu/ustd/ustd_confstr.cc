@@ -104,9 +104,9 @@ namespace libu {
 		        rs = SR_OVERFLOW ;
 		    }
 	        } else if (res == 0uz) {
-	            rs = (errno) ? (- errno) : SR_NOTSUP ;
+	            rs = (errno) ? (neg errno) : SR_NOTSUP ;
 		} else if (res == minusone) {
-	            rs = (errno) ? (- errno) : SR_NOTSUP ;
+	            rs = (errno) ? (neg errno) : SR_NOTSUP ;
 		} else {
 		    rs = SR_NOSYS ;	/* not defined in documentation */
 	        } /* end if */
@@ -115,9 +115,9 @@ namespace libu {
 	    if ((res = confstr(req,np,0uz)) > 0uz) {
 	        len = intsat(res - 1) ;
 	    } else if (res == 0uz) {
-	        rs = (errno) ? (- errno) : SR_NOTSUP ;
+	        rs = (errno) ? (neg errno) : SR_NOTSUP ;
 	    } else if (res == minusone) {
-	        rs = (errno) ? (- errno) : SR_NOTSUP ;
+	        rs = (errno) ? (neg errno) : SR_NOTSUP ;
 	    } else {
 		rs = SR_NOSYS ;
 	    }
