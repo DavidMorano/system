@@ -23,18 +23,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucsig.h>
-#include	<ucdescread.h>
-#include	<buffer.h>
-#include	<sfx.h>
-#include	<mkx.h>			/* |mkquoted(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucsig.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkx.h>			/* LIBUC |mkquoted(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialuss.h"
 
@@ -56,10 +56,6 @@ typedef mainv		mv ;
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_writen(int,cvoid *,int) noex ;
-}
-
 
 /* external variables */
 
@@ -69,9 +65,9 @@ extern "C" {
 
 /* forward references */
 
-static int	dialer(cc *,cc *,int,mv,int,int) noex ;
-static int	buffer_loadargs(buffer *,mainv) noex ;
-static int	badreq(int,cchar *) noex ;
+local int	dialer(cc *,cc *,int,mv,int,int) noex ;
+local int	buffer_loadargs(buffer *,mainv) noex ;
+local int	badreq(int,cchar *) noex ;
 
 
 /* local variables */
@@ -85,9 +81,9 @@ static int	badreq(int,cchar *) noex ;
 int dialussmux(cc *ps,cc *svc,mv sargv,int to,int dot) noex {
 	int		rs = SR_FAULT ;
 	int		fd = -1 ;
-	if (ps && svc) {
+	if (ps && svc) ylikely {
 	    rs = SR_INVALID ;
-	    if (ps[0] && svc[0]) {
+	    if (ps[0] && svc[0]) ylikely {
 		cchar	*sp{} ;
 		if (int sl ; (sl = sfshrink(svc,-1,&sp)) > 0) {
 		    rs = dialer(ps,sp,sl,sargv,to,dot) ;
@@ -96,22 +92,21 @@ int dialussmux(cc *ps,cc *svc,mv sargv,int to,int dot) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialussmux) */
+} /* end subroutine (dialussmux) */
 
 
 /* local subroutines */
 
-static int dialer(cc *ps,cc *sp,int sl,mv sargv,int to,int dot) noex {
+local int dialer(cc *ps,cc *sp,int sl,mv sargv,int to,int dot) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (buffer srvbuf ; (rs = buffer_start(&srvbuf,100)) >= 0) {
+	if (buffer srvbuf ; (rs = buffer_start(&srvbuf,100)) >= 0) ylikely {
 	    buffer_strw(&srvbuf,sp,sl) ;
-	    if ((rs = buffer_loadargs(&srvbuf,sargv)) >= 0) {
+	    if ((rs = buffer_loadargs(&srvbuf,sargv)) >= 0) ylikely {
 		cchar	*bp{} ;
 	        buffer_chr(&srvbuf,'\n') ;
-	        if ((rs = buffer_get(&srvbuf,&bp)) >= 0) {
+	        if ((rs = buffer_get(&srvbuf,&bp)) >= 0) ylikely {
 		    SIGACTION	osigs ;
 		    SIGACTION	sigs{} ;
 		    sigset_t	signalmask ;
@@ -149,10 +144,9 @@ static int dialer(cc *ps,cc *sp,int sl,mv sargv,int to,int dot) noex {
 	    }
 	} /* end if (buffer) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialer) */
+} /* end subroutine (dialer) */
 
-static int buffer_loadargs(buffer *bp,mainv sargv) noex {
+local int buffer_loadargs(buffer *bp,mainv sargv) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sargv != nullptr) {
@@ -169,15 +163,13 @@ static int buffer_loadargs(buffer *bp,mainv sargv) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (buffer_loadargs) */
+} /* end subroutine (buffer_loadargs) */
 
-static int badreq(int rs,cchar *rbuf) noex {
+local int badreq(int rs,cchar *rbuf) noex {
 	if ((rs == 0) || (rbuf[0] != '+')) {
 	    rs = SR_BADREQUEST ;
 	}
 	return rs ;
-}
-/* end subroutine (badreq) */
+} /* end subroutine (badreq) */
 
 
