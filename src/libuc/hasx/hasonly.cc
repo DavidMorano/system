@@ -80,7 +80,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     typedef bool (*isx_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
