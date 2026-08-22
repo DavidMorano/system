@@ -112,7 +112,7 @@ import libutil ;			/* |emclear(3u)| */
 
 extern "C" {
     extern int	getuserhome(char *,int,cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
