@@ -74,11 +74,11 @@
 
 extern "C" {
     extern int uc_unlinkshm(cchar *) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     extern int	openshmtmp(char *,int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
