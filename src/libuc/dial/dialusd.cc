@@ -43,22 +43,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sockaddress.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialusd.h"
 
@@ -77,7 +77,7 @@
 extern "C" {
     extern int uc_socket(int,int,int) noex ;
     extern int uc_connect(int,cvoid *,int) noex ;
-}
+} /* end */
 
 
 /* external variables */
@@ -101,13 +101,13 @@ int dialusd(cchar *dst,int to,int) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (dst) {
+	if (dst) ylikely {
 	    rs = SR_INVALID ;
-	    if (dst[0]) {
+	    if (dst[0]) ylikely {
 	        cint	pf = PF_UNIX ;
 		cint	st = SOCK_DGRAM ;
 		cint	proto = 0 ;
-	        if ((rs = uc_socket(pf,st,proto)) >= 0) {
+	        if ((rs = uc_socket(pf,st,proto)) >= 0) ylikely {
 	            sockaddress	sa ;
 	            cint	af = AF_UNIX ;
 	            fd = rs ;
@@ -127,7 +127,6 @@ int dialusd(cchar *dst,int to,int) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialusd) */
+} /* end subroutine (dialusd) */
 
 
