@@ -94,7 +94,7 @@ namespace libu {
 	if (otvp) {
 	    repeat {
 	        if ((rs = getitimer(w,otvp)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
@@ -105,7 +105,7 @@ namespace libu {
 	if (ntvp && otvp) {
 	    repeat {
 	        if ((rs = setitimer(w,ntvp,otvp)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
