@@ -89,8 +89,7 @@ char *mallocbuf(void *bp,int µbl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rp ;
-}
-/* end subroutine (mallocbuf) */
+} /* end subroutine (mallocbuf) */
 
 char *mallocstrw(char *sp,int µsl) noex {
 	char		*rp = nullptr ;
@@ -106,13 +105,11 @@ char *mallocstrw(char *sp,int µsl) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rp ;
-}
-/* end subroutine (mallocstrw) */
+} /* end subroutine (mallocstrw) */
 
 char *mallocstr(cchar *sp) noex {
 	return mallocstrw(sp,-1) ;
-}
-/* end subroutine (mallocstr) */
+} /* end subroutine (mallocstr) */
 
 char *mallocint(int v) noex {
 	int		rs ;
@@ -127,7 +124,6 @@ char *mallocint(int v) noex {
 	    ulogerror("mallocint",rs,"uc_malloc") ;
 	}
 	return rp ;
-}
-/* end subroutine (mallocint) */
+} /* end subroutine (mallocint) */
 
 
