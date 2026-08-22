@@ -486,7 +486,7 @@ int stdcaller::callstd(cchar *fn,int of,mode_t om) noex {
 	int		rs ;
 	of &= (~ OM_SPECIAL) ;
 	if ((rs = (this->*m)(fn,of,om)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (stdcaller::callstd) */
@@ -567,7 +567,7 @@ int stdcaller::iopen(cchar *fn,int of,mode_t om) noex {
 	    rs = SR_INVALID ;
 	    if (fn[0] && (of >= 0)) {
 	        if ((rs = open(fn,of,om)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -580,7 +580,7 @@ int stdcaller::iopenat(cchar *fn,int of,mode_t om) noex {
 	    rs = SR_INVALID ;
 	    if (fn[0] && (of >= 0)) {
 	        if ((rs = openat(dfd,fn,of,om)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -591,7 +591,7 @@ int stdcaller::isocket(cchar *,int,mode_t) noex {
 	int		rs = SR_INVALID ;
 	if ((pf >= 0) && (st >= 0) && (pr >= 0)) {
 	    if ((rs = socket(pf,st,pr)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (valid) */
 	return rs ;
@@ -602,7 +602,7 @@ int stdcaller::iaccept(cchar *,int,mode_t) noex {
 	if (sap && lenp) {
 	    socklen_t	salen = socklen_t(*lenp) ;
 	    if ((rs = accept(dfd,sap,&salen)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	    if (rs >= 0) {
 	        *lenp = int(salen & INT_MAX) ;
@@ -614,7 +614,7 @@ int stdcaller::iaccept(cchar *,int,mode_t) noex {
 int stdcaller::idup1(cchar *,int,mode_t) noex {
 	int		rs ;
 	if ((rs = dup(dfd)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (stdcaller::idup1) */
@@ -623,7 +623,7 @@ int stdcaller::idupover(cchar *,int,mode_t) noex {
 	int		rs = SR_BADF ;
 	if ((dfd >= 0) && (tfd >= 0)) {
 	    if ((rs = dup2(dfd,tfd)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	}
 	return rs ;
@@ -634,7 +634,7 @@ int stdcaller::idupmin(cchar *,int,mode_t) noex {
 	if ((dfd >= 0) && (tfd >= 0)) {
 	    cint	cmd = F_DUPFD ;
 	    if ((rs = fcntl(dfd,cmd,tfd)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	}
 	return rs ;
@@ -654,7 +654,7 @@ int stdcaller::idupminer(cchar *,int of,mode_t) noex {
 		    }
 	        } /* end if (O_NONBLOCK was specified) */
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	}
 	return (rs >= 0) ? fd : rs ;
@@ -666,7 +666,7 @@ int stdcaller::isocketpair(cchar *,int,mode_t) noex {
 	    rs = SR_INVALID ;
 	    if ((pf >= 0) && (st >= 0) && (pr >= 0)) {
 	        if ((rs = socketpair(pf,st,pf,pipes)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -677,7 +677,7 @@ int stdcaller::ipipe(cchar *,int,mode_t) noex {
 	int		rs = SR_FAULT ;
 	if (pipes) {
 	    if ((rs = pipe(pipes)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (valid) */
 	return rs ;
@@ -687,7 +687,7 @@ int stdcaller::ipipe2(cchar *,int of,mode_t) noex {
 	int		rs = SR_FAULT ;
 	if (pipes) {
 	    if ((rs = pipe2(pipes,of)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (valid) */
 	return rs ;
@@ -697,7 +697,7 @@ int stdcaller::ipiper(cchar *,int of,mode_t) noex {
 	int		rs = SR_FAULT ;
 	if (pipes) {
 	    if ((rs = pipe2(pipes,of)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (valid) */
 	return rs ;
@@ -707,7 +707,7 @@ int stdcaller::iclose(cchar *,int,mode_t) noex {
 	int		rs = SR_BADF ;
 	if (dfd >= 0) {
 	    if ((rs = close(dfd)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	}
 	return rs ;
