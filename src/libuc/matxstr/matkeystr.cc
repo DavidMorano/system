@@ -76,7 +76,7 @@
 
 constexpr bool keyend(cint ch) noex {
 	return (((ch) == '\0') || ((ch) == '=')) ;
-}
+} /* end */
 
 
 /* local variables */
@@ -89,7 +89,7 @@ constexpr bool keyend(cint ch) noex {
 
 int matkeystr(con mainv a,cchar *sp,int sl) noex {
     	int		rc = -1 ;
-	if (a && sp) {
+	if (a && sp) ylikely {
 	    cint	sch = sp[0] ; /* ok: everything promotes the same */
 	    int		i = 0 ; /* used-afterwards */
 	    bool 	f = false ;
