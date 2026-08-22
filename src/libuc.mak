@@ -960,7 +960,6 @@ bits.o:			bits.cc		bits.h
 userattrdb.o:		userattrdb.cc	userattrdb.h
 pmq.o:			pmq.cc		pmq.h
 filegrp.o:		filegrp.cc	filegrp.h
-unameo.o:		unameo.cc	unameo.h
 lookaside.o:		lookaside.cc	lookaside.h
 memfile.o:		memfile.cc	memfile.h		$(INCS)
 dirlist.o:		dirlist.cc	dirlist.h		$(INCS)
@@ -1107,8 +1106,8 @@ conmsghdr.o:		conmsghdr.cc	conmsghdr.h		$(INCS)
 strval.o:		strval.cc strval.h
 
 # emulated system kernel calls
-umask.o:		umask.cc umask.h
-unameo.o:		unameo.cc unameo.h
+umask.o:		umask.cc	umask.h			$(INCS)
+ucnameo.o:		ucnameo.cc	ucnameo.h		$(INCS)
 
 # environment related string values
 strlibval.o:		strlibval.cc	strlibval.hh	$(INCS)
