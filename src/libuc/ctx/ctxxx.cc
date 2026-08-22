@@ -211,26 +211,26 @@ local int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
 
 int ctxxxi(char *dp,int dl,int b,int v)			noex {
 	return sctxxxx<uint>(dp,dl,b,v) ;
-}
+} /* end */
 
 int ctxxxl(char *dp,int dl,int b,long v)		noex {
 	return sctxxxx<ulong>(dp,dl,b,v) ;
-}
+} /* end */
 
 int ctxxxll(char *dp,int dl,int b,longlong v)		noex {
 	return sctxxxx<ulonglong>(dp,dl,b,v) ;
-}
+} /* end */
 
 int ctxxxui(char *dp,int dl,int b,uint uv)		noex {
 	return uctxxxx(dp,dl,b,uv) ;
-}
+} /* end */
 
 int ctxxxul(char *dp,int dl,int b,ulong uv)		noex {
 	return uctxxxx(dp,dl,b,uv) ;
-}
+} /* end */
 
 int ctxxxull(char *dp,int dl,int b,ulonglong uv)	noex {
 	return uctxxxx(dp,dl,b,uv) ;
-}
+} /* end */
 
 
