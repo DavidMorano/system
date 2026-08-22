@@ -72,7 +72,7 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     int	buffer_strquote(buffer *,cchar *,int) noex ;
-}
+} /* end */
 
 
 /* external variables */
