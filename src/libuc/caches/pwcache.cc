@@ -93,7 +93,7 @@ namespace {
 	ureq(cchar *p) noex : un(p) { } ;
 	ureq(uid_t u) noex : uid(u) { } ;
     } ; /* end if (ureq) */
-}
+} /* end namespace */
 
 
 /* forward references */
