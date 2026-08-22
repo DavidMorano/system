@@ -50,13 +50,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ncol.h>		/* |ncolchar(3uc)| */
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ncol.h>		/* LIBUC |ncolchar(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ncolline.h"
 
@@ -97,7 +97,6 @@ int ncolline(int ntab,int ccol,cchar *sp,int µsl) noex {
 	    } /* end for */
 	} /* end if (getlenstr) */
 	return rcol ;
-}
-/* end subroutine (ncolline) */
+} /* end subroutine (ncolline) */
 
 
