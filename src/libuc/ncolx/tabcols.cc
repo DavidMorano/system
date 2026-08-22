@@ -37,14 +37,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<intceil.h>		/* |iceil(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU |iceil(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"tabcols.h"
 
@@ -75,7 +75,6 @@
 int tabcols(int tablen,int ncol) noex {
 	cint		n = (ncol % tablen) ;
 	return (iceil((n + 1),tablen) - n) ;
-}
-/* end subroutine (tabcols) */
+} /* end subroutine (tabcols) */
 
 
