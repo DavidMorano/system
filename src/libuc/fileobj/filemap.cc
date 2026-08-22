@@ -361,19 +361,19 @@ int filemap::open(cchar *fn,size_t fsz) noex {
 
 int filemap::stat(ustat *p) noex {
     	return filemap_stat(this,p) ;
-}
+} /* end method */
 
 int filemap::read(int rlen,void *rbuf) noex {
     	return filemap_read(this,rlen,rbuf) ;
-}
+} /* end method */
 
 int filemap::getln(cchar **cpp) noex {
     	return filemap_getln(this,cpp) ;
-}
+} /* end method */
 
 int filemap::seek(off_t fo,int w) noex {
     	return filemap_seek(this,fo,w) ;
-}
+} /* end method */
 
 void filemap::dtor() noex {
 	if (cint rs = close ; rs < 0) {
