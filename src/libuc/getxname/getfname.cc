@@ -66,6 +66,7 @@
 #include	<utility>		/* C++STD |std::unreachable(c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<permx.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
@@ -91,10 +92,6 @@ using std::unreachable ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
 
 
 /* external variables */
