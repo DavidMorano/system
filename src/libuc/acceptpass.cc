@@ -42,17 +42,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>			/* |time(2)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD |time(2)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"acceptpass.h"
 
@@ -78,8 +78,8 @@
 
 /* forward references */
 
-static int acceptpass_stall(int,STRRECVFD *) noex ;
-static int acceptpass_poll(int,STRRECVFD *,int) noex ;
+local int acceptpass_stall	(int,STRRECVFD *) noex ;
+local int acceptpass_poll	(int,STRRECVFD *,int) noex ;
 
 
 /* local variables */
@@ -102,13 +102,12 @@ int acceptpass(int fd_pass,STRRECVFD *sp,int to) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (acceptpass) */
+} /* end subroutine (acceptpass) */
 
 
 /* local subroutines */
 
-static int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
+local int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
 	POLLFD		pfds[2] = {} ;
 	time_t		ti_now = time(nullptr) ;
 	time_t		ti_start ;
@@ -147,10 +146,9 @@ static int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
 	    if (rs < 0) break ;
 	} /* end while (polling) */
 	return (rs >= 0) ? pfd : rs ;
-}
-/* end subroutine (acceptpass_poll) */
+} /* end subroutine (acceptpass_poll) */
 
-static int acceptpass_stall(int fd_pass,STRRECVFD *sp) noex {
+local int acceptpass_stall(int fd_pass,STRRECVFD *sp) noex {
 	int		rs = SR_OK ;
 	int		pfd = -1 ;
 	while (rs >= 0) {
@@ -162,7 +160,6 @@ static int acceptpass_stall(int fd_pass,STRRECVFD *sp) noex {
 	    }
 	} /* end while */
 	return (rs >= 0) ? pfd : rs ;
-}
-/* end subroutine (acceptpass_stall) */
+} /* end subroutine (acceptpass_stall) */
 
 
