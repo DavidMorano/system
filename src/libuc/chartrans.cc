@@ -27,18 +27,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |wchar_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<storebuf.h>
-#include	<utf8decoder.h>
-#include	<matstr.h>
-#include	<strwcmp.h>
-#include	<endian.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD |wchar_t| */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<utf8decoder.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<endian.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"chartrans.h"
 
@@ -70,7 +70,7 @@ typedef const wchar_t *	cwchrp ;
 
 extern "C"{
     extern int	wsnwcpynarrow(wchar_t *,int,cchar *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -88,8 +88,7 @@ local inline int chartrans_magic(chartrans *op,Args ... args) noex {
 	    rs = (op->magval == CHARTRANS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (chartrans_magic) */
+} /* end subroutine (chartrans_magic) */
 
 local int chartrans_setfins(CT *) noex ;
 local int chartrans_sethave(CT *,cchar *,int) noex ;
@@ -112,7 +111,7 @@ enum charsets {
 	charset_asciia,
 	charset_asciib,
 	charset_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	charsets[] = {
 	"utf-8",
@@ -122,7 +121,7 @@ constexpr cpcchar	charsets[] = {
 	"us-ascii",
 	"ascii",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -151,13 +150,12 @@ int chartrans_open(CT *op ,cchar *pr,int maxtx) noex {
 			void *vp = voidp(op->pr) ;
 	                libmem.free(vp) ;
 	                op->pr = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (memory_allocation) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (chartrans_open) */
+} /* end subroutine (chartrans_open) */
 
 int chartrans_close(CT *op) noex {
 	int		rs ;
@@ -173,7 +171,7 @@ int chartrans_close(CT *op) noex {
 	            rs1 = libmem.free(op->utf8decoder) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->utf8decoder = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	    }
 	    if (op->nsets > 0) ylikely {
 	        rs1 = chartrans_setfins(op) ;
@@ -183,18 +181,17 @@ int chartrans_close(CT *op) noex {
 	        rs1 = libmem.free(op->sets) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->sets = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->pr) ylikely {
 		void *vp = voidp(op->pr) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->pr = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (chartrans_close) */
+} /* end subroutine (chartrans_close) */
 
 int chartrans_transbegin(CT *op,time_t dt,cchar *sp,int sl) noex {
 	int		rs ;
@@ -225,8 +222,7 @@ int chartrans_transbegin(CT *op,time_t dt,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? txid : rs ;
-}
-/* end subroutine (chartrans_transbegin) */
+} /* end subroutine (chartrans_transbegin) */
 
 int chartrans_transend(CT *op,int txid) noex {
 	int		rs ;
@@ -239,8 +235,7 @@ int chartrans_transend(CT *op,int txid) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (chartrans_transend) */
+} /* end subroutine (chartrans_transend) */
 
 int chartrans_transread(CT *op,int txid,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	int		rs ;
@@ -276,8 +271,7 @@ int chartrans_transread(CT *op,int txid,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (chartrans_transread) */
+} /* end subroutine (chartrans_transread) */
 
 
 /* private subroutines */
@@ -294,8 +288,7 @@ local int chartrans_setfins(CT *op) noex {
 	    } /* end for */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (chartrans_setfins) */
+} /* end subroutine (chartrans_setfins) */
 
 local int chartrans_setopen(CT *op,time_t dt,int txid,cc *sp,int sl) noex {
 	chartrans_set	*setp = (op->sets + txid) ;
@@ -330,8 +323,7 @@ local int chartrans_setopen(CT *op,time_t dt,int txid,cc *sp,int sl) noex {
             }
         } /* end if (memory-acquire) */
 	return rs ;
-}
-/* end subroutine (chartrans_setopen) */
+} /* end subroutine (chartrans_setopen) */
 
 local int chartrans_setclose(CT *op,int txid) noex {
 	chartrans_set	*setp = (op->sets + txid) ;
@@ -351,8 +343,7 @@ local int chartrans_setclose(CT *op,int txid) noex {
 	    if (op->nsets > 0) op->nsets -= 1 ;
 	}
 	return rs ;
-}
-/* end subroutine (chartrans_setclose) */
+} /* end subroutine (chartrans_setclose) */
 
 local int chartrans_sethave(CT *op,cchar *sp,int sl) noex {
 	chartrans_set	*setp ;
@@ -366,8 +357,7 @@ local int chartrans_sethave(CT *op,cchar *sp,int sl) noex {
 	    }
 	} /* end for */
 	return (f) ? i : SR_NOTFOUND ;
-}
-/* end subroutine (chartrans_sethave) */
+} /* end subroutine (chartrans_sethave) */
 
 local int chartrans_setfind(CT *op,time_t dt) noex {
 	chartrans_set	*setp ;
@@ -389,8 +379,7 @@ local int chartrans_setfind(CT *op,time_t dt) noex {
 	} /* end for */
 	if (mini < 0) rs = SR_AGAIN ;
 	return (rs >= 0) ? mini : rs ;
-}
-/* end subroutine (chartrans_setfind) */
+} /* end subroutine (chartrans_setfind) */
 
 local int chartrans_transutf8(CT *op,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -408,8 +397,7 @@ local int chartrans_transutf8(CT *op,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	    } /* end if (ok) */
 	} /* end if (positive) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (chartrans_transutf8) */
+} /* end subroutine (chartrans_transutf8) */
 
 local int chartrans_checkdecoder(CT *op) noex {
 	int		rs = SR_OK ;
@@ -426,8 +414,7 @@ local int chartrans_checkdecoder(CT *op) noex {
             } /* end if (a-m) */
         } /* end if (needed initialization) */
 	return rs ;
-}
-/* end subroutine (chartrans_checkdecoder) */
+} /* end subroutine (chartrans_checkdecoder) */
 
 local int mktransname(char *nbuf,int nlen,cchar *sp,int sl) noex {
     	storebuf	sb(nbuf,nlen) ;
@@ -438,7 +425,6 @@ local int mktransname(char *nbuf,int nlen,cchar *sp,int sl) noex {
 	if (rs >= 0) rs = sb.str(suf) ;
 	len = sb.idx ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mktransname) */
+} /* end subroutine (mktransname) */
 
 
