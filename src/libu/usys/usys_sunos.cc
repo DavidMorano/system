@@ -56,7 +56,7 @@ static sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 			    len = rs ;
 			}
 		    } else {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	            }
 	        } /* end if (not-overflow) */
 	    } /* end if (valid) */
@@ -79,7 +79,7 @@ namespace usys {
 	int		rs = SR_FAULT ;
 	if (la) {
 	    if ((rs = __getloadavg(la,n)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
