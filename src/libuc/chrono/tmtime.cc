@@ -309,39 +309,39 @@ local int tmtime_mktimer(tmtime *op,int fadj,time_t *tp) noex {
 
 int tmtime::timex(bool fz,time_t t) noex {
 	return tmtime_timex(this,fz,t) ;
-}
+} /* end method */
 
 int tmtime::timegm(time_t t) noex {
 	return tmtime_timegm(this,t) ;
-}
+} /* end method */
 
 int tmtime::timelocal(time_t t) noex {
 	return tmtime_timelocal(this,t) ;
-}
+} /* end method */
 
 int tmtime::insert(CTM *tmp) noex {
 	return tmtime_insert(this,tmp) ;
-}
+} /* end method */
 
 int tmtime::extract(TM *tmp) noex {
 	return tmtime_extract(this,tmp) ;
-}
+} /* end method */
 
 int tmtime::mktime(time_t *tp) noex {
 	return tmtime_mktime(this,tp) ;
-}
+} /* end method */
 
 int tmtime::adjtime(time_t *tp) noex {
 	return tmtime_adjtime(this,tp) ;
-}
+} /* end method */
 
 int tmtime::getzn(char *rbuf,int rlen) noex {
 	return tmtime_getzn(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int tmtime::loadzn(cchar *sp,int sl) noex {
 	return tmtime_loadzn(this,sp,sl) ;
-}
+} /* end method */
 
 void tmtime::dtor() noex {
 	if (cint rs = tmtime_zfini(this) ; rs < 0) {
