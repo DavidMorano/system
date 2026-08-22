@@ -79,7 +79,7 @@ int u_shmget(key_t key,size_t sz,int msgflag) noex {
 	bool		f_exit = false ;
 	repeat {
 	    if ((rs = shmget(key,sz,msgflag)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	        switch (rs) {
 	        case SR_NOMEM:
 	            if (to_nomem-- > 0) {
@@ -117,7 +117,7 @@ int u_shmat(int shmid,void *shmaddr,int flags,void **app) noex {
 	    repeat {
 	        *app = shmat(shmid,shmaddr,flags) ;
 		if (intptr_t ui ; (ui = reinterpret_cast<long>(*app)) == -1) {
-	            rs = (- errno) ;
+	            rs = (neg errno) ;
 		} else if (ui < 0) {
 		    rs = SR_NOANODE ;
 		} else {
@@ -164,7 +164,7 @@ int u_shmctl(int shmid,int cmd,SHMIDDS *buf) noex {
 	bool		f_exit = false ;
 	repeat {
 	    if ((rs = shmctl(shmid,cmd,buf)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	        switch (rs) {
 	        case SR_NOMEM:
 	            if (to_nomem-- > 0) {
@@ -188,7 +188,7 @@ int u_shmdt(void *shmaddr) noex {
 	int		rs ;
 	repeat {
 	    if ((rs = shmdt(shmaddr)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} until (rs != SR_INTR) ;
 	return rs ;
