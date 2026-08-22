@@ -158,14 +158,14 @@ local int storebuf_twodig(char *rbuf,int rlen,int i,int v) noex {
 
 int zoffparts::set(int zo) noex {
 	return zoffparts_set(this,zo) ;
-}
+} /* end method */
 
 int zoffparts::get(int *vp) noex {
 	return zoffparts_get(this,vp) ;
-}
+} /* end method */
 
 int zoffparts::mkstr(char *rbuf,int rlen) noex {
 	return zoffparts_mkstr(this,rbuf,rlen) ;
-}
+} /* end method */
 
 
