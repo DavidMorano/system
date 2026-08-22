@@ -53,9 +53,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialprog.h"
 
@@ -73,7 +75,7 @@
 
 extern "C" {
     extern int	uc_openprogerr(cchar *,int,mainv,mainv,int *) noex ;
-}
+} /* end */
 
 
 /* external variables */
@@ -95,7 +97,6 @@ extern "C" {
 
 int dialprog(cchar *fname,int of,mainv argv,mainv envv,int *fd2p) noex {
 	return uc_openprogerr(fname,of,argv,envv,fd2p) ;
-}
-/* end subroutine (dialprog) */
+} /* end subroutine (dialprog) */
 
 
