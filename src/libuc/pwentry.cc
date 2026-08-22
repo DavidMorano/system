@@ -414,11 +414,11 @@ local int pwentry_loadname(PE *op,cc *vp,int vl) noex {
 
 int pwentry::fieldpw(int fn,cchar *sp,int sl) noex {
 	return pwentry_fieldpw(this,fn,sp,sl) ;
-}
+} /* end method */
 
 int pwentry::mkcopy(pwentry *oop,char *rbuf,int rlen) noex {
 	return pwentry_mkcopy(this,oop,rbuf,rlen) ;
-}
+} /* end method */
 
 void pwentry::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
