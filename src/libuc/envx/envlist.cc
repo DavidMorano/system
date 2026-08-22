@@ -296,15 +296,15 @@ local int envlist_storer(envlist *op) noex {
 
 int envlist::addkeyval(cchar *kp,cchar *sp,int sl) noex {
 	return envlist_addkeyval(this,kp,sp,sl) ;
-}
+} /* end method */
 
 int envlist::add(cchar *sp,int sl) noex {
 	return envlist_add(this,sp,sl) ;
-}
+} /* end method */
 
 int envlist::present(cchar *kp,int kl,cchar **rpp) noex {
 	return envlist_present(this,kp,kl,rpp) ;
-}
+} /* end method */
 
 void envlist::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
