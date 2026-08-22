@@ -88,8 +88,7 @@ int mknlsreq(char *nlsbuf,int nlslen,cchar *svcbuf,int svclen) noex {
 	    if (rs >= 0) rs = len ;
 	} /* end if (nlsbuf) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mknlsreq) */
+} /* end subroutine (mknlsreq) */
 
 int readnlsresp(int fd,char *tbuf,int tlen,int to) noex {
 	int		rs ;
@@ -119,8 +118,7 @@ int readnlsresp(int fd,char *tbuf,int tlen,int to) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (readnlsresp) */
+} /* end subroutine (readnlsresp) */
 
 
 /* local subroutine */
