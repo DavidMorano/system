@@ -84,16 +84,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<ascii.h>
-#include	<mkchar.h>
-#include	<tabcols.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<tabcols.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ncol.h"
 
@@ -140,8 +140,7 @@ int ncolstr(int ntab,int ccol,cchar *sp,int µsl) noex {
 	    } /* end while */
 	} /* end if (getlenstr) */
 	return rcol ;
-}
-/* end subroutine (ncolstr) */
+} /* end subroutine (ncolstr) */
 
 int ncolchar(int ntab,int ccol,int ch) noex {
 	int		cols = 0 ; /* return-value */
@@ -162,8 +161,7 @@ int ncolchar(int ntab,int ccol,int ch) noex {
 	    break ;
 	} /* end switch */
 	return cols ;
-}
-/* end subroutine (ncolchar) */
+} /* end subroutine (ncolchar) */
 
 int ncols(int ntab,int ccol,int ncols,cchar *sp,int µsl) noex {
 	int		i = -1 ; /* return-value */
@@ -178,7 +176,6 @@ int ncols(int ntab,int ccol,int ncols,cchar *sp,int µsl) noex {
 	    } /* end if */
 	} /* end if (getlenstr) */
 	return i ;
-}
-/* end subroutine (ncols) */
+} /* end subroutine (ncols) */
 
 
