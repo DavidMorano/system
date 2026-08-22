@@ -89,7 +89,7 @@ int usigsets::empty(sigset_t *sp) noex {
 	int		rs = SR_FAULT ;
 	if (sp) {
 	    if ((rs = sigemptyset(sp)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -99,7 +99,7 @@ int usigsets::fill(sigset_t *sp) noex {
 	int		rs = SR_FAULT ;
 	if (sp) {
 	    if ((rs = sigfillset(sp)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -111,7 +111,7 @@ int usigsets::add(sigset_t *sp,int sn) noex {
 	    rs = SR_INVALID ;
 	    if (sn >= 0) {
 	        if ((rs = sigaddset(sp,sn)) < 0) {
-	            rs = (- errno) ;
+	            rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -124,7 +124,7 @@ int usigsets::del(sigset_t *sp,int sn) noex {
 	    rs = SR_INVALID ;
 	    if (sn >= 0) {
 	        if ((rs = sigdelset(sp,sn)) < 0) {
-	            rs = (- errno) ;
+	            rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -137,7 +137,7 @@ int usigsets::ismem(const sigset_t *sp,int sn) noex {
 	    rs = SR_INVALID ;
 	    if (sn >= 0) {
 	        if ((rs = sigismember(sp,sn)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
