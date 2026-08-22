@@ -61,7 +61,7 @@ import libutil ;			/* |getlenstr(3u)| */
 
 extern "C" {
     int	buffer_strcompact(buffer *,cchar *,int) noex ;
-}
+} /* end */
 
 
 /* external variables */
