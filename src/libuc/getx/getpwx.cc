@@ -50,7 +50,7 @@
 extern "C" {
     typedef int (*getpwxname_f)	(ucentpw *,char *,int,cchar *) noex ;
     typedef int (*getpwxuid_f)	(ucentpw *,char *,int,uid_t) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -78,7 +78,6 @@ constexpr getpwxuid_f	subuids[] = {
 } ; /* end array */
 
 constexpr uid_t		uidend(-1) ;
-
 static int		getpwx_state = 1 ; /* <- writable */
 
 
@@ -122,14 +121,14 @@ int getpwx_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 
 int ucentpwx::nam(char *pwbuf,int pwlen,cchar *un) noex {
     	return getnam(pwbuf,pwlen,un) ;
-}
+} /* end method */
 
 int ucentpwx::uid(char *pwbuf, int pwlen,uid_t uid) noex {
     	return getuid(pwbuf,pwlen,uid) ;
-}
+} /* end method */
 
 int ucentpwx::control(int ns) noex {
     	return getpwx_control(ns) ;
-}
+} /* end method */
 
 
