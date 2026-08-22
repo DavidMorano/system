@@ -35,16 +35,15 @@ DEFS=
 
 INCS= usysauxinfo.h usysauxinforeqs.h
 
+MODS=
+
 LIBS=
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
