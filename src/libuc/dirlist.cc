@@ -91,7 +91,7 @@ typedef dirlist_ent	*entp ;
 
 extern "C" {
     int		dirlist_add(dirlist *,cchar *,int) noex ;
-}
+} /* end */
 
 
 /* local structures */
@@ -101,7 +101,7 @@ struct dirlist_ent {
 	ino_t		ino ;
 	dev_t		dev ;
 	int		sl ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -143,7 +143,7 @@ local int dirlist_magic(dirlist *op,Args ... args) noex {
 extern "C" {
     local int	vcmpname	(cvoid **,cvoid **) noex ;
     local int	vcmpdevino	(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 local int	entry_start	(ent *,cchar *,int,dev_t,ino_t) noex ;
 local int	entry_finish	(ent *) noex ;
@@ -448,31 +448,31 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 
 int dirlist::adds(cchar *sp,int sl) noex {
 	return dirlist_adds(this,sp,sl) ;
-}
+} /* end method */
 
 int dirlist::add(cchar *sp,int sl) noex {
 	return dirlist_add(this,sp,sl) ;
-}
+} /* end method */
 
 int dirlist::curbegin(dirlist_cur *curp) noex {
 	return dirlist_curbegin(this,curp) ;
-}
+} /* end method */
 
 int dirlist::curend(dirlist_cur *curp) noex {
 	return dirlist_curend(this,curp) ;
-}
+} /* end method */
 
 int dirlist::curenum(dirlist_cur *curp,char *rbuf,int rlen) noex {
 	return dirlist_curenum(this,curp,rbuf,rlen) ;
-}
+} /* end method */
 
 int dirlist::curget(dirlist_cur *curp,cchar **rpp) noex {
 	return dirlist_curget(this,curp,rpp) ;
-}
+} /* end method */
 
 int dirlist::joinmk(char *jbuf,int jlen) noex {
 	return dirlist_joinmk(this,jbuf,jlen) ;
-}
+} /* end method */
 
 void dirlist::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
