@@ -119,7 +119,7 @@ define	isleap(y) ((((y) % 4) == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 
 extern "C" {
     extern int	isleapyear(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -138,7 +138,7 @@ local int	indomain(int,int,int) noex ;
 /* Days-Of-Year (DOY) */
 constexpr int		doy[12] = { 
 	0,31,59,90,120,151,181,212,243,273,304,334 
-} ;
+} ; /* end array */
 
 constexpr int		yrbase = TM_YEAR_BASE ; /* TZFILE 1900 */
 
