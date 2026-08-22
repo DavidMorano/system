@@ -134,11 +134,11 @@ int outbuf_get(outbuf *op,cchar **onpp) noex {
 
 int outbuf::start(char *ob,int ol) noex {
 	return outbuf_start(this,ob,ol) ;
-}
+} /* end method */
 
 int outbuf::get(cchar **rpp) noex {
 	return outbuf_get(this,rpp) ;
-}
+} /* end method */
 
 void outbuf::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
