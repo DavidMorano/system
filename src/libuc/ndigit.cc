@@ -161,24 +161,29 @@ template<typename T> local int ndigitx(T v,int b) noex {
 int ndigiti(int v,int b) noex {
     	cuint		uv = uint(abs(v)) ;
 	return ndigitx(uv,b) + 1 ;
-}
+} /* end */
+
 int ndigitl(long v,int b) noex {
     	culong		uv = ulong(abs(v)) ;
 	return ndigitx(uv,b) + 1 ;
-}
+} /* end */
+
 int ndigitll(longlong v,int b) noex {
     	culonglong	uv = ulonglong(abs(v)) ;
 	return ndigitx(uv,b) + 1 ;
-}
+} /* end */
+
 
 int ndigitui(uint uv,int b) noex {
 	return ndigitx(uv,b) ;
-}
+} /* end */
+
 int ndigitul(ulong uv,int b) noex {
 	return ndigitx(uv,b) ;
-}
+} /* end */
+
 int ndigitull(ulonglong uv,int b) noex {
 	return ndigitx(uv,b) ;
-}
+} /* end */
 
 
