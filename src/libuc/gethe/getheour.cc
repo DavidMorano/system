@@ -90,7 +90,7 @@ typedef hostent *	hostentp ;
 extern "C" {
     extern int	gethename(ucentho *,char *,int,cchar *) noex ;
     extern int	getheaddr(ucentho *,char *,int,cvoid *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
