@@ -200,31 +200,31 @@ int date_getzname(date *op,char *zbuf,int zlen) noex {
 
 int date::start(time_t t,int off,int dst,cchar *zbuf,int zlen) noex {
 	return date_start(this,t,off,dst,zbuf,zlen) ;
-}
+} /* end method */
 
 int date::setzname(cchar *sp,int sl) noex {
 	return date_setzname(this,sp,sl) ;
-}
+} /* end method */
 
 int date::copy(date *d2p) noex {
 	return date_copy(this,d2p) ;
-}
+} /* end method */
 
 int date::gettime(time_t *tp) noex {
 	return date_gettime(this,tp) ;
-}
+} /* end method */
 
 int date::getzoff(int *zop) noex {
 	return date_getzoff(this,zop) ;
-}
+} /* end method */
 
 int date::getisdst(int *dstp) noex {
 	return date_getisdst(this,dstp) ;
-}
+} /* end method */
 
 int date::getzname(char *zbuf,int zlen) noex {
 	return date_getzname(this,zbuf,zlen) ;
-}
+} /* end method */
 
 void date::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
