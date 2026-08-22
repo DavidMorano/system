@@ -160,11 +160,11 @@ int charq_count(charq *op) noex {
 
 int charq::ins(int ch) noex {
 	return charq_ins(this,ch) ;
-}
+} /* end method */
 
 int charq::rem(char *rp) noex {
 	return charq_rem(this,rp) ;
-}
+} /* end method */
 
 void charq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
