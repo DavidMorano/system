@@ -135,115 +135,115 @@ import libutil ;			/* |memclear(3u)| */
 
 int dater::start(TIMEB *nowp,cchar *zsp,int zsl) noex {
 	return dater_start(this,nowp,zsp,zsl) ;
-}
+} /* end method */
 
 int dater::startcopy(dater *d2p) noex {
 	return dater_startcopy(this,d2p) ;
-}
+} /* end method */
 
 int dater::setcopy(dater *d2p) noex {
 	return dater_setcopy(this,d2p) ;
-}
+} /* end method */
 
 int dater::setstd(cchar *sp,int sl) noex {
 	return dater_setstd(this,sp,sl) ;
-}
+} /* end method */
 
 int dater::setmsg(cchar *sp,int sl) noex {
 	return dater_setmsg(this,sp,sl) ;
-}
+} /* end method */
 
 int dater::setstrdig(cchar *sp,int sl) noex {
 	return dater_setstrdig(this,sp,sl) ;
-}
+} /* end method */
 
 int dater::setlogz(cchar *sp,int sl) noex {
 	return dater_setlogz(this,sp,sl) ;
-}
+} /* end method */
 
 int dater::settouch(cchar *sp,int sl) noex {
 	return dater_settouch(this,sp,sl) ;
-}
+} /* end method */
 
 int dater::settoucht(cchar *sp,int sl) noex {
 	return dater_settoucht(this,sp,sl) ;
-}
+} /* end method */
 
 int dater::settmzon(TM *stp,int zoff,cchar *zstr,int zlen) noex {
 	return dater_settmzon(this,stp,zoff,zstr,zlen) ;
-}
+} /* end method */
 
 int dater::settmzo(TM *stp,int zoff) noex {
 	return dater_settmzo(this,stp,zoff) ;
-}
+} /* end method */
 
 int dater::settmzn(TM *stp,cchar *zstr,int zlen) noex {
 	return dater_settmzn(this,stp,zstr,zlen) ;
-}
+} /* end method */
 
 int dater::settimezn(time_t t,cchar *zn,int isdst) noex {
 	return dater_settimezn(this,t,zn,isdst) ;
-}
+} /* end method */
 
 int dater::settimezon(time_t t,int zoff,cchar *zn,int isdst) noex {
 	return dater_settimezon(this,t,zoff,zn,isdst) ;
-}
+} /* end method */
 
 int dater::mkdatestr(daterdts dt,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(this,dt,dbuf,dlen) ;
-}
+} /* end method */
 
 int dater::mkstd(char *dbuf,int dlen) noex {
 	return dater_mkstd(this,dbuf,dlen) ;
-}
+} /* end method */
 
 int dater::mkenv(char *dbuf,int dlen) noex {
 	return dater_mkenv(this,dbuf,dlen) ;
-}
+} /* end method */
 
 int dater::mkmsg(char *dbuf,int dlen) noex {
 	return dater_mkmsg(this,dbuf,dlen) ;
-}
+} /* end method */
 
 int dater::mkhdr(char *dbuf,int dlen) noex {
 	return dater_mkhdr(this,dbuf,dlen) ;
-}
+} /* end method */
 
 int dater::mkstrdig(char *dbuf,int dlen) noex {
 	return dater_mkstrdig(this,dbuf,dlen) ;
-}
+} /* end method */
 
 int dater::mklogz(char *dbuf,int dlen) noex {
 	return dater_mklogz(this,dbuf,dlen) ;
-}
+} /* end method */
 
 int dater::mkgmtlogz(char *dbuf,int dlen) noex {
 	return dater_mkgmtlogz(this,dbuf,dlen) ;
-}
+} /* end method */
 
 int dater::zinfoset(dater_zi *zip,cchar *zn,int zl) noex {
 	return dater_zinfoset(this,zip,zn,zl) ;
-}
+} /* end method */
 
 int dater::gettime(time_t *tp) noex {
 	return dater_gettime(this,tp) ;
-}
+} /* end method */
 
 int dater::getzoneoff(int *zp) noex {
 	return dater_getzoneoff(this,zp) ;
-}
+} /* end method */
 
 int dater::getzonename(char *rbuf,int rlen) noex {
 	return dater_getzonename(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int dater::zinfoget(dater_zi *zip,char *zbuf,int zlen) noex {
 	return dater_zinfoget(this,zip,zbuf,zlen) ;
-}
+} /* end method */
 
 int dater::diff(dater *d2p,time_t *rp) noex {
 	return dater_diff(this,d2p,rp) ;
-}
+} /* end method */
 
 void dater::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
