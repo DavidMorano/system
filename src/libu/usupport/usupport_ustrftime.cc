@@ -96,7 +96,7 @@ namespace libu {
 	            dbuf[0] = '\0' ;
 	            rs = SR_OVERFLOW ;
 	        } else if (errno) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		} else {
 		    rs = SR_NOMSG ;
 		}
