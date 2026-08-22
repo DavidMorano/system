@@ -52,12 +52,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ndig.h"
 
@@ -91,8 +91,7 @@ int ndig(double *la,int n) noex {
 	    if (t > m) m = t ;
 	} /* end for */
 	return m ;
-}
-/* end subroutine (ndig) */
+} /* end subroutine (ndig) */
 
 int ndigmax(double *la,int n,int m) noex {
 	double		c = 1.0 ;
@@ -104,8 +103,7 @@ int ndigmax(double *la,int n,int m) noex {
 	    if (la[i] > c) la[i] = c ;
 	} /* end for */
 	return m ;
-}
-/* end subroutine (ndigmax) */
+} /* end subroutine (ndigmax) */
 
 
 /* local subroutines */
