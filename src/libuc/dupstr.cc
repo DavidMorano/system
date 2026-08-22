@@ -106,8 +106,7 @@ int dupstr_start(dupstr *op,cchar *sp,int µsl,char **rpp) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (dupstr_start) */
+} /* end subroutine (dupstr_start) */
 
 int dupstr_finish(dupstr *op) noex {
 	int		rs = SR_FAULT ;
@@ -122,15 +121,14 @@ int dupstr_finish(dupstr *op) noex {
 	    op->buf[0] = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dupstr_finish) */
+} /* end subroutine (dupstr_finish) */
 
 
 /* local subroutines */
 
 int dupstr::start(cchar *sp,int sl,char **rpp) noex {
 	return dupstr_start(this,sp,sl,rpp) ;
-}
+} /* end method */
 
 void dupstr::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
