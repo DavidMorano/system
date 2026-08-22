@@ -127,10 +127,10 @@ int dirseen_notadd(dirseen *op,ustat *sbp,cchar *dbuf,int dlen) noex {
 
 int dirseen::notseen(ustat *sbp,cchar *dbuf,int dlen) noex {
 	return dirseen_notseen(this,sbp,dbuf,dlen) ;
-}
+} /* end method */
 
 int dirseen::notadd(ustat *sbp,cchar *dbuf,int dlen) noex {
 	return dirseen_notadd(this,sbp,dbuf,dlen) ;
-}
+} /* end method */
 
 
