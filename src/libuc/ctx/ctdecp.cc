@@ -120,27 +120,27 @@ int ctdecpx(int (*ctx)(char *,int,int,UT),char *dp,int dl,int p,T v) noex {
 
 int ctdecpui(char *dp,int dl,int p,uint uv) noex {
 	return ctdecpux(ctdecui,dp,dl,p,uv) ;
-}
+} /* end */
 
 int ctdecpul(char *dp,int dl,int p,ulong uv) noex {
 	return ctdecpux(ctdecul,dp,dl,p,uv) ;
-}
+} /* end */
 
 int ctdecpull(char *dp,int dl,int p,ulonglong uv) noex {
 	return ctdecpux(ctdecull,dp,dl,p,uv) ;
-}
+} /* end */
 
 int ctdecpi(char *rbuf,int rlen,int prec,int v) noex {
 	return ctdecpx(ctdecpui,rbuf,rlen,prec,v) ;
-}
+} /* end */
 
 int ctdecpl(char *rbuf,int rlen,int prec,long v) noex {
 	return ctdecpx(ctdecpul,rbuf,rlen,prec,v) ;
-}
+} /* end */
 
 int ctdecpll(char *rbuf,int rlen,int prec,longlong v) noex {
 	return ctdecpx(ctdecpull,rbuf,rlen,prec,v) ;
-}
+} /* end */
 
 
 /* local subroutines */
