@@ -231,8 +231,7 @@ int lookaside_count(lookaside *op) noex {
 	    rs = op->nused ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (lookaside_count) */
+} /* end subroutine (lookaside_count) */
 
 int lookaside_audit(lookaside *op) noex {
 	int		rs = SR_FAULT ;
