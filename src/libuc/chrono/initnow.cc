@@ -88,7 +88,7 @@ import libutil ;			/* |memclear(3u)| */
 extern "C" {
     extern int uc_ftime(timeb *) noex ;
     extern int uc_gettimeofday(timeval *,void *) noex ;
-}
+} /* end */
 
 
 /* external variables */
