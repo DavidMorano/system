@@ -32,22 +32,22 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucdesc.h>
-#include	<sysval.hh>
-#include	<intsat.h>
-#include	<intceil.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<intsat.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"memfile.h"
 
@@ -103,8 +103,7 @@ local inline int memfile_ctor(memfile *op,Args ... args) noex {
 	    op->fd = -1 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (memfile_ctor) */
+} /* end subroutine (memfile_ctor) */
 
 local inline int memfile_dtor(memfile *op) noex {
 	int		rs = SR_FAULT ;
@@ -112,8 +111,7 @@ local inline int memfile_dtor(memfile *op) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (memfile_dtor) */
+} /* end subroutine (memfile_dtor) */
 
 template<typename ... Args>
 local inline int memfile_magic(memfile *op,Args ... args) noex {
@@ -122,8 +120,7 @@ local inline int memfile_magic(memfile *op,Args ... args) noex {
 	    rs = (op->magval == MEMFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (memfile_magic) */
+} /* end subroutine (memfile_magic) */
 
 local int	memfile_opener(memfile *,cchar *,int,mode_t) noex ;
 local int	memfile_openmap(memfile *,size_t) noex ;
@@ -158,8 +155,7 @@ int memfile_open(memfile *op,cchar *fname,int of,mode_t om) noex {
 	    } /* end if (error) */
 	} /* end if (memfile_ctor) */
 	return rs ;
-}
-/* end subroutine (memfile_open) */
+} /* end subroutine (memfile_open) */
 
 int memfile_close(memfile *op) noex {
 	int		rs ;
@@ -181,8 +177,7 @@ int memfile_close(memfile *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (memfile_close) */
+} /* end subroutine (memfile_close) */
 
 int memfile_write(memfile *op,cvoid *wbuf,int wlen) noex {
 	int		rs ;
@@ -222,8 +217,7 @@ int memfile_write(memfile *op,cvoid *wbuf,int wlen) noex {
 	    } /* end if (open) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (memfile_write) */
+} /* end subroutine (memfile_write) */
 
 int memfile_len(memfile *op) noex {
 	int		rs ;
@@ -231,8 +225,7 @@ int memfile_len(memfile *op) noex {
 	    rs = intsat(op->fsize) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (memfile_len) */
+} /* end subroutine (memfile_len) */
 
 int memfile_alloc(memfile *op) noex {
 	int		rs ;
@@ -240,8 +233,7 @@ int memfile_alloc(memfile *op) noex {
 	    rs = intsat(op->dlen) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (memfile_alloc) */
+} /* end subroutine (memfile_alloc) */
 
 int memfile_tell(memfile *op,off_t *offp) noex {
 	int		rs ;
@@ -250,8 +242,7 @@ int memfile_tell(memfile *op,off_t *offp) noex {
 	    if (offp) *offp = op->off ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (memfile_tell) */
+} /* end subroutine (memfile_tell) */
 
 int memfile_getbuf(memfile *op,void *vp) noex {
 	caddr_t		*rpp = caddrp(vp) ;
@@ -260,8 +251,7 @@ int memfile_getbuf(memfile *op,void *vp) noex {
 	    *rpp = caddr_t(op->dbuf) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (memfile_getbuf) */
+} /* end subroutine (memfile_getbuf) */
 
 
 /* private subroutines */
@@ -290,8 +280,7 @@ local int memfile_opener(memfile *op,cchar *fname,int of,mode_t om) noex {
             } /* end if (error) */
         } /* end if (file-open) */
 	return rs ;
-}
-/* end subroutine (memfile_opener) */
+} /* end subroutine (memfile_opener) */
 
 local int memfile_openmap(memfile *op,size_t fsize) noex {
 	int		rs ;
@@ -305,8 +294,7 @@ local int memfile_openmap(memfile *op,size_t fsize) noex {
 	    } /* end if (error) */
 	} /* end if (u_mmapbegin) */
 	return rs ;
-}
-/* end subroutine (memfile_openmap) */
+} /* end subroutine (memfile_openmap) */
 
 local int memfile_mapbegin(memfile *op,size_t of,size_t msz) noex {
 	cnullptr	np{} ;
@@ -321,8 +309,7 @@ local int memfile_mapbegin(memfile *op,size_t of,size_t msz) noex {
 	    op->dlen = msz ;
 	}
 	return rs ;
-}
-/* end subroutine (memfile_mepend) */
+} /* end subroutine (memfile_mepend) */
 
 local int memfile_mapend(memfile *op) noex {
 	int		rs ;
@@ -333,8 +320,7 @@ local int memfile_mapend(memfile *op) noex {
 	    op->dlen = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (memfile_mapend) */
+} /* end subroutine (memfile_mapend) */
 
 local size_t mklen(sz soff,sz zsize) noex {
     	int		zl = intconv(zsize) ;
@@ -368,8 +354,7 @@ local int memfile_extend(memfile *op) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (memfile_extend) */
+} /* end subroutine (memfile_extend) */
 
 local int memfile_mapextend(memfile *op,size_t ext) noex {
 	cnullptr	np{} ;
@@ -407,8 +392,7 @@ local int memfile_mapextend(memfile *op,size_t ext) noex {
 	    } /* end if */
 	} /* end if (remap) */
 	return rs ;
-}
-/* end subroutine (memfile_mapextend) */
+} /* end subroutine (memfile_mapextend) */
 
 local int memfile_memfree(memfile *op,caddr_t addr,size_t ext) noex {
 	size_t		tsize = size_t(op->pagesz) ;
@@ -424,8 +408,7 @@ local int memfile_memfree(memfile *op,caddr_t addr,size_t ext) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (memfile_memfree) */
+} /* end subroutine (memfile_memfree) */
 
 #ifdef	COMMENT
 local int memfile_memfree(memfile *op,caddr_t addr,size_t ext) noex {
@@ -438,8 +421,7 @@ local int memfile_memfree(memfile *op,caddr_t addr,size_t ext) noex {
 	    if (rs != SR_NOMEM) break ;
 	} /* end for */
 	return (rs == SR_NOMEM) ? true : SR_EXIST ;
-}
-/* end subroutine (memfile_memfree) */
+} /* end subroutine (memfile_memfree) */
 #endif /* COMMENT */
 
 
