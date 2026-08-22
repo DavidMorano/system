@@ -248,7 +248,7 @@ int u_alarm(cuint secs) noex {
 	uint		rem = 0 ;
 	int		rs  = SR_OK ;
 	if ((rem = alarm(secs)) == uint(-1)) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	if (rs >= 0) {
 	    rs = intsat(rem) ;
@@ -276,7 +276,7 @@ int u_getgroups(int n,gid_t *a) noex {
 	int		rs = SR_FAULT ;
 	if (a) {
 	    if ((rs = getgroups(n,a)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	}
 	return rs ;
@@ -285,7 +285,7 @@ int u_getgroups(int n,gid_t *a) noex {
 int u_getpgid(pid_t pid) noex {
 	int		rs ;
 	if ((rs = getpgid(pid)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end subroutine (u_getpgid) */
@@ -294,7 +294,7 @@ int u_getrlimit(int rn,RLIMIT *rp) noex {
 	int		rs = SR_FAULT ;
 	if (rp) {
 	    if ((rs = getrlimit(rn,rp)) < 0)  {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	}
 	return rs ;
@@ -303,7 +303,7 @@ int u_getrlimit(int rn,RLIMIT *rp) noex {
 int u_getsid(pid_t pid) noex {
 	int		rs ;
 	if ((rs = getsid(pid)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end subroutine (u_getsid) */
@@ -314,7 +314,7 @@ int u_nice(int value,int *rip) noex {
 	errno = 0 ;
 	if ((v = nice(value)) == -1) {
 	    if (errno != 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	}
 	if (rip) {
@@ -380,7 +380,7 @@ int u_setgroups(int n,const gid_t *glist) noex {
 int u_setrlimit(int rn,CRLIMIT *rp) noex {
 	int		rs ;
 	if ((rs = setrlimit(rn,rp)) == -1) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end subroutine (u_setrlimit) */
@@ -389,7 +389,7 @@ int u_times(TMS *rp) noex {
 	clock_t		tics ;
 	int		rs ;
 	if ((tics = times(rp)) == errclock) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    rs = intsat(tics) ;
 	}
@@ -418,7 +418,7 @@ int u_ulimit(int cmd,...) noex {
 	} /* end switch */
 	if (rval == -1L) {
 	    if (errno != 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    } else {
 		rs = INT_MAX ;
 	    }
@@ -440,7 +440,7 @@ int u_wait(int *sp) noex {
 	repeat {
 	    rs = SR_OK ;
 	    if ((rpid = wait(sp)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} until (rs != SR_INTR) ;
 	if (rs >= 0) {
@@ -453,7 +453,7 @@ int u_waitid(idtype_t idtype,id_t id,siginfo_t *sip,int opts) noex {
 	int		rs ;
 	repeat {
 	    if ((rs = waitid(idtype,id,sip,opts)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} until (rs != SR_INTR) ;
 	return rs ;
@@ -465,7 +465,7 @@ int u_waitpid(pid_t pid,int *sp,int flags) noex {
 	repeat {
 	    rs = SR_OK ;
 	    if ((rpid = waitpid(pid,sp,flags)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} until (rs != SR_INTR) ;
 	if (rs >= 0) {
@@ -478,7 +478,7 @@ int u_nanosleep(CTIMESPEC *tsp,TIMESPEC *rtsp) noex {
 	int		rs = SR_FAULT ;
 	if (tsp) {
 	    if ((rs = nanosleep(tsp,rtsp)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -500,7 +500,7 @@ int uprocer::ifork() noex {
 	if (pid_t pid ; (pid = fork()) >= 0) {
 	    rs = int(pid) ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uprocer::ifork) */
@@ -510,7 +510,7 @@ int uprocer::ivfork() noex {
 	if (pid_t pid ; (pid = vfork()) >= 0) {
 	    rs = int(pid) ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uprocer::ivfork) */
@@ -518,7 +518,7 @@ int uprocer::ivfork() noex {
 int uprocer::isetuid() noex {
 	int		rs ;
 	if ((rs = setuid(id1)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uprocer::isetuid) */
@@ -526,7 +526,7 @@ int uprocer::isetuid() noex {
 int uprocer::isetreuid() noex {
 	int		rs ;
 	if ((rs = setreuid(id1,id2)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end subroutine (uprocer::isetreuid) */
@@ -534,7 +534,7 @@ int uprocer::isetreuid() noex {
 int uprocer::iseteuid() noex {
 	int		rs ;
 	if ((rs = seteuid(id1)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uprocer::iseteuid) */
@@ -542,7 +542,7 @@ int uprocer::iseteuid() noex {
 int uprocer::isetgid() noex {
 	int		rs ;
 	if ((rs = setgid(id1)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uprocer::isetgid) */
@@ -550,7 +550,7 @@ int uprocer::isetgid() noex {
 int uprocer::isetregid() noex {
 	int		rs ;
 	if ((rs = setregid(id1,id2)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uprocer::isetregid) */
@@ -558,7 +558,7 @@ int uprocer::isetregid() noex {
 int uprocer::isetegid() noex {
 	int		rs ;
 	if ((rs = setegid(id1)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uprocer::isetegid) */
@@ -566,7 +566,7 @@ int uprocer::isetegid() noex {
 int uprocer::isetpgid() noex {
 	int		rs ;
 	if ((rs = setpgid(id1,id2)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uprocer::isetpgid) */
@@ -575,7 +575,7 @@ int uprocer::isetsid() noex {
 	int		rs ;
 	pid_t		pid ;
 	if ((pid = setsid()) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	} else {
 	    rs = intsat(pid) ;
 	}
@@ -585,7 +585,7 @@ int uprocer::isetsid() noex {
 int uprocer::isetgroups() noex {
 	int		rs ;
 	if ((rs = setgroups(n,glist)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uprocer::isetgroups) */
