@@ -111,7 +111,7 @@ using libuc::libmem ;			/* variable */
 /* forward references */
 
 template<typename ... Args>
-static inline int buffer_ctor(buffer *op,Args ... args) noex {
+local inline int buffer_ctor(buffer *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
@@ -313,23 +313,23 @@ int buffer_len(buffer *op) noex {
 
 int buffer::adv(int v) noex {
 	return buffer_adv(this,v) ;
-}
+} /* end */
 
 int buffer::strw(cchar *sp,int sl) noex {
 	return buffer_strw(this,sp,sl) ;
-}
+} /* end */
 
 int buffer::chr(int ch) noex {
 	return buffer_chr(this,ch) ;
-}
+} /* end */
 
 int buffer::buf(cchar *sbuf,int slen) noex {
 	return buffer_buf(this,sbuf,slen) ;
-}
+} /* end */
 
 int buffer::get(cchar **rpp) noex {
 	return buffer_get(this,rpp) ;
-}
+} /* end */
 
 void buffer::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
