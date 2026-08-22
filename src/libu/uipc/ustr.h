@@ -50,7 +50,7 @@ extern int u_strmsgputp(int,STRBUF *,STRBUF *,int,int) noex ;
 
 extern int u_detach(cchar *) noex ;
 
-local int u_fdetach(cchar *fname) noex {
+local inline int u_fdetach(cchar *fname) noex {
     	return u_detach(fname) ;
 } /* end subroutine */
 
