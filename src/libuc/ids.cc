@@ -253,7 +253,7 @@ ids_co::operator int () noex {
 
 int ids::copy(const ids *oip) noex {
 	return ids_copy(this,oip) ;
-}
+} /* end method */
 
 void ids::dtor() noex {
 	if (cint rs = release ; rs < 0) {
