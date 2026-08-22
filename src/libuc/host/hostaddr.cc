@@ -116,7 +116,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     extern int geteaddrinfo(cchar *,cchar *,AI *,char *,AI **) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -137,7 +137,7 @@ local inline int hostaddr_ctor(hostaddr *op,Args ... args) noex {
 	    op->resarr = nullptr ;
 	    op->ehostname = nullptr ;
 	    op->n = 0 ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine */
 
@@ -145,7 +145,7 @@ local inline int hostaddr_dtor(hostaddr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (hostaddr_dtor) */
 
@@ -163,7 +163,7 @@ local int	hostaddr_resultend(hostaddr *) noex ;
 
 extern "C" {
     local int	vcmpaddr(cvoid *,cvoid *) noex ;	/* for |qsort(3c)| */
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -190,19 +190,19 @@ int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 	                }
 		        if (rs < 0) {
 		            hostaddr_resultend(op) ;
-			}
+			} /* end if (error) */
 	            } /* end if (hostaddr_sort) */
 	            if (rs < 0) {
 	                uc_addrinfofree(op->aip) ;
 		        op->aip = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (geteaddrinfo) */
 		rs1 = lm_free(ehostname) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    if (rs < 0) {
 		hostaddr_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (hostaddr_ctor) */
 	return rs ;
 } /* end subroutine (hostaddr_start) */
