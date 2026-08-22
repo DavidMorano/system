@@ -27,7 +27,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -68,35 +68,35 @@
 
 int filer::start(int afd,off_t soff,int bsz,int to) noex {
 	return filer_start(this,afd,soff,bsz,to) ;
-}
+} /* end method */
 
 int filer::read(void *rbuf,int rlen,int to) noex {
 	return filer_read(this,rbuf,rlen,to) ;
-}
+} /* end method */
 
 int filer::readp(void *rbuf,int rlen,off_t poff,int to) noex {
 	return filer_readp(this,rbuf,rlen,poff,to) ;
-}
+} /* end method */
 
 int filer::readln(char *rbuf,int rlen,int to) noex {
 	return filer_readln(this,rbuf,rlen,to) ;
-}
+} /* end method */
 
 int filer::readlns(char *rbuf,int rlen,int to,int *nlinep) noex {
 	return filer_readlns(this,rbuf,rlen,to,nlinep) ;
-}
+} /* end method */
 
 int filer::write(cvoid *rbuf,int rlen) noex {
 	return filer_write(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int filer::writeto(cvoid *rbuf,int rlen,int to) noex {
 	return filer_writeto(this,rbuf,rlen,to) ;
-}
+} /* end method */
 
 int filer::println(cchar *rbuf,int rlen) noex {
 	return filer_println(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int filer::printf(cchar *fmt,...) noex {
 	va_list		ap ;
@@ -119,19 +119,19 @@ int filer::vprintf(cchar *fmt,va_list ap) noex {
 
 int filer::seek(off_t soff,int w) noex {
 	return filer_seek(this,soff,w) ;
-}
+} /* end method */
 
 int filer::writefill(cchar *wbuf,int wlen) noex {
 	return filer_writefill(this,wbuf,wlen) ;
-}
+} /* end method */
 
 int filer::writefd(char *bufp,int bufl,int mfd,int alen) noex {
 	return filer_writefd(this,bufp,bufl,mfd,alen) ;
-}
+} /* end method */
 
 int filer::stat(ustat *sbp) noex {
 	return filer_stat(this,sbp) ;
-}
+} /* end method */
 
 void filer::dtor() noex {
 	if (cint rs = filer_finish(this) ; rs < 0) {
