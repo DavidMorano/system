@@ -101,7 +101,7 @@ export module bstree ;
 
 export {
     template <typename T,typename Comp = std::less<T>> class bstree ;
-}
+} /* end */
 
 template <typename T,typename Comp = std::less<T>>
 class bstree_iter ;
