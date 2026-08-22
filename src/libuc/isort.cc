@@ -60,7 +60,7 @@
 
 extern "C" {
     typedef int	(*sortcmp_f)(cvoid *,cvoid *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
