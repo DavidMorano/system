@@ -189,11 +189,11 @@ typedef vecstr *		vecstrp ;
 
 extern "C" {
     extern int uc_getlogin(char *,int) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     int		getxusername(getxuser *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -619,13 +619,13 @@ local int getxusername_lookup(getxuser *xup,cchar *sp) noex {
 
 #ifdef	COMMENT
 local int logpop(uid_t uid) noex {
-	time_t		daytime = time(nullptr) ;
+	custime		dt getustime ;
 	uid_t		pid = ugetpid() ;
 	int		rs ;
 	cchar		*pp = getexecname() ;
 	cchar		*fmt ;
 	char		timebuf[TIMEBUFLEN + 1] ;
-	timestr_logz(daytime,timebuf),
+	timestr_logz(dt,timebuf),
 	fmt = "%-23s p=%d u=%u ef=%s\n" ;
 	rs = nprintf(DEBFNAME,fmt,timebuf,pid,uid,pp) ;
 	return rs ;
