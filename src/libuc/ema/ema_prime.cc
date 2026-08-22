@@ -105,7 +105,7 @@ local inline int ema_dtor(ema *op) noex {
 
 namespace ema_ns {
     extern int	ema_parseit(ema *,asstr *) noex ;
-}
+} /* end namespace (ema_ns) */
 
 local int	ema_addentone(ema *,ema_ent *) noex ;
 
