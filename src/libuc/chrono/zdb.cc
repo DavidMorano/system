@@ -350,19 +350,19 @@ local int findname(cchar *sp,int sl) noex {
 
 int zdb::nameoff(cchar *sp,int sl,int zoff) noex {
 	return zdb_nameoff(this,sp,sl,zoff) ;
-}
+} /* end method */
 
 int zdb::setname(cchar *sp,int sl) noex {
 	return zdb_setname(this,sp,sl) ;
-}
+} /* end method */
 
 int zdb::setoff(int zoff) noex {
 	return zdb_setoff(this,zoff) ;
-}
+} /* end method */
 
 int zdb::offisdst(int zoff,int dst) noex {
 	return zdb_offisdst(this,zoff,dst) ;
-}
+} /* end method */
 
 zdb_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
