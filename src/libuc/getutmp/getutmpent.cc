@@ -208,7 +208,7 @@ ufinder::operator int () noex {
 
 int ufinder::start() noex {
 	return lm_mall(aelen,&aebuf) ;
-}
+} /* end method */
 
 int ufinder::finish() noex {
 	int		rs = SR_BUGCHECK ;
@@ -222,11 +222,11 @@ int ufinder::finish() noex {
 	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method */
 
 int ufinder::trysid() noex {
 	return utmpacc_entsid(&ae,aebuf,aelen,sid) ;
-}
+} /* end method */
 
 int ufinder::tryline() noex {
 	static cint	oursid = getsid(0) ;
@@ -240,11 +240,11 @@ int ufinder::tryline() noex {
 	    } /* end for */
 	} /* end if (referencing ourself) */
 	return rs ;
-}
+} /* end method */
 
 int ufinder::trystat() noex {
 	return utmpacc_entstat(&ae,aebuf,aelen,sid) ;
-}
+} /* end method */
 
 local int utmpent_utmpacc(utmpentx *ep,pid_t sid) noex {
 	int		rs ;
@@ -278,10 +278,10 @@ local int utmpent_load(utmpentx *ep,utmpacc_ent *aep) noex {
 
 int utmpentx::get(pid_t pid) noex {
 	return getutmpent(this,pid) ;
-}
+} /* end method */
 
 int utmpentx::operator () (pid_t pid) noex {
 	return getutmpent(this,pid) ;
-}
+} /* end method */
 
 
