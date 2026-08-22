@@ -47,31 +47,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<fcntl.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<bitset>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<fsdir.h>
-#include	<fifostr.h>
-#include	<strwcpy.h>
-#include	<matstr.h>
-#include	<filetypes.h>
-#include	<hasx.h>
-#include	<ischarx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<bitset>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<fifostr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<filetypes.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"fsdirtree.h"
 
@@ -113,7 +113,7 @@ extern "C" {
     extern int uc_getcwd(char *,int) noex ;
     extern int uc_readlink(cchar *,char *,int) noex ;
     extern int uc_stat(cchar *,ustat *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -529,7 +529,7 @@ constexpr cint	selsz = DT_OVERLAST ;
 
 local void bset(bitset<selsz> &v,int n) noex {
     	v[n] = true ;
-}
+} /* end subroutine */
 
 local int fsdirtree_sel(fsdirtree *op) noex {
     	const fsdirtreems	*dtp = &fsdirtreem ;
@@ -682,15 +682,15 @@ local int dirid_finish(dirid *dip) noex {
 
 int fsdirtree::open(cchar *dname,int fo) noex {
 	return fsdirtree_open(this,dname,fo) ;
-}
+} /* end method */
 
 int fsdirtree::prune(cchar **parr) noex {
 	return fsdirtree_prune(this,parr) ;
-}
+} /* end method */
 
 int fsdirtree::read(ustat *sbp,char *rbuf,int rlen) noex {
 	return fsdirtree_read(this,sbp,rbuf,rlen) ;
-}
+} /* end method */
 
 void fsdirtree::dtor() noex {
 	if (cint rs = close ; rs < 0) {
