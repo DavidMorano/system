@@ -66,7 +66,8 @@ import uconstants ;			/* |varname(3u)| */
 
 extern "C" {
     extern int uc_sysauxinfo(char *,int,int) noex ;
-}
+} /* end extern (C) */
+
 
 /* external variables */
 
