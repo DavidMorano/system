@@ -137,7 +137,7 @@ struct nodedb_ie {
 	int		nkeys ;			/* number of keys */
 	int		tsize ;			/* total size */
 	int		fi ;			/* file index */
-} ;
+} ; /* end struct */
 
 struct lineinfo_field {
 	cchar		*fp ;
@@ -248,7 +248,7 @@ local int	entry_load(NODEDB_ENT *,char *,int,ND_IE *) noex ;
 
 extern "C" {
     local int	vcmpfn(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
