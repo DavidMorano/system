@@ -137,7 +137,7 @@ int u_select(int nfds,SET *ifds,SET *ofds,SET *efds,TV *tvp) noex {
 sysret_t selector::iselect(int) noex {
     	int		rs ;
 	if ((rs = select(nfds,ifds,ofds,efds,tvp)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (selector::iselect) */
