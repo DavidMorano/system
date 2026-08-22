@@ -107,8 +107,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -338,11 +336,11 @@ local int gecos_storename(gecos *op,sbuf *bp,cchar *tp) noex {
 
 int gecoshelp::start() noex {
 	return sl ;
-}
+} /* end method */
 
 int gecoshelp::finish() noex {
 	return n ;
-}
+} /* end method */
 
 void gecoshelp::organization() noex {
 	if (cchar *tp ; (tp = strnchr(bp,bl,'-')) != np) {
@@ -496,15 +494,15 @@ void gecoshelp::proc() noex {
 
 int gecos::start(cchar *sp,int sl) noex {
 	return gecos_start(this,sp,sl) ;
-}
+} /* end method */
 
 int gecos::compose(char *rb,int rl) noex {
 	return gecos_compose(this,rb,rl) ;
-}
+} /* end method */
 
 int gecos::getval(int i,cchar **rpp) noex {
 	return gecos_getval(this,i,rpp) ;
-}
+} /* end method */
 
 void gecos::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
