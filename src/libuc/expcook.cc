@@ -47,12 +47,12 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<hdbstr.h>
-#include	<sbuf.h>
-#include	<buffer.h>
-#include	<snwcpy.h>
-#include	<strwcpy.h>
-#include	<strn.h>
+#include	<hdbstr.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"expcook.h"
@@ -93,8 +93,7 @@ local inline int expcook_ctor(EX *op) noex {
 	    } /* end if (new-hdbstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (expcook_ctor) */
+} /* end subroutine (expcook_ctor) */
 
 local int expcook_dtor(EX *op) noex {
 	int		rs = SR_OK ;
@@ -115,9 +114,7 @@ local inline int expcook_magic(EX *op,Args ... args) noex {
 } /* end subroutine (expcook_magic) */
 
 local int	expcook_prockey(EX *,int,buffer *,cchar *,int) noex ;
-
 local int	buffer_keydef(buffer *,int,cchar *,int) noex ;
-
 local int	mkcomp(char *,int,cchar *,int,cchar *,int) noex ;
 
 
@@ -140,11 +137,10 @@ int expcook_start(EX *op) noex {
 	    }
 	    if (rs < 0) {
 		expcook_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (expcook_ctor) */
 	return rs ;
-}
-/* end subroutine (expcook_start) */
+} /* end subroutine (expcook_start) */
 
 int expcook_finish(EX *op) noex {
 	int		rs ;
@@ -161,8 +157,7 @@ int expcook_finish(EX *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (expcook_finish) */
+} /* end subroutine (expcook_finish) */
 
 int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 	cnullptr	np{} ;
@@ -180,8 +175,7 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (expcook_add) */
+} /* end subroutine (expcook_add) */
 
 int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 	cnullptr	np{} ;
@@ -198,8 +192,7 @@ int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 	    } /* end if (new-hdbstr) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (expcook_curbegin) */
+} /* end subroutine (expcook_curbegin) */
 
 int expcook_curend(EX *op,expcook_cur *curp) noex {
 	int		rs ;
@@ -216,8 +209,7 @@ int expcook_curend(EX *op,expcook_cur *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (expcook_curend) */
+} /* end subroutine (expcook_curend) */
 
 int expcook_curenum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
@@ -234,8 +226,7 @@ int expcook_curenum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? bl : rs ;
-}
-/* end subroutine (expcook_curenum) */
+} /* end subroutine (expcook_curenum) */
 
 int expcook_findkey(EX *op,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs ;
@@ -244,8 +235,7 @@ int expcook_findkey(EX *op,cchar *kp,int kl,cchar **rpp) noex {
 	    rs = slp->fetch(kp,kl,nullptr,rpp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (expcook_findkey) */
+} /* end subroutine (expcook_findkey) */
 
 int expcook_delkey(EX *op,cchar *key) noex {
 	int		rs ;
@@ -254,8 +244,7 @@ int expcook_delkey(EX *op,cchar *key) noex {
 	    rs = slp->delkey(key,-1) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (expcook_delkey) */
+} /* end subroutine (expcook_delkey) */
 
 int expcook_exp(EX *op,int wch,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	int		rs ;
@@ -282,8 +271,7 @@ int expcook_exp(EX *op,int wch,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? bl : rs ;
-}
-/* end subroutine (expcook_exp) */
+} /* end subroutine (expcook_exp) */
 
 int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
@@ -345,8 +333,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (expcook_expbuf) */
+} /* end subroutine (expcook_expbuf) */
 
 
 /* private subroutines */
@@ -411,35 +398,35 @@ local int mkcomp(char *rp,int rl,cchar *kp,int kl,cchar *vp,int vl) noex {
 
 int expcook::add(cchar *kbuf,cchar *vbuf,int vlen) noex {
 	return expcook_add(this,kbuf,vbuf,vlen) ;
-}
+} /* end method */
 
 int expcook::curbegin(expcook_cur *curp) noex {
 	return expcook_curbegin(this,curp) ;
-}
+} /* end method */
 
 int expcook::curend(expcook_cur *curp) noex {
 	return expcook_curend(this,curp) ;
-}
+} /* end method */
 
 int expcook::curenum(expcook_cur *curp,char *rbuf,int rlen) noex {
 	return expcook_curenum(this,curp,rbuf,rlen) ;
-}
+} /* end method */
 
 int expcook::findkey(cchar *kp,int kl,cchar **rpp) noex {
 	return expcook_findkey(this,kp,kl,rpp) ;
-}
+} /* end method */
 
 int expcook::delkey(cchar *key) noex {
 	return expcook_delkey(this,key) ;
-}
+} /* end method */
 
 int expcook::exp(int wch,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	return expcook_exp(this,wch,rbuf,rlen,sp,sl) ;
-}
+} /* end method */
 
 int expcook::expbuf(int wch,buffer *bufp,cchar *sp,int sl) noex {
 	return expcook_expbuf(this,wch,bufp,sp,sl) ;
-}
+} /* end method */
 
 void expcook::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
