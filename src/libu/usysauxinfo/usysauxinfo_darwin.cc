@@ -59,7 +59,7 @@ namespace libu {
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    cchar	*vp = nullptr ;
 	    cchar	*name = nullptr ;
 	    rs = SR_OK ;
@@ -90,7 +90,7 @@ namespace usysauxinfo {
 		rs = SR_NOTFOUND ;
 		break ;
 	    } /* end switch */
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 		if (name) {
 		    rs = darwin_usysctl(rbuf,rlen,name) ;
 	        } else if (vp) {
