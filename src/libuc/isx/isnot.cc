@@ -140,7 +140,7 @@ bool isNotPresent(int rs) noex {
 } /* end subroutine (isNotPresent) */
 
 bool isNotAccess(int rs) noex {
-	int		f = false ;
+	int	f = false ;
 	f = f || isonebad(naccess,rs) ;
 	f = f || isonebad(npresent,rs) ;
 	return f ;
@@ -156,10 +156,10 @@ bool isNotLib(int rs) noex {
 
 bool isNotTerm(int rs) noex {
 	return isonebad(rnoterm,rs) ;
-}
+} /* end subroutine */
 
 bool isNotSupport(int rs) noex {
 	return isonebad(rnosupport,rs) ;
-}
+} /* end subroutine */
 
 
