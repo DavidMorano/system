@@ -32,24 +32,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<usysflag.h>
-#include	<utimeout.h>		/* |uto_{x}(3u)| */
-#include	<getax.h>
-#include	<getpwx.h>
-#include        <errtimer.hh>
-#include	<mkpathx.h>
-#include	<sncpyx.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<utimeout.h>		/* LIBUC |uto_{x}(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include        <errtimer.hh>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pmq.h"
 
@@ -88,7 +88,7 @@ import libutil ;			/* |lenstr(3u)| */
 extern "C" {
     extern int	getgid_group(cchar *,int) noex ;
     extern int	isNotValid(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -155,7 +155,7 @@ namespace {
 int		uc_unlinkpmq(cchar *) noex ;
 
 template<typename ... Args>
-static inline int pmq_ctor(pmq *op,Args ... args) noex {
+local inline int pmq_ctor(pmq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
@@ -163,44 +163,43 @@ static inline int pmq_ctor(pmq *op,Args ... args) noex {
 	    op->magval = 0 ;
 	}
 	return rs ;
-}
+} /* end subroutine */
 
-static inline int pmq_dtor(pmq *op) noex {
+local inline int pmq_dtor(pmq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (pmq_dtor) */
+} /* end subroutine (pmq_dtor) */
 
 template<typename ... Args>
-static inline int pmq_magic(pmq *op,Args ... args) noex {
+local inline int pmq_magic(pmq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == PMQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
+} /* end subroutie */
 
-static int	pmq_nameload(pmq *,cchar *) noex ;
-static int	pmq_nameclean(pmq *) noex ;
+local int	pmq_nameload(pmq *,cchar *) noex ;
+local int	pmq_nameclean(pmq *) noex ;
 
 #if	CF_PMQDIR
-static int	pmqdiradd(cchar *,mode_t) noex ;
-static int	pmqdirrm(cchar *) noex ;
-static int	pmqdircheck(cchar *) noex ;
+local int	pmqdiradd(cchar *,mode_t) noex ;
+local int	pmqdirrm(cchar *) noex ;
+local int	pmqdircheck(cchar *) noex ;
 #endif /* CF_PMQDIR */
 
 #if	CF_GETPMQ
-static int	getpmquid(void) noex ;
-static int	getpmqgid(void) noex ;
+local int	getpmquid(void) noex ;
+local int	getpmqgid(void) noex ;
 #endif /* CF_GETPMQ */
 
 static constexpr mqd_t mkmqdbad() noex {
 	mqd_t	r = 0 ;
 	return (compl r) ;
-}
+} /* end */
 
 
 /* local variables */
@@ -236,8 +235,7 @@ int pmq_open(pmq *op,cchar *name,int of,mode_t om,const pmq_attr *attr) noex {
 	    }
 	} /* end if (pmq_ctor) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (pmq_open) */
+} /* end subroutine (pmq_open) */
 
 int pmq_close(pmq *op) noex {
 	int		rs ;
@@ -260,8 +258,7 @@ int pmq_close(pmq *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pmq_close) */
+} /* end subroutine (pmq_close) */
 
 int pmq_send(pmq *op,cchar *sbuf,int slen,uint prio) noex {
 	int		rs ;
@@ -271,8 +268,7 @@ int pmq_send(pmq *op,cchar *sbuf,int slen,uint prio) noex {
 	    rs = po(op) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pmq_send) */
+} /* end subroutine (pmq_send) */
 
 int pmq_recv(pmq *op,char *rbuf,int rlen,uint *priop) noex {
 	int		rs ;
@@ -282,8 +278,7 @@ int pmq_recv(pmq *op,char *rbuf,int rlen,uint *priop) noex {
 	    rs = po(op) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pmq_send) */
+} /* end subroutine (pmq_send) */
 
 int pmq_attrset(pmq *op,const pmq_attr *nattr,pmq_attr *oattr) noex {
 	int		rs ;
@@ -293,8 +288,7 @@ int pmq_attrset(pmq *op,const pmq_attr *nattr,pmq_attr *oattr) noex {
 	    rs = po(op) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pmq_attrset) */
+} /* end subroutine (pmq_attrset) */
 
 int pmq_attrget(pmq *op,pmq_attr *oattr) noex {
 	int		rs ;
@@ -304,8 +298,7 @@ int pmq_attrget(pmq *op,pmq_attr *oattr) noex {
 	    rs = po(op) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pmq_attrget) */
+} /* end subroutine (pmq_attrget) */
 
 int pmq_notify(pmq *op,SIGEVENT *sep) noex {
 	int		rs ;
@@ -315,8 +308,7 @@ int pmq_notify(pmq *op,SIGEVENT *sep) noex {
 	    rs = po(op) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pmq_notify) */
+} /* end subroutine (pmq_notify) */
 
 int pmq_unlink(pmq *op) noex {
 	int		rs ;
@@ -326,8 +318,7 @@ int pmq_unlink(pmq *op) noex {
 	    rs = po(op) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (pmq_unlink) */
+} /* end subroutine (pmq_unlink) */
 
 /* OTHER API (but related) */
 int uc_unlinkpmq(cchar *name) noex {
@@ -365,13 +356,12 @@ int uc_unlinkpmq(cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_unlinkpmq) */
+} /* end subroutine (uc_unlinkpmq) */
 
 
 /* local subroutines */
 
-static int pmq_nameload(pmq *op,cchar *name) noex {
+local int pmq_nameload(pmq *op,cchar *name) noex {
 	int		cl = lenstr(name) ;
 	int		rs = SR_OK ;
 	cchar		*prefix = "" ;
@@ -392,10 +382,9 @@ static int pmq_nameload(pmq *op,cchar *name) noex {
 	    } /* end if (m-a) */
 	} /* end if (ok) */
 	return rs ;
-}
-/* end subroutine (pmq_nameload) */
+} /* end subroutine (pmq_nameload) */
 
-static int pmq_nameclean(pmq *op) noex {
+local int pmq_nameclean(pmq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->name) ylikely {
@@ -404,8 +393,7 @@ static int pmq_nameclean(pmq *op) noex {
 	    op->name = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (pmq_nameclean) */
+} /* end subroutine (pmq_nameclean) */
 
 int posixhelp::callkern(pmq *op) noex {
     	int		rs ;
@@ -450,8 +438,7 @@ int posixhelp::operator () (pmq *op) noex {
 	    } /* end if (ok) */
 	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
-}
-/* end method (posixhelp::operator) */
+} /* end method (posixhelp::operator) */
 
 int posixhelp::open(pmq *op) noex {
 	int		rs = SR_OK ;
@@ -459,8 +446,7 @@ int posixhelp::open(pmq *op) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (posixhelp::open) */
+} /* end method (posixhelp::open) */
 
 int posixhelp::close(pmq *op) noex {
 	int		rs ;
@@ -468,8 +454,7 @@ int posixhelp::close(pmq *op) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (posixhelp::close) */
+} /* end method (posixhelp::close) */
 
 int posixhelp::send(pmq *op) noex {
 	int		rs ;
@@ -477,8 +462,7 @@ int posixhelp::send(pmq *op) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (posixhelp::send) */
+} /* end method (posixhelp::send) */
 
 int posixhelp::recv(pmq *op) noex {
 	int		rs ;
@@ -486,8 +470,7 @@ int posixhelp::recv(pmq *op) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (posixhelp::recv) */
+} /* end method (posixhelp::recv) */
 
 int posixhelp::attrset(pmq *op) noex {
 	int		rs ;
@@ -495,8 +478,7 @@ int posixhelp::attrset(pmq *op) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (posixhelp::setattr) */
+} /* end method (posixhelp::setattr) */
 
 int posixhelp::attrget(pmq *op) noex {
 	int		rs ;
@@ -504,8 +486,7 @@ int posixhelp::attrget(pmq *op) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (posixhelp::attrget) */
+} /* end method (posixhelp::attrget) */
 
 int posixhelp::notify(pmq *op) noex {
 	int		rs ;
@@ -513,8 +494,7 @@ int posixhelp::notify(pmq *op) noex {
 	    rs = (- errno) ;
 	}
 	return rs ;
-}
-/* end method (posixhelp::notify) */
+} /* end method (posixhelp::notify) */
 
 int posixhelp::unlink(pmq *op) noex {
 	int		rs = SR_NOENT ;
@@ -526,12 +506,11 @@ int posixhelp::unlink(pmq *op) noex {
 	    }
 	} /* end if (non-empty) */
 	return rs ;
-}
-/* end method (posixhelp::unlink) */
+} /* end method (posixhelp::unlink) */
 
 #if	CF_PMQDIR
 
-static int pmqdiradd(cchar *name,mode_t om) noex {
+local int pmqdiradd(cchar *name,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pp = PMQ_PATHPREFIX ;
@@ -548,10 +527,9 @@ static int pmqdiradd(cchar *name,mode_t om) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (pmqdiradd) */
+} /* end subroutine (pmqdiradd) */
 
-static int pmqdirrm(cchar *name) noex {
+local int pmqdirrm(cchar *name) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*pp = PMQ_PATHPREFIX ;
@@ -563,10 +541,9 @@ static int pmqdirrm(cchar *name) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (pmqdirrm) */
+} /* end subroutine (pmqdirrm) */
 
-static int pmqdircheck(cchar *pp) noex {
+local int pmqdircheck(cchar *pp) noex {
 	int		rs ;
 	if (ustat sb ; (rs = u_stat(pp,&sb)) == SR_NOENT) {
 	    const mode_t	dm = 0777 ;
@@ -589,14 +566,13 @@ static int pmqdircheck(cchar *pp) noex {
 	    } /* end if (mkdir) */
 	} /* end if (directory did not exist) */
 	return rs ;
-}
-/* end subroutine (pmqdircheck) */
+} /* end subroutine (pmqdircheck) */
 
 #endif /* CF_PMQDIR */
 
 #if	CF_GETPMQ
 
-static int getpmquid(void) noex {
+local int getpmquid(void) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
@@ -619,10 +595,9 @@ static int getpmquid(void) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? uid : rs ;
-}
-/* end subroutine (getpmquid) */
+} /* end subroutine (getpmquid) */
 
-static int getpmqgid(void) noex {
+local int getpmqgid(void) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	cchar		*gn = PMQ_GROUPNAME1 ;
@@ -633,8 +608,7 @@ static int getpmqgid(void) noex {
 	    }
 	} /* end if (getgid_group) */
 	return rs ;
-}
-/* end subroutine (getpmqgid) */
+} /* end subroutine (getpmqgid) */
 
 #endif /* CF_GETPMQ */
 
