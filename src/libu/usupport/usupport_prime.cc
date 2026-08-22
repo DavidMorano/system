@@ -132,7 +132,7 @@ local int isleep(int mto) noex {
 	bool		fexit = false ;
 	repeat {
 	    if ((rs = poll(fds,0,mto)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	        switch (rs) {
 	        case SR_AGAIN:
 		    break ;
