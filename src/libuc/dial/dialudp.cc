@@ -48,26 +48,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usyscalls.h>
-#include	<usysbase.h>
-#include	<uinet.h>		/* |PF_{x}(3u)| */
-#include	<uclibmem.h>
-#include	<hostaddr.h>
-#include	<getpf.h>
-#include	<getproto.h>
-#include	<openaddrinfo.h>
-#include	<iserror.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU |PF_{x}(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<hostaddr.h>		/* LIBUC */
+#include	<getpf.h>		/* LIBUC */
+#include	<getproto.h>		/* LIBUC */
+#include	<openaddrinfo.h>	/* LIBUC */
+#include	<iserror.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialudp.h"
 
@@ -99,13 +99,13 @@
 
 /* forward references */
 
-static int	opendialudp(int,cchar *,cchar *,int) noex ;
-static int	opendialudp_hint(ADDRINFO *,cchar *,cchar *,int) noex ;
+local int	opendialudp(int,cchar *,cchar *,int) noex ;
+local int	opendialudp_hint(ADDRINFO *,cchar *,cchar *,int) noex ;
 
 
 /* local variables */
 
-static constexpr int	pfs[] = {
+constexpr int		pfs[] = {
 	PF_INET4,
 	PF_INET6,
 	0
@@ -128,13 +128,12 @@ int dialudp(cchar *hostname,cchar *portspec,int af,int to,int) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (dialudp) */
+} /* end subroutine (dialudp) */
 
 
 /* local subroutines */
 
-static int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
+local int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
 	ADDRINFO	hint{} ;
 	int		rs = SR_OK ;
 	if_constexpr (f_proto) {
@@ -150,8 +149,8 @@ static int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
 	        hint.ai_family = rs ; /* PF */
 	    }
 	}
-/* do the spin */
-	if (rs >= 0) {
+	/* do the spin */
+	if (rs >= 0) ylikely {
 	    if (hint.ai_family == PF_UNSPEC) {
 	        rs = SR_NOTCONN ;
 	        for (int i = 0 ; (pfs[i] > 0) && isFailConn(rs) ; i += 1) {
@@ -164,16 +163,15 @@ static int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
 	    }
 	} /* end if (ok) */
 	return rs ;
-}
-/* end subroutine (opendialudp) */
+} /* end subroutine (opendialudp) */
 
-static int opendialudp_hint(ADDRINFO *hip,cchar *hs,cchar *ps,int to) noex {
+local int opendialudp_hint(ADDRINFO *hip,cchar *hs,cchar *ps,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (hostaddr ha ; (rs = hostaddr_start(&ha,hs,ps,hip)) >= 0) {
+	if (hostaddr ha ; (rs = hostaddr_start(&ha,hs,ps,hip)) >= 0) ylikely {
 	    hostaddr_cur	cur ;
-	    if ((rs = hostaddr_curbegin(&ha,&cur)) >= 0) {
+	    if ((rs = hostaddr_curbegin(&ha,&cur)) >= 0) ylikely {
 	        ADDRINFO	*aip ;
 	        int		c = 0 ;
 	        while ((rs1 = hostaddr_curenum(&ha,&cur,&aip)) >= 0) {
@@ -200,7 +198,6 @@ static int opendialudp_hint(ADDRINFO *hip,cchar *hs,cchar *ps,int to) noex {
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (hostaddr) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opendialudp_hint) */
+} /* end subroutine (opendialudp_hint) */
 
 
