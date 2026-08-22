@@ -87,7 +87,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     extern int	mkaddrdisp(char *,int,cchar *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -112,7 +112,7 @@ local bool	isBadAddr(int) noex ;
 
 /* local variables */
 
-static constexpr int	rsbadaddr[] = {
+constexpr int		rsbadaddr[] = {
 	SR_INVALID,
 	SR_DOM,
 	0
