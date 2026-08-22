@@ -102,27 +102,27 @@
 
 int buffer::strcompact(cchar *sp,int sl) noex {
 	return buffer_strcompact(this,sp,sl) ;
-}
+} /* end method */
 
 int buffer::stropaque(cchar *sp,int sl) noex {
 	return buffer_stropaque(this,sp,sl) ;
-}
+} /* end method */
 
 int buffer::strquote(cchar *sp,int sl) noex {
 	return buffer_strquote(this,sp,sl) ;
-}
+} /* end method */
 
 int buffer::chrs(int ch,int n) noex {
 	return buffer_chrs(this,ch,n) ;
-}
+} /* end method */
 
 int buffer::blanks(int n) noex {
 	return buffer_blanks(this,n) ;
-}
+} /* end method */
 
 int buffer::vprintf(cchar *fmt,va_list ap) noex {
     	return buffer_vprintf(this,fmt,ap) ;
-}
+} /* end method */
 
 int buffer::printf(cchar *fmt,...) noex {
     	va_list		ap ;
