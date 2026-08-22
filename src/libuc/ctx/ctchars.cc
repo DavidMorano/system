@@ -127,26 +127,26 @@ local int ctcharsx(char *dbuf,int dlen,int base,T &v) noex {
 
 int ctcharsi(char *dp,int dl,int b,int v) noex {
 	return ctcharsx(dp,dl,b,v) ;
-}
+} /* end */
 
 int ctcharsl(char *dp,int dl,int b,long v) noex {
 	return ctcharsx(dp,dl,b,v) ;
-}
+} /* end */
 
 int ctcharsll(char *dp,int dl,int b,longlong v) noex {
 	return ctcharsx(dp,dl,b,v) ;
-}
+} /* end */
 
 int ctcharsui(char *dp,int dl,int b,uint v) noex {
 	return ctcharsx(dp,dl,b,v) ;
-}
+} /* end */
 
 int ctcharsul(char *dp,int dl,int b,ulong v) noex {
 	return ctcharsx(dp,dl,b,v) ;
-}
+} /* end */
 
 int ctcharsull(char *dp,int dl,int b,ulonglong v) noex {
 	return ctcharsx(dp,dl,b,v) ;
-}
+} /* end */
 
 
