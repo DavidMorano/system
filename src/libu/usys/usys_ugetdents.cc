@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		length of result
-	<0		error code (- errno)
+	<0		error code (neg errno)
 
 	Notes:
 	1. Apple-Darwin has depracated their version of |getdents(2)|.
@@ -70,7 +70,7 @@ namespace usys {
 		    csize	vsz = size_t(rlen) ;
 		    rs = SR_OK ;
 		    if (int rc ; (rc = getdents(fd,rbuf,vsz)) < 0) {
-			rs = (- errno) ;
+			rs = (neg errno) ;
 		    }
 	        } /* end if (not-bad FD) */
 	    } /* end if (valid) */
@@ -112,7 +112,7 @@ namespace usys {
 		    csize	vsz = size_t(rlen) ;
 		    rs = SR_OK ;
 		    if (int rc ; (rc = getdents(fd,rbuf,vsz)) < 0) {
-			rs = (- errno) ;
+			rs = (neg errno) ;
 		    }
 	        } /* end if (not-bad FD) */
 	    } /* end if (valid) */
