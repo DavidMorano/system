@@ -88,7 +88,6 @@ bool matparam(cshort *pp,int pl,int v) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
-}
-/* end subroutine (matparam) */
+} /* end subroutine (matparam) */
 
 
