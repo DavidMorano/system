@@ -50,20 +50,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<ucsig.h>
-#include	<sbuf.h>
-#include	<char.h>
-#include	<sfx.h>
-#include	<nlsdialassist.h>
-#include	<localmisc.h>
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucsig.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<nlsdialassist.h>	/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialtcp.h"
 
@@ -77,10 +77,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_writen(int,cvoid *,int) noex ;
-}
-
 
 /* external variables */
 
@@ -90,7 +86,7 @@ extern "C" {
 
 /* forward references */
 
-static int	dialconn(int,cchar *,int,int) noex ;
+local int	dialconn(int,cchar *,int,int) noex ;
 
 
 /* local variables */
@@ -153,13 +149,12 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialtcpnls) */
+} /* end subroutine (dialtcpnls) */
 
 
 /* local subroutines */
 
-static int dialconn(int fd,cc *nbuf,int nlen,int to) noex {
+local int dialconn(int fd,cc *nbuf,int nlen,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	if (char *rbuf ; (rs = lm_mn(&rbuf)) >= 0) {
@@ -171,7 +166,6 @@ static int dialconn(int fd,cc *nbuf,int nlen,int to) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (dialconn) */
+} /* end subroutine (dialconn) */
 
 
