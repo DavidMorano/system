@@ -132,7 +132,7 @@ import ulibvals ;			/* |ulibval(3u)| */
 
 extern "C" {
     typedef bool (*isc_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
