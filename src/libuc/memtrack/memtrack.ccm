@@ -85,7 +85,7 @@ constexpr int		memtrack_magicval = MEMTRACK_MAGIC ;
 
 export {
     struct memtrack ;
-}
+} /* end export */
 
     struct memtrack_ma {
         memtrack          *op = nullptr ;
