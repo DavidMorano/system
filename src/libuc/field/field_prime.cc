@@ -147,15 +147,15 @@ constexpr fieldterminit		shterms(" #") ;
 
 local inline bool istermorquote(cchar *terms,int ch) noex {
 	return (batst(terms,ch) || batst(quotes.terms,ch)) ;
-}
+} /* end */
 
 local inline bool istermandnotquote(cchar *terms,int ch) noex {
 	return batst(terms,ch) && (! batst(quotes.terms,ch)) ;
-}
+} /* end */
 
 local inline bool isquoteanddouble(int sl,int ch) noex {
 	return ((ch == CH_SQUOTE) && (sl > 1) && batst(doubles.terms,ch)) ;
-}
+} /* end */
 
 
 /* exported variables */
