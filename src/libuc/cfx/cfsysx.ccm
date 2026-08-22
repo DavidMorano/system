@@ -93,25 +93,32 @@ inline constexpr int	cfsysx_maxstack = (256+1) ;
 
 template<typename T> inline int cfsystox(cc *,int,T *)		noex {
 	return SR_BUGCHECK ;
-}
+} /* end */
+
 template<> inline int cfsystox(cc *sp,int b,int *rp)		noex {
 	return uc_strto(sp,nullptr,b,rp) ;
-}
+} /* end */
+
 template<> inline int cfsystox(cc *sp,int b,long *rp)		noex {
 	return uc_strto(sp,nullptr,b,rp) ;
-}
+} /* end */
+
 template<> inline int cfsystox(cc *sp,int b,longlong *rp)	noex {
 	return uc_strto(sp,nullptr,b,rp) ;
-}
+} /* end */
+
 template<> inline int cfsystox(cc *sp,int b,uint *rp)		noex {
 	return uc_strto(sp,nullptr,b,rp) ;
-}
+} /* end */
+
 template<> inline int cfsystox(cc *sp,int b,ulong *rp)		noex {
 	return uc_strto(sp,nullptr,b,rp) ;
-}
+} /* end */
+
 template<> inline int cfsystox(cc *sp,int b,ulonglong *rp)	noex {
 	return uc_strto(sp,nullptr,b,rp) ;
-}
+} /* end */
+
 
 export {
     template<typename T> inline int cfsysx(cc *sp,int sl,int b,T *rp) noex {
