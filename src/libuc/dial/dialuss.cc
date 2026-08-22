@@ -39,22 +39,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sockaddress.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialuss.h"
 
@@ -71,12 +72,8 @@
 /* external subroutines */
 
 extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
-
-extern "C" {
     extern int	opensockaddr(int,int,int,SOCKADDR *,int) noex ;
-}
+} /* end */
 
 
 /* external variables */
@@ -97,10 +94,10 @@ int dialuss(cchar *pathname,int to,int opts) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (pathname) {
+	if (pathname) ylikely {
 	    rs = SR_INVALID ;
-	    if (pathname[0]) {
-	        if (USTAT sb ; (rs = uc_stat(pathname,&sb)) >= 0) {
+	    if (pathname[0]) ylikely {
+	        if (USTAT sb ; (rs = uc_stat(pathname,&sb)) >= 0) ylikely {
 	            if (S_ISSOCK(sb.st_mode)) {
 		        sockaddress	sa ;
 		        cint		af = AF_UNIX ;
@@ -120,7 +117,7 @@ int dialuss(cchar *pathname,int to,int opts) noex {
 		        if ((rs < 0) && (fd >= 0)) {
 		            u_close(fd) ;
 		            fd = -1 ;
-		        }
+		        } /* end if (error) */
 	            } else {
 		        rs = SR_NOTSOCK ;
 	            } /* end if */
@@ -128,7 +125,6 @@ int dialuss(cchar *pathname,int to,int opts) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialuss) */
+} /* end subroutine (dialuss) */
 
 
