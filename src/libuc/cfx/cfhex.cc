@@ -75,26 +75,26 @@ constexpr int	b = OURBASE ;
 
 int cfhexi(cchar *sp,int sl,int *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfhexl(cchar *sp,int sl,long *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfhexll(cchar *sp,int sl,longlong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfhexui(cchar *sp,int sl,uint *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfhexul(cchar *sp,int sl,ulong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfhexull(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 
