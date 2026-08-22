@@ -46,6 +46,8 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<mkfile.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -62,10 +64,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_minmod(cchar *,mode_t) noex ;
-}
 
 
 /* external variables */
