@@ -84,7 +84,7 @@ extern "C" {
     typedef int (*toxc_f)	(int) noex ;
     typedef int (*nleadxstr_f)	(cchar *,cchar *,int) noex ;
     typedef int (*matxstr_f)	(con mainv,cchar *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -124,17 +124,17 @@ namespace {
 int matpbasestr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tobc,nleadbasestr,matbasestr) ;
 	return mo.matpxstr(a,n,sp,sl) ;
-}
+} /* end subroutine */
 
 int matpcasestr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(touc,nleadcasestr,matcasestr) ;
 	return mo.matpxstr(a,n,sp,sl) ;
-}
+} /* end subroutine */
 
 int matpfoldstr(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tofc,nleadfoldstr,matfoldstr) ;
 	return mo.matpxstr(a,n,sp,sl) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
