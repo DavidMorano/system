@@ -90,10 +90,10 @@ bool isaccmode_writable(int am) noex {
 
 bool isaccmoder::rd(int am) const noex {
     	return isaccmode_readable(am) ;
-}
+} /* end method */
 
 bool isaccmoder::wr(int am) const noex {
 	return isaccmode_writable(am) ;
-}
+} /* end method */
 
 
