@@ -98,7 +98,7 @@ local sysret_t std_realpath(cchar *fn,char *rbuf,char **rpp) noex {
 	    if (char *rp ; (rp = realpath(fn,rbuf)) != np) ylikely {
 	        if (rpp) *rpp = rp ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
