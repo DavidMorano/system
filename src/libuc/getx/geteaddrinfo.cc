@@ -119,7 +119,7 @@ using std::nothrow ;			/* constant */
 extern "C" {
     extern int uc_addrinfoget(cchar *,cchar *,CADDRINFO *,ADDRINFO **) noex ;
     extern int uc_addrinfofree(ADDRINFO *) noex ;
-}
+} /* end extern (C) */
 
 
 /* local structures */
