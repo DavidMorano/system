@@ -5,7 +5,7 @@
 /* open-dialer (USS-family) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* special debugging */
 
 /* revision history:
@@ -123,8 +123,8 @@ constexpr cpcchar	ops[] = {
 
 /* forward references */
 
-static int argparse_start(struct argparse *,cchar *) noex ;
-static int argparse_finish(struct argparse *) noex ;
+local int argparse_start(struct argparse *,cchar *) noex ;
+local int argparse_finish(struct argparse *) noex ;
 
 
 /* exported variables */
@@ -149,7 +149,7 @@ int		to ;
 	int		fd = -1 ;
 	cchar	*argz = nullptr ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    int	i ;
 	    debugprintf("opendialer_uss: prn=%s\n",prn) ;
@@ -160,7 +160,7 @@ int		to ;
 	        }
 	    }
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
@@ -192,14 +192,12 @@ int		to ;
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("opendialer_uss: ret rs=%d fd=%u\n",rs,fd) ;
 #endif
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opendialer_uss) */
-
+} /* end subroutine (opendialer_uss) */
 
 int opendialer_ussnls(pr,prn,fname,of,om,argv,envv,to)
 cchar	*pr ;
@@ -218,7 +216,7 @@ int		to ;
 	int		fd = -1 ;
 	cchar	*argz = nullptr ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    int	i ;
 	    debugprintf("opendialer_ussnls: prn=%s\n",prn) ;
@@ -229,7 +227,7 @@ int		to ;
 	        }
 	    }
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
@@ -261,14 +259,12 @@ int		to ;
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("opendialer_ussnls: ret rs=%d fd=%u\n",rs,fd) ;
 #endif
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opendialer_ussnls) */
-
+} /* end subroutine (opendialer_ussnls) */
 
 int opendialer_ussmux(pr,prn,fname,of,om,argv,envv,to)
 cchar	*pr ;
@@ -287,7 +283,7 @@ int		to ;
 	int		fd = -1 ;
 	cchar	*argz = nullptr ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    int	i ;
 	    debugprintf("opendialer_ussmux: prn=%s\n",prn) ;
@@ -298,7 +294,7 @@ int		to ;
 	        }
 	    }
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
@@ -332,23 +328,21 @@ int		to ;
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("opendialer_uss: ret rs=%d fd=%u\n",rs,fd) ;
 #endif
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opendialer_ussmux) */
+} /* end subroutine (opendialer_ussmux) */
 
 
 /* local subroutines */
-
 
 /*
 	ticotsord¥<af>:<host>:<port>[,to=<to>][,af=<af>][­<arg(s)>]
 */
 
-static int argparse_start(struct argparse *app,cchar *argz)
+local int argparse_start(struct argparse *app,cchar *argz)
 {
 	int		rs = SR_OK ;
 	cchar	*tp ;
@@ -378,7 +372,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 	            optl = lenstr(sp) ;
 		    nsp = (sp+optl) ;
 	        }
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("opendialer_ticotsord/argparse_start: o=>%r<\n",
 		    optp,optl) ;
 #endif
@@ -391,7 +385,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 		    vp = (tp+1) ;
 		    vl = ((optp+optl)-(tp+1)) ;
 		}
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("opendialer_ticotsord/argparse_start: k=%r\n",kp,kl) ;
 		if (vp != nullptr) 
 	    debugprintf("opendialer_ticotsord/argparse_start: v=%r\n",vp,vl) ;
@@ -408,7 +402,7 @@ static int argparse_start(struct argparse *app,cchar *argz)
 	            } /* end switch */
 		} /* end if (had valid option) */
 	        sp = nsp ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("opendialer_ticotsord/argparse_start: "
 		    "while-bot rs=%d\n",rs) ;
 #endif
@@ -434,23 +428,17 @@ static int argparse_start(struct argparse *app,cchar *argz)
 
 ret0:
 	return rs ;
-}
-/* end subroutine (argparse_start) */
+} /* end subroutine (argparse_start) */
 
-
-static int argparse_finish(struct argparse *app)
-{
+local int argparse_finish(struct argparse *app) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
-
-	if (app->a != nullptr) {
+	if (app->a) {
 	    rs1 = uc_free(app->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    app->a = nullptr ;
 	}
-
 	return rs ;
-}
-/* end subroutine (argparse_finish) */
+} /* end subroutine (argparse_finish) */
 
 
