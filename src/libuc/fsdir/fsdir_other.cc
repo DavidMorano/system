@@ -211,8 +211,7 @@ int fsdir_open(fsdir *op,cchar *dname) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fsdir_open) */
+} /* end subroutine (fsdir_open) */
 
 int fsdir_close(fsdir *op) noex {
 	int		rs ;
