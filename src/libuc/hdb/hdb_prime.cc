@@ -174,7 +174,7 @@ typedef uint		hdbhv ;		/* HDB hash-value */
 
 extern "C" {
     typedef uint (*fc_f)(cvoid *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -183,7 +183,7 @@ extern "C" {
     int		hdb_delall(hdb *) noex ;
     int		hdb_fetchrec(hdb *,DAT,CUR *,DAT *,DAT *) noex ;
     int		hdb_curenum(hdb *,CUR *,DAT *,DAT *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -287,7 +287,7 @@ local ENT	**getpoint(hdb *,uint,HDB_D *) noex ;
 
 local inline int defcmpfun(cvoid *s1,cvoid *s2,int sl) noex {
 	return memcmp(s1,s2,sl) ;
-}
+} /* end */
 
 local inline int voidlen(cvoid *buf) noex {
 	cchar	*s = charp(buf) ;
