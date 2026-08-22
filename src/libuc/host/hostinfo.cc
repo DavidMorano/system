@@ -109,7 +109,7 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     typedef int (*vog_f)(vecobj *,int,void **) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -219,7 +219,7 @@ local int	matknown(cchar *,int) noex ;
 extern "C" {
     local int	vmatname(cvoid **,cvoid **) noex ;
     local int	vmataddr(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -254,11 +254,11 @@ constexpr bool		f_fastaddr = CF_FASTADDR ;
 
 local inline bool isaf4(int a) noex {
 	return ((a == af0) || (a == af4)) ;
-}
+} /* end */
 
 local inline bool isaf6(int a) noex {
 	return ((a == af0) || (a == af6)) ;
-}
+} /* end */
 
 
 /* exported variables */
