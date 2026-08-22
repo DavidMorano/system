@@ -55,7 +55,7 @@ local sysret_t sunos_getauxinfo(char *,int,int) noex ;
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    int		r = -1 ;
 	    rs = SR_NOENT ;
 	    switch (req) {
