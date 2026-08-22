@@ -185,8 +185,8 @@ int fdliner_adv(fdliner *lsp,int inc) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (fdliner_adv) */
+} /* end subroutine (fdliner_adv) */
+
 
 /* local subroutines */
 
@@ -225,11 +225,11 @@ local int fdliner_bufsize(fdliner *op,int mfd) noex {
 
 int fdliner::start(int mfd,off_t off,int ato) noex {
 	return fdliner_start(this,mfd,off,ato) ;
-}
+} /* end method */
 
 int fdliner::getln(cchar **lpp) noex {
 	return fdliner_getln(this,lpp) ;
-}
+} /* end method */
 
 void fdliner::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
