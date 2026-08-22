@@ -108,7 +108,7 @@ using libu::strwcpy ;			/* subroutine */
 
 local inline int getaf(cchar *sp,int sl) noex {
 	return (strnchr(sp,sl,':') != nullptr) ? AF_INET6 : AF_INET4 ;
-}
+} /* end */
 
 
 /* local variables */
