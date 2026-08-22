@@ -81,26 +81,26 @@ constexpr int	b = OURBASE ;
 
 int cfdeci(cchar *sp,int sl,int *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfdecl(cchar *sp,int sl,long *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfdecll(cchar *sp,int sl,longlong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfdecui(cchar *sp,int sl,uint *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfdecul(cchar *sp,int sl,ulong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfdecull(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 
