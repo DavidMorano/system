@@ -61,20 +61,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<ucsig.h>
-#include	<sbuf.h>
-#include	<sfx.h>
-#include	<mkx.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucsig.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialtcp.h"
 
@@ -100,10 +100,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_writen(int,cvoid *,int) noex ;
-}
 
 
 /* external variables */
@@ -137,17 +133,17 @@ namespace {
 	int mkreq() noex ;
 	int blocker() noex ;
 	int reqsvc(int) noex ;
-	~muxhelp() {
+	destruct muxhelp() {
 	    (void) finish() ;
 	} ;
     } ; /* end struct (muxhelp) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
-static int	getmuxlen(int,mainv) noex ;
-static int	mkmuxreq(char *,int,cchar *,int,mainv) noex ;
+local int	getmuxlen(int,mainv) noex ;
+local int	mkmuxreq(char *,int,cchar *,int,mainv) noex ;
 
 
 /* local variables */
@@ -181,8 +177,7 @@ int dialtcpmux(cc *hn,cc *ps,int af,cc *svc,mainv sargs,int to,int dot) noex {
 	} /* end if (non-null) */
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialtcpmux) */
+} /* end subroutine (dialtcpmux) */
 
 
 /* local subroutines */
@@ -194,8 +189,7 @@ int muxhelp::start() noex {
 	    mbuf = charp(vp) ;
 	}
 	return rs ;
-}
-/* end method (muxhelp::start) */
+} /* end method (muxhelp::start) */
 
 int muxhelp::finish() noex {
 	int		rs = SR_FAULT ;
@@ -204,15 +198,13 @@ int muxhelp::finish() noex {
 	    rs1 = lm_free(mbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    mbuf = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end method (muxhelp::finish) */
+} /* end method (muxhelp::finish) */
 
 int muxhelp::mkreq() noex {
 	return mkmuxreq(mbuf,mlen,sp,sl,sargs) ;
-}
-/* end method (muxhelp::mkreq) */
+} /* end method (muxhelp::mkreq) */
 
 int muxhelp::blocker() noex {
 	SIGACTION	sighand{} ;
@@ -235,8 +227,7 @@ int muxhelp::blocker() noex {
 	} /* end if (sigaction) */
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
-}
-/* end method (muxhelp::blocker) */
+} /* end method (muxhelp::blocker) */
 
 int muxhelp::reqsvc(int fd) noex {
 	int		rs ;
@@ -254,10 +245,9 @@ int muxhelp::reqsvc(int fd) noex {
 	    } /* end if (m-a-f) */
         } /* end if (read response) */
 	return rs ;
-}
-/* end method (muxhelp::reqsvc) */
+} /* end method (muxhelp::reqsvc) */
 
-static int getmuxlen(int svclen,mainv sargs) noex {
+local int getmuxlen(int svclen,mainv sargs) noex {
 	int		ml = (svclen+4) ;
 	if (sargs) {
 	    for (int i = 0 ; sargs[i] ; i += 1) {
@@ -266,10 +256,9 @@ static int getmuxlen(int svclen,mainv sargs) noex {
 	    } /* end for */
 	} /* end if */
 	return ml ;
-}
-/* end subroutine (getmuxlen) */
+} /* end subroutine (getmuxlen) */
 
-static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
+local int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -301,7 +290,6 @@ static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
 	    if (rs >= 0) rs = len ;
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkmuxreq) */
+} /* end subroutine (mkmuxreq) */
 
 
