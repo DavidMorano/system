@@ -65,7 +65,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     typedef int (*sixsub_f)(cchar *,int,cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
