@@ -5,7 +5,7 @@
 /* LOCAL facility open-service (copyout) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -57,18 +57,18 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"openint_copyout.h"
 #include	"defs.h"
@@ -113,7 +113,7 @@ int		to ;
 	cchar	*inter = "copyout" ;
 	char		fname[MAXPATHLEN+1] ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("openint_copyout: pr=%s\n",pr) ;
 	debugprintf("openint_copyout: dn=%s\n",dn) ;
 	debugprintf("openint_copyout: prn=%s\n",prn) ;
@@ -125,8 +125,7 @@ int		to ;
 	}
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (openint_copyout) */
+} /* end subroutine (openint_copyout) */
 
 
 /* local subroutines */
