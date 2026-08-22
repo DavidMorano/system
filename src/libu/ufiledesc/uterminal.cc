@@ -154,7 +154,7 @@ int u_termattrset(int fd,int cmd,const TERMIOS *tip) noex {
 sysret_t umgr::iterminal(int fd) noex {
     	int		rs ;
 	if ((rs = isatty(fd)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (umgr::iterminal) */
@@ -162,7 +162,7 @@ sysret_t umgr::iterminal(int fd) noex {
 sysret_t umgr::attrget(int fd) noex {
 	int		rs ;
 	if ((rs = tcgetattr(fd,tip)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (umgr::attrget) */
@@ -171,7 +171,7 @@ sysret_t umgr::attrset(int fd) noex {
     	const TERMIOS	*cp = cast_const<const TERMIOS *>(tip) ;
 	int		rs ;
 	if ((rs = tcsetattr(fd,cmd,cp)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (umgr::attrset) */
