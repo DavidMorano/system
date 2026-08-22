@@ -235,7 +235,7 @@ int syscaller::isysctl() noex {
             len = intsat(osize) ;
             obuf[len] = '\0' ;
         } else {
-            rs = (- errno) ;
+            rs = (neg errno) ;
 	}
 	return (rs >= 0) ? len : rs ;
 } /* end method (syscaller:isysctl) */
