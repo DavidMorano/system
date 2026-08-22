@@ -239,11 +239,11 @@ extern "C" {
     local int	vcmpfname(cvoid **,cvoid **) noex ;
     local int	vcmpkey(cvoid **,cvoid **) noex ;
     local int	cmpkeyval(cvoid *,cvoid *,int) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     local uint	hashkeyval(cvoid *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
