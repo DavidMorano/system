@@ -244,19 +244,19 @@ const short	char_dictorder[] = {
 
 bool char_iswhite(int ch) noex {
 	return char_data.iswhite[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 bool char_islc(int ch) noex {
 	return char_data.islc[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 bool char_isuc(int ch) noex {
 	return char_data.isuc[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 int char_toval(int ch) noex {
 	return char_data.toval[ch & UCHAR_MAX] ;
-}
+} /* end */
 
 
 /* local subroutines */
