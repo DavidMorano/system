@@ -85,7 +85,7 @@ using std::bit_ceil ;			/* subroutine-template */
 
 extern "C" {
     extern int nextpowtwo(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -99,8 +99,8 @@ extern "C" {
 
 /* local variables */
 
-constexpr int		nbits = (szof(int) * CHAR_BIT) ;
-constexpr bool		f_powceil = CF_POWCEIL ;
+constexpr int		nbits		 = (szof(int) * CHAR_BIT) ;
+constexpr bool		f_powceil	= CF_POWCEIL ;
 
 
 /* exported variables */
