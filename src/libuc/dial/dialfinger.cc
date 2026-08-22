@@ -61,24 +61,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<netdb.h>
-#include	<fcntl.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<ucsig.h>
-#include	<sbuf.h>
-#include	<mkx.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucsig.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dial.h"
 
@@ -103,7 +104,7 @@ import libutil ;			/* |lenstr(3u)| */
 extern "C" {
     extern int uc_writen(int,cvoid *,int) noex ;
     extern int uc_shutdown(int,int) noex ;
-}
+} /* end */
 
 
 /* external variables */
@@ -176,8 +177,7 @@ int dialfinger(cc *hn,cc *ps,int af,cc *svc,
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialfinger) */
+} /* end subroutine (dialfinger) */
 
 
 /* local subroutines */
@@ -188,8 +188,7 @@ local int getsvclen(cchar *svc) noex {
 	    sl -= 1 ;
 	}
 	return sl ;
-}
-/* end subroutine (getsvclen) */
+} /* end subroutine (getsvclen) */
 
 local int getmlen(int svclen,mainv sargs) noex {
 	int		ml = (svclen + 4) ;
@@ -200,8 +199,7 @@ local int getmlen(int svclen,mainv sargs) noex {
 	    } /* end for */
 	} /* end if */
 	return ml ;
-}
-/* end subroutine (getmlen) */
+} /* end subroutine (getmlen) */
 
 local int dialourtcp(cchar *hs,cchar *ps,int af,int to,int opt) noex {
 	int		rs = SR_OK ;
@@ -220,8 +218,7 @@ local int dialourtcp(cchar *hs,cchar *ps,int af,int to,int opt) noex {
 	    fd = rs ;
 	}
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialourtcp) */
+} /* end subroutine (dialourtcp) */
 
 /* format the service code and arguments for transmission */
 local int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,
@@ -261,7 +258,6 @@ local int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mkmuxreq) */
+} /* end subroutine (mkmuxreq) */
 
 
