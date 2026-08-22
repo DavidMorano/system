@@ -5,7 +5,7 @@
 /* open-dialer (prog) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* special debugging */
 
 /* revision history:
@@ -135,44 +135,41 @@ cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
-	char		progfname[MAXPATHLEN+1] = { 0 } ;
+	char		pbuf[MAXPATHLEN+1] = { 0 } ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("opendialer_prog: svc=%s\n",svc) ;
 #endif
 
 	if (svc[0] == '\0') return SR_INVALID ;
 
 	if (strchr(svc,'/') == nullptr) {
-	    rs = findprog(pr,progfname,svc) ;
-	    svc = progfname ;
+	    rs = findprog(pr,pbuf,svc) ;
+	    svc = pbuf ;
 	} else if (svc[0] != '/') {
 	    char	pwd[MAXPATHLEN+1] ;
 	    if ((rs = getpwd(pwd,MAXPATHLEN)) >= 0) {
-		rs = mkpath2(progfname,pwd,svc) ;
-		svc = progfname ;
+		rs = mkpath2(pbuf,pwd,svc) ;
+		svc = pbuf ;
 	    }
 	} /* end if (simple name) */
-
 	if (rs >= 0) {
 	    rs = uc_openprog(svc,of,argv,envv) ;
 	}
-
 	return rs ;
-}
-/* end subroutine (opendialer_prog) */
+} /* end subroutine (opendialer_prog) */
 
 
 /* local subroutines */
 
-local int findprog(cchar *pr,char *progfname,cchar *svc) noex {
+local int findprog(cchar *pr,char *pbuf,cchar *svc) noex {
 	cint		rsn = SR_NOENT ;
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
 	if (ids id ; (rs = ids_load(&id)) >= 0) {
 	    if (vecstr p ; (rs = vecstr_start(&p,20,0)) >= 0) {
-		cchar	*pp = getenv(VARPATH) ;
+		static cchar	*pp = getenv(VARPATH) ;
 		if ((pp != nullptr) && (pp[0] != '\0')) {
 		    rs = vecstr_addpath(&p,pp,-1) ;
 		} else {
@@ -181,10 +178,10 @@ local int findprog(cchar *pr,char *progfname,cchar *svc) noex {
 		    }
 		}
 		if (rs >= 0) {
-		    if ((rs = getprogpath(&id,&p,progfname,svc,-1)) == rsn) {
-			if ((rs = vecstr_addpr(&p,progfname,pr)) > 0) {
-		    	    rs = getprogpath(&id,&p,progfname,svc,-1) ;
-		            pl = rs ;
+		    if ((rs = getprogpath(&id,&p,pbuf,svc,-1)) == rsn) {
+			if ((rs = vecstr_addpr(&p,pbuf,pr)) > 0) {
+		    	    rs = getprogpath(&id,&p,pbuf,svc,-1) ; 
+			    pl = rs ;
 			} else if (rs == 0) {
 			    rs = rsn ;
 			}
@@ -199,8 +196,7 @@ local int findprog(cchar *pr,char *progfname,cchar *svc) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (findprog) */
+} /* end subroutine (findprog) */
 
 local int vecstr_addpr(vecstr *plp,char *rbuf,cchar *pr) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -236,7 +232,6 @@ local int vecstr_addpr(vecstr *plp,char *rbuf,cchar *pr) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (vecstr_addpr) */
+} /* end subroutine (vecstr_addpr) */
 
 
