@@ -59,7 +59,7 @@ namespace libu {
 namespace usysauxinfo {
     sysret_t ugetauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    ccar	*vp = nullptr ;
 	    rs = SR_NOENT ;
 	    switch (req) {
