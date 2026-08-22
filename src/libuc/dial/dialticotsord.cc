@@ -51,27 +51,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uxti.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucsigset.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<cfhexstr.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uxti.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucsigset.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<cfhexstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"dialticotsord.h"
 
@@ -100,7 +100,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     extern int	snxtilook(char *,int,int) noex ;
-}
+} /* end */
 
 
 /* external variables */
@@ -166,8 +166,7 @@ int dialticotsord(cchar *abuf,int alen,int to,int opts) noex {
 	    } /* end if (syshas.xti) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (dialticotsord) */
+} /* end subroutine (dialticotsord) */
 
 
 /* local subroutines */
@@ -210,8 +209,7 @@ local int makeconn(SUB *gp,cchar addr[],int alen,int to) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (makeconn) */
+} /* end subroutine (makeconn) */
 
 local int pushmod(int fd,cchar *mods) noex {
     	cnullptr	np{} ;
