@@ -326,15 +326,15 @@ int comparse_bake(comparse *op,cchar *sp,int sl) noex {
 
 int comparse::start(cchar *sp,int sl) noex {
 	return comparse_start(this,sp,sl) ;
-}
+} /* end method */
 
 int comparse::getval(cchar **rpp) noex {
 	return comparse_getval(this,rpp) ;
-}
+} /* end method */
 
 int comparse::getcom(cchar **rpp) noex {
 	return comparse_getcom(this,rpp) ;
-}
+} /* end method */
 
 void comparse::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
