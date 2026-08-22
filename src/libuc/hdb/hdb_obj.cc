@@ -179,69 +179,69 @@ using std::nothrow ;			/* constant */
 
 int hdb::start(int n,int alt,hdbhash_f h,hdbcmp_f c) noex {
     	return hdb_start(this,n,alt,h,c) ;
-}
+} /* end method */
 
 int hdb::store(HDB_D key,DAT val) noex {
 	return hdb_store(this,key,val) ;
-}
+} /* end method */
 
 int hdb::have(HDB_D key) noex {
 	return hdb_have(this,key) ;
-}
+} /* end method */
 
 int hdb::curbegin(CUR *curp) noex {
 	return hdb_curbegin(this,curp) ;
-}
+} /* end method */
 
 int hdb::curend(CUR *curp) noex {
 	return hdb_curend(this,curp) ;
-}
+} /* end method */
 
 int hdb::curenum(CUR *curp,HDB_D *keyp,DAT *valp) noex {
 	return hdb_curenum(this,curp,keyp,valp) ;
-}
+} /* end method */
 
 int hdb::curget(CUR *curp,DAT *keyp,DAT *valp) noex {
 	return hdb_curget(this,curp,keyp,valp) ;
-}
+} /* end method */
 
 int hdb::curnext(CUR *curp) noex {
 	return hdb_curnext(this,curp) ;
-}
+} /* end method */
 
 int hdb::curdel(CUR *curp,int fadv) noex {
 	return hdb_curdel(this,curp,fadv) ;
-}
+} /* end method */
 
 int hdb::curdone(CUR *curp) noex {
 	return hdb_curdone(this,curp) ;
-}
+} /* end method */
 
 int hdb::fetch(DAT key,CUR *curp,DAT *valp) noex {
 	return hdb_fetch(this,key,curp,valp) ;
-}
+} /* end method */
 
 int hdb::fetchrec(DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	return hdb_fetchrec(this,key,curp,keyp,valp) ;
-}
+} /* end method */
 
 int hdb::getkeyrec(DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	return hdb_getkeyrec(this,key,curp,keyp,valp) ;
-}
+} /* end method */
 
 int hdb::nextrec(hdb_dat key,hdb_cur *curp) noex {
     	return hdb_nextrec(this,key,curp) ;
-}
+} /* end method */
 
 int hdb::delkey(hdb_dat key) noex {
     	return hdb_delkey(this,key) ;
-}
+} /* end method */
 
 void hdb::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("hdb",rs,"fini-finish") ;
 	}
-}
+} /* end method */
 
 hdb_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
