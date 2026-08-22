@@ -94,7 +94,7 @@ using std::bitset ;			/* type */
 
 extern "C" {
     typedef bool (*isx_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
