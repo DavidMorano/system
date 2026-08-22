@@ -100,7 +100,7 @@ using std::max ;			/* subroutine-template */
 #define	TYPEDEF_STDSORTF
 extern "C" {
     typedef int	(*stdsort_f)(cvoid *,cvoid *) noex ;
-}
+} /* end extern (C) */
 #endif
 
 
@@ -230,7 +230,7 @@ local int	cmpug(cvoid *,cvoid *) noex ;
 
 extern "C" {
     local int	vcmpug(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -1187,7 +1187,7 @@ local int vcmpug(cvoid **v1pp,cvoid **v2pp) noex {
 	{
 	    grmems_ug	*g1p = *g1pp ;
 	    grmems_ug	*g2p = *g2pp ;
-	    if (g1p || g2p) {
+	    if (g1p || g2p) ylikely {
 		rc = +1 ;
 		if (g1p) {
 		    rc = -1 ;
@@ -1195,7 +1195,7 @@ local int vcmpug(cvoid **v1pp,cvoid **v2pp) noex {
 			rc = cmpug(g1p,g2p) ;
 		    }
 		}
-	    }
+	    } /* end if */
 	} /* end block */
 	return rc ;
 } /* end subroutine (vcmpug) */
