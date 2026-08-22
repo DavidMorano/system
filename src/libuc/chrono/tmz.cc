@@ -190,10 +190,8 @@ constexpr char		tpterms[] = {
 } ; /* end array (tpterms) */
 
 static vars		var ;
-
-constexpr int		nyears = NYEARS_CENTURY ;
-
-constexpr bool		f_comment = false ;
+constexpr int		nyears		= NYEARS_CENTURY ;
+constexpr bool		f_comment	= false ;
 
 
 /* exported variables */
@@ -1121,55 +1119,55 @@ local int tmz_clear(tmz *op) noex {
 
 int tmz::xstd(cchar *sp,int sl) noex {
 	return tmz_xstd(this,sp,sl) ;
-}
+} /* end method */
 
 int tmz::xmsg(cchar *sp,int sl) noex {
 	return tmz_xmsg(this,sp,sl) ;
-}
+} /* end method */
 
 int tmz::xtouch(cchar *sp,int sl) noex {
 	return tmz_xtouch(this,sp,sl) ;
-}
+} /* end method */
 
 int tmz::xtoucht(cchar *sp,int sl) noex {
 	return tmz_xtoucht(this,sp,sl) ;
-}
+} /* end method */
 
 int tmz::xstrdig(cchar *sp,int sl) noex {
 	return tmz_xstrdig(this,sp,sl) ;
-}
+} /* end method */
 
 int tmz::xlogz(cchar *sp,int sl) noex {
 	return tmz_xlogz(this,sp,sl) ;
-}
+} /* end method */
 
 int tmz::xday(cchar *sp,int sl) noex {
 	return tmz_xday(this,sp,sl) ;
-}
+} /* end method */
 
 int tmz::setday(int y,int m,int d) noex {
 	return tmz_setday(this,y,m,d) ;
-}
+} /* end method */
 
 int tmz::setyear(int year) noex {
 	return tmz_setyear(this,year) ;
-}
+} /* end method */
 
 int tmz::setzone(cchar *sp,int sl) noex {
 	return tmz_setzone(this,sp,sl) ;
-}
+} /* end method */
 
 int tmz::gettm(TM *tmp) noex {
 	return tmz_gettm(this,tmp) ;
-}
+} /* end method */
 
 int tmz::getzoff(short *rp) noex {
     	return tmz_getzoff(this,rp) ;
-}
+} /* end method */
 
 int tmz::getzone(char *rbuf,int rlen) noex {
     	return tmz_getzone(this,rbuf,rlen) ;
-}
+} /* end method */
 
 void tmz::dtor() noex {
     if (cint rs = tmz_zfini(this) ; rs < 0) {
