@@ -442,8 +442,7 @@ int hdbstr_count(hdbstr *op) noex {
 	    rs = hdb_count(op) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdbstr_count) */
+} /* end subroutine (hdbstr_count) */
 
 hdbstr_iter hdbstr::begin() noex {
     	hdbstr_iter	it ;
@@ -463,8 +462,7 @@ hdbstr_iter hdbstr::begin() noex {
 	    ulogerror(objname,rs,"begin") ;
 	}
 	return it ;
-}
-/* end method (hdbstr_iter::begin) */
+} /* end method (hdbstr_iter::begin) */
 
 hdbstr_iter hdbstr::end() noex {
     	hdbstr_iter	it ;
