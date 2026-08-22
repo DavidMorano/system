@@ -227,19 +227,19 @@ int aiq_count(aiq *op) noex {
 
 int aiq::ins(aiq_ent *ep) noex {
 	return aiq_ins(this,ep) ;
-}
+} /* end method */
 
 int aiq::inshead(aiq_ent *ep) noex {
 	return aiq_inshead(this,ep) ;
-}
+} /* end method */
 
 int aiq::rem(aiq_ent **rpp) noex {
 	return aiq_rem(this,rpp) ;
-}
+} /* end method */
 
 int aiq::remtail(aiq_ent **rpp) noex {
 	return aiq_remtail(this,rpp) ;
-}
+} /* end method */
 
 void aiq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
