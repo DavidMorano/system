@@ -68,26 +68,26 @@
 
 bool numsigni(int v) noex {
 	return numsign(v) ;
-}
+} /* end */
 
 bool numsignl(long v) noex {
 	return numsign(v) ;
-}
+} /* end */
 
 bool numsignul(longlong v) noex {
 	return numsign(v) ;
-}
+} /* end */
 
 bool numsignui(uint v) noex {
 	return numsign(v) ;
-}
+} /* end */
 
 bool numsignul(ulong v) noex {
 	return numsign(v) ;
-}
+} /* end */
 
 bool numsignull(ulonglong v) noex {
 	return numsign(v) ;
-}
+} /* end */
 
 
