@@ -121,7 +121,6 @@ local int envhelp_dtor(envhelp *op) noex {
 } /* end subroutine (envhelp_dtor) */
 
 local int	envhelp_copy(envhelp *,mainv,mainv) noex ;
-
 local int	vechand_addover(vechand *,cchar *) noex ;
 
 
@@ -326,19 +325,19 @@ local int vechand_addover(vechand *elp,cchar *ep) noex {
 
 int envhelp::start(mainv argv,mainv ev) noex {
 	return envhelp_start(this,argv,ev) ;
-}
+} /* end method */
 
 int envhelp::present(cchar *kp,int kl,cchar **rpp) noex {
 	return envhelp_present(this,kp,kl,rpp) ;
-}
+} /* end method */
 
 int envhelp::envset(cchar *kp,cchar *vp,int vl) noex {
     	return envhelp_envset(this,kp,vp,vl) ;
-}
+} /* end method */
 
 int envhelp::getvec(mainv *rp) noex {
 	return envhelp_getvec(this,rp) ;
-}
+} /* end method */
 
 void envhelp::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
