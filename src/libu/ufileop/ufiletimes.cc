@@ -123,7 +123,7 @@ sysret_t ufiletimer::i_filetime(cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (utp) {
 	    if ((rs = utime(fname,utp)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -133,7 +133,7 @@ sysret_t ufiletimer::i_filetimes(cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (tvp) {
 	    if ((rs = utimes(fname,tvp)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
