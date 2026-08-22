@@ -80,6 +80,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucclustername.h>	/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<getnodename.h>		/* LIBUC */
 #include	<nodedb.h>		/* LIBUC */
@@ -123,13 +124,9 @@ using libuc::prgetclustername ;		/* subroutine */
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
-
 namespace libuc {
     int prgetclustername(cchar *,char *,int,cchar *) noex ;
-}
+} /* end namespace (libuc) */
 
 
 /* external variables */
