@@ -175,7 +175,7 @@ int uiconv_trans(uiconv *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 	        {
 		    char	**ibp = cast_const<char **>(ib) ;
 	            if ((isize = iconv(*cdp,ibp,ileftp,ob,oleftp)) == szbad) {
-			rs = (- errno) ;
+			rs = (neg errno) ;
 		    }
 	        }
 	        {
@@ -202,7 +202,7 @@ local int uiconv_libopen(uiconv *op ,cchar *tsp,cchar *fsp) noex {
 	    repeat {
 	        rs = SR_OK ;
 		if ((*cdp = iconv_open(tsp,fsp)) == iconvbad) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	        if (rs < 0) {
 	            switch (rs) {
@@ -230,7 +230,7 @@ local int uiconv_libclose(uiconv *op) noex {
 	int		rs ;
 	repeat {
 	    if ((rs = iconv_close(*cdp)) == -1) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} until (rs != SR_INTR) ;
 	return rs ;
