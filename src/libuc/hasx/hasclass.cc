@@ -88,7 +88,7 @@ import libutil ;			/* |getlenstr(3u)| + |lenstr(3u)| */
 
 extern "C" {
     typedef bool (*ischar_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
