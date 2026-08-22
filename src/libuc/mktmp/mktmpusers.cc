@@ -48,6 +48,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<strlibval.hh>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<removes.h>		/* LIBUC */
@@ -74,11 +75,6 @@ import uconstants ;			/* |sysword(3u)| */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-    extern int uc_minmod(cchar *,mode_t) noex ;
-}
 
 
 /* external variables */
