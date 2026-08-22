@@ -57,7 +57,7 @@
 
 extern "C" {
     extern int mknpathxw(char *,int,int,...) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
