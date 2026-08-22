@@ -58,27 +58,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ids.h>
-#include	<keyopt.h>
-#include	<vecstr.h>
-#include	<vechand.h>
-#include	<sbuf.h>
-#include	<buffer.h>
-#include	<paramfile.h>
-#include	<nulstr.h>
-#include	<logfile.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ids.h>			/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"opendialer_hello.h"
 #include	"defs.h"
@@ -139,7 +139,6 @@ int		to ;
 	} /* end if */
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opendialer_hello) */
+} /* end subroutine (opendialer_hello) */
 
 
