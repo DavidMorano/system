@@ -75,26 +75,26 @@ constexpr int	b = OURBASE ;
 
 int cfocti(cchar *sp,int sl,int *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfoctl(cchar *sp,int sl,long *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfoctll(cchar *sp,int sl,longlong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfoctui(cchar *sp,int sl,uint *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfoctul(cchar *sp,int sl,ulong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 int cfoctull(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
-}
+} /* end */
 
 
