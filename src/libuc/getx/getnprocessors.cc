@@ -70,7 +70,7 @@ import uconstants ;
 
 extern "C" {
     extern int uc_nprocessors(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
