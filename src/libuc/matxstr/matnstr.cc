@@ -73,7 +73,7 @@ using stdclib::std_strncasecmp ;		/* subroutine */
 
 extern "C" {
     typedef int (*nxcmp_f)(cchar *,cchar *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
