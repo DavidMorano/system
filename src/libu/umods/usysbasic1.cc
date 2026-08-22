@@ -264,7 +264,7 @@ ucaller::operator int () noex {
 sysret_t ucaller::stdatfork() noex {
 	int		rs ;
 	if ((rs = pthread_atfork(bf,apf,acf)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (ucaller::stdatfork) */
@@ -272,7 +272,7 @@ sysret_t ucaller::stdatfork() noex {
 sysret_t ucaller::stdatexit() noex {
 	int		rs ;
 	if ((rs = atexit(func)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (ucaller::stdatexit) */
@@ -281,7 +281,7 @@ sysret_t ucaller::stdstat() noex {
     	ustat		*p = cast_static<ustat *>(sbp) ;
 	int		rs ;
 	if ((rs = statfile(fn,p)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (ucaller::stdstat) */
@@ -290,7 +290,7 @@ sysret_t ucaller::stdstatfs() noex {
     	ustatfs		*p = cast_static<ustatfs *>(sbp) ;
 	int		rs ;
 	if ((rs = statfilefs(fn,p)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (ucaller::stdstatfs) */
@@ -299,7 +299,7 @@ sysret_t ucaller::stdstatvfs() noex {
     	ustatvfs	*p = cast_static<ustatvfs *>(sbp) ;
 	int		rs ;
 	if ((rs = statfilevfs(fn,p)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (ucaller::stdstatvfs) */
@@ -311,7 +311,7 @@ sysret_t ucaller::stdgetcwd() noex {
 	if (char *rp ; (rp = getcwd(rbuf,(rsize + 1))) != np) {
 	    rs = lenstr(rp) ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (ucaller::stdgetcwd) */
@@ -319,7 +319,7 @@ sysret_t ucaller::stdgetcwd() noex {
 sysret_t ucaller::stdaccess() noex {
 	int		rs ;
 	if ((rs = access(fn,am)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (ucaller::stdaccess) */
