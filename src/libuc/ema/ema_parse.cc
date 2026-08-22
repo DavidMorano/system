@@ -73,7 +73,7 @@ typedef ema_ent	*	entp ;
 
 namespace ema_ns {
     extern int	ema_load(ema *,cchar *,int,parts *,ema *) noex ;
-}
+} /* end namespace (ema_ns) */
 
 
 /* local variables */
