@@ -67,7 +67,7 @@ namespace usys {
 	    rs = SR_INVALID ;
 	    if (olen > 0) {
 		if ((rs = proc_pidpath(pid,obuf,olen)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -79,7 +79,7 @@ namespace usys {
 	    rs = SR_INVALID ;
 	    if (olen > 0) {
 		if ((rs = proc_name(pid,obuf,olen)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
