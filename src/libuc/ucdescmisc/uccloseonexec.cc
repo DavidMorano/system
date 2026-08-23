@@ -17,14 +17,14 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |LEQUIV(3u)| */
 
 #include	"uccloseonexec.h"
@@ -54,13 +54,12 @@ int uc_closeonexec(int fd,int f) noex {
 	        if (f) {
 	            fdflags |= FD_CLOEXEC ;
 	        } else {
-	            fdflags &= (~ FD_CLOEXEC) ;
+	            fdflags &= (compl FD_CLOEXEC) ;
 		}
 	        rs = u_fcntl(fd,F_SETFD,fdflags) ;
 	    } /* end if (needed a change) */
 	} /* end if */
 	return (rs >= 0) ? f_previous : rs ;
-}
-/* end subroutine (uc_closeonexec) */
+} /* end subroutine (uc_closeonexec) */
 
 
