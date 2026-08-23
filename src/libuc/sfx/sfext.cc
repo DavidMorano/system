@@ -71,7 +71,7 @@ import chrset ;
 extern "C++" {
     int siobrk(cchar *,int,con chrset *) noex ;
     int sirbrk(cchar *,int,con chrset *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -113,7 +113,7 @@ int sfext(cchar *sp,int µsl,cchar **rpp) noex {
 		if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 		    while ((sl > 0) && (sp[sl - 1] == CH_SLASH)) {
 		        sl -= 1 ;
-		    }
+		    } /* end while */
 		    if (int si ; (si = sirbrk(sp,sl,&bi.brks)) >= 0) {
                         if (sp[si] == CH_DOT) {
                             si += 1 ;
