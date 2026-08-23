@@ -20,7 +20,7 @@
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
 #include	<cerrno>		/* CSTD */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -39,6 +39,18 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
 /* exported variables */
 
 
@@ -52,7 +64,7 @@ int uc_fsync(int fd) noex {
 	    bool	fexit = false ;
 	    repeat {
 	        if ((rs = fsync(fd)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	            switch (rs) {
 	            case SR_AGAIN:
 	                if (to_again-- > 0) {
@@ -78,8 +90,7 @@ int uc_fsync(int fd) noex {
 	    } until ((rs >= 0) || fexit) ;
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (uc_fsync) */
+} /* end subroutine (uc_fsync) */
 
 int uc_fsyncdata(int fd) noex {
 	int		rs = SR_BADFD ;
@@ -89,7 +100,7 @@ int uc_fsyncdata(int fd) noex {
 	    bool	fexit = false ;
 	    repeat {
 	        if ((rs = fdatasync(fd)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	            switch (rs) {
 	            case SR_AGAIN:
 	                if (to_again-- > 0) {
@@ -115,7 +126,6 @@ int uc_fsyncdata(int fd) noex {
 	    } until ((rs >= 0) || fexit) ;
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (uc_fsyncdata) */
+} /* end subroutine (uc_fsyncdata) */
 
 
