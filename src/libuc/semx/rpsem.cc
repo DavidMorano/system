@@ -249,11 +249,11 @@ int rpsem_count(rpsem *op) noex {
 
 int rpsem::create(int pshared,int acnt) noex {
 	return rpsem_create(this,pshared,acnt) ;
-}
+} /* end method */
 
 rpsem::operator int () noex {
 	return rpsem_count(this) ;
-}
+} /* end method */
 
 void rpsem::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
