@@ -153,13 +153,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<termios.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<termios.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"tcx.h"
 
@@ -229,8 +229,7 @@ int tcsetown(int fd,cchar *termdev,uid_t uid,gid_t gid,mode_t perms) noex {
 	    } /* end if (isatty) */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (tcsetown) */
+} /* end subroutine (tcsetown) */
 
 int tcsetlines(int fd,int lines) noex {
 	int		rs = SR_NOTOPEN ;
@@ -248,8 +247,7 @@ int tcsetlines(int fd,int lines) noex {
 	    }
 	} /* end if (valid) */
 	return (rs >= 0) ? plines : rs ;
-}
-/* end subroutine (tcsetlines) */
+} /* end subroutine (tcsetlines) */
 
 int tcgetlines(int fd) noex {
 	int		rs = SR_NOTOPEN ;
@@ -259,8 +257,7 @@ int tcgetlines(int fd) noex {
 	    }
 	} 
 	return rs ;
-}
-/* end subroutine (tcgetlines) */
+} /* end subroutine (tcgetlines) */
 
 int tcsetws(int fd,WINSIZE *wsp) noex {
 	int		rs = SR_FAULT ;
@@ -271,8 +268,7 @@ int tcsetws(int fd,WINSIZE *wsp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (tcsetws) */
+} /* end subroutine (tcsetws) */
 
 int tcgetws(int fd,WINSIZE *wsp) noex {
 	int		rs = SR_FAULT ;
@@ -284,8 +280,7 @@ int tcgetws(int fd,WINSIZE *wsp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (tcgetws) */
+} /* end subroutine (tcgetws) */
 
 int tcsetmesg(int fd,int f_new) noex {
 	int		rs = SR_NOTOPEN ;
@@ -306,8 +301,7 @@ int tcsetmesg(int fd,int f_new) noex {
 	    } /* end if (stat) */
 	} /* end if (valid) */
 	return (rs >= 0) ? f_old : rs ;
-}
-/* end subroutine (tcsetmesg) */
+} /* end subroutine (tcsetmesg) */
 
 int tcsetbiff(int fd,int f_new) noex {
 	int		rs = SR_NOTOPEN ;
@@ -328,8 +322,7 @@ int tcsetbiff(int fd,int f_new) noex {
 	    } /* end if (stat) */
 	} /* end if (valid) */
 	return (rs >= 0) ? f_old : rs ;
-}
-/* end subroutine (tcsetbiff) */
+} /* end subroutine (tcsetbiff) */
 
 int tcpeek(int fd,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
@@ -361,7 +354,6 @@ int tcpeek(int fd,char *dbuf,int dlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs > 0) ? len : rs ;
-}
-/* end subroutine (tcpeek) */
+} /* end subroutine (tcpeek) */
 
 
