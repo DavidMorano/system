@@ -40,16 +40,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>		/* |AF_{xx}| */
-#include	<unistd.h>
-#include	<fcntl.h>		/* |O_{xx}| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<uclibsubs.h>
-#include	<ucdesc.h>
-#include	<sockaddress.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® |AF_{xx}| */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® |O_{xx}| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucdescsock.h"
 
@@ -57,6 +60,8 @@
 
 
 /* importæd namespaces */
+
+using libuc::libmem ;			/* variable */
 
 
 /* external subroutines */
@@ -70,8 +75,8 @@
 
 /* forward references */
 
-local int binder(int,SOCKADDR *,int,int,mode_t) noex ;
-local int setperm(SOCKADDR *,mode_t) noex ;
+local int binder	(int,SOCKADDR *,int,int,mode_t) noex ;
+local int setperm	(SOCKADDR *,mode_t) noex ;
 
 
 /* local variables */
@@ -98,8 +103,7 @@ int uc_sockjoin(int fd,SOCKADDR *sap,int sal,int of,mode_t om) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_sockjoin) */
+} /* end subroutine (uc_sockjoin) */
 
 
 /* local subroutines */
