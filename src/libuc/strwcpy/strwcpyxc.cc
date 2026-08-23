@@ -63,7 +63,7 @@
 
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -107,18 +107,18 @@ local char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
 
 char *strwcpybc(char *dp,cchar *sp,int sl) noex {
 	return strwcpyxc<tobc>(dp,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strwcpylc(char *dp,cchar *sp,int sl) noex {
 	return strwcpyxc<tolc>(dp,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strwcpyuc(char *dp,cchar *sp,int sl) noex {
 	return strwcpyxc<touc>(dp,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strwcpyfc(char *dp,cchar *sp,int sl) noex {
 	return strwcpyxc<tofc>(dp,sp,sl) ;
-}
+} /* end subroutine */
 
 
