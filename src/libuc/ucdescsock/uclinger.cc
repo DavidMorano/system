@@ -16,19 +16,19 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucdesc.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIC® */
+#include	<sys/stat.h>		/* POSIC® */
+#include	<sys/socket.h>		/* POSIC® */
+#include	<unistd.h>		/* POSIC® */
+#include	<fcntl.h>		/* POSIC® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucdescsock.h"
 
@@ -42,8 +42,8 @@
 
 int uc_linger(int fd,int to) noex {
 	int		rs ;
-	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
-	    if (S_ISSOCK(sb.st_mode)) {
+	if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) ylikely {
+	    if (S_ISSOCK(sb.st_mode)) ylikely {
 	        LINGER	ls{} ;
 		cint	sol = SOL_SOCKET ;
 		cint	cmd = SO_LINGER ;
@@ -59,7 +59,6 @@ int uc_linger(int fd,int to) noex {
 	    } /* end if (socket) */
 	} /* end if (stat) */
 	return rs ;
-}
-/* end subroutine (uc_linger) */
+} /* end subroutine (uc_linger) */
 
 
