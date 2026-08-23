@@ -21,8 +21,8 @@
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
 #include	<poll.h>		/* POSIX */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -76,7 +76,6 @@ int uc_ndelay(int fd,int f) noex {
 	    } /* end if (needed a change) */
 	} /* end if (u_fcntl) */
 	return (rs >= 0) ? f_previous : rs ;
-}
-/* end subroutine (uc_ndelay) */
+} /* end subroutine (uc_ndelay) */
 
 
