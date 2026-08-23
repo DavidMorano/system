@@ -401,35 +401,35 @@ int plainq_audit(plainq *op) noex {
 
 int plainq::ins(plainq_ent *ep) noex {
 	return plainq_ins(this,ep) ;
-}
+} /* end method */
 
 int plainq::insgroup(plainq_ent *ep,int esz,int n) noex {
 	return plainq_insgroup(this,ep,esz,n) ;
-}
+} /* end method */
 
 int plainq::inshead(plainq_ent *ep) noex {
 	return plainq_inshead(this,ep) ;
-}
+} /* end method */
 
 int plainq::gethead(plainq_ent **rpp) noex {
 	return plainq_gethead(this,rpp) ;
-}
+} /* end method */
 
 int plainq::gettail(plainq_ent **rpp) noex {
 	return plainq_gettail(this,rpp) ;
-}
+} /* end method */
 
 int plainq::rem(plainq_ent **rpp) noex {
 	return plainq_rem(this,rpp) ;
-}
+} /* end method */
 
 int plainq::remtail(plainq_ent **rpp) noex {
 	return plainq_remtail(this,rpp) ;
-}
+} /* end method */
 
 int plainq::unlink(plainq_ent *ep) noex {
 	return plainq_unlink(this,ep) ;
-}
+} /* end method */
 
 void plainq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
