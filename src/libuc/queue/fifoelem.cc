@@ -255,7 +255,7 @@ int fifoelem_present(FE *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
 		sl = lenstr(sp) ;
 	    }
 	    if (scmp == nullptr) scmp = fifoelem_cmp(strcmp) ;
-	    auto entcmp = [&sp,&sl,scmp] (FE_ENT *ep) {
+	    cauto entcmp = [&sp,&sl,scmp] (FE_ENT *ep) {
 		bool f = true ;
 		f = f && (sl == ep->dl) ;
 		f = f && scmp(sp,ep->dp) ;
@@ -391,39 +391,39 @@ local int entry_finish(FE_ENT *ep) noex {
 
 int fifoelem::start(int a) noex {
 	return fifoelem_start(this,a) ;
-}
+} /* end method */
 
 int fifoelem::ins(void *ep) noex {
 	return fifoelem_ins(this,ep) ;
-}
+} /* end method */
 
 int fifoelem::get(fifoelem_ent **rpp) noex {
 	return fifoelem_get(this,rpp) ;
-}
+} /* end method */
 
 int fifoelem::rem(void *rbuf,int rlen) noex {
 	return fifoelem_rem(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int fifoelem::curbegin(fifoelem_cur *curp) noex {
 	return fifoelem_curbegin(this,curp) ;
-}
+} /* end method */
 
 int fifoelem::curend(fifoelem_cur *curp) noex {
 	return fifoelem_curend(this,curp) ;
-}
+} /* end method */
 
 int fifoelem::curdel(fifoelem_cur *curp) noex {
 	return fifoelem_curdel(this,curp) ;
-}
+} /* end method */
 
 int fifoelem::curenum(fifoelem_cur *curp,fifoelem_ent **rpp) noex {
 	return fifoelem_curenum(this,curp,rpp) ;
-}
+} /* end method */
 
 int fifoelem::present(cvoid *crp,int rl,fifoelem_cmp cmp) noex {
 	return fifoelem_present(this,crp,rl,cmp) ;
-}
+} /* end method */
 
 void fifoelem::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
