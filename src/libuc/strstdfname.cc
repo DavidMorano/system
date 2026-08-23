@@ -36,11 +36,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdfiles.h>
-#include	<stdfnames.h>		/* |stdfname(3u)| */
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdfiles.h>		/* LIBU */
+#include	<stdfnames.h>		/* LIBU |stdfname(3u)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strstdfname.h"
 
@@ -75,7 +75,6 @@ cchar *strstdfname(int w,cchar *atf) noex {
 	    }
 	}
 	return atf ;
-}
-/* end subroutine (strstdfname) */
+} /* end subroutine (strstdfname) */
 
 
