@@ -23,12 +23,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<usysnative.h>		/* native system headers */
-
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<usysnative.h>		/* LIBU native system headers */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 
 #include	<absfn.h>
 #include	<acceptpass.h>
@@ -291,7 +289,6 @@
 #include	<ucnameo.h>
 
 #include	<udomain.h>
-#include	<umask.h>
 #include	<usyscalls.h>
 #include	<usysdefs.h>
 #include	<usysrets.h>
