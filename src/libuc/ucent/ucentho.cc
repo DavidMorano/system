@@ -146,8 +146,7 @@ int ucentho::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentho::parse) */
+} /* end subroutine (ucentho::parse) */
 
 int ucentho::load(char *rbuf,int rlen,const ucentho *chop) noex {
 	int		rs = SR_FAULT ;
@@ -179,8 +178,7 @@ int ucentho::load(char *rbuf,int rlen,const ucentho *chop) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentho::load) */
+} /* end subroutine (ucentho::load) */
 
 int ucentho::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -212,8 +210,7 @@ int ucentho::format(char *rbuf,int rlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentho::format) */
+} /* end subroutine (ucentho::format) */
 
 int ucentho::size() noex {
 	int		rs = SR_OK ;
@@ -238,20 +235,19 @@ int ucentho::size() noex {
 	    } /* end if (addr-alias list) */
 	    rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
-}
-/* end subroutine (ucentho::size) */
+} /* end subroutine (ucentho::size) */
 
 int ucentho::getent(char *hobuf,int holen) noex {
 	return uc_gethoent(this,hobuf,holen) ;
-}
+} /* end method */
 
 int ucentho::getnam(char *hobuf,int holen,cchar *name) noex {
 	return uc_gethonam(this,hobuf,holen,name) ;
-}
+} /* end method */
 
 int ucentho::getadd(char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 	return uc_gethoadd(this,hobuf,holen,af,ap,al) ;
-}
+} /* end method */
 
 
 /* local subroutines */
