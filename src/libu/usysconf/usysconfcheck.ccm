@@ -63,7 +63,8 @@ export {
 	dataitem_maxentsv,		/* entry SERIVE */
 	dataitem_maxmsg,
 	dataitem_maxfstype,
-	dataitem_maxtzname,
+	dataitem_maxtzname,		/* time-zone name */
+	dataitem_maxtzabbr,		/* time-zone abbreviation */
 	dataitem_clk,
 	dataitem_overlast
     } ; /* end enum (dataitems) */
@@ -100,7 +101,7 @@ export {
 } /* end export */
 
 export {
-    extern const getter	getci ;
+    extern const getter		getci ;
 } /* end export */
 
 
