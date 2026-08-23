@@ -27,25 +27,25 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<arpa/inet.h>		/* <- |htonl(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uinet.h>		/* |AF_INET{x}(3u)| */
-#include	<storeitem.h>
-#include	<sbuf.h>
-#include	<vechand.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<intceil.h>
-#include	<cfdec.h>
-#include	<inetconv.h>
-#include	<nulstr.h>
-#include	<localmisc.h>
+#include	<arpa/inet.h>		/* POSIX® <- |htonl(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU |AF_INET{x}(3u)| */
+#include	<intceil.h>		/* LIBU */
+#include	<storeitem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<inetconv.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetnw.h"		/* |uc_getnw{x}(3uc)| */
 #include	"ucentnw.h"
@@ -87,7 +87,6 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 local int ucentnw_parseaddr(NWE *,cchar *,int) noex ;
 local int ucentnw_parsestrs(NWE *,SI *,cchar *,int) noex ;
-
 local int ucentnw_formataddr(NWE *,sbuf *) noex ;
 
 
@@ -142,8 +141,7 @@ int ucentnw::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentnw::parse) */
+} /* end subroutine (ucentnw::parse) */
 
 int ucentnw::load(char *rbuf,int rlen,const ucentnw *cnwp) noex {
 	int		rs = SR_FAULT ;
@@ -176,8 +174,7 @@ int ucentnw::load(char *rbuf,int rlen,const ucentnw *cnwp) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentnw::load) */
+} /* end subroutine (ucentnw::load) */
 
 int ucentnw::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -212,8 +209,7 @@ int ucentnw::format(char *rbuf,int rlen) noex {
 	    } /* end if (supported AF) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentnw::format) */
+} /* end subroutine (ucentnw::format) */
 
 int ucentnw::size() noex {
 	int		rs = SR_OK ;
@@ -230,20 +226,19 @@ int ucentnw::size() noex {
 	    } /* end if (name-list aliases) */
 	    rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
-}
-/* end subroutine (ucentnw::size) */
+} /* end subroutine (ucentnw::size) */
 
 int ucentnw::getent(char *nwbuf,int nwlen) noex {
 	return uc_getnwent(this,nwbuf,nwlen) ;
-}
+} /* end method */
 
 int ucentnw::getnam(char *nwbuf,int nwlen,cchar *name) noex {
 	return uc_getnwnam(this,nwbuf,nwlen,name) ;
-}
+} /* end method */
 
 int ucentnw::getnum(char *nwbuf,int nwlen,int af,uint32_t num) noex {
 	return uc_getnwnum(this,nwbuf,nwlen,af,num) ;
-}
+} /* end method */
 
 
 /* local subroutines */
