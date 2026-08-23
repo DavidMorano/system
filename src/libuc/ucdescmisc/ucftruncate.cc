@@ -16,21 +16,21 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<utimeout.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/uio.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<utimeout.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucftruncate.h"
 
@@ -65,8 +65,7 @@ int uc_ftruncate(int fd,off_t len) noex {
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end suboutine (uc_ftruncate) */
+} /* end suboutine (uc_ftruncate) */
 
 
 /* local subroutines */
@@ -99,7 +98,7 @@ local int ucftruncater(int fd,off_t len) noex {
 local sysret_t std_ftruncate(int fd,off_t len) noex {
 	int		rs ;
 	if ((rs = ftruncate(fd,len)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end subroutine (std_ftruncate) */
