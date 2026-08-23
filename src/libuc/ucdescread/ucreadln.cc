@@ -70,23 +70,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<six.h>
-#include	<strn.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSYD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<six.h>			/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucdescbase.hh"
 #include	"ucdescread.h"
@@ -116,11 +116,11 @@ import libutil ;			/* |memclear(3u)| */
 
 extern "C" {
     extern int	uc_recve(int,void *,int,int,int,int) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     extern int	isasocket(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -168,13 +168,11 @@ int uc_readlnto(int fd,char *lbuf,int llen,int to) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_readlnto) */
+} /* end subroutine (uc_readlnto) */
 
 int uc_readln(int fd,char *lbuf,int llen) noex {
 	return uc_readlnto(fd,lbuf,llen,-1) ;
-}
-/* end subroutine (uc_readln) */
+} /* end subroutine (uc_readln) */
 
 
 /* private subroutines */
@@ -212,8 +210,7 @@ local int readln_socket(int fd,char *lbuf,int llen,int to) noex {
 	    } /* end if (uc_recve) */
 	} /* end while */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (readln_socket) */
+} /* end subroutine (readln_socket) */
 
 local int readln_stream(int fd,char *lbuf,int llen,int to) noex {
 	time_t		ti_now = time(nullptr) ;
@@ -287,8 +284,7 @@ local int readln_stream(int fd,char *lbuf,int llen,int to) noex {
 	    rs = SR_TIMEDOUT ;
 	} /* end if */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (readln_stream) */
+} /* end subroutine (readln_stream) */
 
 local int readln_seekable(int fd,char *lbuf,int llen,int to,off_t fo) noex {
 	int		rs ;
@@ -301,8 +297,7 @@ local int readln_seekable(int fd,char *lbuf,int llen,int to,off_t fo) noex {
 	    rs = u_read(fd,lbuf,rlen) ;
 	} /* end if (u_readp) */
 	return rs ;
-}
-/* end subroutine (readln_seekable) */
+} /* end subroutine (readln_seekable) */
 
 local int readln_default(int fd,char *lbuf,int llen,int to) noex {
 	cint		opts = (FM_TIMED | FM_EXACT) ;
@@ -321,8 +316,7 @@ local int readln_default(int fd,char *lbuf,int llen,int to) noex {
 	    } /* end if (uc_reade) */
 	} /* end while */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (readln_default) */
+} /* end subroutine (readln_default) */
 
 local int isseekable(int fd,off_t *fop) noex {
 	int		rs ;
@@ -333,7 +327,6 @@ local int isseekable(int fd,off_t *fop) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (isseekable) */
+} /* end subroutine (isseekable) */
 
 
