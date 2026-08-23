@@ -79,10 +79,10 @@ int setstr_loadfile(setstr *op,int fu,cchar *fname) noex {
 
 int setstrer::add(cchar *sp,int sl) noex {
     	return setstr_add(op,sp,sl) ;
-}
+} /* end method */
 
 int setstrer::del(cchar *sp,int sl) noex {
 	return setstr_del(op,sp,sl) ;
-}
+} /* end method */
 
 
