@@ -114,101 +114,101 @@ int stdorder_rc(cchar *buf,char *wp) noex {
 	uchar		*ubuf = ucharp(buf) ;
 	*wp = ubuf[0] ;
 	return 1 ;
-}
+} /* end subroutine */
 
 int stdorder_rs(cchar *buf,short *sp) noex {
 	ushort		*up = ushortp(sp) ;
 	return stdorder_rus(buf,up) ;
-}
+} /* end subroutine */
 
 int stdorder_ri(cchar *buf,int *sp) noex {
 	uint		*up = uintp(sp) ;
 	return stdorder_rui(buf,up) ;
-}
+} /* end subroutine */
 
 int stdorder_rl(cchar *buf,long *sp) noex {
 	ulong		*up = ulongp(sp) ;
 	return stdorder_rul(buf,up) ;
-}
+} /* end subroutine */
 
 int stdorder_rll(cchar *buf,longlong *sp) noex {
 	ulonglong	*up = ulonglongp(sp) ;
 	return stdorder_rull(buf,up) ;
-}
+} /* end subroutine */
 
 int stdorder_ruc(cchar *buf,uchar *wp) noex {
 	const uchar	*ubuf = (const uchar *) buf ;
 	*wp = ubuf[0] ;
 	return 1 ;
-}
+} /* end subroutine */
 
 int stdorder_rus(cchar *buf,ushort *wp) noex {
 	return stdorder_rxx(buf,wp) ;
-}
+} /* end subroutine */
 
 int stdorder_rui(cchar *buf,uint *wp) noex {
 	return stdorder_rxx(buf,wp) ;
-}
+} /* end subroutine */
 
 int stdorder_rul(cchar *buf,ulong *wp) noex {
 	return stdorder_rxx(buf,wp) ;
-}
+} /* end subroutine */
 
 int stdorder_rull(cchar *buf,ulonglong *wp) noex {
 	return stdorder_rxx(buf,wp) ;
-}
+} /* end subroutine */
 
 int stdorder_wc(char *buf,char cw) noex {
 	uchar		*ubuf = ucharp(buf) ;
 	ubuf[0] = uchar(cw) ;
 	return 1 ;
-}
+} /* end subroutine */
 
 int stdorder_ws(char *buf,short sw) noex {
 	uchar		*ubuf = ucharp(buf) ;
 	ubuf[0] = uchar(sw >> (0 * nb)) ;
 	ubuf[1] = uchar(sw >> (1 * nb)) ;
 	return 2 ;
-}
+} /* end subroutine */
 
 int stdorder_wi(char *buf,int sw) noex {
 	uint		uw = uint(sw) ;
 	return stdorder_wui(buf,uw) ;
-}
+} /* end subroutine */
 
 int stdorder_wl(char *buf,long sw) noex {
 	ulong		uw = ulong(sw) ;
 	return stdorder_wul(buf,uw) ;
-}
+} /* end subroutine */
 
 int stdorder_wll(char *buf,longlong sw) noex {
 	ulonglong	uw = ulonglong(sw) ;
 	return stdorder_wull(buf,uw) ;
-}
+} /* end subroutine */
 
 int stdorder_wuc(char *buf,uchar uw) noex {
 	uchar		*ubuf = ucharp(buf) ;
 	ubuf[0] = uchar(uw) ;
 	return 1 ;
-}
+} /* end subroutine */
 
 int stdorder_wus(char *buf,ushort uw) noex {
 	uchar		*ubuf = ucharp(buf) ;
 	ubuf[0] = uchar(uw >> (0 * nb)) ;
 	ubuf[1] = uchar(uw >> (1 * nb)) ;
 	return 2 ;
-}
+} /* end subroutine */
 
 int stdorder_wui(char *buf,uint uw) noex {
 	return stdorder_wxx(buf,uw) ;
-}
+} /* end subroutine */
 
 int stdorder_wul(char *buf,ulong uw) noex {
 	return stdorder_wxx(buf,uw) ;
-}
+} /* end subroutine */
 
 int stdorder_wull(char *buf,ulonglong uw) noex {
 	return stdorder_wxx(buf,uw) ;
-}
+} /* end subroutine */
 
 
