@@ -52,23 +52,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/uio.h>
-#include	<unistd.h>
-#include	<poll.h>
-#include	<cerrno>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>		/* |POLL_INTMULT| */
+#include	<sys/uio.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |POLL_INTMULT| */
 
 #include	"ucdescbase.hh"
 #include	"ucdescwrite.h"
 #include	"ucwrite.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
@@ -107,9 +107,9 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 int uc_writeto(int fd,cvoid *ubuf,int ulen,int to) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (ubuf) {
+	if (ubuf) ylikely {
 	    rs = SR_BADF ;
-	    if (fd >= 0) {
+	    if (fd >= 0) ylikely {
 	        POLLFD		fds[1] ;
 	        time_t		ti_now ;
 	        time_t		ti_start ;
@@ -157,13 +157,11 @@ int uc_writeto(int fd,cvoid *ubuf,int ulen,int to) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (uc_writeto) */
+} /* end subroutine (uc_writeto) */
 
 int uc_write(int fd,cvoid *wbuf,int wlen) noex {
 	return uc_writeto(fd,wbuf,wlen,-1) ;
-}
-/* end subroutine (uc_write) */
+} /* end subroutine (uc_write) */
 
 int uc_writen(int fd,cvoid *abuf,int µalen) noex {
 	int		rs = SR_FAULT ;
@@ -188,7 +186,6 @@ int uc_writen(int fd,cvoid *abuf,int µalen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (uc_writen) */
+} /* end subroutine (uc_writen) */
 
 
