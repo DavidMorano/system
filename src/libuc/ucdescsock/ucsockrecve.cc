@@ -44,23 +44,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<sys/uio.h>
-#include	<unistd.h>
-#include	<poll.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucdesc.h>
-#include	<bufprintf.h>
-#include	<localmisc.h>
-#include	<libdebug.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<sys/uio.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufprintf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"ucdescsock.h"
 
@@ -78,6 +78,10 @@
 #define	EBUFLEN		100
 
 #define	POLLEVENTS	(POLLIN | POLLPRI) ;
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug printo-outs */
+#endif
 
 
 /* external subroutines */
@@ -97,6 +101,8 @@ static char	*d_reventstr() ;
 
 
 /* local variables */
+
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -119,7 +125,7 @@ int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
 #endif
 
 #if	CF_DEBUG
-	debugprintf("uc_recve: ent rlen=%u to=%d opts=%08x\n",
+	DEBUGPRINTF("uc_recve: ent rlen=%u to=%d opts=%08x\n",
 		rlen,to,opts) ;
 #endif
 
@@ -145,24 +151,24 @@ int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
 	while ((rs >= 0) && (to >= 0)) {
 
 #if	CF_DEBUG
-	    debugprintf("uc_recve: u_poll() pollint=%d to=%d\n",
+	    DEBUGPRINTF("uc_recve: u_poll() pollint=%d to=%d\n",
 	        pollint,to) ;
 #endif
 
 	    if ((rs = u_poll(fds,1,(pollint * POLL_INTMULT))) > 0) {
 
 #if	CF_DEBUG
-	        debugprintf("uc_recve: events %s\n",
+	        DEBUGPRINTF("uc_recve: events %s\n",
 	            d_reventstr(fds[0].revents,ebuf,EBUFLEN)) ;
 
-	        debugprintf("uc_recve: about to 'read'\n") ;
+	        DEBUGPRINTF("uc_recve: about to 'read'\n") ;
 #endif
 
 	        rs = u_recv(fd,rbuf,rlen,mflags) ;
 	        tlen = rs ;
 
 #if	CF_DEBUG
-	        debugprintf("uc_recve: u_read() rs=%d\n",
+	        DEBUGPRINTF("uc_recve: u_read() rs=%d\n",
 	            rs) ;
 #endif
 
@@ -200,13 +206,12 @@ int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
 	} /* end if */
 
 #if	CF_DEBUG
-	debugprintf("uc_recve: ret rs=%d tlen=%u\n",
+	DEBUGPRINTF("uc_recve: ret rs=%d tlen=%u\n",
 	    rs,tlen) ;
 #endif
 
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (uc_recve) */
+} /* end subroutine (uc_recve) */
 
 #if	CF_DEBUG
 static char *d_reventstr(int revents,char *rbuf,int rlen) noex {
@@ -222,8 +227,7 @@ static char *d_reventstr(int revents,char *rbuf,int rlen) noex {
 	    (revents & POLLHUP) ? "HU" : "  ",
 	    (revents & POLLNVAL) ? "NV" : "  ") ;
 	return rbuf ;
-}
-/* end subroutine (d_reventstr) */
+} /* end subroutine (d_reventstr) */
 #endif /* CF_DEBUG */
 
 
