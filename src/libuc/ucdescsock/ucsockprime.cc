@@ -85,14 +85,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/socket.h>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibsubs.h>
-#include	<localmisc.h>
+#include	<sys/socket.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucdescbase.hh"
 #include	"ucsockprime.h"
@@ -132,7 +132,6 @@ using libuc::ucdescbase ;		/* type */
 
 
 /* exported subroutines */
-
 
 
 /* local structures */
@@ -256,29 +255,25 @@ int uc_bind(int fd,cvoid *sap,int sal) noex {
 	sockmgr		so(sap,sal) ;
 	so.m = &sockmgr::ibind ;
 	return so(fd) ;
-}
-/* end subroutine (uc_bind) */
+} /* end subroutine (uc_bind) */
 
 int uc_listen(int fd,int backlog) noex {
 	sockmgr		so(backlog) ;
 	so.m = &sockmgr::ilisten ;
 	return so(fd) ;
-}
-/* end subroutine (uc_listen) */
+} /* end subroutine (uc_listen) */
 
 int uc_sockoptset(int fd,int level,int optname,cvoid *valp,int len) noex {
 	sockmgr		so(level,optname,valp,len) ;
 	so.m = &sockmgr::isetsockopt ;
 	return so(fd) ;
-}
-/* end subroutine (uc_sockoptset) */
+} /* end subroutine (uc_sockoptset) */
 
 int uc_sockoptget(int fd,int level,int optname,void *valp,int *lenp) noex {
 	sockmgr		so(level,optname,valp,lenp) ;
 	so.m = &sockmgr::igetsockopt ;
 	return so(fd) ;
-}
-/* end subroutine (uc_sockoptget) */
+} /* end subroutine (uc_sockoptget) */
 
 int uc_getpeername(int fd,void *sap,int *lenp) noex {
 	int		rs = SR_FAULT ;
@@ -288,8 +283,7 @@ int uc_getpeername(int fd,void *sap,int *lenp) noex {
 	    rs = so(fd) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getpeername) */
+} /* end subroutine (uc_getpeername) */
 
 int uc_getsockname(int fd,void *sap,int *lenp) noex {
 	int		rs = SR_FAULT ;
@@ -299,8 +293,7 @@ int uc_getsockname(int fd,void *sap,int *lenp) noex {
 	    rs = so(fd) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getsockname) */
+} /* end subroutine (uc_getsockname) */
 
 int uc_send(int fd,cvoid *wbuf,int wlen,int flags) noex {
 	int		rs = SR_FAULT ;
@@ -321,8 +314,7 @@ int uc_sendmsg(int fd,CMSGHDR *msgp,int flags) noex {
 	    rs = so(fd) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_sendmsg) */
+} /* end subroutine (uc_sendmsg) */
 
 int uc_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
 	int		rs = SR_FAULT ;
@@ -332,8 +324,7 @@ int uc_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
 	    rs = so(fd) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_sendto) */
+} /* end subroutine (uc_sendto) */
 
 int uc_sendfile(int s,int fd,off_t fo,size_t c) noex {
 	int		rs = SR_FAULT ;
@@ -343,8 +334,7 @@ int uc_sendfile(int s,int fd,off_t fo,size_t c) noex {
 	    rs = so(fd) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_sendfile) */
+} /* end subroutine (uc_sendfile) */
 
 int uc_recv(int fd,void *rbuf,int rlen,int flags) noex {
 	int		rs = SR_FAULT ;
@@ -354,8 +344,7 @@ int uc_recv(int fd,void *rbuf,int rlen,int flags) noex {
 	    rs = so(fd) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_recv) */
+} /* end subroutine (uc_recv) */
 
 int uc_recvmsg(int fd,MSGHDR *msgp,int flags) noex {
 	int		rs = SR_FAULT ;
@@ -365,8 +354,7 @@ int uc_recvmsg(int fd,MSGHDR *msgp,int flags) noex {
 	    rs = so(fd) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_recvmsg) */
+} /* end subroutine (uc_recvmsg) */
 
 int uc_recvfrom(int fd,void *rbuf,int rlen,int flags,void *vp,int *lenp) noex {
 	int		rs = SR_FAULT ;
@@ -376,15 +364,13 @@ int uc_recvfrom(int fd,void *rbuf,int rlen,int flags,void *vp,int *lenp) noex {
 	    rs = so(fd) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_recvfrom) */
+} /* end subroutine (uc_recvfrom) */
 
 int uc_shutdown(int fd,int dir) noex {
 	sockmgr	so(dir) ;
 	so.m = &sockmgr::ishutdown ;
 	return so(fd) ;
-}
-/* end subroutine (uc_shutdown) */
+} /* end subroutine (uc_shutdown) */
 
 
 /* local subroutines */
