@@ -189,15 +189,15 @@ int namestr_next(namestr *op,cchar **npp,int *fap,int *flp) noex {
 
 int namestr::start(cchar *sp,int sl) noex {
     	return namestr_start(this,sp,sl) ;
-}
+} /* end method */
 
 int namestr::next(cchar **npp,int *fap,int *flp) noex {
 	return namestr_next(this,npp,fap,flp) ;
-}
+} /* end method */
 
 int namestr::brk(cchar *bs,cchar **rpp) noex {
 	return namestr_brk(this,bs,rpp) ;
-}
+} /* end method */
 
 void namestr::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
