@@ -77,7 +77,7 @@
 
 extern "C" {
     typedef int (*ucode_f)(int,ccharpp) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -91,7 +91,7 @@ extern "C" {
 
 /* forward references */
 
-local int snabbrx(ucode_f get,char *dbuf,int dlen,int n) noex {
+local int snabbrx(char *dbuf,int dlen,ucode_f get,int n) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf) ylikely {
 	    if (cchar *rp ; (rs = get(n,&rp)) >= 0) {
@@ -113,11 +113,11 @@ local int snabbrx(ucode_f get,char *dbuf,int dlen,int n) noex {
 /* exported subroutines */
 
 int snabbrerr(char *dbuf,int dlen,int n) noex {
-    	return snabbrx(ucodename_sr,dbuf,dlen,n) ;
+    	return snabbrx(dbuf,dlen,ucodename_sr,n) ;
 } /* end subroutine (snabbrerr) */
 
 int snabbrsig(char *dbuf,int dlen,int n) noex {
-    	return snabbrx(ucodename_sig,dbuf,dlen,n) ;
+    	return snabbrx(dbuf,dlen,ucodename_sig,n) ;
 } /* end subroutine (snabbrsig) */
 
 
