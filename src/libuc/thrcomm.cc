@@ -27,14 +27,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"thrcomm.h"
 
@@ -132,8 +132,7 @@ int thrcomm_start(thrcomm *op,int f_shared) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (thrcomm_start) */
+} /* end subroutine (thrcomm_start) */
 
 int thrcomm_finish(thrcomm *op) noex {
 	int		rs ;
@@ -156,8 +155,7 @@ int thrcomm_finish(thrcomm *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (thrcomm_finish) */
+} /* end subroutine (thrcomm_finish) */
 
 int thrcomm_cmdsend(thrcomm *op,int cmd,int to) noex {
 	int		rs ;
@@ -194,8 +192,7 @@ int thrcomm_cmdsend(thrcomm *op,int cmd,int to) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? cmd : rs ;
-}
-/* end subroutine (thrcomm_cmdsend) */
+} /* end subroutine (thrcomm_cmdsend) */
 
 int thrcomm_cmdrecv(thrcomm *op,int to) noex {
 	int		rs ;
@@ -226,8 +223,7 @@ int thrcomm_cmdrecv(thrcomm *op,int to) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? cmd : rs ;
-}
-/* end subroutine (thrcomm_cmdrecv) */
+} /* end subroutine (thrcomm_cmdrecv) */
 
 int thrcomm_rspsend(thrcomm *op,int rrs,int to) noex {
 	int		rs ;
@@ -257,8 +253,7 @@ int thrcomm_rspsend(thrcomm *op,int rrs,int to) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rrs : rs ;
-}
-/* end subroutine (thrcomm_rspsend) */
+} /* end subroutine (thrcomm_rspsend) */
 
 int thrcomm_rsprecv(thrcomm *op,int to) noex {
 	int		rs ;
@@ -289,8 +284,7 @@ int thrcomm_rsprecv(thrcomm *op,int to) noex {
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rrs : rs ;
-}
-/* end subroutine (thrcomm_rsprecv) */
+} /* end subroutine (thrcomm_rsprecv) */
 
 int thrcomm_exiting(thrcomm *op) noex {
 	int		rs ;
@@ -303,8 +297,7 @@ int thrcomm_exiting(thrcomm *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (thrcomm_exiting) */
+} /* end subroutine (thrcomm_exiting) */
 
 
 /* private subroutines */
@@ -332,8 +325,7 @@ local int thrcomm_ptminit(thrcomm *op,int f_shared) noex {
 	    }
 	} /* end if (ptma) */
 	return rs ;
-}
-/* end subroutine (thrcomm_ptminit) */
+} /* end subroutine (thrcomm_ptminit) */
 
 local int thrcomm_ptcinit(thrcomm *op,int f_shared) noex {
 	int		rs ;
@@ -358,7 +350,6 @@ local int thrcomm_ptcinit(thrcomm *op,int f_shared) noex {
 	    }
 	} /* end if (ptca) */
 	return rs ;
-}
-/* end subroutine (thrcomm_ptcinit) */
+} /* end subroutine (thrcomm_ptcinit) */
 
 
