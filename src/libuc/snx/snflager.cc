@@ -153,15 +153,15 @@ int snflager_finish(snflager *op) noex {
 
 int snflager::start(char *bufp,int bufl) noex {
 	return snflager_start(this,bufp,bufl) ;
-}
+} /* end method */
 
 int snflager::addstr(cchar *sp) noex {
 	return snflager_addstrw(this,sp,-1) ;
-}
+} /* end method */
 
 int snflager::addstrw(cchar *sp,int sl) noex {
 	return snflager_addstrw(this,sp,sl) ;
-}
+} /* end method */
 
 void snflager::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
