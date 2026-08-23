@@ -51,27 +51,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<utmpacc.h>
-#include	<opentmp.h>
-#include	<sysval.hh>
-#include	<intfloor.h>
-#include	<intceil.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memcpy(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<utmpacc.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<intfloor.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"tmpx.h"
 
@@ -107,7 +107,8 @@ extern "C" {
     extern int uc_fstat(int,ustat *) noex ;
     extern int uc_closeonexec(int,int) noex ;
     extern int uc_pipe(int *) noex ;
-}
+} /* end extern (C) */
+
 
 /* external variables */
 
@@ -178,8 +179,7 @@ int tmpx_open(tmpx *op,cchar *dbfn,int oflags) noex {
 	    } /* end if (pagesz) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (tmpx_open) */
+} /* end subroutine (tmpx_open) */
 
 int tmpx_close(tmpx *op) noex {
 	int		rs ;
@@ -196,8 +196,7 @@ int tmpx_close(tmpx *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (tmpx_close) */
+} /* end subroutine (tmpx_close) */
 
 int tmpx_write(tmpx *op,int ei,tmpx_ent *ep) noex {
 	int		rs ;
@@ -216,8 +215,7 @@ int tmpx_write(tmpx *op,int ei,tmpx_ent *ep) noex {
             } /* end if */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (tmpx_write) */
+} /* end subroutine (tmpx_write) */
 
 int tmpx_check(tmpx *op,time_t dt) noex {
 	int		rs ;
@@ -243,8 +241,7 @@ int tmpx_check(tmpx *op,time_t dt) noex {
             } /* end if (possible) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_ch : rs ;
-}
-/* end subroutine (tmpx_check) */
+} /* end subroutine (tmpx_check) */
 
 int tmpx_curbegin(tmpx *op,tmpx_cur *curp) noex {
 	int		rs ;
@@ -259,8 +256,7 @@ int tmpx_curbegin(tmpx *op,tmpx_cur *curp) noex {
 	    if (rs >= 0) op->ncursors += 1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (tmpx_curbegin) */
+} /* end subroutine (tmpx_curbegin) */
 
 int tmpx_curend(tmpx *op,tmpx_cur *curp) noex {
 	int		rs ;
@@ -269,8 +265,7 @@ int tmpx_curend(tmpx *op,tmpx_cur *curp) noex {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (tmpx_curend) */
+} /* end subroutine (tmpx_curend) */
 
 int tmpx_curenum(tmpx *op,tmpx_cur *curp,tmpx_ent *ep) noex {
 	int		rs ;
@@ -292,8 +287,7 @@ int tmpx_curenum(tmpx *op,tmpx_cur *curp,tmpx_ent *ep) noex {
             }
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (tmpx_curenum) */
+} /* end subroutine (tmpx_curenum) */
 
 int tmpx_fetchpid(tmpx *op,tmpx_ent *ep,pid_t pid) noex {
 	int		rs ;
@@ -327,8 +321,7 @@ int tmpx_fetchpid(tmpx *op,tmpx_ent *ep,pid_t pid) noex {
             } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (tmpx_fetchpid) */
+} /* end subroutine (tmpx_fetchpid) */
 
 int tmpx_fetchuser(tmpx *op,tmpx_cur *curp,tmpx_ent *ep,cchar *name) noex {
 	int		rs ;
@@ -369,8 +362,7 @@ int tmpx_fetchuser(tmpx *op,tmpx_cur *curp,tmpx_ent *ep,cchar *name) noex {
             } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ei : rs ;
-}
-/* end subroutine (tmpx_fetchuser) */
+} /* end subroutine (tmpx_fetchuser) */
 
 int tmpx_read(tmpx *op,int ei,tmpx_ent *ep) noex {
 	int		rs ;
@@ -397,8 +389,7 @@ int tmpx_read(tmpx *op,int ei,tmpx_ent *ep) noex {
             } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (tmpx_read) */
+} /* end subroutine (tmpx_read) */
 
 int tmpx_nusers(tmpx *op) noex {
 	int		rs ;
@@ -431,8 +422,7 @@ int tmpx_nusers(tmpx *op) noex {
             } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? nusers : rs ;
-}
-/* end subroutine (tmpx_nusers) */
+} /* end subroutine (tmpx_nusers) */
 
 
 /* private subroutines */
@@ -616,7 +606,7 @@ local int tmpx_mapents(tmpx *op,int ei,int en,tmpx_ent **rpp) noex {
 	            ep = (((ei * esz) - op->mapoff) + op->mapdata) ;
 	        }
 	        *rpp = (tmpx_ent *) ep ;
-	    }
+	    } /* end if (result) */
 	} /* end if (non-equal-zero) */
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (tmpx_mapents) */
