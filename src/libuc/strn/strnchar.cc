@@ -65,7 +65,7 @@ import libutil ;			/* |getlenstr(3u)| */
 
 extern "C" {
     typedef bool (*xchr_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -102,26 +102,26 @@ local char *strnxx(xchr_f xchr,cchar *sp,int sl) noex {
 
 char *strnalpha(cchar *sp,int sl) noex {
     	return strnxx(isalphalatin,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strnalnum(cchar *sp,int sl) noex {
     	return strnxx(isalnumlatin,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strndigit(cchar *sp,int sl) noex {
     	return strnxx(isdigitlatin,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strndigex(cchar *sp,int sl) noex {
     	return strnxx(isdigexlatin,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strnoctal(cchar *sp,int sl) noex {
     	return strnxx(isoctallatin,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strnblank(cchar *sp,int sl) noex {
     	return strnxx(isblanklatin,sp,sl) ;
-}
+} /* end subroutine */
 
 
