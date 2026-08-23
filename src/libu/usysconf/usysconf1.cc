@@ -6,7 +6,7 @@
 /* get system configuration information */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* debugging */
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -71,7 +71,7 @@ module ;
 #include	<utmpx.h>		/* POSIX UTMPX */
 #include	<cerrno>		/* CSTD */
 #include	<climits>		/* CSTD */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<new>			/* C++STD |nothrow(3c++)| */
 #include	<atomic>		/* C++STD |atomic_int(3c++)| */
@@ -154,10 +154,8 @@ namespace {
 /* local variables */
 
 static ucachestore	udata ;
-
-constexpr size_t	minusone = -1uz ;
-
-cbool			f_debug = CF_DEBUG ;
+constexpr size_t	minusone	= -1uz ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -249,7 +247,7 @@ int usysconf::getvalcache(int req,int ci) noex {
 int usysconf::synthetic(int req) noex {
     	long		val = -1 ;
     	int		rs = SR_OK ;
-	DPRINTF("ent\n") ;
+	DPRINTF("ent req=%d\n",req) ;
 	switch (req) {
         case sysconfcmd_maxpid:		/* maximum PID value */
 	    val = PID_MAX ;		/* six '9's is the common standard */
@@ -272,14 +270,23 @@ int usysconf::synthetic(int req) noex {
         case sysconfcmd_maxsymbol:
 	    val = SNBUFLEN ;
 	    break ;
+        case sysconfcmd_maxnodename:
+	    rs = getdefnodename() ;
+	    break ;
         case sysconfcmd_maxname:
 	    val = MNBUFLEN ;
 	    break ;
         case sysconfcmd_maxpath:
 	    val = MPBUFLEN ;
 	    break ;
-        case sysconfcmd_maxnodename:
-	    rs = getdefnodename() ;
+        case sysconfcmd_maxtzname:
+	    val = ZNBUFLEN ;
+	    break ;
+        case sysconfcmd_maxtzabbr:
+	    val = ZABUFLEN ;
+	    break ;
+        case sysconfcmd_maxzoneinfo:
+	    rs = getdefzoneinfo() ;
 	    break ;
         case sysconfcmd_maxusername:
 	    rs = getdefacctname() ;
@@ -325,12 +332,6 @@ int usysconf::synthetic(int req) noex {
 	    break ;
 	case sysconfcmd_fstype:
 	    val = FSBUFLEN ;
-	    break ;
-        case sysconfcmd_maxtzname:
-	    val = ZNBUFLEN ;
-	    break ;
-        case sysconfcmd_maxzoneinfo:
-	    rs = getdefzoneinfo() ;
 	    break ;
         case sysconfcmd_maxmailaddr:
 	    rs = getdefmailaddr() ;
