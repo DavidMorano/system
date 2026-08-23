@@ -51,6 +51,9 @@
 #ifndef	MAXBASE
 #define	MAXBASE		64		/* standard (common) value */
 #endif
+#ifndef	DIGBASE_MAX
+#define	DIGBASE_MAX	64		/* standard (common) value */
+#endif
 
 /* maximum type (number of bits) for normal numeric conversions */
 #ifndef	MAXTYPE
@@ -115,16 +118,20 @@
 #endif /* SYMBOL_MAX */
 
 #ifndef	NODENAME_MAX
-#define	NODENAME_MAX	255
+#define	NODENAME_MAX	255		/* pretty-much de-facto standard */
 #endif /* NODENAME_MAX */
 
 #ifndef	NAME_MAX
-#define	NAME_MAX	NNBUFLEN
-#endif /* TZNAME_MAX */
+#define	NAME_MAX	255		/* pretty-much de-factor standard */
+#endif /* NAME_MAX */
 
 #ifndef	TZNAME_MAX
-#define	TZNAME_MAX	6
+#define	TZNAME_MAX	255
 #endif /* TZNAME_MAX */
+
+#ifndef	TZABBR_MAX
+#define	TZABBR_MAX	8
+#endif /* TZABBR_MAX */
 
 /* maximum SHM name (as per POSIX®) */
 #ifndef	SHMNAME_MAX
@@ -132,7 +139,7 @@
 #endif
 
 #ifndef	SYSUID_MAX
-#define	SYSUID_MAX	500		/* really from Apple-Darwin */
+#define	SYSUID_MAX	(500-1)		/* really from Apple-Darwin */
 #endif
 
 
