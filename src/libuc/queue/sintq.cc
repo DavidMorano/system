@@ -200,20 +200,19 @@ int sintq_count(sintq *op) noex {
 	    rs = op->cnt ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sintq_count) */
+} /* end subroutine (sintq_count) */
 
 int sintq::ins(int ch) noex {
 	return sintq_ins(this,ch) ;
-}
+} /* end method */
 
 int sintq::rem(short *rp) noex {
 	return sintq_rem(this,rp) ;
-}
+} /* end method */
 
 int sintq::remread(short *rp,int rl) noex {
 	return sintq_remread(this,rp,rl) ;
-}
+} /* end method */
 
 void sintq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
