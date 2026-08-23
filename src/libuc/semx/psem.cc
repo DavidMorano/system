@@ -263,7 +263,7 @@ int psem_count(psem *op) noex {
 
 int psem::create(int pshared,int acnt) noex {
 	return psem_create(this,pshared,acnt) ;
-}
+} /* end method */
 
 psem::operator int () noex {
 	return psem_count(this) ;
