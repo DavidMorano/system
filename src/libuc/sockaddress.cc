@@ -76,19 +76,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncpy(3c)| + |stpncpy(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uinet.h>		/* |AF_{x}| */
-#include	<endian.h>		/* |htoni(3u)| + |ntohi(3u)| */
-#include	<snwcpy.h>		/* |snwcpy(3uc)| */
-#include	<strn.h>		/* |strncpybc(3uc)| */
-#include	<cthexstr.h>		/* |cthexstr(3uc)| */
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strncpy(3c)| + |stpncpy(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uinet.h>		/* LIBU |AF_{x}| */
+#include	<endian.h>		/* LIBU |htoni(3u)| + |ntohi(3u)| */
+#include	<snwcpy.h>		/* LIBUC |snwcpy(3uc)| */
+#include	<strn.h>		/* LIBUC |strncpybc(3uc)| */
+#include	<cthexstr.h>		/* LIBUC |cthexstr(3uc)| */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sockaddress.h"
 
@@ -596,8 +596,7 @@ int sockaddress_putaddr(SA *sap,cvoid *vaddr) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (sockaddress_putaddr) */
+} /* end subroutine (sockaddress_putaddr) */
 
 
 /* local subroutines */
@@ -637,15 +636,15 @@ int sa::portput(int port) noex {
 
 int sockaddress::start(int af,cvoid *va,int port,uint flow) noex {
 	return sockaddress_start(this,af,va,port,flow) ;
-}
+} /* end method */
 
 int sockaddress::getaddr(void *valp,int vall) noex {
     	return sockaddress_getaddr(this,valp,vall) ;
-}
+} /* end method */
 
 sockaddress::operator int () noex {
     	return sockaddress_getlen(this) ;
-}
+} /* end method */
 
 local void sockaddress_init(sockaddress *op,const sockaddress *other) noex {
     	cint	msz = SOCKADDRESS_STRSIZE ;
