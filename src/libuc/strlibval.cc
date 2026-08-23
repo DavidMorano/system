@@ -44,7 +44,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstdlib>		/* CSTD |getenv(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU |getenver(3u)| */
@@ -82,7 +82,7 @@ import uconstants ;			/* |sysword(3u)| + |varname(3u)| */
 extern "C" {
     int		valstore_init() noex ;
     int		valstore_fini() noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -200,7 +200,7 @@ extern "C" {
     local void	valstore_atforkbefore() noex ;
     local void	valstore_atforkafter() noex ;
     local void	valstore_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -219,11 +219,11 @@ static valstore		data ;
 
 int valstore_init() noex {
 	return data.init() ;
-}
+} /* end */
 
 int valstore_fini() noex {
 	return data.fini() ;
-}
+} /* end */
 
 
 /* local subroutines */
