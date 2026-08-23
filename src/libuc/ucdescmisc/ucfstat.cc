@@ -22,7 +22,7 @@
 #include	<fcntl.h>		/* POSIX */
 #include	<cerrno>		/* CSTD */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -70,8 +70,7 @@ int uc_fstat(int fd,ustat *sbp) noex {
 	    } /* end if (u_fstat) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_fstat) */
+} /* end subroutine (uc_fstat) */
 
 int uc_fsize(int fd) noex {
 	int		rs ;
@@ -80,8 +79,7 @@ int uc_fsize(int fd) noex {
 	    rs = intsat(fsize) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_fsize) */
+} /* end subroutine (uc_fsize) */
 
 int uc_fuid(int fd) noex {
 	int		rs ;
@@ -89,8 +87,7 @@ int uc_fuid(int fd) noex {
 	    rs = intsat(sb.st_uid) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_fuid) */
+} /* end subroutine (uc_fuid) */
 
 int uc_fgid(int fd) noex {
 	int		rs ;
@@ -98,7 +95,6 @@ int uc_fgid(int fd) noex {
 	    rs = intsat(sb.st_gid) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_fgid) */
+} /* end subroutine (uc_fgid) */
 
 
