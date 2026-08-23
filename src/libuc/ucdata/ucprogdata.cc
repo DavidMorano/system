@@ -124,7 +124,7 @@ typedef volatile sig_atomic_t	vaflag ;
 extern "C" {
     int		ucprogdata_init() noex ;
     int		ucprogdata_fini() noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -157,7 +157,7 @@ extern "C" {
     local void	ucprogdata_atforkbefore() noex ;
     local void	ucprogdata_atforkafter() noex ;
     local void	ucprogdata_exit() noex ;
-}
+} /* end extern (C) */
 
 local int	ucprogdata_struct	(UCPD *) noex ;
 local int	ucprogdata_begin	(UCPD *) noex ;
@@ -225,8 +225,7 @@ int ucprogdata_init() noex {
 	    } /* end if */
 	} /* end if (not-void) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ucprogdata_init) */
+} /* end subroutine (ucprogdata_init) */
 
 int ucprogdata_fini() noex {
 	UCPD		*uip = &ucprogdata_data ;
@@ -258,8 +257,7 @@ int ucprogdata_fini() noex {
 	    uip->f_initdone = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end subroutine (ucprogdata_fini) */
+} /* end subroutine (ucprogdata_fini) */
  
 int ucprogdata_set(int di,cchar *cbuf,int clen,int ttl) noex {
 	int		rs = SR_FAULT ;
@@ -287,8 +285,7 @@ int ucprogdata_set(int di,cchar *cbuf,int clen,int ttl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (ucprogdata_set) */
+} /* end subroutine (ucprogdata_set) */
 
 int ucprogdata_get(int di,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -316,8 +313,7 @@ int ucprogdata_get(int di,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ucprogdata_get) */
+} /* end subroutine (ucprogdata_get) */
 
 
 /* local subroutines */
