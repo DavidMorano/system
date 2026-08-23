@@ -16,14 +16,14 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ucontext.h>		/* «- system-header money-shot */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<ucontext.h>		/* POSIX® «- system-header money-shot */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uccontext.h"
 
@@ -65,19 +65,17 @@ int uc_contextmake(ucontext_t *nucp,context_f cf,int val) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_contextmake) */
+} /* end subroutine (uc_contextmake) */
 
 int uc_contextswap(ucontext_t *oucp,const ucontext_t *nucp) noex {
 	int		rs = SR_FAULT ;
 	if (oucp && nucp) {
 	    if ((rs = swapcontext(oucp,nucp)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_contextswap) */
+} /* end subroutine (uc_contextswap) */
 
 int uc_contextset(ucontext_t *nucp) noex {
 	int		rs = SR_FAULT ;
@@ -86,7 +84,6 @@ int uc_contextset(ucontext_t *nucp) noex {
 	    rs = SR_BUGCHECK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_contextset) */
+} /* end subroutine (uc_contextset) */
 
 
