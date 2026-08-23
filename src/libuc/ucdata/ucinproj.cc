@@ -43,13 +43,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cerrno>
+#include	<cerrno>		/* CSTD */
 #include	<cstddef>		/* CSTD */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include        <errtimer.hh>
-#include	<localmisc.h>
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include        <errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucinproj.h"
 
@@ -87,7 +87,7 @@ local sysret_t std_inproj(cchar *un,cchar *pn,char *rbuf,int rlen) noex {
 	errno = 0 ;
 	finproj = inproj(username,projname,rbuf,rsize) ;
 	if (errno != 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return (rs >= 0) ? finproj : rs ;
 } /* end subroutine (std_inproj) */
@@ -135,8 +135,7 @@ int uc_inproj(cchar *username,cchar *projname,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? finproj : rs ;
-}
-/* end subroutine (uc_inproj) */
+} /* end subroutine (uc_inproj) */
 
 /******************************************************************************/
 #else /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
@@ -151,8 +150,7 @@ int uc_inproj(cchar *name,cc *projname,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_inproj) */
+} /* end subroutine (uc_inproj) */
 
 /******************************************************************************/
 #endif /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
