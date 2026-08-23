@@ -45,11 +45,12 @@
 **************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<mkquoted.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<mkquoted.h>		/* LIBU */
 
 
 /* local defines */
@@ -59,7 +60,7 @@
 
 extern "C" {
     extern int quoteshellarg(char *,int,cchar *,int,cchar **) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -82,7 +83,6 @@ int quoteshellarg(char *dp,int dl,cchar *ap,int al,cchar **nvpp) noex {
 	    *nvpp = (rs >= 0) ? dp : nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (quoteshellarg) */
+} /* end subroutine (quoteshellarg) */
 
 
