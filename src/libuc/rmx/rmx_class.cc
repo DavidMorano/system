@@ -77,7 +77,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     typedef bool (*iscond_f)(int) noex ;
-}
+} /* end extern (C) */
+
 
 /* external subroutines */
 
