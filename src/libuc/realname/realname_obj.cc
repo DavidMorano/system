@@ -85,15 +85,15 @@
 
 int realname::name(char *rbuf,int rlen) noex {
     	return realname_name(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int realname::fullname(char *rbuf,int rlen) noex {
     	return realname_fullname(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int realname::mailname(char *rbuf,int rlen) noex {
     	return realname_mailname(this,rbuf,rlen) ;
-}
+} /* end method */
 
 void realname::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
