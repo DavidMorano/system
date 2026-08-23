@@ -89,7 +89,7 @@ int isasocket(int fd) noex {
 	int		len = szof(int) ;
 	int		val = 0 ;
 	int		f = false ;
-	if ((rs = u_getsockopt(fd,slev,scmd,&val,&len)) >= 0) {
+	if ((rs = u_sockoptget(fd,slev,scmd,&val,&len)) >= 0) {
 	    f = true ;
 	} else if (isNotSock(rs)) {
 	    rs = SR_OK ;
