@@ -38,13 +38,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"tmpx.h"
 
@@ -84,11 +84,11 @@ int tmpx_getrunlevel(tmpx *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		runlevel = 0 ; /* return-value */
-	if (op) {
+	if (op) ylikely {
 	    if_constexpr (f_darwin) {
 		runlevel = 3 ;
 	    } else {
-	        if (tmpx_cur cur ; (rs = tmpx_curbegin(op,&cur)) >= 0) {
+	        if (tmpx_cur cur ; (rs = tmpx_curbegin(op,&cur)) >= 0) ylikely {
 	            tmpx_ent	ue{} ;
 	            while (rs >= 0) {
 		        rs1 = tmpx_curenum(op,&cur,&ue) ;
@@ -110,7 +110,6 @@ int tmpx_getrunlevel(tmpx *op) noex {
 	    } /* end if_constexpr (f_darwin) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? runlevel : rs ;
-}
-/* end subroutine (tmpx_getrunlevel) */
+} /* end subroutine (tmpx_getrunlevel) */
 
 
