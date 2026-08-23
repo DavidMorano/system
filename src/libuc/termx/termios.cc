@@ -56,7 +56,7 @@ int termios_cfsetispeed(TERMIOS *tp,speed_t speed) noex {
 	if (tp) ylikely {
 	    repeat {
 	        if ((rs = cfsetispeed(tp,speed)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	        }
 	    } until ((rs >= 0) || ((rs != SR_INTR) && (rs != SR_NOMEM))) ;
 	} /* end if (non-null) */
@@ -68,7 +68,7 @@ int termios_cfsetospeed(TERMIOS *tp,speed_t speed) noex {
 	if (tp) ylikely {
 	    repeat {
 	        if ((rs = cfsetospeed(tp,speed)) < 0) {
-	            rs = (- errno) ;
+	            rs = (neg errno) ;
 	        }
 	    } until ((rs >= 0) || ((rs != SR_INTR) && (rs != SR_NOMEM))) ;
 	} /* end if (non-null) */
