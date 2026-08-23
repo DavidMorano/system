@@ -16,10 +16,14 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/socket.h>
-#include	<uclibsubs.h>
-#include	<ucdesc.h>
-#include	<localmisc.h>
+#include	<sys/socket.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |u_sockoptset(3u)| */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucdescsock.h"
 
@@ -59,10 +63,9 @@ int uc_sockreuse(int fd) noex {
 	mut int		one = 1 ; /* <- must be mutable */
 	int		rs = SR_BADF ;
 	if (fd >= 0) {
-	    rs = u_setsockopt(fd,sol,so,&one,optlen) ;
+	    rs = u_sockoptset(fd,sol,so,&one,optlen) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_sockreuse) */
+} /* end subroutine (uc_sockreuse) */
 
 
