@@ -110,6 +110,7 @@ namespace {
 	    n[dataitem_maxmsg]		= _SC_MSG_MAX ;
 	    n[dataitem_maxfstype]	= _SC_FSTYPE ;
 	    n[dataitem_maxtzname]	= _SC_TZNAME_MAX ;
+	    n[dataitem_maxtzabbr]	= _SC_TZABBR_MAX ;
 	    n[dataitem_clk]		= _SC_CLK_TCK ;
         } ; /* end struct (mktab) */
 	consteval void tabload_x() noex {
