@@ -1,16 +1,13 @@
 /* tty_waitoo SUPPORT */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSYD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 static int tty_wait(uterm *op,int timeout) noex {
 	POLLFD		fds[2] ;
@@ -129,6 +126,5 @@ enter:
 /* we-re out of here */
 ret0:
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (tty_wait) */
+} /* end subroutine (tty_wait) */
 
