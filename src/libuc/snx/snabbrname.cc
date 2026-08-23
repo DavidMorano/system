@@ -103,20 +103,22 @@ int snabbrname(char *dp,int dl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ; /* return-value */
 	if (dp && sp) ylikely {
-	    cchar	*cp{} ;
-	    rs = SR_OK ;
-	    if (dl < 0) dl = INT_MAX ;
-	    if (sl < 0) sl = lenstr(sp) ;
-	    for (int cl ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
-	        if (i < dl) {
-	            dp[i++] = chtouc(cp[0]) ; /* <- GCC conversion complaint */
-	        } else {
-		    rs = SR_OVERFLOW ;
-	        }
-	        sl -= intconv((cp + cl) - sp) ;
-	        sp = (cp + cl) ;
-	        if (rs < 0) break ;
-	    } /* end for */
+	    rs = SR_INVALID ;
+	    if (dl >= 0) ylikely {
+	        cchar	*cp{} ;
+	        rs = SR_OK ;
+	        if (sl < 0) sl = lenstr(sp) ;
+	        for (int cl ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
+	            if (i < dl) {
+	                dp[i++] = chtouc(cp[0]) ;
+	            } else {
+		        rs = SR_OVERFLOW ;
+	            }
+	            sl -= intconv((cp + cl) - sp) ;
+	            sp = (cp + cl) ;
+	            if (rs < 0) break ;
+	        } /* end for */
+	    } /* end if (non-null) */
 	    dp[i] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
