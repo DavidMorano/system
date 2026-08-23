@@ -119,18 +119,18 @@ local int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
 
 int sncpybc(char *dp,int dl,cchar *s1) noex {
 	return sncpyxc<tobc>(dp,dl,s1) ;
-}
+} /* end subroutine */
 
 int sncpylc(char *dp,int dl,cchar *s1) noex {
 	return sncpyxc<tolc>(dp,dl,s1) ;
-}
+} /* end subroutine */
 
 int sncpyuc(char *dp,int dl,cchar *s1) noex {
 	return sncpyxc<touc>(dp,dl,s1) ;
-}
+} /* end subroutine */
 
 int sncpyfc(char *dp,int dl,cchar *s1) noex {
 	return sncpyxc<tofc>(dp,dl,s1) ;
-}
+} /* end subroutine */
 
 
