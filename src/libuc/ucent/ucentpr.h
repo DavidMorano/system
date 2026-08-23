@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<netdb.h>		/* <- is that the money shot? */
+#include	<netdb.h>		/* POSIX® <- is that the money shot? */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #ifdef	__cplusplus
