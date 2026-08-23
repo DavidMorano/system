@@ -428,43 +428,43 @@ int pq_curenum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
 
 int pq::ins(pq_ent *ep) noex {
 	return pq_ins(this,ep) ;
-}
+} /* end method */
 
 int pq::insgroup(pq_ent *ep,int esz,int n) noex {
 	return pq_insgroup(this,ep,esz,n) ;
-}
+} /* end method */
 
 int pq::gethead(pq_ent **rpp) noex {
 	return pq_gethead(this,rpp) ;
-}
+} /* end method */
 
 int pq::gettail(pq_ent **rpp) noex {
 	return pq_gettail(this,rpp) ;
-}
+} /* end method */
 
 int pq::rem(pq_ent **rpp) noex {
 	return pq_rem(this,rpp) ;
-}
+} /* end method */
 
 int pq::remtail(pq_ent **rpp) noex {
 	return pq_remtail(this,rpp) ;
-}
+} /* end method */
 
 int pq::unlink(pq_ent *ep) noex {
 	return pq_unlink(this,ep) ;
-}
+} /* end method */
 
 int pq::curbegin(pq_cur *curp) noex {
 	return pq_curbegin(this,curp) ;
-}
+} /* end method */
 
 int pq::curend(pq_cur *curp) noex {
 	return pq_curend(this,curp) ;
-}
+} /* end method */
 
 int pq::curenum(pq_cur *curp,pq_ent **rpp) noex {
 	return pq_curenum(this,curp,rpp) ;
-}
+} /* end method */
 
 void pq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
