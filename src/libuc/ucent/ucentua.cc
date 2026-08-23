@@ -27,21 +27,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storeitem.h>
-#include	<sbuf.h>
-#include	<vecstr.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<intceil.h>
-#include	<cfdec.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<storeitem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetua.h"		/* |uc_getua{x}(3uc)| */
 #include	"ucentua.h"
@@ -145,8 +145,7 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	    } /* end if (non-zero non-comment) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (ucentua::parse) */
+} /* end subroutine (ucentua::parse) */
 
 int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	int		rs = SR_FAULT ;
@@ -195,8 +194,7 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (userattrent_load) */
+} /* end subroutine (userattrent_load) */
 
 int ucentua::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -239,8 +237,7 @@ int ucentua::format(char *rbuf,int rlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (userattrent_format) */
+} /* end subroutine (userattrent_format) */
 
 int ucentua::size() noex {
 	int		rs = SR_OK ;
@@ -261,20 +258,19 @@ int ucentua::size() noex {
 	    } /* end if */
 	    rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
-}
-/* end subroutine (userattrent_size) */
+} /* end subroutine (userattrent_size) */
 
 int ucentua::getent(char *uabuf,int ualen) noex {
 	return uc_getuaent(this,uabuf,ualen) ;
-}
+} /* end method */
 
 int ucentua::getnam(char *uabuf,int ualen,cchar *uaname) noex {
 	return uc_getuanam(this,uabuf,ualen,uaname) ;
-}
+} /* end method */
 
 int ucentua::getuid(char *uabuf,int ualen,uid_t uid) noex {
 	return uc_getuauid(this,uabuf,ualen,uid) ;
-}
+} /* end method */
 
 
 /* local subroutines */
