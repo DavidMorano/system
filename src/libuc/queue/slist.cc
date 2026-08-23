@@ -330,30 +330,30 @@ slist_co::operator int () noex {
 
 int slist::ins(slist_ent *ep) noex {
 	return slist_ins(this,ep) ;
-}
+} /* end method */
 
 int slist::insgroup(slist_ent *gp,int esz,int n) noex {
 	return slist_insgroup(this,gp,esz,n) ;
-}
+} /* end method */
 
 int slist::present(slist_ent *ep) noex {
 	return slist_present(this,ep) ;
-}
+} /* end method */
 
 int slist::unlink(slist_ent *ep) noex {
 	return slist_unlink(this,ep) ;
-}
+} /* end method */
 
 int slist::rem(slist_ent **epp) noex {
 	return slist_rem(this,epp) ;
-}
+} /* end method */
 
 int slist::gethead(slist_ent **epp) noex {
 	return slist_gethead(this,epp) ;
-}
+} /* end method */
 
 int slist::gettail(slist_ent **epp) noex {
 	return slist_gettail(this,epp) ;
-}
+} /* end method */
 
 
