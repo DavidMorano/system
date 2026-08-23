@@ -152,10 +152,9 @@ local int	sbuf_datex	(sbuf *,tmtime *) noex ;
 
 /* local variables */
 
-constexpr cchar		blinker[] = "\033[5m:\033[0m" ;
-
-cint			nyears = NYEARS_CENTURY ;
-cint			znlen = 8 ;
+cchar		blinker[]	= "\033[5m:\033[0m" ;
+cint		nyears		= NYEARS_CENTURY ;
+cint		znlen		= 8 ;
 
 
 /* exported variables */
@@ -346,8 +345,7 @@ local int sbuf_twodig(sbuf *ssp,int v) noex {
 	dbuf[0] = charconv((v / 10) + '0') ;
 	dbuf[1] = charconv((v % 10) + '0') ;
 	return sbuf_strw(ssp,dbuf,2) ;
-}
-/* end subroutine (sbuf_twodig) */
+} /* end subroutine (sbuf_twodig) */
 
 local int sbuf_digs(sbuf *ssp,int v,int n,int f_space) noex {
 	int		rs = SR_OK ;
