@@ -38,10 +38,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucmem.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"rsfree.h"
 
@@ -87,7 +87,6 @@ int rsfree(int rs,cvoid *cvp) noex {
 	    rs = SR_FAULT ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (rsfree) */
+} /* end subroutine (rsfree) */
 
 
