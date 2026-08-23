@@ -229,7 +229,7 @@ int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
 		sl = lenstr(cp) ;
 	    }
 	    if (scmp == nullptr) scmp = fifoitem_cmp(strcmp) ;
-	    auto entcmp = [&sp,&sl,scmp] (FI_ENT *ep) {
+	    cauto entcmp = [&sp,&sl,scmp] (FI_ENT *ep) {
 		bool f = true ;
 		f = f && (sl == ep->dl) ;
 		f = f && scmp(sp,ep->dp) ;
@@ -256,8 +256,7 @@ int fifoitem_curbegin(fifoitem *op,fifoitem_cur *curp) noex {
 	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (fifoitem_curbegin) */
+} /* end subroutine (fifoitem_curbegin) */
 
 int fifoitem_curend(fifoitem *op,fifoitem_cur *curp) noex {
 	int		rs ;
