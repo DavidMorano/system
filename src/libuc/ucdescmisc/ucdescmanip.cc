@@ -92,19 +92,19 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>		/* <- for |getdtablesize(3c)| */
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucdesc.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® |getdtablesize(3c)| */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucdescmanip.h"
 
@@ -150,8 +150,7 @@ int uc_duper(int fd,int min) noex {
 	    } /* end if (dup) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ufd : rs ;
-}
-/* end subroutine (uc_duper) */
+} /* end subroutine (uc_duper) */
 
 int uc_moveup(int fd,int minfd) noex {
 	int		rs = SR_INVALID ;
@@ -168,8 +167,7 @@ int uc_moveup(int fd,int minfd) noex {
 	    } /* end if (move needed) */
 	} /* end if (valid) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_moveup) */
+} /* end subroutine (uc_moveup) */
 
 
 /* local subroutines */
