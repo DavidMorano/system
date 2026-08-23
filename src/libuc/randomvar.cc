@@ -77,21 +77,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/time.h>		/* |gettimeofday(3c)| */
-#include	<unistd.h>
-#include	<ctime>
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* UNIX® system subroutines */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |libu::cfdec(3u)| */
-#include	<uclibmem.h>
-#include	<ucgetx.h>
-#include	<randlc.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/time.h>		/* POSIX® |gettimeofday(3c)| */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD UNIX® system subroutines */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |libu::cfdec(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC */
+#include	<randlc.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"randomvar.h"
 
@@ -257,8 +257,7 @@ int randomvar_start(randomvar *op,int f_pseudo,uint seed) noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (randomvar_start) */
+} /* end subroutine (randomvar_start) */
 
 int randomvar_finish(randomvar *op) noex {
 	int		rs ;
@@ -271,8 +270,7 @@ int randomvar_finish(randomvar *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (randomvar_finish) */
+} /* end subroutine (randomvar_finish) */
 
 int randomvar_stateload(randomvar *op,cchar *nstate,int sl) noex {
 	int		rs ;
@@ -294,8 +292,7 @@ int randomvar_stateload(randomvar *op,cchar *nstate,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (randomvar_stateload) */
+} /* end subroutine (randomvar_stateload) */
 
 int randomvar_statesave(randomvar *op,char *state,int bl) noex {
 	int		rs ;
@@ -316,8 +313,7 @@ int randomvar_statesave(randomvar *op,char *state,int bl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (randomvar_statesave) */
+} /* end subroutine (randomvar_statesave) */
 
 int randomvar_addnoise(randomvar *op,cvoid *noise,int sl) noex {
 	int		rs ;
@@ -337,8 +333,7 @@ int randomvar_addnoise(randomvar *op,cvoid *noise,int sl) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (randomvar_addnoise) */
+} /* end subroutine (randomvar_addnoise) */
 
 /* set the polynomial to use (second highest degree to next lowest) */
 int randomvar_setpoly(randomvar *op,int a,int b) noex {
@@ -353,8 +348,7 @@ int randomvar_setpoly(randomvar *op,int a,int b) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (randomvar_setpoly) */
+} /* end subroutine (randomvar_setpoly) */
 
 int randomvar_getlong(randomvar *op,long *rp) noex {
 	int		rs ;
@@ -362,8 +356,7 @@ int randomvar_getlong(randomvar *op,long *rp) noex {
 	    if (rp) *rp = long(res >> 1) ;
 	} /* end if (randomvar_getulong) */
 	return rs ;
-}
-/* end subroutine (randomvar_getlong) */
+} /* end subroutine (randomvar_getlong) */
 
 int randomvar_getulong(randomvar *op,ulong *rp) noex {
 	int		rs ;
@@ -379,8 +372,7 @@ int randomvar_getulong(randomvar *op,ulong *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (randomvar_getulong) */
+} /* end subroutine (randomvar_getulong) */
 
 int randomvar_getint(randomvar *op,int *rp) noex {
 	uint		res ;
@@ -389,8 +381,7 @@ int randomvar_getint(randomvar *op,int *rp) noex {
 	    if (rp) *rp = (res >> 1) ;
 	} /* end if (randomvar_getuint) */
 	return rs ;
-}
-/* end subroutine (randomvar_getint) */
+} /* end subroutine (randomvar_getint) */
 
 int randomvar_getuint(randomvar *op,uint *rp) noex {
 	int		rs ;
@@ -408,8 +399,7 @@ int randomvar_getuint(randomvar *op,uint *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (randomvar_getuint) */
+} /* end subroutine (randomvar_getuint) */
 
 int randomvar_get(randomvar *op,void *rbuf,int rlen) noex {
 	int		rs ;
@@ -432,8 +422,7 @@ int randomvar_get(randomvar *op,void *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (randomvar_getuint) */
+} /* end subroutine (randomvar_getuint) */
 
 
 /* private subroutines */
@@ -450,8 +439,7 @@ local int randomvar_initpseudo(randomvar *op,uint seed) noex {
 	    op->state[i] |= lseed ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (randomvar_initpseudo) */
+} /* end subroutine (randomvar_initpseudo) */
 
 local int randomvar_initreal(randomvar *op,uint seed) noex {
 	arrlongs<NLS>	al ;
@@ -473,8 +461,7 @@ local int randomvar_initreal(randomvar *op,uint seed) noex {
 	    } /* emd if (addtime) */
 	} /* end if (mkprocrand) */
 	return rs ;
-}
-/* end subroutine (randomvar_initreal) */
+} /* end subroutine (randomvar_initreal) */
 
 local int randomvar_maint(randomvar *op) noex {
 	int		rs ;
@@ -490,8 +477,7 @@ local int randomvar_maint(randomvar *op) noex {
 	    } /* end if (not-pseudo) */
 	} /* end if (swapone) */
 	return rs ;
-}
-/* end subroutine (randomvar_maint) */
+} /* end subroutine (randomvar_maint) */
 
 local int randomvar_swapone(randomvar *op) noex {
 	const ulong	one = op->state[0] ;
@@ -508,8 +494,7 @@ local int randomvar_swapone(randomvar *op) noex {
 	    op->state[0] = ((one1 << 32) | (one0 << 00)) ;
 	}
 	return rs ;
-}
-/* end subroutine (randomvar_swapone) */
+} /* end subroutine (randomvar_swapone) */
 
 static void addtime(ulong *lp,TIMEVAL *tvp) noex {
 	const ulong	cur = *lp ;
@@ -527,8 +512,7 @@ static void addtime(ulong *lp,TIMEVAL *tvp) noex {
 	    stage = ((ln1 << 32) | ln0) ;
 	    *lp = stage ;
 	}
-}
-/* end subroutine (addtime) */
+} /* end subroutine (addtime) */
 
 local int rdulong(cchar *sp,int sl,ulong *lp) noex {
 	int		r = 0 ;
@@ -545,8 +529,7 @@ local int rdulong(cchar *sp,int sl,ulong *lp) noex {
 	    *lp = 0 ;
 	}
 	return r ;
-}
-/* end subroutine (rdulong) */
+} /* end subroutine (rdulong) */
 
 local int wrulong(char *bp,int bl,ulong ulw) noex {
 	cint		n = digsize ;
@@ -555,8 +538,7 @@ local int wrulong(char *bp,int bl,ulong ulw) noex {
 	    *bp = char(ulw) ; ulw >>= 8 ;
 	} /* end for */
 	return i ;
-}
-/* end subroutine (wrulong) */
+} /* end subroutine (wrulong) */
 
 /* this extracts process-constant randoness (done only once) */
 local int mkprocrand() noex {
@@ -577,8 +559,7 @@ local int mkprocrand() noex {
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mkprocrand) */
+} /* end subroutine (mkprocrand) */
 
 int randomvar_st::operator () (int fpseudo,uint seed) noex {
 	int		rs = SR_BUGCHECK ;
@@ -590,8 +571,7 @@ int randomvar_st::operator () (int fpseudo,uint seed) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (randomvar_st::operator) */
+} /* end method (randomvar_st::operator) */
 
 randomvar_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -603,65 +583,64 @@ randomvar_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (randomvar_co::operator) */
+} /* end method (randomvar_co::operator) */
 
 int randomvar::stateload(cchar *ms,int ml) noex {
     	return randomvar_stateload(this,ms,ml) ;
-}
+} /* end method */
 
 int randomvar::statesave(char *msp,int msl) noex {
     	return randomvar_statesave(this,msp,msl) ;
-}
+} /* end method */
 
 int randomvar::setpoly(int µa,int µb) noex {
     	return randomvar_setpoly(this,µa,µb) ;
-}
+} /* end method */
 
 int randomvar::addnoise(cvoid *nbuf,int nlen) noex {
     	return randomvar_addnoise(this,nbuf,nlen) ;
-}
+} /* end method */
 
 int randomvar::getlong(long *slp) noex {
     	return randomvar_getlong(this,slp) ;
-}
+} /* end method */
 
 int randomvar::getulong(ulong *ulp) noex {
     	return randomvar_getulong(this,ulp) ;
-}
+} /* end method */
 
 int randomvar::getint(int *sip) noex {
     	return randomvar_getint(this,sip) ;
-}
+} /* end method */
 
 int randomvar::getuint(uint *uip) noex {
     	return randomvar_getuint(this,uip) ;
-}
+} /* end method */
 
 int randomvar::get(void *rbuf,int rlen) noex {
     	return randomvar_get(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int randomvar::get(long *slp) noex {
     	return randomvar_getlong(this,slp) ;
-}
+} /* end method */
 
 int randomvar::get(ulong *ulp) noex {
     	return randomvar_getulong(this,ulp) ;
-}
+} /* end method */
 
 int randomvar::get(int *sip) noex {
     	return randomvar_getint(this,sip) ;
-}
+} /* end method */
 
 int randomvar::get(uint *uip) noex {
     	return randomvar_getuint(this,uip) ;
-}
+} /* end method */
 
 void randomvar::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("randomvar",rs,"fini-finish") ;
 	}
-}
+} /* end method */
 
 
