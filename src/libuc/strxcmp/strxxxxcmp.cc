@@ -40,7 +40,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* BSD |strcasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strcmp(3c)| */
@@ -49,8 +48,8 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<stdclib.hh>		/* LIBU */
+#include	<toxc.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
-#include	<char.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<cmporders.h>		/* LIBU */
 
@@ -58,10 +57,6 @@
 
 
 /* local defines */
-
-#define	TOFC(ch)	CHAR_TOFC(ch)
-
-#define	strcasecmp	std_strcasecmp
 
 
 /* imported namespaces */
@@ -75,7 +70,8 @@ typedef cmporders	co ;
 
 extern "C" {
     typedef int (*strcmp_f)(cchar *,cchar *) noex ;
-}
+    typedef int (*toxc_f)(int) noex ;
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -88,6 +84,19 @@ extern "C" {
 
 
 /* forward references */
+
+local int strxxxxcmp(toxc_f tox,cchar *s1,cchar *s2) noex {
+	int		rc = 0 ;
+	if (s1 && s2) ylikely {
+	    while (rc == 0) {
+	        cint ch1 = tox(*s1++) ;
+	        cint ch2 = tox(*s2++) ;
+	        rc = ch1 - ch2 ;
+	        if (!ch1 || !ch2) break ;
+	    } /* end while */
+	} /* end if (non-null) */
+	return rc ;
+} /* end subroutine (strxxxxcmp) */
 
 local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
     	int		rc = 0 ;
@@ -103,7 +112,7 @@ local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
 		    }
 		}
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (strxcmp) */
 
@@ -124,61 +133,60 @@ int strbasecmp(cchar *s1,cchar *s2) noex {
 	return rc ;
 } /* end subroutine (strbasecmp) */
 
-int strfoldcmp(cchar *s1,cchar *s2) noex {
-	int		rc = 0 ;
-	if (s1 && s2) ylikely {
-	    while (rc == 0) {
-	        cint ch1 = TOFC(*s1++) ;
-	        cint ch2 = TOFC(*s2++) ;
-	        rc = ch1 - ch2 ;
-	        if (!ch1 || !ch2) break ;
-	    } /* end while */
-	} /* end if (non-null) */
-	return rc ;
-} /* end subroutine (strfoldcmp) */
+int strcasecmp_latin(cchar *s1,cchar *s2) noex {
+    	return strxxxxcmp(touc,s1,s2) ;
+} /* end subroutine (strfoldcmp_latin) */
 
+int strfoldcmp(cchar *s1,cchar *s2) noex {
+    	return strxxxxcmp(tofc,s1,s2) ;
+} /* end subroutine (strfoldcmp) */
 
 int strbasecmpo(cchar *s1,cchar *s2) noex {
 	return (+ strbasecmp(s1,s2)) ;
-}
+} /* end subroutine */
+
 int strbasecmpr(cchar *s1,cchar *s2) noex {
 	return (- strbasecmp(s1,s2)) ;
-}
+} /* end subroutine */
 
 int strcasecmpo(cchar *s1,cchar *s2) noex {
-	return (+ strcasecmp(s1,s2)) ;
-}
+	return (+ strcasecmp_latin(s1,s2)) ;
+} /* end subroutine */
+
 int strcasecmpr(cchar *s1,cchar *s2) noex {
-	return (- strcasecmp(s1,s2)) ;
-}
+	return (- strcasecmp_latin(s1,s2)) ;
+} /* end subroutine */
 
 int strfoldcmpo(cchar *s1,cchar *s2) noex {
 	return (+ strfoldcmp(s1,s2)) ;
-}
+} /* end subroutine */
+
 int strfoldcmpr(cchar *s1,cchar *s2) noex {
 	return (- strfoldcmp(s1,s2)) ;
-}
-
+} /* end subroutine */
 
 int strxbasecmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strbasecmp,s1,s2,cmporder_obverse) ;
-}
+} /* end subroutine */
+
 int strxbasecmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strbasecmp,s1,s2,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 int strxcasecmpo(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strcasecmp,s1,s2,cmporder_obverse) ;
-}
+    	return strxcmp(strcasecmp_latin,s1,s2,cmporder_obverse) ;
+} /* end subroutine */
+
 int strxcasecmpr(cchar *s1,cchar *s2) noex {
-    	return strxcmp(strcasecmp,s1,s2,cmporder_reverse) ;
-}
+    	return strxcmp(strcasecmp_latin,s1,s2,cmporder_reverse) ;
+} /* end subroutine */
 
 int strxfoldcmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strfoldcmp,s1,s2,cmporder_obverse) ;
-}
+} /* end subroutine */
+
 int strxfoldcmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strfoldcmp,s1,s2,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 
