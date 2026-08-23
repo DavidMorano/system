@@ -48,22 +48,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usysflag.h>
-#include	<ucdescsock.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/uio.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<ucdescsock.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -84,7 +84,7 @@
 
 extern "C" {
     extern int uc_nonblock(int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -127,13 +127,11 @@ int uc_connecte(int fd,const void *vsap,int sal,int to) noex {
 	    rs = u_connect(fd,sap,sal) ;
 	} /* end if (time-out or not) */
 	return rs ;
-}
-/* end subroutine (uc_connecte) */
+} /* end subroutine (uc_connecte) */
 
 int uc_connect(int fd,const void *vsap,int sal) noex {
     	return uc_connecte(fd,vsap,sal,-1) ;
-}
-/* end subroutine (uc_connect) */
+} /* end subroutine (uc_connect) */
 
 
 /* local subroutines */
@@ -188,7 +186,6 @@ local int connwait(int fd,SOCKADDR *sap,int sal,int to) noex {
 	    rs = SR_TIMEDOUT ;
 	}
 	return rs ;
-}
-/* end subroutine (connwait) */
+} /* end subroutine (connwait) */
 
 
