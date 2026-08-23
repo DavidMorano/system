@@ -81,7 +81,7 @@ import libutil ;			/* |lenstr(3u)| */
 extern "C" {
     typedef int (*cfx_f)(cchar *,int,int *) noex ;
     typedef int (*sinonx_f)(cchar *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -305,15 +305,15 @@ int expmgr::handle_x() noex {
 
 int expmgr::handle_u() noex {
     	return SR_NOSYS ;
-}
+} /* end method */
 
 int expmgr::handle_U() noex {
     	return SR_NOSYS ;
-}
+} /* end method */
 
 int expmgr::handle_N() noex {
     	return SR_NOSYS ;
-}
+} /* end method */
 
 int expmgr::storeval(cfx_f cfx,cc *op,int ol) noex {
     	int		rs ;
