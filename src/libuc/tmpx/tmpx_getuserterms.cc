@@ -42,21 +42,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<ctime>			/* |time_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<vecobj.h>
-#include	<pathadd.h>
-#include	<mkpath.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<ctime>			/* CSTD |time_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<mkpath.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"tmpx.h"
 
@@ -141,8 +141,7 @@ int tmpx_getuserterms(tmpx *op,vecstr *lp,cchar *username) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (tmpx_getuserterms) */
+} /* end subroutine (tmpx_getuserterms) */
 
 
 /* local subroutines */
