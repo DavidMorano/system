@@ -73,18 +73,16 @@ int uc_setappend(int fd,int f) noex {
 	        if (f) {
 	            flflags |= O_APPEND ;
 	        } else {
-	            flflags &= (~ O_APPEND) ;
+	            flflags &= (compl O_APPEND) ;
 		}
 	        rs = u_fcntl(fd,F_SETFL,flflags) ;
 	    } /* end if (needed a change) */
 	} /* end if (u_fcntl) */
 	return (rs >= 0) ? pfl : rs ;
-}
-/* end subroutine (uc_setappend) */
+} /* end subroutine (uc_setappend) */
 
 int uc_append(int fd,int f) noex {
 	return uc_setappend(fd,f) ;
-}
-/* end subroutine (uc_append) */
+} /* end subroutine (uc_append) */
 
 
