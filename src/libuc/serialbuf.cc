@@ -526,151 +526,195 @@ int serialbuf_wubuf(serialbuf *op,const uchar *wbuf,int wlen) noex {
 
 int serialbuf::start(char *bp,int bl) noex {
 	return serialbuf_start(this,bp,bl) ;
-}
+} /* end method */
 
 int serialbuf::robj(void *rp,int rl) noex {
 	return serialbuf_robj(this,rp,rl) ;
-}
+} /* end method */
+
 int serialbuf::rc(char *rp) noex {
 	return serialbuf_rc(this,rp) ;
-}
+} /* end method */
+
 int serialbuf::rs(short *rp) noex {
 	return serialbuf_rs(this,rp) ;
-}
+} /* end method */
+
 int serialbuf::ri(int *rp) noex {
 	return serialbuf_ri(this,rp) ;
-}
+} /* end method */
+
 int serialbuf::rl(long *rp) noex {
 	return serialbuf_rl(this,rp) ;
-}
+} /* end method */
+
 int serialbuf::rll(longlong *rp) noex {
 	return serialbuf_rll(this,rp) ;
-}
+} /* end method */
+
 int serialbuf::ria(int *rp,int n) noex {
 	return serialbuf_ria(this,rp,n) ;
-}
+} /* end method */
+
 int serialbuf::rla(long *rp,int n) noex {
 	return serialbuf_rla(this,rp,n) ;
-}
+} /* end method */
+
 int serialbuf::rlla(longlong *rp,int n) noex {
 	return serialbuf_rlla(this,rp,n) ;
-}
+} /* end method */
+
 int serialbuf::rstrn(char *rbuf,int rlen) noex {
 	return serialbuf_rstrn(this,rbuf,rlen) ;
-}
+} /* end method */
+
 int serialbuf::rstrw(char *rbuf,int rlen) noex {
 	return serialbuf_rstrw(this,rbuf,rlen) ;
-}
+} /* end method */
+
 int serialbuf::rbuf(char *rbuf,int rlen) noex {
 	return serialbuf_rbuf(this,rbuf,rlen) ;
-}
+} /* end method */
+
 int serialbuf::ruc(uchar *rp) noex {
 	return serialbuf_ruc(this,rp) ;
-}
+} /* end method */
+
 int serialbuf::rus(ushort *rp) noex {
 	return serialbuf_rus(this,rp) ;
-}
+} /* end method */
+
 int serialbuf::rui(uint *rp) noex {
 	return serialbuf_rui(this,rp) ;
-}
+} /* end method */
+
 int serialbuf::rul(ulong *rp) noex {
 	return serialbuf_rul(this,rp) ;
-}
+} /* end method */
+
 int serialbuf::rull(ulonglong *rp) noex {
 	return serialbuf_rull(this,rp) ;
-}
+} /* end method */
+
 int serialbuf::ruia(uint *rp,int n) noex {
 	return serialbuf_ruia(this,rp,n) ;
-}
+} /* end method */
+
 int serialbuf::rula(ulong *rp,int n) noex {
 	return serialbuf_rula(this,rp,n) ;
-}
+} /* end method */
+
 int serialbuf::rulla(ulonglong *rp,int n) noex {
 	return serialbuf_rulla(this,rp,n) ;
-}
+} /* end method */
+
 int serialbuf::rustrn(uchar *rbuf,int rlen) noex {
 	return serialbuf_rustrn(this,rbuf,rlen) ;
-}
+} /* end method */
+
 int serialbuf::rustrw(uchar *rbuf,int rlen) noex {
 	return serialbuf_rustrw(this,rbuf,rlen) ;
-}
+} /* end method */
+
 int serialbuf::rubuf(uchar *rbuf,int rlen) noex {
 	return serialbuf_rubuf(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int serialbuf::wobj(cvoid *wp,int wl) noex {
 	return serialbuf_wobj(this,wp,wl) ;
-}
+} /* end method */
+
 int serialbuf::wc(char ch) noex {
 	return serialbuf_wc(this,ch) ;
-}
+} /* end method */
+
 int serialbuf::ws(short sw) noex {
 	return serialbuf_ws(this,sw) ;
-}
+} /* end method */
+
 int serialbuf::wi(int iw) noex {
 	return serialbuf_wi(this,iw) ;
-}
+} /* end method */
+
 int serialbuf::wl(long lw) noex {
 	return serialbuf_wl(this,lw) ;
-}
+} /* end method */
+
 int serialbuf::wll(longlong llw) noex {
 	return serialbuf_wll(this,llw) ;
-}
+} /* end method */
+
 int serialbuf::wia(cint *iwa,int n) noex {
 	return serialbuf_wia(this,iwa,n) ;
-}
+} /* end method */
+
 int serialbuf::wla(clong *lwa,int n) noex {
 	return serialbuf_wla(this,lwa,n) ;
-}
+} /* end method */
+
 int serialbuf::wlla(const longlong *llwa,int n) noex {
 	return serialbuf_wlla(this,llwa,n) ;
-}
+} /* end method */
+
 int serialbuf::wstrn(cchar *wbuf,int wlen) noex {
 	return serialbuf_wstrn(this,wbuf,wlen) ;
-}
+} /* end method */
+
 int serialbuf::wstrw(cchar *wbuf,int wlen) noex {
 	return serialbuf_wstrw(this,wbuf,wlen) ;
-}
+} /* end method */
+
 int serialbuf::wbuf(cchar *wbuf,int wlen) noex {
 	return serialbuf_wbuf(this,wbuf,wlen) ;
-}
+} /* end method */
+
 int serialbuf::wuc(uchar uch) noex {
 	return serialbuf_wuc(this,uch) ;
-}
+} /* end method */
+
 int serialbuf::wus(ushort usw) noex {
 	return serialbuf_wus(this,usw) ;
-}
+} /* end method */
+
 int serialbuf::wui(uint uiw) noex {
 	return serialbuf_wui(this,uiw) ;
-}
+} /* end method */
+
 int serialbuf::wul(ulong ulw) noex {
 	return serialbuf_wul(this,ulw) ;
-}
+} /* end method */
+
 int serialbuf::wull(ulonglong ullw) noex {
 	return serialbuf_wull(this,ullw) ;
-}
+} /* end method */
+
 int serialbuf::wuia(const uint *uiwa,int n) noex {
 	return serialbuf_wuia(this,uiwa,n) ;
-}
+} /* end method */
+
 int serialbuf::wula(const ulong *ulwa,int n) noex {
 	return serialbuf_wula(this,ulwa,n) ;
-}
+} /* end method */
+
 int serialbuf::wulla(const ulonglong *ullwa,int n) noex {
 	return serialbuf_wulla(this,ullwa,n) ;
-}
+} /* end method */
+
 int serialbuf::wustrn(const uchar *wbuf,int wlen) noex {
 	return serialbuf_wustrn(this,wbuf,wlen) ;
-}
+} /* end method */
+
 int serialbuf::wustrw(const uchar *wbuf,int wlen) noex {
 	return serialbuf_wustrw(this,wbuf,wlen) ;
-}
+} /* end method */
+
 int serialbuf::wubuf(const uchar *wbuf,int wlen) noex {
 	return serialbuf_wubuf(this,wbuf,wlen) ;
-}
+} /* end method */
 
 int serialbuf::adv(int sz) noex {
 	return serialbuf_adv(this,sz) ;
-}
+} /* end method */
 
 void serialbuf::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
@@ -692,7 +736,7 @@ serialbuf_co::operator int () noex {
 	        rs = serialbuf_finish(op) ;
 	        break ;
 	    } /* end switch */
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end method (serialbuf_co::operator) */
 
