@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucsys.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucsys.h>		/* LIBUC */
 #include	<spwd.h>		/* <- the money shot! */
 
 
