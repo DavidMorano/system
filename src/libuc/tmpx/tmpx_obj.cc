@@ -29,12 +29,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"tmpx.h"
 
@@ -70,45 +70,45 @@
 
 int tmpx::read(int ei,tmpx_ent *ep) noex {
 	return tmpx_read(this,ei,ep) ;
-}
+} /* end method */
 
 int tmpx::write(int ei,tmpx_ent *ep) noex {
 	return tmpx_write(this,ei,ep) ;
-}
+} /* end method */
 
 int tmpx::check(time_t dt) noex {
 	return tmpx_check(this,dt) ;
-}
+} /* end method */
 
 int tmpx::curbegin(tmpx_cur *curp) noex {
 	return tmpx_curbegin(this,curp) ;
-}
+} /* end method */
 
 int tmpx::curend(tmpx_cur *curp) noex {
 	return tmpx_curend(this,curp) ;
-}
+} /* end method */
 
 int tmpx::curenum(tmpx_cur *curp,tmpx_ent *ep) noex {
 	return tmpx_curenum(this,curp,ep) ;
-}
+} /* end method */
 
 int tmpx::fetchpid(tmpx_ent *ep,pid_t pid) noex {
 	return tmpx_fetchpid(this,ep,pid) ;
-}
+} /* end method */
 
 int tmpx::fetchuser(tmpx_cur *curp,tmpx_ent *ep,cchar *un) noex {
 	return tmpx_fetchuser(this,curp,ep,un) ;
-}
+} /* end method */
 
 void tmpx::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("tmpx",rs,"fini-close") ;
 	}
-}
+} /* end method */
 
 int tmpx_op::operator () (cchar *fn,int of) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case tmpxmem_open:
 		rs = tmpx_open(op,fn,of) ;
@@ -116,12 +116,11 @@ int tmpx_op::operator () (cchar *fn,int of) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (tmpx_op::operator) */
+} /* end method (tmpx_op::operator) */
 
 tmpx_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case tmpxmem_getrunlevel:
 	        rs = tmpx_getrunlevel(op) ;
@@ -135,7 +134,6 @@ tmpx_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (tmpx_co::operator) */
+} /* end method (tmpx_co::operator) */
 
 
