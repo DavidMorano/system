@@ -219,27 +219,27 @@ int setstr_curenum(setstr *op,setstr_cur *curp,cchar **rpp) noex {
 
 int setstr::already(cchar *sp,int sl) noex {
 	return setstr_already(this,sp,sl) ;
-}
+} /* end method */
 
 int setstr::add(cchar *sp,int sl) noex {
 	return setstr_add(this,sp,sl) ;
-}
+} /* end method */
 
 int setstr::del(cchar *sp,int sl) noex {
 	return setstr_del(this,sp,sl) ;
-}
+} /* end method */
 
 int setstr::curbegin(setstr_cur *curp) noex {
 	return setstr_curbegin(this,curp) ;
-}
+} /* end method */
 
 int setstr::curend(setstr_cur *curp) noex {
 	return setstr_curend(this,curp) ;
-}
+} /* end method */
 
 int setstr::curenum(setstr_cur *curp,cchar **rpp) noex {
 	return setstr_curenum(this,curp,rpp) ;
-}
+} /* end method */
 
 void setstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
