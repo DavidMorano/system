@@ -82,7 +82,7 @@ local int intiq_ctor(intiq *op,Args ... args) noex {
 	    if (rs < 0) {
 		delete op->mxp ;
 		op->mxp = nullptr ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (intiq_ctor) */
@@ -131,11 +131,11 @@ int intiq_start(intiq *op) noex {
 		}
 	        if (rs < 0) {
 		    mxp->destroy() ;
-		}
-	    }
+		} /* end if (error) */
+	    } /* end if */
 	    if (rs < 0) {
 		intiq_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (intiq_ctor) */
 	return rs ;
 } /* end subroutine (intiq_start) */
@@ -220,11 +220,11 @@ int intiq_count(intiq *op) noex {
 
 int intiq::ins(int ch) noex {
 	return intiq_ins(this,ch) ;
-}
+} /* end method */
 
 int intiq::rem(int *rp) noex {
 	return intiq_rem(this,rp) ;
-}
+} /* end method */
 
 void intiq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
