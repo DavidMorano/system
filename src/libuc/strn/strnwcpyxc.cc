@@ -92,7 +92,7 @@ import libutil ;			/* |memclear(3u)| */
 
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -130,19 +130,19 @@ local char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
 
 char *strnwcpybc(char *dp,int dl,cchar *sp,int sl) noex {
     	return strnwcpyxc(tobc,dp,dl,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strnwcpylc(char *dp,int dl,cchar *sp,int sl) noex {
     	return strnwcpyxc(tolc,dp,dl,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strnwcpyuc(char *dp,int dl,cchar *sp,int sl) noex {
     	return strnwcpyxc(touc,dp,dl,sp,sl) ;
-}
+} /* end subroutine */
 
 char *strnwcpyfc(char *dp,int dl,cchar *sp,int sl) noex {
     	return strnwcpyxc(tofc,dp,dl,sp,sl) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
