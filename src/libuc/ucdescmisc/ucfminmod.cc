@@ -16,18 +16,18 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<sys/uio.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/uio.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucfminmod.h"
 
@@ -75,7 +75,6 @@ int uc_fminmod(int fd,mode_t mm) noex {
 	    } /* end if (successful stat) */
 	} /* end if (valid) */
 	return (rs >= 0) ? fchanged : rs ;
-}
-/* end subroutine (uc_fminmod) */
+} /* end subroutine (uc_fminmod) */
 
 
