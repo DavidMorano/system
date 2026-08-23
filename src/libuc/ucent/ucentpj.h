@@ -20,10 +20,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usys.h>		/* |projid_t(3u)| */
-#include	<ucsyspj.h>		/* <- the money shot! */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usys.h>		/* LIBU |projid_t(3u)| */
+#include	<ucsyspj.h>		/* LIBUC <- the money shot! */
 
 
 #ifdef	__cplusplus
