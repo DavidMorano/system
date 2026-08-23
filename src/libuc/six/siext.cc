@@ -67,7 +67,7 @@ import chrset ;
 extern "C++" {
     int		siobrk(cchar *,int,con chrset *) noex ;
     int		sirbrk(cchar *,int,con chrset *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
