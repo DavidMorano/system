@@ -106,7 +106,7 @@ using libu::strnbrk ;			/* subroutine */
 
 namespace libu {
     extern "C++" char * strnwhtbrk(cchar *,int,con chrset *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
