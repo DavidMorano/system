@@ -70,8 +70,6 @@
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -90,14 +88,15 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 local inline int csem_ctor(csem *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
 	    op->cnt = 0 ;
 	    op->nwaiting = 0 ;
-	    if ((op->mxp = new(nothrow) ptm) != np) ylikely {
-	        if ((op->cvp = new(nothrow) ptc) != np) ylikely {
+	    if ((op->mxp = new(nt) ptm) != np) ylikely {
+	        if ((op->cvp = new(nt) ptc) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-ptc) */
 	 	if (rs < 0) {
@@ -354,11 +353,11 @@ local int csem_ptcinit(csem *op,int f_shared) noex {
 
 int csem::create(int fshared,int sc) noex {
     	return csem_create(this,fshared,sc) ;
-}
+} /* end method */
 
 int csem::decr(int c,int to) noex {
     	return csem_decr(this,c,to) ;
-}
+} /* end method */
 
 void csem::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
