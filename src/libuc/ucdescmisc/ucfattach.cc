@@ -66,7 +66,7 @@ int uc_fattach(int fd,cchar *fname) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
 	        if ((rs = fattach(fd,fname)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
