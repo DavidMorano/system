@@ -137,15 +137,12 @@ extern "C" {
     extern int uc_stat(cchar *,ustat *) noex ;
     extern int uc_fork() noex ;
     extern int uc_exit(int) noex ;
-}
-
-extern "C" {
-}
+} /* end extern (C) */
 
 extern "C" {
     extern int	sigdefaults(cint *) noex ;
     extern int	dupup(int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -167,7 +164,7 @@ enum cmds {
 	cmd_fddupover,
 	cmd_fdcreate,
 	cmd_overlast
-} ;
+} ; /* end enum */
 
 struct spawner_cmd {
 	uid_t		euid ;
@@ -176,7 +173,7 @@ struct spawner_cmd {
 	int		pfdend ;
 	int		pfd ;		/* "parent" FD */
 	int		cfd ;		/* "child" FD */
-} ;
+} ; /* end struct */
 
 typedef SCMD		scmd ;
 typedef SCMD *		scmdp ;
@@ -348,8 +345,7 @@ int spawner_start(spawner *op,cchar *fn,mainv av,mainv ev) noex {
 	if ((rs = spawner_ctor(op,fn)) >= 0) ylikely {
 	    rs = SR_INVAL ;
 	    if (fn[0]) {
-		static cint	rsv = var.mkvars() ;
-		if ((rs = rsv) >= 0) ylikely {
+		if (static cint	rsv = var.mkvars() ; (rs = rsv) >= 0) ylikely {
 		    op->argv = av ;
 		    op->pid = -1 ;
 		    if (starter so(op,fn,av,ev) ; (rs = so) >= 0) ylikely {
