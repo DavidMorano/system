@@ -68,6 +68,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
@@ -90,10 +91,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_ttyname(int,char *,int) noex ;
-}
 
 
 /* external variables */
