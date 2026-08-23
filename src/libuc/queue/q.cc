@@ -267,19 +267,19 @@ int q_count(q *op) noex {
 
 int q::ins(q_ent *ep) noex {
 	return q_ins(this,ep) ;
-}
+} /* end method */
 
 int q::inshead(q_ent *ep) noex {
 	return q_inshead(this,ep) ;
-}
+} /* end method */
 
 int q::rem(q_ent **rpp) noex {
 	return q_rem(this,rpp) ;
-}
+} /* end method */
 
 int q::remtail(q_ent **rpp) noex {
 	return q_remtail(this,rpp) ;
-}
+} /* end method */
 
 void q::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
