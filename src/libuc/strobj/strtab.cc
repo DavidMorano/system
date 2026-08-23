@@ -150,7 +150,7 @@ using std::nothrow ;			/* constant */
 extern "C" {
     typedef int (*vhg_f)(vechand *,int,void **) noex ;
     typedef int (*vog_f)(vecobj *,int,void **) noex ;
-}
+} /* end extern (C) */
 
 typedef strtab_ch *	chunkp ;
 
