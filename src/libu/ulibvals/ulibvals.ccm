@@ -66,6 +66,8 @@ export {
 	static const int	maxpathlen ;	/* file-system */
 	static const int	maxmsglen ;	/* Maximum-Message-Length */
 	static const int	maxsysuid ;	/* maximum-system-UID */
+	static const int	maxtzname ;	/* maximum tz-name */
+	static const int	maxtzabbr ;	/* maximum tz-abbr */
 	static const int	nodenamelen ;	/* name system node */
 	static const int	usernamelen ;	/* name system user */
 	static const int	groupnamelen ;	/* name system group */
