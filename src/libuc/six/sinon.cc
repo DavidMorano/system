@@ -60,7 +60,7 @@
 
 extern "C" {
     typedef bool (*isnon_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -99,18 +99,18 @@ local int sinon(isnon_f isx,cchar *sp,int sl) noex {
 
 int sinonoct(cchar *sp,int sl) noex {
     	return sinon(isoctlatin,sp,sl) ;
-}
+} /* end subroutine */
 
 int sinondec(cchar *sp,int sl) noex {
     	return sinon(isdeclatin,sp,sl) ;
-}
+} /* end subroutine */
 
 int sinonhex(cchar *sp,int sl) noex {
     	return sinon(ishexlatin,sp,sl) ;
-}
+} /* end subroutine */
 
 int sinonwht(cchar *sp,int sl) noex {
     	return sinon(iswhtlatin,sp,sl) ;
-}
+} /* end subroutine */
 
 
