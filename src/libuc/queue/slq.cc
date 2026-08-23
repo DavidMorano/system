@@ -190,8 +190,7 @@ int slq_audit(slq *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (slq_audit) */
+} /* end subroutine (slq_audit) */
 
 
 /* local subroutines */
@@ -222,22 +221,22 @@ slq_co::operator int () noex {
 
 int slq::ins(slq_ent *ep) noex {
 	return slq_ins(this,ep) ;
-}
+} /* end method */
 
 int slq::insgroup(slq_ent *gp,int esz,int n) noex {
 	return slq_insgroup(this,gp,esz,n) ;
-}
+} /* end method */
 
 int slq::rem(slq_ent **epp) noex {
 	return slq_rem(this,epp) ;
-}
+} /* end method */
 
 int slq::gethead(slq_ent **epp) noex {
 	return slq_gethead(this,epp) ;
-}
+} /* end method */
 
 int slq::gettail(slq_ent **epp) noex {
 	return slq_gettail(this,epp) ;
-}
+} /* end method */
 
 
