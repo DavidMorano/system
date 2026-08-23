@@ -56,16 +56,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<aio.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<aio.h>			/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -103,7 +103,7 @@ namespace {
 	int suspend(AIOCB *) noex ;
 	int operator () (AIOCB *) noex ;
     } ; /* end struct (ucaio) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -115,25 +115,25 @@ int uc_aioread(AIOCB *aiocbp) noex {
 	ucaio		ao ;
 	ao.m = &ucaio::read ;
 	return ao(aiocbp) ;
-}
+} /* end subroutine */
 
 int uc_aiowrite(AIOCB *aiocbp) noex {
 	ucaio		ao ;
 	ao.m = &ucaio::write ;
 	return ao(aiocbp) ;
-}
+} /* end subroutine */
 
 int uc_aiocancel(AIOCB *aiocbp,int fd) noex {
 	ucaio		ao(fd) ;
 	ao.m = &ucaio::cancel ;
 	return ao(aiocbp) ;
-}
+} /* end subroutine */
 
 int uc_aiofsync(AIOCB *aiocbp,int cmd) noex {
 	ucaio		ao(cmd) ;
 	ao.m = &ucaio::fsync ;
 	return ao(aiocbp) ;
-}
+} /* end subroutine */
 
 int uc_aioreturn(AIOCB *aiocbp) noex {
 	int	rs SR_FAULT ;
@@ -142,32 +142,30 @@ int uc_aioreturn(AIOCB *aiocbp) noex {
 	    errno = 0 ;
 	    rs = SR_OK ;
 	    if ((ec = aio_error(aiocbp)) == -1) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	    if (rs >= 0) {
 	        if (ec == 0) {
 	            ssize_t	size = aio_return(aiocbp) ;
-		    rs = (size == -1) ? (- errno) : int(size) ;
+		    rs = (size == -1) ? (neg errno) : int(size) ;
 	        } else {
 		    rs = (- ec) ;
 	        }
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_aioreturn) */
+} /* end subroutine (uc_aioreturn) */
 
 int uc_aiolist(int mode,AIOCB *const *aiocbpp,int n,SIGEVENT *sep) noex {
 	int		rs = SR_FAULT ;
 	if (aiocbpp) {
 	    errno = 0 ;
 	    if ((rs = lio_listio(mode,aiocbpp,n,sep)) == -1) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_aiolist) */
+} /* end subroutine (uc_aiolist) */
 
 int uc_aiosuspend(const AIOCB *const *aiocbpp,int n,CTIMESPEC *tsp) noex {
 	AIOCB		*aiocbp = (AIOCB *) aiocbpp ;
@@ -178,8 +176,7 @@ int uc_aiosuspend(const AIOCB *const *aiocbpp,int n,CTIMESPEC *tsp) noex {
 	    rs = ao(aiocbp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_aiosuspend) */
+} /* end subroutine (uc_aiosuspend) */
 
 
 /* local subroutines */
@@ -218,58 +215,52 @@ int ucaio::operator () (AIOCB *aiocbp) noex {
 	    } until ((rs >= 0) || f_exit) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucaio::operator) */
+} /* end subroutine (ucaio::operator) */
 
 int ucaio::read(AIOCB *aiocbp) noex {
 	int		rs ;
 	errno = 0 ;
 	if ((rs = aio_read(aiocbp)) == -1) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaio::read) */
+} /* end method (ucaio::read) */
 
 int ucaio::write(AIOCB *aiocbp) noex {
 	int		rs ;
 	errno = 0 ;
 	if ((rs = aio_write(aiocbp)) == -1) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaio::write) */
+} /* end method (ucaio::write) */
 
 int ucaio::cancel(AIOCB *aiocbp) noex {
 	int		rs ;
 	errno = 0 ;
 	if ((rs = aio_cancel(fd,aiocbp)) == -1) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaio::cancel) */
+} /* end method (ucaio::cancel) */
 
 int ucaio::fsync(AIOCB *aiocbp) noex {
 	int		rs ;
 	errno = 0 ;
 	if ((rs = aio_fsync(fd,aiocbp)) == -1) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (ucaio::fsync) */
+} /* end method (ucaio::fsync) */
 
 int ucaio::suspend(AIOCB *aiocbp) noex {
 	const AIOCB *const *aiocbpp = (AIOCB *const *) aiocbp ;
 	int		rs ;
 	errno = 0 ;
 	if ((rs = aio_suspend(aiocbpp,ne,tsp)) == -1) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (ucaio::suspend) */
+} /* end subroutine (ucaio::suspend) */
 
 
