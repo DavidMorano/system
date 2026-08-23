@@ -390,8 +390,8 @@ int storebuf_hexull(char *rbuf,int rlen,int i,ulonglong uv) noex {
 
 int storebuf::chrs(int ch,int n) noex {
     int		rs ;
-    if ((rs = idx) >= 0) {
-	if ((rs = storebuf_chrs(bufp,bufl,idx,ch,n)) >= 0) {
+    if ((rs = idx) >= 0) ylikely {
+	if ((rs = storebuf_chrs(bufp,bufl,idx,ch,n)) >= 0) ylikely {
             idx += rs ;
 	} else {
 	    idx = rs ;
@@ -402,8 +402,8 @@ int storebuf::chrs(int ch,int n) noex {
 
 int storebuf::chr(int ch) noex {
     int		rs ;
-    if ((rs = idx) >= 0) {
-        if ((rs = storebuf_chr(bufp,bufl,idx,ch)) >= 0) {
+    if ((rs = idx) >= 0) ylikely {
+        if ((rs = storebuf_chr(bufp,bufl,idx,ch)) >= 0) ylikely {
             idx += rs ;
 	} else {
 	    idx = rs ;
@@ -414,8 +414,8 @@ int storebuf::chr(int ch) noex {
 
 int storebuf::strw(cchar *sp,int sl) noex {
     int		rs ;
-    if ((rs = idx) >= 0) {
-        if ((rs = storebuf_strw(bufp,bufl,idx,sp,sl)) >= 0) {
+    if ((rs = idx) >= 0) ylikely {
+        if ((rs = storebuf_strw(bufp,bufl,idx,sp,sl)) >= 0) ylikely {
             idx += rs ;
 	} else {
 	    idx = rs ;
@@ -426,8 +426,8 @@ int storebuf::strw(cchar *sp,int sl) noex {
 
 int storebuf::str(cchar *sp) noex {
     int		rs ;
-    if ((rs = idx) >= 0) {
-        if ((rs = storebuf_str(bufp,bufl,idx,sp)) >= 0) {
+    if ((rs = idx) >= 0) ylikely {
+        if ((rs = storebuf_str(bufp,bufl,idx,sp)) >= 0) ylikely {
             idx += rs ;
 	} else {
 	    idx = rs ;
@@ -438,8 +438,8 @@ int storebuf::str(cchar *sp) noex {
 
 int storebuf::buf(cchar *sp,int sl) noex {
     int		rs ;
-    if ((rs = idx) >= 0) {
-        if ((rs = storebuf_buf(bufp,bufl,idx,sp,sl)) >= 0) {
+    if ((rs = idx) >= 0) ylikely {
+        if ((rs = storebuf_buf(bufp,bufl,idx,sp,sl)) >= 0) ylikely {
             idx += rs ;
 	} else {
 	    idx = rs ;
@@ -450,8 +450,8 @@ int storebuf::buf(cchar *sp,int sl) noex {
 
 int storebuf::blanks(int n) noex {
     int		rs ;
-    if ((rs = idx) >= 0) {
-        if ((rs = storebuf_blanks(bufp,bufl,idx,n)) >= 0) {
+    if ((rs = idx) >= 0) ylikely {
+        if ((rs = storebuf_blanks(bufp,bufl,idx,n)) >= 0) ylikely {
             idx += rs ;
 	} else {
 	    idx = rs ;
@@ -463,14 +463,14 @@ int storebuf::blanks(int n) noex {
 storebuf &storebuf::operator << (cchar *sp) noex {
 	strw(sp) ;
 	return *this ;
-}
+} /* end method */
 
 storebuf &storebuf::operator << (char ch) noex {
 	chr(ch) ;
 	return *this ;
-}
+} /* end method */
 
-template<typename T> local inline storebuf &opval(storebuf *op,T v) noex {
+template<typename T> local storebuf &opval(storebuf *op,T v) noex {
 	op->dec(v) ;
 	return *op ;
 } /* end subroutine-template (opval) */
@@ -478,18 +478,18 @@ template<typename T> local inline storebuf &opval(storebuf *op,T v) noex {
 storebuf &storebuf::operator << (short		sv) noex {
     	cint v = int(sv) ;
 	return opval(this,v) ;
-}
+} /* end method */
 
 storebuf &storebuf::operator << (int		v) noex {
 	return opval(this,v) ;
-}
+} /* end method */
 
 storebuf &storebuf::operator << (long		v) noex {
 	return opval(this,v) ;
-}
+} /* end method */
 
 storebuf &storebuf::operator << (longlong	v) noex {
 	return opval(this,v) ;
-}
+} /* end method */
 
 
