@@ -16,15 +16,15 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucnonblock.h"
 
@@ -58,13 +58,12 @@ int uc_nonblock(int fd,int f) noex {
 	        if (f) {
 	            fl |= O_NONBLOCK ;
 	        } else {
-	            fl &= (~ O_NONBLOCK) ;
+	            fl &= (compl O_NONBLOCK) ;
 		}
 	        rs = u_fcntl(fd,F_SETFL,fl) ;
 	    } /* end if (needed a change) */
 	} /* end if (u_fcntl) */
 	return (rs >= 0) ? fprev : rs ;
-}
-/* end subroutine (uc_nonblock) */
+} /* end subroutine (uc_nonblock) */
 
 
