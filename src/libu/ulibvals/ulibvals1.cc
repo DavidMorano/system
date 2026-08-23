@@ -42,7 +42,7 @@ module ;
 #include	<bit>			/* C++STD |endian(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<usysdefs.h>		/* LIBU |MAXBASE| */
+#include	<usysdefs.h>		/* LIBU |DIGBASE_MAX| */
 #include	<ulogerror.h>		/* LIBU */
 #include	<usysflag.h>		/* LIBU */
 #include	<sysconfcmds.h>		/* LIBU |_SC_{xx}| */
@@ -56,8 +56,8 @@ import usysconf ;			/* |usysconfval(3u)| */
 
 using std::endian ;
 
-#ifndef	MAXSYSUID
-#define	MAXSYSUID	(500 - 1)
+#ifndef	SYSUID_MAX
+#define	SYSUID_MAX	(500 - 1)	/* from Apple-Darwin? */
 #endif
 
 static int	rscum ;
@@ -86,35 +86,36 @@ int getval(int cmd) noex {
 	return rs ;
 } /* end subroutine (getval) */
 
-const int	ulibvals::endianval	= mkendian() ;
-const int	ulibvals::pagesz	= getval(_SC_PAGESIZE) ;
-const int	ulibvals::clktck	= getval(_SC_CLK_TCK) ;
-const int	ulibvals::maxbase	= MAXBASE ; /* the standard value */
-const int	ulibvals::maxpid	= getval(_SC_PID_MAX) ;
-const int	ulibvals::maxarg	= getval(_SC_ARG_MAX) ;
-const int	ulibvals::maxline	= getval(_SC_LINE_MAX) ;
-const int	ulibvals::maxlink	= getval(_SC_LINK_MAX) ;
-const int	ulibvals::maxlogin	= getval(_SC_LOGIN_NAME_MAX) ;
-const int	ulibvals::maxsymloop	= getval(_SC_SYMLOOP_MAX) ;
-const int	ulibvals::maxsymbol	= getval(_SC_SYMBOL_MAX) ;
-const int	ulibvals::maxgroups	= getval(_SC_NGROUPS_MAX) ;
-const int	ulibvals::maxnamelen	= getval(_SC_NAME_MAX) ;
-const int	ulibvals::maxpathlen	= getval(_SC_PATH_MAX) ;
-const int	ulibvals::maxmsglen	= getval(_SC_MSG_MAX) ;
-const int	ulibvals::maxsysuid	= MAXSYSUID ;
-const int	ulibvals::nodenamelen	= getval(_SC_NODENAME_MAX) ;
-const int	ulibvals::usernamelen	= getval(_SC_USERNAME_MAX) ;
-const int	ulibvals::groupnamelen	= getval(_SC_GROUPNAME_MAX) ;
-const int	ulibvals::projnamelen	= 
-				getval(_SC_PROJECTNAME_MAX) ;
-const int	ulibvals::protnamelen	= getval(_SC_PROTNAME_MAX) ;
-const int	ulibvals::hostnamelen	= getval(_SC_HOSTNAME_MAX) ;
-const int	ulibvals::servnamelen	= getval(_SC_SERVNAME_MAX) ;
-const int	ulibvals::binbuflen	= BINBUFLEN ;	/* for |int256_t| */
-const int	ulibvals::octbuflen	= OCTBUFLEN ;	/* for |int256_t| */
-const int	ulibvals::decbuflen	= DECBUFLEN ;	/* for |int256_t| */
-const int	ulibvals::hexbuflen	= HEXBUFLEN ;	/* for |int256_t| */
-const int	ulibvals::digbuflen	= DIGBUFLEN ;	/* for |int256_t| */
+const int ulibvals::endianval		= mkendian() ;
+const int ulibvals::pagesz		= getval(_SC_PAGESIZE) ;
+const int ulibvals::clktck		= getval(_SC_CLK_TCK) ;
+const int ulibvals::maxbase		= DIGBASE_MAX ;
+const int ulibvals::maxpid		= getval(_SC_PID_MAX) ;
+const int ulibvals::maxarg		= getval(_SC_ARG_MAX) ;
+const int ulibvals::maxline		= getval(_SC_LINE_MAX) ;
+const int ulibvals::maxlink		= getval(_SC_LINK_MAX) ;
+const int ulibvals::maxlogin		= getval(_SC_LOGIN_NAME_MAX) ;
+const int ulibvals::maxsymloop		= getval(_SC_SYMLOOP_MAX) ;
+const int ulibvals::maxsymbol		= getval(_SC_SYMBOL_MAX) ;
+const int ulibvals::maxgroups		= getval(_SC_NGROUPS_MAX) ;
+const int ulibvals::maxnamelen		= getval(_SC_NAME_MAX) ;
+const int ulibvals::maxpathlen		= getval(_SC_PATH_MAX) ;
+const int ulibvals::maxmsglen		= getval(_SC_MSG_MAX) ;
+const int ulibvals::maxsysuid		= SYSUID_MAX ;
+const int ulibvals::maxtzname		= getval(_SC_TZNAME_MAX) ;
+const int ulibvals::maxtzabbr		= TZABBR_MAX ;
+const int ulibvals::nodenamelen		= getval(_SC_NODENAME_MAX) ;
+const int ulibvals::usernamelen		= getval(_SC_USERNAME_MAX) ;
+const int ulibvals::groupnamelen	= getval(_SC_GROUPNAME_MAX) ;
+const int ulibvals::projnamelen		= getval(_SC_PROJECTNAME_MAX) ;
+const int ulibvals::protnamelen		= getval(_SC_PROTNAME_MAX) ;
+const int ulibvals::hostnamelen		= getval(_SC_HOSTNAME_MAX) ;
+const int ulibvals::servnamelen		= getval(_SC_SERVNAME_MAX) ;
+const int ulibvals::binbuflen		= BINBUFLEN ;	/* for |int256_t| */
+const int ulibvals::octbuflen		= OCTBUFLEN ;	/* for |int256_t| */
+const int ulibvals::decbuflen		= DECBUFLEN ;	/* for |int256_t| */
+const int ulibvals::hexbuflen		= HEXBUFLEN ;	/* for |int256_t| */
+const int ulibvals::digbuflen		= DIGBUFLEN ;	/* for |int256_t| */
 
 ulibvals::operator int () noex {
 	return rscum ;
