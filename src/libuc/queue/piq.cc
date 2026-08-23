@@ -124,13 +124,14 @@ int piq_start(piq *op) noex {
 	    if ((rs = mxp->create) >= 0) ylikely {
 	        if ((rs = pq_start(op->qlp)) >= 0) ylikely {
 		    op->magval = PIQ_MAGIC ;
-	        }
-	        if (rs < 0)
+	        } /* end if */
+	        if (rs < 0) {
 		    mxp->destroy() ;
-	    }
+		} /* end if (error) */
+	    } /* end if */
 	    if (rs < 0) {
 		piq_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (piq_ctor) */
 	return rs ;
 } /* end subroutine (piq_start) */
@@ -233,11 +234,11 @@ int piq_audit(piq *op) noex {
 
 int piq::ins(void *ep) noex {
 	return piq_ins(this,ep) ;
-}
+} /* end method */
 
 int piq::rem(void *rpp) noex {
 	return piq_rem(this,rpp) ;
-}
+} /* end method */
 
 void piq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
