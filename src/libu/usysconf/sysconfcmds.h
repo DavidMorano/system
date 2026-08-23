@@ -50,10 +50,11 @@ enum sysconfcmds {
     sysconfcmd_maxsymloop,	/* file-system symbolic (soft) links */
     sysconfcmd_maxsymbol,
     sysconfcmd_maxnodename,	/* UNIX® system nodename length */
-    sysconfcmd_maxtzname,
-    sysconfcmd_maxzoneinfo,
     sysconfcmd_maxname,		/* file-system max-name length */
     sysconfcmd_maxpath,		/* file-system max-path length */
+    sysconfcmd_maxtzname,	/* time-zone name */
+    sysconfcmd_maxtzabbr,	/* time-zone abbreviation */
+    sysconfcmd_maxzoneinfo,	/* zone-info *something* */
     sysconfcmd_maxusername,	/* mame system-account user-name length */
     sysconfcmd_maxgroupname,	/* name system-account group-name length */
     sysconfcmd_maxprojectname,	/* name system-account project-name length */
@@ -105,15 +106,24 @@ enum sysconfcmds {
 #ifndef	_SC_SYMBOL_MAX
 #define	_SC_SYMBOL_MAX		sysconfcmd_maxsymbol
 #endif
+#ifndef	_SC_NODENAME_MAX
+#define	_SC_NODENAME_MAX	sysconfcmd_maxnodename
+#endif /* _SC_NODENAME_MAX */
 #ifndef	_SC_NAME_MAX
 #define	_SC_NAME_MAX		sysconfcmd_maxname
 #endif
 #ifndef	_SC_PATH_MAX
 #define	_SC_PATH_MAX		sysconfcmd_maxpath
 #endif
-#ifndef	_SC_NODENAME_MAX
-#define	_SC_NODENAME_MAX	sysconfcmd_maxnodename
-#endif /* _SC_NODENAME_MAX */
+#ifndef	_SC_TZNAME_MAX
+#define	_SC_TZNAME_MAX		sysconfcmd_maxtzname
+#endif
+#ifndef	_SC_TZABBR_MAX
+#define	_SC_TZABBR_MAX		sysconfcmd_maxtzabbr
+#endif
+#ifndef	_SC_ZONEINFO_MAX
+#define	_SC_ZONEINFO_MAX	sysconfcmd_maxzoneinfo
+#endif
 #ifndef	_SC_USERNAME_MAX
 #define	_SC_USERNAME_MAX	sysconfcmd_maxusername
 #endif
@@ -180,12 +190,6 @@ enum sysconfcmds {
 #endif
 #ifndef	_SC_FSTYPE
 #define	_SC_FSTYPE		sysconfcmd_fstype
-#endif
-#ifndef	_SC_TZNAME_MAX
-#define	_SC_TZNAME_MAX		sysconfcmd_maxtzname
-#endif
-#ifndef	_SC_ZONEINFO_MAX
-#define	_SC_ZONEINFO_MAX	sysconfcmd_maxzoneinfo
 #endif
 #ifndef	_SC_MSG_MAX
 #define	_SC_MSG_MAX		sysconfcmd_maxmsg
