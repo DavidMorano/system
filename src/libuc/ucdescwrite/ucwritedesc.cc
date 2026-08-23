@@ -60,11 +60,11 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<ucsysmisc.h>
-#include	<uclibmem.h>
-#include	<ucdescread.h>
-#include	<bufsizeget.h>
-#include	<filetypes.h>		/* |filetype(3u)| */
+#include	<ucsysmisc.h>		/* LIBUC */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdescread.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<filetypes.h>		/* LIBU |filetype(3u)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"ucdescbase.hh"
@@ -90,7 +90,7 @@ extern "C" {
     extern int uc_fstat(int,ustat *) noex ;
     extern int uc_tell(int,off_t *) noex ;
     extern int uc_write(int,cvoid *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
