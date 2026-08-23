@@ -52,10 +52,10 @@ export extern "C" {
     int	siwht(cchar *,int) noex ;
     int	siwhtchr(cchar *,int,int) noex ;
     int	siwhtbrk(cchar *,int,cchar *) noex ;
-}
+} /* end extern (C) */
 
 export extern "C++" {
     int	siwhtbrk(cchar *,int,con chrset *) noex ;
-}
+} /* end extern (C) */
 
 
