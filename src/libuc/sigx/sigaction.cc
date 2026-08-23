@@ -55,7 +55,7 @@ import libutil ;			/* |memclear(3u)| */
 #define	TYPEDEF_SIGINFOHAND
 extern "C" {
     typedef void (*siginfohand_f)(int,siginfo_t *,void *) noex ;
-}
+} /* end extern (C) */
 #endif
 
 
@@ -63,7 +63,7 @@ extern "C" {
 
 extern "C" {
     int sigaction_load(SIGACTION *,sigset_t *,int,siginfohand_f) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
