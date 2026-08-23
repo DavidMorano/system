@@ -19,8 +19,6 @@
 
 	Names:
 	u_bind
-	u_setsockopt
-	u_getsockopt
 	u_getsockname
 	u_getpeername
 	u_listen
@@ -32,6 +30,8 @@
 	u_sendto
 	u_sendfile
 	u_shutdown
+	u_sockoptget
+	u_sockoptset
 
 	Description:
 	This module contains the UNIX® socket system calls (yes,
@@ -188,8 +188,8 @@ namespace {
 	} ;
 	int ibind(int) noex ;
 	int ilisten(int) noex ;
-	int isetsockopt(int) noex ;
-	int igetsockopt(int) noex ;
+	int isockoptset(int) noex ;
+	int isockoptget(int) noex ;
 	int igetpeername(int) noex ;
 	int igetsockname(int) noex ;
 	int isend(int) noex ;
@@ -246,17 +246,17 @@ int u_listen(int fd,int backlog) noex {
 	return so(fd) ;
 } /* end subroutine (u_listen) */
 
-int u_setsockopt(int fd,int level,int optname,cvoid *valp,int len) noex {
+int u_sockoptset(int fd,int level,int optname,cvoid *valp,int len) noex {
 	usocket		so(level,optname,valp,len) ;
-	so.m = &usocket::isetsockopt ;
+	so.m = &usocket::isockoptset ;
 	return so(fd) ;
-} /* end subroutine (u_setsockopt) */
+} /* end subroutine (u_sockoptset) */
 
-int u_getsockopt(int fd,int level,int optname,void *valp,int *lenp) noex {
+int u_sockoptget(int fd,int level,int optname,void *valp,int *lenp) noex {
 	usocket		so(level,optname,valp,lenp) ;
-	so.m = &usocket::igetsockopt ;
+	so.m = &usocket::isockoptget ;
 	return so(fd) ;
-} /* end subroutine (u_getsockopt) */
+} /* end subroutine (u_sockoptget) */
 
 int u_getpeername(int fd,void *sap,int *lenp) noex {
 	int		rs = SR_FAULT ;
@@ -375,16 +375,16 @@ int usocket::ilisten(int fd) noex {
 	return rs ;
 } /* end method (usocket::listen) */
 
-int usocket::isetsockopt(int fd) noex {
+int usocket::isockoptset(int fd) noex {
 	int		rs ;
 	socklen_t	slen = socklen_t(len) ;
 	if ((rs = setsockopt(fd,level,name,valp,slen)) < 0) {
 	    rs = (neg errno) ;
 	}
 	return rs ;
-} /* end method (usocket::isetsockopt) */
+} /* end method (usocket::isockoptset) */
 
-int usocket::igetsockopt(int fd) noex {
+int usocket::isockoptget(int fd) noex {
 	int		rs = SR_FAULT ;
 	if (valp && lenp) {
 	    void	*vp = cast_const<void *>(valp) ;
@@ -397,7 +397,7 @@ int usocket::igetsockopt(int fd) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-} /* end method (usocket::igetsockopt) */
+} /* end method (usocket::isockoptget) */
 
 int usocket::igetpeername(int fd) noex {
 	SOCKADDR	*fromp = cast_const<SOCKADDR *>(sap) ;
