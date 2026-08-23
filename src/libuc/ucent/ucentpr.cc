@@ -27,21 +27,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storeitem.h>
-#include	<sbuf.h>
-#include	<vechand.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<intceil.h>
-#include	<cfdec.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<six.h>			/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetpr.h"		/* |uc_getpr{3uc}(3uc)| */
 #include	"ucentpr.h"
@@ -129,8 +129,7 @@ int ucentpr::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentpr::parse) */
+} /* end subroutine (ucentpr::parse) */
 
 int ucentpr::load(char *rbuf,int rlen,const ucentpr *cprp) noex {
 	int		rs = SR_FAULT ;
@@ -163,8 +162,7 @@ int ucentpr::load(char *rbuf,int rlen,const ucentpr *cprp) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentpr::load) */
+} /* end subroutine (ucentpr::load) */
 
 int ucentpr::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -198,8 +196,7 @@ int ucentpr::format(char *rbuf,int rlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentpr::format) */
+} /* end subroutine (ucentpr::format) */
 
 int ucentpr::size() noex {
 	int		rs = SR_OK ;
@@ -216,20 +213,19 @@ int ucentpr::size() noex {
 	    } /* end if (group members) */
 	    rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
-}
-/* end subroutine (ucentpr::size) */
+} /* end subroutine (ucentpr::size) */
 
 int ucentpr::getent(char *prbuf,int prlen) noex {
 	return uc_getprent(this,prbuf,prlen) ;
-}
+} /* end method */
 
 int ucentpr::getnam(char *prbuf,int prlen,cchar *name) noex {
 	return uc_getprnam(this,prbuf,prlen,name) ;
-}
+} /* end method */
 
 int ucentpr::getnum(char *prbuf,int prlen,int num) noex {
 	return uc_getprnum(this,prbuf,prlen,num) ;
-}
+} /* end method */
 
 
 /* local subroutines */
