@@ -121,18 +121,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/uio.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucdescbase.hh"
 #include	"ucdescread.h"
@@ -169,7 +169,7 @@ import libutil ;			/* |memclear(3u)| */
 
 extern "C" {
     extern int uc_nonblock(int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -254,8 +254,7 @@ int uc_reade(int fd,void *vbuf,int ulen,int to,int opts) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (uc_reade) */
+} /* end subroutine (uc_reade) */
 
 int uc_read(int fd,void *vbuf,int ulen) noex {
 	return uc_reade(fd,vbuf,ulen,-1,0) ;
@@ -308,8 +307,7 @@ local int subinfo_start(SI *sip,int fd,char *ubuf,int ulen,int to,int ro) noex {
 	} /* end if (stat) */
 
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
 local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -334,8 +332,7 @@ local int subinfo_finish(SI *sip) noex {
 	    }
 	} /* end if (had a timeout) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
 local int subinfo_setmode(SI *sip,mode_t fm) noex {
 	if (S_ISFIFO(fm)) {
@@ -354,8 +351,7 @@ local int subinfo_setmode(SI *sip,mode_t fm) noex {
 	    sip->fl.isother = true ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (subinfo_setmode) */
+} /* end subroutine (subinfo_setmode) */
 
 local int subinfo_readreg(SI *sip) noex {
 	int		rs ;
@@ -371,8 +367,7 @@ local int subinfo_readreg(SI *sip) noex {
 	    }
 	} /* end if (u_read) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (subinfo_readreg) */
+} /* end subroutine (subinfo_readreg) */
 
 local int subinfo_readslow(SI *sip) noex {
 	int		rs = SR_OK ;
@@ -423,8 +418,7 @@ local int subinfo_readslow(SI *sip) noex {
 	    if (f_break) break ;
 	} /* end while (looping on poll) */
 	return rs ;
-}
-/* end subroutine (subinfo_readslow) */
+} /* end subroutine (subinfo_readslow) */
 
 local int subinfo_readpoll(SI *sip) noex {
 	int		rs ;
@@ -453,7 +447,6 @@ local int subinfo_readpoll(SI *sip) noex {
 	    if (! sip->fl.isnonblock) rs = SR_OK ;
 	}
 	return (rs >= 0) ? f_break : rs ;
-}
-/* end subroutine (subinfo_readpoll) */
+} /* end subroutine (subinfo_readpoll) */
 
 
