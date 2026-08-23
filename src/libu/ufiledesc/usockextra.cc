@@ -92,7 +92,7 @@ int u_linger(int fd,int to) noex {
 		}
 		{
 		    cchar	*obuf = charp(&ls) ;
-	            rs = u_setsockopt(fd,sol,cmd,obuf,llen) ;
+	            rs = u_sockoptset(fd,sol,cmd,obuf,llen) ;
 		}
 	    } /* end if (socket) */
 	} /* end if (stat) */
