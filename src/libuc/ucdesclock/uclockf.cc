@@ -58,17 +58,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |msleep(3u)| */
-#include	<upt.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |msleep(3u)| */
+#include	<upt.h>			/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucdesclock.h"
 
@@ -107,7 +107,7 @@ int uc_lockf(int fd,int cmd,off_t lsize) noex {
 	        repeat {
 	            errno = 0 ;
 	            if ((rs = lockf(fd,cmd,lsize)) < 0) {
-			rs = (- errno) ;
+			rs = (neg errno) ;
 	                switch (rs) {
 	                case SR_DEADLK:
 	                    if (to-- > 0) {
@@ -128,7 +128,6 @@ int uc_lockf(int fd,int cmd,off_t lsize) noex {
 	    } /* end if (valid) */
 	} /* end if (open) */
 	return rs ;
-}
-/* end subroutine (uc_lockf) */
+} /* end subroutine (uc_lockf) */
 
 
