@@ -42,7 +42,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* CSTD  |UCHAR_MAX| */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strchr(3c)| */
@@ -69,7 +69,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     typedef char *(*strnx_f)(cchar *,int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
