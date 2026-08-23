@@ -97,7 +97,7 @@ using libuc::libmem ;			/* variable */
 extern "C" {
     int		sysdbmgr_init() noex ;
     int		sysdbmgr_fini() noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -137,7 +137,7 @@ extern "C" {
     local void	sysdbmgr_atforkbefore() noex ;
     local void	sysdbmgr_atforkafter() noex ;
     local void	sysdbmgr_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* lcoal variables */
@@ -152,11 +152,11 @@ static sysdbmgr		sysdbmgr_data ;
 
 int sysdbmgr_init() noex {
 	return sysdbmgr_data.init() ;
-}
+} /* end */
 
 int sysdbmgr_fini() noex {
 	return sysdbmgr_data.fini() ;
-}
+} /* end */
 
 int sysdbfn_get(enum sysdbfiles w,cchar *fname,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
