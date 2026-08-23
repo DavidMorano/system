@@ -49,8 +49,7 @@ OBJ_UCENUM= obj0.o obj1.o obj2.o obj3.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
