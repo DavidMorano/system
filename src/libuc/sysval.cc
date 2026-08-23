@@ -47,7 +47,7 @@
 
 extern "C" {
     extern int uc_sysconfval(int,long *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
