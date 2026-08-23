@@ -27,13 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<ctime>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -64,8 +66,7 @@ int uc_clockset(clockid_t cid,const TIMESPEC *tsp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_clockset) */
+} /* end subroutine (uc_clockset) */
 
 int uc_clockres(clockid_t cid,TIMESPEC *tsp) noex {
 	int		rs = SR_FAULT ;
@@ -75,8 +76,7 @@ int uc_clockres(clockid_t cid,TIMESPEC *tsp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_clockres) */
+} /* end subroutine (uc_clockres) */
 
 int uc_clockget(clockid_t cid,TIMESPEC *tsp) noex {
 	int		rs = SR_FAULT ;
@@ -86,7 +86,6 @@ int uc_clockget(clockid_t cid,TIMESPEC *tsp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_clockget) */
+} /* end subroutine (uc_clockget) */
 
 
