@@ -129,7 +129,7 @@ typedef volatile sig_atomic_t	vaflag ;
 extern "C" {
     int		ucproguser_init() noex ;
     int		ucproguser_fini() noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -167,7 +167,7 @@ extern "C" {
     local void	ucproguser_atforkbefore() noex ;
     local void	ucproguser_atforkafter() noex ;
     local void	ucproguser_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -221,8 +221,7 @@ int ucproguser_init() noex {
 	    } /* end if */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ucproguser_init) */
+} /* end subroutine (ucproguser_init) */
 
 int ucproguser_fini() noex {
 	pumgr		*uip = &ucproguser_data ;
@@ -249,8 +248,7 @@ int ucproguser_fini() noex {
 	    uip->f_initdone = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end subroutine (ucproguser_fini) */
+} /* end subroutine (ucproguser_fini) */
 
 int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex {
 	int		rs = SR_FAULT ;
@@ -286,8 +284,7 @@ int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (ucproguser_nameset) */
+} /* end subroutine (ucproguser_nameset) */
 
 int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex {
 	pumgr		*uip = &ucproguser_data ;
@@ -325,8 +322,7 @@ int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex {
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ucproguser_nameget) */
+} /* end subroutine (ucproguser_nameget) */
 
 
 /* local subroutines */
