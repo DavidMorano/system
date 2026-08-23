@@ -27,21 +27,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storeitem.h>
-#include	<sbuf.h>
-#include	<vechand.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<intceil.h>
-#include	<cfdec.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<storeitem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetsp.h"		/* |uc_getsp{x}(3uc)| */
 #include	"ucentsp.h"
@@ -115,8 +115,7 @@ int ucentsp::parse(char *spbuf,int splen,cchar *sp,int sl) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentsp::parse) */
+} /* end subroutine (ucentsp::parse) */
 
 int ucentsp::load(char *spbuf,int splen,const ucentsp *sspp) noex {
 	int		rs = SR_FAULT ;
@@ -134,8 +133,7 @@ int ucentsp::load(char *spbuf,int splen,const ucentsp *sspp) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentsp::load) */
+} /* end subroutine (ucentsp::load) */
 
 int ucentsp::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -197,8 +195,7 @@ int ucentsp::format(char *rbuf,int rlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentsp::format) */
+} /* end subroutine (ucentsp::format) */
 
 int ucentsp::size() noex {
 	int		rs = SR_OK ;
@@ -211,16 +208,15 @@ int ucentsp::size() noex {
 	    }
 	    rs = sz ;
 	return rs ;
-}
-/* end subroutine (ucentsp::size) */
+} /* end subroutine (ucentsp::size) */
 
 int ucentsp::getent(char *spbuf,int splen) noex {
 	return uc_getspent(this,spbuf,splen) ;
-}
+} /* end method */
 
 int ucentsp::getnam(char *spbuf,int splen,cchar *name) noex {
 	return uc_getspnam(this,spbuf,splen,name) ;
-}
+} /* end method */
 
 
 /* local subroutines */
