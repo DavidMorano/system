@@ -85,33 +85,27 @@
 
 char *strdcpy1(char *dp,int dl,cc *s1) noex {
 	return strdcpyx(dp,dl,1,s1) ;
-}
-/* end subroutine (strdcpy1) */
+} /* end subroutine (strdcpy1) */
 
 char *strdcpy2(char *dp,int dl,cc *s1,cc *s2) noex {
 	return strdcpyx(dp,dl,2,s1,s2) ;
-}
-/* end subroutine (strdcpy2) */
+} /* end subroutine (strdcpy2) */
 
 char *strdcpy3(char *dp,int dl,cc *s1,cc *s2,cc *s3) noex {
 	return strdcpyx(dp,dl,3,s1,s2,s3) ;
-}
-/* end subroutine (strdcpy3) */
+} /* end subroutine (strdcpy3) */
 
 char *strdcpy4(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4) noex {
 	return strdcpyx(dp,dl,4,s1,s2,s3,s4) ;
-}
-/* end subroutine (strdcpy4) */
+} /* end subroutine (strdcpy4) */
 
 char *strdcpy5(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5) noex {
 	return strdcpyx(dp,dl,5,s1,s2,s3,s4,s5) ;
-}
-/* end subroutine (strdcpy5) */
+} /* end subroutine (strdcpy5) */
 
 char *strdcpy6(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 	return strdcpyx(dp,dl,6,s1,s2,s3,s4,s5,s6) ;
-}
-/* end subroutine (strdcpy6) */
+} /* end subroutine (strdcpy6) */
 
 char *strdcpyx(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
