@@ -20,16 +20,16 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<time.h>		/* clock defines */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<time.h>		/* POSIX® clock defines */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int uc_clockset(clockid_t,const TIMESPEC *) noex ;
-extern int uc_clockres(clockid_t,TIMESPEC *) noex ;
-extern int uc_clockget(clockid_t,TIMESPEC *) noex ;
+extern int uc_clockset	(clockid_t,const TIMESPEC *) noex ;
+extern int uc_clockres	(clockid_t,TIMESPEC *) noex ;
+extern int uc_clockget	(clockid_t,TIMESPEC *) noex ;
 
 local inline int uc_clockreal(TIMESPEC *tsp) noex {
     const clockid_t	cid = CLOCK_REALTIME ;
