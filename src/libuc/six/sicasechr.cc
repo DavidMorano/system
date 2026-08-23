@@ -72,7 +72,7 @@
 
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
