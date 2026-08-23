@@ -111,7 +111,7 @@ local int thrbase_dtor(thrbase *op) noex {
 
 extern "C" {
     local int	startworker(THRBASE_SI *) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
