@@ -44,7 +44,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
@@ -83,7 +83,7 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     typedef int (*vo_f)(vecobj *,int,void **) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
