@@ -51,6 +51,7 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<errtimer.hh>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<ucgetpw.h>		/* LIBUC */
 #include	<getxid.h>		/* LIBUC */
 #include	<posname.h>		/* LIBUC */
@@ -89,10 +90,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_unlink(cchar *) noex ;
-}
 
 
 /* external variables */
@@ -513,7 +510,7 @@ local int getnamesemgid(void) noex {
 
 int namesem::open(cchar *aname,int of,mode_t om,uint c) noex {
 	return namesem_open(this,aname,of,om,c) ;
-}
+} /* end method */
 
 void namesem::dtor() noex {
 	if (cint rs = close ; rs < 0) {
