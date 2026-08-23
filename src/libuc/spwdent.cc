@@ -35,6 +35,9 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<storeitem.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -53,12 +56,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	sfshrink	(cchar *,int,cchar **) noex ;
-    extern int	sichr		(cchar *,int,int) noex ;
-    extern char	*strnchr	(cchar *,int,int) noex ;
-}
 
 
 /* external variables */
