@@ -207,27 +207,27 @@ int cq_curenum(cq *op,cq_cur *curp,void *vrp) noex {
 
 int cq::ins(void *ep) noex {
 	return cq_ins(this,ep) ;
-}
+} /* end method */
 
 int cq::rem(void *rpp) noex {
 	return cq_rem(this,rpp) ;
-}
+} /* end method */
 
 int cq::unlink(void *rpp) noex {
 	return cq_unlink(this,rpp) ;
-}
+} /* end method */
 
 int cq::curbegin(cq_cur *curp) noex {
 	return cq_curbegin(this,curp) ;
-}
+} /* end method */
 
 int cq::curend(cq_cur *curp) noex {
 	return cq_curend(this,curp) ;
-}
+} /* end method */
 
 int cq::curenum(cq_cur *curp,void *rpp) noex {
 	return cq_curenum(this,curp,rpp) ;
-}
+} /* end method */
 
 void cq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
