@@ -95,7 +95,7 @@
 
 extern "C" {
     typedef bool (*isclass_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
