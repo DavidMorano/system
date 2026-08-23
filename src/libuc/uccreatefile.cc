@@ -17,13 +17,12 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defnes */
@@ -36,10 +35,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_create(cchar *,mode_t) noex ;
-}
 
 
 /* local structures */
@@ -58,16 +53,15 @@ extern "C" {
 
 int uc_createfile(cchar *fname,mode_t om) noex {
 	int		rs = SR_FAULT ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	        if ((rs = uc_create(fname,om)) >= 0) {
+	    if (fname[0]) ylikely {
+	        if ((rs = uc_create(fname,om)) >= 0) ylikely {
 	            rs = uc_close(rs) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_createfile) */
+} /* end subroutine (uc_createfile) */
 
 
