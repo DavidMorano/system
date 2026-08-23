@@ -66,7 +66,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     int strpack_envstorer(SP *,cchar *,int,cchar *,int,cchar **) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
