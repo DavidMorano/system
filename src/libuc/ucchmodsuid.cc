@@ -17,18 +17,18 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/uio.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -46,17 +46,17 @@
 int uc_chmodsuid(cchar *fname,int f) noex {
 	int		rs = SR_FAULT ;
 	int		fprev = false ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	        if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
+	    if (fname[0]) ylikely {
+	        if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) ylikely {
 	            mode_t mperm = sb.st_mode ;
 	            fprev = ((mperm & S_IXSUID) == S_IXSUID) ;
 	            if (! LEQUIV(fprev,f)) {
 	                if (f) {
 	                    mperm |= S_IXSUID ;
 	                } else {
-	                    mperm &= (~ S_ISUID) ;
+	                    mperm &= (compl S_ISUID) ;
 		        }
 	                rs = u_chmod(fname,mperm) ;
 	            } /* end if (needed a change) */
@@ -64,7 +64,6 @@ int uc_chmodsuid(cchar *fname,int f) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fprev : rs ;
-}
-/* end subroutine (uc_chmodsuid) */
+} /* end subroutine (uc_chmodsuid) */
 
 
