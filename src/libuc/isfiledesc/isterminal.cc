@@ -85,7 +85,7 @@ int isterminal(int fd) noex {
 	    if ((rs = isatty(fd)) > 0) {
 	        f = true ;
 	    } else if (rs < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	}
 	return (rs >= 0) ? f : rs ;
