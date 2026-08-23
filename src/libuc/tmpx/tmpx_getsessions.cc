@@ -42,13 +42,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecint.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecint.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"tmpx.h"
 
@@ -80,9 +80,9 @@ int tmpx_getsessions(tmpx *op,vecint *vip,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = tmpx_magic(op,vip,un)) >= 0) {
+	if ((rs = tmpx_magic(op,vip,un)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (un[0]) {
+	    if (un[0]) ylikely {
 	        if (tmpx_cur cur{} ; (rs = tmpx_curbegin(op,&cur)) >= 0) {
 	            tmpx_ent	ue{} ;
 	            bool	f ;
@@ -106,7 +106,6 @@ int tmpx_getsessions(tmpx *op,vecint *vip,cchar *un) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (tmpx_getsessions) */
+} /* end subroutine (tmpx_getsessions) */
 
 
