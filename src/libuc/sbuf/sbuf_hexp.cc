@@ -101,23 +101,23 @@ int sbuf_hexpx(sbuf *op,int n,UT v) noex {
 
 int sbuf_hexpuc		(sbuf *op,int n,uchar v) noex {
     	return sbuf_hexpx(op,n,v) ;
-}
+} /* end */
 
 int sbuf_hexpus		(sbuf *op,int n,ushort v) noex {
     	return sbuf_hexpx(op,n,v) ;
-}
+} /* end */
 
 int sbuf_hexpui		(sbuf *op,int n,uint v) noex {
     	return sbuf_hexpx(op,n,v) ;
-}
+} /* end */
 
 int sbuf_hexpul		(sbuf *op,int n,ulong v) noex {
     	return sbuf_hexpx(op,n,v) ;
-}
+} /* end */
 
 int sbuf_hexpull	(sbuf *op,int n,ulonglong v) noex {
     	return sbuf_hexpx(op,n,v) ;
-}
+} /* end */
 
 
 /* local subroutines */
