@@ -87,15 +87,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucdesclock.h"
 
@@ -119,7 +119,7 @@
 
 extern "C" {
     extern int uc_safesleep(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -130,7 +130,7 @@ extern "C" {
 
 /* forward references */
 
-static int	lockto(int,FLOCK *,int) noex ;
+local int	lockto(int,FLOCK *,int) noex ;
 
 
 /* local variables */
@@ -217,13 +217,12 @@ int uc_lockfile(int fd,int cmd,off_t start,off_t sz,int to) noex {
 	    }
 	} /* end if_constexpr (f_oldunixbug) */
 	return rs ;
-}
-/* end subroutine (uc_lockfile) */
+} /* end subroutine (uc_lockfile) */
 
 
 /* local subroutines */
 
-static int lockto(int fd,FLOCK *flp,int to) noex {
+local int lockto(int fd,FLOCK *flp,int to) noex {
     	int		rs = SR_OK ;
 	for (int i = 0 ; rs >= 0 ; i += 1) {
 	    rs = u_fcntl(fd,F_SETLK,flp) ;
@@ -232,7 +231,6 @@ static int lockto(int fd,FLOCK *flp,int to) noex {
 	    rs = uc_safesleep(1) ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (lockto) */
+} /* end subroutine (lockto) */
 
 
