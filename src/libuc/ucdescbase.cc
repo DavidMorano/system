@@ -30,18 +30,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>		/* POLL_INTMULT */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/uio.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |POLL_INTMULT| */
 
 #include	"ucdescbase.hh"
 
@@ -86,6 +86,6 @@ using libuc::ucdescbase ;		/* type */
 
 int ucdescbase::operator () (int fd) noex {
     	return callstd(fd) ;
-}
+} /* end method */
 
 
