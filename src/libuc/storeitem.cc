@@ -337,35 +337,35 @@ int storeitem_getlen(storeitem *op) noex {
 
 int storeitem::start(char *rbuf,int rlen) noex {
 	return storeitem_start(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int storeitem::strw(cchar *sp,int sl,cchar **rpp) noex {
 	return storeitem_strw(this,sp,sl,rpp) ;
-}
+} /* end method */
 
 int storeitem::buf(cvoid *sp,int sl,cchar **rpp) noex {
 	return storeitem_buf(this,sp,sl,rpp) ;
-}
+} /* end method */
 
 int storeitem::dec(int v,cchar **rpp) noex {
 	return storeitem_dec(this,v,rpp) ;
-}
+} /* end method */
 
 int storeitem::chr(int ch,cchar **rpp) noex {
 	return storeitem_chr(this,ch,rpp) ;
-}
+} /* end method */
 
 int storeitem::nul(cchar **rpp) noex {
 	return storeitem_nul(this,rpp) ;
-}
+} /* end method */
 
 int storeitem::ptab(int n,void ***vppp) noex {
 	return storeitem_ptab(this,n,vppp) ;
-}
+} /* end method */
 
 int storeitem::block(int bsz,int bal,void **vpp) noex {
 	return storeitem_block(this,bsz,bal,vpp) ;
-}
+} /* end method */
 
 void storeitem::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
