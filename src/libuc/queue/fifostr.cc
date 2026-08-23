@@ -399,39 +399,39 @@ local int fifostr_mat(fifostr *op,fifostr_ent *mep) noex {
 
 int fifostr::add(cchar *sp,int sl) noex {
 	return fifostr_add(this,sp,sl) ;
-}
+} /* end method */
 
 int fifostr::headread(char *rbuf,int rlen) noex {
 	return fifostr_headread(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int fifostr::entread(char *rbuf,int rlen,int n) noex {
 	return fifostr_entread(this,rbuf,rlen,n) ;
-}
+} /* end method */
 
 int fifostr::entlen(int n) noex {
 	return fifostr_entlen(this,n) ;
-}
+} /* end method */
 
 int fifostr::rem(char *rbuf,int rlen) noex {
 	return fifostr_rem(this,rbuf,rlen) ;
-}
+} /* end method */
 
 int fifostr::curbegin(fifostr_cur *curp) noex {
 	return fifostr_curbegin(this,curp) ;
-}
+} /* end method */
 
 int fifostr::curend(fifostr_cur *curp) noex {
 	return fifostr_curend(this,curp) ;
-}
+} /* end method */
 
 int fifostr::curenum(fifostr_cur *curp,char *rbuf,int rlen) noex {
 	return fifostr_curenum(this,curp,rbuf,rlen) ;
-}
+} /* end method */
 
 int fifostr::curdel(fifostr_cur *curp) noex {
 	return fifostr_curdel(this,curp) ;
-}
+} /* end method */
 
 void fifostr::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
