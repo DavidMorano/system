@@ -39,16 +39,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucpeek.h"
 
@@ -67,9 +67,9 @@
 
 /* forward references */
 
-static int	peek_socket(int,void *,int) noex ;
-static int	peek_stream(int,void *,int) noex ;
-static int	peek_regular(int,void *,int) noex ;
+local int	peek_socket(int,void *,int) noex ;
+local int	peek_stream(int,void *,int) noex ;
+local int	peek_regular(int,void *,int) noex ;
 
 
 /* local variables */
@@ -102,19 +102,17 @@ int uc_peek(int fd,void *dbuf,int dlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_peek) */
+} /* end subroutine (uc_peek) */
 
 
 /* local subroutines */
 
-static int peek_socket(int fd,void *dbuf,int dlen) noex {
+local int peek_socket(int fd,void *dbuf,int dlen) noex {
 	cint		mopts = MSG_PEEK ;
 	return u_recv(fd,dbuf,dlen,mopts) ;
-}
-/* end subroutine (peek_socket) */
+} /* end subroutine (peek_socket) */
 
-static int peek_stream(int fd,void *dbuf,int dlen) noex {
+local int peek_stream(int fd,void *dbuf,int dlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -136,17 +134,15 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs > 0) ? len : rs ;
-}
-/* end subroutine (peek_stream) */
+} /* end subroutine (peek_stream) */
 
-static int peek_regular(int fd,void *dbuf,int dlen) noex {
+local int peek_regular(int fd,void *dbuf,int dlen) noex {
 	off_t		fo{} ;
 	int		rs ;
 	if ((rs = u_tell(fd,&fo)) >= 0) {
 	    rs = u_readp(fd,dbuf,dlen,fo) ;
 	} /* end if (u_tell) */
 	return rs ;
-}
-/* end subroutine (peek_regular) */
+} /* end subroutine (peek_regular) */
 
 
