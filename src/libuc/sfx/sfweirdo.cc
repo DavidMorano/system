@@ -67,7 +67,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     typedef charp (*xbrk_f)(cc *,int,cc *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
