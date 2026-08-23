@@ -77,7 +77,7 @@ typedef cmporders	co ;
 
 extern "C" {
     typedef int (*strncmp_f)(cchar *,cchar *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -145,49 +145,53 @@ int strnfoldcmp(cchar *e1p,cchar *e2p,int n) noex {
 	return rc ;
 } /* end subroutine (strnfoldcmp) */
 
-
 int strnbasecmpo(cchar *e1p,cchar *e2p,int n) noex {
     	return (+ strnbasecmp(e1p,e2p,n)) ;
-}
+} /* end subroutine */
+
 int strnbasecmpr(cchar *e1p,cchar *e2p,int n) noex {
     	return (- strnbasecmp(e1p,e2p,n)) ;
-}
+} /* end subroutine */
 
 int strncasecmpo(cchar *e1p,cchar *e2p,int n) noex {
     	return (+ strncasecmp(e1p,e2p,n)) ;
-}
+} /* end subroutine */
+
 int strncasecmpr(cchar *e1p,cchar *e2p,int n) noex {
     	return (- strncasecmp(e1p,e2p,n)) ;
-}
+} /* end subroutine */
 
 int strnfoldcmpo(cchar *e1p,cchar *e2p,int n) noex {
     	return (+ strnfoldcmp(e1p,e2p,n)) ;
-}
+} /* end subroutine */
+
 int strnfoldcmpr(cchar *e1p,cchar *e2p,int n) noex {
     	return (- strnfoldcmp(e1p,e2p,n)) ;
-}
-
+} /* end subroutine */
 
 int strnxbasecmpo(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnbasecmp,s1,s2,n,cmporder_obverse) ;
-}
+} /* end subroutine */
+
 int strnxbasecmpr(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnbasecmp,s1,s2,n,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 int strnxcasecmpo(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strncasecmp,s1,s2,n,cmporder_obverse) ;
-}
+} /* end subroutine */
+
 int strnxcasecmpr(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strncasecmp,s1,s2,n,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 int strnxfoldcmpo(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnfoldcmp,s1,s2,n,cmporder_obverse) ;
-}
+} /* end subroutine */
+
 int strnxfoldcmpr(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnfoldcmp,s1,s2,n,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
