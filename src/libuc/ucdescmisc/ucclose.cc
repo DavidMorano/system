@@ -1,4 +1,4 @@
-/* ucclose */
+/* ucclose SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -52,12 +52,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucclose.h"
 
@@ -87,7 +87,6 @@
 
 int uc_close(int fd) noex {
 	return u_close(fd) ;
-}
-/* end subroutine (uc_close) */
+} /* end subroutine (uc_close) */
 
 
