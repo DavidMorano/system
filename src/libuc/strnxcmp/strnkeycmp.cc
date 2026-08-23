@@ -76,7 +76,7 @@ using std::max ;			/* subroutine */
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
     typedef int (*strncmp_f)(cchar *,cchar *,int) noex ;
-}
+} /* end extern (C) */
 
 typedef cmporders	co ;
 
@@ -162,58 +162,62 @@ local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
 
 int strnkeybasecmp(cchar *e1p,cchar *e2p,int n) noex {
 	return strnkeyxcmp(tobc,e1p,e2p,n) ;
-}
+} /* end subroutine */
 
 int strnkeycasecmp(cchar *e1p,cchar *e2p,int n) noex {
 	return strnkeyxcmp(touc,e1p,e2p,n) ;
-}
+} /* end subroutine */
 
 int strnkeyfoldcmp(cchar *e1p,cchar *e2p,int n) noex {
 	return strnkeyxcmp(tofc,e1p,e2p,n) ;
-}
-
+} /* end subroutine */
 
 int strnkeybasecmpo(cchar *s1,cchar *s2,int n) noex {
 	return (+ strnkeybasecmp(s1,s2,n)) ;
-}
+} /* end subroutine */
+
 int strnkeybasecmpr(cchar *s1,cchar *s2,int n) noex {
 	return (- strnkeybasecmp(s1,s2,n)) ;
-}
+} /* end subroutine */
 
 int strnkeycasecmpo(cchar *s1,cchar *s2,int n) noex {
     	return (+ strnkeycasecmp(s1,s2,n)) ;
-}
+} /* end subroutine */
+
 int strnkeycasecmpr(cchar *s1,cchar *s2,int n) noex {
     	return (- strnkeycasecmp(s1,s2,n)) ;
-}
+} /* end subroutine */
 
 int strnkeyfoldcmpo(cchar *s1,cchar *s2,int n) noex {
     	return (+ strnkeyfoldcmp(s1,s2,n)) ;
-}
+} /* end subroutine */
+
 int strnkeyfoldcmpr(cchar *s1,cchar *s2,int n) noex {
     	return (- strnkeyfoldcmp(s1,s2,n)) ;
-}
-
+} /* end subroutine */
 
 int strnkeyxbasecmpo(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnkeybasecmp,s1,s2,n,cmporder_obverse) ;
-}
+} /* end subroutine */
+
 int strnkeyxbasecmpr(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnkeybasecmp,s1,s2,n,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 int strnkeyxcasecmpo(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnkeycasecmp,s1,s2,n,cmporder_obverse) ;
-}
+} /* end subroutine */
+
 int strnkeyxcasecmpr(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnkeycasecmp,s1,s2,n,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 int strnkeyxfoldcmpo(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnkeyfoldcmp,s1,s2,n,cmporder_obverse) ;
-}
+} /* end subroutine */
+
 int strnkeyxfoldcmpr(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnkeyfoldcmp,s1,s2,n,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 
