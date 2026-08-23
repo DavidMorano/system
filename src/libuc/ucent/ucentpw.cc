@@ -27,21 +27,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storeitem.h>
-#include	<sbuf.h>
-#include	<vechand.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<intceil.h>
-#include	<cfdec.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<storeitem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetpw.h"		/* |uc_getpw{x}(3uc)| */
 #include	"ucentpw.h"
@@ -117,8 +117,7 @@ int ucentpw::parse(char *pwbuf,int pwlen,cc *sp,int sl) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentpw::parse) */
+} /* end subroutine (ucentpw::parse) */
 
 int ucentpw::load(char *pwbuf,int pwlen,const ucentpw *spwp) noex {
 	int		rs = SR_FAULT ;
@@ -139,8 +138,7 @@ int ucentpw::load(char *pwbuf,int pwlen,const ucentpw *spwp) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentpw::load) */
+} /* end subroutine (ucentpw::load) */
 
 int ucentpw::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -183,8 +181,7 @@ int ucentpw::format(char *rbuf,int rlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentpw::format) */
+} /* end subroutine (ucentpw::format) */
 
 int ucentpw::size() noex {
 	int		rs = SR_OK ;
@@ -206,20 +203,19 @@ int ucentpw::size() noex {
 	    }
 	    rs = sz ;
 	return rs ;
-}
-/* end subroutine (ucentpw::size) */
+} /* end subroutine (ucentpw::size) */
 
 int ucentpw::getent(char *pwbuf,int pwlen) noex {
     	return uc_getpwent(this,pwbuf,pwlen) ;
-}
+} /* end method */
 
 int ucentpw::getnam(char *pwbuf,int pwlen,cchar *name) noex {
     	return uc_getpwnam(this,pwbuf,pwlen,name) ;
-}
+} /* end method */
 
 int ucentpw::getuid(char *pwbuf,int pwlen,uid_t uid) noex {
     	return uc_getpwuid(this,pwbuf,pwlen,uid) ;
-}
+} /* end method */
 
 
 /* local subroutines */
