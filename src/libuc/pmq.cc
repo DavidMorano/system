@@ -339,7 +339,7 @@ int uc_unlinkpmq(cchar *name) noex {
 	                bool	f_exit = false ;
 	                repeat {
 	                    if ((rs = mq_unlink(name)) < 0) {
-			        rs = (- errno) ;
+			        rs = (neg errno) ;
 		                switch (rs) {
 		                case SR_INTR:
 	    	                    break ;
@@ -398,7 +398,7 @@ local int pmq_nameclean(pmq *op) noex {
 int posixhelp::callkern(pmq *op) noex {
     	int		rs ;
 	if ((rs = (this->*m)(op)) < 0) nlikely {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (posixhelp::callkern) */
@@ -443,7 +443,7 @@ int posixhelp::operator () (pmq *op) noex {
 int posixhelp::open(pmq *op) noex {
 	int		rs = SR_OK ;
 	if (mqd_t res ; (res = mq_open(op->name,of,om,nattr)) == mqdbad) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (posixhelp::open) */
@@ -451,7 +451,7 @@ int posixhelp::open(pmq *op) noex {
 int posixhelp::close(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_close(op->pq)) < 0) nlikely {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (posixhelp::close) */
@@ -459,7 +459,7 @@ int posixhelp::close(pmq *op) noex {
 int posixhelp::send(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_send(op->pq,sbuf,slen,prio)) < 0) nlikely {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (posixhelp::send) */
@@ -467,7 +467,7 @@ int posixhelp::send(pmq *op) noex {
 int posixhelp::recv(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_receive(op->pq,rbuf,rlen,priop)) < 0) nlikely {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (posixhelp::recv) */
@@ -475,7 +475,7 @@ int posixhelp::recv(pmq *op) noex {
 int posixhelp::attrset(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_setattr(op->pq,nattr,oattr)) < 0) nlikely {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (posixhelp::setattr) */
@@ -483,7 +483,7 @@ int posixhelp::attrset(pmq *op) noex {
 int posixhelp::attrget(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_getattr(op->pq,oattr)) < 0) nlikely {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (posixhelp::attrget) */
@@ -491,7 +491,7 @@ int posixhelp::attrget(pmq *op) noex {
 int posixhelp::notify(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_notify(op->pq,sep)) < 0) nlikely {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (posixhelp::notify) */
@@ -500,7 +500,7 @@ int posixhelp::unlink(pmq *op) noex {
 	int		rs = SR_NOENT ;
 	if (op->name[0] != '\0') ylikely {
 	    if ((rs = mq_unlink(op->name)) < 0) nlikely {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    } else {
 	        op->name[0] = '0' ;
 	    }
