@@ -46,16 +46,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucentua.h>
-#include	<numsign.h>
-#include	<localmisc.h>
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucentua.h>		/* LIBUC */
+#include	<numsign.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 #include	<userattr.h>		/* <- the money shot */
 
 #include	"ucuserattr.h"
@@ -103,26 +103,24 @@ int uc_userattrbegin() noex {
 	if_constexpr (f_userattr) {
 	    errno = 0 ;
 	    setuserattr() ;
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_userattrbegin) */
+} /* end subroutine (uc_userattrbegin) */
 
 int uc_userattrend() noex {
 	int		rs = SR_NOSYS ;
 	if_constexpr (f_userattr) {
 	    errno = 0 ;
 	    enduserattr() ;
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_userattrend) */
+} /* end subroutine (uc_userattrend) */
 
 int uc_userattrent(userattr **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (rpp) {
+	if (rpp) ylikely {
 	    userattr	*uap = nullptr ;
 	    if_constexpr (f_userattr) {
 		rs = SR_OK ;
@@ -137,12 +135,11 @@ int uc_userattrent(userattr **rpp) noex {
 	    *rpp = (rs >= 0) ? uap : nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_userattrent) */
+} /* end subroutine (uc_userattrent) */
 
 int uc_userattrnam(userattr **rpp,cchar *un) noex {
 	int		rs = SR_FAULT ;
-	if (rpp && un) {
+	if (rpp && un) ylikely {
 	    userattr	*uap = nullptr ;
 	    rs = SR_INVALID ;
 	    if (un[0]) {
@@ -160,12 +157,11 @@ int uc_userattrnam(userattr **rpp,cchar *un) noex {
 	    *rpp = (rs >= 0) ? uap : nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_userattrnam) */
+} /* end subroutine (uc_userattrnam) */
 
 int uc_userattruid(userattr **rpp,uid_t uid) noex {
 	int		rs = SR_FAULT ;
-	if (rpp) {
+	if (rpp) ylikely {
 	    userattr	*uap = nullptr ;
 	    rs = SR_INVALID ;
 	    if (! numsign(uid)) {
@@ -183,12 +179,11 @@ int uc_userattruid(userattr **rpp,uid_t uid) noex {
 	    *rpp = (rs >= 0) ? uap : nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_userattruid) */
+} /* end subroutine (uc_userattruid) */
 
 int uc_userattrfree(userattr *uap) noex {
 	int		rs = SR_FAULT ;
-	if (uap) {
+	if (uap) ylikely {
 	    if_constexpr (f_userattr) {
 	        rs = SR_OK ;
 	        free_userattr(uap) ;
@@ -197,7 +192,6 @@ int uc_userattrfree(userattr *uap) noex {
 	    } /* end if_constexpr (f_userattr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_userattrfree) */
+} /* end subroutine (uc_userattrfree) */
 
 
