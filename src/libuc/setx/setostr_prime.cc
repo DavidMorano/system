@@ -253,27 +253,27 @@ int setostr_curenum(setostr *op,setostr_cur *curp,cchar **rpp) noex {
 
 int setostr::already(cchar *sp,int sl) noex {
 	return setostr_already(this,sp,sl) ;
-}
+} /* end method */
 
 int setostr::add(cchar *sp,int sl) noex {
 	return setostr_add(this,sp,sl) ;
-}
+} /* end method */
 
 int setostr::del(cchar *sp,int sl) noex {
 	return setostr_del(this,sp,sl) ;
-}
+} /* end method */
 
 int setostr::curbegin(setostr_cur *curp) noex {
     	return setostr_curbegin(this,curp) ;
-}
+} /* end method */
 
 int setostr::curend(setostr_cur *curp) noex {
 	return setostr_curend(this,curp) ;
-}
+} /* end method */
 
 int setostr::curenum(setostr_cur *curp,cchar **rpp) noex {
 	return setostr_curenum(this,curp,rpp) ;
-}
+} /* end method */
 
 void setostr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
