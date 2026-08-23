@@ -71,7 +71,7 @@ import libutil ;			/* |lenstr(3u)| */
 extern "C" {
     typedef int	(*toxc_f)(int) noex ;
     typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -106,17 +106,17 @@ namespace {
 int sfbasesub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
     sfxsub sx(tobc,nleadbasestr) ;
     return sx(sp,sl,ss,rpp) ;
-}
+} /* end subroutine */
 
 int sfcasesub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
     sfxsub sx(touc,nleadcasestr) ;
     return sx(sp,sl,ss,rpp) ;
-}
+} /* end subroutine */
 
 int sffoldsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
     sfxsub sx(tofc,nleadfoldstr) ;
     return sx(sp,sl,ss,rpp) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
