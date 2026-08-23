@@ -72,7 +72,7 @@ import chrset ;
 extern "C++" {
     extern char *strnobrk(cchar *,int,const chrset &) noex ;
     extern char *strnrbrk(cchar *,int,const chrset &) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
