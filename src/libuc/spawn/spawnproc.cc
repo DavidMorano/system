@@ -135,12 +135,12 @@ extern "C" {
     extern int uc_stat(cchar *,ustat *) noex ;
     extern int uc_fork() noex ;
     extern int uc_exit(int) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     extern int	dupup(int,int) noex ;
     extern int	sigdefaults(cint *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
