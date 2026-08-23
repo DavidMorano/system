@@ -83,9 +83,9 @@ int tmpx_getuserlines(tmpx *op,vecstr *lp,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (op && lp && un) {
+	if (op && lp && un) ylikely {
 	    rs = SR_INVALID ;
-	    if (un[0]) {
+	    if (un[0]) ylikely {
 	        if (tmpx_cur cur ; (rs = tmpx_curbegin(op,&cur)) >= 0) {
 	            tmpx_ent	ue ;
 	            cint	llen = TMPX_LLINE ;
@@ -109,7 +109,6 @@ int tmpx_getuserlines(tmpx *op,vecstr *lp,cchar *un) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (tmpx_getuserlines) */
+} /* end subroutine (tmpx_getuserlines) */
 
 
