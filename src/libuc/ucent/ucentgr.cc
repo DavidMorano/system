@@ -27,20 +27,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storeitem.h>
-#include	<sbuf.h>
-#include	<vechand.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<intceil.h>
-#include	<cfdec.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<storeitem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetgr.h"		/* |uc_getgr{x}(3uc)| */
 #include	"ucentgr.h"
@@ -140,8 +140,7 @@ int ucentgr::parse(char *grbuf,int grlen,cchar *sp,int sl) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentgr::parse) */
+} /* end subroutine (ucentgr::parse) */
 
 int ucentgr::load(char *grbuf,int grlen,CGRE *sgrp) noex {
 	int		rs = SR_FAULT ;
@@ -164,7 +163,7 @@ int ucentgr::load(char *grbuf,int grlen,CGRE *sgrp) noex {
 	        } else {
 	            gr_mem = nullptr ;
 	        }
-		if (rs >= 0) {
+		if (rs >= 0) ylikely {
 	            si_copystr(&si,&gr_name,sgrp->gr_name) ;
 	            si_copystr(&si,&gr_passwd,sgrp->gr_passwd) ;
 		} /* end if (ok) */
@@ -173,8 +172,7 @@ int ucentgr::load(char *grbuf,int grlen,CGRE *sgrp) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentgr::load) */
+} /* end subroutine (ucentgr::load) */
 
 int ucentgr::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -211,8 +209,7 @@ int ucentgr::format(char *rbuf,int rlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucentgr::format) */
+} /* end subroutine (ucentgr::format) */
 
 int ucentgr::size() noex {
 	int		rs = SR_OK ;
@@ -232,20 +229,19 @@ int ucentgr::size() noex {
 	    } /* end if (group members) */
 	    rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
-}
-/* end subroutine (ucentgr::size) */
+} /* end subroutine (ucentgr::size) */
 
 int ucentgr::getent(char *grbuf,int grlen) noex {
 	return uc_getgrent(this,grbuf,grlen) ;
-}
+} /* end method */
 
 int ucentgr::getnam(char *grbuf,int grlen,cchar *name) noex {
 	return uc_getgrnam(this,grbuf,grlen,name) ;
-}
+} /* end method */
 
 int ucentgr::getgid(char *grbuf,int grlen,gid_t gid) noex {
 	return uc_getgrgid(this,grbuf,grlen,gid) ;
-}
+} /* end method */
 
 
 /* local subroutines */
