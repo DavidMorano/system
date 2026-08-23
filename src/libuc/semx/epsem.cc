@@ -110,11 +110,11 @@ int epsem_count(epsem *op) noex {
 
 int epsem::create(int pshared,int acnt) noex {
 	return epsem_create(this,pshared,acnt) ;
-}
+} /* end method */
 
 epsem::operator int () noex {
 	return csem_count(this) ;
-}
+} /* end method */
 
 void epsem::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
