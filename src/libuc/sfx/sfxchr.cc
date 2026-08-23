@@ -82,7 +82,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     typedef charp (*strxchr_f)(cchar *,int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -116,12 +116,12 @@ namespace {
 int sfochr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 	sub_sfxchr so(strnochr) ;
 	return so(sp,sl,sch,rpp) ;
-}
+} /* end subroutine */
 
 int sfrchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 	sub_sfxchr so(strnrchr) ;
 	return so(sp,sl,sch,rpp) ;
-}
+} /* end subroutine */
 
 int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
 	return sfochr(sp,sl,'.',rpp) ;
