@@ -68,7 +68,7 @@ import libutil ;			/* |memclear(3u)| + |memcopy(3u)| */
 extern "C" {
     typedef char (*chtoxc_f)(int) noex ;
     typedef char *(*scxc_f)(char *,cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -112,18 +112,18 @@ local char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 
 char *strncpybc(char *dst,cchar *src,int n) noex {
 	return strncpyxc<chtobc>(strcpybc,dst,src,n) ;
-}
+} /* end subroutine */
 
 char *strncpylc(char *dst,cchar *src,int n) noex {
 	return strncpyxc<chtolc>(strcpylc,dst,src,n) ;
-}
+} /* end subroutine */
 
 char *strncpyuc(char *dst,cchar *src,int n) noex {
 	return strncpyxc<chtouc>(strcpyuc,dst,src,n) ;
-}
+} /* end subroutine */
 
 char *strncpyfc(char *dst,cchar *src,int n) noex {
 	return strncpyxc<chtofc>(strcpyfc,dst,src,n) ;
-}
+} /* end subroutine */
 
 
