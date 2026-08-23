@@ -20,12 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<signal.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<signal.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
