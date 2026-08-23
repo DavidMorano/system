@@ -67,7 +67,7 @@
 #ifdef	SYS_NMLN
 #define	NNBUFLEN	(SYS_NMLN-1)
 #else
-#define	NNBUFLEN	256
+#define	NNBUFLEN	255		/* pretty standard de-facto value */
 #endif
 #endif
 #endif /* NNBUFLEN */
@@ -194,7 +194,7 @@
 #define	SNBUFLEN	SYMNAMELEN	/* symbol-name-length (really 255) */
 #endif
 
-/* time-zone-name (this is the abbreviated time-zone from time immemorial) */
+/* time-zone-name (??) */
 #ifndef	ZNBUFLEN
 #ifdef	TZNAME_MAX
 #define	ZNBUFLEN	TZNAME_MAX
@@ -206,6 +206,15 @@
 #endif /* _POSIX_TZNAME_MAX */
 #endif /* TZNAME_MAX */
 #endif /* ZNBUFLEN */
+
+/* time-zone-abbr (this is the abbreviated time-zone from time immemorial) */
+#ifndef	ZABUFLEN
+#ifdef	TZABBR_MAX
+#define	ZABUFLEN	TZABBR_MAX
+#else
+#define	ZABUFLEN	8			/* my own value */
+#endif /* TANAME_MAX */
+#endif /* ZABUFLEN */
 
 /* zone-info-name (from Zone-Info; a newer concept) */
 #ifndef	ZIBUFLEN
