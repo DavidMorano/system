@@ -74,7 +74,7 @@ typedef cmporders	co ;
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
     typedef int (*strcmp_f)(cchar *,cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -147,58 +147,62 @@ local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
 
 int strkeybasecmp(cchar *e1p,cchar *e2p) noex {
 	return strkeyxcmp(tobc,e1p,e2p) ;
-}
+} /* end subroutine */
 
 int strkeycasecmp(cchar *e1p,cchar *e2p) noex {
 	return strkeyxcmp(touc,e1p,e2p) ;
-}
+} /* end subroutine */
 
 int strkeyfoldcmp(cchar *e1p,cchar *e2p) noex {
 	return strkeyxcmp(tofc,e1p,e2p) ;
-}
-
+} /* end subroutine */
 
 int strkeybasecmpo(cchar *s1,cchar *s2) noex {
 	return (+ strkeybasecmp(s1,s2)) ;
-}
+} /* end subroutine */
+
 int strkeybasecmpr(cchar *s1,cchar *s2) noex {
 	return (- strkeybasecmp(s1,s2)) ;
-}
+} /* end subroutine */
 
 int strkeycasecmpo(cchar *s1,cchar *s2) noex {
     	return (+ strkeycasecmp(s1,s2)) ;
-}
+} /* end subrouine */
+
 int strkeycasecmpr(cchar *s1,cchar *s2) noex {
     	return (- strkeycasecmp(s1,s2)) ;
-}
+} /* end subroutine */
 
 int strkeyfoldcmpo(cchar *s1,cchar *s2) noex {
     	return (+ strkeyfoldcmp(s1,s2)) ;
-}
+} /* end subroutine */
+
 int strkeyfoldcmpr(cchar *s1,cchar *s2) noex {
     	return (- strkeyfoldcmp(s1,s2)) ;
-}
-
+} /* end subroutine */
 
 int strkeyxbasecmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeybasecmp,s1,s2,cmporder_obverse) ;
-}
+} /* end subrouine */
+
 int strkeyxbasecmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeybasecmp,s1,s2,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 int strkeyxcasecmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeycasecmp,s1,s2,cmporder_obverse) ;
-}
+} /* end subrouine */
+
 int strkeyxcasecmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeycasecmp,s1,s2,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 int strkeyxfoldcmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeyfoldcmp,s1,s2,cmporder_obverse) ;
-}
+} /* end subroutine */
+
 int strkeyxfoldcmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeyfoldcmp,s1,s2,cmporder_reverse) ;
-}
+} /* end subroutine */
 
 
