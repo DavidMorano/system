@@ -80,7 +80,7 @@
 
 extern "C" {
     typedef bool (*ischr_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
