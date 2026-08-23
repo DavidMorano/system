@@ -85,18 +85,18 @@ int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
 
 int snwcpybc(char *dp,int dl,cchar *sp,int sl) noex {
 	return snwcpyxc<chtobc>(dp,dl,sp,sl) ;
-}
+} /* end */
 
 int snwcpylc(char *dp,int dl,cchar *sp,int sl) noex {
 	return snwcpyxc<chtolc>(dp,dl,sp,sl) ;
-}
+} /* end */
 
 int snwcpyuc(char *dp,int dl,cchar *sp,int sl) noex {
 	return snwcpyxc<chtouc>(dp,dl,sp,sl) ;
-}
+} /* end */
 
 int snwcpyfc(char *dp,int dl,cchar *sp,int sl) noex {
 	return snwcpyxc<chtofc>(dp,dl,sp,sl) ;
-}
+} /* end */
 
 
