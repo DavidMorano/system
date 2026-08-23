@@ -63,27 +63,27 @@ import libutil ;			/* |getlenstr(3u)| */
 
 local inline bool iswht(int ch) noex {
     	return CHAR_ISWHITE(ch) ;
-}
+} /* end */
 
 local bool iswhiteand(strop *sop,int tch) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return CHAR_ISWHITE(ch) && (ch != tch) ;
-}
+} /* end */
 
 local bool isnotchr(strop *sop,int tch) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return (ch != tch) ;
-}
+} /* end */
 
 local bool isnotterm(strop *sop,cchar *terms) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return (! batst(terms,ch)) ;
-}
+} /* end */
 
 local bool isterm(strop *sop,cchar *terms) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return  batst(terms,ch) ;
-}
+} /* end */
 
 
 /* local variables */
@@ -237,31 +237,39 @@ int strop_span(strop *sop,cchar *ss) noex {
 
 int strop::start(cchar *ap,int al) noex {
 	return strop_start(this,ap,al) ;
-}
+} /* end method */
+
 int strop::fieldwht(cchar **rpp) noex {
 	return strop_fieldwht(this,rpp) ;
-}
+} /* end method */
+
 int strop::fieldchr(int sch,cchar **rpp) noex {
 	return strop_fieldchr(this,sch,rpp) ;
-}
+} /* end method */
+
 int strop::fieldbrk(cchar *ss,cchar **rpp) noex {
 	return strop_fieldbrk(this,ss,rpp) ;
-}
+} /* end method */
+
 int strop::whitechr(int tch) noex {
 	return strop_whitechr(this,tch) ;
-}
+} /* end method */
+
 int strop::findchr(int tch) noex {
 	return strop_findchr(this,tch) ;
-}
+} /* end method */
+
 int strop::findterm(cchar *terms) noex {
 	return strop_findterm(this,terms) ;
-}
+} /* end method */
+
 int strop::spanterm(cchar *terms) noex {
 	return strop_spanterm(this,terms) ;
-}
+} /* end method */
+
 int strop::span(cchar *ss) noex {
 	return strop_span(this,ss) ;
-}
+} /* end method */
 
 void strop::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
