@@ -76,7 +76,7 @@ int uc_getauid() noex {
 	if (au_id_t auid{} ; getauid(&auid) >= 0) {
 	    rs = intsat(auid) ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end subroutine (uc_getauid) */
