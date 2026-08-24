@@ -33,20 +33,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucatexit.h>
-#include	<ucgetpid.h>
-#include	<timewatch.hh>
-#include	<sigblocker.h>
-#include	<lockrw.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<timewatch.hh>		/* LIBU */
+#include	<sigblocker.h>		/* LIBU */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<ucgetpid.h>		/* LIBUC */
+#include	<lockrw.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucfork.h"
 
@@ -65,7 +65,7 @@
 extern "C" {
     int		ucfork_init() noex ;
     int		ucfork_fini() noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -97,7 +97,7 @@ namespace {
 
 extern "C" {
     local void	ucfork_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -112,23 +112,23 @@ static ucfork			ucfork_data ;
 
 int ucfork_init() noex {
 	return ucfork_data.init() ;
-}
+} /* end subroutine */
 
 int ucfork_fini() noex {
 	return ucfork_data.fini() ;
-}
+} /* end subroutine */
 
 int uc_fork() noex {
 	return ucfork_data.stdfork() ;
-}
+} /* end subroutine */
 
 int uc_forklockbegin(int to) noex {
 	return ucfork_data.lockbegin(to) ;
-}
+} /* end subroutine */
 
 int uc_forklockend() noex {
 	return ucfork_data.lockend() ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -244,6 +244,6 @@ int ucfork::lockend() noex {
 
 local void ucfork_exit() noex {
 	ucfork_data.fvoid = true ;
-}
+} /* end subroutine */
 
 
