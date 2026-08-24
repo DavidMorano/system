@@ -72,17 +72,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
-#include	<ucsyspr.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<ucsyspr.h>		/* LIBUC */
 
 #include	"ucgetpr.h"
 #include	"ucgetxx.hh"
@@ -137,7 +137,6 @@ namespace {
 constexpr bool		f_sunos		= F_SUNOS ;
 constexpr bool		f_darwin	= F_DARWIN ;
 constexpr bool		f_linux		= F_LINUX ;
-
 constexpr bool		f_getprxxxr	= F_GETPRXXXR ;
 
 
@@ -149,23 +148,20 @@ constexpr bool		f_getprxxxr	= F_GETPRXXXR ;
 int uc_getprbegin(int stayopen) noex {
 	errno = 0 ;
 	setprotoent(stayopen) ;
-	return (- errno) ;
-}
-/* end subroutine (uc_getprbegin) */
+	return (neg errno) ;
+} /* end subroutine (uc_getprbegin) */
 
 int uc_getprend() noex {
 	errno = 0 ;
 	endprotoent() ;
-	return (- errno) ;
-}
-/* end subroutine (uc_getprend) */
+	return (neg errno) ;
+} /* end subroutine (uc_getprend) */
 
 int uc_getprent(ucentpr *prp,char *prbuf,int prlen) noex {
 	ucgetpr		pro(nullptr) ;
 	pro.m = &ucgetpr::getpr_ent ;
 	return pro(prp,prbuf,prlen) ;
-}
-/* end subroutine (uc_getprent) */
+} /* end subroutine (uc_getprent) */
 
 int uc_getprnam(ucentpr *prp,char *prbuf,int prlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
@@ -178,15 +174,13 @@ int uc_getprnam(ucentpr *prp,char *prbuf,int prlen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getprnam) */
+} /* end subroutine (uc_getprnam) */
 
 int uc_getprnum(ucentpr *prp,char *prbuf,int prlen,int num) noex {
 	ucgetpr		pro(nullptr,num) ;
 	pro.m = &ucgetpr::getpr_num ;
 	return pro(prp,prbuf,prlen) ;
-}
-/* end subroutine (uc_getprnum) */
+} /* end subroutine (uc_getprnum) */
 
 
 /* local subroutines */
@@ -204,8 +198,7 @@ int ucgetpr::operator () (ucentpr *prp,char *prbuf,int prlen) noex {
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucgetpr::operator) */
+} /* end subroutine (ucgetpr::operator) */
 
 int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
     	cnullptr	np{} ;
@@ -214,22 +207,21 @@ int ucgetpr::getpr_ent(ucentpr *prp,char *prbuf,int prlen) noex {
 	    if ((rs = getprent_rp(prp,prbuf,prlen)) >= 0) {
 	        rs = prp->size() ;
 	    } else {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} else {
 	    SYSDBPR	*ep = getprent() ;
 	    if (ucentpr *rp = cast_static<ucentpr *>(ep) ; rp != np) {
 	        rs = prp->load(prbuf,prlen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetpr::getpr_ent) */
+} /* end subroutine (ucgetpr::getpr_ent) */
 
 int ucgetpr::getpr_nam(ucentpr *prp,char *prbuf,int prlen) noex {
     	cnullptr	np{} ;
@@ -238,22 +230,21 @@ int ucgetpr::getpr_nam(ucentpr *prp,char *prbuf,int prlen) noex {
             if ((rs = getprnam_rp(prp,prbuf,prlen,name)) >= 0) {
                 rs = prp->size() ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBPR         *ep = getprnam(name) ;
             if (ucentpr *rp = cast_static<ucentpr *>(ep) ; rp != np) {
                 rs = prp->load(prbuf,prlen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetpr::getpr_nam) */
+} /* end subroutine (ucgetpr::getpr_nam) */
 
 int ucgetpr::getpr_num(ucentpr *prp,char *prbuf,int prlen) noex {
     	cnullptr	np{} ;
@@ -262,21 +253,20 @@ int ucgetpr::getpr_num(ucentpr *prp,char *prbuf,int prlen) noex {
             if ((rs = getprnum_rp(prp,prbuf,prlen,num)) >= 0) {
                 rs = prp->size() ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBPR         *ep = getprnum(num) ;
             if (ucentpr *rp = cast_static<ucentpr *>(ep) ; rp != np) {
                 rs = prp->load(prbuf,prlen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetpr::getpr_num) */
+} /* end subroutine (ucgetpr::getpr_num) */
 
 
