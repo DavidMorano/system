@@ -32,10 +32,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucenumxx.h>		/* <- money shot */
-#include	<ucentho.h>		/* <- money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucenumxx.h>		/* LIBUC <- money shot */
+#include	<ucentho.h>		/* LIBUC <- money shot */
 
 
 #define	UCENUMHO_MAGIC		0x88776281
@@ -85,7 +85,7 @@ struct ucenumho : ucenumxx {
 	    reset(this,ucenumhomem_reset) ;
 	    close(this,ucenumhomem_close) ;
 	    magval = 0 ;
-	} ;
+	} ; /* end ctor */
 	ucenumho(const ucenumho &) = delete ;
 	ucenumho &operator = (const ucenumho &) = delete ;
 	int readent(ucenumho_ent *,char *,int) noex ;
