@@ -27,30 +27,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<bufsizeget.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<getusername.h>
-#include	<opensysfs.hh>
-#include	<opensysdbs.h>
-#include	<snwcpy.h>
-#include	<mkpathx.h>
-#include	<strn.h>
-#include	<strwcpy.h>
-#include	<strdcpy.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucpwcache.h>		/* LIBUC |ucpwcache_name(3uc)| */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<opensysfs.hh>		/* LIBUC */
+#include	<opensysdbs.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strdcpy.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucopeninfo.h"
 
@@ -75,7 +75,7 @@ using libuc::libmem ;			/* variable */
 extern "C" {
     int	uc_openuserbase(ucopeninfo *oip) noex ;
     int	uc_openuserpath(ucopeninfo *oip) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -109,11 +109,11 @@ int uc_openuser(cchar *un,cchar *upath,int oflags,mode_t operms,int to) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ; /* return-value */
-	if (un && upath) {
+	if (un && upath) ylikely {
 	    rs = SR_INVALID ;
-	    if (un[0]) {
-		if (static cint rsv = var ; (rs = rsv) >= 0) {
-	            if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
+	    if (un[0]) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+	            if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
 	                ucentpw		pw ;
 	                cint		pwlen = rs ;
 	                if (un[0] == '-') {
@@ -121,7 +121,7 @@ int uc_openuser(cchar *un,cchar *upath,int oflags,mode_t operms,int to) noex {
 	                } else {
 	                    rs = getpwx_name(&pw,pwbuf,pwlen,un) ;
 	                }
-	                if (rs >= 0) {
+	                if (rs >= 0) ylikely {
 			    if (char *fbuf ; (rs = lm_mp(&fbuf)) >= 0) {
 			        cchar	*udir = pw.pw_dir ;
 	                        if ((rs = mkpath(fbuf,udir,upath)) >= 0) {
@@ -147,8 +147,7 @@ int uc_openuser(cchar *un,cchar *upath,int oflags,mode_t operms,int to) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_openuser) */
+} /* end subroutine (uc_openuser) */
 
 int uc_openuserinfo(ucopeninfo *oip) noex {
 	int		rs ;
@@ -162,18 +161,17 @@ int uc_openuserinfo(ucopeninfo *oip) noex {
 	    rs = uc_openuserpath(oip) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_openuserinfo) */
+} /* end subroutine (uc_openuserinfo) */
 
 int uc_openuserbase(ucopeninfo *oip) noex {
 	const opensysdbs	w = opensysdb_userhomes ;
 	cint			of = oip->oflags ;
 	cint			to = oip->to ;
 	return opensysfs(w,of,to) ;
-}
-/* end subroutine (uc_openuserbase) */
+} /* end subroutine (uc_openuserbase) */
 
 int uc_openuserpath(ucopeninfo *oip) noex {
+	cint		maxuser = var.usernamelen ;
 	int		rs = SR_NOENT ;
 	int		rs1 ;
 	int		ul = -1 ;
@@ -181,9 +179,7 @@ int uc_openuserpath(ucopeninfo *oip) noex {
 	cchar		*fp = oip->fname ;
 	cchar		*tp ;
 	cchar		*un = nullptr ;
-
 	while (fp[0] == '/') fp += 1 ;
-
 	un = fp ;
 	if ((tp = strchr(fp,'/')) != nullptr) {
 	    ul = intconv(tp - fp) ;
@@ -191,12 +187,11 @@ int uc_openuserpath(ucopeninfo *oip) noex {
 	} else {
 	    fp += lenstr(fp) ;
 	}
-
 	if (un[0] != '\0') {
 	    cint	sz = ((var.maxpathlen + 1) + (var.usernamelen + 1)) ;
 	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
-	        cint	ulen = USERNAMELEN ;
-	        char	ubuf[USERNAMELEN + 1] ;
+	        cint	ulen = maxuser ;
+	        charp	ubuf = (a + (0 * (maxuser + 1))) ;
 	        if ((rs = snwcpy(ubuf,ulen,un,ul)) >= 0) {
 		    if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 		        ucentpw	pw ;
@@ -204,7 +199,7 @@ int uc_openuserpath(ucopeninfo *oip) noex {
 	                if ((rs = getpwx_name(&pw,pwbuf,pwlen,ubuf)) >= 0) {
 	                    cchar	*ud = pw.pw_dir ;
 	                    if (ud[0] != '\0') {
-				char	tbuf[MAXPATHLEN + 1] ;
+				charp	tbuf = (a + (maxuser + 1)) ;
 	                        while (fp[0] == '/') fp += 1 ;
 	                        if (fp[0] != '\0') {
 	                            if ((rs = mkpath2(tbuf,ud,fp)) >= 0) {
@@ -213,7 +208,7 @@ int uc_openuserpath(ucopeninfo *oip) noex {
 					fd = rs ;
 	                            }
 	                        } else {
-	                            const int	of = oip->oflags ;
+	                            cint	of = oip->oflags ;
 	                            rs = u_open(ud,of,0666) ;
 				    fd = rs ;
 	                        }
@@ -232,16 +227,14 @@ int uc_openuserpath(ucopeninfo *oip) noex {
 	} else {
 	    rs = SR_NOENT ;
 	}
-
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_openuserpath) */
+} /* end subroutine (uc_openuserpath) */
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
-	    if ((rs = bufsizeget(bufsize_un)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 	        usernamelen = rs ;
 	    }
 	}
