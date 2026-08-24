@@ -59,31 +59,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<getprogpath.h>
-#include	<estrings.h>
-#include	<ids.h>
-#include	<vecstr.h>
-#include	<mkx.h>
-#include	<mkpathxx.h>
-#include	<mkpathx.h>
-#include	<envmk.h>
-#include	<spawnproc.h>
-#include	<permx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<getprogpath.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<mkpathxx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<envmk.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucopeninfo.h"
 
@@ -143,16 +143,16 @@ int uc_openprogerr(cchar *pfn,int of,cmv argv,cmv envv,int *efdp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ; /* return-value */
-	if (pfn && argv && envv) {
+	if (pfn && argv && envv) ylikely {
 	    rs = SR_INVALID ;
-	    if (pfn[0]) {
+	    if (pfn[0]) ylikely {
 	        while ((pfn[0] == '/') && (pfn[1] == '/')) {
 	            pfn += 1 ;
 	        } /* end while */
 	        /* argument check */
-	        if ((rs = accmode(of)) >= 0) {
-	            if (char *ebuf ;(rs = lm_mp(&ebuf)) >= 0) {
-	                if ((rs = mkepath(ebuf,pfn)) >= 0) {
+	        if ((rs = accmode(of)) >= 0) ylikely {
+	            if (char *ebuf ;(rs = lm_mp(&ebuf)) >= 0) ylikely {
+	                if ((rs = mkepath(ebuf,pfn)) >= 0) ylikely {
 		            if (rs > 0) pfn = ebuf ;
 		            rs = openprogs(pfn,of,argv,envv,efdp) ;
 		            fd = rs ;
@@ -164,18 +164,17 @@ int uc_openprogerr(cchar *pfn,int of,cmv argv,cmv envv,int *efdp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_openprogerr) */
+} /* end subroutine (uc_openprogerr) */
 
 int uc_openprog(cchar *pfn,int of,mainv argv,mainv envv) noex {
 	return uc_openprogerr(pfn,of,argv,envv,nullptr) ;
-}
-/* end subroutine (uc_openprog) */
+} /* end subroutine (uc_openprog) */
 
 
 /* local subroutines */
 
 local int mkepath(char *ebuf,cchar *pfn) noex {
+    	cnullptr	np{} ;
 	cint		rsn = SR_NOENT ;
 	int		rs ;
 	int		rs1 ;
@@ -187,7 +186,7 @@ local int mkepath(char *ebuf,cchar *pfn) noex {
 	    } /* end if (non-zero positive) */
 	    if (strncmp(pfn,"/u/",3) == 0) {
 	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
-		    if ((rs = mkpathuser(tbuf,nullptr,pfn,-1)) > 0) {
+		    if ((rs = mkpathuser(tbuf,np,pfn,-1)) > 0) {
 		        el = rs ;
 	                rs = mkpath1(ebuf,tbuf) ;
 	                pfn = ebuf ;
@@ -196,9 +195,9 @@ local int mkepath(char *ebuf,cchar *pfn) noex {
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
 	    } /* end if (special) */
-	    if ((rs >= 0) && (strchr(pfn,'/') == nullptr)) {
-		if ((rs = perm(pfn,-1,-1,nullptr,X_OK)) == rsn) {
-		    if (cchar *tp ; (tp = strchr(pfn,':')) != nullptr) {
+	    if ((rs >= 0) && (strchr(pfn,'/') == np)) {
+		if ((rs = perm(pfn,-1,-1,np,X_OK)) == rsn) {
+		    if (cchar *tp ; (tp = strchr(pfn,':')) != np) {
 			if (((tp-pfn) == 3) && (strncmp(pfn,"sys",3) == 0)) {
 			    pfn = (tp+1) ;
 			}
@@ -218,9 +217,9 @@ local int mkfindpath(char *ebuf,cchar *pfn) noex {
 	int		rs ;
 	int		rs1 ;
 	int		el = 0 ;
-	if ((rs = ids_load(&id)) >= 0) {
-	    if (vecstr ps ; (rs = vecstr_start(&ps,5,0)) >= 0) {
-		if ((rs = vecstr_addcspath(&ps)) >= 0) {
+	if ((rs = ids_load(&id)) >= 0) ylikely {
+	    if (vecstr ps ; (rs = vecstr_start(&ps,5,0)) >= 0) ylikely {
+		if ((rs = vecstr_addcspath(&ps)) >= 0) ylikely {
 		    rs = getprogpath(&id,&ps,ebuf,pfn,-1) ;
 		    el = rs ;
 		} /* end if (vecstr_addcspath) */
@@ -237,8 +236,8 @@ local int openprogs(cc *pfn,int of,cmv argv,cmv envv,int *efdp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (envmk pe ; (rs = envmk_start(&pe,envv)) >= 0) {
-	    if (mainv ev ; (rs = envmk_getvec(&pe,&ev)) >= 0) {
+	if (envmk pe ; (rs = envmk_start(&pe,envv)) >= 0) ylikely {
+	    if (mainv ev ; (rs = envmk_getvec(&pe,&ev)) >= 0) ylikely {
 		rs = spawnit(pfn,of,argv,ev,efdp) ;
 		fd = rs ;
 	    }
@@ -322,7 +321,6 @@ int spawnit(cchar *pfn,int of,cmv argv,cmv envv,int *fd2p) noex {
 		} /* end for */
 	    } /* end if (error-cleanup) */
 	} /* end if (uc_piper) */
-
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (spawnit) */
 
