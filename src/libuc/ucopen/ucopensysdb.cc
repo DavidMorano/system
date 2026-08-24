@@ -42,17 +42,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<sysdbfiles.h>		/* |sysdbfile(uc)| */
-#include	<mknpathx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<sysdbfiles.h>		/* LIBUC |sysdbfile(uc)| */
+#include	<mknpathx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucopensysdb.h"
 
@@ -110,12 +110,11 @@ int uc_opensysdb(sysdbfiles id,int oflags,mode_t operms) noex {
 		{
 		    if ((rs < 0) && (fd >= 0)) {
 			uc_close(fd) ;
-		    }
+		    } /* end if (error) */
 		}
 	    } /* end if (m-a-f) */
 	} /* end if (valid) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_opensysdb) */
+} /* end subroutine (uc_opensysdb) */
 
 
