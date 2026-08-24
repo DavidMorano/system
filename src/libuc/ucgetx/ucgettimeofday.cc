@@ -94,7 +94,7 @@ int uc_gettimeofday(TIMEVAL *tvp,void *dp) noex {
 	if (tvp) {
 	    rs = SR_OK ;
 	    if (gettimeofday(tvp,dp) == -1) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
