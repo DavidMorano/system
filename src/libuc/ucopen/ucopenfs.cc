@@ -87,6 +87,10 @@
 
 #define	DEFPATH		"/usr/bin:/bin"
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+
 
 /* imported namespaces */
 
@@ -100,7 +104,7 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     extern int dialpass(cchar *,int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -152,8 +156,7 @@ int uc_openfs(cchar *passfname,int oflags,int to,int opts) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (uc_openfs) */
+} /* end subroutine (uc_openfs) */
 
 
 /* local subroutines */
