@@ -40,20 +40,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |realpath(3c)| */
-#include	<cstring>		/* |strcpy(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<bufsizevar.hh>
-#include	<mkpathx.h>
-#include	<prefixfn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |realpath(3c)| */
+#include	<cstring>		/* CSTD |strcpy(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<prefixfn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucfileop.h"
 
-#pragma		GCC dependency	"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
 
@@ -124,7 +124,6 @@ int uc_realpath(cchar *fname,char *rbuf) noex {
 	    } /* end if (prefixfn) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (uc_realpath) */
+} /* end subroutine (uc_realpath) */
 
 
