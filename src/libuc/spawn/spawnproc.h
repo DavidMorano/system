@@ -52,19 +52,49 @@
 
 /* object */
 #define	SPAWNPROC_CON		struct spawnproc_control
+
+enum spawnprocos {
+    	spawnproco_ignintr,		/* ignore interrupts */
+    	spawnproco_setsid,		/* set-session-id */
+    	spawnproco_setpgrp,		/* set-process-group */
+    	spawnproco_setctty,		/* set control-terminal PGID */
+    	spawnproco_sigdefs,		/* set default signals */
+    	spawnproco_overlast
+} ; /* end enum (spawnprocos) */
+
+enum spawnprocds {
+    	spawnprocd_inherit,		/* inherit this FD */
+    	spawnprocd_close,		/* close this FD */
+    	spawnprocd_create,		/* create this one */
+    	spawnprocd_dup,			/* DUP this one */
+    	spawnprocd_null,		/* NULL out */
+    	spawnprocd_overlast,
+    	spawnprocd_open		= spawnprocd_create /* create this one */
+} ; /* end enum (spawnprocds) */
+
+#ifdef	__cplusplus
+struct spawnprocms {
+    	static constexpr int	ignintr		= (1 << spawnproco_ignintr) ;
+    	static constexpr int	setsid		= (1 << spawnproco_setsid) ;
+    	static constexpr int	setpgrp		= (1 << spawnproco_setpgrp) ;
+    	static constexpr int	setctty		= (1 << spawnproco_setctty) ;
+    	static constexpr int	sigdefs		= (1 << spawnproco_sigdefs) ;
+} ; /* end struct (spawnprocds) */
+#endif /* __cplusplus */
+
 /* options */
-#define	SPAWNPROC_OIGNINTR	(1<<0)		/* ignore interrupts */
-#define	SPAWNPROC_OSETSID	(1<<1)		/* set-session-id */
-#define	SPAWNPROC_OSETPGRP	(1<<2)		/* set-proces-group ID */
-#define	SPAWNPROC_OSETCTTY	(1<<3)		/* set control-term PGID */
-#define	SPAWNPROC_OSIGDEFS	(1<<4)		/* set default signals */
+#define	SPAWNPROC_OIGNINTR	(1 << spawnproco_ignintr)
+#define	SPAWNPROC_OSETSID	(1 << spawnproco_setsid)
+#define	SPAWNPROC_OSETPGRP	(1 << spawnproco_setpgrp)
+#define	SPAWNPROC_OSETCTTY	(1 << spawnproco_setctty)
+#define	SPAWNPROC_OSIGDEFS	(1 << spawnproco_sigdefs)
 /* file descriptor dispositions are */
-#define	SPAWNPROC_DINHERIT	0			/* inherit this FD */
-#define	SPAWNPROC_DCLOSE	1			/* close this FD */
-#define	SPAWNPROC_DCREATE	2			/* create this one */
-#define	SPAWNPROC_DOPEN		SPAWNPROC_DCREATE	/* create this one */
-#define	SPAWNPROC_DDUP		3			/* DUP this one */
-#define	SPAWNPROC_DNULL		4			/* NULL out */
+#define	SPAWNPROC_DINHERIT	spawnprocd_inherit
+#define	SPAWNPROC_DCLOSE	spawnprocd_close
+#define	SPAWNPROC_DCREATE	spawnprocd_create
+#define	SPAWNPROC_DOPEN		spawnprocd_create
+#define	SPAWNPROC_DDUP		spawnprocd_dup
+#define	SPAWNPROC_DNULL		spawnprocd_null
 
 /* notes on this structure */
 
@@ -95,6 +125,10 @@ EXTERNC_begin
 extern int spawnproc(spawnproc_con *,cchar *,mainv,mainv) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+extern const spawnprocms	spawnprocm ;
+#endif /* __cplusplus */
 
 
 #endif /* SPAWNPROC_INCLUDE */
