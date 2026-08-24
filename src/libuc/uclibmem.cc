@@ -85,7 +85,7 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 extern "C" {
     int lm_mallsys(int w,charpp rpp) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -121,7 +121,7 @@ local sysval		pagesz(sysval_ps) ;
 
 namespace libuc {
     libmems		libmem ;
-}
+} /* end namespace */
 
 using libuc::libmem ;
 
@@ -130,141 +130,165 @@ using libuc::libmem ;
 
 int uc_libmemallocstrw(cchar *sp,int 탎l,cchar **rpp) noex {
     	return libmem.strw(sp,탎l,rpp) ;
-}
+} /* end */
 
 int uc_libmemallocitem(cvoid *sp,int 탎l,void **rpp) noex {
     	return libmem.item(sp,탎l,rpp) ;
-}
+} /* end */
 
 int uc_libmemalloc(int sz,void *vp) noex {
     	return libmem.mall(sz,vp) ;
-}
+} /* end */
 
 int uc_libmemvalloc(int sz,void *vp) noex {
     	return libmem.vall(sz,vp) ;
-}
+} /* end */
 
 int uc_libmemcalloc(int ne,int esz,void *vp) noex {
     	return libmem.call(ne,esz,vp) ;
-}
+} /* end */
 
 int uc_libmemrealloc(void *cp,int sz,void *vp) noex {
     	return libmem.rall(cp,sz,vp) ;
-}
+} /* end */
 
 int uc_libmemfree(void *cp) noex {
     	return libmem.free(cp) ;
-}
+} /* end */
 
 int uc_libmemrsfree(int rs,void *p) noex {
     	return libmem.rsfree(rs,p) ;
-}
+} /* end */
 
 int lm_ma(char **rpp) noex {
 	cint	w = bufsize_ma ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_mn(char **rpp) noex {
 	cint	w = bufsize_mn ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_mp(char **rpp) noex {
 	cint	w = bufsize_mp ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_ml(char **rpp) noex {
 	cint	w = bufsize_ml ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_mm(char **rpp) noex {
 	cint	w = bufsize_mm ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_nn(char **rpp) noex {
 	cint	w = bufsize_nn ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_proname(char **rpp) noex {
 	cint	w = bufsize_protname ;	/* network prot-name (protocol-name) */
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_hostname(char **rpp) noex {
 	cint	w = bufsize_hostname ;	/* network host-name (host-name) */
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_servname(char **rpp) noex {
 	cint	w = bufsize_servname ;	/* network serv-name (service-name) */
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_un(char **rpp) noex {
 	cint	w = bufsize_un ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_gn(char **rpp) noex {
 	cint	w = bufsize_gn ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_pn(char **rpp) noex {
 	cint	w = bufsize_pn ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_pw(char **rpp) noex {
 	cint	w = bufsize_pw ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_sp(char **rpp) noex {
 	cint	w = bufsize_sp ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_ua(char **rpp) noex {
 	cint	w = bufsize_ua ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_gr(char **rpp) noex {
 	cint	w = bufsize_gr ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_pj(char **rpp) noex {
 	cint	w = bufsize_pj ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_pr(char **rpp) noex {
 	cint	w = bufsize_pr ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_nw(char **rpp) noex {
 	cint	w = bufsize_nw ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_ho(char **rpp) noex {
 	cint	w = bufsize_ho ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_sv(char **rpp) noex {
 	cint	w = bufsize_sv ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_fs(char **rpp) noex {
 	cint	w = bufsize_fs ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_sn(char **rpp) noex {
 	cint	w = bufsize_sn ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_zn(char **rpp) noex {
 	cint	w = bufsize_zn ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
+
 int lm_zi(char **rpp) noex {
 	cint	w = bufsize_zi ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
 
 int lm_ad(char **rpp) noex {
 	cint	w = bufsize_mailaddr ;
 	return lm_mallsys(w,rpp) ;
-}
+} /* end */
 
 int lm_ps(char **rpp) noex {
 	int             rs ;
@@ -514,7 +538,7 @@ int mgr::stdmalloc(int sz,void *vp) noex {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	    *rpp = nullptr ;
 	}
 	return rs ;
@@ -529,7 +553,7 @@ int mgr::stdvalloc(int sz,void *vp) noex {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	    *rpp = nullptr ;
 	}
 	return rs ;
@@ -545,7 +569,7 @@ int mgr::stdrealloc(int sz,void *vp) noex {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	    *rpp = nullptr ;
 	}
 	return rs ;
