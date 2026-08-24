@@ -28,13 +28,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<sysdbfn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<sysdbfn.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucenumxx.h"
 #include	"ucenumua.h"
@@ -60,8 +60,8 @@
 
 /* local variables */
 
-constexpr uint		mxx = UCENUMUA_MAGIC ;
-constexpr sysdbfiles	w = sysdbfile_ua ;
+constexpr uint		mxx	= UCENUMUA_MAGIC ;
+constexpr sysdbfiles	w	= sysdbfile_ua ;
 
 
 /* local subroutines */
@@ -79,26 +79,22 @@ int ucenumua_open(ucenumua *op,cchar *efname) noex {
 	    rs = ueo.open(rp) ;
 	} /* end if (sysdbfn_get) */
 	return rs ;
-}
-/* end if (ucenumua_open) */
+} /* end if (ucenumua_open) */
 
 int ucenumua_close(ucenumua *op) noex {
 	ucenumxxco<ucenumua_ent>	ueo(op,mxx) ;
 	return ueo.close() ;
-} 
-/* end subroutine (ucenumua_close) */
+} /* end subroutine (ucenumua_close) */
 
 int ucenumua_readent(ucenumua *op,ucenumua_ent *ep,char *bp,int bl) noex {
 	ucenumxxco<ucenumua_ent>	ueo(op,mxx) ;
 	return ueo.readent(ep,bp,bl) ;
-}
-/* end subroutine (ucenumua_readent) */
+} /* end subroutine (ucenumua_readent) */
 
 int ucenumua_reset(ucenumua *op) noex {
 	ucenumxxco<ucenumua_ent>	ueo(op,mxx) ;
 	return ueo.reset() ;
-}
-/* end subroutine (ucenumua_reset) */
+} /* end subroutine (ucenumua_reset) */
 
 
 /* local subroutines */
