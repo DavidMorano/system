@@ -37,14 +37,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<utility>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
-#include	<exitcodes.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<utility>		/* C++SYD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -54,7 +54,7 @@
 
 extern "C" {
     extern int	mainprog(int,con mainv,con mainv) noex ;
-}
+} /* end extern (C) */
 
 
 /* forward references */
@@ -71,7 +71,6 @@ int main(int argc,con mainv argv,con mainv envv) {
 	}
 	exit(ex) ;
 	std::unreachable() ;
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
