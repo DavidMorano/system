@@ -28,13 +28,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<sysdbfn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<sysdbfn.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucenumxx.h"
 #include	"ucenumpr.h"
@@ -79,26 +79,22 @@ int ucenumpr_open(ucenumpr *op,cchar *efname) noex {
 	    rs = ueo.open(rp) ;
 	} /* end if (sysdbfn_get) */
 	return rs ;
-}
-/* end if (ucenumpr_open) */
+} /* end if (ucenumpr_open) */
 
 int ucenumpr_close(ucenumpr *op) noex {
 	ucenumxxco<ucenumpr_ent>	ueo(op,mxx) ;
 	return ueo.close() ;
-} 
-/* end subroutine (ucenumpr_close) */
+} /* end subroutine (ucenumpr_close) */
 
 int ucenumpr_readent(ucenumpr *op,ucenumpr_ent *ep,char *bp,int bl) noex {
 	ucenumxxco<ucenumpr_ent>	ueo(op,mxx) ;
 	return ueo.readent(ep,bp,bl) ;
-}
-/* end subroutine (ucenumpr_readent) */
+} /* end subroutine (ucenumpr_readent) */
 
 int ucenumpr_reset(ucenumpr *op) noex {
 	ucenumxxco<ucenumpr_ent>	ueo(op,mxx) ;
 	return ueo.reset() ;
-}
-/* end subroutine (ucenumpr_reset) */
+} /* end subroutine (ucenumpr_reset) */
 
 
 /* local subroutines */
