@@ -112,12 +112,12 @@ template<> void strtox(cchar *sp,char **epp,int b,int *rp)		noex {
 /* |long| */
 template<> void strtox(cchar *sp,char **epp,int b,long *rp)		noex {
 	*rp = strtol(sp,epp,b) ;
-}
+} /* end */
 
 /* |longlong| */
 template<> void strtox(cchar *sp,char **epp,int b,longlong *rp)		noex {
 	*rp = strtoxll(sp,epp,b) ;
-}
+} /* end */
 
 /* |uint| */
 template<> void strtox(cchar *sp,char **epp,int b,uint *rp)		noex {
@@ -151,7 +151,7 @@ local sysret_t ucstrtox(cchar *sp,cchar **epp,int b,T *rp)		noex {
 	    errno = 0 ;
 	    strtox(sp,&endp,b,rp) ;
 	    if (epp) *epp = endp ;
-	    rs = (errno) ? (- errno) : intconv(endp - sp) ;
+	    rs = (errno) ? (neg errno) : intconv(endp - sp) ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine-template (ucstrtox) */
