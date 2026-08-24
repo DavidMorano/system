@@ -308,15 +308,6 @@ typedef const char		cc ;
 #endif
 #endif
 
-/* timezone (zoneinfo) name */
-#ifndef	TZNAMELEN
-#ifdef	TZNAME_MAX
-#define	TZNAMELEN	TZNAME_MAX
-#else
-#define	TZNAMELEN	256
-#endif
-#endif
-
 #ifndef	NODENAMELEN
 #define	NODENAMELEN	256
 #endif
@@ -326,9 +317,22 @@ typedef const char		cc ;
 #endif
 
 /* timezone abbreviation */
+#ifndef	TZNAMELEN
+#ifdef	TZNAME_MAX
+#define	TZNAMELEN	TZNAME_MAX
+#else
+#define	TZNAMELEN	8
+#endif
+#endif /* TZNAMELEN */
+
+/* timezone abbreviation */
 #ifndef	TZABBRLEN
+#ifdef	TZABBR_MAX
+#define	TZABBRLEN	TZABBR_MAX
+#else
 #define	TZABBRLEN	8
 #endif
+#endif /* TZABBRLEN */
 
 /* log-ID (for logging) */
 #ifndef	LOGIDLEN
