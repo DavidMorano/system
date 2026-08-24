@@ -28,23 +28,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>		/* |uc_closeonexec(3uc)| */
-#include	<getx.h>
-#include	<opensysfs.hh>
-#include	<mkpathx.h>
-#include	<strn.h>		/* |strnchr(3c)| */
-#include	<strwcpy.h>
-#include	<matstr.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC |uc_closeonexec(3uc)| */
+#include	<getx.h>		/* LIBUC */
+#include	<opensysfs.hh>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3c)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucopeninfo.h"
 
@@ -73,7 +73,7 @@ extern "C" {
     extern int	dialtcpnls(cc *,cchar *,int,cchar *,int,int) noex ;
     extern int	dialtcpmux(cc *,cchar *,int,cchar *,cchar **,int,int) noex ;
     extern int	dialudp(cc *,cchar *,int,int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* local structures */
@@ -143,19 +143,19 @@ int uc_opendev(cchar *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
 	int		fd = -1 ; /* return-value */
 	(void) envv ;
 	(void) opts ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 		int fl = -1 ;
 		bool f_more = false ;
 	        while (fname[0] == '/') fname += 1 ;
-	        if (cchar*tp ; (tp = strchr(fname,'/')) != nullptr) {
+	        if (cchar *tp = strchr(fname,'/') ; tp) {
 	            fl = intconv(tp - fname) ;
 	            while (fl && (fname[fl-1] == '/')) fl -= 1 ;
 	            while (tp[0] == '/') tp += 1 ;
 	            f_more = (tp[0] != '\0') ;
 	        } /* end if */
-	        if (int fi ; (fi = matstr(subnames,fname,fl)) >= 0) {
+	        if (int fi ; (fi = matstr(subnames,fname,fl)) >= 0) ylikely {
 	            switch (fi) {
 	            case devname_users:
 	            case devname_groups:
@@ -190,8 +190,7 @@ int uc_opendev(cchar *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;;
-}
-/* end subroutine (uc_opendev) */
+} /* end subroutine (uc_opendev) */
 
 
 /* private subroutines */
@@ -206,8 +205,8 @@ local int opendev_default(cchar *fname,int of,mode_t om) noex {
 	sz += 1 ;
 	sz += intconv(lenstr(fname) + 1) ;
 	sz += 1 ;
-	if (char *fnbuf ; (rs = lm_mall(sz,&fnbuf)) >= 0) {
-	    if ((rs = mkpath2(fnbuf,devdname,fname)) >= 0) {
+	if (char *fnbuf ; (rs = lm_mall(sz,&fnbuf)) >= 0) ylikely {
+	    if ((rs = mkpath2(fnbuf,devdname,fname)) >= 0) ylikely {
 	        rs = u_open(fnbuf,of,om) ;
 		fd = rs ;
 	    }
@@ -216,14 +215,13 @@ local int opendev_default(cchar *fname,int of,mode_t om) noex {
 	} /* end if (memory-acquire) */
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opendev_default) */
+} /* end subroutine (opendev_default) */
 
 local int opendev_inet(int fi,cchar *fname,int of,int to,int ne) noex {
 	inetargs	ia ;
 	int		rs ;
 	int		fd = -1 ;
-	if ((rs = inetargs_start(&ia,fname,-1)) >= 0) {
+	if ((rs = inetargs_start(&ia,fname,-1)) >= 0) ylikely {
 	    cchar	*a = ia.ia[da_af].p ;
 	    cchar	*h = ia.ia[da_host].p ;
 	    cchar	*s = ia.ia[da_svc].p ;
@@ -254,8 +252,7 @@ local int opendev_inet(int fi,cchar *fname,int of,int to,int ne) noex {
 	}
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (opendev_inet) */
+} /* end subroutine (opendev_inet) */
 
 local int inetargs_start(inetargs *iap,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -264,10 +261,10 @@ local int inetargs_start(inetargs *iap,cchar *sp,int sl) noex {
 	while (sl && (sp[0] == '/')) {
 	    sp += 1 ;
 	    sl -= 1 ;
-	}
+	} /* end while */
 	iap->ia[da_proto].l = sl ;
 	iap->ia[da_proto].p = sp ;
-	if (cchar *tp ; (tp = strnchr(sp,sl,'/')) != nullptr) {
+	if (cchar *tp = strnchr(sp,sl,'/') ; tp) {
 	    int		cl ;
 	    cchar	*cp ;
 	    iap->ia[da_host].l = intconv(tp - sp) ;
@@ -319,21 +316,18 @@ local int inetargs_start(inetargs *iap,cchar *sp,int sl) noex {
 		} /* end for */
 	    } /* end if (memory-acquire) */
 	} /* end block */
-
 	return rs ;
-}
-/* end subroutine (inetargs_start) */
+} /* end subroutine (inetargs_start) */
 
 local int inetargs_finish(inetargs *iap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (iap->a != nullptr) {
+	if (iap->a) {
 	    rs1 = lm_free(iap->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    iap->a = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (inetargs_finish) */
+} /* end subroutine (inetargs_finish) */
 
 
