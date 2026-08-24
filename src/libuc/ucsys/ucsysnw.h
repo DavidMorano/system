@@ -33,7 +33,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<netdb.h>		/* POSIX <- the money shot */
-#include	<stdint.h>		/* |uint32_t| */
+#include	<stdint.h>		/* CSTD |uint32_t| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
