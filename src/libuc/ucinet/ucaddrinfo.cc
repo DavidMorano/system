@@ -60,17 +60,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<netdb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include        <errtimer.hh>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include        <errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucaddrinfo.h"
 
@@ -107,9 +107,9 @@ local int std_getaddinfo(cc *,cc *,con ai *,ai **) noex ;
 
 int uc_addrinfoget(cc *hn,cc *svc,con ai *hintp,ai **rpp) noex {
     	int		rs = SR_FAULT ;
-	if (hn || svc) { /* <- either must be non-NULL */
+	if (hn || svc) ylikely { /* <- either must be non-NULL */
 	    rs = SR_INVALID ;
-	    if (hn[0] && svc[0]) {
+	    if (hn[0] && svc[0]) ylikely {
                 errtimer    to_again        = utimeout[uto_again] ;
                 errtimer    to_busy         = utimeout[uto_busy] ;
                 errtimer    to_nomem        = utimeout[uto_nomem] ;
@@ -173,8 +173,7 @@ int uc_addrinfoget(cc *hn,cc *svc,con ai *hintp,ai **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_addrinfoget) */
+} /* end subroutine (uc_addrinfoget) */
 
 int uc_addrinfofree(ADDRINFO *aip) noex {
 	int		rs = SR_FAULT ;
@@ -183,8 +182,7 @@ int uc_addrinfofree(ADDRINFO *aip) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_addrinfofree) */
+} /* end subroutine (uc_addrinfofree) */
 
 
 /* local subroutines */
@@ -225,7 +223,7 @@ local int std_getaddinfo(cc *hn,cc *svc,con ai *hintp,ai **rpp) noex {
                 rs = SR_SOCKTNOSUPPORT ;
                 break ;
             case EAI_SYSTEM:
-                rs = (- errno) ;
+                rs = (neg errno) ;
                 break ;
             default:
                 rs = SR_NOANODE ;
