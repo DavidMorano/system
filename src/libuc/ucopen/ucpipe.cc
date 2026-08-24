@@ -122,7 +122,7 @@ constexpr bool		f_pipes = F_PIPES ;
 
 int uc_pipe(int *pipes) noex {
     	return u_pipe(pipes) ;
-}
+} /* end subroutine */
 
 int uc_pipes(int *pipes,int of) noex {
 	int		rs ;
@@ -148,8 +148,7 @@ int uc_pipes(int *pipes,int of) noex {
 	    } /* end if (u_pipe) */
 	} /* end if_constexpr (f_pipes) */
 	return rs ;
-}
-/* end subroutine (uc_pipe2) */
+} /* end subroutine (uc_pipe2) */
 
 int uc_piper(int *pipes,int of,int minfd) noex {
 	int		rs = SR_FAULT ;
@@ -169,7 +168,6 @@ int uc_piper(int *pipes,int of,int minfd) noex {
 	    } /* end if (created successfully) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_piper) */
+} /* end subroutine (uc_piper) */
 
 
