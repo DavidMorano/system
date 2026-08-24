@@ -122,11 +122,11 @@ local int tagtrack_dtor(tagtrack *op) noex {
 	if (op->elp) ylikely {
 	    delete op->elp ;
 	    op->elp = nullptr ;
-	}
+	} /* end if (delete-vecobj) */
 	if (op->tlp) ylikely {
 	    delete op->tlp ;
 	    op->tlp = nullptr ;
-	}
+	} /* end if (delete-vechand) */
 	return rs ;
 } /* end subroutine (tagtrack_dtor) */
 
@@ -493,7 +493,7 @@ local int tagtrack_search(TT *op,TT_TAG **tagpp,cchar *nap,int nal) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*name = nullptr ;
-	if (nulstr tn ; (rs = tn.start(nap,nal,&name)) >= 0) {
+	if (nulstr tn ; (rs = tn.start(nap,nal,&name)) >= 0) ylikely {
 	    {
 	        TT_TAG	te{} ;
 	        te.name = name ;
@@ -523,10 +523,10 @@ local int tagtrack_addesc(TT *op,TT_TAG *tagp,int fi,uint eoff,int elen) noex {
 
 local int tag_start(TT_TAG *tagp,cchar *kp,int kl) noex {
 	int		rs = SR_BUGCHECK ;
-	if (tagp && kp) {
+	if (tagp && kp) ylikely {
 	    memclear(tagp) ;
 	    tagp->tagtype = -1 ;
-	    if (cchar *cp ; (rs = mem.strw(kp,kl,&cp)) >= 0) {
+	    if (cchar *cp ; (rs = mem.strw(kp,kl,&cp)) >= 0) ylikely {
 	        tagp->name = cp ;
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
@@ -536,7 +536,7 @@ local int tag_start(TT_TAG *tagp,cchar *kp,int kl) noex {
 local int tag_finish(TT_TAG *sp) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_OK ;
 	    if (sp->name) {
 	        voidp vp = voidp(sp->name) ;
@@ -562,7 +562,7 @@ local int tag_addnum(TT_TAG *tagp,int ltt,int lc) noex {
 local int entry_load(TT_ENT *ep,TT_ESC *fop) noex {
 	TT_TAG		*tagp = fop->tagp ;
 	int		rs = SR_BUGCHECK ;
-	if (ep && fop) {
+	if (ep && fop) ylikely {
 	    rs = SR_OK ;
 	    ep->fi	= fop->fi ;
 	    ep->eoff	= fop->eoff ;
