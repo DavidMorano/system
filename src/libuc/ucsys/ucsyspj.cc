@@ -44,13 +44,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsyspj.h"
 
@@ -146,7 +146,7 @@ unixret_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
 	}
 	if (ec) errno = ex ;
 	return rc ;
-}
+} /* end subroutine */
 
 #else /* defined(SYSHAS_GETPJNAMR) && (SYSHAS_GETPJNAMR > 0) */
 
@@ -246,7 +246,7 @@ unixret_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
 #define	SUBROUTINE_GETPROJID
 projid_t getprojid() noex {
 	return projid_t(0) ;
-}
+} /* end */
 #endif
 
 void setprojent() noex { }
@@ -256,19 +256,22 @@ void endprojent() noex { }
 PROJECT	*getpjent() noex {
 	errno = ENOSYS ;
 	return nullptr ;
-}
+} /* end */
+
 PROJECT	*getpjnam(cchar *) noex {
 	errno = ENOSYS ;
 	return nullptr ;
-}
+} /* end */
+
 PROJECT	*getpjpid(projid_t) noex {
 	errno = ENOSYS ;
 	return nullptr ;
-}
+} /* end */
+
 PROJECT	*getpjdef(cchar *) noex {
 	errno = ENOSYS ;
 	return nullptr ;
-}
+} /* end */
 
 unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
         errno_t     	ec = EFAULT ;
