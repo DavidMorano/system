@@ -180,7 +180,7 @@ extern "C" {
     local void	ucinfo_atforkbefore() noex ;
     local void	ucinfo_atforkafter() noex ;
     local void	ucinfo_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
