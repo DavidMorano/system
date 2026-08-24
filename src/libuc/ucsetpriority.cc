@@ -24,18 +24,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<sys/resource.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/resource.h>	/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -50,10 +50,9 @@ int uc_setpriority(int which,id_t who,int prio) noex {
 	int	rs = SR_OK ;
 	errno = 0 ;
 	if ((rs = setpriority(which,who,prio)) < 0) {
-	    if (errno != 0) rs = (- errno) ;
+	    if (errno != 0) rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_setpriority) */
+} /* end subroutine (uc_setpriority) */
 
 
