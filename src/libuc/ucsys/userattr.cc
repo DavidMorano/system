@@ -32,14 +32,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"userattr.h"
 
@@ -85,30 +85,30 @@
 
 extern void setuserattr() noex { 
 	errno = ENOSYS ;
-} ;
+} /* end */
 
 extern void enduserattr() noex { 
 	errno = ENOSYS ;
-} ;
+} /* end */
 
 extern void free_userattr(userattr *) noex { 
 	errno = ENOSYS ;
-}
+} /* end */
 
 extern userattr *getuserattr() noex {
 	errno = ENOENT ;
 	return nullptr ;
-}
+} /* end */
 
 extern userattr *getusernam(cchar *) noex {
 	errno = ENOENT ;
 	return nullptr ;
-}
+} /* end */
 
 extern userattr *getuseruid(uid_t) noex {
 	errno = ENOENT ;
 	return nullptr ;
-}
+} /* end */
 
 
 /******************************************************************************/
