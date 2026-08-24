@@ -16,14 +16,14 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -62,12 +62,11 @@ int uc_initgroups(cchar *name,gid_t gid) noex {
 	    if (name[0]) {
 		rs = SR_OK ;
 	        if (initgroups(name,gid) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_initgroups) */
+} /* end subroutine (uc_initgroups) */
 
 
