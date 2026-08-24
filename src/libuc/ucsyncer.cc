@@ -46,22 +46,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucfork.h>
-#include	<ucatfork.h>
-#include	<ucatexit.h>
-#include	<sigblocker.h>
-#include	<ptm.h>
-#include	<ptc.h>
-#include	<pta.h>
-#include	<upt.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucfork.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<sigblocker.h>		/* LIBUC */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
+#include	<pta.h>			/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -78,7 +78,7 @@
 extern "C" {
     int		ucsyncer_init() noex ;
     int		ucsyncer_fini() noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -127,7 +127,7 @@ extern "C" {
     local void	ucsyncer_atforkparent() noex ;
     local void	ucsyncer_atforkchild() noex ;
     local void	ucsyncer_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -185,8 +185,7 @@ int ucsyncer_init() noex {
 	    } /* end if */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ucsyncer_init) */
+} /* end subroutine (ucsyncer_init) */
 
 int ucsyncer_fini() noex {
 	US	*uip = &ucsyncer_data ;
@@ -219,8 +218,7 @@ int ucsyncer_fini() noex {
 	    uip->f_init = false ;
 	} /* end if (atexit registered) */
 	return rs ;
-}
-/* end subroutine (ucsyncer_fini) */
+} /* end subroutine (ucsyncer_fini) */
 
 int uc_syncer(int w) noex {
 	US	*uip = &ucsyncer_data ;
@@ -240,8 +238,7 @@ int uc_syncer(int w) noex {
 	    } /* end switch */
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (uc_syncer) */
+} /* end subroutine (uc_syncer) */
 
 
 /* local subroutines */
