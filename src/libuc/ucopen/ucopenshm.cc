@@ -45,22 +45,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |mode_t| */
-#include	<sys/mman.h>		/* SHM asks for this */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cerrno>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<errtimer.hh>
-#include	<posname.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® |mode_t| */
+#include	<sys/mman.h>		/* POSIX® SHM asks for this */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<errtimer.hh>		/* LIBUC */
+#include	<posname.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -101,9 +101,9 @@ int uc_openshmto(cchar *shmname,int of,mode_t om,int to) noex {
 	int		rs1 ;
 	int		fd = -1 ;
 	if (to < 0) to = INT_MAX ;
-	if (shmname) {
+	if (shmname) ylikely {
 	    rs = SR_INVALID ;
-	    if (shmname[0]) {
+	    if (shmname[0]) ylikely {
 	        cchar	*nn ;
 	        if (posname pn ; (rs = pn.start(shmname,-1,&nn)) >= 0) {
 	            for (int i = 0 ; to-- >= 0 ; i += 1) {
@@ -124,13 +124,11 @@ int uc_openshmto(cchar *shmname,int of,mode_t om,int to) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_openshmto) */
+} /* end subroutine (uc_openshmto) */
 
 int uc_openshm(cchar *shmname,int of,mode_t om) noex {
     	return uc_openshmto(shmname,of,om,-1) ;
-}
-/* end subroutine (uc_openshm) */
+} /* end subroutine (uc_openshm) */
 
 
 /* local subroutines */
@@ -145,7 +143,7 @@ local int ucopenshm(cc *name,int of,mode_t om) noex {
         repeat {
 	    errno = 0 ;
 	    if ((rs = shm_open(name,of,om)) < 0) {
-                rs = (- errno) ;
+                rs = (neg errno) ;
                 r(rs) ;                 /* <- default causes exit */
 	        switch (rs) {
 	        case SR_MFILE:
