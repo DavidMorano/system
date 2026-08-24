@@ -58,6 +58,7 @@ enum spawneros {
     	spawnero_ignintr,		/* ignore interrupts */
     	spawnero_setsid,		/* set-session-id */
     	spawnero_setpgrp,		/* set-process-group */
+    	spawnero_setctty,		/* set control-terminal PFID */
     	spawnero_sigdefs,		/* set default signals */
     	spawnero_overlast
 } ; /* end enum (spawneros) */
@@ -67,6 +68,7 @@ struct spawnerms {
     	static constexpr int	ignintr		= (1 << spawnero_ignintr) ;
     	static constexpr int	setsid		= (1 << spawnero_setsid) ;
     	static constexpr int	setpgrp		= (1 << spawnero_setpgrp) ;
+    	static constexpr int	setctty		= (1 << spawnero_setctty) ;
     	static constexpr int	sigdefs		= (1 << spawnero_sigdefs) ;
 } ; /* end struct (spawnerms) */
 #endif /* __cplusplus */
