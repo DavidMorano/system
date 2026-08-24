@@ -51,13 +51,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsysho.h"
 
@@ -327,7 +327,7 @@ unixret_t gethoadd_rp(HO *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
 
 HOSTENT *gethoent() noex {
 	return gethostent() ;
-}
+} /* end */
 
 HOSTENT *gethonam(cchar *n) noex {
 	HOSTENT		*rp = nullptr ;
