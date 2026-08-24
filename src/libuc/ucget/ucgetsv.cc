@@ -135,13 +135,13 @@ constexpr bool		f_getsvxxxr	= F_GETSVXXXR ;
 int uc_getsvbegin(int stayopen) noex {
 	errno = 0 ;
 	setservent(stayopen) ;
-	return (- errno) ;
+	return (neg errno) ;
 } /* end subroutine (uc_getsvbegin) */
 
 int uc_getsvend() noex {
 	errno = 0 ;
 	endservent() ;
-	return (- errno) ;
+	return (neg errno) ;
 } /* end subroutine (uc_getsvend) */
 
 int uc_getsvent(ucentsv *svp,char *svbuf,int svlen) noex {
@@ -200,14 +200,14 @@ int ucgetsv::getsv_ent(ucentsv *svp,char *svbuf,int svlen) noex {
 	    if ((rs = getsvent_rp(svp,svbuf,svlen)) >= 0) {
 	        rs = svp->size() ;
 	    } else {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} else {
 	    SYSDBSV	*ep = getsvent() ;
 	    if (ucentsv *rp = cast_static<ucentsv *>(ep) ; rp != np) {
 	        rs = svp->load(svbuf,svlen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
@@ -223,14 +223,14 @@ int ucgetsv::getsv_nam(ucentsv *svp,char *svbuf,int svlen) noex {
             if ((rs = getsvnam_rp(svp,svbuf,svlen,name,proto)) >= 0) {
                 rs = svp->size() ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBSV         *ep = getsvnam(name,proto) ;
             if (ucentsv *rp = cast_static<ucentsv *>(ep) ; rp != np) {
                 rs = svp->load(svbuf,svlen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
@@ -246,14 +246,14 @@ int ucgetsv::getsv_num(ucentsv *svp,char *svbuf,int svlen) noex {
             if ((rs = getsvpor_rp(svp,svbuf,svlen,num,proto)) >= 0) {
                 rs = svp->size() ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBSV     *ep = getsvpor(num,proto) ;
             if (ucentsv *rp = cast_static<ucentsv *>(ep) ; rp != np) {
                 rs = svp->load(svbuf,svlen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
