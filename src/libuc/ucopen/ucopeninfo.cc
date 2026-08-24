@@ -324,8 +324,7 @@ int uc_openex(cchar *fn,int of,mode_t om,int to,int oo) noex {
 	oi.to = to ;
 	oi.opts = oo ;
 	return uc_openinfo(&oi) ;
-}
-/* end subroutine (uc_openex) */
+} /* end subroutine (uc_openex) */
 
 int uc_openinfo(OI *oip) noex {
 	int		rs = SR_FAULT ;
@@ -344,8 +343,7 @@ int uc_openinfo(OI *oip) noex {
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_openinfo) */
+} /* end subroutine (uc_openinfo) */
 
 
 /* local subroutines */
