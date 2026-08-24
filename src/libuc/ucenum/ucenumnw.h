@@ -32,10 +32,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucenumxx.h>		/* <- money shot */
-#include	<ucentnw.h>		/* <- money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucenumxx.h>		/* LIBUC <- money shot */
+#include	<ucentnw.h>		/* LIBUC <- money shot */
 
 
 #define	UCENUMNW_MAGIC		0x88776281
@@ -85,7 +85,7 @@ struct ucenumnw : ucenumxx {
 	    reset(this,ucenumnwmem_reset) ;
 	    close(this,ucenumnwmem_close) ;
 	    magval = 0 ;
-	} ;
+	} ; /* end ctor */
 	ucenumnw(const ucenumnw &) = delete ;
 	ucenumnw &operator = (const ucenumnw &) = delete ;
 	int readent(ucenumnw_ent *,char *,int) noex ;
