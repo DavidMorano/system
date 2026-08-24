@@ -16,19 +16,19 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/mman.h>		/* |shm_{x}(2)| */
-#include	<semaphore.h>		/* |sem_{x}(2)| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<posname.h>		/* create POSIX® entity names */
-#include	<prefixfn.h>
-#include	<mkx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® |shm_{x}(2)| */
+#include	<semaphore.h>		/* POSIX® |sem_{x}(2)| */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<posname.h>		/* LIBUC create POSIX® entity names */
+#include	<prefixfn.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucfileop.h"
 
@@ -94,8 +94,7 @@ int uc_unlink(cchar *fname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (prefixfn) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (uc_unlink) */
+} /* end subroutine (uc_unlink) */
 
 int uc_unlinkshm(cchar *fname) noex {
 	int		rs = SR_FAULT ;
@@ -109,7 +108,7 @@ int uc_unlinkshm(cchar *fname) noex {
 	                repeat {
 	                    errno = 0 ;
 	                    if ((rs = shm_unlink(nn)) < 0) {
-		                rs = (- errno) ;
+		                rs = (neg errno) ;
 	                    }
 	                } until (rs != SR_INTR) ;
 		        rs1 = pn.finish ;
@@ -121,8 +120,7 @@ int uc_unlinkshm(cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_unlinkshm) */
+} /* end subroutine (uc_unlinkshm) */
 
 int uc_unlinksem(cchar *fname) noex {
 	int		rs = SR_FAULT ;
@@ -136,7 +134,7 @@ int uc_unlinksem(cchar *fname) noex {
 	                repeat {
 	                    errno = 0 ;
 	                    if ((rs = sem_unlink(nn)) < 0) {
-			        rs = (- errno) ;
+			        rs = (neg errno) ;
 		            }
 	                } until (rs != SR_INTR) ;
 		        rs1 = pn.finish ;
@@ -148,7 +146,6 @@ int uc_unlinksem(cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_unlinksem) */
+} /* end subroutine (uc_unlinksem) */
 
 
