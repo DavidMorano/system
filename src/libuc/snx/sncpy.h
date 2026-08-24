@@ -30,7 +30,7 @@
 
 EXTERNC_begin
 
-extern int sncpyarray(char *,int,cchar **,int) noex ;
+extern int sncpyarray(char *,int,con mainv,int) noex ;
 
 EXTERNC_end
 
