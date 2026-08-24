@@ -32,11 +32,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<userattr.h>		/* <- ?? */
-#include	<ucenumxx.h>		/* <- money shot */
-#include	<ucentua.h>		/* <- money shot */
+#include	<ucenumxx.h>		/* LIBUC <- money shot */
+#include	<ucentua.h>		/* LIBUC <- money shot */
 
 
 #define	UCENUMUA_MAGIC		0x88776217
@@ -86,7 +86,7 @@ struct ucenumua : ucenumxx {
 	    reset(this,ucenumuamem_reset) ;
 	    close(this,ucenumuamem_close) ;
 	    magval = 0 ;
-	} ;
+	} ; /* end ctor */
 	ucenumua(const ucenumua &) = delete ;
 	ucenumua &operator = (const ucenumua &) = delete ;
 	int readent(ucenumua_ent *,char *,int) noex ;
