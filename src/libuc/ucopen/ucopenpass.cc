@@ -41,21 +41,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<permx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -65,7 +65,7 @@
 
 extern "C" {
     extern int dialpass(cc *,int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -78,7 +78,7 @@ enum accmodes {
 	accmode_wronly,
 	accmode_rdwr,
 	accmode_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward reference */
@@ -95,23 +95,24 @@ local int	accmode(int) noex ;
 /* exported subroutines */
 
 int uc_openpass(cc *passfname,int oflags,int timeout,int opts) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
-	if (passfname) {
+	if (passfname) ylikely {
 	    rs = SR_INVALID ;
-	    if (passfname[0]) {
-	        if ((rs = accmode(oflags)) >= 0) {
+	    if (passfname[0]) ylikely {
+	        if ((rs = accmode(oflags)) >= 0) ylikely {
+	            cint am = W_OK ;
 	            while ((passfname[0] == '/') && (passfname[1] == '/')) {
 	                passfname += 1 ;
-	            }
-	            if ((rs = perm(passfname,-1,-1,nullptr,(W_OK))) >= 0) {
+	            } /* end while */
+	            if ((rs = perm(passfname,-1,-1,np,am)) >= 0) ylikely {
 	                rs = dialpass(passfname,timeout,opts) ;
 	            }
 	        } /* end if (accmode) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_openpass) */
+} /* end subroutine (uc_openpass) */
 
 
 /* local subroutines */
