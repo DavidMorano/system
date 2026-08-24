@@ -29,14 +29,7 @@
 	filesystem as symbolic links.
 
 	Synopsis:
-	int uc_opendialer(prn,svc,of,om,argv,envv,to)
-	cchar	prn[] ;
-	cchar	svc[] ;
-	int		of ;
-	mode_t		om ;
-	cchar	**argv[] ;
-	cchar	**envv[] ;
-	int		to ;
+	int uc_opendialer(cc *prn,cc *svc,int of,m_t om,mv argv,mv envv,int to)
 
 	Arguments:
 	prn		facility name
@@ -76,28 +69,29 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<dlfcn.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<getnodedomain.h>
-#include	<ids.h>
-#include	<sncpyx.h>
-#include	<mkx.h>
-#include	<mkpr.h>
-#include	<mkpathx.h>
-#include	<permx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<mkpr.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -111,12 +105,10 @@ import libutil ;			/* |lenstr(3u)| */
 #define	SVCDNAME	"lib/opendialers"
 #define	SVCSYMPREFIX	"opendialer_"
 
-#ifndef	SVCLEN
-#define	SVCLEN		MAXNAMELEN
-#endif
-
 
 /* imported namespaces */
+
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -134,56 +126,115 @@ typedef mode_t		m_t ;
 /* local structures */
 
 extern "C" {
-    typedef int (*subdialer_t)(cc *,cc *,cc *,int,mode_t,mainv,mainv,int) noex ;
-}
+    typedef int (*subdialer_t)(cc *,cc *,cc *,int,m_t,mv,mv,int) noex ;
+} /* end extern (C) */
 
-struct subinfo_flags {
+namespace {
+    struct vars {
+	int		maxnamelen ;
+	int		maxpathlen ;
+	int		hostnamelen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+    struct subinfo ;
+    struct subinfo_flags {
 	uint		dummy:1 ;
-} ; /* end struct (subinfo_flags) */
-
-struct subinfo {
-	ids		id ;
-	SI_FL		fl ;
+    } ; /* end struct (subinfo_flags) */
+    enum subinfomems {
+    	subinfomem_start,
+	subinfomem_finish,
+	subinfomem_search,
+	subinfomem_idbeg,
+	subinfomem_idend,
+	subinfomem_buf,
+	subinfomem_overlast
+    } ; /* end enum (subinfomems) */
+    struct subinfo_co {
+	subinfo		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (subinfo *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+    } ; /* end struct (subinfo_co) */
+    struct subinfo {
+	friend		subinfo_co ;
+	subinfo_co	start ;
+	subinfo_co	finish ;
+	subinfo_co	search ;
+	subinfo_co	idbeg ;
+	subinfo_co	idend ;
+	subinfo_co	buf ;
 	cchar		*prn ;
 	cchar		*svc ;
 	char		*dialsym ;	/* memory-allocated */
 	mainv		argv ;
 	mainv		envv ;
+	ids		id ;
+	SI_FL		fl ;
 	int		of ;
 	int		to ;
 	int		fd ;
 	mode_t		om ;
-} ; /* end struct (subinfo) */
+	subinfo(cc *p,cc *s,int f,m_t m,mainv a,mainv e,int t) noex {
+	    start	(this,subinfomem_start) ;
+	    finish	(this,subinfomem_finish) ;
+	    search	(this,subinfomem_search) ;
+	    idbeg	(this,subinfomem_idbeg) ;
+	    idend	(this,subinfomem_idend) ;
+	    buf		(this,subinfomem_buf) ;
+	    prn		= p ;
+	    svc		= s ;
+	    of		= f ;
+	    om		= m ;
+	    argv	= a ;
+	    envv	= e ;
+	    to		= t ;
+	    fd		= -1 ;
+	    dialsym	= nullptr ;
+	} /* end ctor */
+	int exts	(cchar *,cchar *,char *) noex ;
+	int searchlib	(cchar *,cchar *) noex ;
+	int searchcall	(cchar *,subdialer_t) noex ;
+	int environ	() noex ;
+	int proc	(char *,char *,char *,cc *) noex ;
+    private:
+	int ºstart	() noex ;
+	int ºfinish	() noex ;
+	int ºsearch	() noex ;
+	int ºidbeg	() noex ;
+	int ºidend	() noex ;
+	int ºbuf	() noex ;
+    } ; /* end struct (subinfo) */
+} /* end namespace */
 
 
 /* forward references */
 
-local int	subinfo_start(SI *,cchar *,cchar *,
-			int,mode_t,mainv,mainv,int) noex ;
-local int	subinfo_finish(SI *) noex ;
-local int	subinfo_search(SI *) noex ;
-local int	subinfo_exts(SI *,cchar *,cchar *,char *) noex ;
-local int	subinfo_searchlib(SI *,cchar *,cchar *) noex ;
-local int	subinfo_searchcall(SI *,cchar *,subdialer_t) noex ;
-local int	subinfo_idbegin(SI *) noex ;
-local int	subinfo_idend(SI *) noex ;
-local int	subinfo_envv(SI *op,mainv) noex ;
-
 
 /* local variables */
 
-constexpr cpcchar		prns[] = {
+constexpr cpcchar	prns[] = {
+	"usrlocal",
+	"local",
 	"extra",
 	"preroot",
 	nullptr
 } ; /* end array (prns) */
 
-constexpr cpcchar		soexts[] = {
+constexpr cpcchar	soexts[] = {
 	"so",
 	"o",
+	"dylib",
 	"",
 	nullptr
 } ; /* end array (soexts) */
+
+static vars		var ;
 
 
 /* exported variables */
@@ -191,95 +242,123 @@ constexpr cpcchar		soexts[] = {
 
 /* exported subroutines */
 
-int uc_opendialer(cc *prn,cc *svc,int of,m_t om,mv argv,mv envv,int to) noex {
+int uc_opendialer(cc *prn,cc *svc,int of,m_t om,mv av,mv ev,int to) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ; /* return-value */
-	if (prn && svc) {
+	if (prn && svc) ylikely {
 	    rs = SR_INVALID ;
-	    if (prn[0] && svc[0]) {
-	        SI si, *sip = &si ;
-	        if ((rs = subinfo_start(&si,prn,svc,of,om,argv,envv,to)) >= 0) {
-	            if ((rs = subinfo_search(&si)) > 0) { /* >0 means found */
-		        fd = sip->fd ;
-	            } else if (rs == 0) {
-		        rs = SR_NOENT ;
-	            }
-	            rs1 = subinfo_finish(&si) ;
-	            if (rs >= 0) rs = rs1 ;
-	            if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-	        } /* end if (subinfo) */
+	    if (prn[0] && svc[0]) ylikely {
+	        if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+		    subinfo si(prn,svc,of,om,av,ev,to) ;
+		    if ((rs = si.start) >= 0) {
+	                if ((rs = si.search) > 0) { /* >0 means found */
+		            fd = si.fd ;
+	                } else if (rs == 0) {
+		            rs = SR_NOENT ;
+	                }
+	                rs1 = si.finish ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (subinfo) */
+	            if ((rs < 0) && (fd >= 0)) {
+			u_close(fd) ;
+		    } /* end if (error) */
+	        } /* end if (vars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_opendialer) */
+} /* end subroutine (uc_opendialer) */
 
 
 /* local subroutines */
 
-local int subinfo_start(SI *sip,cc *prn,cc *svc,int of,mode_t om,
-		mainv argv,mainv ev,int to) noex {
-	int		rs = SR_FAULT ;
-	if (sip) {
-	   if ((rs = memclear(sip)) >= 0) ylikely {
-	       if ((rs = subinfo_envv(sip,ev)) >= 0) ylikely {
-	           sip->prn = prn ;
-	           sip->svc = svc ;
-	           sip->argv = argv ;
-	           sip->of = of ;
-	           sip->om = om ;
-	           sip->to = to ;
-	           sip->fd = -1 ;
-	           {
-		       cint	mn = MAXNAMELEN ;
-	               cchar	*prefix = SVCSYMPREFIX ;
-	               char	dialsym[mn +1] ;
-	               if ((rs = sncpy2(dialsym,mn,prefix,sip->prn)) >= 0) {
-		           cchar	*sp = dialsym ;
-	                   if (cchar *cp ; (rs = lm_strw(sp,rs,&cp)) >= 0) {
-	                       sip->dialsym = const_cast<char *>(cp) ;
-		           }
-	               }
-	            } /* end block */
-	        } /* end if (memclear) */
-	    } /* end if (subifo_envv) */
-	} /* end if (non-null) */
+int subinfo::ºstart() noex {
+	ccharp		prefix = SVCSYMPREFIX ;
+	int		rs ;
+	int		rs1 ;
+	    if ((rs = environ()) >= 0) ylikely {
+		if (charp dbuf ; (rs = mem.mn(&dbuf)) >= 0) {
+		    cint dlen = rs ;
+	            if ((rs = sncpy(dbuf,dlen,prefix,prn)) >= 0) {
+		        cchar	*sp = dbuf ;
+	                if (cchar *cp ; (rs = mem.strw(sp,rs,&cp)) >= 0) {
+	                    dialsym = const_cast<charp>(cp) ;
+		        } /* end if (memory-acquire) */
+	            } /* end if (sncpy) */
+		    rs1 = mem.free(dbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (subifo::environ) */
 	return rs ;
-} /* end subroutine (subinfo_start) */
+} /* end method (subinfo::ºstart) */
 
-local int subinfo_finish(SI *sip) noex {
+int subinfo::ºfinish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (sip->dialsym) {
-	    rs1 = lm_free(sip->dialsym) ;
+	if (dialsym) {
+	    rs1 = mem.free(dialsym) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->dialsym = nullptr ;
-	}
+	    dialsym = nullptr ;
+	} /* end if (memory-release) */
 	return rs ;
-} /* end subroutine (subinfo_finish) */
+} /* end method (subinfo::ºfinish) */
 
-local int subinfo_search(SI *sip) noex {
-	cint	plen = MAXPATHLEN ;
+int subinfo::ºsearch() noex {
+    	int		rs ;
+	int		rs1 ;
+	int		f = false ; /* return-value */
+	if ((rs = idbeg) >= 0) {
+	    {
+		rs = buf ;
+		f = rs ;
+	    }
+	    rs1 = idend ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (subinfo-id) */
+	if ((rs < 0) && (fd >= 0)) {
+	    u_close(fd) ;
+	    fd = -1 ;
+	} /* end if (error) */
+	return (rs >= 0) ? f : rs ;
+} /* end method (subinfo::ºsearch) */
+
+int subinfo::ºbuf() noex {
+    	cnullptr	np{} ;
+	cint		maxpath = var.maxpathlen ;
+	cint		sz = ((var.maxpathlen + 1) * 3) ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ; /* return-value */
-	if ((rs = subinfo_idbegin(sip)) >= 0) {
-	    cint	sz = ((plen+1)*3) ;
-	    int		ai = 0 ;
-	    if (char	*abuf ; (rs = lm_mall(sz,&abuf)) >= 0) {
-	        char	dn[MAXHOSTNAMELEN+1] ;
-	        char	*pdn = (abuf+(ai++*(plen+1))) ;
-	        char	*sdn = (abuf+(ai++*(plen+1))) ;
-	        char	*sfn = (abuf+(ai++*(plen+1))) ;
-	        if ((rs = getnodedomain(nullptr,dn)) >= 0) {
+	int		ai = 0 ;
+	if (char	*a ; (rs = mem.mall(sz,&a)) >= 0) {
+	    char	*pdn = (a + (ai++ * (maxpath + 1))) ;
+	    char	*sdn = (a + (ai++ * (maxpath + 1))) ;
+	    char	*sfn = (a + (ai++ * (maxpath + 1))) ;
+	    if (charp dn ; (rs = mem.hostname(&dn)) >= 0) {
+	        if ((rs = getnodedomain(np,dn)) >= 0) {
+		    rs = proc(pdn,sdn,sfn,dn) ;
+		    f = rs ;
+	        } /* end if */
+		rs1 = mem.free(dn) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	    rs1 = mem.free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? f : rs ;
+} /* end method (subinfo::ºbuf) */
+
+int subinfo::proc(char *pdn,char *sdn,char *sfn,cc *dn) noex {
+    	cint		plen = var.maxpathlen ;
+    	int		rs = SR_OK ;
+	int		f = false ;
 		    ustat	sb ;
-	            for (int i = 0 ; prns[i] != nullptr ; i += 1) {
+	            for (int i = 0 ; prns[i] ; i += 1) {
 	                if ((rs = mkpr(pdn,plen,prns[i],dn)) > 0) {
-		            if ((rs = mkpath2(sdn,pdn,SVCDNAME)) >= 0) {
+		            if ((rs = mkpath(sdn,pdn,SVCDNAME)) >= 0) {
 	        		if ((rs = u_stat(sdn,&sb)) >= 0) {
 				    if (S_ISDIR(sb.st_mode)) {
-	                                rs = subinfo_exts(sip,pdn,sdn,sfn) ;
+	                                rs = exts(pdn,sdn,sfn) ;
 	                                f = rs ;
 				    } /* end if */
 				} else if (isNotPresent(rs)) {
@@ -290,32 +369,19 @@ local int subinfo_search(SI *sip) noex {
 			if (f) break ;
 			if (rs < 0) break ;
 	            } /* end for (prns) */
-	        } /* end if */
-	        rs1 = lm_free(abuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (ma-a) */
-	    rs1 = subinfo_idend(sip) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo-id) */
-	if ((rs < 0) && (sip->fd >= 0)) {
-	    u_close(sip->fd) ;
-	    sip->fd = -1 ;
-	}
 	return (rs >= 0) ? f : rs ;
-} /* end subroutine (subinfo_search) */
+} /* end method (subinfo::proc) */
 
-local int subinfo_exts(SI *sip,cchar *pr,cchar *sdn,char *sfn) noex {
-	ustat		sb ;
-	cint		am = (R_OK|X_OK) ;
+int subinfo::exts(cchar *pr,cchar *sdn,char *sfn) noex {
+	cint		am = (R_OK | X_OK) ;
 	int		rs = SR_OK ;
 	int		f = false ;
-	cchar		*prn = sip->prn ;
-	for (int i = 0 ; soexts[i] != nullptr ; i += 1) {
+	for (int i = 0 ; soexts[i] ; i += 1) {
 	    if ((rs = mksofname(sfn,sdn,prn,soexts[i])) >= 0) {
-	        if ((rs = u_stat(sfn,&sb)) >= 0) {
+		if (ustat sb ; (rs = u_stat(sfn,&sb)) >= 0) {
 		    if (S_ISREG(sb.st_mode)) {
-	                if ((rs = permids(&sip->id,&sb,am)) >= 0) {
-			    rs = subinfo_searchlib(sip,pr,sfn) ;
+	                if ((rs = permids(&id,&sb,am)) >= 0) {
+			    rs = searchlib(pr,sfn) ;
 			    f = rs ;
 			} else if (rs == SR_ACCESS) {
 			    rs = SR_OK ;
@@ -329,67 +395,91 @@ local int subinfo_exts(SI *sip,cchar *pr,cchar *sdn,char *sfn) noex {
 	    if (rs < 0) break ;
 	} /* end for (soexts) */
 	return (rs >= 0) ? f : rs ;
-} /* end subroutine (subinfo_exts) */
+} /* end method (subinfo::exts) */
 
-local int subinfo_searchlib(SI *sip,cchar *pr,cchar *sfn) noex {
+int subinfo::searchlib(cchar *pr,cchar *sfn) noex {
+    	cnullptr	np{} ;
 	cint		dlmode = RTLD_LAZY ;
 	int		rs = SR_OK ;
-	int		f = false ;
-	void		*sop ;
-	if ((sop = dlopen(sfn,dlmode)) != nullptr) {
+	int		f = false ; /* return-value */
+	if (void *sop = dlopen(sfn,dlmode) ; sop) {
 	    subdialer_t	symp ;
-	    if ((symp = (subdialer_t) dlsym(sop,sip->dialsym)) != nullptr) {
-		rs = subinfo_searchcall(sip,pr,symp) ;
+	    if ((symp = (subdialer_t) dlsym(sop,dialsym)) != np) {
+		rs = searchcall(pr,symp) ;
 		f = rs ;
 	    } /* end if (dlsym) */
 	    dlclose(sop) ;
 	} /* end if (dlopen) */
 	return (rs >= 0) ? f : rs ;
-} /* end subroutine (subinfo_searchlib) */
+} /* end method (subinfo::searchlib) */
 
-local int subinfo_searchcall(SI *sip,cchar *pr,subdialer_t symp) noex {
-	mode_t		om = sip->om ;
+int subinfo::searchcall(cchar *pr,subdialer_t symp) noex {
 	int		rs ;
-	int		of = sip->of ;
-	int		to = sip->to ;
 	int		f = false ;
-	cchar	*prn = sip->prn ;
-	cchar	*svc = sip->svc ;
-	mainv		argv = sip->argv ;
-	mainv		envv = sip->envv ;
 	if ((rs = (*symp)(pr,prn,svc,of,om,argv,envv,to)) >= 0) {
-	    sip->fd = rs ;
+	    fd = rs ;
 	    f = true ;
 	} /* end if (call) */
 	return (rs >= 0) ? f : rs ;
-} /* end subroutine (subinfo_searchcall) */
+} /* end method (subinfo::searchcall) */
 
-local int subinfo_idbegin(SI *sip) noex {
-	int		rs = ids_load(&sip->id) ;
+int subinfo::ºidbeg() noex {
+	return id.load() ;
+} /* end method (subinfo::ºidbeg) */
+
+int subinfo::ºidend() noex {
+    	return id.release() ;
+} /* end method (subinfo::ºidend) */
+
+int subinfo::environ() noex {
+    	int	rs = SR_OK ;
+	if (envv == nullptr) {
+	    if (mainv ev ; (rs = u_getenviron(&ev)) >= 0) {
+		envv = ev ;
+	    } /* end if (u_getenviron) */
+	} /* end if (needed) */
 	return rs ;
-} /* end subroutine (subinfo_idbegin) */
+} /* end method (subinfo::environ) */
 
-local int subinfo_idend(SI *sip) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	if (sip) {
-	    rs = SR_OK ;
-	    {
-	        rs1 = ids_release(&sip->id) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
+	    maxnamelen = rs ;
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+		maxpathlen = rs ;
+	        if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
+		    hostnamelen = rs ;
+	        }
+	    } /* end if */
+	} /* end if */
+	return rs ;
+} /* end method (vars::operator) */
+
+subinfo_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case subinfomem_start:
+	        rs = op->ºstart() ;
+	        break ;
+	    case subinfomem_finish:
+	        rs = op->ºfinish() ;
+	        break ;
+	    case subinfomem_search:
+	        rs = op->ºsearch() ;
+	        break ;
+	    case subinfomem_idbeg:
+	        rs = op->ºidbeg() ;
+	        break ;
+	    case subinfomem_idend:
+	        rs = op->ºidend() ;
+	        break ;
+	    case subinfomem_buf:
+	        rs = op->ºbuf() ;
+	        break ;
+	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-} /* end subroutine (subinfo_idend) */
-
-local int subinfo_envv(subinfo *op,mainv envv) noex {
-    	int	rs = SR_OK ;
-	if ((op->envv = envv) == nullptr) {
-	    if (mainv ev ; (rs = u_getenviron(&ev)) >= 0) {
-		op->envv = ev ;
-	    }
-	}
-	return rs ;
-} /* end subroutine (subinfo_envv) */
+} /* end method (subinfo_co::operator) */
 
 
