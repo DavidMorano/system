@@ -53,15 +53,15 @@ template<typename T> local T strtox(cchar *,char **) noex {
 
 template<> float strtox(cchar *stp,char **epp) noex {
 	return strtof(stp,epp) ;
-}
+} /* end */
 
 template<> double strtox(cchar *stp,char **epp) noex {
 	return strtod(stp,epp) ;
-}
+} /* end */
 
 template<> longdouble strtox(cchar *stp,char **epp) noex {
 	return strtold(stp,epp) ;
-}
+} /* end */
 
 template<typename T> local int strtoxx(cchar *startp,cchar **epp,T *rp) noex {
 	int		rs = SR_FAULT ;
