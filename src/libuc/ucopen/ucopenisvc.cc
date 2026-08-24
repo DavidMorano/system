@@ -98,32 +98,50 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<dlfcn.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ids.h>
-#include	<sncpyx.h>
-#include	<mkx.h>			/* |mksofname(3uc)| */
-#include	<mkpathx.h>
-#include	<permx.h>
-#include	<isoneof.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ids.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC |mksofname(3uc)| */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 import openxsvc ;
 
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -136,7 +154,6 @@ int uc_openisvc(cc *pr,cc *prn,cc *svc,int of,mode_t om,
     	openxsvc	os(pr,prn,svc,of,om,argv,envv,to) ;
 	os.prefix = "openint" ;
 	return uc_openxsvc(&os) ;
-}
-/* end subroutine (uc_openisvc) */
+} /* end subroutine (uc_openisvc) */
 
 
