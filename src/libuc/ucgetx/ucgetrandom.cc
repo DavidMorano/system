@@ -109,7 +109,7 @@ int uc_getentropy(void *vbuf,int rlen) noex {
 			rem -= msize ;
 			rl += intconv(msize) ;
 		    } else {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 		    }
 		    if (rs < 0) break ;
 		} /* end for */
