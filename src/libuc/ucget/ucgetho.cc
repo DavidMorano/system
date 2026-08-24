@@ -143,13 +143,13 @@ constexpr bool		f_gethoxxxr	= F_GETHOXXXR ;
 int uc_gethobegin(int stayopen) noex {
 	errno = 0 ;
 	sethostent(stayopen) ;
-	return (- errno) ;
+	return (neg errno) ;
 } /* end subroutine (uc_gethobegin) */
 
 int uc_gethoend() noex {
 	errno = 0 ;
 	endhostent() ;
-	return (- errno) ;
+	return (neg errno) ;
 } /* end subroutine (uc_gethoend) */
 
 int uc_gethoent(ucentho *hop,char *hobuf,int holen) noex {
@@ -209,14 +209,14 @@ int ucgetho::getho_ent(ucentho *hop,char *hobuf,int holen) noex {
 	    if ((rs = gethoent_rp(hop,hobuf,holen)) >= 0) {
 	        rs = hop->size() ;
 	    } else {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} else {
 	    SYSDBHO	*ep = gethoent() ;
 	    if (ucentho *rp = cast_static<ucentho *>(ep) ; rp != np) {
 	        rs = hop->load(hobuf,holen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
@@ -232,14 +232,14 @@ int ucgetho::getho_nam(ucentho *hop,char *hobuf,int holen) noex {
             if ((rs = gethonam_rp(hop,hobuf,holen,name)) >= 0) {
                 rs = hop->size() ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBHO     *ep = gethonam(name) ;
             if (ucentho *rp = cast_static<ucentho *>(ep) ; rp != np) {
                 rs = hop->load(hobuf,holen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
@@ -255,14 +255,14 @@ int ucgetho::getho_add(ucentho *hop,char *hobuf,int holen) noex {
             if ((rs = gethoadd_rp(hop,hobuf,holen,af,ap,al)) >= 0) {
                 rs = hop->size() ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBHO     *ep = gethoadd(af,ap,al) ;
             if (ucentho *rp = cast_static<ucentho *>(ep) ; rp != np) {
                 rs = hop->load(hobuf,holen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
