@@ -41,9 +41,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* |size_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<stddef.h>		/* POSIX® |size_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #ifndef	SPWD
