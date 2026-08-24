@@ -93,13 +93,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucopen.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucopenxsvc.h"
 
@@ -123,7 +123,6 @@ int uc_openfsvc(cc *pr,cc *prn,cc *svc,int of,mode_t om,
     	openxsvc	os(pr,prn,svc,of,om,argv,envv,to) ;
 	os.prefix = "opensvc" ;
 	return uc_openxsvc(&os) ;
-}
-/* end subroutine (uc_openfsvc) */
+} /* end subroutine (uc_openfsvc) */
 
 
