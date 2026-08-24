@@ -42,7 +42,7 @@
 #include	<unistd.h>		/* POSIX |confstr(2)| */
 #include	<cerrno>		/* CSTD */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -73,7 +73,7 @@
 
 /* forward references */
 
-local bool hasnolimit(int) noex ;
+local bool isnolimit(int) noex ;
 
 
 /* local variables */
@@ -85,6 +85,7 @@ constexpr int		nolimits[] = {
 	_SC_THREAD_THREADS_MAX,
 	_SC_THREAD_KEYS_MAX,
 	_SC_THREAD_DESTRUCTOR_ITERATIONS,
+	_SC_TZNAME_MAX,
 	-1
 } ; /* end array (nolimits) */
 
@@ -104,12 +105,14 @@ namespace libu {
 	} else {
 	    if (errno) {
 	        rs = (neg errno) ;
+		if (lp) *lp = 0 ;
 	    } else {
-		if (hasnolimit(req)) {
+		if (isnolimit(req)) {
 		    rs = INT_MAX ;
 		    if (lp) *lp = INT_MAX ;
 		} else {
 		    rs = SR_NOTSUP ;
+		    if (lp) *lp = 0 ;
 		}
 	    } /* end if */
 	} /* end if */
@@ -120,12 +123,12 @@ namespace libu {
 
 /* local subroutines */
 
-local bool hasnolimit(int name) noex {
+local bool isnolimit(int name) noex {
     	bool f = false ;
 	for (int i = 0 ; (! f) && (nolimits[i] >= 0) ; i += 1) {
 	    f = (name == nolimits[i]) ;
 	} /* end for */
 	return f ;
-} /* end subroutine (hasnolimit) */
+} /* end subroutine (isnolimit) */
 
 
