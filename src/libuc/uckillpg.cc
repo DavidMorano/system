@@ -1,4 +1,4 @@
-/* uckillpg */
+/* uckillpg SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -35,15 +35,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<csignal>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -69,10 +69,9 @@
 int uc_killpg(pid_t pgrp,int signo) noex {
 	int		rs ;
 	repeat {
-	    if ((rs = killpg(pgrp,signo)) < 0) rs = (- errno) ;
+	    if ((rs = killpg(pgrp,signo)) < 0) rs = (neg errno) ;
 	} until (rs != SR_INTR) ;
 	return rs ;
-}
-/* end subroutine (uc_killpg) */
+} /* end subroutine (uc_killpg) */
 
 
