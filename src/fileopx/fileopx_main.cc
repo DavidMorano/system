@@ -156,7 +156,7 @@ struct dirid {
 	dev_t		dev ;
 } ; /* end struct (dirid) */
 
-FID {
+struct fileid {
 	ino_t		ino ;
 	dev_t		dev ;
 } ; /* end struct (fileid) */
@@ -167,7 +167,7 @@ struct tardir {
 	dev_t		dev ;
 } ; /* end struct (tardir) */
 
-LI {
+struct linkinfo {
 	cchar		*fname ;
 	ino_t		ino ;
 	dev_t		dev ;
