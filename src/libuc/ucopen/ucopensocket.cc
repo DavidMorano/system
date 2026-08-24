@@ -29,30 +29,31 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<sys/wait.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<netdb.h>		/* |htons(3net)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<hostent.h>
-#include	<sockaddress.h>
-#include	<inetaddr.h>
-#include	<opentmp.h>
-#include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/wait.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® |htons(3net)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<inetaddr.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<vardefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsockprime.h"
 
@@ -130,8 +131,7 @@ int uc_opensocket(cchar *fname,int oflags,int to) noex {
 	} /* end if (successful open) */
 
 	return (rs >= 0) ? s : rs ;
-}
-/* end subroutine (uc_opensocket) */
+} /* end subroutine (uc_opensocket) */
 
 
 /* local subroutines */
