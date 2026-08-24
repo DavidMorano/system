@@ -28,13 +28,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<sysdbfn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<sysdbfn.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucenumxx.h"
 #include	"ucenumsv.h"
@@ -60,8 +60,8 @@
 
 /* local variables */
 
-constexpr uint		mxx = UCENUMSV_MAGIC ;
-constexpr sysdbfiles	w = sysdbfile_sv ;
+constexpr uint		mxx	= UCENUMSV_MAGIC ;
+constexpr sysdbfiles	w	= sysdbfile_sv ;
 
 
 /* local subroutines */
@@ -79,26 +79,22 @@ int ucenumsv_open(ucenumsv *op,cchar *efname) noex {
 	    rs = ueo.open(rp) ;
 	} /* end if (sysdbfn_get) */
 	return rs ;
-}
-/* end if (ucenumsv_open) */
+} /* end if (ucenumsv_open) */
 
 int ucenumsv_close(ucenumsv *op) noex {
 	ucenumxxco<ucenumsv_ent>	ueo(op,mxx) ;
 	return ueo.close() ;
-} 
-/* end subroutine (ucenumsv_close) */
+} /* end subroutine (ucenumsv_close) */
 
 int ucenumsv_readent(ucenumsv *op,ucenumsv_ent *ep,char *bp,int bl) noex {
 	ucenumxxco<ucenumsv_ent>	ueo(op,mxx) ;
 	return ueo.readent(ep,bp,bl) ;
-}
-/* end subroutine (ucenumsv_readent) */
+} /* end subroutine (ucenumsv_readent) */
 
 int ucenumsv_reset(ucenumsv *op) noex {
 	ucenumxxco<ucenumsv_ent>	ueo(op,mxx) ;
 	return ueo.reset() ;
-}
-/* end subroutine (ucenumsv_reset) */
+} /* end subroutine (ucenumsv_reset) */
 
 
 /* local subroutines */
