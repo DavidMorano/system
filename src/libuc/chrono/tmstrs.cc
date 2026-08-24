@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* TM structure strings processing */
+/* calculate an ordinal (an integer number) from a c-string */
 /* version %I% last-modified %G% */
 
 #define	CF_THREEYEAR	1		/* use RFC2822 3-digit years */
@@ -100,7 +100,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local variables */
 
-constexpr bool		f_threeyear = CF_THREEYEAR ;
+constexpr int		Seventy		= 70 ;
+constexpr int		OneHundred	= 100 ;
+constexpr bool		f_threeyear	= CF_THREEYEAR ;
 
 
 /* exported variables */
@@ -108,105 +110,114 @@ constexpr bool		f_threeyear = CF_THREEYEAR ;
 
 /* exported subroutines */
 
-int tmstrsday(cchar *sp,int sl) noex {
-	int		rs = SR_INVALID ;
-	if (sl < 0) sl = lenstr(sp) ;
-	if ((sl >= 1) && (sl <= 9)) ylikely {
-	    switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
-	    case TWOCHARS('S', 'u'):
-	        rs = 0 ;
-	        break ;
-	    case TWOCHARS('M', 'o'):
-	        rs = 1 ;
-	        break ;
-	    case TWOCHARS('T', 'u'):
-	        rs = 2 ;
-	        break ;
-	    case TWOCHARS('W', 'e'):
-	        rs = 3 ;
-	        break ;
-	    case TWOCHARS('T', 'h'):
-	        rs = 4 ;
-	        break ;
-	    case TWOCHARS('F', 'r'):
-	        rs = 5 ;
-	        break ;
-	    case TWOCHARS('S', 'a'):
-	        rs = 6 ;
-	        break ;
-	    } /* end switch */
-	} /* end if (possible) */
+int tmstrsday(cchar *sp,int 탎l) noex {
+	int		rs = SR_FAULT ;
+	if (cint sl = getlenstr(sp,탎l) ; sl >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if ((sl >= 1) && (sl <= 9)) ylikely {
+	        switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
+	        case TWOCHARS('S', 'u'):
+	            rs = 0 ;
+	            break ;
+	        case TWOCHARS('M', 'o'):
+	            rs = 1 ;
+	            break ;
+	        case TWOCHARS('T', 'u'):
+	            rs = 2 ;
+	            break ;
+	        case TWOCHARS('W', 'e'):
+	            rs = 3 ;
+	            break ;
+	        case TWOCHARS('T', 'h'):
+	            rs = 4 ;
+	            break ;
+	        case TWOCHARS('F', 'r'):
+	            rs = 5 ;
+	            break ;
+	        case TWOCHARS('S', 'a'):
+	            rs = 6 ;
+	            break ;
+	        } /* end switch */
+	    } /* end if (valid) */
+	} /* end if (getlenstr) */
 	return rs ;
 } /* end subroutine (tmstrsday) */
 
-int tmstrsmonth(cchar *sp,int sl) noex {
-	int		rs = SR_INVALID ;
-	if (sl < 0) sl = lenstr(sp) ;
-	if (sl >= 3) ylikely {
-	    switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
-	    case TWOCHARS('J', 'a'):
-	        rs = 0 ;
-	        break ;
-	    case TWOCHARS('F', 'e'):
-	        rs = 1 ;
-	        break ;
-	    case TWOCHARS('M', 'a'):		/* March - May */
-	        rs = ((TOLOWER(sp[2]) == 'r') ? 2 : 4) ;
-	        break ;
-	    case TWOCHARS('A', 'p'):
-	        rs = 3 ;
-	        break ;
-	    case TWOCHARS('J', 'u'):		/* June - July */
-	        rs = ((TOLOWER(sp[2]) == 'n') ? 5 : 6) ;
-	        break ;
-	    case TWOCHARS('A', 'u'):
-	        rs = 7 ;
-	        break ;
-	    case TWOCHARS('S', 'e'):
-	        rs = 8 ;
-	        break ;
-	    case TWOCHARS('O', 'c'):
-	        rs = 9 ;
-	        break ;
-	    case TWOCHARS('N', 'o'):
-	        rs = 10 ;
-	        break ;
-	    case TWOCHARS('D', 'e'):
-	        rs = 11 ;
-	        break ;
-	    } /* end switch */
-	} /* end if (possible) */
+int tmstrsmonth(cchar *sp,int 탎l) noex {
+	int		rs = SR_FAULT ;
+	if (cint sl = getlenstr(sp,탎l) ; sl >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if (sl >= 3) ylikely {
+	        switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
+	        case TWOCHARS('J', 'a'):
+	            rs = 0 ;
+	            break ;
+	        case TWOCHARS('F', 'e'):
+	            rs = 1 ;
+	            break ;
+	        case TWOCHARS('M', 'a'):	/* March - May */
+	            rs = ((TOLOWER(sp[2]) == 'r') ? 2 : 4) ;
+	            break ;
+	        case TWOCHARS('A', 'p'):
+	            rs = 3 ;
+	            break ;
+	        case TWOCHARS('J', 'u'):	/* June - July */
+	            rs = ((TOLOWER(sp[2]) == 'n') ? 5 : 6) ;
+	            break ;
+	        case TWOCHARS('A', 'u'):
+	            rs = 7 ;
+	            break ;
+	        case TWOCHARS('S', 'e'):
+	            rs = 8 ;
+	            break ;
+	        case TWOCHARS('O', 'c'):
+	            rs = 9 ;
+	            break ;
+	        case TWOCHARS('N', 'o'):
+	            rs = 10 ;
+	            break ;
+	        case TWOCHARS('D', 'e'):
+	            rs = 11 ;
+	            break ;
+	        } /* end switch */
+	    } /* end if (valid) */
+	} /* end if (getlenstr) */
 	return rs ;
 } /* end subroutine (tmstrsmonth) */
 
 /* calclate the year based on the number of digits given */
-int tmstrsyear(cchar *sp,int sl) noex {
-	int		rs = SR_INVALID ;
-	int		year = 0 ;
-	if (sl < 0) sl = lenstr(sp) ;
-	if ((sl >= 1) && (sl <= 5)) ylikely {
-	    if ((rs = cfdeci(sp,sl,&year)) >= 0) ylikely {
-	        switch (sl) {
-	        case 1:
-	            year += 100 ;
-	            break ;
-	        case 2:
-	            if (year < 70) year += 100 ;
-	            break ;
-	        case 3:
-		    if_constexpr (f_threeyear) {
-	                year += 100 ;
-		    } else {
-	                if (year < 70) year += 100 ;
-		    } /* end if_constexpr (f_threeyear) */
-	            break ;
-	        case 4:
-	        case 5:
-	            year -= TMTIME_YEARBASE ;
-	            break ;
-	        } /* end switch */
-	    } /* end if (cfdec) */
-	} /* end if (possible) */
+int tmstrsyear(cchar *sp,int 탎l) noex {
+	int		rs = SR_FAULT ;
+	int		year = 0 ; /* return-value */
+	if (cint sl = getlenstr(sp,탎l) ; sl >= 0) ylikely {
+	    rs = SR_INVALID ;
+	    if ((sl >= 1) && (sl <= 5)) ylikely {
+	        if ((rs = cfdeci(sp,sl,&year)) >= 0) ylikely {
+	            switch (sl) {
+	            case 1:
+	                year += OneHundred ;
+	                break ;
+	            case 2:
+	                if (year < Seventy) year += OneHundred ;
+	                break ;
+	            case 3:
+		        if_constexpr (f_threeyear) {
+	                    year += OneHundred ;
+		        } else {
+	                    if (year < Seventy) year += OneHundred ;
+		        } /* end if_constexpr (f_threeyear) */
+	                break ;
+	            case 4:
+	            case 5:
+	                year -= TMTIME_YEARBASE ;
+	                break ;
+		    default:
+			rs = SR_INVALID ;
+			break ;
+	            } /* end switch */
+	        } /* end if (cfdec) */
+	    } /* end if (valid) */
+	} /* end if (getlenstr) */
 	return (rs >= 0) ? year : rs ;
 } /* end subroutine (tmstrsyear) */
 
