@@ -172,7 +172,7 @@ extern "C" {
     local void	rander_atforkbefore() noex ;
     local void	rander_atforkafter() noex ;
     local void	rander_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
