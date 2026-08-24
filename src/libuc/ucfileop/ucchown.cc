@@ -16,13 +16,13 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<prefixfn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<prefixfn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucfileop.h"
 
@@ -64,7 +64,6 @@ int uc_chown(cchar *fname,uid_t uid,gid_t gid) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pefixfn) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (uc_chown) */
+} /* end subroutine (uc_chown) */
 
 
