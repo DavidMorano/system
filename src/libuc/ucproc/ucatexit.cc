@@ -120,7 +120,7 @@ int ucatexit::operator () () noex {
 int ucatexit::stdatexit() noex {
 	int		rs ;
 	if ((rs = atexit(func)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (ucatexit::stdatexit) */
