@@ -5,7 +5,7 @@
 /* interface component for UNIX® library-3c */
 /* get status on a file */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -35,14 +35,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<intsat.h>
-#include	<prefixfn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
+#include	<prefixfn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucfileop.h"
 
@@ -86,7 +86,6 @@ int uc_stat(cchar *fname,ustat *sbp) noex {
 	    } /* end if (prefixfn) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? flen : rs ;
-}
-/* end subroutine (uc_stat) */
+} /* end subroutine (uc_stat) */
 
 
