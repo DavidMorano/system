@@ -81,9 +81,9 @@ int uc_getsocktype(int fd) noex {
 	cint		slev = SOL_SOCKET ;
 	cint		scmd = SO_TYPE ;
 	int		rs ;
-	int		tval = 0 ;
+	int		tval = 0 ; /* return-value */
 	int		tlen = szof(int) ;
-	if ((rs = u_getsockopt(fd,slev,scmd,&tval,&tlen)) >= 0) {
+	if ((rs = u_sockoptget(fd,slev,scmd,&tval,&tlen)) >= 0) {
 	    if (tlen != szof(int)) rs = SR_NOMSG ;
 	}
 	return (rs >= 0) ? tval : rs ;
