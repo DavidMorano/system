@@ -28,16 +28,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<mkx.h>			/* |mkpathexp(3uc)| */
-#include	<mkchar.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC |mkpathexp(3uc)| */
+#include	<ascii.h>		/* LIBU */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"prefixfn.h"
 
@@ -103,8 +103,7 @@ int prefixfn_start(prefixfn *op,cchar *sp,int µsl,cchar **rpp) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (prefixfn_start) */
+} /* end subroutine (prefixfn_start) */
 
 int prefixfn_finish(prefixfn *op) noex {
 	int		rs = SR_FAULT ;
@@ -119,8 +118,7 @@ int prefixfn_finish(prefixfn *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (prefixfn_finish) */
+} /* end subroutine (prefixfn_finish) */
 
 
 /* local subroutines */
@@ -147,8 +145,7 @@ local int prefixfn_loadexp(prefixfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (prefixfn_loadexp) */
+} /* end subroutine (prefixfn_loadexp) */
 
 local int prefixfn_loadnul(prefixfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
@@ -158,12 +155,11 @@ local int prefixfn_loadnul(prefixfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	    *rpp = cp ;
 	} /* end if (memory-acquire) */
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (prefixfn_loadnul) */
+} /* end subroutine (prefixfn_loadnul) */
 
 int prefixfn::start(cchar *sp,int sl,cchar **rpp) noex {
 	return prefixfn_start(this,sp,sl,rpp) ;
-}
+} /* end method */
 
 void prefixfn::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
