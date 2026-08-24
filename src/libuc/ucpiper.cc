@@ -73,15 +73,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -94,16 +95,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_nonblock(int,int) noex ;
-    extern int uc_closeonexec(int,int) noex ;
-    extern int uc_moveup(int,int) noex ;
-}
-
-extern "C" {
-    extern int uc_pipe2(int *,int) noex ;
-}
 
 
 /* external variables */
@@ -149,12 +140,11 @@ int uc_pipes(int *pipes,int of) noex {
 	    } /* end if (u_pipe) */
 	} /* end if_constexpr (f_pipes) */
 	return rs ;
-}
-/* end subroutine (uc_pipes) */
+} /* end subroutine (uc_pipes) */
 
 int uc_pipe2(int *pipes,int of) noex {
 	return uc_pipes(pipes,of) ;
-}
+} /* end subroutine */
 
 int uc_piper(int *pipes,int of,int minfd) noex {
 	int		rs = SR_FAULT ;
@@ -174,7 +164,6 @@ int uc_piper(int *pipes,int of,int minfd) noex {
 	    } /* end if (created successfully) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_piper) */
+} /* end subroutine (uc_piper) */
 
 
