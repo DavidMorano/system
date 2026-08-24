@@ -43,17 +43,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -75,7 +75,7 @@
 
 extern "C" {
    extern int	mkdirp(cchar *,mode_t) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -107,8 +107,7 @@ int uc_mkdirp(cchar *fname,mode_t m) noex {
 	    rs = SR_NOSYS ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_mkdirp) */
+} /* end subroutine (uc_mkdirp) */
 
 
 /* local subroutines */
@@ -122,7 +121,7 @@ local int ucmkdirp(cchar *fname,mode_t m) noex {
 	repeat {
 	    rs = mkdirp(fname,m) ;
 	    if (rs == -1) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    } else if (rs < -1) {
 	        rs = SR_INVALID ;
 	    }
@@ -159,7 +158,6 @@ local int ucmkdirp(cchar *fname,mode_t m) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (ucmkdirp) */
+} /* end subroutine (ucmkdirp) */
 
 
