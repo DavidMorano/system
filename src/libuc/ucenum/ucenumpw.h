@@ -32,10 +32,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucenumxx.h>		/* <- money shot */
-#include	<ucentpw.h>		/* <- money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucenumxx.h>		/* LIBUC <- money shot */
+#include	<ucentpw.h>		/* LIBUC <- money shot */
 
 
 #define	UCENUMPW_MAGIC		0x88776281
@@ -85,7 +85,7 @@ struct ucenumpw : ucenumxx {
 	    reset(this,ucenumpwmem_reset) ;
 	    close(this,ucenumpwmem_close) ;
 	    magval = 0 ;
-	} ;
+	} ; /* end ctor */
 	ucenumpw(const ucenumpw &) = delete ;
 	ucenumpw &operator = (const ucenumpw &) = delete ;
 	int readent(ucenumpw_ent *,char *,int) noex ;
