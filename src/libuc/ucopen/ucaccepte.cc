@@ -41,16 +41,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>		/* ?? */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -83,12 +83,11 @@
 int uc_accepte(int fd,SOCKADDR *sap,int *salp,int to) noex {
 	int		rs = SR_FAULT ;
 	int		s = -1 ;
-	if (sap && salp) {
+	if (sap && salp) ylikely {
 	    rs = SR_BADFD ;
-	    if (fd >= 0) {
+	    if (fd >= 0) ylikely {
 		rs = SR_OK ;
-	        if (to < 0) to = INT_MAX ;
-	        if (to >= 0) {
+		if (to >= 0) {
 	            POLLFD	fds[1] = {} ;
 		    cint	mto = POLL_INTMULT ;
 		    int		nfd = 0 ;
@@ -126,7 +125,6 @@ int uc_accepte(int fd,SOCKADDR *sap,int *salp,int to) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? s : rs ;
-}
-/* end subroutine (uc_accepte) */
+} /* end subroutine (uc_accepte) */
 
 
