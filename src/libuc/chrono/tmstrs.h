@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* TM structure strings processing */
+/* calculate an ordinal (an integer number) from a c-string */
 /* version %I% last-modified %G% */
 
 
