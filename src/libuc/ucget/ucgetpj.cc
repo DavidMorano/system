@@ -46,17 +46,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
-#include	<ucsyspj.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<ucsyspj.h>		/* LIBUC */
 
 #include	"ucgetpj.h"
 #include	"ucgetxx.hh"
@@ -125,7 +125,7 @@ namespace {
 
 constexpr bool bit(uint v,int b) noex {
 	return bool((v >> b) & 1) ;
-}
+} /* end */
 
 
 /* local variables */
@@ -149,23 +149,20 @@ constexpr projid_t	pjidend = projid_t(-1) ;
 int uc_getpjbegin() noex {
 	errno = 0 ;
 	setprojent() ;
-	return (- errno) ;
-}
-/* end subroutine (uc_getpjbegin) */
+	return (neg errno) ;
+} /* end subroutine (uc_getpjbegin) */
 
 int uc_getpjend() noex {
 	errno = 0 ;
 	endprojent() ;
-	return (- errno) ;
-}
-/* end subroutine (uc_getpjend) */
+	return (neg errno) ;
+} /* end subroutine (uc_getpjend) */
 
 int uc_getpjent(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	ucgetpj		pjo(nullptr) ;
 	pjo.m = &ucgetpj::getpj_ent ;
 	return pjo(pjp,pjbuf,pjlen) ;
-}
-/* end subroutine (uc_getpjent) */
+} /* end subroutine (uc_getpjent) */
 
 int uc_getpjnam(ucentpj *pjp,char *pjbuf,int pjlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
@@ -178,8 +175,7 @@ int uc_getpjnam(ucentpj *pjp,char *pjbuf,int pjlen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getpjnam) */
+} /* end subroutine (uc_getpjnam) */
 
 int uc_getpjpid(ucentpj *pjp,char *pjbuf,int pjlen,projid_t pjid) noex {
     	int		rs = SR_INVALID ;
@@ -192,8 +188,7 @@ int uc_getpjpid(ucentpj *pjp,char *pjbuf,int pjlen,projid_t pjid) noex {
 	    rs = pjo(pjp,pjbuf,pjlen) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getpjpid) */
+} /* end subroutine (uc_getpjpid) */
 
 int uc_getpjdef(ucentpj *pjp,char *pjbuf,int pjlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
@@ -206,8 +201,7 @@ int uc_getpjdef(ucentpj *pjp,char *pjbuf,int pjlen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getpjnam) */
+} /* end subroutine (uc_getpjnam) */
 
 
 /* local subroutines */
@@ -225,8 +219,7 @@ int ucgetpj::operator () (ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucgetpj::operator) */
+} /* end subroutine (ucgetpj::operator) */
 
 int ucgetpj::getpj_ent(ucentpj *pjp,char *pjbuf,int pjlen) noex {
     	cnullptr	np{} ;
@@ -236,19 +229,18 @@ int ucgetpj::getpj_ent(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	    if ((rs = getpjent_rp(pjp,pjbuf,pjlen)) >= 0) {
 	        rs = pjp->size() ;
 	    } else {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} else {
 	    CSYSDBPJ	*ep = getprojent(pjp,pjbuf,pjsize) ;
 	    if (cucentpj *rp = cast_static<cucentpj *>(ep) ; rp != np) {
 	        rs = pjp->load(pjbuf,pjlen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	return rs ;
-}
-/* end subroutine (ucgetpj::getpj_ent) */
+} /* end subroutine (ucgetpj::getpj_ent) */
 
 int ucgetpj::getpj_nam(ucentpj *pjp,char *pjbuf,int pjlen) noex {
     	cnullptr	np{} ;
@@ -258,22 +250,21 @@ int ucgetpj::getpj_nam(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	    if ((rs = getpjnam_rp(pjp,pjbuf,pjlen,name)) >= 0) {
 	        rs = pjp->size() ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} else {
 	    CSYSDBPJ	*ep = getprojbyname(name,pjp,pjbuf,pjsize) ;
 	    if (cucentpj *rp = cast_static<cucentpj *>(ep) ; rp != np) {
 	        rs = pjp->load(pjbuf,pjlen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetpj::getpj_nam) */
+} /* end subroutine (ucgetpj::getpj_nam) */
 
 int ucgetpj::getpj_pid(ucentpj *pjp,char *pjbuf,projid_t pjlen) noex {
     	cnullptr	np{} ;
@@ -283,22 +274,21 @@ int ucgetpj::getpj_pid(ucentpj *pjp,char *pjbuf,projid_t pjlen) noex {
 	    if ((rs = getpjpid_rp(pjp,pjbuf,pjlen,pjid)) >= 0) {
 	        rs = pjp->size() ;
 	    } else {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} else {
 	    CSYSDBPJ	*ep = getprojbyid(pjid,pjp,pjbuf,pjsize) ;
 	    if (cucentpj *rp = cast_static<cucentpj *>(ep) ; rp != np) {
 	        rs = pjp->load(pjbuf,pjlen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetpj::getpj_pid) */
+} /* end subroutine (ucgetpj::getpj_pid) */
 
 int ucgetpj::getpj_def(ucentpj *pjp,char *pjbuf,int pjlen) noex {
     	cnullptr	np{} ;
@@ -308,21 +298,20 @@ int ucgetpj::getpj_def(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	    if ((rs = getpjdef_rp(pjp,pjbuf,pjlen,name)) >= 0) {
 	        rs = pjp->size() ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} else {
 	    CSYSDBPJ	*ep = getdefaultproj(name,pjp,pjbuf,pjsize) ;
 	    if (cucentpj *rp = cast_static<cucentpj *>(ep) ; rp != np) {
 	        rs = pjp->load(pjbuf,pjlen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
 	   if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetpj::getpj_def) */
+} /* end subroutine (ucgetpj::getpj_def) */
 
 
