@@ -51,13 +51,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsysnw.h"
 
@@ -316,7 +316,7 @@ unixret_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t) noex {
 
 NETENT *getnwent() noex {
 	return getnetent() ;
-}
+} /* end */
 
 NETENT *getnwnam(cchar *n) noex {
 	NETENT		*rp = nullptr ;
@@ -337,6 +337,6 @@ NETENT *getnwnam(cchar *n) noex {
 
 NETENT *getnwnum(int t,uint32_t num) noex {
 	return getnetbyaddr(num,t) ;
-}
+} /* end */
 
 
