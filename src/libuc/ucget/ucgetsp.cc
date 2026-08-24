@@ -46,17 +46,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
-#include	<spwd.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSYD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<spwd.h>		/* LIBUC */
 
 #include	"ucgetsp.h"
 #include	"ucgetxx.hh"
@@ -130,23 +130,20 @@ constexpr bool		f_getspnamr 	= F_GETSPNAMR ;
 int uc_getspbegin() noex {
 	errno = 0 ;
 	setspent() ;
-	return (- errno) ;
-}
-/* end subroutine (uc_getspbegin) */
+	return (neg errno) ;
+} /* end subroutine (uc_getspbegin) */
 
 int uc_getspend() noex {
 	errno = 0 ;
 	endspent() ;
-	return (- errno) ;
-}
-/* end subroutine (uc_getspend) */
+	return (neg errno) ;
+} /* end subroutine (uc_getspend) */
 
 int uc_getspent(ucentsp *spp,char *spbuf,int splen) noex {
 	ucgetsp		spo(nullptr) ;
 	spo.m = &ucgetsp::getsp_ent ;
 	return spo(spp,spbuf,splen) ;
-}
-/* end subroutine (uc_getspent) */
+} /* end subroutine (uc_getspent) */
 
 int uc_getspnam(ucentsp *spp,char *spbuf,int splen,cchar *name) noex {
     	int		rs = SR_FAULT ;
@@ -159,8 +156,7 @@ int uc_getspnam(ucentsp *spp,char *spbuf,int splen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getspnam) */
+} /* end subroutine (uc_getspnam) */
 
 
 /* local subroutines */
@@ -178,8 +174,7 @@ int ucgetsp::operator () (ucentsp *spp,char *spbuf,int splen) noex {
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucgetsp::operator) */
+} /* end subroutine (ucgetsp::operator) */
 
 int ucgetsp::getsp_ent(ucentsp *spp,char *spbuf,int splen) noex {
     	cnullptr	np{} ;
@@ -188,22 +183,21 @@ int ucgetsp::getsp_ent(ucentsp *spp,char *spbuf,int splen) noex {
 	    if ((rs = getspent_rp(spp,spbuf,splen)) >= 0) {
 	        rs = spp->size() ;
 	    } else {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} else {
 	    SYSDBSP	*ep = getspent() ;
 	    if (ucentsp *rp = cast_static<ucentsp *>(ep) ; ep != np) {
 	        rs = spp->load(spbuf,splen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetsp::getsp_ent) */
+} /* end subroutine (ucgetsp::getsp_ent) */
 
 int ucgetsp::getsp_nam(ucentsp *spp,char *spbuf,int splen) noex {
     	cnullptr	np{} ;
@@ -212,21 +206,20 @@ int ucgetsp::getsp_nam(ucentsp *spp,char *spbuf,int splen) noex {
             if ((rs = getspnam_rp(spp,spbuf,splen,name)) >= 0) {
                 rs = spp->size() ;
 	    } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBSP         *ep = getspnam(name) ;
             if (ucentsp *rp = cast_static<ucentsp *>(ep) ; ep != np) {
                 rs = spp->load(spbuf,splen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetsp::getsp_nam) */
+} /* end subroutine (ucgetsp::getsp_nam) */
 
 
