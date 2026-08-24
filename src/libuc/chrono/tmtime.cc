@@ -124,16 +124,16 @@ local int	getznlen() noex ;
 
 /* local variables */
 
-static bufsizevar	znlen(bufsize_zn) ;
-
+static bufsizevar	znlen		(bufsize_zn) ;
 constexpr bool		f_darwin	= F_DARWIN ;
 constexpr bool		f_linux		= F_LINUX ;
 
 
 /* exported variables */
 
-cint	tmtime::znlen	= getznlen() ;
-cint	baseyear	= TMTIME_YEARBASE ;
+cint	tmtime::znlen		= getznlen() ;
+cint	tmtime::baseyear	= TMTIME_YEARBASE ;
+cint	baseyear		= TMTIME_YEARBASE ;
 
 
 /* exported subroutines */
