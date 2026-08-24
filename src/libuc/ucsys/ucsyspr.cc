@@ -54,13 +54,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsyspr.h"
 
@@ -321,7 +321,7 @@ unixret_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
 
 PROTOENT *getprent() noex {
 	return getprotoent() ;
-}
+} /* end */
 
 PROTOENT *getprnam(cchar *n) noex {
 	PROTOENT	*rp = nullptr ;
