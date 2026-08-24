@@ -6,7 +6,7 @@
 /* get system configuration information */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -135,9 +135,10 @@ namespace {
 	int mconfstr	(int) noex ;
 	int getval	(int) noex ;
 	int getstr	(int) noex ;
-	int getvalsys	(int) noex ;
-	int synthetic	(int) noex ;
 	int getvalcache	(int,int) noex ;
+	int getvalsys	(int) noex ;
+	int getvaldef	(int) noex ;
+	int getvalsyn	(int) noex ;
 	int callstd	(int) noex ;
 	int getdefmsg	() noex ;
 	int getdefzoneinfo() noex ;
@@ -150,8 +151,16 @@ namespace {
 
 /* forward references */
 
+local inline bool isNoSup(int) noex ;
+
 
 /* local variables */
+
+constexpr int		rsnosup[] = {
+    	SR_INVALID,
+	SR_NOTSUP,
+	SR_NOSYS
+} ; /* end array */
 
 static ucachestore	udata ;
 constexpr size_t	minusone	= -1uz ;
@@ -204,12 +213,19 @@ extern "C++" {
 
 int usysconf::getvalsys(int req) noex {
     	int		rs ;
+	int		val = 0 ; /* return-value */
 	if (req >= sysconfcmd_synthetic) {
-	    rs = synthetic(req) ;
+	    rs = getvalsyn(req) ;
+	    val = rs ;
 	} else {
-	    rs = callstd(req) ;
-	}
-    	return rs ;
+	    if ((rs = callstd(req)) >= 0) {
+		val = rs ;
+	    } else if (isNoSup(rs)) {
+		rs = getvaldef(req) ;
+		val = rs ;
+	    } /* end if */
+	} /* end if */
+    	return (rs >= 0) ? val : rs ;
 } /* end subroutine (usysconf::getvalsys) */
 
 int usysconf::getstr(int req) noex {
@@ -244,7 +260,7 @@ int usysconf::getvalcache(int req,int ci) noex {
 	return rs ;
 } /* end subroutine (usysconf::getvalcache) */
 
-int usysconf::synthetic(int req) noex {
+int usysconf::getvalsyn(int req) noex {
     	long		val = -1 ;
     	int		rs = SR_OK ;
 	DPRINTF("ent req=%d\n",req) ;
@@ -347,7 +363,20 @@ int usysconf::synthetic(int req) noex {
 	if (lp) *lp = (rs >= 0) ? val : 0L ;
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (usysconf::synthetic) */
+} /* end subroutine (usysconf::getvalsyn) */
+
+int usysconf::getvaldef(int req) noex {
+    	int		rs = SR_NOTSUP ;
+	switch (req) {
+	case _SC_TZNAME_MAX:
+	    rs = 8 ;
+	    break ;
+	case _SC_ZONEINFO_MAX :
+	    rs = 255 ;
+	    break ;
+	} /* end switch */
+	return rs ;
+} /* end method (usysconf::getvaldef) */
 
 int usysconf::callstd(int req) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
@@ -432,5 +461,15 @@ int usysconf::getdefmailaddr() noex {
 	} /* end if (getval) */
     	return (rs >= 0) ? len : rs ;
 } /* end method (usysconf::getdefmailaddr) */
+
+local inline bool isNoSup(int rs) noex {
+    	bool f = false ;
+	if (rs < 0) {
+	    for (cauto &e : rsnosup) {
+		if ((f = (rs == e))) break ;
+	    } /* end for */
+	} /* end if (pssible) */
+	return f ;
+} /* end subroutine (isNoSup) */
 
 
