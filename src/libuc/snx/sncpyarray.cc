@@ -96,7 +96,7 @@
 
 /* exported subroutines */
 
-int sncpyarray(char *dbuf,int dlen,cchar **a,int n) noex {
+int sncpyarray(char *dbuf,int dlen,con mainv a,int n) noex {
 	int		rs = SR_FAULT ;
 	int		si = 0 ;
 	if (dbuf && a) ylikely {
