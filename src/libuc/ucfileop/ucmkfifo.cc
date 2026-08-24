@@ -17,16 +17,16 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucmkfifo.h"
 
@@ -51,7 +51,7 @@ int uc_mkfifo(cchar *path,mode_t om) noex {
 	        int		to_nospc = utimeout[uto_nospc] ;
 	        int		f_exit = false ;
 	        repeat {
-	            if ((rs = mkfifo(path,om)) < 0) rs = (- errno) ;
+	            if ((rs = mkfifo(path,om)) < 0) rs = (neg errno) ;
 	            if (rs < 0) {
 	                switch (rs) {
 	                case SR_IO:
@@ -87,7 +87,6 @@ int uc_mkfifo(cchar *path,mode_t om) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_mkfifo) */
+} /* end subroutine (uc_mkfifo) */
 
 
