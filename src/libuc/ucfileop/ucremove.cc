@@ -46,13 +46,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<prefixfn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<prefixfn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucfileop.h"
 
@@ -107,7 +107,6 @@ int uc_remove(cchar *fname) noex {
 	    } /* end if (prefixfn) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (uc_remove) */
+} /* end subroutine (uc_remove) */
 
 
