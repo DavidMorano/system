@@ -46,17 +46,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
-#include	<ucsysgr.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<ucsysgr.h>		/* LIBUC */
 
 #include	"ucgetgr.h"
 #include	"ucgetxx.hh"
@@ -117,7 +117,7 @@ namespace {
 
 constexpr bool bit(uint v,int b) noex {
 	return bool((v >> b) & 1) ;
-}
+} /* end */
 
 
 /* local variables */
@@ -140,23 +140,20 @@ constexpr gid_t		gidend = gid_t(-1) ;
 int uc_getgrbegin() noex {
 	errno = 0 ;
 	setgrent() ;
-	return (- errno) ;
-}
-/* end subroutine (uc_getgrbegin) */
+	return (neg errno) ;
+} /* end subroutine (uc_getgrbegin) */
 
 int uc_getgrend() noex {
 	errno = 0 ;
 	endgrent() ;
-	return (- errno) ;
-}
-/* end subroutine (uc_getgrend) */
+	return (neg errno) ;
+} /* end subroutine (uc_getgrend) */
 
 int uc_getgrent(ucentgr *grp,char *grbuf,int grlen) noex {
 	ucgetgr		gro(nullptr) ;
 	gro.m = &ucgetgr::getgr_ent ;
 	return gro(grp,grbuf,grlen) ;
-}
-/* end subroutine (uc_getgrent) */
+} /* end subroutine (uc_getgrent) */
 
 int uc_getgrnam(ucentgr *grp,char *grbuf,int grlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
@@ -169,8 +166,7 @@ int uc_getgrnam(ucentgr *grp,char *grbuf,int grlen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getgrnam) */
+} /* end subroutine (uc_getgrnam) */
 
 int uc_getgrgid(ucentgr *grp,char *grbuf,int grlen,gid_t gid) noex {
     	int		rs = SR_OK ;
@@ -183,8 +179,7 @@ int uc_getgrgid(ucentgr *grp,char *grbuf,int grlen,gid_t gid) noex {
 	    rs = gro(grp,grbuf,grlen) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getgrgid) */
+} /* end subroutine (uc_getgrgid) */
 
 
 /* local subroutines */
@@ -202,8 +197,7 @@ int ucgetgr::operator () (ucentgr *grp,char *grbuf,int grlen) noex {
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucgetgr::operator) */
+} /* end subroutine (ucgetgr::operator) */
 
 int ucgetgr::getgr_ent(ucentgr *grp,char *grbuf,int grlen) noex {
     	cnullptr	np{} ;
@@ -213,22 +207,21 @@ int ucgetgr::getgr_ent(ucentgr *grp,char *grbuf,int grlen) noex {
 	    if ((rs = getgrent_rp(grp,grbuf,grlen)) >= 0) {
 	        rs = grp->size() ;
 	    } else {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} else {
 	    SYSDBGR	*ep = getgrent() ;
 	    if (ucentgr *rp = cast_static<ucentgr *>(ep) ; rp != np) {
 	        rs = grp->load(grbuf,grlen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetgr::getgr_ent) */
+} /* end subroutine (ucgetgr::getgr_ent) */
 
 int ucgetgr::getgr_nam(ucentgr *grp,char *grbuf,int grlen) noex {
     	cnullptr	np{} ;
@@ -237,22 +230,21 @@ int ucgetgr::getgr_nam(ucentgr *grp,char *grbuf,int grlen) noex {
             if ((rs = getgrnam_rp(grp,grbuf,grlen,name)) >= 0) {
                 rs = grp->size() ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBGR         *ep = getgrnam(name) ;
             if (ucentgr *rp = cast_static<ucentgr *>(ep) ; rp != np) {
                 rs = grp->load(grbuf,grlen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetgr::getgr_nam) */
+} /* end subroutine (ucgetgr::getgr_nam) */
 
 int ucgetgr::getgr_gid(ucentgr *grp,char *grbuf,int grlen) noex {
     	cnullptr	np{} ;
@@ -261,21 +253,20 @@ int ucgetgr::getgr_gid(ucentgr *grp,char *grbuf,int grlen) noex {
             if ((rs = getgrgid_rp(grp,grbuf,grlen,gid)) >= 0) {
                 rs = grp->size() ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBGR         *ep = getgrgid(gid) ;
             if (ucentgr *rp = cast_static<ucentgr *>(ep) ; rp != np) {
                 rs = grp->load(grbuf,grlen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetgr::getgr_gid) */
+} /* end subroutine (ucgetgr::getgr_gid) */
 
 
