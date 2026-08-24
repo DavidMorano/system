@@ -83,9 +83,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local variables */
 
-static bufsizevar	maxnamelen(bufsize_mn) ;
-cchar			liba[]	= "lib" ;
-cint			libl	= clenstr(liba) ;
+static bufsizevar	maxnamelen	(bufsize_mn) ;
+cchar			liba[]		= "lib" ;
+cint			libl		= clenstr(liba) ;
 
 
 /* exported variables */
