@@ -125,7 +125,8 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     typedef int (libmems::*alloc_m)(int,void *) noex ;
-}
+} /* end extern (C) */
+
 
 /* external subroutines */
 
@@ -221,13 +222,13 @@ namespace {
 extern "C" {
     int		ucmem_init() noex ;
     int		ucmem_fini() noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     local void	submgr_atforkbefore() noex ;
     local void	submgr_atforkafter() noex ;
     local void	submgr_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* forward references */
@@ -236,14 +237,14 @@ extern "C" {
 /* local variables */
 
 static submgr		submgr_data ;
-static cint		pagesz = ulibval.pagesz ;
+static cint		pagesz		= ulibval.pagesz ;
 
 
 /* exported variables */
 
 namespace libuc {
     libuc::mems		mem ;
-}
+} /* end namespace (libuc) */
 
 using libuc::mem ;
 
@@ -252,87 +253,87 @@ using libuc::mem ;
 
 int ucmem_init() noex {
 	return submgr_data.init ;
-}
+} /* end subroutine */
 
 int ucmem_fini() noex {
 	return submgr_data.fini ;
-}
+} /* end subroutine */
 
 int uc_mallset(int cmd) noex {
     	return mem.mallset(cmd) ;
-}
+} /* end subroutine */
 
 int uc_malloc(int sz,void *vp) noex {
     	return mem.mall(sz,vp) ;
-}
+} /* end subroutine */
 
 int uc_valloc(int sz,void *vp) noex {
     	return mem.vall(sz,vp) ;
-}
+} /* end subroutine */
 
 int uc_calloc(int ne,int esz,void *vp) noex {
     	return mem.call(ne,esz,vp) ;
-}
+} /* end subroutine */
 
 int uc_realloc(void *cp,int sz,void *vp) noex {
     	return mem.rall(cp,sz,vp) ;
-}
+} /* end subroutine */
 
 int um_free(void *vp) noex {
     	return mem.free(vp) ;
-}
+} /* end subroutine */
 
 int uc_mallcount(ulong *rp) noex {
     	return mem.mallcount(rp) ;
-}
+} /* end subroutine */
 
 int uc_mallpresent(cvoid *a) noex {
     	return mem.mallpresent(a) ;
-}
+} /* end subroutine */
 
 int uc_mallout(ulong *rp) noex {
     	return mem.mallout(rp) ;
-}
+} /* end subroutine */
 
 int uc_mallstats(ucmem_stats *statp) noex {
     	return mem.mallstats(statp) ;
-}
+} /* end subroutine */
 
 int mem_strw(cchar *sp,int sl,cchar **rpp) noex {
     	return mem.strw(sp,sl,rpp) ;
-}
+} /* end subroutine */
 
 int mem_mall	(int sz,void *rpp) noex {
     	return mem.mall(sz,rpp) ;
-}
+} /* end subroutine */
 
 int mem_vall	(int sz,void *rpp) noex {
     	return mem.vall(sz,rpp) ;
-}
+} /* end subroutine */
 
 int mem_call	(int n,int esz,void *rpp) noex {
     	return mem.call(n,esz,rpp) ;
-}
+} /* end subroutine */
 
 int mem_rall	(void *oldp,int sz,void *rpp) noex {
     	return mem.rall(oldp,sz,rpp) ;
-}
+} /* end subroutine */
 
 int mem_free	(void *vp) noex {
     	return mem.free(vp) ;
-}
+} /* end subroutine */
 
 int ucmem_curbegin(ucmem_cur *curp) noex {
     	return mem.curbegin(curp) ;
-}
+} /* end subroutine */
 
 int ucmem_curend(ucmem_cur *curp) noex {
     	return mem.curend(curp) ;
-}
+} /* end subroutine */
 
 int ucmem_curenum(ucmem_cur *curp,ucmem_ent *rp) noex {
     	return mem.curenum(curp,rp) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -579,7 +580,7 @@ namespace libuc {
 int submgr::iinit() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
-	if (!fvoid) ylikely {
+	if (! fvoid) ylikely {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {		/* <- the money shot */
