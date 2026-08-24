@@ -5,7 +5,7 @@
 /* interface component for UNIX® library-3c */
 /* extended read */
 
-#define	CF_DEBUGS	0		/* non-switchable debug printo-outs */
+#define	CF_DEBUG	0		/* non-switchable debug printo-outs */
 
 /* revision history:
 
@@ -40,22 +40,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<sys/uio.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<poll.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>
-#include	<bufprintf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<sys/uio.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<bufprintf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -72,8 +72,8 @@
 
 /* forward references */
 
-#if	CF_DEBUGS
-static char	*d_reventstr() ;
+#if	CF_DEBUG
+local char	*d_reventstr() ;
 #endif
 
 
@@ -94,7 +94,7 @@ int uc_recvmsge(int fd,MSGHDR *msgp,int flags,int timeout,int opts) noex {
 	int		len = 0 ;
 	int		f_first = true ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	char		ebuf[EBUFLEN + 1] ;
 #endif
 
@@ -160,17 +160,16 @@ int uc_recvmsge(int fd,MSGHDR *msgp,int flags,int timeout,int opts) noex {
 	    rs = SR_TIMEDOUT ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("uc_recvmsge: ret rs=%d len=%d\n",
 	    rs,len) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (uc_recvmsge) */
+} /* end subroutine (uc_recvmsge) */
 
-#if	CF_DEBUGS
-static char *d_reventstr(int revents,char *buf,int buflen) noex {
+#if	CF_DEBUG
+local char *d_reventstr(int revents,char *buf,int buflen) noex {
 	buf[0] = '\0' ;
 	bufprintf(buf,buflen,"%s %s %s %s %s %s %s %s %s",
 	    (revents & POLLIN) ? "I " : "  ",
@@ -183,8 +182,7 @@ static char *d_reventstr(int revents,char *buf,int buflen) noex {
 	    (revents & POLLHUP) ? "HU" : "  ",
 	    (revents & POLLNVAL) ? "NV" : "  ") ;
 	return buf ;
-}
-/* end subroutine (d_reventstr) */
-#endif /* CF_DEBUGS */
+} /* end subroutine (d_reventstr) */
+#endif /* CF_DEBUG */
 
 
