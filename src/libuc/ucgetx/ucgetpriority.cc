@@ -55,7 +55,7 @@ int uc_getpriority(int which,id_t who,int *rp) noex {
 	    errno = 0 ;
 	    prio = getpriority(which,who) ;
 	    if ((prio == -1) && errno) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	    if (rp) {
 	        *rp = prio ;
