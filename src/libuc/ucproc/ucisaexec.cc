@@ -68,7 +68,7 @@ int uc_isaexecve(cchar *pfn,con mainv argv,con mainv envv) noex {
 	        bool	fexit = false ;
 	        repeat {
 	            if ((rs = isaexec(pfn,cav,cev)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	                switch (rs) {
 	                case SR_AGAIN:
 		            if (to_again-- > 0) {
