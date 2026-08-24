@@ -57,24 +57,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t(3c++)| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<atomic>		/* |atomic_int(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucatfork.h>
-#include	<ucatexit.h>
-#include	<ucentpw.h>
-#include	<timewatch.hh>
-#include	<ptm.h>
-#include	<ptc.h>
-#include	<pwcache.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIC® */
+#include	<sys/param.h>		/* POSIC® */
+#include	<csignal>		/* POSIC® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<atomic>		/* C++STD |atomic_int(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<ucentpw.h>		/* LIBUC */
+#include	<timewatch.hh>		/* LIBUC */
+#include	<pwcache.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucpwcache.h"
 
@@ -111,7 +111,7 @@ enum ucpwcachecos {
 	ucpwcacheco_opbegin,
 	ucpwcacheco_opend,
 	ucpwcacheco_overlast
-} ;
+} ; /* end enum */
 
 namespace {
     struct ucpwcache ;
@@ -170,16 +170,16 @@ namespace {
 	    }
 	} ; /* end dtor */
     } ; /* end struct (ucpwcache) */
-}
+} /* end namespace */
 
 
 /* forward references */
 
 extern "C" {
-    static void	ucpwcache_atforkbefore() noex ;
-    static void	ucpwcache_atforkafter() noex ;
-    static void	ucpwcache_exit() noex ;
-}
+    local void	ucpwcache_atforkbefore() noex ;
+    local void	ucpwcache_atforkafter() noex ;
+    local void	ucpwcache_exit() noex ;
+} /* end extern (C) */
 
 
 /* local variables */
@@ -194,23 +194,23 @@ static ucpwcache	ucpwcache_data ;
 
 int ucpwcache_init() noex {
 	return ucpwcache_data.init() ;
-}
+} /* end */
 
 int ucpwcache_fini() noex {
 	return ucpwcache_data.fini() ;
-}
+} /* end */
 
 int ucpwcache_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	return ucpwcache_data.name(pwp,pwbuf,pwlen,un) ;
-}
+} /* end subroutine */
 
 int ucpwcache_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	return ucpwcache_data.uid(pwp,pwbuf,pwlen,uid) ;
-}
+} /* end subroutine */
 
 int ucpwcache_getstat(ucpwcache_st *usp) noex {
 	return ucpwcache_data.getstat(usp) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -261,8 +261,7 @@ int ucpwcache::iinit() noex {
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end method (ucpwcache::iinit) */
+} /* end method (ucpwcache::iinit) */
 
 int ucpwcache::ifini() noex {
 	int		rs = SR_OK ;
@@ -290,8 +289,7 @@ int ucpwcache::ifini() noex {
 	    finit = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end method (ucpwcache::ifini) */
+} /* end method (ucpwcache::ifini) */
 
 int ucpwcache::name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
@@ -312,8 +310,7 @@ int ucpwcache::name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	    } /* end if (ucpwcache_init) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ucpwcache_name) */
+} /* end subroutine (ucpwcache_name) */
 
 int ucpwcache::uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
@@ -334,8 +331,7 @@ int ucpwcache::uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	    } /* end if (ucpwcache::init) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ucpwcache_uid) */
+} /* end subroutine (ucpwcache_uid) */
 
 int ucpwcache::getstat(ucpwcache_st *usp) noex {
 	int		rs = SR_FAULT ;
@@ -365,8 +361,7 @@ int ucpwcache::getstat(ucpwcache_st *usp) noex {
 	    } /* end if (ucpwcache_init) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end method (ucpwcache::getstat) */
+} /* end method (ucpwcache::getstat) */
 
 int ucpwcache::icapbegin(int to) noex {
 	int		rs ;
@@ -384,8 +379,7 @@ int ucpwcache::icapbegin(int to) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end method (ucpwcache::icapbegin) */
+} /* end method (ucpwcache::icapbegin) */
 
 int ucpwcache::icapend() noex {
 	int		rs ;
@@ -399,8 +393,7 @@ int ucpwcache::icapend() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end method (ucpwcache::icapend) */
+} /* end method (ucpwcache::icapend) */
 
 int ucpwcache::iopcheck() noex {
 	int		rs = SR_OK ;
@@ -408,8 +401,7 @@ int ucpwcache::iopcheck() noex {
 	    rs = iopbegin() ;
 	}
 	return rs ;
-}
-/* end method (ucpwcache::iopcheck) */
+} /* end method (ucpwcache::iopcheck) */
 
 int ucpwcache::iopbegin() noex {
 	int		rs = SR_OK ;
@@ -430,8 +422,7 @@ int ucpwcache::iopbegin() noex {
 	    } /* end if (memory-acquire) */
 	} /* end if (needed initialization) */
 	return rs ;
-}
-/* end method (ucpwcache::iopbegin) */
+} /* end method (ucpwcache::iopbegin) */
 
 int ucpwcache::iopend() noex {
 	int		rs = SR_OK ;
@@ -449,25 +440,21 @@ int ucpwcache::iopend() noex {
 	    pwc = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucpwcache::iopend) */
+} /* end method (ucpwcache::iopend) */
 
-static void ucpwcache_atforkbefore() noex {
+local void ucpwcache_atforkbefore() noex {
 	ucpwcache_data.capbegin(-1) ;
-}
-/* end subroutine (ucpwcache_atforkbefore) */
+} /* end subroutine (ucpwcache_atforkbefore) */
 
-static void ucpwcache_atforkafter() noex {
+local void ucpwcache_atforkafter() noex {
 	ucpwcache_data.capend() ;
-}
-/* end subroutine (ucpwcache_atforkafter) */
+} /* end subroutine (ucpwcache_atforkafter) */
 
-static void ucpwcache_exit() noex {
+local void ucpwcache_exit() noex {
 	if (cint rs = ucpwcache_data.fini ; rs < 0) {
 	    ulogerror("ucpwcache",rs,"exit-fini") ;
 	}
-}
-/* end subroutine (ucpwcache_exit) */
+} /* end subroutine (ucpwcache_exit) */
 
 int ucpwcache_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
@@ -497,7 +484,6 @@ int ucpwcache_co::operator () (int a) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (ucpwcache::operator) */
+} /* end method (ucpwcache::operator) */
 
 
