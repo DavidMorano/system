@@ -91,13 +91,12 @@ int uc_openpt(int oflags) noex {
 	if_constexpr (f_openpt) {
 	    errno = 0 ;
 	    if ((rs = posix_openpt(oflags)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} else {
 	    rs = u_open(PTMXFNAME,oflags,0662) ;
 	} /* end if_constexpr (f_openpt) */
 	return rs ;
-}
-/* end subroutine (uc_openpt) */
+} /* end subroutine (uc_openpt) */
 
 
