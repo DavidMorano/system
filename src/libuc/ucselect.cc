@@ -19,16 +19,16 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/time.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/time.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -53,11 +53,10 @@ int uc_select(int nfds,fd_set *readfds,fd_set *writefds,
 	int		rs = SR_INVALID ;
 	if (readfds || writefds || errorfds) {
 	    if ((rs = select(nfds,readfds,writefds,errorfds,tp)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if (valid) */
 	return rs ;
-}
-/* end subroutine (uc_select) */
+} /* end subroutine (uc_select) */
 
 
