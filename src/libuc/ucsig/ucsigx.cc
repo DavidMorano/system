@@ -26,19 +26,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cerrno>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<usysflag.h>
-#include	<timespec.h>
-#include	<localmisc.h>
+#include	<cerrno>		/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<timespec.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsigx.h"
 
@@ -77,20 +74,18 @@ constexpr bool		f_darwin = F_DARWIN ;
 int uc_sigdefault(int sn) noex {
 	int		rs = SR_OK ;
 	if (sig_t ret ; (ret = signal(sn,SIG_DFL)) == SIG_ERR) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_sigdefault) */
+} /* end subroutine (uc_sigdefault) */
 
 int uc_sigignore(int sn) noex {
 	int		rs = SR_OK ;
 	if (sig_t ret ; (ret = signal(sn,SIG_IGN)) == SIG_ERR) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_sigignore) */
+} /* end subroutine (uc_sigignore) */
 
 int uc_sighold(int sn) noex {
 	int		rs ;
@@ -98,12 +93,11 @@ int uc_sighold(int sn) noex {
 	    rs = SR_NOSYS ;
 	} else {
 	    if ((rs = sighold(sn)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (f_darwin) */
 	return rs ;
-}
-/* end subroutine (uc_sighold) */
+} /* end subroutine (uc_sighold) */
 
 int uc_sigrelease(int sn) noex {
 	int		rs ;
@@ -111,12 +105,11 @@ int uc_sigrelease(int sn) noex {
 	    rs = SR_NOSYS ;
 	} else {
 	    if ((rs = sigrelse(sn)) < 0) {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (f_darwin) */
 	return rs ;
-}
-/* end subroutine (uc_sigrelease) */
+} /* end subroutine (uc_sigrelease) */
 
 int uc_sigpause(int sn) noex {
 	int		rs ;
@@ -124,7 +117,7 @@ int uc_sigpause(int sn) noex {
 	bool		f_exit = false ;
 	repeat {
 	    if ((rs = sigpause(sn)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	        switch (rs) {
 	        case SR_INTR:
 	            break ;
@@ -142,8 +135,7 @@ int uc_sigpause(int sn) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (uc_sigpause) */
+} /* end subroutine (uc_sigpause) */
 
 int uc_sigqueue(pid_t pid,int sn,CSIGVAL val) noex {
 	int		rs ;
@@ -151,7 +143,7 @@ int uc_sigqueue(pid_t pid,int sn,CSIGVAL val) noex {
 	bool		f_exit = false ;
 	repeat {
 	    if ((rs = sigqueue(pid,sn,val)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	        switch (rs) {
 	        case SR_AGAIN:
 	            if (to_again-- > 0) {
@@ -169,8 +161,7 @@ int uc_sigqueue(pid_t pid,int sn,CSIGVAL val) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (uc_sigqueue) */
+} /* end subroutine (uc_sigqueue) */
 
 int uc_sigwaitinfo(const sigset_t *ssp,siginfo_t *sip) noex {
 	int		rs = SR_FAULT ;
@@ -178,7 +169,7 @@ int uc_sigwaitinfo(const sigset_t *ssp,siginfo_t *sip) noex {
 	    bool	f_exit = false ;
 	    repeat {
 	        if ((rs = sigwaitinfo(ssp,sip)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	            switch (rs) {
 	            case SR_INTR:
 		        break ;
@@ -194,8 +185,7 @@ int uc_sigwaitinfo(const sigset_t *ssp,siginfo_t *sip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_sigwaitinfo) */
+} /* end subroutine (uc_sigwaitinfo) */
 
 int uc_sigtimedwait(const sigset_t *ssp,siginfo_t *sip,CTIMESPEC *tsp) noex {
 	int		rs = SR_FAULT ;
@@ -208,7 +198,7 @@ int uc_sigtimedwait(const sigset_t *ssp,siginfo_t *sip,CTIMESPEC *tsp) noex {
 	    }
 	    repeat {
 	        if ((rs = sigtimedwait(ssp,sip,tsp)) < 0) {
-		    rs = (- errno) ;
+		    rs = (neg errno) ;
 	            switch (rs) {
 	            case SR_INTR:
 		        break ;
@@ -224,8 +214,7 @@ int uc_sigtimedwait(const sigset_t *ssp,siginfo_t *sip,CTIMESPEC *tsp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_sigtimedwait) */
+} /* end subroutine (uc_sigtimedwait) */
 
 int uc_sigwaitinfoto(const sigset_t *ssp,siginfo_t *sip,CTIMESPEC *tsp) noex {
 	int		rs = SR_FAULT ;
@@ -237,22 +226,20 @@ int uc_sigwaitinfoto(const sigset_t *ssp,siginfo_t *sip,CTIMESPEC *tsp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_sigwaitinfoto) */
+} /* end subroutine (uc_sigwaitinfoto) */
 
 int uc_raise(int sig) noex {
 	int		rs ;
 	if ((rs = raise(sig)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_raise) */
+} /* end subroutine (uc_raise) */
 
 int uc_pause() noex {
 	int		rs ;
 	if ((rs = pause()) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	    switch (rs) {
 	    case SR_INTR:
 		rs = SR_OK ;
@@ -260,7 +247,6 @@ int uc_pause() noex {
 	    } /* end switch */
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (uc_pause) */
+} /* end subroutine (uc_pause) */
 
 
