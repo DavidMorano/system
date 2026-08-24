@@ -54,13 +54,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsyssv.h"
 
@@ -322,7 +322,7 @@ unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cc *p) noex {
 
 SERVENT *getsvent() noex {
 	return getservent() ;
-}
+} /* end */
 
 SERVENT *getsvnam(cchar *n,cchar *p) noex {
 	SERVENT		*rp = nullptr ;
