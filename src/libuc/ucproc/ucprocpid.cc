@@ -39,20 +39,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<bufsizeget.h>
-#include	<sfx.h>
-#include	<cfdec.h>
-#include	<ctdec.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucprocpid.h"
 
@@ -61,11 +62,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_openprog(cchar *,int,con mainv,con mainv) noex ;
-    extern int uc_read(int,void *,int) noex ;
-}
 
 
 /* external variables */
@@ -89,16 +85,16 @@ int uc_procpid(cchar *name,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		pid = 0 ;
-	if (name) {
+	if (name) ylikely {
 	    int		v = uid ;
 	    rs = SR_INVALID ;
-	    if (name[0] && (v >= 0)) {
+	    if (name[0] && (v >= 0)) ylikely {
 	        cint	dlen = DIGBUFLEN ;
 	        char	dbuf[DIGBUFLEN+1] ;
-	        if ((rs = ctdeci(dbuf,dlen,v)) >= 0) {
+	        if ((rs = ctdeci(dbuf,dlen,v)) >= 0) ylikely {
 		    cnullptr	np{} ;
 	            cint	of = O_RDONLY ;
-	            int		i = 0 ;
+	            int		i = 0 ; /* used-multiple */
 	            cchar	*pfname = "sys:pgrep" ;
 	            cchar	*argv[6] ;
 	            argv[i++] = "PGREP" ;
