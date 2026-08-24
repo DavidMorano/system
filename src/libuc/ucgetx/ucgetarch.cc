@@ -129,8 +129,7 @@ int uc_getarch(char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getarch) */
+} /* end subroutine (uc_getarch) */
 
 
 /* local subroutines */
