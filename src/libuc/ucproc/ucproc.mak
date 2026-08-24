@@ -46,11 +46,11 @@ OBJ2= ucexec.o ucisaexec.o ucexit.o
 OBJ3= ucsafesleep.o
 OBJ4= ucatexit.o ucatfork.o
 OBJ5= ucnprocs.o
-OBJ6= 
+OBJ6= ucfilemask.o
 OBJ7= 
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o obj5.o
+OBJB= obj4.o obj5.o obj6.o
 
 OBJ= obja.o objb.o
 
@@ -165,5 +165,6 @@ ucprocpid.o:		ucprocpid.cc	ucprocpid.h		$(INCS)
 ucfork.o:		ucfork.cc	ucfork.h		$(INCS)
 ucforkdet.o:		ucforkdet.cc	ucforkdet.h		$(INCS)
 ucnprocs.o:		ucnprocs.cc	ucnprocs.h		$(INCS)
+ucfilemask.o:		ucfilemask.cc	ucfilemask.h		$(INCS)
 
 
