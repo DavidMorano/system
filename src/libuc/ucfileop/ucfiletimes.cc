@@ -50,13 +50,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<prefixfn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<prefixfn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucfiletimes.h"
 
@@ -106,8 +106,7 @@ int uc_filetime(cchar *fname,CUTIMBUF *utp) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (uc_filetime) */
+} /* end subroutine (uc_filetime) */
 
 int uc_filetimes(cchar *fname,CTIMEVAL *utp) noex {
 	int		rs = SR_FAULT ;
@@ -125,7 +124,6 @@ int uc_filetimes(cchar *fname,CTIMEVAL *utp) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (uc_filetimes) */
+} /* end subroutine (uc_filetimes) */
 
 
