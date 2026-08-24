@@ -93,26 +93,26 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<dlfcn.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ids.h>
-#include	<sncpyx.h>
-#include	<mkx.h>			/* |mksofname(3uc)| */
-#include	<mkpathx.h>
-#include	<permx.h>
-#include	<isoneof.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC |mksofname(3uc)| */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucopenxsvc.h"
 
@@ -137,7 +137,8 @@ typedef const mainv	cmv ;
 
 extern "C" {
     typedef int (*subsvc_f)(cc *,cc *,int,mode_t,cmv,cmv,int) noex ;
-}
+} /* end extern (C) */
+
 
 /* external subroutines */
 
@@ -228,8 +229,7 @@ int uc_openxsvc(con openxsvc *oscp) noex {
 	    } /* end if (non-null) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_openxsvc) */
+} /* end subroutine (uc_openxsvc) */
 
 
 /* local subroutines */
