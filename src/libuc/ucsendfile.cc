@@ -17,16 +17,16 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* for |sendfile(3net)| */
-#include	<sys/socket.h>		/* for |sendfile(3net)| */
-#include	<sys/uio.h>		/* for |sendfile(3net)| */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® for |sendfile(3net)| */
+#include	<sys/socket.h>		/* POSIX® for |sendfile(3net)| */
+#include	<sys/uio.h>		/* POSIX® for |sendfile(3net)| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -64,7 +64,7 @@ int uc_sendfile(int ofd,int ifd,off_t *offp,int wlen) noex {
 	    ssize_t	ss ;
 	    fo = (off_t) (*offp & INT_MAX) ;
 	    ss = sendfile(ofd,ifd,&fo,wlen) ;
-	    if (ss == -1) rs = (- errno) ;
+	    if (ss == -1) rs = (neg errno) ;
 	    len = (ss & INT_MAX) ;
 	} until (rs != SR_INTR) ;
 #else /* COMMENT */
@@ -76,8 +76,7 @@ int uc_sendfile(int ofd,int ifd,off_t *offp,int wlen) noex {
 
 	*offp = (off_t) fo ;
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (uc_sendfile) */
+} /* end subroutine (uc_sendfile) */
 
 int uc_sendbuf(int ofd,void *wbuf,int wlen) noex {
 	int		rs = SR_OK ;
@@ -89,7 +88,7 @@ int uc_sendbuf(int ofd,void *wbuf,int wlen) noex {
 	repeat {
 	    ssize_t	ss ;
 	    ss = sendfile(ofd,SFV_FD_SELF,wbuf,wlen) ;
-	    if (ss == -1) rs = (- errno) ;
+	    if (ss == -1) rs = (neg errno) ;
 	    len = (ss & INT_MAX) ;
 	} until (rs != SR_INTR) ;
 #else /* COMMENT */
@@ -99,7 +98,6 @@ int uc_sendbuf(int ofd,void *wbuf,int wlen) noex {
 #endif /* COMENT */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (uc_sendbuf) */
+} /* end subroutine (uc_sendbuf) */
 
 
