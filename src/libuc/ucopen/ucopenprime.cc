@@ -64,14 +64,12 @@
 int uc_open(cchar *fn,int of,mode_t om) noex {
 	cint		oo = 0 ;
 	return uc_openex(fn,of,om,-1,oo) ;
-}
-/* end subroutine (uc_open) */
+} /* end subroutine (uc_open) */
 
 int uc_opene(cchar *fn,int of,mode_t om,int to) noex {
 	cint		oo = 0 ;
 	return uc_openex(fn,of,om,to,oo) ;
-}
-/* end subroutine (uc_opene) */
+} /* end subroutine (uc_opene) */
 
 int uc_openenv(cchar *fn,int of,mode_t om,con mainv ev,int to) noex {
 	ucopeninfo	oi{} ;
@@ -82,24 +80,20 @@ int uc_openenv(cchar *fn,int of,mode_t om,con mainv ev,int to) noex {
 	oi.opts = 0 ;
 	oi.envv = ev ;
 	return uc_openinfo(&oi) ;
-}
-/* end subroutine (uc_openenv) */
+} /* end subroutine (uc_openenv) */
 
 int uc_socket(int pf,int pt,int proto) noex {
 	return u_socket(pf,pt,proto) ;
-}
-/* end subroutine (uc_socket) */
+} /* end subroutine (uc_socket) */
 
 int uc_dupmin(int fd,int mfd) noex {
 	cint	cmd = F_DUPFD ;
 	return u_fcntl(fd,cmd,mfd) ;
-}
-/* end subroutine (uc_dupmin) */
+} /* end subroutine (uc_dupmin) */
 
 int uc_dupmince(int fd,int mfd) noex {
 	cint	cmd = F_DUPFD_CLOEXEC ;
 	return u_fcntl(fd,cmd,mfd) ;
-}
-/* end subroutine (uc_dupmince) */
+} /* end subroutine (uc_dupmince) */
 
 
