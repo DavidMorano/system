@@ -27,24 +27,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strnrchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<opensysfs.hh>
-#include	<ipasswd.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<matstr.h>
-#include	<strwcmp.h>
-#include	<strx.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strnrchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<opensysfs.hh>		/* LIBUC */
+#include	<ipasswd.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucopensys.h"
 
@@ -67,7 +67,7 @@ using libuc::opensysfs ;
 
 extern "C" {
     extern int	opensys_banner(cchar *,int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* local structures */
