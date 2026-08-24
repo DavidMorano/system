@@ -32,10 +32,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucenumxx.h>		/* <- money shot */
-#include	<ucentsp.h>		/* <- money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucenumxx.h>		/* LIBUC <- money shot */
+#include	<ucentsp.h>		/* LIBUC <- money shot */
 
 
 #define	UCENUMSP_MAGIC		0x88776281
@@ -85,7 +85,7 @@ struct ucenumsp : ucenumxx {
 	    reset(this,ucenumspmem_reset) ;
 	    close(this,ucenumspmem_close) ;
 	    magval = 0 ;
-	} ;
+	} ; /* end ctor */
 	ucenumsp(const ucenumsp &) = delete ;
 	ucenumsp &operator = (const ucenumsp &) = delete ;
 	int readent(ucenumsp_ent *,char *,int) noex ;
