@@ -80,11 +80,11 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     extern int uc_procpid(cchar *,uid_t) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     extern int	getnetname(char *) noex ;	/* UNIX® ONC interface */
-}
+} /* end extern (C) */
 
 
 /* external variables */
