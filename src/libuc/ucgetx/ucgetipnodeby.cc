@@ -146,8 +146,7 @@ int uc_getipnodebyname(HOSTENT **hepp,cchar *hn,int af,int fl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getipnodebyname) */
+} /* end subroutine (uc_getipnodebyname) */
 
 int uc_getipnodebyaddr(HOSTENT **hepp,cvoid *ap,int al,int af) noex {
 	int		rs = SR_FAULT ;
@@ -159,8 +158,7 @@ int uc_getipnodebyaddr(HOSTENT **hepp,cvoid *ap,int al,int af) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getipnodebyaddr) */
+} /* end subroutine (uc_getipnodebyaddr) */
 
 int uc_hostentfree(HOSTENT *hep) noex {
 	int		rs = SR_FAULT ;
@@ -169,8 +167,7 @@ int uc_hostentfree(HOSTENT *hep) noex {
 	    freehostent(hep) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_hostentfree) */
+} /* end subroutine (uc_hostentfree) */
 
 
 /* local subroutines */
@@ -269,7 +266,7 @@ local int errcvt(int herr) noex {
 	    rs = SR_DOWN ;
 	    break ;
 	case NETDB_INTERNAL:
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	    break ;
 	default:
 	    rs = SR_PROTO ;
