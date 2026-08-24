@@ -32,10 +32,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucenumxx.h>		/* <- money shot */
-#include	<ucentpj.h>		/* <- money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucenumxx.h>		/* LIBUC <- money shot */
+#include	<ucentpj.h>		/* LIBUC <- money shot */
 
 
 #define	UCENUMPJ_MAGIC		0x88776216
@@ -58,7 +58,7 @@ struct ucenumpj_op {
 	void operator () (ucenumpj *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end method */
 	int operator () (cchar *) noex ;
 	operator int () noex {
 	    return operator () (nullptr) ;
@@ -85,7 +85,7 @@ struct ucenumpj : ucenumxx {
 	    reset(this,ucenumpjmem_reset) ;
 	    close(this,ucenumpjmem_close) ;
 	    magval = 0 ;
-	} ;
+	} ; /* end ctor */
 	ucenumpj(const ucenumpj &) = delete ;
 	ucenumpj &operator = (const ucenumpj &) = delete ;
 	int readent(ucenumpj_ent *,char *,int) noex ;
