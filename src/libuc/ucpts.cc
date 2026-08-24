@@ -112,13 +112,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |ptsname_r(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
-#include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |ptsname_r(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucpts.h"
 
@@ -170,10 +170,10 @@ int uc_ptsname(int fd,char *nbuf,int nlen) noex {
 	            errno = 0 ;
 	            if ((rs = ptsname_r(fd,nbuf,nsize)) != 0) {
 		        if_constexpr (f_linux) {
-	                    rs = (- errno) ;
+	                    rs = (neg errno) ;
 		        } else if_constexpr (! f_sunos) {
 			    if (rs < 0) {
-	                        rs = (- errno) ;
+	                        rs = (neg errno) ;
 			    } else {
 		                rs = lenstr(nbuf) ;
 			    }
@@ -187,28 +187,25 @@ int uc_ptsname(int fd,char *nbuf,int nlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_ptsname) */
+} /* end subroutine (uc_ptsname) */
 
 int uc_ptsgrant(int fd) noex {
 	int		rs ;
 	errno = 0 ;
 	if ((rs = grantpt(fd)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_ptsgrant) */
+} /* end subroutine (uc_ptsgrant) */
 
 int uc_ptsunlock(int fd) noex {
 	int		rs ;
 	errno = 0 ;
 	if ((rs = unlockpt(fd)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end subroutine (uc_ptsunlock) */
+} /* end subroutine (uc_ptsunlock) */
 
 
 /* local subroutines */
@@ -218,7 +215,7 @@ local int mkname(int fd,char *nbuf,int nlen) noex {
 	if (cchar *rp = ptsname(fd) ; rp) { /* <- thread-safe! */
 	    rs = sncpy(nbuf,nlen,rp) ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end subroutine (mkname) */
