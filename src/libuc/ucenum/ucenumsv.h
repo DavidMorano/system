@@ -32,10 +32,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucenumxx.h>		/* <- money shot */
-#include	<ucentsv.h>		/* <- money shot */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucenumxx.h>		/* LIBUC <- money shot */
+#include	<ucentsv.h>		/* LIBUC <- money shot */
 
 
 #define	UCENUMSV_MAGIC		0x88776281
@@ -85,7 +85,7 @@ struct ucenumsv : ucenumxx {
 	    reset(this,ucenumsvmem_reset) ;
 	    close(this,ucenumsvmem_close) ;
 	    magval = 0 ;
-	} ;
+	} ; /* end ctor */
 	ucenumsv(const ucenumsv &) = delete ;
 	ucenumsv &operator = (const ucenumsv &) = delete ;
 	int readent(ucenumsv_ent *,char *,int) noex ;
