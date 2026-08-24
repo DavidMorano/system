@@ -112,7 +112,7 @@ int uc_getrusage(int who,RUSAGE *rp) noex {
 local int std_getrusage(int who,RUSAGE *rp) noex {
     	int		rs ;
 	if ((rs = getrusage(who,rp)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end subroutine (std_getrusage) */
