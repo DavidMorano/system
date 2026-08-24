@@ -83,18 +83,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucfork.h>
-#include        <timewatch.hh>
-#include	<sigblocker.h>
-#include	<ptm.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include        <timewatch.hh>		/* LIBU */
+#include	<sigblocker.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucfork.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucatfork.h"
 
@@ -123,7 +123,7 @@ extern "C" {
     extern int ucatfork_init() noex ;
     extern int ucatfork_fini() noex ;
     extern int ucatfork_trackbegin() noex ;
-}
+} /* end extern (C) */
 
 
 /* local structures */
@@ -135,11 +135,11 @@ namespace {
 	void_f		sub_before ;
 	void_f		sub_parent ;
 	void_f		sub_child ;
-    } ;
+    } ; /* end struct */
     struct ucatfork_list {
 	ucatfork_ent	*head ;
 	ucatfork_ent	*tail ;
-    } ;
+    } ; /* end struct */
     struct ucatfork_head {
 	ptm		mx ;		/* data mutex */
 	ucatfork_list	hlist ;		/* memory allocations */
@@ -172,7 +172,7 @@ extern "C" {
     local void ucatfork_atforkparent() noex ;
     local void ucatfork_atforkchild() noex ;
     local void ucatfork_exit() noex ;
-}
+} /* end extern (C) */
 
 local int	list_add(UCAF_LIST *,UCAF_ENT *) noex ;
 local int	list_rem(UCAF_LIST *,UCAF_ENT *) noex ;
@@ -193,23 +193,23 @@ static ucatfork_head		ucatfork_data ;
 
 int uc_atforkrec(void_f b,void_f p,void_f c) noex {
 	return ucatfork_data.record(b,p,c) ;
-}
+} /* end subroutine */
 
 int uc_atforkexp(void_f b,void_f p,void_f c) noex {
 	return ucatfork_data.expunge(b,p,c) ;
-}
+} /* end subroutine */
 
 int ucatfork_init() noex {
 	return ucatfork_data.init() ;
-}
+} /* end subroutine */
 
 int ucatfork_fini() noex {
 	return ucatfork_data.fini() ;
-}
+} /* end subroutine */
 
 int ucatfork_trackbegin() noex {
 	return ucatfork_data.trackbegin() ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -221,26 +221,26 @@ int ucatfork_head::init() noex {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
-	        if ((rs = mx.create) >= 0) {
+	        if ((rs = mx.create) >= 0) ylikely {
 	            void_f	sb = ucatfork_atforkbefore ;
 	            void_f	sp = ucatfork_atforkparent ;
 	            void_f	sc = ucatfork_atforkchild ;
-	            if ((rs = uatfork(sb,sp,sc)) >= 0) {
-	                if ((rs = u_atexit(ucatfork_exit)) >= 0) {
+	            if ((rs = uatfork(sb,sp,sc)) >= 0) ylikely {
+	                if ((rs = u_atexit(ucatfork_exit)) >= 0) ylikely {
 	        	    finitdone = true ;
 	        	    f = true ;
 	                } /* end if (uc_atexit) */
 			if (rs < 0) {
 			    u_atforkexp(sb,sp,sc) ;
-			}
+			} /* end if (error) */
 	            } /* end if (u_atfork) */
 		    if (rs < 0) {
 		        mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm-create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
@@ -261,7 +261,7 @@ int ucatfork_head::init() noex {
 int ucatfork_head::fini() noex {
 	int		rs = SR_OK ;	
 	int		rs1 ;
-	if (finitdone) {
+	if (finitdone) ylikely {
 	    fvoid = true ;
 	    if (ftrack) {
 	        rs1 = trackend() ;
@@ -280,8 +280,8 @@ int ucatfork_head::fini() noex {
 int ucatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 	int		rs ;
 	int		rs1 ;
-	if (sigblocker b ; (rs = b.start) >= 0) {
-	    if ((rs = init()) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	    if ((rs = init()) >= 0) ylikely {
 	        if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
 	            if ((rs = mx.lockbegin) >= 0) { /* single */
 			ucatfork_ent	*ep{} ;
@@ -291,7 +291,7 @@ int ucatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 				ucatfork_list	*lp = &hlist ;
 				entry_load(ep,sb,sp,sc) ;
 				list_add(lp,ep) ;
-	                    } /* end if (memory-acquire) */
+			    } /* end if (memory-acquire) */
 	                } /* end if (track-begin) */
 	                rs1 = mx.lockend ;
 			if (rs >= 0) rs = rs1 ;
@@ -310,8 +310,8 @@ int ucatfork_head::expunge(void_f sb,void_f sp,void_f sc) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (sigblocker b ; (rs = b.start) >= 0) {
-	    if ((rs = init()) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) ylikely {
+	    if ((rs = init()) >= 0) ylikely {
 	        if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
 	            if ((rs = mx.lockbegin) >= 0) { /* single */
 			ucatfork_list	*lp = &hlist ;
@@ -388,7 +388,7 @@ void ucatfork_head::atforkbefore() noex {
 void ucatfork_head::atforkparent() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (finitdone) {
+	if (finitdone) ylikely {
 	    ucatfork_ent	*ep = hlist.head ;
 	    ucatfork_ent	*nep ;
 	    while (ep) {
@@ -430,19 +430,19 @@ void ucatfork_head::atforkchild() noex {
 
 local void ucatfork_atforkbefore() noex {
 	ucatfork_data.atforkbefore() ;
-}
+} /* end subroutine */
 
 local void ucatfork_atforkparent() noex {
 	ucatfork_data.atforkparent() ;
-}
+} /* end subroutine */
 
 local void ucatfork_atforkchild() noex {
 	ucatfork_data.atforkchild() ;
-}
+} /* end subroutine */
 
 local void ucatfork_exit() noex {
 	ucatfork_data.fvoid = true ;
-}
+} /* end subroutine */
 
 /* add at the tail */
 local int list_add(ucatfork_list *lp,ucatfork_ent *ep) noex {
