@@ -122,8 +122,7 @@ int uc_mincoreset(void *ca,size_t cs,char *bits) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_mincoreset) */
+} /* end subroutine (uc_mincoreset) */
 
 
 /* local subroutines */
@@ -135,7 +134,6 @@ local size_t getnpages(int ps,void *ma,size_t ms) noex {
 	ea = (ua + ms) ;
 	ca = uipceil(ea,ps) ;
 	return ((ca - fa) / ps) ;
-}
-/* end subroutine (getnpages) */
+} /* end subroutine (getnpages) */
 
 
