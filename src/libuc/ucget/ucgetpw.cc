@@ -60,17 +60,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>		/* |SYSDBPW(3u)| */
-#include	<usysflag.h>
-#include	<localmisc.h>
-#include	<ucsyspw.h>
+#include	<sys/types.h>		/* POSIC® */
+#include	<sys/param.h>		/* POSIC® */
+#include	<unistd.h>		/* POSIC® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU |SYSDBPW(3u)| */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<ucsyspw.h>		/* LIBUC */
 
 #include	"ucgetpw.h"
 #include	"ucgetxx.hh"
@@ -131,19 +131,18 @@ namespace {
 
 constexpr bool bit(uint v,int b) noex {
 	return bool((v >> b) & 1) ;
-}
+} /* end */
 
 
 /* local variables */
 
+constexpr uid_t		uidend		= uid_t(-1) ;
 constexpr bool		f_sunos		= F_SUNOS ;
 constexpr bool		f_darwin	= F_DARWIN ;
 constexpr bool		f_linux		= F_LINUX ;
 constexpr bool		f_getpwentr	= F_GETPWENTR ;
 constexpr bool		f_getpwnamr	= F_GETPWNAMR ;
 constexpr bool		f_getpwuidr	= F_GETPWUIDR ;
-
-constexpr uid_t		uidend = uid_t(-1) ;
 
 
 /* exported variables */
@@ -154,23 +153,20 @@ constexpr uid_t		uidend = uid_t(-1) ;
 int uc_getpwbegin() noex {
 	errno = 0 ;
 	setpwent() ;
-	return (- errno) ;
-}
-/* end subroutine (uc_getpwbegin) */
+	return (neg errno) ;
+} /* end subroutine (uc_getpwbegin) */
 
 int uc_getpwend() noex {
 	errno = 0 ;
 	endpwent() ;
-	return (- errno) ;
-}
-/* end subroutine (uc_getpwend) */
+	return (neg errno) ;
+} /* end subroutine (uc_getpwend) */
 
 int uc_getpwent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	ucgetpw		pwo(nullptr) ;
 	pwo.m = &ucgetpw::getpw_ent ;
 	return pwo(pwp,pwbuf,pwlen) ;
-}
-/* end subroutine (uc_getpwent) */
+} /* end subroutine (uc_getpwent) */
 
 int uc_getpwnam(ucentpw *pwp,char *pwbuf,int pwlen,cchar *name) noex {
     	int		rs = SR_FAULT ;
@@ -183,8 +179,7 @@ int uc_getpwnam(ucentpw *pwp,char *pwbuf,int pwlen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getpwnam) */
+} /* end subroutine (uc_getpwnam) */
 
 int uc_getpwuid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
     	int		rs = SR_INVALID ;
@@ -197,8 +192,7 @@ int uc_getpwuid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	    rs = pwo(pwp,pwbuf,pwlen) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getpwuid) */
+} /* end subroutine (uc_getpwuid) */
 
 
 /* local subroutines */
@@ -216,8 +210,7 @@ int ucgetpw::operator () (ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	    } /* end if (buffer length non-negative) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ucgetpw::operator) */
+} /* end subroutine (ucgetpw::operator) */
 
 int ucgetpw::getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
     	cnullptr	np{} ;
@@ -226,22 +219,21 @@ int ucgetpw::getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	    if ((rs = getpwent_rp(pwp,pwbuf,pwlen)) >= 0) {
 	        rs = pwp->size() ;
 	    } else {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} else {
 	    SYSDBPW	*ep = getpwent() ;
 	    if (ucentpw *rp = cast_static<ucentpw *>(ep) ; rp != np) {
 	        rs = pwp->load(pwbuf,pwlen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (ucgetpw::getpw_ent) */
+} /* end subroutine (ucgetpw::getpw_ent) */
 
 int ucgetpw::getpw_nam(ucentpw *pwp,char *pwbuf,int pwlen) noex {
     	cnullptr	np{} ;
@@ -250,22 +242,21 @@ int ucgetpw::getpw_nam(ucentpw *pwp,char *pwbuf,int pwlen) noex {
             if ((rs = getpwnam_rp(pwp,pwbuf,pwlen,name)) >= 0) {
                 rs = pwp->size() ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBPW         *ep = getpwnam(name) ;
             if (ucentpw *rp = cast_static<ucentpw *>(ep) ; rp != np) {
                 rs = pwp->load(pwbuf,pwlen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetpw::getpw_nam) */
+} /* end subroutine (ucgetpw::getpw_nam) */
 
 int ucgetpw::getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen) noex {
     	cnullptr	np{} ;
@@ -274,21 +265,20 @@ int ucgetpw::getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen) noex {
             if ((rs = getpwuid_rp(pwp,pwbuf,pwlen,uid)) >= 0) {
                 rs = pwp->size() ;
 	    } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBPW         *ep = getpwuid(uid) ;
             if (ucentpw *rp = cast_static<ucentpw *>(ep) ; rp != np) {
                 rs = pwp->load(pwbuf,pwlen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
             if (rs == SR_BADF) rs = SR_NOENT ;
         }
 	return rs ;
-}
-/* end subroutine (ucgetpw::getpw_uid) */
+} /* end subroutine (ucgetpw::getpw_uid) */
 
 
