@@ -73,7 +73,7 @@
 extern "C" {
     int		ucgetpid_init() noex ;
     int		ucgetpid_fini() noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -117,7 +117,7 @@ extern "C" {
     local void	ucgetpid_atforkparent() noex ;
     local void	ucgetpid_atforkchild() noex ;
     local void	ucgetpid_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* lcoal variables */
@@ -149,11 +149,11 @@ int uc_setpid(pid_t pid) noex {
 
 int ucgetpid_init() noex {
 	return ucgetpid_data.init() ;
-}
+} /* end */
 
 int ucgetpid_fini() noex {
 	return ucgetpid_data.fini() ;
-}
+} /* end */
 
 
 /* local subroutines */
