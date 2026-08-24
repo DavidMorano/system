@@ -27,18 +27,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/time.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usysflag.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/time.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local variables */
@@ -58,11 +58,10 @@ int uc_settimeofday(TIMEVAL *tvp,cvoid *cvp) noex {
 	        rs = settimeofday(tvp,ctp) ;
 	    } /* end block */
 	    if (rs < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_settimeofday) */
+} /* end subroutine (uc_settimeofday) */
 
 
