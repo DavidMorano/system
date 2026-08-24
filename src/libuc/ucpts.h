@@ -35,15 +35,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
 
 
 EXTERNC_begin
 
-extern int uc_ptsname(int,char *,int) noex ;
-extern int uc_ptsgrant(int) noex ;
-extern int uc_ptsunlock(int) noex ;
+extern int uc_ptsname	(int,char *,int) noex ;
+extern int uc_ptsgrant	(int) noex ;
+extern int uc_ptsunlock	(int) noex ;
 
 EXTERNC_end
 
