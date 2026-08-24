@@ -152,13 +152,13 @@ constexpr bool		f_getnwxxxr	= F_GETNWXXXR ;
 int uc_getnwbegin(int stayopen) noex {
 	errno = 0 ;
 	setnetent(stayopen) ;
-	return (- errno) ;
+	return (neg errno) ;
 } /* end subroutine (uc_getnwbegin) */
 
 int uc_getnwend() noex {
 	errno = 0 ;
 	endnetent() ;
-	return (- errno) ;
+	return (neg errno) ;
 } /* end subroutine (uc_getnwend) */
 
 int uc_getnwent(ucentnw *nwp,char *nwbuf,int nwlen) noex {
@@ -215,14 +215,14 @@ int ucgetnw::getnw_ent(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	    if ((rs = getnwent_rp(nwp,nwbuf,nwlen)) >= 0) {
 	        rs = nwp->size() ;
 	    } else {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	} else {
 	    SYSDBNW	*ep = getnwent() ;
 	    if (ucentnw *rp = cast_static<ucentnw *>(ep) ; rp != np) {
 	        rs = nwp->load(nwbuf,nwlen,rp) ;
 	    } else {
-	        rs = (- errno) ;
+	        rs = (neg errno) ;
 	    }
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
@@ -237,14 +237,14 @@ int ucgetnw::getnw_nam(ucentnw *nwp,char *nwbuf,int nwlen) noex {
         if_constexpr (f_getnwxxxr) {
             if ((rs = getnwnam_rp(nwp,nwbuf,nwlen,name)) >= 0) {
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBNW         *ep = getnwnam(name) ;
             if (ucentnw *rp = cast_static<ucentnw *>(ep) ; rp != np) {
                 rs = nwp->load(nwbuf,nwlen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
@@ -260,14 +260,14 @@ int ucgetnw::getnw_num(ucentnw *nwp,char *nwbuf,int nwlen) noex {
             if ((rs = getnwnum_rp(nwp,nwbuf,nwlen,type,num)) >= 0) {
                 rs = nwp->size() ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } else {
             SYSDBNW         *ep = getnwnum(type,num) ;
             if (ucentnw *rp = cast_static<ucentnw *>(ep) ; rp != np) {
                 rs = nwp->load(nwbuf,nwlen,rp) ;
             } else {
-                rs = (- errno) ;
+                rs = (neg errno) ;
             }
         } /* end if_constexpr (selection) */
         if_constexpr (f_sunos) {
