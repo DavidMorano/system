@@ -16,18 +16,18 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<fcntl.h>		/* |mode_t| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<mkx.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® |mode_t| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucopeninfo.h"
 
@@ -67,10 +67,10 @@ int uc_create(cchar *fname,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = 0 ; /* return-value */
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-		if (char *ebuf ; (rs = lm_mp(&ebuf)) >= 0) {
+	    if (fname[0]) ylikely {
+		if (char *ebuf ; (rs = lm_mp(&ebuf)) >= 0) ylikely {
 	            if ((rs = mkpathexp(ebuf,fname,-1)) > 0) {
 		        rs = u_creat(ebuf,om) ;
 			fd = rs ;
@@ -85,7 +85,6 @@ int uc_create(cchar *fname,mode_t om) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_create) */
+} /* end subroutine (uc_create) */
 
 
