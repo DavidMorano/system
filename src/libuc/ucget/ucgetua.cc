@@ -46,16 +46,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucuserattr.h>		/* |userattr| */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucuserattr.h>		/* LIBUC |userattr| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetua.h"
 #include	"ucgetxx.hh"
@@ -92,13 +92,11 @@
 
 int uc_getuabegin() noex {
 	return uc_userattrbegin() ;
-}
-/* end subroutine (uc_getuabegin) */
+} /* end subroutine (uc_getuabegin) */
 
 int uc_getuaend() noex {
 	return uc_userattrend() ;
-}
-/* end subroutine (uc_getuaend) */
+} /* end subroutine (uc_getuaend) */
 
 int uc_getuaent(ucentua *uap,char *uabuf,int ualen) noex {
 	int		rs = SR_FAULT ;
@@ -119,8 +117,7 @@ int uc_getuaent(ucentua *uap,char *uabuf,int ualen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (uc_getuaent) */
+} /* end subroutine (uc_getuaent) */
 
 int uc_getuanam(ucentua *uap,char *uabuf,int ualen,cchar *name) noex {
 	int		rs = SR_FAULT ;
@@ -141,8 +138,7 @@ int uc_getuanam(ucentua *uap,char *uabuf,int ualen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (uc_getuanam) */
+} /* end subroutine (uc_getuanam) */
 
 int uc_getuauid(ucentua *uap,char *uabuf,int ualen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
@@ -163,7 +159,6 @@ int uc_getuauid(ucentua *uap,char *uabuf,int ualen,uid_t uid) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (uc_getuauid) */
+} /* end subroutine (uc_getuauid) */
 
 
