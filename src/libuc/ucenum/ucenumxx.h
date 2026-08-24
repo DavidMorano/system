@@ -32,9 +32,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<filemap.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<filemap.h>		/* LIBUC */
 
 
 #define	UCENUMXX	struct ucenumxx_head
