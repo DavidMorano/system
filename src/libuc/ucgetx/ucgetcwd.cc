@@ -105,8 +105,7 @@ int uc_getcwd(char *cwbuf,int cwlen) noex {
 	    } /* end if_constexpr (f_ugetcwd) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_getcwd) */
+} /* end subroutine (uc_getcwd) */
 
 
 /* local subroutines */
@@ -145,7 +144,7 @@ int ucgetcwd::stdgetcwd() noex {
 	if (cchar *rp ; (rp = getcwd(cwbuf,(cwlen+1))) != nullptr) {
 	    rs = lenstr(rp,cwlen) ;
 	} else {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (ucgetcwd::stdgetcwd) */
