@@ -113,7 +113,7 @@ int uc_getprojdef(PROJECT *pjp,char *rbuf,int rlen,cchar *name) noex {
 	            errno = 0 ;
 	            rp = getdefaultproj(name,pjp,rbuf,(size_t) rlen) ;
 	            if (rp == nullptr) {
-		        rs = ((errno == 0) ? SR_NOENT : (- errno)) ;
+		        rs = ((errno == 0) ? SR_NOENT : (neg errno)) ;
 	            }
 	            if (rs < 0) {
 	                switch (rs) {
