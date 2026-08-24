@@ -83,50 +83,50 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<getaf.h>
-#include	<openshm.h>
-#include	<ascii.h>
-#include	<vecstr.h>
-#include	<hostent.h>
-#include	<sockaddress.h>
-#include	<sbuf.h>
-#include	<storeitem.h>
-#include	<storebuf.h>
-#include	<inetaddr.h>
-#include	<filer.h>
-#include	<linefold.h>
-#include	<sfx.h>
-#include	<snx.h>
-#include	<snwcpy.h>
-#include	<sncpyx.h>
-#include	<strn.h>
-#include	<strwcpy.h>
-#include	<strdcpy.h>
-#include	<mkpathx.h>
-#include	<matstr.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
-#include	<upt.h>
-#include	<dial.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netinet/in.h>		/* POSIX® */
+#include	<arpa/inet.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<getaf.h>		/* LIBUC */
+#include	<openshm.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<hostent.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<inetaddr.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<linefold.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strdcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<dial.h>		/* ?? */
 
 #include	"ucopeninfo.h"
 
@@ -278,9 +278,9 @@ local int	dialfinger(inetargs *,cchar *,int,int,int) noex ;
 local int	fingerclean(int) noex ;
 #if	CF_FINERBACK
 local int	fingerworker(FINGERARGS *) noex ;
-local int	fingerworker_loop(FINGERARGS *,FILER *,FILER *,
+local int	fingerworker_loop(FINGERARGS *,filer *,filer *,
 			int,int,int) noex ;
-local int	fingerworker_liner(FINGERARGS *,FILER *,
+local int	fingerworker_liner(FINGERARGS *,filer *,
 			int,int,int,cchar *,int) noex ;
 #endif /* CF_FINERBACK */
 #endif /* CF_FINGERCLEAN */
@@ -459,8 +459,7 @@ int uc_openproto(cchar *fname,int of,int to,int opts) noex {
 	}
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (uc_openproto) */
+} /* end subroutine (uc_openproto) */
 
 
 /* local subroutines */
@@ -596,7 +595,7 @@ local int openproto_ticotsord(SI *sip,int pni,int of,int to,int opts) noex {
 	(void) to ;
 	(void) opts ;
 	return SR_NOSYS ;
-}
+} /* end subroutine */
 #endif /* CF_TICOTSORD */
 
 local int openproto_ussmux(SI *sip,cc *fpath,cc *svc,int to,int no) noex {
@@ -1318,15 +1317,15 @@ local bool isdirty(int ch) noex {
 /* DEBUG subroutines */
 
 #if	COMMENT
-local int makeint(const void *addr) noex {
+local int makeint(cvoid *addr) noex {
 	int	hi = 0 ;
-	uchar	*us = (uchar *) addr ;
+	uchar	*us = ucharp(addr) ;
 	hi |= (mkchar(us[0]) << 24) ;
 	hi |= (mkchar(us[1]) << 16) ;
 	hi |= (mkchar(us[2]) << 8) ;
 	hi |= (mkchar(us[3]) << 0) ;
 	return hi ;
-}
+} /* end subroutine */
 #endif /* CF_DEBUGS */
 
 local bool hasBadOflags(int of) noex {
