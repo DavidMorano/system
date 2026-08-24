@@ -126,7 +126,7 @@
 #endif /* NAME_MAX */
 
 #ifndef	TZNAME_MAX
-#define	TZNAME_MAX	255
+#define	TZNAME_MAX	255		/* from Apple-Darwin */
 #endif /* TZNAME_MAX */
 
 #ifndef	TZABBR_MAX
