@@ -39,13 +39,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<prefixfn.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<prefixfn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucfileop.h"
 
@@ -95,8 +95,7 @@ int uc_chmod(cchar *fname,mode_t fm) noex {
 	    } /* end if (prefixfn) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (uc_chmod) */
+} /* end subroutine (uc_chmod) */
 
 int uc_minmod(cchar *fname,mode_t mm) noex {
 	int		rs = SR_FAULT ;
@@ -119,11 +118,10 @@ int uc_minmod(cchar *fname,mode_t mm) noex {
 	    } /* end if (prefixfn) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fchanged : rs ;
-}
-/* end subroutine (uc_minmod) */
+} /* end subroutine (uc_minmod) */
 
 #ifdef	COMMENT
-static int ensuremode(cchar *rbuf,mode_t nm) noex {
+local int ensuremode(cchar *rbuf,mode_t nm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f = false ;
@@ -149,8 +147,7 @@ static int ensuremode(cchar *rbuf,mode_t nm) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ensuremode) */
+} /* end subroutine (ensuremode) */
 #endif /* COMMENT */
 
 
