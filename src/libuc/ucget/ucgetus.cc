@@ -45,22 +45,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usysflag.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
 #include	<ucatexit.h>		/* |uc_atexit(3uc)| */
 #include	<ucatfork.h>		/* |uc_atfork{x}(3uc)| */
 #include	<ucfork.h>		/* |uc_forklock{x}(3uc)| */
 #include	<timewatch.hh>
 #include	<sncpyx.h>
-#include	<ptm.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetus.h"
 #include	"ucgetxx.hh"
@@ -97,11 +97,11 @@ namespace {
 	int getusent(char *,int) noex ;
         void atforkbefore() noex {
 	    mx.lockbegin() ;
-        }
+        } ;
         void atforkafter() noex {
 	    mx.lockend() ;
-        }
-	~ucgetus() noex {
+        } ;
+	destruct ucgetus() noex {
 	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("ucgetus",rs,"dtor-fini") ;
 	    }
@@ -116,7 +116,7 @@ extern "C" {
     local void		ucgetus_atforkbefore() noex ;
     local void		ucgetus_atforkafter() noex ;
     local void		ucgetus_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -131,15 +131,15 @@ static ucgetus		ucgetus_data ;
 
 int uc_getusbegin() noex {
 	return ucgetus_data.getusbegin() ;
-}
+} /* end subroutine */
 
 int uc_getusend() noex {
 	return ucgetus_data.getusend() ;
-}
+} /* end subroutine */
 
 int uc_getusent(char *rbuf,int rlen) noex {
 	return ucgetus_data.getusent(rbuf,rlen) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -182,8 +182,7 @@ int ucgetus::init() noex {
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (ucgetus::init) */
+} /* end subroutine (ucgetus::init) */
 
 int ucgetus::fini() noex {
 	int		rs = SR_OK ;
@@ -207,8 +206,7 @@ int ucgetus::fini() noex {
 	    finitdone = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end subroutine (ucgetus::fini) */
+} /* end subroutine (ucgetus::fini) */
 
 int ucgetus::getusbegin() noex {
 	int		rs ;
@@ -220,7 +218,7 @@ int ucgetus::getusbegin() noex {
 			errno = 0 ;
 		        factive = true ;
 		        setusershell() ;
-			rs = (- errno) ;
+			rs = (neg errno) ;
 		    }
 		    rs1 = mx.lockend ;
 		    if (rs >= 0) rs = rs1 ;
@@ -230,8 +228,7 @@ int ucgetus::getusbegin() noex {
 	    } /* end if (forklock) */
 	} /* end if (init) */
 	return rs ;
-}
-/* end subroutine (ucgetus::getusbegin) */
+} /* end subroutine (ucgetus::getusbegin) */
 
 int ucgetus::getusend() noex {
 	int		rs ;
@@ -243,7 +240,7 @@ int ucgetus::getusend() noex {
 			errno = 0 ;
 		        factive = false ;
 		        endusershell() ;
-			rs = (- errno) ;
+			rs = (neg errno) ;
 		    }
 		    rs1 = mx.lockend ;
 		    if (rs >= 0) rs = rs1 ;
@@ -253,8 +250,7 @@ int ucgetus::getusend() noex {
 	    } /* end if (forklock) */
 	} /* end if (init) */
 	return rs ;
-}
-/* end subroutine (ucgetus::getusend) */
+} /* end subroutine (ucgetus::getusend) */
 
 int ucgetus::getusent(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -273,7 +269,7 @@ int ucgetus::getusent(char *rbuf,int rlen) noex {
 	    	                rs = sncpy1(rbuf,rlen,rp) ;
 			        len = rs ;
 		            } else { /* this is really extra safety */
-			        if (errno != 0) rs = (- errno) ;
+			        if (errno != 0) rs = (neg errno) ;
 		            }
 		            rs1 = mx.lockend ;
 		            if (rs >= 0) rs = rs1 ;
@@ -285,24 +281,20 @@ int ucgetus::getusent(char *rbuf,int rlen) noex {
 	    } /* end if (non-negative buffer length) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (ucgetus::getusent) */
+} /* end subroutine (ucgetus::getusent) */
 
 local void ucgetus_atforkbefore() noex {
 	ucgetus_data.atforkbefore() ;
-}
-/* end subroutine (ucgetus_atforkbefore) */
+} /* end subroutine (ucgetus_atforkbefore) */
 
 local void ucgetus_atforkafter() noex {
 	ucgetus_data.atforkafter() ;
-}
-/* end subroutine (ucgetus_atforkafter) */
+} /* end subroutine (ucgetus_atforkafter) */
 
 local void ucgetus_exit() noex {
 	if (cint rs = ucgetus_data.fini() ; rs < 0) {
 	    ulogerror("ucgetus",rs,"exit-fini") ;
 	}
-}
-/* end subroutine (ucgetus_exit) */
+} /* end subroutine (ucgetus_exit) */
 
 
