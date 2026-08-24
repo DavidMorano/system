@@ -213,6 +213,8 @@ constexpr bool		f_isaexec = F_ISAEXEC ;
 
 /* exported variables */
 
+const spawnprocms	spawnprocm ;
+
 
 /* exported subroutines */
 
