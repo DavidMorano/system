@@ -28,14 +28,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<sysdbfn.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<sysdbfn.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucenumxx.h"
 #include	"ucenumnw.h"
@@ -80,26 +80,22 @@ int ucenumnw_open(ucenumnw *op,cchar *efname) noex {
 	    rs = ueo.open(rp) ;
 	} /* end if (sysdbfn_get) */
 	return rs ;
-}
-/* end if (ucenumnw_open) */
+} /* end if (ucenumnw_open) */
 
 int ucenumnw_close(ucenumnw *op) noex {
 	ucenumxxco<ucenumnw_ent>	ueo(op,mxx) ;
 	return ueo.close() ;
-} 
-/* end subroutine (ucenumnw_close) */
+} /* end subroutine (ucenumnw_close) */
 
 int ucenumnw_readent(ucenumnw *op,ucenumnw_ent *ep,char *bp,int bl) noex {
 	ucenumxxco<ucenumnw_ent>	ueo(op,mxx) ;
 	return ueo.readent(ep,bp,bl) ;
-}
-/* end subroutine (ucenumnw_readent) */
+} /* end subroutine (ucenumnw_readent) */
 
 int ucenumnw_reset(ucenumnw *op) noex {
 	ucenumxxco<ucenumnw_ent>	ueo(op,mxx) ;
 	return ueo.reset() ;
-}
-/* end subroutine (ucenumnw_reset) */
+} /* end subroutine (ucenumnw_reset) */
 
 
 /* local subroutines */
