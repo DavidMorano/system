@@ -32,18 +32,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<utimeout.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/uio.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<utimeout.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uctruncate.h"
 
@@ -74,7 +74,7 @@ int uc_truncate(cchar *fn,off_t len) noex {
 	        bool	fexit = false ;
 	        repeat {
 	            if ((rs = truncate(fn,len)) < 0) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	                switch (rs) {
 	                case SR_AGAIN:
 	                    if (to_again-- > 0) {
@@ -94,7 +94,6 @@ int uc_truncate(cchar *fn,off_t len) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (uc_truncate) */
+} /* end subroutine (uc_truncate) */
 
 
