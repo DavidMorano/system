@@ -49,8 +49,7 @@ OBJ_UCGET= obj0_ucget.o obj1_ucget.o obj2_ucget.o obj3_ucget.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNINFO)
 LIBINFO= $(LIBDIRS) $(LIBS)
