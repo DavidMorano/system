@@ -35,12 +35,12 @@ DEFS +=
 
 INCS += libu.h
 
-MODS += valuelims.ccm digbufsizes.ccm uconstants.ccm 
-MODS += libutil.ccm chrset.ccm bitgrp.ccm
-MODS += digtab.ccm xxtostr.ccm
-MODS += usigsets.o usigblock.ccm umisc.ccm
-MODS += unixfnames.ccm constdiv.ccm
-MODS += usysbasic.ccm ureserve.cmm vecbool.ccm
+MODS += valuelims.o digbufsizes.o uconstants.o 
+MODS += libutil.o chrset.o bitgrp.o
+MODS += digtab.o xxtostr.o
+MODS += usigsets.o usigblock.o umisc.o
+MODS += unixfnames.o constdiv.o
+MODS += usysbasic.o ureserve.cmm vecbool.o
 
 LIBS += -liconv -lproc
 
@@ -88,7 +88,7 @@ OBJ31= ccfile.o readln.o dprint.o
 OBJ32= muldigs.o varithmetic.o xxtostr.o
 OBJ33= intext.o cmporders.o localmisc.o
 OBJ34= exitcodes.o stacktypes.o sysconfcmds.o
-OBJ35= utmptypes.o utmpsizes.o
+OBJ35= utmptypes.o utmpsizes.o usyscalls.o
 
 OBJ36= mapex.o deb.o
 OBJ37= syspredefined.o
@@ -382,6 +382,7 @@ objn.o:			$(OBJN)
 
 # SUPPORT objects
 syshas.o:		syshas.cc	syshas.h		$(INCS)
+usyscalls.o:		usyscalls.cc	usyscalls.h		$(INCS)
 ustsdefs.o:		usysdefs.cc	usysdefs.h		$(INCS)
 timewatch.o:		timewatch.cc	timewatch.hh		$(INCS)
 timecount.o:		timecount.cc	timecount.hh		$(INCS)
