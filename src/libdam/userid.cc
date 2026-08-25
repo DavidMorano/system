@@ -23,7 +23,7 @@
 	userid
 
 	Description:
-	This object implment a user-identity.
+	This object implments a user-identity.
 
 	Synopsis:
 	int userid_start(userid *op,cc *un,cc *gn,uid_t uid,gid_t gid) noex
