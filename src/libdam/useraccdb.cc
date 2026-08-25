@@ -80,7 +80,7 @@
 #include	<sfx.h>			/* LIBUC */
 #include	<strwcmp.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
-#include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
 
 #include	"useraccdb.h"
 
