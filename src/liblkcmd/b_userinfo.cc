@@ -55,25 +55,28 @@
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<ucgetx.h>
-#include	<ucgetnetname.h>
-#include	<ucgetpw.h>
-#include	<ucgetpid.h>
-#include	<bufsizeget.h>
-#include	<getxname.h>
-#include	<getax.h>
-#include	<getusername.h>
-#include	<getpwentry.h>
-#include	<getutmpent.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC */
+#include	<ucgetnetname.h>	/* LIBUC */
+#include	<ucgetpw.h>		/* LIBUC */
+#include	<ucgetpid.h>		/* LIBUC */
+#include	<ucinfo.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<getxname.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getpwentry.h>		/* LIBUC */
+#include	<getutmpent.h>		/* LIBUC */
 #include	<estrings.h>
-#include	<ucinfo.h>
+#include	<pwentry.h>
+#include	<pwfile.h>
+#include	<user.h>		/* LIBUC |userdomain(3uc)| */
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
@@ -89,8 +92,9 @@
 #include	<sysgroup.h>
 #include	<sysproject.h>
 #include	<tmpx.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<vardefs.h>		/* LIBU */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -102,26 +106,6 @@
 import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
-
-#ifndef	VARTZ
-#define	VARTZ		"TZ"
-#endif
-
-#ifndef	VARNAME
-#define	VARNAME		"NAME"
-#endif
-
-#ifndef	VARFULLNAME
-#define	VARFULLNAME	"FULLNAME"
-#endif
-
-#ifndef	VARMAILNAME
-#define	VARMAILNAME	"MAILNAME"
-#endif
-
-#ifndef	VARPRINTER
-#define	VARPRINTER	"PRINTER"
-#endif
 
 #ifndef	ORGCODELEN
 #define	ORGCODELEN	USERNAMELEN
@@ -139,19 +123,21 @@ import libutil ;			/* |memclear(3u)| */
 #define	DEVDNAME	"/dev"
 #endif
 
+#ifndef	PI
 #define	PI		proginfo
+#endif
 
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
+#define	LOCINFO		locinfo
+#define	LOCINFO_FL	locinfo_flags
 
-#define	PROGDATA	struct progdata
-#define	PROGDATA_FL	struct progdata_flags
+#define	PROGDATA	progdata
+#define	PROGDATA_FL	progdata_flags
 
-#define	DATASYS		struct datasys
-#define	DATASYS_FL	struct datasys_flags
+#define	DATASYS		datasys
+#define	DATASYS_FL	datasys_flags
 
-#define	DATAUSER	struct datauser
-#define	DATAUSER_FL	struct datauser_flags
+#define	DATAUSER	datauser
+#define	DATAUSER_FL	datauser_flags
 
 
 /* external subroutines */
@@ -384,7 +370,7 @@ constexpr PIVARS	initvars = {
 	VARPRNAME
 } ; /* end array */
 
-constexpr MAPEX	mapexs[] = {
+constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -3210,13 +3196,11 @@ local int datauser_finish(DATAUSER *dup)
 	}
 
 	return rs ;
-}
-/* end subroutine (datauser_finish) */
+} /* end subroutine (datauser_finish) */
 
-
-local int datauser_ua(DATAUSER *dup)
-{
+local int datauser_ua(DATAUSER *dup) noex {
 	PROGINFO	*pip ;
+	cnullptr	no{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -3236,7 +3220,8 @@ local int datauser_ua(DATAUSER *dup)
 	        int		vl ;
 	        char		vbuf[VBUFLEN + 1] ;
 	        for (i = 0 ; uakeys[i] != nullptr ; i += 1) {
-	            if ((rs = userattrdb_lookup(&ua,vbuf,vlen,uakeys[i])) >= 0) {
+		    cchar *uk = uakeys[i] ;
+	            if ((rs = userattrdb_lookup(&ua,vbuf,vlen,uk)) >= 0) {
 			vl = rs ;
 	                switch (i) {
 	                case uakey_tz:
@@ -3289,9 +3274,10 @@ local int datauser_domain(DATAUSER *dup)
 
 #ifdef	COMMENT
 	    if ((rs >= 0) && (! dup->have.domain)) {
+		cchar *dn = dup->domainname ;
 	        cint	dlen = MAXHOSTNAMELEN ;
-	        if ((rs = udomain(nullptr,dup->domainname,dlen,dup->un)) >= 0) {
-		    dup->have.domain = (dup->domainname[0] != '\0') ;
+	        if ((rs = userdomain(nl,dn,dlen,dup->un)) >= 0) {
+		    dup->have.domain = (dn[0] != '\0') ;
 		} else if ((rs == SR_NOTFOUND) || (rs == SR_NOSYS)) {
 		    rs = SR_OK ;
 	            dup->domainname[0] = '\0' ;
@@ -3308,12 +3294,9 @@ local int datauser_domain(DATAUSER *dup)
 #endif
 
 	return rs ;
-}
-/* end subroutine (datauser_domain) */
+} /* end subroutine (datauser_domain) */
 
-
-local int datauser_pw(DATAUSER *dup)
-{
+local int datauser_pw(DATAUSER *dup) noex {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
