@@ -111,7 +111,7 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     typedef int (*tworker)(void *) noex ;
-}
+} /* end extern (C) */
 
 typedef vecsorthand	prique ;
 typedef const TIMEOUT *	ctimeoutp ;
@@ -158,41 +158,41 @@ namespace {
 	aflag		freqexit ;	/* request exit of threads */
 	aflag		fexitsiger ;	/* thread is exiting */
 	aflag		fexitdisp ;	/* thread is exiting */
-	int init() noex ;
-	int fini() noex ;
-	int cmdset(TIMEOUT *) noex ;
-	int cmdcancel(TIMEOUT *) noex ;
-	int cmdtimeout(int,TIMEOUT *) noex ;
-	int capbegin(int = -1) noex ;
-	int capend() noex ;
-	int enterpri(TIMEOUT *) noex ;
-	int timerset(time_t) noex ;
-	int workready() noex ;
-	int workbegin() noex ;
-	int workend() noex ;
-	int workfins() noex ;
-	int workdump() noex ;
-	int priqbegin() noex ;
-	int priqend() noex ;
-	int pridump() noex ;
-	int sigbegin() noex ;
-	int sigend() noex ;
-	int timerbegin() noex ;
-	int timerend() noex ;
-	int thrsbegin() noex ;
-	int thrsend() noex ;
-	int sigerbegin() noex ;
-	int sigerend() noex ;
-	int sigerworker() noex ;
-	int sigerwait() noex ;
-	int sigerserve() noex ;
-	int sigerdump() noex ;
-	int dispbegin() noex ;
-	int dispend() noex ;
-	int dispworker() noex ;
-	int disprecv() noex ;
-	int disphandle() noex ;
-	int dispjobdel(TIMEOUT *) noex ;
+	int init	() noex ;
+	int fini	() noex ;
+	int cmdset	(TIMEOUT *) noex ;
+	int cmdcancel	(TIMEOUT *) noex ;
+	int cmdtimeout	(int,TIMEOUT *) noex ;
+	int capbegin	(int = -1) noex ;
+	int capend	() noex ;
+	int enterpri	(TIMEOUT *) noex ;
+	int timerset	(time_t) noex ;
+	int workready	() noex ;
+	int workbegin	() noex ;
+	int workend	() noex ;
+	int workfins	() noex ;
+	int workdump	() noex ;
+	int priqbegin	() noex ;
+	int priqend	() noex ;
+	int pridump	() noex ;
+	int sigbegin	() noex ;
+	int sigend	() noex ;
+	int timerbegin	() noex ;
+	int timerend	() noex ;
+	int thrsbegin	() noex ;
+	int thrsend	() noex ;
+	int sigerbegin	() noex ;
+	int sigerend	() noex ;
+	int sigerworker	() noex ;
+	int sigerwait	() noex ;
+	int sigerserve	() noex ;
+	int sigerdump	() noex ;
+	int dispbegin	() noex ;
+	int dispend	() noex ;
+	int dispworker	() noex ;
+	int disprecv	() noex ;
+	int disphandle	() noex ;
+	int dispjobdel	(TIMEOUT *) noex ;
 	destruct uctimeout() noex {
 	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("uctimeout",rs,"dtor-fini") ;
@@ -219,7 +219,7 @@ extern "C" {
     local void	uctimeout_atforkchild() noex ;
     local void	uctimeout_exit() noex ;
     local int	ventcmp(cvoid *,cvoid *) noex ;
-}
+} /* end extern (C) */
 
 local int mkopts() noex {
 	int	vo = 0 ;
@@ -235,10 +235,8 @@ local int mkopts() noex {
 /* local variables */
 
 static uctimeout	uctimeout_data ;
-
-cint			vopts = mkopts() ;
-
-cbool			f_childthrs = CF_CHILDTHRS ;
+cint			vopts		= mkopts() ;
+cbool			f_childthrs	= CF_CHILDTHRS ;
 
 
 /* exported variables */
@@ -248,7 +246,7 @@ cbool			f_childthrs = CF_CHILDTHRS ;
 
 int uc_timeout(int cmd,TIMEOUT *valp) noex {
 	return uctimeout_data.cmdtimeout(cmd,valp) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -257,12 +255,12 @@ int uctimeout::cmdtimeout(int cmd,TIMEOUT *valp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		id = 0 ;
-	if (valp) {
+	if (valp) ylikely {
 	    rs = SR_INVALID ;
-	    if (cmd >= 0) {
-	        if ((rs = init()) >= 0) {
-	            if ((rs = capbegin()) >= 0) {
-	                if ((rs = workready()) >= 0) {
+	    if (cmd >= 0) ylikely {
+	        if ((rs = init()) >= 0) ylikely {
+	            if ((rs = capbegin()) >= 0) ylikely {
+	                if ((rs = workready()) >= 0) ylikely {
 	                    switch (cmd) {
 	                    case timeoutcmd_set:
 	                        rs = cmdset(valp) ;
@@ -519,10 +517,10 @@ int uctimeout::workbegin() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
 	    static cint		vo = vopts ;
-	    if ((rs = vechand_start(&ents,0,vo)) >= 0) {
-	        if ((rs = priqbegin()) >= 0) {
-	            if ((rs = sigbegin()) >= 0) {
-	                if ((rs = timerbegin()) >= 0) {
+	    if ((rs = vechand_start(&ents,0,vo)) >= 0) ylikely {
+	        if ((rs = priqbegin()) >= 0) ylikely {
+	            if ((rs = sigbegin()) >= 0) ylikely {
+	                if ((rs = timerbegin()) >= 0) ylikely {
 	                    if ((rs = ciq_start(&pass)) >= 0) {
 	                        if ((rs = thrsbegin()) >= 0) {
 	                            fl.workready = true ;
@@ -625,7 +623,7 @@ int uctimeout::workdump() noex {
 int uctimeout::priqbegin() noex {
 	cint		osize = szof(vecsorthand) ;
 	int		rs ;
-	if (void *vp ; (rs = libmem.mall(osize,&vp)) >= 0) {
+	if (void *vp ; (rs = libmem.mall(osize,&vp)) >= 0) ylikely {
 	    pqp = resumelife<prique>(vp) ;
 	    rs = vecsorthand_start(pqp,ventcmp,1) ;
 	    if (rs < 0) {
@@ -702,11 +700,11 @@ int uctimeout::timerbegin() noex {
 	if (SIGEVENT se ; (rs = sigevent_load(&se,st,sig,val)) >= 0) {
 	    const clockid_t	cid = CLOCK_REALTIME ;
 	    timer_t		tid ;
-	    if ((rs = uc_timercreate(cid,&se,&tid)) >= 0) {
+	    if ((rs = uc_timercreate(cid,&se,&tid)) >= 0) ylikely {
 	        timerid = tid ;
 	        fl.timer = true ;
-	    }
-	}
+	    } /* end if (uc_timercreate) */
+	} /* end if (sigevent_load) */
 	return rs ;
 } /* end method (uctimeout::timerbegin) */
 
@@ -993,7 +991,7 @@ int uctimeout::dispjobdel(TIMEOUT *tep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-        if ((rs = capbegin(to)) >= 0) {
+        if ((rs = capbegin(to)) >= 0) ylikely {
 	    if ((rs = vechand_delhand(&ents,tep)) >= 0) {
 		f = true ;
 	    } else if (rs == SR_NOTFOUND) {
@@ -1007,11 +1005,11 @@ int uctimeout::dispjobdel(TIMEOUT *tep) noex {
 
 local int uctimeout_sigerworker(uctimeout *uip) noex {
 	return uip->sigerworker() ;
-}
+} /* end subroutine */
 
 local int uctimeout_dispworker(uctimeout *uip) noex {
 	return uip->dispworker() ;
-}
+} /* end subroutine */
 
 local void uctimeout_atforkbefore() noex {
 	uctimeout_data.mtx.lockbegin() ;
