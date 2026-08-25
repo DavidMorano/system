@@ -67,7 +67,7 @@ typedef vstrorders	vo ;
 
 extern "C" {
     typedef int (*strxcmp_f)(cc *,cc *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
