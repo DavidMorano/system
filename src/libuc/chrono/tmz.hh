@@ -21,10 +21,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<time.h>		/* |TM| */
-#include	<limits.h>		/* |SHORT_MIN| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<time.h>		/* CSTD |TM| */
+#include	<limits.h>		/* CSTD |SHORT_MIN| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	TMZ		tmz
