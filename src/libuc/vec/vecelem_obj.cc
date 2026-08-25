@@ -63,39 +63,39 @@
 
 int vecelem::start(int µesz,int µvn,int µvo) noex {
 	return vecelem_start(this,µesz,µvn,µvo) ;
-}
+} /* end method */
 
 int vecelem::add(cvoid *ep) noex {
 	return vecelem_add(this,ep) ;
-}
+} /* end method */
 
 int vecelem::addlist(cvoid *ep,int el) noex {
 	return vecelem_addlist(this,ep,el) ;
-}
+} /* end method */
 
 int vecelem::adduniq(cvoid *ep) noex {
 	return vecelem_adduniq(this,ep) ;
-}
+} /* end method */
 
 int vecelem::sort(vecelem_vcmp vcf) noex {
 	return vecelem_sort(this,vcf) ;
-}
+} /* end method */
 
 int vecelem::get(int ai,void *vrp) noex {
 	return vecelem_get(this,ai,vrp) ;
-}
+} /* end method */
 
 int vecelem::getval(int ai,void *vrp) noex {
 	return vecelem_getval(this,ai,vrp) ;
-}
+} /* end method */
 
 int vecelem::getvec(void **rpp) noex {
 	return vecelem_getvec(this,rpp) ;
-}
+} /* end method */
 
 int vecelem::del(int ai) noex {
 	return vecelem_del(this,ai) ;
-}
+} /* end method */
 
 void vecelem::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
