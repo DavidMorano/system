@@ -15,6 +15,21 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Object:
+	tmtime
+
+	Description:
+
+	Notes:
+	1. The member vriable |gmtoff| contains **MINUTES** 
+	**west** of GMT.  Being minutes **west** of GMT mimics
+	the old behavior of the |TIMRB| structure, of |ftime(3c)|
+	fame.
+
+*******************************************************************************/
+
 #ifndef	TMTIME_INCLUDE
 #define	TMTIME_INCLUDE
 #ifdef	__cplusplus
@@ -35,17 +50,17 @@
 struct tmtime {
     	static cint	znlen ;
 	static cint	baseyear ;
-	char	*znbuf{} ;	/* time-zone name abbreviation (allocated) */
-	int	sec ;		/* 0-61 (for up to two leap-seconds) */
-	int	min ;		/* 0-59 */
-	int	hour ;		/* 0-23 */
-	int	mday ;		/* month-day (day-of-month 1-31) */
-	int	mon ;		/* month 0-11 */
-	int	year ;		/* number of years since 1900 */
-	int	wday ;		/* week-day (day-of-week 0-6) */
-	int	yday ;		/* year-day (day-of-year) */
-	int	gmtoff ;	/* offset from GMT (seconds west of GMT) */
-	int	isdst ;
+	char		*znbuf{} ;	/* time-zone name abbreviation */
+	int		sec ;		/* 0-61 (for up to two leap-seconds) */
+	int		min ;		/* 0-59 */
+	int		hour ;		/* 0-23 */
+	int		mday ;		/* month-day (day-of-month 1-31) */
+	int		mon ;		/* month 0-11 */
+	int		year ;		/* number of years since 1900 */
+	int		wday ;		/* week-day (day-of-week 0-6) */
+	int		yday ;		/* year-day (day-of-year) */
+	int		gmtoff ;	/* seconds west of GMT */
+	int		isdst ;
 	tmtime() noex {
 	    gmtoff = -1 ;
 	    isdst = -1 ;
@@ -61,7 +76,7 @@ struct tmtime {
 	int adjtime	(time_t *) noex ;
 	int getzn	(char *,int) noex ;
 	int loadzn	(cchar *,int) noex ;
-	void dtor() noex ;
+	void dtor	() noex ;
 	destruct tmtime() {
 	    if (znbuf) dtor() ;
 	} ;
@@ -69,20 +84,20 @@ struct tmtime {
 
 EXTERNC_begin
 
-extern int	tmtime_insert		(tmtime *,CTM *) noex ;
-extern int	tmtime_timex		(tmtime *,bool,time_t) noex ;
-extern int	tmtime_timegm		(tmtime *,time_t) noex ;
-extern int	tmtime_timelocal	(tmtime *,time_t) noex ;
-extern int	tmtime_extract		(tmtime *,TM *) noex ;
-extern int	tmtime_mktime		(tmtime *,time_t *) noex ;
-extern int	tmtime_adjtime		(tmtime *,time_t *) noex ;
-extern int	tmtime_getzn		(tmtime *,char *,int) noex ;
-extern int	tmtime_loadzn		(tmtime *,cchar *,int) noex ;
+extern int tmtime_insert	(tmtime *,CTM *) noex ;
+extern int tmtime_timex		(tmtime *,bool,time_t) noex ;
+extern int tmtime_timegm	(tmtime *,time_t) noex ;
+extern int tmtime_timelocal	(tmtime *,time_t) noex ;
+extern int tmtime_extract	(tmtime *,mut TM *) noex ;
+extern int tmtime_mktime	(tmtime *,time_t *) noex ;
+extern int tmtime_adjtime	(tmtime *,time_t *) noex ;
+extern int tmtime_getzn		(tmtime *,char *,int) noex ;
+extern int tmtime_loadzn	(tmtime *,cchar *,int) noex ;
 
 #ifdef	COMMENT
-extern int	tmtime_setznoe		(tmtime *,cchar *,int) noex ;
-extern int	tmtime_settimez		(tmtime *,cchar *,cchar *,time_t) noex ;
-extern int	tmtime_gettime		(tmtime *,cchar *,time_t *) noex ;
+extern int tmtime_setznoe	(tmtime *,cchar *,int) noex ;
+extern int tmtime_settimez	(tmtime *,cchar *,cchar *,time_t) noex ;
+extern int tmtime_gettime	(tmtime *,cchar *,time_t *) noex ;
 #endif /* COMMENT */
 
 local inline int tmtime_gmtime(tmtime *tmp,time_t t) noex {
