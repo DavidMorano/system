@@ -140,8 +140,7 @@ int utmpaccent_load(utmpaccent *uep,char *uebuf,int uelen,CFENT *suep) noex {
 	    } /* end if (storeitem) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (utmpaccent_load) */
+} /* end subroutine (utmpaccent_load) */
 
 int utmpaccent_size(cutmpaccent *uep) noex {
 	int		rs = SR_FAULT ;
@@ -161,8 +160,7 @@ int utmpaccent_size(cutmpaccent *uep) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? sz : rs ;
-}
-/* end subroutine (utmpaccent_size) */
+} /* end subroutine (utmpaccent_size) */
 
 
 /* local subroutines */
