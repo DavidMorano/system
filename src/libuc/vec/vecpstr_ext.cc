@@ -176,42 +176,42 @@ int vecpstr_svcargs(vecpstr *op,int *fp,cchar *abuf) noex {
 
 int vecpstrer::add(cchar *sp,int sl) noex {
     	return vecpstr_add(op,sp,sl) ;
-}
+} /* end method */
 
 int vecpstrer::adduniq(cchar *sp,int sl) noex {
     	return vecpstr_adduniq(op,sp,sl) ;
-}
+} /* end method */
 
 int vecpstrer::addkeyval(cchar *kp,int kl,cchar *valp,int vall) noex {
     	return vecpstr_addkeyval(op,kp,kl,valp,vall) ;
-}
+} /* end method */
 
 int vecpstrer::insert(int ii,cchar *sp,int sl) noex {
     	return vecpstr_insert(op,ii,sp,sl) ;
-}
+} /* end method */
 
 int vecpstrer::get(int i,cchar **rpp) noex {
     	return vecpstr_get(op,i,rpp) ;
-}
+} /* end method */
 
 int vecpstrer::getvec(mainv *mp) noex {
     	return vecpstr_getvec(op,mp) ;
-}
+} /* end method */
 
 int vecpstrer::finder(cchar *s,vecpstr_f vcmp,cchar **rpp) noex {
     	return vecpstr_finder(op,s,vcmp,rpp) ;
-}
+} /* end method */
 
 int vecpstrer::del(int i) noex {
 	return vecpstr_del(op,i) ;
-}
+} /* end method */
 
 int vecpstrer::sort(vecpstr_f vcmp) noex {
 	return vecpstr_sort(op,vcmp) ;
-}
+} /* end method */
 
 int vecpstr::addpathclean(cchar *lp,int ll) noex {
 	return vecpstr_addpathclean(this,lp,ll) ;
-}
+} /* end method */
 
 
