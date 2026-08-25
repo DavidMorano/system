@@ -61,7 +61,7 @@ typedef vecobj_vcf	c_f ;
 
 extern "C" {
     typedef int (*vg_f)(vecobj *,int,void **) noex ;
-}
+} /* end extern (C) */
 
 
 /* forward references */
@@ -773,56 +773,56 @@ int sub_fetch::next(cur *curp) noex {
 
 int vecobj::start(int osz,int vn,int vo) noex {
 	return vecobj_start(this,osz,vn,vo) ;
-}
+} /* end method */
 
 int vecobj::add(cvoid *ep) noex {
 	return vecobj_add(this,ep) ;
-}
+} /* end method */
 
 int vecobj::adduniq(cvoid *ep) noex {
 	return vecobj_adduniq(this,ep) ;
-}
+} /* end method */
 
 int vecobj::store(cvoid *ep,void **rpp) noex {
 	return vecobj_store(this,ep,rpp) ;
-}
+} /* end method */
 
 int vecobj::find(cvoid *ep) noex {
 	return vecobj_find(this,ep) ;
-}
+} /* end method */
 
 int vecobj::get(int ei,void **rpp) noex {
 	return vecobj_get(this,ei,rpp) ;
-}
+} /* end method */
 
 int vecobj::getvec(void ***rppp) noex {
 	return vecobj_getvec(this,rppp) ;
-}
+} /* end method */
 
 int vecobj::del(int ai) noex {
 	if (ai < 0) ai = 0 ;
 	return vecobj_del(this,ai) ;
-}
+} /* end method */
 
 int vecobj::search(cvoid *ep,vecobj_vcf vcf,void **rpp) noex {
 	return vecobj_search(this,ep,vcf,rpp) ;
-}
+} /* end method */
 
 int vecobj::sort(vecobj_vcf vcf) noex {
 	return vecobj_sort(this,vcf) ;
-}
+} /* end method */
 
 int vecobj::curbegin(vecobj_cur *curp) noex {
 	return vecobj_curbegin(this,curp) ;
-}
+} /* end method */
 
 int vecobj::curend(vecobj_cur *curp) noex {
 	return vecobj_curend(this,curp) ;
-}
+} /* end method */
 
 int vecobj::curfetch(cvoid *ep,cur *curp,c_f vcf,void **rpp) noex {
 	return vecobj_curfetch(this,ep,curp,vcf,rpp) ;
-}
+} /* end method */
 
 void vecobj::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
