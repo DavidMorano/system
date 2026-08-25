@@ -17,16 +17,18 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<termios.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<termios.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"uctc.h"
 
@@ -61,14 +63,14 @@ namespace {
 	    	tip = cast_const<TERMIOS *>(p) ;
 	} ;
 	int operator () (int) noex ;
-	int drain(int) noex ;
-	int flow(int) noex ;
-	int flush(int) noex ;
-	int getpgrp(int) noex ;
-	int getsid(int) noex ;
-	int attrget(int) noex ;
-	int attrset(int) noex ;
-	int setpgrp(int) noex ;
+	int drain	(int) noex ;
+	int flow	(int) noex ;
+	int flush	(int) noex ;
+	int getpgrp	(int) noex ;
+	int getsid	(int) noex ;
+	int attrget	(int) noex ;
+	int attrset	(int) noex ;
+	int setpgrp	(int) noex ;
     } ; /* end struct (uctc) */
 } /* end namespace */
 
@@ -88,31 +90,31 @@ int uc_tcdrain(int fd) noex {
 	uctc		to ;
 	to.m = &uctc::drain ;
 	return to(fd) ;
-}
+} /* end subroutine */
 
 int uc_tcflow(int fd,int cmd) noex {
 	uctc		to(cmd) ;
 	to.m = &uctc::flow ;
 	return to(fd) ;
-}
+} /* end subroutine */
 
 int uc_tcflush(int fd,int cmd) noex {
 	uctc		to(cmd) ;
 	to.m = &uctc::flush ;
 	return to(fd) ;
-}
+} /* end subroutine */
 
 int uc_tcgetpgrp(int fd) noex {
 	uctc		to ;
 	to.m = &uctc::getpgrp ;
 	return to(fd) ;
-}
+} /* end subroutine */
 
 int uc_tcgetsid(int fd) noex {
 	uctc		to ;
 	to.m = &uctc::getsid ;
 	return to(fd) ;
-}
+} /* end subroutine */
 
 int uc_tcattrget(int fd,TERMIOS *tip) noex {
 	int		rs = SR_FAULT ;
@@ -122,7 +124,7 @@ int uc_tcattrget(int fd,TERMIOS *tip) noex {
 	    rs = to(fd) ;
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine */
 
 int uc_tcattrset(int fd,int cmd,const TERMIOS *tip) noex {
 	int		rs = SR_FAULT ;
@@ -132,13 +134,13 @@ int uc_tcattrset(int fd,int cmd,const TERMIOS *tip) noex {
 	    rs = to(fd) ;
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end subroutine */
 
 int uc_tcsetpgrp(int fd,pid_t pgrp) noex {
 	uctc		to(pgrp) ;
 	to.m = &uctc::setpgrp ;
 	return to(fd) ;
-}
+} /* end subroutine */
 
 
 /* local subroutines */
@@ -166,78 +168,71 @@ int uctc::operator () (int fd) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end method (tcuc::operator) */
+} /* end method (tcuc::operator) */
 
 int uctc::drain(int fd) noex {
 	int		rs ;
 	if ((rs = tcdrain(fd)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
+} /* end method */
 
 int uctc::flow(int fd) noex {
 	int		rs ;
 	if ((rs = tcflow(fd,cmd)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (uctc::flow) */
+} /* end method (uctc::flow) */
 
 int uctc::flush(int fd) noex {
 	int		rs ;
 	if ((rs = tcflush(fd,cmd)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
+} /* end method */
 
 int uctc::getpgrp(int fd) noex {
 	int		rs ;
 	if ((rs = tcgetpgrp(fd)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (uctc::getpgrp) */
+} /* end method (uctc::getpgrp) */
 
 int uctc::getsid(int fd) noex {
 	int		rs ;
 	if ((rs = tcgetsid(fd)) < 0) {
-	     rs = (- errno) ;
+	     rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (uctc::getsid) */
+} /* end method (uctc::getsid) */
 
 int uctc::attrget(int fd) noex {
 	int		rs ;
 	if ((rs = tcgetattr(fd,tip)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (uctc::attrget) */
+} /* end method (uctc::attrget) */
 
 int uctc::attrset(int fd) noex {
     	const TERMIOS	*cp = cast_const<const TERMIOS *>(tip) ;
 	int		rs ;
 	if ((rs = tcsetattr(fd,cmd,cp)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (uctc::attrset) */
+} /* end method (uctc::attrset) */
 
 int uctc::setpgrp(int fd) noex {
 	int		rs ;
 	if ((rs = tcsetpgrp(fd,cmd)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
-}
-/* end method (uctc::setpgrp) */
+} /* end method (uctc::setpgrp) */
 
 
