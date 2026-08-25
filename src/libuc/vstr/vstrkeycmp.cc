@@ -71,7 +71,7 @@ typedef vstrorders	vo ;
 
 extern "C" {
     typedef int (*strxcmp_f)(cchar *,cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -114,16 +114,15 @@ local int vstrkeyxcmp(strxcmp_f vx,cchar **s1pp,cchar **s2pp) noex {
 
 int vstrkeybasecmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeyxcmp(strkeybasecmp,s1pp,s2pp) ;
-}
+} /* end subroutine */
 
 int vstrkeycasecmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeyxcmp(strkeycasecmp,s1pp,s2pp) ;
-}
+} /* end subroutine */
 
 int vstrkeyfoldcmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeyxcmp(strkeyfoldcmp,s1pp,s2pp) ;
-}
-
+} /* end subroutine */
 
 int vstrkeybasecmpx(cchar **e1pp,cchar **e2pp,vo fo) noex { /* base */
 	strxcmp_f cmpfun = (fo) ? strkeybasecmpr : strkeybasecmpo ;
