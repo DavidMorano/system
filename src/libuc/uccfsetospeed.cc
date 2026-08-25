@@ -22,7 +22,7 @@
 #include	<unistd.h>		/* POSIX® */
 #include	<fcntl.h>		/* POSIX® */
 #include	<poll.h>		/* POSIX® */
-#include	<cerrno>		/* CSYD */
+#include	<cerrno>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
