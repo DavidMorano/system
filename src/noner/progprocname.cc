@@ -1,4 +1,4 @@
-/* progprocname */
+/* noner_progprocname SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -21,28 +21,33 @@
 
 /******************************************************************************
 
+  	Name:
+	noner
+
+	Description:
 	This subroutine just provides optional expansion of
 	directories.  The real work is done by the PROCFILE subroutine.
 
 ******************************************************************************/
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<paramopt.h>
 #include	<fsdir.h>
 #include	<fsdirtree.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
 #include	"defs.h"
@@ -54,18 +59,12 @@
 #define	SUFBUFLEN	MAXNAMELEN
 #endif
 
+#define	PI		proginfo
+
 
 /* external subroutines */
 
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matcasestr(cchar **,cchar *,int) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-
 extern int	progfile(struct proginfo *,PARAMOPT *,cchar *) ;
-
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -78,30 +77,27 @@ extern int	if_int ;
 
 /* forward references */
 
-static int	procdir(struct proginfo *,PARAMOPT *,cchar *) ;
-static int	procrecurse(struct proginfo *,PARAMOPT *,cchar *) ;
-static int	procone(struct proginfo *,PARAMOPT *,cchar *) ;
-static int	isdotdir(cchar *) ;
+local int	procdir(struct proginfo *,PARAMOPT *,cchar *) ;
+local int	procrecurse(struct proginfo *,PARAMOPT *,cchar *) ;
+local int	procone(struct proginfo *,PARAMOPT *,cchar *) ;
+local bool	isdotdir(cchar *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progprocname(pip,pop,fname)
-struct proginfo	*pip ;
-PARAMOPT	*pop ;
-cchar	fname[] ;
-{
+int progprocname(PI *pip,paramopt *pop,cchar *fname) noex {
 	ustat	sb ;
-
 	int	rs ;
 	int	rs1 ;
 	int	c = 0 ;
-	int	f_link = FALSE ;
-	int	f_dir = FALSE ;
+	int	f_link = false ;
+	int	f_dir = false ;
 
 
 	if (fname == NULL)
@@ -176,39 +172,22 @@ bad0:
 
 /* local subroutines */
 
-
-static int procdir(pip,pop,fname)
-struct proginfo	*pip ;
-PARAMOPT	*pop ;
-cchar	fname[] ;
-{
-	int	rs ;
-
-
-	if (pip->fl.recurse)
+local int procdir(PI *pip,paramopt *pop,cchar *fname) noex {
+	int		rs ;
+	if (pip->fl.recurse) {
 	    rs = procrecurse(pip,pop,fname) ;
-
-	else
+	} else {
 	    rs = procone(pip,pop,fname) ;
-
+	}
 	return rs ;
 }
 /* end subroutine (procdir) */
 
-
-static int procrecurse(pip,pop,fname)
-struct proginfo	*pip ;
-PARAMOPT	*pop ;
-cchar	fname[] ;
-{
-	ustat	sb ;
-
-	FSDIRTREE	dt ;
-
-	int	rs = SR_OK ;
+local int procrecurse(PI *pip,paramopt *pop,cchar *fname) noex {
+	int		rs = SR_OK ;
 	int		del ;
-	int	dtopts = 0 ;
-	int	c = 0 ;
+	int		fdo = 0 ;
+	int		c = 0 ;
 
 	char	tmpfname[MAXPATHLEN + 1] ;
 	char	dename[MAXPATHLEN + 1] ;
@@ -219,8 +198,10 @@ cchar	fname[] ;
 	    debugprintf("procrecurse: recursing\n") ;
 #endif
 
-	dtopts |= ((pip->fl.follow) ? FSDIRTREE_MFOLLOW : 0) ;
-	rs = fsdirtree_open(&dt,fname,dtopts) ;
+	fdo |= ((pip->fl.follow) ? fsdirtreem.follow : 0) ;
+	ustat	sb ;
+	fsdirtree	dt ;
+	rs = fsdirtree_open(&dt,fname,fdo) ;
 	if (rs < 0)
 	    goto bad0 ;
 
@@ -235,7 +216,7 @@ cchar	fname[] ;
 #endif
 
 	while (! if_int) {
-	    const int	mpl = MAXPATHLEN ;
+	    cint	mpl = MAXPATHLEN ;
 
 	    del = fsdirtree_read(&dt,&sb,dename,mpl) ;
 
@@ -255,8 +236,9 @@ cchar	fname[] ;
 
 	    if (isdotdir(fname)) {
 	        rs = mkpath1(tmpfname,dename) ;
-	    } else
+	    } else {
 	        rs = mkpath2(tmpfname,fname,dename) ;
+	    }
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
@@ -281,7 +263,6 @@ cchar	fname[] ;
 	        break ;
 
 	} /* end while (looping through entries) */
-
 	fsdirtree_close(&dt) ;
 
 ret0:
@@ -306,7 +287,7 @@ bad0:
 /* end subroutine (procrecurse) */
 
 
-static int procone(pip,pop,fname)
+local int procone(pip,pop,fname)
 struct proginfo	*pip ;
 PARAMOPT	*pop ;
 cchar	fname[] ;
@@ -404,25 +385,16 @@ bad0:
 }
 /* end subroutine (procdir) */
 
-
-static int isdotdir(dname)
-cchar	dname[] ;
-{
-	int	f = FALSE ;
-
-
+local bool isdotdir(cchar *dname) noex {
+	int	f = false ;
 	if (dname[0] == '.') {
-
 	    f = (dname[1] == '\0') ;
-
-	    if (! f)
+	    if (! f) {
 	        f = ((dname[1] == '/') && (dname[2] == '\0')) ;
-
+	    }
 	}
-
 	return f ;
 }
 /* end subroutine (isdotdir) */
-
 
 
