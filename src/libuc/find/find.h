@@ -25,7 +25,7 @@
 
 #include	<findfilepath.h>
 #include	<findfile.h>
-#include	<findxfile.h>
+#include	<findfilex.h>
 
 
 #endif /* FIND_INCLUDE */
