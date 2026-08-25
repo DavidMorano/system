@@ -31,18 +31,18 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/time.h>		/* i-timer types */
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<sys/time.h>		/* POSIX® i-timer types */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern int	uc_timelocal	(custime *,TM *) noex ;
-extern int	uc_timegm	(custime *,TM *) noex ;
-extern int	uc_timex	(custime *,TM *,int) noex ;
-extern int	uc_mktime	(TM *,time_t *) noex ;
+extern int	uc_timelocal	(custime *,mut TM *) noex ;
+extern int	uc_timegm	(custime *,mut TM *) noex ;
+extern int	uc_timex	(custime *,mut TM *,int) noex ;
+extern int	uc_mktime	(mut TM *,mut time_t *) noex ;
 
 EXTERNC_end
 
