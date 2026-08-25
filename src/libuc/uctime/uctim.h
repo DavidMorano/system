@@ -56,13 +56,13 @@ struct uctimnote_head {
 	void		*objp ;		/* object pointer (function argument) */
 	psem		*psemp ;	/* POSIX® Semaphore pointer */
 	int		arg ;		/* function argument */
-} ; /* end struct (uctim_note) */
+} ; /* end struct (uctimnote_head) */
 
 #ifdef	__cplusplus
-struct uctimeote : uctimenote_head {
+struct uctimnote : uctimnote_head {
     	int load	(void *,psem *,uctim_f,int) noex ;
 } ; /* end struct (uctimnote) */
-#endif /* __cplusplus */
+#else /* __cplusplus */
 typedef	UCTIMNOTE	uctimnote ;
 #endif /* __cplusplus */
 
