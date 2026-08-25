@@ -89,7 +89,7 @@
 	*current* time-zone offset as indicated by the 'dstflag'
 	member.  So this is what we do instead of the original
 	behavior.  We instead return the current time-zone offset
-	in the 'timezone' (minues west of GMT) variable of the TIMEB
+	in the 'timezone' (minutes west of GMT) variable of the TIMEB
 	struction.
 
 	Use of this subroutine (|uc_ftime(3dam)|) and its UNIX®
@@ -107,15 +107,15 @@
 
 	Note:
 	Only Apple Darwin still fully supports this subroutine.
-	Solaris® supports it only partially (not filling in the
-	POSIX® optional fields).  Linux does not (no longer) support
-	this subroutine at all.
+	Solaris® supports it but it is broken, as dicussed above.
+	GNU-Linux is also broken in that it just sets to zero the
+	'timezone' and 'dstflag' variable fields.
 
 	Synopsis:
 	int uc_ftime(TIMEB *tbp) noex
 
 	Arguments:
-	tbp		time-buffer-pointer
+	tbp		time-buffer pointer
 
 	Returns:
 	>=0		OK
@@ -206,7 +206,7 @@ import libutil ;			/* |memclear(3u)| */
 
 extern "C" {
     extern int uc_gettimeofday(TIMEVAL *,void *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -351,12 +351,12 @@ int uc_ftime(TIMEB *tbp) noex {
 namespace libuc {
     ucpagesizer::operator int () noex {
     	int		rs ;
-	if ((rs = pagesize) == 0) ylikely {
+	if ((rs = pagesz) == 0) ylikely {
 	    cint	cmd = _SC_PAGESIZE ;
 	    if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) ylikely {
-		pagesize = rs ;
+		pagesz = rs ;
 	    }
-	}
+	} /* end if (pagesz) */
     	return rs ;
     } /* end method (ucpagesizer::operator) */
     ucnprocesser::operator int () noex {
@@ -375,7 +375,7 @@ local sysret_t local_ftime(TIMEB *tbp) noex {
             custime     t = tbp->time ;
             tbp->time = tv.tv_sec ;
             tbp->millitm = ushortconv(tv.tv_usec / 1000) ;
-            if (tmtime tmt ; (rs = tmtime_timelocal(&tmt,t)) >= 0) {
+            if (tmtime tmt ; (rs = tmt.timelocal(t)) >= 0) {
                 tbp->timezone = shortconv(tmt.gmtoff / 60) ;
                 tbp->dstflag = shortconv(tmt.isdst) ;
                 rs = (tmt.isdst > 0) ;
