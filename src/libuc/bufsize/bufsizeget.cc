@@ -133,10 +133,10 @@ namespace {
     class ubufmgr {
 	aflag		finit ;
 	aflag		finitdone ;
-	aflag		fbegin ;
+	aflag		fready ;
 	aflag		floaded ;
 	int init	() noex ;
-	int begin	() noex ;
+	int ready	() noex ;
 	int retrieve	(int) noex ;
 	int sysbs	(int,int) noex ;
 	int def		(int) noex ;
@@ -150,7 +150,7 @@ namespace {
 	int fileline	(cchar *,csize) noex ;
 	int fileparse	(cchar *,int) noex ;
 	int filelook	(cchar *,int,cchar *,int) noex ;
-	ubufmgr() noex {
+	constexpr ubufmgr() noex {
 	    for (int i = 0 ; i < bufsize_overlast ; i += 1) {
 		bs[i] = 0 ;
 	    } /* end for */
@@ -213,12 +213,12 @@ int ubufmgr::init() noex {
 	int		f = false ;
 	DPRINTF("ent »init«\n") ;
 	if (! finit.testandset) {
-	    DPRINTF("-> begin\n") ;
-	    if ((rs = begin()) >= 0) {
+	    DPRINTF("-> ready\n") ;
+	    if ((rs = ready()) >= 0) {
 	        DPRINTF("begin() rs=%d\n",rs) ;
 	        finitdone = true ;
 	        f = true ;
-	    }
+	    } /* end if (ready) */
 	    DPRINTF("begin-out rs=%d\n",rs) ;
 	    if (rs < 0) finit = false ;
 	} else if (! finitdone) {
@@ -238,16 +238,16 @@ int ubufmgr::init() noex {
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (ubufmgr::init) */
 
-int ubufmgr::begin() noex {
+int ubufmgr::ready() noex {
 	int		rs = SR_OK ;
-	if (! fbegin) {
-	    fbegin = true ;
+	if (! fready) {
+	    fready = true ;
 	    if_constexpr (f_load) {
 	        rs = fileload(fileconf) ;
 	    } /* end if_constexpr (f_load) */
 	} /* end if (fileload) */
 	return rs ;
-} /* end subroutine (ubufmgr::begin) */
+} /* end subroutine (ubufmgr::ready) */
 
 int ubufmgr::retrieve(int w) noex {
 	int		rs ;
