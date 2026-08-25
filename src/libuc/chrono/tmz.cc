@@ -85,6 +85,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<estrings.h>		/* LIBUC |isalphalatin(3uc)| */
+#include	<fieldterminit.hh>	/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<tmstrs.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
@@ -133,7 +134,7 @@ template<typename ... Args>
 local int tmz_zinit(tmz *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-    	    if (static cint rsv = mkvars() ; (rs = rsv) >= 0) ylikely {
+    	    if (cint rsv = mkvars() ; (rs = rsv) >= 0) ylikely {
 	        if (op->zname == nullptr) ylikely {
 	            if (char *a ; (rs = lm_zn(&a)) >= 0) ylikely {
 		        op->zname = a ;
@@ -160,36 +161,26 @@ local int tmz_zfini(tmz *op) noex {
 	return rs ;
 } /* end subroutine (tmz_zfini) */
 
-local int	tmz_timeparts(tmz *,cchar *,int) noex ;
-local int	tmz_xstdtrailing(tmz *,cchar *,int) noex ;
-local int	tmz_procday(tmz *,cchar *,int) noex ;
-local int	tmz_procmonth(tmz *,cchar *,int) noex ;
-local int	tmz_procyear(tmz *,cchar *,int) noex ;
-local int	tmz_proczoff(tmz *,cchar *,int) noex ;
-local int	tmz_proczname(tmz *,cchar *,int) noex ;
-local int	tmz_yearadj(tmz *,int) noex ;
+local int	tmz_timeparts		(tmz *,cchar *,int) noex ;
+local int	tmz_xstdtrailing	(tmz *,cchar *,int) noex ;
+local int	tmz_procday		(tmz *,cchar *,int) noex ;
+local int	tmz_procmonth		(tmz *,cchar *,int) noex ;
+local int	tmz_procyear		(tmz *,cchar *,int) noex ;
+local int	tmz_proczoff		(tmz *,cchar *,int) noex ;
+local int	tmz_proczname		(tmz *,cchar *,int) noex ;
+local int	tmz_yearadj		(tmz *,int) noex ;
 
-local int	getzoff(int *,cchar *,int) noex ;
-local int	val(cchar *) noex ;
-local int	silogend(cchar *,int) noex ;
+local int	getzoff		(int *,cchar *,int) noex ;
+local int	val		(cchar *) noex ;
+local int	silogend	(cchar *,int) noex ;
 
 local cchar	*strnzone(cchar *,int) noex ;
 
 
 /* local variables */
 
-constexpr char		tpterms[] = {
-	0x00, 0x1F, 0x00, 0x00,
-	0x01, 0x00, 0x00, 0x04,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ; /* end array (tpterms) */
-
 static vars		var ;
+constexpr fieldterminit	tpt		("\b\t\n\v\f :") ;
 constexpr int		nyears		= NYEARS_CENTURY ;
 constexpr bool		f_comment	= false ;
 
@@ -470,7 +461,7 @@ int tmz_xstrdig(tmz *op,cchar *sp,int sl) noex {
 	    while (sl && CHAR_ISWHITE(sp[sl-1])) {
 	        sl -= 1 ;
 	    } /* end while */
-	    if (cchar *tp ; (tp = strnzone(sp,sl)) != nullptr) ylikely {
+	    if (cchar *tp = strnzone(sp,sl) ; tp) ylikely {
 	        cchar	*cp = tp ;
 	        int	cl = intconv(sl - (tp - sp)) ;
 	        if ((cl >= 1) && ispm(*cp)) { /* ok */
@@ -717,7 +708,7 @@ int tmz_hasyear(tmz *op) noex {
 	    rs = op->fl.year ;
 	    if (rs < 0) {
 		op->dtor() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (tmz_zinit) */
 	return rs ;
 } /* end subroutine (tmz_hasyear) */
@@ -854,14 +845,14 @@ local int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
 	    cchar	*lp = sp ;
 	    cchar	*fp{} ;
 	    /* get hours */
-	    if ((fl = fsb.get(tpterms,&fp)) > 0) ylikely {
+	    if ((fl = fsb.get(tpt.terms,&fp)) > 0) ylikely {
 	        lp = (fp + fl) ;
 	        rs = cfdeci(fp,fl,&v) ;
 	        op->st.tm_hour = v ;
 	    }
 	    if ((rs >= 0) && (fsb.term == ':')) {
 	        /* get minutes */
-	        if ((fl = fsb.get(tpterms,&fp)) > 0) {
+	        if ((fl = fsb.get(tpt.terms,&fp)) > 0) {
 	            lp = (fp + fl) ;
 	            rs = cfdeci(fp,fl,&v) ;
 	            op->st.tm_min = v ;
@@ -869,7 +860,7 @@ local int tmz_timeparts(tmz *op,cchar *sp,int sl) noex {
 	    } /* end if */
 	    if ((rs >= 0) && (fsb.term == ':')) {
 		/* get seconds */
-	        if ((fl = fsb.get(tpterms,&fp)) > 0) {
+	        if ((fl = fsb.get(tpt.terms,&fp)) > 0) {
 	            lp = (fp + fl) ;
 	            rs = cfdeci(fp,fl,&v) ;
 	            op->st.tm_sec = v ;
@@ -1059,7 +1050,7 @@ local int getzoff(int *zop,cchar *sp,int sl) noex {
 	        cp += 1 ;
 	        cl -= 1 ;
 	    }
-	    cauto lamb = [&cp,&cl] (int &idx) {
+	    cauto lamb = [&cp,&cl] (int &idx) -> int {
 		cint	ich = mkchar(cp[idx]) ;
 		bool	lf = true ;
 		lf = lf && (idx < cl) ;
@@ -1218,7 +1209,8 @@ vars::operator int () noex {
 } /* end method (vars::operator) */
 
 local int mkvars() noex {
-    	return var ;
+    	static cint rsv = var ;
+    	return rsv ;
 } /* end subroutine */
 
 local int val(cchar *sp) noex {
