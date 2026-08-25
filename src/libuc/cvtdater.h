@@ -51,9 +51,9 @@ struct cvtdater : cvtdater_head {
 	} ; /* end ctor */
 	cvtdater(const cvtdater &) = delete ;
 	cvtdater &operator = (const cvtdater &) = delete ;
-	int start(time_t = 0L) noex ;
-	int load(time_t *,cchar *,int = -1) noex ;
-	void dtor() noex ;
+	int start	(time_t = 0L) noex ;
+	int load	(time_t *,cchar *,int = -1) noex ;
+	void dtor	() noex ;
 	destruct cvtdater() {
 	    if (daytime) dtor() ;
 	} ;
