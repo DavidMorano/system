@@ -25,8 +25,8 @@
 	(instead of DOMAIN).
 
 	= 2008-08-12, David A­D­ Morano
-	I replaced calls to |getusernam(3secdb)| and |udomain(3dam)|
-	by calls to the single object 'userattr(3dam)'.  Since the
+	I replaced calls to |getusernam(3secdb)| and |userdomain(3dam)|
+	by calls to the single object |userattr(3uc)|.  Since the
 	old UDOMAIN database is now (quietly) queried by the
 	|userattr(3dam)| object if a lookup on the system user-attribute
 	database fails for the 'id' keyword, any code here that
@@ -86,6 +86,7 @@
 #include	<getpwx.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<userattrdb.h>		/* LIBUC */
+#include	<user.h>		/* LIBUC */
 #include	<gecos.h>		/* LIBUC */
 #include	<bits.h>		/* LIBUC */
 #include	<strstore.h>		/* LIBUC */
@@ -259,8 +260,9 @@ namespace {
 	int		nodenamelen ;
 	int		hostnamelen ;
 	int		projnamelen ;
+	int		tznamelen ;
 	int		pwlen ;
-	int mkvars() noex ;
+	operator int () noex ;
     } ; /* end struct (vars) */
 } /* end namespace */
 
@@ -377,7 +379,7 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = userinfo_ctor(uip)) >= 0) ylikely {
-	    if (static cint rsv = var.mkvars() ; (rs = rsv) >= 0) ylikely {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		static cchar	*nn = getenver(varname.node) ;
 	        uip->nodename = nn ;
 	        if ((rs = userinfo_id(uip)) >= 0) ylikely {
@@ -398,7 +400,7 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	            } /* end if (memory_allocation) */
 	            if (rs >= 0) uip->magval = USERINFO_MAGIC ;
 	        } /* end if (userinfo_id) */
-	    } /* end if (vars::mkvars) */
+	    } /* end if (vars::operator) */
 	    if (rs < 0) {
 		userinfo_dtor(uip) ;
 	    } /* end if (error) */
@@ -1327,6 +1329,7 @@ local int procinfo_project(PCI *pip) noex {
 
 local int procinfo_tz(PCI *pip) noex {
 	userinfo	*uip = pip->uip ;
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		uit = uit_tz ;
 	if ((pip->sis[uit] == 0) && (uip->tz == nullptr)) {
@@ -1335,26 +1338,24 @@ local int procinfo_tz(PCI *pip) noex {
 	        if (! pip->fl.altuser) {
 	            uip->tz = getenver(varname.tz) ;
 	        }
-	    }
-	    if (uip->tz == nullptr) {
-	        cint	dlen = TZABBRLEN ;
+	    } /* end if */
+	    if ((rs >= 0) && (uip->tz == nullptr)) {
+	        cint	dlen = var.tznamelen ;
 	        int	dl = -1 ;
-	        char	dbuf[TZABBRLEN+1] = { 0 } ;
-	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-	            if (pip->fl.pw) {
-	                cchar	*kn = UA_TZ ;
-	                rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
-	                dl = rs ;
-	                if (isNotPresent(rs)) {
-	                    dbuf[0] = '\0' ;
-	                    rs = SR_OK ;
-	                }
+	        char	dbuf[var.tznamelen +1] ;
+	        if (pip->fl.pw) {
+	            cchar	*kn = UA_TZ ;
+	            rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
+	            dl = rs ;
+	            if (isNotPresent(rs)) {
+	                dbuf[0] = '\0' ;
+	                rs = SR_OK ;
 	            }
-	        }
+	        } /* end if */
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
-	            rs = procinfo_store(pip,uit,dbuf,dl,nullptr) ;
-	        }
-	    }
+	            rs = procinfo_store(pip,uit,dbuf,dl,np) ;
+	        } /* end if */
+	    } /* end if */
 	} /* end if (tz) */
 	return rs ;
 } /* end subroutine (procinfo_tz) */
@@ -1658,7 +1659,8 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 } /* end subroutine (userinfo_data) */
 #endif /* CF_OLDUSERINFO */
 
-int vars::mkvars() noex {
+vars::operator int () noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	if ((rs = bufsizeget(bufsize_mn)) >= 0) {
 	    maxnamelen = rs ;
@@ -1671,7 +1673,11 @@ int vars::mkvars() noex {
 	                if ((rs = bufsizeget(bufsize_pn)) >= 0) {
 	                    projnamelen = rs ;
 	                    if ((rs = bufsizeget(bufsize_pw)) >= 0) {
+				cint req = _SC_TZNAME_MAX ;
 				pwlen = rs ;
+				if ((rs = u_sysconfval(req,np)) >= 0) {
+				    tznamelen = rs ;
+				} /* end if (u_sysconfval) */
 			    }
 			}
 		    }
@@ -1679,6 +1685,6 @@ int vars::mkvars() noex {
 	    }
 	}
 	return rs ;
-} /* end method (vars::mkvars) */
+} /* end method (vars::operator) */
 
 
