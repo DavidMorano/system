@@ -174,42 +174,42 @@ int vecstr_svcargs(vecstr *op,int *fp,cchar *abuf) noex {
 
 int vecstrer::add(cchar *sp,int sl) noex {
     	return vecstr_add(op,sp,sl) ;
-}
+} /* end method */
 
 int vecstrer::adduniq(cchar *sp,int sl) noex {
     	return vecstr_adduniq(op,sp,sl) ;
-}
+} /* end method */
 
 int vecstrer::addkeyval(cchar *kp,int kl,cchar *valp,int vall) noex {
     	return vecstr_addkeyval(op,kp,kl,valp,vall) ;
-}
+} /* end method */
 
 int vecstrer::insert(int ii,cchar *sp,int sl) noex {
     	return vecstr_insert(op,ii,sp,sl) ;
-}
+} /* end method */
 
 int vecstrer::get(int i,cchar **rpp) noex {
     	return vecstr_get(op,i,rpp) ;
-}
+} /* end method */
 
 int vecstrer::getvec(mainv *mp) noex {
     	return vecstr_getvec(op,mp) ;
-}
+} /* end method */
 
 int vecstrer::finder(cchar *s,vecstr_f vcmp,cchar **rpp) noex {
     	return vecstr_finder(op,s,vcmp,rpp) ;
-}
+} /* end method */
 
 int vecstrer::del(int i) noex {
 	return vecstr_del(op,i) ;
-}
+} /* end method */
 
 int vecstrer::sort(vecstr_f vcmp) noex {
 	return vecstr_sort(op,vcmp) ;
-}
+} /* end method */
 
 int vecstr::addpathclean(cchar *lp,int ll) noex {
 	return vecstr_addpathclean(this,lp,ll) ;
-}
+} /* end method */
 
 
