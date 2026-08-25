@@ -105,6 +105,7 @@ using std::atomic_int ;			/* type */
 	int getval	(int) noex ;
 	int getvalcache	(int,int) noex ;
 	int getvalsyn	(int) noex ;
+	int getvaldef	(int) noex ;
 	int getstr	(int) noex ;
 	int getstrsyn	(int) noex ;
 	int getstd	(int) noex ;
