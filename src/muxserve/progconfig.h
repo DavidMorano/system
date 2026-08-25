@@ -50,7 +50,7 @@ struct proginfo_flags {
 	uint		p:1 ;		/* paramfile */
 	uint		lockinfo:1 ;
 	uint		portspec:1 ;
-} ;
+} ; /* end struct */
 
 struct progconfig_head {
 	cchar	*configfname ;
@@ -78,7 +78,7 @@ struct progconfig_head {
 	PROFCONFIG_FL	open ;
 	PROFCONFIG_FL	final ;
 	uint		magic ;
-} ;
+} ; /* end struct */
 
 EXTERNC_begin
 
