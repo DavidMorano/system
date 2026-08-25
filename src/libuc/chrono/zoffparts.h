@@ -24,6 +24,9 @@
 	These two small subroutines manipulate zone-offsets for use
 	in time strings.
 
+	Notes:
+	1. The member variable |zoff| is in SECONDS.
+
 *******************************************************************************/
 
 #ifndef	ZOFFPARTS_INCLUDE
@@ -39,9 +42,9 @@
 
 
 struct zoffparts_head {
-	uint	hours ;
-	uint	mins ;
-	int	zoff ;		/* value */
+	uint		hours ;		/* unsigned */
+	uint		mins ;		/* unsigned */
+	int		zoff ;		/* signed value in SECONDS */
 } ; /* end struct */
 
 #ifdef	__cplusplus
