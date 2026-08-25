@@ -1,7 +1,7 @@
 /* tty_waitoo SUPPORT */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* CSYD */
+#include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
