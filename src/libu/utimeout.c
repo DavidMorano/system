@@ -25,6 +25,17 @@
 	Description:
 	This module (in part) manages UNIX® system kernel-call timeouts.
 
+	Synopsis:
+	int u_timeout(int w,int val) noex
+
+	Arguments:
+	w		which timeout to set
+	val		timeout value to be set
+
+	Returns:
+	>=0		ok
+	<0		error (system-return)
+
 	Note:
 	1. This module MUST be coded in the C-language!  We need
 	C-language features that are NOT in (brain-damaged) C++.
