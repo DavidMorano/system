@@ -67,7 +67,7 @@ typedef vecelem_vcmp	c_f ;
 extern "C" {
     typedef int (*rawc_f)(void **,void **) noex ;
     typedef int (*vg_f)(vecelem *,int,void **) noex ;
-}
+} /* end extern (C) */
 
 
 /* forward references */
