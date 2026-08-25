@@ -99,8 +99,8 @@ extern "C" {
 
 /* forward references */
 
-local int initnow_ftime(timeb *,char *,int) noex ;
-local int initnow_gettime(timeb *,char *,int) noex ;
+local int initnow_ftime		(timeb *,char *,int) noex ;
+local int initnow_gettime	(timeb *,char *,int) noex ;
 
 
 /* local variables */
@@ -157,12 +157,12 @@ local int initnow_gettime(timeb *tbp,char *zbuf,int zlen) noex {
             tbp->time = tv.tv_sec ;
             tbp->millitm = ushortconv(tv.tv_usec / 1000) ;
             if (tmtime tmt ; (rs = tmt.timelocal(tbp->time)) >= 0) {
-                tbp->timezone = shortconv(tmt.gmtoff / 60) ;
-                tbp->dstflag = shortconv(tmt.isdst) ;
+                tbp->timezone	= shortconv(tmt.gmtoff / 60) ;
+                tbp->dstflag	= shortconv(tmt.isdst) ;
                 if (zbuf) {
                     rs = sncpy(zbuf,zlen,tmt.znbuf) ;
                     len = rs ;
-                }
+                } /* end if (zbuf) */
             } /* end if (tmtime_timelocal) */
 	} /* end if (uc_gettimeofday) */
 	return (rs >= 0) ? len : rs ;
