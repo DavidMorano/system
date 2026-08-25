@@ -89,7 +89,7 @@ namespace libu {
 	    if (errno) {
 		rs = (neg errno) ;
 	    } else {
-		rs = intsat(v) ;
+		rs = (v >= 0) ? intsat(v) : 0 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
