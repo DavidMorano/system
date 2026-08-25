@@ -5,6 +5,7 @@
 /* time-zone offset string management */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -48,15 +49,18 @@
 
 	Description:
 	This subroutine extracts a zone-offset integer value from
-	a zone-offset string.
+	a zone-offset string.  The value returns is the minutes west
+	of GMT.  If the zone-offset was eastwards of GMT, the value
+	return is negative.  In all cases, the value returns is
+	in MINUYES.
 
 	Synopsis:
-	int zos_get(char *zbuf,int zlen,int *zop) noex
+	int zos_get(cchar *zbuf,int zlen,int *zop) noex
 
 	Arguments:
-	zbuf		buffer to extract time-zone from
-	zlen		length of supplied buffer
-	zop		pointer to store resulting time-zone offset 
+	zbuf		source string pointer
+	zlen		source string length
+	zop		pointer to store result (offset in SECONDS)
 
 	Returns:
 	>=0		OK
@@ -69,14 +73,20 @@
 #include	<cstdlib>		/* CSTD |abs(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
 #include	<sfx.h>			/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"zos.h"
 
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -96,8 +106,15 @@
 
 /* forward references */
 
+local int decval(int ch) noex {
+    	return (ch - '0') ;
+} /* end if (decval) */
+
 
 /* local variables */
+
+cint		base10		= 10 ;
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -118,10 +135,10 @@ int zos_set(char *rbuf,int rlen,int zo) noex {
 	        hours = abs(zo / 60) % 100 ;
 	        mins = abs(zo % 60) ;
 	        *bp++ = ((zo >= 0) ? '-' : '+') ;
-	        *bp++ = charconv((hours / 10) + '0') ;
-	        *bp++ = charconv((hours % 10) + '0') ;
-	        *bp++ = charconv((mins / 10) + '0') ;
-	        *bp++ = charconv((mins % 10) + '0') ;
+	        *bp++ = charconv((hours / base10) + '0') ;
+	        *bp++ = charconv((hours % base10) + '0') ;
+	        *bp++ = charconv((mins / base10) + '0') ;
+	        *bp++ = charconv((mins % base10) + '0') ;
 	        *bp = '\0' ;
 	        rl = intconv(bp - rbuf) ;
 	    } /* end if (valid) */
@@ -131,6 +148,11 @@ int zos_set(char *rbuf,int rlen,int zo) noex {
 
 int zos_get(cchar *sp,int sl,int *zop) noex {
 	int		rs = SR_FAULT ;
+	DPRINTF("ent\n") ;
+	if_constexpr (f_debug) {
+	    strnul ds(sp,sl) ;
+	    DPRINTF("zbuf=>%s<\n",ccp(ds)) ;
+	}
 	if (sp && zop) ylikely {
 	    rs = SR_INVALID ;
 	    if (sp[0]) ylikely {
@@ -142,26 +164,26 @@ int zos_get(cchar *sp,int sl,int *zop) noex {
 			if (hasalldig(zp,zl)) ylikely {
 	                    int	zoff ;
 	                    int	sign = (fneg) ? 1 : -1 ; /* reverse */
-	                    int	hours ;
-	                    int	mins ;
-	                    hours = (*zp++ - '0') ;
+	                    int	hours = decval(*zp++) ;
+	                    int	mins = 0 ;
 	                    if (zl > 3) {
-	                        hours *= 10 ;
-	                        hours += (*cp++ - '0') ;
-	                    }
-	                    mins = (*zp++ - '0') * 10 ;
-	                    mins += (*zp++ - '0') ;
+	                        hours *= base10 ;
+	                        hours += decval(*zp++) ;
+	                    } /* end if (more than three characters) */
+	                    mins += decval(*zp++) * base10 ;
+	                    mins += decval(*zp++) ;
 	                    zoff = (hours * 60) + mins ;
 	                    zoff *= sign ;
-	                    if (zop) {
+			    {
 		                *zop = zoff ;
-	                    }
+			    }
 		            rs = intconv(zp - sp) ;
 			} /* end if (hasalldig) */
 		    } /* end if (sfbnextchr) */
 	        } /* end if (sfsign) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (zos_get) */
 
