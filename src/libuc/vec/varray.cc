@@ -391,19 +391,19 @@ local int varray_extend(varray *op,int ni) noex {
 
 int varray::start(int sz,int en) noex {
 	return varray_start(this,sz,en) ;
-}
+} /* end method */
 
 int varray::enumer(int ii,void *rp) noex {
 	return varray_enumer(this,ii,rp) ;
-}
+} /* end method */
 
 int varray::acc(int ii,void *rp) noex {
 	return varray_acc(this,ii,rp) ;
-}
+} /* end method */
 
 int varray::mk(int ii,void *rp) noex {
 	return varray_mk(this,ii,rp) ;
-}
+} /* end method */
 
 int varray::del(int ai) noex {
     	int		rs = SR_OK ;
@@ -417,11 +417,11 @@ int varray::del(int ai) noex {
 
 int varray::find(void *oep) noex {
 	return varray_find(this,oep) ;
-}
+} /* end method */
 
 int varray::search(void *oep,varray_vcmp fvcmp,void *vrp) noex {
 	return varray_search(this,oep,fvcmp,vrp) ;
-}
+} /* end method */
 
 void varray::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
