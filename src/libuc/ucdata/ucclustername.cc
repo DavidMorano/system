@@ -75,7 +75,7 @@
 #include	<ctime>			/* CSTD */
 #include	<csignal>		/* CSTD */
 #include	<cstddef>		/* CSTD */
-#include	<cstdlib>		/* CSYD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
