@@ -2,8 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* version %I% last-modified %G% */
+/* interface component for UNIX® library-3c */
 /* UNIX® system-calls */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
