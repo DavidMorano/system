@@ -76,7 +76,7 @@
 #include	<sys/socket.h>		/* POSIX® */
 #include	<unistd.h>		/* POSIX® */
 #include	<fcntl.h>		/* POSIX® */
-#include	<ctime>			/* CSYD */
+#include	<ctime>			/* CSTD */
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
