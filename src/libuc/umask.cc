@@ -96,7 +96,7 @@ extern "C" {
     local void	umask_atforkbefore() noex ;
     local void	umask_atforkafter() noex ;
     local void	umask_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -121,7 +121,7 @@ int umaskget() noex {
 	int		rs ;
 	int		rs1 ;
 	int		cmask = 0 ;
-	if (sigblocker b ; (rs = b.start) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) ylikely {
 	    {
 		rs = umask_data.get() ;
 		cmask = rs ;
@@ -136,7 +136,7 @@ int umaskset(mode_t cmask) noex {
 	int		rs ;
 	int		rs1 ;
 	int		omask = 0 ;
-	if (sigblocker b ; (rs = b.start) >= 0) {
+	if (sigblocker b ; (rs = b.start) >= 0) ylikely {
 	    {
 		rs = umask_data.setmode(cmask) ;
 		omask = rs ;
@@ -157,12 +157,12 @@ int umasker::init() noex {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
-	        if ((rs = mx.create) >= 0) {
+	        if ((rs = mx.create) >= 0) ylikely {
 	            void_f	b = umask_atforkbefore ;
 	            void_f	a = umask_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
 			void_f	e = umask_exit ;
-	                if ((rs = uc_atexit(e)) >= 0) {
+	                if ((rs = uc_atexit(e)) >= 0) ylikely {
 	    	            finitdone = true ;
 		            f = true ;
 		        }
@@ -218,9 +218,9 @@ int umasker::get() noex {
 	int		rs ;
 	int		rs1 ;
 	int		omask = 0 ;
-	if ((rs = init()) >= 0) {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	        if ((rs = mx.lockbegin) >= 0) { /* single */
+	if ((rs = init()) >= 0) ylikely {
+	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely { /* multi */
+	        if ((rs = mx.lockbegin) >= 0) ylikely { /* single */
 		    {
 			mode_t cm = umask(0) ; /* in case of race! */
 			umask(cm) ;
@@ -241,9 +241,9 @@ int umasker::setmode(mode_t cmask) noex {
 	int		rs ;
 	int		rs1 ;
 	int		omask = 0 ;
-	if ((rs = init()) >= 0) {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	        if ((rs = mx.lockbegin) >= 0) { /* single */
+	if ((rs = init()) >= 0) ylikely {
+	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely { /* multi */
+	        if ((rs = mx.lockbegin) >= 0) ylikely { /* single */
 		    {
 			omask = umask(cmask) ;
 		    }
