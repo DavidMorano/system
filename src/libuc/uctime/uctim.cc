@@ -128,7 +128,7 @@ using libu::uitimer_set ;		/* subroutine */
 
 extern "C" {
     typedef int (*tworker_f)(void *) noex ;
-}
+} /* end extern (C) */
 
 typedef vecsorthand	prique ;
 typedef uctiment *	uctimp ;
@@ -469,7 +469,7 @@ int uctim::cmd_create(int id,timemgr_arg *argp) noex {
 	    cint	esz = szof(uctiment) ;
 	    if (void *ep ; (rs = lm_mall(esz,&vp)) >= 0) ylikely {
 		rs = SR_BUGCHECK ;
-	        if (uctiment *ep = new(nt) uctiment ; ep) {
+	        if (uctiment *ep = new(nt) uctiment ; ep) ylikely {
 		    uctiment_load(ep,argp->notep) ;
 	            if ((rs = ents.add(ep)) >= 0) ylikely {
 	                ep->id = rs ;
@@ -488,9 +488,9 @@ int uctim::cmd_create(int id,timemgr_arg *argp) noex {
 
 int uctim::cmd_destroy(int id,timemgr_arg *argp) noex {
 	cint		rsn = SR_NOTFOUND ;
+	cint		id = argp->id ;
 	int		rs ;
 	int		rs1 ;
-	cint	id = argp->id ;
 	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
 	    cint	ei = rs ;
 	    rs = SR_BUGCHECK ;
@@ -520,7 +520,7 @@ int uctim::cmd_destroy(int id,timemgr_arg *argp) noex {
 int uctim::cmd_set(int id,timemgr_arg *argp) noex {
 	int		rs ;
 	int		rs1 ;
-	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) {
+	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
 	    cint	ei = rs ;
 	    {
 		rs = priqins(ep) ;
