@@ -93,11 +93,11 @@
 #include	<fcntl.h>
 #include	<utmpx.h>
 #include	<netdb.h>
-#include	<ctime>			/* CSYD */
-#include	<climits>		/* CSYD */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSYD */
+#include	<cstring>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<utmpacc.h>
