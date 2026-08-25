@@ -64,7 +64,7 @@ typedef vstrorders	vo ;
 
 extern "C" {
     extern int	strkeydictcmp(cchar *,cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -108,10 +108,10 @@ local int vstrkeydictcmpx(cchar **s1pp,cchar **s2pp,vo fo) noex {
 
 int vstrkeydictcmpo(cchar **s1pp,cchar **s2pp) noex {
     	return vstrkeydictcmpx(s1pp,s2pp,vstrorder_obverse) ;
-}
+} /* end subroutine */
 
 int vstrkeydictcmpr(cchar **s1pp,cchar **s2pp) noex {
     	return vstrkeydictcmpx(s1pp,s2pp,vstrorder_reverse) ;
-}
+} /* end subroutine */
 
 
