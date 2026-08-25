@@ -612,23 +612,23 @@ int veclong_st::operator () (int vn,int vo) noex {
 
 int veclong::add(VECLONG_TYPE v) noex {
 	return veclong_add(this,v) ;
-}
+} /* end method */
 
 int veclong::addlist(const VECLONG_TYPE *ap,int al) noex {
 	return veclong_addlist(this,ap,al) ;
-}
+} /* end method */
 
 int veclong::adduniq(VECLONG_TYPE v) noex {
 	return veclong_adduniq(this,v) ;
-}
+} /* end method */
 
 int veclong::insert(int idx,VECLONG_TYPE v) noex {
 	return veclong_insert(this,idx,v) ;
-}
+} /* end method */
 
 int veclong::assign(int idx,VECLONG_TYPE v) noex {
 	return veclong_insert(this,idx,v) ;
-}
+} /* end method */
 
 int veclong::del(int idx) noex {
     	int		rs ;
@@ -638,39 +638,39 @@ int veclong::del(int idx) noex {
 	    rs = veclong_delall(this) ;
 	}
 	return rs ;
-}
+} /* end method */
 
 int veclong::find(VECLONG_TYPE v) noex {
 	return veclong_find(this,v) ;
-}
+} /* end method */
 
 int veclong::match(VECLONG_TYPE v) noex {
 	return veclong_match(this,v) ;
-}
+} /* end method */
 
 int veclong::getval(int idx,VECLONG_TYPE *rp) noex {
 	return veclong_getval(this,idx,rp) ;
-}
+} /* end method */
 
 int veclong::getvec(VECLONG_TYPE **rpp) noex {
 	return veclong_getvec(this,rpp) ;
-}
+} /* end method */
 
 int veclong::mkvec(VECLONG_TYPE *rva) noex {
 	return veclong_mkvec(this,rva) ;
-}
+} /* end method */
 
 int veclong::curbegin(veclong_cur *curp) noex {
 	return veclong_curbegin(this,curp) ;
-}
+} /* end method */
 
 int veclong::curend(veclong_cur *curp) noex {
 	return veclong_curend(this,curp) ;
-}
+} /* end method */
 
 int veclong::curenum(veclong_cur *curp,VECLONG_TYPE *rp) noex {
 	return veclong_curenum(this,curp,rp) ;
-}
+} /* end method */
 
 void veclong::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
@@ -713,7 +713,7 @@ int veclong_co::operator () (int a) noex {
 
 bool veclong_iter::operator == (const veclong_iter &oit) noex {
 	return (va == oit.va) && (i == oit.i) && (ii == oit.ii) ;
-}
+} /* end method */
 
 bool veclong_iter::operator != (const veclong_iter &oit) noex {
 	bool		f = false ;
@@ -729,25 +729,25 @@ veclong_iter veclong_iter::operator + (int n) const noex {
 	veclong_iter	rit(va,i,i) ;
 	rit.i = ((rit.i + n) >= 0) ? (rit.i + n) : 0 ;
 	return rit ;
-}
+} /* end method */
 
 veclong_iter veclong_iter::operator += (int n) noex {
 	veclong_iter	rit(va,i,i) ;
 	i = ((i + n) >= 0) ? (i + n) : 0 ;
 	rit.i = i ;
 	return rit ;
-}
+} /* end method */
 
 veclong_iter veclong_iter::operator ++ () noex { /* pre */
 	increment() ;
 	return (*this) ;
-}
+} /* end method */
 
 veclong_iter veclong_iter::operator ++ (int) noex { /* post */
 	veclong_iter	pre(*this) ;
 	increment() ;
 	return pre ;
-}
+} /* end method */
 
 void veclong_iter::increment(int n) noex {
 	if ((i + n) < 0) n = -i ;
