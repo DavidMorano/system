@@ -5,6 +5,8 @@
 /* this is supposed to provide OS-independent time management operations */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
+#define	CF_USEMORE	1		/* use more field in structure TM */
 
 /* revision history:
 
@@ -43,6 +45,12 @@
 	Finally, the Darwin OS (from Apple) has some extra fields
 	in its |TM| object that needs handling.
 
+	Notes:
+	1. The |zos_get(3uc)| subroutine below returns MINUTES west
+	of GMT.  If the zone-offset is indicated to be eastwards
+	of GMT, the value returned is negative.  In all cases, the
+	value returned is in MINUTES.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -55,12 +63,16 @@
 #include	<usupport.h>		/* LIBU |geustime(3u)| */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<uctimeconv.h>		/* LIBUC */
+#include	<ucstrftime.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<strn.h>		/* LIBUC |strnwcpy(3uc)| */
 #include	<strdcpy.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
-#include	<localmisc.h>		/* LIBU */
+#include	<cfdec.h>		/* LIBUC */
+#include	<zos.h>			/* LIBUC (part of |chrono|) */
+#include	<localmisc.h>		/* LIBU |DECBUFLEN| */
+#include	<dprint.hh>		/* LIBU |DPRINT(3u)| */
 
 #include	"tmtime.hh"
 
@@ -69,6 +81,13 @@
 import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	1		/* debugging */
+#endif
+#ifndef	CF_USEMORE
+#define	CF_USEMORE	1		/* use more field in structure TM */
+#endif
 
 
 /* imported namespaces */
@@ -107,7 +126,7 @@ local int tmtime_zinit(tmtime *op,Args ... args) noex {
 local int tmtime_zfini(tmtime *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->znbuf) {
 		rs1 = lm_free(op->znbuf) ;
@@ -118,13 +137,19 @@ local int tmtime_zfini(tmtime *op) noex {
 	return rs ;
 } /* end subroutine (tmtime_zfini) */
 
-local int	tmtime_mktimer(tmtime *,int,time_t *) noex ;
+local int	tmtime_mktimer	(tmtime *,int,time_t *) noex ;
+local int	tmtime_moreuse	(tmtime *,con TM *) noex ;
+local int	tmtime_morecalc	(tmtime *,con TM *) noex ;
 local int	getznlen() noex ;
 
 
 /* local variables */
 
 static bufsizevar	znlen		(bufsize_zn) ;
+constexpr int		OneMinute	= 60 ;
+constexpr int		OneHour		= (60 * 60) ;
+constexpr int		MinusOne	= -1 ;
+constexpr bool		f_debug		= CF_DEBUG ;
 constexpr bool		f_darwin	= F_DARWIN ;
 constexpr bool		f_linux		= F_LINUX ;
 
@@ -134,6 +159,7 @@ constexpr bool		f_linux		= F_LINUX ;
 cint	tmtime::znlen		= getznlen() ;
 cint	tmtime::baseyear	= TMTIME_YEARBASE ;
 cint	baseyear		= TMTIME_YEARBASE ;
+cbool	f_usemore		= CF_USEMORE ;
 
 
 /* exported subroutines */
@@ -203,15 +229,11 @@ int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	        rs = uc_mktime(&tc,&t) ;
 	    } /* end if (need DST indicator) */
 	    if (rs >= 0) ylikely {
-	        cchar	*zp ;
-	        if_constexpr (f_darwin || f_linux) {
-	            op->gmtoff	= intconv(tc.tm_gmtoff) ;
-	            zp		= tc.tm_zone ;
+	        if_constexpr (f_usemore && (f_darwin || f_linux)) {
+		    rs = tmtime_moreuse(op,tmp) ;
 	        } else {
-	            op->gmtoff	= intconv(tc.tm_gmtoff) ;
-	            zp 		= tc.tm_zone ;
+		    rs = tmtime_morecalc(op,tmp) ;
 	        } /* end if_constexpr (f_darwin) */
-	        rs = intconv(strwcpy(op->znbuf,zp,znlen) - op->znbuf) ;
 	    } /* end if (getting zone-name) */
 	    if (rs < 0) {
 		op->dtor() ;
@@ -221,7 +243,7 @@ int tmtime_insert(tmtime *op,CTM *tmp) noex {
 } /* end subroutine (tmtime_insert) */
 
 /* tmtime -> tm */
-int tmtime_extract(tmtime *op,TM *tmp) noex {
+int tmtime_extract(tmtime *op,mut TM *tmp) noex {
 	int		rs ;
 	if ((rs = tmtime_zinit(op,tmp)) >= 0) ylikely {
 	    tmp->tm_sec		= op->sec ;
@@ -257,9 +279,9 @@ int tmtime_adjtime(tmtime *op,time_t *tp) noex {
 
 int tmtime_getzn(tmtime *op,char *rbuf,int rlen) noex {
     	int		rs ;
-	if (op && rbuf) {
+	if (op && rbuf) ylikely {
     	    rs = SR_NOTOPEN ;
-	    if (op->znbuf) {
+	    if (op->znbuf) ylikely {
 	        rs = sncpy(rbuf,rlen,op->znbuf) ;
 	    }
 	} /* end if (non-null) */
@@ -306,6 +328,42 @@ local int tmtime_mktimer(tmtime *op,int fadj,time_t *tp) noex {
 	} /* end if (tmtime_zinit) */
 	return rs ;
 } /* end subroutine (tmtime_mktimer) */
+
+#if	CF_USEMORE && (F_DARWIN || F_LINUX)
+local int tmtime_moreuse(tmtime *op,con TM *tmp) noex {
+    	int		rs ;
+	ccharp		zp = tmp->tm_zone ;
+	{
+	   op->gmtoff = intconv(tmp->tm_gmtoff) * MinusOne ;
+	   rs = intconv(strwcpy(op->znbuf,zp,op->znlen) - op->znbuf) ;
+	}
+	return rs ;
+} /* end subroutine (tmtime_moreuse) */
+#else /* CF_USEMORE && (F_DARWIN || F_LINUX) */
+local int tmtime_moreuse(tmtime *,con TM *) noex {
+	return SR_OK ;
+} /* end subroutine (tmtime_moreuse) */
+#endif /* CF_USEMORE && (F_DARWIN || F_LINUX) */
+
+local int tmtime_morecalc(tmtime *op,con TM *tmp) noex {
+    	int		rs ;
+	int		zl = 0 ; /* return-value */
+	cchar		*fmt = "%Z" ;
+	DPRINTF("ent\n") ;
+	if ((rs = uc_strftime(op->znbuf,op->znlen,fmt,tmp)) >= 0) ylikely {
+	    cint	dlen = DECBUFLEN ;
+	    char	dbuf[DECBUFLEN + 1] ;
+	    zl = rs ;
+	    fmt = "%z" ;
+	    if ((rs = uc_strftime(dbuf,dlen,fmt,tmp)) >= 0)  ylikely {
+		if (int v ; (rs = zos_get(dbuf,dlen,&v)) >= 0) ylikely {
+	            op->gmtoff = v * OneMinute ; /* calculate seconds */
+		} /* end if (zos_get) */
+	    } /* end if (uc_strftime) */
+	} /* end if (uc_strftime) */
+	DPRINTF("ret rs=%d zl=%d\n",rs,zl) ;
+    	return (rs >= 0) ? zl : rs ;
+} /* end subroutine (tmtime_morecalc) */
 
 int tmtime::timex(bool fz,time_t t) noex {
 	return tmtime_timex(this,fz,t) ;
