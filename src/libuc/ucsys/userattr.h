@@ -20,10 +20,11 @@
 
 /*******************************************************************************
 
+  	Description:
 	This file contains the UNIX system types that the brain-damaged
-	MacOS operating system does NOT have.  We are trying in a very
-	small way to make up for some of the immense brain-damage within
-	the Apple Darwin operating system.
+	MacOS operating system does NOT have.  We are trying in a
+	very small way to make up for some of the immense brain-damage
+	within the Apple Darwin operating system.
 
 *******************************************************************************/
 
@@ -32,9 +33,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* |uid_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX® |uid_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<secdb.h>		/* <- money shot (at least partly) */
 
 
