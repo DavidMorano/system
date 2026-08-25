@@ -38,7 +38,7 @@ EXTERNC_end
 
 namespace libuc {
     struct ucpagesizer {
-    	int		pagesize ;
+    	int		pagesz ;
     	operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
