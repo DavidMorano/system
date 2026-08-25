@@ -196,7 +196,7 @@ int uctimer::create(timer_t) noex {
 	int		rs = SR_FAULT ;
 	if (tmp) {
 	    if ((rs = timer_create(cid,sep,tmp)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	}
 	return rs ;
@@ -205,7 +205,7 @@ int uctimer::create(timer_t) noex {
 int uctimer::destroy(timer_t tid) noex {
 	int		rs ;
 	if ((rs = timer_delete(tid)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uctimer::destroy) */
@@ -214,7 +214,7 @@ int uctimer::set(timer_t tid) noex {
 	int		rs = SR_FAULT ;
 	if (ntvp) {
 	    if ((rs = timer_settime(tid,tf,ntvp,otvp)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	}
 	return rs ;
@@ -224,7 +224,7 @@ int uctimer::get(timer_t tid) noex {
 	int		rs = SR_FAULT ;
 	if (otvp) {
 	    if ((rs = timer_gettime(tid,otvp)) < 0) {
-		rs = (- errno) ;
+		rs = (neg errno) ;
 	    }
 	}
 	return rs ;
@@ -233,7 +233,7 @@ int uctimer::get(timer_t tid) noex {
 int uctimer::over(timer_t tid) noex {
 	int		rs ;
 	if ((rs = timer_getoverrun(tid)) < 0) {
-	    rs = (- errno) ;
+	    rs = (neg errno) ;
 	}
 	return rs ;
 } /* end method (uctimer::over) */
