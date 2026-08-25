@@ -23,14 +23,15 @@
 	Description:
 	These two small subroutines manipulate zone-offsets for use
 	in time strings.  Set the value of the object from the
-	number of seconds the current timezone is west of GMT.
+	number of (signed) seconds the current timezone is west of
+	GMT.
 
 	Symopsis:
 	int zoffparts_set(XOFFPARTS *zop,int v) noex
 
 	Arguments:
 	aop		pointer to object
-	v		offset from GMT (seconds west of GMT)
+	v		offset from GMT (signed seconds west of GMT)
 
 	Returns:
 	0		always succeeds
@@ -56,14 +57,16 @@
 	0		always succeeds
 
 	Note:
-	The "zone-offset" for these subroutines is in the time-units
-	of SECONDS.  It is not in minutes, as it is in other interfaces.
+	1. The member variable |zoff| is in SECONDS.
+	2. The "zone-offset" (member variable |zoff|) for these
+	subroutines is in the time-units of SECONDS.  It is not in
+	minutes, as it is in other interfaces (which will remain
+	nameless -- for now).
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* CSTD */
-#include	<cstdlib>		/* CSTD */
 #include	<cstdlib>		/* CSTD |abs(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -101,8 +104,8 @@ int zoffparts_set(zoffparts *zop,int zo) noex {
 	    cint	v = abs(zo) / 60 ;	/* discard seconds */
 	    zop->zoff = zo ;
 	    rs = SR_OK ;
-	    zop->hours = (v / 60) ;
-	    zop->mins = (v % 60) ;
+	    zop->hours	= (v / 60) ;
+	    zop->mins	= (v % 60) ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (zoffparts_set) */
@@ -113,7 +116,7 @@ int zoffparts_get(zoffparts *zop,int *vp) noex {
 	if (zop) ylikely {
 	    rs = SR_OK ;
 	    v = ((zop->hours * 60) + zop->mins) * 60 ; /* create seconds */
-	    if (zop->zoff < 0) v = (-v) ;
+	    if (zop->zoff < 0) v = (neg v) ;
 	    if (vp) *vp = v ;
 	    v = abs(v) ;
 	} /* end if (non-null) */
@@ -148,11 +151,11 @@ int zoffparts_mkstr(zoffparts *zop,char *rbuf,int rlen) noex {
 local int storebuf_twodig(char *rbuf,int rlen,int i,int v) noex {
 	cint		n = 2 ;
 	int		rs = SR_OVERFLOW ;
-	if ((i+n) <= rlen) ylikely {
+	if ((i + n) <= rlen) ylikely {
 	    rbuf[i++] = charconv((v / 10) + '0') ;
 	    rbuf[i++] = charconv((v % 10) + '0') ;
 	    rs = n ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (storebuf_twodig) */
 
