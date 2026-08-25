@@ -120,7 +120,7 @@ typedef VPS_CH	chunk ;
 
 extern "C++" {
     int		vecpstr_add(vecpstr *,string *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -1106,71 +1106,71 @@ local int indexsize(int il) noex {
 
 int vecpstr::add(cchar *sp,int sl) noex {
 	return vecpstr_add(this,sp,sl) ;
-}
+} /* end method */
 
 int vecpstr::addkeyval(cchar *kp,int kl,cchar *vp,int vl) noex {
 	return vecpstr_addkeyval(this,kp,kl,vp,vl) ;
-}
+} /* end method */
 
 int vecpstr::adduniq(cchar *sp,int sl) noex {
 	return vecpstr_adduniq(this,sp,sl) ;
-}
+} /* end method */
 
 int vecpstr::addsyms(cchar *on,mainv sv) noex {
 	return vecpstr_addsyms(this,on,sv) ;
-}
+} /* end method */
 
 int vecpstr::addpath(cchar *sp,int sl) noex {
 	return vecpstr_addpath(this,sp,sl) ;
-}
+} /* end method */
 
 int vecpstr::store(cchar *sp,int sl,cchar **rpp) noex {
 	return vecpstr_store(this,sp,sl,rpp) ;
-}
+} /* end method */
 
 int vecpstr::already(cchar *sp,int sl) noex {
 	return vecpstr_already(this,sp,sl) ;
-}
+} /* end method */
 
 int vecpstr::loadfile(int fu,cchar *fname) noex {
 	return vecpstr_loadfile(this,fu,fname) ;
-}
+} /* end method */
 
 int vecpstr::get(int ai,cchar **rpp) noex {
 	return vecpstr_get(this,ai,rpp) ;
-}
+} /* end method */
 
 int vecpstr::getlast(cchar **spp) noex {
     	return vecpstr_getlast(this,spp) ;
-}
+} /* end method */
 
 int vecpstr::getvec(mainv *rppp) noex {
 	return vecpstr_getvec(this,rppp) ;
-}
+} /* end method */
 
 int vecpstr::envadd(cchar *kp,cchar *valp,int vall) noex {
 	return vecpstr_envadd(this,kp,valp,vall) ;
-}
+} /* end method */
 
 int vecpstr::envset(cchar *kp,cchar *valp,int vall) noex {
 	return vecpstr_envset(this,kp,valp,vall) ;
-}
+} /* end method */
 
 int vecpstr::envfile(cchar *fn) noex {
 	return vecpstr_envfile(this,fn) ;
-}
+} /* end method */
 
 int vecpstr::find(cchar *s) noex {
     	return vecpstr_find(this,s) ;
-}
+} /* end method */
 
 int vecpstr::findn(cchar *sp,int sl) noex {
     	return vecpstr_findn(this,sp,sl) ;
-}
+} /* end method */
 
 int vecpstr::search(cchar *s,vecpstr_f vcmp,cchar **rpp) noex {
 	return vecpstr_search(this,s,vcmp,rpp) ;
-}
+} /* end method */
 
 int vecpstr::searchl(cchar *sp,int sl,vecpstr_f vcmp,cchar **rpp) noex {
 	return vecpstr_searchl(this,sp,sl,vcmp,rpp) ;
@@ -1178,7 +1178,7 @@ int vecpstr::searchl(cchar *sp,int sl,vecpstr_f vcmp,cchar **rpp) noex {
 
 int vecpstr::finder(cchar *s,vecpstr_f vcmp,cchar **rpp) noex {
 	return vecpstr_finder(this,s,vcmp,rpp) ;
-}
+} /* end method */
 
 int vecpstr::findkey(cchar *kp,int kl,cchar **rpp) noex {
 	return searchl(kp,kl,vstrkeycmp,rpp) ;
@@ -1187,7 +1187,7 @@ int vecpstr::findkey(cchar *kp,int kl,cchar **rpp) noex {
 int vecpstr::del(int ai) noex {
 	if (ai < 0) ai = 0 ;
 	return vecpstr_del(this,ai) ;
-}
+} /* end method */
 
 void vecpstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
@@ -1250,7 +1250,7 @@ vecpstr_co::operator int () noex {
 
 bool vecpstr_iter::operator == (const vecpstr_iter &oit) noex {
 	return (va == oit.va) && (i == oit.i) && (ii == oit.ii) ;
-}
+} /* end method */
 
 bool vecpstr_iter::operator != (const vecpstr_iter &oit) noex {
 	bool		f = false ;
@@ -1266,23 +1266,23 @@ vecpstr_iter vecpstr_iter::operator + (int n) const noex {
 	vecpstr_iter	rit(va,i,i) ;
 	rit.i = ((rit.i + n) >= 0) ? (rit.i + n) : 0 ;
 	return rit ;
-}
+} /* end method */
 
 vecpstr_iter &vecpstr_iter::operator += (int n) noex {
 	increment(n) ;
 	return *this ;
-}
+} /* end method */
 
 vecpstr_iter vecpstr_iter::operator ++ () noex { /* pre */
 	increment() ;
 	return *this ;
-}
+} /* end method */
 
 vecpstr_iter vecpstr_iter::operator ++ (int) noex { /* post */
 	vecpstr_iter	pre(*this) ;
 	increment() ;
 	return pre ;
-}
+} /* end method */
 
 void vecpstr_iter::increment(int n) noex {
 	if ((i + n) < 0) n = -i ;
