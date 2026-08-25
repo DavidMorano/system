@@ -16,16 +16,16 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<pthread.h>
-#include	<cerrno>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<pthread.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -63,7 +63,7 @@ int uc_thrkill(pthread_t tid,int sn) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
+} /* end subroutine */
 
 int uc_thrsigqueue(pthread_t tid,int sn,const SIGVAL val) noex {
 	int		rs ;
@@ -92,7 +92,6 @@ int uc_thrsigqueue(pthread_t tid,int sn,const SIGVAL val) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
-}
-/* end subroutine (uc_thrsigqueue) */
+} /* end subroutine (uc_thrsigqueue) */
 
 
