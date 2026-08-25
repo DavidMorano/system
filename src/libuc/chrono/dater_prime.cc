@@ -26,12 +26,15 @@
 	data including strings.
 
 	Note:
-	The timezone offset value in 'TIMEB' is the minutes
+	1. The timezone offset value in 'TIMEB' is the minutes
 	west of GMT.  This is a positive value for timezones that
 	are west of Greenwich.  It is negative for timezones east
 	of Greenwich.  This is opposite from what you will see in
 	email headers (for example).  Our number here must be
 	subtracted from GMT in order to get the local time.
+	2. Note that the |zos_get(3uc)| subroutine returns MINUYES
+	west of GMT.  If the zone is eastwards of GMT, the value
+	retured is negative.
 
 	Frustration note:
 	What an incredible pain this time-dater handling stuff all
@@ -946,7 +949,7 @@ local int dater_pnum(dater *op) noex {
 		op->fl.zname = false ;	/* XXX why is this? */
 	        op->fl.zoff = true ;
 	        op->b.timezone = shortconv(zo) ;
-	    }
+	    } /* end if (zos) */
 	} /* end if (already extracted) */
 	return rs ;
 } /* end subroutine (dater_pnum) */
