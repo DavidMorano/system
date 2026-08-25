@@ -608,27 +608,27 @@ int vecint_st::operator () (int vn,int vo) noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
+} /* end method */
 
 int vecint::add(VECINT_TYPE v) noex {
 	return vecint_add(this,v) ;
-}
+} /* end method */
 
 int vecint::addlist(const VECINT_TYPE *ap,int al) noex {
 	return vecint_addlist(this,ap,al) ;
-}
+} /* end method */
 
 int vecint::adduniq(VECINT_TYPE v) noex {
 	return vecint_adduniq(this,v) ;
-}
+} /* end method */
 
 int vecint::insert(int idx,VECINT_TYPE v) noex {
 	return vecint_insert(this,idx,v) ;
-}
+} /* end method */
 
 int vecint::assign(int idx,VECINT_TYPE v) noex {
 	return vecint_insert(this,idx,v) ;
-}
+} /* end method */
 
 int vecint::del(int idx) noex {
     	int		rs ;
@@ -638,39 +638,39 @@ int vecint::del(int idx) noex {
 	    rs = vecint_delall(this) ;
 	}
 	return rs ;
-}
+} /* end method */
 
 int vecint::find(VECINT_TYPE v) noex {
 	return vecint_find(this,v) ;
-}
+} /* end method */
 
 int vecint::match(VECINT_TYPE v) noex {
 	return vecint_match(this,v) ;
-}
+} /* end method */
 
 int vecint::getval(int idx,VECINT_TYPE *rp) noex {
 	return vecint_getval(this,idx,rp) ;
-}
+} /* end method */
 
 int vecint::getvec(VECINT_TYPE **rpp) noex {
 	return vecint_getvec(this,rpp) ;
-}
+} /* end method */
 
 int vecint::mkvec(VECINT_TYPE *rva) noex {
 	return vecint_mkvec(this,rva) ;
-}
+} /* end method */
 
 int vecint::curbegin(vecint_cur *curp) noex {
 	return vecint_curbegin(this,curp) ;
-}
+} /* end method */
 
 int vecint::curend(vecint_cur *curp) noex {
 	return vecint_curend(this,curp) ;
-}
+} /* end method */
 
 int vecint::curenum(vecint_cur *curp,VECINT_TYPE *rp) noex {
 	return vecint_curenum(this,curp,rp) ;
-}
+} /* end method */
 
 void vecint::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
@@ -713,7 +713,7 @@ int vecint_co::operator () (int a) noex {
 
 bool vecint_iter::operator == (const vecint_iter &oit) noex {
 	return (va == oit.va) && (i == oit.i) && (ii == oit.ii) ;
-}
+} /* end method */
 
 bool vecint_iter::operator != (const vecint_iter &oit) noex {
 	bool		f = false ;
@@ -729,25 +729,25 @@ vecint_iter vecint_iter::operator + (int n) const noex {
 	vecint_iter	rit(va,i,i) ;
 	rit.i = ((rit.i + n) >= 0) ? (rit.i + n) : 0 ;
 	return rit ;
-}
+} /* end method */
 
 vecint_iter vecint_iter::operator += (int n) noex {
 	vecint_iter	rit(va,i,i) ;
 	i = ((i + n) >= 0) ? (i + n) : 0 ;
 	rit.i = i ;
 	return rit ;
-}
+} /* end method */
 
 vecint_iter vecint_iter::operator ++ () noex { /* pre */
 	increment() ;
 	return (*this) ;
-}
+} /* end method */
 
 vecint_iter vecint_iter::operator ++ (int) noex { /* post */
 	vecint_iter	pre(*this) ;
 	increment() ;
 	return pre ;
-}
+} /* end method */
 
 void vecint_iter::increment(int n) noex {
 	if ((i + n) < 0) n = -i ;
