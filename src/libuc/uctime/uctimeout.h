@@ -1,4 +1,4 @@
-/* timeout HEADER */
+/* uctimeout HEADER */
 /* charset=ISO8859-1 */
 /* lang=C99 */
 
@@ -26,8 +26,8 @@
 
 *******************************************************************************/
 
-#ifndef	TIMEOUT_INCLUDE
-#define	TIMEOUT_INCLUDE
+#ifndef	UCTIMEOUT_INCLUDE
+#define	UCTIMEOUT_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -71,6 +71,6 @@ extern int uc_timeout(int,timeout *) noex ;
 EXTERNC_end
 
 
-#endif /* TIMEOUT_INCLUDE */
+#endif /* UCTIMEOUT_INCLUDE */
 
 
