@@ -2,6 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* interface component for UNIX® library-3c */
 /* memory allocation facility (for library use) */
 /* version %I% last-modified %G% */
 
