@@ -259,7 +259,7 @@ extern "C" {
     local void	utmpacc_atforkbefore() noex ;
     local void	utmpacc_atforkafter() noex ;
     local void	utmpacc_exit() noex ;
-}
+} /* end extern (C) */
 
 local bool isourtype(utmpx *up) noex {
 	bool	f = false ;
@@ -293,42 +293,42 @@ utmpacc_enter		utmpacc_entbuflen ;
 
 int utmpacc_init() noex {
 	return utmpacc_data.init ;
-}
+} /* end subroutine */
 
 int utmpacc_fini() noex {
 	return utmpacc_data.fini ;
-}
+} /* end subroutine */
 
 int utmpacc_boottime(time_t *tp) noex {
 	return utmpacc_data.boottime(tp) ;
-}
+} /* end subroutine */
 
 int utmpacc_runlevel() noex {
 	return utmpacc_data.runlevel ;
-}
+} /* end subroutine */
 
 int utmpacc_users(int w) noex {
 	return utmpacc_data.users(w) ;
-}
+} /* end subroutine */
 
 int utmpacc_entsid(ENT *uep,char *uebuf,int uelen,pid_t sid) noex {
 	utmpacc_arg	a(0,uep,uebuf,uelen) ;
 	return utmpacc_data.entsid(&a,sid) ;
-}
+} /* end subroutine */
 
 int utmpacc_entstat(ENT *uep,char *uebuf,int uelen,pid_t sid) noex {
 	utmpacc_arg	a(0,uep,uebuf,uelen) ;
 	return utmpacc_data.entstat(&a,sid) ;
-}
+} /* end subroutine */
 
 int utmpacc_entline(ENT *uep,char *uebuf,int uelen,cchar *lp,int ll) noex {
 	utmpacc_arg	a(0,uep,uebuf,uelen) ;
 	return utmpacc_data.entline(&a,lp,ll) ;
-}
+} /* end subroutine */
 
 int utmpacc_getstats(utmpacc_sb *usp) noex {
 	return utmpacc_data.stats(usp) ;
-}
+} /* end subroutine */
 
 int utmpacc_extract(int fd) noex {
 	return utmpacc_data.extract(fd) ;
