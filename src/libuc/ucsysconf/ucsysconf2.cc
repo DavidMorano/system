@@ -70,6 +70,7 @@ module ;
 #include	<algorithm>		/* C++STD |sort(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<utimeout.h>		/* LIBU |uto_{x}| */
 #include	<ustd.h>		/* LIBU |ustd_conf{x}| */
 #include	<intsat.h>		/* LIBU */
@@ -116,9 +117,9 @@ local bool	isNoSup(int) noex ;
 /* local variables */
 
 constexpr int	rsnosup[] = {
-    	SR_NOSYS,
-	SR_NOTSUP,
 	SR_INVALID,
+	SR_NOTSUP,
+    	SR_NOSYS,
 	0
 } ; /* end array */
 
@@ -182,14 +183,20 @@ int ucsysconf::getvalsyn(int req) noex {
 	case sysconfcmd_maxsymbol:
 	    val = SYMBOL_MAX ;
 	    break ;
+	case sysconfcmd_maxnodename:
+	    val = NODENAME_MAX ;
+	    break ;
 	case sysconfcmd_maxname:
 	    val = NAME_MAX ;
 	    break ;
 	case sysconfcmd_maxpath:
 	    val = PATH_MAX ;
 	    break ;
-	case sysconfcmd_maxnodename:
-	    val = NODENAME_MAX ;
+        case sysconfcmd_maxtzname:
+            val = ZNBUFLEN ;
+            break ;
+	case sysconfcmd_maxzoneinfo:
+	    val = ZIBUFLEN ;
 	    break ;
         case sysconfcmd_maxusername:
             rs = UNBUFLEN ;
@@ -236,17 +243,11 @@ int ucsysconf::getvalsyn(int req) noex {
         case sysconfcmd_fstype:
             val = FSBUFLEN ;
             break ;
-        case sysconfcmd_maxtzname:
-            val = ZNBUFLEN ;
-            break ;
-	case sysconfcmd_maxzoneinfo:
-	    val = ZIBUFLEN ;
-	    break ;
         case sysconfcmd_maxmailaddr:
             rs = usysconfval(_SC_MAILADDR_MAX) ;
             break ;
 	default:
-	    rs = SR_NOSYS ;
+	    rs = SR_NOTSUP ;
 	    break ;
 	} /* end switch */
 	if (rs >= 0) {
@@ -257,18 +258,36 @@ int ucsysconf::getvalsyn(int req) noex {
 	return rs ;
 } /* end method (ucsysconf::getvalsyn) */
 
+int ucsysconf::getvaldef(int req) noex {
+    	int		rs = SR_NOTSUP ;
+	switch (req) {
+	case _SC_TZNAME_MAX:
+	    rs = 8 ;
+	    break ;
+	case _SC_ZONEINFO_MAX:
+	    rs = 255 ;
+	    break ;
+	} /* end switch */
+    	return rs ;
+} /* end method (usysconf::getvaldef) */
+
 int ucsysconf::getval(int req) noex {
+    	cnullptr	np{} ;
     	int		rs ;
-	int		val = 0 ;
-	if (req >= sysconfcmd_synthetic) {
-	    rs = getvalsyn(req) ;
+	int		val = 0 ; /* return-value */
+	if ((rs = u_sysconfval(req,np)) >= 0) {
 	    val = rs ;
-	} else if ((rs = getstd(req)) > 0) {
-	    val = rs ;
-	} else if ((rs < 0) && isNoSup(rs)) {
-	    rs = getvalsyn(req) ;
-	    val = rs ;
-	} /* end if */
+	} else if (isNoSup(rs)) {
+	    if (req >= sysconfcmd_synthetic) {
+	        rs = getvalsyn(req) ;
+	        val = rs ;
+	    } else if ((rs = getstd(req)) >= 0) {
+	        val = rs ;
+	    } else if (isNoSup(rs)) {
+	        rs = getvaldef(req) ;
+	        val = rs ;
+	    } /* end if */
+	} /* end if (alternatives) */
 	return (rs >= 0) ? val : rs ;
 } /* end method (ucsysconf::getval) */
 
@@ -277,7 +296,7 @@ int ucsysconf::mconfval(int req) noex {
 } /* end method (ucsysconf::mconfval) */
 
 local bool isNoSup(int rs) noex {
-	return isOneOf(rsnosup,rs) ;
+    	return isOneBad(rsnosup,rs) ;
 } /* end wubtoutine (isNoSup) */
 
 
