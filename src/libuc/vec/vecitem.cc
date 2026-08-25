@@ -58,7 +58,7 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     typedef vecitem_cmpf	cmpf ;
-}
+} /* end extern (C) */
 
 typedef vecitem_cur	cur ;
 
@@ -89,7 +89,7 @@ namespace {
 	    rpp = arpp ;
 	} ;
    } ; /* end struct (fetchargs) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -630,35 +630,35 @@ local int vecitem_fetchcont(vecitem *op,fetchargs *ap) noex {
 
 int vecitem::start(int an,int ao) noex {
 	return vecitem_start(this,an,ao) ;
-}
+} /* end method */
 
 int vecitem::add(cvoid *ep,int el) noex {
 	return vecitem_add(this,ep,el) ;
-}
+} /* end method */
 
 int vecitem::get(int ai,void *rp) noex {
 	return vecitem_get(this,ai,rp) ;
-}
+} /* end method */
 
 int vecitem::find(cvoid *ep,int el) noex {
     	return vecitem_find(this,ep,el) ;
-}
+} /* end method */
 
 int vecitem::fetch(cvoid *ep,vecitem_cur *curp,vecitem_cmpf cf,void *rp) noex {
     	return vecitem_fetch(this,ep,curp,cf,rp) ;
-}
+} /* end method */
 
 int vecitem::search(cvoid *ep,vecitem_cmpf cf,void *rp) noex {
     	return vecitem_search(this,ep,cf,rp) ;
-}
+} /* end method */
 
 int vecitem::sort(vecitem_cmpf cf) noex {
     	return vecitem_sort(this,cf) ;
-}
+} /* end method */
 
 int vecitem::getvec(void **rpp) noex {
 	return vecitem_getvec(this,rpp) ;
-}
+} /* end method */
 
 void vecitem::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
