@@ -49,7 +49,7 @@
 #include	<sys/types.h>		/* POSIX® */
 #include	<sys/param.h>		/* POSIX® */
 #include	<unistd.h>		/* POSIX® */
-#include	<cerrno>		/* CSYD */
+#include	<cerrno>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
