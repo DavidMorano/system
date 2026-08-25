@@ -33,7 +33,7 @@
 #include	<fcntl.h>
 #include	<netdb.h>
 #include	<tzfile.h>		/* |TM_YEAR_BASE| */
-#include	<ctime>			/* CSYD */
+#include	<ctime>			/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
