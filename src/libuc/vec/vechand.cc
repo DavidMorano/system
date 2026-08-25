@@ -508,40 +508,40 @@ local int vechand_validx(vechand *op,int i) noex {
 
 int vechand::start(int an,int ao) noex {
 	return vechand_start(this,an,ao) ;
-}
+} /* end method */
 
 int vechand::add(cvoid *ep) noex {
 	return vechand_add(this,ep) ;
-}
+} /* end method */
 
 int vechand::get(int ai,void **rpp) noex {
 	return vechand_get(this,ai,rpp) ;
-}
+} /* end method */
 
 int vechand::getlast(void **rpp) noex {
 	return vechand_getlast(this,rpp) ;
-}
+} /* end method */
 
 int vechand::getvec(void *vap) noex {
 	return vechand_getvec(this,vap) ;
-}
+} /* end method */
 
 int vechand::sort(vechand_f vcmp) noex {
 	return vechand_sort(this,vcmp) ;
-}
+} /* end method */
 
 int vechand::del(int ai) noex {
 	if (ai < 0) ai = 0 ;
 	return vechand_del(this,ai) ;
-}
+} /* end method */
 
 int vechand::delhand(cvoid *ep) noex {
     	return vechand_delhand(this,ep) ;
-}
+} /* end method */
 
 int vechand::search(cvoid *ep,vechand_f vcmp,void **rpp) noex {
     	return vechand_search(this,ep,vcmp,rpp) ;
-}
+} /* end method */
 
 void vechand::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
