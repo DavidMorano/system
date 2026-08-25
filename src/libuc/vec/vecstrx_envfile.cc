@@ -95,7 +95,7 @@ using libuc::libmem ;			/* variable */
 extern "C" {
     typedef int (*rls_f)(filer *,char *,int,int,int *) noex ;
     typedef int (*vs_f)(cchar **,cchar **) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
