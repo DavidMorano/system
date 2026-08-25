@@ -104,7 +104,7 @@ OBJ19 =
 
 OBJ20= hdb.o hdbstr.o
 OBJ21= spawn.o
-OBJ22=
+OBJ22= user.o
 OBJ23=
 
 OBJ24= ucopen.o nonpath.o ucdescbase.o
@@ -422,7 +422,6 @@ passwdent.o:		passwdent.cc passwdent.h
 spwdent.o:		spwdent.cc spwdent.h
 groupent.o:		groupent.cc groupent.h
 projectent.o:		projectent.cc projectent.h
-userattrent.o:		userattrent.cc userattrent.h
 
 strcpyxc.o:		strcpyxc.cc strcpyxc.h
 
@@ -444,7 +443,6 @@ mallocstuff.o:		mallocstuff.cc mallocstuff.h
 
 # UNIX C-language system library data-base interface (support)
 spwd.o:			spwd.cc spwd.h
-userattr.o:		userattr.cc userattr.h
 ucpasswd.o:		ucpasswd.cc ucpasswd.h
 ucgroup.o:		ucgroup.cc ucgroup.h
 ucproject.o:		ucproject.cc ucproject.h
