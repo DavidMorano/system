@@ -118,14 +118,14 @@ import libutil ;			/* |lenstr(3u)| */
 extern "C" {
     extern int uc_fuid(int) noex ;
     extern int uc_raise(int) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     extern int	tcsetmesg(int,int) noex ;
     extern int	tcsetbiff(int,int) noex ;
     extern int	tcgetlines(int) noex ;
     extern int	tcsetlines(int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
