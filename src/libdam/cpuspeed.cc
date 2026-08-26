@@ -94,7 +94,7 @@
 
 extern "C" {
     typedef int (*mod_f)(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
