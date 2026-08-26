@@ -38,7 +38,6 @@ extern int	uc_recve(int,void *,int,int,int,int) noex ;
 extern int	uc_recvfrom(int,void *,int,int,void *,int *) noex ;
 extern int	uc_recvfrome(int,void *,int,int,void *,int *,int,int) noex ;
 extern int	uc_recvmsg(int,MSGHDR *,int) noex ;
-extern int	uc_recvmsge(int,MSGHDR *,int,int,int) noex ;
 extern int	uc_send(int,cvoid *,int,int) noex ;
 extern int	uc_sendfiler(int,int,off_t,size_t) noex ;
 extern int	uc_sendmsg(int,CMSGHDR *,int) noex ;
