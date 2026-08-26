@@ -197,11 +197,11 @@ local int nodesfile_dtor(nodesfile *op) noex {
 	    if (op->elp) ylikely {
 		delete op->elp ;
 		op->elp = nullptr ;
-	    }
+	    } /* end if (delete-hdb) */
 	    if (op->flp) ylikely {
 		delete op->flp ;
 		op->flp = nullptr ;
-	    }
+	    } /* end if (delete-vechand) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (nodesfile_dtor) */
