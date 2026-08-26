@@ -236,7 +236,7 @@ local int	parttype(cchar *) noex ;
 
 extern "C" {
     local int	vcmpent(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 local charp	compile(cchar *,char *,char *) noex ;
 local int	advance(cchar *,cchar *) noex ;
