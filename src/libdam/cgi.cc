@@ -60,7 +60,7 @@ import libutil ;			/* |memclear(3u)| */
 
 extern "C" {
     extern int	bufprintf(char *,int,cchar *,...) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
