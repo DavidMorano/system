@@ -120,7 +120,7 @@ local inline int offindex_magic(offindex *op,Args ... args) noex {
 
 extern "C" {
     local int vecmp(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 local int ecmpe(OI_E *,OI_E *) noex ;
 
