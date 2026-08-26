@@ -279,7 +279,10 @@
 /* Solaris: properly working |ftime(3c)| */
 #define	SYSHAS_FTIME		0
 
-/* Solaris: |struct in4in6_addr| */
+/* Solaris: has structure |timezone| */
+#define	SYSHAS_TIMEZONE		0
+
+/* Solaris: has structure |in4in6_addr| */
 #define	SYSHAS_IN4IN6ADDR	0
 
 /******************************************************************************/
@@ -550,6 +553,9 @@
 /* Darwin: properly working |ftime(3c)| */
 #define	SYSHAS_FTIME		1
 
+/* Darwin: has structure |timezone| */
+#define	SYSHAS_TIMEZONE		1
+
 /* Darwin: |struct in4in6_addr| */
 #define	SYSHAS_IN4IN6ADDR	1
 
@@ -801,6 +807,9 @@
 /* Linux: properly working |ftime(3c)| */
 #define	SYSHAS_FTIME		0
 
+/* Linux: has structure |timezone| */
+#define	SYSHAS_TIMEZONE		0
+
 /* Linux: |struct in4in6_addr| */
 #define	SYSHAS_IN4IN6ADDR	0
 
@@ -909,6 +918,7 @@ struct syshas_mgr {
 	uint	onc:1 ;			/* Open-Network-Computing */
 	uint	getnetname:1 ;		/* part of Open-Network-Computing */
 	uint	ftime:1 ;		/* properly working |ftime(3c)| */
+	uint	timezone:1 ;		/* has structure |timezone| */
 	uint	in4in6addr:1 ;
 	consteval syshas_mgr() noexcept ;
 } ; /* end struct (syshas_mgr) */
