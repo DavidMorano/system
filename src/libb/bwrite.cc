@@ -87,9 +87,9 @@ using std::max ;			/* subroutine-template */
 
 /* external subroutines */
 
-extern "C" {
+namespace bfile_ns {
     int		bfile_write(bfile *,cvoid *,int) noex ;
-}
+} /* end namespace (bfile_ns) */
 
 
 /* external variables */
@@ -119,15 +119,20 @@ cbool		f_flushpart	= CF_FLUSHPART ;
 
 int bwrite(bfile *op,cvoid *abuf,int alen) noex {
 	int		rs ;
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = bfile_magic(op,abuf)) > 0) {
+	    DEBUGPRINTF("-> ckwr\n") ;
 	    if ((rs = bfile_ckwr(op)) >= 0) {
-		rs = bfile_write(op,abuf,alen) ;
+	        DEBUGPRINTF("-> bfile_write\n") ;
+		rs = bfile_ns::bfile_write(op,abuf,alen) ;
 	    } /* end if (access) */
 	} /* end if (magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (bwrite) */
 
-int bfile_write(bfile *op,cvoid *abuf,int alen) noex {
+namespace bfile_ns {
+    int bfile_write(bfile *op,cvoid *abuf,int alen) noex {
 	int		rs ;
 	cchar		*abp = charp(abuf) ;
 	if (alen < 0) alen = lenstr(abp) ;
@@ -141,7 +146,8 @@ int bfile_write(bfile *op,cvoid *abuf,int alen) noex {
 	} /* end if */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (bfile_write) */
+    } /* end subroutine (bfile_write) */
+} /* end namespace (bfile_ns) */
 
 
 /* local subroutines */
