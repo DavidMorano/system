@@ -106,20 +106,20 @@ import libutil ;			/* |memclear(3u)| */
 #define	TYPEDEF_TWORKER
 extern "C" {
     typedef	int (*tworker_f)(void *) noex ;
-}
+} /* end extern (C) */
 #endif
 
 extern "C" {
     typedef	int (*cmdsub_f)(int,cchar **,cchar **,void *) noex ;
     typedef	int (*func_caller)(int,cchar **,void *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
 
 extern "C" {
     typedef int (*subcmd_f)(int,cchar **,cchar **,void *) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     int		progsig_init(void) noex ;
@@ -128,7 +128,7 @@ extern "C" {
     int		progsig_callcmd(cchar *,int,cchar **,cchar **,void *) noex ;
     int 	progsig_callfunc(subcmd_f,int,cchar **,cchar **,void *) noex ;
     int		progsig_initmemalloc(int) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     extern int uc_stat(cchar *,ustat *) noex ;
@@ -198,11 +198,11 @@ enum cmds {
 /* forward references */
 
 extern "C" {
-    static void	progsig_atforkbefore() noex ;
-    static void	progsig_atforkafter() noex ;
-    static void	progsig_exit() noex ;
-    static void	progsig_sighand(int,siginfo_t *,void *) noex ;
-}
+    local void	progsig_atforkbefore() noex ;
+    local void	progsig_atforkafter() noex ;
+    local void	progsig_exit() noex ;
+    local void	progsig_sighand(int,siginfo_t *,void *) noex ;
+} /* end extern (C) */
 
 local int	progsig_mainstuff(progsig *) noex ;
 
@@ -315,8 +315,7 @@ int progsig_init(void) noex {
 	    while (! uip->f_initdone) msleep(1) ;
 	}
 	return rs ;
-}
-/* end subroutine (progsig_init) */
+} /* end subroutine (progsig_init) */
 
 int progsig_fini(void) noex {
 	progsig		*uip = &progsig_data ;
@@ -353,8 +352,7 @@ int progsig_fini(void) noex {
 	    uip->f_initdone = false ;
 	} /* end if (atexit registered) */
 	return rs ;
-}
-/* end subroutine (progsig_fini) */
+} /* end subroutine (progsig_fini) */
 
 int progsig_mainbegin(cchar **envv) noex {
 	int		rs ;
@@ -369,8 +367,7 @@ int progsig_mainbegin(cchar **envv) noex {
 	    } /* end if (progsig_sigbegin) */
 	} /* end if (progsig_init) */
 	return rs ;
-}
-/* end subroutine (progsig_mainbegin) */
+} /* end subroutine (progsig_mainbegin) */
 
 int progsig_mainend(void) noex {
 	progsig		*uip = &progsig_data ;
@@ -386,8 +383,7 @@ int progsig_mainend(void) noex {
 	}
 	uip->envv = nullptr ;
 	return rs ;
-}
-/* end subroutine (progsig_mainend) */
+} /* end subroutine (progsig_mainend) */
 
 int progsig_adm(int cmd) noex {
 	progsig		*kip = &progsig_data ;
@@ -401,21 +397,18 @@ int progsig_adm(int cmd) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end subroutine (progsig_runmode) */
+} /* end subroutine (progsig_runmode) */
 
 int progsig_runmode(void) noex {
 	progsig		*kip = &progsig_data ;
 	return kip->runmode ;
-}
-/* end subroutine (progsig_runmode) */
+} /* end subroutine (progsig_runmode) */
 
 int progsig_serial() noex {
 	progsig		*kip = &progsig_data ;
 	int		s = kip->serial ;
 	return s ;
-}
-/* end subroutine (progsig_serial) */
+} /* end subroutine (progsig_serial) */
 
 int progsig_sigquit(void) noex {
 	progsig		*kip = &progsig_data ;
@@ -425,8 +418,7 @@ int progsig_sigquit(void) noex {
 	    rs = SR_QUIT ;
 	}
 	return rs ;
-}
-/* end subroutine (progsig_sigquit) */
+} /* end subroutine (progsig_sigquit) */
 
 int progsig_sigterm() noex {
 	progsig		*kip = &progsig_data ;
@@ -436,8 +428,7 @@ int progsig_sigterm() noex {
 	    rs = SR_EXIT ;
 	}
 	return rs ;
-}
-/* end subroutine (progsig_sigterm) */
+} /* end subroutine (progsig_sigterm) */
 
 int progsig_sigintr() noex {
 	progsig		*kip = &progsig_data ;
@@ -447,8 +438,7 @@ int progsig_sigintr() noex {
 	    rs = SR_INTR ;
 	}
 	return rs ;
-}
-/* end subroutine (progsig_sigintr) */
+} /* end subroutine (progsig_sigintr) */
 
 int progsig_issig(int sn) noex {
 	progsig		*kip = &progsig_data ;
@@ -484,8 +474,7 @@ int progsig_issig(int sn) noex {
 	    break ;
 	} /* end switch */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (progsig_issig) */
+} /* end subroutine (progsig_issig) */
 
 int progsig_noteread(progsig_note *rp,int ni) noex {
 	int		rs ;
@@ -516,8 +505,7 @@ int progsig_noteread(progsig_note *rp,int ni) noex {
 	    } /* end if (capture) */
 	} /* end if (progsig_init) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (progsig_noteread) */
+} /* end subroutine (progsig_noteread) */
 
 int progsig_notedel(int ni) noex {
 	int		rs ;
@@ -536,8 +524,7 @@ int progsig_notedel(int ni) noex {
 	    } /* end if (capture) */
 	} /* end if (progsig_init) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (progsig_notedel) */
+} /* end subroutine (progsig_notedel) */
 
 
 /* local subroutines */
@@ -546,8 +533,7 @@ local int progsig_mainstuff(progsig *uip) noex {
 	int		rs = SR_OK ;
 	if (uip == nullptr) return SR_FAULT ;
 	return rs ;
-}
-/* end subroutine (progsig_mainstuff) */
+} /* end subroutine (progsig_mainstuff) */
 
 local int progsig_mq(progsig *uip) noex {
 	int		rs = SR_OK ;
@@ -555,8 +541,7 @@ local int progsig_mq(progsig *uip) noex {
 	    rs = progsig_begin(uip) ;
 	}
 	return rs ;
-}
-/* end subroutine (progsig_mq) */
+} /* end subroutine (progsig_mq) */
 
 local int progsig_begin(progsig *uip) noex {
 	int		rs = SR_OK ;
@@ -567,8 +552,7 @@ local int progsig_begin(progsig *uip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (progsig_begin) */
+} /* end subroutine (progsig_begin) */
 
 local int progsig_end(progsig *uip) noex {
 	int		rs = SR_OK ;
@@ -585,8 +569,7 @@ local int progsig_end(progsig *uip) noex {
 	    uip->f_mq = false ;
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (progsig_end) */
+} /* end subroutine (progsig_end) */
 
 local int progsig_entfins(progsig *uip) noex {
 	raqhand		*qlp = &uip->mq ;
@@ -607,8 +590,7 @@ local int progsig_entfins(progsig *uip) noex {
 	    } /* end if (non-null) */
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (progsig_entfins) */
+} /* end subroutine (progsig_entfins) */
 
 local int progsig_runbegin(progsig *uip) noex {
 	int		rs = SR_OK ;
@@ -627,8 +609,7 @@ local int progsig_runbegin(progsig *uip) noex {
 	    } /* end if (capture) */
 	} /* end if (not-running) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (progsig_runbegin) */
+} /* end subroutine (progsig_runbegin) */
 
 local int progsig_runner(progsig *uip) noex {
 	int		rs ;
@@ -650,8 +631,7 @@ local int progsig_runner(progsig *uip) noex {
 	} /* end if (pta) */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (progsig_runner) */
+} /* end subroutine (progsig_runner) */
 
 local int progsig_runend(progsig *uip) noex {
 	int		rs = SR_OK ;
@@ -670,8 +650,7 @@ local int progsig_runend(progsig *uip) noex {
 	    } /* end if (progsig_cmdsend) */
 	} /* end if (running) */
 	return rs ;
-}
-/* end subroutine (progsig_runend) */
+} /* end subroutine (progsig_runend) */
 
 /* it always takes a good bit of code to make this part look easy! */
 local int progsig_worker(progsig *uip) noex {
@@ -696,8 +675,7 @@ local int progsig_worker(progsig *uip) noex {
 	} /* end while (looping on commands) */
 	uip->f_exiting = true ;
 	return rs ;
-}
-/* end subroutine (progsig_worker) */
+} /* end subroutine (progsig_worker) */
 
 local int progsig_workecho(progsig *uip,msgdata *mip) noex {
 	int		rs ;
@@ -705,8 +683,7 @@ local int progsig_workecho(progsig *uip,msgdata *mip) noex {
 	    rs = progsig_reqsend(uip,mip,0) ;
 	} /* end if (msgdata_conpass) */
 	return rs ;
-}
-/* end subroutine (progsig_workecho) */
+} /* end subroutine (progsig_workecho) */
 
 local int progsig_workgen(progsig *uip,msgdata *mip) noex {
 	int		rs ;
@@ -724,8 +701,7 @@ local int progsig_workgen(progsig *uip,msgdata *mip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (capture) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (progsig_workgen) */
+} /* end subroutine (progsig_workgen) */
 
 local int progsig_workgener(progsig *uip,SESMSG_GEN *mp) noex {
 	cint		esz = szof(SN) ;
@@ -749,8 +725,7 @@ local int progsig_workgener(progsig *uip,SESMSG_GEN *mp) noex {
 	    }
 	} /* end if (m-a) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (progsig_workgener) */
+} /* end subroutine (progsig_workgener) */
 
 local int progsig_workbiff(progsig *uip,msgdata *mip) noex {
 	int		rs ;
@@ -768,8 +743,7 @@ local int progsig_workbiff(progsig *uip,msgdata *mip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (capture) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (progsig_workbiff) */
+} /* end subroutine (progsig_workbiff) */
 
 local int progsig_workbiffer(progsig *uip,SESMSG_BIFF *mp) noex {
 	cint		esz = szof(SN) ;
@@ -794,8 +768,7 @@ local int progsig_workbiffer(progsig *uip,SESMSG_BIFF *mp) noex {
 	    }
 	} /* end if (m-a) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (progsig_workbiffer) */
+} /* end subroutine (progsig_workbiffer) */
 
 local int progsig_workdef(progsig *uip,msgdata *mip) noex {
 	int		rs = SR_FAULT ;
@@ -811,8 +784,7 @@ local int progsig_workdef(progsig *uip,msgdata *mip) noex {
 	    } /* end if (mutex) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (progsig_workdef) */
+} /* end subroutine (progsig_workdef) */
 
 local int progsig_msgenter(progsig *uip,SN *ep) noex {
 	raqhand		*qlp = &uip->mq ;
@@ -824,8 +796,7 @@ local int progsig_msgenter(progsig *uip,SN *ep) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (progsig_msgenter) */
+} /* end subroutine (progsig_msgenter) */
 
 local int progsig_reqopen(progsig *uip) noex {
     	cmode		dm = (W_OK|X_OK) ;
@@ -856,8 +827,7 @@ local int progsig_reqopen(progsig *uip) noex {
 	    } /* end if (bufsizeget) */
 	} /* end if (sdir) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (progsig_reqopen) */
+} /* end subroutine (progsig_reqopen) */
 
 local int progsig_reqopener(progsig *uip,cchar *pbuf) noex {
 	cint		lo = 0 ;
@@ -879,8 +849,7 @@ local int progsig_reqopener(progsig *uip,cchar *pbuf) noex {
 	    }
 	} /* end if (listenusd) */
 	return rs ;
-}
-/* end subroutine (progsig_reqopener) */
+} /* end subroutine (progsig_reqopener) */
 
 local int progsig_reqclose(progsig *uip) noex {
 	int		rs = SR_OK ;
@@ -905,14 +874,12 @@ local int progsig_reqclose(progsig *uip) noex {
 	    } /* end if (reqfname) */
 	} /* end if (server-open) */
 	return rs ;
-}
-/* end subroutine (progsig_reqclose) */
+} /* end subroutine (progsig_reqclose) */
 
 local int progsig_reqsend(progsig *uip,msgdata *mip,int dlen) noex {
 	cint		fd = uip->sfd ;
 	return msgdata_send(mip,fd,dlen,0) ;
-}
-/* end subroutine (progsig_reqsend) */
+} /* end subroutine (progsig_reqsend) */
 
 local int progsig_reqrecv(progsig *uip,msgdata *mip) noex {
 	POLLFD		fds[1] = {} ;
@@ -950,8 +917,7 @@ local int progsig_reqrecv(progsig *uip,msgdata *mip) noex {
 	    if (rs < 0) break ;
 	} /* end while (polling) */
 	return (rs >= 0) ? rc : rs ;
-}
-/* end subroutine (progsig_reqrecv) */
+} /* end subroutine (progsig_reqrecv) */
 
 local int progsig_poll(progsig *uip) noex {
 	int		rs = SR_FAULT ;
@@ -959,8 +925,7 @@ local int progsig_poll(progsig *uip) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (progsig_poll) */
+} /* end subroutine (progsig_poll) */
 
 local int progsig_cmdsend(progsig *uip,int cmd) noex {
 	int		rs = SR_OK ;
@@ -992,33 +957,29 @@ local int progsig_cmdsend(progsig *uip,int cmd) noex {
 	    } /* end switch */
 	} /* end if (running) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (progsig_cmdsend) */
+} /* end subroutine (progsig_cmdsend) */
 
-static void progsig_atforkbefore() noex {
+local void progsig_atforkbefore() noex {
 	progsig		*uip = &progsig_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockbegin() ;
 	}
-}
-/* end subroutine (progsig_atforkbefore) */
+} /* end subroutine (progsig_atforkbefore) */
 
-static void progsig_atforkafter() noex {
+local void progsig_atforkafter() noex {
 	progsig		*uip = &progsig_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockend() ;
 	}
-}
-/* end subroutine (progsig_atforkafter) */
+} /* end subroutine (progsig_atforkafter) */
 
-static void progsig_exit() noex {
+local void progsig_exit() noex {
 	(void) progsig_fini() ;
-}
-/* end subroutine (progsig_atforkafter) */
+} /* end subroutine (progsig_atforkafter) */
 
-static void progsig_sighand(int sn,siginfo_t *sip,void *vcp) noex {
+local void progsig_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	progsig		*kip = &progsig_data ;
 	(void) sip ;
 	(void) vcp ;
@@ -1042,8 +1003,7 @@ static void progsig_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	    kip->f_sigchild = true ;
 	    break ;
 	} /* end switch */
-}
-/* end subroutine (progsig_sighand) */
+} /* end subroutine (progsig_sighand) */
 
 local int progsig_mkreqfname(progsig *uip,char *sbuf,cchar *dname) noex {
 	const uint	uv = uint(uip->pid) ;
@@ -1061,8 +1021,7 @@ local int progsig_mkreqfname(progsig *uip,char *sbuf,cchar *dname) noex {
 	    } /* end if (mkpath) */
 	} /* end if (ctdecui) */
 	return rs ;
-}
-/* end subroutine (progsig_mkreqfname) */
+} /* end subroutine (progsig_mkreqfname) */
 
 local int progsig_capbegin(progsig *uip,int to) noex {
 	ptm		*mxp = &uip->mx ;
@@ -1084,8 +1043,7 @@ local int progsig_capbegin(progsig *uip,int to) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end subroutine (progsig_capbegin) */
+} /* end subroutine (progsig_capbegin) */
 
 local int progsig_capend(progsig *uip) noex {
 	ptm		*mxp = &uip->mx ;
@@ -1103,8 +1061,7 @@ local int progsig_capend(progsig *uip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-}
-/* end subroutine (progsig_capend) */
+} /* end subroutine (progsig_capend) */
 
 local int progsig_sigbegin(progsig *kip) noex {
 	int		rs ;
@@ -1113,8 +1070,7 @@ local int progsig_sigbegin(progsig *kip) noex {
 	kip->f_sigintr = 0 ;
 	rs = sighand_start(&kip->sm,sigblocks,sigigns,sigints,sh) ;
 	return rs ;
-}
-/* end subroutine (progsig_sigbegin) */
+} /* end subroutine (progsig_sigbegin) */
 
 local int progsig_sigend(progsig *kip) noex {
 	int		rs = SR_FAULT ;
@@ -1127,8 +1083,7 @@ local int progsig_sigend(progsig *kip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (progsig_sigend) */
+} /* end subroutine (progsig_sigend) */
 
 local int snote_start(SN *ep,int mt,time_t st,cc *un,cc *mdp,int mdl) noex {
 	int		rs = SR_FAULT ;
@@ -1149,8 +1104,7 @@ local int snote_start(SN *ep,int mt,time_t st,cc *un,cc *mdp,int mdl) noex {
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (snote_start) */
+} /* end subroutine (snote_start) */
 
 local int snote_finish(SN *ep) noex {
 	int		rs = SR_OK ;
@@ -1166,8 +1120,7 @@ local int snote_finish(SN *ep) noex {
 	ep->stime = 0 ;
 	ep->type = 0 ;
 	return rs ;
-}
-/* end subroutine (snote_finish) */
+} /* end subroutine (snote_finish) */
 
 local int libmalstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -1179,8 +1132,7 @@ local int libmalstrw(cchar *sp,int sl,cchar **rpp) noex {
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (libmalstrw) */
+} /* end subroutine (libmalstrw) */
 
 local int sdir(cchar *dname,int am) noex {
 	cint		nrs = SR_NOTFOUND ;
@@ -1194,8 +1146,7 @@ local int sdir(cchar *dname,int am) noex {
 	    rs = perm(dname,-1,-1,nullptr,am) ;
 	} /* end if (stat) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (sdir) */
+} /* end subroutine (sdir) */
 
 local int mksdir(cchar *dname,mode_t dm) noex {
 	int		rs ;
@@ -1203,8 +1154,7 @@ local int mksdir(cchar *dname,mode_t dm) noex {
 	    rs = uc_minmod(dname,dm) ;
 	}
 	return rs ;
-}
-/* end if (mksdir) */
+} /* end if (mksdir) */
 
 local int mksdname(char *rbuf,cchar *dname,pid_t sid) noex {
 	const uint	uv = uint(sid) ;
@@ -1220,7 +1170,6 @@ local int mksdname(char *rbuf,cchar *dname,pid_t sid) noex {
 	    } /* end if (mkpath) */
 	} /* end if (ctdecui) */
 	return rs ;
-}
-/* end subroutine (mksdname) */
+} /* end subroutine (mksdname) */
 
 
