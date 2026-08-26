@@ -90,10 +90,6 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
-
 
 /* external variables */
 
