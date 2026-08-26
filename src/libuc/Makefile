@@ -369,7 +369,6 @@ character.o:	$(OBJ_CHAR)
 
 
 # LIBUC
-ucsysmisc.o:		ucsysmisc.cc	ucsysmisc.h		$(INCS)
 ucpathconf.o:		ucpathconf.cc
 ucmain.o:		ucmain.cc
 ucatfork.o:		ucatfork.cc	ucatfork.h		$(INCS)
@@ -477,6 +476,11 @@ ucsupport.dir:
 # UCSYSCONF
 ucsysconf.o:		ucsysconf.dir
 ucsysconf.dir:
+	makesubdir $@
+
+# UCSYSMISC
+ucsysmisc.o:		ucsysmisc.dir
+ucsysmisc.dir:
 	makesubdir $@
 
 # UCOPEN
