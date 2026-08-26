@@ -186,25 +186,30 @@ char *convdecsx(ST snum,char *endptr) noex {
 
 /* exported subroutines */
 
-extern char *convdecsi	(sint sv,	char *endp) noex {
+char *convdecsi	(sint sv,	char *endp) noex {
     	return convdecsx<uint>		(sv,endp) ;
-}
-extern char *convdecsl	(slong sv,	char *endp) noex {
-    	return convdecsx<ulong>		(sv,endp) ;
-}
-extern char *convdecsll	(slonglong sv,	char *endp) noex {
-    	return convdecsx<ulonglong>	(sv,endp) ;
-}
+} /* end */
 
-extern char *convdecui	(uint uv,	char *endp) noex {
+char *convdecsl	(slong sv,	char *endp) noex {
+    	return convdecsx<ulong>		(sv,endp) ;
+} /* end */
+
+char *convdecsll	(slonglong sv,	char *endp) noex {
+    	return convdecsx<ulonglong>	(sv,endp) ;
+} /* end */
+
+
+char *convdecui	(uint uv,	char *endp) noex {
     	return convdecux(uv,endp) ;
-}
-extern char *convdecul	(ulong uv,	char *endp) noex {
+} /* end */
+
+char *convdecul	(ulong uv,	char *endp) noex {
     	return convdecux(uv,endp) ;
-}
-extern char *convdecull	(ulonglong uv,	char *endp) noex {
+} /* end */
+
+char *convdecull	(ulonglong uv,	char *endp) noex {
     	return convdecux(uv,endp) ;
-}
+} /* end */
 
 
 /* local subroutines */
