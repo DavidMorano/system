@@ -281,7 +281,6 @@ local int wordfill_mkline(wordfill *op,int f_part,char *lbuf,int llen) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (wordfill_mkline) */
+} /* end subroutine (wordfill_mkline) */
 
 
