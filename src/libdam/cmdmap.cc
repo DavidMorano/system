@@ -112,7 +112,7 @@ local int cmdmap_defmap(cmdmap *,const cmdmap_ent *) noex ;
 
 extern "C" {
     local int	vcmpfind(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -127,11 +127,11 @@ constexpr bool		f_fastdef = CF_FASTDEF ;
 
 int cmdmap_start(cmdmap *op,const cmdmap_ent *defmap) noex {
 	int		rs ;
-	if ((rs = cmdmap_ctor(op)) >= 0) {
+	if ((rs = cmdmap_ctor(op)) >= 0) ylikely {
 	    cint	sz = szof(cmdmap_ent) ;
 	    cint	vn = 10 ;
 	    cint	vo = vecobjm.reuse ;
-	    if ((rs = vecobj_start(op->mlp,sz,vn,vo)) >= 0) {
+	    if ((rs = vecobj_start(op->mlp,sz,vn,vo)) >= 0) ylikely {
 	        if (defmap) {
 		    rs = cmdmap_defmap(op,defmap) ;
 		}
