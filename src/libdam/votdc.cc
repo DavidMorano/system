@@ -267,7 +267,7 @@ int votdc_open(votdc *op,cchar *pr,cchar *lang,int of) noex {
 	        static cint		rsv = var ;
 	        if ((rs = rsv) >= 0) ylikely {
 	            op->pagesz = var.pagesz ;
-	            of &= (~ O_ACCMODE) ;
+	            of &= (compl O_ACCMODE) ;
 	            of |= O_RDWR ;
 	            op->fd = -1 ;
 	            if ((rs = votdc_shmhandbegin(op,pr)) >= 0) ylikely {
@@ -865,7 +865,7 @@ local int votdc_shmprep(votdc *op,time_t dt,int fd,m_t om,
 		votdchdr *hdrp) noex {
 	int		rs ;
 	int		foff = 0 ;
-	op->shmsize = 0 ;
+	op->shmsz = 0 ;
 	if (dt == 0) dt = getustime ;
 	{
 	hdrp->vetu[0] = VOTDCHDR_VERSION ;
@@ -889,16 +889,16 @@ local int votdc_shmpreper(votdc *op,time_t dt,int fd,mode_t om,
 	int		foff = 0 ; /* return-value */
 	if (char *hbuf ; (rs = lm_mall(hsz,&hbuf)) >= 0) ylikely {
 	    cint	hlen = rs ;
-	    op->shmsize = 0 ;
+	    op->shmsz = 0 ;
 	    if (dt == 0) dt = getustime ;
 	    if ((rs = votdchdr_rd(hdrp,hbuf,hlen)) >= 0) ylikely {
 	        int	hl = rs ;
 	        if ((rs = votdc_shmwriter(op,dt,fd,hdrp,hbuf,hl)) >= 0) {
-	            hdrp->shmsize = foff ;
+	            hdrp->shmsz = foff ;
 	            if ((rs = u_rewind(fd)) >= 0) {
 	                if ((rs = votdchdr_rd(hdrp,hbuf,hlen)) >= 0) {
 	                    if ((rs = u_write(fd,hbuf,rs)) >= 0) {
-	    		        op->shmsize = foff ;
+	    		        op->shmsz = foff ;
 	    		        rs = u_fchmod(fd,om) ;
 		            }
 		        } /* end if (votdchdr_rd) */
@@ -920,7 +920,7 @@ local int votdc_shmwriter(votdc *op,time_t dt,int fd,votdchdr *hdrp,
 	int		size ;
 	int		foff = 0 ;
 	{
-	op->shmsize = 0 ;
+	op->shmsz = 0 ;
 	if (dt == 0) dt = getustime ;
 	}
 	if ((rs = filer_start(sfp,fd,0,bsz,0)) >= 0) ylikely {
@@ -934,7 +934,7 @@ local int votdc_shmwriter(votdc *op,time_t dt,int fd,votdchdr *hdrp,
 	            foff += rs ;
 		    size = VOTDC_MUSIZE ;
 		    hdrp->muoff = foff ;
-		    hdrp->musize = size ;
+		    hdrp->musz = size ;
 		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
@@ -964,7 +964,7 @@ local int votdc_shmwriter(votdc *op,time_t dt,int fd,votdchdr *hdrp,
 	            foff += rs ;
 		    size = szof(shmalloc) ;
 		    hdrp->balloff = foff ;
-		    hdrp->ballsize = size ;
+		    hdrp->ballsz = size ;
 		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
@@ -974,7 +974,7 @@ local int votdc_shmwriter(votdc *op,time_t dt,int fd,votdchdr *hdrp,
 	            foff += rs ;
 		    size = szof(shmalloc) ;
 		    hdrp->valloff = foff ;
-		    hdrp->vallsize = size ;
+		    hdrp->vallsz = size ;
 		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
@@ -1000,14 +1000,14 @@ local int votdc_shmwriter(votdc *op,time_t dt,int fd,votdchdr *hdrp,
 	        }
 	    } /* end if (ok) */
 	    if (rs >= 0) {
-		size = iceil(foff,op->pagesize) - foff ;
+		size = iceil(foff,op->pagesz) - foff ;
 		rs = filer_writezero(sfp,size) ;
 	        foff += rs ;
 	    } /* end if (ok) */
 	    rs1 = filer_finish(sfp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
-	hdrp->shmsize = foff ;
+	hdrp->shmsz = foff ;
 	return (rs >= 0) ? foff : rs ;
 } /* end subroutine (votdc_shmwriter) */
 
@@ -1083,7 +1083,7 @@ local int votdc_shmchown(votdc *op) noex {
 
 local int votdc_verify(votdc *op) noex {
 	votdchdr	*hdrp = &op->hdr ;
-	uint		ushmsz = int(op->shmsize) ;;
+	uint		ushmsz = int(op->shmsz) ;
 	int		rs = SR_OK ;
 	int		sz ;
 	bool		f = true ;
@@ -1101,13 +1101,13 @@ local int votdc_verify(votdc *op) noex {
 	f = f && (hdrp->bstroff < ushmsz) ;
 	f = f && (hdrp->vstroff > 0) ;
 	f = f && (hdrp->vstroff < ushmsz) ;
-	f = f && ((hdrp->muoff + hdrp->musize) < ushmsz) ;
+	f = f && ((hdrp->muoff + hdrp->musz) < ushmsz) ;
 	sz = szof(votdc_book) ;
 	f = f && ((hdrp->bookoff + (hdrp->booklen * sz)) < ushmsz) ;
 	sz = szof(votdc_verse) ;
 	f = f && ((hdrp->recoff + (hdrp->reclen * sz)) < ushmsz) ;
-	f = f && ((hdrp->balloff + hdrp->ballsize) < ushmsz) ;
-	f = f && ((hdrp->valloff + hdrp->vallsize) < ushmsz) ;
+	f = f && ((hdrp->balloff + hdrp->ballsz) < ushmsz) ;
+	f = f && ((hdrp->valloff + hdrp->vallsz) < ushmsz) ;
 	f = f && ((hdrp->bstroff + hdrp->blenstr) < ushmsz) ;
 	f = f && ((hdrp->vstroff + hdrp->vlenstr) < ushmsz) ;
 	if (! f) rs = SR_BADFMT ;
@@ -1629,7 +1629,7 @@ local int titlecache_release(VOTDC_TC *tcp) noex {
 vars::operator int () noex {
     	int		rs ;
 	if ((rs = ucpagesize) >= 0) nlikely {
-	    pagesize = rs ;
+	    pagesz = rs ;
 	    if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 		maxnamelen = rs ;
 		hdrbuflen = (szof(votdchdr) + maxnamelen) ;
