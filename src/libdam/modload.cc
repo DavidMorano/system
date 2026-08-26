@@ -757,19 +757,19 @@ vars::operator int () noex {
 
 int modload::open(cc *apr,cc *afn,cc *amn,int mo,mv ms) noex {
 	return modload_open(this,apr,afn,amn,mo,ms) ;
-}
+} /* end method */
 
 int modload::getmv(int vi) noex {
 	return modload_getmv(this,vi) ;
-}
+} /* end method */
 
 int modload::getmva(int *mva,int mvn) noex {
 	return modload_getmva(this,mva,mvn) ;
-}
+} /* end method */
 
 int modload::getsym(cchar *symname,cvoid **vpp) noex {
 	return modload_getsym(this,symname,vpp) ;
-}
+} /* end method */
 
 void modload::dtor() noex {
 	if (cint rs = close ; rs < 0) {
