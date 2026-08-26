@@ -235,7 +235,7 @@ int xwords::start(cchar *wbuf,int wlen) noex {
 
 int xwords::get(int i,cchar **rpp) noex {
 	return xwords_get(this,i,rpp) ;
-}
+} /* emd method */
 
 void xwords::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
