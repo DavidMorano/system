@@ -112,7 +112,7 @@ local int keysymer_dtor(keysymer *op) noex {
 	    if (op->mlp) ylikely {
 		delete op->mlp ;
 		op->mlp = nullptr ;
-	    }
+	    } /* end if (delete-mapstrint) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (keysymer_dtor) */
@@ -149,12 +149,12 @@ constexpr int		keylen = KEYSYMER_NAMELEN ;
 int keysymer_open(keysymer *op,cchar *pr) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = keysymer_ctor(op,pr)) >= 0) {
+	if ((rs = keysymer_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0]) {
+	    if (pr[0]) ylikely {
 		cint	ne = 20 ;
-	        if ((rs = mapstrint_start(op->mlp,ne)) >= 0) {
-	            if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) {
+	        if ((rs = mapstrint_start(op->mlp,ne)) >= 0) ylikely {
+	            if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) ylikely {
 		        if (S_ISDIR(sb.st_mode)) {
 	        	    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
 		                cchar	*idn = KS_INCDNAME ;
@@ -186,7 +186,7 @@ int keysymer_open(keysymer *op,cchar *pr) noex {
 int keysymer_close(keysymer *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = keysymer_magic(op)) >= 0) {
+	if ((rs = keysymer_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = keysymer_finishthem(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -206,7 +206,7 @@ int keysymer_close(keysymer *op) noex {
 
 int keysymer_count(keysymer *op) noex {
 	int		rs ;
-	if ((rs = keysymer_magic(op)) >= 0) {
+	if ((rs = keysymer_magic(op)) >= 0) ylikely {
 	    rs = mapstrint_count(op->mlp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -215,7 +215,7 @@ int keysymer_count(keysymer *op) noex {
 int keysymer_lookup(keysymer *op,cchar *kp,int kl) noex {
 	int		rs ;
 	int		v = 0 ;
-	if ((rs = keysymer_magic(op,kp)) >= 0) {
+	if ((rs = keysymer_magic(op,kp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (kp[0]) {
 	        char	knbuf[keylen + 1] ;
@@ -232,7 +232,7 @@ int keysymer_lookup(keysymer *op,cchar *kp,int kl) noex {
 
 int keysymer_curbegin(keysymer *op,keysymer_cur *curp) noex {
 	int		rs ;
-	if ((rs = keysymer_magic(op,curp)) >= 0) {
+	if ((rs = keysymer_magic(op,curp)) >= 0) ylikely {
 	    rs = mapstrint_curbegin(op->mlp,&curp->c) ;
 	} /* end if (magic) */
 	return rs ;
@@ -240,7 +240,7 @@ int keysymer_curbegin(keysymer *op,keysymer_cur *curp) noex {
 
 int keysymer_curend(keysymer *op,keysymer_cur *curp) noex {
 	int		rs ;
-	if ((rs = keysymer_magic(op,curp)) >= 0) {
+	if ((rs = keysymer_magic(op,curp)) >= 0) ylikely {
 	    rs = mapstrint_curend(op->mlp,&curp->c) ;
 	} /* end if (magic) */
 	return rs ;
@@ -249,7 +249,7 @@ int keysymer_curend(keysymer *op,keysymer_cur *curp) noex {
 int keysymer_curenum(keysymer *op,keysymer_cur *curp,keysymer_ke *rp) noex {
 	int		rs ;
 	int		sl = 0 ;
-	if ((rs = keysymer_magic(op,curp,rp)) >= 0) {
+	if ((rs = keysymer_magic(op,curp,rp)) >= 0) ylikely {
 	    int		v ;
 	    cchar	*sp = nullptr ;
 	    rp->keynum = 0 ;
@@ -297,8 +297,7 @@ local int keysymer_parse(keysymer *op,cchar *fname) noex {
 	    } /* end if (open-file) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (keysymer_parse) */
+} /* end subroutine (keysymer_parse) */
 
 local int keysymer_parseln(keysymer *op,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
