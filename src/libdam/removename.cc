@@ -114,7 +114,7 @@ namespace {
 
 extern "C" {
     local int	remover_co(cchar *,ustat *,void *) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
