@@ -57,7 +57,7 @@ struct dayspec : dayspec_head {
 	dayspec() noex {
 	    def		(this,dayspecmem_def) ;
 	    yday	(this,dayspecmem_yday) ;
-	} ;
+	} ; /* end ctor */
 	dayspec(const dayspec &) = delete ;
 	dayspec &operator = (const dayspec &) = delete ;
 	int load	(cchar *,int = -1) noex ;
