@@ -1475,15 +1475,15 @@ void userinfo::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("userinfo",rs,"fini-finish") ;
 	}
-} /* end subroutine (useirnfo::dtor) */
+} /* end method (useirnfo::dtor) */
 
 userinfo_cos::operator int () noex {
 	return userinfo_start(op,nullptr) ;
-}
+} /* end method */
 
 int userinfo_cos::operator () (cchar *un) noex {
 	return userinfo_start(op,un) ;
-}
+} /* end method */
 
 userinfo_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
