@@ -407,8 +407,7 @@ int systems_check(systems *op,time_t dt) noex {
 	    } /* end if (needed) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (systems_check) */
+} /* end subroutine (systems_check) */
 
 
 /* private subroutines */
