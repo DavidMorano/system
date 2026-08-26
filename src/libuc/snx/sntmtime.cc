@@ -22,7 +22,7 @@
 
 	Description:
 	Ths subroutine is similar to |sncpy1(3uc)| but it takes a
-	broken-out time-specification (a la object TMTIME) and
+	broken-out time-specification (a la object |tmtime|) and
 	creates the corresponding string in the destination buffer.
 	A format specifiction is supplied to determine what the
 	resulting string looks like.  A format string is a string
@@ -31,12 +31,12 @@
 	list of the format-codes.
 
 	Synopsis:
-	int sntmtime(char *dbuf,int dlen,TMTIME *tmp,cchar *fmt) noex
+	int sntmtime(char *dbuf,int dlen,tmtime *tmp,cchar *fmt) noex
 
 	Arguments:
 	dbuf		destination string buffer
 	dlen		destination string buffer length
-	tmp		pointer to TMTIME object
+	tmp		pointer to |tmtime| object
 	fmt		format string
 
 	Returns:
