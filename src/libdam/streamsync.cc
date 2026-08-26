@@ -153,11 +153,11 @@ int streamsync_test(streamsync *op,int ch) noex {
 
 int streamsync::start(cchar *stp,int stl) noex {
 	return streamsync_start(this,stp,stl) ;
-}
+} /* emd method */
 
 int streamsync::test(int ch) noex {
 	return streamsync_test(this,ch) ;
-}
+} /* emd method */
 
 void streamsync::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
