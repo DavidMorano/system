@@ -45,8 +45,13 @@ OBJ1= ucsockreuse.o
 OBJ2= ucsockprime.o uckeepalive.o uclinger.o
 OBJ3= ucsockrecve.o ucsockrecvfrome.o
 
+OBJ4= ucrecvmsge.o
+OBJ5=
+OBJ6=
+OBJ7=
+
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB=
+OBJB= obj4.o
 
 OBJ= obja.o
 
@@ -142,5 +147,6 @@ ucsockrecve.o:		ucsockrecve.cc			$(INCS)
 ucsockrecvfrome.o:	ucsockrecvfrome.cc		$(INCS)
 uckeepalive.o:		uckeepalive.cc			$(INCS)
 uclinger.o:		uclinger.cc			$(INCS)
+ucrecvmsge.o:		ucrecvmsge.cc	ucrecvmsge.h	$(INCS)
 
 
