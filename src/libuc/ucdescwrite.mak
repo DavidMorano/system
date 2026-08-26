@@ -43,22 +43,21 @@ LIBS +=
 OBJ0= ucwrite.o
 OBJ1= ucwritedesc.o
 OBJ2= ucwritefile.o
-OBJ3= 
+OBJ3= ucwritable.o
 
 OBJ4= 
 OBJ5= 
 OBJ6= 
 OBJ7= 
 
-OBJA= obj0.o obj1.o obj2.o 
+OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= 
 
 OBJ= obja.o 
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -155,5 +154,6 @@ objb.o:			$(OBJB)
 ucwrite.o:		ucwrite.cc	ucwrite.h		$(INCS)
 ucwritedesc.o:		ucwritedesc.cc	ucwritedesc.h		$(INCS)
 ucwritefile.o:		ucwritefile.cc	ucwritefile.h		$(INCS)
+ucwritable.o:		ucwritable.cc	ucwritable.h		$(INCS)
 
 
