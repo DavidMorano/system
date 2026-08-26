@@ -25,21 +25,21 @@
 
 
 enum votdchdrhs {
-	votdchdrh_shmsize,
+	votdchdrh_shmsz,
 	votdchdrh_wtime,
 	votdchdrh_atime,
 	votdchdrh_wcount,		/* write count */
 	votdchdrh_acount,		/* access count */
 	votdchdrh_muoff,		/* MUTEX offset */
-	votdchdrh_musize,
+	votdchdrh_musz,
 	votdchdrh_bookoff,		/* book table */
 	votdchdrh_booklen,		
 	votdchdrh_recoff,		/* verse (record) table */
 	votdchdrh_reclen,		
 	votdchdrh_balloff,		/* SHM allocator (for books) */
-	votdchdrh_ballsize,
+	votdchdrh_ballsz,
 	votdchdrh_valloff,		/* SHM allocator (for verses) */
-	votdchdrh_vallsize,
+	votdchdrh_vallsz,
 	votdchdrh_bstroff,		/* book-name string table */
 	votdchdrh_blenstr,
 	votdchdrh_vstroff,		/* verse string table */
@@ -48,21 +48,21 @@ enum votdchdrhs {
 } ; /* end enum */
 
 struct votdchdr_head {
-	uint		shmsize ;
+	uint		shmsz ;
 	uint		wtime ;
 	uint		atime ;
 	uint		wcount ;	/* write count */
 	uint		acount ;	/* access count */
 	uint		muoff ;		/* MUTEX offset */
-	uint		musize ;
+	uint		musz ;
 	uint		bookoff ;	/* book table */
 	uint		booklen ;
 	uint		recoff ;	/* record (verse) table */
 	uint		reclen ;
 	uint		balloff ;	/* book SHM allocator object */
-	uint		ballsize ;
+	uint		ballsz ;
 	uint		valloff ;	/* verse SHM allocator object */
-	uint		vallsize ;
+	uint		vallsz ;
 	uint		bstroff ;	/* book-name string table (aligned) */
 	uint		blenstr ;
 	uint		vstroff ;	/* verse string table (aligned) */
