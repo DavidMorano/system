@@ -109,7 +109,7 @@ struct vecsorthand : vecsorthand_head {
 	    del		(this,vecsorthandmem_del) ;
 	    finish	(this,vecsorthandmem_finish) ;
 	    va = nullptr ;
-	} ;
+	} ; /* end ctor */
 	vecsorthand(const vecsorthand &) = delete ;
 	vecsorthand &operator = (const vecsorthand &) = delete ;
 	int start(vecsorthand_cmpf,int = 0) noex ;
@@ -120,16 +120,16 @@ struct vecsorthand : vecsorthand_head {
 	vecsorthand_iter begin() noex {
 	    vecsorthand_iter	it(va,0,i) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	vecsorthand_iter end() noex {
 	    vecsorthand_iter	it(va,i,i) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	void dtor() noex ;
 	operator int () noex ;
 	destruct vecsorthand() {
 	    if (va) dtor() ;
-	} ;
+	} ; /* end destruct */
 } ; /* end struct (vecsorthand) */
 #else	/* __cplusplus */
 typedef VECSORTHAND		vecsorthand ;
