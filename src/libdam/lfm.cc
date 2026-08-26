@@ -113,7 +113,7 @@ using libuc::mem ;			/* variable */
 
 extern "C" {
     extern int	fmtstr(char *,int,int,cchar *,va_list) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -222,27 +222,27 @@ int lfm_start(lfm *op,cc *fname,int type,int to,lfm_ch *lcp,
 		cc *nn,cc *un,cc *bn) noex {
 	int		rs ;
 	if (to < 0) to = LFM_TOLOCK ;
-	if ((rs = lfm_ctor(op,fname)) >= 0) {
-	    if ((rs = ucpid) >= 0) {
+	if ((rs = lfm_ctor(op,fname)) >= 0) ylikely {
+	    if ((rs = ucpid) >= 0) ylikely {
 		op->pid = rs ;
 	        op->type = type ;
 	        op->tolock = to ;
 	        rs = SR_INVALID ;
 	        if (fname[0] && (type >= 0) && (type < LFM_TOVERLAST)) {
-		    if ((rs = lfm_fnbegin(op,fname)) >= 0) {
+		    if ((rs = lfm_fnbegin(op,fname)) >= 0) ylikely {
 			{
 	            	    starter	so(op,lcp,nn,un,bn) ;
 		    	    rs = so ;
 			}
 			if (rs < 0) {
 			    lfm_fnend(op) ;
-			}
+			} /* end if (error) */
 		    } /* end if (lfm_fnbegin) */
 	        } /* end if (valid) */
 	    } /* end if (ucpid) */
 	    if (rs < 0) {
 		lfm_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (lfm_ctor) */
 	return rs ;
 } /* end subroutine (lfm_start) */
@@ -250,13 +250,13 @@ int lfm_start(lfm *op,cc *fname,int type,int to,lfm_ch *lcp,
 starter::operator int () noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-	if ((rs = check_init(lcp)) >= 0) {
-	    if ((rs = allocbegin()) >= 0) {
+	if ((rs = check_init(lcp)) >= 0) ylikely {
+	    if ((rs = allocbegin()) >= 0) ylikely {
 	        {
 		    rs = opener() ;
 		    if (rs < 0) {
 	    	        if (lcp) lfm_lockload(op,lcp) ;
-		    }
+		    } /* end if (error) */
 	        }
 	        rs1 = allocend() ;
 	        if (rs >= 0) rs = rs1 ;
@@ -268,14 +268,14 @@ starter::operator int () noex {
 int starter::allocbegin() noex {
     	int		rs = SR_OK ;
 	if ((rs >= 0) && (nn == nullptr)) {
-	    if ((rs = mem.nn(&nnbuf)) >= 0) {
+	    if ((rs = mem.nn(&nnbuf)) >= 0) ylikely {
 		nnlen = rs ;
 	        nn = nnbuf ;
 	        rs = getnodename(nnbuf,nnlen) ;
 	    } /* end if (memory-acquire) */
 	}
 	if ((rs >= 0) && (un == nullptr)) {
-	    if ((rs = mem.un(&unbuf)) >= 0) {
+	    if ((rs = mem.un(&unbuf)) >= 0) ylikely {
 		unlen = rs ;
 	        un = unbuf ;
 	        rs = getusername(unbuf,unlen,-1) ;
@@ -308,8 +308,8 @@ int starter::opener() noex {
 	cchar		*fn = op->lfname ;
 	cchar		*dnp{} ;
 	if (int dnl ; (dnl = sfdirname(fn,-1,&dnp)) > 0) {
-            if (char *dbuf{} ; (rs = mem.mp(&dbuf)) >= 0) {
-                if ((rs = mkpath1w(dbuf,dnp,dnl)) >= 0) {
+            if (char *dbuf ; (rs = mem.mp(&dbuf)) >= 0) ylikely {
+                if ((rs = mkpath1w(dbuf,dnp,dnl)) >= 0) ylikely {
                     lfm_lin	li{} ;
                     custime 	dt = getustime ;
                     cint    	rsn = SR_NOENT ;
@@ -339,7 +339,7 @@ int starter::opener() noex {
 int lfm_finish(lfm *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = lfm_magic(op)) >= 0) {
+	if ((rs = lfm_magic(op)) >= 0) ylikely {
 	    if (op->lfd >= 0) {
 	        rs1 = u_close(op->lfd) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -360,7 +360,7 @@ int lfm_finish(lfm *op) noex {
 
 int lfm_setpoll(lfm *op,int tocheck) noex {
     	int		rs ;
-	if ((rs = lfm_magic(op)) >= 0) {
+	if ((rs = lfm_magic(op)) >= 0) ylikely {
 	    op->tocheck = tocheck ;
 	} /* end if (magic) */
 	return rs ;
@@ -368,7 +368,7 @@ int lfm_setpoll(lfm *op,int tocheck) noex {
 
 int lfm_getinfo(lfm *op,lfm_in *ip) noex {
     	int		rs ;
-	if ((rs = lfm_magic(op,ip)) >= 0) {
+	if ((rs = lfm_magic(op,ip)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (op->lfname) {
 		rs = SR_OK ;
@@ -382,10 +382,10 @@ int lfm_getinfo(lfm *op,lfm_in *ip) noex {
 
 int lfm_check(lfm *op,lfm_ch *cip,time_t dt) noex {
 	int		rs ;
-	if ((rs = lfm_magic(op)) >= 0) {
+	if ((rs = lfm_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
-	    if (op->lfname) {
-		if ((rs = check_init(cip)) >= 0) {
+	    if (op->lfname) ylikely {
+		if ((rs = check_init(cip)) >= 0) ylikely {
 	            if (op->tocheck >= 0) {
 	                if (dt == 0) dt = getustime ;
 	                if ((dt - op->ti_check) >= op->tocheck) {
@@ -408,7 +408,7 @@ int lfm_check(lfm *op,lfm_ch *cip,time_t dt) noex {
 	                    if ((rs < 0) && cip) {
 	                        lfm_lockload(op,cip) ;
 	                        cip->status = rs ;
-	                    }
+	                    } /* end if (error) */
 	                } /* end if */
 	            } /* end if (time-out enabled) */
 		} /* end if (check_init) */
@@ -422,7 +422,7 @@ int lfm_printf(lfm *op,cchar *fmt,...) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = lfm_magic(op,fmt)) >= 0) {
+	if ((rs = lfm_magic(op,fmt)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (op->lfname) {
 		rs = SR_OK ;
@@ -456,7 +456,7 @@ int lfm_printf(lfm *op,cchar *fmt,...) noex {
 
 int lfm_rewind(lfm *op) noex {
     	int		rs ;
-	if ((rs = lfm_magic(op)) >= 0) {
+	if ((rs = lfm_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (op->lfname) {
 		op->owrite = op->orewind ;
@@ -467,7 +467,7 @@ int lfm_rewind(lfm *op) noex {
 
 int lfm_flush(lfm *op) noex {
 	int		rs ;
-	if ((rs = lfm_magic(op)) >= 0) {
+	if ((rs = lfm_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (op->lfname) {
 		rs = SR_OK ;
@@ -478,7 +478,7 @@ int lfm_flush(lfm *op) noex {
 
 int lfm_getpid(lfm *op,pid_t *rp) noex {
 	int		rs ;
-	if ((rs = lfm_magic(op)) >= 0) {
+	if ((rs = lfm_magic(op)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (op->lfname) {
 		rs = SR_OK ;
@@ -591,7 +591,7 @@ local int lfm_lockload(lfm *op,lfm_ch *lcp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = check_init(lcp)) > 0) {
-	    if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
+	    if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) ylikely {
 	        cint	llen = rs ;
 	        cint	of = O_RDONLY ;
 	        cmode	om = 0666 ;
@@ -693,7 +693,7 @@ local int lfm_locklost(lfm *op,lfm_ch *lcp,filer *fp) noex {
 	int		rs1 ;
 	if (lcp && fp) {
 	    lcp->pid = op->pid_lock ;
-	    if (linebuffer lb ; (rs = lb.start) >= 0) {
+	    if (linebuffer lb ; (rs = lb.start) >= 0) ylikely {
 	        if (storeitem cb ; (rs = cb.start(lcp->buf,buflen)) >= 0) {
 		    parser	po(op,lcp,&lb,&cb) ;
 	            if ((rs = fp->readln(lb.lbuf,lb.llen,0)) > 0) {
@@ -717,9 +717,9 @@ local int lfm_locklost(lfm *op,lfm_ch *lcp,filer *fp) noex {
 
 local int lfm_lockwrite(lfm *op,lfm_lin *lip,int lfd) noex {
 	int		rs ;
-	if ((rs = lfm_lockwriter(op,lip,lfd)) >= 0) {
+	if ((rs = lfm_lockwriter(op,lip,lfd)) >= 0) ylikely {
 	    coff	woff = rs ;
-	    if ((rs = uc_ftruncate(lfd,woff)) >= 0) {
+	    if ((rs = uc_ftruncate(lfd,woff)) >= 0) ylikely {
 	        op->owrite = woff ;
 	        op->orewind = woff ;
 	        rs = int(woff) ;
@@ -732,7 +732,7 @@ local int lfm_lockwriter(lfm *op,lfm_lin *lip,int lfd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		woff = 0 ;
-	if (filer b ; (rs = b.start(lfd,0z,512,0)) >= 0) {
+	if (filer b ; (rs = b.start(lfd,0z,512,0)) >= 0) ylikely {
 	    if (rs >= 0) {
 	        rs = b.printf("%u\n",op->pid) ;
 	        woff += rs ;
@@ -756,17 +756,16 @@ local int lfm_lockwriter(lfm *op,lfm_lin *lip,int lfd) noex {
 } /* end subroutine (lfm_lockwriter) */
 
 local int lfm_lockreadpid(lfm *op) noex {
-    	cnullptr	np{} ;
 	cint		lfd = op->lfd ;
 	int		rs ;
 	int		rs1 ;
 	int		v = 0 ; /* return-value */
-	if ((rs = u_rewind(lfd)) >= 0) {
-	    if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
+	if ((rs = u_rewind(lfd)) >= 0) ylikely {
+	    if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) ylikely {
 	        cint	llen = rs ;
-	        if ((rs = u_read(lfd,lbuf,llen)) >= 0) {
+	        if ((rs = u_read(lfd,lbuf,llen)) > 0) ylikely {
 	            int		len = rs ;
-	            if (cchar *tp ; (tp = strnchr(lbuf,len,'\n')) != np) {
+	            if (cchar *tp = strnchr(lbuf,len,'\n') ; tp) {
 			len = intconv(tp - lbuf) ;
 	            }
 	            rs = cfdeci(lbuf,len,&v) ;
@@ -781,7 +780,7 @@ local int lfm_lockreadpid(lfm *op) noex {
 
 local int lfm_lockwritedate(lfm *op,time_t dt) noex {
 	int		rs ;
-	if ((rs = u_seek(op->lfd,op->odate,SEEK_SET)) >= 0) {
+	if ((rs = u_seek(op->lfd,op->odate,SEEK_SET)) >= 0) ylikely {
 	    int		tl ;
 	    char	tbuf[TIMEBUFLEN+2] ;
 	    timestr_logz(dt,tbuf) ;
@@ -821,14 +820,14 @@ local int lfm_checklock(lfm *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		v = 0 ;
-	if ((rs = lfm_lockbegin(op)) >= 0) {
+	if ((rs = lfm_lockbegin(op)) >= 0) ylikely {
 	    bool	f_open = (rs > 0) ;
-	    if ((rs = lfm_lockreadpid(op)) >= 0) {
+	    if ((rs = lfm_lockreadpid(op)) >= 0) ylikely {
 	        const pid_t	pid_lock = rs ;
 	        if (pid_lock != op->pid)  {
 	            rs = SR_LOCKFAIL ;
 	        }
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            v = pid_lock ;
 	            rs = lfm_lockwritedate(op,dt) ;
 	        }
@@ -851,8 +850,8 @@ local int lfm_ourdevino(lfm *op,USTAT *sbp) noex {
 
 local int check_init(lfm_ch *lcp) noex {
     	int		rs = SR_OK ;
-	if (lcp) {
-	    rs = 1 ;
+	if (lcp) ylikely {
+	    rs = 1 ; /* <- return */
 	    memclear(lcp) ;
 	    lcp->nodename = nullptr ;
 	    lcp->username = nullptr ;
