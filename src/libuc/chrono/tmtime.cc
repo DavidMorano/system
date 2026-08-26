@@ -214,7 +214,7 @@ int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	int		rs ;
 	if ((rs = tmtime_zinit(op,tmp)) >= 0) ylikely {
 	    TM		tc = *tmp ;
-	    op->gmtoff = -1 ;
+	    op->gmtoff	= -1 ;
 	    op->sec	= tmp->tm_sec ;
 	    op->min	= tmp->tm_min ;
 	    op->hour	= tmp->tm_hour ;
