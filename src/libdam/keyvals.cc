@@ -175,12 +175,12 @@ local int	entry_finish(ENT *) noex ;
 
 extern "C" {
     static uint	hashent(cvoid *,int) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     local int	vcmpkey(cvoid **,cvoid **) noex ;
     local int	cmpent(cvoid *,cvoid *,int) noex ;
-}
+} /* end extern (C) */
 
 constexpr bool		f_comment = false ;
 
@@ -199,11 +199,11 @@ int keyvals_start(keyvals *op,int ndef) noex {
 	if (ndef < KEYVALS_DEFENTS) {
 	    ndef = KEYVALS_DEFENTS ;
 	}
-	if ((rs = keyvals_ctor(op)) >= 0) {
+	if ((rs = keyvals_ctor(op)) >= 0) ylikely {
 	    cint	sz = szof(KEYVALS_KEY) ;
 	    cint	vn = (ndef / 10) ;
 	    cint	vo = (vecobjm.stationary | vecobjm.reuse) ;
-	    if ((rs = vecobj_start(op->keyp,sz,vn,vo)) >= 0) {
+	    if ((rs = vecobj_start(op->keyp,sz,vn,vo)) >= 0) ylikely {
 	        if ((rs = hdb_start(op->bykeyp,ndef,0,np,np)) >= 0) {
 	            auto	hk = hashent ;
 	            auto	cmp = cmpent ;
@@ -228,7 +228,7 @@ int keyvals_start(keyvals *op,int ndef) noex {
 int keyvals_finish(keyvals *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = keyvals_magic(op)) >= 0) {
+	if ((rs = keyvals_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = keyvals_finents(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -263,7 +263,7 @@ int keyvals_add(keyvals *op,int fi,cc *kp,cc *vp,int vl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		cadd = 0 ;
-	if ((rs = keyvals_magic(op,kp,vp)) >= 0) {
+	if ((rs = keyvals_magic(op,kp,vp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (*kp) {
 	        if (vl < 0) vl = lenstr(vp) ;
@@ -298,7 +298,7 @@ int keyvals_already(keyvals *op,cc *kp,int kl) noex {
 
 int keyvals_count(keyvals *op) noex {
 	int		rs ;
-	if ((rs = keyvals_magic(op)) >= 0) {
+	if ((rs = keyvals_magic(op)) >= 0) ylikely {
 	    rs = hdb_count(op->bykeyp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -306,7 +306,7 @@ int keyvals_count(keyvals *op) noex {
 
 int keyvals_curbegin(keyvals *op,keyvals_cur *curp) noex {
 	int		rs ;
-	if ((rs = keyvals_magic(op,curp)) >= 0) {
+	if ((rs = keyvals_magic(op,curp)) >= 0) ylikely {
 	    cint	osz = szof(hdb_cur) ;
 	    curp->i = -1 ;
 	    if (void *vp{} ; (rs = mem.mall(osz,&vp)) >= 0) {
@@ -371,7 +371,7 @@ int keyvals_curenumkey(keyvals *op,CUR *curp,cchar **kpp) noex {
 int keyvals_curenum(keyvals *op,CUR *curp,cchar **kpp,cchar **vpp) noex {
 	int		rs ;
 	int		kl = 0 ;
-	if ((rs = keyvals_magic(op,curp)) >= 0) {
+	if ((rs = keyvals_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (curp->ecp) {
 	        hdb_dat		key ;
@@ -402,7 +402,7 @@ int keyvals_curenum(keyvals *op,CUR *curp,cchar **kpp,cchar **vpp) noex {
 int keyvals_fetch(keyvals *op,cchar *kp,CUR *curp,cchar **vpp) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if ((rs = keyvals_magic(op,kp,curp)) >= 0) {
+	if ((rs = keyvals_magic(op,kp,curp)) >= 0) ylikely {
 	    rs = SR_BUGCHECK ;
 	    if (curp->ecp) {
 	        hdb_dat		key ;
@@ -430,7 +430,7 @@ int keyvals_delset(keyvals *op,int fi) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = keyvals_magic(op)) >= 0) {
+	if ((rs = keyvals_magic(op)) >= 0) ylikely {
 	    hdb_cur	cur ; /* used multiple blocks */
 	    hdb_dat	key ; /* used multiple blocks */
 	    hdb_dat	val ; /* used multiple blocks */
@@ -470,8 +470,8 @@ int keyvals_delkey(keyvals *op,cchar *kp,int kl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = keyvals_magic(op,kp)) >= 0) {
-	    if ((rs = keyvals_keyhave(op,kp,kl,np)) >= 0) {
+	if ((rs = keyvals_magic(op,kp)) >= 0) ylikely {
+	    if ((rs = keyvals_keyhave(op,kp,kl,np)) >= 0) ylikely {
 	        hdb		*bykeyp = op->bykeyp ;
 	        hdb_cur		cur ; /* used in multiple blocks (below) */
 	        hdb_dat		key ; /* used multiple blocks */
