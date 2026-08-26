@@ -26,15 +26,6 @@
 #define	SVCBUFLEN		32
 #endif
 
-#define	VOTDC_MAGIC		0x43628190
-#define	VOTDC_DEFLANG		"english"
-#define	VOTDC_LANGLEN		SVCBUFLEN
-#define	VOTDC_NTITLES		(66+1)
-#define	VOTDC_NLANGS		4
-#define	VOTDC_NBOOKS		4
-#define	VOTDC_NVERSES		20
-#define	VOTDC_BSTRSIZE		(VOTDC_NBOOKS*VOTDC_NTITLES*30)
-#define	VOTDC_VSTRSIZE		(VOTDC_NVERSES*320)
 #define	VOTDC			struct votdc_head
 #define	VOTDC_FL		struct votdc_flags
 #define	VOTDC_OBJ		struct votdc_object
@@ -45,6 +36,15 @@
 #define	VOTDC_Q			struct votdc_citation
 #define	VOTDC_TC		struct votdc_titlecache
 #define	VOTDC_VCUR		struct votdc_vcursor
+#define	VOTDC_MAGIC		0x43628190
+#define	VOTDC_DEFLANG		"english"
+#define	VOTDC_LANGLEN		SVCBUFLEN
+#define	VOTDC_NTITLES		(66+1)
+#define	VOTDC_NLANGS		4
+#define	VOTDC_NBOOKS		4
+#define	VOTDC_NVERSES		20
+#define	VOTDC_BSTRSIZE		(VOTDC_NBOOKS*VOTDC_NTITLES*30)
+#define	VOTDC_VSTRSIZE		(VOTDC_NVERSES*320)
 
 
 struct votdc_object {
