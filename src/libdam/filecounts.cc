@@ -197,7 +197,7 @@ local int	cmpoff(WKR_ENT *,WKR_ENT *) noex ;
 
 extern "C" {
     local int	vcmpoff(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
