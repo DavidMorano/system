@@ -53,7 +53,7 @@
 	d		1-31
 
 	Synopsis:
-	int dayspec_def(dayspec *op) noex
+	int dayspec_def	(dayspec *op) noex
 	int dayspec_load(dayspec *op,cchar *sp,int sl) noex
 	int dayspec_yday(dayspec *op) noex
 
