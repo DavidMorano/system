@@ -69,10 +69,10 @@
 
 local bool isxu(cmode fm) noex {
     	return (fm & S_IXUSR) && (fm & S_ISUID) ;
-}
+} /* end */
 local bool isxg(cmode fm) noex {
     	return (fm & S_IXGRP) && (fm & S_ISGID) ;
-}
+} /* end */
 
 
 /* local variables */
@@ -86,10 +86,10 @@ local bool isxg(cmode fm) noex {
 int securefile(cchar *name,uid_t euid,gid_t egid) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ; /* return-value */
-	if (name) {
+	if (name) ylikely {
 	    rs = SR_INVALID ;
-	    if (name[0]) {
-	        if (ustat sb ; (rs = u_stat(name,&sb)) >= 0) {
+	    if (name[0]) ylikely {
+	        if (ustat sb ; (rs = u_stat(name,&sb)) >= 0) ylikely {
 	            cmode fm = sb.st_mode ;
 	            f = f || ((sb.st_uid == euid) && isxu(fm)) ;
 	            f = f || ((sb.st_gid == egid) && isxg(fm)) ;
