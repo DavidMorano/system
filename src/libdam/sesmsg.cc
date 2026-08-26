@@ -58,7 +58,7 @@ local int sesmsger_mbuf(SESMSG_MBUF *,int,int,char *,int) noex ;
 
 local uchar mktype(int ch) noex {
     	return uchar(ch & UCHAR_MAX) ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -72,7 +72,7 @@ local uchar mktype(int ch) noex {
 int sesmsger_exit(SESMSG_EXIT *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -100,7 +100,7 @@ int sesmsger_exit(SESMSG_EXIT *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_noop(SESMSG_NOOP *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -144,7 +144,7 @@ int sesmsger_echo(SESMSG_ECHO *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_response(SESMSG_RESPONSE *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -174,7 +174,7 @@ int sesmsger_response(SESMSG_RESPONSE *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_passfd(SESMSG_PASSFD *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -203,7 +203,7 @@ int sesmsger_passfd(SESMSG_PASSFD *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_getsysmisc(SESMSG_GETSYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -229,7 +229,7 @@ int sesmsger_getsysmisc(SESMSG_GETSYSMISC *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_sysmisc(SESMSG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -267,7 +267,7 @@ int sesmsger_sysmisc(SESMSG_SYSMISC *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_getloadave(SESMSG_GETLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -293,7 +293,7 @@ int sesmsger_getloadave(SESMSG_GETLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_loadave(SESMSG_LOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -327,7 +327,7 @@ int sesmsger_loadave(SESMSG_LOADAVE *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_reploadave(SESMSG_REPLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -368,10 +368,11 @@ int sesmsger_reploadave(SESMSG_REPLOADAVE *sp,int f,char *mbuf,int mlen) noex {
 	return rs ;
 } /* end subroutine (sesmsg_reploadave) */
 
-int sesmsger_getlistener(SESMSG_GETLISTENER *sp,int f,char *mbuf,int mlen) noex {
+int sesmsger_getlistener(SESMSG_GETLISTENER *sp,int f,
+		char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -437,7 +438,7 @@ int sesmsger_listener(SESMSG_LISTENER *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_mark(SESMSG_MARK *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -463,7 +464,7 @@ int sesmsger_mark(SESMSG_MARK *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_unknown(SESMSG_UNKNOWN *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -487,7 +488,7 @@ int sesmsger_unknown(SESMSG_UNKNOWN *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_gethelp(SESMSG_GETHELP *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -515,7 +516,7 @@ int sesmsger_gethelp(SESMSG_GETHELP *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_help(SESMSG_HELP *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -550,7 +551,7 @@ int sesmsger_help(SESMSG_HELP *sp,int f,char *mbuf,int mlen) noex {
 int sesmsger_cmd(SESMSG_CMD *sp,int f,char *mbuf,int mlen) noex {
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&mb,&hdr) ;
@@ -583,7 +584,7 @@ local int sesmsger_mbuf(SESMSG_MBUF *sp,int mt,int f,char *mbuf,int mlen) noex {
 	cint		ulen = SESMSG_USERLEN ;
 	int		rs ;
 	int		rs1 ;
-	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) {
+	if (serialbuf mb ; (rs = mb.start(mbuf,mlen)) >= 0) ylikely {
 	    ulong	lw ;
 	    uint	hdr ;
 	    if (f) { /* read */
