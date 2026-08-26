@@ -33,10 +33,10 @@ extern bool isonebad	(cint *,int) noex ;
 
 local inline bool isOneOf(cint *rsa,int rs) noex {
 	return isoneof(rsa,rs) ;
-}
+} /* end */
 local inline bool isOneBad(cint *rsa,int rs) noex {
 	return isonebad(rsa,rs) ;
-}
+} /* end */
 
 EXTERNC_end
 
