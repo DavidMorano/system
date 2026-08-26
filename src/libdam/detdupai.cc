@@ -71,7 +71,7 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     local int	cmpint(cvoid *,cvoid *) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -90,7 +90,7 @@ int detdupai(cint *ap,int al) noex {
 	    rs = SR_OK ;
 	    if (al > 1) {
 		cint	esz = szof(int) ;
-		cint	sz = ((al+1)*szof(int)) ;
+		cint	sz = ((al + 1) * szof(int)) ;
 	        if (int	*aa ; (rs = lm_mall(sz,&aa)) >= 0) {
 	            memcopy(aa,ap,sz) ;
 	            qsort(aa,al,esz,cmpint) ;
@@ -109,9 +109,13 @@ int detdupai(cint *ap,int al) noex {
 /* local subroutines */
 
 int cmpint(cvoid *v1p,cvoid *v2p) noex {
+    	int		rc = 0 ;
 	cint	*i1p = intp(v1p) ;
 	cint	*i2p = intp(v2p) ;
-	return (*i1p - *i2p) ;
+	if (i1p && i2p) {
+	    rc = (*i1p - *i2p) ;
+	}
+	return rc ;
 } /* end subroutine (cmpint) */
 
 
