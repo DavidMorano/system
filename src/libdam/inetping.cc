@@ -128,8 +128,11 @@ typedef in4_addr_t	*addrp ;
 
 extern "C" {
     extern int uc_readlnto(int,void *,int,int) noex ;
+} /* end extern (C) */
+
+extern "C" {
     extern int	getheour(cchar *,char *,HOSTENT *,char *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
