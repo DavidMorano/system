@@ -257,7 +257,7 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	            i = (bot + top) / 2 ;
 		    cauto lamb = [&op,&cf,&ep] (int ii) noex {
 			return cf(ep,op->va[ii]) ;
-		    } ;
+		    } ; /* end lambda */
 		    while (((top - bot) > 0) && ((rc = lamb(i)) != 0)) {
 		        if (rc < 0) {
 	                    top = i - 1 ;
