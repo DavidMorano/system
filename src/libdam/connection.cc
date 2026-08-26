@@ -146,7 +146,7 @@ local int connection_ip6lookup(CON *,char *,int) noex ;
 
 local int isNotFound(int rs) noex {
 	return isNotPresent(rs) ;
-}
+} /* end */
 
 
 /* local variables */
@@ -591,7 +591,7 @@ void connection::dtor() noex {
 
 connection_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case connectionmem_finish:
 	        rs = connection_finish(op) ;
@@ -599,8 +599,7 @@ connection_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (connection_co::operator) */
+} /* end method (connection_co::operator) */
 
 vars::operator int () noex {
 	int		rs ;
