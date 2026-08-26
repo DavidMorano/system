@@ -62,7 +62,7 @@ import bitmanip ;			/* |nbits(3u)| */
 
 extern "C" {
     extern int	randlc(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* forward references */
