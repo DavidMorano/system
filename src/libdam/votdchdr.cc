@@ -86,14 +86,14 @@ constexpr char		magstr[]	= VOTDCHDR_MAGICSTR ;
 int votdchdr_wr(votdchdr *ep,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
-	if (ep && hbuf) {
+	if (ep && hbuf) ylikely {
 	    int		bl = hlen ;
 	    cchar	*bp = hbuf ;
-	    if ((bl > magsz) && hasValidMagic(bp,magsz,magstr)) {
+	    if ((bl > magsz) && hasValidMagic(bp,magsz,magstr)) ylikely {
 	        bp += magsz ;
 	        bl -= magsz ;
 		/* read out the VETU information */
-	        if (bl >= 4) {
+	        if (bl >= 4) ylikely {
 		    uchar	ech = uchar(ENDIAN) ;
 	            memcpy(ep->vetu,bp,4) ;
 	            if (ep->vetu[0] != VOTDCHDR_VERSION) {
@@ -107,24 +107,24 @@ int votdchdr_wr(votdchdr *ep,cchar *hbuf,int hlen) noex {
 	        } else {
 	            rs = SR_ILSEQ ;
 		}
-	        if (rs >= 0) {
-	            if (bl >= headsz) {
-	    	        uint	*header = uintp(bp) ;
-	                ep->shmsize	= header[votdchdrh_shmsize] ;
+	        if (rs >= 0) ylikely {
+	            if (bl >= headsz) ylikely {
+	    	        uint		*header = uintp(bp) ;
+	                ep->shmsz	= header[votdchdrh_shmsz] ;
 	                ep->wtime	= header[votdchdrh_wtime] ;
 	                ep->atime	= header[votdchdrh_atime] ;
 	                ep->wcount	= header[votdchdrh_wcount] ;
 	                ep->acount	= header[votdchdrh_acount] ;
 	                ep->muoff	= header[votdchdrh_muoff] ;
-	                ep->musize	= header[votdchdrh_musize] ;
+	                ep->musz	= header[votdchdrh_musz] ;
 	                ep->bookoff	= header[votdchdrh_bookoff] ;
 	                ep->booklen	= header[votdchdrh_booklen] ;
 	                ep->recoff	= header[votdchdrh_recoff] ;
 	                ep->reclen	= header[votdchdrh_reclen] ;
 	                ep->balloff	= header[votdchdrh_balloff] ;
-	                ep->ballsize	= header[votdchdrh_ballsize] ;
+	                ep->ballsz	= header[votdchdrh_ballsz] ;
 	                ep->valloff	= header[votdchdrh_valloff] ;
-	                ep->vallsize	= header[votdchdrh_vallsize] ;
+	                ep->vallsz	= header[votdchdrh_vallsz] ;
 	                ep->bstroff	= header[votdchdrh_bstroff] ;
 	                ep->blenstr	= header[votdchdrh_blenstr] ;
 	                ep->vstroff	= header[votdchdrh_vstroff] ;
@@ -145,11 +145,11 @@ int votdchdr_wr(votdchdr *ep,cchar *hbuf,int hlen) noex {
 int votdchdr_rd(votdchdr *ep,char *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
-	if (ep && hbuf) {
+	if (ep && hbuf) ylikely {
 	    int		bl = hlen ;
 	    char	*bp = hbuf ;
-	    if (bl >= (magsz + 4)) {
-	        if ((rs = mkmagic(bp,magsz,magstr)) >= 0) {
+	    if (bl >= (magsz + 4)) ylikely {
+	        if ((rs = mkmagic(bp,magsz,magstr)) >= 0) ylikely {
 	            bp += magsz ;
 	            bl -= magsz ;
 	    	    memcpy(bp,ep->vetu,4) ;
@@ -157,23 +157,23 @@ int votdchdr_rd(votdchdr *ep,char *hbuf,int hlen) noex {
 	    	    bp[1] = uchar(ENDIAN) ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
-	    	    if (bl >= headsz) {
-	    	        uint	*header = uintp(bp) ;
-	        	header[votdchdrh_shmsize]	= ep->shmsize ;
+	    	    if (bl >= headsz) ylikely {
+	    	        uint				*header = uintp(bp) ;
+	        	header[votdchdrh_shmsz]		= ep->shmsz ;
 	        	header[votdchdrh_wtime]		= ep->wtime ;
 	        	header[votdchdrh_atime]		= ep->atime ;
 	        	header[votdchdrh_wcount]	= ep->wcount ;
 	        	header[votdchdrh_acount]	= ep->acount ;
 	        	header[votdchdrh_muoff]		= ep->muoff ;
-	        	header[votdchdrh_musize]	= ep->musize ;
+	        	header[votdchdrh_musz]		= ep->musz ;
 	        	header[votdchdrh_bookoff]	= ep->bookoff ;
 	        	header[votdchdrh_booklen]	= ep->booklen ;
 	        	header[votdchdrh_recoff]	= ep->recoff ;
 	        	header[votdchdrh_reclen]	= ep->reclen ;
 	        	header[votdchdrh_balloff]	= ep->balloff ;
-	        	header[votdchdrh_ballsize]	= ep->ballsize ;
+	        	header[votdchdrh_ballsz]	= ep->ballsz ;
 	        	header[votdchdrh_valloff]	= ep->valloff ;
-	        	header[votdchdrh_vallsize]	= ep->vallsize ;
+	        	header[votdchdrh_vallsz]	= ep->vallsz ;
 	        	header[votdchdrh_bstroff]	= ep->bstroff ;
 	        	header[votdchdrh_blenstr]	= ep->blenstr ;
 	        	header[votdchdrh_vstroff]	= ep->vstroff ;
