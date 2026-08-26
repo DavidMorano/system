@@ -341,15 +341,15 @@ local int dayofmonth_mkmonth(dayofmonth *op,int m) noex {
 
 int dayofmonth::start(int y) noex {
 	return dayofmonth_start(this,y) ;
-}
+} /* end */
 
 int dayofmonth::lookup(int m,int wday,int oday) noex {
 	return dayofmonth_lookup(this,m,wday,oday) ;
-}
+} /* end */
 
 int dayofmonth::mkday(int m,cchar *sp,int sl) noex {
 	return dayofmonth_mkday(this,m,sp,sl) ;
-}
+} /* end */
 
 void dayofmonth::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
