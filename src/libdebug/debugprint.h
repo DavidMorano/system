@@ -25,6 +25,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
+#define DEBUGOPEN(fn)	debugopen(fn)
+
 #ifdef	__cplusplus
 #define DEBUGPRINTF(FMT, ...)	({ 				\
 	int rsdebug = 0 ;					\
@@ -37,8 +39,7 @@
     debugprintx(__func__,FMT __VA_OPT__(,) __VA_ARGS__)
 #endif /* __cplusplus */
 
-#define DEBUGCLOSE(FMT, ...)					\
-	debugclose() ;
+#define DEBUGCLOSE	debugclose()
 
 
 EXTERNC_begin
