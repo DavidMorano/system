@@ -13,23 +13,23 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/param.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ptm.h>
-#include	<lockrw.h>
-#include	<paramfile.h>
-#include	<finduid.h>
-#include	<vechand.h>
-#include	<userid.hh>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<sys/param.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<lockrw.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<finduid.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<userid.hh>		/* LIBUC */
 
 
-#define	MOTD_MAGIC	0x75648941
 #define	MOTD		struct motd_head
 #define	MOTD_ID		struct motd_ident
 #define	MOTD_MR		struct motd_mapper
 #define	MOTD_FL		struct motd_flags
+#define	MOTD_MAGIC	0x75648941
 
 
 struct motd_ident {
