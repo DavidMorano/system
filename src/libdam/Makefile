@@ -601,7 +601,7 @@ obju.o:			$(OBJU)
 objv.o:			$(OBJV)
 	$(LD) -r -o $@ $(LDFLAGS) $(OBJV)
 
-
+# OBJECTS
 dstr.o:			dstr.c dstr.h
 keyvals.o:		keyvals.cc keyvals.h
 loadave.o:		loadave.cc loadave.h
@@ -894,6 +894,9 @@ get.dir:
 	makesubdir $@
 
 ba.o:			ba.cc ba.h
+
+# GROUPS
+
 
 # SINGLES
 printhelp.o:		printhelp.cc printhelp.hh
