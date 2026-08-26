@@ -53,6 +53,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<fsdir.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -71,7 +72,7 @@
 extern "C" {
     extern int uc_stat(cchar *,ustat *) noex ;
     extern int uc_statvfs(cchar *,ustatvfs *) noex ;
-}
+} /* end extern (C) */
 
 
 /* local structures */
@@ -93,8 +94,8 @@ local int	trytouch(cchar *) noex ;
 
 int statvfsdir(cchar *fname,ustatvfs *sbp) noex {
 	int		rs = SR_FAULT ;
-	if (fname && sbp) {
-	    if ((rs = uc_statvfs(fname,sbp)) >= 0) {
+	if (fname && sbp) ylikely {
+	    if ((rs = uc_statvfs(fname,sbp)) >= 0) ylikely {
 	        if (sbp->f_blocks == 0) {
 		    rs = trydive(fname,sbp) ;
 	        } /* end if (zero-blocks) */
@@ -109,9 +110,9 @@ int statvfsdir(cchar *fname,ustatvfs *sbp) noex {
 local int trydive(cchar *fname,ustatvfs *sbp) noex {
 	int		rs ;
 	int		rs1 ;
-        if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) {
+        if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) ylikely {
             if (S_ISDIR(sb.st_mode)) {
-                 if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+                 if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
                      rs1 = SR_NOENT ;
                      if ((rs = mkpath2(tbuf,fname,".")) >= 0) {
                          if ((rs1 = uc_stat(tbuf,&sb)) >= 0) {
@@ -139,9 +140,9 @@ local int trydive(cchar *fname,ustatvfs *sbp) noex {
 local int trytouch(cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) ylikely {
 	    cint	nlen = rs ;
-	    if (fsdir dir ; (rs = fsdir_open(&dir,fname)) >= 0) {
+	    if (fsdir dir ; (rs = fsdir_open(&dir,fname)) >= 0) ylikely {
 		fsdir_ent	ds ;
 	        while ((rs = fsdir_read(&dir,&ds,nbuf,nlen)) > 0) {
 	            cchar	*sp = ds.name ;
