@@ -177,15 +177,15 @@ int outstore_strw(outstore *op,cchar *sp,int sl) noex {
 
 int outstore::get(cchar **app) noex {
 	return outstore_get(this,app) ;
-}
+} /* end method */
 
 int outstore::strw(cchar *sp,int sl) noex {
 	return outstore_strw(this,sp,sl) ;
-}
+} /* end method */
 
 int outstore::str(cchar *sp,int sl) noex {
 	return outstore_strw(this,sp,sl) ;
-}
+} /* end method */
 
 void outstore::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
