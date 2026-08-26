@@ -423,8 +423,7 @@ int useraccdb_curend(UAD *op,UAD_CUR *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (useraccdb_curend) */
+} /* end subroutine (useraccdb_curend) */
 
 namespace {
     struct enumerator {
