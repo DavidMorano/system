@@ -70,49 +70,49 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<climits>		/* |UINT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdescread.h>
-#include	<ucdescwrite.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD |UINT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ptma.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdescread.h>		/* LIBUC */
+#include	<ucdescwrite.h>		/* LIBUC */
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<bufsizeget.h>
-#include	<estrings.h>
-#include	<ascii.h>
-#include	<ids.h>
-#include	<vecstr.h>
-#include	<vechand.h>
-#include	<getax.h>
-#include	<getxid.h>
-#include	<getusername.h>
-#include	<getpwx.h>
-#include	<ptma.h>
-#include	<ptm.h>
-#include	<lockrw.h>
-#include	<paramfile.h>
-#include	<strpack.h>
-#include	<bfile.h>
-#include	<ctdec.h>
-#include	<permx.h>
-#include	<writeto.h>
-#include	<snx.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<mknpathx.h>
-#include	<strwcpy.h>
-#include	<matstr.h>
-#include	<matxstr.h>
-#include	<mkchar.h>
-#include	<isnot.h>
-#include	<localmisc.h>		/* |DECBUFLEN| */
+#include	<getax.h>		/* LIBUC */
+#include	<getxid.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<lockrw.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<strpack.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<writeto.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mknpathx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |DECBUFLEN| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"motd.h"
 
@@ -175,7 +175,7 @@ typedef mainv		mv ;
 extern "C" {
     extern int uc_openenv(cchar *,int,mode_t,mainv,int) noex ;
     extern int uc_openfsvc(cc *,cc *,cc *,int,mode_t,mainv,mainv,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -327,27 +327,27 @@ cbool			f_testproc	= CF_TESTPROC ;
 int motd_open(motd *op,cchar *pr) noex {
 	custime		dt = getustime ;
 	int		rs ;
-	if ((rs = motd_ctor(op,pr)) >= 0) {
+	if ((rs = motd_ctor(op,pr)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0]) {
+	    if (pr[0]) ylikely {
 	        op->fe = MOTD_DIRSFNAME ;
-		if ((rs = var) >= 0) {
-	            if (cchar *cp ; (rs = lm_strw(pr,-1,&cp)) >= 0) {
+		if ((rs = var) >= 0) ylikely {
+	            if (cchar *cp ; (rs = lm_strw(pr,-1,&cp)) >= 0) ylikely {
 			ptm *mxp = op->mxp ;
 	                op->pr = cp ;
-	                if ((rs = mxp->create) >= 0) {
-	                    if ((rs = motd_mapfind(op,dt)) >= 0) {
-	                        if ((rs = motd_envbegin(op)) >= 0) {
+	                if ((rs = mxp->create) >= 0) ylikely {
+	                    if ((rs = motd_mapfind(op,dt)) >= 0) ylikely {
+	                        if ((rs = motd_envbegin(op)) >= 0) ylikely {
 	                            op->ti_lastcheck = dt ;
 	                            op->magval = MOTD_MAGIC ;
 	                        } /* end if (envbegin) */
 	                        if (rs < 0) {
 	                            motd_maplose(op) ;
-		                }
+				} /* end if (error) */
 	                    } /* end if (mapfind) */
 	                    if (rs < 0) {
 	                        mxp->destroy() ;
-		            }
+		            } /* end if (error) */
 	                } /* end if (ptm_begin) */
 	                if (rs < 0) {
 		            void *vp = voidp(op->pr) ;
@@ -359,16 +359,15 @@ int motd_open(motd *op,cchar *pr) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		motd_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (motd_ctor) */
 	return rs ;
-}
-/* end subroutine (motd_open) */
+} /* end subroutine (motd_open) */
 
 int motd_close(motd *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = motd_magic(op)) >= 0) {
+	if ((rs = motd_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = motd_ufindend(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -391,7 +390,7 @@ int motd_close(motd *op) noex {
 		rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->pr = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 		rs1 = motd_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -399,22 +398,20 @@ int motd_close(motd *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (motd_close) */
+} /* end subroutine (motd_close) */
 
 int motd_check(motd *op,time_t dt) noex {
 	int		rs ;
-	if ((rs = motd_magic(op)) >= 0) {
+	if ((rs = motd_magic(op)) >= 0) ylikely {
 	    rs = motd_checker(op,dt) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (motd_check) */
+} /* end subroutine (motd_check) */
 
 int motd_process(motd *op,cchar *gn,mainv admins,int fd) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = motd_magic(op,gn)) >= 0) {
+	if ((rs = motd_magic(op,gn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (gn[0]) {
 	        if (userid id ; (rs = id.start(nullptr,gn)) >= 0) {
@@ -432,15 +429,14 @@ int motd_process(motd *op,cchar *gn,mainv admins,int fd) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (motd_process) */
+} /* end subroutine (motd_process) */
 
 local int motd_procidx(motd *,userid *,mv,int) noex ;
 
 int motd_processid(motd *op,userid *idp,mainv admins,int fd) noex {
 	int		rs ;
 	int		wlen = 0 ; /* return-value */
-	if ((rs = motd_magic(op,idp)) >= 0) {
+	if ((rs = motd_magic(op,idp)) >= 0) ylikely {
 	    rs = SR_BADF ;
 	    if (fd >= 0) {
 		cchar	*groupname = idp->groupname ;
@@ -452,8 +448,7 @@ int motd_processid(motd *op,userid *idp,mainv admins,int fd) noex {
 	    } /* end if (open) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (motd_processid) */
+} /* end subroutine (motd_processid) */
 
 local int motd_procidx(motd *op,userid *idp,mv admins,int fd) noex {
 	cint		n = nelem(envstrs) ;
@@ -462,9 +457,9 @@ local int motd_procidx(motd *op,userid *idp,mv admins,int fd) noex {
 	int		wlen = 0 ; /* return-value */
 	{
 	    cint	sz = (op->nenv + n + 1) * szof(cchar *) ;
-	    if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
+	    if (void *p ; (rs = lm_mall(sz,&p)) >= 0) ylikely {
 	        cchar	**ev = ccharpp(p) ;
-	        if (SP packer ; (rs = packer.start(128)) >= 0) {
+	        if (SP packer ; (rs = packer.start(128)) >= 0) ylikely {
 	            if ((rs = motd_envadds(op,&packer,ev,idp)) >= 0) {
 			cchar *gn = idp->groupname ;
 	                rs = motd_processor(op,ev,admins,gn,fd) ;
@@ -486,9 +481,9 @@ local int motd_procidx(motd *op,userid *idp,mv admins,int fd) noex {
 local int motd_mapfind(motd *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
-	if (char *mbuf ; (rs = lm_mp(&mbuf)) >= 0) {
+	if (char *mbuf ; (rs = lm_mp(&mbuf)) >= 0) ylikely {
 	    mbuf[0] = '\0' ;
-	    if ((rs = motd_mapfname(op,mbuf)) >= 0) {
+	    if ((rs = motd_mapfname(op,mbuf)) >= 0) ylikely {
 	        if (mbuf[0] != '\0') {
 	            if ((rs = mapper_start(&op->mapper,dt,mbuf)) >= 0) {
 	                op->nmaps += 1 ;
@@ -499,8 +494,7 @@ local int motd_mapfind(motd *op,time_t dt) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (motd_mapfind) */
+} /* end subroutine (motd_mapfind) */
 
 local int motd_maplose(motd *op) noex {
 	int		rs = SR_OK ;
@@ -511,16 +505,15 @@ local int motd_maplose(motd *op) noex {
 	    op->nmaps = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (motd_maplose) */
+} /* end subroutine (motd_maplose) */
 
 local int motd_mapfname(motd *op,char *fbuf) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
 	fbuf[0] = '\0' ;
-	if (vecstr ss ; (rs = ss.start(6,0)) >= 0) {
-	    if ((rs = motd_schedload(op,&ss)) >= 0) {
+	if (vecstr ss ; (rs = ss.start(6,0)) >= 0) ylikely {
+	    if ((rs = motd_schedload(op,&ss)) >= 0) ylikely {
 	        cint	flen = var.maxpathlen ;
 		cint	am = R_OK ;
 		cchar	*fe = op->fe ;
@@ -534,8 +527,7 @@ local int motd_mapfname(motd *op,char *fbuf) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (scheds) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (motd_mapfname) */
+} /* end subroutine (motd_mapfname) */
 
 local int motd_schedload(motd *op,vecstr *slp) noex {
 	int		rs = SR_OK ;
@@ -564,8 +556,7 @@ local int motd_schedload(motd *op,vecstr *slp) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (motd_schedload) */
+} /* end subroutine (motd_schedload) */
 
 local int motd_checker(motd *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -585,8 +576,7 @@ local int motd_checker(motd *op,time_t dt) noex {
 	    } /* end if (mutex) */
 	} /* end if (positive) */
 	return (rs >= 0) ? nchanged : rs ;
-}
-/* end subroutine (motd_checker) */
+} /* end subroutine (motd_checker) */
 
 local int motd_envbegin(motd *op) noex {
 	cint		ech = mkchar(envpre[0]) ;
@@ -615,8 +605,7 @@ local int motd_envbegin(motd *op) noex {
 	    op->nenv = c ;
 	} /* end if (memory-acquire) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (motd_envbegin) */
+} /* end subroutine (motd_envbegin) */
 
 local int motd_envend(motd *op) noex {
 	int		rs = SR_OK ;
@@ -625,10 +614,9 @@ local int motd_envend(motd *op) noex {
 	    rs1 = lm_free(op->envv) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->envv = nullptr ;
-	}
+	} /* end if (momory-release) */
 	return rs ;
-}
-/* end subroutine (motd_envend) */
+} /* end subroutine (motd_envend) */
 
 local int mkdigenv(char *ebuf,int elen,cc *pre,cc *key,uint uv) noex {
     	int		rs ;
@@ -646,8 +634,8 @@ local int motd_envadds(motd *op,strpack *spp,ccharpp ev,userid *idp) noex {
 	mainv		envv = op->envv ;
 	for (n = 0 ; n < op->nenv ; n += 1) {
 	    ev[n] = envv[n] ;
-	}
-	if (char *ebuf ; (rs = lm_mall((elen + 1),&ebuf)) >= 0) {
+	} /* end for */
+	if (char *ebuf ; (rs = lm_mall((elen + 1),&ebuf)) >= 0) ylikely {
 	    cchar	*pre = envpre ;
 	    for (int i = 0 ; (rs >= 0) && envstrs[i] ; i += 1) {
 	        uint	uv = UINT_MAX ;
@@ -693,8 +681,7 @@ local int motd_envadds(motd *op,strpack *spp,ccharpp ev,userid *idp) noex {
 	} /* end if (m-a-f) */
 	ev[n] = nullptr ; /* very important! */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (motd_envadds) */
+} /* end subroutine (motd_envadds) */
 
 local int motd_envstore(motd *op,strpack *spp,
 		ccharpp ev,int n,cc *ep,int el) noex {
@@ -709,21 +696,19 @@ local int motd_envstore(motd *op,strpack *spp,
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (motd_envstore) */
+} /* end subroutine (motd_envstore) */
 
 local int motd_processor(motd *op,ccharpp ev,mv adms,cchar *gn,int fd) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = motd_checker(op,0)) >= 0) {
+	if ((rs = motd_checker(op,0)) >= 0) ylikely {
 	    if (op->nmaps > 0) {
 	        rs = mapper_process(&op->mapper,ev,adms,gn,fd) ;
 	        wlen += rs ;
 	    }
 	}
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (motd_processor) */
+} /* end subroutine (motd_processor) */
 
 local int motd_ufindbegin(motd *op) noex {
 	cint		maxent = 30 ;
@@ -734,8 +719,7 @@ local int motd_ufindbegin(motd *op) noex {
 	    op->open.ufind = (rs >= 0) ;
 	}
 	return rs ;
-}
-/* end subroutine (motd_ufindbegin) */
+} /* end subroutine (motd_ufindbegin) */
 
 local int motd_ufindend(motd *op) noex {
 	int		rs = SR_OK ;
@@ -746,22 +730,21 @@ local int motd_ufindend(motd *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (motd_ufindend) */
+} /* end subroutine (motd_ufindend) */
 
 local int motd_ufindlook(motd *op,char *ubuf,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		ul = 0 ; /* return-value */
 	if (ubuf) ylikely {
-	    if ((rs = bufsizeget(bufsize_un)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 	        ptm	*mxp = op->mxp ;
 	        cint	ulen = rs ;
-	        if ((rs = mxp->lockbegin) >= 0) {
+	        if ((rs = mxp->lockbegin) >= 0) ylikely {
 	            if (! op->open.ufind) {
 		        rs = motd_ufindbegin(op) ;
 		    }
-	            if (rs >= 0) {
+	            if (rs >= 0) ylikely {
 	                rs = finduid_lookup(op->ufp,ubuf,ulen,uid) ;
 		        ul = rs ;
 	            } /* end if */
@@ -771,17 +754,16 @@ local int motd_ufindlook(motd *op,char *ubuf,uid_t uid) noex {
 	    } /* end if (getbusize) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (motd_ufindlook) */
+} /* end subroutine (motd_ufindlook) */
 
 local int mapper_start(MR *mmp,time_t dt,cchar *fname) noex {
 	int		rs ;
 	mainv		evp = mainv(environ) ;
 	memclear(mmp) ;
-	if ((rs = lockrw_create(&mmp->rwm,0)) >= 0) {
-	    if (cc *cp ; (rs = lm_strw(fname,-1,&cp)) >= 0) {
+	if ((rs = lockrw_create(&mmp->rwm,0)) >= 0) ylikely {
+	    if (cc *cp ; (rs = lm_strw(fname,-1,&cp)) >= 0) ylikely {
 		mmp->fname = cp ;
-		if ((rs = vechand_start(&mmp->mapdirs,4,0)) >= 0) {
+		if ((rs = vechand_start(&mmp->mapdirs,4,0)) >= 0) ylikely {
 		    cchar	*fn = mmp->fname ;
 		    if ((rs = paramfile_open(&mmp->dirsfile,evp,fn)) >= 0) {
 			cint	to = TO_MAPCHECK ;
@@ -813,8 +795,7 @@ local int mapper_start(MR *mmp,time_t dt,cchar *fname) noex {
 	} /* end if (lockrw_create) */
 
 	return rs ;
-}
-/* end subroutine (mapper_start) */
+} /* end subroutine (mapper_start) */
 
 local int mapper_finish(MR *mmp) noex {
 	int		rs = SR_FAULT ;
@@ -849,8 +830,7 @@ local int mapper_finish(MR *mmp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapper_finish) */
+} /* end subroutine (mapper_finish) */
 
 local int mapper_check(MR *mmp,time_t dt) noex {
 	cint		to_lock = TO_LOCK ;
@@ -881,8 +861,7 @@ local int mapper_check(MR *mmp,time_t dt) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? nchanged : rs ;
-}
-/* end subroutine (mapper_check) */
+} /* end subroutine (mapper_check) */
 
 local int mapper_proctest(MR *,cc **,mv,cc *,int) noex ;
 
@@ -908,8 +887,7 @@ local int mapper_process(MR *mmp,ccharpp ev,mv adms,cc *gn,int fd) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapper_process) */
+} /* end subroutine (mapper_process) */
 
 local int mapper_proctest(MR *mmp,ccharpp ev,mv adms,cc *gn,int fd) noex {
     	int		rs = SR_FAULT ;
@@ -965,8 +943,7 @@ local int mapper_processor(MR *mmp,ccharpp ev,mv adms,cc *gn,int fd) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapper_processor) */
+} /* end subroutine (mapper_processor) */
 
 local int mapper_mapload(MR *mmp) noex {
 	int		rs = SR_FAULT ;
@@ -1020,8 +997,7 @@ local int mapper_mapload(MR *mmp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mapper_mapload) */
+} /* end subroutine (mapper_mapload) */
 
 local int mapper_mapadd(MR *mmp,cc *kp,int kl,cc *valp,int vall) noex {
 	cint		sz = szof(MD) ;
@@ -1045,8 +1021,7 @@ local int mapper_mapadd(MR *mmp,cc *kp,int kl,cc *valp,int vall) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapper_mapadd) */
+} /* end subroutine (mapper_mapadd) */
 
 local int mapper_mapfins(MR *mmp) noex {
 	int		rs = SR_FAULT ;
@@ -1077,8 +1052,7 @@ local int mapper_mapfins(MR *mmp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapper_mapfins) */
+} /* end subroutine (mapper_mapfins) */
 
 local int mapdir_start(MD *ep,cchar *kp,int kl,cchar *valp,int vall) noex {
 	int		rs = SR_FAULT ;
@@ -1107,8 +1081,7 @@ local int mapdir_start(MD *ep,cchar *kp,int kl,cchar *valp,int vall) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapdir_start) */
+} /* end subroutine (mapdir_start) */
 
 local int mapdir_finish(MD *ep) noex {
 	int		rs = SR_FAULT ;
@@ -1134,8 +1107,7 @@ local int mapdir_finish(MD *ep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapdir_finish) */
+} /* end subroutine (mapdir_finish) */
 
 local int mapdir_proc(MD *ep,ccharpp ev,mv admins,cchar *gn,int fd) noex {
 	cint		to_lock = TO_LOCK ;
@@ -1168,8 +1140,7 @@ local int mapdir_proc(MD *ep,ccharpp ev,mv admins,cchar *gn,int fd) noex {
 	    } /* end if (continued) */
 	} /* end if (non-nul) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapdir_proc) */
+} /* end subroutine (mapdir_proc) */
 
 local int mapdir_expand(MD *ep) noex {
 	cint		to_lock = TO_LOCK ;
@@ -1185,8 +1156,7 @@ local int mapdir_expand(MD *ep) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (read-write lock) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (mapdir_expand) */
+} /* end subroutine (mapdir_expand) */
 
 local int mapdir_expanders(MD *ep,cc *,cc *) noex ;
 
@@ -1216,15 +1186,14 @@ local int mapdir_expander(MD *ep) noex {
 	    rs = SR_INVALID ;
 	}
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (mapdir_expander) */
+} /* end subroutine (mapdir_expander) */
 
 local int mapdir_expanders(MD *ep,cc *un,cc *pp) noex {
     	int		rs ;
 	int		rs1 ;
 	int		fl = 0 ; /* return-value */
-        if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) {
-            if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
+        if (char *hbuf ; (rs = lm_mp(&hbuf)) >= 0) ylikely {
+            if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) ylikely {
                 cint        pwlen = rs ;
                 if (ucentpwx pw ; (rs = pw.nam(pwbuf,pwlen,un)) >= 0) {
                     cchar   *uh = pw.pw_dir ;
@@ -1235,7 +1204,7 @@ local int mapdir_expanders(MD *ep,cc *un,cc *pp) noex {
                         rs = mkpath(hbuf,uh) ;
                         fl = rs ;
                     }
-                    if (rs >= 0) {
+                    if (rs >= 0) ylikely {
                         cauto malls = lm_strw ;
                         if (cchar *cp ; (rs = malls(hbuf,fl,&cp)) >= 0) {
                             ep->dname = cp ;
@@ -1269,7 +1238,7 @@ local int mapdir_procer(MD *mdp,ccharpp ev,cchar *gn,int fd) noex {
 	}
 	if (f_continue) {
 	    if (ustat sb ; (rs = u_stat(dn,&sb)) >= 0) {
-	        if (VS el ; (rs = el.start) >= 0) {
+	        if (VS el ; (rs = el.start) >= 0) ylikely {
 	            cchar	*pre = envpre ;
 		    if ((rs = vecstr_envload(&el,pre,mdp->admin,dn)) >= 0) {
 	        	cint	n = lenstrarr(ev) ;
@@ -1327,7 +1296,7 @@ local int mapdir_procout(MD *ep,mainv ev,cchar *dn,cchar *gn,int fd) noex {
 	int		wlen = 0 ; /* return-value */
 	int		ai = 0 ;
 	cchar		name[] = MOTD_NAME ;
-	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) {
+	if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
 	    cint	clen = var.maxnamelen ;
 	    char	*fbuf = (a + ((maxpath + 1) * ai++)) ;
 	    char	*cbuf = (a + ((maxpath + 1) * ai++)) ;
@@ -1341,8 +1310,7 @@ local int mapdir_procout(MD *ep,mainv ev,cchar *dn,cchar *gn,int fd) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapdir_procout) */
+} /* end subroutine (mapdir_procout) */
 
 local int mapdir_procouter(MD *ep,mainv ev,cchar *fname,int ofd) noex {
 	cint		to_open = TO_OPEN ;
@@ -1377,15 +1345,14 @@ local int mapdir_procouter(MD *ep,mainv ev,cchar *fname,int ofd) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapdir_procouter) */
+} /* end subroutine (mapdir_procouter) */
 
 vars::operator int () noex {
     	int		rs ;
 	if ((rs = maxpathlen) == 0) {
-	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	        maxpathlen = rs ;
-	        if ((rs = bufsizeget(bufsize_mn)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 		    maxnamelen = rs ;
 		    envlen = maxnamelen ;
 		    parambuflen = maxpathlen ;
@@ -1399,7 +1366,7 @@ local int vecstr_envload(VS *op,cc *pre,cc *adm,cc *dn) noex {
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *pbuf ; (rs = lm_sn(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = lm_sn(&pbuf)) >= 0) ylikely {
 	    cint	plen = rs ;
             for (int i = 0 ; (rs >= 0) && (i < 2) ; i += 1) {
                 cchar       *post{} ;
