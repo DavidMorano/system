@@ -26,16 +26,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"wcuswhite.h"
 
 
 /* local defines */
@@ -45,13 +48,15 @@
 
 extern "C" {
     bool	wcishite(wchar_t) noex ;
-}
+} /* end extern (C) */
 
 
 /* forward references */
 
 
 /* local variables */
+
+cint		cslen		= (UCHAR_MAX + 1) ;
 
 
 /* exported variables */
@@ -61,7 +66,7 @@ extern "C" {
 
 bool wciswhite(wchar_t ch) noex {
 	bool		f = false ;
-	if ((ch >= 0) && (ch < 256)) {
+	if ((ch >= 0) && (ch < cslen)) {
 	    f = CHAR_ISWHITE(ch) ;
 	}
 	return f ;
