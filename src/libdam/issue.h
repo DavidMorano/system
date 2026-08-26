@@ -13,20 +13,20 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ptm.h>
-#include	<lockrw.h>
-#include	<paramfile.h>
-#include	<vechand.h>
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<lockrw.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
 
 
-#define	ISSUE_MAGIC	0x75648941
 #define	ISSUE		struct issue_head
 #define	ISSUE_FL	struct issue_flags
 #define	ISSUE_MAP	struct issue_mapper
 #define	ISSUE_DEFKEYNAME	"login"
+#define	ISSUE_MAGIC	0x75648941
 
 
 struct issue_mapper {
