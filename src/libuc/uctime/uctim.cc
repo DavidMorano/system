@@ -1,4 +1,4 @@
-/* uctiment SUPPORT */
+/* uctim SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++11 */
 
@@ -80,12 +80,13 @@
 #include	<usupport.h>		/* LIBU */
 #include	<timewatch.hh>		/* LIBU */
 #include	<itimers.hh>		/* LIBU i-timer selection */
+#include	<timespec.h>		/* LIBU */
+#include	<itimerspec.h>		/* LIBU */
 #include	<ptm.h>			/* LIBU */
 #include	<ptc.h>			/* LIBU */
 #include	<pta.h>			/* LIBU */
 #include	<upt.h>			/* LIBU */
-#include	<timespec.h>		/* LIBU */
-#include	<itimerspec.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC vector-handles */
 #include	<vecsorthand.h>		/* LIBUC vector-sorted-handles */
@@ -131,7 +132,7 @@ extern "C" {
 } /* end extern (C) */
 
 typedef vecsorthand	prique ;
-typedef uctiment *	uctimp ;
+typedef uctiment *	uctimentp ;
 
 
 /* external subroutines */
@@ -285,7 +286,7 @@ namespace {
 
 local void uctimeent_load(uctiment *ep,con uctimnote *nop) noex {
 
-local int	ourcmp(const TIMEOUT *,const TIMEOUT *) noex ;
+local int	cmpqent(cvoid *,cvoid *) noex ;
 
 extern "C" {
     local int	timemgr_sigerworker(uctiment *) noex ;
@@ -300,8 +301,8 @@ extern "C" {
 /* local variables */
 
 static timemgr		timemgr_data ;
-cint			wt = itimer.real ;
-cbool			f_childthrs = CF_CHILDTHRS ;
+cint			wt		= itimer.real ;
+cbool			f_childthrs	= CF_CHILDTHRS ;
 
 
 /* exported variables */
@@ -737,7 +738,7 @@ int uctim::priqbegin() noex {
 	if (void *p ; (rs = lm_mall(osz,&p)) >= 0) {
 	    rs = SR_BUGCHECK ;
 	    if (prique *pqp = new(p) prique ; pqp) {
-	        rs = pqp->start(ourcmp,1) ;
+	        rs = pqp->start(cmpqent,1) ;
 		if (rs < 0) {
 		    destroy_at(pqp) ;
 		} /* end if (error) */
@@ -1181,18 +1182,28 @@ local void uctimeent_load(uctiment *ep,con uctimnote *nop) noex {
 	ep->arg		= nop->arg ;
 } /* end subroutine (uctimeent_load) */
 
-local int ourcmp(const TIMEOUT *e1p,const TIMEOUT *e2p) noex {
+local int cmpuctiment((con uctiment *e1p,con uctiment *e2p) noex {
+	int		rc = 0 ;
+	if ((rc = intsat(e1p->tv_sec - e2p->tv_sec)) == 0) {
+	    rc = intsat(e1p->tc_usec - e2p->rv_usec) ;
+	}
+	return rc ;
+} /* end subroutine (cmpuctiment) */
+
+local int cmpqent(cvoid *v1p,cvoid *v2p) noex {
+	con uctiment	*e1p = resumelife<uctiment>(v1p) ;
+	con uctiment	*e2p = resumelife<uctiment>(v2p) ;
 	int		rc = 0 ;
 	if (e1p || e2p) ylikely {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
-	            rc = cast_saturate<int>(e1p->val - e2p->val) ;
+	            rc = cmpuctiment(e1p,e2p) ;
 	        }
 	    }
-	}
+	} /* end if */
 	return rc ;
-} /* end subroutine (ourcmp) */
+} /* end subroutine (cmpqent) */
 
 
