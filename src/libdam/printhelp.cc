@@ -305,8 +305,7 @@ local int printout(ostream *osp,expcook *ecp,cc *fn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (printout) */
+} /* end subroutine (printout) */
 
 int helper::start(char *b,int l) noex {
 	vecstr		*svp = &svars ;
@@ -343,7 +342,7 @@ int helper::schedfile() noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if ((rs = mkpath2(tbuf,pr,HELPSCHEDFNAME)) >= 0) {
+	if ((rs = mkpath2(tbuf,pr,HELPSCHEDFNAME)) >= 0) ylikely {
 	    if ((rs = perm(tbuf,-1,-1,nullptr,R_OK)) >= 0) {
 		cint	vn = 15 ;
 		cint	vo = vecstrm.compact ;
@@ -405,10 +404,10 @@ local int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 	cint		sz = var.maxcombolen ;
 	int		rs ;
 	int		rs1 ;
-	if (char *nn ; (rs = mem.mall(sz,&nn)) >= 0) {
+	if (char *nn ; (rs = mem.mall(sz,&nn)) >= 0) ylikely {
 	    char	*dn = (nn + (var.maxnodelen + 1)) ;
-	    if ((rs = getnodedomain(nn,dn)) >= 0) {
-	        if (char *hbuf ; (rs = mem.hostname(&hbuf)) >= 0) {
+	    if ((rs = getnodedomain(nn,dn)) >= 0) ylikely {
+	        if (char *hbuf ; (rs = mem.hostname(&hbuf)) >= 0) ylikely {
 		    cint	hlen = rs ;
 	            cchar	*ks = "SNDHPR" ;
 	            char	kbuf[KBUFLEN+1] = {} ;
