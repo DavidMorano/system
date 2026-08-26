@@ -43,6 +43,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<ucdescsock.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetx.h"
@@ -83,9 +84,11 @@ int uc_getsocktype(int fd) noex {
 	int		rs ;
 	int		tval = 0 ; /* return-value */
 	int		tlen = szof(int) ;
-	if ((rs = u_sockoptget(fd,slev,scmd,&tval,&tlen)) >= 0) {
-	    if (tlen != szof(int)) rs = SR_NOMSG ;
-	}
+	if ((rs = uc_sockoptget(fd,slev,scmd,&tval,&tlen)) >= 0) {
+	    if (tlen != szof(int)) {
+		rs = SR_NOMSG ;
+	    }
+	} /* end if (uc_sockoptget) */
 	return (rs >= 0) ? tval : rs ;
 } /* end subroutine (uc_getsocktype) */
 
