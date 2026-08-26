@@ -117,6 +117,7 @@ consteval syshas_mgr::syshas_mgr() noexcept {
 	onc		= SYSHAS_ONC ;	/* Open-Network-Computing */
 	getnetname	= SYSHAS_ONC ;	/* part of Open-Network-Computing */
 	ftime		= SYSHAS_FTIME ;	/* working |ftime(3c)| */
+	timezone	= SYSHAS_TIMEZONE ;	/* working |ftime(3c)| */
 	in4in6addr	= SYSHAS_IN4IN6ADDR ;	/* |struct in4in6_addr| */
 } /* end ctor (syshas_mgr::syshas_mgr) */
 
