@@ -276,6 +276,7 @@ usys_strtox.o:		usys_strtox.cc		usys_strtox.h		$(INCS)
 usys_nprocs.o:		usys_nprocs.cc		usys_nprocs.h		$(INCS)
 usys_getprocuid.o:	usys_getprocuid.cc	usys_getprocuid.h	$(INCS)
 usys_in4in6addr.o:	usys_in4in6addr.cc	usys_in4in6addr.h	$(INCS)
+usys_timezone.o:	usys_timezone.cc	usys_timezone.h		$(INCS)
 
 # special
 usysargz.o:		usysargz.cc		usysargz.hh		$(INCS)
