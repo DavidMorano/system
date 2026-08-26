@@ -236,8 +236,8 @@ int filewatch_finish(FW *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (filewatch_finish) */
+} /* end subroutine (filewatch_finish) */
+
 local int filewatch_checks(FW *,off_t,bfile *) noex ;
 local int filewatch_checkrest(FW *,time_t) noex ;
 
@@ -571,11 +571,11 @@ local int filewatch_putoutln(FW *op,BF *ofp,int nline,cc *lp,int ll) noex {
 
 int filewatch::check(time_t dt,BF *ofp) noex {
 	return filewatch_check(this,dt,ofp) ;
-}
+} /* end method */
 
 int filewatch::readln(time_t dt,char *lbuf,int llen) noex {
 	return filewatch_readln(this,dt,lbuf,llen) ;
-}
+} /* end method */
 
 void filewatch::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
