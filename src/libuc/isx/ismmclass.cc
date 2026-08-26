@@ -98,7 +98,7 @@ bool ismmclass_7bit(int ch) noex {
 	    f = f || (ch == '\r') ;
 	    f = f || (ch == CH_TAB) ;
 	    f = f || (ch == CH_SP) ;
-	}
+	} /* end if */
 	return f ;
 } /* end subroutine (ismmclass_7bit) */
 
@@ -108,7 +108,7 @@ bool ismmclass_8bit(int ch) noex {
 	ch &= UCHAR_MAX ;
 	if (ch >= 0x80) {
 	    f = ((ch & 0x7f) >= 0x20) ;
-	}
+	} /* end if */
 	return f ;
 } /* end subroutine (ismmclass_8bit) */
 
@@ -121,7 +121,7 @@ bool ismmclass_binary(int ch) noex {
 	    f = f && (ch != CH_TAB) ;
 	    f = f && (ch != '\n') ;
 	    f = f && (ch != '\r') ;
-	}
+	} /* end if */
 	return f ;
 } /* end subroutine (ismmclass_binary) */
 
