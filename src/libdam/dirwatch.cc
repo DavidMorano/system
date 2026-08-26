@@ -192,7 +192,7 @@ local int	entry_load(DW_ENT *,IENT *,cchar *) noex ;
 
 extern "C" {
     local int	vcmpfn(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
