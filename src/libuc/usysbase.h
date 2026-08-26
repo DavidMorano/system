@@ -20,12 +20,12 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usys.h>
-#include	<ubufdefs.h>
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usys.h>		/* LIBU */
+#include	<ubufdefs.h>		/* LIBU */
 
 
 #endif /* USYSBASE_INCLUDE */
