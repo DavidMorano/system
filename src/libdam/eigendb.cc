@@ -438,27 +438,27 @@ local int eigendb_fileline(eigendb *op,cchar *lbuf,int llen) noex {
 
 int eigendb::addfile(cchar *fname) noex {
 	return eigendb_addfile(this,fname) ;
-}
+} /* end method */
 
 int eigendb::addword(cchar *wp,int wl) noex {
 	return eigendb_addword(this,wp,wl) ;
-}
+} /* end method */
 
 int eigendb::exists(cchar *wp,int wl) noex {
 	return eigendb_exists(this,wp,wl) ;
-}
+} /* end method */
 
 int eigendb::curbegin(eigendb_cur *curp) noex {
 	return eigendb_curbegin(this,curp) ;
-}
+} /* end method */
 
 int eigendb::curend(eigendb_cur *curp) noex {
 	return eigendb_curend(this,curp) ;
-}
+} /* end method */
 
 int eigendb::curenum(eigendb_cur *curp,cchar **rpp) noex {
 	return eigendb_curenum(this,curp,rpp) ;
-}
+} /* end method */
 
 void eigendb::dtor() noex {
 	if (cint rs = close ; rs < 0) {
