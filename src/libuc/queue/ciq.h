@@ -52,11 +52,11 @@ struct ciq_co {
         constexpr void operator () (ciq *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ciq_co) */
 struct ciq : ciq_head {
 	ciq_co		start ;
