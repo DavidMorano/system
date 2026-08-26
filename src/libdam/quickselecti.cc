@@ -70,13 +70,13 @@
 
 extern "C" {
     typedef int	(*partpred_t)(int,int) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     extern void	arrswapi(int *,int,int) noex ;
     extern int	partitionai(int *,int,partpred_t,int) noex ;
     extern int	nthai(int *,int,int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
