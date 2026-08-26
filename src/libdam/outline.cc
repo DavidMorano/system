@@ -245,19 +245,19 @@ int outline_needlength(outline *op,int cl) noex {
 
 int outline::start(bfile *fp,int ml) noex {
 	return outline_start(this,fp,ml) ;
-}
+} /* end method */
 
 int outline::item(cchar *vp,int vl) noex {
 	return outline_item(this,vp,vl) ;
-}
+} /* end method */
 
 int outline::value(cchar *vp,int vl) noex {
 	return outline_value(this,vp,vl) ;
-}
+} /* end method */
 
 int outline::write(cchar *vp,int vl) noex {
 	return outline_write(this,vp,vl) ;
-}
+} /* end method */
 
 int outline::printf(cchar *fmt,...) noex {
     	va_list		ap ;
@@ -272,7 +272,7 @@ int outline::printf(cchar *fmt,...) noex {
 
 int outline::needlength(int cl) noex {
 	return outline_needlength(this,cl) ;
-}
+} /* end method */
 
 void outline::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
