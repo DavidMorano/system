@@ -93,7 +93,7 @@ struct paramfile_file ;		/* <- needed for the typedef ("filep") below */
 
 extern "C" {
     typedef int (*vog_f)(vecobj *,int,void **) noex ;
-}
+} /* end extern (C) */
 
 typedef PF_C	*cursorp ;
 typedef PF_E	*entp ;
@@ -226,7 +226,7 @@ local int	entry_finish(PF_E *) noex ;
 
 extern "C" {
     local int	vcmpentry(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -507,8 +507,7 @@ int paramfile_check(PF *op,time_t dt) noex {
 	    } /* end if (needed) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c_changed : rs ;
-}
-/* end subroutine (paramfile_check) */
+} /* end subroutine (paramfile_check) */
 
 
 /* private subroutines */
@@ -918,35 +917,35 @@ local int paramfile_entrels(PF *op) noex {
 
 int paramfile::open(con mainv ev,cchar *fname) noex {
 	return paramfile_open(this,ev,fname) ;
-}
+} /* end method */
 
 int paramfile::fileadd(cchar *fname) noex {
 	return paramfile_fileadd(this,fname) ;
-}
+} /* end method */
 
 int paramfile::setdefines(vecstr *dvp) noex {
 	return paramfile_setdefines(this,dvp) ;
-}
+} /* end method */
 
 int paramfile::curbegin(PF_C *curp) noex {
 	return paramfile_curbegin(this,curp) ;
-}
+} /* end method */
 
 int paramfile::curend(PF_C *curp) noex {
 	return paramfile_curend(this,curp) ;
-}
+} /* end method */
 
 int paramfile::curenum(PF_C *curp,PF_E *ep,char *rbuf,int rlen) noex {
 	return paramfile_curenum(this,curp,ep,rbuf,rlen) ;
-}
+} /* end method */
 
 int paramfile::fetch(cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
 	return paramfile_fetch(this,ks,curp,vbuf,vlen) ;
-}
+} /* end method */
 
 int paramfile::check(time_t dt) noex {
 	return paramfile_check(this,dt) ;
-}
+} /* end method */
 
 void paramfile::dtor() noex {
 	if (cint rs = close ; rs < 0) {
