@@ -54,8 +54,8 @@
 #include	<ptm.h>			/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
-#include	<ucdescread.h>		/* LIBUC */
-#include	<ucdescwrite.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
 #include	<getax.h>		/* LIBUC */
 #include	<getusername.h>		/* LIBUC */
 #include	<getuserhome.h>		/* LIBUC */
@@ -149,7 +149,7 @@ typedef	mainv		mv ;
 
 extern "C" {
     extern int uc_openenv(cc *,int,mode_t,mainv,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -193,9 +193,9 @@ local int statmsg_ctor(statmsg *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->mxp = new(nt) ptm) != np) {
+	    if ((op->mxp = new(nt) ptm) != np) ylikely {
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (statmsg_ctor) */
@@ -207,7 +207,7 @@ local int statmsg_dtor(statmsg *op) noex {
 	    {
 		delete op->mxp ;
 		op->mxp = nullptr ;
-	    }
+	    } /* end if (delete-ptm) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (statmsg_dtor) */
@@ -305,15 +305,11 @@ constexpr cpcchar	envstrs[] = {
 } ; /* end array (envstrs) */
 
 static vars		var ;
-
-constexpr uid_t		uidend = -1 ;
-constexpr gid_t		gidend = -1 ;
-
-cchar			envpre[] = "STATMSG_" ;	/* environment prefix */
-
+constexpr uid_t		uidend		= -1 ;
+constexpr gid_t		gidend		= -1 ;
+cchar			envpre[]	= "STATMSG_" ;	/* environment prefix */
 cint			msgbuflen	= MSGBUFLEN ;
 cint			diglen		= DECBUFLEN ;
-
 cbool			f_writeto 	= CF_WRITETO ;
 cbool			f_paramfile 	= CF_paramfile ;
 
@@ -326,45 +322,44 @@ cbool			f_paramfile 	= CF_paramfile ;
 int statmsg_open(SM *op,cchar *username) noex {
 	custime		dt = getustime ;
 	int		rs ;
-	if ((rs = statmsg_ctor(op,username)) >= 0) {
+	if ((rs = statmsg_ctor(op,username)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (username[0]) {
-		if ((rs = var) >= 0) {
+	    if (username[0]) ylikely {
+		if ((rs = var) >= 0) ylikely {
 		    ptm *mxp = op->mxp ;
 	            op->fe = SM_DIRSFNAME ;
-	            if ((rs = mxp->create) >= 0) {
+	            if ((rs = mxp->create) >= 0) ylikely {
 	                if ((rs = statmsg_userbegin(op,username)) >= 0) {
 		            if ((rs = statmsg_mapfind(op,dt)) >= 0) {
-		                if ((rs = statmsg_envbegin(op)) >= 0) {
+		                if ((rs = statmsg_envbegin(op)) >= 0) ylikely {
 			            op->ti_lastcheck = dt ;
 			            op->magval = SM_MAGIC ;
 		                }
 		                if (rs < 0) {
 			            statmsg_maplose(op) ;
-		                }
+		                } /* end if (error) */
 		            }
 		            if (rs < 0) {
 		                statmsg_userend(op) ;
-		            }
+		            } /* end if (error) */
 	                }
 	                if (rs < 0) {
 		            mxp->destroy() ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (ptm) */
 	        } /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		statmsg_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (statmsg_ctor) */
 	return rs ;
-}
-/* end subroutine (statmsg_open) */
+} /* end subroutine (statmsg_open) */
 
 int statmsg_close(SM *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = statmsg_magic(op)) >= 0) {
+	if ((rs = statmsg_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = statmsg_envend(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -389,23 +384,21 @@ int statmsg_close(SM *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (statmsg_close) */
+} /* end subroutine (statmsg_close) */
 
 int statmsg_check(SM *op,time_t dt) noex {
 	int		rs ;
-	if ((rs = statmsg_magic(op)) >= 0) {
+	if ((rs = statmsg_magic(op)) >= 0) ylikely {
 	    rs = statmsg_checker(op,dt) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (statmsg_check) */
+} /* end subroutine (statmsg_check) */
 
 int statmsg_process(SM *op,cchar *gn,cchar **adms,cchar *kn,int fd) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if ((rs = statmsg_magic(op,adms,kn)) >= 0) {
+	if ((rs = statmsg_magic(op,adms,kn)) >= 0) ylikely {
 	    if (userid id ; (rs = id.start(nullptr,gn)) >= 0) {
 		{
 		    rs = statmsg_processid(op,&id,adms,kn,fd) ;
@@ -416,15 +409,14 @@ int statmsg_process(SM *op,cchar *gn,cchar **adms,cchar *kn,int fd) noex {
 	    } /* end if (userid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (statmsg_process) */
+} /* end subroutine (statmsg_process) */
 
 local int statmsg_procidx(statmsg *,userid *,mv,int,cc *) noex ;
 
 int statmsg_processid(SM *op,userid *idp,cc **adms,cc *kn,int fd) noex {
 	int		rs ;
 	int		wlen = 0 ; /* return-value */
-	if ((rs = statmsg_magic(op,idp,adms,kn)) >= 0) {
+	if ((rs = statmsg_magic(op,idp,adms,kn)) >= 0) ylikely {
 	    rs = SR_BADF ;
 	    if (fd >= 0) {
 		cchar	*groupname = idp->groupname ;
@@ -506,8 +498,7 @@ local int statmsg_userbegin(SM *op,cchar *username) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (statmsg_userbegin) */
+} /* end subroutine (statmsg_userbegin) */
 
 local int statmsg_userend(SM *op) noex {
 	int		rs = SR_OK ;
@@ -521,8 +512,7 @@ local int statmsg_userend(SM *op) noex {
 	    op->userhome = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (statmsg_userend) */
+} /* end subroutine (statmsg_userend) */
 
 local int statmsg_mapfind(SM *op,time_t dt) noex {
 	int		rs ;
@@ -542,8 +532,7 @@ local int statmsg_mapfind(SM *op,time_t dt) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (statmsg_mapfind) */
+} /* end subroutine (statmsg_mapfind) */
 
 local int statmsg_maplose(SM *op) noex {
 	int		rs = SR_OK ;
@@ -554,8 +543,7 @@ local int statmsg_maplose(SM *op) noex {
 	    op->nmaps = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (statmsg_maplose) */
+} /* end subroutine (statmsg_maplose) */
 
 local int statmsg_mapfname(SM *op,char *fbuf) noex {
 	int		rs ;
@@ -578,8 +566,7 @@ local int statmsg_mapfname(SM *op,char *fbuf) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (statmsg_mapfname) */
+} /* end subroutine (statmsg_mapfname) */
 
 local int statmsg_schedload(SM *op,vecstr *slp) noex {
 	int		rs = SR_OK ;
@@ -608,8 +595,7 @@ local int statmsg_schedload(SM *op,vecstr *slp) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (statmsg_schedload) */
+} /* end subroutine (statmsg_schedload) */
 
 local int statmsg_checker(SM *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -629,8 +615,7 @@ local int statmsg_checker(SM *op,time_t dt) noex {
 	    } /* end if (mutex) */
 	} /* end if (positive) */
 	return (rs >= 0) ? nchanged : rs ;
-}
-/* end subroutine (statmsg_checker) */
+} /* end subroutine (statmsg_checker) */
 
 local int statmsg_envbegin(SM *op) noex {
 	int		rs = SR_OK ;
@@ -658,8 +643,7 @@ local int statmsg_envbegin(SM *op) noex {
 	    } /* end if (memory-acquire) */
 	} /* end block */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (statmsg_envbegin) */
+} /* end subroutine (statmsg_envbegin) */
 
 local int statmsg_envend(SM *op) noex {
 	int		rs = SR_OK ;
@@ -670,8 +654,7 @@ local int statmsg_envend(SM *op) noex {
 	    op->envv = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (statmsg_envend) */
+} /* end subroutine (statmsg_envend) */
 
 local int mkdigenv(char *ebuf,int elen,cc *pre,cc *key,uint uv) noex {
     	int	rs ;
@@ -742,8 +725,7 @@ local int statmsg_envadds(SM *op,SP *spp,cc **ev,userid *idp,cc *kn) noex {
 	} /* end if (m-a-f) */
 	ev[n] = nullptr ; /* very important! */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (statmsg_envadds) */
+} /* end subroutine (statmsg_envadds) */
 
 local int statmsg_envstore(SM *op,SP *spp,cc **ev,int n,cc *ep,int el) noex {
 	int		rs = SR_FAULT ;
@@ -757,8 +739,7 @@ local int statmsg_envstore(SM *op,SP *spp,cc **ev,int n,cc *ep,int el) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (statmsg_envstore) */
+} /* end subroutine (statmsg_envstore) */
 
 local int statmsg_processor(SM *op,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	int		rs ;
@@ -770,8 +751,7 @@ local int statmsg_processor(SM *op,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	    }
 	}
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (statmsg_processor) */
+} /* end subroutine (statmsg_processor) */
 
 local int mapper_start(MA *mmp,time_t dt,cc *un,cc *uh,cc *fname) noex {
 	cint		to = TO_MAPCHECK ;
@@ -792,29 +772,28 @@ local int mapper_start(MA *mmp,time_t dt,cc *un,cc *uh,cc *fname) noex {
 	                    mmp->ti_check = dt ;
 			    if (rs < 0) {
 			        mmp->magval = 0 ;
-			    }
+			    } /* end if (error) */
 	                }
 	                if (rs < 0) {
 		            paramfile_close(&mmp->dirsfile) ;
-			}
+			} /* end if (error) */
 	            } /* end if (paramfile_open) */
 	            if (rs < 0) {
 		        vechand_finish(&mmp->mapdirs) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (vechand_start) */
 	        if (rs < 0) {
 	            void *vp = voidp(mmp->fname) ;
 	    	    lm_free(vp) ;
 	            mmp->fname = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (memory-acquire) */
 	    if (rs < 0) {
 	        lockrw_destroy(&mmp->rwm) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (lockrw_create) */
 	return rs ;
-}
-/* end subroutine (mapper_start) */
+} /* end subroutine (mapper_start) */
 
 local int mapper_finish(MA *mmp) noex {
 	int		rs = SR_FAULT ;
@@ -849,8 +828,7 @@ local int mapper_finish(MA *mmp) noex {
 	    } /* end if (magic) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapper_finish) */
+} /* end subroutine (mapper_finish) */
 
 local int mapper_check(MA *mmp,time_t dt) noex {
 	cint		to_lock = TO_LOCK ;
@@ -896,8 +874,7 @@ local int mapper_check(MA *mmp,time_t dt) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? nchanged : rs ;
-}
-/* end subroutine (mapper_check) */
+} /* end subroutine (mapper_check) */
 
 local int mapper_process(MA *mmp,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	cint		to_lock = TO_LOCK ;
@@ -919,8 +896,7 @@ local int mapper_process(MA *mmp,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapper_process) */
+} /* end subroutine (mapper_process) */
 
 local int mapper_processor(MA *mmp,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	int		rs = SR_FAULT ;
@@ -942,8 +918,7 @@ local int mapper_processor(MA *mmp,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapper_processor) */
+} /* end subroutine (mapper_processor) */
 
 local int mapper_maploadparam(MA *mmp) noex {
     	int		rs ;
@@ -1055,8 +1030,7 @@ local int mapper_mapload(MA *mmp) noex {
 	    } /* end if (magic) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mapper_mapload) */
+} /* end subroutine (mapper_mapload) */
 
 local int mapper_mapadd(MA *mmp,cc *kp,int kl,cc *vap,int val) noex {
 	cint		sz = szof(MD) ;
@@ -1072,17 +1046,16 @@ local int mapper_mapadd(MA *mmp,cc *kp,int kl,cc *vap,int val) noex {
 	                rs = vechand_add(&mmp->mapdirs,ep) ;
 	                if (rs < 0) {
 	                    mapdir_finish(ep) ;
-		        }
+		        } /* end if (error) */
 	            } /* end if (mapdir_start) */
 	            if (rs < 0) {
 	                lm_free(ep) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (memory-acquire) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapper_mapadd) */
+} /* end subroutine (mapper_mapadd) */
 
 local int mapper_mapfins(MA *mmp) noex {
 	int		rs = SR_FAULT ;
@@ -1113,8 +1086,7 @@ local int mapper_mapfins(MA *mmp) noex {
 	    } /* end if (magic) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapper_mapfins) */
+} /* end subroutine (mapper_mapfins) */
 
 local int mapdir_start(MD *ep,cc *un,cc *uh,
 		cc *kp,int kl,cc *valp,int vall) noex {
@@ -1145,8 +1117,7 @@ local int mapdir_start(MD *ep,cc *un,cc *uh,
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapdir_start) */
+} /* end subroutine (mapdir_start) */
 
 local int mapdir_finish(MD *ep) noex {
 	int		rs = SR_FAULT ;
@@ -1172,8 +1143,7 @@ local int mapdir_finish(MD *ep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mapdir_finish) */
+} /* end subroutine (mapdir_finish) */
 
 local int mapdir_proc(MD *ep,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	cint		to_lock = TO_LOCK ;
@@ -1205,8 +1175,7 @@ local int mapdir_proc(MD *ep,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	    } /* end if (continued) */
 	} /* end if */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapdir_proc) */
+} /* end subroutine (mapdir_proc) */
 
 local int mapdir_expand(MD *ep) noex {
 	cint		to_lock = TO_LOCK ;
@@ -1222,8 +1191,7 @@ local int mapdir_expand(MD *ep) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (read-write lock) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (mapdir_expand) */
+} /* end subroutine (mapdir_expand) */
 
 local int mapdir_expander(MD *ep) noex {
 	int		rs = SR_INVALID ;
@@ -1255,8 +1223,7 @@ local int mapdir_expander(MD *ep) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (mapdir_expander) */
+} /* end subroutine (mapdir_expander) */
 
 local int vecstr_envload(VS *,cc *,cc *,cc *) noex ;
 
@@ -1303,8 +1270,7 @@ local int mapdir_procer(MD *mdp,cc **ev,cc *gn,cc *kn,int fd) noex {
 	    } /* end if (u_stat) */
 	} /* end if (continued) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapdir_procer) */
+} /* end subroutine (mapdir_procer) */
 
 local int mapdir_procerv(MD *mdp,cc **ev,cc *dn,mv strs,int fd,cc *kn) noex {
     	int		rs ;
@@ -1381,8 +1347,7 @@ local int mapdir_procerthem(MD *mdp,cc **ev,cc *dn,
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapdir_procerthem) */
+} /* end subroutine (mapdir_procerthem) */
 
 local int mapdir_procerone(MD *ep,cc **ev,cc *dn,
 		VS *blp,cc *kn,int fd) noex {
@@ -1406,8 +1371,7 @@ local int mapdir_procerone(MD *ep,cc **ev,cc *dn,
 	} /* end for */
 	if ((rs >= 0) && (c == 0)) rs = SR_NOENT ;
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapdir_procerone) */
+} /* end subroutine (mapdir_procerone) */
 
 local int mapdir_procout(MD *ep,cchar **ev,cchar *dn,cchar *bn,int fd) noex {
 	cint		sz = ((var.maxpathlen + 1) + (var.maxnamelen + 1)) ;
@@ -1431,8 +1395,7 @@ local int mapdir_procout(MD *ep,cchar **ev,cchar *dn,cchar *bn,int fd) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapdir_procout) */
+} /* end subroutine (mapdir_procout) */
 
 local int mapdir_procouter(MD *ep,cchar **ev,cchar *fn,int ofd) noex {
 	cint		to_open = TO_OPEN ;
@@ -1467,17 +1430,16 @@ local int mapdir_procouter(MD *ep,cchar **ev,cchar *fn,int ofd) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mapdir_procouter) */
+} /* end subroutine (mapdir_procouter) */
 
 vars::operator int () noex {
     	int		rs ;
 	if ((rs = maxpathlen) == 0) {
-	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	        maxpathlen = rs ;
-	        if ((rs = bufsizeget(bufsize_mn)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_mn)) >= 0) ylikely {
 		    maxnamelen = rs ;
-		    if ((rs = bufsizeget(bufsize_un)) >= 0) {
+		    if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 		        usernamelen = rs ;
 			envlen = maxnamelen ;
 			parambuflen = maxpathlen ;
@@ -1492,7 +1454,7 @@ local int vecstr_envload(VS *op,cc *pre,cc *adm,cc *dn) noex {
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (char *pbuf ; (rs = lm_sn(&pbuf)) >= 0) {
+	if (char *pbuf ; (rs = lm_sn(&pbuf)) >= 0) ylikely {
 	    cint	plen = rs ;
             for (int i = 0 ; (rs >= 0) && (i < 2) ; i += 1) {
                 cchar       *post{} ;
@@ -1531,7 +1493,6 @@ local bool isBaseMatch(cchar *den,cchar *bname,cchar *digp) noex {
 	    f = (m == bl) && (den[m] == '.') ;
 	}
 	return f ;
-}
-/* end subroutine (isBaseMatch) */
+} /* end subroutine (isBaseMatch) */
 
 
