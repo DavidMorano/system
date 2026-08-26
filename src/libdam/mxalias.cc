@@ -237,7 +237,7 @@ local int	cmpfe(MA_FI *,MA_FI *) noex ;
 
 extern "C" {
     local int	vcmpfe(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 local bool	isnotspecial(int) noex ;
 local bool	isOurFileType(mode_t) noex ;
@@ -302,11 +302,11 @@ constexpr bool		f_comment = false ;
 int mxalias_open(MA *op,cchar *pr,cchar *username) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = mxalias_ctor(op,pr,username)) >= 0) {
-	    if (static cint rsv = var ; (rs = rsv) >= 0) {
-	        if (cchar *cp ; (rs = lm_strw(pr,-1,&cp)) >= 0) {
+	if ((rs = mxalias_ctor(op,pr,username)) >= 0) ylikely {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+	        if (cchar *cp ; (rs = lm_strw(pr,-1,&cp)) >= 0) ylikely {
 	            op->pr = cp ;
-	            if ((rs = mxalias_username(op,username)) >= 0) {
+	            if ((rs = mxalias_username(op,username)) >= 0) ylikely {
 		        cint	vn = 5 ;
 	                cint	vo = (vecobjm.stationary | vecobjm.reuse) ;
 	                cint	sz = szof(MA_FI) ;
@@ -348,7 +348,7 @@ int mxalias_open(MA *op,cchar *pr,cchar *username) noex {
 int mxalias_close(MA *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mxalias_magic(op)) >= 0) {
+	if ((rs = mxalias_magic(op)) >= 0) ylikely {
 	    {
 	        rs1 = mxalias_finents(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -380,7 +380,7 @@ int mxalias_close(MA *op) noex {
 
 int mxalias_audit(MA *op) noex {
 	int		rs ;
-	if ((rs = mxalias_magic(op)) >= 0) {
+	if ((rs = mxalias_magic(op)) >= 0) ylikely {
 	    custime	dt = getustime ;
 	    rs = keyvals_check(op->elp,dt) ;
 	} /* end if (magic) */
@@ -389,7 +389,7 @@ int mxalias_audit(MA *op) noex {
 
 int mxalias_count(MA *op) noex {
 	int		rs ;
-	if ((rs = mxalias_magic(op)) >= 0) {
+	if ((rs = mxalias_magic(op)) >= 0) ylikely {
 	    rs = keyvals_count(op->elp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -397,7 +397,7 @@ int mxalias_count(MA *op) noex {
 
 int mxalias_curbegin(MA *op,MA_CUR *curp) noex {
 	int		rs ;
-	if ((rs = mxalias_magic(op,curp)) >= 0) {
+	if ((rs = mxalias_magic(op,curp)) >= 0) ylikely {
 	    rs = memclear(curp) ;
 	    curp->i = -1 ;
 	    curp->vbuf = nullptr ;
@@ -412,7 +412,7 @@ int mxalias_curbegin(MA *op,MA_CUR *curp) noex {
 int mxalias_curend(MA *op,MA_CUR *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mxalias_magic(op,curp)) >= 0) {
+	if ((rs = mxalias_magic(op,curp)) >= 0) ylikely {
 	    if (op->fl.cursoracc) {
 	        op->ti_access = getustime ;
 	    }
@@ -449,7 +449,7 @@ int mxalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	int		kl = 0 ;
-	if ((rs = mxalias_magic(op,curp,kbuf)) >= 0) {
+	if ((rs = mxalias_magic(op,curp,kbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if ((curp->magval == MXALIAS_MAGIC) && (op->ncursors > 0)) {
 	        keyvals_cur	*kvcp = curp->kvcp ;
@@ -487,7 +487,7 @@ int mxalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 int mxalias_curlook(MA *op,MA_CUR *curp,cchar *kbuf,int klen) noex {
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = mxalias_magic(op,curp,kbuf)) >= 0) {
+	if ((rs = mxalias_magic(op,curp,kbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if ((curp->magval == MXALIAS_MAGIC) && (op->ncursors > 0)) {
 	        if (kbuf[0]) {
@@ -544,7 +544,7 @@ local int mxalias_curlooks(MA *op,MA_CUR *curp,cc *kbuf,int klen) noex {
 int mxalias_curread(MA *op,MA_CUR *curp,char *vbuf,int vlen) noex {
 	int		rs ;
 	int		vl = 0 ;
-	if ((rs = mxalias_magic(op,curp)) >= 0) {
+	if ((rs = mxalias_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (op->ncursors > 0) {
 	        cint	ni = (curp->i < 0) ? 0 : (curp->i + 1) ;
@@ -640,7 +640,7 @@ int mxalias_fileadd(MA *op,cchar *atfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = mxalias_magic(op,atfname)) >= 0) {
+	if ((rs = mxalias_magic(op,atfname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (atfname[0]) {
 	        cchar	*fn = atfname ;
@@ -682,7 +682,7 @@ int mxalias_fileadd(MA *op,cchar *atfname) noex {
 local int mxalias_filereg(MA *op,ustat *sbp,cchar *fn) noex {
 	int		rs ;
 	int		fi = INT_MAX ;
-	if (MA_FI fe ; (rs = file_start(&fe,sbp,fn)) >= 0) {
+	if (MA_FI fe ; (rs = file_start(&fe,sbp,fn)) >= 0) ylikely {
 	    vecobj	*flp = op->flp ;
 	    cint	rsn = SR_NOTFOUND ;
 	    if ((rs = flp->search(&fe,vcmpfe,nullptr)) == rsn) {
@@ -748,7 +748,7 @@ local int mxalias_fileparse(MA *op,int fi) noex {
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
 	void		*vp{} ;
-	if ((rs = flp->get(fi,&vp)) >= 0) {
+	if ((rs = flp->get(fi,&vp)) >= 0) ylikely {
 	    MA_FI	*fep = (MA_FI *) vp ;
 	    if (vp) {
 	        bfile	mxfile, *lfp = &mxfile ;
@@ -785,7 +785,7 @@ local int mxalias_fileparser(MA *op,int fi,bfile *lfp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
-	if (BD bd ; (rs = bufdesc_start(&bd,llen)) >= 0) {
+	if (BD bd ; (rs = bufdesc_start(&bd,llen)) >= 0) ylikely {
 	    char	*lbuf = bd.lbuf ;
 	    while ((rs = breadln(lfp,lbuf,llen)) > 0) {
 	        cchar	*cp ;
@@ -805,7 +805,7 @@ local int mxalias_fileparseln(MA *op,int fi,BD *bdp,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
-	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
+	if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) ylikely {
 	    cchar	*fp ;
 	    if (int fl ; (fl = fsb.get(kterms,&fp)) > 0) {
 	        if (int ki ; (ki = matstr(keynames,fp,fl)) >= 0) {
@@ -958,7 +958,7 @@ local int mxalias_fileold(MA *op,time_t daytime) noex {
 	int		rs1 ;
 	int		f = false ; /* return-value */
 	if ((rs = mxalias_aprofile(op,daytime)) >= 0) {
-	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 	        ustat	sb ;
 	        int	i ; /* used-afterwards */
 	        for (i = 0 ; op->aprofile[i] != nullptr ; i += 1) {
@@ -983,7 +983,7 @@ local int mxalias_fileold(MA *op,time_t daytime) noex {
 local int mxalias_mkuserfname(MA *op,char *fname) noex {
 	int		rs ;
 	fname[0] = '\0' ;
-	if ((rs = mxalias_userdname(op)) >= 0) {
+	if ((rs = mxalias_userdname(op)) >= 0) ylikely {
 	    cchar	*homedname = op->userdname ;
 	    rs = mkpath(fname,homedname,MXALIAS_USERDB) ;
 	}
@@ -1036,7 +1036,7 @@ local int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
 	if (op) ylikely {
 	    if ((rs = vlp->count) > 0) {
 	        int	sz = (rs + 1) * szof(char **) ;
-	        if (void *p ; (rs = lm_mall(sz,&p)) >= 0) {
+	        if (void *p ; (rs = lm_mall(sz,&p)) >= 0) ylikely {
 	            cchar	*cp{} ;
 	            curp->vals = charpp(p) ; /* store allocation here */
 	            sz = 1 ;
@@ -1061,8 +1061,8 @@ local int mxalias_mkvals(MA *op,MA_CUR *curp,vecstr *vlp) noex {
 	            if (rs < 0) {
 	                lm_free(curp->vals) ;
 	                curp->vals = nullptr ;
-	            }
-	        } /* end if (m-a) */
+	            } /* end if (error) */
+	        } /* end if (memory-acquire) */
 	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -1171,7 +1171,7 @@ local int bufdesc_finish(BD *bdp) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_ml)) >= 0) {
+	if ((rs = bufsizeget(bufsize_ml)) >= 0) ylikely {
 	    maxlinelen = rs ;
 	}
 	return rs ;
@@ -1179,7 +1179,7 @@ vars::operator int () noex {
 
 local int cmpfe(MA_FI *e1p,MA_FI *e2p) noex {
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    if (e1p) {
 	        if (e2p) {
 		    if ((e1p->dev - e2p->dev) == 0) {
@@ -1197,7 +1197,7 @@ local int cmpfe(MA_FI *e1p,MA_FI *e2p) noex {
 	    } else {
 	        rc = +1 ;
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (cmpfe) */
 
