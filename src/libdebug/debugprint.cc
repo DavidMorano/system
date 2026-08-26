@@ -135,11 +135,14 @@ import ureserve ;			/* |is{x}(3u)| */
 #define	O_FLAGS		(O_WRONLY | O_CREAT | O_APPEND)
 
 #ifndef	LINEBUFLEN
-#define	LINEBUFLEN	(2*1024)
+#define	LINEBUFLEN	(2 * 1024)
 #endif
  
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
+#endif
+#ifndef	CF_LINELEN
+#define	CF_LINELEN	0		/* use |strlinelen(3dam)| */
 #endif
 
 
@@ -163,7 +166,7 @@ extern "C" {
     int debugmgr_init() noex ;
     int debugmgr_fini() noex ;
     int	debugclose() noex ;
-}
+} /* end */
 
 
 /* external variables */
@@ -193,7 +196,7 @@ namespace {
 extern "C" {
     local void	debugmgr_atforkbefore() noex ;
     local void	debugmgr_atforkafter() noex ;
-}
+} /* end */
 
 local int	debugprinter(cchar *,int) noex ;
 local int	snwcpyprintclean(char *,int,cchar *,int) noex ;
@@ -264,8 +267,7 @@ int debugmgr_init() noex {
 	    }
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (debugmgr_init) */
+} /* end subroutine (debugmgr_init) */
 
 int debugmgr_fini() noex {
 	DEBUGMGR	*uip = &ef ;
@@ -292,8 +294,7 @@ int debugmgr_fini() noex {
 	    memclear(uip) ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end subroutine (debugmgr_fini) */
+} /* end subroutine (debugmgr_fini) */
 
 int debugprintf(cchar *fmt,...) noex {
 	va_list		ap ;
@@ -313,8 +314,7 @@ int debugprintf(cchar *fmt,...) noex {
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d wlen=%d\n",rs,wlen) ;
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (debugprintf) */
+} /* end subroutine (debugprintf) */
 
 /* special for |DEBUGPRINTF(3debug)| */
 int debugprintx(cchar *fun,cchar *fmt,...) noex {
@@ -339,8 +339,7 @@ int debugprintx(cchar *fun,cchar *fmt,...) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (debugvprintx) */
+} /* end subroutine (debugvprintx) */
 
 int debugvprintf(cchar *fmt,va_list ap) noex {
     	cnothrow	nt{} ;
@@ -365,8 +364,7 @@ int debugvprintf(cchar *fmt,va_list ap) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (debugvprintf) */
+} /* end subroutine (debugvprintf) */
 
 int debugprintdeci(cchar *s,int v) noex {
     	cnothrow	nt{} ;
@@ -381,8 +379,7 @@ int debugprintdeci(cchar *s,int v) noex {
 	    } /* end if (new-char) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (debugprintdeci) */
+} /* end subroutine (debugprintdeci) */
 
 int debugprinthexi(cchar *s,int v) noex {
     	cnothrow	nt{} ;
@@ -397,13 +394,11 @@ int debugprinthexi(cchar *s,int v) noex {
 	    } /* end if (new-char) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (debugprinthexi) */
+} /* end subroutine (debugprinthexi) */
 
 int debugprintnum(cchar *s,int v) noex {
 	return debugprintdeci(s,v) ;
-}
-/* end subroutine (debugprintnum) */
+} /* end subroutine (debugprintnum) */
 
 int debugsetfd(int fd) noex {
 	int		rs = SR_NOTOPEN ;
@@ -412,21 +407,20 @@ int debugsetfd(int fd) noex {
 	    if (ustat sb ; (fd < FD_MAX) && ((rs = uc_fstat(fd,&sb)) >= 0)) {
 	        ef.fd = fd ;
 	        ef.sz = intconv(sb.st_size) ;
-	    }
-	}
+	    } /* end if (uc_fstat) */
+	} /* end if (was open) */
 	if ((rs >= 0) && (ef.fd >= 0)) {
 	    uc_fchmod(ef.fd ,0666) ;
-	}
+	} /* end if */
 	return rs ;
-}
-/* end subroutine (debugsetfd) */
+} /* end subroutine (debugsetfd) */
 
 int debugopen(cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	int		fd = -1 ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 	        debugclose() ;
 	        if (hasalldig(fname,-1)) {
 	            if (uint v ; (rs = cfdecui(fname,-1,&v)) >= 0) {
@@ -442,7 +436,7 @@ int debugopen(cchar *fname) noex {
 	                }
 	            } /* end if (u_open) */
 	        } /* end if */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            ef.fd = fd ;
 	            ef.sz = 0 ;
 	            if (ustat sb ; (rs = uc_fstat(ef.fd,&sb)) >= 0) {
@@ -456,23 +450,23 @@ int debugopen(cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ef.fd : rs ;
-}
-/* end subroutine (debugopen) */
+} /* end subroutine (debugopen) */
 
 int debugclose() noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
 	if (ef.fd > 0) {
-	    u_close(ef.fd) ;
+	    rs1 = u_close(ef.fd) ;
+	    if (rs >= 0) rs = rs1 ;
 	    ef.fd = 0 ; /* special case (use zero) */
-	}
+	} /* end if (was open) */
 	ef.sz = 0 ;
-	return 0 ;
-}
-/* end subroutine (debugclose) */
+	return rs ;
+} /* end subroutine (debugclose) */
 
 int debuggetfd() noex {
 	return ef.fd ;
-}
-/* end subroutine (debuggetfd) */
+} /* end subroutine (debuggetfd) */
 
 /* low level debug-print function */
 int debugprint(cchar *sbuf,int slen) noex {
@@ -484,8 +478,7 @@ int debugprint(cchar *sbuf,int slen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (debugprint) */
+} /* end subroutine (debugprint) */
 
 local int getlen(cchar *sp,int sl) noex {
     	int	al = 0 ;
@@ -536,8 +529,7 @@ int debugwrite(cchar *sbuf,int µslen) noex {
 	} /* end if (getlenstr) */
 	DPRINTF("ret rs=%d wlen=%d\n",rs,wlen) ;
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (debugwrite) */
+} /* end subroutine (debugwrite) */
 
 
 /* local subroutines */
