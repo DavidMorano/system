@@ -58,14 +58,14 @@ import libutil ;			/* |memclear(3u)| */
 extern "C" {
     typedef int (*workthr)(void *) noex ;
     typedef int (*callthr)(void *,void *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
 
 extern "C" {
     extern int uc_nprocessors(int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
