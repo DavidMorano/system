@@ -114,7 +114,7 @@ int tmstrsday(cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	if (cint sl = getlenstr(sp,µsl) ; sl >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if ((sl >= 1) && (sl <= 9)) ylikely {
+	    if ((sl >= 2) && (sl <= 9)) ylikely {
 	        switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
 	        case TWOCHARS('S', 'u'):
 	            rs = 0 ;
