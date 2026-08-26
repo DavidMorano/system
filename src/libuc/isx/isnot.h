@@ -34,7 +34,7 @@ extern bool isNotValid		(int) noex ;
 extern bool isNotLib		(int) noex ;
 extern bool isNotTerm		(int) noex ;
 extern bool isNotSupport	(int) noex ;
-local inline bool isInvalid(int rs) noex {
+local inline bool isInvalid	(int rs) noex {
 	return isNotValid(rs) ;
 }
 
