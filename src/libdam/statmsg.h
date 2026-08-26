@@ -13,25 +13,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |uid_t| + |gid_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ptm.h>
-#include	<lockrw.h>
-#include	<paramfile.h>
-#include	<vechand.h>
-#include	<userid.hh>
+#include	<sys/types.h>		/* POSIX® |uid_t| + |gid_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<lockrw.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<userid.hh>		/* LIBUC */
 
 
-#define	STATMSG_MAGIC	0x75648942
 #define	STATMSG		struct statmsg_head
 #define	STATMSG_ID	struct statmsg_ident
 #define	STATMSG_MAP	struct statmsg_mapper
 #define	STATMSG_FL	struct statmsg_flags
 #define	STATMSG_CK	struct statmsg_checkdata
+#define	STATMSG_MAGIC	0x75648942
 
 
 struct statmsg_ident {
