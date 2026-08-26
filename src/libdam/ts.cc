@@ -211,7 +211,7 @@ typedef ts_ent		tsent ;
 extern "C" {
     extern int uc_lockf(int,int,off_t) noex ;
     extern int uc_closeonexec(int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
