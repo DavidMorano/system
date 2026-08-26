@@ -156,7 +156,7 @@ local int	tagent_finish(RT_TAG *) noex ;
 
 extern "C" {
     local int	vcmpdef(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 local int	cmpdefe(RT_TAG *,RT_TAG *) noex ;
 
