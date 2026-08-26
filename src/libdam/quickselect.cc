@@ -59,7 +59,7 @@
 
 extern "C" {
     extern void	arrswapi(int *,int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
