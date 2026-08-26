@@ -39,7 +39,7 @@
 ******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<climits>
@@ -57,7 +57,6 @@
 
 
 /* exported subroutines */
-
 
 int fftell(fp,offp)
 FFILE		*fp ;
