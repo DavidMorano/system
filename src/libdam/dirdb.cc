@@ -37,7 +37,8 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<uclibmem.h>		/* LIBUS */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<hdb.h>			/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
@@ -64,10 +65,6 @@ typedef dirdb_ent *	entp ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_stat(cchar *,ustat *) noex ;
-}
 
 
 /* external variables */
@@ -134,7 +131,7 @@ local int	entry_finish(dirdb_ent *) noex ;
 #if	CF_STATCMP
 extern "C" {
     local int	vcmpstat(cvoid **,cvoid **) noex ;
-}
+} /* end */
 #endif
 
 
@@ -149,9 +146,9 @@ extern "C" {
 int dirdb_start(dirdb *op,int n) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	if ((rs = dirdb_ctor(op)) >= 0) {
+	if ((rs = dirdb_ctor(op)) >= 0) ylikely {
 	    op->count = 0 ;
-	    if ((rs = vechand_start(op->dlp,n,0)) >= 0) {
+	    if ((rs = vechand_start(op->dlp,n,0)) >= 0) ylikely {
 	        if ((rs = hdb_start(op->dbp,n,1,np,np)) >= 0) {
 	            op->magval = DIRDB_MAGIC ;
 	        }
@@ -169,7 +166,7 @@ int dirdb_start(dirdb *op,int n) noex {
 int dirdb_finish(dirdb *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dirdb_magic(op)) >= 0) {
+	if ((rs = dirdb_magic(op)) >= 0) ylikely {
 	    if (op->dbp) {
 		vechand	*dlp = op->dlp ;
 	        void	*vp{} ;
@@ -209,11 +206,11 @@ int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_new = false ;
-	if ((rs = dirdb_magic(op,dp)) >= 0) {
+	if ((rs = dirdb_magic(op,dp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (dp[0]) {
+	    if (dp[0]) ylikely {
 	        if (dl < 0) dl = lenstr(dp) ;
-	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	        if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 	             if ((rs = mkpath1w(tbuf,dp,dl)) >= 0) {
 	                 if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
 		             if (S_ISDIR(sb.st_mode)) {
@@ -257,7 +254,7 @@ int dirdb_add(dirdb *op,cchar *dp,int dl) noex {
 int dirdb_clean(dirdb *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = dirdb_magic(op)) >= 0) {
+	if ((rs = dirdb_magic(op)) >= 0) ylikely {
 	    if (hdb_cur cur ; (rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
 	        hdb_dat		key{} ;
 	        hdb_dat		val{} ;
@@ -290,7 +287,7 @@ int dirdb_clean(dirdb *op) noex {
 
 int dirdb_curbegin(dirdb *op,dirdb_cur *curp) noex {
 	int		rs ;
-	if ((rs = dirdb_magic(op,curp)) >= 0) {
+	if ((rs = dirdb_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -298,7 +295,7 @@ int dirdb_curbegin(dirdb *op,dirdb_cur *curp) noex {
 
 int dirdb_curend(dirdb *op,dirdb_cur *curp) noex {
 	int		rs ;
-	if ((rs = dirdb_magic(op,curp)) >= 0) {
+	if ((rs = dirdb_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
@@ -307,7 +304,7 @@ int dirdb_curend(dirdb *op,dirdb_cur *curp) noex {
 int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = dirdb_magic(op,curp,epp)) >= 0) {
+	if ((rs = dirdb_magic(op,curp,epp)) >= 0) ylikely {
 	    vechand	*dlp = op->dlp ;
 	    int		i = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	    if (void *vp ; (rs = dlp->get(i,&vp)) >= 0) {
@@ -325,10 +322,10 @@ int dirdb_curenum(dirdb *op,dirdb_cur *curp,dirdb_ent **epp) noex {
 local int dirdb_adding(dirdb *op,ustat *sbp,cchar *sp,int sl) noex {
 	cint		sz = szof(dirdb_ent) ;
 	int		rs ;
-	if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
+	if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) ylikely {
 	    dirdb_ent	*ep = entp(vp) ;
-	    if ((rs = entry_start(ep,sp,sl,sbp,op->count)) >= 0) {
-	        if ((rs = vechand_add(op->dlp,ep)) >= 0) {
+	    if ((rs = entry_start(ep,sp,sl,sbp,op->count)) >= 0) ylikely {
+	        if ((rs = vechand_add(op->dlp,ep)) >= 0) ylikely {
 		    hdb_dat	key ;
 		    hdb_dat	val ;
 	            int		dbi = rs ;
@@ -376,10 +373,10 @@ local int dirdb_alreadyname(dirdb *op,cchar *name,int nlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
+	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 	    if (nlen < 0) nlen = lenstr(name) ;
-	    if ((rs = mkpath1w(tbuf,name,nlen)) >= 0) {
-	        if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) {
+	    if ((rs = mkpath1w(tbuf,name,nlen)) >= 0) ylikely {
+	        if (ustat sb ; (rs = uc_stat(tbuf,&sb)) >= 0) ylikely {
 	            dirdb_fid	fid{} ;
 	            hdb_dat	key ;
 	            hdb_dat	val{} ;
@@ -446,7 +443,7 @@ local int vcmpstat(cvoid **v1pp,cvoid **v2pp) noex {
 	const ustat	*e1p = (ustat *) *v1pp ;
 	const ustat	*e2p = (ustat *) *v2pp ;
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    rc = +1 ;
 	    if (e1p) {
 		rc = -1 ;
@@ -454,7 +451,7 @@ local int vcmpstat(cvoid **v1pp,cvoid **v2pp) noex {
 		    rc = cmpstat(e1p,e2p) ;
 		}
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (vcmpstat) */
 
