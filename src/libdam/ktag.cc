@@ -112,11 +112,11 @@ local int ktag_dtor(ktag *op) noex {
 	    if (op->slp) ylikely {
 		delete op->slp ;
 		op->slp = nullptr ;
-	    }
+	    } /* end if (delete-vecstr) */
 	    if (op->klp) ylikely {
 		delete op->klp ;
 		op->klp = nullptr ;
-	    }
+	    } /* end if (delete-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ktag_dtor) */
@@ -133,7 +133,7 @@ local inline int ktag_magic(ktag *op,Args ... args) noex {
 extern "C" {
     local int	vercmp(KT_KEY *,KT_KEY *) noex ;
     local int	vesrch(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -154,19 +154,19 @@ int ktag_start(KT *op,KT_PA *kap,uint soff,cchar *lp,int ll) noex {
 	    cint	vo = vecobjm.compact ;
 	    op->kap = kap ;
 	    op->recoff = soff ;
-	    if ((rs = vecobj_start(op->klp,sz,vn,vo)) >= 0) {
+	    if ((rs = vecobj_start(op->klp,sz,vn,vo)) >= 0) ylikely {
 	        if_constexpr (f_comment) {
 	            rs = vecstr_start(op->slp,5,0) ;
 	            op->f_store = (rs >= 0) ;
 	        } /* end if_constexpr (f_comment) */
-	        if (rs >= 0) {
-	            if ((rs = ktag_procline(op,lp,ll)) >= 0) {
+	        if (rs >= 0) ylikely {
+	            if ((rs = ktag_procline(op,lp,ll)) >= 0) ylikely {
 			op->magval = KTAG_MAGIC ;
 		    }
 	            if (rs < 0) {
 	                if (op->f_store) {
 	                    vecstr_finish(op->slp) ;
-	                }
+	                } /* end if */
 	            } /* end if (error) */
 	        } /* end if (ok) */
 	        if (rs < 0) {
@@ -183,7 +183,7 @@ int ktag_start(KT *op,KT_PA *kap,uint soff,cchar *lp,int ll) noex {
 int ktag_finish(KT *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ktag_magic(op)) >= 0) {
+	if ((rs = ktag_magic(op)) >= 0) ylikely {
 	    if (op->tkeys) {
 	        rs1 = lm_free(op->tkeys) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -208,7 +208,7 @@ int ktag_finish(KT *op) noex {
 
 int ktag_add(KT *op,cchar *lp,int ll) noex {
 	int		rs ;
-	if ((rs = ktag_magic(op)) >= 0) {
+	if ((rs = ktag_magic(op)) >= 0) ylikely {
 	    rs = ktag_procline(op,lp,ll) ;
 	} /* end if (magic) */
 	return rs ;
@@ -216,7 +216,7 @@ int ktag_add(KT *op,cchar *lp,int ll) noex {
 
 int ktag_mktag(KT *op,uint endoff,KT_TAG *tagp) noex {
 	int		rs ;
-	if ((rs = ktag_magic(op,tagp)) >= 0) {
+	if ((rs = ktag_magic(op,tagp)) >= 0) ylikely {
 	    op->reclen = (endoff - op->recoff) ;
 	    memclear(tagp) ;
 	    tagp->fname = op->fname ;
@@ -242,9 +242,9 @@ int ktag_mktag(KT *op,uint endoff,KT_TAG *tagp) noex {
 int ktag_procline(KT *op,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ktag_magic(op,lp)) >= 0) {
+	if ((rs = ktag_magic(op,lp)) >= 0) ylikely {
 	    KT_PA	*kap = op->kap ;
-	    if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) {
+	    if (field fsb ; (rs = fsb.start(lp,ll)) >= 0) ylikely {
 		cchar	*wt = charp(kap->wterms) ;
 	        int	fl, sl, cl ;
 	        cchar	*fp, *sp, *cp ;
@@ -283,7 +283,7 @@ int ktag_procword(KT *op,cchar *cp,int cl) noex {
     	cnullptr	np{} ;
 	cint		nrs = SR_NOTFOUND ;
 	int		rs ;
-	if ((rs = ktag_magic(op,cp)) >= 0) {
+	if ((rs = ktag_magic(op,cp)) >= 0) ylikely {
 	    KT_KEY	key ;
 	    int		f_needstore = false ;
 	    char	keybuf[KEYBUFLEN + 1] ;
@@ -318,7 +318,7 @@ int ktag_procword(KT *op,cchar *cp,int cl) noex {
 
 int ktag_storelc(KT *op,cchar **rpp,cchar *cp,int cl) noex {
 	int		rs ;
-	if ((rs = ktag_magic(op,rpp,cp)) >= 0) {
+	if ((rs = ktag_magic(op,rpp,cp)) >= 0) ylikely {
 	    if (! op->f_store) {
 	        rs = vecstr_start(op->slp,5,0) ;
 	        op->f_store = (rs >= 0) ;
