@@ -31,19 +31,22 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= isx.h
+INCS += isx.h
 
 MODS +=
 
-LIBS=
+LIBS +=
 
 
-OBJ0= isindomain.o isinetaddr.o ischarx.o 
-OBJ1= isnot.o isoneof.o iserror.o
+OBJ0= isindomain.o isinetaddr.o
+OBJ1= isoneof.o isnot.o iserror.o
+OBJ2= ischarx.o iswchar.o
+OBJ3= ismmclass.o
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB=
 
 OBJ= obja.o
 
@@ -131,11 +134,13 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ischarx.o:	ischarx.cc	ischarx.h	$(INCS)
-iserror.o:	iserror.cc	iserror.h	$(INCS)
-isindomain.o:	isindomain.cc	isindomain.h	$(INCS)
-isinetaddr.o:	isinetaddr.cc	isinetaddr.h	$(INCS)
-isnot.o:	isnot.cc	isnot.h		$(INCS)
-isoneof.o:	isoneof.cc	isoneof.h	$(INCS)
+isindomain.o:	isindomain.cc	isindomain.h			$(INCS)
+isinetaddr.o:	isinetaddr.cc	isinetaddr.h			$(INCS)
+ischarx.o:	ischarx.cc	ischarx.h			$(INCS)
+iswchar.o:	iswchar.cc	iswchar.h			$(INCS)
+isoneof.o:	isoneof.cc	isoneof.h			$(INCS)
+isnot.o:	isnot.cc	isnot.h				$(INCS)
+iserror.o:	iserror.cc	iserror.h			$(INCS)
+ismmclass.o:	ismmclass.cc	ismmclass.h			$(INCS)
 
 
