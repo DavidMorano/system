@@ -111,19 +111,19 @@ local inline int article_dtor(article *op) noex {
 	    if (op->pathp) {
 		delete op->pathp ;
 		op->pathp = nullptr ;
-	    }
+	    } /* end if (delete-dater) */
 	    if (op->ngp) {
 		delete op->ngp ;
 		op->ngp = nullptr ;
-	    }
+	    } /* end if (delete-vechand) */
 	    if (op->envp) {
 		delete op->envp ;
 		op->envp = nullptr ;
-	    }
+	    } /* end if (delete-ng) */
 	    if (op->msgp) {
 		delete op->msgp ;
 		op->msgp = nullptr ;
-	    }
+	    } /* end if (delete-retpath) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (article_dtor) */
@@ -197,7 +197,7 @@ int article_finish(AR *op) noex {
 		    {
 		        rs1 = mem.free(dp) ;
 		        if (rs >= 0) rs = rs1 ;
-		    }
+		    } /* end if (memory-release) */
 	        } /* end for */
 	        rs1 = vechand_finish(op->envp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -225,7 +225,7 @@ int article_finish(AR *op) noex {
 	            rs1 = mem.free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->strs[i] = nullptr ;
-	        }
+	        } /* end if (memory-release) */
 	    } /* end for */
 	    {
 	        rs1 = article_dtor(op) ;
@@ -242,9 +242,9 @@ int article_addpath(AR *op,cchar *sp,int sl) noex {
 	        op->fl.path = true ;
 	        rs = retpath_start(op->pathp) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = retpath_parse(op->pathp,sp,sl) ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (article_addpath) */
@@ -256,9 +256,9 @@ int article_addng(AR *op,cchar *sp,int sl) noex {
 	        op->fl.ngs = true ;
 	        rs = ng_start(op->ngp) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        rs = ng_addparse(op->ngp,sp,sl) ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (article_addng) */
@@ -291,7 +291,7 @@ int article_addmsgdate(AR *op,dater *dp) noex {
 	    }
 	    if (rs >= 0) ylikely {
 	        rs = dater_setcopy(op->msgp,dp) ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (article_addmsgdate) */
@@ -321,7 +321,7 @@ int article_addstr(AR *op,int type,cchar *sp,int sl) noex {
 	if ((rs = article_magic(op,sp)) >= 0) ylikely {
 	    cint	n = articlestr_overlast ;
 	    rs = SR_INVALID ;
-	    if ((type >= 0) &&  (type < n)) {
+	    if ((type >= 0) && (type < n)) {
 		rs = SR_OK ;
 	        if (op->strs[type] != nullptr) {
 	            void *vp = voidp(op->strs[type]) ;
@@ -329,7 +329,7 @@ int article_addstr(AR *op,int type,cchar *sp,int sl) noex {
 		    if (rs >= 0) rs = rs1 ;	/* <- on purpose */
 	            op->strs[type] = nullptr ;
 	        } /* end if (memory-release) */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            if (cchar *cp ; (rs = mem.strw(sp,sl,&cp)) > 0) {
 		        op->strs[type] = cp ;
 	            } /* end if (memory-acquire) */
