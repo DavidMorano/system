@@ -41,14 +41,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>		/* |CHAR_BIT| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |CHAR_BIT| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -81,35 +82,34 @@ template<typename T> T minx(int a,int b) noex {
 	const T		d = (a - b) ;
 	const T		sel = (! (((a - b) >> sbit) & 1)) ;
 	return (a - (sel * d)) ;
-}
+} /* end */
 
 int mini(int a,int b) noex {
     	return minx(a,b) ;
-}
+} /* end */
 
 long minl(long a,long b) noex {
     	return minx(a,b) ;
-}
+} /* end */
 
 longlong minl(longlong a,longlong b) noex {
     	return minx(a,b) ;
-}
-
+} /* end */
 
 typedef<typename T> T maxx(T a,T b) noex {
 	const T		sbit = ((szof(T) * CHAR_BIT) - 1) ;
 	const T		d = (a - b) ;
 	const T		sel = (((a - b) >> sbit) & 1) ;
 	return (a - (sel * d)) ;
-}
+} /* end */
 
 int maxi(int a,int b) noex {
     	return maxx(a,b) ;
-}
+} /* end */
 
 long maxl(long a,long b) noex {
     	return maxx(a,b) ;
-}
+} /* end */
 
 longlong maxl(longlong a,longlong b) noex {
     	return maxx(a,b) ;
@@ -121,40 +121,39 @@ template<typename T> T minx(T a,T b) noex {
 	T	v = a ;
 	if (b < v) v = b ;
 	return v ;
-}
-/* end subroutine (minx) */
+} /* end subroutine (minx) */
 
 int mini(int a,int b) noex {
     	return minx(a,b) ;
-}
+} /* end */
 
 long minl(long a,long b) noex {
     	return minx(a,b) ;
-}
+} /* end */
 
 longlong minl(longlong a,longlong b) noex {
     	return minx(a,b) ;
-}
+} /* end */
 
 
 template<typename T> T maxx(T a,T b) noex {
 	int	v = a ;
 	if (b > v) v = b ;
 	return v ;
-}
+} /* end */
 /* end subroutine (maxx) */
 
 int maxi(int a,int b) noex {
     	return maxx(a,b) ;
-}
+} /* end */
 
 long maxl(long a,long b) noex {
     	return maxx(a,b) ;
-}
+} /* end */
 
 longlong maxl(longlong a,longlong b) noex {
     	return maxx(a,b) ;
-}
+} /* end */
 
 
 #endif /* CF_STRENGTH */
