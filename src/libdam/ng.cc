@@ -1,4 +1,4 @@
-/* ng SUPPORT (news-Group) */
+/* ng SUPPORT (News-Group) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -28,8 +28,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<strings.h>		/* for |strcasecmp(3c)| */
-#include	<climits>		/* |INT_MAX| */
+#include	<strings.h>		/* BSD |strcasecmp(3c)| */
+#include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
