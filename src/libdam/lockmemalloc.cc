@@ -316,7 +316,7 @@ local int lockmemalloc_basemalloc(int sz,void *vp) noex {
 	        repeat {
 	            rs = SR_OK ;
 	            if ((rp = malloc(msize)) == nullptr) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	                switch (rs) {
 	                case SR_AGAIN:
 	                    if (to_again-- > 0) {
@@ -354,7 +354,7 @@ local int lockmemalloc_basevalloc(int sz,void *vp) noex {
 	       repeat {
 	           rs = SR_OK ;
 	           if ((rp = valloc(msize)) == nullptr) {
-		       rs = (- errno) ;
+		       rs = (neg errno) ;
 	               switch (rs) {
 	               case SR_AGAIN:
 	                   if (to_again-- > 0) {
@@ -393,7 +393,7 @@ local int lockmemalloc_baserealloc(cvoid *cp,int sz,void *vp) noex {
 	        repeat {
 	            rs = SR_OK ;
 	            if ((rp = realloc(argp,msize)) == nullptr) {
-		        rs = (- errno) ;
+		        rs = (neg errno) ;
 	                switch (rs) {
 	                case SR_AGAIN:
 	                    if (to_again-- > 0) {
