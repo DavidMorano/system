@@ -104,9 +104,9 @@ import pcsutil ;			/* |hdrmatbasic(3pcs)| */
 int hmatch(cchar *header,cchar *str) noex {
     	int		rs = SR_FAULT ;
 	int		idx = 0 ; /* return-value */
-	if (header && str) {
+	if (header && str) ylikely {
 	    rs = SR_OK ;
-	    if (hdrmatbasic(header,str)) {
+	    if (hdrmatbasic(header,str)) ylikely {
 	        cchar	*hp = header ;
 	        cchar	*sp = str ;
 	        bool	fmat = false ;
