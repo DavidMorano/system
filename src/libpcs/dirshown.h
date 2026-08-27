@@ -20,10 +20,10 @@
 #define	DIRSHOWN_INCLUDE
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<mkdirlist.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<mkdirlist.h>		/* LIBUC */
 
 
 #define	DIRSHOWN	vechand
