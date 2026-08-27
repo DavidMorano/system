@@ -21,12 +21,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/timeb.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
-#include	<dater.h>
+#include	<sys/types.h>		/* P§SIX® */
+#include	<sys/timeb.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<dater.h>		/*U LIBUC */
 
 
 #define	ARTLIST			struct artlist_head
