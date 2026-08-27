@@ -75,6 +75,7 @@
 #include	<ascii.h>		/* LIBU */
 #include	<intceil.h>		/* LIBU */
 #include	<findbit.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<getpwx.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<estrings.h>		/* LIBUC */
@@ -89,7 +90,6 @@
 #include	<paramfile.h>		/* LIBUC */
 #include	<expcook.h>		/* LIBUC */
 #include	<svcfile.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC */
 #include	<bwops.h>		/* LIBUC */
 #include	<termout.h>		/* LIBUC */
