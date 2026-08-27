@@ -57,13 +57,13 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<strnul.hh>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<getnodename.h>		/* LIBUC */
 #include	<getnodedomain.h>	/* LIBUC */
 #include	<getpwd.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
 #include	<dirseen.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
