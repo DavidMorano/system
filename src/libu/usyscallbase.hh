@@ -50,10 +50,10 @@ namespace libu {
 	int		fd = 0 ;
 	usyscallbase() noex { } ;
 	virtual int callstd() noex = 0 ;
-	int handler() noex ;
-	int uwrcheck() noex ;
+	int handler	() noex ;
+	int uwrcheck	() noex ;
     } ; /* end struct (usyscallbase) */
-}
+} /* end namespace (libu) */
 
 
 #endif /* __cplusplus (C++ only) */
