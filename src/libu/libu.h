@@ -72,6 +72,7 @@
 #include	<ustream.hh>
 #include	<ucodenames.h>
 #include	<ugetx.h>
+#include	<utimezone.h>
 
 #include	<atox.h>
 #include	<varnames.hh>
