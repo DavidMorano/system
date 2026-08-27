@@ -57,7 +57,7 @@ export {
 	void operator () (usigblock *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () (const int * = nullptr) noex ;
     } ; /* end struct (usigblock_co) */
@@ -76,14 +76,14 @@ export {
 	usigblock() noex {
 	    start	(this,usigblockmem_start) ;
 	    finish	(this,usigblockmem_finish) ;
-	} ;
+	} ; /* end ctor */
 	void dtor() noex ;
 	destruct usigblock() {
 	    if (fl.open) dtor() ;
-	} ;
+	} ; /* end dtor */
     private:
-	int istart(cint *) noex ;
-	int ifinish() noex ;
+	int istart	(cint *) noex ;
+	int ifinish	() noex ;
     } ; /* end class (sigblock) */
 } /* end export (usigblock) */
 
@@ -98,14 +98,15 @@ export {
 	    }
 	} else {
 	    rs = usigset.fill(&nsm) ;
-	}
-	if (rs >= 0) {
+	} /* end if */
+	if (rs >= 0) ylikely {
 	    if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 		fl.open = true ;
 	    }
-	} /* end if */
+	} /* end if (ok) */
 	return rs ;
     } /* end method (usigblock::istart) */
+
     int usigblock::ifinish() noex {
 	int		rs = SR_NOTOPEN ;
 	if (fl.open) {
@@ -114,13 +115,15 @@ export {
 	}
 	return rs ;
     } /* end method (usigblock::ifinish) */
+
     int usigblock_co::operator () (cint *sigs) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
 	    rs = op->istart(sigs) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
     } /* end method (usigblock_co::operator) */
+
     usigblock_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) {
@@ -132,9 +135,10 @@ export {
 	        rs = op->ifinish() ;
 	        break ;
 	    } /* end switch */
-	}
+	} /* end if (non-null) */
 	return rs ;
     } /* end method (usigblock_co::operator) */
+
     void usigblock::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("usigblock",rs,"fini-finish") ;
