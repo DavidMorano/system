@@ -35,9 +35,9 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
 #include	<strxcmp.h>		/* LIBUC */
