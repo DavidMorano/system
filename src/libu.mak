@@ -48,7 +48,7 @@ LIBS += -liconv -lproc
 OBJ00= syshas.o mailvalues.o endian.o 
 OBJ01= aflag.o errtimer.o usysdefs.o
 OBJ02= timewatch.o timecount.o clanguage.o
-OBJ03= libutil.o usysconf.o umods.o 
+OBJ03= libutil.o usysconf.o umods.o utimezone.o
 
 OBJ04= utimeout.o utimeouts.o utimeoutdefs.o
 OBJ05= ulogerror.o ischx.o ulimits.o
@@ -429,6 +429,16 @@ ustd.o:			ustd.dir
 ustd.dir:
 	makesubdir $@
 
+# USYSCONF
+usysconf.o:		usysconf.dir
+usysconf.dir:
+	makesubdir $@
+
+# UTIMEZONE
+utimezone.o:		utimezone.dir
+utimezone.dir:
+	makesubdir $@
+
 # UFDLOCK
 uopen.o:		uopen.dir
 uopen.dir:
@@ -492,11 +502,6 @@ ureserve.dir:
 # USUPPORT
 usupport.o:		usupport.dir ischx.o
 usupport.dir:
-	makesubdir $@
-
-# USYSCONF
-usysconf.o:		usysconf.dir
-usysconf.dir:
 	makesubdir $@
 
 # VECBOOL
