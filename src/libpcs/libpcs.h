@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysnase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysnase.h>		/* LIBU */
 
 #include	<pcsconfs.h>
 #include	<pcsopendircache.h>
