@@ -38,9 +38,9 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<endian.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<mkfname.h>		/* LIBUC */
