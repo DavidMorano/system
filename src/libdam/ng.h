@@ -1,4 +1,4 @@
-/* ng HEADER (news-Group) */
+/* ng HEADER (News-Group) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
