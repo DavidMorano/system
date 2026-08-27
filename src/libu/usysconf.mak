@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += usysconf.h
+INCS += usysconf.h sysconfcmds.h
 
 MODS += usysconf.o usysconfcheck.o
 
@@ -46,7 +46,7 @@ OBJPART=
 
 OBJPRIME= usysconf0.o
 
-OBJ0= usysconf1.o
+OBJ0= usysconf1.o usysconf2.o
 OBJ1= usysconfcheck.o
 OBJ2= sysconfcmds.o
 OBJ3= unprocessors.o
@@ -156,6 +156,9 @@ usysconf0.o:		usysconf.ccm				$(INCS)
 
 # module implementation
 usysconf1.o:		usysconf1.cc usysconf0.o $(DEPS)	$(INCS)
+	$(COMPILE.cc) $<
+
+usysconf2.o:		usysconf2.cc usysconf0.o $(DEPS)	$(INCS)
 	$(COMPILE.cc) $<
 
 usysconfcheck.o:	usysconfcheck0.o usysconfcheck1.o
