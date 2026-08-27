@@ -43,11 +43,11 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<opentmp.h>		/* LIBUC */
 #include	<getx.h>		/* LIBUC */
