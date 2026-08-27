@@ -44,6 +44,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<getax.h>		/* LIBUC */
@@ -54,7 +55,6 @@
 #include	<vecobj.h>		/* LIBUC */
 #include	<bfile.h>		/* LIBUC */
 #include	<field.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
