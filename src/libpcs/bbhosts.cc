@@ -68,8 +68,8 @@ namespace {
 template<typename ... Args>
 local inline int bbhosts_magic(bbhosts *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == BBHOSTS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == BBHOSTS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (bbhosts_magic) */
@@ -86,12 +86,12 @@ local inline int bbhosts_magic(bbhosts *op,Args ... args) noex {
 int bbhosts_start(bbhosts *op,cchar *pr,cchar *bbhostfn) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ; /* return-value */
-	if (op && pr && bbhostfn) {
+	if (op && pr && bbhostfn) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0] && bbhostfn[0]) {
-		if (loader lo(op,pr,bbhostfn) ; (rs = lo) >= 0) {
+	    if (pr[0] && bbhostfn[0]) ylikely {
+		if (loader lo(op,pr,bbhostfn) ; (rs = lo) >= 0) ylikely {
 		    c = rs ;
-		    op->magic = BBHOSTS_MAGIC ;
+		    op->magval = BBHOSTS_MAGIC ;
 		} /* end if (loader) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -100,16 +100,16 @@ int bbhosts_start(bbhosts *op,cchar *pr,cchar *bbhostfn) noex {
 
 int bbhosts_finish(bbhosts *op) noex {
     	int		rs ;
-	if ((rs = bbhosts_magic(op)) >= 0) {
+	if ((rs = bbhosts_magic(op)) >= 0) ylikely {
 	    rs = op->vecpstr::finish ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
 } /* end subroutine (bbhosts_finish) */
 
 int bbhosts_get(bbhosts *op,int µi,cchar **rpp) noex {
     	int		rs ;
-	if ((rs = bbhosts_magic(op)) >= 0) {
+	if ((rs = bbhosts_magic(op)) >= 0) ylikely {
 	    rs = op->vecpstr::get(µi,rpp) ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
@@ -117,7 +117,7 @@ int bbhosts_get(bbhosts *op,int µi,cchar **rpp) noex {
 
 int bbhosts_find(bbhosts *op,cchar *s) noex {
     	int		rs ;
-	if ((rs = bbhosts_magic(op,s)) >= 0) {
+	if ((rs = bbhosts_magic(op,s)) >= 0) ylikely {
 	    rs = op->vecpstr::find(s) ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
@@ -125,7 +125,7 @@ int bbhosts_find(bbhosts *op,cchar *s) noex {
 
 int bbhosts_count(bbhosts *op) noex {
     	int		rs ;
-	if ((rs = bbhosts_magic(op)) >= 0) {
+	if ((rs = bbhosts_magic(op)) >= 0) ylikely {
     	    rs = op->vecpstr::count ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
@@ -133,7 +133,7 @@ int bbhosts_count(bbhosts *op) noex {
 
 int bbhosts_audit(bbhosts *op) noex {
     	int		rs ;
-	if ((rs = bbhosts_magic(op)) >= 0) {
+	if ((rs = bbhosts_magic(op)) >= 0) ylikely {
     	    rs = op->vecpstr::audit ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
