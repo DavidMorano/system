@@ -31,8 +31,8 @@
 
 EXTERNC_begin
 
-typedef int (*bbhosts_vcmp)(cchar **,cchar **) noex ;
-typedef int (*bbhosts_f)(cchar **,cchar **) noex ;
+typedef int (*bbhosts_vcmp)	(cchar **,cchar **) noex ;
+typedef int (*bbhosts_f)	(cchar **,cchar **) noex ;
 
 EXTERNC_end
 
@@ -49,22 +49,22 @@ struct bbhosts_co {
 	void operator () (bbhosts *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (bbhosts_co) */
 struct bbhosts : vecpstr {
 	bbhosts_co	count ;
 	bbhosts_co	audit ;
 	bbhosts_co	finish ;
-	uint		magic ;
+	uint		magval ;
 	bbhosts() noex {
 	    count	(this,bbhostsmem_count) ;
 	    audit	(this,bbhostsmem_audit) ;
 	    finish	(this,bbhostsmem_finish) ;
-	    magic = 0 ;
+	    magval	= 0 ;
 	} ; /* end ctor */
 	bbhosts(const bbhosts &) = delete ;
 	bbhosts &operator = (const bbhosts &) = delete ;
@@ -74,7 +74,7 @@ struct bbhosts : vecpstr {
 	operator int () noex ;
 	void dtor() noex ;
 	destruct bbhosts() {
-	    if (magic) dtor() ;
+	    if (magval) dtor() ;
 	} ;
 } ; /* end struct (bbhosts) */
 
