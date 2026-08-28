@@ -34,7 +34,7 @@ struct pcsmsg_getstatus {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 struct pcsmsg_status {
 	uint	msglen ;
@@ -43,7 +43,7 @@ struct pcsmsg_status {
 	uint	queries ;
 	uchar	msgtype ;		/* message type */
 	uchar	rc ;
-} ;
+} ; /* end struct */
 
 struct pcsmsg_getval {
 	uint	msglen ;
@@ -51,7 +51,7 @@ struct pcsmsg_getval {
 	uchar	w ;			/* request code */
 	uchar	msgtype ;		/* message type */
 	char	key[PCSMSG_KEYLEN+1] ;
-} ;
+} ; /* end struct */
 
 struct pcsmsg_val {
 	uint	msglen ;
@@ -61,14 +61,14 @@ struct pcsmsg_val {
 	uchar	rc ;
 	uchar	vl ;
 	char	val[REALNAMELEN+1] ;
-} ;
+} ; /* end struct */
 
 struct pcsmsg_gethelp {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
 	uchar	idx ;
-} ;
+} ; /* end struct */
 
 struct pcsmsg_help {
 	uint	msglen ;
@@ -78,7 +78,7 @@ struct pcsmsg_help {
 	uchar	rc ;
 	uchar	vl ;
 	char	val[REALNAMELEN+1] ;
-} ;
+} ; /* end struct */
 
 struct pcsmsg_getname {
 	uint	msglen ;
@@ -100,7 +100,7 @@ struct pcsmsg_getuser {
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
 	char	spec[REALNAMELEN+1] ;
-} ;
+} ; /* end struct */
 
 struct pcsmsg_user {
 	uint	msglen ;
@@ -121,14 +121,14 @@ struct pcsmsg_mark {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
-} ;
+} ; /* end struct */
 
 struct pcsmsg_ack {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
 	uchar	rc ;
-} ;
+} ; /* end struct */
 
 /* request types */
 enum pcsmsgtypes {
@@ -146,7 +146,7 @@ enum pcsmsgtypes {
 	pcsmsgtype_user,
 	pcsmsgtype_ack,
 	pcsmsgtype_overlast
-} ;
+} ; /* end enum */
 
 /* response codes */
 enum pcsmsgrcs {
@@ -156,7 +156,7 @@ enum pcsmsgrcs {
 	pcsmsgrc_notavail,
 	pcsmsgrc_notfound,
 	pcsmsgrc_overlast
-} ;
+} ; /* end enum */
 
 EXTERNC_begin
 
