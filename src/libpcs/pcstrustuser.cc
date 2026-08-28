@@ -168,10 +168,10 @@ int pcstrustuser(cchar *pr,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f = false ; /* return-value */
-	if (pr && un) {
+	if (pr && un) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0] && un[0]) {
-	        if (SI si ; (rs = subinfo_start(&si,pr,un)) >= 0) {
+	    if (pr[0] && un[0]) ylikely {
+	        if (SI si ; (rs = subinfo_start(&si,pr,un)) >= 0) ylikely {
 	            for (int i = 0 ; (rs >= 0) && tries[i] ; i += 1) {
 	                rs = (*tries[i])(&si) ;
 			f = rs ;
@@ -197,17 +197,17 @@ local int subinfo_start(SI *sip,cchar *pr,cchar *un) noex {
 	sip->gid_pr = -1 ;
 	sip->uid_un = -1 ;
 	sip->gid_un = -1 ;
-	if (char *p ; (rs = lm_un(&p)) >= 0) {
+	if (char *p ; (rs = lm_un(&p)) >= 0) ylikely {
 	    sip->unbuf = p ;
 	    sip->unlen = rs ;
-	}
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (subinfo_start) */
 
 local int subinfo_finish(SI *sip) noex {
     	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	    if (sip->unbuf) {
 		rs1 = lm_free(sip->unbuf) ;
