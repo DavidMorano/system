@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	NULSTR		struct nulstr_head
@@ -45,18 +45,18 @@ struct nulstr_co {
 	void operator () (nulstr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (nulstr_co) */
 struct nulstr : nulstr_head {
 	nulstr_co	finish ;
 	nulstr() noex {
 	    finish(this,nulstrmem_finish) ;
 	    as = nullptr ;
-	} ;
+	} ; /* end ctor */
 	nulstr(const nulstr &) = delete ;
 	nulstr &operator = (const nulstr &) = delete ;
 	int start(cchar *,int,cchar **) noex ;
@@ -64,7 +64,7 @@ struct nulstr : nulstr_head {
 	operator int () noex ;
 	destruct nulstr() {
 	    if (as) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (nulstr) */
 #else /* __cplusplus */
 typedef NULSTR		nulstr ;
