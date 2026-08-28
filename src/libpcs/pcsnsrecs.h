@@ -13,16 +13,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<pq.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<pq.h>			/* LIBUC */
 
 
-#define	PCSNSRECS_MAGIC		0x98643168
 #define	PCSNSRECS		struct pcsnsrecs_head
 #define	PCSNSRECS_ST		struct pcsnsrecs_stats
-
+#define	PCSNSRECS_MAGIC		0x98643168
 #define	PCSNSRECS_DEFENTS	10	/* default entries */
 #define	PCSNSRECS_DEFMAX	20	/* default maximum entries */
 #define	PCSNSRECS_DEFTTL	(10*60)	/* default time-to-live */
@@ -34,7 +33,7 @@ struct pcsnsrecs_stats {
 	uint		refreshes ;		/* refreshes */
 	uint		phits, pmisses ;	/* positive */
 	uint		nhits, nmisses ;	/* negative */
-} ;
+} ; /* end struct */
 
 struct pcsnsrecs_head {
 	void		*recs ;		/* linear array (of recs) */
@@ -42,10 +41,10 @@ struct pcsnsrecs_head {
 	pq		lru ;		/* least-recently-used */
 	time_t		ti_check ;
 	uint		wcount ;	/* write-count */
-	uint		magic ;
+	uint		magval ;
 	int		ttl ;		/* time-to-live */
 	int		nmax ;		/* maximum entries */
-} ;
+} ; /* end struct */
 
 typedef PCSNSRECS	pcsnsrecs ;
 typedef	PCSNSRECS_ST	pcsnsrecs_st ;
