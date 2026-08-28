@@ -142,10 +142,10 @@ int pcsopendircache(cchar *pr,cchar *ndname,int of,mode_t om,int ttl) noex {
 	int		fd = -1 ;
 	of &= O_ACCMODE ;
 	of |= O_RDONLY ;
-	if (pr && ndname) {
+	if (pr && ndname) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0] && ndname[0]) {
-		if ((rs = maxpathlen) >= 0) {
+	    if (pr[0] && ndname[0]) ylikely {
+		if ((rs = maxpathlen) >= 0) ylikely {
 		    dirhelp	ho(pr,ndname,of,om,ttl) ;
 		    rs = ho ;
 		    fd = rs ;
@@ -162,7 +162,7 @@ dirhelp::operator int () noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = start()) >= 0) {
+	if ((rs = start()) >= 0) ylikely {
 	    {
 		rs = proc() ;
 		fd = rs ;
@@ -177,11 +177,11 @@ dirhelp::operator int () noex {
 int dirhelp::start() noex {
 	int		rs = SR_OK ;
 	if (ndname[0] != '/') {
-	    if ((rs = malloc_mp(&nbuf)) >= 0) {
+	    if ((rs = mem.mp(&nbuf)) >= 0) ylikely {
 	        rs = mkpath(nbuf,pr,ndname) ;
 	        ndname = nbuf ;
 		if (rs < 0) {
-		    uc_free(nbuf) ;
+		    mem.free(nbuf) ;
 		    nbuf = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
@@ -193,7 +193,7 @@ int dirhelp::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (nbuf) {
-	    rs1 = uc_free(nbuf) ;
+	    rs1 = mem.free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    nbuf = nullptr ;
 	}
@@ -204,14 +204,14 @@ int dirhelp::proc() noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = procdname(ndname,ttl)) >= 0) {
+	if ((rs = procdname(ndname,ttl)) >= 0) ylikely {
 	        int	fsz = 1 ;
 	        cchar	*dc = DIRCACHE_CFNAME ;
 	        char	*fbuf{} ;
 	        fsz += (lenstr(ndname) + 1) ;
 	        fsz += 1 ;
 	        fsz += (lenstr(dc) + 1) ;
-	        if ((rs = uc_malloc(fsz,&fbuf)) >= 0) {
+	        if ((rs = mem.mall(fsz,&fbuf)) >= 0) {
 		    if ((rs = mkpath(fbuf,ndname,dc)) >= 0) {
 	    	        if ((rs = u_open(fbuf,of,om)) >= 0) {
 	    	            fd = rs ;
@@ -223,7 +223,7 @@ int dirhelp::proc() noex {
 			    }
 		        } /* end if (dircache-open) */
 		    } /* end if (mkpath) */
-		    rs1 = uc_free(fbuf) ;
+		    rs1 = mem.free(fbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (memory-allocation) */
 		if ((rs < 0) && (fd >= 0)) u_close(fd) ;
@@ -235,12 +235,10 @@ local int procdname(cchar *newsdname,int ttl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*dbuf{} ;
-	if ((rs = malloc_mp(&dbuf)) >= 0) {
+	if (char *dbuf ; (rs = mem.mp(&dbuf)) >= 0) ylikely {
 	    cchar	*dc = DIRCACHE_CFNAME ;
-	    if ((rs = mkpath(dbuf,newsdname,dc)) >= 0) {
-	        USTAT	sb ;
-	        if ((rs = u_stat(dbuf,&sb)) >= 0) {
+	    if ((rs = mkpath(dbuf,newsdname,dc)) >= 0) ylikely {
+	        if (ustat sb ; (rs = u_stat(dbuf,&sb)) >= 0) {
 		    if (ttl >= 0) {
 		        time_t	dt = time(NULL) ;
 		        if ((dt-sb.st_mtime) >= ttl) rs = SR_STALE ;
@@ -251,7 +249,7 @@ local int procdname(cchar *newsdname,int ttl) noex {
 		    c = rs ;
 	        } /* end (not-found or stale) */
 	    } /* end if (mkpath) */
-	    rs1 = uc_free(dbuf) ;
+	    rs1 = mem.free(dbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
@@ -262,8 +260,8 @@ local int procdnamer(cchar *newsdname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = vecpstr_start(&dirs,25,0,0)) >= 0) {
-	    if ((rs = vecpstr_loaddirs(&dirs,newsdname)) >= 0) {
+	if ((rs = vecpstr_start(&dirs,25,0,0)) >= 0) ylikely {
+	    if ((rs = vecpstr_loaddirs(&dirs,newsdname)) >= 0) ylikely {
 		c = rs ;
 		if ((rs = procdiffer(&dirs,newsdname)) > 0) {
 		    rs = procdircache(&dirs,newsdname) ;
@@ -280,14 +278,13 @@ local int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = true ;
-	if ((rs = vecpstr_getsize(dlp)) >= 0) {
+	if ((rs = vecpstr_getsize(dlp)) >= 0) ylikely {
 	    int		dsz = rs ;
 	    cchar	*dc = DIRCACHE_CFNAME ;
 	    char	*dcfname{} ;
-	    if ((rs = malloc_mp(&dcfname)) >= 0) {
-	        if ((rs = mkpath(dcfname,newsdname,dc)) >= 0) {
-	            USTAT	sb ;
-	            if ((rs = uc_stat(dcfname,&sb)) >= 0) {
+	    if ((rs = mem.mp(&dcfname)) >= 0) ylikely {
+	        if ((rs = mkpath(dcfname,newsdname,dc)) >= 0) ylikely {
+	            if (ustat sb ; (rs = uc_stat(dcfname,&sb)) >= 0) {
 	                int	isz = intsat(sb.st_size) ;
 	                if (dsz == (isz -ml-1)) {
 			    rs = procdiffers(dlp,dcfname) ;
@@ -297,7 +294,7 @@ local int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
 	                rs = SR_OK ;
 		    }
 	        } /* end if (mkpath) */
-		rs1 = uc_free(dcfname) ;
+		rs1 = mem.free(dcfname) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (vecpstr-getsize) */
@@ -308,11 +305,10 @@ local int procdiffers(vecpstr *dlp,cchar *dcfname) noex {
 	int		rs ;
 	int		rs1 ;
 	bool		fmis = false ;
-	char		*dbuf{} ;
-	if ((rs = malloc_mp(&dbuf)) >= 0) {
+	if (char *dbuf ; (rs = mem.mp(&dbuf)) >= 0) ylikely {
 	    bfile	cfile, *cfp = &cfile ;
 	    cint	dlen = rs ;
-	    if ((rs = bopen(cfp,dcfname,"r",0666)) >= 0) {
+	    if ((rs = bopen(cfp,dcfname,"r",0666)) >= 0) ylikely {
                 int         line = 0 ;
                 cchar       *dp ;
                 while ((rs = breadln(cfp,dbuf,dlen)) > 0) {
@@ -331,7 +327,7 @@ local int procdiffers(vecpstr *dlp,cchar *dcfname) noex {
                 rs1 = bclose(cfp) ;
                 if (rs >= 0) rs = rs1 ;
 	    } /* end if (bfile) */
-	    rs1 = uc_free(dbuf) ;
+	    rs1 = mem.free(dbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? fmis : rs ;
@@ -343,8 +339,7 @@ local int procdircache(vecpstr *dlp,cchar *newsdname) noex {
 	int		c = 0 ;
 	int		na = 0 ;
 	cint		sz = (3 * (maxpathlen + 1)) ;
-	char		*a{} ;
-	if ((rs = uc_malloc(sz,&a)) >= 0) {
+	if (char *a ; (rs = mem.mall(sz,&a)) >= 0) ylikely {
 	    char	*dcfname = (a + (na++ * (maxpathlen + 1))) ;
 	    if ((rs = mkpath(dcfname,newsdname,DIRCACHE_CFNAME)) >= 0) {
 	        cchar	*patname = DIRCACHE_PATNAME ;
@@ -361,7 +356,7 @@ local int procdircache(vecpstr *dlp,cchar *newsdname) noex {
 	            } /* end if (mktmpfile) */
 	        } /* end if (mkpath) */
 	    } /* end if (mkpath) */
-	    rs1 = uc_free(a) ;
+	    rs1 = mem.free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
