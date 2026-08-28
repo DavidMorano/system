@@ -60,6 +60,10 @@
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG 	0		/* run-time debugging */
+#endif
+
 
 /* external subroutines */
 
@@ -75,16 +79,20 @@
 
 /* local variables */
 
+cint		magicsz		= PCSUNSFH_MAGICSZ ;
+cchar		magicstr[]	= PCSUNSFH_MAGICSTR ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
 int pcsunsfh(PCSUNSFH *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	cint	magicsize = PCSUNSFH_MAGICSIZE ;
 	int		rs = SR_OK ;
-	int		headsize ;
+	int		headsz ;
 	int		bl, cl ;
-	cchar	*magicstr = PCSUNSFH_MAGICSTR ;
 	cchar	*tp, *cp ;
 	char		*bp ;
 
@@ -93,22 +101,22 @@ int pcsunsfh(PCSUNSFH *ep,int f,char *hbuf,int hlen) noex {
 
 	bp = hbuf ;
 	bl = hlen ;
-	headsize = pcsunsfhh_overlast * sizeof(uint) ;
+	headsz = pcsunsfhh_overlast * szof(uint) ;
 	if (f) { /* read */
 
 /* the magic string is within the first 15 bytes */
 
 	    if ((rs >= 0) && (bl > 0)) {
 
-	        if (bl >= magicsize) {
+	        if (bl >= magicsz) {
 
 	            cp = bp ;
-	            cl = magicsize ;
+	            cl = magicsz ;
 	            if ((tp = strnchr(cp,cl,'\n')) != NULL)
 	                cl = (tp - cp) ;
 
-	            bp += magicsize ;
-	            bl -= magicsize ;
+	            bp += magicsz ;
+	            bl -= magicsz ;
 
 /* verify the magic string */
 
@@ -144,23 +152,21 @@ int pcsunsfh(PCSUNSFH *ep,int f,char *hbuf,int hlen) noex {
 
 	    if ((rs >= 0) && (bl > 0)) {
 
-	        if (bl >= headsize) {
+	        if (bl >= headsz) {
+	            header = uintp(bp) ;
+	            ep->shmsz	= header[pcsunsfhh_shmsz] ;
+	            ep->dbsz	= header[pcsunsfhh_dbsz] ;
+	            ep->dbtime	= header[pcsunsfhh_dbtime] ;
+	            ep->wtime	= header[pcsunsfhh_wtime] ;
+	            ep->atime	= header[pcsunsfhh_atime] ;
+	            ep->acount	= header[pcsunsfhh_acount] ;
+	            ep->muoff	= header[pcsunsfhh_muoff] ;
+	            ep->musz	= header[pcsunsfhh_musz] ;
+	            ep->btoff	= header[pcsunsfhh_btoff] ;
+	            ep->btlen	= header[pcsunsfhh_btlen] ;
 
-	            header = (uint *) bp ;
-
-	            ep->shmsize = header[pcsunsfhh_shmsize] ;
-	            ep->dbsize = header[pcsunsfhh_dbsize] ;
-	            ep->dbtime = header[pcsunsfhh_dbtime] ;
-	            ep->wtime = header[pcsunsfhh_wtime] ;
-	            ep->atime = header[pcsunsfhh_atime] ;
-	            ep->acount = header[pcsunsfhh_acount] ;
-	            ep->muoff = header[pcsunsfhh_muoff] ;
-	            ep->musize = header[pcsunsfhh_musize] ;
-	            ep->btoff = header[pcsunsfhh_btoff] ;
-	            ep->btlen = header[pcsunsfhh_btlen] ;
-
-	            bp += headsize ;
-	            bl -= headsize ;
+	            bp += headsz ;
+	            bl -= headsz ;
 
 	        } else
 	            rs = SR_ILSEQ ;
@@ -169,9 +175,9 @@ int pcsunsfh(PCSUNSFH *ep,int f,char *hbuf,int hlen) noex {
 
 	} else { /* write */
 
-	    mkmagic(bp, magicsize, magicstr) ;
-	    bp += magicsize ;
-	    bl -= magicsize ;
+	    mkmagic(bp, magicsz, magicstr) ;
+	    bp += magicsz ;
+	    bl -= magicsz ;
 
 	    memcpy(bp,ep->vetu,4) ;
 	    bp[0] = PCSUNSFH_VERSION ;
@@ -179,29 +185,27 @@ int pcsunsfh(PCSUNSFH *ep,int f,char *hbuf,int hlen) noex {
 	    bp += 4 ;
 	    bl -= 4 ;
 
-	    if ((rs >= 0) && (bl >= headsize)) {
+	    if ((rs >= 0) && (bl >= headsz)) {
+	        header				= uintp(bp) ;
+	        header[pcsunsfhh_shmsz]		= ep->shmsz ;
+	        header[pcsunsfhh_dbsz]		= ep->dbsz ;
+	        header[pcsunsfhh_dbtime]	= ep->dbtime ;
+	        header[pcsunsfhh_wtime]		= ep->wtime ;
+	        header[pcsunsfhh_atime]		= ep->atime ;
+	        header[pcsunsfhh_acount]	= ep->acount ;
+	        header[pcsunsfhh_muoff]		= ep->muoff ;
+	        header[pcsunsfhh_musz]		= ep->musz ;
+	        header[pcsunsfhh_btoff]		= ep->btoff ;
+	        header[pcsunsfhh_btlen]		= ep->btlen ;
 
-	        header = (uint *) bp ;
-
-	        header[pcsunsfhh_shmsize] = ep->shmsize ;
-	        header[pcsunsfhh_dbsize] = ep->dbsize ;
-	        header[pcsunsfhh_dbtime] = ep->dbtime ;
-	        header[pcsunsfhh_wtime] = ep->wtime ;
-	        header[pcsunsfhh_atime] = ep->atime ;
-	        header[pcsunsfhh_acount] = ep->acount ;
-	        header[pcsunsfhh_muoff] = ep->muoff ;
-	        header[pcsunsfhh_musize] = ep->musize ;
-	        header[pcsunsfhh_btoff] = ep->btoff ;
-	        header[pcsunsfhh_btlen] = ep->btlen ;
-
-	        bp += headsize ;
-	        bl -= headsize ;
+	        bp += headsz ;
+	        bl -= headsz ;
 
 	    } /* end if */
 
 	} /* end if */
 
-	return (rs >= 0) ? (bp - hbuf) : rs ;
+	return (rs >= 0) ? intconv(bp - hbuf) : rs ;
 } /* end subroutine (pcsunsfh) */
 
 
