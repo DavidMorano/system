@@ -5,7 +5,7 @@
 /* PCS-NAME-SERVER query database manager */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 #define	CF_PCSNSC	1		/* use PCSNSC facility */
 
 /* revision history:
@@ -224,20 +224,12 @@ int pcsnso_open(PCSNSO *op,cchar *pr) noex {
 	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnso_open: pr=%s\n",pr) ;
-#endif
-
+	DEBUGPRINTF("ent pr=%s\n",pr) ;
 	memclear(op) ;
 	if ((rs = pcsnso_infoloadbegin(op,pr)) >= 0) {
 	    op->magval = PCSNSO_MAGIC ;
 	} /* end if (pcsnso_infoloadbegin) */
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnso_open: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (pcsnso_open) */
 
@@ -254,11 +246,7 @@ int pcsnso_close(PCSNSO *op) noex {
 
 	rs1 = pcsnso_infoloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnso_close: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	op->magval = 0 ;
 	return rs ;
 } /* end subroutine (pcsnso_close) */
@@ -310,11 +298,7 @@ int pcsnso_get(PCSNSO *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	    rs1 = subinfo_finish(sip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (subinfo) */
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnso_get: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d len=%u\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (pcsnso_get) */
 
@@ -324,11 +308,7 @@ int pcsnso_audit(PCSNSO *op) noex {
 	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magval != PCSNSO_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnso_audit: txtindex_audit() rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("txtindex_audit() rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (pcsnso_audit) */
 
@@ -376,11 +356,7 @@ int pcsnso_curenum(PCSNSO *op,PCSNSO_CUR *curp,char *vbuf,int vlen,int w) {
 	if (vbuf == nullptr) return SR_FAULT ;
 
 	if (op->magval != PCSNSO_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	DEBUGPRINTF("pcsnso_curenum: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d len=%u\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (pcsnso_curenum) */
 
@@ -483,13 +459,13 @@ local int pcsnso_getfullname(PCSNSO *op,SI *sip) noex {
 local int pcsnso_getprojinfo(PCSNSO *op,SI *sip) noex {
 	int		rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	DEBUGPRINTF("pcsnso/getprojinfo: ent\n") ;
 #endif
 
 	rs = getname(sip) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	DEBUGPRINTF("pcsnso/getprojinfo: ret rs=%d\n",rs) ;
 #endif
 
@@ -507,7 +483,7 @@ local int pcsnso_client(PCSNSO *op) noex {
 		rs = pcsno_clientbegin(op,dt) ;
 	    }
 	}
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	DEBUGPRINTF("pcsnso_client: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
@@ -529,7 +505,7 @@ local int pcsnso_clientbegin(PCSNSO *op,time_t dt) noex {
 		rs = SR_OK ;
 	    }
 	} /* end if (client was not open) */
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	DEBUGPRINTF("pcsnso_clientbegin: ret rs=%d f=%u\n",rs,f) ;
 #endif
 	return (rs >= 0) ? f : rs ;
@@ -602,7 +578,7 @@ local int getname(SI *sip) noex {
 	        } /* end for */
 	        if ((rs > 0) && sip->fl.setcache) {
 	            rs = pcsnsmgr_set(sip->rbuf,len,sip->un,sip->w,0) ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            DEBUGPRINTF("pcsnso/getname: pcsnsmgr_set() rs=%d\n",rs) ;
 #endif
 	        }
@@ -682,24 +658,24 @@ local int getname_nsmgr(SI *sip) noex {
 	int		rs ;
 	cchar	*un = sip->un ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	DEBUGPRINTF("pcsnso/getname_nsmgr: ent\n") ;
 #endif
 
 	if ((rs = pcsnsmgr_get(sip->rbuf,sip->rlen,un,w)) == rsn) {
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    DEBUGPRINTF("pcsnso/getname_nsmgr: pcsnsmgr_get() rs=%d\n",rs) ;
 #endif
 	    rs = SR_OK ;
 	    sip->fl.setcache = TRUE ;
 	} else if (rs == 0) {
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    DEBUGPRINTF("pcsnso/getname_nsmgr: pcsnsmgr_get() rs=%d\n",rs) ;
 #endif
 	    sip->fl.setcache = TRUE ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	DEBUGPRINTF("pcsnso/getname_nsmgr: ret rs=%d\n",rs) ;
 #endif
 
@@ -712,12 +688,12 @@ local int getname_userhome(SI *sip) noex {
 	cchar		*un = sip->un ;
 	cchar		*fn ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	DEBUGPRINTF("pcsgetnames/getname_userhome: ent un=%s w=%u\n",un,w) ;
 #endif
 
 	fn = pcsnametypes[w].fname ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	DEBUGPRINTF("pcsgetnames/getname_userhome: fn=%s\n",fn) ;
 #endif
 	if (fn != nullptr) {
@@ -725,11 +701,11 @@ local int getname_userhome(SI *sip) noex {
 	    char	hbuf[MAXPATHLEN + 1] ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
 	        char	tbuf[MAXPATHLEN + 1] ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        DEBUGPRINTF("pcsgetnames/getname_userhome: h=%s\n",hbuf) ;
 #endif
 	        if ((rs = mkpath2(tbuf,hbuf,fn)) >= 0) {
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            DEBUGPRINTF("pcsgetnames/getname_userhome: tbuf=%s\n",
 	                tbuf) ;
 #endif
@@ -739,7 +715,7 @@ local int getname_userhome(SI *sip) noex {
 	    } /* end if (getuserhome) */
 	} /* end if (non-null) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	DEBUGPRINTF("pcsgetnames/getname_userhome: ret rs=%d\n",rs) ;
 #endif
 
@@ -857,7 +833,7 @@ local int getprojinfo_sysdb(SI *sip) noex {
 	int		rs1 ;
 	int		len = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	DEBUGPRINTF("pcsgetnames/getprojinfo_sysdb: un=%d\n",sip->un) ;
 #endif
 
