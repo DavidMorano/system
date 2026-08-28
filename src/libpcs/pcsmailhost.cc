@@ -103,9 +103,9 @@ cchar			fn[] = MAILHOSTFNAME ;
 
 int pcsmailhost(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
     	int		rs = SR_FAULT ;
-	if (pr && rbuf) {
+	if (pr && rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0]) {
+	    if (pr[0]) ylikely {
 		hoster ho(pr,rbuf,rlen,un) ;
 		rs = ho ;
 	    } /* end if (valid) */
@@ -140,12 +140,12 @@ int hoster::tryfile() noex {
     	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
-	    if ((rs = mkpath(pbuf,pr,fn)) >= 0) {
-	        if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) {
-	            if ((rs = filereadln(pbuf,lbuf,rs)) > 0) {
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
+	    if ((rs = mkpath(pbuf,pr,fn)) >= 0) ylikely {
+	        if (char *lbuf ; (rs = lm_ml(&lbuf)) >= 0) ylikely {
+	            if ((rs = filereadln(pbuf,lbuf,rs)) > 0) ylikely {
 			cchar *cp ;
-			if (int cl ; (cl = sfnext(lbuf,rs,&cp)) > 0) {
+			if (int cl ; (cl = sfnext(lbuf,rs,&cp)) > 0) ylikely {
 			    rs = snwcpy(rbuf,rlen,cp,cl) ;
 			    len = rs ;
 			} /* end if (sfnext) */
