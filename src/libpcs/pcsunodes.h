@@ -17,9 +17,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	PCSUNODES	struct pcsunodes_head
@@ -33,7 +33,7 @@ struct pcsunodes_cursor {
 
 struct pcsunodes_head {
 	cchar		**unodes ;
-	uint		magic ;
+	uint		magval ;
 	int		n ;
 } ; /* end struct */
 
@@ -42,14 +42,14 @@ typedef	PCSUNODES_CUR	pcsunodes_cur ;
 
 EXTERNC_begin
 
-extern int pcsunodes_start(PCSUNODES *,cchar *) noex ;
-extern int pcsunodes_get(PCSUNODES *,int,cchar **) noex ;
-extern int pcsunodes_mat(PCSUNODES *,cchar *,int) noex ;
-extern int pcsunodes_curbegin(PCSUNODES *,pcsunodes_cur *) noex ;
-extern int pcsunodes_curenum(PCSUNODES *,pcsunodes_cur *,char *,int) noex ;
-extern int pcsunodes_curend(PCSUNODES *,pcsunodes_cur *) noex ;
-extern int pcsunodes_audit(PCSUNODES *) noex ;
-extern int pcsunodes_finish(PCSUNODES *) noex ;
+extern int pcsunodes_start	(pcsunodes *,cchar *) noex ;
+extern int pcsunodes_get	(pcsunodes *,int,cchar **) noex ;
+extern int pcsunodes_mat	(pcsunodes *,cchar *,int) noex ;
+extern int pcsunodes_curbegin	(pcsunodes *,pcsunodes_cur *) noex ;
+extern int pcsunodes_curenum	(pcsunodes *,pcsunodes_cur *,char *,int) noex ;
+extern int pcsunodes_curend	(pcsunodes *,pcsunodes_cur *) noex ;
+extern int pcsunodes_audit	(pcsunodes *) noex ;
+extern int pcsunodes_finish	(pcsunodes *) noex ;
 
 EXTERNC_end
 
