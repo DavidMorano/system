@@ -127,7 +127,7 @@ local int record_get(PCSNSRECS_REC *,char *,int) noex ;
 int pcsnsrecs_start(RECS *op,int nmax,int ttl) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (nmax < PCSNSRECS_DEFMAX)
 	    nmax = PCSNSRECS_DEFMAX ;
@@ -138,9 +138,8 @@ int pcsnsrecs_start(RECS *op,int nmax,int ttl) noex {
 	memclear(op) ;
 
 	{
-	    cint	sz = sizeof(RECARR) ;
-	    char	*p ;
-	    if ((rs = lm_mall(sz,&p)) >= 0) {
+	    cint	sz = szof(RECARR) ;
+	    if (char *p ; (rs = lm_mall(sz,&p)) >= 0) {
 	        int	ro = 0 ;
 	        ro |= RECARR_OSTATIONARY ;
 	        ro |= RECARR_OREUSE ;
@@ -150,16 +149,17 @@ int pcsnsrecs_start(RECS *op,int nmax,int ttl) noex {
 	            if ((rs = pq_start(&op->lru)) >= 0) {
 	                op->nmax = nmax ;
 	                op->ttl = ttl ;
-	                op->ti_check = time(NULL) ;
-	                op->magic = PCSNSRECS_MAGIC ;
-	            }
-	            if (rs < 0)
+	                op->ti_check = time(nullptr) ;
+	                op->magval = PCSNSRECS_MAGIC ;
+	            } /* end if (ready) */
+	            if (rs < 0) {
 	                recarr_finish(op->recs) ;
+		    } /* end if (error) */
 	        }
 	        if (rs < 0) {
 	            lm_free(op->recs) ;
-	            op->recs = NULL ;
-	        }
+	            op->recs = nullptr ;
+	        } /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end block */
 
@@ -170,9 +170,9 @@ int pcsnsrecs_finish(RECS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
 
 /* finish up the LRU queue */
 
@@ -189,13 +189,13 @@ int pcsnsrecs_finish(RECS *op) noex {
 	rs1 = recarr_finish(op->recs) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->recs != NULL) {
+	if (op->recs != nullptr) {
 	    rs1 = lm_free(op->recs) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->recs = NULL ;
+	    op->recs = nullptr ;
 	}
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 } /* end subroutine (pcsnsrecs_finish) */
 
@@ -205,11 +205,11 @@ int pcsnsrecs_store(RECS *op,cchar *vbuf,int vlen,cchar *un,
 	custime		dt = getustime ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (vbuf == NULL) return SR_FAULT ;
-	if (un == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (vbuf == nullptr) return SR_FAULT ;
+	if (un == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
 
 	if (vlen < 1) return SR_INVALID ;
 	if (un[0] == '\0') return SR_INVALID ;
@@ -225,15 +225,15 @@ int pcsnsrecs_store(RECS *op,cchar *vbuf,int vlen,cchar *un,
 } /* end subroutine (pcsnsrecs_store) */
 
 int pcsnsrecs_lookup(RECS *op,char *rbuf,int rlen,cchar *un,int w) noex {
-	PCSNSRECS_REC	*ep = NULL ;
+	PCSNSRECS_REC	*ep = nullptr ;
 	int		rs ;
 	int		ct = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (un == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (un == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
 
 	if (rlen < 1) return SR_INVALID ;
 	if (un[0] == '\0') return SR_INVALID ;
@@ -241,7 +241,7 @@ int pcsnsrecs_lookup(RECS *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	op->s.total += 1 ;
 
 	if ((rs = pcsnsrecs_fetch(op,&ep,un,w)) >= 0) {
-	    time_t	dt = time(NULL) ;
+	    time_t	dt = time(nullptr) ;
 	    if ((rs = record_old(ep,dt,op->ttl)) > 0) {
 	        ct = ct_miss ;
 	        if ((rs = pcsnsrecs_recdel(op,ep)) >= 0) {
@@ -275,12 +275,12 @@ int pcsnsrecs_invalidate(RECS *op,cchar *un,int w) noex {
 	PCSNSRECS_REC	*ep ;
 	int		rs ;
 	int		rs1 ;
-	int		f_found = FALSE ;
+	int		f_found = false ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (un == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (un == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
 
 	if (un[0] == '\0') return SR_INVALID ;
 
@@ -288,7 +288,7 @@ int pcsnsrecs_invalidate(RECS *op,cchar *un,int w) noex {
 	    cint	ri = rs ;
 	    pq_ent	*pep = (pq_ent *) ep ;
 
-	    f_found = TRUE ;
+	    f_found = true ;
 
 	    rs1 = pq_unlink(&op->lru,pep) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -314,17 +314,17 @@ int pcsnsrecs_check(RECS *op,time_t dt) noex {
 	RECARR		*rlp = op->recs ;
 	int		rs ;
 	int		i ;
-	int		f = FALSE ;
+	int		f = false ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
 	/* loop checking all cache entries */
 	for (i = 0 ; recarr_get(rlp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
-	        if (dt == 0) dt = time(NULL) ;
+	    if (ep != nullptr) {
+	        if (dt == 0) dt = time(nullptr) ;
 	        if ((rs = record_old(ep,dt,op->ttl)) > 0) {
-	            f = TRUE ;
+	            f = true ;
 	            if ((rs = pcsnsrecs_recdel(op,ep)) >= 0) {
 	                pq_ent	*pep = (pq_ent *) ep ;
 	                rs = pq_unlink(&op->lru,pep) ;
@@ -341,10 +341,10 @@ int pcsnsrecs_check(RECS *op,time_t dt) noex {
 int pcsnsrecs_stats(RECS *op,PCSNSRECS_ST *sp) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSRECS_MAGIC) return SR_NOTOPEN ;
 
 	if ((rs = recarr_count(op->recs)) >= 0) {
 	    *sp = op->s ;
@@ -363,14 +363,14 @@ local int pcsnsrecs_fetch(RECS *op,PCSNSRECS_REC **epp,cchar *un,int w) noex {
 	int		rs ;
 	int		i{} ;
 	for (i = 0 ; (rs = recarr_get(rlp,i,&ep)) >= 0 ; i += 1) {
-	    if (ep != NULL) {
+	    if (ep != nullptr) {
 	        if ((un[0] == ep->un[0]) && (w == ep->w)) {
 	            if (strcmp(un,ep->un) == 0) break ;
 	        }
 	    }
 	} /* end for */
 	if (epp) {
-	    *epp = (rs >= 0) ? ep : NULL ;
+	    *epp = (rs >= 0) ? ep : nullptr ;
 	}
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (pcsnsrecs_fetch) */
@@ -396,7 +396,7 @@ local int pcsnsrecs_mkrec(RECS *op,time_t dt,RECINFO *rip) noex {
 	        PCSNSRECS_REC	*ep ;
 	        if ((rs = pcsnsrecs_newrec(op,dt,&ep,rip)) >= 0) {
 	            vl = rs ;
-	            if (ep != NULL) {
+	            if (ep != nullptr) {
 	                pep = (pq_ent *) ep ;
 	                rs = pq_ins(&op->lru,pep) ;
 	            }
@@ -409,16 +409,17 @@ local int pcsnsrecs_mkrec(RECS *op,time_t dt,RECINFO *rip) noex {
 local int pcsnsrecs_newrec(RECS *op,time_t dt,
 		PCSNSRECS_REC **epp,RECINFO *rip) noex {
 	PCSNSRECS_REC	*ep ;
-	cint	size = sizeof(PCSNSRECS_REC) ;
+	cint	size = szof(PCSNSRECS_REC) ;
 	int		rs ;
 
 	if ((rs = lm_mall(size,&ep)) >= 0) {
 	    rs = pcsnsrecs_recstart(op,dt,ep,rip) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        lm_free(ep) ;
+	    } /* end if (error) */
 	} /* end if (m-a) */
 
-	*epp = (rs >= 0) ? ep : NULL ;
+	*epp = (rs >= 0) ? ep : nullptr ;
 	return rs ;
 } /* end subroutine (pcsnsrecs_newrec) */
 
@@ -431,8 +432,9 @@ local int pcsnsrecs_recstart(RECS *op,time_t dt,PCSNSRECS_REC *ep,
 	    rl = rs ;
 	    rs = recarr_add(op->recs,ep) ;
 	    ep->recidx = rs ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        record_finish(ep) ;
+	    } /* end if (error) */
 	} /* end if (entry-start) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (pcsnsrecs_recstart) */
@@ -459,7 +461,7 @@ local int pcsnsrecs_recrear(RECS *op,PCSNSRECS_REC *ep) noex {
 	                PCSNSRECS_REC	*ep = (PCSNSRECS_REC *) pep ;
 	                record_finish(ep) ;
 	                lm_free(pep) ;
-	            }
+	            } /* end if (error) */
 	        }
 	    }
 	} /* end if (pq-gettail) */
@@ -490,7 +492,7 @@ local int pcsnsrecs_recfins(RECS *op) noex {
 	int		i ;
 
 	for (i = 0 ; recarr_get(rlp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
+	    if (ep != nullptr) {
 	        rs1 = record_finish(ep) ;
 	        if (rs >= 0) rs = rs1 ;
 	        rs1 = lm_free(ep) ;
@@ -522,8 +524,8 @@ local int record_start(PCSNSRECS_REC *ep,time_t dt,int wc,RECINFO *rip) noex {
 	int		vl = 0 ;
 	char		*vbuf ;
 
-	if (ep == NULL) return SR_FAULT ;
-	if (rip == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
+	if (rip == nullptr) return SR_FAULT ;
 
 	if (rip->un[0] == '\0') return SR_INVALID ;
 
@@ -554,12 +556,12 @@ local int record_finish(PCSNSRECS_REC *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
-	if (ep->vbuf != NULL) {
+	if (ep->vbuf != nullptr) {
 	    rs1 = lm_free(ep->vbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->vbuf = NULL ;
+	    ep->vbuf = nullptr ;
 	    ep->vlen = 0 ;
 	}
 
@@ -571,7 +573,7 @@ local int record_access(PCSNSRECS_REC *ep,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		vl = 0 ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	ep->ti_access = dt ;
 	vl = ep->vl ;
@@ -580,7 +582,7 @@ local int record_access(PCSNSRECS_REC *ep,time_t dt) noex {
 
 local int record_old(PCSNSRECS_REC *ep,time_t dt,int ttl) noex {
 	int		f_old = false ;
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 	if ((ep->ttl > 0) && (ep->ttl < ttl)) ttl = ep->ttl ;
 	f_old = ((dt - ep->ti_create) >= ttl) ;
 	return f_old ;
