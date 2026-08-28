@@ -20,7 +20,7 @@
 	Names:
 	u_writefd
 	u_writefile
-	u_copy
+	u_filecopy
 
 	Description:
 	These subroutines provide various copy-file operations.
@@ -28,7 +28,7 @@
 	Synopsis:
 	int u_writefd(int fd,int sfd) noex
 	int u_writefile(int fd,cchar *fn) noex
-	int u_copy(cchar *srcfname,cchar *dstfname) noex
+	int u_filecopy(cchar *srcfname,cchar *dstfname) noex
 
 	Arguments:
 	fd		file-descriptor to write to
@@ -144,7 +144,7 @@ int u_writefile(int fd,cchar *fn) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (u_writefile) */
 
-int u_copy(cchar *srcfname,cchar *dstfname) noex {
+int u_filecopy(cchar *srcfname,cchar *dstfname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		csz = 0 ;
@@ -173,7 +173,7 @@ int u_copy(cchar *srcfname,cchar *dstfname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? csz : rs ;
-} /* end subroutine (u_copy) */
+} /* end subroutine (u_filecopy) */
 
 
 /* local subroutines */
