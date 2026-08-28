@@ -75,10 +75,10 @@ extern "C" {
 
 int pcsgetorg(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
-	if (pr && rbuf) {
+	if (pr && rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (pr[0]) {
+	    if (pr[0]) ylikely {
 	        rs = localgetorg(pr,rbuf,rlen,un) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
