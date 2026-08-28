@@ -56,6 +56,10 @@ import libutil ;			/* |lenstr(3u)| */
 #define	PN_MAGIC	PCSUNODES_MAGIC
 #define	PN_FNAME	"etc/usernodes"
 
+#ifndef	CF_DEBUGS
+#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+#endif
+
 
 /* external subroutines */
 
@@ -71,8 +75,8 @@ import libutil ;			/* |lenstr(3u)| */
 template<typename ... Args>
 local inline int pcsunodes_magic(pcsunodes *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == PN_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	if (op && (args && ...)) ylikely {
+	    rs = (op->magval == PN_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (pcsunodes_magic) */
@@ -93,13 +97,13 @@ int pcsunodes_start(PN *op,cchar *pr) noex {
     	PCSUNODES	*hop = op ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op && pr) {
+	if (op && pr) ylikely {
 	    rs = SR_INVALID ;
 	    memclear(hop) ;
-	    if (pr[0]) {
+	    if (pr[0]) ylikely {
 	        cchar	*ufn = PN_FNAME ;
-		if (char *ubuf ; (rs = lm_mp(&ubuf)) >= 0) {
-	            if ((rs = mkpath(ubuf,pr,ufn)) >= 0) {
+		if (char *ubuf ; (rs = lm_mp(&ubuf)) >= 0) ylikely {
+	            if ((rs = mkpath(ubuf,pr,ufn)) >= 0) ylikely {
 	                cint	vsz = 0 ;
 	                cint	vn = 0 ;
 	                cint	vo = 0 ;
@@ -107,7 +111,7 @@ int pcsunodes_start(PN *op,cchar *pr) noex {
 	                if (vecpstr un ; (rs = un.start(vsz,vn,vo)) >= 0) {
 	                    if ((rs = un.loadfile(f,ubuf)) >= 0) {
 		                if ((rs = pcsunodes_mktab(op,&un)) >= 0) {
-			            op->magic = PN_MAGIC ;
+			            op->magval = PN_MAGIC ;
 		                }
 		            } /* end if (vecpstr_loadfile) */
 		            rs1 = un.finish ;
@@ -115,7 +119,7 @@ int pcsunodes_start(PN *op,cchar *pr) noex {
 	                } /* end if (vecpstr) */
 	                if (rs < 0) {
 		            pcsunodes_finish(op) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (mkpath) */
 		    rs1 = lm_free(ubuf) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -128,20 +132,20 @@ int pcsunodes_start(PN *op,cchar *pr) noex {
 int pcsunodes_finish(PN *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pcsunodes_magic(op)) >= 0) {
-	    if (op->unodes != nullptr) {
+	if ((rs = pcsunodes_magic(op)) >= 0) ylikely {
+	    if (op->unodes) {
 	        rs1 = lm_free(op->unodes) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->unodes = nullptr ;
-	    }
-	    op->magic = 0 ;
+	    } /* end if (memory-release) */
+	    op->magval = 0 ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
 } /* end subroutine (pcsunodes_finish) */
 
 int pcsunodes_get(PN *op,int i,cchar **rpp) noex {
 	int		rs ;
-	if ((rs = pcsunodes_magic(op)) >= 0) {
+	if ((rs = pcsunodes_magic(op)) >= 0) ylikely {
 	    if ((i >= 0) && (i < op->n)) {
 	        if (rpp) {
 		    *rpp = op->unodes[i] ;
@@ -157,7 +161,7 @@ int pcsunodes_get(PN *op,int i,cchar **rpp) noex {
 
 int pcsunodes_mat(PN *op,cchar *mp,int ml) noex {
 	int		rs ;
-	if ((rs = pcsunodes_magic(op)) >= 0) {
+	if ((rs = pcsunodes_magic(op)) >= 0) ylikely {
 	    if ((rs = matcasestr(op->unodes,mp,ml)) < 0) {
 	        rs = SR_NOTFOUND ;
 	    }
@@ -167,7 +171,7 @@ int pcsunodes_mat(PN *op,cchar *mp,int ml) noex {
 
 int pcsunodes_curbegin(PN *op,PN_CUR *curp) noex {
     	int		rs ;
-	if ((rs = pcsunodes_magic(op,curp)) >= 0) {
+	if ((rs = pcsunodes_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
@@ -175,7 +179,7 @@ int pcsunodes_curbegin(PN *op,PN_CUR *curp) noex {
 
 int pcsunodes_curend(PN *op,PN_CUR *curp) noex {
     	int		rs ;
-	if ((rs = pcsunodes_magic(op,curp)) >= 0) {
+	if ((rs = pcsunodes_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
@@ -184,7 +188,7 @@ int pcsunodes_curend(PN *op,PN_CUR *curp) noex {
 int pcsunodes_curenum(PN *op,PN_CUR *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rl = 0 ; /* return-value */
-	if ((rs = pcsunodes_magic(op,curp,rbuf)) >= 0) {
+	if ((rs = pcsunodes_magic(op,curp,rbuf)) >= 0) ylikely {
 	    int		i = (curp->i >= 0) ? (curp->i+1) : 0 ;
 	    if (i < op->n) {
 	        if ((rs = sncpy1(rbuf,rlen,op->unodes[i])) >= 0) {
@@ -201,7 +205,7 @@ int pcsunodes_curenum(PN *op,PN_CUR *curp,char *rbuf,int rlen) noex {
 
 int pcsunodes_audit(PN *op) noex {
     	int		rs ;
-	if ((rs = pcsunodes_magic(op)) >= 0) {
+	if ((rs = pcsunodes_magic(op)) >= 0) ylikely {
 	    rs = SR_OK ;
 	} /* end if (pcsunodes_magic) */
 	return rs ;
@@ -229,7 +233,7 @@ local int pcsunodes_mktab(PN *op,vecpstr *ulp) noex {
 	            } /* end if (record-table allocated) */
 		    if (rs < 0) {
 			lm_free(bp) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (m-a) */
 	    } /* end if (vecpstr_strsize) */
 	} /* end if (vecpstr_count) */
