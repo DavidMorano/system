@@ -20,10 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<modload.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
 
 #include	"pcsnso.h"
 #include	"pcsnsreq.h"
@@ -39,8 +38,8 @@
 
 
 struct pcsns_cursor {
-	void	*scp ;		/* SO-cursor pointer */
-	uint	magic ;
+	void		*scp ;		/* SO-cursor pointer */
+	uint		magval ;
 } ; /* end struct (pcsns_cursor) */
 
 EXTERNC_begin
@@ -60,9 +59,9 @@ struct pcsns_head {
 	modload		loader ;
 	PCSNS_CALLS	call ;
 	void		*obj ;		/* object pointer */
-	uint		magic ;
-	int		objsize ;	/* object size */
-	int		cursize ;	/* cursor size */
+	uint		magval ;
+	int		objsz ;		/* object size */
+	int		cursz ;		/* cursor size */
 } ; /* end struct (pcsns_head) */
 
 typedef	PCSNS		pcsns ;
