@@ -106,18 +106,14 @@ int pcsuucp(cchar *rhost,cchar *filename,int *fd2p) noex {
 	cchar	*cmd_uucp = PROG_UUCP ;
 	char		pfname[MAXPATHLEN + 1] ;
 	char		dst[DSTLEN + 1] ;
-#if	CF_DEBUG
-	debugprintf("uucp: ent\n") ;
-#endif
+	DEBUGPRINTF("ent\n") ;
 	/* check for bad input */
 	if ((rhost == NULL) || (rhost[0] == '\0')) return SR_INVAL ;
 
 	if (u_access(cmd_uucp,X_OK) < 0) 
 	    return SR_PROTO ;
 
-#if	CF_DEBUG
-	debugprintf("uucp: got in\n") ;
-#endif
+	DEBUGPRINTF("got in\n") ;
 
 /* test the remote host for accessibility */
 
@@ -125,10 +121,7 @@ int pcsuucp(cchar *rhost,cchar *filename,int *fd2p) noex {
 	if (rs < 0)
 	    return SR_HOSTUNREACH ;
 
-#if	CF_DEBUG
-	debugprintf("uucp: continuing\n") ;
-#endif
-
+	DEBUGPRINTF("continuing\n") ;
 	pfname[0] = '\0' ;
 
 /* open up the necessary pipes */
@@ -136,9 +129,7 @@ int pcsuucp(cchar *rhost,cchar *filename,int *fd2p) noex {
 	if ((fd2p != NULL) && ((rs = u_pipe(pipes[2])) < 0))
 	    goto badpipes ;
 
-#if	CF_DEBUG
-	debugprintf("uucp: about to make pipe file\n") ;
-#endif
+	DEBUGPRINTF("about to make pipe file\n") ;
 
 	rs = mktmpfile(pfname,omode,"/tmp/uufileXXXXXXXX") ;
 	if (rs < 0) {
@@ -146,11 +137,7 @@ int pcsuucp(cchar *rhost,cchar *filename,int *fd2p) noex {
 	    goto badpipemk ;
 	}
 
-
-#if	CF_DEBUG
-	debugprintf("uucp: got pipes \n") ;
-#endif
-
+	DEBUGPRINTF("got pipes \n") ;
 /* form the necessary UUCP command */
 
 	rs = sncpy3(dst,DSTLEN,rhost,"!",filename) ;
@@ -158,17 +145,10 @@ int pcsuucp(cchar *rhost,cchar *filename,int *fd2p) noex {
 
 /* we fork the command */
 
-#if	CF_DEBUG
-	debugprintf("uucp: about to fork\n") ;
-#endif
-
+	DEBUGPRINTF("about to fork\n") ;
 	if ((rs = uc_fork()) == 0) { /* child */
 	    int		fd ;
-
-#if	CF_DEBUG
-	    debugprintf("uucp: inside fork\n") ;
-#endif
-
+	    DEBUGPRINTF("inside fork\n") ;
 	    for (i = 0 ; i < 3 ; i += 1)
 	        u_close(i) ;
 
@@ -199,9 +179,7 @@ int pcsuucp(cchar *rhost,cchar *filename,int *fd2p) noex {
 	} else if (rs < 0)
 		goto badfork ;
 
-#if	CF_DEBUG
-	debugprintf("uucp: main line continue\n") ;
-#endif
+	DEBUGPRINTF("main line continue\n") ;
 
 /* close some pipe ends */
 
@@ -212,9 +190,7 @@ int pcsuucp(cchar *rhost,cchar *filename,int *fd2p) noex {
 
 /* open the pipe file */
 
-#if	CF_DEBUG
-	debugprintf("uucp: about to open the pipe\n") ;
-#endif
+	DEBUGPRINTF("about to open the pipe\n") ;
 
 	rs = u_open(pfname,O_WRONLY,0600) ;
 	pfd = rs ;
@@ -222,7 +198,7 @@ int pcsuucp(cchar *rhost,cchar *filename,int *fd2p) noex {
 	    goto badopen ;
 
 #if	CF_DEBUG
-	debugprintf("uucp: opened pipe, about to read answer\n") ;
+	DEBUGPRINTF("opened pipe, about to read answer\n") ;
 	sleep(10) ;
 	system("ps -f") ;
 #endif
@@ -234,16 +210,12 @@ int pcsuucp(cchar *rhost,cchar *filename,int *fd2p) noex {
 	int f_bad = false ;
 	while ((rs = reade(pipes[2][0],pfname,1,0,10)) > 0) {
 
-#if	CF_DEBUG
-	    debugprintf("uucp: 'reade' goto one\n") ;
-#endif
+	    DEBUGPRINTF("'reade' goto one\n") ;
 
 	    f_bad = true ;
 	}
 
-#if	CF_DEBUG
-	debugprintf("uucp: read answer, f_bad=%d\n",f_bad) ;
-#endif
+	DEBUGPRINTF("read answer, f_bad=%d\n",f_bad) ;
 	}
 #endif /* COMMENT */
 
@@ -257,10 +229,7 @@ int pcsuucp(cchar *rhost,cchar *filename,int *fd2p) noex {
 
 ret0:
 
-#if	CF_DEBUG
-	debugprintf("uucp: ret rs=%d fd=%d\n", rs,pfd) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d fd=%d\n", rs,pfd) ;
 	return (rs >= 0) ? pfd : rs ;
 
 /* handle the bad cases */
@@ -296,18 +265,11 @@ local int testuucp(cchar *queue_machine) {
 	cchar	*cmd_uuname = PROG_UUNAME ;
 	char		buf[NODENAMELEN + 1] ;
 	char		*cp ;
-
-#if	CF_DEBUG
-	debugprintf("testuucp: ent\n") ;
-#endif
-
+	DEBUGPRINTF("ent\n") ;
 	if ((queue_machine == NULL) || (queue_machine[0] == '\0'))
 	    return BAD ;
 
-#if	CF_DEBUG
-	debugprintf("testuucp: got in\n") ;
-#endif
-
+	DEBUGPRINTF("got in\n") ;
 	if (u_access(cmd_uuname,X_OK) < 0) 
 		return BAD ;
 
@@ -315,19 +277,11 @@ local int testuucp(cchar *queue_machine) {
 	fpa[1] = pfp ;		/* capture the standard output ! */
 	fpa[2] = &file2 ;
 
-#if	CF_DEBUG
-	debugprintf("testuucp: about to open command - FPA[1]=%08X\n",fpa[1]) ;
-	debugprintf("testuucp: FPA[0]=%08X\n",fpa[0]) ;
-#endif
-
+	DEBUGPRINTF("about to open command - FPA[1]=%08X\n",fpa[1]) ;
+	DEBUGPRINTF("FPA[0]=%08X\n",fpa[0]) ;
 	if ((rs = bopencmd(fpa,cmd_uuname)) >= 0) {
-
-#if	CF_DEBUG
-	    debugprintf("testuucp: opened command OK\n") ;
-#endif
-
+	    DEBUGPRINTF("opened command OK\n") ;
 	    pid = rs ;
-
 	    bclose(fpa[0]) ;
 
 /* find the part of the machine name that we like */
@@ -341,7 +295,7 @@ local int testuucp(cchar *queue_machine) {
 	    while ((l = breadln(pfp,buf,NODENAMELEN)) > 0) {
 
 #if	CF_DEBUG && 0
-	        debugprintf("testuucp: got a line\n") ;
+	        DEBUGPRINTF("got a line\n") ;
 #endif
 
 	        buf[l] = '\0' ;
@@ -350,10 +304,7 @@ local int testuucp(cchar *queue_machine) {
 	        j = strlen(cp) ;
 
 	        if ((i == j) && (strncasecmp(cp,queue_machine,i) == 0)) {
-
-#if	CF_DEBUG
-	            debugprintf("testuucp: got a machine match\n") ;
-#endif
+	            DEBUGPRINTF("got a machine match\n") ;
 
 	            rs = OK ;
 	            break ;
@@ -371,11 +322,7 @@ local int testuucp(cchar *queue_machine) {
 	    u_waitpid(pid,&child_stat,0) ;
 
 	} /* end if (program spawned) */
-
-#if	CF_DEBUG
-	debugprintf("testuucp: passed the command OK\n") ;
-#endif
-
+	DEBUGPRINTF("passed the command OK\n") ;
 	return rs ;
 } /* end subroutine (testuucp) */
 
