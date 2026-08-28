@@ -13,11 +13,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucentpw.h>
-#include	<ids.h>
-#include	<pcsnsc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucentpw.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<pcsnsc.h>		/* LIBPCS */
 
 #include	"pcsnsreq.h"
 
