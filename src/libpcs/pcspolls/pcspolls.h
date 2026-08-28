@@ -21,11 +21,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<pthread.h>
-#include	<thrcomm.h>
-#include	<pcsconf.h>		/* need def for PCSCONF */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<pthread.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<thrcomm.h>		/* LIBUC */
+#include	<pcsconf.h>		/* LIBOCS need def for PCSCONF */
 
 
 #define	PCSPOLLS	struct pcspolls_head
@@ -41,23 +42,23 @@
 
 struct pcspolls_n {
 	cchar		*name ;
-	uint		objsize ;
-	uint		infosize ;
-} ;
+	uint		objsz ;
+	uint		infosz ;
+} ; /* end struct */
 
 struct pcspolls_obj {
 	cchar		*name ;
-	int		objsize ;
-	int		infosize ;
-} ;
+	int		objsz ;
+	int		infosz ;
+} ; /* end struct */
 
 struct pcspolls_information {
 	int		dummy ;
-} ;
+} ; /* end struct */
 
 struct pcspolls_flags {
 	uint		working:1 ;
-} ;
+} ; /* end struct */
 
 struct pcspolls_thread {
 	PCSPOLLS	*op ;
@@ -80,18 +81,18 @@ struct pcspolls_head {
 	mainv		envv ;
 	PCSPOLLS_THREAD	t ;
 	PCSPOLLS_FL	fl ;
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 typedef	PCSPOLLS	pcspolls ;
 typedef	PCSPOLLS_INFO	pcspolls_info ;
 
 EXTERNC_begin
 
-extern int	pcspolls_start(pcspolls *,pcsconf *,cchar *) noex ;
-extern int	pcspolls_info(pcspolls *,pcspolls_info *) noex ;
-extern int	pcspolls_cmd(pcspolls *,int) noex ;
-extern int	pcspolls_finish(pcspolls *) noex ;
+extern int	pcspolls_start	(pcspolls *,pcsconf *,cchar *) noex ;
+extern int	pcspolls_info	(pcspolls *,pcspolls_info *) noex ;
+extern int	pcspolls_cmd	(pcspolls *,int) noex ;
+extern int	pcspolls_finish	(pcspolls *) noex ;
 
 EXTERNC_end
 
