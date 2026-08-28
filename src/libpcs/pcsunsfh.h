@@ -11,46 +11,46 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	PCSUNSFH		struct pcsunsfh
 #define	PCSUNSFH_MAGICSTR	"PCSUNS"
-#define	PCSUNSFH_MAGICLEN	sizeof(PCSUNSFH_MAGICSTR)
-#define	PCSUNSFH_MAGICSIZE	16
+#define	PCSUNSFH_MAGICLEN	szof(PCSUNSFH_MAGICSTR)
+#define	PCSUNSFH_MAGICSZ	16
 #define	PCSUNSFH_VERSION	0
 #define	PCSUNSFH_IDLEN		20
 
 
 enum pcsunsfhhs {
-	pcsunsfhh_shmsize,
-	pcsunsfhh_dbsize,
+	pcsunsfhh_shmsz,
+	pcsunsfhh_dbsz,
 	pcsunsfhh_dbtime,
 	pcsunsfhh_wtime,
 	pcsunsfhh_atime,
 	pcsunsfhh_acount,
 	pcsunsfhh_muoff,
-	pcsunsfhh_musize,
+	pcsunsfhh_musz,
 	pcsunsfhh_btoff,
 	pcsunsfhh_btlen,
 	pcsunsfhh_overlast
-} ;
+} ; /* end enum */
 
 struct pcsunsfh {
-	uint		shmsize ;
-	uint		dbsize ;
+	uint		shmsz ;
+	uint		dbsz ;
 	uint		dbtime ;
 	uint		wtime ;
 	uint		atime ;
 	uint		acount ;
 	uint		muoff ;
-	uint		musize ;
+	uint		musz ;
 	uint		btoff ;
 	uint		btlen ;
 	uchar		vetu[4] ;
-} ;
+} ; /* end struct */
 
 EXTERNC_begin
 
