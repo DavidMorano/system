@@ -111,6 +111,10 @@ import uconstants ;			/* |varname(3u)| + |sysword(3u)|  */
 
 #define	ISEND(c)	(((c) == '\n') || ((c) == '\r'))
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
+#endif
+
 
 /* external subroutines */
 
@@ -136,7 +140,7 @@ namespace {
 	int		dlen ;
 	checker(cc *p,char *b,int l,cc *u) noex :  pr(p), dbuf(b), dlen(l) {
 	    un = u ;
-	} ;
+	} ; /* end ctor */
 	operator int () noex ;
     } ; /* end struct (checker) */
 } /* end namespace */
@@ -208,6 +212,7 @@ constexpr int		rsdirs[] = {
 } ; /* end array (rsdirs) */
 
 static vars		var ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -218,13 +223,13 @@ static vars		var ;
 int pcsmailcheck(cchar *pr,char *dbuf,int dlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ; /* return-value */
-	if (dbuf && un) {
+	if (dbuf && un) ylikely {
 	    dbuf[0] = '\0' ;
 	    if (pr == nullptr) {
 		static cchar *vpr = getenver(VARPRPCS) ;
 		pr = vpr ;
 	    }
-	    if (pr) {
+	    if (pr) ylikely {
 		if (static cint	rsv = var ; (rs = rsv) >= 0) {
 		    if (checker co(pr,dbuf,dlen,un) ; (rs = co) >= 0) {
 		        n = rs ;
@@ -244,43 +249,43 @@ local inline int subinfo_ctor(SI *op,Args ... args) noex {
     	cnullptr	np{} ;
 	cnothrow	nt{} ;
     	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->mlp = new(nt) dirlist) != np) {
+	    if ((op->mlp = new(nt) dirlist) != np) ylikely {
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-dirlist) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (subinfo_ctor) */
 
 local int subinfo_dtor(SI *op) noex {
     	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->mlp) {
 		delete op->mlp ;
 		op->mlp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (subinfo_dtor) */
 
 local int subinfo_start(SI *sip,cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	int		rs ;
-	if ((rs = subinfo_ctor(sip,pr,rbuf,un)) >= 0) {
+	if ((rs = subinfo_ctor(sip,pr,rbuf,un)) >= 0) ylikely {
 	    sip->pr = pr ;
 	    sip->rbuf = rbuf ;
 	    sip->rlen = rlen ;
 	    sip->ti_first = TIME_MAX ;
-	    if ((rs = dirlist_start(sip->mlp)) >= 0) {
-	        if ((rs = subinfo_username(sip,un)) >= 0) {
+	    if ((rs = dirlist_start(sip->mlp)) >= 0) ylikely {
+	        if ((rs = subinfo_username(sip,un)) >= 0) ylikely {
 		    cint	tlen = var.maxpathlen ;
 		    cint	flen = var.mailaddrlen ;
 		    int	sz = 0 ;
 		    sz += (tlen + 1) ;
 		    sz += (flen + 1) ;
-		    if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) {
+		    if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) ylikely {
 		        sip->a = bp ;
 		        sip->tbuf = bp ;
 		        sip->tlen = tlen ;
@@ -302,7 +307,7 @@ local int subinfo_start(SI *sip,cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	    if (sip->fl.allocusername && sip->username) {
 	        void *vp = voidp(sip->username) ;
@@ -410,29 +415,21 @@ local int subinfo_getsysmail(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
-
-#if	CF_DEBUG
-	debugprintf("pcsmailcheck/subinfo_getsysmail: ent\n") ;
-#endif
-
-	if ((rs = maildirs_begin(sip)) >= 0) {
+	DEBUGPRINTF("ent\n") ;
+	if ((rs = maildirs_begin(sip)) >= 0) ylikely {
 	    dirlist	*dlp = sip->mlp ;
 	    dirlist_cur	cur ;
-	    if ((rs = dirlist_curbegin(dlp,&cur)) >= 0) {
+	    if ((rs = dirlist_curbegin(dlp,&cur)) >= 0) ylikely {
 	        cint	tlen = sip->tlen ;
-	        int		dl ;
-		cchar		*un = sip->username ;
-	        char		*tbuf = sip->tbuf ;
+	        int	dl ;
+		cchar	*un = sip->username ;
+	        char	*tbuf = sip->tbuf ;
 	        while (rs >= 0) {
 	            dl = dirlist_curenum(dlp,&cur,tbuf,tlen) ;
 	            if (dl == SR_NOTFOUND) break ;
 		    rs = dl ;
-#if	CF_DEBUG
-		    debugprintf("pcsmailcheck/subinfo_getsysmail: "
-			    "dirlist_curenum() rs=%d\n",rs) ;
-		    debugprintf("pcsmailcheck/subinfo_getsysmail: "
-			    "md=%r\n",tbuf,dl) ;
-#endif
+		    DEBUGPRINTF("dirlist_curenum() rs=%d\n",rs) ;
+		    DEBUGPRINTF("md=%r\n",tbuf,dl) ;
 		    if (rs >= 0) {
 	                if ((rs = pathadd(tbuf,dl,un)) >= 0) {
 			    rs = subinfo_mailfile(sip) ;
@@ -447,11 +444,7 @@ local int subinfo_getsysmail(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 
 	} /* end if (maildirs) */
-
-#if	CF_DEBUG
-	debugprintf("pcsmailcheck/subinfo_getsysmail: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (subinfo_getsysmail) */
 
@@ -460,11 +453,7 @@ local int subinfo_mailfile(SI *sip) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	cchar		*mfn = sip->tbuf ;
-
-#if	CF_DEBUG
-	debugprintf("pcsmailcheck/subinfo_mailfile: ent mfn=%s\n",mfn) ;
-#endif
-
+	DEBUGPRINTF("ent mfn=%s\n",mfn) ;
 	if (ustat sb ; (rs = u_stat(mfn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode) && (sb.st_size > 0)) {
 		mailbox		mb ;
@@ -478,13 +467,8 @@ local int subinfo_mailfile(SI *sip) noex {
 			    char	*tb = sip->fbuf ;
 	            	    if ((rs = mailbox_getfrom(&mb,tb,tl,mfn,mi)) >= 0) {
 				sip->froml = rs ; /* returned length */
-
-#if	CF_DEBUG
-	        	    debugprintf("pcsmailcheck/subinfo_mailfile: "
-				"mailbox_getfrom() rs=%d\n",rs) ;
-	        	    debugprintf("pcsmailcheck/subinfo_mailfile: "
-				"f=>%r<\n",sip->fbuf,rs) ;
-#endif
+	        	    DEBUGPRINTF("mailbox_getfrom() rs=%d\n",rs) ;
+	        	    DEBUGPRINTF("f=>%r<\n",sip->fbuf,rs) ;
 			    } else if (rs == SR_OVERFLOW) {
 				tb[0] = '\0' ;
 				rs = SR_OK ;
@@ -499,9 +483,7 @@ local int subinfo_mailfile(SI *sip) noex {
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	} /* end if (exists) */
-#if	CF_DEBUG
-	debugprintf("pcsmailcheck/subinfo_mailfile: ret rs=%d c=%u\n",rs,c) ;
-#endif
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (subinfo_mailfile) */
 
@@ -522,20 +504,14 @@ local int subinfo_cvtfrom(SI *sip) noex {
 	int		wlen = sip->froml ;
 	int		sz ;
 	int		len = 0 ; /* return-value */
-#if	CF_DEBUG
-	debugprintf("pcsmailcheck/subinfo_cvtfrom: ent\n") ;
-#endif
+	DEBUGPRINTF("ent\n") ;
 	sz = ((wlen + 1) * szof(wchar_t)) ;
 	if (wchar_t *wbuf ; (rs = lm_mall(sz,&wbuf)) >= 0) {
 	    hdrdecode	d ;
-#if	CF_DEBUG
-	debugprintf("pcsmailcheck/subinfo_cvtfrom: hdrdecode\n") ;
-#endif
+	DEBUGPRINTF("hdrdecode\n") ;
 	    if ((rs = hdrdecode_start(&d,sip->pr)) >= 0) {
 		cchar		*fbuf = sip->fbuf ;
-#if	CF_DEBUG
-	debugprintf("pcsmailcheck/subinfo_cvtfrom: mid1\n") ;
-#endif
+	DEBUGPRINTF("mid1\n") ;
 		if ((rs = hdrdecode_proc(&d,wbuf,wlen,fbuf,froml)) >= 0) {
 		    cint	dlen = (2 * rs) ;
 		    int		wl = rs ;
@@ -561,28 +537,28 @@ local int subinfo_cvtfrom(SI *sip) noex {
 local int maildirs_begin(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ; /* return-value */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    static cchar *vmaildir = getenv(varname.maildir) ;
 	    if (vmaildir) {
 	        rs = maildirs_varmaildirs(sip,vmaildir) ;
 	        c += rs ;
 	    }
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    static cchar *vmaildirs = getenv(varname.maildirs) ;
 	    if (vmaildirs) {
 	        rs = maildirs_varmaildirs(sip,vmaildirs) ;
 	        c += rs ;
 	    }
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    static cchar *vmail = getenv(varname.mail) ;
 	    if (vmail) {
 	        rs = maildirs_varmail(sip,vmail) ;
 	        c += rs ;
 	    }
 	}
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    rs = maildirs_default(sip,sysword.w_maildir) ;
 	    c += rs ;
 	}
@@ -591,7 +567,7 @@ local int maildirs_begin(SI *sip) noex {
 
 local int maildirs_end(SI *sip) noex {
     	int		rs = SR_FAULT ;
-	if (sip) {
+	if (sip) ylikely {
 	    rs = SR_OK ;
 	}
 	return rs ;
@@ -602,7 +578,7 @@ local int maildirs_varmaildirs(SI *sip,cchar *sp) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (vlp && sp) {
+	if (vlp && sp) ylikely {
 	    int		sl = lenstr(sp) ;
 	    int		cl ;
 	    cchar	*cp ;
@@ -630,7 +606,7 @@ local int maildirs_varmail(SI *sip,cchar *mvfn) noex {
 	dirlist		*vlp = sip->mlp ;
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (vlp) {
+	if (vlp) ylikely {
 	    if ((mvfn != nullptr) && (mvfn[0] != '\0')) {
 	        cchar	*cp ;
 	        if (int cl ; (cl = sfdirname(mvfn,-1,&cp)) > 0) {
@@ -646,7 +622,7 @@ local int maildirs_varmail(SI *sip,cchar *mvfn) noex {
 local int maildirs_default(SI *sip,cchar *sp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (sp) {
+	if (sp) ylikely {
 	    rs = SR_OK ;
 	    if (sp[0] != '\0') {
 	        rs = maildirs_add(sip,sp,-1) ;
@@ -685,9 +661,9 @@ checker::operator int () noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    maxpathlen = rs ;
-	    if ((rs = bufsizeget(bufsize_mailaddr)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mailaddr)) >= 0) ylikely {
 		mailaddrlen = rs ;
 	    }
 	}
