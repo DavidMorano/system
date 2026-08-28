@@ -88,6 +88,10 @@ import libutil ;			/* |lenstr(3u)| */
 #define	TO_RUN		(5 * 60)
 #define	TO_RECVMSG	5
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+
 
 /* external subroutines */
 
@@ -121,17 +125,17 @@ local int	mksrvdname(char *,cchar *,cchar *,cchar *) noex ;
 /* local variables */
 
 #ifdef	COMMENT
-static cchar	*prbins[] = {
+constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 #endif /* COMMENT */
 
 
 /* exported variables */
 
-const PCSNSC_OBJ	pcsnsc = {
+constexpr PCSNSC_OBJ	pcsnsc_modinfo = {
 	"pcsnsc",
 	szof(PCSNSC),
 	0
@@ -146,17 +150,13 @@ const PCSNSC_OBJ	pcsnsc = {
 int pcsnsc_open(PCSNSC *op,cchar *pr,int to) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 	if (pr[0] == '\0') return SR_INVALID ;
 
 	if (to < 1) to = 1 ;
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_open: ent pr=%s to=%d\n",pr,to) ;
-#endif
-
-	memset(op,0,sizeof(PCSNSC)) ;
+	DEBUGPRINTF("ent pr=%s to=%d\n",pr,to) ;
+	memclear(op) ;
 	op->to = to ;
 	op->fd = -1 ;
 	op->pid = getpid() ;
@@ -164,20 +164,16 @@ int pcsnsc_open(PCSNSC *op,cchar *pr,int to) noex {
 	if ((rs = pcsnsc_setbegin(op,pr)) > 0) {
 	    if ((rs = pcsnsc_connect(op)) > 0) {
 	        if ((rs = pcsnsc_bufbegin(op)) >= 0) {
-	            op->fl.srv = TRUE ;
+	            op->fl.srv = true ;
 		    rs = 1 ;
-	            op->magic = PCSNSC_MAGIC ;
+	            op->magval = PCSNSC_MAGIC ;
 	        }
 	    }
 	    if ((rs < 0) || (! op->fl.srv)) {
 	        pcsnsc_setend(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (pcsnsc-set) */
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_open: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (pcsnsc_open) */
 
@@ -185,9 +181,9 @@ int pcsnsc_close(PCSNSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSC_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = pcsnsc_bufend(op) ;
 	if (rs >= 0) rs = rs1 ;
@@ -195,35 +191,26 @@ int pcsnsc_close(PCSNSC *op) noex {
 	rs1 = pcsnsc_setend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUG
-	debugprintf("pcsnsc_close: ret rs=%d\n",rs) ;
-#endif
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 } /* end subroutine (pcsnsc_close) */
 
 int pcsnsc_status(PCSNSC *op,PCSNSC_STATUS *statp) noex {
 	int		rs ;
 
-#if	CF_DEBUG
-	debugprintf("pcsnsc_status: ent\n") ;
-#endif
+	DEBUGPRINTF("ent\n") ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSC_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUG
-	debugprintf("pcsnsc_status: con\n") ;
-#endif
+	DEBUGPRINTF("con\n") ;
 
 	rs = pcsnsc_istatus(op,statp) ;
 
-#if	CF_DEBUG
-	debugprintf("pcsnsc_status: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (pcsnsc_status) */
 
@@ -231,14 +218,12 @@ int pcsnsc_help(PCSNSC *op,char *rbuf,int rlen,int idx) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
-#if	CF_DEBUG
-	debugprintf("pcsnsc_help: ent\n") ;
-#endif
+	DEBUGPRINTF("ent\n") ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNSC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSC_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.srv) {
 	    struct pcsmsg_gethelp	mreq ;
@@ -266,39 +251,32 @@ int pcsnsc_help(PCSNSC *op,char *rbuf,int rlen,int idx) noex {
 	                    }
 	                }
 		    } else if (isBadRecv(rs)) {
-		        op->fl.srv = FALSE ;
+		        op->fl.srv = false ;
 		        rs = SR_OK ;
 	            } /* end if (uc_recve) */
 		} else if (isBadSend(rs)) {
-		    op->fl.srv = FALSE ;
+		    op->fl.srv = false ;
 		    rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (pcsmsg_gethelp) */
-	    if (rs < 0) op->fl.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = false ;
 	} /* end if (servicing) */
 
-#if	CF_DEBUG
-	debugprintf("pcsnsc_help: ret rs=%d rl=%u\n",rs,rl) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d rl=%u\n",rs,rl) ;
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (pcsnsc_help) */
 
 int pcsnsc_getval(PCSNSC *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_getval: ent un=%s w=%u\n",un,w) ;
-#endif
-
-	if (op == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (un == NULL) return SR_FAULT ;
+	DEBUGPRINTF("ent un=%s w=%u\n",un,w) ;
+	if (op == nullptr) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (un == nullptr) return SR_FAULT ;
 
 	if (un[0] == '\0') return SR_INVALID ;
 
-	if (op->magic != PCSNSC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSC_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.srv) {
 	    struct pcsmsg_getval	mreq ;
@@ -311,9 +289,7 @@ int pcsnsc_getval(PCSNSC *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	    strwcpy(mreq.key,un,PCSMSG_KEYLEN) ;
 	    if ((rs = pcsmsg_getval(&mreq,0,mbuf,mlen)) >= 0) {
 	        cint	fd = op->fd ;
-#if	CF_DEBUG
-	debugprintf("pcsnsc_getval: fd=%d\n",fd) ;
-#endif
+	DEBUGPRINTF("fd=%d\n",fd) ;
 	        if ((rs = u_send(fd,mbuf,rs,0)) >= 0) {
 	            cint	mf = 0 ;
 	            cint	ro = FM_TIMED ;
@@ -330,44 +306,31 @@ int pcsnsc_getval(PCSNSC *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	                    }
 	                }
 		    } else if (isBadRecv(rs)) {
-#if	CF_DEBUG
-	debugprintf("pcsnsc_getval: uc_recve() out rs=%d\n",rs) ;
-#endif
-		        op->fl.srv = FALSE ;
+	DEBUGPRINTF("uc_recve() out rs=%d\n",rs) ;
+		        op->fl.srv = false ;
 		        rs = SR_OK ;
 	            } /* end if (uc_recve) */
 		} else if (isBadSend(rs)) {
-#if	CF_DEBUG
-	debugprintf("pcsnsc_getval: u_send() out rs=%d\n",rs) ;
-#endif
-		    op->fl.srv = FALSE ;
+	DEBUGPRINTF("u_send() out rs=%d\n",rs) ;
+		    op->fl.srv = false ;
 		    rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (pcsmsg_getval) */
-#if	CF_DEBUG
-	debugprintf("pcsnsc_getval: pcsmsg_getval() out rs=%d\n",rs) ;
-#endif
-	    if (rs < 0) op->fl.srv = FALSE ;
+	DEBUGPRINTF("pcsmsg_getval() out rs=%d\n",rs) ;
+	    if (rs < 0) op->fl.srv = false ;
 	} /* end if (servicing) */
 
-#if	CF_DEBUG
-	debugprintf("pcsnsc_getval: ret rs=%d rl=%u\n",rs,rl) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d rl=%u\n",rs,rl) ;
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (pcsnsc_getval) */
 
 int pcsnsc_mark(PCSNSC *op) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
+	DEBUGPRINTF("ent\n") ;
+	if (op == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUG
-	debugprintf("pcsnsc_mark: ent\n") ;
-#endif
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != PCSNSC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSC_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.srv) {
 	    struct pcsmsg_mark	mreq ;
@@ -390,35 +353,29 @@ int pcsnsc_mark(PCSNSC *op) noex {
 	                    }
 	                }
 		    } else if (isBadRecv(rs)) {
-		        op->fl.srv = FALSE ;
+		        op->fl.srv = false ;
 		        rs = SR_OK ;
 	            } /* end if (uc_recve) */
 		} else if (isBadSend(rs)) {
-		    op->fl.srv = FALSE ;
+		    op->fl.srv = false ;
 		    rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (pcsmsg_mark) */
-	    if (rs < 0) op->fl.srv = FALSE ;
+	    if (rs < 0) {
+		op->fl.srv = false ;
+	    } /* end if (error) */
 	} /* end if (servicing) */
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_mark: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (pcsnsc_mark) */
 
 int pcsnsc_exit(PCSNSC *op,cchar *reason) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
+	DEBUGPRINTF("ent\n") ;
+	if (op == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUG
-	debugprintf("pcsnsc_exit: ent\n") ;
-#endif
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != PCSNSC_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNSC_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.srv) {
 	    struct pcsmsg_exit	mreq ;
@@ -428,7 +385,7 @@ int pcsnsc_exit(PCSNSC *op,cchar *reason) noex {
 	    char		*mbuf = op->mbuf ;
 	    mreq.tag = op->pid ;
 	    mreq.reason[0] = '\0' ;
-	    if (reason != NULL) {
+	    if (reason != nullptr) {
 	        strwcpy(mreq.reason,reason,REALNAMELEN) ;
 	    }
 	    if ((rs = pcsmsg_exit(&mreq,0,mbuf,mlen)) >= 0) {
@@ -445,21 +402,19 @@ int pcsnsc_exit(PCSNSC *op,cchar *reason) noex {
 	                    }
 	                }
 		    } else if (isBadRecv(rs)) {
-		        op->fl.srv = FALSE ;
+		        op->fl.srv = false ;
 		        rs = SR_OK ;
 	            } /* end if (uc_recve) */
 		} else if (isBadSend(rs)) {
-		    op->fl.srv = FALSE ;
+		    op->fl.srv = false ;
 		    rs = SR_OK ;
 	        } /* end if (u_send) */
 	    } /* end if (pcsmsg_exit) */
-	    if (rs < 0) op->fl.srv = FALSE ;
+	    if (rs < 0) {
+		op->fl.srv = false ;
+	    } /* end if (error) */
 	} /* end if (servicing) */
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_exit: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (pcsnsc_exit) */
 
@@ -473,31 +428,27 @@ int pcsnsc_getname(PCSNSC *op,char *rbuf,int rlen,cchar *un) noex {
 
 local int pcsnsc_setbegin(PCSNSC *op,cchar *pr) noex {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar		*cp ;
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_setbegin: ent\n") ;
-#endif
-
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	    char	rbuf[MAXPATHLEN+1] ;
 	    op->pr = cp ;
 	    if ((rs = pcsnsc_srvdname(op,rbuf)) > 0) {
 	        if ((rs = pcsnsc_srvfname(op,rbuf)) > 0) {
-	            if ((rs = pcsnsc_bind(op,TRUE,rbuf)) >= 0) {
-	                f = TRUE ;
+	            if ((rs = pcsnsc_bind(op,true,rbuf)) >= 0) {
+	                f = true ;
 	            }
-	            if ((rs < 0) && (op->srvfname != NULL)) {
+	            if ((rs < 0) && op->srvfname) {
 	                uc_free(op->srvfname) ;
-	                op->srvfname = NULL ;
-	            }
+	                op->srvfname = nullptr ;
+	            } /* end if (error) */
 	        } /* end if (pcsnsc_srvfname) */
 	    } /* end if (pcsnsc_srvdname) */
-	    if (((rs < 0) || (!f)) && (op->pr != NULL)) {
+	    if (((rs < 0) || (!f)) && (op->pr != nullptr)) {
 	        uc_free(op->pr) ;
-	        op->pr = NULL ;
-	    }
+	        op->pr = nullptr ;
+	    } /* end if (error) */
 	} /* end if (m-a) */
 
 	return (rs >= 0) ? f : rs ;
@@ -511,19 +462,19 @@ local int pcsnsc_setend(PCSNSC *op) noex {
 	if (rs >= 0) rs = rs1 ;
 	}
 	{
-	rs1 = pcsnsc_bind(op,FALSE,NULL) ;
+	rs1 = pcsnsc_bind(op,false,nullptr) ;
 	if (rs >= 0) rs = rs1 ;
 	}
 	{
-	if (op->srvfname != NULL) {
+	if (op->srvfname != nullptr) {
 	    rs1 = uc_free(op->srvfname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->srvfname = NULL ;
+	    op->srvfname = nullptr ;
 	}
-	if (op->pr != NULL) {
+	if (op->pr != nullptr) {
 	    rs1 = uc_free(op->pr) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->pr = NULL ;
+	    op->pr = nullptr ;
 	}
 	return rs ;
 } /* end subroutine (pcsnsc_setend) */
@@ -533,17 +484,13 @@ local int pcsnsc_srvdname(PCSNSC *op,char *rbuf) noex {
 	int		rl = 0 ;
 	cchar		*td = TMPDNAME ;
 	cchar		*fn = PCSNSC_FACNAME ;
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_srvdname: ent\n") ;
-#endif
-
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = mksrvdname(rbuf,td,op->pr,fn)) >= 0) {
 	    USTAT	sb ;
 	    if ((rs = u_stat(rbuf,&sb)) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 	            cint	am = (W_OK|W_OK|X_OK) ;
-	            if ((rs = perm(rbuf,-1,-1,NULL,am)) >= 0) {
+	            if ((rs = perm(rbuf,-1,-1,nullptr,am)) >= 0) {
 	                rl = 1 ;
 	            } else if (isNotAccess(rs)) {
 	                rs = SR_OK ;
@@ -553,11 +500,7 @@ local int pcsnsc_srvdname(PCSNSC *op,char *rbuf) noex {
 	        rs = SR_OK ;
 	    }
 	}
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_srvdname: ret rs=%d rl=%u\n",rs,rl) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d rl=%u\n",rs,rl) ;
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (pcsnsc_srvdname) */
 
@@ -566,21 +509,15 @@ local int pcsnsc_srvfname(PCSNSC *op,cchar *srvdname) noex {
 	int		rl = 0 ;
 	cchar		*reqname = PCSNSC_REQNAME ;
 	char		srvfname[MAXPATHLEN + 1] ;
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_srvfname: ent\n") ;
-#endif
-
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = mkpath2(srvfname,srvdname,reqname)) >= 0) {
 	    USTAT	sb ;
 	    rl = rs ;
-#if	CF_DEBUG
-	debugprintf("pcsnsc_srvfname: srvfname=%s\n",srvfname) ;
-#endif
+	DEBUGPRINTF("srvfname=%s\n",srvfname) ;
 	    if ((rs = u_stat(srvfname,&sb)) >= 0) {
 	        if (S_ISSOCK(sb.st_mode)) {
 	            cint	am = (R_OK|W_OK) ;
-	            if ((rs = perm(srvfname,-1,-1,NULL,am)) >= 0) {
+	            if ((rs = perm(srvfname,-1,-1,nullptr,am)) >= 0) {
 	                cchar	*cp ;
 	                if ((rs = uc_mallocstrw(srvfname,rl,&cp)) >= 0) {
 	                    op->srvfname = cp ;
@@ -593,29 +530,19 @@ local int pcsnsc_srvfname(PCSNSC *op,cchar *srvdname) noex {
 	            rl = 0 ;
 	        }
 	    } else if (isNotPresent(rs)) {
-#if	CF_DEBUG
-	debugprintf("pcsnsc_srvfname: not-present rs=%d\n",rs) ;
-#endif
+	DEBUGPRINTF("not-present rs=%d\n",rs) ;
 	        rl = 0 ;
 	        rs = SR_OK ;
 	    }
 	} /* end if (srvfname) */
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_srvfname: ret rs=%d rl=%u\n",rs,rl) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d rl=%u\n",rs,rl) ;
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (pcsnsc_srvfname) */
 
 local int pcsnsc_bind(PCSNSC *op,int f,cchar *srvdname) noex {
 	int		rs = SR_OK ;
-	int		f_err = FALSE ;
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_bind: ent f=%u\n",f) ;
-#endif
-
+	int		f_err = false ;
+	DEBUGPRINTF("ent f=%u\n",f) ;
 	if (f) {
 	    cchar	*tn = "clientXXXXXXXX" ;
 	    char	template[MAXPATHLEN + 1] ;
@@ -626,16 +553,14 @@ local int pcsnsc_bind(PCSNSC *op,int f,cchar *srvdname) noex {
 	        char		fname[MAXPATHLEN + 1] ;
 	        if ((rs = opentmpusd(template,of,om,fname)) >= 0) {
 	            cchar	*cp ;
-#if	CF_DEBUG
-			debugprintf("pcsnsc_bind: opentmpusd() rs=%d\n",rs) ;
-#endif
+			DEBUGPRINTF("opentmpusd() rs=%d\n",rs) ;
 	            op->fd = rs ;
 	            u_chmod(fname,om) ;
-	            uc_closeonexec(op->fd,TRUE) ;
+	            uc_closeonexec(op->fd,true) ;
 	            if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
 	                op->srcfname = cp ;
 	            } else {
-	                f_err = TRUE ;
+	                f_err = true ;
 	            }
 	        } /* end if (opentmpusd) */
 	    } /* end if (mkpath) */
@@ -648,20 +573,16 @@ local int pcsnsc_bind(PCSNSC *op,int f,cchar *srvdname) noex {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
 	    }
-	    if (op->srcfname != NULL) {
+	    if (op->srcfname != nullptr) {
 	        if (op->srcfname[0] != '\0') {
 	            u_unlink(op->srcfname) ;
 	        }
 	        uc_free(op->srcfname) ;
-	        op->srcfname = NULL ;
+	        op->srcfname = nullptr ;
 	    }
 
 	} /* end if (bind-off) */
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_bind: ret rs=%d\n",rs) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (pcsnsc_bind) */
 
@@ -679,10 +600,10 @@ local int pcsnsc_bufbegin(PCSNSC *op) noex {
 local int pcsnsc_bufend(PCSNSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->mbuf != NULL) {
+	if (op->mbuf != nullptr) {
 	    rs1 = uc_free(op->mbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->mbuf = NULL ;
+	    op->mbuf = nullptr ;
 	    op->mlen = 0 ;
 	}
 	return rs ;
@@ -691,13 +612,9 @@ local int pcsnsc_bufend(PCSNSC *op) noex {
 local int pcsnsc_connect(PCSNSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_connect: ent srvfname=%s\n",op->srvfname) ;
-#endif
-
-	if (op->srvfname != NULL) {
+	int		f = false ;
+	DEBUGPRINTF("ent srvfname=%s\n",op->srvfname) ;
+	if (op->srvfname != nullptr) {
 	    SOCKADDRESS	sa ;
 	    cint	af = AF_UNIX ;
 	    cchar	*sfn = op->srvfname ;
@@ -706,7 +623,7 @@ local int pcsnsc_connect(PCSNSC *op) noex {
 	        cint	sal = rs ;
 	        cint	to = op->to ;
 	        if ((rs = uc_connecte(op->fd,sap,sal,to)) >= 0) {
-	            f = TRUE ;
+	            f = true ;
 	        } else if (isFailConn(rs)) {
 	            rs = SR_OK ;
 	        }
@@ -714,24 +631,16 @@ local int pcsnsc_connect(PCSNSC *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sockaddress) */
 	} /* end if (non-null) */
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_connect: ret rs=%d f=%u\n",rs,f) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d f=%u\n",rs,f) ;
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (pcsnsc_connect) */
 
 local int pcsnsc_istatus(PCSNSC *op,PCSNSC_STATUS *statp) noex {
 	int		rs = SR_OK ;
 	int		rc = 0 ;
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_istatus: ent\n") ;
-#endif
-
-	if (statp != NULL) {
-	    memset(statp,0,sizeof(PCSNSC_STATUS)) ;
+	DEBUGPRINTF("ent\n") ;
+	if (statp) {
+	    memclear(statp) ;
 	}
 
 	if (op->fl.srv) {
@@ -748,13 +657,11 @@ local int pcsnsc_istatus(PCSNSC *op,PCSNSC_STATUS *statp) noex {
 	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = pcsmsg_status(&mres,1,mbuf,rs)) >= 0) {
-#if	CF_DEBUG
-	                    debugprintf("pcsnsc_istatus: "
-	                        "pcsmsg_status() rs=%d rc=%u\n",rs,mres.rc) ;
-#endif
+	                    DEBUGPRINTF("pcsmsg_status() rs=%d rc=%u\n",
+				    rs,mres.rc) ;
 	                    if (mres.rc == pcsmsgrc_ok) {
 				rc = 1 ;
-				if (statp != NULL) {
+				if (statp != nullptr) {
 	                            statp->pid = mres.pid ;
 				    statp->queries = mres.queries ;
 				}
@@ -765,27 +672,19 @@ local int pcsnsc_istatus(PCSNSC *op,PCSNSC_STATUS *statp) noex {
 	                    }
 	                }
 		    } else if (isBadRecv(rs)) {
-		        op->fl.srv = FALSE ;
+		        op->fl.srv = false ;
 		        rs = SR_OK ;
 	            } /* end if (uc_recve) */
-#if	CF_DEBUG
-		debugprintf("pcsnsc_istatus: recv-out rs=%d\n",rs) ;
-#endif
+		DEBUGPRINTF("recv-out rs=%d\n",rs) ;
 		} else if (isBadSend(rs)) {
-		    op->fl.srv = FALSE ;
+		    op->fl.srv = false ;
 		    rs = SR_OK ;
 	        } /* end if (u_send) */
-#if	CF_DEBUG
-		debugprintf("pcsnsc_istatus: send-out rs=%d\n",rs) ;
-#endif
+		DEBUGPRINTF("send-out rs=%d\n",rs) ;
 	    } /* end if (pcsmsg_getstatus) */
-	    if (rs < 0) op->fl.srv = FALSE ;
+	    if (rs < 0) op->fl.srv = false ;
 	} /* end if (servicing) */
-
-#if	CF_DEBUG
-	debugprintf("pcsnsc_istatus: ret rs=%d pid=%d\n",rs,rc) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d pid=%d\n",rs,rc) ;
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (pcsnsc_istatus) */
 
@@ -799,19 +698,19 @@ local int pcsnsc_spawn(PCSNSC *op) noex {
 	cchar	*argz = PCSNSC_FACNAME ;
 	char		pbuf[MAXPATHLEN + 1] ;
 
-	for (i = 0 ; (rs >= 0) && (prbins[i] != NULL) ; i += 1) {
+	for (i = 0 ; (rs >= 0) && (prbins[i] != nullptr) ; i += 1) {
 	    if ((rs = mkpath3(pbuf,op->pr,prbins[i],argz)) >= 0) {
-	        rs = perm(pbuf,-1,-1,NULL,X_OK) ;
+	        rs = perm(pbuf,-1,-1,nullptr,X_OK) ;
 	    }
 	} /* end for */
 
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    ENVMGR	em ;
-	    if ((rs = envmgr_start(&em)) >= 0) {
-	        if ((rs = pcsnsc_envload(op,&em)) >= 0) {
+	    if ((rs = envmgr_start(&em)) >= 0) ylikely {
+	        if ((rs = pcsnsc_envload(op,&em)) >= 0) ylikely {
 		    cint	dlen = DIGBUFLEN ;
 	            char	dbuf[DIGBUFLEN + 1] ;
-	            if ((rs = ctdeci(dbuf,dlen,to_run)) >= 0) {
+	            if ((rs = ctdeci(dbuf,dlen,to_run)) >= 0) ylikely {
 	                char	optbuf[OPTBUFLEN + 1] ;
 	                if ((rs = sncpy2(optbuf,OPTBUFLEN,"-d=",dbuf)) >= 0) {
 	                    int		i = 0 ;
@@ -821,10 +720,9 @@ local int pcsnsc_spawn(PCSNSC *op) noex {
 	                    av[i++] = optbuf ;
 	                    av[i++] = "-o" ;
 	                    av[i++] = "quick" ;
-	                    av[i++] = NULL ;
+	                    av[i++] = nullptr ;
 	                    if ((rs = envmgr_getvec(&em,&ev)) >= 0) {
-	                        SPAWNPROC	ps ;
-	                        memset(&ps,0,sizeof(SPAWNPROC)) ;
+	                        SPAWNPROC	ps = {} ;
 				ps.opts = SPAWNPROC_OSETSID ;
 	                        ps.disp[0] = SPAWNPROC_DCLOSE ;
 	                        ps.disp[1] = SPAWNPROC_DCLOSE ;
