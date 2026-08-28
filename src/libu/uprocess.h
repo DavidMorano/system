@@ -59,15 +59,12 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/resource.h>	/* |getrlimit(2)| */
-#include	<unistd.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usupport.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<sys/resource.h>	/* POSIX® |getrlimit(2)| */
+#include	<unistd.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
 
 
 #ifdef	__cplusplus
@@ -82,7 +79,7 @@ namespace uprocess {
 	int operator () () noex ;
 	virtual int callstd() noex = 0 ;
     } ; /* end struct (uprocessbase) */
-}
+} /* end namespace (uprocess) */
 
 #endif /* __cplusplus */
 
@@ -125,7 +122,7 @@ EXTERNC_end
 
 inline int u_nice(int incr) noex {
 	return u_nice(incr,nullptr) ;
-}
+} /* end */
 
 namespace libu {
     struct ungrouper {
@@ -133,9 +130,9 @@ namespace libu {
         operator int () noex ;
         int operator () () noex {
 	    return operator int () ;
-        } ;
+        } ; /* end */
     } ; /* end struct (ungrouper) */
-}
+} /* end namespace (libu) */
 
 extern libu::ungrouper	ungroups ;
 
