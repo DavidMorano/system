@@ -122,15 +122,15 @@ namespace {
     struct ucachestore {
 	atomic_int	d[dataitem_overlast] ;
     } ; /* end struct (ucachestore) */
-    struct usysconf ;
-    typedef int (usysconf::*usysconf_m)(int) ;
-    struct usysconf {
-	usysconf_m	m ;
+    struct usysconfmgr ;
+    typedef int (usysconfmgr::*usysconfmgr_m)(int) ;
+    struct usysconfmgr {
+	usysconfmgr_m	m ;
 	char		*rbuf ;
 	long		*lp ;
 	int		rlen ;
-	usysconf(char *rp,int rl) noex : rbuf(rp), rlen(rl) { } ;
-	usysconf(long *p) noex : lp(p) { } ;
+	usysconfmgr(char *rp,int rl) noex : rbuf(rp), rlen(rl) { } ;
+	usysconfmgr(long *p) noex : lp(p) { } ;
 	int mconfval	(int) noex ;
 	int mconfstr	(int) noex ;
 	int getval	(int) noex ;
@@ -175,10 +175,10 @@ cbool			f_debug		= CF_DEBUG ;
 extern "C" {
     int u_sysconfval(int cmd,long *rp) noex {
         return usysconfval(cmd,rp) ;
-    }
+    } /* end */
     int u_sysconfstr(int cmd,char *rbuf,int rlen) noex {
         return usysconfstr(cmd,rbuf,rlen) ;
-    }
+    } /* end */
 } /* end extern (C) */
 
 
@@ -187,8 +187,8 @@ extern "C++" {
 	int		rs = SR_INVALID ;
 	DPRINTF("ent\n") ;
 	if (req >= 0) {
-	    usysconf	sco(rp) ;
-	    sco.m = &usysconf::mconfval ;
+	    usysconfmgr	sco(rp) ;
+	    sco.m = &usysconfmgr::mconfval ;
 	    rs = sco.getval(req) ;
 	} /* end if (valid) */
 	DPRINTF("ret rs=%d\n",rs) ;
@@ -199,8 +199,8 @@ extern "C++" {
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if ((req >= 0) && (rlen >= 0)) {
-	        usysconf	sco(rbuf,rlen) ;
-	        sco.m = &usysconf::mconfstr ;
+	        usysconfmgr	sco(rbuf,rlen) ;
+	        sco.m = &usysconfmgr::mconfstr ;
 	        rs = sco.getstr(req) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -211,7 +211,7 @@ extern "C++" {
 
 /* local subroutines */
 
-int usysconf::getvalsys(int req) noex {
+int usysconfmgr::getvalsys(int req) noex {
     	int		rs ;
 	int		val = 0 ; /* return-value */
 	if (req >= sysconfcmd_synthetic) {
@@ -226,13 +226,13 @@ int usysconf::getvalsys(int req) noex {
 	    } /* end if */
 	} /* end if */
     	return (rs >= 0) ? val : rs ;
-} /* end subroutine (usysconf::getvalsys) */
+} /* end subroutine (usysconfmgr::getvalsys) */
 
-int usysconf::getstr(int req) noex {
+int usysconfmgr::getstr(int req) noex {
     	return callstd(req) ;
-} /* end subroutine (usysconf::getstr) */
+} /* end subroutine (usysconfmgr::getstr) */
 
-int usysconf::getval(int req) noex {
+int usysconfmgr::getval(int req) noex {
         cint            rsn = SR_NOTFOUND ;
     	int		rs ;
 	DPRINTF("ent\n") ;
@@ -243,9 +243,9 @@ int usysconf::getval(int req) noex {
 	} /* end switch */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end method (usysconf::getval) */
+} /* end method (usysconfmgr::getval) */
 
-int usysconf::getvalcache(int req,int ci) noex {
+int usysconfmgr::getvalcache(int req,int ci) noex {
 	int		rs ;
 	DPRINTF("ent req=%d ci=%dn",req,ci) ;
 	if ((rs = udata.d[ci].load(memord_relaxed)) == 0) {
@@ -258,9 +258,9 @@ int usysconf::getvalcache(int req,int ci) noex {
 	} /* end if (result) */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (usysconf::getvalcache) */
+} /* end subroutine (usysconfmgr::getvalcache) */
 
-int usysconf::getvalsyn(int req) noex {
+int usysconfmgr::getvalsyn(int req) noex {
     	long		val = -1 ;
     	int		rs = SR_OK ;
 	DPRINTF("ent req=%d\n",req) ;
@@ -363,9 +363,9 @@ int usysconf::getvalsyn(int req) noex {
 	if (lp) *lp = (rs >= 0) ? val : 0L ;
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (usysconf::getvalsyn) */
+} /* end subroutine (usysconfmgr::getvalsyn) */
 
-int usysconf::getvaldef(int req) noex {
+int usysconfmgr::getvaldef(int req) noex {
     	int		rs = SR_NOTSUP ;
 	switch (req) {
 	case _SC_TZNAME_MAX:
@@ -376,9 +376,9 @@ int usysconf::getvaldef(int req) noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-} /* end method (usysconf::getvaldef) */
+} /* end method (usysconfmgr::getvaldef) */
 
-int usysconf::callstd(int req) noex {
+int usysconfmgr::callstd(int req) noex {
 	errtimer	to_again	= utimeout[uto_again] ;
 	errtimer	to_busy		= utimeout[uto_busy] ;
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
@@ -407,17 +407,17 @@ int usysconf::callstd(int req) noex {
 	} until ((rs >= 0) || r.fexit) ;
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (usysconf::callstd) */
+} /* end subroutine (usysconfmgr::callstd) */
 
-int usysconf::mconfval(int req) noex {
+int usysconfmgr::mconfval(int req) noex {
     	return ustd_confval(req,lp) ;
-} /* end subroutine (usysconf::mconfval) */
+} /* end subroutine (usysconfmgr::mconfval) */
 
-int usysconf::mconfstr(int req) noex {
+int usysconfmgr::mconfstr(int req) noex {
     	return ustd_confstr(req,rbuf,rlen) ;
-} /* end subroutine (usysconf::mconfstr) */
+} /* end subroutine (usysconfmgr::mconfstr) */
 
-int usysconf::getdefmsg() noex {
+int usysconfmgr::getdefmsg() noex {
 	int		rs ;
 	if (usysflag.darwin) {
 	    rs = umaxmsglen() ;
@@ -425,28 +425,28 @@ int usysconf::getdefmsg() noex {
 	    rs = MMBUFLEN ;		/* Maximum-Message-Buffer-Length */
 	} /* end if_constexpr (usysflag.darwin) */
 	return rs ;
-} /* end method (usysconf::getdefmsg) */
+} /* end method (usysconfmgr::getdefmsg) */
 
-int usysconf::getdefzoneinfo() noex {
+int usysconfmgr::getdefzoneinfo() noex {
 	cint		cmdname = _SC_NAME_MAX ;
 	return getval(cmdname) ;
-} /* end method (usysconf::getdefzoneinfo) */
+} /* end method (usysconfmgr::getdefzoneinfo) */
 
-int usysconf::getdefacctname() noex {
+int usysconfmgr::getdefacctname() noex {
 	cint		cmdlogin = _SC_LOGIN_NAME_MAX ;
 	return getval(cmdlogin) ;
-} /* end method (usysconf::getdefacctname) */
+} /* end method (usysconfmgr::getdefacctname) */
 
-int usysconf::getdefnodename() noex {
+int usysconfmgr::getdefnodename() noex {
     	UTSNAME		ut ;
 	int		rs ;
 	{
 	    rs = (szof(ut.nodename) - 1) ;
 	}
 	return rs ;
-} /* end method (usysconf::getdefnodename) */
+} /* end method (usysconfmgr::getdefnodename) */
 
-int usysconf::getdefmailaddr() noex {
+int usysconfmgr::getdefmailaddr() noex {
 	cint		cmdnode = _SC_NODENAME_MAX ;
 	cint		cmdhost = _SC_HOSTNAME_MAX ;
     	cint		nnm = mailvalue.nodenamemult ;
@@ -460,7 +460,7 @@ int usysconf::getdefmailaddr() noex {
 	    }
 	} /* end if (getval) */
     	return (rs >= 0) ? len : rs ;
-} /* end method (usysconf::getdefmailaddr) */
+} /* end method (usysconfmgr::getdefmailaddr) */
 
 local inline bool isNoSup(int rs) noex {
     	bool f = false ;
