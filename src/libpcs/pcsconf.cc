@@ -162,7 +162,7 @@ local int pcsconf_ctor(pcsconf *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->mlp ;
 		    op->mlp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-modload) */
 	} /* end if (non-null) */
 	return rs ;
@@ -175,11 +175,11 @@ local int pcsconf_dtor(pcsconf *op) noex {
 	    if (op->mxp) {
 		delete op->mxp ;
 		op->mxp = nullptr ;
-	    }
+	    } /* end if (delete-ptm) */
 	    if (op->mlp) {
 		delete op->mlp ;
 		op->mlp = nullptr ;
-	    }
+	    } /* end if (delete-modload) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pcsconf_dtor) */
@@ -188,7 +188,7 @@ template<typename ... Args>
 local inline int pcsconf_magic(pcsconf *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == PCSCONF_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == PCSCONF_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (pcsconf_magic) */
@@ -292,10 +292,10 @@ constexpr uid_t		uidend = uid_t(-1) ;
 
 int pcsconf_start(PC *op,cchar *pr,mainv envv,cchar *cfname) noex {
 	int		rs ;
-	if ((rs = pcsconf_ctor(op,pr,envv,cfname)) >= 0) {
+	if ((rs = pcsconf_ctor(op,pr,envv,cfname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0] && cfname[0]) {
-	        if (static cint	rsv = sysvar ; (rs = rsv) >= 0) {
+	    if (pr[0] && cfname[0]) ylikely {
+	        if (static cint	rsv = sysvar ; (rs = rsv) >= 0) ylikely {
 	            cchar	*objname = PC_OBJNAME ;
 	            op->pr = pr ;
 	            op->envv = envv ;
@@ -304,9 +304,9 @@ int pcsconf_start(PC *op,cchar *pr,mainv envv,cchar *cfname) noex {
 	                ptm *mxp = op->mxp ;
 	                if ((rs = mxp->create) >= 0) {
 	                    rs = (*op->call.start)(op->obj,pr,envv,cfname) ;
-	                    if (rs >= 0) {
-		                op->magic = PCSCONF_MAGIC ;
-	                    }
+	                    if (rs >= 0) ylikely {
+		                op->magval = PCSCONF_MAGIC ;
+	                    } /* end if (ok) */
 	                    if (rs < 0) {
 		                mxp->destroy() ;
 		            } /* end if (error) */
@@ -327,7 +327,7 @@ int pcsconf_start(PC *op,cchar *pr,mainv envv,cchar *cfname) noex {
 int pcsconf_finish(PC *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pcsconf_magic(op)) >= 0) {
+	if ((rs = pcsconf_magic(op)) >= 0) ylikely {
 	    if (op->pcsusername != nullptr) {
 		void *vp = voidp(op->pcsusername) ;
 	        rs1 = lm_free(vp) ;
@@ -363,7 +363,7 @@ int pcsconf_finish(PC *op) noex {
 	        rs1 = pcsconf_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (pcsconf_finish) */
@@ -372,10 +372,10 @@ int pcsconf_audit(PC *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		vl = 0 ;
-	if ((rs = pcsconf_magic(op)) >= 0) {
+	if ((rs = pcsconf_magic(op)) >= 0) ylikely {
 	    if (op->call.audit != nullptr) {
 	        ptm *mxp = op->mxp ;
-	        if ((rs = mxp->lockbegin) >= 0) {
+	        if ((rs = mxp->lockbegin) >= 0) ylikely {
 		    {
 	                rs = (*op->call.audit)(op->obj) ;
 		        vl = rs ;
@@ -392,12 +392,12 @@ int pcsconf_getpcsuid(PC *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		v = 0 ;
-	if ((rs = pcsconf_magic(op)) >= 0) {
+	if ((rs = pcsconf_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) {
-	        if ((rs = pcsconf_getpcsids(op)) >= 0) {
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	        if ((rs = pcsconf_getpcsids(op)) >= 0) ylikely {
 	            v = op->uid_pcs ;
-	        }
+	        } /* end if */
 	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
@@ -409,10 +409,10 @@ int pcsconf_getpcsgid(PC *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		v = 0 ;
-	if ((rs = pcsconf_magic(op)) >= 0) {
+	if ((rs = pcsconf_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) {
-	        if ((rs = pcsconf_getpcsids(op)) >= 0) {
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	        if ((rs = pcsconf_getpcsids(op)) >= 0) ylikely {
 	            v = op->gid_pcs ;
 	        }
 	        rs1 = mxp->lockend ;
@@ -426,13 +426,13 @@ int pcsconf_getpcsusername(PC *op,char *ubuf,int ulen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		vl = 0 ;
-	if ((rs = pcsconf_magic(op,ubuf)) >= 0) {
+	if ((rs = pcsconf_magic(op,ubuf)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) {
+	    if ((rs = mxp->lockbegin) >= 0) ylikely {
 	        if (op->pcsusername == nullptr) {
 		    rs = pcsconf_getpcspw(op) ;
 		}
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    if (op->pcsusername != nullptr) {
 		        rs = sncpy1(ubuf,ulen,op->pcsusername) ;
 		        vl = rs ;
@@ -449,7 +449,7 @@ int pcsconf_getpcsusername(PC *op,char *ubuf,int ulen) noex {
 
 int pcsconf_getpr(PC *op,cchar **prp) noex {
 	int		rs ;
-	if ((rs = pcsconf_magic(op)) >= 0) {
+	if ((rs = pcsconf_magic(op)) >= 0) ylikely {
 	    rs = lenstr(op->pr) ;
 	    if (prp) {
 	        *prp = op->pr ;
@@ -460,7 +460,7 @@ int pcsconf_getpr(PC *op,cchar **prp) noex {
 
 int pcsconf_getenvv(PC *op,mainv *envvp) noex {
 	int		rs ;
-	if ((rs = pcsconf_magic(op)) >= 0) {
+	if ((rs = pcsconf_magic(op)) >= 0) ylikely {
 	    if (envvp) {
 	        *envvp = op->envv ;
 	    }
@@ -471,19 +471,19 @@ int pcsconf_getenvv(PC *op,mainv *envvp) noex {
 int pcsconf_curbegin(PC *op,pcsconf_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pcsconf_magic(op,curp)) >= 0) {
+	if ((rs = pcsconf_magic(op,curp)) >= 0) ylikely {
 	    cint	csz = szof(PCSCONFS_CUR) ;
 	    rs = SR_BUGCHECK ;
 	    if (op->cursize == csz) {
 	        memclear(curp) ;
 	        if (op->call.curbegin != nullptr) {
 	            ptm *mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
-	                if (void *p ; (rs = lm_mall(csz,&p)) >= 0) {
+	            if ((rs = mxp->lockbegin) >= 0) ylikely {
+	                if (void *p ; (rs = lm_mall(csz,&p)) >= 0) ylikely {
 		            curp->scp = p ;
 	                    if ((rs = (*op->call.curbegin)
 					(op->obj,curp->scp)) >= 0) {
-		                curp->magic = PC_CURMAGIC ;
+		                curp->magval = PC_CURMAGIC ;
 		            }
 	                    if (rs < 0) {
 	                        lm_free(curp->scp) ;
@@ -502,12 +502,12 @@ int pcsconf_curbegin(PC *op,pcsconf_cur *curp) noex {
 int pcsconf_curend(PC *op,pcsconf_cur *curp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pcsconf_magic(op,curp)) >= 0) {
+	if ((rs = pcsconf_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == PC_CURMAGIC) {
+	    if (curp->magval == PC_CURMAGIC) ylikely {
 	        if (curp->scp != nullptr) {
 	            ptm *mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
+	            if ((rs = mxp->lockbegin) >= 0) ylikely {
 	                if (op->call.curend != nullptr) {
 	                    rs1 = (*op->call.curend)(op->obj,curp->scp) ;
 		            if (rs >= 0) rs = rs1 ;
@@ -522,7 +522,7 @@ int pcsconf_curend(PC *op,pcsconf_cur *curp) noex {
 	        } else {
 	            rs = SR_BUGCHECK ;
 	        }
-	        curp->magic = 0 ;
+	        curp->magval = 0 ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
@@ -534,15 +534,15 @@ int pcsconf_curfetch(PC *op,cchar *kp,int kl,PC_CUR *curp,
 	int		rs = SR_NOSYS ;
 	int		rs1 ;
 	int		vl = 0 ;
-	if ((rs = pcsconf_magic(op,curp,kp)) >= 0) {
+	if ((rs = pcsconf_magic(op,curp,kp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == PC_CURMAGIC) {
+	    if (curp->magval == PC_CURMAGIC) ylikely {
 	        if (op->call.fetch != nullptr) {
 	            ptm *mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
+	            if ((rs = mxp->lockbegin) >= 0) ylikely {
 	                rs = (*op->call.fetch)
 			    (op->obj,kp,kl,curp->scp,vbuf,vlen) ;
-	                if (rs >= 0) {
+	                if (rs >= 0) ylikely {
 	                    rs = pcsconf_expand(op,vbuf,vlen,rs) ;
 		            vl = rs ;
 		        }
@@ -560,16 +560,16 @@ int pcsconf_curenum(PC *op,PC_CUR *curp,char *kbuf,int klen,
 	int		rs = SR_NOSYS ;
 	int		rs1 ;
 	int		vl = 0 ;
-	if ((rs = pcsconf_magic(op,curp,kbuf)) >= 0) {
+	if ((rs = pcsconf_magic(op,curp,kbuf)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == PC_CURMAGIC) {
+	    if (curp->magval == PC_CURMAGIC) ylikely {
 	        if (op->call.enumerate != nullptr) {
 	            ptm *mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
+	            if ((rs = mxp->lockbegin) >= 0) ylikely {
 		        void	*cp = curp->scp ;
 	                rs = (*op->call.enumerate)
 			    (op->obj,cp,kbuf,klen,vbuf,vlen) ;
-	                if (rs >= 0) {
+	                if (rs >= 0) ylikely {
 	                    rs = pcsconf_expand(op,vbuf,vlen,rs) ;
 		            vl = rs ;
 		        }
@@ -586,8 +586,8 @@ int pcsconf_fetchone(PC *op,cchar *kp,int kl,char *vbuf,int vlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		vl = 0 ;
-	if ((rs = pcsconf_magic(op,kp,vbuf)) >= 0) {
-	    if (PC_CUR cur ; (rs = pcsconf_curbegin(op,&cur)) >= 0) {
+	if ((rs = pcsconf_magic(op,kp,vbuf)) >= 0) ylikely {
+	    if (PC_CUR cur ; (rs = pcsconf_curbegin(op,&cur)) >= 0) ylikely {
 	        {
 	            rs = pcsconf_curfetch(op,kp,kl,&cur,vbuf,vlen) ;
 		    vl = rs ;
@@ -607,9 +607,9 @@ local int pcsconf_objloadbegin(PC *op,cchar *pr,cchar *objname) noex {
 	int		rs ;
 	if ((rs = pcsconf_modloadopen(op,pr,objname)) >= 0) {
 	    modload	*lp = op->mlp ;
-	    if ((rs = modload_getmv(lp,0)) >= 0) {
+	    if ((rs = modload_getmv(lp,0)) >= 0) ylikely {
 	        op->objsize = rs ;
-	        if ((rs = modload_getmv(lp,1)) >= 0) {
+	        if ((rs = modload_getmv(lp,1)) >= 0) ylikely {
 		    cint osz = op->objsize ;
 	    	    op->cursize = rs ;
 		    if (void *p ; (rs = lm_mall(osz,&p)) >= 0) {
@@ -624,7 +624,7 @@ local int pcsconf_objloadbegin(PC *op,cchar *pr,cchar *objname) noex {
 	    } /* end if (getmv) */
 	    if (rs < 0) {
 		modload_close(lp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (modloadopen) */
 	return rs ;
 } /* end subroutine (pcsconf_objloadbegin) */
@@ -679,7 +679,7 @@ local int pcsconf_modloadopen(PC *op,cchar *pr,cchar *objname) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        if ((rs < 0) && f_modload) {
 		    modload_close(lp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (modload-open) */
 	    rs1 = lm_free(sbuf) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -846,14 +846,14 @@ local int pcsconf_cookmgr(PC *op) noex {
 	int		rs = SR_OK ;
 	if (op->cookmgr == nullptr) {
 	    cint	osz = szof(CM) ;
-	    if (void *p ; (rs = lm_mall(osz,&p)) >= 0) {
+	    if (void *p ; (rs = lm_mall(osz,&p)) >= 0) ylikely {
 	        CM	*cmp = (CM *) p ;
 	        if ((rs = cookmgr_start(cmp,op->pr)) >= 0) {
 	            op->cookmgr = cmp ;
 	        }
 	        if (rs < 0) {
 	            lm_free(p) ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end if (needed to initialize CM) */
 	return rs ;
@@ -861,7 +861,7 @@ local int pcsconf_cookmgr(PC *op) noex {
 
 local int pcsconf_cookload(PC *op,cchar *kp,int kl) noex {
 	int		rs ;
-	if ((rs = pcsconf_cookmgr(op)) >= 0) {
+	if ((rs = pcsconf_cookmgr(op)) >= 0) ylikely {
 	    CM	*cmp = (CM *) op->cookmgr ;
 	    rs = cookmgr_load(cmp,kp,kl) ;
 	} /* end if (cook-manager started) */
@@ -1080,13 +1080,13 @@ local int cookmgr_finish(CM *cmp) noex {
 
 variables::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) ylikely {
 	    nodenamelen = rs ;
-	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_hostname)) >= 0) ylikely {
 	        hostnamelen = rs ;
-	        if ((rs = bufsizeget(bufsize_un)) >= 0) {
+	        if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 	            usernamelen = rs ;
-	            if ((rs = bufsizeget(bufsize_sn)) >= 0) {
+	            if ((rs = bufsizeget(bufsize_sn)) >= 0) ylikely {
 		        symnamelen = rs ;
 	            }
 		}
