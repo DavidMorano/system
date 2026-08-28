@@ -124,7 +124,7 @@ local int mklogentry(cchar *,cchar *,mainv,PCSCONF *) noex ;
 
 /* exported variables */
 
-pcspolls_obj		loguser_info = {
+const pcspolls_obj	loguser_info = {
 	"loguser",
 	szof(loguser),
 	0
