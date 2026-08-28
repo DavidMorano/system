@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<msfile.h>		/* LIBUC */
 #include	<paramfile.h>		/* LIBUC */
-#include	<expcook.h>
+#include	<expcook.h>		/* LIBUC */
 
 #include	"proginfo.h"
 
