@@ -74,6 +74,10 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
+#endif
+
 
 /* external subroutines */
 
