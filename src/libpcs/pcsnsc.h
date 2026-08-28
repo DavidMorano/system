@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<pcsnsreq.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<pcsnsreq.h>		/* LIBPCS */
 
 
 #define	PCSNSC		struct pcsnsc_head
@@ -34,7 +34,7 @@
 
 struct pcsnsc_object {
 	char		*name ;
-	uint		objsze ;
+	uint		objsz ;
 } ; /* end struct */
 
 struct pcsnsc_status {
@@ -53,7 +53,7 @@ struct pcsnsc_head {
 	char		*mbuf ;
 	PCSNSC_FL	fl ;
 	pid_t		pid ;
-	uint		magic ;
+	uint		magval ;
 	int		mlen ;
 	int		fd ;
 	int		to ;
