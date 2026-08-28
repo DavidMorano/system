@@ -59,7 +59,7 @@ EXTERNC_end
 
 struct pcsconf_cursor {
 	void		*scp ;		/* SO-cursor pointer */
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct pcsconf_flags {
@@ -78,7 +78,7 @@ struct pcsconf_head {
 	uid_t		uid_pcs ;
 	gid_t		gid_pcs ;
 	PCSCONF_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		objsize ;	/* object size */
 	int		cursize ;	/* cursor size */
 } ; /* end struct */
