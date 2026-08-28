@@ -44,6 +44,9 @@
 
 #include	"pcsns.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -114,11 +117,11 @@ int pcsns_open(pcsns *op,cchar *pr) noex {
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(PCSNS)) ;
+	memclear(op) ;
 
 	if ((rs = pcsns_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr)) >= 0) {
-		op->magic = PCSNS_MAGIC ;
+		op->magval = PCSNS_MAGIC ;
 	    }
 	    if (rs < 0) {
 		pcsns_objloadend(op) ;
@@ -134,7 +137,7 @@ int pcsns_close(pcsns *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNS_MAGIC) return SR_NOTOPEN ;
 	{
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
@@ -143,7 +146,7 @@ int pcsns_close(pcsns *op) noex {
 	rs1 = pcsns_objloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
 	}
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 } /* end subroutine (pcsns_close) */
 
@@ -152,7 +155,7 @@ int pcsns_setopts(pcsns *op,int opts) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNS_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.setopts != nullptr) {
 	    rs = (*op->call.setopts)(op->obj,opts) ;
@@ -166,7 +169,7 @@ int pcsns_audit(pcsns *op) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNS_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.audit != nullptr) {
 	    rs = (*op->call.audit)(op->obj) ;
@@ -180,7 +183,7 @@ int pcsns_get(pcsns *op,char *rbuf,int rlen,cchar *un,int w) noex {
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNS_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.get != nullptr) {
 	    rs = (*op->call.get)(op->obj,rbuf,rlen,un,w) ;
@@ -195,21 +198,21 @@ int pcsns_curbegin(pcsns *op,PCSNS_CUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNS_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(PCSNS_CUR)) ;
+	memclear(curp) ;
 
 	if (op->call.curbegin != nullptr) {
 	    void	*p ;
 	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
 		curp->scp = p ;
 		if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
-	    	    curp->magic = PCSNS_MAGIC ;
+	    	    curp->magval = PCSNS_MAGIC ;
 		}
 		if (rs < 0) {
 	    	    uc_free(curp->scp) ;
 	    	    curp->scp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-allocation) */
 	}
 	return rs ;
@@ -222,8 +225,8 @@ int pcsns_curend(pcsns *op,PCSNS_CUR *curp) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNS_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != PCSNS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNS_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != PCSNS_MAGIC) return SR_NOTOPEN ;
 
 	if (curp->scp != nullptr) {
 	    if (op->call.curend != nullptr) {
@@ -235,7 +238,7 @@ int pcsns_curend(pcsns *op,PCSNS_CUR *curp) noex {
 	    curp->scp = nullptr ;
 	}
 
-	curp->magic = 0 ;
+	curp->magval = 0 ;
 	return rs ;
 } /* end subroutine (pcsns_curend) */
 
@@ -246,8 +249,8 @@ int pcsns_curenum(pcsns *op,PCSNS_CUR *curp,char *vbuf,int vlen,int w) noex {
 	if (curp == nullptr) return SR_FAULT ;
 	if (vbuf == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSNS_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != PCSNS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSNS_MAGIC) return SR_NOTOPEN ;
+	if (curp->magval != PCSNS_MAGIC) return SR_NOTOPEN ;
 
 	if (op->call.enumerate != nullptr) {
 	    rs = (*op->call.enumerate)(op->obj,curp->scp,vbuf,vlen,w) ;
@@ -294,32 +297,32 @@ local int pcsns_objloadbegin(pcsns *op,cchar *pr,cchar *objname) noex {
 	            rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
 		    f_modload = (rs >= 0)  ;
 		}
-	    }
+	    } /* end if (ok) */
 
 	    rs1 = vecstr_finish(&syms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_modload) {
 		modload_close(lp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (allocation) */
 
 	if (rs >= 0) {
 	    int		mv[2] ;
 	    if ((rs = modload_getmva(lp,mv,2)) >= 0) {
-		void	*p ;
 		op->objsize = mv[0] ;
 		op->cursize = mv[1] ;
-		if ((rs = uc_malloc(op->objsize,&p)) >= 0) {
+		if (void *p ; (rs = uc_malloc(op->objsize,&p)) >= 0) {
 		    op->obj = p ;
 		    rs = pcsns_loadcalls(op,objname) ;
 		    if (rs < 0) {
 			uc_free(op->obj) ;
 			op->obj = nullptr ;
-		    }
+		    } /* end if (error) */
 		} /* end if (memory-allocation) */
 	    } /* end if (getmva) */
-	    if (rs < 0)
+	    if (rs < 0) {
 		modload_close(lp) ;
+	    } /* end if (error) */
 	} /* end if (ok) */
 
 	return rs ;
