@@ -179,7 +179,7 @@ int testcrash_start(TESTCRASH *op,cchar *pr,cchar *sn,mainv envv,
 	    if ((rs = thrbase_start(&op->t,thr,wap)) >= 0) {
 		op->fl.working = TRUE ;
 		op->wap = wap ;
-		op->magic = TESTCRASH_MAGIC ;
+		op->magval = TESTCRASH_MAGIC ;
 	    }
 	    if (rs < 0) {
 	        uc_free(wap) ;
@@ -200,7 +200,7 @@ int testcrash_finish(TESTCRASH *op) noex {
 	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != TESTCRASH_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != TESTCRASH_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGS
 	debugprintf("testcrash_finish: f_working=%d\n",op->fl.working) ;
@@ -221,7 +221,7 @@ int testcrash_finish(TESTCRASH *op) noex {
 	debugprintf("testcrash_finish: ret rs=%d\n",rs) ;
 #endif
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 }
 /* end subroutine (testcrash_finish) */
