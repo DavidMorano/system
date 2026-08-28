@@ -35,9 +35,9 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<fmtstr.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
