@@ -20,15 +20,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
 
 extern int	u_writefd(int,int) noex ;
 extern int	u_writefile(int,cchar *) noex ;
-extern int	u_copy(cchar *,cchar *) noex ;
+extern int	u_filecopy(cchar *,cchar *) noex ;
 
 EXTERNC_end
 
