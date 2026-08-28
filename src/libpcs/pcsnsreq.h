@@ -12,6 +12,13 @@
 #define	PCSNSREQ_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+
+
 enum pcsnsreqs {
 	pcsnsreq_realname,
 	pcsnsreq_pcsname,
