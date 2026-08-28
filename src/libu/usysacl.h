@@ -38,8 +38,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/acl.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/acl.h>		/* POSIX® */
 
 
 #endif /* USYSACL_INCLUDE */
