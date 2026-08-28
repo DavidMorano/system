@@ -24,13 +24,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<modload.h>
-#include	<pcsconf.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<modload.h>		/* LIBUC */
+#include	<pcsconf.h>		/* LIBPCS */
 
 #include	"pcspolls.h"
 
@@ -55,7 +54,7 @@ struct pcspoll_head {
 	modload		loader ;
 	PCSPOLL_CA	call ;
 	PCSPOLL_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 typedef	PCSPOLL		pcspoll ;
