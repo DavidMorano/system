@@ -104,12 +104,12 @@ local bool	isNotOurs(int) noex ;
 int pcsngdname(cchar *pcs,char *rbuf,cchar *newsdname,cchar *ngname) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (pcs && rbuf && newsdname && ngname) {
+	if (pcs && rbuf && newsdname && ngname) ylikely {
 	    rs = SR_INVALID ;
-	    if (ngname[0]) {
+	    if (ngname[0]) ylikely {
 	        cint	n = ndots(ngname) ;
-	        if ((rs = mknewsdname(pcs,rbuf,newsdname)) >= 0) {
-	            USTAT	sb ;
+	        if ((rs = mknewsdname(pcs,rbuf,newsdname)) >= 0) ylikely {
+	            ustat	sb ;
 	            cint	npow = ipow(2,n) ;
 	            int		rlen = rs ;
 	            if (n > 0) {
@@ -153,13 +153,13 @@ local int mknewsdname(cchar *pr,char *rbuf,cchar *newsdname) noex {
 local int mkdname(char *rbuf,int rlen,cchar *ngname,int mask) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = pathadd(rbuf,rlen,ngname)) >= 0) {
+	if ((rs = pathadd(rbuf,rlen,ngname)) >= 0) ylkely {
 	    int		nlen = (rlen+1) ;
 	    int		c = 0 ;
 	    len = rs ;
-	    if (cchar *tp ; (tp = strnchr(rbuf,rlen,'.')) != nullptr) {
-		nlen = (tp-rbuf) ;
-	    }
+	    if (cchar *tp = strnchr(rbuf,rlen,'.') ; tp) {
+		nlen = intconv(tp - rbuf) ;
+	    } /* end if */
 	    for (int i = (len-1) ; i >= nlen ; i -= 1) {
 		cint	ch = mkchar(rbuf[i]) ;
 		if (ch == '.') {
@@ -168,7 +168,7 @@ local int mkdname(char *rbuf,int rlen,cchar *ngname,int mask) noex {
 			c += 1 ;
 		    }
 		}
-	    } /* end if */
+	    } /* end for */
 	} /* end if (pathadd) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (mkdname) */
@@ -177,7 +177,7 @@ local int ndots(cchar *ngname) noex {
 	int		n = 0 ;
 	for (int i = 0 ; ngname[i] ; i += 1) {
 	    if (ngname[i] == '.') n += 1 ;
-	}
+	} /* end for */
 	return n ;
 } /* end subroutine (ndots) */
 
@@ -185,7 +185,7 @@ local bool isNotOurs(int rs) noex {
 	bool		f = true ;
 	if (isNotPresent(rs) || (rs == SR_NOTDIR)) {
 	    f = false ;
-	}
+	} /* end if */
 	return f ;
 } /* end subroutine (isNotOurs) */
 
