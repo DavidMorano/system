@@ -76,6 +76,7 @@ namespace {
 	static cint	maxname		= _SC_NAME_MAX ;
 	static cint	maxpath		= _SC_PATH_MAX ;
 	static cint	maxnode		= _SC_NODENAME_MAX ;
+	static cint	maxzone		= _SC_TZNAME_MAX ;
     } ; /* end struct (valcmds) */
 } /* end namespace */
 
@@ -87,11 +88,12 @@ namespace {
 	int	maxnamelen ;
 	int	maxpathlen ;
 	int	maxnodelen ;
+	int	maxzonelen ;
     } ; /* end struct (valmgr_vals) */
     struct valmgr {
 	valmgr_vals	v ;
 	int operator () (int) noex ;
-	int get(int) noex ;
+	int get		(int) noex ;
     } ; /* end struct (valmgr) */
 } /* end namespace */
 
@@ -117,9 +119,7 @@ namespace {
 /* local vaiables */
 
 constexpr valcmds	valcmd ;
-
 static valmgr		valer ;
-
 static cint		pagesz		= ulibval.pagesz ;
 
 
@@ -206,7 +206,7 @@ namespace libu {
 } /* end namespace (libu) */
 
 namespace libu {
-    int umems::ps(cchar **rpp) noex {
+    int umems::ps(char **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rpp) ylikely {
@@ -214,41 +214,44 @@ namespace libu {
 	        len = rs ;
 	        rs = vall(len,rpp) ;
 	    }
-	}
+	} /* end if */
 	return (rs >= 0) ? len : rs ;
     } /* end method (umems::ps) */
 } /* end namespace (libu) */
 
 namespace libu {
-    local int bufx(cint cmd,cchar **rpp) noex {
+    local int bufx(cint cmd,char **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rpp) ylikely {
 	    if ((rs = valer(cmd)) >= 0) {
 	        len = rs ;
 	        rs = umem.mall((len + 1),rpp) ;
-	    }
-	}
+	    } /* end if */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (bufx) */
 } /* end namespace (libu) */
 
 namespace libu {
-    int umems::ma(cchar **rpp) noex {
+    int umems::ma(char **rpp) noex {
 	return bufx(valcmd.maxargs,rpp) ;
     } /* end method (umems::ma) */
-    int umems::ml(cchar **rpp) noex {
+    int umems::ml(char **rpp) noex {
 	return bufx(valcmd.maxline,rpp) ;
     } /* end method (umems::ml) */
-    int umems::mn(cchar **rpp) noex {
+    int umems::mn(char **rpp) noex {
 	return bufx(valcmd.maxname,rpp) ;
     } /* end method (umems::mn) */
-    int umems::mp(cchar **rpp) noex {
+    int umems::mp(char **rpp) noex {
 	return bufx(valcmd.maxname,rpp) ;
     } /* end method (umems::mp) */
-    int umems::nn(cchar **rpp) noex {
+    int umems::nn(char **rpp) noex {
 	return bufx(valcmd.maxnode,rpp) ;
     } /* end method (umems::nn) */
+    int umems::zn(char **rpp) noex {
+	return bufx(valcmd.maxzone,rpp) ;
+    } /* end method (umems::zn) */
 } /* end namespace (libu) */
 
 
@@ -294,13 +297,13 @@ sysret_t umgr::stdmalloc(int sz,void *vp) noex {
 	int		rs ;
 	void		**rpp = voidpp(vp) ;
 	errno = 0 ;
-	if (void *rp ; (rp = malloc(msize)) != np) ylikely {
+	if (void *rp = malloc(msize) ; rp) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
 	    rs = (neg errno) ;
-	    *rpp = nullptr ;
-	}
+	    *rpp = np ;
+	} /* end if */
 	return rs ;
 } /* end method (umgr::stdmalloc) */
 
@@ -310,13 +313,13 @@ sysret_t umgr::stdvalloc(int sz,void *vp) noex {
 	int		rs ;
 	void		**rpp = voidpp(vp) ;
 	errno = 0 ;
-	if (void *rp ; (rp = valloc(msize)) != np) ylikely {
+	if (void *rp = valloc(msize) ; rp) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
 	    rs = (neg errno) ;
-	    *rpp = nullptr ;
-	}
+	    *rpp = np ;
+	}/* end if */
 	return rs ;
 } /* end method (umgr::stdvalloc) */
 
@@ -326,13 +329,13 @@ sysret_t umgr::stdrealloc(int sz,void *vp) noex {
 	void		**rpp = voidpp(vp) ;
 	int		rs ;
 	errno = 0 ;
-	if (void *rp ; (rp = realloc(cp,msize)) != np) ylikely {
+	if (void *rp = realloc(cp,msize) ; rp) ylikely {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
 	    rs = (neg errno) ;
-	    *rpp = nullptr ;
-	}
+	    *rpp = np ;
+	} /* end if */
 	return rs ;
 } /* end method (umgr::stdrealloc) */
 
@@ -356,7 +359,7 @@ sysret_t umgr::stdfree(int,void *) noex {
 	})
 
 int valmgr::operator () (int cmd) noex {
-    	int		rs = SR_BUGCHECK;
+    	int		rs = SR_BUGCHECK ;
 	switch (cmd) {
 	case valcmd.maxargs:
 	    rs = RETVAL(v.maxargslen,cmd) ;
@@ -372,6 +375,9 @@ int valmgr::operator () (int cmd) noex {
 	    break ;
 	case valcmd.maxnode:
 	    rs = RETVAL(v.maxnodelen,cmd) ;
+	    break ;
+	case valcmd.maxzone:
+	    rs = RETVAL(v.maxzonelen,cmd) ;
 	    break ;
 	} /* end switch */
 	return rs ;
