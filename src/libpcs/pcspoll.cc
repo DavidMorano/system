@@ -64,6 +64,8 @@ import libutil ;			/* |lenstr(3u)| */
 #define	PCSPOLL_MODBNAME	"pcspolls"
 #define	PCSPOLL_OBJNAME		"pcspolls"
 
+#define	PP		pcspoll
+
 #define	LIBCNAME	"lib"
 #define	POLLSCNAME	PCSPOLLS_POLLCNAME
 
@@ -73,6 +75,10 @@ import libutil ;			/* |lenstr(3u)| */
 
 #ifndef	SYMNAMELEN
 #define	SYMNAMELEN	60
+#endif
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #endif
 
 
@@ -87,10 +93,10 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* forward references */
 
-local int	pcspoll_objloadbegin(PCSPOLL *,cchar *,cchar *) noex ;
-local int	pcspoll_objloadend(PCSPOLL *) noex ;
-local int	pcspoll_modloadopen(PCSPOLL *,cchar *,cchar *) noex ;
-local int	pcspoll_loadcalls(PCSPOLL *,cchar *) noex ;
+local int	pcspoll_objloadbegin(PP *,cchar *,cchar *) noex ;
+local int	pcspoll_objloadend(PP *) noex ;
+local int	pcspoll_modloadopen(PP *,cchar *,cchar *) noex ;
+local int	pcspoll_loadcalls(PP *,cchar *) noex ;
 
 local bool	isrequired(int) noex ;
 
@@ -128,7 +134,7 @@ constexpr cpcchar	ubs[] = {
 
 /* exported subroutines */
 
-int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn) noex {
+int pcspoll_start(PP *op,PCSCONF *pcp,cchar *sn) noex {
 	int		rs ;
 	cchar	*pr ;
 
@@ -138,7 +144,7 @@ int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn) noex {
 	debugprintf("pcspoll_start: pcp={%p} sn=%s\n",pcp,sn) ;
 #endif
 
-	memset(op,0,sizeof(PCSPOLL)) ;
+	memclear(op) ;
 
 	if (pcp == nullptr) return SR_FAULT ;
 	if (sn == nullptr) return SR_FAULT ;
@@ -161,11 +167,14 @@ int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn) noex {
 	                if ((rs = (*op->call.start)(op->obj,pcp,sn)) >= 0) {
 			    op->fl.loaded = true ;
 			}
-	                if (rs < 0)
+	                if (rs < 0) {
 		            pcspoll_objloadend(op) ;
+			} /* end if (error) */
 	            } /* end if (obj-mod loading) */
 	        } /* end if (stat) */
-		if (rs >= 0) op->magic = PCSPOLL_MAGIC ;
+		if (rs >= 0) {
+		    op->magval = PCSPOLL_MAGIC ;
+		} /* end if (ok) */
 	    } /* end if (pollsdname) */
 	} /* end block */
 
@@ -177,13 +186,13 @@ int pcspoll_start(PCSPOLL *op,PCSCONF *pcp,cchar *sn) noex {
 } /* end subroutine (pcspoll_start) */
 
 /* free up the entire vector string data structure object */
-int pcspoll_finish(PCSPOLL *op) noex {
+int pcspoll_finish(PP *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSPOLL_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSPOLL_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.loaded) {
 	    rs1 = (*op->call.finish)(op->obj) ;
@@ -192,19 +201,21 @@ int pcspoll_finish(PCSPOLL *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (loaded) */
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
 } /* end subroutine (pcspoll_finish) */
 
-int pcspoll_info(PCSPOLL *op,PCSPOLL_INFO *ip) noex {
+int pcspoll_info(PP *op,PCSPOLL_INFO *ip) noex {
 	int		rs = SR_NOSYS ;
 	int		n = 0 ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSPOLL_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSPOLL_MAGIC) return SR_NOTOPEN ;
 
-	if (ip != nullptr) memset(ip,0,sizeof(PCSPOLL_INFO)) ;
+	if (ip) {
+	    memclear(ip) ;
+	}
 
 	if (op->fl.loaded) {
 	    if (op->call.info != nullptr) {
@@ -215,18 +226,19 @@ int pcspoll_info(PCSPOLL *op,PCSPOLL_INFO *ip) noex {
 		    ip->dummy = ps.dummy ;
 		}
 	    }
-	} else
+	} else {
 	    rs = SR_OK ;
+	}
 
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (pcspoll_info) */
 
-int pcspoll_cmd(PCSPOLL *op,int cmd) noex {
+int pcspoll_cmd(PP *op,int cmd) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSPOLL_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSPOLL_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fl.loaded) {
 	    if (op->call.cmd != nullptr) {
@@ -242,7 +254,7 @@ int pcspoll_cmd(PCSPOLL *op,int cmd) noex {
 /* private subroutines */
 
 /* find and load the DB-access object */
-local int pcspoll_objloadbegin(PCSPOLL *op,cchar *pr,cchar *objname) noex {
+local int pcspoll_objloadbegin(PP *op,cchar *pr,cchar *objname) noex {
 	int		rs ;
 
 #if	CF_DEBUG
@@ -261,33 +273,33 @@ local int pcspoll_objloadbegin(PCSPOLL *op,cchar *pr,cchar *objname) noex {
 		    if (rs < 0) {
 	    	        uc_free(op->obj) ;
 	    	        op->obj = nullptr ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (memory-allocation) */
 	    } /* end if (getmv) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	       modload_close(lp) ;
+	    } /* end if (error) */
 	} /* end if (modload-ed) */
 
 	return rs ;
 } /* end subroutine (pcspoll_objloadbegin) */
 
-local int pcspoll_objloadend(PCSPOLL *op) noex {
+local int pcspoll_objloadend(PP *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op->obj != nullptr) {
+	if (op->obj) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
-	}
-
+	} /* end if (memory-release) */
+	{
 	rs1 = modload_close(&op->loader) ;
 	if (rs >= 0) rs = rs1 ;
-
+	}
 	return rs ;
 } /* end subroutine (pcspoll_objloadend) */
 
-local int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname) noex {
+local int pcspoll_modloadopen(PP *op,cchar *pr,cchar *objname) noex {
 	cint	vn = nelem(subs) ;
 	int		rs ;
 	int		rs1 ;
@@ -301,8 +313,9 @@ local int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname) noex {
 	    for (int i = 0 ; (i < n) && subs[i] ; i += 1) {
 	        if (isrequired(i)) {
 	            rs = sncpy3(symname,SYMNAMELEN,objname,"_",subs[i]) ;
-		    if (rs >= 0)
+		    if (rs >= 0) {
 			rs = vecstr_add(&syms,symname,rs) ;
+		    }
 		}
 		if (rs < 0) break ;
 	    } /* end for */
@@ -316,7 +329,6 @@ local int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname) noex {
 	            rs = modload_open(lp,pr,modbname,objname,opts,sv) ;
 		}
 	    } /* end if (ok) */
-
 	    rs1 = vecstr_finish(&syms) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (allocation) */
@@ -324,7 +336,7 @@ local int pcspoll_modloadopen(PCSPOLL *op,cchar *pr,cchar *objname) noex {
 	return rs ;
 } /* end subroutine (pcspoll_modloadopen) */
 
-local int pcspoll_loadcalls(PCSPOLL *op,cchar *objname) noex {
+local int pcspoll_loadcalls(PP *op,cchar *objname) noex {
 	modload		*lp = &op->loader ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -343,8 +355,9 @@ local int pcspoll_loadcalls(PCSPOLL *op,cchar *objname) noex {
 	    if (rs1 == SR_NOTFOUND) {
 		snp = nullptr ;
 		if (isrequired(i)) break ;
-	    } else
+	    } else {
 		rs = rs1 ;
+	    }
 
 	    if (rs < 0) break ;
 
