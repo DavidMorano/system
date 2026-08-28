@@ -38,22 +38,19 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* POSIX® */
 #include	<sys/ipc.h>		/* UNIX® System V IPC */
 #include	<sys/shm.h>		/* UNIX® System V IPC - SHM */
 #include	<sys/msg.h>		/* UNIX® System V IPC - MSG */
 #include	<sys/sem.h>		/* UNIX® System V IPC - SEM */
-#include	<unistd.h>
-#include	<limits.h>		/* |INT_MAX| */
-#include	<errno.h>
-#include	<stddef.h>		/* |nullptr_t| */
-#include	<stdint.h>		/* |intptr_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usupport.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<errno.h>		/* CSTD */
+#include	<limits.h>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
 
 
 #ifdef	__cplusplus
@@ -67,7 +64,7 @@ namespace uipc {
 	uipcbase() noex : key(0) { } ;
 	int operator () (int,void *) noex ;
     } ; /* end struct (uipcbase) */
-}
+} /* end namespace (uipc) */
 
 #endif /* __cplusplus */
 
