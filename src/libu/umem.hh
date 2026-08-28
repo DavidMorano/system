@@ -31,18 +31,19 @@
 
 namespace libu {
     struct umems {
-        int strw(cchar *,int,cchar **) noex ;
-        int mall(int,void *) noex ;
-        int vall(int,void *) noex ;
-        int call(int,int,void *) noex ;
-        int rall(void *,int,void *) noex ;
-        int free(void *) noex ;
-	int ps(cchar **) noex ;
-	int ma(cchar **) noex ;
-	int ml(cchar **) noex ;
-	int mn(cchar **) noex ;
-	int mp(cchar **) noex ;
-	int nn(cchar **) noex ;
+        int strw	(cchar *,int,cchar **) noex ;
+        int mall	(int,void *) noex ;
+        int vall	(int,void *) noex ;
+        int call	(int,int,void *) noex ;
+        int rall	(void *,int,void *) noex ;
+        int free	(void *) noex ;
+	int ps		(char **) noex ;
+	int ma		(char **) noex ;
+	int ml		(char **) noex ;
+	int mn		(char **) noex ;
+	int mp		(char **) noex ;
+	int nn		(char **) noex ;
+	int zn		(char **) noex ;
     } ; /* end struct (umems) */
     extern umems	um ;
     extern umems	umem ;
