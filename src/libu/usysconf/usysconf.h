@@ -41,6 +41,43 @@ EXTERNC_end
     extern unprocer 	unprocessors ;
 #endif /* __cplusplus */
 
+#ifdef	__cplusplus
+namespace libu {
+    enum usysconfermems {
+    	usysconfermem_tzname,
+	usysconfermem_overlast
+    } ; /* end enum (usysconfmems) */
+    struct usysconfer ;
+    struct usysconfer_co {
+	usysconfer	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (usysconfer *p,int m) noex ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ; /* end */
+    } ; /* end struct (usysconfer_co) */
+    struct usysconfer {
+	usysconfer_co	tzname ;
+	bool		finit ;
+	usysconfer() noex {
+	    tzname	(this,usysconfermem_tzname) ;
+	    finit	= false ;
+	} /* end ctor */
+	void dtor	() noex ;
+	destruct usysconfer() {
+	    if (finit) dtor() ;
+	} ; /* end destruct */
+    } ; /* end struct (usysconfer) */
+} /* end namespace (libu) */
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+namespace libu {
+    extern usysconfer	usysconf ;
+} /* end namespace (libu) */
+#endif /* __cplusplus */
+
 
 #endif /* USYSCONF_INCLUDE */
 
