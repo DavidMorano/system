@@ -64,10 +64,10 @@
 /* exported subroutines */
 
 int pcsmsg_getstatus(pcsmsg_getstatus *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -91,10 +91,10 @@ int pcsmsg_getstatus(pcsmsg_getstatus *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_getstatus) */
 
 int pcsmsg_status(pcsmsg_status *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -124,10 +124,10 @@ int pcsmsg_status(pcsmsg_status *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_status) */
 
 int pcsmsg_getval(pcsmsg_getval *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -155,10 +155,10 @@ int pcsmsg_getval(pcsmsg_getval *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_getval) */
 
 int pcsmsg_val(pcsmsg_val *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -190,10 +190,10 @@ int pcsmsg_val(pcsmsg_val *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_val) */
 
 int pcsmsg_gethelp(pcsmsg_gethelp *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -219,10 +219,10 @@ int pcsmsg_gethelp(pcsmsg_gethelp *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_gethelp) */
 
 int pcsmsg_help(pcsmsg_help *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -254,10 +254,10 @@ int pcsmsg_help(pcsmsg_help *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_help) */
 
 int pcsmsg_getname(pcsmsg_getname *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -283,10 +283,10 @@ int pcsmsg_getname(pcsmsg_getname *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_getname) */
 
 int pcsmsg_name(pcsmsg_name *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -314,10 +314,10 @@ int pcsmsg_name(pcsmsg_name *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_name) */
 
 int pcsmsg_getuser(pcsmsg_getuser *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -343,10 +343,10 @@ int pcsmsg_getuser(pcsmsg_getuser *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_getuser) */
 
 int pcsmsg_user(pcsmsg_user *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -374,10 +374,10 @@ int pcsmsg_user(pcsmsg_user *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_user) */
 
 int pcsmsg_exit(pcsmsg_exit *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -403,10 +403,10 @@ int pcsmsg_exit(pcsmsg_exit *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_exit) */
 
 int pcsmsg_mark(pcsmsg_mark *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
@@ -430,10 +430,10 @@ int pcsmsg_mark(pcsmsg_mark *sp,int f,char *mbuf,int mlen) noex {
 } /* end subroutine (pcsmsg_mark) */
 
 int pcsmsg_ack(pcsmsg_ack *sp,int f,char *mbuf,int mlen) noex {
-	serialbuf	m ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) {
+	serialbuf	m ;
+	if ((rs = serialbuf_start(&m,mbuf,mlen)) >= 0) ylikely {
 	    uint	hdr ;
 	    if (f) { /* read */
 	        serialbuf_rui(&m,&hdr) ;
