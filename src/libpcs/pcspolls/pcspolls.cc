@@ -63,21 +63,24 @@
 
 #include	"pcspolls.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 #define	LIBCNAME	"lib"
 #define	POLLCNAME	PCSPOLLS_POLLCNAME
 
-#define	THREAD		struct pcspolls_thread
-#define	THREAD_ARGS	struct thread_args
+#define	THREAD		pcspolls_thread
+#define	THREAD_ARGS	thread_args
 
-#define	WORK		struct work_head
+#define	WORK		work_head
 
-#define	POLLINFO	struct pollinfo
+#define	POLLINFO	pollinfo
 
-#define	POLLOBJ		struct pollobj
-#define	POLLOBJ_FL	struct pollobj_flags
+#define	POLLOBJ		pollobj
+#define	POLLOBJ_FL	pollobj_flags
 
 #ifndef	SYMNAMELEN
 #define	SYMNAMELEN	60
@@ -114,7 +117,7 @@ extern "C" {
 	int		(*cmd)(void *) ;
 	int		(*finish)(void *) ;
     } ;
-}
+} /* end extern (C) */
 
 struct pollobj_flags {
 	uint		running:1 ;
@@ -135,7 +138,7 @@ extern "C" {
 	uint		objsize ;
 	uint		infosize ;
     } ;
-}
+} /* end extern (C) */
 
 struct thread_args {
 	PCSPOLLS	*op ;
@@ -247,12 +250,11 @@ int pcspolls_start(pcspolls *op,PCSCONF *pcp,cchar *sn)
 	debugprintf("pcspolls_start: sn=%s\n",sn) ;
 #endif
 
-	memset(op,0,sizeof(PCSPOLLS)) ;
-
+	memclear(op) ;
 	if ((rs = pcspolls_valsbegin(op,pcp,sn)) >= 0) {
 	    if ((rs = thread_start(&op->t,op)) >= 0) {
 		op->fl.working = true ;
-		op->magic = PCSPOLLS_MAGIC ;
+		op->magval = PCSPOLLS_MAGIC ;
 	    }
 	    if (rs < 0)
 	        pcspolls_valsend(op) ;
@@ -263,8 +265,7 @@ int pcspolls_start(pcspolls *op,PCSCONF *pcp,cchar *sn)
 #endif
 
 	return rs ;
-}
-/* end subroutine (pcspolls_start) */
+} /* end subroutine (pcspolls_start) */
 
 
 int pcspolls_finish(pcspolls *op)
@@ -273,7 +274,7 @@ int pcspolls_finish(pcspolls *op)
 	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != PCSPOLLS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSPOLLS_MAGIC) return SR_NOTOPEN ;
 
 #if	CF_DEBUGN
 	nprintf(NDF,"pcspolls_finish: ent\n") ;
@@ -292,10 +293,9 @@ int pcspolls_finish(pcspolls *op)
 	nprintf(NDF,"pcspolls_finish: ret rs=%d\n",rs) ;
 #endif
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (pcspolls_finish) */
+} /* end subroutine (pcspolls_finish) */
 
 
 int pcspolls_info(pcspolls *op,PCSPOLLS_INFO *ip)
@@ -304,16 +304,15 @@ int pcspolls_info(pcspolls *op,PCSPOLLS_INFO *ip)
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSPOLLS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSPOLLS_MAGIC) return SR_NOTOPEN ;
 
-	if (ip != nullptr) {
-	    memset(ip,0,sizeof(PCSPOLLS_INFO)) ;
+	if (ip) {
+	    memclear(ip) ;
 	    ip->dummy = 1 ;
 	}
 
 	return rs ;
-}
-/* end subroutine (pcspolls_info) */
+} /* end subroutine (pcspolls_info) */
 
 
 int pcspolls_cmd(pcspolls *op,int cmd)
@@ -322,11 +321,10 @@ int pcspolls_cmd(pcspolls *op,int cmd)
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if (op->magic != PCSPOLLS_MAGIC) return SR_NOTOPEN ;
+	if (op->magval != PCSPOLLS_MAGIC) return SR_NOTOPEN ;
 
 	return (rs >= 0) ? cmd : rs ;
-}
-/* end subroutine (pcspolls_cmd) */
+} /* end subroutine (pcspolls_cmd) */
 
 
 /* private subroutines */
@@ -353,8 +351,7 @@ local int pcspolls_valsbegin(pcspolls *op,PCSCONF *pcp,cchar *sn)
 	} /* end if (memory-allocation) */
 
 	return rs ;
-}
-/* end subroutine (pcspolls_valsbegin) */
+} /* end subroutine (pcspolls_valsbegin) */
 
 
 local int pcspolls_valsend(pcspolls *op)
@@ -369,8 +366,7 @@ local int pcspolls_valsend(pcspolls *op)
 	}
 
 	return rs ;
-}
-/* end subroutine (pcspolls_valsend) */
+} /* end subroutine (pcspolls_valsend) */
 
 
 #ifdef	COMMENT
@@ -395,7 +391,7 @@ local int thread_start(THREAD *tip,pcspolls *op)
 {
 	int		rs ;
 
-	memset(tip,0,sizeof(THREAD)) ;
+	memclear(tip) ;
 	tip->op = op ;
 	tip->pr = op->pr ;
 	tip->sn = op->sn ;
@@ -419,8 +415,7 @@ local int thread_start(THREAD *tip,pcspolls *op)
 	} /* end if (thrcomm-start) */
 
 	return rs ;
-}
-/* end subroutine (thread_start) */
+} /* end subroutine (thread_start) */
 
 
 local int thread_finish(THREAD *tip)
@@ -454,8 +449,7 @@ local int thread_finish(THREAD *tip)
 #endif
 
 	return rs ;
-}
-/* end subroutine (thread_finish) */
+} /* end subroutine (thread_finish) */
 
 
 local int thread_cmdrecv(THREAD *tip,int to)
@@ -470,16 +464,14 @@ local int thread_cmdrecv(THREAD *tip,int to)
 	}
 
 	return (rs >= 0) ? cmd : rs ;
-}
-/* end subroutine (thread_cmdrecv) */
+} /* end subroutine (thread_cmdrecv) */
 
 
 local int thread_exiting(THREAD *tip)
 {
 	tip->f_exiting = true ;
 	return thrcomm_exiting(&tip->tc) ;
-}
-/* end subroutine (thread_exiting) */
+} /* end subroutine (thread_exiting) */
 
 
 local int thread_cmdexit(THREAD *tip)
@@ -490,8 +482,7 @@ local int thread_cmdexit(THREAD *tip)
 	    rs = thrcomm_cmdsend(&tip->tc,cmd,-1) ;
 	}
 	return rs ;
-}
-/* end subroutine (thread_cmdexit) */
+} /* end subroutine (thread_cmdexit) */
 
 
 local int thread_waitexit(THREAD *tip)
@@ -502,8 +493,7 @@ local int thread_waitexit(THREAD *tip)
 	    tip->trs = trs ;
 	}
 	return rs ;
-}
-/* end subroutine (thread_waitexit) */
+} /* end subroutine (thread_waitexit) */
 
 
 #ifdef	COMMENT
@@ -511,8 +501,7 @@ local int thread_setdone(THREAD *tip)
 {
 	cint	rrs = 1 ;
 	return thrcomm_rspsend(&tip->tc,rrs,-1) ;
-}
-/* end subroutine (thread_setdone) */
+} /* end subroutine (thread_setdone) */
 #endif /* COMMENT */
 
 
@@ -566,8 +555,7 @@ local int thread_worker(THREAD *tip)
 #endif
 
 	return rs ;
-}
-/* end subroutine (thread_worker) */
+} /* end subroutine (thread_worker) */
 
 local int work_start(WORK *wp,THREAD *tip) noex {
 	int		rs ;
@@ -576,7 +564,7 @@ local int work_start(WORK *wp,THREAD *tip) noex {
 
 	if (wp == nullptr) return SR_FAULT ;
 
-	memset(wp,0,sizeof(WORK)) ;
+	memclear(wp) ;
 	wp->tip = tip ;
 
 #if	CF_DEBUGS
@@ -619,8 +607,7 @@ local int work_start(WORK *wp,THREAD *tip) noex {
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (work_start) */
+} /* end subroutine (work_start) */
 
 
 local int work_finish(WORK *wp)
@@ -652,8 +639,7 @@ local int work_finish(WORK *wp)
 #endif
 
 	return rs ;
-}
-/* end subroutine (work_finish) */
+} /* end subroutine (work_finish) */
 
 
 local int work_term(WORK *wp)
@@ -665,8 +651,7 @@ local int work_term(WORK *wp)
 	debugprintf("pcspolls/work_term: ent\n") ;
 #endif
 	return SR_OK ;
-}
-/* end subroutine (work_term) */
+} /* end subroutine (work_term) */
 
 local int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen) noex {
 	int		rs ;
@@ -694,8 +679,7 @@ local int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fsdir) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (work_objloads) */
+} /* end subroutine (work_objloads) */
 
 local int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl) noex {
 	struct pollinfo	oi ;
@@ -712,7 +696,7 @@ local int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl) noex {
 	            cint	m = RTLD_LAZY ;
 	            void	*sop ;
 	            if ((sop = dlopen(fname,m)) != nullptr) {
-	                memset(&oi,0,sizeof(struct pollinfo)) ;
+	                memsclear(&oi) ;
 	                oi.sop = sop ;
 	                if ((rs = pollinfo_syms(&oi,sop,sp,sl)) > 0) {
 #if	CF_DEBUGS
@@ -740,8 +724,7 @@ local int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl) noex {
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (work_objloadcheck) */
+} /* end subroutine (work_objloadcheck) */
 
 
 local int work_objload(WORK *wp,POLLINFO *oip)
@@ -755,7 +738,7 @@ local int work_objload(WORK *wp,POLLINFO *oip)
 
 	if ((rs = uc_malloc(psize,&p)) >= 0) {
 	    POLLOBJ	*pop = p ;
-	    memset(pop,0,psize) ;
+	    memclear(pop) ;
 	    pop->sop = oip->sop ;
 	    pop->start = oip->start ;
 	    pop->check = oip->check ;
@@ -788,8 +771,7 @@ local int work_objload(WORK *wp,POLLINFO *oip)
 	} /* end if (memory-allocation) */
 
 	return rs ;
-}
-/* end subroutine (work_objload) */
+} /* end subroutine (work_objload) */
 
 
 local int work_objstarts(WORK *wp,THREAD *tip)
@@ -811,8 +793,7 @@ local int work_objstarts(WORK *wp,THREAD *tip)
 	debugprintf("pcspolls/work_objstarts: ret rs=%d u=%d\n",rs,i) ;
 #endif
 	return rs ;
-}
-/* end subroutine (work_objstarts) */
+} /* end subroutine (work_objstarts) */
 
 
 local int work_objchecks(WORK *wp)
@@ -837,8 +818,7 @@ local int work_objchecks(WORK *wp)
 	nprintf(NDF,"pcspolls/work_objchecks: ret rs=%d c=%u\n",rs,c) ;
 #endif
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (work_objchecks) */
+} /* end subroutine (work_objchecks) */
 
 
 local int work_objfins(WORK *wp)
@@ -865,8 +845,7 @@ local int work_objfins(WORK *wp)
 	nprintf(NDF,"pcspolls/work_objfins: ret rs=%d c=%u\n",rs,c) ;
 #endif
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (work_objfins) */
+} /* end subroutine (work_objfins) */
 
 
 local int pollinfo_syms(POLLINFO *oip,void *sop,cchar *sp,int sl)
@@ -910,8 +889,7 @@ local int pollinfo_syms(POLLINFO *oip,void *sop,cchar *sp,int sl)
 	} /* end if (snwcpy) */
 
 	return rs ;
-}
-/* end subroutine (pollinfo_syms) */
+} /* end subroutine (pollinfo_syms) */
 
 
 local int pollobj_callstart(POLLOBJ *pop,THREAD *tip)
@@ -940,8 +918,7 @@ local int pollobj_callstart(POLLOBJ *pop,THREAD *tip)
 	    rs = SR_BUGCHECK ;
 
 	return rs ;
-}
-/* end subroutine (pollobj_callstart) */
+} /* end subroutine (pollobj_callstart) */
 
 
 local int pollobj_check(POLLOBJ *pop)
@@ -975,8 +952,7 @@ local int pollobj_check(POLLOBJ *pop)
 #endif
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (pollobj_check) */
+} /* end subroutine (pollobj_check) */
 
 
 local int pollobj_finish(POLLOBJ *pop)
@@ -1021,8 +997,7 @@ local int pollobj_finish(POLLOBJ *pop)
 #endif
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (pollobj_finish) */
+} /* end subroutine (pollobj_finish) */
 
 local int mksymname(char *rbuf,cchar *sp,int sl,cchar *sub) noex {
 	cint		rlen = SYMNAMELEN ;
@@ -1041,8 +1016,7 @@ local int mksymname(char *rbuf,cchar *sp,int sl,cchar *sub) noex {
 	    nl += rs ;
 	}
 	return (rs >= 0) ? nl : rs ;
-}
-/* end subroutine (mksymname) */
+} /* end subroutine (mksymname) */
 
 local bool isrequired(int i) noex {
 	int		f = false ;
@@ -1053,7 +1027,6 @@ local bool isrequired(int i) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (isrequired) */
+} /* end subroutine (isrequired) */
 
 
