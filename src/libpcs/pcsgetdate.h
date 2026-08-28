@@ -22,9 +22,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<tmtime.hh>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<tmtime.hh>		/* LIBUC */
 
 
 enum pcsdatetypes {
