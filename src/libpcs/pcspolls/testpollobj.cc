@@ -5,7 +5,7 @@
 /* this is a test POLLOBJ object for PCSPOLLS */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	1		/* compile-time debugging */
+#define	CF_DEBUG	1		/* compile-time debugging */
 
 /* revision history:
 
@@ -44,44 +44,43 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<pcsconf.h>
-#include	<storebuf.h>
-#include	<upt.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<pcsconf.h>		/* LIBPCS */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"pcspolls.h"
 #include	"thrbase.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	TESTPOLLOBJ		struct testpollobj_head
-#define	TESTPOLLOBJ_FL		struct testpollobj_flags
+#define	TESTPOLLOBJ		testpollobj_head
+#define	TESTPOLLOBJ_FL		testpollobj_flags
 #define	TESTPOLLOBJ_MAGIC	0x88773422
 
-#define	WORK			struct work_head
-#define	WORK_FL			struct work_flags
-#define	WORKARGS		struct work_args
+#define	WORK			work_head
+#define	WORK_FL			work_flags
+#define	WORKARGS		work_args
 
 #define	TO_CHECK	4
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern char	*timestr_log(time_t,char *) ;
-#endif
 
 
 /* external variables */
@@ -91,7 +90,7 @@ extern char	*timestr_log(time_t,char *) ;
 
 struct testpollobj_flags {
 	uint		working:1 ;
-} ;
+} ; /* end struct */
 
 struct testpollobj_head {
 	uint		magic ;
@@ -99,7 +98,7 @@ struct testpollobj_head {
 	TESTPOLLOBJ_FL	f ;
 	WORKARGS	*wap ;
 	int		dummy ;
-} ;
+} ; /* end struct */
 
 struct work_args {
 	TESTPOLLOBJ	*op ;
@@ -107,25 +106,25 @@ struct work_args {
 	cchar	*sn ;
 	cchar	**envv ;
 	PCSCONF		*pcp ;
-} ;
+} ; /* end struct */
 
 struct work_flags {
 	uint		dummy:1 ;
-} ;
+} ; /* end struct */
 
 struct work_head {
-	uint		magic ;
 	THRBASE		*tip ;
 	WORKARGS	*wap ;
-	volatile int	f_term ;
 	WORK_FL		f ;
-} ;
+	uint		magic ;
+	volatile int	f_term ;
+} ; /* end struct */
 
 enum cmds {
 	cmd_noop,
 	cmd_exit,
 	cmd_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward references */
@@ -145,11 +144,11 @@ local int work_finish(WORK *) noex ;
 
 /* exported variables */
 
-PCSPOLLS_NAME	testpollobj = {
+const PCSPOLLS_NAME	testpollobj_modinfo = {
 	"testpollobj",
 	szof(TESTPOLLOBJ),
 	0
-} ;
+} ; /* end if (initialization) */
 
 
 /* exported subroutines */
@@ -160,85 +159,81 @@ int testpollobj_start(TESTPOLLOBJ *op,
 	cint	wsz = szof(WORKARGS) ;
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("testpollobj_start: entered\n") ;
-	debugprintf("testpollobj_start: pr=%s\n",pr) ;
-	debugprintf("testpollobj_start: sn=%s\n",sn) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj_start: entered\n") ;
+	DEBUGPRINTF("testpollobj_start: pr=%s\n",pr) ;
+	DEBUGPRINTF("testpollobj_start: sn=%s\n",sn) ;
 #endif
 
 	memclear(op) ;
 	if ((rs = uc_malloc(wsz,&wap)) >= 0) {
 	    workargs_load(wap,op,pr,sn,envv,pcp) ;
 	    if ((rs = thrbase_start(&op->t,worker,wap)) >= 0) {
-		op->fl.working = TRUE ;
+		op->fl.working = true ;
 		op->wap = wap ;
-		op->magic = TESTPOLLOBJ_MAGIC ;
+		op->magval = TESTPOLLOBJ_MAGIC ;
 	    }
 	    if (rs < 0) {
 		uc_free(wap) ;
-		op->wap = NULL ;
-	    }
+		op->wap = nullptr ;
+	    } /* end if (error */
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
-	debugprintf("testpollobj_start: ret rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj_start: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (testpollobj_start) */
+} /* end subroutine (testpollobj_start) */
 
 int testpollobj_finish(TESTPOLLOBJ *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magval != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("testpollobj_finish: f_working=%d\n",op->fl.working) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj_finish: f_working=%d\n",op->fl.working) ;
 #endif
 	if (op->fl.working) {
-	    op->fl.working = FALSE ;
+	    op->fl.working = false ;
 	    rs1 = thrbase_finish(&op->t) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-	if (op->wap != NULL) {
+	if (op->wap != nullptr) {
 	    rs1 = uyc_free(op->wap) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->wap = NULL ;
+	    op->wap = nullptr ;
 	}
-#if	CF_DEBUGS
-	debugprintf("testpollobj_finish: ret rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj_finish: ret rs=%d\n",rs) ;
 #endif
 
-	op->magic = 0 ;
+	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (testpollobj_finish) */
+} /* end subroutine (testpollobj_finish) */
 
 #ifdef	COMMENT
 
 int testpollobj_info(TESTPOLLOBJ *op,TESTPOLLOBJ_INFO *ip) noex {
 	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magval != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
 	if (ip) {
 	    memclear(ip) ;
 	    ip->dummy = 1 ;
 	}
 	return rs ;
-}
-/* end subroutine (testpollobj_info) */
+} /* end subroutine (testpollobj_info) */
 
 int testpollobj_cmd(TESTPOLLOBJ *op,int cmd) noex {
 	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magval != TESTPOLLOBJ_MAGIC) return SR_NOTOPEN ;
 	return (rs >= 0) ? cmd : rs ;
-}
-/* end subroutine (testpollobj_cmd) */
+} /* end subroutine (testpollobj_cmd) */
 
 #endif /* COMMENT */
 
@@ -254,8 +249,7 @@ local int workargs_load(WORKARGS *wap,TESTPOLLOBJ *op,
 	wap->envv = envv ;
 	wap->pcp = pcp ;
 	return SR_OK ;
-}
-/* end subroutine (workargs_load) */
+} /* end subroutine (workargs_load) */
 
 local int worker(THRBASE *tip) noex {
 	WORK		w ;
@@ -264,12 +258,12 @@ local int worker(THRBASE *tip) noex {
 	int		rs ;
 	int		ctime = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("testpollobj/worker: started\n") ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj/worker: started\n") ;
 #endif
 
 	if ((rs = work_start(&w,tip,wap)) >= 0) {
-	    int		f_exit = FALSE ;
+	    int		f_exit = false ;
 
 	    while ((rs = thrbase_cmdrecv(tip,to)) >= 0) {
 		cint	cmd = rs ;
@@ -277,14 +271,14 @@ local int worker(THRBASE *tip) noex {
 	        switch (cmd) {
 		case cmd_noop:
 		    ctime += 1 ;
-#if	CF_DEBUGS
-	debugprintf("testpollobj/worker: timed-poll\n") ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj/worker: timed-poll\n") ;
 #endif
 		    break ;
 	        case cmd_exit:
-		    f_exit = TRUE ;
-#if	CF_DEBUGS
-	debugprintf("testpollobj/worker: exit\n") ;
+		    f_exit = true ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj/worker: exit\n") ;
 #endif
 		    rs = work_term(&w) ;
 		    break ;
@@ -297,20 +291,19 @@ local int worker(THRBASE *tip) noex {
 	    work_finish(&w) ;
 	} /* end if (work) */
 
-#if	CF_DEBUGS
-	debugprintf("testpollobj/worker: ret rs=%d ctime=%u\n",rs,ctime) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj/worker: ret rs=%d ctime=%u\n",rs,ctime) ;
 #endif
 
 	return (rs >= 0) ? ctime : rs ;
-}
-/* end subroutine (worker) */
+} /* end subroutine (worker) */
 
 local int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar	*pr, *sn ;
 
-	if (wp == NULL) return SR_FAULT ;
+	if (wp == nullptr) return SR_FAULT ;
 
 	memclear(wp) ;
 	wp->tip = tip ;
@@ -319,34 +312,31 @@ local int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap) noex {
 	pr = wap->pr ;
 	sn = wap->sn ;
 
-#if	CF_DEBUGS
-	debugprintf("testpollobj/work_start: pr=%s\n",pr) ;
-	debugprintf("testpollobj/work_start: sn=%s\n",sn) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj/work_start: pr=%s\n",pr) ;
+	DEBUGPRINTF("testpollobj/work_start: sn=%s\n",sn) ;
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (work_start) */
+} /* end subroutine (work_start) */
 
 local int work_finish(WORK *wp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (wp == NULL) return SR_FAULT ;
-#if	CF_DEBUGS
-	debugprintf("testpollobj/work_finish: ret rs=%d\n",rs) ;
+	if (wp == nullptr) return SR_FAULT ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj/work_finish: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (work_finish) */
+} /* end subroutine (work_finish) */
 
 
 local int work_term(WORK *wp) noex {
-	if (wp == NULL) return SR_FAULT ;
-#if	CF_DEBUGS
-	debugprintf("testpollobj/work_term: entered\n") ;
+	if (wp == nullptr) return SR_FAULT ;
+#if	CF_DEBUG
+	DEBUGPRINTF("testpollobj/work_term: entered\n") ;
 #endif
 	return SR_OK ;
-}
-/* end subroutine (work_term) */
+} /* end subroutine (work_term) */
 
 
