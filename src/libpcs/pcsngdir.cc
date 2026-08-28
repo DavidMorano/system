@@ -85,7 +85,6 @@
 /* exported subroutines */
 
 int pcsngdir(cc *pcs,char *ngdir,cc *bbnewsdir,cc *newsgroup) noex {
-	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	int		f_first ;
@@ -110,7 +109,7 @@ int pcsngdir(cc *pcs,char *ngdir,cc *bbnewsdir,cc *newsgroup) noex {
 
 	ndp = strwcpy(ndp,"/",1) ;
 
-	if ((rs = u_stat(bbnewsdir2,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_stat(bbnewsdir2,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        if ((rs = mkpath1(ngdir,newsgroup)) >= 0) {
 
@@ -146,11 +145,10 @@ int pcsngdir(cc *pcs,char *ngdir,cc *bbnewsdir,cc *newsgroup) noex {
 	                strcpy(ndp,ngdir) ;
 	                if ((u_stat(bbnewsdir2,&sb) >= 0) && 
 	                    S_ISDIR(sb.st_mode) &&
-	                    (u_access(bbnewsdir2,W_OK) >= 0))
+	                    (u_access(bbnewsdir2,W_OK) >= 0)) {
 	                    rs = SR_OK ;
-
-	            } /* end if (tried to make it) */
-
+			}
+	            } /* end if (error) */
 	        } /* end if (mkpath) */
 	    } else {
 	        rs = SR_NOTDIR ;
