@@ -216,19 +216,19 @@ const pcsconfs_obj	pcsconfs_mod = {
 
 int pcsconfs_start(PC *op,cchar *pr,mainv ev,cchar *cfname) noex {
 	int		rs = SR_FAULT ;
-	if (op && pr) {
+	if (op && pr) ylikely {
 	    rs = SR_INVALID ;
 	    memclear(op) ; /* dangerous */
 	    op->fl.prdb = (cfname == nullptr) ;
-	    if (pr[0]) {
-		if ((rs = pcsconfs_envv(op,ev)) >= 0) {
-	            if ((rs = pcsconfs_valsbegin(op,pr,cfname)) >= 0) {
+	    if (pr[0]) ylikely {
+		if ((rs = pcsconfs_envv(op,ev)) >= 0) ylikely {
+	            if ((rs = pcsconfs_valsbegin(op,pr,cfname)) >= 0) ylikely {
 	                if ((rs = pcsconfs_dbcheck(op)) >= 0) {
 		            op->magval = PC_MAGIC ;
 	                }
 	                if (rs < 0) {
 		            pcsconfs_valsend(op) ;
-	                }
+	                } /* end if (error) */
 	            } /* end if */
 		} /* end if (pcsconfs_envv) */
 	    } /* end if (valid) */
@@ -320,7 +320,7 @@ int pcsconfs_fetch(PC *op,cchar *kp,int kl,PC_CUR *curp,
 
 	if ((rs < 0) && (vbuf != nullptr)) {
 	    vbuf[0] = '\0' ;
-	}
+	} /* end if (error) */
 
 	return rs ;
 } /* end subroutine (pcsconfs_fetch) */
@@ -342,7 +342,7 @@ int pcsconfs_curenum(PC *op,PC_CUR *curp,char *kbuf,int klen,
 
 	if ((rs < 0) && (vbuf != nullptr)) {
 	    vbuf[0] = '\0' ;
-	}
+	} /* end if (error) */
 
 	return rs ;
 } /* end subroutine (pcsconfs_curenum) */
@@ -565,15 +565,16 @@ local int confvars_dbstart(CV *sip) noex {
 	        	    rs = confvars_dbmake(sip,dbname) ;
 		    }
 		}
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 	            rs = confvars_dbopen(sip,dbname) ;
 		    if ((rs >= 0) && op->fl.prdb) {
 		        dbname[dl] = '\0' ;
 		        rs = confvars_chown(sip,dbname,dl) ;
 		    }
-		    if (rs < 0)
+		    if (rs < 0) {
 			confvars_dbclose(sip) ;
-		}
+		    } /* end if (error) */
+		} /* end if (ok) */
 	    } /* end if */
 	} /* end if */
 
