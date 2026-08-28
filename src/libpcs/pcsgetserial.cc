@@ -89,7 +89,7 @@ extern "C" {
 
 extern "C" {
     extern int	getserial(cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -120,9 +120,9 @@ namespace {
 int pcsgetserial(cchar *pr) noex {
 	int		rs ;
 	int		s = 0 ; /* return-value */
-	if (pr) {
+	if (pr) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0]) {
+	    if (pr[0]) ylikely {
 		serializer so(pr) ;
 		rs = so ;
 		s = rs ;
@@ -139,8 +139,8 @@ serializer::operator int () noex {
 	int		rs ;
 	int		rs1 ;
 	int		s = 0 ;
-	if (char *sbuf ; (rs = lm_mp(&sbuf)) >= 0) {
-	    if ((rs = mkpath(sbuf,pr,SERIALFNAME)) >= 0) {
+	if (char *sbuf ; (rs = lm_mp(&sbuf)) >= 0) ylikely {
+	    if ((rs = mkpath(sbuf,pr,SERIALFNAME)) >= 0) ylikely {
 	        if ((rs = getserial(sbuf)) >= 0) {
 		    s = rs ;
 	        } else if (isNotPresent(rs)) {
