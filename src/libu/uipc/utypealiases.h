@@ -23,8 +23,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysnative.h>
-#include	<clanguage.h>		/* <- necessary inclusion */
+#include	<usysnative.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU <- necessary inclusion */
 
 
 /* UNIX® kernal structures */
