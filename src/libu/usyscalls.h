@@ -24,17 +24,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysnative.h>
+#include	<usysnative.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ubufdefs.h>		/* LIBU */
 
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ubufdefs.h>
-
-#include	<aflag.hh>
-#include	<endian.h>
+#include	<aflag.hh>		/* LIBU */
+#include	<endian.h>		/* LIBU */
 
 #include	<usys.h>	/* <- auxilllary OS support */
 #include	<usysflag.h>
