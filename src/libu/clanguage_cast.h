@@ -29,6 +29,8 @@
 #define	cast_const		const_cast
 #define	cast_reinterpret	reinterpret_cast
 #define	cast_bit		bit_cast
+#define	cast_clock		clock_cast
+#define	cast_duration		duration_cast
 #define	cast_saturate		saturate_cast
 #define	cast_sat		saturate_cast
 #define	saturate		saturate_cast
