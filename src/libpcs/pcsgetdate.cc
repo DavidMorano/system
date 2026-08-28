@@ -105,12 +105,12 @@ int pcsgetdate(cchar *pr,tmtime *tmp,cc *sp,int µsl,pcsdatetypes dt) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if (pr && tmp) {
+	if (pr && tmp) ylikely {
 	    if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
 	        rs = SR_INVALID ;
-	        if (pr[0] && (dt >= 0)) {
-		    if (tmz z ; (rs = z.init) >= 0) {
-			if ((rs = tmz_typer(&z,sp,sl,dt)) >= 0) {
+	        if (pr[0] && (dt >= 0)) ylikely {
+		    if (tmz z ; (rs = z.init) >= 0) ylikely {
+			if ((rs = tmz_typer(&z,sp,sl,dt)) >= 0) ylikely {
 			    rs = tmtime_load(tmp,&z) ;
 			    rv = rs ;
 			} /* end if (tmz_typer) */
@@ -144,9 +144,9 @@ local int tmtime_loadzone(tmtime *tmp,tmz *zp) noex {
 	if ((rs = zp->haszone) > 0) {
 	    rs = SR_NOTOPEN ;
 	    if (zp->zname) {
-	        if (char *zbuf ; (rs = lm_zn(&zbuf)) >= 0) {
+	        if (char *zbuf ; (rs = lm_zn(&zbuf)) >= 0) ylikely {
 		    cint zlen = rs ;
-		    if ((rs = zp->getzone(zbuf,zlen)) >= 0) {
+		    if ((rs = zp->getzone(zbuf,zlen)) >= 0) ylikely {
 		        rs = tmp->loadzn(zbuf,rs) ;
 			zl = rs ;
 		    } /* end if (tmz_getzone) */
@@ -161,9 +161,9 @@ local int tmtime_loadzone(tmtime *tmp,tmz *zp) noex {
 local int tmtime_load(tmtime *tmp,tmz *zp) noex {
     	int		rs ;
 	int		rv = 0 ; /* return-value */
-	if (TM vals{} ; (rs = zp->gettm(&vals)) >= 0) {
+	if (TM vals{} ; (rs = zp->gettm(&vals)) >= 0) ylikely {
 	    if ((rs = tmp->insert(&vals)) >= 0) {
-	        if ((rs = tmtime_loadzoff(tmp,zp)) >= 0) {
+	        if ((rs = tmtime_loadzoff(tmp,zp)) >= 0) ylikely {
 		    rs = tmtime_loadzone(tmp,zp) ;
 		    rv = rs ;
 		}
