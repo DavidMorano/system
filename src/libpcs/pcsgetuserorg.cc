@@ -79,10 +79,10 @@
 
 int pcsgetuserorg(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
-	if (pr && rbuf && un) {
+	if (pr && rbuf && un) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (pr[0] && un[0]) {
+	    if (pr[0] && un[0]) ylikely {
 	        rs = getuserorg(rbuf,rlen,un) ;
 	        if (isNotPresent(rs) || (rs == 0)) {
 	            rs = pcsgetorg(pr,rbuf,rlen,un) ;
