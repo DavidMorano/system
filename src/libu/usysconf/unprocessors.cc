@@ -73,8 +73,8 @@ unprocer	unprocessors ;
 int u_nprocessors(int w) noex {
     	int	rs = SR_INVALID ;
 	int	rv = 0 ; /* return-value */
-	if ((w >= 0) && (w < 2)) {
-	    int cmd ;
+	if ((w >= 0) && (w < 2)) ylikely {
+	    int cmd = -1 ;
 	    switch (w) {
 	    case 0:
     	        cmd = _SC_NPROCESSORS_ONLN ;
@@ -86,10 +86,10 @@ int u_nprocessors(int w) noex {
 		rs = SR_BUGCHECK ;
 		break ;
 	    } /* end switch */
-	    if (rs >= 0) {
+	    if ((rs >= 0) && (cmd >= 0)) ylikely {
 	       rs = u_sysconfval(cmd,nullptr) ;
 	       rv = rs ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (valid) */
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (u_nprocessors) */
