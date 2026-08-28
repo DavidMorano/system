@@ -1,4 +1,4 @@
-/* pcsnsmgr SUPPORT */
+* pcsnsmgr SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -73,7 +73,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	PCSNSMGR	struct pcsnsmgr_head
+#define	PCSNSMGR	pcsnsmgr_head
 
 
 /* imported namespaces */
@@ -87,7 +87,7 @@ import libutil ;			/* |lenstr(3u)| */
 extern "C" {
     int		pcsnsmgr_init() noex ;
     int		pcsnsmgr_fini() noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -119,7 +119,7 @@ extern "C" {
     local void	pcsnsmgr_atforkbefore() noex ;
     local void	pcsnsmgr_atforkafter() noex ;
     local void	pcsnsmgr_exit() noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -151,26 +151,28 @@ int pcsnsmgr_init() noex {
 	                } /* end if (uc_atexit) */
 	                if (rs < 0) {
 	                    uc_atforkexp(b,a,a) ;
-			}
+			} /* end if (error) */
 	            } /* end if (uc_atfork) */
 	            if (rs < 0) {
 	                cnp->destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptc_create) */
 	        if (rs < 0) {
 	            mxp->destroy() ;
-		}
+		} /* end if (error) */
 	    } /* end if (ptm_create) */
 	    if (rs < 0) {
 	        uip->f_init = false ;
-	    }
+	    } /* end if (error) */
 	} else {
 	    while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 		rs = msleep(1) ;
 		if (rs == SR_INTR) rs = SR_OK ;
 	    }
-	    if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKFAIL ;
-	}
+	    if ((rs >= 0) && (! uip->f_init)) {
+		rs = SR_LOCKFAIL ;
+	    }
+	} /* end if */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (pcsnsmgr_init) */
 
@@ -204,8 +206,7 @@ int pcsnsmgr_fini() noex {
 	    uip->f_init = false ;
 	} /* end if (was initialized) */
 	return rs ;
-}
-/* end subroutine (pcsnsmgr_fini) */
+} /* end subroutine (pcsnsmgr_fini) */
 
 int pcsnsmgr_set(cchar *vbuf,int vlen,cchar *un,int w,int ttl) noex {
 	int		rs ;
@@ -402,7 +403,7 @@ local int pcsnsmgr_begin(PCSNSMGR *uip) noex {
 	int		rs = SR_OK ;
 
 	if (uip->recs == nullptr) {
-	    cint	size = sizeof(PCSNSRECS) ;
+	    cint	size = szof(PCSNSRECS) ;
 	    if (void *p ; (rs = lm_mall(size,&p)) >= 0) {
 	        cint		nmax = PCSNSMGR_MAX ;
 	        cint		ttl = PCSNSMGR_TTL ;
@@ -414,7 +415,7 @@ local int pcsnsmgr_begin(PCSNSMGR *uip) noex {
 		}
 	        if (rs < 0) {
 	            lm_free(p) ;
-		}
+		} /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end if (needed initialization) */
 
