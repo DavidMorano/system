@@ -123,11 +123,10 @@ int pcsmkconf(cchar *pr,mainv envv,cc *cfname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if (pr && cfname) {{
+	if (pr && cfname) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0] && cfname[0]) {
-		static cint rsv = var ;
-		if ((rs = rsv) >= 0) {
+	    if (pr[0] && cfname[0]) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	            SI	si ;
 	            if ((rs = subinfo_start(&si,pr,envv,cfname)) >= 0) {
 	                {
@@ -162,8 +161,7 @@ local int subinfo_start(SI *sip,cc *pr,mainv envv,cc *cfname) noex {
 	sip->pr = pr ;
 	sip->cfname = cfname ;
 	/* open the PCS-configuration file (if it exists) */
-	vecstr		subs ;
-	if ((rs = vecstr_start(&subs,4,0)) >= 0) {
+	if (vecstr subs ; (rs = vecstr_start(&subs,4,0)) >= 0) ylikely {
 	    char	tmpfname[MAXPATHLEN+1] ;
 	    rs = subinfo_startsubs(sip,&subs) ;
 	    if ((rs >= 0) && (cfname == nullptr)) {
@@ -173,14 +171,14 @@ local int subinfo_start(SI *sip,cc *pr,mainv envv,cc *cfname) noex {
 	        cfname = tmpfname ;
 	        rs = permsched(schedconf,&subs,tbuf,tlen,sip->prconf,m) ;
 	    }
-	    if (rs >= 0) {
+	    if (rs >= 0) ylikely {
 	        if (f_global) {
 	            rs = subinfo_confglobal(sip,dbname) ;
 	        } else {
 	            rs = subinfo_conflocal(sip,dbname) ;
 	        }
 		/* see if we can create a new VAR DB */
-	        if (rs >= 0) {
+	        if (rs >= 0) ylikely {
 		    rs = varmk_open(&sip->v,dbname,of,vm,n) ;
 	        } /* end if (ok) */
 	    } /* end if (ok) */
@@ -204,16 +202,16 @@ local int subinfo_startsubs(SI *sip,vecstr *slp) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar		*cp ;
-
+	{
 	cl = sfbasename(sip->pr,-1,&cp) ;
 	if (cl <= 0) rs = SR_INVALID ;
-
-	if (rs >= 0)
+	}
+	if (rs >= 0) {
 	    rs = vecstr_envadd(slp,"p",sip->pr,-1) ;
-
-	if (rs >= 0)
+	}
+	if (rs >= 0) {
 	    rs = vecstr_envadd(slp,"n",cp,cl) ;
-
+	}
 	return rs ;
 } /* end subroutine (subinfo_startsubs) */
 
@@ -233,7 +231,7 @@ local int subinfo_conflocal(SI *sip,char *dbname) noex {
 	cmode		dm = 0775 ;
 	cchar		*cdname = "pcsconf" ;
 	char		tmpdname[MAXPATHLEN+1] ;
-	if ((rs = mktmpuserdir(tmpdname,"-",cdname,dm)) >= 0) {
+	if ((rs = mktmpuserdir(tmpdname,"-",cdname,dm)) >= 0) ylikely {
 	    rs = mkpath2(dbname,tmpdname,sip->prconf) ;
 	}
 	return rs ;
@@ -243,10 +241,10 @@ local int subinfo_proc(SI *sip) noex {
 	paramfile	*pfp = &sip->pf ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = paramfile_open(pfp,sip->envv,sip->cfname)) >= 0) {
+	if ((rs = paramfile_open(pfp,sip->envv,sip->cfname)) >= 0) ylikely {
 	    paramfile_cur	cur ;
 	    paramfile_ent	pe ;
-	    if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
+	    if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) ylikely {
 	        cint	plen = PARAMBUFLEN ;
 	        int	kl ;
 	        char	pbuf[PARAMBUFLEN+1] ;
@@ -254,9 +252,9 @@ local int subinfo_proc(SI *sip) noex {
 	            kl = paramfile_curenum(pfp,&cur,&pe,pbuf,plen) ;
 	            if (kl == SR_NOTFOUND) break ;
 	            rs = kl ;
-		    if (rs >= 0) {
+		    if (rs >= 0) ylikely {
 	                rs = varmk_addvar(&sip->v,pe.key,pe.value,pe.vlen) ;
-		    }
+		    } /* end if (ok) */
 	        } /* end while (reading parameters) */
 	        rs1 = paramfile_curend(pfp,&cur) ;
 	        if (rs >= 0) rs = rs1 ;
