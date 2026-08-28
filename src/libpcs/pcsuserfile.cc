@@ -119,9 +119,9 @@ int pcsuserfile(cc *pr,cc *ufn,cc *nn,cc *un,cc *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f_created = false ;
-	if (pr && ufn && nn && un) {
+	if (pr && ufn && nn && un) ylikely {
 	    rs = SR_INVALID ;
-	    if (pr[0] && ufn[0] && nn[0] && un[0]) {
+	    if (pr[0] && ufn[0] && nn[0] && un[0]) ylikely {
 		cint nnlen = lenstr(nn) ;
 		cint unlen = lenstr(un) ;
 	        cchar	*bnp ;
