@@ -186,7 +186,6 @@ control:
 	date >> Control
 
 
-
 main.o:			main.c $(INCS)
 
 whatinfo.o:		whatinfo.c config.h
