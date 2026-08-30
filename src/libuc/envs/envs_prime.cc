@@ -31,10 +31,10 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<hdb.h>			/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"envs.h"
