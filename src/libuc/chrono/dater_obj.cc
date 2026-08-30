@@ -189,7 +189,7 @@ int dater::settimezon(time_t t,int zoff,cchar *zn,int isdst) noex {
 	return dater_settimezon(this,t,zoff,zn,isdst) ;
 } /* end method */
 
-int dater::mkdatestr(daterdts dt,char *dbuf,int dlen) noex {
+int dater::mkdatestr(datertypes dt,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(this,dt,dbuf,dlen) ;
 } /* end method */
 
