@@ -64,7 +64,7 @@
 #include	<ucdescsock.h>		/* LIBUC */
 #include	<bufprintf.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<libdebug.h>		/* LIBDEBUG */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 
 /* local defines */
@@ -93,6 +93,11 @@ local char	*d_reventstr() ;
 #endif
 
 
+/* local variables */
+
+cbool		f_debug		= CF_DEBUG ;
+
+
 /* exported variables */
 
 
@@ -114,11 +119,9 @@ int uc_recvfrome(int fd,void *rbuf,int rlen,int flags,
 	char	ebuf[EBUFLEN + 1] ;
 #endif
 
-#if	CF_DEBUG
-	    DEBUGPRINTF("uc_recvfrome: rlen=%d\n",rlen) ;
-	    DEBUGPRINTF("uc_recvfrome: flags=%04x\n",flags) ;
-	    DEBUGPRINTF("uc_recvfrome: timeout=%d\n",timeout) ;
-#endif
+	    DPRINTF("uc_recvfrome: rlen=%d\n",rlen) ;
+	    DPRINTF("uc_recvfrome: flags=%04x\n",flags) ;
+	    DPRINTF("uc_recvfrome: timeout=%d\n",timeout) ;
 
 	(void) opts ;
 	if (rlen <= 0) return SR_OK ;
@@ -146,51 +149,31 @@ int uc_recvfrome(int fd,void *rbuf,int rlen,int flags,
 	    f_first = false ;
 	    rs = u_poll(fds,1,(pollint * POLL_INTMULT)) ;
 	    if (rs < 0) break ;
-
-#if	CF_DEBUG
-	    DEBUGPRINTF("uc_recvfrome: back from POLL w/ rs=%d\n",
-	        rs) ;
-#endif
-
+	    DPRINTF("back from POLL w/ rs=%d\n", rs) ;
 	    if (rs > 0) {
-
 #if	CF_DEBUG
-	        DEBUGPRINTF("uc_recvfrome: events %s\n",
+	        DPRINTF("events %s\n",
 	            d_reventstr(fds[0].revents,ebuf,EBUFLEN)) ;
-	        DEBUGPRINTF("uc_recvfrome: about to 'read'\n") ;
 #endif
-
+	        DPRINTF("about to 'read'\n") ;
 	        rs = u_recvfrom(fd,rbuf,rlen,flags,fromp,fromlenp) ;
 	        len = rs ;
-
-#if	CF_DEBUG
-	        DEBUGPRINTF("uc_recvfrome: u_recvfrom() rs=%d\n",
-	            rs) ;
-#endif
-
+	        DPRINTF("u_recvfrom() rs=%d\n", rs) ;
 	        break ;
 
 	    } else {
-
 	        current = time(nullptr) ;
-
 	        timeout -= intconv(current - previous) ;
 	        previous = current ;
-	        if (timeout < TI_POLL)
+	        if (timeout < TI_POLL) {
 	            pollint = timeout ;
-
-	        if (timeout <= 0)
+		}
+	        if (timeout <= 0) {
 	            rs = SR_TIMEDOUT ;
-
+		}
 	    } /* end if */
-
 	} /* end while */
-
-#if	CF_DEBUG
-	DEBUGPRINTF("uc_recvfrome: ret rs=%d len=%d\n",
-	    rs,len) ;
-#endif
-
+	DPRINTF("ret rs=%d len=%d\n", rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (uc_recvfrome) */
 
