@@ -23,6 +23,8 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
+#include	<ucmincore.h>
+
 
 EXTERNC_begin
 
@@ -31,7 +33,13 @@ extern int	uc_gethz	(int) noex ;
 extern int	uc_syspages	(int) noex ;
 extern int	uc_pagesize	() noex ;
 extern int	uc_ftime	(TIMEB *) noex ;
+extern int	uc_syncer	(int) noex ;
 
+EXTERNC_end
+
+EXTERNC_begin
+extern int	ucsyncer_init() noex ;
+extern int	ucsyncer_fini() noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
