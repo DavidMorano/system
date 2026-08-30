@@ -23,9 +23,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysnative.h>		/* useful native system headers */
-#include	<clanguage.h>		/* <- necessary inclusion */
-#include	<stdintx.h>		/* extened integer types */
+#include	<stdint.h>		/* POSIX® integer types */
+#include	<usysnative.h>		/* LIBU useful native system headers */
+#include	<clanguage.h>		/* LIBU <- necessary inclusion */
+#include	<stdintx.h>		/* LIBU extended integer types */
+#include	<syspredefined.h>	/* LIBU system pre-defined types */
+
+#include	<utypedefs_ints.h>
+#include	<utypedefs_intp.h>
+#include	<utypedefs_intpp.h>
 
 
 /* for |stat(2)| and its many friends */
@@ -52,53 +58,6 @@
 #define	UPOLLFD		struct pollfd
 #endif /* STRUCT_USTAT */
 
-
-/* PREDEFINED start */
-/* determine if some unsigned-related typedefs have already been made */
-/* the following unsigned typedefs are supposedly "System V" compatibility */
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-
-#ifndef	TYPEDEF_USHORT
-#define	TYPEDEF_USHORT
-/* already typedef'ed on Darwin */
-#endif
-
-#ifndef	TYPEDEF_UINT
-#define	TYPEDEF_UINT
-/* already typedef'ed on Darwin */
-#endif
-
-#endif /* !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE) */
-#endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
-/* PREDEFINED end */
-
-/* PREDEFINED start */
-/* determine if some unsigned-related typedefs have already been made */
-/* the following unsigned typedefs are supposedly "System V" compatibility */
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-#if !defined(__XOPEN_OR_POSIX) || defined(__EXTENSIONS__)
-
-#ifndef	TYPEDEF_USHORT
-#define	TYPEDEF_USHORT
-/* already typedef'ed on Solaris® */
-#endif
-
-#ifndef	TYPEDEF_UINT
-#define	TYPEDEF_UINT
-/* already typedef'ed on Solaris® */
-#endif
-
-#ifndef	TYPEDEF_ULONG
-#define	TYPEDEF_ULONG
-/* already typedef'ed on Solaris® */
-#endif
-
-#endif /* !defined(__XOPEN_OR_POSIX) || defined(__EXTENSIONS__) */
-#endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
-/* PREDEFINED end */
-
-/* types */
 
 #ifndef	TYPEDEF_CADDRP
 #define	TYPEDEF_CADDRP
@@ -219,26 +178,6 @@ typedef int (*sortvcmp_f)(const void *,const void *) noex ;
 EXTERNC_end
 #endif /* TYPEDEF_SORTVCMP */
 
-#ifndef	TYPEDEF_SCHAR
-#define	TYPEDEF_SCHAR
-typedef signed char		schar ;
-#endif /* TYPEDEF_SCHAR */
-
-#ifndef	TYPEDEF_UCHAR
-#define	TYPEDEF_UCHAR
-typedef unsigned char		uchar ;
-#endif /* TYPEDEF_UCHAR */
-
-#ifndef	TYPEDEF_UINT
-#define	TYPEDEF_UINT
-typedef unsigned int		uint ;
-#endif /* TYPEDEF_UINT */
-
-#ifndef	TYPEDEF_ULONG
-#define	TYPEDEF_ULONG
-typedef unsigned long		ulong ;
-#endif /* TYPEDEF_ULONG */
-
 #ifndef	TYPEDEF_LONGDOUBLE
 #define	TYPEDEF_LONGDOUBLE
 typedef long double		longdouble ;
@@ -250,31 +189,6 @@ typedef long double		longdouble ;
 #define	TYPEDEF_CBOOL
 typedef const bool		cbool ;
 #endif
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef const char		cchar ;
-#endif
-
-#ifndef	TYPEDEF_CSCHAR
-#define	TYPEDEF_CSCHAR
-typedef const signed char	cschar ;
-#endif /* TYPEDEF_SCHAR */
-
-#ifndef	TYPEDEF_CSHORT
-#define	TYPEDEF_CSHORT
-typedef const short		cshort ;
-#endif /* TYPEDEF_CSHORT */
-
-#ifndef	TYPEDEF_CINT
-#define	TYPEDEF_CINT
-typedef const int		cint ;
-#endif /* TYPEDEF_CINT */
-
-#ifndef	TYPEDEF_CLONG
-#define	TYPEDEF_CLONG
-typedef const long		clong ;
-#endif /* TYPEDEF_CULONG */
 
 #ifndef	TYPEDEF_CFLOAT
 #define	TYPEDEF_CFLOAT
@@ -330,28 +244,6 @@ typedef const socklen_t		csocklen ;
 #define	TYPEDEF_CMODE
 typedef const mode_t		cmode ;
 #endif /* TYPEDEF_CMODE */
-
-#ifndef	TYPEDEF_CUCHAR
-#define	TYPEDEF_CUCHAR
-typedef const unsigned char	cuchar ;
-#endif /* TYPEDEF_UCHAR */
-
-#ifndef	TYPEDEF_CUSHORT
-#define	TYPEDEF_CUSHORT
-typedef const unsigned short	cushort ;
-#endif /* TYPEDEF_UCHAR */
-
-#ifndef	TYPEDEF_CUINT
-#define	TYPEDEF_CUINT
-typedef const unsigned int	cuint ;
-#endif /* TYPEDEF_CUINT */
-
-#ifndef	TYPEDEF_CULONG
-#define	TYPEDEF_CULONG
-typedef const unsigned long	culong ;
-#endif /* TYPEDEF_CULONG */
-
-/* specials */
 
 #ifndef	TYPEDEF_CC
 #define	TYPEDEF_CC
@@ -432,6 +324,26 @@ typedef int *			intp ;
 #ifndef	TYPEDEF_LONGP
 #define	TYPEDEF_LONGP
 typedef long *			longp ;
+#endif
+
+#ifndef	TYPEDEF_SCHARP
+#define	TYPEDEF_SCHARP
+typedef signed char *		scharp ;
+#endif
+
+#ifndef	TYPEDEF_SSHORTP
+#define	TYPEDEF_SSHORTP
+typedef signed short *		sshortp ;
+#endif
+
+#ifndef	TYPEDEF_SINTP
+#define	TYPEDEF_SINTP
+typedef signed int *		sintp ;
+#endif
+
+#ifndef	TYPEDEF_SLONGP
+#define	TYPEDEF_SLONGP
+typedef signed long *		slongp ;
 #endif
 
 #ifndef	TYPEDEF_UCHARP
@@ -664,6 +576,11 @@ typedef const mode_t		cfsperm ;
 #ifndef	TYPEDEF_USTIME
 #define	TYPEDEF_USTIME
 typedef time_t			ustime ;
+#endif
+
+#ifndef	TYPEDEF_MTIME
+#define	TYPEDEF_MTIME
+typedef long			mtime_t ;
 #endif
 
 #ifndef	TYPEDEF_CUSTIME
