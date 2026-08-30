@@ -266,7 +266,7 @@ int progsvcopen(proginfo *pip) noex {
 	        debugprintf("progsvcopen: svcfile_open() rs=%d\n",rs) ;
 	        svcfile_curbegin(&pip->stab,&cur) ;
 	        while (rs >= 0) {
-	            nlen = svcfile_enumsvc(&pip->stab,&cur,nbuf,SVCNAMELEN) ;
+	            nlen = svcfile_curenumsvc(&pip->stab,&cur,nbuf,SVCNAMELEN) ;
 	            if (nlen < 0)
 	                break ;
 	            c += 1 ;
@@ -310,7 +310,7 @@ int progsvcopen(proginfo *pip) noex {
 	    svcfile_curbegin(&pip->stab,&cur) ;
 /* CONSTCOND */
 	    while (TRUE) {
-	        kl = svcfile_enumsvc(&pip->stab,&cur,kbuf,KBUFLEN) ;
+	        kl = svcfile_curenumsvc(&pip->stab,&cur,kbuf,KBUFLEN) ;
 	        if (kl < 0)
 	            break ;
 	        c += 1 ;
@@ -438,7 +438,7 @@ ccharg	*s ;
 	if ((rs = svcfile_curbegin(svcp,&cur)) >= 0) {
 
 	    while (rs >= 0) {
-	        rs1 = svcfile_enumsvc(svcp,&cur,svcbuf,svclen) ;
+	        rs1 = svcfile_curenumsvc(svcp,&cur,svcbuf,svclen) ;
 	        sl = rs1 ;
 	        if (rs1 == SR_NOTFOUND) break ;
 	        rs = rs1 ;
