@@ -388,8 +388,7 @@ int main(int argc,mainv argv,mainv envv) {
 	}
 	DEBPRINTF("ret ex=%d\n",ex) ;
 	return ex ;
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
@@ -417,8 +416,7 @@ int proginfo::istart() noex {
 	    } /* end if (error) */
 	} /* end if (exts.start) */
 	return rs ;
-}
-/* end method (proginfo::istart) */
+} /* end method (proginfo::istart) */
 
 int proginfo::ifinish() noex {
     	int		rs = SR_OK ;
@@ -439,8 +437,7 @@ int proginfo::ifinish() noex {
 	    fl.exts = false ;
 	}
 	return rs ;
-}
-/* end method (proginfo::ifinish) */
+} /* end method (proginfo::ifinish) */
 
 int proginfo::getpnames(mainv names,cc *sp,int sl) noex {
     	int		rs = SR_NOMSG ;
@@ -499,8 +496,7 @@ int proginfo::iflistbegin() noex {
 	    break ;
 	} /* end switch */
 	return rs ;
-}
-/* end method (proginfo::iflistbegin) */
+} /* end method (proginfo::iflistbegin) */
 
 int proginfo::iflistend() noex {
     	int		rs = SR_OK ;
@@ -521,8 +517,7 @@ int proginfo::iflistend() noex {
 	    fl.mods = false ;
 	}
 	return rs ;
-}
-/* end method (proginfo::iflistend) */
+} /* end method (proginfo::iflistend) */
 
 int proginfo::argproc() noex {
 	int		rs ;
