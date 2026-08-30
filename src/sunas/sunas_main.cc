@@ -388,13 +388,13 @@ static int proc_progok(PI *pip,cchar *progfname) noex {
 	    }
 #endif /* CF_DEBUGS */
 	    if (S_ISREG(sb.st_mode)) {
-	        if ((rs = permid(&pip->id,&sb,X_OK)) >= 0) {
+	        if ((rs = permids(&pip->id,&sb,X_OK)) >= 0) {
 	            if ((sb.st_dev != pip->dev) || (sb.st_ino != pip->ino)) {
 	                f = true ;
 	            }
 	        } else if (isNotPresent(rs)) {
 #if	CF_DEBUGS
-	            debugprintf("main/proc_progok: permid() rs=%d\n",rs) ;
+	            debugprintf("main/proc_progok: permids() rs=%d\n",rs) ;
 #endif
 	            rs = SR_OK ;
 	        }
@@ -484,7 +484,7 @@ static int proc_savecopy(PI *pip,cchar *a) noex {
 	if ustat sb ; (rs = uc_stat(dn,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 		cint	am = (X_OK|W_OK) ;
-		if ((rs = permid(&pip->id,&sb,am)) >= 0) {
+		if ((rs = permids(&pip->id,&sb,am)) >= 0) {
 	            char	cbuf[MAXPATHLEN+1] ;
 	            if ((rs = mkcfname(cbuf,dn,a)) >= 0) {
 			bfile	cfile, *cfp = &cfile ;
@@ -499,7 +499,7 @@ static int proc_savecopy(PI *pip,cchar *a) noex {
 	            } /* end if (mkcfname) */
 		} else if (isNotAccess(rs)) {
 		    rs = SR_OK ; /* fail silently! */
-		} /* end if (permid) */
+		} /* end if (permids) */
 	    } /* end if (is-dir) */
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ; /* fail silently! */
