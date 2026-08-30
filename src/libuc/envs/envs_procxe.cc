@@ -64,11 +64,12 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<expcook.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
+#include	<nulstr.h>		/* LIBU */
 #include	<field.h>		/* LIBUC */
 #include	<fieldterms.h>		/* LIBUC */
 #include	<buffer.h>		/* LIBUC */
