@@ -44,167 +44,242 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<errno.h>
+#include	<errno.h>		/* LIBU */
 
 
-enum errnomssings {
-	errnomissing_l2nsync = 10000,
-	errnomissing_l2hlt,
-	errnomissing_l3hlt,
-	errnomissing_l3rst,
-	errnomissing_noano,
-	errnomissing_bad,
-	errnomissing_badr,
-	errnomissing_bade,
-	errnomissing_badrqc,
-	errnomissing_badslt,
-	errnomissing_deadlock,
-	errnomissing_bfont,
-	errnomissing_ownerdead,
-	errnomissing_unavailable,
-	errnomissing_notrecoverable,
-	errnomissing_notuniq,
-	errnomissing_proto,
-	errnomissing_badfd,
-	errnomissing_libacc,
-	errnomissing_libbad,
-	errnomissing_libscn,
-	errnomissing_libmax,
-	errnomissing_libexec,
-	errnomissing_hostdown,
-	errnomissing_unatch,
-	errnomissing_nosr,
-	errnomissing_nopkg,
-	errnomissing_noattr,
-	errnomissing_nocsi,
-	errnomissing_nonet,
-	errnomissing_chrng,
-	errnomissing_lnrng,
-	errnomissing_srmnt,
-	errnomissing_xfull,
-	errnomissing_adv,
-	errnomissing_comm,
-	errnomissing_remchg,
-	errnomissing_restart,
-	errnomissing_strpipe,
-	errnomissing_overlast
-} ;
+enum missingerrnos {
+	missingerrno_BEGIN = 10000,
+	missingerrno_lockfail,
+	missingerrno_l2nsync,
+	missingerrno_l2hlt,
+	missingerrno_l3hlt,
+	missingerrno_l3rst,
+	missingerrno_noano,
+	missingerrno_bad,
+	missingerrno_badr,
+	missingerrno_bade,
+	missingerrno_badrqc,
+	missingerrno_badslt,
+	missingerrno_deadlock,
+	missingerrno_bfont,
+	missingerrno_ownerdead,
+	missingerrno_unavailable,
+	missingerrno_notrecoverable,
+	missingerrno_notuniq,
+	missingerrno_proto,
+	missingerrno_badfd,
+	missingerrno_libacc,
+	missingerrno_libbad,
+	missingerrno_libscn,
+	missingerrno_libmax,
+	missingerrno_libexec,
+	missingerrno_hostdown,
+	missingerrno_unatch,
+	missingerrno_nosr,
+	missingerrno_nopkg,
+	missingerrno_noattr,
+	missingerrno_nocsi,
+	missingerrno_nonet,
+	missingerrno_chrng,
+	missingerrno_lnrng,
+	missingerrno_srmnt,
+	missingerrno_xfull,
+	missingerrno_adv,
+	missingerrno_comm,
+	missingerrno_remchg,
+	missingerrno_restart,
+	missingerrno_strpipe,
+	missingerrno_badrpc,
+	missingerrno_rpcmismatch,
+	missingerrno_progunavail,
+	missingerrno_progmismatch,
+	missingerrno_procunavail,
+	missingerrno_ftype,
+	missingerrno_auth,
+	missingerrno_needauth,
+	missingerrno_pwroff,
+	missingerrno_deverr,
+	missingerrno_badexec,
+	missingerrno_badarch,
+	missingerrno_shlibvers,
+	missingerrno_badmarco,
+	missingerrno_proclim,
+	missingerrno_nopolicy,
+	missingerrno_qfull,
+	missingerrno_overlast
+} ; /* end enum (missingerrnos) */
 
+
+#ifndef	ELOCKFAIL
+#define	ELOCKFAIL	missingerrno_lockfail
+#endif
 #ifndef	EL2NSYNC
-#define	EL2NSYNC	errnomissing_l2nsync
-#endif
-#ifndef	EL3HLT
-#define	EL3HLT		errnomissing_l3hlt
-#endif
-#ifndef	EL3RST
-#define	EL3RST		errnomissing_l3rst
+#define	EL2NSYNC	missingerrno_l2nsync
 #endif
 #ifndef	EL2HLT
-#define	EL2HLT		errnomissing_l2hlt
+#define	EL2HLT		missingerrno_l2hlt
+#endif
+#ifndef	EL3HLT
+#define	EL3HLT		missingerrno_l3hlt
+#endif
+#ifndef	EL3RST
+#define	EL3RST		missingerrno_l3rst
 #endif
 #ifndef	ENOANO
-#define	ENOANO		errnomissing_noano
+#define	ENOANO		missingerrno_noano
 #endif
 #ifndef	EBAD
-#define	EBAD		errnomissing_bad
+#define	EBAD		missingerrno_bad
 #endif
 #ifndef	EBADR
-#define	EBADR		errnomissing_badr
+#define	EBADR		missingerrno_badr
 #endif
 #ifndef	EBADE
-#define	EBADE		errnomissing_bade
+#define	EBADE		missingerrno_bade
 #endif
 #ifndef	EBADRQC
-#define	EBADRQC		errnomissing_badrqc
+#define	EBADRQC		missingerrno_badrqc
 #endif
 #ifndef	EBADSLT
-#define	EBADSLT		errnomissing_badslt
+#define	EBADSLT		missingerrno_badslt
 #endif
 #ifndef	EDEADLOCK
-#define	EDEADLOCK	errnomissing_deadlock
+#define	EDEADLOCK	missingerrno_deadlock
 #endif
 #ifndef	EBFONT
-#define	EBFONT		errnomissing_bfont
+#define	EBFONT		missingerrno_bfont
 #endif
 #ifndef	EOWNERDEAD
 #define	EOWNERDEAD	errnomising_ownerdead
 #endif
 #ifndef	ENOTRECOVERABLE
-#define	ENOTRECOVERABLE	errnomissing_notrecoverable
+#define	ENOTRECOVERABLE	missingerrno_notrecoverable
 #endif
 #ifndef	ENOTUNIQ
-#define	ENOTUNIQ	errnomissing_notuniq
+#define	ENOTUNIQ	missingerrno_notuniq
 #endif
 #ifndef	EPROTO
-#define	EPROTO		errnomissing_proto
+#define	EPROTO		missingerrno_proto
 #endif
 #ifndef	EBADFD
-#define	EBADFD		errnomissing_badfd
+#define	EBADFD		missingerrno_badfd
 #endif
 #ifndef	ELIBACC
-#define	ELIBACC		errnomissing_libacc
+#define	ELIBACC		missingerrno_libacc
 #endif
 #ifndef	ELIBBAD
-#define	ELIBBAD		errnomissing_libbad
+#define	ELIBBAD		missingerrno_libbad
 #endif
 #ifndef	ELIBSCN
-#define	ELIBSCN		errnomissing_libscn
+#define	ELIBSCN		missingerrno_libscn
 #endif
 #ifndef	ELIBMAX
-#define	ELIBMAX		errnomissing_libmax
+#define	ELIBMAX		missingerrno_libmax
 #endif
 #ifndef	ELIBEXEC
-#define	ELIBEXEC	errnomissing_libexec
+#define	ELIBEXEC	missingerrno_libexec
 #endif
 #ifndef	EHOSTDOWN
-#define	EHOSTDOWN	errnomissing_hostdown
+#define	EHOSTDOWN	missingerrno_hostdown
 #endif
 #ifndef	EUNATCH
-#define	EUNATCH		errnomissing_unatch
+#define	EUNATCH		missingerrno_unatch
 #endif
 #ifndef	ENOSR
-#define	ENOSR		errnomissing_nosr
+#define	ENOSR		missingerrno_nosr
 #endif
 #ifndef	ENOPKG
-#define	ENOPKG		errnomissing_nopkg
+#define	ENOPKG		missingerrno_nopkg
 #endif
 #ifndef	ENOATTR
-#define	ENOATTR		errnomissing_noattr
+#define	ENOATTR		missingerrno_noattr
 #endif
-
 #ifndef	ENOCSI
-#define	ENOCSI		errnomissing_nocsi
+#define	ENOCSI		missingerrno_nocsi
 #endif
 #ifndef	ENONET
-#define	ENONET		errnomissing_nonet
+#define	ENONET		missingerrno_nonet
 #endif
-
 #ifndef	ECHRNG
-#define	ECHRNG		errnomissing_chrng
+#define	ECHRNG		missingerrno_chrng
 #endif
 #ifndef	ELNRNG
-#define	ELNRNG		errnomissing_lnrng
+#define	ELNRNG		missingerrno_lnrng
 #endif
 #ifndef	ESRMNT
-#define	ESRMNT		errnomissing_srmnt
+#define	ESRMNT		missingerrno_srmnt
 #endif
 #ifndef	EXFULL
-#define	EXFULL		errnomissing_xfull
+#define	EXFULL		missingerrno_xfull
 #endif
 #ifndef	EADV
-#define	EADV		errnomissing_adv
+#define	EADV		missingerrno_adv
 #endif
 #ifndef	ECOMM
-#define	ECOMM		errnomissing_comm
+#define	ECOMM		missingerrno_comm
 #endif
 #ifndef	EREMCHG
-#define	EREMCHG		errnomissing_remchg
+#define	EREMCHG		missingerrno_remchg
 #endif
 #ifndef	ERESTART
-#define	ERESTART	errnomissing_restart
+#define	ERESTART	missingerrno_restart
 #endif
 #ifndef	ESTRPIPE
-#define	ESTRPIPE	errnomissing_strpipe
+#define	ESTRPIPE	missingerrno_strpipe
+#endif
+
+#ifndef	EBADRPC         /* Apple-Darwin */
+#define	EBADRPC         missingerrno_badrpc
+#endif
+#ifndef	ERPCMISMATCH	/* Apple-Darwin */
+#define	ERPCMISMATCH    missingerrno_rpcmismatch
+#endif
+#ifndef	EPROGUNAVAIL	/* Apple-Darwin */
+#define	EPROGUNAVAIL    missingerrno_progunavail
+#endif
+#ifndef	EPROGMISMATCH	/* Apple-Darwin */
+#define	EPROGMISMATCH   missingerrno_progmismatch
+#endif
+#ifndef	EPROCUNAVAIL	/* Apple-Darwin */
+#define	EPROCUNAVAIL    missingerrno_procunavail
+#endif
+
+#ifndef	EFTYPE		/* Apple-Darwin */
+#define	EFTYPE          missingerrno_ftype
+#endif
+#ifndef	EAUTH		/* Apple-Darwin */
+#define	EAUTH           missingerrno_auth
+#endif
+#ifndef	ENEEDAUTH	/* Apple-Darwin */
+#define	ENEEDAUTH       missingerrno_needauth
+#endif
+#ifndef	EPWROFF		/* Apple-Darwin */
+#define	EPWROFF         missingerrno_pwroff
+#endif
+#ifndef	EDEVERR		/* Apple-Darwin */
+#define	EDEVERR         missingerrno_deverr
+#endif
+#ifndef	EBADEXEC	/* Apple-Darwin */
+#define	EBADEXEC        missingerrno_badexec
+#endif
+#ifndef	EBADARCH	/* Apple-Darwin */
+#define	EBADARCH        missingerrno_badarch
+#endif
+#ifndef	ESHLIBVERS	/* Apple-Darwin */
+#define	ESHLIBVERS      missingerrno_shlibvers
+#endif
+#ifndef	EBADMACHO 	/* Apple-Darwin */
+#define	EBADMACHO       missingerrno_shlibvers
+#endif
+
+#ifndef	EPROCLIM	/* Apple-Darin */
+#define	EPROCLIM	missingerrno_proclim
+#endif
+#ifndef	ENOPOLICY	/* Apple-Darin */
+#define	ENOPOLICY	missingerrno_nopolicy
+#endif
+#ifndef	EQFULL		/* Apple-Darin */
+#define	EQFULL		missingerrno_qfull
 #endif
 
 /* status return codes (only used when explicit return status is requested) */
@@ -337,10 +412,27 @@ enum errnomssings {
 #define	SR_ALREADY	(- EALREADY)	/* operation already in progress */
 #define	SR_INPROGRESS	(- EINPROGRESS)	/* operation now in progress */
 #define	SR_STALE	(- ESTALE)	/* Stale NFS file handle */
+#define	SR_LOCKFAIL	(- ELOCKFAIL)	/* failed to acquire lock */
 #define	SR_NOATTR	(- ENOATTR)	/* no (extended) attribute */
+#define SR_BADRPC         (- EBADRPC)	/* RPC struct is bad */
+#define SR_RPCMISMATCH    (- ERPCMISMATCH) /* RPC version wrong */
+#define SR_PROGUNAVAIL    (- EPROGUNAVAIL) /* RPC prog. not avail */
+#define SR_PROGMISMATCH   (- EPROGMISMATCH) /* Program version wrong */
+#define SR_PROCUNAVAIL    (- EPROCUNAVAIL) /* Bad procedure for program */
+#define SR_FTYPE	(- EFTYPE)
+#define SR_AUTH		(- EAUTH)
+#define SR_NEEDAUTH	(- ENEEDAUTH)
+#define SR_PWROFF	(- EPWROFF)
+#define SR_DEVERR	(- EDEVERR)
+#define SR_BADEXEC	(- EBADEXEC)
+#define SR_BADARCH	(- EBADARCH)
+#define SR_SHLIBVERS	(- ESHLIBVERS)
+#define SR_BADMACHO	(- EBADMACHO)
+#define	SR_PROCLIM	(- EPROCLIM)	/* too many processes */
+#define	SR_NOPOLICY	(- ENOPOLICY)	/* no policy */
+#define	SR_QFULL	(- EQFULL)	/* queue full */
 
 /* our favorite aliases */
-
 #define	SR_QUIT		SR_L2HLT	/* quit requested */
 #define	SR_EXIT		SR_L3HLT	/* exit requested */
 #define	SR_NOENTRY	SR_NOENT	/* no entry */
@@ -353,7 +445,6 @@ enum errnomssings {
 #define	SR_EXISTS	SR_EXIST	/* object already exists */
 #define	SR_LOCKED	SR_AGAIN	/* object is already locked */
 #define	SR_INUSE	SR_ADDRINUSE	/* already in use */
-#define	SR_LOCKLOST	SR_NXIO		/* a lock was lost */
 #define	SR_HANGUP	SR_NXIO		/* hangup on device (not writable) */
 #define	SR_POLLERR	SR_IO		/* SPECIAL for |poll(2)| error */
 #define	SR_TOOBIG	SR_2BIG		/* arguments too big */
@@ -384,6 +475,10 @@ enum errnomssings {
 
 #ifndef	ETOOBIG
 #define	ETOOBIG		E2BIG
+#endif
+
+#ifndef	EDOMAIN
+#define	EDOMAIN		EDOM
 #endif
 
 #ifndef	EBADFMT
