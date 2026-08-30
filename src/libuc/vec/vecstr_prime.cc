@@ -98,8 +98,8 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<nleadstr.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<vstrcmp.h>		/* LIBUC */
