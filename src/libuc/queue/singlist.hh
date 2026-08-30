@@ -46,16 +46,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<initializer_list>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>		/* system-returns */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
+#include	<initializer_list>	/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU system-returns */
+#include	<localmisc.h>		/* LIBU */
 
 
 template <typename T>
@@ -71,7 +71,7 @@ class singlist_node {
 	singlist_node(const singlist_node<T> &other) = delete ;
 	singlist_node &operator = (const singlist_node<T> &other) = delete ;
 	singlist_node(const T &av) noex : val(av) { } ;
-	~singlist_node() { } ;
+	destruct singlist_node() { } ;
  	friend singlist<T> ;
  	friend singlist_iter<T> ;
 } ; /* end class (singlist_node) */
