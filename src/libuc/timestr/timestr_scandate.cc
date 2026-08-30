@@ -88,10 +88,10 @@ char *timestr_scandate(time_t t,char *tbuf) noex {
 	if (tbuf) ylikely {
 	    rs = SR_DOM ;
 	    if (t >= 0) ylikely {
-	        if (tmtime ts ; (rs = tmtime_timelocal(&ts,t)) >= 0) ylikely {
+	        if (tmtime ts ; (rs = ts.timelocal(t)) >= 0) ylikely {
 		    cchar	*fmt = "%e %b %R %y" ;
 	            rs = sntmtime(tbuf,tlen,&ts,fmt) ;
-	        }
+	        } /* end if (tmtime) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		tbuf[0] = '\0' ;
