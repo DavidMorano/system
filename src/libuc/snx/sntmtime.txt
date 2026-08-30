@@ -1,0 +1,35 @@
+
+	Format codes:
+	- A		full weekday name (not yet coded)
+	- a		abbreviated weekday name
+	- B		full month name (not yet coded)
+	- b		abbreviated month name
+	- C		century 00-99
+	- d		day of month 01-31
+	- D		short for '%m/%d/%y'
+	- e		day of month 1-31 (leading space as appropriate)
+	- h		abbreviated month name
+	- H		24-hour 00-23
+	- I		12-hour 01-24
+	- j		day of year 001-366
+	- m		month of year 01-12
+	- M		minute 00-61 (for leap-seconds)
+	- n		insert a new-line (NL) character
+	- O		zone-offset ±HHMM
+	- p		'am' or 'pm'
+	- R		same as '%H:%M'
+	- r		a 12-hour time specification w/ am-pm following
+	- T		same as %H:%M:%S
+	- t		insert a TAB character
+	- S		seconds 00-61
+	- u		day of week 1-7
+	- w		day of week 0-6
+	- x		dd mmm yyyy
+	- X		HH:MM:SS
+	- y		year within century 00-99
+	- Y		year 0000-9999
+	- Z		time zone abbreviation
+	- z		time zone offset (seconds east of GMT) ±xxxxx
+	- Ð		yyyy-mm-dd
+	- :		blinking ':' character
+
