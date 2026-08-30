@@ -48,8 +48,8 @@
 
 
 struct tmtime {
-    	static cint	znlen ;
-	static cint	baseyear ;
+    	static int	znlen ;
+	static int	baseyear ;
 	charp		znbuf ;		/* time-zone name abbreviation */
 	int		sec ;		/* 0-61 (for up to two leap-seconds) */
 	int		min ;		/* 0-59 */
