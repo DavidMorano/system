@@ -6,6 +6,7 @@
 /* miscellaneous system information retrieval functions */
 /* version %I% last-modified %G% */
 
+#define	CF_OPTIMIZE	0		/* try to optimize */
 
 /* revision history:
 
@@ -62,6 +63,10 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
+#ifndef	CF_OPTIMIZE
+#define	CF_OPTIMIZE	1		/* try to optimize */
+#endif
+
 
 /* local namespaces */
 
@@ -83,19 +88,34 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local variables */
 
+cbool		f_optimize	= CF_OPTIMIZE ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int uc_gettimeofday(TIMEVAL *tvp,void *dp) noex {
+int uc_gettimeofday(TIMEVAL *tvp,TIMEZONE *tzp) noex {
 	int		rs = SR_FAULT ;
-	if (tvp) {
+	if (tvp) ylikely {
 	    rs = SR_OK ;
-	    if (gettimeofday(tvp,dp) == -1) {
-		rs = (neg errno) ;
-	    }
+	    if (syshas.timezone && f_optimize) {
+	        if (gettimeofday(tvp,tzp) < 0) {
+		    rs = (neg errno) ;
+	        } /* end if */
+	    } else {
+		if ((rs = libu::ugettimeofday(tvp,tzp)) >= 0) ylikely {
+		    if (tzp) {
+		        if (TIMEZONE tz ; (rs = u_timezone(&tz)) >= 0) {
+    			    tzp->tz_minuteswest	= tz.tz_minuteswest ;
+    			    tzp->tz_dsttime	= tz.tz_dsttime ;
+			} else {
+			    memclear(tzp) ;
+		        } /* end if (utimezone) */
+		    } /* end if (non-null) */
+		} /* end if (ugettimeofday) */
+	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (uc_gettimeofday) */
