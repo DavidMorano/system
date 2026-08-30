@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* initiali a NOW structure */
+/* initialize a NOW structure */
 /* version %I% last-modified %G% */
 
 
