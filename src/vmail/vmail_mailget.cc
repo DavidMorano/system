@@ -52,43 +52,40 @@
 	This subroutine gets new mail (if any) from the system mail-spool area.
 
 	Synopsis:
-
 	int progmailget(pip,app)
 	PROGINFO	*pip ;
 	paramopt	*app ;
 
 	Arguments:
-
 	pip		program information pointer
 	app		pointer to argument paramopt object
 
 	Returns:
-
 	>=0		successful with count of messages
-	<0		cannot be opened or other error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ids.h>
+#include	<permx.h>
 #include	<paramopt.h>
 #include	<vecstr.h>
 #include	<vechand.h>
 #include	<envhelp.h>
 #include	<spawnproc.h>
 #include	<localmisc.h>
+#include	<bfile.h>		/* LIBB */
 
 #include	"vmail_config.h"
 #include	"defs.h"
@@ -111,26 +108,25 @@
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	permid(IDS *,ustat *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	lockend(int,int,int,int) ;
-extern int	pcsgetprog(const char *,char *,const char *) ;
+extern int	pcsgetprog(cchar *,char *,cchar *) ;
 extern int	isNotPresent(int) ;
 
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	progvmerr_printf(PROGINFO *,cchar *,...) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strwcpyuc(char *,cchar *,int) ;
 extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
 
 
@@ -140,9 +136,9 @@ extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
 /* local structures */
 
 struct muinfo {
-	const char	*varmailusers ;
-	const char	*progfname ;
-	const char	*argz ;
+	cchar	*varmailusers ;
+	cchar	*progfname ;
+	cchar	*argz ;
 	int		i ;
 } ;
 
@@ -152,9 +148,9 @@ struct muinfo {
 static int	procmailgeter(PROGINFO *,paramopt *) ;
 static int	procmailgeteruc(PROGINFO *,paramopt *,vechand *) ;
 static int	procmailgeterux(PROGINFO *,vechand *,cchar *,cchar *) ;
-static int	procmuc(PROGINFO *,paramopt *,const char *) ;
+static int	procmuc(PROGINFO *,paramopt *,cchar *) ;
 static int	procmailgeteru(PROGINFO *,vechand *) ;
-static int	procmailgeterum(PROGINFO *,vechand *,int,const char *) ;
+static int	procmailgeterum(PROGINFO *,vechand *,int,cchar *) ;
 static int	procmkenvusers(PROGINFO *,vechand *,ENVHELP *,struct muinfo *) ;
 static int	procmailgeterumer(PROGINFO *,int,cchar **,struct muinfo *) ;
 
@@ -200,8 +196,8 @@ int progmailget(PROGINFO *pip,paramopt *app)
 	}
 
 	if (pip->fl.mailget && (pip->prog_getmail != NULL)) {
-	    const char	*folder = pip->folderdname ;
-	    const char	*mb = pip->mbname_in ;
+	    cchar	*folder = pip->folderdname ;
+	    cchar	*mb = pip->mbname_in ;
 
 	    proglog_printf(pip,"mbin=%s",mb) ;
 	    if (pip->debuglevel > 0) {
@@ -278,7 +274,7 @@ static int procmailgeter(PROGINFO *pip,paramopt *app)
 	    if ((rs = vechand_start(&musers,1,vo)) >= 0) {
 	        int		i ;
 	        int		c = 0 ;
-	        const char	*mup = NULL ;
+	        cchar	*mup = NULL ;
 
 	        for (i = 0 ; (rs1 = vecstr_get(mlp,i,&mup)) >= 0 ; i += 1) {
 	            if (mup != NULL) {
@@ -374,14 +370,14 @@ static int procmailgeteruc(PROGINFO *pip,paramopt *app,vechand *mlp)
 /* end subroutine (procmailgeteruc) */
 
 
-static int procmuc(PROGINFO *pip,paramopt *app,const char *mup)
+static int procmuc(PROGINFO *pip,paramopt *app,cchar *mup)
 {
 	paramopt_cur	cur ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	const char	*po = PO_MAILDIRS ;
-	const char	*ccp ;
+	cchar	*po = PO_MAILDIRS ;
+	cchar	*ccp ;
 
 	if (pip == NULL) return SR_FAULT ; /* LINT */
 
@@ -420,7 +416,7 @@ static int procmuc(PROGINFO *pip,paramopt *app,const char *mup)
 	                }
 #else /* CF_ACCESS */
 	                if (sb.st_size > 0) {
-	                    rs1 = permid(&pip->id,&sb,am) ;
+	                    rs1 = permids(&pip->id,&sb,am) ;
 	                    if (rs1 >= 0) c += 1 ;
 	                }
 #endif /* CF_ACCESS */
@@ -539,7 +535,7 @@ static int procmailgeterum(pip,mlp,mfd,progfname)
 PROGINFO	*pip ;
 vechand		*mlp ;
 int		mfd ;
-const char	*progfname ;
+cchar	*progfname ;
 {
 	int		rs ;
 	int		rs1 ;
@@ -548,11 +544,11 @@ const char	*progfname ;
 	int		len = 0 ;
 #if	CF_DEBUG
 #else
-	const char	*efnull = STDFNNULL ;
+	cchar	*efnull = STDFNNULL ;
 #endif
-	const char	*ext_mailusers = VARMAILUSERS ;
-	const char	*ext_ef = "EF" ;
-	const char	*cp ;
+	cchar	*ext_mailusers = VARMAILUSERS ;
+	cchar	*ext_ef = "EF" ;
+	cchar	*cp ;
 	char		*p ;
 
 #if	CF_DEBUG
@@ -568,9 +564,9 @@ const char	*progfname ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    struct muinfo	mi ;
 	    ENVHELP		env ;
-	    const char		*argz ;
-	    const char		*env_ef ;
-	    const char		*env_mailusers ;
+	    cchar		*argz ;
+	    cchar		*env_ef ;
+	    cchar		*env_mailusers ;
 	    char		*bp = p ;
 
 	    argz = bp ;
@@ -602,11 +598,11 @@ const char	*progfname ;
 
 	        if (rs >= 0) {
 	            while ((rs = procmkenvusers(pip,mlp,&env,&mi)) > 0) {
-	                const char	**ev ;
+	                cchar	**ev ;
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(5)) {
-	                    const char	*ep ;
+	                    cchar	*ep ;
 	                    envhelp_present(&env,env_mailusers,-1,&ep) ;
 	                    debugprintf("progmailget/_erum: "
 	                        "env_mailusers=%s\n",env_mailusers) ;
@@ -719,7 +715,7 @@ struct muinfo	*mip ;
 static int procmailgeterumer(pip,mfd,ev,mip)
 PROGINFO	*pip ;
 int		mfd ;
-const char	**ev ;
+cchar	**ev ;
 struct muinfo	*mip ;
 {
 	SPAWNPROC	disp ;
@@ -728,7 +724,7 @@ struct muinfo	*mip ;
 	int		rs1 ;
 	int		cs ;
 	int		ai = 0 ;
-	const char	*av[10] ;
+	cchar	*av[10] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
@@ -771,9 +767,9 @@ struct muinfo	*mip ;
 	            rs1,cs) ;
 #endif
 	    if ((rs1 >= 0) && (pip->debuglevel > 0)) {
-	        const char	*pn = pip->progname ;
-	        const char	*spn = "mailget" ;
-	        const char	*fmt ;
+	        cchar	*pn = pip->progname ;
+	        cchar	*spn = "mailget" ;
+	        cchar	*fmt ;
 	        if (WIFEXITED(cs)) {
 	            int	ex = WEXITSTATUS(cs) ;
 	            fmt = "%s: %s exited ex=%u\n" ;
