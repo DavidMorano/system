@@ -1,6 +1,6 @@
 /* vecbool HEADER */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* string-index operations */
 /* version %I% last-modified %G% */
@@ -17,16 +17,18 @@
 
 #ifndef	VECBOOL_INCLUDE
 #define	VECBOOL_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
+#endif /* __cplusplus */
 #endif /* VECBOOL_INCLUDE */
 
 
