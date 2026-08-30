@@ -44,7 +44,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<errno.h>
+#include	<errno.h>		/* LIBU */
 
 
 enum missingerrnos {
