@@ -163,7 +163,6 @@ userinfo
 vetus
 votdc
 votdchdr
-wcuswhite
 wdt
 wordfill
 writen
