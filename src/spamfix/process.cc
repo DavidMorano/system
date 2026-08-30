@@ -1,49 +1,49 @@
-/* process */
+/* process SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0
 
-
 /* revision history:
 
-	= 96/03/01, David A­D­ Morano
-
-	The program was written from scratch to do what
-	the previous program by the same name did.
-
+	= 1996-03-01, David A­D­ Morano
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
+/* Copyright © 1995 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /******************************************************************************
 
+  	Description:
 	This subroutine processes a file for SpamAssassin bugs.
-
 
 ******************************************************************************/
 
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<csignal>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<char.h>
 #include	<bfile.h>
+#include	<headkeymat.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
-
 
 
 /* local defines */
@@ -63,10 +63,7 @@
 #define	SPAMHEADER	"x-spam-level"
 
 
-
 /* external subroutines */
-
-extern int	headkeymat(const char *,const char *,int) ;
 
 
 /* external variables */
@@ -77,20 +74,21 @@ extern int	headkeymat(const char *,const char *,int) ;
 
 /* forward references */
 
-static int	headkey(const char *,int) ;
+static int	headkey(cchar *,int) ;
 
 
 /* local variables */
 
 
+/* exported variables */
 
 
-
+/* exported subroutines */
 
 int process(pip,ofp,fname)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	bfile	infile ;
 
@@ -98,10 +96,8 @@ const char	fname[] ;
 	int	vi, hi ;
 	int	cl ;
 	int	f_inheader = TRUE ;
-
 	char	linebuf[LINEBUFLEN + 1] ;
 	char	*cp ;
-
 
 	if (fname == NULL)
 	    return SR_FAULT ;
@@ -134,11 +130,10 @@ const char	fname[] ;
 
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(4))
-	                        debugprintf("process: found screw-up hi=%u\n",hi) ;
+	                        debugprintf("process: screw-up hi=%u\n",hi) ;
 #endif
 
 	                    rs = bwrite(ofp,(cp + hi),(cl - hi)) ;
-
 	                    len = 0 ;
 	                }
 
@@ -162,13 +157,10 @@ const char	fname[] ;
 /* end subroutine (process) */
 
 
-
-/* LOCAL SUBROUTINES */
-
-
+/* local subroutines */
 
 static int headkey(sp,sl)
-const char	sp[] ;
+cchar	sp[] ;
 int		sl ;
 {
 	int	hi = 0 ;
