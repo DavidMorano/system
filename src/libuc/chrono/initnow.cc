@@ -5,7 +5,7 @@
 /* initialize both timeb and ZNAME */
 /* version %I% last-modified %G% */
 
-#define	CF_FTIME	1		/* actually call |uc_ftime(3uc)| */
+#define	CF_FTIME	0		/* actually call |uc_ftime(3uc)| */
 
 /* revision history:
 
