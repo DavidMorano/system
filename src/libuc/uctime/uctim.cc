@@ -199,11 +199,11 @@ namespace {
 	void operator () (timemgr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (timemgr_co) */
     struct timemgr {
 	friend		timemgr_co ;
@@ -232,7 +232,7 @@ namespace {
 	struct timemgr() noex {
 	    init	(this,timemgrmem_init) ;
 	    fini	(this,timemgrmem_fini) ;
-	} ;
+	} ; /* end ctor */
 	int cmd_create	(int,timemgr_arg *) noex ;
 	int cmd_destroy	(int,timemgr_arg *) noex ;
 	int cmd_set	(int,timemgr_arg *) noex ;
@@ -400,7 +400,7 @@ int uctim::pinit() noex {
 	                    if ((rs = uc_atexit(e)) >= 0) ylikely {
 	                        finitdone = true ;
 	                        f = true ;
-	                    }
+	                    } /* end if (ready) */
 	                    if (rs < 0) {
 	                        uc_atforkexp(b,ap,ac) ;
 			    } /* end if (error) */
@@ -592,7 +592,7 @@ int uctim::capbegin(int to) noex {
 	    } /* end while */
 	    if (rs >= 0) {
 	        fcapture = true ;
-	    }
+	    } /* end if (ok) */
 	    waiters -= 1 ;
 	    rs1 = mtx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
@@ -618,10 +618,10 @@ int uctim::workready() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
 	    rs = workbegin() ;
-	}
+	} /* end if (work) */
 	if ((rs >= 0) && (! fl.thrs)) {
 	    rs = thrsbegin() ;
-	}
+	} /* end if (threads) */
 	return rs ;
 } /* end method (uctim::workready) */
 
@@ -793,7 +793,7 @@ int uctim::sigbegin() noex {
 	cint		sig = SIGALARM ;
 	int		rs ;
 	uc_sigsetempty(&nss) ;
-	uc_sigsetadd(&ss,sig) ;
+	uc_sigsetadd(&nss,sig) ;
 	if ((rs = u_sigmask(scmd,&nss,&oss)) >= 0) {
 	    if ((rs = uc_sigsetismem(&nss,sig)) > 0) {
 	        fl.wasblocked = true ;
