@@ -245,7 +245,7 @@ BUILTIN		*bip ;
 /* end subroutine (builtin_finish) */
 
 
-int builtin_enum(bip,ei,spp)
+int builtin_curenum(bip,ei,spp)
 BUILTIN		*bip ;
 int		ei ;
 const char	**spp ;
@@ -267,7 +267,7 @@ const char	**spp ;
 	*spp = bisvcs[ei] ;
 	return ei ;
 }
-/* end subroutine (builtint_enum) */
+/* end subroutine (builtin_curenum) */
 
 
 int builtin_match(bip,service)
@@ -382,7 +382,7 @@ const char	*sargv[] ;
 
 	svcfile_curbegin(bip->sfp,&cur) ;
 
-	while ((i = svcfile_enumsvc(bip->sfp,&cur,svcbuf,svclen)) >= 0) {
+	while ((i = svcfile_curenumsvc(bip->sfp,&cur,svcbuf,svclen)) >= 0) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
