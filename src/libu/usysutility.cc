@@ -246,7 +246,7 @@ sysret_t syscaller::std_getloadavg() noex {
 	int		rs ;
 	if ((rs = getloadavg(dlap,dlan)) < 0) ylikely {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (syscaller::std_getloadavg) */
 
