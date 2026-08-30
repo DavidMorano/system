@@ -32,8 +32,8 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<estrings.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strwcmp.h>		/* LIBUC |strwcasecmp(3uc)| */
 #include	<toxc.h>		/* LIBUC */
