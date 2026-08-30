@@ -58,7 +58,7 @@ namespace {
 	int	hours ;
 	int	days ;
 	timepieces(char *b,int l) noex : rbuf(b), rlen(l) { } ;
-	int cvt(cchar *) noex ;
+	int cvt	(cchar *) noex ;
     } ; /* end struct (timepieces) */
 } /* end namespace */
 
@@ -91,14 +91,14 @@ char *timestr_elapsed(time_t t,char *rbuf) noex {
 	                te.hours = (thours % 24) ;
 	                cchar fmt[] = "%5u-%02u:%02u:%02u" ;
 	                rs = te.cvt(fmt) ;
-		    }
-		}
+		    } /* end block */
+		} /* end block */
 	    } /* end if (valid) */
 	    if (rs < 0) rbuf[0] = '\0' ;
 	} /* end if (non-null) */
 	if (rs < 0) {
 	    ulogerror("timestr",rs,"elapsed") ;
-	}
+	} /* end if (error) */
 	return (rs >= 0) ? rbuf : nullptr ;
 } /* end subroutine (timestr_elapsed) */
 
