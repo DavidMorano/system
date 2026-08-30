@@ -13,10 +13,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ptm.h>
-#include	<ptc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
 
 
 #define	THRCOMM		struct thrcomm_head
@@ -27,10 +27,10 @@ struct thrcomm_head {
 	ptm		*mxp ;
 	ptc		*cvp ;
 	uint		magval ;
-	volatile int	cmd ;
-	volatile int	rrs ;
-	volatile int	f_cmd ;
-	volatile int	f_exiting ;
+	vol int		cmd ;
+	vol int		rrs ;
+	vol int		f_cmd ;
+	vol int		f_exiting ;
 } ; /* end struct */
 
 typedef THRCOMM		thrcomm ;
