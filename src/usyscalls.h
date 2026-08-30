@@ -2,8 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* version %I% last-modified %G% */
+/* interface component for UNIX® library-3c */
 /* UNIX® system-calls */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -23,31 +24,29 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysnative.h>
+#include	<usysnative.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ubufdefs.h>		/* LIBU */
 
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ubufdefs.h>
-
-#include	<aflag.hh>
-#include	<endian.h>
+#include	<aflag.hh>		/* LIBU */
+#include	<endian.h>		/* LIBU */
 
 #include	<usys.h>	/* <- auxilllary OS support */
 #include	<usysflag.h>
+#include	<umem.hh>
 #include	<usysop.h>	/* UNIX® system-operations */
 #include	<usysdata.h>	/* UNIX® system-data */
 #include	<usysutility.hh>
 #include	<usysauxinfo.h>
 #include	<usysdata.h>
 #include	<usysconf.h>
+#include	<usupport.h>
 
 #include	<ustd.h>	/* <- converted system calls */
-
 #include	<uatexit.h>
 #include	<ucomposite.h>
+#include	<uexec.h>
 #include	<ugetloadavg.h>	/* load-average retrieval |u_getloadavg| */
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
@@ -55,17 +54,23 @@
 #include	<ufdlock.h>
 #include	<ufiledesc.h>	/* file-descriptor */
 #include	<ufileop.h>	/* file-operations */
+#include	<upt.h>
 #include	<usig.h>
 #include	<uprocess.h>
 #include	<uatfork.h>
-#include	<uexec.h>
 #include	<ulogerror.h>
 #include	<umem.hh>
 #include	<utimeoutdefs.h>
 #include	<utimeout.h>
 #include	<utimeouts.h>
 #include	<uxti.h>
+#include	<uchartype.h>
+#include	<ustream.hh>
+#include	<ucodenames.h>
+#include	<ugetx.h>
+#include	<utimezone.h>
 
+#include	<atox.h>
 #include	<varnames.hh>
 #include	<syswords.hh>
 #include	<sysconfcmds.h>
@@ -75,14 +80,25 @@
 #include	<intx.h>
 #include	<timewatch.hh>
 #include	<timecount.hh>
-#include	<timeval.h>
+#include	<timeval.hh>
 #include	<timespec.h>
+#include	<itimers.hh>
 #include	<itimerval.h>
 #include	<itimerspec.h>
+#include	<stdfiles.h>
 #include	<stdfnames.h>
 #include	<xxtostr.h>
 #include	<strtox.h>
 #include	<baops.h>
+#include	<mkchar.h>
+#include	<funcodes.h>
+
+#include	<stdintx.h>
+#include	<ccfile.hh>
+#include	<readln.hh>
+#include	<conintx.hh>
+#include	<udiv.hh>
+#include	<binchunk.hh>
 
 
 #endif /* USYSCALLS_INCLUDE */
