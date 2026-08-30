@@ -204,6 +204,14 @@
 #define	VARDISPLAY	"DISPLAY"
 #endif
 
+#ifndef	VARNAME
+#define	VARNAME		"NAME"
+#endif
+
+#ifndef	VARFULLNAME
+#define	VARFULLNAME	"FULLNAME"
+#endif
+
 
 #endif /* VARDEFS_INCLUDE */
 
