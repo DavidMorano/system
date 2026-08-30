@@ -61,7 +61,7 @@ struct date : date_head {
 	int getzoff	(int *) noex ;
 	int getisdst	(int *) noex ;
 	int getzname	(char *,int) noex ;
-	void dtor() noex ;
+	void dtor	() noex ;
 	destruct date() {
 	    if (zname) dtor() ;
 	} ; /* end */
