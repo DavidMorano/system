@@ -37,7 +37,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/ioctl.h>
+#include	<sys/ioctl.h>		/* POSIX® */
 
 
 /* missing UNIX® signals */
