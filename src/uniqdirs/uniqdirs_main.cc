@@ -70,7 +70,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
 	vecstr		stores ;
 	DIRDB		dirs ;
@@ -86,8 +86,8 @@ struct locinfo {
 
 static int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
 static int	procout(PROGINFO *,cchar *) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
@@ -172,7 +172,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
+	bits		pargs ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -744,7 +744,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -769,7 +769,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -888,7 +888,7 @@ static int procout(PROGINFO *pip,cchar *ofn)
 	    DIRDB_ENT	*ep ;
 
 	    if ((rs = dirdb_curbegin(dirp,&cur)) >= 0) {
-	        while (dirdb_enum(dirp,&cur,&ep) >= 0) {
+	        while (dirdb_curenum(dirp,&cur,&ep) >= 0) {
 	            if (ep != NULL) {
 	                c += 1 ;
 	                rs = bprintln(ofp,ep->name,-1) ;
