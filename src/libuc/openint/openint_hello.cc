@@ -68,6 +68,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<baops.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<ids.h>			/* LIBUC */
 #include	<keyopt.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
@@ -75,7 +76,6 @@
 #include	<sbuf.h>		/* LIBUC */
 #include	<buffer.h>		/* LIBUC */
 #include	<paramfile.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<logfile.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBU */
 #include	<exitcodes.h>		/* LIBU */
