@@ -45,10 +45,10 @@ OBJ1= ucftruncate.o ucfminmod.o
 OBJ2= ucfstat.o ucdescmanip.o
 OBJ3= ucnonblock.o ucndelay.o ucfsync.o
 
-OBJ4= ucttyname.o ucsetappend.o
+OBJ4= ucttyname.o ucisatty.o
 OBJ5= ucclose.o
 OBJ6= ucpeek.o ucfpassfd.o
-OBJ7= ucfattach.o
+OBJ7= ucfattach.o ucsetappend.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
@@ -166,5 +166,6 @@ ucpeek.o:		ucpeek.cc		ucpeek.h		$(INCS)
 ucttyname.o:		ucttyname.cc		ucttyname.h		$(INCS)
 ucsetappend.o:		ucsetappend.cc		ucsetappend.h		$(INCS)
 ucfpassfd.o:		ucfpassfd.cc		ucfpassfd.h		$(INCS)
+ucisatty.o:		ucisatty.cc		ucisatty.h		$(INCS)
 
 
