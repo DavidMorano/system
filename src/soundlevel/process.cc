@@ -34,7 +34,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 
 #include	<bfile.h>
 #include	<baops.h>
