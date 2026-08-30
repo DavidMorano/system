@@ -6,6 +6,8 @@
 /* miscellaneous system information retrieval functions */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
+#define	CF_OPTIMIZE	0		/* try to optimize */
 
 /* revision history:
 
@@ -96,7 +98,7 @@
 	inspired piece of crap (|ftime(3c)|) should be eliminated
 	from all code as soon as time permits.
 
-	A 'timeb' structure looks like:
+	A |timeb| structure looks like:
 
 	struct timeb {
 		time_t	time ;		// time, seconds since the epoch
@@ -137,6 +139,7 @@
 #include	<ucsysconf.h>		/* LIBUC */
 #include	<tmtime.hh>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"ucsysmisc.h"
 
@@ -195,6 +198,13 @@ import libutil ;			/* |memclear(3u)| */
 #define	_SC_PHYS_PAGES	-1
 #endif
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	1		/* debugging */
+#endif
+#ifndef	CF_OPTIMIZE
+#define	CF_OPTIMIZE	0		/* try to optimize */
+#endif
+
 
 /* local namespaces */
 
@@ -203,10 +213,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_gettimeofday(TIMEVAL *,void *) noex ;
-} /* end extern (C) */
 
 
 /* external variables */
@@ -230,6 +236,8 @@ constexpr bool		f_clk		= F_CLK ;
 constexpr bool		f_sctck		= F_SCTCK ;
 constexpr bool		f_pagesavail	= F_PAGESAVAIL ;
 constexpr bool		f_pagesall	= F_PAGESALL ;
+cbool			f_debug		= CF_DEBUG ;
+cbool			f_optimize	= CF_OPTIMIZE ;
 
 
 /* exported variables */
@@ -267,7 +275,7 @@ int uc_nprocessors(int w) noex {
 	    } else if (rs == SR_INVALID) {
 	        rs = SR_NOTSUP ;
 	    }
-	}
+	} /* end if (ok) */
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (uc_nprocessors) */
 
@@ -323,7 +331,7 @@ int uc_syspages(int w) noex {
 	    } else if (rs == SR_INVALID) {
 		rs = SR_NOTSUP ;
 	    }
-	} /* end if */
+	} /* end if (ok) */
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (uc_syspages) */
 
@@ -334,14 +342,17 @@ int uc_pagesize() noex {
 
 int uc_ftime(TIMEB *tbp) noex {
 	int		rs = SR_FAULT ;
+	DPRINTF("ent\n") ;
 	if (tbp) ylikely {
-	    if constexpr(f_darwin) {
-		ftime(tbp) ;
-		rs = SR_OK ;
+	    if (syshas.timezone && f_optimize) {
+		DPRINTF("optimied\n") ;
+		rs = libu::uftime(tbp) ;
 	    } else {
+		DPRINTF("local\n") ;
 		rs = local_ftime(tbp) ;
 	    } /* end if (syshas.ftime) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (uc_ftime) */
 
@@ -350,10 +361,11 @@ int uc_ftime(TIMEB *tbp) noex {
 
 namespace libuc {
     ucpagesizer::operator int () noex {
+	cnullptr	np{} ;
     	int		rs ;
 	if ((rs = pagesz) == 0) ylikely {
 	    cint	cmd = _SC_PAGESIZE ;
-	    if ((rs = uc_sysconfval(cmd,nullptr)) >= 0) ylikely {
+	    if ((rs = uc_sysconfval(cmd,np)) >= 0) ylikely {
 		pagesz = rs ;
 	    }
 	} /* end if (pagesz) */
@@ -368,19 +380,22 @@ namespace libuc {
 } /* end namespace (libuc) */
 
 local sysret_t local_ftime(TIMEB *tbp) noex {
-    	cnullptr	np{} ;
     	int		rs ;
         memclear(tbp) ;
-        if (TIMEVAL tv ; (rs = uc_gettimeofday(&tv,np)) >= 0) ylikely {
-            custime     t = tbp->time ;
-            tbp->time = tv.tv_sec ;
-            tbp->millitm = ushortconv(tv.tv_usec / 1000) ;
-            if (tmtime tmt ; (rs = tmt.timelocal(t)) >= 0) {
-                tbp->timezone = shortconv(tmt.gmtoff / 60) ;
-                tbp->dstflag = shortconv(tmt.isdst) ;
-                rs = (tmt.isdst > 0) ;
-            } /* end if (tmtime_timelocal) */
-        } /* end if (uc_gettimeofday) */
+	TIMEZONE tz ;
+	DPRINTF("ent\n") ;
+        if (TIMEVAL tv ; (rs = libu::ugettimeofday(&tv,&tz)) >= 0) ylikely {
+            tbp->time		= tv.tv_sec ;
+            tbp->millitm	= ushortconv(tv.tv_usec / 1000) ;
+	    DPRINTF("mid rs=%d\n",rs) ;
+	    if ((rs = u_timezone(&tz)) >= 0) {
+	        DPRINTF("u_timezone() rs=%d\n",rs) ;
+                tbp->timezone	= shortconv(tz.tz_minuteswest) ;
+                tbp->dstflag	= shortconv(tz.tz_dsttime) ;
+	    } /* end if (u_timezone) */
+	    DPRINTF("out rs=%d\n",rs) ;
+        } /* end if (libu::ugettimeofday) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (local_ftime) */
 
