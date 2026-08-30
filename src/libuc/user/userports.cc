@@ -51,6 +51,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<getax.h>		/* LIBUC */
@@ -59,7 +60,6 @@
 #include	<filemap.h>		/* LIBUC */
 #include	<fieldterminit.hh>	/* LIBUC */
 #include	<field.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<strdcpyx.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
