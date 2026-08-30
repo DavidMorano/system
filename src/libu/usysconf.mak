@@ -158,15 +158,18 @@ usysconf0.o:		usysconf.ccm				$(INCS)
 usysconf1.o:		usysconf1.cc usysconf0.o $(DEPS)	$(INCS)
 	$(COMPILE.cc) $<
 
+# module implementation
 usysconf2.o:		usysconf2.cc usysconf0.o $(DEPS)	$(INCS)
 	$(COMPILE.cc) $<
 
 usysconfcheck.o:	usysconfcheck0.o usysconfcheck1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+# module primary
 usysconfcheck0.o:	usysconfcheck.ccm usysconfcheck.hh	$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
+# module implementation
 usysconfcheck1.o:	usysconfcheck1.cc usysconfcheck0.o	$(INCS)
 	$(COMPILE.cc) $<
 
