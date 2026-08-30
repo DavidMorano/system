@@ -55,12 +55,12 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<getusername.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<sockaddress.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
