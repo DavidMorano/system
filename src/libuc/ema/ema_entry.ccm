@@ -34,13 +34,12 @@ module ;
 #include	<cstdlib>		/* CSTD */
 #include	<functional>		/* C++STD |mem_fn(3c++)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
-#include	<usysrets.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC |uclibmem(3uc)| */
 #include	<ema.h>			/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINT(3u)| */
+
 
 #include	"ema.h"
 
@@ -203,20 +202,20 @@ static int entry_debugprint(ema_ent *ep,cchar *s) noex {
 	if (ep) {
 	    rs = SR_OK ;
 	    if (s != nullptr) {
-	        DEBUGPRINTF("entry_debugprint: s=%s\n",s) ;
+	        DPRINTF("entry_debugprint: s=%s\n",s) ;
 	    }
-	    DEBUGPRINTF("entry_debugprint: type=%u\n",ep->type) ;
+	    DPRINTF("entry_debugprint: type=%u\n",ep->type) ;
 	    if (ep->op)
-	        DEBUGPRINTF("entry_debugprint: O %u %r\n",
+	        DPRINTF("entry_debugprint: O %u %r\n",
 	            ep->ol,ep->op,ep->ol) ;
 	    if (ep->ap)
-	        DEBUGPRINTF("entry_debugprint: A %u %r\n",
+	        DPRINTF("entry_debugprint: A %u %r\n",
 	            ep->al,ep->ap,ep->al) ;
 	    if (ep->rp)
-	        DEBUGPRINTF("entry_debugprint: R %u %r\n",
+	        DPRINTF("entry_debugprint: R %u %r\n",
 	            ep->rl,ep->rp,ep->rl) ;
 	    if (ep->cp)
-	        DEBUGPRINTF("entry_debugprint: C %u %r\n",
+	        DPRINTF("entry_debugprint: C %u %r\n",
 	            ep->cl,ep->cp,ep->cl) ;
 	} /* end if (non-null) */
 	return rs ;
