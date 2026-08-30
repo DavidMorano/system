@@ -34,7 +34,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<baops.h>		/* LIBUC */
+#include	<baops.h>		/* LIBU */
 #include	<field.h>		/* LIBUC */
 #include	<fieldterms.h>		/* LIBUC */
 #include	<ascii.h>		/* LIBU */
