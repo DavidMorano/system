@@ -175,7 +175,6 @@ int retriever::divine() noex {
         try {
 	    cauto tzp = std::chrono::current_zone() ; // may throw
             cauto now = std::chrono::system_clock::now() ;
-            const std::chrono::zoned_time cur_time(tzp,now) ;
 	    {
 	        using namespace std::chrono ;
 	        cauto info = tzp->get_info(now) ;
@@ -190,8 +189,8 @@ int retriever::divine() noex {
 		        cauto rsav = s_sav.count() ;
 			{
 			    cint   al = conv<int>(abbrlen) ;
-			    int woff = (neg conv<int>(roff / 60)) ;
-			    int wsav = (conv<int>(rsav) / 60) ;
+			    cint woff = (neg conv<int>(roff / 60)) ;
+			    cint wsav = (conv<int>(rsav) / 60) ;
 			    tz.tz_minuteswest	= (woff + wsav) ;
 			    tz.tz_dsttime	= (rsav != 0)  ;
 			    rs = tzload(ap,al) ;
