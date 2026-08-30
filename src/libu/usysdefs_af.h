@@ -37,9 +37,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netdb.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/socket.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
 
 
 enum missingafs {
