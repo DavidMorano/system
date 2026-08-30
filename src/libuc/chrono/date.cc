@@ -160,11 +160,11 @@ int date_copy(date *op,date *d2p) noex {
 	return rs ;
 } /* end subroutine (date_copy) */
 
-int date_gettime(date *op,time_t *tp) noex {
+int date_gettime(date *op,time_t *timep) noex {
 	int		rs = SR_FAULT ;
-	if (op && tp) ylikely {
+	if (op && timep) ylikely {
 	    rs = SR_OK ;
-	    *tp = op->time ;
+	    *timep = op->time ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (date_gettime) */
