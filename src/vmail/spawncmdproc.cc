@@ -58,28 +58,27 @@
 
 /* external subroutines */
 
-extern int	snsdd(char *,int,const char *,uint) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	permid(IDS *,ustat *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	bufvprintf(char *,int,const char *,va_list) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	findfilepath(const char *,char *,const char *,int) ;
+extern int	snsdd(char *,int,cchar *,uint) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2w(char *,cchar *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	bufvprintf(char *,int,cchar *,va_list) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	findfilepath(cchar *,char *,cchar *,int) ;
 extern int	getpwd(char *,int) ;
 
 
@@ -88,7 +87,7 @@ extern int	getpwd(char *,int) ;
 
 /* forward references */
 
-static int	mkcmdfname(char *,const char *,const char *) ;
+static int	mkcmdfname(char *,cchar *,cchar *) ;
 
 
 /* exported subroutines */
@@ -99,7 +98,7 @@ int spawncmdproc(SPAWNPROC *psp,cchar *shell,cchar *cmd)
 	const int	am = (R_OK|X_OK) ;
 	int		rs ;
 	int		pid = 0 ;
-	const char	*shprog = NULL ;
+	cchar	*shprog = NULL ;
 	char		shbuf[MAXPATHLEN + 1] ;
 
 	if (psp == NULL) return SR_FAULT ;
@@ -188,7 +187,7 @@ static int mkcmdfname(char *cmdfname,cchar *shprog,cchar *cmd)
 {
 	int		rs ;
 	int		rs1 ;
-	const char	*tmpdname = getenv(VARTMPDNAME) ;
+	cchar	*tmpdname = getenv(VARTMPDNAME) ;
 	char		inname[MAXPATHLEN + 1] ;
 
 	if (tmpdname == NULL) tmpdname = TMPDNAME ;
