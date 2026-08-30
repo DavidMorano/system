@@ -42,7 +42,7 @@
 	created when run in "daemon" mode.
 
 	Synopsis:
-	$ mailnew [-u <user>]
+	$ mbproc [-u <user>]
 
 *******************************************************************************/
 
@@ -58,13 +58,13 @@
 #include	<shell.h>
 #endif
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<utime.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<utime.h>		/* POSIX® */
 #include	<ctime>			/* CSTD */
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
@@ -73,29 +73,29 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<bits.h>
-#include	<keyopt.h>
-#include	<paramopt.h>
-#include	<field.h>
-#include	<vecstr.h>
-#include	<vecpstr.h>
-#include	<vechand.h>
-#include	<userinfo.h>
-#include	<paramfile.h>
-#include	<expcook.h>
-#include	<logfile.h>
-#include	<storebuf.h>
-#include	<mailbox.h>
-#include	<mailmsghdrs.h>
-#include	<mbcache.h>
-#include	<bfile.h>
-#include	<tmtime.hh>
-#include	<strw.h>		/* |strwset(3uc)| */
-#include	<strn.h>
-#include	<char.h>
+#include	<bits.h>		/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<paramopt.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecpstr.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<mailbox.h>		/* LIBUC */
+#include	<mailmsghdrs.h>		/* LIBUC */
+#include	<mbcache.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<strw.h>		/* LIBUC |strwset(3uc)| */
+#include	<strn.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
 #include	<mapex.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG */
+#include	<bfile.h>		/* LIBB */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -172,13 +172,13 @@ struct locinfo_flags {
 	uint		sortrev:1 ;
 	uint		nshow:1 ;
 	uint		clen:1 ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
 	proginfo	*pip ;
 	LOCINFO_FL	have, f, finval, changed ;
 	LOCINFO_FL	open ;
-	VECSTR		stores ;
+	vecstr		stores ;
 	VECPSTR		mbfnames ;
 	STRPACK		midstore ;
 	HDB		midtrack ;
@@ -194,7 +194,7 @@ struct locinfo {
 	int		nshow ;
 	int		pagesize ;
 	int		serial ;		/* serial number */
-} ;
+} ; /* end struct */
 
 struct config {
 	proginfo	*pip ;
@@ -204,7 +204,7 @@ struct config {
 	uint		magic ;
 	uint		f_p:1 ;
 	uint		f_cooks:1 ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -340,7 +340,7 @@ constexpr MAPEX		mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
 enum akonames {
 	akoname_md,
@@ -1410,13 +1410,11 @@ local int procourconf_end(PI *pip)
 	}
 
 	return rs ;
-}
-/* end subroutine (procourconf_end) */
+} /* end subroutine (procourconf_end) */
 
-
-local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
-{
+local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn) noex {
 	SHIO		ofile, *ofp = &ofile ;
+	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1440,7 +1438,7 @@ local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 	        for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
 	            f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
+	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != np)) ;
 	            if (f) {
 	                cp = aip->argv[ai] ;
 			if (cp[0] != '\0') {
@@ -1522,14 +1520,10 @@ local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 #endif
 
 	return rs ;
-}
-/* end subroutine (procargs) */
+} /* end subroutine (procargs) */
 
-
-local int procmailbox(PI *pip,SHIO *ofp,cchar *mbp,int mbl)
-{
+local int procmailbox(PI *pip,SHIO *ofp,cchar *mbp,int mbl) noex {
 	LOCINFO		*lip = pip->lip ;
-	MAILBOX		mb ;
 	int		rs ;
 	int		rs1 ;
 	int		mbopts = MAILBOX_ORDONLY ;
@@ -1549,6 +1543,7 @@ local int procmailbox(PI *pip,SHIO *ofp,cchar *mbp,int mbl)
 
 	if (! lip->fl.clen) mbopts |= MAILBOX_ONOCLEN ;
 
+	mailbox		mb ;
 	if ((rs = mailbox_open(&mb,mbfname,mbopts)) >= 0) {
 	    MBCACHE	mc ;
 	    if ((rs = mbcache_start(&mc,mbfname,0,&mb)) >= 0) {
@@ -1595,9 +1590,7 @@ local int procmailbox(PI *pip,SHIO *ofp,cchar *mbp,int mbl)
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procmailbox) */
-
+} /* end subroutine (procmailbox) */
 
 local int procmailmsg(pip,ofp,mcp,mi,mfd,mbuf)
 proginfo	*pip ;
@@ -1650,9 +1643,7 @@ char		*mbuf ;
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procmailmsg) */
-
+} /* end subroutine (procmailmsg) */
 
 local int procout(pip,ofp,mfd,mbuf,msp,mo,ml)
 proginfo	*pip ;
@@ -1685,7 +1676,7 @@ int		ml ;
 	        const off_t	bo = msp->boff ;
 	        cint	hl = msp->hlen ;
 	        cint	bl = msp->blen ;
-	        int		wl = ((ho+hl)-mo) ;
+	        int	wl = ((ho+hl)-mo) ;
 	        if ((rs = procouter(pip,mfd,ofp,mbuf,mo,wl)) >= 0) {
 	            wlen += rs ;
 	            if ((rs = procouthdrs(pip,ofp,msp)) >= 0) {
@@ -1714,9 +1705,7 @@ int		ml ;
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procout) */
-
+} /* end subroutine (procout) */
 
 local int procouter(pip,mfd,ofp,mbuf,mo,ml)
 proginfo	*pip ;
@@ -1749,9 +1738,7 @@ int		ml ;
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procouter) */
-
+} /* end subroutine (procouter) */
 
 local int procouthdrs(pip,ofp,msp)
 proginfo	*pip ;
@@ -1779,9 +1766,7 @@ MBCACHE_SCAN	*msp ;
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procouthdrs) */
-
+} /* end subroutine (procouthdrs) */
 
 local int procouthdrstatus(pip,ofp,msp)
 proginfo	*pip ;
@@ -1799,9 +1784,7 @@ MBCACHE_SCAN	*msp ;
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procouthdrstatus) */
-
+} /* end subroutine (procouthdrstatus) */
 
 local int procouthdrmid(pip,ofp,msp)
 proginfo	*pip ;
@@ -1826,9 +1809,7 @@ MBCACHE_SCAN	*msp ;
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procouthdrmid) */
-
+} /* end subroutine (procouthdrmid) */
 
 local int procbase(pip,mfd,mbuf,msp,mo,ml)
 proginfo	*pip ;
@@ -1897,9 +1878,7 @@ int		ml ;
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procbase) */
-
+} /* end subroutine (procbase) */
 
 local int procbaser(pip,mfd,yfp,mbuf,mo,ml)
 proginfo	*pip ;
@@ -1932,9 +1911,7 @@ int		ml ;
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procbaser) */
-
+} /* end subroutine (procbaser) */
 
 local int procbasehdrs(pip,yfp,msp)
 proginfo	*pip ;
@@ -1962,9 +1939,7 @@ MBCACHE_SCAN	*msp ;
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procbasehdrs) */
-
+} /* end subroutine (procbasehdrs) */
 
 local int procbasehdrstatus(pip,yfp,msp)
 proginfo	*pip ;
@@ -1982,9 +1957,7 @@ MBCACHE_SCAN	*msp ;
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procbasehdrstatus) */
-
+} /* end subroutine (procbasehdrstatus) */
 
 local int procbasehdrmid(pip,yfp,msp)
 proginfo	*pip ;
@@ -2009,12 +1982,9 @@ MBCACHE_SCAN	*msp ;
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procbasehdrmid) */
+} /* end subroutine (procbasehdrmid) */
 
-
-local int locinfo_start(LOCINFO *lip,PI *pip)
-{
+local int locinfo_start(LOCINFO *lip,PI *pip) noex {
 	cint	n = 1000 ;
 	int		rs ;
 
@@ -2052,12 +2022,9 @@ local int locinfo_start(LOCINFO *lip,PI *pip)
 	} /* end if (vecstr-stores) */
 
 	return rs ;
-}
-/* end subroutine (locinfo_start) */
+} /* end subroutine (locinfo_start) */
 
-
-local int locinfo_finish(LOCINFO *lip)
-{
+local int locinfo_finish(LOCINFO *lip) noex {
 	proginfo	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2121,12 +2088,9 @@ local int locinfo_finish(LOCINFO *lip)
 	}
 
 	return rs ;
-}
-/* end subroutine (locinfo_finish) */
+} /* end subroutine (locinfo_finish) */
 
-
-local int locinfo_yearfins(LOCINFO *lip)
-{
+local int locinfo_yearfins(LOCINFO *lip) noex {
 	proginfo	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2163,13 +2127,10 @@ local int locinfo_yearfins(LOCINFO *lip)
 
 	} /* end if (initialized) */
 	return rs ;
-}
-/* end subroutine (locinfo_yearfins) */
+} /* end subroutine (locinfo_yearfins) */
 
-
-local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
-{
-	VECSTR		*slp ;
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -2622,14 +2583,11 @@ local int config_finish(CONFIG *csp)
 #endif
 
 	return rs ;
-}
-/* end subroutine (config_finish) */
+} /* end subroutine (config_finish) */
 
-
-local int config_findfile(CONFIG *csp,char tbuf[],cchar cfname[])
-{
+local int config_findfile(CONFIG *csp,char *tbuf,cchar *cfname) noex {
 	proginfo	*pip = csp->pip ;
-	VECSTR		sv ;
+	vecstr		sv ;
 	int		rs ;
 	int		pl = 0 ;
 
@@ -2650,12 +2608,9 @@ local int config_findfile(CONFIG *csp,char tbuf[],cchar cfname[])
 	} /* end if (finding file) */
 
 	return (rs >= 0) ? pl : rs ;
-}
-/* end subroutine (config_findfile) */
+} /* end subroutine (config_findfile) */
 
-
-local int config_cookbegin(CONFIG *csp)
-{
+local int config_cookbegin(CONFIG *csp) noex {
 	proginfo	*pip = csp->pip ;
 	int		rs ;
 
@@ -2716,12 +2671,9 @@ local int config_cookbegin(CONFIG *csp)
 	} /* end if (expcook_start) */
 
 	return rs ;
-}
-/* end subroutine (config_cookbegin) */
+} /* end subroutine (config_cookbegin) */
 
-
-local int config_cookend(CONFIG *csp)
-{
+local int config_cookend(CONFIG *csp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -2732,13 +2684,10 @@ local int config_cookend(CONFIG *csp)
 	}
 
 	return rs ;
-}
-/* end subroutine (config_cookend) */
-
+} /* end subroutine (config_cookend) */
 
 #ifdef	COMMENT
-local int config_check(CONFIG *csp)
-{
+local int config_check(CONFIG *csp) noex {
 	proginfo	*pip = csp->pip ;
 	int		rs = SR_OK ;
 
@@ -2752,13 +2701,10 @@ local int config_check(CONFIG *csp)
 	}
 
 	return rs ;
-}
-/* end subroutine (config_check) */
+} /* end subroutine (config_check) */
 #endif /* COMMENT */
 
-
-local int config_read(CONFIG *csp)
-{
+local int config_read(CONFIG *csp) noex {
 	proginfo	*pip = csp->pip ;
 	LOCINFO		*lip ;
 	int		rs = SR_OK ;
@@ -2779,8 +2725,7 @@ local int config_read(CONFIG *csp)
 	}
 
 	return rs ;
-}
-/* end subroutine (config_read) */
+} /* end subroutine (config_read) */
 
 local int config_reader(CONFIG *csp) noex {
 	proginfo	*pip = csp->pip ;
@@ -2893,7 +2838,6 @@ local int config_reader(CONFIG *csp) noex {
 	} /* end for (parameters) */
 
 	return rs ;
-}
-/* end subroutine (config_reader) */
+} /* end subroutine (config_reader) */
 
 
