@@ -95,7 +95,7 @@ int dater_getbbtime(dater *op,cchar *sp,int sl,time_t *tp) noex {
 	                *tp = time_t(ulw) ;
 	            }
 	        } /* end if */
-	    } /* end if */
+	    } /* end if sfshrink) */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (dater_getbbtime) */
