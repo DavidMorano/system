@@ -10,15 +10,30 @@
 
 /* revision history:
 
-	- 2008-10-01, David A­D­ Morano
+	= 1998-02-01, David A­D­ Morano
 	This object module was originally written.
 
-	= 2026-04-28, David A­D­ Morano
+	- 1999-10-01, David A­D­ Morano
 	I modified (this POS) to remove references to |altzone|.
+	The |altzone| external variable is simply not available on
+	some non-SysV systems.  OK, will disclose.  In an attempt
+	to port this code to the MacOS (Apple-Darwin) operating
+	system, I was confronted with the fact that MacOS is not
+	(at all) like the former Sys-V type systems (that is: no
+	|altzone| global variable).  It could be argued that code
+	like this should never have referred to any global variables
+	at all, but Sys-V was messed up in this and many other ways
+	already.  I argue that the MacOS version of the TM(3c)
+	object structure is the proper way to represent these sorts
+	of date-time features.  I modified this code to try to be
+	portable for both Sys-V like systems (those w/ those global
+	variable and without the additional MacOS structure object
+	variables) and for non-Sys-V operating systems that follow
+	the MacOS implementation.
 
 */
 
-/* Copyright © 2008,2026 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,1999 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -50,6 +65,9 @@
 	of GMT.  If the zone-offset is indicated to be eastwards
 	of GMT, the value returned is negative.  In all cases, the
 	value returned is in MINUTES.
+	2. This code is complicated enough (even for me), so there
+	could be bugs in this code that I am not (yet) aware of.
+	Enjoy.
 
 *******************************************************************************/
 
@@ -62,6 +80,7 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU |geustime(3u)| */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucsysmisc.h>		/* LIBUC */
 #include	<uctimeconv.h>		/* LIBUC */
 #include	<ucstrftime.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
@@ -83,10 +102,10 @@ import libutil ;			/* |memclear(3u)| */
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 #ifndef	CF_USEMORE
-#define	CF_USEMORE	1		/* use more field in structure TM */
+#define	CF_USEMORE	1		/* use more fields in structure TM */
 #endif
 
 
@@ -104,8 +123,24 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local structures */
 
+enum adjustments {
+    	adjustment_no,
+	adjustment_yes,
+	adjustment_overlast
+} ; /* end enum (adjustments) */
+
+namespace {
+    struct offer {
+	int		offval ; /* ± minutes west of GMT */
+	bool		finit ;
+	int operator () (intp = nullptr) noex ;
+    } ; /* end struct (offer) */
+} /* end namespace */
+
 
 /* forward references */
+
+local int initer() noex ;
 
 template<typename ... Args>
 local int tmtime_zinit(tmtime *op,Args ... args) noex {
@@ -117,6 +152,11 @@ local int tmtime_zinit(tmtime *op,Args ... args) noex {
 		    op->znbuf = a ;
 		    memclear(a,rs) ;
 		    a[rs] = '\0' ;
+		    rs = initer() ;
+		    if (rs < 0) {
+			lm_free(a) ;
+			op->znbuf = nullptr ;
+		    } /* end if (error) */
 	        } /* end if (memory-acquire) */
 	    } /* end if (NULL zname) */
 	} /* end if (non-null) */
@@ -137,15 +177,19 @@ local int tmtime_zfini(tmtime *op) noex {
 	return rs ;
 } /* end subroutine (tmtime_zfini) */
 
-local int	tmtime_mktimer	(tmtime *,int,time_t *) noex ;
+local void	tm_loadmore	(TM *,con TMTIME *) noex ;
+local int	tm_getoff	(con TM *,intp) noex ;
+
+local int	tmtime_mktimer	(tmtime *,adjustments,mut time_t *) noex ;
 local int	tmtime_moreuse	(tmtime *,con TM *) noex ;
 local int	tmtime_morecalc	(tmtime *,con TM *) noex ;
-local int	getznlen() noex ;
+local int	getznlen	() noex ;
 
 
 /* local variables */
 
 static bufsizevar	znlen		(bufsize_zn) ;
+static offer		gmoff ;
 constexpr int		OneMinute	= 60 ;
 constexpr int		OneHour		= (60 * 60) ;
 constexpr int		MinusOne	= -1 ;
@@ -165,10 +209,10 @@ cbool	f_usemore		= CF_USEMORE ;
 /* exported subroutines */
 
 /* 0=GMT 1=local */
-int tmtime_timex(tmtime *op,bool fz,time_t t) noex {
+int tmtime_timex(tmtime *op,time_t t,bool flocal) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
-	    if (fz) {
+	    if (flocal) {
 	        rs = tmtime_timelocal(op,t) ;
 	    } else {
 	        rs = tmtime_timegm(op,t) ;
@@ -201,7 +245,7 @@ int tmtime_timelocal(tmtime *op,time_t t) noex {
 	    if (t == 0) t = getustime ;
 	    if (TM tmd ; (rs = uc_timelocal(&t,&tmd)) >= 0) ylikely {
 	        rs = tmtime_insert(op,&tmd) ;
-	    }
+	    } /* end if */
 	    if (rs < 0) {
 		op->dtor() ;
 	    } /* end if (error) */
@@ -213,8 +257,8 @@ int tmtime_timelocal(tmtime *op,time_t t) noex {
 int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	int		rs ;
 	if ((rs = tmtime_zinit(op,tmp)) >= 0) ylikely {
-	    TM		tc = *tmp ;
-	    op->gmtoff	= -1 ;
+	    TM		tc = *tmp ; /* copy */
+	    op->gmtoff	= 0 ;
 	    op->sec	= tmp->tm_sec ;
 	    op->min	= tmp->tm_min ;
 	    op->hour	= tmp->tm_hour ;
@@ -256,12 +300,8 @@ int tmtime_extract(tmtime *op,mut TM *tmp) noex {
 	    tmp->tm_yday	= op->yday ;
 	    tmp->tm_isdst	= op->isdst ;
 	    if_constexpr (f_darwin || f_linux) {
-	        tmp->tm_gmtoff = long(op->gmtoff) ;
-	        tmp->tm_zone = op->znbuf ;
-	    } else {
-	        tmp->tm_gmtoff = long(op->gmtoff) ;
-	        tmp->tm_zone = op->znbuf ;
-	    } /* end if_constexpr (f_darwin) */
+		tm_loadmore(tmp,op) ;
+	    } /* end if_constexpr (f_darwin || f_linux) */
 	    if (rs < 0) {
 		op->dtor() ;
 	    } /* end if (error) */
@@ -270,11 +310,11 @@ int tmtime_extract(tmtime *op,mut TM *tmp) noex {
 } /* end subroutine (tmtime_extract) */
 
 int tmtime_mktime(tmtime *op,time_t *tp) noex {
-	return tmtime_mktimer(op,0,tp) ;
+	return tmtime_mktimer(op,adjustment_no,tp) ;
 } /* end subroutine (tmtime_mktime) */
 
 int tmtime_adjtime(tmtime *op,time_t *tp) noex {
-	return tmtime_mktimer(op,1,tp) ;
+	return tmtime_mktimer(op,adjustment_yes,tp) ;
 } /* end subroutine (tmtime_adjtime) */
 
 int tmtime_getzn(tmtime *op,char *rbuf,int rlen) noex {
@@ -300,32 +340,42 @@ int tmtime_loadzn(tmtime *op,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-local int tmtime_mktimer(tmtime *op,int fadj,time_t *tp) noex {
+local int tmtime_mktimer(tmtime *op,adjustments fadj,mut time_t *timep) noex {
 	int		rs ;
+	DPRINTF("ent\n") ;
 	if ((rs = tmtime_zinit(op)) >= 0) ylikely {
 	    time_t	t = 0 ;
+	    DPRINTF("tmtime gmtoff=%d\n",op->gmtoff) ;
 	    if (TM tmd ; (rs = tmtime_extract(op,&tmd)) >= 0) ylikely {
+	        DPRINTF("tm gmtoff=%ld\n",tmd.tm_gmtoff) ;
 	        if ((rs = uc_mktime(&tmd,&t)) >= 0) ylikely {
 	            cint	taroff = op->gmtoff ;
-	            cint 	locoff = intconv(tmd.tm_gmtoff) ;
-	            t += (taroff - locoff) ;
-	            if (fadj) ylikely {
-	                op->sec = tmd.tm_sec ;
-	                op->min = tmd.tm_min ;
-	                op->hour = tmd.tm_hour ;
-	                op->mday = tmd.tm_mday ;
-	                op->mon = tmd.tm_mon ;
-	                op->year = tmd.tm_year ;
-	                op->wday = tmd.tm_wday ;
-	                op->yday = tmd.tm_yday ;
-	                op->isdst = tmd.tm_isdst ;
-	            } /* end if (fadj) */
+	            DPRINTF("tm gmtoff=%ld\n",tmd.tm_gmtoff) ;
+	            if (int locoff ; (rs = tm_getoff(&tmd,&locoff)) >= 0) {
+	                cint tdiff = (taroff - (neg locoff)) ;
+	                DPRINTF("tm taroff=%d\n",taroff) ;
+	                DPRINTF("tm locoff=%d\n",locoff) ;
+	                DPRINTF("time-diff=%d\n",tdiff) ;
+	                t += tdiff ;	/* -> add difference (secs w-of-GMT) */
+	                if (fadj) ylikely {
+	                    op->sec	= tmd.tm_sec ;
+	                    op->min	= tmd.tm_min ;
+	                    op->hour	= tmd.tm_hour ;
+	                    op->mday	= tmd.tm_mday ;
+	                    op->mon	= tmd.tm_mon ;
+	                    op->year	= tmd.tm_year ;
+	                    op->wday	= tmd.tm_wday ;
+	                    op->yday	= tmd.tm_yday ;
+	                    op->isdst	= tmd.tm_isdst ;
+	                } /* end if (fadj) */
+		    } /* end if (tm_getoff) */
 	        } /* end if (uc_mktime) */
 	    } /* end if (ttime_extract) */
-	    if (tp) {
-	        *tp = (rs >= 0) ? t : 0 ;
+	    if (timep) {
+	        *timep = (rs >= 0) ? t : 0 ;
 	    }
 	} /* end if (tmtime_zinit) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (tmtime_mktimer) */
 
@@ -365,8 +415,8 @@ local int tmtime_morecalc(tmtime *op,con TM *tmp) noex {
     	return (rs >= 0) ? zl : rs ;
 } /* end subroutine (tmtime_morecalc) */
 
-int tmtime::timex(bool fz,time_t t) noex {
-	return tmtime_timex(this,fz,t) ;
+int tmtime::timex(time_t t,bool flocal) noex {
+	return tmtime_timex(this,t,flocal) ;
 } /* end method */
 
 int tmtime::timegm(time_t t) noex {
@@ -406,6 +456,56 @@ void tmtime::dtor() noex {
 	    ulogerror("tmtime",rs,"dtor-free") ;
 	}
 } /* end method (tmtime::dtor) */
+
+#if	CF_USEMORE && (F_DARWIN || F_LINUX)
+local void tm_loadmore(TM *tmp,con TMTIME *op) noex {
+	tmp->tm_gmtoff = long(neg op->gmtoff) ;
+	tmp->tm_zone = op->znbuf ;
+} /* end subroutine (tm_loadmore) */
+#else /* CF_USEMODE */
+local void tm_loadmore(TM *tmp,con TMTIME *op) noex {
+    	(void) tmp ;
+	(void) op ;
+} /* end subroutine (tm_loadmore) */
+#endif /* CF_USEMORE && (F_DARWIN || F_LINUX) */
+
+#if	CF_USEMORE && (F_DARWIN || F_LINUX)
+local int tm_getoff(con TM *tmp,intp lp) noex {
+	int		rs = SR_OK ;
+	if (tmp->tm_isdst >= 0) {
+	    cint val = conv<int>(tmp->tm_gmtoff) ;
+	    if (lp) *lp = val ;
+	} else {
+    	    rs = gmoff(lp) ;
+	}
+	return rs ;
+} /* end */
+#else /* CF_USEMODE */
+local int tm_getoff(con TM *,intp lp) noex {
+    	return gmoff(lp) ;
+} /* end */
+#endif /* CF_USEMORE && (F_DARWIN || F_LINUX) */
+
+int offer::operator () (intp lp) noex {
+    	int		rs = SR_OK ;
+	if (finit) {
+	    if (lp) *lp = (neg offval) ;
+	} else {
+	    if (TIMEB tb ; (rs = uc_ftime(&tb)) >= 0) {
+		if (tb.dstflag >= 0) {
+		    cint adj = (tb.dstflag > 0) ? (neg OneHour) : 0 ;
+		    offval = ((tb.timezone * 60) + adj) ; /* ± mins w-of-GMT */
+		} /* end if (have a time-zone) */
+		if (lp) *lp = (neg offval) ; /* ± mins west of GMY */
+		finit = true ;
+	    } /* end if (uc_ftime) */
+	} /* end if (needed) */
+	return rs ;
+} /* end method (offer::operator) */
+
+local int initer() noex {
+    	return gmoff() ;
+} /* end subroutine (initer) */
 
 local int getznlen() noex {
     	int		rs ;
