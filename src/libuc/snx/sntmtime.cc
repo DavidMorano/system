@@ -59,6 +59,7 @@
 	- m		month of year 01-12
 	- M		minute 00-61 (for leap-seconds)
 	- n		insert a new-line (NL) character
+	- O		zone-offset ±HHMM
 	- p		'am' or 'pm'
 	- R		same as '%H:%M'
 	- r		a 12-hour time specification w/ am-pm following
@@ -67,13 +68,13 @@
 	- S		seconds 00-61
 	- u		day of week 1-7
 	- w		day of week 0-6
+	- x		dd mmm yyyy
+	- X		HH:MM:SS
 	- y		year within century 00-99
 	- Y		year 0000-9999
 	- Z		time zone abbreviation
-	- O		zone-offset ±HHMM
+	- z		time zone offset (seconds east of GMT) ±xxxxx
 	- Ð		yyyy-mm-dd
-	- x		dd mmm yyyy
-	- X		HH:MM:SS
 	- :		blinking ':' character
 
 	Usage note:
@@ -113,6 +114,7 @@
 #include	<cstdlib>		/* CSTD |abs(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |ctdec(3u)| */
 #include	<calstrs.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<zoffparts.h>		/* LIBUC */
@@ -126,6 +128,14 @@
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libu::ctdec ;			/* subroutine */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -148,6 +158,7 @@ local int	sbuf_zoff	(sbuf *,tmtime *) noex ;
 local int	sbuf_dated	(sbuf *,tmtime *) noex ;
 local int	sbuf_dater	(sbuf *,tmtime *) noex ;
 local int	sbuf_datex	(sbuf *,tmtime *) noex ;
+local int	sbuf_gmoff	(sbuf *,tmtime *) noex ;
 
 
 /* local variables */
@@ -325,6 +336,9 @@ local int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	            case 'x':
 	                rs = sbuf_datex(ssp,tmp) ;
 	                break ;
+	            case 'z':
+	                rs = sbuf_gmoff(ssp,tmp) ;
+	                break ;
 	            case ':':
 	                rs = sbuf_strw(ssp,blinker,-1) ;
 	                break ;
@@ -462,5 +476,22 @@ local int sbuf_datex(sbuf *ssp,tmtime *tmp) noex {
 	}
 	return rs ;
 } /* end subroutine (sbuf_datex) */
+
+local int sbuf_gmoff(sbuf *ssp,tmtime *tmp) noex {
+    	cint		v = (neg tmp->gmtoff) ;
+    	cint		dlen = DECBUFLEN ;
+    	int		rs ;
+	char		dbuf[DECBUFLEN + 1] ;
+	if ((rs = ctdec(dbuf,dlen,v)) >= 0) {
+	    cint dl = rs ;
+	    if (v >= 0) {
+		rs = ssp->chr('+') ;
+	    } /* end if (was positive) */
+	    if (rs >= 0) {
+		rs = ssp->strw(dbuf,dl) ;
+	    } /* end */
+	} /* end if (ctdec) */
+	return rs ;
+} /* end subroutine (sbuf_gmoff) */
 
 
