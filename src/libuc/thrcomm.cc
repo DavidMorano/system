@@ -73,7 +73,7 @@ local int thrcomm_ctor(thrcomm *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->mxp ;
 		    op->mxp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
@@ -84,11 +84,11 @@ local int thrcomm_dtor(thrcomm *op) noex {
 	if (op->cvp) ylikely {
 	    delete op->cvp ;
 	    op->cvp = nullptr ;
-	}
+	} /* end if (delete-ptc) */
 	if (op->mxp) ylikely {
 	    delete op->mxp ;
 	    op->mxp = nullptr ;
-	}
+	} /* end if (delete-ptm) */
 	return rs ;
 } /* end subroutine (thrcomm_dtor) */
 
@@ -129,7 +129,7 @@ int thrcomm_start(thrcomm *op,int f_shared) noex {
 	    } /* end if (PTM created) */
 	    if (rs < 0) {
 		thrcomm_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (thrcomm_start) */
@@ -322,7 +322,7 @@ local int thrcomm_ptminit(thrcomm *op,int f_shared) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_ptm) {
 		mxp->destroy() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ptma) */
 	return rs ;
 } /* end subroutine (thrcomm_ptminit) */
@@ -347,7 +347,7 @@ local int thrcomm_ptcinit(thrcomm *op,int f_shared) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_ptc) {
 		cnp->destroy() ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ptca) */
 	return rs ;
 } /* end subroutine (thrcomm_ptcinit) */
