@@ -40,18 +40,18 @@ struct date_co {
 	void operator () (date *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (date_co) */
 struct date : date_head {
 	date_co	finish ;
 	date() noex {
 	    finish	(this,datemem_finish) ;
 	    zname = nullptr ;
-	} ;
+	} ; /* end */
 	date(const date &) = delete ;
 	date &operator = (const date &) = delete ;
 	int start	(time_t,int,int,cchar *,int) noex ;
@@ -64,7 +64,7 @@ struct date : date_head {
 	void dtor() noex ;
 	destruct date() {
 	    if (zname) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (date) */
 #else	/* __cplusplus */
 typedef DATE		date ;
