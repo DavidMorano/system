@@ -1,4 +1,5 @@
 /* varbabies SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* KSH variable implmentation */
@@ -20,10 +21,15 @@
 
 /*******************************************************************************
 
+  	Object:
+	varbabies
+
+	Description:
 	These subroutines implement a KSH variable.
 
 *******************************************************************************/
 
+#include	<envstandards.h>	/* MUST be first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -35,7 +41,6 @@
 #include	<shell.h>
 #endif
 
-#include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -90,7 +95,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, final ;
+	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	init, open ;
 	vecstr		stores ;
 	int		to ;		/* time-out */
@@ -122,7 +127,7 @@ static Namval_t *typef(Namval_t *,Namfun_t *) ;
 
 KSHVAR	v_babies = {
 	"babies",
-	NULL
+	nullptr
 } ;
 
 
