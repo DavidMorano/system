@@ -41,15 +41,15 @@ LIBS +=
 
 
 OBJ0= ucsysmisc_prime.o
-OBJ1=
-OBJ2=
+OBJ1= ucsyncer.o
+OBJ2= ucmincore.o
 OBJ3=
 OBJ4=
 OBJ5=
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o 
+OBJA= obj0.o obj1.o obj2.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o 
@@ -162,5 +162,7 @@ obj.o:			$(OBJ)
 
 
 ucsysmisc_prime.o:	ucsysmisc_prime.cc			$(INCS)
+ucsyncer.o:		ucsyncer.cc				$(INCS)
+ucmincore.o:		ucmincore.cc	ucmincore.h		$(INCS)
 
 
