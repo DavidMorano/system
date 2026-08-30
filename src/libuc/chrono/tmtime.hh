@@ -50,7 +50,7 @@
 struct tmtime {
     	static cint	znlen ;
 	static cint	baseyear ;
-	char		*znbuf{} ;	/* time-zone name abbreviation */
+	charp		znbuf ;		/* time-zone name abbreviation */
 	int		sec ;		/* 0-61 (for up to two leap-seconds) */
 	int		min ;		/* 0-59 */
 	int		hour ;		/* 0-23 */
@@ -64,14 +64,15 @@ struct tmtime {
 	tmtime() noex {
 	    gmtoff = -1 ;
 	    isdst = -1 ;
+	    znbuf = nullptr ;
 	} ; /* end ctor */
 	tmtime &operator = (const tmtime &) = delete ;
 	tmtime(const tmtime &) = delete ;
-	int insert	(CTM *) noex ;
-	int timex	(bool,time_t) noex ;
+	int insert	(con TM *) noex ;
+	int timex	(time_t,bool) noex ;
 	int timegm	(time_t) noex ;
 	int timelocal	(time_t) noex ;
-	int extract	(TM *) noex ;
+	int extract	(mut TM *) noex ;
 	int mktime	(time_t *) noex ;
 	int adjtime	(time_t *) noex ;
 	int getzn	(char *,int) noex ;
@@ -79,13 +80,13 @@ struct tmtime {
 	void dtor	() noex ;
 	destruct tmtime() {
 	    if (znbuf) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (tmtime) */
 
 EXTERNC_begin
 
 extern int tmtime_insert	(tmtime *,CTM *) noex ;
-extern int tmtime_timex		(tmtime *,bool,time_t) noex ;
+extern int tmtime_timex		(tmtime *,time_t,bool) noex ;
 extern int tmtime_timegm	(tmtime *,time_t) noex ;
 extern int tmtime_timelocal	(tmtime *,time_t) noex ;
 extern int tmtime_extract	(tmtime *,mut TM *) noex ;
@@ -102,10 +103,10 @@ extern int tmtime_gettime	(tmtime *,cchar *,time_t *) noex ;
 
 local inline int tmtime_gmtime(tmtime *tmp,time_t t) noex {
 	return tmtime_timegm(tmp,t) ;
-}
+} /* end */
 local inline int tmtime_localtime(tmtime *tmp,time_t t) noex {
 	return tmtime_timelocal(tmp,t) ;
-}
+} /* end */
 
 EXTERNC_end
 
