@@ -88,12 +88,12 @@ local inline int ciq_ctor(ciq *op,Args ... args) noex {
 		    if (rs < 0) {
 		        delete op->fifop ;
 		        op->fifop = nullptr ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (new-pq) */
 		if (rs < 0) {
 		    delete op->mxp ;
 		    op->mxp = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
@@ -106,15 +106,15 @@ local inline int ciq_dtor(ciq *op) noex {
 	    if (op->freep) ylikely {
 		delete op->freep ;
 		op->freep = nullptr ;
-	    }
+	    } /* end if (delete-ptm) */
 	    if (op->fifop) ylikely {
 		delete op->fifop ;
 		op->fifop = nullptr ;
-	    }
+	    } /* end if (delete-pq) */
 	    if (op->mxp) ylikely {
 		delete op->mxp ;
 		op->mxp = nullptr ;
-	    }
+	    } /* end if (delete-pq) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ciq_dtor) */
@@ -149,18 +149,18 @@ int ciq_start(ciq *op) noex {
 		if ((rs = pq_start(op->fifop)) >= 0) ylikely {
 	            if ((rs = pq_start(op->freep)) >= 0) ylikely {
 		        op->magval = CIQ_MAGIC ;
-		    }
+		    } /* end if (ready) */
 		    if (rs < 0) {
 		        pq_finish(op->fifop) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (pq_start) */
 	        if (rs < 0) {
 		    mxp->destroy() ;
-		}
+		} /* end if (error) */
 	    } /* end if (ptm_create) */
 	    if (rs < 0) {
 		ciq_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ciq_ctor) */
 	return rs ;
 } /* end subroutine (ciq_start) */
@@ -234,7 +234,7 @@ int ciq_rem(ciq *op,void *vrp) noex {
 		    rs1 = pq_ins(op->freep,pep) ;
 		    if (rs1 < 0) {
 		        libmem.free(pep) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (pq_rem) */
 	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
@@ -282,7 +282,7 @@ int ciq_remtail(ciq *op,void *vrp) noex {
 		    rs = pq_ins(op->freep,pep) ;
 		    if (rs < 0) {
 		        libmem.free(pep) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (pq_remtail) */
 	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
@@ -304,7 +304,7 @@ int ciq_rement(ciq *op,void *ep) noex {
 		        rs = pq_ins(op->freep,pep) ;
 		        if (rs < 0) {
 			    libmem.free(pep) ;
-			}
+			} /* end if (error) */
 	            } /* end if (pq_remtail) */
 	        } else if (rs == 0) {
 		    rs = SR_NOTFOUND ;
@@ -384,7 +384,7 @@ local int pq_finishup(pq *qp) noex {
 	    if (pq_ent *pep ; (rs1 = pq_rem(qp,&pep)) >= 0) {
 	        rs1 = libmem.free(pep) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if (memory-release) */
 	    if ((rs >= 0) && (rs1 != SR_EMPTY)) rs = rs1 ;
 	}
 	{
