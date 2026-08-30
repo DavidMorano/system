@@ -60,7 +60,7 @@
 #include	<ucdesc.h>		/* LIBUC */
 #include	<bufprintf.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<libdebug.h>		/* LIBDEBUG */
+#include	<dprint.hh>		/* LIBU |SPRINTF(3u)| */
 
 #include	"ucdescsock.h"
 
@@ -124,10 +124,7 @@ int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
 	char	ebuf[EBUFLEN + 1] ;
 #endif
 
-#if	CF_DEBUG
-	DEBUGPRINTF("uc_recve: ent rlen=%u to=%d opts=%08x\n",
-		rlen,to,opts) ;
-#endif
+	DPRINTF("ent rlen=%u to=%d opts=%08x\n", rlen,to,opts) ;
 
 	if (rlen <= 0)
 	    return SR_OK ;
@@ -150,28 +147,19 @@ int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
 
 	while ((rs >= 0) && (to >= 0)) {
 
-#if	CF_DEBUG
-	    DEBUGPRINTF("uc_recve: u_poll() pollint=%d to=%d\n",
-	        pollint,to) ;
-#endif
+	    DPRINTF("u_poll() pollint=%d to=%d\n", pollint,to) ;
 
 	    if ((rs = u_poll(fds,1,(pollint * POLL_INTMULT))) > 0) {
-
 #if	CF_DEBUG
-	        DEBUGPRINTF("uc_recve: events %s\n",
-	            d_reventstr(fds[0].revents,ebuf,EBUFLEN)) ;
-
-	        DEBUGPRINTF("uc_recve: about to 'read'\n") ;
+	        DPRINTF("events %s\n",
+		    d_reventstr(fds[0].revents,ebuf,EBUFLEN)) ;
 #endif
+	        DPRINTF("about to 'read'\n") ;
 
 	        rs = u_recv(fd,rbuf,rlen,mflags) ;
 	        tlen = rs ;
 
-#if	CF_DEBUG
-	        DEBUGPRINTF("uc_recve: u_read() rs=%d\n",
-	            rs) ;
-#endif
-
+	        DPRINTF("u_read() rs=%d\n", rs) ;
 		f_eof = (tlen == 0) ;
 	        break ;
 
@@ -204,12 +192,7 @@ int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
 	    }
 
 	} /* end if */
-
-#if	CF_DEBUG
-	DEBUGPRINTF("uc_recve: ret rs=%d tlen=%u\n",
-	    rs,tlen) ;
-#endif
-
+	DPRINTF("ret rs=%d tlen=%u\n", rs,tlen) ;
 	return (rs >= 0) ? tlen : rs ;
 } /* end subroutine (uc_recve) */
 
