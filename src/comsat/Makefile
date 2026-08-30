@@ -257,73 +257,12 @@ proginfo.o:		proginfo.c defs.h
 
 proginfo_setpiv.o:	proginfo_setpiv.c defs.h
 
-progreader.o:		progreader.c $(INCS)
+progcsreader.o:		progcsreader.c $(INCS)
 
 progcsmsg.o:		progcsmsg.c $(INCS)
 
 progloglock.o:		progloglock.c $(INCS)
 
 proglog.o:		proglog.c proglog.h $(INCS)
-
-
-csro.o:			csro.c csro.h
-
-getutmpent.o:		getutmpent.c getutmpent.h
-
-spawnproc.o:		spawnproc.c spawnproc.h
-
-openport.o:		openport.c openport.h
-
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-tmpx.o:			tmpx.c tmpx.h
-
-csr.o:			csr.c csr.h
-
-fsi.o:			fsi.c fsi.h
-
-fistore.o:		fistore.c fistore.h
-
-ciq.o:			ciq.c ciq.h
-
-termnote.o:		termnote.c termnote.h
-
-logfile.o:		logfile.c logfile.h
-
-mailmsg.o:		mailmsg.c mailmsg.h
-
-mailmsg_loadfd.o:	mailmsg_loadfd.c mailmsg.h
-
-sesnotes.o:		sesnotes.c sesnotes.h
-
-spawner.o:		spawner.c spawner.h
-
-uiconv.o:		uiconv.c uiconv.h
-
-chartrans.o:		chartrans.c chartrans.h
-
-termtrans.o:		termtrans.cc termtrans.h 
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) termtrans.cc
-
-hdrdecode.o:		hdrdecode.cc hdrdecode.h 
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) hdrdecode.cc
-
-dispatcher.o:		dispatcher.c dispatcher.h
-
-
-mailmsgmatenv.o:	mailmsgmatenv.c mailmsgmatenv.h
-
-mailmsgmathdr.o:	mailmsgmathdr.c mailmsgmathdr.h
 
 
