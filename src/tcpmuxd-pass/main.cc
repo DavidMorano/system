@@ -71,24 +71,8 @@
 
 /* external subroutines */
 
-extern int	snddd(char *,int,uint,uint) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfui(const char *,int,int *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	dupup(int,int) ;
-extern int	isdigitlatin(int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -167,8 +151,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	ustat	sb ;
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	bfile		errfile, *efp = &errfile ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
@@ -411,7 +395,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -532,7 +516,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	if (rs >= 0) {
 	    ARGINFO	*aip = &ainfo ;
-	    BITS	*bop = &pargs ;
+	    bits	*bop = &pargs ;
 	    for (ai = 1 ; ai < argc ; ai += 1) {
 	        f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
 	        f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
