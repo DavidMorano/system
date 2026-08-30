@@ -54,7 +54,7 @@ EXTERNC_begin
 extern int builtin_start(builtin *,proginfo *) noex ;
 extern int builtin_finish(builtin *) noex ;
 extern int builtin_match(builtin *,cchar *) noex ;
-extern int builtin_enum(builtin *,int,cchar **) noex ;
+extern int builtin_curenum(builtin *,int,cchar **) noex ;
 extern int builtin_execute(builtin *,standing *,clientinfo *,int,cc **) noex ;
 
 EXTERNC_end
