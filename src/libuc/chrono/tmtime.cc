@@ -200,8 +200,8 @@ constexpr bool		f_linux		= F_LINUX ;
 
 /* exported variables */
 
-cint	tmtime::znlen		= getznlen() ;
-cint	tmtime::baseyear	= TMTIME_YEARBASE ;
+int	tmtime::znlen		= 0 ;	/* initialized for real on first use */
+int	tmtime::baseyear	= TMTIME_YEARBASE ;
 cint	baseyear		= TMTIME_YEARBASE ;
 cbool	f_usemore		= CF_USEMORE ;
 
@@ -491,6 +491,7 @@ int offer::operator () (intp lp) noex {
 	if (finit) {
 	    if (lp) *lp = (neg offval) ;
 	} else {
+	    tmtime::znlen = getznlen() ;
 	    if (TIMEB tb ; (rs = uc_ftime(&tb)) >= 0) {
 		if (tb.dstflag >= 0) {
 		    cint adj = (tb.dstflag > 0) ? (neg OneHour) : 0 ;
