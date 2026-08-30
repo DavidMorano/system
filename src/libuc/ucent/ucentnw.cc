@@ -36,6 +36,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<uinet.h>		/* LIBU |AF_INET{x}(3u)| */
 #include	<intceil.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<storeitem.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC */
@@ -44,7 +45,6 @@
 #include	<six.h>			/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<inetconv.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"ucgetnw.h"		/* |uc_getnw{x}(3uc)| */
