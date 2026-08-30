@@ -59,35 +59,33 @@
 	const char	mbname[] ;
 
 	Arguments:
-
 	pip		program information pointer
 	dsp		display pointer
 	mbname		mailbox-name to setup
 
 	Returns:
-
 	>=0	successful with count of messages
-	<0	can't be opened or other error
-
+	<0	error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
 #include	<curses.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ids.h>
+#include	<permx.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
 #include	<localmisc.h>
+#include	<bfile.h>		/* LIBB */
 
 #include	"vmail_config.h"
 #include	"defs.h"
@@ -104,9 +102,7 @@
 
 extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	permid(IDS *,ustat *,int) ;
 extern int	mkmailbox(struct proginfo *,const char *) ;
-extern int	search() ;
 
 
 /* external variables */
@@ -119,15 +115,15 @@ extern struct mailbox	mb ;
 int		messplace(char *,int) ;
 int		numinarray(int *,int,int) ;
 
-static int	getnewmail(struct proginfo *) ;
-static int	lockfileend(int) ;
+local int	getnewmail(struct proginfo *) ;
+local int	lockfileend(int) ;
 
 
 /* local variables */
 
-static int	tempmessord[MAXMESS + 1] ;
+local int	tempmessord[MAXMESS + 1] ;
 
-static int	ptord ;		/* to make it compile */
+local int	ptord ;		/* to make it compile */
 
 
 
@@ -369,7 +365,7 @@ int	len ;	/* length of given array */
 
 
 /* get new mail from the spool area and append to the "incoming" mailbox */
-static int getnewmail(pip)
+local int getnewmail(pip)
 struct proginfo	*pip ;
 {
 	ustat	sf ;
@@ -462,7 +458,7 @@ struct proginfo	*pip ;
 
 	    if ((u_stat(msfname,&sb) >= 0) && (sb.st_size > 0) &&
 	        (! S_ISDIR(sb.stmode)) &&
-	        (permid(&pip->id,&sb,(R_OK | W_OK)) >= 0)) {
+	        (permids(&pip->id,&sb,(R_OK | W_OK)) >= 0)) {
 
 
 #if	CF_SPAWNPROC
@@ -513,24 +509,18 @@ struct proginfo	*pip ;
 
 /* cleanup */
 ret1:
-	if (mfd >= 0)
+	if (mfd >= 0) {
 	    u_close(mfd) ;
+	}
 
 ret0:
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (getnewmail) */
+} /* end subroutine (getnewmail) */
 
-
-static int lockfileend(fd)
-int	fd ;
-{
+local int lockfileend(int fd) noex {
 	int	rs = SR_OK ;
-
-
 	return rs ;
-}
-/* end subroutine (lockfileend) */
+} /* end subroutine (lockfileend) */
 
 
 
