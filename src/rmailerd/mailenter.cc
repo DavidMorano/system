@@ -50,7 +50,7 @@
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctype.h>
@@ -321,7 +321,7 @@ int		ifd, ofd, efd ;
 	        rs = u_tell(ifd,&offset2) ;
 	        debugprintf("mailenter: 1 SEEK preview, rs=%d offset=%lld\n",
 	            rs,offset2) ;
-	        while ((len = uc_readline(ifd,buf,BUFLEN)) > 0)
+	        while ((len = uc_readln(ifd,buf,BUFLEN)) > 0)
 	            debugprintf("mailenter: | %W",buf,len) ;
 	        rs1 = u_seek(ifd,offset,SEEK_SET) ;
 	        rs2 = u_tell(ifd,&offset2) ;
@@ -413,7 +413,7 @@ int		ifd, ofd, efd ;
 	        rs = u_tell(0,&offset2) ;
 	        debugprintf("mailenter: 2 SEEK preview, rs=%d offset=%lld\n",
 	            rs,offset2) ;
-	        while ((len = uc_readline(0,buf,BUFLEN)) > 0)
+	        while ((len = uc_readln(0,buf,BUFLEN)) > 0)
 	            debugprintf("mailenter: | %W",buf,len) ;
 	        u_seek(0,offset,SEEK_SET) ;
 	        rs = u_tell(0,&offset2) ;
