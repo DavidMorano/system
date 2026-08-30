@@ -257,11 +257,11 @@ struct proginfo {
 	void		*config ;	/* configuration */
 	void		*watch ;	/* watch */
 	void		*pcsconf ;	/* save space when not needed */
-	PROGINFO_FL	have, f, changed, final ;
+	PROGINFO_FL	have, f, changed, finval ;
 	PROGINFO_FL	open ;
-	struct timeb	now ;
-	IDS		id ;
-	LOGFILE		lh ;
+	TIMEB		now ;
+	idsS		id ;
+	logfile		lh ;
 	time_t		daytime ;
 	pid_t		pid ;
 	uid_t		uid, euid ;
