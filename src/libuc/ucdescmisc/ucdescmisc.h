@@ -50,6 +50,7 @@
 #include	<ucfstat.h>
 #include	<ucfsync.h>
 #include	<ucftruncate.h>
+#include	<ucisatty.h>
 #include	<ucndelay.h>
 #include	<ucnonblock.h>
 #include	<ucpeek.h>
