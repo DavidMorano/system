@@ -35,8 +35,8 @@
 	int zos_set(char *rbuf,int rlen,int zo) noex
 
 	Arguments:
-	rbuf		buffer to create string into
-	rlen		length of supplied buffer
+	rbuf		result buffer pointer
+	rlen		result buffer length
 	zo		the time-zone offset to use in creating string
 
 	Returns:
