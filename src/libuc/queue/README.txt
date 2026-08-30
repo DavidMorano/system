@@ -14,11 +14,11 @@ piq		Q: pointer, relo, double, count, magic, thread
 q		Q: self-rel, relo, double, count, thread
 aiq		Q: self-rel, relo, double, count, magic, thread, async
 pq		Q: pointer, relo, double, count, not-circular
-cq		container Q, relo, count, magic
-ciq		container Q, relo, count, magic, thread
-charq		character Q, relo, count
-chariq		character Q, relo, count, thread
-intiq		integer Q, relo, count, magic, thread
+ciq		container Q: circular, relo, double, count, magic, thread
+cq		container Q: relo, count, magic
+charq		character Q: relo, count
+chariq		character Q: relo, count, thread
+intiq		integer   Q: relo, count, magic, thread
 
 = obsoleted
 cpq		Q: circular pointer Q (huge in the old days w/ OS stuff!)
