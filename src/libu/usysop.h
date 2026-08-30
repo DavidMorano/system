@@ -33,15 +33,12 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/time.h>		/* |adjtime(2)| */
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<sys/time.h>		/* POSIX® |adjtime(2)| */
 #include	<unistd.h>		/* POSIX */
-#include	<time.h>		/* VSTD |time(2)| */
+#include	<time.h>		/* CSTD |time(2)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
-#include	<usysrets.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 
 
