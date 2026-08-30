@@ -41,22 +41,22 @@ EXTERNC_end
 #ifdef	__cplusplus
 inline char	*convdec(sint		sv,char *endp) noex {
     	return convdecsi(sv,endp) ;
-}
+} /* end */
 inline char	*convdec(slong		sv,char *endp) noex {
     	return convdecsl(sv,endp) ;
-}
+} /* end */
 inline char	*convdec(slonglong	sv,char *endp) noex {
     	return convdecsll(sv,endp) ;
-}
+} /* end */
 inline char	*convdec(uint		uv,char *endp) noex {
     	return convdecui(uv,endp) ;
-}
+} /* end */
 inline char	*convdec(ulong		uv,char *endp) noex {
     	return convdecul(uv,endp) ;
-}
+} /* end */
 inline char	*convdec(ulonglong	uv,char *endp) noex {
     	return convdecull(uv,endp) ;
-}
+} /* end */
 #endif /* __cplusplus */
 
 
