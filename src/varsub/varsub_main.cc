@@ -73,19 +73,6 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	varsub_loadfile(VARSUB *,const char *) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -96,11 +83,6 @@ extern int	debugprinthex(const char *,int,const char *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,int,const char *) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -120,8 +102,8 @@ struct subopts {
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,
 			VARSUB *,cchar *,cchar *,cchar *) ;
 
 static int	procfiles(PROGINFO *,VARSUB *,bfile *,const char *,int) ;
@@ -237,8 +219,8 @@ int main(int argc,cchar **argv,cchar **envv)
 	PROGINFO	pi, *pip = &pi ;
 	SUBOPTS		sopts ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
+	bits		pargs ;
+	keyopt		akopts ;
 	VECSTR		substrs ;
 	bfile		errfile ;
 
@@ -764,12 +746,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 #ifdef	COMMENT
 	if (rs >= 0) {
-	    KEYOPT_CUR	cur ;
+	    keyopt_cur	cur ;
 	    uint	v ;
 
 	    keyopt_curbegin(&akopts,&cur) ;
 
-	    while ((sl = keyopt_enumkeys(&akopts,&cur,&sp)) >= 0) {
+	    while ((sl = keyopt_curenumkeys(&akopts,&cur,&sp)) >= 0) {
 	        if (sp == NULL) continue ;
 
 	        if ((kwi = matostr(akopts,2,sp,sl)) >= 0) {
@@ -928,7 +910,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                }
 	                if (rs >= 0) {
 			    ARGINFO	*aip = &ainfo ;
-			    BITS	*bop = &pargs ;
+			    bits	*bop = &pargs ;
 	                    cchar	*ofn = ofname ;
 	                    cchar	*afn = afname ;
 	                    cchar	*ifn = ifname ;
@@ -1060,7 +1042,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1071,13 +1053,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
@@ -1086,9 +1068,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                c += 1 ;
 	                switch (oi) {
 	                case akoname_badnokey:
-	                    if (! pip->final.badnokey) {
+	                    if (! pip->finval.badnokey) {
 	                        pip->have.badnokey = TRUE ;
-	                        pip->final.badnokey = TRUE ;
+	                        pip->finval.badnokey = TRUE ;
 	                        pip->fl.badnokey = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1097,9 +1079,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    }
 	                    break ;
 	                case akoname_blanks:
-	                    if (! pip->final.blanks) {
+	                    if (! pip->finval.blanks) {
 	                        pip->have.blanks = TRUE ;
-	                        pip->final.blanks = TRUE ;
+	                        pip->finval.blanks = TRUE ;
 	                        pip->fl.blanks = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1126,7 +1108,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 static int procargs(pip,aip,bop,vsp,ofn,afn,ifn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-BITS		*bop ;
+bits		*bop ;
 VARSUB		*vsp ;
 const char	*ofn ;
 const char	*afn ;
