@@ -1,0 +1,11 @@
+TIMEB
+
+
+struct timeb {
+	time_t  time ;		/* regular UNIX® in seconds */
+	ushort	millitm ;	/* UNIX® fractional milloseconds */
+	short   timezone ;	/* minuts west of GMY */
+	short   dstflag ;	/* has a time-zone been determined */
+} ;
+
+
