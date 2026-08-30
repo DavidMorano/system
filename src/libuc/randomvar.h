@@ -31,26 +31,26 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
+#define	RANDOMVAR		struct randomvar_head
+#define	RANDOMVAR_FL		struct randomvar_flags
 #define	RANDOMVAR_MAGIC		0x97857322
 #define	RANDOMVAR_DEGREE	127
 #define	RANDOMVAR_DIGIT		ulong
 #define	RANDOMVAR_STATELEN	(RANDOMVAR_DEGREE+1)
 #define	RANDOMVAR_STIRINT	(5 * 60)
-#define	RANDOMVAR		struct randomvar_head
-#define	RANDOMVAR_FL		struct randomvar_flags
 
 
 struct randomvar_flags {
 	uint		pseudo:1 ;
 	uint		flipper:1 ;
-} ;
+} ; /* end struct */
 
 struct randomvar_head {
 	ulong		*state ;
@@ -59,13 +59,13 @@ struct randomvar_head {
 	uint		magval ;
 	int		maintcount ;
 	int		a, b, c ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum randomvarmems {
 	randomvarmem_finish,
 	randomvarmem_overlast
-} ;
+} ; /* end enum */
 struct randomvar ;
 struct randomvar_st {
 	randomvar	*op = nullptr ;
@@ -73,11 +73,11 @@ struct randomvar_st {
 	void operator () (randomvar *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = 0,uint = 0) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (randomvar_st) */
 struct randomvar_co {
 	randomvar	*op = nullptr ;
@@ -85,38 +85,39 @@ struct randomvar_co {
 	void operator () (randomvar *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (randomvar_co) */
 struct randomvar : randomvar_head {
 	randomvar_st	start ;
 	randomvar_co	finish ;
 	randomvar() noex {
-	    start(this,0) ;
-	    finish(this,randomvarmem_finish) ;
-	} ;
+	    start	(this,0) ;
+	    finish	(this,randomvarmem_finish) ;
+	    magval	= 0 ;
+	} ; /* end ctor */
 	randomvar(const randomvar &) = delete ;
 	randomvar &operator = (const randomvar &) = delete ;
-	int stateload(cchar *,int) noex ;
-	int statesave(char *,int) noex ;
-	int setpoly(int,int) noex ;
-	int addnoise(cvoid *,int) noex ;
-	int getlong(long *) noex ;
-	int getulong(ulong *) noex ;
-	int getint(int *) noex ;
-	int getuint(uint *) noex ;
-	int get(void *,int) noex ;
-	int get(long *) noex ;
-	int get(ulong *) noex ;
-	int get(int *) noex ;
-	int get(uint *) noex ;
-	void dtor() noex ;
-	~randomvar() {
-	    dtor() ;
-	} ;
+	int stateload	(cchar *,int) noex ;
+	int statesave	(char *,int) noex ;
+	int setpoly	(int,int) noex ;
+	int addnoise	(cvoid *,int) noex ;
+	int getlong	(long *) noex ;
+	int getulong	(ulong *) noex ;
+	int getint	(int *) noex ;
+	int getuint	(uint *) noex ;
+	int get		(void *,int) noex ;
+	int get		(long *) noex ;
+	int get		(ulong *) noex ;
+	int get		(int *) noex ;
+	int get		(uint *) noex ;
+	void dtor	() noex ;
+	destruct randomvar() {
+	    if (magval) dtor() ;
+	} ; /* end destruct */
 } ; /* end struct (randomvar) */
 #else	/* __cplusplus */
 typedef RANDOMVAR	randomvar ;
@@ -144,16 +145,16 @@ EXTERNC_end
 
 inline int randomvar_get(randomvar *op,int *p) noex {
 	return randomvar_getint(op,p) ;
-}
+} /* end */
 inline int randomvar_get(randomvar *op,long *p) noex {
 	return randomvar_getlong(op,p) ;
-}
+} /* end */
 inline int randomvar_get(randomvar *op,uint *p) noex {
 	return randomvar_getuint(op,p) ;
-}
+} /* end */
 inline int randomvar_get(randomvar *op,ulong *p) noex {
 	return randomvar_getulong(op,p) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
