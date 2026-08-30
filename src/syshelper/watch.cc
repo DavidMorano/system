@@ -1,19 +1,17 @@
-/* watch */
+/* watch SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* watch (listen on) the specified socket */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1		/* switchable debug print-outs */
 #define	F_REQUESTS	1		/* handle FIFO requests, usually on */
-
 
 /* revision history:
 
 	= 1991-09-01, David A­D­ Morano
-
 	This subroutine was adopted from the DWD program.
-
 
 */
 
@@ -22,11 +20,12 @@
 
 /*****************************************************************************
 
+  	Description:
 	This subroutine is responsible for listening on the given
 	socket and spawning off a program to handle any incoming
 	connection.
 
-	This subroutine is called with the folowing arguments :
+	This subroutine is called with the folowing arguments:
 	pip	program information pointer
 	s	socket to listen on
 	ssp	varsub substitutions to be made on server table stuff
@@ -45,17 +44,19 @@
 #include	<sys/socket.h>
 #include	<sys/msg.h>
 #include	<netinet/in.h>
+#include	<dirent.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<csignal>
-#include	<time.h>
-#include	<ftw.h>
-#include	<dirent.h>
-#include	<climits>
-#include	<cstring>
 #include	<poll.h>
-#include	<usystem.h>
+#include	<ftw.h>
+#include	<ctime>
+#include	<csignal>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<logfile.h>
