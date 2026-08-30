@@ -51,6 +51,18 @@
 	(far) suprerior since it includes the timezone abbreviation
 	and the time-zone offset value).
 
+	Synopsis:
+	char *timestr_date(time_t t,char *tbuf,timestrtypes type) noex
+
+	Arguments:
+	t		time to convert (format)
+	rbuf		result buffer pointer
+	type		type of convesion (format) to perform
+
+	Returns:
+	non-NULL	pointer to given result buffer
+	NULL		conversion failed
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -77,6 +89,8 @@
 
 /* local typedefs */
 
+using tst_tx	= timestrtypes ;
+
 
 /* external subroutines */
 
@@ -88,6 +102,9 @@
 
 
 /* forward references */
+
+local int	snrender	(char *,int,time_t,timestrtypes,cc *) noex ;
+local bool	typelocal	(timestrtypes) noex ;
 
 
 /* local variables */
@@ -147,64 +164,73 @@ char *timestr_gmlogz(time_t t,char *buf) noex {
 } /* end subroutine (timestr_gmlogz) */
 
 /* create a date-string as specified by its type-code */
-char *timestr_date(time_t t,char *tbuf,int type) noex {
+char *timestr_date(time_t t,char *tbuf,timestrtypes type) noex {
 	cint		tlen = TIMEBUFLEN ;
 	int		rs = SR_FAULT ;
 	if (tbuf) ylikely {
 	    tbuf[0] = '\0' ;
 	    rs = SR_DOM ;
 	    if (t >= 0) ylikely {
-	        tmtime	tmt ;
-	        bool	f_gmt = false ;
+		cchar	*fmt = nullptr ;
+		rs = SR_OK ;
 	        switch (type) {
+	        case timestrtype_std:
 	        case timestrtype_gmstd:
+	            fmt = "%a %b %d %T %Z %Y %O" ;
+	            break ;
+	        case timestrtype_msg:
+		    fmt = "%d %b %Y %T %O (%Z)" ;
+	            break ;
+	        case timestrtype_log:
 	        case timestrtype_gmlog:
+		    fmt = "%y%m%d_%H%M:%S" ;
+	            break ;
+	        case timestrtype_logz:
 	        case timestrtype_gmlogz:
-	            f_gmt = true ;
+		    fmt = "%y%m%d_%H%M:%S_%Z" ;
+	            break ;
+	        default:
+	            rs = sncpy1(tbuf,tlen,"** invalid type **") ;
 	            break ;
 	        } /* end switch */
-		/* split the time into its component parts */
-	        if (f_gmt) {
-	            rs = tmtime_timegm(&tmt,t) ;
-	        } else {
-	            rs = tmtime_timelocal(&tmt,t) ;
-	        }
-        	/* create the appropriate string based on the type-code */
-	        if (rs >= 0) ylikely {
-		    cchar	*fmt = nullptr ;
-	            switch (type) {
-	            case timestrtype_std:
-	            case timestrtype_gmstd:
-	                fmt = "%a %b %d %T %Z %Y %O" ;
-	                break ;
-	            case timestrtype_msg:
-			fmt = "%d %b %Y %T %O (%Z)" ;
-	                break ;
-	            case timestrtype_log:
-	            case timestrtype_gmlog:
-			fmt = "%y%m%d_%H%M:%S" ;
-	                break ;
-	            case timestrtype_logz:
-	            case timestrtype_gmlogz:
-			fmt = "%y%m%d_%H%M:%S_%Z" ;
-	                break ;
-	            default:
-	                rs = sncpy1(tbuf,tlen,"** invalid type **") ;
-	                break ;
-	            } /* end switch */
-		    if (fmt) ylikely {
-	                rs = sntmtime(tbuf,tlen,&tmt,fmt) ;
-		    }
-	        } /* end if (ok) */
+		if ((rs >= 0) && fmt) ylikely {
+		    rs = snrender(tbuf,tlen,t,type,fmt) ;
+		} /* end if (ok) */
+	        if (rs < 0) {
+		    tbuf[0] = '\0' ;
+	        } /* end if (error) */
 	    } /* end if (valid) */
-	    if (rs < 0) {
-		tbuf[0] = '\0' ;
-	    } /* end if (error) */
 	} /* end if (non-null) */
 	if (rs < 0) {
 	    ulogerror("timestr",rs,"date") ;
 	} /* end if (error) */
 	return (rs >= 0) ? tbuf : nullptr ;
 } /* end subroutine (timestr_date) */
+
+
+/* local subroutines */
+
+local int snrender(char *tbuf,int tlen,time_t t,tst_tx type,cc *fmt) noex {
+	int		rs ;
+	cbool		flocal = typelocal(type) ;
+	if (tmtime tmt ; (rs = tmt.timex(t,flocal)) >= 0) ylikely {
+	    rs = sntmtime(tbuf,tlen,&tmt,fmt) ;
+	} /* end if (tmtime) */
+	return rs ;
+} /* end subroutine (snrender) */
+
+local bool typelocal(timestrtypes type) noex {
+    	bool	flocal = true ;
+	switch (type) {
+	case timestrtype_gmstd:
+	case timestrtype_gmlog:
+	case timestrtype_gmlogz:
+	    flocal = false ;
+	    break ;
+	default:
+	    break ;
+	} /* end switch */
+	return flocal ;
+} /* end subroutine (typelocal) */
 
 
