@@ -23,8 +23,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usysnative.h>
-#include	<clanguage.h>		/* <- necessary inclusion */
+#include	<usysnative.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU <- necessary inclusion */
 
 
 /* UNIX® kernal structures */
@@ -228,8 +228,8 @@
 #define	INADDR6		struct in6_addr
 #endif
 
-#ifndef	INADDRX
-#define	INADDRX		struct in4in6_addr
+#ifndef	INADDR46
+#define	INADDR46	struct in4in6_addr
 #endif
 
 /* UTMPX */
