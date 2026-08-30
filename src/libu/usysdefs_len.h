@@ -37,8 +37,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<limits.h>		/* |{xxx}_MIN| + |{xxx}_MAX| */
+#include	<sys/param.h>		/* POSIX® */
+#include	<limits.h>		/* POSIX® |{xxx}_MIN| + |{xxx}_MAX| */
 
 
 /* some stuff that not all systems (like GNU-Linux) have */
