@@ -35,8 +35,8 @@ DEFS +=
 
 INCS +=
 
-MODS += argmgr.ccm filerec.ccm
-MODS += cmdutils.ccm
+MODS += argmgr.o filerec.o
+MODS += cmdutils.o
 MODS +=
 
 LIBS += -lf -lu
