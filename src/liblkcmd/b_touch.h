@@ -1,4 +1,9 @@
-/* config */
+/* touch_config */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* touch a file */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
