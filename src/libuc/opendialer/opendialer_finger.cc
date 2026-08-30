@@ -71,13 +71,13 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<baops.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<keyopt.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<logfile.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
