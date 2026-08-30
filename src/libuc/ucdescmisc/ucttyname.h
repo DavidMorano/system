@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* LIBUC Teermina-Control functions */
+/* LIBUC Teerminal-Control functions */
 /* version %I% last-modified %G% */
 
 
