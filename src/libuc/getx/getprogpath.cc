@@ -45,6 +45,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<getpwd.h>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
@@ -52,7 +53,6 @@
 #include	<vecstr.h>		/* LIBUC */
 #include	<mkpathxw.h>		/* LIBUC */
 #include	<path.h>		/* LIBUC */
-#include	<nulstr.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
 #include	<rmx.h>			/* LIBUC |rmshlashes(3uc)| */
 #include	<xfile.h>		/* LIBUC */
