@@ -32,24 +32,24 @@
 #define	DATER_ZI		struct dater_zinfo
 #define	DATER_MAGIC		0x26213711
 /* dater-type-strings (DTSes) */
-enum daterdts {
-    	daterdt_std,
-	daterdt_msg,
-	daterdt_strdig,
-	daterdt_logz,
-	daterdt_gmlogz,
-	daterdt_overlast,
-	daterdt_env	= daterdt_std,
-	daterdt_ctime	= daterdt_std
-} ; /* end enum (daterdts) */
+enum datertypes {
+    	datertype_std,
+	datertype_msg,
+	datertype_strdig,
+	datertype_logz,
+	datertype_gmlogz,
+	datertype_overlast,
+	datertype_env	= datertype_std,
+	datertype_ctime	= datertype_std
+} ; /* end enum (datertypes) */
 
-#define	DATER_DTSSTD		daterdt_std	/* email envelope */
-#define	DATER_DTSMSG		daterdt_msg	/* message header */
-#define	DATER_DTSSTRDIG		daterdt_strdig	/* string of digits */
-#define	DATER_DTSLOGZ		daterdt_logz	/* 'logz' type */
-#define	DATER_DTSGMLOGZ		daterdt_gmlogz	/* 'logz' type for GMT */
-#define	DATER_DTSENV		daterdt_env	/* email envelope */
-#define	DATER_DTSCTIME		daterdt_std	/* same as UNIX 'ctime' */
+#define	DATER_DTSSTD		datertype_std	/* email envelope */
+#define	DATER_DTSMSG		datertype_msg	/* message header */
+#define	DATER_DTSSTRDIG		datertype_strdig	/* string of digits */
+#define	DATER_DTSLOGZ		datertype_logz	/* 'logz' type */
+#define	DATER_DTSGMLOGZ		datertype_gmlogz	/* 'logz' type for GMT */
+#define	DATER_DTSENV		datertype_env	/* email envelope */
+#define	DATER_DTSCTIME		datertype_std	/* same as UNIX 'ctime' */
 
 #ifdef	COMMENT
 struct timeb {
@@ -92,7 +92,7 @@ typedef	DATER_ZI	dater_zi ;
 enum datermems {
 	datermem_finish,
 	datermem_overlast
-} ;
+} ; /* end enum */
 struct dater ;
 struct dater_co {
 	dater		*op = nullptr ;
@@ -100,16 +100,16 @@ struct dater_co {
 	void operator () (dater *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (dater_co) */
 struct dater : dater_head {
 	dater_co	finish ;
 	dater() noex {
-	    finish(this,datermem_finish) ;
+	    finish	(this,datermem_finish) ;
 	    magval = 0 ;
 	    zname = nullptr ;
 	    cname = nullptr ;
@@ -133,7 +133,7 @@ struct dater : dater_head {
 	int setzinfo	(dater_zi *,cc *,int = -1) noex ;
 	int setkey	(cc *,int,TIMEB *,cc *) noex ;
 	int tzinfo	(dater_zi *) noex ;
-	int mkdatestr	(daterdts,char *,int) noex ;
+	int mkdatestr	(datertypes,char *,int) noex ;
 	int mkstd	(char *,int) noex ;
 	int mkenv	(char *,int) noex ;
 	int mkmsg	(char *,int) noex ;
@@ -152,7 +152,7 @@ struct dater : dater_head {
 	void dtor() noex ;
 	destruct dater() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (dater) */
 #else	/* __cplusplus */
 typedef DATER		dater ;
@@ -177,7 +177,7 @@ extern int dater_settimezon	(dater *,time_t,int,cchar *,int) noex ;
 extern int dater_setzinfo	(dater *,dater_zi *,cc *,int) noex ;
 extern int dater_setkey		(dater *,cc *,int,TIMEB *,cc *) noex ;
 extern int dater_tzinfo		(dater *,dater_zi *) noex ;
-extern int dater_mkdatestr	(dater *,daterdts,char *,int) noex ;
+extern int dater_mkdatestr	(dater *,datertypes,char *,int) noex ;
 extern int dater_mkstd		(dater *,char *,int) noex ;
 extern int dater_mkenv		(dater *,char *,int) noex ;
 extern int dater_mkmsg		(dater *,char *,int) noex ;
