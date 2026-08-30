@@ -204,26 +204,26 @@ all:			$(ALL)
 	$(COMPILE.cc) $<
 
 .ccm.o:
-	makemodule $(*)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T):			$(T).ee
 	cp -p $(T).ee $(T)
 
-$(T).x:			$(OBJ) Makefile
+$(T).x:			$(OBJ)
 	makedate -m $(T) > makedate.c
 	$(CC) -c $(CFLAGS) makedate.c
-	$(LD) -o $@ $(LDFLAGS) $(OBJS) $(LIBINFO) > $(T).lm
+	$(LD) -o $@ $(LDFLAGS) $^ $(LIBINFO) > $(T).lm
 
-$(T).prof:		$(OBJ) Makefile
+$(T).prof:		$(MOBJ)
 	makedate -m $(T) > makedate.c
 	$(CC) -c makedate.c
-	$(LD) -o $@ $(LDFLAGS_P) $(MOBJS) $(LIBDIRS) $(LIBS) > $(T).lm
+	$(LD) -o $@ $(LDFLAGS_P) $^ $(LIBDIRS) $(LIBS) > $(T).lm
 
-$(T).gprof:		$(OBJ) Makefile
+$(T).gprof:		$(GOBJ)
 	makedate -m $(T) > makedate.c
 	$(CC) -c makedate.c
-	$(LD) -o $@ $(LDFLAGS_P) $(GOBJS) $(LIBDIRS) $(LIBS) > $(T).lm
+	$(LD) -o $@ $(LDFLAGS_P) $^ $(LIBDIRS) $(LIBS) > $(T).lm
 
 $(T).$(OFF) $(OFF):	$(T).x
 	cp -p $(T).x $(T).$(OFF)
