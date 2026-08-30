@@ -29,7 +29,7 @@ export {
     template<typename ... Args>
     inline int dater_magic(dater *op,Args ... args) noex {
 	    int		rs = SR_FAULT ;
-	    if (op && (args && ...)) {
+	    if (op && (args && ...)) ylikely {
 	        rs = (op->magval == DATER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	    }
 	    return rs ;
