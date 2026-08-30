@@ -45,9 +45,9 @@ enum datertypes {
 
 #define	DATER_DTSSTD		datertype_std	/* email envelope */
 #define	DATER_DTSMSG		datertype_msg	/* message header */
-#define	DATER_DTSSTRDIG		datertype_strdig	/* string of digits */
+#define	DATER_DTSSTRDIG		datertype_strdig /* string of digits */
 #define	DATER_DTSLOGZ		datertype_logz	/* 'logz' type */
-#define	DATER_DTSGMLOGZ		datertype_gmlogz	/* 'logz' type for GMT */
+#define	DATER_DTSGMLOGZ		datertype_gmlogz /* 'logz' type for GMT */
 #define	DATER_DTSENV		datertype_env	/* email envelope */
 #define	DATER_DTSCTIME		datertype_std	/* same as UNIX 'ctime' */
 
