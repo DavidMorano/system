@@ -56,7 +56,7 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
@@ -234,7 +234,7 @@ struct clientinfo	*cip ;
 
 /* pop off the service name */
 
-	rs = uc_readlinetimed(ifd,svcspec,BUFLEN,TO_SVC) ;
+	rs = uc_readlnto(ifd,svcspec,BUFLEN,TO_SVC) ;
 	len = rs ;
 	if (rs <= 1) {
 
