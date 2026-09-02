@@ -33,60 +33,60 @@ module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module ureserve:charx ;
 
 export {
     inline bool char_isdigit(int ch) noex {
 	return ((ch >= '0') && (ch <= '9')) ;
-    } ;
+    } /* end */
     inline bool char_isdigex(int ch) noex {
 	bool f = false ;
 	f = f || ((ch >= '0') && (ch <= '9')) ;
 	f = f || ((ch >= 'A') && (ch <= 'F')) ;
 	f = f || ((ch >= 'a') && (ch <= 'f')) ;
 	return f ;
-    } ;
+    } /* end */
     inline bool char_isoctal(int ch) noex {
 	return (ch >= '0') && (ch <= '7') ;
-    }
+    } /* end */
     inline bool char_isblank(int ch) noex {
 	return (ch == ' ') || (ch == '\t') ;
-    }
+    } /* end */
     bool char_iswhite(int) noex ;
     bool char_islc(int) noex ;
     bool char_isuc(int) noex ;
     bool char_isfc(int) noex ;
     inline bool char_isdig(int ch) noex {
 	return char_isdigit(ch) ;
-    }
+    } /* end */
     inline bool char_isoct(int ch) noex {
 	return char_isoctal(ch) ;
-    }
+    } /* end */
     inline bool char_isdec(int ch) noex {
 	return char_isdigit(ch) ;
-    }
+    } /* end */
     inline bool char_ishex(int ch) noex {
 	return char_isdigex(ch) ;
-    }
+    } /* end */
     inline bool char_iswht(int ch) noex {
 	return char_iswhite(ch) ;
-    }
+    } /* end */
     inline bool char_isblk(int ch) noex {
 	return char_isblank(ch) ;
-    }
+    } /* end */
 } /* end export */
 
 export {
     short	char_dictorder(int) noex ;
     inline uchar char_tobc(int ch) noex {
     	return uchar(ch & UCHAR_MAX) ;
-    }
+    } /* end */
     uchar	char_tolc(int) noex ;
     uchar	char_touc(int) noex ;
     uchar	char_tofc(int) noex ;
