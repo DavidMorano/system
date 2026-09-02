@@ -68,8 +68,7 @@
 
 /* forward references */
 
-template<typename T>
-local int intsatsx(T v) noex {
+template<typename T> local int intsatsx(T v) noex {
 	int	r = int(v) ;
 	if (v > INT_MAX) {
 	    r = INT_MAX ;
@@ -79,8 +78,7 @@ local int intsatsx(T v) noex {
 	return r ;
 } /* end subroutine-template (intsatsx) */
 
-template<typename UT>
-local int intsatux(UT v) noex {
+template<typename UT> local int intsatux(UT v) noex {
 	UT	im = UT(INT_MAX) ;
 	if (v > im) v = im ;
 	return int(v) ;
@@ -92,24 +90,24 @@ local int intsatux(UT v) noex {
 
 /* exported subroutines */
 
-int intsatl(long v) noex {
+int intsatl	(long v)	noex {
 	return intsatsx(v) ;
 } /* end */
 
-int intsatll(longlong v) noex {
+int intsatll	(longlong v)	noex {
 	return intsatsx(v) ;
 } /* end */
 
 
-int intsatui(uint v) noex {
+int intsatui	(uint v)	noex {
     	return intsatux(v) ;
 } /* end */
 
-int intsatul(ulong v) noex {
+int intsatul	(ulong v)	noex {
     	return intsatux(v) ;
 } /* end */
 
-int intsatull(ulonglong v) noex {
+int intsatull(ulonglong v)	noex {
     	return intsatux(v) ;
 } /* end */
 
