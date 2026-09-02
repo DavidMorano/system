@@ -40,10 +40,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<numeric>		/* C++STD (saturating arithmetic) */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"intcmp.h"
@@ -63,13 +65,17 @@
 
 /* forward references */
 
-template<typename T> local int intcmpx(T v1,T v2) noex {
+template<typename T> local int intcmpsx(T v1,T v2) noex {
+    	return intsat(v1 - v2) ;
+} /* end subroutine-template (intcmpsx) */
+
+template<typename T> local int intcmpux(T v1,T v2) noex {
     	int rc = 0 ;
 	if (v1 != v2) {
 	    rc = (v1 > v2) ? +1 : -1 ;
 	}
 	return rc ;
-} /* end subroutine */
+} /* end subroutine-template (intcmpux) */
 
 
 /* local variables */
@@ -80,24 +86,44 @@ template<typename T> local int intcmpx(T v1,T v2) noex {
 
 /* exported subroutines */
 
-int intcmpc(uchar v1,uchar v2)			noex {
-	return intcmpx(v1,v2) ;
+int intcmpsc(char v1,char v2)			noex {
+	return intcmpsx(v1,v2) ;
 } /* end */
 
-int intcmps(ushort v1,ushort v2)		noex {
-	return intcmpx(v1,v2) ;
+int intcmpss(short v1,short v2)			noex {
+	return intcmpsx(v1,v2) ;
 } /* end */
 
-int intcmpi(uint v1,uint v2)			noex {
-	return intcmpx(v1,v2) ;
+int intcmpsi(int v1,int v2)			noex {
+	return intcmpsx(v1,v2) ;
 } /* end */
 
-int intcmpl(ulong v1,ulong v2)			noex {
-	return intcmpx(v1,v2) ;
+int intcmpsl(long v1,long v2)			noex {
+	return intcmpsx(v1,v2) ;
 } /* end */
 
-int intcmpll(ulonglong v1,ulonglong v2)		noex {
-	return intcmpx(v1,v2) ;
+int intcmpsll(longlong v1,longlong v2)		noex {
+	return intcmpsx(v1,v2) ;
+} /* end */
+
+int intcmpuc(uchar v1,uchar v2)			noex {
+	return intcmpux(v1,v2) ;
+} /* end */
+
+int intcmpus(ushort v1,ushort v2)		noex {
+	return intcmpux(v1,v2) ;
+} /* end */
+
+int intcmpui(uint v1,uint v2)			noex {
+	return intcmpux(v1,v2) ;
+} /* end */
+
+int intcmpul(ulong v1,ulong v2)			noex {
+	return intcmpux(v1,v2) ;
+} /* end */
+
+int intcmpull(ulonglong v1,ulonglong v2)		noex {
+	return intcmpux(v1,v2) ;
 } /* end */
 
 
