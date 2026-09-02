@@ -7,8 +7,8 @@ struct itimerval {
 } ;
 
 struct timeval {
-	time_t       tv_sec;   /* seconds since Jan. 1, 1970 */
-	suseconds_t  tv_usec;  /* and microseconds */
+	time_t       tv_sec ;   /* seconds since 1 Jan 1970 */
+	suseconds_t  tv_usec ;  /* and microseconds */
 } ;
 
 
