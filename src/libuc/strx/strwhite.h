@@ -29,10 +29,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>		/* LINU */
-#include	<utypedefs.h>		/* LINU */
-#include	<utypealiases.h>	/* LINU */
-#include	<usysdefs.h>		/* LINU */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
