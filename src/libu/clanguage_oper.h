@@ -68,9 +68,9 @@
 
 #ifdef	__cplusplus
 #ifndef	logand_eq
-#define	logand_eq		&&=
-#define	logor_eq		||=
-#define	logxor_eq		^^=
+#define	logand_eq		&&=	/* <- does not exist! */
+#define	logor_eq		||=	/* <- does not exist! */
+#define	logxor_eq		^^=	/* <- does not exist! */
 #endif
 #endif /* __cplusplus */
 
