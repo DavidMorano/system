@@ -89,7 +89,7 @@
 #define	UTO_NFILE	5
 #define	UTO_POLL	10
 #define	UTO_NOLCK	10
-#define	UTO_CAPURE	5
+#define	UTO_CAPTURE	5
 #define	UTO_TXTBUSY	5
 #define	UTO_CLOSEWAIT	2
 #define	UTO_INPROGRESS	(5*60)
