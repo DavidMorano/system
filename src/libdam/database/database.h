@@ -33,7 +33,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ptm.h>			/* LIBU */
-#include	<fifoitem.h>		/* LINUC */
+#include	<fifoitem.h>		/* LIBUC */
 
 #include	<babieshdr.h>
 #include	<babycalc.h>
