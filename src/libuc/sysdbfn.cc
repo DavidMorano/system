@@ -119,13 +119,13 @@ namespace {
 	int gets(int,cchar **) noex ;
         void atforkbefore() noex {
 	    mx.lockbegin() ;
-        }
+        } /* end */
         void atforkafter() noex {
 	    mx.lockend() ;
-        }
+        } /* end */
 	void dtor() noex ;
 	destruct sysdbmgr() noex {
-	    dtor() ;
+	    if (finit) dtor() ;
 	} ; /* end dtor (sysdbmgr) */
     } ; /* end structure (sysdbmgr) */
 } /* end namespace */
