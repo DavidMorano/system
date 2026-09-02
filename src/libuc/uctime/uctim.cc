@@ -87,6 +87,7 @@
 #include	<pta.h>			/* LIBU */
 #include	<upt.h>			/* LIBU */
 #include	<intsat.h>		/* LIBU */
+#include	<ucmpx.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC vector-handles */
 #include	<vecsorthand.h>		/* LIBUC vector-sorted-handles */
@@ -523,7 +524,7 @@ int uctim::cmd_set(int id,timemgr_arg *argp) noex {
 	int		rs1 ;
 	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
 	    cint	ei = rs ;
-	    {
+	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
 		rs = priqins(ep) ;
 	    }
 	} /* end if (vechand_get) */
@@ -573,12 +574,11 @@ int uctim::priqrem(uctiment *ep) noex {
 int uctim::timerset(time_t val) noex {
     	cnullptr	np{} ;
 	int		rs ;
-	if (TIMESPEC ts ; (rs = timespec_load(&ts,val,0)) >= 0) {
-	    if (ITIMERSPEC it ; (rs = itimerspec_load(&it,&ts,np)) >= 0) {
-	        cint	tf = TIMER_ABSTIME ;
-	        rs = uitimer_set(wt,tf,&it,nullptr) ;
-	    }
-	} /* end if */
+	if (TIMEVAL tv ; (rs = timespec_load(&tv,val,0)) >= 0) ylikely {
+	    if (ITIMERVAL it ; (rs = itimerspec_load(&it,&tv,np)) >= 0) {
+	        rs = uitimer_set(wt,&it,np) ;
+	    } /* end if (ITIMETVAL) */
+	} /* end if (TIMEVVAL) */
 	return rs ;
 } /* end method (uctim::timerset) */
 
@@ -630,11 +630,11 @@ int uctim::workbegin() noex {
 	if (! fl.workready) {
 	    cint	vn = 0 ;
 	    cint	vo = (vechandm.compact | vechandm.ordered) ;
-	    if ((rs = ents.start(vn,vo)) >= 0) {
-	        if ((rs = priqbegin()) >= 0) {
-	            if ((rs = sigbegin()) >= 0) {
-	                if ((rs = timerbegin()) >= 0) {
-	                    if ((rs = ciq_start(&pass)) >= 0) {
+	    if ((rs = ents.start(vn,vo)) >= 0) ylikely {
+	        if ((rs = priqbegin()) >= 0) ylikely {
+	            if ((rs = sigbegin()) >= 0) ylikely {
+	                if ((rs = timerbegin()) >= 0) ylikely {
+	                    if ((rs = ciq_start(&pass)) >= 0) ylikely {
 	                        if ((rs = thrsbegin()) >= 0) {
 	                            fl.workready = true ;
 	                        } /* end if (good-to-go) */
@@ -705,8 +705,13 @@ int uctim::workfins() noex {
 	void		*otp{} ;
 	for (int i = 0 ; ents.get(i,&otp) >= 0 ; i += 1) {
 	    if (otp) {
-	        rs1 = lm_free(otp) ;
-	        if (rs >= 0) rs = rs1 ;
+	        if (uctiment *ep = resumelife<uctiment>(otp) ; ep) {
+		    destroy_at(ep) ;
+		}
+		{
+	            rs1 = lm_free(otp) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
 	    } /* end if (memory-release) */
 	} /* end for */
 	return rs ;
@@ -1182,12 +1187,8 @@ local void uctimeent_load(uctiment *ep,con uctimnote *nop) noex {
 	ep->arg		= nop->arg ;
 } /* end subroutine (uctimeent_load) */
 
-local int cmpuctiment((con uctiment *e1p,con uctiment *e2p) noex {
-	int		rc = 0 ;
-	if ((rc = intsat(e1p->tv_sec - e2p->tv_sec)) == 0) {
-	    rc = intsat(e1p->tc_usec - e2p->rv_usec) ;
-	}
-	return rc ;
+local int cmpuctiment(con uctiment *e1p,con uctiment *e2p) noex {
+    	return cmpitimerval(&e1p->it,&e2p->it) ;
 } /* end subroutine (cmpuctiment) */
 
 local int cmpqent(cvoid *v1p,cvoid *v2p) noex {
