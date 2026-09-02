@@ -57,6 +57,7 @@
 #include	<usysdefs_sig.h>
 
 #include	<memord.hh>
+#include	<cmpord.hh>
 
 
 #endif /* USYSDEFS_INCLUDE */
