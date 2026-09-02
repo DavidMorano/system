@@ -1,0 +1,72 @@
+/* modsys-intsat MODULE (primary-partition) */
+/* charset=ISO8859-1 */
+/* lang=C20 (conformance reviewed) */
+
+/* Integer Saturation (clamping) */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2000-05-14, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>		/* CSTD */
+#include	<stdint.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"modsys.hh"
+
+export module modsys:intsat ;
+
+export {
+   inline int intsati	(cint v)	noex {
+	return v ;
+   } /* end */
+   int intsatl		(clong)		noex ;
+   int intsatll		(clonglong)	noex ;
+} /* end export */
+
+export {
+   int intsatui		(cuint)		noex ;
+   int intsatul		(culong)	noex ;
+   int intsatull	(culonglong)	noex ;
+} /* end export */
+
+export {
+    inline int intsat	(cint v)	noex {
+	return intsati(v) ;
+    } /* end */
+    inline int intsat	(clong v)	noex {
+	return intsatl(v) ;
+    } /* end */
+    inline int intsat	(clonglong v)	noex {
+	return intsatll(v) ;
+    } /* end */
+} /* end export */
+
+export {
+    inline int intsat	(cuint v)	noex {
+	return intsatui(v) ;
+    } /* end */
+    inline int intsat	(culong v)	noex {
+	return intsatul(v) ;
+    } /* end */
+    inline int intsat	(culonglong v)	noex {
+	return intsatull(v) ;
+    } /* end */
+} /* end export */
+
+
