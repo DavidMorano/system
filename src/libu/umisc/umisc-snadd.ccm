@@ -43,19 +43,19 @@ export {
     int snaddw(char *,int,int,cchar *,int) noex ;
     inline int snaddw(char *dbuf,int dlen,int dl,cchar *sp) noex {
 	return snaddw(dbuf,dlen,dl,sp,-1) ;
-    }
+    } /* end */
 } /* end export */
 
 export {
     int snaddx(char *,int,int,int,...) noex ;
     inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
 	return snaddw(dbuf,dlen,dl,sp,-1) ;
-    }
+    } /* end */
     template<typename ... Args>
     inline int snadd(char *dbuf,int dlen,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return snaddx(dbuf,dlen,dl,na,args ...) ;
-    }
+    } /* end */
 } /* end export */
 
 export {
