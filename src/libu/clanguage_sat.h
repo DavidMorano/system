@@ -17,22 +17,26 @@
 
 #ifndef	CLANGUAGESAT_INCLUDE
 #define	CLANGUAGESAT_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* CSTD */
+#include	<numeric>		/* C++STD */
 
 
 #ifndef	SAT_SUBROUTINE
 #define	SAT_SUBROUTINE
-#ifdef	__cplusplus
-#define	sat_add			add_sat
-#define	sat_sub			sub_sat
-#define	sat_mul			mul_sat
-#define	sat_div			div_sat
-#endif /* __cplusplus */
+#ifndef	sat_add
+#define	sat_add			std::saturating_add
+#define	sat_sub			std::saturating_sub
+#define	sat_mul			std::saturating_mul
+#define	sat_div			std::saturating_div
+#endif /* sat_add */
 #endif /* SAT_SUBROUTINE */
 
 
+#endif /* __cplusplus */
 #endif /* CLANGUAGESAT_INCLUDE */
 
 
