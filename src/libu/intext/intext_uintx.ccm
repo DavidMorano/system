@@ -74,16 +74,18 @@ constexpr bool		f_debug		= CF_DEBUG ;
 export {
     template<int Nbits,typename Digit = ulonglong> struct uintx {
 	typedef Digit		digtype ;
-	inline static cint	n = ndig<Nbits,Digit> ;
+	static inline cint	n = ndig<Nbits,Digit> ;
 	Digit			v[ndig<Nbits,Digit>] ;
 	uintx() = default ;
 	uintx(const uintx &o) noex {
 	    vcopy(n,v,o.v) ;
-	} ;
+	} ; /* end */
 	uintx &operator = (const uintx &o) noex {
-	    vcopy(n,v,o.v) ;
+	    if (&o != this) {
+	        vcopy(n,v,o.v) ;
+	    } /* end if (self-assign) */
 	    return *this ;
-	} ;
+	} ; /* end */
 	uintx(int)		noex ;
 	uintx(long)		noex ;
 	uintx(longlong)		noex ;
@@ -99,7 +101,7 @@ export {
 	uintx operator compl () noex {
 	    for (int i = 0 ; i < n ; i += 1) {
 		v[i] = (compl v[i]) ;
-	    }
+	    } /* end for */
 	    return *this ;
 	} ; /* end ctor */
 	uintx operator - () noex {
@@ -132,14 +134,14 @@ export {
 	    vmulutrunc(n,r,v,o.v) ;
 	    vcopy(n,v,r) ;
 	    return *this ;
-	} ;
+	} ; /* end */
 	uintx &operator /=	(const uintx &o) noex {
 	    Digit	q[n] ;
 	    Digit	r[n] ;
 	    vdivutrunc(n,q,r,v,o.v) ;
 	    vcopy(n,v,q) ;
 	    return *this ;
-	} ;
+	} ; /* end */
 	uintx &operator %=	(const uintx &o) noex {
 	    Digit	q[n] ;
 	    Digit	r[n] ;
@@ -163,7 +165,7 @@ export {
 	    vlshr(n,r,v,nb) ;
 	    vcopy(n,v,r) ;
 	    return *this ;
-	} ;
+	} ; /* end */
 	uintx &operator <<= (int nb) noex {
 	    Digit	r[n] ;
 	    vlshl(n,r,v,nb) ;
@@ -172,20 +174,20 @@ export {
 	} ;
 	ord operator <=> (const uintx &o) const noex {
     	    ord res = ord::equal ;
-	    cint rc = vcmp(n,v,o.v) ;
-	    if (rc) {
+	    if (cint rc = vcmp(n,v,o.v) ; rc != 0) {
 	        res = (rc > 0) ? ord::greater : ord::less ;
 	    }
 	    return res ;
-	} /* end smethod (uintx) */
+	} /* end method (uintx) */
+	bool operator == (const uintx &o) const noex = default ;
 	void clear() noex {
 	    vclear(n,v) ;
-	} ;
+	} ; /* end */
 	uintx add	(const uintx &o) const noex {
 	    uintx res ;
 	    vaddu(n,res.v,v,o.v) ;
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx sub	(const uintx &o) const noex {
 	    uintx res ;
 	    vsubu(n,res.v,v,o.v) ;
@@ -207,12 +209,12 @@ export {
 	    uintx res ;
 	    vdivutrunc(n,q,res.v,v,o.v) ;
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx band	(const uintx &o) const noex {
 	    uintx res ;
 	    vand(n,res.v,v,o.v) ;
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx bor	(const uintx &o) const noex {
 	    uintx res ;
 	    vor(n,res.v,v,o.v) ;
@@ -222,17 +224,17 @@ export {
 	    uintx res ;
 	    vxor(n,res.v,v,o.v) ;
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx rotr(int nb) const noex {
 	    uintx res ;
 	    vrotr(n,res.v,v,nb) ;
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx rotl(int nb) const noex {
 	    uintx res ;
 	    vrotl(n,res.v,v,nb) ;
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx rotx(int nb) const noex {
 	    uintx res ;
 	    if (nb >= 0) {
@@ -282,55 +284,55 @@ export {
 	} ; /* end method (ashx) */
 	uintx operator +	(const uintx &o) const noex {
 	    return add(o) ;
-	} ;
+	} ; /* end */
 	uintx operator -	(const uintx &o) const noex {
 	    return sub(o) ;
-	} ;
+	} ; /* end */
 	uintx operator *	(const uintx &o) const noex {
 	    return mul(o) ;
-	} ;
+	} ; /* end */
 	uintx operator /	(const uintx &o) const noex {
 	    return div(o) ;
-	} ;
+	} ; /* end */
 	uintx operator %	(const uintx &o) const noex {
 	    return rem(o) ;
-	} ;
+	} ; /* end */
 	uintx operator bitand	(const uintx &o) const noex {
 	    return band(o) ;
-	} ;
+	} ; /* end */
 	uintx operator bitor	(const uintx &o) const noex {
 	    return bor(o) ;
-	} ;
+	} ; /* end */
 	uintx operator bitxor	(const uintx &o) const noex {
 	    return bxor(o) ;
-	} ;
+	} ; /* end */
 	uintx operator >>	(const uintx &o) const noex {
 	    return lshr(o) ;
-	} ;
+	} ; /* end */
 	uintx operator <<	(const uintx &o) const noex {
 	    return lshl(o) ;
-	} ;
+	} ; /* end */
 	operator bool		() const noex {
 	    return visgot(n,v) ;
-	} ;
+	} ; /* end */
 	operator uint		() const noex {
 	    return uintconv(v[0]) ;
-	} ;
+	} ; /* end */
 	operator ulong 		() const noex {
 	    return ulongconv(v[0]) ;
-	} ;
+	} ; /* end */
 	operator ulonglong 	() const noex {
 	    return v[0] ;
-	} ;
+	} ; /* end */
 	operator int		() const noex {
 	    return intconv(v[0]) ;
-	} ;
+	} ; /* end */
 	operator long		() const noex {
 	    return longconv(v[0]) ;
-	} ;
+	} ; /* end */
 	operator longlong	() const noex {
 	    return longlongconv(v[0]) ;
-	} ;
+	} ; /* end */
     } ; /* end struct-template (uintx) */
 } /* end export */
 
