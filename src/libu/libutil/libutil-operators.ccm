@@ -25,11 +25,11 @@ export {
     template<typename TA,typename TB>
     constexpr inline bool logequiva(TA a,TB b) noex {
 	return LEQUIV(a,b) ;
-    }
+    } /* end subroutine-template */
     template<typename TA,typename TB>
     constexpr inline bool logdiffer(TA a,TB b) noex {
 	return (! LEQUIV(a,b)) ;
-    }
+    } /* end subroutine-template */
 } /* end export */
 
 
