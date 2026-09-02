@@ -33,97 +33,97 @@ module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module ureserve:isx ;
 
 export {
-    bool	isalphalatin(int) noex ;
-    bool	isalnumlatin(int) noex ;
-    bool	isdigexlatin(int) noex ;
-    bool	iswhitelatin(int) noex ;
-    bool	islowerlatin(int) noex ;
-    bool	isupperlatin(int) noex ;
-    bool	isprintlatin(int) noex ;
-    bool	isprintterm(int) noex ;
-    bool	isprintbad(int) noex ;
-    bool	isdict(int) noex ;
-    bool	iscmdstart(int) noex ;
-    bool	ishdrkey(int) noex ;
+    bool	isalphalatin	(int) noex ;
+    bool	isalnumlatin	(int) noex ;
+    bool	isdigexlatin	(int) noex ;
+    bool	iswhitelatin	(int) noex ;
+    bool	islowerlatin	(int) noex ;
+    bool	isupperlatin	(int) noex ;
+    bool	isprintlatin	(int) noex ;
+    bool	isprintterm	(int) noex ;
+    bool	isprintbad	(int) noex ;
+    bool	isdict		(int) noex ;
+    bool	iscmdstart	(int) noex ;
+    bool	ishdrkey	(int) noex ;
     constexpr inline bool	isdigitlatin(int ch)	noex {
 	    return (ch >= '0') && (ch <= '9') ;
-    }
+    } /* end */
     constexpr inline bool	isblanklatin(int ch)	noex {
 	    return (ch == ' ') || (ch == '\t') ;
-    }
+    } /* end */
     constexpr inline bool	isbinarlatin(int ch)	noex {
 	    return (ch >= '0') && (ch <= '1') ;
-    }
+    } /* end */
     constexpr inline bool	isoctallatin(int ch)	noex {
 	    return (ch >= '0') && (ch <= '7') ;
-    }
+    } /* end */
     constexpr inline bool	isdiglatin(int ch)	noex {
 	    return (ch >= '0') && (ch <= '9') ;
-    }
+    } /* end */
     constexpr inline bool	isbinlatin(int ch)	noex {
 	    return (ch >= '0') && (ch <= '1') ;
-    }
+    } /* end */
     constexpr inline bool	isoctlatin(int ch)	noex {
 	    return (ch >= '0') && (ch <= '7') ;
-    }
+    } /* end */
     constexpr inline bool	isdeclatin(int ch)	noex {
     	    return isdigitlatin(ch) ;
-    }
+    } /* end */
     constexpr inline bool	ishexlatin(int ch)	noex {
     	    return isdigexlatin(ch) ;
-    }
+    } /* end */
     constexpr inline bool	isnumlatin(int ch)	noex {
     	    return isdigexlatin(ch) || (ch == '\\') || (ch == 'x') ;
-    }
+    } /* end */
     constexpr inline bool	iswhtlatin(int ch)	noex {
     	    return iswhitelatin(ch) ;
-    }
+    } /* end */
     constexpr inline bool	isblklatin(int ch)	noex {
     	    return isblanklatin(ch) ;
-    }
+    } /* end */
     constexpr inline bool	iswht(int ch)		noex {
     	    return iswhitelatin(ch) ;
-    }
+    } /* end */
     constexpr inline bool	isblk(int ch)		noex {
     	    return isblanklatin(ch) ;
-    }
+    } /* end */
     constexpr inline bool	iseol(int ch)		noex {
 	    return (ch == '\n') || (ch == '\r') ;
-    }
+    } /* end */
     constexpr inline bool	iszero(int ch)		noex {
 	    return (ch == '0') ;
-    }
+    } /* end */
     constexpr inline bool	ispl(int ch)		noex {
 	    return (ch == '+') ;
-    }
+    } /* end */
     constexpr inline bool	ismi(int ch)		noex {
 	    return (ch == '-') ;
-    }
+    } /* end */
     constexpr inline bool	ispm(int ch)		noex {
 	    return (ch == '+') || (ch == '-') ;
-    }
+    } /* end */
     constexpr inline bool	isme(int ch)		noex {
 	    return (ch == '+') || (ch == '-') || (ch == '!') ;
-    }
+    } /* end */
     constexpr inline bool	isabbr(int ch)		noex {
 	    ch &= UCHAR_MAX ;
 	    return (ch == '.') || (ch == ('­' & UCHAR_MAX)) || (ch == '-') ;
-    }
+    } /* end */
     constexpr inline bool	isspacetab(int ch)	noex {
 	    return isblanklatin(ch) ;
-    }
+    } /* end */
     constexpr inline bool	isAbbr(int ch)		noex {
     	    return isabbr(ch) ;
-    }
+    } /* end */
 } /* end export */
 
 
