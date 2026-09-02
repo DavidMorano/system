@@ -77,23 +77,23 @@ extern char *ulltostr(ulonglong,	char *,int) noex ;
 
 inline char *xtostr(int sv,		char *endp,int b = 10) noex {
     return itostr(sv,endp,b) ;
-}
+} /* end */
 inline char *xtostr(long sv,		char *endp,int b = 10) noex {
     return ltostr(sv,endp,b) ;
-}
+} /* end */
 inline char *xtostr(longlong sv,	char *endp,int b = 10) noex {
     return lltostr(sv,endp,b) ;
-}
+} /* end */
 
 inline char *xtostr(uint uv,		char *endp,int b = 10) noex {
     return uitostr(uv,endp,b) ;
-}
+} /* end */
 inline char *xtostr(ulong uv,		char *endp,int b = 10) noex {
     return ultostr(uv,endp,b) ;
-}
+} /* end */
 inline char *xtostr(ulonglong uv,	char *endp,int b = 10) noex {
     return ulltostr(uv,endp,b) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
