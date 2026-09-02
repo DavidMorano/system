@@ -114,7 +114,6 @@
 #include	<cstdlib>		/* CSTD |abs(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<usupport.h>		/* LIBU |ctdec(3u)| */
 #include	<calstrs.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<zoffparts.h>		/* LIBUC */
@@ -131,8 +130,6 @@
 
 
 /* imported namespaces */
-
-using libu::ctdec ;			/* subroutine */
 
 
 /* local typedefs */
@@ -418,7 +415,7 @@ local int sbuf_coder(sbuf *ssp,tmtime *tmp,int f_sec) noex {
 } /* end subroutine (sbuf_coder) */
 
 local int sbuf_zoff(sbuf *ssp,tmtime *tmp) noex {
-	cint		zo = (tmp->gmtoff / 60) ; /* minutes west of GMT */
+	cint		zo = (tmp->gmtoff / 60) ; /* get minutes west of GMT */
 	int		rs ;
 	{
 	    cint	ch = ((zo >= 0) ? '-' : '+') ;
@@ -466,7 +463,7 @@ local int sbuf_datex(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
 	if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) ylikely {
 	    if ((rs = sbuf_chr(ssp,' ')) >= 0) ylikely {
-		cchar	*const *m = calstrs_months ;
+		mainv m = calstrs_months ;
 	        if ((rs = sbuf_strw(ssp,m[tmp->mon],3)) >= 0) ylikely {
 	    	    if ((rs = sbuf_chr(ssp,' ')) >= 0) ylikely {
 	        	rs = sbuf_year(ssp,tmp) ;
