@@ -41,9 +41,9 @@
 	want.  For bases between 27 and 62 inclusive, the resulting
 	digits are in the range of the lower-case alpha characters
 	'a' to 'z'.  Only the following integer types are supported:
-	|int|		(32-bits), 
-	|long|		(64-bits), 
-	|longlong|	(128-bits),
+		|int|		(32-bits), 
+		|long|		(64-bits), 
+		|longlong|	(128-bits),
        	and their associated unsigned cousins.
 
 	Synopsis:
