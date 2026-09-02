@@ -218,7 +218,7 @@ extern "C" {
     local void	uctimeout_atforkparent() noex ;
     local void	uctimeout_atforkchild() noex ;
     local void	uctimeout_exit() noex ;
-    local int	ventcmp(cvoid *,cvoid *) noex ;
+    local int	cmpent(cvoid *,cvoid *) noex ;
 } /* end extern (C) */
 
 local int mkopts() noex {
@@ -301,22 +301,22 @@ int uctimeout::init() noex {
 	                    if ((rs = uc_atexit(e)) >= 0) {
 	                        finitdone = true ;
 	                        f = true ;
-	                    }
+	                    } /* end if (ready) */
 	                    if (rs < 0) {
 	                        uc_atforkexp(b,ap,ac) ;
-			    }
+			    } /* end if (error) */
 	                } /* end if (uc_atfork) */
 	                if (rs < 0) {
 	                    cnv.destroy() ;
-			}
+			} /* end if (error) */
 	            } /* end if (ptc::create) */
 	            if (rs < 0) {
 	                mtx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm::create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
@@ -625,7 +625,7 @@ int uctimeout::priqbegin() noex {
 	int		rs ;
 	if (void *vp ; (rs = libmem.mall(osize,&vp)) >= 0) ylikely {
 	    pqp = resumelife<prique>(vp) ;
-	    rs = vecsorthand_start(pqp,ventcmp,1) ;
+	    rs = vecsorthand_start(pqp,cmpent,1) ;
 	    if (rs < 0) {
 	        libmem.free(pqp) ;
 	        pqp = nullptr ;
@@ -688,7 +688,7 @@ int uctimeout::sigend() noex {
 	    uc_sigsetempty(&ss) ;
 	    uc_sigsetadd(&ss,sig) ;
 	    rs = u_sigmask(scmd,&ss,nullptr) ;
-	}
+	} /* end if */
 	return rs ;
 } /* end method (uctimeout::sigend) */
 
@@ -729,7 +729,7 @@ int uctimeout::thrsbegin() noex {
 	        }
 	        if (rs < 0) {
 	            sigerend() ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (sigerbegin) */
 	} /* end if (needed) */
 	return rs ;
@@ -957,7 +957,7 @@ int uctimeout::disprecv() noex {
 	        rs = SR_OK ;
 	    } else {
 	        cmd = dispcmd_exit ;
-	    }
+	    } /* end if */
 	    waiters -= 1 ;
 	    rs1 = mtx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
@@ -996,7 +996,7 @@ int uctimeout::dispjobdel(TIMEOUT *tep) noex {
 		f = true ;
 	    } else if (rs == SR_NOTFOUND) {
 		rs = SR_OK ;
-	    }
+	    } /* end if */
 	    rs1 = capend() ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (uctimeout-cap) */
@@ -1041,7 +1041,7 @@ local void uctimeout_exit() noex {
 	uctimeout_data.fvoid = true ;
 } /* end subroutine (uctimeout_atforkparent) */
 
-local int ventcmp(cvoid *v1p,cvoid *v2p) noex {
+local int cmpent(cvoid *v1p,cvoid *v2p) noex {
 	const TIMEOUT	*e1p = ctimeoutp(v1p) ;
 	const TIMEOUT	*e2p = ctimeoutp(v2p) ;
 	int		rc = 0 ;
@@ -1053,8 +1053,8 @@ local int ventcmp(cvoid *v1p,cvoid *v2p) noex {
 	            rc = intsat(e1p->val - e2p->val) ;
 	        }
 	    }
-	}
+	} /* end if */
 	return rc ;
-} /* end subroutine (ventcmp) */
+} /* end subroutine (cmpent) */
 
 
