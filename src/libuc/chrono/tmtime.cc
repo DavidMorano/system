@@ -190,20 +190,20 @@ local int	getznlen	() noex ;
 
 static bufsizevar	znlen		(bufsize_zn) ;
 static offer		gmoff ;
-constexpr int		OneMinute	= 60 ;
-constexpr int		OneHour		= (60 * 60) ;
-constexpr int		MinusOne	= -1 ;
-constexpr bool		f_debug		= CF_DEBUG ;
-constexpr bool		f_darwin	= F_DARWIN ;
-constexpr bool		f_linux		= F_LINUX ;
+cint			baseyear	= TMTIME_YEARBASE ;
+cint			OneMinute	= 60 ;
+cint			OneHour		= (60 * 60) ;
+cint			MinusOne	= -1 ;
+cbool			f_debug		= CF_DEBUG ;
+cbool			f_usemore	= CF_USEMORE ;
+cbool			f_darwin	= F_DARWIN ;
+cbool			f_linux		= F_LINUX ;
 
 
 /* exported variables */
 
 int	tmtime::znlen		= 0 ;	/* initialized for real on first use */
 int	tmtime::baseyear	= TMTIME_YEARBASE ;
-cint	baseyear		= TMTIME_YEARBASE ;
-cbool	f_usemore		= CF_USEMORE ;
 
 
 /* exported subroutines */
@@ -231,7 +231,7 @@ int tmtime_timegm(tmtime *op,time_t t) noex {
 	            op->gmtoff = 0 ; /* <- GMT */
 	            rs = intconv(p - op->znbuf) ;
 	        } /* end if (tmtime_insert) */
-	    } /* end if */
+	    } /* end if (TM) */
 	    if (rs < 0) {
 		op->dtor() ;
 	    } /* end if (error) */
@@ -245,7 +245,7 @@ int tmtime_timelocal(tmtime *op,time_t t) noex {
 	    if (t == 0) t = getustime ;
 	    if (TM tmd ; (rs = uc_timelocal(&t,&tmd)) >= 0) ylikely {
 	        rs = tmtime_insert(op,&tmd) ;
-	    } /* end if */
+	    } /* end if (TM) */
 	    if (rs < 0) {
 		op->dtor() ;
 	    } /* end if (error) */
@@ -370,7 +370,7 @@ local int tmtime_mktimer(tmtime *op,adjustments fadj,mut time_t *timep) noex {
 	                } /* end if (fadj) */
 		    } /* end if (tm_getoff) */
 	        } /* end if (uc_mktime) */
-	    } /* end if (ttime_extract) */
+	    } /* end if (TM) */
 	    if (timep) {
 	        *timep = (rs >= 0) ? t : 0 ;
 	    }
@@ -386,7 +386,7 @@ local int tmtime_moreuse(tmtime *op,con TM *tmp) noex {
 	{
 	   op->gmtoff = intconv(tmp->tm_gmtoff) * MinusOne ;
 	   rs = intconv(strwcpy(op->znbuf,zp,op->znlen) - op->znbuf) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (tmtime_moreuse) */
 #else /* CF_USEMORE && (F_DARWIN || F_LINUX) */
@@ -400,13 +400,13 @@ local int tmtime_morecalc(tmtime *op,con TM *tmp) noex {
 	int		zl = 0 ; /* return-value */
 	cchar		*fmt = "%Z" ;
 	DPRINTF("ent\n") ;
-	if ((rs = uc_strftime(op->znbuf,op->znlen,fmt,tmp)) >= 0) ylikely {
+	if ((rs = uc_strftime(op->znbuf,op->znlen,fmt,tmp)) > 0) ylikely {
 	    cint	dlen = DECBUFLEN ;
 	    char	dbuf[DECBUFLEN + 1] ;
 	    zl = rs ;
 	    fmt = "%z" ;
-	    if ((rs = uc_strftime(dbuf,dlen,fmt,tmp)) >= 0)  ylikely {
-		if (int v ; (rs = zos_get(dbuf,dlen,&v)) >= 0) ylikely {
+	    if ((rs = uc_strftime(dbuf,dlen,fmt,tmp)) > 0)  ylikely {
+		if (int v ; (rs = zos_get(dbuf,rs,&v)) >= 0) ylikely {
 	            op->gmtoff = v * OneMinute ; /* calculate seconds */
 		} /* end if (zos_get) */
 	    } /* end if (uc_strftime) */
@@ -489,17 +489,19 @@ local int tm_getoff(con TM *,intp lp) noex {
 int offer::operator () (intp lp) noex {
     	int		rs = SR_OK ;
 	if (finit) {
-	    if (lp) *lp = (neg offval) ;
+	    if (lp) *lp = (neg offval) ; /* ± mins west of GMY */
 	} else {
-	    tmtime::znlen = getznlen() ;
-	    if (TIMEB tb ; (rs = uc_ftime(&tb)) >= 0) {
-		if (tb.dstflag >= 0) {
-		    cint adj = (tb.dstflag > 0) ? (neg OneHour) : 0 ;
-		    offval = ((tb.timezone * 60) + adj) ; /* ± mins w-of-GMT */
-		} /* end if (have a time-zone) */
-		if (lp) *lp = (neg offval) ; /* ± mins west of GMY */
-		finit = true ;
-	    } /* end if (uc_ftime) */
+	    if ((rs = getznlen()) >= 0) {
+	        tmtime::znlen = rs ;
+	        if (TIMEB tb ; (rs = uc_ftime(&tb)) >= 0) {
+		    if (tb.dstflag >= 0) {
+		        cint adj = (tb.dstflag > 0) ? (neg OneHour) : 0 ;
+		        offval = ((tb.timezone * 60) + adj) ;
+		    } /* end if (have a time-zone) */
+		    if (lp) *lp = (neg offval) ; /* ± mins west of GMY */
+		    finit = true ;
+	        } /* end if (TIMEB) */
+	    } /* end if (getznlen) */
 	} /* end if (needed) */
 	return rs ;
 } /* end method (offer::operator) */
