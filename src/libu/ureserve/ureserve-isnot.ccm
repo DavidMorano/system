@@ -48,40 +48,40 @@ export {
     bool isoneof(cint *,int) noex ;
     inline bool isOneOf(cint *rsa,int rs) noex {
 	    return isoneof(rsa,rs) ;
-    }
+    } /* end */
 } /* end export */
 
 export {
-    bool isnotaccess(int) noex ;
-    bool isnotlib(int) noex ;
-    bool isnotpresent(int) noex ;
-    bool isnotsupport(int) noex ;
-    bool isnotterm(int) noex ;
-    bool isnotvalid(int) noex ;
+    bool isnotaccess	(int) noex ;
+    bool isnotlib	(int) noex ;
+    bool isnotpresent	(int) noex ;
+    bool isnotsupport	(int) noex ;
+    bool isnotterm	(int) noex ;
+    bool isnotvalid	(int) noex ;
 } /* end export */
 
 export {
-    inline bool isNotAccess(int rc) noex {
+    inline bool isNotAccess	(int rc) noex {
         return isnotaccess(rc) ;
-    }
-    inline bool isNotLib(int rc) noex {
+    } /* end */
+    inline bool isNotLib	(int rc) noex {
         return isnotlib(rc) ;
-    }
-    inline bool isNotPresent(int rc) noex {
+    } /* end */
+    inline bool isNotPresent	(int rc) noex {
 	return isnotpresent(rc) ;
-    }
-    inline bool isNotSupport(int rc) noex {
+    } /* end */
+    inline bool isNotSupport	(int rc) noex {
     	return isnotsupport(rc) ;
-    }
-    inline bool isNotTerm(int rc) noex {
+    } /* end */
+    inline bool isNotTerm	(int rc) noex {
     	return isnotterm(rc) ;
-    }
-    inline bool isNotValid(int rc) noex {
+    } /* end */
+    inline bool isNotValid	(int rc) noex {
     	return isnotvalid(rc) ;
-    }
-    inline bool isInvalid(int rc) noex {
+    } /* end */
+    inline bool isInvalid	(int rc) noex {
     	return isnotvalid(rc) ;
-    }
+    } /* end */
 } /* end export */
 
 
