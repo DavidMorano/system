@@ -40,8 +40,6 @@ MODS += libutil.o
 LIBS +=
 
 
-DEPS += 
-
 OBJPART00= libutil-strlen.o libutil-strxspn.o
 OBJPART01= libutil-cvtconst.o libutil-getlen.o 
 OBJPART02= libutil-lenstr.o libutil-lenstrarr.o
