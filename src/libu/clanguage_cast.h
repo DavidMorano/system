@@ -31,16 +31,24 @@
 #define	cast_bit		bit_cast
 #define	cast_clock		clock_cast
 #define	cast_duration		duration_cast
-#define	cast_saturate		saturate_cast
-#define	cast_sat		saturate_cast
-#define	saturate		saturate_cast
 #define	cast_any		any_cast
-#endif
+#endif /* cast_static */
 #endif /* __cplusplus */
 
+#ifdef	__cplusplus
+#ifndef	cast_saturating
+#define	cast_saturating		saturating_cast
+#define	cast_saturate		saturating_cast
+#define	cast_sat		saturating_cast
+#define	saturate		saturating_cast
+#endif /* cast_saturating */
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 #ifndef	CAST_R
 #define	CAST_R			cast_reinterpret
 #endif
+#endif /* __cplusplus */
 
 
 #endif /* CLANGUAGECAST_INCLUDE */
