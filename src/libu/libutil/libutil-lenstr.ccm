@@ -42,7 +42,7 @@ export {
     } /* end subroutine (clenstr) */
     constexpr inline int lenstr(cchar *sp,int sl = -1) noex {
     	int		len = -1 ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl >= 0) {
     	        csize strsize = size_t(sl) ;
 	        len = intconv(strnlen(sp,strsize)) ;
@@ -54,7 +54,7 @@ export {
     } /* end subroutine (lenstr) */
     constexpr inline int getlenstr(cchar *sp,int sl = -1) noex {
 	int		len = -1 ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (sl >= 0) {
 		len = sl ;
 	    } else {
