@@ -80,7 +80,7 @@ import libutil ;
 
 int itimerval_load(ITIMERVAL *tsp,CTIMEVAL *valp,CTIMEVAL *ivp) noex {
 	int		rs = SR_FAULT ;
-	if (tsp) {
+	if (tsp) ylikely {
 	    rs = memclear(tsp) ;
 	    if (valp) {
 	        tsp->it_value = *valp ;
