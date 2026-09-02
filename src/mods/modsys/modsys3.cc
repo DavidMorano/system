@@ -1,0 +1,154 @@
+/* modsys3 MODULE (implementation) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-26, David A­D­ Morano
+	This was first written to give a little bit to UNIX® what
+	we have in our own circuit-pack OSes!
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	msleep
+
+	Description:
+	This subroutine sleeps for some number of milliseconds.
+
+	Synopsis:
+	int msleep(int msec) noex
+
+	Arguments:
+	msec		number of millisecond to sleep
+
+	Returns:
+	>=0		amount of data returned
+	<0		error (system-return)
+
+
+	Name:
+	umtime
+
+	Description:
+	This is sort of like |time(2)| but returns milliseconds
+	rather than seconds.  Unlike |time(2)|, this subroutine
+	takes no arguments.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<unistd.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX */
+#include	<ctime>			/* CSTD */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |stpcpy(3c)| */
+#include	<stdintx.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"modsys.hh"
+
+module modsys ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+local int		isleep(int) noex ;
+
+
+/* local variables */
+
+constexpr int		onethousand = 1000 ;
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+mtime_t umtime(void) noex {
+	mtime_t		t ;
+	mtime_t		m = 0 ; /* return-value */
+	if (TIMEVAL tv ; gettimeofday(&tv,nullptr) >= 0) {
+	    t = tv.tv_sec ;
+	    m += (t * onethousand) ;
+	    m += (tv.tv_usec / onethousand) ;
+	} else {
+	    const time_t	ut = time(nullptr) ;
+	    t = mtime_t(ut) ;
+	    m += (t * onethousand) ;
+	}
+	return m ;
+} /* end subroutine (umtime) */
+
+int msleep(int msec) noex {
+	int		rs = SR_INVALID ;
+	if (msec > 0) {
+	    cint	rsi = SR_INTR ;
+	    if ((rs = isleep(msec)) == rsi) {
+		rs = 1 ;
+	    }
+	} else if (msec == 0) {
+	    rs = SR_OK ;
+	} /* end if (valiid argument) */
+	return rs ;
+} /* end subroutine (msleep) */
+
+
+/* local subroutines */
+
+local int isleep(int mto) noex {
+	POLLFD		fds[1] = {} ; /* no entries actually used */
+	int		rs ;
+	bool		fexit = false ;
+	repeat {
+	    if ((rs = poll(fds,0,mto)) < 0) {
+		rs = (neg errno) ;
+	        switch (rs) {
+	        case SR_AGAIN:
+		    break ;
+	        case SR_INTR:
+		default:
+		    fexit = true ;
+		    break ;
+	        } /* end switch */
+	    } /* end if (poll got an error) */
+	} until ((rs >= 0) || fexit) ;
+	return rs ;
+} /* end subroutine (isleep) */
+
+
