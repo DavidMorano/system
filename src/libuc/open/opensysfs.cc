@@ -82,9 +82,9 @@
 
 #include	"opensysfs.hh"
 
-#pragma		GCC dependency		"mod/unixfnames.ccm"
+#pragma		GCC dependency		"mod/sysdbfnames.ccm"
 
-import unixfnames ;
+import sysdbfnames ;			/* |sysdbfname(3u)| */
 
 /* local defines */
 
@@ -238,7 +238,7 @@ local int opencfile(int w,int of,int ttl) noex {
 		    cchar	*ufn = nullptr ;
 		    switch (w) {
 	            case opensysdb_shadow:
-		        ufn = unixfname.shadow ;
+		        ufn = sysdbfname.shadow ;
 		        mm &= (~7) ;
 		        falldown ;
 		    default:
