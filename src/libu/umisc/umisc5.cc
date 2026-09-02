@@ -74,7 +74,7 @@ int snaddx(char *rbuf,int rlen,int rl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
