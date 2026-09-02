@@ -72,9 +72,9 @@ module umisc ;
 int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf && sp) {
+	if (rbuf && sp) ylikely {
 	    rs = SR_INVALID ;
- 	    if (i >= 0) {	
+ 	    if (i >= 0) ylikely {	
 	        char	*bp = (rbuf + i) ;
 	        rs = SR_OK ;
 	        if (rlen < 0) {
