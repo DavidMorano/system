@@ -35,12 +35,12 @@ DEFS +=
 
 INCS += umods.h
 
-MODS += valuelims.ccm digbufsizes.ccm
-MODS += bitop.ccm
-MODS += digtab.ccm
+MODS += valuelims.o digbufsizes.o
+MODS += bitop.o
+MODS += digtab.o
 MODS +=
-MODS += unixfnames.ccm constdiv.ccm builtin.ccm
-MODS += usysbasic.ccm
+MODS += sysdbfnames.o constdiv.o builtin.o
+MODS += usysbasic.o
 
 LIBS +=
 
@@ -49,7 +49,7 @@ OBJ00_UMODS = valuelims.o
 OBJ01_UMODS = builtin.o
 OBJ02_UMODS = digtab.o
 OBJ03_UMODS = bitop.o
-OBJ04_UMODS = unixfnames.o 
+OBJ04_UMODS = sysdbfnames.o 
 OBJ05_UMODS = constdiv.o 
 OBJ06_UMODS = usysbasic.o
 OBJ07_UMODS = digbufsizes.o numbasedigs.o
@@ -63,9 +63,7 @@ OBJ_UMODS= obja_umods.o objb_umods.o objc_umods.o objd_umods.o
 
 
 INCDIRS=
-
 LIBDIRS=
-
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -237,14 +235,14 @@ valuelims.o:		valuelims.ccm			$(INCS)
 digbufsizes.o:		digbufsizes.ccm
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-# UNIXFNAMES
-unixfnames.o:		unixfnames0.o unixfnames1.o
+# SYSDBFNAMES
+sysdbfnames.o:		sysdbfnames0.o sysdbfnames1.o
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
-unixfnames0.o:		unixfnames.ccm
+sysdbfnames0.o:		sysdbfnames.ccm sysdbfnames.hh
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-unixfnames1.o:		unixfnames1.cc unixfnames0.o
+sysdbfnames1.o:		sysdbfnames1.cc sysdbfnames0.o sysdbfnames.hh
 	$(COMPILE.cc) $<
 
 # USYSBASIC
