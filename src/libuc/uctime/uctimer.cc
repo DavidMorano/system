@@ -70,7 +70,6 @@
 /* imported namespaces */
 
 
-
 /* local typedefs */
 
 
@@ -97,18 +96,18 @@ namespace {
 	uctimer(clockid_t c,sigevent *sp,timer_t *tp) noex : tmp(tp) {
 	    cid = c ;
 	    sep = sp ;
-	} ;
+	} ; /* end ctor */
 	uctimer(int f,ITS *o,const ITS *n) noex : tf(f) {
 	    otvp = o ;
 	    ntvp = n ;
-	} ;
+	} ; /* end ctor */
 	uctimer(ITS *o) noex : otvp(o) { } ;
 	int operator () (timer_t) noex ;
-	int create(timer_t) noex ;
-	int destroy(timer_t) noex ;
-	int set(timer_t) noex ;
-	int get(timer_t) noex ;
-	int over(timer_t) noex ;
+	sysret_t sys_create	(timer_t) noex ;
+	sysret_t sys_destroy	(timer_t) noex ;
+	sysret_t sys_set	(timer_t) noex ;
+	sysret_t sys_get	(timer_t) noex ;
+	sysret_t sys_over	(timer_t) noex ;
     } ; /* end struct (uctimer) */
 } /* end namespace */
 
@@ -128,9 +127,9 @@ constexpr timer_t	tnull{} ;
 
 int uc_timercreate(clockid_t cid,sigevent *sep,timer_t *tmp) noex {
 	int		rs = SR_FAULT ;
-	if (tmp) {
+	if (tmp) ylikely {
 	    uctimer	uco(cid,sep,tmp) ;
-	    uco.m = &uctimer::create ;
+	    uco.m = &uctimer::sys_create ;
 	    rs = uco(tnull) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -138,25 +137,25 @@ int uc_timercreate(clockid_t cid,sigevent *sep,timer_t *tmp) noex {
 
 int uc_timerdestroy(timer_t tid) noex {
 	uctimer		uco ;
-	uco.m = &uctimer::destroy ;
+	uco.m = &uctimer::sys_destroy ;
 	return uco(tid) ;
 } /* end subroutine (uc_timerdestroy) */
 
 int uc_timerset(timer_t tid,int tf,CITS *ntvp,ITS *otvp) noex {
 	uctimer		uco(tf,otvp,ntvp) ;
-	uco.m = &uctimer::set ;
+	uco.m = &uctimer::sys_set ;
 	return uco(tid) ;
 } /* end method (uctimer::set) */
 
 int uc_timerget(timer_t tid,ITS *otvp) noex {
 	uctimer		uco(otvp) ;
-	uco.m = &uctimer::get ;
+	uco.m = &uctimer::sys_get ;
 	return uco(tid) ;
 } /* end method (uctimer::get) */
 
 int uc_timerover(timer_t tid) noex {
 	uctimer		uco ;
-	uco.m = &uctimer::over ;
+	uco.m = &uctimer::sys_over ;
 	return uco(tid) ;
 } /* end subroutine (uc_timerover) */
 
@@ -192,50 +191,50 @@ int uctimer::operator () (timer_t tid) noex {
 	return rs ;
 } /* end subroutine (uctimer::operator) */
 
-int uctimer::create(timer_t) noex {
+sysret_t uctimer::sys_create(timer_t) noex {
 	int		rs = SR_FAULT ;
 	if (tmp) {
 	    if ((rs = timer_create(cid,sep,tmp)) < 0) {
 		rs = (neg errno) ;
-	    }
+	    } /* end if (error) */
 	}
 	return rs ;
-} /* end method (uctimer::create) */
+} /* end method (uctimer::sys_create) */
 
-int uctimer::destroy(timer_t tid) noex {
+sysret_t uctimer::sys_destroy(timer_t tid) noex {
 	int		rs ;
 	if ((rs = timer_delete(tid)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
-} /* end method (uctimer::destroy) */
+} /* end method (uctimer::sys_destroy) */
 
-int uctimer::set(timer_t tid) noex {
+sysret_t uctimer::sys_set(timer_t tid) noex {
 	int		rs = SR_FAULT ;
-	if (ntvp) {
+	if (ntvp) ylikely {
 	    if ((rs = timer_settime(tid,tf,ntvp,otvp)) < 0) {
 		rs = (neg errno) ;
-	    }
+	    } /* end if (error) */
 	}
 	return rs ;
-} /* end method (uctimer::set) */
+} /* end method (uctimer::sys_set) */
 
-int uctimer::get(timer_t tid) noex {
+sysret_t uctimer::sys_get(timer_t tid) noex {
 	int		rs = SR_FAULT ;
-	if (otvp) {
+	if (otvp) ylikely {
 	    if ((rs = timer_gettime(tid,otvp)) < 0) {
 		rs = (neg errno) ;
-	    }
+	    } /* end if (error) */
 	}
 	return rs ;
-} /* end method (uctimer::get) */
+} /* end method (uctimer::sys_get) */
 
-int uctimer::over(timer_t tid) noex {
+sysret_t uctimer::sys_over(timer_t tid) noex {
 	int		rs ;
 	if ((rs = timer_getoverrun(tid)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
-} /* end method (uctimer::over) */
+} /* end method (uctimer::sys_over) */
 
 
