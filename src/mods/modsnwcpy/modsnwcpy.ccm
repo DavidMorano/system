@@ -1,0 +1,36 @@
+/* modsnwcpy MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-26, David A­D­ Morano
+	This was first written to give a little bit to UNIX® 
+	of what we have in our own circuit-pack OSes!
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module modsnwcpy ;
+
+export {
+    extern int snwcpy(char *,int,cchar *,int = -1) noex ;
+} /* end export */
+
+
