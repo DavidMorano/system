@@ -1,0 +1,66 @@
+/* modsys-timeout MODULE (primary-partition) */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* manage UNIX® kernal-call (and std-c library) timeouts */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module modsys:timeout ;
+
+export {
+    enum utos {
+	uto_again,
+	uto_intr,
+	uto_nomem,
+	uto_nosr,
+	uto_nobufs,
+	uto_busy,
+	uto_get,
+	uto_deadlock,
+	uto_io,
+	uto_dquot,
+	uto_nospc,
+	uto_dial,
+	uto_open,
+	uto_read,
+	uto_mfile,
+	uto_nfile,
+	uto_poll,
+	uto_nolck,
+	uto_capture,
+	uto_txtbusy,
+	uto_closewait,
+	uto_inprogress,
+	uto_overlast
+    } ; /* end enum (utos) */
+} /* end export */
+
+export {
+    intp	utimeout ;
+} /* end export */
+
+export {
+    int	ms_timeout(int,int) noex ;
+} /* end export */
+
+
