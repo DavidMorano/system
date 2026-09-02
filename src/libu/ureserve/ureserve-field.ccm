@@ -34,7 +34,7 @@ module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -64,11 +64,11 @@ export {
 	void operator () (field *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (field_co) */
     struct field : field_head {
 	field_co	finish ;
@@ -90,7 +90,7 @@ export {
 	void dtor() noex ;
 	destruct field() {
 	    if (lp) dtor() ;
-	} ;
+	} ; /* end */
     } ; /* end struct (field) */
 } /* end export */
 
