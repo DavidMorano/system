@@ -37,7 +37,7 @@ int memclearer(void *,int) noex ;
 export {
     inline int memclear(void *objp,int sz) noex {
 	int	rs = SR_FAULT ;
-	if (objp) {
+	if (objp) ylikely {
 	    rs = SR_INVALID ;
 	    if (sz >= 0) {
 	        rs = SR_OK ;
@@ -50,7 +50,7 @@ export {
     } /* end subroutine */
     template<typename T> inline int memclear(T *objp,int sz) noex {
 	int	rs = SR_FAULT ;
-	if (objp) {
+	if (objp) ylikely {
 	    if (sz < 0) {
     	        sz = szof(T) ;
 	    }
@@ -60,7 +60,7 @@ export {
     } /* end subroutine-template */
     template<typename T> inline int memclear(T *objp) noex {
 	int	rs = SR_FAULT ;
-	if (objp) {
+	if (objp) ylikely {
 	    cint sz = szof(T) ;
 	    rs = memclearer(objp,sz) ;
 	} /* end if (non-null) */
