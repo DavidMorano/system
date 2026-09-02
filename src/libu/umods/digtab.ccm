@@ -88,13 +88,13 @@ struct digtaber {
     	int	i = 0 ;
 	for (int j = 0 ; j < 10 ; j += 1) {
 	    dig[i++] = uchar('0' + j) ;
-	}
+	} /* end */
 	for (int j = 0 ; j < 26 ; j += 1) {
 	    dig[i++] = uchar('A' + j) ;
-	}
+	} /* end */
 	for (int j = 0 ; j < 26 ; j += 1) {
 	    dig[i++] = uchar('a' + j) ;
-	}
+	} /* end */
 	dig[i++] = uchar('Ø') ;
 	dig[i++] = uchar('ø') ;
     } ; /* end method (mkdig) */
