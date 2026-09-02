@@ -35,17 +35,17 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<cstring>		/* |memset(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>		/* |COLUMNS| */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<cstring>		/* CSTD |memset(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
 
 module libutil ;
 
@@ -80,7 +80,7 @@ module libutil ;
 
 int memclearer(void *op,int sz) noex {
     	int	rs = SR_FAULT ;
-    	if (op) {
+    	if (op) ylikely {
 	    rs = SR_INVALID ;
 	    if (sz >= 0) {
 		rs = sz ;
@@ -93,10 +93,10 @@ int memclearer(void *op,int sz) noex {
 	return rs ;
 } /* end subroutine (memclearer) */
 
-    int loadstrs(cc **strs,int n,...) noex {
+int loadstrs(cc **strs,int n,...) noex {
     	va_list		ap ;
 	int		i = -1 ; /* return-value */
-	if (strs) {
+	if (strs) ylikely {
 	    va_begin(ap,n) ;
 	    for (i = 0 ; i < n ; i += 1) {
 		cc *cp = (ccharp) va_arg(ap,charp) ;
@@ -104,13 +104,13 @@ int memclearer(void *op,int sz) noex {
 	    } /* end for */
 	    strs[i] = nullptr ;
 	    va_end(ap) ;
-	}
+	} /* end if (non-null) */
 	return i ;
-    } /* end subroutine (loadstrs) */
+} /* end subroutine (loadstrs) */
 
 int lenstrline(cchar *sp,int sl,int ll) noex {
     	int	rl = -1 ; /* return-value */
-	if (sp) {
+	if (sp) ylikely {
 	    rl = 0 ;
 	    if (ll < 0) ll = COLUMNS ;
 	    if (sl < 0) sl = INT_MAX ;
