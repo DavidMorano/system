@@ -108,7 +108,7 @@ int strop_start(strop *sop,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	if (sop && sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
+	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 	        sop->sp = sp ;
 	        sop->sl = sl ;
 	        rs = sop->sl ;
