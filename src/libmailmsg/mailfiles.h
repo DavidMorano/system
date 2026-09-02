@@ -25,7 +25,7 @@
 #include	<time.h>		/* CSTD |time_t| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<vecobj.h>		/* LINUC */
+#include	<vecobj.h>		/* LIBUC */
 
 
 #define	MAILFILES		struct mailfiles_head
