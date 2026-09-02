@@ -82,7 +82,7 @@ namespace {
 	operator int () noex ;
 	virtual bool termx(int ch) const noex {
 	    return (ch == 0) ;
-	} ;
+	} ; /* end */
 	bool isterm(int ch) const noex {
 	    bool	f = false ;
 	    ch &= UCHAR_MAX ;
@@ -136,7 +136,7 @@ int sfbasename(cchar *sp,int µsl,cchar **rpp) noex {
 	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
 	    while ((sl > 1) && (sp[sl - 1] == '/')) {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    {
 	        int	si ; /* used-afterwards */
 	        for (si = sl ; si > 0 ; si -= 1) {
@@ -160,10 +160,10 @@ int sfdirname(cchar *sp,int µsl,cchar **rpp) noex {
 	    int		i ; /* used-afterwards */
 	    while ((sl > 0) && (sp[sl - 1] == '/'))  {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    for (i = sl ; i > 0 ; i -= 1) {
 	        if (sp[i - 1] == '/') break ;
-	    }
+	    } /* end for */
 	    rp = sp ;
 	    if (i == 1) {
 	        rl = 1 ;
