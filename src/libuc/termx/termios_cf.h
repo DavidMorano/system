@@ -20,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<termios.h>		/* LINUC */
+#include	<termios.h>		/* LIBUC */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
