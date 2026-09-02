@@ -18,24 +18,24 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
-#include	<algorithm>		/* |min(C++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* C++STD |min(C++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module libutil:memcopy ;
 
 export {
     constexpr inline void *memcopy(void *dp,cvoid *sp,int sl) noex {
 	caddr_t		rp = nullptr ; /* return-value */
-	if (dp && sp) {
+	if (dp && sp) ylikely {
 	    if (sl < 0) {
 	        cchar *cp = charp(sp) ;
 	        sl = intconv(strlen(cp)) ;
@@ -52,7 +52,7 @@ export {
     template<typename T>
     constexpr inline void *memcopy(T *dp,cvoid *sp) noex {
     	caddr_t		rp = nullptr ;
-	if (dp && sp) {
+	if (dp && sp) ylikely {
 	    rp = caddr_t(dp) ;
 	    {
 		csize dstsize = sizeof(T) ;
@@ -65,7 +65,7 @@ export {
     template<typename T>
     constexpr inline void *memcopyz(T *dp,int dl,cvoid *sp,int sl) noex {
     	caddr_t		rp = nullptr ;
-	if (dp && sp) {
+	if (dp && sp) ylikely {
 	    if (dl < 0) {
 		dl = szof(T) ;
 	    }
