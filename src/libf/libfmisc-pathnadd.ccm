@@ -1,0 +1,62 @@
+/* libfmisc-pathnadd MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® Miscellaneous support */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-21, David A­D­ Morano
+	This module was originally written.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
+*/
+
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Module:
+	libfmisc
+
+	Description:
+	This module provides miscellaneous UNIX® or other
+	common (library oriented) subroutines.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module libfmisc:pathnadd ;
+
+export {
+	int pathnaddw(char *,int,int,cchar *,int) noex ;
+	int pathnaddx(char *,int,int,int,cchar *,...) noex ;
+	inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp) noex {
+	    return pathnaddw(pbuf,plen,pl,sp,-1) ;
+	} /* end */
+	inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
+	    return pathnaddw(pbuf,plen,pl,sp,sl) ;
+	} /* end */
+	template<typename ... Args>
+	inline int pathnadd(char *dbuf,int dl,Args ... args) noex {
+	    cint	na = npack(Args) ;
+	    return pathnaddx(dbuf,dl,na,args ...) ;
+	} /* end */
+} /* end export */
+
+
