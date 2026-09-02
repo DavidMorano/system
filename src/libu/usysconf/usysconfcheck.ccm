@@ -94,7 +94,7 @@ export {
 		    rs = SR_OK ;
 	    	    rv = ni ;
 		} /* end if (got a match) */
-	    } /* end if (partition) */
+	    } /* end if (partition_point) */
 	    return (rs >= 0) ? rv : rs ;
 	} ; /* end method (operator) */
     } ; /* end struct (getter) */
