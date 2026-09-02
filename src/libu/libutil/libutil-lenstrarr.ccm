@@ -18,7 +18,7 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
+#include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
@@ -34,7 +34,7 @@ export module libutil:lenstrarr ;
 export {
     int lenstrarr(con mainv a) noex {
     	int	n = -1 ; /* return-value */
-	if (a) {
+	if (a) ylikely {
 	    for (n = 0 ; a[n] ; n += 1) ;
 	}
 	return n ;
