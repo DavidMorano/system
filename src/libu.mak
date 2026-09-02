@@ -39,10 +39,10 @@ MODS += valuelims.o digbufsizes.o uconstants.o
 MODS += libutil.o chrset.o bitgrp.o
 MODS += digtab.o xxtostr.o
 MODS += usigsets.o usigblock.o umisc.o
-MODS += unixfnames.o constdiv.o
+MODS += constdiv.o
 MODS += usysbasic.o ureserve.cmm vecbool.o
 
-LIBS += -liconv -lproc
+LIBS += -lf -liconv -lproc
 
 
 OBJ00= syshas.o mailvalues.o endian.o 
@@ -78,7 +78,7 @@ OBJ23= syscontain.o stdfnames.o stdfiles.o
 OBJ24= posixdirent.o nulstr.o
 OBJ25= fonce.o filerec.o
 OBJ26= ustd.o ugetx.o
-OBJ27= ucomposite.o upt.o
+OBJ27= ucomposite.o upt.o ucmpx.o
 
 OBJ28= bitmanip.o findbit.o baops.o
 OBJ29= clockids.o itimers.o filetypes.o funcodes.o 
@@ -398,14 +398,14 @@ itimerspec.o:		itimerspec.cc	itimerspec.h		$(INCS)
 
 # SUPPORT helpers
 usysflag.o:		usysflag.cc	usysflag.h		$(INCS)
-ulimits.o:		ulimits.cc	ulimits.h			$(INCS)
+ulimits.o:		ulimits.cc	ulimits.h		$(INCS)
 utimeout.o:		utimeout.c	utimeout.h		$(INCS)
 utimeouts.o:		utimeouts.cc	utimeouts.h		$(INCS)
 utimeoutdefs.o:		utimeoutdefs.cc	utimeoutdefs.h		$(INCS)
 usyscallbase.o:		usyscallbase.cc	usyscallbase.hh		$(INCS)
 usysutility.o:		usysutility.cc	usysutility.hh		$(INCS)
 usysdata.o:		usysdata.cc	usysdata.h		$(INCS)
-ulogerror.o:		ulogerror.cc	ulogerror.h			$(INCS)
+ulogerror.o:		ulogerror.cc	ulogerror.h		$(INCS)
 
 # requires USYSBASIC
 uatfork.o:		umods.o usigblock.o
@@ -504,26 +504,6 @@ usupport.o:		usupport.dir ischx.o
 usupport.dir:
 	makesubdir $@
 
-# VECBOOL
-vecbool.o:		vecbool.dir
-vecbool.dir:
-	makesubdir $@
-
-# FONCE
-fonce.o:		fonce.dir
-fonce.dir:
-	makesubdir $@
-
-# FILEREC
-filerec.o:		filerec.dir
-filerec.dir:
-	makesubdir $@
-
-# LIBUTIL
-libutil.o:		libutil.dir
-libutil.dir:
-	makesubdir $@
-
 # ULIBVALS
 ulibvals.o:		ulibvals.dir
 ulibvals.dir:
@@ -542,6 +522,11 @@ usigsets.dir:
 # USIREAM
 ustream.o:		ustream.dir
 ustream.dir:
+	makesubdir $@
+
+# UCMPX
+ucmpx.o:		ucmpx.dir
+ucmpx.dir:
 	makesubdir $@
 
 usigblock.o:		usigblock.ccm			$(INCS)
@@ -567,6 +552,26 @@ intext.dir:		varithmetic.o loadvals.o
 # DEBUG
 deb.o:			deb.dir
 deb.dir:
+	makesubdir $@
+
+# VECBOOL
+vecbool.o:		vecbool.dir
+vecbool.dir:
+	makesubdir $@
+
+# FONCE
+fonce.o:		fonce.dir
+fonce.dir:
+	makesubdir $@
+
+# FILEREC
+filerec.o:		filerec.dir
+filerec.dir:
+	makesubdir $@
+
+# LIBUTIL
+libutil.o:		libutil.dir
+libutil.dir:
 	makesubdir $@
 
 # misc-objects
