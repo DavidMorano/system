@@ -18,17 +18,17 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
-#include	<algorithm>		/* |min(C++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD *|strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* C++STD |min(C++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module libutil:getlen ;
 
@@ -36,7 +36,7 @@ export {
     template<typename T> 
     constexpr inline int getlen(const T *ap,int al = -1) noex {
 	int		i = -1 ; /* return-value and multiple */
-	if (ap) {
+	if (ap) ylikely {
 	    i = 0 ; 
 	    if (al >= 0) {
 		i = al ;
