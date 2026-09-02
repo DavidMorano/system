@@ -1,0 +1,153 @@
+/* modsys-conf MODULE (primary-partition) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* interface component for UNIX® library-3c */
+/* get system configuration information */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-04-13, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
+*/
+
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	modsysconfval
+
+	Description:
+	This subroutine returns system-related values (as opposed
+	to strings as |modsysconfstr(3uc)| does).
+
+	Synopsis:
+	int modsysconfval(int req,long *rp = nullptr) noex
+
+	Arguments:
+	req		requested value to return
+	rp		pointer to value-type |long| for received value
+
+	Returns:
+	>=0		OK and this is the requested value
+	<0		error (system-return)
+
+	Name:
+	modsysconfstr
+
+	Description:
+	This subroutine is NOT the same as the UNIX®-System version.
+	This subroutine returns "OVERFLOW" when the user supplied
+	buffer is not big enough to hold the associated value.
+
+	Synopsis:
+	int modsysconfstr(char *rbuf,int rlen,int req) noex
+
+	Arguments:
+	rbuf		user supplied buffer to hold result
+	rlen		length of user supplied value
+	req		configuration value to request
+
+	Returns:
+	>0		valid and the value is returned with this length
+	0		valid but there was no value associated
+	<0		error (system-return)
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU */
+
+export module modsys:conf ;
+
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+export {
+    struct unprocer {
+	operator int () noex ;
+	int operator () (int = 0) noex ;
+    } ; /* end struct */
+    enum modsysconfermems {
+    	modsysconfermem_tzname,
+	modsysconfermem_overlast
+    } ; /* end enum (modsysconfmems) */
+    struct modsysconfer ;
+    struct modsysconfer_co {
+	modsysconfer	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (modsysconfer *p,int m) noex ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ; /* end */
+    } ; /* end struct (modsysconfer_co) */
+    struct modsysconfer {
+	modsysconfer_co	tzname ;
+	bool		finit ;
+	modsysconfer() noex {
+	    tzname	(this,modsysconfermem_tzname) ;
+	    finit	= false ;
+	} /* end ctor */
+	void dtor	() noex ;
+	destruct modsysconfer() {
+	    if (finit) dtor() ;
+	} ; /* end destruct */
+    } ; /* end struct (modsysconfer) */
+} /* end export */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+export {
+    extern unprocer 	unprocessors ;
+    extern modsysconfer	usysconf ;
+} /* end export */
+
+
+/* exported subroutines */
+
+export {
+    int ms_confval	(int,long * = nullptr) noex ;
+    int ms_confstr	(int,char *,int) noex ;
+    int	ms_nprocessors	(int) noex ;
+} /* end export */
+
+
