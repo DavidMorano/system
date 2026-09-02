@@ -96,7 +96,7 @@ int uc_strftime(char *dbuf,int dlen,cc *fmt,CTM *tmp) noex {
 		    rs = SR_OK ;
 		    rl = intsat(res) ;
 		} else if (res == 0) {
-		    rs = (errno) ? (neg errno) : SR_OK ;
+		    rs = (errno) ? (neg errno) : SR_OVERFLOW ;
 		} else {
 		    rs = SR_BADFMT ;
 	        } /* end if (strftime) */
