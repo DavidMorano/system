@@ -33,13 +33,13 @@ module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<vector>
-#include	<string>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<vector>		/* C++STD */
+#include	<string>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module ureserve:vecstr ;
 
@@ -67,11 +67,11 @@ export {
 	void operator () (vecstr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (vecstr_co) */
     struct vecstr_cur ;
     struct vecstr : vector<string> {
@@ -109,12 +109,12 @@ export {
 	    if (fl.open) dtor() ;
 	} ; /* end destrcut */
     private:
-	int istart(int = 0) noex ;
-	int ifinish() noex ;
-	int idelall() noex ;
-	int ifind(cchar *,int) noex ;
-	int isort() noex ;
-	void dtor() noex ;
+	int istart	(int = 0) noex ;
+	int ifinish	() noex ;
+	int idelall	() noex ;
+	int ifind	(cchar *,int) noex ;
+	int isort	() noex ;
+	void dtor	() noex ;
     } ; /* end struct (vecstr) */
     struct vecstr_cur {
 	vecstr::iterator	it ;
