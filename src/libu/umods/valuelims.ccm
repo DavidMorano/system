@@ -31,12 +31,16 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |CHAR_BIT| + others */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<stdintx.h>
+#include	<climits>		/* CSTD |CHAR_BIT| + others */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
+
+#include	"valuelims.hh"
 
 export module valuelims ;
 
@@ -60,10 +64,10 @@ export {
 	    ullmax = ~ullmax ;
 	    llmin = (one << (n - 1)) ;
 	    llmax = longlong(ullmax >> 1) ;
-	} ;
+	} ; /* end */
 	constexpr valuelims() noex {
 	    mklonglong() ;
-	} ;
+	} ; /* end */
     } ; /* end subroutine (valuelims) */
 } /* end export */
 
