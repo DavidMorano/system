@@ -50,35 +50,33 @@
 *****************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
 #include	<cstddef>		/* STC-C */
 #include	<cstdlib>		/* STC-C */
 #include	<cstdio>		/* STC-C */
 #include	<cstring>		/* STD-C |strcpy(3c)| */
+#include	<new>			/* C++CTD placement-new */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
-#include	<umem.hh>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<ubufdefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"libf.h"
 
-#pragma		GCC dependency		"mod/ulibvals.ccm"
-#pragma		GCC dependency		"mod/umisc.ccm"
-
-import ulibvals ;
-import umisc ;				/* |mknpath(3u)| */
+import libfsup ;
+import libfmisc ;			/* |mknpath(3u)| */
 
 /* local defines */
 
 
 /* imported namespaces */
-
-using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -98,7 +96,7 @@ using libu::umem ;			/* variable */
 
 /* local variables */
 
-cint		maxpathlen = ulibval.maxpathlen ;
+cint		maxpathlen = MAXPATHLEN ;
 
 
 /* exported variables */
@@ -107,26 +105,31 @@ cint		maxpathlen = ulibval.maxpathlen ;
 /* exported subroutines */
 
 FILE *fopenroot(cchar *pr,cchar *fn,char *outname,cchar *mstr) noex {
-	FILE	*fp = nullptr ;
-	int	rs = SR_FAULT ;
-	int	rs1 ;
+	FILE		*fp = nullptr ;
+	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
 	if (mstr == nullptr) {
 	    mstr = "r" ;
 	}
-	if (pr && fn) {
+	if (pr && fn) ylikely {
 	    rs = SR_INVALID ;
-	    if (fn[0] && mstr[0]) {
-		if ((rs = maxpathlen) >= 0) {
+	    outname[0] = '\0' ;
+	    if (fn[0] && mstr[0]) ylikely {
+		if ((rs = maxpathlen) >= 0) ylikely {
 		    cint plen = rs ;
-		    if (char *pbuf ; (rs = umem.mall((plen + 1),&pbuf)) >= 0) {
+		    rs = SR_NOMEM ;
+		    if (char *pbuf = new(nt) char [plen + 1] ; pbuf) ylikely {
 	    	        if ((rs = mknpath(pbuf,plen,pr,fn)) >= 0) {
 			    fp = fopen(pbuf,mstr) ;
-		        }
-		        rs1 = umem.free(pbuf) ;
-		        if (rs >= 0) rs = rs1 ;
-		        if (outname) {
-			    strcpy(outname,pbuf) ;
-		        }
+		            if (outname) {
+			        rs = mknpath(outname,plen,pbuf) ;
+		            }
+			    if (rs < 0) {
+				fclose(fp) ;
+				fp = nullptr ;
+			    } /* end if (error) */
+		        } /* end if (mknpath) */
+			delete [] pbuf ;
 		    } /* end if (m-a-f) */
 		} /* end if (maxpathlen) */
 	    } /* end if (valid) */
@@ -136,7 +139,6 @@ FILE *fopenroot(cchar *pr,cchar *fn,char *outname,cchar *mstr) noex {
 	    fp = nullptr ;
 	} /* end if (error) */
 	return fp ;
-}
-/* end subroutine (fopenroot) */
+} /* end subroutine (fopenroot) */
 
 
