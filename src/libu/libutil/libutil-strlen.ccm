@@ -29,14 +29,14 @@ export {
     	cchar		*cp = sp ;
 	while (sl && *cp++) {
 	    sl -= 1 ;
-	}
+	} /* end */
 	return int(cp - sp) ;
-    }
+    } /* end subroutine */
     constexpr inline int cstrlen(cchar *sp) noex {
     	int		len = 0 ;
 	while (sp[len]) len += 1 ;
 	return len ;
-    }
+    } /* end subroutine */
     constexpr inline int xstrnlen(cchar *sp,int sl) noex {
     	int		len = 0 ;
 	if (sl >= 0) {
@@ -46,10 +46,10 @@ export {
 	    len = intconv(strlen(sp)) ;
 	}
     	return len ;
-    }
+    } /* end subroutine */
     constexpr inline int xstrlen(cchar *sp) noex {
     	return intconv(strlen(sp)) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 
