@@ -34,7 +34,7 @@ module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |UCHAR_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<bitset>		/* C++STD <- the money shot! */
 #include	<clanguage.h>		/* LIBU */
@@ -95,16 +95,16 @@ constexpr void charinfo::mkiswhite() noex {
 	for (int i = 0 ; w[i] ; i += 1) {
 	    cint	ch = w[i] ;
 	    iswhite.set(ch,true) ;
-	}
+	} /* end for */
 } /* end method (charinfo::mkiswhite) */
 
 constexpr void charinfo::mkislc() noex {
 	for (int ch = 'a' ; ch <= 'z' ; ch += 1) {
 	    islc.set(ch,true) ;
-	}
+	} /* end for */
 	for (int ch = UC('à') ; ch <= UC('ÿ') ; ch += 1) {
 	    islc.set(ch,true) ;
-	}
+	} /* end for */
 	islc.set(UC('÷'),false) ;
 	islc.set(UC('ß'),true) ; 	/* <- this is 'ss' in German */
 } /* end method (charinfo::mkislc) */
@@ -112,10 +112,10 @@ constexpr void charinfo::mkislc() noex {
 constexpr void charinfo::mkisuc() noex {
 	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
 	    isuc.set(ch,true) ;
-	}
+	} /* end for */
 	for (int ch = UC('À') ; ch <= UC('Þ') ; ch += 1) {
 	    isuc.set(ch,true) ;
-	}
+	} /* end for */
 	isuc.set(UC('×'),false) ;
 	isuc.set(UC('ß'),false) ; 	/* <- this is 'ss' in German */
 } /* end method (charinfo::mkisuc) */
@@ -123,11 +123,10 @@ constexpr void charinfo::mkisuc() noex {
 constexpr void charinfo::mkisfc() noex {
 	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
 	    isfc.set(ch,true) ;
-	}
+	} /* end for */
 	isfc.set(UC('Ð'),false) ;
 	isfc.set(UC('Þ'),false) ; /* 0xDE - 'PB' in German */
-}
-/* end method (charinfo::mkisfc) */
+} /* end method (charinfo::mkisfc) */
 
 constexpr void charinfo::mktoval() noex {
         for (int ch = 0 ; ch < chtablen ; ch += 1) {
