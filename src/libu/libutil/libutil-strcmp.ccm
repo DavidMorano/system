@@ -12,16 +12,16 @@ module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* |INT_MAX| + |UCHAR_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<cstring>		/* |strlen(3c)| + |strnlen(3c)| */
-#include	<algorithm>		/* |min(C++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* C++STD |min(C++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module libutil:strcmp ;
 
