@@ -23,8 +23,8 @@
 #include	<unistd.h>		/* POSIX® |off_t| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<vecobj.h>		/* LINUC */
-#include	<strpack.h>		/* LINUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<strpack.h>		/* LIBUC */
 #include	<mailbox.h>		/* LIBMAILSG */
 
 
