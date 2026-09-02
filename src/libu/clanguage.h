@@ -24,18 +24,18 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
-#include	<clanguage_conv.h>
+#include	<clanguage_assert.h>
+#include	<clanguage_attr.h>
 #include	<clanguage_branch.h>
 #include	<clanguage_cast.h>
-#include	<clanguage_sat.h>
-#include	<clanguage_attr.h>
-#include	<clanguage_memorder.h>
-#include	<clanguage_assert.h>
-#include	<clanguage_oper.h>
-#include	<clanguage_intrinsic.h>
-#include	<clanguage_externc.h>
 #include	<clanguage_concepts.h>
+#include	<clanguage_conv.h>
+#include	<clanguage_cmporder.h>
+#include	<clanguage_externc.h>
+#include	<clanguage_intrinsic.h>
 #include	<clanguage_keywords.h>
+#include	<clanguage_oper.h>
+#include	<clanguage_sat.h>
 
 
 #endif /* CLANGUAGE_INCLUDE */
