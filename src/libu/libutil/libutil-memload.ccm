@@ -35,14 +35,13 @@ export module libutil:memload ;
 export {
     constexpr inline int memload(void *dp,cvoid *sp,int sl) noex {
 	int		len = 0 ; /* return-value */
-	if (dp && sp) {
+	if (dp && sp) ylikely {
 	    if (sl < 0) {
 	        cchar *cp = charp(sp) ;
 	        sl = intconv(strlen(cp)) ;
 	    }
 	    if (sl > 0) {
 	        csize	srcsize = size_t(sl) ;
-	        caddr_t	dst = caddr_t(dp) ;
 	        memcpy(dp,sp,srcsize) ;
 	        len = sl ;
 	    } /* end block */
@@ -52,7 +51,7 @@ export {
     template<typename T>
     constexpr inline int memload(T *dp,cvoid *sp) noex {
 	int		len = 0 ; /* return-value */
-	if (dp && sp) {
+	if (dp && sp) ylikely {
 	    if (csize dstsize = sizeof(T) ; dstsize > 0) {
 	        memcpy(dp,sp,dstsize) ;
 	        len = intconv(dstsize) ;
@@ -63,7 +62,7 @@ export {
     template<typename T>
     constexpr inline void *memloadz(T *dp,int dl,cvoid *sp,int sl) noex {
     	int		len = 0 ; /* return-value */
-	if (dp && sp) {
+	if (dp && sp) ylikely {
 	    if (dl < 0) {
 		dl = szof(T) ;
 	    }
