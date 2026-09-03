@@ -40,7 +40,7 @@ export {
 	        cchar *cp = charp(sp) ;
 	        sl = intconv(strlen(cp)) ;
 	    }
-	    if (sl > 0) {
+	    if (sl > 0) ylikely {
 	        csize	srcsize = size_t(sl) ;
 	        memcpy(dp,sp,srcsize) ;
 	        len = sl ;
@@ -71,7 +71,7 @@ export {
 	        sl = intconv(strlen(cp)) ;
 	    }
 	    if (sl > dl) sl = dl ;
-	    if (sl > 0) {
+	    if (sl > 0) ylikely {
 	        csize	srcsize = size_t(sl) ;
 	        caddr_t	dst = caddr_t(dp) ;
 	        memcpy(dst,sp,srcsize) ;
