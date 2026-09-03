@@ -28,22 +28,21 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* STD-C |UCHAR_MAX| */
-#include	<cstddef>		/* STD-C |nullptr_t| */
+#include	<cstddef>		/* STD-C */
 #include	<cstdlib>		/* STD-C */
 #include	<cstdio>		/* STD-C */
 #include	<cstring>		/* STD-C */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
-#include	<usyscalls.h>		/* LIBU */
-#include	<intsat.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"libf.h"
 
-#pragma		GCC dependency		"mod/libutil.ccm"
-
-import libutil ;			/* |getlenstr(3u)| */
-
+import libfsup ;			/* |getlenstr(3u)| */
+import modsys ;				/* |intsat(3u)| */
 
 /* local defines */
 
@@ -52,7 +51,7 @@ import libutil ;			/* |getlenstr(3u)| */
 
 extern "C++" {
     int	fwrite(FILE *,cvoid *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -75,7 +74,7 @@ extern "C++" {
 int fputch(FILE *fp,int ch) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
-	if (fp) {
+	if (fp) ylikely {
 	    char wbuf[2] = { char(ch) } ;
 	    rs = fwrite(fp,wbuf,1) ;
 	    wlen += rs ;
