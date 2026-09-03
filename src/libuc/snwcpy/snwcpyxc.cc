@@ -57,10 +57,11 @@
 
 template<char (*chtoxc)(int)>
 int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
-    	int		rs = SR_OVERFLOW ; /* return-value */
+    	int		rs = SR_FAULT ; /* return-value */
 	if (dbuf && sp) ylikely {
 	    int		i = 0 ; /* used-afterwards */
 	    char	*dp = dbuf ;
+    	    rs = SR_OVERFLOW ;
 	    if (dlen < 0) dlen = INT_MAX ;
 	    while ((i < dlen) && sl && sp[i]) {
 	        *dp++ = chtoxc(sp[i++]) ;
@@ -69,7 +70,7 @@ int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    *dp = '\0' ;
 	    if ((sl == 0) || (sp[i] == '\0')) {
 	        rs = intconv(dp - dbuf) ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine-template (snwcpyxc) */
