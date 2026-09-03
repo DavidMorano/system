@@ -47,7 +47,7 @@ module ;
 #include	<usysrets.h>
 #include	<localmisc.h>		/* |COLUMNS| */
 
-module libutil ;
+module libfsup ;
 
 /* local defines */
 
