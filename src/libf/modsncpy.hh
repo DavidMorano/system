@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* string-index operations */
+/* counted-string copy functions */
 /* version %I% last-modified %G% */
 
 
