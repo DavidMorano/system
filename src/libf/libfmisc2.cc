@@ -112,8 +112,8 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
 	char		*bp = pbuf ;
-	if (pbuf) {
-	    if ((rs = getrlen(plen)) >= 0) {
+	if (pbuf) ylikely {
+	    if ((rs = getrlen(plen)) >= 0) ylikely {
 	        int	bl = rs ;
 	        int	sl = -1 ;
 	        va_begin(ap,n) ;
