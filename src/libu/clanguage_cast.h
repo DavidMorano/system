@@ -36,12 +36,19 @@
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
-#ifndef	cast_saturating
-#define	cast_saturating		saturating_cast
-#define	cast_saturate		saturating_cast
-#define	cast_sat		saturating_cast
-#define	saturate		saturating_cast
-#endif /* cast_saturating */
+#ifndef	saturate
+#define	saturate		std::saturate_cast
+#endif /* saturate */
+#endif /* __cplusplus */
+
+/* NOTE: this is GCC-specific (since GCC-14) and not C++26 */
+/* NOTE: C++26 says the proper cast is |std:saturating_cast(3c++)| */
+#ifdef	__cplusplus
+#ifndef	cast_saturate
+#define	cast_saturate		saturate_cast
+#define	cast_saturate		saturate_cast
+#define	cast_sat		saturate_cast
+#endif /* cast_saturate */
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
