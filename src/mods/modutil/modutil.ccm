@@ -1,0 +1,43 @@
+/* modutil MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Module:
+	modutil
+
+	Description:
+	This is a collection of utility (support) subroutines for
+	the library LIBF library.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module modutil ;
+
+export import :lenstr ;
+export import :memclear ;
+export import :memload ;
+export import :memcopy ;
+export import :memnset ;
+export import :resumelife ;
+
+
