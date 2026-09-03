@@ -1,0 +1,92 @@
+/* modutil-memcopy MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2020-10-13, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* C++STD |min(C++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module modutil:memcopy ;
+
+export {
+    constexpr inline void *memcopy(void *dp,cvoid *sp,int sl) noex {
+	caddr_t		rp = nullptr ; /* return-value */
+	if (dp && sp) ylikely {
+	    if (sl < 0) {
+	        cchar *cp = charp(sp) ;
+	        sl = intconv(strlen(cp)) ;
+	    }
+	    {
+	        csize	srcsize = size_t(sl) ;
+	        caddr_t	dst = caddr_t(dp) ;
+	        memcpy(dp,sp,srcsize) ;
+	        rp = (dst + sl) ;
+	    }
+	} /* end if (non-null) */
+	return voidp(rp) ;
+    } /* end subroutine (memcopy) */
+    template<typename T>
+    constexpr inline void *memcopy(T *dp,cvoid *sp) noex {
+    	caddr_t		rp = nullptr ;
+	if (dp && sp) ylikely {
+	    rp = caddr_t(dp) ;
+	    {
+		csize dstsize = sizeof(T) ;
+	        memcpy(dp,sp,dstsize) ;
+	        rp += dstsize ;
+	    } /* end block */
+	} /* end if (non-null) */
+	return voidp(rp) ;
+    } /* end subroutine (memcopy) */
+    template<typename T>
+    constexpr inline void *memcopyz(T *dp,int dl,cvoid *sp,int sl) noex {
+    	caddr_t		rp = nullptr ;
+	if (dp && sp) ylikely {
+	    if (dl < 0) {
+		dl = szof(T) ;
+	    }
+	    if (sl < 0) {
+	        cchar *cp = ccharp(sp) ;
+	        sl = intconv(strlen(cp)) ;
+	    }
+	    if (sl > dl) sl = dl ;
+	    {
+	        csize	srcsize = size_t(sl) ;
+	        caddr_t	dst = caddr_t(dp) ;
+	        memcpy(dp,sp,srcsize) ;
+	        rp = (dst + sl) ;
+		if (sl < dl) {
+		    csize zsize = size_t(dl - sl) ;
+		    memset(rp,0,zsize) ;
+		}
+	    } /* end block */
+	} /* end if (non-null) */
+	return voidp(rp) ;
+    } /* end subroutine (memcopyz) */
+} /* end export */
+
+
