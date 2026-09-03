@@ -15,8 +15,8 @@
 
 /* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	LIBFUTIL_INCLUDE
-#define	LIBFUTIL_INCLUDE
+#ifndef	LIBFSUP_INCLUDE
+#define	LIBFSUP_INCLUDE
 #ifdef	__cplusplus
 
 
@@ -29,6 +29,6 @@
 
 
 #endif /* __cplusplus */
-#endif /* LIBFUTIL_INCLUDE */
+#endif /* LIBFSUP_INCLUDE */
 
 
