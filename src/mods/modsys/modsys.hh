@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* string-index operations */
+/* provides various system oriented functions */
 /* version %I% last-modified %G% */
 
 
@@ -21,12 +21,14 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
-#include	<localmisc.h>		/* LIBU */
 
 
 #define MODPRINTF(FMT, ...) 						\
