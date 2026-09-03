@@ -46,18 +46,19 @@
 
 #include	<envstandards.h>	/* must be ordered first to configure */
 #include	<cerrno>		/* STD-C */
-#include	<cstddef>		/* STD-C |nullptr_t| */
+#include	<cstddef>		/* STD-C */
 #include	<cstdlib>		/* STD-C */
 #include	<cstdio>		/* STD-C */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"freadln.h"
 
-#pragma		GCC dependency		"mod/libutil.ccm"
-
-import libutil ;			/* |lenstr(3u)| */
+import libfsup ;			/* |lenstr(3u)| */
 
 
 /* local defines */
@@ -68,7 +69,7 @@ import libutil ;			/* |lenstr(3u)| */
 extern "C" {
     int		freadln(FILE *,char *,int) noex ;
     int		fgetline(FILE *,char *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -91,29 +92,28 @@ extern "C" {
 int freadln(FILE *fp,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (fp && rbuf) {
+	if (fp && rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen > 0) {
-	        if (char *bp = fgets(rbuf,(rlen + 1),fp) ; bp) {
+	    rbuf[0] = '\0' ;
+	    if (rlen > 0) ylikely {
+	        if (char *bp = fgets(rbuf,(rlen + 1),fp) ; bp) ylikely {
 		    rs = SR_OK ;
 		    len = lenstr(bp) ;
 		} else {
 		    if (feof(fp)) {
 			rs = SR_OK ;
 		    } else if (ferror(fp)) {
-		        rs = (errno) ? (- errno) : SR_IO ;
+		        rs = (errno) ? (neg errno) : SR_IO ;
 	                clearerr(fp) ;
-	            }
+	            } /* end if (error) */
 		} /* end if (result) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (freadln) */
+} /* end subroutine (freadln) */
 
 int fgetline(FILE *fp,char *rbuf,int rlen) noex {
 	return freadln(fp,rbuf,rlen) ;
-}
-/* end subroutine (fgetline) */
+} /* end subroutine (fgetline) */
 
 
