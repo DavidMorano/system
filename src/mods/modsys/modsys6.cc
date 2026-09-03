@@ -51,9 +51,8 @@ module ;
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
-#include	<utimeout.h>		/* LIBU */
-#include	<sysconfcmds.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU */
 
 #include	"modsys.hh"
 
@@ -89,7 +88,7 @@ module modsys ;
 
 /* exported variables */
 
-modsysconfer	usysconf ;
+modsysconfer	msconf ;
 
 
 /* exported subroutines */
@@ -111,11 +110,27 @@ modsysconfer	usysconf ;
     modsysconfer_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
+	    int sc = -1 ;
 	    switch (w) {
+	    case modsysconfermem_maxnodelen:
+	        sc = _SC_NODENAME_MAX ;
+		break ;
+	    case modsysconfermem_maxnamelen:
+	        sc = _SC_NAME_MAX ;
+	        break ;
+	    case modsysconfermem_maxpathlen:
+	        sc = _SC_PATH_MAX ;
+	        break ;
+	    case modsysconfermem_maxlinelen:
+	        sc = _SC_LINE_MAX ;
+	        break ;
 	    case modsysconfermem_tzname:
-	        rs = modsysconfval(sysconfcmd_maxtzname) ;
+	        sc = _SC_TZNAME_MAX ;
 	        break ;
 	    } /* end switch */
+	    if (sc >= 0) {
+	        rs = ms_confval(sc) ;
+	    }
 	} /* end if (non-null) */
 	if (rs >= 0) {
 	    op->finit = true ;
