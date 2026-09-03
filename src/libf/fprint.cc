@@ -27,22 +27,21 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* STD-C |nullptr_t| */
+#include	<cstddef>		/* STD-C */
 #include	<cstdlib>		/* STD-C */
 #include	<cstdio>		/* STD-C |FILE(3stdio)| */
 #include	<cstring>		/* STD-C */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
-#include	<usyscalls.h>		/* LIBU */
-#include	<intsat.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"libf.h"
 
-#pragma		GCC dependency		"mod/libutil.ccm"
-
-import libutil ;			/* |getlenstr(3u)| */
+import libfsup ;			/* |getlenstr(3u)| */
 
 
 /* local defines */
@@ -52,7 +51,7 @@ import libutil ;			/* |getlenstr(3u)| */
 
 extern "C++" {
     int fwrite(FILE *,cvoid *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* local structures */
@@ -72,8 +71,8 @@ extern "C++" {
 int fprint(FILE *fp,cchar *lbuf,int µllen) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ; /* return-value */
-	if(fp && lbuf) {
-	    if (int llen ; (llen = getlenstr(lbuf,µllen)) >= 0) {
+	if(fp && lbuf) ylikely {
+	    if (int llen ; (llen = getlenstr(lbuf,µllen)) >= 0) ylikely {
 	        if (llen > 0) {
 	            rs = fwrite(fp,lbuf,llen) ;
 	            wlen += rs ;
@@ -81,7 +80,7 @@ int fprint(FILE *fp,cchar *lbuf,int µllen) noex {
 	        if ((rs >= 0) && ((llen == 0) || (lbuf[llen-1] != CH_NL))) {
 	            rs = fputch(fp,CH_NL) ;
 	            wlen += rs ;
-	        }
+	        } /* end if */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
