@@ -81,7 +81,7 @@ using libuc::mem ;			/* variable */
 void *newobjsub(int ne,int esz) noex {
 	void		*rp = nullptr ;
 	int		rs = SR_INVALID ;
-	if ((ne > 0) && (esz > 0)) {
+	if ((ne > 0) && (esz > 0)) ylikely {
 	    rs = SR_TOOBIG ;
 	    if (int sz{} ; ckd_mul(&sz,ne,esz) == false) ylikely {
 	        if (void *p ; (rs = mem.mall(sz,&p)) >= 0) ylikely {
