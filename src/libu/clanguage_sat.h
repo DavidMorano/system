@@ -28,10 +28,10 @@
 #ifndef	SAT_SUBROUTINE
 #define	SAT_SUBROUTINE
 #ifndef	sat_add
-#define	sat_add			std::saturating_add
-#define	sat_sub			std::saturating_sub
-#define	sat_mul			std::saturating_mul
-#define	sat_div			std::saturating_div
+#define	sat_add			std::add_sat
+#define	sat_sub			std::sub_sat
+#define	sat_mul			std::mul_sat
+#define	sat_div			std::div_sat
 #endif /* sat_add */
 #endif /* SAT_SUBROUTINE */
 
