@@ -35,13 +35,13 @@ DEFS +=
 
 INCS += libf.h
 
-MODS += modstrw.o modsncpy.o modsnwcpy.o
+MODS += modstrw.o modsncpy.o modsnwcpy.o modsys.o
 
-LIBS += -lu
+LIBS +=
 
 
 DEPS= 		libfsup.o libfmisc.o
-DEPS_MISC=	modstrw.o modsncpy.o modsnwcpy.o
+DEPS_MISC=	$(MODS)
 
 OBJPART00= libfsup-lenstr.o libfsup-memclear.o
 OBJPART01= libfsup-memcopy.o libfsup-memload.o
@@ -304,6 +304,9 @@ libfmisc.o:		libfmisc_oa.o libfmisc0.o libfmisc_oi.o
 libfmisc0.o:		libfmisc.ccm libfmisc_oa.o	libfmisc.hh	$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
+libfmisc_op.o:		libfmisc0.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 # partitions
 libfmisc-mknpathx.o:	libfmisc-mknpathx.ccm	libfmisc.hh	$(INCS)
 libfmisc-mknpathxw.o:	libfmisc-mknpathxw.ccm	libfmisc.hh	$(INCS)
@@ -358,6 +361,11 @@ modsncpy.dir:
 # MODSNWCPY
 modsnwcpy.o:		modsnwcpy.dir modstrw.o modsncpy.o
 modsnwcpy.dir:
+	makesubdir $@
+
+# MODSYS
+modsys.o:		modsys.dir
+modsys.dir:
 	makesubdir $@
 
 
