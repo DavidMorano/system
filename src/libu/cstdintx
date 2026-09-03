@@ -2,6 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+
+#ifndef	CSTDINTX_INCLUDE
+#define	CSTDINTX_INCLUDE
+#ifdef	__cplusplus
+
+
 #include	<stdintx.h>
+
+
+#endif /* __cplusplus */
+#endif /* CSTDINTX_INCLUDE */
 
 
