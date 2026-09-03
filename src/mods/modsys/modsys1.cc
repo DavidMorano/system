@@ -42,9 +42,12 @@ module ;
 #include	<climits>		/* CSTD |INT_MIN| + |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<stdintx.h>		/* LIBU */
+#include	<cstdintx>		/* LIBU */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"modsys.hh"
