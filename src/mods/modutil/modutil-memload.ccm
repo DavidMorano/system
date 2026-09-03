@@ -1,0 +1,90 @@
+/* modutil-memload MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2020-10-13, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* C++STD |min(C++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module modutil:memload ;
+
+export {
+    constexpr inline int memload(void *dp,cvoid *sp,int sl) noex {
+	int		len = 0 ; /* return-value */
+	if (dp && sp) ylikely {
+	    if (sl < 0) {
+	        cchar *cp = charp(sp) ;
+	        sl = intconv(strlen(cp)) ;
+	    }
+	    if (sl > 0) ylikely {
+	        csize	srcsize = size_t(sl) ;
+	        memcpy(dp,sp,srcsize) ;
+	        len = sl ;
+	    } /* end block */
+	} /* end if (non-null) */
+	return len ;
+    } /* end subroutine (memload) */
+    template<typename T>
+    constexpr inline int memload(T *dp,cvoid *sp) noex {
+	int		len = 0 ; /* return-value */
+	if (dp && sp) ylikely {
+	    if (csize dstsize = sizeof(T) ; dstsize > 0) {
+	        memcpy(dp,sp,dstsize) ;
+	        len = intconv(dstsize) ;
+	    } /* end block */
+	} /* end if (non-null) */
+	return len ;
+    } /* end subroutine (memload) */
+    template<typename T>
+    constexpr inline void *memloadz(T *dp,int dl,cvoid *sp,int sl) noex {
+    	int		len = 0 ; /* return-value */
+	if (dp && sp) ylikely {
+	    if (dl < 0) {
+		dl = szof(T) ;
+	    }
+	    if (sl < 0) {
+	        cchar *cp = ccharp(sp) ;
+	        sl = intconv(strlen(cp)) ;
+	    }
+	    if (sl > dl) sl = dl ;
+	    if (sl > 0) ylikely {
+	        csize	srcsize = size_t(sl) ;
+	        caddr_t	dst = caddr_t(dp) ;
+	        memcpy(dst,sp,srcsize) ;
+	        len = sl ;
+		dst += sl ;
+		if (sl < dl) {
+		    csize zsize = size_t(dl - sl) ;
+		    memset(dst,0,zsize) ;
+		} /* end if (zero-fill) */
+	    } /* end block */
+	} /* end if (non-null) */
+	return len ;
+    } /* end subroutine (memloadz) */
+} /* end export */
+
+
