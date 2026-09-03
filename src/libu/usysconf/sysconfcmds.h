@@ -37,7 +37,9 @@
 #include	<stddef.h>		/* CSTD */
 #include	<stdlib.h>		/* CSTD */
 #include	<clanguage.h>		/* CSTD */
-#include	<usysbase.h>		/* CSTD */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 enum sysconfcmds {
