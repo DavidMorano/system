@@ -39,7 +39,7 @@ export {
 	int	rs = SR_FAULT ;
 	if (objp) ylikely {
 	    rs = SR_INVALID ;
-	    if (sz >= 0) {
+	    if (sz >= 0) ylikely {
 	        rs = SR_OK ;
 	        if (sz > 0) {
 		    rs = memclearer(objp,sz) ;
