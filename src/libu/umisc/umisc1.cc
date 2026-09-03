@@ -72,7 +72,7 @@ local int cstrlcpy(char *dp,cchar *sp,int sl) noex {
 
 local int getrlen(int plen) noex {
     	int		rs = SR_INVALID ;
-	if (plen > 0) {
+	if (plen > 0) ylikely {
 	    rs = plen ;
 	}
 	return rs ;
@@ -115,9 +115,9 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
-	if (pbuf) {
+	if (pbuf) ylikely {
 	    char	*bp = pbuf ;
-	    if ((rs = getrlen(plen)) >= 0) {
+	    if ((rs = getrlen(plen)) >= 0) ylikely {
 	        int	rlen = (rs + 1) ;
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
@@ -133,7 +133,7 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	                    rs = SR_NAMETOOLONG ;
 		        }
 	            } /* end if (needed a pathname separator) */
-		    if (rs >= 0) {
+		    if (rs >= 0) ylikely {
 	                if (int ml ; (ml = cstrlcpy(bp,sp,rlen)) < rlen) {
 	        	    bp += ml ;
 	        	    rlen -= ml ;
