@@ -72,6 +72,7 @@
 
 import libfsup ;
 import libfmisc ;			/* |mknpath(3u)| */
+import modsys ;				/* |sysconf(3mod)| */
 
 /* local defines */
 
@@ -96,7 +97,7 @@ import libfmisc ;			/* |mknpath(3u)| */
 
 /* local variables */
 
-cint		maxpathlen = MAXPATHLEN ;
+cint		maxpathlen = msconf.maxpathlen ;
 
 
 /* exported variables */
