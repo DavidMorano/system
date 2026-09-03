@@ -26,6 +26,7 @@
 #include	<cmpitimer.h>
 #include	<cmptimeval.h>
 #include	<cmptimespec.h>
+#include	<cmpval.hh>
 
 
 #endif /* UCMPX_INCLUDE */
