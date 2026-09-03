@@ -44,20 +44,31 @@ MODSYS_OP= modsys0.o
 
 MODSYS_OA0= modsys-intsat.o 
 MODSYS_OA1= modsys-errtimer.o modsys-msleep.o
-MODSYS_OA2= modsys-conf.o modsys-confcheck.o
-MODSYS_OA3= modsys-timeout.o
+MODSYS_OA2= modsys-timeout.o modsys-ustd.o
+MODSYS_OA3= modsys-conf.o modsys-confcheck.o
+
+MODSYS_OA4= modsys-mailvals.o
+MODSYS_OA5=
+MODSYS_OA6=
+MODSYS_OA7=
 
 MODSYS_OA+= modsys_oa0.o modsys_oa1.o 
 MODSYS_OA+= modsys_oa2.o modsys_oa3.o
-MODSYS_OA+= modsys_oa3.o
+MODSYS_OA+= modsys_oa4.o
 
 MODSYS_OI0= modsys1.o modsys2.o
 MODSYS_OI1= modsys3.o modsys4.o
 MODSYS_OI2= modsys5.o modsys6.o
-MODSYS_OI3= modsys7.o
+MODSYS_OI3= modsys7.o modsys8.o
+
+MODSYS_OI4= modsys9.o modsys10.o
+MODSYS_OI5=
+MODSYS_OI6=
+MODSYS_OI7=
 
 MODSYS_OI+= modsys_oi0.o modsys_oi1.o
 MODSYS_OI+= modsys_oi2.o modsys_oi3.o
+MODSYS_OI+= modsys_oi4.o
 
 
 INCDIRS +=
@@ -160,7 +171,7 @@ obj.o:			$(OBJ)
 
 
 # primary
-modsys0.o:		modsys.ccm				$(INCS)
+modsys0.o:		modsys.ccm $(MODSYS_OA)			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 modsys_oa0.o:		$(MODSYS_OA0)
@@ -173,6 +184,18 @@ modsys_oa2.o:		$(MODSYS_OA2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 modsys_oa3.o:		$(MODSYS_OA3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modsys_oa4.o:		$(MODSYS_OA4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modsys_oa5.o:		$(MODSYS_OA5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modsys_oa6.o:		$(MODSYS_OA6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modsys_oa7.o:		$(MODSYS_OA7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 modsys_oa.o:		$(MODSYS_OA)
@@ -190,15 +213,25 @@ modsys_oi2.o:		$(MODSYS_OI2)
 modsys_oi3.o:		$(MODSYS_OI3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+modsys_oi4.o:		$(MODSYS_OI4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modsys_oi5.o:		$(MODSYS_OI5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modsys_op.o:		$(MODSYS_OP)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 modsys_oi.o:		$(MODSYS_OI)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 modsys-intsat.o:	modsys-intsat.ccm		$(INCS)
 modsys-errtimer.o:	modsys-errtimer.ccm		$(INCS)
 modsys-msleep.o:	modsys-msleep.ccm		$(INCS)
+modsys-timeout.o:	modsys-timeout.ccm		$(INCS)
+modsys-ustd.o:		modsys-ustd.ccm			$(INCS)
 modsys-conf.o:		modsys-conf.ccm			$(INCS)
 modsys-confcheck.o:	modsys-confcheck.ccm		$(INCS)
-modsys-timeout.o:	modsys-timeout.ccm		$(INCS)
 
 # implementation
 modsys1.o:		modsys1.cc modsys0.o		$(INCS)
@@ -209,5 +242,7 @@ modsys5.o:		modsys5.cc modsys0.o		$(INCS)
 modsys6.o:		modsys6.cc modsys0.o		$(INCS)
 modsys7.o:		modsys7.cc modsys0.o		$(INCS)
 modsys8.o:		modsys8.cc modsys0.o		$(INCS)
+modsys9.o:		modsys9.cc modsys0.o		$(INCS)
+modsys10.o:		modsys10.cc modsys0.o		$(INCS)
 
 
