@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* string-index operations */
+/* miscellaneous modules */
 /* version %I% last-modified %G% */
 
 
@@ -21,15 +21,21 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
 
+
+#include	<modmisc.hh>
 #include	<modsncpy.hh>
 #include	<modsnwcpy.hh>
 #include	<modstrw.hh>
+#include	<modsys.hh>
+#include	<modutil.hh>
 
 
 #endif /* __cplusplus */
