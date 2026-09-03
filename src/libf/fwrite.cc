@@ -27,20 +27,20 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* STD-C |nullptr_t| */
+#include	<cstddef>		/* STD-C */
 #include	<cstdlib>		/* STD-C */
 #include	<cstdio>		/* STD-C */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
-#include	<usyscalls.h>		/* LIBU */
-#include	<intsat.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"libf.h"
 
-#pragma		GCC dependency		"mod/libutil.ccm"
-
-import libutil ;			/* |getlenstr(3u)| */
+import libfsup ;			/* |getlenstr()| */
+import modsys ;				/* |intsat(3modsys)| */
 
 
 /* local defines */
@@ -50,7 +50,7 @@ import libutil ;			/* |getlenstr(3u)| */
 
 extern "C++" {
     int fwrite(FILE *,cvoid *,int) noex ;
-}
+} /* end extern (C++) */
 
 
 /* local structures */
@@ -70,17 +70,17 @@ extern "C++" {
 int fwriter(FILE *fp,cvoid *lbuf,int µllen) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
-	if (fp && lbuf) {
+	if (fp && lbuf) ylikely {
 	    cchar *sbuf = charp(lbuf) ;
 	    rs = SR_OK ;
-	    if (cint llen = getlenstr(sbuf,µllen) ; llen > 0) {
+	    if (cint llen = getlenstr(sbuf,µllen) ; llen > 0) ylikely {
 		csize nsize = size_t(llen) ;
 		csize lsize = 1 ;
 	        if (size_t res = fwrite(lbuf,lsize,nsize,fp) ; res > 0) {
 	            wlen += intsat(res) ;
 		} else {
-		    rs = (errno) ? (- errno) : SR_OK ;
-		}
+		    rs = (errno) ? (neg errno) : SR_OK ;
+		} /* end if (error) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
@@ -88,6 +88,6 @@ int fwriter(FILE *fp,cvoid *lbuf,int µllen) noex {
 
 int fwrite(FILE *fp,cvoid *wbuf,int wlen) noex {
     	return fwriter(fp,wbuf,wlen) ;
-}
+} /* end subroutine */
 
 
