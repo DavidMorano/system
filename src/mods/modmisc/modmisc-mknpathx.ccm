@@ -1,0 +1,62 @@
+/* modmisc-mknpathx MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® Miscellaneous support */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-21, David A­D­ Morano
+	This module was originally written.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
+*/
+
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Module:
+	modmisc
+
+	Description:
+	This module provides miscellaneous UNIX® or other
+	common (library oriented) subroutines.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module modmisc:mknpathx ;
+
+export {
+    int mknpathx(char *,int,int,...) noex ;
+    int mknpath1(char *,int,cc *) noex ;
+    int mknpath2(char *,int,cc *,cc *) noex ;
+    int mknpath3(char *,int,cc *,cc *,cc *) noex ;
+    int mknpath4(char *,int,cc *,cc *,cc *,cc *) noex ;
+    int mknpath5(char *,int,cc *,cc *,cc *,cc *,cc *) noex ;
+    int mknpath6(char *,int,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
+    template<typename ... Args>
+    inline int mknpath(char *dp,int dl,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return mknpathx(dp,dl,na,args ...) ;
+   } /* end subroutine-template */
+} /* end export */
+
+
