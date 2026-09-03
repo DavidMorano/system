@@ -38,9 +38,8 @@ module ;
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
-#include	<utimeout.h>		/* LIBU |uto_{x}| */
-#include	<sysconfcmds.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU */
 
 #include	"modsys.hh"
 
