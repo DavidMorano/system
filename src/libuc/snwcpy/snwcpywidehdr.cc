@@ -99,7 +99,6 @@ cint		ch_sub = mkchar('¿') ;
 /* exported subroutines */
 
 int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int µwsl) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		dl = 0 ; /* return-value */
@@ -115,7 +114,7 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int µwsl) noex {
 		        int	i ; /* used-afterwards */
 	                for (i = 0 ; (rs >= 0) && (i < wl) && wp[i] ; i += 1) {
 	                    if (uint wch ; (wch = (uint) wp[i]) > UCHAR_MAX) {
-			        if (cc *ss ; (ss = straltwchar(wch)) != np) {
+			        if (cc *ss = straltwchar(wch) ; ss) {
 	                            rs = m.str(ss) ;
 			        } else {
 	                            rs = m.chr(ch_sub) ;
