@@ -90,7 +90,7 @@ int sncpyx(char *dp,int dl,int n,...) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	if (dl < 0) dl = (INT_MAX - 1) ;
-	if (dp) {
+	if (dp) ylikely {
 	    char	*bp = dp ;
 	    size_t	rlen = (dl + 1) ;
 	    va_begin(ap,n) ;
