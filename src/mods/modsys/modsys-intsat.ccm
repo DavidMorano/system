@@ -18,13 +18,14 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* CSTD */
-#include	<stdint.h>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdint>		/* CSTD */
+#include	<cstdintx>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<stdintx.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"modsys.hh"
