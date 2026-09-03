@@ -32,6 +32,8 @@ export import :intsat ;
 export import :errtimer ;
 export import :msleep ;
 export import :timeout ;
+export import :ustd ;
+export import :mailvals ;
 export import :confcheck ;
 export import :conf ;
 
