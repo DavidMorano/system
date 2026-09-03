@@ -55,7 +55,7 @@ module ;
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |stpcpy(3c)| */
-#include	<stdintx.h>		/* LIBU */
+#include	<cstdintx>		/* LIBU */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
