@@ -75,6 +75,8 @@ module ;
 #include	<localmisc.h>		/* LIBU */
 #include	<sysconfcmds.h>		/* LIBU */
 
+#include	"modsys.hh"
+
 export module modsys:conf ;
 
 /* local defines */
@@ -95,11 +97,15 @@ export module modsys:conf ;
 /* local structures */
 
 export {
-    struct unprocer {
+    struct msprocer {
 	operator int () noex ;
 	int operator () (int = 0) noex ;
     } ; /* end struct */
     enum modsysconfermems {
+    	modsysconfermem_maxnodelen,
+    	modsysconfermem_maxnamelen,
+    	modsysconfermem_maxpathlen,
+    	modsysconfermem_maxlinelen,
     	modsysconfermem_tzname,
 	modsysconfermem_overlast
     } ; /* end enum (modsysconfmems) */
@@ -114,9 +120,17 @@ export {
 	} ; /* end */
     } ; /* end struct (modsysconfer_co) */
     struct modsysconfer {
+	modsysconfer_co	maxnodelen ;
+	modsysconfer_co	maxnamelen ;
+	modsysconfer_co	maxpathlen ;
+	modsysconfer_co	maxlinelen ;
 	modsysconfer_co	tzname ;
 	bool		finit ;
 	modsysconfer() noex {
+	    maxnodelen	(this,modsysconfermem_maxnodelen) ;
+	    maxnamelen	(this,modsysconfermem_maxnamelen) ;
+	    maxpathlen	(this,modsysconfermem_maxpathlen) ;
+	    maxlinelen	(this,modsysconfermem_maxlinelen) ;
 	    tzname	(this,modsysconfermem_tzname) ;
 	    finit	= false ;
 	} /* end ctor */
@@ -137,8 +151,8 @@ export {
 /* exported variables */
 
 export {
-    extern unprocer 	unprocessors ;
-    extern modsysconfer	usysconf ;
+    extern msprocer 	msnprocessors ;
+    extern modsysconfer	msconf ;
 } /* end export */
 
 
@@ -147,7 +161,7 @@ export {
 export {
     int ms_confval	(int,long * = nullptr) noex ;
     int ms_confstr	(int,char *,int) noex ;
-    int	ms_nprocessors	(int) noex ;
+    int	ms_nproc	(int) noex ;
 } /* end export */
 
 
