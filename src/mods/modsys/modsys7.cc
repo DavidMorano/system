@@ -21,7 +21,7 @@
 /*******************************************************************************
 
 	Name:
-	modsysproc
+	ms_nproc
 
 	Description:
 	Use the |sysconf(2)| favility to retrive the number of
@@ -39,8 +39,8 @@ module ;
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
-#include	<sysconfcmds.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU */
 
 #include	"modsys.hh"
 
@@ -72,12 +72,12 @@ module modsys ;
 
 /* exported variables */
 
-unprocer	unprocessors ;
+msprocer	msnprocessors ;
 
 
 /* exported subroutines */
 
-int modsysproc(int w) noex {
+int ms_nproc(int w) noex {
     	int	rs = SR_INVALID ;
 	int	rv = 0 ; /* return-value */
 	if ((w >= 0) && (w < 2)) ylikely {
@@ -94,23 +94,23 @@ int modsysproc(int w) noex {
 		break ;
 	    } /* end switch */
 	    if ((rs >= 0) && (cmd >= 0)) ylikely {
-	       rs = modsysconfval(cmd,nullptr) ;
+	       rs = ms_confval(cmd,nullptr) ;
 	       rv = rs ;
 	    } /* end if (ok) */
 	} /* end if (valid) */
 	return (rs >= 0) ? rv : rs ;
-} /* end subroutine (modsysproc) */
+} /* end subroutine (ms_nproc) */
 
 
 /* local subroutines */
 
-unprocer::operator int () noex {
+msprocer::operator int () noex {
     	cint cmd = _SC_NPROCESSORS_ONLN ;
-	return modsysconfval(cmd,nullptr) ;
-} /* end method (unprocer::operator) */
+	return ms_confval(cmd,nullptr) ;
+} /* end method (msprocer::operator) */
 
-int unprocer::operator () (int w) noex {
-    	return modsyspro(w) ;
-} /* end method (unprocer::operator) */
+int msprocer::operator () (int w) noex {
+    	return ms_nproc(w) ;
+} /* end method (msprocer::operator) */
 
 
