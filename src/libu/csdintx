@@ -2,6 +2,16 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+
+#ifndef	INITLIST_INCLUDE
+#define	INITLIST_INCLUDE
+#ifdef	__cplusplus
+
+
 #include	<stdintx.h>
+
+
+#endif /* __cplusplus */
+#endif /* INITLIST_INCLUDE */
 
 
