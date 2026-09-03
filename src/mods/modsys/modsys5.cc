@@ -81,9 +81,9 @@ module ;
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
 #include	<usysflag.h>		/* LIBU */
-#include	<sysconfcmds.h>		/* LIBU */
-#include	<mailvalues.hh>		/* LIBU |mailvalue(3u)| */
+#include	<ubufdefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<sysconfcmds.h>		/* LIBU */
 
 #include	"modsys.hh"
 
@@ -165,18 +165,7 @@ cbool			f_debug		= CF_DEBUG ;
 
 /* exported subroutines */
 
-extern "C" {
-    int ms_confval(int cmd,long *rp) noex {
-        return modsysconfval(cmd,rp) ;
-    } /* end */
-    int ms_confstr(int cmd,char *rbuf,int rlen) noex {
-        return modsysconfstr(cmd,rbuf,rlen) ;
-    } /* end */
-} /* end extern (C) */
-
-
-extern "C++" {
-    int modsysconfval(int req,long *rp) noex {
+int ms_confval(int req,long *rp) noex {
 	int		rs = SR_INVALID ;
 	MODPRINTF("ent\n") ;
 	if (req >= 0) ylikely {
@@ -186,8 +175,9 @@ extern "C++" {
 	} /* end if (valid) */
 	MODPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-    } /* end subroutine (modsysconfval) */
-    int modsysconfstr(int req,char *rbuf,int rlen) noex {
+} /* end subroutine (modsysconfval) */
+
+int ms_confstr(int req,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
@@ -198,8 +188,7 @@ extern "C++" {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (modsysconfstr) */
-} /* end extern (C++) */
+} /* end subroutine (ms_confstr) */
 
 
 /* local subroutines */
@@ -411,13 +400,8 @@ int modsysconfmgr::mconfstr(int req) noex {
 } /* end subroutine (modsysconfmgr::mconfstr) */
 
 int modsysconfmgr::getdefmsg() noex {
-	int		rs ;
-	if (modsysflag.darwin) {
-	    rs = umaxmsglen() ;
-	} else {
-	    rs = MMBUFLEN ;		/* Maximum-Message-Buffer-Length */
-	} /* end if_constexpr (modsysflag.darwin) */
-	return rs ;
+	cint		cmdname = _SC_PATH_MAX ;
+	return getval(cmdname) ;
 } /* end method (modsysconfmgr::getdefmsg) */
 
 int modsysconfmgr::getdefzoneinfo() noex {
