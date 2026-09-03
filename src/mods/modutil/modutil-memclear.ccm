@@ -1,0 +1,71 @@
+/* modutil-memclear MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2020-10-13, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module modutil:memclear ;
+
+int memclearer(void *,int) noex ;
+
+export {
+    inline int memclear(void *objp,int sz) noex {
+	int	rs = SR_FAULT ;
+	if (objp) ylikely {
+	    rs = SR_INVALID ;
+	    if (sz >= 0) ylikely {
+	        rs = SR_OK ;
+	        if (sz > 0) {
+		    rs = memclearer(objp,sz) ;
+	        }
+	    }
+	} /* end if (non-null) */
+    	return rs ;
+    } /* end subroutine */
+    template<typename T> inline int memclear(T *objp,int sz) noex {
+	int	rs = SR_FAULT ;
+	if (objp) ylikely {
+	    if (sz < 0) {
+    	        sz = szof(T) ;
+	    }
+	    rs = memclearer(objp,sz) ;
+	} /* end if (non-null) */
+    	return rs ;
+    } /* end subroutine-template */
+    template<typename T> inline int memclear(T *objp) noex {
+	int	rs = SR_FAULT ;
+	if (objp) ylikely {
+	    cint sz = szof(T) ;
+	    rs = memclearer(objp,sz) ;
+	} /* end if (non-null) */
+	return rs ;
+    } /* end subroutine-template */
+} /* end export */
+
+
