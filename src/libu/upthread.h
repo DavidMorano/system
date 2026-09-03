@@ -20,6 +20,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	upthread
+
+	Description:
 	Additional (or supplemental) support for UNIX® limits.
 
 *******************************************************************************/
@@ -30,7 +34,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<usyhsbase.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
