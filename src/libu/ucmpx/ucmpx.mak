@@ -42,14 +42,14 @@ LIBS +=
 
 OBJ0= cmpitimer.o
 OBJ1= cmptimeval.o cmptimespec.o
-OBJ2=
+OBJ2= cmpval.o
 OBJ3=
 OBJ4=
 OBJ5=
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o
@@ -160,5 +160,9 @@ obj.o:			$(OBJ)
 cmpitimer.o:		cmpitimer.cc	cmpitimer.h			$(INCS)
 cmptimeval.o:		cmptimeval.cc	cmptimeval.h			$(INCS)
 cmptimespec.o:		cmptimespec.cc	cmptimespec.h			$(INCS)
+
+cmpval.o:		cmpval.dir	cmpval.hh			$(INCS)
+cmpval.dir:
+	makesubdir $@
 
 
