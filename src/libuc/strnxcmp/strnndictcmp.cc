@@ -73,7 +73,6 @@
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<char.h>		/* LIBUC */
