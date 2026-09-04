@@ -21,7 +21,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
@@ -30,7 +32,7 @@ extern char	*strnset(char *dp,int ch,int n) noex ;
 
 local inline char *strnblanks(char *dp,int n) noex {
 	return strnset(dp,' ',n) ;
-}
+} /* end */
 
 EXTERNC_end
 
