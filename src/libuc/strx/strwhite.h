@@ -39,17 +39,17 @@ EXTERNC_begin
 extern char *strwht(cchar *,int) noex ;
 local inline char *strwhite(cchar *sp) noex {
     	return strwht(sp,-1) ;
-}
+} /* end */
 EXTERNC_end
 
 #if	__cpluspls
 
 inline char *strwhite(cchar *sp,int sl) noex {
     	return strwht(sp,sl) ;
-}
+} /* end */
 inline char *strwit(cchar *sp) noex {
     	return strwht(sp,sl) ;
-}
+} /* end */
 
 #endif /* __cpluspls */
 
