@@ -1,4 +1,4 @@
-/* libutil MODULE */
+/* libutil MODULE (primary) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -11,12 +11,12 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 export module libutil ;
 
@@ -29,6 +29,7 @@ export import :memclear ;
 export import :memload ;
 export import :memcopy ;
 export import :memcpy ;
+export import :memncpy ;
 export import :memnset ;
 export import :resumelife ;
 export import :stpcpy ;
