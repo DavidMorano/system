@@ -21,7 +21,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
@@ -37,16 +39,16 @@ EXTERNC_end
 
 inline char	* strnwcpybc (char *dp,int dl,cchar *sp) noex {
     	return strnwcpybc(dp,dl,sp,-1) ;
-}
+} /* end */
 inline char	* strnwcpylc (char *dp,int dl,cchar *sp) noex {
     	return strnwcpylc(dp,dl,sp,-1) ;
-}
+} /* end */
 inline char	* strnwcpyuc (char *dp,int dl,cchar *sp) noex {
     	return strnwcpyuc(dp,dl,sp,-1) ;
-}
+} /* end */
 inline char	* strnwcpyfc (char *dp,int dl,cchar *sp) noex {
     	return strnwcpyfc(dp,dl,sp,-1) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
