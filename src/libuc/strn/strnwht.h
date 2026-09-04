@@ -43,7 +43,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
@@ -54,7 +56,7 @@ extern char *strnwhtbrk(cchar *,int,cchar *) noex ;
 
 local inline char *strnwhite(cchar *sp,int sl) noex {
 	return strnwht(sp,sl) ;
-}
+} /* end */
 
 EXTERNC_end
 
