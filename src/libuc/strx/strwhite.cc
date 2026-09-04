@@ -57,6 +57,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<usys.h>		/* LIBU semi-standard-pieces */
 #include	<ascii.h>		/* LIBU |CH_{x}| */
 #include	<strn.h>		/* LIBUC |strnbrk(3uc)| */
 #include	<char.h>		/* LIBUC |CHAR_{x}(3uc)| */
