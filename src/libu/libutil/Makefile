@@ -35,10 +35,12 @@ DEFS +=
 
 INCS += libutil.hh
 
-MODS += libutil.o
+MODS += modcstring.o
 
 LIBS +=
 
+
+DEPS += modcstring.o
 
 OBJPART00= libutil-strlen.o libutil-strxspn.o
 OBJPART01= libutil-cvtconst.o libutil-getlen.o 
@@ -50,7 +52,7 @@ OBJPART06= libutil-strcopy.o libutil-strcpy.o
 OBJPART07= libutil-memload.o libutil-strcmp.o
 
 OBJPART08= libutil-getbyte.o
-OBJPART09= libutil-memnset.o
+OBJPART09= libutil-memncpy.o libutil-memnset.o
 OBJPART10= libutil-operators.o
 OBJPART11=
 
@@ -67,11 +69,11 @@ OBJPART+= objparte.o objpartf.o
 OBJPRIME= libutil0.o
 
 OBJ00= libutil1.o
-OBJ01=
+OBJ01= $(DEPS)
 OBJ02=
 OBJ03=
 
-OBJIMPL= obj00.o
+OBJIMPL= obj00.o obj01.o
 
 
 INCDIRS=
@@ -253,97 +255,44 @@ objimpl.o:		$(OBJIMPL)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-libutil0.o:		libutil.ccm objpart.o
+libutil0.o:		libutil.ccm objpart.o		$(DEPS) $(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-libutil1.o:		libutil1.cc libutil0.o
-	$(COMPILE.cc) $<
+libutil1.o:		libutil1.cc libutil0.o		$(DEPS) $(INCS)
+libutil2.o:		libutil2.cc libutil0.o		$(DEPS) $(INCS)
+libutil3.o:		libutil3.cc libutil0.o		$(DEPS) $(INCS)
+libutil4.o:		libutil4.cc libutil0.o		$(DEPS) $(INCS)
+libutil5.o:		libutil5.cc libutil0.o		$(DEPS) $(INCS)
+libutil6.o:		libutil6.cc libutil.o		$(DEPS) $(INCS)
+libutil7.o:		libutil7.cc libutil.o		$(DEPS) $(INCS)
+libutil8.o:		libutil8.cc libutil.o		$(DEPS) $(INCS)
+libutil9.o:		libutil9.cc libutil.o		$(DEPS) $(INCS)
+libutil10.o:		libutil10.cc libutil.o		$(DEPS) $(INCS)
+libutil11.o:		libutil11.cc libutil.o		$(DEPS) $(INCS)
 
-libutil2.o:		libutil2.cc libutil0.o
-	$(COMPILE.cc) $<
+libutil-cvtconst.o:	libutil-cvtconst.ccm		$(DEPS)	$(INCS)
+libutil-getlen.o:	libutil-getlen.ccm		$(DEPS)	$(INCS)
+libutil-lenstr.o:	libutil-lenstr.ccm		$(DEPS)	$(INCS)
+libutil-lenstrarr.o:	libutil-lenstrarr.ccm		$(DEPS)	$(INCS)
+libutil-loadstrs.o:	libutil-loadstrs.ccm		$(DEPS) $(INCS)
+libutil-memclear.o:	libutil-memclear.ccm		$(DEPS)	$(INCS)
+libutil-memload.o:	libutil-memload.ccm		$(DEPS)	$(INCS)
+libutil-memcopy.o:	libutil-memcopy.ccm		$(DEPS)	$(INCS)
+libutil-memcpy.o:	libutil-memcpy.ccm		$(DEPS)	$(INCS)
+libutil-resumelife.o:	libutil-resumelife.ccm		$(DEPS)	$(INCS)
+libutil-strlen.o:	libutil-strlen.ccm		$(DEPS)	$(INCS)
+libutil-strxspn.o:	libutil-strxspn.ccm		$(DEPS)	$(INCS)
+libutil-stpcpy.o:	libutil-stpcpy.ccm		$(DEPS)	$(INCS)
+libutil-strcpy.o:	libutil-strcpy.ccm		$(DEPS)	$(INCS)
+libutil-strcopy.o:	libutil-strcopy.ccm		$(DEPS)	$(INCS)
+libutil-strcmp.o:	libutil-strcmp.ccm		$(DEPS)	$(INCS)
+libutil-getbyte.o:	libutil-getbyte.ccm		$(DEPS)	$(INCS)
+libutil-memncpy.o:	libutil-memncpy.ccm		$(DEPS)	$(INCS)
+libutil-memnset.o:	libutil-memnset.ccm		$(DEPS)	$(INCS)
+libutil-operators.o:	libutil-operators.ccm		$(DEPS)	$(INCS)
 
-libutil3.o:		libutil3.cc libutil0.o
-	$(COMPILE.cc) $<
-
-libutil4.o:		libutil4.cc libutil0.o
-	$(COMPILE.cc) $<
-
-libutil5.o:		libutil5.cc libutil0.o
-	$(COMPILE.cc) $<
-
-libutil6.o:		libutil6.cc libutil.ccm
-	$(COMPILE.cc) $<
-
-libutil7.o:		libutil7.cc libutil.ccm
-	$(COMPILE.cc) $<
-
-libutil8.o:		libutil8.cc libutil.ccm
-	$(COMPILE.cc) $<
-
-libutil9.o:		libutil9.cc libutil.ccm
-	$(COMPILE.cc) $<
-
-libutil10.o:		libutil10.cc libutil.ccm
-	$(COMPILE.cc) $<
-
-libutil11.o:		libutil11.cc libutil.ccm
-	$(COMPILE.cc) $<
-
-libutil-cvtconst.o:	libutil-cvtconst.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-getlen.o:	libutil-getlen.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-lenstr.o:	libutil-lenstr.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-lenstrarr.o:	libutil-lenstrarr.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-loadstrs.o:	libutil-loadstrs.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-memclear.o:	libutil-memclear.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-memload.o:	libutil-memload.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-memcopy.o:	libutil-memcopy.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-memcpy.o:	libutil-memcpy.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-resumelife.o:	libutil-resumelife.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-strlen.o:	libutil-strlen.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-strxspn.o:	libutil-strxspn.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-stpcpy.o:	libutil-stpcpy.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-strcpy.o:	libutil-strcpy.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-strcopy.o:	libutil-strcopy.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-strcmp.o:	libutil-strcmp.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-getbyte.o:	libutil-getbyte.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-memnset.o:	libutil-memnset.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-libutil-operators.o:	libutil-operators.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+modcstring.o:		modcstring.dir
+modcstring.dir:
+	makesubdir $@
 
 
