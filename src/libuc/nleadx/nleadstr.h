@@ -37,11 +37,11 @@ EXTERNC_end
 #ifdef	__cplusplus
 inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {
 	return nleadbasestr(bs,sp,sl) ;
-}
+} /* end */
 #else
 local inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {
 	return nleadbasestr(bs,sp,sl) ;
-}
+} /* end */
 #endif /* __cplusplus */
 
 
