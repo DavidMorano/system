@@ -21,7 +21,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
@@ -32,7 +34,7 @@ extern char *strnfoldsub(cchar *,int,cchar *) noex ;
 
 local inline char *strnsub(cchar *sp,int sl,cchar *ss) noex {
     	return strnbasesub(sp,sl,ss) ;
-}
+} /* end */
 
 EXTERNC_end
 
