@@ -66,7 +66,9 @@
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |strstr(3c)| + |strnstr(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 #include	<nleadstr.h>		/* LIBUC */
 #include	<toxc.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
