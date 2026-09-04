@@ -44,7 +44,9 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 #include	<usys.h>		/* LIBU */
 #include	<strx.h>		/* LIBUC |strbrk(3u)| */
 #include	<baops.h>		/* LIBU |batst(3u)| */
