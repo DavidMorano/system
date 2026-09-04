@@ -32,9 +32,9 @@ extern char	*strbasesub(cchar *,cchar *) noex ;
 extern char	*strcasesub(cchar *,cchar *) noex ;
 extern char	*strfoldsub(cchar *,cchar *) noex ;
 
-static inline char *strsub(cchar *sp,cchar *ss) noex {
+local inline char *strsub(cchar *sp,cchar *ss) noex {
     	return strbasesub(sp,ss) ;
-}
+} /* end */
 
 EXTERNC_end
 
