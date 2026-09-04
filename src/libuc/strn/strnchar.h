@@ -21,7 +21,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 #include	<strnwht.h>
 
@@ -37,16 +39,16 @@ extern char *strnblank(cchar *,int) noex ;
 
 local inline char *strndig(cchar *sp,int sl) noex {
 	return strndigit(sp,sl) ;
-}
+} /* end */
 local inline char *strnoct(cchar *sp,int sl) noex {
 	return strnoctal(sp,sl) ;
-}
+} /* end */
 local inline char *strndec(cchar *sp,int sl) noex {
 	return strndigit(sp,sl) ;
-}
+} /* end */
 local inline char *strnhex(cchar *sp,int sl) noex {
 	return strndigex(sp,sl) ;
-}
+} /* end */
 
 EXTERNC_end
 
