@@ -143,10 +143,6 @@ obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obj8.o:			$(OBJ8)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
