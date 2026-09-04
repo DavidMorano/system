@@ -21,7 +21,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
@@ -31,7 +33,7 @@ extern char *strnrchr(cchar *,int,int) noex ;
 
 local inline char *strnchr(cchar *sp,int sl,int sch) noex {
 	return strnochr(sp,sl,sch) ;
-}
+} /* end */
 
 EXTERNC_end
 
