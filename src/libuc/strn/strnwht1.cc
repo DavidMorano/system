@@ -58,7 +58,9 @@ module ;
 #include	<cstdlib>		/* CSTD */
 #include	<new>			/* C++STD |nullptr_t| */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 #include	<char.h>		/* LIBYC |CHAR_ISWHT(3uc)| */
 #include	<ischarx.h>		/* LIBYC |iswht(3uc)| */
 #include	<mkchar.h>		/* LIBU */
