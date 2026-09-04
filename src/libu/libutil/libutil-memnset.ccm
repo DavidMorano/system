@@ -1,4 +1,4 @@
-/* libutil-memnset MODULE */
+/* libutil-memnset MODULE (primary-partition) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -24,21 +24,31 @@ module ;
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 export module libutil:memnset ;
 
 export {
-    constexpr inline int memnset(void *dp,int ch,int n) noex {
+    constexpr inline int memnset(void *dp,int dl,int ch,int n = -1) noex {
+	int		rs = SR_FAULT ;
 	int		rl = -1 ; /* return-value */
 	if (dp) ylikely {
-	    char *bp = charp(dp) ;
-	    while (n-- > 0) {
-		*bp++ = char(ch) ;
-	    } /* end while */
-	    rl = intconv(bp - charp(dp)) ;
+	    rs = SR_INVALID ;
+	    if (dl >= 0) {
+		rs = SR_OVERFLOW ;
+		if (n <= dl) {
+	            rs = SR_OK ;
+		    if (n < 0) n = dl ;
+	            char *bp = charp(dp) ;
+	            while (n-- > 0) {
+		        *bp++ = char(ch) ;
+	            } /* end while */
+	            rl = intconv(bp - charp(dp)) ;
+	        } /* end if (no-overflow) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return rl ;
+	return (rs >= 0) ? rl : rs ;
     } /* end subroutine (memnset) */
 } /* end export */
 
