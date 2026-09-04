@@ -34,7 +34,7 @@ extern int strwfoldcmp(cchar *,cchar *,int) noex ;
 
 local inline int strwcmp(cchar *bs,cchar *sp,int sl) noex {
 	return strwbasecmp(bs,sp,sl) ;
-}
+} /* end */
 
 EXTERNC_end
 
