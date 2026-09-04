@@ -32,7 +32,7 @@ extern char	*strwset(char *dp,int ch,int n) noex ;
 
 local inline char *strwblanks(char *dp,int n) noex {
     return strwset(dp,' ',n) ;
-}
+} /* end */
 
 EXTERNC_end
 
