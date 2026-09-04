@@ -1,4 +1,4 @@
-/* libutil-lenstr MODULE */
+/* libutil-lenstr MODULE (primary-partition) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -34,21 +34,29 @@ export module libutil:lenstr ;
 
 export {
     constexpr inline int clenstr(cchar *sp,int sl = -1) noex {
-    	cchar *cp = sp ;
-	while (sl-- && *cp) {
-	    cp += 1 ;
-	}
-	return intconv(cp - sp) ;
+	int len = -1 ;
+	if (sp) ylikely {
+    	    cchar *cp = sp ;
+	    while (sl-- && *cp) {
+	        cp += 1 ;
+	    } /* end */
+	    len = intconv(cp - sp) ;
+	} /* end if (non-null) */
+	return len ;
     } /* end subroutine (clenstr) */
     constexpr inline int lenstr(cchar *sp,int sl = -1) noex {
     	int		len = -1 ;
 	if (sp) ylikely {
-	    if (sl >= 0) {
-    	        csize strsize = size_t(sl) ;
-	        len = intconv(strnlen(sp,strsize)) ;
+	    if consteval {
+		len = clenstr(sp,sl) ;
 	    } else {
-	        len = intconv(strlen(sp)) ;
-	    }
+	        if (sl >= 0) {
+    	            csize strsize = size_t(sl) ;
+	            len = intconv(strnlen(sp,strsize)) ;
+	        } else {
+	            len = intconv(strlen(sp)) ;
+	        } /* end if */
+	    } /* end if (consteval) */
 	} /* end if (non-null) */
     	return len ;
     } /* end subroutine (lenstr) */
@@ -58,8 +66,12 @@ export {
 	    if (sl >= 0) {
 		len = sl ;
 	    } else {
-	        len = intconv(strlen(sp)) ;
-	    }
+		if consteval {
+	            len = clenstr(sp) ;
+		} else {
+	            len = intconv(strlen(sp)) ;
+		} /* end if (consteval) */
+	    } /* end if */
 	} /* end if (non-null) */
 	return len ;
     } /* end subroutine (getlenstr) */
