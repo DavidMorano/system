@@ -1,0 +1,41 @@
+/* mailbox_mag MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* mailbox handling object */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2009-01-10, David A­D­ Morano
+        This is being written from scratch to finally get an abstracted
+        "mailbox" that is fast enough for interactive use.
+
+*/
+
+/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"mailbox.h"
+
+export module mailbox_mag ;
+
+export {
+    template<typename ... Args>
+    inline int mailbox_magic(mailbox *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == MAILBOX_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (mailbox_magval) */
+} /* end export */
+
+
