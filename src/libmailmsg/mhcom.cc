@@ -31,17 +31,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<uclibmem.h>
-#include	<sbuf.h>
-#include	<ascii.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mhcom.h"
 
@@ -79,7 +79,7 @@ template<typename ... Args>
 local inline int mhcom_magic(mhcom *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MHCOM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MHCOM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (mhcom_magic) */
@@ -114,7 +114,7 @@ int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
 	        op->value = (op->a + (0*buflen)) ;
 	        op->comment = (op->a + (1*buflen)) ;
 	        if ((rs = mhcom_bake(op,buflen,sp,sl)) >= 0) ylikely {
-	            op->magic = MHCOM_MAGIC ;
+	            op->magval = MHCOM_MAGIC ;
 	        }
 	        if (rs < 0) {
 	            libmem.free(op->a) ;
@@ -123,8 +123,7 @@ int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mhcom_start) */
+} /* end subroutine (mhcom_start) */
 
 int mhcom_finish(mhcom *op) noex {
 	int		rs ;
@@ -137,11 +136,10 @@ int mhcom_finish(mhcom *op) noex {
 	    }
 	    op->value = nullptr ;
 	    op->comment = nullptr ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mhcom_finish) */
+} /* end subroutine (mhcom_finish) */
 
 int mhcom_getval(mhcom *op,cchar **rpp) noex {
 	int		rs ;
@@ -150,8 +148,7 @@ int mhcom_getval(mhcom *op,cchar **rpp) noex {
 	    rs = (op->value) ? op->vlen : SR_NOENT ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mhcom_getval) */
+} /* end subroutine (mhcom_getval) */
 
 int mhcom_getcom(mhcom *op,cchar **rpp) noex {
 	int		rs ;
@@ -160,8 +157,7 @@ int mhcom_getcom(mhcom *op,cchar **rpp) noex {
 	    rs = (op->comment) ? op->clen : SR_NOENT ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mhcom_getcom) */
+} /* end subroutine (mhcom_getcom) */
 
 
 /* private subroutines */
@@ -270,26 +266,25 @@ local int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
 	    op->vlen = vl ;
 	} /* end if (sbuf) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (mhcom_bake) */
+} /* end subroutine (mhcom_bake) */
 
 int mhcom::start(cchar *sp,int sl) noex {
 	return mhcom_start(this,sp,sl) ;
-}
+} /* end */
 
 int mhcom::getval(cchar **rpp) noex {
 	return mhcom_getval(this,rpp) ;
-}
+} /* end */
 
 int mhcom::getcom(cchar **rpp) noex {
 	return mhcom_getcom(this,rpp) ;
-}
+} /* end */
 
 void mhcom::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("mhcom",rs,"fini-finish") ;
 	}
-}
+} /* end */
 
 mhcom_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
@@ -301,8 +296,6 @@ mhcom_co::operator int () noex {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (mhcom_co::operator) */
-
+} /* end method (mhcom_co::operator) */
 
 
