@@ -21,8 +21,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<usystem.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<localmisc.h>		/* |LOGNAMELEN| + ... */
 
 
@@ -51,7 +52,7 @@ enum mcmsgmems {
     mcmsgmem_start,
     mcmsgmem_finish,
     mcmsgmem_overlast
-} ;
+} ; /* end enum */
 
 struct mcmsg_req ;
 struct mcmsg_rep ;
@@ -94,24 +95,24 @@ mcmsg_co<mcmsg_ack>::operator int () noex {
 struct mcmsg_req {
     	mcmsg_co<mcmsg_req>	start ;
     	mcmsg_co<mcmsg_req>	finish ;
-	uint	msglen ;
-	uint	tag ;
-	uint	timestamp ;
-	char	cluster[MCMSG_LCLUSTER + 1] ;
-	char	mailuser[MCMSG_LMAILUSER + 1] ;
-	uchar	msgtype ;
-	uchar	seq ;
-	int rd(char *,int) noex ;
-	int wr(cchar *,int) noex ;
+	uint		msglen ;
+	uint		tag ;
+	uint		timestamp ;
+	char		cluster[MCMSG_LCLUSTER + 1] ;
+	char		mailuser[MCMSG_LMAILUSER + 1] ;
+	uchar		msgtype ;
+	uchar		seq ;
+	int rd		(char *,int) noex ;
+	int wr		(cchar *,int) noex ;
 	mcmsg_req() noex {
-	    start(this,mcmsgmem_start) ;
-	    finish(this,mcmsgmem_finish) ;
-	} ;
+	    start	(this,mcmsgmem_start) ;
+	    finish	(this,mcmsgmem_finish) ;
+	} ; /* end ctor */
 	void dtor() noex ;
-	~mcmsg_req() {
+	destruct mcmsg_req() {
 	    dtor() ;
-	} ;
-} ;
+	} ; /* end destruct */
+} ; /* end struct */
 
 /* server report */
 struct mcmsg_rep {
