@@ -39,7 +39,8 @@
 
 #include	"libf.h"
 
-import libfsup ;			/* |getlenstr()| */
+import modutil ;
+import modmisc ;			/* |mknpath(3u)| */
 import modsys ;				/* |intsat(3modsys)| */
 
 
@@ -49,7 +50,7 @@ import modsys ;				/* |intsat(3modsys)| */
 /* external subroutines */
 
 extern "C++" {
-    int fwrite(FILE *,cvoid *,int) noex ;
+    int fwrite		(FILE *,cvoid *,int) noex ;
 } /* end extern (C++) */
 
 
