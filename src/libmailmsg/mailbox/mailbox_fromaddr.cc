@@ -41,27 +41,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<estrings.h>
-#include	<dater.h>
-#include	<bfile.h>
-#include	<mkx.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
 #include	<mailmsg.h>		/* MAILMSG */
 #include	<mailmsghdrs.h>		/* MAILMSG */
-#include	<isoneof.h>
-#include	<isnot.h>
-#include	<iserror.h>
-#include	<localmisc.h>
+#include	<isoneof.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<iserror.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"mailbox.h"
 #include	"mailmsgfrom.h"
 
+import mailbox_mag ;
 
 /* local defines */
 
@@ -81,7 +82,7 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     extern int	mailmsg_loadfile(mailmsg *,bfile *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -147,8 +148,7 @@ int mailbox_fromaddr(mailbox *mbp,dater *dp,MMF *fip,cchar *mfn) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mailbox_fromaddr) */
+} /* end subroutine (mailbox_fromaddr) */
 
 
 /* local subroutines */
@@ -178,8 +178,7 @@ local int mailbox_proc(mailbox *mbp,dater *dp,MMF *fip,
 	    } /* end if (seek) */
 	} /* end if (mailbox_msgret) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mailbox_proc) */
+} /* end subroutine (mailbox_proc) */
 
 local int mailmsg_hdrfrom(mailmsg *mmp,cchar **rpp) noex {
     	int		rs ;
@@ -216,8 +215,7 @@ local int mailmsg_msgfrom(mailmsg *mmp,MMF *fip) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (ok) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mailmsg_msgfrom) */
+} /* end subroutine (mailmsg_msgfrom) */
 
 local int mailmsg_msgtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	int		rs ;
@@ -225,8 +223,7 @@ local int mailmsg_msgtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	    rs = mailmsg_envtime(mmp,dp,tp) ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsg_msgtime) */
+} /* end subroutine (mailmsg_msgtime) */
 
 local int mailmsg_hdrtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	int		rs ;
@@ -243,8 +240,7 @@ local int mailmsg_hdrtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailmsg_hdrtime) */
+} /* end subroutine (mailmsg_hdrtime) */
 
 local int mailmsg_envtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	int		rs ;
@@ -260,12 +256,10 @@ local int mailmsg_envtime(mailmsg *mmp,dater *dp,time_t *tp) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailmsg_envtime) */
+} /* end subroutine (mailmsg_envtime) */
 
 local bool isNoMsg(int rs) noex {
 	return isOneOf(rsnomsg,rs) ;
-}
-/* end subroutine (isNoMsg) */
+} /* end subroutine (isNoMsg) */
 
 
