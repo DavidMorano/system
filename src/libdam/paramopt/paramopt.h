@@ -76,11 +76,11 @@ struct paramopt_co {
 	void operator () (paramopt *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (paramopt_co) */
 struct paramopt : paramopt_head {
 	paramopt_co	start ;
@@ -115,7 +115,7 @@ struct paramopt : paramopt_head {
 	operator int () noex ;
 	destruct paramopt() {
 	    if (head) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (paramopt) */
 #else	/* __cplusplus */
 typedef PARAMOPT	paramopt ;
@@ -146,19 +146,6 @@ extern int paramopt_curfetch	(paramopt *,cc *,paramopt_cur *,cc **) noex ;
 extern int paramopt_finish	(paramopt *) noex ;
 
 EXTERNC_end
-
-#ifdef	__cplusplus
-
-template<typename ... Args>
-local inline int paramopt_magic(paramopt *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magval == PARAMOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (paramopt_magic) */
-
-#endif /* __cplusplus */
 
 
 #endif /* PARAMOPT_INCLUDE */
