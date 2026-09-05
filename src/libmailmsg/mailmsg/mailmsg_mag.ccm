@@ -1,0 +1,40 @@
+/* mailmsg_mag MODULE (primary) HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* message parsing object */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"mailmsg.h"
+
+export module mailmsg_mag ;
+
+export {
+    template<typename ... Args>
+    inline int mailmsg_magic(mailmsg *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == MAILMSG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (mailmsg_magval) */
+} /* end export */
+
+
