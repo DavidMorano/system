@@ -47,34 +47,34 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<bfile.h>
-#include	<sbuf.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<ema.h>			/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<mapstrint.h>		/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC */
+#include	<intsat.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
+#include	<bfile.h>		/* LIBB */
 #include	<mailmsg.h>		/* MAILMSG */
 #include	<mailmsg_envget.h>	/* MAILMSG */
 #include	<mailmsghdrs.h>		/* MAILMSG */
-#include	<ema.h>
-#include	<vecobj.h>
-#include	<tmtime.hh>
-#include	<mapstrint.h>
-#include	<snx.h>
-#include	<mkx.h>
-#include	<strwcpy.h>
-#include	<timestr.h>
-#include	<intsat.h>
-#include	<char.h>
-#include	<isoneof.h>
-#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"mailbox.h"
 #include	"mbcache.h"
@@ -195,7 +195,7 @@ template<typename ... Args>
 local int mbcache_magic(mbcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MBCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MBCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (mbcache_magic) */
@@ -238,7 +238,7 @@ local bool	isBadDate(int) noex ;
 
 extern "C" {
     local int	vcmpmsgentry(cvoid *,cvoid *) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -294,8 +294,7 @@ int mbcache_start(mbcache *op,cchar *mbfname,int mflags,mailbox *mbp) noex {
 	    }
 	} /* end if (mbcache_ctor) */
 	return (rs >= 0) ? nmsgs : rs ;
-}
-/* end subroutine (mbcache_start) */
+} /* end subroutine (mbcache_start) */
 
 local int mbcache_starter(mbcache *op,cc *mbfname) noex {
 	cnullptr	np{} ;
@@ -318,7 +317,7 @@ local int mbcache_starter(mbcache *op,cc *mbfname) noex {
 	                if ((rs = strpack_start(psp,strsz)) >= 0) {
 			   dater	*dp = op->dmp ;
 			    if ((rs = dater_start(dp,np,np,0)) >= 0) {
-	    			op->magic = MBCACHE_MAGIC ;
+	    			op->magval = MBCACHE_MAGIC ;
 			    }
 	                    if (rs < 0) {
 	                        strpack_finish(psp) ;
@@ -340,8 +339,7 @@ local int mbcache_starter(mbcache *op,cc *mbfname) noex {
 	    } /* end if (error) */
 	} /* end if (memory-allocation) */
 	return (rs >= 0) ? nmsgs : rs ;
-}
-/* end subroutine (mbcache_starter) */
+} /* end subroutine (mbcache_starter) */
 
 int mbcache_finish(mbcache *op) noex {
 	int		rs ;
@@ -375,11 +373,10 @@ int mbcache_finish(mbcache *op) noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->mbp = nullptr ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mbcache_finish) */
+} /* end subroutine (mbcache_finish) */
 
 int mbcache_mbfile(mbcache *op,char *dbuf,int dlen) noex {
 	int		rs ;
@@ -387,8 +384,7 @@ int mbcache_mbfile(mbcache *op,char *dbuf,int dlen) noex {
 	    rs = sncpy1(dbuf,dlen,op->mbfname) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mbcache_mbfile) */
+} /* end subroutine (mbcache_mbfile) */
 
 int mbcache_mbinfo(mbcache *op,MBCACHE_INFO *mep) noex {
 	int		rs ;
@@ -402,8 +398,7 @@ int mbcache_mbinfo(mbcache *op,MBCACHE_INFO *mep) noex {
 	    nmsgs = mip->nmsgs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? nmsgs : rs ;
-}
-/* end subroutine (mbcache_mbinfo) */
+} /* end subroutine (mbcache_mbinfo) */
 
 int mbcache_count(mbcache *op) noex {
 	int		rs ;
@@ -413,8 +408,7 @@ int mbcache_count(mbcache *op) noex {
 	    nmsgs = mip->nmsgs ;
 	} /* end if (magic) */
 	return (rs >= 0) ? nmsgs : rs ;
-}
-/* end subroutine (mbcache_count) */
+} /* end subroutine (mbcache_count) */
 
 int mbcache_sort(mbcache *op) noex {
 	int		rs ;
@@ -432,8 +426,7 @@ int mbcache_sort(mbcache *op) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? nmsgs : rs ;
-}
-/* end subroutine (mbcache_sort) */
+} /* end subroutine (mbcache_sort) */
 
 #ifdef	COMMENT
 int mbcache_check(mbcache *op,TIMEB *nowp,cchar *zname) noex {
@@ -451,8 +444,7 @@ int mbcache_check(mbcache *op,TIMEB *nowp,cchar *zname) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mbcache_check) */
+} /* end subroutine (mbcache_check) */
 #endif /* COMMENT */
 
 /* mark a message for deletion */
@@ -483,8 +475,7 @@ int mbcache_msgdel(mbcache *op,int mi,int delcmd) noex {
 	    } /* end if (have-message) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_delprev : rs ;
-}
-/* end subroutine (mbcache_msgdel) */
+} /* end subroutine (mbcache_msgdel) */
 
 int mbcache_msgdeldup(mbcache *op) noex {
     	int		nmsgs ;
@@ -520,8 +511,7 @@ int mbcache_msgdeldup(mbcache *op) noex {
 	    } /* end if (mapstrint) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mbcache_msgdeldup) */
+} /* end subroutine (mbcache_msgdeldup) */
 
 /* retrieve MSG flags (dispositions) */
 int mbcache_msgflags(mbcache *op,int mi) noex {
@@ -542,8 +532,7 @@ int mbcache_msgflags(mbcache *op,int mi) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? mf : rs ;
-}
-/* end subroutine (mbcache_msgflags) */
+} /* end subroutine (mbcache_msgflags) */
 
 /* set MSG flags (dispositions) */
 int mbcache_msgsetflag(mbcache *op,int mi,int w,int v) noex {
@@ -578,8 +567,7 @@ int mbcache_msgsetflag(mbcache *op,int mi,int w,int v) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? mf : rs ;
-}
-/* end subroutine (mbcache_msgsetflag) */
+} /* end subroutine (mbcache_msgsetflag) */
 
 int mbcache_countdel(mbcache *op) noex {
 	int		rs ;
@@ -587,8 +575,7 @@ int mbcache_countdel(mbcache *op) noex {
 	    rs = mailbox_countdel(op->mbp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mbcache_countdel) */
+} /* end subroutine (mbcache_countdel) */
 
 int mbcache_msgsetlines(mbcache *op,int mi,int vlines) noex {
     	int		nmsgs ;
@@ -616,8 +603,7 @@ int mbcache_msgsetlines(mbcache *op,int mi,int vlines) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rlines : rs ;
-}
-/* end subroutine (mbcache_msgsetlines) */
+} /* end subroutine (mbcache_msgsetlines) */
 
 /* get the file offset to the start-envelope of a message */
 int mbcache_msgoff(mbcache *op,int mi,off_t *rp) noex {
@@ -640,8 +626,7 @@ int mbcache_msgoff(mbcache *op,int mi,off_t *rp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mbcache_msgoff) */
+} /* end subroutine (mbcache_msgoff) */
 
 /* get the number of lines in a message */
 int mbcache_msglines(mbcache *op,int mi,int *rp) noex {
@@ -669,8 +654,7 @@ int mbcache_msglines(mbcache *op,int mi,int *rp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mbcache_msglines) */
+} /* end subroutine (mbcache_msglines) */
 
 /* get the framing information for a message */
 int mbcache_msginfo(mbcache *op,int mi,ME **mpp) noex {
@@ -695,8 +679,7 @@ int mbcache_msginfo(mbcache *op,int mi,ME **mpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mbcache_msginfo) */
+} /* end subroutine (mbcache_msginfo) */
 
 /* get the scan information for a message */
 int mbcache_msgscan(mbcache *op,int mi,ME **mpp) noex {
@@ -708,8 +691,7 @@ int mbcache_msgscan(mbcache *op,int mi,ME **mpp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (mbcache_msgscan) */
+} /* end subroutine (mbcache_msgscan) */
 
 int mbcache_msgenvtime(mbcache *op,int mi,time_t *timep) noex {
 	time_t		t = 0 ;
@@ -725,8 +707,7 @@ int mbcache_msgenvtime(mbcache *op,int mi,time_t *timep) noex {
 	} /* end if (magic) */
 	if (timep) *timep = t ;
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mbcache_msgenvtime) */
+} /* end subroutine (mbcache_msgenvtime) */
 
 int mbcache_msghdrtime(mbcache *op,int mi,time_t *timep) noex {
 	time_t		t = 0 ;
@@ -742,8 +723,7 @@ int mbcache_msghdrtime(mbcache *op,int mi,time_t *timep) noex {
 	} /* end if (magic) */
 	if (timep) *timep = t ;
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mbcache_msghdrtime) */
+} /* end subroutine (mbcache_msghdrtime) */
 
 int mbcache_msgtimes(mbcache *op,int mi,time_t *timep) noex {
 	int		rs ;
@@ -756,8 +736,7 @@ int mbcache_msgtimes(mbcache *op,int mi,time_t *timep) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mbcache_msgtimes) */
+} /* end subroutine (mbcache_msgtimes) */
 
 
 /* private subroutines */
@@ -783,8 +762,7 @@ local int mbcache_msgfins(mbcache *op) noex {
 	    } /* end if (non-null) */
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (mbcache_msgfins) */
+} /* end subroutine (mbcache_msgfins) */
 
 local int mbcache_msgframing(mbcache *op,int mi,ME **mpp) noex {
 	int		rs = SR_OK ;
@@ -811,8 +789,7 @@ local int mbcache_msgframing(mbcache *op,int mi,ME **mpp) noex {
 	    *mpp = (rs >= 0) ? op->msgs[mi] : nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (mbcache_msgframing) */
+} /* end subroutine (mbcache_msgframing) */
 
 local int mbcache_msgtimers(mbcache *op,int mi,time_t *timep) noex {
 	int		rs ;
@@ -825,8 +802,7 @@ local int mbcache_msgtimers(mbcache *op,int mi,time_t *timep) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (mbcache_msgtimers) */
+} /* end subroutine (mbcache_msgtimers) */
 
 #ifdef	COMMENT
 local int mbcache_msgscanmk(mbcache *op,int mi) noex {
@@ -854,8 +830,7 @@ local int mbcache_msgscanmk(mbcache *op,int mi) noex {
 	    } /* end if */
 	} /* end if (not-null) */
 	return rs ;
-}
-/* end subroutine (mbcache_msgscanmk) */
+} /* end subroutine (mbcache_msgscanmk) */
 #endif /* COMMENT */
 
 #ifdef	COMMENT
@@ -873,8 +848,7 @@ local int mbcache_setnow(mbcache *op) noex {
 	    } /* end if (uc_ftime) */
 	} /* end if (have-now) */
 	return rs ;
-}
-/* end subroutine (mbcache_setnow) */
+} /* end subroutine (mbcache_setnow) */
 
 #endif /* COMMENT */
 
@@ -891,8 +865,7 @@ local int msgent_start(ME *mep,int mi) noex {
 	    mep->boff = -1 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msgent_start) */
+} /* end subroutine (msgent_start) */
 
 local int msgent_finish(ME *mep) noex {
 	int		rs = SR_FAULT ;
@@ -912,8 +885,7 @@ local int msgent_finish(ME *mep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msgent_finish) */
+} /* end subroutine (msgent_finish) */
 
 local int msgent_frame(ME *mep,mailbox_mi *mip) noex {
 	int		rs = SR_FAULT ;
@@ -944,8 +916,7 @@ local int msgent_frame(ME *mep,mailbox_mi *mip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msgent_frame) */
+} /* end subroutine (msgent_frame) */
 
 typedef int (*msgent_f)(ME *,mbcache *,mailmsg *) noex ;
 
@@ -987,8 +958,7 @@ local int msgent_load(ME *mep,mbcache *op) noex {
 	    } /* end if (mailmsg) */
 	} /* end if (initialized) */
 	return rs ;
-}
-/* end subroutine (msgent_load) */
+} /* end subroutine (msgent_load) */
 
 local int msgent_loadenv(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
@@ -1032,8 +1002,7 @@ local int msgent_loadenv(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	    }
 	} /* end if (mailmsg_envcount) */
 	return rs ;
-}
-/* end subroutine (msgent_loadenv) */
+} /* end subroutine (msgent_loadenv) */
 
 #if	CF_LOADENVADDR
 local int msgent_loadenvaddr(ME *mep,MC *op,mailmsg *mmp,cchar **rpp) noex {
@@ -1050,8 +1019,7 @@ local int msgent_loadenvaddr(ME *mep,MC *op,mailmsg *mmp,cchar **rpp) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (msgent_loadenvaddr) */
+} /* end subroutine (msgent_loadenvaddr) */
 #endif /* CF_LOADENVADDR */
 
 local int msgent_loadhdrmid(ME *mep,mbcache *op,mailmsg *mmp) noex {
@@ -1078,8 +1046,7 @@ local int msgent_loadhdrmid(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (msgent_loadhdrmid) */
+} /* end subroutine (msgent_loadhdrmid) */
 
 local int msgent_loadhdrfrom(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
@@ -1105,8 +1072,7 @@ local int msgent_loadhdrfrom(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (msgent_loadhdrfrom) */
+} /* end subroutine (msgent_loadhdrfrom) */
 
 local int msgent_loadhdrsubj(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
@@ -1124,8 +1090,7 @@ local int msgent_loadhdrsubj(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (msgent_loadhdrsubj) */
+} /* end subroutine (msgent_loadhdrsubj) */
 
 local int msgent_loadhdrdate(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
@@ -1143,8 +1108,7 @@ local int msgent_loadhdrdate(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (msgent_loadhdrdate) */
+} /* end subroutine (msgent_loadhdrdate) */
 
 local int msgent_loadhdrstatus(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	int		rs ;
@@ -1162,8 +1126,7 @@ local int msgent_loadhdrstatus(ME *mep,mbcache *op,mailmsg *mmp) noex {
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? sl : rs ;
-}
-/* end subroutine (msgent_loadhdrstatus) */
+} /* end subroutine (msgent_loadhdrstatus) */
 
 local int msgent_procenvdate(ME *mep,mbcache *op) noex {
 	cint		vi = mbcachemf_envdate ;
@@ -1190,8 +1153,7 @@ local int msgent_procenvdate(ME *mep,mbcache *op) noex {
 	    } /* end if (had ENV value) */
 	} /* end if (processing) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (msgent_procenvdate) */
+} /* end subroutine (msgent_procenvdate) */
 
 local int msgent_prochdrdate(ME *mep,mbcache *op) noex {
 	int		rs = SR_OK ;
@@ -1218,8 +1180,7 @@ local int msgent_prochdrdate(ME *mep,mbcache *op) noex {
 	    } /* end if (had HDR value) */
 	} /* end if (processing) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (msgent_prochdrdate) */
+} /* end subroutine (msgent_prochdrdate) */
 
 local int msgent_procscanfrom(ME *mep,mbcache *op) noex {
 	int		rs = SR_OK ;
@@ -1255,8 +1216,7 @@ local int msgent_procscanfrom(ME *mep,mbcache *op) noex {
 	    len = mep->vl[mbcachemf_scanfrom] ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (msgent_procscanfrom) */
+} /* end subroutine (msgent_procscanfrom) */
 
 local int msgent_procscandate(ME *mep,mbcache *op) noex {
     	cnullptr	np{} ;
@@ -1288,8 +1248,7 @@ local int msgent_procscandate(ME *mep,mbcache *op) noex {
 	    cl = mep->vl[mbcachemf_scandate] ;
 	}
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (msgent_procscandate) */
+} /* end subroutine (msgent_procscandate) */
 
 local int msgent_msgtimes(ME *mep,mbcache *op) noex {
 	int		rs ;
@@ -1301,8 +1260,7 @@ local int msgent_msgtimes(ME *mep,mbcache *op) noex {
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (msgent_msgtimes) */
+} /* end subroutine (msgent_msgtimes) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -1310,17 +1268,15 @@ vars::operator int () noex {
 	    hdrbuflen = (rs * HDRBUFMULT) ;
 	}
 	return rs ;
-}
+} /* end method */
 
 local bool isBadDate(int rs) noex {
 	return isOneOf(rsdatebad,rs) ;
-}
-/* end subroutine (isBadDate) */
+} /* end subroutine (isBadDate) */
 
 local bool isNoMsg(int rs) noex {
 	return isOneOf(rsnomsg,rs) ;
-}
-/* end subroutine (isNoMsg) */
+} /* end subroutine (isNoMsg) */
 
 local int vcmpmsgentry(cvoid *e1pp,cvoid *e2pp) noex {
 	ME		**m1pp = (ME **) e1pp ;
@@ -1346,8 +1302,7 @@ local int vcmpmsgentry(cvoid *e1pp,cvoid *e2pp) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (vcmpmsgentry) */
+} /* end subroutine (vcmpmsgentry) */
 
 #ifdef	COMMENT
 /* append some additional value to an existing header value */
@@ -1367,8 +1322,7 @@ local int headappend(cchar **pp,cchar *sp,int sl) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (valid) */
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (headappend) */
+} /* end subroutine (headappend) */
 #endif /* COMMENT */
 
 #ifdef	COMMENT
@@ -1379,8 +1333,7 @@ local int nextnonwhite(cchar *sp,int sl) noex {
 	    sp += 1 ;
 	}
 	return (i < sl) ? *sp : ' ' ;
-}
-/* end subroutine (nextnonwhite) */
+} /* end subroutine (nextnonwhite) */
 #endif /* COMMENT */
 
 
