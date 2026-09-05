@@ -42,6 +42,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import paramopt_mag ;
 
 /* local defines */
 
