@@ -44,11 +44,13 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"configvarsobj.hh"
+#include	"configvars_util.hh"
+#include	"configvars.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import configvars_util ;
 
 /* local namespaces */
 
