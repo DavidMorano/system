@@ -70,28 +70,29 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<estrings.h>
-#include	<strpack.h>
-#include	<vecobj.h>
-#include	<strwcpy.h>
-#include	<toxc.h>
-#include	<hasx.h>
-#include	<localmisc.h>		/* |COLUMNS| */
-#include	<mailmsgmatenv.h>	/* MAILMSG */
-#include	<mailmsgmathdr.h>	/* MAILMSG */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<strpack.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
+#include	<mailmsgmatenv.h>	/* LIBMAILMSG */
+#include	<mailmsgmathdr.h>	/* LIBMAILMSG */
 
 #include	"mailmsg.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
+import mailmsg_mag ;
 
 /* local defines */
 
@@ -182,8 +183,7 @@ local int mailmsg_ctor(mailmsg *op,Args ... args) noex {
 	    } /* end if (new-strpack) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsg_ctor) */
+} /* end subroutine (mailmsg_ctor) */
 
 local int mailmsg_dtor(mailmsg *op) noex {
 	int		rs = SR_FAULT ;
@@ -203,8 +203,7 @@ local int mailmsg_dtor(mailmsg *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsg_dtor) */
+} /* end subroutine (mailmsg_dtor) */
 
 local int mailmsg_procline(mailmsg *,cchar *,int) noex ;
 
@@ -265,8 +264,7 @@ int mailmsg_start(mailmsg *op) noex {
 	    }
 	} /* end if (mailmsg_ctor) */
 	return rs ;
-}
-/* end subroutine (mailmsg_start) */
+} /* end subroutine (mailmsg_start) */
 
 int mailmsg_finish(mailmsg *op) noex {
 	int		rs ;
@@ -291,8 +289,7 @@ int mailmsg_finish(mailmsg *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsg_finish) */
+} /* end subroutine (mailmsg_finish) */
 
 int mailmsg_loadline(mailmsg *op,cchar *lp,int ll) noex {
 	int		rs ;
@@ -311,8 +308,7 @@ int mailmsg_loadline(mailmsg *op,cchar *lp,int ll) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (mailmsg_loadline) */
+} /* end subroutine (mailmsg_loadline) */
 
 int mailmsg_envcount(mailmsg *op) noex {
 	int		rs ;
@@ -320,8 +316,7 @@ int mailmsg_envcount(mailmsg *op) noex {
 	    rs = vecobj_count(op->elp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsg_envcount) */
+} /* end subroutine (mailmsg_envcount) */
 
 int mailmsg_envaddress(mailmsg *op,int i,cchar **rpp) noex {
 	int		rs ;
@@ -340,8 +335,7 @@ int mailmsg_envaddress(mailmsg *op,int i,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? el : rs ;
-}
-/* end subroutine (mailmsg_envaddress) */
+} /* end subroutine (mailmsg_envaddress) */
 
 int mailmsg_envdate(mailmsg *op,int i,cchar **rpp) noex {
 	int		rs ;
@@ -360,8 +354,7 @@ int mailmsg_envdate(mailmsg *op,int i,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? el : rs ;
-}
-/* end subroutine (mailmsg_envdate) */
+} /* end subroutine (mailmsg_envdate) */
 
 int mailmsg_envremote(mailmsg *op,int i,cchar **rpp) noex {
 	int		rs ;
@@ -380,8 +373,7 @@ int mailmsg_envremote(mailmsg *op,int i,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? el : rs ;
-}
-/* end subroutine (mailmsg_envremote) */
+} /* end subroutine (mailmsg_envremote) */
 
 int mailmsg_hdrcount(mailmsg *op,cchar *name) noex {
 	int		rs ;
@@ -404,8 +396,7 @@ int mailmsg_hdrcount(mailmsg *op,cchar *name) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mailmsg_hdrcount) */
+} /* end subroutine (mailmsg_hdrcount) */
 
 int mailmsg_hdrikey(mailmsg *op,int hi,cchar **rpp) noex {
 	int		rs ;
@@ -425,8 +416,7 @@ int mailmsg_hdrikey(mailmsg *op,int hi,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? nl : rs ;
-}
-/* end subroutine (mailmsg_hdrikey) */
+} /* end subroutine (mailmsg_hdrikey) */
 
 int mailmsg_hdriline(mailmsg *op,cchar *name,int hi,int li,cchar **rpp) noex {
 	int		rs ;
@@ -452,8 +442,7 @@ int mailmsg_hdriline(mailmsg *op,cchar *name,int hi,int li,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (mailmsg_hdriline) */
+} /* end subroutine (mailmsg_hdriline) */
 
 int mailmsg_hdrival(mailmsg *op,cchar *name,int hi,cchar **rpp) noex {
 	int		rs ;
@@ -479,8 +468,7 @@ int mailmsg_hdrival(mailmsg *op,cchar *name,int hi,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (mailmsg_hdrival) */
+} /* end subroutine (mailmsg_hdrival) */
 
 int mailmsg_hdrval(mailmsg *op,cchar *name,cchar **rpp) noex {
 	int		rs ;
@@ -506,8 +494,7 @@ int mailmsg_hdrval(mailmsg *op,cchar *name,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (mailmsg_hdrval) */
+} /* end subroutine (mailmsg_hdrval) */
 
 
 /* local subroutines */
@@ -531,14 +518,12 @@ local int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 	    }
 	} /* end if */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (mailmsg_procline) */
+} /* end subroutine (mailmsg_procline) */
 
 local int mailmsg_envbegin(mailmsg *op) noex {
 	cint		esz = szof(mmenvdat) ;
 	return vecobj_start(op->elp,esz,4,0) ;
-}
-/* end subroutine (mailmsg_envbegin) */
+} /* end subroutine (mailmsg_envbegin) */
 
 local int mailmsg_envend(mailmsg *op) noex {
 	int		rs = SR_OK ;
@@ -548,8 +533,7 @@ local int mailmsg_envend(mailmsg *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsg_envend) */
+} /* end subroutine (mailmsg_envend) */
 
 local int mailmsg_envadd(mailmsg *op,mmenvdat *esp) noex {
 	int		rs = SR_FAULT ;
@@ -557,15 +541,13 @@ local int mailmsg_envadd(mailmsg *op,mmenvdat *esp) noex {
 	    rs = vecobj_add(op->elp,esp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsg_envadd) */
+} /* end subroutine (mailmsg_envadd) */
 
 local int mailmsg_hdrbegin(mailmsg *op) noex {
 	cint		hsz = szof(MMHNAME) ;
 	op->lastname = -1 ;
 	return vecobj_start(op->hlp,hsz,10,0) ;
-}
-/* end subroutine (mailmsg_hdrbegin) */
+} /* end subroutine (mailmsg_hdrbegin) */
 
 local int mailmsg_hdrend(mailmsg *op) noex {
 	int		rs = SR_OK ;
@@ -583,8 +565,7 @@ local int mailmsg_hdrend(mailmsg *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsg_hdrend) */
+} /* end subroutine (mailmsg_hdrend) */
 
 local int mailmsg_hdraddnew(mailmsg *op,cc *hp,int hl,cc *valp,int vall) noex {
 	int		rs = SR_OK ;
@@ -621,8 +602,7 @@ local int mailmsg_hdraddnew(mailmsg *op,cc *hp,int hl,cc *valp,int vall) noex {
 	    op->lastname = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsg_hdraddnew) */
+} /* end subroutine (mailmsg_hdraddnew) */
 
 local int mailmsg_hdraddcont(mailmsg *op,cchar *valp,int vall) noex {
 	int		rs = SR_OK ;
@@ -641,8 +621,7 @@ local int mailmsg_hdraddcont(mailmsg *op,cchar *valp,int vall) noex {
 	    } /* end if (positive) */
 	} /* end if (positive) */
 	return rs ;
-}
-/* end subroutine (mailmsg_hdraddcont) */
+} /* end subroutine (mailmsg_hdraddcont) */
 
 local int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,cc *hp,int hl) noex {
 	cint		rsn = SR_NOTFOUND ;
@@ -665,8 +644,7 @@ local int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,cc *hp,int hl) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mailmsg_hdrmatch) */
+} /* end subroutine (mailmsg_hdrmatch) */
 
 local int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *valp,int vall) noex {
 	vecobj		*ilp = &hnp->insts ;
@@ -696,8 +674,7 @@ local int msghdrname_start(MMHNAME *hnp,cc *hp,int hl,cc *valp,int vall) noex {
 	    }
 	} /* end if (vecobj_start) */
 	return rs ;
-}
-/* end subroutine (msghdrname_start) */
+} /* end subroutine (msghdrname_start) */
 
 local int msghdrname_finish(MMHNAME *hnp) noex {
 	int		rs = SR_OK ;
@@ -733,8 +710,7 @@ local int msghdrname_finish(MMHNAME *hnp) noex {
 	hnp->vp = nullptr ;
 	hnp->f_alloc = false ;
 	return rs ;
-}
-/* end subroutine (msghdrname_finish) */
+} /* end subroutine (msghdrname_finish) */
 
 local int msghdrname_match(MMHNAME *hnp,cchar *hp,int hl) noex {
 	int		rs = SR_FAULT ;
@@ -746,8 +722,7 @@ local int msghdrname_match(MMHNAME *hnp,cchar *hp,int hl) noex {
 	    f = f && (strncmp(hnp->name,hp,hl) == 0) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (msghdrname_match) */
+} /* end subroutine (msghdrname_match) */
 
 local int msghdrname_addnew(MMHNAME *hnp,cchar *vp,int vl) noex {
 	vecobj		*ilp = &hnp->insts ;
@@ -764,8 +739,7 @@ local int msghdrname_addnew(MMHNAME *hnp,cchar *vp,int vl) noex {
 	    }
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (msghdrname_addnew) */
+} /* end subroutine (msghdrname_addnew) */
 
 local int msghdrname_addcont(MMHNAME *hnp,cchar *valp,int vall) noex {
 	int		rs = SR_OK ;
@@ -785,8 +759,7 @@ local int msghdrname_addcont(MMHNAME *hnp,cchar *valp,int vall) noex {
 	    } /* end if (positive) */
 	} /* end if (positive) */
 	return rs ;
-}
-/* end subroutine (msghdrname_addcont) */
+} /* end subroutine (msghdrname_addcont) */
 
 local int msghdrname_iline(MMHNAME *hnp,int hi,int li,cchar **rpp) noex {
     	vecobj		*ilp = &hnp->insts ;
@@ -800,8 +773,7 @@ local int msghdrname_iline(MMHNAME *hnp,int hi,int li,cchar **rpp) noex {
 	    }
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (msghdrname_iline) */
+} /* end subroutine (msghdrname_iline) */
 
 local int msghdrname_ival(MMHNAME *hnp,int hi,cchar **rpp) noex {
 	int		rs ;
@@ -814,8 +786,7 @@ local int msghdrname_ival(MMHNAME *hnp,int hi,cchar **rpp) noex {
 	    }
 	}
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (msghdrname_ival) */
+} /* end subroutine (msghdrname_ival) */
 
 local int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 	int		rs = SR_OK ;
@@ -868,13 +839,11 @@ local int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 	    *rpp = (rs >= 0) ? hnp->vp : nullptr ;
 	}
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (msghdrname_val) */
+} /* end subroutine (msghdrname_val) */
 
 local int msghdrname_count(MMHNAME *hnp) noex {
 	return vecobj_count(&hnp->insts) ;
-}
-/* end subroutine (msghdrname_count) */
+} /* end subroutine (msghdrname_count) */
 
 local int msghdrinst_start(MMHINST *hip,cchar *vp,int vl) noex {
 	cint		vsz = szof(MMHVAL) ;
@@ -891,8 +860,7 @@ local int msghdrinst_start(MMHINST *hip,cchar *vp,int vl) noex {
 	    }
 	} /* enf if (vecobj_start) */
 	return rs ;
-}
-/* end subroutine (msghdrinst_start) */
+} /* end subroutine (msghdrinst_start) */
 
 local int msghdrinst_add(MMHINST *hip,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
@@ -905,8 +873,7 @@ local int msghdrinst_add(MMHINST *hip,cchar *vp,int vl) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (msghdrinst_add) */
+} /* end subroutine (msghdrinst_add) */
 
 local int msghdrinst_ival(MMHINST *hip,int li,cchar **rpp) noex {
 	int		rs ;
@@ -921,8 +888,7 @@ local int msghdrinst_ival(MMHINST *hip,int li,cchar **rpp) noex {
 	    *rpp = (rs >= 0) ? rp : nullptr ;
 	}
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (msghdrinst_ival) */
+} /* end subroutine (msghdrinst_ival) */
 
 local int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 	int		rs = SR_OK ;
@@ -965,8 +931,7 @@ local int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 	    *rpp = (rs >= 0) ? hip->vp : nullptr ;
 	}
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (msghdrinst_val) */
+} /* end subroutine (msghdrinst_val) */
 
 local int msghdrinst_finish(MMHINST *hip) noex {
 	int		rs = SR_OK ;
@@ -986,7 +951,6 @@ local int msghdrinst_finish(MMHINST *hip) noex {
 	hip->vp = nullptr ;
 	hip->f_alloc = false ;
 	return rs ;
-}
-/* end subroutine (msghdrinst_finish) */
+} /* end subroutine (msghdrinst_finish) */
 
 
