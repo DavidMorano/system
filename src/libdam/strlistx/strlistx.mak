@@ -35,15 +35,17 @@ DEFS +=
 
 INCS += strlist.h strlisthdr.h
 
-MODS +=
+MODS += strlistmks_mag.o
 
 LIBS +=
 
 
-OBJ0_STRLIST= strlist.o
+DEPS= strlistmks_mag.o srectab.h	
+
+OBJ0_STRLIST= strlist.o srectab.o
 OBJ1_STRLIST= strlisthdr.o
 OBJ2_STRLIST= strlistmk.o
-OBJ3_STRLIST= strlistmks.o srectab.o
+OBJ3_STRLIST= strlistmks.o $(MODS)
 
 OBJA_STRLIST= obj0.o obj1.o
 OBJB_STRLIST= obj2.o obj3.o
@@ -137,7 +139,8 @@ objb.o:			$(OBJB_STRLIST)
 strlist.o:		strlist.cc				$(INCS)
 strlisthdr.o:		strlisthdr.cc				$(INCS)
 strlistmk.o:		strlistmk.cc strlistmk.h 		$(INCS)
-strlistmks.o:		strlistmks.cc strlistmks.h srectab.h	$(INCS)
+strlistmks.o:		strlistmks.cc strlistmks.h	$(DEPS)	$(INCS)
+strlistmks_mag.o:	strlistmks_mag.ccm			$(INCS)
 
 srectab.o:		srectab.cc srectab.h			$(INCS)
 
