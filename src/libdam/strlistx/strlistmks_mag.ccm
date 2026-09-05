@@ -1,0 +1,35 @@
+/* strlistmks_mag MODULE HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* make a STRLIST database */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* POSIX® systems IDs */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strtab.h>		/* LIBUC */
+#include	<srectab.h>		/* LIBUC */
+
+#include	"strlistmks.h"
+
+export module strlistmks_mag ;
+
+export {
+    template<typename ... Args>
+    inline int strlistmks_magic(strlistmks *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == STRLISTMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (strlistmks_magic) */
+} /* end export */
+
+
