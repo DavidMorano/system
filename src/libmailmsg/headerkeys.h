@@ -2,7 +2,24 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
+/* these are mail-message header key-names and ley-name lengths */
+/* version %I% last-modified %G% */
 
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
+#ifndef	HEADERKEYS_INCLUDE
+#define	HEADERKEYS_INCLUDE
+
+
+/* header-key names */
 #define		HK_FROM		"From"
 #define		HK_TO		"To"
 #define		HK_DATE		"Date"
@@ -20,7 +37,7 @@
 #define		HK_CTYPE	"Content-type"
 #define		HK_SUBJ		"Subj"
 
-
+/* header-key name length */
 #define		HKL_FROM	4
 #define		HKL_TO		2
 #define		HKL_DATE	4
@@ -37,5 +54,8 @@
 #define		HKL_REFERENCES	10
 #define		HKL_CTYPE	12
 #define		HKL_SUBJ	4
+
+
+#endif /* HEADERKEYS_INCLUDE */
 
 
