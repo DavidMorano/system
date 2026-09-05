@@ -35,26 +35,26 @@ DEFS +=
 
 INCS += mailfiles.h
 
-MODS +=
+MODS += mailfiles_mag.o
 
 LIBS +=
 
 
+DEPS= mailfiles_mag.o
+
 OBJ0= mailfiles_prime.o mailfiles_parse.o
-OBJ1= 
+OBJ1= $(MODS)
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
 OBJB=
 
 OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -136,7 +136,9 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-mailfiles_prime.o:	mailfiles_prime.cc		$(INCS)
-mailfiles_parse.o:	mailfiles_parse.cc		$(INCS)
+mailfiles_prime.o:	mailfiles_prime.cc		$(DEPS) $(INCS)
+mailfiles_parse.o:	mailfiles_parse.cc		$(DEPS) $(INCS)
+
+mailfiles_mag.o:	mailfiles_mag.ccm		$(INCS)
 
 
