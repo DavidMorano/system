@@ -28,17 +28,18 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<dater.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<dater.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsg.h"
 
+import mailmsg_mag ;
 
 /* local defines */
 
@@ -106,7 +107,6 @@ int mailmsg_envdates(mailmsg *op,TIMEB *nowp,char *zname,time_t *rp) noex {
 	    } /* end if (dater) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (mailmsg_envdates) */
+} /* end subroutine (mailmsg_envdates) */
 
 
