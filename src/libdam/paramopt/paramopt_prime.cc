@@ -68,6 +68,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import paramopt_mag ;
 
 /* local defines */
 
@@ -383,8 +384,7 @@ int paramopt_curbegin(PO *op,PO_CUR *curp) noex {
 	    curp->valp = nullptr ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (paramopt_curbegin) */
+} /* end subroutine (paramopt_curbegin) */
 
 /* free up a cursor */
 int paramopt_curend(PO *op,PO_CUR *curp) noex {
@@ -394,8 +394,7 @@ int paramopt_curend(PO *op,PO_CUR *curp) noex {
 	    curp->valp = nullptr ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (paramopt_curend) */
+} /* end subroutine (paramopt_curend) */
 
 int paramopt_curenumkey(PO *op,PO_CUR *curp,cchar **rpp) noex {
 	int		rs ;
