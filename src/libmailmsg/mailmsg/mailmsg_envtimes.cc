@@ -41,15 +41,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<dater.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<dater.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsg.h"
 
+import mailmsg_mag ;
 
 /* local defines */
 
@@ -105,7 +106,6 @@ int mailmsg_envtimes(mailmsg *op,dater *dp,time_t *ta,int nents) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (mailmsg_envtimes) */
+} /* end subroutine (mailmsg_envtimes) */
 
 
