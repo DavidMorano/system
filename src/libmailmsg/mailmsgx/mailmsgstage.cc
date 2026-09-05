@@ -170,7 +170,7 @@ template<typename ... Args>
 local inline int mailmsgstage_magic(MMS *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MAILMSGSTAGE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAILMSGSTAGE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (mailmsgstage_magic) */
@@ -299,7 +299,7 @@ local int mailmsgstage_starter(MMS *op,int ifd) noex {
 	            }
 	        } /* end if */
 	        if (rs >= 0) {
-		    op->magic = MAILMSGSTAGE_MAGIC ;
+		    op->magval = MAILMSGSTAGE_MAGIC ;
 		}
 	        if (rs < 0) {
 	            mailmsgstage_msgfins(op) ;
@@ -351,7 +351,7 @@ int mailmsgstage_finish(MMS *op) noex {
 	        rs1 = mailmsgstage_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
