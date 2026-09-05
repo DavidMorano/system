@@ -28,11 +28,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsghdrct.h"
 
@@ -79,7 +79,7 @@ template<typename ... Args>
 local inline int mailmsghdrct_magic(mailmsghdrct *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MAILMSGHDRCT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAILMSGHDRCT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (mailmsghdrct_magic) */
@@ -119,7 +119,7 @@ int mailmsghdrct_finish(MMHCT *op) noex {
 		rs1 = mailmsghdrct_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
