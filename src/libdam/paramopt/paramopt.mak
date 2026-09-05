@@ -35,17 +35,20 @@ DEFS +=
 
 INCS += paramopt.h
 
-MODS +=
+MODS += paramopt_mag.o
 
 LIBS +=
 
 
+DEPS= $(MODS)
+
 OBJ0= paramopt_prime.o paramopt_loadone.o
 OBJ1= paramopt_obj.o
-OBJ2=
+OBJ2= $(MODS)
 OBJ3=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
+OBJB=
 
 OBJ= obja.o
 
@@ -145,8 +148,9 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-paramopt_prime.o:	paramopt_prime.cc			$(INCS)
-paramopt_loadone.o:	paramopt_loadone.cc			$(INCS)
+paramopt_prime.o:	paramopt_prime.cc		$(DEPS)	$(INCS)
+paramopt_loadone.o:	paramopt_loadone.cc		#(DEPS)	$(INCS)
 paramopt_obj.o:		paramopt_obj.cc				$(INCS)
+paramopt_mag.o:		paramopt_mag.ccm			$(INCS)
 
 
