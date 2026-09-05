@@ -31,36 +31,37 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= mailmsg.h
+INCS += mailmsg.h
 
-MODS +=
+MODS += mailmsg_mag.o
 
-LIBS=
+LIBS +=
 
+
+DEPS= mailmsg_mag.o
+DEPS_ENVGET= mailmsg_envget.h $(DEPS)
 
 OBJ0_MAILMSG= mailmsg_prime.o 
 OBJ1_MAILMSG= mailmsg_envaddrfold.o mailmsg_envget.o
 OBJ2_MAILMSG= mailmsg_envdates.o mailmsg_envtimes.o
 OBJ3_MAILMSG= mailmsg_loadfile.o
 OBJ4_MAILMSG= mailmsg_loadfd.o mailmsg_loadmb.o 
-OBJ5_MAILMSG=
+OBJ5_MAILMSG= $(MODS)
 OBJ6_MAILMSG=
 OBJ7_MAILMSG=
 
 OBJA_MAILMSG= obj0_mailmsg.o obj1_mailmsg.o
 OBJB_MAILMSG= obj2_mailmsg.o obj3_mailmsg.o
-OBJC_MAILMSG= obj4_mailmsg.o
+OBJC_MAILMSG= obj4_mailmsg.o obj5_mailmsg.o
 OBJD_MAILMSG=
 
 OBJ_MAILMSG= obja.o objb.o objc.o
 
 
 LDRPATH= $(EXTRA)/lib
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -160,13 +161,15 @@ objd.o:			$(OBJD_MAILMSG)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-mailmsg_prime.o:		mailmsg_prime.cc		$(INCS)
-mailmsg_loadfd.o:		mailmsg_loadfd.cc		$(INCS)
-mailmsg_loadmb.o:		mailmsg_loadmb.cc		$(INCS)
-mailmsg_loadfile.o:		mailmsg_loadfile.cc		$(INCS)
-mailmsg_envaddrfold.o:		mailmsg_envaddrfold.cc		$(INCS)
-mailmsg_envget.o:		mailmsg_envget.cc mailmsg_envget.h $(INCS)
-mailmsg_envdates.o:		mailmsg_envdates.cc		$(INCS)
-mailmsg_envtimes.o:		mailmsg_envtimes.cc		$(INCS)
+mailmsg_prime.o:	mailmsg_prime.cc		$(DEPS)	$(INCS)
+mailmsg_loadfd.o:	mailmsg_loadfd.cc		$(DEPS)	$(INCS)
+mailmsg_loadmb.o:	mailmsg_loadmb.cc		$(DEPS)	$(INCS)
+mailmsg_loadfile.o:	mailmsg_loadfile.cc		$(DEPS)	$(INCS)
+mailmsg_envaddrfold.o:	mailmsg_envaddrfold.cc		$(DEPS)	$(INCS)
+mailmsg_envdates.o:	mailmsg_envdates.cc		$(DEPS)	$(INCS)
+mailmsg_envtimes.o:	mailmsg_envtimes.cc		$(DEPS)	$(INCS)
+mailmsg_envget.o:	mailmsg_envget.cc 	$(DEPS_ENVGET)	$(INCS)
+
+mailmsg_mag.o:		mailmsg_mag.ccm				$(INCS)
 
 
