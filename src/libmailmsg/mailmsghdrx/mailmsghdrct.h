@@ -33,7 +33,7 @@ struct mailmsghdrct_param {
 struct mailmsghdrct_head {
 	cchar		*mtp ;		/* type-main */
 	cchar		*stp ;		/* type-sub */
-	uint		magic ;
+	uint		magval ;
 	int		mtl ;		/* type-main */
 	int		stl ;		/* type-sub */
 	MAILMSGHDRCT_PAR	p[MAILMSGHDRCT_NPARAMS] ;
