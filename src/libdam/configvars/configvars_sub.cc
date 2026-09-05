@@ -41,8 +41,10 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"configvarsobj.hh"
+#include	"configvars_util.hh"
+#include	"configvars.h"
 
+import configvars_util ;
 
 /* local defines */
 
