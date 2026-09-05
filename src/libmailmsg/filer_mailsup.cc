@@ -38,17 +38,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<mailmsghdrfold.h>
-#include	<strn.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mailmsghdrfold.h>	/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"filer.h"
 #include	"filer_mailsup.h"
@@ -122,8 +122,7 @@ int filer_writehdr(filer *fbp,cchar *sp,int sl) noex {
 	    } /* end if (positive) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_writehdr) */
+} /* end subroutine (filer_writehdr) */
 
 int filer_writehdrkey(filer *fbp,cchar *kn) noex {
 	int		rs = SR_FAULT ;
@@ -139,8 +138,7 @@ int filer_writehdrkey(filer *fbp,cchar *kn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_writehdrkey) */
+} /* end subroutine (filer_writehdrkey) */
 
 int filer_printlncont(filer *fbp,int leader,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -169,24 +167,23 @@ int filer_printlncont(filer *fbp,int leader,cchar *sp,int sl) noex {
 	    } /* end if (non-empty value) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_printlncont) */
+} /* end subroutine (filer_printlncont) */
 
 
 /* private subroutines */
 
 local int filer_writehdrval(filer *fbp,cchar *vp,int vl) noex {
-	static cint	ln = 0 ;
+	cint		ln = 0 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		wlen = 0 ;
+	int		wlen = 0 ; /* return-value */
 	if (vp) {
 	    MAILMSGHDRFOLD	folder, *fp = &folder ;
 	    if (vl < 0) vl = lenstr(vp) ;
 	    while (vl && CHAR_ISWHITE(*vp)) {
 	        vp += 1 ;
 	        vl -= 1 ;
-	    }
+	    } /* end while */
 	    if ((rs = mailmsghdrfold_start(fp,mcols,ln,vp,vl)) >= 0) {
 	        int	indent = wlen ;
 	        for (int i = 0 ; rs >= 0 ; ) {
@@ -211,7 +208,6 @@ local int filer_writehdrval(filer *fbp,cchar *vp,int vl) noex {
 	    } /* end if (mailmsghdrfold) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mailbox_writehdrval) */
+} /* end subroutine (mailbox_writehdrval) */
 
 
