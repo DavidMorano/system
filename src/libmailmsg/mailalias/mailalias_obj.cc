@@ -51,58 +51,58 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
 #include	<sys/mman.h>		/* Memory Management */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<bit>			/* |rotl(3c++)| + |rotr(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<sysval.hh>
-#include	<bufsizevar.hh>
-#include	<endian.h>
-#include	<vecobj.h>
-#include	<vecstr.h>
-#include	<linebuffer.h>
-#include	<bfile.h>
-#include	<opentmp.h>
-#include	<field.h>
-#include	<kvsfile.h>
-#include	<strtab.h>
-#include	<intceil.h>
-#include	<hash.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<snx.h>
-#include	<sncpyx.h>
-#include	<mkx.h>
-#include	<mkpathx.h>
-#include	<mkpathxw.h>
-#include	<mkpathx.h>
-#include	<strwcpy.h>
-#include	<mkdirs.h>
-#include	<ids.h>
-#include	<permx.h>
-#include	<hashindex.h>
-#include	<randlc.h>
-#include	<matxstr.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<mailvalues.hh>
-#include	<hasx.h>
-#include	<isfiledesc.h>
-#include	<isnot.h>
-#include	<iserror.h>
-#include	<ischarx.h>
-#include	<localmisc.h>		/* |MODP2| */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<bit>			/* C++STD |rotl(3c++)| + |rotr(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<linebuffer.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<kvsfile.h>		/* LIBUC */
+#include	<strtab.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkpathxw.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<mkdirs.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<hashindex.h>		/* LIBUC */
+#include	<randlc.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBUC */
+#include	<mailvalues.hh>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<isfiledesc.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<iserror.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |MODP2| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"mailalias.h"
 #include	"mailaliashdr.h"
@@ -169,7 +169,7 @@ typedef mode_t		m_t ;
 
 extern "C" {
     extern int uc_closeonexec(int,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -206,8 +206,7 @@ local int mailalias_ctor(mailalias *op,Args ... args) noex {
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailalias_ctor) */
+} /* end subroutine (mailalias_ctor) */
 
 local int mailalias_dtor(mailalias *op) noex {
 	int		rs = SR_FAULT ;
@@ -223,18 +222,16 @@ local int mailalias_dtor(mailalias *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailalias_dtor) */
+} /* end subroutine (mailalias_dtor) */
 
 template<typename ... Args>
 local inline int mailalias_magic(mailalias *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MAILALIAS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAILALIAS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mailalias_magic) */
+} /* end subroutine (mailalias_magic) */
 
 local int	mailalias_opener(MA *op) noex ;
 local int	mailalias_hdrload(MA *) noex ;
@@ -345,8 +342,7 @@ int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
 	    }
 	} /* end if (mailalias_ctor) */
 	return (rs >= 0) ? f_create : rs ;
-}
-/* end subroutine (mailalias_open) */
+} /* end subroutine (mailalias_open) */
 
 int mailalias_close(MA *op) noex {
 	int		rs ;
@@ -386,11 +382,10 @@ int mailalias_close(MA *op) noex {
 	        rs1 = mailalias_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailalias_close) */
+} /* end subroutine (mailalias_close) */
 
 int mailalias_audit(MA *op) noex {
 	int		rs ;
@@ -398,8 +393,7 @@ int mailalias_audit(MA *op) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailalias_audit) */
+} /* end subroutine (mailalias_audit) */
 
 int mailalias_count(MA *op) noex {
 	int		rs ;
@@ -407,8 +401,7 @@ int mailalias_count(MA *op) noex {
 	    rs = (op->rtlen - 1) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailalias_count) */
+} /* end subroutine (mailalias_count) */
 
 int mailalias_indcount(MA *op) noex {
 	int		rs ;
@@ -416,8 +409,7 @@ int mailalias_indcount(MA *op) noex {
 	    rs = op->rilen ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailalias_indcount) */
+} /* end subroutine (mailalias_indcount) */
 
 int mailalias_curbegin(MA *op,MA_CUR *curp) noex {
 	int		rs ;
@@ -426,17 +418,16 @@ int mailalias_curbegin(MA *op,MA_CUR *curp) noex {
 	    op->fl.cursorlockbroken = false ;
 	    op->fl.cursoracc = false ;
 	    curp->i = -1 ;
-	    curp->magic = MAILALIAS_MAGIC ;
+	    curp->magval = MAILALIAS_MAGIC ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailalias_curbegin) */
+} /* end subroutine (mailalias_curbegin) */
 
 int mailalias_curend(MA *op,MA_CUR *curp) noex {
 	int		rs ;
 	if ((rs = mailalias_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == MAILALIAS_MAGIC) ylikely {
+	    if (curp->magval == MAILALIAS_MAGIC) ylikely {
 		rs = SR_OK ;
 	        if (op->fl.cursoracc) {
 	            op->ti_access = time(nullptr) ;
@@ -445,12 +436,11 @@ int mailalias_curend(MA *op,MA_CUR *curp) noex {
 	            op->cursors -= 1 ;
 	        }
 	        curp->i = -1 ;
-	        curp->magic = 0 ;
+	        curp->magval = 0 ;
 	    } /* end if (magic) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailalias_curend) */
+} /* end subroutine (mailalias_curend) */
 
 int mailalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
@@ -459,7 +449,7 @@ int mailalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	int		vl = 0 ;
 	if ((rs = mailalias_magic(op,curp,kbuf,vbuf)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == MAILALIAS_MAGIC) ylikely {
+	    if (curp->magval == MAILALIAS_MAGIC) ylikely {
 		rs = SR_INVALID ;
 	        if (op->cursors) {
 	            time_t	dt = 0 ;
@@ -504,8 +494,7 @@ int mailalias_curenum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	    } /* end if (cursor-open) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (mailalias_curenum) */
+} /* end subroutine (mailalias_curenum) */
 
 int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 		char *vbuf,int vlen) noex {
@@ -515,7 +504,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	(void) opts ;
 	if ((rs = mailalias_magic(op,aname,curp,vbuf)) >= 0) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (curp->magic == MAILALIAS_MAGIC) ylikely {
+	    if (curp->magval == MAILALIAS_MAGIC) ylikely {
 		rs = SR_INVALID ;
 	        if (op->cursors) {
 	            time_t	dt = 0 ;
@@ -615,8 +604,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	    } /* end if (cursor-magic) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (mailalias_fetch) */
+} /* end subroutine (mailalias_fetch) */
 
 int mailalias_getinfo(MA *op,MA_INFO *rp) noex {
 	int		rs ;
@@ -626,8 +614,7 @@ int mailalias_getinfo(MA *op,MA_INFO *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailalias_getinfo) */
+} /* end subroutine (mailalias_getinfo) */
 
 int mailalias_check(MA *op,time_t dt) noex {
 	int		rs ;
@@ -650,8 +637,7 @@ int mailalias_check(MA *op,time_t dt) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailalias_check) */
+} /* end subroutine (mailalias_check) */
 
 
 /* private subroutines */
@@ -684,7 +670,7 @@ local int mailalias_opener(MA *op) noex {
 	                    if ((rs = vecstr_start(alp,5,vo)) >= 0) {
 	                        if ((rs = mailalias_dbopen(op,dt)) >= 0) {
 	                            f_create = (rs > 0) ;
-	                            op->magic = MAILALIAS_MAGIC ;
+	                            op->magval = MAILALIAS_MAGIC ;
 	                        }
 	                        if (rs < 0) {
 	                            vecstr_finish(op->afp) ;
@@ -703,8 +689,7 @@ local int mailalias_opener(MA *op) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (bufsizeget) */
 	return (rs >= 0) ? f_create : rs ;
-}
-/* end subroutine (mailalias_opener) */
+} /* end subroutine (mailalias_opener) */
 
 local int mailalias_checkchanged(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -719,8 +704,7 @@ local int mailalias_checkchanged(MA *op,time_t dt) noex {
 	    }
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailalias_checkchanged) */
+} /* end subroutine (mailalias_checkchanged) */
 
 local int mailalias_checkold(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -733,8 +717,7 @@ local int mailalias_checkold(MA *op,time_t dt) noex {
 	    }
 	} /* end if (within check interval) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailalias_checkold) */
+} /* end subroutine (mailalias_checkold) */
 
 /* read the file header and check it out */
 local int mailalias_hdrload(MA *op) noex {
@@ -757,8 +740,7 @@ local int mailalias_hdrload(MA *op) noex {
 	    rs = SR_BADFMT ;
 	}
 	return rs ;
-}
-/* end subroutine (mailalias_hdrload) */
+} /* end subroutine (mailalias_hdrload) */
 
 local int mailalias_hdrloader(MA *op) noex {
 	uint		*table = (uint *) (op->mapdata + MAILALIAS_IDLEN) ;
@@ -784,8 +766,7 @@ local int mailalias_hdrloader(MA *op) noex {
 	    op->svlen = table[mailaliashdr_svalsize] ;
 	}
 	return rs ;
-}
-/* end subroutine (mailalias_hdrloader) */
+} /* end subroutine (mailalias_hdrloader) */
 
 local int mailalias_fileopen(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -806,8 +787,7 @@ local int mailalias_fileopen(MA *op,time_t dt) noex {
 	    } /* end if */
 	} /* end if (needed open) */
 	return (rs >= 0) ? op->fd : rs ;
-}
-/* end subroutine (mailalias_fileopen) */
+} /* end subroutine (mailalias_fileopen) */
 
 local int mailalias_fileclose(MA *op) noex {
 	int		rs = SR_OK ;
@@ -818,8 +798,7 @@ local int mailalias_fileclose(MA *op) noex {
 	    op->fd = -1 ;
 	}
 	return rs ;
-}
-/* end subroutine (mailalias_fileclose) */
+} /* end subroutine (mailalias_fileclose) */
 
 local int mailalias_mapbegin(MA *op,time_t dt) noex {
 	cnullptr	np{} ;
@@ -841,8 +820,7 @@ local int mailalias_mapbegin(MA *op,time_t dt) noex {
 	    } /* end if (u_mmapbegin) */
 	} /* end if (map needed) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailalias_mapbegin) */
+} /* end subroutine (mailalias_mapbegin) */
 
 local int mailalias_mapend(MA *op) noex {
 	int		rs = SR_OK ;
@@ -856,8 +834,7 @@ local int mailalias_mapend(MA *op) noex {
 	    op->mapsize = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (mailalias_mapend) */
+} /* end subroutine (mailalias_mapend) */
 
 local int mailalias_keymatch(MA *op,int ri,cchar *aname) noex {
 	cint		ki = op->rectab[ri][0] ;
@@ -866,8 +843,7 @@ local int mailalias_keymatch(MA *op,int ri,cchar *aname) noex {
 	f = f && (ks[0] == aname[0]) ;
 	f = f && (strcmp(ks,aname) == 0) ;
 	return f ;
-}
-/* end subroutine (mailalias_keymatch) */
+} /* end subroutine (mailalias_keymatch) */
 
 local int mailalias_dbopen(MA *op,time_t dt) noex {
 	int		rs ;
@@ -893,8 +869,7 @@ local int mailalias_dbopen(MA *op,time_t dt) noex {
 	    }
 	} /* end if (mailalias_dbopenfile) */
 	return (rs >= 0) ? f_create : rs ;
-}
-/* end subroutine (mailalias_dbopen) */
+} /* end subroutine (mailalias_dbopen) */
 
 local int mailalias_dbopenfile(MA *op,time_t dt) noex {
 	int		rs ;
@@ -937,8 +912,7 @@ local int mailalias_dbopenfile(MA *op,time_t dt) noex {
 	    op->fl.needcreate = true ;
 	}
 	return (rs >= 0) ? f_create : rs ;
-}
-/* end subroutine (mailalias_dbopenfile) */
+} /* end subroutine (mailalias_dbopenfile) */
 
 local int mailalias_dbopenmake(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -962,8 +936,7 @@ local int mailalias_dbopenmake(MA *op,time_t dt) noex {
 	    } /* end if (mailalias_dbmake) */
 	} /* end if (created or re-created the file) */
 	return rs ;
-}
-/* end subroutine (mailalias_dbopenmake) */
+} /* end subroutine (mailalias_dbopenmake) */
 
 /* wait for the file to come in if it is not yet available */
 local int mailalias_dbopenwait(MA *op) noex {
@@ -989,8 +962,7 @@ local int mailalias_dbopenwait(MA *op) noex {
 	    }
 	} /* end if (u_fstat) */
 	return rs ;
-}
-/* end subroutine (mailalias_dbopenwait) */
+} /* end subroutine (mailalias_dbopenwait) */
 
 local int mailalias_isremote(MA *op) noex {
 	int		rs ;
@@ -998,8 +970,7 @@ local int mailalias_isremote(MA *op) noex {
 	    op->fl.remote = true ;
 	}
 	return rs ;
-}
-/* end subroutine (mailalias_isremote) */
+} /* end subroutine (mailalias_isremote) */
 
 local int mailalias_dbclose(MA *op) noex {
 	int		rs = SR_FAULT ;
@@ -1016,8 +987,7 @@ local int mailalias_dbclose(MA *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailalias_dbclose) */
+} /* end subroutine (mailalias_dbclose) */
 
 /* make the index file */
 local int mailalias_dbmake(MA *op,time_t dt) noex {
@@ -1051,8 +1021,7 @@ local int mailalias_dbmake(MA *op,time_t dt) noex {
 	    rs = SR_ISDIR ;
 	} /* end if */
 	return rs ;
-}
-/* end subroutine (mailalias_dbmake) */
+} /* end subroutine (mailalias_dbmake) */
 
 local int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
 	int		rs ;
@@ -1126,8 +1095,7 @@ local int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (maxpathlen) */
 	return rs ;
-}
-/* end subroutine (mailalias_dbmaker) */
+} /* end subroutine (mailalias_dbmaker) */
 
 local int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
 	cint		sz = szof(record) ;
@@ -1180,8 +1148,7 @@ local int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecobj-recs) */
 	return rs ;
-}
-/* end subroutine (mailalias_dbmaking) */
+} /* end subroutine (mailalias_dbmaking) */
 
 local int mailalias_filechanged(MA *op,ustat *sbp) noex {
 	csize		fsz = size_t(sbp->st_size) ;
@@ -1191,8 +1158,7 @@ local int mailalias_filechanged(MA *op,ustat *sbp) noex {
 	f = f || (op->fi.ino != sbp->st_ino) ;
 	f = f || (op->fi.dev != sbp->st_dev) ;
 	return f ;
-}
-/* end subroutine (mailalias_filechanged) */
+} /* end subroutine (mailalias_filechanged) */
 
 /* return true if the underlying file(s) are "old" */
 local int mailalias_fileold(MA *op,time_t dt) noex {
@@ -1217,8 +1183,7 @@ local int mailalias_fileold(MA *op,time_t dt) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (mailalias_aprofile) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailalias_fileold) */
+} /* end subroutine (mailalias_fileold) */
 
 /* get a-profiles */
 local int mailalias_aprofile(MA *op,time_t dt) noex {
@@ -1262,8 +1227,7 @@ local int mailalias_aprofile(MA *op,time_t dt) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (needed due to time-out) */
 	return rs ;
-}
-/* end subroutine (mailalias_aprofile) */
+} /* end subroutine (mailalias_aprofile) */
 
 local int mailalias_aprofiler(MA *op,char *tbuf,int tlen,cchar *profp) noex {
 	int		rs ;
@@ -1293,8 +1257,7 @@ local int mailalias_aprofiler(MA *op,char *tbuf,int tlen,cchar *profp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (opened key-values table) */
 	return rs ;
-}
-/* end subroutine (mailalias_aprofiler) */
+} /* end subroutine (mailalias_aprofiler) */
 
 /* acquire access to the file (mapped memory) */
 local int mailalias_enterbegin(MA *op,time_t dt) noex {
@@ -1304,8 +1267,7 @@ local int mailalias_enterbegin(MA *op,time_t dt) noex {
 	    f = true ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailalias_enterbegin) */
+} /* end subroutine (mailalias_enterbegin) */
 
 /* release our hold on the filemap */
 local int mailalias_enterend(MA *op,time_t dt) noex {
@@ -1315,8 +1277,7 @@ local int mailalias_enterend(MA *op,time_t dt) noex {
 	    op->fl.held = false ;
 	}
 	return rs ;
-}
-/* end subroutine (mailalias_enterend) */
+} /* end subroutine (mailalias_enterend) */
 
 local int mailalias_mapcheck(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
@@ -1336,8 +1297,7 @@ local int mailalias_mapcheck(MA *op,time_t dt) noex {
 	    } /* end if (mailalias_fileopen) */
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailalias_mapcheck) */
+} /* end subroutine (mailalias_mapcheck) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -1346,7 +1306,6 @@ vars::operator int () noex {
 	    mailaliaslen = mailvalue.mailaliaslen ;
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
