@@ -63,19 +63,6 @@ extern int mailmsg_finish	(mailmsg *) noex ;
 
 EXTERNC_end
 
-#ifdef	__cplusplus
-
-template<typename ... Args>
-inline int mailmsg_magic(mailmsg *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magval == MAILMSG_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (mailmsg_magic) */
-
-#endif /* __cplusplus */
-
 
 #endif /* MAILMSG_INCLUDE */
 
