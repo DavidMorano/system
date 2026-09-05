@@ -58,7 +58,8 @@
 
 #include	"freadln.h"
 
-import libfsup ;			/* |lenstr(3u)| */
+import modutil ;
+import modmisc ;			/* |mknpath(3u)| */
 
 
 /* local defines */
@@ -67,8 +68,8 @@ import libfsup ;			/* |lenstr(3u)| */
 /* external subroutines */
 
 extern "C" {
-    int		freadln(FILE *,char *,int) noex ;
-    int		fgetline(FILE *,char *,int) noex ;
+    int freadln		(FILE *,char *,int) noex ;
+    int fgetline	(FILE *,char *,int) noex ;
 } /* end extern (C) */
 
 
