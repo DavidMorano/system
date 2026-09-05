@@ -85,7 +85,10 @@
 #include	"strlistmks.h"
 #include	"strlisthdr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 import libutil ;
+import strlistmks_mag ;
 
 /* local defines */
 
@@ -120,13 +123,11 @@ import libutil ;
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
 typedef mode_t		om_t ;
-typedef uint		*rectab_t ;
+typedef uintp		rectab_t ;
 
 
 /* external subroutines */
@@ -157,12 +158,13 @@ template<typename ... Args>
 local int strlistmks_ctor(strlistmks *op,Args ... args) noex {
     	STRLISTMKS	*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->stp = new(nothrow) strtab) != np) ylikely {
-		if ((op->rtp = new(nothrow) srectab) != np) ylikely {
+	    if ((op->stp = new(nt) strtab) != np) ylikely {
+		if ((op->rtp = new(nt) srectab) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-rectab) */
 		if (rs < 0) {
