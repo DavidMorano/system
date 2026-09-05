@@ -34,18 +34,18 @@
 **************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<estrings.h>
-#include	<sbuf.h>
-#include	<strn.h>
-#include	<sfx.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
 #include	<strwcmp.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"retpath.h"
 
@@ -84,8 +84,7 @@ int retpath_start(retpath *plp) noex {
 	    rs = vecstr_start(plp,vn,vo) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (retpath_start) */
+} /* end subroutine (retpath_start) */
 
 int retpath_finish(retpath *plp) noex {
 	int		rs = SR_FAULT ;
@@ -98,8 +97,7 @@ int retpath_finish(retpath *plp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (retpath_finish) */
+} /* end subroutine (retpath_finish) */
 
 int retpath_add(retpath *plp,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -111,8 +109,7 @@ int retpath_add(retpath *plp,cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (retpath_add) */
+} /* end subroutine (retpath_add) */
 
 /* add ret-path entries by parsing a string of them */
 int retpath_parse(retpath *plp,cchar *sp,int sl) noex {
@@ -142,18 +139,15 @@ int retpath_parse(retpath *plp,cchar *sp,int sl) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (retpath_parse) */
+} /* end subroutine (retpath_parse) */
 
 int retpath_count(retpath *plp) noex {
 	return vecstr_count(plp) ;
-}
-/* end subroutine (retpath_count) */
+} /* end subroutine (retpath_count) */
 
 int retpath_get(retpath *plp,int i,cchar **rpp) noex {
 	return vecstr_get(plp,i,rpp) ;
-}
-/* end subroutine (retpath_get) */
+} /* end subroutine (retpath_get) */
 
 int retpath_search(retpath *plp,cchar *name,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -166,8 +160,7 @@ int retpath_search(retpath *plp,cchar *name,cchar **rpp) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (retpath_search) */
+} /* end subroutine (retpath_search) */
 
 int retpath_mk(retpath *plp,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -186,8 +179,7 @@ int retpath_mk(retpath *plp,char *rbuf,int rlen) noex {
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (retpath_mk) */
+} /* end subroutine (retpath_mk) */
 
 
 /* private subroutines */
@@ -205,7 +197,6 @@ local int retpath_iadd(retpath *plp,cchar *sp,int sl) noex {
 	    rs = INT_MAX ;
 	}
 	return rs ;
-}
-/* end subroutine (retpath_iadd) */
+} /* end subroutine (retpath_iadd) */
 
 
