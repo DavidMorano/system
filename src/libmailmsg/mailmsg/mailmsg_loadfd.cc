@@ -32,19 +32,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<filer.h>
-#include	<rmx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsg.h"
 
+import mailmsg_mag ;
 
 /* local defines */
 
@@ -99,8 +100,7 @@ int mailmsg_loadfd(MM *op,int mfd,off_t fbo) noex {
 	    } /* end if (bufsizeget) */
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (mailmsg_loadfd) */
+} /* end subroutine (mailmsg_loadfd) */
 
 
 /* local subroutines */
