@@ -45,7 +45,7 @@
 
 
 struct mailalias_cursor {
-	uint		magic ;
+	uint		magval ;
 	int		i ;
 } ; /* end struct */
 
@@ -102,7 +102,7 @@ struct mailalias_head {
 	size_t		mapsize ;
 	MAILALIAS_FI	fi ;
 	MAILALIAS_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		pagesize ;
 	int		sklen ;
 	int		svlen ;
@@ -111,7 +111,8 @@ struct mailalias_head {
 	int		collisions ;
 	int		cursors ;
 	int		fd ;
-	int		oflags, otype ;
+	int		oflags ;
+	int		otype ;
 	int		ropts ;
 	mode_t		operm ;
 } ; /* end struct */
