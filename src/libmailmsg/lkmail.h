@@ -17,31 +17,31 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<time.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<sys/types.h>		/* POSIX® system types */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
-#define	LKMAIL_MAGIC	0x95437651
 #define	LKMAIL		struct lkmail_head
 #define	LKMAIL_IDS	struct lkmail_holdids
+#define	LKMAIL_MAGIC	0x95437651
 
 
 struct lkmail_holdids {
 	uid_t		uid, euid, uid_maildir ;
 	gid_t		gid, egid, gid_maildir ;
-} ;
+} ; /* end struct */
 
 struct lkmail_head {
 	char		*lockfname ;
 	LKMAIL_IDS	id ;
-	uint		magic ;
+	uint		magval ;
 	int		lfd ;
-} ;
+} ; /* end struct */
 
 typedef	LKMAIL		lkmail ;
 typedef	LKMAIL_IDS	lkmail_ids ;
