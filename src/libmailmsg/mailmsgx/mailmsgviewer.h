@@ -52,7 +52,7 @@ struct mailmsgviewer_head {
 	char		*bp ;
 	size_t		mapsize ;
 	MAILMSGVIEWER_FL fl ;
-	uint		magic ;
+	uint		magval ;
 	int		ln ;
 } ; /* end struct */
 
