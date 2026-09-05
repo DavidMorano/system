@@ -40,23 +40,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<estrings.h>
-#include	<bfile.h>
-#include	<mkx.h>
-#include	<mailmsg.h>
-#include	<mailmsghdrs.h>
-#include	<isoneof.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC */
+#include	<mailmsg.h>		/* LIBUC */
+#include	<mailmsghdrs.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"mailbox.h"
 
+import mailbox_mag ;
 
 /* local defines */
 
@@ -71,7 +72,7 @@
 
 extern "C" {
     extern int	mailmsg_loadfile(mailmsg *,bfile *) noex ;
-}
+} /* end export (C) */
 
 
 /* external variables */
@@ -140,8 +141,7 @@ int mailbox_getfrom(mailbox *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mailbox_getfrom) */
+} /* end subroutine (mailbox_getfrom) */
 
 
 /* local subroutines */
@@ -178,12 +178,10 @@ local int mailmsg_fromer(mailmsg *mmp,char *rbuf,int rlen) noex {
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mailmsg_fromer) */
+} /* end subroutine (mailmsg_fromer) */
 
 local bool isNoMsg(int rs) noex {
 	return isOneOf(rsnomsg,rs) ;
-}
-/* end subroutine (isNoMsg) */
+} /* end subroutine (isNoMsg) */
 
 
