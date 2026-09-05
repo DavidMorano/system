@@ -35,7 +35,7 @@
 
 struct mailfiles_head {
     	vecobj		*elp ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct mailfiles_entry {
@@ -61,21 +61,7 @@ extern int mailfiles_parse(mailfiles *,cchar *) noex ;
 
 EXTERNC_end
 
-#ifdef	__cplusplus
-
-template<typename ... Args>
-static inline int mailfiles_magic(mailfiles *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == MAILFILES_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (mailfiles_magic) */
-
-#endif /* __cplusplus */
-
 
 #endif /* MAILFILES_INCLUDE */
-
 
 
