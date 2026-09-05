@@ -123,7 +123,7 @@ template<typename ... Args>
 local inline int mailmsgviewer_magic(MMV *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MAILMSGVIEWER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAILMSGVIEWER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
@@ -181,7 +181,7 @@ int mailmsgviewer_close(MMV *op) noex {
 	        rs1 = mailmsgviewer_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
