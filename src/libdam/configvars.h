@@ -27,6 +27,8 @@
 #define	CONFIGVARS_VFL		struct configvars_vflags
 #define	CONFIGVARS_MAGIC	0x04311633
 #define	CONFIGVARS_NFILES	(sizeof(int) * 8)
+#define	CONFIGVARS_WSETS	0
+#define	CONFIGVARS_WVARS	1
 
 
 struct configvars_cursor {
