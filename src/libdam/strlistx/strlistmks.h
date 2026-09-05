@@ -30,14 +30,14 @@
 
 #ifdef	__cplusplus
 struct strlistmks_params {
-	static constexpr int	magic	= 0x88773423 ;
-	static constexpr int	nents	= (2 * 1024) ;
-	static constexpr int	version	= 0 ;
+	static constexpr int	magicval	= STRLISTMKS_MAGIC ;
+	static constexpr int	nents		= (2 * 1024) ;
+	static constexpr int	version		= 0 ;
 } ; /* end struct */
 #endif /* __cplusplus */
 
 struct strlistmks_object {
-	cchar		*name ;
+	ccharp		name ;
 	uint		objsz ;
 	uint		cursz ;
 } ; /* end struct */
@@ -79,19 +79,6 @@ extern int strlistmks_chgrp	(strlistmks *,gid_t) noex ;
 extern int strlistmks_close	(strlistmks *) noex ;
 
 EXTERNC_end
-
-#ifdef	__cplusplus
-
-template<typename ... Args>
-local inline int strlistmks_magic(strlistmks *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magval == STRLISTMKS_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (strlistmks_magic) */
-
-#endif /* __cplusplus */
 
 extern const strlistmks_obj	strlistmks_modinfo ;
 
