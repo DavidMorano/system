@@ -50,18 +50,16 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>		/* |strchr(3c)| */
-#include	<bufsizeget.h>		/* for |bufsize_mailaddr| */
-#include	<storebuf.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<sncpyx.h>
-#include	<snwcpy.h>
-#include	<mailaddrtypes.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<bufsizeget.h>		/* LIBUC |bufsize_mailaddr| */
+#include	<storebuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<mailaddrtypes.h>	/* LIBMAILMSG */
+#include	<localmisc.h>		/* LIBUC */
 
 #include	"mailaddr.h"
 
@@ -117,10 +115,9 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	int		rs = SR_FAULT ;
 	int		t = 0 ;
 	if (sp && mahost && malocal) {
-	    static cint		rsv = var ;
 	    mahost[0] = '\0' ;
 	    malocal[0] = '\0' ;
-	    if ((rs = rsv) >= 0) {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) {
 	        cint	hnl = var.hostnamelen ; /* host-name length */
 	        cint	mal = var.mailaddrlen ; /* mail-address length */
 		cchar	*tp ; /* used-multiple */
@@ -191,8 +188,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? t : rs ;
-}
-/* end subroutine (mailaddrparse) */
+} /* end subroutine (mailaddrparse) */
 
 /* put an address back together as it was ORIGINALLY */
 int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,mat type) noex {
@@ -249,8 +245,7 @@ int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,mat type) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mailaddjoin) */
+} /* end subroutine (mailaddjoin) */
 
 /* put an address back together as its ARPA form only */
 int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,mat type) noex {
@@ -315,8 +310,7 @@ int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,mat type) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mailaddrarpa) */
+} /* end subroutine (mailaddrarpa) */
 
 vars::operator int () noex {
     	int		rs ;
@@ -327,7 +321,6 @@ vars::operator int () noex {
 	    }
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
