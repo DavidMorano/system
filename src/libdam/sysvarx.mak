@@ -31,13 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= sysvar.h sysvars.h
+INCS += sysvar.h sysvars.h
 
 MODS +=
 
-LIBS=
+LIBS +=
 
 
 OBJ0= sysvar.o
