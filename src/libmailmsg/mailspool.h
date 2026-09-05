@@ -33,7 +33,7 @@ struct mailspool_head {
 	cchar		*lfname ;	/* lock file-name */
 	int		mfd ;		/* mail-file descriptor */
 	int		f_created ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 typedef	MAILSPOOL	mailspool ;
