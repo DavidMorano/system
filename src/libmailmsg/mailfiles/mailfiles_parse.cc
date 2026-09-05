@@ -45,17 +45,18 @@
 *************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strbrk(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strx.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strbrk(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailfiles.h"
 
+import mailfiles_mag ;
 
 /* local defines */
 
@@ -100,10 +101,9 @@ int mailfiles_parse(mailfiles *op,cchar *mailpath) noex {
 	    if ((rs >= 0) && (! fdone) && cp[0]) {
 	        rs = mailfiles_add(op,cp,-1) ;
 		c += (rs < INT_MAX) ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mailfiles_parse) */
+} /* end subroutine (mailfiles_parse) */
 
 
