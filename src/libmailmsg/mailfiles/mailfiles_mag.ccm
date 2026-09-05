@@ -1,0 +1,41 @@
+/* mailfiles_mag MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* mail-files handling object */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2009-01-10, David A­D­ Morano
+        This is being written from scratch to finally get an abstracted
+        "mailfiles" that is fast enough for interactive use.
+
+*/
+
+/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"mailfiles.h"
+
+export module mailfiles_mag ;
+
+export {
+    template<typename ... Args>
+    inline int mailfiles_magic(mailfiles *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == MAILFILES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (mailfiles_magval) */
+} /* end export */
+
+
