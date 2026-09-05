@@ -5,7 +5,7 @@
 /* SYSTEM dialer for MAINTQOTD */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_BACKGROUND	1		/* put program in background */
 
 /* revision history:
@@ -40,29 +40,33 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<vecstr.h>
-#include	<ascii.h>
-#include	<spawner.h>
-#include	<filer.h>
-#include	<logfile.h>
-#include	<snwcpy.h>
-#include	<strx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<spawner.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<systems.h>
+#include	<sysdialer.h>
+#include	<cm.h>
+#include	<maintqotd.h>
 
-#include	"maintqotd.h"
-#include	"systems.h"
-#include	"sysdialer.h"
-#include	"cm.h"
+#pragma		GCC dependency		"mod/libutil.ccm"
 
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -72,14 +76,12 @@
 #define	VBUFLEN		(6 * MAXPATHLEN)
 #endif
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
+
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-static int	debugoutput(cchar *,int) ;
-#endif
 
 
 /* external variables */
@@ -90,32 +92,32 @@ extern cchar	**environ ;
 /* local structures */
 
 struct checker {
-	VECSTR		stores ;
+	vecstr		stores ;
 	MAINTQOTD	*sip ;
-	cchar	**envv ;	/* remains NULL */
-	cchar	*pr ;
-	cchar	*sep ;
-	cchar	*progfname ;
-	cchar	**argv ;
-	cchar	*a ;		/* allocation */
+	cchar		**envv ;	/* remains NULL */
+	cchar		*pr ;
+	cchar		*sep ;
+	cchar		*progfname ;
+	cchar		**argv ;
+	cchar		*a ;		/* allocation */
 	int		intcheck ;	/* interval-check */
 	int		an ;
-} ;
+} ; /* end struct (checker) */
 
 
 /* forward references */
 
-static int checker_start(CHECKER *,MAINTQOTD *,cchar *) ;
-static int checker_finish(CHECKER *) ;
-static int checker_setentry(CHECKER *,cchar **,cchar *,int) ;
-static int checker_argbegin(CHECKER *,cchar *) ;
-static int checker_argend(CHECKER *) ;
-static int checker_findprog(CHECKER *,char *,cchar *,int) ;
-static int checker_progrun(CHECKER *,cchar *) ;
-static int checker_proglog(CHECKER *,int) ;
+local int checker_start(CHECKER *,MAINTQOTD *,cchar *) noex ;
+local int checker_finish(CHECKER *) noex ;
+local int checker_setentry(CHECKER *,cchar **,cchar *,int) noex ;
+local int checker_argbegin(CHECKER *,cchar *) noex ;
+local int checker_argend(CHECKER *) noex ;
+local int checker_findprog(CHECKER *,char *,cchar *,int) noex ;
+local int checker_progrun(CHECKER *,cchar *) noex ;
+local int checker_proglog(CHECKER *,int) noex ;
 
 #ifdef	COMMENT
-static int mksfname(char *,cchar *,cchar *,cchar *) ;
+local int mksfname(char *,cchar *,cchar *,cchar *) noex ;
 #endif /* COMMENT */
 
 
@@ -133,12 +135,12 @@ int maintqotd_sys(MAINTQOTD *sip,cchar *qfname,cchar *sep) noex {
 	int		rs1 ;
 	int		fd = -1 ;
 
-#if	CF_DEBUGS
-	debugprintf("maintqotd_sys: ent\n") ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ent\n") ;
 #endif
 
-	if (qfname == NULL) return SR_FAULT ;
-	if (sep == NULL) return SR_FAULT ;
+	if (qfname == nullptr) return SR_FAULT ;
+	if (sep == nullptr) return SR_FAULT ;
 
 	if ((rs = checker_start(&c,sip,sep)) >= 0) {
 	        if ((rs = checker_argbegin(&c,sep)) >= 0) {
@@ -146,8 +148,8 @@ int maintqotd_sys(MAINTQOTD *sip,cchar *qfname,cchar *sep) noex {
 	            rs = checker_progrun(&c,qfname) ;
 	            fd = rs ;
 
-#if	CF_DEBUGS
-	            debugprintf("maintqotd_sys: _progrun() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	            DEBUGPRINTF("checker_progrun() rs=%d\n",rs) ;
 #endif
 	            rs1 = checker_argend(&c) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -160,25 +162,24 @@ int maintqotd_sys(MAINTQOTD *sip,cchar *qfname,cchar *sep) noex {
 	    }
 	} /* end if (checker) */
 
-#if	CF_DEBUGS
-	debugprintf("maintqotd_sys: ret rs=%d fd=%u\n",rs,fd) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ret rs=%d fd=%u\n",rs,fd) ;
 #endif
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (maintqotd_sys) */
+} /* end subroutine (maintqotd_sys) */
 
 
 /* local subroutines */
 
-static int procsystems(PROGINFO *pip,void *ofp,cchar *sfname) noex {
-	LOCKINFO	*lip = pip->lip ;
+local int procsystems(PROGINFO *pip,void *ofp,cchar *sfname) noex {
+	LOCINFO		*lip = pip->lip ;
 	SYSDIALER	d ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = sysdialer_start(&d,pip->pr,NULL,NULL)) >= 0) {
+	if ((rs = sysdialer_start(&d,pip->pr,nullptr,nullptr)) >= 0) {
 	    CM_ARGS	ca{} ;
-	    SYSTEMS	sysdb ;
+	    systems	sysdb ;
 	    int		al ;
 	    cchar	*ap ;
 	    ca.pr = pip->pr ;
@@ -196,26 +197,26 @@ static int procsystems(PROGINFO *pip,void *ofp,cchar *sfname) noex {
 
 	    if ((rs = systems_open(&sysdb,sfname)) >= 0) {
 
-#if	CF_DEBUGS
-	            debugprintf("b_rfinger: systems_open() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	            DEBUGPRINTF("systems_open() rs=%d\n",rs) ;
 #endif
 
-	        if (sfname == NULL) {
+	        if (sfname == nullptr) {
 	            rs = loadsysfiles(pip,&sysdb) ;
 	        } /* end if (loadfiles) */
 
-#if	CF_DEBUGS && 0
+#if	CF_DEBUG && 0
 	        {
-	            SYSTEMS_CUR		cur ;
-	            SYSTEMS_ENT	*sep ;
-	            debugprintf("b_rfinger: sysnames: \n") ;
+	            systems_cur		cur ;
+	            systems_ent	*sep ;
+	            DEBUGPRINTF("sysnames: \n") ;
 	            systems_curbegin(&sysdb,&cur) ;
 	            while (systems_curenum(&sysdb,&cur,&sep) >= 0) {
-	                debugprintf("b_rfinger: sysname=%s\n",sep->sysname) ;
+	                DEBUGPRINTF("sysname=%s\n",sep->sysname) ;
 	            }
 	            systems_curend(&sysdb,&cur) ;
 	        }
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	        if (rs >= 0) {
 	            int	i = 0 ;
@@ -225,7 +226,7 @@ static int procsystems(PROGINFO *pip,void *ofp,cchar *sfname) noex {
 	                rs = al ;
 
 	                if (rs >= 0) {
-	                    if (ap == NULL) continue ;
+	                    if (ap == nullptr) continue ;
 	                    rs = procsystem(pip,ofp,&ca,ap) ;
 	                }
 
@@ -238,10 +239,9 @@ static int procsystems(PROGINFO *pip,void *ofp,cchar *sfname) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sysdialer) */
 	return rs ;
-}
-/* end subroutine (procsystems) */
+} /* end subroutine (procsystems) */
 
-static int procsystem(pip,ofp,cap,ap)
+local int procsystem(pip,ofp,cap,ap)
 PROGINFO	*pip ;
 void		*ofp ;
 CM_ARGS		*cap ;
@@ -265,10 +265,10 @@ cchar	*ap ;
 	char		lbuf[LINEBUFLEN + 1], *lp = lbuf ;
 	char		cbuf[LINEBUFLEN+1] ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
-	    debugprintf("main/procsystem: ap=>%s<\n",ap) ;
-	    debugprintf("main/procsystem: svc=%s\n",lip->svcspec) ;
+	    DEBUGPRINTF("ap=>%s<\n",ap) ;
+	    DEBUGPRINTF("svc=%s\n",lip->svcspec) ;
 	}
 #endif
 
@@ -276,13 +276,13 @@ cchar	*ap ;
 	av = lip->av ;
 	to = lip->to ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
-	    debugprintf("main/procsystem: av=%p\n",av) ;
-	    if (av != NULL) {
+	    DEBUGPRINTF("av=%p\n",av) ;
+	    if (av != nullptr) {
 	        int	i ;
-	        for (i = 0 ; av[i] != NULL ; i += 1)
-	            debugprintf("main/procsystem: a[%u]=%s\n",i,av[i]) ;
+	        for (i = 0 ; av[i] != nullptr ; i += 1)
+	            DEBUGPRINTF("a[%u]=%s\n",i,av[i]) ;
 	    }
 	}
 #endif /* CF_DBEBUGS */
@@ -290,10 +290,10 @@ cchar	*ap ;
 	rs = query_parse(&q,ap) ;
 	if (rs < 0) goto ret0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
-	    debugprintf("main/procsystem: hpart=>%s<\n",q.hpart) ;
-	    debugprintf("main/procsystem: upart=>%s<\n",q.upart) ;
+	    DEBUGPRINTF("hpart=>%s<\n",q.hpart) ;
+	    DEBUGPRINTF("upart=>%s<\n",q.upart) ;
 	}
 #endif
 
@@ -302,18 +302,18 @@ cchar	*ap ;
 	if (rs < 0) goto ret0 ;
 	qp = lbuf ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
-	    debugprintf("main/procsystem: mkfingerquery() rs=%d\n",rs) ;
-	    debugprintf("main/procsystem: q=>%r<\n",qp,ql) ;
+	    DEBUGPRINTF("mkfingerquery() rs=%d\n",rs) ;
+	    DEBUGPRINTF("q=>%r<\n",qp,ql) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-	if ((rs = cm_open(&con,cap,q.hpart,lip->svcspec,NULL)) >= 0) {
+	if ((rs = cm_open(&con,cap,q.hpart,lip->svcspec,nullptr)) >= 0) {
 	    cchar	*tmpdname = pip->tmpdname ;
 
-#if	CF_DEBUGS
-	        debugprintf("main/procsystem: cm_open() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	        DEBUGPRINTF("cm_open() rs=%d\n",rs) ;
 #endif
 
 /* debug information (if requested) */
@@ -323,8 +323,8 @@ cchar	*ap ;
 
 	        rs = cm_info(&con,&ci) ;
 
-#if	CF_DEBUGS
-	            debugprintf("main/procsystem: cm_info() rs=%d\n",rs) ;
+#if	CF_DEBUG
+	            DEBUGPRINTF("cm_info() rs=%d\n",rs) ;
 #endif
 
 	        if (rs >= 0)
@@ -357,8 +357,8 @@ cchar	*ap ;
 	        while (rs >= 0) {
 	            rs = cm_reade(&con,lbuf,llen,to,ropts) ;
 	            ll = rs ;
-#if	CF_DEBUGS
-	                debugprintf("main/procsystem: cm_reade() rs=%d\n",
+#if	CF_DEBUG
+	                DEBUGPRINTF("cm_reade() rs=%d\n",
 	                    rs) ;
 #endif
 	            if (rs <= 0) break ;
@@ -372,7 +372,7 @@ cchar	*ap ;
 	            if (filer b ; (rs = filer_start(&b,fd,0z,512,opts)) >= 0) {
 
 	                while (rs >= 0) {
-	                    rs = filer_readlns(&b,lbuf,llen,to,NULL) ;
+	                    rs = filer_readlns(&b,lbuf,llen,to,nullptr) ;
 	                    ll = rs ;
 	                    if (rs <= 0) break ;
 
@@ -408,10 +408,9 @@ cchar	*ap ;
 
 ret0:
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procsystem) */
+} /* end subroutine (procsystem) */
 
-static int loadsysfiles(proginfo *pip,systems *sdbp) noex {
+local int loadsysfiles(proginfo *pip,systems *sdbp) noex {
 	SCHEDVAR	sf ;
 	int		rs ;
 	int		rs1 ;
@@ -433,7 +432,7 @@ static int loadsysfiles(proginfo *pip,systems *sdbp) noex {
 	            schedvar_add(&sf,"f",SYSFNAME2,-1) ;
 		}
 
-	        for (i = 0 ; sysfiles[i] != NULL ; i += 1) {
+	        for (i = 0 ; sysfiles[i] != nullptr ; i += 1) {
 
 	            rs = schedvar_expand(&sf,tmpfname,MAXPATHLEN,
 	                sysfiles[i],-1) ;
@@ -447,14 +446,12 @@ static int loadsysfiles(proginfo *pip,systems *sdbp) noex {
 	                n += 1 ;
 	                rs = systems_fileadd(sdbp,tmpfname) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                {
-	                    debugprintf("b_rfinger: "
-	                        "systems_fileadd() rs=%d\n",
-	                        rs) ;
-	                    debugprintf("b_rfinger: fname=%s\n", tmpfname) ;
+	                    DEBUGPRINTF("systems_fileadd() rs=%d\n",rs) ;
+	                    DEBUGPRINTF("fname=%s\n", tmpfname) ;
 	                }
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	            } /* end if */
 
@@ -468,15 +465,9 @@ static int loadsysfiles(proginfo *pip,systems *sdbp) noex {
 	} /* end if (schedvar) */
 
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (loadsysfiles) */
+} /* end subroutine (loadsysfiles) */
 
-
-static int checker_start(chp,sip,sep)
-CHECKER		*chp ;
-MAINTQOTD	*sip ;
-cchar	*sep ;
-{
+local int checker_start(CHECKER *chp,MAINTQORD *sip,cchar *sep) noex {
 	int		rs ;
 
 	memset(chp,0,sizeof(CHECKER)) ;
@@ -487,70 +478,56 @@ cchar	*sep ;
 
 	rs = vecstr_start(&chp->stores,1,0) ;
 
-#if	CF_DEBUGS
-	debugprintf("checker_start: ret rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (checker_start) */
+} /* end subroutine (checker_start) */
 
-
-static int checker_finish(chp)
-CHECKER		*chp ;
-{
+local int checker_finish(CHECKER *chp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("checker_finish: ent\n") ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ent\n") ;
 #endif
 
 	rs1 = vecstr_finish(&chp->stores) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("checker_finish: ret rs=%d\n",rs) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (checker_finish) */
+} /* end subroutine (checker_finish) */
 
-
-int checker_setentry(chp,epp,vp,vl)
-CHECKER		*chp ;
-cchar	**epp ;
-cchar	*vp ;
-int		vl ;
-{
-	VECSTR		*slp = &chp->stores ;
+int checker_setentry(CHECKER *chp,cchar **epp,cchar *vp,int vl) noex {
+	vecstr		*slp = &chp->stores ;
 	int		rs = SR_OK ;
 	int		oi = -1 ;
 	int		len = 0 ;
 
-	if (chp == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_INVALID ;
+	if (chp == nullptr) return SR_FAULT ;
+	if (epp == nullptr) return SR_INVALID ;
 
-	if (*epp != NULL)
+	if (*epp != nullptr)
 	    oi = vecstr_findaddr(slp,*epp) ;
 
-	if (vp != NULL) {
+	if (vp != nullptr) {
 	    len = strnlen(vp,vl) ;
 	    rs = vecstr_store(slp,vp,len,epp) ;
-	} else if (epp != NULL)
-	    *epp = NULL ;
+	} else if (epp != nullptr)
+	    *epp = nullptr ;
 
 	if ((rs >= 0) && (oi >= 0))
 	    vecstr_del(slp,oi) ;
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (checker_setentry) */
+} /* end subroutine (checker_setentry) */
 
-
-static int checker_argbegin(CHECKER *chp,cchar *ap)
-{
+local int checker_argbegin(CHECKER *chp,cchar *ap) noex {
 	int		rs ;
 	int		avsize ;
 	int		size = 0 ;
@@ -559,7 +536,7 @@ static int checker_argbegin(CHECKER *chp,cchar *ap)
 	cchar	*tp ;
 	void		*a ;
 
-	while ((tp = strchr(sp,CH_FS)) != NULL) {
+	while ((tp = strchr(sp,CH_FS)) != nullptr) {
 	    na += 1 ;
 	    size += ((tp-sp)+1) ;
 	    sp = (tp+1) ;
@@ -581,7 +558,7 @@ static int checker_argbegin(CHECKER *chp,cchar *ap)
 	    chp->argv = argv ;
 	    sp = ap ;
 	    bp += avsize ;
-	    while ((tp = strchr(sp,CH_FS)) != NULL) {
+	    while ((tp = strchr(sp,CH_FS)) != nullptr) {
 	        argv[c++] = sp ;
 	        bp = (strwcpy(bp,sp,(tp-sp)) + 1) ;
 	    }
@@ -589,42 +566,34 @@ static int checker_argbegin(CHECKER *chp,cchar *ap)
 	        argv[c++] = sp ;
 	        bp = (strwcpy(bp,sp,-1) + 1) ;
 	    }
-	    argv[c] = NULL ;
+	    argv[c] = nullptr ;
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
-	debugprintf("checker_argbegin: ret rs=%d n=%u\n",rs,na) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ret rs=%d n=%u\n",rs,na) ;
 #endif
 
 	return (rs >= 0) ? na : rs ;
-}
-/* end subroutine (checker_argbegin) */
+} /* end subroutine (checker_argbegin) */
 
-
-static int checker_argend(CHECKER *chp)
-{
+local int checker_argend(CHECKER *chp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (chp->a != NULL) {
+	if (chp->a != nullptr) {
 	    rs1 = uc_free(chp->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    chp->a = NULL ;
-	    chp->argv= NULL ;
+	    chp->a = nullptr ;
+	    chp->argv= nullptr ;
 	}
-
 	return rs ;
-}
-/* end subroutine (checker_argend) */
+} /* end subroutine (checker_argend) */
 
-
-static int checker_findprog(CHECKER *chp,char *rbuf,cchar *pp,int pl)
-{
+local int checker_findprog(CHECKER *chp,char *rbuf,cchar *pp,int pl) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("checker_findprog: ent pn=%r\n",pp,pl) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ent pn=%r\n",pp,pl) ;
 #endif
 
 	rbuf[0] = '\0' ;
@@ -635,14 +604,14 @@ static int checker_findprog(CHECKER *chp,char *rbuf,cchar *pp,int pl)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("checker_findprog: pn=%r\n",pp,pl) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pn=%r\n",pp,pl) ;
 #endif
 
 	rs = prgetprogpath(chp->pr,rbuf,pp,pl) ;
 
-#if	CF_DEBUGS
-	debugprintf("checker_findprog: prgetprogpath() rs=%d rbuf=%s\n",
+#if	CF_DEBUG
+	DEBUGPRINTF("prgetprogpath() rs=%d rbuf=%s\n",
 	    rs,rbuf) ;
 #endif
 
@@ -661,30 +630,27 @@ static int checker_findprog(CHECKER *chp,char *rbuf,cchar *pp,int pl)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("checker_findprog: ret rbuf=%s\n",rbuf) ;
-	debugprintf("checker_findprog: ret rs=%d rl=%u\n",rs,rl) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ret rbuf=%s\n",rbuf) ;
+	DEBUGPRINTF("ret rs=%d rl=%u\n",rs,rl) ;
 #endif
 
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (checker_findprog) */
+} /* end subroutine (checker_findprog) */
 
-
-static int checker_progrun(CHECKER *chp,cchar *qfname)
-{
+local int checker_progrun(CHECKER *chp,cchar *qfname) noex {
 	SPAWNER		s ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		fd = -1 ;
 
-#if	CF_DEBUGS
-	debugprintf("checker_progrun: ent\n") ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ent\n") ;
 #endif
 
-	if (chp == NULL) return SR_FAULT ;
+	if (chp == nullptr) return SR_FAULT ;
 
-	if (chp->progfname != NULL) {
+	if (chp->progfname != nullptr) {
 	    int		zl ;
 	    cchar	*pf = chp->progfname ;
 	    cchar	**ev = chp->envv ;
@@ -695,7 +661,7 @@ static int checker_progrun(CHECKER *chp,cchar *qfname)
 		const int	of = (O_RDWR|O_CREAT|O_TRUNC) ;
 	        cchar	*ap = av[0] ;
 	        char		argz[MAXNAMELEN+1] ;
-	        if (ap != NULL) {
+	        if (ap != nullptr) {
 	            if ((ap[0] == '+') || (ap[0] == '-') || (ap[0] == '\0')) {
 	                char	*bp = argz ;
 	                if (ap[0] == '-') *bp++ = '-' ;
@@ -707,7 +673,7 @@ static int checker_progrun(CHECKER *chp,cchar *qfname)
 	            fd = rs ;
 	            if ((rs = spawner_start(&s,pf,av,ev)) >= 0) {
 	                cchar	*varpr = MAINTQOTD_PRNAME ;
-	                if (getourenv(ev,varpr) == NULL) {
+	                if (getourenv(ev,varpr) == nullptr) {
 	                    rs = spawner_envset(&s,varpr,chp->pr,-1) ;
 	                }
 	                if (rs >= 0) {
@@ -727,9 +693,8 @@ static int checker_progrun(CHECKER *chp,cchar *qfname)
 	                	rs1 = spawner_wait(&s,&cs,0) ;
 	                	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	                        debugprintf("checker_progrun: w rs=%d cs=%d\n",
-				    rs,cs) ;
+#if	CF_DEBUG
+	                        DEBUGPRINTF("w rs=%d cs=%d\n", rs,cs) ;
 #endif
 
 				if (rs >= 0) {
@@ -739,9 +704,8 @@ static int checker_progrun(CHECKER *chp,cchar *qfname)
 	                        if (rs >= 0) u_rewind(fd) ;
 			    } /* end if (spawner_run) */
 
-#if	CF_DEBUGS
-	                    debugprintf("checker_progrun: "
-				"spawner_run() rs=%d\n", rs) ;
+#if	CF_DEBUG
+	                    DEBUGPRINTF("spawner_run() rs=%d\n", rs) ;
 	                    debugoutput("checker_progrun: ¬",fd) ;
 #endif
 
@@ -758,17 +722,14 @@ static int checker_progrun(CHECKER *chp,cchar *qfname)
 	} else
 	    rs = SR_NOENT ;
 
-#if	CF_DEBUGS
-	debugprintf("checker_progrun: ret rs=%d fd=%u\n",rs,fd) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ret rs=%d fd=%u\n",rs,fd) ;
 #endif
 
 	return (rs >= 0) ? fd : rs ;
-}
-/* end subroutine (checker_progrun) */
+} /* end subroutine (checker_progrun) */
 
-
-static int checker_proglog(CHECKER *chp,int cs)
-{
+local int checker_proglog(CHECKER *chp,int cs) noex {
 	MAINTQOTD	*sip = chp->sip ;
 	int		rs = SR_OK ;
 
@@ -781,7 +742,7 @@ static int checker_proglog(CHECKER *chp,int cs)
 		int	sig = WTERMSIG(cs) ;
 		cchar	*ss ;
 		char		sigbuf[20+1] ;
-		if ((ss = strabbrsig(sig)) == NULL) {
+		if ((ss = strabbrsig(sig)) == nullptr) {
 		     ctdeci(sigbuf,20,sig) ;
 		     ss = sigbuf ;
 		}
@@ -792,42 +753,33 @@ static int checker_proglog(CHECKER *chp,int cs)
 	} /* end if (logging) */
 
 	return rs ;
-}
-/* end subroutine (checker_proglog) */
-
+} /* end subroutine (checker_proglog) */
 
 #ifdef	COMMENT
-static int mksfname(rbuf,pr,sdname,sname)
-char		rbuf[] ;
-cchar	*pr ;
-cchar	*sdname ;
-cchar	*sname ;
-{
+local int mksfname(char *rbuf,cc *pr,cc *sdname,cc *sname) noex {
 	int		rs ;
-
 	if (sdname[0] != '/') {
 	    rs = mkpath3(rbuf,pr,sdname,sname) ;
-	} else
+	} else {
 	    rs = mkpath2(rbuf,sdname,sname) ;
-
+	}
 	return rs ;
-}
-/* end subroutine (mksfname) */
+} /* end subroutine (mksfname) */
 #endif /* COMMENT */
 
-#if	CF_DEBUGS
-static int debugoutput(cchar *ids,int fd) noex {
+#if	CF_DEBUG
+local int debugoutput(cchar *ids,int fd) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	debugprintf("%r\n",ids,strlinelen(ids,80,60)) ;
+	DEBUGPRINTF("%r\n",ids,strlinelen(ids,80,60)) ;
 	sleep(2) ;
 	if ((rs = uc_fsize(fd)) >= 0) {
-	    debugprintf("%r fsize=%u\n",ids,strlinelen(ids,80,60),rs) ;
+	    DEBUGPRINTF("%r fsize=%u\n",ids,strlinelen(ids,80,60),rs) ;
 	    if (filer b ; (rs = filer_start(&b,fd,0z,0,0)) >= 0) {
 	        cint	llen = LINEBUFLEN ;
 	        char	lbuf[LINEBUFLEN+1] ;
 	        while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
-	            debugprintf("o> %r\n",
+	            DEBUGPRINTF("o> %r\n",
 	                lbuf,strlinelen(lbuf,rs,70)) ;
 	        } /* end while */
 	        filer_finish(&b) ;
@@ -835,7 +787,7 @@ static int debugoutput(cchar *ids,int fd) noex {
 	} /* end if (fsize) */
 	if (rs >= 0) u_rewind(fd) ;
 	return (rs >= 0) ? wlen : rs ;
-}
-#endif /* CF_DEBUGS */
+} /* end subroutine */
+#endif /* CF_DEBUG */
 
 
