@@ -46,16 +46,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storebuf.h>
-#include	<strn.h>		/* |strnchr(3uc)| */
-#include	<strwcpy.h>
-#include	<mailaddrtypes.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnchr(3uc)| */
+#include	<strwcpy.h>		/* LINUC */
+#include	<mailaddrtypes.h>	/* LIBMAILMSG */
+#include	<localmisc.h>		/* LINU */
 
 #include	"emainfo.h"
 
@@ -98,9 +98,9 @@ using std::max ;			/* subroutine-template */
 int emainfo_load(emainfo *op,cchar *sp,int 탎l) noex {
     	int		rs = SR_FAULT ;
 	int		rtype = 0 ; /* return-value */
-	if (op && sp) {
+	if (op && sp) ylikely {
 	    rs = SR_INVALID ;
-	    if (int sl ; (sl = getlenstr(sp,탎l)) > 0) {
+	    if (int sl ; (sl = getlenstr(sp,탎l)) > 0) ylikely {
 		rs = memclear(op) ;
 	        cchar	*cp ;
 	        cchar	*cp1, *cp2 ;
@@ -146,8 +146,7 @@ int emainfo_load(emainfo *op,cchar *sp,int 탎l) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rtype : rs ;
-}
-/* end subroutine (emainfo_load) */
+} /* end subroutine (emainfo_load) */
 
 int emainfo_mktype(emainfo *op,mailaddrtypes type,char *rbuf,int rlen) noex {
     	cnullptr	np{} ;
@@ -216,7 +215,6 @@ int emainfo_mktype(emainfo *op,mailaddrtypes type,char *rbuf,int rlen) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (emainfo_mktype) */
+} /* end subroutine (emainfo_mktype) */
 
 
