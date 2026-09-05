@@ -54,7 +54,7 @@ struct mailmsgstage_head {
 	size_t		tflen ;
 	size_t		mapsize ;
 	MAILMSGSTAGE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		nmsgs ;
 	int		tfd ;
 	int		to ;
