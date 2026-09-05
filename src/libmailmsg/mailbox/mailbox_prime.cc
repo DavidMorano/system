@@ -35,51 +35,52 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<sysval.hh>
-#include	<sigblocker.h>
-#include	<filer.h>
-#include	<filer_mailsup.h>	/* MAILMSG */
-#include	<fbliner.h>
-#include	<ascii.h>
-#include	<vecobj.h>
-#include	<vecstr.h>
-#include	<strn.h>		/* |strnset(3uc)| */
-#include	<mkpathx.h>
-#include	<sncpyx.h>
-#include	<matstr.h>		/* |matcasestr(3uc)| */
-#include	<lockfile.h>
-#include	<intceil.h>
-#include	<opentmp.h>
-#include	<strwcpy.h>		/* |strwblanks(3uc)| */
-#include	<char.h>
-#include	<hasx.h>		/* |hasEOH(3uc)| */
-#include	<ischarx.h>
-#include	<localmisc.h>
-#include	<mailmsghdrval.h>	/* MAILMSG */
-#include	<mailmsghdrfold.h>	/* MAILMSG */
-#include	<mailmsgmatenv.h>	/* MAILMSG */
-#include	<mailmsgmathdr.h>	/* MAILMSG */
-#include	<hdrextnum.h>		/* MAILMSG */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<sigblocker.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<filer_mailsup.h>	/* LIBUC MAILMSG */
+#include	<fbliner.h>		/* LIBUC */
+#include	<ascii.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnset(3uc)| */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC |matcasestr(3uc)| */
+#include	<lockfile.h>		/* LIBUC */
+#include	<intceil.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC |strwblanks(3uc)| */
+#include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasEOH(3uc)| */
+#include	<ischarx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<mailmsghdrval.h>	/* LIBMAILMSG */
+#include	<mailmsghdrfold.h>	/* LIBMAILMSG */
+#include	<mailmsgmatenv.h>	/* LIBMAILMSG */
+#include	<mailmsgmathdr.h>	/* LIBMAILMSG */
+#include	<hdrextnum.h>		/* LIBMAILMSG */
 
 #include	"mailbox.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
+import mailbox_mag ;
 
 /* local defines */
 
@@ -137,12 +138,12 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     extern int	tmpmailboxes(char *,int) noex ;
-}
+} /* end extern (C) */
 
 extern "C" {
     extern int uc_ftruncate(int,off_t) noex ;
     extern int uc_open(cchar *,int,mode_t) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -231,7 +232,7 @@ local int writeblanks(int,int) noex ;
 
 local inline bool hasfmat(cc *lp,int ll) noex {
     	return ((ll > 5) && (lp[0] == 'F')) ;
-}
+} /* end */
 
 
 /* local variables */
@@ -302,8 +303,7 @@ int mailbox_open(MB *op,cchar *mbfname,int mflags) noex {
 	    }
 	} /* end if (mailbox_ctor) */
 	return (rs >= 0) ? nmsgs : rs ;
-}
-/* end subroutine (mailbox_open) */
+} /* end subroutine (mailbox_open) */
 
 int mailbox_close(MB *op) noex {
 	int		rs ;
@@ -341,11 +341,10 @@ int mailbox_close(MB *op) noex {
 	        rs1 = mailbox_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? mblen : rs ;
-}
-/* end subroutine (mailbox_close) */
+} /* end subroutine (mailbox_close) */
 
 int mailbox_mbfile(MB *op,char *mbuf,int mlen) noex {
 	int		rs ;
@@ -353,8 +352,7 @@ int mailbox_mbfile(MB *op,char *mbuf,int mlen) noex {
 	    rs = sncpy1(mbuf,mlen,op->mailfname) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailbox_mbfile) */
+} /* end subroutine (mailbox_mbfile) */
 
 int mailbox_getinfo(MB *op,mailbox_info *mip) noex {
 	int		rs ;
@@ -365,8 +363,7 @@ int mailbox_getinfo(MB *op,mailbox_info *mip) noex {
 	    total = op->msgs_total ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? total : rs ;
-}
-/* end subroutine (mailbox_getinfo) */
+} /* end subroutine (mailbox_getinfo) */
 
 int mailbox_count(MB *op) noex {
 	int		rs ;
@@ -375,8 +372,7 @@ int mailbox_count(MB *op) noex {
 	    total = op->msgs_total ;
 	} /* end if (magic) */
 	return (rs >= 0) ? total : rs ;
-}
-/* end subroutine (mailbox_count) */
+} /* end subroutine (mailbox_count) */
 
 int mailbox_check(MB *op,time_t dt) noex {
 	int		rs ;
@@ -385,8 +381,7 @@ int mailbox_check(MB *op,time_t dt) noex {
 	    if (dt == 0) dt = getustime ;
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailbox_check) */
+} /* end subroutine (mailbox_check) */
 
 int mailbox_msgdel(MB *op,int mi,int f) noex {
 	int		rs ;
@@ -417,8 +412,7 @@ int mailbox_msgdel(MB *op,int mi,int f) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f_prev : rs ;
-}
-/* end subroutine (mailbox_msgdel) */
+} /* end subroutine (mailbox_msgdel) */
 
 int mailbox_countdel(MB *op) noex {
 	int		rs ;
@@ -427,8 +421,7 @@ int mailbox_countdel(MB *op) noex {
 	    count = op->msgs_del ;
 	} /* end if (magic) */
 	return (rs >= 0) ? count : rs ;
-}
-/* end subroutine (mailbox_countdel) */
+} /* end subroutine (mailbox_countdel) */
 
 int mailbox_msgoff(MB *op,int mi,off_t *offp) noex {
 	int		rs ;
@@ -450,8 +443,7 @@ int mailbox_msgoff(MB *op,int mi,off_t *offp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? mlen : rs ;
-}
-/* end subroutine (mailbox_msgoff) */
+} /* end subroutine (mailbox_msgoff) */
 
 int mailbox_msgret(MB *op,int mi,MB_MI **rpp) noex {
 	int		rs ;
@@ -471,8 +463,7 @@ int mailbox_msgret(MB *op,int mi,MB_MI **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? mlen : rs ;
-}
-/* end subroutine (mailbox_msgret) */
+} /* end subroutine (mailbox_msgret) */
 
 int mailbox_msghdradd(MB *op,int mi,cchar *k,cchar *sp,int sl) noex {
 	int		rs ;
@@ -497,8 +488,7 @@ int mailbox_msghdradd(MB *op,int mi,cchar *k,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (mailbox_msghdradd) */
+} /* end subroutine (mailbox_msghdradd) */
 
 int mailbox_readbegin(MB *op,MB_READ *curp,off_t foff,int rsz) noex {
 	int		rs ;
@@ -513,8 +503,7 @@ int mailbox_readbegin(MB *op,MB_READ *curp,off_t foff,int rsz) noex {
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailbox_readbegin) */
+} /* end subroutine (mailbox_readbegin) */
 
 int mailbox_readend(MB *op,MB_READ *curp) noex {
 	int		rs ;
@@ -533,8 +522,7 @@ int mailbox_readend(MB *op,MB_READ *curp) noex {
 	    } /* end if (good-fd) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailbox_readend) */
+} /* end subroutine (mailbox_readend) */
 
 int mailbox_readln(MB *op,MB_READ *curp,char *lbuf,int llen) noex {
 	int		rs ;
@@ -579,8 +567,7 @@ int mailbox_readln(MB *op,MB_READ *curp,char *lbuf,int llen) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (mailbox_readln) */
+} /* end subroutine (mailbox_readln) */
 
 
 /* private subroutines */
@@ -609,7 +596,7 @@ local int mailbox_opener(MB *op,cc *mbfname,int of) noex {
 	                    if ((rs = uc_locktail(op->mfd,true,1,to)) >= 0) {
 	                        if ((rs = mailbox_parse(op)) >= 0) {
 	                            nmsgs = op->msgs_total ;
-	                            op->magic = MAILBOX_MAGIC ;
+	                            op->magval = MAILBOX_MAGIC ;
 	                        }
 	                        if (rs < 0) {
 	                            mailbox_msgfins(op) ;
@@ -639,8 +626,7 @@ local int mailbox_opener(MB *op,cc *mbfname,int of) noex {
 	    }
 	} /* end if (file-open) */
 	return (rs >= 0) ? nmsgs : rs ;
-}
-/* end subroutine (mailbox_opener) */
+} /* end subroutine (mailbox_opener) */
 
 local int mailbox_parse(MB *op) noex {
 	coff		soff = 0z ;
@@ -667,8 +653,7 @@ local int mailbox_parse(MB *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
 	return (rs >= 0) ? op->msgs_total : rs ;
-}
-/* end subroutine (mailbox_parse) */
+} /* end subroutine (mailbox_parse) */
 
 local int mailbox_parsemsg(MB *op,fbliner *lsp,int mi) noex {
 	int		rs ;
@@ -705,8 +690,7 @@ local int mailbox_parsemsg(MB *op,fbliner *lsp,int mi) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (mailboxpi) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (mailbox_parsemsg) */
+} /* end subroutine (mailbox_parsemsg) */
 
 local int mailbox_parsemsger(MB *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	fbliner		*lsp = pip->lsp ;
@@ -880,8 +864,7 @@ local int mailbox_parsemsger(MB *op,mmenvdat *mep,MAILBOXPI *pip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (msginfo) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (mailbox_parsemsger) */
+} /* end subroutine (mailbox_parsemsger) */
 
 local int mailbox_loadmsghead(MB *op,MB_MI *msgp,
 		mailmsghdrval *mhvp) noex {
@@ -925,8 +908,7 @@ local int mailbox_loadmsghead(MB *op,MB_MI *msgp,
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? hi : rs ;
-}
-/* end subroutine (mailbox_loadmsghead) */
+} /* end subroutine (mailbox_loadmsghead) */
 
 local int mailbox_msgfins(MB *op) noex {
     	vecobj		*mlp = op->mlp ;
@@ -942,8 +924,7 @@ local int mailbox_msgfins(MB *op) noex {
 	    }
 	} /* end for */
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mailbox_msgfins) */
+} /* end subroutine (mailbox_msgfins) */
 
 local int mailbox_rewrite(MB *op) noex {
 	int		rs ;
@@ -966,8 +947,7 @@ local int mailbox_rewrite(MB *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (mailbox_rewrite) */
+} /* end subroutine (mailbox_rewrite) */
 
 local int mailbox_rewrites(MB *op,cchar *tpat) noex {
 	int		rs ;
@@ -993,8 +973,7 @@ local int mailbox_rewrites(MB *op,cchar *tpat) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (mailbox_rewrites) */
+} /* end subroutine (mailbox_rewrites) */
 
 local int mailbox_rewriter(MB *op,int tfd) noex {
 	cint		ps = op->pagesize ;
@@ -1071,8 +1050,7 @@ local int mailbox_rewriter(MB *op,int tfd) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (mailbox_rewriter) */
+} /* end subroutine (mailbox_rewriter) */
 
 local int mailbox_msgcopy(MB *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	int		rs = SR_OK ;
@@ -1094,8 +1072,7 @@ local int mailbox_msgcopy(MB *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	    mcp->moff += wlen ;
 	} /* end if (ok) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mailbox_msgcopy) */
+} /* end subroutine (mailbox_msgcopy) */
 
 local int mailbox_msgcopyadd(MB *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	cint		mfd = op->mfd ;
@@ -1125,8 +1102,7 @@ local int mailbox_msgcopyadd(MB *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	    }
 	} /* end if (filer_writefd) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mailbox_msgcopyadd) */
+} /* end subroutine (mailbox_msgcopyadd) */
 
 local int msginfo_start(MB_MI *mp,off_t off,int mi) noex {
 	int		rs = SR_OK ;	
@@ -1151,8 +1127,7 @@ local int msginfo_start(MB_MI *mp,off_t off,int mi) noex {
 #endif
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msginfo_start) */
+} /* end subroutine (msginfo_start) */
 
 local int msginfo_finish(MB_MI *mp) noex {
 	int		rs = SR_FAULT ;
@@ -1167,8 +1142,7 @@ local int msginfo_finish(MB_MI *mp) noex {
 	    mp->mlen = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (msginfo_finish) */
+} /* end subroutine (msginfo_finish) */
 
 local int msginfo_setenv(MB_MI *msgp,mmenvdat *mep) noex {
 	int		rs = SR_FAULT ;
@@ -1178,8 +1152,7 @@ local int msginfo_setenv(MB_MI *msgp,mmenvdat *mep) noex {
 	    msgp->fl.senv = mep->fl.start ;
 	}
 	return rs ;
-}
-/* end subroutine (msginfo_setenv) */
+} /* end subroutine (msginfo_setenv) */
 
 local int mailboxpi_start(MAILBOXPI *pip,fbliner *lsp,int mi) noex {
 	int		rs = SR_FAULT ;
@@ -1189,8 +1162,7 @@ local int mailboxpi_start(MAILBOXPI *pip,fbliner *lsp,int mi) noex {
 	    pip->mi = mi ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailboxpi_start) */
+} /* end subroutine (mailboxpi_start) */
 
 local int mailboxpi_finish(MAILBOXPI *pip) noex {
 	int		rs = SR_FAULT ;
@@ -1198,13 +1170,11 @@ local int mailboxpi_finish(MAILBOXPI *pip) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailboxpi_finish) */
+} /* end subroutine (mailboxpi_finish) */
 
 local int mailboxpi_havemsg(MAILBOXPI *pip) noex {
 	return (pip->fl.fenv || pip->fl.fhdr || pip->fl.feoh) ;
-}
-/* end subroutine (mailboxpi_havemsg) */
+} /* end subroutine (mailboxpi_havemsg) */
 
 local int writeblanks(int mfd,int len) noex {
 	int		rs ;
@@ -1225,7 +1195,6 @@ local int writeblanks(int mfd,int len) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (writeblanks) */
+} /* end subroutine (writeblanks) */
 
 
