@@ -39,18 +39,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<emainfo.h>
-#include	<sbuf.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<emainfo.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsg.h"
 #include	"mailmsg_envget.h"
 
+import mailmsg_mag ;
 
 /* local defines */
 
@@ -122,8 +123,7 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mailmsg_envaddrfold) */
+} /* end subroutine (mailmsg_envaddrfold) */
 
 
 /* local subroutines */
@@ -135,7 +135,7 @@ local int mailmsg_ema(mm *op,dat *mep,char *abuf,int alen,sbuf *sbp) noex {
 	    cint	cl = mep->a.el ;
 	    cchar	*cp = mep->a.ep ;
 	    if (emainfo ai ; (rs = emainfo_load(&ai,cp,cl)) >= 0) ylikely {
-	        ematypes at = ematypes(rs) ;
+	        mailaddrtypes at = mailaddrtypes(rs) ;
 	        if ((rs = emainfo_mktype(&ai,at,abuf,alen)) > 0) {
 		    cint	al = rs ;
 		    if (c > 0) rs = sbp->chr('!') ;
@@ -147,7 +147,6 @@ local int mailmsg_ema(mm *op,dat *mep,char *abuf,int alen,sbuf *sbp) noex {
 	    } /* end if (emainfo_load) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mailmsg_ema) */
+} /* end subroutine (mailmsg_ema) */
 
 
