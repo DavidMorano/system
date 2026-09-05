@@ -20,15 +20,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
-#define	RECEIVED_MAGIC	0x97634587
 #define	RECEIVED	struct received_head
+#define	RECEIVED_MAGIC	0x97634587
 
 
 enum received_keys {
@@ -45,7 +45,7 @@ enum received_keys {
 struct received_head {
 	char		*a ;
 	cchar		*key[received_keyoverlast] ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 #ifdef	__cplusplus
@@ -60,27 +60,27 @@ struct received_co {
 	void operator () (received *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (received_co) */
 struct received : received_head {
 	received_co	finish ;
 	received() noex {
-	    finish(this,receivedmem_finish) ;
-	    magic = 0 ;
-	} ;
+	    finish	(this,receivedmem_finish) ;
+	    magval = 0 ;
+	} ; /* end */
 	received(const received &) = delete ;
 	received &operator = (const received &) = delete ;
-	int start(cchar *,int = -1) noex ;
-	int getkey(int,cchar **) noex ;
-	int getitem(int,cchar **) noex ;
-	void dtor() noex ;
+	int start	(cchar *,int = -1) noex ;
+	int getkey	(int,cchar **) noex ;
+	int getitem	(int,cchar **) noex ;
+	void dtor	() noex ;
 	destruct received() {
-	    if (magic) dtor() ;
-	} ;
+	    if (magval) dtor() ;
+	} ; /* end */
 } ; /* end struct (received) */
 #else	/* __cplusplus */
 typedef	RECEIVED	received ;
