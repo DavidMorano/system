@@ -36,12 +36,13 @@ DEFS +=
 INCS += libf.h
 
 MODS += modstrw.o modsncpy.o modsnwcpy.o modsys.o
+MODS += modutil.o modmisc.o
 
 LIBS +=
 
 
-DEPS= 		libfsup.o libfmisc.o
-DEPS_MISC=	$(MODS)
+DEPS= 		$(MODS)
+DEPS_MISC=	modutil.o
 
 OBJPART00= libfsup-lenstr.o libfsup-memclear.o
 OBJPART01= libfsup-memcopy.o libfsup-memload.o
@@ -85,9 +86,9 @@ LIBFMISC_OI= libfmisc_oi0.o libfmisc_oi1.o libfmisc_oi2.o
 OBJ0= freadln.o
 OBJ1= fwrite.o fprint.o fputch.o
 OBJ2= fopenroot.o
-OBJ3= $(DEPS)
+OBJ3= $(MODS)
 
-OBJ4= $(MODS)
+OBJ4=
 OBJ5=
 OBJ6=
 OBJ7=
@@ -95,7 +96,7 @@ OBJ7=
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= obj4.o
 
-OBJ= obja.o objb.o
+OBJ= obja.o
 
 OBJIMPL= libfsup1.o
 
@@ -366,6 +367,16 @@ modsnwcpy.dir:
 # MODSYS
 modsys.o:		modsys.dir
 modsys.dir:
+	makesubdir $@
+
+# MODUTIL
+modutil.o:		modutil.dir
+modutil.dir:
+	makesubdir $@
+
+# MODMISC
+modmisc.o:		modmisc.dir modutil.o
+modmisc.dir:
 	makesubdir $@
 
 
