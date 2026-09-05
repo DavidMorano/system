@@ -44,27 +44,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getusername.h>
-#include	<getuserhome.h>
-#include	<permx.h>
-#include	<char.h>
-#include	<hasx.h>
-#include	<ischarx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<getuserhome.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"lookaddr.h"
 
@@ -97,7 +97,7 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     extern int uc_stat(cchar *,ustat *) noex ;
-}
+} /* end extern (c) */
 
 
 /* external variables */
@@ -210,8 +210,7 @@ int lookaddr_start(LA *op,cchar *pr,cchar *sn) noex {
 	    }
 	} /* end if (lookaddr_ctor) */
 	return rs ;
-}
-/* end subroutine (lookaddr_start) */
+} /* end subroutine (lookaddr_start) */
 
 int lookaddr_finish(LA *op) noex {
 	int		rs ;
@@ -244,8 +243,7 @@ int lookaddr_finish(LA *op) noex {
 	    op->magval = 0 ;
 	} /* end if (lookaddr_magic) */
 	return rs ;
-}
-/* end subroutine (lookaddr_finish) */
+} /* end subroutine (lookaddr_finish) */
 
 int lookaddr_userbegin(LA *op,LA_US *up,cchar *un) noex {
 	int		rs ;
@@ -278,8 +276,7 @@ int lookaddr_userbegin(LA *op,LA_US *up,cchar *un) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lookaddr_userbegin) */
+} /* end subroutine (lookaddr_userbegin) */
 
 int lookaddr_userend(LA *op,LA_US *up) noex {
 	int		rs ;
@@ -307,8 +304,7 @@ int lookaddr_userend(LA *op,LA_US *up) noex {
 	    } /* end if (user-magic) */
 	} /* end if (object-magic) */
 	return rs ;
-}
-/* end subroutine (lookaddr_userend) */
+} /* end subroutine (lookaddr_userend) */
 
 /* result: 0=ok, 1=bad */
 int lookaddr_usercheck(LA *op,LA_US *up,cchar *ema,int f) noex {
@@ -343,8 +339,7 @@ int lookaddr_usercheck(LA *op,LA_US *up,cchar *ema,int f) noex {
 	    } /* end if (spam or not) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (lookaddr_usercheck) */
+} /* end subroutine (lookaddr_usercheck) */
 
 
 /* private subroutines */
@@ -355,8 +350,7 @@ local int lookaddr_loadvars(LA *op,cchar *pr,cchar *sn) noex {
 	    rs = vecstr_envset(op->svp,"n",sn,-1) ;
 	}
 	return rs ;
-}
-/* end subroutine (lookaddr_loadvars) */
+} /* end subroutine (lookaddr_loadvars) */
 
 local int lookaddr_swl(LA *op,cchar *ema) noex {
 	int		rs = SR_OK ;
@@ -381,8 +375,7 @@ local int lookaddr_swl(LA *op,cchar *ema) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (lookaddr_swl) */
+} /* end subroutine (lookaddr_swl) */
 
 local int lookaddr_sbl(LA *op,cchar *ema) noex {
 	int		rs = SR_OK ;
@@ -407,8 +400,7 @@ local int lookaddr_sbl(LA *op,cchar *ema) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (lookaddr_sbl) */
+} /* end subroutine (lookaddr_sbl) */
 
 local int lookaddr_uwl(LA *op,LA_US *up,cchar *ema) noex {
 	int		rs = SR_OK ;
@@ -437,8 +429,7 @@ local int lookaddr_uwl(LA *op,LA_US *up,cchar *ema) noex {
 	    }
 	} /* end if (have-real-user) */
 	return rs ;
-}
-/* end subroutine (lookaddr_uwl) */
+} /* end subroutine (lookaddr_uwl) */
 
 local int lookaddr_ubl(LA *op,LA_US *up,cchar *ema) noex {
 	int		rs = SR_OK ;
@@ -468,7 +459,6 @@ local int lookaddr_ubl(LA *op,LA_US *up,cchar *ema) noex {
 	    }
 	} /* end if (have-real-user) */
 	return rs ;
-}
-/* end subroutine (lookaddr_ubl) */
+} /* end subroutine (lookaddr_ubl) */
 
 
