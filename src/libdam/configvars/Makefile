@@ -33,19 +33,22 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += configvars.h
+INCS += configvars.h configvars_util.hh
 
-MODS +=
+MODS += configvars_util.o
 
 LIBS +=
 
 
+DEPS= $(MODS)
+
 OBJ0= configvars_prime.o configvars_parse.o 
 OBJ1= configvars_file.o configvars_var.o
 OBJ2= configvars_sub.o
-OBJ3=
+OBJ3= $(MODS)
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB=
 
 OBJ= $(OBJA)
 
@@ -133,11 +136,11 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-
-configvars_prime.o:	configvars_prime.cc	$(INCS) configvarsobj.hh
-configvars_parse.o:	configvars_parse.cc	$(INCS) configvarsobj.hh
-configvars_sub.o:	configvars_sub.cc	$(INCS) configvarsobj.hh
-configvars_file.o:	configvars_file.cc	$(INCS) configvarsobj.hh
-configvars_var.o:	configvars_var.cc	$(INCS) configvarsobj.hh
+configvars_prime.o:	configvars_prime.cc		$(DEPS) $(INCS)
+configvars_parse.o:	configvars_parse.cc		$(DEPS) $(INCS)
+configvars_sub.o:	configvars_sub.cc		$(DEPS) $(INCS)
+configvars_file.o:	configvars_file.cc		$(DEPS) $(INCS)
+configvars_var.o:	configvars_var.cc		$(DEPS) $(INCS)
+configvars_util.o:	configvars_util.ccm			$(INCS)
 
 
