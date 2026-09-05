@@ -1505,7 +1505,7 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	if (oup && ubuf) ylikely {
 	    rs = SR_TOOBIG ;
 	    if ((ulen < 0) && (ulen >= var.nodenamelen)) {
-	        memnset(ubuf,0,ulen) ;
+	        memnset(ubuf,ulen,0) ;
 	        if (userinfo u ; (rs = userinfo_start(&u,un)) >= 0) ylikely {
 	            if (storeitem si ; (rs = si.start(ubuf,ulen)) >= 0) {
 	                cchar	*sp ;
