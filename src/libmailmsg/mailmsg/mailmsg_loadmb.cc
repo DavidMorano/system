@@ -35,18 +35,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<mailbox.h>
-#include	<rmx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<mailbox.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsg.h"
 
+import mailmsg_mag ;
 
 /* local defines */
 
@@ -93,8 +94,7 @@ int mailmsg_loadmb(mailmsg *op,mailbox *mbp,off_t fbo) noex {
  	    } /* end if (bufsizeget) */
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (mailmsg_loadmb) */
+} /* end subroutine (mailmsg_loadmb) */
 
 
 /* local subroutines */
@@ -125,7 +125,6 @@ local int mailmsg_read(mailmsg *op,mailbox *mbp,off_t fbo,int ml) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (mailmsg_read) */
+} /* end subroutine (mailmsg_read) */
 
 
