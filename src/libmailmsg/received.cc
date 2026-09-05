@@ -46,17 +46,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>		/* |ulogerror(3u)| */
-#include	<uclibmem.h>
-#include	<field.h>
-#include	<sbuf.h>
-#include	<matstr.h>
-#include	<matxstr.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mhcom.h"
 #include	"received.h"
@@ -99,7 +99,7 @@ template<typename ... Args>
 local inline int received_magic(received *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == RECEIVED_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == RECEIVED_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (received_magic) */
@@ -169,7 +169,7 @@ int received_start(received *op,cchar *hbuf,int hlen) noex {
 	                op->a = charp(p) ;
 	                if ((rs = received_bake(op,sz,sp,sl)) >= 0) {
 	                    c = rs ;
-	                    op->magic = RECEIVED_MAGIC ;
+	                    op->magval = RECEIVED_MAGIC ;
 	                }
 	                if (rs < 0) {
 	                    libmem.free(op->a) ;
@@ -182,8 +182,7 @@ int received_start(received *op,cchar *hbuf,int hlen) noex {
 	    } /* end if (received) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (received_start) */
+} /* end subroutine (received_start) */
 
 int received_finish(received *op) noex {
 	int		rs ;
@@ -194,11 +193,10 @@ int received_finish(received *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (received_finish) */
+} /* end subroutine (received_finish) */
 
 int received_getkey(received *op,int ki,cchar **rpp) noex {
     	int		rs ;
@@ -217,13 +215,11 @@ int received_getkey(received *op,int ki,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? cl : rs ;
-}
-/* end subroutine (received_getkey) */
+} /* end subroutine (received_getkey) */
 
 int received_getitem(received *op,int ki,cchar **rpp) noex {
 	return received_getkey(op,ki,rpp) ;
-}
-/* end subroutine (received_getitem) */
+} /* end subroutine (received_getitem) */
 
 
 /* private subroutines */
@@ -296,20 +292,19 @@ local int received_bake(received *op,int sz,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sbuf) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (received_bake) */
+} /* end subroutine (received_bake) */
 
 int received::start(cchar *sp,int sl) noex {
 	return received_start(this,sp,sl) ;
-}
+} /* end */
 
 int received::getkey(int ki,cchar **rpp) noex {
 	return received_getkey(this,ki,rpp) ;
-}
+} /* end */
 
 int received::getitem(int ki,cchar **rpp) noex {
 	return received_getitem(this,ki,rpp) ;
-}
+} /* end */
 
 void received::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
