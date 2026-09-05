@@ -27,29 +27,30 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memset(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<new>			/* |nothrow(3C++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecobj.h>
-#include	<strwcpy.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memset(3c)| */
+#include	<new>			/* C++STD |nothrow(3C++)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailfiles.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
+import mailfiles_mag ;
 
 /* local defines */
 
@@ -60,7 +61,6 @@ import libutil ;			/* |getlenstr(3u)| */
 /* local namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -81,11 +81,12 @@ template<typename ... Args>
 local int mailfiles_ctor(MF *op,Args ... args) noex {
     	MAILFILES	*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->elp = new(nothrow) vecobj) != np) ylikely {
+	    if ((op->elp = new(nt) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
@@ -123,15 +124,14 @@ int mailfiles_start(MF *op) noex {
 	    cint	vn = 4 ;
 	    cint	vo = VECOBJ_OCOMPACT ;
 	    if ((rs = elp->start(vsz,vn,vo)) >= 0) ylikely {
-		op->magic = MAILFILES_MAGIC ;
+		op->magval = MAILFILES_MAGIC ;
 	    }
 	    if (rs < 0) {
 		mailfiles_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (mailfiles_ctor) */
 	return rs ;
-}
-/* end subroutine (mailfiles_start) */
+} /* end subroutine (mailfiles_start) */
 
 int mailfiles_finish(MF *op) noex {
 	int		rs ;
@@ -158,8 +158,7 @@ int mailfiles_finish(MF *op) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailfiles_finish) */
+} /* end subroutine (mailfiles_finish) */
 
 int mailfiles_add(MF *op,cchar *sp,int sl) noex {
     	int		rs ;
@@ -171,13 +170,12 @@ int mailfiles_add(MF *op,cchar *sp,int sl) noex {
 		    rs = elp->add(&e) ;
 		    if (rs < 0) {
 			entry_finish(&e) ;
-		    }
+		    } /* end if (error) */
 		} /* end if (entry_start) */
 	    } /* end if (sfshrink) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailfiles_add) */
+} /* end subroutine (mailfiles_add) */
 
 int mailfiles_addpath(MF *op,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
@@ -203,8 +201,7 @@ int mailfiles_addpath(MF *op,cchar *sp,int sl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (mailfiles_addpath) */
+} /* end subroutine (mailfiles_addpath) */
 
 int mailfiles_get(MF *op,int i,MF_ENT **epp) noex {
 	int		rs ;
@@ -215,8 +212,7 @@ int mailfiles_get(MF *op,int i,MF_ENT **epp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailfiles_get) */
+} /* end subroutine (mailfiles_get) */
 
 int mailfiles_count(MF *op) noex {
 	int		rs ;
@@ -225,8 +221,7 @@ int mailfiles_count(MF *op) noex {
 	    rs = elp->count ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailfiles_count) */
+} /* end subroutine (mailfiles_count) */
 
 int mailfiles_check(MF *op) noex {
 	int		rs ;
@@ -259,8 +254,7 @@ int mailfiles_check(MF *op) noex {
 	    } /* end for */
 	} /* end if (magic) */
 	return (rs >= 0) ? nchg : rs ;
-}
-/* end subroutine (mailfiles_check) */
+} /* end subroutine (mailfiles_check) */
 
 
 /* local subroutines */
@@ -275,7 +269,7 @@ local int entry_start(MF_ENT *ep,cchar *sp,int sl) noex {
 		if (ustat sb ; (rs = u_stat(cp,&sb)) >= 0) {
 		    ep->lasttime = sb.st_mtime ;
 		    ep->lastsize = sb.st_size ;
-		}
+		} /* end if */
 		if (rs < 0) {
 		    void *vp = voidp(ep->mailfname) ;
 		    libmem.free(vp) ;
@@ -284,8 +278,7 @@ local int entry_start(MF_ENT *ep,cchar *sp,int sl) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (entry_start) */
+} /* end subroutine (entry_start) */
 
 local int entry_finish(MF_ENT *ep) noex {
 	int		rs = SR_OK ;
@@ -295,9 +288,8 @@ local int entry_finish(MF_ENT *ep) noex {
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->mailfname = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
-}
-/* end subroutine (entry_finish) */
+} /* end subroutine (entry_finish) */
 
 
