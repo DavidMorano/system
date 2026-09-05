@@ -45,27 +45,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<getax.h>
-#include	<getpwx.h>
-#include	<bufsizevar.hh>
-#include	<estrings.h>
-#include	<sncpyx.h>
-#include	<mkpathx.h>
-#include	<isnot.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getpwx.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailspool.h"
 
@@ -123,7 +123,7 @@ template<typename ... Args>
 local inline int mailspool_magic(mailspool *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MAILSPOOL_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAILSPOOL_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (mailspool_magic) */
@@ -165,7 +165,7 @@ int mailspool_open(MS *op,cchar *md,cchar *un,int of,mode_t om,int to) noex {
 	        if ((rs = mailspool_lfbegin(op,md,un)) >= 0) ylikely {
 	            if ((rs = si_checkcreate(sip)) >= 0) ylikely {
 	                if ((rs = si_trying(sip)) >= 0) ylikely {
-		            op->magic = MAILSPOOL_MAGIC ;
+		            op->magval = MAILSPOOL_MAGIC ;
 		        }
 	            }
 		    if (rs < 0) {
@@ -180,8 +180,7 @@ int mailspool_open(MS *op,cchar *md,cchar *un,int of,mode_t om,int to) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? mfd : rs ;
-}
-/* end subroutine (mailspool_open) */
+} /* end subroutine (mailspool_open) */
 
 int mailspool_close(MS *op) noex {
 	int		rs ;
@@ -200,11 +199,10 @@ int mailspool_close(MS *op) noex {
 	        rs1 = mailspool_lfend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailspool_close) */
+} /* end subroutine (mailspool_close) */
 
 local int mailspool_lfbegin(MS *op,cchar *md,cchar *un) noex {
 	int		rs ;
@@ -229,8 +227,7 @@ local int mailspool_lfbegin(MS *op,cchar *md,cchar *un) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (maxpathlen) */
 	return rs ;
-}
-/* end subroutine (mailspool_lfbegin) */
+} /* end subroutine (mailspool_lfbegin) */
 
 local int mailspool_lfend(MS *op) noex {
 	int		rs = SR_OK ;
@@ -242,8 +239,7 @@ local int mailspool_lfend(MS *op) noex {
 	    op->lfname = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (mailspool_lfend) */
+} /* end subroutine (mailspool_lfend) */
 
 int mailspool_setlockinfo(MS *op,cchar *wbuf,int wlen) noex {
 	int		rs ;
@@ -264,8 +260,7 @@ int mailspool_setlockinfo(MS *op,cchar *wbuf,int wlen) noex {
 	    } /* end if (file) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wl : rs ;
-}
-/* end subroutine (mailspool_setlockinfo) */
+} /* end subroutine (mailspool_setlockinfo) */
 
 
 /* private subroutines */
@@ -293,8 +288,7 @@ local int si_start(si *sip,MS *op,cc *md,cc *un,int of,om_t om,int to) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (si_start) */
+} /* end subroutine (si_start) */
 
 local int si_finish(si *sip) noex {
 	int		rs = SR_FAULT ;
@@ -312,8 +306,7 @@ local int si_finish(si *sip) noex {
 	    mfd = op->mfd ;
 	} /* end if (magic) */
 	return (rs >= 0) ? mfd : rs ;
-}
-/* end subroutine (si_finish) */
+} /* end subroutine (si_finish) */
 
 local int si_checkcreate(si *sip) noex {
 	int		rs ;
@@ -330,8 +323,7 @@ local int si_checkcreate(si *sip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (si_checkcreate) */
+} /* end subroutine (si_checkcreate) */
 
 local int si_trying(si *sip) noex {
 	time_t		ti_start = getustime ;
@@ -356,8 +348,7 @@ local int si_trying(si *sip) noex {
 	    }
 	} /* end while */
 	return (rs >= 0) ? mfd : rs ;
-}
-/* end subroutine (si_trying) */
+} /* end subroutine (si_trying) */
 
 local int si_lockoutbegin(si *sip,time_t dt) noex {
 	mailspool	*op = sip->op ;
@@ -377,8 +368,7 @@ local int si_lockoutbegin(si *sip,time_t dt) noex {
 	    f = rs ;
 	}
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (si_lockoutbegin) */
+} /* end subroutine (si_lockoutbegin) */
 
 local int si_lockoutend(si *sip,int prs) noex {
 	mailspool	*op = sip->op ;
@@ -391,8 +381,7 @@ local int si_lockoutend(si *sip,int prs) noex {
 	    bp[0] = '\0' ;
 	}
 	return rs ;
-}
-/* end subroutine (si_lockoutend) */
+} /* end subroutine (si_lockoutend) */
 
 local int si_lockcreate(si *sip) noex {
 	mailspool	*op = sip->op ;
@@ -407,8 +396,7 @@ local int si_lockcreate(si *sip) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (si_lockcreate) */
+} /* end subroutine (si_lockcreate) */
 
 local int si_lockin(si *sip) noex {
 	mailspool	*op = sip->op ;
@@ -435,8 +423,7 @@ local int si_lockin(si *sip) noex {
 	    }
 	} /* end if (file-open) */
 	return (rs >= 0) ? mfd : rs ;
-}
-/* end subroutine (si_lockin) */
+} /* end subroutine (si_lockin) */
 
 local int si_minmod(si *sip,int mfd,mode_t om) noex {
 	int		rs = SR_OK ;
@@ -444,8 +431,7 @@ local int si_minmod(si *sip,int mfd,mode_t om) noex {
 	    rs = uc_fminmod(mfd,om) ;
 	}
 	return rs ;
-}
-/* end subroutine (si_minmod) */
+} /* end subroutine (si_minmod) */
 
 local int si_chown(si *sip) noex {
 	int		rs = SR_OK ;
@@ -480,8 +466,7 @@ local int si_chown(si *sip) noex {
 	    } /* end if (stat) */
 	} /* end if (file was created) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (si_chown) */
+} /* end subroutine (si_chown) */
 
 local int getlockcmd(int of) noex {
 	cint		am = (of & O_ACCMODE) ;
@@ -496,7 +481,6 @@ local int getlockcmd(int of) noex {
 	    break ;
 	} /* end switch */
 	return cmd ;
-}
-/* end subroutine (getlockcmd) */
+} /* end subroutine (getlockcmd) */
 
 
