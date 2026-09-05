@@ -83,8 +83,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -129,13 +127,14 @@ template<typename ... Args>
 local int sysvar_ctor(SV *op,Args ... args) noex {
     	SYSVAR		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ; /* dangerous! */
-	    if ((op->mlp = new(nothrow) modload) != np) ylikely {
+	    if ((op->mlp = new(nt) modload) != np) ylikely {
 		sysvar_calls	*callp ;
-	        if ((callp = new(nothrow) sysvar_calls) != np) ylikely {
+	        if ((callp = new(nt) sysvar_calls) != np) ylikely {
 		    op->callp = callp ;
 		    rs = SR_OK ;
 		} /* end if (new-sysvars_calls) */
