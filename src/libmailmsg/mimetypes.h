@@ -13,9 +13,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
 
 
 #define	MIMETYPES		mimetypes_head
@@ -27,7 +27,7 @@
 
 struct mimetypes_head {
     	hdb		*dbp ;
-	uint		magic ;
+	uint		magval ;
 	int		typelen ;
 } ; /* end struct */
 
@@ -42,7 +42,7 @@ extern int mimetypes_finish	(mimetypes *) noex ;
 extern int mimetypes_file	(mimetypes *,cchar *) noex ;
 extern int mimetypes_curbegin (mimetypes *,mimetypes_cur *) noex ;
 extern int mimetypes_curend   (mimetypes *,mimetypes_cur *) noex ;
-extern int mimetypes_curenum     (mimetypes *,mimetypes_cur *,char *,char *) noex ;
+extern int mimetypes_curenum(mimetypes *,mimetypes_cur *,char *,char *) noex ;
 extern int mimetypes_fetch  (mimetypes *,cchar *,mimetypes_cur *,char *) noex ;
 extern int mimetypes_find   (mimetypes *,char *,cchar *) noex ;
 extern int mimetypes_get    (mimetypes *,char *,cchar *) noex ;
