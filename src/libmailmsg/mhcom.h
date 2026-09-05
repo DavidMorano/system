@@ -20,31 +20,31 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
-#define	MHCOM_MAGIC	0x98638451
 #define	MHCOM		struct mhcom_head
+#define	MHCOM_MAGIC	0x98638451
 
 
 struct mhcom_head {
 	char		*a ;
 	char		*value ;
 	char		*comment ;
-	uint		magic ;
+	uint		magval ;
 	int		vlen ;
 	int		clen ;
-} ;
+} ; /* end struct */
 
 #ifdef	__cplusplus
 enum mhcommems {
 	mhcommem_finish,
 	mhcommem_overlast
-} ;
+} ; /* end enum */
 struct mhcom ;
 struct mhcom_co {
 	mhcom		*op = nullptr ;
@@ -52,18 +52,18 @@ struct mhcom_co {
 	void operator () (mhcom *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (mhcom_co) */
 struct mhcom : mhcom_head {
 	mhcom_co	finish ;
 	mhcom() noex {
 	    finish	(this,mhcommem_finish) ;
-	    magic = 0 ;
-	} ;
+	    magval = 0 ;
+	} ; /* end */
 	mhcom(const mhcom &) = delete ;
 	mhcom &operator = (const mhcom &) = delete ;
 	int start(cchar *,int = -1) noex ;
@@ -71,8 +71,8 @@ struct mhcom : mhcom_head {
 	int getcom(cchar **) noex ;
 	void dtor() noex ;
 	destruct mhcom() {
-	    if (magic) dtor() ;
-	} ;
+	    if (magval) dtor() ;
+	} ; /* end */
 } ; /* end struct (mhcom) */
 #else	/* __cplusplus */
 typedef MHCOM		mhcom ;
