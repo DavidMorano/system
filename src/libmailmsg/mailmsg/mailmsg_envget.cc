@@ -27,15 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<mailmsgmatenv.h>
-#include	<isoneof.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mailmsgmatenv.h>	/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsg.h"
 #include	"mailmsg_envget.h"
@@ -43,6 +43,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import mailmsg_mag ;
 
 /* local defines */
 
@@ -77,7 +78,7 @@ constexpr int		rsnofield[] = {
 	SR_NOENT,
 	SR_NOMSG,
 	0
-} ;
+} ; /* end array */
 
 cbool			f_direct = CF_DIRECT ;
 
@@ -121,15 +122,13 @@ int mailmsg_envget(mailmsg *op,int ei,mailmsg_envdat *mep) noex {
 	    } /* end if_constexpr (f_direct) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsg_envget) */
+} /* end subroutine (mailmsg_envget) */
 
 
 /* provate subroutines */
 
 local bool isNotField(int rs) noex {
 	return isOneOf(rsnofield,rs) ;
-}
-/* end subroutine (isNotField) */
+} /* end subroutine (isNotField) */
 
 
