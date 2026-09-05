@@ -30,10 +30,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<filer.h>
-#include	<ema.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<filer.h>		/* LIBUC */
+#include	<ema.h>			/* LIBUC */
 
 
 #define	OUTEMA		struct outema_head
@@ -48,7 +48,7 @@ struct outema_flags {
 struct outema_head {
 	filer		*ofp ;
 	OUTEMA_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		maxlen ;
 	int		rlen ;
 	int		llen ;
