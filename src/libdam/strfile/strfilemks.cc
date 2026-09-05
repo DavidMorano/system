@@ -1134,16 +1134,12 @@ local int strfilemks_wrvarfile(SFM *op) noex {
 		/* make and write out the record-index table */
 	        if (rs >= 0) {
 		    uint	(*indtab)[3] = nullptr ;
-
 	            itl = nextpowtwo(rtl) ;
-
 	            hf.itoff = fileoff ;
 	            hf.itlen = itl ;
-
 	            sz = (itl + 1) * 3 * szof(int) ;
-
 	            if ((rs = mem.mall(sz,&indtab)) >= 0) {
-			memnset(indtab,0,sz) ;
+			memnset(indtab,sz,0) ;
 	                rs = strfilemks_mkind(op,kstab,indtab,itl) ;
 	                if (rs >= 0) {
 	                    rs = filer_write(&varfile,indtab,sz) ;
