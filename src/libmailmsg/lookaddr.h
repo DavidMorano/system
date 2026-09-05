@@ -20,17 +20,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
-#include	<whitelist.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<whitelist.h>		/* LIBUC */
 
 
-#define	LOOKADDR_MAGIC		0x97658232
 #define	LOOKADDR		struct lookaddr_head
 #define	LOOKADDR_SL		struct lookaddr_sysflags
 #define	LOOKADDR_US		struct lookaddr_user
 #define	LOOKADDR_UF		struct lookaddr_userflags
+#define	LOOKADDR_MAGIC		0x97658232
 
 
 struct lookaddr_sysflags {
