@@ -71,7 +71,7 @@ template<typename ... Args>
 local inline int mailmsghdrs_magic(mailmsghdrs *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MAILMSGHDRS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAILMSGHDRS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (mailmsghdrs_magic) */
@@ -160,13 +160,13 @@ int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
 	        } /* end for (looping over header names) */
 	        op->v[i] = nullptr ;
 	        if (rs >= 0) {
-		    op->magic = MAILMSGHDRS_MAGIC ;
+		    op->magval = MAILMSGHDRS_MAGIC ;
 		}
 		if (rs < 0) {
 		    rs1 = libmem.free(p) ;
 		    if (rs >= 0) rs = rs1 ;
 		    op->v = nullptr ;
-		    op->magic = 0 ;
+		    op->magval = 0 ;
 		} /* end if (error) */
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
@@ -183,7 +183,7 @@ int mailmsghdrs_finish(mailmsghdrs *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->v = nullptr ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
