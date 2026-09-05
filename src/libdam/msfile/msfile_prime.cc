@@ -1099,7 +1099,7 @@ local int msfile_filetopwrite(MSF *op) noex {
 
 	/* next is the header (we just write zeros here) */
 
-	memnset(bp,0,MSF_HEADTABLEN) ;
+	memnset(bp,MSF_HEADTABLEN,0) ;
 	bp += MSF_HEADTABLEN ;
 
 	bl = bp - op->topbuf ;
