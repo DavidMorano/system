@@ -57,17 +57,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstrings>		/* |strncasecmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<six.h>			/* |sichr(3uc)| */
-#include	<rmx.h>			/* |rmblk(3uc)| */
-#include	<strwcmp.h>
-#include	<toxc.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstrings>		/* CSTD |strncasecmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<six.h>			/* LIBUC |sichr(3uc)| */
+#include	<rmx.h>			/* LIBUC |rmblk(3uc)| */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"headkeymat.h"
 
@@ -126,7 +126,6 @@ int headkeymat(cchar *keyp,cchar *hbuf,int µhlen) noex {
 	    } /* end if (getlenstr) */
 	} /* end if (getlenstr) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (headkeymat) */
+} /* end subroutine (headkeymat) */
 
 
