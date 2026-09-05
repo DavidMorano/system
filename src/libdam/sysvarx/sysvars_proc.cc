@@ -208,7 +208,7 @@ int sysvars_procset(hdbstr *vlp,cchar *dbn,mode_t om) noex {
 	                    if (rs >= 0) {
 	                        c += 1 ;
 	                        rs = varmk_addvar(&svars,kp,vap,val) ;
-	                    }
+	                    } /* end if (ok) */
 	                } /* end while */
 	                rs1 = hdbstr_curend(vlp,&cur) ;
 	                if (rs >= 0) rs = rs1 ;
