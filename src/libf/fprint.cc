@@ -41,7 +41,8 @@
 
 #include	"libf.h"
 
-import libfsup ;			/* |getlenstr(3u)| */
+import modutil ;
+import modmisc ;			/* |mknpath(3u)| */
 
 
 /* local defines */
