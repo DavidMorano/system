@@ -1,0 +1,61 @@
+/* configvars_util MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* Configuration-Variables */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBU */
+
+#include	"configvars.h"
+
+export module configvars_util ;
+
+export {
+    enum configvarsws {
+	configvarsw_sets,
+	configvarsw_vars,
+	configvarsw_unsets,
+	configvarsw_unvars,
+	configvarsw_overlast
+    } ; /* end enum */
+} /* end export */
+
+export {
+    enum keytypes {
+	keytype_define,
+	keytype_export,
+	keytype_set,
+	keytype_unset,
+	keytype_var,
+	keytype_overlast
+    } ; /* end enum */
+} /* end export */
+
+export {
+    template<typename ... Args>
+    inline int configvars_magic(configvars *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == CONFIGVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (configvars_magic) */
+} /* end export */
+
+
