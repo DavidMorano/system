@@ -280,7 +280,7 @@ enum his {
 
 struct mailmsghdrs_head {
 	cchar		**v ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 extern cpcchar		mailmsghdrs_names[] ;
