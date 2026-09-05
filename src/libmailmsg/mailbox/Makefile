@@ -31,30 +31,30 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= mailbox.h
+INCS += mailbox.h
 
-MPDS +=
+MODS += mailbox_mag.o
 
-LIBS=
+LIBS +=
 
+
+DEPS= mailbox_mag.o
 
 OBJ0_MAILBOX= mailbox_prime.o
 OBJ1_MAILBOX= mailbox_fromaddr.o
 OBJ2_MAILBOX= mailbox_getfrom.o
-OBJ3_MAILBOX=
+OBJ3_MAILBOX= $(MODS)
 
 OBJA_MAILBOX= obj0_mailbox.o obj1_mailbox.o
-OBJB_MAILBOX= obj2_mailbox.o
+OBJB_MAILBOX= obj2_mailbox.o obj3_mailbox.o
 
 OBJ_MAILBOX= $(OBJA_MAILBOX) $(OBJB_MAILBOX)
 
 
 LDRPATH= $(EXTRA)/lib
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -129,8 +129,10 @@ obj3_mailbox.o:		$(OBJ3_MAILBOX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-mailbox_prime.o:	mailbox_prime.cc	$(INCS)
-mailbox_fromaddr.o:	mailbox_fromaddr.cc	$(INCS)
-mailbox_getfrom.o:	mailbox_getfrom.cc	$(INCS)
+mailbox_prime.o:	mailbox_prime.cc	$(DEPS) $(INCS)
+mailbox_fromaddr.o:	mailbox_fromaddr.cc	$(DEPS) $(INCS)
+mailbox_getfrom.o:	mailbox_getfrom.cc	$(DEPS) $(INCS)
+
+mailbox_mag.o:		mailbox_mag.ccm		$(INCS)
 
 
