@@ -112,7 +112,7 @@ template<typename ... Args>
 local inline int mailmsghdrfold_magic(mailmsghdrfold *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MAILMSGHDRFOLD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAILMSGHDRFOLD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (mailmsghdrfold_magic) */
@@ -163,7 +163,7 @@ int mailmsghdrfold_start(MF *op,int mcols,int ln,cchar *sp,int sl) noex {
 	        }
 	        op->sp = sp ;
 	        op->sl = sl ;
-	        op->magic = MAILMSGHDRFOLD_MAGIC ;
+	        op->magval = MAILMSGHDRFOLD_MAGIC ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -174,7 +174,7 @@ int mailmsghdrfold_finish(MF *op) noex {
 	int		rs = SR_FAULT ;
 	if ((rs = mailmsghdrfold_magic(op)) >= 0) ylikely {
 	    op->sp = nullptr ;
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
