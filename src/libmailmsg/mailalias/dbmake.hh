@@ -53,12 +53,12 @@
 #define	DBMAKE_INCLUDE
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecobj.h>
-#include	<strtab.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<strtab.h>		/* LIBUC */
 
 
 /* lengths (small) */
@@ -101,32 +101,32 @@ namespace mailutils {
 	    fd = afd ;
 	    ropts = 0 ;
 	    f_havekey = false ;
-	} ;
-	void setmagic(cchar *m,int s) noex {
+	} ; /* end */
+	void setmagic	(cchar *m,int s) noex {
 	    magp = m ;
 	    mags = s ;
-	} ;
-	void setnshift(int n) noex {
+	} ; /* end */
+	void setnshift	(int n) noex {
 	    nshift = n ;
-	} ;
-	void setversion(int v) noex {
+	} ; /* end */
+	void setversion	(int v) noex {
 	    fver = v ;
-	} ;
-	int wrfileproc(cchar *) noex ;
-	int wrfileline(cchar *,int) noex ;
-	int wrfile(time_t) noex ;
-	int wrfiler(time_t) noex ;
+	} ; /* end */
+	int wrfileproc	(cchar *) noex ;
+	int wrfileline	(cchar *,int) noex ;
+	int wrfile	(time_t) noex ;
+	int wrfiler	(time_t) noex ;
 	int wrfilekeytab() noex ;
-	int wrfilerec() noex ;
-	int wrfilekeys() noex ;
-	int wrfilevals() noex ;
-	int mkind(vecobj *,cc *,rt_t,int) noex ;
+	int wrfilerec	() noex ;
+	int wrfilekeys	() noex ;
+	int wrfilevals	() noex ;
+	int mkind	(vecobj *,cc *,rt_t,int) noex ;
     } ; /* end class (dbmake) */
     struct record {
 	uint		key ;
 	uint		val ;
 	record() noex : key(0), val(0) { } ;
-	record(uint k,uint v) noex : key(k), val(v) { } ;
+	record (uint k,uint v) noex : key(k), val(v) { } ;
     } ; /* end class (record) */
     typedef record *	recordp ;
 } /* end namespace (mailutils) */
