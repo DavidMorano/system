@@ -58,7 +58,7 @@ struct mailmsgfile_head {
 	cchar		*tmpdname ;
 	pthread_t	tid ;
 	MAILMSGFILE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		pagesize ;
 	int		cols ;
 	int		ind ;
