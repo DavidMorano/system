@@ -13,27 +13,24 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>		/* |time_t| */
-#include	<unistd.h>		/* |time_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecint.h>
-#include	<strpack.h>
-#include	<dater.h>
-#include	<date.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecint.h>		/* LIBUC */
+#include	<strpack.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
+#include	<date.h>		/* LIBUC */
 
 #include	"mailbox.h"
 
 
-#define	MBCACHE_MAGIC		0x31415927
 #define	MBCACHE			struct mbcache_head
 #define	MBCACHE_FL		struct mbcache_flags
 #define	MBCACHE_INFO		struct mbcache_information
 #define	MBCACHE_SCAN		struct mbcache_scanner
 #define	MBCACHE_SFLAGS		struct mbcache_sflags
+#define	MBCACHE_MAGIC		0x31415927
 /* open options */
 #define	MBCACHE_ORDWR		MAILBOX_ORDWR
 /* state */
@@ -62,12 +59,12 @@ enum mbcachemfs {
 	mbcachemf_scandate,
 	mbcachemf_scanline,
 	mbcachemf_overlast
-} ;
+} ; /* end enum */
 
 struct mbcache_information {
 	int		nmsgs ;		/* mailbox messages total */
 	int		nmsgdels ;	/* mailbox messages deleted */
-} ;
+} ; /* end struct */
 
 struct mbcache_sflags {
 	uint		info:1 ;	/* msg-info loaded */
@@ -89,7 +86,7 @@ struct mbcache_sflags {
 	uint		scanfrom:1 ;
 	uint		scansubject:1 ;
 	uint		scandate:1 ;
-} ;
+} ; /* end struct */
 
 struct mbcache_scanner {
 	cchar		*vs[mbcachemf_overlast] ;
@@ -112,11 +109,11 @@ struct mbcache_scanner {
 	int		nlines ;	/* message lines-native */
 	int		vlines ; 	/* message lines-view */
 	int		msgi ;		/* message index */
-} ;
+} ; /* end struct */
 
 struct mbcache_flags {
 	uint		readonly:1 ;
-} ;
+} ; /* end struct */
 
 struct mbcache_head {
 	cchar		*mbfname ;	/* mail-box-file-name */
@@ -126,9 +123,9 @@ struct mbcache_head {
 	dater		*dmp ;		/* dater-manager-pointer */
 	MBCACHE_SCAN	**msgs ;
 	MBCACHE_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		mflags ;	/* mailbox open-flags */
-} ;
+} ; /* end struct */
 
 typedef	MBCACHE		mbcache ;
 typedef	MBCACHE_FL	mbcache_fl ;
