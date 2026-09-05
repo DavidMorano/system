@@ -37,24 +37,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<bufsizeget.h>
-#include	<bfile.h>
-#include	<hdb.h>
-#include	<field.h>
-#include	<fieldterms.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<snwcpy.h>
-#include	<strwcpy.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"mimetypes.h"
 
@@ -90,7 +90,7 @@ namespace {
 	int		typelen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -99,11 +99,10 @@ template<typename ... Args>
 local inline int mimetypes_magic(mimetypes *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MIMETYPES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MIMETYPES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mimetypes_magic) */
+} /* end subroutine (mimetypes_magic) */
 
 local int	mimetypes_fileln(mt *,cchar *,int) noex ;
 
@@ -134,7 +133,7 @@ int mimetypes_start(mt *op) noex {
 	            cint	ne = MIMETYPES_NUMKEYS ;
 		    op->dbp = (hdb *) vp ;
 	            if ((rs = hdb_start(op->dbp,ne,1,nullptr,nullptr)) >= 0) {
-			op->magic = MIMETYPES_MAGIC ;
+			op->magval = MIMETYPES_MAGIC ;
 		    }
 		    if (rs < 0) {
 			libmem.free(op->dbp) ;
@@ -144,8 +143,7 @@ int mimetypes_start(mt *op) noex {
 	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mimetypes_start) */
+} /* end subroutine (mimetypes_start) */
 
 int mimetypes_finish(mt *op) noex {
 	int		rs = SR_FAULT ;
@@ -179,11 +177,10 @@ int mimetypes_finish(mt *op) noex {
 		    op->dbp = nullptr ;
 		}
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mimetypes_finish) */
+} /* end subroutine (mimetypes_finish) */
 
 /* read a whole file into the database */
 int mimetypes_file(mt *op,cchar *fname) noex {
@@ -210,8 +207,7 @@ int mimetypes_file(mt *op,cchar *fname) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mimetypes_file) */
+} /* end subroutine (mimetypes_file) */
 
 local int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
 	cnullptr	np{} ;
@@ -263,8 +259,7 @@ local int mimetypes_fileln(mt *op,cchar *lbuf,int ll) noex {
 	    } /* end if (field) */
 	} /* end if (exttypespec) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mimetypes_fileln) */
+} /* end subroutine (mimetypes_fileln) */
 
 /* find a MIME type for the given extension */
 int mimetypes_find(mt *op,char *typespec,cchar *ext) noex {
@@ -295,8 +290,7 @@ int mimetypes_find(mt *op,char *typespec,cchar *ext) noex {
 	    } /* end if (found) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mimetypes_find) */
+} /* end subroutine (mimetypes_find) */
 
 int mimetypes_curbegin(mt *op,mt_cur *curp) noex {
     	int		rs ;
@@ -304,8 +298,7 @@ int mimetypes_curbegin(mt *op,mt_cur *curp) noex {
 	    rs = hdb_curbegin(op->dbp,curp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mimetypes_curbegin) */
+} /* end subroutine (mimetypes_curbegin) */
 
 int mimetypes_curend(mt *op,mt_cur *curp) noex {
     	int		rs ;
@@ -313,8 +306,7 @@ int mimetypes_curend(mt *op,mt_cur *curp) noex {
 	    rs = hdb_curend(op->dbp,curp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mimetypes_curend) */
+} /* end subroutine (mimetypes_curend) */
 
 /* enumerate all of the key-val pairs */
 int mimetypes_curenum(mt *op,mt_cur *curp,char *ext,char *ts) noex {
@@ -336,8 +328,7 @@ int mimetypes_curenum(mt *op,mt_cur *curp,char *ext,char *ts) noex {
 	    } /* end if (hdb_curenum) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mimetypes_curenum) */
+} /* end subroutine (mimetypes_curenum) */
 
 /* fetch the next val by extension and a possible cursor */
 int mimetypes_fetch(mt *op,mt_cur *curp,char *ext,char *ts) noex {
@@ -355,14 +346,12 @@ int mimetypes_fetch(mt *op,mt_cur *curp,char *ext,char *ts) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mimetypes_fetch) */
+} /* end subroutine (mimetypes_fetch) */
 
 /* OLDER API: find a MIME type given an extension */
 int mimetypes_get(mt *op,char *typespec,cchar *ext) noex {
 	return mimetypes_find(op,typespec,ext) ;
-}
-/* end subroutine (mimetypes_get) */
+} /* end subroutine (mimetypes_get) */
 
 
 /* private subroutines */
@@ -386,12 +375,11 @@ local int exttypespec(cchar *tbuf,int tlen,cchar **rpp) noex {
 	    spec = intconv(cp - sp) ;
 	} /* end if */
 	return spec ;
-}
-/* end subroutine (exttypespec) */
+} /* end subroutine (exttypespec) */
 
 local int mkterms() noex {
     	return fieldterms(terms,false," \t#") ;
-}
+} /* end subroutine */
 
 vars::operator int () noex {
     	int		rs ;
@@ -400,7 +388,6 @@ vars::operator int () noex {
 	    rs = mkterms() ;
 	}
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
