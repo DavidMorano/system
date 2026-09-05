@@ -104,7 +104,7 @@ template<typename ... Args>
 local inline int mailmsgattent_magic(mailmsgattent *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == MAILMSGATTENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAILMSGATTENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (mailmsgattent_magic) */
@@ -161,7 +161,7 @@ int mailmsgattent_start(MME *op,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
 	        } /* end if (memory-allocation) */
 	    }
 	    if (rs >= 0) {
-	        op->magic = MAILMSGATTENT_MAGIC ;
+	        op->magval = MAILMSGATTENT_MAGIC ;
 	    }
 	    if (rs < 0) {
 	        mailmsgattent_finish(op) ;
@@ -208,7 +208,7 @@ int mailmsgattent_finish(MME *op) noex {
 	        rs1 = freeit(&op->auxfname) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (mailmsgattent_finish) */
