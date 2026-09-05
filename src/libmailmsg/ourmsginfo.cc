@@ -38,14 +38,14 @@
 *****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
-#include	<dater.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ourmsginfo.h"
 
@@ -86,8 +86,7 @@ int ourmsginfo_start(ourmsginfo *op,dater *dp) noex {
 	    rs = dater_startcopy(&op->edate,dp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ourmsginfo_start) */
+} /* end subroutine (ourmsginfo_start) */
 
 int ourmsginfo_finish(ourmsginfo *op) noex {
 	int		rs = SR_FAULT ;
@@ -106,8 +105,7 @@ int ourmsginfo_finish(ourmsginfo *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ourmsginfo_finish) */
+} /* end subroutine (ourmsginfo_finish) */
 
 int ourmsginfo_addhead(ourmsginfo *op,int w,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -130,8 +128,7 @@ int ourmsginfo_addhead(ourmsginfo *op,int w,cc *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ourmsginfo_addhead) */
+} /* end subroutine (ourmsginfo_addhead) */
 
 int ourmsginfo_gethead(ourmsginfo *op,int w,int i,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -143,7 +140,6 @@ int ourmsginfo_gethead(ourmsginfo *op,int w,int i,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (ourmsginfo_gethead) */
+} /* end subroutine (ourmsginfo_gethead) */
 
 
