@@ -224,11 +224,11 @@ vars::operator int () noex {
 
 int comsatmsg::rd(char *rdbuf,int rdlen) noex {
 	return comsatmsg_rd(this,rdbuf,rdlen) ;
-}
+} /* end */
 
 int comsatmsg::wr(cchar *sp,int sl) noex {
 	return comsatmsg_wr(this,sp,sl) ;
-}
+} /* end */
 
 void comsatmsg::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
