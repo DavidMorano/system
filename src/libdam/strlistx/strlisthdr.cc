@@ -120,7 +120,7 @@ int strlisthdr_rd(strlisthdr *ep,char *hbuf,int hlen) noex {
 	            *bp = STRLISTHDR_VERSION ;
 	            bp += 4 ;
 	            bl -= 4 ;
-	            if (bl >= hdrsz) {
+	            if (bl >= hdrsz) ylikely {
 	                uint	*header = uintp(bp) ;
 	                header[hi_fsize] = ep->fsize ;
 	                header[hi_wtime] = ep->wtime ;
@@ -153,12 +153,12 @@ int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
 	if (ep && hbuf) ylikely {
             int         bl = hlen ;
             cchar       *bp = hbuf ;
-            if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) {
+            if ((bl > magicsz) && hasValidMagic(bp,magicsz,magicstr)) ylikely {
                 rs = SR_OK ;
                 bp += magicsz ;
                 bl -= magicsz ;
                 /* read out the VETU information */
-                if (bl >= 4) {
+                if (bl >= 4) ylikely {
                     memcpy(ep->vetu,bp,4) ;
                     if (ep->vetu[0] != STRLISTHDR_VERSION) {
                         rs = SR_PROTONOSUPPORT ;
@@ -171,8 +171,8 @@ int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
                 } else {
                     rs = SR_ILSEQ ;
                 }
-	        if ((rs >= 0) && (bl > 0)) {
-	            if (bl >= hdrsz) {
+	        if ((rs >= 0) && (bl > 0)) ylikely {
+	            if (bl >= hdrsz) ylikely {
 	                uint	*header = uintp(bp) ;
 	                ep->fsize = header[hi_fsize] ;
 	                ep->wtime = header[hi_wtime] ;
