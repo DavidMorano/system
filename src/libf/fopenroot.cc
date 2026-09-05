@@ -70,8 +70,8 @@
 
 #include	"libf.h"
 
-import libfsup ;
-import libfmisc ;			/* |mknpath(3u)| */
+import modutil ;
+import modmisc ;			/* |mknpath(3u)| */
 import modsys ;				/* |sysconf(3mod)| */
 
 /* local defines */
@@ -97,8 +97,6 @@ import modsys ;				/* |sysconf(3mod)| */
 
 /* local variables */
 
-cint		maxpathlen = msconf.maxpathlen ;
-
 
 /* exported variables */
 
@@ -116,7 +114,7 @@ FILE *fopenroot(cchar *pr,cchar *fn,char *outname,cchar *mstr) noex {
 	    rs = SR_INVALID ;
 	    outname[0] = '\0' ;
 	    if (fn[0] && mstr[0]) ylikely {
-		if ((rs = maxpathlen) >= 0) ylikely {
+		if ((rs = msconf.maxpathlen) >= 0) ylikely {
 		    cint plen = rs ;
 		    rs = SR_NOMEM ;
 		    if (char *pbuf = new(nt) char [plen + 1] ; pbuf) ylikely {
