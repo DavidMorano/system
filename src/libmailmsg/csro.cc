@@ -39,21 +39,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<netdb.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<hdb.h>
-#include	<vecstr.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"csro.h"
 
@@ -88,7 +88,7 @@ local int csro_ctor(csro *op,Args ... args) noex {
 	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	    op->elp = nullptr ;
 	    rs = SR_NOMEM ;
 	    if ((op->nlp = new(nothrow) vecstr) != np) ylikely {
@@ -102,8 +102,7 @@ local int csro_ctor(csro *op,Args ... args) noex {
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (csro_ctor) */
+} /* end subroutine (csro_ctor) */
 
 local int csro_dtor(csro *op) noex {
 	int		rs = SR_FAULT ;
@@ -119,18 +118,16 @@ local int csro_dtor(csro *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (csro_dtor) */
+} /* end subroutine (csro_dtor) */
 
 template<typename ... Args>
 local inline int csro_magic(csro *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == CSRO_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == CSRO_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (csro_magic) */
+} /* end subroutine (csro_magic) */
 
 local int	value_start(VALUE *,cchar *,cchar *,off_t) noex ;
 local int	value_finish(VALUE *) noex ;
@@ -138,7 +135,7 @@ local int	value_finish(VALUE *) noex ;
 extern "C" {
     local int	vcmpname(cvoid **,cvoid **) noex ;
     local int	vcmpentry(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -158,7 +155,7 @@ int csro_start(csro *op,int n) noex {
 	    if ((rs = vecstr_start(op->nlp,n,vo)) >= 0) ylikely {
 		vo = 0 ;
 	    	if ((rs = vecobj_start(op->elp,sz,n,vo)) >= 0) ylikely {
-	            op->magic = CSRO_MAGIC ;
+	            op->magval = CSRO_MAGIC ;
 	        } /* end if (vecobj_start) */
 	        if (rs < 0) {
 	           vecstr_finish(op->nlp) ;
@@ -169,8 +166,7 @@ int csro_start(csro *op,int n) noex {
 	    }
 	} /* end if (csro_ctor) */
 	return rs ;
-}
-/* end subroutine (csro_start) */
+} /* end subroutine (csro_start) */
 
 int csro_finish(csro *op) noex {
 	int		rs ;
@@ -197,11 +193,10 @@ int csro_finish(csro *op) noex {
 	        rs1 = csro_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csro_finish) */
+} /* end subroutine (csro_finish) */
 
 int csro_add(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 	cnullptr	np{} ;
@@ -234,8 +229,7 @@ int csro_add(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 	    } /* end if (value) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csro_add) */
+} /* end subroutine (csro_add) */
 
 /* do we already have an entry like this? */
 int csro_already(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
@@ -257,8 +251,7 @@ int csro_already(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 	    } /* end if (value) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (csro_already) */
+} /* end subroutine (csro_already) */
 
 /* return the number of hosts seen so far */
 int csro_countnames(csro *op) noex {
@@ -267,8 +260,7 @@ int csro_countnames(csro *op) noex {
 	    rs = vecstr_count(op->nlp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csro_countnames) */
+} /* end subroutine (csro_countnames) */
 
 /* return the count of the number of items in this list */
 int csro_count(csro *op) noex {
@@ -277,8 +269,7 @@ int csro_count(csro *op) noex {
 	    rs = vecobj_count(op->elp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csro_count) */
+} /* end subroutine (csro_count) */
 
 /* sort the strings in the vector list */
 int csro_sort(csro *op) noex {
@@ -287,8 +278,7 @@ int csro_sort(csro *op) noex {
 	    rs = vecobj_sort(op->elp,vcmpname) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csro_sort) */
+} /* end subroutine (csro_sort) */
 
 int csro_ncurbegin(csro *op,csro_ncur *hcp) noex {
 	int		rs ;
@@ -296,8 +286,7 @@ int csro_ncurbegin(csro *op,csro_ncur *hcp) noex {
 	    *hcp = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csro_ncurbegin) */
+} /* end subroutine (csro_ncurbegin) */
 
 int csro_ncurend(csro *op,csro_ncur *hcp) noex {
 	int		rs ;
@@ -305,8 +294,7 @@ int csro_ncurend(csro *op,csro_ncur *hcp) noex {
 	    *hcp = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csro_ncurend) */
+} /* end subroutine (csro_ncurend) */
 
 int csro_vcurbegin(csro *op,csro_vcur *vcp) noex {
 	int		rs ;
@@ -314,8 +302,7 @@ int csro_vcurbegin(csro *op,csro_vcur *vcp) noex {
 	    *vcp = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csro_vcurbegin) */
+} /* end subroutine (csro_vcurbegin) */
 
 int csro_vcurend(csro *op,csro_vcur *vcp) noex {
 	int		rs ;
@@ -323,8 +310,7 @@ int csro_vcurend(csro *op,csro_vcur *vcp) noex {
 	    *vcp = -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* ens subroutine (csro_vcurend) */
+} /* ens subroutine (csro_vcurend) */
 
 int csro_getname(csro *op,csro_ncur *hcp,cchar **hnpp) noex {
 	int		rs ;
@@ -339,8 +325,7 @@ int csro_getname(csro *op,csro_ncur *hcp,cchar **hnpp) noex {
 	    *hcp = (rs >= 0) ? i : -1 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csro_getname) */
+} /* end subroutine (csro_getname) */
 
 /* fetch the next entry value that matches the given host name */
 int csro_getvalue(csro *op,cc *mailname,csro_vcur *vcp,csro_val **vepp) noex {
@@ -362,8 +347,7 @@ int csro_getvalue(csro *op,cc *mailname,csro_vcur *vcp,csro_val **vepp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (csro_getvalue) */
+} /* end subroutine (csro_getvalue) */
 
 
 /* private subroutines */
@@ -388,8 +372,7 @@ local int value_start(VALUE *ep,cchar *mailname,cchar *fname,off_t moff) noex {
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (value_start) */
+} /* end subroutine (value_start) */
 
 local int value_finish(VALUE *ep) noex {
 	int		rs = SR_FAULT ;
@@ -404,8 +387,7 @@ local int value_finish(VALUE *ep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (value_finish) */
+} /* end subroutine (value_finish) */
 
 local int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	csro_val	**e1pp = (csro_val **) v1pp ;
@@ -431,8 +413,7 @@ local int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	    } 
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (vcmpname) */
+} /* end subroutine (vcmpname) */
 
 local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 	csro_val	**e1pp = (csro_val **) v1pp ;
@@ -463,10 +444,9 @@ local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 	        } else {
 	            rc = 1 ;
 	        }
-	    }
+	    } /* end if */
 	} /* end block */
 	return rc ;
-}
-/* end subroutine (vcmpentry) */
+} /* end subroutine (vcmpentry) */
 
 
