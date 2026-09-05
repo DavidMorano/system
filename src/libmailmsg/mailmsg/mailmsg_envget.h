@@ -20,12 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<mailmsg.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mailmsg.h>		/* LIBMAILMSG */
 
 
 #define	MAILMSG_ENVDAT		struct mailmsg_envdata
@@ -35,13 +32,13 @@
 struct mailmsg_envstring {
 	cchar		*ep ;
 	int		el ;
-} ;
+} ; /* end struct */
 
 struct mailmsg_envdata {
 	MAILMSG_ENVSTR	a ;		/* address */
 	MAILMSG_ENVSTR	d ;		/* ?? */
 	MAILMSG_ENVSTR	r ;		/* route-address */
-} ;
+} ; /* end struct */
 
 typedef MAILMSG_ENVSTR		mailmsg_envstr ;
 typedef MAILMSG_ENVDAT		mailmsg_envdat ;
