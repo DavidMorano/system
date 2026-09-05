@@ -165,7 +165,7 @@ template<typename ... Args>
 local int mailmsgfile_magic(mailmsgfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MAILMSGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == MAILMSGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (mailmsgfile_magic) */
@@ -260,7 +260,7 @@ int mailmsgfile_finish(MMF *op) noex {
 		rs1 = mailmsgfile_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -338,7 +338,7 @@ local int mailmsgfile_starter(MMF *op,cc *tmpdname) noex {
 	    if ((rs = hdb_start(op->flp,ne,true,np,np)) >= 0) ylikely {
 		op->fl.files = true ;
 		if ((rs = mailmsgfile_checkbegin(op)) >= 0) ylikely {
-		    op->magic = MAILMSGFILE_MAGIC ;
+		    op->magval = MAILMSGFILE_MAGIC ;
 		}
 	    }
 	    if (rs < 0) {
