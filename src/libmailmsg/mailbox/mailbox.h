@@ -71,7 +71,7 @@ struct mailbox_head {
 	time_t		ti_mod ;	/* modification time */
 	time_t		ti_check ;	/* check time */
 	MAILBOX_FL	fl ;
-	uint		magic ;
+	uint		magval ;
 	int		pagesize ;
 	int		mfd ;		/* mail file-descriptor */
 	int		mblen ;		/* mailbox file length */
@@ -190,21 +190,6 @@ extern int mailbox_msgreadln	(mailbox *,int,char *,int) noex ;
 #endif
 
 EXTERNC_end
-
-#ifdef	__cplusplus
-
-template<typename ... Args>
-inline int mailbox_magic(mailbox *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == MAILBOX_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (mailbox_magic) */
-
-extern const mailboxms 	mailboxm ;
-
-#endif /* __cplusplus */
 
 
 #endif /* MAILBOX_INCLUDE */
