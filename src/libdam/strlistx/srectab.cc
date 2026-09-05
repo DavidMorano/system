@@ -49,6 +49,8 @@
 
 /* local defines */
 
+#define	SRECTAB_DEFENTS		10
+
 
 /* imported namespaces */
 
@@ -75,6 +77,8 @@ using libuc::libmem ;			/* variable */
 
 /* local variables */
 
+cint		dents = SRECTAB_DEFENTS ;
+
 
 /* exported variables */
 
@@ -82,41 +86,50 @@ using libuc::libmem ;			/* variable */
 /* exported subroutines */
 
 int srectab_start(srectab *rtp,int n) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		sz ;
-	if (n < 10) n = 10 ;
-	rtp->i = 0 ;
-	rtp->n = n ;
-	sz = (n + 1) * szof(int) ;
-	if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
-	    rtp->rt = uintp(vp) ;
-	    rtp->rt[0] = 0 ;
-	    rtp->i = 1 ;
-	} /* end if (memory-acquire) */
+	if (n < dents) n = dents ;
+	if (rtp) ylikely {
+	    rtp->i = 0 ;
+	    rtp->n = n ;
+	    sz = (n + 1) * szof(int) ;
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
+	        rtp->rt = uintp(vp) ;
+	        rtp->rt[0] = 0 ;
+	        rtp->i = 1 ;
+	    } /* end if (memory-acquire) */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (srectab_start) */
 
 int srectab_finish(srectab *rtp) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (rtp->rt) {
-	    rs1 = lm_free(rtp->rt) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rtp->rt = nullptr ;
-	} /* end if (memory-release) */
+	if (rtp) ylikely {
+	    rs = SR_OK ;
+	    if (rtp->rt) {
+	        rs1 = lm_free(rtp->rt) ;
+	        if (rs >= 0) rs = rs1 ;
+	        rtp->rt = nullptr ;
+	    } /* end if (memory-release) */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (srectab_finish) */
 
 int srectab_add(srectab *rtp,uint ki) noex {
-	int		rs = SR_OK ;
-	int		i = rtp->i ;
-	if ((i + 1) > rtp->n) {
-	    rs = srectab_extend(rtp) ;
-	}
-	if (rs >= 0) {
-	    rtp->rt[i] = ki ;
-	    rtp->i += 1 ;
-	} /* end if (ok) */
+	int		rs = SR_FAULT ;
+	int		i = 0 ; /* return-value */
+	if (rtp) ylikely {
+	    i = rtp->i ; 
+	    rs = SR_OK ;
+	    if ((i + 1) > rtp->n) {
+	        rs = srectab_extend(rtp) ;
+	    }
+	    if (rs >= 0) ylikely {
+	        rtp->rt[i] = ki ;
+	        rtp->i += 1 ;
+	    } /* end if (ok) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (srectab_add) */
 
@@ -134,18 +147,35 @@ int srectab_extend(srectab *rtp) noex {
 } /* end subroutine (srectab_extend) */
 
 int srectab_done(srectab *rtp) noex {
-	int		i = rtp->i ;
-	rtp->rt[i] = UINT_MAX ;
-	return i ;
+    	int		rs = SR_FAULT ;
+	int		i = 0 ; /* return-value */
+	if (rtp) ylikely {
+	    rs = SR_OK ;
+	    i = rtp->i ;
+	    rtp->rt[i] = UINT_MAX ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
 } /* end subroutine (srectab_done) */
 
 int srectab_count(srectab *rtp) noex {
-	return rtp->i ;
+    	int		rs = SR_FAULT ;
+	int		i = 0 ; /* return-value */
+	if (rtp) ylikely {
+	    rs = SR_OK ;
+	    i = rtp->i ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
 } /* end subroutine (srectab_count) */
 
 int srectab_getvec(srectab *rtp,uint **rpp) noex {
-	*rpp = rtp->rt ;
-	return rtp->i ;
+    	int		rs = SR_FAULT ;
+	int		i = 0 ; /* return-value */
+	if (rtp) ylikely {
+	    rs = SR_OK ;
+	    if (rpp) *rpp = rtp->rt ;
+	    i = rtp->i ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
 } /* end subroutine (srectab_getvec) */
 
 
