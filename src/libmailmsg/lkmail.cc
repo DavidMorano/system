@@ -27,23 +27,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* system types */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sbuf.h>
-#include	<sfx.h>
-#include	<mkpathx.h>
-#include	<mkfname.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIC® system types */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkfname.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"lkmail.h"
 
@@ -105,7 +105,7 @@ template<typename ... Args>
 local inline int lkmail_magic(lkmail *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == LKMAIL_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == LKMAIL_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (lkmail_magic) */
@@ -133,7 +133,7 @@ int lkmail_start(lkmail *op,lkmail_ids *idp,cchar *mfname) noex {
 	        op->id = *idp ;
 	        if (op->id.gid_maildir <= 0) {
 		    if ((rs = lkmail_starter(op)) >= 0) {
-	        	op->magic = LKMAIL_MAGIC ;
+	        	op->magval = LKMAIL_MAGIC ;
 		    }
 		} /* end if (maildir) */
 	    } /* end if (mkfnamesuf) */
@@ -142,8 +142,7 @@ int lkmail_start(lkmail *op,lkmail_ids *idp,cchar *mfname) noex {
 	    }
 	} /* end if (lkmail_ctor) */
 	return rs ;
-}
-/* end subroutine (lkmail_start) */
+} /* end subroutine (lkmail_start) */
 
 int lkmail_finish(lkmail *op) noex {
 	int		rs ;
@@ -158,11 +157,10 @@ int lkmail_finish(lkmail *op) noex {
 		rs1 = lkmail_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lkmail_finish) */
+} /* end subroutine (lkmail_finish) */
 
 int lkmail_create(lkmail *op) noex {
 	cint		nrs = SR_NOENT ;
@@ -224,8 +222,7 @@ int lkmail_create(lkmail *op) noex {
 	    } /* end if (u_stat) */
 	} /* end if (magic) */
 	return (rs >= 0) ? lfd : rs ;
-}
-/* end subroutine (lkmail_create) */
+} /* end subroutine (lkmail_create) */
 
 int lkmail_unlink(lkmail *op) noex {
 	int		rs ;
@@ -253,8 +250,7 @@ int lkmail_unlink(lkmail *op) noex {
 	    } /* end if (trying as superuser) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (lkmail_unlink) */
+} /* end subroutine (lkmail_unlink) */
 
 int lkmail_old(lkmail *op,time_t dt,int age) noex {
 	int		rs ;
@@ -266,8 +262,7 @@ int lkmail_old(lkmail *op,time_t dt,int age) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (lkmail_old) */
+} /* end subroutine (lkmail_old) */
 
 
 /* private subrouties */
@@ -290,7 +285,6 @@ local int lkmail_starter(lkmail *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (lkmail_starter) */
+} /* end subroutine (lkmail_starter) */
 
 
