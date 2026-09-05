@@ -13,36 +13,36 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types - |off_t| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<hdb.h>
-#include	<vecstr.h>
-#include	<vecobj.h>
+#include	<sys/types.h>		/* POSIX® system types - |off_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
 
 
-#define	CSRO_MAGIC	0x99723317
-#define	CSRO_DEFENTS	10
 #define	CSRO		struct csro_head
 #define	CSRO_VAL	struct csro_value
 #define	CSRO_NCUR	int
 #define	CSRO_VCUR	int
+#define	CSRO_MAGIC	0x99723317
+#define	CSRO_DEFENTS	10
 
 
 struct csro_head {
 	vecstr		*nlp ;			/* name-list-pointer */
 	vecobj		*elp ;			/* entry-list-pointer */
-	uint		magic ;
-} ;
+	uint		magval ;
+} ; /* end struct */
 
 struct csro_value {
 	cchar		*mailname ;
 	cchar		*fname ;
 	off_t		moff ;
-} ;
+} ; /* end struct */
 
 typedef	CSRO		csro ;
 typedef	CSRO_VAL	csro_val ;
