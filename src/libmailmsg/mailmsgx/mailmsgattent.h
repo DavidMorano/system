@@ -13,17 +13,17 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<contypevals.h>		/* content-type values */
-#include	<mimetypes.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<contypevals.h>		/* LIBMAILMSG content-type values */
+#include	<mimetypes.h>		/* LIBUC */
 
 
-#define	MAILMSGATTENT_MAGIC	0x49827261
 #define	MAILMSGATTENT		struct mailmsgattent_head
+#define	MAILMSGATTENT_MAGIC	0x49827261
 
 
 struct mailmsgattent_head {
@@ -34,12 +34,12 @@ struct mailmsgattent_head {
 	cchar		*ext ;
 	cchar		*encoding ;	/* content-encoding */
 	cchar		*description ;
-	uint		magic ;
+	uint		magval ;
 	int		clen ;		/* content-length */
 	int		clines ;	/* content-lines */
 	int		cte ;		/* content-transfer-encoding */
 	int		f_plaintext ;
-} ;
+} ; /* end struct */
 
 typedef MAILMSGATTENT	mailmsgattent ;
 
