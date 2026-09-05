@@ -120,7 +120,7 @@ int ba_setones(ba *op) noex {
 	if (op) {
 	    int		asz = op->nwords * szof(BA_DIGIT) ;
 	    rs = SR_OK ;
-	    memnset(op->a,UCHAR_MAX,asz) ;
+	    memnset(op->a,esz,UCHAR_MAX,asz) ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ba_setones) */
