@@ -45,7 +45,7 @@ OBJ1= uctim.o
 OBJ2= uctimeout.o
 OBJ3= uctimer.o
 OBJ4= ucstrftime.o
-OBJ5=
+OBJ5= uctimx.o
 OBJ6=
 OBJ7=
 
@@ -161,6 +161,7 @@ uctim.o:		uctim.cc	uctim.h			$(INCS)
 uctimeconv.o:		uctimeconv.cc	uctimeconv.h		$(INCS)
 uctimeout.o:		uctimeout.cc	uctimeout.h		$(INCS)
 uctimer.o:		uctimer.cc	uctimer.h		$(INCS)
+uctimx.o:		uctimx.cc	uctimx.h		$(INCS)
 ucstrftime.o:		ucstrftime.cc	ucstrftime.h		$(INCS)
 
 
