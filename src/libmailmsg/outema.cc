@@ -26,19 +26,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ascii.h>
-#include	<estrings.h>
-#include	<buffer.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<localmisc.h>		/* |NTABCOLS| + |COLUMNS| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU |NTABCOLS| + |COLUMNS| */
 
 #include	"outema.h"
 
@@ -72,7 +72,7 @@ template<typename ... Args>
 local inline int outema_magic(outema *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == OUTEMA_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == OUTEMA_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (outema_magic) */
@@ -96,11 +96,10 @@ int outema_start(outema *op,filer *ofp,int maxlen) noex {
 	    op->maxlen = maxlen ;
 	    op->rlen = maxlen ;
 	    op->ofp = ofp ;
-	    op->magic = OUTEMA_MAGIC ;
+	    op->magval = OUTEMA_MAGIC ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (outema_start) */
+} /* end subroutine (outema_start) */
 
 int outema_finish(outema *op) noex {
 	int		rs ;
@@ -118,11 +117,10 @@ int outema_finish(outema *op) noex {
 	        wlen = op->wlen ;
 	        op->ofp = nullptr ;
 	    } /* end if (bugcheck) */
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (outema_finish) */
+} /* end subroutine (outema_finish) */
 
 int outema_ent(outema *op,EMA_ENT *ep) noex {
 	int		rs ;
@@ -179,8 +177,7 @@ int outema_ent(outema *op,EMA_ENT *ep) noex {
 	    } /* end if (buffer-ret) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (outema_ent) */
+} /* end subroutine (outema_ent) */
 
 int outema_item(outema *op,cchar *vp,int vl) noex {
 	int		rs ;
@@ -197,8 +194,7 @@ int outema_item(outema *op,cchar *vp,int vl) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (outema_item) */
+} /* end subroutine (outema_item) */
 
 int outema_value(outema *op,cchar *vp,int vl) noex {
 	int		rs ;
@@ -256,8 +252,7 @@ int outema_value(outema *op,cchar *vp,int vl) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (outema_value) */
+} /* end subroutine (outema_value) */
 
 int outema_write(outema *op,cchar *v,int vlen) noex {
 	int		rs ;
@@ -273,8 +268,7 @@ int outema_write(outema *op,cchar *v,int vlen) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (outema_write) */
+} /* end subroutine (outema_write) */
 
 #ifdef	COMMENT
 
@@ -302,8 +296,7 @@ int outema_printf(outema *op,cchar *fmt,...) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (outema_printf) */
+} /* end subroutine (outema_printf) */
 
 #endif /* COMMENT */
 
@@ -343,8 +336,7 @@ int outema_hdrkey(outema *op,cchar *kname) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (outema_hdrkey) */
+} /* end subroutine (outema_hdrkey) */
 
 int outema_needlength(outema *op,int cl) noex {
 	int		rs ;
@@ -358,8 +350,7 @@ int outema_needlength(outema *op,int cl) noex {
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? nlen : rs ;
-}
-/* end subroutine (outema_needlength) */
+} /* end subroutine (outema_needlength) */
 
 
 /* private subroutines */
@@ -382,7 +373,6 @@ local int filer_outpart(filer *fbp,int f_comma,cchar *cp,int cl) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (filer_outpart) */
+} /* end subroutine (filer_outpart) */
 
 
