@@ -32,6 +32,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
 #include	<vecstr.h>		/* LIBUC */
 #include	<stdorder.h>		/* LIBUC */
 #include	<serialbuf.h>		/* LIBUC */
@@ -67,13 +68,13 @@
 int mcmsg_req::rd(char *abuf,int alen) noex {
     	cint	frd = true ;
     	return mcmsg_request(this,frd,abuf,alen) ;
-}
+} /* end method */
 
 int mcmsg_req::wr(cchar *abuf,int alen) noex {
     	char	*wbuf = cast_const<charp>(abuf) ;
     	cint	frd = false ;
     	return mcmsg_request(this,frd,wbuf,alen) ;
-}
+} /* end method */
 
 int mcmsg_request(mcmsg_req *sp,int f,char *abuf,int alen) noex {
 	int		rs ;
@@ -112,13 +113,13 @@ int mcmsg_request(mcmsg_req *sp,int f,char *abuf,int alen) noex {
 int mcmsg_rep::rd(char *abuf,int alen) noex {
     	cint	frd = true ;
     	return mcmsg_report(this,frd,abuf,alen) ;
-}
+} /* end method */
 
 int mcmsg_rep::wr(cchar *abuf,int alen) noex {
     	char	*wbuf = cast_const<charp>(abuf) ;
     	cint	frd = false ;
     	return mcmsg_report(this,frd,wbuf,alen) ;
-}
+} /* end method */
 
 int mcmsg_report(mcmsg_rep *sp,int f,char *abuf,int alen) noex {
 	int		rs ;
@@ -167,13 +168,13 @@ int mcmsg_report(mcmsg_rep *sp,int f,char *abuf,int alen) noex {
 int mcmsg_ack::rd(char *abuf,int alen) noex {
     	cint	frd = true ;
     	return mcmsg_acknowledge(this,frd,abuf,alen) ;
-}
+} /* end method */
 
 int mcmsg_ack::wr(cchar *abuf,int alen) noex {
     	char	*wbuf = cast_const<charp>(abuf) ;
     	cint	frd = false ;
     	return mcmsg_acknowledge(this,frd,wbuf,alen) ;
-}
+} /* end method */
 
 int mcmsg_acknowledge(mcmsg_ack *sp,int f,char *abuf,int alen) noex {
 	int		rs ;
@@ -214,7 +215,7 @@ local int mcmsg_reqstart(mcmsg_req *op) noex {
 	    rs = SR_OK ;
 	}
     	return rs ;
-}
+} /* end subroutine */
 
 local int mcmsg_reqfinish(mcmsg_req *op) noex {
     	int		rs = SR_FAULT ;
@@ -222,7 +223,7 @@ local int mcmsg_reqfinish(mcmsg_req *op) noex {
 	    rs = SR_OK ;
 	}
     	return rs ;
-}
+} /* end subroutine */
 
 local int mcmsg_repstart(mcmsg_rep *op) noex {
     	int		rs = SR_FAULT ;
@@ -230,7 +231,7 @@ local int mcmsg_repstart(mcmsg_rep *op) noex {
 	    rs = SR_OK ;
 	}
     	return rs ;
-}
+} /* end subroutine */
 
 local int mcmsg_repfinish(mcmsg_rep *op) noex {
     	int		rs = SR_FAULT ;
@@ -238,7 +239,7 @@ local int mcmsg_repfinish(mcmsg_rep *op) noex {
 	    rs = SR_OK ;
 	}
     	return rs ;
-}
+} /* end subroutine */
 
 local int mcmsg_ackstart(mcmsg_ack *op) noex {
     	int		rs = SR_FAULT ;
@@ -246,7 +247,7 @@ local int mcmsg_ackstart(mcmsg_ack *op) noex {
 	    rs = SR_OK ;
 	}
     	return rs ;
-}
+} /* end subroutine */
 
 local int mcmsg_ackfinish(mcmsg_ack *op) noex {
     	int		rs = SR_FAULT ;
@@ -254,25 +255,25 @@ local int mcmsg_ackfinish(mcmsg_ack *op) noex {
 	    rs = SR_OK ;
 	}
     	return rs ;
-}
+} /* end subroutine */
 
 void mcmsg_req::dtor() noex {
     	if (cint rs = finish ; rs < 0) {
 	    ulogerror("mcmsg_req",rs,"dtor-finish") ;
 	}
-}
+} /* end method */
 
 void mcmsg_rep::dtor() noex {
     	if (cint rs = finish ; rs < 0) {
 	    ulogerror("mcmsg_rep",rs,"dtor-finish") ;
 	}
-}
+} /* end method */
 
 void mcmsg_ack::dtor() noex {
     	if (cint rs = finish ; rs < 0) {
 	    ulogerror("mcmsg_ack",rs,"dtor-finish") ;
 	}
-}
+} /* end method */
 
 int mcmsg_coreq(mcmsg_req *op,int w) noex {
     	int		rs = SR_BUGCHECK ;
@@ -287,7 +288,7 @@ int mcmsg_coreq(mcmsg_req *op,int w) noex {
 	    }
 	}
 	return rs ;
-}
+} /* end method */
 
 int mcmsg_corep(mcmsg_rep *op,int w) noex {
     	int		rs = SR_BUGCHECK ;
@@ -302,7 +303,7 @@ int mcmsg_corep(mcmsg_rep *op,int w) noex {
 	    }
 	}
 	return rs ;
-}
+} /* end subroutine */
 
 int mcmsg_coack(mcmsg_ack *op,int w) noex {
     	int		rs = SR_BUGCHECK ;
@@ -317,6 +318,6 @@ int mcmsg_coack(mcmsg_ack *op,int w) noex {
 	    }
 	}
 	return rs ;
-}
+} /* end subroutine */
 
 
