@@ -50,50 +50,50 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstrings>		/* |strncasecmp(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<bit>			/* |rotl(3c++)| + |rotr(3c++)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sysval.hh>
-#include	<bufsizevar.hh>
-#include	<endian.h>
-#include	<ids.h>
-#include	<vecobj.h>
-#include	<linebuffer.h>
-#include	<bfile.h>
-#include	<field.h>
-#include	<fieldterminit.hh>
-#include	<kvsfile.h>
-#include	<strtab.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<snx.h>
-#include	<sncpyx.h>
-#include	<strwcpy.h>
-#include	<mkx.h>			/* |mkmagic(3uc)| */
-#include	<nextpowtwo.h>
-#include	<hash.h>
-#include	<hashindex.h>
-#include	<randlc.h>
-#include	<matxstr.h>
-#include	<mailvalues.hh>		/* |mailaliaslen| */
-#include	<char.h>
-#include	<isnot.h>
-#include	<iserror.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstrings>		/* CSTD |strncasecmp(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<bit>			/* C++STD |rotl(3c++)| + |rotr(3c++)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<endian.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<linebuffer.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<fieldterminit.hh>	/* LIBUC */
+#include	<kvsfile.h>		/* LIBUC */
+#include	<strtab.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snx.h>			/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<mkx.h>			/* LIBUC |mkmagic(3uc)| */
+#include	<nextpowtwo.h>		/* LIBUC */
+#include	<hash.h>		/* LIBUC */
+#include	<hashindex.h>		/* LIBUC */
+#include	<randlc.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<iserror.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC */
+#include	<mailvalues.hh>		/* LIBU |mailaliaslen| */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"dbmake.hh"
 #include	"mailaliashdr.h"
@@ -132,7 +132,7 @@ namespace {
 	int		mailaliaslen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
-}
+} /* end namespace */
 
 
 /* forward references */
@@ -191,8 +191,7 @@ int dbmake::wrfileproc(cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c_rec : rs ;
-}
-/* end subroutine (dbmake::wrfileproc) */
+} /* end subroutine (dbmake::wrfileproc) */
 
 /* write out the cache file */
 int dbmake::wrfile(time_t dt) noex {
@@ -216,8 +215,7 @@ int dbmake::wrfile(time_t dt) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (dbmake::wrfile) */
+} /* end subroutine (dbmake::wrfile) */
 
 /* OK, we are ready to start writing stuff out! */
 int dbmake::wrfiler(time_t dt) noex {
@@ -291,8 +289,7 @@ int dbmake::wrfiler(time_t dt) noex {
 	    } /* end if (ok) */
 	} /* end if (write of id-section) */
 	return rs ;
-}
-/* end subroutine (dbmake::wrfiler) */
+} /* end subroutine (dbmake::wrfiler) */
 
 int dbmake::wrfileline(cchar *lbuf,int llen) noex {
     	static cint	rsv = var ;
@@ -370,8 +367,7 @@ int dbmake::wrfileline(cchar *lbuf,int llen) noex {
 	    count = c_rec ;
 	} /* end if (vars) */
 	return (rs >= 0) ? c_rec : rs ;
-}
-/* end method (dbmake::wrfileline) */
+} /* end method (dbmake::wrfileline) */
 
 /* write the key-table */
 int dbmake::wrfilekeytab() noex {
@@ -387,8 +383,7 @@ int dbmake::wrfilekeytab() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end method (dbmake::wrfilekeytab) */
+} /* end method (dbmake::wrfilekeytab) */
 
 /* write the record table */
 int dbmake::wrfilerec() noex {
@@ -417,8 +412,7 @@ int dbmake::wrfilerec() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (record table) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end method (dbmake::wrfilerec) */
+} /* end method (dbmake::wrfilerec) */
 
 /* make the index table and the key-string table */
 int dbmake::wrfilekeys() noex {
@@ -445,8 +439,7 @@ int dbmake::wrfilekeys() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory allocation) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end method (dbmake::wrfilekeys) */
+} /* end method (dbmake::wrfilekeys) */
 
 /* make the value-string table */
 int dbmake::wrfilevals() noex {
@@ -462,8 +455,7 @@ int dbmake::wrfilevals() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (value string-table) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end method (dbmake::wrfilevals) */
+} /* end method (dbmake::wrfilevals) */
 
 /* make the (only) index for this file */
 int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
@@ -530,13 +522,14 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	    } /* end if (vecobj_count) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end method (dbmake::mkind) */
+} /* end method (dbmake::mkind) */
 
 vars::operator int () noex {
-    	mailaliaslen = mailvalue.mailaliaslen ;
+    	int		rs ;
+    	if ((rs = mailaliaslen = mailvalue.mailaliaslen) >= 0) {
+    	    mailaliaslen = rs ;
+	} /* end if */
 	return SR_OK ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 
