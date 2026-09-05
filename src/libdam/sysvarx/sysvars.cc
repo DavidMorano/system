@@ -204,7 +204,7 @@ using libuc::libmem ;			/* variable */
 extern "C" {
     extern int	sysvars_procget(hdbstr *,cchar *) noex ;
     extern int	sysvars_procset(hdbstr *,cchar *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
