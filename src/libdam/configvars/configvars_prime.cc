@@ -40,8 +40,10 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"configvarsobj.hh"
+#include	"configvars_util.hh"
+#include	"configvars.h"
 
+import configvars_util ;
 
 /* local defines */
 
@@ -85,27 +87,27 @@ local inline int configvars_ctor(configvars *op,Args ... args) noex {
 			        if (rs < 0) {
 				    delete op->expp ;
 				    op->expp = np ;
-			        }
+			        } /* end if (error) */
 	                    } /* end if (new-exp) */
 			    if (rs < 0) {
 				delete op->setp ;
 				op->setp = np ;
-			    }
+			    } /* end if (error) */
 	                } /* end if (new-set) */
 		        if (rs < 0) {
 			    delete op->defp ;
 			    op->defp = np ;
-		        }
+		        } /* end if (error) */
 	            } /* end if (new-def) */
 		    if (rs < 0) {
 			delete op->varp ;
 			op->varp = np ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (new-var) */
 		if (rs < 0) {
 		    delete op->fesp ;
 		    op->fesp = np ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-fes) */
 	} /* end if (non-null) */
 	return rs ;
@@ -206,7 +208,7 @@ int configvars_open(configvars *cvp,cchar *cfn,vecobj *eep) noex {
 				    }
 				    if (rs < 0) {
 				        vecobj_finish(cvp->unvp) ;
-				    }
+				    } /* end if (error) */
 				} /* end if (unv) */
 				if (rs < 0) {
 			            vecobj_finish(cvp->expp) ;
