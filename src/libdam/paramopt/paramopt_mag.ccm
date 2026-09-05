@@ -1,0 +1,39 @@
+/* paramopt_mag MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* paramater option manipulations */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-09-01, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+
+#include	"paramopt.h"
+
+export module paramopt_mag ;
+
+export {
+    template<typename ... Args>
+    inline int paramopt_magic(paramopt *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == PARAMOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (paramopt_magic) */
+} /* end export */
+
+
