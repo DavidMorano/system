@@ -35,17 +35,18 @@ DEFS +=
 
 INCS += ema.h
 
-MODS += ema_asstr.o ema_entry.o ema_parts.o
+MODS += ema_asstr.o ema_entry.o ema_parts.o ema_mag.o
 
 LIBS +=
 
 
-DEPS_MAIN += ema_asstr.o ema_entry.o ema_parts.o
+DEPS_MAIN += ema_asstr.o ema_entry.o ema_parts.o ema_mag.o
+DEPS= ema_mag.o
 
 OBJ0= ema_prime.o ema_obj.o
 OBJ1= ema_parse.o ema_load.o
 OBJ2= ema_haveaddr.o ema_first.o
-OBJ3= $(DEPS_MAIN)
+OBJ3= $(MODS)
 
 OBJA= obj0.o obj1.o
 OBJB= obj2.o obj3.o
@@ -142,9 +143,9 @@ objb.o:			$(OBJB)
 ema_prime.o:		ema_prime.cc $(DEPS_MAIN)		$(INCS)
 ema_parse.o:		ema_parse.cc $(DEPS_MAIN)		$(INCS)
 ema_load.o:		ema_load.cc $(DEPS_MAIN)		$(INCS)
-ema_obj.o:		ema_obj.cc				$(INCS)
-ema_haveaddr.o:		ema_haveaddr.cc				$(INCS)
-ema_first.o:		ema_first.cc				$(INCS)
+ema_obj.o:		ema_obj.cc			$(DEPS)	$(INCS)
+ema_haveaddr.o:		ema_haveaddr.cc			$(DEPS)	$(INCS)
+ema_first.o:		ema_first.cc			$(DEPS)	$(INCS)
 
 # EMA_PARTS
 ema_parts.o:		ema_parts.ccm				$(INCS)
@@ -163,5 +164,13 @@ ema_asstr0.o:		ema_asstr.ccm				$(INCS)
 
 ema_asstr1.o:		ema_asstr1.cc ema_asstr0.o		$(INCS)
 	$(COMPILE.cc) $<
+
+ema_mag.o:		ema_mag0.o ema_mag1.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+ema_mag0.o:		ema_mag.ccm				$(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
+ema_mag1.o:		ema_mag1.cc ema_mag0.o			$(INCS)
 
 
