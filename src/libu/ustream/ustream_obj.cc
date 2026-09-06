@@ -36,6 +36,7 @@
 
 #include	"ustream.hh"
 
+import ustream_mag ;
 
 /* local defines */
 
