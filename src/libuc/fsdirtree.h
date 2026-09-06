@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<fsdir.h>
-#include	<fifostr.h>
-#include	<hdb.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<fsdir.h>		/* LIBUC */
+#include	<fifostr.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
 
 
 #define	FSDIRTREE		struct fsdirtree_head
@@ -149,13 +149,13 @@ struct fsdirtree : fsdirtree_head {
 	} ; /* end ctor */
 	fsdirtree(const fsdirtree &) = delete ;
 	fsdirtree &operator = (const fsdirtree &) = delete ;
-	int open(cchar *,int = 0) noex ;
-	int prune(cchar **) noex ;
-	int read(ustat *,char *,int) noex ;
-	void dtor() noex ;
+	int open	(cchar *,int = 0) noex ;
+	int prune	(cchar **) noex ;
+	int read	(ustat *,char *,int) noex ;
+	void dtor	() noex ;
 	destruct fsdirtree() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (fsdirtree) */
 #else	/* __cplusplus */
 typedef FSDIRTREE	fsdirtree ;
