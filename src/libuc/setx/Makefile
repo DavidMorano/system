@@ -35,23 +35,26 @@ DEFS +=
 
 INCS += setx.h
 
-MODS +=
+MODS += setostr_mag.o
 
 LIBS +=
 
 
-OBJ0= setint.o setoint.o
-OBJ1= setstr_prime.o setstr_ext.o
-OBJ2= setostr_prime.o setostr_ext.o
-OBJ3= sethand.o
+SETOSTR_DEPS=	setostr.h setostr_mag.o setstrx.hh
+SETOSTR_OBJ=	setostr_prime.o setostr_ext.o
 
-OBJ4= setstrx_loadfile.o
+OBJ0= setstr_prime.o setstr_ext.o
+OBJ1= setostr.o
+OBJ2= sethand.o
+OBJ3= setstrx_loadfile.o
+
+OBJ4= setint.o setoint.o
 OBJ5= 
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o obj1.o obj2.o 
-OBJB= obj3.o obj4.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o
 
 OBJ= obja.o objb.o
 
@@ -156,8 +159,12 @@ setstr_prime.o:		setstr_prime.cc		setstr.h	$(INCS)
 setstr_ext.o:		setstr_ext.cc		setstrx.hh	$(INCS)
 
 # set-ordered-strings
-setostr_rime.o:		setostr_prime.cc	setostr.h	$(INCS)
-setostr_ext.o:		setostr_ext.cc		setstrx.hh	$(INCS)
+setostr.o:		$(SETOSTR_OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+setostr_prime.o:	setostr_prime.cc	$(SETOSTR_DEPS)	$(INCS)
+setostr_ext.o:		setostr_ext.cc		$(SETOSTR_DEPS) $(INCS)
+setostr_mag.o:		setostr_mag.ccm		setostr.h	$(INCS)
 
 setint.o:		setint.cc setint.h			$(INCS)
 
