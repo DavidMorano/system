@@ -62,6 +62,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"{L
  
 import libutil ;			/* |memclear(3u)| */
+import strpack_mag ;
 
 /* local defines */
 
@@ -73,8 +74,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -93,6 +92,7 @@ typedef strpack_ch *	chunkp ;
 template<typename ... Args>
 local int strpack_ctor(strpack *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
@@ -101,7 +101,7 @@ local int strpack_ctor(strpack *op,Args ... args) noex {
 	    op->chsize = 0 ;
 	    op->totalsize = 0 ;
 	    op->c = 0 ;
-	    if ((op->clp = new(nothrow) vechand) != np) ylikely {
+	    if ((op->clp = new(nt) vechand) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vechand) */
 	} /* end if (non-null) */
