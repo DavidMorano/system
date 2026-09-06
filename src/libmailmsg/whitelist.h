@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
 
 
 #define	WHITELIST		struct whitelist_head
@@ -33,7 +33,7 @@
 
 struct whitelist_head {
 	vecstr		*wlp ;
-	uint		magic ;
+	uint		magval ;
 } ; /* end struct */
 
 struct whitelist_cursor {
