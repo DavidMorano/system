@@ -56,6 +56,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import strpack_mag ;
 
 /* local defines */
 
