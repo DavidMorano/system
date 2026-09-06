@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	CONFIGVARS_INCLUDE
-#define	CONFIGVARS_INCLUDE
+#ifndef	CONFIGVARSUTIL_INCLUDE
+#define	CONFIGVARSUTIL_INCLUDE
 #ifdef	__cplusplus
 
 
@@ -59,6 +59,6 @@
 
 
 #endif /* __cplusplus */
-#endif /* CONFIGVARS_INCLUDE */
+#endif /* CONFIGVARSUTIL_INCLUDE */
 
 
