@@ -43,19 +43,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstrings>		/* |strcasecmp(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vechand.h>
-#include	<strn.h>		/* |strnrbrk(3uc)| */
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstrings>		/* C++STD |strcasecmp(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnrbrk(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"splitaddr.h"
 
@@ -186,8 +186,7 @@ int splitaddr_start(splitaddr *op,cchar *ap) noex {
 	    } /* end if (error handling) */
 	} /* end if (splitaddr_ctor) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (splitaddr_start) */
+} /* end subroutine (splitaddr_start) */
 
 int splitaddr_finish(splitaddr *op) noex {
 	int		rs = SR_OK ;
@@ -210,8 +209,7 @@ int splitaddr_finish(splitaddr *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (splitaddr_finish) */
+} /* end subroutine (splitaddr_finish) */
 
 int splitaddr_count(splitaddr *op) noex {
 	int		rs ;
@@ -219,8 +217,7 @@ int splitaddr_count(splitaddr *op) noex {
 	    rs = vechand_count(op->comp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (splitaddr_count) */
+} /* end subroutine (splitaddr_count) */
 
 int splitaddr_prematch(splitaddr *op,splitaddr *sap) noex {
     	int		rsn = SR_NOTFOUND ;
@@ -270,8 +267,7 @@ int splitaddr_prematch(splitaddr *op,splitaddr *sap) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (splitaddr_prematch) */
+} /* end subroutine (splitaddr_prematch) */
 
 int splitaddr_audit(splitaddr *op) noex {
 	int		rs ;
@@ -279,7 +275,6 @@ int splitaddr_audit(splitaddr *op) noex {
 	    rs = vechand_audit(op->comp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (splitaddr_audit) */
+} /* end subroutine (splitaddr_audit) */
 
 
