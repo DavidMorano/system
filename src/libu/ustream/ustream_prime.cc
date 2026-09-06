@@ -52,6 +52,7 @@
 
 import libutil ;			/* |memcopy(3u)| */
 import ulibvals ;			/* |ulibval(3u)| */
+import ustream_mag ;
 
 /* local defines */
 
