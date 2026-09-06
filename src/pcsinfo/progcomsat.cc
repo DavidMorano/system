@@ -425,7 +425,7 @@ vecstr		*nlp ;
 
 	        while (rs >= 0) {
 
-	            hl = kvsfile_enumkey(&info,&cur,hostbuf,hostlen) ;
+	            hl = kvsfile_curenumkey(&info,&cur,hostbuf,hostlen) ;
 	            if (hl == SR_NOTFOUND) break ;
 
 	            rs = hl ;
