@@ -1,0 +1,4 @@
+CONFIGVARS
+
+Need pointer implementation.
+
