@@ -56,12 +56,14 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD */
-#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<new>			/* C++STD placement-new */
 #include	<bitset>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<fsdir.h>		/* LIBUC */
 #include	<fifostr.h>		/* LIBUC */
@@ -99,7 +101,6 @@ import umisc ;				/* |mknpath1(3u)| */
 
 using std::bitset ;			/* type */
 using libu::sncpy ;			/* subroutine */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -108,12 +109,6 @@ typedef ino_t		ui ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_getcwd(char *,int) noex ;
-    extern int uc_readlink(cchar *,char *,int) noex ;
-    extern int uc_stat(cchar *,ustat *) noex ;
-} /* end extern (C) */
 
 
 /* external variables */
@@ -124,7 +119,7 @@ extern "C" {
 struct dirid {
 	ino_t		ino ;
 	dev_t		dev ;
-} ;
+} ; /* end struct (dirid) */
 
 namespace {
     struct vars {
@@ -147,24 +142,25 @@ template<typename ... Args>
 local int fsdirtree_ctor(fsdirtree *op,Args ... args) noex {
     	FSDIRTREE	*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->dqp = new(nothrow) fifostr) != np) ylikely {
-	        if ((op->dirp = new(nothrow) fsdir) != np) ylikely {
-	            if ((op->dip = new(nothrow) hdb) != np) ylikely {
+	    if ((op->dqp = new(nt) fifostr) != np) ylikely {
+	        if ((op->dirp = new(nt) fsdir) != np) ylikely {
+	            if ((op->dip = new(nt) hdb) != np) ylikely {
 			rs = SR_OK ;
 		    } /* end if (new-hdb) */
 		    if (rs < 0) {
 			delete op->dirp ;
 			op->dirp = nullptr ;
-		    }
+		    } /* end if (error) */
 		} /* end if (new-fsdir) */
 		if (rs < 0) {
 		    delete op->dqp ;
 		    op->dqp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-fifostr) */
 	} /* end if (non-null) */
 	return rs ;
@@ -282,7 +278,7 @@ int fsdirtree_open(fsdirtree *op,cchar *dname,int opts) noex {
 	    } /* end if (vars) */
 	    if (rs < 0) {
 		fsdirtree_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (fsdirtree_ctor) */
 	return rs ;
 } /* end subroutine (fsdirtree_open) */
@@ -293,7 +289,7 @@ local int fsdirtree_opener(fsdirtree *op,cchar *dname) noex {
         cchar		*bdp = dname ;
         if ((bdp == nullptr) || (strcmp(bdp,".") == 0)) {
 	    bdp = "" ;
-	}
+	} /* end if */
         if (bdp[0] != '/') {
             if ((rs = uc_getcwd(op->bnbuf,maxpath)) >= 0) {
                 op->bndlen = rs ;
@@ -301,13 +297,13 @@ local int fsdirtree_opener(fsdirtree *op,cchar *dname) noex {
                     op->bnbuf[op->bndlen++] = '/' ;
 		}
             }
-        }
+        } /* end if */
         if (rs >= 0) ylikely {
             if (bdp[0] != '\0') {
                 cint	cl = maxpath - op->bndlen ;
                 rs = sncpy((op->bnbuf + op->bndlen),cl,bdp) ;
                 op->bndlen += rs ;
-            }
+            } /* end if */
             if (rs >= 0) ylikely {
                 if ((rs = fsdir_open(op->dirp,op->bnbuf)) >= 0) {
                     op->fl.dir = true ;
@@ -564,7 +560,7 @@ local int fsdirtree_trackbegin(fsdirtree *op) noex {
                 } /* end if (stat) */
                 if (rs < 0) {
                     fsdirtree_dirend(op) ;
-                }
+                } /* end if (error) */
             } /* end if (dir-tracking) */
         } /* end if (uniq traversal requested) */
 	return rs ;
@@ -637,11 +633,11 @@ local int fsdirtree_diradd(fsdirtree *op,dev_t dev,ino_t ino) noex {
 	        rs = hdb_store(dbp,key,val) ;
 	        if (rs < 0) {
 	            dirid_finish(dip) ;
-		}
+		} /* end if (error) */
 	    } /* end if (dirid-start) */
 	    if (rs < 0) {
 	        lm_free(dip) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (fsdirtree_diradd) */
