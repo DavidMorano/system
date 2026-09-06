@@ -35,17 +35,17 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>		/* |va_list(3c)| */
-#include	<cstring>		/* |memset(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>		/* |COLUMNS| */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<cstring>		/* CSTD |memset(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
 
 module modutil ;
 
@@ -82,12 +82,12 @@ int memclearer(void *op,int sz) noex {
     	int	rs = SR_FAULT ;
     	if (op) ylikely {
 	    rs = SR_INVALID ;
-	    if (sz >= 0) {
+	    if (sz >= 0) ylikely {
 		rs = sz ;
 	        if (sz > 0) {
     	            csize osize = size_t(sz) ;
     	            memset(op,0,osize) ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
