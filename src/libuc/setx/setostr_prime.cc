@@ -43,6 +43,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import setostr_mag ;
 
 /* local defines */
 
