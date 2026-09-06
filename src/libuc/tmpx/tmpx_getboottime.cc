@@ -46,6 +46,7 @@
 
 #include	"tmpx.h"
 
+import tmpx_mag ;
 
 /* local defines */
 
@@ -80,7 +81,7 @@ int tmpx_getboottime(tmpx *op,time_t *rp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		n = 0 ; /* return-value */
-	if (op && rp) {
+	if (op && rp) ylikely {
 	    *rp = 0 ;
 	    if (tmpx_cur uc ; (rs = tmpx_curbegin(op,&uc)) >= 0) {
 	        tmpx_ent	ue ;
