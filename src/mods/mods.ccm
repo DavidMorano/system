@@ -30,6 +30,7 @@ module ;
 
 export module mods ;
 
+export import modcstring ;
 export import modutil ;
 export import modsncpy ;
 export import modsnwcpy ;
