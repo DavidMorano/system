@@ -1,0 +1,121 @@
+/* modutil-memncpy MODULE (primary-partition) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2020-10-13, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* C++STD |min(C++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module modutil:memncpy ;
+
+import modcstring ;
+
+export {
+    constexpr inline int memncpy(void *dp,int dl,cvoid *sp,int sl = -1) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ; /* return-value */
+	if (dp && sp) ylikely {
+	    rs = SR_INVALID ;
+	    if (dl >= 0) {
+		rs = SR_OK ;
+	        if (sl < 0) {
+	            cchar *cp = charp(sp) ;
+		    if consteval {
+	                sl = cstrlen(cp) ;
+		    } else {
+	                sl = intconv(strlen(cp)) ;
+		    } /* end if (consteval) */
+	        } /* end if (calculate source length) */
+	        if (sl > 0) ylikely {
+		    rs = SR_OVERFLOW ;
+		    if (sl <= dl) {
+			rs = SR_OK ;
+			if consteval {
+	                    cmemcpy(dp,sp,sl) ;
+	                    len = sl ;
+			} else {
+	                    csize srcsize = size_t(sl) ;
+	                    memcpy(dp,sp,srcsize) ;
+	                    len = sl ;
+			} /* end if (consteval) */
+		    } /* end if (ok) */
+	        } /* end block */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+    } /* end subroutine (memncpy) */
+} /* end export */
+
+export {
+    template<typename T>
+    constexpr inline void *memncpyz(T *dp,int dl,cvoid *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+    	int		len = 0 ; /* return-value */
+	if (dp && sp) ylikely {
+	    rs = SR_INVALID ;
+	    if (dl >= 0) {
+		rs = SR_OK ;
+	        if (sl < 0) {
+	            cchar *cp = ccharp(sp) ;
+		    if consteval {
+	                sl = cstrlen(cp) ;
+		    } else {
+	                sl = intconv(strlen(cp)) ;
+		    } /* end if (consteval) */
+	        } /* end if (calculate source length) */
+	        if (sl > 0) ylikely {
+		    rs = SR_OVERFLOW ;
+		    if (sl <= dl) {
+	                caddr_t	dst = caddr_t(dp) ;
+		        rs = SR_OK ;
+		        if consteval {
+	            	    cmemcpy(dst,sp,sl) ;
+	                    len = sl ;
+		        } else {
+	                    csize srcsize = size_t(sl) ;
+		            memcpy(dst,sp,srcsize) ;
+	                    len = sl ;
+		        } /* end if (consteval) */
+		        dst += sl ;
+		        if (sl < dl) {
+		            csize zsize = size_t(dl - sl) ;
+			    if consteval {
+		                cmemset(dst,0,int(zsize)) ;
+			    } else {
+		                memset(dst,0,zsize) ;
+			    } /* end if (consteval) */
+		        } /* end if (zero-fill) */
+	            } /* end if (no-overflow) */
+		} /* end if (non-zero positive) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+    } /* end subroutine (memncpyz) */
+} /* end export */
+
+
