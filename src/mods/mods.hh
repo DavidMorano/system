@@ -29,7 +29,7 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
 
-
+#include	<modcstring.hh>
 #include	<modmisc.hh>
 #include	<modsncpy.hh>
 #include	<modsnwcpy.hh>
