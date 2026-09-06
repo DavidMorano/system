@@ -59,6 +59,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |memcopy(3u)| */
+import filer_mag ;
 
 /* local defines */
 
