@@ -1,0 +1,53 @@
+/* filer_mag MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* support some buffered file operations */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2002-04-01, David A­D­ Morano
+	This code was originally written for Rightcore Network
+	Services (RNS).
+
+*/
+
+/* Copyright © 2002 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Object:
+	filer
+
+	Description:
+        This little object supports some buffered file operations for
+        low-overhead buffered I-O requirements.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+
+#include	"filer.h"
+
+export module filer_mag ;
+
+export {
+    template<typename ... Args>
+    inline int filer_magic(filer *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == FILER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (filer_magic) */
+} /* end export */
+
+
