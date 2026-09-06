@@ -103,7 +103,7 @@ local inline int fsdir_magic(fsdir *op,Args ... args) noex {
 		    rs = SR_OK ;
 		}
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (fsdir_magic) */
 
