@@ -42,8 +42,8 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"configvars_util.hh"
 #include	"configvars.h"
+#include	"configvars_util.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -85,7 +85,6 @@ using namespace		configvars_obj ;
 /* exported subroutines */
 
 namespace configvars_obj {
-
     int file_start(CV_FILE *cfp,cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	if (cfp && fn) ylikely {
@@ -120,7 +119,9 @@ namespace configvars_obj {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (file_start) */
+} /* end namespace (configvars_obj) */
 
+namespace configvars_obj {
     int file_finish(CV_FILE *cfp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -136,16 +137,18 @@ namespace configvars_obj {
 	} /* end if (memory-release) */
 	return rs ;
     } /* end subroutine (file_finish) */
+} /* end namespace (configvars_obj) */
 
+namespace configvars_obj {
     int file_finone(CV_FILE *cfp,int type) noex {
 	vecobj		*vip{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	switch (type) {
-	case 0: vip = &cfp->defines ; break ;
-	case 1: vip = &cfp->exports ; break ;
-	case 2: vip = &cfp->unsets ; break ;
-	default: rs = SR_BUGCHECK ; break ;
+	case 0:		vip = &cfp->defines ;	break ;
+	case 1:		vip = &cfp->exports ;	break ;
+	case 2:		vip = &cfp->unsets ;	break ;
+	default:	rs = SR_BUGCHECK ;	break ;
 	} /* end switch */
 	if ((rs >= 0) && vip) {
 	    void	*vp{} ;
@@ -163,7 +166,9 @@ namespace configvars_obj {
 	} /* end if (ok) */
 	return rs ;
     } /* end subroutine (file_finone) */
+} /* end namespace (configvars_obj) */
 
+namespace configvars_obj {
     int file_addvar(CV_FILE *cfp,int type,int fi,
 		cc *key,int klen,cc *value,int vlen) noex {
 	CV_VAR		ve{} ;
@@ -185,7 +190,6 @@ namespace configvars_obj {
 	} /* end if (var_start) */
 	return rs ;
     } /* end subroutine (file_addvar) */
-
 } /* end namespace (configvars_obj) */
 
 
