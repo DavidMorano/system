@@ -35,6 +35,7 @@ DEFS +=
 
 INCS += mods.hh
 
+MODS += modcstring.o
 MODS += modsncpy.o modstrw.o modsnwcpy.o modsys.o
 MODS += modutil.o modmisc.o
 
@@ -44,16 +45,16 @@ LIBS +=
 DEPS_MODS= $(MODS)
 
 OBJ0= mods0.o
-OBJ1= modsncpy.o modstrw.o
-OBJ2= modsnwcpy.o
-OBJ3= modsys.o
-OBJ4= modutil.o modmisc.o
-OBJ5=
+OBJ1= modcstring.o
+OBJ2= modsncpy.o modstrw.o
+OBJ3= modsnwcpy.o
+OBJ4= modsys.o
+OBJ5= modutil.o modmisc.o
 OBJ6=
 OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o
+OBJB= obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
@@ -146,10 +147,6 @@ obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obj8.o:			$(OBJ8)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -160,13 +157,14 @@ objc.o:			$(OBJC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obj.o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-
 mods0.o:		mods.ccm	$(DEPS_MODS)		$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
+
+# MODCSTRING
+modcstring.o:		modcstring.dir
+modcstring.dir:
+	makesubdir $@
 
 # MODSTRW
 modstrw.o:		modstrw.dir
@@ -189,12 +187,12 @@ modsys.dir:
 	makesubdir $@
 
 # MODUTIL
-modutil.o:		modutil.dir
+modutil.o:		modutil.dir modcstring.o
 modutil.dir:
 	makesubdir $@
 
 # MODMISC
-modmisc.o:		modmisc.dir
+modmisc.o:		modmisc.dir modutil.o
 modmisc.dir:
 	makesubdir $@
 
