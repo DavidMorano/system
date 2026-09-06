@@ -1,0 +1,76 @@
+/* modcstring MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2020-10-13, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module modcstring ;
+
+export {
+    consteval int cstrlen(cchar *sp) noex {
+    	int len = -1 ;
+	if (sp) ylikely {
+    	    len = 0 ;
+	    while (sp[len]) len += 1 ;
+	} /* end if (non-null) */
+	return len ;
+    } /* end subroutine (cstrlen) */
+} /* end export */
+
+export {
+    consteval voidp cmemcpy(voidp dp,cvoidp sp,int sl) noex {
+    	void *rp = nullptr ;
+	if (dp && sp) ylikely {
+	    if (sl >= 0) ylikely {
+		mut char *dst = cast_static<charp>(dp) ;
+		con char *src = cast_static<ccharp>(sp) ;
+		rp = dp ;
+	        while (sl-- > 0) {
+		    *dst++ = *src++ ;
+	        } /* end */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rp ;
+    } /* end subroutine (cmemcpy) */
+} /* end export */
+
+export {
+    consteval voidp cmemset(void *dp,int ch,int sl) noex {
+    	void *rp = nullptr ;
+	if (dp) ylikely {
+	    if (sl >= 0) ylikely {
+		mut char *dst = cast_static<charp>(dp) ;
+		rp = dp ;
+	        while (sl-- > 0) {
+		    *dst++ = char(ch) ;
+	        } /* end */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rp ;
+    } /* end subroutine (cmemset) */
+} /* end export */
+
+
