@@ -35,10 +35,12 @@ DEFS +=
 
 INCS += tmpx.h
 
-MODS +=
+MODS += tmpx_mag.o
 
 LIBS +=
 
+
+DEPS= $(MODS)
 
 OBJ0= tmpx_prime.o tmpx_obj.o
 OBJ1= tmpx_getboottime.o
@@ -46,12 +48,12 @@ OBJ2= tmpx_getrunlevel.o
 OBJ3= tmpx_getuserlines.o tmpx_getuserterms.o
 
 OBJ4= tmpx_getsessions.o
-OBJ5=
+OBJ5= $(MODS)
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o obj1.o
-OBJB= obj2.o obj3.o obj4.o
+OBJA= obj0.o obj1.o obj2.o obj3.o 
+OBJB= obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
@@ -151,11 +153,12 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-tmpx_prime.o:		tmpx_prime.cc		$(INCS)
-tmpx_getboottime.o:	tmpx_getboottime.cc	$(INCS)
-tmpx_getrunlevel.o:	tmpx_getrunlevel.cc	$(INCS)
-tmpx_getuserlines.o:	tmpx_getuserlines.cc	$(INCS)
-tmpx_getuserterms.o:	tmpx_getuserterms.cc	$(INCS)
-tmpx_getsessions.o:	tmpx_getsessions.cc	$(INCS)
+tmpx_prime.o:		tmpx_prime.cc			$(DEPS) $(INCS)
+tmpx_getboottime.o:	tmpx_getboottime.cc		$(DEPS) $(INCS)
+tmpx_getrunlevel.o:	tmpx_getrunlevel.cc		$(DEPS) $(INCS)
+tmpx_getuserlines.o:	tmpx_getuserlines.cc		$(DEPS) $(INCS)
+tmpx_getuserterms.o:	tmpx_getuserterms.cc		$(DEPS) $(INCS)
+tmpx_getsessions.o:	tmpx_getsessions.cc		$(DEPS) $(INCS)
+tmpx_mag.o:		tmpx_mag.ccm				$(INCS)
 
 
