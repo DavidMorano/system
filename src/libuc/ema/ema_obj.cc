@@ -37,13 +37,12 @@
 
 #include	"ema.h"
 
+import ema_mag ;
 
 /* local defines */
 
 
 /* imported namespaces */
-
-using namespace		ema_ns ;	/* |ema_starter()| */
 
 
 /* local typedefs */
