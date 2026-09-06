@@ -129,6 +129,7 @@
 
 import libutil ;			/* |lenstr(3u)| */
 import uconstants ;
+import filer_mag ;
 
 /* local defines */
 
