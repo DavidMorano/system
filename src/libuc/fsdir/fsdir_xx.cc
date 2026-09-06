@@ -66,8 +66,6 @@
 
 /* imported namespaces */
 
-using std::destroy_at ;			/* subroutine */
-
 
 /* local typedefs */
 
