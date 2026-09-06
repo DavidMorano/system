@@ -35,17 +35,20 @@ DEFS +=
 
 INCS += filer.h
 
-MODS +=
+MODS += filer_mag.o
 
 LIBS +=
 
 
+DEPS= $(MODS)
+
 OBJ0= filer_prime.o filer_obj.o
 OBJ1= filer_read.o
 OBJ2= filer_writers.o 
-OBJ3=
+OBJ3= $(MODS)
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB=
 
 OBJ= obja.o
 
@@ -136,9 +139,10 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-filer_prime.o:		filer_prime.cc		$(INCS)
-filer_read.o:		filer_read.cc		$(INCS)
-filer_writers.o:	filer_writers.cc	$(INCS)
-filer_obj.o:		filer_obj.cc		$(INCS)
+filer_prime.o:		filer_prime.cc			$(DEPS) $(INCS)
+filer_read.o:		filer_read.cc			$(DEPS) $(INCS)
+filer_writers.o:	filer_writers.cc		$(DEPS) $(INCS)
+filer_obj.o:		filer_obj.cc				$(INCS)
+filer_mag.o:		filer_mag.ccm				$(INCS)
 
 
