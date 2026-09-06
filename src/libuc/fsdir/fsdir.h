@@ -74,7 +74,7 @@ struct fsdir_opener {
 	void operator () (fsdir *p,cchar *n) noex {
 	    op = p ;
 	    name = n ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () (cchar * = nullptr) noex ;
 } ; /* end struct (fsdir_opener) */
@@ -84,11 +84,11 @@ struct fsdir_te {
 	void operator () (fsdir *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (off_t * = nullptr) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (fsdir_te) */
 struct fsdir_co {
 	fsdir		*op = nullptr ;
@@ -96,11 +96,11 @@ struct fsdir_co {
 	void operator () (fsdir *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (fsdir_co) */
 struct fsdir : fsdir_head {
 	FSDIR_ENT	ent ;
@@ -124,7 +124,7 @@ struct fsdir : fsdir_head {
 	void dtor() noex ;
 	destruct fsdir() {
 	    if (posixp || magval) dtor() ;
-	} ;
+	} ; /* end */
 	int isdir(cchar *) noex ;
 } ; /* end struct (fsdir) */
 #else	/* __cplusplus */
