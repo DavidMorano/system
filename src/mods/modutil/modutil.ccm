@@ -28,7 +28,7 @@ module ;
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 export module modutil ;
@@ -37,6 +37,7 @@ export import :lenstr ;
 export import :memclear ;
 export import :memload ;
 export import :memcopy ;
+export import :memncpy ;
 export import :memnset ;
 export import :resumelife ;
 
