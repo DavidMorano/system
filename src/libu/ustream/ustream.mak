@@ -35,17 +35,19 @@ DEFS +=
 
 INCS += ustream.hh
 
-MODS +=
+MODS += ustream_mag.o
 
 LIBS +=
 
 
+DEPS= $(MODS)
+
 OBJ0= ustream_prime.o ustream_printf.o
 OBJ1= ustream_writers.o 
 OBJ2= ustream_obj.o
-OBJ3=
+OBJ3= $(MODS)
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB=
 
 OBJ= $(OBJA)
@@ -141,9 +143,10 @@ obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ustream_prime.o:	ustream_prime.cc		$(INCS)
-ustream_printf.o:	ustream_printf.cc		$(INCS)
-ustream_writers.o:	ustream_writers.cc		$(INCS)
-ustream_obj.o:		ustream_obj.cc			$(INCS)
+ustream_prime.o:	ustream_prime.cc		$(DEPS) $(INCS)
+ustream_printf.o:	ustream_printf.cc		$(DEPS) $(INCS)
+ustream_writers.o:	ustream_writers.cc		$(DEPS) $(INCS)
+ustream_obj.o:		ustream_obj.cc			$(DEPS) $(INCS)
+ustream_mag.o:		ustream_mag.ccm				$(INCS)
 
 
