@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vechand.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vechand.h>		/* LIBUC */
 
 
 #define	SPLITADDR	struct splitaddr_head
