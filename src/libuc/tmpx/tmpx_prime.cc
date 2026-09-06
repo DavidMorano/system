@@ -65,7 +65,9 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<utmpacc.h>		/* LIBUC */
 #include	<opentmp.h>		/* LIBUC */
 #include	<sysval.hh>		/* LIBUC */
@@ -75,6 +77,7 @@
 
 #include	"tmpx.h"
 
+import tmpx_mag ;
 
 /* local defines */
 
@@ -93,7 +96,6 @@
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -102,10 +104,6 @@ using std::nothrow ;			/* constant */
 /* external subroutines */
 
 extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-    extern int uc_duper(int,int) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-    extern int uc_closeonexec(int,int) noex ;
     extern int uc_pipe(int *) noex ;
 } /* end extern (C) */
 
