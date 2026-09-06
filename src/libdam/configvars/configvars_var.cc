@@ -44,8 +44,8 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"configvars_util.hh"
 #include	"configvars.h"
+#include	"configvars_util.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
