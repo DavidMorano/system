@@ -1,0 +1,34 @@
+/* strpack_mag MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* string-pack */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+
+#include	"strpack.h"
+
+export module strpack_mag ;
+
+export {
+    template<typename ... Args>
+    inline int strpack_magic(strpack *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magval == STRPACK_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+    } /* end subroutine (strpack_magic) */
+} /* end export */
+
+
