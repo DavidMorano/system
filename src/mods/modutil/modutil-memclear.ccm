@@ -1,4 +1,4 @@
-/* modutil-memclear MODULE */
+/* modutil-memclear MODULE (primary-partition) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -38,13 +38,7 @@ export {
     inline int memclear(void *objp,int sz) noex {
 	int	rs = SR_FAULT ;
 	if (objp) ylikely {
-	    rs = SR_INVALID ;
-	    if (sz >= 0) ylikely {
-	        rs = SR_OK ;
-	        if (sz > 0) {
-		    rs = memclearer(objp,sz) ;
-	        }
-	    }
+	    rs = memclearer(objp,sz) ;
 	} /* end if (non-null) */
     	return rs ;
     } /* end subroutine */
