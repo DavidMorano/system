@@ -35,6 +35,7 @@
 #include	"setostr.h"
 #include	"setstrx.hh"
 
+import setostr_mag ;
 
 /* local defines */
 
