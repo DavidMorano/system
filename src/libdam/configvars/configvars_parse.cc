@@ -46,8 +46,8 @@
 #include	<bfile.h>		/* LIBB */
 #include	<bfliner.h>		/* LIBB */
 
-#include	"configvars_util.hh"
 #include	"configvars.h"
+#include	"configvars_util.hh"
 
 import configvars_util ;
 
