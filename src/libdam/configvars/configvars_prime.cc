@@ -40,8 +40,8 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"configvars_util.hh"
 #include	"configvars.h"
+#include	"configvars_util.hh"
 
 import configvars_util ;
 
@@ -75,7 +75,7 @@ local inline int configvars_ctor(configvars *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
-	    op->checktime = getustime ;
+	    op->ticheck = getustime ;
 	    if ((op->fesp = new(nt) vecobj) != np) ylikely {
 		if ((op->varp = new(nt) vecobj) != np) ylikely {
 	            if ((op->defp = new(nt) vecobj) != np) ylikely {
@@ -119,27 +119,27 @@ local int configvars_dtor(configvars *op) noex {
 	if (op->unvp) {
 	    delete op->unvp ;
 	    op->unvp = np ;
-	}
+	} /* end if (delete-vecobj) */
 	if (op->expp) {
 	    delete op->expp ;
 	    op->expp = np ;
-	}
+	} /* end if (delete-vecobj) */
 	if (op->setp) {
 	    delete op->setp ;
 	    op->setp = np ;
-	}
+	} /* end if (delete-vecobj) */
 	if (op->defp) {
 	    delete op->defp ;
 	    op->defp = np ;
-	}
+	} /* end if (delete-vecobj) */
 	if (op->varp) {
 	    delete op->varp ;
 	    op->varp = np ;
-	}
+	} /* end if (delete-vecobj) */
 	if (op->fesp) {
 	    delete op->fesp ;
 	    op->fesp = np ;
-	}
+	} /* end if (delete-vecobj) */
 	return rs ;
 } /* end subroutine (configvars_dtor) */
 
@@ -180,12 +180,10 @@ enum vartypes {
 int configvars_open(configvars *cvp,cchar *cfn,vecobj *eep) noex {
 	int		rs ;
 	if ((rs = configvars_ctor(cvp,cfn)) >= 0) ylikely {
-	    vecobj	*vip ;
 	    cint	vn = 10 ;
-	    int		vsz ;
+	    int		vsz = szof(CV_FILE) ;
 	    int		vo = 0 ;
-	    vip = cvp->fesp ;
-	    vsz = szof(CV_FILE) ;
+	    vecobj	*vip = cvp->fesp ;
 	    if ((rs = vecobj_start(vip,vsz,vn,vo)) >= 0) ylikely {
 	  	vsz = szof(CV_VAR) ;
 	        vip = cvp->varp ;
