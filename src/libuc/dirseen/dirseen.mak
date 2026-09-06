@@ -35,15 +35,17 @@ DEFS +=
 
 INCS += dirseen.h
 
-MODS +=
+MODS += dirseen_mag.o
 
 LIBS +=
 
 
-OBJ0= dirseen_prime.o dirseen_not.o
-OBJ1=
+DEPS= $(MODS)
 
-OBJA= obj0.o 
+OBJ0= dirseen_prime.o dirseen_not.o
+OBJ1= $(MODS)
+
+OBJA= obj0.o obj1.o
 OBJB=
 
 OBJ= obja.o
@@ -132,7 +134,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-dirseen_prime.o:	dirseen_prime.cc		$(INCS)
-dirseen_not.o:		dirseen_not.cc			$(INCS)
-
+dirseen_prime.o:	dirseen_prime.cc		$(DEPS) $(INCS)
+dirseen_not.o:		dirseen_not.cc			$(DEPS) $(INCS)
+dirseen_mag.o:		dirseen_mag.ccm				$(INCS)
 
