@@ -47,6 +47,7 @@ import libutil ;			/* |getlenstr(3u)| */
 import ema_entry ;
 import ema_asstr ;
 import ema_parts ;
+import ema_mag ;
 
 /* local defines */
 
@@ -56,7 +57,6 @@ import ema_parts ;
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -80,11 +80,12 @@ template<typename ... Args>
 local inline int ema_ctor(ema *op,Args ... args) noex {
     	EMA		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->elp = new(nothrow) vechand) != np) ylikely {
+	    if ((op->elp = new(nt) vechand) != np) ylikely {
 		rs = SR_OK ;
 	    }
 	} /* end if (non-null) */
@@ -259,21 +260,6 @@ int ema_addents(ema *op,ema *oop) noex {
 
 
 /* private subroutines */
-
-namespace ema_ns {
-    int ema_starter(ema *op,cchar *sp,int sl) noex {
-	int		rs ;
-	if ((rs = ema_start(op)) >= 0) ylikely {
-	    if (sp) {
-	        rs = ema_parse(op,sp,sl) ;
-	    } /* end if (optional data) */
-	    if (rs < 0) {
-	        ema_finish(op) ;
-	    }
-	} /* end if (ema_start) */
-	return rs ;
-   } /* end subroutine (ema_starter) */
-} /* end namespace (ema_ns) */
 
 local int ema_addentone(ema *op,ema_ent *ep) noex {
 	cint		sz = szof(ema_ent) ;
