@@ -185,7 +185,7 @@ local inline int fsdir_magic(fsdir *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magic == FSDIR_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (fsdir_magic) */
 
