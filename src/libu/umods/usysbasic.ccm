@@ -66,6 +66,8 @@ module ;
 #include	<sys/mount.h>		/* |statfs| */
 #include	<sys/statvfs.h>		/* |statvfs| */
 #include	<sys/stat.h>		/* |ustat| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>
 #include	<utypedefs.h>		/* |void_f| */
 #include	<utypealiases.h>
