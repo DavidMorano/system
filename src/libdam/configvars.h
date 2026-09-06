@@ -26,7 +26,7 @@
 #define	CONFIGVARS_CUR		struct configvars_cursor
 #define	CONFIGVARS_VFL		struct configvars_vflags
 #define	CONFIGVARS_MAGIC	0x04311633
-#define	CONFIGVARS_NFILES	(sizeof(int) * 8)
+#define	CONFIGVARS_NFILES	(szof(int) * 8)
 #define	CONFIGVARS_WSETS	0
 #define	CONFIGVARS_WVARS	1
 
@@ -42,12 +42,12 @@ struct configvars_head {
 	vecobj		*setp ;		/* "set" variables */
 	vecobj		*expp ;		/* "export" environment variables */
 	vecobj		*unvp ;		/* "unset" environment variables */
-	time_t		checktime ;
+	time_t		ticheck ;
 	uint		magval ;	/* magic number */
 } ; /* end struct */
 
 struct configvars_filer {
-	cchar		*filename ;
+	ccharp		filename ;
 	vecobj		defines ;	/* defined variables */
 	vecobj		exports ;	/* environment variables */
 	vecobj		unsets ;	/* unset ENV variables */
@@ -65,7 +65,7 @@ struct configvars_variable {
 	char		*key ;
 	char		*value ;
 	mainv		argv ;
-	CONFIGVARS_VFL	f ;
+	CONFIGVARS_VFL	fl ;
 	int		argc ;
 	int		fi ;		/* file index of source */
 	int		fmask ;		/* file mask of dependencies */
