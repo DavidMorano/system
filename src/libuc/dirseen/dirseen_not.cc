@@ -60,6 +60,7 @@
 
 #include	"dirseen.h"
 
+import dirseen_mag ;
 
 /* local defines */
 
