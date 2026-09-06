@@ -61,8 +61,6 @@ enum ustreammems {
 	ustreammem_overlast
 } ; /* end enum (ustreammems) */
 
-constexpr uint		ustream_magicval = USTREAM_MAGIC ;
-
 struct ustream ;
 
 struct ustream_fl {
@@ -157,24 +155,6 @@ struct ustream {
 	int iclose() noex ;
 	void dtor() noex ;
 } ; /* end struct (ustream) */
-
-template<typename ... Args>
-local inline int ustream_magic(ustream *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magval == ustream_magicval) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-} /* end subroutine (ustream_magic) */
-
-template<typename ... Args> 
-int ustream_ma::operator () (Args ... args) noex {
-        int             rs = SR_FAULT ;
-        if ((... && args)) {
-            rs = (op->magval == ustream_magicval) ? SR_OK : SR_NOTOPEN ;
-        }
-        return rs ;
-} /* end method (ustream_ma::operator) */
 
 namespace ustream_ns {
     extern int	ustream_close		(ustream *) noex ;
