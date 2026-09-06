@@ -27,23 +27,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstrings>		/* for |strcasecmp(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<vecstr.h>
-#include	<bfile.h>
-#include	<bfliner.h>
-#include	<sfx.h>			/* |sfconrtent(3uc)| */
-#include	<strn.h>
-#include	<sncpyx.h>
-#include	<snwcpyx.h>
-#include	<strx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstrings>		/* CSTD |strcasecmp(3c)| */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<bfliner.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC |sfconrtent(3uc)| */
+#include	<strn.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<snwcpyx.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"splitaddr.h"
 #include	"whitelist.h"
@@ -109,7 +109,7 @@ template<typename ... Args>
 local inline int whitelist_magic(whitelist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	    rs = (op->magic == WHITELIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magval == WHITELIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 } /* end subroutine (whitelist_magic) */
@@ -118,7 +118,7 @@ local int	mkaddr(char *,int,cchar *,int) noex ;
 
 extern "C" {
     local int	vcmpaddr(cchar **,cchar **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -137,13 +137,13 @@ int whitelist_open(whitelist *op,cchar *fname) noex {
 	int		rs ;
 	if ((rs = whitelist_ctor(op)) >= 0) ylikely {
 	    if ((rs = vecstr_start(op->wlp,vn,vo)) >= 0) ylikely {
-	        op->magic = WHITELIST_MAGIC ;
+	        op->magval = WHITELIST_MAGIC ;
 	        if (fname) {
 	            rs = whitelist_fileadd(op,fname) ;
 	        } /* end if */
 	        if (rs < 0) {
 	            vecstr_finish(op->wlp) ;
-	            op->magic = 0 ;
+	            op->magval = 0 ;
 	        }
 	    }
 	    if (rs < 0) {
@@ -151,8 +151,7 @@ int whitelist_open(whitelist *op,cchar *fname) noex {
 	    }
 	} /* end if (whitelist_ctor) */
 	return rs ;
-}
-/* end subroutine (whitelist_open) */
+} /* end subroutine (whitelist_open) */
 
 int whitelist_close(whitelist *op) noex {
 	int		rs ;
@@ -166,11 +165,10 @@ int whitelist_close(whitelist *op) noex {
 		rs1 = whitelist_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->magic = 0 ;
+	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (whitelist_close) */
+} /* end subroutine (whitelist_close) */
 
 int whitelist_fileadd(whitelist *op,cchar *fname) noex {
 	int		rs ;
@@ -208,8 +206,7 @@ int whitelist_fileadd(whitelist *op,cchar *fname) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (whitelist_fileadd) */
+} /* end subroutine (whitelist_fileadd) */
 
 int whitelist_get(whitelist *op,int i,cchar **rpp) noex {
 	int		rs ;
@@ -221,8 +218,7 @@ int whitelist_get(whitelist *op,int i,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (whitelist_get) */
+} /* end subroutine (whitelist_get) */
 
 int whitelist_read(whitelist *op,char *rbuf,int rlen,int idx) noex {
 	int		rs ;
@@ -233,8 +229,7 @@ int whitelist_read(whitelist *op,char *rbuf,int rlen,int idx) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (whitelist_fetch) */
+} /* end subroutine (whitelist_fetch) */
 
 int whitelist_count(whitelist *op) noex {
 	int		rs ;
@@ -242,8 +237,7 @@ int whitelist_count(whitelist *op) noex {
 	    rs = vecstr_count(op->wlp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (whitelist_count) */
+} /* end subroutine (whitelist_count) */
 
 int whitelist_prematch(whitelist *op,cchar *ta) noex {
 	cnullptr	np{} ;
@@ -285,8 +279,7 @@ int whitelist_prematch(whitelist *op,cchar *ta) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (whitelist_prematch) */
+} /* end subroutine (whitelist_prematch) */
 
 int whitelist_audit(whitelist *op) noex {
 	int		rs ;
@@ -294,8 +287,7 @@ int whitelist_audit(whitelist *op) noex {
 	    rs = vecstr_audit(op->wlp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (whitelist_audit) */
+} /* end subroutine (whitelist_audit) */
 
 
 /* private subroutines */
@@ -305,16 +297,15 @@ local int mkaddr(char *mbuf,int mlen,cchar *lp,int ll) noex {
 	    ll = intconv(tp - lp) ;
 	}
 	return snwcpyopaque(mbuf,mlen,lp,ll) ;
-}
-/* end subroutine (mkaddr) */
+} /* end subroutine (mkaddr) */
 
 local int vcmpaddr(cchar **e1pp,cchar **e2pp) noex {
 	cchar		*e1p = *e1pp ;
 	cchar		*e2p = *e2pp ;
 	int		rc = 0 ;
-	if (e1p || e2p) {
+	if (e1p || e2p) ylikely {
 	    rc = 1 ;
-	    if (e1pp) {
+	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
 	            cchar	*h1p = strchr(e1p,'@') ;
@@ -330,9 +321,8 @@ local int vcmpaddr(cchar **e1pp,cchar **e2pp) noex {
 	            }
 	        }
 	    }
-	}
+	} /* end if */
 	return rc ;
-}
-/* end subroutine (vcmpaddr) */
+} /* end subroutine (vcmpaddr) */
 
 
