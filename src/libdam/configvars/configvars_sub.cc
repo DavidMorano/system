@@ -41,8 +41,8 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"configvars_util.hh"
 #include	"configvars.h"
+#include	"configvars_util.hh"
 
 import configvars_util ;
 
@@ -103,15 +103,14 @@ enum vartypes {
 /* exported subroutines */
 
 namespace configvars_obj {
-
     int configvars_addvar(CV *cvp,int fi,int w,
 		 cchar *kp,int kl,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-	int		idx = 0 ;
+	int		idx = 0 ; /* return-value */
 	if (cvp && kp) ylikely {
 	    CV_VAR	v{} ;
 	    if ((rs = var_start(&v,fi,kp,kl,vp,vl)) >= 0) ylikely {
-	        vecobj		*slp = (w) ? cvp->setp : cvp->varp ;
+	        vecobj	*slp = (w) ? cvp->setp : cvp->varp ;
 	        if ((rs = vecobj_add(slp,&v)) >= 0) ylikely {
 		    idx = rs ;
 		} /* end if (ok) */
@@ -122,18 +121,20 @@ namespace configvars_obj {
 	} /* end if (non-null) */
 	return (rs >= 0) ? idx : rs ;
     } /* end subroutine (configvars_addvar) */
+} /* end namespace (configvars_obj) */
 
+namespace configvars_obj {
     int configvars_finvars(CV *cvp) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 	for (int j = 0 ; j < 5 ; j += 1) {
 	    vecobj	*slp{} ;
 	    switch (j) {
-	    case vartype_set: slp = cvp->setp ; break ;
-	    case vartype_var: slp = cvp->varp ; break ;
-	    case vartype_export: slp = cvp->expp ; break ;
-	    case vartype_define: slp = cvp->defp ; break ;
-	    case vartype_unset: slp = cvp->unvp ; break ;
+	    case vartype_set:		slp = cvp->setp ; break ;
+	    case vartype_var:		slp = cvp->varp ; break ;
+	    case vartype_export:	slp = cvp->expp ; break ;
+	    case vartype_define:	slp = cvp->defp ; break ;
+	    case vartype_unset:		slp = cvp->unvp ; break ;
 	    } /* end switch */
 	    if (slp) {
 		void	*vp{} ;
@@ -152,7 +153,9 @@ namespace configvars_obj {
 	} /* end for */
 	return rs ;
     } /* end subroutine (configvars_finvars) */
+} /* end namespace (configvars_obj) */
 
+namespace configvars_obj {
     int configvars_finfiles(CV *cvp) noex {
 	vecobj		*slp = cvp->fesp ;
 	int		rs = SR_OK ;
@@ -173,7 +176,6 @@ namespace configvars_obj {
 	}
 	return rs ;
     } /* end subroutine (configvars_finfiles) */
-
 } /* end namespace (configvars_obj) */
 
 
