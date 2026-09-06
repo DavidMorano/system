@@ -38,6 +38,7 @@
 
 #include	"tmpx.h"
 
+import tmpx_mag ;
 
 /* local defines */
 
