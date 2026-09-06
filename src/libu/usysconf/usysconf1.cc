@@ -145,7 +145,7 @@ namespace {
 	int getdefacctname() noex ;
 	int getdefnodename() noex ;
 	int getdefmailaddr() noex ;
-    } ; /* end struct (usysconf) */
+    } ; /* end struct (usysconfmgr) */
 } /* end namespace */
 
 
@@ -186,7 +186,7 @@ extern "C++" {
     int usysconfval(int req,long *rp) noex {
 	int		rs = SR_INVALID ;
 	DPRINTF("ent\n") ;
-	if (req >= 0) {
+	if (req >= 0) ylikely {
 	    usysconfmgr	sco(rp) ;
 	    sco.m = &usysconfmgr::mconfval ;
 	    rs = sco.getval(req) ;
@@ -196,9 +196,9 @@ extern "C++" {
     } /* end subroutine (usysconfval) */
     int usysconfstr(int req,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if ((req >= 0) && (rlen >= 0)) {
+	    if ((req >= 0) && (rlen >= 0)) ylikely {
 	        usysconfmgr	sco(rbuf,rlen) ;
 	        sco.m = &usysconfmgr::mconfstr ;
 	        rs = sco.getstr(req) ;
@@ -253,7 +253,7 @@ int usysconfmgr::getvalcache(int req,int ci) noex {
 		udata.d[ci].store(rs,memord_relaxed) ;
 	    }
 	} /* end if (filling cache) */
-	if (rs >= 0) {
+	if (rs >= 0) ylikely {
 	    if (lp) *lp = long(rs) ;
 	} /* end if (result) */
 	DPRINTF("ret rs=%d\n",rs) ;
@@ -453,9 +453,9 @@ int usysconfmgr::getdefmailaddr() noex {
     	cint		hnm = mailvalue.hostnamemult ;
 	int		rs ;
 	int		len = 0 ; /* return-value */
-	if ((rs = getval(cmdnode)) >= 0) {
+	if ((rs = getval(cmdnode)) >= 0) ylikely {
 	    len += (rs * nnm) ;
-	    if ((rs = getval(cmdhost)) >= 0) {
+	    if ((rs = getval(cmdhost)) >= 0) ylikely {
     		len += (rs * hnm) ;
 	    }
 	} /* end if (getval) */
