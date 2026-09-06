@@ -75,7 +75,7 @@ OBJ21= strnul.o intx.o chrset.o stdclib.o
 OBJ22= ugetloadavg.o uiconv.o bitgrp.o
 OBJ23= syscontain.o stdfnames.o stdfiles.o
 
-OBJ24= posixdirent.o nulstr.o
+OBJ24= posixdir.o nulstr.o
 OBJ25= fonce.o filerec.o
 OBJ26= ustd.o ugetx.o
 OBJ27= ucomposite.o upt.o ucmpx.o
@@ -539,6 +539,11 @@ ptx.o:			ptx.dir
 ptx.dir:
 	makesubdir $@
 
+# LIBUTIL
+libutil.o:		libutil.dir
+libutil.dir:
+	makesubdir $@
+
 # VARITHMETIC
 varithmetic.o:		varithmetic.dir 
 varithmetic.dir:	bitmanip.o muldigs.o
@@ -559,6 +564,11 @@ vecbool.o:		vecbool.dir
 vecbool.dir:
 	makesubdir $@
 
+# POSIXDIR
+posixdir.o:		posixdir.dir
+posixdir.dir:
+	makesubdir $@
+
 # FONCE
 fonce.o:		fonce.dir
 fonce.dir:
@@ -569,11 +579,6 @@ filerec.o:		filerec.dir
 filerec.dir:
 	makesubdir $@
 
-# LIBUTIL
-libutil.o:		libutil.dir
-libutil.dir:
-	makesubdir $@
-
 # misc-objects
 chrset.o:		chrset.ccm					$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
@@ -582,7 +587,6 @@ bitgrp.o:		bitgrp.ccm					$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 nulstr.o:		nulstr.cc	nulstr.h			$(INCS)
-posixdirent.o:		posixdirent.cc	posixdirent.hh			$(INCS)
 binchunk.o:		binchunk.cc	binchunk.hh			$(INCS)
 sigblocker.o:		sigblocker.cc	sigblocker.h			$(INCS)
 
