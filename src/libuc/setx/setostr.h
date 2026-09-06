@@ -29,8 +29,6 @@
 #define	SETOSTR_MAGIC	0x97351229
 
 
-constexpr uint		setostr_magicval = SETOSTR_MAGIC ;
-
 struct setostr_cursor {
 	void		*itp ;
 } ; /* end struct */
@@ -55,7 +53,7 @@ struct setostr_ma {
         setostr	*op = nullptr ;
         void operator () (setostr *p,int) noex {
             op = p ;
-        } ;
+        } ; /* end */
         template<typename ... Args> int operator () (Args ... ) noex ;
         operator int () noex ;
 } ; /* end struct (setostr_ma) */
@@ -65,11 +63,11 @@ struct setostr_co {
 	void operator () (setostr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = 0) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (setostr_co) */
 struct setostr : setostr_head {
 	setostr_co	start ;
@@ -97,7 +95,7 @@ struct setostr : setostr_head {
 	operator int () noex ;
 	destruct setostr() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (setostr) */
 #else	/* __cplusplus */
 typedef SETOSTR		setostr ;
@@ -119,19 +117,6 @@ extern int setostr_finish	(setostr *) noex ;
 extern int setostr_loadfile	(setostr *,int,cchar *) noex ;
 
 EXTERNC_end
-
-#ifdef	__cplusplus
-
-template<typename ... Args> 
-int setostr_ma::operator () (Args ... args) noex {
-        int             rs = SR_FAULT ;
-        if ((... && args)) {
-            rs = (op->magval == setostr_magicval) ? SR_OK : SR_NOTOPEN ;
-        }
-        return rs ;
-} /* end method (setostr_ma::operator) */
-
-#endif /* __cplusplus */
 
 
 #endif /* SETOSTR_INCLUDE */
