@@ -34,6 +34,7 @@
 
 #include	"ema.h"
 
+import ema_mag ;
 
 /* local defines */
 
