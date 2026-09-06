@@ -49,6 +49,7 @@
 
 import libutil ;			/* |memcopy(3u)| */
 import ulibvals ;			/* |ulibval(3u)| */
+import ustream_mag ;
 
 /* local defines */
 
@@ -89,8 +90,6 @@ using ustream_ns::ustream_write ;
 
 /* local variables */
 
-static cint	maxlinelen	= ulibval.maxline ;
-
 
 /* exported variables */
 
@@ -101,18 +100,16 @@ namespace ustream_ns {
     int ustream_vprintf(ustream *op,cchar *fmt,va_list ap) noex {
 	int		rs ;
 	int		rs1 ;
-	int		wlen = 0 ;
-	    if ((rs = maxlinelen) >= 0) ylikely {
-		cint	llen = rs ;
-		if (char *lbuf ; (rs = umem.mall((llen + 1),&lbuf)) >= 0) {
-	    	    if ((rs = snvprintf(lbuf,llen,fmt,ap)) >= 0) {
-	    	        rs = ustream_write(op,lbuf,rs) ;
-			wlen = rs ;
-		    }
-		    rs1 = umem.free(lbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (m-a-f) */
-	    } /* end if (maxlinelen) */
+	int		wlen = 0 ; /* return-value */
+	if (char *lbuf ; (rs = umem.ml(&lbuf)) >= 0) {
+	    cint llen = rs ;
+	    if ((rs = snvprintf(lbuf,llen,fmt,ap)) >= 0) {
+		rs = ustream_write(op,lbuf,rs) ;
+		wlen = rs ;
+	    }
+	    rs1 = umem.free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
     } /* end subroutine (ustream_vprintf) */
 } /* end nameapce (ustream_ns) */
