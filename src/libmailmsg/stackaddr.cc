@@ -40,15 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<storebuf.h>
-#include	<nulstr.h>
-#include	<strwcmp.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<strwcmp.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"stackaddr.h"
 
@@ -89,8 +89,7 @@ int stackaddr_start(stackaddr *op,char *dbuf,int dlen) noex {
 	    op->dlen = dlen ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (stackaddr_start) */
+} /* end subroutine (stackaddr_start) */
 
 int stackaddr_finish(stackaddr *op) noex {
 	int		rs = SR_FAULT ;
@@ -98,8 +97,7 @@ int stackaddr_finish(stackaddr *op) noex {
 	    rs = op->i ;
 	}
 	return rs ;
-}
-/* end subroutine (stackaddr_finish) */
+} /* end subroutine (stackaddr_finish) */
 
 int stackaddr_add(stackaddr *op,cchar *hp,int hl,cchar *up,int ul) noex {
 	int		rs = SR_FAULT ;
@@ -151,7 +149,6 @@ int stackaddr_add(stackaddr *op,cchar *hp,int hl,cchar *up,int ul) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (stackaddr_add) */
+} /* end subroutine (stackaddr_add) */
 
 
