@@ -35,16 +35,19 @@ DEFS +=
 
 INCS += strpack.h
 
-MODS +=
+MODS += strpack_mag.o
 
 LIBS +=
 
 
+DEPS= $(MODS)
+
 OBJ0= strpack_prime.o strpack_envstore.o strpack_obj.o
-OBJ1=
+OBJ1= $(MODS)
+OBJ2=
+OBJ3=
 
-
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
 OBJB=
 
 OBJ= $(OBJA)
@@ -131,6 +134,12 @@ obj4.o:			$(OBJ4)
 obj5.o:			$(OBJ5)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
@@ -139,8 +148,9 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-strpack_envstore.o:		strpack_envstore.cc		$(INCS)
-strpack_prime.o:		strpack_prime.cc		$(INCS)
-strpack_obj.o:			strpack_obj.cc			$(INCS)
+strpack_envstore.o:		strpack_envstore.cc	$(DEPS)	$(INCS)
+strpack_prime.o:		strpack_prime.cc	$(DPES)	$(INCS)
+strpack_obj.o:			strpack_obj.cc		$(DEPS)	$(INCS)
+strpack_mag.o:			strpack_mag.ccm			$(INCS)
 
 
