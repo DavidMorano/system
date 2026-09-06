@@ -42,8 +42,8 @@ LIBS +=
 
 OBJPART00= modutil-lenstr.o modutil-memclear.o
 OBJPART01= modutil-memcopy.o modutil-memload.o
-OBJPART02= modutil-memnset.o modutil-resumelife.o
-OBJPART03=
+OBJPART02= modutil-memncpy.o modutil-memnset.o 
+OBJPART03= modutil-resumelife.o
 
 OBJPART04= 
 OBJPART05= 
@@ -51,7 +51,7 @@ OBJPART06=
 OBJPART07=
 
 OBJPARTA= objpart00.o objpart01.o 
-OBJPARTB= objpart02.o
+OBJPARTB= objpart02.o objpart03.o
 OBJPARTC= objpart04.o objpart05.o 
 OBJPARTD= objpart06.o objpart07.o
 OBJPARTE= objpart08.o objpart09.o
@@ -238,16 +238,17 @@ objimpl.o:		$(OBJIMPL)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 # primary
-modutil0.o:		modutil.ccm $(OBJPARTS)	modutil.hh	$(INCS)
+modutil0.o:		modutil.ccm $(OBJPARTS)			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # primary partitions
-modutil-lenstr.o:	modutil-lenstr.ccm		modutil.hh $(INCS)
-modutil-memclear.o:	modutil-memclear.ccm		modutil.hh $(INCS)
-modutil-memcopy.o:	modutil-memcopy.ccm		modutil.hh $(INCS)
-modutil-memload.o:	modutil-memload.ccm		modutil.hh $(INCS)
-modutil-memnset.o:	modutil-memnset.ccm		modutil.hh $(INCS)
-modutil-resumelife.o:	modutil-resumelife.ccm		modutil.hh $(INCS)
+modutil-lenstr.o:	modutil-lenstr.ccm			$(INCS)
+modutil-memclear.o:	modutil-memclear.ccm			$(INCS)
+modutil-memcopy.o:	modutil-memcopy.ccm			$(INCS)
+modutil-memload.o:	modutil-memload.ccm			$(INCS)
+modutil-memncpy.o:	modutil-memncpy.ccm			$(INCS)
+modutil-memnset.o:	modutil-memnset.ccm			$(INCS)
+modutil-resumelife.o:	modutil-resumelife.ccm			$(INCS)
 
 # implementaiton
 modutil1.o:		modutil1.cc modutil0.o			#(INCS)
