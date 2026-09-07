@@ -1,4 +1,4 @@
-/* posixdirent_prime SUPPORT */
+/* posixdir_prime SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	posixdirent
+	posixdir
 
 	Description:
 	This object provides a helper interface to the POSIX©
@@ -55,7 +55,7 @@
 #include	<intsat.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"posixdirent.hh"
+#include	"posixdir.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -106,7 +106,7 @@ constexpr bool		f_readdirr = F_READDIRR ;
 
 /* exported subroutines */
 
-int posixdirent::open(cchar *fn) noex {
+int posixdir::open(cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	if (fn) ylikely {
 	    rs = SR_INVALID ;
@@ -114,8 +114,8 @@ int posixdirent::open(cchar *fn) noex {
 		if ((rs = maxnamelen) >= 0) ylikely {
 	            if ((rs = bufbegin(fn)) >= 0) ylikely {
 	                fname = fn ;
-	                if ((rs = callout(&posixdirent::diropen)) >= 0) {
-			    magval = POSIXDIRENT_MAGIC ;
+	                if ((rs = callout(&posixdir::diropen)) >= 0) {
+			    magval = POSIXDIR_MAGIC ;
 			}
 			if (rs < 0) {
 			    bufend() ;
@@ -125,14 +125,14 @@ int posixdirent::open(cchar *fn) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-} /* end method (posixdirent::open) */
+} /* end method (posixdir::open) */
 
-int posixdirent::iclose() noex {
+int posixdir::iclose() noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = magic) >= 0) ylikely {
 	    if (dirp) {
-	        rs1 = callout(&posixdirent::dirclose) ;
+	        rs1 = callout(&posixdir::dirclose) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (debuf) {
@@ -142,9 +142,9 @@ int posixdirent::iclose() noex {
 	    magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-} /* end method (posixdirent::iclose) */
+} /* end method (posixdir::iclose) */
 
-int posixdirent::read(dirent *ep,char *dbuf,int dlen) noex {
+int posixdir::read(dirent *ep,char *dbuf,int dlen) noex {
 	int		rs ;
 	if ((rs = magic(ep,dbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
@@ -152,42 +152,42 @@ int posixdirent::read(dirent *ep,char *dbuf,int dlen) noex {
 		dep = ep ;
 	        nbuf = dbuf ;
 	        nlen = dlen ;
-	        rs = callout(&posixdirent::dirread) ;
+	        rs = callout(&posixdir::dirread) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-} /* end method (posixdirent::read) */
+} /* end method (posixdir::read) */
 
-int posixdirent::itell(mut off_t *fop) noex {
+int posixdir::itell(mut off_t *fop) noex {
     	int		rs ;
 	if ((rs = magic) >= 0) ylikely {
 	    sop = fop ;
-	    rs = callout(&posixdirent::dirtell) ;
+	    rs = callout(&posixdir::dirtell) ;
 	} /* end if (magic) */
 	return rs ;
-} /* end method (posixdirent::itell) */
+} /* end method (posixdir::itell) */
 
-int posixdirent::seek(off_t o) noex {
+int posixdir::seek(off_t o) noex {
     	int		rs ;
 	if ((rs = magic) >= 0) ylikely {
 	    so = o ;
-	    rs = callout(&posixdirent::dirseek) ;
+	    rs = callout(&posixdir::dirseek) ;
 	} /* end if (magic) */
 	return rs ;
-} /* end method (posixdirent::seek) */
+} /* end method (posixdir::seek) */
 
-int posixdirent::irewind() noex {
+int posixdir::irewind() noex {
     	int		rs ;
 	if ((rs = magic) >= 0) ylikely {
-	    rs = callout(&posixdirent::dirrewind) ;
+	    rs = callout(&posixdir::dirrewind) ;
 	} /* end if (magic) */
 	return rs ;
-} /* end method (posixdirent::irewind) */
+} /* end method (posixdir::irewind) */
 
 
 /* local subroutines */
 
-int posixdirent::bufbegin(cchar *fn) noex {
+int posixdir::bufbegin(cchar *fn) noex {
 	int		rs ;
 	if_constexpr (f_readdirr) {
 	    cint	req = _PC_NAME_MAX ;
@@ -202,9 +202,9 @@ int posixdirent::bufbegin(cchar *fn) noex {
 	    rs = SR_OK ;
 	} /* end if_constexpr (f_readdirr) */
 	return rs ;
-} /* end method (posixdirent::bufbegin) */
+} /* end method (posixdir::bufbegin) */
 
-int posixdirent::bufend() noex {
+int posixdir::bufend() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	if (debuf) ylikely {
@@ -214,9 +214,9 @@ int posixdirent::bufend() noex {
 	    delen = 0 ;
 	}
 	return rs ;
-} /* end method (posixdirent::bufend) */
+} /* end method (posixdir::bufend) */
 
-int posixdirent::callout(posixdirent_m m) noex {
+int posixdir::callout(posixdir_m m) noex {
         errtimer    to_again	= utimeout[uto_again] ;
         errtimer    to_nomem	= utimeout[uto_nomem] ;
         errtimer    to_nosr	= utimeout[uto_nosr] ;
@@ -251,9 +251,9 @@ int posixdirent::callout(posixdirent_m m) noex {
             } /* end if (error) */
         } until ((rs >= 0) || r.fexit) ;
 	return rs ;
-} /* end method (posixdirent::callout) */
+} /* end method (posixdir::callout) */
 
-int posixdirent::diropen() noex {
+int posixdir::diropen() noex {
 	int		rs = SR_OK ;
 	errno = 0 ;
 	if (DIR *p ; (p = opendir(fname)) != nullptr) ylikely {
@@ -262,9 +262,9 @@ int posixdirent::diropen() noex {
 	    rs = (neg errno) ;
 	}
 	return rs ;
-} /* end method (posixdirent::diropen) */
+} /* end method (posixdir::diropen) */
 
-int posixdirent::dirclose() noex {
+int posixdir::dirclose() noex {
 	int		rs = SR_NOTOPEN ;
 	if (dirp) {
 	    errno = 0 ;
@@ -275,9 +275,9 @@ int posixdirent::dirclose() noex {
 	    dirp = nullptr ;
 	} /* end if (open) */
 	return rs ;
-} /* end method (posixdirent::dirclose) */
+} /* end method (posixdir::dirclose) */
 
-int posixdirent::dirread() noex {
+int posixdir::dirread() noex {
     	cint		desz = szof(dirent) ;
 	int		rs = SR_NOTOPEN ;
 	if (dirp) ylikely {
@@ -306,9 +306,9 @@ int posixdirent::dirread() noex {
 	    } /* end if_constexpr (f_readdirr) */
 	} /* end if (open) */
 	return rs ;
-} /* end method (posixdirent::dirread) */
+} /* end method (posixdir::dirread) */
 
-int posixdirent::dirtell() noex {
+int posixdir::dirtell() noex {
 	int		rs = SR_NOTOPEN ;
 	if (dirp) ylikely {
 	    long	loff{} ;
@@ -323,9 +323,9 @@ int posixdirent::dirtell() noex {
 	    }
 	} /* end if (open) */
 	return rs ;
-} /* end method (posixdirent::dirtell) */
+} /* end method (posixdir::dirtell) */
 
-int posixdirent::dirseek() noex {
+int posixdir::dirseek() noex {
     	int		rs = SR_NOTOPEN ;
 	if (dirp) ylikely {
 	    long	loff = long(so) ;
@@ -334,9 +334,9 @@ int posixdirent::dirseek() noex {
 	    rs = (neg errno) ;
 	} /* end if (open) */
 	return rs ;
-} /* end method (posixdirent::dirseek) */
+} /* end method (posixdir::dirseek) */
 
-int posixdirent::dirrewind() noex {
+int posixdir::dirrewind() noex {
     	int		rs = SR_NOTOPEN ;
 	if (dirp) ylikely {
 	    errno = 0 ;
@@ -344,39 +344,39 @@ int posixdirent::dirrewind() noex {
 	    rs = (neg errno) ;
 	} /* end if (open) */
 	return rs ;
-} /* end method (posixdirent::dirrewind) */
+} /* end method (posixdir::dirrewind) */
 
-void posixdirent::dtor() noex {
+void posixdir::dtor() noex {
     	if (cint rs = close() ; rs < 0) {
-	    ulogerror("posixdirent",rs,"dtor-close") ;
+	    ulogerror("posixdir",rs,"dtor-close") ;
 	}
 } /* end method */
 
-int posixdirent_te::operator () (mut off_t *fop) noex {
+int posixdir_te::operator () (mut off_t *fop) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
 	    switch (w) {
-	    case posixdirentmem_rewind:
+	    case posixdirmem_rewind:
 		rs = op->itell(fop) ;
 		break ;
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-} /* end method (posixdirent_te::operator) */
+} /* end method (posixdir_te::operator) */
 
-posixdirent_co::operator int () noex {
+posixdir_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
 	    switch (w) {
-	    case posixdirentmem_rewind:
+	    case posixdirmem_rewind:
 	        rs = op->irewind() ;
 	        break ;
-	    case posixdirentmem_close:
+	    case posixdirmem_close:
 	        rs = op->iclose() ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-} /* end method (posixdirent_co::operator) */
+} /* end method (posixdir_co::operator) */
 
 
