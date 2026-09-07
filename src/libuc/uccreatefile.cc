@@ -21,6 +21,8 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucclose.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
