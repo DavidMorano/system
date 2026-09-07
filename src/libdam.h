@@ -146,7 +146,6 @@
 #include	<netfile.h>
 #include	<nettime.h>
 #include	<newobj.h>
-#include	<ng.h>
 #include	<nistinfo.h>
 #include	<nlspeername.h>
 #include	<nodesearch.h>
