@@ -63,7 +63,7 @@ OBJ11= ustr.o uobjlock.o ureserve.o
 OBJ12= usysflag.o usysdata.o usysauxinfo.o 
 OBJ13= ufileop.o ufiledesc.o 
 OBJ14= um.o uprocess.o ucodenames.o
-OBJ15= usysop.o vecbool.o uchartype.o
+OBJ15= usysop.o uchartype.o
 
 OBJ16= syswords.o varnames.o
 OBJ17= ptx.o sigblocker.o
@@ -75,7 +75,7 @@ OBJ21= strnul.o intx.o chrset.o stdclib.o
 OBJ22= ugetloadavg.o uiconv.o bitgrp.o
 OBJ23= syscontain.o stdfnames.o stdfiles.o
 
-OBJ24= posixdir.o nulstr.o
+OBJ24= posixdir.o nulstr.o vecbool.o
 OBJ25= fonce.o filerec.o
 OBJ26= ustd.o ugetx.o
 OBJ27= ucomposite.o upt.o ucmpx.o
