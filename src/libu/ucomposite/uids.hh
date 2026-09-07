@@ -39,11 +39,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 namespace libu {
@@ -52,20 +52,20 @@ namespace libu {
     class uids {
 	int iload() noex { 
 	    return 0 ;
-	} ;
+	} ; /* end */
 	int irelease() noex { 
 	    return 0 ;
-	} ;
+	} ; /* end */
 	struct uids_co {
 	    uids	*op = nullptr ;
 	    uids_m	m ;
 	    void operator () (uids *o,uids_m am) noex {
 		op = o ;
 		m = am ;
-	    } ;
+	    } ; /* end */
 	    operator int () noex {
 		return (op->*m)() ;
-	    } ;
+	    } ; /* end */
 	} ; /* end struct (ids_co) */
     public:
 	uids_co		load ;
