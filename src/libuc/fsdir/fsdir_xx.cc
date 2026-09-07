@@ -56,7 +56,6 @@
 #include	<snwcpy.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<posixdirent.hh>	/* LIBUC */
 
 #include	"fsdir.h"
 
