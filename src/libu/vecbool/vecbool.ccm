@@ -42,16 +42,16 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<vector>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module vecbool ;
 
@@ -88,7 +88,7 @@ using std::vector ;			/* type */
 export {
     struct vecbool_fl {
 	uint		open:1 ;
-    } ;
+    } ; /* end */
     struct vecbool ;
     struct vecbool_co {
 	vecbool		*op = nullptr ;
@@ -96,7 +96,7 @@ export {
 	void operator () (vecbool *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator [] (int) noex ;
     } ; /* end struct (vecbool_co) */
@@ -118,15 +118,15 @@ export {
 	    set		(this,vecboolmem_set) ;
 	    clr		(this,vecboolmem_clr) ;
 	    tst		(this,vecboolmem_tst) ;
-	} ;
+	} ; /* end ctor */
 	int resize(int n) noex ;
 	operator int () const noex {
 	    return int(size()) ;
-	} ;
+	} ; /* end */
 	void dtor() noex ;
 	destruct vecbool() {
 	    if (fl.open) dtor() ;
-	} ;
+	} ; /* end */
     private:
 	int icount() noex ;
 	int adj(int) noex ;
