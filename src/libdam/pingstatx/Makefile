@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += pingstatx.h pingstatdb.h
 
-MODS +=
+MODS += pingstatdb_rec.o
 
 LIBS +=
 
@@ -52,11 +52,8 @@ OBJ1= pingstatdb_uptime.o
 OBJ2= $(DEPS)
 OBJ3= pinghost.o pingtab.o
 
-OBJ8=
-
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
-OBJC= obj8.o
 
 OBJ= obja.o
 
@@ -149,17 +146,10 @@ obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obj8.o:			$(OBJ8)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-objc.o:			$(OBJC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
