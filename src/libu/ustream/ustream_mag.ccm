@@ -30,13 +30,11 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* POSIX system types */
-#include	<unistd.h>		/* POSIX system types */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdarg>		/* CSTD |va_list(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ustream.hh"
 
