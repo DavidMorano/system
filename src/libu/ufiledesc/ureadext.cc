@@ -39,7 +39,7 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
-#include	<numeric>		/* C++STD |sat_add(3c++)| */
+#include	<numeric>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU |u_sysconfval(3u)| */
@@ -63,7 +63,6 @@
 using libu::ufiledescbase ;		/* type */
 using std::min ;			/* subroutine */
 using std::max ;			/* subroutine */
-using std::sat_add ;			/* subroutine */
 using libu::umem ;			/* variable */
 
 
