@@ -35,10 +35,7 @@ module ;
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<endian.h>		/* LIBU */
-#include	<ucmem.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"msfile.h"
 
