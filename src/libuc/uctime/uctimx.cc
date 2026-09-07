@@ -31,7 +31,7 @@
 	This module creates per-process (virtual) time-of-day timers
 	for callers.  This interface (these subroutines) are meant
 	to mimic the POSIX® real-time per-process timer facility.
-	Why was this necessary?  Becuase somt (stupid) operating
+	Why was this necessary?  Becuase some (stupid) operating
 	systems which will not be named but have the initials --
 	Apple Darwin -- do not have the POSIX® rea-time per-process
 	timers.  Just a note: unlinke the POSIX® real-time per-process
