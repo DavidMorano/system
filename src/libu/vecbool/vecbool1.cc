@@ -33,7 +33,7 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<new>			/* C++STD */
 #include	<vector>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -84,7 +84,7 @@ int vecbool::resize(int n) noex {
 	        rs = SR_OK ;
 	    } catch (...) {
 		rs = SR_NOMEM ;
-	    }
+	    } /* end */
 	} /* end if (valid) */
 	return rs ;
 } /* end method (vecbool::resize) */
@@ -101,14 +101,14 @@ int vecbool::adj(int idx) noex {
 	    vector<bool>::resize(nsize,false) ;
 	} catch (...) {
 	    rs = SR_NOMEM ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vecbool::adj) */
 
 void vecbool::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecbool",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method */
 
 vecbool_co::operator int () noex {
