@@ -43,17 +43,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| + |strchr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<umem.hh>
-#include	<uids.hh>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| + |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<umem.hh>		/* LIBU */
+#include	<uids.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"umkdirs.h"
 
@@ -85,8 +85,8 @@ namespace {
 	mode_t		dm ;
 	mker(cchar *d,mode_t m) noex : dname(d), dm(m) { } ;
 	operator int () noex ;
-	int procdir(uids *,cchar *) noex ;
-	int mkdirer(uids *,cchar *) noex ;
+	int procdir	(uids *,cchar *) noex ;
+	int mkdirer	(uids *,cchar *) noex ;
     } ; /* end struct (mker) */
 } /* end namespace */
 
