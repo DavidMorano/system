@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += vecbool.h
+INCS += vecbool.hh
 
 MODS +=
 
@@ -44,6 +44,7 @@ OBJ0= vecbool0.o vecbool1.o
 OBJ1=
 
 OBJA= obj0.o
+OBJB=
 
 OBJ= obja.o
 
