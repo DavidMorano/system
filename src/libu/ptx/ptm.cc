@@ -30,7 +30,7 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<numeric>		/* C++STD |mul_sat(3c++)| */
+#include	<numeric>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU |POLL_INTMULT| */
 #include	<usyscalls.h>		/* LIBU |um(3u)| */
@@ -46,8 +46,6 @@
 
 
 /* imported namespaces */
-
-using std::mul_sat ;			/* subroutie-template */
 
 
 /* local typedefs */
@@ -165,7 +163,7 @@ int ptm_lockbeginto(ptm *op,int to) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if (to > 0) {
-		int mto = mul_sat(to,POLL_INTMULT) ;
+		int mto = sat_mul(to,POLL_INTMULT) ;
 		rs = SR_OK ;
 		for (int c = 0 ; mto-- ; c += 1) {
 		    if (c) {
