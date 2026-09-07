@@ -940,6 +940,11 @@ ucinet.o:		ucinet.dir
 ucinet.dir:
 	makesubdir $@
 
+# UCTERMIOS
+uctermios.o:		uctermios.dir
+uctermios.dir:
+	makesubdir $@
+
 # tab and character column handling
 tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h
 
@@ -1073,6 +1078,11 @@ spawn.o:		spawn.dir
 spawn.dir:
 	makesubdir $@
 
+# FIND
+find.o:			find.dir
+find.dir:
+	makesubdir $@
+
 # string-constants
 sysdbfiles.o:		sysdbfiles.cc	sysdbfiles.h
 sysdbfn.o:		sysdbfn.cc	sysdbfn.h
@@ -1108,7 +1118,6 @@ conmsghdr.o:		conmsghdr.cc	conmsghdr.h		$(INCS)
 strval.o:		strval.cc strval.h
 
 # emulated system kernel calls
-umask.o:		umask.cc	umask.h			$(INCS)
 ucnameo.o:		ucnameo.cc	ucnameo.h		$(INCS)
 
 # environment related string values
