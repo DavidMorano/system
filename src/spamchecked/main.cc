@@ -3,12 +3,10 @@
 /* front-end to SPAMCHECKED */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_GETEXECNAME	1		/* use 'getexecname(3c)' */
 #define	CF_ARGSHRINK	1		/* shrink arg in argfile */
-
 
 /* revision history:
 
@@ -22,26 +20,24 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ spamchecked [file(s)]
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<time.h>
 #include	<netdb.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<getx.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<vecstr.h>
@@ -91,20 +87,8 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
-extern int	process(struct proginfo *,bfile *,const char *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strshrink(char *) ;
+extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
+extern int	process(struct proginfo *,bfile *,cchar *) ;
 
 
 /* external variables */
@@ -118,7 +102,7 @@ extern char	*strshrink(char *) ;
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"VERSION",
 	"VERBOSE",
 	"HELP",
@@ -138,7 +122,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*pwisched[] = {
+static cchar	*pwisched[] = {
 	    "%r/var/%n/%n.%f",
 	    "%r/var/%n/%f",
 	    "%r/var/%n.%f",
@@ -181,11 +165,11 @@ char	*envv[] ;
 	int	f_help = FALSE ;
 	int	f_checked = TRUE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*pr = NULL ;
-	const char	*ofname = NULL ;
-	const char	*afname = NULL ;
-	const char	*sp, *cp, *cp2 ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*pr = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*sp, *cp, *cp2 ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	nodename[NODENAMELEN + 1] ;
 	char	domainname[MAXHOSTNAMELEN + 1] ;
@@ -577,11 +561,7 @@ char	*envv[] ;
 
 #if	CF_GETEXECNAME && defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 	    if ((pr == NULL) && (pip->pr == NULL)) {
-
-	        const char	*pp ;
-
-
-	        pp = getexecname() ;
+	        cchar	*pp = getexecname() ;
 
 	        if (pp != NULL)
 	            proginfo_execname(pip,pp) ;
