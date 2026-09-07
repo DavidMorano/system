@@ -28,14 +28,14 @@
 ****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usupport.h>		/* |ulogeerror(3u)| */
-#include	<ucmem.h>		/* |mem(3uc)| */
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |ulogeerror(3u)| */
+#include	<ucmem.h>		/* LIBUC |mem(3uc)| */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mallocstuff.h"
 
@@ -79,7 +79,7 @@ char *mallocbuf(void *bp,int 킶l) noex {
 	if (bp) {
 	    int		rs ;
 	    if (int bl ; (bl = getlenstr(charp(bp),킶l)) >= 0) {
-	        if ((rs = mem.malloc((bl+1),&rp)) >= 0) {
+	        if ((rs = mem.mall((bl+1),&rp)) >= 0) {
 		    memcopy(rp,bp,bl) ;
 		    *rp = '\0' ;
 	        } /* end if (memory-acquire) */
@@ -96,9 +96,9 @@ char *mallocstrw(char *sp,int 탎l) noex {
 	if (sp) {
 	    int		rs ;
 	    if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) {
-	        if ((rs = mem.malloc((sl + 1),&rp)) >= 0) {
+	        if ((rs = mem.mall((sl + 1),&rp)) >= 0) {
 	            strwcpy(rp,sp,sl) ;
-	        } /* end if (uc_malloc) */
+	        } /* end if (memory-acquire) */
 	        if (rs < 0) {
 		    ulogerror("mallocstrw",rs,"uc_malloc") ;
 	        }
@@ -115,11 +115,11 @@ char *mallocint(int v) noex {
 	int		rs ;
 	cint		len = sizeof(int) ;
 	char		*rp = nullptr ;
-	if ((rs = mem.malloc((len + 1),&rp)) >= 0) {
+	if ((rs = mem.mall((len + 1),&rp)) >= 0) {
 	    char	*bp = charp(&v) ;
 	    memcopy(rp,bp,len) ;
 	    *rp = '\0' ;
-	} /* end if (uc_malloc) */
+	} /* end if (memory-acquir) */
 	if (rs < 0) {
 	    ulogerror("mallocint",rs,"uc_malloc") ;
 	}
