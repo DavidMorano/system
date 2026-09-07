@@ -30,7 +30,7 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<compare>		/* C++STD */
-#include	<numeric>		/* C++STD |sat_mul(3c++)| */
+#include	<numeric>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -47,8 +47,6 @@
 
 
 /* imported namespaces */
-
-using std::sat_mul ;			/* subroutine */
 
 
 /* local typedefs */
