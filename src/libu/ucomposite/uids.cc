@@ -43,13 +43,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* UNIX® system types */
-#include	<sys/stat.h>		/* |S_{x}| */
-#include	<unistd.h>		/* |get{x}{y}id(3c)| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<sys/stat.h>		/* POSIX® |S_{x}| */
+#include	<unistd.h>		/* POSIX® |get{x}{y}id(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* CSTD */
+#include	<usysbase.h>		/* CSTD */
+#include	<localmisc.h>		/* CSTD */
 
 #include	"uids.hh"
 
@@ -96,26 +96,26 @@ namespace {
 	} ; /* end ctor */
 	constexpr int operator [] (int a) const noex {
 	    return tab[a] ;
-	} ;
+	} ; /* end */
     } ; /* end struct (permtab) */
 } /* end namespace */
 
 namespace {
     struct trier {
-	uids	*op ;
-        ustat	*sbp ;
-        int	am ;
-	int	pm ;			/* permissions-mask */
-	bool	fdone{} ;
+	uids		*op ;
+        ustat		*sbp ;
+        int		am ;
+	int		pm ;		/* permissions-mask */
+	bool		fdone{} ;
 	trier(uids *p,ustat *s,int a) noex : op(p), sbp(s), am(a) { 
 	    pm = mkperms(am) ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int checkpm(int) const noex ;
-	int root() noex ;
-	int usr() noex ;
-	int grp() noex ;
-	int oth() noex ;
+	int root	() noex ;
+	int usr		() noex ;
+	int grp		() noex ;
+	int oth		() noex ;
     } ; /* end struct (trier) */
     typedef int (trier::*trier_m)() noex ;
 } /* end namespace */
@@ -145,10 +145,10 @@ namespace libu {
     int uids::perm(ustat *sbp,int am) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
-	if (sbp) {
+	if (sbp) ylikely {
 	    rs = SR_OK ;
-	    if (am) {
-	        if (trier to(this,sbp,am) ; (rs = to) >= 0) {
+	    if (am) ylikely {
+	        if (trier to(this,sbp,am) ; (rs = to) >= 0) ylikely {
 		    f = rs ;
 	        } /* end if (trier) */
 	    } /* end if (non-zero positive) */
