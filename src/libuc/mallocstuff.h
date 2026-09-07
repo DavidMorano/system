@@ -20,18 +20,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 EXTERNC_begin
 
-extern char	*mallocbuf(void *,int) noex ;
-extern char	*mallocstr(cchar *) noex ;
-extern char	*mallocstrw(cchar *,int) noex ;
-extern char	*malloctest(int) noex ;
+extern char	*mallocbuf	(void *,int) noex ;
+extern char	*mallocstr	(cchar *) noex ;
+extern char	*mallocstrw	(cchar *,int) noex ;
+extern char	*malloctest	(int) noex ;
 
 EXTERNC_end
 
