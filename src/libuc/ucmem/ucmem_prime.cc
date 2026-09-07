@@ -169,39 +169,39 @@ namespace {
 	aflag		finitdone ;
 	aflag		ftrack ;
 	alloc_m		almem ;
-	int mallcount(ulong *) noex ;
-	int mallset(int) noex ;
-	int trackstart(int) noex ;
+	int mallcount	(ulong *) noex ;
+	int mallset	(int) noex ;
+	int trackstart	(int) noex ;
 	int trackstarter(int) noex ;
-	int trackfinish() noex ;
-	int trackcall(void *,int = 0,void * = nullptr) noex ;
-	int trackmall(int,void *) noex ;
-	int trackvall(int,void *) noex ;
-	int tracrall(void *,int,void *) noex ;
-	int trackfree(void *) noex ;
+	int trackfinish	() noex ;
+	int trackcall	(void *,int = 0,void * = nullptr) noex ;
+	int trackmall	(int,void *) noex ;
+	int trackvall	(int,void *) noex ;
+	int tracrall	(void *,int,void *) noex ;
+	int trackfree	(void *) noex ;
 	int trackpresent(cvoid *) noex ;	/* track-present */
 	int trackcurenum(ucmem_cur *,ucmem_ent *) noex ;
-	int trackreg(cvoid *,int) noex ;	/* track-register */
-	int trackrel(cvoid *) noex ;		/* track-release */
-	int trackout(ulong *) noex ;
-	int mallstats(ucmem_stats *) noex ;
-	int callxalloc(void *,int,void *) noex ;
-	int callrealloc(void *,int,void *) noex ;
-	int callfree(void *,int,void *) noex ;
-	int callpresent(void *,int,void *) noex ;
-	int callcurenum(ucmem_cur *,ucmem_ent *) noex ;
-	int iinit() noex ; 
-	int ifini() noex ;
+	int trackreg	(cvoid *,int) noex ;	/* track-register */
+	int trackrel	(cvoid *) noex ;	/* track-release */
+	int trackout	(ulong *) noex ;
+	int mallstats	(ucmem_stats *) noex ;
+	int callxalloc	(void *,int,void *) noex ;
+	int callrealloc	(void *,int,void *) noex ;
+	int callfree	(void *,int,void *) noex ;
+	int callpresent	(void *,int,void *) noex ;
+	int callcurenum	(ucmem_cur *,ucmem_ent *) noex ;
+	int iinit	() noex ; 
+	int ifini	() noex ;
 	void atforkbefore() noex {
 	    mx.lockbegin() ;
-	} ;
+	} ; /* end */
 	void atforkafter() noex {
 	    mx.lockend() ;
-	} ;
+	} ; /* end */
 	constexpr submgr() noex {
 	    init	(this,submgrmem_init) ;
 	    fini	(this,submgrmem_fini) ;
-	} ;
+	} ; /* end */
 	destruct submgr() noex {
 	    if (cint rs = fini ; rs < 0) {
 		ulogerror("ucmenalloc",rs,"dtor-fini") ;
@@ -211,11 +211,11 @@ namespace {
 	    if ((rs < 0) && (st.err_rs == 0)) {
 		st.err_rs = rs ;
 	    }
-	} ;
+	} ; /* end */
 	void numoutmax() noex {
 	    ulong 	out = (st.num_allocs - st.num_frees) ;
 	    if (out > st.num_outmax) st.num_outmax = out ;
-	} ;
+	} ; /* end */
     } ; /* end structure (ucmem) */
 } /* end namespace */
 
