@@ -62,7 +62,7 @@
 #include	<umem.hh>		/* LIBU */
 #include	<intsat.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<posixdirent.hh>	/* LIBUC */
+#include	<posixdir.hh>		/* LIBU */
 
 #include	"fsdir.h"
 
@@ -79,7 +79,7 @@ using libu::umem ;			/* variable */
 
 /* local typedefs */
 
-typedef posixdirent *	posixdirentp ;
+typedef posixdir *	posixdirp ;
 
 
 /* external subroutines */
@@ -164,7 +164,7 @@ int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 	if ((rs = fsdir_magic(op,dep,nbuf)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (nlen > 0) ylikely {
-		posixdirent	*objp = posixdirentp(op->posixp) ;
+		posixdir	*objp = posixdirp(op->posixp) ;
 		if (dirent_t de ; (rs = objp->read(&de,nbuf,nlen)) >= 0) {
 		    dep->ino = de.d_ino ;
 		    dep->nlen = de.d_namlen ;
@@ -179,7 +179,7 @@ int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 int fsdir_tell(fsdir *op,off_t *rp) noex {
 	int		rs ;
 	if ((rs = fsdir_magic(op)) >= 0) ylikely {
-	    posixdirent	*objp = posixdirentp(op->posixp) ;
+	    posixdir	*objp = posixdirp(op->posixp) ;
 	    if (off_t o ; (rs = objp->tell(&o)) >= 0) ylikely {
 		csize fo = size_t(o) ;
 		if (rp) *rp = o ;
@@ -192,7 +192,7 @@ int fsdir_tell(fsdir *op,off_t *rp) noex {
 int fsdir_seek(fsdir *op,off_t o) noex {
 	int		rs ;
 	if ((rs = fsdir_magic(op)) >= 0) ylikely {
-	    posixdirent	*objp = posixdirentp(op->posixp) ;
+	    posixdir	*objp = posixdirp(op->posixp) ;
 	    rs = objp->seek(o) ;
 	} /* end if (magic) */
 	return rs ;
@@ -201,7 +201,7 @@ int fsdir_seek(fsdir *op,off_t o) noex {
 int fsdir_rewind(fsdir *op) noex {
 	int		rs ;
 	if ((rs = fsdir_magic(op)) >= 0) ylikely {
-	    posixdirent	*objp = posixdirentp(op->posixp) ;
+	    posixdir	*objp = posixdirp(op->posixp) ;
 	    rs = objp->rewind ;
 	} /* end if (magic) */
 	return rs ;
@@ -219,23 +219,22 @@ int fsdir_audit(fsdir *op) noex {
 /* private subroutines */
 
 local int fsdir_begin(fsdir *op,cchar *dname) noex {
-	cnullptr	np{} ;
-	cint		objl = szof(posixdirent) ;
+	cint		objl = szof(posixdir) ;
 	int		rs ;
 	if (void *vp ; (rs = umem.mall(objl,&vp)) >= 0) ylikely {
 	    rs = SR_NOMEM ;
-	    if (posixdirent *objp ; (objp = new(vp) posixdirent) != np) {
+	    if (posixdir *objp = new(vp) posixdir) ylikely {
 		if ((rs = objp->open(dname)) >= 0) {
 	            op->posixp = vp ;
-		}
+		} /* end if (ready) */
 		if (rs < 0) {
 		    destroy_at(objp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (operator-new) */
 	    if (rs < 0) {
 		umem.free(vp) ;
-	    }
-	} /* end if (m-a) */
+	    } /* end if (error) */
+	} /* end if (memor-acquire) */
 	return rs ;
 } /* end subroutine (fsdir_begin) */
 
@@ -243,18 +242,20 @@ local int fsdir_end(fsdir *op) noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	if (op->posixp) ylikely {
-	    posixdirent	*objp = posixdirentp(op->posixp) ;
+	    posixdir	*objp = posixdirp(op->posixp) ;
 	    rs = SR_OK ;
 	    {
 	        rs1 = objp->close ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    destroy_at(objp) ;
+	    {
+	        destroy_at(objp) ;
+	    }
 	    {
 		rs1 = umem.free(op->posixp) ;
 	        if (rs >= 0) rs = rs1 ;
 		op->posixp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (was allocated) */
 	return rs ;
 } /* end subroutine (fsdir_end) */
