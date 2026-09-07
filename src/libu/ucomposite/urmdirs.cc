@@ -56,7 +56,7 @@
 #include	<cstdio>		/* CSTD */
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU |hasnotdots(3u)| */
-#include	<posixdirent.hh>	/* LIBU */
+#include	<posixdir.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
@@ -95,23 +95,23 @@ using libu::umem ;			/* variable */
 
 namespace {
     struct mgr {
-	cchar	*tardname ;
-	char	*pbuf ;
-	char	*nbuf ;
-	int	plen ;
-	int	nlen ;
-	mgr(cchar *td) noex : tardname(td) { } ;
+	cchar		*tardname ;
+	char		*pbuf ;
+	char		*nbuf ;
+	int		plen ;
+	int		nlen ;
+	mgr		(cchar *td) noex : tardname(td) { } ;
 	operator int () noex ;
-	int remover(int) noex ;
-	int removedents(int) noex ;
+	int remover	(int) noex ;
+	int removedents	(int) noex ;
     } ; /* end struct (mgr) */
     struct vars {
-	int	maxname ;
-	int	maxpath ;
+	int		maxname ;
+	int		maxpath ;
 	operator int () noex ;
     } ; /* end struct (vars) */
     struct dirents : vecstr {
-	int load(char *,int,cchar *) noex ;
+	int load	(char *,int,cchar *) noex ;
     } ; /* end struct (dirents) */
 } /* end namespace */
 
@@ -134,10 +134,10 @@ cbool		f_debug = CF_DEBUG ;
 int u_rmdirs(cchar *tardname) noex {
 	int		rs = SR_FAULT ;
 	DPRINTF("ent fn=%s\n",tardname) ;
-	if (tardname) {
+	if (tardname) ylikely {
 	    rs = SR_INVALID ;
-	    if (tardname[0]) {
-		if (static cint rsv = var ; (rs = rsv) >= 0) {
+	    if (tardname[0]) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		    mgr mo(tardname) ;
 		    rs = mo ;
 		} /* end if (vars) */
@@ -158,10 +158,10 @@ mgr::operator int () noex {
 	DPRINTF("ent sz=%d\n",sz) ;
 	plen = var.maxpath ;
 	nlen = var.maxname ;
-	if (char *a ; (rs = umem.mall(sz,&a)) >= 0) {
+	if (char *a ; (rs = umem.mall(sz,&a)) >= 0) ylikely {
 	    pbuf = (a + 0) ;
 	    nbuf = (a + (plen + 1)) ;
-	    if ((rs = mknpath(pbuf,plen,tardname)) >= 0) {
+	    if ((rs = mknpath(pbuf,plen,tardname)) >= 0) ylikely {
 	        DPRINTF("mknpath() rs=%d pbuf=%s\n",rs,pbuf) ;
 		rs = remover(rs) ;
 		c = rs ;
@@ -178,7 +178,7 @@ int mgr::remover(int pl) noex {
 	int		rs ;
 	int		c = 0 ; /* return-value */
 	DPRINTF("ent pl=%d pbuf=%s\n",pl,pbuf) ;
-	if (ustat sb ; (rs = u_lstat(pbuf,&sb)) >= 0) {
+	if (ustat sb ; (rs = u_lstat(pbuf,&sb)) >= 0) ylikely {
 	    if (S_ISDIR(sb.st_mode)) {
 		if ((rs = removedents(pl)) >= 0) {
 		    c = (rs + 1) ;
@@ -201,8 +201,8 @@ int mgr::removedents(int pl) noex {
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
 	DPRINTF("ent pl=%d pbuf=%s\n",pl,pbuf) ;
-	if (dirents names ; (rs = names.start) >= 0) {
-	    if ((rs = names.load(nbuf,nlen,pbuf)) > 0) {
+	if (dirents names ; (rs = names.start) >= 0) ylikely {
+	    if ((rs = names.load(nbuf,nlen,pbuf)) > 0) ylikely {
 	        DPRINTF("names.load() rs=%d\n",rs) ;
 	        cchar	*sp ;
 	        for (int i = 0 ; names.get(i,&sp) >= 0 ; i += 1) {
@@ -229,7 +229,7 @@ int dirents::load(char *nbuf,int nlen,cchar *dname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
-	if (posixdirent d ; (rs = d.open(dname)) >= 0) {
+	if (posixdir d ; (rs = d.open(dname)) >= 0) ylikely {
 	    for (dirent_t de ; (rs = d.read(&de,nbuf,nlen)) > 0 ; ) {
 	        if ((nbuf[0] != '.') || hasnotdots(nbuf,rs)) {
 	            c += 1 ;
@@ -239,18 +239,18 @@ int dirents::load(char *nbuf,int nlen,cchar *dname) noex {
 	    } /* end for */
 	    rs1 = d.close ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (posixdirent) */
+	} /* end if (posixdir) */
 	return (rs >= 0) ? c : rs ;
 } /* end method (dirents::load) */
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = ulibval.maxnamelen) >= 0) {
+	if ((rs = ulibval.maxnamelen) >= 0) ylikely {
 	    maxname = rs ;
-	    if ((rs = ulibval.maxpathlen) >= 0) {
+	    if ((rs = ulibval.maxpathlen) >= 0) ylikely {
 		maxpath = rs ;
-	    }
-	}
+	    } /* end */
+	} /* end */
 	return rs ;
 } /* end method (vars::operator) */
 
