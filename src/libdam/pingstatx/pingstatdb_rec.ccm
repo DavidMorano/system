@@ -80,7 +80,7 @@ module ;
 #include	<vecitem.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
 #include	<ismisc.h>		/* LIBUC */
-#include	<localmisc.h>		/* LIBU |timebUFLEN| */
+#include	<localmisc.h>		/* LIBU |IMTEBUFLEN| */
 #include	<bfile.h>		/* LIBB */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -130,10 +130,10 @@ export {
 	pingstatdb_rec() noex ;
 	destruct pingstatdb_rec() noex {
 	    if (cdp || pdp || hostbuf) dtor() ;
-	} ;
-	int init() noex ;
-	int fini() noex ;
-	void dtor() noex ;
+	} ; /* end */
+	int init	() noex ;
+	int fini	() noex ;
+	void dtor	() noex ;
     } ; /* end struct (pingstatdb_rec) */
 } /* end export */
 
