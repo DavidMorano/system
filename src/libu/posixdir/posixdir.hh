@@ -135,6 +135,21 @@ public:
 	} ; /* end destruct */
 } ; /* end struct (posixdir) */
 
+    cuint		posixdir_magicval = POSIXDIR_MAGIC ;
+
+    template<typename ... Args> 
+    int posixdir_ma::operator () (Args ... args) noex {
+        int             rs = SR_FAULT ;
+        if ((... && args)) {
+            rs = (op->magval == posixdir_magicval) ? SR_OK : SR_NOTOPEN ;
+        } /* end */
+        return rs ;
+    } /* end method (posixdir_ma::operator) */
+
+    inline posixdir_ma::operator int () noex {
+        return (op->magval == posixdir_magicval) ? SR_OK : SR_NOTOPEN ;
+    } /* end method (posixdir_ma::operator) */
+
 
 #endif	/* __cplusplus */
 #endif /* POSIXDIR_INCLUDE */
