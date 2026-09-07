@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
@@ -33,7 +33,7 @@ EXTERNC_end
 #ifdef	__cplusplus
 namespace libu {
     extern int uperm(cchar *,int) noex ;
-}
+} /* end namespace (libu) */
 #endif /* __cplusplus */
 
 
