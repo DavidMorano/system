@@ -13,6 +13,7 @@ envx
 field
 filer
 filex
+find
 fmtflag
 fmtstr
 fsdir
@@ -23,6 +24,7 @@ getxx
 hash
 hdb
 hdbstr
+host
 inetaddrx
 isfiledesc
 ismisc
@@ -52,6 +54,7 @@ sigx
 six
 snwcpy
 snx
+spawn
 strdcpy
 strfilter
 strn
@@ -83,6 +86,7 @@ ucstream
 ucsupport
 ucsys
 ucsysconf
+uctermios
 uterm
 utmpxx
 vec
