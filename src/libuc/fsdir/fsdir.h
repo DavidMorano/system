@@ -17,7 +17,7 @@
 	Traverse a directory and read out the entries.
 
 	Implementation-note:
-	I employ a sub-object (named |posixdirent|) to actually
+	I employ a sub-object (named |posixdir(3u)|) to actually
 	implement the whole "fsdir" functionality.
 
 *******************************************************************************/
