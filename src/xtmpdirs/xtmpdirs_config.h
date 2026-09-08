@@ -1,16 +1,22 @@
-/* config */
+/* xtmpdirs_config HEADER */
+/* charset=ISO8859-1 */
+/* version %I% last-modified %G% */
+
+/* XTMPDIRS (X-Windows Temporary-Directories) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2000-05-14, David A­D­ Morano
-
 	Originally written for Rightcore Network Services.
-
 
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	XTMPDIRSCONFIG_INCLUDE
+#define	XTMPDIRSCONFIG_INCLUDE
 
 
 #define	VERSION		"0"
@@ -109,5 +115,8 @@
 
 #define	TMPGNAME	"sys"
 #define	TMPGID		3
+
+
+#endif /* XTMPDIRSCONFIG_INCLUDE */
 
 
