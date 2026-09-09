@@ -28,6 +28,8 @@
 
 *******************************************************************************/
 
+module ;
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>		/* POSIX */
 #include	<unistd.h>		/* POSIX |SEEK_{xx}| */
@@ -50,9 +52,10 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/ulibvals.ccm"
 
+module ustream ;
+
 import libutil ;			/* |memcopy(3u)| */
 import ulibvals ;			/* |ulibval(3u)| */
-import ustream_mag ;
 
 /* local defines */
 
@@ -76,8 +79,6 @@ using std::max ;		/* subroutine-template */
 using libu::uread ;		/* subroutine */
 using libu::ureade ;		/* subroutine */
 using libu::umem ;		/* variable */
-using ustream_ns::ustream_reserve ;
-using ustream_ns::ustream_flush ;
 
 
 /* local typedefs */
@@ -194,7 +195,6 @@ local int ustream_opener(ustream *op) noex {
 	return rs ;
 } /* end subroutine (ustream_opener) */
 
-namespace ustream_ns {
     int ustream_close(ustream *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -220,9 +220,7 @@ namespace ustream_ns {
 	    op->magval = 0 ;
 	return rs ;
     } /* end subroutine (ustream_close) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_read(ustream *op,void *rbuf,int rlen,int to) noex {
         cint        fmo = FM_TIMED ;
 	int		rs = SR_OK ;
@@ -265,9 +263,7 @@ namespace ustream_ns {
 	} /* end if */
 	return (rs >= 0) ? tlen : rs ;
     } /* end subroutine (ustream_read) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
    int ustream_readp(ustream *op,void *rbuf,int rlen,off_t off,int to) noex {
 	int		rs = SR_OK ;
 	int		tlen = 0 ;
@@ -279,9 +275,7 @@ namespace ustream_ns {
 	    rs = SR_NOSYS ;
 	return (rs >= 0) ? tlen : rs ;
     } /* end subroutine (ustream_readp) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_readln(ustream *op,char *rbuf,int rlen,int to) noex {
 	int		rs = SR_OK ;
 	int		tlen = 0 ;
@@ -332,9 +326,7 @@ namespace ustream_ns {
 	    }
 	return (rs >= 0) ? tlen : rs ;
     } /* end subroutine (ustream_readln) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_readlns(ustream *op,char *lbuf,int llen,int to,int *lcp) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ; /* return-value */
@@ -351,9 +343,7 @@ namespace ustream_ns {
 	    if (lcp) *lcp = lines ;
 	return (rs >= 0) ? i : rs ;
     } /* end subroutine (ustream_readlns) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_write(ustream *op,cvoid *abuf,int alen) noex {
 	    int		rs = SR_OK ;
 	    int		alenr ;
@@ -392,9 +382,7 @@ namespace ustream_ns {
 	    }
 	return (rs >= 0) ? alen : rs ;
     } /* end subroutine (ustream_write) */
-} /* end nameapce (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_println(ustream *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -418,9 +406,7 @@ namespace ustream_ns {
 	    }
 	return (rs >= 0) ? wlen : rs ;
     } /* end subroutine (ustream_println) */
-} /* end nameapce (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_reserve(ustream *op,int len) noex {
 	int		rs = SR_OK ;
 	    if (op->fl.write && (len > 0)) {
@@ -430,10 +416,8 @@ namespace ustream_ns {
 	    }
 	return rs ;
     } /* end subroutine (ustream_reserve) */
-} /* end nameapce (ustream_ns) */
 
-/* update a section of the buffer */
-namespace ustream_ns {
+    /* update a section of the buffer */
     int ustream_update(ustream *op,off_t roff,cchar *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	    uint	boff, bext ;
@@ -467,9 +451,7 @@ namespace ustream_ns {
 	    }
 	return (rs >= 0) ? rlen : rs ;
     } /* end subroutine (ustream_update) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_adv(ustream *op,int inc) noex {
 	int		rs = SR_INVALID ;
 	    if (inc >= 0) ylikely {
@@ -494,9 +476,7 @@ namespace ustream_ns {
 	    } /* end if (valid) */
 	return rs ;
     } /* end subroutine (ustream_adv) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_seek(ustream *op,off_t woff,int w) noex {
 	int		rs = SR_NOTSEEK ;
 	    if (! op->fl.net) {
@@ -534,18 +514,14 @@ namespace ustream_ns {
 	    } /* end if (seekable) */
 	return rs ;
     } /* end subroutine (ustream_seek) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_tell(ustream *op,off_t *offp) noex {
 	int		rs = SR_OK ;
 	    if (offp) *offp = op->foff ;
 	    rs = int(op->foff & INT_MAX) ;
 	return rs ;
     } /* end subroutine (ustream_tell) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_invalidate(ustream *op) noex {
 	int		rs = SR_OK ;
 	    if ((! op->fl.write) && (op->blen > 0)) {
@@ -557,9 +533,7 @@ namespace ustream_ns {
 	    op->bptr = op->dbuf ;
 	return rs ;
     } /* end subroutine (ustream_invalidate) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_flush(ustream *op) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -571,9 +545,7 @@ namespace ustream_ns {
 	    } /* end if */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (ustream_flush) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_poll(ustream *op,int mto) noex {
 	POLLFD		fds[nfds] = {} ;
 	    fds[0].fd = op->fd ;
@@ -581,15 +553,11 @@ namespace ustream_ns {
 	    fds[0].revents = 0 ;
 	return u_poll(fds,nfds,mto) ;
     } /* end subroutine (ustream_poll) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_stat(ustream *op,ustat *sbp) noex {
 	return u_fstat(op->fd,sbp) ;
     } /* end subroutine (ustream_stat) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_lockbegin(ustream *op,int lt,int to) noex {
     	int		rs = SR_INVALID ;
 	(void) to ;
@@ -599,13 +567,10 @@ namespace ustream_ns {
 	    }
 	return rs ;
     } /* end subroutine (ustream_lockbegin) */
-} /* end namespace (ustream_ns) */
 
-namespace ustream_ns {
     int ustream_lockend(ustream *op) noex {
 	return u_lockf(op->fd,F_UNLOCK,0z) ;
     } /* end subroutine (ustream_lockend) */
-} /* end namespace (ustream_ns) */
 
 
 /* private subroutines */
@@ -635,7 +600,7 @@ local int ustream_adjbuf(ustream *op,int bufsz) noex {
 	    op->dlen = bufsz ;
 	    if (rs >= 0) {
 		rs = op->dlen ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (stat) */
 	return rs ;
 } /* end subroutine (ustream_adjbuf) */
@@ -647,7 +612,7 @@ local int ustream_bufcpy(ustream *op,cchar *abp,int mlen) noex {
 	    char	*bp = op->bptr ;
 	    for (int i = 0 ; i < mlen ; i += 1) {
 	        *bp++ = *abp++ ;
-	    }
+	    } /* end for */
 	} /* end if */
 	op->bptr += mlen ;
 	return mlen ;
