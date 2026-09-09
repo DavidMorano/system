@@ -1,4 +1,4 @@
-/* posixdir_prime SUPPORT */
+/* posixdir_prime MODULE (implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -37,6 +37,8 @@
 
 *******************************************************************************/
 
+module ;
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* POSIX® |dir| + |dirent| */
 #include	<unistd.h>		/* POSIX® */
@@ -59,9 +61,10 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
+module posixdir;
+
 import libutil ;			/* |memclear(3u)| */
 import ulibvals ;
-import posixdir_mag ;
 
 /* local defines */
 
