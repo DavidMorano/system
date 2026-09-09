@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += ustream.hh
 
-MODS += ustream_mag.o
+MODS += ustream0.o
 
 LIBS +=
 
@@ -143,10 +143,12 @@ obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+ustream0.o:		ustream.ccm				$(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
 ustream_prime.o:	ustream_prime.cc		$(DEPS) $(INCS)
 ustream_printf.o:	ustream_printf.cc		$(DEPS) $(INCS)
 ustream_writers.o:	ustream_writers.cc		$(DEPS) $(INCS)
 ustream_obj.o:		ustream_obj.cc			$(DEPS) $(INCS)
-ustream_mag.o:		ustream_mag.ccm				$(INCS)
 
 
