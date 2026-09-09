@@ -62,10 +62,10 @@
 #include	<umem.hh>		/* LIBU */
 #include	<intsat.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<posixdir.hh>		/* LIBU */
 
 #include	"fsdir.h"
 
+import posixdir ;
 
 /* local defines */
 
