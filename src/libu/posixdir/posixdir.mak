@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += posixdir.hh
 
-MODS += 
+MODS += posixdir0.o
 
 LIBS +=
 
@@ -43,7 +43,7 @@ LIBS +=
 DEPS= $(MODS)
 
 OBJ0= posixdir_prime.o
-OBJ1=
+OBJ1= $(MODS)
 OBJ2=
 OBJ3=
 OBJ4=
@@ -51,7 +51,7 @@ OBJ5=
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o
@@ -155,6 +155,8 @@ objb.o:			$(OBJB)
 obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+posixdir0.o:		posixdir.ccm			$(INCS)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 posixdir_prime.o:	posixdir_prime.cc	$(DEPS) $(INCS)
 
