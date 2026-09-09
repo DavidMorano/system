@@ -27,6 +27,8 @@
 
 *******************************************************************************/
 
+module ;
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>		/* POSIX */
 #include	<unistd.h>		/* POSIX |SEEK_{xx}| */
@@ -47,9 +49,10 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/ulibvals.ccm"
 
+module ustream ;
+
 import libutil ;			/* |memcopy(3u)| */
 import ulibvals ;			/* |ulibval(3u)| */
-import ustream_mag ;
 
 /* local defines */
 
@@ -68,9 +71,6 @@ using libu::uread ;		/* subroutine */
 using libu::ureade ;		/* subroutine */
 using libu::snvprintf ;		/* subroutine */
 using libu::umem ;		/* variable */
-using ustream_ns::ustream_reserve ;
-using ustream_ns::ustream_flush ;
-using ustream_ns::ustream_write ;
 
 
 /* local typedefs */
@@ -96,7 +96,6 @@ using ustream_ns::ustream_write ;
 
 /* exported subroutines */
 
-namespace ustream_ns {
     int ustream_vprintf(ustream *op,cchar *fmt,va_list ap) noex {
 	int		rs ;
 	int		rs1 ;
@@ -112,7 +111,6 @@ namespace ustream_ns {
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
     } /* end subroutine (ustream_vprintf) */
-} /* end nameapce (ustream_ns) */
 
 
 /* private subroutines */
