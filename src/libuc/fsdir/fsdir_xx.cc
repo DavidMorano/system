@@ -59,6 +59,7 @@
 
 #include	"fsdir.h"
 
+import posixdir ;
 
 /* local defines */
 
