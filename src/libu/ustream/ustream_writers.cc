@@ -114,6 +114,8 @@
 
 *******************************************************************************/
 
+module ;
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD |nullptr_t| */
 #include	<cstdlib>		/* CSTD */
@@ -127,9 +129,10 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
+module ustream ;
+
 import libutil ;			/* |lenstr(3u)| */
 import uconstants ;
-import ustream_mag ;
 
 /* local defines */
 
@@ -138,8 +141,6 @@ import ustream_mag ;
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using ustream_ns::ustream_writealign ;	/* subroutine */
-using ustream_ns::ustream_writezero ;	/* subroutine */
 
 /* local typedefs */
 
@@ -178,7 +179,6 @@ constexpr zeroer	zo ;
 
 /* exported subroutines */
 
-namespace ustream_ns {
     int ustream_writeblanks(ustream *op,int n) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -189,6 +189,7 @@ namespace ustream_ns {
 	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
     } /* end subroutine (ustream_writeblanks) */
+
     int ustream_writealign(ustream *op,int asz) noex {
 	int		rs ;
 	int		wlen = 0 ;
@@ -203,6 +204,7 @@ namespace ustream_ns {
 	} /* end if (ustream_tell) */
 	return (rs >= 0) ? wlen : rs ;
     } /* end subroutine (ustream_writeallign) */
+
     int ustream_writezero(ustream *op,int n) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -214,7 +216,6 @@ namespace ustream_ns {
 	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
     } /* end subroutine (ustream_writezero) */
-} /* end namespace (ustream_ns) */
 
 int ustream::writefill(cchar *sp,int sl) noex {
 	int		rs ;
@@ -230,6 +231,7 @@ int ustream::writefill(cchar *sp,int sl) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (ustream_writefill) */
+
 int ustream::writefd(char *bp,int bl,int mfd,int len) noex {
 	int		rs ;
 	int		wlen = 0 ;
