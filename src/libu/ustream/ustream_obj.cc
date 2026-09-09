@@ -26,8 +26,10 @@
 
 *******************************************************************************/
 
+module ;
+
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -36,35 +38,12 @@
 
 #include	"ustream.hh"
 
-import ustream_mag ;
+module ustream ;
 
 /* local defines */
 
 
 /* imported namespaces */
-
-using ustream_ns::ustream_close ;
-using ustream_ns::ustream_read ;
-using ustream_ns::ustream_readp ;
-using ustream_ns::ustream_readln ;
-using ustream_ns::ustream_readlns ;
-using ustream_ns::ustream_write ;
-using ustream_ns::ustream_println ;
-using ustream_ns::ustream_vprintf ;
-using ustream_ns::ustream_reserve ;
-using ustream_ns::ustream_update ;
-using ustream_ns::ustream_adv ;
-using ustream_ns::ustream_seek ;
-using ustream_ns::ustream_tell ;
-using ustream_ns::ustream_invalidate ;
-using ustream_ns::ustream_flush ;
-using ustream_ns::ustream_poll ;
-using ustream_ns::ustream_stat ;
-using ustream_ns::ustream_lockbegin ;
-using ustream_ns::ustream_lockend ;
-using ustream_ns::ustream_writeblanks ;
-using ustream_ns::ustream_writealign ;
-using ustream_ns::ustream_writezero ;
 
 
 /* local typedefs */
