@@ -56,7 +56,6 @@
 #include	<cstdio>		/* CSTD */
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU |hasnotdots(3u)| */
-#include	<posixdir.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
@@ -68,6 +67,7 @@ import libutil ;
 import umisc ;				/* |mknpath(3u)| + |pathnpadd(3u) */
 import ureserve ;			/* |vecstr(3u)| */
 import ulibvals ;			/* |max{x}| */
+import posixdir ;
 
 /* local defines */
 
