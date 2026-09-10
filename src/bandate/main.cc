@@ -29,16 +29,17 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<usystem.h>
-#include	<getourenv.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<usyscalls.h>
 #include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<bfile.h>
@@ -149,7 +150,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_top = (cp[0] == 't') ;
 	}
 
-	if ((rs = tmtime_gmtime(&tm,daytime)) >= 0) {
+	if ((rs = tmtime_timegm(&tm,daytime)) >= 0) {
 	    rs = sntmtime(dbuf,dlen,&tm,tspec) ;
 	}
 
