@@ -2,6 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
+/* definitions? */
 /* version %I% last-modified %G% */
 
 
@@ -15,20 +16,17 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DEFS_INCLUDE
-#define	DEFS_INCLUDE	1
+#define	DEFS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/timeb.h>		/* for 'struct timeb' */
-#include	<limits.h>
-
-#include	<vecstr.h>
-#include	<logfile.h>
-#include	<ids.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<sys/timeb.h>		/* POSIX |struct timeb| */
+#include	<limits.h>		/* CSTD */
+#include	<vecstr.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
 
 
 #ifndef	MAXPATHLEN
@@ -261,7 +259,7 @@ struct proginfo {
 	void		*config ;	/* configuration */
 	void		*watch ;	/* watch */
 	void		*pcsconf ;	/* save space when not needed */
-	PROGINFO_FL	have, f, changed, final ;
+	PROGINFO_FL	have, f, changed, finval ;
 	PROGINFO_FL	open ;
 	struct timeb	now ;
 	IDS		id ;
