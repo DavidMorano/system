@@ -1,10 +1,10 @@
-#!/usr/extra/bin/ksh
+#!/usr/local/bin/ksh
 # MKLINKS
 
 CMDS=" appleterminal_pwd appleterminal_doc "
 
 LOCPROG=appleterminal.x
-TDIRS=" /usr/local /opt/local "
+TDIRS=" /usr/extra /usr/local "
 
 function linkdir {
   typeset TDIR=${1}
