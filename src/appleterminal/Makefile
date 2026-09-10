@@ -37,18 +37,16 @@ INCS +=
 
 MODS += libutil.ccm umisc.ccm
 
-LIBS += -luo -lu
+LIBS += -lu
 
 
 DEPS_MAIN += 
 
-OBJ_MACUSER= term_main.o
+OBJ_MACUSER= appleterminal_main.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -95,7 +93,7 @@ all:			$(ALL)
 
 
 $(T).x:			$(OBJ_MACUSER)
-	$(CXX) -o $@ $(LDFLAGS) $(RUNINFO) $(OBJ_MACUSER) $(LIBINFO)
+	$(CXX) -o $@ $(LDFLAGS) $(RUNINFO) $^ $(LIBINFO)
 
 $(T).nm:		$(T).x
 	$(NM) $(NMFLAGS) $(T).x > $(T).nm
@@ -116,7 +114,7 @@ install:		$(T).x
 	makeinstall $(T).x
 
 
-term_main.o:		term_main.cc			$(INCS)
+appleterminal_main.o:	appleterminal_main.cc			$(INCS)
 
 libutil.ccm:
 	makemodcurrent $@
