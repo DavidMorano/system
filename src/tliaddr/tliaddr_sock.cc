@@ -1,6 +1,6 @@
 /* progsock SUPPORT */
 /* charset=ISO8859-1 */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to process socket interface type addresses */
 /* version %I% last-modified %G% */
