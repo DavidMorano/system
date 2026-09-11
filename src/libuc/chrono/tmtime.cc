@@ -257,7 +257,6 @@ int tmtime_timelocal(tmtime *op,time_t t) noex {
 int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	int		rs ;
 	if ((rs = tmtime_zinit(op,tmp)) >= 0) ylikely {
-	    TM		tc = *tmp ; /* copy */
 	    op->gmtoff	= 0 ;
 	    op->sec	= tmp->tm_sec ;
 	    op->min	= tmp->tm_min ;
@@ -269,6 +268,7 @@ int tmtime_insert(tmtime *op,CTM *tmp) noex {
 	    op->yday	= tmp->tm_yday ;
 	    op->isdst	= tmp->tm_isdst ;
 	    if (tmp->tm_isdst < 0) {
+	    	TM	tc = *tmp ; /* copy */
 	        time_t	t ; /* dummy */
 	        rs = uc_mktime(&tc,&t) ;
 	    } /* end if (need DST indicator) */
