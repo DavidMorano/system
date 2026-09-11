@@ -34,9 +34,11 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>		/* POSIX |ttyname_r(3c)| */
 #include	<fcntl.h>		/* POSIX */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<usyscalls.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<localmisc.h>		/* CSTD */
 
 #include	"ucttyname.h"
@@ -73,16 +75,16 @@ import libutil ;			/* |lenstr(3u)| */
 
 int uc_ttyname(int fd,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (dbuf) {
+	int		len = 0 ; /* return-value */
+	if (dbuf) ylikely {
 	    rs = SR_BADF ;
-	    if (fd >= 0) {
+	    if (fd >= 0) ylikely {
 		rs = SR_INVALID ;
-		if (dlen >= 0) {
+		if (dlen >= 0) ylikely {
 		    if ((rs = ttyname_rp(fd,dbuf,dlen)) == 0) {
 	    	        len = lenstr(dbuf,dlen) ;
 		    } else {
-			rs = (- rs) ; /* returned an ERRNO code */
+			rs = (neg rs) ; /* returned an ERRNO code */
 		    }
 		} /* end if (valid) */
 	    } /* end if (valid) */
