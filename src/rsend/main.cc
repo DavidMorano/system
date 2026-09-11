@@ -32,7 +32,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -42,7 +42,7 @@
 #include	<fcntl.h>
 #include	<csignal>
 #include	<netdb.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 
@@ -917,11 +917,11 @@ char	*envv[] ;
 
 	    for (j = 0 ; j < 2 ; j += 1) {
 
-	        if (j == 0)
+	        if (j == 0) {
 	            schedvar_add(&sf,"f",SYSFNAME1) ;
-
-	        else
+	        } else {
 	            schedvar_add(&sf,"f",SYSFNAME2) ;
+		}
 
 	        for (i = 0 ; sysfiles[i] != NULL ; i += 1) {
 
@@ -950,7 +950,6 @@ char	*envv[] ;
 	    } /* end for */
 
 	    schedvar_finish(&sf) ;
-
 	} /* end block (loading 'systems' files) */
 
 #if	CF_DEBUG 
@@ -965,7 +964,7 @@ char	*envv[] ;
 
 	    systems_curbegin(&sysdb,&cur) ;
 
-	    while (systems_enum(&sysdb,&cur,&sep) >= 0) {
+	    while (systems_curenum(&sysdb,&cur,&sep) >= 0) {
 
 	        debugprintf("main: sysname=%s\n",sep->sysname) ;
 
@@ -1126,11 +1125,11 @@ char	*envv[] ;
 
 	                    if (! f_anyformat) {
 
-	                        len = uc_readlinetimed(s,buf,BUFLEN,timeout) ;
+	                        len = uc_readlnto(s,buf,BUFLEN,timeout) ;
 
 #if	CF_DEBUG
 	                        if (pip->debuglevel > 1)
-	                            debugprintf("main: uc_readlinetimed() "
+	                            debugprintf("main: uc_readlnto() "
 					    "len=%d\n",
 	                                len) ;
 #endif /* CF_DEBUG */
