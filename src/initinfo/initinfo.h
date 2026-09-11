@@ -49,7 +49,7 @@ extern int	initinfo_open(initinfo *,cchar *) noex ;
 extern int	initinfo_curbegin(initinfo *,initinfo_cur *) noex ;
 extern int	initinfo_curend(initinfo *,initinfo_cur *) noex ;
 extern int	initinfo_query(initinfo *,cchar *,char *,int) noex ;
-extern int	initinfo_enum(initinfo *,initinfo_cur *,
+extern int	initinfo_curenum(initinfo *,initinfo_cur *,
 			char *,int,char *,int) noex ;
 extern int	initinfo_close(initinfo *) noex ;
 
