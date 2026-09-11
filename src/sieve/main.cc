@@ -58,7 +58,7 @@
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>
-#include	<time.h>
+#include	<ctime>
 
 #include	<usystem.h>
 #include	<bfile.h>
