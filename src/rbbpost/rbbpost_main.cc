@@ -41,41 +41,40 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/timeb.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<umask.h>
-#include	<bits.h>
-#include	<keyopt.h>
-#include	<bfile.h>
-#include	<tmz.hh>
-#include	<tmtime.hh>
-#include	<timestr.h>
-#include	<vecstr.h>
-#include	<vechand.h>
-#include	<userinfo.h>
-#include	<field.h>
-#include	<vecitem.h>
-#include	<ema.h>
-#include	<ascii.h>
-#include	<buffer.h>
-#include	<nulstr.h>
-#include	<hdbstr.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/timeb.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
+#include	<bits.h>		/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<tmz.hh>		/* LIBUC */
+#include	<tmtime.hh>		/* LIBUC */
+#include	<timestr.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<vecitem.h>		/* LIBUC */
+#include	<ema.h>			/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<hdbstr.h>		/* LIBUC */
 #include	<pcsconf.h>		/* PCS */
 #include	<pcspoll.h>		/* PCS */
 #include	<ng.h>			/* PCS */
 #include	<article.h>		/* PCS */
 #include	<bbhosts.h>		/* PCS */
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -83,8 +82,12 @@
 
 /* local defines */
 
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
+#ifndef	PI
+#define	PI		progingo
+#endif
+
+#define	LI		locinfo
+#define	LI_FL	locinfo_flags
 
 
 /* external subroutines */
@@ -145,8 +148,8 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, fl, changed, fin ;
-	LOCINFO_FL	open ;
+	LI_FL	have, fl, changed, fin ;
+	LI_FL	open ;
 	vecstr		stores ;
 	EMA		hdrfroms ;
 	HDBSTR		ngmap ;
@@ -169,42 +172,42 @@ struct locinfo {
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procbase(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,struct tdinfo *,ARGINFO *,bits *,
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procbase(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+local int	procargs(PROGINFO *,struct tdinfo *,ARGINFO *,bits *,
 			cchar *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,vecstr *,cchar *,int) ;
-static int	procinput(PROGINFO *,struct tdinfo *,vecstr *,cchar *) ;
+local int	procspecs(PROGINFO *,vecstr *,cchar *,int) ;
+local int	procinput(PROGINFO *,struct tdinfo *,vecstr *,cchar *) ;
 
-static int	procartloads(PROGINFO *,struct tdinfo *,VECHAND *,vecstr *) ;
-static int	procartload(PROGINFO *,struct tdinfo *,ARTICLE *,cchar *,int) ;
-static int	procartloader(PROGINFO *,struct tdinfo *,char *,int,cchar *) ;
+local int	procartloads(PROGINFO *,struct tdinfo *,VECHAND *,vecstr *) ;
+local int	procartload(PROGINFO *,struct tdinfo *,ARTICLE *,cchar *,int) ;
+local int	procartloader(PROGINFO *,struct tdinfo *,char *,int,cchar *) ;
 
-static int	procartdel(PROGINFO *,struct tdinfo *,ARTICLE *) ;
+local int	procartdel(PROGINFO *,struct tdinfo *,ARTICLE *) ;
 
-static int	procartfins(PROGINFO *,vechand *) ;
-static int	procnewsdname(PROGINFO *pip) ;
-static int	procartdname(PROGINFO *,struct tdinfo *) ;
+local int	procartfins(PROGINFO *,vechand *) ;
+local int	procnewsdname(PROGINFO *pip) ;
+local int	procartdname(PROGINFO *,struct tdinfo *) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procpcsconf_begin(PROGINFO *,PCSCONF *) ;
-static int	procpcsconf_end(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
+local int	procpcsconf_begin(PROGINFO *,PCSCONF *) ;
+local int	procpcsconf_end(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_hdrfrom(LOCINFO *,cchar *,int) ;
-static int	locinfo_hdrfromget(LOCINFO *,EMA **) ;
-static int	locinfo_mkhdrfrom(LOCINFO *) ;
-static int	locinfo_mkhdrfromname(LOCINFO *) ;
-static int	locinfo_mkhdrfromaddr(LOCINFO *) ;
-static int	locinfo_ngdname(LOCINFO *,char *,cchar *,int) ;
+local int	locinfo_start(LI *,PROGINFO *) ;
+local int	locinfo_finish(LI *) ;
+local int	locinfo_setentry(LI *,cchar **,cchar *,int) ;
+local int	locinfo_hdrfrom(LI *,cchar *,int) ;
+local int	locinfo_hdrfromget(LI *,EMA **) ;
+local int	locinfo_mkhdrfrom(LI *) ;
+local int	locinfo_mkhdrfromname(LI *) ;
+local int	locinfo_mkhdrfromaddr(LI *) ;
+local int	locinfo_ngdname(LI *,char *,cchar *,int) ;
 
 #ifdef	COMMENT
-static int	pcsconf_mkdir() ;
+local int	pcsconf_mkdir() ;
 #endif
 
 
@@ -315,7 +318,7 @@ static const uchar	aterms[] = {
 int main(int argc,cchar *argv[],cchar *envv[])
 {
 	PROGINFO	pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+	LI		li, *lip = &li ;
 	ARGINFO		ainfo ;
 	bits		pargs ;
 	keyopt		akopts ;
@@ -362,7 +365,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	memset(&stz,0,sizeof(TMZ)) ;
 
-	umaskset(0002) ;
+	uc_fileumaskset(0002) ;
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
 	if (rs < 0) {
@@ -1163,7 +1166,7 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1188,9 +1191,9 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
@@ -1279,7 +1282,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1324,7 +1327,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1339,7 +1342,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
+local int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 {
 	int		rs = SR_OK ;
 
@@ -1381,7 +1384,7 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 /* end subroutine (procpcsconf_begin) */
 
 
-static int procpcsconf_end(PROGINFO *pip)
+local int procpcsconf_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1392,7 +1395,7 @@ static int procpcsconf_end(PROGINFO *pip)
 /* end subroutine (procpcsconf_end) */
 
 
-static int procbase(PROGINFO *pip,ARGINFO *aip,bits *app,cchar *afn,cchar *ofn,
+local int procbase(PROGINFO *pip,ARGINFO *aip,bits *app,cchar *afn,cchar *ofn,
 		cchar *ifn)
 {
 	int		rs ;
@@ -1432,7 +1435,7 @@ static int procbase(PROGINFO *pip,ARGINFO *aip,bits *app,cchar *afn,cchar *ofn,
 /* end subroutine (procbase) */
 
 
-static int procargs(pip,tip,aip,app,afn,ofn,ifn)
+local int procargs(pip,tip,aip,app,afn,ofn,ifn)
 PROGINFO	*pip ;
 struct tdinfo	*tip ;
 ARGINFO		*aip ;
@@ -1555,7 +1558,7 @@ cchar		*ifn ;
 /* end subroutine (procargs) */
 
 
-static int procspecs(PROGINFO *pip,vecstr *nlp,cchar *lbuf,int llen)
+local int procspecs(PROGINFO *pip,vecstr *nlp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1578,7 +1581,7 @@ static int procspecs(PROGINFO *pip,vecstr *nlp,cchar *lbuf,int llen)
 /* end subroutine (procspecs) */
 
 
-static int procinput(PROGINFO *pip,struct tdinfo *tip,vecstr *nlp,cchar *ifn)
+local int procinput(PROGINFO *pip,struct tdinfo *tip,vecstr *nlp,cchar *ifn)
 {
 	vechand		arts, *alp = &arts ;
 	int		rs ;
@@ -1656,7 +1659,7 @@ static int procinput(PROGINFO *pip,struct tdinfo *tip,vecstr *nlp,cchar *ifn)
 /* end subroutine (procinput) */
 
 
-static int procartloads(pip,tip,alp,nlp)
+local int procartloads(pip,tip,alp,nlp)
 PROGINFO	*pip ;
 struct tdinfo	*tip ;
 VECHAND		*alp ;
@@ -1718,14 +1721,14 @@ vecstr		*nlp ;
 /* end subroutine (procartloads) */
 
 
-static int procartload(pip,tip,aip,np,nl)
+local int procartload(pip,tip,aip,np,nl)
 PROGINFO	*pip ;
 struct tdinfo	*tip ;
 ARTICLE		*aip ;
 cchar		*np ;
 int		nl ;
 {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	const int	st = articlestr_articleid ;
 	int		rs ;
 	int		c = 0 ;
@@ -1795,7 +1798,7 @@ int		nl ;
 /* end subroutine (procartload) */
 
 
-static int procartloader(pip,tip,ngdname,ngdlen,sp)
+local int procartloader(pip,tip,ngdname,ngdlen,sp)
 PROGINFO	*pip ;
 struct tdinfo	*tip ;
 char		ngdname[] ;
@@ -1831,7 +1834,7 @@ cchar		*sp ;
 /* end subroutine (procartloader) */
 
 
-static int procartdel(PROGINFO *pip,TDINFO *tip,ARTICLE *aip)
+local int procartdel(PROGINFO *pip,TDINFO *tip,ARTICLE *aip)
 {
 	const int	st = articlestr_articleid ;
 	int		rs ;
@@ -1854,7 +1857,7 @@ static int procartdel(PROGINFO *pip,TDINFO *tip,ARTICLE *aip)
 /* end subroutine (procloaddel) */
 
 
-static int procartfins(PROGINFO *pip,vechand *alp)
+local int procartfins(PROGINFO *pip,vechand *alp)
 {
 	ARTICLE		*aip ;
 	int		rs = SR_OK ;
@@ -1900,7 +1903,7 @@ static int procartfins(PROGINFO *pip,vechand *alp)
 /* end subroutine (procartfins) */
 
 
-static int procnewsdname(PROGINFO *pip)
+local int procnewsdname(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1974,7 +1977,7 @@ static int procnewsdname(PROGINFO *pip)
 /* end subroutine (procnewsdname) */
 
 
-static int procartdname(PROGINFO *pip,struct tdinfo *tip)
+local int procartdname(PROGINFO *pip,struct tdinfo *tip)
 {
 	int		rs ;
 	cchar		*artcname = ARTCNAME ;
@@ -2003,13 +2006,13 @@ static int procartdname(PROGINFO *pip,struct tdinfo *tip)
 /* end subroutine (procartdname) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LI *lip,PROGINFO *pip)
 {
 	int		rs ;
 
 	if (lip == NULL) return SR_FAULT ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memset(lip,0,sizeof(LI)) ;
 	lip->pip = pip ;
 	lip->to = -1 ;
 
@@ -2024,7 +2027,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LI *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2048,7 +2051,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -2082,7 +2085,7 @@ int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_hdrfrom(LOCINFO *lip,cchar *sp,int sl)
+local int locinfo_hdrfrom(LI *lip,cchar *sp,int sl)
 {
 	EMA		*emap = &lip->hdrfroms ;
 	int		rs ;
@@ -2093,7 +2096,7 @@ static int locinfo_hdrfrom(LOCINFO *lip,cchar *sp,int sl)
 /* end subroutine (locinfo_hdrfrom) */
 
 
-static int locinfo_mkhdrfrom(LOCINFO *lip)
+local int locinfo_mkhdrfrom(LI *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2149,7 +2152,7 @@ static int locinfo_mkhdrfrom(LOCINFO *lip)
 /* end subroutine (locinfo_mkhdrfrom) */
 
 
-static int locinfo_mkhdrfromname(LOCINFO *lip)
+local int locinfo_mkhdrfromname(LI *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2212,7 +2215,7 @@ static int locinfo_mkhdrfromname(LOCINFO *lip)
 /* end subroutine (locinfo_mkhdrfromname) */
 
 
-static int locinfo_mkhdrfromaddr(LOCINFO *lip)
+local int locinfo_mkhdrfromaddr(LI *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2275,7 +2278,7 @@ static int locinfo_mkhdrfromaddr(LOCINFO *lip)
 /* end subroutine (locinfo_mkhdrfromaddr) */
 
 
-static int locinfo_hdrfromget(LOCINFO *lip,EMA **epp)
+local int locinfo_hdrfromget(LI *lip,EMA **epp)
 {
 	int		rs ;
 	if ((rs = locinfo_mkhdrfrom(lip)) >= 0) {
@@ -2289,7 +2292,7 @@ static int locinfo_hdrfromget(LOCINFO *lip,EMA **epp)
 
 
 /* our little NG-directory cache (caching only positive hits) */
-static int locinfo_ngdname(LOCINFO *lip,char *ngdname,cchar *np,int nl)
+local int locinfo_ngdname(LI *lip,char *ngdname,cchar *np,int nl)
 {
 	PROGINFO	*pip = lip->pip ;
 	HDBSTR		*mlp = &lip->ngmap ;
@@ -2334,21 +2337,15 @@ static int locinfo_ngdname(LOCINFO *lip,char *ngdname,cchar *np,int nl)
 	} /* end if (ok) */
 
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (locinfo_ngdname) */
+} /* end subroutine (locinfo_ngdname) */
 
+int progngdname(PROGINFO *pip,char *ngdname,cchar *nap,int nl) noex {
+	LI	*lip = pip->lip ;
+	return locinfo_ngdname(lip,ngdname,nap,nl) ;
+} /* end subroutine (progngdname) */
 
-int progngdname(PROGINFO *pip,char *ngdname,cchar *np,int nl)
-{
-	LOCINFO	*lip = pip->lip ;
-	return locinfo_ngdname(lip,ngdname,np,nl) ;
-}
-/* end subroutine (progngdname) */
-
-
-int progmsgfromema(PROGINFO *pip,EMA **epp)
-{
-	LOCINFO		*lip = pip->lip ;
+int progmsgfromema(PROGINFO *pip,EMA **epp) noex {
+	LI		*lip = pip->lip ;
 	int		rs ;
 	if (pip == NULL) return SR_FAULT ;
 	rs = locinfo_hdrfromget(lip,epp) ;
@@ -2357,12 +2354,9 @@ int progmsgfromema(PROGINFO *pip,EMA **epp)
 	    debugprintf("main/progmsgfromema: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (progmsgfromget) */
+} /* end subroutine (progmsgfromget) */
 
-
-int progexpiration(PROGINFO *pip,cchar **rpp)
-{
+int progexpiration(PROGINFO *pip,cchar **rpp) noex {
 	int		rs = SR_OK ;
 
 	if (pip == NULL) return SR_FAULT ;
@@ -2378,14 +2372,10 @@ int progexpiration(PROGINFO *pip,cchar **rpp)
 	}
 
 	return rs ;
-}
-/* end subroutine (progexpiration) */
-
+} /* end subroutine (progexpiration) */
 
 #ifdef	COMMENT
-
-static int pcsconf_mkdir(PCSCONF *pp,char *name,more_t mode)
-{
+local int pcsconf_mkdir(PCSCONF *pp,char *name,more_t mode) noex {
 	ustat	sb ;
 	uid_t		uid_pcs ;
 	gid_t		gid_pcs ;
@@ -2407,7 +2397,7 @@ static int pcsconf_mkdir(PCSCONF *pp,char *name,more_t mode)
 	if (rs >= 0)
 	    goto ret0 ;
 
-	um = umask(0) ;
+	um = uc_filemaskget() ;
 
 /* check on the parent */
 
