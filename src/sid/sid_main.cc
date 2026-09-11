@@ -27,6 +27,23 @@
 #include	<localmisc.h>		/* LIBU */
 
 
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::cout ;			/* variable */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* exported variables */
 
 
@@ -34,7 +51,7 @@
 
 int main(int,con mainv,con mainv) {
 	int	sid = getsid(0) ;
-	std::cout << sid << '\n' ;
+	cout << sid << eol ;
 } /* end subroutine (main) */
 
 
