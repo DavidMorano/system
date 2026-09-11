@@ -34,11 +34,9 @@
 	Returns:
 	OK	doesn't really matter in the current implementation
 
-
 *****************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -686,30 +684,19 @@ BUILTIN		*bip ;
 	}
 
 #ifdef	COMMENT
-	jobdb_delp(&jdb,jep) ;
+	jobdb_delent(&jdb,jep) ;
 #endif /* COMMENT */
 
 	jobdb_free(&jdb) ;
-
 	return rs ;
-}
-/* end subroutine (watchone) */
+} /* end subroutine (watchone) */
 
 
+/* local subroutines */
 
-/* LOCAL SUBROUTINES */
-
-
-
-static void int_all(sn)
-int	sn ;
-{
-
-
-	f_exit = TRUE ;
-}
-/* end subroutine (int_all) */
-
+local void int_all(int sn) noex {
+	f_exit = true ;
+} /* end subroutine (int_all) */
 
 /* write out the output files from the executed program */
 static int writeout(gp,fd,s)
@@ -718,43 +705,24 @@ int	fd ;
 char	s[] ;
 {
 	bfile		file, *fp = &file ;
-
-	ustat	sb ;
-
-	int		tlen, len ;
-
+	int		tlen = 0 ;
+	int		len ;
 	char		linebuf[LINELEN + 1] ;
-
-
-	tlen = 0 ;
-	if ((u_fstat(fd,&sb) >= 0) && (sb.st_size > 0)) {
-
+	if (ustat sb ; (u_fstat(fd,&sb) >= 0) && (sb.st_size > 0)) {
 	    u_rewind(fd) ;
-
 	    logfile_printf(&gp->lh,s) ;
-
 	    if (bopen(fp,(char *) fd,"dr",0666) >= 0) {
-
 	        while ((len = breadln(fp,linebuf,LINELEN)) > 0) {
-
 	            tlen += len ;
 	            if (linebuf[len - 1] == '\n')
 	                linebuf[--len] = '\0' ;
-
 	            logfile_printf(&gp->lh,"| %W\n",
 			linebuf,MIN(len,MAXOUTLEN)) ;
-
 	        } /* end while (reading lines) */
-
 	        bclose(fp) ;
-
 	    } /* end if (opening file) */
-
 	} /* end if (non-zero file size) */
-
 	return tlen ;
-}
-/* end subroutine (writeout) */
-
+} /* end subroutine (writeout) */
 
 
