@@ -36,7 +36,7 @@
 #define	SRVPE_MASTER	1
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -45,7 +45,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<ftw.h>
 #include	<dirent.h>
 #include	<climits>
