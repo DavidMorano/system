@@ -28,7 +28,7 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<vecstr.h>
-#include	<vstrxcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<paramfile.h>
 #include	<localmisc.h>
 
@@ -191,7 +191,7 @@ INITINFO_CUR	*curp ;
 
 
 /* enum: returns key-length */
-int initinfo_enum(op,curp,kbuf,kbuflen,vbuf,vbuflen)
+int initinfo_curenum(op,curp,kbuf,kbuflen,vbuf,vbuflen)
 INITINFO	*op ;
 INITINFO_CUR	*curp ;
 char		kbuf[] ;
@@ -260,7 +260,7 @@ int		vbuflen ;
 
 	return (rs >= 0) ? kl : rs ;
 }
-/* end subroutine (initinfo_enum) */
+/* end subroutine (initinfo_curenum) */
 
 
 /* query: returns value-length */
