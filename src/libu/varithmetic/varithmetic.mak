@@ -131,7 +131,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat varithmetic	gcm.cache
+	rmsubpat $(T)
 	rmobj
 
 control:
