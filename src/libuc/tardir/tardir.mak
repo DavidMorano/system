@@ -120,9 +120,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat tardir-prime	gcm.cache
-	rmsubpat tardir-vecent	gcm.cache
-	rmsubpat tardir		gcm.cache
+	rmsubpat tardir tardir-prime tardir-vecent 
 
 control:
 	(uname -n ; date) > Control
