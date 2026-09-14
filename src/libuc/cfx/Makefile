@@ -116,11 +116,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat cfalphax	gcm.cache
-	rmsubpat cfcharsx	gcm.cache
-	rmsubpat cfdigx		gcm.cache
-	rmsubpat cfpowx		gcm.cache
-	rmsubpat cfsysx		gcm.cache
+	rmsubpat cfalphax cfcharsx cfdigx cfpowx cfsysx
 
 control:
 	(uname -n ; date) > Control
