@@ -240,10 +240,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat bstree		gcm.cache
-	rmsubpat sview		gcm.cache
-	rmsubpat bufsizedata	gcm.cache
-	rmsubpat mapblock	gcm.cache
+	rmsubpat bstree intenum mapblock prique retstat sview 
 
 control:
 	(uname -n ; date) > Control
