@@ -106,7 +106,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat usigsets	gcm.cache
+	rmsubpat $(T)
 
 control:
 	(uname -n ; date) > Control
