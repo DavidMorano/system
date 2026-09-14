@@ -129,14 +129,8 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat digtab		gcm.cache
-	rmsubpat constdiv	gcm.cache
-	rmsubpat builtin	gcm.cache
-	rmsubpat bitop		gcm.cache
-	rmsubpat valuelims	gcm.cache
-	rmsubpat digbufsizes	gcm.cache
-	rmsubpat usysbasic	gcm.cache
-	rmsubpat numbasedigs	gcm.cache
+	rmsubpat digtab	constdiv builtin bitop valuelims
+	rmsubpat digbufsizes usysbasic numbasedigs
 	rmobj
 
 control:
