@@ -106,7 +106,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat uconstants	gcm.cache
+	rmsubpat $(T)
 	rmobj
 
 control:
