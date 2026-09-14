@@ -128,7 +128,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat intext		gcm.cache
+	rmsubpat $(T)
 	rmobj
 
 control:
