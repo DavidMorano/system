@@ -30,14 +30,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* |pipe(2)| */
-#include	<cerrno>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysflag.h>
-#include	<usysrets.h>
-#include	<usupport.h>
+#include	<unistd.h>		/* POSIX® |pipe(2)| */
+#include	<cerrno>		/* CSTD */
+#include	<clanguage.h>		/* CSTD */
+#include	<utypedefs.h>		/* CSTD */
+#include	<utypealiases.h>	/* CSTD */
+#include	<usysflag.h>		/* CSTD */
+#include	<usysrets.h>		/* CSTD */
+#include	<usupport.h>		/* CSTD */
 
 #include	"usys.h"
 #include	"usys_pipes.h"
@@ -90,7 +90,7 @@ unixret_t pipe2(int *pipes,int of) noex {
                 if (rs < 0) {
                     close(pipes[0]) ;
                     close(pipes[1]) ;
-		    errno = (- rs) ;
+		    errno = (neg rs) ;
 		    rc = -1 ;
                 } /* end if (error) */
 	    } /* end if (pipe) */
