@@ -68,15 +68,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getprogname(3c)| |getexecname(3c) */
-#include	<cstring>		/* |strncpy(3c)| */
+#include	<cstring>		/* CSTD |strncpy(3c)| */
 #include	<new>			/* C++STD |nothrow(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ulogerror.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usys.h"
 #include	"getexecname.h"
@@ -117,7 +117,7 @@ namespace {
 	} ; /* end ctor */
 	operator int () noex {
 	    return ((rss >= 0) && ebuf) ? elen : rss ;
-	} ;
+	} ; /* end */
 	destruct execstorer() {
 	    if (ebuf) {
 		delete [] ebuf ;
@@ -139,7 +139,7 @@ cchar *getexecname() noex {
 	        rp = exec_data.ebuf ;
 	    }
 	} else {
-	    errno = (- rs) ;
+	    errno = (neg rs) ;
 	    ulogerror("getexecname",rs,"namer::operator") ;
 	}
 	return rp ;
