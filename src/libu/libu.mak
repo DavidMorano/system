@@ -196,13 +196,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat ischx		gcm.cache
-	rmsubpat findbit	gcm.cache
-	rmsubpat typecodes	gcm.cache
-	rmsubpat bitmanip	gcm.cache
-	rmsubpat bitgrp		gcm.cache
-	rmsubpat chrset		gcm.cache
-	rmsubpat chrset		gcm.cache
+	rmsubpat ischx findbit typecodes bitmanip bitgrp chrset
 	rmobj
 
 control:
