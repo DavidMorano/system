@@ -113,7 +113,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat sif		gcm.cache
+	rmsubpat $(T)
 
 control:
 	(uname -n ; date) > Control
