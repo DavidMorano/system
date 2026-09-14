@@ -115,8 +115,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat cvtdig		gcm.cache
-	rmsubpat cvtfloat	gcm.cache
+	rmsubpat cvtdig cvtfloat
 
 control:
 	(uname -n ; date) > Control
