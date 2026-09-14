@@ -243,8 +243,8 @@ int namer::pwd() noex {
 		    strcpy((rbuf + rl),az) ;
 		    rs = verify(rl + pl) ;
 		}
-	    }
-	}
+	    } /* end if (ugetcwd) */
+	} /* end if (relative path) */
 	return rs ;
 } /* end method (namer::pwd) */
 
