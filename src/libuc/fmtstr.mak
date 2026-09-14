@@ -123,11 +123,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat fmtutil	gcm.cache
-	rmsubpat fmtspec	gcm.cache
-	rmsubpat fmtsub		gcm.cache
-	rmsubpat fmtobj		gcm.cache
-	rmsubpat fmtstrdata	gcm.cache
+	rmsubpat fmtutil fmtspec fmtsub fmtobj fmtstrdata
 
 control:
 	(uname -n ; date) > Control
