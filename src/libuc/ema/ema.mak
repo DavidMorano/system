@@ -112,9 +112,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat ema_parts	gcm.cache
-	rmsubpat ema_entry	gcm.cache
-	rmsubpat ema_asstr	gcm.cache
+	rmsubpat ema_mag ema_parts ema_entry ema_asstr
 
 control:
 	(uname -n ; date) > Control
