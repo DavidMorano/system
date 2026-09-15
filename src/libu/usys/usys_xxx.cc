@@ -172,38 +172,4 @@ namespace usys {
 /* LOADAVGINT end */
 /*----------------------------------------------------------------------------*/
 
-#if	CF_STRTOX
-#ifndef	SUBROUTINE_STRTOX
-#define	SUBROUTINE_STRTOX
-int	strtoi	(cchar *sp,char **endp,int b) noex { 
-    	int		res = 0 ;
-    	cint nb = (szof(int) * CHAR_BIT) ;
-	if (sp) {
-    	    const long	r = strtol(sp,endp,b) ;
-	    res = intconv(r) ;
-	    if (abs(r) >> nb) {
-	        errno = ERANGE ;
-	    }
-	} else {
-	    errno = EFAULT ;
-	}
-	return res ;
-} /* end subroutine */
-uint	strtoui	(cchar *sp,char **endp,int b) noex {
-    	uint		res = 0 ;
-    	cint nb = (szof(uint) * CHAR_BIT) ;
-	if (sp) {
-    	    const ulong	r = strtoul(sp,endp,b) ;
-	    res = uintconv(r) ;
-	    if (r >> nb) {
-	        errno = ERANGE ;
-	    }
-	} else {
-	    errno = EFAULT ;
-	}
-	return res ;
-} /* end subroutine */
-#endif /* SUBROUTINE_STRTOI */
-#endif /* CF_STRTOX */
-
 
