@@ -1,6 +1,9 @@
-/* envstandards (Darwin) */
+/* envstandards HEADER (Darwin) */
 /* charset=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
+
+/* compilation environment standards */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
