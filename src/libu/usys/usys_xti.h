@@ -31,10 +31,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
@@ -44,9 +44,9 @@
 #else /* defined(SYSHAS_XTI) && (SYSHAS_XTI > 0) */
 
 
-#include	"usys_xtibase.h"
-#include	"usys_xtierror.h"
-#include	"usys_xtistructs.h"
+#include	"usys_xtibase.h"	/* ?? STREAMS® */
+#include	"usys_xtierror.h"	/* ?? STREAMS® */
+#include	"usys_xtistructs.h"	/* ?? STREAMS® */
 
 extern int t_errno ;
 
