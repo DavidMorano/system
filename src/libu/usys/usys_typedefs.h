@@ -36,11 +36,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<dirent.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<dirent.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #if	defined(SYSHAS_TYPEDIRENT) && (SYSHAS_TYPEDIRENT > 0)
