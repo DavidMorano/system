@@ -5,7 +5,6 @@
 /* miscelllaneous (XXX) operating system support */
 /* version %I% last-modified %G% */
 
-#define	CF_STRTOX	0		/* enable compilation */
 
 /* revision history:
 
@@ -52,11 +51,6 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-
-
-#ifndef	CF_STRTOX
-#define	CF_STRTOX	0		/* enable compilation */
-#endif
 
 
 /*----------------------------------------------------------------------------*/
@@ -130,7 +124,7 @@ typedef int	projid_t ;
 #ifdef	__cplusplus
 extern "C" {
     extern projid_t getprojid() noex ;
-}
+} /* end */
 #else
     extern projid_t getprojid() noex ;
 #endif /* __cplusplus */
@@ -239,7 +233,7 @@ EXTERNC_end
 #ifdef	__cplusplus /* C++ only! */
 namespace usys {
     extern sysret_t kloadavg(int *,int) noex ;
-}
+} /* end */
 #endif /* __cplusplus (C++ only) */
 #endif /* DECLARATION_KLOADAVG */
 
@@ -253,19 +247,19 @@ namespace usys {
 EXTERNC_begin
 local inline unixret_t statfile(cchar *fn,USTAT *sbp) noex {
     	return stat(fn,sbp) ;
-}
+} /* end */
 local inline unixret_t statfilefs(cchar *fn,USTATFS *sbp) noex {
     	return statfs(fn,sbp) ;
-}
+} /* end */
 local inline unixret_t statfilevfs(cchar *fn,USTATVFS *sbp) noex {
     	return statvfs(fn,sbp) ;
-}
+} /* end */
 local inline unixret_t fstatfile(int fd,USTAT *sbp) noex {
     	return fstat(fd,sbp) ;
-}
+} /* end */
 local inline unixret_t fstatfilevfs(int fd,USTATVFS *sbp) noex {
     	return fstatvfs(fd,sbp) ;
-}
+} /* end */
 EXTERNC_end
 #endif /* SUBROUTINE_STATFILE */
 
@@ -274,7 +268,7 @@ EXTERNC_end
 EXTERNC_begin
 local inline unixret_t dupover(int sfd,int dfd) noex {
     	return dup2(sfd,dfd) ;
-}
+} /* end */
 EXTERNC_end
 #endif /* SUBROUTINE_DUPOVER */
 
@@ -283,7 +277,7 @@ EXTERNC_end
 EXTERNC_begin
 local inline char *strbrk(cchar *sp,cchar *sc) noex {
     	return strpbrk(sp,sc) ;
-}
+} /* end */
 EXTERNC_end
 #endif /* SUBROUTINE_STRBRK */
 
@@ -293,19 +287,9 @@ EXTERNC_end
 EXTERNC_begin
 local inline char *strochr(cchar *sp,int sch) noex {
     	return strchr(sp,sch) ;
-}
+} /* end */
 EXTERNC_end
 #endif /* SUBROUTINE_STROCHR */
-
-#if	CF_STRTOX
-#ifndef	DECLARATION_STRTOX
-#define	DECLARATION_STRTOX
-EXTERNC_begin
-extern sint	strtoi(cchar *,char **,int) noex ;
-extern uint	strtoui(cchar *,char **,int) noex ;
-EXTERNC_end
-#endif /* DECLARATION_STRTOX */
-#endif /* CF_STRTOX */
 
 
 #endif /* USYSXXX_INCLUDE */
