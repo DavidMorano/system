@@ -41,18 +41,18 @@
 /* USYSDARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
-#include	<sys/types.h>
+#include	<sys/types.h>		/* POSIX® */
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */
 #include	<sys/sysctl.h>		/* <- Darwin |sysctl(2)| */
-#include	<signal.h>
-#include	<time.h>
-#include	<pthread.h>
-#include	<semaphore.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<pthread.h>		/* POSIX® */
+#include	<semaphore.h>		/* POSIX® */
+#include	<time.h>		/* CSTD */
+#include	<signal.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 #include	<usysargz.hh>
 
