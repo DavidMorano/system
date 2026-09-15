@@ -29,11 +29,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<netinet/in.h>		/* |in_addr| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<netinet/in.h>		/* POSIX® |in_addr| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #if	defined(SYSHAS_IN4IN6ADDR) && (SYSHAS_IN4IN6ADDR > 0)
