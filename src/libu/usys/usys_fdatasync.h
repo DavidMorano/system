@@ -33,12 +33,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* for Solaris® */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysflag.h>
+#include	<unistd.h>		/* POSIX® for Solaris® */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
 
 /* FDATASYNC begin */
 #if	defined(SYSHAS_FDATASYNC) && (SYSHAS_FDATASYNC > 0)
