@@ -36,20 +36,20 @@
 #ifndef USYSXTIBASE_INCLUDE
 #define	USYSXTIBASE_INCLUDE
 
-#include <sys/types.h>
-#include <stdint.h>
+#include <sys/types.h>			/* POSIX® */
+#include <stdint.h>			/* POSIX® */
 
 /*
  * The following include file has declarations needed by both the kernel
  * level transport providers and the user level library. This file includes
  * it to expose its namespaces to XTI user level interface.
  */
-#include <sys/tpicommon.h>
+#include <sys/tpicommon.h>		/* ?? STREAMS® */
 
 /*
  * Include XTI interface level options management declarations
  */
-#include <sys/xti_xtiopt.h>
+#include <sys/xti_xtiopt.h>		/* ?? STREAMS® */
 
 #if !defined(_XPG5)
 
@@ -59,8 +59,8 @@
  * Note: The older Unix95/XNS4 XTI spec required these to be
  * exposed through the generic interface header.
  */
-#include <sys/xti_osi.h>
-#include <sys/xti_inet.h>
+#include <sys/xti_osi.h>		/* ?? STREAMS® */
+#include <sys/xti_inet.h>		/* ?? STREAMS® */
 
 #endif /* !defined(_XPG5) */
 
