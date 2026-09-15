@@ -61,7 +61,7 @@ OBJ14_USYS= usys_environ.o usys_onc.o usys_getnetname.o
 OBJ15_USYS= usys_getauid.o usys_atox.o usys_strtox.o
 
 OBJ16_USYS= usys_getprocuid.o usys_in4in6addr.o
-OBJ17_USYS=
+OBJ17_USYS= getexecname.o
 OBJ18_USYS=
 OBJ19_USYS=
 
@@ -70,14 +70,13 @@ OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
 OBJC= obj06_usys.o obj07_usys.o obj08_usys.o
 OBJD= obj09_usys.o obj10_usys.o obj11_usys.o 
 OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
-OBJF= obj15_usys.o obj16_usys.o
+OBJF= obj15_usys.o obj16_usys.o obj17_usys.o
 
 OBJ_USYS= obja.o objb.o objc.o objd.o obje.o objf.o
 
 
 INCDIRS= -I inc -I /usr/local/include
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -280,5 +279,7 @@ usys_timezone.o:	usys_timezone.cc	usys_timezone.h		$(INCS)
 
 # special
 usysargz.o:		usysargz.cc		usysargz.hh		$(INCS)
+
+getexecname.o:		getexecname.cc		getexecname.h		$(INCS)
 
 
