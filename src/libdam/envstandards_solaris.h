@@ -1,6 +1,9 @@
-/* envstandards HEADER */
+/* envstandards HEADER (Solaris®) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
+
+/* compilation environment standards */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
