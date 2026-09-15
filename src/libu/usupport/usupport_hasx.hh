@@ -21,15 +21,15 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 namespace libu {
-    extern bool hasnotdots(cchar *,int) noex ;
-}
+    extern bool hasext		(cchar *,int,cchar *) noex ;
+} /* end namespace (libu) */
 
 
 #endif /* __cplusplus (C++ only) */
