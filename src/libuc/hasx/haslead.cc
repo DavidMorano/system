@@ -28,7 +28,7 @@
 	(caller supplied) after skipping all leading white-space.
 
 	Synopsis:
-	bool haslead(cchar *sp,int µsl,int chx) noex
+	bool haslead(cchar *sp,int sl,int chx) noex
 
 	Arguments:
 	sp		c-string pointer
