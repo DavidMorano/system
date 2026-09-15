@@ -44,7 +44,7 @@ namespace usys {
 	void dtor() noex ;
 	destruct usysargz() {
 	    if (name) dtor() ;
-	} ;
+	} ; /* end */
 	void initonce() noex ;
     } ; /* end struct (usysargz) */
 } /* end namespace (usys) */
