@@ -39,6 +39,7 @@
 #include	<usupport_cfinet.hh>
 #include	<usupport_getsign.hh>
 #include	<usupport_hasnot.hh>
+#include	<usupport_hasx.hh>
 #include	<usupport_itimer.hh>
 #include	<usupport_matkeystr.hh>
 #include	<usupport_matostr.hh>
@@ -48,6 +49,7 @@
 #include	<usupport_prime.h>
 #include	<usupport_rmx.hh>
 #include	<usupport_sichar.hh>
+#include	<usupport_siext.hh>
 #include	<usupport_sispan.hh>
 #include	<usupport_siwhtx.hh>
 #include	<usupport_sixchr.hh>
