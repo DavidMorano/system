@@ -38,19 +38,19 @@ module ;
 #include	<sys/statvfs.h>		/* |statvfs| */
 #include	<sys/stat.h>		/* |stat(3c)| */
 #include	<pthread.h>		/* |pthread_atfork(3c)| */
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |atexit(3c)| */
-#include	<cstring>		/* |strncpy(3c)| + |stpcpy(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usys.h>		/* |statfile(2)| + |statfilefs(2)| */
-#include	<utimeout.h>
-#include	<errtimer.hh>
-#include	<localmisc.h>
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD |atexit(3c)| */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usys.h>		/* LIBU |statfile{x}(2)| */
+#include	<utimeout.h>		/* LIBU */
+#include	<errtimer.hh>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -91,7 +91,7 @@ namespace {
 	    bf = abf ;
 	    apf = aapf ;
 	    acf = aacf ;
-	} ;
+	} ; /* end */
 	ucaller(void_f f) noex : func(f) { } ;
 	ucaller(cchar *afn,void *asp) noex : fn(afn), sbp(asp) { } ;
 	ucaller(cchar *afn,int aam) noex : fn(afn), am(aam) { } ;
@@ -305,10 +305,9 @@ sysret_t ucaller::stdstatvfs() noex {
 } /* end method (ucaller::stdstatvfs) */
 
 sysret_t ucaller::stdgetcwd() noex {
-    	cnullptr	np{} ;
     	csize		rsize = size_t(rlen) ;
 	int		rs ;
-	if (char *rp ; (rp = getcwd(rbuf,(rsize + 1))) != np) {
+	if (char *rp = getcwd(rbuf,(rsize + 1))) {
 	    rs = lenstr(rp) ;
 	} else {
 	    rs = (neg errno) ;
