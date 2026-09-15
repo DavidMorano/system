@@ -86,6 +86,8 @@
 #include	<usys_in4in6addr.h>
 #include	<usys_timezone.h>
 
+#include	<getexecname.h>
+
 
 #endif /* USYS_INCLUDE */
 
