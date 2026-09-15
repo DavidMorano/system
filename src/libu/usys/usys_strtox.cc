@@ -17,6 +17,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This file contains the UNIX® system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very
 	small way to make up for some of the immense brain-damage within
@@ -90,7 +91,8 @@ uint	strtoui(cchar *s,char **epp,int b) noex {
 	if (s) {
 	    con ulong resl = strtoul(s,epp,b) ;
 	    if (errno == 0) {
-	        if ((resl >> (szof(uint) * CHAR_BIT)) == 0L) {
+		cint nib = (szof(uint) * CHAR_BIT) ;
+	        if ((resl >> nib) == 0UL) {
 	            res = conv<uint>(resl) ;
 		} else {
 		    res = UINT_MAX ;
