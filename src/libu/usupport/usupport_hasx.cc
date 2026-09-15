@@ -18,36 +18,36 @@
 /*******************************************************************************
 
 	Name:
-	hasnotdots
+	hasext
 
 	Description:
-	This subroutine determines if the given string has neither of the
-	following:
-	+ only one dot character
-	+ only two dot characters
+	This subroutine determines if the given counted string has 
+	the given extension (given as a c-string).
 
 	Synopsis:
-	bool hasNotDots(cchar *sp,int sl) noex
+    	bool hasext(cchar *sp,int sl,cchar *ext) noex
 
 	Arguments:
-	sp		pointer to given string
-	sl		length of given string
+	sp		test string pointer
+	sl		test string length
+	ext		etension c-string to search for
 
 	Returns:
-	false		string has the standard dot-dirs
-	true		string does not have the standard dot-dirs
+	false		no	- test string has the extension
+	true		yes	- test string has the extention
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
-#include	<cstdlib>		/* CSTD */
+#include	<cstdlib>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |UC(3u)| */
 
+#include	"usupport_siext.hh"
 #include	"usupport_hasx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
@@ -58,6 +58,8 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 
 
 /* imported namespaces */
+
+using libu::siext ;			/* subroutine */
 
 
 /* local typedefs */
@@ -84,19 +86,13 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 /* exported subroutines */
 
 namespace libu {
-    bool hasnotdots(cchar *sp,int µsl) noex {
-	bool		f = true ;
-	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
-	    if (sp[0] == '.') {
-	        if (sl == 1) {
-	            f = false ;
-	        } else if (sl == 2) {
-	            f = (sp[1] != '.') ;
-	        }
-	    } /* end if (possible) */
-	} /* end if (getlenstr) */
-	return f ;
-    } /* end subroutine (hasnotdots) */
+    bool hasext(cchar *sp,int sl,cchar *ext) noex {
+    	bool		f = false ;
+	if (cint si = siext(sp,sl) ; si >= 0) {
+	    f = (strcmp((sp + si),ext) == 0) ;
+	} /* end if (siext) */
+    	return f ;
+    } /* end subroutine (hasext) */
 } /* end namespace (libu) */
 
 
