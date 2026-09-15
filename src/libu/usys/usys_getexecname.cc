@@ -79,7 +79,7 @@
 #include	<localmisc.h>		/* LIBU */
 
 #include	"usys.h"
-#include	"getexecname.h"
+#include	"getexecname.h"		/* Solaris® */
 
 #ifndef	MAXPATH
 #define	MAXPATH		(4 * 1024)	/* resonable value for exec-name */
@@ -123,7 +123,7 @@ namespace {
 		delete [] ebuf ;
 		ebuf = nullptr ;
 		elen = 0 ;
-	    }
+	    } /* end if (delete) */
 	} ; /* end dtor */
     } ; /* end struct (execstorer) */
 } /* end namespace */
@@ -131,10 +131,9 @@ namespace {
 static execstorer	exec_data ;
 
 cchar *getexecname() noex {
-    	static cint	rss = exec_data ;
 	cchar		*rp = nullptr ;
 	int		rs ;
-	if ((rs = rss) >= 0) {
+    	if  (static cint rss = exec_data ; (rs = rss) >= 0) {
 	    if (rs > 0) {
 	        rp = exec_data.ebuf ;
 	    }
@@ -147,8 +146,8 @@ cchar *getexecname() noex {
 
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
-#include	<sys/auxv.h>
-#include	<elf.h>
+#include	<sys/auxv.h>		/* Solaris® */
+#include	<elf.h>			/* Solaris® */
 
 cchar *getexecname() noex {
 	culong		at = AT_EXECFN ;
