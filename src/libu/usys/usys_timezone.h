@@ -30,13 +30,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/time.h>		/* for all others |gettimeofday(3c)| */
+#include	<sys/time.h>		/* POSIX® |gettimeofday(3c)| */
 #include	<sys/timeb.h>		/* |ftime(3c)| */
-#include	<unistd.h>		/* for Solaris® */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<unistd.h>		/* POSIX® for Solaris® */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 /* STIME begin */
 #if	defined(SYSHAS_TIMEZONE) && (SYSHAS_TIMEZONE > 0)
