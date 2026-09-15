@@ -49,7 +49,7 @@ OBJ05= usupport_rmx.o
 OBJ06= usupport_ustrftime.o 
 OBJ07= usupport_ctdec.o usupport_cthex.o
 
-OBJ08= usupport_getsign.o
+OBJ08= usupport_getsign.o usupport_siext.o
 OBJ09= usupport_strnxchr.o usupport_strnxbrk.o
 OBJ10= usupport_strnchar.o usupport_strnwht.o
 OBJ11= usupport_strkeycmp.o usupport_strwcmp.o
@@ -60,9 +60,9 @@ OBJ14= usupport_sichar.o usupport_sispan.o
 OBJ15= usupport_sixchr.o usupport_siwhtx.o
 
 OBJ16= usupport_matstr.o usupport_matostr.o 
-OBJ17= usupport_hasnot.o usupport_strwcpy.o
+OBJ17= usupport_matkeystr.o usupport_strwcpy.o
 OBJ18= usupport_nleadkeystr.o usupport_nleadstr.o
-OBJ19= usupport_matkeystr.o 
+OBJ19= usupport_hasx.o usupport_hasnot.o 
 
 OBJ20= usupport_strdcpyx.o usupport_strdcpyxw.o
 OBJ21= usupport_vstrcmp.o usupport_vstrkeycmp.o
@@ -252,8 +252,8 @@ usupport_getsign.o:	usupport_getsign.cc	usupport_getsign.hh	$(INCS)
 usupport_getusmtime.o:	usupport_getusmtime.cc	usupport_getusmtime.hh	$(INCS)
 usupport_getustime.o:	usupport_getustime.cc	usupport_getustime.hh	$(INCS)
 usupport_itimer.o:	usupport_itimer.cc	usupport_itimer.hh	$(INCS)
-usupport_hasx.o:	usupport_hasx.cc	usupport_hasx.hh	$(INCS)
 usupport_hasnot.o:	usupport_hasnot.cc	usupport_hasnot.hh	$(INCS)
+usupport_hasx.o:	usupport_hasx.cc	usupport_hasx.hh	$(INCS)
 usupport_ctdec.o:	usupport_ctdec.cc	usupport_ctdec.hh	$(INCS)
 usupport_cthex.o:	usupport_cthex.cc	usupport_cthex.hh	$(INCS)
 usupport_matostr.o:	usupport_matostr.cc	usupport_matostr.hh	$(INCS)
@@ -264,6 +264,7 @@ usupport_matkeystr.o:	usupport_matkeystr.cc	usupport_matkeystr.hh	$(INCS)
 usupport_prime.o:	usupport_prime.cc	usupport_prime.h	$(INCS)
 usupport_rmx.o:		usupport_rmx.cc		usupport_rmx.hh		$(INCS)
 usupport_sichar.o:	usupport_sichar.cc	usupport_sichar.hh	$(INCS)
+usupport_siext.o:	usupport_siext.cc	usupport_siext.hh	$(INCS)
 usupport_sispan.o:	usupport_sispan.cc	usupport_sispan.hh	$(INCS)
 usupport_siwhtx.o:	usupport_siwhtx.cc	usupport_siwhtx.hh	$(INCS)
 usupport_sixchr.o:	usupport_sixchr.cc	usupport_sixchr.hh	$(INCS)
