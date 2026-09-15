@@ -104,7 +104,7 @@ int siext(cchar *fp,int µfl) noex {
 	if (int fl ; (fl = getlenstr(fp,µfl)) >= 0) {
 	    while ((fl > 0) && (fp[fl - 1] == CH_SLASH)) {
 	        fl -= 1 ;
-	    }
+	    } /* end */
 	    if ((si = sirbrk(fp,fl,&bi.brks)) >= 0) {
 		if (fp[si] == CH_DOT) {
 		    si += 1 ;
