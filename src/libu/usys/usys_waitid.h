@@ -33,17 +33,17 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/wait.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/wait.h>		/* POSIX® */
 
 /* WAITID begin */
 #if	(!defined(SYSHAS_WAITID)) || (SYSHAS_WAITID == 0)
 
 
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #ifndef	TYPEDEF_WAITID
