@@ -89,7 +89,7 @@ import uconstants ;			/* |varname(3u)| */
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 
 
@@ -151,7 +151,7 @@ constexpr try_m		tries[] = {
     	&subinfo::tryother
 } ; /* end array */
 
-static bufsizevar	maxpathlen(bufsize_mp) ;
+static bufsizevar	maxpathlen	(bufsize_mp) ;
 constexpr cchar		*varpath	= varname.path ;
 cbool			f_debug		= CF_DEBUG ;
 
@@ -178,7 +178,10 @@ int getprogroot(char *rbuf,cc *pr,con mainv prns,cc *namep) noex {
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (getprogroot) */
 
-int subinfo::operator ()(cchar *namep,int namel) noex {
+
+/* local subroutines */
+
+int subinfo::operator () (cchar *namep,int namel) noex {
     	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ; /* return-value */
@@ -197,9 +200,6 @@ int subinfo::operator ()(cchar *namep,int namel) noex {
 	} /* end is (strt-finish) */
 	return (rs >= 0) ? rl : rs ;
 } /* end method (subinfo::operator) */
-
-
-/* local subroutines */
 
 int subinfo::start() noex {
     	int		rs ;
