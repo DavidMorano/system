@@ -85,7 +85,7 @@ import ureserve ;			/* |char_{x}(3u)| */
 
 /* forward references */
 
-local bool	isnotempry(int) noex ;
+local bool	isnotempty(int) noex ;
 
 
 /* local variables */
@@ -117,7 +117,7 @@ namespace libu {
 	bool		f = false ;
 	if (sp) ylikely {
 	    for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
-	        if ((f = isnotempry(ch))) break ;
+	        if ((f = isnotempty(ch))) break ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return f ;
@@ -127,11 +127,11 @@ namespace libu {
 
 /* local subroutines */
 
-local bool isnotempry(int ch) noex {
+local bool isnotempty(int ch) noex {
     	bool f = true ;
 	f = f && (! char_iswhite(ch)) ;
 	f = f && (ch != CH_NL) ;
 	return f ;
-} /* end subroutine (isnotempry) */
+} /* end subroutine (isnotempty) */
 
 
