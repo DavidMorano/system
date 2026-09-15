@@ -34,18 +34,18 @@
 #if	(!defined(SYSHAS_GETRANDOM)) || (SYSHAS_GETRANDOM == 0)
 
 
-#include	<sys/random.h>		/* |getentropy(2)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<sys/random.h>		/* POSIX® |getentropy(2)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 enum grnds {
     grnd_nonblock,
     grnd_random,
     grnd_insecure,
     grnd_overlast
-} ;
+} ; /* end enum (grnds) */
 
 #define GRND_NONBLOCK	(1 << grnd_nonblock)	/* do not block open */
 #define GRND_RANDOM	(1 << grnd_random)	/* use '/dev/random' */
