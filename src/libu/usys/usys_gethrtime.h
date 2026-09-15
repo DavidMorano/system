@@ -29,12 +29,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/time.h>		/* <- |gethrtime(3c)| */
-#include	<time.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<sys/time.h>		/* POSIX® <- |gethrtime(3c)| */
+#include	<time.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 /* GETHRTIME begin */
