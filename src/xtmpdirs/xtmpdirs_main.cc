@@ -119,7 +119,7 @@ local int	process(PI *) noex ;
 local int	procdir(PI *,cchar *) noex ;
 local int	procdirer(PI *,cchar *,mode_t) noex ;
 
-local int	procuserinfo_begin(PI *,USERINFO *) noex ;
+local int	procuserinfo_begin(PI *,userinfo *) noex ;
 local int	procuserinfo_end(PI *) noex ;
 
 local int	locinfo_start(LI *,PI *) noex ;
@@ -186,7 +186,7 @@ constexpr cpcchar	progopts[] = {
 	nullptr
 } ; /* end array */
 
-static cchar	*xdnames[] = {
+constexpr cpcchar	xdnames[] = {
 	".X11-unix",
 	".X11-pipe",
 	nullptr
@@ -605,7 +605,7 @@ int main(int argc,con mainv argv,con mainv envv) {
 /* continue */
 
 	if (rs >= 0) {
-	    USERINFO	u ;
+	    userinfo	u ;
 	    if ((rs = userinfo_start(&u,nullptr)) >= 0) {
 	        if ((rs = procuserinfo_begin(pip,&u)) >= 0) {
 		    if ((rs = proglog_begin(pip,&u)) >= 0) {
@@ -856,7 +856,7 @@ local int procdirer(PI *pip,cchar *xdname,mode_t dm) noex {
 	return rs ;
 } /* end subroutine (procdirer) */
 
-local int procuserinfo_begin(PI *pip,USERINFO *uip) noex {
+local int procuserinfo_begin(PI *pip,userinfo *uip) noex {
 	int		rs = SR_OK ;
 
 	pip->nodename = uip->nodename ;
