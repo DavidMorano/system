@@ -47,6 +47,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -56,6 +58,7 @@
 #include	"usys_umaxmsglen.h"
 
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) 
+/*----------------------------------------------------------------------------*/
 
 #include	<sys/sysctl.h>
 
@@ -74,7 +77,9 @@ namespace libu {
     } /* end subroutine (umaxmsglen) */
 } /* end namespace (libu) */
 
+/*----------------------------------------------------------------------------*/
 #else /* all other OSes */
+/*----------------------------------------------------------------------------*/
 
 namespace libu {
     sysret_t umaxmsglen() noex {
@@ -82,6 +87,7 @@ namespace libu {
     } /* end subroutine (umaxmsglen) */
 } /* end namespace (libu) */
 
-#endif /* which OS */
+/*----------------------------------------------------------------------------*/
+#endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 
 
