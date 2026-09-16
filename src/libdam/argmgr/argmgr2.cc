@@ -46,7 +46,7 @@ module ;
 
 module argmgr ;
 
-import deb ;
+import deb ;				/* LIBU |debprintf(3u)| */
 
 /* local defines */
 
