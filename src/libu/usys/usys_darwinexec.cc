@@ -81,14 +81,14 @@
 #include	<unistd.h>		/* |getpid(2)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getenv(3c)| + |getprogname(3c)| */
-#include	<cstring>		/* |strchr(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<usupport.h>		/* |libu::sncpy(3u)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usys_darwin.h"
 #include	"usys_pathpid.h"	/* |usys_pathpid(3usys)| */
@@ -130,9 +130,9 @@ constexpr int		rsnot[] = {
 	SR_STALE
 } ; /* end array (rsnot) */
 
-static cchar *strunder(cchar *sp) noex {
+local cchar *strunder(cchar *sp) noex {
     	cnullptr	np{} ;
-    	cchar		*rp ;
+    	cchar		*rp ; /* return-value */
 	constexpr cint	sch{'*'} ;
 	if ((rp = strchr(sp,sch)) != np) {
 	    if (*++rp) {
@@ -148,31 +148,33 @@ static cchar *strunder(cchar *sp) noex {
 	return rp ;
 } /* end subroutine (strunder) */
 
-static bool isnotpresent(int rs) noex {
+local bool isnotpresent(int rs) noex {
     	bool	f = false ;
 	for (cauto &v : rsnot) {
 	    if ((f = (rs == v))) break ;
-	}
+	} /* end for */
 	return f ;
 } /* end subroutine (isnotpesent) */
 
 namespace {
     struct namer {
-	cchar	*az ;
-	char	*rbuf ;
-	int	rlen ;
-	namer(char *rb,int rl) noex : rbuf(rb), rlen(rl) { } ;
-	operator int () noex ;
-	int	abs() noex ;
-	int	env() noex ;
-	int	proc() noex ;
-	int	pwd() noex ;
-	int	pr() noex ;
-	int	path() noex ;
+	cchar		*az ;
+	char		*rbuf ;
+	int		rlen ;
+	namer(char *rb,int rl) noex : rbuf(rb), rlen(rl) { 
+	    az = nullptr ;
+	} ; /* end ctor */
+	operator int 	() noex ;
+	int abs		() noex ;
+	int env		() noex ;
+	int proc	() noex ;
+	int pwd		() noex ;
+	int pr		() noex ;
+	int path	() noex ;
     private:
-	int	prmk(cc *,cc *,cc *) noex ;
-	int	pathmk(cc *,int) noex ;
-	int	verify(int = -1) noex ;
+	int prmk	(cc *,cc *,cc *) noex ;
+	int pathmk	(cc *,int) noex ;
+	int verify	(int = -1) noex ;
     } ; /* end struct (namer) */
     typedef int (namer::*namer_m)() ;
 } /* end namespace */
@@ -187,9 +189,8 @@ constexpr namer_m	namegets[] = {
 } ; /* end array */
 
 namer::operator int () noex {
-    	cnullptr	np{} ;
-    	int		rs = SR_NOSYS ;
-	if ((az = darwin_getargz()) != np) {
+    	int		rs ;
+	if ((rs = darwin_getargz(&az)) >= 0) {
 	    for (cauto &m : namegets) {
 	        rs = (this->*m)() ;
 	        if (rs != 0) break ;
@@ -200,21 +201,21 @@ namer::operator int () noex {
 
 int namer::abs() noex {
     	int		rs = SR_OK ;
-	if (az[0] == '/') {
-	    if ((rs = sncpy(rbuf,rlen,az)) >= 0) {
-		rs = verify(rs) ;
-	    }
-	}
+	if (az) {
+	    if (az[0] == '/') {
+	        if ((rs = sncpy(rbuf,rlen,az)) >= 0) {
+		    rs = verify(rs) ;
+	        }
+	    } /* end if (non-empty) */
+	} /* end if (non-null) */
 	return rs ;
 } /* end method (namer::abs) */
 
 int namer::env() noex {
-    	static cchar	*valp = getenv(VARUNDER) ;
-	cnullptr	np{} ;
     	int		rs = SR_OK ;
-	if (valp) {
+    	if (static cchar *valp = getenv(VARUNDER) ; valp) {
 	    if (valp[0] == '*') {
-		if (cchar *rp ; (rp = strunder(valp)) != np) {
+		if (cchar *rp = strunder(valp)) {
 	            if ((rs = sncpy(rbuf,rlen,rp)) > 0) {
 			rs = verify(rs) ;
 		    }
@@ -237,7 +238,7 @@ int namer::pwd() noex {
     	int		rs = SR_OK ;
 	if (az[0] != '/') {
 	    if ((rs = ugetcwd(rbuf,rlen)) >= 0) {
-		int	rl = rs ;
+		mut int	rl = rs ;
 		if (cint pl = lenstr(az) ; pl <= (rlen - (rl + 1))) {
 		    rbuf[rl++] = '/' ;
 		    strcpy((rbuf + rl),az) ;
@@ -265,9 +266,9 @@ int namer::verify(int len) noex {
 namespace usys {
     sysret_t darwin_execname(char *obuf,int olen) noex {
 	int		rs = SR_FAULT ;
-	if (obuf) {
+	if (obuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (olen > 0) {
+	    if (olen > 0) ylikely {
 		namer	geto(obuf,olen) ;
 		rs = geto ;
 	    } /* end if (valid) */
@@ -287,8 +288,7 @@ int namer::pr() noex {
 	int		rs = SR_OK ;
 	if_constexpr (f_pr) {
 	    if (strchr(az,'/') == np) {
-	        static cc	*valp = getenv(VARPR) ;
-		if (valp) {
+	        if (static cc *valp = getenv(VARPR) ; valp) {
 	            cint	am = (R_OK|X_OK) ;
 	            if ((rs = udiraccess(valp,am)) >= 0) {
 		        for (cauto &bin : bins) {
@@ -320,8 +320,7 @@ int namer::path() noex {
 	int		len = 0 ; /* return-path */
 	if_constexpr (f_path) {
 	    if (strchr(az,'/') == np) {
-	        static cchar	*valp = getenv(VARPATH) ;
-	        if (valp) {
+	        if (static cchar *valp = getenv(VARPATH) ; valp) {
 		    cchar	*paths = valp ;
 		    for (char *pp ; (pp = strchr(paths,'/')) != np ; ) {
 			if (cint pl = intconv(pp - paths) ; pl > 0) {
