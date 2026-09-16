@@ -60,8 +60,8 @@ OBJ13_USYS= usys_eaccess.o usys_stat.o usys_xti.o
 OBJ14_USYS= usys_environ.o usys_onc.o usys_getnetname.o
 OBJ15_USYS= usys_getauid.o usys_atox.o usys_strtox.o
 
-OBJ16_USYS= usys_getprocuid.o usys_in4in6addr.o
-OBJ17_USYS= getexecname.o
+OBJ16_USYS= usys_getprocuid.o 
+OBJ17_USYS= usys_in4in6addr.o
 OBJ18_USYS=
 OBJ19_USYS=
 
@@ -260,7 +260,7 @@ usys_streams.o:		usys_streams.cc		usys_streams.h		$(INCS)
 usys_pipes.o:		usys_pipes.cc		usys_pipes.h		$(INCS)
 usys_stat.o:		usys_stat.cc		usys_stat.h		$(INCS)
 usys_libstr.o:		usys_libstr.cc		usys_libstr.h		$(INCS)
-usys_getexecname.o:	usys_getexecname.cc	getexecname.h		$(INCS)
+usys_getexecname.o:	usys_getexecname.cc	usys_getexecname.h	$(INCS)
 usys_stime.o:		usys_stime.cc		usys_stime.h		$(INCS)
 usys_isaexec.o:		usys_isaexec.cc		usys_isaexec.h		$(INCS)
 usys_fatasync.o:	usys_fdatasync.cc	usys_fdatasync.h	$(INCS)
@@ -279,7 +279,5 @@ usys_timezone.o:	usys_timezone.cc	usys_timezone.h		$(INCS)
 
 # special
 usysargz.o:		usysargz.cc		usysargz.hh		$(INCS)
-
-getexecname.o:		getexecname.cc		getexecname.h		$(INCS)
 
 
