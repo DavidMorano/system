@@ -78,7 +78,7 @@ module modproc ;
 
 import libutil ;			/* |getlenstr(3u)| */
 import ulibvals ;			/* |ulibval(3u)| + |pagesz| */
-import deb ;
+import deb ;				/* LIBU |debprintf(3u)| */
 
 /* local defines */
 
