@@ -51,7 +51,7 @@ module ;
 
 module modproc ;
 
-import deb ;
+import deb ;				/* LIBU |debprintf(3u)| */
 
 /* local defines */
 
