@@ -69,7 +69,7 @@ module strfilter ;
 import libutil ;			/* |lenstr(3u)| */
 import ureserve ;			/* |vecstr(3u)| */
 import sif ;
-import deb ;				/* |defprintf(3uc)| */
+import deb ;				/* LIBU |defprintf(3u)| */
 
 /* local defines */
 
