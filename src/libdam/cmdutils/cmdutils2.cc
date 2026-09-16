@@ -63,7 +63,7 @@ module ;
 module cmdutils ;
 
 import libutil ;			/* |lenstr(3u)| */
-import deb ;				/* |debprintf(3u)| */
+import deb ;				/* LIBU |debprintf(3u)| */
 
 
 /* local defines */
