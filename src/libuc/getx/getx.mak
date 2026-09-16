@@ -208,7 +208,7 @@ getngroups.o:		getngroups.cc		getngroups.h		$(INCS)
 getnodedomain.o:	getnodedomain.cc	getnodedomain.h		$(INCS)
 getnodeinfo.o:		getnodeinfo.cc		getnodeinfo.h		$(INCS)
 getnprocessors.o:	getnprocessors.cc	getnprocessors.h	$(INCS)
-getostype.o:		getostype.cc		getostype.h
+getostype.o:		getostype.cc		getostype.h		$(INCS)
 getpassword.o:		getpassword.cc		getpassword.h		$(INCS)
 getportnum.o:		getportnum.cc		getportnum.h		$(INCS)
 getprogexec.o:		getprogexec.cc		getprogexec.h		$(INCS)
