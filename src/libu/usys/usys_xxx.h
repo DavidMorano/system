@@ -272,7 +272,7 @@ local inline unixret_t dupover(int sfd,int dfd) noex {
 EXTERNC_end
 #endif /* SUBROUTINE_DUPOVER */
 
-#ifndef	SUBRUOTINE_STRBRK
+#ifndef	SUBROUTINE_STRBRK
 #define	SUBROUTINE_STRBRK
 EXTERNC_begin
 local inline char *strbrk(cchar *sp,cchar *sc) noex {
