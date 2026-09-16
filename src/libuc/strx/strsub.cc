@@ -45,7 +45,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<strn.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strn{x}sub(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"strsub.h"
