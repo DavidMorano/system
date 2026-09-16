@@ -95,7 +95,7 @@ struct procset {
 	id_t		p_lid ;
 	idtype_t	p_ridtype ;
 	id_t		p_rid ;
-} ;
+} ; /* end struct */
 #endif /* STRUCT_PROCSET */
 
 #ifndef	TYPEDEF_PROCSET
@@ -140,7 +140,7 @@ EXTERNC_end
 struct itimerspec {
 	struct timespec	it_interval ;
 	struct timespec	it_value ;
-} ;
+} ; /* end struct */
 #endif /* TYPEDEF_ITIMERSPEC */
 
 #ifndef	TYPEDEF_TIMER
@@ -311,8 +311,8 @@ namespace usys {
     extern sysret_t darwin_ttyname(int,char *,int) noex ; /* currently unused */
     extern sysret_t darwin_execname(char *,int) noex ;
     extern sysret_t darwin_argz(char *,int) noex ;
-    extern cchar *darwin_getargz() noex ;
-}
+    extern sysret_t darwin_getargz(cchar **) noex ;
+} /* end namespace */
 
 #endif /* __cplusplus */
 /* DECLARATIONS end */
