@@ -43,7 +43,7 @@
 #pragma		GCC dependency		"mod/deb.ccm"
 
 import libutil ;			/* |memcopy(3u)| */
-import deb ;				/* |debprintf(3uc)| */
+import deb ;				/* LIBU |debprintf(3u)| */
 
 /* local defines */
 
