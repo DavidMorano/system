@@ -50,7 +50,12 @@
 #else /* defined(SYSHAS_GETEXECNAME) && (SYSHAS_GETEXECNAME > 0) */
 /******************************************************************************/
 
-
+#ifndef	GETEXECNAME_DECLARATION
+#define	GETEXECNAME_DECLARATION
+EXTERNC_begin
+extern cchar	*getexecname() noex ;
+EXTERNC_end
+#endif /* GETEXECNAME_DECLARATION */
 
 /******************************************************************************/
 #endif /* defined(SYSHAS_GETEXECNAME) && (SYSHAS_GETEXECNAME > 0) */
