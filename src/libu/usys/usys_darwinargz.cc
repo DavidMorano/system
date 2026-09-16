@@ -45,45 +45,48 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getprogname(3c)| |getexecname(3c) */
 #include	<cstring>		/* |strncpy(3c)| */
-#include	<new>			/* |nothrow(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<ulogerror.h>
-#include	<localmisc.h>
+#include	<new>			/* C++STD plaecment-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<ulogerror.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usys_darwin.h"
 #include	"usysargz.hh"		/* |usys:usysargz(3u)| */
+
+import libutil ;			/* |lenstr(3u)| */
 
 using usys::usysargz ;			/* type */
 
 static usysargz		argz_data ;
 
 namespace usys {
-    extern int usys_darwinargz(char *abuf,int alen) noex {
+    int darwin_argz(char *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
-	if (abuf) {
+	if (abuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (alen > 0) {
-	        static cint	rsa = argz_data ;
-	        if ((rs = rsa) >= 0) {
+	    if (alen > 0) ylikely {
+	        if (static cint	rsa = argz_data ; (rs = rsa) >= 0) {
 	            rs = argz_data.get(abuf,alen) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subrouine (usys_darwinargz) */
-    cchar *darwin_getargz() noex {
-	static cint	rsa = argz_data ;
-	cchar		*rp = nullptr ;
-	if (int rs ; (rs = rsa) >= 0) {
-	    rp = argz_data.name ;
-	} else {
-	    ulogerror("darwin_getargz",rs,"usysargz") ;
-	}
-	return rp ;
+    } /* end subrouine (darwin_argz) */
+    int darwin_getargz(cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (rpp) ylikely {
+	    if (static cint rsa = argz_data ; (rs = rsa) >= 0) {
+	        *rpp = argz_data.name ;
+		rs = lenstr(argz_data.name) ;
+	    } else {
+	        ulogerror("darwin_getargz",rs,"usysargz") ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
     } /* end subrouine (darwin_getargz) */
 } /* end namespace (usys) */
 
