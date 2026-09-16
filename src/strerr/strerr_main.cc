@@ -41,11 +41,11 @@
 #include	<unistd.h>		/* POSIX */
 #include	<fcntl.h>		/* POSIX */
 #include	<climits>		/* CSTD */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<cstdio>		/* CSTD */
-#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<new>			/* C++STD placement-new */
 #include	<string>		/* C++STD */
 #include	<string_view>		/* C++STD */
 #include	<filesystem>		/* C++STD */
@@ -76,19 +76,19 @@
 #include	<deb.hh>		/* |DEBPRINTF| */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
-#pragma		GCC dependency	"mod/libutil.ccm"
-#pragma		GCC dependency	"mod/ulibvals.ccm"
-#pragma		GCC dependency	"mod/ureserve.ccm"
-#pragma		GCC dependency	"mod/strfilter.ccm"
-#pragma		GCC dependency	"mod/argmgr.ccm"
-#pragma		GCC dependency	"mod/fonce.ccm"
-#pragma		GCC dependency	"mod/sif.ccm"
-#pragma		GCC dependency	"mod/bitop.ccm"
-#pragma		GCC dependency	"mod/tardir.ccm"
-#pragma		GCC dependency	"mod/filerec.ccm"
-#pragma		GCC dependency	"mod/modproc.ccm"
-#pragma		GCC dependency	"mod/cmdutils.ccm"
-#pragma		GCC dependency	"mod/deb.ccm"
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ulibvals.ccm"
+#pragma		GCC dependency		"mod/ureserve.ccm"
+#pragma		GCC dependency		"mod/strfilter.ccm"
+#pragma		GCC dependency		"mod/argmgr.ccm"
+#pragma		GCC dependency		"mod/fonce.ccm"
+#pragma		GCC dependency		"mod/sif.ccm"
+#pragma		GCC dependency		"mod/bitop.ccm"
+#pragma		GCC dependency		"mod/tardir.ccm"
+#pragma		GCC dependency		"mod/filerec.ccm"
+#pragma		GCC dependency		"mod/modproc.ccm"
+#pragma		GCC dependency		"mod/cmdutils.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 import ulibvals ;
@@ -102,7 +102,7 @@ import tardir ;
 import filerec ;
 import modproc ;
 import cmdutils ;
-import deb ;				/* |debprintf(3uc)| */
+import deb ;				/* LIBU |debprintf(3u)| */
 
 /* local defines */
 
@@ -129,7 +129,6 @@ using libu::umem ;			/* variable */
 using std::cin ;			/* variable */
 using std::cout ;			/* variable */
 using std::cerr ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -792,6 +791,7 @@ int proginfo::argprocer(argmgr *amp) noex {
 } /* end method (proginfo::argprocer) */
 
 int proginfo::process_pmbegin() noex {
+    	cnothrow	nt{} ;
 	int		rs = SR_OK ;
 	int		fcontinue = (! fexit) ;
 	switch (pm) {
@@ -799,7 +799,7 @@ int proginfo::process_pmbegin() noex {
 	    if ((rs = maxlinelen) >= 0) {
 	        llen = rs ;
 		rs = SR_NOMEM ;
-	        if ((lbuf = new(nothrow) char[llen + 1]) != nullptr) {
+	        if ((lbuf = new(nt) char[llen + 1]) != nullptr) {
 		    rs = SR_OK ;
 	        } else {
 		    llen = 0 ;
@@ -826,12 +826,13 @@ int proginfo::process_pmend() noex {
 
 int proginfo::argreadin() noex {
 	cnullptr	np{} ;
+    	cnothrow	nt{} ;
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = maxpathlen) >= 0) {
 	    cint	plen = rs ;
 	    rs = SR_NOMEM ;
-	    if (char *pbuf ; (pbuf = new(nothrow) char[plen + 1]) != np) {
+	    if (char *pbuf ; (pbuf = new(nt) char[plen + 1]) != np) {
 	        while ((rs = readln(&cin,pbuf,plen)) > 0) {
 		    if (cint pl = rmeol(pbuf,rs) ; pl > 0) {
 		        rs = argprocname(pbuf,pl) ;
