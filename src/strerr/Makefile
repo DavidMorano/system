@@ -332,7 +332,6 @@ strabbrerr.o:		strabbrerr.cc	strabbrerr.h		$(INCS)
 
 prognamevar.o:		prognamevar.cc	prognamevar.hh
 shellunder.o:		shellunder.cc	shellunder.h
-strerr.o:		strnul.cc	strnul.hh
 char.o:			char.cc		char.h
 
 
