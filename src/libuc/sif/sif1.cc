@@ -78,7 +78,7 @@ module sif ;
 
 import libutil ;			/* |getlenstr(3u)| */
 import ureserve ;			/* |sfx(3u)| */
-import deb ;
+import deb ;				/* LIBU |debprintf(3u)| */
 
 /* local defines */
 
