@@ -73,7 +73,7 @@
 
 #pragma		GCC dependency		"mod/deb.ccm"
 
-import deb ;
+import deb ;				/* LIBU |debprintf(3u)| */
 
 /* local defines */
 
