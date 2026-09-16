@@ -115,7 +115,7 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	                }
 	            } else {
 	                rs = SR_INVALID ;
-		    }
+		    } /* end */
 	        } /* end if (bad a '*') */
 	        if ((rs >= 0) && (under[0] != '\0')) {
 	            while (ISWHT(*under)) {
@@ -123,7 +123,7 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 		    }
 	            op->execname = under ;
 	            pl = lenstr(under) ;
-	        }
+	        } /* end */
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
