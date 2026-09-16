@@ -64,7 +64,7 @@
 
 import libutil ;			/* |resumelife(3u)| */
 import ureserve ;			/* |vecstr(3u)| */
-import deb ;
+import deb ;				/* LIBU |debprintf(3u)| */
 
 /* local defines */
 
