@@ -57,36 +57,35 @@
 #include	<usys_onc.hh>
 
 /* missing operating system calls or facilities */
-#include	<usys_shadow.h>
-#include	<usys_project.h>
-#include	<usys_task.h>
-#include	<usys_mqueue.h>
+#include	<usys_atox.h>
+#include	<usys_eaccess.h>
+#include	<usys_environ.hh>
+#include	<usys_getauid.h>
+#include	<usys_getexecname.h>
 #include	<usys_gethrtime.h>
+#include	<usys_getprocuid.h>
+#include	<usys_getnetname.h>
 #include	<usys_getrandom.h>
-#include	<usys_ttynamerp.h>
-#include	<usys_stime.h>
-#include	<usys_resolvepath.h>
-#include	<usys_waitid.h>
-#include	<usys_sigx.h>
-#include	<usys_streams.h>
-#include	<usys_pipes.h>
-#include	<usys_stat.h>
 #include	<usys_libstr.h>
+#include	<usys_mqueue.h>
+#include	<usys_pipes.h>
+#include	<usys_project.h>
+#include	<usys_resolvepath.h>
+#include	<usys_shadow.h>
+#include	<usys_sigx.h>
+#include	<usys_stat.h>
+#include	<usys_stime.h>
+#include	<usys_streams.h>
+#include	<usys_strtox.h>
+#include	<usys_task.h>
+#include	<usys_timezone.h>
+#include	<usys_ttynamerp.h>
 #include	<usys_isaexec.h>
 #include	<usys_fdatasync.h>
-#include	<usys_eaccess.h>
-#include	<usys_xti.h>
-#include	<usys_environ.hh>
-#include	<usys_getnetname.h>
-#include	<usys_getauid.h>
-#include	<usys_atox.h>
-#include	<usys_strtox.h>
 #include	<usys_nprocs.h>
-#include	<usys_getprocuid.h>
 #include	<usys_in4in6addr.h>
-#include	<usys_timezone.h>
-
-#include	<getexecname.h>
+#include	<usys_waitid.h>
+#include	<usys_xti.h>
 
 
 #endif /* USYS_INCLUDE */
