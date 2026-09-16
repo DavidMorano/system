@@ -69,7 +69,7 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getprogname(3c)| |getexecname(3c) */
 #include	<cstring>		/* CSTD |strncpy(3c)| */
-#include	<new>			/* C++STD |nothrow(3c)| */
+#include	<new>			/* C++STD placement-new */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -79,16 +79,21 @@
 #include	<localmisc.h>		/* LIBU */
 
 #include	"usys.h"
-#include	"getexecname.h"		/* Solaris® */
+#include	"usys_getexecname.h"
 
 #ifndef	MAXPATH
 #define	MAXPATH		(4 * 1024)	/* resonable value for exec-name */
 #endif
 
-using std::nothrow ;			/* constant */
+#if	defined(SYSHAS_GETEXECNAME) && (SYSHAS_GETEXECNAME > 0)
+/******************************************************************************/
 
-#if	(! defined(SYSHAS_GETEXECNAME)) || (SYSHAS_GETEXECNAME == 0)
+
+
+/******************************************************************************/
+#else /* defined(SYSHAS_GETEXECNAME) && (SYSHAS_GETEXECNAME > 0) */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+/******************************************************************************/
 
 using usys::darwin_execname ;	/* subroutine */
 
@@ -100,12 +105,13 @@ namespace {
 	int	rss ;
 	execstorer() noex {
 	    cnullptr	np{} ;
+	    cnothrow	nt{} ;
 	    rss = SR_NOMEM ;
-	    if (char *tbuf ; (tbuf = new(nothrow) char[tlen + 1]) != np) {
+	    if (char *tbuf ; (tbuf = new(nt) char[tlen + 1]) != np) {
 	        if ((rss = darwin_execname(tbuf,tlen)) >= 0) {
 		    elen = rss ;
 		    rss = SR_NOMEM ;
-		    if ((ebuf = new(nothrow) char[elen + 1]) != np) {
+		    if ((ebuf = new(nt) char[elen + 1]) != np) {
 			csize	esize = size_t(elen) ;
 			strncpy(ebuf,tbuf,esize) ;
 			ebuf[elen] = '\0' ;
@@ -144,21 +150,24 @@ cchar *getexecname() noex {
 	return rp ;
 } /* end subroutine (getexecname) */
 
+/******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
+/******************************************************************************/
 
 #include	<sys/auxv.h>		/* Solaris® */
 #include	<elf.h>			/* Solaris® */
 
 cchar *getexecname() noex {
 	culong		at = AT_EXECFN ;
-	cchar		*rp = nullptr ;
+	cchar		*rp = nullptr ; /* return-value */
 	if (ulong r ; (r = getauxval(at)) != 0) {
 	    rp = charp(r) ;
 	} /* end if (have entry) */
 	return rp ;
 } /* end subroutine (getexecname) */
 
+/******************************************************************************/
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
-#endif /* (! defined(SYSHAS_GETEXECNAME)) || (SYSHAS_GETEXECNAME == 0) */
+#endif /* defined(SYSHAS_GETEXECNAME) && (SYSHAS_GETEXECNAME > 0) */
 
 
