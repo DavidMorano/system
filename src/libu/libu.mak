@@ -57,7 +57,7 @@ OBJ07= umem.o usigsets.o usigblock.o umisc.o
 
 OBJ08= usys.o usyscallbase.o usysutility.o 
 OBJ09= uregfork.o uatfork.o uopen.o 
-OBJ10= usig.o uexec.o uipc.o 
+OBJ10= uipc.o 
 OBJ11= ustr.o uobjlock.o ureserve.o
 
 OBJ12= usysflag.o usysdata.o usysauxinfo.o 
@@ -406,7 +406,6 @@ uatfork.o:		umods.o usigblock.o
 uatfork.o:		uatfork.cc uatfork.h umods.o		$(INCS)
 uregfork.o:		umods.o uregfork.cc uregfork.hh		$(INCS)
 uobjlock.o:		umods.o uobjlock.cc uobjlock.cc		$(INCS)
-uprocess.o:		umods.o uprocess.cc uprocess.h		$(INCS)
 
 # UCONSTANTS
 uconstants.o:		uconstants.dir
@@ -431,6 +430,11 @@ usysconf.dir:
 # UTIMEZONE
 utimezone.o:		utimezone.dir
 utimezone.dir:
+	makesubdir $@
+
+# UPROC
+uproc.o:		uproc.dir
+uproc.dir:
 	makesubdir $@
 
 # UFDLOCK
@@ -587,10 +591,8 @@ sigblocker.o:		sigblocker.cc	sigblocker.h			$(INCS)
 # OTHER subroutine-groups
 umem.o:			umem.cc		umem.hh				$(INCS)
 um.o:			um.cc		um.h				$(INCS)
-usig.o:			usig.cc		usig.h				$(INCS)
 usysop.o:		usysop.cc	usysop.h			$(INCS)
 ugetloadavg.o:		ugetloadavg.cc	ugetloadavg.h			$(INCS)
-uexec.o:		uexec.cc	uexec.h				$(INCS)
 uinet.o:		uinet.cc	uinet.h				$(INCS)
 uiconv.o:		uiconv.cc	uiconv.h			$(INCS)
 uchartype.o:		uchartype.cc	uchartype.h			${INCS}
