@@ -107,7 +107,7 @@ namespace {
 	    cnullptr	np{} ;
 	    cnothrow	nt{} ;
 	    rss = SR_NOMEM ;
-	    if (char *tbuf ; (tbuf = new(nt) char[tlen + 1]) != np) {
+	    if (char *tbuf = new(nt) char[tlen + 1]) {
 	        if ((rss = darwin_execname(tbuf,tlen)) >= 0) {
 		    elen = rss ;
 		    rss = SR_NOMEM ;
@@ -146,7 +146,7 @@ cchar *getexecname() noex {
 	} else {
 	    errno = (neg rs) ;
 	    ulogerror("getexecname",rs,"namer::operator") ;
-	}
+	} /* end */
 	return rp ;
 } /* end subroutine (getexecname) */
 
