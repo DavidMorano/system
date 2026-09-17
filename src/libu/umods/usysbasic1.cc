@@ -134,7 +134,7 @@ int uatfork(void_f b,void_f ap,void_f ac) noex {
 } /* end subroutine (uatfork) */
 int uatexit(void_f func) noex {
 	int		rs = SR_FAULT ;
-	if (func) {
+	if (func) ylikely {
 	    ucaller	aeo(func) ;
 	    aeo.m = &ucaller::stdatexit ;
 	    rs = aeo ;
@@ -143,9 +143,9 @@ int uatexit(void_f func) noex {
 } /* end subroutine (uatexit) */
 int ustatfile(cchar *afn,ustat *asp) noex {
 	int		rs = SR_FAULT ;
-	if (afn && asp) {
+	if (afn && asp) ylikely {
 	    rs = SR_INVALID ;
-	    if (afn[0]) {
+	    if (afn[0]) ylikely {
 	        ucaller	po(afn,asp) ;
 	        po.m = &ucaller::stdstat ;
 	        rs = po ;
@@ -155,9 +155,9 @@ int ustatfile(cchar *afn,ustat *asp) noex {
 } /* end subroutine (ustatfile) */
 int ustatfilefs(cchar *afn,ustatfs *asp) noex {
 	int		rs = SR_FAULT ;
-	if (afn && asp) {
+	if (afn && asp) ylikely {
 	    rs = SR_INVALID ;
-	    if (afn[0]) {
+	    if (afn[0]) ylikely {
 	        ucaller	po(afn,asp) ;
 	        po.m = &ucaller::stdstatfs ;
 	        rs = po ;
@@ -167,9 +167,9 @@ int ustatfilefs(cchar *afn,ustatfs *asp) noex {
 } /* end subroutine (ustatfilefs) */
 int ustatfilevfs(cchar *afn,ustatvfs *asp) noex {
 	int		rs = SR_FAULT ;
-	if (afn && asp) {
+	if (afn && asp) ylikely {
 	    rs = SR_INVALID ;
-	    if (afn[0]) {
+	    if (afn[0]) ylikely {
 	        ucaller	po(afn,asp) ;
 	        po.m = &ucaller::stdstatvfs ;
 	        rs = po ;
@@ -179,9 +179,9 @@ int ustatfilevfs(cchar *afn,ustatvfs *asp) noex {
 } /* end subroutine (ustatfilevfs) */
 int ugetcwd(char *rb,int rl) noex {
 	int		rs = SR_FAULT ;
-	if (rb) {
+	if (rb) ylikely {
 	    rs = SR_INVALID ;
-	    if (rl > 0) {
+	    if (rl > 0) ylikely {
 	        ucaller	po(rb,rl) ;
 	        po.m = &ucaller::stdgetcwd ;
 	        rs = po ;
@@ -191,9 +191,9 @@ int ugetcwd(char *rb,int rl) noex {
 } /* end subroutine (ugetcwd) */
 int uaccess(cchar *afn,int am) noex {
 	int		rs = SR_FAULT ;
-	if (afn) {
+	if (afn) ylikely {
 	    rs = SR_INVALID ;
-	    if (afn[0] && (am >= 0)) {
+	    if (afn[0] && (am >= 0)) ylikely {
 	        ucaller	po(afn,am) ;
 	        po.m = &ucaller::stdaccess ;
 	        rs = po ;
@@ -203,9 +203,9 @@ int uaccess(cchar *afn,int am) noex {
 } /* end subroutine (uaccess) */
 int udiraccess(cchar *afn,int am) noex {
 	int		rs = SR_FAULT ;
-	if (afn) {
+	if (afn) ylikely {
 	    rs = SR_INVALID ;
-	    if (afn[0] && (am >= 0)) {
+	    if (afn[0] && (am >= 0)) ylikely {
 		if (ustat sb ; (rs = ustatfile(afn,&sb)) >= 0) {
 		    rs = SR_NOTDIR ;
 		    if (S_ISDIR(sb.st_mode)) {
