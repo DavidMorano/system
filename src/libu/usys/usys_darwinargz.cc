@@ -20,7 +20,7 @@
 
 	Name:
 	darwin_argz
-	getexecname
+	darwin_argzget
 
 	Description:
 	This subroutine returns the ARGZ element (if any) that
@@ -28,10 +28,12 @@
 
 	Synopsis:
 	int darwin_argz(char *abuf,int alen) noex
+	int darwin_argzget(ccharpp rpp) noex
 
 	Arguments:
 	abuf		result buffer pointer
 	alen		result buffer length
+	rpp		pointer to pointer to receive result
 
 	Returns:
 	-		the number of bytes in the result
@@ -54,8 +56,9 @@
 #include	<ulogerror.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"usys_darwin.h"
 #include	"usysargz.hh"		/* |usys:usysargz(3u)| */
+#include	"usys_darwin.h"
+#include	"usys_darwinargz.h"
 
 import libutil ;			/* |lenstr(3u)| */
 
@@ -76,18 +79,18 @@ namespace usys {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subrouine (darwin_argz) */
-    int darwin_getargz(cchar **rpp) noex {
+    int darwin_argzget(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (rpp) ylikely {
 	    if (static cint rsa = argz_data ; (rs = rsa) >= 0) {
 	        *rpp = argz_data.name ;
 		rs = lenstr(argz_data.name) ;
 	    } else {
-	        ulogerror("darwin_getargz",rs,"usysargz") ;
+	        ulogerror("darwin_argzget",rs,"usysargz") ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subrouine (darwin_getargz) */
+    } /* end subrouine (darwin_argzget) */
 } /* end namespace (usys) */
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
