@@ -26,17 +26,17 @@
 /* USYS_SUNOS start */
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
-
-#include	<sys/systeminfo.h>
-#include	<cerrno>
-#include	<climits>		/* |INT_MAX| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<intsat.h>
+#include	<sys/systeminfo.h>	/* Solaris® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
 
 #include	"usys.h"
+#include	"usys_sunos.h"
 
 
 static sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
