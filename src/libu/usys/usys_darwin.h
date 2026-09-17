@@ -54,6 +54,8 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 
+#include	<usys_darwinargz.h>
+#include	<usys_darwinexec.h>
 #include	<usysargz.hh>
 
 /*----------------------------------------------------------------------------*/
@@ -309,9 +311,6 @@ EXTERNC_end
 namespace usys {
     extern sysret_t darwin_usysctl(char *,int,cchar *) noex ;
     extern sysret_t darwin_ttyname(int,char *,int) noex ; /* currently unused */
-    extern sysret_t darwin_execname(char *,int) noex ;
-    extern sysret_t darwin_argz(char *,int) noex ;
-    extern sysret_t darwin_getargz(cchar **) noex ;
 } /* end namespace */
 
 #endif /* __cplusplus */
