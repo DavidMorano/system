@@ -214,9 +214,9 @@ EXTERNC_end
 namespace usys {
     sysret_t darwin_usysctl(char *obuf,int olen,cchar *name) noex {
 	int		rs = SR_FAULT ;
-	if (obuf && name) {
+	if (obuf && name) ylikely {
 	    rs = SR_INVALID ;
-	    if (olen > 0) {
+	    if (olen > 0) ylikely {
 	        syscaller syscall ;
 	        syscall.m = &syscaller::isysctl ;
 	        rs = syscall(obuf,olen,name) ;
