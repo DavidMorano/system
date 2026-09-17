@@ -90,8 +90,9 @@
 #include	<usupport.h>		/* |libu::sncpy(3u)| */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"usys_darwin.h"
 #include	"usys_pathpid.h"	/* |usys_pathpid(3usys)| */
+#include	"usys_darwin.h"
+#include	"usys_darwinexec.h"
 
 #if	defined(SYSHAS_LIBPROC) && (SYSHAS_LIBPROC > 0)
 #define	F_LIBPROC	1		/* if you have |libproc| available */
@@ -117,7 +118,7 @@ import usysbasic ;
 
 using libu::sncpy ;			/* subroutine (usupport) */
 using usys::usys_pathpid ;		/* subroutine (usys) */
-using usys::darwin_getargz ;		/* subroutine (usys) */
+using usys::darwin_argzget ;		/* subroutine (usys) */
 
 cbool		f_libproc	= bool(F_LIBPROC) ;
 cbool		f_pr		= bool(CF_PR) ;
@@ -144,7 +145,7 @@ local cchar *strunder(cchar *sp) noex {
 	    } else {
 		rp = nullptr ;
 	    }
-	}
+	} /* end if (strchr) */
 	return rp ;
 } /* end subroutine (strunder) */
 
@@ -190,12 +191,12 @@ constexpr namer_m	namegets[] = {
 
 namer::operator int () noex {
     	int		rs ;
-	if ((rs = darwin_getargz(&az)) >= 0) {
+	if ((rs = darwin_argzget(&az)) >= 0) {
 	    for (cauto &m : namegets) {
 	        rs = (this->*m)() ;
 	        if (rs != 0) break ;
 	    } /* end for */
-	} /* end if (getprogname) */
+	} /* end if (darwin_argzget) */
 	return rs ;
 } /* end method (namer::operator) */
 
@@ -220,7 +221,7 @@ int namer::env() noex {
 			rs = verify(rs) ;
 		    }
 		}
-	    }
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (namer::env) */
@@ -243,7 +244,7 @@ int namer::pwd() noex {
 		    rbuf[rl++] = '/' ;
 		    strcpy((rbuf + rl),az) ;
 		    rs = verify(rl + pl) ;
-		}
+		} /* end */
 	    } /* end if (ugetcwd) */
 	} /* end if (relative path) */
 	return rs ;
@@ -259,7 +260,7 @@ int namer::verify(int len) noex {
 	    }
 	} else if (isnotpresent(rs)) {
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (namer::verify) */
 
