@@ -39,9 +39,9 @@ namespace usys {
 	int		nlen ;
 	int		rss = SR_OK ;
 	usysargz() = default ;
-	operator int () noex ;
-	int get(char *,int) noex ;
-	void dtor() noex ;
+	operator int 	() noex ;
+	int get		(char *,int) noex ;
+	void dtor	() noex ;
 	destruct usysargz() {
 	    if (name) dtor() ;
 	} ; /* end */
