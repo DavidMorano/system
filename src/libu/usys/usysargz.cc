@@ -72,9 +72,9 @@ import libutil ;
 #define MAXPATH		(4 * 1024)	/* resonable value for exec-name */
 #endif
 
+using std::call_once ;			/* subroutine */
 using libu::sncpy ;			/* subroutine */
 using libu::snwcpy ;			/* subroutine */
-using std::call_once ;			/* subroutine */
 
 cint		tlen = MAXPATH ;
 
@@ -88,11 +88,11 @@ namespace usys {
 	return rss ;
     } /* end method (usysargz::operator) */
     void usysargz::initonce() noex {
-	cnothrow	nt{} ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	if ((rss >= 0) && (name == nullptr)) {
 	    rss = SR_NOMEM ;
-	    if (char *tbuf ; (tbuf = new(nt) char[tlen + 1]) != np) {
+	    if (char *tbuf = new(nt) char[tlen + 1]) {
 		const pid_t	pid = getpid() ;
 		if ((rss = usys_namepid(tbuf,tlen,pid)) >= 0) {
 		    nlen = rss ;
