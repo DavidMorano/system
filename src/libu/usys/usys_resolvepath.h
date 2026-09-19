@@ -49,9 +49,7 @@
 #ifndef	DECLARATION_RESOLVEPATH
 #define	DECLARATION_RESOLVEPATH
 EXTERNC_begin
-
 extern unixret_t resolvepath(cchar *,char *,size_t) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_RESOLVEPATH */
 
