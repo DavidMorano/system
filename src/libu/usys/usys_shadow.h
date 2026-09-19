@@ -105,12 +105,12 @@ struct spwd {
 namespace solaris {
     extern CSPWD *getspent_r(SPWD *,char *,int) noex ;
     extern CSPWD *getspnam_r(cchar *,SPWD *,char *,int) noex ;
-}
+} /* end namespace */
 
 namespace gnu {
     extern errno_t getspent_r(SPWD *,char *,size_t,SPWD **) noex ;
     extern errno_t getspnam_r(cchar *,SPWD *,char *,size_t,SPWD **) noex ;
-}
+} /* end namespace */
 
 #endif /* __cplusplus (C++ only) */
 #endif /* DECLARATION_GETSP */
