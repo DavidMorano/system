@@ -54,9 +54,7 @@ typedef unsigned long		hrtime_t ;
 #ifndef	DECLARATION_GETHRTIME
 #define	DECLARATION_GETHRTIME
 EXTERNC_begin
-
 extern hrtime_t gethrtime() noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_GETHRTIME */
 
