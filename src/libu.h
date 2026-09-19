@@ -46,7 +46,6 @@
 #include	<ustd.h>	/* <- converted system calls */
 #include	<uatexit.h>
 #include	<ucomposite.h>
-#include	<uexec.h>
 #include	<ugetloadavg.h>	/* load-average retrieval |u_getloadavg| */
 #include	<um.h>		/* UNIX® memory-management */
 #include	<uipc.h>	/* UNIX® System V IPC */
@@ -55,8 +54,7 @@
 #include	<ufiledesc.h>	/* file-descriptor */
 #include	<ufileop.h>	/* file-operations */
 #include	<upt.h>
-#include	<usig.h>
-#include	<uprocess.h>
+#include	<uproc.h>
 #include	<uatfork.h>
 #include	<ulogerror.h>
 #include	<umem.hh>
