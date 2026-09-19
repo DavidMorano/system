@@ -62,8 +62,8 @@ OBJ15_USYS= usys_getauid.o usys_atox.o usys_strtox.o
 
 OBJ16_USYS= usys_getprocuid.o usys_sysctl.o
 OBJ17_USYS= usys_in4in6addr.o
-OBJ18_USYS=
-OBJ19_USYS=
+OBJ18_USYS= usys_strw.o usys_snx.o
+OBJ19_USYS= usys_execname.o
 
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
 OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
@@ -71,8 +71,9 @@ OBJC= obj06_usys.o obj07_usys.o obj08_usys.o
 OBJD= obj09_usys.o obj10_usys.o obj11_usys.o 
 OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
 OBJF= obj15_usys.o obj16_usys.o obj17_usys.o
+OBJG= obj18_usys.o obj19_usys.o
 
-OBJ_USYS= obja.o objb.o objc.o objd.o obje.o objf.o
+OBJ_USYS= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
 
 INCDIRS= -I inc -I /usr/local/include
@@ -244,6 +245,9 @@ usys_ufstype.o:		usys_ufstype.cc		usys_ufstype.h		$(INCS)
 usys_pathpid.o:		usys_pathpid.cc		usys_pathpid.h		$(INCS)
 usys_umaxmsglen.o:	usys_umaxmsglen.cc	usys_umaxmsglen.h	$(INCS)
 usys_plock.o:		usys_plock.cc		usys_plock.h		$(INCS)
+usys_execname.o:	usys_execname.cc	usys_execname.hh	$(INCS)
+usys_snx.o:		usys_snx.cc		usys_snx.hh		$(INCS)
+usys_strw.o:		usys_strw.cc		usys_strw.hh		$(INCS)
 
 # missing operating system calls or facilities
 usys_task.o:		usys_task.cc		usys_task.h		$(INCS)
@@ -258,10 +262,11 @@ usys_waitid.o:		usys_waitid.cc		usys_waitid.h		$(INCS)
 usys_sigx.o:		usys_sigx.cc		usys_sigx.h		$(INCS)
 usys_streams.o:		usys_streams.cc		usys_streams.h		$(INCS)
 usys_pipes.o:		usys_pipes.cc		usys_pipes.h		$(INCS)
-usys_stat.o:		usys_stat.cc		usys_stat.h		$(INCS)
 usys_libstr.o:		usys_libstr.cc		usys_libstr.h		$(INCS)
 usys_getexecname.o:	usys_getexecname.cc	usys_getexecname.h	$(INCS)
+usys_stat.o:		usys_stat.cc		usys_stat.h		$(INCS)
 usys_stime.o:		usys_stime.cc		usys_stime.h		$(INCS)
+usys_strtox.o:		usys_strtox.cc		usys_strtox.h		$(INCS)
 usys_isaexec.o:		usys_isaexec.cc		usys_isaexec.h		$(INCS)
 usys_fatasync.o:	usys_fdatasync.cc	usys_fdatasync.h	$(INCS)
 usys_eaccess.o:		usys_eaccess.cc		usys_eaccess.h		$(INCS)
@@ -271,7 +276,6 @@ usys_onc.o:		usys_onc.cc		usys_onc.hh		$(INCS)
 usys_getnetname.o:	usys_getnetname.cc	usys_getnetname.h	$(INCS)
 usys_getauid.o:		usys_getauid.cc		usys_getauid.h		$(INCS)
 usys_atox.o:		usys_atox.cc		usys_atox.h		$(INCS)
-usys_strtox.o:		usys_strtox.cc		usys_strtox.h		$(INCS)
 usys_nprocs.o:		usys_nprocs.cc		usys_nprocs.h		$(INCS)
 usys_getprocuid.o:	usys_getprocuid.cc	usys_getprocuid.h	$(INCS)
 usys_in4in6addr.o:	usys_in4in6addr.cc	usys_in4in6addr.h	$(INCS)
