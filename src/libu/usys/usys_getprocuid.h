@@ -42,9 +42,7 @@
 
 
 EXTERNC_begin
-
 extern sysret_t	getprocuid(pid_t) noex ;
-
 EXTERNC_end
 
 
