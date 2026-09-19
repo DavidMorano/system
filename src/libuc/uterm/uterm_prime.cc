@@ -54,6 +54,7 @@
 #include	<baops.h>		/* LIBU */
 #include	<uctc.h>		/* LIBUC terminal-control */
 #include	<ucsysconf.h>		/* LIBUC */
+#include	<ucsigx.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<charq.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
@@ -117,7 +118,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     extern int uc_fuid(int) noex ;
-    extern int uc_raise(int) noex ;
 } /* end extern (C) */
 
 extern "C" {
