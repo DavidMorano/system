@@ -68,13 +68,38 @@ module ;
 #include	<sys/stat.h>		/* |ustat| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<utypedefs.h>		/* |void_f| */
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU |void_f| */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 export module usysbasic ;
+
+char *strwcpy(char *,cchar *,int = -1) noex ;
+
+int sncpy1(char *,int,cchar *) noex ;
+inline int sncpy(char *rb,int rl,cchar *sp) noex {
+	return sncpy1(rb,rl,sp) ;
+} /* end */
+
+int snwcpy(char *,int,cchar *,int = -1) noex ;
+
+bool isoneof	(cint *a,int rs) noex ;
+bool isonebad	(cint *a,int rs) noex ;
+
+inline bool isOneOf(cint *rarr,int rs) noex {
+    	return isoneof(rarr,rs) ;
+} /* end */
+inline bool isOneBad(cint *rarr,int rs) noex {
+    	return isonebad(rarr,rs) ;
+} /* end */
+bool isNotPresent	(int) noex ;
+bool isNotAccess	(int) noex ;
+bool isNotValid		(int) noex ;
+bool isNotLib		(int) noex ;
+bool isNotTerm		(int) noex ;
+bool isNotSupport	(int) noex ;
 
 export {
     int uatfork(void_f,void_f,void_f) noex ;
@@ -87,13 +112,18 @@ export {
     int udiraccess(cchar *,int) noex ;
     int ugetstat(cchar *fn,ustat *sp) noex {
 	return ustatfile(fn,sp) ;
-    }
+    } /* end subroutine */
     int ugetstatfs(cchar *fn,ustatfs *sp) noex {
 	return ustatfilefs(fn,sp) ;
-    }
+    } /* end subroutine */
     int ugetstatvfs(cchar *fn,ustatvfs *sp) noex {
 	return ustatfilevfs(fn,sp) ;
-    }
+    } /* end subroutine */
+} /* end export */
+
+export {
+    int ugetpwd		(char *,int) noex ;
+    int ugetpwds	(char *,int,ustat * = nullptr) noex ;
 } /* end export */
 
 
