@@ -1,4 +1,4 @@
-/* um HEADER */
+/* um HEADER (UNIX® memory operations) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -20,6 +20,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This file contains the subroutine declarations for various
 	UNIX® system Memory-Management subroutines.
 
