@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= usigsets0.o usigsets1.o
+OBJ0= usigsets0.o usigsets1.o usigsets2.o
 OBJ1=
 
 OBJA= obj0.o
@@ -130,6 +130,6 @@ usigsets0.o:		usigsets.ccm			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 usigsets1.o:		usigsets1.cc usigsets0.o	$(INCS)
-	$(COMPILE.cc) $<
+usigsets2.o:		usigsets2.cc usigsets0.o	$(INCS)
 
 
