@@ -37,7 +37,7 @@ extern char *strwcpy(char *dp,cchar *sp,int sl = -1) noex ;
 
 local inline char *strwcpy(char *dp,cchar *sp,int sl) noex {
 	return strwcpybc(dp,sp,sl) ;
-}
+} /* end subroutine */
 
 #endif /* __cplusplus */
 
