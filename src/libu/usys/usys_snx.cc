@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* get the file-name (file-path) that was used to 'exec' this program */
+/* miscelllaneous (SNX) operating system support */
 /* version %I% last-modified %G% */
 
 
@@ -19,49 +19,10 @@
 /*******************************************************************************
 
 	Name:
-	execname
+	sn{x}
 
 	Description:
-	This subroutine returns the name (file-path) by which the
-	current program was 'exec'ed.
-
-	Synopsis:
-	cchar *execname() noex
-
-	Returns:
-	-		the exec-name pointer or NULL (if not found)
-
-	Notes:
-	1. This subroutine (the subroutine that needs emulation by
-	some operating systems, which will remain nameless like
-	Apple-Darwin®) is already native to Solaris® (SunOS), and its
-	declaration on that plarform is accessed though the include
-	file |cstdlib|.
-	2. This subroutine is Thread-Safe but only Fork-Semi-Safe.
-	That is: it is as fork-safe as any general C++ piece of
-	code.  The C++ language itself only creates code (in the
-	strictest sense) that is only Fork-Semi-Safe.  Actually,
-	there are many pieces of code throughout everywhere (when
-	written in C++) that are only Fork-Semi-Safe (if you did
-	not already know).  The reason is due to the fact that
-	executing over statically declared variables in block scape
-	that are dynamically initialized by subroutine calls is not
-	strictly Fork-Safe in the C++ language.  Of course, the C
-	language does not even allow for that, so it is not an issue
-	in pure C-language environments.  Executing over statically
-	declared variables in namespace (file) scope initialized
-	dynamically might also be fork-unsafe in some weirdo
-	circumstantes, but that is usually very unlikely since the
-	initialization happens at process load time when there is
-	not likely to be multiple threads executing at the same
-	time and one of them executing over the static variable
-	initialization while a fork happens in another thread,
-	Further the unlikiness is helped because the loadable module
-	image got laoded by the dynamic linker, and then a fork
-	happening at the very same time elsewhere is very quite
-	unlikely.  This is probably why the ISO C++ Committee did
-	not really care about strict fork-safety in dynamically
-	initialized static variables.
+	These are string-copy operations.
 
 *******************************************************************************/
 
@@ -74,13 +35,52 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
-#include	<ulogerror.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"usys_snx.h"
+#include	"usys_strw.hh"		/* |strwcpy(3usys)| */
+#include	"usys_snx.hh"
 
 
 namespace usys {
+    int sncpy1(char *dp,int dl,cchar *sp) noex {
+	int		rs = SR_FAULT ;
+	int		rl = 0 ; /* return-value */
+	if (dp && sp) ylikely {
+	    rs = SR_INVALID ;
+	    if (dl >= 0) ylikely {
+		rs = SR_OK ;
+		for (rl = 0 ; (rl < dl) && *sp ; rl += 1) {
+		    *dp++ = *sp++ ;
+		} /* end for */
+		if ((rl == dl) && *sp) {
+		    rs = SR_OVERFLOW ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+    } /* end subroutine (sncpy1) */
+} /* end namespace (usys) */
+
+namespace usys {
+    int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (dp && sp) ylikely {
+	    if (dl >= 0) {
+	        if (sl >= 0) {
+	            if (sl > dl) {
+	                rs = sncpy1(dp,dl,sp) ;
+	            } else {
+	                rs = intconv(strwcpy(dp,sp,sl) - dp) ;
+		    }
+	        } else {
+	            rs = sncpy1(dp,dl,sp) ;
+	        }
+	    } else {
+	        rs = intconv(strwcpy(dp,sp,sl) - dp) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+    } /* end subroutine (snwcpy) */
 } /* end namespace (usys) */
 
 
