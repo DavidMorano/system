@@ -46,15 +46,18 @@
 #include	<usys_linux.h>
 
 /* utilities */
+#include	<usys_execname.hh>
+#include	<usys_onc.hh>
+#include	<usys_pathpid.h>
+#include	<usys_plock.h>		/* defines |usys_plock()| */
+#include	<usys_snx.hh>
+#include	<usys_strw.hh>
 #include	<usys_ufcntl.h>
 #include	<usys_ugetdents.h>
 #include	<usys_ugetnisdom.h>
 #include	<usys_usendfile.h>
 #include	<usys_ufstype.h>
 #include	<usys_umaxmsglen.h>
-#include	<usys_pathpid.h>
-#include	<usys_plock.h>		/* defines |usys_plock()| */
-#include	<usys_onc.hh>
 
 /* missing operating system calls or facilities */
 #include	<usys_atox.h>
