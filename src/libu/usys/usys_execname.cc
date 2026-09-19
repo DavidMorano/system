@@ -79,11 +79,14 @@
 #include	<localmisc.h>		/* LIBU */
 
 #include	"usys.h"
-#include	"usys_execname.h"
+#include	"usys_snx.hh"		/* |snwcpy(3usys)| */
+#include	"usys_execname.hh"
 
 #ifndef	MAXPATH
 #define	MAXPATH		(4 * 1024)	/* resonable value for exec-name */
 #endif
+
+using usys::snwcpy ;
 
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 /******************************************************************************/
@@ -100,11 +103,11 @@ namespace {
 	    cnullptr	np{} ;
 	    cnothrow	nt{} ;
 	    rss = SR_NOMEM ;
-	    if (char *tbuf = new(nt) char[tlen + 1]) {
-	        if ((rss = darwin_execname(tbuf,tlen)) >= 0) {
+	    if (char *tbuf = new(nt) char[tlen + 1]) ylikely {
+	        if ((rss = darwin_execname(tbuf,tlen)) >= 0) ylikely {
 		    elen = rss ;
 		    rss = SR_NOMEM ;
-		    if ((ebuf = new(nt) char[elen + 1]) != np) {
+		    if ((ebuf = new(nt) char[elen + 1]) != np) ylikely {
 			csize	esize = size_t(elen) ;
 			strncpy(ebuf,tbuf,esize) ;
 			ebuf[elen] = '\0' ;
@@ -130,18 +133,18 @@ namespace {
 static execstorer	exec_data ;
 
 namespace usys {
-    sysret_t usys_execname(cchar *rbuf,int rlen) noex {
-	cchar		*rp = nullptr ;
-	int		rs ;
-    	if  (static cint rss = exec_data ; (rs = rss) >= 0) {
-	    if (rs > 0) {
-	        rp = exec_data.ebuf ;
-	    }
-	} else {
-	    errno = (neg rs) ;
-	    ulogerror("execname",rs,"namer::operator") ;
-	} /* end */
-	return rp ;
+    sysret_t usys_execname(char *rbuf,int rlen) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf) ylikely {
+	    rs = SR_INVALID ;
+	    if (rlen > 0) ylikely {
+    	        if (static cint rss = exec_data ; (rs = rss) >= 0) ylikely {
+	            cchar *rp = exec_data.ebuf ;
+		    rs = snwcpy(rbuf,rlen,rp) ;
+	        } /* end if (rss) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
     } /* end subroutine (usys_execname) */
 } /* end namespace (usys) */
 
@@ -153,15 +156,15 @@ namespace usys {
 #include	<elf.h>			/* Solaris® */
 
 namespace usys {
-    sysret_t usys_execname(cchar *rbuf,int rlen) noex {
+    sysret_t usys_execname(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen > 0) {
+	    if (rlen > 0) ylikely {
 	        culong	at = AT_EXECFN ;
-	        if (ulong r ; (r = getauxval(at)) != 0) {
+	        if (ulong r ; (r = getauxval(at)) != 0) ylikely {
 	            cchar *rp = charp(r) ;
-		    rs = usys_snwcpy(rbuf,rlen,rp) ;
+		    rs = snwcpy(rbuf,rlen,rp) ;
 	        } /* end if (have entry) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -170,19 +173,36 @@ namespace usys {
 } /* end namespace (usys) */
 
 /******************************************************************************/
-#elif	defined(OSNAME_SunOs) && (OSNAME_SunOS > 0)
+#elif	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 /******************************************************************************/
 
 namespace usys {
-    sysret_t usys_execname(cchar *rbuf,int rlen) noex {
+    sysret_t usys_execname(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen > 0) {
+	    if (rlen > 0) ylikely {
 		rs = SR_OK ;
-	        if (cchar *rp = getexecname() ; rp) {
-		    rs = usys_snwcpy(rbuf,rlen,rp) ;
+	        if (cchar *rp = getexecname() ; rp) ylikely {
+		    rs = snwcpy(rbuf,rlen,rp) ;
 	        } /* end if (getexecname) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+    } /* end subroutine (usys_execname) */
+} /* end namespace (usys) */
+
+/******************************************************************************/
+#else /* unknown operating system */
+/******************************************************************************/
+
+namespace usys {
+    sysret_t usys_execname(char *rbuf,int rlen) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf) ylikely {
+	    rs = SR_INVALID ;
+	    if (rlen > 0) ylikely {
+		rs = SR_NOSYS ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
