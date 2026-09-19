@@ -1,0 +1,81 @@
+/* errtimer HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* error-timer */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services (RNS).
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Names:
+	errtimer
+
+	Description:
+	This object actually provides a counter for counting how
+	many times it is called (after sleeping on each call).
+
+*******************************************************************************/
+
+#ifndef	ERRTIMER_INCLUDE
+#define	ERRTIMER_INCLUDE
+#ifdef	__cplusplus /* C++ only! */
+
+
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+
+
+struct errtimer ;
+
+struct reterr {
+	friend		errtimer ;
+	int		rs = SR_OK ;
+	bool		fexit = true ;
+	reterr() = default ;
+	reterr(int ars,bool afe) noex : rs(ars), fexit(afe) { } ;
+	void operator () (int ars) noex {
+	    rs = ars ;
+	    fexit = (ars < 0) ;
+	} ; /* end */
+	void operator () (bool f = true) noex {
+	    fexit = f ;
+	} ; /* end */
+	operator int () const noex {
+	    return rs ;
+	} ; /* end */
+} ; /* end struct (reterr) */
+
+struct errtimer {
+	int		mto = 0 ;
+	int		rs = SR_TIMEDOUT ;
+	errtimer(cint ato = 0) noex {
+	    mto = (ato * POLL_INTMULT) ;
+	} ; /* end */
+	void operator = (cint &ato) noex {
+	    mto = (ato * POLL_INTMULT) ;
+	} ; /* end */
+	const reterr operator () (int) noex ;
+	operator reterr () noex ;
+} ; /* end struct (errtimer) */
+
+
+#endif /* __cplusplus (C++ only) */
+#endif /* ERRTIMER_INCLUDE */
+
+
