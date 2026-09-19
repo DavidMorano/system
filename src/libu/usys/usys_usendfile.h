@@ -55,7 +55,7 @@
 
 namespace usys {
     extern sysret_t usendfile(int,int,off_t,size_t) noex ;
-}
+} /* end namespace */
 
 
 #endif /* __cplusplus */
