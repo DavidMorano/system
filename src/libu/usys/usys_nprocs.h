@@ -51,7 +51,7 @@ enum unprocscmds {
 
 namespace usys {
     extern sysret_t	usys_nprocs(int) noex ;
-}
+} /* end namespace */
 
 
 #endif /* __cplusplus */
