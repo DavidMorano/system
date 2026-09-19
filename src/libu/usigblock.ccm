@@ -42,7 +42,7 @@ module ;
 
 export module usigblock ;
 
-import usigsets ;			/* |usigset(3u)| */
+import usigsets ;			/* |usigseter(3u)| */
 
 export {
     enum usigblockmems {
@@ -91,13 +91,13 @@ export {
 	int		rs = SR_OK ;
 	sigset_t	nsm ;
 	if (sigs) {
-	    if ((rs = usigset.empty(&nsm)) >= 0) {
+	    if ((rs = usigseter.empty(&nsm)) >= 0) {
 	        for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
-	            rs = usigset.add(&nsm,sigs[i]) ;
+	            rs = usigseter.add(&nsm,sigs[i]) ;
 	        }
 	    }
 	} else {
-	    rs = usigset.fill(&nsm) ;
+	    rs = usigseter.fill(&nsm) ;
 	} /* end if */
 	if (rs >= 0) ylikely {
 	    if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
