@@ -51,7 +51,6 @@
 extern int t_errno ;
 
 EXTERNC_begin
-
 extern voidp	xti_alloc	(int,int,int) noex ;
 extern int	xti_open	(cchar *,int,struct t_info *) noex ;
 extern int	xti_bind	(int,struct t_bind *,struct t_bind *) noex ;
@@ -62,7 +61,6 @@ extern int	xti_look	(int) noex ;
 extern int	xti_sync	(int) noex ;
 extern int	xti_close	(int) noex ;
 extern int	xti_free	(void *,int) noex ;
-
 EXTERNC_end
 
 #endif /* defined(SYSHAS_XTI) && (SYSHAS_XTI > 0) */
