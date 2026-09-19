@@ -173,9 +173,7 @@ EXTERNC_end
 #ifndef	DECLARATION_MEMINHERIT
 #define	DECLARATION_MEMINHERIT
 EXTERNC_begin
-
 extern unixret_t minherit(void *,size_t,int) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_MEMINHERIT */
 
@@ -214,9 +212,7 @@ enum syshasmemplock {
 #ifndef	DECLARATION_MEMPLOCK
 #define	DECLARATION_MEMPLOCK
 EXTERNC_begin
-
 extern unixret_t plock(int) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_MEMPLOCK */
 
