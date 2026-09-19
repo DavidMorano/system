@@ -46,11 +46,11 @@ LIBS += -lf -liconv -lproc
 
 
 OBJ00= syshas.o mailvalues.o endian.o 
-OBJ01= aflag.o errtimer.o usysdefs.o
-OBJ02= timewatch.o timecount.o clanguage.o
+OBJ01= aflag.o usysdefs.o
+OBJ02= clanguage.o
 OBJ03= libutil.o usysconf.o umods.o utimezone.o
 
-OBJ04= utimeout.o utimeouts.o utimeoutdefs.o
+OBJ04= utimeutil.o
 OBJ05= ulogerror.o ischx.o ulimits.o
 OBJ06= ulibvals.o uconstants.o usupport.o
 OBJ07= umem.o usigsets.o usigblock.o umisc.o
@@ -62,18 +62,18 @@ OBJ11= ustr.o uobjlock.o ureserve.o
 
 OBJ12= usysflag.o usysdata.o usysauxinfo.o 
 OBJ13= ufileop.o ufiledesc.o 
-OBJ14= um.o uprocess.o ucodenames.o
+OBJ14= um.o uproc.o ucodenames.o
 OBJ15= usysop.o uchartype.o
 
 OBJ16= syswords.o varnames.o
 OBJ17= ptx.o sigblocker.o
-OBJ18= timeval.o itimerval.o 
-OBJ19= timespec.o itimerspec.o
+OBJ18= stdclib.o
+OBJ19= stdfnames.o stdfiles.o
 
 OBJ20= uinet.o ustream.o
-OBJ21= strnul.o intx.o chrset.o stdclib.o
+OBJ21= strnul.o intx.o chrset.o 
 OBJ22= ugetloadavg.o uiconv.o bitgrp.o
-OBJ23= syscontain.o stdfnames.o stdfiles.o
+OBJ23= syscontain.o 
 
 OBJ24= posixdir.o nulstr.o vecbool.o
 OBJ25= fonce.o filerec.o
@@ -81,7 +81,7 @@ OBJ26= ustd.o ugetx.o
 OBJ27= ucomposite.o upt.o ucmpx.o
 
 OBJ28= bitmanip.o findbit.o baops.o
-OBJ29= clockids.o itimers.o filetypes.o funcodes.o 
+OBJ29= clockids.o filetypes.o funcodes.o 
 OBJ30= binchunk.o conintx.o udiv.o stdintx.o
 OBJ31= ccfile.o readln.o dprint.o
 
@@ -378,17 +378,10 @@ objn.o:			$(OBJN)
 syshas.o:		syshas.cc	syshas.h		$(INCS)
 usyscalls.o:		usyscalls.cc	usyscalls.h		$(INCS)
 ustsdefs.o:		usysdefs.cc	usysdefs.h		$(INCS)
-timewatch.o:		timewatch.cc	timewatch.hh		$(INCS)
-timecount.o:		timecount.cc	timecount.hh		$(INCS)
 clanguage.o:		clanguage.cc	clanguage.h		$(INCS)
 exitcodes.o:		exitcodes.cc	exitcodes.h		$(INCS)
 stacktypes.o:		stacktypes.cc	stacktypes.h		$(INCS)
 aflag.o:		aflag.cc	aflag.hh		$(INCS)
-errtimer.o:		errtimer.cc	errtimer.hh		$(INCS)
-timeval.o:		timeval.cc	timeval.hh		$(INCS)
-itimerval.o:		itimerval.cc	itimerval.h		$(INCS)
-timespec.o:		timespec.cc	timespec.h		$(INCS)
-itimerspec.o:		itimerspec.cc	itimerspec.h		$(INCS)
 
 # SUPPORT helpers
 usysflag.o:		usysflag.cc	usysflag.h		$(INCS)
@@ -406,6 +399,11 @@ uatfork.o:		umods.o usigblock.o
 uatfork.o:		uatfork.cc uatfork.h umods.o		$(INCS)
 uregfork.o:		umods.o uregfork.cc uregfork.hh		$(INCS)
 uobjlock.o:		umods.o uobjlock.cc uobjlock.cc		$(INCS)
+
+# UTIMEUTIL
+utimeutil.o:		utimeutil.dir
+utimeutil.dir:
+	makesubdir $@
 
 # UCONSTANTS
 uconstants.o:		uconstants.dir
@@ -607,7 +605,6 @@ mailvalues.o:		mailvalues.cc	mailvalues.hh			$(INCS)
 
 # IDS of-various-sorts
 clockids.o:		clockids.cc	clockids.hh			$(INCS)
-itimers.o:		itimers.cc	itimers.hh			$(INCS)
 filetypes.o:		filetypes.cc	filetypes.h			$(INCS)
 funcodes.o:		funcodes.cc	funcodes.h			$(INCS)
 
