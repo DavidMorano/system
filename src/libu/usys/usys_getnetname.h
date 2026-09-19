@@ -43,7 +43,6 @@
 EXTERNC_begin
 /* 0=not-found, 1=found */
 extern int	getnetname(char *) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_GETNETNAME */
 
