@@ -56,7 +56,7 @@
 #ifndef	DECLARATION_EACCESS
 #define	DECLARATION_EACCESS
 EXTERNC_begin
-extern unixret_t	eaccess(const char *,int) noexcept ;
+extern unixret_t	eaccess(cchar *,int) noex ;
 EXTERNC_end
 #endif /* DECLARATION_EACCESS */
 
