@@ -122,13 +122,13 @@ void sigblocker::dtor() noex {
 local int mksignew(sigset_t *rp,cint *sigs) noex {
     	int		rs = SR_OK ;
 	if (sigs) {
-	    if ((rs = usigset.empty(rp)) >= 0) {
+	    if ((rs = usigseter.empty(rp)) >= 0) {
 		for (int i = 0 ; (rs >= 0) && (sigs[i] > 0) ; i += 1) {
-		    rs = usigset.add(rp,sigs[i]) ;
+		    rs = usigseter.add(rp,sigs[i]) ;
 		} /* end for */
 	    } /* end if */
 	} else {
-	    rs = usigset.fill(rp) ;
+	    rs = usigseter.fill(rp) ;
 	} /* end if */
 	return rs ;
 } /* end subroutine (mksignew) */
