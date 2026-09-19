@@ -55,6 +55,7 @@
 #include	<usysdefs_poll.h>
 #include	<usysdefs_rtld.h>
 #include	<usysdefs_sig.h>
+#include	<usysdefs_sigmask.h>
 
 #include	<memord.hh>
 #include	<cmpord.hh>
