@@ -37,9 +37,7 @@
 
 
 EXTERNC_begin
-
 extern int u_execname(char *,int) noex ;
-
 EXTERNC_end
 
 
