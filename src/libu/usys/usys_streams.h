@@ -138,32 +138,31 @@
 #define	RMSGD		(I_STREAMBASE+7)
 #endif
 
-
 struct strbuf {
 	char		*buf ;
 	int		len ;
 	int		maxlen ;
-} ;
+} ; /* end struct */
 
 struct strpeek {
 	STRBUF		ctlbuf ;
 	STRBUF		databuf ;
 	uint		flags ;
-} ;
+} ; /* end struct */
 
 struct strrecvfd {      
         int		fd ;
         uid_t		uid ;
         gid_t		gid ;
         char		fill[8] ;
-} ;
+} ; /* end struct */
 
 struct strioctl {
 	char		*ic_dp ;	/* data pointer */
 	int		ic_len ;	/* data length */
 	int		ic_cmd ;	/* command */
 	int		ic_timout ;	/* timeout */
-} ;
+} ; /* end struct */
 
 EXTERNC_begin
 
