@@ -103,12 +103,12 @@ export {
     constexpr int numbasedigs_nbases = (numbasedigs_maxbase+1) ;
 } /* end export */
 
-consteval int ndigits(int t,int b) noex {
-    int             n = 0 ;
+consteval short ndigits(int t,int b) noex {
+    short		n = 0 ;
     if (b >= 2) {
 	cdouble		fbase = double(b) ;
 	cdouble		fbits = double((1 << t) * CHAR_BIT) ;
-	n = int(ceil(fbits / log2(fbase))) ;
+	n = short(ceil(fbits / log2(fbase))) ;
     } /* end if (valid base) */
     return n ;
 } /* end subroutine (ndigits) */
