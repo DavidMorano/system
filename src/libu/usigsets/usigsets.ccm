@@ -60,6 +60,25 @@ export {
     } ; /* end struct (usigsets) */
 } /* end export (usigset) */
 
+export {
+    struct usigsetcon {
+	sigset_t	ss ;
+    } ; /* end struct */
+    struct usigset : usigsetcon {
+	int add		(int) noex ;
+	int del		(int) noex ;
+	int all		() noex ;
+	int none	() noex ;
+	int is		(int) noex ;
+	int operator +=	(int) noex ;
+	int operator -=	(int) noex ;
+	int operator <<	(int) noex ;
+	int operator >>	(int) noex ;
+	usigset() noex ;
+	usigset(int) noex ;
+    } ; /* end struct (usigset) */
+} /* end export */
+
 
 /* forward references */
 
@@ -70,10 +89,17 @@ export {
 /* exported variables */
 
 export {
-    extern usigsets	usigset ;
+    extern usigsets	usigseter ;
 } /* end export */
 
 
 /* exported subroutines */
+
+export {
+    int u_sigmask(int,usigset *,usigset *) noex ;
+    int u_sigmask(int,usigset *,sigset_t *) noex ;
+    int u_sigmask(int,sigset_t *,usigset *) noex ;
+    int u_sigwait(usigset *,int *) noex ;
+} /* end export */
 
 
