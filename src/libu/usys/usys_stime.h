@@ -53,9 +53,7 @@
 #ifndef	DECLARATION_STIME
 #define	DECLARATION_STIME
 EXTERNC_begin
-
 extern unixret_t stime(const time_t *) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_STIME */
 
