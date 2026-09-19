@@ -56,7 +56,7 @@
 
 namespace usys {
     extern sysret_t ugetdents(int,void *,int) noex ;
-}
+} /* end namespace */
 
 
 #endif /* __cplusplus */
