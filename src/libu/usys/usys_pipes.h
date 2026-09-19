@@ -56,9 +56,7 @@
 #ifndef	DECLARATION_PIPES
 #define	DECLARATION_PIPES
 EXTERNC_begin
-
 extern unixret_t	pipe2(int *,int) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_PIPES */
 
