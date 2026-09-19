@@ -42,7 +42,7 @@ namespace usys {
     extern sysret_t ufcntl		(int,int,...) noex ;
     extern sysret_t ucloseonexec	(int,int) noex ;
     extern sysret_t unonblock		(int,int) noex ;
-}
+} /* end namespace */
 
 
 #endif /* __cplusplus */
