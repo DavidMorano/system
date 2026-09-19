@@ -5,6 +5,7 @@
 /* retrieve the full path of the current process executable file */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_PR		1		/* use environment program-root */
 #define	CF_PATH		1		/* use environment PATH */
 
@@ -78,7 +79,7 @@
 #if	(! defined(SYSHAS_GETEXECNAME)) || (SYSHAS_GETEXECNAME == 0)
 
 #include	<sys/types.h>		/* system types */
-#include	<unistd.h>		/* |getpid(2)| */
+#include	<unistd.h>		/* POSIX® |getpid(2)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getenv(3c)| + |getprogname(3c)| */
 #include	<cstring>		/* CSTD |strchr(3c)| */
@@ -89,6 +90,7 @@
 #include	<usysrets.h>		/* LIBU */
 #include	<usupport.h>		/* |libu::sncpy(3u)| */
 #include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"usys_pathpid.h"	/* |usys_pathpid(3usys)| */
 #include	"usys_darwin.h"
@@ -100,6 +102,9 @@
 #define	F_LIBPROC	0		/* no |libproc| is available */
 #endif
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 #ifndef	CF_PR
 #define	CF_PR		1		/* use environment program-root */
 #endif
@@ -121,6 +126,7 @@ using usys::usys_pathpid ;		/* subroutine (usys) */
 using usys::darwin_argzget ;		/* subroutine (usys) */
 
 cbool		f_libproc	= bool(F_LIBPROC) ;
+cbool		f_debug		= bool(CF_DEBUG) ;
 cbool		f_pr		= bool(CF_PR) ;
 cbool		f_path		= bool(CF_PATH) ;
 
@@ -191,6 +197,7 @@ constexpr namer_m	namegets[] = {
 
 namer::operator int () noex {
     	int		rs ;
+	DPRINTF("ent\n") ;
 	if ((rs = darwin_argzget(&az)) >= 0) {
 	    for (cauto &m : namegets) {
 	        rs = (this->*m)() ;
@@ -202,6 +209,7 @@ namer::operator int () noex {
 
 int namer::abs() noex {
     	int		rs = SR_OK ;
+	DPRINTF("ent\n") ;
 	if (az) {
 	    if (az[0] == '/') {
 	        if ((rs = sncpy(rbuf,rlen,az)) >= 0) {
@@ -214,6 +222,7 @@ int namer::abs() noex {
 
 int namer::env() noex {
     	int		rs = SR_OK ;
+	DPRINTF("ent\n") ;
     	if (static cchar *valp = getenv(VARUNDER) ; valp) {
 	    if (valp[0] == '*') {
 		if (cchar *rp = strunder(valp)) {
@@ -228,6 +237,7 @@ int namer::env() noex {
 
 int namer::proc() noex {
     	int		rs = SR_OK ;
+	DPRINTF("ent\n") ;
 	if_constexpr (f_libproc) {
 	    const pid_t		pid = getpid() ;
 	    rs = usys_pathpid(rbuf,rlen,pid) ;
@@ -237,8 +247,9 @@ int namer::proc() noex {
 
 int namer::pwd() noex {
     	int		rs = SR_OK ;
+	DPRINTF("ent\n") ;
 	if (az[0] != '/') {
-	    if ((rs = ugetcwd(rbuf,rlen)) >= 0) {
+	    if ((rs = ugetpwd(rbuf,rlen)) >= 0) {
 		mut int	rl = rs ;
 		if (cint pl = lenstr(az) ; pl <= (rlen - (rl + 1))) {
 		    rbuf[rl++] = '/' ;
@@ -251,22 +262,26 @@ int namer::pwd() noex {
 } /* end method (namer::pwd) */
 
 int namer::verify(int len) noex {
-    	int		rs ;
-	if (ustat sb ; (rs = ustatfile(rbuf,&sb)) >= 0) {
-	    if (S_ISREG(sb.st_mode) && (sb.st_mode & 0111)) {
-		rs = (len >= 0) ? len : lenstr(rbuf) ;
-	    } else {
-		rs = SR_OK ;
-	    }
-	} else if (isnotpresent(rs)) {
-	    rs = SR_OK ;
-	} /* end */
+    	int		rs = SR_OK ;
+	DPRINTF("ent\n") ;
+	if (rbuf[0] == '/') {
+	    if (ustat sb ; (rs = ustatfile(rbuf,&sb)) >= 0) {
+	        if (S_ISREG(sb.st_mode) && (sb.st_mode & 0111)) {
+		    rs = (len >= 0) ? len : lenstr(rbuf) ;
+	        } else {
+		    rs = SR_OK ;
+	        }
+	    } else if (isnotpresent(rs)) {
+	        rs = SR_OK ;
+	    } /* end */
+	} /* end if (absolute) */
 	return rs ;
 } /* end method (namer::verify) */
 
 namespace usys {
     sysret_t darwin_execname(char *obuf,int olen) noex {
 	int		rs = SR_FAULT ;
+	DPRINTF("ent\n") ;
 	if (obuf) ylikely {
 	    rs = SR_INVALID ;
 	    if (olen > 0) ylikely {
@@ -287,6 +302,7 @@ constexpr cpcchar	bins[] = {
 int namer::pr() noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
+	DPRINTF("ent\n") ;
 	if_constexpr (f_pr) {
 	    if (strchr(az,'/') == np) {
 	        if (static cc *valp = getenv(VARPR) ; valp) {
@@ -308,6 +324,7 @@ int namer::pr() noex {
 int namer::prmk(cc *pr,cc *bin,cc *an) noex {
 	int		rs ;
 	int		len = 0 ; /* return-value */
+	DPRINTF("ent\n") ;
 	if ((rs = mknpath(rbuf,rlen,pr,bin,an)) >= 0) {
 	    rs = verify(rs) ;
 	    len = rs ;
@@ -319,6 +336,7 @@ int namer::path() noex {
     	cnullptr	np{} ;
     	int		rs = SR_OK ;
 	int		len = 0 ; /* return-path */
+	DPRINTF("ent\n") ;
 	if_constexpr (f_path) {
 	    if (strchr(az,'/') == np) {
 	        if (static cchar *valp = getenv(VARPATH) ; valp) {
@@ -344,6 +362,7 @@ int namer::path() noex {
 
 int namer::pathmk(cc *pp,int pl) noex {
     	int		rs = SR_OK ;
+	DPRINTF("ent\n") ;
 	if (pl > 0) {
 	    if ((rs = mknpathw(rbuf,rlen,pp,pl)) >= 0) {
 		rs = verify(rs) ;
