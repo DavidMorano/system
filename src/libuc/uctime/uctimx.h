@@ -47,7 +47,7 @@
 
 EXTERNC_begin
 
-typedef int (*uctimx_f)(void *objp,int timid,int arg) noex ;
+typedef int (*uctimx_f)(void *objp,int timid,int notarg) noex ;
 
 EXTERNC_end
 
@@ -55,7 +55,7 @@ struct uctimxnote_head {
 	uctimx_f	notf ;		/* notify function (C-linkage) */
 	void		*objp ;		/* object pointer (function argument) */
 	psem		*psemp ;	/* POSIX® Semaphore pointer */
-	int		arg ;		/* function argument */
+	int		notarg ;	/* notification function argument */
 } ; /* end struct (uctimxnote_head) */
 
 #ifdef	__cplusplus
