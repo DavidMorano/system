@@ -45,6 +45,10 @@ MODS += usysbasic.o
 LIBS +=
 
 
+USYSBASIC_OBJ += usysbasic0.o usysbasic1.o usysbasic2.o
+USYSBASIC_OBJ += usysbasic3.o usysbasic4.o
+
+
 OBJ00_UMODS = valuelims.o 
 OBJ01_UMODS = builtin.o
 OBJ02_UMODS = digtab.o
@@ -240,14 +244,16 @@ sysdbfnames1.o:		sysdbfnames1.cc sysdbfnames0.o sysdbfnames.hh
 	$(COMPILE.cc) $<
 
 # USYSBASIC
-usysbasic.o:		usysbasic0.o usysbasic1.o
+usysbasic.o:		$(USYSBASIC_OBJ)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 usysbasic0.o:		usysbasic.ccm
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 usysbasic1.o:		usysbasic1.cc usysbasic0.o
-	$(COMPILE.cc) $<
+usysbasic2.o:		usysbasic2.cc usysbasic0.o
+usysbasic3.o:		usysbasic3.cc usysbasic0.o
+usysbasic4.o:		usysbasic4.cc usysbasic0.o
 
 # NUMBASEDIGS (module)
 numbasedigs.o:		numbasedigs.ccm
