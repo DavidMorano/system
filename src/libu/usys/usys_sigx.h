@@ -46,9 +46,7 @@
 #ifndef	DECLARATION_SIGQUEUE
 #define	DECLARATION_SIGQUEUE
 EXTERNC_begin
-
 extern unixret_t sigqueue(pid_t,int,const SIGVAL) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_SIGUEUE */
 
@@ -61,9 +59,7 @@ EXTERNC_end
 #ifndef	DECLARATION_SIGSEND
 #define	DECLARATION_SIGSEND
 EXTERNC_begin
-
 extern unixret_t sigsend(idtype_t,id_t,int) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_SIGSEND */
 
@@ -86,7 +82,7 @@ struct procset {
 	id_t		p_lid ;
 	idtype_t	p_ridtype ;
 	id_t		p_rid ;
-} ;
+} ; /* end struct */
 #endif /* STRUCT_PROCSET */
 
 #ifndef	TYPEDEF_PROCSET
