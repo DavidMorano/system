@@ -92,7 +92,7 @@ namespace libu {
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
 	    dp[0] = '\0' ;
-	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+	    for (int i = 0 ; i < n ; i += 1) {
 	        cc	*sp = (cc *) va_arg(ap,cc *) ;
 	        if (size_t ml ; (ml = strlcpy(bp,sp,rlen)) >= rlen) {
 	            rs = SR_OVERFLOW ;
