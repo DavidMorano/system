@@ -20,6 +20,7 @@
 	Names:
 	u_kill
 	u_killpg
+	u_raise
 	u_sigaction
 	u_sigaltstack
 	u_sigpending
@@ -101,6 +102,14 @@ int u_killpg(pid_t pid,int sig) noex {
 	return rs ;
 } /* end subroutine (u_killpg) */
 
+int u_raise(int sn) noex {
+	int		rs ;
+	if ((rs = raise(sn)) < 0) {
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (u_raise) */
+
 int u_sigaction(int sn,SIGACTION *nsp,SIGACTION *osp) noex {
 	int		rs ;
 	if ((rs = sigaction(sn,nsp,osp)) < 0) {
@@ -134,35 +143,25 @@ int u_sigprocmask(int how,sigset_t *setp,sigset_t *osetp) noex {
 } /* end subroutine (u_sigprocmask) */
 
 int u_sigsuspend(const sigset_t *ssp) noex {
-	int		rs ;
-	int		to_intr = utimeout[uto_intr] ;
-	int		f_exit = false ;
-	repeat {
+	int		rs = SR_FAULT ;
+	if (ssp) {
 	    rs = SR_OK ;
 	    if (sigsuspend(ssp) < 0) {
-		rs = (neg errno) ;
-		switch (rs) {
-	        case SR_INTR:
-	            if (to_intr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-		default:
-		    f_exit = true ;
-		    break ;
-	        } /* end switch */
+		if ((rs = (neg errno)) == SR_INTR) {
+		    rs = SR_OK ;
+		}
 	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (u_sigsuspend) */
 
 int u_pause() noex {
 	int		rs = SR_OK ;
 	if (pause() < 0) {
-	    rs = (neg errno) ;
-	}
+	    if ((rs = (neg errno)) == SR_INTR) {
+		rs = SR_OK ;
+	    }
+	} /* end if (pause) */
 	return rs ;
 } /* end subroutine (u_pause) */
 
@@ -176,6 +175,17 @@ int u_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
 	} /* end if (valid) */
 	return rs ;
 } /* end subroutine (u_sigmask) */
+
+int u_sigwait(const sigset_t *ssp,int *rp) noex {
+	int		rs ;
+	int		sig = 0 ; /* return-value */
+	if ((rs = sigwait(ssp,&sig)) < 0) {
+	    rs = (neg errno) ;
+	}
+	if (rp) *rp = sig ;
+	sig &= INT_MAX ;
+	return (rs >= 0) ? sig : rs ;
+} /* end subroutine (u_sigwait) */
 
 
 /* these below are NOT on all systems (like MacOS Darwin!) */
@@ -195,16 +205,5 @@ int u_sigsendset(procset_t *psp,int sig) noex {
 	}
 	return rs ;
 } /* end subroutine (u_sigsendset) */
-
-int u_sigwait(const sigset_t *ssp,int *rp) noex {
-	int		rs ;
-	int		sig ;
-	if ((rs = sigwait(ssp,&sig)) < 0) {
-	    rs = (neg errno) ;
-	}
-	if (rp) *rp = sig ;
-	sig &= INT_MAX ;
-	return (rs >= 0) ? sig : rs ;
-} /* end subroutine (u_sigwait) */
 
 
