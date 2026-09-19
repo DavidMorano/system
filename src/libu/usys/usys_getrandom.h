@@ -54,9 +54,7 @@ enum grnds {
 #ifndef	DECLARATION_GETRANDOM
 #define	DECLARATION_GETRANDOM
 EXTERNC_begin
-
 extern unixret_t	getrandom(void *,size_t,uint) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_GETRANDOM */
 
