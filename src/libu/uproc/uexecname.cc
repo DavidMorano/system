@@ -47,6 +47,8 @@
 
 /* local namespaces */
 
+using usys::usys_execname ;		/* subroutine */
+
 
 /* local typedefs */
 
@@ -76,94 +78,13 @@ int u_execname(char *rbuf,int rlen) noex {
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen > 0) {
-		rs = SR_OK ;
+		rs = usys_execname(rbuf,rlen) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-} /* end subroutine (uexecname) */
+} /* end subroutine (u_execname) */
 
 
 /* local subroutines */
-
-
-
-#else /* defined(SYSHAS_GETEXECNAME) && (SYSHAS_GETEXECNAME > 0) */
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-/******************************************************************************/
-
-using usys::darwin_execname ;	/* subroutine */
-
-namespace {
-    struct execstorer {
-	cint	tlen = MAXPATH ;
-	char	*ebuf{} ;
-	int	elen ;
-	int	rss ;
-	execstorer() noex {
-	    cnullptr	np{} ;
-	    cnothrow	nt{} ;
-	    rss = SR_NOMEM ;
-	    if (char *tbuf = new(nt) char[tlen + 1]) {
-	        if ((rss = darwin_execname(tbuf,tlen)) >= 0) {
-		    elen = rss ;
-		    rss = SR_NOMEM ;
-		    if ((ebuf = new(nt) char[elen + 1]) != np) {
-			csize	esize = size_t(elen) ;
-			strncpy(ebuf,tbuf,esize) ;
-			ebuf[elen] = '\0' ;
-			rss = elen ;
-		    } /* end if (new-ebuf) */
-	        } /* end if (darwin_execname) */
-	        delete [] tbuf ;
-	    } /* end if (new-delete) */
-	} ; /* end ctor */
-	operator int () noex {
-	    return ((rss >= 0) && ebuf) ? elen : rss ;
-	} ; /* end */
-	destruct execstorer() {
-	    if (ebuf) {
-		delete [] ebuf ;
-		ebuf = nullptr ;
-		elen = 0 ;
-	    } /* end if (delete) */
-	} ; /* end dtor */
-    } ; /* end struct (execstorer) */
-} /* end namespace */
-
-static execstorer	exec_data ;
-
-cchar *getexecname() noex {
-	cchar		*rp = nullptr ;
-	int		rs ;
-    	if  (static cint rss = exec_data ; (rs = rss) >= 0) {
-	    if (rs > 0) {
-	        rp = exec_data.ebuf ;
-	    }
-	} else {
-	    errno = (neg rs) ;
-	    ulogerror("getexecname",rs,"namer::operator") ;
-	} /* end */
-	return rp ;
-} /* end subroutine (getexecname) */
-
-/******************************************************************************/
-#elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
-/******************************************************************************/
-
-#include	<sys/auxv.h>		/* Solaris® */
-#include	<elf.h>			/* Solaris® */
-
-cchar *getexecname() noex {
-	culong		at = AT_EXECFN ;
-	cchar		*rp = nullptr ; /* return-value */
-	if (ulong r ; (r = getauxval(at)) != 0) {
-	    rp = charp(r) ;
-	} /* end if (have entry) */
-	return rp ;
-} /* end subroutine (getexecname) */
-
-/******************************************************************************/
-#endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
-#endif /* defined(SYSHAS_GETEXECNAME) && (SYSHAS_GETEXECNAME > 0) */
 
 
