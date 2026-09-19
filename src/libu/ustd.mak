@@ -126,54 +126,54 @@ control:
 	(uname -n ; date) > Control
 
 
-obj00_ustd.o:	$(OBJ00_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ00_USYS)
+obj00_ustd.o:		$(OBJ00_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj01_ustd.o:	$(OBJ01_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ01_USYS)
+obj01_ustd.o:		$(OBJ01_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj02_ustd.o:	$(OBJ02_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ02_USYS)
+obj02_ustd.o:		$(OBJ02_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj03_ustd.o:	$(OBJ03_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ03_USYS)
+obj03_ustd.o:		$(OBJ03_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj04_ustd.o:	$(OBJ04_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ04_USYS)
+obj04_ustd.o:		$(OBJ04_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj05_ustd.o:	$(OBJ05_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ05_USYS)
+obj05_ustd.o:		$(OBJ05_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj06_ustd.o:	$(OBJ06_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ06_USYS)
+obj06_ustd.o:		$(OBJ06_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj07_ustd.o:	$(OBJ07_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ07_USYS)
+obj07_ustd.o:		$(OBJ07_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj08_ustd.o:	$(OBJ08_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ08_USYS)
+obj08_ustd.o:		$(OBJ08_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj09_ustd.o:	$(OBJ09_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ09_USYS)
+obj09_ustd.o:		$(OBJ09_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj10_ustd.o:	$(OBJ10_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ10_USYS)
+obj10_ustd.o:		$(OBJ10_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj11_ustd.o:	$(OBJ11_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJ11_USYS)
+obj11_ustd.o:		$(OBJ11_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obja.o:		$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJA)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb.o:		$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJB)
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objc.o:		$(OBJC)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJC)
+objc.o:			$(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objd.o:		$(OBJD)
-	$(LD) -r $(LDFLAGS) -o $@ $(OBJD)
+objd.o:			$(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
 ustd_confstr.o:		ustd_confstr.cc		ustd_confstr.h	$(INCS)
