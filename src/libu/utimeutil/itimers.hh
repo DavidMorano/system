@@ -1,0 +1,51 @@
+/* itimers HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* constants used in identifying internal-timers */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-02-13, David A­D­ Morano
+	This code was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Object:
+	itimer
+
+	Description:
+	This object simply provides the identifying values used in
+	selecting a process interval-timer.
+
+*******************************************************************************/
+
+#ifndef	ITIMERS_INCLUDE
+#define	ITIMERS_INCLUDE
+#ifdef	__cplusplus	/* C++ only! */
+
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+
+
+struct itimers {
+    static constexpr int	real		= ITIMER_REAL ;
+    static constexpr int	virt		= ITIMER_VIRTUAL ;
+    static constexpr int	prof		= ITIMER_PROF ;
+} ; /* end struct (timers) */
+
+extern const itimers	itimer ;
+
+
+#endif /* __cplusplus (C++ only) */
+#endif /* ITIMERS_INCLUDE */
+
+
