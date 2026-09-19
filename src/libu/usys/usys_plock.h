@@ -49,7 +49,7 @@
 
 namespace usys {
     extern sysret_t	usys_plock(int) noex ;
-}
+} /* end namespace */
 
 
 #endif /* __cplusplus */
