@@ -36,9 +36,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	<ustd_typedefs.h>	/* should be ordered first */
-
 #include	<ustd_confstr.h>
 #include	<ustd_confval.h>
 
