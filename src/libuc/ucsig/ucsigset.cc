@@ -60,23 +60,23 @@ import usigsets ;			/* |usigset(3u)| */
 /* exported subroutines */
 
 int uc_sigsetempty(sigset_t *sp) noex {
-    	return usigset.empty(sp) ;
+    	return usigseter.empty(sp) ;
 } /* end subroutine (uc_sigsetempty) */
 
 int uc_sigsetfill(sigset_t *sp) noex {
-    	return usigset.fill(sp) ;
+    	return usigseter.fill(sp) ;
 } /* end subroutine (uc_sigsetfill) */
 
 int uc_sigsetadd(sigset_t *sp,int sn) noex {
-    	return usigset.add(sp,sn) ;
+    	return usigseter.add(sp,sn) ;
 } /* end subroutine (uc_sigsetadd) */
 
 int uc_sigsetdel(sigset_t *sp,int sn) noex {
-    	return usigset.del(sp,sn) ;
+    	return usigseter.del(sp,sn) ;
 } /* end subroutine (uc_sigsetdel) */
 
 int uc_sigsetismem(const sigset_t *sp,int sn) noex {
-    	return usigset.ismem(sp,sn) ;
+    	return usigseter.ismem(sp,sn) ;
 } /* end subroutine (uc_sigsetismem) */
 
 
