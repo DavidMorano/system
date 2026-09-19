@@ -45,7 +45,7 @@
 namespace usys {
     extern sysret_t usys_pathpid(char *,int,pid_t) noex ;
     extern sysret_t usys_namepid(char *,int,pid_t) noex ;
-}
+} /* end namespace */
 
 
 #endif /* __cplusplus */
