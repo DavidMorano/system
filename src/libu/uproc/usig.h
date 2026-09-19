@@ -33,12 +33,14 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usys.h>		/* LIBU */
+#include	<usigsets.h>		/* LIBU */
 
 
 EXTERNC_begin
 
 extern int u_kill		(pid_t,int) noex ;
 extern int u_killpg		(pid_t,int) noex ;
+extern int u_raise		(int) noex ;
 extern int u_sigaction		(int,SIGACTION *,SIGACTION *) noex ;
 extern int u_sigaltstack	(const stack_t *,stack_t *) noex ;
 extern int u_sigpending		(sigset_t *) noex ;
@@ -50,6 +52,9 @@ extern int u_sigwait		(const sigset_t *,int *) noex ;
 extern int u_sigmask		(int,sigset_t *,sigset_t *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+#endif /* __cplusplus */
 
 
 #endif /* USIG_INCLUDE */
