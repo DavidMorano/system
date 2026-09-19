@@ -54,7 +54,7 @@
 #define	STRUCT_MQATTR
 struct mq_attr {
 	uint	dummy ;
-} ;
+} ; /* end */
 #endif /* STRUCT_MQATTR */
 
 #ifndef	TYPEDEF_MQDT
