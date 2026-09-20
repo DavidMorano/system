@@ -67,18 +67,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	strwcmp(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	isdigitlatin(int) ;
-
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
@@ -88,13 +76,6 @@ extern int	debugprintf(const char *,...) ;
 extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -114,20 +95,20 @@ struct fileuniq {
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *,PARAMOPT *) ;
-static int	process(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *,paramopt *) ;
+static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
 static int	procin(PROGINFO *,bfile *,const char *) ;
 static int	procfile(PROGINFO *,bfile *,const char *) ;
-static int	procsufs(PROGINFO *,PARAMOPT *,const char *) ;
+static int	procsufs(PROGINFO *,paramopt *,const char *) ;
 static int	procnoprog(PROGINFO *,struct fileuniq *,cchar *) ;
 
-static int	procsuf_begin(PROGINFO *,PARAMOPT *,cchar *,cchar *) ;
+static int	procsuf_begin(PROGINFO *,paramopt *,cchar *,cchar *) ;
 static int	procsuf_end(PROGINFO *) ;
 static int	procuniq_begin(PROGINFO *) ;
 static int	procuniq_end(PROGINFO *) ;
 
-static int	loadsuf(PROGINFO *,PARAMOPT *,cchar *,cchar *,int) ;
+static int	loadsuf(PROGINFO *,paramopt *,cchar *,cchar *,int) ;
 
 static int	cmpuniq(struct fileuniq *,struct fileuniq *,int) ;
 
@@ -294,9 +275,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	bits		pargs ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -870,10 +851,10 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	if (rs >= 0) {
 	    if ((rs = procuniq_begin(pip)) >= 0) {
-	        PARAMOPT	*pop = &aparams ;
+	        paramopt	*pop = &aparams ;
 	        if ((rs = procsuf_begin(pip,pop,po_sufacc,po_sufrej)) >= 0) {
 	            ARGINFO	*aip = &ainfo ;
-	            BITS	*bop = &pargs ;
+	            bits	*bop = &pargs ;
 	            cchar	*ofn = ofname ;
 	            cchar	*ifn = ifname ;
 	            cchar	*afn = afname ;
@@ -991,7 +972,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *pop)
+static int procopts(PROGINFO *pip,keyopt *kop,paramopt *pop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1002,13 +983,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *pop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(progopts,2,kp,kl)) >= 0) {
 
@@ -1041,8 +1022,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *pop)
 	                    pip->fl.f_nodev = TRUE ;
 	                    break ;
 	                case progopt_noextra:
-	                    if (! pip->final.f_noextra) {
-	                        pip->final.f_noextra = TRUE ;
+	                    if (! pip->finval.f_noextra) {
+	                        pip->finval.f_noextra = TRUE ;
 	                        pip->fl.f_noextra = TRUE ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
@@ -1077,7 +1058,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop,PARAMOPT *pop)
 /* end subroutine (procopts) */
 
 
-static int procsuf_begin(PROGINFO *pip,PARAMOPT *app,cchar *poa,cchar *por)
+static int procsuf_begin(PROGINFO *pip,paramopt *app,cchar *poa,cchar *por)
 {
 	int		rs ;
 	int		rs1 ;
@@ -1115,7 +1096,7 @@ static int procsuf_end(PROGINFO *pip)
 /* end subroutine (procsuf_end) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,
+static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,
 		cchar *ifn,cchar *afn)
 {
 	bfile		ofile, *ofp = &ofile ;
@@ -1151,7 +1132,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *afn)
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1499,7 +1480,7 @@ static int procuniq_end(PROGINFO *pip)
 /* end subroutine (procuniq_end) */
 
 
-static int procsufs(PROGINFO *pip,PARAMOPT *pop,cchar *s)
+static int procsufs(PROGINFO *pip,paramopt *pop,cchar *s)
 {
 	VECPSTR		*vlp ;
 	int		rs = SR_OK ;
@@ -1521,7 +1502,7 @@ static int procsufs(PROGINFO *pip,PARAMOPT *pop,cchar *s)
 #endif
 
 	if (c > 0) {
-	    PARAMOPT_CUR	cur ;
+	    paramopt_cur	cur ;
 	    switch (si) {
 	    case suf_acc:
 	        f = pip->have.sufacc ;
@@ -1604,7 +1585,7 @@ static int procnoprog(PROGINFO *pip,struct fileuniq *ufp,cchar fname[])
 /* end subroutine (procnoprog) */
 
 
-static int loadsuf(PROGINFO *pip,PARAMOPT *pop,cchar *s,cchar *ap,int al)
+static int loadsuf(PROGINFO *pip,paramopt *pop,cchar *s,cchar *ap,int al)
 {
 	int		rs = SR_OK ;
 	int		si ;
@@ -1622,14 +1603,14 @@ static int loadsuf(PROGINFO *pip,PARAMOPT *pop,cchar *s,cchar *ap,int al)
 
 	switch (si) {
 	case suf_acc:
-	    f_final = pip->final.sufacc ;
-	    pip->final.sufacc = TRUE ;
+	    f_final = pip->finval.sufacc ;
+	    pip->finval.sufacc = TRUE ;
 	    pip->have.sufacc = TRUE ;
 	    var = VARSA ;
 	    break ;
 	case suf_rej:
-	    f_final = pip->final.sufrej ;
-	    pip->final.sufrej = TRUE ;
+	    f_final = pip->finval.sufrej ;
+	    pip->finval.sufrej = TRUE ;
 	    pip->have.sufrej = TRUE ;
 	    var = VARSR ;
 	    break ;
