@@ -8,16 +8,16 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 1998-04-13, David A-D- Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	lookword
 
 	Description:
@@ -126,9 +126,9 @@ int lookword_open(LW *op,cchar *dfname,int opts) noex {
 	int		rs = SR_FAULT ;
 	if (op && dfname) ylikely {
 	    memclear(op) ;
-	    op->fl.dict = LOGICVAL(opts&LOOKWORD_ODICT) ;
-	    op->fl.fold = LOGICVAL(opts&LOOKWORD_OFOLD) ;
-	    op->fl.word = LOGICVAL(opts&LOOKWORD_OWORD) ;
+	    op->fl.dict = LOGICVAL(opts & LOOKWORD_ODICT) ;
+	    op->fl.fold = LOGICVAL(opts & LOOKWORD_OFOLD) ;
+	    op->fl.word = LOGICVAL(opts & LOOKWORD_OWORD) ;
 	    if ((rs = uc_open(dfname,O_RDONLY,0666)) >= 0) ylikely {
 	        cint		fd = rs ;
 	        if ((rs = uc_fsize(fd)) >= 0) ylikely {
@@ -145,7 +145,7 @@ int lookword_open(LW *op,cchar *dfname,int opts) noex {
 	        } /* end if (fsize) */
 	        if (rs < 0) {
 	            u_close(fd) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (file-open) */
 	} /* end if (non-null) */
 	return rs ;
@@ -271,9 +271,9 @@ local int lookword_record(LW *op,LW_CUR *curp,
 	int		c = 0 ;
 	if ((rs = vecobj_start(&ans,esize,1,0)) >= 0) {
 	    LW_W	w ;
-	    int			m ;
-	    bool		f_mat = true ;
-	    cchar		*tp ;
+	    int		m ;
+	    bool	f_mat = true ;
+	    cchar	*tp ;
 	    auto cmp = [&] () noex -> bool {
 		bool	f = true ;
 		f = f && (front < back) ;
@@ -284,8 +284,8 @@ local int lookword_record(LW *op,LW_CUR *curp,
 	        if ((tp = strchr(front,'\n')) != np) {
 	            if (op->fl.word) {
 	                f_mat = (compare(op,front,tp,wstr,&m) == 0) ;
-	                f_mat = f_mat && 
-	                    (wstr[m] == '\0') && (front[m] == '\n') ;
+	                f_mat = f_mat && (wstr[m] == '\0') ;
+	                f_mat = f_mat && (front[m] == '\n') ;
 	                if (f_mat) {
 	                    c += 1 ;
 	                    w.wp = front ;
