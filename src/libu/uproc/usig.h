@@ -32,28 +32,33 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<usys.h>		/* LIBU */
-#include	<usigsets.h>		/* LIBU */
 
 
 EXTERNC_begin
 
+extern int u_alarm		(int) noex ;
 extern int u_kill		(pid_t,int) noex ;
 extern int u_killpg		(pid_t,int) noex ;
 extern int u_raise		(int) noex ;
-extern int u_sigaction		(int,SIGACTION *,SIGACTION *) noex ;
+extern int u_sigaction		(int,con SIGACTION *,mut SIGACTION *) noex ;
 extern int u_sigaltstack	(const stack_t *,stack_t *) noex ;
-extern int u_sigpending		(sigset_t *) noex ;
-extern int u_sigprocmask	(int,sigset_t *,sigset_t *) noex ;
-extern int u_sigsuspend		(const sigset_t *) noex ;
+extern int u_sigpending		(mut sigset_t *) noex ;
+extern int u_sigprocmask	(int,con sigset_t *,sigset_t *) noex ;
+extern int u_sigsuspend		(con sigset_t *) noex ;
 extern int u_sigsend		(idtype_t,id_t,int) noex ;
 extern int u_sigsendset		(procset_t *,int) noex ;
-extern int u_sigwait		(const sigset_t *,int *) noex ;
-extern int u_sigmask		(int,sigset_t *,sigset_t *) noex ;
+extern int u_sigmask		(int,con sigset_t *,mut sigset_t *) noex ;
+extern int u_sigwait		(con sigset_t *,mut int *) noex ;
 
 EXTERNC_end
 
 #ifdef	__cplusplus
+inline int u_sigaction		(int sig,con SIGACTION *sap) noex {
+    	return u_sigaction(sig,sap,nullptr) ;
+} /* end subroutine */
+inline int u_sigwait		(con sigset_t *ssp) noex {
+    	return u_sigwait(ssp,nullptr) ;
+} /* end subroutine */
 #endif /* __cplusplus */
 
 
