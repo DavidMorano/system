@@ -18,6 +18,7 @@
 /*******************************************************************************
 
 	Names:
+	u_alarm
 	u_kill
 	u_killpg
 	u_raise
@@ -28,8 +29,8 @@
 	u_sigsuspend
 	u_sigsend
 	u_sigsendset
-	u_sigwait
 	u_sigmask
+	u_sigwait
 
 	Name:
 	u_sigprocmask
@@ -39,11 +40,10 @@
 
 	Notes:
 	|u_sigprocmask(3u)|
-	Set the process signal mask (to something).  When there are
-	more than one thread in the proces, this only sets the
-	signal mask of the thread it is called from.  A cousin of
-	this system call is the call |u_sigmask(3u)|, which is
-	supposed to be for thread specific use.
+	Set the process signal mask (to something).  This sets the
+	signal mask for the whole process.  this system call is the
+	call |u_sigmask(3u)|, which is supposed to be for thread
+	specific use.
 
 *******************************************************************************/
 
@@ -86,6 +86,19 @@
 
 /* exported subroutines */
 
+int u_alarm(int secs) noex {
+    	uint		usecs = uint(secs) ;
+	int		rs = SR_INVALID ;
+	if (secs >= 0) {
+	    if (uint uret = alarm(usecs) ; uret == uint(-1)) {
+	        rs = (neg errno) ;
+	    } else {
+		rs = intconv(usecs & INT_MAX) ;
+	    }
+	} /* end if (valid) */
+	return rs ;
+} /* end subroutine (u_alarm) */
+
 int u_kill(pid_t pid,int sig) noex {
 	int		rs ;
 	if ((rs = kill(pid,sig)) < 0) {
@@ -110,7 +123,7 @@ int u_raise(int sn) noex {
 	return rs ;
 } /* end subroutine (u_raise) */
 
-int u_sigaction(int sn,SIGACTION *nsp,SIGACTION *osp) noex {
+int u_sigaction(int sn,con SIGACTION *nsp,mut SIGACTION *osp) noex {
 	int		rs ;
 	if ((rs = sigaction(sn,nsp,osp)) < 0) {
 	    rs = (neg errno) ;
@@ -126,25 +139,29 @@ int u_sigaltstack(const stack_t *ssp,stack_t *ossp) noex {
 	return rs ;
 } /* end subroutine (u_sigaltstack) */
 
-int u_sigpending(sigset_t *ssp) noex {
-	int		rs ;
-	if ((rs = sigpending(ssp)) < 0) {
-	    rs = (neg errno) ;
-	}
+int u_sigpending(mut sigset_t *ssp) noex {
+	int		rs = SR_FAULT ;
+	if (ssp) ylikely {
+	    if ((rs = sigpending(ssp)) < 0) {
+	        rs = (neg errno) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (u_sigpending) */
 
-int u_sigprocmask(int how,sigset_t *setp,sigset_t *osetp) noex {
-	int		rs ;
-	if ((rs = sigprocmask(how,setp,osetp)) < 0) {
-	    rs = (neg errno) ;
-	}
+int u_sigprocmask(int how,con sigset_t *setp,mut sigset_t *osetp) noex {
+	int		rs = SR_INVALID ;
+	if (how >= 0) {
+	    if ((rs = sigprocmask(how,setp,osetp)) < 0) {
+	        rs = (neg errno) ;
+	    }
+	} /* end if (valid) */
 	return rs ;
 } /* end subroutine (u_sigprocmask) */
 
-int u_sigsuspend(const sigset_t *ssp) noex {
+int u_sigsuspend(con sigset_t *ssp) noex {
 	int		rs = SR_FAULT ;
-	if (ssp) {
+	if (ssp) ylikely {
 	    rs = SR_OK ;
 	    if (sigsuspend(ssp) < 0) {
 		if ((rs = (neg errno)) == SR_INTR) {
@@ -165,7 +182,7 @@ int u_pause() noex {
 	return rs ;
 } /* end subroutine (u_pause) */
 
-int u_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
+int u_sigmask(int how,con sigset_t *setp,mut sigset_t *osetp) noex {
 	int		rs = SR_INVALID ;
 	if (how >= 0) {
 	    rs = SR_OK ;
@@ -176,14 +193,29 @@ int u_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
 	return rs ;
 } /* end subroutine (u_sigmask) */
 
-int u_sigwait(const sigset_t *ssp,int *rp) noex {
-	int		rs ;
+int u_sigwait(con sigset_t *ssp,mut int *rp) noex {
+	int		rs = SR_FAULT ;
 	int		sig = 0 ; /* return-value */
-	if ((rs = sigwait(ssp,&sig)) < 0) {
-	    rs = (neg errno) ;
-	}
-	if (rp) *rp = sig ;
-	sig &= INT_MAX ;
+	if (ssp) ylikely {
+	    bool fexit = false ;
+	    repeat {
+	        if ((rs = sigwait(ssp,&sig)) < 0) {
+	            rs = (neg errno) ;
+		    switch (rs) {
+		    case SR_AGAIN:
+			break ;
+		    case SR_INTR:
+			rs = SR_OK ;
+			break ;
+		    default:
+			fexit = true ;
+			break ;
+		    } /* end switch */
+	        } /* end if (sigwait) */
+	    } until ((rs >= 0) || fexit) ;
+	    if (rp) *rp = sig ;
+	    sig &= INT_MAX ;
+	} /* end if (non-null) */
 	return (rs >= 0) ? sig : rs ;
 } /* end subroutine (u_sigwait) */
 
