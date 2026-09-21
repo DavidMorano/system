@@ -273,7 +273,7 @@ OBJ155= mailboxappend.o
 OBJ156= hdrextid.o hdrextnum.o 
 OBJ157= localset.o
 OBJ158= localget.o
-OBJ159= inetpton.o inetntop.o inet_ntoa_r.o inet4int.o
+OBJ159=
 
 OBJ160= tabcols.o nextfield.o nextfieldterm.o nextqtoken.o 
 OBJ161= nusers.o mesg.o initnow.o 
