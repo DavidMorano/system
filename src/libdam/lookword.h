@@ -6,7 +6,14 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 2002 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LOOKWORD_INCLUDE
 #define	LOOKWORD_INCLUDE
