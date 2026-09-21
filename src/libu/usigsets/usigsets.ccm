@@ -48,15 +48,15 @@ export module usigsets ;
 /* external variables */
 
 
-/* local structures */
+/* exported structures */
 
 export {
     struct usigsets {
-        int empty	(sigset_t *) noex ;
-        int fill	(sigset_t *) noex ;
-        int add		(sigset_t *,int) noex ;
-        int del		(sigset_t *,int) noex ;
-        int ismem	(const sigset_t *,int) noex ;
+        int empty	(mut sigset_t *) noex ;
+        int fill	(mut sigset_t *) noex ;
+        int add		(mut sigset_t *,int) noex ;
+        int del		(mut sigset_t *,int) noex ;
+        int ismem	(con sigset_t *,int) const noex ;
     } ; /* end struct (usigsets) */
 } /* end export (usigset) */
 
@@ -69,7 +69,7 @@ export {
 	int del		(int) noex ;
 	int all		() noex ;
 	int none	() noex ;
-	int is		(int) noex ;
+	int is		(int) const noex ;
 	int operator +=	(int) noex ;
 	int operator -=	(int) noex ;
 	int operator <<	(int) noex ;
@@ -96,10 +96,10 @@ export {
 /* exported subroutines */
 
 export {
-    int u_sigmask(int,usigset *,usigset *) noex ;
-    int u_sigmask(int,usigset *,sigset_t *) noex ;
-    int u_sigmask(int,sigset_t *,usigset *) noex ;
-    int u_sigwait(usigset *,int *) noex ;
+    int u_sigmask(int,con usigset *,mut usigset * = nullptr) noex ;
+    int u_sigmask(int,con usigset *,mut sigset_t *) noex ;
+    int u_sigmask(int,con sigset_t *,mut usigset * = nullptr) noex ;
+    int u_sigwait(con usigset *,mut int * = nullptr) noex ;
 } /* end export */
 
 
