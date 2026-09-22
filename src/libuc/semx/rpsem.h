@@ -61,11 +61,11 @@ struct rpsem_co {
 	void operator () (rpsem *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (rpsem_co) */
 struct rpsem : rpsem_head {
 	rpsem_co	wait ;
@@ -86,11 +86,11 @@ struct rpsem : rpsem_head {
 	rpsem(const rpsem &) = delete ;
 	rpsem &operator = (const rpsem &) = delete ;
 	int create	(int = 0,int = -1) noex ;
+	void dtor	() noex ;
 	operator int 	() noex ;
-	void dtor() noex ;
 	destruct rpsem() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (rpsem) */
 #else	/* __cplusplus */
 typedef RPSEM		rpsem ;
