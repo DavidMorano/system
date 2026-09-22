@@ -102,9 +102,9 @@ using std::ceil ;			/* C++ subroutine (template) */
 
 template<typename T> local int ndivx(T v,int b) noex {
 	int		n = 0 ;
-	if (v >= 0) {
+	if (v >= 0) ylikely {
 	    const uint	ub = uint(b) ;	/* unsigned division is faster? */
-	    if (b >= 2) {
+	    if (b >= 2) ylikely {
 	        if (v == 0) {
 	            n = 1 ;
 	        } else {
@@ -137,7 +137,7 @@ cbool		f_math = CF_MATH ;
 
 template<typename T> local int ndigitx(T v,int b) noex {
     	int		n = 0 ;
-	if (b >= 2) {
+	if (b >= 2) ylikely {
 	    if_constexpr (f_math && (szof(T) <= szof(long))) {
 	        clongdouble 	fv = longdouble(v) ;
 	        {
