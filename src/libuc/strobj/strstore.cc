@@ -76,7 +76,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -106,6 +105,7 @@ int		strstore_already(strstore *,cchar *,int) noex ;
 template<typename ... Args>
 local inline int strstore_ctor(strstore *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
@@ -114,10 +114,10 @@ local inline int strstore_ctor(strstore *op,Args ... args) noex {
 	    op->chsz = 0 ;
 	    op->totalsz = 0 ;
 	    op->c = 0 ;
-	    if ((op->clp = new(nothrow) vechand) != np) ylikely {
-	        if ((op->nlp = new(nothrow) vechand) != np) ylikely {
-	            if ((op->lap = new(nothrow) lookaside) != np) ylikely {
-	                if ((op->hlp = new(nothrow) hdb) != np) ylikely {
+	    if ((op->clp = new(nt) vechand) != np) ylikely {
+	        if ((op->nlp = new(nt) vechand) != np) ylikely {
+	            if ((op->lap = new(nt) lookaside) != np) ylikely {
+	                if ((op->hlp = new(nt) hdb) != np) ylikely {
 			    rs = SR_OK ;
 	                } /* end if (new-hdb) */
 		        if (rs < 0) {
@@ -203,7 +203,7 @@ int strstore_start(strstore *op,int n,int csz) noex {
 	if (csz < STRSTORE_CHUNKSIZE) csz = STRSTORE_CHUNKSIZE ;
 	if ((rs = strstore_ctor(op)) >= 0) ylikely {
 	    vechand	*clp = op->clp ;
-	    cint	vo = VECHAND_OORDERED ;
+	    cint	vo = vechandm.ordered ;
 	    cint	nch = max((n/6),6) ;
 	    op->chsz = csz ;
 	    if ((rs = vechand_start(clp,nch,vo)) >= 0) ylikely {
@@ -495,8 +495,8 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 	    if (cint isz = indexsize(il) ; itsize >= isz) ylikely {
                 cint	esz = szof(strentry) ;
 		cint	vn = op->c ;
-                cint	vo = VECOBJ_OCOMPACT ;
-                memset(it,0,isz) ;
+                cint	vo = vecobjm.compact ;
+                memclear(it,isz) ;
                 if (vecobj ses ; (rs = vecobj_start(&ses,esz,vn,vo)) >= 0) {
                     strentry        se ;
                     hdb             *hp = op->hlp ;
