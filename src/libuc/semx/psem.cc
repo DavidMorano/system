@@ -275,6 +275,14 @@ void psem::dtor() noex {
 	}
 } /* end method (psem::dtor) */
 
+int psem_cr::operator () (int fshared,int cnt) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    rs = psem_create(op,fshared,cnt) ;
+	}
+	return rs ;
+} /* end method (psem_cr::operator) */
+
 int psem_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
