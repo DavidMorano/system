@@ -1,4 +1,4 @@
-/* epsem SUPPORT (emulated POSIX® Semaphore) */
+/* epsem SUPPORT ('emulated' POSIX® Semaphore) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
