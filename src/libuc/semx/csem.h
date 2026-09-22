@@ -55,11 +55,11 @@ struct csem_co {
 	void operator () (csem *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = 1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (csem_co) */
 struct csem : csem_head {
 	csem_co		incr ;
@@ -79,11 +79,11 @@ struct csem : csem_head {
 	csem &operator = (const csem &) = delete ;
 	int create	(int = 0,int = 0) noex ;
 	int decr	(int = 1,int = -1) noex ;
+	void dtor	() noex ;
 	operator int 	() noex ;
-	void dtor() noex ;
 	destruct csem() {
 	    if (magval || mxp) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (csem) */
 #else	/* __cplusplus */
 typedef CSEM		csem ;
