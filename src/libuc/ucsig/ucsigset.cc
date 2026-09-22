@@ -59,23 +59,23 @@ import usigsets ;			/* |usigset(3u)| */
 
 /* exported subroutines */
 
-int uc_sigsetempty(sigset_t *sp) noex {
+int uc_sigsetempty	(mut sigset_t *sp) noex {
     	return usigseter.empty(sp) ;
 } /* end subroutine (uc_sigsetempty) */
 
-int uc_sigsetfill(sigset_t *sp) noex {
+int uc_sigsetfill	(mut sigset_t *sp) noex {
     	return usigseter.fill(sp) ;
 } /* end subroutine (uc_sigsetfill) */
 
-int uc_sigsetadd(sigset_t *sp,int sn) noex {
+int uc_sigsetadd	(mut sigset_t *sp,int sn) noex {
     	return usigseter.add(sp,sn) ;
 } /* end subroutine (uc_sigsetadd) */
 
-int uc_sigsetdel(sigset_t *sp,int sn) noex {
+int uc_sigsetdel	(mut sigset_t *sp,int sn) noex {
     	return usigseter.del(sp,sn) ;
 } /* end subroutine (uc_sigsetdel) */
 
-int uc_sigsetismem(const sigset_t *sp,int sn) noex {
+int uc_sigsetismem	(con sigset_t *sp,int sn) noex {
     	return usigseter.ismem(sp,sn) ;
 } /* end subroutine (uc_sigsetismem) */
 
