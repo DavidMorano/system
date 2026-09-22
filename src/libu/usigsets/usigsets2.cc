@@ -87,7 +87,7 @@ int usigset::none() noex {
     return usigseter.empty(&ss) ;
 } /* end method */
 
-int usigset::is(int sn) noex {
+int usigset::is(int sn) const noex {
     return usigseter.ismem(&ss,sn) ;
 } /* end method */
 
