@@ -60,19 +60,28 @@ enum psemmems {
 	psemmem_overlast
 } ; /* end enum */
 struct psem ;
+struct psem_cr {
+	psem		*op = nullptr ;
+	void operator () (psem *p) noex {
+	    op = p ;
+	} ; /* end */
+	int operator () (int = 0,int = -1) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ; /* end */
+} ; /* end struct (psem_co) */
 struct psem_co {
 	psem		*op = nullptr ;
-	int		w = -1 ;
 	void operator () (psem *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (psem_co) */
 struct psem : psem_head {
+    	psem_cr		create ;
 	psem_co		wait ;
 	psem_co		waiter ;
 	psem_co		trywait ;
@@ -80,6 +89,7 @@ struct psem : psem_head {
 	psem_co		count ;
 	psem_co		destroy ;
 	psem() noex {
+	    create	(this) ;
 	    wait	(this,psemmem_wait) ;
 	    waiter	(this,psemmem_waiter) ;
 	    trywait	(this,psemmem_trywait) ;
@@ -90,12 +100,11 @@ struct psem : psem_head {
 	} ; /* end ctor */
 	psem(const psem &) = delete ;
 	psem &operator = (const psem &) = delete ;
-	int create	(int = 0,int = -1) noex ;
-	operator int () noex ;
-	void dtor() noex ;
+	void dtor	() noex ;
+	operator int	() noex ;
 	destruct psem() {
 	    if (subobj) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (psem) */
 #else	/* __cplusplus */
 typedef PSEM		psem ;
