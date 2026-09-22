@@ -102,7 +102,7 @@ local inline int csem_ctor(csem *op,Args ... args) noex {
 	 	if (rs < 0) {
 		    delete op->mxp ;
 		    op->mxp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
@@ -113,11 +113,11 @@ local int csem_dtor(csem *op) noex {
 	if (op->cvp) ylikely {
 	    delete op->cvp ;
 	    op->cvp = nullptr ;
-	}
+	} /* end if (delete-ptc) */
 	if (op->mxp) ylikely {
 	    delete op->mxp ;
 	    op->mxp = nullptr ;
-	}
+	} /* end if (delete-ptm) */
 	return rs ;
 } /* end subroutine (csem_dtor) */
 
@@ -172,16 +172,16 @@ int csem_destroy(csem *op) noex {
 		ptc *cvp = op->cvp ;
 		rs1 = cvp->destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (op->mxp) ylikely {
 		ptm *mxp = op->mxp ;
 		rs1 = mxp->destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = csem_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -193,7 +193,7 @@ int csem_decr(csem *op,int c,int to) noex {
 	int		ocount = 0 ;
 	assert(op) ;
 	if ((rs = csem_magic(op)) >= 0) ylikely {
-            if (c > 0) {
+            if (c > 0) ylikely {
                 timespec    ts{} ; /* used-afterwards */
 		ptm *mxp = op->mxp ;
 		ptc *cvp = op->cvp ;
@@ -301,27 +301,31 @@ int csem_waiters(csem *op) noex {
 /* private subroutines */
 
 local int csem_ptminit(csem *op,int f_shared) noex {
-	ptma		a ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = ptma_create(&a)) >= 0) ylikely {
-	    ptm		*mxp = op->mxp ;
-	    bool	f_ptm = false ;
-	    {
-	        if (f_shared) {
-		    cint	v = PTHREAD_PROCESS_SHARED ;
-		    rs = ptma_setpshared(&a,v) ;
-	        }
-	        if (rs >= 0) ylikely {
-	            rs = mxp->create(&a) ;
-		    f_ptm = (rs >= 0) ;
-	        }
-	    } /* end block */
-	    rs1 = ptma_destroy(&a) ;
-	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_ptm) {
-		mxp->destroy() ;
-	    } /* end if (error) */
+	if (ptma a ; (rs = ptma_create(&a)) >= 0) ylikely {
+	    rs = SR_BUGCHECK ;
+	    if (ptm *mxp = op->mxp) ylikely {
+	        bool	f_ptm = false ;
+	        rs = SR_OK ;
+		{
+	            {
+	                if (f_shared) {
+		            cint v = PTHREAD_PROCESS_SHARED ;
+		            rs = ptma_setpshared(&a,v) ;
+	                } /* end */
+	                if (rs >= 0) ylikely {
+	                    rs = mxp->create(&a) ;
+		            f_ptm = (rs >= 0) ;
+	                } /* end if (ok) */
+	            } /* end block */
+	            rs1 = ptma_destroy(&a) ;
+	            if (rs >= 0) rs = rs1 ;
+		} /* end block */
+	        if ((rs < 0) && f_ptm) {
+		    mxp->destroy() ;
+	        } /* end if (error) */
+	    } /* end if (non-null) */
 	} /* end if (ptma) */
 	return rs ;
 } /* end subroutine (csem_ptminit) */
@@ -336,7 +340,7 @@ local int csem_ptcinit(csem *op,int f_shared) noex {
 	        if (f_shared) {
 		    cint	v = PTHREAD_PROCESS_SHARED ;
 		    rs = ptca_setpshared(&a,v) ;
-	        }
+	        } /* end */
 	        if (rs >= 0) ylikely {
 	            rs = cvp->create(&a) ;
 		    f_ptc = (rs >= 0) ;
@@ -362,14 +366,14 @@ int csem::decr(int c,int to) noex {
 void csem::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("csem",rs,"fini-destroy") ;
-	}
+	} /* end */
 } /* end method (csem::dtor) */
 
 csem::operator int () noex {
 	int		rs = SR_NOTOPEN ;
 	if (mxp && cvp) {
 	    rs = cnt ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (csem::operator) */
 
