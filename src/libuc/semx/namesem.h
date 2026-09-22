@@ -47,11 +47,11 @@ struct namesem_co {
 	void operator () (namesem *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (namesem_co) */
 struct namesem : namesem_head {
 	namesem_co	close ;
@@ -76,11 +76,11 @@ struct namesem : namesem_head {
 	namesem(const namesem &) = delete ;
 	namesem &operator = (const namesem &) = delete ;
 	int open	(cchar *,int,mode_t,uint) noex ;
-	operator int () noex ;
-	void dtor() noex ;
+	void dtor	() noex ;
+	operator int	() noex ;
 	destruct namesem() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (namesem) */
 #else	/* __cplusplus */
 typedef NAMESEM		namesem ;
