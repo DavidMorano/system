@@ -46,11 +46,11 @@ OBJ2= inetconv.o
 OBJ3= inet4int.o
 OBJ4= inaddrbad.o
 OBJ5= inetaddrs.o
-OBJ6=
+OBJ6= inet_ntoa_r.o
 OBJ7=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o obj5.o
+OBJB= obj4.o obj5.o obj6.o
 
 OBJ= obja.o objb.o
 
@@ -156,6 +156,7 @@ inetaddrparse.o:	inetaddrparse.cc	inetaddrparse.h		$(INCS)
 inetconv.o:		inetconv.cc		inetconv.h		$(INCS)
 inet4int.o:		inet4int.cc		inet4int.h		$(INCS)
 inaddrbad.o:		inaddrbad.cc		inaddrbad.hh		$(INCS)
+inet_ntoa_r.o:		inet_ntoa_r.cc		inet_ntoa_r.h		$(INCS)
 
 # this has been archived because I use the version in LIBU-USUPPORT
 cfinet.o:		cfinet.cc		cfinet.hh
