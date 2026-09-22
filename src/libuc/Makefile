@@ -828,8 +828,8 @@ sigobj.dir:
 	makesubdir $@
 
 # UTERM
-uterm.o:		uterm.dir
-uterm.dir:
+ucterm.o:		ucterm.dir
+ucterm.dir:
 	makesubdir $@
 
 # SETX
