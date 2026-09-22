@@ -212,11 +212,11 @@ int vecsorthand_del(vecsorthand *op,int i) noex {
 
 int vecsorthand_delhand(vecsorthand *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
+	int		i = 0 ; /* return-value */
 	if (op && ep) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
 	        cint	n = op->i ;
-	        int	i ; /* used-afterwards */
 	        bool	f = false ;
 	        rs = SR_NOTFOUND ;
 	        for (i = 0 ; i < n ; i += 1) {
@@ -228,7 +228,7 @@ int vecsorthand_delhand(vecsorthand *op,cvoid *ep) noex {
 	        }
 	    } /* end if (open) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? i : rs ;
 } /* end subroutine (vecsorthand_delhand) */
 
 int vecsorthand_count(vecsorthand *op) noex {
@@ -241,6 +241,25 @@ int vecsorthand_count(vecsorthand *op) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (vecsorthand_count) */
+
+int vecsorthand_present(vecsorthand *op,cvoid *p) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ;
+	if (op && p) ylikely {
+	    rs = SR_NOTOPEN ;
+	    if (op->va) ylikely {
+	        cint	n = op->i ;
+		rs = SR_NOTFOUND ;
+		for (i = 0 ; i < n ; i += 1) {
+		    if (cvoid *ep = op->va[i]) {
+			if (ep == p) break ;
+		    } /* end if (non-null) */
+		} /* end for */
+		if (i < op->i) rs = SR_OK ;
+	    } /* end if (open) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
+} /* end subroutine (vecsorthand_present) */
 
 int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	int		rs = SR_FAULT ;
@@ -319,6 +338,10 @@ int vecsorthand::add(cvoid *nep) noex {
 
 int vecsorthand::get(int ai,void *rvp) noex {
 	return vecsorthand_get(this,ai,rvp) ;
+} /* end method */
+
+int vecsorthand::present(cvoid *p) noex {
+	return vecsorthand_present(this,p) ;
 } /* end method */
 
 void vecsorthand::dtor() noex {
