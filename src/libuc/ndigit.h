@@ -43,23 +43,23 @@ EXTERNC_end
 
 inline int ndigit(int v,int b)			noex {
 	return ndigiti(v,b) ;
-}
+} /* end */
 inline int ndigit(long v,int b)			noex {
 	return ndigitl(v,b) ;
-}
+} /* end */
 inline int ndigit(longlong v,int b)		noex {
 	return ndigitll(v,b) ;
-}
+} /* end */
 
 inline int ndigit(uint v,int b)			noex {
 	return ndigitui(v,b) ;
-}
+} /* end */
 inline int ndigit(ulong v,int b)		noex {
 	return ndigitul(v,b) ;
-}
+} /* end */
 inline int ndigit(ulonglong v,int b)		noex {
 	return ndigitull(v,b) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
