@@ -853,11 +853,11 @@ int uctimeout::sigerserve() noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = capbegin(to)) >= 0) ylikely {
-	    const time_t	dt = time(nullptr) ;
+	    custime	dt = time(nullptr) ;
 	    while ((rs = vecsorthand_count(pqp)) > 0) {
-	        if (TIMEOUT *tep{} ; (rs = vecsorthand_get(pqp,0,&tep)) >= 0) {
+	        if (TIMEOUT *tep{} ; (rs = pqp->get(0,&tep)) >= 0) {
 	            cint	ei = rs ;
-	            if (tep->val > dt) break ;
+	            if (tep->val < dt) break ;
 	            if ((rs = vecsorthand_del(pqp,ei)) >= 0) {
 	                if ((rs = ciq_ins(&pass,tep)) >= 0) {
 	                    fcmd = true ;
