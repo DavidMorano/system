@@ -62,11 +62,11 @@ struct epsem_co {
 	void operator () (epsem *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (epsem_co) */
 struct epsem : csem {
 	epsem_co	wait ;
@@ -87,11 +87,11 @@ struct epsem : csem {
 	epsem(const epsem &) = delete ;
 	epsem &operator = (const epsem &) = delete ;
 	int create	(int = 0,int = -1) noex ;
-	void dtor() noex ;
-	operator int () noex ;
+	void dtor	() noex ;
+	operator int	() noex ;
 	destruct epsem() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (epsem) */
 #else	/* __cplusplus */
 typedef EPSEM		epsem ;
