@@ -65,24 +65,24 @@ usigsets	usigseter ;
 /* exported subroutines */
 
 extern "C" {
-    int u_sigsetempty	(sigset_t *sp) noex {
+    int u_sigsetempty	(mut sigset_t *sp) noex {
 	return usigseter.empty(sp) ;
-    }
-    int u_sigsetfill	(sigset_t *sp) noex {
+    } /* end */
+    int u_sigsetfill	(mut sigset_t *sp) noex {
 	return usigseter.fill(sp) ;
-    }
-    int u_sigsetadd	(sigset_t *sp,int si) noex {
+    } /* end */
+    int u_sigsetadd	(mut sigset_t *sp,int si) noex {
 	return usigseter.add(sp,si) ;
-    }
-    int u_sigsetdel	(sigset_t *sp,int si) noex {
+    } /* end */
+    int u_sigsetdel	(mut sigset_t *sp,int si) noex {
 	return usigseter.del(sp,si) ;
-    }
-    int u_sigsetismem	(const sigset_t *sp,int si) noex {
+    } /* end */
+    int u_sigsetismem	(con sigset_t *sp,int si) noex {
 	return usigseter.ismem(sp,si) ;
-    }
+    } /* end */
 } /* end extern (C) */
 
-int u_sigmask(int w,usigset *nsp,usigset *osp) noex {
+int u_sigmask(int w,con usigset *nsp,mut usigset *osp) noex {
     int		rs ;
     if (nsp && osp) {
         rs = u_sigmask(w,&nsp->ss,&osp->ss) ;
@@ -98,18 +98,18 @@ int u_sigmask(int w,usigset *nsp,usigset *osp) noex {
 } /* end subroutine */
 
 /* local subroutines */
-int u_sigmask(int w,usigset *nsp,sigset_t *osp) noex {
+int u_sigmask(int w,con usigset *nsp,mut sigset_t *osp) noex {
     int		rs ;
     if (nsp) {
         rs = u_sigmask(w,&nsp->ss,osp) ;
     } else {
 	sigset_t *tnsp = nullptr ;
         rs = u_sigmask(w,tnsp,osp) ;
-    }
+    } /* end */
     return rs ;
 } /* end subroutine */
 
-int u_sigmask(int w,sigset_t *nsp,usigset *osp) noex {
+int u_sigmask(int w,con sigset_t *nsp,mut usigset *osp) noex {
     int		rs ;
     if (osp) {
         rs = u_sigmask(w,nsp,&osp->ss) ;
@@ -120,14 +120,14 @@ int u_sigmask(int w,sigset_t *nsp,usigset *osp) noex {
     return rs ;
 } /* end subroutine */
 
-int u_sigwait(usigset *sp,int *rp) noex {
+int u_sigwait(con usigset *sp,mut int *rp) noex {
     return u_sigwait(&sp->ss,rp) ;
 } /* end subroutine */
 
 
 /* local subroutines */
 
-int usigsets::empty(sigset_t *sp) noex {
+int usigsets::empty(mut sigset_t *sp) noex {
 	int		rs = SR_FAULT ;
 	if (sp) ylikely {
 	    if ((rs = sigemptyset(sp)) < 0) {
@@ -137,7 +137,7 @@ int usigsets::empty(sigset_t *sp) noex {
 	return rs ;
 } /* end method (usigsets::empty) */
 
-int usigsets::fill(sigset_t *sp) noex {
+int usigsets::fill(mut sigset_t *sp) noex {
 	int		rs = SR_FAULT ;
 	if (sp) ylikely {
 	    if ((rs = sigfillset(sp)) < 0) {
@@ -147,7 +147,7 @@ int usigsets::fill(sigset_t *sp) noex {
 	return rs ;
 } /* end method (usigsets::fill) */
 
-int usigsets::add(sigset_t *sp,int sn) noex {
+int usigsets::add(mut sigset_t *sp,int sn) noex {
 	int		rs = SR_FAULT ;
 	if (sp) ylikely {
 	    rs = SR_INVALID ;
@@ -160,7 +160,7 @@ int usigsets::add(sigset_t *sp,int sn) noex {
 	return rs ;
 } /* end method (usigsets::add) */
 
-int usigsets::del(sigset_t *sp,int sn) noex {
+int usigsets::del(mut sigset_t *sp,int sn) noex {
 	int		rs = SR_FAULT ;
 	if (sp) ylikely {
 	    rs = SR_INVALID ;
@@ -173,7 +173,7 @@ int usigsets::del(sigset_t *sp,int sn) noex {
 	return rs ;
 } /* end method (usigsets::del) */
 
-int usigsets::ismem(const sigset_t *sp,int sn) noex {
+int usigsets::ismem(con sigset_t *sp,int sn) const noex {
 	int		rs = SR_FAULT ;
 	if (sp) ylikely {
 	    rs = SR_INVALID ;
