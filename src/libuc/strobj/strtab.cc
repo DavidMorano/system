@@ -483,17 +483,17 @@ int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 	int		rs1 ;
 	int		sc = 0 ;
 	if ((rs = strtab_magic(op,it)) >= 0) ylikely {
-	    int		isize ;
+	    int		isz ;
 	    if (nskip < 0) nskip = 0 ;
 	    {
 		cint	il = indexlen(op->cnt + 1) ;
-		isize = indexsize(il) ;
+		isz = indexsize(il) ;
 		rs = SR_OVERFLOW ;
-		if (itsize >= isize) {
+		if (itsize >= isz) {
 	            vecobj	ses ;
-		    cint	vo = VECOBJ_OCOMPACT ;
+		    cint	vo = vecobjm.compact ;
 		    cint	esize = szof(strentry) ;
-		    memclear(it,isize) ;
+		    memclear(it,isz) ;
 		    if ((rs = vecobj_start(&ses,esize,op->cnt,vo)) >= 0) {
 	    	        strentry	se ;
 	    	        hdb_cur		cur ;
