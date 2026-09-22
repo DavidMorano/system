@@ -38,13 +38,13 @@ export {
 	retstat(int a) : rs(a) { } ;
 	int get() const { 
 	    return rs ; 
-	} ;
+	} ; /* end */
 	void set(int a) { 
 	    rs = a ; 
-	} ;
+	} ; /* end */
 	operator int () noex {
     	    return rs ;
-	} ;
+	} ; /* end */
     } ; /* end struct (retstat) */
 } /* end export */
 
