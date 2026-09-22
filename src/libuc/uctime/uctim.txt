@@ -1,0 +1,78 @@
+UCTIM (develpment notes)
+
+
+The 'itimerval' structure looks like this:
+
+struct itimerval {
+	struct timeval		it_interval ;    /* timer interval */
+	struct timeval		it_value ;       /* current value */
+} ;
+
+
+Here is the 'itimerspec' structure (not defined by Apple-Darwin®):
+
+struct itimerspec {
+	struct timespec		it_interval ;
+	struct timespec		it_value ;
+} ;
+
+
+The Illumos® operating system defines the 'itimerspec' structure as follows:
+
+typedef struct itimerspec {		/* definition per POSIX.4 */
+	struct timespec		it_interval ;	/* timer period */
+	struct timespec		it_value ;	/* timer expiration */
+} itimerspec_t ;
+
+
+Here is the definition of the 'sigevent' structure by Illumos®:
+
+struct sigevent {
+	int		sigev_notify;	/* notification mode */
+	int		sigev_signo;	/* signal number */
+	union sigval	sigev_value;	/* signal value */
+	void		(*sigev_notify_function)(union sigval);
+	pthread_attr_t	*sigev_notify_attributes;
+	int		__sigev_pad2;
+} ;
+
+
+Here is the definition of the 'sigevent' structure by Linux®:
+
+typedef struct sigevent {
+    __sigval_t sigev_value;
+    int sigev_signo;
+    int sigev_notify;
+    void (*sigev_notify_function) (__sigval_t);	    /* Function to start.  */
+    void *sigev_notify_attributes;		    /* Really pthread_attr_t.*/
+  } sigevent_t ;
+
+
+Here is the API for POSIX® timers:
+
+
+/* Create new per-process timer using CLOCK_ID.  */
+extern int timer_create (clockid_t __clock_id,
+			 struct sigevent *__restrict __evp,
+			 timer_t *__restrict __timerid) __THROW;
+
+/* Delete timer TIMERID.  */
+extern int timer_delete (timer_t __timerid) __THROW;
+
+/* Set timer TIMERID to VALUE, returning old value in OVALUE.  */
+# ifndef __USE_TIME64_REDIRECTS
+extern int timer_settime (timer_t __timerid, int __flags,
+			  const struct itimerspec *__restrict __value,
+			  struct itimerspec *__restrict __ovalue) __THROW;
+
+/* Get current value of timer TIMERID and store it in VALUE.  */
+extern int timer_gettime (timer_t __timerid, struct itimerspec *__value)
+     __THROW;
+# else
+#  ifdef __REDIRECT_NTH
+extern int __REDIRECT_NTH (timer_settime, (timer_t __timerid, int __flags,
+     const struct itimerspec *__restrict __value,
+     struct itimerspec *__restrict __ovalue),
+                          __timer_settime64);
+
+
