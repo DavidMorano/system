@@ -27,11 +27,11 @@
 
 EXTERNC_begin
 
-extern int u_sigsetempty	(sigset_t *) noex ;
-extern int u_sigsetfill		(sigset_t *) noex ;
-extern int u_sigsetadd		(sigset_t *,int) noex ;
-extern int u_sigsetdel		(sigset_t *,int) noex ;
-extern int u_sigsetismem	(const sigset_t *,int) noex ;
+extern int u_sigsetempty	(mut sigset_t *) noex ;
+extern int u_sigsetfill		(mut sigset_t *) noex ;
+extern int u_sigsetadd		(mut sigset_t *,int) noex ;
+extern int u_sigsetdel		(mut sigset_t *,int) noex ;
+extern int u_sigsetismem	(con sigset_t *,int) noex ;
 
 EXTERNC_end
 
