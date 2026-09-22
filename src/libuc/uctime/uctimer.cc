@@ -193,7 +193,7 @@ int uctimer::operator () (timer_t tid) noex {
 
 sysret_t uctimer::sys_create(timer_t) noex {
 	int		rs = SR_FAULT ;
-	if (tmp) {
+	if (tmp) ylikely {
 	    if ((rs = timer_create(cid,sep,tmp)) < 0) {
 		rs = (neg errno) ;
 	    } /* end if (error) */
