@@ -139,7 +139,7 @@ int strpack_start(strpack *op,int chsize) noex {
 	int		rs ;
 	if (chsize < STRPACK_CHSIZE) chsize = STRPACK_CHSIZE ;
 	if ((rs = strpack_ctor(op)) >= 0) ylikely {
-	    cint	vo = VECHAND_OORDERED ;
+	    cint	vo = vechandm.ordered ;
 	    op->chsize = chsize ;
 	    if ((rs = vechand_start(op->clp,0,vo)) >= 0) ylikely {
 		if_constexpr (f_prealloc) {
