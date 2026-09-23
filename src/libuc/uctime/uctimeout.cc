@@ -404,7 +404,7 @@ int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 	        if ((rs = vechand_del(elp,ei)) >= 0) {
 	            cint	rsn = SR_NOTFOUND ;
 		    bool	f_free = false ;
-	            if ((rs = vecsorthand_delhand(pqp,ep)) >= 0) {
+	            if ((rs = vecsorthand_delent(pqp,ep)) >= 0) {
 			f_free = true ;
 		    } else if (rs == rsn) {
 	                ciq	*cqp = &pass ;
@@ -992,7 +992,7 @@ int uctimeout::dispjobdel(TIMEOUT *tep) noex {
 	int		rs1 ;
 	int		f = false ;
         if ((rs = capbegin(to)) >= 0) ylikely {
-	    if ((rs = vechand_delhand(&ents,tep)) >= 0) {
+	    if ((rs = ents.delent(tep)) >= 0) {
 		f = true ;
 	    } else if (rs == SR_NOTFOUND) {
 		rs = SR_OK ;
