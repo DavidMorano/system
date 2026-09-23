@@ -98,7 +98,6 @@ export {
 export {
     int u_sigmask(int,con usigset *,mut usigset * = nullptr) noex ;
     int u_sigmask(int,con usigset *,mut sigset_t *) noex ;
-    int u_sigmask(int,con sigset_t *,mut usigset * = nullptr) noex ;
     int u_sigwait(con usigset *,mut int * = nullptr) noex ;
 } /* end export */
 
