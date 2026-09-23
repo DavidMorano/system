@@ -25,7 +25,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -73,7 +73,7 @@ extern int	isFailOpen(int) ;
 
 extern int	printhelp(void *,const char *,const char *,const char *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	progspec(PROGINFO *,PARAMOPT *,const char *) ;
+extern int	progspec(PROGINFO *,paramopt *,const char *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(const char *) ;
@@ -113,9 +113,9 @@ struct locinfo {
 
 static int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procargs(PROGINFO *,ARGINFO *,BITS *,
-			PARAMOPT *,cchar *,cchar *) ;
+static int	procopts(PROGINFO *,keyopt *) ;
+static int	procargs(PROGINFO *,ARGINFO *,bits *,
+			paramopt *,cchar *,cchar *) ;
 
 
 /* external variables */
@@ -221,9 +221,9 @@ int main(int argc,cchar **argv,cchar **envv)
 {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	PARAMOPT	aparams ;
+	bits		pargs ;
+	keyopt		akopts ;
+	paramopt	aparams ;
 	bfile		errfile ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
@@ -413,7 +413,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-	                            PARAMOPT	*pop = &aparams ;
+	                            paramopt	*pop = &aparams ;
 	                            cchar	*po = PO_OPTION ;
 	                            rs = paramopt_loads(pop,po,argp,argl) ;
 	                        }
@@ -428,7 +428,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        argr -= 1 ;
 	                        argl = strlen(argp) ;
 	                        if (argl) {
-	                            PARAMOPT	*pop = &aparams ;
+	                            paramopt	*pop = &aparams ;
 	                            rs = paramopt_loadu(pop,argp,argl) ;
 	                        }
 	                    } else
@@ -635,7 +635,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                KEYOPT	*kop = &akopts ;
+	                                keyopt	*kop = &akopts ;
 	                                rs = keyopt_loads(kop,argp,argl) ;
 	                            }
 	                        } else
@@ -680,7 +680,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                                rs = SR_INVALID ;
 	                        }
 	                        if ((rs >= 0) && (cp != NULL)) {
-	                            PARAMOPT	*pop = &aparams ;
+	                            paramopt	*pop = &aparams ;
 	                            cchar	*po = PO_SUFFIX ;
 	                            rs = paramopt_loads(pop,po,cp,cl) ;
 	                        }
@@ -840,7 +840,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if (pip->intage >= 0) {
 	    pip->have.intage = TRUE ;
-	    pip->final.intage = TRUE ;
+	    pip->finval.intage = TRUE ;
 	}
 
 	rs = procopts(pip,&akopts) ;
@@ -885,11 +885,11 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	opts = 0 ;
 	if ((rs = vecstr_start(&pip->suffixes,10,opts)) >= 0) {
-	    PARAMOPT	*pop = &aparams ;
+	    paramopt	*pop = &aparams ;
 	    cchar	*po = PO_SUFFIX ;
 
 	    if ((rs = paramopt_havekey(pop,po)) > 0) {
-	        PARAMOPT_CUR	cur ;
+	        paramopt_cur	cur ;
 	        const char	*vp ;
 
 	        if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
@@ -915,7 +915,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    if (rs >= 0) {
 	        const char	*po = PO_OPTION ;
 	        if ((rs = paramopt_havekey(pop,po)) > 0) {
-	            PARAMOPT_CUR	cur ;
+	            paramopt_cur	cur ;
 	            const char		*vp ;
 
 	            if ((rs = paramopt_curbegin(pop,&cur)) >= 0) {
@@ -1072,7 +1072,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,KEYOPT *kop)
+static int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1084,13 +1084,13 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	}
 
 	if (rs >= 0) {
-	    KEYOPT_CUR	kcur ;
+	    keyopt_cur	kcur ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int	oi ;
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&kcur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
 	            if ((oi = matostr(akonames,3,kp,kl)) >= 0) {
 
@@ -1197,7 +1197,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,PARAMOPT *app,
+static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *app,
 cchar *ofn, cchar *afn)
 {
 	bfile		ofile, *ofp = &ofile ;
