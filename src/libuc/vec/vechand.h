@@ -154,7 +154,7 @@ struct vechand : vechand_head {
 	int getvec	(void *) noex ;
 	int search	(cvoid *,vechand_f,void **) noex ;
 	int del		(int = -1) noex ;
-	int delhand	(cvoid *) noex ;
+	int delent	(cvoid *) noex ;
 	int sort	(vechand_f) noex ;
 	void dtor() noex ;
 	operator int () noex ;
@@ -179,7 +179,7 @@ extern int vechand_search	(vechand *,cvoid *,vechand_vcmp,void **) noex ;
 extern int vechand_ent		(vechand *,cvoid *) noex ;
 extern int vechand_issorted	(vechand *) noex ;
 extern int vechand_del		(vechand *,int) noex ;
-extern int vechand_delhand	(vechand *,cvoid *) noex ;
+extern int vechand_delent	(vechand *,cvoid *) noex ;
 extern int vechand_delall	(vechand *) noex ;
 extern int vechand_getvec	(vechand *,void *) noex ;
 extern int vechand_extent	(vechand *) noex ;
