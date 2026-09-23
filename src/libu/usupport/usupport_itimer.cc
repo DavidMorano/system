@@ -5,6 +5,7 @@
 /* UNIX® kernel support subroutines */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -55,11 +56,16 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<stdintx.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"usupport_itimer.hh"
 
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -82,6 +88,8 @@
 
 /* local variables */
 
+cbool			f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -91,24 +99,32 @@
 namespace libu {
     sysret_t uitimer_get(int w,ITIMERVAL *otvp) noex {
 	int		rs = SR_FAULT ;
-	if (otvp) {
-	    repeat {
+	if (otvp) ylikely {
+	    rs = SR_INVALID ;
+	    if (w >= 0) ylikely {
+	        repeat {
 	        if ((rs = getitimer(w,otvp)) < 0) {
-		    rs = (neg errno) ;
-	        }
-	    } until (rs != SR_INTR) ;
+		        rs = (neg errno) ;
+	            }
+	        } until (rs != SR_INTR) ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (uitimer_get) */
     sysret_t uitimer_set(int w,CITIMERVAL *ntvp,ITIMERVAL *otvp) noex {
 	int		rs = SR_FAULT ;
-	if (ntvp && otvp) {
-	    repeat {
-	        if ((rs = setitimer(w,ntvp,otvp)) < 0) {
-		    rs = (neg errno) ;
-	        }
-	    } until (rs != SR_INTR) ;
+	DPRINTF("ent w=%d\n",w) ;
+	if (ntvp) ylikely {
+	    rs = SR_INVALID ;
+	    if (w >= 0) ylikely {
+	        repeat {
+	            if ((rs = setitimer(w,ntvp,otvp)) < 0) {
+		        rs = (neg errno) ;
+	            }
+	        } until (rs != SR_INTR) ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
     } /* end subroutine (uitimer_set) */
 } /* end namespace (libu) */
