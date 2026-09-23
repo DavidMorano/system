@@ -36,11 +36,11 @@ struct ptrwa_co {
         constexpr void operator () (ptrwa *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         int operator () (int a = -1) noex ;
         operator int () noex {
 	    return operator () (-1) ;
-	}
+	} ; /* end */
 } ; /* end struct (ptrwa_co) */
 struct ptrwa : pthread_rwlockattr_t {
 	ptrwa_co	create ;
