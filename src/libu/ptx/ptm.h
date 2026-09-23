@@ -1,4 +1,4 @@
-/* ptm HEADER */
+/* ptm HEADER (POSIX®-Thread-Mutex) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -46,11 +46,11 @@ struct ptm_creater {
 	constexpr void operator () (ptm *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (ptma * = nullptr) noex ;
 	operator int () noex {
 	    return (*this)() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ptm_creater) */
 struct ptm_co {
         ptm             *op = nullptr ;
@@ -58,11 +58,11 @@ struct ptm_co {
         constexpr void operator () (ptm *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         int operator () (int = -1) noex ;
         operator int () noex {
             return (*this)() ;
-        } ;
+        } ; /* end */
 } ; /* end struct (ptm_co) */
 struct ptm : pthread_mutex_t {
 	ptm_creater	create ;
