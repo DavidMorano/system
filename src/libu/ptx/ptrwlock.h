@@ -44,11 +44,11 @@ struct ptrwlock_cr {
 	constexpr void operator () (ptrwlock *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (ptrwa * = nullptr) noex ;
 	operator int () noex {
 	    return (*this)() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ptrwlock_cr) */
 struct ptrwlock_co {
         ptrwlock	*op = nullptr ;
@@ -56,7 +56,7 @@ struct ptrwlock_co {
         constexpr void operator () (ptrwlock *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         operator int () noex ;
 } ; /* end struct (ptrwlock_co) */
 struct ptrwlock : pthread_rwlock_t {
