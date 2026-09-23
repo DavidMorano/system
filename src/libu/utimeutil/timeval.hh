@@ -61,7 +61,7 @@
                         (vvp)->tv_usec -= 1000000 ;                      \
                 }                                                       \
         } while (0)
-#endif
+#endif /* timeradd */
 
 #ifndef	timersub
 #define timersub(tvp, uvp, vvp)                                         \
