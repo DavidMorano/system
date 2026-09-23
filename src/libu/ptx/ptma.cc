@@ -1,4 +1,4 @@
-/* ptma SUPPORT */
+/* ptma SUPPORT (POSIX®-Thread-Mutex-Attributes) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -80,7 +80,7 @@ int ptma_create(ptma *op) noex {
 	    reterr	r ;
 	    repeat {
 	        if ((rs = pthread_mutexattr_init(op)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		    r(rs) ;
 	            switch (rs) {
 	            case SR_NOMEM:
@@ -113,7 +113,7 @@ int ptma_destroy(ptma *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutexattr_destroy(op)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -125,7 +125,7 @@ int ptma_getprioceiling(ptma *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutexattr_getprioceiling(op,oldp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -137,7 +137,7 @@ int ptma_setprioceiling(ptma *op,int fn) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutexattr_setprioceiling(op,fn)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -149,7 +149,7 @@ int ptma_getprotocol(ptma *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutexattr_getprotocol(op,oldp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -161,7 +161,7 @@ int ptma_setprotocol(ptma *op,int fn) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutexattr_setprotocol(op,fn)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -173,7 +173,7 @@ int ptma_getpshared(ptma *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutexattr_getpshared(op,oldp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -185,7 +185,7 @@ int ptma_setpshared(ptma *op,int fn) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutexattr_setpshared(op,fn)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -198,7 +198,7 @@ int ptma_getrobustnp(ptma *op,int *oldp) noex {
 	if (op) ylikely{
 	    if_constexpr (f_mutexrobust) {
 	        if ((rs = pthread_mutexattr_getrobust_np(op,oldp)) > 0) {
-	            rs = (- rs) ;
+	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 		    rs = SR_NOANODE ;
 		}
@@ -215,7 +215,7 @@ int ptma_setrobustnp(ptma *op,int fn) noex {
 	if (op) ylikely {
 	    if_constexpr (f_mutexrobust) {
 		if ((rs = pthread_mutexattr_setrobust_np(op,fn)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 	         } else if (rs < 0) {
 		     rs = SR_NOANODE ;
 		}
@@ -231,7 +231,7 @@ int ptma_gettype(ptma *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutexattr_gettype(op,oldp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -243,7 +243,7 @@ int ptma_settype(ptma *op,int nf) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutexattr_settype(op,nf)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
