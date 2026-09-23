@@ -36,7 +36,7 @@ struct ptca_co {
         constexpr void operator () (ptca *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         int operator () (int = 0) noex ;
 } ; /* end struct (ptca_co) */
 struct ptca : pthread_condattr_t {
