@@ -1,4 +1,4 @@
-/* pta HEADER */
+/* pta HEADER (POSIX®-Thread-Attributes) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -42,11 +42,11 @@ struct pta_co {
         constexpr void operator () (pta *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         int operator () (int a = -1) noex ;
         operator int () noex {
 	    return operator () (-1) ;
-	}
+	} ; /* end */
 } ; /* end struct (pta_co) */
 struct pta : pthread_attr_t {
 	pta_co		create ;
