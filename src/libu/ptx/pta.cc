@@ -1,4 +1,4 @@
-/* pta SUPPORT */
+/* pta SUPPORT (POSIX®-Thread-Attributes) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -63,7 +63,7 @@ int pta_create(pta *op) noex {
 	    reterr	r ;
 	    repeat {
 	        if ((rs = pthread_attr_init(op)) > 0) {
-	            rs = (- rs) ;
+	            rs = (neg rs) ;
 		    r(rs) ;
 	            switch (rs) {
 	            case SR_NOMEM:
@@ -95,8 +95,12 @@ int pta_create(pta *op) noex {
 int pta_destroy(pta *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
-	    (void) pthread_attr_destroy(op) ;
-	}
+	    if ((rs = pthread_attr_destroy(op)) > 0) {
+		rs = (neg rs) ;
+	    } else if (rs < 0) {
+		rs = SR_NOANODE ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_destroy) */
 
@@ -104,11 +108,11 @@ int pta_setstacksize(pta *op,size_t v) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_attr_setstacksize(op,v)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_setstacksize) */
 
@@ -116,11 +120,11 @@ int pta_getstacksize(pta *op,size_t *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_getstacksize(op,vp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_getstacksize) */
 
@@ -128,11 +132,11 @@ int pta_setguardsize(pta *op,size_t v) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_attr_setguardsize(op,v)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_setguardsize) */
 
@@ -140,11 +144,11 @@ int pta_getguardsize(pta *op,size_t *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_getguardsize(op,vp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_getguardsize) */
 
@@ -152,11 +156,11 @@ int pta_setstackaddr(pta *op,void *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_setstackaddr(op,vp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_setstackaddr) */
 
@@ -164,11 +168,11 @@ int pta_getstackaddr(pta *op,void **vpp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vpp) ylikely {
 	    if ((rs = pthread_attr_getstackaddr(op,vpp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_getstackaddr) */
 
@@ -176,11 +180,11 @@ int pta_setdetachstate(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_attr_setdetachstate(op,v)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_setdetachstate) */
 
@@ -188,11 +192,11 @@ int pta_getdetachstate(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_getdetachstate(op,vp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_getdetachstate) */
 
@@ -203,11 +207,11 @@ int pta_setscope(pta *op,int v) noex {
 	}
 	if (op) ylikely {
 	    if ((rs = pthread_attr_setscope(op,v)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_setscope) */
 
@@ -215,11 +219,11 @@ int pta_getscope(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_attr_getscope(op,vp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_getscope) */
 
@@ -227,11 +231,11 @@ int pta_setinheritsched(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_attr_setinheritsched(op,v)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_setinheritsched) */
 
@@ -239,11 +243,11 @@ int pta_getinheritsched(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_getinheritsched(op,vp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_getinheritsched) */
 
@@ -251,11 +255,11 @@ int pta_setschedpolicy(pta *op,int v) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_attr_setschedpolicy(op,v)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_setschedpolicy) */
 
@@ -263,11 +267,11 @@ int pta_getschedpolicy(pta *op,int *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_attr_getschedpolicy(op,vp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_getschedpolicy) */
 
@@ -275,11 +279,11 @@ int pta_setschedparam(pta *op,const SCHEDPARAM *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_setschedparam(op,vp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_setschedparam) */
 
@@ -287,11 +291,11 @@ int pta_getschedparam(pta *op,SCHEDPARAM *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) ylikely {
 	    if ((rs = pthread_attr_getschedparam(op,vp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_getschedparam) */
 
@@ -301,7 +305,7 @@ int pta_setstack(pta *op,void *saddr,size_t ssize) noex {
 	    if ((rs = pta_setstackaddr(op,saddr)) >= 0) {
 	        rs = pta_setstacksize(op,ssize) ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pta_setstack) */
 
