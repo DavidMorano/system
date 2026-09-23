@@ -27,12 +27,12 @@
 
 
 namespace libu {
-    extern int uitimer_get(int,ITIMERVAL *) noex ;
-    extern int uitimer_set(int,CITIMERVAL *,ITIMERVAL *) noex ;
+    extern int uitimer_get(int,mut ITIMERVAL *) noex ;
+    extern int uitimer_set(int,CITIMERVAL *,mut ITIMERVAL * = nullptr) noex ;
 } /* end namespace (libu) */
 
 
-#endif /* __cplusplus */
+#endif /* __cplusplus (C++ only) */
 #endif /* USUPPORTITIMER_INCLUDE */
 
 
