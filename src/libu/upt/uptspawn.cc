@@ -107,18 +107,18 @@ int uptspawn(pthread_t *rp,pthread_attr_t *ptap,objsub_t start,
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if (rp && start) {
+	if (rp && start) ylikely {
 	    cint	osz = szof(ourargs) ;
-	    if (ourargs *oap ; (rs = umem.mall(osz,&oap)) >= 0) {
-		if (usigblock b ; (rs = b.start) >= 0) {
+	    if (ourargs *oap ; (rs = umem.mall(osz,&oap)) >= 0) ylikely {
+		if (usigblock b ; (rs = b.start) >= 0) ylikely {
 		    {
 	                oap->start = start ;
 	                oap->op = op ;
 	                oap->ap = arg ;
-		        if ((rs = uptcreator(rp,ptap,oap)) >= 0) {
+		        if ((rs = uptcreator(rp,ptap,oap)) >= 0) ylikely {
 			    uintptr_t	v = uintptr_t(*rp) ;
 		            rv = (v & INT_MAX) ;
-		        }
+		        } /* end if */
 		    } /* end block */
 		    rs1 = b.finish ;
 		    if (rs >= 0) rs = rs1 ;
@@ -139,8 +139,6 @@ local int uptcreator(pthread_t *rp,pthread_attr_t *ptap,void *arg) noex {
 	    rs = SR_OK ;
 	    if (errno_t ec ; (ec = pthread_create(rp,ptap,uptruner,arg)) > 0) {
 		rs = (- ec) ;
-	    }
-	    if (rs < 0) {
 	        switch (rs) {
 	        case SR_NOMEM:
 		    if (to_nomem-- > 0) {
