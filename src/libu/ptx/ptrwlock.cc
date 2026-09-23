@@ -109,7 +109,7 @@ int ptrwlock_create(ptrwlock *psp,ptrwa *atp) noex {
 	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_init(psp,atp)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		} else if (rs < 0) {
 		    rs = SR_NOANODE ;
 		}
@@ -123,7 +123,7 @@ int ptrwlock_destroy(ptrwlock *psp) noex {
 	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_destroy(psp)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		} else if (rs < 0) {
 		    rs = SR_NOANODE ;
 		}
@@ -137,7 +137,7 @@ int ptrwlock_lockrd(ptrwlock *psp) noex {
 	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_rdlock(psp)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		} else if (rs < 0) {
 		    rs = SR_NOANODE ;
 		}
@@ -151,7 +151,7 @@ int ptrwlock_lockrdtry(ptrwlock *psp) noex {
 	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		} else if (rs < 0) {
 		    rs = SR_NOANODE ;
 		}
@@ -169,7 +169,7 @@ int ptrwlock_lockrdto(ptrwlock *psp,int to) noex {
 	    bool	f_exit = false ;
 	    repeat {
 	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		    switch (rs) {
 		    case SR_BUSY:
 		        if (++c < cto) {
@@ -198,7 +198,7 @@ int ptrwlock_lockwr(ptrwlock *psp) noex {
 	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_wrlock(psp)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		} else if (rs < 0) {
 		    rs = SR_NOANODE ;
 		}
@@ -209,10 +209,10 @@ int ptrwlock_lockwr(ptrwlock *psp) noex {
 
 int ptrwlock_lockwrtry(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
-	if (psp) ylikely{
+	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		} else if (rs < 0) {
 		    rs = SR_NOANODE ;
 		}
@@ -224,13 +224,13 @@ int ptrwlock_lockwrtry(ptrwlock *psp) noex {
 int ptrwlock_lockwrto(ptrwlock *psp,int to) noex {
 	int		rs = SR_FAULT ;
 	if (to < 0) to = (INT_MAX / (2 * NLPS)) ;
-	if (psp) ylikely{
+	if (psp) ylikely {
 	    int		cto = (to*NLPS) ;
 	    int		c = 0 ;
 	    bool	f_exit = false ;
 	    repeat {
 	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		    switch (rs) {
 		    case SR_BUSY:
 		        if (++c < cto) {
@@ -254,10 +254,10 @@ int ptrwlock_lockwrto(ptrwlock *psp,int to) noex {
 
 int ptrwlock_lockend(ptrwlock *psp) noex {
 	int		rs = SR_FAULT ;
-	if (psp) ylikely{
+	if (psp) ylikely {
 	    repeat {
 	        if ((rs = pthread_rwlock_unlock(psp)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		} else if (rs < 0) {
 		    rs = SR_NOANODE ;
 		}
