@@ -1,4 +1,4 @@
-/* ptma HEADER */
+/* ptma HEADER (POSIX®-Thread-Mutex-Attributes) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -40,11 +40,11 @@ struct ptma_co {
         constexpr void operator () (ptma *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         int operator () (int = 0) noex ;
 	operator int () noex {
 	    return operator () (0) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ptma_co) */
 struct ptma : pthread_mutexattr_t {
 	ptma_co		create ;
