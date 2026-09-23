@@ -109,7 +109,7 @@ export {
 
     int usigblock::ifinish() noex {
 	int		rs = SR_NOTOPEN ;
-	if (fl.open) {
+	if (fl.open) ylikely {
 	    fl.open = false ;
 	    rs = u_sigmask(SIG_SETMASK,&osm,nullptr) ;
 	}
@@ -118,7 +118,7 @@ export {
 
     int usigblock_co::operator () (cint *sigs) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->istart(sigs) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -126,7 +126,7 @@ export {
 
     usigblock_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case usigblockmem_start:
 	        rs = op->istart(nullptr) ;
