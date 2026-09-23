@@ -210,7 +210,7 @@ int vecsorthand_del(vecsorthand *op,int i) noex {
 	return rs ;
 } /* end subroutine (vecsorthand_del) */
 
-int vecsorthand_delhand(vecsorthand *op,cvoid *ep) noex {
+int vecsorthand_delent(vecsorthand *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ; /* return-value */
 	if (op && ep) ylikely {
@@ -229,7 +229,7 @@ int vecsorthand_delhand(vecsorthand *op,cvoid *ep) noex {
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
-} /* end subroutine (vecsorthand_delhand) */
+} /* end subroutine (vecsorthand_delent) */
 
 int vecsorthand_count(vecsorthand *op) noex {
 	int		rs = SR_FAULT ;
@@ -343,6 +343,14 @@ int vecsorthand::get(int ai,void *rvp) noex {
 int vecsorthand::present(cvoid *p) noex {
 	return vecsorthand_present(this,p) ;
 } /* end method */
+
+int vecsorthand::delent(cvoid *p) noex {
+	return vecsorthand_delent(this,p) ;
+} /* end method (vecsorthand::delent) */
+
+int vecsorthand::search(cvoid *p,void *rp) noex {
+	return vecsorthand_search(this,p,rp) ;
+} /* end method (vecsorthand::search) */
 
 void vecsorthand::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
