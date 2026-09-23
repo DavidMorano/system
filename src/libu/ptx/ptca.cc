@@ -73,7 +73,7 @@ int ptca_create(ptca *op) noex {
 	    reterr	r ;
 	    repeat {
 	        if ((rs = pthread_condattr_init(op)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		    r(rs) ;
 	            switch (rs) {
 	            case SR_NOMEM:
@@ -106,7 +106,7 @@ int ptca_destroy(ptca *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_condattr_destroy(op)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -118,7 +118,7 @@ int ptca_getpshared(ptca *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_condattr_getpshared(op,oldp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -130,7 +130,7 @@ int ptca_setpshared(ptca *op,int fl) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_condattr_setpshared(op,fl)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
