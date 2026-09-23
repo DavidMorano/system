@@ -72,7 +72,7 @@ int ptrwa_create(ptrwa *op) noex {
 	    reterr	r ;
 	    repeat {
 	        if ((rs = pthread_rwlockattr_init(op)) > 0) {
-		    rs = (- rs) ;
+		    rs = (neg rs) ;
 		    r(rs) ;
 	            switch (rs) {
 	            case SR_NOMEM:
@@ -105,11 +105,11 @@ int ptrwa_destroy(ptrwa *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_rwlockattr_destroy(op)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ptrwa_destroy) */
 
@@ -117,11 +117,11 @@ int ptrwa_getpshared(ptrwa *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_rwlockattr_getpshared(op,oldp)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ptrwa_getpshared) */
 
@@ -130,11 +130,11 @@ int ptrwa_setpshared(ptrwa *op,int fl) noex {
 	if (op) ylikely {
 	    if (fl < 0) fl = PTHREAD_PROCESS_SHARED ;
 	    if ((rs = pthread_rwlockattr_setpshared(op,fl)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ptrwa_setpshared) */
 
