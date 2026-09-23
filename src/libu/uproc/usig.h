@@ -56,6 +56,12 @@ EXTERNC_end
 inline int u_sigaction		(int sig,con SIGACTION *sap) noex {
     	return u_sigaction(sig,sap,nullptr) ;
 } /* end subroutine */
+inline int u_sigprocmask	(int h,con sigset_t *omp) noex {
+    	return u_sigprocmask(h,omp,nullptr) ;
+} /* end subroutine */
+inline int u_sigmask		(int h,con sigset_t *omp) noex {
+    	return u_sigmask(h,omp,nullptr) ;
+} /* end subroutine */
 inline int u_sigwait		(con sigset_t *ssp) noex {
     	return u_sigwait(ssp,nullptr) ;
 } /* end subroutine */
