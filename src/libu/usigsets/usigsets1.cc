@@ -109,6 +109,7 @@ int u_sigmask(int w,con usigset *nsp,mut sigset_t *osp) noex {
     return rs ;
 } /* end subroutine */
 
+#ifdef	COMMENT
 int u_sigmask(int w,con sigset_t *nsp,mut usigset *osp) noex {
     int		rs ;
     if (osp) {
@@ -118,7 +119,8 @@ int u_sigmask(int w,con sigset_t *nsp,mut usigset *osp) noex {
         rs = u_sigmask(w,nsp,tosp) ;
     }
     return rs ;
-} /* end subroutine */
+} /* end subroutine (u_sigmask) */
+#endif /* COMMENT */
 
 int u_sigwait(con usigset *sp,mut int *rp) noex {
     return u_sigwait(&sp->ss,rp) ;
