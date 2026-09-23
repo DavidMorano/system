@@ -314,7 +314,7 @@ int vechand_del(vechand *op,int i) noex {
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (vechand_del) */
 
-int vechand_delhand(vechand *op,cvoid *ep) noex {
+int vechand_delent(vechand *op,cvoid *ep) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = vechand_ent(op,ep)) >= 0) ylikely {
@@ -322,7 +322,7 @@ int vechand_delhand(vechand *op,cvoid *ep) noex {
 	    }
 	}
 	return rs ;
-} /* end subroutine (vechand_delhand) */
+} /* end subroutine (vechand_delent) */
 
 int vechand_delall(vechand *op) noex {
 	int		rs = SR_FAULT ;
@@ -535,8 +535,8 @@ int vechand::del(int ai) noex {
 	return vechand_del(this,ai) ;
 } /* end method */
 
-int vechand::delhand(cvoid *ep) noex {
-    	return vechand_delhand(this,ep) ;
+int vechand::delent(cvoid *ep) noex {
+    	return vechand_delent(this,ep) ;
 } /* end method */
 
 int vechand::search(cvoid *ep,vechand_f vcmp,void **rpp) noex {
