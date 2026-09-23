@@ -45,17 +45,17 @@ struct ptc_creater {
 	ptc		*op = nullptr ;
 	void init(ptc *p) noex {
 	    op = p ;
-	} ;
+	} ; /* end */
 	operator int () noex {
 	    return (*this)() ;
-	} ;
+	} ; /* end */
 	int operator () (ptca * = nullptr) noex ;
 } ; /* end struct (ptc_creater) */
 struct ptc_ma {
         ptc		*op = nullptr ;
         void operator () (ptc *p,int) noex {
             op = p ;
-        } ;
+        } ; /* end */
         template<typename ... Args> int operator () (Args ... ) noex ;
         operator int () noex ;
 } ; /* end struct (ptc_ma) */
@@ -65,10 +65,10 @@ struct ptc_co {
         constexpr void operator () (ptc *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         operator int () noex {
             return (*this)() ;
-        } ;
+        } ; /* end */
         int operator () (int = -1) noex ;
 } ; /* end struct (ptc_co) */
 struct ptc : pthread_cond_t {
