@@ -1,4 +1,4 @@
-/* term_main SUPPORT (appleterminal) */
+/* appleterminal_main SUPPORT (appleterminal) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -49,7 +49,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<cstdio>		/* CSTD |snprintf(3c)| */
 #include	<cstring>		/* CSTD |strcmp(3c)| */
-#include	<iostream>		/* C++STD unuesed */
+#include	<iostream>		/* C++STD unused */
 #include	<string>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
