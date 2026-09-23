@@ -1,4 +1,4 @@
-/* psem HEADER ("real" POSIX® Semaphore) */
+/* psem HEADER (POSIX® Semaphore) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -69,12 +69,14 @@ struct psem_cr {
 	operator int () noex {
 	    return operator () () ;
 	} ; /* end */
-} ; /* end struct (psem_co) */
+} ; /* end struct (psem_cr) */
 struct psem_co {
 	psem		*op = nullptr ;
+	int		w = -1 ;
 	void operator () (psem *p,int m) noex {
 	    op = p ;
 	    w = m ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
