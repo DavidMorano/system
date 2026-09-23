@@ -1,4 +1,4 @@
-/* ptm SUPPORT */
+/* ptm SUPPORT (POSIX®-Thread-Mutex) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -68,9 +68,9 @@ namespace {
 	int		mto = 0 ;
 	ucptm() = default ;
 	ucptm(ptma *p) noex : ap(p) { } ;
-	int create(ptm *) noex ;
-	int lock(ptm *) noex ;
-	int locktry(ptm *) noex ;
+	int create	(ptm *) noex ;
+	int lock	(ptm *) noex ;
+	int locktry	(ptm *) noex ;
 	int operator () (ptm *) noex ;
     } ; /* end struct (ucptm) */
 } /* end namespace */
@@ -111,7 +111,7 @@ int ptm_destroy(ptm *op) noex {
 	if (op) ylikely {
 	    repeat {
 	        if ((rs = pthread_mutex_destroy(op)) > 0) {
-	            rs = (- rs) ;
+	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 		    rs = SR_NOANODE ;
 	        }
@@ -125,7 +125,7 @@ int ptm_setprioceiling(ptm *op,int npri,int *oldp) noex {
 	if (op && oldp) ylikely {
 	    repeat {
 	        if ((rs = pthread_mutex_setprioceiling(op,npri,oldp)) > 0) {
-	            rs = (- rs) ;
+	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 		    rs = SR_NOANODE ;
 	        }
@@ -139,7 +139,7 @@ int ptm_getprioceiling(ptm *op,int *oldp) noex {
 	if (op && oldp) ylikely {
 	    repeat {
 	        if ((rs = pthread_mutex_getprioceiling(op,oldp)) > 0) {
-	            rs = (- rs) ;
+	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 		    rs = SR_NOANODE ;
 	        }
@@ -203,7 +203,7 @@ int ptm_lockend(ptm *op) noex {
 	if (op) ylikely {
 	    repeat {
 	        if ((rs = pthread_mutex_unlock(op)) > 0) {
-	            rs = (- rs) ;
+	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 		    rs = SR_NOANODE ;
 	        }
@@ -256,7 +256,7 @@ int ucptm::create(ptm *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutex_init(op,ap)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -268,7 +268,7 @@ int ucptm::lock(ptm *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutex_lock(op)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
@@ -280,7 +280,7 @@ int ucptm::locktry(ptm *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    if ((rs = pthread_mutex_trylock(op)) > 0) {
-	        rs = (- rs) ;
+	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
 	    }
