@@ -79,6 +79,7 @@ constexpr int		onemillion = INTMILLION ;
 int timeval_load(TIMEVAL *dst,time_t sec,int usec) noex {
 	int		rs = SR_FAULT ;
 	if (dst) {
+	    rs = SR_OK ;
 	    while (usec >= onemillion) {
 	        sec += 1 ;
 	        usec -= onemillion ;
@@ -92,6 +93,7 @@ int timeval_load(TIMEVAL *dst,time_t sec,int usec) noex {
 int timeval_add(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	int		rs = SR_FAULT ;
 	if (dst && src1 && src2) {
+	    rs = SR_OK ;
 	    dst->tv_sec = src1->tv_sec + src2->tv_sec ;
 	    dst->tv_usec = src1->tv_usec + src2->tv_usec ;
 	    if (dst->tv_usec >= onemillion) {
@@ -105,6 +107,7 @@ int timeval_add(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 int timeval_sub(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	int		rs = SR_FAULT ;
 	if (dst && src1 && src2) {
+	    rs = SR_OK ;
 	    dst->tv_sec = src1->tv_sec - src2->tv_sec ;
 	    dst->tv_usec = src1->tv_usec - src2->tv_usec ;
 	    if (dst->tv_usec < 0) {
