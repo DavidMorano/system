@@ -113,7 +113,7 @@ struct vecsorthand : vecsorthand_head {
 	int add		(cvoid *) noex ;
 	int get		(int,void *) noex ;
 	int present	(cvoid *) noex ;
-	int delhand	(cvoid *) noex ;
+	int delent	(cvoid *) noex ;
 	int search	(cvoid *,void *) noex ;
 	vecsorthand_iter begin() noex {
 	    vecsorthand_iter	it(va,0,i) ;
@@ -140,7 +140,7 @@ extern int vecsorthand_finish	(vecsorthand *) noex ;
 extern int vecsorthand_add	(vecsorthand *,cvoid *) noex ;
 extern int vecsorthand_get	(vecsorthand *,int,void *) noex ;
 extern int vecsorthand_del	(vecsorthand *,int) noex ;
-extern int vecsorthand_delhand	(vecsorthand *,cvoid *) noex ;
+extern int vecsorthand_delent	(vecsorthand *,cvoid *) noex ;
 extern int vecsorthand_count	(vecsorthand *) noex ;
 extern int vecsorthand_present	(vecsorthand *,cvoid *) noex ;
 extern int vecsorthand_search	(vecsorthand *,cvoid *,void *) noex ;
