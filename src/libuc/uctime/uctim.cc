@@ -499,7 +499,7 @@ int uctim::cmd_destroy(int id,timemgr_arg *argp) noex {
 	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
 	        if ((rs = ents.del(ei)) >= 0) ylikely {
 		    bool	f_free = false ;
-	            if ((rs = pqp->delhand(ep)) >= 0) ylikely {
+	            if ((rs = pqp->delent(ep)) >= 0) ylikely {
 			f_free = true ;
 		    } else if (rs == rsn) {
 	                ciq	*cqp = &pass ;
@@ -1107,7 +1107,7 @@ int uctim::dispjobdel(uctiment *tep) noex {
 	int		rs1 ;
 	int		f = false ;
         if ((rs = capbegin(to)) >= 0) ylikely {
-	    if ((rs = ents.delhand(tep)) >= 0) {
+	    if ((rs = ents.delent(tep)) >= 0) {
 		f = true ;
 	    } else if (rs == SR_NOTFOUND) {
 		rs = SR_OK ;
