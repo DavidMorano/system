@@ -55,18 +55,29 @@
 #include	<sys/socket.h>		/* POSIX® */
 #include	<netinet/in.h>		/* POSIX® */
 #include	<arpa/inet.h>		/* POSIX® */
+#include	<string>		/* C++STD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
 #include	<uinet.h>		/* LIBU */
-#include	<sbuf.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"inet_ntoa_r.h"
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using std::string ;			/* type */
+using std::to_string ;			/* subroutine */
+using libu::strnwcpy ;			/* subroutine */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -80,6 +91,9 @@
 
 /* local variables */
 
+cint		ndots	= 3 ;		/* number of dots in result */
+cint		nzeros	= 4 ;		/* number of zeros in result */
+
 
 /* exported variables */
 
@@ -87,22 +101,33 @@
 /* exported subroutines */
 
 char *inet_ntoa_r(INADDR in,char *rbuf,int rlen) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
+	char		*rp = nullptr ;
 	if (rbuf) ylikely {
-	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
+	    rbuf[0] = '0' ;
+	    if (rlen >= (ndots + nzeros)) {
 	        cint	n = INET4ADDRLEN ;
+	        string	b ; 
 	        cchar	*ap = charp(&in) ;
-	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-		    cint	v = mkchar(*ap++) ;
-		    if (i > 0) b.chr('.') ;
-		    rs = b.deci(v) ;
+		bool	fbad = false ;
+	        for (int i = 0 ; i < n ; i += 1) {
+		    cint v = mkchar(*ap++) ;
+		    try {
+		        if (i > 0) b += '.' ;
+		        b += to_string(v) ;
+		    } catch (...) {
+			fbad = true ;
+			break ;
+		    }
 	        } /* end for */
-	        rs1 = b.finish ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (sbuf) */
+	        if (! fbad) {
+	            if (cint cl = intconv(b.size()) > 0) {
+		        cchar *cp = b.c_str() ;
+		        rp = strnwcpy(rbuf,rlen,cp,cl) ;
+	            }
+	        } /* end if (! fbad) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? rbuf : nullptr ;
+	return rp ;
 } /* end subroutine (inet_ntoa_r) */
 
 
