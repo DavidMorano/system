@@ -30,40 +30,40 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<poll.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<ucatexit.h>
-#include	<ucatfork.h>
-#include	<ucfork.h>
-#include	<bufsizeget.h>
-#include	<aflag.hh>
-#include	<upt.h>
-#include	<ptm.h>
-#include	<ptc.h>
-#include	<sighand.h>
-#include	<raqhand.h>
-#include	<sockaddress.h>
-#include	<listenusd.h>
-#include	<strwcpy.h>
-#include	<mkpathx.h>
-#include	<mkdirs.h>
-#include	<permx.h>
-#include	<ctdec.h>
-#include	<sesmsg.hh>		/* "sesion message" */
-#include	<msgdata.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<poll.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<ptm.h>			/* LIBU */
+#include	<ptc.h>			/* LIBU */
+#include	<aflag.hh>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<ucfork.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<sighand.h>		/* LIBUC */
+#include	<raqhand.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<listenusd.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkdirs.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<sesmsg.hh>		/* LIBUC "sesion message" */
+#include	<msgdata.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"progsig.h"
 
