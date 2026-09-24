@@ -60,11 +60,11 @@ struct aiq_co {
         constexpr void operator () (aiq *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
 	int operator () (int = 0) noex ;
         operator int () noex {
 	    return operator () (0) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (aiq_co) */
 struct aiq : aiq_head {
 	aiq_co		start ;
