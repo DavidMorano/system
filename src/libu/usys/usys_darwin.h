@@ -37,10 +37,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-/* USYSDARWIN start */
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-
 #include	<sys/types.h>		/* POSIX® */
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */
@@ -53,6 +49,10 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+
+/* USYSDARWIN start */
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+
 
 #include	<usys_darwinargz.h>
 #include	<usys_darwinexec.h>
