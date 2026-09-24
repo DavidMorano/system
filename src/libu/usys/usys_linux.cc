@@ -20,28 +20,29 @@
 
 /*******************************************************************************
 
-	We defines some system (global) variables in this module.
+  	Description:
+	I provide some missing system facilities in this module.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-#if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
-
-
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<climits>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
 
 #include	"usys_linux.h"
 
 
+#if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
+/*----------------------------------------------------------------------------*/
 
+
+/*----------------------------------------------------------------------------*/
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0) */
 /* USYS_LINUX finish */
 
