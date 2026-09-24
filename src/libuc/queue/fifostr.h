@@ -71,11 +71,11 @@ struct fifostr_co {
 	void operator () (fifostr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (fifostr_co) */
 struct fifostr : fifostr_head {
 	fifostr_co	start ;
@@ -100,10 +100,10 @@ struct fifostr : fifostr_head {
 	int curend	(fifostr_cur *) noex ;
 	int curenum	(fifostr_cur *,char *,int) noex ;
 	int curdel	(fifostr_cur *) noex ;
-	void dtor() noex ;
+	void dtor	() noex ;
 	destruct fifostr() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (fifostr) */
 #else	/* __cplusplus */
 typedef FIFOSTR		fifostr ;
