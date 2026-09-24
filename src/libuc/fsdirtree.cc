@@ -195,20 +195,19 @@ local inline int fsdirtree_magic(fsdirtree *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (fsdirtree_magic) */
 
-local int	fsdirtree_sel(fsdirtree *) noex ;
-local int	fsdirtree_trackbegin(fsdirtree *) noex ;
-local int	fsdirtree_trackend(fsdirtree *) noex ;
-local int	fsdirtree_dirbegin(fsdirtree *) noex ;
-local int	fsdirtree_diradd(fsdirtree *,dev_t,ino_t) noex ;
-local int	fsdirtree_dirhave(fsdirtree *,dev_t,ino_t,dirid **) noex ;
-local int	fsdirtree_dirend(fsdirtree *) noex ;
+local int fsdirtree_sel		(fsdirtree *) noex ;
+local int fsdirtree_trackbeg	(fsdirtree *) noex ;
+local int fsdirtree_trackend	(fsdirtree *) noex ;
+local int fsdirtree_dirbegin	(fsdirtree *) noex ;
+local int fsdirtree_diradd	(fsdirtree *,dev_t,ino_t) noex ;
+local int fsdirtree_dirhave	(fsdirtree *,dev_t,ino_t,dirid **) noex ;
+local int fsdirtree_dirend	(fsdirtree *) noex ;
 
-local int	dirid_start(dirid *,dev_t,ino_t) noex ;
-local int	dirid_finish(dirid *) noex ;
+local int dirid_start	(dirid *,dev_t,ino_t) noex ;
+local int dirid_finish	(dirid *) noex ;
 
-local int	diridcmp(dirid *,dirid *,int) noex ;
-
-local uint	diridhash(cvoid *,int) noex ;
+local int	cmpdirid(dirid *,dirid *,int) noex ;
+local uint	hashdirid(cvoid *,int) noex ;
 
 local inline bool btst(ushort v,int n) noex {
     	return bool((v >> n) & 1) ;
@@ -310,7 +309,7 @@ local int fsdirtree_opener(fsdirtree *op,cchar *dname) noex {
                     if (op->bnbuf[op->bndlen - 1] != '/') {
                         op->bnbuf[op->bndlen++] = '/' ;
                     }
-		    if ((rs = fsdirtree_trackbegin(op)) >= 0) {
+		    if ((rs = fsdirtree_trackbeg(op)) >= 0) {
                         op->cdnlen = op->bndlen ;
                         op->magval = FSDIRTREE_MAGIC ;
                     }
@@ -356,11 +355,11 @@ int fsdirtree_close(fsdirtree *op) noex {
             if (op->dqp) ylikely {
                 rs1 = fifostr_finish(op->dqp) ;
                 if (rs >= 0) rs = rs1 ;
-            }
+            } /* end */
             {
                 rs1 = fsdirtree_dtor(op) ;
                 if (rs >= 0) rs = rs1 ;
-            }
+            } /* end */
             op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -549,7 +548,7 @@ local int fsdirtree_sel(fsdirtree *op) noex {
 	return rs ;
 } /* end subroutine (fsdirtree_sel) */
 
-local int fsdirtree_trackbegin(fsdirtree *op) noex {
+local int fsdirtree_trackbeg(fsdirtree *op) noex {
     	int		rs = SR_OK ;
         if (op->opts & FSDIRTREE_MUNIQFILE) ylikely {
             if ((rs = fsdirtree_dirbegin(op)) >= 0) ylikely {
@@ -564,7 +563,7 @@ local int fsdirtree_trackbegin(fsdirtree *op) noex {
             } /* end if (dir-tracking) */
         } /* end if (uniq traversal requested) */
 	return rs ;
-} /* end subroutine (fsdirtree_trackbegin) */
+} /* end subroutine (fsdirtree_trackbeg) */
 
 local int fsdirtree_trackend(fsdirtree *op) noex {
     	int		rs = SR_OK ;
@@ -572,7 +571,7 @@ local int fsdirtree_trackend(fsdirtree *op) noex {
         if (op->fl.dirids) {
             rs1 = fsdirtree_dirend(op) ;
             if (rs >= 0) rs = rs1 ;
-        }
+        } /* end */
 	return rs ;
 } /* end subroutine (fsdirtree_trackend) */
 
@@ -581,10 +580,10 @@ local int fsdirtree_dirbegin(fsdirtree *op) noex {
 	cint		ne = FSDIRTREE_NENTS ;
 	cint		at = 1 ;	/* use |lookaside(3dam)| */
 	int		rs ;
-	hdbcmp_f	cmp = hdbcmp_f(diridcmp) ;
-	if ((rs = hdb_start(dbp,ne,at,diridhash,cmp)) >= 0) ylikely {
+	hdbcmp_f	cmp = hdbcmp_f(cmpdirid) ;
+	if ((rs = hdb_start(dbp,ne,at,hashdirid,cmp)) >= 0) ylikely {
 	    op->fl.dirids = true ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (fsdirtree_dirbegin) */
 
@@ -613,7 +612,7 @@ local int fsdirtree_dirend(fsdirtree *op) noex {
 	    {
 	        rs1 = hdb_finish(op->dip) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	} /* end if (was activated) */
 	return rs ;
 } /* end subroutine (fsdirtree_dirend) */
@@ -654,7 +653,7 @@ local int fsdirtree_dirhave(fsdirtree *op,dev_t d,ui ino,dirid **rpp) noex {
 	key.len = szof(ino_t) + szof(dev_t) ;
 	if ((rs = hdb_fetch(dbp,key,nullptr,&val)) >= 0) ylikely {
 	    if (rpp) *rpp = (dirid *) val.buf ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (fsdirtree_dirhave) */
 
@@ -664,7 +663,7 @@ local int dirid_start(dirid *dip,dev_t dev,ino_t ino) noex {
 	    rs = SR_OK ;
 	    dip->dev = dev ;
 	    dip->ino = ino ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (dirid_start) */
 
@@ -672,7 +671,7 @@ local int dirid_finish(dirid *dip) noex {
 	int		rs = SR_FAULT ;
 	if (dip) ylikely {
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (dirid_finish) */
 
@@ -715,7 +714,7 @@ vars::operator int () noex {
     	return rs ;
 } /* end method (vars::operator) */
 
-local uint diridhash(cvoid *vp,int vl) noex {
+local uint hashdirid(cvoid *vp,int vl) noex {
 	uint		h = 0 ;
 	ushort		*sa = (ushort *) vp ;
 	h = h ^ ((sa[1] << 16) | sa[0]) ;
@@ -733,9 +732,9 @@ local uint diridhash(cvoid *vp,int vl) noex {
 	    }
 	}
 	return h ;
-} /* end subroutine (diridhash) */
+} /* end subroutine (hashdirid) */
 
-local int diridcmp(dirid *e1p,dirid *e2p,int len) noex {
+local int cmpdirid(dirid *e1p,dirid *e2p,int len) noex {
 	int64_t		d = int64_t(e1p->dev - e2p->dev) ;
 	int		rc = 0 ;
 	(void) len ;
@@ -750,6 +749,6 @@ local int diridcmp(dirid *e1p,dirid *e2p,int len) noex {
 	    }
 	}
 	return rc ;
-} /* end subroutine (diridcmp) */
+} /* end subroutine (cmpdirid) */
 
 
