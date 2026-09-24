@@ -59,11 +59,11 @@ struct cq_co {
         constexpr void operator () (cq *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (cq_co) */
 struct cq : cq_head {
 	cq_co		start ;
