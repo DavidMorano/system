@@ -27,7 +27,7 @@
 ******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -64,25 +64,7 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matstr3(const char **,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-extern int	isdigitlatin(int) ;
-
 extern int	process(PROGINFO *,const char *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strshrink(char *) ;
 
 
 /* forward references */
@@ -164,7 +146,7 @@ char	*envv[] ;
 {
 	PROGINFO	pi, *pip = &pi ;
 	ustat	sb ;
-	PARAMOPT	aparams ;
+	paramopt	aparams ;
 	bfile		errfile ;
 	bfile		outfile, *ofp = &outfile ;
 
@@ -883,7 +865,7 @@ char	*envv[] ;
 	} /* end if */
 
 	if ((rs = paramopt_havekey(&aparams,PO_OPTION)) > 0) {
-	    PARAMOPT_CUR	cur ;
+	    paramopt_cur	cur ;
 
 	    paramopt_curbegin(&aparams,&cur) ;
 
