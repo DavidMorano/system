@@ -17,18 +17,13 @@
 
 /*******************************************************************************
 
-	We defines some missing OS interfaces.
+  	Description:
+	I provide some missing OS interfaces.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 
-/* GETHRTIME begin */
-#if	defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0)
-
-/* nothing needed; def in 'time.h' */
-
-#else /* defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0) */
 
 #include	<sys/time.h>		/* <- the money shot */
 #include	<cerrno>
@@ -41,38 +36,51 @@
 #include	"usys_gethrtime.h"
 
 
+/* GETHRTIME begin */
+#if	defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0)
+/*----------------------------------------------------------------------------*/
+
+
+/* nothing needed; def in 'time.h' */
+
+
+/*----------------------------------------------------------------------------*/
+#else /* defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0) */
 #if	defined(OSNAME_DARWIN) && (OSNAME_DARWIN > 0)
+/*----------------------------------------------------------------------------*/
 
 hrtime_t gethrtime() noex {
 	const clockid_t	cid = CLOCK_MONOTONIC_RAW ;
 	return clock_gettime_nsec_np(cid) ;
-} /* end */
+} /* end subroutine */
 
+/*----------------------------------------------------------------------------*/
 #elif	defined(OSNAME_LINUX) && (OSNAME_LINUX > 0)
+/*----------------------------------------------------------------------------*/
 
 constexpr unsigned long	onebillion = 1000000000 ;
 
 hrtime_t gethrtime() noex {
-	TIMESPEC	ts ;
 	const clockid_t	cid = CLOCK_MONOTONIC_RAW ;
-	hrtime_t	r = 0 ;
-	if (clock_gettime(cid,&ts) >= 0) {
+	hrtime_t	r = 0 ; /* return-value */
+	if (TIMESPEC ts ; clock_gettime(cid,&ts) >= 0) {
 	    hrtime_t	t = ts.tv_sec ;
 	    r = ts.tv_nsec ;
 	    r += (t * onebillion) ;
-	}
+	} /* end */
 	return r ;
-} /* end */
+} /* end subroutine */
 
+/*----------------------------------------------------------------------------*/
 #else /* all other OSes */
+/*----------------------------------------------------------------------------*/
 
 hrtime_t gethrtime() noex {
 	return 0 ;
 } /* end */
 
+/*----------------------------------------------------------------------------*/
 #endif /* which OS */
-
-
 #endif /* (!defined(SYSHAS_GETHRTIME)) || (SYSHAS_GETHRTIME == 0) */
 /* GETHRTIME end */
 
