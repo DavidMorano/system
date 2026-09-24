@@ -17,22 +17,24 @@
 
 /*******************************************************************************
 
-	We defines some system (global) variables in this module.
+  	Description:
+	I provide some missing system facilities in this module.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<climits>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 #include	"usys_mqueue.h"
+
 
 consteval mqd_t mkmqdbad() noex {
 	mqd_t	r = 0 ;
@@ -42,7 +44,13 @@ consteval mqd_t mkmqdbad() noex {
 constexpr mqd_t	mqdbad = mkmqdbad() ;
 
 /* PMQ begin */
-#if	(!defined(SYSHAS_PMQ)) || (SYSHAS_PMQ == 0)
+#if	defined(SYSHAS_PMQ) && (SYSHAS_PMQ > 0)
+/*----------------------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------------------*/
+#else /* defined(SYSHAS_PMQ) && (SYSHAS_PMQ > 0) */
+/*----------------------------------------------------------------------------*/
 
 #ifndef	MQATTR
 #define	MQATTR		struct mq_attr
@@ -141,6 +149,7 @@ unixret_t mq_unlink(const char *n) noex {/* end */
 	return -1 ;
 } /* end */
 
+/*----------------------------------------------------------------------------*/
 #endif /* (!defined(SYSHAS_PMQ)) || (SYSHAS_PMQ == 0) */
 /* SYSHAS_PMQ end */
 
