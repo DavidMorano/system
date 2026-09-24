@@ -63,11 +63,11 @@ struct sintq_co {
         constexpr void operator () (sintq *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
 	int operator () (int = 0) noex ;
         operator int () noex {
 	    return operator () (0) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (sintq_co) */
 struct sintq : sintq_head {
 	sintq_co	start ;
@@ -91,7 +91,7 @@ struct sintq : sintq_head {
 	int rem		(short *) noex ;
 	int remread	(short *,int) noex ;
 	void dtor	() noex ;
-	operator int () noex ;
+	operator int 	() noex ;
 	destruct sintq() {
 	    if (qbuf) dtor() ;
 	} ; /* end dtor (sintq) */
@@ -113,7 +113,7 @@ extern int	sintq_finish	(sintq *) noex ;
 
 local inline int sintq_len(sintq *op) noex {
     	return sintq_count(op) ;
-}
+} /* end subroutine */
 
 EXTERNC_end
 
