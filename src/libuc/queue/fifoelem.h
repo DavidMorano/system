@@ -66,11 +66,11 @@ struct fifoelem_co {
 	void operator () (fifoelem *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (fifoelem_co) */
 struct fifoelem : fifoelem_head {
 	fifoelem_co	del ;
@@ -93,8 +93,8 @@ struct fifoelem : fifoelem_head {
 	int curend	(fifoelem_cur *) noex ;
 	int curdel	(fifoelem_cur *) noex ;
 	int curenum	(fifoelem_cur *,fifoelem_ent **) noex ;
-	void dtor() noex ;
-	operator int () noex ;
+	void dtor	() noex ;
+	operator int 	() noex ;
 	destruct fifoelem() {
 	    if (magval) dtor() ;
 	} ;
