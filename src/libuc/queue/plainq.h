@@ -64,11 +64,11 @@ struct plainq_co {
         constexpr void operator () (plainq *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (plainq_co) */
 struct plainq : plainq_head {
 	plainq_co	start ;
@@ -95,8 +95,8 @@ struct plainq : plainq_head {
 	int curbegin	(plainq_cur *) noex ;
 	int curend	(plainq_cur *) noex ;
 	int curenum	(plainq_cur *,plainq_ent **) noex ;
-	void	dtor() noex ;
-	operator int () noex ;
+	void dtor	() noex ;
+	operator int 	() noex ;
 	destruct plainq() {
 	    if (magval) dtor() ;
 	} ; /* end dtor (plainq) */
