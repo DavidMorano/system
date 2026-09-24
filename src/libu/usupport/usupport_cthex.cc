@@ -87,26 +87,26 @@ namespace libu {
 	return rs ;
     } /* end subroutine-template (cthexx) */
     int cthexi		(char *dp,int dl,int uv)	noex {
-	return cthexx(itostr,dp,dl,uv) ;
-    }
+	return cthexx(sitostr,dp,dl,uv) ;
+    } /* end subroutine */
     int cthexl		(char *dp,int dl,long uv)	noex {
-	return cthexx(ltostr,dp,dl,uv) ;
-    }
+	return cthexx(sltostr,dp,dl,uv) ;
+    } /* end subroutine */
     int cthexll		(char *dp,int dl,longlong uv)	noex {
-	return cthexx(lltostr,dp,dl,uv) ;
-    }
+	return cthexx(slltostr,dp,dl,uv) ;
+    } /* end subroutine */
     int cthexui		(char *dp,int dl,uint uv)	noex {
 	return cthexx(uitostr,dp,dl,uv) ;
-    }
+    } /* end subroutine */
     int cthexul		(char *dp,int dl,ulong uv)	noex {
 	return cthexx(ultostr,dp,dl,uv) ;
-    }
+    } /* end subroutine */
     int cthexull	(char *dp,int dl,ulonglong uv)	noex {
 	return cthexx(ulltostr,dp,dl,uv) ;
-    }
+    } /* end subroutine */
     int cthex_unknown	(char *dp,int dl)		noex {
 	return sncpy(dp,dl,"unknown") ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
