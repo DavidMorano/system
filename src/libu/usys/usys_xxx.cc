@@ -21,7 +21,8 @@
 	usys_xxx
 
     	Description:
-	We defines some system (global) variables in this module.
+  	Description:
+	I provide some missing system facilities in this module.
 
 *******************************************************************************/
 
@@ -39,9 +40,9 @@
 
 #include	"usys_xxx.h"
 
-/*----------------------------------------------------------------------------*/
 /* USERATTR begin */
 #if	(! defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
+/*----------------------------------------------------------------------------*/
 
 EXTERNC_begin
 
@@ -78,13 +79,14 @@ userattr *getuseruid(uid_t) noex {
 
 EXTERNC_end
 
+/*----------------------------------------------------------------------------*/
 #endif /* (! defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0) */
 /* USERATTR end */
-/*----------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------*/
+
 /* MEMCNTL begin */
 #if	(! defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0)
+/*----------------------------------------------------------------------------*/
 
 EXTERNC_begin
 
@@ -102,13 +104,13 @@ unixret_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 
 EXTERNC_end
 
+/*----------------------------------------------------------------------------*/
 #endif /* (! defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
 /* MEMCNTL end */
-/*----------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------*/
 /* MEMINHERIT begin */
 #if	(! defined(SYSHAS_MEMINHERIT)) || (SYSHAS_MEMINHERIT == 0)
+/*----------------------------------------------------------------------------*/
 
 EXTERNC_begin
 
@@ -126,13 +128,13 @@ unixret_t minherit(void *ma,size_t ms,int cmd) noex {
 
 EXTERNC_end
 
+/*----------------------------------------------------------------------------*/
 #endif /* (! defined(SYSHAS_MEMINHERIT)) || (SYSHAS_MEMINHERIT == 0) */
 /* MEMINHERIT end */
-/*----------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------*/
 /* MEMPLOCK begin */
 #if	(! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0)
+/*----------------------------------------------------------------------------*/
 
 EXTERNC_begin
 
@@ -147,14 +149,15 @@ unixret_t plock(int cmd) noex {
 
 EXTERNC_end
 
+/*----------------------------------------------------------------------------*/
 #endif /* (! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0) */
 /* MEMPLOCK end */
-/*----------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------*/
 /* LOADAVGINT begin */
 #if	(! defined(SYSHAS_LOADAVGINT)) || (SYSHAS_LOADAVGINT == 0)
 #ifdef	__cplusplus /* C++ only! */
+/*----------------------------------------------------------------------------*/
+
 namespace usys {
     sysret_t kloadavg(int *la,int n) noex {
     	int		rs = SR_FAULT ;
@@ -167,9 +170,10 @@ namespace usys {
     	return rs ;
     } /* end subroutine (kloadavg) */
 } /* end namespec (usys) */
+
+/*----------------------------------------------------------------------------*/
 #endif /* __cplusplus (C++ only) */
 #endif /* (! defined(SYSHAS_LOADAVGINT)) || (SYSHAS_LOADAVGINT == 0) */
 /* LOADAVGINT end */
-/*----------------------------------------------------------------------------*/
 
 
