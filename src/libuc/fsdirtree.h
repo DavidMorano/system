@@ -135,11 +135,11 @@ struct fsdirtree_co {
 	void operator () (fsdirtree *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (fsdirtree_co) */
 struct fsdirtree : fsdirtree_head {
 	fsdirtree_co	close ;
