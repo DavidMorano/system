@@ -63,6 +63,7 @@
 #include	<usupport_strnkeycmp.hh>
 #include	<usupport_strnchar.hh>
 #include	<usupport_strnset.hh>
+#include	<usupport_strnwcpy.hh>
 #include	<usupport_strnwht.hh>
 #include	<usupport_strnxchr.hh>
 #include	<usupport_strnxbrk.hh>
