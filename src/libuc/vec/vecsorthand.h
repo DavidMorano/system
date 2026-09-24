@@ -36,9 +36,9 @@ EXTERNC_end
 struct vecsorthand_head {
 	vecsorthand_cmpf	cmpf ;
 	void		**va ;
-	int		c ;		/* count of items in list */
-	int		i ;		/* highest index */
-	int		e ;		/* extent of array */
+	int		cnt ;		/* count of items in list */
+	int		idx ;		/* highest index */
+	int		ext ;		/* extent of array */
 } ; /* end struct */
 
 #ifdef	__cplusplus
@@ -116,11 +116,11 @@ struct vecsorthand : vecsorthand_head {
 	int delent	(cvoid *) noex ;
 	int search	(cvoid *,void *) noex ;
 	vecsorthand_iter begin() noex {
-	    vecsorthand_iter	it(va,0,i) ;
+	    vecsorthand_iter	it(va,0,idx) ;
 	    return it ;
 	} ; /* end */
 	vecsorthand_iter end() noex {
-	    vecsorthand_iter	it(va,i,i) ;
+	    vecsorthand_iter	it(va,idx,idx) ;
 	    return it ;
 	} ; /* end */
 	void dtor	() noex ;
