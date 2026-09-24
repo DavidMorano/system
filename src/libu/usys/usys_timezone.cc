@@ -17,7 +17,8 @@
 
 /*******************************************************************************
 
-	We defines some system (global) variables in this module.
+  	Description:
+	I provide some missing system facilities in this module.
 
 	Important note:
 	It looks like only SunOS (really Solaris®) and Illumos®
