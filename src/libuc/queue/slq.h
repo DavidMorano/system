@@ -55,11 +55,11 @@ struct slq_co {
 	void operator () (slq *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (slq_co) */
 struct slq : slq_head {
 	slq_co		start ;
@@ -70,7 +70,7 @@ struct slq : slq_head {
 	    audit	(this,slqmem_audit) ;
 	    finish	(this,slqmem_finish) ;
 	    head = nullptr ;
-	} ;
+	} ; /* end */
 	slq(const slq &) = delete ;
 	slq &operator = (const slq &) = delete ;
 	int ins		(slq_ent *) noex ;
@@ -81,7 +81,7 @@ struct slq : slq_head {
 	void dtor	() noex ;
 	destruct slq() {
 	    if (head) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (slq) */
 #else	/* __cplusplus */
 typedef SLIST		slq ;
