@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<time.h>			/* |time_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<time.h>		/* CSTD |time_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	PROGSIG_NOTE	struct progsig_noter
