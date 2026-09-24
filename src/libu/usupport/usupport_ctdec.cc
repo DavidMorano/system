@@ -85,26 +85,26 @@ namespace libu {
 	return rs ;
     } /* end subroutine-template (ctdecx) */
     int ctdeci		(char *dp,int dl,int uv)	noex {
-	return ctdecx(itostr,dp,dl,uv) ;
-    }
+	return ctdecx(sitostr,dp,dl,uv) ;
+    } /* end subroutine */
     int ctdecl		(char *dp,int dl,long uv)	noex {
-	return ctdecx(ltostr,dp,dl,uv) ;
-    }
+	return ctdecx(sltostr,dp,dl,uv) ;
+    } /* end subroutine */
     int ctdecll		(char *dp,int dl,longlong uv)	noex {
-	return ctdecx(lltostr,dp,dl,uv) ;
-    }
+	return ctdecx(slltostr,dp,dl,uv) ;
+    } /* end subroutine */
     int ctdecui		(char *dp,int dl,uint uv)	noex {
 	return ctdecx(uitostr,dp,dl,uv) ;
-    }
+    } /* end subroutine */
     int ctdecul		(char *dp,int dl,ulong uv)	noex {
 	return ctdecx(ultostr,dp,dl,uv) ;
-    }
+    } /* end subroutine */
     int ctdecull	(char *dp,int dl,ulonglong uv)	noex {
 	return ctdecx(ulltostr,dp,dl,uv) ;
-    }
+    } /* end subroutine */
     int ctdec_unknown	(char *dp,int dl)		noex {
 	return sncpy(dp,dl,"unknown") ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
