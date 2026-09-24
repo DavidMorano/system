@@ -172,20 +172,20 @@ int ciq_finish(ciq *op) noex {
 	    if (op->freep) ylikely {
 	        rs1 = pq_finishup(op->freep) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (op->fifop) ylikely {
 	        rs1 = pq_finishup(op->fifop) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        ptm *mxp = op->mxp ;
 	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = ciq_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -232,9 +232,7 @@ int ciq_rem(ciq *op,void *vrp) noex {
 	                *vpp = cep->vp ;
 	            } /* end if */
 		    rs1 = pq_ins(op->freep,pep) ;
-		    if (rs1 < 0) {
-		        libmem.free(pep) ;
-		    } /* end if (error) */
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (pq_rem) */
 	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
@@ -406,8 +404,8 @@ int ciq::remtail(void *rpp) noex {
 	return ciq_remtail(this,rpp) ;
 } /* end method */
 
-int ciq::rement(void *rpp) noex {
-	return ciq_rement(this,rpp) ;
+int ciq::rement(void *ep) noex {
+	return ciq_rement(this,ep) ;
 } /* end method */
 
 int ciq::gettail(void *rpp) noex {
