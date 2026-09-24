@@ -59,11 +59,11 @@ struct piq_co {
         constexpr void operator () (piq *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (piq_co) */
 struct piq : piq_head {
 	piq_co		start ;
