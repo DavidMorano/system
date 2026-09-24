@@ -98,23 +98,42 @@ debon_mgr::operator int () noex {
 	return (dfd >= 0) ;
 } /* end method */
 
+int debopen(cchar *fn) noex {
+    	int		rs = SR_FAULT ;
+	if (fn) ylikely {
+	    rs = SR_INVALID ;
+	    if (fn[0]) ylikely {
+		cint of = O_WRONLY ;
+		if ((rs = open(fn,of,0666)) < 0) {
+		    rs = (neg errno) ;
+		} else {
+		    dfd = rs ;
+		} /* end if (open) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (debopen) */
+
 int debfd(int fd) noex {
-    	dfd = fd ;
-	return SR_OK ;
+    	int		rs = SR_INVALID ;
+	if (fd >= 0) ylikely {
+	    rs = SR_OK ;
+    	    dfd = fd ;
+	} /* end if (valid) */
+	return rs ;
 } /* end subroutine (debfd) */
 
 int debprintf(cchar *func,cchar *fmt,...) noex {
     	va_list		ap ;
 	cnothrow	nt{} ;
-	cnullptr	np{} ;
     	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
-	if (func && fmt) {
+	if (func && fmt) ylikely {
 	    rs = SR_OK ;
 	    if (dfd >= 0) {
 	        va_begin(ap,fmt) ;
     	        rs = SR_NOMEM ;
-	        if (char *fbuf ; (fbuf = new(nt) char[flen + 1]) != np) {
+	        if (char *fbuf = new(nt) char[flen + 1]) ylikely {
 		    if ((rs = sncpy(fbuf,flen,func,": ")) >= 0) {
 		        cint	bl = (flen - rs) ;
 		        char	*bp = (fbuf + rs) ;
