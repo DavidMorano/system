@@ -39,10 +39,13 @@
 
 /* GETHRTIME begin */
 #if	defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0)
+/*----------------------------------------------------------------------------*/
 
 /* » nothing needed « */
 
+/*----------------------------------------------------------------------------*/
 #else /* defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0) */
+/*----------------------------------------------------------------------------*/
 
 #ifndef	TYPEDEF_HRTIME
 #define	TYPEDEF_HRTIME
@@ -58,6 +61,7 @@ extern hrtime_t gethrtime() noex ;
 EXTERNC_end
 #endif /* DECLARATION_GETHRTIME */
 
+/*----------------------------------------------------------------------------*/
 #endif /* defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0) */
 /* GETHRTIME end */
 
