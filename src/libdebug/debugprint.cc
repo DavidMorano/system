@@ -132,7 +132,7 @@ import ureserve ;			/* |is{x}(3u)| */
 
 #define	DEBUGMGR	debugmgr_head
 
-#define	O_FLAGS		(O_WRONLY | O_CREAT | O_APPEND)
+#define	O_FLAGS		(O_WRONLY | O_APPEND)
 
 #ifndef	LINEBUFLEN
 #define	LINEBUFLEN	(2 * 1024)
@@ -213,9 +213,9 @@ local bool	hasprintbad(cchar *,int) noex ;
 
 /* local variables */
 
-static DEBUGMGR	ef ; /* zero-initialized */
+static DEBUGMGR		ef ; /* zero-initialized */
 
-constexpr char	cthextable[] = {
+constexpr char		cthextable[] = {
 	'0', '1', '2', '3', '4', '5', '6', '7',
 	'8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 0
 } ; /* end array */
@@ -246,10 +246,10 @@ int debugmgr_init() noex {
 	            if ((rs = uc_atexit(funexit)) >= 0) {
 	                rs = 0 ;
 	                uip->f_initdone = true ;
-	            }
+	            } /* end if (ok) */
 	            if (rs < 0) {
 	                uc_atforkexp(b,a,a) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (uc_atfork) */
 	        if (rs < 0) {
 	            mxp->destroy() ;
@@ -261,10 +261,10 @@ int debugmgr_init() noex {
 	} else {
 	    while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 	        rs = msleep(1) ;
-	    }
+	    } /* end while */
 	    if ((rs >= 0) && (! uip->f_init)) {
 		rs = SR_LOCKFAIL ;
-	    }
+	    } /* end if (error) */
 	} /* end if */
 	return rs ;
 } /* end subroutine (debugmgr_init) */
@@ -279,18 +279,18 @@ int debugmgr_fini() noex {
 	        rs1 = u_close(uip->fd) ;
 		if (rs >= 0) rs = rs1 ;
 	        uip->fd = 0 ; /* special case (use zero) */
-	    }
+	    } /* end */
 	    {
 	        void_f	b = debugmgr_atforkbefore ;
 	        void_f	a = debugmgr_atforkafter ;
 	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	    	ptm *mxp = &uip->mx ;
 	        rs1 = mxp->destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    memclear(uip) ;
 	} /* end if (was initialized) */
 	return rs ;
