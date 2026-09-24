@@ -62,11 +62,11 @@ struct pq_co {
         constexpr void operator () (pq *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (pq_co) */
 struct pq : pq_head {
 	pq_co		start ;
@@ -92,8 +92,8 @@ struct pq : pq_head {
 	int curbegin	(pq_cur *) noex ;
 	int curend	(pq_cur *) noex ;
 	int curenum	(pq_cur *,pq_ent **) noex ;
-	void dtor() noex ;
-	operator int () noex ;
+	void dtor	() noex ;
+	operator int 	() noex ;
 	destruct pq() {
 	    if (head) dtor() ;
 	} ; /* end dtor (pq) */
