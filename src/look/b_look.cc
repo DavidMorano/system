@@ -5,7 +5,6 @@
 /* this is the LOOK program (for looking up words in a dictionary) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_CHAR		1		/* use |char(3uc)| */
@@ -49,26 +48,27 @@
 #include	<shell.h>
 #endif
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<bits.h>
-#include	<vecobj.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<naturalwords.h>
-#include	<strn.h>
-#include	<strwcpy.h>
-#include	<char.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<bits.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -90,38 +90,18 @@
 #define	WORDF		"share/dict/words"
 #endif
 
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
+#ifndef	PI
+#define	PI		proginfo
+#endif
+
+#define	LI		locinfo
+#define	LI_FL		locinfo_flags
 
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	nleadcasestr(const char *,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	strnndictcmp(const char *,int,const char *,int) ;
-extern int	isalnumlatin(int) ;
-extern int	isdigitlatin(int) ;
-extern int	isdict(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
-
-extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
+extern int	printhelp(void *,cchar *,cchar *,cchar *) noex ;
+extern int	proginfo_setpiv(PI *,cchar *,const pivars *) noex ;
 
 
 /* external variables */
@@ -137,47 +117,35 @@ struct locinfo_flags {
 	uint		f ;
 	uint		d ;
 	uint		q ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
-	LOCINFO_FL	have, f, finval, changed ;
-	PROGINFO	*pip ;
-} ;
+	LI_FL	have, f, finval, changed ;
+	PI	*pip ;
+} ; /* end struct */
 
 struct word {
-	const char	*wp ;
+	cchar		*wp ;
 	int		wl ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) noex ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PI *) noex ;
 
-static int	procsort(PROGINFO *,void *,const char *) ;
-static int	procsortread(PROGINFO *,vecobj *,const char *,int) ;
-static int	procsortout(PROGINFO *,void *,vecobj *) ;
+local int	procsort(PI *,void *,cchar *) noex ;
+local int	procsortread(PI *,vecobj *,cchar *,int) noex ;
+local int	procsortout(PI *,void *,vecobj *) noex ;
 
-static int	procsearch(PROGINFO *,void *,cchar *,cchar *) ;
+local int	procsearch(PI *,void *,cchar *,cchar *) noex ;
 
-static int	wordcmp(const void *,const void *) ;
+local int	wordcmp(cvoid *,cvoid *) noex ;
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"ef",
-	"of",
-	"if",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -189,17 +157,29 @@ enum argopts {
 	argopt_of,
 	argopt_if,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static const PIVARS	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"ef",
+	"of",
+	"if",
+	nullptr
+} ; /* end array */
+
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
-static const MAPEX	mapexs[] = {
+constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -211,38 +191,39 @@ static const MAPEX	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
-static const char	*prnames[] = {
+constexpr cpcchar	prnames[] = {
 	"NCMP",
 	"LOCAL",
 	"GNU",
 	"EXTRA",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
-static const char	*wordfiles[] = {
+constexpr cpcchar	wordfiles[] = {
 	"/usr/add-on/ncmp/share/dict/words",
 	"/usr/add-on/local/share/dict/words",
 	"/usr/add-on/gnu/share/dict/words",
 	"/usr/share/lib/dict/words",
 	"/usr/share/dict/words",
 	"/usr/dict/words",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int b_look(int argc,cchar *argv[],void *contextp)
-{
+int b_look(int argc,con mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
 
-	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -251,30 +232,23 @@ int b_look(int argc,cchar *argv[],void *contextp)
 	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
 
 	return ex ;
-}
-/* end subroutine (b_look) */
+} /* end subroutine (b_look) */
 
-
-int p_look(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_look(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
-}
-/* end subroutine (p_look) */
+} /* end subroutine (p_look) */
 
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
-	PROGINFO	pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
+	PI	pi, *pip = &pi ;
+	LI		li, *lip = &li ;
 	bits		pargs ;
 	SHIO		errfile ;
 	SHIO		ofile, *ofp = &ofile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -291,27 +265,27 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_help = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*file ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
+	cchar	*pr = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*efname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*file ;
+	cchar	*cp ;
 
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		string[MAXSTRLEN + 1] ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+#if	CF_DEBUG || CF_DEBUG
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -322,7 +296,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
@@ -330,10 +304,10 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	pip->verboselevel = 1 ;
 
 	pip->lip = lip ;
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memset(lip,0,sizeof(LI)) ;
 	lip->pip = pip ;
 
-	file = NULL ;
+	file = nullptr ;
 
 	string[0] = '\0' ;
 
@@ -343,7 +317,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -354,7 +328,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -371,14 +345,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -509,7 +483,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -650,8 +624,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDFNERR ;
+	if (efname == nullptr) efname = getourenv(envv,VAREFNAME) ;
+	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -700,7 +674,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_SFIO
 	    printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	}
 
@@ -712,7 +686,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* more initialization */
 
-	if ((rs >= 0) && (pip->n == 0) && (argval != NULL)) {
+	if ((rs >= 0) && (pip->n == 0) && (argval != nullptr)) {
 	    rs = optvalue(argval,-1) ;
 	    pip->n = rs ;
 	}
@@ -722,7 +696,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	for (ai = 1 ; ai < argc ; ai += 1) {
 
 	    f = (ai <= ai_max) && (bits_test(&pargs,ai) > 0) ;
-	    f = f || ((ai > ai_pos) && (argv[ai] != NULL)) ;
+	    f = f || ((ai > ai_pos) && (argv[ai] != nullptr)) ;
 	    if (f) {
 	        cp = argv[ai] ;
 		switch (pan) {
@@ -749,21 +723,21 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* find a file if we do not have one already */
 
-	if (file == NULL) {
+	if (file == nullptr) {
 
 	    rs = SR_NOENT ;
-	    if ((cp = getourenv(envv,VARWORDS)) != NULL) {
+	    if ((cp = getourenv(envv,VARWORDS)) != nullptr) {
 	        file = cp ;
-	        rs = perm(cp,-1,-1,NULL,R_OK) ;
+	        rs = perm(cp,-1,-1,nullptr,R_OK) ;
 	    }
 
 	    if (isNotPresent(rs)) {
 
-	        for (i = 0 ; prnames[i] != NULL ; i += 1) {
-	            if ((cp = getourenv(envv,prnames[i])) != NULL) {
+	        for (i = 0 ; prnames[i] != nullptr ; i += 1) {
+	            if ((cp = getourenv(envv,prnames[i])) != nullptr) {
 	                file = tmpfname ;
 	                mkpath2(tmpfname,cp,WORDF) ;
-	                rs = perm(tmpfname,-1,-1,NULL,R_OK) ;
+	                rs = perm(tmpfname,-1,-1,nullptr,R_OK) ;
 		    }
 	            if (rs >= 0) break ;
 	        } /* end for */
@@ -772,9 +746,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	    if (isNotPresent(rs)) {
 
-	        for (i = 0 ; wordfiles[i] != NULL ; i += 1) {
+	        for (i = 0 ; wordfiles[i] != nullptr ; i += 1) {
 
-	            rs = perm(wordfiles[i],-1,-1,NULL,R_OK) ;
+	            rs = perm(wordfiles[i],-1,-1,nullptr,R_OK) ;
 	            file = (char *) wordfiles[i] ;
 
 	            if (rs >= 0) break ;
@@ -795,7 +769,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* continue */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("main: file=%s f_dict=%u f_fold=%u\n",
 	    file,lip->fl.f,lip->fl.f) ;
 #endif
@@ -812,7 +786,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (rs >= 0) {
 
-	if ((ofname == NULL) || (ofname[0] == '\0') || (ofname[0] == '-'))
+	if ((ofname == nullptr) || (ofname[0] == '\0') || (ofname[0] == '-'))
 	    ofname = BFILE_STDOUT ;
 
 	if ((rs = shio_open(ofp,ofname,"wct",0666)) >= 0) {
@@ -853,10 +827,10 @@ retearly:
 	    debugprintf("main: exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    pip->open.errfile = FALSE ;
 	    shio_close(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	bits_finish(&pargs) ;
@@ -866,7 +840,7 @@ badpargs:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
@@ -875,7 +849,7 @@ badprogstart:
 	}
 #endif
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -888,16 +862,13 @@ badarg:
 	    pip->progname,rs) ;
 	usage(pip) ;
 	goto retearly ;
-}
-/* end subroutine (mainsub) */
+} /* end subroutine (mainsub) */
 
-
-static int usage(PROGINFO *pip)
-{
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-df] [-w] <string> [<file>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -912,20 +883,17 @@ static int usage(PROGINFO *pip)
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
-
-static int procsort(PROGINFO *pip,void *ofp,cchar fname[])
-{
-	VECOBJ		wlist ;
-	const int	n = 250000 ;
+local int procsort(PI *pip,void *ofp,cchar *fname) noex {
+	vecobj		wlist ;
+	cint	n = 250000 ;
 	int		rs ;
 	int		size ;
 	int		wlen = 0 ;
 
-	if (pip == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
+	if (pip == nullptr) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
@@ -939,7 +907,7 @@ static int procsort(PROGINFO *pip,void *ofp,cchar fname[])
 	size = sizeof(struct word) ;
 	if ((rs = vecobj_start(&wlist,size,n,0)) >= 0) {
 	    const mode_t	operms = 0666 ;
-	    const int		oflags = O_RDONLY ;
+	    cint		oflags = O_RDONLY ;
 	    if ((rs = uc_open(fname,oflags,operms)) >= 0) {
 	        ustat	sb ;
 	        int	fd = rs ;
@@ -948,13 +916,13 @@ static int procsort(PROGINFO *pip,void *ofp,cchar fname[])
 	            size_t 		ps = getpagesize() ;
 	            if (fs > 0) {
 	                size_t		ms = MAX(fs,ps) ;
-	                const int	mp = PROT_READ ;
-	                const int	mf = MAP_SHARED ;
+	                cint	mp = PROT_READ ;
+	                cint	mf = MAP_SHARED ;
 	                void		*md ;
-	                if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
+	                if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                    int		madv = MADV_SEQUENTIAL ;
 	                    int		mdl = ms ;
-	                    const char	*mdp = md ;
+	                    cchar	*mdp = md ;
 	                    const caddr_t	ma = (const caddr_t) md ;
 
 	                    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
@@ -990,23 +958,20 @@ static int procsort(PROGINFO *pip,void *ofp,cchar fname[])
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procsort) */
-
+} /* end subroutine (procsort) */
 
 /* read all of the words in */
-static int procsortread(PROGINFO *pip,vecobj *wlp,cchar *mdp,int mdl)
-{
-	struct word	w ;
+local int procsortread(PI *pip,vecobj *wlp,cchar *mdp,int mdl) noex {
+	word	w ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		ll ;
 	int		wl ;
-	const char	*tp ;
-	const char	*lp ;
-	const char	*wp ;
+	cchar	*tp ;
+	cchar	*lp ;
+	cchar	*wp ;
 
-	while ((tp = strnchr(mdp,mdl,'\n')) != NULL) {
+	while ((tp = strnchr(mdp,mdl,'\n')) != nullptr) {
 	    len = ((tp + 1) - mdp) ;
 
 	    lp = mdp ;
@@ -1017,8 +982,9 @@ static int procsortread(PROGINFO *pip,vecobj *wlp,cchar *mdp,int mdl)
 	        debugprintf("procsort: w=>%r<\n",lp,ll) ;
 #endif
 
-	    if ((tp = strnchr(lp,ll,'#')) != NULL)
+	    if ((tp = strnchr(lp,ll,'#')) != nullptr) {
 	        ll = (tp - lp) ;
+	    }
 
 	    if ((wl = sfshrink(lp,ll,&wp)) > 0) {
 	        w.wp = wp ;
@@ -1033,34 +999,25 @@ static int procsortread(PROGINFO *pip,vecobj *wlp,cchar *mdp,int mdl)
 	} /* end while */
 
 	return rs ;
-}
-/* end subroutine (procsortread) */
+} /* end subroutine (procsortread) */
 
-
-static int procsortout(PROGINFO *pip,void *ofp,vecobj *wlp)
-{
-	struct word	*ep ;
+local int procsortout(PI *pip,void *ofp,vecobj *wlp) noex {
+	word	*ep ;
 	int		rs = SR_OK ;
-	int		i ;
 	int		wlen = 0 ;
-
-	for (i = 0 ; vecobj_get(wlp,i,&ep) >= 0 ; i += 1) {
-	    if (ep == NULL) continue ;
+	for (int i = 0 ; vecobj_get(wlp,i,&ep) >= 0 ; i += 1) {
+	    if (ep == nullptr) continue ;
 	    rs = shio_print(ofp,ep->wp,ep->wl) ;
 	    wlen += rs ;
 	    if (rs >= 0) rs = lib_sigterm() ;
 	    if (rs >= 0) rs = lib_sigintr() ;
 	    if (rs < 0) break ;
 	} /* end for */
-
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procsortout) */
+} /* end subroutine (procsortout) */
 
-
-static int procsearch(PROGINFO *pip,void *ofp,cchar *dfname,cchar *string)
-{
-	LOCINFO		*lip = pip->lip ;
+local int procsearch(PI *pip,void *ofp,cchar *dfname,cchar *string) noex {
+	LI		*lip = pip->lip ;
 	LOOKWORD	lw ;
 	int		rs ;
 	int		rs1 ;
@@ -1074,7 +1031,7 @@ static int procsearch(PROGINFO *pip,void *ofp,cchar *dfname,cchar *string)
 	    LOOKWORD_CUR	cur ;
 	    if ((rs = lookword_curbegin(&lw,&cur)) >= 0) {
 		if ((rs = lookword_lookup(&lw,&cur,string)) > 0) {
-		    const int	rlen = NATURALWORDLEN ;
+		    cint	rlen = NATURALWORDLEN ;
 		    char	rbuf[NATURALWORDLEN+1] ;
 		    while ((rs = lookword_read(&lw,&cur,rbuf,rlen)) > 0) {
 			c += 1 ;
@@ -1092,20 +1049,17 @@ static int procsearch(PROGINFO *pip,void *ofp,cchar *dfname,cchar *string)
 	} /* end if (lookword) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procsearch) */
+} /* end subroutine (procsearch) */
 
-
-static int wordcmp(const void *v1p,const void *v2p)
-{
-	struct word	*e1p, **e1pp = (struct word **) v1p ;
-	struct word	*e2p, **e2pp = (struct word **) v2p ;
+local int wordcmp(cvoid *v1p,cvoid *v2p) noex {
+	word	*e1p, **e1pp = (word **) v1p ;
+	word	*e2p, **e2pp = (word **) v2p ;
 	int		rc = 0 ;
 
-	if (*e1pp == NULL) {
+	if (*e1pp == nullptr) {
 	    rc = 1 ;
 	} else {
-	    if (*e2pp == NULL) {
+	    if (*e2pp == nullptr) {
 	        rc = -1 ;
 	    } else {
 	        e1p = *e1pp ;
@@ -1115,7 +1069,6 @@ static int wordcmp(const void *v1p,const void *v2p)
 	}
 
 	return rc ;
-}
-/* end subroutine (wordcmp) */
+} /* end subroutine (wordcmp) */
 
 
