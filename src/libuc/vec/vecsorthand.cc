@@ -73,9 +73,9 @@ local int vecsorthand_ctor(vecsorthand *op,Args ... args) noex {
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
 	    op->va = nullptr ;
-	    op->c = 0 ;
-	    op->i = 0 ;
-	    op->e = 0 ;
+	    op->cnt = 0 ;
+	    op->idx = 0 ;
+	    op->ext = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (vecsorthand_ctor) */
@@ -101,7 +101,7 @@ int vecsorthand_start(vecsorthand *op,cmp_f cmpfunc,int vn) noex {
 	    cint	sz = (szof(void **) * (vn + 1)) ;
 	    if (void *vp ; (rs = libmem.mall(sz,&vp)) >= 0) ylikely {
 	        op->va = voidpp(vp) ;
-	        op->e = vn ;
+	        op->ext = vn ;
 	        {
 	            op->va[0] = nullptr ;
 	            op->cmpf = cmpfunc ;
@@ -121,9 +121,9 @@ int vecsorthand_finish(vecsorthand *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->va = nullptr ;
 	    } /* end if (memory-release) */
-	    op->c = 0 ;
-	    op->i = 0 ;
-	    op->e = 0 ;
+	    op->cnt = 0 ;
+	    op->idx = 0 ;
+	    op->ext = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (vecsorthand_finish) */
@@ -135,11 +135,11 @@ int vecsorthand_add(vecsorthand *op,cvoid *nep) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
 	        if ((rs = vecsorthand_extend(op)) >= 0) ylikely {
-		    if (op->i > 0) ylikely {
+		    if (op->idx > 0) ylikely {
 		        cauto	cf = op->cmpf ;
 			int	rc = -1 ;
 	                int	bot = 0 ;
-	                int	top = topidx(op->i) ;
+	                int	top = topidx(op->idx) ;
 	                i = (bot + top) / 2 ;
 	                while ((top - bot) > 0) {
 	                    if ((rc = cf(nep,op->va[i])) < 0) {
@@ -151,19 +151,19 @@ int vecsorthand_add(vecsorthand *op,cvoid *nep) noex {
 		            }
 	                    i = (bot + top) / 2 ;
 	                } /* end while */
-	                if (i < op->i) {
+	                if (i < op->idx) {
 	                    if ((rc != 0) && (cf(nep,op->va[i]) > 0)) {
 	                        i += 1 ;
 	                    } /* end if */
-	                    for (int j = (op->i - 1) ; j >= i ; j -= 1) {
+	                    for (int j = (op->idx - 1) ; j >= i ; j -= 1) {
 	                        op->va[j + 1] = op->va[j] ;
 	                    } /* end for */
 	                } /* end if */
 		    } /* end if (non-zero positive) */
 	            op->va[i] = voidpp(nep) ;
-	            op->i += 1 ;
-	            op->va[op->i] = nullptr ;
-	            op->c += 1 ;		/* increment list count */
+	            op->idx += 1 ;
+	            op->va[op->idx] = nullptr ;
+	            op->cnt += 1 ;		/* increment list count */
 	        } /* end if (vecsorthand_extend) */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -177,14 +177,14 @@ int vecsorthand_get(vecsorthand *op,int i,void *vp) noex {
 	    if (op->va) ylikely {
 		void		*rval = nullptr ;
 		rs = SR_NOTFOUND ;
-		if ((i >= 0) && (i < op->i)) ylikely {
+		if ((i >= 0) && (i < op->idx)) ylikely {
 	    	    rval = op->va[i] ;
 	    	    rs = i ;
 		} /* end if */
 	        if (vp) {
 	            void	**rpp = voidpp(vp) ;
 	            *rpp = rval ;
-	        }
+	        } /* end */
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
@@ -196,14 +196,14 @@ int vecsorthand_del(vecsorthand *op,int i) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
 		rs = SR_NOTFOUND ;
-	        if ((i >= 0) && (i < op->i)) ylikely {
-	            op->i -= 1 ;
-	            for (int j = i ; j < op->i ; j += 1) {
+	        if ((i >= 0) && (i < op->idx)) ylikely {
+	            op->idx -= 1 ;
+	            for (int j = i ; j < op->idx ; j += 1) {
 	                op->va[j] = op->va[j + 1] ;
 	            } /* end for */
-	            op->va[op->i] = nullptr ;
-	            op->c -= 1 ;		/* decrement list count */
-	            rs = op->c ;
+	            op->va[op->idx] = nullptr ;
+	            op->cnt -= 1 ;		/* decrement list count */
+	            rs = op->cnt ;
 	        } /* end if */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -216,7 +216,7 @@ int vecsorthand_delent(vecsorthand *op,cvoid *ep) noex {
 	if (op && ep) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
-	        cint	n = op->i ;
+	        cint	n = op->idx ;
 	        bool	f = false ;
 	        rs = SR_NOTFOUND ;
 	        for (i = 0 ; i < n ; i += 1) {
@@ -236,7 +236,7 @@ int vecsorthand_count(vecsorthand *op) noex {
 	if (op) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
-		rs = op->c ;
+		rs = op->cnt ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
@@ -248,14 +248,14 @@ int vecsorthand_present(vecsorthand *op,cvoid *p) noex {
 	if (op && p) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
-	        cint	n = op->i ;
+	        cint	n = op->idx ;
 		rs = SR_NOTFOUND ;
 		for (i = 0 ; i < n ; i += 1) {
 		    if (cvoid *ep = op->va[i]) {
 			if (ep == p) break ;
 		    } /* end if (non-null) */
 		} /* end for */
-		if (i < op->i) rs = SR_OK ;
+		if (i < op->idx) rs = SR_OK ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
@@ -268,11 +268,11 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
 		rs = SR_NOTFOUND ;
-		if (op->i > 0) ylikely {
+		if (op->idx > 0) ylikely {
 		    cauto	cf = op->cmpf ;
 		    int		rc = -1 ;
 	            int		bot = 0 ;
-	            int		top = topidx(op->i) ;
+	            int		top = topidx(op->idx) ;
 	            i = (bot + top) / 2 ;
 		    cauto lamb = [&op,&cf,&ep] (int ii) noex {
 			return cf(ep,op->va[ii]) ;
@@ -287,7 +287,7 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 	            } /* end while */
 	            if (rc == 0) {
 			rs = SR_OK ;
-		    } else if (i < op->i) {
+		    } else if (i < op->idx) {
 	                if (cf(ep,op->va[i]) == 0) rs = SR_OK ;
 		    }
 		} /* end if (have entries) */
@@ -305,24 +305,24 @@ int vecsorthand_search(vecsorthand *op,cvoid *ep,void *vrp) noex {
 
 local int vecsorthand_extend(vecsorthand *op) noex {
 	int		rs = SR_OK ;
-	if ((op->i + 1) > op->e) {
+	if ((op->idx + 1) > op->ext) {
 	    cint	ndef = defents ;
 	    int		ne ;
 	    int		sz ;
 	    void	**nva{} ;
-	    if (op->e == 0) {
+	    if (op->ext == 0) {
 	        ne = ndef ;
 	        sz = (ne * szof(void **)) ;
 	        rs = libmem.mall(sz,&nva) ;
 	    } else {
-	        ne = (op->e * 2) ;
+	        ne = (op->ext * 2) ;
 	        sz = (ne * szof(void **)) ;
 	        rs = libmem.rall(op->va,sz,&nva) ;
 	    } /* end if */
 	    if (rs >= 0) ylikely {
 	        op->va = nva ;
-	        op->e = ne ;
-		op->va[op->i] = nullptr ;
+	        op->ext = ne ;
+		op->va[op->idx] = nullptr ;
 	    } /* end if (ok) */
 	} /* end if */
 	return rs ;
@@ -361,7 +361,7 @@ void vecsorthand::dtor() noex {
 vecsorthand::operator int () noex {
 	int		rs = SR_NOTOPEN ;
 	if (cmpf) {
-	    rs = c ;
+	    rs = cnt ;
 	}
 	return rs ;
 } /* end method (vecsorthand::operator) */
