@@ -17,16 +17,12 @@
 
 /*******************************************************************************
 
-	We define some SunOS-specific subroutines.
+  	Description:
+	I provide some missing system facilities in this module.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-/* USYS_SUNOS start */
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-
-#include	<sys/systeminfo.h>	/* Solaris® */
 #include	<cerrno>		/* CSTD */
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<clanguage.h>		/* LIBU */
@@ -38,6 +34,12 @@
 #include	"usys.h"
 #include	"usys_sunos.h"
 
+
+/* USYS_SUNOS start */
+#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
+/*----------------------------------------------------------------------------*/
+
+#include	<sys/systeminfo.h>	/* Solaris® */
 
 static sysret_t sunos_sysinfo(char *ubuf,int ulen,int req) noex {
 	int		rs = SR_FAULT ;
@@ -70,10 +72,11 @@ sysret_t ugetnisdom(char *rbuf,int rlen) noex {
 } /* end subroutine (sunos_ugetnisdom) */
 
 
-/*----------------------------------------------------------------------------*/
 /* LOADAVGINT begin */
 #if	defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0)
 #ifdef	__cplusplus /* C++ only! */
+/*----------------------------------------------------------------------------*/
+
 namespace usys {
     sysret_t kloadavg(int *la,int n) noex {
 	int		rs = SR_FAULT ;
@@ -85,12 +88,14 @@ namespace usys {
 	return rs ;
     } /* end subroutine (kloadavg) */
 } /* end namesapce (usys) */
+
+/*----------------------------------------------------------------------------*/
 #endif /* __cplusplus (C++ only) */
 #endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 /* LOADAVGINT end */
+
+
 /*----------------------------------------------------------------------------*/
-
-
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 /* USYS_SUNOS finish */
 
