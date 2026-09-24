@@ -356,21 +356,21 @@ namespace {
 	longlong	cutoff ;
 	strer_sll(cc *s,char **e,int b) noex : strer(s,e,b) { } ;
 	operator longlong ()	noex ;
-	void cookprep()		noex override final ;
-	void cvt(int)		noex override final ;
-	void cvtpos(int)	noex ;
-	void cvtneg(int)	noex ;
-	void reterr()		noex override final ;
+	void cookprep	()	noex override final ;
+	void cvt	(int)	noex override final ;
+	void cvtpos	(int)	noex ;
+	void cvtneg	(int)	noex ;
+	void reterr	()	noex override final ;
     } ; /* end struct */
     struct strer_ull : strer { /* "unsigned-longlong" */
 	ulonglong	ures{} ;
 	ulonglong	cutoff ;
 	strer_ull(cc *s,char **e,int b) noex : strer(s,e,b) { } ;
 	operator ulonglong ()	noex ;
-	void cookprep()		noex override final ;
-	void cvt(int)		noex override final ;
-	void negator()		noex override final ;
-	void reterr()		noex override final ;
+	void cookprep	()	noex override final ;
+	void cvt	(int)	noex override final ;
+	void negator	()	noex override final ;
+	void reterr	()	noex override final ;
     } ; /* end struct */
 } /* end namespace */
 
