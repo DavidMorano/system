@@ -63,11 +63,11 @@ struct slist_co {
 	void operator () (slist *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (slist_co) */
 struct slist : slist_head {
 	slist_co	start ;
@@ -80,7 +80,7 @@ struct slist : slist_head {
 	    audit	(this,slistmem_audit) ;
 	    finish	(this,slistmem_finish) ;
 	    head = nullptr ;
-	} ;
+	} ; /* end */
 	slist(const slist &) = delete ;
 	slist &operator = (const slist &) = delete ;
 	int ins		(slist_ent *) noex ;
@@ -96,7 +96,7 @@ struct slist : slist_head {
 	void dtor	() noex ;
 	destruct slist() {
 	    if (head) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (slist) */
 #else	/* __cplusplus */
 typedef SLIST		slist ;
