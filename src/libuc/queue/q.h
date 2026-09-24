@@ -62,11 +62,11 @@ struct q_co {
         constexpr void operator () (q *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
 	int operator () (int = 0) noex ;
         operator int () noex {
 	    return operator () (0) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (q_co) */
 struct q : q_head {
 	q_co		start ;
@@ -84,8 +84,8 @@ struct q : q_head {
 	int	inshead	(q_ent *) noex ;
 	int	rem	(q_ent **) noex ;
 	int	remtail	(q_ent **) noex ;
-	void	dtor() noex ;
-	operator int () noex ;
+	void	dtor	() noex ;
+	operator int 	() noex ;
 	destruct q() {
 	    if (mxp) dtor() ;
 	} ; /* end dtor (q) */
