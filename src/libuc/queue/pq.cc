@@ -101,27 +101,25 @@ int pq_finish(pq *qhp) noex {
 int pq_ins(pq *qhp,pq_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rc = 0 ;
-	if (qhp) ylikely {
+	if (qhp && ep) ylikely {
 	    rs = SR_OK ;
 	    if (qhp->head && qhp->tail) ylikely {
-	        if (qhp->head != qhp->tail) {
-	            pq_ent	*pep = qhp->tail ;
-	            ep->next = nullptr ;
-	            ep->prev = qhp->tail ;
-	            pep->next = ep ;
-	            qhp->tail = ep ;
-	        } else {
-	            ep->next = nullptr ;
-	            ep->prev = nullptr ;
-	            qhp->head = ep ;
-	            qhp->tail = ep ;
-	        } /* end if */
-	        if (rs >= 0) {
-	            rc = ++qhp->cnt ;
-	        }
+	        pq_ent	*pep = qhp->tail ;
+	        ep->next = nullptr ;
+	        ep->prev = qhp->tail ;
+	        pep->next = ep ;
+	        qhp->tail = ep ;
 	    } else if (qhp->head || qhp->tail) {
 	        rs = SR_BADFMT ;
-	    }
+	    } else {
+	        ep->next = nullptr ;
+	        ep->prev = nullptr ;
+	        qhp->head = ep ;
+	        qhp->tail = ep ;
+	    } /* end if */
+	    if (rs >= 0) {
+	        rc = ++qhp->cnt ;
+	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (pq_ins) */
@@ -217,7 +215,7 @@ int pq_gettail(pq *qhp,pq_ent **epp) noex {
 
 int pq_rem(pq *qhp,pq_ent **epp) noex {
 	int		rs = SR_FAULT ;
-	int		rc = 0 ;
+	int		rc = 0 ; /* return-value */
 	if (qhp) ylikely {
 	    pq_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
@@ -230,7 +228,7 @@ int pq_rem(pq *qhp,pq_ent **epp) noex {
 			rs = SR_OK ;
 	                nep->prev = nullptr ;
 	                qhp->head = nep ;
-		    }
+		    } /* end if (ok) */
 	        } else {
 		    rs = SR_OK ;
 	            qhp->head = nullptr ;
@@ -240,12 +238,12 @@ int pq_rem(pq *qhp,pq_ent **epp) noex {
 		    ep->next = nullptr ;
 		    ep->prev = nullptr ;
 		    rc = --qhp->cnt ;
-	        }
+	        } /* end if (ok) */
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    } /* end if (not-empty) */
 	    if (epp) {
-		 *epp = (rs >= 0) ? ep : nullptr ;
+		*epp = (rs >= 0) ? ep : nullptr ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
@@ -268,17 +266,17 @@ int pq_remtail(pq *qhp,pq_ent **epp) noex {
 			rs = SR_OK ;
 	                pep->next = nullptr ;
 	                qhp->tail = pep ;
-		    }
+		    } /* end if (ok) */
 	        } else {
 		    rs = SR_OK ;
 	            qhp->head = nullptr ;
 	            qhp->tail = nullptr ;
-	        }
+	        } /* end if */
 	        if (rs >= 0) {
 		    ep->next = nullptr ;
 		    ep->prev = nullptr ;
 		    rc = --qhp->cnt ;
-		}
+		} /* end if (ok) */
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    } /* end if (not empty) */
@@ -312,7 +310,7 @@ int pq_unlink(pq *qhp,pq_ent *ep) noex {
 		         } else {
 		             rs = SR_BADFMT ;
 		         }
-	             }
+	             } /* end if */
 	         } else {
 	             if (ep->prev != nullptr) {
 		         if (qhp->tail == ep) {
@@ -329,11 +327,11 @@ int pq_unlink(pq *qhp,pq_ent *ep) noex {
 		         } else {
 		             rs = SR_BADFMT ;
 		         }
-	             }
+	             } /* end if */
 	        } /* end if */
 	        if (rs >= 0) {
 		    rc = --qhp->cnt ;
-	        }
+	        } /* end if (ok) */
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    } /* end if (ok) */
@@ -413,7 +411,7 @@ int pq_curenum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
 		    nep = ep->next ;
 	        } else {
 	            nep = qhp->head ;
-	        }
+	        } /* end if */
 	        if (nep != nullptr) rs = SR_OK ;
 	        curp->entp = nep ;
 		if (rpp) {
