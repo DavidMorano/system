@@ -79,13 +79,13 @@ import ureserve ;			/* |char(3u)| */
 namespace libu {
     int tolc(int ch) noex {
 	return char_tolc(ch) ;
-    }
+    } /* end */
     int touc(int ch) noex {
 	return char_touc(ch) ;
-    }
+    } /* end */
     int tofc(int ch) noex {
 	return char_tofc(ch) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 
