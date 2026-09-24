@@ -62,7 +62,7 @@ struct intiq_co {
         constexpr void operator () (intiq *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         operator int () noex ;
 } ; /* end struct (intiq_co) */
 struct intiq : intiq_head {
@@ -80,7 +80,7 @@ struct intiq : intiq_head {
 	int ins		(int) noex ;
 	int rem		(int *) noex ;
 	void dtor	() noex ;
-	operator int () noex ;
+	operator int 	() noex ;
 	destruct intiq() {
 	    if (magval) dtor() ;
 	} ; /* end dtor (intiq) */
