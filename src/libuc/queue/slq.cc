@@ -91,20 +91,18 @@ int slq_finish(slq *op) noex {
 int slq_ins(slq *op,slq_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	if (op && ep) ylikely {
-	    ep->next = nullptr ;
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
-	        slq_ent		*pep = op->tail ;
+	        slq_ent *pep = op->tail ;
 		pep->next = ep ;
 	        op->tail = ep ;
+	    } else if (op->head || op->tail) {
+		rs = SR_BADFMT ;
 	    } else {
-		if (op->head || op->tail) {
-		    rs = SR_BADFMT ;
-		} else {
-		    op->head = ep ;
-		    op->tail = ep ;
-		}
-	    }
+	        ep->next = nullptr ;
+		op->head = ep ;
+		op->tail = ep ;
+	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (slq_ins) */
@@ -134,13 +132,11 @@ int slq_rem(slq *op,slq_ent **epp) noex {
 	        slq_ent		*hep = op->head ;
 	        *epp = hep ;
 		op->head = hep->next ;
+	    } else if (op->head || op->tail) {
+		rs = SR_BADFMT ;
 	    } else {
-		if (op->head || op->tail) {
-		    rs = SR_BADFMT ;
-		} else {
-		    rs = SR_NOTFOUND ;
-		}
-	    }
+		rs = SR_NOTFOUND ;
+	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (slq_rem) */
@@ -151,13 +147,11 @@ int slq_gethead(slq *op,slq_ent **epp) noex {
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
 	        *epp = op->head ;
+	    } else if (op->head || op->tail) {
+		rs = SR_BADFMT ;
 	    } else {
-		if (op->head || op->tail) {
-		    rs = SR_BADFMT ;
-		} else {
-		    rs = SR_NOTFOUND ;
-		}
-	    }
+		rs = SR_NOTFOUND ;
+	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (slq_gethead) */
@@ -168,13 +162,11 @@ int slq_gettail(slq *op,slq_ent **epp) noex {
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
 	        *epp = op->tail ;
+	    } else if (op->head || op->tail) {
+		rs = SR_BADFMT ;
 	    } else {
-		if (op->head || op->tail) {
-		    rs = SR_BADFMT ;
-		} else {
-		    rs = SR_NOTFOUND ;
-		}
-	    }
+		rs = SR_NOTFOUND ;
+	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (slq_gettail) */
@@ -185,9 +177,9 @@ int slq_audit(slq *op) noex {
 	    rs = SR_OK ;
 	    if (op->head && op->tail) {
 	        rs = SR_OK ;
-	    } else {
-	        if (op->head || op->tail) rs = SR_BADFMT ;
-	    }
+	    } else if (op->head || op->tail) {
+		rs = SR_BADFMT ;
+	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (slq_audit) */
