@@ -17,7 +17,8 @@
 
 /*******************************************************************************
 
-	We defines some system (global) variables in this module.
+  	Description:
+	I provide some missing system facilities in this module.
 
 	Important note:
 	It looks like only SunOS (really Solaris®) and Illumos®
@@ -26,12 +27,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/time.h>		/* type |timeval| */
-#include	<cerrno>
-#include	<ctime>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
+#include	<sys/time.h>		/* POSIX® type |timeval| */
+#include	<ctime>			/* CSTD */
+#include	<cerrno>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
 
 #include	"usys_stime.h"
 
