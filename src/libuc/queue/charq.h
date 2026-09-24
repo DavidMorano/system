@@ -62,11 +62,11 @@ struct charq_co {
         constexpr void operator () (charq *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
 	int operator () (int = 0) noex ;
         operator int () noex {
 	    return operator () (0) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (charq_co) */
 struct charq : charq_head {
 	charq_co	start ;
