@@ -60,7 +60,7 @@ struct chariq_co {
         constexpr void operator () (chariq *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         operator int () noex ;
 } ; /* end struct (chariq_co) */
 struct chariq : chariq_head {
