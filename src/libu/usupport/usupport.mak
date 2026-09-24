@@ -66,7 +66,7 @@ OBJ19= usupport_hasx.o usupport_hasnot.o
 
 OBJ20= usupport_strdcpyx.o usupport_strdcpyxw.o
 OBJ21= usupport_vstrcmp.o usupport_vstrkeycmp.o
-OBJ22= usupport_strxxxxcmp.o 
+OBJ22= usupport_strxxxxcmp.o usupport_strnwcpy.o
 OBJ23= vstrorders.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
@@ -280,6 +280,7 @@ usupport_strnset.o:	usupport_strnset.cc	usupport_strnset.hh	$(INCS)
 usupport_strnxchr.o:	usupport_strnxchr.cc	usupport_strnxchr.hh	$(INCS)
 usupport_strnxbrk.o:	usupport_strnxbrk.cc	usupport_strnxbrk.hh	$(INCS)
 usupport_strnkeycmp.o:	usupport_strnkeycmp.cc	usupport_strnkeycmp.hh	$(INCS)
+usupport_strnwcpy.o:	usupport_strnwcpy.cc	usupport_strnwcpy.hh	$(INCS)
 usupport_strnwht.o:	usupport_strnwht.cc	usupport_strnwht.hh	$(INCS)
 usupport_strwcmp.o:	usupport_strwcmp.cc	usupport_strwcmp.hh	$(INCS)
 usupport_strwcpy.o:	usupport_strwcpy.cc	usupport_strwcpy.hh	$(INCS)
