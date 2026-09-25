@@ -103,16 +103,16 @@ int pq_ins(pq *qhp,pq_ent *ep) noex {
 	int		rc = 0 ;
 	if (qhp && ep) ylikely {
 	    rs = SR_OK ;
+	    ep->next = nullptr ;
 	    if (qhp->head && qhp->tail) ylikely {
-	        pq_ent	*pep = qhp->tail ;
-	        ep->next = nullptr ;
+	        pq_ent	*lep = qhp->tail ;
 	        ep->prev = qhp->tail ;
-	        pep->next = ep ;
+	        lep->next = ep ;
 	        qhp->tail = ep ;
 	    } else if (qhp->head || qhp->tail) {
+	        ep->prev = nullptr ;
 	        rs = SR_BADFMT ;
 	    } else {
-	        ep->next = nullptr ;
 	        ep->prev = nullptr ;
 	        qhp->head = ep ;
 	        qhp->tail = ep ;
@@ -223,7 +223,7 @@ int pq_rem(pq *qhp,pq_ent **epp) noex {
 	        ep = qhp->head ;
 		if (qhp->head != qhp->tail) {
 		    rs = SR_BADFMT ;
-	            if (ep->next && (ep->prev == nullptr)) {
+	            if (ep->next && isnull(ep->prev)) {
 	                pq_ent	*nep = ep->next ;
 			rs = SR_OK ;
 	                nep->prev = nullptr ;
@@ -261,7 +261,7 @@ int pq_remtail(pq *qhp,pq_ent **epp) noex {
 		ep = qhp->tail ;
 		if (qhp->head != qhp->tail) {
 		    rs = SR_BADFMT ;
-	            if ((ep->next == nullptr) && ep->prev) {
+	            if (isnull(ep->next) && ep->prev) {
 	                pq_ent	*pep = ep->prev ;
 			rs = SR_OK ;
 	                pep->next = nullptr ;
