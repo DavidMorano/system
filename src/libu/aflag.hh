@@ -48,12 +48,12 @@ struct aflag_co {
 	constexpr void operator () (aflag *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	bool operator () () noex ;
 	bool operator () (bool) noex ;
 	operator bool () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (aglag_co) */
 struct aflag_mx {
 	aflag		*op = nullptr ;
@@ -61,11 +61,11 @@ struct aflag_mx {
 	constexpr void operator () (aflag *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (aglag_mx) */
 struct aflag {
 	friend		aflag_mx ;
@@ -92,10 +92,10 @@ struct aflag {
 	} ; /* end ctor */
 	operator bool () const noex {
 	    return af.test() ;
-	} ;
+	} ; /* end */
 	operator int () const noex {
 	    return int(af.test()) ;
-	} ;
+	} ; /* end */
 	bool operator = (const bool f) noex {
 	    bool	rf = false ;
 	    if (f) {
@@ -103,12 +103,12 @@ struct aflag {
 	    } else {
 		rf = af.test() ;
 	        af.clear() ;
-	    }
+	    } /* end if */
 	    return rf ;
 	} ; /* end method (operator-assignment) */
     private:
-	int ilockbegin(int = -1) noex ;
-	int ilockend() noex ;
+	int ilockbegin	(int = -1) noex ;
+	int ilockend	() noex ;
 } ; /* end struct (aflag) */
 
 
