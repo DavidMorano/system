@@ -80,7 +80,7 @@ int slist_start(slist *qhp) noex {
 	    qhp->head = nullptr ;
 	    qhp->tail = nullptr ;
 	    qhp->cnt = 0 ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (slist_start) */
 
@@ -91,7 +91,7 @@ int slist_finish(slist *qhp) noex {
 	    qhp->head = nullptr ;
 	    qhp->tail = nullptr ;
 	    qhp->cnt = 0 ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (slist_finish) */
 
@@ -101,26 +101,19 @@ int slist_ins(slist *qhp,slist_ent *ep) noex {
 	if (qhp && ep) ylikely {
 	    rs = SR_OK ;
 	    ep->next = nullptr ;
-	    if (qhp->head) {
-	        slist_ent	*pep = qhp->tail ;
-		if (pep) {
-	            pep->next = ep ;
-	            qhp->tail = ep ;
-		} else {
-		    rs = SR_BADFMT ;
-		}
+	    if (qhp->head && qhp->tail) {
+	        slist_ent *lep = qhp->tail ;
+	        lep->next = ep ;
+	        qhp->tail = ep ;
+	    } else if (qhp->head || qhp->tail) {
+		rs = SR_BADFMT ;
 	    } else {
-		if (qhp->tail) {
-		    rs = SR_BADFMT ;
-		} else {
-	            qhp->head = ep ;
-	            qhp->tail = ep ;
-		}
+	        qhp->head = ep ;
+	        qhp->tail = ep ;
 	    } /* end if */
 	    if (rs >= 0) ylikely {
-	        qhp->cnt += 1 ;
-	        c = qhp->cnt ;
-	    }
+	        c = ++qhp->cnt ;
+	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (slist_ins) */
@@ -169,7 +162,7 @@ int slist_present(slist *qhp,slist_ent *ep) noex {
 	    while (nep && (!f)) {
 		f = (ep == nep) ;
 		nep = nep->next ;
-	    }
+	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (slist_present) */
@@ -185,7 +178,7 @@ int slist_unlink(slist *qhp,slist_ent *ep) noex {
 		if ((f = (ep == nep))) break ;
 		pep = nep ;
 		nep = nep->next ;
-	    }
+	    } /* end while */
 	    if (f) {
 		if (pep) {
 		    if (ep->next) {
@@ -193,15 +186,15 @@ int slist_unlink(slist *qhp,slist_ent *ep) noex {
 		    } else {
 			qhp->tail = pep ;
 			pep->next = nullptr ;
-		    }
+		    } /* end if */
 		} else {
 		    if (ep->next) {
 			qhp->head = ep->next ;
 		    } else {
 			qhp->head = nullptr ;
 			qhp->tail = nullptr ;
-		    }
-		}
+		    } /* end if */
+		} /* end if */
 		ep->next = nullptr ;
 		qhp->cnt -= 1 ;
 	    } /* end if */
@@ -222,7 +215,7 @@ int slist_rem(slist *qhp,slist_ent **epp) noex {
 		} else {
 		    qhp->head = nullptr ;
 		    qhp->tail = nullptr ;
-		}
+		} /* end if */
 		ep->next = nullptr ;
 		qhp->cnt -= 1 ;
 	        c = qhp->cnt ;
@@ -245,7 +238,7 @@ int slist_gethead(slist *qhp,slist_ent **epp) noex {
 	        c = qhp->cnt ;
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
-	    }
+	    } /* end if */
 	    *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -262,10 +255,10 @@ int slist_gettail(slist *qhp,slist_ent **epp) noex {
 	        c = qhp->cnt ;
 		if (ep->next) {
 		    rs = SR_BADFMT ;
-		}
+		} /* end if */
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
-	    }
+	    } /* end if */
 	    *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -276,7 +269,7 @@ int slist_count(slist *qhp) noex {
 	int		c = 0 ;
 	if (qhp) ylikely {
 	    c = qhp->cnt ;
-	}
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (slist_count) */
 
@@ -293,7 +286,7 @@ int slist_audit(slist *qhp) noex {
 		if ((rs >= 0) && (c != qhp->cnt)) rs = SR_BADFMT ;
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (slist_audit) */
