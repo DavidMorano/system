@@ -49,6 +49,14 @@
 #endif
 #endif /* __cplusplus */
 
+#ifndef	isnull
+#define	isnull(a)		((a) == nullptr)
+#endif
+
+#ifndef	iszero
+#define	iszero(a)		((a) == 0)
+#endif
+
 
 #endif /* CLANGUAGEINTRINSIC_INCLUDE */
 
