@@ -54,7 +54,7 @@
 #include	<cstdlib>		/* CSTD |getpid(2)| */
 #include	<new>			/* C++STD |nothrow(3c)| */
 #include	<atomic>		/* C++STD |atomic_flag(3c++)| */
-#include	<mutex>			/* C++STD |call_once(3c++)| */
+#include	<mutex>			/* C++STD |once_call(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -72,7 +72,7 @@ import libutil ;
 #define MAXPATH		(4 * 1024)	/* resonable value for exec-name */
 #endif
 
-using std::call_once ;			/* subroutine */
+using std::once_call ;			/* subroutine */
 using libu::sncpy ;			/* subroutine */
 using libu::snwcpy ;			/* subroutine */
 
@@ -84,7 +84,7 @@ local void oncefunc(usys::usysargz *op) noex {
 
 namespace usys {
     usysargz::operator int () noex {
-	call_once(ox,oncefunc,this) ;
+	once_call(ox,oncefunc,this) ;
 	return rss ;
     } /* end method (usysargz::operator) */
     void usysargz::initonce() noex {
