@@ -85,7 +85,7 @@ local inline int q_ctor(q *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->mxp ;
 		    op->mxp = nullptr ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
@@ -98,11 +98,11 @@ local inline int q_dtor(q *op) noex {
 	    if (op->pqp) ylikely {
 		delete op->pqp ;
 		op->pqp = nullptr ;
-	    }
+	    } /* end if (delete-plainq) */
 	    if (op->mxp) ylikely {
 		delete op->mxp ;
 		op->mxp = nullptr ;
-	    }
+	    } /* end if (delete-ptm) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (q_dtor) */
@@ -142,10 +142,10 @@ int q_start(q *op,int type) noex {
 		    ptm *mxp = op->mxp ;
 		    mxp->destroy() ;
 		}
-	    }
+	    } /* end if (error) */
 	    if (rs < 0) {
 		q_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (q_ctor) */
 	return rs ;
 } /* end subroutine (q_start) */
@@ -160,16 +160,16 @@ int q_finish(q *op) noex {
 	        rs1 = plainq_finish(op->pqp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        rc = rs1 ;
-	    }
+	    } /* end */
 	    if (op->mxp) ylikely {
 		ptm *mxp = op->mxp ;
 	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = q_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (q_finish) */
