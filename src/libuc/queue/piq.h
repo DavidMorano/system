@@ -81,8 +81,8 @@ struct piq : piq_head {
 	piq &operator = (const piq &) = delete ;
 	int ins		(void *) noex ;
 	int rem		(void *) noex ;
-	void dtor() noex ;
-	operator int () noex ;
+	void dtor	() noex ;
+	operator int	() noex ;
 	destruct piq() {
 	    if (magval) dtor() ;
 	} ; /* end dtor (piq) */
