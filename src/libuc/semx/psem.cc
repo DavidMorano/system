@@ -108,7 +108,7 @@ int psem_create(psem *op,int pshared,int acnt) noex {
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    if_constexpr (f_psem) {
-		if (rpsem *semp = new(nt) rpsem ; semp) {
+		if (rpsem *semp = new(nt) rpsem) ylikely {
 		    if ((rs = rpsem_create(semp,pshared,acnt)) >= 0) {
 			op->subobj = semp ;
 		    } /* end if (rpsem_create) */
@@ -118,7 +118,7 @@ int psem_create(psem *op,int pshared,int acnt) noex {
 		    } /* end if (error) */
 		} /* end if (new-rpsem) */
 	    } else {
-		if (epsem *semp = new(nt) epsem ; semp) {
+		if (epsem *semp = new(nt) epsem) ylikely {
 		    if ((rs = epsem_create(semp,pshared,acnt)) >= 0) {
 			op->subobj = semp ;
 		    } /* end if (rpsem_create) */
@@ -145,21 +145,21 @@ int psem_destroy(psem *op) noex {
 		    {
 		        rs1 = rpsem_destroy(semp) ;
 		        if (rs >= 0) rs = rs1 ;
-		    }
+		    } /* end */
 		    {
 			delete semp ;
 			op->subobj = nullptr ;
-		    }
+		    } /* end */
 	        } else {
 		    epsem *semp = (epsem *) op->subobj ;
 		    {
 		        rs1 = epsem_destroy(semp) ;
 		        if (rs >= 0) rs = rs1 ;
-		    }
+		    } /* end */
 		    {
 			delete semp ;
 			op->subobj = nullptr ;
-		    }
+		    } /* end */
 	        } /* end if_constexpr (f_psem) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
