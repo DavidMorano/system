@@ -20,9 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdio.h>		/* |FILE(3stdio)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<stdio.h>		/* CSTD |FILE(3stdio)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 #include	<freadln.h>
 
@@ -34,6 +36,10 @@ extern int	fwriter(FILE *,cvoid *,int) noex ;
 
 extern FILE *fopenroot(cchar *,cchar *,
 			char * = nullptr,cchar * = nullptr) noex ;
+
+local inline int fprintln(FILE *fp,cchar *lp,int ll) noex {
+    	return fprint(fp,lp,ll) ;
+} /* end subroutine */
 
 EXTERNC_end
 
