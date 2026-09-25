@@ -92,14 +92,14 @@ int slq_ins(slq *op,slq_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	if (op && ep) ylikely {
 	    rs = SR_OK ;
+	    ep->next = nullptr ;
 	    if (op->head && op->tail) {
-	        slq_ent *pep = op->tail ;
-		pep->next = ep ;
+	        slq_ent *lep = op->tail ;
+		lep->next = ep ;
 	        op->tail = ep ;
 	    } else if (op->head || op->tail) {
 		rs = SR_BADFMT ;
 	    } else {
-	        ep->next = nullptr ;
 		op->head = ep ;
 		op->tail = ep ;
 	    } /* end if */
@@ -124,19 +124,33 @@ int slq_insgroup(slq *op,void *vp,int esz,int n) noex {
 	return rs ;
 } /* end subroutine (slq_insgroup) */
 
-int slq_rem(slq *op,slq_ent **epp) noex {
+int slq_rem(slq *op,slq_ent **rpp) noex {
 	int		rs = SR_FAULT ;
-	if (op && epp) ylikely {
-	    rs = SR_OK ;
+	if (op && rpp) ylikely {
+	    slq_ent	*rp = nullptr ;
+	    rs = SR_EMPTY ;
 	    if (op->head && op->tail) {
-	        slq_ent		*hep = op->head ;
-	        *epp = hep ;
-		op->head = hep->next ;
+	        rp = op->head ;
+		if (op->head != op->tail) {
+		    rs = SR_BADFMT ;
+		    if (rp->next) {
+		        slq_ent *nep = rp->next ;
+		        rs = SR_OK ;
+		        rp->next = nullptr ;
+		        op->head = nep ;
+		    } /* end if (ok) */
+		} else {
+		    rs = SR_OK ;
+		    op->head = nullptr ;
+		    op->tail = nullptr ;
+		    rp->next = nullptr ;
+		} /* end if */
 	    } else if (op->head || op->tail) {
 		rs = SR_BADFMT ;
-	    } else {
-		rs = SR_NOTFOUND ;
 	    } /* end if */
+	    if (rpp) {
+		*rpp = (rs >= 0) ? rp : nullptr ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (slq_rem) */
