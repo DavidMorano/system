@@ -83,8 +83,8 @@ struct cq : cq_head {
 	int curbegin	(cq_cur *) noex ;
 	int curend	(cq_cur *) noex ;
 	int curenum	(cq_cur *,void *) noex ;
-	void	dtor() noex ;
-	operator int () noex ;
+	void dtor	() noex ;
+	operator int	() noex ;
 	destruct cq() {
 	    if (magval) dtor() ;
 	} ; /* end dtor (cq) */
