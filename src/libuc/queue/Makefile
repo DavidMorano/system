@@ -45,7 +45,7 @@ OBJ1_QUEUE= pq.o ciq.o piq.o intiq.o
 OBJ2_QUEUE= cq.o fifoitem.o fifoelem.o
 OBJ3_QUEUE= charq.o chariq.o
 OBJ4_QUEUE= slq.o fifostr.o
-OBJ5_QUEUE= slist.o
+OBJ5_QUEUE= slist.o singlist.o
 OBJ6_QUEUE= shortq.o sintq.o
 OBJ7_QUEUE=
 
@@ -193,5 +193,7 @@ intiq.o:		intiq.cc intiq.h			$(INCS)
 
 # single-linked-list
 slist.o:		slist.cc slist.h			$(INCS)
+
+singlist.o:		singlist.cc	singlist.hh		$(INCS)
 
 
