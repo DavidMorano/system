@@ -47,7 +47,6 @@
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -61,11 +60,12 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 local inline int cq_ctor(cq *op,Args ... args) noex {
 	cnullptr	np{} ;
+    	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
-	    if ((op->qp = new(nothrow) vechand) != np) ylikely {
+	    if ((op->qp = new(nt) vechand) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-pq) */
 	} /* end if (non-null) */
@@ -79,7 +79,7 @@ local inline int cq_dtor(cq *op) noex {
 	    if (op->qp) ylikely {
 		delete op->qp ;
 		op->qp = nullptr ;
-	    }
+	    } /* end if (delete-vechand) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (cq_dtor) */
@@ -89,7 +89,7 @@ local int cq_magic(cq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == CQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (cq_magic) */
 
@@ -109,10 +109,10 @@ int cq_start(cq *op) noex {
 	    cint	de = CQ_DEFENTS ;
 	    if ((rs = vechand_start(op->qp,de,vo)) >= 0) ylikely {
 	        op->magval = CQ_MAGIC ;
-	    }
+	    } /* end */
 	    if (rs < 0) {
 		cq_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (cq_ctor) */
 	return rs ;
 } /* end subroutine (cq_start) */
@@ -124,11 +124,11 @@ int cq_finish(cq *op) noex {
 	    if (op->qp) ylikely {
 		rs1 = vechand_finish(op->qp) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = cq_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -144,28 +144,30 @@ int cq_ins(cq *op,void *ep) noex {
 
 int cq_rem(cq *op,void *vrp) noex {
 	int		rs ;
-	int		count = 0 ;
+	int		c = 0 ;
 	if ((rs = cq_magic(op)) >= 0) ylikely {
 	    if (void *vp ; (rs = vechand_get(op->qp,0,&vp)) >= 0) ylikely {
 		void	**rpp = voidpp(vrp) ;
 		if (rpp) *rpp = vp ;
 	    	vechand_del(op->qp,0) ;
-	        count = vechand_count(op->qp) ;
+	        rs = vechand_count(op->qp) ;
+		c = rs ;
 	    } /* end if (vechand_get) */
 	} /* end if (magic) */
-	return (rs >= 0) ? count : rs ;
+	return (rs >= 0) ? c : rs ;
 } /* end subroutine (cq_rem) */
 
 int cq_unlink(cq *op,void *ep) noex {
 	int		rs ;
-	int		count = 0 ;
+	int		c = 0 ;
 	if ((rs = cq_magic(op,ep)) >= 0) ylikely {
 	    if ((rs = vechand_ent(op->qp,ep)) >= 0) ylikely {
 		vechand_del(op->qp,0) ;
-		count = vechand_count(op->qp) ;
+		rs = vechand_count(op->qp) ;
+		c = rs ;
 	    }
 	} /* end if (magic) */
-	return (rs >= 0) ? count : rs ;
+	return (rs >= 0) ? c : rs ;
 } /* end subroutine (cq_unlink) */
 
 int cq_count(cq *op) noex {
