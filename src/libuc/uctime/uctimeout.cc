@@ -186,6 +186,7 @@ namespace {
 	int sigerworker	() noex ;
 	int sigerwait	() noex ;
 	int sigerserve	() noex ;
+	int sigersignal	() noex ;
 	int sigerdump	() noex ;
 	int dispbegin	() noex ;
 	int dispend	() noex ;
@@ -860,8 +861,7 @@ int uctimeout::sigerserve() noex {
 	            if (tep->val < dt) break ;
 	            if ((rs = vecsorthand_del(pqp,ei)) >= 0) {
 	                if ((rs = ciq_ins(&pass,tep)) >= 0) {
-	                    fcmd = true ;
-	                    rs = cnv.signal ;
+			    rs = sigersignal() ;
 	                }
 	            }
 	        }
@@ -872,6 +872,21 @@ int uctimeout::sigerserve() noex {
 	} /* end if (capture) */
 	return rs ;
 } /* end method (uctimeout::sigerserve) */
+
+int uctimeout::sigersignal() noex {
+        cint       	to = TO_CAPTURE ;
+        int             rs ;
+	int		rs1 ;
+	if ((rs = mtx.lockbegin(to)) >= 0) ylikely {
+	    {
+		fcmd = true ;
+		rs = cnv.signal ;
+	    }
+	    rs1 = mtx.lockend ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (mutex) */
+	return rs ;
+} /* end method (uctimeout::sigersignal) */
 
 int uctimeout::sigerdump() noex {
         ciq             *cqp = &pass ;
