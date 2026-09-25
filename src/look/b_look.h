@@ -1,4 +1,9 @@
-/* config */
+/* look_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* look-up word program */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,9 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	LOOKCONFIG_INCLUDE
+#define	LOOKCONFIG_INCLUDE
 
 
 #define	VERSION		"0a"
@@ -56,5 +64,8 @@
 #define	LOGFNAME	"var/log/look"		/* activity log */
 #define	LOCKFNAME	"spool/locks/look"	/* lock mutex file */
 #define	WORDSFNAME	"/usr/add-on/ncmp/share/dict/words"
+
+
+#endif /* LOOKCONFIG_INCLUDE */
 
 
