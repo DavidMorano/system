@@ -53,7 +53,6 @@
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -77,12 +76,13 @@ struct ciq_ent : pq_ent {
 template<typename ... Args>
 local inline int ciq_ctor(ciq *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((op->mxp = new(nothrow) ptm) != np) ylikely {
-	        if ((op->fifop = new(nothrow) pq) != np) ylikely {
-	            if ((op->freep = new(nothrow) pq) != np) ylikely {
+	    if ((op->mxp = new(nt) ptm) != np) ylikely {
+	        if ((op->fifop = new(nt) pq) != np) ylikely {
+	            if ((op->freep = new(nt) pq) != np) ylikely {
 		        rs = SR_OK ;
 	            } /* end if (new-pq) */
 		    if (rs < 0) {
@@ -384,11 +384,11 @@ local int pq_finishup(pq *qp) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-release) */
 	    if ((rs >= 0) && (rs1 != SR_EMPTY)) rs = rs1 ;
-	}
+	} /* end */
 	{
 	    rs1 = pq_finish(qp) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (pq_finishup) */
 
