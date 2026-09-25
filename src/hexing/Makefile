@@ -258,15 +258,6 @@ sesmsg.o:		sesmsg.c sesmsg.h
 
 msgdata.o:		msgdata.c msgdata.h
 
-
-shio.o:			shio.c shio.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-sbuf.o:			sbuf.c sbuf.h
-
 hexdecoder.o:		hexdecoder.cc hexdecoder.h
 	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) hexdecoder.cc
 
