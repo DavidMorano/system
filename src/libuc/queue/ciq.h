@@ -76,8 +76,8 @@ struct ciq : ciq_head {
 	int	gettail	(void *) noex ;
 	int	remtail	(void *) noex ;
 	int	rement	(void *) noex ;
-	void	dtor() noex ;
-	operator int () noex ;
+	void	dtor	() noex ;
+	operator int	() noex ;
 	destruct ciq() {
 	    if (magval) dtor() ;
 	} ; /* end dtor (ciq) */
