@@ -190,7 +190,7 @@ int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
                     fifostr_ent     *ep = op->head ;
                     for (int i = 0 ; (i < n) && ep ; i += 1) {
                         ep = ep->next ;
-                    }
+                    } /* end for */
                     if (ep) {
                         sl = ep->slen ;
                         if (rbuf) {
@@ -200,7 +200,7 @@ int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
                         } else {
                             rs = SR_OK ;
                         }
-                    }
+                    } /* end if */
                 } /* end if (possible) */
             } /* end if (valid) */
 	} /* end if (magic) */
@@ -218,11 +218,11 @@ int fifostr_entlen(fifostr *op,int n) noex {
                     fifostr_ent     *ep = op->head ;
                     for (int i = 0 ; (i < n) && ep ; i += 1) {
                         ep = ep->next ;
-                    }
+                    } /* end for */
                     if (ep) {
                         rs = SR_OK ;
                         sl = ep->slen ;
-                    }
+                    } /* end if */
                 } /* end if (possible) */
             } /* end if (valid) */
 	} /* end if (magic) */
@@ -241,14 +241,14 @@ int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
                     cchar   *sp = cast_reinterpret<charp>(ep) ;
                     sp += szof(fifostr_ent) ;
                     rs = snwcpy(rbuf,rlen,sp,sl) ;
-                }
+                } /* end */
                 if (rs >= 0) ylikely {
                     op->head = ep->next ;
                     if (op->head == nullptr) {
                         op->tail = nullptr ;
                     } else {
                         (op->head)->prev = nullptr ;
-                    }
+                    } /* end */
                     rs1 = libmem.free(ep) ;
 	    	    if (rs >= 0) rs = rs1 ;
                     op->ic -= 1 ;
@@ -256,7 +256,7 @@ int fifostr_rem(fifostr *op,char *rbuf,int rlen) noex {
                 } /* end if (successful removal) */
             } else {
 	        rs = SR_NOTFOUND ;
-	    }
+	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 } /* end subroutine (fifostr_rem) */
@@ -303,7 +303,7 @@ int fifostr_curenum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
                     }
                 } else {
                     rs = SR_NOTFOUND ;
-                }
+                } /* end if */
             } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
@@ -348,7 +348,7 @@ int fifostr_curdel(fifostr *op,fifostr_cur *curp) noex {
                 op->cnt -= sl ;
             } else {
                 rs = SR_NOTFOUND ;
-            }
+            } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (fifostr_curdel) */
@@ -391,7 +391,7 @@ local int fifostr_mat(fifostr *op,fifostr_ent *mep) noex {
 	    if (ep == mep) {
 	        rs = SR_OK ;
 	        break ;
-	    }
+	    } /* end */
 	    ep = ep->next ;
 	} /* end while */
 	return rs ;
