@@ -150,8 +150,8 @@ int aflag::ilockbegin(int to) noex {
 	} else {
 	    while (af.test_and_set(memord_acquire) == true) {
 		af.wait(true,memord_relaxed) ;
-	    }
-	}
+	    } /* end while */
+	} /* end if */
 	return rs ;
 } /* end method (aflag::ilockbegin) */
 
