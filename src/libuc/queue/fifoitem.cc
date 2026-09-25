@@ -114,7 +114,7 @@ int fifoitem_finish(fifoitem *op) noex {
 		if (rs == SR_NOENT) rs = SR_OK ;
 	    } else if (op->head || op->tail) {
 		rs = SR_BADFMT ;
-	    }
+	    } /* end if */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -128,8 +128,10 @@ int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
 	        fifoitem_ent	*ep = entp(vp) ;
 	        if ((rs = entry_start(ep,sp,sl)) >= 0) ylikely {
 		    if (op->head && op->tail) {
-	                ep->prev = op->tail ;
-	                (op->tail)->next = ep ;
+			fifoitem_ent *lep = op->tail ;
+	                ep->prev = lep->prev ;
+			ep->next = nullptr ;
+	                lep->next = ep ;
 	                op->tail = ep ;
 		    } else if (op->head || op->tail) {
 			rs = SR_BADFMT ;
@@ -141,8 +143,8 @@ int fifoitem_ins(fifoitem *op,cvoid *sp,int sl) noex {
 	            op->n += 1 ;
 	        } /* end if (entry_start) */
 	        if (rs < 0) {
-	            libmem.free(vp) ;
-	        }
+	            libmem.free(vp) ; 
+	        } /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (magic) */
 	return (rs >= 0) ? op->n : rs ;
@@ -166,15 +168,15 @@ int fifoitem_rem(fifoitem *op,void *vbuf,int vlen) noex {
 	                op->tail = nullptr ;
 	            } else {
 	                (op->head)->prev = nullptr ;
-	            }
+	            } /* end if */
 	            {
 	                rs1 = entry_finish(ep) ;
 	                if (rs >= 0) rs = rs1 ;
-	            }
+	            } /* end */
 	            {
 	                rs1 = libmem.free(ep) ;
 	                if (rs >= 0) rs = rs1 ;
-	            }
+	            } /* end if (memory-release) */
 	            op->n -= 1 ;
 		} /* end if (not-overflow) */
 	    } else if (op->head || op->tail) {
@@ -205,11 +207,11 @@ int fifoitem_del(fifoitem *op) noex {
 	        {
 	            rs1 = entry_finish(ep) ;
 	            if (rs >= 0) rs = rs1 ;
-	        }
+	        } /* end */
 	        {
 	            rs1 = libmem.free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
-	        }
+	        } /* end if (memory-release) */
 	        op->n -= 1 ;
 	    } else if (op->head || op->tail) {
 		rs = SR_BADFMT ;
@@ -276,7 +278,7 @@ int fifoitem_curdel(fifoitem *op,fifoitem_cur *curp) noex {
 	        ep = op->head ;
 	    } else {
 	        ep = curp->current ;
-	    }
+	    } /* end if */
 	    if (ep) {
 	        if (curp) {
 	            if (ep->prev == nullptr) {
@@ -301,15 +303,15 @@ int fifoitem_curdel(fifoitem *op,fifoitem_cur *curp) noex {
 	        {
 	            rs1 = entry_finish(ep) ;
 	            if (rs >= 0) rs = rs1 ;
-	        }
+	        } /* end */
 	        {
 	            rs1 = libmem.free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
-	        }
+	        } /* end if (memory-release) */
 	        op->n -= 1 ;
 	    } else {
 	        rs = SR_NOTFOUND ;
-	    }
+	    } /* end if */
 	    n = op->n ;
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
@@ -323,11 +325,11 @@ int fifoitem_curenum(fifoitem *op,fifoitem_cur *curp,void *rvp) noex {
 	        ep = op->head ;
 	    } else {
 	        ep = (curp->current)->next ;
-	    }
+	    } /* end */
 	    curp->current = ep ;
 	    if (rvp && ep) {
 		memcopy(rvp,ep->dp,ep->dl) ;
-	    }
+	    } /* end */
 	    rs = (ep) ? ep->dl : SR_NOTFOUND ;
 	} /* end if (magic) */
 	return rs ;
@@ -345,11 +347,11 @@ local int fifoitem_curfetch(fifoitem *op,fifoitem_cur *curp,
 	        ep = op->head ;
 	    } else {
 	        ep = (curp->current)->next ;
-	    }
+	    } /* end */
 	    curp->current = ep ;
 	    if (rpp) {
 	        *rpp = ep ;
-	    }
+	    } /* end */
 	    rs = (ep) ? ep->dl : SR_NOTFOUND ;
 	} /* end if (magic) */
 	return rs ;
@@ -364,7 +366,7 @@ local int entry_start(fifoitem_ent *ep,cvoid *vp,int sl) noex {
 	if (void *dp ; (rs = libmem.item(sp,sl,&dp)) >= 0) ylikely {
 	    ep->dp = cvoidp(dp) ;
 	    ep->dl = sl ;
-	}
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (entry_start) */
 
@@ -375,7 +377,7 @@ local int entry_finish(fifoitem_ent *ep) noex {
 	    rs1 = libmem.free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->dp = nullptr ;
-	}
+	} /* end if (memory-release) */
 	ep->next = nullptr ;
 	ep->prev = nullptr ;
 	return rs ;
