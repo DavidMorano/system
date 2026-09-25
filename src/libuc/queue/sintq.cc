@@ -5,6 +5,7 @@
 /* short-integer queue module */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -47,6 +48,10 @@ import deb ;				/* LIBU |debprintf(3u)| */
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
 
 /* imported namespaces */
 
@@ -74,7 +79,8 @@ local int sinq_ext(sintq *) noex ;
 
 /* local variables */
 
-cint		esz = szof(short) ;	/* entry-size */
+cint		esz		= szof(short) ;	/* entry-size */
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
