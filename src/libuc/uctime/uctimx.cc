@@ -153,8 +153,8 @@ typedef vecsorthand	prique ;
 
 namespace {
     struct uctimxent {
-	uctimx_f	notf ;		/* notify function (C-linkage) */
-	void		*objp ;		/* object pointer (function argument) */
+	uctimx_f	notfun ;	/* notification function pointer */
+	voidp		notobj ;	/* notification function object */
 	psem		*psemp ;	/* POSIX® Semaphore pointer */
 	time_t		val ;		/* i-timer-value */
 	int		id ;		/* timer-ID */
@@ -437,27 +437,19 @@ int timemgr::cmdsub(cmdsubs cmd,int id,timemgr_arg *uap) noex {
 int timemgr::pinit() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
-	DPRINTF("ent\n") ;
 	if (! fvoid) {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
-	    DPRINTF("1\n") ;
 	    if (! finit.testandset) {
-	    DPRINTF("2\n") ;
 	        if ((rs = mtx.create) >= 0) ylikely {
-	    DPRINTF("3\n") ;
 	            if ((rs = cnv.create) >= 0) ylikely {
 	                void_f	b = timemgr_atforkbefore ;
 	                void_f	ap = timemgr_atforkparent ;
 	                void_f	ac = timemgr_atforkchild ;
-	    DPRINTF("4\n") ;
 	                if ((rs = uc_atforkrec(b,ap,ac)) >= 0) ylikely {
 			    void_f	e = timemgr_exit ;
-	    DPRINTF("5\n") ;
 	                    if ((rs = uc_atexit(e)) >= 0) ylikely {
-	    DPRINTF("6\n") ;
 				if ((rs = initx) >= 0) {
-				    DPRINTF("initx() rs=%d\n",rs) ;
 	                            finitdone = true ;
 	                            f = true ;
 				} /* end if (initx) */
@@ -491,7 +483,6 @@ int timemgr::pinit() noex {
 	        rs = tw(lamb) ;			/* <- time-watching */
 	    } /* end if (initialization) */
 	} /* end if (not-voided) */
-	DPRINTF("ret rs=%d f=%d\n",rs,f) ;
 	return (rs >= 0) ? f : rs ;
 } /* end method (timemgr::pinit) */
 
@@ -647,16 +638,15 @@ int timemgr::cmd_destroy(int id,timemgr_arg *) noex {
 
 int timemgr::cmd_set(int id,timemgr_arg *uap) noex {
 	int		rs ;
-	(void) uap ;
 	DEBPRINTF("ent val=%ld\n",uap->ntim) ;
 	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
 	    DEBPRINTF("ei=%d\n",rs) ;
 	    if (uctimxent *ep = resumelife<uctimxent>(vp) ; ep) ylikely {
 		custime dt = getustime ;
-		ep->val = uap->ntim ;	/* <- set time-value */
 		if (time_t *rtp = uap->rtp) {
 		    *rtp = max((ep->val - dt),0L) ;
 		} /* end if (remaining time) */
+		ep->val = uap->ntim ;	/* <- set time-value */
 		if ((ep->val - dt) > 0) {
 	    	    DEBPRINTF("-> priqins\n") ;
 		    rs = priqins(ep) ;
@@ -670,10 +660,19 @@ int timemgr::cmd_set(int id,timemgr_arg *uap) noex {
 	return rs ;
 } /* end method (timemgr::cmd_set) */
 
-int timemgr::cmd_get(int id,timemgr_arg *) noex {
+int timemgr::cmd_get(int id,timemgr_arg *uap) noex {
     	int		rs = SR_OK ;
 	DEBPRINTF("ent\n") ;
-	(void) id ;
+	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
+	    DEBPRINTF("ei=%d\n",rs) ;
+	    if (uctimxent *ep = resumelife<uctimxent>(vp) ; ep) ylikely {
+		custime dt = getustime ;
+		rs = SR_OK ;
+		if (time_t *rtp = uap->rtp) {
+		    *rtp = max((ep->val - dt),0L) ;
+		} /* end if (remaining time) */
+	    } /* end if (non-null) */
+	} /* end if (vechand_get) */
 	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method (timemgr::cmd_get) */
@@ -681,7 +680,12 @@ int timemgr::cmd_get(int id,timemgr_arg *) noex {
 int timemgr::cmd_over(int id,timemgr_arg *) noex {
     	int		rs = SR_OK ;
 	DEBPRINTF("ent\n") ;
-	(void) id ;
+	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
+	    DEBPRINTF("ei=%d\n",rs) ;
+	    if (uctimxent *ep = resumelife<uctimxent>(vp) ; ep) ylikely {
+		rs = SR_OK ;
+	    } /* end if (non-null) */
+	} /* end if (vechand_get) */
 	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method (timemgr::cmd_over) */
@@ -1275,9 +1279,9 @@ int timemgr::disprempri(uctimxent *tep) noex {
 
 int timemgr::deliver(uctimxent *tep) noex {
     	int		rs ;
-	if ((rs = deliversem(tep)) > 0) {
-	    if (cauto notf = tep->notf) {
-	        rs = notf(tep->objp,tep->id,tep->notarg) ;
+	if ((rs = deliversem(tep)) >= 0) {
+	    if (cauto notf = tep->notfun) {
+	        rs = notf(tep->notobj,tep->id,tep->notarg) ;
 	    } /* end if */
 	} /* end if (deliversem) */
 	return rs ;
@@ -1381,8 +1385,8 @@ local void timemgr_exit() noex {
 int uctimxnote::load (void *op,psem *psp,uctimx_f fp,int a) noex {
     	int		rs = SR_FAULT ;
 	if (op) {
-	    notf	= fp ;		/* notify function (C-linkage) */
-	    objp	= op ;		/* object pointer (function argument) */
+	    notfun	= fp ;		/* notify function (C-linkage) */
+	    notobj	= op ;		/* object pointer (function argument) */
 	    psemp	= psp ;		/* POSIX® Semaphore pointer */
 	    notarg	= a ;		/* notification function argument */
 	} /* end if (non-null) */
@@ -1392,8 +1396,8 @@ int uctimxnote::load (void *op,psem *psp,uctimx_f fp,int a) noex {
 local void uctimxent_load(uctimxent *ep,con uctimxnote *nop) noex {
     	ep->val = {} ;
 	ep->id = 0 ;
-	ep->notf	= nop->notf ;
-	ep->objp	= nop->objp ;
+	ep->notfun	= nop->notfun ;
+	ep->notobj	= nop->notobj ;
 	ep->psemp	= nop->psemp ;
 	ep->notarg	= nop->notarg ;
 } /* end subroutine (uctimxeent_load) */
