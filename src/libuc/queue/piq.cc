@@ -47,7 +47,6 @@
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -67,11 +66,12 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 local inline int piq_ctor(piq *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((op->mxp = new(nothrow) ptm) != np) ylikely {
-	        if ((op->qlp = new(nothrow) pq) != np) ylikely {
+	    if ((op->mxp = new(nt) ptm) != np) ylikely {
+	        if ((op->qlp = new(nt) pq) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-pq) */
 		if (rs < 0) {
@@ -90,11 +90,11 @@ local inline int piq_dtor(piq *op) noex {
 	    if (op->qlp) ylikely {
 		delete op->qlp ;
 		op->qlp = nullptr ;
-	    }
+	    } /* end if (delete-pq) */
 	    if (op->mxp) ylikely {
 		delete op->mxp ;
 		op->mxp = nullptr ;
-	    }
+	    } /* end if (delete-ptm) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (piq_dtor) */
@@ -143,16 +143,16 @@ int piq_finish(piq *op) noex {
 	    if (op->qlp) ylikely {
 	        rs1 = pq_finish(op->qlp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (op->mxp) ylikely {
 	        ptm *mxp = op->mxp ;
 	        rs1 = mxp->destroy ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = piq_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -188,7 +188,7 @@ int piq_rem(piq *op,void *vrp) noex {
 	        if (pq_ent *pep{} ; (rs = pq_remtail(op->qlp,&pep)) >= 0) {
 	            c = rs ;
 	            if (vpp) *vpp = pep ;
-	        }
+	        } /* end */
 	        rs1 = mxp->lockend ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
