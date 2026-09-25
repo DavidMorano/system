@@ -96,7 +96,7 @@ int charq_finish(charq *op) noex {
 	        rs1 = libmem.free(op->qbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->qbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->qlen = 0 ;
 	    op->cnt = 0 ;
 	} /* end if (non-null) */
@@ -146,7 +146,7 @@ int charq_size(charq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = op->qlen ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (charq_size) */
 
@@ -154,7 +154,7 @@ int charq_count(charq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = op->cnt ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (charq_count) */
 
@@ -169,7 +169,7 @@ int charq::rem(char *rp) noex {
 void charq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("charq",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (charq::dtor) */
 
 charq::operator int () noex {
