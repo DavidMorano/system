@@ -59,7 +59,6 @@
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -72,11 +71,12 @@ typedef q_ent		*entp ;
 template<typename ... Args>
 local inline int aiq_ctor(aiq *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
-	    if ((op->qp = new(nothrow) q) != np) ylikely {
+	    if ((op->qp = new(nt) q) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-pq) */
 	} /* end if (non-null) */
@@ -100,7 +100,7 @@ local int aiq_magic(aiq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == AIQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (aiq_magic) */
 
@@ -121,7 +121,7 @@ int aiq_start(aiq *op,int type) noex {
 	    } /* end if (q-start) */
 	    if (rs < 0) {
 		aiq_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (aiq_ctor) */
 	return rs ;
 } /* end subroutine (aiq_start) */
@@ -133,11 +133,11 @@ int aiq_finish(aiq *op) noex {
 	    if (op->qp) ylikely {
 		rs1 = q_finish(op->qp) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = aiq_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
