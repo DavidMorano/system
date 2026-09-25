@@ -212,7 +212,7 @@ int plainq_unlink(plainq *op,plainq_ent *ep) noex {
                         } else {
                             rs = SR_BADFMT ;
                         }
-                    }
+                    } /* end if */
                 } else {
                     ptrdiff_t       eo = (ca(ep) - qha) ;
                     if (ep->prev != 0) {
@@ -230,7 +230,7 @@ int plainq_unlink(plainq *op,plainq_ent *ep) noex {
                         } else {
                             rs = SR_BADFMT ;
                         }
-                    }
+                    } /* end if */
                 } /* end if */
                 if (rs >= 0) ylikely {
                     ep->next = 0 ;
@@ -239,7 +239,7 @@ int plainq_unlink(plainq *op,plainq_ent *ep) noex {
                 } /* end if (ok) */
             } else {
                 if (op->head || op->tail) rs = SR_BADFMT ;
-            }
+            } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (plainq_unlink) */
@@ -254,28 +254,30 @@ int plainq_rem(plainq *op,plainq_ent **epp) noex {
                 plainq_ent       *ep = entp(op->head + qha) ;
                 if (op->head != op->tail) {
                     rs = SR_BADFMT ;
-                    if (ep->next && (ep->prev == 0)) {
+                    if (ep->next && iszero(ep->prev)) {
                         plainq_ent   *nep = entp(ep->next + qha) ;
                         rs = SR_OK ;
                         nep->prev = 0 ;
                         op->head = ep->next ;
                         rc = --op->cnt ;
-                    }
+                    } /* end if */
                 } else {
                     rs = SR_OK ;
                     op->head = 0 ;
                     op->tail = 0 ;
                     rc = --op->cnt ;
-                }
+                } /* end if */
                 if (epp && (rs >= 0)) {
                     ep->prev = 0 ;
                     ep->next = 0 ;
                     *epp = ep ;
-                }
+                } /* end if (ok) */
             } else {
                 if (op->head || op->tail) rs = SR_BADFMT ;
             } /* end if (not-empty) */
-            if (epp && (rs < 0)) *epp = nullptr ;
+            if (epp && (rs < 0)) {
+		*epp = nullptr ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (plainq_rem) */
@@ -320,18 +322,18 @@ int plainq_remtail(plainq *op,plainq_ent **epp) noex {
 	                    if (op->tail == 0) op->head = 0 ;
 			    pep->next = 0 ;
 		            rc = --op->cnt ;
-			}
+			} /* end if */
 		    } else {
 			rs = SR_OK ;
 			op->head = 0 ;
 			op->tail = 0 ;
 			rc = --op->cnt ;
-		    }
+		    } /* end if */
 	            if (epp) {
 			ep->next = 0 ;
 			ep->prev = 0 ;
 			*epp = ep ;
-		    }
+		    } /* end if */
 		} else {
 		    if (op->head || op->tail) rs = SR_BADFMT ;
 		} /* end if (not-empty) */
@@ -355,7 +357,7 @@ int plainq_gettail(plainq *op,plainq_ent **epp) noex {
 		        rc = op->cnt ;
 	            } else {
 		        rs = SR_BADFMT ;
-	            }
+	            } /* end if */
 		} else {
 		    if (op->head || op->tail) rs = SR_BADFMT ;
 		} /* end if (not-empty) */
