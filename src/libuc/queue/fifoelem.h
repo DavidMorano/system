@@ -97,7 +97,7 @@ struct fifoelem : fifoelem_head {
 	operator int 	() noex ;
 	destruct fifoelem() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end destruct */
 } ; /* end struct (fifoelem) */
 #else	/* __cplusplus */
 typedef FIFOSTR		fifoelem ;
