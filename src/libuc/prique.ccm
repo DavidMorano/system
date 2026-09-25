@@ -51,16 +51,17 @@ module ;
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>
-#include	<utility>
-#include	<queue>
-#include	<vector>
-#include	<functional>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<new>			/* C++SYD */
+#include	<utility>		/* C++SYD */
+#include	<queue>			/* C++SYD */
+#include	<vector>		/* C++SYD */
+#include	<functional>		/* C++SYD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"prique.hh"
 
@@ -83,22 +84,22 @@ export {
 	constexpr void operator () (pq_t *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	constexpr int operator () (int = 0) noex ;
 	constexpr operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (prique_co) */
     template<typename K> struct prique_rem {
         using		pq_t = prique<K> ;
 	pq_t		*op = nullptr ;
 	constexpr void operator () (pq_t *p) noex {
 	    op = p ;
-	} ;
+	} ; /* end */
 	constexpr int operator () (K * = nullptr) noex ;
 	constexpr operator int () noex {
 	    return operator () (nullptr) ;
-	} ;
+	} ; /* end */
     } ; /* end struct (prique_rem) */
     template<typename K> class prique {
 	prique_is<K>	*mp = nullptr ;
@@ -137,7 +138,7 @@ export {
 
     template<typename K> constexpr int prique<K>::istart(int n) noex {
 	int		rs = SR_INVALID ;
-	if (n >= 0) {
+	if (n >= 0) ylikely {
 	    rs = SR_NOMEM ;
 	    try {
 		const nothrow_t		nt = std::nothrow ;
@@ -148,21 +149,21 @@ export {
 	    } catch (...) {
 		rs = SR_NOMEM ;
 	    }
-	}
+	} /* end if */
 	return rs ;
     } /* end method (prique::istart) */
     template<typename K> constexpr int prique<K>::ifinish() noex {
 	int		rs = SR_BUGCHECK ;
-	if (mp) {
+	if (mp) ylikely {
 	    delete mp ;
 	    mp = nullptr ;
 	    rs = SR_OK ;
-	}
+	} /* end if (delete) */
 	return rs ;
     } /* end method (prique::ifinish) */
     template<typename K> constexpr int prique<K>::ins(const K *kp) noex {
 	int		rs = SR_BUGCHECK ;
-	if (mp && kp) {
+	if (mp && kp) ylikely {
 	    rs = SR_OK ;
 	    try {
 	        mp->push(*kp) ;
@@ -177,14 +178,15 @@ export {
     } ; /* end */
     template<typename K> constexpr int prique<K>::icount() noex {
 	int		rs = SR_BUGCHECK ;
-	if (mp) {
-	    rs = mp->size() ;
+	if (mp) ylikely {
+	    csize qsize = mp->size() ;
+	    rs = conv<int>(qsize) ;
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::icount) */
     template<typename K> constexpr int prique<K>::get(const K *ep) noex {
 	int		rs = SR_BUGCHECK ;
-	if (mp) {
+	if (mp) ylikely {
 	    rs = SR_FAULT ;
 	    if (ep) {
 	        if (! mp->empty()) {
@@ -203,7 +205,7 @@ export {
     } /* end method (prique::get) */
     template<typename K> constexpr int prique<K>::irem(K *ep) noex {
 	int		rs = SR_BUGCHECK ;
-	if (mp) {
+	if (mp) ylikely {
 	    if (! mp->empty()) {
 	        try {
 	            if (ep) {
@@ -222,14 +224,14 @@ export {
     } ; /* end */
     template<typename K> constexpr int prique_rem<K>::operator () (K *ep) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->irem(ep) ;
 	}
 	return rs ;
     } ; /* end */
     template<typename K> constexpr int prique_co<K>::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case priquemem_start:
 	        rs = op->istart(a) ;
