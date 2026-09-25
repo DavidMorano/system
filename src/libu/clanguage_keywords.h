@@ -126,6 +126,10 @@
 #define	conv			static_cast
 #endif
 
+#ifndef	once_call
+#define	once_call		call_once
+#endif
+
 
 #endif /* CLANGUAGEKEYWORDS_INCLUDE */
 
