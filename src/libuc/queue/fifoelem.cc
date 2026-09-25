@@ -135,7 +135,7 @@ int fifoelem_ins(FE *op,void *usp) noex {
 	                ep->prev = ep->next = nullptr ;
 	            } else {
 			rs = SR_BADFMT ;
-	            }
+	            } /* end if */
 	            op->n += 1 ;
 		    if (rs < 0) {
 			entry_finish(ep) ;
@@ -167,15 +167,15 @@ int fifoelem_rem(FE *op,void *ebuf,int elen) noex {
 	    	       op->tail = nullptr ;
 		    } else {
 	    	        (op->head)->prev = nullptr ;
-		    }
+		    } /* emd if */
 		    {
 		       rs1 = entry_finish(ep) ;
 		       if (rs >= 0) rs = rs1 ;
-		    }
+		    } /* end */
 		    {
 		       rs1 = libmem.free(ep) ;
 		       if (rs >= 0) rs = rs1 ;
-		    }
+		    } /* end if (memory-release) */
 		    op->n -= 1 ;
 	        } /* end if (valid) */
 	    } /* end if (empty) */
@@ -196,7 +196,7 @@ int fifoelem_get(FE *op,FE_ENT **epp) noex {
 		rs = SR_NOTFOUND ;
 	    } else {
 		rs = SR_BADFMT ;
-	    }
+	    } /* end if */
 	    if (epp) *epp = ep ;
 	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
@@ -215,22 +215,22 @@ int fifoelem_del(FE *op) noex {
 	            op->tail = nullptr ;
 	        } else {
 	            (op->head)->prev = nullptr ;
-	        }
+	        } /* end if */
 	        {
 	            rs1 = entry_finish(ep) ;
 	            if (rs >= 0) rs = rs1 ;
-	        }
+	        } /* end */
 	        {
 	            rs1 = libmem.free(ep) ;
 	            if (rs >= 0) rs = rs1 ;
-	        }
+	        } /* end if (memory-release) */
 	        op->n -= 1 ;
 	        n = op->n ;
 	    } else if ((op->head == np) && (op->tail == np)) {
 		rs = SR_NOTFOUND ;
 	    } else {
 		rs = SR_BADFMT ;
-	    }
+	    } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (fifoelem_del) */
@@ -320,15 +320,15 @@ int fifoelem_curdel(FE *op,FE_CUR *curp) noex {
 		rs = SR_NOTFOUND ;
 	    } else {
 		rs = SR_BADFMT ;
-	    }
+	    } /* end if */
 	    {
 	        rs1 = entry_finish(ep) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = libmem.free(ep) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if (memory-release) */
 	    op->n -= 1 ;
 	    n = op->n ;
 	} /* end if (magic) */
@@ -346,14 +346,14 @@ int fifoelem_curenum(FE *op,FE_CUR *curp,FE_ENT **epp) noex {
 	            ep = op->head ;
 	        } else {
 	            ep = (curp->current)->next ;
-	        }
+	        } /* end if */
 	        curp->current = ep ;
 		dl = ep->dl ;
 	    } else if ((op->head == np) && (op->tail == np)) {
 		rs = SR_NOTFOUND ;
 	    } else {
 		rs = SR_BADFMT ;
-	    }
+	    } /* end if */
 	    if (epp) *epp = ep ;
 	} /* end if (magic) */
 	return (rs >= 0) ? dl : rs ;
@@ -373,7 +373,7 @@ local int entry_start(FE_ENT *ep,cvoid *vsp,int vsl) noex {
 	if (cchar *cp ; (rs = libmem.strw(sp,vsl,&cp)) >= 0) ylikely {
 	    ep->dl = vsl ;
 	    ep->dp = voidp(cp) ;
-	}
+	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (entry_start) */
 
@@ -384,7 +384,7 @@ local int entry_finish(FE_ENT *ep) noex {
 	    rs1 = libmem.free(ep->dp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->dp = nullptr ;
-	}
+	} /* end if (memory-release) */
 	ep->dl = 0 ;
 	return rs ;
 } /* end subroutine (entry_finish) */
