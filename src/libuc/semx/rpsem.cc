@@ -59,6 +59,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |msleep(3c)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"rpsem.h"
@@ -69,16 +70,26 @@
 /****
 This "define" crap below is needed in order to avoid a compiler
 error (on Apple-Darwin).  Apple-Darwin has marked the two subroutine
-callas below as "depracated."  So in order to avoid that crap, I need to
+calls below as "depracated."  So in order to avoid that crap, I need to
 do the following.
 ****/
 
-#if	(!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0)
+#if	defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0)
+/*----------------------------------------------------------------------------*/
+
+/* nothing needed */
+
+/*----------------------------------------------------------------------------*/
+#else /* defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0) */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+/*----------------------------------------------------------------------------*/
+
 #define	sem_init	darwinsem_init
 #define	sem_destroy	darwinsem_destroy
-#endif
-#endif /* (!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0) */
+
+/*----------------------------------------------------------------------------*/
+#endif /* end if (Apple-Darwin operating system) */
+#endif /* defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0) */
 
 #undef	NLPS
 #define	NLPS		5	/* number of polls per second */
@@ -124,12 +135,24 @@ int rpsem_create(rpsem *op,int pshared,int acnt) noex {
 	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_INVALID ;
-	    if (acnt > 0) {
+	    if (acnt >= 0) {
+		bool fexit = false ;
 	        repeat {
 	            if ((rs = sem_init(&op->ps,pshared,acnt)) < 0) {
 		        rs = (neg errno) ;
-	            }
-	        } until (rs != SR_INTR) ;
+			switch (rs) {
+			case SR_INTR:
+			    break ;
+	    	        case SR_AGAIN:
+			case SR_NOSPC:
+			    msleep(1) ;
+			    break ;
+			default:
+			    fexit = true ;
+			    break ;
+			} /* end switch */
+	            } /* end if (sem_init) */
+	        } until ((rs >= 0) || fexit) ;
 		if (rs >= 0) {
 		    op->magval = RPSEM_MAGIC ;
 		} /* end if (ok) */
