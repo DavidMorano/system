@@ -38,7 +38,7 @@
 
 
 struct charq_head {
-	char		*qbuf ;
+	charp		qbuf ;
 	int		qlen ;
 	int		ri ;
 	int		wi ;
