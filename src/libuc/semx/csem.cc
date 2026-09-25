@@ -142,11 +142,11 @@ local int	csem_ptcinit(csem *,int) noex ;
 
 /* exported subroutines */
 
-int csem_create(csem *op,int f_shared,int count) noex {
+int csem_create(csem *op,int f_shared,int acnt) noex {
 	int		rs ;
 	assert(op) ;
 	if ((rs = csem_ctor(op)) >= 0) ylikely {
-	    op->cnt = (count > 0) ? count : 0 ;
+	    op->cnt = (acnt > 0) ? acnt : 0 ;
 	    if ((rs = csem_ptminit(op,f_shared)) >= 0) ylikely {
 		ptm *mxp = op->mxp ;
 	        if ((rs = csem_ptcinit(op,f_shared)) >= 0) ylikely {
