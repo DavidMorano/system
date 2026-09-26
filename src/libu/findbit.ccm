@@ -194,198 +194,198 @@ template<integral_unsigned T> constexpr int flbcx(T uv) noex {
 /* exported subroutines */
 
 export {
-    constexpr int ffbsi(uint uv) noex {
+    constexpr int ffbsi(uint uv)			noex {
 	return ffbsx(uv) ;
-    }
-    constexpr int ffbsl(ulong uv) noex {
+    } /* end subroutine */
+    constexpr int ffbsl(ulong uv)			noex {
 	return ffbsx(uv) ;
-    }
-    constexpr int ffbsll(ulonglong uv) noex {
+    } /* end subroutine */
+    constexpr int ffbsll(ulonglong uv)			noex {
 	return ffbsx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr int ffbci(uint uv) noex {
+    constexpr int ffbci(uint uv)			noex {
 	return ffbcx(uv) ;
-    }
-    constexpr int ffbcl(ulong uv) noex {
+    } /* end subroutine */
+    constexpr int ffbcl(ulong uv)			noex {
 	return ffbcx(uv) ;
-    }
-    constexpr int ffbcll(ulonglong uv) noex {
+    } /* end subroutine */
+    constexpr int ffbcll(ulonglong uv)			noex {
 	return ffbcx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr int flbsi(uint uv) noex {
+    constexpr int flbsi(uint uv)			noex {
 	return flbsx(uv) ;
-    }
-    constexpr int flbsl(ulong uv) noex {
+    } /* end subroutine */
+    constexpr int flbsl(ulong uv)			noex {
 	return flbsx(uv) ;
-    }
-    constexpr int flbsll(ulonglong uv) noex {
+    } /* end subroutine */
+    constexpr int flbsll(ulonglong uv)			noex {
 	return flbsx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr int flbci(uint uv) noex {
+    constexpr int flbci(uint uv)			noex {
 	return flbcx(uv) ;
-    }
-    constexpr int flbcl(ulong uv) noex {
+    } /* end subroutine */
+    constexpr int flbcl(ulong uv)			noex {
 	return flbcx(uv) ;
-    }
-    constexpr int flbcll(ulonglong uv) noex {
+    } /* end subroutine */
+    constexpr int flbcll(ulonglong uv)			noex {
 	return flbcx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr int fbscounti(uint uv) noex {
+    constexpr int fbscounti(uint uv)			noex {
     	return popcount(uv) ;
-    }
-    constexpr int fbscountl(ulong uv) noex {
+    } /* end subroutine */
+    constexpr int fbscountl(ulong uv)			noex {
     	return popcount(uv) ;
-    }
-    constexpr int fbscountll(ulonglong uv) noex {
+    } /* end subroutine */
+    constexpr int fbscountll(ulonglong uv)		noex {
     	return popcount(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr inline int ffbs		(uint uv) noex {
+    constexpr inline int ffbs		(uint uv)	noex {
 	return ffbsx(uv) ;
-    }
-    constexpr inline int ffbs		(ulong uv) noex {
+    } /* end subroutine */
+    constexpr inline int ffbs		(ulong uv)	noex {
 	return ffbsx(uv) ;
-    }
-    constexpr inline int ffbs		(ulonglong uv) noex {
+    } /* end subroutine */
+    constexpr inline int ffbs		(ulonglong uv)	noex {
 	return ffbsx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr inline int ffbc		(uint uv) noex {
+    constexpr inline int ffbc		(uint uv)	noex {
 	return ffbcx(uv) ;
-    }
-    constexpr inline int ffbc		(ulong uv) noex {
+    } /* end subroutine */
+    constexpr inline int ffbc		(ulong uv)	noex {
 	return ffbcx(uv) ;
-    }
-    constexpr inline int ffbc		(ulonglong uv) noex {
+    } /* end subroutine */
+    constexpr inline int ffbc		(ulonglong uv)	noex {
 	return ffbcx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr inline int flbs		(uint uv) noex {
+    constexpr inline int flbs		(uint uv)	noex {
 	return flbsx(uv) ;
-    }
-    constexpr inline int flbs		(ulong uv) noex {
+    } /* end subroutine */
+    constexpr inline int flbs		(ulong uv)	noex {
 	return flbsx(uv) ;
-    }
-    constexpr inline int flbs		(ulonglong uv) noex {
+    } /* end subroutine */
+    constexpr inline int flbs		(ulonglong uv)	noex {
 	return flbsx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr inline int flbc		(uint uv) noex {
+    constexpr inline int flbc		(uint uv)	noex {
 	return flbcx(uv) ;
-    }
-    constexpr inline int flbc		(ulong uv) noex {
+    } /* end subroutine */
+    constexpr inline int flbc		(ulong uv)	noex {
 	return flbcx(uv) ;
-    }
-    constexpr inline int flbc		(ulonglong uv) noex {
+    } /* end subroutine */
+    constexpr inline int flbc		(ulonglong uv)	noex {
 	return flbcx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr inline int fbscount	(uint uv) noex {
+    constexpr inline int fbscount	(uint uv)	noex {
 	return popcount(uv) ;
-    }
-    constexpr inline int fbscount	(ulong uv) noex {
+    } /* end subroutine */
+    constexpr inline int fbscount	(ulong uv)	noex {
 	return popcount(uv) ;
-    }
-    constexpr inline int fbscount	(ulonglong uv) noex {
+    } /* end subroutine */
+    constexpr inline int fbscount	(ulonglong uv)	noex {
 	return popcount(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr inline int ffbs		(int v) noex {
+    constexpr inline int ffbs		(int v)		noex {
     	cuint uv = uint(v) ;
 	return ffbsx(uv) ;
-    }
-    constexpr inline int ffbs		(long v) noex {
+    } /* end subroutine */
+    constexpr inline int ffbs		(long v)	noex {
     	culong uv = ulong(v) ;
 	return ffbsx(uv) ;
-    }
-    constexpr inline int ffbs		(longlong v) noex {
+    } /* end subroutine */
+    constexpr inline int ffbs		(longlong v)	noex {
     	culonglong uv = ulonglong(v) ;
 	return ffbsx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr inline int ffbc		(int v) noex {
+    constexpr inline int ffbc		(int v)		noex {
     	cuint uv = uint(v) ;
 	return ffbcx(uv) ;
-    }
-    constexpr inline int ffbc		(long v) noex {
+    } /* end subroutine */
+    constexpr inline int ffbc		(long v)	noex {
     	culong uv = ulong(v) ;
 	return ffbcx(uv) ;
-    }
-    constexpr inline int ffbc		(longlong v) noex {
+    } /* end subroutine */
+    constexpr inline int ffbc		(longlong v)	noex {
     	culonglong uv = ulonglong(v) ;
 	return ffbcx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr inline int flbs		(int v) noex {
+    constexpr inline int flbs		(int v)		noex {
     	cuint uv = uint(v) ;
 	return flbsx(uv) ;
-    }
-    constexpr inline int flbs		(long v) noex {
+    } /* end subroutine */
+    constexpr inline int flbs		(long v)	noex {
     	culong uv = ulong(v) ;
 	return flbsx(uv) ;
-    }
-    constexpr inline int flbs		(longlong v) noex {
+    } /* end subroutine */
+    constexpr inline int flbs		(longlong v)	noex {
     	culonglong uv = ulonglong(v) ;
 	return flbsx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr inline int flbc		(int v) noex {
+    constexpr inline int flbc		(int v)		noex {
     	cuint uv = uint(v) ;
 	return flbcx(uv) ;
-    }
-    constexpr inline int flbc		(long v) noex {
+    } /* end subroutine */
+    constexpr inline int flbc		(long v)	noex {
     	culong uv = ulong(v) ;
 	return flbcx(uv) ;
-    }
-    constexpr inline int flbc		(longlong v) noex {
+    } /* end subroutine */
+    constexpr inline int flbc		(longlong v)	noex {
     	culonglong uv = ulonglong(v) ;
 	return flbcx(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
-    constexpr inline int fbscount	(int v) noex {
+    constexpr inline int fbscount	(int v)		noex {
     	cuint uv = uint(v) ;
 	return popcount(uv) ;
-    }
-    constexpr inline int fbscount	(long v) noex {
+    } /* end subroutine */
+    constexpr inline int fbscount	(long v)	noex {
     	culong uv = ulong(v) ;
 	return popcount(uv) ;
-    }
-    constexpr inline int fbscount	(longlong v) noex {
+    } /* end subroutine */
+    constexpr inline int fbscount	(longlong v)	noex {
     	culonglong uv = ulonglong(v) ;
 	return popcount(uv) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 
