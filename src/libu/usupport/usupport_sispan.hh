@@ -21,8 +21,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 namespace libu {
@@ -36,25 +36,25 @@ namespace libu {
     extern int	sispanblank	(cchar *,int) noex ;
     inline int	sispandig	(cchar *sp,int sl) noex {
     	return libu::sispandigit(sp,sl) ;
-    }
+    } /* end subroutine */
     inline int	sispanoct	(cchar *sp,int sl) noex {
     	return libu::sispanoctal(sp,sl) ;
-    }
+    } /* end subroutine */
     inline int	sispandec	(cchar *sp,int sl) noex {
     	return libu::sispandigit(sp,sl) ;
-    }
+    } /* end subroutine */
     inline int	sispanhex	(cchar *sp,int sl) noex {
     	return libu::sispandigex(sp,sl) ;
-    }
+    } /* end subroutine */
     inline int	sispanwht	(cchar *sp,int sl) noex {
     	return libu::sispanwhite(sp,sl) ;
-    }
+    } /* end subroutine */
     inline int	sispanblk	(cchar *sp,int sl) noex {
     	return libu::sispanblank(sp,sl) ;
-    }
+    } /* end subroutine */
     inline int	siskipwhite	(cchar *sp,int sl) noex {
     	return libu::sispanwhite(sp,sl) ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
