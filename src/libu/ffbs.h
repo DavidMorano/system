@@ -43,23 +43,23 @@ EXTERNC_end
 
 inline int ffbs(int v)			noex {
 	return ffbsi(v) ;
-}
+} /* end */
 inline int ffbs(long v)			noex {
 	return ffbsl(v) ;
-}
+} /* end */
 inline int ffbs(longlong v)		noex {
 	return ffbsll(v) ;
-}
+} /* end */
 
 inline int ffbs(uint uv)		noex {
 	return ffbsui(uv) ;
-}
+} /* end */
 inline int ffbs(ulong uv)		noex {
 	return ffbsul(uv) ;
-}
+} /* end */
 inline int ffbs(ulonglong uv)		noex {
 	return ffbsull(uv) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
