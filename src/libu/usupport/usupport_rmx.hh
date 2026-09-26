@@ -21,10 +21,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 namespace libu {
@@ -32,13 +32,13 @@ namespace libu {
     extern int	rmrchr(cchar *,int,int) noex ;
     local inline int rmchr(cchar *sp,int sl,int sch) noex {
 	return libu::rmochr(sp,sl,sch) ;
-    }
+    } /* end subroutine */
     local inline int rmdot(cchar *sp,int sl) noex {
 	return libu::rmrchr(sp,sl,'.') ;
-    }
+    } /* end subroutine */
     local inline int rmdot(cchar *sp) noex {
 	return libu::rmrchr(sp,-1,'.') ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 namespace libu {
