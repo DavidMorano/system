@@ -99,22 +99,22 @@ namespace libu {
 namespace libu {
     int cfdec(cchar *sp,int sl,int *rp)		noex {
 	return cfdecx(strtoxsi,sp,sl,rp) ;
-    }
+    } /* end */
     int cfdec(cchar *sp,int sl,long *rp)	noex {
 	return cfdecx(strtoxsl,sp,sl,rp) ;
-    }
+    } /* end */
     int cfdec(cchar *sp,int sl,longlong *rp)	noex {
 	return cfdecx(strtoxsll,sp,sl,rp) ;
-    }
+    } /* end */
     int cfdec(cchar *sp,int sl,uint *rp)	noex {
 	return cfdecx(strtoxui,sp,sl,rp) ;
-    }
+    } /* end */
     int cfdec(cchar *sp,int sl,ulong *rp)	noex {
 	return cfdecx(strtoxul,sp,sl,rp) ;
-    }
+    } /* end */
     int cfdec(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfdecx(strtoxull,sp,sl,rp) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 
