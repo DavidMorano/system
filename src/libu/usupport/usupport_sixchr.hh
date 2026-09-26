@@ -22,8 +22,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 namespace libu {
@@ -31,10 +31,10 @@ namespace libu {
     extern int	sirchr(cchar *,int,int) noex ;
     inline int	sichr(cchar *sp,int sl,int sch) noex {
 	return libu::siochr(sp,sl,sch) ;
-    }
+    } /* end subroutine */
     inline int	sichr(cchar *sp,int sch) noex {
 	return libu::siochr(sp,-1,sch) ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
