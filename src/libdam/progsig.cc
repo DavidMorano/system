@@ -295,25 +295,25 @@ int progsig_init(void) noex {
 			    uip->sfd = -1 ;
 		            rs = 1 ;
 	    	            uip->f_initdone = true ;
-		        }
+		        } /* end if (ok) */
 		        if (rs < 0) {
 		            uc_atforkexp(b,a,a) ;
-			}
+			} /* end if (error) */
 	            } /* end if (uc_atfork) */
 	            if (rs < 0) {
 	                cnp->destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptc_create) */
 		if (rs < 0) {
 		    mxp->destroy() ;
-		}
+		} /* end if (error) */
 	    } /* end if (ptm_create) */
 	    if (rs < 0) {
 	        uip->f_init = false ;
-	    }
+	    } /* end if (error) */
 	} else {
 	    while (! uip->f_initdone) msleep(1) ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (progsig_init) */
 
@@ -327,27 +327,27 @@ int progsig_fini(void) noex {
 	    {
 	        rs1 = progsig_runend(uip) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = progsig_end(uip) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        void_f	b = progsig_atforkbefore ;
 	        void_f	a = progsig_atforkafter ;
 	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        ptc *cnp = &uip->cn ;
 	        rs1 = cnp->destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        ptm *mxp = &uip->mx ;
 	        rs1 = mxp->destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    uip->f_init = false ;
 	    uip->f_initdone = false ;
 	} /* end if (atexit registered) */
@@ -380,7 +380,7 @@ int progsig_mainend(void) noex {
 	{
 	    rs1 = progsig_sigend(uip) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end */
 	uip->envv = nullptr ;
 	return rs ;
 } /* end subroutine (progsig_mainend) */
@@ -416,7 +416,7 @@ int progsig_sigquit(void) noex {
 	if (kip->f_sigquit) {
 	    kip->f_sigquit = 0 ;
 	    rs = SR_QUIT ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (progsig_sigquit) */
 
@@ -426,7 +426,7 @@ int progsig_sigterm() noex {
 	if (kip->f_sigterm) {
 	    kip->f_sigterm = 0 ;
 	    rs = SR_EXIT ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (progsig_sigterm) */
 
@@ -436,7 +436,7 @@ int progsig_sigintr() noex {
 	if (kip->f_sigintr) {
 	    kip->f_sigintr = 0 ;
 	    rs = SR_INTR ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (progsig_sigintr) */
 
@@ -539,7 +539,7 @@ local int progsig_mq(progsig *uip) noex {
 	int		rs = SR_OK ;
 	if (! uip->f_mq) {
 	    rs = progsig_begin(uip) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (progsig_mq) */
 
@@ -718,11 +718,11 @@ local int progsig_workgener(progsig *uip,SESMSG_GEN *mp) noex {
 		rv = rs ;
 	        if (rs < 0) {
 		    snote_finish(ep) ;
-		}
+		} /* end if (error) */
 	    } /* end if (snote_start) */
 	    if (rs < 0) {
 		lm_free(ep) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (m-a) */
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (progsig_workgener) */
@@ -761,11 +761,11 @@ local int progsig_workbiffer(progsig *uip,SESMSG_BIFF *mp) noex {
 		rv = rs ;
 	        if (rs < 0) {
 		    snote_finish(ep) ;
-		}
+		} /* end if (error) */
 	    } /* end if (snote_start) */
 	    if (rs < 0) {
 		lm_free(ep) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (m-a) */
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (progsig_workbiffer) */
@@ -794,7 +794,7 @@ local int progsig_msgenter(progsig *uip,SN *ep) noex {
 	    if (void *dum ; (rs = raqhand_rem(qlp,&dum)) >= 0) {
 		rs = raqhand_ins(qlp,ep) ;
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (progsig_msgenter) */
 
@@ -843,10 +843,10 @@ local int progsig_reqopener(progsig *uip,cchar *pbuf) noex {
 		    uip->servlen = rs ;
 		    uip->sfd = fd ;
 		}
-	    }
+	    } /* end */
 	    if (rs < 0) {
 		uc_close(fd) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (listenusd) */
 	return rs ;
 } /* end subroutine (progsig_reqopener) */
@@ -862,15 +862,17 @@ local int progsig_reqclose(progsig *uip) noex {
 		sockaddress	*sap = &uip->servaddr ;
 	        rs1 = sockaddress_finish(sap) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (uip->reqfname != nullptr) {
 		if (uip->reqfname[0] != '\0') {
 		    uc_unlink(uip->reqfname) ;
-		}
-		void *vp = voidp(uip->reqfname) ;
-		rs1 = lm_free(vp) ;
-		if (rs >= 0) rs = rs1 ;
-		uip->reqfname = nullptr ;
+		} /* end */
+		{
+		    void *vp = voidp(uip->reqfname) ;
+		    rs1 = lm_free(vp) ;
+		    if (rs >= 0) rs = rs1 ;
+		    uip->reqfname = nullptr ;
+		} /* end block (memory-release) */
 	    } /* end if (reqfname) */
 	} /* end if (server-open) */
 	return rs ;
@@ -909,11 +911,11 @@ local int progsig_reqrecv(progsig *uip,msgdata *mip) noex {
 		}
 	    } else if (rs == SR_INTR) {
 		rs = SR_OK ;
-	    }
+	    } /* end if */
 	    if (f) break ;
 	    if (rs >= 0) {
 		rs = progsig_poll(uip) ;
-	    }
+	    } /* end if (ok) */
 	    if (rs < 0) break ;
 	} /* end while (polling) */
 	return (rs >= 0) ? rc : rs ;
@@ -923,7 +925,7 @@ local int progsig_poll(progsig *uip) noex {
 	int		rs = SR_FAULT ;
 	if (uip) {
 	    rs = SR_OK ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (progsig_poll) */
 
