@@ -22,10 +22,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 namespace libu {
@@ -34,7 +34,7 @@ namespace libu {
     extern int matfoldstr	(con mainv,cchar *,int = -1) noex ;
     inline int matstr		(con mainv bs,cchar *sp,int sl = -1) noex {
 	return libu::matbasestr(bs,sp,sl) ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
