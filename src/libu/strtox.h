@@ -40,13 +40,13 @@ extern ulonglong	strtoxull(cchar *,char **,int) noex ;	/* 128-bits */
 
 local inline int	strtoxi	(cchar *sp,char **endpp,int b) noex {
     	return strtoxsi(sp,endpp,b) ;
-}
+} /* end subroutine */
 local inline long	strtoxl	(cchar *sp,char **endpp,int b) noex {
     	return strtoxsl(sp,endpp,b) ;
-}
-local inline longlong	strtoxll	(cchar *sp,char **endpp,int b) noex {
+} /* end subroutine */
+local inline longlong	strtoxll(cchar *sp,char **endpp,int b) noex {
     	return strtoxsll(sp,endpp,b) ;
-}
+} /* end subroutine */
 
 EXTERNC_end
 
