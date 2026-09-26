@@ -25,9 +25,9 @@
 #include	<stddef.h>		/* CSTD */
 #include	<stdlib.h>		/* CSTD */
 #include	<stdint.h>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<stdintx.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU */
 
 
 namespace libu {
@@ -41,25 +41,25 @@ namespace libu {
     template<typename T> inline int cthex(char *rp,int rl,T uv) noex {
 	(void) uv ;
 	return libu::cthex_unknown(rp,rl) ;
-    }
+    } /* end */
     template<> inline int cthex(char *dp,int dl,int sv)		noex {
 	return libu::cthexi(dp,dl,sv) ;
-    }
+    } /* end */
     template<> inline int cthex(char *dp,int dl,long sv)	noex {
 	return libu::cthexl(dp,dl,sv) ;
-    }
+    } /* end */
     template<> inline int cthex(char *dp,int dl,longlong sv)	noex {
 	return libu::cthexll(dp,dl,sv) ;
-    }
+    } /* end */
     template<> inline int cthex(char *dp,int dl,uint uv)	noex {
 	return libu::cthexui(dp,dl,uv) ;
-    }
+    } /* end */
     template<> inline int cthex(char *dp,int dl,ulong uv)	noex {
 	return libu::cthexul(dp,dl,uv) ;
-    }
+    } /* end */
     template<> inline int cthex(char *dp,int dl,ulonglong uv)	noex {
 	return libu::cthexull(dp,dl,uv) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 
