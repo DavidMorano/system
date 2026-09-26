@@ -492,7 +492,7 @@ constexpr bool		f_debug = CF_DEBUG ;
 
 /* exported subroutines */
 
-sint		strtoxsi(cchar *sp,char **epp,int b) noex {
+sint		strtoxsi(cchar *sp,char **epp,int b)	noex {
 	sint		res{} ;
 	if (sp) {
 	    strtox(sp,epp,b,&res) ;
@@ -502,7 +502,7 @@ sint		strtoxsi(cchar *sp,char **epp,int b) noex {
 	return res ;
 } /* end subroutine (strtoxsi) */
 
-slong		strtoxsl(cchar *sp,char **epp,int b) noex {
+slong		strtoxsl(cchar *sp,char **epp,int b)	noex {
     	slong		res{} ;
 	if (sp) {
 	    res = strtol(sp,epp,b) ;
@@ -512,12 +512,12 @@ slong		strtoxsl(cchar *sp,char **epp,int b) noex {
 	return res ;
 } /* end subroutine (strtoxsl) */
 
-slonglong	strtoxsll(cchar *sp,char **epp,int b) noex {
+slonglong	strtoxsll(cchar *sp,char **epp,int b)	noex {
     	strer_sll so(sp,epp,b) ;
 	return so ;
 } /* end subroutine (strtoxsll) */
 
-uint		strtoxui(cchar *sp,char **epp,int b) noex {
+uint		strtoxui(cchar *sp,char **epp,int b)	noex {
 	uint		ures{} ;
 	if (sp) {
 	    strtox(sp,epp,b,&ures) ;
@@ -527,7 +527,7 @@ uint		strtoxui(cchar *sp,char **epp,int b) noex {
 	return ures ;
 } /* end subroutine (strtoxui) */
 
-ulong		strtoxul(cchar *sp,char **epp,int b) noex {
+ulong		strtoxul(cchar *sp,char **epp,int b)	noex {
     	ulong		ures{} ;
 	if (sp) {
 	    ures = strtoul(sp,epp,b) ;
@@ -537,7 +537,7 @@ ulong		strtoxul(cchar *sp,char **epp,int b) noex {
 	return ures ;
 } /* end subroutine (strtoxul) */
 
-ulonglong	strtoxull(cchar *sp,char **epp,int b) noex {
+ulonglong	strtoxull(cchar *sp,char **epp,int b)	noex {
     	strer_ull so(sp,epp,b) ;
 	return so ;
 } /* end subroutine (strtoxull) */
