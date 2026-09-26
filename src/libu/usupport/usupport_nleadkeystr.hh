@@ -21,15 +21,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 namespace libu {
     extern int nleadkeystr(cchar *,cchar *,int) noex ;
-}
+} /* end namespace (libu) */
 
 
 #endif /* __cplusplus */
