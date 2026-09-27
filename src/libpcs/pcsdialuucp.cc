@@ -351,8 +351,7 @@ badfork:
 
 bad0:
 	goto ret0 ;
-}
-/* end subroutine (pcsdialuucp) */
+} /* end subroutine (pcsdialuucp) */
 
 
 /* local subroutines */
