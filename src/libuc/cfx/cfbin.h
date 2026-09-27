@@ -27,13 +27,23 @@
 
 EXTERNC_begin
 
-extern int cfbini	(cchar *,int,int *)		noex ;
-extern int cfbinl	(cchar *,int,long *)		noex ;
-extern int cfbinll	(cchar *,int,longlong *)	noex ;
+extern int cfbinsi	(cchar *,int,sint *)		noex ;
+extern int cfbinsl	(cchar *,int,slong *)		noex ;
+extern int cfbinsll	(cchar *,int,slonglong *)	noex ;
 
 extern int cfbinui	(cchar *,int,uint *)		noex ;
 extern int cfbinul	(cchar *,int,ulong *)		noex ;
 extern int cfbinull	(cchar *,int,ulonglong *)	noex ;
+
+local inline int cfbini(cchar *sp,int sl,int *rp)		noex {
+	return cfbinsi(sp,sl,rp) ;
+} /* end */
+local inline int cfbinl(cchar *sp,int sl,long *rp)		noex {
+	return cfbinsl(sp,sl,rp) ;
+} /* end */
+local inline int cfbinll(cchar *sp,int sl,longlong *rp)		noex {
+	return cfbinsll(sp,sl,rp) ;
+} /* end */
 
 EXTERNC_end
 
@@ -41,23 +51,23 @@ EXTERNC_end
 
 inline int cfbin(cchar *sp,int sl,int *rp)		noex {
 	return cfbini(sp,sl,rp) ;
-}
+} /* end */
 inline int cfbin(cchar *sp,int sl,long *rp)		noex {
 	return cfbinl(sp,sl,rp) ;
-}
+} /* end */
 inline int cfbin(cchar *sp,int sl,longlong *rp)		noex {
 	return cfbinll(sp,sl,rp) ;
-}
+} /* end */
 
 inline int cfbin(cchar *sp,int sl,uint *rp)		noex {
 	return cfbinui(sp,sl,rp) ;
-}
+} /* end */
 inline int cfbin(cchar *sp,int sl,ulong *rp)		noex {
 	return cfbinul(sp,sl,rp) ;
-}
+} /* end */
 inline int cfbin(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfbinull(sp,sl,rp) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
