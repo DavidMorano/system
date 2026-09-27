@@ -28,7 +28,7 @@
 
 namespace libu {
     extern char *strwcpy(char *,cchar *,int = -1) noex ;
-}
+} /* end namespace (libu) */
 
 
 #endif /* __cplusplus */
