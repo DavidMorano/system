@@ -280,14 +280,13 @@ int mbcache_start(mbcache *op,cchar *mbfname,int mflags,mailbox *mbp) noex {
 	if ((rs = mbcache_ctor(op,mbfname,mbp)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (mbfname[0]) ylikely {
-		static cint	rsv = var ;
 	        op->mflags = mflags ;
 	        op->mbp = mbp ;
 	        op->fl.readonly = (! (mflags & MBCACHE_ORDWR)) ;
-		if ((rs = rsv) >= 0) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		    rs = mbcache_starter(op,mbfname) ;
 		    nmsgs = rs ;
-		}
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		mbcache_dtor(op) ;
