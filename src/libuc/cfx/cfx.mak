@@ -35,11 +35,13 @@ DEFS=
 
 INCS= cfx.h cfutil.hh
 
-MODS += cfalphax.o cfcharsx.o cfdigx.o
+MODS += cfcharsx.o cfdigx.o
 MODS += cfpowx.o cfsysx.o
 
 LIBS=
 
+
+DEPS= $(MODS)
 
 OBJ0_CFX= mods.o
 OBJ1_CFX= cfbin.o 
@@ -174,17 +176,17 @@ objd_cfx.o:		$(OBJD_CFX)
 
 cfutil.o:		cfutil.cc	cfutil.hh			$(INCS)
 
-cfchars.o:		cfchars.cc	cfchars.h	mods.o		$(INCS)
-cfbin.o:		cfbin.cc	cfbin.h		mods.o		$(INCS)
-cfoct.o:		cfoct.cc	cfoct.h		mods.o		$(INCS)
-cfdec.o:		cfdec.cc	cfdec.h		mods.o		$(INCS)
-cfdecf.o:		cfdecf.cc	cfdecf.h	mods.o		$(INCS)
-cfdecmf.o:		cfdecmf.cc	cfdecmf.h	mods.o		$(INCS)
-cfdect.o:		cfdect.cc	cfdect.h	mods.o		$(INCS)
-cfhex.o:		cfhex.cc	cfhex.h		mods.o		$(INCS)
-cfxxx.o:		cfxxx.cc	cfxxx.h		mods.o		$(INCS)
-cfnum.o:		cfnum.cc	cfnum.h		mods.o		$(INCS)
-cfa26.o:		cfa26.cc	cfa26.h		mods.o		$(INCS)
+cfchars.o:		cfchars.cc	cfchars.h	$(DEPS)		$(INCS)
+cfbin.o:		cfbin.cc	cfbin.h		$(DEPS)		$(INCS)
+cfoct.o:		cfoct.cc	cfoct.h		$(DEPS)		$(INCS)
+cfdec.o:		cfdec.cc	cfdec.h		$(DEPS)		$(INCS)
+cfdecf.o:		cfdecf.cc	cfdecf.h	$(DEPS)		$(INCS)
+cfdecmf.o:		cfdecmf.cc	cfdecmf.h	$(DEPS)		$(INCS)
+cfdect.o:		cfdect.cc	cfdect.h	$(DEPS)		$(INCS)
+cfhex.o:		cfhex.cc	cfhex.h		$(DEPS)		$(INCS)
+cfxxx.o:		cfxxx.cc	cfxxx.h		$(DEPS)		$(INCS)
+cfnum.o:		cfnum.cc	cfnum.h		$(DEPS)		$(INCS)
+cfa26.o:		cfa26.cc	cfa26.h		cfalphax.o	$(INCS)
 cfroman.o:		cfroman.cc	cfroman.h			$(INCS)
 
 # algorithms
