@@ -81,16 +81,18 @@ namespace libu {
 	cint		b = CFBASE ;	/* conversion number base */
 	int		rs = SR_FAULT ;
 	if (sp) ylikely {
-	    T		v{} ;
-	    strnul	str(sp,sl) ;
-	    errno = 0 ;
-	    v = cfx(str,&endp,b) ;
-	    if (rp) *rp = v ;
-	    if (errno) {
-		rs = (neg errno) ;
-	    } else {
-		rs = (v >= 0) ? intsat(v) : 0 ;
-	    }
+	    rs = SR_NOMEM ;
+	    if (strnul str(sp,sl) ; str) ylikely {
+	        T	v{} ;
+	        errno = 0 ;
+	        v = cfx(str,&endp,b) ;
+	        if (rp) *rp = v ;
+	        if (errno) {
+		    rs = (neg errno) ;
+	        } else {
+		    rs = (v >= 0) ? intsat(v) : 0 ;
+	        } /* end */
+	    } /* end if (strnul) */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine-template (cfdecx) */
