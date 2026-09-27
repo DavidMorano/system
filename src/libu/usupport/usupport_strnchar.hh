@@ -21,8 +21,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 namespace libu {
@@ -34,16 +34,16 @@ namespace libu {
     extern char *strnblank(cchar *,int) noex ;
     inline char *strndig(cchar *sp,int sl) noex {
 	return libu::strndigit(sp,sl) ;
-    }
+    } /* end subroutine */
     inline char *strnoct(cchar *sp,int sl) noex {
 	return libu::strnoctal(sp,sl) ;
-    }
+    } /* end subroutine */
     inline char *strndec(cchar *sp,int sl) noex {
 	return libu::strndigit(sp,sl) ;
-    }
+    } /* end subroutine */
     inline char *strnhex(cchar *sp,int sl) noex {
 	return libu::strndigex(sp,sl) ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
