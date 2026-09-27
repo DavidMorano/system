@@ -292,11 +292,10 @@ int dbmake::wrfiler(time_t dt) noex {
 } /* end subroutine (dbmake::wrfiler) */
 
 int dbmake::wrfileline(cchar *lbuf,int llen) noex {
-    	static cint	rsv = var ;
 	int		rs ;
 	int		rs1 ;
 	int		c_rec = 0 ;
-	if ((rs = rsv) >= 0) ylikely {
+    	if (static cint	rsv = var ; (rs = rsv) >= 0) ylikely {
 	    cint	klen = var.mailaliaslen ;
 	    if (field fsb ; (rs = fsb.start(lbuf,llen)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
