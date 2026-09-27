@@ -53,7 +53,7 @@
 
 extern "C" {
     extern int	localgetorg(cchar *,char *,int,cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
