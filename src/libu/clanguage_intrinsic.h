@@ -53,8 +53,8 @@
 #define	isnull(a)		((a) == nullptr)
 #endif
 
-#ifndef	iszero
-#define	iszero(a)		((a) == 0)
+#ifndef	iszval
+#define	iszval(a)		((a) == 0)
 #endif
 
 
