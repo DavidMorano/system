@@ -35,9 +35,9 @@ extern int cfromanui	(cchar *,int,uint *)		noex ;
 extern int cfromanul	(cchar *,int,ulong *)		noex ;
 extern int cfromanull	(cchar *,int,ulonglong *)	noex ;
 
-static inline int cfroman(cchar *sp,int sl,int *rp)	noex {
+local inline int cfroman(cchar *sp,int sl,int *rp)	noex {
 	return cfromani(sp,sl,rp) ;
-}
+} /* end */
 
 EXTERNC_end
 
@@ -45,19 +45,19 @@ EXTERNC_end
 
 inline int cfroman(cchar *sp,int sl,long *rp)		noex {
 	return cfromanl(sp,sl,rp) ;
-}
+} /* end */
 inline int cfroman(cchar *sp,int sl,longlong *rp)	noex {
 	return cfromanll(sp,sl,rp) ;
-}
+} /* end */
 inline int cfroman(cchar *sp,int sl,uint *rp)		noex {
 	return cfromanui(sp,sl,rp) ;
-}
+} /* end */
 inline int cfroman(cchar *sp,int sl,ulong *rp)		noex {
 	return cfromanul(sp,sl,rp) ;
-}
+} /* end */
 inline int cfroman(cchar *sp,int sl,ulonglong *rp)	noex {
-	return cfromanull(sp,sl,rp) ;
-}
+	return cfromanull(sp,sl,rp) ; /* end */
+} /* end */
 
 #endif /* __cplusplus */
 
