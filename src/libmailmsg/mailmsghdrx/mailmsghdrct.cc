@@ -80,7 +80,7 @@ local inline int mailmsghdrct_magic(mailmsghdrct *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == MAILMSGHDRCT_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (mailmsghdrct_magic) */
 
@@ -104,8 +104,7 @@ int mailmsghdrct_start(MMHCT *op,cchar *hp,int hl) noex {
 	    }
 	} /* end if (mailmsghdrct_ctor) */
 	return (rs >= 0) ? nparams : rs ;
-}
-/* end subroutine (mailmsghdrct_start) */
+} /* end subroutine (mailmsghdrct_start) */
 
 int mailmsghdrct_finish(MMHCT *op) noex {
 	int		rs ;
@@ -122,8 +121,7 @@ int mailmsghdrct_finish(MMHCT *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrct_finish) */
+} /* end subroutine (mailmsghdrct_finish) */
 
 int mailmsghdrct_paramget(MMHCT *op,int i,MMHCT_PAR *rp) noex {
 	int		rs ;
@@ -135,8 +133,7 @@ int mailmsghdrct_paramget(MMHCT *op,int i,MMHCT_PAR *rp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrct_paramget) */
+} /* end subroutine (mailmsghdrct_paramget) */
 
 int mailmsghdrct_paramfind(MMHCT *op,cchar *key,MMHCT *rp) noex {
 	int		rs ;
@@ -144,7 +141,5 @@ int mailmsghdrct_paramfind(MMHCT *op,cchar *key,MMHCT *rp) noex {
 	    rs = SR_NOSYS ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrct_paramfind) */
-
+} /* end subroutine (mailmsghdrct_paramfind) */
 
