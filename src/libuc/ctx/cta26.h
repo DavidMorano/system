@@ -41,23 +41,23 @@ EXTERNC_end
 
 inline int cta26(char *bp,int bl,int t,int p,int v)		noex {
 	return cta26i(bp,bl,t,p,v) ;
-}
+} /* end */
 inline int cta26(char *bp,int bl,int t,int p,long v)		noex {
 	return cta26l(bp,bl,t,p,v) ;
-}
+} /* end */
 inline int cta26(char *bp,int bl,int t,int p,longlong v)	noex {
 	return cta26ll(bp,bl,t,p,v) ;
-}
+} /* end */
 
 inline int cta26(char *bp,int bl,int t,int p,uint uv)		noex {
 	return cta26ui(bp,bl,t,p,uv) ;
-}
+} /* end */
 inline int cta26(char *bp,int bl,int t,int p,ulong uv)		noex {
 	return cta26ul(bp,bl,t,p,uv) ;
-}
+} /* end */
 inline int cta26(char *bp,int bl,int t,int p,ulonglong uv)	noex {
 	return cta26ull(bp,bl,t,p,uv) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
