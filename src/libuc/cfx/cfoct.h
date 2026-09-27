@@ -27,13 +27,23 @@
 
 EXTERNC_begin
 
-extern int cfocti	(cchar *,int,int *)		noex ;
-extern int cfoctl	(cchar *,int,long *)		noex ;
-extern int cfoctll	(cchar *,int,longlong *)	noex ;
+extern int cfoctsi	(cchar *,int,sint *)		noex ;
+extern int cfoctsl	(cchar *,int,slong *)		noex ;
+extern int cfoctsll	(cchar *,int,slonglong *)	noex ;
 
 extern int cfoctui	(cchar *,int,uint *)		noex ;
 extern int cfoctul	(cchar *,int,ulong *)		noex ;
 extern int cfoctull	(cchar *,int,ulonglong *)	noex ;
+
+local inline int cfocti(cchar *sp,int sl,int *rp)		noex {
+	return cfoctsi(sp,sl,rp) ;
+} /* end */
+local inline int cfoctl(cchar *sp,int sl,long *rp)		noex {
+	return cfoctsl(sp,sl,rp) ;
+} /* end */
+local inline int cfoctll(cchar *sp,int sl,longlong *rp)		noex {
+	return cfoctsll(sp,sl,rp) ;
+} /* end */
 
 EXTERNC_end
 
@@ -41,23 +51,23 @@ EXTERNC_end
 
 inline int cfoct(cchar *sp,int sl,int *rp)		noex {
 	return cfocti(sp,sl,rp) ;
-}
+} /* end */
 inline int cfoct(cchar *sp,int sl,long *rp)		noex {
 	return cfoctl(sp,sl,rp) ;
-}
+} /* end */
 inline int cfoct(cchar *sp,int sl,longlong *rp)		noex {
 	return cfoctll(sp,sl,rp) ;
-}
+} /* end */
 
 inline int cfoct(cchar *sp,int sl,uint *rp)		noex {
 	return cfoctui(sp,sl,rp) ;
-}
+} /* end */
 inline int cfoct(cchar *sp,int sl,ulong *rp)		noex {
 	return cfoctul(sp,sl,rp) ;
-}
+} /* end */
 inline int cfoct(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfoctull(sp,sl,rp) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
