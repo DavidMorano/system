@@ -69,23 +69,23 @@ constexpr int	b = OURBASE ;
 
 /* exported subroutines */
 
-int ctbini(char *dp,int dl,int val) noex {
+int ctbinsi(char *dp,int dl,sint val) noex {
 	uint		uv = uint(val) ;
 	cint		n = szof(int) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (ctbini) */
+} /* end subroutine (ctbinsi) */
 
-int ctbinl(char *dp,int dl,long val) noex {
+int ctbinsl(char *dp,int dl,slong val) noex {
 	ulong		uv = ulong(val) ;
 	cint		n = szof(long) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (ctbinl) */
+} /* end subroutine (ctbinsl) */
 
-int ctbinll(char *dp,int dl,longlong val) noex {
+int ctbinsll(char *dp,int dl,slonglong val) noex {
 	ulonglong	uv = ulonglong(val) ;
 	cint		n = szof(longlong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (ctbinll) */
+} /* end subroutine (ctbinsll) */
 
 int ctbinui(char *dp,int dl,uint uv) noex {
 	cint		n = szof(uint) ;
