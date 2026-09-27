@@ -21,10 +21,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 namespace libu {
@@ -66,13 +66,13 @@ namespace libu {
 namespace libu {
     inline int strnxbasecmp	(cchar *s1,cchar *s2,int n) noex {
     	return libu::strnxbasecmpo(s1,s2,n) ;
-    }
+    } /* end subroutine */
     inline int strnxcasecmp	(cchar *s1,cchar *s2,int n) noex {
     	return libu::strnxcasecmpo(s1,s2,n) ;
-    }
+    } /* end subroutine */
     inline int strnxfoldcmp	(cchar *s1,cchar *s2,int n) noex {
     	return libu::strnxfoldcmpo(s1,s2,n) ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
