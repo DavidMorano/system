@@ -158,7 +158,7 @@ import uconstants ;
 
 extern "C" {
     int	pcsprojectinfo(cchar *,char *,int,cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
