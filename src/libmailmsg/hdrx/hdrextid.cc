@@ -123,7 +123,6 @@ int hdrextid(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	    } /* end if (ema) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (hdrextid) */
+} /* end subroutine (hdrextid) */
 
 
