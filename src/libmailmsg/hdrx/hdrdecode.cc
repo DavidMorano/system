@@ -198,8 +198,7 @@ int hdrdecode_start(hdrdecode *op,cchar *pr) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (hdrdecode_start) */
+} /* end subroutine (hdrdecode_start) */
 
 int hdrdecode_finish(hdrdecode *op) noex {
 	int		rs ;
@@ -247,8 +246,7 @@ int hdrdecode_finish(hdrdecode *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (hdrdecode_finish) */
+} /* end subroutine (hdrdecode_finish) */
 
 int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int alen,cchar *sp,int sl) noex {
 	int		rs ;
@@ -274,8 +272,7 @@ int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int alen,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (hdrdecode_proc) */
+} /* end subroutine (hdrdecode_proc) */
 
 
 /* private subroutines */
@@ -294,8 +291,7 @@ local int hdrdecode_b64decoder(hdrdecode *op) noex {
 	    } /* end if (m-a) */
 	} /* end if (initialization needed) */
 	return rs ;
-}
-/* end subroutine (hdrdecode_b64decoder) */
+} /* end subroutine (hdrdecode_b64decoder) */
 
 local int hdrdecode_qpdecoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
@@ -311,8 +307,7 @@ local int hdrdecode_qpdecoder(hdrdecode *op) noex {
 	    } /* end if (m-a) */
 	} /* end if (initialization needed) */
 	return rs ;
-}
-/* end subroutine (hdrdecode_qpdecoder) */
+} /* end subroutine (hdrdecode_qpdecoder) */
 
 local int hdrdecode_chartrans(hdrdecode *op) noex {
 	int		rs = SR_OK ;
@@ -328,8 +323,7 @@ local int hdrdecode_chartrans(hdrdecode *op) noex {
 	    } /* end if (m-a) */
 	} /* end if (initialization needed) */
 	return rs ;
-}
-/* end subroutine (hdrdecode_chartrans) */
+} /* end subroutine (hdrdecode_chartrans) */
 
 int subinfo::proc() noex {
 	escinfo		ei ;
@@ -354,13 +348,11 @@ int subinfo::proc() noex {
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo_proc) */
+} /* end subroutine (subinfo_proc) */
 
 int subinfo::procreg(int n) noex {
 	return procreger(sp,n) ;
-}
-/* end subroutine (subinfo_procreg) */
+} /* end subroutine (subinfo_procreg) */
 
 int subinfo::procreger(cchar *ep,int n) noex {
 	int		c = 0 ;
@@ -370,8 +362,7 @@ int subinfo::procreger(cchar *ep,int n) noex {
 	} /* end for */
 	rarr[rl] = 0 ;
 	return c ;
-}
-/* end subroutine (subinfo_procreger) */
+} /* end subroutine (subinfo_procreger) */
 
 int subinfo::proctrans(escinfo *eip) noex {
 	int		rs = SR_OK ;
@@ -414,8 +405,7 @@ int subinfo::proctrans(escinfo *eip) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (positive) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo::proctrans) */
+} /* end subroutine (subinfo::proctrans) */
 
 int subinfo::proctranser(escinfo *eip,cchar *tp,int tl) noex {
 	int		rs ;
@@ -441,8 +431,7 @@ int subinfo::proctranser(escinfo *eip,cchar *tp,int tl) noex {
 	    } /* end if (snwcpyuc) */
 	} /* end if (hdrdecode_chartrans) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo::proctranser) */
+} /* end subroutine (subinfo::proctranser) */
 
 int subinfo::storetrans(int txid,cchar *tp,int tl) noex {
 	cint		tlen = (tl * szof(wchar_t)) ;
@@ -459,8 +448,7 @@ int subinfo::storetrans(int txid,cchar *tp,int tl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? wl : rs ;
-}
-/* end subroutine (subinfo::storetrans) */
+} /* end subroutine (subinfo::storetrans) */
 
 int subinfo::proctrans_b(escinfo *eip,char *tbuf,int tlen) noex {
 	int		rs ;
@@ -480,8 +468,7 @@ int subinfo::proctrans_b(escinfo *eip,char *tbuf,int tlen) noex {
 	    } /* end if (b64decoder_load) */
 	} /* end if (hdrdecode_b64decoder) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo::proctrans_b) */
+} /* end subroutine (subinfo::proctrans_b) */
 
 int subinfo::proctrans_q(escinfo *eip,char *tbuf,int tlen) noex {
 	int		rs ;
@@ -501,8 +488,7 @@ int subinfo::proctrans_q(escinfo *eip,char *tbuf,int tlen) noex {
 	    } /* end if (qpdecoder_load) */
 	} /* end if (hdrdecode_qpdecoder) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo::proctrans_q) */
+} /* end subroutine (subinfo::proctrans_q) */
 
 int subinfo::proctrans_unknown(escinfo *eip,char *tp,int tl,cchar *up) noex {
 	int		rs = SR_FAULT ;
@@ -517,8 +503,7 @@ int subinfo::proctrans_unknown(escinfo *eip,char *tp,int tl,cchar *up) noex {
 	    if (*up != '\0') rs = SR_OVERFLOW ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo::proctrans_unknown) */
+} /* end subroutine (subinfo::proctrans_unknown) */
 
 /* do we have a coding sequence? */
 local int escinfo_have(escinfo *eip,cchar *sp,int sl) noex {
@@ -557,17 +542,14 @@ local int escinfo_have(escinfo *eip,cchar *sp,int sl) noex {
 	    }
 	} /* end if (have escape) */
 	return si ;
-}
-/* end subroutine (escinfo_have) */
+} /* end subroutine (escinfo_have) */
 
 local int escinfo_skip(escinfo *eip) noex {
 	return (eip->skip) ;
-}
-/* end subroutine (escinfo_skip) */
+} /* end subroutine (escinfo_skip) */
 
 local int escinfo_pass(escinfo *eip) noex {
 	return matcasestr(passes,eip->csp,eip->csl) ;
-}
-/* end subroutine (escinfo_pass) */
+} /* end subroutine (escinfo_pass) */
 
 
