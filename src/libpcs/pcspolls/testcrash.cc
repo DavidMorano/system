@@ -5,7 +5,7 @@
 /* this is a PCSPOLLS module for performing TESTCRASH polls */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 #define	CF_WORK		1		/* work */
 #define	CF_ENABLE	1		/* enabled */
 
@@ -24,12 +24,7 @@
 	This object is a PCSPOLLS module for performing TESTCRASH polls.
 
 	Synopsis:
-	int testcrash_start(op,pr,sn,envv,pcp)
-	PCSPOLLS	*op ;
-	cchar	*pr ;
-	cchar	*sn ;
-	cchar	**envv ;
-	PCSCONF		*pcp ;
+	int testcrash_start(PP *op,cc *pr,cc *sn,mainv envv,PC *pcp) noex
 
 	Arguments:
 	op		object pointer
@@ -45,22 +40,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<estrings.h>
-#include	<pcsconf.h>
-#include	<storebuf.h>
-#include	<upt.h>
-#include	<userinfo.h>
-#include	<logfile.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<pcsconf.h>		/* LIBPCS */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"pcspolls.h"
 #include	"thrbase.h"
@@ -92,41 +88,41 @@ import libutil ;			/* |lenstr(3u)| */
 
 struct testcrash_flags {
 	uint		working:1 ;
-} ;
+} ; /* end struct */
 
 struct testcrash_head {
-	uint		magic ;
 	THRBASE		t ;
 	TESTCRASH_FL	f ;
 	WORKARGS	*wap ;
+	uint		magval ;
 	int		dummy ;
-} ;
+} ; /* end struct */
 
 struct work_args {
 	TESTCRASH	*op ;
-	cchar	*pr ;
-	cchar	*sn ;
-	cchar	**envv ;
+	cchar		*pr ;
+	cchar		*sn ;
+	mainv		envv ;
 	PCSCONF		*pcp ;
-} ;
+} ; /* end struct */
 
 struct work_flags {
 	uint		dummy:1 ;
 } ;
 
 struct work_head {
-	uint		magic ;
 	THRBASE		*tip ;
 	WORKARGS	*wap ;
-	volatile int	f_term ;
+	uint		magval ;
+	vol int		f_term ;
 	WORK_FL		f ;
-} ;
+} ; /* end struct */
 
 enum cmds {
 	cmd_noop,
 	cmd_exit,
 	cmd_overlast
-} ;
+} ; /* end enum */
 
 
 /* forward references */
@@ -148,11 +144,11 @@ local int mklogentry(cchar *,cchar *,cchar **,PCSCONF *) noex ;
 
 /* exported variables */
 
-PCSPOLLS_NAME	testcrash = {
+constexpr PCSPOLLS_NAME	testcrash = {
 	"testcrash",
 	szof(TESTCRASH),
 	0
-} ;
+} ; /* end array */
 
 
 /* exported subroutines */
@@ -165,7 +161,7 @@ int testcrash_start(TESTCRASH *op,cchar *pr,cchar *sn,mainv envv,
 
 	if (op == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash_start: entered\n") ;
 	debugprintf("testcrash_start: pr=%s\n",pr) ;
 	debugprintf("testcrash_start: sn=%s\n",sn) ;
@@ -187,13 +183,12 @@ int testcrash_start(TESTCRASH *op,cchar *pr,cchar *sn,mainv envv,
 	    }
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash_start: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (testcrash_start) */
+} /* end subroutine (testcrash_start) */
 
 int testcrash_finish(TESTCRASH *op) noex {
 	int		rs = SR_OK ;
@@ -202,7 +197,7 @@ int testcrash_finish(TESTCRASH *op) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magval != TESTCRASH_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash_finish: f_working=%d\n",op->fl.working) ;
 #endif
 
@@ -217,14 +212,13 @@ int testcrash_finish(TESTCRASH *op) noex {
 	    op->wap = nullptr ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash_finish: ret rs=%d\n",rs) ;
 #endif
 
 	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (testcrash_finish) */
+} /* end subroutine (testcrash_finish) */
 
 
 /* private subroutines */
@@ -238,8 +232,7 @@ local int workargs_load(WORKARGS *wap,TESTCRASH *op,cchar *pr,cchar *sn,
 	wap->envv = envv ;
 	wap->pcp = pcp ;
 	return SR_OK ;
-}
-/* end subroutine (workargs_load) */
+} /* end subroutine (workargs_load) */
 
 local int worker(THRBASE *tip,WORKARGS *wap) noex {
 	WORK		w ;
@@ -248,7 +241,7 @@ local int worker(THRBASE *tip,WORKARGS *wap) noex {
 	int		ctime = 0 ;
 	int		f_exit = FALSE ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash/worker: started\n") ;
 #endif
 
@@ -261,13 +254,13 @@ local int worker(THRBASE *tip,WORKARGS *wap) noex {
 	        switch (cmd) {
 		case cmd_noop:
 		    ctime += 1 ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash/worker: timed-poll\n") ;
 #endif
 		    break ;
 	        case cmd_exit:
 		    f_exit = TRUE ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash/worker: exit\n") ;
 #endif
 		    rs = work_term(&w) ;
@@ -281,13 +274,12 @@ local int worker(THRBASE *tip,WORKARGS *wap) noex {
 	} /* end if (work) */
 #endif /* CF_WORK */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash/worker: ret rs=%d ctime=%u\n",rs,ctime) ;
 #endif
 
 	return (rs >= 0) ? ctime : rs ;
-}
-/* end subroutine (worker) */
+} /* end subroutine (worker) */
 
 local int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap) noex {
 	int		rs = SR_OK ;
@@ -304,7 +296,7 @@ local int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap) noex {
 	pr = wap->pr ;
 	sn = wap->sn ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash/work_start: pr=%s\n",pr) ;
 	debugprintf("testcrash/work_start: sn=%s\n",sn) ;
 #endif
@@ -318,32 +310,29 @@ local int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap) noex {
 	}
 #endif /* CF_ENABLED */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash/work_start: ret rs=%d c=%u\n",rs,c) ;
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (work_start) */
+} /* end subroutine (work_start) */
 
 local int work_finish(WORK *wp) noex {
 	int	rs = SR_OK ;
 	if (wp == nullptr) return SR_FAULT ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash/work_finish: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (work_finish) */
+} /* end subroutine (work_finish) */
 
 local int work_term(WORK *wp) noex {
 	if (wp == nullptr) return SR_FAULT ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("testcrash/work_term: entered\n") ;
 #endif
 	return SR_OK ;
-}
-/* end subroutine (work_term) */
+} /* end subroutine (work_term) */
 
 local int mklogentry(cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp) noex {
 	int		rs = SR_OK ;
@@ -372,7 +361,6 @@ local int mklogentry(cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp) noex {
 	} /* end if (mkpath) */
 
 	return rs ;
-}
-/* end subroutine (mklogentry) */
+} /* end subroutine (mklogentry) */
 
 
