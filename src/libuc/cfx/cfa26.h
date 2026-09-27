@@ -41,23 +41,23 @@ EXTERNC_end
 
 inline int cfa26(cchar *sp,int sl,int *rp)		noex {
 	return cfa26i(sp,sl,rp) ;
-}
+} /* end */
 inline int cfa26(cchar *sp,int sl,long *rp)		noex {
 	return cfa26l(sp,sl,rp) ;
-}
+} /* end */
 inline int cfa26(cchar *sp,int sl,longlong *rp)		noex {
 	return cfa26ll(sp,sl,rp) ;
-}
+} /* end */
 
 inline int cfa26(cchar *sp,int sl,uint *rp)		noex {
 	return cfa26ui(sp,sl,rp) ;
-}
+} /* end */
 inline int cfa26(cchar *sp,int sl,ulong *rp)		noex {
 	return cfa26ul(sp,sl,rp) ;
-}
+} /* end */
 inline int cfa26(cchar *sp,int sl,ulonglong *rp) 	noex {
 	return cfa26ull(sp,sl,rp) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
