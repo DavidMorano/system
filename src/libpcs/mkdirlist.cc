@@ -108,7 +108,7 @@ typedef mkdirlist_ent *	entp ;
 extern "C" {
     extern int	pcsopendircache(cchar *,cchar *,int,mode_t,int) noex ;
     extern int	bbcmp(cchar *,cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -176,7 +176,7 @@ local int entry_matung(ENT *,cchar *,time_t,int,int) noex ;
 
 extern "C" {
     local int vcmporder(cvoid **,cvoid **) noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
