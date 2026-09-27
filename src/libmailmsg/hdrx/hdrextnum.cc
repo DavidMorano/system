@@ -110,8 +110,7 @@ int hdrextnum(cchar *sp,int sl) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (hdrextnum) */
+} /* end subroutine (hdrextnum) */
 
 
 /* local subroutines */
@@ -231,7 +230,6 @@ local int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = vl ;
 	} /* end if (sbuf) */
 	return (rs >= 0) ? vl : rs ;
-}
-/* end subroutine (hdrextnum_ext) */
+} /* end subroutine (hdrextnum_ext) */
 
 
