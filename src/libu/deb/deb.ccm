@@ -62,6 +62,7 @@ export {
 	operator int () noex ;
     } ; /* end struct (debon) */
     int debopen(cchar *) noex ;
+    int debclose() noex ;
     int debfd(int) noex ;
     int debprintf(cchar *,cchar *,...) noex ;
 } /* end export */
