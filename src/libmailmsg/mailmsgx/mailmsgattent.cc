@@ -83,7 +83,7 @@ using libuc::libmem ;			/* variable */
 
 extern "C" {
     extern int uc_unlink(cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -98,7 +98,7 @@ extern "C" {
     int		mailmsgattent_analyze(MME *,cchar *) noex ;
     int		mailmsgattent_finish(MME *) noex ;
     int		mailmsgattent_isplaintext(MME *) noex ;
-}
+} /* end extern (C) */
 
 template<typename ... Args>
 local inline int mailmsgattent_magic(mailmsgattent *op,Args ... args) noex {
