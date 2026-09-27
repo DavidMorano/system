@@ -616,8 +616,7 @@ local int maildirs_varmail(SI *sip,cchar *mvfn) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (maildirs_varmail) */
+} /* end subroutine (maildirs_varmail) */
 
 local int maildirs_default(SI *sip,cchar *sp) noex {
 	int		rs = SR_FAULT ;
