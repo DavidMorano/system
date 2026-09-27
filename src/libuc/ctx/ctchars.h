@@ -42,23 +42,23 @@ EXTERNC_end
 
 inline int ctchars	(char *bp,int bl,int b,int v)		noex {
 	return ctcharsi(bp,bl,b,v) ;
-}
+} /* end */
 inline int ctchars	(char *bp,int bl,int b,long v)		noex {
 	return ctcharsl(bp,bl,b,v) ;
-}
+} /* end */
 inline int ctchars	(char *bp,int bl,int b,longlong v)	noex {
 	return ctcharsll(bp,bl,b,v) ;
-}
+} /* end */
 
 inline int ctchars	(char *bp,int bl,int b,uint v)		noex {
 	return ctcharsui(bp,bl,b,v) ;
-}
+} /* end */
 inline int ctchars	(char *bp,int bl,int b,ulong v)		noex {
 	return ctcharsul(bp,bl,b,v) ;
-}
+} /* end */
 inline int ctchars	(char *bp,int bl,int b,ulonglong v)	noex {
 	return ctcharsull(bp,bl,b,v) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
