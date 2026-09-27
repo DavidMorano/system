@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += umods.h
+INCS += umods.hh
 
 MODS += valuelims.o digbufsizes.o
 MODS += bitop.o
