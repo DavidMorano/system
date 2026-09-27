@@ -27,13 +27,23 @@
 
 EXTERNC_begin
 
-extern int ctbini	(char *,int,int)		noex ;
-extern int ctbinl	(char *,int,long)		noex ;
-extern int ctbinll	(char *,int,longlong)		noex ;
+extern int ctbinsi	(char *,int,sint)		noex ;
+extern int ctbinsl	(char *,int,slong)		noex ;
+extern int ctbinsll	(char *,int,slonglong)		noex ;
 
 extern int ctbinui	(char *,int,uint)		noex ;
 extern int ctbinul	(char *,int,ulong)		noex ;
 extern int ctbinull	(char *,int,ulonglong)		noex ;
+
+inline int ctbini(char *bp,int bl,int v)			noex {
+	return ctbinsi(bp,bl,v) ;
+} /* end */
+inline int ctbinl(char *bp,int bl,long v)		noex {
+	return ctbinsl(bp,bl,v) ;
+} /* end */
+inline int ctbinll(char *bp,int bl,longlong v)		noex {
+	return ctbinsll(bp,bl,v) ;
+} /* end */
 
 EXTERNC_end
 
@@ -41,23 +51,23 @@ EXTERNC_end
 
 inline int ctbin(char *bp,int bl,int v)			noex {
 	return ctbini(bp,bl,v) ;
-}
+} /* end */
 inline int ctbin(char *bp,int bl,long v)		noex {
 	return ctbinl(bp,bl,v) ;
-}
+} /* end */
 inline int ctbin(char *bp,int bl,longlong v)		noex {
 	return ctbinll(bp,bl,v) ;
-}
+} /* end */
 
 inline int ctbin(char *bp,int bl,uint v)		noex {
 	return ctbinui(bp,bl,v) ;
-}
+} /* end */
 inline int ctbin(char *bp,int bl,ulong v)		noex {
 	return ctbinul(bp,bl,v) ;
-}
+} /* end */
 inline int ctbin(char *bp,int bl,ulonglong v)		noex {
 	return ctbinull(bp,bl,v) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
