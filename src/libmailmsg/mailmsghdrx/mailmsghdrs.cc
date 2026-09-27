@@ -171,8 +171,7 @@ int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (mailmsghdrs_start) */
+} /* end subroutine (mailmsghdrs_start) */
 
 int mailmsghdrs_finish(mailmsghdrs *op) noex {
 	int		rs ;
@@ -186,7 +185,6 @@ int mailmsghdrs_finish(mailmsghdrs *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrs_finish) */
+} /* end subroutine (mailmsghdrs_finish) */
 
 
