@@ -120,8 +120,7 @@ static vars		var ;
 int comsatmsg_start(comsatmsg *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) {
 	        cint	sz = (var.usernamelen + var.maxpathlen + 2) ;
 	        if (char *cp ; (rs = libmem.mall(sz,&cp)) >= 0) {
 		    op->a = cp ;
