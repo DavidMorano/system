@@ -96,13 +96,13 @@ int cfhexstr(cchar *sp,int sl,uchar *rp) noex {
 	                *rp++ = uchar(v) ;
 	            } else {
 		        rs = SR_INVALID ;
-	            }
+	            } /* end */
 	            cp += 2 ;
 	            cl -= 2 ;
 	        } /* end while */
 	        if ((rs >= 0) && (cl > 0)) {
 		    rs = SR_INVALID ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (got some) */
 	    rl = intconv(rp - rbuf) ;
 	} /* end if (non-null) */
