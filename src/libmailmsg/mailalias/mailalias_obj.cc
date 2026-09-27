@@ -299,8 +299,7 @@ int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
 	int		rs ;
 	int		f_create = false ;
 	if ((rs = mailalias_ctor(op,pr,pname)) >= 0) ylikely {
-	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) ylikely {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	        op->fd = -1 ;
 	        op->oflags = of ;
 	        op->operm = om ;
