@@ -46,18 +46,17 @@ module ;
 #include	<climits>		/* CSTD |CHAR_BIT| + |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<stdintx.h>		/* extended integer types */
-#include	<cfutil.hh>		/* namespace |cfx| + |lenstr(3u)| */
-#include	<checkbase.h>
-#include	<cfutil.hh>		/* namespace |cfx| */
-#include	<char.h>
-#include	<ischarx.h>		/* |isplusminus(2uc)| */
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU extended integer types */
+#include	<cfutil.hh>		/* LIBUC namespace |cfx| */
+#include	<checkbase.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC |isplusminus(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 export module cfpowx ;
 
@@ -78,7 +77,7 @@ template<typename T> struct cfpowshelp {
 	cfpowshelp(cchar *asp,int asl,int b,T *arp) noex : sp(asp), sl(asl) {
 	    const T	one = 1 ;
 	    tmin = (one << (nb - 1)) ;
-	    tmax = (~ tmax) & (~ tmin) ;
+	    tmax = (compl tmax) & (compl tmin) ;
 	    base = b ;
 	    rp = arp ;
 	} ; /* end ctor */
@@ -91,7 +90,7 @@ template<typename T> struct cfpowshelp {
 		    cutlim -= base ;
 		    cutoff += 1 ;
 		}
-		cutlim = (- cutlim) ;
+		cutlim = (neg cutlim) ;
 	    }
 	} ; /* end method (prepare) */
 	int getval(int ch) noex {
@@ -139,13 +138,13 @@ template<typename T> struct cfpowshelp {
 		rs = proc() ;
 	    }
 	    return rs ;
-	} ;
+	} ; /* end method */
 } ; /* end struct (cfpowshelp) */
 
 export {
     template<typename T> int cfpowsx(cchar *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
-	if (sp && rp) {
+	if (sp && rp) ylikely {
 	    if (cfpowshelp cfo(sp,sl,b,rp) ; (rs = cfo.getsign()) >= 0) {
 		cfo.prepare() ;
 		rs = cfo.proc() ;
