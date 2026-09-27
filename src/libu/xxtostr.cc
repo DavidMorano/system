@@ -40,7 +40,9 @@
 	hexadecimal digit c-string to lower case afterwards if you
 	want.  For bases between 27 and 62 inclusive, the resulting
 	digits are in the range of the lower-case alpha characters
-	'a' to 'z'.  Only the following integer types are supported:
+	'a' to 'z'.  For number bases of 63 and 64, the last two
+	resulting digits are the characters 'Ø' and 'ø' respectively.
+	Only the following integer (sized) types are supported:
 		|int|		(32-bits), 
 		|long|		(64-bits), 
 		|longlong|	(128-bits),
@@ -317,13 +319,13 @@ constexpr int		b10 = 10 ;
 
 /* exported subroutines */
 
-char *sitostr	(int v,         char *endp)     	noex {
+char *sitostr	(sint v,	char *endp)     	noex {
     return stostr<uint>(v,endp,b10) ;
 } /* end */
-char *sltostr	(long v,        char *endp)     	noex {
+char *sltostr	(slong v,	char *endp)     	noex {
     return stostr<ulong>(v,endp,b10) ;
 } /* end */
-char *slltostr	(longlong v,    char *endp)     	noex {
+char *slltostr	(slonglong v,	char *endp)     	noex {
     return stostr<ulonglong>(v,endp,b10) ;
 } /* end */
 char *uitostr	(uint uv,       char *endp)     	noex {
@@ -336,13 +338,13 @@ char *ulltostr	(ulonglong uv,  char *endp)     	noex {
     return utostr(uv,endp,b10) ;
 } /* end */
 
-char *sitostr	(int v,         char *endp,int b)	noex {
+char *sitostr	(sint v,	char *endp,int b)	noex {
     return stostr<uint>(v,endp,b) ;
 } /* end */
-char *sltostr	(long v,        char *endp,int b)	noex {
+char *sltostr	(slong v,	char *endp,int b)	noex {
     return stostr<ulong>(v,endp,b) ;
 } /* end */
-char *slltostr	(longlong v,    char *endp,int b)	noex {
+char *slltostr	(slonglong v,	char *endp,int b)	noex {
     return stostr<ulonglong>(v,endp,b) ;
 } /* end */
 char *uitostr	(uint uv,       char *endp,int b)	noex {
