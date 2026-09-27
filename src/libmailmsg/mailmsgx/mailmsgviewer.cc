@@ -69,7 +69,7 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     extern int uc_open(cchar *,int,mode_t) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -103,8 +103,7 @@ local int mailmsgviewer_ctor(MMV *op,Args ... args) noex {
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_ctor) */
+} /* end subroutine (mailmsgviewer_ctor) */
 
 local int mailmsgviewer_dtor(MMV *op) noex {
 	int		rs = SR_FAULT ;
@@ -116,8 +115,7 @@ local int mailmsgviewer_dtor(MMV *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_dtor) */
+} /* end subroutine (mailmsgviewer_dtor) */
 
 template<typename ... Args>
 local inline int mailmsgviewer_magic(MMV *op,Args ... args) noex {
@@ -126,8 +124,7 @@ local inline int mailmsgviewer_magic(MMV *op,Args ... args) noex {
 	    rs = (op->magval == MAILMSGVIEWER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_magic) */
+} /* end subroutine (mailmsgviewer_magic) */
 
 local int	mailmsgviewer_mapbegin(MMV *,cc *) noex ;
 local int	mailmsgviewer_mapend(MMV *) noex ;
@@ -162,8 +159,7 @@ int mailmsgviewer_open(MMV *op,cchar *fname) noex {
 	    }
 	} /* end if (mailmsgviewer_ctor) */
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_open) */
+} /* end subroutine (mailmsgviewer_open) */
 
 int mailmsgviewer_close(MMV *op) noex {
 	int		rs ;
@@ -184,8 +180,7 @@ int mailmsgviewer_close(MMV *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_close) */
+} /* end subroutine (mailmsgviewer_close) */
 
 int mailmsgviewer_getline(MMV *op,int ln,cchar **lpp) noex {
 	int		rs ;
@@ -205,8 +200,7 @@ int mailmsgviewer_getline(MMV *op,int ln,cchar **lpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_getline) */
+} /* end subroutine (mailmsgviewer_getline) */
 
 #ifdef	COMMENT
 
@@ -236,8 +230,7 @@ int mailmsgviewer_seek(MMV *op,off_t off,int w) noex {
 	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_seek) */
+} /* end subroutine (mailmsgviewer_seek) */
 
 int mailmsgviewer_tell(MMV *op,off_t *offp) noex {
 	int		rs ;
@@ -246,8 +239,7 @@ int mailmsgviewer_tell(MMV *op,off_t *offp) noex {
 	    *offp = (op->bp - op->mapdata) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_tell) */
+} /* end subroutine (mailmsgviewer_tell) */
 
 int mailmsgviewer_rewind(MMV *op) noex {
 	int		rs ;
@@ -256,8 +248,7 @@ int mailmsgviewer_rewind(MMV *op) noex {
 	    op->bp = op->mapdata ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_rewind) */
+} /* end subroutine (mailmsgviewer_rewind) */
 
 #endif /* COMMENT */
 
@@ -293,8 +284,7 @@ local int mailmsgviewer_mapbegin(MMV *op,cc *fn) noex {
 	    if (rs >= 0) rs = rs1 ;
         } /* end if (file) */
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_mapbegin) */
+} /* end subroutine (mailmsgviewer_mapbegin) */
 
 local int mailmsgviewer_mapend(MMV *op) noex {
 	int		rs = SR_OK ;
@@ -308,8 +298,7 @@ local int mailmsgviewer_mapend(MMV *op) noex {
 	    op->mapsize = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsgviewer_mapend) */
+} /* end subroutine (mailmsgviewer_mapend) */
 
 local int mailmsgviewer_findline(MMV *op,int ln,cchar **lpp) noex {
 	int		rs = SR_OK ;
@@ -359,7 +348,6 @@ local int mailmsgviewer_findline(MMV *op,int ln,cchar **lpp) noex {
 	    } /* end if (vecobj_count) */
 	} /* end if (not-EOF) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (mailmsgviewer_findline) */
+} /* end subroutine (mailmsgviewer_findline) */
 
 
