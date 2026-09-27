@@ -96,7 +96,6 @@ int hdrctype_decode(hdrctype *op,cchar *hp,int µhl) noex {
 	    }
 	} /* end if (getlenstr) */
 	return rs ;
-}
-/* end subroutine (hdrctype_decode) */
+} /* end subroutine (hdrctype_decode) */
 
 
