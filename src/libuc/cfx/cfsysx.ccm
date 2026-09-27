@@ -89,7 +89,7 @@ module ;
 export module cfsysx ;
 
 /* max for |int256_t| + sign */
-inline constexpr int	cfsysx_maxstack = (256+1) ;
+constexpr int	cfsysx_maxstack = (256+1) ;
 
 template<typename T> inline int cfsystox(cc *,int,T *)		noex {
 	return SR_BUGCHECK ;
