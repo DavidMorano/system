@@ -43,40 +43,40 @@ namespace libu {
 namespace libu {
     inline int vstrkeycmp(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrkeybasecmp(s1pp,s2pp) ;
-    }
+    } /* end subroutine */
     inline int vstrkeycmpo(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrkeybasecmpx(s1pp,s2pp,vstrorder_obverse) ;
-    }
+    } /* end subroutine */
     inline int vstrkeycmpr(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrkeybasecmpx(s1pp,s2pp,vstrorder_reverse) ;
-    }
+    } /* end subroutine */
 } /* end nanespace (libu) */
 
 namespace libu {
     inline int vstrkeybasecmpo(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrkeybasecmpx(s1pp,s2pp,vstrorder_obverse) ;
-    }
+    } /* end subroutine */
     inline int vstrkeybasecmpr(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrkeybasecmpx(s1pp,s2pp,vstrorder_reverse) ;
-    }
+    } /* end subroutine */
 } /* end nanespace (libu) */
 
 namespace libu {
     inline int vstrkeycasecmpo(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrkeycasecmpx(s1pp,s2pp,vstrorder_obverse) ;
-    }
+    } /* end subroutine */
     inline int vstrkeycasecmpr(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrkeycasecmpx(s1pp,s2pp,vstrorder_reverse) ;
-    }
+    } /* end subroutine */
 } /* end nanespace (libu) */
 
 namespace libu {
     inline int vstrkeyfoldcmpo(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrkeyfoldcmpx(s1pp,s2pp,vstrorder_obverse) ;
-    }
+    } /* end subroutine */
     inline int vstrkeyfoldcmpr(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrkeyfoldcmpx(s1pp,s2pp,vstrorder_reverse) ;
-    }
+    } /* end subroutine */
 } /* end nanespace (libu) */
 
 
