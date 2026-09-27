@@ -5,6 +5,7 @@
 /* conversion of c-string digits into binary integer types */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -63,21 +64,29 @@ module ;
 #include	<climits>		/* CSTD |CHAR_BIT| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<stdintx.h>		/* extended integer types */
-#include	<conintx.hh>		/* concept |stdintx| */
-#include	<cfutil.hh>		/* namespace |cfx| */
-#include	<char.h>
-#include	<ischarx.h>		/* |isplusminus(2uc)| */
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<stdintx.h>		/* LIBU extended integer types */
+#include	<conintx.hh>		/* LIBU concept |stdintx| */
+#include	<cfutil.hh>		/* LIBUC namespace |cfx| */
+#include	<char.h>		/* LIBUC */
+#include	<ischarx.h>		/* LIBUC |isplusminus(3uc)| */
+#include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	1		/* debugging */
+#endif
 
 export module cfalphax ;
 
 import typecodes ;			/* |numbits(3u)| */
+import deb ;				/* |DEBPRINTF(3u)| */
+
+cbool			f_debug		= CF_DEBUG ;
 
 template<stdintx T> struct cfashelp {
 	cint		nb = numbits<T> ;
@@ -115,11 +124,12 @@ template<stdintx T> struct cfashelp {
 		    cutlim -= base ;
 		    cutoff += 1 ;
 		}
-		cutlim = (- cutlim) ;
-	    }
+		cutlim = (neg cutlim) ;
+	    } /* end if (negative) */
 	} ; /* end method (prepare) */
 	int getval(int ch) noex {
 	    int		rs = SR_INVALID ;
+	    DEBPRINTF("ent ch=>%c< (\\x%02X)\n",ch,ch) ;
 	    if ((ch >= 'A') && (ch <= 'Z')) {
 		rs = (ch - 'A') ;
 	    } else if ((ch >= 'a') && (ch <= 'z')) {
@@ -128,37 +138,41 @@ template<stdintx T> struct cfashelp {
 	    if (rs >= base) {
 		rs = SR_DOM ;
 	    }
+	    DEBPRINTF("ret rs=%d\n",rs) ;
 	    return rs ;
 	} ; /* end method (getval) */
 	int proc() noex {
 	    int		rs = SR_INVALID ;
 	    if (fneg) {
-	        while (sl && ((rs = getval(*sp)) >= 0)) {
+		DEBPRINTF("neg\n") ;
+	        while (sl && *sp && ((rs = getval(*sp)) >= 0)) {
 		    cint	nv = rs ;
 		    if ((val < cutoff) || (val == cutoff && nv > cutlim)) {
 			rs = SR_RANGE ;
 		    } else {
 		        val *= base ;
 		        val -= nv ;
-		    }
+		    } /* end */
 		    sp += 1 ;
 		    sl -= 1 ;
 		    if (rs < 0) break ;
 	        } /* end while */
 	    } else {
-	    	while (sl && ((rs = getval(*sp)) >= 0)) {
+		DEBPRINTF("pos sl=%d\n",sl) ;
+	    	while (sl && *sp && ((rs = getval(*sp)) >= 0)) {
 		    cint	nv = rs ;
 		    if ((val > cutoff) || (val == cutoff && nv > cutlim)) {
 			rs = SR_RANGE ;
 		    } else {
 			val *= base ;
 			val += nv ;
-		    }
+		    } /* end */
 		    sp += 1 ;
 		    sl -= 1 ;
 		    if (rs < 0) break ;
 	        } /* end while */
 	    } /* end if (sign) */
+	    DEBPRINTF("ret rs=%d\n",rs) ;
 	    *rp = (rs >= 0) ? val : 0 ;
 	    return rs ;
 	} ; /* end method (proc) */
@@ -167,18 +181,20 @@ template<stdintx T> struct cfashelp {
 	    if ((rs = getsign()) >= 0) {
 		prepare() ;
 		rs = proc() ;
-	    }
+	    } /* end */
 	    return rs ;
-	} ;
+	} ; /* end method */
 } ; /* end struct (cfashelp) */
 
 export {
     template<typename T> inline int cfalphax(cc *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
-	if (sp && rp) {
+	DEBPRINTF("ent\n") ;
+	if (sp && rp) ylikely {
 	   cfashelp cfo(sp,sl,b,rp) ;
 	   rs = cfo ;
 	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
     } /* end subroutine-template (cfalphax) */
 } /* end export */
