@@ -167,8 +167,7 @@ int mailmsghdrfold_start(MF *op,int mcols,int ln,cchar *sp,int sl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrfold_start) */
+} /* end subroutine (mailmsghdrfold_start) */
 
 int mailmsghdrfold_finish(MF *op) noex {
 	int		rs = SR_FAULT ;
@@ -177,8 +176,7 @@ int mailmsghdrfold_finish(MF *op) noex {
 	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrfold_finish) */
+} /* end subroutine (mailmsghdrfold_finish) */
 
 /* get the resulting lines from the folding operation */
 int mailmsghdrfold_get(MF *op,int ncol,cchar **rpp) noex {
@@ -209,8 +207,7 @@ int mailmsghdrfold_get(MF *op,int ncol,cchar **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (mailmsghdrfold_get) */
+} /* end subroutine (mailmsghdrfold_get) */
 
 
 /* private subroutines */
@@ -255,8 +252,7 @@ local int findpieces(MF *op,int ncol,cchar **rpp) noex {
 	    *rpp = sp ;
 	} /* end if (string length) */
 	return ll ;
-}
-/* end subroutine (findpieces) */
+} /* end subroutine (findpieces) */
 
 local int findbreaks(MF *op,int ncol,cchar **rpp) noex {
 	int		ll = 0 ;
@@ -264,8 +260,7 @@ local int findbreaks(MF *op,int ncol,cchar **rpp) noex {
 	    ll = findbreakers(op,breaks[i],ncol,rpp) ;
 	} /* end for */
 	return ll ;
-}
-/* end subroutine (findbreaks) */
+} /* end subroutine (findbreaks) */
 
 local int findbreakers(MF *op,int bch,int ncol,cchar **rpp) noex {
 	cint		mcols = op->mcols ;
@@ -301,8 +296,7 @@ local int findbreakers(MF *op,int bch,int ncol,cchar **rpp) noex {
 	    *rpp = sp ;
 	} /* end if (string length) */
 	return ll ;
-}
-/* end subroutine (findbreakers) */
+} /* end subroutine (findbreakers) */
 
 local int findslices(MF *op,int ncol,cchar **rpp) noex {
 	cint		ntab = NTABCOLS ;
@@ -349,8 +343,7 @@ local int findslices(MF *op,int ncol,cchar **rpp) noex {
 	    *rpp = sp ;
 	} /* end if (string length) */
 	return ll ;
-}
-/* end subroutine (findslices) */
+} /* end subroutine (findslices) */
 
 local int findall(MF *op,cchar **rpp) noex {
 	int		cl ; /* return-value */
@@ -360,8 +353,7 @@ local int findall(MF *op,cchar **rpp) noex {
 	op->sp += op->sl ;
 	op->sl = 0 ;
 	return cl ;
-}
-/* end subroutine (findall) */
+} /* end subroutine (findall) */
 
 local int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	cint		ntab = NTABCOLS ;
@@ -403,8 +395,7 @@ local int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	*ncp = ncs ;
 	pl = intconv(cp - sp) ;
 	return pl ;
-}
-/* end subroutine (nextpiece) */
+} /* end subroutine (nextpiece) */
 
 local int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
 	cint		ntab = NTABCOLS ;
@@ -444,8 +435,7 @@ local int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
 	*ncp = ncs ;
 	/* done */
 	return pl ;
-}
-/* end subroutine (nextbreak) */
+} /* end subroutine (nextbreak) */
 
 local cchar *strnbreak(cchar *sp,int sl,int bch) noex {
 	bool		f = false ;
@@ -465,12 +455,10 @@ local cchar *strnbreak(cchar *sp,int sl,int bch) noex {
 	    sl -= si ;
 	} /* end for */
 	return (f) ? sp : nullptr ;
-}
-/* end subroutine (strnbreak) */
+} /* end subroutine (strnbreak) */
 
 local bool isskip(int ch) noex {
 	return (CHAR_ISWHITE(ch) || iseol(ch)) ;
-}
-/* end subrouine (isskip) */
+} /* end subrouine (isskip) */
 
 
