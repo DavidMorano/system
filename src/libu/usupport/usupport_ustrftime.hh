@@ -22,13 +22,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 namespace libu {
     extern int ustrftime(char *,int,cchar *,CTM *) noex ;
-}
+} /* end namespace (libu) */
 
 
 #endif /* __cplusplus */
