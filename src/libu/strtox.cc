@@ -85,7 +85,7 @@
 	to integers for bases up to 128 are available elsewhere in
 	my code bases.
 	2. When the standard C library subroutine |strtol(3c)|
-	is given a NULL string, it seg-faults.  So I here below,
+	is given a NULL string, it seg-faults.  So here below I
 	check for that (a NULL pointer).  But at least when the 
 	|strtol(3c)| subroutine is given an empty string, it 
 	returns an EINVAL (as desired).
@@ -163,6 +163,12 @@
 	For other weirdo number bases (strange creatures not
 	elaborated on further here), or for more normal number bases
 	from 2 through 128, go check out my CFX family of subroutines.
+
+	Q. Given your experiences in developing your own APIs over
+	the years, what do you thinkg of this particular API?
+
+	A. Stupid (no particular offense inteded to those involved
+	in its design), but typical of the era it was invented in.
 
 	Q. Have you written enough of these "number conversion"
 	functions yet?
@@ -452,6 +458,7 @@ local inline bool isbaseval(int b) noex attrconst {
     return ((b >= 2) && (b <= maxbase)) ;
 } /* end subroutine (isbaseval) */
 
+/* is-error-negative */
 template<typename TS>
 local bool iserrneg(TS co,int cl,TS res,int val) noex attrconst {
 	bool f = false ;
@@ -460,6 +467,7 @@ local bool iserrneg(TS co,int cl,TS res,int val) noex attrconst {
 	return f ;
 } /* end subroutine */
 
+/* is-error-positive */
 template<typename TS>
 local bool iserrpos(TS co,int cl,TS res,int val) noex attrconst {
 	bool f = false ;
@@ -468,13 +476,14 @@ local bool iserrpos(TS co,int cl,TS res,int val) noex attrconst {
 	return f ;
 } /* end subroutine */
 
+/* is-error-unsigned */
 template<typename TU>
-local bool iserr(TU co,int cl,TU ures,int val) noex attrconst {
+local bool iserruns(TU co,int cl,TU ures,int val) noex attrconst {
 	bool f = false ;
 	f = f || (ures > co) ;
 	f = f || (ures == co && val > cl) ;
 	return f ;
-} /* end subroutine (iserr) */
+} /* end subroutine (iserruns) */
 
 
 /* local variables */
@@ -492,6 +501,7 @@ constexpr bool		f_debug = CF_DEBUG ;
 
 /* exported subroutines */
 
+/* signed-int */
 sint		strtoxsi(cchar *sp,char **epp,int b)	noex {
 	sint		res{} ;
 	if (sp) {
@@ -502,6 +512,7 @@ sint		strtoxsi(cchar *sp,char **epp,int b)	noex {
 	return res ;
 } /* end subroutine (strtoxsi) */
 
+/* signed-long */
 slong		strtoxsl(cchar *sp,char **epp,int b)	noex {
     	slong		res{} ;
 	if (sp) {
@@ -512,11 +523,13 @@ slong		strtoxsl(cchar *sp,char **epp,int b)	noex {
 	return res ;
 } /* end subroutine (strtoxsl) */
 
+/* signed-longlong */
 slonglong	strtoxsll(cchar *sp,char **epp,int b)	noex {
     	strer_sll so(sp,epp,b) ;
 	return so ;
 } /* end subroutine (strtoxsll) */
 
+/* unsigned-int */
 uint		strtoxui(cchar *sp,char **epp,int b)	noex {
 	uint		ures{} ;
 	if (sp) {
@@ -527,6 +540,7 @@ uint		strtoxui(cchar *sp,char **epp,int b)	noex {
 	return ures ;
 } /* end subroutine (strtoxui) */
 
+/* unsigned-long */
 ulong		strtoxul(cchar *sp,char **epp,int b)	noex {
     	ulong		ures{} ;
 	if (sp) {
@@ -537,6 +551,7 @@ ulong		strtoxul(cchar *sp,char **epp,int b)	noex {
 	return ures ;
 } /* end subroutine (strtoxul) */
 
+/* unsigned-longlong */
 ulonglong	strtoxull(cchar *sp,char **epp,int b)	noex {
     	strer_ull so(sp,epp,b) ;
 	return so ;
@@ -655,7 +670,7 @@ void strer_ull::cookprep() noex {
 } /* end method */
 
 void strer_ull::cvt(int val) noex {
-	if (iserr(cutoff,cutlim,ures,val)) {
+	if (iserruns(cutoff,cutlim,ures,val)) {
 	    verr = -1 ;
 	} else {
 	    verr = +1 ;
