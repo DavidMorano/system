@@ -5,7 +5,7 @@
 /* debugging interface to the STDERR output stream */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
