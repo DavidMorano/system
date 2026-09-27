@@ -109,8 +109,7 @@ int mailmsghdrval_start(mailmsghdrval *op,int i,cchar *hp,int hl) noex {
 	    } /* end if (maxlinelen) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrval_start) */
+} /* end subroutine (mailmsghdrval_start) */
 
 int mailmsghdrval_finish(mailmsghdrval *op) noex {
 	int		rs = SR_FAULT ;
@@ -127,8 +126,7 @@ int mailmsghdrval_finish(mailmsghdrval *op) noex {
 	    op->vl = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrval_finish) */
+} /* end subroutine (mailmsghdrval_finish) */
 
 int mailmsghdrval_add(mailmsghdrval *op,cchar *hp,int hl) noex {
 	int		rs = SR_FAULT ;
@@ -136,8 +134,7 @@ int mailmsghdrval_add(mailmsghdrval *op,cchar *hp,int hl) noex {
 	    rs = mailmsghdrval_loadadd(op,hp,hl) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrval_add) */
+} /* end subroutine (mailmsghdrval_add) */
 
 int mailmsghdrval_get(mailmsghdrval *op,cchar **vpp,int *vlp) noex {
 	int		rs = SR_FAULT ;
@@ -149,8 +146,7 @@ int mailmsghdrval_get(mailmsghdrval *op,cchar **vpp,int *vlp) noex {
 	    idx = op->idx ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? idx : rs ;
-}
-/* end subroutine (mailmsghdrval_get) */
+} /* end subroutine (mailmsghdrval_get) */
 
 int mailmsghdrval_clr(mailmsghdrval *op) noex {
 	int		rs = SR_FAULT ;
@@ -159,8 +155,7 @@ int mailmsghdrval_clr(mailmsghdrval *op) noex {
 	    op->vl = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsghdrval_clr) */
+} /* end subroutine (mailmsghdrval_clr) */
 
 
 /* private subroutines */
@@ -189,7 +184,6 @@ local int mailmsghdrval_loadadd(mailmsghdrval *op,cchar *hp,int hl) noex {
 	    } /* end if (ok) */
 	} /* end if (sfshrink) */
 	return (rs >= 0) ? hlen : rs ;
-}
-/* end subroutine (mailmsghdrval_loadadd) */
+} /* end subroutine (mailmsghdrval_loadadd) */
 
 
