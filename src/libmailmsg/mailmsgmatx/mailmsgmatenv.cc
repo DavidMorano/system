@@ -166,8 +166,7 @@ int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
 	    } /* end if (hit) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (mailmsgmatenv) */
+} /* end subroutine (mailmsgmatenv) */
 
 
 /* local subroutines */
@@ -181,8 +180,7 @@ local int mmenvdat_ema(mmenvdat *mep,cchar *sp,int sl) noex {
 	    skip = intconv((cp + cl) - sp) ;
 	}
 	return skip ;
-}
-/* end subroutine (mmenvdat_ema) */
+} /* end subroutine (mmenvdat_ema) */
 
 /* > From rightcore.com!dam Wed Dec 8 11:44:30 EDT 1993 -0400 */
 local int mmenvdat_date(mmenvdat *mep,cchar *sp,int sl) noex {
@@ -225,8 +223,7 @@ local int mmenvdat_date(mmenvdat *mep,cchar *sp,int sl) noex {
 	    }
 	} /* end if (sfnext) */
 	return skip ;
-}
-/* end subroutine (mmenvdat_date) */
+} /* end subroutine (mmenvdat_date) */
 
 local int mmenvdat_datefin(mmenvdat *mep,cchar *rp,int rl) noex {
 	int		i ; /* used afterwards */
@@ -238,8 +235,7 @@ local int mmenvdat_datefin(mmenvdat *mep,cchar *rp,int rl) noex {
 	    mep->rt = i ;
 	}
 	return si ;
-}
-/* end subroutine (mmenvdat_datefin) */
+} /* end subroutine (mmenvdat_datefin) */
 
 local int mmenvdat_remote(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		skip = 0 ;
@@ -256,7 +252,6 @@ local int mmenvdat_remote(mmenvdat *mep,cchar *sp,int sl) noex {
 	    }
 	}
 	return skip ;
-}
-/* end subroutine (mmenvdat_remote) */
+} /* end subroutine (mmenvdat_remote) */
 
 
