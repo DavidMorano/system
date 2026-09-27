@@ -89,7 +89,7 @@ using std::nothrow ;			/* constant */
 extern "C" {
     typedef int (*cmp_f)(AL_ENT **,AL_ENT **) noex ;
     typedef int	(*sortcmp_t)(cvoid *,cvoid *) noex ;
-}
+} /* end extern (C) */
 
 typedef time_t (*enttime_f)(AL_ENT *) noex ;
 
