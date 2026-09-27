@@ -5,6 +5,7 @@
 /* this is a PCSPOLLS module for running the PCSPOLL program */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -44,19 +45,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<pcsconf.h>
-#include	<storebuf.h>
-#include	<upt.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<storebuf.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<pcsconf.h>		/* LIBPCS */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"pcspolls.h"
 
@@ -78,7 +80,7 @@ import libutil ;			/* |memclear(3u)| */
 
 extern "C" {
     typedef int	(*thrsub_f)(void *) noex ;
-}
+} /* end extern (C) */
 
 typedef mainv	mv ;
 
@@ -87,7 +89,7 @@ typedef mainv	mv ;
 
 extern "C" {
     extern int	pollprogcheck(cchar *,cchar *,cchar **,PCSCONF *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -132,18 +134,18 @@ local int	pollprog_worker(PP *) ;
 
 /* exported variables */
 
-pcspolls_name	pollprog_mod = {
+constexpr pcspolls_name	pollprog_mod = {
 	"pollprog",
 	szof(pollprog),
 	0
-} ;
+} ; /* end array */
 
 
 /* exported subroutines */
 
 int pollprog_start(PP *op,cc *pr,cc *sn,mainv ev,PCSCONF *pcp) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    memclear(op) ;
 	    if ((pollprog_envv(op,ev)) >= 0) {
 	        op->pcp = pcp ;
@@ -167,8 +169,7 @@ int pollprog_start(PP *op,cc *pr,cc *sn,mainv ev,PCSCONF *pcp) noex {
 	    /* end if (pollprog_envv) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (pollprog_start) */
+} /* end subroutine (pollprog_start) */
 
 int pollprog_finish(PP *op) noex {
 	int		rs = SR_OK ;
@@ -178,7 +179,7 @@ int pollprog_finish(PP *op) noex {
 
 	if (op->magval != PP_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pollprog_finish: f_working=%d\n",op->fl.working) ;
 #endif
 
@@ -200,14 +201,13 @@ int pollprog_finish(PP *op) noex {
 	if (rs >= 0) rs = rs1 ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pollprog_finish: ret rs=%d\n",rs) ;
 #endif
 
 	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (pollprog_finish) */
+} /* end subroutine (pollprog_finish) */
 
 int pollprog_check(PP *op) noex {
 	int		rs = SR_FAULT ;
@@ -234,8 +234,7 @@ int pollprog_check(PP *op) noex {
 	    } /* end if (magval) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (pollprog_check) */
+} /* end subroutine (pollprog_check) */
 
 
 /* private subroutines */
@@ -268,8 +267,7 @@ local int pollprog_argsbegin(PP *op,cchar *pr,cchar *sn) noex {
 	    }
 	} /* end if (m-a) */
 	return rs ;
-}
-/* end subroutine (pollprog_argsbegin) */
+} /* end subroutine (pollprog_argsbegin) */
 
 local int pollprog_argsend(PP *op) noex {
 	int		rs = SR_OK ;
@@ -280,8 +278,7 @@ local int pollprog_argsend(PP *op) noex {
 	    op->a = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (pollprog_argsend) */
+} /* end subroutine (pollprog_argsend) */
 
 local int pollprog_worker(PP *op) noex {
 	PCSCONF		*pcp = op->pcp ;
@@ -290,20 +287,19 @@ local int pollprog_worker(PP *op) noex {
 	cchar	*pr = op->pr ;
 	cchar	*sn = op->sn ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pollprog_worker: ent\n") ;
 #endif
 
 	    rs = pollprogcheck(pr,sn,envv,pcp) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pollprog/work_start: ret rs=%d\n",rs) ;
 #endif
 
 	op->f_exiting = true ;
 	return rs ;
-}
-/* end subroutine (pollprog_worker) */
+} /* end subroutine (pollprog_worker) */
 
 local int pollprog_envv(pollprog *op,mainv ev) noex {
     	int	rs = SR_OK ;
