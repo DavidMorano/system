@@ -96,11 +96,11 @@ import libutil ;			/* |lenstr(3u)| */
 
 local inline bool isblk(int ch) noex {
         return ((ch == ' ') || (ch == '\t')) ;
-}
+} /* end subroutine */
 
 local inline bool iskey(int ch) noex {
         return ISALP(ch) || (ch == '-') || (ch == '_') ;
-}
+} /* end subroutine */
 
 
 /* local variables */
@@ -136,7 +136,6 @@ int mailmsgmathdr(cchar *sp,int µsl,int *vip) noex {
 	    } /* end if (required) */
 	} /* end if (gelenstr) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (mailmsgmathdr) */
+} /* end subroutine (mailmsgmathdr) */
 
 
