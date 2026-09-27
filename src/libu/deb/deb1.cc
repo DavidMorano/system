@@ -103,7 +103,7 @@ int debopen(cchar *fn) noex {
 	if (fn) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0]) ylikely {
-		cint of = O_WRONLY ;
+		cint of = (O_WRONLY | O_TRUNC) ;
 		if ((rs = open(fn,of,0666)) < 0) {
 		    rs = (neg errno) ;
 		} else {
@@ -113,6 +113,16 @@ int debopen(cchar *fn) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (debopen) */
+
+int debclose() noex {
+    	int		rs = SR_NOTOPEN ;
+	if (dfd >= 0) {
+	    if ((rs = close(dfd)) < 0) {
+		rs = (neg errno) ;
+	    } /* end if (close) */
+	} /* end if (was-open) */
+	return rs ;
+} /* end subroutine (debclose) */
 
 int debfd(int fd) noex {
     	int		rs = SR_INVALID ;
