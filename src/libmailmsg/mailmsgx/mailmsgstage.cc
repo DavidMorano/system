@@ -217,17 +217,16 @@ int mailmsgstage_start(MMS *op,int ifd,int to,int mmo) noex {
 	        if (tmpdn == np) {
 		    tmpdn = MAILMSGSTAGE_TMPDNAME ;
 		}
-	            if ((rs = mailmsgstage_starts(op,ifd,tmpdn)) >= 0) {
-			n = rs ;
-		    } /* end if (mailmsgstage_starts) */
+	        if ((rs = mailmsgstage_starts(op,ifd,tmpdn)) >= 0) {
+		    n = rs ;
+		} /* end if (mailmsgstage_starts) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		mailmsgstage_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (mailmsgstage_ctor) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (mailmsgstage_start) */
+} /* end subroutine (mailmsgstage_start) */
 
 local int mailmsgstage_starts(MMS *op,int ifd,cc *tmpdn) noex {
 	int		rs ;
@@ -253,7 +252,7 @@ local int mailmsgstage_starts(MMS *op,int ifd,cc *tmpdn) noex {
 				    void *vp = voidp(op->tmpfname) ;
 	                            libmem.free(vp) ;
 	                            op->tmpfname = nullptr ;
-	                        }
+	                        } /* end if (error) */
 	                    } /* end if (memory-allocation) */
 	                } /* end if (uc_closeonexec) */
 	                if (rs < 0) {
@@ -273,8 +272,7 @@ local int mailmsgstage_starts(MMS *op,int ifd,cc *tmpdn) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? nmsgs : rs ;
-}
-/* end subroutine (mailmsgstage_starts) */
+} /* end subroutine (mailmsgstage_starts) */
 
 local int mailmsgstage_starter(MMS *op,int ifd) noex {
 	cnullptr	np{} ;
@@ -300,18 +298,17 @@ local int mailmsgstage_starter(MMS *op,int ifd) noex {
 	        } /* end if */
 	        if (rs >= 0) {
 		    op->magval = MAILMSGSTAGE_MAGIC ;
-		}
+		} /* end if (ok) */
 	        if (rs < 0) {
 	            mailmsgstage_msgfins(op) ;
-		}
+		} /* end if (error) */
 	    } /* end if */
 	    if (rs < 0) {
 	        vechand_finish(op->mlp) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (vechand) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (mailmsgstage_starter) */
+} /* end subroutine (mailmsgstage_starter) */
 
 int mailmsgstage_finish(MMS *op) noex {
 	int		rs ;
@@ -324,38 +321,39 @@ int mailmsgstage_finish(MMS *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->mapdata = nullptr ;
 	        op->mapsize = 0 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mailmsgstage_msgfins(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = vechand_finish(op->mlp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (op->tfd >= 0) {
 	        rs1 = u_close(op->tfd) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->tfd = -1 ;
-	    }
+	    } /* end */
 	    if (op->tmpfname) ylikely {
 	        if (op->tmpfname[0] != '\0') {
 	            u_unlink(op->tmpfname) ;
 	        }
-		void *vp = voidp(op->tmpfname) ;
-	        rs1 = libmem.free(vp) ;
-	        op->tmpfname = nullptr ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
+		{
+		    void *vp = voidp(op->tmpfname) ;
+	            rs1 = libmem.free(vp) ;
+	            op->tmpfname = nullptr ;
+	            if (rs >= 0) rs = rs1 ;
+		} /* end block (memory-release) */
+	    } /* end */
 	    {
 	        rs1 = mailmsgstage_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_finish) */
+} /* end subroutine (mailmsgstage_finish) */
 
 int mailmsgstage_count(MMS *op) noex {
 	int		rs ;
@@ -363,8 +361,7 @@ int mailmsgstage_count(MMS *op) noex {
 	    rs = vechand_count(op->mlp) ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_count) */
+} /* end subroutine (mailmsgstage_count) */
 
 int mailmsgstage_clen(MMS *op,int mi) noex {
 	int		rs ;
@@ -375,8 +372,7 @@ int mailmsgstage_clen(MMS *op,int mi) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_clen) */
+} /* end subroutine (mailmsgstage_clen) */
 
 int mailmsgstage_clines(MMS *op,int mi) noex {
 	int		rs ;
@@ -387,8 +383,7 @@ int mailmsgstage_clines(MMS *op,int mi) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_clines) */
+} /* end subroutine (mailmsgstage_clines) */
 
 int mailmsgstage_envcount(MMS *op,int mi) noex {
 	int		rs ;
@@ -399,8 +394,7 @@ int mailmsgstage_envcount(MMS *op,int mi) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_envcount) */
+} /* end subroutine (mailmsgstage_envcount) */
 
 int mailmsgstage_envaddress(MMS *op,int mi,int n,cchar **rpp) noex {
 	int		rs ;
@@ -411,8 +405,7 @@ int mailmsgstage_envaddress(MMS *op,int mi,int n,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_envaddress) */
+} /* end subroutine (mailmsgstage_envaddress) */
 
 int mailmsgstage_envdate(MMS *op,int mi,int n,cchar **rpp) noex {
 	int		rs ;
@@ -423,8 +416,7 @@ int mailmsgstage_envdate(MMS *op,int mi,int n,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_envdate) */
+} /* end subroutine (mailmsgstage_envdate) */
 
 int mailmsgstage_envremote(MMS *op,int mi,int n,cchar **rpp) noex {
 	int		rs ;
@@ -435,8 +427,7 @@ int mailmsgstage_envremote(MMS *op,int mi,int n,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_envremote) */
+} /* end subroutine (mailmsgstage_envremote) */
 
 int mailmsgstage_hdrikey(MMS *op,int mi,int hi,cchar **rpp) noex {
 	int		rs ;
@@ -447,8 +438,7 @@ int mailmsgstage_hdrikey(MMS *op,int mi,int hi,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_hdrikey) */
+} /* end subroutine (mailmsgstage_hdrikey) */
 
 int mailmsgstage_hdrcount(MMS *op,int mi,cchar *name) noex {
 	int		rs ;
@@ -459,8 +449,7 @@ int mailmsgstage_hdrcount(MMS *op,int mi,cchar *name) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_hdrcount) */
+} /* end subroutine (mailmsgstage_hdrcount) */
 
 int mailmsgstage_hdriline(MMS *op,int mi,cc *name,int hi,int li,cc **rpp) noex {
 	int		rs ;
@@ -471,8 +460,7 @@ int mailmsgstage_hdriline(MMS *op,int mi,cc *name,int hi,int li,cc **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_hdriline) */
+} /* end subroutine (mailmsgstage_hdriline) */
 
 int mailmsgstage_hdrival(MMS *op,int mi,cchar *name,
 		int hi,cchar **rpp) noex {
@@ -484,8 +472,7 @@ int mailmsgstage_hdrival(MMS *op,int mi,cchar *name,
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_hdrival) */
+} /* end subroutine (mailmsgstage_hdrival) */
 
 int mailmsgstage_hdrval(MMS *op,int mi,cchar *name,cchar **rpp) noex {
 	int		rs ;
@@ -496,8 +483,7 @@ int mailmsgstage_hdrval(MMS *op,int mi,cchar *name,cchar **rpp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_hdrval) */
+} /* end subroutine (mailmsgstage_hdrval) */
 
 int mailmsgstage_getfl(MMS *op,int mi) noex {
 	int		rs ;
@@ -515,8 +501,7 @@ int mailmsgstage_getfl(MMS *op,int mi) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? flags : rs ;
-}
-/* end subroutine (mailmsgstage_getfl) */
+} /* end subroutine (mailmsgstage_getfl) */
 
 int mailmsgstage_bodyget(MMS *op,int mi,off_t boff,cchar **bpp) noex {
 	int		rs = SR_OK ;
@@ -545,8 +530,7 @@ int mailmsgstage_bodyget(MMS *op,int mi,off_t boff,cchar **bpp) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ml : rs ;
-}
-/* end subroutine (mailmsgstage_bodyget) */
+} /* end subroutine (mailmsgstage_bodyget) */
 
 int mailmsgstage_bodyread(MMS *op,int mi,off_t boff,
 		char *bbuf,int blen) noex {
@@ -566,8 +550,7 @@ int mailmsgstage_bodyread(MMS *op,int mi,off_t boff,
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ml : rs ;
-}
-/* end subroutine (mailmsgstage_bodyread) */
+} /* end subroutine (mailmsgstage_bodyread) */
 
 
 /* private subroutines */
@@ -593,8 +576,7 @@ local int mailmsgstage_g(MMS *op,int ifd) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filer) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (mailmsgstage_g) */
+} /* end subroutine (mailmsgstage_g) */
 
 /* parse out the headers of this message */
 local int mailmsgstage_gmsg(MMS *op,filer *tfp,
@@ -634,8 +616,7 @@ local int mailmsgstage_gmsg(MMS *op,filer *tfp,
 	    el = rs ;
 	}
 	return (rs >= 0) ? el : rs ;
-}
-/* end subroutine (mailmsgstage_gmsg) */
+} /* end subroutine (mailmsgstage_gmsg) */
 
 local int mailmsgstage_gmsgent(MMS *op,filer *tfp,fdliner *lsp,
 		cchar *lp,int ll,int f_eoh) noex {
@@ -672,8 +653,7 @@ local int mailmsgstage_gmsgent(MMS *op,filer *tfp,fdliner *lsp,
 	    }
 	} /* end if (mailmsgstage_gmsgentnew) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (mailmsgstage_gmsgent) */
+} /* end subroutine (mailmsgstage_gmsgent) */
 
 local int mailmsgstage_gmsgenter(MMS *op,filer *tfp,fdliner *lsp,
 		msgentry *mep) noex {
@@ -687,8 +667,7 @@ local int mailmsgstage_gmsgenter(MMS *op,filer *tfp,fdliner *lsp,
 	    }
 	} /* end if (insertion) */
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (mailmsgstage_gmsgenter) */
+} /* end subroutine (mailmsgstage_gmsgenter) */
 
 local int mailmsgstage_gmsgbody(MMS *op,filer *tfp,fdliner *lsp,
 		msgentry *mep) noex {
@@ -736,8 +715,7 @@ local int mailmsgstage_gmsgbody(MMS *op,filer *tfp,fdliner *lsp,
 	    if (clines < 0) msgentry_setclines(mep,blines) ;
 	}
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (mailmsgstage_gmsgbody) */
+} /* end subroutine (mailmsgstage_gmsgbody) */
 
 local int mailmsgstage_gmsgentnew(MMS *op,msgentry **mpp) noex {
 	int		rs = SR_FAULT ;
@@ -746,8 +724,7 @@ local int mailmsgstage_gmsgentnew(MMS *op,msgentry **mpp) noex {
 	    rs = libmem.mall(esz,mpp) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_gmsgentnew) */
+} /* end subroutine (mailmsgstage_gmsgentnew) */
 
 local int mailmsgstage_gmsgentdel(MMS *op,msgentry *mep) noex {
 	int		rs = SR_FAULT ;
@@ -760,8 +737,7 @@ local int mailmsgstage_gmsgentdel(MMS *op,msgentry *mep) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_gmsgentdel) */
+} /* end subroutine (mailmsgstage_gmsgentdel) */
 
 local int mailmsgstage_msgfins(MMS *op) noex {
 	vechand		*mlp = op->mlp ;
@@ -783,7 +759,6 @@ local int mailmsgstage_msgfins(MMS *op) noex {
 	    } /* end if (non-null) */
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (mailmsgstage_msgfins) */
+} /* end subroutine (mailmsgstage_msgfins) */
 
 
