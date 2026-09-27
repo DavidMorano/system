@@ -18,7 +18,7 @@
 	= 2013-04-30, David A­D­ Morano
 	I took my old code above and created two parts from it.
 	The first part was changed to use the Standard C-language
-	Library subroutines |{xx}tostr(3c)|, provided by all UNIX-like
+	Library subroutines |strto{xx}(3c)|, provided by all UNIX-like
 	operating sytems (really any system that has the standard
 	LIBC library available on it).  That first part is now witin
 	the subroutine-group |cfsysx(3uc)|.  The old code remains
@@ -152,27 +152,27 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	int proc() noex {
 	    int		rs = SR_INVALID ;
 	    if (fneg) {
-	        while (sl && ((rs = getval(*sp)) >= 0)) {
+	        while (sl && *sp && ((rs = getval(*sp)) >= 0)) {
 		    cint	nv = rs ;
 		    if ((val < cutoff) || (val == cutoff && nv > cutlim)) {
 			rs = SR_RANGE ;
 		    } else {
 		        val *= base ;
 		        val -= nv ;
-		    }
+		    } /* end */
 		    sp += 1 ;
 		    sl -= 1 ;
 		    if (rs < 0) break ;
 	        } /* end while */
 	    } else {
-	    	while (sl && ((rs = getval(*sp)) >= 0)) {
+	    	while (sl && *sp && ((rs = getval(*sp)) >= 0)) {
 		    cint	nv = rs ;
 		    if ((val > cutoff) || (val == cutoff && nv > cutlim)) {
 			rs = SR_RANGE ;
 		    } else {
 			val *= base ;
 			val += nv ;
-		    }
+		    } /* end */
 		    sp += 1 ;
 		    sl -= 1 ;
 		    if (rs < 0) break ;
@@ -243,7 +243,7 @@ template<stdintx T> struct cfduhelp { /* Convert-From-Digit-UnSigned */
 	        } /* end while */
 	    } /* end block */
 	    if (rs >= 0) {
-		*rp = (fneg) ? (- val) : val ;
+		*rp = (fneg) ? (neg val) : val ;
 	    } else {
 		*rp = 0 ;
 	    }
@@ -251,10 +251,10 @@ template<stdintx T> struct cfduhelp { /* Convert-From-Digit-UnSigned */
 	} ; /* end method (proc) */
 	operator int () noex {
 	    int		rs ;
-	    if ((rs = getsign()) >= 0) {
+	    if ((rs = getsign()) >= 0) ylikely {
 		prepare() ;
 		rs = proc() ;
-	    }
+	    } /* end */
 	    return rs ;
 	} ; /* end method (operator) */
 } ; /* end struct (cfduhelp -- Convert-From-Digit-UnSigned) */
@@ -262,7 +262,7 @@ template<stdintx T> struct cfduhelp { /* Convert-From-Digit-UnSigned */
 export {
     template<typename ST> inline int cfdigsx(cc *sp,int sl,int b,ST *rp) noex {
 	int		rs = SR_FAULT ;
-	if (sp && rp) {
+	if (sp && rp) ylikely {
 	   cfdshelp cfo(sp,sl,b,rp) ;
 	   rs = cfo ;
 	} /* end if (non-null) */
@@ -270,7 +270,7 @@ export {
     } /* end subroutine-template (cfdigsx) */
     template<typename UT> inline int cfdigux(cc *sp,int sl,int b,UT *rp) noex {
 	int		rs = SR_FAULT ;
-	if (sp && rp) {
+	if (sp && rp) ylikely {
 	   cfduhelp cfo(sp,sl,b,rp) ;
 	   rs = cfo ;
 	} /* end if (non-null) */
