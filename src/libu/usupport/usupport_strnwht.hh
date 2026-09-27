@@ -43,8 +43,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 namespace libu {
@@ -53,7 +53,7 @@ namespace libu {
     extern char *strnwhtbrk	(cchar *,int,cchar *) noex ;
     inline char *strnwhite	(cchar *sp,int sl) noex {
 	return libu::strnwht(sp,sl) ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
