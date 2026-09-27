@@ -32,11 +32,23 @@ extern int	cfdecd	(cchar *,int,double *)		noex ;
 extern int	cfdecld	(cchar *,int,longdouble *)	noex ;
 
 /* historical (from about 1995 or earlier) */
-static inline int cfdouble(cchar *sp,int sl,double *rp)	noex {
+local inline int cfdouble(cchar *sp,int sl,double *rp)	noex {
     	return cfdecd(sp,sl,rp) ;
-}
+} /* end */
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+inline int	cfdec	(cchar *sp,int sl,float *rp)		noex {
+    	return cfdecf(sp,sl,rp) ;
+} /* end */
+inline int	cfdec	(cchar *sp,int sl,double *rp)		noex {
+    	return cfdecd(sp,sl,rp) ;
+} /* end */
+inline int	cfdec	(cchar *sp,int sl,longdouble *rp)	noex {
+    	return cfdecld(sp,sl,rp) ;
+} /* end */
+#endif /* __cplusplus */
 
 
 #endif /* CFDECF_INCLUDE */
