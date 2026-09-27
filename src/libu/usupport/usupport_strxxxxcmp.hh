@@ -65,13 +65,13 @@ namespace libu {
 namespace libu {
     inline int strxbasecmp(cchar *s1,cchar *s2) noex {
     	return libu::strxbasecmpo(s1,s2) ;
-    }
+    } /* end subroutine */
     local inline int strxcasecmp(cchar *s1,cchar *s2) noex {
     	return libu::strxcasecmpo(s1,s2) ;
-    }
+    } /* end subroutine */
     local inline int strxfoldcmp(cchar *s1,cchar *s2) noex {
     	return libu::strxfoldcmpo(s1,s2) ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
