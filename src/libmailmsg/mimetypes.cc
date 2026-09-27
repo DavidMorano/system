@@ -113,7 +113,6 @@ local int	exttypespec(cchar *,int,cchar **) noex ;
 /* local variables */
 
 static vars		var ;
-
 static char		terms[fieldterms_termsize] ;
 
 
@@ -125,8 +124,7 @@ static char		terms[fieldterms_termsize] ;
 int mimetypes_start(mt *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
-	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) ylikely {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		cint	hsz = szof(hdb) ;
 		op->typelen = var.typelen ;
 		if (void *vp ; (rs = libmem.mall(hsz,&vp)) >= 0) ylikely {
