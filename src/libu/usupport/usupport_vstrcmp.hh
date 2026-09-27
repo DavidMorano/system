@@ -43,40 +43,40 @@ namespace libu {
 namespace libu {
    inline int vstrcmp(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrbasecmp(s1pp,s2pp) ;
-   }
+   } /* end subroutine */
    inline int vstrcmpo(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrbasecmpx(s1pp,s2pp,vstrorder_obverse) ;
-   }
+   } /* end subroutine */
    inline int vstrcmpr(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrbasecmpx(s1pp,s2pp,vstrorder_reverse) ;
-   }
+   } /* end subroutine */
 } /* end namespace (libc) */
 
 namespace libu {
    inline int vstrbasecmpo(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrbasecmpx(s1pp,s2pp,vstrorder_obverse) ;
-   }
+   } /* end subroutine */
    inline int vstrbasecmpr(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrbasecmpx(s1pp,s2pp,vstrorder_reverse) ;
-   }
+   } /* end subroutine */
 } /* end namespace (libc) */
 
 namespace libu {
    inline int vstrcasecmpo(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrcasecmpx(s1pp,s2pp,vstrorder_obverse) ;
-   }
+   } /* end subroutine */
    inline int vstrcasecmpr(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrcasecmpx(s1pp,s2pp,vstrorder_reverse) ;
-   }
+   } /* end subroutine */
 } /* end namespace (libc) */
 
 namespace libu {
    inline int vstrfoldcmpo(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrfoldcmpx(s1pp,s2pp,vstrorder_obverse) ;
-   }
+   } /* end subroutine */
    inline int vstrfoldcmpr(cchar **s1pp,cchar **s2pp) noex {
 	return libu::vstrfoldcmpx(s1pp,s2pp,vstrorder_reverse) ;
-   }
+   } /* end subroutine */
 } /* end namespace (libc) */
 
 
