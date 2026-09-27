@@ -41,23 +41,23 @@ EXTERNC_end
 
 inline int cfchars(cchar *sp,int sl,int *rp)		noex {
 	return cfcharsi(sp,sl,rp) ;
-}
+} /* end */
 inline int cfchars(cchar *sp,int sl,long *rp)		noex {
 	return cfcharsl(sp,sl,rp) ;
-}
+} /* end */
 inline int cfchars(cchar *sp,int sl,longlong *rp)	noex {
 	return cfcharsll(sp,sl,rp) ;
-}
+} /* end */
 
 inline int cfchars(cchar *sp,int sl,uint *rp)		noex {
 	return cfcharsui(sp,sl,rp) ;
-}
+} /* end */
 inline int cfchars(cchar *sp,int sl,ulong *rp)		noex {
 	return cfcharsul(sp,sl,rp) ;
-}
+} /* end */
 inline int cfchars(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfcharsull(sp,sl,rp) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
