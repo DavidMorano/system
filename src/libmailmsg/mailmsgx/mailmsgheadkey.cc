@@ -141,7 +141,6 @@ int mailmsgheadkey(cchar *sp,int sl,cchar **kpp) noex {
 	    } /* end if_constexpr (f_progressive) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? kl : rs ;
-}
-/* end subroutine (mailmsgheadkey) */
+} /* end subroutine (mailmsgheadkey) */
 
 
