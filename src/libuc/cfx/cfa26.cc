@@ -58,8 +58,6 @@
 
 #include	"cfa26.h"
 
-#pragma		GCC dependency		"mod/cfalphax.ccm"
-
 import cfalphax ;
 
 /* local defines */
