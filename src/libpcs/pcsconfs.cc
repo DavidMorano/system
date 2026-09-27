@@ -5,6 +5,7 @@
 /* interface to query the PCS configuration-variable database */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -578,7 +579,7 @@ local int confvars_dbstart(CV *sip) noex {
 	    } /* end if */
 	} /* end if */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("confvars_dbstart: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
@@ -594,7 +595,7 @@ local int confvars_confglobal(CV *sip,char *dname) noex {
 
 	if (tmpdname == nullptr) tmpdname = TMPDNAME ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("confvars_confglobal/prmktmpdir: pr=%s\n",sip->pr) ;
 	debugprintf("confvars_confglobal/prmktmpdir: prconf=%s\n",sip->prconf) ;
 #endif
@@ -621,7 +622,7 @@ local int confvars_dbopen(CV *sip,cchar *dbname) noex {
 	var		*vdp = &op->db ;
 	int		rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("confvars_dbopen: dbname=%s\n",dbname) ;
 #endif
 
@@ -629,7 +630,7 @@ local int confvars_dbopen(CV *sip,cchar *dbname) noex {
 	    var_info	vi ;
 	    op->fl.db = true ;
 	    if ((rs = var_getinfo(vdp,&vi)) >= 0) {
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 		char	timebuf[TIMEBUFLEN+1] ;
 		time_t	t ;
@@ -650,7 +651,7 @@ local int confvars_dbopen(CV *sip,cchar *dbname) noex {
 	    }
 	} /* end if (attempted open) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("confvars_dbopen: ret rs=%d\n",rs) ;
 #endif
 
