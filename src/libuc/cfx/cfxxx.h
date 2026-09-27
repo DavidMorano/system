@@ -41,23 +41,23 @@ EXTERNC_end
 
 inline int cfxxx(cchar *sp,int sl,int *rp)		noex {
 	return cfxxxi(sp,sl,rp) ;
-}
+} /* end */
 inline int cfxxx(cchar *sp,int sl,long *rp)		noex {
 	return cfxxxl(sp,sl,rp) ;
-}
+} /* end */
 inline int cfxxx(cchar *sp,int sl,longlong *rp)		noex {
 	return cfxxxll(sp,sl,rp) ;
-}
+} /* end */
 
 inline int cfxxx(cchar *sp,int sl,uint *rp)		noex {
 	return cfxxxui(sp,sl,rp) ;
-}
+} /* end */
 inline int cfxxx(cchar *sp,int sl,ulong *rp)		noex {
 	return cfxxxul(sp,sl,rp) ;
-}
+} /* end */
 inline int cfxxx(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfxxxull(sp,sl,rp) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
