@@ -5,7 +5,7 @@
 /* this is a PCSPOLLS module for performing LU pseudo-polls */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -42,21 +42,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<pcsconf.h>
-#include	<upt.h>
-#include	<userinfo.h>
-#include	<logfile.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<userinfo.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<pcsconf.h>		/* LIBPCS */
 
 #include	"pcspolls.h"
 
@@ -80,7 +81,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     typedef int	(*thrsub_t)(void *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -124,7 +125,7 @@ local int mklogentry(cchar *,cchar *,mainv,PCSCONF *) noex ;
 
 /* exported variables */
 
-const pcspolls_obj	loguser_info = {
+constexpr pcspolls_obj	loguser_info = {
 	"loguser",
 	szof(loguser),
 	0
@@ -160,8 +161,7 @@ int loguser_start(LU *op,cc *pr,cc *sn,mainv ev,PCSCONF *pcp) noex {
 	    /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (loguser_start) */
+} /* end subroutine (loguser_start) */
 
 int loguser_check(LU *op) noex {
 	int		rs = SR_OK ;
@@ -187,8 +187,7 @@ int loguser_check(LU *op) noex {
 	}
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (loguser_check) */
+} /* end subroutine (loguser_check) */
 
 int loguser_finish(LU *op) noex {
 	int		rs = SR_OK ;
@@ -198,7 +197,7 @@ int loguser_finish(LU *op) noex {
 
 	if (op->magval != LU_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loguser_finish: f_working=%d\n",op->fl.working) ;
 #endif
 
@@ -219,14 +218,13 @@ int loguser_finish(LU *op) noex {
 	    rs1 = loguser_argsend(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loguser_finish: ret rs=%d\n",rs) ;
 #endif
 
 	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (loguser_finish) */
+} /* end subroutine (loguser_finish) */
 
 
 /* provate subroutines */
@@ -249,8 +247,7 @@ local int loguser_argsbegin(LU *op,cchar *pr,cchar *sn) noex {
 	    }
 	} /* end if (m-a) */
 	return rs ;
-}
-/* end subroutine (loguser_argsbegin) */
+} /* end subroutine (loguser_argsbegin) */
 
 local int loguser_argsend(LU *op) noex {
 	int		rs = SR_OK ;
@@ -261,8 +258,7 @@ local int loguser_argsend(LU *op) noex {
 	    op->a = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (loguser_argsend) */
+} /* end subroutine (loguser_argsend) */
 
 local int loguser_worker(LU *op) noex {
 	PCSCONF		*pcp = op->pcp ;
@@ -271,20 +267,19 @@ local int loguser_worker(LU *op) noex {
 	cchar		*sn = op->sn ;
 	mainv		envv = op->envv ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loguser_worker: ent\n") ;
 #endif
 
 	rs = mklogentry(pr,sn,envv,pcp) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("loguser/work_start: ret rs=%d\n",rs) ;
 #endif
 
 	op->f_exiting = true ;
 	return rs ;
-}
-/* end subroutine (loguser_worker) */
+} /* end subroutine (loguser_worker) */
 
 local int loguser_envv(loguser *op,mainv ev) noex {
     	int	rs = SR_OK ;
@@ -327,7 +322,6 @@ local int mklogentry(cchar *pr,cchar *sn,mainv envv,PCSCONF *pcp) noex {
 	} /* end if (mkpath) */
 
 	return rs ;
-}
-/* end subroutine (mklogentry) */
+} /* end subroutine (mklogentry) */
 
 
