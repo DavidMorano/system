@@ -79,8 +79,7 @@ int mailmsgatt_start(mailmsgatt *op) noex {
 	    rs = vecitem_start(op,ne,vo) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgatt_start) */
+} /* end subroutine (mailmsgatt_start) */
 
 int mailmsgatt_finish(mailmsgatt *op) noex {
 	int		rs = SR_OK ;
@@ -102,8 +101,7 @@ int mailmsgatt_finish(mailmsgatt *op) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgatt_finish) */
+} /* end subroutine (mailmsgatt_finish) */
 
 /* add an attachment (w/ default content-type and content-encoding) */
 int mailmsgatt_add(mailmsgatt *op,cc *ct,cc *ce,cc *sp,int sl) noex {
@@ -120,8 +118,7 @@ int mailmsgatt_add(mailmsgatt *op,cc *ct,cc *ce,cc *sp,int sl) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgatt_add) */
+} /* end subroutine (mailmsgatt_add) */
 
 /* delete an mailmsgattment */
 int mailmsgatt_del(mailmsgatt *alp,int i) noex {
@@ -139,8 +136,7 @@ int mailmsgatt_del(mailmsgatt *alp,int i) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgatt_del) */
+} /* end subroutine (mailmsgatt_del) */
 
 /* return the number of hosts seen so far */
 int mailmsgatt_count(mailmsgatt *op) noex {
@@ -149,8 +145,7 @@ int mailmsgatt_count(mailmsgatt *op) noex {
 	    rs = vecitem_count(op) ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsgatt_count) */
+} /* end subroutine (mailmsgatt_count) */
 
 /* enumerate */
 int mailmsgatt_curenum(mailmsgatt *op,int i,mailmsgattent **epp) noex {
@@ -159,8 +154,7 @@ int mailmsgatt_curenum(mailmsgatt *op,int i,mailmsgattent **epp) noex {
 	    rs = vecitem_get(op,i,epp) ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsgatt_curenum) */
+} /* end subroutine (mailmsgatt_curenum) */
 
 /* find content types for all of the mailmsgattments using a MIME-types DB */
 int mailmsgatt_typeatts(mailmsgatt *op,MIMETYPES *mtp) noex {
@@ -176,7 +170,6 @@ int mailmsgatt_typeatts(mailmsgatt *op,MIMETYPES *mtp) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgatt_typeatts) */
+} /* end subroutine (mailmsgatt_typeatts) */
 
 
