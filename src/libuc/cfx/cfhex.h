@@ -27,13 +27,23 @@
 
 EXTERNC_begin
 
-extern int cfhexi	(cchar *,int,int *)		noex ;
-extern int cfhexl	(cchar *,int,long *)		noex ;
-extern int cfhexll	(cchar *,int,longlong *)	noex ;
+extern int cfhexsi	(cchar *,int,sint *)		noex ;
+extern int cfhexsl	(cchar *,int,slong *)		noex ;
+extern int cfhexsll	(cchar *,int,slonglong *)	noex ;
 
 extern int cfhexui	(cchar *,int,uint *)		noex ;
 extern int cfhexul	(cchar *,int,ulong *)		noex ;
 extern int cfhexull	(cchar *,int,ulonglong *)	noex ;
+
+local inline int cfhexi(cchar *sp,int sl,int *rp)		noex {
+	return cfhexsi(sp,sl,rp) ;
+} /* end */
+local inline int cfhexl(cchar *sp,int sl,long *rp)		noex {
+	return cfhexsl(sp,sl,rp) ;
+} /* end */
+local inline int cfhexll(cchar *sp,int sl,longlong *rp)		noex {
+	return cfhexsll(sp,sl,rp) ;
+} /* end */
 
 EXTERNC_end
 
@@ -41,23 +51,23 @@ EXTERNC_end
 
 inline int cfhex(cchar *sp,int sl,int *rp)		noex {
 	return cfhexi(sp,sl,rp) ;
-}
+} /* end */
 inline int cfhex(cchar *sp,int sl,long *rp)		noex {
 	return cfhexl(sp,sl,rp) ;
-}
+} /* end */
 inline int cfhex(cchar *sp,int sl,longlong *rp)		noex {
 	return cfhexll(sp,sl,rp) ;
-}
+} /* end */
 
 inline int cfhex(cchar *sp,int sl,uint *rp)		noex {
 	return cfhexui(sp,sl,rp) ;
-}
+} /* end */
 inline int cfhex(cchar *sp,int sl,ulong *rp)		noex {
 	return cfhexul(sp,sl,rp) ;
-}
+} /* end */
 inline int cfhex(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfhexull(sp,sl,rp) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
