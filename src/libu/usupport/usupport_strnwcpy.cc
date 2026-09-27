@@ -64,16 +64,16 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using libu::tobc ;			/* subroutine */
-using libu::tolc ;			/* subroutine */
-using libu::touc ;			/* subroutine */
-using libu::tofc ;			/* subroutine */
+using libu::chtobc ;			/* subroutine */
+using libu::chtolc ;			/* subroutine */
+using libu::chtouc ;			/* subroutine */
+using libu::chtofc ;			/* subroutine */
 
 
 /* local typedefs */
 
 extern "C" {
-    typedef int (*toxc_f)(int) noex ;
+    typedef char (*chtoxc_f)(int) noex ;
 } /* end extern (C) */
 
 
@@ -88,15 +88,15 @@ extern "C" {
 
 /* forward references */
 
-local char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
+local char *strnwcpyxc(chtoxc_f cvt,char *dp,int dl,cchar *sp,int sl) noex {
 	if (dp && sp) ylikely {
     	    while (dl && sl-- && *sp) {
-	        *dp++ = char(toxc(*sp++)) ;
+	        *dp++ = cvt(*sp++) ;
 		dl -= 1 ;
-	    }
+	    } /* end while */
 	    if (dl > 0) {
 	        memclear(dp,dl) ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return dp ;
 } /* end subroutine (strnwcpyxc) */
@@ -112,16 +112,16 @@ local char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
 
 namespace libu {
     char *strnwcpybc(char *dp,int dl,cchar *sp,int sl) noex {
-    	return strnwcpyxc(tobc,dp,dl,sp,sl) ;
+    	return strnwcpyxc(chtobc,dp,dl,sp,sl) ;
     } /* end subroutine */
     char *strnwcpylc(char *dp,int dl,cchar *sp,int sl) noex {
-    	return strnwcpyxc(tolc,dp,dl,sp,sl) ;
+    	return strnwcpyxc(chtolc,dp,dl,sp,sl) ;
     } /* end subroutine */
     char *strnwcpyuc(char *dp,int dl,cchar *sp,int sl) noex {
-    	return strnwcpyxc(touc,dp,dl,sp,sl) ;
+    	return strnwcpyxc(chtouc,dp,dl,sp,sl) ;
     } /* end subroutine */
     char *strnwcpyfc(char *dp,int dl,cchar *sp,int sl) noex {
-    	return strnwcpyxc(tofc,dp,dl,sp,sl) ;
+    	return strnwcpyxc(chtofc,dp,dl,sp,sl) ;
     } /* end subroutine */
 } /* end namespace (libu) */
 
