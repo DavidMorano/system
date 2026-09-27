@@ -5,7 +5,7 @@
 /* PCS user-nodes */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -56,8 +56,8 @@ import libutil ;			/* |lenstr(3u)| */
 #define	PN_MAGIC	PCSUNODES_MAGIC
 #define	PN_FNAME	"etc/usernodes"
 
-#ifndef	CF_DEBUGS
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
 #endif
 
 
@@ -238,7 +238,7 @@ local int pcsunodes_mktab(PN *op,vecpstr *ulp) noex {
 	    } /* end if (vecpstr_strsize) */
 	} /* end if (vecpstr_count) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcsunodes_mktab: ret rs=%d c=%u\n",rs,c) ;
 #endif
 
@@ -256,7 +256,7 @@ local int vecpstr_loadnodes(vecpstr *ulp,cchar **va,char *st) noex {
 		    cint	n = rs ;
 		    for (int i = 0 ; (i < n) && (rec[i] >= 0) ; i += 1) {
 		        if (rec[i] > 0) {
-#if	CF_DEBUGS
+#if	CF_DEBUG
 			    debugprintf("vecpstr_loadnodes: i=%u c=%u v=%s\n",
 				i,c,(st+rec[i])) ;
 #endif
@@ -269,7 +269,7 @@ local int vecpstr_loadnodes(vecpstr *ulp,cchar **va,char *st) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (vecpstr_recsize) */
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("vecpstr_loadnodes: ret rs=%d c=%u\n",rs,c) ;
 #endif
 	return (rs >= 0) ? c : rs ;
