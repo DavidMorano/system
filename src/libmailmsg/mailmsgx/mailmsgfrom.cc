@@ -79,8 +79,7 @@ int mailmsgfrom_start(mailmsgfrom *op,char *fbuf,int flen) noex {
 	    op->flen = flen ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgfrom_start) */
+} /* end subroutine (mailmsgfrom_start) */
 
 int mailmsgfrom_finish(mailmsgfrom *op) noex {
 	int		rs = SR_FAULT ;
@@ -88,8 +87,7 @@ int mailmsgfrom_finish(mailmsgfrom *op) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsgfrom_finish) */
+} /* end subroutine (mailmsgfrom_finish) */
 
 int mailmsgfrom_test(mailmsgfrom *op,time_t t) noex {
 	int		rs = SR_OK ;
@@ -102,8 +100,7 @@ int mailmsgfrom_test(mailmsgfrom *op,time_t t) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (mailmsgfrom_test) */
+} /* end subroutine (mailmsgfrom_test) */
 
 int mailmsgfrom_loadfrom(mailmsgfrom *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -114,7 +111,6 @@ int mailmsgfrom_loadfrom(mailmsgfrom *op,cchar *sp,int sl) noex {
 	    fl = op->fl ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (mailmsgfrom_loadfrom) */
+} /* end subroutine (mailmsgfrom_loadfrom) */
 
 
