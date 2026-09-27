@@ -5,7 +5,7 @@
 /* management interface to the PCSPOLL loadable-object poll facility */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 #define	CF_DEBUGN	0		/* special debugging */
 #define	CF_EARLY	1		/* early exit */
 
@@ -43,23 +43,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<dlfcn.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<vechand.h>
-#include	<pcsconf.h>
-#include	<fsdir.h>
-#include	<storebuf.h>
-#include	<upt.h>
-#include	<six.h>
-#include	<strwcpy.h>
-#include	<hasx.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<dlfcn.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<vechand.h>		/* LIBUC */
+#include	<pcsconf.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"pcspolls.h"
 
@@ -93,7 +94,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* external subroutines */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 extern int	debugprintf(cchar *,...) noex ;
 #endif
 
@@ -246,7 +247,7 @@ int pcspolls_start(pcspolls *op,PCSCONF *pcp,cchar *sn)
 
 	if (sn[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls_start: sn=%s\n",sn) ;
 #endif
 
@@ -260,7 +261,7 @@ int pcspolls_start(pcspolls *op,PCSCONF *pcp,cchar *sn)
 	        pcspolls_valsend(op) ;
 	} /* end if (vals) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls_start: ret rs=%d\n",rs) ;
 #endif
 
@@ -513,7 +514,7 @@ local int thread_worker(THREAD *tip)
 	int		rs1 ;
 	int		ctime = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/worker: ent\n") ;
 #endif
 
@@ -546,7 +547,7 @@ local int thread_worker(THREAD *tip)
 	rs1 = thread_exiting(tip) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/worker: ret rs=%d ctime=%u\n",rs,ctime) ;
 #endif
 
@@ -567,7 +568,7 @@ local int work_start(WORK *wp,THREAD *tip) noex {
 	memclear(wp) ;
 	wp->tip = tip ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/work_start: ent\n") ;
 #endif
 
@@ -579,7 +580,7 @@ local int work_start(WORK *wp,THREAD *tip) noex {
 	    if ((rs = mkpath3(pdname,pr,ld,pd)) >= 0) {
 	        int	dl = rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("pcspolls/work_start: pdname=%s\n",pdname) ;
 #endif
 
@@ -602,7 +603,7 @@ local int work_start(WORK *wp,THREAD *tip) noex {
 	        vechand_finish(&wp->polls) ;
 	} /* end if (vechand-objs) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/work_start: ret rs=%d c=%u\n",rs,c) ;
 #endif
 
@@ -618,7 +619,7 @@ local int work_finish(WORK *wp)
 
 	if (wp == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/work_finish: ent\n") ;
 #endif
 
@@ -634,7 +635,7 @@ local int work_finish(WORK *wp)
 	rs1 = vechand_finish(plp) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/work_finish: ret rs=%d\n",rs) ;
 #endif
 
@@ -647,7 +648,7 @@ local int work_term(WORK *wp)
 	if (wp == nullptr) return SR_FAULT ;
 	wp->f_term = true ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/work_term: ent\n") ;
 #endif
 	return SR_OK ;
@@ -686,7 +687,7 @@ local int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/work_objloadcheck: ent\n") ;
 #endif
 
@@ -699,12 +700,12 @@ local int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl) noex {
 	                memsclear(&oi) ;
 	                oi.sop = sop ;
 	                if ((rs = pollinfo_syms(&oi,sop,sp,sl)) > 0) {
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/work_objloadcheck: work_objload()\n") ;
 #endif
 	                    c = 1 ;
 	                    rs = work_objload(wp,&oi) ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                    debugprintf("pcspolls/work_objloadcheck: "
 				"fn=%s rs=%d\n",fname,
 	                        rs) ;
@@ -719,7 +720,7 @@ local int work_objloadcheck(WORK *wp,cchar *fname,cchar *sp,int sl) noex {
 	    rs = SR_OK ;
 	} /* end if (stat) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/work_objloadcheck: ret rs=%d c=%d\n",rs,c) ;
 #endif
 
@@ -756,7 +757,7 @@ local int work_objload(WORK *wp,POLLINFO *oip)
 	        if ((rs = uc_malloc(osize,&p)) >= 0) {
 	            pop->obj = p ;
 	            rs = vechand_add(&wp->polls,pop) ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            debugprintf("pcspolls/work_objload: vechand_add() rs=%d\n",
 			rs) ;
 #endif
@@ -780,7 +781,7 @@ local int work_objstarts(WORK *wp,THREAD *tip)
 	POLLOBJ		*pop ;
 	int		rs = SR_OK ;
 	int		i ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/work_objstarts: ent\n") ;
 #endif
 	for (i = 0 ; vechand_get(plp,i,&pop) >= 0 ; i += 1) {
@@ -789,7 +790,7 @@ local int work_objstarts(WORK *wp,THREAD *tip)
 	        if (rs < 0) break ;
 	    }
 	} /* end for */
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/work_objstarts: ret rs=%d u=%d\n",rs,i) ;
 #endif
 	return rs ;
@@ -910,7 +911,7 @@ local int pollobj_callstart(POLLOBJ *pop,THREAD *tip)
 	        pop->fl.running = true ;
 	        pop->fl.active = true ;
 	    }
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("pcspolls/pollobj_callstart: "
 		"pollobj->start() rs=%d\n",rs) ;
 #endif
@@ -961,7 +962,7 @@ local int pollobj_finish(POLLOBJ *pop)
 	int		rs1 ;
 	int		f = false ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("pcspolls/pollobj_finish: ent n=%s\n",pop->name) ;
 #endif
 
@@ -972,7 +973,7 @@ local int pollobj_finish(POLLOBJ *pop)
 	if ((pop->finish != nullptr) && pop->fl.active) {
 	    int	(*finish)(void *) = pop->finish ;
 	    rs1 = (*finish)(pop->obj) ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("pcspolls/pollobj_finish: obj->finish() rs=%d\n",rs1) ;
 #endif
 	    if (rs >= 0) rs = rs1 ;
