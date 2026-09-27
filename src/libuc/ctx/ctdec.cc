@@ -169,7 +169,7 @@ local int ctdecsx(char *dp,int dl,const ST &v) noex {
 		{
 		    char dbuf[dlen+1] ;
 		    len = ctdecx(dbuf,dlen,uv) ;
-		    if (v < 0) dbuf[dlen-(++len)] = '-' ;
+		    if (v < 0) dbuf[dlen - (++len)] = '-' ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		    rl = rs ;
 		} /* end block */
@@ -204,16 +204,16 @@ local int ctdecux(char *dp,int dl,const UT &uv) noex {
 
 /* exported subroutines */
 
-int ctdeci(char *dp,int dl,int v)		noex {
+int ctdecsi(char *dp,int dl,sint v)		noex {
 	return ctdecsx<uint>(dp,dl,v) ;
 } /* end */
 
-int ctdecl(char *dp,int dl,long v)		noex {
+int ctdecsl(char *dp,int dl,slong v)		noex {
 	return ctdecsx<ulong>(dp,dl,v) ;
 } /* end */
 
-int ctdecll(char *dp,int dl,longlong v)		noex {
-	return ctdecsx<ulonglong>(dp,dl,v) ;
+int ctdecsll(char *dp,int dl,slonglong v)	noex {
+    return ctdecsx<ulonglong>(dp,dl,v) ;
 } /* end */
 
 int ctdecui(char *dp,int dl,uint uv)		noex {
