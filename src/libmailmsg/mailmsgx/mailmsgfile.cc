@@ -109,7 +109,7 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     extern int uc_unlink(cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -198,7 +198,6 @@ local int mkcols(int) noex ;
 /* local variables */
 
 static sysval		pagesize(sysval_ps) ;
-
 static vars		var ;
 
 
@@ -211,8 +210,7 @@ int mailmsgfile_start(MMF *op,cc *tmpdname,int cols,int ind) noex {
 	int		rs ;
 	int		rv = 0 ;
 	if ((rs = mailmsgfile_magic(op,tmpdname)) >= 0) ylikely {
-	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) ylikely {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	        if ((rs = pagesize) >= 0) ylikely {
 		    op->pagesize = rs ;
 		    op->to = MAILMSGFILE_FILEINT ;
@@ -230,8 +228,7 @@ int mailmsgfile_start(MMF *op,cc *tmpdname,int cols,int ind) noex {
 	    }
 	} /* end if (mailmsgfile_ctor) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (mailmsgfile_start) */
+} /* end subroutine (mailmsgfile_start) */
 
 int mailmsgfile_finish(MMF *op) noex {
 	int		rs ;
@@ -263,8 +260,7 @@ int mailmsgfile_finish(MMF *op) noex {
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
-}
-/* end subroutine (mailmsgfile_finish) */
+} /* end subroutine (mailmsgfile_finish) */
 
 int mailmsgfile_new(MMF *op,int type,cc *msgid,int mfd,
 		off_t boff,int blen) noex {
@@ -281,8 +277,7 @@ int mailmsgfile_new(MMF *op,int type,cc *msgid,int mfd,
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vlines : rs ;
-}
-/* end subroutine (mailmsgfile_new) */
+} /* end subroutine (mailmsgfile_new) */
 
 int mailmsgfile_msginfo(MMF *op,MMF_MI **mipp,cc *msgid) noex {
 	cnullptr	np{} ;
@@ -304,8 +299,7 @@ int mailmsgfile_msginfo(MMF *op,MMF_MI **mipp,cc *msgid) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vlines : rs ;
-}
-/* end subroutine (mailmsgfile_msginfo) */
+} /* end subroutine (mailmsgfile_msginfo) */
 
 int mailmsgfile_get(MMF *op,cc *msgid,cc **rpp) noex {
 	int		rs ;
@@ -323,8 +317,7 @@ int mailmsgfile_get(MMF *op,cc *msgid,cc **rpp) noex {
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? vlines : rs ;
-}
-/* end subroutine (mailmsgfile_get) */
+} /* end subroutine (mailmsgfile_get) */
 
 
 /* private subroutines */
@@ -348,8 +341,7 @@ local int mailmsgfile_starter(MMF *op,cc *tmpdname) noex {
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (mailmsgfile_starter) */
+} /* end subroutine (mailmsgfile_starter) */
 
 local int mailmsgfile_newx(MMF *op,cc *mid,int mfd,off_t bo,int bl) noex {
 	int		rs ;
@@ -374,8 +366,7 @@ local int mailmsgfile_newx(MMF *op,cc *mid,int mfd,off_t bo,int bl) noex {
 	    } /* end if (m-a-f) */
 	} /* end if (found or not) */
 	return (rs >= 0) ? vlines : rs ;
-}
-/* end if (mailmsgfile_newx) */
+} /* end if (mailmsgfile_newx) */
 
 local int mailmsgfile_mk(MMF *op,cc *mid,cc *fn,int mfd,off_t bo,int bl) noex {
 	int		rs ;
@@ -411,8 +402,7 @@ local int mailmsgfile_mk(MMF *op,cc *mid,cc *fn,int mfd,off_t bo,int bl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? vlines : rs ;
-}
-/* end subroutine (mailmsgfile_mk) */
+} /* end subroutine (mailmsgfile_mk) */
 
 local int mailmsgfile_filefins(MMF *op) noex {
 	hdb		*mp = op->flp ;
@@ -441,8 +431,7 @@ local int mailmsgfile_filefins(MMF *op) noex {
 	} /* end if (cursor) */
 	if (rs >= 0) rs = rs1 ;
 	return rs ;
-}
-/* end subroutine (mailmsgfile_filefins) */
+} /* end subroutine (mailmsgfile_filefins) */
 
 local int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 		int tfd,int mfd,off_t bo) noex {
@@ -502,8 +491,7 @@ local int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? vlines : rs ;
-}
-/* end subroutine (mailmsgfile_mkdis) */
+} /* end subroutine (mailmsgfile_mkdis) */
 
 local int mailmsgfile_proclines(MMF *op,MMF_MI *mip,filer *fbp,
 		cchar *lbuf,int llen) noex {
@@ -540,8 +528,7 @@ local int mailmsgfile_proclines(MMF *op,MMF_MI *mip,filer *fbp,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (linefold) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mailmsgfile_proclines) */
+} /* end subroutine (mailmsgfile_proclines) */
 
 local int mailmsgfile_procout(MMF *op,filer *fbp,int li,cc *lp,int ll,
 		int f_cont) noex {
@@ -584,8 +571,7 @@ local int mailmsgfile_procout(MMF *op,filer *fbp,int li,cc *lp,int ll,
 	    } /* end if (m-a-f) */
 	} /* end if (ok) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (mailmsgfile_procout) */
+} /* end subroutine (mailmsgfile_procout) */
 
 local int mailmsgfile_store(MMF *op,MMF_MI *mip) noex {
 	int		rs = SR_FAULT ;
@@ -606,8 +592,7 @@ local int mailmsgfile_store(MMF *op,MMF_MI *mip) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mailmsgfile_store) */
+} /* end subroutine (mailmsgfile_store) */
 
 local int mailmsgfile_checkbegin(MMF *op) noex {
 	pthread_t	tid ;
@@ -618,8 +603,7 @@ local int mailmsgfile_checkbegin(MMF *op) noex {
 	    op->fl.checkout = true ;
 	}
 	return rs ;
-}
-/* end subroutine (mailmsgfile_checkbegin) */
+} /* end subroutine (mailmsgfile_checkbegin) */
 
 local int mailmsgfile_checkend(MMF *op) noex {
 	int		rs = SR_OK ;
@@ -631,8 +615,7 @@ local int mailmsgfile_checkend(MMF *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (mailmsgfile_checkend) */
+} /* end subroutine (mailmsgfile_checkend) */
 
 local int mailmsgfile_checkout(MMF *op) noex {
 	int		rs = SR_OK ;
@@ -644,8 +627,7 @@ local int mailmsgfile_checkout(MMF *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (mailmsgfile_checkout) */
+} /* end subroutine (mailmsgfile_checkout) */
 
 local int mailmsgfile_checker(MMF *op) noex {
 	int		rs = SR_OK ;
@@ -662,8 +644,7 @@ local int mailmsgfile_checker(MMF *op) noex {
 	}
 	op->f_checkdone = true ;
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (mailmsgfile_checker) */
+} /* end subroutine (mailmsgfile_checker) */
 
 local int mailmsgfile_checkerx(MMF *op) noex {
 	int		rs ;
@@ -680,8 +661,7 @@ local int mailmsgfile_checkerx(MMF *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
-}
-/* end subroutine (mailmsgfile_checkerx) */
+} /* end subroutine (mailmsgfile_checkerx) */
 
 local int mailmsgfile_checkerxx(MMF *op,MMF_CD *cdp) noex {
 	vecpstr		files, *flp = &files ;
@@ -704,8 +684,7 @@ local int mailmsgfile_checkerxx(MMF *op,MMF_CD *cdp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecpstr) */
 	return rs ;
-}
-/* end subroutine (mailmsgfile_checkerxx) */
+} /* end subroutine (mailmsgfile_checkerxx) */
 
 local int mailmsgfile_checkerxxx(MMF *op,vecpstr *flp,
 		char *pbuf,int plen) noex {
@@ -739,8 +718,7 @@ local int mailmsgfile_checkerxxx(MMF *op,vecpstr *flp,
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return rs ;
-}
-/* end subroutine (mailmsgfile_checkerxxx) */
+} /* end subroutine (mailmsgfile_checkerxxx) */
 
 local int mi_start(MMF_MI *mip,cc *msgid,cc *mfname,int blen) noex {
 	int		rs = SR_FAULT ;
@@ -760,8 +738,7 @@ local int mi_start(MMF_MI *mip,cc *msgid,cc *mfname,int blen) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mi_start) */
+} /* end subroutine (mi_start) */
 
 local int mi_finish(MMF_MI *mip) noex {
 	int		rs = SR_FAULT ;
@@ -784,14 +761,12 @@ local int mi_finish(MMF_MI *mip) noex {
 	    mip->vlines = 0 ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (mi_finish) */
+} /* end subroutine (mi_finish) */
 
 local int mi_newlines(MMF_MI *mip,int n) noex {
 	mip->vlines += n ;
 	return SR_OK ;
-}
-/* end subroutine (mi_newlines) */
+} /* end subroutine (mi_newlines) */
 
 vars::operator int () noex {
 	int		rs ;
@@ -800,14 +775,12 @@ vars::operator int () noex {
 	    var.outbuflen = (rs * 2) ;
 	} /* end if (bufsizeget) */
 	return rs ;
-}
-/* end method (vars::operator) */
+} /* end method (vars::operator) */
 
 local int mkcols(int cols) noex {
 	static cchar	*vn = varname.columns ;
 	if (cols < MAILMSGFILE_MINCOLS) {
-	    static cchar	*cval = getenv(vn) ;
-	    if (cval) {
+	    if (static cchar *cval = getenv(vn) ; cval) {
 		if (cfdec(cval,-1,&cols) < 0) cols = 0 ;
 	    } /* end if (non-null) */
 	    if (cols < 2) {
@@ -815,7 +788,6 @@ local int mkcols(int cols) noex {
 	    }
 	} /* end if (new 'cols' needed) */
 	return cols ;
-}
-/* end subroutine (mkcols) */
+} /* end subroutine (mkcols) */
 
 
