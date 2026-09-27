@@ -73,15 +73,15 @@ constexpr int	b = OURBASE ;
 
 /* exported subroutines */
 
-int cfbini(cchar *sp,int sl,int *rp) noex {
+int cfbinsi(cchar *sp,int sl,sint *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
 } /* end */
 
-int cfbinl(cchar *sp,int sl,long *rp) noex {
+int cfbinsl(cchar *sp,int sl,slong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
 } /* end */
 
-int cfbinll(cchar *sp,int sl,longlong *rp) noex {
+int cfbinsll(cchar *sp,int sl,slonglong *rp) noex {
 	return cfsysx(sp,sl,b,rp) ;
 } /* end */
 
