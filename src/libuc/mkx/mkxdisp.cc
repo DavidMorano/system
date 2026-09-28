@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* qualifit a display name with its domain-name */
+/* qualify an X display name with its domain-name */
 /* version %I% last-modified %G% */
 
 
@@ -22,19 +22,20 @@
 
 	Description:
 	This subroutine is used to qualify an X window DISPLAY
-	specification with the local hostname when :
-
+	specification with the local hostname when 
 	= it is not given at all!
-
 	= it is an implied local name and the target is
 	  in another domain!
 
+	Synopsis:
+	int mkxsdisp(char *rbuf,int rlen,cc *disp,cc *node,cc *domain) noex
+
 	Arguments:
-	- display	current display string
-	- node		current nodename
-	- domain	current domainname
-	- disbuf	buffer to hold the resulting display value
-	- dislen	length of user supplied display buffer
+	rbuf		result buffer pointer
+	rlenf		result buffer length
+	disp		current display string
+	node		current nodename
+	domain		current domainname
 
 	Returns:
 	>=0	length of the created DISPLAY string specification
