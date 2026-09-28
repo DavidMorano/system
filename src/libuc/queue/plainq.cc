@@ -254,7 +254,7 @@ int plainq_rem(plainq *op,plainq_ent **epp) noex {
                 plainq_ent       *ep = entp(op->head + qha) ;
                 if (op->head != op->tail) {
                     rs = SR_BADFMT ;
-                    if (ep->next && iszero(ep->prev)) {
+                    if (ep->next && iszval(ep->prev)) {
                         plainq_ent   *nep = entp(ep->next + qha) ;
                         rs = SR_OK ;
                         nep->prev = 0 ;
