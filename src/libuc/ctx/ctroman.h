@@ -42,37 +42,37 @@ EXTERNC_end
 template<typename T>
 inline int ctroman(char *,int,T)			noex {
 	return SR_NOSYS ;
-}
+} /* end */
 
 template<>
 inline int ctroman(char *dp,int dl,int v)		noex {
 	return ctromani(dp,dl,v) ;
-}
+} /* end */
 
 template<>
 inline int ctroman(char *dp,int dl,long v)		noex {
 	return ctromanl(dp,dl,v) ;
-}
+} /* end */
 
 template<>
 inline int ctroman(char *dp,int dl,longlong v)		noex {
 	return ctromanll(dp,dl,v) ;
-}
+} /* end */
 
 template<>
 inline int ctroman(char *dp,int dl,uint v)		noex {
 	return ctromanui(dp,dl,v) ;
-}
+} /* end */
 
 template<>
 inline int ctroman(char *dp,int dl,ulong v)		noex {
 	return ctromanul(dp,dl,v) ;
-}
+} /* end */
 
 template<>
 inline int ctroman(char *dp,int dl,ulonglong v)		noex {
 	return ctromanull(dp,dl,v) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
