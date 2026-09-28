@@ -47,7 +47,7 @@
 #include	<new>			/* C++STD |nothrow(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<usyscalls.h>		/* LIBU |ulogerror(2u)| */
+#include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
 #include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
