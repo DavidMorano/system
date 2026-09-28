@@ -142,7 +142,7 @@ local constexpr int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	} else {
 	    rl = 1 ;
 	    *--rp = '0' ;
-	}
+	} /* end */
 	return rl ;
 } /* end subroutine (ctxxxx) */
 
@@ -209,15 +209,15 @@ local int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
 
 /* exported subroutines */
 
-int ctxxxi(char *dp,int dl,int b,int v)			noex {
+int ctxxxsi(char *dp,int dl,int b,sint v)			noex {
 	return sctxxxx<uint>(dp,dl,b,v) ;
 } /* end */
 
-int ctxxxl(char *dp,int dl,int b,long v)		noex {
+int ctxxxsl(char *dp,int dl,int b,slong v)		noex {
 	return sctxxxx<ulong>(dp,dl,b,v) ;
 } /* end */
 
-int ctxxxll(char *dp,int dl,int b,longlong v)		noex {
+int ctxxxsll(char *dp,int dl,int b,slonglong v)		noex {
 	return sctxxxx<ulonglong>(dp,dl,b,v) ;
 } /* end */
 
