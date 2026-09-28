@@ -87,8 +87,8 @@ int cfhexstr(cchar *sp,int sl,uchar *rp) noex {
 	    rs = SR_INVALID ;
 	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	        while ((rs >= 0) && (cl >= 2) && cp[0]) {
-	            cint	ch0 = mkchar(cp[0]) ;
-	            cint	ch1 = mkchar(cp[1]) ;
+	            cint ch0 = mkchar(cp[0]) ;
+	            cint ch1 = mkchar(cp[1]) ;
 	            if (ishexlatin(ch0) && ishexlatin(ch1)) {
 		        int	v = 0 ;
 	                v |= (digvalhex(ch0) << 4) ;
