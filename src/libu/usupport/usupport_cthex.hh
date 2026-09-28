@@ -31,9 +31,9 @@
 
 
 namespace libu {
-    extern int cthexi	(char *,int,int)		noex ;
-    extern int cthexl	(char *,int,long)		noex ;
-    extern int cthexll	(char *,int,longlong)		noex ;
+    extern int cthexsi	(char *,int,sint)		noex ;
+    extern int cthexsl	(char *,int,slong)		noex ;
+    extern int cthexsll	(char *,int,slonglong)		noex ;
     extern int cthexui	(char *,int,uint)		noex ;
     extern int cthexul	(char *,int,ulong)		noex ;
     extern int cthexull	(char *,int,ulonglong)		noex ;
@@ -42,14 +42,14 @@ namespace libu {
 	(void) uv ;
 	return libu::cthex_unknown(rp,rl) ;
     } /* end */
-    template<> inline int cthex(char *dp,int dl,int sv)		noex {
-	return libu::cthexi(dp,dl,sv) ;
+    template<> inline int cthex(char *dp,int dl,sint sv)	noex {
+	return libu::cthexsi(dp,dl,sv) ;
     } /* end */
-    template<> inline int cthex(char *dp,int dl,long sv)	noex {
-	return libu::cthexl(dp,dl,sv) ;
+    template<> inline int cthex(char *dp,int dl,slong sv)	noex {
+	return libu::cthexsl(dp,dl,sv) ;
     } /* end */
-    template<> inline int cthex(char *dp,int dl,longlong sv)	noex {
-	return libu::cthexll(dp,dl,sv) ;
+    template<> inline int cthex(char *dp,int dl,slonglong sv)	noex {
+	return libu::cthexsll(dp,dl,sv) ;
     } /* end */
     template<> inline int cthex(char *dp,int dl,uint uv)	noex {
 	return libu::cthexui(dp,dl,uv) ;
