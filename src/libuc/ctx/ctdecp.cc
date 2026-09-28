@@ -149,12 +149,11 @@ local int zerofill(char *rbuf,int rlen,int prec,int n) noex {
 	int		rs = SR_OVERFLOW ;
 	cint		bi = (prec - n) ;
 	if (prec <= rlen) ylikely {
-	    int		i ;
 	    rs = SR_OK ;
-	    for (i = (n-1) ; i >= 0 ; i -= 1) {
+	    for (int i = (n-1) ; i >= 0 ; i -= 1) {
 	       rbuf[i+bi] = rbuf[i] ;
 	    } /* end for */
-	    for (i = 0 ; i < bi ; i += 1) {
+	    for (int i = 0 ; i < bi ; i += 1) {
 		rbuf[i] = '0' ;
 	    } /* end for */
 	    rs = prec ;
