@@ -33,7 +33,7 @@ struct inetaddr_head {
 	union {
 	    INADDR4	a ;
 	    char	straddr[szof(INADDR4)] ;
-	} ;
+	} ; /* end */
 } ; /* end struct (inetaddr_head) */
 
 #ifdef	__cplusplus
@@ -48,17 +48,17 @@ struct inetaddr_co {
 	void operator () (inetaddr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (inetaddr_co) */
 struct inetaddr : inetaddr_head {
 	inetaddr_co	finish ;
 	inetaddr() noex {
 	    finish	(this,inetaddrmem_finish) ;
-	} ;
+	} ; /* end ctor */
 	inetaddr(const inetaddr &) = delete ;
 	inetaddr &operator = (const inetaddr &) = delete ;
 	int start	(inetaddrs,cvoid *,int = -1) noex ;
