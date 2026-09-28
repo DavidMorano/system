@@ -97,7 +97,7 @@
 #include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<baops.h>		/* LIBU |batst(2uc)| */
+#include	<baops.h>		/* LIBU |batst(3uc)| */
 #include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
