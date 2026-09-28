@@ -504,22 +504,22 @@ int timemgr::pfini() noex {
 	    {
 	        rs1 = workend() ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        void_f	b = timemgr_atforkbefore ;
 	        void_f	ap = timemgr_atforkparent ;
 	        void_f	ac = timemgr_atforkchild ;
 	        rs1 = uc_atforkexp(b,ap,ac) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = cnv.destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mtx.destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finit = false ;
 	    finitdone = false ;
 	} /* end if (was initialized) */
@@ -745,7 +745,7 @@ int timemgr::priqrem(uctimxent *ep) noex {
     	int		rs ;
 	if ((rs = pqp->delent(ep)) == rsn) {
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (timemgr::priqrem) */
 
@@ -830,31 +830,31 @@ int timemgr::workend() noex {
 	    {
 	        rs1 = thrsend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = pass.finish ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = timerend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = sigend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = priqend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = entfins() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = ents.finish ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    fl.workready = false ;
 	} /* end if (work-ready) */
 	return rs ;
@@ -1055,7 +1055,7 @@ int timemgr::sigerend() noex {
 	            rs = trs ;
 	        } else if (rs == SR_SRCH) {
 	            rs = SR_OK ;
-	        }
+	        } /* end */
 	    } /* end if (uptkill) */
 	} /* end if (running) */
 	return rs ;
@@ -1176,7 +1176,7 @@ int timemgr::dispend() noex {
 	        rs = trs ;
 	    } else if (rs == SR_SRCH) {
 	        rs = SR_OK ;
-	    }
+	    } /* end if */
 	} /* end if (running) */
 	return rs ;
 } /* end method (timemgr::dispend) */
@@ -1309,7 +1309,7 @@ int timemgr::dispjobdel(uctimxent *tep) noex {
 		f = true ;
 	    } else if (rs == SR_NOTFOUND) {
 		rs = SR_OK ;
-	    }
+	    } /* end if */
 	    rs1 = capend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (uctimx-cap) */
