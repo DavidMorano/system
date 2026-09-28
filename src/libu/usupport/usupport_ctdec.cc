@@ -84,13 +84,13 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine-template (ctdecx) */
-    int ctdeci		(char *dp,int dl,int uv)	noex {
+    int ctdecsi		(char *dp,int dl,sint uv)	noex {
 	return ctdecx(sitostr,dp,dl,uv) ;
     } /* end subroutine */
-    int ctdecl		(char *dp,int dl,long uv)	noex {
+    int ctdecsl		(char *dp,int dl,slong uv)	noex {
 	return ctdecx(sltostr,dp,dl,uv) ;
     } /* end subroutine */
-    int ctdecll		(char *dp,int dl,longlong uv)	noex {
+    int ctdecsll	(char *dp,int dl,slonglong uv)	noex {
 	return ctdecx(slltostr,dp,dl,uv) ;
     } /* end subroutine */
     int ctdecui		(char *dp,int dl,uint uv)	noex {
