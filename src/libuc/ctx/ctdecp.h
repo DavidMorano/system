@@ -42,37 +42,37 @@ EXTERNC_end
 template<typename T>
 inline int ctdecp(char *,int,int,T)				noex {
 	return SR_NOSYS ;
-}
+} /* end */
 
 template<>
 inline int ctdecp(char *dp,int dl,int p,int v)			noex {
 	return ctdecpi(dp,dl,p,v) ;
-}
+} /* end */
 
 template<>
 inline int ctdecp(char *dp,int dl,int p,long v)			noex {
 	return ctdecpl(dp,dl,p,v) ;
-}
+} /* end */
 
 template<>
 inline int ctdecp(char *dp,int dl,int p,longlong v)		noex {
 	return ctdecpll(dp,dl,p,v) ;
-}
+} /* end */
 
 template<>
 inline int ctdecp(char *dp,int dl,int p,uint v)			noex {
 	return ctdecpui(dp,dl,p,v) ;
-}
+} /* end */
 
 template<>
 inline int ctdecp(char *dp,int dl,int p,ulong v)		noex {
 	return ctdecpul(dp,dl,p,v) ;
-}
+} /* end */
 
 template<>
 inline int ctdecp(char *dp,int dl,int p,ulonglong v)		noex {
 	return ctdecpull(dp,dl,p,v) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
