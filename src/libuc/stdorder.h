@@ -63,67 +63,67 @@ EXTERNC_end
 
 inline int stdorder_r(cchar *sp,char *rp) 	noex {
 	return stdorder_rc(sp,rp) ;
-}
+} /* end subroutine */
 inline int stdorder_r(cchar *sp,short *rp)	noex {
 	return stdorder_rs(sp,rp) ;
-}
+} /* end subroutine */
 inline int stdorder_r(cchar *sp,int *rp)	noex {
 	return stdorder_ri(sp,rp) ;
-}
+} /* end subroutine */
 inline int stdorder_r(cchar *sp,long *rp)	noex {
 	return stdorder_rl(sp,rp) ;
-}
+} /* end subroutine */
 inline int stdorder_r(cchar *sp,longlong *rp)	noex {
 	return stdorder_rll(sp,rp) ;
-}
+} /* end subroutine */
 
 inline int stdorder_r(cchar *sp,uchar *rp)	noex {
 	return stdorder_ruc(sp,rp) ;
-}
+} /* end subroutine */
 inline int stdorder_r(cchar *sp,ushort *rp)	noex {
 	return stdorder_rus(sp,rp) ;
-}
+} /* end subroutine */
 inline int stdorder_r(cchar *sp,uint *rp)	noex {
 	return stdorder_rui(sp,rp) ;
-}
+} /* end subroutine */
 inline int stdorder_r(cchar *sp,ulong *rp)	noex {
 	return stdorder_rul(sp,rp) ;
-}
+} /* end subroutine */
 inline int stdorder_r(cchar *sp,ulonglong *rp)	noex {
 	return stdorder_rull(sp,rp) ;
-}
+} /* end subroutine */
 
 inline int stdorder_w(char *bp,char v)		noex {
 	return stdorder_wc(bp,v) ;
-}
+} /* end subroutine */
 inline int stdorder_w(char *bp,short v)		noex {
 	return stdorder_ws(bp,v) ;
-}
+} /* end subroutine */
 inline int stdorder_w(char *bp,int v)		noex {
 	return stdorder_wi(bp,v) ;
-}
+} /* end subroutine */
 inline int stdorder_w(char *bp,long v)		noex {
 	return stdorder_wl(bp,v) ;
-}
+} /* end subroutine */
 inline int stdorder_w(char *bp,longlong v)	noex {
 	return stdorder_wll(bp,v) ;
-}
+} /* end subroutine */
 
 inline int stdorder_w(char *bp,uchar uv)	noex {
 	return stdorder_wuc(bp,uv) ;
-}
+} /* end subroutine */
 inline int stdorder_w(char *bp,ushort uv)	noex {
 	return stdorder_wus(bp,uv) ;
-}
+} /* end subroutine */
 inline int stdorder_w(char *bp,uint uv)		noex {
 	return stdorder_wui(bp,uv) ;
-}
+} /* end subroutine */
 inline int stdorder_w(char *bp,ulong uv)	noex {
 	return stdorder_wul(bp,uv) ;
-}
+} /* end subroutine */
 inline int stdorder_w(char *bp,ulonglong uv)	noex {
 	return stdorder_wull(bp,uv) ;
-}
+} /* end subroutine */
 
 #endif /* __cplusplus */
 
