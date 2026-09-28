@@ -155,11 +155,11 @@ namespace {
 	void operator () (subinfo *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (subinfo_co) */
     struct subinfo {
 	friend		subinfo_co ;
@@ -276,19 +276,19 @@ int subinfo::ºstart() noex {
 	ccharp		prefix = SVCSYMPREFIX ;
 	int		rs ;
 	int		rs1 ;
-	    if ((rs = environ()) >= 0) ylikely {
-		if (charp dbuf ; (rs = mem.mn(&dbuf)) >= 0) {
-		    cint dlen = rs ;
-	            if ((rs = sncpy(dbuf,dlen,prefix,prn)) >= 0) {
-		        cchar	*sp = dbuf ;
-	                if (cchar *cp ; (rs = mem.strw(sp,rs,&cp)) >= 0) {
-	                    dialsym = const_cast<charp>(cp) ;
-		        } /* end if (memory-acquire) */
-	            } /* end if (sncpy) */
-		    rs1 = mem.free(dbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
-	    } /* end if (subifo::environ) */
+	if ((rs = environ()) >= 0) ylikely {
+	    if (charp dbuf ; (rs = mem.mn(&dbuf)) >= 0) {
+		cint dlen = rs ;
+	        if ((rs = sncpy(dbuf,dlen,prefix,prn)) >= 0) {
+		    cchar	*sp = dbuf ;
+	            if (cchar *cp ; (rs = mem.strw(sp,rs,&cp)) >= 0) {
+	                dialsym = const_cast<charp>(cp) ;
+		    } /* end if (memory-acquire) */
+	        } /* end if (sncpy) */
+		rs1 = mem.free(dbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (subifo::environ) */
 	return rs ;
 } /* end method (subinfo::ºstart) */
 
@@ -330,10 +330,10 @@ int subinfo::ºbuf() noex {
 	int		rs1 ;
 	int		f = false ; /* return-value */
 	int		ai = 0 ;
-	if (char	*a ; (rs = mem.mall(sz,&a)) >= 0) {
-	    char	*pdn = (a + (ai++ * (maxpath + 1))) ;
-	    char	*sdn = (a + (ai++ * (maxpath + 1))) ;
-	    char	*sfn = (a + (ai++ * (maxpath + 1))) ;
+	if (char *a ; (rs = mem.mall(sz,&a)) >= 0) {
+	    char *pdn = (a + (ai++ * (maxpath + 1))) ;
+	    char *sdn = (a + (ai++ * (maxpath + 1))) ;
+	    char *sfn = (a + (ai++ * (maxpath + 1))) ;
 	    if (charp dn ; (rs = mem.hostname(&dn)) >= 0) {
 	        if ((rs = getnodedomain(np,dn)) >= 0) {
 		    rs = proc(pdn,sdn,sfn,dn) ;
@@ -352,23 +352,23 @@ int subinfo::proc(char *pdn,char *sdn,char *sfn,cc *dn) noex {
     	cint		plen = var.maxpathlen ;
     	int		rs = SR_OK ;
 	int		f = false ;
-		    ustat	sb ;
-	            for (int i = 0 ; prns[i] ; i += 1) {
-	                if ((rs = mkpr(pdn,plen,prns[i],dn)) > 0) {
-		            if ((rs = mkpath(sdn,pdn,SVCDNAME)) >= 0) {
-	        		if ((rs = u_stat(sdn,&sb)) >= 0) {
-				    if (S_ISDIR(sb.st_mode)) {
-	                                rs = exts(pdn,sdn,sfn) ;
-	                                f = rs ;
-				    } /* end if */
-				} else if (isNotPresent(rs)) {
-		    		    rs = SR_OK ;
-				}
-			    } /* end if (mkpath) */
-	                } /* end if (mkpr) */
-			if (f) break ;
-			if (rs < 0) break ;
-	            } /* end for (prns) */
+        ustat       sb ;
+        for (int i = 0 ; prns[i] ; i += 1) {
+            if ((rs = mkpr(pdn,plen,prns[i],dn)) > 0) {
+                if ((rs = mkpath(sdn,pdn,SVCDNAME)) >= 0) {
+                    if ((rs = u_stat(sdn,&sb)) >= 0) {
+                        if (S_ISDIR(sb.st_mode)) {
+                            rs = exts(pdn,sdn,sfn) ;
+                            f = rs ;
+                        } /* end if */
+                    } else if (isNotPresent(rs)) {
+                        rs = SR_OK ;
+                    }
+                } /* end if (mkpath) */
+            } /* end if (mkpr) */
+            if (f) break ;
+            if (rs < 0) break ;
+        } /* end for (prns) */
 	return (rs >= 0) ? f : rs ;
 } /* end method (subinfo::proc) */
 
