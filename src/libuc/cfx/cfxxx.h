@@ -27,26 +27,36 @@
 
 EXTERNC_begin
 
-extern int cfxxxi	(cchar *,int,int *)		noex ;
-extern int cfxxxl	(cchar *,int,long *)		noex ;
-extern int cfxxxll	(cchar *,int,longlong *)	noex ;
+extern int cfxxxsi	(cchar *,int,sint *)		noex ;
+extern int cfxxxsl	(cchar *,int,slong *)		noex ;
+extern int cfxxxsll	(cchar *,int,slonglong *)	noex ;
 
 extern int cfxxxui	(cchar *,int,uint *)		noex ;
 extern int cfxxxul	(cchar *,int,ulong *)		noex ;
 extern int cfxxxull	(cchar *,int,ulonglong *)	noex ;
 
+inline int cfxxxi(cchar *sp,int sl,int *rp)		noex {
+	return cfxxxsi(sp,sl,rp) ;
+} /* end */
+inline int cfxxxl(cchar *sp,int sl,long *rp)		noex {
+	return cfxxxsl(sp,sl,rp) ;
+} /* end */
+inline int cfxxxll(cchar *sp,int sl,longlong *rp)		noex {
+	return cfxxxsll(sp,sl,rp) ;
+} /* end */
+
 EXTERNC_end
 
 #if	__cplusplus
 
-inline int cfxxx(cchar *sp,int sl,int *rp)		noex {
-	return cfxxxi(sp,sl,rp) ;
+inline int cfxxx(cchar *sp,int sl,sint *rp)		noex {
+	return cfxxxsi(sp,sl,rp) ;
 } /* end */
-inline int cfxxx(cchar *sp,int sl,long *rp)		noex {
-	return cfxxxl(sp,sl,rp) ;
+inline int cfxxx(cchar *sp,int sl,slong *rp)		noex {
+	return cfxxxsl(sp,sl,rp) ;
 } /* end */
-inline int cfxxx(cchar *sp,int sl,longlong *rp)		noex {
-	return cfxxxll(sp,sl,rp) ;
+inline int cfxxx(cchar *sp,int sl,slonglong *rp)		noex {
+	return cfxxxsll(sp,sl,rp) ;
 } /* end */
 
 inline int cfxxx(cchar *sp,int sl,uint *rp)		noex {
