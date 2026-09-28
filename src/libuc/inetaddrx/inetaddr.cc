@@ -81,7 +81,7 @@
 #pragma		GCC dependency		"mod/ureserve.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
-import digtab ;
+import digtab ;				/* |digtab(3u)| */
 import ureserve ;
 
 /* local defines */
