@@ -52,9 +52,9 @@ typedef int (*uctimx_f)(void *objp,int timid,int notarg) noex ;
 EXTERNC_end
 
 struct uctimxnote_head {
+	psem		*psemp ;	/* POSIX® Semaphore pointer */
 	uctimx_f	notfun ;	/* notification function pointer */
 	voidp		notobj ;	/* notification function object */
-	psem		*psemp ;	/* POSIX® Semaphore pointer */
 	int		notarg ;	/* notification function argument */
 } ; /* end struct (uctimxnote_head) */
 
