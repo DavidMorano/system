@@ -86,13 +86,13 @@ namespace libu {
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine-template (cthexx) */
-    int cthexi		(char *dp,int dl,int uv)	noex {
+    int cthexsi		(char *dp,int dl,sint uv)	noex {
 	return cthexx(sitostr,dp,dl,uv) ;
     } /* end subroutine */
-    int cthexl		(char *dp,int dl,long uv)	noex {
+    int cthexsl		(char *dp,int dl,slong uv)	noex {
 	return cthexx(sltostr,dp,dl,uv) ;
     } /* end subroutine */
-    int cthexll		(char *dp,int dl,longlong uv)	noex {
+    int cthexsll	(char *dp,int dl,slonglong uv)	noex {
 	return cthexx(slltostr,dp,dl,uv) ;
     } /* end subroutine */
     int cthexui		(char *dp,int dl,uint uv)	noex {
