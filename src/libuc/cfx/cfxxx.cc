@@ -87,27 +87,27 @@ import cfsysx ;
 
 /* exported subroutines */
 
-int cfxxxi(cchar *sp,int sl,int b,int *rp) noex {
+int cfxxxsi(cchar *sp,int sl,int b,sint *rp)		noex {
 	return cfsysx(sp,sl,b,rp) ;
 } /* end */
 
-int cfxxxl(cchar *sp,int sl,int b,long *rp) noex {
+int cfxxxsl(cchar *sp,int sl,int b,slong *rp)		noex {
 	return cfsysx(sp,sl,b,rp) ;
 } /* end */
 
-int cfxxxll(cchar *sp,int sl,int b,longlong *rp) noex {
+int cfxxxsll(cchar *sp,int sl,int b,slonglong *rp)	noex {
 	return cfsysx(sp,sl,b,rp) ;
 } /* end */
 
-int cfxxxui(cchar *sp,int sl,int b,uint *rp) noex {
+int cfxxxui(cchar *sp,int sl,int b,uint *rp)		noex {
 	return cfsysx(sp,sl,b,rp) ;
 } /* end */
 
-int cfxxxul(cchar *sp,int sl,int b,ulong *rp) noex {
+int cfxxxul(cchar *sp,int sl,int b,ulong *rp)		noex {
 	return cfsysx(sp,sl,b,rp) ;
 } /* end */
 
-int cfxxxull(cchar *sp,int sl,int b,ulonglong *rp) noex {
+int cfxxxull(cchar *sp,int sl,int b,ulonglong *rp)	noex {
 	return cfsysx(sp,sl,b,rp) ;
 } /* end */
 
