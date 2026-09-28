@@ -81,8 +81,8 @@ template<typename T> local void strtox(cchar *,char **,int,T *rp)	noex {
 	*rp = 0 ;
 } /* end subroutine-template */
 
-/* |int| */
-template<> void strtox(cchar *sp,char **epp,int b,int *rp)		noex {
+/* |signed-int| */
+template<> void strtox(cchar *sp,char **epp,int b,sint *rp)		noex {
 	clong	v = strtol(sp,epp,b) ;
 	*rp = int(v) ;
 	if (errno == 0) {
@@ -96,30 +96,30 @@ template<> void strtox(cchar *sp,char **epp,int b,int *rp)		noex {
 		    if (uv || (! bit(v,((n/2)-1)))) {
 			errno = ERANGE ;
 			*rp = INT_MIN ;
-		    }
+		    } /* end */
 		} else {	/* test poitive value */
 	    	    ulong	uv = ulong(v) ;
 	            uv >>= (n/2) ;
 		    if (uv || bit(v,((n/2)-1))) {
 			errno = ERANGE ;
 			*rp = INT_MAX ;
-		    }
+		    } /* end */
 		} /* end if */
 	    } /* end block */
 	} /* end if (no error so far) */
 } /* end subroutine-template (strtox) */
 
-/* |long| */
-template<> void strtox(cchar *sp,char **epp,int b,long *rp)		noex {
+/* |signed-long| */
+template<> void strtox(cchar *sp,char **epp,int b,slong *rp)		noex {
 	*rp = strtol(sp,epp,b) ;
 } /* end */
 
-/* |longlong| */
-template<> void strtox(cchar *sp,char **epp,int b,longlong *rp)		noex {
+/* |signed-longlong| */
+template<> void strtox(cchar *sp,char **epp,int b,slonglong *rp)	noex {
 	*rp = strtoxll(sp,epp,b) ;
 } /* end */
 
-/* |uint| */
+/* |unsigned-int| */
 template<> void strtox(cchar *sp,char **epp,int b,uint *rp)		noex {
 	ulong	uv = strtoul(sp,epp,b) ;
 	*rp = uint(uv) ;
@@ -133,12 +133,12 @@ template<> void strtox(cchar *sp,char **epp,int b,uint *rp)		noex {
 	} /* end if (not-error) */
 } /* end subroutine-template (strtox) */
 
-/* |ulong| */
+/* |unsigned-long| */
 template<> void strtox(cchar *sp,char **epp,int b,ulong *rp)		noex {
 	*rp = strtoul(sp,epp,b) ;
 } /* end subroutine-template */
 
-/* |ulonglong| */
+/* |unsigned-longlong| */
 template<> void strtox(cchar *sp,char **epp,int b,ulonglong *rp)	noex {
 	*rp = strtoxull(sp,epp,b) ;
 } /* end subroutine-template */
@@ -165,15 +165,15 @@ local sysret_t ucstrtox(cchar *sp,cchar **epp,int b,T *rp)		noex {
 
 /* exported subroutines */
 
-int uc_strtosi(cchar *sp,cchar **epp,int b,int *rp)		noex {
+int uc_strtosi(cchar *sp,cchar **epp,int b,sint *rp)		noex {
 	return ucstrtox(sp,epp,b,rp) ;
 } /* end subroutine (uc_strtoi) */
 
-int uc_strtosl(cchar *sp,cchar **epp,int b,long *rp)		noex {
+int uc_strtosl(cchar *sp,cchar **epp,int b,slong *rp)		noex {
 	return ucstrtox(sp,epp,b,rp) ;
 } /* end subroutine (uc_strtol) */
 
-int uc_strtosll(cchar *sp,cchar **epp,int b,longlong *rp)	noex {
+int uc_strtosll(cchar *sp,cchar **epp,int b,slonglong *rp)	noex {
 	return ucstrtox(sp,epp,b,rp) ;
 } /* end subroutine (uc_strtoll) */
 
