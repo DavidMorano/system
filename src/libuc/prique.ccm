@@ -104,16 +104,16 @@ export {
     template<typename K> class prique {
 	prique_is<K>	*mp = nullptr ;
     public:
-	typedef K			key_type ;
+	typedef K	key_type ;
 	prique(const prique &) = delete ;
 	prique &operator = (const prique &) = delete ;
 	prique_co<K>	start ;
 	prique_co<K>	finish ;
 	prique_co<K>	count ;
 	prique_rem<K>	rem ;
-	constexpr int		ins(const K &) noex ;
-	constexpr int		ins(const K *) noex ;
-	constexpr int		get(const K *) noex ;
+	constexpr int	ins(const K &) noex ;
+	constexpr int	ins(const K *) noex ;
+	constexpr int	get(const K *) noex ;
 	constexpr prique() noex {
 	    start	(this,priquemem_start) ;
 	    finish	(this,priquemem_finish) ;
@@ -124,15 +124,15 @@ export {
 	    if (mp) {
 	        delete mp ;
 		mp = nullptr ;
-	    }
+	    } /* end */
 	} ; /* end dtor */
 	friend prique_rem<K> ;
 	friend prique_co<K> ;
     private:
-	constexpr int		istart(int = 0) noex ;
-	constexpr int		ifinish() noex ;
-	constexpr int		icount() noex ;
-	constexpr int		irem(K * = nullptr) noex ;
+	constexpr int	istart(int = 0) noex ;
+	constexpr int	ifinish() noex ;
+	constexpr int	icount() noex ;
+	constexpr int	irem(K * = nullptr) noex ;
     } ; /* end class (prique) */
 } /* end export (prique) */
 
@@ -148,7 +148,7 @@ export {
 	        }
 	    } catch (...) {
 		rs = SR_NOMEM ;
-	    }
+	    } /* end */
 	} /* end if */
 	return rs ;
     } /* end method (prique::istart) */
@@ -169,7 +169,7 @@ export {
 	        mp->push(*kp) ;
 	    } catch (...) {
 	        rs = SR_NOMEM ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::ins) */
@@ -199,7 +199,7 @@ export {
 	       } else {
 		   rs = SR_NOENT ;
 	       } /* end if */
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique::get) */
@@ -226,7 +226,7 @@ export {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
 	    rs = op->irem(ep) ;
-	}
+	} /* end */
 	return rs ;
     } ; /* end */
     template<typename K> constexpr int prique_co<K>::operator () (int a) noex {
@@ -243,7 +243,7 @@ export {
 	        rs = op->icount() ;
 	        break ;
 	    } /* end switch */
-	}
+	} /* end if (non-null) */
 	return rs ;
     } /* end method (prique_co::operator) */
 
