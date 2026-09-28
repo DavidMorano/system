@@ -32,11 +32,12 @@
 
 #include	<vstrorders.h>		/* LIBU */
 
-#include	<usupport_ctdec.hh>
 #include	<usupport_cfdec.hh>
 #include	<usupport_cfdect.hh>
 #include	<usupport_cfhex.hh>
 #include	<usupport_cfinet.hh>
+#include	<usupport_ctdec.hh>
+#include	<usupport_cthex.hh>
 #include	<usupport_getsign.hh>
 #include	<usupport_hasnot.hh>
 #include	<usupport_hasx.hh>
