@@ -27,13 +27,23 @@
 
 EXTERNC_begin
 
-extern int ctocti	(char *,int,int)		noex ;
-extern int ctoctl	(char *,int,long)		noex ;
-extern int ctoctll	(char *,int,longlong)		noex ;
+extern int ctoctsi	(char *,int,sint)		noex ;
+extern int ctoctsl	(char *,int,slong)		noex ;
+extern int ctoctsll	(char *,int,slonglong)		noex ;
 
 extern int ctoctui	(char *,int,uint)		noex ;
 extern int ctoctul	(char *,int,ulong)		noex ;
 extern int ctoctull	(char *,int,ulonglong)		noex ;
+
+local inline int ctocti(char *bp,int bl,int v)		noex {
+	return ctoctsi(bp,bl,v) ;
+} /* end */
+local inline int ctoctl(char *bp,int bl,long v)		noex {
+	return ctoctsl(bp,bl,v) ;
+} /* end */
+local inline int ctoctll(char *bp,int bl,longlong v)	noex {
+	return ctoctsll(bp,bl,v) ;
+} /* end */
 
 EXTERNC_end
 
@@ -41,23 +51,23 @@ EXTERNC_end
 
 inline int ctoct(char *bp,int bl,int v)			noex {
 	return ctocti(bp,bl,v) ;
-}
+} /* end */
 inline int ctoct(char *bp,int bl,long v)		noex {
 	return ctoctl(bp,bl,v) ;
-}
+} /* end */
 inline int ctoct(char *bp,int bl,longlong v)		noex {
 	return ctoctll(bp,bl,v) ;
-}
+} /* end */
 
 inline int ctoct(char *bp,int bl,uint v)		noex {
 	return ctoctui(bp,bl,v) ;
-}
+} /* end */
 inline int ctoct(char *bp,int bl,ulong v)		noex {
 	return ctoctul(bp,bl,v) ;
-}
+} /* end */
 inline int ctoct(char *bp,int bl,ulonglong v)		noex {
 	return ctoctull(bp,bl,v) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
