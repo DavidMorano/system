@@ -167,11 +167,11 @@ int mkfmt(char *fbuf,int flen,int fc,int fg,int w,int p,int sz) noex {
 	            *fp++ = 'l' ;
 	            fl += 1 ;
 	        }
-	    } /* end block */
+	    } /* end if (ok) */
 	    if (rs >= 0) ylikely {
 	        *fp++ = char(fc) ;
 	        fl += 1 ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (mkflags) */
 	*fp = '\0' ;
 	return (rs >= 0) ? fl : rs ;
