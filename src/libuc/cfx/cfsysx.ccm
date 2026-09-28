@@ -95,15 +95,15 @@ template<typename T> inline int cfsystox(cc *,int,T *)		noex {
 	return SR_BUGCHECK ;
 } /* end */
 
-template<> inline int cfsystox(cc *sp,int b,int *rp)		noex {
+template<> inline int cfsystox(cc *sp,int b,sint *rp)		noex {
 	return uc_strto(sp,nullptr,b,rp) ;
 } /* end */
 
-template<> inline int cfsystox(cc *sp,int b,long *rp)		noex {
+template<> inline int cfsystox(cc *sp,int b,slong *rp)		noex {
 	return uc_strto(sp,nullptr,b,rp) ;
 } /* end */
 
-template<> inline int cfsystox(cc *sp,int b,longlong *rp)	noex {
+template<> inline int cfsystox(cc *sp,int b,slonglong *rp)	noex {
 	return uc_strto(sp,nullptr,b,rp) ;
 } /* end */
 
@@ -124,7 +124,7 @@ export {
     template<typename T> inline int cfsysx(cc *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sp && rp) {
+	if (sp && rp) ylikely {
 	    cchar	*nsp{} ;
 	    rs = SR_DOM ;
 	    if (int nsl ; (nsl = cfx::sfdigs(sp,sl,&nsp)) > 0) ylikely {
