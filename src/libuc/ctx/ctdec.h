@@ -33,13 +33,23 @@
 
 EXTERNC_begin
 
-extern int ctdeci	(char *,int,int)		noex ;
-extern int ctdecl	(char *,int,long)		noex ;
-extern int ctdecll	(char *,int,longlong)		noex ;
+extern int ctdecsi	(char *,int,sint)		noex ;
+extern int ctdecsl	(char *,int,slong)		noex ;
+extern int ctdecsll	(char *,int,slonglong)		noex ;
 
 extern int ctdecui	(char *,int,uint)		noex ;
 extern int ctdecul	(char *,int,ulong)		noex ;
 extern int ctdecull	(char *,int,ulonglong)		noex ;
+
+local inline int ctdeci(char *bp,int bl,int v)		noex {
+	return ctdecsi(bp,bl,v) ;
+} /* end */
+local inline int ctdecl(char *bp,int bl,long v)		noex {
+	return ctdecsl(bp,bl,v) ;
+} /* end */
+local inline int ctdecll(char *bp,int bl,longlong v)	noex {
+	return ctdecsll(bp,bl,v) ;
+} /* end */
 
 EXTERNC_end
 
@@ -47,23 +57,23 @@ EXTERNC_end
 
 inline int ctdec(char *bp,int bl,int v)			noex {
 	return ctdeci(bp,bl,v) ;
-}
+} /* end */
 inline int ctdec(char *bp,int bl,long v)		noex {
 	return ctdecl(bp,bl,v) ;
-}
+} /* end */
 inline int ctdec(char *bp,int bl,longlong v)		noex {
 	return ctdecll(bp,bl,v) ;
-}
+} /* end */
 
 inline int ctdec(char *bp,int bl,uint v)		noex {
 	return ctdecui(bp,bl,v) ;
-}
+} /* end */
 inline int ctdec(char *bp,int bl,ulong v)		noex {
 	return ctdecul(bp,bl,v) ;
-}
+} /* end */
 inline int ctdec(char *bp,int bl,ulonglong v)		noex {
 	return ctdecull(bp,bl,v) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
