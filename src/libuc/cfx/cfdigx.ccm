@@ -186,7 +186,7 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	    if ((rs = getsign()) >= 0) {
 		prepare() ;
 		rs = proc() ;
-	    }
+	    } /* end */
 	    return rs ;
 	} ; /* end method (operator) */
 } ; /* end struct (cfdshelp -- Convert-From-Digit-SiSigned) */
@@ -229,14 +229,14 @@ template<stdintx T> struct cfduhelp { /* Convert-From-Digit-UnSigned */
 	int proc() noex {
 	    int		rs = SR_INVALID ;
 	    {
-	        while (sl && ((rs = getval(*sp)) >= 0)) {
+	        while (sl && *sp && ((rs = getval(*sp)) >= 0)) {
 		    cint	nv = rs ;
 		    if ((val > cutoff) || (val == cutoff && nv > cutlim)) {
 			rs = SR_RANGE ;
 		    } else {
 		        val *= base ;
 		        val += nv ;
-		    }
+		    } /* end */
 		    sp += 1 ;
 		    sl -= 1 ;
 		    if (rs < 0) break ;
@@ -246,7 +246,7 @@ template<stdintx T> struct cfduhelp { /* Convert-From-Digit-UnSigned */
 		*rp = (fneg) ? (neg val) : val ;
 	    } else {
 		*rp = 0 ;
-	    }
+	    } /* end */
 	    return rs ;
 	} ; /* end method (proc) */
 	operator int () noex {
