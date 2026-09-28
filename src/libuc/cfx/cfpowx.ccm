@@ -91,7 +91,7 @@ template<typename T> struct cfpowshelp {
 		    cutoff += 1 ;
 		}
 		cutlim = (neg cutlim) ;
-	    }
+	    } /* end */
 	} ; /* end method (prepare) */
 	int getval(int ch) noex {
 	    int		rs = CHAR_TOVAL(ch) ;
@@ -116,17 +116,17 @@ template<typename T> struct cfpowshelp {
 		    if ((val < cutoff) || (val == cutoff && nv > cutlim)) {
 			rs = SR_RANGE ;
 		    } else {
-		        val *= base;
+		        val *= base ;
 		        val -= nv ;
 		    }
 		} else {
 		    if ((val > cutoff) || (val == cutoff && nv > cutlim)) {
 			rs = SR_RANGE ;
 		    } else {
-			val *= base;
+			val *= base ;
 			val += nv ;
 		    }
-		}
+		} /* end if */
 		if (rs < 0) break ;
 	    } /* end while */
 	    return rs ;
