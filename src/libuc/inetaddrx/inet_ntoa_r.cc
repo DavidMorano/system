@@ -91,8 +91,8 @@ using libu::strnwcpy ;			/* subroutine */
 
 /* local variables */
 
-cint		ndots	= 3 ;		/* number of dots in result */
-cint		nzeros	= 4 ;		/* number of zeros in result */
+cint		ndots	= 3 ;		/* result number of dots */
+cint		nzeros	= 4 ;		/* result number of zeros */
 
 
 /* exported variables */
@@ -101,30 +101,25 @@ cint		nzeros	= 4 ;		/* number of zeros in result */
 /* exported subroutines */
 
 char *inet_ntoa_r(INADDR in,char *rbuf,int rlen) noex {
-	char		*rp = nullptr ;
+	char		*rp = nullptr ; /* return-value */
 	if (rbuf) ylikely {
 	    rbuf[0] = '0' ;
-	    if (rlen >= (ndots + nzeros)) {
-	        cint	n = INET4ADDRLEN ;
-	        string	b ; 
-	        cchar	*ap = charp(&in) ;
-		bool	fbad = false ;
-	        for (int i = 0 ; i < n ; i += 1) {
-		    cint v = mkchar(*ap++) ;
-		    try {
+	    if (rlen >= (ndots + nzeros)) ylikely {
+		try {
+	            cint	n = INET4ADDRLEN ;
+	            string	b ; 
+	            cchar	*ap = charp(&in) ;
+	            for (int i = 0 ; i < n ; i += 1) {
+		        cint v = mkchar(*ap++) ;
 		        if (i > 0) b += '.' ;
 		        b += to_string(v) ;
-		    } catch (...) {
-			fbad = true ;
-			break ;
-		    }
-	        } /* end for */
-	        if (! fbad) {
+	            } /* end for */
 	            if (cint cl = intconv(b.size()) > 0) {
 		        cchar *cp = b.c_str() ;
 		        rp = strnwcpy(rbuf,rlen,cp,cl) ;
-	            }
-	        } /* end if (! fbad) */
+	            } /* end if */
+		} catch (...) {
+		} /* end try */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rp ;
