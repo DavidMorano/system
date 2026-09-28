@@ -69,23 +69,23 @@ constexpr int	b = OURBASE ;
 
 /* exported subroutines */
 
-int ctocti(char *dp,int dl,int val) noex {
+int ctoctsi(char *dp,int dl,sint val) noex {
 	uint		uv = uint(val) ;
 	cint		n = szof(int) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (ctocti) */
+} /* end subroutine (ctoctsi) */
 
-int ctoctl(char *dp,int dl,long val) noex {
+int ctoctsl(char *dp,int dl,slong val) noex {
 	ulong		uv = ulong(val) ;
 	cint		n = szof(long) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (ctoctl) */
+} /* end subroutine (ctoctsl) */
 
-int ctoctll(char *dp,int dl,longlong val) noex {
+int ctoctsll(char *dp,int dl,slonglong val) noex {
 	ulonglong	uv = ulonglong(val) ;
 	cint		n = szof(longlong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (ctoctll) */
+} /* end subroutine (ctoctsll) */
 
 int ctoctui(char *dp,int dl,uint uv) noex {
 	cint		n = szof(uint) ;
