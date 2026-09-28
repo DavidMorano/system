@@ -69,35 +69,35 @@ constexpr int	b = OURBASE ;
 
 /* exported subroutines */
 
-int cthexc(char *dp,int dl,char val) noex {
+int cthexsc(char *dp,int dl,schar val) noex {
 	uint		uv = uint(val) ;
 	cint		n = szof(char) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (cthexc) */
+} /* end subroutine (cthexsc) */
 
-int cthexs(char *dp,int dl,short val) noex {
+int cthexss(char *dp,int dl,sshort val) noex {
 	uint		uv = uint(val) ;
 	cint		n = szof(short) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (cthexs) */
+} /* end subroutine (cthexss) */
 
-int cthexi(char *dp,int dl,int val) noex {
+int cthexsi(char *dp,int dl,sint val) noex {
 	uint		uv = uint(val) ;
 	cint		n = szof(int) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (cthexi) */
+} /* end subroutine (cthexsi) */
 
-int cthexl(char *dp,int dl,long val) noex {
+int cthexsl(char *dp,int dl,slong val) noex {
 	ulong		uv = ulong(val) ;
 	cint		n = szof(long) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (cthexl) */
+} /* end subroutine (cthexsl) */
 
-int cthexll(char *dp,int dl,longlong val) noex {
+int cthexsll(char *dp,int dl,slonglong val) noex {
 	ulonglong	uv = ulonglong(val) ;
 	cint		n = szof(longlong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
-} /* end subroutine (cthexll) */
+} /* end subroutine (cthexsll) */
 
 int cthexuc(char *dp,int dl,uchar uv) noex {
 	cint		n = szof(uchar) ;
