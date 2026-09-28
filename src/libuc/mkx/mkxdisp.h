@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* qualify an X display specification */
+/* qualify an X display name with its domain-name */
 /* version %I% last-modified %G% */
 
 
