@@ -39,24 +39,24 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline int uc_strto(cchar *sp,cchar **endpp,int b,int *rp)		noex {
+inline int uc_strto(cchar *sp,cchar **endpp,int b,sint *rp)		noex {
 	return uc_strtosi(sp,endpp,b,rp) ;
-}
-inline int uc_strto(cchar *sp,cchar **endpp,int b,long *rp)		noex {
+} /* end */
+inline int uc_strto(cchar *sp,cchar **endpp,int b,slong *rp)		noex {
 	return uc_strtosl(sp,endpp,b,rp) ;
-}
-inline int uc_strto(cchar *sp,cchar **endpp,int b,longlong *rp) 	noex {
+} /* end */
+inline int uc_strto(cchar *sp,cchar **endpp,int b,slonglong *rp) 	noex {
 	return uc_strtosll(sp,endpp,b,rp) ;
-}
+} /* end */
 inline int uc_strto(cchar *sp,cchar **endpp,int b,uint *rp)		noex {
 	return uc_strtoui(sp,endpp,b,rp) ;
-}
+} /* end */
 inline int uc_strto(cchar *sp,cchar **endpp,int b,ulong *rp)		noex {
 	return uc_strtoul(sp,endpp,b,rp) ;
-}
+} /* end */
 inline int uc_strto(cchar *sp,cchar **endpp,int b,ulonglong *rp)	noex {
 	return uc_strtoull(sp,endpp,b,rp) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
