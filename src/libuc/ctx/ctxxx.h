@@ -30,13 +30,23 @@
 
 EXTERNC_begin
 
-extern int ctxxxi	(char *,int,int,int)		noex ;
-extern int ctxxxl	(char *,int,int,long)		noex ;
-extern int ctxxxll	(char *,int,int,longlong)	noex ;
+extern int ctxxxsi	(char *,int,int,sint)		noex ;
+extern int ctxxxsl	(char *,int,int,slong)		noex ;
+extern int ctxxxsll	(char *,int,int,slonglong)	noex ;
 
 extern int ctxxxui	(char *,int,int,uint)		noex ;
 extern int ctxxxul	(char *,int,int,ulong)		noex ;
 extern int ctxxxull	(char *,int,int,ulonglong)	noex ;
+
+local inline int ctxxxi(char *bp,int bl,int b,int v)		noex {
+	return ctxxxsi(bp,bl,b,v) ;
+} /* end */
+local inline int ctxxxl(char *bp,int bl,int b,long v)		noex {
+	return ctxxxsl(bp,bl,b,v) ;
+} /* end */
+local inline int ctxxxll(char *bp,int bl,int b,longlong v)	noex {
+	return ctxxxsll(bp,bl,b,v) ;
+} /* end */
 
 EXTERNC_end
 
@@ -44,23 +54,23 @@ EXTERNC_end
 
 inline int ctxxx(char *bp,int bl,int b,int v)		noex {
 	return ctxxxi(bp,bl,b,v) ;
-}
+} /* end */
 inline int ctxxx(char *bp,int bl,int b,long v)		noex {
 	return ctxxxl(bp,bl,b,v) ;
-}
+} /* end */
 inline int ctxxx(char *bp,int bl,int b,longlong v)	noex {
 	return ctxxxll(bp,bl,b,v) ;
-}
+} /* end */
 
 inline int ctxxx(char *bp,int bl,int b,uint v)		noex {
 	return ctxxxui(bp,bl,b,v) ;
-}
+} /* end */
 inline int ctxxx(char *bp,int bl,int b,ulong v)		noex {
 	return ctxxxul(bp,bl,b,v) ;
-}
+} /* end */
 inline int ctxxx(char *bp,int bl,int b,ulonglong v)	noex {
 	return ctxxxull(bp,bl,b,v) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
