@@ -31,9 +31,9 @@
 
 
 namespace libu {
-    extern int cfhex(cchar *,int,int *)		noex ;
-    extern int cfhex(cchar *,int,long *)	noex ;
-    extern int cfhex(cchar *,int,longlong *)	noex ;
+    extern int cfhex(cchar *,int,sint *)	noex ;
+    extern int cfhex(cchar *,int,slong *)	noex ;
+    extern int cfhex(cchar *,int,slonglong *)	noex ;
     extern int cfhex(cchar *,int,uint *)	noex ;
     extern int cfhex(cchar *,int,ulong *)	noex ;
     extern int cfhex(cchar *,int,ulonglong *)	noex ;
