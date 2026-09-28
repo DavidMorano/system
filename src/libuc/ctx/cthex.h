@@ -27,11 +27,11 @@
 
 EXTERNC_begin
 
-extern int cthexc	(char *,int,char)		noex ;
-extern int cthexs	(char *,int,short)		noex ;
-extern int cthexi	(char *,int,int)		noex ;
-extern int cthexl	(char *,int,long)		noex ;
-extern int cthexll	(char *,int,longlong)		noex ;
+extern int cthexsc	(char *,int,schar)		noex ;
+extern int cthexss	(char *,int,sshort)		noex ;
+extern int cthexsi	(char *,int,sint)		noex ;
+extern int cthexsl	(char *,int,slong)		noex ;
+extern int cthexsll	(char *,int,slonglong)		noex ;
 
 extern int cthexuc	(char *,int,uchar)		noex ;
 extern int cthexus	(char *,int,ushort)		noex ;
@@ -39,35 +39,51 @@ extern int cthexui	(char *,int,uint)		noex ;
 extern int cthexul	(char *,int,ulong)		noex ;
 extern int cthexull	(char *,int,ulonglong)		noex ;
 
+local inline int cthexc(char *bp,int bl,char v)		noex {
+	return cthexsc(bp,bl,v) ;
+} /* end */
+local inline int cthexs(char *bp,int bl,short v)	noex {
+	return cthexss(bp,bl,v) ;
+} /* end */
+local inline int cthexi(char *bp,int bl,int v)		noex {
+	return cthexsi(bp,bl,v) ;
+} /* end */
+local inline int cthexl(char *bp,int bl,long v)		noex {
+	return cthexsl(bp,bl,v) ;
+} /* end */
+local inline int cthexll(char *bp,int bl,longlong v)	noex {
+	return cthexsll(bp,bl,v) ;
+} /* end */
+
 EXTERNC_end
 
 #ifdef	__cplusplus
 
 inline int cthex(char *bp,int bl,int v)			noex {
 	return cthexi(bp,bl,v) ;
-}
+} /* end */
 inline int cthex(char *bp,int bl,long v)		noex {
 	return cthexl(bp,bl,v) ;
-}
+} /* end */
 inline int cthex(char *bp,int bl,longlong v)		noex {
 	return cthexll(bp,bl,v) ;
-}
+} /* end */
 
 inline int cthex(char *bp,int bl,uchar v)		noex {
 	return cthexuc	(bp,bl,v) ;
-}
+} /* end */
 inline int cthex(char *bp,int bl,ushort v)		noex {
 	return cthexus	(bp,bl,v) ;
-}
+} /* end */
 inline int cthex(char *bp,int bl,uint v)		noex {
 	return cthexui	(bp,bl,v) ;
-}
+} /* end */
 inline int cthex(char *bp,int bl,ulong v)		noex {
 	return cthexul	(bp,bl,v) ;
-}
+} /* end */
 inline int cthex(char *bp,int bl,ulonglong v)		noex {
 	return cthexull	(bp,bl,v) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
