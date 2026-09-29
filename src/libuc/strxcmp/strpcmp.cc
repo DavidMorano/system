@@ -138,7 +138,7 @@ int strxpcmp(cchar *s1,cchar *s2) noex {
 		    rc = strpcmp(s1,s2) ;
 		}
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (strxpcmp) */
 
