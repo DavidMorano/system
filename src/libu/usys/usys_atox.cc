@@ -43,7 +43,7 @@ constexpr int		base10 = 10 ;	/* base-10 */
 
 sint	atosi(cchar *s) noex {
     	sint		res = 0 ; /* return-value */
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (s) {
 	    res = atoi(s) ;
 	} else {
@@ -59,7 +59,7 @@ sint	atosi(cchar *s,int b) noex {
 
 uint	atoui(cchar *s) noex {
     	uint		res = 0 ; /* return-value */
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (s) {
 	    con ulong resl = strtoul(s,nullptr,base10) ;
 	    if (errno == 0) {
@@ -85,7 +85,7 @@ uint	atoui(cchar *s,int b) noex {
 
 slong	atosl(cchar *s) noex {
     	slong		res = 0 ; /* return-value */
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (s) {
 	    res = atol(s) ;
 	} else {
@@ -105,7 +105,7 @@ ulong	atoul(cchar *s) noex {
 
 ulong	atoul(cchar *s,int b) noex {
     	ulong		res = 0 ; /* return-value */
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (s) {
 	    res = strtoul(s,nullptr,b) ;
 	} else {
