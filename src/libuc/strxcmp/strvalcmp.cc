@@ -112,7 +112,7 @@ int strxvalcmp(cchar *sp,cchar *vp) noex {
 		    rc = strvalcmp(sp,vp) ;
 		}
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (strxvalcmp) */
 
