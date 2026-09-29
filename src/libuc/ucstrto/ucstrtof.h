@@ -38,13 +38,13 @@ EXTERNC_end
 
 inline int uc_strto(cchar *sp,cchar **endpp,float *rp)		noex {
 	return uc_strtof(sp,endpp,rp) ;
-}
+} /* end */
 inline int uc_strto(cchar *sp,cchar **endpp,double *rp)		noex {
 	return uc_strtod(sp,endpp,rp) ;
-}
+} /* end */
 inline int uc_strto(cchar *sp,cchar **endpp,longdouble *rp)	noex {
 	return uc_strtold(sp,endpp,rp) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
