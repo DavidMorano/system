@@ -46,7 +46,7 @@ These versiona are used on arrays (otherwise often called "vectors")
 of pointers to c-strings.  But if the array contains some NULL
 pointers, these NULL pointers are sorted to the end of the sorted
 array.  This behavior is often wanted (demanded) when it is not
-known whether or not NULL pointer are present in the array of
+known whether or not NULL pointers are present in the array of
 pointers operated on (sorted).
 
 
