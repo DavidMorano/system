@@ -27,9 +27,9 @@
 
 EXTERNC_begin
 
-extern int ctromani	(char *,int,int)		noex ;
-extern int ctromanl	(char *,int,long)		noex ;
-extern int ctromanll	(char *,int,longlong)		noex ;
+extern int ctromansi	(char *,int,sint)		noex ;
+extern int ctromansl	(char *,int,slong)		noex ;
+extern int ctromansll	(char *,int,slonglong)		noex ;
 
 extern int ctromanui	(char *,int,uint)		noex ;
 extern int ctromanul	(char *,int,ulong)		noex ;
@@ -45,18 +45,18 @@ inline int ctroman(char *,int,T)			noex {
 } /* end */
 
 template<>
-inline int ctroman(char *dp,int dl,int v)		noex {
-	return ctromani(dp,dl,v) ;
+inline int ctroman(char *dp,int dl,sint v)		noex {
+	return ctromansi(dp,dl,v) ;
 } /* end */
 
 template<>
-inline int ctroman(char *dp,int dl,long v)		noex {
-	return ctromanl(dp,dl,v) ;
+inline int ctroman(char *dp,int dl,slong v)		noex {
+	return ctromansl(dp,dl,v) ;
 } /* end */
 
 template<>
-inline int ctroman(char *dp,int dl,longlong v)		noex {
-	return ctromanll(dp,dl,v) ;
+inline int ctroman(char *dp,int dl,slonglong v)		noex {
+	return ctromansll(dp,dl,v) ;
 } /* end */
 
 template<>
