@@ -96,7 +96,7 @@ int strxleadcmp(cchar *s1,cchar *s2) noex {
 		    rc = strleadcmp(s1,s2) ;
 		}
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (strxleadcmp) */
 
