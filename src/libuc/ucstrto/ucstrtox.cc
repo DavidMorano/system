@@ -85,7 +85,7 @@ template<typename T> local void strtox(cchar *,char **,int,T *rp)	noex {
 template<> void strtox(cchar *sp,char **epp,int b,sint *rp)		noex {
 	clong	v = strtol(sp,epp,b) ;
 	*rp = int(v) ;
-	if (errno == 0) {
+	if (errno == 0) ylikely {
 	    cint	n = nbits(v) ;
 	    {
 	        cbool	f_neg = bit(v,(n-1)) ;
@@ -123,7 +123,7 @@ template<> void strtox(cchar *sp,char **epp,int b,slonglong *rp)	noex {
 template<> void strtox(cchar *sp,char **epp,int b,uint *rp)		noex {
 	ulong	uv = strtoul(sp,epp,b) ;
 	*rp = uint(uv) ;
-	if (errno == 0) {
+	if (errno == 0) ylikely {
 	    cint	n = nbits(uv) ;
 	    uv >>= (n/2) ;
 	    if (uv) {
@@ -146,7 +146,7 @@ template<> void strtox(cchar *sp,char **epp,int b,ulonglong *rp)	noex {
 template<typename T>
 local sysret_t ucstrtox(cchar *sp,cchar **epp,int b,T *rp)		noex {
 	int		rs = SR_FAULT ;
-	if (sp && rp) {
+	if (sp && rp) ylikely {
 	    char	*endp = nullptr ;
 	    errno = 0 ;
 	    strtox(sp,&endp,b,rp) ;
