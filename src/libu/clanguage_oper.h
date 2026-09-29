@@ -23,6 +23,12 @@
 
 
 #ifdef	__cplusplus
+#ifndef	pos
+#define	pos			+
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 #ifndef	neg
 #define	neg			-
 #endif
