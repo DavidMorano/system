@@ -64,7 +64,7 @@ local int	toval(int) noex ;
 
 /* exported subroutines */
 
-int cfromani(cchar *sp,int sl,int *rp) noex {
+int cfromansi(cchar *sp,int sl,sint *rp) noex {
 	ulonglong	val ;
 	int		rs ;
 	rs = romconv(sp,sl,&val) ;
@@ -72,7 +72,7 @@ int cfromani(cchar *sp,int sl,int *rp) noex {
 	return rs ;
 } /* end subroutine (cfromani) */
 
-int cfromanl(cchar *sp,int sl,long *rp) noex {
+int cfromansl(cchar *sp,int sl,slong *rp) noex {
 	ulonglong	val ;
 	int		rs ;
 	rs = romconv(sp,sl,&val) ;
@@ -80,7 +80,7 @@ int cfromanl(cchar *sp,int sl,long *rp) noex {
 	return rs ;
 } /* end subroutine (cfromanl) */
 
-int cfromanll(cchar *sp,int sl,longlong *rp) noex {
+int cfromansll(cchar *sp,int sl,slonglong *rp) noex {
 	ulonglong	val ;
 	int		rs ;
 	rs = romconv(sp,sl,&val) ;
