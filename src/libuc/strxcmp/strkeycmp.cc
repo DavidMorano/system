@@ -132,7 +132,7 @@ local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
 		    }
 		}
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (strxcmp) */
 
