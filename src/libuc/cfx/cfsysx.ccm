@@ -119,7 +119,6 @@ template<> inline int cfsystox(cc *sp,int b,ulonglong *rp)	noex {
 	return uc_strto(sp,nullptr,b,rp) ;
 } /* end */
 
-
 export {
     template<typename T> inline int cfsysx(cc *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
