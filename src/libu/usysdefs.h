@@ -41,6 +41,7 @@
 #include	<usysdefs_data.h>	/* miscellaneous system data */
 #include	<usysdefs_af.h>		/* address families */
 #include	<usysdefs_pf.h>		/* protocol families */
+#include	<usysdefs_errno.h>
 #include	<usysdefs_fcntl.h>
 #include	<usysdefs_ioctl.h>
 #include	<usysdefs_itimers.h>
