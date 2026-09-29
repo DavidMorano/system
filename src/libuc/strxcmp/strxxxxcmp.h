@@ -53,20 +53,20 @@ extern int	strxfoldcmpr(cchar *,cchar *) noex ;
 
 local inline int strxbasecmp(cchar *s1,cchar *s2) noex {
     	return strxbasecmpo(s1,s2) ;
-}
+} /* end */
 local inline int strxcasecmp(cchar *s1,cchar *s2) noex {
     	return strxcasecmpo(s1,s2) ;
-}
+} /* end */
 local inline int strxfoldcmp(cchar *s1,cchar *s2) noex {
     	return strxfoldcmpo(s1,s2) ;
-}
+} /* end */
 
 local inline int strbasecmp_latin(cchar *s1,cchar *s2) noex {
     	return strbasecmp(s1,s2) ;
-}
+} /* end */
 local inline int strfoldcmp_latin(cchar *s1,cchar *s2) noex {
     	return strfoldcmp(s1,s2) ;
-}
+} /* end */
 
 EXTERNC_end
 
