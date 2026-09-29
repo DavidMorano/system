@@ -27,27 +27,26 @@
 
 EXTERNC_begin
 
-extern int cfromani	(cchar *,int,int *)		noex ;
-extern int cfromanl	(cchar *,int,long *)		noex ;
-extern int cfromanll	(cchar *,int,longlong *)	noex ;
+extern int cfromansi	(cchar *,int,sint *)		noex ;
+extern int cfromansl	(cchar *,int,slong *)		noex ;
+extern int cfromansll	(cchar *,int,slonglong *)	noex ;
 
 extern int cfromanui	(cchar *,int,uint *)		noex ;
 extern int cfromanul	(cchar *,int,ulong *)		noex ;
 extern int cfromanull	(cchar *,int,ulonglong *)	noex ;
 
-local inline int cfroman(cchar *sp,int sl,int *rp)	noex {
-	return cfromani(sp,sl,rp) ;
-} /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline int cfroman(cchar *sp,int sl,long *rp)		noex {
-	return cfromanl(sp,sl,rp) ;
+inline int cfroman(cchar *sp,int sl,sint *rp)		noex {
+	return cfromansi(sp,sl,rp) ;
 } /* end */
-inline int cfroman(cchar *sp,int sl,longlong *rp)	noex {
-	return cfromanll(sp,sl,rp) ;
+inline int cfroman(cchar *sp,int sl,slong *rp)		noex {
+	return cfromansl(sp,sl,rp) ;
+} /* end */
+inline int cfroman(cchar *sp,int sl,slonglong *rp)	noex {
+	return cfromansll(sp,sl,rp) ;
 } /* end */
 inline int cfroman(cchar *sp,int sl,uint *rp)		noex {
 	return cfromanui(sp,sl,rp) ;
