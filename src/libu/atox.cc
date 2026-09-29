@@ -30,8 +30,8 @@
 
 	Synopsis:
 	slonglong atosll(cchar *sp) noex
-	slonglong atosll(cchar *sp,int b) noex
 	ulonglong atoull(cchar *sp) noex
+	slonglong atosll(cchar *sp,int b) noex
 	ulonglong atoull(cchar *sp,int b) noex
 
 	Arguments:
@@ -100,19 +100,19 @@ constexpr bool		f_debug = CF_DEBUG ;
 
 /* exported subroutines */
 
-slonglong	atosll(cchar *s,int b) noex {
+slonglong	atosll(cchar *s,int b)	noex {
 	return strtoxsll(s,nullptr,b) ;
 } /* end subroutine (atosll) */
 
-slonglong	atosll(cchar *s) noex {
-    	return atosll(s,base10) ;
-} /* end subroutine */
-
-ulonglong	atoull(cchar *s,int b) noex {
+ulonglong	atoull(cchar *s,int b)	noex {
 	return strtoxull(s,nullptr,b) ;
 } /* end subroutine (atoull) */
 
-ulonglong	atoull(cchar *s) noex {
+slonglong	atosll(cchar *s)	noex {
+    	return atosll(s,base10) ;
+} /* end subroutine */
+
+ulonglong	atoull(cchar *s)	noex {
     	return atoull(s,base10) ;
 } /* end subroutine */
 
