@@ -110,6 +110,9 @@ enum missingerrnos {
 } ; /* end enum (missingerrnos) */
 
 
+#ifndef	EOK
+#define	EOK		0
+#endif
 #ifndef	ELOCKFAIL
 #define	ELOCKFAIL	missingerrno_lockfail
 #endif
