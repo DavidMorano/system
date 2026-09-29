@@ -44,7 +44,7 @@ extern int strkeyfoldcmp(cchar *,cchar *) noex ;
 
 local inline int strkeycmp(cchar *s1,cchar *s2) noex {
     	return strkeybasecmp(s1,s2) ;
-}
+} /* end */
 
 extern int strkeyxbasecmpo(cchar *,cchar *) noex ;
 extern int strkeyxbasecmpr(cchar *,cchar *) noex ;
@@ -57,13 +57,13 @@ extern int strkeyxfoldcmpr(cchar *,cchar *) noex ;
 
 local inline int strkeyxbasecmp(cchar *s1,cchar *s2) noex {
     	return strkeyxbasecmpo(s1,s2) ;
-}
+} /* end */
 local inline int strkeyxcasecmp(cchar *s1,cchar *s2) noex {
     	return strkeyxcasecmpo(s1,s2) ;
-}
+} /* end */
 local inline int strkeyxfoldcmp(cchar *s1,cchar *s2) noex {
     	return strkeyxfoldcmpo(s1,s2) ;
-}
+} /* end */
 
 EXTERNC_end
 
