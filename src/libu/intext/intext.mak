@@ -53,6 +53,7 @@ OBJ0= intext0.o
 OBJ1= intext_util.o
 OBJ2= intext_uintx.o
 OBJ3= intext_uint256.o
+#OBJ3= intext_uint256.o intext_sint256.o
 OBJ4= intext_uint512.o
 OBJ5=
 OBJ6=
@@ -63,14 +64,11 @@ OBJ9=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= obj4.o 
-OBJC= obj8.o
 
 OBJ= obja.o objb.o 
 
 
 INCDIRS=
-
-#LIBDIRS= -L $(LIBDIR)
 LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
@@ -194,16 +192,16 @@ intext_util.o:		intext_util.ccm
 intext_uintx.o:		intext_uintx.ccm	$(MUTIL)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
+intext_sint256.o:	intext_sint256.ccm	$(MUTIL) $(UINTX)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
 intext_uint256.o:	intext_uint256.ccm	$(MUTIL) $(UINTX)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
+intext_sint512.o:	intext_sint512.ccm	$(MUTIL) $(UINTX)
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
 intext_uint512.o:	intext_uint512.ccm	$(MUTIL) $(UINTX)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-intext_int256.o:	intext_int256.ccm	$(MUTIL) $(UINTX)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-intext_int512.o:	intext_int512.ccm	$(MUTIL) $(UINTX)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
