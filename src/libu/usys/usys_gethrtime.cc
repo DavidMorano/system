@@ -23,15 +23,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-
-#include	<sys/time.h>		/* <- the money shot */
-#include	<cerrno>
-#include	<ctime>			/* Darwin |clock_xx(3)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysflag.h>
+#include	<sys/time.h>		/* POSIX® <- the money shot */
+#include	<ctime>			/* CSTD Darwin |clock_xx(3)| */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysflag.h>		/* LIBU */
 
 #include	"usys_gethrtime.h"
 
