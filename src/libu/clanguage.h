@@ -30,11 +30,11 @@
 #include	<clanguage_cast.h>
 #include	<clanguage_concepts.h>
 #include	<clanguage_conv.h>
-#include	<clanguage_cmporder.h>
 #include	<clanguage_externc.h>
 #include	<clanguage_intrinsic.h>
 #include	<clanguage_keywords.h>
 #include	<clanguage_oper.h>
+#include	<clanguage_ordcmp.h>
 #include	<clanguage_sat.h>
 
 
