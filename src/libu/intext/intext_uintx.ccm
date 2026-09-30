@@ -52,7 +52,7 @@ import intext.util ;
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 
 
@@ -148,7 +148,7 @@ export {
 	    vdivutrunc(n,q,r,v,o.v) ;
 	    vcopy(n,v,r) ;
 	    return *this ;
-	} ;
+	} ; /* end */
 	uintx &operator and_eq	(const uintx &o) noex {
 	    veq_and(n,v,o.v) ;
 	    return *this ;
@@ -171,7 +171,7 @@ export {
 	    vlshl(n,r,v,nb) ;
 	    vcopy(n,v,r) ;
 	    return *this ;
-	} ;
+	} ; /* end */
 	ord operator <=> (const uintx &o) const noex {
     	    ord res = ord::equal ;
 	    if (cint rc = vcmp(n,v,o.v) ; rc != 0) {
@@ -192,18 +192,18 @@ export {
 	    uintx res ;
 	    vsubu(n,res.v,v,o.v) ;
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx mul	(const uintx &o) const noex {
 	    uintx res ;
 	    vmulutrunc(n,res.v,v,o.v) ;
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx div	(const uintx &o) const noex {
 	    Digit	r[n] ;
 	    uintx res ;
 	    vdivutrunc(n,res.v,r,v,o.v) ;
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx rem	(const uintx &o) const noex {
 	    Digit	q[n] ;
 	    uintx res ;
@@ -219,7 +219,7 @@ export {
 	    uintx res ;
 	    vor(n,res.v,v,o.v) ;
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx bxor	(const uintx &o) const noex {
 	    uintx res ;
 	    vxor(n,res.v,v,o.v) ;
@@ -243,7 +243,7 @@ export {
 		res = rotl(nb) ;
 	    }
 	    return res ;
-	} ;
+	} ; /* end */
 	uintx lshr(int nb) const noex {
 	    uintx res ;
 	    vlshr(n,res.v,v,nb) ;
@@ -341,17 +341,17 @@ export {
 	void uintx<Nbits,Digit>::load(uint a)		noex {
 	    vclear(n,v) ;
             v[0] = a ;
-	} ;
+	} ; /* end */
     template<int Nbits,typename Digit>
 	void uintx<Nbits,Digit>::load(ulong a)		noex {
 	    vclear(n,v) ;
             v[0] = a ;
-	} ;
+	} ; /* end */
     template<int Nbits,typename Digit>
 	void uintx<Nbits,Digit>::load(ulonglong a)	noex {
 	    vclear(n,v) ;
             v[0] = a ;
-	} ;
+	} ; /* end */
 } /* end export */
 
 export {
@@ -373,15 +373,15 @@ export {
     template<int Nbits,typename Digit>
 	uintx<Nbits,Digit>::uintx(int a)	noexcept {
 	    load(a) ;
-	} ;
+	} ; /* end */
     template<int Nbits,typename Digit>
 	uintx<Nbits,Digit>::uintx(long a)	noexcept {
 	    load(a) ;
-	} ;
+	} ; /* end */
     template<int Nbits,typename Digit>
 	uintx<Nbits,Digit>::uintx(longlong a)	noexcept {
 	    load(a) ;
-	} ;
+	} ; /* end */
 } /* end export */
 
 export {
