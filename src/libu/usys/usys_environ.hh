@@ -40,8 +40,8 @@
 
 /* everybody */
 namespace libu {
-    extern int usys_environ(mainv *) noex ;
-}
+    extern int usys_environ(con mainv *) noex ;
+} /* end namespace (libu) */
 
 
 #endif /* __cplusplus */
