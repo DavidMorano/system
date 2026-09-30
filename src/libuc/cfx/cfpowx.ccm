@@ -93,13 +93,6 @@ template<typename T> struct cfpowshelp {
 		cutlim = (neg cutlim) ;
 	    } /* end */
 	} ; /* end method (prepare) */
-	int getval(int ch) noex {
-	    int		rs = CHAR_TOVAL(ch) ;
-	    if ((rs == UCHAR_MAX) || (rs >= base)) {
-		rs = SR_DOM ;
-	    }
-	    return rs ;
-	} ; /* end method (getval) */
 	int getsign() noex {
     	    int rs ;
 	    if ((rs = cfx::getsign(sp,sl,&fneg)) > 0) {
@@ -108,6 +101,13 @@ template<typename T> struct cfpowshelp {
 	    }
 	    return rs ;
 	} ; /* end if (getsign) */
+	int getval(int ch) noex {
+	    int		rs = CHAR_TOVAL(ch) ;
+	    if ((rs == UCHAR_MAX) || (rs >= base)) {
+		rs = SR_DOM ;
+	    }
+	    return rs ;
+	} ; /* end method (getval) */
 	int proc() noex {
 	    int		rs = SR_INVALID ;
 	    while (sl && *sp && ((rs = getval(*sp)) >= 0)) {
@@ -136,7 +136,7 @@ template<typename T> struct cfpowshelp {
 	    if ((rs = getsign()) >= 0) {
 		prepare() ;
 		rs = proc() ;
-	    }
+	    } /* end */
 	    return rs ;
 	} ; /* end method */
 } ; /* end struct (cfpowshelp) */
