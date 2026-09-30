@@ -29,18 +29,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cerrno>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>		/* |srcpy(3c)| */
-#include	<new>			/* |nothrow(c++)| */
-#include	<string>		/* |string(c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysflag.h>
-#include	<localmisc.h>		/* |DECBUFLEN| */
+#include	<cerrno>		/* LIBU */
+#include	<cstddef>		/* LIBU */
+#include	<cstdlib>		/* LIBU */
+#include	<cstring>		/* CSTD |srcpy(3c)| */
+#include	<new>			/* C++STD |nothrow(c++)| */
+#include	<string>		/* C++STD |string(c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |DECBUFLEN| */
 
 #include	"usys_ugetnisdom.h"
 #include	"usys_onc.hh"		/* Open-Network-Computing */
