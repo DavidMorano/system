@@ -72,8 +72,8 @@ extern int uctimxnote_load	(uctimxnote *,void *,psem *,uctimx_f,int) noex ;
 
 extern int uc_timxcreate	(con uctimxnote *) noex ;
 extern int uc_timxdestroy	(int) noex ;
-extern int uc_timxset		(int,time_t *,time_t) noex ;
-extern int uc_timxget		(int,time_t *) noex ;
+extern int uc_timxset		(int,mut time_t *,time_t) noex ;
+extern int uc_timxget		(int,mut time_t *) noex ;
 extern int uc_timxover		(int) noex ;
 
 EXTERNC_end
