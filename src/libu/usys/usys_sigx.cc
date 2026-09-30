@@ -17,15 +17,16 @@
 
 /*******************************************************************************
 
-	For those operating systems that do not have |sigx(2)|
+  	Description:
+	For those operating systems that do not have |sig{x}(2)|
 	we try to define it.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<climits>		/* |PATH_MAX| + |INT_MAX| */
+#include	<sys/types.h>		/* POSIX® */
 #include	<cerrno>		/* CSTD */
+#include	<climits>		/* CSTD |PATH_MAX| + |INT_MAX| */
 #include	<csignal>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD |realpath(3c)| */
@@ -43,14 +44,16 @@
 
 unixret_t sigqueue(pid_t pid,int sn,const SIGVAL) noex {
 	unixret_t	rc = 0 ;
+	errno_t		ec = EOK ;
 	if ((pid > 0) && (sn >= 0)) {
 	    rc = kill(pid,sn) ;
 	} else {
-	    errno = EINVAL ;
+	    ec = EINVAL ;
 	    rc = -1 ;
-	}
+	} /* end if */
+	if (ec) errno = ec ;
 	return rc ;
-} /* end */
+} /* end subroutine */
 
 #endif /* (!defined(SYSHAS_SIGQUEUE)) || (SYSHAS_SIGQUEUE == 0) */
 /* SIGQUEUE end */
@@ -65,6 +68,7 @@ constexpr id_t		idend = id_t(-1) ;
 
 unixret_t sigsend(idtype_t type,id_t id,int sn) noex {
 	unixret_t	rc = 0 ;
+	errno_t		ec = EOK ;
 	if ((id != idend) && (sn >= 0)) {
 	    switch (type) {
 	    case P_ALL:
@@ -79,7 +83,7 @@ unixret_t sigsend(idtype_t type,id_t id,int sn) noex {
 	               rc = killpg(0,sn) ;
 		    }
 	        } else {
-	            errno = EINVAL ;
+	            ec = EINVAL ;
 	            rc = -1 ;
 	        }
 	        break ;
@@ -88,16 +92,17 @@ unixret_t sigsend(idtype_t type,id_t id,int sn) noex {
 	        rc = kill(id,sn) ;
 	        break ;
 	    default:
-	        errno = ENOTSUP ;
+	        ec = ENOTSUP ;
 	        rc = -1 ;
 	        break ;
 	    } /* end switch */
 	} else {
-	    errno = EINVAL ;
+	    ec = EINVAL ;
 	    rc = -1 ;
-	}
+	} /* end if */
+	if (ec) errno = ec ;
 	return rc ;
-} /* end */
+} /* end subroutine */
 
 #endif /* (!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0) */
 /* SIGSEND end */
@@ -107,20 +112,22 @@ unixret_t sigsend(idtype_t type,id_t id,int sn) noex {
 
 unixret_t sigsendset(procset_t *sp,int sn) noex {
 	unixret_t	rc = 0 ;
+	errno_t		ec = EOK ;
 	if (sp) {
 	    if (sn >= 0) {
-	        errno = ENOTSUP ;
+	        ec = ENOTSUP ;
 	        rc = -1 ;
 	    } else {
-	        errno = EINVAL ;
+	        ec = EINVAL ;
 	        rc = -1 ;
 	    }
 	} else {
-	    errno = EFAULT ;
+	    ec = EFAULT ;
 	    rc = -1 ;
-	}
+	} /* end if */
+	if (ec) errno = ec ;
 	return rc ;
-} /* end */
+} /* end subroutine */
 
 #endif /* (!defined(SYSHAS_SIGSENDSET)) || (SYSHAS_SIGSENDSET == 0) */
 /* SIGSENDSET end */
@@ -129,14 +136,14 @@ unixret_t sigsendset(procset_t *sp,int sn) noex {
 #if	(!defined(SYSHAS_PTHREADSIGQUEUE)) || (SYSHAS_PTHREADSIGQUEUE == 0)
 
 extern errno_t pthread_sigqueue(pthread_t tid,int sn,const SIGVAL) noex {
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (sn >= 0) {
 	    ec = pthread_kill(tid,sn) ;
 	} else {
 	    ec = EINVAL ;
-	}
+	} /* end if */
 	return ec ;
-} /* end */
+} /* end subroutine */
 
 #endif /* (!defined(SYSHAS_PTHREADSIGQUEUE)) || (SYSHAS_PTHREADSIGQUEUE == 0) */
 /* PTHREADSIGQUEUE end */
