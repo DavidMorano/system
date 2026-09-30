@@ -41,7 +41,7 @@ module ;
 #include	<usysdefs.h>		/* LIBU */
 #include	<stdintx.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<dprint.hh>		/* debugging */
+#include	<dprint.hh>		/* LIBU debugging */
 
 export module intext.uint512 ;
 
@@ -54,7 +54,7 @@ import intext.uint256 ;
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 
 
@@ -96,11 +96,11 @@ export {
 	    vcopy(nh,v,a.v) ;
 	    vclear(nh,(v + nh)) ;
 	    return *this ;
-	} ;
+	} ; /* end */
 	uint512_t &operator = (const uintx<512> &a) noex {
 	    vcopy(n,v,a.v) ;
 	    return *this ;
-	} ;
+	} ; /* end */
 	uint512_t &operator = (int a)		noex {
 	    load(a) ;
 	    return *this ;
