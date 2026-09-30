@@ -17,6 +17,7 @@
 
 /*******************************************************************************
 
+  	Descrption:
 	For those operating systems that do not have |waitid(2)|
 	we try to define it.
 
