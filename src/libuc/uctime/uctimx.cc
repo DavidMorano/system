@@ -319,12 +319,12 @@ local void uctimxent_load(uctimxent *ep,con uctimxnote *nop) noex ;
 local int	cmpqent(cvoid *,cvoid *) noex ;
 
 extern "C" {
-    local int	timemgr_sigerwork(timemgr *) noex ;
-    local int	timemgr_dispworker(timemgr *) noex ;
-    local void	timemgr_atforkbefore() noex ;
-    local void	timemgr_atforkparent() noex ;
-    local void	timemgr_atforkchild() noex ;
-    local void	timemgr_exit() noex ;
+    local int	timemgr_sigerwork	(timemgr *) noex ;
+    local int	timemgr_dispworker	(timemgr *) noex ;
+    local void	timemgr_atforkbefore	() noex ;
+    local void	timemgr_atforkparent	() noex ;
+    local void	timemgr_atforkchild	() noex ;
+    local void	timemgr_exit		() noex ;
 } /* end extern */
 
 
@@ -355,7 +355,7 @@ int uc_timxdestroy(int id) noex {
 	return ao(cmdsub_destroy,id) ;
 } /* end subroutine */
 
-int uc_timxset(int id,time_t *rtp,time_t ntim) noex {
+int uc_timxset(int id,mut time_t *rtp,time_t ntim) noex {
     	custime		dt = getustime ;
     	int		rs = SR_INVALID ;
 	DEBPRINTF("ent dt=%ld ntim=%ld\n",dt,ntim) ;
@@ -368,7 +368,7 @@ int uc_timxset(int id,time_t *rtp,time_t ntim) noex {
 	return rs ;
 } /* end subroutine */
 
-int uc_timxget(int id,time_t *rtp) noex {
+int uc_timxget(int id,mut time_t *rtp) noex {
 	timemgr_arg	ao(rtp) ;
 	DEBPRINTF("ent\n") ;
 	return ao(cmdsub_get,id) ;
