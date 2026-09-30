@@ -48,7 +48,7 @@ export module intext.util ;
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 
 
