@@ -10,7 +10,7 @@
 
 	= 1998-10-01, David A­D­ Morano
 	This subroutine was written by being adapted from one of
-	my previous versions of the same (from the early 1980s;
+	my previous versions of the same (from the early 1980s,
 	embedded work at AT&T), which itself was adapted from an
 	original asembly-language version (in Digital Equipment Corp
 	VAX assembly).
@@ -18,11 +18,11 @@
 	= 2013-04-30, David A­D­ Morano
 	I took the plunge and rewrote this set of subroutines using
 	the LIBC subroutines |strtoXX(3c)|, being much simplified
-	now.  It is no longer stand-alone (no LIBC dependency),
-	like in the old days, but we have been mostly on UNIX®i for
-	some time now (decades) and use in non-UNIX®i environments
-	is now quite rare.  I hope that this is not a problem.  We
-	will see.
+	now.  It is no longer stand-alone (formerly with no LIBC
+	dependency), like in the old days, but we have been mostly
+	on UNIX®i for some time now (decades) and use in non-UNIX®i
+	environments is now quite rare.  I hope that this is not a
+	problem.  We will see.
 
 	= 2020-05-07, David A-D- Morano
 	I converted this (formerly a header-only file) to a module.
