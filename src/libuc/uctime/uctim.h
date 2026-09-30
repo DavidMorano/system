@@ -1,4 +1,4 @@
-/* uctim HEADER */
+/* uctim HEADER interval timer) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -47,15 +47,15 @@
 
 EXTERNC_begin
 
-typedef int (*uctim_f)(void *objp,int timid,int arg) noex ;
+typedef int (*uctim_f)(void *objp,int timid,int notarg) noex ;
 
 EXTERNC_end
 
 struct uctimnote_head {
-	uctim_f		notf ;		/* notify function (C-linkage) */
-	void		*objp ;		/* object pointer (function argument) */
 	psem		*psemp ;	/* POSIX® Semaphore pointer */
-	int		arg ;		/* function argument */
+	uctim_f		notfun ;	/* notification function pointer */
+	voidp		notobj ;	/* notification function object */
+	int		notarg ;	/* notification function argument */
 } ; /* end struct (uctimnote_head) */
 
 #ifdef	__cplusplus
@@ -70,11 +70,11 @@ EXTERNC_begin
 
 extern int uctimnote_load	(uctimnote *,void *,psem *,uctim_f,int) noex ;
 
-extern int uc_timcreate		(con uctimnote *) noex ;
-extern int uc_timdestroy	(int) noex ;
-extern int uc_timset		(int,CITIMERVAL *,ITIMERVAL *) noex ;
-extern int uc_timget		(int,ITIMERVAL *) noex ;
-extern int uc_timover		(int) noex ;
+extern int uc_timxcreate	(con uctimnote *) noex ;
+extern int uc_timxdestroy	(int) noex ;
+extern int uc_timxset		(int,mut ITIMERVAL *,CITIMERVAL *) noex ;
+extern int uc_timxget		(int,mut ITIMERVAL *) noex ;
+extern int uc_timxover		(int) noex ;
 
 EXTERNC_end
 
