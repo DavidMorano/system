@@ -122,14 +122,6 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 	    base = b ;
 	    rp = arp ;
 	} ; /* end ctor */
-	int getsign() noex {
-	    int rs ;
-    	    if ((rs = cfx::getsign(sp,sl,&fneg)) > 0) {
-	        sp += rs ;
-	        sl -= rs ;
-	    }
-	    return rs ;
-	} ; /* end if (getsign) */
 	void prepare() noex {
 	    cutoff = fneg ? tmin : tmax ;
 	    cutlim = int(cutoff % base) ;
@@ -142,6 +134,14 @@ template<stdintx T> struct cfdshelp { /* Convert-From-Digit-SiSigned */
 		cutlim = (neg cutlim) ;
 	    } /* end if (was negative) */
 	} ; /* end method (prepare) */
+	int getsign() noex {
+	    int rs ;
+    	    if ((rs = cfx::getsign(sp,sl,&fneg)) > 0) {
+	        sp += rs ;
+	        sl -= rs ;
+	    }
+	    return rs ;
+	} ; /* end if (getsign) */
 	int getval(int ch) noex {
 	    int		rs = CHAR_TOVAL(ch) ;
 	    if ((rs == UCHAR_MAX) || (rs >= base)) {
@@ -206,6 +206,11 @@ template<stdintx T> struct cfduhelp { /* Convert-From-Digit-UnSigned */
 	    base = b ;
 	    rp = arp ;
 	} ; /* end ctor */
+	void prepare() noex {
+	    cuint	ub = uint(base) ;
+	    cutoff = (tmax / ub) ;
+	    cutlim = int(tmax % ub) ;
+	} ; /* end method (prepare) */
 	int getsign() noex {
     	    int rs ;
 	    if ((rs = cfx::getsign(sp,sl,&fneg)) > 0) {
@@ -214,11 +219,6 @@ template<stdintx T> struct cfduhelp { /* Convert-From-Digit-UnSigned */
 	    } /* end if (getsign) */
 	    return rs ;
 	} ; /* end if (getsign) */
-	void prepare() noex {
-	    cuint	ub = uint(base) ;
-	    cutoff = (tmax / ub) ;
-	    cutlim = int(tmax % ub) ;
-	} ; /* end method (prepare) */
 	int getval(int ch) noex {
 	    int		rs = CHAR_TOVAL(ch) ;
 	    if ((rs == UCHAR_MAX) || (rs >= base)) {
