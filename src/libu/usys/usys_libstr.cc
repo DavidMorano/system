@@ -17,6 +17,7 @@
 
 /*******************************************************************************
 
+  	Description:[
 	This file contains the UNIX® system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very
 	small way to make up for some of the immense brain-damage within
@@ -45,7 +46,7 @@ size_t strnlen(cchar *s,size_t nsz) noex {
 	if (s) {
 	    for (rsz = 0 ; (rsz < nsz) && *s ; rsz += 1) {
 	        s += 1 ;
-	    }
+	    } /* end for */
 	} /* end if (non-null) */
 	return rsz ;
 } /* end subroutine (strnlen) */
