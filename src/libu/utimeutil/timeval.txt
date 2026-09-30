@@ -1,0 +1,9 @@
+TIMEVAL
+
+
+     struct timeval {
+             time_t       tv_sec ;   /* seconds since 1 Jan 1970 */
+             suseconds_t  tv_usec ;  /* and microseconds */
+     } ;
+
+
