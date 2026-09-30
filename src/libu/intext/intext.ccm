@@ -42,7 +42,10 @@ module ;
 export module intext ;
 
 export import intext.uintx ;
+
 export import intext.uint256 ;
 export import intext.uint512 ;
+
+export import intext.util ;
 
 
