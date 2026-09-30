@@ -42,7 +42,7 @@
 /* local defines */
 
 #ifndef	INTMILLION
-#define	INTMILLION	1000000
+#define	INTMILLION	1000000		/* one million */
 #endif
 
 
@@ -76,7 +76,7 @@ constexpr int		onemillion = INTMILLION ;
 
 /* exported subroutines */
 
-int timeval_load(TIMEVAL *dst,time_t sec,int usec) noex {
+int timeval_load(mut TIMEVAL *dst,time_t sec,int usec) noex {
 	int		rs = SR_FAULT ;
 	if (dst) {
 	    rs = SR_OK ;
@@ -90,7 +90,7 @@ int timeval_load(TIMEVAL *dst,time_t sec,int usec) noex {
 	return rs ;
 } /* end subroutine (timeval_load) */
 
-int timeval_add(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
+int timeval_add(mut TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	int		rs = SR_FAULT ;
 	if (dst && src1 && src2) {
 	    rs = SR_OK ;
@@ -104,7 +104,7 @@ int timeval_add(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	return rs ;
 } /* end subroutine (timeval_add) */
 
-int timeval_sub(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
+int timeval_sub(mut TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	int		rs = SR_FAULT ;
 	if (dst && src1 && src2) {
 	    rs = SR_OK ;
@@ -117,6 +117,30 @@ int timeval_sub(TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (timeval_sub) */
+
+timeval operator + (const timeval &t1,const timeval &t2) noex {
+	timeval	r ;
+	timeval_add(&r,&t1,&t2) ;
+	return r ;
+} /* end method (timeval::operator) */
+
+timeval operator - (const timeval &t1,const timeval &t2) noex {
+	timeval	r ;
+	timeval_sub(&r,&t1,&t2) ;
+	return r ;
+} /* end method (timeval::operator) */
+
+ordcmp_strong operator <=> (con timeval &v1,con timeval &v2) noex {
+    	ord res = ord::equal ;
+	int rc = 0 ;
+	if ((rc = intconv(v1.tv_sec - v2.tv_sec)) == 0L) {
+	    rc = intconv(v1.tv_usec - v2.tv_usec) ;
+	}
+	if (rc) {
+	    res = (rc > 0) ? ord::greater : ord::less ;
+	}
+	return res ;
+} /* end subroutine (timeval::operator) */
 
 timeval_t &timeval_t::operator *= (int m) noex {
     	const time_t		vs = m ;
@@ -154,6 +178,10 @@ timeval_t &timeval_t::operator -= (const timeval_t &o) noex {
 	return *this ;
 } /* end method (timeval::operator) */
 
+bool timeval_t::operator == (const timeval_t &o) const {
+	return (tv_sec == o.tv_sec) && (tv_usec == o.tv_usec) ;
+} /* end method (timeval_t::operator) */
+
 ord timeval_t::operator <=> (const timeval_t &o) const {
     	ord res = ord::equal ;
 	int rc = 0 ;
@@ -164,18 +192,22 @@ ord timeval_t::operator <=> (const timeval_t &o) const {
 	    res = (rc > 0) ? ord::greater : ord::less ;
 	}
 	return res ;
-} /* end smethod (timeval_t) */
+} /* end smethod (timeval_t::operator) */
 
-timeval operator + (const timeval &t1,const timeval &t2) noex {
-	timeval	r ;
-	timeval_add(&r,&t1,&t2) ;
-	return r ;
-} /* end method (timeval::operator) */
+bool timeval_t::operator == (const time_t o) const {
+	return (tv_sec == o) && (tv_usec == 0L) ;
+} /* end method (timeval_t::operator) */
 
-timeval operator - (const timeval &t1,const timeval &t2) noex {
-	timeval	r ;
-	timeval_sub(&r,&t1,&t2) ;
-	return r ;
-} /* end method (timeval::operator) */
+ord timeval_t::operator <=> (const time_t o) const {
+    	ord res = ord::equal ;
+	int rc = 0 ;
+	if ((rc = intconv(tv_sec - o)) == 0L) {
+	    rc = intconv(tv_usec - 0) ;
+	}
+	if (rc) {
+	    res = (rc > 0) ? ord::greater : ord::less ;
+	}
+	return res ;
+} /* end smethod (timeval_t::operator) */
 
 
