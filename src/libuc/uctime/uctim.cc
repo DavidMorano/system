@@ -1,4 +1,4 @@
-/* uctim SUPPORT */
+/* uctim SUPPORT (interval timer) */
 /* charset=ISO8859-1 */
 /* lang=C++11 */
 
@@ -6,7 +6,7 @@
 /* virtual per-process timer management */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* debugging */
+#define	CF_DEBUG	1		/* debugging */
 #define	CF_CHILDTHRS	0		/* start threads in child process */
 
 /* revision history:
@@ -40,19 +40,17 @@
 	interface uses).
 
 	Synopsis:
-	typedef ITIMEVAL	itim
-	typedef CITIMEVAL	citim
-	int uc_timcreate	(uctiment *notep) noex
+	int uc_timcreate	(con uctiment *notep) noex
 	int uc_timdestroy	(int id) noex
-	int uc_timset		(int id,int,citim *ntvp,itim *otvp) noex
-	int uc_timget		(int id,itim *otvp) noex
+	int uc_timset		(int id,mut time_t *rtp,time_t ntim) noex
+	int uc_timget		(int id,mut time_t *rtp) noex
 	int uc_timover		(int id) noex
 
 	Arguments:
 	notep		UCTIM object pointer
 	id		timer identification
-	ntvp		new timer-value-pointer
-	otvp		old timer-value-pointer
+	rtp		result time pointer
+	nt		new time
 
 	Returns:
 	>=0		OK
@@ -74,14 +72,15 @@
 #include	<memory>		/* C++STD |destroy_at(3c++)| */
 #include	<numeric>		/* C++STD |cast_saturate(3c++)| */
 #include	<queue>			/* C++STD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 #include	<timewatch.hh>		/* LIBU */
 #include	<itimers.hh>		/* LIBU i-timer selection */
-#include	<timespec.h>		/* LIBU */
-#include	<itimerspec.h>		/* LIBU */
+#include	<timeval.hh>		/* LIBU */
+#include	<itimerval.h>		/* LIBU */
 #include	<ptm.h>			/* LIBU */
 #include	<ptc.h>			/* LIBU */
 #include	<pta.h>			/* LIBU */
@@ -89,18 +88,25 @@
 #include	<intsat.h>		/* LIBU */
 #include	<ucmpx.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucatexit.h>		/* LIBUC */
+#include	<ucatfork.h>		/* LIBUC */
+#include	<ucsigset.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC vector-handles */
 #include	<vecsorthand.h>		/* LIBUC vector-sorted-handles */
 #include	<ciq.h>			/* LIBUC container-interlocked-queue */
 #include	<sigevent.h>		/* LIBUC */
 #include	<psem.h>		/* LIBUC POSIX® semaphore */
 #include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"uctim.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import usigsets ;			/* |usigset(3u)| */
+import deb ;				/* LIBU debugging */
 
 /* local defines */
 
@@ -122,6 +128,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::cast_saturate ;		/* subroutine */
 using std::destroy_at ;			/* subroutine */
+using std::min ;			/* subroutine */
+using std::max ;			/* subroutine */
 using libu::uitimer_get ;		/* subroutine */
 using libu::uitimer_set ;		/* subroutine */
 
@@ -133,7 +141,6 @@ extern "C" {
 } /* end extern (C) */
 
 typedef vecsorthand	prique ;
-typedef uctiment *	uctimentp ;
 
 
 /* external subroutines */
@@ -146,12 +153,12 @@ typedef uctiment *	uctimentp ;
 
 namespace {
     struct uctiment {
-	uctim_f		notf ;		/* notify function (C-linkage) */
-	void		*objp ;		/* object pointer (function argument) */
+	uctim_f		notfun ;	/* notification function pointer */
+	voidp		notobj ;	/* notification function object */
 	psem		*psemp ;	/* POSIX® Semaphore pointer */
-	ITIMERVAL	it ;		/* i-timer-value */
+	ITIMERVAL	val ;		/* i-timer-value */
 	int		id ;		/* timer-ID */
-	int		arg ;		/* function argument */
+	int		notarg ;	/* notification function argument */
     } ; /* end struct (uctiment) */
 } /* end namespace */
 
@@ -172,18 +179,30 @@ enum cmdsubs {
 } ; /* end enum */
 
 namespace {
-    enum timemgrmems {
+    enum mimemgrmems {
 	timemgrmem_init,
+	timemgrmem_initx,
 	timemgrmem_fini,
+	timemgrmem_capbeg,
+	timemgrmem_capend,
+	timemgrmem_capsignal,
 	timemgrmem_ovelast
-    } /* end enum (timemgrmems) */
+    } ; /* end enum (timemgrmems) */
     struct timemgr ;
     struct timemgr_arg {
 	con uctimnote	*notep ;
-	CITIMERVAL	*ntcp ;
-	ITIMERVAL	*otcp ;
-	timemgr_arg(con uctimnote *c) noex : notep(c) { } ;
-	timemgr_arg(ITIMERVAL *o,CITIMERVAL *n) noex : ntvp(n), otvp(o) { } ;
+	mut ITIMERVAL	*rtp ;		/* remaining-time-pointer */
+	con ITIMERVAL	*ntp ;		/* new-time pointer */
+	timemgr_arg() noex : notep(nullptr), rtp(nullptr), ntp(nullptr) { } ;
+	timemgr_arg(con uctimnote *c) noex : notep(c) { 
+	    rtp		= nullptr ;
+	    ntp		= nullptr ;
+	} ; /* end ctor */
+	timemgr_arg(mut ITIMERVAL *pap,con ITIMERVAL *nap = 0) noex {
+	    notep	= nullptr ;
+	    rtp		= pap ;
+	    ntp		= nap ;
+	} ; /* end ctor */
 	int operator () (cmdsubs,int = 0) noex ;
     } ; /* end struct (timemgr_arg) */
     struct timemgr_fl {
@@ -201,21 +220,24 @@ namespace {
 	    op = p ;
 	    w = m ;
 	} ; /* end */
-	operator int () noex ;
-	int operator () () noex { 
-	    return operator int () ;
+	int operator () (int = -1) noex ;
+	operator int () noex {
+	    return operator () () ;
 	} ; /* end */
     } ; /* end struct (timemgr_co) */
     struct timemgr {
 	friend		timemgr_co ;
 	timemgr_co	init ;
+	timemgr_co	initx ;
 	timemgr_co	fini ;
+	timemgr_co	capbeg ;
+	timemgr_co	capend ;
+	timemgr_co	capsignal ;
 	ptm		mtx ;		/* data mutex */
 	ptc		cnv ;		/* condition variable */
 	vechand		ents ;
 	ciq		pass ;
 	prique		*pqp ;
-	sigset_t	savemask ;
 	pthread_t	tid_siger ;
 	pthread_t	tid_disper ;
 	timemgr_fl	fl ;
@@ -230,25 +252,28 @@ namespace {
 	aflag		freqexit ;	/* request exit of threads */
 	aflag		fexitsiger ;	/* thread is exiting */
 	aflag		fexitdisp ;	/* thread is exiting */
-	struct timemgr() noex {
+	timemgr() noex {
 	    init	(this,timemgrmem_init) ;
+	    initx	(this,timemgrmem_initx) ;
 	    fini	(this,timemgrmem_fini) ;
+	    capbeg	(this,timemgrmem_capbeg) ;
+	    capend	(this,timemgrmem_capend) ;
+	    capsignal	(this,timemgrmem_capsignal) ;
 	} ; /* end ctor */
 	int cmd_create	(int,timemgr_arg *) noex ;
 	int cmd_destroy	(int,timemgr_arg *) noex ;
 	int cmd_set	(int,timemgr_arg *) noex ;
 	int cmd_get	(int,timemgr_arg *) noex ;
 	int cmd_over	(int,timemgr_arg *) noex ;
+	int cmdtrans	(uctiment *) noex ;
 	int cmdsub	(cmdsubs,int,timemgr_arg *) noex ;
-	int capbegin	(int = -1) noex ;
-	int capend	() noex ;
 	int priqins	(uctiment *) noex ;
 	int priqrem	(uctiment *) noex ;
-	int timerset	(time_t) noex ;
+	int timerset	(time_t,time_t) noex ;
 	int workready	() noex ;
 	int workbegin	() noex ;
 	int workend	() noex ;
-	int workfins	() noex ;
+	int entfins	() noex ;
 	int workdump	() noex ;
 	int priqbegin	() noex ;
 	int priqend	() noex ;
@@ -259,18 +284,25 @@ namespace {
 	int timerend	() noex ;
 	int thrsbegin	() noex ;
 	int thrsend	() noex ;
-	int sigerbegin	() noex ;
+	int sigerbeg	() noex ;
 	int sigerend	() noex ;
-	int sigerworker	() noex ;
+	int sigerwork	() noex ;
 	int sigerwait	() noex ;
 	int sigerserve	() noex ;
+	int sigertrans	(int,uctiment *) noex ;
 	int sigerdump	() noex ;
-	int dispbegin	() noex ;
+	int dispbeg	() noex ;
 	int dispend	() noex ;
 	int dispworker	() noex ;
 	int disprecv	() noex ;
 	int disphandle	() noex ;
+	int dispdeliver	(uctiment *) noex ;
+	int disprempri	(uctiment *) noex ;
+	int deliver	(uctiment *) noex ;
+	int deliversem	(uctiment *) noex ;
+#ifdef	COMMENT
 	int dispjobdel	(uctiment *) noex ;
+#endif
 	destruct timemgr() noex {
 	    if (cint rs = fini ; rs < 0) {
 		ulogerror("timemgr",rs,"dtor-fini") ;
@@ -278,31 +310,38 @@ namespace {
 	} ; /* end dtor (timemgr) */
     private:
 	int pinit	() noex ;
+	int pinitx	() noex ;
 	int pfini	() noex ;
+	int pcapbeg	(int) noex ;
+	int pcapend	() noex ;
+	int pcapsignal	() noex ;
     } ; /* end struct (timemgr) */
 } /* end namespace */
 
 
 /* forward references */
 
-local void uctimeent_load(uctiment *ep,con uctimnote *nop) noex {
+local void uctiment_load(uctiment *ep,con uctimnote *nop) noex ;
 
 local int	cmpqent(cvoid *,cvoid *) noex ;
 
 extern "C" {
-    local int	timemgr_sigerworker(uctiment *) noex ;
-    local int	timemgr_dispworker(uctiment *) noex ;
-    local void	timemgr_atforkbefore() noex ;
-    local void	timemgr_atforkparent() noex ;
-    local void	timemgr_atforkchild() noex ;
-    local void	timemgr_exit() noex ;
+    local int	timemgr_sigerwork	(timemgr *) noex ;
+    local int	timemgr_dispworker	(timemgr *) noex ;
+    local void	timemgr_atforkbefore	() noex ;
+    local void	timemgr_atforkparent	() noex ;
+    local void	timemgr_atforkchild	() noex ;
+    local void	timemgr_exit		() noex ;
 } /* end extern */
 
 
 /* local variables */
 
 static timemgr		timemgr_data ;
-cint			wt		= itimer.real ;
+cint			itimid		= itimer.real ;
+cint			sigto		= SIGALARM ;
+cint			vtimlim		= 100'000'000 ;
+cbool			f_debug		= CF_DEBUG ;
 cbool			f_childthrs	= CF_CHILDTHRS ;
 
 
@@ -312,29 +351,69 @@ cbool			f_childthrs	= CF_CHILDTHRS ;
 /* exported subroutines */
 
 int uc_timcreate(con uctimnote *notep) noex {
-	timemgr_arg	ao(notep) ;
-	return ao(cmdsub_create) ;
-} /* end subroutine */
+    	int		rs = SR_FAULT ;
+	DEBPRINTF("ent\n") ;
+	if (notep) ylikely {
+	    timemgr_arg	ao(notep) ;
+	    rs = ao(cmdsub_create) ;
+	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end subroutine (uc_timecreate) */
 
 int uc_timdestroy(int id) noex {
-	timemgr_arg	ao ;
-	return ao(cmdsub_destroy,id) ;
-} /* end subroutine */
+    	int		rs = SR_INVALID ;
+	DEBPRINTF("ent id=%d\n",id) ;
+	if (id >= 0) ylikely {
+	    timemgr_arg	ao ;
+	    rs = ao(cmdsub_destroy,id) ;
+	} /* end if (valid) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end subroutine (uc_timdestroy) */
 
-int uc_timset(int id,CITIMERVAL *ntvp,ITIMERVAL *otvp) noex {
-	timemgr_arg	ao(otvp,ntvp) ;
-	return ao(cmdsub_set,id) ;
-} /* end subroutine */
+int uc_timset(int id,mut ITIMERVAL *rtp,con ITIMERVAL *ntp) noex {
+    	custime		dt = getustime ;
+    	int		rs = SR_FAULT ;
+	DEBPRINTF("ent id=%d ntim=\n",id) ;
+	if (ntp) ylikely {
+    	    rs = SR_INVALID ;
+	    if (id >= 0) ylikely {
+	        if ((ntp->tv_sec ntim > dt) && ((ntim - dt) < vtimlim)) {
+	            timemgr_arg	ao(rtp,ntp) ;
+	            DEBPRINTF("valid\n") ;
+	            rs = ao(cmdsub_set,id) ;
+	        } /* end if (valid) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end subroutine (uc_timset) */
 
-int uc_timget(int id,ITIMERVAL *otvp) noex {
-	timemgr_arg	ao(otvp) ;
-	return ao(cmdsub_get,id) ;
-} /* end subroutine */
+int uc_timget(int id,mut ITIMERVAL *rtp) noex {
+    	int		rs = SR_FAULT ;
+	DEBPRINTF("ent id=%d\n",id) ;
+	if (rtp) ylikely {
+	    rs = SR_INVALID ;
+	    if (id >= 0) ylikely {
+	        timemgr_arg ao(rtp) ;
+	        rs = ao(cmdsub_get,id) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ; 
+} /* end subroutine (uc_timget) */
 
 int uc_timover(int id) noex {
-	timemgr_arg	ao ;
-	return ao(cmdsub_over,id) ;
-} /* end subroutine */
+    	int		rs = SR_INVALID ;
+	DEBPRINTF("ent id=%d\n",id) ;
+	if (id >= 0) ylikely {
+	    timemgr_arg	ao ;
+	    rs = ao(cmdsub_over,id) ;
+	} /* end if (valid) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end subroutine (uc_timover) */
 
 
 /* local subroutines */
@@ -343,16 +422,20 @@ int timemgr_arg::operator () (cmdsubs cmd,int id) noex {
 	return timemgr_data.cmdsub(cmd,id,this) ;
 } /* end method (timemgr_arg::operator) */
 
-int uctim::cmdsub(cmdsubs cmd,int id,timemgr_arg *uap) noex {
+int timemgr::cmdsub(cmdsubs cmd,int id,timemgr_arg *uap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rv = 0 ;
+	DEBPRINTF("ent\n") ;
 	if (uap) ylikely {
 	    rs = SR_INVALID ;
 	    if (cmd >= 0) ylikely {
 	        if ((rs = init) >= 0) ylikely {
-	            if ((rs = capbegin()) >= 0) ylikely {
+		    DEBPRINTF("init() rs=%d\n",rs) ;
+	            if ((rs = capbeg) >= 0) ylikely {
+		        DEBPRINTF("capbeg() rs=%d\n",rs) ;
 	                if ((rs = workready()) >= 0) ylikely {
+		            DEBPRINTF("workbeg() rs=%d\n",rs) ;
 	                    switch (cmd) {
 	                    case cmdsub_create:
 	                        rs = cmd_create		(id,uap) ;
@@ -375,16 +458,18 @@ int uctim::cmdsub(cmdsubs cmd,int id,timemgr_arg *uap) noex {
 	                    } /* end switch */
 			    rv = rs ;
 	                } /* end if (timemgr_workready) */
-	                rs1 = capend() ;
+		        DEBPRINTF("switch-out rs=%d\n",rs) ;
+	                rs1 = capend ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (uctim-cap) */
 	        } /* end if (timemgr_init) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d rv=%d\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
-} /* end method (uctim::cmdsub) */
+} /* end method (timemgr::cmdsub) */
 
-int uctim::pinit() noex {
+int timemgr::pinit() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (! fvoid) {
@@ -399,8 +484,10 @@ int uctim::pinit() noex {
 	                if ((rs = uc_atforkrec(b,ap,ac)) >= 0) ylikely {
 			    void_f	e = timemgr_exit ;
 	                    if ((rs = uc_atexit(e)) >= 0) ylikely {
-	                        finitdone = true ;
-	                        f = true ;
+				if ((rs = initx) >= 0) {
+	                            finitdone = true ;
+	                            f = true ;
+				} /* end if (initx) */
 	                    } /* end if (ready) */
 	                    if (rs < 0) {
 	                        uc_atforkexp(b,ap,ac) ;
@@ -420,187 +507,81 @@ int uctim::pinit() noex {
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
-	            int		rs = SR_OK ;
+	            int		rsl = SR_OK ;
 	            if (!finit) ylikely {
-		        rs = SR_LOCKFAIL ;
+		        rsl = SR_LOCKFAIL ;
 	            } else if (finitdone) {
-		        rs = 1 ;
+		        rsl = 1 ;
 	            }
-	            return rs ;
+	            return rsl ;
 	        } ; /* end lambda */
 	        rs = tw(lamb) ;			/* <- time-watching */
 	    } /* end if (initialization) */
 	} /* end if (not-voided) */
 	return (rs >= 0) ? f : rs ;
-} /* end method (uctim::pinit) */
+} /* end method (timemgr::pinit) */
 
-int uctim::pfini() noex {
+int timemgr::pinitx() noex {
+    	int		rs = SR_OK ;
+	cchar		*fn = "uctim.deb" ;
+	if (cint rs1 = debopen(fn) ; rs1 >= 0) {
+	    DEBPRINTF("start fd=%d\n",rs1) ;
+	} else {
+	    ulogerror("uctim",rs1,"debopen") ;
+	} /* end if */
+	return rs ;
+} /* end method (timemgr::pinitx) */
+
+int timemgr::pfini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
 	    {
 	        rs1 = workend() ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        void_f	b = timemgr_atforkbefore ;
 	        void_f	ap = timemgr_atforkparent ;
 	        void_f	ac = timemgr_atforkchild ;
 	        rs1 = uc_atforkexp(b,ap,ac) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = cnv.destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mtx.destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finit = false ;
 	    finitdone = false ;
 	} /* end if (was initialized) */
 	return rs ;
-} /* end method (uctim::pfini) */
+} /* end method (timemgr::pfini) */
 
-int uctim::cmd_create(int id,timemgr_arg *argp) noex {
-    	cnothrow	nt{} ;
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	if (argp->notep) ylikely {
-	    cint	esz = szof(uctiment) ;
-	    if (void *ep ; (rs = lm_mall(esz,&vp)) >= 0) ylikely {
-		rs = SR_BUGCHECK ;
-	        if (uctiment *ep = new(nt) uctiment ; ep) ylikely {
-		    uctiment_load(ep,argp->notep) ;
-	            if ((rs = ents.add(ep)) >= 0) ylikely {
-	                ep->id = rs ;
-	            } /* end if (vechand_add) */
-		    if (rs < 0) {
-			delete ep ;
-		    } /* end if (error) */
-	        } /* end if (new-uctiment) */
-	        if (rs < 0) ylikely {
-	            lm_free(ep) ;
-		} /* end if (error) */
-	    } /* end if (memory-acquire) */
-	} /* end if (non-null) */
-	return rs ;
-} /* end method (uctim::cmd_create) */
-
-int uctim::cmd_destroy(int id,timemgr_arg *argp) noex {
-	cint		rsn = SR_NOTFOUND ;
-	cint		id = argp->id ;
-	int		rs ;
-	int		rs1 ;
-	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
-	    cint	ei = rs ;
-	    rs = SR_BUGCHECK ;
-	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
-	        if ((rs = ents.del(ei)) >= 0) ylikely {
-		    bool	f_free = false ;
-	            if ((rs = pqp->delent(ep)) >= 0) ylikely {
-			f_free = true ;
-		    } else if (rs == rsn) {
-	                ciq	*cqp = &pass ;
-	                if ((rs = ciq_rement(cqp,ep)) >= 0) {
-			    f_free = true ;
-			} else if (rs == rsn) {
-	                    rs = SR_OK ;
-	                }
-		    } /* end if */
-		    if ((rs >= 0) && f_free) {
-	            	rs1 = lm_free(ep) ;
-			if (rs >= 0) rs = rs1 ;
-		    } /* end if (memory-release) */
-	        } /* end if (vechand_del) */
-	    } /* end if (non-null) */
-	} /* end if (vechand_get) */
-	return rs ;
-} /* end method (uctim::cmd_destroy) */
-
-int uctim::cmd_set(int id,timemgr_arg *argp) noex {
-	int		rs ;
-	int		rs1 ;
-	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
-	    cint	ei = rs ;
-	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
-		rs = priqins(ep) ;
-	    }
-	} /* end if (vechand_get) */
-	return rs ;
-} /* end method (uctim::cmd_set) */
-
-int uctim::cmd_over(int id,timemgr_arg *argp) noex {
-    	int		rs = SR_OK ;
-	(void) id ;
-	(void) argp ;
-	return rs ;
-/* end method (uctim::cmd_over) */
-
-int uctim::priqins(uctiment *ep) noex {
-	int		rs ;
-	int		pi = 0 ;
-	if ((rs = pqp->count) > 0) {
-	    if (uctiment *tep ; (rs = pqp->get(0,&tep)) >= 0) {
-	        if (ep->val < tep->val) {
-	            if ((rs = pqp->add(ep)) >= 0) {
-	                pi = rs ;
-	                rs = timerset(ep->val) ;
-	                if (rs < 0) {
-	                    pqp->del(pi) ;
-			} /* end if (error) */
-	            } /* end if (add) */
-	        } else {
-	            rs = pqp->add(ep) ;
-	            pi = rs ;
-	        }
-	    } /* end if (vecsorthand_get) */
-	} else {
-	    if ((rs = pqp->add(ep)) >= 0) {
-	        pi = rs ;
-	        rs = timerset(ep->val) ;
-	        if (rs < 0) {
-	            pqp->del(pi) ;
-		} /* end if (error) */
-	    } /* end if (vecsorthand_add) */
-	} /* end if */
-	return (rs >= 0) ? pi : rs ;
-} /* end method (uctim::priqins) */
-
-int uctim::priqrem(uctiment *ep) noex {
-} /* end method (uctim::priqrem) */
-
-int uctim::timerset(time_t val) noex {
-    	cnullptr	np{} ;
-	int		rs ;
-	if (TIMEVAL tv ; (rs = timespec_load(&tv,val,0)) >= 0) ylikely {
-	    if (ITIMERVAL it ; (rs = itimerspec_load(&it,&tv,np)) >= 0) {
-	        rs = uitimer_set(wt,&it,np) ;
-	    } /* end if (ITIMETVAL) */
-	} /* end if (TIMEVVAL) */
-	return rs ;
-} /* end method (uctim::timerset) */
-
-int uctim::capbegin(int to) noex {
+int timemgr::pcapbeg(int to) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mtx.lockbegin(to)) >= 0) {
-	    waiters += 1 ;
-	    while ((rs >= 0) && fcapture) { /* busy */
-	        rs = cnv.wait(&mx,to) ;
-	    } /* end while */
-	    if (rs >= 0) {
-	        fcapture = true ;
-	    } /* end if (ok) */
-	    waiters -= 1 ;
+	    {
+	        waiters += 1 ;
+	        while ((rs >= 0) && fcapture) { /* busy */
+	            rs = cnv.wait(&mtx,to) ;
+	        } /* end while */
+	        if (rs >= 0) {
+	            fcapture = true ;
+	        } /* end if (ok) */
+	        waiters -= 1 ;
+	    } /* end block */
 	    rs1 = mtx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-} /* end method (uctim::capbegin) */
+} /* end method (timemgr::pcapbeg) */
 
-int uctim::capend() noex {
+int timemgr::pcapend() noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mtx.lockbegin) >= 0) {
@@ -612,9 +593,214 @@ int uctim::capend() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
-} /* end method (uctim::capend) */
+} /* end method (timemgr::pcapend) */
 
-int uctim::workready() noex {
+int timemgr::pcapsignal() noex {
+    	int		rs ;
+	int		rs1 ;
+	DEBPRINTF("ent\n") ;
+	if ((rs = mtx.lockbegin) >= 0) {
+	    {
+		fcmd = true ;
+		rs = cnv.signal ;
+	    }
+	    rs1 = mtx.lockend ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (cap) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (timemgr::pcapsignal) */
+
+int timemgr::cmd_create(int,timemgr_arg *argp) noex {
+    	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	DEBPRINTF("ent\n") ;
+	if (argp->notep) ylikely {
+	    cint	esz = szof(uctiment) ;
+	    if (void *vp ; (rs = lm_mall(esz,&vp)) >= 0) ylikely {
+		rs = SR_BUGCHECK ;
+	        if (uctiment *ep = new(vp) uctiment ; ep) ylikely {
+		    uctiment_load(ep,argp->notep) ;
+	            if ((rs = ents.add(ep)) >= 0) ylikely {
+	                ep->id = rs ;
+	            } /* end if (vechand_add) */
+		    if (rs < 0) {
+			destroy_at(ep) ;
+		    } /* end if (error) */
+	        } /* end if (new-uctiment) */
+	        if (rs < 0) ylikely {
+	            lm_free(vp) ;
+		} /* end if (error) */
+	    } /* end if (memory-acquire) */
+	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (timemgr::cmd_create) */
+
+int timemgr::cmd_destroy(int id,timemgr_arg *) noex {
+	cint		rsn = SR_NOTFOUND ;
+	int		rs ;
+	int		rs1 ;
+	DEBPRINTF("ent\n") ;
+	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
+	    cint	ei = rs ;
+	    rs = SR_BUGCHECK ;
+	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
+	        if ((rs = ents.del(ei)) >= 0) ylikely {
+		    bool	f_free = false ;
+	            if ((rs = pqp->delent(ep)) >= 0) ylikely {
+			f_free = true ;
+		    } else if (rs == rsn) {
+	                if ((rs = pass.rement(ep)) >= 0) {
+			    f_free = true ;
+			} else if (rs == rsn) {
+	                    rs = SR_OK ;
+	                }
+		    } /* end if */
+		    if ((rs >= 0) && f_free) {
+			destroy_at(ep) ;
+		    } /* end if (destroy_at) */
+		    if ((rs >= 0) && f_free) {
+	            	rs1 = lm_free(ep) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (memory-release) */
+	        } /* end if (vechand_del) */
+	    } /* end if (non-null) */
+	} /* end if (vechand_get) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (timemgr::cmd_destroy) */
+
+int timemgr::cmd_set(int id,timemgr_arg *uap) noex {
+	int		rs ;
+	DEBPRINTF("ent val=%ld\n",uap->ntim) ;
+	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
+	    DEBPRINTF("ei=%d\n",rs) ;
+	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
+		custime dt = getustime ;
+		if (time_t *rtp = uap->rtp) {
+		    *rtp = max((ep->val - dt),0L) ;
+		} /* end if (remaining time) */
+		ep->val = uap->ntim ;	/* <- set time-value */
+		if ((ep->val - dt) > 0) {
+	    	    DEBPRINTF("-> priqins\n") ;
+		    rs = priqins(ep) ;
+		} else {
+	    	    DEBPRINTF("-> cmdtrans\n") ;
+		    rs = cmdtrans(ep) ;
+		} /* end if */
+	    } /* end if (non-null) */
+	} /* end if (vechand_get) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (timemgr::cmd_set) */
+
+int timemgr::cmd_get(int id,timemgr_arg *uap) noex {
+    	int		rs = SR_OK ;
+	DEBPRINTF("ent\n") ;
+	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
+	    DEBPRINTF("ei=%d\n",rs) ;
+	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
+		custime dt = getustime ;
+		rs = SR_OK ;
+		if (time_t *rtp = uap->rtp) {
+		    *rtp = max((ep->val - dt),0L) ;
+		} /* end if (remaining time) */
+	    } /* end if (non-null) */
+	} /* end if (vechand_get) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (timemgr::cmd_get) */
+
+int timemgr::cmd_over(int id,timemgr_arg *) noex {
+    	int		rs = SR_OK ;
+	DEBPRINTF("ent\n") ;
+	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
+	    DEBPRINTF("ei=%d\n",rs) ;
+	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
+		rs = SR_OK ;
+	    } /* end if (non-null) */
+	} /* end if (vechand_get) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (timemgr::cmd_over) */
+
+int timemgr::cmdtrans(uctiment *tep) noex {
+    	int		rs ;
+	DEBPRINTF("ent\n") ;
+	if ((rs = pass.ins(tep)) >= 0) {
+	    fcmd = true ;
+	    rs = cnv.signal ;
+	} /* end */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (timemgr::cmdtrans) */
+
+int timemgr::priqins(uctiment *ep) noex {
+    	custime		dt = getustime ;
+	int		rs ;
+	int		pi = 0 ;
+	DEBPRINTF("ent\n") ;
+	if ((rs = pqp->count) > 0) {
+	    DEBPRINTF("cnt=%d\n",rs) ;
+	    if (uctiment *tep ; (rs = pqp->get(0,&tep)) >= 0) {
+	        if (ep->val < tep->val) {
+	    DEBPRINTF("less-than\n") ;
+	            if ((rs = pqp->add(ep)) >= 0) {
+	                pi = rs ;
+	                rs = timerset(dt,ep->val) ;
+	                if (rs < 0) {
+	                    pqp->del(pi) ;
+			} /* end if (error) */
+	            } /* end if (add) */
+	        } else {
+	    DEBPRINTF("greater-equal\n") ;
+	            rs = pqp->add(ep) ;
+	            pi = rs ;
+	        } /* end */
+	    } /* end if (vecsorthand_get) */
+	} else {
+	    DEBPRINTF("cnt=%d\n",0) ;
+	    if ((rs = pqp->add(ep)) >= 0) {
+	    DEBPRINTF("vecsorthand_add() rs=%d\n",rs) ;
+	        pi = rs ;
+	        rs = timerset(dt,ep->val) ;
+	    DEBPRINTF("timerset() rs=%d\n",rs) ;
+	        if (rs < 0) {
+	            pqp->del(pi) ;
+		} /* end if (error) */
+	    } /* end if (vecsorthand_add) */
+	} /* end if */
+	DEBPRINTF("ret rs=%d pi=%d\n",rs,pi) ;
+	return (rs >= 0) ? pi : rs ;
+} /* end method (timemgr::priqins) */
+
+int timemgr::priqrem(uctiment *ep) noex {
+    	cint		rsn = SR_NOTFOUND ;
+    	int		rs ;
+	if ((rs = pqp->delent(ep)) == rsn) {
+	    rs = SR_OK ;
+	} /* end */
+	return rs ;
+} /* end method (timemgr::priqrem) */
+
+int timemgr::timerset(custime dt,time_t val) noex {
+    	cnullptr	np{} ;
+	custime		ival = (val - dt) ;
+	int		rs ;
+	DEBPRINTF("ent ival=%ld\n",ival) ;
+	if (TIMEVAL tv ; (rs = timeval_load(&tv,ival,0)) >= 0) ylikely {
+	DEBPRINTF("-> itimerval_load\n") ;
+	    if (ITIMERVAL it ; (rs = itimerval_load(&it,&tv,np)) >= 0) {
+	DEBPRINTF("-> uitimer_set\n") ;
+	        rs = uitimer_set(itimid,&it,np) ;
+	    } /* end if (ITIMETVAL) */
+	} /* end if (TIMEVVAL) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (timemgr::timerset) */
+
+int timemgr::workready() noex {
 	int		rs = SR_OK ;
 	if (! fl.workready) {
 	    rs = workbegin() ;
@@ -623,83 +809,93 @@ int uctim::workready() noex {
 	    rs = thrsbegin() ;
 	} /* end if (threads) */
 	return rs ;
-} /* end method (uctim::workready) */
+} /* end method (timemgr::workready) */
 
-int uctim::workbegin() noex {
+int timemgr::workbegin() noex {
 	int		rs = SR_OK ;
+	DEBPRINTF("ent\n") ;
 	if (! fl.workready) {
 	    cint	vn = 0 ;
 	    cint	vo = (vechandm.compact | vechandm.ordered) ;
+	    DEBPRINTF("-> ents.start\n") ;
 	    if ((rs = ents.start(vn,vo)) >= 0) ylikely {
+	    DEBPRINTF("-> priqbeg\n") ;
 	        if ((rs = priqbegin()) >= 0) ylikely {
+	    DEBPRINTF("-> sigbeg\n") ;
 	            if ((rs = sigbegin()) >= 0) ylikely {
+	    DEBPRINTF("-> timerbeg\n") ;
 	                if ((rs = timerbegin()) >= 0) ylikely {
-	                    if ((rs = ciq_start(&pass)) >= 0) ylikely {
+	    DEBPRINTF("-> pass.start\n") ;
+	                    if ((rs = pass.start) >= 0) ylikely {
+	    DEBPRINTF("-> thrsbeg\n") ;
 	                        if ((rs = thrsbegin()) >= 0) {
 	                            fl.workready = true ;
 	                        } /* end if (good-to-go) */
+	    DEBPRINTF("thrsbeg-out rs=%d\n",rs) ;
 	                        if (rs < 0) {
-	                            ciq_finish(&pass) ;
+	                            pass.finish() ;
 	                        } /* end if (error) */
 	                    } /* end if (ciq_start) */
+	    DEBPRINTF("ciq_start-out rs=%d\n",rs) ;
 	                    if (rs < 0) {
 	                        timerend() ;
 	                    } /* end if (error) */
-	                } /* end if (uctim::timerbegin) */
+	                } /* end if (timemgr::timerbegin) */
 	                if (rs < 0) {
 	                    sigend() ;
 			} /* end if (error) */
-	            } /* end if (uctim::sigbegin) */
+	            } /* end if (timemgr::sigbegin) */
 	            if (rs < 0) {
 	                priqend() ;
 	            } /* end if (error) */
-	        } /* end if (uctim::pribegin) */
+	        } /* end if (timemgr::pribegin) */
 	        if (rs < 0) {
 	            ents.finish() ;
 	        } /* end if (error) */
 	    } /* end if (vechand_start) */
 	} /* end if (needed) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end method (uctim::workbegin) */
+} /* end method (timemgr::workbegin) */
 
-int uctim::workend() noex {
+int timemgr::workend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (fl.workready) {
 	    {
 	        rs1 = thrsend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
-	        rs1 = ciq_finish(&pass) ;
+	        rs1 = pass.finish ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = timerend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = sigend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = priqend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
-	        rs1 = workfins() ;
+	        rs1 = entfins() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = ents.finish ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    fl.workready = false ;
 	} /* end if (work-ready) */
 	return rs ;
-} /* end method (uctim::workend) */
+} /* end method (timemgr::workend) */
 
-int uctim::workfins() noex {
+int timemgr::entfins() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*otp{} ;
@@ -707,42 +903,42 @@ int uctim::workfins() noex {
 	    if (otp) {
 	        if (uctiment *ep = resumelife<uctiment>(otp) ; ep) {
 		    destroy_at(ep) ;
-		}
+		} /* end if (destroy) */
 		{
 	            rs1 = lm_free(otp) ;
 	            if (rs >= 0) rs = rs1 ;
-		}
+		} /* end if (memory-release) */
 	    } /* end if (memory-release) */
 	} /* end for */
 	return rs ;
-} /* end method (timemgr_workfins) */
+} /* end method (timemgr_entfins) */
 
-int uctim::workdump() noex {
+int timemgr::workdump() noex {
         int             rs = SR_OK ;
         int             rs1 ;
         if (fl.workready) {
 	    {
                 rs1 = pridump() ;
                 if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
                 rs1 = sigerdump() ;
                 if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
-                rs1 = workfins() ;
+                rs1 = entfins() ;
                 if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
         } /* end if (work-ready) */
         return rs ;
-} /* end method (uctim::workdump) */
+} /* end method (timemgr::workdump) */
 
-int uctim::priqbegin() noex {
+int timemgr::priqbegin() noex {
 	cint		osz = szof(vecsorthand) ;
 	int		rs ;
 	if (void *p ; (rs = lm_mall(osz,&p)) >= 0) {
 	    rs = SR_BUGCHECK ;
-	    if (prique *pqp = new(p) prique ; pqp) {
+	    if (pqp = new(p) prique ; pqp) {
 	        rs = pqp->start(cmpqent,1) ;
 		if (rs < 0) {
 		    destroy_at(pqp) ;
@@ -754,20 +950,20 @@ int uctim::priqbegin() noex {
 	    } /* end if (error) */
 	} /* end if (memory-acquire) */
 	return rs ;
-} /* end subroutine (uctim::priqbegin) */
+} /* end subroutine (timemgr::priqbegin) */
 
-int uctim::priqend() noex {
+int timemgr::priqend() noex {
 	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
-	if (pqp) {
+	if (pqp) ylikely {
 	    rs = SR_OK ;
 	    {
 	        rs1 = pqp->finish ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		destroy_at(pqp) ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = lm_free(pqp) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -775,9 +971,9 @@ int uctim::priqend() noex {
 	    pqp = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
-} /* end method (uctim::priqend) */
+} /* end method (timemgr::priqend) */
 
-int uctim::pridump() noex {
+int timemgr::pridump() noex {
         int             rs = SR_OK ;
         int             rs1 ;
         void            *tep ;
@@ -789,77 +985,57 @@ int uctim::pridump() noex {
         } /* end for */
         if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
         return rs ;
-} /* end method (uctim::pridump) */
+} /* end method (timemgr::pridump) */
 
-int uctim::sigbegin() noex {
-	sigset_t	nss ;
-	sigset_t	oss ;
-	cint		scmd = SIG_BLOCK ;
-	cint		sig = SIGALARM ;
+int timemgr::sigbegin() noex {
+	cint		scmd = SIG_BLOCK ; /* <- block */
 	int		rs ;
-	uc_sigsetempty(&nss) ;
-	uc_sigsetadd(&nss,sig) ;
-	if ((rs = u_sigmask(scmd,&nss,&oss)) >= 0) {
-	    if ((rs = uc_sigsetismem(&nss,sig)) > 0) {
+	if (usigset oss, nss(sigto) ; (rs = u_sigmask(scmd,&nss,&oss)) >= 0) {
+	    if ((rs = oss.is(sigto)) > 0) {
 	        fl.wasblocked = true ;
 	    }
-	}
+	} /* end if (u_sigmask) */
 	return rs ;
-} /* end method (uctim::sigbegin) */
+} /* end method (timemgr::sigbegin) */
 
-int uctim::sigend() noex {
+int timemgr::sigend() noex {
 	int		rs = SR_OK ;
 	if (! fl.wasblocked) {
-	    sigset_t	ss ;
-	    cint	scmd = SIG_UNBLOCK ;
-	    cint	sig = SIGALARM ;
-	    uc_sigsetempty(&ss) ;
-	    uc_sigsetadd(&ss,sig) ;
-	    rs = u_sigmask(scmd,&ss,nullptr) ;
+	    usigset	nsm(sigto) ;
+	    cint	scmd = SIG_UNBLOCK ; /* <- un-block */
+	    rs = u_sigmask(scmd,&nsm) ;
 	} /* end if (was blocked) */
 	return rs ;
-} /* end method (uctim::sigend) */
+} /* end method (timemgr::sigend) */
 
-int uctim::timerbegin() noex {
-	cint		st = SIGEV_SIGNAL ;
-	cint		sig = SIGALARM ;
-	cint		val = 0 ; /* we do not (really) care about this */
-	int		rs ;
-	if (SIGEVENT se ; (rs = sigevent_load(&se,st,sig,val)) >= 0) {
-	    (void) se ;
-	    timerid = 0 ;
-	    rs = SR_OK ;
-	} /* end if */
-	return rs ;
-} /* end method (uctim::timerbegin) */
+int timemgr::timerbegin() noex {
+	fl.timer = true ;
+	return SR_OK ;
+} /* end method (timemgr::timerbegin) */
 
-int uctim::timerend() noex {
+int timemgr::timerend() noex {
+	fl.timer = false ;
+	return SR_OK ;
+} /* end method (timemgr::timerend) */
+
+int timemgr::thrsbegin() noex {
 	int		rs = SR_OK ;
-	int		rs1 ;
-	{
-	    (void) rs1 ;
-	    timerid = 0 ;
-	    fl.timer = false ;
-	}
-	return rs ;
-} /* end method (uctim::timerend) */
-
-int uctim::thrsbegin() noex {
-	int		rs = SR_OK ;
+	DEBPRINTF("ent\n") ;
 	if ((! fl.thrs) && (! freqexit)) {
-	    if ((rs = sigerbegin()) >= 0) {
-	        if ((rs = dispbegin()) >= 0) {
+	    if ((rs = sigerbeg()) >= 0) {
+	        if ((rs = dispbeg()) >= 0) {
 	            fl.thrs = true ;
 	        }
 	        if (rs < 0) {
 	            sigerend() ;
 	        } /* end if (error) */
-	    } /* end if (sigerbegin) */
+	    } /* end if (sigerbeg) */
 	} /* end if (needed) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end method (uctim::thrsbegin) */
+} /* end method (timemgr::thrsbegin) */
 
-int uctim::thrsend() noex {
+int timemgr::thrsend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (fl.thrs) {
@@ -868,59 +1044,65 @@ int uctim::thrsend() noex {
 	    {
 	        rs1 = dispend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = sigerend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	} /* end if */
 	return rs ;
-} /* end method (uctim::thrsend) */
+} /* end method (timemgr::thrsend) */
 
-int uctim::sigerbegin() noex {
+int timemgr::sigerbeg() noex {
 	int		rs ;
 	int		rs1 ;
-	int		f = false ;
+	int		f = false ; /* return-value */
+	DEBPRINTF("ent\n") ;
 	if (pta ta ; (rs = ta.create) >= 0) ylikely {
 	    cint	scope = UCTIM_SCOPE ;
+	    DEBPRINTF("-> ta.setscope\n") ;
 	    if ((rs = ta.setscope(scope)) >= 0) ylikely {
-	        tworker_f	wt = tworker_f(timemgr_sigerworker) ;
+	        tworker_f	wt = tworker_f(timemgr_sigerwork) ;
+	    DEBPRINTF("-> uptcreate\n") ;
 	        if (pthread_t tid ; (rs = uptcreate(&tid,&ta,wt,this)) >= 0) {
+	    DEBPRINTF("uptcreate() rs=%d\n",rs) ;
 	            fl.running_siger = true ;
 	            tid_siger = tid ;
 	            f = true ;
 	        } /* end if (pthread-create) */
+	    DEBPRINTF("uptcreate-out rs=%d\n",rs) ;
 	    } /* end if (pta-setscope) */
+	    DEBPRINTF("ta.setscope-out rs=%d\n",rs) ;
 	    rs1 = ta.destroy ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pta) */
+	DEBPRINTF("ret rs=%d f=%d\n",rs,f) ;
 	return (rs >= 0) ? f : rs ;
-} /* end method (timemgr_sigerbegin) */
+} /* end method (timemgr_sigerbeg) */
 
-int uctim::sigerend() noex {
+int timemgr::sigerend() noex {
 	int		rs = SR_OK ;
 	if (fl.running_siger) {
 	    pthread_t	tid = tid_siger ;
-	    cint	sig = SIGALARM ;
-	    if ((rs = uptkill(tid,sig)) >= 0) {
+	    if ((rs = uptkill(tid,sigto)) >= 0) {
 	        fl.running_siger = false ;
 	        if (int trs ; (rs = uptjoin(tid,&trs)) >= 0) {
 	            rs = trs ;
 	        } else if (rs == SR_SRCH) {
 	            rs = SR_OK ;
-	        }
+	        } /* end */
 	    } /* end if (uptkill) */
 	} /* end if (running) */
 	return rs ;
 } /* end method (timemgr_sigerend) */
 
 /* this is an independent thread of execution */
-int uctim::sigerworker() noex {
+int timemgr::sigerwork() noex {
 	int		rs ;
 	while ((rs = sigerwait()) > 0) {
 	    if (freqexit) break ;
 	    switch (rs) {
-	    case 1:
+	    case dispcmd_timeout:
 	        rs = sigerserve() ;
 	        break ;
 	    } /* end switch */
@@ -928,85 +1110,79 @@ int uctim::sigerworker() noex {
 	} /* end while */
 	fexitsiger = true ;
 	return rs ;
-} /* end method (uctim::sigerworker) */
+} /* end method (timemgr::sigerwork) */
 
-int uctim::sigerwait() noex {
-	sigset_t	ss ;
-	cint		sig = SIGALARM ;
-	cint		to = TO_SIGWAIT ;
+int timemgr::sigerwait() noex {
 	int		rs ;
-	int		cmd = 0 ;
-	bool		f_timedout = false ;
-	uc_sigsetempty(&ss) ;
-	uc_sigsetadd(&ss,sig) ;
-	uc_sigsetadd(&ss,SIGALRM) ;
-	if (TIMESPEC ts ; (rs = timespec_load(&ts,to,0)) >= 0) {
-	    siginfo_t	si{} ;
-	    bool	f_exit = false ;
-	    repeat {
-	        if ((rs = uc_sigwaitinfoto(&ss,&si,&ts)) < 0) {
-	            switch (rs) {
-	            case SR_INTR:
-	                break ;
-	            case SR_AGAIN:
-	                f_timedout = true ;
-	                rs = SR_OK ; /* will cause exit from loop */
-	                break ;
-	            default:
-	                f_exit = true ;
-	                break ;
-	            } /* end switch */
-	        } /* end if (error) */
-	    } until ((rs >= 0) || f_exit) ;
-	} /* end if (timespec) */
-	if (rs >= 0) {
-	    if (! freqexit) {
-	        if (f_timedout) {
-	            cmd = dispcmd_handle ;
-	        } else if (sig == si.si_signo) {
-	            cmd = dispcmd_timeout ;
-	        }
-	    } /* end if (not exiting) */
-	} /* end if (ok) */
+	int		cmd = 0 ; /* return-value */
+	DEBPRINTF("ent\n") ;
+	if (usigset nss(sigto) ; (rs = u_sigwait(&nss)) >= 0) {
+	    if (rs == sigto) {
+	DEBPRINTF("timeout\n") ;
+	        cmd = dispcmd_timeout ;
+	    } else {
+	DEBPRINTF("handle\n") ;
+	        cmd = dispcmd_handle ;
+	    } /* end */
+	} /* end if (u_sigwait) */
+	DEBPRINTF("ret rs=%d cmd=%d\n",rs,cmd) ;
 	return (rs >= 0) ? cmd : rs ;
-} /* end method (uctim::sigerwait) */
+} /* end method (timemgr::sigerwait) */
 
-int uctim::sigerserve() noex {
+int timemgr::sigerserve() noex {
 	cint		to = TO_CAPTURE ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = capbegin(to)) >= 0) ylikely {
-	    custime	dt = time(nullptr) ;
+	DEBPRINTF("ent\n") ;
+	if ((rs = capbeg(to)) >= 0) ylikely {
+	    custime	dt = getustime ;
+	    DEBPRINTF("dt=%ld\n",dt) ;
 	    while ((rs = pqp->count) > 0) {
+		DEBPRINTF("cnt=%d\n",rs) ;
 	        if (uctiment *tep ; (rs = pqp->get(0,&tep)) >= 0) {
-	            cint	ei = rs ;
-	            if (tep->val > dt) break ;
-	            if ((rs = pqp->del(ei)) >= 0) {
-	                if ((rs = ciq_ins(&pass,tep)) >= 0) {
-	                    fcmd = true ;
-	                    rs = cnv.signal ;
-	                }
-	            }
-	        }
+	            cint ei = rs ; 
+		    DEBPRINTF("ei=%d val=%ld\n",ei,tep->val) ;
+		    if (tep->val < dt) break ;
+		    DEBPRINTF("-> sigertrans\n") ;
+		    rs = sigertrans(ei,tep) ;
+		    DEBPRINTF("sigertrans() rs=%d\n",rs) ;
+	        } /* end if (prique-get) */
 	        if (rs < 0) break ;
 	    } /* end while */
-	    rs1 = capend() ;
+	    DEBPRINTF("while-out rs=%d\n",rs) ;
+	    rs1 = capend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (capture) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end method (uctim::sigerserve) */
+} /* end method (timemgr::sigerserve) */
 
-int uctim::sigerdump() noex {
-        ciq             *cqp = &pass ;
+int timemgr::sigertrans(int ei,uctiment *tep) noex {
+    	int		rs ;
+	if ((rs = pqp->del(ei)) >= 0) {
+	    DEBPRINTF("-> pass.ins\n") ;
+	    if ((rs = pass.ins(tep)) >= 0) {
+		rs = capsignal() ;
+	    } /* end */
+	} /* end if (delete) */
+	return rs ;
+} /* end method (timemgr::sigertrans) */
+
+int timemgr::sigerdump() noex {
         int             rs = SR_OK ;
         int             rs1 ;
-        void            *tep ;
-        while ((rs1 = ciq_rem(cqp,&tep)) >= 0) ; /* loop */
+	DEBPRINTF("ent\n") ;
+        for (void *tep ; (rs1 = pass.rem(&tep)) >= 0 ; ) {
+	    if (uctiment *uep = resumelife<uctiment>(tep)) {
+	        destroy_at(uep) ;
+	    }
+	} /* end for */
         if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
+	DEBPRINTF("ret rs=%d\n",rs) ;
         return rs ;
-} /* end method (uctim::sigerdump) */
+} /* end method (timemgr::sigerdump) */
 
-int uctim::dispbegin() noex {
+int timemgr::dispbeg() noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
@@ -1024,9 +1200,9 @@ int uctim::dispbegin() noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pta) */
 	return (rs >= 0) ? f : rs ;
-} /* end method (uctim::dispbegin) */
+} /* end method (timemgr::dispbeg) */
 
-int uctim::dispend() noex {
+int timemgr::dispend() noex {
 	int		rs = SR_OK ;
 	if (fl.running_disper) {
 	    pthread_t	tid = tid_disper ;
@@ -1035,15 +1211,17 @@ int uctim::dispend() noex {
 	        rs = trs ;
 	    } else if (rs == SR_SRCH) {
 	        rs = SR_OK ;
-	    }
+	    } /* end if */
 	} /* end if (running) */
 	return rs ;
-} /* end method (uctim::dispend) */
+} /* end method (timemgr::dispend) */
 
 /* it always takes a good bit of code to make this part look easy! */
-int uctim::dispworker() noex {
+int timemgr::dispworker() noex {
 	int		rs ;
+	DEBPRINTF("ent\n") ;
 	while ((rs = disprecv()) > 0) {
+	    DEBPRINTF("disprecv() rs=%d\n",rs) ;
 	    switch (rs) {
 	    case dispcmd_timeout:
 	        break ;
@@ -1054,91 +1232,159 @@ int uctim::dispworker() noex {
 	    if (rs < 0) break ;
 	} /* end while (looping on commands) */
 	fexitdisp = true ;
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end method (uctim::dispworker) */
+} /* end method (timemgr::dispworker) */
 
-int uctim::disprecv() noex {
+int timemgr::disprecv() noex {
 	cint		to = TO_DISPRECV ;
 	int		rs ;
 	int		rs1 ;
 	int		cmd = dispcmd_exit ;
+	DEBPRINTF("ent\n") ;
 	if ((rs = mtx.lockbegin) >= 0) ylikely {
-	    waiters += 1 ;
-	    while ((rs >= 0) && (! fcmd)) {
-	        rs = cnv.wait(&mx,to) ;
-	    } /* end while */
-	    if (rs >= 0) {
-	        fcmd = false ;
-	        if (! freqexit) cmd = dispcmd_handle ;
-	        if (waiters > 1) {
-	            rs = cnv.signal ;
-	        }
-	    } else if (rs == SR_TIMEDOUT) {
-	        if (! freqexit) cmd = dispcmd_timeout ;
-	        rs = SR_OK ;
-	    } else {
-	        cmd = dispcmd_exit ;
-	    }
-	    waiters -= 1 ;
+	    {
+	        waiters += 1 ;
+		DEBPRINTF("fcmd=%d\n",int(fcmd)) ;
+	        while ((rs >= 0) && (! fcmd)) {
+		    DEBPRINTF("-> condition-wait\n") ;
+	            rs = cnv.wait(&mtx,to) ;
+	        } /* end while */
+		DEBPRINTF("while-out rs=%d\n",rs) ;
+		DEBPRINTF("while-out fcmd=%d\n",int(fcmd)) ;
+	        if (rs >= 0) {
+	            fcmd = false ;
+		    DEBPRINTF("freqexit=%d\n",int(freqexit)) ;
+	            if (! freqexit) cmd = dispcmd_handle ;
+		    DEBPRINTF("waiters=%d\n",waiters) ;
+	            if (waiters > 1) {
+	                rs = cnv.signal ;
+	            }
+	        } else if (rs == SR_TIMEDOUT) {
+	            if (! freqexit) cmd = dispcmd_timeout ;
+	            rs = SR_OK ;
+	        } /* end if */
+	        waiters -= 1 ;
+	    } /* end block */
 	    rs1 = mtx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (mutex-section) */
+	} /* end if (mutex) */
+	DEBPRINTF("ret rs=%d cmd=%d\n",rs,cmd) ;
 	return (rs >= 0) ? cmd : rs ;
-} /* end method (uctim::disprecv) */
+} /* end method (timemgr::disprecv) */
 
-int uctim::disphandle() noex {
+int timemgr::disphandle() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	for (uctiment *tep ; (rs1 = ciq_rem(&pass,&tep)) >= 0 ; ) {
-	    if ((rs = dispjobdel(tep)) > 0) {
-	        timeout_f	met = (timeout_f) tep->metf ;
-	        rs = (*met)(tep->objp,tep->tag,tep->arg) ;
-	        lm_free(tep) ;
-	    } /* end if (still had job) */
+	DEBPRINTF("ent\n") ;
+	for (uctiment *tep ; (rs1 = pass.rem(&tep)) >= 0 ; ) {
+	    DEBPRINTF("got one\n") ;
+	    rs = dispdeliver(tep) ;
 	    if (rs < 0) break ;
 	} /* end while */
+	DEBPRINTF("while-out rs=%d rs1=%d\n",rs,rs1) ;
 	if ((rs >= 0) && (rs1 != SR_EMPTY)) rs = rs1 ;
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end method (uctim::disphandle) */
+} /* end method (timemgr::disphandle) */
 
-int uctim::dispjobdel(uctiment *tep) noex {
+int timemgr::dispdeliver(uctiment *tep) noex {
+    	int		rs ;
+	DEBPRINTF("ent\n") ;
+	if ((rs = disprempri(tep)) >= 0) {
+	    rs = deliver(tep) ;
+	} /* end if (disprempri) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (timemgr::dispdeliver) */
+
+int timemgr::disprempri(uctiment *tep) noex {
+        cint       	to = TO_CAPTURE ;
+    	int		rs = SR_OK ;
+	int		rs1 ;
+        if ((rs = capbeg(to)) >= 0) ylikely {
+	    {
+		rs = priqrem(tep) ;
+	    }
+	    rs1 = capend ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (capture) */
+	return rs ;
+} /* end method (timemgr::disprempri) */
+
+int timemgr::deliver(uctiment *tep) noex {
+    	int		rs ;
+	if ((rs = deliversem(tep)) >= 0) {
+	    if (cauto notf = tep->notfun) {
+	        rs = notf(tep->notobj,tep->id,tep->notarg) ;
+	    } /* end if */
+	} /* end if (deliversem) */
+	return rs ;
+} /* end method (timemgr::deliver) */
+
+int timemgr::deliversem(uctiment *tep) noex {
+    	int		rs = SR_OK ;
+	DEBPRINTF("ent\n") ;
+	if (psem *psp = tep->psemp) {
+	    rs = psp->post ;
+	    DEBPRINTF("psem_post() rs=%d\n",rs) ;
+	} /* end if (had semaphore) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (timemgr::deliversem) */
+
+#ifdef	COMMENT
+int timemgr::dispjobdel(uctiment *tep) noex {
         cint       	to = TO_CAPTURE ;
 	int		rs ;
 	int		rs1 ;
-	int		f = false ;
-        if ((rs = capbegin(to)) >= 0) ylikely {
+	int		f = false ; /* return-value */
+        if ((rs = capbeg(to)) >= 0) ylikely {
 	    if ((rs = ents.delent(tep)) >= 0) {
 		f = true ;
 	    } else if (rs == SR_NOTFOUND) {
 		rs = SR_OK ;
-	    }
-	    rs1 = capend() ;
+	    } /* end if */
+	    rs1 = capend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (uctim-cap) */
 	return (rs >= 0) ? f : rs ;
-} /* end method (uctim::dispjobdel) */
+} /* end method (timemgr::dispjobdel) */
+#endif /* COMMENT */
 
-timemgr_co::operator int () noex {
+int timemgr_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
 	    switch (w) {
 	    case timemgrmem_init:
 	        rs = op->pinit() ;
 	        break ;
+	    case timemgrmem_initx:
+	        rs = op->pinitx() ;
+	        break ;
 	    case timemgrmem_fini:
 	        rs = op->pfini() ;
+	        break ;
+	    case timemgrmem_capbeg:
+	        rs = op->pcapbeg(a) ;
+	        break ;
+	    case timemgrmem_capend:
+	        rs = op->pcapend() ;
+	        break ;
+	    case timemgrmem_capsignal:
+	        rs = op->pcapsignal() ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (timemgr_co::operator) */
 
-local int timemgr_sigerworker(uctiment *uip) noex {
-	return uip->sigerworker() ;
+local int timemgr_sigerwork(timemgr *tmp) noex {
+	return tmp->sigerwork() ;
 } /* end subroutine */
 
-local int timemgr_dispworker(uctiment *uip) noex {
-	return uip->dispworker() ;
+local int timemgr_dispworker(timemgr *tmp) noex {
+	return tmp->dispworker() ;
 } /* end subroutine */
 
 local void timemgr_atforkbefore() noex {
@@ -1150,45 +1396,49 @@ local void timemgr_atforkparent() noex {
 } /* end subroutine (timemgr_atforkparent) */
 
 local void timemgr_atforkchild() noex {
-        uctiment       *uip = &timemgr_data ;
-        if (uip->fl.workready) {
-            uip->fl.running_siger = false ;
-            uip->fl.running_disper = false ;
+        timemgr		*tmp = &timemgr_data ;
+        if (tmp->fl.workready) {
+            tmp->fl.running_siger = false ;
+            tmp->fl.running_disper = false ;
 	    if_constexpr (f_childthrs) {
-                if (uip->fl.thrs) {
-                    uip->fl.thrs = false ;
-                    uip->thrsbegin() ;
+                if (tmp->fl.thrs) {
+                    tmp->fl.thrs = false ;
+                    tmp->thrsbegin() ;
                 }
 	    } else {
-                uip->fl.thrs = false ;
-                uip->workdump() ;
-	    }
+                tmp->fl.thrs = false ;
+                tmp->workdump() ;
+	    } /* end if */
         } /* end if (was "working") */
-        uip->capend() ;
+        tmp->capend() ;
 } /* end subroutine (timemgr_atforkchild) */
 
 local void timemgr_exit() noex {
 	timemgr_data.fvoid = true ;
 } /* end subroutine (timemgr_atforkparent) */
 
-int uctimnote::load (void *op,psem *psp,uctim_f fp,int arg) noex {
-	notf	= fp ;		/* notify function (C-linkage) */
-	objp	= op ;		/* object pointer (function argument) */
-	psemp	= psp ;		/* POSIX® Semaphore pointer */
-	arg	= a ;		/* function argument */
+int uctimnote::load (void *op,psem *psp,uctim_f fp,int a) noex {
+    	int		rs = SR_FAULT ;
+	if (op) {
+	    notfun	= fp ;		/* notify function (C-linkage) */
+	    notobj	= op ;		/* object pointer (function argument) */
+	    psemp	= psp ;		/* POSIX® Semaphore pointer */
+	    notarg	= a ;		/* notification function argument */
+	} /* end if (non-null) */
+	return rs ;
 } /* end method (uctimnote::load) */
 
-local void uctimeent_load(uctiment *ep,con uctimnote *nop) noex {
-    	ep->it = {} ;
+local void uctiment_load(uctiment *ep,con uctimnote *nop) noex {
+    	ep->val = {} ;
 	ep->id = 0 ;
-	ep->notf	= nop->notf ;
-	ep->objp	= nop->objp ;
+	ep->notfun	= nop->notfun ;
+	ep->notobj	= nop->notobj ;
 	ep->psemp	= nop->psemp ;
-	ep->arg		= nop->arg ;
+	ep->notarg	= nop->notarg ;
 } /* end subroutine (uctimeent_load) */
 
 local int cmpuctiment(con uctiment *e1p,con uctiment *e2p) noex {
-    	return cmpitimerval(&e1p->it,&e2p->it) ;
+    	return saturate<int>(e1p->val - e2p->val) ;
 } /* end subroutine (cmpuctiment) */
 
 local int cmpqent(cvoid *v1p,cvoid *v2p) noex {
