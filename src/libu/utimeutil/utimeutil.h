@@ -57,8 +57,9 @@
 #include	<timespec.h>
 #include	<timeval.hh>
 #include	<timewatch.hh>
-#include	<utimeutiloutdefs.h>
-#include	<utimeutilouts.h>
+#include	<utimeout.h>
+#include	<utimeoutdefs.h>
+#include	<utimeouts.h>
 
 
 #endif /* UTIMEUTIL_INCLUDE */
