@@ -73,7 +73,7 @@
                         (vvp)->tv_usec += 1000000 ;                     \
                 }                                                       \
         } while (0)
-#endif
+#endif /* timersub */
 
 /* more operations on TIMEVALs (I guess from a different origin) */
 #ifndef	timevalclear
@@ -91,16 +91,34 @@
 
 EXTERNC_begin
 
-extern int timeval_load(TIMEVAL *,time_t,int) noex ;
-extern int timeval_add(TIMEVAL *,CTIMEVAL *,CTIMEVAL *) noex ;
-extern int timeval_sub(TIMEVAL *,CTIMEVAL *,CTIMEVAL *) noex ;
+extern int timeval_load	(mut TIMEVAL *,time_t,int) noex ;
+extern int timeval_add	(mut TIMEVAL *,CTIMEVAL *,CTIMEVAL *) noex ;
+extern int timeval_sub	(mut TIMEVAL *,CTIMEVAL *,CTIMEVAL *) noex ;
 
 EXTERNC_end
+
+extern timeval operator + (const timeval &,const timeval &) noex ;
+extern timeval operator - (const timeval &,const timeval &) noex ;
+
+inline bool operator == (con timeval &v1,con timeval &v2) noex {
+    	return (v1.tv_sec == v2.tv_sec) && (v1.tv_usec == v2.tv_usec) ;
+} /* end subroutine (timeval::operator) */
+
+extern ordcmp_strong operator <=> (con timeval &,con timeval &) noex ;
 
 struct timeval_t : timeval {
     	timeval_t(time_t ªsec = 0,suseconds_t ªusec = 0) noex {
 	    tv_sec	= ªsec ;
 	    tv_usec	= ªusec ;
+	} ; /* end ctor */
+    	timeval_t(const timeval &o) noex {
+	    tv_sec	= o.tv_sec ;
+	    tv_usec	= o.tv_usec ;
+	} ; /* end ctor */
+    	timeval_t &operator = (const timeval &o) noex {
+	    tv_sec	= o.tv_sec ;
+	    tv_usec	= o.tv_usec ;
+	    return *this ;
 	} ; /* end ctor */
     	timeval_t(const timeval_t &o) noex {
 	    tv_sec	= o.tv_sec ;
@@ -123,11 +141,11 @@ struct timeval_t : timeval {
 	timeval_t &operator *= (int v) noex ;
 	timeval_t &operator += (const timeval_t &) noex ;
 	timeval_t &operator -= (const timeval_t &) noex ;
+	bool operator == (const timeval_t &) const ;
 	std::ordering_strong operator <=> (const timeval_t &) const ;
+	bool operator == (const time_t)  const ;
+	std::ordering_strong operator <=> (const time_t) const ;
 } ; /* end struct (timeval_t) */
-
-timeval operator + (const timeval &,const timeval &) noex ;
-timeval operator - (const timeval &,const timeval &) noex ;
 
 
 #endif /* __cplusplus */
