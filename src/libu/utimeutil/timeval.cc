@@ -142,6 +142,18 @@ ordcmp_strong operator <=> (con timeval &v1,con timeval &v2) noex {
 	return res ;
 } /* end subroutine (timeval::operator) */
 
+ordcmp_strong operator <=> (con timeval &v1,time_t t) noex {
+    	ord res = ord::equal ;
+	int rc = 0 ;
+	if ((rc = intconv(v1.tv_sec - t)) == 0L) {
+	    rc = intconv(v1.tv_usec - 0) ;
+	}
+	if (rc) {
+	    res = (rc > 0) ? ord::greater : ord::less ;
+	}
+	return res ;
+} /* end subroutine (timeval::operator) */
+
 timeval_t &timeval_t::operator *= (int m) noex {
     	const time_t		vs = m ;
 	const suseconds_t	vu = m ;
