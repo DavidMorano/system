@@ -46,7 +46,7 @@ template<typename ... Args>
 inline char *strdcpy(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return strdcpyx(dp,dl,na,args ...) ;
-}
+} /* end subroutine */
 
 #endif /* __cplusplus */
 
