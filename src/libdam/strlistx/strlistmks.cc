@@ -183,11 +183,11 @@ local int strlistmks_dtor(strlistmks *op) noex {
 	    if (op->rtp) ylikely {
 		delete op->rtp ;
 		op->rtp = nullptr ;
-	    }
+	    } /* end if (delete-srectab) */
 	    if (op->stp) ylikely {
 		delete op->stp ;
 		op->stp = nullptr ;
-	    }
+	    } /* end if (delete-strtab) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (strlistmks_dtor) */
@@ -235,7 +235,7 @@ constexpr bool		f_usesbuf	= CF_USESBUF ;
 
 /* exported variables */
 
-const strlistmks_obj	strlistmks_modinfo = {
+constexpr strlistmks_obj	strlistmks_modinfo = {
 	"strlistmks",
 	szof(strlistmks),
 	0
@@ -295,24 +295,24 @@ int strlistmks_close(SLM *op) noex {
 	    if (! op->fl.abort) {
 	        rs1 = strlistmks_mksfile(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (op->nfd >= 0) {
 	        rs1 = u_close(op->nfd) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->nfd = -1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = strlistmks_listend(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if ((rs >= 0) && (! op->fl.abort)) {
 	        rs1 = strlistmks_renamefiles(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = strlistmks_filesend(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (op->dbname) ylikely {
 	        void *vp = voidp(op->dbname) ;
 	        rs1 = lm_free(vp) ;
@@ -322,7 +322,7 @@ int strlistmks_close(SLM *op) noex {
 	    {
 		rs1 = strlistmks_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return (rs >= 0) ? nvars : rs ;
@@ -447,19 +447,19 @@ local int strlistmks_nfdestroy(SLM *op) noex {
 	    rs1 = u_close(op->nfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->nfd = -1 ;
-	}
+	} /* end if */
 	if (op->nfname) {
 	    if (op->nfname[0] != '\0') {
 		rs1 = u_unlink(op->nfname) ;
 	        if (rs >= 0) rs = rs1 ;
 		op->nfname[0] = '\0' ;
-	    }
+	    } /* end if */
 	    {
 	        rs1 = lm_free(op->nfname) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->nfname = nullptr ;
 	    } /* end if (memory-release) */
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (strlistmks_nfdestroy) */
 
@@ -572,11 +572,11 @@ local int strlistmks_listend(SLM *op) noex {
 	if (op->rtp) {
 	    rs1 = srectab_finish(op->rtp) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end */
 	if (op->stp) {
 	    rs1 = strtab_finish(op->stp) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (strlistmks_listend) */
 
@@ -588,7 +588,7 @@ local int strlistmks_mksfile(SLM *op) noex {
 	    if ((rs = strlistmks_wrsfile(op)) >= 0) {
 		nstrs = op->nstrs ;
 	    }
-	}
+	} /* end */
 	return (rs >= 0) ? nstrs : rs ;
 } /* end subroutine (strlistmks_mksfile) */
 
@@ -730,17 +730,17 @@ int strlistmks_mkind(SLM *op,char *kst,uint (*it)[3], int il) noex {
 	    uint	ki ;
 	    uint	khash ;
 	    char	*kp ;
-	        for (int ri = 1 ; ri < rtl ; ri += 1) {
-	            ki = rt[ri] ;
-	            kp = kst + ki ;
-	            khash = hash_elf(kp,-1) ;
-	            hi = hashindex(khash,il) ;
-	            ve.ri = ri ;
-	            ve.ki = ki ;
-	            ve.khash = khash ;
-	            ve.hi = hi ;
-	            sc += indinsert(rt,it,il,&ve) ;
-	        } /* end for */
+	    for (int ri = 1 ; ri < rtl ; ri += 1) {
+	        ki = rt[ri] ;
+	        kp = kst + ki ;
+	        khash = hash_elf(kp,-1) ;
+	        hi = hashindex(khash,il) ;
+	        ve.ri = ri ;
+	        ve.ki = ki ;
+	        ve.khash = khash ;
+	        ve.hi = hi ;
+	        sc += indinsert(rt,it,il,&ve) ;
+	    } /* end for */
 	    it[il][0] = UINT_MAX ;
 	    it[il][1] = 0 ;
 	    it[il][2] = 0 ;
@@ -788,11 +788,11 @@ local int indinsert(rectab_t rt,uint (*it)[3],int il,VE *vep) noex {
 	    uint	nhi ;
 	    while ((nhi = it[lhi][2]) > 0) {
 	        lhi = nhi ;
-	    }
+	    } /* end while */
 	    hi = hashindex((lhi + 1),il) ;
 	    while (it[hi][0] > 0) {
 	        hi = hashindex((hi + 1),il) ;
-	    }
+	    } /* end while */
 	    it[lhi][2] = hi ;
 	} /* end if (same-key continuation) */
 	it[hi][0] = vep->ri ;
