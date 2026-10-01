@@ -21,11 +21,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 #define	RECORDER		struct recorder_head
@@ -48,7 +48,7 @@ struct recorder_information {
 	uint		c_fl3 ;
 	uint		c_un ;
 	uint		ilen ;		/* index length */
-} ;
+} ; /* end struct */
 
 struct recorder_entry {
 	uint		username ;
@@ -56,7 +56,7 @@ struct recorder_entry {
 	uint		first ;
 	uint		m1 ;
 	uint		m2 ;
-} ;
+} ; /* end struct */
 
 struct recorder_head {
 	RECORDER_ENT	*rectab ;
@@ -66,7 +66,7 @@ struct recorder_head {
 	int		e ;		/* current buffer extent */
 	int		c ;		/* count */
 	int		opts ;
-} ;
+} ; /* end struct */
 
 typedef	RECORDER	recorder ;
 typedef	RECORDER_ENT	recorder_ent ;
