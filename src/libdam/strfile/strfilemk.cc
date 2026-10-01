@@ -23,7 +23,7 @@
 
 	Description:
 	This module implements an interface (a trivial one) that
-	provides access to the STRFILEMK object (which is dynamically
+	provides access to the STRFILEMKS object (which is dynamically
 	loaded).
 
 *******************************************************************************/
@@ -139,11 +139,11 @@ local int strfilemk_dtor(SFM *op) noex {
                 strfilemk_calls    *callp = callsp(op->callp) ;
                 delete callp ;
                 op->callp = nullptr ;
-            }
+            } /* end if (delete-calls) */
 	    if (op->mlp) ylikely {
 		delete op->mlp ;
 		op->mlp = nullptr ;
-	    }
+	    } /* end if (delete-modload) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (strfilemk_dtor) */
@@ -238,15 +238,15 @@ int strfilemk_close(SFM *op) noex {
                     if (rs >= 0) rs = rs1 ;
                 } else {
                     rs = SR_NOSYS ;
-                }
+                } /* end */
                 {
                     rs1 = strfilemk_objloadend(op) ;
                     if (rs >= 0) rs = rs1 ;
-                }
+                } /* end */
                 {
                     rs1 = strfilemk_dtor(op) ;
                     if (rs >= 0) rs = rs1 ;
-                }
+                } /* end */
                 op->magval = 0 ;
             } /* end if (valid) */
 	} /* end if (strfilemk_magic) */
