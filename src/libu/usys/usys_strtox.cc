@@ -51,10 +51,10 @@ sint	strtosi(cchar *s,char **epp,int b) noex {
     	sint		res = 0 ; /* return-value */
 	errno_t		ec = 0 ;
 	bool		fneg ;
-    	if (s) {
+    	if (s) ylikely {
 	    clong	v = strtol(s,epp,b) ;
 	    fneg = bit(v,(nb - 1)) ;
-	    if (errno == 0) {
+	    if (errno == 0) ylikely {
 	        ulong	uv = conv<ulong>(v) ;
 		res = conv<sint>(v) ;
 	        if (fneg) {
@@ -88,9 +88,9 @@ sint	strtosi(cchar *s,char **epp,int b) noex {
 uint	strtoui(cchar *s,char **epp,int b) noex {
     	uint		res = 0 ; /* return-value */
 	errno_t		ec = 0 ;
-	if (s) {
+	if (s) ylikely {
 	    con ulong resl = strtoul(s,epp,b) ;
-	    if (errno == 0) {
+	    if (errno == 0) ylikely {
 		cint nib = (szof(uint) * CHAR_BIT) ;
 	        if ((resl >> nib) == 0UL) {
 	            res = conv<uint>(resl) ;
@@ -111,7 +111,7 @@ uint	strtoui(cchar *s,char **epp,int b) noex {
 slong	strtosl(cchar *s,char **epp,int b) noex {
     	slong		res = 0 ; /* return-value */
 	errno_t		ec = 0 ;
-	if (s) {
+	if (s) ylikely {
 	    res = strtol(s,epp,b) ;
 	} else {
 	    ec = EFAULT ;
