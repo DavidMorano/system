@@ -66,21 +66,9 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	bprintlns(bfile *,int,const char *,int) ;
-extern int	isdigitlatin(int) ;
-
 extern int	proginfo_setpiv(struct proginfo *,const char *,
 			const struct pivars *) ;
 extern int	printhelp(void *,const char *,const char *,const char *) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -398,7 +386,7 @@ char	*envv[] ;
 	                        case 'Q':
 	                            pip->have.quiet = TRUE ;
 	                            pip->fl.quiet = TRUE ;
-	                            pip->final.quiet = TRUE ;
+	                            pip->finval.quiet = TRUE ;
 	                            break ;
 
 /* version */
