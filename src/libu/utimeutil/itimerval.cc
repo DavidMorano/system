@@ -48,6 +48,8 @@
 #include	<ctime>			/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -91,5 +93,26 @@ int itimerval_load(ITIMERVAL *tsp,CTIMEVAL *valp,CTIMEVAL *ivp) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (itimerval_load) */
+
+bool operator == (con itimerval &v1,con itimerval &v2) noex {
+    	return (v1.it_value == v2.it_value) ;
+} /* end subroutine itimerval::operator) */
+
+ordcmp_strong operator <=> (con itimerval &v1,con itimerval &v2) noex {
+    	return (v1.it_value <=> v2.it_value) ;
+} /* end subroutine (itimerval::operator) */
+
+const itimerval operator - (con itimerval &v1,con itimerval &v2) noex {
+    	itimerval res{} ;
+	res.it_value	= v1.it_value - v2.it_value ;
+	res.it_interval	= v1.it_interval - v2.it_interval ;
+    	return res ;
+} /* end subroutine (itimerval::operator) */
+
+const itimerval operator - (con itimerval &v1,con time_t t) noex {
+    	itimerval res = v1 ;
+	res.it_value.tv_sec -= t ;
+    	return res ;
+} /* end subroutine (itimerval::operator) */
 
 
