@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= strxbrk.o straltwchar.o
+OBJ0= straltwchar.o
 OBJ1= strabbrsig.o strabbrerr.o
 OBJ2= strsub.o strwildsub.o
 OBJ3= strwhite.o 
@@ -162,7 +162,7 @@ strlinelen.o:		strlinelen.cc	strlinelen.h		$(INCS)
 strlocktype.o:		strlocktype.cc	strlocktype.h		$(INCS)
 
 # these subroutines (below) are very close to retirement!
-strbasename.o:		strbasename.cc				$(INCS)
-strdirname.o:		strdirname.cc				$(INCS)
+strbasename.o:		strbasename.cc	strxname.h		$(INCS)
+strdirname.o:		strdirname.cc	strxname.h		$(INCS)
 
 
