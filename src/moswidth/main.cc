@@ -1,4 +1,5 @@
-/* main SUPPORT */
+/* miswidth_main SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* process MOSFET width specifications within ADVICE connectivity */
@@ -17,25 +18,29 @@
 
 /*******************************************************************************
 
-	Synopsis:
-	$ moswidth [infile] [-i infile] [-o outfile]
-
+	Description:
 	This program will process width specifications for MOSFETs.
 	Specifically, we will look for MOSFET width specifications
 	that have an "X" in them and we will convert these to
 	straight microns.
 
+	Synopsis:
+	$ moswidth [infile] [-i infile] [-o outfile]
+
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<cerrno>
-#include	<cstring>
 #include	<ctime>
-#include	<usystem.h>
+#include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<char.h>
@@ -51,30 +56,23 @@
 #define		MAXARGGROUPS	(MAXARGINDEX/8 + 1)
 
 
-
-/* external functions */
-
-extern int	matstr(const char **,const char *,int) ;
+/* external subroutines */
 
 extern char	*putheap() ;
-extern char	*strbasename(char *) ;
 
 
-/* forward references */
+/* external variables */
 
 
 /* local structures */
 
 
-/* local globals */
+/* forward references */
 
 
-/* local statics */
+/* local variables */
 
-
-/* define command option words */
-
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	    "VERSION",		/* 0 */
 	    "TMPDIR",		/* 1 */
 	    NULL,
@@ -84,13 +82,14 @@ static const char *argopts[] = {
 #define	ARGOPT_TMPDIR	1
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
-	struct global	g, *gdp = &g ;
+int main(int argc,cchar **argv,cchar **envv) {
+    	prognamevar	progname(argc,argv,envv) ;
+	global		g, *gdp = &g ;
 	bfile		errfile, *efp = &errfile ;
 	bfile		infile, *ifp = &infile ;
 	bfile		outfile ;
@@ -102,24 +101,23 @@ int main(int argc,cchar **argv,cchar **envv)
 	int	maxai ;
 	int	l, pn ;
 	int	blen ;
-	int	f_version = FALSE ;
-	int	f_usage = FALSE ;
-	int	f_extra = FALSE ;
+	int	f_version = false ;
+	int	f_usage = false ;
+	int	f_extra = false ;
 	int	f_optminus, f_optplus, f_optequal ;
 	int	f_bol, f_eol ;
 	int	line ;
 
-	const char	*argp, *aop, *akp, *avp ;
+	cchar	*argp, *aop, *akp, *avp ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	linebuf[LINELEN + 1] ;
 	char	linebuf2[LINELEN + 1] ;
-	const char	*ifname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*ifname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
 
-	g.progname = strbasename(argv[0]) ;
-
+	g.progname = progname ;
 	if (bopen(efp,BERR,"wca",0664) < 0) return BAD ;
 
 	for (i = 0 ; i < MAXARGGROUPS ; i += 1) argpresent[i] = 0 ;
@@ -153,14 +151,14 @@ int main(int argc,cchar **argv,cchar **envv)
 	            aop = argp + 1 ;
 	            aol = argl - 1 ;
 			akp = aop ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
 
 			akl = avp - aop ;
 	                aol = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 
 	            } else {
 
@@ -178,7 +176,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    case ARGOPT_TMPDIR:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) g.tmpdir = avp ;
 
 	                        } else {
@@ -196,14 +194,14 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                case ARGOPT_VERSION:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal) goto badargextra ;
 
 	                    break ;
 
 /* default action and user specified help */
 	                default:
-	                    f_usage = TRUE ;
+	                    f_usage = true ;
 	                    break ;
 
 	                } /* end switch (key words) */
@@ -218,7 +216,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        gdp->debuglevel = 1 ;
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (cfdec(avp,avl,&gdp->debuglevel) != OK)
 					goto badargvalue ;
 
@@ -227,14 +225,14 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 /* input file */
 	                    case 'i':
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) 
 					ifname = avp ;
 
@@ -257,7 +255,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                    case 'o':
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) 
 					ofname = avp ;
 
@@ -277,7 +275,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 				break ;
 
 	                    default:
@@ -309,7 +307,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	            if (! f_extra) {
 
-	                f_extra = TRUE ;
+	                f_extra = true ;
 	                bprintf(efp,"%s: extra arguments ignored\n",
 	                    g.progname) ;
 
@@ -368,17 +366,17 @@ int main(int argc,cchar **argv,cchar **envv)
 /* go through the loops */
 
 	line = 0 ;
-	f_bol = TRUE ;
+	f_bol = true ;
 	offset = 0 ;
 	blen = 0 ;
 	blockstart = 0 ;
 	while ((len = breadln(gdp->ifp,linebuf,LINELEN)) > 0) {
 
 	    linebuf[len] = '\0' ;
-	    f_eol = FALSE ;
-	    if (linebuf[len - 1] == '\n') f_eol = TRUE ;
+	    f_eol = false ;
+	    if (linebuf[len - 1] == '\n') f_eol = true ;
 
-		f_continue = FALSE ;
+		f_continue = false ;
 	    if (f_bol) {
 
 #if	CF_DEBUG
@@ -394,13 +392,13 @@ int main(int argc,cchar **argv,cchar **envv)
 /* skip over white space */
 
 	        cp = linebuf ;
-		if (*cp == '+') f_continue = TRUE ;
+		if (*cp == '+') f_continue = true ;
 
 	        while (CHAR_ISWHITE(*cp)) cp += 1 ;
 
 /* scan for a MOSFET specification 'M' */
 
-		if (tolower(*cp) == 'm') f_mos = TRUE ;
+		if (tolower(*cp) == 'm') f_mos = true ;
 
 	    } /* end if (BOL) */
 
@@ -413,26 +411,21 @@ int main(int argc,cchar **argv,cchar **envv)
 	        while (CHAR_ISWHITE(*cp)) cp += 1 ;
 
 		if (strncasecmp(cp,"sw=",3) == 0) {
-
-/* we finally got one */
-
-		f_width = TRUE ;
+		/* we finally got one */
+		f_width = true ;
 		cp2 = cp ;
 		cp3 = cp2 + 3 ;
-
-
-
 		} /* end if (we got a width specification) */
 
 		} /* end if (we got a MOSFET) */
 
 /* write out */
 
-	if (! f_width)
+	if (! f_width) {
 		bwrite(gdp->ofp,linebuf,len) ;
+	}
 
-
-	if (f_eol) f_mos = FALSE ;
+	if (f_eol) f_mos = false ;
 
 #if	CF_DEBUG
 	    if (gdp->debuglevel > 1)
