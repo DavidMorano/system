@@ -36,10 +36,11 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<netdb.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<mallocstuff.h>
 #include	<vecstr.h>
 #include	<varsub.h>
