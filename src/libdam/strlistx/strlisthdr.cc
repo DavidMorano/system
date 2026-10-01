@@ -162,15 +162,15 @@ int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
                     memcpy(ep->vetu,bp,4) ;
                     if (ep->vetu[0] != STRLISTHDR_VERSION) {
                         rs = SR_PROTONOSUPPORT ;
-                    }
+                    } /* end */
                     if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
                         rs = SR_PROTOTYPE ;
-                    }
+                    } /* end */
                     bp += 4 ;
                     bl -= 4 ;
                 } else {
                     rs = SR_ILSEQ ;
-                }
+                } /* end if */
 	        if ((rs >= 0) && (bl > 0)) ylikely {
 	            if (bl >= hdrsz) ylikely {
 	                uint	*header = uintp(bp) ;
@@ -189,7 +189,7 @@ int strlisthdr_wr(strlisthdr *ep,cchar *hbuf,int hlen) noex {
 		        len = intconv(bp - hbuf) ;
 	            } else {
 	                rs = SR_ILSEQ ;
-		    }
+		    } /* end if */
 	        } /* end if (ok) */
 	    } else {
 		rs = SR_ILSEQ ;
