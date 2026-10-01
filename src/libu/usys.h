@@ -80,6 +80,7 @@
 #include	<usys_stime.h>
 #include	<usys_streams.h>
 #include	<usys_strtox.h>
+#include	<usys_strxbrk.h>
 #include	<usys_sysctl.h>
 #include	<usys_task.h>
 #include	<usys_timezone.h>
