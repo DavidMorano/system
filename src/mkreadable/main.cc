@@ -18,7 +18,7 @@
 /* Copyright © 1996 David A­D­ Morano.  All rights reserved. */
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -26,7 +26,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 
 #include	<usystem.h>
 #include	<bfile.h>
@@ -48,14 +48,6 @@
 
 
 /* external subroutines */
-
-extern int	matstr(const char **,const char *,int) ;
-extern int	wdt() ;
-extern int	checkname() ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strshrink() ;
 
 
 /* forward references */
