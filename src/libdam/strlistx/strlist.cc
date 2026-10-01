@@ -61,7 +61,7 @@
 #include	<mkpathx.h>		/* LIBUC */
 #include	<mkfnamesuf.h>		/* LIBUC */
 #include	<nleadstr.h>		/* LIBUC */
-#include	<localmisc.h>		/* |NATURAULWORDLEN| */
+#include	<localmisc.h>		/* LIBU |NATURAULWORDLEN| */
 
 #include	"strlist.h"
 #include	"strlisthdr.h"
@@ -92,8 +92,6 @@ import libutil ;			/* |memset(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -120,11 +118,12 @@ template<typename ... Args>
 local int strlist_ctor(strlist *op,Args ... args) noex {
     	STRLIST		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->fhp = new(nothrow) strlisthdr) != np) ylikely {
+	    if ((op->fhp = new(nt) strlisthdr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-strlisthdr) */
 	} /* end if (non-null) */
@@ -152,15 +151,15 @@ local inline int strlist_magic(strlist *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (strlist_magic) */
 
-local int strlist_dbloadbegin(SL *,time_t) noex ;
-local int strlist_dbloadend(SL *) noex ;
-local int strlist_dbmapcreate(SL *,time_t) noex ;
-local int strlist_dbmapdestroy(SL *) noex ;
-local int strlist_filemapcreate(SL *,SL_FM *,cc *,time_t) noex ;
-local int strlist_filemapdestroy(SL *,SL_FM *) noex ;
-local int strlist_dbproc(SL *,time_t) noex ;
-local int strlist_viverify(SL *,time_t) noex ;
-local int strlist_ouraudit(SL *) noex ;
+local int strlist_dbloadbegin		(SL *,time_t) noex ;
+local int strlist_dbloadend		(SL *) noex ;
+local int strlist_dbmapcreate		(SL *,time_t) noex ;
+local int strlist_dbmapdestroy		(SL *) noex ;
+local int strlist_filemapcreate		(SL *,SL_FM *,cc *,time_t) noex ;
+local int strlist_filemapdestroy	(SL *,SL_FM *) noex ;
+local int strlist_dbproc		(SL *,time_t) noex ;
+local int strlist_viverify		(SL *,time_t) noex ;
+local int strlist_ouraudit		(SL *) noex ;
 
 local bool	ismatkey(cchar *,cchar *,int) noex ;
 
@@ -170,7 +169,7 @@ local bool	ismatkey(cchar *,cchar *,int) noex ;
 
 /* exported variables */
 
-const SL_OBJ	strlist_modinfo = {
+constexpr SL_OBJ	strlist_modinfo = {
 	"strlist",
 	szof(strlist),
 	szof(strlist_cur)
@@ -194,7 +193,7 @@ int strlist_open(SL *op,cchar *dbname) noex {
 		        if ((rs = strlist_dbloadbegin(op,dt)) >= 0) {
 			    op->ti_lastcheck = dt ;
 			    op->magval = STRLIST_MAGIC ;
-		        }
+		        } /* end if */
 		        if (rs < 0) {
 	    		    void *vp = voidp(op->dbname) ;
 	    		    lm_free(vp) ;
@@ -219,17 +218,17 @@ int strlist_close(SL *op) noex {
 	    {
 	        rs1 = strlist_dbloadend(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (op->dbname) ylikely {
 	        void *vp = voidp(op->dbname) ;
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->dbname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 		rs1 = strlist_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -244,11 +243,11 @@ int strlist_getinfo(SL *op,SL_INFO *vip) noex {
 	    {
 	        vip->mtime = fip->ti_mod ;
 	        vip->wtime = time_t(hip->wtime) ;
-	    }
+	    } /* end */
 	    {
 	        vip->nstrlist = hip->nstrs ;
 	        vip->nskip = hip->nskip ;
-	    }
+	    } /* end */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (strlist_info) */
@@ -317,7 +316,7 @@ int strlist_curlook(SL *op,SL_CUR *curp,cchar *kp,int kl) noex {
             rt = mip->rt ;
             it = mip->it ;
             if (curp->i <= 0) {
-    /* unhappy or not, the index-table uses same-hash-linking! */
+    		/* unhappy or not, the index-table uses same-hash-linking! */
                 khash = hash_elf(kp,kl) ;
                 nhash = khash ;
                 chash = (khash & INT_MAX) ;
@@ -569,7 +568,7 @@ local int strlist_ouraudit(SL *op) noex {
 	rt = mip->rt ;
 	it = mip->it ;
 	kst = mip->kst ;
-/* record table */
+	/* record table */
 	if ((rt[0][0] != 0) || (rt[0][1] != 0)) {
 	    rs = SR_BADFMT ;
 	}
@@ -590,12 +589,12 @@ local int strlist_ouraudit(SL *op) noex {
 	    }
 	    if (rs < 0) break ;
 	} /* end for (record table entries) */
-/* index table */
+	/* index table */
 	if (rs >= 0) {
 	    if ((it[0][0] != 0) || (it[0][1] != 0) || (it[0][2] != 0)) {
 	        rs = SR_BADFMT ;
 	    }
-	}
+	} /* end if (ok) */
 	for (uint i = 1 ; (rs >= 0) && (i < hip->itlen) ; i += 1) {
 	    if (it[i][0] != 0) {
 	        uint	ri = it[i][0] ;
