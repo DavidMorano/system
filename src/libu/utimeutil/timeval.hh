@@ -97,14 +97,18 @@ extern int timeval_sub	(mut TIMEVAL *,CTIMEVAL *,CTIMEVAL *) noex ;
 
 EXTERNC_end
 
-extern timeval operator + (const timeval &,const timeval &) noex ;
-extern timeval operator - (const timeval &,const timeval &) noex ;
+extern timeval operator + (con timeval &,const timeval &) noex ;
+extern timeval operator - (con timeval &,const timeval &) noex ;
+
+extern timeval operator + (con timeval &,time_t) noex ;
+extern timeval operator - (con timeval &,time_t) noex ;
 
 inline bool operator == (con timeval &v1,con timeval &v2) noex {
     	return (v1.tv_sec == v2.tv_sec) && (v1.tv_usec == v2.tv_usec) ;
 } /* end subroutine (timeval::operator) */
 
 extern ordcmp_strong operator <=> (con timeval &,con timeval &) noex ;
+extern ordcmp_strong operator <=> (con timeval &,time_t) noex ;
 
 struct timeval_t : timeval {
     	timeval_t(time_t ªsec = 0,suseconds_t ªusec = 0) noex {
