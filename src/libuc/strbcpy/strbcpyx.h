@@ -1,0 +1,56 @@
+/* strbcpyx HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* string-copy variant */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	STRBCPYX_INCLUDE
+#define	STRBCPYX_INCLUDE
+
+
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<strbcpyxw.h>		/* LIBU */
+
+
+EXTERNC_begin
+
+extern char *strbcpyx(char *,int,int,...) noex ;
+
+extern char *strbcpy1(char *,int,cc *) noex ;
+extern char *strbcpy2(char *,int,cc *,cc *) noex ;
+extern char *strbcpy3(char *,int,cc *,cc *,cc *) noex ;
+extern char *strbcpy4(char *,int,cc *,cc *,cc *,cc *) noex ;
+extern char *strbcpy5(char *,int,cc *,cc *,cc *,cc *,cc *) noex ;
+extern char *strbcpy6(char *,int,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
+
+EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+inline char *strbcpy(char *dp,int dl,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return strbcpyx(dp,dl,na,args ...) ;
+} /* end subroutine */
+
+#endif /* __cplusplus */
+
+
+#endif /* STRBCPYX_INCLUDE */
+
+
