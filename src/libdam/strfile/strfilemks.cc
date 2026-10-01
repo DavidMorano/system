@@ -189,7 +189,7 @@ struct idx {
 } ; /* end struct */
 
 struct mapfile {
-	void		*mdata ;
+	voidp		mdata ;
 	size_t		msize ;
 } ; /* end struct */
 
@@ -256,7 +256,7 @@ constexpr char		zerobuf[4] = {
 
 /* exported variables */
 
-const SFM_OBJ		strfilemks_modinfo = {
+constexpr SFM_OBJ	strfilemks_modinfo = {
 	"strfilemks",
 	szof(SFM),
 	0
