@@ -96,6 +96,7 @@
 #include	<ciq.h>			/* LIBUC container-interlocked-queue */
 #include	<sigevent.h>		/* LIBUC */
 #include	<psem.h>		/* LIBUC POSIX® semaphore */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
@@ -375,11 +376,15 @@ int uc_timdestroy(int id) noex {
 int uc_timset(int id,mut ITIMERVAL *rtp,con ITIMERVAL *ntp) noex {
     	custime		dt = getustime ;
     	int		rs = SR_FAULT ;
-	DEBPRINTF("ent id=%d ntim=\n",id) ;
+	DEBPRINTF("ent id=%d\n",id) ;
+	if_constexpr (f_debug) {
+	    char tbuf[TIMEBUFLEN+1] ;
+	    DEBPRINTF("ntim=%s\n",strtimeval(ntp->it_value,tbuf)) ;
+	} /* end if_constexpr */
 	if (ntp) ylikely {
     	    rs = SR_INVALID ;
 	    if (id >= 0) ylikely {
-	        if ((ntp->tv_sec ntim > dt) && ((ntim - dt) < vtimlim)) {
+	        if ((ntp->it_value > dt) && ((ntp->it_value - dt) < vtimlim)) {
 	            timemgr_arg	ao(rtp,ntp) ;
 	            DEBPRINTF("valid\n") ;
 	            rs = ao(cmdsub_set,id) ;
@@ -673,12 +678,16 @@ int timemgr::cmd_destroy(int id,timemgr_arg *) noex {
 
 int timemgr::cmd_set(int id,timemgr_arg *uap) noex {
 	int		rs ;
-	DEBPRINTF("ent val=%ld\n",uap->ntim) ;
+	if_constexpr (f_debug) {{
+	    const ITIMERVAL *ntp = uap->ntp ;
+	    char tbuf[TIMEBUFLEN+1] ;
+	    DEBPRINTF("ent val=%ld\n",strtimeval(ntp->it_value,tbuf)) ;
+	} /* end if_constexpr */
 	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
 	    DEBPRINTF("ei=%d\n",rs) ;
 	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
 		custime dt = getustime ;
-		if (time_t *rtp = uap->rtp) {
+		if (ITIMERVAL *rtp = uap->rtp) {
 		    *rtp = max((ep->val - dt),0L) ;
 		} /* end if (remaining time) */
 		ep->val = uap->ntim ;	/* <- set time-value */
