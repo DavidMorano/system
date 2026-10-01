@@ -50,6 +50,8 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"strxname.h"
+
 import libutil ;
 
 /* local defines */
