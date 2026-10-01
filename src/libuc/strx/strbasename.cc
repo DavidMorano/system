@@ -40,6 +40,8 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"strxname.h"
+
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
