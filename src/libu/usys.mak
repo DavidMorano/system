@@ -65,13 +65,18 @@ OBJ17_USYS= usys_in4in6addr.o
 OBJ18_USYS= usys_strw.o usys_snx.o
 OBJ19_USYS= usys_execname.o
 
+OBJ20_USYS= usys_strxbrk.o
+OBJ21_USYS=
+OBJ22_USYS=
+OBJ23_USYS=
+
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
 OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
 OBJC= obj06_usys.o obj07_usys.o obj08_usys.o
 OBJD= obj09_usys.o obj10_usys.o obj11_usys.o 
 OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
 OBJF= obj15_usys.o obj16_usys.o obj17_usys.o
-OBJG= obj18_usys.o obj19_usys.o
+OBJG= obj18_usys.o obj19_usys.o obj20_usys.o
 
 OBJ_USYS= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
@@ -113,17 +118,17 @@ all:			$(ALL)
 .cc.s:
 	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
 
-.c.o:
+.c.o:	
 	$(COMPILE.c) $<
 
-.cc.o:
+.cc.o:	
 	$(COMPILE.cc) $<
 
-.ccm.o:
+.ccm.o:	
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).o:			$(OBJ_USYS)
+$(T).o:				$(OBJ_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
@@ -139,91 +144,104 @@ control:
 	(uname -n ; date) > Control
 
 
-obj00_usys.o:	$(OBJ00_USYS)
+obj00_usys.o:		$(OBJ00_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj01_usys.o:	$(OBJ01_USYS)
+obj01_usys.o:		$(OBJ01_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj02_usys.o:	$(OBJ02_USYS)
+obj02_usys.o:		$(OBJ02_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj03_usys.o:	$(OBJ03_USYS)
+obj03_usys.o:		$(OBJ03_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj04_usys.o:	$(OBJ04_USYS)
+obj04_usys.o:		$(OBJ04_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj05_usys.o:	$(OBJ05_USYS)
+obj05_usys.o:		$(OBJ05_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj06_usys.o:	$(OBJ06_USYS)
+obj06_usys.o:		$(OBJ06_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj07_usys.o:	$(OBJ07_USYS)
+obj07_usys.o:		$(OBJ07_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj08_usys.o:	$(OBJ08_USYS)
+obj08_usys.o:		$(OBJ08_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj09_usys.o:	$(OBJ09_USYS)
+obj09_usys.o:		$(OBJ09_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj10_usys.o:	$(OBJ10_USYS)
+obj10_usys.o:		$(OBJ10_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj11_usys.o:	$(OBJ11_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-
-obj12_usys.o:	$(OBJ12_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj13_usys.o:	$(OBJ13_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj14_usys.o:	$(OBJ14_USYS)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj15_usys.o:	$(OBJ15_USYS)
+obj11_usys.o:		$(OBJ11_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obj16_usys.o:	$(OBJ16_USYS)
+obj12_usys.o:		$(OBJ12_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj17_usys.o:	$(OBJ17_USYS)
+obj13_usys.o:		$(OBJ13_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj18_usys.o:	$(OBJ18_USYS)
+obj14_usys.o:		$(OBJ14_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj19_usys.o:	$(OBJ19_USYS)
+obj15_usys.o:		$(OBJ15_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obja.o:		$(OBJA)
+obj16_usys.o:		$(OBJ16_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objb.o:		$(OBJB)
+obj17_usys.o:		$(OBJ17_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objc.o:		$(OBJC)
+obj18_usys.o:		$(OBJ18_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objd.o:		$(OBJD)
+obj19_usys.o:		$(OBJ19_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obje.o:		$(OBJE)
+
+obj20_usys.o:		$(OBJ20_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objf.o:		$(OBJF)
+obj21_usys.o:		$(OBJ21_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objg.o:		$(OBJG)
+obj22_usys.o:		$(OBJ22_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-objh.o:		$(OBJH)
+obj23_usys.o:		$(OBJ23_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objc.o:			$(OBJC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd.o:			$(OBJD)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obje.o:			$(OBJE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objf.o:			$(OBJF)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objg.o:			$(OBJG)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objh.o:			$(OBJH)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -255,6 +273,7 @@ usys_project.o:		usys_project.cc		usys_project.h		$(INCS)
 usys_shadow.o:		usys_shadow.cc		usys_shadow.h		$(INCS)
 usys_mqueue.o:		usys_mqueue.cc		usys_mqueue.h		$(INCS)
 usys_gethrtime.o:	usys_gethrtime.cc	usys_gethrtime.h	$(INCS)
+usys_getprocuid.o:	usys_getprocuid.cc	usys_getprocuid.h	$(INCS)
 usys_getrandom.o:	usys_getrandom.cc	usys_getrandom.h	$(INCS)
 usys_ttynamerp.o:	usys_ttynamerp.cc	usys_ttynamerp.h	$(INCS)
 usys_resolvepath.o:	usys_resolvepath.cc	usys_resolvepath.h	$(INCS)
@@ -267,6 +286,8 @@ usys_getexecname.o:	usys_getexecname.cc	usys_getexecname.h	$(INCS)
 usys_stat.o:		usys_stat.cc		usys_stat.h		$(INCS)
 usys_stime.o:		usys_stime.cc		usys_stime.h		$(INCS)
 usys_strtox.o:		usys_strtox.cc		usys_strtox.h		$(INCS)
+usys_strxbrk.o:		usys_strxbrk.cc		usys_strxbrk.h		$(INCS)
+usys_strxchr.o:		usys_strxchr.cc		usys_strxchr.h		$(INCS)
 usys_isaexec.o:		usys_isaexec.cc		usys_isaexec.h		$(INCS)
 usys_fatasync.o:	usys_fdatasync.cc	usys_fdatasync.h	$(INCS)
 usys_eaccess.o:		usys_eaccess.cc		usys_eaccess.h		$(INCS)
@@ -277,7 +298,6 @@ usys_getnetname.o:	usys_getnetname.cc	usys_getnetname.h	$(INCS)
 usys_getauid.o:		usys_getauid.cc		usys_getauid.h		$(INCS)
 usys_atox.o:		usys_atox.cc		usys_atox.h		$(INCS)
 usys_nprocs.o:		usys_nprocs.cc		usys_nprocs.h		$(INCS)
-usys_getprocuid.o:	usys_getprocuid.cc	usys_getprocuid.h	$(INCS)
 usys_in4in6addr.o:	usys_in4in6addr.cc	usys_in4in6addr.h	$(INCS)
 usys_timezone.o:	usys_timezone.cc	usys_timezone.h		$(INCS)
 usys_sysctl.o:		usys_sysctl.cc		usys_sysctl.h		$(INCS)
