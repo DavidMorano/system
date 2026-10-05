@@ -197,7 +197,7 @@ cchar	af[] ;
 	bfile		afile, *afp = &afile ;
 	bfile		helpfname, *hfp = &helpfname ;
 	bfile		savefile, *sfp = &savefile ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i, len ;
@@ -1211,8 +1211,8 @@ prompt:
 /* FALLTHROUGH */
 	case 'm':
 	    {
-	        const int	m = SMODE_MAILBOX ;
-		const int	mblen = MAXNAMELEN ;
+	        cint	m = SMODE_MAILBOX ;
+		cint	mblen = MAXNAMELEN ;
 		int		f_new = FALSE ;
 		cchar	*tp ;
 		char		mbname[MAXNAMELEN+1] ;
@@ -1606,7 +1606,7 @@ local int isus(nfp,hostbuf)
 bfile		*nfp ;
 cchar	hostbuf[] ;
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		cl ;
 	int		f = FALSE ;
