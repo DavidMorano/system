@@ -56,9 +56,9 @@
 
 /* external subroutines */
 
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	bbcpy(char *,const char *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
+extern int	bbcpy(char *,cchar *) ;
 
 extern int	uc_system(cchar *) ;
 
@@ -72,16 +72,16 @@ extern int	uc_system(cchar *) ;
 int cmd_follow(pip,ap,ngdir,afname, hv_subject)
 struct proginfo	*pip ;
 ARTLIST_ENT	*ap ;
-const char	ngdir[] ;
-const char	afname[] ;
-const char	hv_subject[] ;
+cchar	ngdir[] ;
+cchar	afname[] ;
+cchar	hv_subject[] ;
 {
 	bfile		afile, *afp = &afile ;
 	bfile		tmpfile, *tfp = &tmpfile ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		len ;
-	const char	*tp ;
+	cchar	*tp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		cmdbuf[(2*MAXPATHLEN) + 1], *cbp ;
