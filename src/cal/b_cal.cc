@@ -125,27 +125,27 @@ struct monyear {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) noex ;
+local int	mainsub(int,cchar **,cchar **,void *) noex ;
 
-static int	usage(PROGINFO *) noex ;
+local int	usage(PROGINFO *) noex ;
 
-static int	procarger(PROGINFO *,CA *) noex ;
-static int	process(PROGINFO *,CA *,cchar *,int) noex ;
-static int	procexec(PROGINFO *,CA *,int) noex ;
-static int	procerrout(PROGINFO *,int,cchar *,int) noex ;
-static int	procline(PROGINFO *,int,cchar *,int) noex ;
+local int	procarger(PROGINFO *,CA *) noex ;
+local int	process(PROGINFO *,CA *,cchar *,int) noex ;
+local int	procexec(PROGINFO *,CA *,int) noex ;
+local int	procerrout(PROGINFO *,int,cchar *,int) noex ;
+local int	procline(PROGINFO *,int,cchar *,int) noex ;
 
-static int	getstuff(PROGINFO *,struct monyear *,cchar *) noex ;
+local int	getstuff(PROGINFO *,struct monyear *,cchar *) noex ;
 
-static int	getdefyear(CA *) noex ;
+local int	getdefyear(CA *) noex ;
 
-static int	whichmonth(cchar *,int) noex ;
-static int	getval(cchar *,int) noex ;
+local int	whichmonth(cchar *,int) noex ;
+local int	getval(cchar *,int) noex ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -197,7 +197,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	blanks[] = "        " ;
+static cchar	blanks[] = "        " ;
 
 
 /* exported variables */
@@ -232,7 +232,7 @@ int p_cal(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* local subroutines */
 
 /* ARGSUSED */
-static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
+local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	CA	ca ;
 	bits		pargs ;
@@ -316,7 +316,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -513,7 +513,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -829,7 +829,7 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-static int usage(PROGINFO *pip) noex {
+local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -847,7 +847,7 @@ static int usage(PROGINFO *pip) noex {
 }
 /* end subroutine (usage) */
 
-static int procarger(PROGINFO *pip,CA *cap) noex {
+local int procarger(PROGINFO *pip,CA *cap) noex {
 	struct monyear	my, *myp = &my ;
 	int		rs = SR_OK ;
 
@@ -943,7 +943,7 @@ static int procarger(PROGINFO *pip,CA *cap) noex {
 }
 /* end subroutine (procarger) */
 
-static int process(PROGINFO *pip,CA *cap,cchar *ofn,int ncals) noex {
+local int process(PROGINFO *pip,CA *cap,cchar *ofn,int ncals) noex {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
@@ -990,7 +990,7 @@ static int process(PROGINFO *pip,CA *cap,cchar *ofn,int ncals) noex {
 	        } /* end for (looping through calendars) */
 
 	        if (rs >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN+1] ;
 	            if ((rs = u_rewind(ofd)) >= 0) {
 	                while ((rs = u_read(ofd,lbuf,llen)) > 0) {
@@ -1022,7 +1022,7 @@ static int process(PROGINFO *pip,CA *cap,cchar *ofn,int ncals) noex {
 }
 /* end subroutine (process) */
 
-static int procexec(PROGINFO *pip,CA *cap,int ofd) noex {
+local int procexec(PROGINFO *pip,CA *cap,int ofd) noex {
 	SPAWNPROC	ps ;
 	pid_t		pid ;
 	int		rs = SR_OK ;
@@ -1126,7 +1126,7 @@ static int procexec(PROGINFO *pip,CA *cap,int ofd) noex {
 }
 /* end subroutine (procexec) */
 
-static int procerrout(PROGINFO *pip,int cols,cchar *s,int ofd) noex {
+local int procerrout(PROGINFO *pip,int cols,cchar *s,int ofd) noex {
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	int		wlen = 0 ;
@@ -1166,7 +1166,7 @@ static int procerrout(PROGINFO *pip,int cols,cchar *s,int ofd) noex {
 }
 /* end subroutine (procerrout) */
 
-static int procline(PROGINFO *pip,int cols,cchar *lp,int ll) noex {
+local int procline(PROGINFO *pip,int cols,cchar *lp,int ll) noex {
 	SHIO		*fp = pip->efp ;
 	cint		indent = 2 ;
 	int		rs = SR_OK ;
@@ -1202,7 +1202,7 @@ static int procline(PROGINFO *pip,int cols,cchar *lp,int ll) noex {
 /* end subroutine (procline) */
 
 /* get the month and-or year out of a string argument */
-static int getstuff(PROGINFO *pip,struct monyear *myp,cchar *s) noex {
+local int getstuff(PROGINFO *pip,struct monyear *myp,cchar *s) noex {
 	int		rs = SR_OK ;
 	int		v ;
 	cchar		*tp ;
@@ -1275,7 +1275,7 @@ static int getstuff(PROGINFO *pip,struct monyear *myp,cchar *s) noex {
 }
 /* end subroutine (getstuff) */
 
-static int getdefyear(CA *cap) noex {
+local int getdefyear(CA *cap) noex {
 	TM		ts ;
 	const time_t	daytime = time(NULL) ;
 	int		rs = SR_OK ;
@@ -1314,7 +1314,7 @@ static int getdefyear(CA *cap) noex {
 }
 /* end subroutine (getdefyear) */
 
-static int whichmonth(cchar *sp,int sl) noex {
+local int whichmonth(cchar *sp,int sl) noex {
 	int		i = -1 ;
 	int		cl ;
 	cchar		*cp ;
@@ -1325,7 +1325,7 @@ static int whichmonth(cchar *sp,int sl) noex {
 }
 /* end subroutine (whichmonth) */
 
-static int getval(cchar *sp,int sl) noex {
+local int getval(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
 	int		v = 0 ;
 	cchar		*cp ;
