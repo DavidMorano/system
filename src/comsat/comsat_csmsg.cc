@@ -96,7 +96,7 @@
 #include	<sntmtime.h>
 #include	<mkx.h>
 #include	<wsix.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<instr.h>
 #include	<localmisc.h>
 #include	<comsatmsg.h>
@@ -183,33 +183,33 @@ struct outinfo {
 
 /* forward references */
 
-static int	progcsmsger(PI *,int,off_t,cchar *) ;
-static int	proclogmsg(PI *,COMSATMSG_MO *) ;
-static int	procmsginfo(PI *,MAILMSG *,cchar *) ;
-static int	procmsgbad(PI *,cchar *,off_t,int) ;
-static int	getdateinfo(PI *,char *,int,cchar *,int,int) ;
+local int	progcsmsger(PI *,int,off_t,cchar *) ;
+local int	proclogmsg(PI *,COMSATMSG_MO *) ;
+local int	procmsginfo(PI *,MAILMSG *,cchar *) ;
+local int	procmsgbad(PI *,cchar *,off_t,int) ;
+local int	getdateinfo(PI *,char *,int,cchar *,int,int) ;
 
 #if	CF_OUTINFO
-static int	outinfo_start(OI *,PI *,MAILMSG *,cchar *) ;
-static int	outinfo_finish(OI *) ;
-static int	outinfo_hdrs(OI *) ;
-static int	outinfo_getfrom(OI *,cchar **) ;
-static int	outinfo_mkfrom(OI *) ;
-static int	outinfo_cvtfrom(OI *,cchar *,int) ;
-static int	outinfo_getsubj(OI *,cchar **) ;
-static int	outinfo_mksubj(OI *) ;
-static int	outinfo_cvtsubj(OI *,cchar *,int) ;
-static int	outinfo_mkdate(OI *) ;
-static int	outinfo_adjust(OI *) ;
-static int	outinfo_cols(OI *) ;
-static int	outinfo_termbegin(OI *) ;
-static int	outinfo_termend(OI *) ;
-static int	outinfo_termbeginfrom(OI *) ;
-static int	outinfo_termbeginsubj(OI *) ;
-static int	outinfo_print(OI *) ;
+local int	outinfo_start(OI *,PI *,MAILMSG *,cchar *) ;
+local int	outinfo_finish(OI *) ;
+local int	outinfo_hdrs(OI *) ;
+local int	outinfo_getfrom(OI *,cchar **) ;
+local int	outinfo_mkfrom(OI *) ;
+local int	outinfo_cvtfrom(OI *,cchar *,int) ;
+local int	outinfo_getsubj(OI *,cchar **) ;
+local int	outinfo_mksubj(OI *) ;
+local int	outinfo_cvtsubj(OI *,cchar *,int) ;
+local int	outinfo_mkdate(OI *) ;
+local int	outinfo_adjust(OI *) ;
+local int	outinfo_cols(OI *) ;
+local int	outinfo_termbegin(OI *) ;
+local int	outinfo_termend(OI *) ;
+local int	outinfo_termbeginfrom(OI *) ;
+local int	outinfo_termbeginsubj(OI *) ;
+local int	outinfo_print(OI *) ;
 #endif /* CF_OUTINFO */
 
-static int	wsfnormfrom(const wchar_t *,int) noex ;
+local int	wsfnormfrom(const wchar_t *,int) noex ;
 
 static bool	isNoMsg(int) noex ;
 static bool	isBadMsg(int) noex ;
@@ -321,7 +321,7 @@ int progcsmsg(PI *pip,cchar *mbuf,int mlen) noex {
 
 	            if ((rs = uc_open(mailfname,O_RDONLY,0666)) >= 0) {
 	                off_t	fo = (off_t) m0.offset ;
-	                const int	mfd = rs ;
+	                cint	mfd = rs ;
 	                cchar	*un = m0.username ;
 
 #if	CF_DEBUG
@@ -377,7 +377,7 @@ int progcsmsg(PI *pip,cchar *mbuf,int mlen) noex {
 /* local subroutines */
 
 
-static int progcsmsger(PI *pip,int mfd,off_t fo,cchar *un)
+local int progcsmsger(PI *pip,int mfd,off_t fo,cchar *un)
 {
 	MAILMSG		mm ;
 	int		rs ;
@@ -388,7 +388,7 @@ static int progcsmsger(PI *pip,int mfd,off_t fo,cchar *un)
 	    debugprintf("progcsmsger: ent\n") ;
 #endif
 	if ((rs = mailmsg_start(&mm)) >= 0) {
-	    const int	rsi = SR_INVALID ;
+	    cint	rsi = SR_INVALID ;
 	    if ((rs = mailmsg_loadfd(&mm,mfd,fo)) > 0) {
 		rs = procmsginfo(pip,&mm,un) ;
 		wlen = rs ;
@@ -409,7 +409,7 @@ static int progcsmsger(PI *pip,int mfd,off_t fo,cchar *un)
 /* end subroutine (progcsmsger) */
 
 
-static int proclogmsg(PI *pip,COMSATMSG_MO *m0p)
+local int proclogmsg(PI *pip,COMSATMSG_MO *m0p)
 {
 	int		rs = SR_OK ;
 	cchar	*pn = pip->progname ;
@@ -429,7 +429,7 @@ static int proclogmsg(PI *pip,COMSATMSG_MO *m0p)
 /* end subroutine (proclogmsg) */
 
 #if	CF_OUTINFO
-static int procmsginfo(PI *pip,MAILMSG *mmp,cchar *un) noex {
+local int procmsginfo(PI *pip,MAILMSG *mmp,cchar *un) noex {
 	outinfo		oi ;
 	int		rs ;
 	int		rs1 ;
@@ -462,13 +462,13 @@ static int procmsginfo(PI *pip,MAILMSG *mmp,cchar *un) noex {
 }
 /* end subroutine (procmsginfo) */
 #else /* CF_OUTINFO */
-static int procmsginfo(PI *pip,MAILMSG *mmp,cchar *un)
+local int procmsginfo(PI *pip,MAILMSG *mmp,cchar *un)
 {
-	const int	dt = pip->daytime ;
-	const int	fromlen = MAILADDRLEN ;
-	const int	datelen = TIMEBUFLEN ;
-	const int	subjlen = TIMEBUFLEN ;
-	const int	notelen = NOTEBUFLEN ;
+	cint	dt = pip->daytime ;
+	cint	fromlen = MAILADDRLEN ;
+	cint	datelen = TIMEBUFLEN ;
+	cint	subjlen = TIMEBUFLEN ;
+	cint	notelen = NOTEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		hl ;
@@ -574,11 +574,11 @@ static int procmsginfo(PI *pip,MAILMSG *mmp,cchar *un)
 	        subjbuf[sl] = '\0' ;
 	    }
 
-	    timestr_logz(dt,tbuf) ;
+	    strtime_logz(dt,tbuf) ;
 	    progerr_printf(pip,"%s: %s u=%s time=%s\n",
 	        pip->progname,tbuf,un,datebuf) ;
 
-	    timestr_logz(dt,timebuf) ;
+	    strtime_logz(dt,timebuf) ;
 	    progloglock_printf(pip,"%s u=%s time=%s",timebuf,un,datebuf) ;
 	    progloglock_printf(pip,"  from=»%s«",frombuf) ;
 	    progloglock_printf(pip,"  subj=»%s«",subjbuf) ;
@@ -593,8 +593,8 @@ static int procmsginfo(PI *pip,MAILMSG *mmp,cchar *un)
 	    }
 
 	    if (rs >= 0) {
-	        const int	max = pip->notesmax ;
-	        const int	o = (TERMNOTE_OBIFF | TERMNOTE_OBELL) ;
+	        cint	max = pip->notesmax ;
+	        cint	o = (TERMNOTE_OBIFF | TERMNOTE_OBELL) ;
 	        int		i = 0 ;
 	        cchar		*recips[2] ;
 	        recips[i++] = un ;
@@ -613,7 +613,7 @@ static int procmsginfo(PI *pip,MAILMSG *mmp,cchar *un)
 /* end subroutine (procmsginfo) */
 #endif /* CF_OUTINFO */
 
-static int procmsgbad(PI *pip,cchar *un,off_t fo,int rsl) noex {
+local int procmsgbad(PI *pip,cchar *un,off_t fo,int rsl) noex {
 	int		rs = SR_OK ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
@@ -636,7 +636,7 @@ static int procmsgbad(PI *pip,cchar *un,off_t fo,int rsl) noex {
 /* end subroutine (procmsgbad) */
 
 
-static int getdateinfo(PI *pip,char *abuf,int alen,cchar *ap,int al,
+local int getdateinfo(PI *pip,char *abuf,int alen,cchar *ap,int al,
 		int f_edate)
 {
 	int		rs = SR_OK ;
@@ -694,7 +694,7 @@ static int getdateinfo(PI *pip,char *abuf,int alen,cchar *ap,int al,
 
 #if	CF_OUTINFO
 
-static int outinfo_start(OI *op,PI *pip,MAILMSG *mmp,cchar *un) noex {
+local int outinfo_start(OI *op,PI *pip,MAILMSG *mmp,cchar *un) noex {
 	int		rs = SR_OK ;
 
 	memclear(op) ;
@@ -709,7 +709,7 @@ static int outinfo_start(OI *op,PI *pip,MAILMSG *mmp,cchar *un) noex {
 }
 /* end subroutine (outinfo_start) */
 
-static int outinfo_finish(OI *op) noex {
+local int outinfo_finish(OI *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -731,7 +731,7 @@ static int outinfo_finish(OI *op) noex {
 /* end subroutine (outinfo_finish) */
 
 
-static int outinfo_hdrs(OI *oip)
+local int outinfo_hdrs(OI *oip)
 {
 	int		rs ;
 	if ((rs = outinfo_mkdate(oip)) >= 0) {
@@ -744,7 +744,7 @@ static int outinfo_hdrs(OI *oip)
 /* end subroutine (outinfo_hdrs) */
 
 
-static int outinfo_mkdate(OI *oip)
+local int outinfo_mkdate(OI *oip)
 {
 	PROGINFO	*pip = oip->pip ;
 	MAILMSG		*mmp = oip->mmp ;
@@ -773,7 +773,7 @@ static int outinfo_mkdate(OI *oip)
 #endif
 	if ((rs >= 0) && (hl > 0)) {
 	    PROGINFO	*pip = oip->pip ;
-	    const int	dlen = oip->dlen ;
+	    cint	dlen = oip->dlen ;
 	    char	*dbuf = oip->dbuf ;
 	    rs = getdateinfo(pip,dbuf,dlen,hp,hl,f_edate) ;
 	}
@@ -786,7 +786,7 @@ static int outinfo_mkdate(OI *oip)
 /* end subroutine (outinfo_mkdate) */
 
 
-static int outinfo_getfrom(OI *oip,cchar **rpp)
+local int outinfo_getfrom(OI *oip,cchar **rpp)
 {
 	MAILMSG		*mmp = oip->mmp ;
 	int		rs ;
@@ -816,14 +816,14 @@ static int outinfo_getfrom(OI *oip,cchar **rpp)
 /* end subroutine (outinfo_getfrom) */
 
 
-static int outinfo_mkfrom(OI *oip)
+local int outinfo_mkfrom(OI *oip)
 {
 	int		rs ;
 	int		len = 0 ;
 	cchar		*hp ;
 	if ((rs = outinfo_getfrom(oip,&hp)) >= 0) {
-	    const int	hl = rs ;
-	    const int	rlen = rs ;
+	    cint	hl = rs ;
+	    cint	rlen = rs ;
 	    char	*rbuf ;
 	    if ((rs = uc_malloc((rlen+1),&rbuf)) >= 0) {
 		if ((rs = mkaddrname(rbuf,rlen,hp,hl)) > 0) {
@@ -838,11 +838,11 @@ static int outinfo_mkfrom(OI *oip)
 /* end subroutine (outinfo_mkfrom) */
 
 
-static int outinfo_cvtfrom(OI *oip,cchar *sp,int sl)
+local int outinfo_cvtfrom(OI *oip,cchar *sp,int sl)
 {
 	PROGINFO	*pip = oip->pip ;
-	const int	size = ((sl+1) * sizeof(wchar_t)) ;
-	const int	ilen = sl ;
+	cint	size = ((sl+1) * sizeof(wchar_t)) ;
+	cint	ilen = sl ;
 	int		rs ;
 	int		rcols = 0 ;
 	wchar_t		*ibuf ;
@@ -867,7 +867,7 @@ static int outinfo_cvtfrom(OI *oip,cchar *sp,int sl)
 /* end subroutine (outinfo_cvtfrom) */
 
 
-static int outinfo_getsubj(OI *oip,cchar **rpp)
+local int outinfo_getsubj(OI *oip,cchar **rpp)
 {
 	MAILMSG		*mmp = oip->mmp ;
 	int		rs ;
@@ -888,7 +888,7 @@ static int outinfo_getsubj(OI *oip,cchar **rpp)
 /* end subroutine (outinfo_getsubj) */
 
 
-static int outinfo_mksubj(OI *oip)
+local int outinfo_mksubj(OI *oip)
 {
 	int		rs ;
 	int		len = 0 ;
@@ -906,11 +906,11 @@ static int outinfo_mksubj(OI *oip)
 /* end subroutine (outinfo_mksubj) */
 
 
-static int outinfo_cvtsubj(OI *oip,cchar *sp,int sl)
+local int outinfo_cvtsubj(OI *oip,cchar *sp,int sl)
 {
 	PROGINFO	*pip = oip->pip ;
-	const int	size = ((sl+1) * sizeof(wchar_t)) ;
-	const int	ilen = sl ;
+	cint	size = ((sl+1) * sizeof(wchar_t)) ;
+	cint	ilen = sl ;
 	int		rs ;
 	int		rcols = 0 ;
 	wchar_t		*ibuf ;
@@ -935,7 +935,7 @@ static int outinfo_cvtsubj(OI *oip,cchar *sp,int sl)
 /* end subroutine (outinfo_cvtsubj) */
 
 
-static int outinfo_adjust(OI *oip)
+local int outinfo_adjust(OI *oip)
 {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
@@ -1019,7 +1019,7 @@ static int outinfo_adjust(OI *oip)
 /* end if (outinfo_adjust) */
 
 
-static int outinfo_cols(OI *oip)
+local int outinfo_cols(OI *oip)
 {
 	int	cols = (3+5+3+3) ; /* non-field columns in output string */
 	cols += (oip->dl+oip->ul+oip->fl+oip->sl) ;
@@ -1028,7 +1028,7 @@ static int outinfo_cols(OI *oip)
 /* end if (outinfo_cols) */
 
 
-static int outinfo_termbegin(OI *oip)
+local int outinfo_termbegin(OI *oip)
 {
 	int		rs = SR_OK ;
 	if (rs >= 0) {
@@ -1042,7 +1042,7 @@ static int outinfo_termbegin(OI *oip)
 /* end if (outinfo_termbegin) */
 
 
-static int outinfo_termend(OI *oip)
+local int outinfo_termend(OI *oip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1063,15 +1063,15 @@ static int outinfo_termend(OI *oip)
 /* end if (outinfo_termend) */
 
 
-static int outinfo_termbeginfrom(OI *oip)
+local int outinfo_termbeginfrom(OI *oip)
 {
-	const int	fl = oip->flen ;
-	const int	oflen = (2*oip->flen) ;
+	cint	fl = oip->flen ;
+	cint	oflen = (2*oip->flen) ;
 	int		rs ;
 	const wchar_t	*fp = oip->fbuf ;
 	char		*ofbuf ;
 	if ((rs = uc_malloc((oflen+1),&ofbuf)) >= 0) {
-		const int	tlen = oflen ;
+		cint	tlen = oflen ;
 		char		*tbuf ;
 		if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		    if ((rs = snwcpywidehdr(tbuf,tlen,fp,fl)) >= 0) {
@@ -1091,15 +1091,15 @@ static int outinfo_termbeginfrom(OI *oip)
 /* end subroutine (outinfo_termbeginfrom) */
 
 
-static int outinfo_termbeginsubj(OI *oip)
+local int outinfo_termbeginsubj(OI *oip)
 {
-	const int	sl = oip->slen ;
-	const int	oslen = (2*oip->slen) ;
+	cint	sl = oip->slen ;
+	cint	oslen = (2*oip->slen) ;
 	int		rs ;
 	const wchar_t	*sp = oip->sbuf ;
 	char		*osbuf ;
 	    if ((rs = uc_malloc((oslen+1),&osbuf)) >= 0) {
-		const int	tlen = oslen ;
+		cint	tlen = oslen ;
 		char		*tbuf ;
 		if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		    if ((rs = snwcpywidehdr(tbuf,tlen,sp,sl)) >= 0) {
@@ -1119,10 +1119,10 @@ static int outinfo_termbeginsubj(OI *oip)
 /* end subroutine (outinfo_termbeginsubj) */
 
 
-static int outinfo_print(OI *oip)
+local int outinfo_print(OI *oip)
 {
 	PROGINFO	*pip = oip->pip ;
-	const int	olen = oip->tl ;
+	cint	olen = oip->tl ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		*obuf ;
@@ -1134,8 +1134,8 @@ static int outinfo_print(OI *oip)
 
 	if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
 	    time_t	dt = pip->daytime ;
-	    const int	fl = oip->fl ;
-	    const int	sl = oip->sl ;
+	    cint	fl = oip->fl ;
+	    cint	sl = oip->sl ;
 	    cchar	*pn = pip->progname ;
 	    cchar	*un = oip->un ;
 	    cchar	*db = oip->dbuf ;
@@ -1145,7 +1145,7 @@ static int outinfo_print(OI *oip)
 	    char	tbuf[TIMEBUFLEN+1] ;
 
 	    fmt = "%s: %s u=%s time=%s\n" ;
-	    timestr_logz(dt,tbuf) ;
+	    strtime_logz(dt,tbuf) ;
 	    progerr_printf(pip,fmt,pn,tbuf,un,db) ;
 	    fmt = "%s: from=>%r<\n" ;
 	    progerr_printf(pip,fmt,pn,fb,fl) ;
@@ -1158,9 +1158,9 @@ static int outinfo_print(OI *oip)
 
 	    fmt = "¶ %s %s « %r - %r" ;
 	    if ((rs = bufprintf(obuf,olen,fmt,db,un,fb,fl,sb,sl)) >= 0) {
-	        const int	max = 3 ;
-	        const int	o = (TERMNOTE_OBIFF | TERMNOTE_OBELL) ;
-		const int	ol = rs ;
+	        cint	max = 3 ;
+	        cint	o = (TERMNOTE_OBIFF | TERMNOTE_OBELL) ;
+		cint	ol = rs ;
 	        int		i = 0 ;
 	        cchar		*recips[2] ;
 	        wlen = rs ;
@@ -1185,7 +1185,7 @@ static int outinfo_print(OI *oip)
 }
 /* end subroutine (outinfo_print) */
 
-static int wsfnormfrom(const wchar_t *fp,int fl) noex {
+local int wsfnormfrom(const wchar_t *fp,int fl) noex {
 	if (int si ; (si = wsichr(fp,fl,',')) >= 0) {
 	    fl = si ;
 	    while (fl && wciswhite(fp[fl-1])) {
