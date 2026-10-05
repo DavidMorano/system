@@ -28,25 +28,27 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<ctime>
-
-#include	<usystem.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>
 #include	<bits.h>
 #include	<keyopt.h>
-#include	<bfile.h>
-#include	<ascii.h>
 #include	<cfdec.h>
 #include	<char.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -91,18 +93,8 @@ extern int	progoutbegin(PI *,bfile *) ;
 extern int	progoutend(PI *,bfile *) ;
 extern int	progfile(PI *,bfile *,cchar *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -123,23 +115,23 @@ struct vzlw {
 
 /* forward references */
 
-static int	usage(PI *) ;
+local int	usage(PI *) ;
 
-static int	procopts(PI *,keyopt *) ;
-static int	process(PI *,ARGINFO *,bits *,
+local int	procopts(PI *,keyopt *) ;
+local int	process(PI *,ARGINFO *,bits *,
 			cchar *,cchar *,cchar *,cchar *) ;
-static int	procargs(PI *,ARGINFO *,bits *,void *,cchar *) ;
-static int	procout(PI *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procpagetitle(PI *) ;
+local int	procargs(PI *,ARGINFO *,bits *,void *,cchar *) ;
+local int	procout(PI *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procpagetitle(PI *) ;
 
-static int	loadpvs(PI *,cchar *,int) ;
-static int	loadvzlw(PI *,cchar *,int) ;
+local int	loadpvs(PI *,cchar *,int) ;
+local int	loadvzlw(PI *,cchar *,int) ;
 
-static int	metawordsbegin(PI *) ;
-static int	metawordsend(PI *) ;
+local int	metawordsbegin(PI *) ;
+local int	metawordsend(PI *) ;
 
 #ifdef	COMMENT
-static int	defvzlinewidth(PI *) ;
+local int	defvzlinewidth(PI *) ;
 #endif
 
 static char	*firstup(char *) ;
@@ -354,7 +346,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -820,7 +812,7 @@ int main(int argc,mainv argv,mainv envv) {
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1188,7 +1180,7 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PI *pip)
+local int usage(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1208,7 +1200,7 @@ static int usage(PI *pip)
 /* end subroutine (usage) */
 
 /* process the program ako-options */
-static int procopts(PI *pip,keyopt *kop) noex {
+local int procopts(PI *pip,keyopt *kop) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar	*cp ;
@@ -1379,7 +1371,7 @@ static int procopts(PI *pip,keyopt *kop) noex {
 /* end subroutine (procopts) */
 
 
-static int process(pip,aip,bop,ndb,wdb,ofn,afn)
+local int process(pip,aip,bop,ndb,wdb,ofn,afn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bits		*bop ;
@@ -1431,7 +1423,7 @@ cchar		*afn ;
 /* end subroutine (process) */
 
 
-static int procout(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procout(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	bfile		ofile, *ofp = &ofile ;
 	int		rs = SR_OK ;
@@ -1452,7 +1444,7 @@ static int procout(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	            if ((rs = procargs(pip,aip,bop,ofp,afn)) >= 0) {
 	                cchar	*fmt = "%s BIBLESET %s completed\n" ;
 	                char		timebuf[TIMEBUFLEN+1] ;
-	                timestr_logz(pip->daytime,timebuf) ;
+	                strtime_logz(pip->daytime,timebuf) ;
 	                rs = bprintf(ofp,fmt,pip->troff.linecomment,timebuf) ;
 	                wlen += rs ;
 	            }
@@ -1482,7 +1474,7 @@ static int procout(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procout) */
 
 
-static int procargs(PI *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
+local int procargs(PI *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1519,7 +1511,7 @@ static int procargs(PI *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
 	    if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1567,11 +1559,11 @@ static int procargs(PI *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procpagetitle(PI *pip)
+local int procpagetitle(PI *pip)
 {
 	int		rs = SR_OK ;
 	if ((pip->pagetitle == nullptr) && (! pip->finval.pagetitle)) {
-	    const int	blen = BIBLEBOOK_LEN ;
+	    cint	blen = BIBLEBOOK_LEN ;
 	    char	bbuf[BIBLEBOOK_LEN + 1] ;
 	    if ((rs = biblebook_get(&pip->bb,0,bbuf,blen)) >= 0) {
 		cchar	**vpp = &pip->pagetitle ;
@@ -1586,7 +1578,7 @@ static int procpagetitle(PI *pip)
 
 
 #ifdef	COMMENT
-static int defvzlinewidth(PI *pip)
+local int defvzlinewidth(PI *pip)
 {
 	double		flw ;
 	int		rs = SR_OK ;
@@ -1601,7 +1593,7 @@ static int defvzlinewidth(PI *pip)
 #endif /* COMMENT */
 
 
-static int loadpvs(PI *pip,cchar *ap,int al)
+local int loadpvs(PI *pip,cchar *ap,int al)
 {
 	uint		ps = 0 ;
 	uint		vs = 0 ;
@@ -1654,7 +1646,7 @@ static int loadpvs(PI *pip,cchar *ap,int al)
 /* end subroutine (loadpvs) */
 
 
-static int loadvzlw(PI *pip,cchar *ap,int al)
+local int loadvzlw(PI *pip,cchar *ap,int al)
 {
 	int		rs = SR_OK ;
 	int		sl ;
@@ -1710,9 +1702,9 @@ static int loadvzlw(PI *pip,cchar *ap,int al)
 /* end subroutine (loadvzlw) */
 
 
-static int metawordsbegin(PI *pip)
+local int metawordsbegin(PI *pip)
 {
-	const int	wordlen = BIBLEMETA_LEN ;
+	cint	wordlen = BIBLEMETA_LEN ;
 	int		rs = SR_OK ;
 	int		mi ;
 	int		len ;
@@ -1763,7 +1755,7 @@ static int metawordsbegin(PI *pip)
 }
 /* end subroutine (metawordsbegin) */
 
-static int metawordsend(PI *pip) noex {
+local int metawordsend(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		mi ;
