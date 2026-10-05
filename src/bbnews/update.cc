@@ -30,24 +30,25 @@
  *		board_ct	number of boards
  *		user_bds	structure of user boards and times
  
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<cstring>
 #include	<dirent.h>
 #include	<ctime>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>
 
 #include	"bbnewsrc.h"
 #include	"config.h"
@@ -57,9 +58,7 @@
 
 /* external subroutines */
 
-extern int	bbcpy(char *,const char *) ;
-
-extern char	*timestr_log(time_t,char *) ;
+extern int	bbcpy(char *,cchar *) ;
 
 
 /* external variables */
@@ -133,7 +132,7 @@ int		nuboards ;
 	            debugprintf("update: ngname=%s\n", ngname) ;
 	            debugprintf("update: sf=%d mtime=%s\n",
 			f_subscribe,
-			timestr_log(user_bds[i].mtime,timebuf)) ;
+			strtime_log(user_bds[i].mtime,timebuf)) ;
 		}
 #endif
 
