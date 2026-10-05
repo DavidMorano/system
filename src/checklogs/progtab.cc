@@ -57,12 +57,12 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	cfdecmfui(const char *,int,uint *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	cfdecmfui(cchar *,int,uint *) ;
 
-extern int	proglogent(struct proginfo *,const char *,int) ;
+extern int	proglogent(struct proginfo *,cchar *,int) ;
 
 
 /* external variables */
@@ -84,7 +84,7 @@ extern int	proglogent(struct proginfo *,const char *,int) ;
 
 int progtab(pip,lnp,lnl)
 struct proginfo	*pip ;
-const char	lnp[] ;
+cchar	lnp[] ;
 int		lnl ;
 {
 	bfile		ltfile, *ltp = &ltfile ;
@@ -92,8 +92,8 @@ int		lnl ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-	const char	*sizespec ;
-	const char	*sp, *cp ;
+	cchar	*sizespec ;
+	cchar	*sp, *cp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		logfname[MAXPATHLEN+1] ;
 
@@ -134,7 +134,7 @@ int		lnl ;
 	if ((lnp[0] == '\0') || (lnp[0] == '-')) lnp = BFILE_STDIN ;
 
 	if ((rs = bopen(ltp,lnp,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
 	while ((rs = breadln(ltp,lbuf,llen)) > 0) {
