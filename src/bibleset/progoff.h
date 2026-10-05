@@ -23,20 +23,20 @@ extern "C" {
 #endif
 
 extern int	progoffbegin(struct proginfo *,bfile *) ;
-extern int	progoffcomment(struct proginfo *,bfile *,const char *,int) ;
+extern int	progoffcomment(struct proginfo *,bfile *,cchar *,int) ;
 extern int	progoffdss(struct proginfo *,bfile *,
-			const char *,const char *) ;
+			cchar *,cchar *) ;
 extern int	progoffdsn(struct proginfo *,bfile *,
-			const char *,int) ;
+			cchar *,int) ;
 extern int	progoffsrs(struct proginfo *,bfile *,
-			const char *,const char *,const char *) ;
+			cchar *,cchar *,cchar *) ;
 extern int	progoffsrn(struct proginfo *,bfile *,
-			const char *,const char *,int) ;
+			cchar *,cchar *,int) ;
 extern int	progoffhf(struct proginfo *,bfile *,
-			const char *,const char *,const char *,const char *) ;
+			cchar *,cchar *,cchar *,cchar *) ;
 extern int	progoffsetbasefont(struct proginfo *,bfile *) ;
-extern int	progoffwrite(struct proginfo *,bfile *,const char *,int) ;
-extern int	progofftcadd(struct proginfo *,bfile *,int,const char *) ;
+extern int	progoffwrite(struct proginfo *,bfile *,cchar *,int) ;
+extern int	progofftcadd(struct proginfo *,bfile *,int,cchar *) ;
 extern int	progofftcmk(struct proginfo *,bfile *,int) ;
 extern int	progoffend(struct proginfo *) ;
 
