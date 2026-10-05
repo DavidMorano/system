@@ -53,7 +53,7 @@
 #include	<mailmsgmatenv.h>
 #include	<artlist.h>		/* LIBPCS */
 #include	<headerkeys.h>		/* LIBPCS */
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -101,7 +101,7 @@ extern int	bbcpy(char *,cchar *) ;
 
 /* forward references */
 
-static int	matenv(cchar *,int) noex ;
+local int	matenv(cchar *,int) noex ;
 
 
 /* local variables */
@@ -321,7 +321,7 @@ int cmd_save(PI *pip,AENT *ap,cc *ngdir,cc *afname,int mode,cc *mailbox) noex {
 	            bprintf(mfp,
 	                "From %s %s\n",
 	                envfromstr,
-	                timestr_edate(t,env_date)) ;
+	                strtime_edate(t,env_date)) ;
 	            f_envesc = TRUE ;
 	        } /* end if (adding an envelope) */
 
@@ -333,7 +333,7 @@ int cmd_save(PI *pip,AENT *ap,cc *ngdir,cc *afname,int mode,cc *mailbox) noex {
 	            bprintf(mfp,
 	                "From %s!%s %s\n",
 	                pip->mailhost,from_username,
-	                timestr_edate(stat_a.st_mtime,env_date)) ;
+	                strtime_edate(stat_a.st_mtime,env_date)) ;
 
 	            f_envesc = FALSE ;
 
@@ -468,7 +468,7 @@ int cmd_save(PI *pip,AENT *ap,cc *ngdir,cc *afname,int mode,cc *mailbox) noex {
 /* date of posting */
 
 	if ((! f_date) && (bcontrol(afp,BC_STAT,&sb) >= 0)) {
-	    timestr_hdate(sb.st_mtime,hv_date) ;
+	    strtime_hdate(sb.st_mtime,hv_date) ;
 	    bprintf(mfp,"%s:       %s\n",HK_DATE,hv_date) ;
 	} /* end if (posting date) */
 
@@ -502,7 +502,7 @@ ret0:
 
 /* local subroutines */
 
-static int matenv(cchar *sp,int sl) noex {
+local int matenv(cchar *sp,int sl) noex {
 	mailmsgenv	e ;
 	return mailmsgmatenv(&e,sp,sl) ;
 }
