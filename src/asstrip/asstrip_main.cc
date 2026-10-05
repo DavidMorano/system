@@ -5,7 +5,7 @@
 /* strip the comments from an assembler source file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* run-time */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -28,20 +28,20 @@
 *********************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<fcntl.h>
-#include	<ctime>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>
-#include	<clanguage.h>
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<baops.h>
-#include	<prognamevar.hh>
-#include	<localmisc.h>
+#include	<baops.h>		/* LIBU */
+#include	<prognamevar.hh>	/* LINDAM */
+#include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
@@ -58,15 +58,21 @@
 #define		BUFLEN		(MAXPATHLEN + (2 * LINELEN))
 #define		DEFPOINT	10
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* run-time */
+#endif
+
 
 /* external subroutines */
 
-extern int	procfile() ;
+extern "C" {
+    extern int	procfile() noex ;
+} /* end extern (C) */
 
 
 /* forward references */
 
-void	helpfile(cchar *,bfile *) ;
+void	helpfile(cchar *,bfile *) noex ;
 
 
 /* local structures */
@@ -81,20 +87,20 @@ struct global		g ;
 
 /* define command option words */
 
-static char *argopts[] = {
-	"ROOT",
-	"DEBUG",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	NULL,
-} ;
-
 #define	ARGOPT_ROOT		0
 #define	ARGOPT_DEBUG		1
 #define	ARGOPT_VERSION		2
 #define	ARGOPT_VERBOSE		3
 #define	ARGOPT_HELP		4
+
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"DEBUG",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	nullptr,
+} ; /* end array */
 
 
 /* exported variables */
@@ -102,7 +108,7 @@ static char *argopts[] = {
 
 /* exported subroutines */
 
-int main(int argc,mainv argv,mainv envv) {
+int main(int argc,con mainv argv,con mainv envv) {
     	prognamevar	progname(argc,argv,envv) ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		errfile, *efp = &errfile ;
@@ -110,19 +116,19 @@ int main(int argc,mainv argv,mainv envv) {
 	int	argr, argl, aol, avl ;
 	int	maxai, pan, npa, kwi, i ;
 	int	f_optminus, f_optplus, f_optequal ;
-	int	f_extra = FALSE ;
-	int	f_version = FALSE ;
-	int	f_usage = FALSE ;
+	int	f_extra = false ;
+	int	f_version = false ;
+	int	f_usage = false ;
 	int	len, lines = 0 ;
 	int	rs ;
-	int	f_help = FALSE ;
+	int	f_help = false ;
 	int	maxlines ;
 
 	cchar	*argp, *aop, *avp ;
 	char	argpresent[NARGGROUPS] ;
 	char	buf[BUFLEN + 1] ;
-	cchar	*ifname = NULL ;
-	cchar	*ofname = NULL ;
+	cchar	*ifname = nullptr ;
+	cchar	*ofname = nullptr ;
 	cchar	*cp ;
 
 	g.progname = progname ;
@@ -132,13 +138,13 @@ int main(int argc,mainv argv,mainv envv) {
 	g.efp = efp ;
 	g.ofp = ofp ;
 	g.debuglevel = 0 ;
-	g.programroot = NULL ;
-	g.helpfile = NULL ;
+	g.programroot = nullptr ;
+	g.helpfile = nullptr ;
 
-	g.f.verbose = FALSE ;
-	g.f.noblanks = FALSE ;
+	g.f.verbose = false ;
+	g.f.noblanks = false ;
 
-	f_help = FALSE ;
+	f_help = false ;
 
 /* process program arguments */
 
@@ -158,7 +164,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 0) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (argl > 1) {
 
@@ -171,13 +177,13 @@ int main(int argc,mainv argv,mainv envv) {
 
 	                aop = argp + 1 ;
 	                aol = argl - 1 ;
-	                f_optequal = FALSE ;
-	                if ((avp = strchr(aop,'=')) != NULL) {
+	                f_optequal = false ;
+	                if ((avp = strchr(aop,'=')) != nullptr) {
 
 	                    aol = avp - aop ;
 	                    avp += 1 ;
 	                    avl = aop + argl - 1 - avp ;
-	                    f_optequal = TRUE ;
+	                    f_optequal = true ;
 
 	                } else
 	                    avl = 0 ;
@@ -192,7 +198,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    case ARGOPT_ROOT:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) g.programroot = avp ;
 
 	                        } else {
@@ -214,7 +220,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        g.debuglevel = 1 ;
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if ((avl > 0) &&
 	                                (cfdec(avp,avl,
 	                                &g.debuglevel) < 0))
@@ -225,23 +231,23 @@ int main(int argc,mainv argv,mainv envv) {
 	                        break ;
 
 	                    case ARGOPT_VERSION:
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 	                    case ARGOPT_VERBOSE:
-	                        g.f.verbose = TRUE ;
+	                        g.f.verbose = true ;
 	                        break ;
 
 /* help file */
 	                    case ARGOPT_HELP:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) g.helpfile = avp ;
 
 	                        }
 
-	                        f_help  = TRUE ;
+	                        f_help  = true ;
 	                        break ;
 
 	                    } /* end switch (key words) */
@@ -256,7 +262,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                            g.debuglevel = 1 ;
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (cfdec(avp,avl, &g.debuglevel) != OK)
 	                                    goto badargvalue ;
 
@@ -265,11 +271,11 @@ int main(int argc,mainv argv,mainv envv) {
 	                            break ;
 
 	                        case 'V':
-	                            f_version = TRUE ;
+	                            f_version = true ;
 	                            break ;
 
 	                        case 'b':
-	                            g.f.noblanks = TRUE ;
+	                            g.f.noblanks = true ;
 	                            break ;
 
 	                        case 'o':
@@ -285,7 +291,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* print a brief usage summary (and then exit !) */
 	                        case '?':
-	                            f_usage = TRUE ;
+	                            f_usage = true ;
 				    break ;
 
 	                        default:
@@ -330,11 +336,9 @@ int main(int argc,mainv argv,mainv envv) {
 	        } else {
 
 	            if (! f_extra) {
-
-	                f_extra = TRUE ;
+	                f_extra = true ;
 	                bprintf(efp,"%s: extra arguments ignored\n",
 	                    g.progname) ;
-
 	            }
 	        }
 
@@ -351,15 +355,15 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* get our program root (if we have one) */
 
-	if (g.programroot == NULL) {
+	if (g.programroot == nullptr) {
 
-	    if (g.programroot == NULL)
+	    if (g.programroot == nullptr)
 	        g.programroot = getenv(VARPROGRAMROOT1) ;
 
-	    if (g.programroot == NULL)
+	    if (g.programroot == nullptr)
 	        g.programroot = getenv(VARPROGRAMROOT2) ;
 
-	    if (g.programroot == NULL)
+	    if (g.programroot == nullptr)
 	        g.programroot = PROGRAMROOT ;
 
 	} /* end if */
@@ -381,7 +385,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	if (f_help) {
 
-	    if (g.helpfile == NULL) {
+	    if (g.helpfile == nullptr) {
 
 	        len = bufprintf(buf,BUFLEN,"%s/%s",
 	            g.programroot,HELPFILE) ;
@@ -404,7 +408,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* open output file */
 
-	if ((ofname == NULL) || (ofname[0] == '-'))
+	if ((ofname == nullptr) || (ofname[0] == '-'))
 	    rs = bopen(ofp,BFILE_STDOUT,"dwct",0666) ;
 
 	else
@@ -552,24 +556,19 @@ badret:
 	bclose(efp) ;
 
 	return BAD ;
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
 
-void helpfile(f,ofp)
-cchar	f[] ;
-bfile		*ofp ;
-{
+void helpfile(cchar *f,bfile *ofp) noex {
 	bfile	file, *ifp = &file ;
 	char	buf[BUFLEN + 1] ;
-	if ((f == NULL) || (f[0] == '\0')) return ;
+	if ((f == nullptr) || (f[0] == '\0')) return ;
 	if (bopen(ifp,f,"r",0666) >= 0) {
 	    bcopyblock(ifp,ofp,-1) ;
 	    bclose(ifp) ;
 	}
-}
-/* end subroutine (helpfile) */
+} /* end subroutine (helpfile) */
 
 
