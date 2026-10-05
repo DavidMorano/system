@@ -71,12 +71,13 @@
 #include	<ctime>
 #include	<dirent.h>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<sfx.h>
-#include	<baops.h>
-#include	<bfile.h>
 #include	<lfm.h>
 #include	<field.h>
 #include	<logfile.h>
@@ -85,8 +86,10 @@
 #include	<sockaddress.h>
 #include	<acctab.h>
 #include	<opentmp.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -116,17 +119,14 @@
 /* external subroutines */
 
 extern int	snddd(char *,int,uint,uint) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	dupup(int,int) ;
 extern int	mktmpdir(struct proginfo *,char *) ;
 extern int	checkdirs(struct proginfo *,char *,int,int) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 #if	CF_DEBUG
 extern char	*d_reventstr() ;
@@ -144,8 +144,8 @@ extern int	if_child ;
 
 /* forward references */
 
-static int	openipc(struct proginfo *,char *) ;
-static int	closeipc(struct proginfo *,char *) ;
+local int	openipc(struct proginfo *,char *) ;
+local int	closeipc(struct proginfo *,char *) ;
 
 
 /* local variables */
@@ -175,7 +175,9 @@ LFM		*lfp ;
 	time_t		ti_pidcheck = 1 ;
 	time_t		ti_lastmark = 0 ;
 
-	int	rs = SR_BAD, rs1, i, len, blen ;
+	int	rs = SR_BADE ;
+	int	rs1 ;
+	int	i, len, blen ;
 	int	re, ns ;
 	int	size, cl ;
 	int	to_pollidle = pip->pollint ;
@@ -653,7 +655,7 @@ LFM		*lfp ;
 
 	            logfile_printf(&pip->lh,
 	                "%s lock file conflict, other PID=%u\n",
-	                timestr_logz(pip->daytime,timebuf),
+	                strtime_logz(pip->daytime,timebuf),
 	                ci.pid) ;
 
 	        }
@@ -676,7 +678,7 @@ LFM		*lfp ;
 
 	            logfile_printf(&pip->lh,
 	                "%s PID file conflict, other PID=%u\n",
-	                timestr_logz(pip->daytime,timebuf),
+	                strtime_logz(pip->daytime,timebuf),
 	                ci.pid) ;
 
 	        }
@@ -693,7 +695,7 @@ LFM		*lfp ;
 
 		    f_logchange = TRUE ;
 	            logfile_printf(&pip->lh,"%s configuration file change\n",
-	                timestr_logz(pip->daytime,timebuf)) ;
+	                strtime_logz(pip->daytime,timebuf)) ;
 
 	    } /* end if */
 
@@ -711,7 +713,7 @@ LFM		*lfp ;
 
 		    f_logchange = TRUE ;
 	            logfile_printf(&pip->lh,"%s mark> %s\n",
-	                timestr_logz(pip->daytime,timebuf),
+	                strtime_logz(pip->daytime,timebuf),
 	                pip->nodename) ;
 
 	            ti_lastmark = pip->daytime ;
@@ -738,7 +740,7 @@ LFM		*lfp ;
 	closeipc(pip,reqfname) ;
 
 	    logfile_printf(&pip->lh,"%s daemon exiting\n",
-	        timestr_logz(pip->daytime,timebuf)) ;
+	        strtime_logz(pip->daytime,timebuf)) ;
 
 	}
 #endif /* COMMENT */
@@ -757,7 +759,7 @@ ret0:
 #ifdef	COMMENT
 
 /* open up the MSG portal */
-static int openipc(pip,fname)
+local int openipc(pip,fname)
 struct proginfo	*pip ;
 char		fname[] ;
 {
@@ -919,7 +921,7 @@ char		fname[] ;
 /* end subroutine (openipc) */
 
 
-static int closeipc(pip,fname)
+local int closeipc(pip,fname)
 struct proginfo	*pip ;
 char		fname[] ;
 {
