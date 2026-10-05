@@ -83,10 +83,10 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	progmoder(PROGINFO *,MKDIRLIST *,bfile *,DIRSHOWN *) ;
-static int	procqueryout(PROGINFO *,bfile *,int) ;
-static int	procqueryoutprep(PROGINFO *,EXPCOOK *,int) ;
-static int	description(PROGINFO *,bfile *,MKDIRLIST_ENT *) ;
+local int	progmoder(PROGINFO *,MKDIRLIST *,bfile *,DIRSHOWN *) ;
+local int	procqueryout(PROGINFO *,bfile *,int) ;
+local int	procqueryoutprep(PROGINFO *,EXPCOOK *,int) ;
+local int	description(PROGINFO *,bfile *,MKDIRLIST_ENT *) ;
 
 
 /* local variables */
@@ -157,7 +157,7 @@ int progmode(PROGINFO *pip,MKDIRLIST *ngp,cchar *ofn)
 int progmoder(PROGINFO *pip,MKDIRLIST *ngp,bfile *ofp,DIRSHOWN *sdp)
 {
 	MKDIRLIST_ENT	*dsp ;
-	const int	pm = pip->progmode ;
+	cint	pm = pip->progmode ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
@@ -252,7 +252,7 @@ int progmoder(PROGINFO *pip,MKDIRLIST *ngp,bfile *ofp,DIRSHOWN *sdp)
 /* end subroutine (progmoder) */
 
 
-static int procqueryout(PROGINFO *pip,bfile *ofp,int tc)
+local int procqueryout(PROGINFO *pip,bfile *ofp,int tc)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -262,7 +262,7 @@ static int procqueryout(PROGINFO *pip,bfile *ofp,int tc)
 	    cchar	*tp ;
 	    if ((tp = strchr(qt,'%')) != NULL) {
 	        BUFFER		b ;
-	        const int	size = (strlen(qt) + 5) ;
+	        cint	size = (strlen(qt) + 5) ;
 	        if ((rs = buffer_start(&b,size)) >= 0) {
 	            EXPCOOK	ec ;
 	            if ((rs = expcook_start(&ec)) >= 0) {
@@ -290,9 +290,9 @@ static int procqueryout(PROGINFO *pip,bfile *ofp,int tc)
 /* end subroutine (procqueryout) */
 
 
-static int procqueryoutprep(PROGINFO *pip,EXPCOOK *ecp,int tc)
+local int procqueryoutprep(PROGINFO *pip,EXPCOOK *ecp,int tc)
 {
-	const int	dlen = DIGBUFLEN ;
+	cint	dlen = DIGBUFLEN ;
 	int		rs ;
 	char		dbuf[DIGBUFLEN+1] ;
 
@@ -305,10 +305,10 @@ static int procqueryoutprep(PROGINFO *pip,EXPCOOK *ecp,int tc)
 /* end subroutine (procqueryoutprep) */
 
 
-static int description(PROGINFO *pip,bfile *ofp,MKDIRLIST_ENT *dsp)
+local int description(PROGINFO *pip,bfile *ofp,MKDIRLIST_ENT *dsp)
 {
 	bfile		dfile ;
-	const int	llen = MAXPATHLEN ;
+	cint	llen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
