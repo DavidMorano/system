@@ -74,8 +74,8 @@ extern int	progfront(PROGINFO *,bfile *) ;
 
 /* forward references */
 
-static int	procoutbeginer(PROGINFO *,bfile *) ;
-static int	progouttc(PROGINFO *,bfile *,int) ;
+local int	procoutbeginer(PROGINFO *,bfile *) ;
+local int	progouttc(PROGINFO *,bfile *,int) ;
 
 
 /* local variables */
@@ -417,7 +417,7 @@ int procoutbeginer(PROGINFO *pip,bfile *ofp)
 /* end subroutine (procoutbeginer) */
 
 
-static int progouttc(PROGINFO *pip,bfile *ofp,int ncols)
+local int progouttc(PROGINFO *pip,bfile *ofp,int ncols)
 {
 	struct troffstrs	*tsp = &pip->troff ;
 	MULTIOUT	mo ;
