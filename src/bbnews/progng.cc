@@ -2,7 +2,6 @@
 
 /* process a newsgroup */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGLOOK	1		/* debug |procartlook()| */
@@ -50,25 +49,25 @@
  			typically print bulletin or report title
  
 	Returns:
-
 	<0		error
 	>=0		EMIT-code
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<fsdir.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -83,25 +82,19 @@ typedef int	(*emit_t)(PROGINFO *,...) ;
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	pathadd(char *,int,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	pathadd(char *,int,cchar *) ;
 extern int	isNotPresent(int) ;
 
-extern int	bbcpy(char *,const char *) ;
+extern int	bbcpy(char *,cchar *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -109,25 +102,26 @@ extern char	*timestr_log(time_t,char *) ;
 
 /* forward references */
 
-static int procartload(PROGINFO *,DIRSHOWN *,ARTLIST *,MKDIRLIST_ENT *) ;
-static int procartdir(PROGINFO *,ARTLIST *,const char *) ;
-static int procartlook(PROGINFO *,ARTLIST *,MKDIRLIST_ENT *,emit_t) ;
+local int procartload(PROGINFO *,DIRSHOWN *,ARTLIST *,MKDIRLIST_ENT *) ;
+local int procartdir(PROGINFO *,ARTLIST *,cchar *) ;
+local int procartlook(PROGINFO *,ARTLIST *,MKDIRLIST_ENT *,emit_t) ;
 
 
 /* local (static) variables */
 
-static const char	*ignorefiles[] = {
+constexpr cpcchar	ignorefiles[] = {
 	"core",
 	NULL
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit)
-{
-	struct timeb	now = pip->now ;
+int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit) noex {
+	TIMEB		now = pip->now ;
 	ARTLIST		al ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -136,7 +130,7 @@ int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    char	timebuf[TIMEBUFLEN+1] ;
-	    timestr_log(dsp->mtime,timebuf),
+	    strtime_log(dsp->mtime,timebuf),
 	    debugprintf("progng: ent umt=%s \n",timebuf) ;
 	    }
 #endif
@@ -204,11 +198,11 @@ int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit)
 /* local subroutines */
 
 
-static int procartload(PROGINFO *pip,DIRSHOWN *sdp,ARTLIST *alp,
+local int procartload(PROGINFO *pip,DIRSHOWN *sdp,ARTLIST *alp,
 		MKDIRLIST_ENT *dsp)
 {
 	MKDIRLIST_ENT	*dsp2 ;
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -238,12 +232,12 @@ static int procartload(PROGINFO *pip,DIRSHOWN *sdp,ARTLIST *alp,
 /* end subroutine (procartload) */
 
 
-static int procartdir(PROGINFO *pip,ARTLIST *alp,cchar *ngd)
+local int procartdir(PROGINFO *pip,ARTLIST *alp,cchar *ngd)
 {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	const char	*nd = pip->newsdname ;
+	cchar	*nd = pip->newsdname ;
 	char		apath[MAXPATHLEN + 2] ;
 
 #if	CF_DEBUG
@@ -257,7 +251,7 @@ static int procartdir(PROGINFO *pip,ARTLIST *alp,cchar *ngd)
 	if ((rs = mkpath2(apath,nd,ngd)) >= 0) {
 	    fsdir	dir ;
 	    fsdir_ent	ds ;
-	    const int	alen = rs ;
+	    cint	alen = rs ;
 
 	    if ((rs = fsdir_open(&dir,apath)) >= 0) {
 		USTAT	sb ;
@@ -295,8 +289,7 @@ static int procartdir(PROGINFO *pip,ARTLIST *alp,cchar *ngd)
 }
 /* end subroutine (procartdir) */
 
-
-static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
+local int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 		emit_t emit)
 {
 	ARTLIST_ENT	*aep ;
@@ -310,9 +303,9 @@ static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 	int		f_previous = FALSE ;
 	int		f_exit = FALSE ;
 	int		f ;
-	const char	*fmt ;
-	const char	*fname ;
-	const char	*ngd ;
+	cchar	*fmt ;
+	cchar	*fname ;
+	cchar	*ngd ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -330,13 +323,13 @@ static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 	    if (DEBUGLEVEL(4)) {
 		char	timebuf[TIMEBUFLEN+1] ;
 	        debugprintf("progng/procartlook: ai=%d mtime=%s\n",ai,
-	            timestr_log(dsp->mtime,timebuf)) ;
+	            strtime_log(dsp->mtime,timebuf)) ;
 	        debugprintf("progng/procartlook: ngd=%s\n",
 	            ngd) ;
 	        debugprintf("progng/procartlook: fname=%s\n",
 	            fname) ;
 	        debugprintf("progng/procartlook: amt=%s\n",
-	            timestr_log(amt,timebuf)) ;
+	            strtime_log(amt,timebuf)) ;
 	    }
 #endif /* CF_DEBUG */
 
@@ -363,7 +356,7 @@ static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 #endif
 
 	        {
-	            const int	blen = MAXNAMELEN ;
+	            cint	blen = MAXNAMELEN ;
 	            int		bl ;
 	            cchar	*bp ;
 	            char	bname[MAXNAMELEN+1] ;
@@ -399,9 +392,9 @@ static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 	            debugprintf("progng/procartlook: emit() rv=%d\n",
 			retval) ;
 	            debugprintf("progng/procartlook: mtime_seen=%s\n",
-	                timestr_log(mtime_seen,timebuf)) ;
+	                strtime_log(mtime_seen,timebuf)) ;
 	            debugprintf("progng/procartlook: amt=%s\n",
-	                timestr_log(amt,timebuf)) ;
+	                strtime_log(amt,timebuf)) ;
 	        }
 #endif /* CF_DEBUG */
 
@@ -469,8 +462,8 @@ static int procartlook(PROGINFO *pip,ARTLIST *alp,MKDIRLIST_ENT *dsp,
 	    debugprintf("progng/procartlook: ret retval=%d\n",
 	        retval) ;
 	    debugprintf("progng/procartlook: mt=%s old_umt=%s\n",
-	        timestr_log(mtime_seen,timebuf1),
-	        timestr_log(dsp->mtime,timebuf2)) ;
+	        strtime_log(mtime_seen,timebuf1),
+	        strtime_log(dsp->mtime,timebuf2)) ;
 	}
 #endif
 
