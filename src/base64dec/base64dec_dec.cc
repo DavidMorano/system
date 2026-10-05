@@ -128,7 +128,7 @@ local char *strnend(cchar *sp,int sl) noex {
 
 /* local variables */
 
-static int	maxlinelen = ulibval.maxline ;
+local int	maxlinelen = ulibval.maxline ;
 
 cbool		f_debug = CF_DEBUG ;
 
