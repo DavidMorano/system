@@ -44,13 +44,15 @@
 #include	<unistd.h>
 #include	<ctime>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<uclibsubs.h>
 #include	<strn.h>
 #include	<char.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG */
 
@@ -85,7 +87,7 @@
 
 /* forward references */
 
-static int	bbnewsrc_ent(BBNEWSRC *,BBNEWSRC_ENT *,cchar *,int) ;
+local int	bbnewsrc_ent(BBNEWSRC *,BBNEWSRC_ENT *,cchar *,int) ;
 
 
 /* local variables */
@@ -196,7 +198,7 @@ int bbnewsrc_close(BBNEWSRC *ungp)
 /* read an entry from the file */
 int bbnewsrc_read(BBNEWSRC *ungp,BBNEWSRC_ENT *ep)
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		len ;
 	int		c = 0 ;
@@ -295,7 +297,7 @@ int bbnewsrc_write(BBNEWSRC *ungp,char ng[],int sf,time_t mtime)
 	    bprintf(&ungp->nf,"#\n") ;
 
 	    bprintf(&ungp->nf,"# updated %s (%lu)\n",
-	        timestr_logz(daytime,timebuf),
+	        strtime_logz(daytime,timebuf),
 	        daytime) ;
 
 	    bprintf(&ungp->nf,"#\n\n") ;
@@ -310,7 +312,7 @@ int bbnewsrc_write(BBNEWSRC *ungp,char ng[],int sf,time_t mtime)
 
 #if	CF_DEBUGS
 	    debugprintf("bbnewsrc_write: non-zero mtime=%s\n",
-	        timestr_log(mtime,timebuf)) ;
+	        strtime_log(mtime,timebuf)) ;
 #endif
 
 	    if (ungp->fl.readtime) {
@@ -320,14 +322,14 @@ int bbnewsrc_write(BBNEWSRC *ungp,char ng[],int sf,time_t mtime)
 #if	CF_DEBUGS
 	        debugprintf("bbnewsrc_write: readable time\n") ;
 	        debugprintf("bbnewsrc_write: local mtime=%s\n",
-			timestr_log(mtime,timebuf)) ;
+			strtime_log(mtime,timebuf)) ;
 #endif
 
 		dater_settimezn(&d,mtime,NULL,-1) ;
 
 #if	CF_DEBUGS
 	        debugprintf("bbnewsrc_write: internal=%s\n",
-			timestr_log(d.b.time,timebuf)) ;
+			strtime_log(d.b.time,timebuf)) ;
 #endif
 
 		dater_mkstrdig(&d,timebuf,TIMEBUFLEN) ;
@@ -391,7 +393,7 @@ int bbnewsrc_rewind(BBNEWSRC *ungp)
 
 /* local subroutines */
 
-static int bbnewsrc_ent(BBNEWSRC *ungp,BBNEWSRC_ENT *ep,cchar lbuf[],int llen)
+local int bbnewsrc_ent(BBNEWSRC *ungp,BBNEWSRC_ENT *ep,cchar lbuf[],int llen)
 {
 	int		rs = SR_OK ;
 	int		si ;
@@ -455,7 +457,7 @@ static int bbnewsrc_ent(BBNEWSRC *ungp,BBNEWSRC_ENT *ep,cchar lbuf[],int llen)
 #if	CF_DEBUGS
 	{
 	    char	timebuf[TIMEBUFLEN+1] ;
-	    timestr_log(ep->mtime,timebuf) ;
+	    strtime_log(ep->mtime,timebuf) ;
 	    debugprintf("bbnewsrc_read: user NG=%s umt=%s\n",
 	        ep->ngname,timebuf) ;
 	}
