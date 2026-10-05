@@ -66,12 +66,13 @@
 #include	<getpwx.h>
 #include	<getax.h>
 #include	<estrings.h>
-#include	<bfile.h>
 #include	<dater.h>
 #include	<mkx.h>
 #include	<mailmsghdrs.h>
 #include	<hdrdecode.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"headerkeys.h"
 #include	"config.h"
@@ -120,8 +121,8 @@ extern "C" {
 
 /* forward references */
 
-static int	emit_headersubj(PROGINFO *,ARTLIST_ENT *) ;
-static int	emit_headerfrom(PROGINFO *,ARTLIST_ENT *) ;
+local int	emit_headersubj(PROGINFO *,ARTLIST_ENT *) ;
+local int	emit_headerfrom(PROGINFO *,ARTLIST_ENT *) ;
 
 
 /* local variables */
@@ -201,14 +202,14 @@ cchar	af[] ;
 	                        if (rs >= 0) {
 	                            dater_gettime(&pip->tmpdate,&t) ;
 	                            bprintf(pip->ofp,"  %s\n",
-	                                timestr_edate(t,timebuf)) ;
+	                                strtime_edate(t,timebuf)) ;
 	                        } else {
 	                            bprintf(pip->ofp, "  %s (arrival)\n",
-	                                timestr_edate(mmsb.st_mtime,timebuf)) ;
+	                                strtime_edate(mmsb.st_mtime,timebuf)) ;
 	                        }
 	                    } else {
 	                        bprintf(pip->ofp, "  %s (arrival)\n",
-	                            timestr_edate(mmsb.st_mtime,timebuf)) ;
+	                            strtime_edate(mmsb.st_mtime,timebuf)) ;
 	                    }
 	                } /* end block */
 	                break ;
@@ -263,7 +264,7 @@ cchar	af[] ;
 
 /* local subroutines */
 
-static int emit_headersubj(PROGINFO *pip,ARTLIST_ENT *ap) noex {
+local int emit_headersubj(PROGINFO *pip,ARTLIST_ENT *ap) noex {
 	int		rs ;
 	cchar		*sp = ap->subject ;
 	if (sp != nullptr) {
@@ -278,7 +279,7 @@ static int emit_headersubj(PROGINFO *pip,ARTLIST_ENT *ap) noex {
 }
 /* end subroutine (emit_headersubj) */
 
-static int emit_headerfrom(PROGINFO *pip,ARTLIST_ENT *ap) noex {
+local int emit_headerfrom(PROGINFO *pip,ARTLIST_ENT *ap) noex {
 	int		rs = SR_OK ;
 	int		hl ;
 	cchar		*hp ;
