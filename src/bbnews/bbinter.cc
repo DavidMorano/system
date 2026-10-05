@@ -247,11 +247,11 @@ local void	sighand_win(int) ;
 
 /* local variables */
 
-static volatile int	if_term = false ;
-static volatile int	if_quit = false ;
-static volatile int	if_int = false ;
-static volatile int	if_win = false ;
-static volatile int	if_def = false ;
+local volatile int	if_term = false ;
+local volatile int	if_quit = false ;
+local volatile int	if_int = false ;
+local volatile int	if_win = false ;
+local volatile int	if_def = false ;
 
 constexpr int	sigblocks[] = {
 	SIGUSR1,
