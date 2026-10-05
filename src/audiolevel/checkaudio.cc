@@ -63,7 +63,7 @@
 
 /* forward references */
 
-static int	audio_recordpause(int,int) ;
+local int	audio_recordpause(int,int) ;
 
 
 /* local variables */
@@ -77,7 +77,7 @@ static int	audio_recordpause(int,int) ;
 int checkaudio(pip,ofp,devfname)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	devfname[] ;
+cchar	devfname[] ;
 {
 	audio_info_t	ainfo, aset ;
 
@@ -313,7 +313,7 @@ const char	devfname[] ;
 
 
 
-static int audio_recordpause(fd,f)
+local int audio_recordpause(fd,f)
 int	fd ;
 int	f ;
 {
