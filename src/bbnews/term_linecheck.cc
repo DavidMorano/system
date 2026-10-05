@@ -67,22 +67,22 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	getfiledirs(const char *,const char *,const char *,vecstr *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	getfiledirs(cchar *,cchar *,cchar *,vecstr *) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern char	*strshrink(char *) ;
