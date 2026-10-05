@@ -10,7 +10,6 @@
 #define	CF_LOCALEOF	0		/* allow local EOF to exit */
 #define	CF_SIGPIPE	1		/* ignore SIGPIPE */
 
-
 /* revision history:
 
 	= 1999-03-01, David A­D­ Morano
@@ -44,7 +43,9 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<logfile.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"config.h"
 #include	"defs.h"
@@ -81,16 +82,9 @@
 /* external subroutines */
 
 extern int	isasocket(int) ;
-extern int	inetping(const char *,int) ;
+extern int	inetping(cchar *,int) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -107,7 +101,7 @@ extern char	*timestr_logz(time_t,char *) ;
 
 int transfer(pip,hostname,rfd,r2fd,ifd,ofd,efd,mxu)
 PROGINFO	*pip ;
-const char	hostname[] ;
+cchar	hostname[] ;
 int		rfd, r2fd ;
 int		ifd, ofd, efd ;
 int		mxu ;
@@ -117,8 +111,8 @@ int		mxu ;
 	ustat	sb ;
 	time_t		ti_pollsanity ;
 	time_t		ti_sanity ;
-	const int	pollinput = (POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI) ;
-	const int	polloutput = (POLLWRNORM | POLLWRBAND) ;
+	cint	pollinput = (POLLIN|POLLRDNORM|POLLRDBAND|POLLPRI) ;
+	cint	polloutput = (POLLWRNORM | POLLWRBAND) ;
 	int		rs = SR_OK ;
 	int		pollint = (10 * POLL_INTMULT) ;
 	int		i ;
@@ -260,7 +254,7 @@ int		mxu ;
 	        debugprintf("transfer: back from POLL w/ rs=%d\n",rs) ;
 		uc_gettimeofday(&tv,NULL) ;
 	        debugprintf("transfer: %s.%ld\n",
-			timestr_log(((time_t) tv.tv_sec),timebuf),
+			strtime_log(((time_t) tv.tv_sec),timebuf),
 			(tv.tv_usec/1000)) ;
 	}
 #endif /* CF_DEBUG */
