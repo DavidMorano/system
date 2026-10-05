@@ -157,65 +157,65 @@ struct proginfo {
 	EXPCOOK		cooks ;
 	USERINFO	*uip ;
 	void		*iap ;
-	const char	**envv ;
-	const char	*pwd ;
-	const char	*progename ;
-	const char	*progdname ;
-	const char	*progname ;
-	const char	*pr ;
-	const char	*searchname ;
-	const char	*version ;
-	const char	*banner ;
-	const char	*usysname ;	/* UNAME OS system-name */
-	const char	*umachine ;	/* UNAME machine name */
-	const char	*urelease ;	/* UNAME OS release */
-	const char	*uversion ;	/* UNAME OS version */
-	const char	*architecture ;	/* UAUX machine architecture */
-	const char	*platform ;	/* UAUX machine platform */
-	const char	*provider ;	/* UAUX machine provider */
-	const char	*hz ;		/* OS HZ */
-	const char	*nodename ;	/* USERINFO */
-	const char	*domainname ;	/* USERINFO */
-	const char	*username ;	/* USERINFO */
-	const char	*userhome ;	/* USERINFO */
-	const char	*shell ;	/* USERINFO */
-	const char	*org ;		/* USERINFO */
-	const char	*gecosname ;	/* USERINFO */
-	const char	*realname ;	/* USERINFO */
-	const char	*name ;		/* USERINFO */
-	const char	*fullname ;	/* USERINFO full-name */
-	const char	*mailname ;	/* USERINFO mail-abbreviated-name */
-	const char	*tz ;		/* USERINFO */
-	const char	*maildname ;	/* USERINFO */
-	const char	*logid ;	/* USERINFO ID for logging purposes */
-	const char	*groupname ;
-	const char	*rootname ;
-	const char	*hostname ;	/* concatenation of N + D */
-	const char	*tmpdname ;	/* temporary directory */
-	const char	*folderdname ;	/* user mail-folder directory */
-	const char	*vmdname ;	/* MSG-body cache directory */
-	const char	*hfname ;	/* help file-name */
-	const char	*cfname ;	/* config file-name */
-	const char	*lfname ;	/* log file-name */
-	const char	*cmdfname ;	/* help file-name */
-	const char	*pidfname ;
-	const char	*mbname_def ;	/* mailbox default (starting) */
-	const char	*mbname_in ;	/* mailbox incoming */
-	const char	*mbname_spam ;	/* mailbox spam */
-	const char	*mbname_trash ;	/* mailbox trash */
-	const char	*mbname_cur ;	/* mailbox current */
-	const char	*termtype ;	/* terminal type 'TERM' */
-	const char	*kbdtype ;	/* keyboard type 'KEYBOARD' */
-	const char	*prog_shell ;
-	const char	*prog_getmail ;
-	const char	*prog_mailer ;
-	const char	*prog_editor ;
-	const char	*prog_metamail ;
-	const char	*prog_pager ;
-	const char	*prog_postspam ;
-	const char	*svspec ;
-	const char	*sjspec ;
-	const char	*testmsg ;
+	cchar	**envv ;
+	cchar	*pwd ;
+	cchar	*progename ;
+	cchar	*progdname ;
+	cchar	*progname ;
+	cchar	*pr ;
+	cchar	*searchname ;
+	cchar	*version ;
+	cchar	*banner ;
+	cchar	*usysname ;	/* UNAME OS system-name */
+	cchar	*umachine ;	/* UNAME machine name */
+	cchar	*urelease ;	/* UNAME OS release */
+	cchar	*uversion ;	/* UNAME OS version */
+	cchar	*architecture ;	/* UAUX machine architecture */
+	cchar	*platform ;	/* UAUX machine platform */
+	cchar	*provider ;	/* UAUX machine provider */
+	cchar	*hz ;		/* OS HZ */
+	cchar	*nodename ;	/* USERINFO */
+	cchar	*domainname ;	/* USERINFO */
+	cchar	*username ;	/* USERINFO */
+	cchar	*userhome ;	/* USERINFO */
+	cchar	*shell ;	/* USERINFO */
+	cchar	*org ;		/* USERINFO */
+	cchar	*gecosname ;	/* USERINFO */
+	cchar	*realname ;	/* USERINFO */
+	cchar	*name ;		/* USERINFO */
+	cchar	*fullname ;	/* USERINFO full-name */
+	cchar	*mailname ;	/* USERINFO mail-abbreviated-name */
+	cchar	*tz ;		/* USERINFO */
+	cchar	*maildname ;	/* USERINFO */
+	cchar	*logid ;	/* USERINFO ID for logging purposes */
+	cchar	*groupname ;
+	cchar	*rootname ;
+	cchar	*hostname ;	/* concatenation of N + D */
+	cchar	*tmpdname ;	/* temporary directory */
+	cchar	*folderdname ;	/* user mail-folder directory */
+	cchar	*vmdname ;	/* MSG-body cache directory */
+	cchar	*hfname ;	/* help file-name */
+	cchar	*cfname ;	/* config file-name */
+	cchar	*lfname ;	/* log file-name */
+	cchar	*cmdfname ;	/* help file-name */
+	cchar	*pidfname ;
+	cchar	*mbname_def ;	/* mailbox default (starting) */
+	cchar	*mbname_in ;	/* mailbox incoming */
+	cchar	*mbname_spam ;	/* mailbox spam */
+	cchar	*mbname_trash ;	/* mailbox trash */
+	cchar	*mbname_cur ;	/* mailbox current */
+	cchar	*termtype ;	/* terminal type 'TERM' */
+	cchar	*kbdtype ;	/* keyboard type 'KEYBOARD' */
+	cchar	*prog_shell ;
+	cchar	*prog_getmail ;
+	cchar	*prog_mailer ;
+	cchar	*prog_editor ;
+	cchar	*prog_metamail ;
+	cchar	*prog_pager ;
+	cchar	*prog_postspam ;
+	cchar	*svspec ;
+	cchar	*sjspec ;
+	cchar	*testmsg ;
 	void		*pcsconf ;
 	void		*pcspoll ;
 	void		*config ;
@@ -256,15 +256,15 @@ struct proginfo {
 } ;
 
 struct pivars {
-	const char	*vpr1 ;
-	const char	*vpr2 ;
-	const char	*vpr3 ;
-	const char	*pr ;
-	const char	*vprname ;
+	cchar	*vpr1 ;
+	cchar	*vpr2 ;
+	cchar	*vpr3 ;
+	cchar	*pr ;
+	cchar	*vprname ;
 } ;
 
 struct arginfo {
-	const char	**argv ;
+	cchar	**argv ;
 	int		argc ;
 	int		ai, ai_max, ai_pos ;
 } ;
@@ -274,14 +274,14 @@ struct arginfo {
 extern "C" {
 #endif
 
-extern int proginfo_start(PROGINFO *,const char **,cchar *,cchar *) ;
-extern int proginfo_setentry(PROGINFO *,const char **,const char *,int) ;
-extern int proginfo_setversion(PROGINFO *,const char *) ;
-extern int proginfo_setbanner(PROGINFO *,const char *) ;
-extern int proginfo_setsearchname(PROGINFO *,const char *,const char *) ;
-extern int proginfo_setprogname(PROGINFO *,const char *) ;
-extern int proginfo_setexecname(PROGINFO *,const char *) ;
-extern int proginfo_setprogroot(PROGINFO *,const char *,int) ;
+extern int proginfo_start(PROGINFO *,cchar **,cchar *,cchar *) ;
+extern int proginfo_setentry(PROGINFO *,cchar **,cchar *,int) ;
+extern int proginfo_setversion(PROGINFO *,cchar *) ;
+extern int proginfo_setbanner(PROGINFO *,cchar *) ;
+extern int proginfo_setsearchname(PROGINFO *,cchar *,cchar *) ;
+extern int proginfo_setprogname(PROGINFO *,cchar *) ;
+extern int proginfo_setexecname(PROGINFO *,cchar *) ;
+extern int proginfo_setprogroot(PROGINFO *,cchar *,int) ;
 extern int proginfo_pwd(PROGINFO *) ;
 extern int proginfo_rootname(PROGINFO *) ;
 extern int proginfo_progdname(PROGINFO *) ;
@@ -289,7 +289,7 @@ extern int proginfo_progename(PROGINFO *) ;
 extern int proginfo_nodename(PROGINFO *) ;
 extern int proginfo_getpwd(PROGINFO *,char *,int) ;
 extern int proginfo_getename(PROGINFO *,char *,int) ;
-extern int proginfo_getenv(PROGINFO *,const char *,int,const char **) ;
+extern int proginfo_getenv(PROGINFO *,cchar *,int,cchar **) ;
 extern int proginfo_finish(PROGINFO *) ;
 
 #ifdef	__cplusplus
