@@ -30,22 +30,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
-#include	<tzfile.h>
 #include	<netdb.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<uterm.h>
+#include	<ctime>
+#include	<csignal>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<tzfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucterm.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -70,13 +71,6 @@ extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	pathclean(char *,cchar *,int) ;
 extern int	tcgetlines(int) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* external variables */
 
@@ -86,9 +80,9 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int proctermlines(PROGINFO *,UTERM *) ;
-static int procmesg_begin(PROGINFO *,UTERM *) ;
-static int procmesg_end(PROGINFO *,UTERM *) ;
+local int proctermlines(PROGINFO *,UTERM *) ;
+local int procmesg_begin(PROGINFO *,UTERM *) ;
+local int procmesg_end(PROGINFO *,UTERM *) ;
 
 
 /* local variables */
@@ -116,8 +110,8 @@ int progterm(PROGINFO *pip)
 	if ((rs = uterm_start(&ut,pip->tfd)) >= 0) {
 	    if ((rs = proctermlines(pip,&ut)) >= 0) {
 		if ((rs = procmesg_begin(pip,&ut)) >= 0) {
-		    const int	ucmd = utermcmd_setmode ;
-		    const int	fm = fm_notecho ;
+		    cint	ucmd = utermcmd_setmode ;
+		    cint	fm = fm_notecho ;
 	            if ((rs = uterm_control(&ut,ucmd,fm)) >= 0) {
 			INTER		ia ;
 
@@ -174,7 +168,7 @@ int progterm(PROGINFO *pip)
 /* local subroutines */
 
 
-static int proctermlines(PROGINFO *pip,UTERM *utp)
+local int proctermlines(PROGINFO *pip,UTERM *utp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -234,12 +228,12 @@ static int proctermlines(PROGINFO *pip,UTERM *utp)
 /* end subroutine (proctermlines) */
 
 
-static int procmesg_begin(PROGINFO *pip,UTERM *utp)
+local int procmesg_begin(PROGINFO *pip,UTERM *utp)
 { 
 	int		rs ;
 	if ((rs = uterm_control(utp,utermcmd_getuid,0)) >= 0) {
 	    if (pip->euid == rs) {
-		const int	ucmd = utermcmd_setmesg ;
+		cint	ucmd = utermcmd_setmesg ;
 		if ((rs = uterm_control(utp,ucmd,FALSE)) >= 0) {
 	    	    pip->fl.mesgs = (rs > 0) ;
 		    if (rs > 0) pip->changed.mesgs = TRUE ;
@@ -251,11 +245,11 @@ static int procmesg_begin(PROGINFO *pip,UTERM *utp)
 /* end subroutine (procmesg_begin) */
 
 
-static int procmesg_end(PROGINFO *pip,UTERM *utp)
+local int procmesg_end(PROGINFO *pip,UTERM *utp)
 {
 	int		rs = SR_OK ;
 	if (pip->changed.mesgs) {
-	    const int	ucmd = utermcmd_setmesg ;
+	    cint	ucmd = utermcmd_setmesg ;
 	    rs = uterm_control(utp,ucmd,pip->fl.mesgs) ;
 	}
 	return rs ;
