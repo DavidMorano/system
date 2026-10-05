@@ -153,8 +153,8 @@ local void	main_sighand(int,siginfo_t *,void *) ;
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
 
 constexpr int		sigblocks[] = {
 	0
@@ -472,7 +472,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 	pip->to_clock = TO_CLOCK ;
 
 	{
-	    const int	f = OPT_FASTSCAN ;
+	    cint	f = OPT_FASTSCAN ;
 	    pip->fl.extrascan = (! f) ;
 	    pip->fl.readtime = true ;
 	    pip->fl.interactive = true ;
@@ -502,7 +502,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -981,7 +981,7 @@ int main(int argc,mainv argv,mainv envv) noex {
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1451,7 +1451,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        cchar		*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -1691,7 +1691,7 @@ local int procuserinfo_begin(PI *pip,userinfo *uip) noex {
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1734,8 +1734,8 @@ local int procpcsconf_begin(PI *pip,PCSCONF *pcp) noex {
 	        PCSCONF_CUR	cur ;
 	        int		c = 0 ;
 	        if ((rs = pcsconf_curbegin(pcp,&cur)) >= 0) {
-	            const int	klen = KBUFLEN ;
-	            const int	vlen = VBUFLEN ;
+	            cint	klen = KBUFLEN ;
+	            cint	vlen = VBUFLEN ;
 	            int		vl ;
 	            char	kbuf[KBUFLEN+1] ;
 	            char	vbuf[VBUFLEN+1] ;
@@ -1823,7 +1823,7 @@ local int procargs(PI *pip,ARGINFO *aip,bits *bop,cc *afn,cc *ofn) noex {
 	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	        if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1945,7 +1945,7 @@ local int procnewsdname(PI *pip) noex {
 	    PCSCONF	*pcp = pip->pcsconf ;
 	    PCSCONF_CUR	cur ;
 	    if ((rs = pcsconf_curbegin(pcp,&cur)) >= 0) {
-	        const int	vlen = VBUFLEN ;
+	        cint	vlen = VBUFLEN ;
 	        cchar		*k = "bb:newsdir" ;
 	        char		vbuf[VBUFLEN+1] ;
 	        if ((rs1 = pcsconf_fetch(pcp,k,-1,&cur,vbuf,vlen)) >= 0) {
