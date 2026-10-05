@@ -2,9 +2,7 @@
 
 /* send commands (by printing) to TROFF */
 
-
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
@@ -19,22 +17,21 @@
 
 	We deal with TROFF matters.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<vecstr.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<ascii.h>
+#include	<vecstr.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -54,36 +51,34 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	bufprintf(const char *,int,...) ;
-
-extern char	*timestr_logz(time_t,char *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	bufprintf(cchar *,int,...) ;
 
 
 /* local structures */
 
 struct fontfamily {
-	const char	*family ;
-	const char	*code[4] ;
-	const char	*name ;
+	cchar	*family ;
+	cchar	*code[4] ;
+	cchar	*name ;
 } ;
 
 struct chartran {
 	int		ch ;
-	const char	*troffstr ;
+	cchar	*troffstr ;
 } ;
 
 
 /* forward references */
 
-static int	proctransbegin(struct proginfo *) ;
-static int	proctransend(struct proginfo *) ;
-static int	procfontset(struct proginfo *,bfile *) ;
-static int	procfontcode(struct proginfo *,const char *,const char **) ;
-static int	proctcbegin(struct proginfo *,bfile *) ;
+local int	proctransbegin(struct proginfo *) ;
+local int	proctransend(struct proginfo *) ;
+local int	procfontset(struct proginfo *,bfile *) ;
+local int	procfontcode(struct proginfo *,cchar *,cchar **) ;
+local int	proctcbegin(struct proginfo *,bfile *) ;
 
-static int	troffswitch(char *,int,const char *) ;
-static int	isallnul(const char *,const char *,const char *) ;
+local int	troffswitch(char *,int,cchar *) ;
+local int	isallnul(cchar *,cchar *,cchar *) ;
 
 
 /* local variables */
@@ -100,21 +95,21 @@ struct fontfamily	families[] = {
 	{ NULL, { NULL, NULL, NULL, NULL }, NULL }
 } ;
 
-static const char troff_slash3[] = {
+static cchar troff_slash3[] = {
 	'\\',
 	'\\',
 	'\\',
 	'\0'
 } ;
 
-static const char troff_int2[] = {
+static cchar troff_int2[] = {
 	'\\',
 	'*',
 	CH_LPAREN,
 	'\0'
 } ;
 
-static const char troff_linecomment[] = {
+static cchar troff_linecomment[] = {
 	'.',
 	'\\',
 	CH_DQUOTE,
@@ -122,7 +117,7 @@ static const char troff_linecomment[] = {
 	'\0'
 } ;
 
-static const char troff_infont_cw[] = {
+static cchar troff_infont_cw[] = {
 	'\\',
 	'f',
 	CH_LPAREN,
@@ -131,35 +126,35 @@ static const char troff_infont_cw[] = {
 	'\0'
 } ;
 
-static const char troff_infont_p[] = {
+static cchar troff_infont_p[] = {
 	'\\',
 	'f',
 	'P',
 	'\0'
 } ;
 
-static const char troff_infont_r[] = {
+static cchar troff_infont_r[] = {
 	'\\',
 	'f',
 	'R',
 	'\0'
 } ;
 
-static const char troff_infont_i[] = {
+static cchar troff_infont_i[] = {
 	'\\',
 	'f',
 	'I',
 	'\0'
 } ;
 
-static const char troff_infont_b[] = {
+static cchar troff_infont_b[] = {
 	'\\',
 	'f',
 	'B',
 	'\0'
 } ;
 
-static const char troff_infont_x[] = {
+static cchar troff_infont_x[] = {
 	'\\',
 	'f',
 	CH_LPAREN,
@@ -168,7 +163,7 @@ static const char troff_infont_x[] = {
 	'\0'
 } ;
 
-static const char	*hftypes[] = {
+static cchar	*hftypes[] = {
 	"PH",
 	"EH",
 	"OH",
@@ -178,7 +173,7 @@ static const char	*hftypes[] = {
 	NULL
 } ;
 
-static const char	nul[] = {
+static cchar	nul[] = {
 	'\0'
 } ;
 
@@ -301,24 +296,24 @@ bfile		*ofp ;
 
 /* load TROFF miscellaneous strings */
 
-	    tsp->slash3 = (const char *) troff_slash3 ;
-	    tsp->int2 = (const char *) troff_int2 ;
-	    tsp->linecomment = (const char *) troff_linecomment ;
-	    tsp->infont_p = (const char *) troff_infont_p ;
-	    tsp->infont_cw = (const char *) troff_infont_cw ;
+	    tsp->slash3 = (cchar *) troff_slash3 ;
+	    tsp->int2 = (cchar *) troff_int2 ;
+	    tsp->linecomment = (cchar *) troff_linecomment ;
+	    tsp->infont_p = (cchar *) troff_infont_p ;
+	    tsp->infont_cw = (cchar *) troff_infont_cw ;
 
 /* load TROFF default ("Times") font-change strings */
 
-	    tsp->infont_r = (const char *) troff_infont_r ;
-	    tsp->infont_i = (const char *) troff_infont_i ;
-	    tsp->infont_b = (const char *) troff_infont_b ;
-	    tsp->infont_x = (const char *) troff_infont_x ;
+	    tsp->infont_r = (cchar *) troff_infont_r ;
+	    tsp->infont_i = (cchar *) troff_infont_i ;
+	    tsp->infont_b = (cchar *) troff_infont_b ;
+	    tsp->infont_x = (cchar *) troff_infont_x ;
 
 /* output the foundational stuff to TROFF */
 
 	    if (rs >= 0) {
-	        const char	*ts = timestr_logz(pip->daytime,timebuf) ;
-	        const char	*lc = pip->troff.linecomment ;
+	        cchar	*ts = strtime_logz(pip->daytime,timebuf) ;
+	        cchar	*lc = pip->troff.linecomment ;
 	        rs = bprintf(ofp,"%s BIBLESET %s starting\n%s\n",lc,ts,lc) ;
 	        wlen += rs ;
 	    }
@@ -378,7 +373,7 @@ struct proginfo	*pip ;
 int progoffcomment(pip,ofp,sp,sl)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	*sp ;
+cchar	*sp ;
 int		sl ;
 {
 	int		rs = SR_OK ;
@@ -388,7 +383,7 @@ int		sl ;
 	    sl = strlen(sp) ;
 
 	if (rs >= 0) {
-	    const char	*lc = pip->troff.linecomment ;
+	    cchar	*lc = pip->troff.linecomment ;
 	    rs = bwrite(ofp,lc,-1) ;
 	    wlen += rs ;
 	}
@@ -417,8 +412,8 @@ int		sl ;
 int progoffdss(pip,ofp,n,v)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	n[] ;
-const char	*v ;
+cchar	n[] ;
+cchar	*v ;
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -441,7 +436,7 @@ const char	*v ;
 int progoffdsn(pip,ofp,n,v)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	n[] ;
+cchar	n[] ;
 int		v ;
 {
 	int		rs = SR_OK ;
@@ -465,9 +460,9 @@ int		v ;
 int progoffsrs(pip,ofp,comment,rn,rv)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	*comment ;
-const char	*rn ;
-const char	*rv ;
+cchar	*comment ;
+cchar	*rn ;
+cchar	*rv ;
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -504,8 +499,8 @@ const char	*rv ;
 int progoffsrn(pip,ofp,comment,rn,rv)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	*comment ;
-const char	*rn ;
+cchar	*comment ;
+cchar	*rn ;
 int		rv ;
 {
 	int		rs = SR_OK ;
@@ -543,12 +538,12 @@ int		rv ;
 int progoffhf(pip,ofp,type,s_l,s_m,s_r)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	type[] ;
-const char	s_l[] ;
-const char	s_m[] ;
-const char	s_r[] ;
+cchar	type[] ;
+cchar	s_l[] ;
+cchar	s_m[] ;
+cchar	s_r[] ;
 {
-	const int	qch = CH_DQUOTE ;
+	cint	qch = CH_DQUOTE ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -605,7 +600,7 @@ bfile		*ofp ;
 int progoffwrite(pip,ofp,sp,sl)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	*sp ;
+cchar	*sp ;
 int		sl ;
 {
 	PROGINFO_POFF	*pop = &pip->poff ;
@@ -615,7 +610,7 @@ int		sl ;
 	int		slr ;
 	int		f ;
 	int		wlen = 0 ;
-	const char	**trans ;
+	cchar	**trans ;
 
 	if (ofp == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
@@ -680,7 +675,7 @@ int progofftcadd(pip,ofp,col,cname)
 struct proginfo	*pip ;
 bfile		*ofp ;
 int		col ;
-const char	cname[] ;
+cchar	cname[] ;
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -789,7 +784,7 @@ int		ncols ;
 /* local subroutines */
 
 
-static int proctransbegin(pip)
+local int proctransbegin(pip)
 struct proginfo	*pip ;
 {
 	PROGINFO_POFF	*pop = &pip->poff ;
@@ -807,7 +802,7 @@ struct proginfo	*pip ;
 	memset(pop->chartrans,0,size) ;
 
 	{
-	const char	*ts ;
+	cchar	*ts ;
 	for (i = 0 ; trofftrans[i].ch != '\0' ; i += 1) {
 	    ch = (trofftrans[i].ch & 0xff) ;
 	    if (pop->chartrans[ch] == NULL) {
@@ -843,7 +838,7 @@ bad1:
 /* end subroutine (proctransbegin) */
 
 
-static int proctransend(pip)
+local int proctransend(pip)
 struct proginfo	*pip ;
 {
 	PROGINFO_POFF	*pop = &pip->poff ;
@@ -869,21 +864,21 @@ bfile		*ofp ;
 	int		rs = SR_OK ;
 	int		i = -1 ;
 	int		wlen = 0 ;
-	const char	*ff ;
-	const char	*fcp ;
+	cchar	*ff ;
+	cchar	*fcp ;
 
 	pip->ffi = -1 ;
 
 /* default */
 
-	tsp->infont_r = (const char *) troff_infont_r ;
-	tsp->infont_i = (const char *) troff_infont_i ;
-	tsp->infont_b = (const char *) troff_infont_b ;
-	tsp->infont_x = (const char *) troff_infont_x ;
+	tsp->infont_r = (cchar *) troff_infont_r ;
+	tsp->infont_i = (cchar *) troff_infont_i ;
+	tsp->infont_b = (cchar *) troff_infont_b ;
+	tsp->infont_x = (cchar *) troff_infont_x ;
 
 /* check for specified argument */
 
-	ff = (const char *) pip->ff ;
+	ff = (cchar *) pip->ff ;
 	if (ff == NULL) {
 	    goto ret1 ;
 	}
@@ -930,7 +925,7 @@ bfile		*ofp ;
 
 ret1:
 	if (rs >= 0) {
-	    const char	*fn = NULL ;
+	    cchar	*fn = NULL ;
 
 	    if ((ff != NULL) && (i >= 0))
 	        fn = families[i].name ;
@@ -953,10 +948,10 @@ ret1:
 /* end subroutine (procoffsetfont) */
 
 
-static int procfontcode(pip,fc,rpp)
+local int procfontcode(pip,fc,rpp)
 struct proginfo	*pip ;
-const char	fc[] ;
-const char	**rpp ;
+cchar	fc[] ;
+cchar	**rpp ;
 {
 	int		rs ;
 	int		tbl = 0 ;
@@ -965,10 +960,10 @@ const char	**rpp ;
 	if ((rs = troffswitch(tmpbuf,TIMEBUFLEN,fc)) >= 0) {
 	    tbl = rs ;
 	    if ((rs = vecstr_add(&pip->stores,tmpbuf,tbl)) >= 0) {
-		const char	*cp ;
-	        const int	si = rs ;
+		cchar	*cp ;
+	        cint	si = rs ;
 	        if ((rs = vecstr_get(&pip->stores,si,&cp)) >= 0) {
-	            *rpp = (const char *) cp ;
+	            *rpp = (cchar *) cp ;
 		}
 	    }
 	}
@@ -978,7 +973,7 @@ const char	**rpp ;
 /* end subroutine (procfontcode) */
 
 
-static int proctcbegin(pip,ofp)
+local int proctcbegin(pip,ofp)
 struct proginfo	*pip ;
 bfile		*ofp ;
 {
@@ -1017,10 +1012,10 @@ bfile		*ofp ;
 /* end subroutine (proctcbegin) */
 
 
-static int troffswitch(buf,buflen,fontcode)
+local int troffswitch(buf,buflen,fontcode)
 char		buf[] ;
 int		buflen ;
-const char	fontcode[] ;
+cchar	fontcode[] ;
 {
 	int		rs = SR_OK ;
 	int		nc ;
@@ -1055,8 +1050,8 @@ const char	fontcode[] ;
 
 
 /* is-all-strings-null? (OK, maybe the grammer is wrong) */
-static int isallnul(s1,s2,s3)
-const char	s1[], s2[], s3[] ;
+local int isallnul(s1,s2,s3)
+cchar	s1[], s2[], s3[] ;
 {
 	int		f = TRUE ;
 
