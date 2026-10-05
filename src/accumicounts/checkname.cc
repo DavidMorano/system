@@ -68,7 +68,7 @@
 
 /* external subroutines */
 
-extern int	sfbasename(const char *,int,const char **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
 
 
 /* external variables */
@@ -76,7 +76,7 @@ extern int	sfbasename(const char *,int,const char **) ;
 
 /* forward references */
 
-static int	addsize() ;
+local int	addsize() ;
 
 
 /* exported subroutines */
@@ -202,7 +202,7 @@ struct checkparams	*ckp ;
 
 
 /* add up the size of this file to the total */
-static int addsize(pip,size)
+local int addsize(pip,size)
 struct proginfo	*pip ;
 size_t		size ;
 {
