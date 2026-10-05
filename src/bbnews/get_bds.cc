@@ -27,24 +27,25 @@
  *
  *	Arguments:
  *
- 
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<ctime>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>
 
 #include	"bbnewsrc.h"
 #include	"config.h"
@@ -57,15 +58,7 @@
 
 /* external subroutines */
 
-extern int	mktmpfile(char *,mode_t,const char *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*timestr_log(time_t,char *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 
 
 /* external variables */
@@ -76,7 +69,7 @@ extern int	namelen ;
 
 /* forward references */
 
-static int	dir_func() ;
+local int	dir_func() ;
 
 
 /* external variables */
@@ -116,7 +109,7 @@ struct userstat	**ubpp ;
 	int		f_subscribe ;
 	int		f_show ;
 	int		f_first ;
-	const char	*cp, *cp2 ;
+	cchar	*cp, *cp2 ;
 	char		lfname[MAXPATHLEN + 1] ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 	char		*env ;
@@ -324,7 +317,7 @@ struct userstat	**ubpp ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	        debugprintf("get_bds: how are we doing, t1=%lu t2=%s\n",
-	            daytime,timestr_log(mtime_user,timebuf)) ;
+	            daytime,strtime_log(mtime_user,timebuf)) ;
 #endif
 
 #if	CF_DEBUG
@@ -341,7 +334,7 @@ struct userstat	**ubpp ;
 #if	 CF_DEBUG
 	if (DEBUGLEVEL(4))
 	                debugprintf("get_bds: user NG=%s umt=%s\n",
-	                    unge.name,timestr_log(unge.mtime,timebuf)) ;
+	                    unge.name,strtime_log(unge.mtime,timebuf)) ;
 #endif
 
 	            f_subscribe = unge.f_subscribed ;
@@ -644,7 +637,7 @@ bad1:
 /* local subroutines */
 
 
-static int dir_func(fnp,fsp,dsp)
+local int dir_func(fnp,fsp,dsp)
 char		*fnp ;
 ustat	*fsp ;
 MKDIRLIST	*dsp ;
