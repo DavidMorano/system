@@ -57,12 +57,12 @@ extern int	bufprintf(char *,int,cchar *,...) ;
 int cmd_printout(pip,ap,ngdir,afname,options)
 struct proginfo	*pip ;
 ARTLIST_ENT	*ap ;
-const char	ngdir[] ;
-const char	afname[] ;
-const char	options[] ;
+cchar	ngdir[] ;
+cchar	afname[] ;
+cchar	options[] ;
 {
 	int		rs = SR_OK ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		cmdbuf[CMDBUFLEN + 1] ;
 
 	if ((cp = getenv("BBPRTCMD")) == NULL)
