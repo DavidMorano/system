@@ -24,7 +24,7 @@
 
 	int procfile(pip,basedname)
 	struct proginfo	*pip ;
-	const char	basedname[] ;
+	cchar	basedname[] ;
 
 	Arguments:
 
@@ -69,8 +69,8 @@
 
 /* external subroutines */
 
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	checklink(struct proginfo *,const char *,ustat *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
+extern int	checklink(struct proginfo *,cchar *,ustat *) ;
 
 
 /* external variables */
@@ -81,7 +81,7 @@ extern int	checklink(struct proginfo *,const char *,ustat *) ;
 
 int procfile(pip,basedname)
 struct proginfo	*pip ;
-const char	basedname[] ;
+cchar	basedname[] ;
 {
 	ustat	se ;
 
