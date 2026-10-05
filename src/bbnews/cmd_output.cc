@@ -58,11 +58,11 @@ extern int	uc_system(cchar *) ;
 int cmd_output(pip,ap,ngdir,afname, cmd)
 struct proginfo	*pip ;
 ARTLIST_ENT	*ap ;
-const char	ngdir[] ;
-const char	afname[] ;
-const char	cmd[] ;
+cchar	ngdir[] ;
+cchar	afname[] ;
+cchar	cmd[] ;
 {
-	const int	cmdlen = CMDBUFLEN ;
+	cint	cmdlen = CMDBUFLEN ;
 	int		rs ;
 	cchar		*fmt = "%s < %s" ;
 	char		cmdbuf[CMDBUFLEN + 1] ;
