@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 extern int	mo_start(MULTIOUT *,bfile *) ;
-extern int	mo_printf(MULTIOUT *,const char *,...) ;
+extern int	mo_printf(MULTIOUT *,cchar *,...) ;
 extern int	mo_finish(MULTIOUT *) ;
 
 #ifdef	__cplusplus
