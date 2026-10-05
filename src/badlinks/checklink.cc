@@ -69,7 +69,7 @@
 
 int checklink(pip,name,sbp)
 struct proginfo	*pip ;
-const char	name[] ;
+cchar	name[] ;
 ustat	*sbp ;
 {
 	ustat	sb2 ;
