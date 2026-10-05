@@ -6,7 +6,7 @@ int calent_same(CALENT *ep,CALYEARS *op,CALENT *oep)
 	int		rs ;
 	int		c1l, c2l ;
 	int		f = FALSE ;
-	const char	*c1p, *c2p ;
+	cchar	*c1p, *c2p ;
 
 	if ((rs = worder_start(&w1,op,ep)) >= 0) {
 
