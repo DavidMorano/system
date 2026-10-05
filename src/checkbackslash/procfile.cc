@@ -91,7 +91,7 @@ int progfile(PROGINFO *pip,PARAMOPT *pp,cchar *fname)
 	    fname = BFILE_STDIN ;
 
 	if ((rs = bopen(ifp,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		line = 0 ;
 	    int		i ;
 	    char		lbuf[LINEBUFLEN + 1] ;
