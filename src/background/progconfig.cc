@@ -143,22 +143,22 @@
 
 /* external subroutines */
 
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
+extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 
 
 /* forward references */
 
 int progconfig_read(struct proginfo *) ;
 
-extern int setfname(struct proginfo *,char *,const char *,int,int,
-	const char *,const char *,const char *) ;
+extern int setfname(struct proginfo *,char *,cchar *,int,int,
+	cchar *,cchar *,cchar *) ;
 
 
 /* local variables */
 
-static const char	*sched1[] = {
+static cchar	*sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -166,7 +166,7 @@ static const char	*sched1[] = {
 	NULL
 } ;
 
-static const char	*params[] = {
+static cchar	*params[] = {
 	"cmd",
 	"loglen",
 	"msfile",
@@ -202,7 +202,7 @@ enum params {
 /* configuration maintenance */
 int progconfig_init(pip,configfname)
 struct proginfo	*pip ;
-const char	*configfname ;
+cchar	*configfname ;
 {
 	struct proginfo_config	*op = &pip->config ;
 
