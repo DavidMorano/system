@@ -49,18 +49,18 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matocasestr(const char **,int,const char *,int) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matocasestr(cchar **,int,cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -75,7 +75,7 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-static int	progmsgenv_beginer(PROGINFO *pip) ;
+local int	progmsgenv_beginer(PROGINFO *pip) ;
 
 
 /* local variables */
@@ -127,7 +127,7 @@ int progmsgenv_envstr(PROGINFO *pip,char mbuf[],int mlen)
 /* local subroutines */
 
 
-static int progmsgenv_beginer(PROGINFO *pip)
+local int progmsgenv_beginer(PROGINFO *pip)
 {
 	int	rs = SR_OK ;
 
@@ -139,11 +139,11 @@ static int progmsgenv_beginer(PROGINFO *pip)
 	if (! pip->open.envdate) {
 	    struct timeb	*nowp = &pip->now ;
 	    DATER		*dp = &pip->envdate ;
-	    const char		*zn = pip->zname ;
+	    cchar		*zn = pip->zname ;
 	    if ((rs = dater_start(dp,nowp,zn,-1)) >= 0) {
 		time_t		t = pip->daytime ;
-		const int	isdst = nowp->dstflag ;
-		const int	zoff = nowp->timezone ;
+		cint	isdst = nowp->dstflag ;
+		cint	zoff = nowp->timezone ;
 	        pip->open.envdate = TRUE ;
 		rs = dater_settimezon(dp,t,zoff,zn,isdst) ;
 	    }
