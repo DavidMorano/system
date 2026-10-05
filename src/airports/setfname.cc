@@ -68,10 +68,11 @@
 #include	<unistd.h>
 #include	<netdb.h>
 #include	<ctime>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<baops.h>
 #include	<paramfile.h>
 #include	<logfile.h>
@@ -104,29 +105,25 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,char *,int) ;
-extern int	matstr2(const char **,char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,char *,int) ;
+extern int	matstr2(cchar **,char *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	mkdirs(cchar *,mode_t) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_loga(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -151,8 +148,8 @@ extern char	**environ ;
 int setfname(pip,fname,ebuf,el,f_def,dname,name,suf)
 PROGINFO	*pip ;
 char		fname[] ;
-const char	ebuf[] ;
-const char	dname[], name[], suf[] ;
+cchar	ebuf[] ;
+cchar	dname[], name[], suf[] ;
 int		el ;
 int		f_def ;
 {
