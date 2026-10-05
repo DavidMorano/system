@@ -71,44 +71,44 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	cfdecmfu(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecmfi(cchar *,int,int *) ;
+extern int	cfdecmfu(cchar *,int,uint *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
+extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 
-extern int	securefile(const char *,uid_t,gid_t) ;
+extern int	securefile(cchar *,uid_t,gid_t) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* forward references */
 
 int		progconfigread(struct proginfo *) ;
 
-static int	proclistenadd(struct proginfo *,vecobj *,const char *,int) ;
-static int	proclistenmerge(struct proginfo *,vecobj *) ;
-static int	proclistenpresent(struct proginfo *,vecobj *,LISTENSPEC *) ;
-static int	proclistentmpdel(struct proginfo *,vecobj *,int) ;
-static int	proclistenfree(struct proginfo *,vecobj *) ;
+local int	proclistenadd(struct proginfo *,vecobj *,cchar *,int) ;
+local int	proclistenmerge(struct proginfo *,vecobj *) ;
+local int	proclistenpresent(struct proginfo *,vecobj *,LISTENSPEC *) ;
+local int	proclistentmpdel(struct proginfo *,vecobj *,int) ;
+local int	proclistenfree(struct proginfo *,vecobj *) ;
 
-static int	setfname(struct proginfo *,char *,const char *,int,int,
-			const char *,const char *,const char *) ;
+local int	setfname(struct proginfo *,char *,cchar *,int,int,
+			cchar *,cchar *,cchar *) ;
 
 
 /* local variables */
 
-static const char	*schedpconf[] = {
+static cchar	*schedpconf[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -116,7 +116,7 @@ static const char	*schedpconf[] = {
 	NULL
 } ;
 
-static const char	*params[] = {
+static cchar	*params[] = {
 	"stampdir",
 	"logsize",
 	"reqfile",
@@ -170,14 +170,14 @@ enum params {
 
 int progconfiginit(pip,sched,configfname)
 struct proginfo	*pip ;
-const char	*sched[] ;
-const char	configfname[] ;
+cchar	*sched[] ;
+cchar	configfname[] ;
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
 	int	f_secreq ;
 
-	const char	**schedp ;
+	cchar	**schedp ;
 
 	char	tmpfname[MAXPATHLEN + 1] ;
 
@@ -364,7 +364,7 @@ struct proginfo	*pip ;
 
 	vecobj	tmplistens ;
 
-	const int	elen = EBUFLEN ;
+	cint	elen = EBUFLEN ;
 
 	int	rs = SR_OK ;
 	int	rs1 = 0 ;
@@ -377,7 +377,7 @@ struct proginfo	*pip ;
 	int	v ;
 	int	f ;
 
-	const char	*kp, *vp, *ep ;
+	cchar	*kp, *vp, *ep ;
 
 	char	tmpfname[MAXPATHLEN + 1] ;
 	char	pbuf[PBUFLEN + 1] ;
@@ -730,10 +730,10 @@ ret0:
 
 
 /* add a listener-specification to a temporary listen */
-static int proclistenadd(pip,tlp,ebuf,elen)
+local int proclistenadd(pip,tlp,ebuf,elen)
 struct proginfo	*pip ;
 vecobj		*tlp ;
-const char	ebuf[] ;
+cchar	ebuf[] ;
 int		elen ;
 {
 	LISTENSPEC	ls ;
@@ -780,7 +780,7 @@ ret0:
 /* end subroutine (proclistenadd) */
 
 
-static int proclistenmerge(pip,tlp)
+local int proclistenmerge(pip,tlp)
 struct proginfo	*pip ;
 vecobj		*tlp ;
 {
@@ -844,7 +844,7 @@ vecobj		*tlp ;
 /* end subroutine (proclistenmerge) */
 
 
-static int proclistenpresent(pip,tlp,lsp)
+local int proclistenpresent(pip,tlp,lsp)
 struct proginfo	*pip ;
 vecobj		*tlp ;
 LISTENSPEC	*lsp ;
@@ -868,7 +868,7 @@ LISTENSPEC	*lsp ;
 /* end subroutine (proclistenpresent) */
 
 
-static int proclistentmpdel(pip,tlp,ei)
+local int proclistentmpdel(pip,tlp,ei)
 struct proginfo	*pip ;
 vecobj		*tlp ;
 int		ei ;
@@ -890,7 +890,7 @@ int		ei ;
 /* end subroutine (proclistentmpdel) */
 
 
-static int proclistenfree(pip,tlp)
+local int proclistenfree(pip,tlp)
 struct proginfo	*pip ;
 vecobj		*tlp ;
 {
@@ -910,11 +910,11 @@ vecobj		*tlp ;
 
 
 /* calculate a file name */
-static int setfname(pip,fname,ebuf,el,f_def,dname,name,suf)
+local int setfname(pip,fname,ebuf,el,f_def,dname,name,suf)
 struct proginfo	*pip ;
 char		fname[] ;
-const char	ebuf[] ;
-const char	dname[], name[], suf[] ;
+cchar	ebuf[] ;
+cchar	dname[], name[], suf[] ;
 int		el ;
 int		f_def ;
 {
