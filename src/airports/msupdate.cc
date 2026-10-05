@@ -2,10 +2,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<msflag.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 
-static int msupdate(progifo *pip,LFM *lp) noex {
+local int msupdate(progifo *pip,LFM *lp) noex {
 	POLLFD		fds[2] = {} ;
 	MSFILE		ms ;
 	MSFILE_ENT	e, etmp ;
@@ -30,7 +31,7 @@ static int msupdate(progifo *pip,LFM *lp) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("b_msu/msupdate: runint=%s\n",
-	        timestr_elapsed((time_t) pip->runint,timebuf)) ;
+	        strtime_elapsed((time_t) pip->runint,timebuf)) ;
 #endif
 
 	nfds = 0 ;
@@ -274,12 +275,12 @@ static int msupdate(progifo *pip,LFM *lp) noex {
 
 	                logfile_printf(&pip->lh,
 	                    "%s mark> %s",
-	                    timestr_logz(pip->daytime,timebuf),
+	                    strtime_logz(pip->daytime,timebuf),
 	                    pip->nodename) ;
 
 	                logfile_printf(&pip->lh,
 	                    "remaining=%s",
-	                    timestr_elapsed(lw,timebuf)) ;
+	                    strtime_elapsed(lw,timebuf)) ;
 
 	                logfile_flush(&pip->lh) ;
 
@@ -338,9 +339,9 @@ static int msupdate(progifo *pip,LFM *lp) noex {
 	        debugprintf("b_msu/msupdate: white-out if_int=%u\n",
 	            if_int) ;
 	        debugprintf("b_msu/msupdate: start=%s\n",
-	            timestr_log(ti_start,timebuf)) ;
+	            strtime_log(ti_start,timebuf)) ;
 	        debugprintf("b_msu/msupdate: now=%s\n",
-	            timestr_log(pip->daytime,timebuf)) ;
+	            strtime_log(pip->daytime,timebuf)) ;
 	    }
 #endif
 
