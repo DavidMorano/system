@@ -55,7 +55,7 @@
 
 /* external subroutines */
 
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	checklink(struct proginfo *,char *,ustat *) ;
 
 
