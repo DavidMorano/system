@@ -45,7 +45,7 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
 
@@ -80,7 +80,7 @@ bfile		*ofp ;
 /* end subroutine (mo_start) */
 
 
-int mo_printf(MULTIOUT *mop,const char *fmt,...)
+int mo_printf(MULTIOUT *mop,cchar *fmt,...)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
