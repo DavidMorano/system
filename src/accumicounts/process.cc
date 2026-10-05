@@ -58,8 +58,8 @@
 
 /* external subroutines */
 
-extern int	nextfield(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
 
 
 /* external variables */
@@ -95,7 +95,7 @@ PARAMOPT	*pp ;
 	int	len ;
 	int	sl, cl ;
 
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 	char	linebuf[LINEBUFLEN + 1] ;
 
